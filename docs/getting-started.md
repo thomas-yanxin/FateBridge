@@ -146,6 +146,8 @@ curl -X POST http://localhost:8010/api/astro/chart \
 如果你不想走 HTTP，而是让 Agent 直接把 FateBridge 当作工具箱使用，可以启动 FastMCP：
 
 ```bash
+fatebridge-mcp
+# 或等价写法（未安装时）
 python -m fatebridge.mcp_server
 ```
 

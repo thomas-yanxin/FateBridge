@@ -5,7 +5,7 @@
 Fatebridge 的领域能力通过三条通道暴露出来：
 
 - REST：`python -m fatebridge.api`，默认监听 `:8010`，适合 Web、后端服务或脚本调用
-- FastMCP：`python -m fatebridge.mcp_server`，供 Claude / Cursor / Codex 等 MCP host 使用
+- FastMCP：`fatebridge-mcp`（等价写法：`python -m fatebridge.mcp_server`），供 Claude / Cursor / Codex 等 MCP host 使用
 - CLI：`fatebridge <tool> ...`，适合 Agentic 流程、shell 或自动化脚本
 
 三条通道的工具集合、参数 schema 和错误形状都来自同一个地方：`src/fatebridge/services/tool_catalog.py`。所以你在一处改动，三处同时生效。
@@ -215,10 +215,24 @@ console.log(data.wealth_analysis);
 启动：
 
 ```bash
+fatebridge-mcp
+# 或等价写法（未安装时）
 python -m fatebridge.mcp_server
 ```
 
 注册到 MCP host（以 Claude Code / Claude Desktop 为例）：
+
+```json
+{
+  "mcpServers": {
+    "fatebridge": {
+      "command": "fatebridge-mcp"
+    }
+  }
+}
+```
+
+如果 `fatebridge-mcp` 不在 PATH 里（虚拟环境未激活），用完整路径代替：
 
 ```json
 {
