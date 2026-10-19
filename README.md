@@ -38,6 +38,8 @@ FateBridge 将八字、紫微、中国占术、西方占星与风水规则组织
 
 从 PyPI 安装独立命令工具，当前版本为 **0.1.0**：
 
+本页描述当前开发分支。PyPI `0.1.0` 是已发布版本，尚未发布的变更见 [CHANGELOG](CHANGELOG.md#unreleased)；体验最新技能与接口范围时，请使用[源码安装](#参与贡献)。
+
 ```bash
 uv tool install fatebridge==0.1.0
 ```

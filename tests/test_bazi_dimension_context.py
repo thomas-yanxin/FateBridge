@@ -122,3 +122,86 @@ def test_explicit_pillars_override_auto_derivation():
         "wealth_analysis"
     ]["timing_context"]
     assert tc["overridden"]["dayun_pillar"] is True
+
+
+@pytest.mark.parametrize("hour_branch", ["寅", "亥", "子"])
+@pytest.mark.parametrize(
+    "hour_stem,expected_god,has_achievement",
+    [
+        ("甲", "比肩", False),
+        ("乙", "劫财", False),
+        ("丙", "食神", True),
+        ("丁", "伤官", True),
+        ("戊", "偏财", True),
+        ("己", "正财", True),
+        ("庚", "七杀", True),
+        ("辛", "正官", True),
+        ("壬", "偏印", True),
+        ("癸", "正印", True),
+    ],
+)
+def test_children_hour_gods_describe_parent_symbols_not_child_abilities(
+    hour_stem, expected_god, has_achievement, hour_branch
+):
+    """Every ten-god branch must retain facts without a child's own chart claims."""
+    import json
+
+    from fatebridge.analysis.children import ChildrenAnalysis
+    from fatebridge.core.output_bazi import ChildrenAnalysis as ChildrenOutput
+
+    pillars = {
+        "year": ("甲", "子"),
+        "month": ("丙", "寅"),
+        "day": ("甲", "午"),
+        "hour": (hour_stem, hour_branch),
+    }
+    result = ChildrenAnalysis.analyze_children(pillars, "女")
+    ChildrenOutput.model_validate(result)
+    palace = result["child_palace"]
+    relationship = result["relationship"]
+    assert palace["hour_pillar"] == hour_stem + hour_branch
+    assert palace["hour_ten_god"] == expected_god
+    assert relationship["hour_ten_god"] == expected_god
+    assert set(relationship) == {"hour_ten_god", "trait", "achievement"}
+    assert relationship["trait"] == palace["trait"]
+    assert "命主" in relationship["trait"] and "传统象意" in relationship["trait"]
+    assert isinstance(relationship["achievement"], list)
+    assert bool(relationship["achievement"]) is has_achievement
+    for interpretation in relationship["achievement"]:
+        assert "命主" in interpretation and "传统象意" in interpretation
+        assert "不推断孩子" in interpretation
+    assert "不推断孩子的性格、能力或成就" in result["interpretation_scope"]
+    text = json.dumps(result, ensure_ascii=False)
+    for claim in (
+        "子女聪慧",
+        "子女聪明",
+        "子女端正有出息",
+        "易有官贵之子",
+        "子女才华出众",
+        "学业文化有成",
+        "能成大事",
+        "得子女财力之助",
+        "亲子关系融洽",
+        "亲子关系较顺",
+        "聚少离多",
+    ):
+        assert claim not in text
+
+
+def test_children_symbol_wording_preserves_star_weights_and_affinity_score():
+    """A wording correction must not alter the underlying cultural classification."""
+    from fatebridge.analysis.children import ChildrenAnalysis
+
+    pillars = {
+        "year": ("甲", "子"),
+        "month": ("丙", "寅"),
+        "day": ("甲", "午"),
+        "hour": ("丙", "寅"),
+    }
+    result = ChildrenAnalysis.analyze_children(pillars, "女")
+    assert result["child_star"]["weight"] == 3.5
+    assert len(result["child_star"]["positions"]) == 5
+    assert result["affinity"]["score"] == 77
+    assert result["children_timing"] == {
+        "timing_signals": ["本轮未取得子女星／宫的时间关系，不据此判断生育时机"]
+    }

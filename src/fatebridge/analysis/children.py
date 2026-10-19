@@ -4,14 +4,14 @@
 基于八字命理的子女分析功能，综合以下经典技法：
 - 子女星：男命以官杀为子女，女命以食伤为子女（子平传统六亲法）
 - 子女宫：时柱为子女宫，看命主的子女传统对应
-- 盲派六亲法：时柱十神与吉凶定子女关系与成就
+- 时柱十神：解释命主视角的亲子传统象意
 - 神煞辅助：时柱逢生扶/冲克影响子女缘
 
 核心分析维度：
 1. 子女星定位（按性别取官杀/食伤）与强弱
 2. 子女宫（时柱）状态分析
 3. 子女传统对应的规则分类
-4. 与子女关系及子女成就倾向
+4. 命主视角的亲子传统象意
 5. 大运流年引动子女星与子女宫的传统关系
 
 说明：仅解释命主视角的传统对应，不推断生育能力、子女数量或孩子本人的能力。
@@ -30,18 +30,18 @@ from ..utils.data import (
     normalize_gender,
 )
 
-# 时柱十神对应子女特征与关系
+# 命主时柱十神的传统象意，不是孩子本人的性格或能力画像
 HOUR_TEN_GOD_CHILDREN = {
-    TenGod.COMPARE: "子女独立自主、个性强，与己如友",
-    TenGod.ROB_WEALTH: "子女好动竞争、花费较大，关系需多沟通",
-    TenGod.FOOD_GOD: "子女聪慧有才华、温和孝顺，晚年得享天伦",
-    TenGod.HURT_OFFICER: "子女聪明叛逆、才气外露，宜因势利导",
-    TenGod.POSITIVE_WEALTH: "子女务实顾家、能理财，关系稳定",
-    TenGod.PARTIAL_WEALTH: "子女活络善交际、闯荡能力强",
-    TenGod.POSITIVE_OFFICER: "子女端正有出息、守规矩，易有官贵之子",
-    TenGod.SEVEN_KILLER: "子女刚强有魄力、能成大事，幼时管教较费心",
-    TenGod.POSITIVE_SEAL: "子女好学有文化、孝顺顾家，重感情",
-    TenGod.PARTIAL_SEAL: "子女思维独特、有专才，性格偏内向",
+    TenGod.COMPARE: "命主子女宫比肩的传统象意涉及平等相处与自主边界。",
+    TenGod.ROB_WEALTH: "命主子女宫劫财的传统象意涉及竞争与资源分配。",
+    TenGod.FOOD_GOD: "命主子女宫食神的传统象意涉及表达、照料与日常互动。",
+    TenGod.HURT_OFFICER: "命主子女宫伤官的传统象意涉及表达与规范之间的张力。",
+    TenGod.POSITIVE_WEALTH: "命主子女宫正财的传统象意涉及资源安排与日常责任。",
+    TenGod.PARTIAL_WEALTH: "命主子女宫偏财的传统象意涉及资源流动与对外交往。",
+    TenGod.POSITIVE_OFFICER: "命主子女宫正官的传统象意涉及规范与责任。",
+    TenGod.SEVEN_KILLER: "命主子女宫七杀的传统象意涉及约束与压力。",
+    TenGod.POSITIVE_SEAL: "命主子女宫正印的传统象意涉及学习与支持。",
+    TenGod.PARTIAL_SEAL: "命主子女宫偏印的传统象意涉及不同学习方式与个人空间。",
 }
 
 
@@ -100,7 +100,7 @@ class ChildrenAnalysis:
         )
 
         return {
-            "interpretation_scope": "命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果。",
+            "interpretation_scope": "命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果，不推断孩子的性格、能力或成就。",
             "gender_basis": star_label,
             "child_star": child_star,
             "child_palace": palace,
@@ -134,11 +134,13 @@ class ChildrenAnalysis:
 
         weight = round(weight, 1)
         if weight == 0:
-            status = "子女星不显，子女缘分宜待大运流年引动，或缘分较淡需顺其自然"
+            status = (
+                "命主盘内子女星不显，仅为十神分布分类，不推断现实亲子关系或生育结果"
+            )
         elif weight >= 2.5:
-            status = "子女星旺，子女缘分较厚，但星过旺亦主操心多、关系密"
+            status = "命主盘内子女星权重较高，仅为十神分布分类"
         else:
-            status = "子女星适中，子女缘分平稳"
+            status = "命主盘内子女星权重适中，仅为十神分布分类"
 
         return {
             "star": star_label,
@@ -163,15 +165,15 @@ class ChildrenAnalysis:
                 continue
             if check_branch_conflict(hour_branch, branch):
                 relations.append(
-                    f"时支{hour_branch}与{p_name}支{branch}相冲，子女宫受动，主子女缘聚少离多或操心"
+                    f"时支{hour_branch}与{p_name}支{branch}相冲，仅记录命主盘内子女宫的相冲关系"
                 )
             elif check_branch_combination(hour_branch, branch):
                 relations.append(
-                    f"时支{hour_branch}与{p_name}支{branch}相合，子女宫得助，亲子关系融洽"
+                    f"时支{hour_branch}与{p_name}支{branch}相合，仅记录命主盘内子女宫的相合关系"
                 )
 
         if not relations:
-            relations.append("子女宫（时柱）无明显冲合，状态平稳")
+            relations.append("命主盘内子女宫（时柱）无明显冲合，不据此判断现实亲子关系")
 
         return {
             "hour_pillar": f"{hour_stem}{hour_branch}",
@@ -193,22 +195,22 @@ class ChildrenAnalysis:
         notes: List[str] = []
         if weight >= 2.5:
             score += 12
-            notes.append("子女星旺，得子女缘较厚")
+            notes.append("命主盘内子女星权重较高，计入传统规则分")
         elif weight == 0:
             score -= 12
             notes.append("子女星权重弱／不显，仅为命主盘内分类")
         if palace_disturbed:
             score -= 8
-            notes.append("子女宫受冲，与子女或聚少离多")
+            notes.append("命主盘内子女宫存在相冲，计入传统规则分")
         else:
             score += 5
-            notes.append("子女宫安稳，亲子关系较顺")
+            notes.append("命主盘内子女宫未见相冲，计入传统规则分")
 
         score = max(30, min(92, score))
         if score >= 78:
             tendency = "子女传统对应规则分较高"
         elif score >= 60:
-            tendency = "子女缘平稳"
+            tendency = "子女传统对应规则分居中"
         else:
             tendency = "子女传统对应规则分较低"
 
@@ -223,20 +225,28 @@ class ChildrenAnalysis:
         pillars: Dict[str, Tuple[str, str]],
         day_stem: str,
     ) -> Dict[str, Any]:
-        """与子女关系及子女成就倾向（以时柱十神为主）。"""
+        """命主时柱的传统象意；保留 achievement 字段供现有调用方读取。"""
         hour_stem = pillars["hour"][0]
         hour_god = get_ten_god(day_stem, hour_stem)
-        trait = HOUR_TEN_GOD_CHILDREN.get(hour_god, "子女特征需综合全局判断")
+        trait = HOUR_TEN_GOD_CHILDREN.get(hour_god, "命主子女宫的传统象意本轮未覆盖。")
 
         achievement: List[str] = []
         if hour_god in (TenGod.POSITIVE_OFFICER, TenGod.SEVEN_KILLER):
-            achievement.append("时柱官杀，子女多有上进心、社会成就可期")
+            achievement.append(
+                "命主时柱官杀的传统象意涉及规范与责任，不推断孩子的社会成就"
+            )
         elif hour_god in (TenGod.FOOD_GOD, TenGod.HURT_OFFICER):
-            achievement.append("时柱食伤，子女才华出众，宜文艺、技术、表达类发展")
+            achievement.append(
+                "命主时柱食伤的传统象意涉及表达与创造，不推断孩子的才能或适合的专业"
+            )
         elif hour_god in (TenGod.POSITIVE_SEAL, TenGod.PARTIAL_SEAL):
-            achievement.append("时柱印星，子女好学顾家，学业文化有成")
+            achievement.append(
+                "命主时柱印星的传统象意涉及学习与支持，不推断孩子的学业表现"
+            )
         elif hour_god in (TenGod.POSITIVE_WEALTH, TenGod.PARTIAL_WEALTH):
-            achievement.append("时柱财星，子女务实善理财，晚年得子女财力之助")
+            achievement.append(
+                "命主时柱财星的传统象意涉及资源安排，不推断孩子的理财能力或未来赡养情况"
+            )
 
         return {
             "hour_ten_god": hour_god.value,

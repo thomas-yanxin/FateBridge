@@ -3,18 +3,18 @@
   "children_analysis": {
     "affinity": {
       "notes": [
-        "子女宫安稳，亲子关系较顺"
+        "命主盘内子女宫未见相冲，计入传统规则分"
       ],
       "score": 65,
-      "tendency": "子女缘平稳"
+      "tendency": "子女传统对应规则分居中"
     },
     "child_palace": {
       "hour_pillar": "辛巳",
       "hour_ten_god": "劫财",
       "palace_relations": [
-        "子女宫（时柱）无明显冲合，状态平稳"
+        "命主盘内子女宫（时柱）无明显冲合，不据此判断现实亲子关系"
       ],
-      "trait": "子女好动竞争、花费较大，关系需多沟通"
+      "trait": "命主子女宫劫财的传统象意涉及竞争与资源分配。"
     },
     "child_star": {
       "positions": [
@@ -38,7 +38,7 @@
         }
       ],
       "star": "官杀（男命子女星）",
-      "status": "子女星适中，子女缘分平稳",
+      "status": "命主盘内子女星权重适中，仅为十神分布分类",
       "weight": 1.5
     },
     "children_timing": {
@@ -47,11 +47,11 @@
       ]
     },
     "gender_basis": "官杀（男命子女星）",
-    "interpretation_scope": "命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果。",
+    "interpretation_scope": "命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果，不推断孩子的性格、能力或成就。",
     "relationship": {
       "achievement": [],
       "hour_ten_god": "劫财",
-      "trait": "子女好动竞争、花费较大，关系需多沟通"
+      "trait": "命主子女宫劫财的传统象意涉及竞争与资源分配。"
     },
     "timing_context": {
       "dayun_pillar": "壬戌",
@@ -69,7 +69,7 @@
     "tool_name": "bazi_children"
   },
   "snapshot_export": {
-    "export_text": "[概要]\n类型：八字子女分析\ninterpretation_scope：命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果。\ngender_basis：官杀（男命子女星）\n\n[child_star]\nstar：官杀（男命子女星）\n落点：\n  - pillar=year，location=地支藏干，char=丁，ten_god=正官\n  - pillar=month，location=地支藏干，char=丙，ten_god=七杀\n  - pillar=hour，location=地支藏干，char=丙，ten_god=七杀\nweight：1.5\nstatus：子女星适中，子女缘分平稳\n\n[child_palace]\nhour_pillar：辛巳\nhour_ten_god：劫财\npalace_relations：\n  - 子女宫（时柱）无明显冲合，状态平稳\ntrait：子女好动竞争、花费较大，关系需多沟通\n\n[affinity]\n评分：65\ntendency：子女缘平稳\n说明：\n  - 子女宫安稳，亲子关系较顺\n\n[relationship]\nhour_ten_god：劫财\ntrait：子女好动竞争、花费较大，关系需多沟通\n\n[children_timing]\ntiming_signals：\n  - 流年丁卯引动子女星，仅为传统对应关系变化\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是",
+    "export_text": "[概要]\n类型：八字子女分析\ninterpretation_scope：命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果，不推断孩子的性格、能力或成就。\ngender_basis：官杀（男命子女星）\n\n[child_star]\nstar：官杀（男命子女星）\n落点：\n  - pillar=year，location=地支藏干，char=丁，ten_god=正官\n  - pillar=month，location=地支藏干，char=丙，ten_god=七杀\n  - pillar=hour，location=地支藏干，char=丙，ten_god=七杀\nweight：1.5\nstatus：命主盘内子女星权重适中，仅为十神分布分类\n\n[child_palace]\nhour_pillar：辛巳\nhour_ten_god：劫财\npalace_relations：\n  - 命主盘内子女宫（时柱）无明显冲合，不据此判断现实亲子关系\ntrait：命主子女宫劫财的传统象意涉及竞争与资源分配。\n\n[affinity]\n评分：65\ntendency：子女传统对应规则分居中\n说明：\n  - 命主盘内子女宫未见相冲，计入传统规则分\n\n[relationship]\nhour_ten_god：劫财\ntrait：命主子女宫劫财的传统象意涉及竞争与资源分配。\n\n[children_timing]\ntiming_signals：\n  - 流年丁卯引动子女星，仅为传统对应关系变化\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是",
     "missing_selected_sections": [
       "起盘信息"
     ],
@@ -84,35 +84,35 @@
     ],
     "sections": [
       {
-        "content": "[概要]\n类型：八字子女分析\ninterpretation_scope：命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果。\ngender_basis：官杀（男命子女星）",
+        "content": "[概要]\n类型：八字子女分析\ninterpretation_scope：命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果，不推断孩子的性格、能力或成就。\ngender_basis：官杀（男命子女星）",
         "included": false,
         "index": 1,
         "raw_title": "概要",
         "title": "概要"
       },
       {
-        "content": "[child_star]\nstar：官杀（男命子女星）\n落点：\n  - pillar=year，location=地支藏干，char=丁，ten_god=正官\n  - pillar=month，location=地支藏干，char=丙，ten_god=七杀\n  - pillar=hour，location=地支藏干，char=丙，ten_god=七杀\nweight：1.5\nstatus：子女星适中，子女缘分平稳",
+        "content": "[child_star]\nstar：官杀（男命子女星）\n落点：\n  - pillar=year，location=地支藏干，char=丁，ten_god=正官\n  - pillar=month，location=地支藏干，char=丙，ten_god=七杀\n  - pillar=hour，location=地支藏干，char=丙，ten_god=七杀\nweight：1.5\nstatus：命主盘内子女星权重适中，仅为十神分布分类",
         "included": false,
         "index": 2,
         "raw_title": "child_star",
         "title": "child_star"
       },
       {
-        "content": "[child_palace]\nhour_pillar：辛巳\nhour_ten_god：劫财\npalace_relations：\n  - 子女宫（时柱）无明显冲合，状态平稳\ntrait：子女好动竞争、花费较大，关系需多沟通",
+        "content": "[child_palace]\nhour_pillar：辛巳\nhour_ten_god：劫财\npalace_relations：\n  - 命主盘内子女宫（时柱）无明显冲合，不据此判断现实亲子关系\ntrait：命主子女宫劫财的传统象意涉及竞争与资源分配。",
         "included": false,
         "index": 3,
         "raw_title": "child_palace",
         "title": "child_palace"
       },
       {
-        "content": "[affinity]\n评分：65\ntendency：子女缘平稳\n说明：\n  - 子女宫安稳，亲子关系较顺",
+        "content": "[affinity]\n评分：65\ntendency：子女传统对应规则分居中\n说明：\n  - 命主盘内子女宫未见相冲，计入传统规则分",
         "included": false,
         "index": 4,
         "raw_title": "affinity",
         "title": "affinity"
       },
       {
-        "content": "[relationship]\nhour_ten_god：劫财\ntrait：子女好动竞争、花费较大，关系需多沟通",
+        "content": "[relationship]\nhour_ten_god：劫财\ntrait：命主子女宫劫财的传统象意涉及竞争与资源分配。",
         "included": false,
         "index": 5,
         "raw_title": "relationship",
@@ -178,5 +178,5 @@
       "当前大运流年"
     ]
   },
-  "snapshot_text": "[概要]\n类型：八字子女分析\ninterpretation_scope：命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果。\ngender_basis：官杀（男命子女星）\n\n[child_star]\nstar：官杀（男命子女星）\n落点：\n  - pillar=year，location=地支藏干，char=丁，ten_god=正官\n  - pillar=month，location=地支藏干，char=丙，ten_god=七杀\n  - pillar=hour，location=地支藏干，char=丙，ten_god=七杀\nweight：1.5\nstatus：子女星适中，子女缘分平稳\n\n[child_palace]\nhour_pillar：辛巳\nhour_ten_god：劫财\npalace_relations：\n  - 子女宫（时柱）无明显冲合，状态平稳\ntrait：子女好动竞争、花费较大，关系需多沟通\n\n[affinity]\n评分：65\ntendency：子女缘平稳\n说明：\n  - 子女宫安稳，亲子关系较顺\n\n[relationship]\nhour_ten_god：劫财\ntrait：子女好动竞争、花费较大，关系需多沟通\n\n[children_timing]\ntiming_signals：\n  - 流年丁卯引动子女星，仅为传统对应关系变化\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是"
+  "snapshot_text": "[概要]\n类型：八字子女分析\ninterpretation_scope：命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果，不推断孩子的性格、能力或成就。\ngender_basis：官杀（男命子女星）\n\n[child_star]\nstar：官杀（男命子女星）\n落点：\n  - pillar=year，location=地支藏干，char=丁，ten_god=正官\n  - pillar=month，location=地支藏干，char=丙，ten_god=七杀\n  - pillar=hour，location=地支藏干，char=丙，ten_god=七杀\nweight：1.5\nstatus：命主盘内子女星权重适中，仅为十神分布分类\n\n[child_palace]\nhour_pillar：辛巳\nhour_ten_god：劫财\npalace_relations：\n  - 命主盘内子女宫（时柱）无明显冲合，不据此判断现实亲子关系\ntrait：命主子女宫劫财的传统象意涉及竞争与资源分配。\n\n[affinity]\n评分：65\ntendency：子女传统对应规则分居中\n说明：\n  - 命主盘内子女宫未见相冲，计入传统规则分\n\n[relationship]\nhour_ten_god：劫财\ntrait：命主子女宫劫财的传统象意涉及竞争与资源分配。\n\n[children_timing]\ntiming_signals：\n  - 流年丁卯引动子女星，仅为传统对应关系变化\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是"
 }
