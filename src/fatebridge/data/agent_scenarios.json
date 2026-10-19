@@ -1,51 +1,86 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "sources_sha256": {
-    "docs/scenario-routing.md": "59e1a328fefdfb81c2b8bc7f6b9930e63fe20d0f07d3361c62952e2e0cb1a0c6",
-    "skills/onda-fengshui/agents/interface.yaml": "72b142ef5646bb84f71d8fe67e98be71cd94380e2bd0f4fb37b2170752ae83d9",
-    "skills/onda-jiankang/agents/interface.yaml": "ab2f0dbab76ffde70c7e93bdff768471eb1dc73acd6c208e08ef09c0e0d4a747",
-    "skills/onda-mingge/agents/interface.yaml": "42ec81eb91482588ff69843e8573bf758494e8c75e662f47503e24c015104aa5",
-    "skills/onda-shiye/agents/interface.yaml": "3e317b33be6281651fd1bda4b3a3276bf243fdf40c07513126f59733e6b230d4",
-    "skills/onda-shiyun/agents/interface.yaml": "353c4ad9e97bf310c1bc8bda83c9352f6f39d477fb3f79bdbf1a9f98fd14c4ea",
-    "skills/onda-xingpan/agents/interface.yaml": "74268d79871cde6b1b6181b7c5df5383ce9a735308b5afdedc78d3f7ab7e9055",
-    "skills/onda-yuanfen/agents/interface.yaml": "8bea033a40552b0856d556697d3e4ab5b3cadea066c983cd47e015b7bf07dd45",
-    "skills/onda-zhanbu/agents/interface.yaml": "687c60b4647f34c678a3fd42fe39b698d6435bb12020676d18785417ca87fe71",
-    "skills/onda-zige/agents/interface.yaml": "18c2da8b8f945f3704b40814145de2e100321d74c605571e5c93bd2ac1d95d05"
+    "docs/scenario-routing.md": "541c26d2318788cecd783803ba173527f34fc4fa715e8c1304a5c3bdf82f67f0",
+    "skills/_shared/bazi-topic-evidence.md": "5f3f18fc833e3f57ed750d7fbe249cdd5146120fe024f710b68ed36107fd31a0",
+    "skills/_shared/consultation-delivery.md": "4a6f723231a6bf4d2f2ab61310e283e3bde7de9494de6731f929d73aeb73e4cc",
+    "skills/_shared/consultation-routing.md": "f9226c03f9607a0b003bb236cacb83a7b97b59158e26975fb392fede992ad984",
+    "skills/_shared/fatebridge-engine.md": "90ab1537234ed3d05332553bf4a6d1fa85fbe1fd9ada23da7aca75ebb1552f9d",
+    "skills/_shared/onda-counsel.md": "4fd8a4bae39f84e3d8d7fefbe43caf940cafd114ac95df653c3ae13b5d696c2c",
+    "skills/_shared/safety-boundaries.md": "5b0fffdc53369e684825515117b21cd5e1e9380459f4a12e89f856b5447a9cf3",
+    "skills/_shared/timing-selection.md": "9351f8874c067d72a2ccc3a52c3bcac4bf71ead55dabbd61ead206cc799ff357",
+    "skills/_shared/western-deep-evidence.md": "a9dd11be3b24c4fcd8a6de919d5afa3b746a93b1c3881bfa7ea51a9e319f68cb",
+    "skills/_shared/western-topic-evidence.md": "d4c9c29428efd852c7f15e1d499cdd7eb0f9c8f6f1945697f7f44c1f49fb015b",
+    "skills/_shared/ziwei-topic-evidence.md": "6d4a104e147cd76bc7fd59ccd48f6ef953838a7062b2e44f373c321f0d99df0c",
+    "skills/onda-caiwu/agents/interface.yaml": "2a6fb484f9e2394ae4645640547f42736b525891bedbb37651600485f797c539",
+    "skills/onda-fengshui/agents/interface.yaml": "0e4c1d9ef174ea1814b25b695404d6cecfe1bb2b4cfb05a23a80cfd0b1aed2bf",
+    "skills/onda-jiankang/agents/interface.yaml": "5d680f3a90ec20bc7071a894fe86a6c357bc662189d5d9d6390985feb283edb2",
+    "skills/onda-jiating/agents/interface.yaml": "d626f0c10535db49302a49b9669638f4cd72cc7b13fcadbd877c21765af53987",
+    "skills/onda-mingge/agents/interface.yaml": "77bbfae2293634ef0dd303919e1b5c9f307afee6664d9ade217645e8f195a260",
+    "skills/onda-renji/agents/interface.yaml": "1f333ac9fac1352b58ebefe255709905685339fc6e99ddc211856dc634df7aad",
+    "skills/onda-shiye/agents/interface.yaml": "4ba53103ca3845ed8ee659a8dc870249c367b69ae3dc58b3204fabbe5196e6c7",
+    "skills/onda-shiyun/agents/interface.yaml": "42307ba9f4e1aa0b69746c41fb6b534f61cc7c3f89ce3f900245d6da877369f6",
+    "skills/onda-xingpan/agents/interface.yaml": "21868faf3a5698e461e6c93fb4a0bbe10a23b2bd799a9121f93240e6542109b5",
+    "skills/onda-xueye/agents/interface.yaml": "7b51416d5804ae76f8b1744284a155ddcd155d93ef5f6e9fcd27767c95fe8b4f",
+    "skills/onda-yuanfen/agents/interface.yaml": "1dcb8af7838c66a86340463879d1473e7565a0a970e4d3d7b5977d89c1ade460",
+    "skills/onda-zhanbu/agents/interface.yaml": "abef443c3ccfaf45966cae4f215c1b49a7553db7f5ce3085c4c3f383ec1e943e",
+    "skills/onda-zige/agents/interface.yaml": "e635de961a59d0353fa1cb564dbb7de981b932415b61a87ea6256b163b997af1"
+  },
+  "consultation_policy": {
+    "id": "consultation_boundaries_v1",
+    "routing": "topic_task_time_scope",
+    "scope": "current_question",
+    "integration": "additional_relevant_evidence_not_tool_quota",
+    "follow_up": "retain_topic_and_reuse_unchanged_results",
+    "boundaries": "skills/_shared/safety-boundaries.md",
+    "time_selection": "skills/_shared/timing-selection.md"
   },
   "scenarios": [
     {
-      "id": "onda-fengshui",
-      "name": "风水 · 空间布局",
-      "version": "0.6.0",
-      "summary": "逐对象解释空间事实与风水依据，对照现状和候选方案，说明可保留、可调整及未覆盖之处",
+      "id": "onda-caiwu",
+      "name": "财务与资源",
+      "version": "0.2.0",
+      "summary": "围绕收入、消费、积累与共同资金，对照相关传统依据和时段，核对现实财务条件",
+      "consultation": {
+        "kind": "topic",
+        "topics": [
+          "finance"
+        ],
+        "scope": "current_question",
+        "time_selection": "shared",
+        "safety_policy": "consultation_boundaries_v1"
+      },
       "triggers": [
-        "风水布局",
-        "住宅风水",
-        "办公室风水",
-        "工位风水",
-        "桌面物件风水摆法",
-        "命卦方位",
-        "宅向",
-        "九宫年星",
-        "玄空宅盘",
-        "室内形态",
-        "多方案布局比较",
-        "家具搬转限制",
-        "合租局部风水",
-        "多层住宅与院落",
-        "家庭人物宫位对应",
-        "家庭卦象与对宫说明",
-        "厨卫与镜面关系风水",
-        "尖角与材质器形风水"
+        "财运",
+        "收入",
+        "消费",
+        "积累",
+        "回款",
+        "共同资金"
       ],
       "engine_tools": [
-        "fengshui_assess",
-        "fengshui_minggua",
-        "fengshui_bazhai",
-        "fengshui_directions",
-        "fengshui_jinsuo",
-        "fengshui_annual_stars",
-        "fengshui_xuankong_natal"
+        "astro_chart",
+        "bazi_wealth",
+        "firdaria",
+        "timing_analysis",
+        "western_timing_analysis",
+        "ziwei_birth",
+        "ziwei_horoscope"
+      ],
+      "dependencies": [
+        {
+          "kind": "shared_support",
+          "tools": [
+            "knowledge_registry",
+            "knowledge_read"
+          ],
+          "condition": "需要查证内置传统知识或来源时；不自动新增个人计算"
+        },
+        {
+          "kind": "conditional_service",
+          "scenario": "onda-shiyun",
+          "condition": "本轮询问阶段、年度、短期或指定时间技法时；只补未覆盖层，先遵守硬边界"
+        }
       ],
       "required_inputs": [],
       "output": {
@@ -53,7 +88,122 @@
         "grounding": "engine_fields",
         "voice": "onda-counsel"
       },
-      "boundary": "选定传统及作者规则的文化参考；先解释已有依据和条件式建议，执行确认不阻塞普通解释；只追问影响当前结论的资料，未覆盖直接说明，不承诺财富、事业或健康结果。",
+      "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
+      "license": "Apache-2.0",
+      "routing": [
+        {
+          "intent": "收入／支出／积累方式",
+          "evidence": [
+            {
+              "role": "primary",
+              "alternatives": [
+                "bazi_wealth"
+              ],
+              "condition": ""
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "ziwei_birth"
+              ],
+              "condition": "相关宫位"
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "astro_chart"
+              ],
+              "condition": "相关配置"
+            }
+          ]
+        },
+        {
+          "intent": "今年／未来几年财务",
+          "evidence": [
+            {
+              "role": "primary",
+              "alternatives": [
+                "bazi_wealth"
+              ],
+              "condition": "已有时机复用"
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "ziwei_birth"
+              ],
+              "condition": ""
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "astro_chart"
+              ],
+              "condition": ""
+            },
+            {
+              "role": "primary",
+              "alternatives": [
+                "timing_analysis",
+                "ziwei_horoscope",
+                "western_timing_analysis",
+                "firdaria"
+              ],
+              "condition": "按阶段和目标范围选择"
+            }
+          ]
+        }
+      ],
+      "source": "skills/onda-caiwu/agents/interface.yaml"
+    },
+    {
+      "id": "onda-fengshui",
+      "name": "居住与工作空间",
+      "version": "0.6.0",
+      "summary": "按空间事实和有来源的规则解释现状与候选，说明可保留、条件式与未覆盖部分",
+      "consultation": {
+        "kind": "topic",
+        "topics": [
+          "space"
+        ],
+        "scope": "current_question",
+        "time_selection": "shared",
+        "safety_policy": "consultation_boundaries_v1"
+      },
+      "triggers": [
+        "风水",
+        "工位",
+        "宅向",
+        "命卦",
+        "空间布局",
+        "桌面风水"
+      ],
+      "engine_tools": [
+        "fengshui_annual_stars",
+        "fengshui_assess",
+        "fengshui_bazhai",
+        "fengshui_directions",
+        "fengshui_jinsuo",
+        "fengshui_minggua",
+        "fengshui_xuankong_natal"
+      ],
+      "dependencies": [
+        {
+          "kind": "shared_support",
+          "tools": [
+            "knowledge_registry",
+            "knowledge_read"
+          ],
+          "condition": "需要查证内置传统知识或来源时；不自动新增个人计算"
+        }
+      ],
+      "required_inputs": [],
+      "output": {
+        "kind": "interpretation",
+        "grounding": "engine_fields",
+        "voice": "onda-counsel"
+      },
+      "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
       "routing": [
         {
@@ -193,23 +343,37 @@
     },
     {
       "id": "onda-jiankang",
-      "name": "健康 · 身心",
+      "name": "传统身心文化参考",
       "version": "0.2.0",
-      "summary": "看懂五行权重及传统藏象对应，分开文化解释与生活观察，有实际不适先回应现实需要",
+      "summary": "解释实际五行权重与传统对应，区分文化观点和健康信息，保持非诊断非治疗边界",
+      "consultation": {
+        "kind": "topic",
+        "topics": [
+          "health_culture"
+        ],
+        "scope": "current_question",
+        "time_selection": "shared",
+        "safety_policy": "consultation_boundaries_v1"
+      },
       "triggers": [
-        "健康运",
-        "传统健康标签是什么意思",
-        "五行养生",
-        "今年传统健康文化参考",
-        "看懂健康文化中的五行对应",
-        "五行养护文化"
+        "传统健康文化",
+        "五行健康标签",
+        "中医文化"
       ],
       "engine_tools": [
         "analyze_destiny",
         "bazi_health",
-        "liunian_analysis",
-        "liuyue_analysis",
         "timing_analysis"
+      ],
+      "dependencies": [
+        {
+          "kind": "shared_support",
+          "tools": [
+            "knowledge_registry",
+            "knowledge_read"
+          ],
+          "condition": "需要查证内置传统知识或来源时；不自动新增个人计算"
+        }
       ],
       "required_inputs": [],
       "output": {
@@ -217,89 +381,44 @@
         "grounding": "engine_fields",
         "voice": "onda-counsel"
       },
-      "boundary": "传统术数与占星的文化参考视角，不是决定论，不替代医疗、心理、法律、财务等专业意见。",
+      "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
       "routing": [
         {
-          "intent": "传统健康标签是什么意思",
+          "intent": "五行标签／传统对应",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
                 "bazi_health"
               ],
-              "condition": ""
+              "condition": "非体质诊断"
             },
             {
               "role": "supporting",
               "alternatives": [
                 "analyze_destiny"
               ],
-              "condition": ""
+              "condition": "仅未覆盖背景"
             }
           ]
         },
         {
-          "intent": "今年健康要注意什么",
+          "intent": "文化关系的阶段变化",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
                 "bazi_health"
               ],
-              "condition": ""
+              "condition": "已有时机复用"
             },
             {
               "role": "supporting",
               "alternatives": [
                 "timing_analysis"
               ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "liunian_analysis"
-              ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "传统健康文化中的作息参考",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "bazi_health"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "analyze_destiny"
-              ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "五行养生调理方向",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "bazi_health"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "analyze_destiny"
-              ],
-              "condition": ""
+              "condition": "未覆盖的传统时间层"
             }
           ]
         }
@@ -307,306 +426,287 @@
       "source": "skills/onda-jiankang/agents/interface.yaml"
     },
     {
-      "id": "onda-mingge",
-      "name": "认识自己 · 性格天赋",
+      "id": "onda-jiating",
+      "name": "家庭与亲子",
       "version": "0.2.0",
-      "summary": "聚焦性格、天赋、学业、亲子或六亲的一项问题，用真实经历核对传统特点并给一项小尝试",
+      "summary": "区分命主家庭对应、家人本人和亲子互动，解释相关依据，联系真实责任与安排",
+      "consultation": {
+        "kind": "topic",
+        "topics": [
+          "family"
+        ],
+        "scope": "current_question",
+        "time_selection": "shared",
+        "safety_policy": "consultation_boundaries_v1"
+      },
       "triggers": [
-        "我是个什么样的人",
-        "我的性格",
-        "天赋适合什么",
-        "学业",
-        "考试运",
-        "孩子的命",
-        "跟父母",
-        "兄弟的关系",
         "原生家庭",
-        "我适合走什么路",
-        "紫微命盘"
+        "六亲",
+        "家庭责任",
+        "亲子",
+        "子女缘"
       ],
       "engine_tools": [
         "analyze_destiny",
         "astro_chart",
-        "bazi_birth",
+        "astro_relative_chart",
         "bazi_children",
-        "bazi_education",
         "bazi_personality",
         "bazi_relatives",
-        "canping",
-        "heluo",
+        "firdaria",
+        "timing_analysis",
+        "two_person_compatibility",
+        "western_timing_analysis",
         "ziwei_birth",
-        "ziwei_rules"
+        "ziwei_horoscope"
       ],
-      "required_inputs": [
-        "birth_year",
-        "birth_month",
-        "birth_day",
-        "birth_hour",
-        "gender",
-        "birth_place"
+      "dependencies": [
+        {
+          "kind": "shared_support",
+          "tools": [
+            "knowledge_registry",
+            "knowledge_read"
+          ],
+          "condition": "需要查证内置传统知识或来源时；不自动新增个人计算"
+        },
+        {
+          "kind": "conditional_service",
+          "scenario": "onda-shiyun",
+          "condition": "本轮询问阶段、年度、短期或指定时间技法时；只补未覆盖层，先遵守硬边界"
+        }
       ],
+      "required_inputs": [],
       "output": {
         "kind": "interpretation",
         "grounding": "engine_fields",
         "voice": "onda-counsel"
       },
-      "boundary": "传统术数与占星的文化参考视角，不是决定论，不替代医疗、心理、法律、财务等专业意见。",
+      "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
       "routing": [
         {
-          "intent": "我是个什么样的人",
+          "intent": "命主六亲／子女对应",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
-                "analyze_destiny"
-              ],
-              "condition": "八字默认"
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "bazi_personality"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "primary",
-              "alternatives": [
-                "ziwei_birth"
-              ],
-              "condition": "用户选择紫微"
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "astro_chart"
-              ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "我的天赋适合什么",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "analyze_destiny"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "bazi_personality"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "ziwei_birth"
-              ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "学业考试运",
-          "evidence": [
-            {
-              "role": "supporting",
-              "alternatives": [
-                "analyze_destiny"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "primary",
-              "alternatives": [
-                "bazi_education"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "ziwei_birth"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "ziwei_rules"
-              ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "跟父母兄弟关系 · 原生家庭",
-          "evidence": [
-            {
-              "role": "supporting",
-              "alternatives": [
-                "analyze_destiny"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "primary",
-              "alternatives": [
-                "bazi_relatives"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "ziwei_birth"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "ziwei_rules"
-              ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "命主的子女宫／子女缘",
-          "evidence": [
-            {
-              "role": "supporting",
-              "alternatives": [
-                "analyze_destiny"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "primary",
-              "alternatives": [
+                "bazi_relatives",
                 "bazi_children"
               ],
-              "condition": ""
+              "condition": "命主资料"
             },
             {
               "role": "supporting",
               "alternatives": [
-                "ziwei_birth"
+                "ziwei_birth",
+                "astro_chart"
               ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "ziwei_rules"
-              ],
-              "condition": ""
+              "condition": "命主结构"
             }
           ]
         },
         {
-          "intent": "孩子本人的性格",
+          "intent": "孩子／家人本人特点",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
-                "analyze_destiny"
-              ],
-              "condition": "使用孩子资料"
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
+                "analyze_destiny",
                 "bazi_personality"
               ],
-              "condition": ""
+              "condition": "该人资料"
             },
             {
               "role": "supporting",
               "alternatives": [
-                "ziwei_birth"
+                "ziwei_birth",
+                "astro_chart"
               ],
-              "condition": ""
+              "condition": "该人资料"
             }
           ]
         },
         {
-          "intent": "孩子本人的学习",
+          "intent": "亲子／家人双方互动",
           "evidence": [
-            {
-              "role": "supporting",
-              "alternatives": [
-                "analyze_destiny"
-              ],
-              "condition": ""
-            },
             {
               "role": "primary",
               "alternatives": [
-                "bazi_education"
+                "two_person_compatibility",
+                "astro_relative_chart"
               ],
-              "condition": "使用孩子资料"
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "ziwei_birth"
-              ],
-              "condition": ""
+              "condition": "双方资料与实际关系"
             }
           ]
         },
         {
-          "intent": "想要一份完整命盘",
+          "intent": "家庭阶段与责任",
+          "evidence": [
+            {
+              "role": "supporting",
+              "alternatives": [
+                "bazi_relatives",
+                "bazi_children"
+              ],
+              "condition": "已有结构"
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "ziwei_birth",
+                "astro_chart"
+              ],
+              "condition": ""
+            },
+            {
+              "role": "primary",
+              "alternatives": [
+                "timing_analysis",
+                "ziwei_horoscope",
+                "western_timing_analysis",
+                "firdaria"
+              ],
+              "condition": "只限问题所需时段"
+            }
+          ]
+        }
+      ],
+      "source": "skills/onda-jiating/agents/interface.yaml"
+    },
+    {
+      "id": "onda-mingge",
+      "name": "认识自己与个人发展",
+      "version": "0.2.0",
+      "summary": "解释性格与做事方式的实际区别，按所问范围对照相关体系，给可核对的参考",
+      "consultation": {
+        "kind": "topic",
+        "topics": [
+          "self"
+        ],
+        "scope": "current_question",
+        "time_selection": "shared",
+        "safety_policy": "consultation_boundaries_v1"
+      },
+      "triggers": [
+        "性格",
+        "天赋",
+        "做事方式",
+        "优势与限制"
+      ],
+      "engine_tools": [
+        "analyze_destiny",
+        "astro_chart",
+        "bazi_birth",
+        "bazi_personality",
+        "canping",
+        "firdaria",
+        "heluo",
+        "timing_analysis",
+        "western_timing_analysis",
+        "ziwei_birth",
+        "ziwei_horoscope",
+        "ziwei_rules"
+      ],
+      "dependencies": [
+        {
+          "kind": "shared_support",
+          "tools": [
+            "knowledge_registry",
+            "knowledge_read"
+          ],
+          "condition": "需要查证内置传统知识或来源时；不自动新增个人计算"
+        },
+        {
+          "kind": "conditional_service",
+          "scenario": "onda-shiyun",
+          "condition": "本轮询问阶段、年度、短期或指定时间技法时；只补未覆盖层，先遵守硬边界"
+        }
+      ],
+      "required_inputs": [],
+      "output": {
+        "kind": "interpretation",
+        "grounding": "engine_fields",
+        "voice": "onda-counsel"
+      },
+      "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
+      "license": "Apache-2.0",
+      "routing": [
+        {
+          "intent": "特点／天赋综合",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
-                "bazi_birth"
+                "analyze_destiny",
+                "bazi_personality"
               ],
-              "condition": ""
+              "condition": "结构与专项按需"
             },
             {
-              "role": "primary",
+              "role": "supporting",
               "alternatives": [
                 "ziwei_birth"
               ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "ziwei_rules"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "canping"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "heluo"
-              ],
-              "condition": ""
+              "condition": "相关宫位"
             },
             {
               "role": "supporting",
               "alternatives": [
                 "astro_chart"
               ],
-              "condition": ""
+              "condition": "相关配置"
+            }
+          ]
+        },
+        {
+          "intent": "阶段中的自我变化",
+          "evidence": [
+            {
+              "role": "supporting",
+              "alternatives": [
+                "analyze_destiny",
+                "bazi_personality"
+              ],
+              "condition": "已有结构"
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "ziwei_birth"
+              ],
+              "condition": "已有结构"
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "astro_chart"
+              ],
+              "condition": "已有结构"
+            },
+            {
+              "role": "primary",
+              "alternatives": [
+                "timing_analysis",
+                "ziwei_horoscope",
+                "western_timing_analysis",
+                "firdaria"
+              ],
+              "condition": "按时间任务选层"
+            }
+          ]
+        },
+        {
+          "intent": "指定原始盘／数算",
+          "evidence": [
+            {
+              "role": "primary",
+              "alternatives": [
+                "bazi_birth",
+                "ziwei_rules",
+                "canping",
+                "heluo"
+              ],
+              "condition": "按用户方法选择"
             }
           ]
         }
@@ -614,249 +714,276 @@
       "source": "skills/onda-mingge/agents/interface.yaml"
     },
     {
-      "id": "onda-shiye",
-      "name": "事业 · 财运",
+      "id": "onda-renji",
+      "name": "人际与合作",
       "version": "0.2.0",
-      "summary": "依据事业结构、创业倾向、财星与时机，说明工作方式或方案条件，给一项现实验证动作",
+      "summary": "区分个人交往方式和双人合作，解释分工、支持与磨合，不用分数认定现实信用",
+      "consultation": {
+        "kind": "topic",
+        "topics": [
+          "social"
+        ],
+        "scope": "current_question",
+        "time_selection": "shared",
+        "safety_policy": "consultation_boundaries_v1"
+      },
       "triggers": [
-        "事业运",
-        "财运",
-        "工作",
-        "跳槽",
-        "要不要创业",
-        "合伙靠不靠谱",
-        "今年财运",
-        "求职方向",
-        "升职",
-        "生意",
-        "偏财正财",
-        "破财"
+        "朋友",
+        "同事",
+        "团队",
+        "合伙",
+        "人际",
+        "贵人"
       ],
       "engine_tools": [
         "analyze_destiny",
-        "bazi_career",
-        "bazi_wealth",
-        "dayun_analysis",
-        "liunian_analysis",
+        "astro_chart",
+        "astro_relative_chart",
+        "firdaria",
+        "sukuyo_compatibility",
         "timing_analysis",
-        "two_person_compatibility"
+        "two_person_compatibility",
+        "western_timing_analysis",
+        "ziwei_birth",
+        "ziwei_horoscope"
       ],
-      "required_inputs": [
-        "birth_year",
-        "birth_month",
-        "birth_day",
-        "birth_hour",
-        "gender",
-        "birth_place"
+      "dependencies": [
+        {
+          "kind": "shared_support",
+          "tools": [
+            "knowledge_registry",
+            "knowledge_read"
+          ],
+          "condition": "需要查证内置传统知识或来源时；不自动新增个人计算"
+        },
+        {
+          "kind": "conditional_service",
+          "scenario": "onda-shiyun",
+          "condition": "本轮询问阶段、年度、短期或指定时间技法时；只补未覆盖层，先遵守硬边界"
+        }
       ],
+      "required_inputs": [],
       "output": {
         "kind": "interpretation",
         "grounding": "engine_fields",
         "voice": "onda-counsel"
       },
-      "boundary": "传统术数与占星的文化参考视角，不是决定论，不替代医疗、心理、法律、财务等专业意见。",
+      "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
       "routing": [
         {
-          "intent": "事业方向适不适合",
+          "intent": "个人交往方式／支持资源",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
-                "bazi_career"
+                "analyze_destiny",
+                "ziwei_birth",
+                "astro_chart"
               ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "analyze_destiny"
-              ],
-              "condition": ""
+              "condition": "相关结构"
             }
           ]
         },
         {
-          "intent": "今年财运",
+          "intent": "朋友／合伙双方互动",
           "evidence": [
+            {
+              "role": "supporting",
+              "alternatives": [
+                "analyze_destiny",
+                "ziwei_birth",
+                "astro_chart"
+              ],
+              "condition": "各自结构"
+            },
             {
               "role": "primary",
               "alternatives": [
-                "bazi_wealth"
+                "two_person_compatibility",
+                "astro_relative_chart",
+                "sukuyo_compatibility"
               ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "timing_analysis"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "dayun_analysis"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "liunian_analysis"
-              ],
-              "condition": ""
+              "condition": "按实际关系"
             }
           ]
         },
         {
-          "intent": "要不要跳槽",
+          "intent": "合作阶段／年度变化",
+          "evidence": [
+            {
+              "role": "supporting",
+              "alternatives": [
+                "analyze_destiny",
+                "ziwei_birth",
+                "astro_chart"
+              ],
+              "condition": "已有结构"
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "two_person_compatibility",
+                "astro_relative_chart",
+                "sukuyo_compatibility"
+              ],
+              "condition": "已有互动"
+            },
+            {
+              "role": "primary",
+              "alternatives": [
+                "timing_analysis",
+                "ziwei_horoscope",
+                "western_timing_analysis",
+                "firdaria"
+              ],
+              "condition": "不推对方行为"
+            }
+          ]
+        }
+      ],
+      "source": "skills/onda-renji/agents/interface.yaml"
+    },
+    {
+      "id": "onda-shiye",
+      "name": "事业与工作",
+      "version": "0.2.0",
+      "summary": "围绕岗位、工作方向与创业角色，结合相关结构和时间变化，讨论现实选项与条件",
+      "consultation": {
+        "kind": "topic",
+        "topics": [
+          "career"
+        ],
+        "scope": "current_question",
+        "time_selection": "shared",
+        "safety_policy": "consultation_boundaries_v1"
+      },
+      "triggers": [
+        "事业",
+        "工作方向",
+        "岗位",
+        "晋升",
+        "跳槽",
+        "创业角色"
+      ],
+      "engine_tools": [
+        "analyze_destiny",
+        "astro_chart",
+        "astro_election",
+        "bazi_career",
+        "firdaria",
+        "timing_analysis",
+        "western_timing_analysis",
+        "ziwei_birth",
+        "ziwei_horoscope"
+      ],
+      "dependencies": [
+        {
+          "kind": "shared_support",
+          "tools": [
+            "knowledge_registry",
+            "knowledge_read"
+          ],
+          "condition": "需要查证内置传统知识或来源时；不自动新增个人计算"
+        },
+        {
+          "kind": "conditional_service",
+          "scenario": "onda-shiyun",
+          "condition": "本轮询问阶段、年度、短期或指定时间技法时；只补未覆盖层，先遵守硬边界"
+        }
+      ],
+      "required_inputs": [],
+      "output": {
+        "kind": "interpretation",
+        "grounding": "engine_fields",
+        "voice": "onda-counsel"
+      },
+      "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
+      "license": "Apache-2.0",
+      "routing": [
+        {
+          "intent": "工作方向／岗位／创业角色",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
-                "bazi_career"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "timing_analysis"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "dayun_analysis"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "liunian_analysis"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
+                "bazi_career",
                 "analyze_destiny"
               ],
-              "condition": ""
+              "condition": "专项优先，整体结构按需"
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "ziwei_birth"
+              ],
+              "condition": "相关职业结构"
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "astro_chart"
+              ],
+              "condition": "相关职业配置"
             }
           ]
         },
         {
-          "intent": "要不要创业",
+          "intent": "今年／未来几年事业",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
-                "bazi_career"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "bazi_wealth"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "timing_analysis"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "dayun_analysis"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
+                "bazi_career",
                 "analyze_destiny"
               ],
-              "condition": ""
+              "condition": "复用已有时机"
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "ziwei_birth"
+              ],
+              "condition": "已有结构"
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "astro_chart"
+              ],
+              "condition": "已有结构"
+            },
+            {
+              "role": "primary",
+              "alternatives": [
+                "timing_analysis",
+                "ziwei_horoscope",
+                "western_timing_analysis",
+                "firdaria"
+              ],
+              "condition": "仅补所需时间层"
             }
           ]
         },
         {
-          "intent": "合伙靠不靠谱",
+          "intent": "给定求职／签约候选时刻",
           "evidence": [
+            {
+              "role": "supporting",
+              "alternatives": [
+                "timing_analysis",
+                "ziwei_horoscope",
+                "western_timing_analysis",
+                "firdaria"
+              ],
+              "condition": "独立背景"
+            },
             {
               "role": "primary",
               "alternatives": [
-                "bazi_career"
+                "astro_election"
               ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "two_person_compatibility"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "analyze_destiny"
-              ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "求职方向",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "bazi_career"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "analyze_destiny"
-              ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "正财偏财 · 破财",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "bazi_wealth"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "liunian_analysis"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "analyze_destiny"
-              ],
-              "condition": ""
+              "condition": "给定候选，非区间最优搜索"
             }
           ]
         }
@@ -865,21 +992,26 @@
     },
     {
       "id": "onda-shiyun",
-      "name": "人生时运 · 择时",
+      "name": "整体时运与阶段",
       "version": "0.2.0",
-      "summary": "按实际时间层级说明阶段与变化，需要时交付时间线或候选对照，并给一项现实准备",
+      "summary": "按用户的阶段、年度或短期问题选择时运依据，解释边界与变化，比较给定候选",
+      "consultation": {
+        "kind": "service",
+        "topics": [
+          "timing"
+        ],
+        "scope": "current_question",
+        "time_selection": "shared",
+        "safety_policy": "consultation_boundaries_v1"
+      },
       "triggers": [
-        "今年运势",
-        "明年怎么样",
+        "整体运势",
+        "人生阶段",
         "大运",
         "流年",
-        "流月",
-        "人生转折点",
-        "什么时候适合做某事",
-        "择日",
-        "本命年",
-        "最近为什么不顺",
-        "运势起伏"
+        "法达",
+        "时间比较",
+        "择时"
       ],
       "engine_tools": [
         "astro_agepoint",
@@ -921,259 +1053,162 @@
         "ziwei_horoscope",
         "zr"
       ],
+      "dependencies": [
+        {
+          "kind": "shared_support",
+          "tools": [
+            "knowledge_registry",
+            "knowledge_read"
+          ],
+          "condition": "需要查证内置传统知识或来源时；不自动新增个人计算"
+        }
+      ],
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
         "grounding": "engine_fields",
         "voice": "onda-counsel"
       },
-      "boundary": "传统术数与占星的文化参考视角，不是决定论，不替代医疗、心理、法律、财务等专业意见。",
+      "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
       "routing": [
         {
-          "intent": "今年/明年运势",
+          "intent": "整体年度／未来几年",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
-                "timing_analysis"
-              ],
-              "condition": "中式默认"
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "liunian_analysis"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "primary",
-              "alternatives": [
-                "western_timing_analysis"
-              ],
-              "condition": "西占视角"
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "solarreturn"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "transit"
-              ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "大运走到哪",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
+                "timing_analysis",
                 "dayun_analysis"
               ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "人生转折点",
-          "evidence": [
-            {
-              "role": "supporting",
-              "alternatives": [
-                "timing_analysis"
-              ],
-              "condition": ""
+              "condition": "中式选择"
             },
             {
-              "role": "supporting",
+              "role": "primary",
               "alternatives": [
-                "dayun_analysis"
+                "ziwei_horoscope"
               ],
-              "condition": ""
+              "condition": "紫微选择"
             },
             {
-              "role": "supporting",
+              "role": "primary",
               "alternatives": [
-                "western_timing_analysis"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "solararc"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "pd"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "firdaria"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
+                "western_timing_analysis",
+                "firdaria",
+                "zr",
                 "decennials"
               ],
-              "condition": ""
+              "condition": "西占选择"
             }
           ]
         },
         {
-          "intent": "最近为什么不顺 · 本命年",
+          "intent": "人生阶段／何时换阶段",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
-                "liunian_analysis"
+                "timing_analysis",
+                "dayun_analysis"
               ],
-              "condition": ""
+              "condition": "大运与精度"
             },
             {
-              "role": "supporting",
+              "role": "primary",
               "alternatives": [
-                "liuyue_analysis"
+                "ziwei_horoscope"
               ],
-              "condition": ""
+              "condition": "大限"
             },
             {
-              "role": "supporting",
+              "role": "primary",
               "alternatives": [
-                "transit"
+                "western_timing_analysis",
+                "firdaria",
+                "zr",
+                "decennials"
               ],
-              "condition": ""
+              "condition": "法达等实际分期"
+            },
+            {
+              "role": "deep",
+              "alternatives": [
+                "solarreturn",
+                "lunarreturn",
+                "transit",
+                "solararc",
+                "givenyear",
+                "profection",
+                "pd",
+                "pdchart"
+              ],
+              "condition": "本轮确需"
             }
           ]
         },
         {
-          "intent": "什么时候适合做某事 · 择日",
+          "intent": "月份／某日／时点",
+          "evidence": [
+            {
+              "role": "supporting",
+              "alternatives": [
+                "timing_analysis",
+                "dayun_analysis"
+              ],
+              "condition": "已有背景"
+            },
+            {
+              "role": "primary",
+              "alternatives": [
+                "ziwei_horoscope"
+              ],
+              "condition": "相应运限"
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "western_timing_analysis",
+                "firdaria",
+                "zr",
+                "decennials"
+              ],
+              "condition": "已有阶段"
+            },
+            {
+              "role": "primary",
+              "alternatives": [
+                "liunian_analysis",
+                "liuyue_analysis",
+                "liuri_analysis",
+                "liushi_analysis"
+              ],
+              "condition": "所需粒度"
+            },
+            {
+              "role": "primary",
+              "alternatives": [
+                "solarreturn",
+                "lunarreturn",
+                "transit",
+                "solararc",
+                "givenyear",
+                "profection",
+                "pd",
+                "pdchart"
+              ],
+              "condition": "西占相关单技法"
+            }
+          ]
+        },
+        {
+          "intent": "活动候选时刻比较",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
                 "astro_election"
               ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "人生各阶段（全生命周期）",
-          "evidence": [
-            {
-              "role": "deep",
-              "alternatives": [
-                "timing_analysis"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "dayun_analysis"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "western_timing_analysis"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "solarreturn"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "lunarreturn"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "transit"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "solararc"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "givenyear"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "profection"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "pd"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "pdchart"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "zr"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "firdaria"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "decennials"
-              ],
-              "condition": ""
+              "condition": "给定非医疗候选"
             }
           ]
         }
@@ -1182,26 +1217,28 @@
     },
     {
       "id": "onda-xingpan",
-      "name": "星盘 · 占星自观",
+      "name": "命盘与指定方法解读",
       "version": "0.2.0",
-      "summary": "用日月上升、重点宫位与实际相位读懂本命和关系，交付可对照的特点与相处建议",
+      "summary": "直接满足用户指定的命盘、流派与技法，按相关主题解释实际字段并保留精度范围",
+      "consultation": {
+        "kind": "service",
+        "topics": [
+          "method"
+        ],
+        "scope": "current_question",
+        "time_selection": "shared",
+        "safety_policy": "consultation_boundaries_v1"
+      },
       "triggers": [
-        "占星",
         "星盘",
-        "出生盘",
-        "本命盘",
-        "上升星座",
-        "太阳月亮",
-        "行星落宫",
-        "相位",
-        "合盘",
+        "八字命盘",
+        "紫微命盘",
+        "流派盘",
         "关系盘",
-        "希腊占星",
-        "古典占星",
-        "印度占星",
-        "果老星宗"
+        "指定技法"
       ],
       "engine_tools": [
+        "analyze_destiny",
         "astro_chart",
         "astro_chart13",
         "astro_germany",
@@ -1209,132 +1246,100 @@
         "astro_hellen",
         "astro_india",
         "astro_relative_chart",
-        "western_timing_analysis"
+        "bazi_birth",
+        "dayun_analysis",
+        "firdaria",
+        "liunian_analysis",
+        "western_timing_analysis",
+        "ziwei_birth",
+        "ziwei_horoscope"
       ],
-      "required_inputs": [
-        "birth_year",
-        "birth_month",
-        "birth_day",
-        "birth_hour"
+      "dependencies": [
+        {
+          "kind": "shared_support",
+          "tools": [
+            "knowledge_registry",
+            "knowledge_read"
+          ],
+          "condition": "需要查证内置传统知识或来源时；不自动新增个人计算"
+        },
+        {
+          "kind": "conditional_service",
+          "scenario": "onda-shiyun",
+          "condition": "本轮询问阶段、年度、短期或指定时间技法时；只补未覆盖层，先遵守硬边界"
+        }
       ],
+      "required_inputs": [],
       "output": {
         "kind": "interpretation",
         "grounding": "engine_fields",
-        "voice": "onda-counsel",
-        "deliverables": [
-          "本命关键落点与相位",
-          "关系盘类型与真实交互",
-          "可在现实中对照的建议"
-        ]
+        "voice": "onda-counsel"
       },
-      "boundary": "传统术数与占星的文化参考视角，不是决定论，不替代医疗、心理、法律、财务等专业意见。",
+      "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
       "routing": [
         {
-          "intent": "我的星盘/本命盘",
+          "intent": "指定八字／紫微命盘",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
-                "astro_chart"
+                "bazi_birth",
+                "analyze_destiny"
               ],
-              "condition": ""
+              "condition": "原始或综合"
+            },
+            {
+              "role": "primary",
+              "alternatives": [
+                "ziwei_birth",
+                "ziwei_horoscope"
+              ],
+              "condition": "本命或动态"
             }
           ]
         },
         {
-          "intent": "上升 · 太阳 · 月亮 · 行星落宫 · 相位",
+          "intent": "西占本命／指定流派",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
-                "astro_chart"
-              ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "13 扇区盘",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "astro_chart13"
-              ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "希腊传统星盘",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "astro_hellen"
-              ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "果老星宗盘",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "astro_guolao"
-              ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "印度星盘（Jyotish）",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "astro_india"
-              ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "德国占星/汉堡学派",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
+                "astro_chart",
+                "astro_chart13",
+                "astro_hellen",
+                "astro_guolao",
+                "astro_india",
                 "astro_germany"
               ],
-              "condition": ""
+              "condition": "择一，不重复"
             }
           ]
         },
         {
-          "intent": "两人关系星盘",
+          "intent": "指定星盘关系盘",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
                 "astro_relative_chart"
               ],
-              "condition": ""
+              "condition": "明确盘型"
             }
           ]
         },
         {
-          "intent": "推运/流年（从星盘延伸）",
+          "intent": "指定阶段方法／法达",
           "evidence": [
             {
-              "role": "deep",
+              "role": "primary",
               "alternatives": [
-                "western_timing_analysis"
+                "western_timing_analysis",
+                "firdaria",
+                "dayun_analysis",
+                "liunian_analysis"
               ],
-              "condition": ""
+              "condition": "按用户所选窄查询"
             }
           ]
         }
@@ -1342,66 +1347,66 @@
       "source": "skills/onda-xingpan/agents/interface.yaml"
     },
     {
-      "id": "onda-yuanfen",
-      "name": "缘分 · 感情合婚",
+      "id": "onda-xueye",
+      "name": "学习与成长",
       "version": "0.2.0",
-      "summary": "区分单人倾向、年级时机与双人关系维度，把配合和张力转成可观察回应的沟通问题",
+      "summary": "围绕学习方式、考试和深造，结合相关结构与阶段，讨论实际准备和选项条件",
+      "consultation": {
+        "kind": "topic",
+        "topics": [
+          "learning"
+        ],
+        "scope": "current_question",
+        "time_selection": "shared",
+        "safety_policy": "consultation_boundaries_v1"
+      },
       "triggers": [
-        "感情运",
-        "姻缘",
-        "桃花运",
-        "什么时候脱单",
-        "八字合婚",
-        "两人合不合",
-        "配对",
-        "夫妻宫",
-        "正缘何时到",
-        "复合",
-        "暧昧",
-        "要不要在一起"
+        "学习",
+        "考试",
+        "深造",
+        "专业选择",
+        "留学"
       ],
       "engine_tools": [
-        "astro_relative_chart",
-        "bazi_marriage",
-        "bazi_romance",
-        "liunian_analysis",
-        "liuyue_analysis",
-        "meihua_analysis",
-        "sixyao",
-        "sukuyo_compatibility",
-        "two_person_compatibility",
-        "ziwei_birth"
+        "astro_chart",
+        "bazi_education",
+        "firdaria",
+        "timing_analysis",
+        "western_timing_analysis",
+        "ziwei_birth",
+        "ziwei_horoscope"
       ],
-      "required_inputs": [
-        "birth_year",
-        "birth_month",
-        "birth_day",
-        "birth_hour",
-        "gender",
-        "birth_place"
+      "dependencies": [
+        {
+          "kind": "shared_support",
+          "tools": [
+            "knowledge_registry",
+            "knowledge_read"
+          ],
+          "condition": "需要查证内置传统知识或来源时；不自动新增个人计算"
+        },
+        {
+          "kind": "conditional_service",
+          "scenario": "onda-shiyun",
+          "condition": "本轮询问阶段、年度、短期或指定时间技法时；只补未覆盖层，先遵守硬边界"
+        }
       ],
+      "required_inputs": [],
       "output": {
         "kind": "interpretation",
         "grounding": "engine_fields",
         "voice": "onda-counsel"
       },
-      "boundary": "传统术数与占星的文化参考视角，不是决定论，不替代医疗、心理、法律、财务等专业意见。",
+      "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
       "routing": [
         {
-          "intent": "我的姻缘/感情走向",
+          "intent": "学习方式／深造选项",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
-                "bazi_marriage"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "supporting",
-              "alternatives": [
-                "bazi_romance"
+                "bazi_education"
               ],
               "condition": ""
             },
@@ -1410,98 +1415,196 @@
               "alternatives": [
                 "ziwei_birth"
               ],
-              "condition": ""
+              "condition": "相关结构"
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "astro_chart"
+              ],
+              "condition": "相关配置"
             }
           ]
         },
         {
-          "intent": "正缘/桃花何时来、旺不旺",
+          "intent": "考试年份／阶段比较",
           "evidence": [
+            {
+              "role": "primary",
+              "alternatives": [
+                "bazi_education"
+              ],
+              "condition": "已有时机复用"
+            },
             {
               "role": "supporting",
               "alternatives": [
-                "bazi_marriage"
+                "ziwei_birth"
+              ],
+              "condition": ""
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "astro_chart"
               ],
               "condition": ""
             },
             {
               "role": "primary",
               "alternatives": [
+                "timing_analysis",
+                "ziwei_horoscope",
+                "western_timing_analysis",
+                "firdaria"
+              ],
+              "condition": "同粒度，非录取承诺"
+            }
+          ]
+        }
+      ],
+      "source": "skills/onda-xueye/agents/interface.yaml"
+    },
+    {
+      "id": "onda-yuanfen",
+      "name": "感情与伴侣关系",
+      "version": "0.2.0",
+      "summary": "区分单人感情方式、双方互动与所问时段，解释相关依据和分歧，保留现实选择",
+      "consultation": {
+        "kind": "topic",
+        "topics": [
+          "romance"
+        ],
+        "scope": "current_question",
+        "time_selection": "shared",
+        "safety_policy": "consultation_boundaries_v1"
+      },
+      "triggers": [
+        "感情",
+        "恋爱",
+        "桃花",
+        "伴侣",
+        "婚姻",
+        "复合"
+      ],
+      "engine_tools": [
+        "astro_chart",
+        "astro_relative_chart",
+        "bazi_marriage",
+        "bazi_romance",
+        "firdaria",
+        "liunian_analysis",
+        "liuyue_analysis",
+        "meihua_analysis",
+        "sixyao",
+        "sukuyo_compatibility",
+        "timing_analysis",
+        "two_person_compatibility",
+        "western_timing_analysis",
+        "ziwei_birth",
+        "ziwei_horoscope"
+      ],
+      "dependencies": [
+        {
+          "kind": "shared_support",
+          "tools": [
+            "knowledge_registry",
+            "knowledge_read"
+          ],
+          "condition": "需要查证内置传统知识或来源时；不自动新增个人计算"
+        },
+        {
+          "kind": "conditional_service",
+          "scenario": "onda-shiyun",
+          "condition": "本轮询问阶段、年度、短期或指定时间技法时；只补未覆盖层，先遵守硬边界"
+        }
+      ],
+      "required_inputs": [],
+      "output": {
+        "kind": "interpretation",
+        "grounding": "engine_fields",
+        "voice": "onda-counsel"
+      },
+      "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
+      "license": "Apache-2.0",
+      "routing": [
+        {
+          "intent": "单人相处方式／婚恋文化",
+          "evidence": [
+            {
+              "role": "primary",
+              "alternatives": [
+                "bazi_marriage",
                 "bazi_romance"
               ],
-              "condition": ""
+              "condition": "按婚姻或桃花任务"
             },
             {
-              "role": "deep",
+              "role": "supporting",
               "alternatives": [
-                "liuyue_analysis"
-              ],
-              "condition": "追问到几月"
-            }
-          ]
-        },
-        {
-          "intent": "我俩合不合（恋爱/结婚）",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "two_person_compatibility"
+                "ziwei_birth"
               ],
               "condition": ""
             },
             {
               "role": "supporting",
               "alternatives": [
+                "astro_chart",
+                "astro_relative_chart"
+              ],
+              "condition": "本命相关配置"
+            }
+          ]
+        },
+        {
+          "intent": "双方互动综合",
+          "evidence": [
+            {
+              "role": "primary",
+              "alternatives": [
+                "two_person_compatibility",
                 "sukuyo_compatibility"
               ],
-              "condition": ""
+              "condition": "跨盘、双向范围"
             },
-            {
-              "role": "deep",
-              "alternatives": [
-                "ziwei_birth"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "deep",
-              "alternatives": [
-                "astro_relative_chart"
-              ],
-              "condition": "需经纬度"
-            }
-          ]
-        },
-        {
-          "intent": "关系的星盘视角/互动相位",
-          "evidence": [
             {
               "role": "supporting",
               "alternatives": [
-                "two_person_compatibility"
+                "ziwei_birth"
               ],
-              "condition": ""
+              "condition": "各自结构"
             },
             {
               "role": "primary",
               "alternatives": [
+                "astro_chart",
                 "astro_relative_chart"
               ],
-              "condition": "需经纬度"
+              "condition": "明确星盘互动"
             }
           ]
         },
         {
-          "intent": "明确求卦看表白／复合",
+          "intent": "年度／阶段／月份变化",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
-                "meihua_analysis",
-                "sixyao"
+                "bazi_marriage",
+                "bazi_romance"
               ],
-              "condition": ""
+              "condition": "已有时机复用"
+            },
+            {
+              "role": "primary",
+              "alternatives": [
+                "timing_analysis",
+                "ziwei_horoscope",
+                "western_timing_analysis",
+                "firdaria",
+                "liuyue_analysis"
+              ],
+              "condition": "仅补所需粒度"
             }
           ]
         }
@@ -1510,23 +1613,25 @@
     },
     {
       "id": "onda-zhanbu",
-      "name": "抉择 · 问事占卜",
+      "name": "具体问事与占卜",
       "version": "0.2.0",
-      "summary": "围绕一件事呈现卦变或盘局依据，整理现实中需确认的条件与下一步",
+      "summary": "仅在用户明确求卦或起局时处理具体事项，解释真实卦变与条件，复用同一问事结果",
+      "consultation": {
+        "kind": "service",
+        "topics": [
+          "divination"
+        ],
+        "scope": "current_question",
+        "time_selection": "shared",
+        "safety_policy": "consultation_boundaries_v1"
+      },
       "triggers": [
-        "求卦辅助一个具体决定",
-        "起卦问能不能成",
-        "求一卦",
-        "占卜",
         "起卦",
-        "梅花易数",
+        "求卦",
         "六爻",
+        "梅花",
         "奇门",
-        "大六壬",
-        "金口诀",
-        "太乙",
-        "星骰",
-        "这事吉凶"
+        "问事"
       ],
       "engine_tools": [
         "astro_horary",
@@ -1544,149 +1649,71 @@
         "taiyi",
         "tongshefa"
       ],
+      "dependencies": [
+        {
+          "kind": "shared_support",
+          "tools": [
+            "knowledge_registry",
+            "knowledge_read"
+          ],
+          "condition": "需要查证内置传统知识或来源时；不自动新增个人计算"
+        }
+      ],
       "required_inputs": [],
       "output": {
         "kind": "interpretation",
         "grounding": "engine_fields",
-        "voice": "onda-counsel",
-        "deliverables": [
-          "本次问题与问时",
-          "卦变或盘局的关键依据",
-          "传统提示与现实验证条件"
-        ]
+        "voice": "onda-counsel"
       },
-      "boundary": "传统术数与占星的文化参考视角，不是决定论，不替代医疗、心理、法律、财务等专业意见。",
+      "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
       "routing": [
         {
-          "intent": "要不要做某件事（即时起念）",
+          "intent": "明确求卦／已选卜法",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
-                "meihua_analysis"
-              ],
-              "condition": "用户明确求卦且未指定其他卜法"
-            }
-          ]
-        },
-        {
-          "intent": "这事能不能成（具体成败）",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
+                "meihua_analysis",
                 "sixyao"
               ],
-              "condition": "用户明确选择本卜法"
-            }
-          ]
-        },
-        {
-          "intent": "方位/时机/谋略布局",
-          "evidence": [
+              "condition": "按所选方式"
+            },
             {
               "role": "primary",
               "alternatives": [
-                "qimen"
-              ],
-              "condition": "用户明确选择本卜法"
-            }
-          ]
-        },
-        {
-          "intent": "具体事件细节与时应",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "liureng_gods"
-              ],
-              "condition": "用户明确选择本卜法"
-            }
-          ]
-        },
-        {
-          "intent": "年运流月简断",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "liureng_runyear"
-              ],
-              "condition": "用户明确选择本卜法"
-            }
-          ]
-        },
-        {
-          "intent": "即时简断吉凶",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
+                "qimen",
+                "liureng_gods",
+                "liureng_runyear",
                 "jinkou"
               ],
-              "condition": "用户明确选择本卜法"
-            }
-          ]
-        },
-        {
-          "intent": "大势国运（深）",
-          "evidence": [
+              "condition": "按所选方式"
+            },
             {
               "role": "primary",
               "alternatives": [
-                "taiyi"
+                "taiyi",
+                "suzhan",
+                "sanshiunited",
+                "otherbu",
+                "tongshefa"
               ],
-              "condition": "用户明确选择本卜法"
-            }
-          ]
-        },
-        {
-          "intent": "宿曜择日/星宿吉凶",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "suzhan"
-              ],
-              "condition": "用户明确选择本卜法"
-            }
-          ]
-        },
-        {
-          "intent": "三式合参（太乙/六壬/奇门）",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "sanshiunited"
-              ],
-              "condition": "用户明确选择本卜法"
-            }
-          ]
-        },
-        {
-          "intent": "解读用户已有星骰",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "otherbu"
-              ],
-              "condition": "用户明确选择本卜法"
-            }
-          ]
-        },
-        {
-          "intent": "西式卜卦（Horary）",
-          "evidence": [
+              "condition": "按所选方式与实际输入"
+            },
             {
               "role": "primary",
               "alternatives": [
                 "astro_horary"
               ],
-              "condition": "用户明确选择本卜法"
+              "condition": "非禁区类别"
+            },
+            {
+              "role": "supporting",
+              "alternatives": [
+                "gua_lookup",
+                "gua_meiyi"
+              ],
+              "condition": "只查义，不重起"
             }
           ]
         }
@@ -1695,128 +1722,149 @@
     },
     {
       "id": "onda-zige",
-      "name": "全面自我画像",
+      "name": "全面画像 · 多主题组合入口",
       "version": "0.2.0",
-      "summary": "按生活主题对照八字紫微西占，呈现有依据的特点、分歧与可尝试的安排",
+      "summary": "按用户要求组合多个生活主题，复用已有命盘，呈现相关体系共同点、分歧与缺失",
+      "consultation": {
+        "kind": "composite",
+        "topics": [
+          "self",
+          "career",
+          "romance",
+          "family",
+          "finance",
+          "learning",
+          "social",
+          "health_culture"
+        ],
+        "scope": "current_question",
+        "time_selection": "shared",
+        "safety_policy": "consultation_boundaries_v1"
+      },
       "triggers": [
-        "三体系全面认识我",
-        "帮我全面分析一下",
-        "告诉我我的全部",
-        "做一个完整的人生说明书",
-        "从八字紫微西占综合看看我",
-        "全面自我分析",
-        "完整命盘解读",
-        "三套交叉印证"
+        "全面画像",
+        "全面分析",
+        "综合全貌",
+        "人生说明书"
       ],
       "engine_tools": [
         "analyze_destiny",
         "astro_chart",
-        "bazi_birth",
-        "bazi_career",
-        "bazi_health",
-        "bazi_personality",
-        "bazi_relatives",
-        "bazi_romance",
-        "dayun_analysis",
-        "timing_analysis",
         "ziwei_birth"
       ],
-      "required_inputs": [
-        "birth_year",
-        "birth_month",
-        "birth_day",
-        "birth_hour",
-        "gender",
-        "birth_place"
+      "dependencies": [
+        {
+          "kind": "shared_support",
+          "tools": [
+            "knowledge_registry",
+            "knowledge_read"
+          ],
+          "condition": "需要查证内置传统知识或来源时；不自动新增个人计算"
+        },
+        {
+          "kind": "conditional_service",
+          "scenario": "onda-shiyun",
+          "condition": "本轮询问阶段、年度、短期或指定时间技法时；只补未覆盖层，先遵守硬边界"
+        },
+        {
+          "kind": "composite_topic",
+          "scenario": "onda-mingge",
+          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+        },
+        {
+          "kind": "composite_topic",
+          "scenario": "onda-shiye",
+          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+        },
+        {
+          "kind": "composite_topic",
+          "scenario": "onda-caiwu",
+          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+        },
+        {
+          "kind": "composite_topic",
+          "scenario": "onda-yuanfen",
+          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+        },
+        {
+          "kind": "composite_topic",
+          "scenario": "onda-xueye",
+          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+        },
+        {
+          "kind": "composite_topic",
+          "scenario": "onda-jiating",
+          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+        },
+        {
+          "kind": "composite_topic",
+          "scenario": "onda-renji",
+          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+        },
+        {
+          "kind": "composite_topic",
+          "scenario": "onda-jiankang",
+          "condition": "仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果"
+        }
       ],
+      "required_inputs": [],
       "output": {
         "kind": "interpretation",
         "grounding": "engine_fields",
-        "voice": "onda-counsel",
-        "deliverables": [
-          "主题画像与各体系依据",
-          "分歧、缺失及精度",
-          "两三项现实观察或尝试"
-        ]
+        "voice": "onda-counsel"
       },
-      "boundary": "传统术数与占星的文化参考视角，不是决定论，不替代医疗、心理、法律、财务等专业意见。",
+      "boundary": "传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。",
       "license": "Apache-2.0",
       "routing": [
         {
-          "intent": "帮我全面分析一下",
+          "intent": "多主题全面画像",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
                 "analyze_destiny"
               ],
-              "condition": ""
+              "condition": "按范围"
             },
             {
               "role": "primary",
               "alternatives": [
                 "ziwei_birth"
               ],
-              "condition": ""
+              "condition": "按范围"
             },
             {
               "role": "primary",
               "alternatives": [
                 "astro_chart"
               ],
-              "condition": ""
+              "condition": "按范围"
             }
           ]
         },
         {
-          "intent": "我是谁 · 完整人生说明书",
+          "intent": "明确三体系完整画像",
           "evidence": [
             {
               "role": "primary",
               "alternatives": [
                 "analyze_destiny"
               ],
-              "condition": ""
+              "condition": "已有则复用"
             },
             {
               "role": "primary",
               "alternatives": [
                 "ziwei_birth"
               ],
-              "condition": ""
+              "condition": "缺失保留"
             },
             {
               "role": "primary",
               "alternatives": [
                 "astro_chart"
               ],
-              "condition": ""
-            }
-          ]
-        },
-        {
-          "intent": "综合看看我",
-          "evidence": [
-            {
-              "role": "primary",
-              "alternatives": [
-                "analyze_destiny"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "primary",
-              "alternatives": [
-                "ziwei_birth"
-              ],
-              "condition": ""
-            },
-            {
-              "role": "primary",
-              "alternatives": [
-                "astro_chart"
-              ],
-              "condition": ""
+              "condition": "缺失保留"
             }
           ]
         }
@@ -1828,6 +1876,14 @@
       "name": "家居风水基础计算",
       "version": "1.0",
       "summary": "住宅各层规则独立，明确参考北、住户与历史定运依据后选择工具",
+      "consultation": {
+        "kind": "calculation",
+        "topics": [
+          "space"
+        ],
+        "scope": "current_question",
+        "safety_policy": "consultation_boundaries_v1"
+      },
       "triggers": [
         "方位／固定宫数",
         "命卦／个人八方",
@@ -1849,6 +1905,16 @@
         "fengshui_jinsuo",
         "fengshui_annual_stars",
         "fengshui_xuankong_natal"
+      ],
+      "dependencies": [
+        {
+          "kind": "shared_support",
+          "tools": [
+            "knowledge_registry",
+            "knowledge_read"
+          ],
+          "condition": "需要查证内置传统知识或来源时；不自动新增个人计算"
+        }
       ],
       "required_inputs": [],
       "output": {

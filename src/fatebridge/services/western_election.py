@@ -39,7 +39,7 @@ def calculate_election(
     house_system: str = "R",
     zodiac_type: str = "Tropic",
 ) -> Dict[str, Any]:
-    """评估某候选时刻对某类用事（结婚/开业/签约/手术…）是否吉利。"""
+    """评估某候选时刻对某类用事（结婚/开业/签约等非医疗活动）是否吉利。"""
     label = "择日"
     try:
         if topic_id not in TOPIC_MASTER:

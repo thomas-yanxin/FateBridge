@@ -1,47 +1,59 @@
-# Machine-readable interface for the onda-yuanfen skill.
-# Enforced by tests/test_skills_interface_contract.py against the FateBridge
-# engine catalog and this skill's SKILL.md. Keep in sync or CI fails.
 name: onda-yuanfen
 version: 0.2.0
-scenario: 缘分 · 感情合婚
-summary: 区分单人倾向、年级时机与双人关系维度，把配合和张力转成可观察回应的沟通问题
+scenario: 感情与伴侣关系
+summary: 区分单人感情方式、双方互动与所问时段，解释相关依据和分歧，保留现实选择
+consultation:
+  kind: topic
+  topics:
+  - romance
+  scope: current_question
+  time_selection: shared
+  safety_policy: consultation_boundaries_v1
 triggers:
-  - 感情运
-  - 姻缘
-  - 桃花运
-  - 什么时候脱单
-  - 八字合婚
-  - 两人合不合
-  - 配对
-  - 夫妻宫
-  - 正缘何时到
-  - 复合
-  - 暧昧
-  - 要不要在一起
+- 感情
+- 恋爱
+- 桃花
+- 伴侣
+- 婚姻
+- 复合
 engine_tools:
-  - astro_relative_chart
-  - bazi_marriage
-  - bazi_romance
-  - liunian_analysis
-  - liuyue_analysis
-  - meihua_analysis
-  - sixyao
-  - sukuyo_compatibility
-  - two_person_compatibility
-  - ziwei_birth
-required_inputs:
-  - birth_year
-  - birth_month
-  - birth_day
-  - birth_hour
-  - gender
-  - birth_place
+- astro_chart
+- astro_relative_chart
+- bazi_marriage
+- bazi_romance
+- firdaria
+- liunian_analysis
+- liuyue_analysis
+- meihua_analysis
+- sixyao
+- sukuyo_compatibility
+- timing_analysis
+- two_person_compatibility
+- western_timing_analysis
+- ziwei_birth
+- ziwei_horoscope
+dependencies:
+- kind: shared_support
+  tools:
+  - knowledge_registry
+  - knowledge_read
+  condition: 需要查证内置传统知识或来源时；不自动新增个人计算
+- kind: conditional_service
+  scenario: onda-shiyun
+  condition: 本轮询问阶段、年度、短期或指定时间技法时；只补未覆盖层，先遵守硬边界
+required_inputs: []
+input_notes:
+- 按当前问题与所选工具实际 Schema 核对必要资料；不是完整问卷
+- 主题、对象与时间范围沿用当前聊天，限定方法优先，缺项仅限制对应层
 reads:
-  - ../../_shared/fatebridge-engine.md
-  - ../../_shared/onda-counsel.md
+- ../../_shared/consultation-routing.md
+- ../../_shared/safety-boundaries.md
+- ../../_shared/fatebridge-engine.md
+- ../../_shared/onda-counsel.md
+- ../../_shared/timing-selection.md
 output:
-  kind: interpretation        # 人类可读解读，非原始命盘字段
-  grounding: engine_fields    # 结论溯源到引擎字段，AI 不手算
+  kind: interpretation
+  grounding: engine_fields
   voice: onda-counsel
-boundary: 传统术数与占星的文化参考视角，不是决定论，不替代医疗、心理、法律、财务等专业意见。
+boundary: 传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。
 license: Apache-2.0

@@ -1,98 +1,40 @@
 ---
 name: onda-shiye
-description: 用 FateBridge 的事业结构、创业倾向、财星与时机计算，回答求职、跳槽、创业、合伙和财运问题。把实际结果转成工作方式、方案条件与一项可验证的现实行动；用户给出岗位或经营选项时做有依据的对照，不把分数当成功率。Use when 用户问事业运、财运、工作、跳槽、要不要创业、合伙、求职方向、升职、生意、偏财正财、破财。
+description: 围绕工作方向、岗位、晋升、跳槽与创业角色，按用户所问深度组织八字、紫微或西占相关依据及阶段变化；讨论实际选项与条件。纯收入消费用 onda-caiwu，双人分工互动用 onda-renji；不因今年事业问题自动展开全部人生主题。
 ---
 
-# 事业 · 财运（Onda）
+# 事业与工作
 
-来问钱和事业的人，常常是卡在一个具体决定上（跳不跳、合不合、能不能赚）。别给宏大命论，给他能用的。
+先回答这次的工作问题，分清长期工作方式、当前阶段、目标年份与实际选项。普通问题保持聚焦；用户要求综合或深入时主动评估多视角，不把多体系留给全面画像独占。
 
-## 用户能得到什么
+## 共用规则与资料
 
-先回答当前决定，再用实际返回的 2–3 项依据说明：哪些是工作方式的传统倾向，哪些是当期时机，哪些仍要靠现实条件核对。普通首轮保持简短；有两个明确选项时可用短表，详细请求再展开。
+先读[按用户问题组织咨询](../_shared/consultation-routing.md)、[硬边界](../_shared/safety-boundaries.md)、[引擎调用](../_shared/fatebridge-engine.md)和[解读层](../_shared/onda-counsel.md)。涉及日期、阶段或变化时读[共享时间选择](../_shared/timing-selection.md)；采用八字时读[八字专题取证](../_shared/bazi-topic-evidence.md)，采用紫微时读[紫微专题取证](../_shared/ziwei-topic-evidence.md)；采用西占主题解释时读[西占证据参考](../_shared/western-topic-evidence.md)。发现入口可能为软链接，先以 `pwd -P` 解析真实目录，再读相对引用。
 
-| 本次问题 | 计算提供的区分 | 交付给用户的内容 |
+资料使用当前聊天已确认内容，一次核对所选计算真正必要的缺项；不猜出生时刻，不把其他方法的缺项升级为必答。首次按任务选已发布 `evidence_views` 的字段：岗位方向用 `bazi_career.direction`，目标年份安排用 `target_year`，西占补证按相关时间卡及 `career` 取字段；这些是描述内卡名，不是请求参数。普通首轮严格字段投影、关闭快照；完整导出首次 `fields=null`，读同 run 交付。追问复用未变结果，只补所需新层。
+
+## 选择能改变理解的依据
+
+| 本次任务 | 候选依据 | 交付重点 |
 | --- | --- | --- |
-| 求职／跳槽方向 | 主导事业类型、事业结构与当期时机 | 把倾向对应到自主权、任务类型、责任与协作要求；已有岗位时对照实际职责，给一个面试中要核对的问题 |
-| 试创业还是继续工作 | `entrepreneurship` 与 `career_structure` 分开，时机另列 | 说明自主经营倾向与现实准备的区别；结合已知条件，选一个付费需求、交付或现金余量的验证动作 |
-| 财运／经营开支 | `wealth_stars`、`wealth_style`、`wealth_risk` 与 `wealth_timing` | 说明传统规则偏向何种求财方式、提示哪类资金安排；把建议落到一笔真实预算、回款或责任核对 |
-| 合伙 | 个人事业结构与双人合作维度分别解释 | 围绕用户已说的分工、款项或决策权限提出一个要谈清的问题，不由合盘认定对方可信或会违约 |
+| 工作方向／岗位特点 | `bazi_career`；`ziwei_birth` 相关官禄、命身等；`astro_chart` 相关职业配置 | 实际角色、自主权、任务类型和协作条件；传统行业五行不当能力测评或就业排除清单 |
+| 创业角色／工作方式 | `bazi_career` 的事业结构与创业倾向 | 自主经营倾向与真实需求、交付、资金准备分开 |
+| 今年／未来几年／换阶段 | 专项已有时机；`timing_analysis`、`ziwei_horoscope`、`western_timing_analysis` 或窄查 `firdaria` 等 | 按共享时间流程选择阶段＋目标时段，同精度复用已有大运流年，交节日指定小时另补真实小时依据 |
+| 明确两个岗位／留任跳槽 | 上述与问题相关的依据＋用户真实职责和条件 | 比较区别，不为公司或 offer 编成功率 |
+| 涉及合伙／回款 | 按需衔接人际合作／财务主题 | 只补分工互动或资金任务，不默认展开完整合盘／财务报告 |
 
-表内财运字段位于 `wealth_analysis`。岗位职责和现金条件来自用户事实，现实动作由助手提出；引擎没有为具体 offer、公司或商业项目计算成功率。行业追问确需 `career_analysis.industry_analysis` 时按实际合同选择字段，其五行行业分类是传统类比，不能当作专业能力测评或就业排除清单。
+各工具各负其责，不把紫微本命宫位解释冒称紫微事业专项评分。综合咨询先评估第二视角能否补充结构、时段条件或分歧；没有新增解释价值就不加工具，不设置多工具配额。单项或限定方法按其范围。
 
-## 引用路径
+## 读结果与回答
 
-发现入口可能是软链接。优先进入入口目录后用 shell 内建 `pwd -P` 取得真实目录，再按它读取下面的相对引用；不要为解析路径调用未经核实的系统 `python3`。不能先裁剪 `.agents/skills/onda-*` 入口的字符串父目录，否则会误指到 `.agents/skills/_shared` 或 `.agents/docs`。读取已知引用无需搜索仓库。
+事业专项读完整 `career_analysis.dominant_ten_gods` 和 `interpretation_scope`，连同 `career_structure/entrepreneurship/career_timing/timing_context`；并列权重一起解释，`primary_career_type` 只是首标签。方向细问才展开行业字段。共现的官印相生／食神制杀先当本工具规则线索，不直接交付为成格；创业指数不是成功概率，现代岗位映射不是古典结论或能力认证。八字总体取用确有需要时用 `analyze_destiny` 的 `structure_profile` 分层、冲突、候选状态，不把格局／扶抑／调候混成补元素处方。紫微区分本命官禄、运限命宫所临本命宫及未输出的运限其他功能宫；年度四化按实际星名或返回连接关联本命，不能写成未计算的流年官禄。西占只用实际相关配置及查证来源。
 
-## 先读这两份（必读）
-- 计算怎么调：[../_shared/fatebridge-engine.md](../_shared/fatebridge-engine.md)
-- 怎么开口说话：[../_shared/onda-counsel.md](../_shared/onda-counsel.md)
-- 场景取舍与去重：[../../docs/scenario-routing.md](../../docs/scenario-routing.md)
+用户问年度变化而 `career_analysis.career_timing.timing_signals` 为空时，按共享时间选择的“专项时间信号为空时”处理：该专项没有命中，不等于其他可用时间视角也不能回答。只补一项能够提供相关阶段或目标年份依据的视角，不以空列表结束整题，也不把它解释为没有机会。
 
-**铁律：十神/财星/喜用/大运流年全部交给引擎算。**
+综合前把各依据放回同一人物、问题和时段：长期工作特点不与目标年安排相互投票；同一命题有分歧时保留各自条件。可据实际并列结构比较两份岗位的职责组合，也可据来源充分的年度证据调整准备事项；没有相应依据就不硬选岗位或月份。先说明有依据的倾向与条件，再给两三处相关差异和一项可核对的现实安排。用户未提供岗位、收入或创业经历时用条件句，不补经历。明年追问保留事业主题和原有相关视角，新增目标时段；短期问题不由年级依据编月份。具体择时使用给定候选的 `astro_election`，不据此替用户决定辞职。
 
-调用纪律与去重见 [引擎调用纪律](../_shared/fatebridge-engine.md#全局调用纪律) 与 [交叉印证与去重](../_shared/fatebridge-engine.md#交叉印证与去重防矛盾)。
+## 简短的判断链示例
 
-## 这个场景用哪些工具
+若实际 `top_gods` 同时返回竞争型与管理型、权重并列，且用户在比较客户沟通岗和流程管理岗，可以解释“本工具两类映射并列；若沟通岗也承担项目推进与规则落实，两类特点都可能用上”，随后用用户已给职责比较自主权、协调量和责任边界。不能只因 primary 排在前面就排除流程岗。这是现代岗位类比及条件式应用，不把它称作原典直接指定职业。
 
-「事业 · 财运」对应路由（主=出结论必调；旁=只加强/修正；深=追问或专家模式才调）：
-
-| 用户想问 | 工具 | 优先级 | 要点 |
-|---------|------|--------|------|
-| 事业方向适不适合 | `bazi_career` | 主 | 自动带大运流年，看官杀/食伤/格局 |
-| 事业方向适不适合 | `analyze_destiny` | 旁 | 喜用+格局定大局 |
-| 今年财运 | `bazi_wealth` | 主 | 看财星与喜用关系、时机 |
-| 今年财运 | `timing_analysis` | 旁 | 时运大势 |
-| 今年财运 | `dayun_analysis` | 旁 | 大运段影响 |
-| 今年财运 | `liunian_analysis` | 旁 | 流年细节 |
-| 要不要跳槽 | `bazi_career` | 主 | |
-| 要不要跳槽 | `timing_analysis` | 旁 | 择时参考 |
-| 要不要跳槽 | `dayun_analysis` | 旁 | |
-| 要不要跳槽 | `liunian_analysis` | 旁 | |
-| 要不要跳槽 | `analyze_destiny` | 旁 | |
-| 要不要创业 | `bazi_career` | 主 | |
-| 要不要创业 | `bazi_wealth` | 旁 | |
-| 要不要创业 | `timing_analysis` | 旁 | |
-| 要不要创业 | `dayun_analysis` | 旁 | |
-| 要不要创业 | `analyze_destiny` | 旁 | |
-| 合伙靠不靠谱 | `bazi_career` | 主 | |
-| 合伙靠不靠谱 | `two_person_compatibility` | 旁 | 看合作契合度，不替代事业分析 |
-| 合伙靠不靠谱 | `analyze_destiny` | 旁 | |
-| 求职方向 | `bazi_career` | 主 | |
-| 求职方向 | `analyze_destiny` | 旁 | |
-| 正财偏财·破财 | `bazi_wealth` | 主 | |
-| 正财偏财·破财 | `liunian_analysis` | 旁 | |
-| 正财偏财·破财 | `analyze_destiny` | 旁 | |
-
-> 去重：时运三工具（`timing_analysis`/`dayun_analysis`/`liunian_analysis`）聚合优先，只需全景时调 `timing_analysis`，仅需大运/流年细节再单独调对应工具。
-> 主证：事业/财运以八字为主，时运类工具只作时机旁证，不单独下事业判断。
-> 合伙场景：`two_person_compatibility` 看合作契合度，不替代八字事业分析。
-
-## 怎么收信息
-出生 年月日时 + 性别 + 城市。要看具体某年财运/事业，问清想看哪一年（`--analysis-year` / `--target-year`）。
-
-使用聊天已确认资料，一次核对缺项、历法与出生时区；只有「上午」等时段时不能猜精确小时。事业首轮采用工具已验证的精简字段，重点读 `career_structure`、`entrepreneurship`、`career_timing` 与 `timing_context`；太阳时和资料精度限制以回执为准。
-
-## 工作流
-1. 已有具体问题就直接处理，仅在决定或资料不清时简短核对。
-2. 财运主调 `bazi_wealth`，事业／跳槽／创业主调 `bazi_career`。合伙仍以事业分析为主，双方资料齐全且需要互动比较时再补 `two_person_compatibility`；关系类型只按已说明事实传入，未说明用 `general`。
-3. 读结构化 `wealth_analysis` / `career_analysis`，专项的 `timing_context` 已有大运流年；只在未覆盖的时机追问中补聚合或单层时运工具，不默认重算已有层。传统解释保留来源，不能由财星术语认定现实亏损原因。
-4. 选一项与本次依据和现实条件相连的行动，并说明核对什么。例如自主经营倾向明显且用户正在考虑试项目，可建议先确认一次真实付费需求；没有现金事实时不编预算数额，也不把「财星受劫」当作实际亏损原因。若依据同时有利有弊，两边都保留，不以综合分抹平。
-5. 按 [Onda 解读层](../_shared/onda-counsel.md) 自然收尾；必要边界简洁说明，正文已有具体建议就不再重复。
-
-## 红线
-- 不给具体投资标的、不荐股、不替代财务/法律意见。
-- 不说「你今年必发/必破产」。说倾向、说场景、给把手。
-- 创业/合伙类，提醒盘只是一个变量，市场和人更重要。
-- 创业结构或分数不等于成功概率，不据此建议立即辞职。现实建议落到付费需求、现金余量、试运营或合同分工，并标明是现实验证。
-
-## 样例
-```bash
-python3 -m fatebridge.cli --no-metadata bazi_wealth \
-  --gender 男 --birth-year 1988 --birth-month 1 --birth-day 9 --birth-hour 11 --birth-place 广州 --analysis-year 2026
-
-python3 -m fatebridge.cli --no-metadata bazi_career \
-  --gender 男 --birth-year 1988 --birth-month 1 --birth-day 9 --birth-hour 11 --birth-place 广州 \
-  --strict-fields --no-include-snapshot-text \
-  --fields career_analysis.dominant_ten_gods.primary_career_type career_analysis.career_timing career_analysis.timing_context career_analysis.career_structure career_analysis.entrepreneurship career_analysis.suggestions
-```
+若事业专项年度信号为空，紫微另返回年度四化关联本命官禄，可以交付“原专项没有年度命中；紫微增加一项与本命工作宫有关的动态连接”，再按已核对的四化解释来源说明新增议题；没有足够来源或月份依据时，仍可依据原有工作特点讨论岗位选择，把作品准备、合同条件和交接安排列为现实建议，不编最佳月份。第二方法只新增字段而没有改变本次解释时，不宣称咨询质量或预测把握提高。

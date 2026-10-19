@@ -1,22 +1,21 @@
-# Machine-readable scenario interface; validated against SKILL.md and engine catalog.
 name: onda-zhanbu
 version: 0.2.0
-scenario: 抉择 · 问事占卜
-summary: 围绕一件事呈现卦变或盘局依据，整理现实中需确认的条件与下一步
+scenario: 具体问事与占卜
+summary: 仅在用户明确求卦或起局时处理具体事项，解释真实卦变与条件，复用同一问事结果
+consultation:
+  kind: service
+  topics:
+  - divination
+  scope: current_question
+  time_selection: shared
+  safety_policy: consultation_boundaries_v1
 triggers:
-- 求卦辅助一个具体决定
-- 起卦问能不能成
-- 求一卦
-- 占卜
 - 起卦
-- 梅花易数
+- 求卦
 - 六爻
+- 梅花
 - 奇门
-- 大六壬
-- 金口诀
-- 太乙
-- 星骰
-- 这事吉凶
+- 问事
 engine_tools:
 - astro_horary
 - gua_lookup
@@ -32,22 +31,25 @@ engine_tools:
 - suzhan
 - taiyi
 - tongshefa
+dependencies:
+- kind: shared_support
+  tools:
+  - knowledge_registry
+  - knowledge_read
+  condition: 需要查证内置传统知识或来源时；不自动新增个人计算
 required_inputs: []
+input_notes:
+- 按当前问题与所选工具实际 Schema 核对必要资料；不是完整问卷
+- 主题、对象与时间范围沿用当前聊天，限定方法优先，缺项仅限制对应层
 reads:
+- ../../_shared/consultation-routing.md
+- ../../_shared/safety-boundaries.md
 - ../../_shared/fatebridge-engine.md
 - ../../_shared/onda-counsel.md
+- ../../_shared/timing-selection.md
 output:
   kind: interpretation
   grounding: engine_fields
   voice: onda-counsel
-  deliverables:
-  - 本次问题与问时
-  - 卦变或盘局的关键依据
-  - 传统提示与现实验证条件
-boundary: 传统术数与占星的文化参考视角，不是决定论，不替代医疗、心理、法律、财务等专业意见。
+boundary: 传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。
 license: Apache-2.0
-input_notes:
-- 必需输入由所选卜法决定；时间梅花核对问题及起卦年月日时/时区
-- 手摇或已有卦例沿用原始记录；不得静默改为时间或随机起卦
-- tongshefa 是已有四卦的确定性组合，不实现蓍草十八变；不得用固定默认充当用户起卦
-- otherbu 解读用户实际骰面，不自动随机抽骰；不得以默认值代替实际抽取

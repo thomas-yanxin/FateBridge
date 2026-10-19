@@ -20,7 +20,7 @@ def test_rest_mcp_flags_and_renderer_agree_on_disjoint_response_budget():
         async with Client(create_mcp_app(families="bazi")) as client:
             tools = await client.list_tools()
             career = next(tool for tool in tools if tool.name == "bazi_career")
-            return career.inputSchema["properties"]["response_char_limit"]
+            return career.input_schema["properties"]["response_char_limit"]
 
     mcp_schema = asyncio.run(schema())
     rest_schema = next(

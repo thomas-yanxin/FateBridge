@@ -410,7 +410,7 @@ def test_authored_surfaces_match_rest_mcp_cli_and_strict_projection(
     async def call():
         async with Client(create_mcp_app()) as client:
             schemas = {t.name: t for t in await client.list_tools()}
-            Draft202012Validator(schemas["fengshui_assess"].inputSchema).validate(
+            Draft202012Validator(schemas["fengshui_assess"].input_schema).validate(
                 {**inputs, **controls}
             )
             return await client.call_tool("fengshui_assess", {**inputs, **controls})

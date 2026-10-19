@@ -1,4 +1,4 @@
 interface:
-  display_name: "全面自我画像"
-  short_description: "对照八字紫微西占，读懂有依据的特点、不同处和适合尝试的生活安排"
-  default_prompt: "使用 $onda-zige 按我关心的生活主题做全面画像，保留各体系依据与分歧，给出能在现实中对照的建议。"
+  display_name: 全面画像 · 多主题组合入口
+  short_description: 按用户要求组合多个生活主题，复用已有命盘，呈现相关体系共同点、分歧与缺失
+  default_prompt: 使用 $onda-zige 围绕我这次的问题，按主题、对象与时间范围选择有价值的依据，解释差异与可核对的安排。

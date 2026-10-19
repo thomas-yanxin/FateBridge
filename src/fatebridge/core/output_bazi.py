@@ -4,7 +4,9 @@ Validate existing payloads without reserialization; dynamic map keys and
 extension fields remain open. Definitions follow the service builders.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
+
+from pydantic import ConfigDict, model_validator
 
 from fatebridge.core.output_base import PartialOutput
 
@@ -16,11 +18,23 @@ class TimingOverrides(PartialOutput):
 
 class DimensionTimingContext(PartialOutput):
     analysis_date: Optional[str] = None
+    analysis_datetime: Optional[str] = None
+    timezone: Optional[str] = None
+    input_granularity: Optional[Literal["date"]] = None
+    anchor_policy: Optional[Literal["local_midnight"]] = None
+    year_boundary_policy: Optional[Literal["lichun_exact_moment"]] = None
+    boundary_status: Optional[Literal["year_boundary_day", "not_year_boundary_day"]] = (
+        None
+    )
+    boundaries_on_date: Optional[List[Dict[str, str]]] = None
+    boundary_scope: Optional[str] = None
+    hourly_evidence: Optional[Dict[str, Any]] = None
     dayun_pillar: Optional[str] = None
     liunian_pillar: Optional[str] = None
     source: Optional[str] = None
     # The timing engine reports fractional years (for example 28.7).
     dayun_age: Optional[float] = None
+    dayun_age_basis: Optional[str] = None
     overridden: Optional[TimingOverrides] = None
 
 
@@ -116,6 +130,10 @@ class CareerGod(PartialOutput):
 class CareerDominant(PartialOutput):
     top_gods: Optional[List[CareerGod]] = None
     primary_career_type: Optional[str] = None
+    weighted_counts: Optional[Dict[str, float]] = None
+    counting_basis: Optional[Dict[str, Any]] = None
+    tied_primary_gods: Optional[List[str]] = None
+    primary_selection: Optional[str] = None
 
 
 class IndustryRecommendation(PartialOutput):
@@ -132,6 +150,12 @@ class IndustryAnalysis(PartialOutput):
     element_distribution: Optional[Dict[str, float]] = None
 
 
+class CareerRuleSignal(PartialOutput):
+    label: Optional[str] = None
+    trigger: Optional[str] = None
+    score_delta: Optional[int] = None
+
+
 class CareerStructure(PartialOutput):
     score_kind: Optional[str] = None
     scope: Optional[str] = None
@@ -139,6 +163,10 @@ class CareerStructure(PartialOutput):
     score: Optional[int] = None
     level: Optional[str] = None
     notes: Optional[List[str]] = None
+    formation_status: Optional[Literal["heuristic_candidate_only"]] = None
+    rule_signals: Optional[List[CareerRuleSignal]] = None
+    unverified_conditions: Optional[List[str]] = None
+    interpretation_scope: Optional[str] = None
 
 
 class Entrepreneurship(PartialOutput):
@@ -148,6 +176,9 @@ class Entrepreneurship(PartialOutput):
     score: Optional[int] = None
     tendency: Optional[str] = None
     notes: Optional[List[str]] = None
+    formation_status: Optional[Literal["heuristic_candidate_only"]] = None
+    rule_signals: Optional[List[CareerRuleSignal]] = None
+    unverified_conditions: Optional[List[str]] = None
 
 
 class FavorableDirection(PartialOutput):
@@ -236,6 +267,7 @@ class Constitution(PartialOutput):
     warm_strength: Optional[float] = None
     cold_strength: Optional[float] = None
     notes: Optional[List[str]] = None
+    reference_scope: Optional[str] = None
 
 
 class OrganFinding(PartialOutput):
@@ -249,24 +281,34 @@ class OrganAnalysis(PartialOutput):
     element_distribution: Optional[Dict[str, float]] = None
     findings: Optional[List[OrganFinding]] = None
     summary: Optional[str] = None
-
-
-class DiseaseRisks(PartialOutput):
-    risks: Optional[List[str]] = None
-
-
-class Regimen(PartialOutput):
-    favorable_elements: Optional[List[str]] = None
-    advice: Optional[List[str]] = None
+    reference_scope: Optional[str] = None
 
 
 class HealthAnalysis(DimensionOutput):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "not": {
+                "anyOf": [
+                    {"required": ["disease_risks"]},
+                    {"required": ["regimen"]},
+                ]
+            }
+        }
+    )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _validate_cultural_scope(cls, data: Any) -> Any:
+        if isinstance(data, dict) and {"disease_risks", "regimen"} & data.keys():
+            raise ValueError("健康文化结果不提供疾病风险或调理处方区块")
+        return data
+
     constitution: Optional[Constitution] = None
     organ_analysis: Optional[OrganAnalysis] = None
-    disease_risks: Optional[DiseaseRisks] = None
     health_timing: Optional[TimingSignals] = None
-    regimen: Optional[Regimen] = None
     disclaimer: Optional[str] = None
+    scope: Optional[str] = None
+    is_medical_assessment: Optional[Literal[False]] = None
 
 
 class ChildStar(PartialOutput):
@@ -286,7 +328,6 @@ class ChildPalace(PartialOutput):
 class ChildAffinity(PartialOutput):
     score: Optional[int] = None
     tendency: Optional[str] = None
-    count_hint: Optional[str] = None
     notes: Optional[List[str]] = None
 
 

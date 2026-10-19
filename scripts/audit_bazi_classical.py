@@ -18,7 +18,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/bazi_classical_v1"
-FREEZE = ROOT / "docs/validation/bazi-classical-v1/reference-freeze.json"
+FREEZE = CORPUS / "provenance/reference-freeze.json"
 PILLAR_NAMES = ("year", "month", "day", "hour")
 
 

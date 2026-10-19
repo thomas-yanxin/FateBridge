@@ -1,33 +1,41 @@
-# Machine-readable interface for the onda-jiankang skill.
-# Enforced by tests/test_skills_interface_contract.py against the FateBridge
-# engine catalog and this skill's SKILL.md. Keep in sync or CI fails.
 name: onda-jiankang
 version: 0.2.0
-scenario: 健康 · 身心
-summary: 看懂五行权重及传统藏象对应，分开文化解释与生活观察，有实际不适先回应现实需要
+scenario: 传统身心文化参考
+summary: 解释实际五行权重与传统对应，区分文化观点和健康信息，保持非诊断非治疗边界
+consultation:
+  kind: topic
+  topics:
+  - health_culture
+  scope: current_question
+  time_selection: shared
+  safety_policy: consultation_boundaries_v1
 triggers:
-  - 健康运
-  - 传统健康标签是什么意思
-  - 五行养生
-  - 今年传统健康文化参考
-  - 看懂健康文化中的五行对应
-  - 五行养护文化
+- 传统健康文化
+- 五行健康标签
+- 中医文化
 engine_tools:
-  - analyze_destiny
-  - bazi_health
-  - liunian_analysis
-  - liuyue_analysis
-  - timing_analysis
+- analyze_destiny
+- bazi_health
+- timing_analysis
+dependencies:
+- kind: shared_support
+  tools:
+  - knowledge_registry
+  - knowledge_read
+  condition: 需要查证内置传统知识或来源时；不自动新增个人计算
 required_inputs: []
 input_notes:
-  - 用户明确需要个人传统文化计算时，按所选工具一次核对出生资料
-  - 实际症状先回应现实求助，不为解释症状采集生辰或自动排盘
+- 按当前问题与所选工具实际 Schema 核对必要资料；不是完整问卷
+- 主题、对象与时间范围沿用当前聊天，限定方法优先，缺项仅限制对应层
 reads:
-  - ../../_shared/fatebridge-engine.md
-  - ../../_shared/onda-counsel.md
+- ../../_shared/consultation-routing.md
+- ../../_shared/safety-boundaries.md
+- ../../_shared/fatebridge-engine.md
+- ../../_shared/onda-counsel.md
+- ../../_shared/timing-selection.md
 output:
-  kind: interpretation        # 人类可读解读，非原始命盘字段
-  grounding: engine_fields    # 结论溯源到引擎字段，AI 不手算
+  kind: interpretation
+  grounding: engine_fields
   voice: onda-counsel
-boundary: 传统术数与占星的文化参考视角，不是决定论，不替代医疗、心理、法律、财务等专业意见。
+boundary: 传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。
 license: Apache-2.0

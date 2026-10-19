@@ -1,0 +1,54 @@
+name: onda-renji
+version: 0.2.0
+scenario: 人际与合作
+summary: 区分个人交往方式和双人合作，解释分工、支持与磨合，不用分数认定现实信用
+consultation:
+  kind: topic
+  topics:
+  - social
+  scope: current_question
+  time_selection: shared
+  safety_policy: consultation_boundaries_v1
+triggers:
+- 朋友
+- 同事
+- 团队
+- 合伙
+- 人际
+- 贵人
+engine_tools:
+- analyze_destiny
+- astro_chart
+- astro_relative_chart
+- firdaria
+- sukuyo_compatibility
+- timing_analysis
+- two_person_compatibility
+- western_timing_analysis
+- ziwei_birth
+- ziwei_horoscope
+dependencies:
+- kind: shared_support
+  tools:
+  - knowledge_registry
+  - knowledge_read
+  condition: 需要查证内置传统知识或来源时；不自动新增个人计算
+- kind: conditional_service
+  scenario: onda-shiyun
+  condition: 本轮询问阶段、年度、短期或指定时间技法时；只补未覆盖层，先遵守硬边界
+required_inputs: []
+input_notes:
+- 按当前问题与所选工具实际 Schema 核对必要资料；不是完整问卷
+- 主题、对象与时间范围沿用当前聊天，限定方法优先，缺项仅限制对应层
+reads:
+- ../../_shared/consultation-routing.md
+- ../../_shared/safety-boundaries.md
+- ../../_shared/fatebridge-engine.md
+- ../../_shared/onda-counsel.md
+- ../../_shared/timing-selection.md
+output:
+  kind: interpretation
+  grounding: engine_fields
+  voice: onda-counsel
+boundary: 传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。
+license: Apache-2.0

@@ -280,6 +280,22 @@ class CareerAnalysis:
 
         return {
             "top_gods": career_profiles,
+            "weighted_counts": {
+                god.value: weight for god, weight in god_counts.items()
+            },
+            "counting_basis": {
+                "included_pillars": [name for name in pillars if name != "day"],
+                "excluded_pillars": ["day"],
+                "stem_weight": 1.0,
+                "hidden_stem_weight": 0.5,
+                "scope": "本事业规则跳过整个日柱（含日支藏干）；权重是计数约定，不是十神旺衰或实际能力。",
+            },
+            "tied_primary_gods": [
+                god.value
+                for god, weight in sorted_gods
+                if weight > 0 and weight == sorted_gods[0][1]
+            ],
+            "primary_selection": "按权重降序、同权重沿十神枚举顺序取首项；并列不代表首项更强。",
             "primary_career_type": (
                 career_profiles[0]["career_type"] if career_profiles else "综合型"
             ),
@@ -343,9 +359,10 @@ class CareerAnalysis:
         pillars: Dict[str, Tuple[str, str]],
         day_stem: str,
     ) -> Dict[str, Any]:
-        """分析事业格局高低。"""
+        """计算事业共现启发式评分及候选线索，不判定古典成格。"""
         score = 60  # 基准分
         notes: List[str] = []
+        rule_signals: List[Dict[str, Any]] = []
 
         # 1. 官印相生 is one positive contribution, not the overall grade.
         has_officer = False
@@ -358,7 +375,16 @@ class CareerAnalysis:
 
         if has_officer and has_seal:
             score += 15
-            notes.append("官印相生，为事业格局加分；总体层级以综合评分为准")
+            notes.append(
+                "官印相生候选：仅官杀与印星共现，按启发式规则加分；未验证古典成格条件"
+            )
+            rule_signals.append(
+                {
+                    "label": "官印相生",
+                    "trigger": "官或杀与正印或偏印共现（非日柱天干及藏干）",
+                    "score_delta": 15,
+                }
+            )
 
         # 2. 食伤生财 → 经商格局
         has_food_hurt = False
@@ -374,12 +400,30 @@ class CareerAnalysis:
 
         if has_food_hurt and has_wealth:
             score += 10
-            notes.append("食伤生财，传统规则关联经商与技术表达，不据此预测收入")
+            notes.append(
+                "食伤生财候选：仅非日柱天干共现，未验证生化条件；不据此预测收入"
+            )
+            rule_signals.append(
+                {
+                    "label": "食伤生财",
+                    "trigger": "食神或伤官与正财或偏财共现（仅非日柱天干）",
+                    "score_delta": 10,
+                }
+            )
 
         # 3. 财官双美
         if has_officer and has_wealth:
             score += 8
-            notes.append("财官双美，为事业格局的传统加分项，不代表现实名利结果")
+            notes.append(
+                "财官双美候选：仅官杀与财星共现，未验证古典成格条件；不代表现实名利结果"
+            )
+            rule_signals.append(
+                {
+                    "label": "财官双美",
+                    "trigger": "官杀（非日柱天干及藏干）与财星（仅非日柱天干）共现",
+                    "score_delta": 8,
+                }
+            )
 
         # 4. 日主强弱影响
         from ..core.elements import ElementAnalysis
@@ -408,6 +452,15 @@ class CareerAnalysis:
             "score": score,
             "score_kind": "traditional_rule_index",
             "scope": "individual_natal_career_structure",
+            "formation_status": "heuristic_candidate_only",
+            "rule_signals": rule_signals,
+            "unverified_conditions": [
+                "月令取格",
+                "透藏位置与根气",
+                "生克制化力度及救应",
+                "格局成败",
+            ],
+            "interpretation_scope": "共现标签与分数只描述本实现的启发式线索；level是历史评分分档，不是古典成格或现实事业层级认证。",
             "score_basis": (
                 "以60为基准，按官印、食伤与财、财官及日主强弱规则加减，"
                 "限制在30–95；不是事业成就或收入概率。"
@@ -424,6 +477,7 @@ class CareerAnalysis:
         """分析创业 vs 打工倾向。"""
         entrepreneur_score = 50
         notes: List[str] = []
+        rule_signals: List[Dict[str, Any]] = []
 
         # 统计十神
         god_counts: Dict[str, float] = {}
@@ -464,10 +518,26 @@ class CareerAnalysis:
         if god_counts.get(TenGod.SEVEN_KILLER.value, 0) > 0:
             if god_counts.get(TenGod.FOOD_GOD.value, 0) > 0:
                 entrepreneur_score += 10
-                notes.append("食神制杀，按本规则提高创业倾向评分，不代表创业成功概率")
+                notes.append(
+                    "食神制杀候选：仅食神与七杀共现，未验证制杀力度及成格条件；不代表创业成功概率"
+                )
+                rule_signals.append(
+                    {
+                        "label": "食神制杀",
+                        "trigger": "食神与七杀共现（非日柱天干及藏干）",
+                        "score_delta": 10,
+                    }
+                )
             elif god_counts.get(TenGod.POSITIVE_SEAL.value, 0) > 0:
                 entrepreneur_score += 8
-                notes.append("杀印相生，传统规则关联管理型自主经营倾向")
+                notes.append("杀印相生候选：仅七杀与正印共现，未验证生化及成格条件")
+                rule_signals.append(
+                    {
+                        "label": "杀印相生",
+                        "trigger": "七杀与正印共现且无食神（非日柱天干及藏干）",
+                        "score_delta": 8,
+                    }
+                )
 
         entrepreneur_score = max(20, min(90, entrepreneur_score))
 
@@ -482,6 +552,13 @@ class CareerAnalysis:
             "score": entrepreneur_score,
             "score_kind": "traditional_rule_index",
             "scope": "individual_natal_entrepreneurship_tendency",
+            "formation_status": "heuristic_candidate_only",
+            "rule_signals": rule_signals,
+            "unverified_conditions": [
+                "日主与食杀印的旺衰根气",
+                "位置及制化力度",
+                "古典成格条件",
+            ],
             "score_basis": (
                 "以50为基准，按正偏十神权重、食神制杀或杀印相生规则加减，"
                 "限制在20–90；只表示本规则的创业倾向，不是成功率或行动建议。"
@@ -574,18 +651,33 @@ class CareerAnalysis:
         """生成事业建议。"""
         suggestions: List[str] = []
 
-        # 基于主导十神
+        # Preserve ties through this derived prose exit, not only raw fields.
         primary_type = dominant_god.get("primary_career_type", "综合型")
-        suggestions.append(f"主导事业类型为{primary_type}，建议发挥自身优势")
-
-        # 基于格局
-        level = structure.get("level", "普通格局")
-        if "上等" in level:
-            suggestions.append("事业格局高，宜志存高远，把握大机遇")
-        elif "中等" in level:
-            suggestions.append("事业格局中等，稳扎稳打，步步为营")
+        tied = dominant_god.get("tied_primary_gods", [])
+        if len(tied) > 1:
+            types = {
+                god.value: profile["career_type"]
+                for god, profile in TEN_GOD_CAREER.items()
+            }
+            labels = "、".join(f"{god}（{types.get(god, '综合型')}）" for god in tied)
+            suggestions.append(
+                f"本规则最高计权并列为{labels}；这些是职业类比，需结合实际职责与经验核验，首项不表示更强"
+            )
         else:
-            suggestions.append("事业格局需突破，建议持续学习提升，积累人脉资源")
+            suggestions.append(
+                f"本规则计权首项映射为{primary_type}，仅作职业类比，需结合实际职责与经验核验"
+            )
+
+        # Historical score bands are not classical formation determinations.
+        level = structure.get("level", "普通格局")
+        if structure.get("formation_status") == "heuristic_candidate_only":
+            suggestions.append(
+                f"本启发式评分的历史分档为“{level}”；共现标签仍属候选，未验证古典成格条件，也不代表现实事业层级或机遇大小"
+            )
+        else:
+            suggestions.append(
+                f"历史规则评分分档为“{level}”；单凭分档不能确认古典成格或现实事业层级"
+            )
 
         # 基于创业倾向
         tendency = entrepreneurship.get("tendency", "")
@@ -601,7 +693,8 @@ class CareerAnalysis:
         # 基于行业
         rec = industry.get("recommended_industries", [])
         if rec:
-            first_industries = rec[0].get("industries", [])[:3]
-            suggestions.append(f"推荐行业：{'、'.join(first_industries)}等")
+            suggestions.append(
+                "行业字段中的五行分类仅为传统类比，列表顺序不构成优先级；选择需核对兴趣、经验与岗位要求"
+            )
 
         return suggestions

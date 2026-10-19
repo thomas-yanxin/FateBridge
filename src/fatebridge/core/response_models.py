@@ -295,7 +295,7 @@ _TOOL_FIELDS = {
     "otherbu": "analysis_type chart diceChart house input_normalized interpretation planet question sign summary",
     "sanshiunited": "analysis_context analysis_type input_normalized liureng qimen sources subresults summary taiyi",
     "ziwei_birth": "analysis_context analysis_type calendar_context four_pillars person_info ziwei_birth",
-    "ziwei_horoscope": "analysis_context analysis_type person_info ziwei_horoscope",
+    "ziwei_horoscope": "analysis_context analysis_type birth_context person_info ziwei_horoscope",
     "ziwei_rules": "analysis_type engine focused_rules requested_year_stem rule_catalogue",
     "liureng_gods": "analysis_context analysis_type calendar_context four_pillars liureng",
     "liureng_runyear": "analysis_context analysis_type calendar_context four_pillars liureng runyear",

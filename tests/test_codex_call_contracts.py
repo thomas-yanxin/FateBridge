@@ -75,6 +75,41 @@ async def test_preloaded_contract_keeps_required_time_and_solar_flag_constraints
 
 
 @pytest.mark.asyncio
+async def test_preloaded_stage_view_retains_actual_period_boundaries():
+    """A normally loaded contract must support stage reading without rediscovery."""
+    record = next(
+        item
+        for item in await builder.call_contracts()
+        if item["tool"] == "western_timing_analysis"
+    )
+    spec = next(s for s in CATALOG if s.tool_name == record["tool"])
+    async with Client(create_mcp_app()) as client:
+        result = await client.call_tool(
+            record["tool"],
+            {
+                **example_input(spec),
+                "fields": record["evidence_views"]["stage"]["fields"],
+                "strict_fields": True,
+                "include_snapshot_text": False,
+            },
+        )
+        payload = result.structured_content
+        if "result_delivery" in payload:
+            reference = payload["result_delivery"]
+            pieces = []
+            uri = reference["first_page_uri"]
+            while uri:
+                page = json.loads((await client.read_resource(uri))[0].text)
+                pieces.append(page["text"])
+                uri = page["next_uri"]
+            payload = json.loads("".join(pieces))
+        assert not result.is_error
+        firdaria = payload["time_lords"]["firdaria"]
+        for period in (firdaria["current_major"], firdaria["current_sub"]):
+            assert period["planet"] and period["start"] < period["end"]
+
+
+@pytest.mark.asyncio
 async def test_only_preloaded_inputs_and_views_are_enough_for_real_mcp_calls():
     records = await builder.call_contracts()
     specs = {s.tool_name: s for s in CATALOG}

@@ -1,49 +1,76 @@
-# Machine-readable scenario interface; validated against SKILL.md and engine catalog.
 name: onda-zige
 version: 0.2.0
-scenario: 全面自我画像
-summary: 按生活主题对照八字紫微西占，呈现有依据的特点、分歧与可尝试的安排
+scenario: 全面画像 · 多主题组合入口
+summary: 按用户要求组合多个生活主题，复用已有命盘，呈现相关体系共同点、分歧与缺失
+consultation:
+  kind: composite
+  topics:
+  - self
+  - career
+  - romance
+  - family
+  - finance
+  - learning
+  - social
+  - health_culture
+  scope: current_question
+  time_selection: shared
+  safety_policy: consultation_boundaries_v1
 triggers:
-- 三体系全面认识我
-- 帮我全面分析一下
-- 告诉我我的全部
-- 做一个完整的人生说明书
-- 从八字紫微西占综合看看我
-- 全面自我分析
-- 完整命盘解读
-- 三套交叉印证
+- 全面画像
+- 全面分析
+- 综合全貌
+- 人生说明书
 engine_tools:
 - analyze_destiny
 - astro_chart
-- bazi_birth
-- bazi_career
-- bazi_health
-- bazi_personality
-- bazi_relatives
-- bazi_romance
-- dayun_analysis
-- timing_analysis
 - ziwei_birth
-required_inputs:
-- birth_year
-- birth_month
-- birth_day
-- birth_hour
-- gender
-- birth_place
+dependencies:
+- kind: shared_support
+  tools:
+  - knowledge_registry
+  - knowledge_read
+  condition: 需要查证内置传统知识或来源时；不自动新增个人计算
+- kind: conditional_service
+  scenario: onda-shiyun
+  condition: 本轮询问阶段、年度、短期或指定时间技法时；只补未覆盖层，先遵守硬边界
+- kind: composite_topic
+  scenario: onda-mingge
+  condition: 仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果
+- kind: composite_topic
+  scenario: onda-shiye
+  condition: 仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果
+- kind: composite_topic
+  scenario: onda-caiwu
+  condition: 仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果
+- kind: composite_topic
+  scenario: onda-yuanfen
+  condition: 仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果
+- kind: composite_topic
+  scenario: onda-xueye
+  condition: 仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果
+- kind: composite_topic
+  scenario: onda-jiating
+  condition: 仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果
+- kind: composite_topic
+  scenario: onda-renji
+  condition: 仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果
+- kind: composite_topic
+  scenario: onda-jiankang
+  condition: 仅请求包含此主题或后续深入该主题时，读取对应技能并复用已有结果
+required_inputs: []
+input_notes:
+- 按当前问题与所选工具实际 Schema 核对必要资料；不是完整问卷
+- 主题、对象与时间范围沿用当前聊天，限定方法优先，缺项仅限制对应层
 reads:
+- ../../_shared/consultation-routing.md
+- ../../_shared/safety-boundaries.md
 - ../../_shared/fatebridge-engine.md
 - ../../_shared/onda-counsel.md
+- ../../_shared/timing-selection.md
 output:
   kind: interpretation
   grounding: engine_fields
   voice: onda-counsel
-  deliverables:
-  - 主题画像与各体系依据
-  - 分歧、缺失及精度
-  - 两三项现实观察或尝试
-boundary: 传统术数与占星的文化参考视角，不是决定论，不替代医疗、心理、法律、财务等专业意见。
+boundary: 传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。
 license: Apache-2.0
-input_notes:
-- 按可用资料分别构造各体系输入；主证已有结果则复用
-- 健康与动态时运按用户问题补充，不默认补算所有专项

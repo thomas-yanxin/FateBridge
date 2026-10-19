@@ -1,10 +1,21 @@
 # 八字旺衰与喜用的计算范围
 
+本文面向需要解释八字结果或维护计算逻辑的开发者，说明旺衰模型、喜用分层、版本回执及原典对照的实际范围。先核对模型和状态，再读取对应解释层；结构计数、有效力量与喜用候选不能互相替代。
+
+[文档中心](README.md) · [能力覆盖](algorithm-coverage.md) · [双人评分](compatibility-scoring.md)
+
+| 要核对什么 | 阅读位置 |
+| --- | --- |
+| 强弱怎样判定，系数来自哪里 | [旺衰实际计算](#旺衰实际计算v2) |
+| 喜用、条件项和中性项怎样区分 | [喜用分层与冲突](#喜用分层与冲突) |
+| 当前输出的具体含义 | [回归案例](#回归案例) |
+| 原典标注能验证什么 | [原典对照基准与未覆盖范围](#原典对照基准与未覆盖范围) |
+
 ## 旺衰实际计算：v2
 
 `day_master.strength` 仍返回 `强 / 中和 / 弱`，底层现为
 `season_root_revelation_relations_v2`，已替换旧版计数加月令2分的判级。
-不是只增加解释字段；专项分析与三端均读取新判级。
+专项分析及 REST、MCP、CLI 均读取这一判级。实现见 [`core/strength.py`](../src/fatebridge/core/strength.py)。
 
 ### 原文原则与工程参数
 
@@ -62,7 +73,7 @@
 月令／通根／透干去除对照、冲的方向、合解冲与争合、成局不化、
 刑不尽拔根、预算守恒、日主不自我投票及120种日干月支组合。
 
-复算：`uv run python scripts/validate_bazi_strength.py`，默认仅输出汇总；
+复算：`uv run --locked --extra dev python scripts/validate_bazi_strength.py`，默认仅输出汇总；
 需要完整报告时显式传入 `--output <文件路径>`。
 参考命例极端情形偏多；原文的整体“中和纯粹”不自动等同于日主强弱字段的“中和”。
 计分系数仍待更广样本和流派复核，不据上述命例符合率声称现实预测有效。
@@ -95,9 +106,16 @@
 藏干位置，不判断剂量是否足够、寒暖是否已经调和或是否需要添加。
 不同门派或不同分析层的分歧保留，不互相抵消。
 
-事业行业、贵人方位、学业方向与养护参考统一读取上述喜用解析；不再从
+事业行业、贵人方位与学业方向统一读取上述喜用解析；不再从
 基础中和标签独立推导“喜水”。事业的忌行业也不再取喜用集合的补集。
-这些现代应用仍只是传统对应参考，不构成职业、健康或人生效果的验证。
+这些现代应用仍只是传统对应参考，不构成职业或人生效果的验证。
+健康文化结果只保留盘内分类、五行传统对应与关系变化，不使用喜用生成调理方案。
+
+### 读取结果时的顺序
+
+1. 在 `day_master.assessment` 核对模型版本、判级状态、触发规则与敏感性，再解释 `day_master.strength`。
+2. 在 `structure_profile` 核对 `resolution_policy`、`assessment_status`、各层依据与冲突，再解释最终四组五行列表。
+3. 解释专项或双人结果时，保留这些上游状态；个人层的 `rule_based` 不能替代喜用层的 `conditional`。
 
 ## 回归案例
 
@@ -113,3 +131,41 @@
 | 调候 | 戊为主、丙为辅，丙藏于寅巳；不由藏干存在推断调候已经足够 |
 
 这是输出规则的回归说明，不是对真实人生的预测。
+
+## 原典对照基准与未覆盖范围
+
+[原典标注夹具](../tests/fixtures/bazi_classical_v1/profile.json)采用
+《秘本子平真诠》扫描本的月令格局口径，版本为
+`ziping_zhenquan_month_command_text_v1`。冻结夹具历史元数据将发行者记为“世界书局”；
+同一书影封面（PDF1）实际题“上海世界图书馆发行”，当前引用以书影为准，
+见[版本与页码](../skills/_shared/bazi-topic-evidence.md)。此次仅勘误书目，
+不改历史冻结夹具、命式或裁定预期。
+[命式与裁定](../tests/fixtures/bazi_classical_v1/cases.json)、
+[规则](../tests/fixtures/bazi_classical_v1/rules.json)、
+[局部及未知输入检查](../tests/fixtures/bazi_classical_v1/probes.json)和
+[分歧](../tests/fixtures/bazi_classical_v1/disagreements.json)由人工目读整理，
+未由生产输出生成；这不是第三方专家盲审。
+[冻结清单](../tests/fixtures/bazi_classical_v1/provenance/reference-freeze.json)
+记录输入与标注的哈希；
+[原文交叉核对](../tests/fixtures/bazi_classical_v1/provenance/source-crosscheck-addendum.json)
+保留原页位置、版本异文和适配器勘误，不更改冻结预期。
+
+复算使用 `uv run --locked --extra dev python scripts/audit_bazi_classical.py --output <仓库外报告路径>`；
+可用 `--split development` 或 `--split reserved` 选择已声明的分组。
+脚本退出1表示原典算法验收仍有差异或未覆盖，测试通过只说明冻结、范围与
+差异留存机制正常。已经用于比较的分组不重新宣称为未见盲测。
+
+需要继续保留的限制：
+
+- 透干、杂气兼透及“不失本格／兼格”不能用固定十神优先表代替；
+  禄刃资格需按所选原典的具体条件核对。
+- 根的存在、种类与权重是不同对象；局部通根相符不证明整体旺衰已获裁定。
+  原文未明确总强弱的命式保留 unknown，不补成中和答案。
+- 共现候选不等于完整成格、破格、制化救应或相神判断；
+  格局用神／相神与现代五行扶抑列表不能直接作集合相等比较。
+- 只有四柱的古代命式不验证历史公历、出生时刻、时区或节气换算；
+  缺时柱不补默认值，也不以古代官职记述认证现代职业或现实效果。
+
+主参考为[国家图书馆藏《秘本子平真诠》扫描本](https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf)；
+[东里书斋文本](https://www.donglishuzhai.net/chapter/3722.html)提供导航和校异线索，
+与扫描同源，不计作第二独立裁判。

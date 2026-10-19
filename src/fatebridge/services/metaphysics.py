@@ -612,7 +612,7 @@ def _build_ziwei_horoscope_snapshot_text(
                 str(s.get("scope", "运限")),
                 _join_snapshot_lines(
                     [
-                        f"宫位：{s.get('palace_name', '无')}（{s.get('palace_ganzhi', '')}）",
+                        f"命宫活动索引所临本命宫：{s.get('natal_palace_name', s.get('palace_name', '无'))}（{s.get('palace_ganzhi', '')}）",
                         f"四化天干：{s.get('stem', '')}",
                         f"四化：{_mutagen_line(s.get('mutagen', {}) or {})}",
                     ]
@@ -770,7 +770,25 @@ def calculate_ziwei_horoscope(
             "birth_longitude": seed.longitude,
             "time_algorithm": "真太阳时" if seed.applied_true_solar else "直接时间",
         },
-        "analysis_context": _analysis_context_payload(seed),
+        # Correct the old birth-seed receipt here; preserve it under an explicit
+        # birth key. The existing target API uses the default analysis timezone,
+        # not the person's birth timezone, and resolves the target minute to 0.
+        "birth_context": {
+            **_analysis_context_payload(seed),
+            "context_role": "birth",
+        },
+        "analysis_context": {
+            **_analysis_context_payload(target_seed),
+            "context_role": "target",
+            "analysis_datetime": target_seed.corrected_datetime.strftime(
+                "%Y-%m-%d %H:%M:%S"
+            ),
+            "analysis_year": target_seed.corrected_datetime.year,
+            "analysis_month": target_seed.corrected_datetime.month,
+            "analysis_day": target_seed.corrected_datetime.day,
+            "analysis_hour": target_seed.corrected_datetime.hour,
+            "analysis_minute": target_seed.corrected_datetime.minute,
+        },
         "ziwei_horoscope": horoscope,
         "snapshot_text": snapshot_text,
         "snapshot_export": snapshot_export,

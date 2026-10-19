@@ -63,17 +63,6 @@ get_taiyi_analysis = rest_handler("taiyi")
 knowledge_read_helper = rest_handler("knowledge_read")
 knowledge_registry_helper = rest_handler("knowledge_registry")
 
-_SPEC_BY_KEY = {spec.key: spec for spec in CATALOG}
-
-
-def get_tool_descriptor(key):
-    """Catalog-backed lookup (replaces the retired tool_registry)."""
-    return _SPEC_BY_KEY[key]
-
-
-def iter_tool_descriptors(*, family=None):
-    return [s for s in CATALOG if family is None or s.family == family]
-
 
 def _build_birth_payload(name: str, gender: str, birth_place: str) -> dict:
     return {
@@ -216,7 +205,7 @@ def _taiyi_mcp_kwargs(request: TaiyiAnalysisRequest) -> dict:
     return payload
 
 
-REGISTRY_PARITY_CASES = [
+PARITY_CASES = [
     (
         "export_registry",
         lambda: ExportRegistryRequest(technique="qimen"),
@@ -263,10 +252,6 @@ REGISTRY_PARITY_CASES = [
         "pdchart",
         lambda request: request.model_dump(),
     ),
-]
-
-
-NON_REGISTRY_PARITY_CASES = [
     (
         "two_person_compatibility",
         lambda: TwoPersonCompatibilityRequest(
@@ -507,25 +492,21 @@ def test_alignment_request_models_accept_fastmcp_offline_fields():
     assert liushi_payload["selected_sections"] == ["查询信息", "流时信息"]
 
 
-def test_tool_registry_first_batch_descriptors_cover_expected_families():
-    assert {item.key for item in iter_tool_descriptors(family="export")} == {
+def test_catalog_descriptors_cover_reference_and_timing_families():
+    assert {item.key for item in CATALOG if item.family == "export"} == {
         "export_registry",
         "export_parse",
     }
-    assert {item.key for item in iter_tool_descriptors(family="knowledge")} == {
+    assert {item.key for item in CATALOG if item.family == "knowledge"} == {
         "knowledge_registry",
         "knowledge_read",
     }
-    assert {
-        item.key for item in iter_tool_descriptors(family="western_timing_tool")
-    } >= {
+    assert {item.key for item in CATALOG if item.family == "western_timing_tool"} >= {
         "solarreturn",
         "pdchart",
     }
-
-    # Invariants for the registry-equivalent families (1:1 REST<->MCP tools).
-    for family in ("export", "knowledge", "western_timing_tool"):
-        for descriptor in iter_tool_descriptors(family=family):
+    for descriptor in CATALOG:
+        if descriptor.family in {"export", "knowledge", "western_timing_tool"}:
             assert descriptor.mcp_name == descriptor.key
             assert descriptor.rest_path.startswith("/api/")
             assert descriptor.request_model
@@ -533,33 +514,11 @@ def test_tool_registry_first_batch_descriptors_cover_expected_families():
 
 
 @pytest.mark.parametrize(
-    ("tool_key", "request_factory", "api_handler", "mcp_tool", "mcp_kwargs_builder"),
-    REGISTRY_PARITY_CASES,
-    ids=[case[0] for case in REGISTRY_PARITY_CASES],
-)
-def test_registry_backed_tools_api_match_fastmcp_output(
-    tool_key,
-    request_factory,
-    api_handler,
-    mcp_tool,
-    mcp_kwargs_builder,
-):
-    descriptor = get_tool_descriptor(tool_key)
-    request = request_factory()
-
-    api_result = asyncio.run(api_handler(request))
-    mcp_result = json.loads(mcp_text(mcp_tool, **mcp_kwargs_builder(request)))
-
-    _assert_transport_parity(api_result, mcp_result, tool_name=descriptor.key)
-    assert descriptor.mcp_name == descriptor.key
-
-
-@pytest.mark.parametrize(
     ("tool_name", "request_factory", "api_handler", "mcp_tool", "mcp_kwargs_builder"),
-    NON_REGISTRY_PARITY_CASES,
-    ids=[case[0] for case in NON_REGISTRY_PARITY_CASES],
+    PARITY_CASES,
+    ids=[case[0] for case in PARITY_CASES],
 )
-def test_non_registry_tools_api_match_fastmcp_output(
+def test_catalog_tools_api_match_fastmcp_output(
     tool_name,
     request_factory,
     api_handler,

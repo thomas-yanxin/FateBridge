@@ -38,6 +38,9 @@ def test_horoscope_has_six_scopes_with_expected_shape():
         assert set(s.keys()) == {
             "scope",
             "palace_name",
+            "scope_palace_role",
+            "natal_palace_name",
+            "mutagen_natal_links",
             "branch",
             "branch_index",
             "palace_ganzhi",

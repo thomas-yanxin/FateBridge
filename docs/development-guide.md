@@ -1,6 +1,10 @@
 # FateBridge 开发指南
 
-这份指南写给要在本仓库里改算法、补接口或修文档的开发者。当前仓库是 backend-only 的 Python 项目，没有内置前端应用。
+[文档中心](README.md) · [贡献流程](../CONTRIBUTING.md) · [架构说明](architecture.md)
+
+这份指南帮助贡献者建立可复现的开发环境、找到修改位置并选择验证范围。FateBridge 使用 Python `src` 布局，需先安装包再运行；当前没有内置前端应用。协作、Issue 和 PR 流程见[贡献指南](../CONTRIBUTING.md)。
+
+本页导航：[环境准备](#环境准备) · [项目结构](#项目结构概览) · [本地运行](#本地运行) · [开发流程](#推荐开发流程) · [设计约束](#设计约束) · [测试策略](#测试策略) · [文档维护](#文档维护与验证) · [打包发布](#ci打包与发布)
 
 ## 环境准备
 
@@ -11,7 +15,7 @@ git clone https://github.com/Yonder-Lab/FateBridge.git
 cd FateBridge
 
 uv sync --locked --extra dev
-source .venv/bin/activate
+uv run --locked --extra dev fatebridge doctor
 ```
 
 `uv.lock` 由 uv 生成并随源码提交，`--locked` 会在锁文件与声明不一致时报错。依赖调整后先更新锁文件，再验证：
@@ -25,7 +29,9 @@ uv lock --check
 uv sync --locked --extra dev
 ```
 
-开发依赖继续声明在 `project.optional-dependencies.dev`，兼容既有的 dev extra。日常命令可以在激活后运行，也可使用 `uv run --locked --extra dev <command>`。提交依赖变更时同时审查 `pyproject.toml` 和 `uv.lock`；不要手改锁文件。
+首次 `doctor` 应能识别包版本和已安装依赖；缺少外部星历文件时按返回的能力范围处理。Windows 的环境准备见[快速入门](getting-started.md)。
+
+开发依赖继续声明在 `project.optional-dependencies.dev`，兼容既有的 dev extra。本页统一用 `uv run --locked --extra dev <command>` 运行仓库命令，无需激活虚拟环境。提交依赖变更时同时审查 `pyproject.toml` 和 `uv.lock`；不要手改锁文件。
 
 环境变量可以按需复制一份：
 
@@ -82,16 +88,18 @@ FateBridge/
 启动 REST API：
 
 ```bash
-API_HOST=127.0.0.1 python -m fatebridge.api
+API_HOST=127.0.0.1 uv run --locked --extra dev fatebridge-api
 ```
 
 启动 FastMCP：
 
 ```bash
-python -m fatebridge.mcp_server
+uv run --locked --extra dev fatebridge-mcp
 ```
 
-健康检查：
+MCP 默认使用 stdio，由客户端启动时应配置上述命令及仓库工作目录；直接启动会等待协议输入。检查实际连接可运行 `uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye`。
+
+在另一个终端检查 REST：
 
 ```bash
 curl http://localhost:8010/health
@@ -99,39 +107,49 @@ curl http://localhost:8010/health
 
 ## 常用开发命令
 
+先运行与改动相关的子集，再按共享合同的影响范围补齐检查。测试通过只能说明该环境和该检查覆盖的内容；CI、安装包与真实客户端需要各自验证。
+
+| 改动范围 | 起始检查 |
+| --- | --- |
+| 单个算法或边界条件 | 对应领域测试与独立参考用例 |
+| 请求模型、输出模型或默认值 | `tests/test_full_surface_validation.py`、`tests/test_output_projection_contracts.py` |
+| 模块整理或入口移除 | `tests/test_architecture_boundaries.py`、`tests/test_retired_entries.py` |
+| 合同缓存 | `tests/test_schema_cache.py` |
+| 纯文档与导航 | [文档维护与验证](#文档维护与验证)中的检查 |
+
 ### 测试
 
 ```bash
-pytest -q
-pytest tests/test_api_alignment.py -q
-pytest tests/test_astrology_tools.py -q
-pytest tests/test_chinese_metaphysics.py -q
+uv run --locked --extra dev python -m pytest -q
+uv run --locked --extra dev python -m pytest -q tests/test_api_alignment.py
+uv run --locked --extra dev python -m pytest -q tests/test_astrology_tools.py
+uv run --locked --extra dev python -m pytest -q tests/test_chinese_metaphysics.py
 ```
 
-测试需要在已安装 dev extra 的 Python 3.10–3.13 环境里跑，这跟 CI 矩阵保持一致。注意不要用系统自带的解释器，否则容易出现伪失败。例如异步测试在缺少 `pytest-asyncio` 时不会真正执行，而是直接报 `FAILED`，错误信息通常是 `async def functions are not natively supported`。这类失败是环境问题，不是代码问题：先执行 `uv sync --locked --extra dev` 并确认已激活对应环境，再判断测试本身是否有错。同理，`black`、`isort`、`mypy` 也都来自 dev extra，系统解释器里一般没有。
+测试需要在已安装 dev extra 的 Python 3.10–3.13 环境里跑，这跟 CI 矩阵保持一致。注意不要用系统自带的解释器，否则容易出现伪失败。例如异步测试在缺少 `pytest-asyncio` 时不会真正执行，而是直接报 `FAILED`，错误信息通常是 `async def functions are not natively supported`。这类失败是环境问题，不是代码问题：先执行 `uv sync --locked --extra dev` 并通过 `uv run --locked --extra dev` 使用该环境，再判断测试本身是否有错。同理，`black`、`isort`、`mypy` 也都来自 dev extra，系统解释器里一般没有。
 
 ### CI 运行范围
 
-CI 对整个 push 的前后提交或整个 PR 的 merge-base 差异分流；同一分支或 PR 有新提交时会取消旧 CI。源码、测试、依赖、工作流、技能、`AGENTS.md`、`docs/examples/` 和 `docs/validation/` 的变更继续运行 Python 3.10–3.13 全量测试及最低依赖测试，数值基线仍由 Linux x86_64 / Python 3.12 校验。无法取得完整差异或出现未识别路径时也运行全量。
+CI 对整个 push 的前后提交或整个 PR 的 merge-base 差异分流；同一分支或 PR 有新提交时会取消旧 CI。源码、测试（含 `tests/fixtures/` 原典标注与冻结清单）、依赖、工作流、技能、`AGENTS.md`、`docs/examples/` 和 `docs/validation/`（包括其中的 Markdown）的变更继续运行 Python 3.10–3.13 全量测试及最低依赖测试，数值基线仍由 Linux x86_64 / Python 3.12 校验。无法取得完整差异或出现未识别路径时也运行全量。
 
-仅根目录的 README、CHANGELOG、CONTRIBUTING、SECURITY，`docs/` 下的普通 Markdown，以及 `docs/audits/`、`docs/research/` 的 JSON、日志、文本、XML、CSV 归档可走文档分支。该分支仍安装锁定开发环境，检查链接、JSON、接口计数、生成合同、技能接口和可运行 CLI 示例。Python 归档文件也按代码变更处理。
+仅根目录的 README、CHANGELOG、CONTRIBUTING、SECURITY，`docs/` 下排除 `examples/`、`validation/` 与 `AGENTS.md` 的普通 Markdown，以及 `docs/audits/`、`docs/research/` 的 JSON、日志、文本、XML、CSV 归档可走文档分支。该分支仍安装锁定开发环境，检查链接、JSON、接口计数、生成合同、技能接口和可运行 CLI 示例。Python 归档文件也按代码变更处理。
 
 Black、isort 和 mypy 在全量矩阵的 Python 3.12 作业检查一次；通用文档检查统一由 locked 作业执行。`CI result` 始终汇总本次选中的检查，文档分支跳过的全量作业不等于失败，已选作业的失败或意外跳过也不会被汇总为成功。
 
 ### 格式化与静态检查
 
 ```bash
-black src/fatebridge/ scripts tests
-isort src/fatebridge/ scripts tests
-mypy src/fatebridge/
+uv run --locked --extra dev black src/fatebridge scripts tests
+uv run --locked --extra dev isort src/fatebridge scripts tests
+uv run --locked --extra dev mypy src/fatebridge/
 ```
 
 如果只想检查、不修改文件：
 
 ```bash
-black --check src/fatebridge/ scripts tests
-isort --check-only src/fatebridge/ scripts tests
-mypy src/fatebridge/
+uv run --locked --extra dev black --check src/fatebridge scripts tests
+uv run --locked --extra dev isort --check-only src/fatebridge scripts tests
+uv run --locked --extra dev mypy src/fatebridge/
 ```
 
 ## 推荐开发流程
@@ -196,7 +214,7 @@ mypy src/fatebridge/
 
 出生公共响应使用 `services.birth_payload.build_destiny_payload`，当前时运状态使用 `services.timing_state.build_current_timing_state`。共享构造器不回调 `calculation`、`bazi`、`compatibility` 或 `timing` 用例服务；快照渲染留在 `timing_snapshots`，节气/农历查询留在 `calendar_tools`。这使计算状态和文本调整能分别维护，同时保持已有公开响应。
 
-结构整理后运行 `pytest -q tests/test_architecture_boundaries.py tests/test_retired_entries.py`，并核对全工具输出与发现合同。完整测试和类型检查仍必须通过；不得为纯结构调整重新冻结数值基线。
+结构整理后运行 `uv run --locked --extra dev python -m pytest -q tests/test_architecture_boundaries.py tests/test_retired_entries.py`，并核对全工具输出与发现合同。完整测试和类型检查仍必须通过；不得为纯结构调整重新冻结数值基线。
 
 ## 测试策略
 
@@ -224,6 +242,10 @@ mypy src/fatebridge/
 
 ## 文档维护与验证
 
+文档应让读者明确下一步：安装指南带读者跑通最小请求，任务指南解决具体问题，参考页提供可查的字段与契约，原理页解释实现选择。各类页面从[文档中心](README.md)进入；公共术语统一见[核心概念](concepts.md)。
+
+每页开头说明用途与必要前提；长页提供本页导航。步骤按实际执行顺序写，命令注明在哪个环境运行，并说明如何确认成功。示例使用虚构数据，只保留理解该任务必需的字段。新增标题时保持描述清楚；修改被引用标题前搜索链接并同步锚点。接口参考以实际 Schema 为准，不在多个页面复制完整参数表。
+
 文档按读者任务组织；生成契约、规则资料和实际运行结果分别承担不同职责。修改前先定位信源，再更新依赖它的说明，避免同一个默认值分散维护。
 
 | 变更内容 | 权威信源 | 需要同步的文档 / 生成物 |
@@ -240,16 +262,17 @@ mypy src/fatebridge/
 只改文档时运行以下检查，不需要为措辞变化补业务测试：
 
 ```bash
-python scripts/check_docs.py
-python -m pytest -q tests/test_doc_tool_counts.py tests/test_scenario_routing_coverage.py \
+uv run --locked --extra dev python scripts/check_docs.py
+uv run --locked --extra dev python -m pytest -q tests/test_documentation_integrity.py \
+  tests/test_doc_tool_counts.py tests/test_scenario_routing_coverage.py \
   tests/test_skills_interface_contract.py tests/test_skills_engine_contract.py \
   tests/test_codex_call_contracts.py
-python scripts/build_scenario_manifest.py --check
-python scripts/build_codex_call_contracts.py --check
+uv run --locked --extra dev python scripts/build_scenario_manifest.py --check
+uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 git diff --check
 ```
 
-`check_docs.py` 只使用标准库，检查根目录、`docs/`（排除本地 `reviews/`）与 `skills/` 的 Markdown 内联链接、本地标题锚点、代码围栏、JSON 代码块及示例 JSON 语法。它不访问外网，不执行代码块，也不证明自然语言或接口参数正确；外部来源保留版本，按受影响内容另行核对。CI 对每个 Python 版本执行该检查。
+`check_docs.py` 只使用标准库，检查根目录、`docs/`（排除本地 `reviews/`）与 `skills/` 的 Markdown 内联链接、本地标题锚点、代码围栏、JSON 代码块及示例 JSON 语法。它不访问外网，不执行代码块，也不证明自然语言或接口参数正确；外部来源保留版本，按受影响内容另行核对。CI 由 `locked` 作业执行该检查。
 
 现有文档测试把计数、路由覆盖、技能与生成合同关联到实时目录；`test_skills_engine_contract.py` 还会实际执行 CLI 示例，绑定测试进程解释器。修改可运行请求时，按[示例索引](examples/README.md)选择对应工具，验证模型与实际结果；结构校验成功不能替代三端或真实模型体验。
 
@@ -272,11 +295,13 @@ uv build
 uvx --from twine twine check dist/*
 ```
 
-CI 的 `locked` 作业检查 `uv.lock` 并在锁定环境中验证命令入口与真实 stdio MCP。现有最新版依赖矩阵和最低依赖作业使用独立的 `uv pip` 环境，不受开发锁文件约束。
+CI 的 `locked` 作业检查 `uv.lock` 和文档；全量分支还在该环境验证命令入口与真实 stdio MCP。现有最新版依赖矩阵和最低依赖作业使用独立的 `uv pip` 环境，不受开发锁文件约束。
 
-`.github/workflows/ci.yml` 的 `test` 作业在 Ubuntu 24.04 上覆盖 Python 3.10–3.13，执行 pytest、black、isort、mypy；`floor` 在 Python 3.10 按最低直接依赖运行测试。黄金快照字节比对仅在受支持的 Linux x86_64 / Python 3.12 环境启用，其他环境跳过不代表该项通过。 每个作业记录解析后的完整依赖清单并上传 JUnit；`floor` 必须用 `uv pip install --system --resolution lowest-direct -e ".[dev]"` 在全新环境解析，不能仅固定 FastMCP 3.4.2 来代替全部最低直接依赖验证。
+`.github/workflows/ci.yml` 的 `test` 作业在 Ubuntu 24.04 上覆盖 Python 3.10–3.13，在各版本执行 pytest，并在 Python 3.12 执行 Black、isort 和 mypy；`floor` 在 Python 3.10 按最低直接依赖运行测试。黄金快照字节比对仅在受支持的 Linux x86_64 / Python 3.12 环境启用，其他环境跳过不代表该项通过。每个作业记录解析后的完整依赖清单并上传 JUnit；`floor` 必须用 `uv pip install --system --resolution lowest-direct -e ".[dev]"` 在全新环境解析，不能仅固定 FastMCP 3.4.2 来代替全部最低直接依赖验证。
 
-版本来自 `src/fatebridge/__init__.py::__version__`。发布需同步更新 CHANGELOG、检查包数据和版本、创建对应标签与 GitHub Release；仅改版本常量不会上传 PyPI。`publish.yml` 在 Release published 事件下构建 sdist/wheel，检查元数据、JSON 数据与 `py.typed` 后，通过已配置的 PyPI Trusted Publishing 发布。新增数据文件需确认被 `pyproject.toml` 的 package-data 覆盖；场景 `skills/` 目前随 Git 仓库分发，不由 wheel 包含。
+版本来自 `src/fatebridge/__init__.py::__version__`。发布时递增该版本并同步更新 CHANGELOG；`publish.yml` 在 `master` 的 push CI 成功完成后，检出该次 CI 实际测试的提交，查询 PyPI，仅在版本尚未发布时构建 sdist/wheel。版本已存在则跳过构建与发布；查询失败则停止，不把网络错误当成新版本。流程不会自动递增版本，因此普通提交沿用已发布版本时不会更新 PyPI。
+
+GitHub Release published 入口继续保留，并要求标签严格匹配 `v<包版本>`；已经由 `master` 自动发布的版本会跳过。两个入口串行执行，检查元数据、JSON 数据、`py.typed` 和安装包运行情况后，通过 PyPI Trusted Publishing 发布。PyPI 的 Trusted Publisher 须匹配仓库实际 owner/name、`publish.yml` 与 GitHub `pypi` environment；若该 environment 设置了人工审批，发布仍需审批。新增数据文件需确认被 `pyproject.toml` 的 package-data 覆盖；场景 `skills/` 目前随 Git 仓库分发，不由 wheel 包含。
 
 ## 依赖与运行时注意事项
 
@@ -297,17 +322,15 @@ CI 的 `locked` 作业检查 `uv.lock` 并在锁定环境中验证命令入口�
 
 提交前建议自查：
 
-1. `pytest -q` 至少跑过相关子集。
-2. `black --check` / `isort --check-only` / `mypy` 通过。
+1. 已通过锁定开发环境运行相关测试子集，必要时完成全量测试。
+2. Python 变更的 Black、isort 和 mypy 检查通过；纯文档变更完成文档检查。
 3. 新工具是否已在 `tool_catalog.py` 的 `CATALOG` 中声明（三端由此派生），并补了 `test_full_surface_validation.py` 的代表性 payload。
 4. 文档是否更新了端口、能力名、section 名；若工具计数变化，`tests/test_doc_tool_counts.py` 是否仍通过。
 5. 是否错误地把近似实现写成了高精度实现。
 
 ## 常用入口
 
-场景源为技能的 `agents/interface.yaml` 与 `docs/scenario-routing.md`，生成物为包内 `data/agent_scenarios.json`。修改后运行 `python scripts/build_scenario_manifest.py`，用 `--check` 验证；PyYAML 只在 dev extra / 构建时需要，生产读取 JSON。新工具的场景角色须在源资料登记，不能只编辑生成文件。
-
-`ToolSpec.reproducibility` 与 execution_hints 分别描述数值重放条件和环境副作用；新增读取默认时间的实现须经过 `execution_context.current_datetime`，随机实现须返回可固定的有效参数。三端共享 execute_tool；不要在某个 transport 单独生成 seed、使用服务器时区或拼装 receipt。实现/数据指纹按进程缓存，原地修改后须重启；重放仍须保存原输入并保持环境，不能只用 run_id 查询。
+重放与默认时间的实现约束见[架构说明](architecture.md#执行回执与重放)。新增读取默认时间的实现使用 `execution_context.current_datetime`，随机实现返回可固定的有效参数；三端共用 `execute_tool` 生成回执。实现或数据原地变化后重启进程，使进程内缓存的指纹与实现一致。
 
 - 交互接口文档：`http://localhost:8010/docs`
 - 架构说明：[architecture.md](architecture.md)

@@ -1,6 +1,10 @@
 # FateBridge 算法与能力覆盖矩阵
 
+[文档中心](README.md) · [核心概念](concepts.md) · [API 参考](api-reference.md)
+
 本文档列出当前工具、实际实现范围、精度依赖与未覆盖项目。工具名按 MCP 集合统计；输入参数查 [API 参考](api-reference.md)，按用户问题选工具查[场景路由](scenario-routing.md)。
+
+查找某项能力先看[总览](#1-总览13-个-family--87-个工具)和[工具清单](#2-逐-family-工具清单)；评估结果精度再看[依赖说明](#3-精度与依赖说明)与[快照覆盖](#4-快照协议覆盖)。八字和双人模型的版本分别见[八字判定](bazi-assessment.md)、[双人评分](compatibility-scoring.md)，风水规则见[家居风水](fengshui.md)。
 
 状态分类：
 
@@ -59,8 +63,8 @@
 | `bazi_marriage` | 婚姻：配偶星/宫、婚期信号、婚姻质量 | Implemented |
 | `bazi_career` | 事业：事业类型、行业、创业倾向、贵人方位 | Implemented |
 | `bazi_wealth` | 财运：正偏财、财库、求财方式/方位、破财风险 | Implemented |
-| `bazi_health` | 传统健康文化：体质标签、五行脏腑对应与养护参考；不作疾病判断 | Implemented |
-| `bazi_children` | 子女：子女星/宫、缘分、生育时机 | Implemented |
+| `bazi_health` | 传统健康文化：盘内权重／寒暖分类和传统名称对应；疾病风险禁用，不作体质诊断或调理处方 | Implemented |
+| `bazi_children` | 命主视角的子女星／宫传统对应；不推数量、生育能力或生育时间 | Implemented |
 | `bazi_education` | 学业：印星/食伤/官星、学历倾向、文昌、考试时机 | Implemented |
 | `bazi_personality` | 性格：日主心性、十神性格、刚柔内外向 | Implemented |
 | `bazi_relatives` | 六亲：父母/兄弟姐妹星、六亲宫位、贵人 | Implemented |
@@ -121,7 +125,7 @@
 
 > 紫微斗数以 iztro 2.5.8 为对齐基线，采用正月初一年界、虚岁自然年递增、本命晚子时算当天、闰月后半月算下月的规则。400 组本命与运限已比较字段一致；流月/流日/流时比较实际落宫索引，不能用历法地支代替。返回的 `branch` 是实际落宫，`palace_ganzhi` 是本命宫干支，`stem` 是该运限四化所用天干；后两者可能不同。童限按命、财帛、疾厄、夫妻、福德、官禄取宫，农历日期或大限超出支持范围时明确报错。
 
-> 六壬取传按九宗门，第一课生克用日干五行、寄宫只定位；贵人顺逆按贵人实际落地盘的位置判断（巳至戌逆布）。已与独立 daliurenpython 的 8,640 种日干支/时支/月将组合对照，三传全部一致。初轮 kinliuren 参考软件的部分三传存在不稳定与异常，不能把与该软件的所有差异一律判为 FateBridge 错误。固定参考来源与 720 张独立天地盘保存在[三传基准](../tests/fixtures/liureng_transmissions_reference.json)，[全组合回归](../tests/test_third_party_correctness_fixes.py)遍历每张盘的 12 个时支位置。此对照限于三传，不包含所有神煞、课体解释、流派差异或金口诀的完整独立认证。
+> 六壬取传按九宗门，第一课生克用日干五行、寄宫只定位；贵人顺逆按贵人实际落地盘的位置判断（巳至戌逆布）。已与独立 daliurenpython 的 8,640 种日干支/时支/月将组合对照，三传全部一致。初轮 kinliuren 参考软件的部分三传存在不稳定与异常，不能把与该软件的所有差异一律判为 FateBridge 错误。固定参考来源与 720 张独立天地盘保存在[三传基准](../tests/fixtures/liureng_transmissions_reference.json)，[全组合回归](../tests/test_metaphysics_reference.py)遍历每张盘的 12 个时支位置。此对照限于三传，不包含所有神煞、课体解释、流派差异或金口诀的完整独立认证。
 
 ### 2.6 `astro` —— 离线核心星盘与关系盘（Implemented，精度依赖星历）
 

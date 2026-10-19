@@ -1,24 +1,23 @@
-# Machine-readable scenario interface; validated against SKILL.md and engine catalog.
 name: onda-xingpan
 version: 0.2.0
-scenario: 星盘 · 占星自观
-summary: 用日月上升、重点宫位与实际相位读懂本命和关系，交付可对照的特点与相处建议
+scenario: 命盘与指定方法解读
+summary: 直接满足用户指定的命盘、流派与技法，按相关主题解释实际字段并保留精度范围
+consultation:
+  kind: service
+  topics:
+  - method
+  scope: current_question
+  time_selection: shared
+  safety_policy: consultation_boundaries_v1
 triggers:
-- 占星
 - 星盘
-- 出生盘
-- 本命盘
-- 上升星座
-- 太阳月亮
-- 行星落宫
-- 相位
-- 合盘
+- 八字命盘
+- 紫微命盘
+- 流派盘
 - 关系盘
-- 希腊占星
-- 古典占星
-- 印度占星
-- 果老星宗
+- 指定技法
 engine_tools:
+- analyze_destiny
 - astro_chart
 - astro_chart13
 - astro_germany_chart
@@ -26,25 +25,35 @@ engine_tools:
 - astro_hellen_chart
 - astro_india_chart
 - astro_relative_chart
+- bazi_birth
+- dayun_analysis
+- firdaria
+- liunian_analysis
 - western_timing_analysis
-required_inputs:
-- birth_year
-- birth_month
-- birth_day
-- birth_hour
+- ziwei_birth
+- ziwei_horoscope
+dependencies:
+- kind: shared_support
+  tools:
+  - knowledge_registry
+  - knowledge_read
+  condition: 需要查证内置传统知识或来源时；不自动新增个人计算
+- kind: conditional_service
+  scenario: onda-shiyun
+  condition: 本轮询问阶段、年度、短期或指定时间技法时；只补未覆盖层，先遵守硬边界
+required_inputs: []
+input_notes:
+- 按当前问题与所选工具实际 Schema 核对必要资料；不是完整问卷
+- 主题、对象与时间范围沿用当前聊天，限定方法优先，缺项仅限制对应层
 reads:
+- ../../_shared/consultation-routing.md
+- ../../_shared/safety-boundaries.md
 - ../../_shared/fatebridge-engine.md
 - ../../_shared/onda-counsel.md
+- ../../_shared/timing-selection.md
 output:
   kind: interpretation
   grounding: engine_fields
   voice: onda-counsel
-  deliverables:
-  - 本命关键落点与相位
-  - 关系盘类型与真实交互
-  - 可在现实中对照的建议
-boundary: 传统术数与占星的文化参考视角，不是决定论，不替代医疗、心理、法律、财务等专业意见。
+boundary: 传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。
 license: Apache-2.0
-input_notes:
-- 核心盘坐标可由受支持出生地点解析；关系盘及西占推运仍需经纬度
-- 出生时区与时间精度须核对；西占默认民用钟时

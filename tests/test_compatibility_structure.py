@@ -1,3 +1,5 @@
+import pytest
+
 from fatebridge.analysis.compatibility import AdvancedCompatibility
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.rules import BaZiRules
@@ -208,6 +210,121 @@ def test_favorable_synergy_reads_top_level_distribution_and_structure_profile():
     assert "risk_reasons" in result
 
 
+@pytest.mark.parametrize("direction", ["forward", "reverse", "both", "neither"])
+def test_favorable_synergy_bidirectional_label_uses_actual_support_directions(
+    direction,
+):
+    # All four cases score 74 under the existing rules. Shared preferences and
+    # useful ten gods can reach this band without any directional support.
+    first = {
+        "element_distribution": {"水": 100.0},
+        "structure_profile": {"useful_elements": [], "useful_ten_gods": []},
+    }
+    second = {
+        "element_distribution": {"水": 100.0},
+        "structure_profile": {"useful_elements": [], "useful_ten_gods": []},
+    }
+    if direction in {"forward", "reverse"}:
+        first["structure_profile"]["useful_elements"] = ["木", "火"]
+        second["element_distribution"] = {"木": 16.0, "火": 16.0, "水": 68.0}
+        if direction == "reverse":
+            first, second = second, first
+        expected_directions = {
+            ("第二人", "第一人") if direction == "forward" else ("第一人", "第二人")
+        }
+        expected_basis_deltas = [7, 7]
+    elif direction == "both":
+        first["structure_profile"]["useful_elements"] = ["木"]
+        second["structure_profile"]["useful_elements"] = ["火"]
+        first["element_distribution"] = {"火": 16.0, "水": 84.0}
+        second["element_distribution"] = {"木": 16.0, "水": 84.0}
+        expected_directions = {("第一人", "第二人"), ("第二人", "第一人")}
+        expected_basis_deltas = [7, 7]
+    else:
+        for person in (first, second):
+            person["structure_profile"]["useful_elements"] = ["木", "火"]
+            person["structure_profile"]["useful_ten_gods"] = ["正印", "偏印"]
+        expected_directions = set()
+        expected_basis_deltas = [8]
+
+    result = AdvancedCompatibility._analyze_favorable_synergy(first, second)
+    assert result["score"] == 74.0
+    assert result["synergy_level"] == (
+        "双向互助" if direction == "both" else "协同较好"
+    )
+    assert {
+        (item["source"], item["target"]) for item in result["supportive_patterns"]
+    } == expected_directions
+    assert len(result["supportive_patterns"]) == (0 if direction == "neither" else 2)
+    assert [
+        int(item.rsplit("(+", 1)[1].rstrip(")")) for item in result["score_basis"]
+    ] == expected_basis_deltas
+    assert result["tension_patterns"] == []
+    if direction == "neither":
+        assert result["useful_ten_gods_support"][0]["common_ten_gods"] == [
+            "偏印",
+            "正印",
+        ]
+    else:
+        assert result["mutual_help"] == [
+            item["description"] for item in result["supportive_patterns"]
+        ]
+
+
+def test_favorable_synergy_label_preserves_scores_events_and_three_surface_parity():
+    from fastapi.testclient import TestClient
+
+    import fatebridge.api as api
+    from tests.fixtures.surface_payloads import REST_POST_CASES
+    from tests.test_agentic_replay import business, cli, native
+
+    inputs = REST_POST_CASES["/api/compatibility"]()
+    controls = {"as_of": "2026-10-20T10:00:00+08:00"}
+    # These are public test fixtures; use the existing auth-free transport
+    # fixture convention so local API-key configuration cannot change the test.
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(
+            api,
+            "API_KEY_AUTHENTICATOR",
+            api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
+        )
+        response = TestClient(api.app).post(
+            "/api/compatibility", json=inputs, params=controls
+        )
+    protocol = native("two_person_compatibility", inputs, controls)
+    code, output = cli("two_person_compatibility", inputs, controls)
+    assert response.status_code == 200 and not protocol.is_error and code == 0
+    expected = business(response.json())
+    assert expected == business(protocol.structured_content) == business(output)
+    assert expected["summary"]["overall_score"] == 69.6
+    assert expected["summary"]["scoring"]["unrounded_score"] == 69.61
+    dimensions = expected["summary"]["scoring"]["dimensions"]
+    assert {key: item["score"] for key, item in dimensions.items()} == {
+        "element_balance": 73.0,
+        "favorable_synergy": 77.0,
+        "ten_gods_relationship": 94.0,
+        "pattern_synergy": 36.0,
+        "traditional_analysis": 39.0,
+    }
+    assert {key: item["weight"] for key, item in dimensions.items()} == {
+        "element_balance": 0.25,
+        "favorable_synergy": 0.35,
+        "ten_gods_relationship": 0.17,
+        "pattern_synergy": 0.18,
+        "traditional_analysis": 0.05,
+    }
+    synergy = expected["detailed_analysis"]["favorable_synergy"]
+    assert synergy["synergy_level"] == "协同较好"
+    assert synergy["score_basis"] == [
+        "第一人土较旺，对第二人有稳定补益(+7)",
+        "第一人金占比高，能明显补到第二人的可用之气(+10)",
+    ]
+    assert [item["element"] for item in synergy["supportive_patterns"]] == ["土", "金"]
+    assert {
+        (item["source"], item["target"]) for item in synergy["supportive_patterns"]
+    } == {("第一人", "第二人")}
+
+
 def test_tian_ke_di_chong_is_reported_as_tension_pattern():
     analysis1 = _build_minimal_analysis(
         day_stem="甲",
@@ -337,3 +454,55 @@ def test_comprehensive_summary_reads_normalized_score_key():
     assert "子与午六冲" not in summarized["strengths"]
     # 常规维度按真实 score 正确归入挑战，证明判定确实读到了分数而非恒 0。
     assert "十神层面存在明显克泄" in summarized["challenges"]
+
+
+def test_compatibility_score_rewards_three_harmony_and_penalises_harm() -> None:
+    """``BaZiRules.calculate_compatibility_score`` previously only scored 六合
+    and 六冲. Three-harmony, half-harmony, 六害 and 三刑 are now included so
+    the traditional_compatibility block reflects classical jipan matching."""
+    from fatebridge.core.rules import BaZiRules
+
+    # 一方: 申子辰 水三合 分散在三柱; 二方: 亥子丑 混合 (主要对冲六合已有)
+    pillars_full_triple = {
+        "year": ("甲", "申"),
+        "month": ("乙", "子"),
+        "day": ("丙", "辰"),  # 三合水局齐
+        "hour": ("丁", "卯"),
+    }
+    # 对方也有自己部分同组支, 跨盘凑成 三合
+    pillars_partial = {
+        "year": ("戊", "申"),  # 跨盘与前者 辰 凑 半合
+        "month": ("己", "子"),
+        "day": ("庚", "午"),  # 日支 六冲 前者的子
+        "hour": ("辛", "未"),  # 前者日支辰 与 未 六害
+    }
+    result = BaZiRules.calculate_compatibility_score(
+        pillars_full_triple, pillars_partial
+    )
+    joined = " | ".join(result["details"])
+    assert "半合" in joined, joined
+    # Six harm shows as "相害" note — we use 六害 consistently
+    assert "六害" in joined, joined
+    assert result["harmony_score"] > 0
+    assert result["clash_score"] > 0
+
+
+def test_compatibility_score_detects_cross_chart_triple_punishment() -> None:
+    from fatebridge.core.rules import BaZiRules
+
+    pillars_a = {
+        "year": ("甲", "寅"),
+        "month": ("乙", "卯"),
+        "day": ("丙", "辰"),
+        "hour": ("丁", "巳"),
+    }
+    pillars_b = {
+        "year": ("戊", "申"),
+        "month": ("己", "酉"),
+        "day": ("庚", "戌"),
+        "hour": ("辛", "亥"),
+    }
+    result = BaZiRules.calculate_compatibility_score(pillars_a, pillars_b)
+    # 寅巳申 三刑 已由 前者 (寅/巳) + 后者 (申) 合成
+    assert any("三刑" in d for d in result["details"]), result["details"]
+    assert result["clash_score"] >= 5

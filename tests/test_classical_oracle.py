@@ -58,13 +58,12 @@ def test_almuten_tiebreak_prefers_chaldean_earliest():
 
 
 def test_arabic_lot_table_frozen_to_canonical_formulas():
-    # The five lots' day/night marker formulas (horosa data/lots.js §1.5).
+    # The allowed lots' day/night marker formulas (horosa data/lots.js §1.5).
     expected = {
         "fortune": (["asc", "moon", "sun"], ["asc", "sun", "moon"]),
         "spirit": (["asc", "sun", "moon"], ["asc", "moon", "sun"]),
         "marriage": (["asc", "venus", "saturn"], ["asc", "saturn", "venus"]),
         "children": (["asc", "jupiter", "saturn"], ["asc", "saturn", "jupiter"]),
-        "death": (["eighth", "saturn", "moon"], ["eighth", "saturn", "moon"]),
     }
     assert set(LOTS) == set(expected)
     for lot_id, (day, night) in expected.items():

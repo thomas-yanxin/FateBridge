@@ -1,53 +1,48 @@
-# Machine-readable scenario contract; checked against SKILL.md and the catalog.
 name: onda-fengshui
 version: 0.6.0
-scenario: 风水 · 空间布局
-summary: 逐对象解释空间事实与风水依据，对照现状和候选方案，说明可保留、可调整及未覆盖之处
+scenario: 居住与工作空间
+summary: 按空间事实和有来源的规则解释现状与候选，说明可保留、条件式与未覆盖部分
+consultation:
+  kind: topic
+  topics:
+  - space
+  scope: current_question
+  time_selection: shared
+  safety_policy: consultation_boundaries_v1
 triggers:
-  - 风水布局
-  - 住宅风水
-  - 办公室风水
-  - 工位风水
-  - 桌面物件风水摆法
-  - 命卦方位
-  - 宅向
-  - 九宫年星
-  - 玄空宅盘
-  - 室内形态
-  - 多方案布局比较
-  - 家具搬转限制
-  - 合租局部风水
-  - 多层住宅与院落
-  - 家庭人物宫位对应
-  - 家庭卦象与对宫说明
-  - 厨卫与镜面关系风水
-  - 尖角与材质器形风水
+- 风水
+- 工位
+- 宅向
+- 命卦
+- 空间布局
+- 桌面风水
 engine_tools:
-  - fengshui_assess
-  - fengshui_minggua
-  - fengshui_bazhai
-  - fengshui_directions
-  - fengshui_jinsuo
-  - fengshui_annual_stars
-  - fengshui_xuankong_natal
-# No universal birth/house requirement; actual tool/method schema is authoritative.
+- fengshui_annual_stars
+- fengshui_assess
+- fengshui_bazhai
+- fengshui_directions
+- fengshui_jinsuo
+- fengshui_minggua
+- fengshui_xuankong_natal
+dependencies:
+- kind: shared_support
+  tools:
+  - knowledge_registry
+  - knowledge_read
+  condition: 需要查证内置传统知识或来源时；不自动新增个人计算
 required_inputs: []
+input_notes:
+- 按当前问题与所选工具实际 Schema 核对必要资料；不是完整问卷
+- 主题、对象与时间范围沿用当前聊天，限定方法优先，缺项仅限制对应层
 reads:
-  - ../references/consultation.md
-  - ../references/delivery.md
-  - ../../_shared/onda-counsel.md
-  - ../../_shared/fatebridge-engine.md
-  - ../references/rule-sources.md
-  - ../references/layout-rules.md
-  - ../references/surface-rules.md
-  - ../references/xuankong.md
-  - ../references/xuankong-interpretation.md
-  - ../references/scene-planning.md
-  - ../references/sourced-interior-rules.md
-  - ../references/workstation-authored.md
+- ../../_shared/consultation-routing.md
+- ../../_shared/safety-boundaries.md
+- ../../_shared/fatebridge-engine.md
+- ../../_shared/onda-counsel.md
+- ../../_shared/timing-selection.md
 output:
   kind: interpretation
   grounding: engine_fields
   voice: onda-counsel
-boundary: 选定传统及作者规则的文化参考；先解释已有依据和条件式建议，执行确认不阻塞普通解释；只追问影响当前结论的资料，未覆盖直接说明，不承诺财富、事业或健康结果。
+boundary: 传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。
 license: Apache-2.0

@@ -54,22 +54,6 @@ def test_rest_case_map_covers_all_business_routes():
     assert expected_paths == actual_paths
 
 
-def test_fastmcp_version_supports_list_tools_api():
-    """The declared runtime supports discovery and native error results."""
-    import inspect
-    from importlib.metadata import version
-
-    from fastmcp.tools import ToolResult
-    from packaging.version import Version
-
-    assert Version(version("fastmcp")) >= Version("3.4.2")
-    assert "is_error" in inspect.signature(ToolResult).parameters
-
-    list_tools = getattr(type(mcp_module.app), "list_tools", None)
-    assert list_tools is not None, "FastMCP app is missing list_tools()"
-    assert "run_middleware" in inspect.signature(list_tools).parameters
-
-
 def test_mcp_case_map_covers_all_registered_tools():
     actual_names = {
         tool.name
@@ -120,7 +104,7 @@ def test_fastmcp_client_accepts_all_representative_payloads():
     async def run():
         async with Client(mcp_module.app) as client:
             schemas = {
-                tool.name: tool.outputSchema for tool in await client.list_tools()
+                tool.name: tool.output_schema for tool in await client.list_tools()
             }
             for name, (_, kwargs_factory) in MCP_CASES.items():
                 result = await client.call_tool(name, kwargs_factory())

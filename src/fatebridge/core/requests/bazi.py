@@ -6,7 +6,10 @@ from typing import List, Optional
 
 from pydantic import Field
 
+from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE
 from fatebridge.core.requests.birth import FateBridgeRequest
+
+PILLAR_PATTERN = "^(?:" + "|".join(SEXAGENARY_CYCLE) + ")$"
 
 
 class BaziDimensionRequest(FateBridgeRequest):
@@ -26,11 +29,18 @@ class BaziDimensionRequest(FateBridgeRequest):
         default=None, ge=1, le=31, description="Analysis day (1-31)"
     )
     dayun_pillar: Optional[str] = Field(
-        default=None, description="Optional override: current dayun pillar, e.g. '甲子'"
+        default=None,
+        min_length=2,
+        max_length=2,
+        pattern=PILLAR_PATTERN,
+        description="Optional override: exactly one valid sexagenary pillar, e.g. '甲子'",
     )
     liunian_pillar: Optional[str] = Field(
         default=None,
-        description="Optional override: current liunian pillar, e.g. '丙寅'",
+        min_length=2,
+        max_length=2,
+        pattern=PILLAR_PATTERN,
+        description="Optional override: exactly one valid sexagenary pillar, e.g. '丙寅'",
     )
 
 

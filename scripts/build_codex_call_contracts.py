@@ -12,7 +12,11 @@ from pathlib import Path
 
 from fastmcp import Client
 
-from fatebridge.application.examples import call_guidance, suggested_fields
+from fatebridge.application.examples import (
+    call_guidance,
+    evidence_views,
+    suggested_fields,
+)
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 
@@ -62,6 +66,11 @@ async def call_contracts():
             **(
                 {"call_guidance": call_guidance(specs[name])}
                 if call_guidance(specs[name])
+                else {}
+            ),
+            **(
+                {"evidence_views": evidence_views(specs[name])}
+                if evidence_views(specs[name])
                 else {}
             ),
         }

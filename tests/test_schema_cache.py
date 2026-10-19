@@ -7,6 +7,7 @@ from typing import ClassVar
 import pytest
 from pydantic import BaseModel, create_model
 
+from fatebridge.application.description import describe_input_spec, describe_spec
 from fatebridge.application.execution import execute_tool
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.schema_cache import (
@@ -139,3 +140,39 @@ def test_user_inputs_results_and_receipts_still_execute_per_call():
     assert left["contract_sha256"] == right["contract_sha256"]
     for field in ("input_sha256", "business_output_sha256", "run_id", "trace_id"):
         assert left[field] != right[field]
+
+
+def test_input_discovery_does_not_materialize_output_schema():
+    class Request(BaseModel):
+        value: int
+
+    class Output(BaseModel):
+        value: int
+        schema_calls: ClassVar[int] = 0
+
+        @classmethod
+        def model_json_schema(cls, **kwargs):
+            cls.schema_calls += 1
+            return super().model_json_schema(**kwargs)
+
+    spec = ToolSpec(
+        key="review_probe",
+        bind=lambda request: (lambda: {"value": request.value}, (), {}),
+        request_model=Request,
+        output_model=Output,
+        summary="Probe",
+        operation_label_zh="探针",
+        family="test",
+    )
+    clear_contract_caches()
+    try:
+        compact = describe_input_spec(spec)
+        assert Output.schema_calls == 0
+        assert compact["output_fields"] == ["value"]
+        full = describe_spec(spec)
+        assert Output.schema_calls == 1
+        assert {key: compact[key] for key in full if key != "output_schema"} == {
+            key: value for key, value in full.items() if key != "output_schema"
+        }
+    finally:
+        clear_contract_caches()

@@ -90,11 +90,13 @@ def _describe_contract(
         }
         for name, field in spec.request_model.model_fields.items()
     ]
-    from fatebridge.application.examples import example_input
+    from fatebridge.application.examples import evidence_views, example_input
 
     example = example_input(spec)
+    views = evidence_views(spec)
     return {
         **({"example_input": example} if example is not None else {}),
+        **({"evidence_views": views} if views is not None else {}),
         "tool": spec.tool_name,
         "key": spec.key,
         "summary": spec.summary,
@@ -145,10 +147,15 @@ def summarize_spec(spec: ToolSpec) -> Dict[str, Any]:
 
 def mcp_description(spec: ToolSpec) -> str:
     """Make a published tool callable without another discovery round trip."""
-    from fatebridge.application.examples import call_guidance, suggested_fields
+    from fatebridge.application.examples import (
+        call_guidance,
+        evidence_views,
+        suggested_fields,
+    )
 
     fields = suggested_fields(spec)
     guidance = call_guidance(spec)
+    views = evidence_views(spec)
     summary = spec.summary + (
         " 调用参考系：" + json.dumps(guidance, ensure_ascii=False) if guidance else ""
     )
@@ -160,6 +167,12 @@ def mcp_description(spec: ToolSpec) -> str:
         + json.dumps(fields, ensure_ascii=False)
         + "; strict_fields=true, include_snapshot_text=false。"
         + "这些是可扩展的首轮视图；仅需更细字段时读取完整输出契约。"
+        + (
+            " 按本轮任务优先复制 evidence_views 中对应 fields（它们不是请求参数）："
+            + json.dumps(views, ensure_ascii=False)
+            if views
+            else ""
+        )
     )
 
 

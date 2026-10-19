@@ -1,185 +1,163 @@
 # FateBridge 场景路由矩阵
 
-机器入口为 `/api/scenarios`、CLI `scenarios` 与 MCP `fatebridge://scenarios`；支持摘要、单场景和入口筛选。打包清单由本文矩阵及 9 个 `skills/onda-*/agents/interface.yaml` 生成，共 10 个场景：9 个 Onda 咨询场景及独立的 `fengshui` 基础计算路由，并实时关联中央目录的可调用名称和要求。修改路由或 YAML 后运行 `.venv/bin/python scripts/build_scenario_manifest.py`；测试会拒绝过期生成物。主/旁/深角色和条件保留，缺失能力明确标记；它是发现指引，不是自动执行计划。
+机器入口为 `/api/scenarios`、CLI `scenarios` 与 MCP `fatebridge://scenarios`。维护源为本矩阵与 `skills/onda-*/agents/interface.yaml`；现有九个主题、三个服务、一个全面画像组合入口，加独立 `fengshui` 基础计算场景，共14项。机器发现包含 consultation.kind/topics、当轮范围与共享安全／时间策略。它是发现指引，不是自动执行计划。`engine_tools` 保留直接工具；接口的 `dependencies` 显式声明知识支撑、条件时间服务与组合主题，生成与运行时均校验依赖闭包、未知引用和循环。条件控制使用时机，工具公开不代表本轮必须调用。
 
-这份文档给 Agent 和解读技能做路由参考。引擎负责计算与规则生成的分析摘要，场景技能负责面向用户的解释；这里回答的是：面对某类问题，该调哪些工具、谁是主证谁是旁证、怎么省 token、怎么避免不同体系给出矛盾结论。
+## 如何使用本页
 
-工具发现仍以机读为准（`/api/tools`、MCP `tools/list`、`fatebridge list`），本文不替代发现过程，只提供场景到工具的取舍建议。文中单元格优先级标记的含义是：
+用户咨询先选择最贴近当前问题的[技能入口](../skills/README.md)，再看下方对应场景；维护工具覆盖时查[覆盖核对清单](#覆盖核对清单)。已有实际 Schema 且工具已公开时可直接调用，不必先遍历矩阵。
 
-- 主：所选问题分支的首选依据；多个入口依问题与体系选择，不默认全部调用
-- 旁：只加强或修正主证，不单独下判断
-- 深：用户追问或专家模式才调用
-
-这些主证/旁证是传统体系内的路由优先级，不是经过统计验证的现实预测证据。多体系共享出生时间等输入，一致时可以合并描述，仍须保留算法来源与输入/精度边界。
+[调用纪律](#全局调用纪律) · [主旁深的含义](#交叉印证与去重) · [场景矩阵](#场景路由矩阵) · [长尾工具](#长尾与专家级工具) · [覆盖清单](#覆盖核对清单)
 
 ## 全局调用纪律
 
-1. 命盘复用。要综合命理画像时调一次 `analyze_destiny`（已包含命盘、喜用、格局），不要再调 `bazi_birth`；只有明确需要四柱/十神原始命盘时才单独用 `bazi_birth`。同一出生信息在八字、紫微、西占之间应复用，不要重复向用户采集。
-2. 聚合优先。要时运全景用 `timing_analysis`（中式）或 `western_timing_analysis`（西占），不要连发多个单技法工具；反过来，只需要某一项技法时才用对应单工具（如只看太阳返照就用 `solarreturn`）。
-3. 粒度匹配。年级工具（如 `bazi_romance` 的 `romance_timing`）只给到流年级，不能往下说成「几月」；要月级才升级到 `liuyue_analysis`，要日级才用 `liuri_analysis`。
-4. 默认裁剪输出。聚焦问题时使用已验证 `fields`/`--fields`，设 `strict_fields=true`、`include_snapshot_text=false`，从结构化结果读取依据。仅文本结果保留必要文本；完整快照或全年时间线按追问展开。已附带的 `run_metadata` 投影后保留，CLI 可单独关闭。`selected_sections` 只裁剪导出文本，不会删除原始快照；REST 使用查询参数投影。
-5. 一次核对必要资料。使用当前聊天已确认信息，缺项或日期无效时简短核对所选计算需要的资料，不逐字段重复采集。已加载完整调用合同就直接调用；其余 MCP 工具按名称一次取得实际定义，本地 CLI 才用 `describe <tool>`。报错读 `error_code` 后修正，不盲目重试。
+1. 先应用[咨询硬边界](../skills/_shared/safety-boundaries.md)，禁区请求不排盘、不起卦、不先算后免责声明。公共接口禁用生死／临床卜卦与手术择时，健康输出限传统分类；语义判断仍由咨询方负责。
+2. 按[用户问题与范围](../skills/_shared/consultation-routing.md)识别主题、对象、任务、时间和深度。当前问什么就回答什么；首轮明确全面则覆盖，追问保留原主题与已有相关视角，只补新增范围。
+3. 命盘与专项已有层复用。八字综合已含命盘、喜用与格局，不重复原始盘；专项已含时机背景，不默认补大运流年。时间问题统一读[共享时间选择](../skills/_shared/timing-selection.md)。法达、大运与紫微运限均是普通阶段问题的正常候选。
+4. 多层确有价值才聚合，窄查询可单技法。后台多工具不等于正文多报告，不为凑数增工具或索取其他体系资料。
+5. 普通首轮按任务／盘型选择公开 evidence_views 中的 fields（视图名不是请求参数），没有对应视图时按已验证合同选择必要字段，使用 strict_fields=true、include_snapshot_text=false；完整 JSON／全部时间线／文件首次 fields=null，保留默认预算并读同 run 交付。selected_sections 只裁剪导出文本。未知生时不填默认，不重复追问用户已说无法提供的缺项。
 
 ## 交叉印证与去重
 
-主证 + 旁证 + 显式标注分歧，是多体系并用时的统一原则：
+按结构、双方互动、阶段、目标年份／时段与候选时刻分别选依据，不按主题永久设唯一主体系。专题综合主动评估相关多视角，通常两套可解释依据即可；单项、已有结果和限定方法可以一套。第三套及额外技法须补尚未回答的问题或独立层。
 
-- 每个场景域钉一个主证系统出结论，其余系统只作旁证（加强或修正），不单独下判断。各域主证见下表和后续每张矩阵的「主」列。
+- 主：当前任务分支入口；同一行多个主依职责／方法选择，不默认全调用。
+- 旁：有新增解释价值的相关视角，并非永久低于主体系。
+- 深：当前范围确需更细节时使用，不把法达等阶段能力全藏入专家模式。
 
-| 场景域 | 主证系统 | 旁证 |
-|---|---|---|
-| 命格（性格/天赋/学业/六亲/原生家庭） | 紫微（性格底色/六亲宫）+ 八字（十神格局） | 西占 |
-| 事业 / 财运 | 八字（事业/财专项） | 时运、合作配合度 |
-| 缘分 / 感情 | 八字婚姻/正缘（单人）、配合度（双人） | 紫微夫妻宫、宿曜、关系盘 |
-| 健康 | 八字健康专项 | 时运对身心影响 |
-| 时运 / 择时 | 时运全系（聚合优先）、西占推运 | 节气农历 |
-| 星盘（西占本体） | `astro_chart`（含流派 variant） | 西占推运衔接 |
-| 问事 / 抉择 | 占卜类（梅花/六爻/奇门/六壬/金口/太乙/宿占/三式/星骰） | —— |
-
-- 一致则合并去重。多系统指向同一结论时合并讲，不重复罗列。
-- 冲突则显式标注。系统间分歧时明确说「两套口径不一」，各自给出结论，不静默二选一，保留整合画像让用户自己权衡。
-- 同信号去重。同一神煞在多个工具里重复出现（如咸池/红鸾在 `bazi_romance` 与 `bazi_marriage` 各出现一次，且口径可能不同——romance 当机会、marriage 提醒防烂桃花），按当前场景取一个口径讲一次，不要当两件事讲两遍。
+这些角色是选择指引，不是统计预测证据。相同描述合并且署明来源；冲突先查时钟、地点、太阳时和模型，再分别保留，不投票、不合成成功概率。重复同一规则不是独立支持；不同时间范围不直接互证。
 
 ## 场景路由矩阵
 
-每张表的行表示用户 query 意图，列表示候选工具，单元格填 主 / 旁 / 深，空表示该场景不调。
+每行是用户任务，列为候选工具组。一个组内按具体方法／职责选择；工具清单不要求逐个执行。具体字段、精度和来源以实际工具及技能参考为准。
 
-### 命格 · 性格天赋六亲（onda-mingge）
+### 认识自己与个人发展（onda-mingge）
 
-| query 意图 | analyze_destiny | bazi_birth | bazi_personality | bazi_education | bazi_children | bazi_relatives | ziwei_birth | ziwei_rules | canping | heluo | astro_chart |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| 我是个什么样的人 | 主（八字默认） | | 旁 | | | | 主（用户选择紫微） | | | | 旁 |
-| 我的天赋适合什么 | 主 | | 旁 | | | | 旁 | | | | |
-| 学业考试运 | 旁 | | | 主 | | | 旁 | 深 | | | |
-| 跟父母兄弟关系 · 原生家庭 | 旁 | | | | | 主 | 旁 | 深 | | | |
-| 命主的子女宫／子女缘 | 旁 | | | | 主 | | 旁 | 深 | | | |
-| 孩子本人的性格 | 主（使用孩子资料） | | 旁 | | | | 旁 | | | | |
-| 孩子本人的学习 | 旁 | | | 主（使用孩子资料） | | | 旁 | | | | |
-| 想要一份完整命盘 | | 主 | | | | | 主 | 深 | 深 | 深 | 旁 |
+| 用户任务 | `analyze_destiny` `bazi_personality` | `ziwei_birth` | `astro_chart` | `timing_analysis` `ziwei_horoscope` `western_timing_analysis` `firdaria` | `bazi_birth` `ziwei_rules` `canping` `heluo` |
+| --- | --- | --- | --- | --- | --- |
+| 特点／天赋综合 | 主（结构与专项按需） | 旁（相关宫位） | 旁（相关配置） |  |  |
+| 阶段中的自我变化 | 旁（已有结构） | 旁（已有结构） | 旁（已有结构） | 主（按时间任务选层） |  |
+| 指定原始盘／数算 |  |  |  |  | 主（按用户方法选择） |
 
-`analyze_destiny` 已含命盘、喜用、格局，调过后不要再调 `bazi_birth`；仅当用户明确要原始四柱/十神数据时才单独调 `bazi_birth`。性格／天赋按具体问题选八字或紫微为主；用户要求完整双体系画像时再对照，西占按需作旁证。`ziwei_rules`、`canping`、`heluo` 属于专家查表，普通场景不默认调用。
+详细选择与读法见 [认识自己与个人发展](../skills/onda-mingge/SKILL.md)。
+本入口可用清单（非必调）：`analyze_destiny`、`astro_chart`、`bazi_birth`、`bazi_personality`、`canping`、`firdaria`、`heluo`、`timing_analysis`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`、`ziwei_rules`。
 
-`bazi_children` 使用命主资料解释命主的子女星／子女宫，不是孩子本人的性格测算。问孩子本人时使用孩子资料，按性格或学习问题分别选择对应主证；`bazi_relatives` 也保留命主视角，不从其内部结构推定现实家人的行为。
+### 事业与工作（onda-shiye）
 
-### 事业 · 财运（onda-shiye）
+| 用户任务 | `bazi_career` `analyze_destiny` | `ziwei_birth` | `astro_chart` | `timing_analysis` `ziwei_horoscope` `western_timing_analysis` `firdaria` | `astro_election` |
+| --- | --- | --- | --- | --- | --- |
+| 工作方向／岗位／创业角色 | 主（专项优先，整体结构按需） | 旁（相关职业结构） | 旁（相关职业配置） |  |  |
+| 今年／未来几年事业 | 主（复用已有时机） | 旁（已有结构） | 旁（已有结构） | 主（仅补所需时间层） |  |
+| 给定求职／签约候选时刻 |  |  |  | 旁（独立背景） | 主（给定候选，非区间最优搜索） |
 
-| query 意图 | bazi_career | bazi_wealth | two_person_compatibility | timing_analysis | dayun_analysis | liunian_analysis | analyze_destiny |
-|---|---|---|---|---|---|---|---|
-| 事业方向适不适合 | 主 | | | | | | 旁 |
-| 今年财运 | | 主 | | 旁 | 旁 | 旁 | |
-| 要不要跳槽 | 主 | | | 旁 | 旁 | 旁 | 旁 |
-| 要不要创业 | 主 | 旁 | | 旁 | 旁 | | 旁 |
-| 合伙靠不靠谱 | 主 | | 旁 | | | | 旁 |
-| 求职方向 | 主 | | | | | | 旁 |
-| 正财偏财 · 破财 | | 主 | | | | 旁 | 旁 |
+详细选择与读法见 [事业与工作](../skills/onda-shiye/SKILL.md)。
+本入口可用清单（非必调）：`analyze_destiny`、`astro_chart`、`astro_election`、`bazi_career`、`firdaria`、`timing_analysis`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
-时运三工具（`timing_analysis`、`dayun_analysis`、`liunian_analysis`）聚合优先，只需全景时调 `timing_analysis`，仅需大运/流年细节再单独调对应工具。事业/财运以八字为主，时运类工具只作时机旁证，不单独下事业判断。合伙场景里 `two_person_compatibility` 看合作契合度，不替代八字事业分析。
+### 财务与资源（onda-caiwu）
 
-### 缘分 · 感情合婚（onda-yuanfen）
+| 用户任务 | `bazi_wealth` | `ziwei_birth` | `astro_chart` | `timing_analysis` `ziwei_horoscope` `western_timing_analysis` `firdaria` |
+| --- | --- | --- | --- | --- |
+| 收入／支出／积累方式 | 主 | 旁（相关宫位） | 旁（相关配置） |  |
+| 今年／未来几年财务 | 主（已有时机复用） | 旁 | 旁 | 主（按阶段和目标范围选择） |
 
-| query 意图 | bazi_marriage | bazi_romance | two_person_compatibility | sukuyo_compatibility | ziwei_birth（夫妻宫） | astro_relative_chart | liuyue_analysis | 占卜类（meihua/sixyao） |
-|---|---|---|---|---|---|---|---|---|
-| 我的姻缘/感情走向 | 主 | 旁 | | | 旁 | | | |
-| 正缘/桃花何时来、旺不旺 | 旁 | 主 | | | | | 深（追问到几月） | |
-| 我俩合不合（恋爱/结婚） | | | 主 | 旁 | 深 | 深（需经纬度） | | |
-| 关系的星盘视角/互动相位 | | | 旁 | | | 主（需经纬度） | | |
-| 明确求卦看表白／复合 | | | | | | | | 主 |
+详细选择与读法见 [财务与资源](../skills/onda-caiwu/SKILL.md)。
+本入口可用清单（非必调）：`astro_chart`、`bazi_wealth`、`firdaria`、`timing_analysis`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
-`bazi_romance` 与 `bazi_marriage` 同时跑时，咸池/红鸾等神煞会两处各出现一次且口径不同，按当前场景取一个口径讲一次。`romance_timing` 只到流年级，要「几月」才升级到 `liuyue_analysis`。`sukuyo_compatibility` 的 `person1_to_person2` 与 `person2_to_person1` 不对称，要分开讲。
+### 感情与伴侣关系（onda-yuanfen）
 
-### 健康 · 养生（onda-jiankang）
+| 用户任务 | `bazi_marriage` `bazi_romance` | `two_person_compatibility` `sukuyo_compatibility` | `ziwei_birth` | `astro_chart` `astro_relative_chart` | `timing_analysis` `ziwei_horoscope` `western_timing_analysis` `firdaria` `liuyue_analysis` |
+| --- | --- | --- | --- | --- | --- |
+| 单人相处方式／婚恋文化 | 主（按婚姻或桃花任务） |  | 旁 | 旁（本命相关配置） |  |
+| 双方互动综合 |  | 主（跨盘、双向范围） | 旁（各自结构） | 主（明确星盘互动） |  |
+| 年度／阶段／月份变化 | 主（已有时机复用） |  |  |  | 主（仅补所需粒度） |
 
-| query 意图 | bazi_health | timing_analysis | liunian_analysis | analyze_destiny |
-|---|---|---|---|---|
-| 传统健康标签是什么意思 | 主 | | | 旁 |
-| 今年健康要注意什么 | 主 | 旁 | 旁 | |
-| 传统健康文化中的作息参考 | 主 | | | 旁 |
-| 五行养生调理方向 | 主 | | | 旁 |
+详细选择与读法见 [感情与伴侣关系](../skills/onda-yuanfen/SKILL.md)。
+本入口可用清单（非必调）：`astro_chart`、`astro_relative_chart`、`bazi_marriage`、`bazi_romance`、`firdaria`、`liunian_analysis`、`liuyue_analysis`、`meihua_analysis`、`sixyao`、`sukuyo_compatibility`、`timing_analysis`、`two_person_compatibility`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
-传统健康文化解读以 `bazi_health` 为唯一主证，时运只作文化节奏旁证，不能用于确认疾病或解释症状。已有专项不重复拆讲五行，西占推运不在此域默认出现；月份追问才补 `liuyue_analysis`，`liunian_analysis` 只提供年级依据。具体不适优先回应现实求助。
+### 学习与成长（onda-xueye）
 
-### 时运 · 择时（onda-shiyun）
+| 用户任务 | `bazi_education` | `ziwei_birth` | `astro_chart` | `timing_analysis` `ziwei_horoscope` `western_timing_analysis` `firdaria` |
+| --- | --- | --- | --- | --- |
+| 学习方式／深造选项 | 主 | 旁（相关结构） | 旁（相关配置） |  |
+| 考试年份／阶段比较 | 主（已有时机复用） | 旁 | 旁 | 主（同粒度，非录取承诺） |
 
-| query 意图 | timing_analysis | dayun_analysis | liunian_analysis | liuyue_analysis | liuri_analysis | liushi_analysis | western_timing_analysis | solarreturn | lunarreturn | transit | solararc | givenyear | profection | pd | pdchart | zr | firdaria | decennials | astro_election |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 今年/明年运势 | 主（中式默认） | | 旁 | | | | 主（西占视角） | 深 | | 深 | | | | | | | | | |
-| 大运走到哪 | | 主 | | | | | | | | | | | | | | | | | |
-| 人生转折点 | 旁 | 旁 | | | | | 旁 | | | | 旁 | | | 深 | | | 深 | 深 | |
-| 最近为什么不顺 · 本命年 | | | 主 | 旁 | | | | | | 旁 | | | | | | | | | |
-| 什么时候适合做某事 · 择日 | | | | | | | | | | | | | | | | | | | 主 |
-| 人生各阶段（全生命周期） | 深 | 深 | | | | | 深 | 深 | 深 | 深 | 深 | 深 | 深 | 深 | 深 | 深 | 深 | 深 | |
+详细选择与读法见 [学习与成长](../skills/onda-xueye/SKILL.md)。
+本入口可用清单（非必调）：`astro_chart`、`bazi_education`、`firdaria`、`timing_analysis`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
-全景时运用 `timing_analysis`（中式）或 `western_timing_analysis`（西占），不连发多个单技法。紫微运限看大限/流年的紫微视角用 `ziwei_horoscope`（大限/小限/流年/流月/流日/流时 + 动态四化），与八字时运、西占推运并行为第三套时运体系；按前文原则，多体系一致则合并、分歧则显式标出，不与中式时运重复罗列同一结论。
+### 家庭与亲子（onda-jiating）
 
-本域「今年/明年运势」填了两个「主」，是因为中式时运与西占推运两套传统并行，按用户语境择一为出结论口径，并非违反「钉一个主证」。粒度升级规则：年用 `liunian_analysis`，月用 `liuyue_analysis`，日用 `liuri_analysis`，时用 `liushi_analysis`，不许跨级说成「几月/几日」。`astro_election` 是唯一择日主证，不用时运聚合工具替代。
+| 用户任务 | `bazi_relatives` `bazi_children` | `analyze_destiny` `bazi_personality` | `ziwei_birth` `astro_chart` | `two_person_compatibility` `astro_relative_chart` | `timing_analysis` `ziwei_horoscope` `western_timing_analysis` `firdaria` |
+| --- | --- | --- | --- | --- | --- |
+| 命主六亲／子女对应 | 主（命主资料） |  | 旁（命主结构） |  |  |
+| 孩子／家人本人特点 |  | 主（该人资料） | 旁（该人资料） |  |  |
+| 亲子／家人双方互动 |  |  |  | 主（双方资料与实际关系） |  |
+| 家庭阶段与责任 | 旁（已有结构） |  | 旁 |  | 主（只限问题所需时段） |
 
-上列 11 个西占单技法（`solarreturn`、`lunarreturn`、`transit`、`solararc`、`givenyear`、`profection`、`pd`、`pdchart`、`zr`、`firdaria`、`decennials`）仅在用户点名某项技法或专家模式时才深调；古典「全生命周期」13 技法（`astro_harmonic` 等）见下文长尾表。
+详细选择与读法见 [家庭与亲子](../skills/onda-jiating/SKILL.md)。
+本入口可用清单（非必调）：`analyze_destiny`、`astro_chart`、`astro_relative_chart`、`bazi_children`、`bazi_personality`、`bazi_relatives`、`firdaria`、`timing_analysis`、`two_person_compatibility`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
-### 星盘 · 西占本体（onda-xingpan）
+### 人际与合作（onda-renji）
 
-| query 意图 | astro_chart | astro_chart13 | astro_hellen | astro_guolao | astro_india | astro_germany | astro_relative_chart | western_timing_analysis |
-|---|---|---|---|---|---|---|---|---|
-| 我的星盘/本命盘 | 主 | | | | | | | |
-| 上升 · 太阳 · 月亮 · 行星落宫 · 相位 | 主 | | | | | | | |
-| 13 扇区盘 | | 主 | | | | | | |
-| 希腊传统星盘 | | | 主 | | | | | |
-| 果老星宗盘 | | | | 主 | | | | |
-| 印度星盘（Jyotish） | | | | | 主 | | | |
-| 德国占星/汉堡学派 | | | | | | 主 | | |
-| 两人关系星盘 | | | | | | | 主 | |
-| 推运/流年（从星盘延伸） | | | | | | | | 深 |
+| 用户任务 | `analyze_destiny` `ziwei_birth` `astro_chart` | `two_person_compatibility` `astro_relative_chart` `sukuyo_compatibility` | `timing_analysis` `ziwei_horoscope` `western_timing_analysis` `firdaria` |
+| --- | --- | --- | --- |
+| 个人交往方式／支持资源 | 主（相关结构） |  |  |
+| 朋友／合伙双方互动 | 旁（各自结构） | 主（按实际关系） |  |
+| 合作阶段／年度变化 | 旁（已有结构） | 旁（已有互动） | 主（不推对方行为） |
 
-`astro_chart` 通过 `chart_variant` 参数切换流派，已知具体流派时直接用对应工具（`astro_chart13`、`astro_hellen` 等），避免带参数的 `astro_chart` 与专用工具重复调用。
+详细选择与读法见 [人际与合作](../skills/onda-renji/SKILL.md)。
+本入口可用清单（非必调）：`analyze_destiny`、`astro_chart`、`astro_relative_chart`、`firdaria`、`sukuyo_compatibility`、`timing_analysis`、`two_person_compatibility`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
-MCP 端工具名差异：本表 4 个流派盘的列名是 catalog key，但 MCP 端工具名带 `_chart` 后缀——`astro_hellen` 对应 `astro_hellen_chart`、`astro_guolao` 对应 `astro_guolao_chart`、`astro_india` 对应 `astro_india_chart`、`astro_germany` 对应 `astro_germany_chart`；CLI/REST 用无后缀名。实际发现工具名仍以机读 `tools/list` 为准。
+### 传统身心文化参考（onda-jiankang）
 
-`astro_relative_chart` 需双方经纬度，缺任一方位信息须先采集再调用。星盘本体分析完成后若用户追问流年走势，应指向时运域而非在此域重复调西占推运工具。
+| 用户任务 | `bazi_health` | `analyze_destiny` | `timing_analysis` |
+| --- | --- | --- | --- |
+| 五行标签／传统对应 | 主（非体质诊断） | 旁（仅未覆盖背景） |  |
+| 文化关系的阶段变化 | 主（已有时机复用） |  | 旁（未覆盖的传统时间层） |
 
-### 问事 · 抉择（onda-zhanbu）
+详细选择与读法见 [传统身心文化参考](../skills/onda-jiankang/SKILL.md)。
+本入口可用清单（非必调）：`analyze_destiny`、`bazi_health`、`timing_analysis`。
 
-以下为用户明确求卦、起局或选择术数视角后的分支。普通现实决定、关系讨论和安排建议不自动触发占卜。
+### 整体时运与阶段（onda-shiyun）
 
-| query 意图 | meihua_analysis | sixyao | qimen | liureng_gods | liureng_runyear | jinkou | taiyi | suzhan | sanshiunited | otherbu | astro_horary |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| 要不要做某件事（即时起念） | 主（用户明确求卦且未指定其他卜法） | | | | | | | | | | |
-| 这事能不能成（具体成败） | | 主（用户明确选择本卜法） | | | | | | | | | |
-| 方位/时机/谋略布局 | | | 主（用户明确选择本卜法） | | | | | | | | |
-| 具体事件细节与时应 | | | | 主（用户明确选择本卜法） | | | | | | | |
-| 年运流月简断 | | | | | 主（用户明确选择本卜法） | | | | | | |
-| 即时简断吉凶 | | | | | | 主（用户明确选择本卜法） | | | | | |
-| 大势国运（深） | | | | | | | 主（用户明确选择本卜法） | | | | |
-| 宿曜择日/星宿吉凶 | | | | | | | | 主（用户明确选择本卜法） | | | |
-| 三式合参（太乙/六壬/奇门） | | | | | | | | | 主（用户明确选择本卜法） | | |
-| 解读用户已有星骰 | | | | | | | | | | 主（用户明确选择本卜法） | |
-| 西式卜卦（Horary） | | | | | | | | | | | 主（用户明确选择本卜法） |
+| 用户任务 | `timing_analysis` `dayun_analysis` | `ziwei_horoscope` | `western_timing_analysis` `firdaria` `zr` `decennials` | `liunian_analysis` `liuyue_analysis` `liuri_analysis` `liushi_analysis` | `solarreturn` `lunarreturn` `transit` `solararc` `givenyear` `profection` `pd` `pdchart` | `astro_election` |
+| --- | --- | --- | --- | --- | --- | --- |
+| 整体年度／未来几年 | 主（中式选择） | 主（紫微选择） | 主（西占选择） |  |  |  |
+| 人生阶段／何时换阶段 | 主（大运与精度） | 主（大限） | 主（法达等实际分期） |  | 深（本轮确需） |  |
+| 月份／某日／时点 | 旁（已有背景） | 主（相应运限） | 旁（已有阶段） | 主（所需粒度） | 主（西占相关单技法） |  |
+| 活动候选时刻比较 |  |  |  |  |  | 主（给定非医疗候选） |
 
-各工具触发场景一句话说明：
+详细选择与读法见 [整体时运与阶段](../skills/onda-shiyun/SKILL.md)。其他生命周期／历法方法按共享时间参考与技法参考选择，不自动全调用。
+本入口可用清单（非必调）：`astro_agepoint`、`astro_balbillus`、`astro_distributions`、`astro_election`、`astro_extrareturns`、`astro_harmonic`、`astro_jaynesprog`、`astro_keypoints`、`astro_lunation_phase`、`astro_mundane`、`astro_persiandirected`、`astro_planetary_ages`、`astro_planetaryarc`、`astro_triplicity_rulers`、`astro_vedicprog`、`astro_yearsystem129`、`dayun_analysis`、`decennials`、`firdaria`、`givenyear`、`jieqi_timeline_analysis`、`jieqi_year`、`liunian_analysis`、`liuri_analysis`、`liushi_analysis`、`liuyue_analysis`、`lunarreturn`、`nongli_time`、`pd`、`pdchart`、`profection`、`solararc`、`solarreturn`、`timing_analysis`、`transit`、`western_timing_analysis`、`ziwei_horoscope`、`zr`。
 
-- 梅花易数（`meihua_analysis`）：按用户选定问时取数，保留年月日时分与时区，不伪称随机抽卦。
-- 统摄四卦组合（`tongshefa`）：按实际提供的四卦组合左右卦、潜藏与亲和；固定默认不是用户起卦，不实现蓍草十八变／大衍随机起卦，不能按“正式郑重”这一偏好替用户选择它。
-- 六爻（`sixyao`）：问具体事能否成败，需明确一件事、一个方向。
-- 奇门遁甲（`qimen`）：问方位选择、行动时机、谋略布局，含趋吉避凶方位。
-- 六壬（`liureng_gods`）：按实际起课与课传结果解读，不据复杂盘名承诺精确应期。
-- 六壬年运（`liureng_runyear`）：按年看流月走势，作为年度运势辅助参考。
-- 金口诀（`jinkou`）：即时简断，快速给吉凶方向，适合快问快答。
-- 太乙神数（`taiyi`）：看大势、国运、天地格局，不适合问个人小事。
-- 宿占（`suzhan`）：以二十八宿星宿为核心，择日或问星宿吉凶应用。
-- 三式合参（`sanshiunited`）：太乙 + 六壬 + 奇门联合推算，仅明确要求合参时使用，保留各系分歧。
-- 星骰（`otherbu`）：解读用户实际提供的行星、星座与宫位骰面，不自动随机抽骰，不支持塔罗牌阵；固定默认不能当作本次抽取。
-- 西式卜卦（`astro_horary`）：用起卦时刻星盘回答具体问题，Horary 占星传统。
+### 命盘与指定方法解读（onda-xingpan）
 
-`gua_lookup`、`gua_meiyi` 为卦义查表支撑工具，不作为主问事工具调用，仅在解卦时辅助查义。
+| 用户任务 | `bazi_birth` `analyze_destiny` | `ziwei_birth` `ziwei_horoscope` | `astro_chart` `astro_chart13` `astro_hellen_chart` `astro_guolao_chart` `astro_india_chart` `astro_germany_chart` | `astro_relative_chart` | `western_timing_analysis` `firdaria` `dayun_analysis` `liunian_analysis` |
+| --- | --- | --- | --- | --- | --- |
+| 指定八字／紫微命盘 | 主（原始或综合） | 主（本命或动态） |  |  |  |
+| 西占本命／指定流派 |  |  | 主（择一，不重复） |  |  |
+| 指定星盘关系盘 |  |  |  | 主（明确盘型） |  |
+| 指定阶段方法／法达 |  |  |  |  | 主（按用户所选窄查询） |
 
+详细选择与读法见 [命盘与指定方法解读](../skills/onda-xingpan/SKILL.md)。
+本入口可用清单（非必调）：`analyze_destiny`、`astro_chart`、`astro_chart13`、`astro_germany_chart`、`astro_guolao_chart`、`astro_hellen_chart`、`astro_india_chart`、`astro_relative_chart`、`bazi_birth`、`dayun_analysis`、`firdaria`、`liunian_analysis`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
-### 综合自我画像（onda-zige）
+### 具体问事与占卜（onda-zhanbu）
 
-| query 意图 | analyze_destiny | ziwei_birth | astro_chart |
-|---|---|---|---|
-| 帮我全面分析一下 | 主 | 主 | 主 |
-| 我是谁 · 完整人生说明书 | 主 | 主 | 主 |
-| 综合看看我 | 主 | 主 | 主 |
+| 用户任务 | `meihua_analysis` `sixyao` | `qimen` `liureng_gods` `liureng_runyear` `jinkou` | `taiyi` `suzhan` `sanshiunited` `otherbu` `tongshefa` | `astro_horary` | `gua_lookup` `gua_meiyi` |
+| --- | --- | --- | --- | --- | --- |
+| 明确求卦／已选卜法 | 主（按所选方式） | 主（按所选方式） | 主（按所选方式与实际输入） | 主（非禁区类别） | 旁（只查义，不重起） |
 
-此域是上述策略最密集的应用处，`analyze_destiny`（八字）、`ziwei_birth`（紫微）、`astro_chart`（西占）三系同时为主证，并行调用、并行出结论。三系一致则合并去重，用同一语言讲一次；三系分歧则显式标注「两套/三套口径不一」，各自呈现，不静默二选一，保留给用户权衡。三个工具并行时务必用 `fields` 或 `selected_sections` 裁剪，不要对每个工具裸吐完整 `snapshot_text`，避免三倍 token 膨胀。用户追问具体子域（如感情/事业/健康）时，切换到对应章节的主证系统，不在此域重复展开专项工具。
+详细选择与读法见 [具体问事与占卜](../skills/onda-zhanbu/SKILL.md)。
+本入口可用清单（非必调）：`astro_horary`、`gua_lookup`、`gua_meiyi`、`jinkou`、`liureng_gods`、`liureng_runyear`、`meihua_analysis`、`otherbu`、`qimen`、`sanshiunited`、`sixyao`、`suzhan`、`taiyi`、`tongshefa`。
+
+### 全面画像多主题组合（onda-zige）
+
+| 用户任务 | `analyze_destiny` | `ziwei_birth` | `astro_chart` |
+| --- | --- | --- | --- |
+| 多主题全面画像 | 主（按范围） | 主（按范围） | 主（按范围） |
+| 明确三体系完整画像 | 主（已有则复用） | 主（缺失保留） | 主（缺失保留） |
+
+详细选择与读法见 [全面画像多主题组合](../skills/onda-zige/SKILL.md)。这是多主题组合入口；单主题多体系仍由对应主题主持，深入追问保留已有视角。
+本入口可用清单（非必调）：`analyze_destiny`、`astro_chart`、`ziwei_birth`。
 
 ### 风水 · 空间布局（onda-fengshui）
 
@@ -219,14 +197,14 @@ MCP 端工具名差异：本表 4 个流派盘的列名是 catalog key，但 MCP
 
 ## 长尾与专家级工具
 
-这些工具非日常场景默认调用，仅在特定追问或专家模式触发：
+这些工具按其真实能力和当前问题选择，通常不在普通首轮全部调用：
 
 | 工具 | 何时触发 |
 |---|---|
-| `astro_harmonic` `astro_planetary_ages` `astro_triplicity_rulers` `astro_lunation_phase` `astro_distributions` `astro_balbillus` `astro_keypoints` `astro_yearsystem129` `astro_planetaryarc` `astro_persiandirected` `astro_agepoint` `astro_vedicprog` `astro_jaynesprog` | 用户要西占「全生命周期/古典分阶段」推运，且点名某一技法或要求专家级深度时。默认时运用时运域的聚合 `western_timing_analysis`。 |
-| `astro_mundane` `astro_extrareturns` | 世俗/世运盘、多重回归——非个人命理，问国运/事件大盘或专家要求时。 |
+| `astro_harmonic` `astro_planetary_ages` `astro_triplicity_rulers` `astro_lunation_phase` `astro_distributions` `astro_balbillus` `astro_keypoints` `astro_yearsystem129` `astro_planetaryarc` `astro_persiandirected` `astro_agepoint` `astro_vedicprog` `astro_jaynesprog` | 用户的问题确需相应生命周期／分阶段方法，或明确指定时；按新增价值选择，不默认全调用。法达等常规阶段方法已在时运主体路由。 |
+| `astro_mundane` `astro_extrareturns` | 世俗盘用于明确的世运方法请求；多重回归用于相关个人周期请求，按实际输出解释。 |
 | `taiyi` | 大势/国运级判断（个人问事默认用六爻/梅花/奇门）。 |
-| `sanshiunited` | 三式合参，重大决策要奇门 + 六壬 + 太乙交叉时。 |
+| `sanshiunited` | 仅用户明确选择三式合参时；普通重大决定不自动起三式。 |
 
 ## 支撑与元工具
 
@@ -246,11 +224,11 @@ MCP 端工具名差异：本表 4 个流派盘的列名是 catalog key，但 MCP
 - `analyze_destiny` — 命格综合主证
 - `bazi_birth` — 核心命盘
 - `bazi_personality` — 命格
-- `bazi_education` — 命格
-- `bazi_children` — 命格
-- `bazi_relatives` — 命格
+- `bazi_education` — 学习
+- `bazi_children` — 家庭亲子
+- `bazi_relatives` — 家庭六亲
 - `bazi_career` — 事业
-- `bazi_wealth` — 事业
+- `bazi_wealth` — 财务
 - `bazi_marriage` — 缘分
 - `bazi_romance` — 缘分
 - `bazi_health` — 健康
@@ -333,3 +311,5 @@ MCP 端工具名差异：本表 4 个流派盘的列名是 catalog key，但 MCP
 - `fengshui_annual_stars` — 家居年度飞星
 - `fengshui_xuankong_natal` — 家居玄空运山向宅盘
 - `fengshui_assess` — 家居三法及可选宅盘分层合参
+
+接口与字段见 [API 参考](api-reference.md)，返回[文档中心](README.md)查看其他任务。

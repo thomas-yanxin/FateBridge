@@ -632,7 +632,18 @@ class AdvancedCompatibility:
         if analysis["score"] >= 82:
             analysis["synergy_level"] = "强力互助"
         elif analysis["score"] >= 70:
-            analysis["synergy_level"] = "双向互助"
+            # 等级分档不变；“双向”须由两种实际承接方向共同支持。
+            support_directions = {
+                (item["source"], item["target"])
+                for item in analysis["supportive_patterns"]
+            }
+            bidirectional_support = {
+                ("第一人", "第二人"),
+                ("第二人", "第一人"),
+            } <= support_directions
+            analysis["synergy_level"] = (
+                "双向互助" if bidirectional_support else "协同较好"
+            )
         elif analysis["score"] >= 58:
             analysis["synergy_level"] = "可形成互助"
         else:

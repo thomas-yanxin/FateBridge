@@ -113,7 +113,9 @@ def test_generated_scenarios_are_current_and_join_live_catalog():
 
 
 @pytest.mark.parametrize("detail", ["summary", "full"])
-@pytest.mark.parametrize("scenario", ["onda-shiyun", "onda-fengshui"])
+@pytest.mark.parametrize(
+    "scenario", ["onda-shiyun", "onda-fengshui", "onda-caiwu", "onda-zige"]
+)
 def test_scenario_manifest_parity_across_three_interfaces(rest, detail, scenario):
     params = {"scenario": scenario, "surface": "mcp", "detail": detail}
     http = rest.get("/api/scenarios", params=params)

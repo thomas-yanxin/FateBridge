@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
+import fatebridge.services.bazi as bazi
 from fatebridge.core.almanac import (
     DAY_GANZHI_STRATEGY_REFERENCE_OFFSET,
     build_calendar_context,
@@ -164,3 +165,16 @@ def test_build_calendar_context_marks_out_of_range_lunar_support():
         "start": "1900-01-31",
         "end": "2100-02-08",
     }
+
+
+def test_zi_shi_rolls_day_pillar_to_next_civil_day():
+    same_day = create_person_info(2024, 2, 4, 22, "t", "男", "北京")
+    zi_shi = create_person_info(2024, 2, 4, 23, "t", "男", "北京", birth_minute=30)
+    next_day = create_person_info(2024, 2, 5, 1, "t", "男", "北京")
+
+    d_same = bazi.calculate_bazi_birth(same_day)["bazi_birth"]["four_pillars"]["day"]
+    d_zi = bazi.calculate_bazi_birth(zi_shi)["bazi_birth"]["four_pillars"]["day"]
+    d_next = bazi.calculate_bazi_birth(next_day)["bazi_birth"]["four_pillars"]["day"]
+
+    assert d_zi == d_next  # 23:30 belongs to the next day's pillar
+    assert d_zi != d_same  # and differs from the same civil day's earlier pillar

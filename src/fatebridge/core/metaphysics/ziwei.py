@@ -749,12 +749,58 @@ def _horoscope_scope(scope: str, palace: Dict[str, Any], stem: str) -> Dict[str,
     return {
         "scope": scope,
         "palace_name": palace["name"],
+        # The index names the natal palace occupied by this scope's Ming
+        # activity index. It is not a rotated scope-specific functional palace.
+        "scope_palace_role": "ming_palace_activity_index",
+        "natal_palace_name": palace["name"],
         "branch": branch,
         "branch_index": ZIWEI_BRANCH_SEQUENCE.index(branch),
         "palace_ganzhi": palace["ganzhi"],
         "stem": stem,
         "mutagen": dict(ZIWEI_SIHUA_RULES[stem]),
     }
+
+
+def _link_mutagen_to_natal_stars(
+    scope: Dict[str, Any], palaces: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
+    """Join the computed transformations to computed natal star placements.
+
+    No scope palace rotation or career interpretation is performed here. Keep
+    the natal transformation separately so it cannot be mistaken for the new
+    transformation of this scope.
+    """
+    links = []
+    for transformation, star_name in scope["mutagen"].items():
+        matches = [
+            (palace, star)
+            for palace in palaces
+            for star in palace["stars_detail"]
+            if star["name"] == star_name
+        ]
+        if not matches:
+            links.append(
+                {
+                    "transformation": transformation,
+                    "star": star_name,
+                    "status": "not_located_in_natal_chart",
+                }
+            )
+        for palace, star in matches:
+            links.append(
+                {
+                    "transformation": transformation,
+                    "star": star_name,
+                    "status": "matched",
+                    "natal_palace_name": palace["name"],
+                    "natal_palace_ganzhi": palace["ganzhi"],
+                    "natal_branch": palace["ganzhi"][1],
+                    "natal_star_label": star["label"],
+                    "natal_star_brightness": star["brightness"],
+                    "natal_mutagen": star["mutagen"],
+                }
+            )
+    return links
 
 
 def build_ziwei_horoscope(
@@ -825,11 +871,24 @@ def build_ziwei_horoscope(
             )
         )
 
+    scopes = [daxian, xiaoxian, *flowing]
+    for scope_record in scopes:
+        scope_record["mutagen_natal_links"] = _link_mutagen_to_natal_stars(
+            scope_record, palaces
+        )
+
     return {
         "engine": "fatebridge-offline",
         "nominal_age": nominal_age,
         "calendar_rules": chart["calendar_rules"],
-        "scopes": [daxian, xiaoxian, *flowing],
+        "interpretation_scope": {
+            "contract_version": "natal_scope_linkage_v1",
+            "scope_palace_meaning": "运限命宫活动索引所临的本命宫",
+            "transformation_meaning": "本层四化标记连接本命星所在宫，不是本层旋宫的功能宫",
+            "full_scope_palaces_supported": False,
+            "limitations": ["未提供完整运限十二宫旋宫表", "未据此判定职业事件或吉凶"],
+        },
+        "scopes": scopes,
     }
 
 

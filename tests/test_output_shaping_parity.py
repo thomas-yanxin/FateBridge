@@ -1,11 +1,4 @@
-"""Output-shaping parity across surfaces.
-
-MCP already lets a caller trim output (``fields`` projection +
-``include_snapshot_text``). These tests pin the same controls onto REST (query
-params) and the CLI (``--fields`` already existed; ``--compact`` /
-``--include-snapshot-text`` are added), and — critically — assert that the
-DEFAULTS preserve each surface's pre-existing output so no golden master drifts.
-"""
+"""Projection, snapshot controls and default output across REST and CLI."""
 
 import json
 
@@ -58,7 +51,7 @@ def _build_client(monkeypatch) -> TestClient:
 
 
 def test_rest_default_preserves_full_payload(monkeypatch):
-    """No query params -> identical to today: snapshot_text present, full block."""
+    """Default REST responses include the snapshot and structured result."""
     client = _build_client(monkeypatch)
     body = client.post(_BAZI_BIRTH_PATH, json=_BAZI_BIRTH_BODY).json()
     assert "snapshot_text" in body
@@ -133,7 +126,7 @@ def test_cli_default_is_pretty_with_snapshot(capsys):
     assert code == 0
     payload = json.loads(out)
     assert "snapshot_text" in payload
-    # Pretty-printed (indent=2) output is multi-line — the pre-existing default.
+    # CLI responses default to multi-line, indented JSON.
     assert "\n" in out.strip()
 
 

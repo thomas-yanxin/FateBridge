@@ -1,4 +1,4 @@
 interface:
-  display_name: "人生时运 · 择时"
-  short_description: "看清当前阶段与时间变化，按实际边界展开时间线，把参考转成现实准备"
-  default_prompt: "使用 $onda-shiyun 分析我关心的时段，解释阶段与时间变化；需要对照时给简明时间线，并说明可做的一项现实准备。"
+  display_name: 整体时运与阶段
+  short_description: 按用户的阶段、年度或短期问题选择时运依据，解释边界与变化，比较给定候选
+  default_prompt: 使用 $onda-shiyun 围绕我这次的问题，按主题、对象与时间范围选择有价值的依据，解释差异与可核对的安排。

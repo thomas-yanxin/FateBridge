@@ -17,13 +17,18 @@ from fatebridge.analysis.personality import PersonalityAnalysis
 from fatebridge.analysis.relatives import RelativesAnalysis
 from fatebridge.analysis.romance import RomanceAnalysis
 from fatebridge.analysis.wealth import WealthAnalysis
-from fatebridge.core.almanac import build_calendar_context, current_local_datetime
+from fatebridge.core.almanac import (
+    build_calendar_context,
+    current_local_datetime,
+    get_solar_terms_for_year,
+    localize_datetime,
+)
 from fatebridge.core.classical import (
     build_classical_overview,
     classical_snapshot_lines,
 )
 from fatebridge.core.export_parser import parse_export_content
-from fatebridge.core.metaphysics.common import kongwang_for_ganzhi
+from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX, kongwang_for_ganzhi
 from fatebridge.services.birth_context import (
     BirthComputationContext,
     build_birth_computation_context,
@@ -39,7 +44,11 @@ from fatebridge.utils.data import (
     get_nayin,
     get_ten_god,
 )
-from fatebridge.utils.errors import calculation_guard, handle_calculation_error
+from fatebridge.utils.errors import (
+    ParameterError,
+    calculation_guard,
+    handle_calculation_error,
+)
 from fatebridge.utils.formatting import format_birth_datetime_display
 
 PILLAR_LABELS = {
@@ -283,8 +292,14 @@ def _resolve_analysis_date(
     analysis_year: Optional[int],
     analysis_month: Optional[int],
     analysis_day: Optional[int],
+    *,
+    timezone_name: Optional[str] = None,
 ) -> datetime:
-    now = current_local_datetime()
+    now = (
+        current_local_datetime(timezone_name)
+        if timezone_name is not None
+        else current_local_datetime()
+    )
     year = analysis_year if analysis_year is not None else now.year
     month = analysis_month if analysis_month is not None else now.month
     day = analysis_day if analysis_day is not None else now.day
@@ -910,14 +925,18 @@ def calculate_bazi_birth(
 # =============================================================================
 
 
-def _parse_pillar_str(pillar_str: Optional[str]) -> Optional[Tuple[str, str]]:
-    """将 '甲子' 形式的柱字符串解析为 (天干, 地支)。无效则返回 None。"""
-    if not pillar_str or len(pillar_str) < 2:
+def _parse_pillar_str(
+    pillar_str: Optional[str], field_name: str = "pillar"
+) -> Optional[Tuple[str, str]]:
+    """Only absent overrides default; explicit invalid pillars are rejected."""
+    if pillar_str is None:
         return None
-    stem, branch = pillar_str[0], pillar_str[1]
-    if stem in HEAVENLY_STEMS and branch in EARTHLY_BRANCHES:
-        return (stem, branch)
-    return None
+    if not isinstance(pillar_str, str) or pillar_str not in SEXAGENARY_INDEX:
+        raise ParameterError(
+            "覆盖柱必须为六十甲子中的完整两字干支",
+            [{"path": field_name, "code": "invalid_sexagenary_pillar"}],
+        )
+    return (pillar_str[0], pillar_str[1])
 
 
 def _derive_current_pillars(
@@ -930,8 +949,32 @@ def _derive_current_pillars(
     liunian_result = state.get("liunian_analysis", {}) or {}
     dayun_pillar_str = (dayun_result.get("dayun_info") or {}).get("pillar")
     liunian_pillar_str = (liunian_result.get("liunian_info") or {}).get("pillar")
+    timezone_name = birth_context.normalized_birth_time.timezone
+    anchor = localize_datetime(analysis_date, timezone_name)
+    # Date-only dimension APIs retain their historical midnight anchor. Expose
+    # the boundary rather than treating an arbitrary clock time as equivalent.
+    year_boundaries = [
+        term
+        for term in get_solar_terms_for_year(anchor.year, timezone_name)
+        if term.name == "立春" and term.moment.date() == anchor.date()
+    ]
     context = {
         "analysis_date": analysis_date.strftime("%Y-%m-%d"),
+        "analysis_datetime": anchor.isoformat(),
+        "timezone": timezone_name,
+        "input_granularity": "date",
+        "anchor_policy": "local_midnight",
+        "year_boundary_policy": "lichun_exact_moment",
+        "boundary_status": (
+            "year_boundary_day" if year_boundaries else "not_year_boundary_day"
+        ),
+        "boundaries_on_date": [term.as_dict() for term in year_boundaries],
+        "boundary_scope": "只核验流年立春年界，不代表已扫描大运或全年时段边界。",
+        "hourly_evidence": {
+            "tool": "timing_analysis",
+            "fields": ["personal_info.analysis_datetime", "liunian_analysis"],
+            "when": "问题涉及交节当日钟时或跨工具时点比较时，按实际目标analysis_hour/minute补证；不把本零点锚点当作全天结果。",
+        },
         "dayun_pillar": dayun_pillar_str,
         "liunian_pillar": liunian_pillar_str,
         "dayun_age": (dayun_result.get("age_info") or {}).get("dayun_age"),
@@ -963,16 +1006,20 @@ def _run_bazi_dimension_analysis(
     用户无需自己知道大运；如显式传入 dayun_pillar / liunian_pillar 则作为覆盖。
     """
     try:
+        # Validate explicit overrides before any birth/timing work. A typo must
+        # not silently turn into an automatically calculated pillar.
+        dayun = _parse_pillar_str(dayun_pillar, "dayun_pillar")
+        liunian = _parse_pillar_str(liunian_pillar, "liunian_pillar")
         birth_context = build_birth_computation_context(person)
         pillars = birth_context.birth_pillars
-
-        dayun = _parse_pillar_str(dayun_pillar)
-        liunian = _parse_pillar_str(liunian_pillar)
 
         timing_context: Optional[Dict[str, Any]] = None
         if dayun is None or liunian is None:
             analysis_date = _resolve_analysis_date(
-                analysis_year, analysis_month, analysis_day
+                analysis_year,
+                analysis_month,
+                analysis_day,
+                timezone_name=birth_context.normalized_birth_time.timezone,
             )
             auto_dayun, auto_liunian, timing_context = _derive_current_pillars(
                 birth_context, analysis_date
@@ -985,12 +1032,20 @@ def _run_bazi_dimension_analysis(
                 dayun = auto_dayun
             if liunian is None:
                 liunian = auto_liunian
+            timing_context["dayun_pillar"] = "".join(dayun) if dayun else None
+            timing_context["liunian_pillar"] = "".join(liunian) if liunian else None
+            if timing_context["overridden"]["dayun_pillar"]:
+                # Keep the published fractional-year reference projectable,
+                # without presenting it as the age of the override pillar.
+                timing_context["dayun_age_basis"] = (
+                    "auto_derived_reference_not_override_pillar_age"
+                )
         else:
             # Explicit pillars still have a provenance contract. They do not
             # have an automatically derived age/date; do not invent those.
             timing_context = {
-                "dayun_pillar": dayun_pillar,
-                "liunian_pillar": liunian_pillar,
+                "dayun_pillar": "".join(dayun),
+                "liunian_pillar": "".join(liunian),
                 "source": "explicit_pillar_overrides",
                 "overridden": {"dayun_pillar": True, "liunian_pillar": True},
             }
@@ -1013,6 +1068,8 @@ def _run_bazi_dimension_analysis(
             "snapshot_text": snapshot_text,
             "snapshot_export": snapshot_export,
         }
+    except ParameterError as exc:
+        return exc.as_result()
     except Exception as exc:
         return handle_calculation_error(exc, error_label)
 

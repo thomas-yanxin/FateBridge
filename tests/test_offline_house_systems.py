@@ -20,6 +20,7 @@ from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.chart import build_core_chart_payload
 from fatebridge.core.astro.geometry import normalize_angle
 from fatebridge.core.astro.parts import _build_houses
+from fatebridge.core.astro.profiles import _resolve_offline_house_system
 from fatebridge.services.astrology import calculate_core_chart_analysis
 
 # Synthetic birth: ascendant and MC+90 fall in different signs, so equal_mc and
@@ -117,3 +118,31 @@ def test_online_quadrant_request_is_untouched():
     profile = chart["chart_profile"]
     assert profile["house_system"] == "placidus"
     assert profile["house_system_source"] == "explicit"
+
+
+@pytest.mark.parametrize(
+    "value,expected_key",
+    [
+        (0, "whole_sign"),
+        ("0", "whole_sign"),
+        ("W", "whole_sign"),
+        ("whole_sign", "whole_sign"),
+        ("P", "placidus"),
+        ("p", "placidus"),
+        ("Placidus", "placidus"),
+        ("placidus", "placidus"),
+        ("K", "koch"),
+        ("Koch", "koch"),
+        ("R", "regiomontanus"),
+        ("Regiomontanus", "regiomontanus"),
+    ],
+)
+def test_astro_house_system_accepts_string_and_integer(value, expected_key) -> None:
+    info = _resolve_offline_house_system(value, context_label="test")
+    assert info["key"] == expected_key
+
+
+@pytest.mark.parametrize("bad", ["", None, "nonsense", 99, "equal"])
+def test_astro_house_system_rejects_unknown(bad) -> None:
+    with pytest.raises(ValueError):
+        _resolve_offline_house_system(bad, context_label="test")

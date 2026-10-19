@@ -3,18 +3,18 @@
 
 基于八字命理的子女分析功能，综合以下经典技法：
 - 子女星：男命以官杀为子女，女命以食伤为子女（子平传统六亲法）
-- 子女宫：时柱为子女宫，看子女缘分、数量与晚年得力
+- 子女宫：时柱为子女宫，看命主的子女传统对应
 - 盲派六亲法：时柱十神与吉凶定子女关系与成就
 - 神煞辅助：时柱逢生扶/冲克影响子女缘
 
 核心分析维度：
 1. 子女星定位（按性别取官杀/食伤）与强弱
 2. 子女宫（时柱）状态分析
-3. 子女缘分厚薄与数量倾向
+3. 子女传统对应的规则分类
 4. 与子女关系及子女成就倾向
-5. 生育/添丁时机（大运流年引动子女星与子女宫）
+5. 大运流年引动子女星与子女宫的传统关系
 
-说明：子女数量受现实因素影响极大，命理仅供缘分参考。
+说明：仅解释命主视角的传统对应，不推断生育能力、子女数量或孩子本人的能力。
 """
 
 from __future__ import annotations
@@ -100,6 +100,7 @@ class ChildrenAnalysis:
         )
 
         return {
+            "interpretation_scope": "命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果。",
             "gender_basis": star_label,
             "child_star": child_star,
             "child_palace": palace,
@@ -184,7 +185,7 @@ class ChildrenAnalysis:
         child_star: Dict[str, Any],
         palace: Dict[str, Any],
     ) -> Dict[str, Any]:
-        """子女缘分厚薄与数量倾向（综合星与宫）。"""
+        """子女传统对应的规则分类（综合星与宫）。"""
         weight = child_star["weight"]
         palace_disturbed = any("相冲" in r for r in palace["palace_relations"])
 
@@ -195,7 +196,7 @@ class ChildrenAnalysis:
             notes.append("子女星旺，得子女缘较厚")
         elif weight == 0:
             score -= 12
-            notes.append("子女星弱/不显，子女缘较淡或晚得")
+            notes.append("子女星权重弱／不显，仅为命主盘内分类")
         if palace_disturbed:
             score -= 8
             notes.append("子女宫受冲，与子女或聚少离多")
@@ -205,19 +206,15 @@ class ChildrenAnalysis:
 
         score = max(30, min(92, score))
         if score >= 78:
-            tendency = "子女缘厚，可早育多育"
-            count_hint = "子女缘较旺，数量倾向偏多（仍以现实规划为准）"
+            tendency = "子女传统对应规则分较高"
         elif score >= 60:
             tendency = "子女缘平稳"
-            count_hint = "子女数量平常，一至二位较常见"
         else:
-            tendency = "子女缘较淡或较晚"
-            count_hint = "子女缘偏薄或得子较晚，宜顺其自然、不必强求"
+            tendency = "子女传统对应规则分较低"
 
         return {
             "score": score,
             "tendency": tendency,
-            "count_hint": count_hint,
             "notes": notes,
         }
 
@@ -255,7 +252,7 @@ class ChildrenAnalysis:
         dayun_pillar: Optional[Tuple[str, str]] = None,
         liunian_pillar: Optional[Tuple[str, str]] = None,
     ) -> Dict[str, Any]:
-        """生育/添丁时机：引动子女星或子女宫。"""
+        """传统时间关系：引动子女星或子女宫，不生成生育建议。"""
         signals: List[str] = []
         hour_branch = pillars["hour"][1]
 
@@ -263,16 +260,14 @@ class ChildrenAnalysis:
             stem, branch = pillar
             god = get_ten_god(day_stem, stem)
             if god in child_gods:
-                signals.append(
-                    f"{label}{stem}{branch}引动子女星，利于添丁、子女相关喜事"
-                )
+                signals.append(f"{label}{stem}{branch}引动子女星，仅为传统对应关系变化")
             if check_branch_combination(branch, hour_branch):
                 signals.append(
-                    f"{label}支{branch}合子女宫{hour_branch}，子女宫得动，主生育或子女缘分显现"
+                    f"{label}支{branch}合子女宫{hour_branch}，子女宫得动，仅为传统对应关系变化"
                 )
             elif check_branch_conflict(branch, hour_branch):
                 signals.append(
-                    f"{label}支{branch}冲子女宫{hour_branch}，子女事多变动，备孕育儿宜多留意"
+                    f"{label}支{branch}冲子女宫{hour_branch}，仅记录相冲关系，不推断生育或孩子的现实状态"
                 )
 
         if dayun_pillar:
@@ -281,6 +276,6 @@ class ChildrenAnalysis:
             _assess("流年", liunian_pillar)
 
         if not signals:
-            signals.append("未提供大运/流年，无法判断生育时机")
+            signals.append("本轮未取得子女星／宫的时间关系，不据此判断生育时机")
 
         return {"timing_signals": signals}

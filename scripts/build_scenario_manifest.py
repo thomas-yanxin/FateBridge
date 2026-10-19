@@ -11,6 +11,8 @@ from pathlib import Path
 
 import yaml
 
+from fatebridge.application.scenarios import dependency_closure
+from fatebridge.core.consultation_policy import POLICY_ID
 from fatebridge.services.tool_catalog import CATALOG
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +29,10 @@ def build_manifest():
             routing_path.read_bytes()
         ).hexdigest()
     }
+    for path in sorted((ROOT / "skills/_shared").glob("*.md")):
+        sources[str(path.relative_to(ROOT))] = hashlib.sha256(
+            path.read_bytes()
+        ).hexdigest()
     sections = re.split(
         r"^### ",
         routing.split("## 场景路由矩阵", 1)[1].split("## 长尾与专家级工具", 1)[0],
@@ -79,8 +85,20 @@ def build_manifest():
                 "name": source["scenario"],
                 "version": source["version"],
                 "summary": source["summary"],
+                "consultation": source["consultation"],
                 "triggers": source["triggers"],
                 "engine_tools": [known[tool] for tool in source["engine_tools"]],
+                "dependencies": [
+                    {
+                        **dependency,
+                        **(
+                            {"tools": [known[tool] for tool in dependency["tools"]]}
+                            if "tools" in dependency
+                            else {}
+                        ),
+                    }
+                    for dependency in source.get("dependencies", [])
+                ],
                 "required_inputs": source["required_inputs"],
                 "output": source["output"],
                 "boundary": source["boundary"],
@@ -118,8 +136,21 @@ def build_manifest():
             "name": "家居风水基础计算",
             "version": "1.0",
             "summary": "住宅各层规则独立，明确参考北、住户与历史定运依据后选择工具",
+            "consultation": {
+                "kind": "calculation",
+                "topics": ["space"],
+                "scope": "current_question",
+                "safety_policy": POLICY_ID,
+            },
             "triggers": [row["intent"] for row in rows],
             "engine_tools": keys,
+            "dependencies": [
+                {
+                    "kind": "shared_support",
+                    "tools": ["knowledge_registry", "knowledge_read"],
+                    "condition": "需要查证内置传统知识或来源时；不自动新增个人计算",
+                }
+            ],
             "required_inputs": [],
             "output": {"kind": "calculation", "grounding": "engine_fields"},
             "boundary": "基础层及已定版本玄空规则；不从户型图猜测缺失测量，不推断其他门派。",
@@ -127,7 +158,23 @@ def build_manifest():
             "source": "docs/scenario-routing.md",
         }
     )
-    return {"schema_version": "1.0", "sources_sha256": sources, "scenarios": scenarios}
+    dependency_closure(
+        {record["id"]: record for record in scenarios}, {spec.key for spec in CATALOG}
+    )
+    return {
+        "schema_version": "1.1",
+        "sources_sha256": sources,
+        "consultation_policy": {
+            "id": POLICY_ID,
+            "routing": "topic_task_time_scope",
+            "scope": "current_question",
+            "integration": "additional_relevant_evidence_not_tool_quota",
+            "follow_up": "retain_topic_and_reuse_unchanged_results",
+            "boundaries": "skills/_shared/safety-boundaries.md",
+            "time_selection": "skills/_shared/timing-selection.md",
+        },
+        "scenarios": scenarios,
+    }
 
 
 def main():

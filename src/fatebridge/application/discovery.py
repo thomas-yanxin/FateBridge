@@ -78,10 +78,14 @@ def select_specs(
         selected = [spec for spec in selected if spec.tool_name in allowed_names]
     if q:
         needle = q.strip().casefold()
-        from fatebridge.application.scenarios import definitions
+        from fatebridge.application.scenarios import definitions, scenario_keys
+        from fatebridge.services.tool_catalog import CATALOG
 
         scenario_matches: set[str] = set()
-        by_key = {spec.key: spec for spec in specs}
+        # Resolve the packaged dependency graph against the complete catalog,
+        # then intersect with this caller's possibly scoped declarations below.
+        # A family-limited catalog need not contain every dependency target.
+        by_key = {spec.key: spec for spec in CATALOG}
         for record in definitions()["scenarios"]:
             # Reuse routing vocabulary; search candidates do not replace the
             # primary/supporting evidence roles in the scenario manifest.
@@ -90,7 +94,7 @@ def select_specs(
                 + [row["intent"] for row in record["routing"]]
             ).casefold()
             if needle and needle in text:
-                keys = set(record["engine_tools"])
+                keys = scenario_keys(CATALOG, record["id"])
                 labels = {
                     by_key[key].operation_label_zh for key in keys if key in by_key
                 }

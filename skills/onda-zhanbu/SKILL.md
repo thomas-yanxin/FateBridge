@@ -3,9 +3,13 @@ name: onda-zhanbu
 description: 用 FateBridge 围绕一个具体问题起卦或起局，呈现可复核的卦变、体用或盘局依据，把传统提示转成现实中需确认的条件与下一步。Use when 用户明确求一卦、占卜、梅花易数、六爻、奇门、大六壬、金口诀、太乙、宿占、三式合参、星骰或西洋卜卦；已有结果解释沿用原卦，不反复起卦，不代替用户决定。
 ---
 
-# 抉择 · 问事（Onda）
+# 问事与占卜
 
 围绕用户悬而未决的一件事，讲清「这次卦／局是什么、传统读法强调哪处变化、现实中还需确认什么」。算出的卦象要可见、可复核，不能起卦后只回一段通用鼓励，也不能把传统吉凶变成真实成败承诺。
+
+## 共用范围与安全
+
+先读[咨询硬边界](../_shared/safety-boundaries.md)与[本轮范围及多视角选择](../_shared/consultation-routing.md)。按当前问题展开，首轮明确要求详细就覆盖；不自动附带全部相关主题。时间追问读[共享时间选择](../_shared/timing-selection.md)，保留原主题与已有相关视角，只补需要的新层。生死、临床判断与医疗择时在选法前停止。
 
 ## 引用路径与必读资料
 
@@ -64,7 +68,17 @@ description: 用 FateBridge 围绕一个具体问题起卦或起局，呈现可�
 
 ## 其他盘局也要有可见依据
 
-奇门至少读实际 `qimen.ju_text/dun_type` 与所问有关的宫位；仅有局号还不足以给行动方位。六爻若文本返回包含世应、用神、动爻等，就引用实际出现的条目；没返回完整纳甲判断时不能照别家教程替引擎补全。大六壬、金口、太乙及西式卜卦按实际字段或文本保留两三项关键事实，与解释分开。不要为展示“全面”把各家术语混成一套。
+奇门使用公开 `evidence_views.directional` 字段卡，六爻使用 `line_reading` 卡（它们的默认首轮已保留核心盘面）；卡只是首次请求的 `fields` 参考，不传 `view` 参数。详细读法如下，不以 snapshot 或 summary 替代已经存在的结构化事实。
+
+| 本次要回答什么 | 实际读取 | 如何解释及保留范围 |
+| --- | --- | --- |
+| 奇门这一次的起局与核心宫 | `analysis_context/four_pillars`、`qimen.ju_text/dun_type/xun_head/kongwang/zhifu/zhishi/palaces` | 固定问时，先找值符／值使实际所在宫，再按已说明的所问角色读相关宫；不由宫名直接认定某个人的心意 |
+| 奇门某方向或选项 | `qimen.palaces` 各条的 `name/trigram/heaven_stem/earth_stem/god/door/star`，变换盘另核 `content_palace/content_trigram` | 说清宫位与门星神、天地盘干的实际组合及所用传统解释。数组整体读取后选相关宫，不构造不存在的筛选路径；位置槽和内容来源分开，不仅凭“某门吉”排现实选项，不把九宫方位当房屋风水定宫 |
+| 六爻本卦到变卦与起卦来源 | `input_normalized/nongli/current_hexagram/changed_hexagram/moving_lines`；需要核起卦方式时加 `cast` | 本变卦与动爻来自同一次结果；手摇、指定卦码、随机和时间梅花分别标明，不能把自动时间装卦说成用户摇卦 |
+| 六爻装卦、世应和变化细读 | `lines` 的 `position/branch/element/liuqin/liushen/shi_ying`、动爻及 `changed_branch/changed_liuqin/is_fuyin_line`；`hexagram_info` | 按初爻至上爻核对位置，引用实际世应、六亲、六神与变支。动爻专属字段可能不存在，不能为静爻补变支；装卦已实现不等于自动完成取用神、月日旺衰、空破与精确应期判定 |
+| 用户点名六合／六冲等结构 | 按实际合同加 `patterns/pattern_flags` | 只解释本次命中的结构及来源，空表不补“隐含”格局；不能由一个结构断成败 |
+
+没有返回完整取用神、旺衰和应期规则时，直接说明该判断未自动覆盖；仍交付已有宫盘／装卦支持的传统解释，不把“没读到”说成“引擎没实现”，也不照别家教程替引擎补算。大六壬、金口、太乙及西式卜卦按实际字段或文本保留两三项关键事实，与解释分开。不要为展示“全面”把各家术语混成一套。
 
 ## 交付给用户的判断辅助
 
@@ -72,11 +86,13 @@ description: 用 FateBridge 围绕一个具体问题起卦或起局，呈现可�
 
 现实建议围绕用户已给的选项：下一步最值得确认的条件、低成本试验或何时复盘。比如用户问项目试点，只有他们确有该选项时才谈范围、资源与验收条件；不能说卦已经算出客户会答应。要比较多个现实选项时，可按「选项／已知条件／尚待验证／可逆下一步」做一张小表，明确这部分是现实决策整理，不是卦象计算排名。
 
-不读他人内心，不预告疾病、灾祸或具体财务结果。医疗、法律和重大财务事项的行动以事实及专业判断为依据，卦只提供文化参考；决定由用户自己作。边界在相关处说明一次，不用长篇免责声明挤掉卦义。
+不读他人内心，不预告疾病、灾祸或具体财务结果。生死、临床判断和医疗择时请求在调用前停止；法律和重大财务事项的行动以事实及专业判断为依据，决定由用户自己作。边界在相关处说明一次，不用长篇免责声明挤掉卦义。
 
 首轮被裁掉的字段不能靠分页恢复。已有 `result_delivery` 时读同 run 的所需字段／分页；用户要求完整 JSON 或完整文件时，首次 `fields=null`、保留默认响应预算，核对业务 payload 的 SHA-256，不另起一卦补交付。
 
 ## 可复核示例
+
+CLI 示例使用已安装并激活的仓库虚拟环境，准备方法见[引擎调用](../_shared/fatebridge-engine.md#怎么调引擎)。
 
 以下为虚构问题与指定时间，不是“现在”。已有 MCP 时直接调用。
 
@@ -88,12 +104,13 @@ python3 -m fatebridge.cli meihua_analysis --question "是否先做小规模项�
 
 python3 -m fatebridge.cli qimen \
   --analysis-year 2026 --analysis-month 6 --analysis-day 18 --analysis-hour 15 \
-  --strict-fields --no-include-snapshot-text --fields qimen.ju_text qimen.dun_type analysis_context
+  --strict-fields --no-include-snapshot-text --fields analysis_context qimen.ju_text qimen.dun_type qimen.zhifu qimen.zhishi qimen.palaces
 
 python3 -m fatebridge.cli tongshefa --fields summary
 
 python3 -m fatebridge.cli sixyao --question "这个项目试点有什么需要留意" \
-  --date 2026-06-18 --time 15:00:00 --seed 20260618 --fields summary
+  --date 2026-06-18 --time 15:00:00 --seed 20260618 \
+  --strict-fields --no-include-snapshot-text --fields input_normalized nongli current_hexagram changed_hexagram moving_lines lines hexagram_info
 
 python3 -m fatebridge.cli astro_horary --category career \
   --question-year 2026 --question-month 6 --question-day 18 --question-hour 15 \

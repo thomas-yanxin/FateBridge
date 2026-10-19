@@ -2,7 +2,6 @@
   "analysis_type": "八字子女分析",
   "children_analysis": {
     "affinity": {
-      "count_hint": "子女数量平常，一至二位较常见",
       "notes": [
         "子女宫安稳，亲子关系较顺"
       ],
@@ -44,10 +43,11 @@
     },
     "children_timing": {
       "timing_signals": [
-        "流年丁卯引动子女星，利于添丁、子女相关喜事"
+        "流年丁卯引动子女星，仅为传统对应关系变化"
       ]
     },
     "gender_basis": "官杀（男命子女星）",
+    "interpretation_scope": "命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果。",
     "relationship": {
       "achievement": [],
       "hour_ten_god": "劫财",
@@ -69,7 +69,7 @@
     "tool_name": "bazi_children"
   },
   "snapshot_export": {
-    "export_text": "[概要]\n类型：八字子女分析\ngender_basis：官杀（男命子女星）\n\n[child_star]\nstar：官杀（男命子女星）\n落点：\n  - pillar=year，location=地支藏干，char=丁，ten_god=正官\n  - pillar=month，location=地支藏干，char=丙，ten_god=七杀\n  - pillar=hour，location=地支藏干，char=丙，ten_god=七杀\nweight：1.5\nstatus：子女星适中，子女缘分平稳\n\n[child_palace]\nhour_pillar：辛巳\nhour_ten_god：劫财\npalace_relations：\n  - 子女宫（时柱）无明显冲合，状态平稳\ntrait：子女好动竞争、花费较大，关系需多沟通\n\n[affinity]\n评分：65\ntendency：子女缘平稳\ncount_hint：子女数量平常，一至二位较常见\n说明：\n  - 子女宫安稳，亲子关系较顺\n\n[relationship]\nhour_ten_god：劫财\ntrait：子女好动竞争、花费较大，关系需多沟通\n\n[children_timing]\ntiming_signals：\n  - 流年丁卯引动子女星，利于添丁、子女相关喜事\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是",
+    "export_text": "[概要]\n类型：八字子女分析\ninterpretation_scope：命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果。\ngender_basis：官杀（男命子女星）\n\n[child_star]\nstar：官杀（男命子女星）\n落点：\n  - pillar=year，location=地支藏干，char=丁，ten_god=正官\n  - pillar=month，location=地支藏干，char=丙，ten_god=七杀\n  - pillar=hour，location=地支藏干，char=丙，ten_god=七杀\nweight：1.5\nstatus：子女星适中，子女缘分平稳\n\n[child_palace]\nhour_pillar：辛巳\nhour_ten_god：劫财\npalace_relations：\n  - 子女宫（时柱）无明显冲合，状态平稳\ntrait：子女好动竞争、花费较大，关系需多沟通\n\n[affinity]\n评分：65\ntendency：子女缘平稳\n说明：\n  - 子女宫安稳，亲子关系较顺\n\n[relationship]\nhour_ten_god：劫财\ntrait：子女好动竞争、花费较大，关系需多沟通\n\n[children_timing]\ntiming_signals：\n  - 流年丁卯引动子女星，仅为传统对应关系变化\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是",
     "missing_selected_sections": [
       "起盘信息"
     ],
@@ -84,7 +84,7 @@
     ],
     "sections": [
       {
-        "content": "[概要]\n类型：八字子女分析\ngender_basis：官杀（男命子女星）",
+        "content": "[概要]\n类型：八字子女分析\ninterpretation_scope：命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果。\ngender_basis：官杀（男命子女星）",
         "included": false,
         "index": 1,
         "raw_title": "概要",
@@ -105,7 +105,7 @@
         "title": "child_palace"
       },
       {
-        "content": "[affinity]\n评分：65\ntendency：子女缘平稳\ncount_hint：子女数量平常，一至二位较常见\n说明：\n  - 子女宫安稳，亲子关系较顺",
+        "content": "[affinity]\n评分：65\ntendency：子女缘平稳\n说明：\n  - 子女宫安稳，亲子关系较顺",
         "included": false,
         "index": 4,
         "raw_title": "affinity",
@@ -119,7 +119,7 @@
         "title": "relationship"
       },
       {
-        "content": "[children_timing]\ntiming_signals：\n  - 流年丁卯引动子女星，利于添丁、子女相关喜事",
+        "content": "[children_timing]\ntiming_signals：\n  - 流年丁卯引动子女星，仅为传统对应关系变化",
         "included": false,
         "index": 6,
         "raw_title": "children_timing",
@@ -178,5 +178,5 @@
       "当前大运流年"
     ]
   },
-  "snapshot_text": "[概要]\n类型：八字子女分析\ngender_basis：官杀（男命子女星）\n\n[child_star]\nstar：官杀（男命子女星）\n落点：\n  - pillar=year，location=地支藏干，char=丁，ten_god=正官\n  - pillar=month，location=地支藏干，char=丙，ten_god=七杀\n  - pillar=hour，location=地支藏干，char=丙，ten_god=七杀\nweight：1.5\nstatus：子女星适中，子女缘分平稳\n\n[child_palace]\nhour_pillar：辛巳\nhour_ten_god：劫财\npalace_relations：\n  - 子女宫（时柱）无明显冲合，状态平稳\ntrait：子女好动竞争、花费较大，关系需多沟通\n\n[affinity]\n评分：65\ntendency：子女缘平稳\ncount_hint：子女数量平常，一至二位较常见\n说明：\n  - 子女宫安稳，亲子关系较顺\n\n[relationship]\nhour_ten_god：劫财\ntrait：子女好动竞争、花费较大，关系需多沟通\n\n[children_timing]\ntiming_signals：\n  - 流年丁卯引动子女星，利于添丁、子女相关喜事\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是"
+  "snapshot_text": "[概要]\n类型：八字子女分析\ninterpretation_scope：命主视角的传统对应，不是孩子本人测算，不预测数量或生育结果。\ngender_basis：官杀（男命子女星）\n\n[child_star]\nstar：官杀（男命子女星）\n落点：\n  - pillar=year，location=地支藏干，char=丁，ten_god=正官\n  - pillar=month，location=地支藏干，char=丙，ten_god=七杀\n  - pillar=hour，location=地支藏干，char=丙，ten_god=七杀\nweight：1.5\nstatus：子女星适中，子女缘分平稳\n\n[child_palace]\nhour_pillar：辛巳\nhour_ten_god：劫财\npalace_relations：\n  - 子女宫（时柱）无明显冲合，状态平稳\ntrait：子女好动竞争、花费较大，关系需多沟通\n\n[affinity]\n评分：65\ntendency：子女缘平稳\n说明：\n  - 子女宫安稳，亲子关系较顺\n\n[relationship]\nhour_ten_god：劫财\ntrait：子女好动竞争、花费较大，关系需多沟通\n\n[children_timing]\ntiming_signals：\n  - 流年丁卯引动子女星，仅为传统对应关系变化\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是"
 }

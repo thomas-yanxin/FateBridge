@@ -41,7 +41,7 @@ def _json(value: Any, compact: bool = True) -> str:
 class ResultStore:
     """Private, process-safe immutable artifacts with indexed character pages.
 
-    The original JSON record remains compatible with ``file_payload_path=payload``.
+    The JSON record exposes its result at ``file_payload_path=payload``.
     Small sidecars hold receipts and UTF-8 byte positions at character boundaries;
     pages never deserialize or hash the complete result. Field sidecars point into
     that same JSON record, rather than copying or caching personal result bodies.
@@ -180,8 +180,7 @@ class ResultStore:
                 fd = os.open(pending, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
                 with os.fdopen(fd, "wb") as handle:
                     handle.write(content)
-            # Publish metadata last; without it an interrupted write is safely
-            # upgraded from the compatible primary record on the next access.
+            # Publish metadata last; incomplete writes stay unavailable to readers.
             for path, pending in zip(files, staging):
                 pending.replace(path)
         finally:
@@ -213,10 +212,9 @@ class ResultStore:
             raise _invalid(
                 "结果超过本地交付存储容量，请缩小 fields", "fields", "result_too_large"
             )
-        replaced = sum(path.stat().st_size for path in files if path.exists())
-        self._prune(sum(map(len, files.values())) - replaced, keep_id=result_id)
+        self._prune(sum(map(len, files.values())), keep_id=result_id)
         self._commit(files)
-        # Pruning uses the immutable expiry even for upgraded legacy records.
+        # Derive creation time from the immutable receipt expiry for pruning.
         created_at = expires_at - RETENTION_SECONDS
         os.utime(self._path(result_id), (created_at, created_at))
         return metadata
@@ -238,11 +236,6 @@ class ResultStore:
         if not primary.exists() or primary.is_symlink():
             raise _invalid("结果引用不存在或已过期", "result_id", "result_unavailable")
         sidecar = self._path(result_id, "meta")
-        if not sidecar.exists():
-            # One-time upgrade of old records preserves their result id, receipt,
-            # expiry, canonical payload and existing file-path consumers.
-            record = self._record(result_id)
-            return self._store_main(result_id, record["payload"], record["expires_at"])
         metadata = self._read_json(sidecar)
         if metadata.get("format") != 1:
             raise _invalid("结果引用格式不受支持", "result_id", "result_unavailable")

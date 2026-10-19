@@ -1,6 +1,6 @@
-# FateBridge 引擎参考层（fatebridge-engine）
+# FateBridge 引擎调用参考
 
-这是所有 FateBridge 场景 Skill 共用的计算层。
+这是所有 FateBridge 场景 Skill 共用的计算层。先读[硬边界](safety-boundaries.md)，按[本轮范围](consultation-routing.md)选择任务，时间问题使用[共享时间选择](timing-selection.md)。
 
 用户要求完整 JSON、全部时间线或完整文件导出时，第一次调用设 `fields=null`（CLI 省略 `--fields`），保留默认响应预算；下文精简首轮字段仅用于普通摘要咨询。输出投影先于交付保存，分页不会恢复投影已排除的字段，所以不能先裁成摘要再补算全文。
 
@@ -8,11 +8,17 @@
 
 ---
 
+## 阅读导航
+
+[调用与错误](#怎么调引擎) · [输出与投影](#输出形态与首轮读取) · [共用参数](#参数字典共用字段) · [工具地图](#全量工具地图按家族) · [调用示例](#典型调用样例) · [调用纪律](#全局调用纪律) · [风水基础](#家居风水基础计算)
+
+本页是 Agent 的调用参考；面向开发者的工具、快照、交付与回执概念集中在[核心概念](../../docs/concepts.md)。按当前缺口读取，不把完整工具地图当成必调清单。
+
 ## 怎么调引擎
 
-已连接 FateBridge MCP 时，按所选工具的实际定义直接调用，不为用户咨询先运行安装诊断、搜索仓库或项目历史。当前聊天已确认的资料足够时直接计算；只有用户要求沿用历史资料才核对历史。以下 CLI 是无连接时的本地后备及可复核示例；不需要起 REST 服务。两种 CLI 写法等价：
+已连接 FateBridge MCP 时，按所选工具的实际定义直接调用，不为用户咨询先运行安装诊断、搜索仓库或项目历史。当前聊天已确认的资料足够时直接计算；只有用户要求沿用历史资料才核对历史。以下 CLI 是无连接时的本地后备及可复核示例，不需要启动 REST 服务。
 
-已加载的调用合同包含完整参数且工具公开时，不重复发现；其他工具按名称一次取得实际 inputSchema 与描述，再调用。工具描述的首轮 `fields` 来自共享字段配置；首轮设 `strict_fields=true`、`include_snapshot_text=false`，详细追问才展开更多字段。没有首轮预设时，依据实际输出合同选字段，不猜路径。下面的出生数据都是示例，不能当作用户资料。
+已加载的调用合同包含完整参数且工具公开时，不重复发现；其他工具按名称一次取得实际 inputSchema 与描述，再调用。工具描述的首轮 `fields` 来自共享字段配置；部分工具还发布按用户任务选择的 `evidence_views`（CLI `describe <tool>`、REST 工具详情也可读取）。先选任务卡，再把其中 `fields` 复制到真实请求；卡名和 `view` 不是请求参数，不发送 `evidence_views/view/task`。关系盘按规范模式选卡，西占时运按 stage／annual／short_term 选卡；事业岗位／年度安排按 direction／target_year 选卡，西占事业补证可合并 career 卡，确保并列十神、判断范围和目标时间依据进入首次字段；细节卡与主任务字段合并去重，不用细节卡取代主层。默认视图是安全后备，不表示每次需要解释全部分支。首轮设 `strict_fields=true`、`include_snapshot_text=false`，详细追问才展开更多字段。没有首轮预设时，依据实际输出合同选字段，不猜路径。下面的出生数据都是示例，不能当作用户资料。
 
 接收调用或资源结果时，先核对实际返回形状：可能是 JSON 字符串、文本 `content` 或 `structuredContent`，不能固定假设存在 `contents[0]` 或 `structuredContent.run_metadata`。有截断标记的 JSON 片段不能解析成完整合同；改读所选工具的实际定义或更小的资源，勿反复解析同一片段。字段选择先用已核对的顶层业务字段，需要细节再展开，不为首轮遍历整个 `$defs`。
 
@@ -21,6 +27,15 @@ MCP 默认响应字符预算为8192；超限返回 `result_delivery`，原结果
 REST/CLI 默认继续完整交付，可显式设置 `response_char_limit` / `--response-char-limit` 获得同一限量合同。MCP 的 `response_char_limit=0` 仅供可保存完整 JSON 的程序客户端；聊天咨询不要用它规避分页，否则宿主仍可能截断。
 
 用户要求保存本机完整文件时，可读取 `file_path` 指向的私有临时记录，按 `file_payload_path`（当前为 `payload`）取出原结果，以 `ensure_ascii=False,separators=(",", ":")` 序列化后核对 `sha256` 并保存。外层记录还含过期时间，其文件散列不等于原结果散列；不把外层记录交付为完整计算结果。保存后的用户文件独立于临时引用保留。
+
+本地 CLI 示例须使用已安装 FateBridge 的虚拟环境。在仓库中按以下方式准备；这属于安装／开发任务，已连接的普通咨询无需运行：
+
+```bash
+uv sync --locked --extra dev
+source .venv/bin/activate
+```
+
+以上为 macOS / Linux；Windows PowerShell 激活命令为 `.\.venv\Scripts\Activate.ps1`。下文 `python3` 指激活后该环境中的解释器，不使用未经核实的系统解释器。两种 CLI 形式 `fatebridge <tool>` 与 `python3 -m fatebridge.cli <tool>` 等价。
 
 在本仓库使用本地后备时，优先已存在且已安装 FateBridge 的 `.venv/bin/python`，例如 `.venv/bin/python -m fatebridge.cli describe <tool>`。下方 `python3` 是已安装环境的通用写法，不表示系统默认解释器可导入本包；咨询不因解释器缺包而安装依赖、接受系统许可或修改用户配置。解析软链接用 shell 内建 `pwd -P` 即可，不依赖 Python 或 Xcode。
 
@@ -35,9 +50,9 @@ fatebridge <tool> [参数...]
 
 常用全局开关：
 
-- `--no-metadata`：去掉 `run_id`/`trace_id` 等溯源字段；复核或日志场景建议保留，示例用此开关简化输出。必须放在工具名之前。
-- `fatebridge.cli list`：列出全部工具。
-- `fatebridge.cli describe <tool>`：输出某工具的完整参数 schema、接口、类型、是否必填，返回 JSON。记不清参数时，先 `describe`，不要猜 flag。
+- `--no-metadata`：去掉 `run_id`/`trace_id` 等溯源字段，可放在工具名之前或之后；复现或关联后续计算时应保留回执，示例用此开关简化输出。
+- `fatebridge list`：列出全部工具。
+- `fatebridge describe <tool>`：输出某工具的完整参数 schema、接口、类型、是否必填，返回 JSON。记不清参数时，先 `describe`，不要猜 flag。
 
 调用前先过一遍自检：
 
@@ -76,9 +91,10 @@ fatebridge <tool> [参数...]
 
 **结构化字段怎么读（需要精确时）：**
 
-- `analyze_destiny` → 根字段 `four_pillars`、`day_master`、`ten_gods`、`structure_profile`、`element_distribution`、`element_distribution_basis`、`person_info`。普通画像首轮可取这七项；格局解释读 `structure_profile.decision_basis/useful_elements`，五行分布不等于喜用。
+- `analyze_destiny` → 根字段 `four_pillars`、`day_master`、`ten_gods`、`structure_profile`、`element_distribution`、`element_distribution_basis`、`person_info`。普通画像首轮可取这七项；格局解释读完整 `structure_profile` 中的 `layers/conflicts/conditional_elements/limitations`、`dominant_structure.formation_status` 和 `decision_basis`，不能只取最终 `useful_elements`；按[八字专题取证](bazi-topic-evidence.md)区分月令格局、扶抑与调候。五行分布不等于喜用。
 - `bazi_birth` → `bazi_birth.four_pillars`、`bazi_birth.day_master` 等嵌套字段。它与 `analyze_destiny` 的输出根结构不同，不能共用 `bazi_birth.` 前缀。
 - `ziwei_birth` → `ziwei_birth.ming_gong/shen_gong/palaces/sihua`；核对出生处理口径时按需加 `person_info`、`analysis_context`。
+- `ziwei_horoscope` → 普通运限首轮可取 `analysis_context`、`birth_context`、`ziwei_horoscope.interpretation_scope`、`ziwei_horoscope.nominal_age`、`ziwei_horoscope.calendar_rules`、`ziwei_horoscope.scopes`，同时设 `strict_fields=true`、`include_snapshot_text=false`；省略 `fields` 并不会因严格模式自动变精简。`scopes` 是数组，当前投影必须整体取，不能编造 `scopes.流年` 或索引路径；按本轮粒度解释其中所需层，其余不展开，也不默认取 `snapshot_export`。核对 `analysis_context.context_role=target` 及 `analysis_datetime`，出生处理另读 `birth_context`；旧进程若返回出生 context，不能将它当目标时刻，也不凭字段名忽略实际值。本命／运限宫位身份与四化连接读[紫微专题取证](ziwei-topic-evidence.md)。
 - `astro_chart` → 根字段 `angles`、`chart_profile`、`planets`、`aspects`、`interpretation`、`person_info`。普通首轮的解释子项按工具公布的字段选择；出生钟时读 `person_info`。`western_timing_analysis` 的 `analysis_context` 不能移作本命盘字段。
 - 八字 9 专项 → `{"analysis_type": "...", "<dim>_analysis": {...}}`。解读读 `<dim>_analysis`，里面是该维度的子项。例如 `bazi_romance` → `romance_analysis.{peach_blossom, hongluan_tianxi, opposite_sex_star, peach_quality, romance_timing, timing_context}`；`bazi_wealth` → `wealth_analysis.{...}`。`timing_context` 段是引擎自动推算的当前大运/流年，看时机就看它。
 - `two_person_compatibility` → `summary`（`overall_score` / `compatibility_level`）、`traditional_compatibility`、`detailed_analysis`（`element_balance` / `favorable_synergy`）、`strengths`、`challenges`、`recommendations`。不同规则段的分数保留各自名称与作用域，不合成成功概率；`person_info` 中的个人内部结构不能直接解释为双方互动。建议列表为空时如实说明，现实沟通建议另作标记。
@@ -94,7 +110,7 @@ python3 -m fatebridge.cli --no-metadata bazi_birth ... \
 
 支持 `--selected-sections` 的工具可用空格分隔的段名筛选导出（带空格的单个标题需引号），不要用逗号拼成一个标题。段名可从 `snapshot_export.section_titles_detected` 查看；该参数只裁剪导出文本，完整 `snapshot_text` 和业务数据仍返回，不会自动缩小整个响应。八字九大专项没有 `selected_sections` 输入，使用 `--fields` 精简。
 
-**精确投影 `--fields`：只取你要的结构化字段，省 token。** 支持顶层 key，也支持点号子路径（从输出根算起的绝对路径，不深搜）。多个字段用空格分隔，不是逗号，逗号会被当成一个不存在的 key，返回空对象。已附带的 `run_metadata` 会保留；`--no-metadata` 会关闭附加。
+**精确投影 `--fields`：只取你要的结构化字段，省 token。** 支持顶层 key，也支持点号子路径（从输出根算起的绝对路径，不深搜）。多个字段用空格分隔，不是逗号，逗号会被当成一个字段路径，严格模式下返回校验错误，宽松模式下附投影警告。已附带的 `run_metadata` 会保留；`--no-metadata` 会关闭附加。
 
 ```bash
 # 单字段：直接拿四柱
@@ -257,35 +273,39 @@ python3 -m fatebridge.cli --no-metadata bazi_birth <出生参数> \
 
 用于给一段结果补充传统词条释义。
 
+知识查询优先沿用工具公开的 `call_guidance`。目录的分类与键位于 `domains[].categories[]`，严格投影先读所属根，不猜 `domain/categories` 根路径。西占相位按 `category=aspect` 与实际角度／键定位；`object_a/object_b` 仅标注对象，不能单独找到词条，返回的通用相位含义也不冒充该星体对的专属规则。健康传统词条中的病名或调理说法不应用为个人医学结论。
+
 ---
 
 ## 读 snapshot_text 的速查（以八字为例）
 
-引擎吐出的 `snapshot_text` 已经分好段，对应着事实。解读时按段取信号：
+引擎吐出的 `snapshot_text` 是摘要，包含计算事实、规则标签和模板解释。优先按结构化字段核对条件，快照只作导航：
 
 - `[起盘信息]`：真太阳时校正、农历、节气。先确认起盘对不对（出生地/时辰）。
 - `[四柱与三元]`：年月日时柱、纳音、十神、藏干。日柱天干 = 日主（命主本人）。
-- `[格局调候]`：月令格局（如正官格）、调候用神（如「主用丁」）、日主十二长生。用神 = 这个人最需要补的五行，是吉凶判断的轴。
+- `[格局调候]`：分开读月令格局、调候简表（如「主用丁」）和日主十二长生。月令格局的用神、扶抑候选、调候所取干支各有语境，不能统一改写为“最需要补的五行”；规则标签须连同成立状态与条件读取。
 - `[流年行运概略]`：当前大运、流年、流月，及五行力量增减。看时机就看这段。
 - `[神煞...]`：桃花、驿马、华盖、天乙贵人、空亡、红鸾天喜等。神煞是色彩，别当铁口直断。
 
-判吉凶的总原则：看某五行/十神是不是命主的喜用。喜用被生扶 = 顺；忌神当旺 / 喜用被克 = 有挑战。引擎已经把喜用、力量增减写在快照里，照着读即可，不要自己重排五行。
+解释顺逆先确定采用哪层规则、支持与反向条件，再看所问时段实际触发什么。`heuristic` 扶抑、`pattern_candidate/candidate_only` 格局候选、`reference_only` 调候简表各保留自己的范围；冲突元素按 `conflicts` 分列，不用统一“喜被生扶便顺”公式消去分歧，也不把未列入喜的元素自动列忌。现有条件支持的工作特点仍可解释；五行名单不转换成补充元素、选行业或辞职处方。传统术语和原典页码见[八字专题取证](bazi-topic-evidence.md)。
 
 ---
 
 ## 跨体系交叉印证（文化视角对照）
 
-八字、紫微、西占采用不同的传统规则，但共享出生信息、历法或星历输入。多体系一致可用于整理文化视角，不是独立统计证据，也不能证明现实预测准确。用户确实需要多体系对照时，再调用两到三套并保留来源：
+八字、紫微、西占采用不同的传统规则，但共享出生信息、历法或星历输入。多体系一致可用于整理文化视角，不是独立统计证据，也不能证明现实预测准确。专题综合主动评估有新增价值的相关视角；单项或限定方法按其范围。选两到三套时保留来源：
 
 - 多套描述重合 → 合并说明哪些规则产生了共同描述，再与用户实际经验对照。
 - 某结论只有一套提到 → 标出该体系与适用范围；另两系未提到不自动表示它较弱，也不补造旁证。
-- 两套描述矛盾 → 先核对时区、坐标、太阳时策略和模型；输入一致后仍有分歧，分别呈现，不自行断言是用户的内在张力。
+- 两套描述矛盾 → 先核对是否在说同一人物、命题、时段和条件，再核对时区、坐标、太阳时策略、独立年界和模型。长期特点与某年安排不直接对冲；同一命题仍有分歧时分别呈现，不自行断言是用户的内在张力。
 
-读法：先各看各的 `snapshot_text`/结构化字段，抓出每套最突出的 2–3 个信号，再横向比对哪些重合、哪些只此一家、哪些相反。重合处合并描述，相反处保留分歧，单一来源留余地。别把三套各背一遍堆给用户。
+读法：调用前写清每种方法要补哪个子问题，首次字段覆盖该主证。按实际结构化字段形成“事实 → 有来源的规则解释 → 本次条件式应用”，现实建议另说明可核对条件。第二方法须增加相关事实、改变适用条件、发现冲突或收窄判断；只重复描述就不增加调用。正文合并真正重合的判断，保留各自来源与分歧，不能按体系票数增加把握。同一八字专项与综合是共享来源的补充字段，不计作两份独立印证。
 
 ---
 
 ## 典型调用样例
+
+以下资料与日期均为虚构示例，在上文已准备的虚拟环境中运行。需要保留复现回执时省略 `--no-metadata`；完整导出不使用摘要投影。
 
 ```bash
 # 八字本命盘
@@ -322,7 +342,7 @@ python3 -m fatebridge.cli --no-metadata astro_chart \
 
 ## 全局调用纪律
 
-权威全文与各场景的工具取舍见 `docs/scenario-routing.md`。本节是所有 onda 技能共享的执行铁律。
+完整调用约定与场景取舍见[场景路由矩阵](../../docs/scenario-routing.md)。本节集中列出所有 Onda 技能共享的执行约定。
 
 - **命盘复用**：综合命理画像调一次 `analyze_destiny`（已含命盘 + 喜用 + 格局），不要再调 `bazi_birth`；只要原始四柱才单用 `bazi_birth`。同一出生信息跨八字/紫微/西占复用，不重复采集。
 - **聚合优先**：时运全景用 `timing_analysis` / `western_timing_analysis`，不连发多个单技法；只要一项才用单工具。
@@ -334,7 +354,7 @@ python3 -m fatebridge.cli --no-metadata astro_chart \
 
 ## 交叉印证与去重（防矛盾）
 
-**主证 + 旁证 + 显式分歧**：需要个案计算时，按场景选择一个主证系统，其余只作旁证（加强/修正）；方法原理和已有结果的解释不为满足路由另开计算。系统间一致则合并去重；冲突则显式标注「两套口径不一」，不静默二选一。同一神煞在多个工具重复出现时，按当前场景取一个口径讲一次（如咸池在 romance = 机会 / marriage = 防烂桃花，合并讲一次）。各域主证分配见 [场景路由：交叉印证与去重](../../docs/scenario-routing.md#交叉印证与去重)。
+按结构、互动、阶段、目标时段与候选时刻分别选择依据，不按领域永久指定唯一主体系。专题综合通常评估两套相关视角，工具数不是配额；简单单项与指定方法可只用一套。新增工具须补未回答的问题或独立层，已有命盘和时机不重算。共同描述合并且署明来源，分歧先查输入再保留，不投票、不平均，不以多体系同向增加现实预测置信度。完整规则见[本轮范围及多视角](consultation-routing.md)。
 
 ## 家居风水基础计算
 

@@ -23,13 +23,15 @@
 
 ## 运行并查看结果
 
-从仓库根目录、已激活的安装环境执行：
+按[快速入门](../getting-started.md)安装后，从仓库根目录执行：
 
 ```bash
-fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json \
+uv run --locked --extra dev fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json \
   --fields status layers coverage rulesets rule_trace --strict-fields --compact
-fatebridge fengshui_xuankong_natal --request-file docs/examples/fengshui-xuankong.json --compact
+uv run --locked --extra dev fatebridge fengshui_xuankong_natal --request-file docs/examples/fengshui-xuankong.json --compact
 ```
+
+两个命令分别演示原始分层结果和独立数字宅盘。查看布局规则时，投影另加实际请求对应的 `layout_analysis` 分支；例如 `fengshui-forms.json` 应读取 `layout_analysis.form_analysis`，`fengshui-home-alternatives.json` 应读取 `layout_analysis.alternatives_analysis`。不要把只投影 `layers` 的输出当成布局审查结果。
 
 REST 将同一文件用 `--data-binary @docs/examples/fengshui-home.json` 发送到对应 POST 路由，MCP 使用文件内容作为参数对象。命令与客户端用法见[三端例子](../fengshui.md#三端例子)。CLI 请求文件未知字段仍会被拒绝，显式字段参数覆盖文件中的同名顶层字段。
 

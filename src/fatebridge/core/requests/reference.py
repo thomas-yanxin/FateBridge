@@ -50,7 +50,8 @@ class KnowledgeReadRequest(_DeferredModel):
     domain: str = Field(
         description=(
             "知识域：astro / bazi / liureng / qimen。各域适用字段不同——"
-            "astro：key 或 (object_a, object_b[, aspect_degree])；"
+            "astro：key，或 category=aspect 配合 aspect_degree；"
+            "星体对 object_a/object_b 只给相位条目标注对象，不能单独定位词条；"
             "bazi / qimen：key（category 可省略，自动解析）；"
             "liureng：(jiang_name, tian_branch, di_branch)。"
         )
@@ -59,7 +60,8 @@ class KnowledgeReadRequest(_DeferredModel):
         default=None,
         description=(
             "Category within the domain. Optional: if omitted, it is auto-resolved "
-            "from `key` (astro/bazi/qimen only)."
+            "from `key` (astro/bazi/qimen only). For an astro aspect_degree "
+            "query without key, explicitly pass category='aspect'."
         ),
     )
     key: Optional[str] = Field(default=None, description="Primary lookup key")
@@ -69,7 +71,7 @@ class KnowledgeReadRequest(_DeferredModel):
     )
     aspect_degree: Optional[int] = Field(
         default=None,
-        description="[domain=astro] 相位角度（可选，用于 astro 相位查询）",
+        description="[domain=astro, category=aspect] 相位角度；无 key 时须显式提供 category=aspect",
     )
     object_a: Optional[str] = Field(
         default=None, description="[domain=astro] 第一星体（相位查询）"

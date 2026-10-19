@@ -39,6 +39,12 @@ class PersonInfo(PartialOutput):
 
 
 class AnalysisContext(PartialOutput):
+    context_role: Optional[str] = None
+    analysis_year: Optional[int] = None
+    analysis_month: Optional[int] = None
+    analysis_day: Optional[int] = None
+    analysis_hour: Optional[int] = None
+    analysis_minute: Optional[int] = None
     input_datetime: Optional[str] = None
     corrected_datetime: Optional[str] = None
     timezone: Optional[str] = None
@@ -246,6 +252,18 @@ class ZiweiBirth(PartialOutput):
     year_stem: Optional[str] = None
 
 
+class ZiweiMutagenNatalLink(PartialOutput):
+    transformation: Optional[str] = None
+    star: Optional[str] = None
+    status: Optional[str] = None
+    natal_palace_name: Optional[str] = None
+    natal_palace_ganzhi: Optional[str] = None
+    natal_branch: Optional[str] = None
+    natal_star_label: Optional[str] = None
+    natal_star_brightness: Optional[str] = None
+    natal_mutagen: Optional[str] = None
+
+
 class ZiweiScope(PartialOutput):
     scope: Optional[str] = None
     branch: Optional[str] = None
@@ -253,13 +271,25 @@ class ZiweiScope(PartialOutput):
     stem: Optional[str] = None
     palace_ganzhi: Optional[str] = None
     palace_name: Optional[str] = None
+    scope_palace_role: Optional[str] = None
+    natal_palace_name: Optional[str] = None
     mutagen: Optional[Dict[str, str]] = None
+    mutagen_natal_links: Optional[List[ZiweiMutagenNatalLink]] = None
+
+
+class ZiweiInterpretationScope(PartialOutput):
+    contract_version: Optional[str] = None
+    scope_palace_meaning: Optional[str] = None
+    transformation_meaning: Optional[str] = None
+    full_scope_palaces_supported: Optional[bool] = None
+    limitations: Optional[List[str]] = None
 
 
 class ZiweiHoroscope(PartialOutput):
     engine: Optional[str] = None
     calendar_rules: Optional[ZiweiCalendarRules] = None
     nominal_age: Optional[int] = None
+    interpretation_scope: Optional[ZiweiInterpretationScope] = None
     scopes: Optional[List[ZiweiScope]] = None
 
 
@@ -681,6 +711,7 @@ CHINESE_FIELDS: Dict[str, Any] = {
     "four_pillars": FourPillars,
     "person_info": PersonInfo,
     "analysis_context": AnalysisContext,
+    "birth_context": AnalysisContext,
     "calendar_context": CalendarContext,
     "jieqi24": List[SolarTerm],
     "jieqi_year": List[SolarTerm],

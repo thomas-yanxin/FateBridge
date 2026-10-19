@@ -293,14 +293,6 @@
           "longitude": 243.1136,
           "sign": "Sagittarius"
         },
-        "death": {
-          "almuten": "Mercury",
-          "cn": "死亡点",
-          "degree_in_sign": 11.7346,
-          "dispositor": "Mercury",
-          "longitude": 71.7346,
-          "sign": "Gemini"
-        },
         "fortune": {
           "almuten": "Mars",
           "cn": "福点",

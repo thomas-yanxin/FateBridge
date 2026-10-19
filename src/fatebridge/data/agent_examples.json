@@ -292,6 +292,41 @@
       "analysis_day": 14,
       "analysis_hour": 12,
       "analysis_minute": 0
+    },
+    "ziwei_horoscope": {
+      "name": "演示甲",
+      "gender": "男",
+      "birth_year": 1990,
+      "birth_month": 5,
+      "birth_day": 15,
+      "birth_hour": 10,
+      "birth_minute": 30,
+      "birth_timezone": "Asia/Shanghai",
+      "birth_place": "北京",
+      "birth_longitude": 116.4074,
+      "birth_latitude": 39.9042,
+      "target_year": 2026,
+      "target_month": 10,
+      "target_day": 12,
+      "target_hour": 12
+    },
+    "firdaria": {
+      "name": "演示甲",
+      "gender": "男",
+      "birth_year": 1990,
+      "birth_month": 5,
+      "birth_day": 15,
+      "birth_hour": 10,
+      "birth_minute": 30,
+      "birth_timezone": "Asia/Shanghai",
+      "birth_place": "北京",
+      "birth_longitude": 116.4074,
+      "birth_latitude": 39.9042,
+      "analysis_year": 2026,
+      "analysis_month": 10,
+      "analysis_day": 14,
+      "analysis_hour": 12,
+      "analysis_minute": 0
     }
   },
   "suggested_fields": {
@@ -317,7 +352,8 @@
       "bazi_birth.day_master"
     ],
     "bazi_career": [
-      "career_analysis.dominant_ten_gods.primary_career_type",
+      "career_analysis.interpretation_scope",
+      "career_analysis.dominant_ten_gods",
       "career_analysis.career_timing",
       "career_analysis.timing_context",
       "career_analysis.career_structure",
@@ -341,6 +377,14 @@
       "ziwei_birth.shen_gong",
       "ziwei_birth.palaces",
       "ziwei_birth.sihua"
+    ],
+    "ziwei_horoscope": [
+      "analysis_context",
+      "birth_context",
+      "ziwei_horoscope.interpretation_scope",
+      "ziwei_horoscope.nominal_age",
+      "ziwei_horoscope.calendar_rules",
+      "ziwei_horoscope.scopes"
     ],
     "astro_chart": [
       "angles",
@@ -380,15 +424,26 @@
       "summary"
     ],
     "sixyao": [
+      "input_normalized",
+      "nongli",
       "current_hexagram",
       "changed_hexagram",
       "moving_lines",
+      "lines",
+      "hexagram_info",
       "summary"
     ],
     "qimen": [
+      "analysis_context",
+      "four_pillars",
       "qimen.ju_text",
       "qimen.dun_type",
-      "analysis_context"
+      "qimen.xun_head",
+      "qimen.kongwang",
+      "qimen.zhifu",
+      "qimen.zhishi",
+      "qimen.palaces",
+      "qimen.engine"
     ],
     "fengshui_directions": [
       "status",
@@ -407,10 +462,21 @@
       "wealth_analysis"
     ],
     "astro_relative_chart": [
+      "relationship_profile",
       "summary",
       "compatibility",
-      "relationship_profile",
-      "synastry_aspects"
+      "synastry_aspects",
+      "in_to_out_aspects",
+      "out_to_in_aspects",
+      "chart",
+      "inner.chart_profile",
+      "inner.chart.angles",
+      "inner.chart.houses",
+      "inner.chart.planets",
+      "outer.chart_profile",
+      "outer.chart.angles",
+      "outer.chart.houses",
+      "outer.chart.planets"
     ],
     "fengshui_minggua": [
       "status",
@@ -473,17 +539,44 @@
     "western_timing_analysis": [
       "analysis_context",
       "summary",
-      "time_lords.annual_profection",
+      "time_lords.firdaria.sect",
+      "time_lords.firdaria.current_major",
       "time_lords.firdaria.current_sub",
-      "returns.solar_return.return_datetime",
-      "returns.lunar_return.return_datetime",
-      "directions.primary_directions.method",
-      "directions.primary_directions.coordinate_backend",
-      "directions.primary_directions.coordinate_precision",
-      "directions.primary_directions.current_arc_degrees",
-      "directions.solar_arc.arc_degrees",
+      "time_lords.annual_profection",
+      "returns.solar_return",
       "transits.current_transit.analysis_datetime",
-      "transits.current_transit.sun"
+      "transits.current_transit.orb_limit",
+      "transits.current_transit.hits"
+    ],
+    "firdaria": [
+      "analysis_context",
+      "firdaria.current_major",
+      "firdaria.current_sub"
+    ],
+    "bazi_health": [
+      "health_analysis.constitution",
+      "health_analysis.organ_analysis",
+      "health_analysis.health_timing",
+      "health_analysis.scope",
+      "health_analysis.is_medical_assessment"
+    ],
+    "bazi_marriage": [
+      "marriage_analysis"
+    ],
+    "bazi_romance": [
+      "romance_analysis"
+    ],
+    "bazi_education": [
+      "education_analysis"
+    ],
+    "bazi_personality": [
+      "personality_analysis"
+    ],
+    "bazi_relatives": [
+      "relatives_analysis"
+    ],
+    "bazi_children": [
+      "children_analysis"
     ]
   },
   "call_guidance": {
@@ -517,7 +610,274 @@
     "western_timing_analysis": {
       "target_clock": "analysis_hour/minute 是目标钟时，按 birth_timezone；显式0有效。省略分别沿用出生小时/分钟，仅兼容日期级调用。return_timezone转换同一时刻。",
       "delivery": "MCP默认8192字符，完整结果超限返回result_delivery。用其manifest_uri按所需字段或分页读取同一run；完整JSON重组核对sha256，不重新计算，不解析截断片段。",
-      "complete_export": "用户要求完整JSON、全部时间线或完整文件时，首次fields=null，保留默认响应预算，再读取result_delivery；first_view仅用于摘要咨询，不能先投影摘要再补算全文。"
+      "complete_export": "用户要求完整JSON、全部时间线或完整文件时，首次fields=null，保留默认响应预算，再读取result_delivery；first_view仅用于摘要咨询，不能先投影摘要再补算全文。",
+      "evidence": "首次按问题选择evidence_views.stage/annual/short_term/career的fields；事业兼阶段与目标时段用career，结合本命职业配置筛选相关hits。默认与其他视图不强制展开全部方法；fields=null仍表示全量。"
+    },
+    "ziwei_horoscope": {
+      "projection": "普通摘要显式使用 suggested_fields；strict_fields=true 配合 fields=null 仍是全量，不会自动精简。",
+      "scopes": "scopes数组只能整体投影；按本轮粒度解释所需层，不编造scopes.流年或数字索引路径，不默认读取snapshot_export。",
+      "identity": "analysis_context是目标时刻，birth_context是出生回执；scopes.palace_name/natal_palace_name表示运限命宫所临本命宫，非该运限其他功能宫。mutagen_natal_links只把该层四化星连接到本命星所在宫，不当完整旋宫或事件结论。"
+    },
+    "firdaria": {
+      "scope": "普通人生阶段问题的正常候选，窄查只用本工具，不默认运行全部西占时运。",
+      "field_root": "单项读 firdaria.current_major/current_sub；聚合读 time_lords.firdaria.current_major/current_sub，不复制前缀。",
+      "time": "保留实际主运／分运起止、夜盘顺序和年长口径；阶段切换不等于现实事件日期。"
+    },
+    "bazi_health": {
+      "scope": "仅盘内文化分类与传统对应，不是中医体质辨识、辨证或医学评估。",
+      "scope_limits": "只解释盘内分类、传统对应与关系变化，不推疾病风险，不据喜用开调理处方。"
+    },
+    "astro_relative_chart": {
+      "views": "首次按已选 relative_mode 取 evidence_views 对应 fields；suggested_fields 是未选专用视图时的安全联合，不要求每次读取全部分支。核对实际 relationship_profile.relative_mode_normalized/primary_layer。",
+      "mode_aliases": "Comp→compare；Composite→composite；Synastry→influence；TimeSpace→timespace；Marks→marks；数值0..4依次对应这五种规范模式。",
+      "delivery": "主层超预算时从 result_delivery 读取同一 run；投影后不能恢复首次未选字段。完整JSON首次 fields=null。"
+    },
+    "bazi_career": {
+      "evidence": "首次按问题选evidence_views.direction/target_year；默认视图保留完整十神权重、并列与作用域，primary只作兼容首标签，不表示显著占优。",
+      "patterns": "career_structure/entrepreneurship中的共现标签为heuristic_candidate_only；按rule_signals.trigger、unverified_conditions解释，分数及level不认证古典成格或现实能力。",
+      "target_clock": "日期级专项固定出生时区的本地零点，timing_context回显analysis_datetime、timezone和boundary_status；交节当日涉及钟时才按实际目标用timing_analysis补证，不以已有流年阻止必要补证。"
+    },
+    "knowledge_read": {
+      "astro_aspect_query": {
+        "domain": "astro",
+        "category": "aspect",
+        "aspect_degree": 90,
+        "object_a": "Sun",
+        "object_b": "Moon"
+      },
+      "astro_aspect_scope": "星体对仅标注所查询相位的对象，必须同时指定category=aspect和aspect_degree（或可定位的key）；返回是通用相位释义，不是两颗星专属规则或新增个案计算。",
+      "lookup": "不确定category/key时先读knowledge_registry的domains[].categories[]；目录根是domains/source/provenance，不是domain/categories。",
+      "health_scope": "传统健康原文可以作为文化出处，不把其中病名、脏腑薄弱或调理语言应用为个人医学结论。"
+    },
+    "knowledge_registry": {
+      "output_fields": [
+        "domains",
+        "source",
+        "provenance"
+      ],
+      "lookup": "分类与键在domains[].categories[]，数组先读所属根；strict fields不能直接填domain或categories。"
+    }
+  },
+  "evidence_views": {
+    "astro_relative_chart": {
+      "compare": {
+        "when": "比较双方跨盘互动；按 A→B 与 B→A 分开读",
+        "relative_mode": "compare",
+        "primary_layer": "directional_synastry",
+        "fields": [
+          "relationship_profile",
+          "summary",
+          "synastry_aspects",
+          "in_to_out_aspects",
+          "out_to_in_aspects"
+        ]
+      },
+      "composite": {
+        "when": "用户指定组合盘，解释合成关系结构",
+        "relative_mode": "composite",
+        "primary_layer": "composite_chart",
+        "fields": [
+          "relationship_profile",
+          "summary",
+          "chart"
+        ]
+      },
+      "influence": {
+        "when": "用户指定影响盘／Synastry，分别读双方视角；inner/outer不是各自本命",
+        "relative_mode": "influence",
+        "primary_layer": "influence_chart_pair",
+        "fields": [
+          "relationship_profile",
+          "summary",
+          "inner.chart_profile",
+          "inner.chart.angles",
+          "inner.chart.houses",
+          "inner.chart.planets",
+          "outer.chart_profile",
+          "outer.chart.angles",
+          "outer.chart.houses",
+          "outer.chart.planets"
+        ]
+      },
+      "timespace": {
+        "when": "用户指定时空中点盘",
+        "relative_mode": "timespace",
+        "primary_layer": "timespace_chart",
+        "fields": [
+          "relationship_profile",
+          "summary",
+          "chart"
+        ]
+      },
+      "marks": {
+        "when": "用户指定马克斯盘",
+        "relative_mode": "marks",
+        "primary_layer": "marks_chart",
+        "fields": [
+          "relationship_profile",
+          "summary",
+          "chart"
+        ]
+      },
+      "relationship_detail": {
+        "when": "明确问双向中点、映点或反映点；将所需字段加入所选模式主层，不替代主盘",
+        "fields": [
+          "relationship_profile",
+          "in_to_out_midpoint",
+          "out_to_in_midpoint",
+          "in_to_out_antiscia",
+          "out_to_in_antiscia",
+          "in_to_out_contra_antiscia",
+          "out_to_in_contra_antiscia"
+        ]
+      }
+    },
+    "qimen": {
+      "directional": {
+        "when": "读相关宫位与方位；局号不能代替九宫；不把盘面当现实结果保证",
+        "fields": [
+          "analysis_context",
+          "four_pillars",
+          "qimen.ju_text",
+          "qimen.dun_type",
+          "qimen.xun_head",
+          "qimen.kongwang",
+          "qimen.zhifu",
+          "qimen.zhishi",
+          "qimen.palaces",
+          "qimen.engine"
+        ]
+      }
+    },
+    "sixyao": {
+      "line_reading": {
+        "when": "读取逐爻纳支、五行、六亲、六神、世应与变爻；装卦不等于引擎已判完用神旺衰应期",
+        "fields": [
+          "input_normalized",
+          "nongli",
+          "current_hexagram",
+          "changed_hexagram",
+          "moving_lines",
+          "lines",
+          "hexagram_info",
+          "summary"
+        ]
+      }
+    },
+    "western_timing_analysis": {
+      "stage": {
+        "when": "人生阶段，读法达主运／分运及真实起止；窄查法达可直接用 firdaria",
+        "fields": [
+          "analysis_context",
+          "summary",
+          "time_lords.firdaria.sect",
+          "time_lords.firdaria.current_major",
+          "time_lords.firdaria.current_sub"
+        ]
+      },
+      "annual": {
+        "when": "年度主题，按生日年起止读小限与太阳返照位置；不是全年逐日时间线",
+        "fields": [
+          "analysis_context",
+          "summary",
+          "time_lords.annual_profection",
+          "time_lords.firdaria.current_major",
+          "time_lords.firdaria.current_sub",
+          "directions.given_year.year_start",
+          "directions.given_year.year_end",
+          "returns.solar_return"
+        ]
+      },
+      "short_term": {
+        "when": "指定短期或钟时，读实际行运命中与月返；空 hits 也是有效结果，不编造命中",
+        "fields": [
+          "analysis_context",
+          "summary",
+          "transits.current_transit.analysis_datetime",
+          "transits.current_transit.orb_limit",
+          "transits.current_transit.house_emphasis",
+          "transits.current_transit.hits",
+          "transits.current_transit.exact_hits",
+          "returns.lunar_return"
+        ]
+      },
+      "career": {
+        "when": "事业问题同时涉及阶段和目标时段，首次保留主运/分运、生日年界及目标时刻行运命中；结合本命职业配置筛选相关hits，空值不补造，也不称全年逐日扫描。",
+        "fields": [
+          "analysis_context",
+          "summary",
+          "time_lords.firdaria.sect",
+          "time_lords.firdaria.current_major",
+          "time_lords.firdaria.current_sub",
+          "time_lords.annual_profection",
+          "directions.given_year.year_start",
+          "directions.given_year.year_end",
+          "returns.solar_return",
+          "transits.current_transit.analysis_datetime",
+          "transits.current_transit.orb_limit",
+          "transits.current_transit.house_emphasis",
+          "transits.current_transit.hits",
+          "transits.current_transit.exact_hits"
+        ]
+      }
+    },
+    "astro_chart": {
+      "classical_detail": {
+        "when": "用户明确问古典日夜、尊贵、定位链、宫位力主、传统点或朔望条件；按相关主题读取，不自动扩成人生报告",
+        "fields": [
+          "person_info",
+          "chart_profile",
+          "classical.sect",
+          "classical.planets",
+          "classical.dispositors",
+          "classical.topic_almutens",
+          "classical.lots",
+          "classical.syzygy",
+          "classical.almuten_figuris"
+        ]
+      },
+      "fixed_stars": {
+        "when": "用户明确问恒星与本命星体／角度联系；读取实际命中与容许度，不将恒星标签当命定事件",
+        "fields": [
+          "person_info",
+          "chart_profile",
+          "planets",
+          "angles",
+          "fixed_stars"
+        ]
+      },
+      "planetary_hours": {
+        "when": "用户明确问本命所处行星时；这是出生时段归属，不是未来行星时择时服务",
+        "fields": [
+          "person_info",
+          "chart_profile",
+          "planetary_hours"
+        ]
+      }
+    },
+    "bazi_career": {
+      "direction": {
+        "when": "工作方向、职责或创业角色比较，保留并列、计权口径及启发式条件；不展开未问行业。",
+        "fields": [
+          "career_analysis.interpretation_scope",
+          "career_analysis.dominant_ten_gods",
+          "career_analysis.career_structure",
+          "career_analysis.entrepreneurship",
+          "career_analysis.suggestions"
+        ]
+      },
+      "target_year": {
+        "when": "工作方向与目标年份转职安排，结构与目标锚点一起取；日期锚点不代表全年时间线。",
+        "fields": [
+          "career_analysis.interpretation_scope",
+          "career_analysis.dominant_ten_gods",
+          "career_analysis.career_timing",
+          "career_analysis.timing_context",
+          "career_analysis.career_structure",
+          "career_analysis.entrepreneurship",
+          "career_analysis.suggestions"
+        ]
+      }
     }
   }
 }
