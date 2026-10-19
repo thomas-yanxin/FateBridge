@@ -183,8 +183,12 @@ def test_actual_mcp_schema_and_runtime_agree_for_empty_and_real_context_facts():
             tool = next(
                 t for t in await client.list_tools() if t.name == "fengshui_assess"
             )
-            Draft202012Validator.check_schema(tool.inputSchema)
-            validator = Draft202012Validator(tool.inputSchema)
+            Draft202012Validator.check_schema(
+                tool.model_dump(by_alias=True)["inputSchema"]
+            )
+            validator = Draft202012Validator(
+                tool.model_dump(by_alias=True)["inputSchema"]
+            )
             for name, context, accepted in context_cases():
                 inputs = {
                     "methods": [],
@@ -208,7 +212,9 @@ def test_nested_candidate_uses_the_same_schema_fact_gate():
             tool = next(
                 t for t in await client.list_tools() if t.name == "fengshui_assess"
             )
-            validator = Draft202012Validator(tool.inputSchema)
+            validator = Draft202012Validator(
+                tool.model_dump(by_alias=True)["inputSchema"]
+            )
             inputs = {
                 "methods": [],
                 "scene": "home",
@@ -276,7 +282,9 @@ def test_method_reference_and_annual_query_need_no_placeholder_environment():
                 "response_char_limit": 0,
             }
             assert "environmental_context" not in inputs
-            Draft202012Validator(tool.inputSchema).validate(inputs)
+            Draft202012Validator(
+                tool.model_dump(by_alias=True)["inputSchema"]
+            ).validate(inputs)
             result = await client.call_tool(
                 "fengshui_assess", inputs, raise_on_error=False
             )

@@ -156,9 +156,7 @@ def test_full_export_reads_linear_bytes_instead_of_whole_document_per_page(
     assert work[1] < work[0] * 4.2
 
 
-def test_legacy_pretty_record_is_upgraded_once_without_recalculation_or_new_run(
-    tmp_path, monkeypatch
-):
+def test_unindexed_record_is_rejected_without_rewriting_the_saved_result(tmp_path):
     store = delivery.ResultStore(tmp_path / "results")
     directory = store._directory()
     result_id = "a" * 48
@@ -169,17 +167,12 @@ def test_legacy_pretty_record_is_upgraded_once_without_recalculation_or_new_run(
         json.dumps({"expires_at": expires_at, "payload": payload}, indent=2)
     )
     primary.chmod(0o600)
-    manifest = store.manifest(result_id)
-    assert manifest["run_metadata"]["run_id"] == "legacy"
-    assert store._read_json(directory / f"{result_id}.meta")["expires_at"] == expires_at
-    assert _reconstruct(store, result_id) == payload
-    assert json.loads(primary.read_text())["payload"] == payload
-
-    def unexpected(*args):
-        raise AssertionError("Legacy records should upgrade only once")
-
-    monkeypatch.setattr(store, "_store_main", unexpected)
-    assert store.page(result_id)["sha256"] == manifest["sha256"]
+    original = primary.read_bytes()
+    for read in (store.manifest, store.page):
+        with pytest.raises(ParameterError, match="不存在或已损坏"):
+            read(result_id)
+        assert primary.read_bytes() == original
+        assert not (directory / f"{result_id}.meta").exists()
 
 
 def _process_writer(directory: str, barrier: Any, output: Any) -> None:

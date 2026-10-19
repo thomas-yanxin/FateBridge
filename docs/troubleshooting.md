@@ -1,6 +1,6 @@
 # FateBridge 故障排除
 
-先确认当前版本、解释器和原始请求，再按错误层定位。接口字段与返回合同以 [API 参考](api-reference.md) 为准，配置见 [快速入门](getting-started.md)。
+本页从现象定位安装、连接、请求与结果问题。先保存原始错误和退出码，再进入对应章节；参数错误应修正输入，依赖错误应修复当前进程环境。接口字段与返回合同见 [API 参考](api-reference.md)，配置见 [快速入门](getting-started.md)。
 
 ## 按现象定位
 
@@ -8,11 +8,25 @@
 | --- | --- |
 | 无法导入、安装或测试环境异常 | [安装和导入](#安装和导入) |
 | 服务不通、MCP 没有工具 | [服务启动与连接](#服务启动与连接) |
+| 桌面 Codex 与终端可用模型不同 | [Codex CLI 路径](#codex-桌面版与终端-cli-的模型不一致) |
 | 401、400、422、CLI 非零退出 | [鉴权与错误](#rest-鉴权与错误) |
 | 时刻、地点或命盘字段不符 | [出生信息与返回字段](#出生信息与返回字段) |
 | 星历降级或西占后端错误 | [占星与推运](#占星与推运) |
 | 只收到部分结果、引用失效 | [快照与结果交付](#快照导出) |
 | 旧路由、字段或 Python 导入失效 | [迁移指南](migration.md) |
+
+## 先检查当前环境
+
+源码环境在仓库根目录执行以下命令；独立工具安装可直接运行 `fatebridge doctor`。诊断只检查当前安装，不修改 host 设置。
+
+```bash
+uv run --locked --extra dev python -c "import sys, fatebridge; print(sys.executable); print(fatebridge.__version__, fatebridge.__file__)"
+uv run --locked --extra dev fatebridge doctor
+```
+
+若问题只出现在 MCP host，再用相同环境运行 `fatebridge doctor --mcp --scenario onda-shiye`，将场景替换为实际范围。这会检查独立 stdio 进程；通过后仍需在 host 的新聊天确认工具已加载。REST 问题还应检查实际端口的 `/health` 与 `/ready`。
+
+本页后面的 `python` / `fatebridge` 简写假设已激活正确环境；源码用户可加 `uv run --locked --extra dev` 前缀。
 
 ## 安装和导入
 
@@ -22,12 +36,11 @@
 
 ```bash
 cd /path/to/FateBridge
-uv sync --locked
-source .venv/bin/activate
-python -c "import sys, fatebridge; print(sys.executable); print(fatebridge.__version__, fatebridge.__file__)"
+uv sync --locked --extra dev
+uv run --locked --extra dev python -c "import sys, fatebridge; print(sys.executable); print(fatebridge.__version__, fatebridge.__file__)"
 ```
 
-Windows 激活命令见 [快速入门](getting-started.md#安装)。测试和静态检查使用 `uv sync --locked --extra dev` 安装依赖。
+输出中的 `fatebridge.__file__` 应指向当前 checkout 的 `src/fatebridge/`。若仍来自其他安装，确认启动器和 host 使用的是本次 `.venv` 中的解释器。Windows 路径与激活命令见 [快速入门](getting-started.md#安装)。
 
 ### 安装失败或异步测试不能执行
 
@@ -62,6 +75,14 @@ API_HOST=127.0.0.1 API_PORT=8011 python -m fatebridge.api
 
 默认 MCP 是 stdio 进程，不创建 HTTP URL。host 配置应使用已安装本仓库的解释器绝对路径，例如 `/absolute/path/to/FateBridge/.venv/bin/python` 和参数 `-m fatebridge.mcp_server`。不要依赖 GUI host 继承 shell 的环境激活状态。确认 host 的进程日志、解释器和包路径，配置结构见 [接入指南](agent-guide.md#fastmcpagent-host)。
 
+### 工具已连接但列表不完整
+
+查看 host 启动环境中的 `FATEBRIDGE_MCP_FAMILIES` 与 `FATEBRIDGE_MCP_SCENARIOS`，两者取交集。先用相同筛选运行 doctor，再检查当前连接的 `tools/list` 与场景 `availability`；读取单工具资源不能使隐藏工具恢复公开。扩大范围后重启连接，并在新聊天确认工具列表。
+
+### Codex 桌面版与终端 CLI 的模型不一致
+
+若终端 CLI 报模型不受 ChatGPT 账号支持，而桌面聊天可正常使用，先用 `fatebridge doctor` 查看 `codex.cli`。桌面版的 `CODEX_CLI_PATH` 和 PATH 中的 CLI 可能是不同版本；按 doctor 返回的完整 `codex.add_command` 注册，不必为此修改用户模型。保存配置不代表当前聊天已经重载 MCP，请在新聊天检查连接。
+
 ## REST 鉴权与错误
 
 ### 401 `authentication_required`
@@ -84,6 +105,8 @@ API_HOST=127.0.0.1 API_PORT=8011 python -m fatebridge.api
 
 - 422：请求字段缺失、类型/范围/枚举错误、未知字段或无效完整公历日期，在请求模型层被拒绝；REST JSON 语法错误也返回 422。
 - 400：请求进入领域计算后被拒绝，例如未由模型限制的未知模式，或显式要求太阳时却无经度。
+
+先查看 `issues[].path`；若路径是 `fields` 中的输出路径，修正投影。`fields`、`strict_fields`、`include_snapshot_text`、`as_of` 等 REST 控制项应放在查询参数，放入业务 JSON 会作为未知字段失败。多个 `fields` 重复写参数，CLI 则用空格分隔。
 
 同一错误码可以来自不同层。模型错误通过 `issues` 指明字段路径、错误类型及可选约束，不回显原始值。查看状态码与 schema，把月/日范围检查和真实日期检查都纳入调用侧校验。完整非法分析日期不会自动改成月底；部分年月日的补齐规则与完整日期校验不同。
 
@@ -159,11 +182,21 @@ CLI 不自动读取 `.env`，`SE_EPHE_PATH` 应在启动前设进程环境。GUI
 
 ## 最小复现材料
 
-报告问题时提供以下脱敏证据：版本/提交、解释器与依赖版本、端口及鉴权是否开启（不含值）、原始请求、状态/退出码、错误码、输入时区和坐标、太阳时策略、分析日期、星历模型、运行 ID（若有）。不要只提供解读文本。
+先用虚构输入复现，再到[项目 Issues](https://github.com/thomas-yanxin/FateBridge/issues)报告。记录以下信息，便于维护者在相同入口重现问题：
+
+```text
+预期行为：
+实际行为：
+版本或 Git 提交：
+Python 版本和解释器路径：
+入口与命令或路由：
+脱敏请求及相关查询参数：
+HTTP 状态 / CLI 退出码 / MCP isError：
+error_code、retryable 与 issues：
+相关配置：端口、鉴权是否开启、MCP family/scenario 范围
+运行凭据：run_id、trace_id（若有）
+```
+
+日期或精度问题另附时区、坐标来源、太阳时策略、分析日期与实际星历模型。清除密钥和真实个人资料，保留错误发生所需的字段与结构；避免只粘贴解读文本或截图。
 
 文档漂移优先核对 `services/tool_catalog.py` 的装配、`services/catalog/` 的领域声明、`core/requests/` 的模型与实际 OpenAPI/MCP schema，再按 [文档维护流程](development-guide.md#文档维护与验证) 同步修正。
-
-
-### Codex 桌面版与终端 CLI 的模型不一致
-
-若终端 CLI 报模型不受 ChatGPT 账号支持，而桌面聊天可正常使用，先用 `fatebridge doctor` 查看 `codex.cli`。桌面版的 `CODEX_CLI_PATH` 和 PATH 中的 CLI 可能是不同版本；按 doctor 返回的完整 `codex.add_command` 注册，不必为此修改用户模型。保存配置不代表当前聊天已经重载 MCP，请在新聊天检查连接。

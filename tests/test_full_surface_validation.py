@@ -120,7 +120,8 @@ def test_fastmcp_client_accepts_all_representative_payloads():
     async def run():
         async with Client(mcp_module.app) as client:
             schemas = {
-                tool.name: tool.outputSchema for tool in await client.list_tools()
+                tool.name: tool.model_dump(by_alias=True)["outputSchema"]
+                for tool in await client.list_tools()
             }
             for name, (_, kwargs_factory) in MCP_CASES.items():
                 result = await client.call_tool(name, kwargs_factory())

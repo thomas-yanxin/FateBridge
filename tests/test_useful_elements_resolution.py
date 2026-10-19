@@ -101,15 +101,10 @@ def test_all_day_stem_month_pairs_partition_without_losing_climate(stem, branch)
 def test_specialties_share_resolver_without_complement_avoidance():
     from fatebridge.analysis.career import CareerAnalysis
     from fatebridge.analysis.education import EducationAnalysis
-    from fatebridge.analysis.health import HealthAnalysis
 
     career = CareerAnalysis._analyze_industries(PILLARS, "壬", Element.WATER)
     assert set(career["favorable_elements"]) == {"土", "金"}
     assert career["avoid_industries"] == []
-    assert set(HealthAnalysis._analyze_regimen(PILLARS)["favorable_elements"]) == {
-        "土",
-        "金",
-    }
     education = EducationAnalysis._analyze_subjects(
         PILLARS, "壬", {"seal_weight": 1, "food_hurt_weight": 1, "officer_weight": 1}
     )

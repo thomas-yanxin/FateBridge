@@ -394,7 +394,10 @@ def test_nested_schema_facts_are_discoverable_identically_on_all_transports(
 
     async def schemas():
         async with Client(mcp.app) as client:
-            return {tool.name: tool.outputSchema for tool in await client.list_tools()}
+            return {
+                tool.name: tool.model_dump(by_alias=True)["outputSchema"]
+                for tool in await client.list_tools()
+            }
 
     native_schemas = asyncio.run(schemas())
     for key, path, expected_type in SCHEMA_LEAVES:

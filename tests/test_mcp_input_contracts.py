@@ -42,7 +42,7 @@ def test_every_mcp_input_preserves_canonical_constraints_and_examples():
     for spec in CATALOG:
         if spec.mcp_name is None:
             continue
-        published = tools[spec.tool_name].inputSchema
+        published = tools[spec.tool_name].model_dump(by_alias=True)["inputSchema"]
         canonical = dereference_refs(model_schema(spec.request_model))
         Draft202012Validator.check_schema(published)
         for field, shape in canonical["properties"].items():
@@ -59,16 +59,16 @@ def test_every_mcp_input_preserves_canonical_constraints_and_examples():
         example = example_input(spec)
         if example is not None:
             Draft202012Validator(published).validate(example)
-    placement = tools["fengshui_assess"].inputSchema["properties"]["placements"][
-        "items"
-    ]
+    placement = tools["fengshui_assess"].model_dump(by_alias=True)["inputSchema"][
+        "properties"
+    ]["placements"]["items"]
     assert placement["type"] == "object" and "$ref" not in placement
     assert set(placement["required"]) == {"object_id", "purpose"}
     assert "至少提供位置或朝向" in placement["description"]
     assert placement["allOf"]  # Cross-field rules survive nested MCP publication.
-    forms = tools["fengshui_assess"].inputSchema["properties"]["form_observations"][
-        "items"
-    ]
+    forms = tools["fengshui_assess"].model_dump(by_alias=True)["inputSchema"][
+        "properties"
+    ]["form_observations"]["items"]
     assert forms["properties"]["purpose"]["enum"] == ["bed", "desk", "stove"]
     assert "无需罗盘" in forms["description"]
 
@@ -106,7 +106,9 @@ def test_recursive_input_falls_back_to_valid_refs_and_remains_callable():
 
     async def call():
         async with Client(app) as client:
-            schema = (await client.list_tools())[0].inputSchema
+            schema = (await client.list_tools())[0].model_dump(by_alias=True)[
+                "inputSchema"
+            ]
             Draft202012Validator.check_schema(schema)
             assert "$defs" in schema  # cycles remain finite valid references
             good = {"node": {"value": 2, "child": {"value": 1}}}
@@ -172,7 +174,9 @@ def test_published_mcp_schema_rejects_missing_role_for_every_supported_purpose()
                 for tool in await client.list_tools()
                 if tool.name == "fengshui_assess"
             )
-            validator = Draft202012Validator(tool.inputSchema)
+            validator = Draft202012Validator(
+                tool.model_dump(by_alias=True)["inputSchema"]
+            )
             for purpose, role in [
                 ("door", "door_facing"),
                 ("bed", "headboard"),

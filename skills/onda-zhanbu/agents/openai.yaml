@@ -1,4 +1,4 @@
 interface:
-  display_name: "抉择 · 问事"
-  short_description: "围绕一件事看清实际卦变与盘局提示，整理待确认条件和可行下一步"
-  default_prompt: "使用 $onda-zhanbu 围绕我的具体问题起卦，讲清真实卦变与传统依据，再整理现实中需要确认的条件；决定由我自己作。"
+  display_name: 具体问事与占卜
+  short_description: 仅在用户明确求卦或起局时处理具体事项，解释真实卦变与条件，复用同一问事结果
+  default_prompt: 使用 $onda-zhanbu 围绕我这次的问题，按主题、对象与时间范围选择有价值的依据，解释差异与可核对的安排。

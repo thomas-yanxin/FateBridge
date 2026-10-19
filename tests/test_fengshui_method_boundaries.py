@@ -1,4 +1,4 @@
-"""Independent review of expert-policy composition and input boundaries."""
+"""Method selection, orientation and source boundaries for Feng Shui."""
 
 import pytest
 from pydantic import ValidationError
@@ -57,19 +57,9 @@ def test_unselected_environment_methods_are_references_without_findings(methods)
         assert entry["judgment_scope"] == "no_calculation_or_physical_judgment"
 
 
-def test_empty_context_never_requests_birth_compass_or_implicit_year_calculation():
-    try:
-        result = assess(environmental_context={})
-    except ValidationError:
-        return  # Rejecting an empty review request is also an honest boundary.
-    assert result["layers"] == {}
-    assert result["coverage"]["implemented_layers"] == []
-    assert result["method_policy"]["selected_method_order"] == []
-    assert result["method_details"]["methods"] == {}
-    assert result["coverage"]["analysis_progress"]["assessment_complete"] is False
-    assert result["layout_analysis"]["missing_inputs"]
-    assert result["layout_analysis"]["placement_findings"] == []
-    assert result["layout_analysis"]["adjustment_options"] == []
+def test_empty_environment_context_is_rejected():
+    with pytest.raises(ValidationError):
+        assess(environmental_context={})
 
 
 @pytest.mark.parametrize("conflict", ["location", "facing", "jinsuo", "external_form"])

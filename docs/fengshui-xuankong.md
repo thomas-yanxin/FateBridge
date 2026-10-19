@@ -1,6 +1,10 @@
 # 玄空运山向宅盘：版本、输入和验证
 
+[文档中心](README.md) · [风水总览](fengshui.md) · [请求示例](examples/README.md)
+
 `fengshui_xuankong_natal` 的 REST 入口为 `POST /api/fengshui/xuankong_natal`，MCP 与 CLI 同名。选定版本 `xuankong_zhongzhou_v1@1.0.1` 完整计算九宫运星、山星、向星，支持下卦和中州派兼向替星。与 `layers.annual_stars` 独立；查询年份变化不改变历史宅盘。基础三法合同见[家居风水](fengshui.md)。
+
+调用时先准备[历史定运与角度资料](#定运校验与角区实现)，再运行[三端示例](#三端调用)。已有数字盘需要进一步解释时，单独启用[有限解释](#显式启用有限解释)；维护者可从[独立验证](#独立验证与复现)追溯固定样本及版本分歧。
 
 ## 规则数据与版本维护
 
@@ -9,6 +13,8 @@
 生产规则为离线 [xuankong-v1.json](../src/fatebridge/data/fengshui/xuankong-v1.json)，与基础规则数据及其版本分别维护。规则语义变化须另建版本及独立样本；1.0.1 修复既定角区的浮点实现与不确定输入处理，五黄和替星表未改。
 
 ## 三端调用
+
+按[快速入门](getting-started.md)安装后，从仓库根目录运行。REST 需先启动服务，并按服务配置提供 API Key。
 
 示例按用途汇总于[请求索引](examples/README.md)。可复制 [独立宅盘请求](examples/fengshui-xuankong.json) 和 [基础三法＋宅盘＋年星合参](examples/fengshui-xuankong-with-annual.json)。
 
@@ -30,9 +36,9 @@ curl -X POST http://localhost:8010/api/fengshui/xuankong_natal \
   -H 'Content-Type: application/json' \
   --data-binary @docs/examples/fengshui-xuankong.json
 
-fatebridge fengshui_xuankong_natal --request-file docs/examples/fengshui-xuankong.json
-fatebridge fengshui_assess --request-file docs/examples/fengshui-xuankong-with-annual.json
-fatebridge describe fengshui_xuankong_natal
+uv run --locked --extra dev fatebridge fengshui_xuankong_natal --request-file docs/examples/fengshui-xuankong.json
+uv run --locked --extra dev fatebridge fengshui_assess --request-file docs/examples/fengshui-xuankong-with-annual.json
+uv run --locked --extra dev fatebridge describe fengshui_xuankong_natal
 ```
 
 MCP `fengshui_xuankong_natal` 的参数就是上面 JSON 对象。认证设置与其他REST端点一致；工具目录、发现接口、JSON输出schema、错误、字段投影和运行元数据均来自共用目录。CLI也支持 `--house '{...}' --period '{...}'`；请求文件保留未知字段供模型拒绝，不静默删除。
@@ -65,7 +71,7 @@ MCP `fengshui_xuankong_natal` 的参数就是上面 JSON 对象。认证设置�
 - 外部山五黄分支直接用 `!facing.yang`，相对本版本借宅运同元龙阴阳发生取反。保持原外部结果；[离线回归](../tests/test_xuankong.py)核对固定夹具中的逐盘差异、元龙、借山、阴阳及逆向数列，不修改参考引擎强求216套一致，也不称其支持替星。
 
 ```bash
-PATH="$PWD/.venv/bin:$PATH" .venv/bin/pytest -q tests/test_xuankong.py tests/test_fengshui_surfaces.py
+uv run --locked --extra dev pytest -q tests/test_xuankong.py tests/test_fengshui_surfaces.py
 ```
 
 另覆盖9运24山正向及左右兼向共648组合、立春前后／跨时区、定运来源、五运、磁北要求、精确山界与角度误差、缺失输入、聚合层不互相覆盖及REST／实际MCP协议／CLI一致性。规则计算一致与现实预测有效性是不同验证范围。
@@ -104,7 +110,7 @@ PATH="$PWD/.venv/bin:$PATH" .venv/bin/pytest -q tests/test_xuankong.py tests/tes
 完整虚构请求见[示例文件](examples/fengshui-xuankong-interpretation.json)，其中八运甲山庚向盘在九运评价时，西南当令山星的山形存在条件满足，东南当令向星的水形条件不满足；这两项条件不合成整体吉凶。可通过三个入口复现：
 
 ```bash
-fatebridge fengshui_assess --request-file docs/examples/fengshui-xuankong-interpretation.json
+uv run --locked --extra dev fatebridge fengshui_assess --request-file docs/examples/fengshui-xuankong-interpretation.json
 curl -X POST http://localhost:8010/api/fengshui/assess \
   -H 'Content-Type: application/json' \
   --data-binary @docs/examples/fengshui-xuankong-interpretation.json

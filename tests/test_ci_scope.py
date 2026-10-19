@@ -40,7 +40,7 @@ def test_documentation_changes_use_the_lightweight_checks(paths):
         "docs/AGENTS.md",
         "docs/examples/fengshui-home.json",
         "docs/examples/README.md",
-        "docs/validation/bazi-classical-v1/reference-freeze.json",
+        "tests/fixtures/bazi_classical_v1/provenance/reference-freeze.json",
         "docs/audits/probe.py",
         "docs/unknown.json",
         "unknown-file",

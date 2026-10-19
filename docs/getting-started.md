@@ -1,8 +1,19 @@
 # FateBridge 快速入门
 
-本页负责安装、运行配置和首次调用。所有人物请求均为虚构示例。工具字段与各端差异查 [API 参考](api-reference.md)，精度边界查 [算法覆盖](algorithm-coverage.md)。
+本页带你安装 FateBridge、完成第一条计算，并按需要接入 REST 或 MCP。首次体验可只完成[安装](#安装)和[CLI 调用](#选择运行方式)，无需配置服务。所有人物资料均为虚构示例。
+
+| 你的目标 | 从这里开始 |
+| --- | --- |
+| 在终端得到第一个结果 | [安装](#安装) → [选择运行方式](#选择运行方式) |
+| 在应用中调用 HTTP 接口 | [启动 REST](#启动-rest-并检查状态) → [第一条八字请求](#第一条八字请求) |
+| 在 Codex 中用自然语言咨询 | 安装后转到 [Codex 使用指南](codex-guide.md) |
+| 接入其他 MCP host | [MCP 与 CLI](#mcp-与-cli) |
+
+字段含义见 [API 参考](api-reference.md)，工具与场景等概念见 [核心概念](concepts.md)。
 
 ## 安装
+
+本页描述当前开发分支。PyPI `0.1.0` 为已发布版本；需要本文最新场景与接口范围时，选择下方源码安装。版本差异见 [CHANGELOG](../CHANGELOG.md#unreleased)，已发布版本的使用说明以对应 Git 标签为准。
 
 包管理统一使用 [uv](https://docs.astral.sh/uv/getting-started/installation/)。需要 Python 3.10+；当前 CI 覆盖 3.10–3.13，源码环境默认使用 `.python-version` 中的 Python 3.12。依赖与三个控制台入口由 `pyproject.toml` 声明。从 PyPI 安装独立命令工具：
 
@@ -15,19 +26,20 @@ uv tool install fatebridge==0.1.0
 ```bash
 git clone https://github.com/thomas-yanxin/FateBridge.git
 cd FateBridge
-uv sync --locked
-source .venv/bin/activate
+uv sync --locked --extra dev
 ```
 
-先按 uv 官方说明安装 uv。`uv sync --locked` 根据 `uv.lock` 创建环境并以 editable 方式安装本仓库。以上是 macOS / Linux 激活命令；Windows PowerShell 同样先执行 `uv sync --locked`，再用 `.\.venv\Scripts\Activate.ps1` 激活。也可使用 `uv run --locked fatebridge list`，无需激活环境。
-
-开发者执行 `uv sync --locked --extra dev`，见 [开发指南](development-guide.md)。源码安装后确认当前解释器加载的是预期包：
+`uv sync --locked --extra dev` 按锁文件创建 `.venv`，以 editable 方式安装源码及开发依赖。后续源码命令使用 `uv run --locked --extra dev`，无需激活环境：
 
 ```bash
-python -c "import fatebridge; print(fatebridge.__version__, fatebridge.__file__)"
-fatebridge list
-fatebridge describe bazi_birth
+uv run --locked --extra dev python -c "import fatebridge; print(fatebridge.__version__, fatebridge.__file__)"
+uv run --locked --extra dev fatebridge list
+uv run --locked --extra dev fatebridge describe bazi_birth --detail input
 ```
+
+独立工具安装可直接使用 `fatebridge`、`fatebridge-api` 与 `fatebridge-mcp`，不会把该包加入系统 Python 环境。下文 `python -m ...` 形式须使用已安装 FateBridge 的虚拟环境解释器；独立工具用户下载星历时使用[星历数据与精度](#星历数据与精度)中的专用命令。
+
+源码用户可在简写命令前加 `uv run --locked --extra dev`，或先激活环境。macOS / Linux 使用 `source .venv/bin/activate`，Windows PowerShell 使用 `.\.venv\Scripts\Activate.ps1`。开发工作流见 [开发指南](development-guide.md)。
 
 安装入口为 `fatebridge`、`fatebridge-api` 和 `fatebridge-mcp`。`pyswisseph` / `kerykeion` 都是常规依赖；FateBridge 的规则、知识与场景 JSON 随包安装，外部星历文件不随 FateBridge wheel 分发，见下文。
 
@@ -47,9 +59,13 @@ fatebridge bazi_birth --birth-year 1990 --birth-month 5 --birth-day 15 \
   --birth-timezone Asia/Shanghai --fields bazi_birth.day_master --strict-fields
 ```
 
-结果包含所选的 `bazi_birth.day_master` 与 `run_metadata`。CLI 不自动读取 `.env`，不需要配置 REST 密钥；如果已有进程环境配置，仍会按实际设置运行。
+执行成功时退出码为 `0`，返回 JSON 中包含 `bazi_birth.day_master` 和 `run_metadata`。这说明当前安装能够完成一次八字计算；`run_metadata` 用于记录本次运行，字段含义见 [核心概念](concepts.md)。
+
+CLI 不自动读取 `.env`，不需要配置 REST 密钥；如果已有进程环境配置，仍会按实际设置运行。
 
 ## 配置环境变量
+
+CLI 首次体验可跳过本节。启动 REST、配置 MCP 工具范围或使用自定义星历目录时，再设置相应变量。
 
 源码安装时可选复制模板；已有 `.env` 时直接编辑，避免覆盖：
 
@@ -99,7 +115,7 @@ curl http://localhost:8010/metrics
 
 ## 第一条八字请求
 
-推荐使用独立八字命盘入口：
+保持 REST 进程运行，在另一个终端执行。推荐使用独立八字命盘入口：
 
 ```bash
 curl -X POST http://localhost:8010/api/cn/bazi/birth \
@@ -140,18 +156,27 @@ curl -X POST http://localhost:8010/api/astro/chart \
 
 `swisseph` 可导入，只能证明运行时可用。缺少相应 `.se1` 文件时，它可能使用内置 Moshier 模型；没有运行时的核心星盘则使用 FateBridge 轨道近似。显式复杂宫制与西占推运缺 backend 时会报错。
 
-源码安装可选择下载默认星历段（此步骤需要网络）：
+源码安装可在仓库根目录下载默认星历段（此步骤需要网络）：
 
 ```bash
-python -m fatebridge.fetch_ephe
+uv run --locked --extra dev python -m fatebridge.fetch_ephe
 ```
 
-默认下载 `sepl_18.se1`、`semo_18.se1`、`seas_18.se1` 到源码仓库 `ephe/`；所需年代/天体的数据可能不同。wheel 安装或自定义路径应明确指定可写目录，并在各服务启动前设置同一路径：
+默认下载 `sepl_18.se1`、`semo_18.se1`、`seas_18.se1` 到源码仓库 `ephe/`；所需年代/天体的数据可能不同。使用已安装包的虚拟环境时，可显式指定可写目录：
 
 ```bash
 python -m fatebridge.fetch_ephe --dest /absolute/path/to/ephe
 export SE_EPHE_PATH=/absolute/path/to/ephe
 ```
+
+通过 `uv tool install` 安装的用户可用独立运行环境下载到同一目录，无需寻找工具环境中的 Python：
+
+```bash
+uv run --no-project --with fatebridge==0.1.0 python -m fatebridge.fetch_ephe \
+  --dest /absolute/path/to/ephe
+```
+
+在各服务启动前设置 `SE_EPHE_PATH` 指向该目录；上面的 `export` 为 macOS / Linux 写法，Windows PowerShell 使用 `$env:SE_EPHE_PATH="C:\path\to\ephe"`。
 
 重启服务后检查核心盘的 `chart_profile.ephemeris_model`（如 `swieph`、`jpl`、`moshier`、`mixed`），以及 `run_metadata.engine_is_approximate`。`engine_backend` / `engine_precision` 不能单独证明加载了数据文件。数据路径、版本和算法限制见 [算法覆盖矩阵](algorithm-coverage.md)。
 
@@ -167,3 +192,9 @@ fatebridge-mcp
 host 应使用已安装 FateBridge 的虚拟环境解释器绝对路径。配置结构见 [接入指南](agent-guide.md#fastmcpagent-host)。
 
 MCP 默认响应预算为 8192 字符，超限时返回 `result_delivery`；需要全文时读取同一次结果。完整 JSON 首次调用不做字段筛选，文件导出方法见 [完整结果交付](agent-guide.md#完整结果交付与同次导出)。三端投影、错误和快照规则查 [API 参考](api-reference.md)。出错时查看 [故障排除](troubleshooting.md)。
+
+## 下一步
+
+- 为应用接入错误处理、字段投影和完整结果读取：[开发者与 Agent 接入指南](agent-guide.md)。
+- 按自己的问题选择工具与示例：[场景路由](scenario-routing.md)和[示例索引](examples/README.md)。
+- 确认算法、星历及传统规则的适用范围：[算法覆盖](algorithm-coverage.md)。

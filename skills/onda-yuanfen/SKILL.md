@@ -3,9 +3,13 @@ name: onda-yuanfen
 description: 用 FateBridge 区分单人感情倾向、年级桃花时机与双人关系的不同维度，把相近和有分歧的依据讲成可讨论的相处问题。Use when 用户问感情运、姻缘、桃花、脱单、八字合婚、两人合不合、配对、夫妻宫、复合、暧昧或要不要在一起；不由命盘判断对方心意、忠诚或关系成败。
 ---
 
-# 缘分 · 感情合婚（Onda）
+# 伴侣关系与感情相处
 
 把感情里的倾向讲成自然、具体的相处参考。用户表达情绪时再回应，已有明确问题时直接处理。
+
+## 共用范围与安全
+
+先读[咨询硬边界](../_shared/safety-boundaries.md)与[本轮范围及多视角选择](../_shared/consultation-routing.md)。按当前问题展开，首轮明确要求详细就覆盖；不自动附带全部相关主题。时间追问读[共享时间选择](../_shared/timing-selection.md)，保留原主题与已有相关视角，只补需要的新层。生死、临床判断与医疗择时在选法前停止。
 
 ## 用户能得到什么
 
@@ -27,7 +31,7 @@ description: 用 FateBridge 区分单人感情倾向、年级桃花时机与双�
 
 发现入口可能是软链接。优先进入入口目录后用 shell 内建 `pwd -P` 取得真实目录，再按它读取下面的相对引用；不要为解析路径调用未经核实的系统 `python3`。不能先裁剪 `.agents/skills/onda-*` 入口的字符串父目录，否则会误指到 `.agents/skills/_shared` 或 `.agents/docs`。读取已知引用无需搜索仓库。
 
-## 先读这两份（必读）
+## 共用参考
 - 计算怎么调：[../_shared/fatebridge-engine.md](../_shared/fatebridge-engine.md)
 - 怎么开口说话：[../_shared/onda-counsel.md](../_shared/onda-counsel.md)
 - 场景取舍与去重：[../../docs/scenario-routing.md](../../docs/scenario-routing.md)
@@ -38,7 +42,7 @@ description: 用 FateBridge 区分单人感情倾向、年级桃花时机与双�
 
 ## 这个场景用哪些工具
 
-「缘分 · 感情合婚」对应路由（主=出结论必调；旁=只加强/修正；深=追问或专家模式才调）：
+下表按问题列候选职责；主为该分支入口，旁为有新增价值的视角，深为确需更多细节时使用，不规定永久体系优先级。
 
 | 用户想问 | 工具 | 优先级 | 要点 |
 |---------|------|--------|------|
@@ -51,7 +55,7 @@ description: 用 FateBridge 区分单人感情倾向、年级桃花时机与双�
 | 我俩合不合（恋爱/结婚） | `two_person_compatibility` | 主 | 两人各一套 `--personN-*`，看综合分、五行互补、共同喜用、挑战 |
 | 我俩合不合（恋爱/结婚） | `sukuyo_compatibility` | 旁 | 27 宿相性，有方向性 |
 | 我俩合不合（恋爱/结婚） | `ziwei_birth`（夫妻宫） | 深 | |
-| 我俩合不合（恋爱/结婚） | `astro_relative_chart` | 深 | 需经纬度 |
+| 我俩合不合（恋爱/结婚） | `astro_relative_chart` | 旁 | 综合互动问题的正常候选，需经纬度 |
 | 关系的星盘视角/互动相位 | `astro_relative_chart` | 主 | 需经纬度，两人用 `--inner-birth-*`/`--outer-birth-*` |
 | 关系的星盘视角/互动相位 | `two_person_compatibility` | 旁 | |
 | 明确要求起卦看表白／复合 | 转「抉择·问事」→ `meihua_analysis` / `sixyao` | 主 | 沿用用户所选卜法；普通关系决定先按现实背景讨论 |
@@ -60,6 +64,8 @@ description: 用 FateBridge 区分单人感情倾向、年级桃花时机与双�
 > 粒度：`romance_timing` 只到流年级，要「几月」才升级 `liuyue_analysis`（见 场景路由「全局调用纪律」第 3 条）。
 > 方向性：`sukuyo_compatibility` 的 `person1_to_person2` 与 `person2_to_person1` 不对称，要分开讲。
 
+阶段与年份问题可补 `timing_analysis`、`ziwei_horoscope`、`western_timing_analysis` 或窄查 `firdaria`；按共享时间选择区分长期、年度和月份，不重复专项已有层。朋友／合作用 [人际与合作](../onda-renji/SKILL.md)，家庭亲子用 [家庭](../onda-jiating/SKILL.md)，不强套合婚。
+
 ## 怎么收信息
 - 单人看运：出生 年月日时 + 性别 + 出生城市。小时是引擎必填项，未知时先确认信息；不能省略或擅自填 0 当作“无时盘”。
 - 合婚：双方各一套上面的信息。
@@ -67,7 +73,7 @@ description: 用 FateBridge 区分单人感情倾向、年级桃花时机与双�
 
 ## 工作流
 1. 已有明确问题直接处理，表达了情绪再回应，不默认套共情开场。
-2. 收齐信息 → 调引擎（合婚用 `two_person_compatibility`，单人用 `bazi_marriage`/`bazi_romance`）。
+2. 按任务选依据：单人可用 `bazi_marriage`／`bazi_romance`、`ziwei_birth` 或 `astro_chart` 的相关结构；双人用 `two_person_compatibility` 或 `astro_relative_chart` 等。专题综合主动评估有价值的第二视角，限定方法与简单单项按其范围。
 3. 按首轮精简字段读结构化结果：挑跟问题最相关的 2–3 个依据，说明规则作用域与精度限制。合婚的综合分、传统规则分各自解释，不能换算成成功率；个人内部刑冲不能直接说成双方冲突，空建议列表不能编成引擎建议。
 4. 给一项能与现实相处核对的动作：例如用户已说有开支分歧，就围绕一笔共同开支谈清各自承担；没有具体背景可用条件句。观察实际回应，不替用户补写矛盾、猜测心意或用分数决定去留。
 5. 按 [Onda 解读层](../_shared/onda-counsel.md) 自然收尾；必要边界简洁说明，不强造安慰或重复相处建议。
@@ -82,6 +88,8 @@ description: 用 FateBridge 区分单人感情倾向、年级桃花时机与双�
 - 幸福靠经营不靠命定，这句要融进话里，别当免责模板甩。
 
 ## 样例
+
+以下使用虚构资料。在已安装并激活的仓库虚拟环境中运行，环境准备见[引擎调用](../_shared/fatebridge-engine.md#怎么调引擎)。已有 MCP 时直接调用，无需执行本地命令。
 ```bash
 python3 -m fatebridge.cli --no-metadata bazi_romance \
   --gender 女 --birth-year 1995 --birth-month 4 --birth-day 12 --birth-hour 20 --birth-place 成都

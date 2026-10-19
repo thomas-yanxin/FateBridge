@@ -1,28 +1,37 @@
 # 贡献指南
 
-FateBridge 接受算法、接口、测试、文档和场景技能改进。开发命令与架构约束集中在 [开发指南](docs/development-guide.md)，本页说明协作和提交流程。
+感谢你帮助改进 FateBridge。本页说明如何报告问题、准备可审查的改动并提交 Pull Request；算法、接口、测试、文档和场景技能都欢迎贡献。环境配置和技术约束见[开发指南](docs/development-guide.md)，首次使用见[快速入门](docs/getting-started.md)。
+
+本页导航：[开始贡献](#开始贡献) · [报告问题](#报告问题) · [修改约束](#修改约束) · [验证](#提交前验证) · [提交 PR](#提交与-pull-request) · [同步 Fork](#保持-fork-同步)
 
 ## 开始贡献
 
-先检查已有 [Issues](https://github.com/Yonder-Lab/FateBridge/issues) 和 Pull Requests，避免重复工作。范围较大的新能力或接口变更先在 Issue 中说明用例、输入输出与兼容策略。文档修正可直接准备 PR。
+先检查已有 [Issues](https://github.com/thomas-yanxin/FateBridge/issues) 和 [Pull Requests](https://github.com/thomas-yanxin/FateBridge/pulls)，避免重复工作。范围较大的新能力或接口变更先在 Issue 中说明用例、输入输出与兼容策略。文档修正可直接准备 PR。
 
 外部贡献者 Fork 后创建分支；已有仓库写权限者可在自己的工作分支开发：
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/FateBridge.git
 cd FateBridge
-git remote add upstream https://github.com/Yonder-Lab/FateBridge.git
+git remote add upstream https://github.com/thomas-yanxin/FateBridge.git
 git fetch upstream
 git switch -c codex/your-change upstream/master
 uv sync --locked --extra dev
-source .venv/bin/activate
+uv run --locked --extra dev fatebridge doctor
 ```
 
-包管理统一使用 uv；依赖变更使用 `uv add`／`uv remove`，同时提交 `pyproject.toml` 和 `uv.lock`。开发工具依赖使用 `uv add --optional dev <package>`。Windows 环境命令见 [快速入门](docs/getting-started.md)。PR 目标分支为 `master`。
+包管理统一使用 uv；依赖变更使用 `uv add`／`uv remove`，同时提交 `pyproject.toml` 和 `uv.lock`。开发工具依赖使用 `uv add --optional dev <package>`。Windows 环境命令见 [快速入门](docs/getting-started.md)。PR 目标分支为 `master`。仓库使用 `src` 布局，后续命令通过 `uv run --locked --extra dev` 运行，以确保使用刚安装的包和开发工具。
 
 ## 报告问题
 
-Bug 报告请提供实际版本/提交、Python 与依赖版本、操作系统、最小请求或 CLI 命令、预期结果与实际结果。涉及精度时附上时区、坐标、太阳时策略、分析日期和星历模型；脱敏姓名、生日与密钥。区分运行时缺依赖、模型校验失败和算法结果偏差。
+一个可复现的报告能更快区分环境问题、输入校验和算法偏差。请附上：
+
+- 实际版本或提交、操作系统、Python 与相关依赖版本；可运行 `uv run --locked --extra dev fatebridge doctor` 收集环境诊断。
+- 最小请求或完整 CLI 命令，以及预期结果和实际结果。
+- 涉及时间或精度时，注明时区、坐标、太阳时策略、分析日期及返回的星历模型。
+- 若有独立参考，给出其版本、来源与比较口径。
+
+用虚构资料或脱敏后的请求复现，不附姓名、真实生日、API 密钥或包含个人数据的完整交付文件。功能建议请说明要解决的读者任务与目前的阻碍。
 
 安全问题请按 [SECURITY.md](SECURITY.md) 私下报告，不在公开 Issue 中粘贴敏感复现材料。
 
@@ -39,14 +48,14 @@ Bug 报告请提供实际版本/提交、Python 与依赖版本、操作系统�
 代码变更运行与 CI 对齐的检查：
 
 ```bash
-python -m pytest -q
-black --check src/fatebridge scripts tests
-isort --check-only src/fatebridge scripts tests
-mypy src/fatebridge/
+uv run --locked --extra dev python -m pytest -q
+uv run --locked --extra dev black --check src/fatebridge scripts tests
+uv run --locked --extra dev isort --check-only src/fatebridge scripts tests
+uv run --locked --extra dev mypy src/fatebridge/
 git diff --check
 ```
 
-纯文档变更运行 `python scripts/check_docs.py` 与[文档合同和示例检查](docs/development-guide.md#文档维护与验证)；修改生成源后重新生成并检查派生文件。报告实际测试结果与跳过项，不将本地通过写成 CI 已通过。
+纯文档变更运行 `uv run --locked --extra dev python scripts/check_docs.py` 与[文档合同和示例检查](docs/development-guide.md#文档维护与验证)；修改生成源后重新生成并检查派生文件。报告实际测试结果与跳过项，不将本地通过写成 CI 已通过。
 
 版本与数据打包变更还需检查 `pyproject.toml`、版本常量、CHANGELOG 和 wheel 的数据文件；发布流程见 [开发指南](docs/development-guide.md#ci打包与发布)。
 
@@ -62,9 +71,11 @@ git commit -m "docs: clarify integration contracts"
 git push -u origin codex/your-change
 ```
 
+保持一个 PR 聚焦一个问题，让审查者能够从描述直接找到变更和验证。
+
 提交信息使用 `feat`、`fix`、`docs`、`refactor`、`perf`、`test` 或 `chore` 等类型，可加范围。PR 描述说明：
 
-- 具体问题及修改后的行为；
+- 具体问题及修改后的行为，必要时给出修改前后的例子；
 - 相关 Issue（如有）；
 - 测试/示例的实际结果、兼容影响与未验证边界。
 

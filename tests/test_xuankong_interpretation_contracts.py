@@ -176,7 +176,10 @@ def test_published_mcp_schema_exposes_the_same_opt_in_contract():
 
     async def check():
         async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
-            schemas = {t.name: t.inputSchema for t in await client.list_tools()}
+            schemas = {
+                t.name: t.model_dump(by_alias=True)["inputSchema"]
+                for t in await client.list_tools()
+            }
             Draft202012Validator(schemas["fengshui_xuankong_natal"]).validate(inputs)
             Draft202012Validator(schemas["fengshui_assess"]).validate(assess_input())
             invalid = deepcopy(inputs)

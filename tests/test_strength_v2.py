@@ -228,3 +228,41 @@ def test_shared_peak_does_not_pick_arbitrary_half_combination():
     assert len(halves) == 2
     assert {event["status"] for event in halves} == {"contested"}
     assert not a["combination_contributions"]
+
+
+def test_hidden_stems_include_day_master_as_bi_jian() -> None:
+    """庚日主生于巳月, 巳藏丙/庚/戊. The old code silently dropped the
+    庚 hidden stem because it matched the day master, hiding the 日主之根.
+    The fix keeps it and labels it 比肩."""
+    pillars = {
+        "year": ("庚", "午"),
+        "month": ("辛", "巳"),
+        "day": ("庚", "辰"),
+        "hour": ("癸", "未"),
+    }
+    ten_gods = ElementAnalysis.analyze_ten_gods(pillars)
+
+    month_hidden = [
+        entry
+        for entry in ten_gods["month"]
+        if entry["position"].startswith("month_branch_hidden_")
+    ]
+    characters = [entry["character"] for entry in month_hidden]
+    assert characters == ["丙", "庚", "戊"], month_hidden
+
+    bi_jian = next(entry for entry in month_hidden if entry["character"] == "庚")
+    assert bi_jian["ten_god"] == "比肩"
+
+
+def test_month_command_flips_borderline_strength():
+    base = {"year": ("庚", "戌"), "day": ("甲", "子"), "hour": ("己", "巳")}
+    de_ling = ElementAnalysis.analyze_day_master_strength(
+        {**base, "month": ("丁", "卯")}
+    )
+    shi_ling = ElementAnalysis.analyze_day_master_strength(
+        {**base, "month": ("丁", "酉")}
+    )
+    # 甲 in 卯 (得令/帮身) is stronger than 甲 in 酉 (失令/克身).
+    assert de_ling["support_strength"] > shi_ling["support_strength"]
+    assert shi_ling["strength_level"] == "弱"
+    assert de_ling["strength_level"] != "弱"

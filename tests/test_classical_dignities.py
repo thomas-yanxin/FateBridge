@@ -1,4 +1,4 @@
-"""Phase 2 tests: almuten (weighted dignity) + dispositor chains (主宰星链).
+"""Classical dignity tests: almuten (weighted dignity) + dispositor chains (主宰星链).
 
 Almuten weights are pinned against horosa's `DIG_W` (lifespanEngine.js); the
 derivations are checked by hand-computable classical ground truths.
@@ -77,7 +77,7 @@ def test_build_dispositor_layer_finds_final_dispositors():
     assert layer["chains"]["Mars"]["terminal_type"] == "domicile"
 
 
-def test_chart_exposes_phase2_layer():
+def test_chart_exposes_dispositors_and_topic_almutens():
     result = calculate_core_chart_analysis(
         name="t",
         birth_year=2000,

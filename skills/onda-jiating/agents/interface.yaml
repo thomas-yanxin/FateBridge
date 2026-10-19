@@ -1,0 +1,46 @@
+name: onda-jiating
+version: 0.2.0
+scenario: 家庭与亲子
+summary: 区分命主家庭对应、家人本人和亲子互动，解释相关依据，联系真实责任与安排
+consultation:
+  kind: topic
+  topics:
+  - family
+  scope: current_question
+  time_selection: shared
+  safety_policy: consultation_boundaries_v1
+triggers:
+- 原生家庭
+- 六亲
+- 家庭责任
+- 亲子
+- 子女缘
+engine_tools:
+- analyze_destiny
+- astro_chart
+- astro_relative_chart
+- bazi_children
+- bazi_personality
+- bazi_relatives
+- firdaria
+- timing_analysis
+- two_person_compatibility
+- western_timing_analysis
+- ziwei_birth
+- ziwei_horoscope
+required_inputs: []
+input_notes:
+- 按当前问题与所选工具实际 Schema 核对必要资料；不是完整问卷
+- 主题、对象与时间范围沿用当前聊天，限定方法优先，缺项仅限制对应层
+reads:
+- ../../_shared/consultation-routing.md
+- ../../_shared/safety-boundaries.md
+- ../../_shared/fatebridge-engine.md
+- ../../_shared/onda-counsel.md
+- ../../_shared/timing-selection.md
+output:
+  kind: interpretation
+  grounding: engine_fields
+  voice: onda-counsel
+boundary: 传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。
+license: Apache-2.0

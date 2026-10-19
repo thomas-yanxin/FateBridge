@@ -246,7 +246,7 @@ def test_all_tools_publish_matching_output_contracts(monkeypatch):
             == advertised
         )
         if spec.mcp_name:
-            published = tools[spec.tool_name].outputSchema
+            published = tools[spec.tool_name].model_dump(by_alias=True)["outputSchema"]
             Draft202012Validator.check_schema(published)
             # FastMCP dereferences schemas at serve time for host compatibility.
             assert set(published["properties"]) == set(advertised["properties"])

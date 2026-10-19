@@ -39,7 +39,18 @@ def _western_event_spec(name: str, service: Any, model: Any, label: str) -> Tool
         key=f"astro_{name}",
         bind=raw_invoke(service),
         request_model=model,
-        summary=f"生成{label}（求解天文时刻后起盘）。",
+        summary=(
+            f"生成{label}（求解天文时刻后起盘）。"
+            + (
+                "评估给定的非医疗活动候选时刻；不是整段时间自动最优搜索，不提供手术或治疗择时。"
+                if name == "election"
+                else (
+                    "生死寿命、疾病及生育临床判断类别不开放。"
+                    if name == "horary"
+                    else ""
+                )
+            )
+        ),
         operation_label_zh=label,
         family="western_event",
         rest_path=f"/api/astro/event/{name}",

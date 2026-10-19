@@ -337,3 +337,55 @@ def test_comprehensive_summary_reads_normalized_score_key():
     assert "子与午六冲" not in summarized["strengths"]
     # 常规维度按真实 score 正确归入挑战，证明判定确实读到了分数而非恒 0。
     assert "十神层面存在明显克泄" in summarized["challenges"]
+
+
+def test_compatibility_score_rewards_three_harmony_and_penalises_harm() -> None:
+    """``BaZiRules.calculate_compatibility_score`` previously only scored 六合
+    and 六冲. Three-harmony, half-harmony, 六害 and 三刑 are now included so
+    the traditional_compatibility block reflects classical jipan matching."""
+    from fatebridge.core.rules import BaZiRules
+
+    # 一方: 申子辰 水三合 分散在三柱; 二方: 亥子丑 混合 (主要对冲六合已有)
+    pillars_full_triple = {
+        "year": ("甲", "申"),
+        "month": ("乙", "子"),
+        "day": ("丙", "辰"),  # 三合水局齐
+        "hour": ("丁", "卯"),
+    }
+    # 对方也有自己部分同组支, 跨盘凑成 三合
+    pillars_partial = {
+        "year": ("戊", "申"),  # 跨盘与前者 辰 凑 半合
+        "month": ("己", "子"),
+        "day": ("庚", "午"),  # 日支 六冲 前者的子
+        "hour": ("辛", "未"),  # 前者日支辰 与 未 六害
+    }
+    result = BaZiRules.calculate_compatibility_score(
+        pillars_full_triple, pillars_partial
+    )
+    joined = " | ".join(result["details"])
+    assert "半合" in joined, joined
+    # Six harm shows as "相害" note — we use 六害 consistently
+    assert "六害" in joined, joined
+    assert result["harmony_score"] > 0
+    assert result["clash_score"] > 0
+
+
+def test_compatibility_score_detects_cross_chart_triple_punishment() -> None:
+    from fatebridge.core.rules import BaZiRules
+
+    pillars_a = {
+        "year": ("甲", "寅"),
+        "month": ("乙", "卯"),
+        "day": ("丙", "辰"),
+        "hour": ("丁", "巳"),
+    }
+    pillars_b = {
+        "year": ("戊", "申"),
+        "month": ("己", "酉"),
+        "day": ("庚", "戌"),
+        "hour": ("辛", "亥"),
+    }
+    result = BaZiRules.calculate_compatibility_score(pillars_a, pillars_b)
+    # 寅巳申 三刑 已由 前者 (寅/巳) + 后者 (申) 合成
+    assert any("三刑" in d for d in result["details"]), result["details"]
+    assert result["clash_score"] >= 5

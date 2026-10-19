@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import cast
+from typing import Any, cast
 
 from pydantic import BaseModel, ConfigDict, model_validator
 from pydantic_core import PydanticCustomError
@@ -22,6 +22,24 @@ class _DeferredModel(BaseModel):
     """
 
     model_config = ConfigDict(defer_build=True, extra="forbid")
+
+    @model_validator(mode="before")
+    @classmethod
+    def _validate_consultation_scope(cls, data: Any) -> Any:
+        from fatebridge.core.consultation_policy import (
+            POLICY_ID,
+            restricted_intent_path,
+        )
+
+        if isinstance(data, dict):
+            path = restricted_intent_path(data)
+            if path:
+                raise PydanticCustomError(
+                    "consultation_restricted",
+                    "此请求超出允许的咨询范围",
+                    {"policy": POLICY_ID, "path": path},
+                )
+        return data
 
     @model_validator(mode="after")
     def _validate_calendar_dates(self) -> "_DeferredModel":

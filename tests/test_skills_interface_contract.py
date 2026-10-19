@@ -179,3 +179,60 @@ def test_codex_project_skill_entries_resolve_and_allow_discovery():
         for rel in re.findall(r"\]\(([^)#]+)(?:#[^)]*)?\)", skill.read_text()):
             if "://" not in rel:
                 assert (entry / rel).exists(), (entry.name, rel)
+
+
+def test_consultation_entries_cover_topics_services_and_compatible_composite():
+    """Discovery distinguishes user topics from services without tool ownership."""
+    from collections import Counter
+
+    from fatebridge.application.scenarios import discover_scenarios, scenario_keys
+    from fatebridge.core.consultation_policy import POLICY_ID
+
+    interfaces = [_load(d) for d in _skill_dirs()]
+    assert Counter(item["consultation"]["kind"] for item in interfaces) == {
+        "topic": 9,
+        "service": 3,
+        "composite": 1,
+    }
+    expected = {
+        "self",
+        "career",
+        "finance",
+        "romance",
+        "learning",
+        "family",
+        "social",
+        "health_culture",
+        "space",
+    }
+    assert {
+        topic
+        for item in interfaces
+        if item["consultation"]["kind"] == "topic"
+        for topic in item["consultation"]["topics"]
+    } == expected
+    for item in interfaces:
+        assert item["consultation"]["scope"] == "current_question"
+        assert item["consultation"]["safety_policy"] == POLICY_ID
+    for topic in (
+        "onda-shiye",
+        "onda-caiwu",
+        "onda-xueye",
+        "onda-jiating",
+        "onda-renji",
+        "onda-yuanfen",
+    ):
+        tools = scenario_keys(CATALOG, topic)
+        assert {
+            "ziwei_birth",
+            "astro_chart",
+            "timing_analysis",
+            "ziwei_horoscope",
+            "western_timing_analysis",
+            "firdaria",
+        } <= tools
+    # Topic filtering must retain its own cross-system and time capabilities.
+    manifest = discover_scenarios(CATALOG, scenario="onda-caiwu", surface="mcp")
+    assert manifest["consultation_policy"]["scope"] == "current_question"
+    assert manifest["scenarios"][0]["consultation"]["kind"] == "topic"
+    assert manifest["scenarios"][0]["availability"]["complete"]

@@ -1,0 +1,4 @@
+interface:
+  display_name: 财务与资源
+  short_description: 围绕收入、消费、积累与共同资金，对照相关传统依据和时段，核对现实财务条件
+  default_prompt: 使用 $onda-caiwu 围绕我这次的问题，按主题、对象与时间范围选择有价值的依据，解释差异与可核对的安排。

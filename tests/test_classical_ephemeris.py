@@ -1,4 +1,4 @@
-"""Phase 2b tests: the ephemeris cut — retrograde, out-of-bounds, prenatal
+"""Classical ephemeris tests: retrograde, out-of-bounds, prenatal
 syzygy, and Almuten Figuris (命主).
 
 Two layers:

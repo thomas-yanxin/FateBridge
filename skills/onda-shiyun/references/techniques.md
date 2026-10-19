@@ -42,3 +42,5 @@
 ## 非个人盘
 
 `astro_mundane` 用于年度节气入宫等世俗盘，`astro_extrareturns` 用于多重回归或事件多盘。两者不默认加入个人年运，也不据星盘推断政治、金融或灾害的确定结果。
+
+返回[时运技能](../SKILL.md)，时间边界与取证粒度见[共享时间选择](../../_shared/timing-selection.md)。

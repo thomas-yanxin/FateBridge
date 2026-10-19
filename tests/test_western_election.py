@@ -63,7 +63,7 @@ def test_moon_not_void_with_imminent_aspect():
     assert _moon_void_of_course(moon, others) is False
 
 
-def test_topic_master_covers_horosa_topics():
+def test_topic_master_covers_allowed_consultation_topics():
     for topic in (
         "marriage",
         "business",
@@ -72,7 +72,6 @@ def test_topic_master_covers_horosa_topics():
         "trade",
         "buy_car",
         "contract",
-        "surgery",
         "travel",
         "job_hunt",
         "general",

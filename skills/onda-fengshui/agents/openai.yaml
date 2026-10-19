@@ -1,6 +1,6 @@
 interface:
-  display_name: "风水 · 空间布局"
-  short_description: "逐对象解释空间的风水依据，对照现状与候选方案，说明哪些可保留或调整"
-  default_prompt: "使用 $onda-fengshui 审查我的空间布局，逐对象说明现状依据、可保留或调整之处，并在有候选时对照差异与条件。"
+  display_name: 居住与工作空间
+  short_description: 按空间事实和有来源的规则解释现状与候选，说明可保留、条件式与未覆盖部分
+  default_prompt: 使用 $onda-fengshui 围绕我这次的问题，按主题、对象与时间范围选择有价值的依据，解释差异与可核对的安排。
 policy:
   allow_implicit_invocation: true

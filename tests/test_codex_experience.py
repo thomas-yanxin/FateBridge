@@ -421,13 +421,18 @@ async def test_all_published_schemas_keep_valid_shared_references():
     total_wire = 0
     total_original = 0
     for tool in tools:
-        for schema in [tool.inputSchema, tool.outputSchema]:
+        for schema in [
+            tool.model_dump(by_alias=True)["inputSchema"],
+            tool.model_dump(by_alias=True)["outputSchema"],
+        ]:
             if schema is not None:
                 validator_for(schema).check_schema(schema)
-        if tool.outputSchema is not None:
+        if tool.model_dump(by_alias=True)["outputSchema"] is not None:
             original = model_schema(by_name[tool.name].output_model)
-            assert tool.outputSchema == original
-            total_wire += len(json.dumps(tool.outputSchema))
+            assert tool.model_dump(by_alias=True)["outputSchema"] == original
+            total_wire += len(
+                json.dumps(tool.model_dump(by_alias=True)["outputSchema"])
+            )
             total_original += len(json.dumps(original))
     assert total_wire == total_original
 

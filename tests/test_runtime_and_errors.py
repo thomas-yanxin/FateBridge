@@ -5,9 +5,14 @@ import os
 import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
+from fastmcp import Client
 
+import fatebridge.api as api
 import fatebridge.api as api_module
+import fatebridge.application.execution as execution
+import fatebridge.mcp_server as mcp
 from fatebridge import mcp_server as fastmcp_server
+from fatebridge.cli import run as cli_run
 from fatebridge.core.requests.bazi import BaziBirthRequest
 from fatebridge.core.requests.western_timing import WesternTimingRequest
 from fatebridge.utils.errors import handle_calculation_error
@@ -17,6 +22,7 @@ from fatebridge.utils.runtime import (
     parse_allowed_origins,
     parse_api_keys,
 )
+from tests.fixtures.surface_payloads import REST_POST_CASES
 from tests.fixtures.transports import rest_handler
 
 calculate_birth = rest_handler("bazi_birth")
@@ -246,28 +252,13 @@ def test_metrics_endpoint_exposes_request_counters():
     assert "fatebridge_api_key_daily_quota" not in response.text
 
 
-def test_repeated_requests_are_not_rate_limited_even_when_legacy_limiter_is_injected(
-    monkeypatch,
-):
-    class RejectAllLimiter:
-        def check(self, *, client_id, path, now=None):
-            return False, 60
-
+def test_repeated_public_requests_succeed():
     api_module._reset_runtime_state_for_tests()
-    if hasattr(api_module, "REQUEST_RATE_LIMITER"):
-        monkeypatch.setattr(
-            api_module,
-            "REQUEST_RATE_LIMITER",
-            RejectAllLimiter(),
-        )
-
     client = TestClient(api_module.app)
 
-    first = client.post("/api/divination/gua", json={"query": "乾"})
-    second = client.post("/api/divination/gua", json={"query": "乾"})
-
-    assert first.status_code == 200
-    assert second.status_code == 200
+    for _ in range(2):
+        response = client.post("/api/divination/gua", json={"query": "乾"})
+        assert response.status_code == 200
 
 
 def test_api_key_auth_rejects_missing_key_when_configured(monkeypatch):
@@ -330,40 +321,23 @@ def test_api_key_auth_keeps_ready_endpoint_public(monkeypatch):
     assert response.json()["status"] == "ready"
 
 
-def test_api_key_requests_are_not_quota_limited_even_when_legacy_tracker_is_injected(
-    monkeypatch,
-):
-    class ExhaustedQuotaTracker:
-        enabled = True
-        daily_quota = 1
-
-        def check_and_consume(self, *, key_id, now=None):
-            return False, 0, 60
-
+def test_repeated_authenticated_requests_succeed(monkeypatch):
     api_module._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api_module,
         "API_KEY_AUTHENTICATOR",
         api_module.ApiKeyAuthenticator(
-            header_name="X-API-Key",
-            api_keys={"agent": "secret-key"},
+            header_name="X-API-Key", api_keys={"agent": "secret-key"}
         ),
     )
-    if hasattr(api_module, "API_KEY_QUOTA_TRACKER"):
-        monkeypatch.setattr(
-            api_module,
-            "API_KEY_QUOTA_TRACKER",
-            ExhaustedQuotaTracker(),
-        )
-
     client = TestClient(api_module.app)
     headers = {"X-API-Key": "secret-key"}
 
-    first = client.post("/api/divination/gua", json={"query": "乾"}, headers=headers)
-    second = client.post("/api/divination/gua", json={"query": "乾"}, headers=headers)
-
-    assert first.status_code == 200
-    assert second.status_code == 200
+    for _ in range(2):
+        response = client.post(
+            "/api/divination/gua", json={"query": "乾"}, headers=headers
+        )
+        assert response.status_code == 200
 
 
 def test_value_error_logged_as_warning_without_traceback(caplog):
@@ -396,3 +370,75 @@ def test_internal_error_logged_at_error_with_traceback(caplog):
     ]
     assert err_records, "expected an ERROR record for an internal fault"
     assert any(r.exc_info is not None for r in err_records)
+
+
+@pytest.mark.parametrize("stage", ["attachment", "validation"])
+def test_metadata_failures_are_internal_and_correlated_in_all_transports(
+    monkeypatch, capsys, caplog, stage
+):
+    from fatebridge.services import run_metadata
+
+    def fail(*args, **kwargs):
+        raise ValueError("private-server-error")
+
+    if stage == "attachment":
+        monkeypatch.setattr(run_metadata, "attach_run_metadata", fail)
+    else:
+        original = execution.validate_output
+
+        def validate(spec, result):
+            if "run_metadata" in result:
+                raise execution.OutputContractError("private-server-error")
+            return original(spec, result)
+
+        monkeypatch.setattr(execution, "validate_output", validate)
+
+    monkeypatch.setattr(
+        api,
+        "API_KEY_AUTHENTICATOR",
+        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
+    )
+    inputs = REST_POST_CASES["/api/cn/bazi/birth"]()
+    controls = {"trace_id": "review-trace", "parent_run_id": "review-parent"}
+    http = TestClient(api.app).post("/api/cn/bazi/birth", json=inputs, params=controls)
+
+    async def call():
+        async with Client(mcp.app) as client:
+            return await client.call_tool(
+                "bazi_birth", {**inputs, **controls}, raise_on_error=False
+            )
+
+    protocol = asyncio.run(call())
+    args = ["bazi_birth"]
+    for key, value in {**inputs, **controls}.items():
+        if value is not None:
+            args += [
+                "--" + key.replace("_", "-"),
+                json.dumps(value) if isinstance(value, bool) else str(value),
+            ]
+    code = cli_run(args)
+    cli_output = json.loads(capsys.readouterr().out)
+    assert http.status_code == 500 and protocol.is_error and code == 1
+    assert json.loads(protocol.content[0].text) == protocol.structured_content
+    payloads = [http.json(), protocol.structured_content, cli_output]
+    for payload in payloads:
+        assert payload["error_code"] == "internal_error"
+        assert payload["trace_id"] == controls["trace_id"]
+        assert payload["parent_run_id"] == controls["parent_run_id"]
+        assert "private" not in json.dumps(payload)
+    # REST conveys status on the HTTP response; MCP also labels the operation.
+    normalized = [
+        {
+            key: value
+            for key, value in payload.items()
+            if key not in {"status_code", "operation"}
+        }
+        for payload in payloads
+    ]
+    assert normalized[0] == normalized[1] == normalized[2]
+    # Sanitization must preserve the actual failure in server-side diagnostics.
+    assert any(
+        record.exc_info and "private-server-error" in str(record.exc_info[1])
+        for record in caplog.records
+        if record.name == "fatebridge.utils.errors"
+    )

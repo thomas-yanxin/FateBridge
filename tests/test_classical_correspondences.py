@@ -1,4 +1,4 @@
-"""Phase 5 tests: dodekatemoria (12分度) + melothesia (身体部位) + temperament (气质).
+"""Traditional correspondence tests: dodekatemoria (12分度) + melothesia (身体部位) + temperament (气质).
 
 Pure degree-table / qualities-tally derivations (no ephemeris). Body-part and
 quality tables are ported verbatim from horosa data/signs.js + data/planets.js.
@@ -44,7 +44,7 @@ def test_temperament_humor_quadrants():
     assert phleg["humor"] == "phlegmatic"
 
 
-def test_chart_exposes_phase5_layer():
+def test_chart_exposes_traditional_correspondences():
     result = calculate_core_chart_analysis(
         name="左右",
         birth_year=2000,

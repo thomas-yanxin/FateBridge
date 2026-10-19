@@ -1,4 +1,4 @@
 interface:
-  display_name: "健康 · 身心文化参考"
-  short_description: "看懂五行权重与传统健康文化，把文化对应和可观察的生活安排分清楚"
-  default_prompt: "使用 $onda-jiankang 解释我关心的传统健康文化，说明计算与传统对应的区别，并结合已有生活事实给一项合适的观察建议。"
+  display_name: 传统身心文化参考
+  short_description: 解释实际五行权重与传统对应，区分文化观点和健康信息，保持非诊断非治疗边界
+  default_prompt: 使用 $onda-jiankang 围绕我这次的问题，按主题、对象与时间范围选择有价值的依据，解释差异与可核对的安排。

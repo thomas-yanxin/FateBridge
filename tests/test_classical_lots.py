@@ -1,4 +1,4 @@
-"""Phase 3 tests: Arabic lots (parts).
+"""Classical lots tests: Arabic lots (parts).
 
 Lot formulas are ported verbatim from horosa data/lots.js; checked by the
 day/night reversal invariant, a hand-computable position, and consistency with
@@ -56,8 +56,8 @@ def test_lot_dispositor_is_domicile_ruler():
     assert lot_dispositor(105.0) == "Moon"  # 105° = 15° Cancer
 
 
-def test_all_five_lots_present_with_required_markers():
-    assert set(LOTS) == {"fortune", "spirit", "marriage", "children", "death"}
+def test_all_allowed_lots_present_with_required_markers():
+    assert set(LOTS) == {"fortune", "spirit", "marriage", "children"}
     lons = {
         "asc": 100.0,
         "sun": 30.0,
@@ -94,6 +94,6 @@ def test_chart_lots_match_existing_fortune_lot():
 def test_chart_exposes_lots_layer():
     result = calculate_core_chart_analysis(chart_variant="chart", **_BIRTH)
     lots = result["classical"]["lots"]
-    assert set(lots) == {"fortune", "spirit", "marriage", "children", "death"}
+    assert set(lots) == {"fortune", "spirit", "marriage", "children"}
     assert lots["fortune"]["dispositor"] is not None
     assert "[阿拉伯点]" in result["snapshot_text"]

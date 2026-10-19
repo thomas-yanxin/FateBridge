@@ -1,5 +1,7 @@
 # 结果交付与方案对照
 
+[场景技能](../SKILL.md) · [咨询闭环](consultation.md) · [候选布局合同](scene-planning.md)
+
 本参考用于把实际结果变成用户能核对的空间判断，不新增风水规则。单项问题先答要点；逐对象、完整审查或多方案请求才展开相应表格。不同请求不必套同一份整宅报告。
 
 ## 从用户的问题组织结果
@@ -34,6 +36,7 @@
 | 门床桌灶的位置／朝向及使用人 | `layout_analysis.placement_findings`，按方法、对象、使用人及 location／facing 区分；个人关系需要时用 `layers.bazhai.occupants` |
 | 入口、背靠、直冲等形态 | `layout_analysis.form_analysis.findings[].checks`，逐条翻译实际 finding 与 adjustment，不从入口方位推直冲 |
 | 镜照床、厨卫、梁管和尖角两端 | 实际提交关系时读取 `layout_analysis.interior_analysis`，保留 predicate、exceptions、分歧和 action_basis |
+| 工位活动与入口隔挡 | 实际提交工位审查时读取 `layout_analysis.workstation_analysis`，区分活动角色、三端关系及动作条件 |
 | 材质器形及代表物资格 | 实际提交属性时读取 `layout_analysis.material_analysis`，只解释独立属性和用途资格 |
 | 用户明确另选 BTB 的桌面物件 | `layout_analysis.surface_analysis.findings` 的 item_findings 与 action_options，按物件覆盖和动作状态分别说明 |
 | 方向／宅盘尚未齐 | `method_policy` 与 `coverage.scene_scope` 说明实际计算层及未选原因；已完成形态仍照常解释 |

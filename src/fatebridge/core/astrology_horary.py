@@ -64,8 +64,6 @@ HOUSE_BY_CATEGORY: Dict[str, int] = {
     "wealth": 2,
     "family": 3,
     "property": 4,
-    "pregnancy": 5,
-    "health": 6,
     "marriage": 7,
     "lawsuit": 7,
     "theft": 7,
@@ -73,15 +71,12 @@ HOUSE_BY_CATEGORY: Dict[str, int] = {
     "career": 10,
     "hope": 11,
     "enemy": 12,
-    "death": 8,
 }
 CATEGORY_LABELS_ZH: Dict[str, str] = {
     "general": "综合",
     "wealth": "财物",
     "family": "兄弟/亲属",
     "property": "房产/田宅",
-    "pregnancy": "子嗣",
-    "health": "疾病",
     "marriage": "婚姻/感情",
     "lawsuit": "官非/对手",
     "theft": "失物/盗贼",
@@ -89,7 +84,6 @@ CATEGORY_LABELS_ZH: Dict[str, str] = {
     "career": "事业/职位",
     "hope": "愿望",
     "enemy": "私敌",
-    "death": "死亡/遗产",
 }
 
 HOUSE_ATTRIBUTES = [
@@ -273,7 +267,8 @@ def build_horary_payload(subject: Any, *, category: str) -> Dict[str, Any]:
     Judge a horary chart for ``category``. Returns significators, radicality
     strictures, the perfection finding, and an overall verdict with reasoning.
     """
-    category = category if category in HOUSE_BY_CATEGORY else "general"
+    if category not in HOUSE_BY_CATEGORY:
+        raise ValueError("不支持的卜卦类别；生死与临床判断不开放")
     quesited_house = HOUSE_BY_CATEGORY[category]
 
     states = {planet: _planet_state(subject, planet) for planet in TRADITIONAL_PLANETS}

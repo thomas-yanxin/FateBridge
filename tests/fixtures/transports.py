@@ -38,7 +38,10 @@ def _mcp_schemas():
 
     async def load():
         async with Client(app) as client:
-            return {tool.name: tool.inputSchema for tool in await client.list_tools()}
+            return {
+                tool.name: tool.model_dump(by_alias=True)["inputSchema"]
+                for tool in await client.list_tools()
+            }
 
     return asyncio.run(load())
 

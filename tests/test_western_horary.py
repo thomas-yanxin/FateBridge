@@ -83,14 +83,12 @@ def test_moon_void_of_course_false_with_imminent_aspect():
     assert result["next_aspect"]["other"] == "Mars"
 
 
-def test_house_by_category_covers_horosa_topics():
+def test_house_by_category_covers_allowed_consultation_topics():
     for topic in (
         "general",
         "wealth",
         "family",
         "property",
-        "pregnancy",
-        "health",
         "marriage",
         "lawsuit",
         "theft",
@@ -98,7 +96,6 @@ def test_house_by_category_covers_horosa_topics():
         "career",
         "hope",
         "enemy",
-        "death",
     ):
         assert topic in HOUSE_BY_CATEGORY
         assert topic in CATEGORY_LABELS_ZH
