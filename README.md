@@ -4,7 +4,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/fatebridge.svg)](https://pypi.org/project/fatebridge/)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg)](pyproject.toml)
-[![CI](https://github.com/Yonder-Lab/FateBridge/actions/workflows/ci.yml/badge.svg)](https://github.com/Yonder-Lab/FateBridge/actions/workflows/ci.yml)
+[![CI](https://github.com/thomas-yanxin/FateBridge/actions/workflows/ci.yml/badge.svg)](https://github.com/thomas-yanxin/FateBridge/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 FateBridge 将八字、紫微、中国占术、西方占星与风水规则组织成可在本地运行的 Python 计算工具。通过 **MCP** 为 Agent 提供计算依据，通过 **REST** 接入应用，也可以用 **CLI** 在终端直接调用。
@@ -153,7 +153,7 @@ curl -X POST http://localhost:8010/api/cn/bazi/birth \
 欢迎改进算法、接口、测试、文档和场景技能。源码开发使用锁定的 uv 环境，无需手动激活虚拟环境：
 
 ```bash
-git clone https://github.com/Yonder-Lab/FateBridge.git
+git clone https://github.com/thomas-yanxin/FateBridge.git
 cd FateBridge
 uv sync --locked --extra dev
 uv run --locked --extra dev fatebridge list
@@ -167,7 +167,7 @@ uv run --locked --extra dev python -m pytest -q \
   tests/test_doc_tool_counts.py tests/test_scenario_routing_coverage.py
 ```
 
-代码改动还需运行领域测试及 CI 对应检查，详见[开发指南](docs/development-guide.md)。提交与 PR 流程见[贡献指南](CONTRIBUTING.md)。报告问题或提出功能建议请到 [Issues](https://github.com/Yonder-Lab/FateBridge/issues)；安全问题按 [SECURITY.md](SECURITY.md) 私下报告。
+代码改动还需运行领域测试及 CI 对应检查，详见[开发指南](docs/development-guide.md)。提交与 PR 流程见[贡献指南](CONTRIBUTING.md)。报告问题或提出功能建议请到 [Issues](https://github.com/thomas-yanxin/FateBridge/issues)；安全问题按 [SECURITY.md](SECURITY.md) 私下报告。
 
 ## 使用范围与许可
 
