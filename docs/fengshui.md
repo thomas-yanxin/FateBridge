@@ -16,7 +16,7 @@
 | `/api/fengshui/xuankong_natal` | `fengshui_xuankong_natal` | `house`、历史 `period`，按需提供测量误差及 `interpretation` | 运／山／向盘、下卦／替星与分界候选；有限解释须显式启用 |
 | `/api/fengshui/assess` | `fengshui_assess` | 已确认的住宅、住户、环境、年度或历史宅运输入；可选 `methods`、`scene`，布局时 `analyze_layout=true` | `bazhai` / `jinsuo` / `annual_stars` / `xuankong_natal` 独立分层；布局及所请求补充审查 |
 
-完整约束见 `/openapi.json`、MCP `tools/list` 和 `fatebridge describe fengshui_assess`。新 family 是 `fengshui`；不加入个人 `analyze_destiny` 或 `profile` 默认系统。
+可运行输入按用途列于[示例索引](examples/README.md)。完整约束见 `/openapi.json`、MCP `tools/list` 和 `fatebridge describe fengshui_assess`。新 family 是 `fengshui`；不加入个人 `analyze_destiny` 或 `profile` 默认系统。
 
 `fengshui_xuankong_natal` 提供中州派完整运／山／向数字盘与兼向替星；聚合时显式选择 `xuankong_natal`，与年度飞星独立。定运资料、分界候选、规则版本及独立盘例见 [玄空宅盘](fengshui-xuankong.md)。
 
@@ -130,7 +130,7 @@ asyncio.run(main())
 
 命卦另接受公历 `birth_date`，与有效生年、出生时刻三选一。按所选时区计算立春所在日期；之前取上一有效生年，之后取本年，立春当日保留 `partial` 并要求出生时刻。选择 `january_1` 时日期即可确定生年。该路径不构造虚假的出生小时，也不使用真太阳时。
 
-年盘有效期是 `[立春, 下次立春)`，不硬编码2月4日午夜，也不按春节。节气沿用现有 `almanac`：优先 Swiss，可能回退线性近似；输出 `timing` 说明供应函数、Swiss可用性、可能回退及独立核验范围。本次外部证据确认2026立春日期和分钟，不认证现有引擎的秒级精度。
+年盘有效期是 `[立春, 下次立春)`，不硬编码2月4日午夜，也不按春节。节气沿用现有 `almanac`：优先 Swiss，可能回退线性近似；输出 `timing` 说明供应函数、Swiss可用性、可能回退及独立核验范围。登记的外部参考核对2026立春日期和分钟，不认证现有引擎的秒级精度。
 
 布局对象分别提供 `location_direction` 与可选 `facing_direction`。后者必须配套用途语义：门 `door_facing`、床头 `headboard`、书桌 `desk_facing`、灶 `fire_mouth`。灶座按凶方约定、已确认火门按吉方约定；现代燃气旋钮不是自动等同古火门。床头与书桌朝向是本版本明确的应用约定。住宅宅盘与每位住户命盘分别输出；`subject_id` 只筛选一位布局关联住户，`subject_ids` 选择明确的多人使用集合，两者互斥；不传二者则保留应用全部已提供住户的语义，均不修改宅卦。多人列表非空、成员唯一且必须引用已提供住户。对象实际使用者与全宅住户分开，不能把同住自动当共用。未知住户引用、重复住户／布局 ID 被拒绝。
 
@@ -195,6 +195,7 @@ status: complete | partial
 layers.bazhai: house.sectors / occupants[].candidates[].sectors / placement_findings
 layers.jinsuo: preferences / feature_findings
 layers.annual_stars: palaces / effective_year / time_context / current_period
+layers.xuankong_natal: 历史宅运、运／山／向盘及边界候选（显式选择时）
 method_policy / method_details: 选法口径、实际层次、固定宫与星五行及带来源象意参考
 layout_analysis.environmental_context: 方位门槛、家庭/生肖关注、多层范围、现代设计及未覆盖观察
 layout_analysis.interior_analysis: 实际提供双对象关系后的有限作者判据、异议及条件动作
@@ -233,7 +234,7 @@ pytest -q tests/test_fengshui.py tests/test_fengshui_surfaces.py
 
 离线测试用[固定参考事实](../tests/fixtures/fengshui-reference.json)登记的提交／SHA-256核对1900–2099男女命卦400项、独立八宅字典64项，并测试纪元／世纪／五数寄宫、立春前后与时区等价、方位边界、坐向反转、门床灶用途、不同住户、未知／混合砂水、来源版本、三端真实调用／校验／投影／请求文件。2026九宫另用作者出版年盘核对。代表性输入加入现有全端与 golden 覆盖，新增快照不重写旧工具数值基线。
 
-外部参考 [JackieL233/fengshui-master 固定提交](https://github.com/JackieL233/fengshui-master/blob/2666304c5cb4ac13091c8c1fcdd4e40c218b275a/fengshui-master/scripts/minggua.py) 仅核对有效生年和八宅关系，不覆盖精确出生时间、年飞星、金锁玉关或完整玄空。本次未取得金锁玉关独立引擎；其验收依据为明确登记的八宫传本规则与输入语义检查。
+外部参考 [JackieL233/fengshui-master 固定提交](https://github.com/JackieL233/fengshui-master/blob/2666304c5cb4ac13091c8c1fcdd4e40c218b275a/fengshui-master/scripts/minggua.py) 仅核对有效生年和八宅关系，不覆盖精确出生时间、年飞星、金锁玉关或完整玄空。金锁玉关未登记独立引擎比较；其验收依据为明确登记的八宫传本规则与输入语义检查。
 
 ## 场景兼容与归一化
 
@@ -247,7 +248,7 @@ pytest -q tests/test_fengshui.py tests/test_fengshui_surfaces.py
 
 公共卦名、五行生克和节气函数可以复用，各方法的星名、五行、作用域和解释规则仍独立。导出类型、快照标题或工具调用成功不能代替实际计算覆盖。
 
-当前输入、输出与支持范围以共享 Schema 和[基础合同](fengshui.md)为准；复杂 CLI 输入使用公开 `--request-file`，不将整个户型塞进绕过校验的字符串或个人 `--subject-file`。
+当前输入、输出与支持范围以共享 Schema 和本页[入口表](#入口与最小输入)为准；复杂 CLI 输入使用公开 `--request-file`，不将整个户型塞进绕过校验的字符串或个人 `--subject-file`。
 
 ## 调用与状态合同
 
@@ -270,6 +271,6 @@ pytest -q tests/test_fengshui.py tests/test_fengshui_surfaces.py
 
 用户案例用于现场回放，不能替代跨变体回归。真实模型体验、结构化调用、三端一致、Linux golden各自报告；规则来源和软件一致性不证明传统效力。
 
-## 工位作者扩展 P0–P2
+## 工位活动、隔挡与材料条件
 
-书桌工作／学习用途、入口隔挡与材料施用条件沿用 `fengshui_assess` 的共享请求模型，详细字段、来源与边界见[工位作者规则](../skills/onda-fengshui/references/workstation-authored.md)。可运行虚构请求：[玄空活动](examples/fengshui-workstation-activity.json)、[入口隔挡](examples/fengshui-entry-barrier.json)、[材料条件](examples/fengshui-material-application.json)。REST、MCP、CLI 使用同一嵌套输入，严格投影按需追加 `layout_analysis.workstation_analysis` 或 `layout_analysis.material_analysis`。WOFS 非 BTB 桌面摆放仍为 P3 作者参考，未启用。
+书桌工作／学习用途、入口隔挡与材料施用条件沿用 `fengshui_assess` 的共享请求模型，详细字段、来源与边界见[工位作者规则](../skills/onda-fengshui/references/workstation-authored.md)。可运行虚构请求：[玄空活动](examples/fengshui-workstation-activity.json)、[入口隔挡](examples/fengshui-entry-barrier.json)、[材料条件](examples/fengshui-material-application.json)。REST、MCP、CLI 使用同一嵌套输入，严格投影按需追加 `layout_analysis.workstation_analysis` 或 `layout_analysis.material_analysis`。WOFS 非 BTB 桌面摆放仅为作者参考，未启用固定吉位判定。

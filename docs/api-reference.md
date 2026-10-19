@@ -7,6 +7,19 @@
 
 > 当前实际暴露 86 个业务 REST 路由（另含 `/health`、`/ready`、`/metrics` 三个运维端点）和 87 个 FastMCP 工具。两个数字由中央目录派生，并由 `tests/test_doc_tool_counts.py` 锁定。
 
+## 阅读导航
+
+| 要查什么 | 章节 |
+| --- | --- |
+| 错误、快照、三端映射、投影、复现 | [公共约定](#2-公共约定) |
+| 输入字段与默认值 | [共享请求族](#3-共享请求族)；具体约束以实际 Schema 为准 |
+| REST 路由与风水入口 | [端点家族](#4-rest-端点家族) · [家居风水](#411-家居风水family-fengshui) |
+| 可复制的 HTTP 调用 | [REST 示例](#5-rest-调用示例) |
+| MCP 公开名称 | [FastMCP 工具面](#6-fastmcp-工具面) |
+| 结果字段、精度排错 | [响应字段](#7-常见响应字段) · [调试建议](#8-调试建议) |
+
+首次安装见[快速入门](getting-started.md)，客户端与完整导出见[接入指南](agent-guide.md)，旧调用升级见[迁移指南](migration.md)。
+
 ## 1. 基础信息
 
 ### REST
@@ -476,6 +489,9 @@ REST 在 JSON 请求体传入这五项，MCP 使用同名参数，CLI 使用
 | `GET` | `/health` | 存活检查，返回 `{"status":"healthy"}`，不验证全部算法依赖 |
 | `GET` | `/ready` | 必需检查决定 `ready` / `not_ready`；可选西占运行时失败不一定改变状态，需检查 `checks` |
 | `GET` | `/metrics` | Prometheus 文本指标，含请求计数、耗时、就绪与鉴权配置状态 |
+| `GET` | `/api/scenarios` | 场景摘要或完整路由；支持 `scenario`、`surface` 与 `detail` |
+| `GET` | `/api/results/{result_id}` | 同次结果的交付 manifest，沿用业务鉴权 |
+| `GET` | `/api/results/{result_id}/pages` | 字符分页；`offset` 指定偏移，`path` 可选字段路径 |
 | `GET` | `/api/tools` | 能力清单：返回每个工具的自描述记录（参数、类型、所在端、family），与 `fatebridge describe` 同源 |
 
 `/api/tools` 是给 Agent 的机读能力清单——无需抓取本文档即可枚举全部工具及调用约定。
@@ -485,10 +501,10 @@ descriptor 形如：
 ```json
 {
   "tool": "bazi_wealth",
-  "summary": "八字财运分析（可传 dayun_pillar / liunian_pillar 输出时机信号）",
+  "summary": "八字财运分析：已按出生资料与分析日期自动推算大运、流年和时机依据；首轮无需先调用 timing_analysis 或手动传大运柱。仅有明确外部口径时用 dayun_pillar / liunian_pillar 覆盖。",
   "operation_label_zh": "八字财运分析",
   "family": "bazi",
-  "surfaces": {"cli": true, "rest_path": "/api/cn/bazi/wealth", "mcp_name": "bazi_wealth"},
+  "surfaces": {"cli": true, "cli_name": "bazi_wealth", "rest_path": "/api/cn/bazi/wealth", "mcp_name": "bazi_wealth"},
   "parameters": [{"name": "birth_year", "type": "int", "required": true, "description": "..."}]
 }
 ```
@@ -497,13 +513,29 @@ descriptor 形如：
 
 `surfaces.rest_path` / `surfaces.mcp_name` 为 `null` 表示该工具不在对应端暴露。
 
+### 4.11 家居风水（family `fengshui`）
+
+| REST POST | MCP / CLI | 说明 |
+| --- | --- | --- |
+| `/api/fengshui/directions` | `fengshui_directions` | 后天八卦固定宫数与八方／24山角区索引 |
+| `/api/fengshui/minggua` | `fengshui_minggua` | 出生日期／有效生年／出生时刻三选一、男女约定的命卦与个人八方关系 |
+| `/api/fengshui/bazhai` | `fengshui_bazhai` | 坐山宅盘、逐人命盘、门床桌灶位置／朝向分开判定 |
+| `/api/fengshui/jinsuo` | `fengshui_jinsuo` | 已确认观察的八宫砂水偏好；未知与混合不推断 |
+| `/api/fengshui/annual_stars` | `fengshui_annual_stars` | 立春换年的九宫年星、有效区间、独立列示当前元运 |
+| `/api/fengshui/xuankong_natal` | `fengshui_xuankong_natal` | 中州派运山向宅盘、历史定运、兼向替星及边界候选；独立于年星 |
+| `/api/fengshui/assess` | `fengshui_assess` | 原始盘与布局关联、室内形态观察、按目标的元素候选、限定年度作者规则、来源与分歧 |
+
+输入不继承完整八字生辰要求；命卦可用 `birth_date`、`effective_birth_year` 或 `birth_at` 三选一，年度使用 `effective_year` 或 `query_at` 二选一。角度须声明参考北。组合结果在 `layers.bazhai`、`layers.jinsuo`、`layers.annual_stars`、`layers.xuankong_natal` 中分别返回，合法缺失资料用 `status=partial`，不是协议错误。月飞星和金锁进阶规则不在此版；没有三法总分。每层带规则版本、来源和范围，快照记录同一组分层计算事实。
+
+三端可复制示例、详细字段语义及来源限制见 [家居风水](fengshui.md)。CLI 示例：`fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json`。MCP 参数为同一文件内容的 JSON 对象；REST 请求体同理。`--request-file` 保留未知字段交给模型拒绝，显式字段参数覆盖同名顶层字段。
+
 ## 5. REST 调用示例
 
 以下示例默认未开启 API Key 鉴权；开启后加 `-H "X-API-Key: <secret>"`。
 
 ### 5.1 旧入口迁移
 
-`/api/calculate` 和 CLI `calculate_legacy` 已移除。独立八字命盘使用 `/api/cn/bazi/birth` 或 `bazi_birth`，命盘字段位于 `bazi_birth` 对象；综合命理使用 MCP / CLI 的 `analyze_destiny`。
+`/api/calculate` 和 CLI `calculate_legacy` 已移除。独立八字命盘使用 `/api/cn/bazi/birth` 或 `bazi_birth`，命盘字段位于 `bazi_birth` 对象；综合命理使用 MCP / CLI 的 `analyze_destiny`。完整模块与字段替换见 [迁移指南](migration.md)。
 
 ### 5.2 核心占星盘
 
@@ -653,7 +685,7 @@ python -m fatebridge.mcp_server
 - `fengshui_directions` / `fengshui_minggua` / `fengshui_bazhai` / `fengshui_jinsuo`
 - `fengshui_annual_stars` / `fengshui_xuankong_natal` / `fengshui_assess`
 
-住宅输入、分层响应与复杂 CLI 用法见 [家居风水接口](#家居风水family-fengshui)。
+住宅输入、分层响应与复杂 CLI 用法见 [家居风水接口](#411-家居风水family-fengshui)。
 
 ### 6.3 MCP 与 REST 的差异
 
@@ -742,19 +774,3 @@ python -m fatebridge.mcp_server
 - [architecture.md](architecture.md)
 - [algorithm-coverage.md](algorithm-coverage.md)
 - [troubleshooting.md](troubleshooting.md)
-
-## 家居风水（family `fengshui`）
-
-| REST POST | MCP / CLI | 说明 |
-| --- | --- | --- |
-| `/api/fengshui/directions` | `fengshui_directions` | 后天八卦固定宫数与八方／24山角区索引 |
-| `/api/fengshui/minggua` | `fengshui_minggua` | 有效生年或出生时刻、男女约定的命卦与个人八方关系 |
-| `/api/fengshui/bazhai` | `fengshui_bazhai` | 坐山宅盘、逐人命盘、门床桌灶位置／朝向分开判定 |
-| `/api/fengshui/jinsuo` | `fengshui_jinsuo` | 已确认观察的八宫砂水偏好；未知与混合不推断 |
-| `/api/fengshui/annual_stars` | `fengshui_annual_stars` | 立春换年的九宫年星、有效区间、独立列示当前元运 |
-| `/api/fengshui/xuankong_natal` | `fengshui_xuankong_natal` | 中州派运山向宅盘、历史定运、兼向替星及边界候选；独立于年星 |
-| `/api/fengshui/assess` | `fengshui_assess` | 原始盘与布局关联、室内形态观察、按目标的元素候选、限定年度作者规则、来源与分歧 |
-
-输入不继承完整八字生辰要求；有效生年与出生时刻二选一，年度同理。角度须声明参考北。组合结果在 `layers.bazhai`、`layers.jinsuo`、`layers.annual_stars` 中分别返回，合法缺失资料用 `status=partial`，不是协议错误。月飞星和金锁进阶规则不在此版；没有三法总分。每层带规则版本、来源和范围，快照记录同一组分层计算事实。
-
-三端可复制示例、详细字段语义及来源限制见 [家居风水](fengshui.md)。CLI 示例：`fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json`。MCP 参数为同一文件内容的 JSON 对象；REST 请求体同理。`--request-file` 保留未知字段交给模型拒绝，显式字段参数覆盖同名顶层字段。

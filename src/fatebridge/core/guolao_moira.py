@@ -6,22 +6,22 @@ GuoLaoChartMain.js). The JS reads a fully-computed 七政四余 chart and emits 
 pattern lines; this module reproduces the **盘面物象格局** subset that runs on data
 FateBridge can supply (planet sign positions + ASC + 孛/罗 + 昼夜/季节).
 
-Scope notes (see docs/superpowers/specs/2026-06-21-guolao-moira-engine-design.md):
+Scope and precision notes (overview: ``docs/algorithm-coverage.md``):
 
-* **神煞 (Phase 2a)**：天贵/玉贵/岁驾 三神煞由 :func:`compute_god_signidx` 依年柱算出，
+* **神煞**：天贵/玉贵/岁驾 三神煞由 :func:`compute_god_signidx` 依年柱算出，
   驱动 日月拱贵人 / 命登岁驾 两格局。贵人阳/阴(昼/夜)定向流派有别，故以单一权威源
   《三命通会》为准（见常量注释）；岁驾=太岁=年支。无 horosa 字节对照 → golden 锁定。其余
-  64+36 神煞（per-宫 显示表）留待 Phase 2b。``god_signidx`` 缺省时两格局自然失效。
-* **紫炁 (木余, Phase 4)**：由 :func:`purple_clouds_longitude` 以 horosa 标定的线性步紫气
+  64+36 神煞（per-宫 显示表）未覆盖。``god_signidx`` 缺省时两格局自然失效。
+* **紫炁 (木余)**：由 :func:`purple_clouds_longitude` 以 horosa 标定的线性步紫气
   算出（4 张 horosa fixture 最小二乘，残差 <1e-5°，周期≈28年）。补齐后 ``孤月独明`` 的同宫
-  计数覆盖全 11 体（含炁），与 horosa 一致——此前的「炁缺省」注记已消除。
-* **命坐两歧 (Phase 3)**：近宫界 + 近宿界 均已实现。宿界以 FB 等分宿口径（360/28，与
+  计数覆盖全 11 体（含炁）。
+* **命坐两歧**：近宫界 + 近宿界 均已实现。宿界以 FB 等分宿口径（360/28，与
   ``core.astro.geometry._su28`` 同源）判定——内部自洽，但非 horosa 后端真实（不等）宿度，故
   近宿界临界判定不与 horosa 字节对照（近宫界仍与 JS 逐字一致）。
 
 The remaining patterns (八杀朝天/日月拱官/金水相涵/日月失所/官福失垣/孛犯太阳/罗犯太阳/
 孛罗交战) match ``guolaoMoira.js`` byte-for-byte given identical chart inputs, and are
-locked by a Node-oracle parity test.
+locked by the saved Node-oracle fixture in ``tests/test_guolao_moira_tool.py``.
 """
 
 from __future__ import annotations

@@ -1,234 +1,107 @@
 # FateBridge
 
-> 一座把中国传统命理、占术与西方占星从「口耳相传」变成「可调用、可验证、可溯源」的计算桥。
-
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg)](pyproject.toml)
-[![Status](https://img.shields.io/badge/status-beta-yellow.svg)](CHANGELOG.md)
 [![CI](https://github.com/Yonder-Lab/FateBridge/actions/workflows/ci.yml/badge.svg)](https://github.com/Yonder-Lab/FateBridge/actions/workflows/ci.yml)
 
-FateBridge 不是占卜 App，也不是命理 frontend，而是一个**后端能力库**。它把八字、紫微、奇门、六壬、太乙、梅花、六爻、西方占星与推运等技法，沉淀成一套统一的服务端接口，让开发者、研究者或 Agent 能够像调用普通 API 一样调用它们。
+FateBridge 是一个可在本地运行的 Python 后端能力库，把八字、紫微、传统占术、西方占星与风水规则组织成可调用、可复算、带来源的计算接口。应用通过 REST 接入，Agent 通过 MCP 调用，脚本通过 CLI 运行；当前版本为 **Beta 0.2.0**。
 
-同一套能力，通过三种形态对外提供：
+当前提供 **86 个业务 REST 路由**、**87 个 FastMCP 工具**；中央目录含 88 条记录，CLI 可执行其中87条。三端共用领域计算，名称和请求形态见 [三端能力边界](docs/api-reference.md#24-三端能力边界)。完整 **13 family / 87 工具** 清单见 [算法覆盖矩阵](docs/algorithm-coverage.md)。
 
-- **REST** —— 用 HTTP 调用，适合网页、脚本、微服务接入；
-- **MCP** —— 用 FastMCP 暴露给 Claude、Cursor、Codex 等 Agent；
-- **CLI** —— 命令行直接交互，适合本地调试与自动化脚本。
+## 从这里开始
 
-当前版本暴露 **86 个业务 REST 路由** 与 **87 个 FastMCP 工具**，三端由同一份中央目录派生；目录含 88 条记录，CLI 可执行其中 87 条。各端的名称与请求形态差异见 [API 参考](docs/api-reference.md#24-三端能力边界)。
+| 你的目标 | 入口 |
+| --- | --- |
+| 在 Codex 中直接咨询 | [Codex 使用指南](docs/codex-guide.md) |
+| 安装并发起第一次调用 | [快速入门](docs/getting-started.md) |
+| 接入应用或 Agent | [接入指南](docs/agent-guide.md) · [API 参考](docs/api-reference.md) |
+| 按问题选择工具或场景技能 | [场景路由](docs/scenario-routing.md) · [9 个 Onda 技能](skills/README.md) |
+| 修改代码、规则或文档 | [开发指南](docs/development-guide.md) · [贡献指南](CONTRIBUTING.md) |
+| 升级旧版调用或排查故障 | [迁移指南](docs/migration.md) · [故障排除](docs/troubleshooting.md) |
 
-> 当前版本为 **Beta 0.2.0**，API 仍可能微调，欢迎试用与反馈。
-
-完整的「13 family / 87 工具」算法矩阵与精度/依赖说明见 **[docs/algorithm-coverage.md](docs/algorithm-coverage.md)**。
-
-家居风水提供八宅、金锁玉关基础砂水、年度九宫飞星及版本明确的玄空运山向宅盘／兼向替星，保留逐人结果、规则来源与版本以及分层覆盖状态。住宅嵌套请求三端均可调用，CLI 使用 `--request-file`。详见 [家居风水计算与示例](docs/fengshui.md)。
-
----
-
-## 它想解决什么问题
-
-传统命理知识往往散落在不同书籍、软件和师承体系里，格式不统一，难以被现代系统复用。FateBridge 尝试做三件事：
-
-1. **统一接口**：把 87 项公开能力收敛成一致的调用方式，不用为每个技法重新对接；
-2. **离线可跑**：核心能力不依赖外部服务，本地启动即可计算；
-3. **可追溯**：成功的工具响应默认附带 `run_metadata`，知道是什么工具、什么时候、跑出了什么结果。
-
----
+完整导航和各文档职责见 [文档中心](docs/README.md)。
 
 ## 能力概览
 
-| 领域 | 示例能力 |
+| 领域 | 计算内容 |
 | --- | --- |
-| 八字命理 | 四柱、日主强弱、格局、喜用神，以及婚姻、事业、财运、健康、子女、学业、性格、六亲、正缘九大专项 |
-| 双人关系 | 八字合婚 / 合作配合度、宿曜相性 |
-| 时运流年 | 大运、流年、流月、流日、流时、节气时间轴 |
-| 中国术数独立盘 | 紫微斗数、奇门遁甲、六壬、太乙神数、金口诀 |
-| 占卜与本地技法 | 梅花易数、六爻、统摄法、参评数、河洛理数、宿占、占星骰子、三式合参 |
-| 西方占星 | 标准盘、13 扇区盘、希腊盘、果老盘、印度盘、中点盘、关系盘 |
-| 西占推运 | 太阳/月返照、行运、太阳弧、小限、主限、黄道释放、法达、十年星限等 |
-| 风水空间 | 命卦、八宅、金锁砂水、年星与玄空宅盘；布局、室内关系、材质及候选方案按已确认事实分层审查 |
+| 八字与双人关系 | 命盘，事业、财运、婚姻等九项专题，双人配合、宿曜相性 |
+| 时运与历法 | 大运、流年、流月、流日、流时、节气与农历 |
+| 中国术数与占卜 | 紫微、奇门、六壬、太乙、金口诀、梅花、六爻及本地技法 |
+| 西方占星 | 本命与流派盘、关系盘、返照、行运、主限及时主等推运 |
+| 风水空间 | 八宅、金锁基础砂水、年星、玄空历史宅盘，以及按事实分层的布局与物件审查 |
 
-更详细的算法矩阵与精度说明，请见 [`docs/algorithm-coverage.md`](docs/algorithm-coverage.md)。
-
----
+风水的输入、来源与适用范围见 [家居风水](docs/fengshui.md)；各工具精度、依赖与未覆盖项目见 [算法覆盖](docs/algorithm-coverage.md)。
 
 ## 快速开始
 
-**用 Codex 体验：** 先看 [Codex 使用指南](docs/codex-guide.md)。安装后运行 `fatebridge doctor --mcp --scenario onda-shiye` 检查接入，按返回的绝对路径命令注册；当前聊天尚未加载 MCP 时可直接使用 CLI。
-
-### 1. 安装
-
-推荐使用 [uv](https://docs.astral.sh/uv/)：
+需要 Git 和 Python 3.10+，当前 CI 覆盖 3.10–3.13。以下为 macOS / Linux 示例；Windows、pip 安装和全部配置见 [快速入门](docs/getting-started.md#安装)。
 
 ```bash
 git clone https://github.com/Yonder-Lab/FateBridge.git
 cd FateBridge
-
 uv venv --python 3.12
 source .venv/bin/activate
 uv pip install -e .
 ```
 
-没有 uv 也可以用 pip：
+### CLI：安装后直接调用
+
+CLI 不需要启动服务。以下命令使用虚构体验资料：
 
 ```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e .
+fatebridge describe bazi_birth --detail input
+fatebridge bazi_birth --birth-year 1990 --birth-month 5 --birth-day 15   --birth-hour 10 --birth-minute 30 --gender 男 --birth-place 北京   --birth-timezone Asia/Shanghai --fields bazi_birth.day_master --strict-fields
 ```
 
-安装完成后，会同时获得三个入口：
-
-- `fatebridge`（CLI）
-- `fatebridge-api`（REST 服务）
-- `fatebridge-mcp`（MCP 服务）
-
-### 2. 启动 REST 服务
-
-Agent 可先用 `/api/tools?detail=summary&family=bazi` 或 `fatebridge discover --family bazi` 查看摘要，再按工具读取完整契约。MCP host 可用 `FATEBRIDGE_MCP_FAMILIES` 缩小实际公开集合，默认仍为全部工具。三端无效投影路径会附 `projection_warnings`；严格调用可用 `strict_fields=true` / `--strict-fields` 明确拒绝。
+### REST：启动后发起请求
 
 ```bash
 API_HOST=127.0.0.1 fatebridge-api
 ```
 
-默认监听 `http://localhost:8010`。打开浏览器访问：
-
-- 交互文档：`http://localhost:8010/docs`
-- 健康检查：`http://localhost:8010/health`
-
-> 端口 `8010` 建议只作为内部服务端口，不要直接暴露在公网。
-
-### 3. 发送第一条请求
+另开一个终端执行：
 
 ```bash
-curl -X POST http://localhost:8010/api/cn/bazi/birth \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "张三", "gender": "男",
-    "birth_year": 1990, "birth_month": 5, "birth_day": 15,
-    "birth_hour": 10, "birth_minute": 30,
-    "birth_timezone": "Asia/Shanghai",
-    "birth_place": "北京",
-    "use_true_solar_time": true
-  }'
+curl http://localhost:8010/health
+curl -X POST http://localhost:8010/api/cn/bazi/birth   -H 'Content-Type: application/json'   -d '{"birth_year":1990,"birth_month":5,"birth_day":15,"birth_hour":10,
+       "birth_minute":30,"gender":"男","birth_place":"北京",
+       "birth_timezone":"Asia/Shanghai","use_true_solar_time":true}'
 ```
 
-这是推荐的独立八字命盘入口，业务字段位于 `bazi_birth`。旧版 `/api/calculate` 已移除；综合命理 `analyze_destiny` 通过 MCP / CLI 调用。若配置了 `FATEBRIDGE_API_KEYS`，请求需额外带上 `X-API-Key`。
+交互文档位于 `http://localhost:8010/docs`。独立命盘数据位于 `bazi_birth`；配置了 `FATEBRIDGE_API_KEYS` 时，业务请求还需密钥头。监听地址默认 `0.0.0.0`，本机使用以上命令限制到 `127.0.0.1`；配置与部署说明见 [快速入门](docs/getting-started.md#配置环境变量) 和 [安全策略](SECURITY.md)。
 
-### 4. 命令行用法
+### MCP：交给 host 启动
 
-```bash
-# 列出所有工具
-fatebridge list
+MCP 使用 stdio。先运行 `fatebridge doctor --mcp --scenario onda-shiye`，再按返回的绝对路径命令注册。完整 Codex 配置、虚构对话和连接检查见 [Codex 使用指南](docs/codex-guide.md)。
 
-# 查看某个工具的参数
-fatebridge describe bazi_wealth
+## 调用与结果
 
-# 直接调用
-fatebridge bazi_wealth \
-  --birth-year 1990 --birth-month 6 --birth-day 15 \
-  --birth-hour 10 --gender male
-```
+- 用 `fatebridge discover --family bazi` 或 REST `/api/tools?detail=summary&family=bazi` 筛选能力，再读取所选工具契约。已知 Schema 时可直接调用。
+- 成功结果默认带 `run_metadata`，记录工具、时间和计算口径；复现还需保存原输入与运行环境。
+- 用 `fields` 控制响应体积，`strict_fields=true` 拒绝无效路径。MCP 默认预算 8192 字符，超限后通过 `result_delivery` 读取同一次结果。
+- **需要完整 JSON 或全部时间线时，首次调用 `fields=null`**，再按 [完整结果交付](docs/agent-guide.md#完整结果交付与同次导出) 保存与校验；摘要投影无法恢复未选字段。
 
----
-
-## 给 Agent 开发者
-
-FateBridge 被设计成 Agent 友好的：
-
-- 所有工具从同一个中央目录派生，共享请求模型派生各端 schema；
-- `GET /api/tools`（或 MCP 的 `tools/list`）可以自动枚举全部能力；
-- 错误返回统一的 `{error, error_code, retryable}` 结构；
-- 输入校验错误附带安全的 `issues` 字段提示；显式非法主题和未知请求字段会被拒绝；
-- MCP 返回结构化 JSON、兼容 text JSON 与原生 `isError`；三端发现接口共享输出 schema；专业嵌套事实覆盖主限、递归时主、星盘、中国术数、八字专题、宿曜关系及知识/导出，支持投影与扩展，详见 [API 参考](docs/api-reference.md)；
-- 成功响应默认包含 `run_metadata`，便于追踪；CLI 可用 `--no-metadata` 关闭。
-
-MCP 默认响应预算为 8192 字符，超限时通过 `result_delivery` 读取同一 run 的保留结果。需要完整 JSON 或全部时间线时，首次调用设置 `fields=null`；摘要投影后保留的文件只包含所选字段。读取和校验示例见 [完整结果交付](docs/agent-guide.md#完整结果交付与同次导出)。
-
-接入示例、字段投影、快照导出等细节，请见 [`docs/agent-guide.md`](docs/agent-guide.md)。
-
----
-
-## 文档地图
-
-| 文档 | 适合谁 | 内容 |
-| --- | --- | --- |
-| [`docs/getting-started.md`](docs/getting-started.md) | 第一次使用的人 | 安装、环境变量、启动、第一条请求 |
-| [`docs/agent-guide.md`](docs/agent-guide.md) | Agent / 开发者 | 三端接入、自助发现、错误/投影/快照、host 配置、Python/JS 示例 |
-| [`docs/api-reference.md`](docs/api-reference.md) | 集成方 | REST 路由、FastMCP 工具、请求族、响应字段 |
-| [`docs/algorithm-coverage.md`](docs/algorithm-coverage.md) | 维护者、评审者 | 13 family / 87 工具算法矩阵 + 精度/依赖说明 |
-| [`docs/scenario-routing.md`](docs/scenario-routing.md) | Agent / 技能作者 | 按用户场景选主证/旁证工具的路由矩阵 |
-| [`docs/fengshui.md`](docs/fengshui.md) | 空间咨询 / 集成方 | 七个风水工具、输入边界、分层规则与专题导航 |
-| [`docs/architecture.md`](docs/architecture.md) | 开发者、架构师 | 代码分层、数据流、设计决策 |
-| [`docs/development-guide.md`](docs/development-guide.md) | 贡献者 | 开发命令、测试策略、扩展路径 |
-| [`docs/troubleshooting.md`](docs/troubleshooting.md) | 所有人 | 安装/依赖/端口/CORS/快照导出问题 |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | 贡献者 | 分支、PR 流程、提交规范 |
-| [`skills/README.md`](skills/README.md) | Onda / 场景技能开发者 | 9 个 Onda 场景技能，含独立风水咨询 |
-
-文档总入口：[docs/README.md](docs/README.md)。
-
----
-
-## 仓库结构
-
-```text
-FateBridge/
-├── src/
-│   └── fatebridge/         # 包代码（src layout：装包后才可 import）
-│       ├── api.py          # REST (FastAPI) 入口
-│       ├── mcp_server.py   # MCP (FastMCP) 入口
-│       ├── cli.py          # CLI 入口
-│       ├── application/   # 绑定、执行、发现、投影与调用凭据
-│       ├── transports/    # REST/MCP 协议注册
-│       ├── services/       # transport-facing 编排层 + 中央工具目录
-│       ├── core/           # 核心算法：历法、八字、占星、占术、导出合同
-│       ├── analysis/       # 复合分析（配合度、时运影响…）
-│       ├── data/           # 内置知识 bundle
-│       └── utils/          # 输入归一化、真太阳时、地点解析
-├── tests/
-├── docs/
-├── pyproject.toml
-└── CONTRIBUTING.md
-```
-
-各层职责详见 [`docs/architecture.md`](docs/architecture.md)。
-
----
+字段、错误与端口差异见 [API 参考](docs/api-reference.md)，Python / JavaScript 客户端例子见 [接入指南](docs/agent-guide.md)。
 
 ## 开发与验证
 
-```bash
-pytest -q
-pytest tests/test_api_alignment.py -q
+源码位于 `src/fatebridge/`；中央目录装配领域声明，REST / MCP / CLI 共用服务与算法。[架构说明](docs/architecture.md) 介绍调用链与模块职责。
 
-black --check src/fatebridge scripts tests
-isort --check-only src/fatebridge scripts tests
-mypy src/fatebridge/
+安装开发依赖后运行：
+
+```bash
+uv pip install -e ".[dev]"
+python scripts/check_docs.py
+python -m pytest -q tests/test_doc_tool_counts.py tests/test_scenario_routing_coverage.py
 ```
 
-> 测试需在装了 `.[dev]` 的 Python 3.10–3.13 环境里跑（对齐 CI 矩阵），别用系统解释器。详见 [`docs/development-guide.md`](docs/development-guide.md)。
+代码变更还需运行领域测试与 CI 对应检查，命令见 [开发指南](docs/development-guide.md)。提交方式见 [贡献指南](CONTRIBUTING.md)，版本变化见 [CHANGELOG](CHANGELOG.md)。
 
----
+## 使用范围与许可
 
-## 项目状态
+计算验证关注历法、规则与数值的一致性；传统解释及分数是文化参考，分数不代表现实成功概率。规则来源、三端一致、黄金快照和真实模型对话分别提供不同证据。
 
-计算验证关注历法、规则与数值的一致性；分数与传统解读不代表现实成功概率。独立比较、黄金快照、三端合同和真实 Agent 对话属于不同证据，精度与性能限制见 [算法覆盖](docs/algorithm-coverage.md#5-这页不包含什么)。
+核心星盘支持本地星历与近似路径，应检查实际返回的 `chart_profile.ephemeris_model` 和 `run_metadata.engine_is_approximate`；西占推运、事件与生命周期工具缺少后端依赖时明确报错。项目包含后端、CLI 与技能资料，前端与部署控制由接入方提供。
 
-- 当前为 **Beta 0.2.0**，API 在到达 1.0 之前仍可能调整；
-- 本仓库**不含前端界面**，接 UI 需要自行对接 REST 或 MCP；
-- 核心占星盘支持本地星历与离线近似路径，实际模型需检查 `chart_profile.ephemeris_model` 和 `run_metadata.engine_is_approximate`；
-- 西占推运 / 事件 / 寿命能力依赖 `kerykeion` / Swiss Ephemeris，缺失时会明确报错，不会静默降级。
-
-完整变更记录见 [`CHANGELOG.md`](CHANGELOG.md)。
-
----
-
-## 参与贡献
-
-欢迎提交 Issue 与 Pull Request。开发环境搭建、编码规范与提交流程，请见 [`CONTRIBUTING.md`](CONTRIBUTING.md) 与 [`docs/development-guide.md`](docs/development-guide.md)。
-
----
-
-## 许可证
-
-本仓库代码采用 [Apache-2.0](LICENSE)，第三方组件说明见 [NOTICE](NOTICE)。星历数据需单独获取，安装与运行边界见 [快速入门](docs/getting-started.md#星历数据与精度)。
+代码采用 [Apache-2.0](LICENSE)，第三方组件见 [NOTICE](NOTICE)；星历数据单独获取，见 [星历数据与精度](docs/getting-started.md#星历数据与精度)。

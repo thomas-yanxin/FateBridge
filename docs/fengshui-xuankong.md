@@ -6,11 +6,11 @@
 
 规则来源、选版差异、二十四山和替星表统一维护在 [skill 的历史宅盘参考](../skills/onda-fengshui/references/xuankong.md)。
 
-生产规则为离线 [xuankong-v1.json](../src/fatebridge/data/fengshui/xuankong-v1.json)，原有第一阶段规则文件和版本保持不变。规则语义变化须另建版本及独立样本；1.0.1 修复既定角区的浮点实现与不确定输入处理，五黄和替星表未改。
+生产规则为离线 [xuankong-v1.json](../src/fatebridge/data/fengshui/xuankong-v1.json)，与基础规则数据及其版本分别维护。规则语义变化须另建版本及独立样本；1.0.1 修复既定角区的浮点实现与不确定输入处理，五黄和替星表未改。
 
 ## 三端调用
 
-可复制 [独立宅盘请求](examples/fengshui-xuankong.json) 和 [基础三法＋宅盘＋年星合参](examples/fengshui-xuankong-with-annual.json)。
+示例按用途汇总于[请求索引](examples/README.md)。可复制 [独立宅盘请求](examples/fengshui-xuankong.json) 和 [基础三法＋宅盘＋年星合参](examples/fengshui-xuankong-with-annual.json)。
 
 ```json
 {
@@ -37,7 +37,7 @@ fatebridge describe fengshui_xuankong_natal
 
 MCP `fengshui_xuankong_natal` 的参数就是上面 JSON 对象。认证设置与其他REST端点一致；工具目录、发现接口、JSON输出schema、错误、字段投影和运行元数据均来自共用目录。CLI也支持 `--house '{...}' --period '{...}'`；请求文件保留未知字段供模型拒绝，不静默删除。
 
-聚合需显式选择 `methods` 中的 `xuankong_natal`，并传 `xuankong` 请求；默认仍是基础三法。内层未提供 `house` 时继承顶层住宅；同时提供时必须一致。年星继续用顶层 `effective_year` 或 `query_at`；宅盘只用 `xuankong.period`，两者不互相补默认值。
+聚合需显式选择 `methods` 中的 `xuankong_natal`，并传 `xuankong` 请求。自动选法按场景与已知事实处理，不能假定每次都运行基础三法；详见[场景兼容与归一化](fengshui.md#场景兼容与归一化)。内层未提供 `house` 时继承顶层住宅；同时提供时必须一致。年星继续用顶层 `effective_year` 或 `query_at`；宅盘只用 `xuankong.period`，两者不互相补默认值。
 
 ## 定运校验与角区实现
 
@@ -53,7 +53,7 @@ MCP `fengshui_xuankong_natal` 的参数就是上面 JSON 对象。认证设置�
 
 聚合年星仅出现在 `layers.annual_stars.palaces.*.annual_star_number`。住宅星与年度星不加总，当前九运不覆盖历史八运，未提供观察形势不产生综合吉凶。快照“玄空宅盘”和“年度飞星”是两个章节，导出注册表也分别识别。
 
-本阶段不包含其他门派替卦策略、玄空大卦、城门、七星打劫、自动立极／纳气定向、月日时盘或峦头裁决。完整运山向数字盘不等于完整住宅勘察断法。
+当前版本不包含其他门派替卦策略、玄空大卦、城门、七星打劫、自动立极／纳气定向、月日时盘或峦头裁决。完整运山向数字盘不等于完整住宅勘察断法。
 
 ## 独立验证与复现
 

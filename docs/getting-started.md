@@ -1,6 +1,6 @@
 # FateBridge 快速入门
 
-本页负责安装、运行配置和首次调用。工具字段与各端差异查 [API 参考](api-reference.md)，精度边界查 [算法覆盖](algorithm-coverage.md)。
+本页负责安装、运行配置和首次调用。所有人物请求均为虚构示例。工具字段与各端差异查 [API 参考](api-reference.md)，精度边界查 [算法覆盖](algorithm-coverage.md)。
 
 ## 安装
 
@@ -33,6 +33,24 @@ fatebridge describe bazi_birth
 ```
 
 安装入口为 `fatebridge`、`fatebridge-api` 和 `fatebridge-mcp`。`pyswisseph` / `kerykeion` 都是常规依赖；FateBridge 的规则、知识与场景 JSON 随包安装，外部星历文件不随 FateBridge wheel 分发，见下文。
+
+## 选择运行方式
+
+| 方式 | 是否要常驻进程 | 下一步 |
+| --- | --- | --- |
+| CLI | 否，命令执行后退出 | 直接运行下面的虚构示例 |
+| REST | 是，由你启动 HTTP 服务 | [配置](#配置环境变量)后[启动 REST](#启动-rest-并检查状态) |
+| MCP | 是，由 host 启动 stdio 子进程 | [MCP 与 CLI](#mcp-与-cli)；Codex 用户看[注册步骤](codex-guide.md#2-注册到-codex) |
+
+CLI 可直接调用，不需要启动 REST：
+
+```bash
+fatebridge bazi_birth --birth-year 1990 --birth-month 5 --birth-day 15 \
+  --birth-hour 10 --birth-minute 30 --gender 男 --birth-place 北京 \
+  --birth-timezone Asia/Shanghai --fields bazi_birth.day_master --strict-fields
+```
+
+结果包含所选的 `bazi_birth.day_master` 与 `run_metadata`。CLI 不自动读取 `.env`，不需要配置 REST 密钥；如果已有进程环境配置，仍会按实际设置运行。
 
 ## 配置环境变量
 
@@ -150,13 +168,5 @@ fatebridge-mcp
 ```
 
 host 应使用已安装 FateBridge 的虚拟环境解释器绝对路径。配置结构见 [接入指南](agent-guide.md#fastmcpagent-host)。
-
-CLI 可直接调用，不需要启动 REST：
-
-```bash
-fatebridge bazi_birth --birth-year 1990 --birth-month 5 --birth-day 15 \
-  --birth-hour 10 --birth-minute 30 --gender 男 --birth-place 北京 \
-  --birth-timezone Asia/Shanghai --fields bazi_birth.day_master
-```
 
 MCP 默认响应预算为 8192 字符，超限时返回 `result_delivery`；需要全文时读取同一次结果。完整 JSON 首次调用不做字段筛选，文件导出方法见 [完整结果交付](agent-guide.md#完整结果交付与同次导出)。三端投影、错误和快照规则查 [API 参考](api-reference.md)。出错时查看 [故障排除](troubleshooting.md)。

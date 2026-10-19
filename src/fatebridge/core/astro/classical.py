@@ -193,9 +193,9 @@ def _build_classical_layer(
 ) -> Dict[str, Any]:
     """Hellenistic/medieval condition layer — the chart's ``classical`` block.
 
-    Phase 1 (per-planet essential + accidental status) + Phase 2 (dispositor
-    chains 主宰星链 + per-house topic almutens). See
-    ``docs/superpowers/specs/2026-06-21-astro-classical-depth-design.md``.
+    Builds planetary conditions, dispositor chains, house almutens, lots,
+    prenatal syzygy, Almuten Figuris and temperament. Public coverage and
+    precision boundaries are documented in ``docs/algorithm-coverage.md``.
     Imported lazily so optional classical layers load only when requested.
     """
     from fatebridge.core.classical_western import (
@@ -307,7 +307,7 @@ def _build_classical_patterns(
     states: Optional[Dict[str, Dict[str, float]]] = None,
 ) -> Dict[str, Any]:
     """The chart's ``classical_patterns`` block — [古典格局] relational layer
-    (Phase 4 + 4b). ``states`` carries per-planet speed for translation/
+    ``states`` carries per-planet speed for translation/
     collection of light; the North Node longitude drives nodal bending. Classical rules
     share tables through astrology_tables."""
     from fatebridge.core.classical_western import build_classical_patterns

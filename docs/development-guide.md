@@ -212,11 +212,23 @@ mypy src/fatebridge/
 
 ## 文档维护与验证
 
-文档职责分开：README 提供定位与最短示例；快速入门维护安装和配置；API 参考维护字段、错误与端口差异；算法矩阵维护精度与能力状态；架构说明维护实际调用链；场景/技能说明维护路由和解读流程。审计记录是特定工作区的历史证据，不替代当前接口文档。
+文档按读者任务组织；生成契约、规则资料和实际运行结果分别承担不同职责。修改前先定位信源，再更新依赖它的说明，避免同一个默认值分散维护。
 
-只改文档时先运行现有合同与示例检查，不需要为措辞变化补测试：
+| 变更内容 | 权威信源 | 需要同步的文档 / 生成物 |
+| --- | --- | --- |
+| 安装、版本、入口与运行配置 | `pyproject.toml`、`__init__.py`、`utils/runtime.py`、`.env.example`、入口模块 | 快速入门；README 仅保留最短示例；安全配置还查 `SECURITY.md` |
+| 工具、字段、端口名称、公开数量 | `services/catalog/`、请求 / 响应模型、协议注册器、实时发现记录 | API 参考、算法矩阵；受影响的 README、接入例子和技能 |
+| 选法、首轮字段、解读与来源 | 场景 `SKILL.md`、`agents/interface.yaml`、共享字段及规则数据 | 场景路由、技能资料；重建场景 manifest / 调用合同 |
+| 模块职责和数据流 | 实际导入、绑定与执行代码 | 架构说明；已删除入口集中记录到迁移指南 |
+| CI、打包与发布 | `.github/workflows/`、`pyproject.toml` | 本页与贡献指南；真实结果另行报告 |
+| 可运行请求 | 当前请求模型和实际三端调用 | `docs/examples/` JSON 与示例索引；仅用虚构资料 |
+
+### 检查命令与覆盖范围
+
+只改文档时运行以下检查，不需要为措辞变化补业务测试：
 
 ```bash
+python scripts/check_docs.py
 python -m pytest -q tests/test_doc_tool_counts.py tests/test_scenario_routing_coverage.py \
   tests/test_skills_interface_contract.py tests/test_skills_engine_contract.py \
   tests/test_codex_call_contracts.py
@@ -225,7 +237,9 @@ python scripts/build_codex_call_contracts.py --check
 git diff --check
 ```
 
-`test_skills_engine_contract.py` 会实际执行具体 CLI 示例，通过 `shlex` 拆分参数并绑定测试进程的 `sys.executable`，确保使用已安装本仓库的解释器。手工运行文档命令仍须激活对应环境。修改 Markdown 后还要检查本地链接、章节锚点、代码围栏和示例 JSON；上述测试不覆盖所有 prose 或所有链接。
+`check_docs.py` 只使用标准库，检查根目录、`docs/`（排除本地 `reviews/`）与 `skills/` 的 Markdown 内联链接、本地标题锚点、代码围栏、JSON 代码块及示例 JSON 语法。它不访问外网，不执行代码块，也不证明自然语言或接口参数正确；外部来源保留版本，按受影响内容另行核对。CI 对每个 Python 版本执行该检查。
+
+现有文档测试把计数、路由覆盖、技能与生成合同关联到实时目录；`test_skills_engine_contract.py` 还会实际执行 CLI 示例，绑定测试进程解释器。修改可运行请求时，按[示例索引](examples/README.md)选择对应工具，验证模型与实际结果；结构校验成功不能替代三端或真实模型体验。
 
 `AGENTS.md` 的 `codex-call-contracts` 区块由 `scripts/build_codex_call_contracts.py` 从实际 MCP 输入 Schema 和共享首轮字段生成，不能手改生成区。接口或首轮字段变化后先运行生成器，再用 `--check` 核对。场景矩阵或技能接口变化后同样重新生成 `data/agent_scenarios.json`，其中包含源文件散列，纯文案变更也可能需要同步生成物。
 
@@ -233,13 +247,9 @@ git diff --check
 
 ### 最低同步面
 
-如果你改了接口或能力范围，至少同步更新：
+接口或能力范围变化至少检查 README、API 参考和算法覆盖矩阵；涉及路由或技能再检查场景源及生成物。结构变化更新架构说明，删除支持的入口更新迁移指南。非生成源页面的导航或措辞调整通常无需改生成数据；生成器 `--check` 报告源文件散列变化时，重新生成后审查差异。
 
-- `README.md`
-- `docs/api-reference.md`
-- `docs/algorithm-coverage.md`
-
-如果改了结构性设计，再补 `docs/architecture.md`。
+当前维护文档与具体实现应相互指向；历史审计只作为特定版本证据。一轮修改的测试数量、临时回执与工作区路径写在验收报告中，不作为长期能力承诺。
 
 ## CI、打包与发布
 

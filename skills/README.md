@@ -24,28 +24,7 @@ FateBridge 引擎里有 80 多个命理、占术和占星工具。这个目录�
 
 ---
 
-## 按场景找入口
-
-不用先学术数，带着你的问题直接进：
-
-- **感情、姻缘、桃花、合不合、正缘何时到** → [`onda-yuanfen`](./onda-yuanfen/SKILL.md)  
-  调八字婚姻/正缘桃花、双人合婚、紫微夫妻宫、关系星盘。
-- **事业、财运、跳槽、创业、合伙** → [`onda-shiye`](./onda-shiye/SKILL.md)  
-  调八字事业/财运、合作配合度、时运。
-- **健康倾向、身心节奏、调理方向** → [`onda-jiankang`](./onda-jiankang/SKILL.md)  
-  解释八字健康文化标签及所选时段的传统参考，不用来判断疾病或身体弱点。
-- **今年运势、大运流年、人生转折、择时** → [`onda-shiyun`](./onda-shiyun/SKILL.md)  
-  调时运全系、节气农历、西占推运全套。
-- **卡在一个决定、要不要做某事、求一卦** → [`onda-zhanbu`](./onda-zhanbu/SKILL.md)  
-  调梅花/六爻/奇门/六壬/金口/太乙/宿占/三式。
-- **我是谁、性格天赋、学业、家人、孩子** → [`onda-mingge`](./onda-mingge/SKILL.md)  
-  调八字性格/学业/子女/六亲、命盘综合、紫微。
-- **占星、出生盘、合盘、各流派星盘** → [`onda-xingpan`](./onda-xingpan/SKILL.md)  
-  调标准/希腊/果老/印度/13 扇区盘、关系盘。
-- **我是一个什么样的人、全面自我分析** → [`onda-zige`](./onda-zige/SKILL.md)  
-  八字+紫微+西占三套交叉印证，按主证、旁证与用户需求组织结果，避免重复调用。
-- **住宅、办公室、工位风水、物件摆法、宅向与年星** → [`onda-fengshui`](./onda-fengshui/SKILL.md)
-  核对现场、使用人及行动限制，调用风水工具，按来源与版本给具体布局方案；无需先提供完整生辰。
+## 发现与调用范围
 
 个人命理工具按 8 个场景组织，独立风水咨询通过第 9 个 `onda-fengshui` 场景调用 `fengshui_*` 工具；住宅输入与分层合同见 [家居风水](../docs/fengshui.md)。当前 REST 公开 86 个工具，MCP 公开 87 个工具，各端绑定差异见 [API 参考](../docs/api-reference.md#24-三端能力边界)，完整工具地图见 [`_shared/fatebridge-engine.md`](./_shared/fatebridge-engine.md)。
 
@@ -71,17 +50,17 @@ skills/
 ├── onda-mingge/               认识自己 · 性格天赋
 ├── onda-xingpan/              星盘 · 占星自观
 ├── onda-zige/                 全面自我画像 · 三套交叉印证
-└── onda-fengshui/             风水 · 空间布局（另含 references/ 与 agents/openai.yaml）
-                               （每个 onda-* 都含 SKILL.md + agents/interface.yaml）
+└── onda-fengshui/             风水 · 空间布局（另含 references/）
+                               （每个 onda-* 都含 SKILL.md、agents/interface.yaml 与 agents/openai.yaml）
 ```
 
 每个场景 Skill 有两份契约。`SKILL.md` 说明问题路由、证据读法和交付方式；`agents/interface.yaml` 给 agent 运行时读，声明场景触发词、引擎工具、输入和输出。计算和声音共用 `_shared/`，复杂场景的交付参考按需加载。
 
-这两份描述都被 `tests/test_skills_interface_contract.py` 锁到引擎 catalog 和 SKILL.md 上。任一方对不上，CI 就挂。
+`tests/test_skills_interface_contract.py` 核对接口声明与引擎目录、SKILL.md 的一致性；`test_skills_engine_contract.py` 验证实际调用示例。静态合同与真实多轮对话质量分别验收。
 
 九个场景都有 Codex 原生 `agents/openai.yaml`，允许自动选择，也可显式输入 `$onda-shiye`、`$onda-yuanfen` 等技能名。仓库 `.agents/skills/onda-*` 是指向本目录各技能的发现入口，维护源仍为 `skills/`；引用依赖随仓库保留，不只复制单个 SKILL.md。新 Codex 会话扫描项目技能，已有会话可能需要重新加载。MCP 可按 `FATEBRIDGE_MCP_SCENARIOS=onda-fengshui` 等场景名限制公开工具；这与技能发现是两个入口。
 
-咨询按当前聊天已确认资料核对所选计算的缺项，首轮使用已验证字段、严格投影并关闭快照，通常先给要点、2–3 条依据及一项现实建议。详细分析与完整审查按请求展开，分数、传统规则和现实建议分别说明。
+咨询按当前聊天已确认资料核对所选计算的缺项，普通首轮使用已验证字段、严格投影并关闭快照，通常先给要点、2–3 条依据及一项现实建议。完整 JSON 或文件请求首次保留 `fields=null` 与所需快照，按[同次导出](../docs/agent-guide.md#完整结果交付与同次导出)交付。详细分析与完整审查按请求展开，分数、传统规则和现实建议分别说明。
 
 ---
 
@@ -98,7 +77,7 @@ python3 -m fatebridge.cli list
 python3 -m fatebridge.cli describe <tool>
 ```
 
-如果改了某个 skill 的工具或输入，记得同步更新它的 `agents/interface.yaml`。`engine_tools` 必须与 SKILL.md 里反引号引用的工具完全一致，否则 `tests/test_skills_interface_contract.py` 会失败。
+如果改了某个 skill 的工具或输入，记得同步更新它的 `agents/interface.yaml`，并按[文档维护流程](../docs/development-guide.md#文档维护与验证)重新生成场景 manifest。`engine_tools` 必须与 SKILL.md 里反引号引用的工具完全一致，否则 `tests/test_skills_interface_contract.py` 会失败。
 
 ---
 

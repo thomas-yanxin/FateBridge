@@ -18,7 +18,16 @@ FateBridge 的领域能力通过三条通道暴露出来：
 
 ## 自助发现：别硬编码工具列表
 
-FateBridge 设计成可被机器自描述。先按分类读取摘要，再为选中的工具获取完整契约；工具列表来自中央目录。
+工具列表来自中央目录。按当前缺口选择发现深度，避免每次调用重复读取全量 Schema：
+
+| 当前已有信息 | 下一步 |
+| --- | --- |
+| 工具已公开，输入 Schema 与用途明确 | 直接调用；解释同一结果无需重新发现或计算 |
+| 知道用户场景，尚未确定主证 | 读场景路由或 family 摘要，再取选中工具契约 |
+| 已确定工具，仅缺参数定义 | REST 单工具记录、CLI `describe --detail input` 或 MCP `fatebridge://tools/{tool}/input` |
+| 需要更细输出字段 | 单工具完整契约；不要展开无关候选 |
+
+场景发现使用 REST `/api/scenarios?detail=summary`、CLI `fatebridge scenarios` 或 MCP `fatebridge://scenarios`；`discover --scenario onda-shiye` 可缩小候选。替代工具组不要求全部调用，路由不是自动执行计划。
 
 ### REST：`GET /api/tools`
 
@@ -37,10 +46,10 @@ curl 'http://localhost:8010/api/tools?tool=bazi_birth&detail=full'
   "tools": [
     {
       "tool": "bazi_wealth",
-      "summary": "八字财运分析（可传 dayun_pillar / liunian_pillar 输出时机信号）",
+      "summary": "八字财运分析：已按出生资料与分析日期自动推算大运、流年和时机依据；首轮无需先调用 timing_analysis 或手动传大运柱。仅有明确外部口径时用 dayun_pillar / liunian_pillar 覆盖。",
       "operation_label_zh": "八字财运分析",
       "family": "bazi",
-      "surfaces": {"cli": true, "rest_path": "/api/cn/bazi/wealth", "mcp_name": "bazi_wealth"},
+      "surfaces": {"cli": true, "cli_name": "bazi_wealth", "rest_path": "/api/cn/bazi/wealth", "mcp_name": "bazi_wealth"},
       "parameters": [
         {"name": "birth_year", "type": "int", "required": true, "description": "..."}
       ]
@@ -69,7 +78,7 @@ fatebridge list --family astro --json # 文本 list 可按需改为 JSON 摘要
 
 MCP 默认通过标准 `tools/list` 公开全部工具。host 可设置 `FATEBRIDGE_MCP_FAMILIES=bazi,knowledge` 只注册所需分类，拼错分类会在启动时失败。通过 `resources/read` 读取 `fatebridge://catalog/summary`、`fatebridge://families/bazi` 和 `fatebridge://tools/bazi_birth`，可获得当前公开集合的摘要及单工具完整契约。资源错误属于资源协议错误，工具失败仍使用 `isError`。
 
-> 推荐做法：先读取所需 family 的摘要，再获取选中工具的完整契约；MCP host 可预先配置分类以减少首次 tools/list 体积。工具增删不必修改 Agent 的硬编码清单。
+`FATEBRIDGE_MCP_SCENARIOS` 可按场景筛选，与 family 配置取交集；隐藏工具不可调用，场景 `availability` 明示缺口。配置与发现参数见 [渐进发现](api-reference.md#27-渐进发现与执行提示)。
 
 ---
 
@@ -100,8 +109,6 @@ MCP 模型/业务失败使用原生 `isError=true`。FastMCP 客户端默认抛�
 不要依赖拼错的字段或主题被忽略：未知字段和非法主题现在会失败，省略可选字段仍使用声明默认值。输出 Schema 覆盖根字段与稳定的专业嵌套事实，包括主限命中、递归子限、宫位与星曜条目、九类八字专题、宿曜双向关系，以及知识来源/覆盖信息和导出设置/分段；动态键及未声明扩展保留。业务字段可选且可空，消费时检查存在性；投影支持对象路径，数组仍整字段选择。先按 `isError` / HTTP 状态 / CLI 退出码判定成功，再按输出 Schema 消费业务数据。需要专业字段时用 `describe` / 单工具资源读取合同；完整 MCP schema 的体积更大，场景 profile 与摘要发现仍是分步发现入口。
 
 ### `run_metadata` 溯源层
-
-先用 REST `/api/scenarios?detail=summary`、CLI `fatebridge scenarios` 或 MCP `fatebridge://scenarios` 发现场景，再按 ID 读取完整路由。`discover --scenario onda-jiankang` 可缩小候选工具；替代组不要求全部调用，缺失主证时应说明能力缺口。
 
 保存原始请求与完整 receipt，将 `replay.overrides` 合并至原输入，使用 `replay.as_of` 作为 REST 查询 / MCP as_of / CLI --as-of，核对输入与业务输出摘要。随机六爻必须采用本次 seed；仅工具名或 run_id 无法重放。跨工具使用同一 trace_id，parent_run_id 引用前次 run_id；CLI profile 自动建立根/子关联。详见 [API 复现契约](api-reference.md#28-确定性与复现元数据)。
 
@@ -355,14 +362,24 @@ fatebridge profile --systems bazi,ziwei,astro \
 
 ## Agent 接入建议
 
-1. 发现：先获取 family 摘要，再读取选中工具的完整契约；MCP 可预设分类以缩小实际工具集。
+1. 发现：已知 Schema 且工具公开时直接调用；有缺口时按场景 / family 获取摘要或单工具契约。
 2. 路由：按用户意图选 family，例如八字走 `bazi`、运势走 `timing`、星盘走 `astro`、术数走 `metaphysics` / `divination`。场景级取舍（谁主谁次、怎么省 token、怎么避免结论打架）见 [scenario-routing.md](scenario-routing.md)。
-3. 取数：传齐出生信息并明确时区、坐标和太阳时策略；复现时同时固定分析日期。
-4. 裁剪：用 `fields` / `--fields` 或 `selected_sections` 控制 token。
+3. 取数：只核对所选计算真正需要的资料；出生时刻未知时不能猜。复现时保存时区、坐标来源、太阳时策略和分析日期。
+4. 裁剪：摘要用严格 `fields` 与快照开关；完整导出首次保留全文，`selected_sections` 仅控制所支持工具的导出文本。
 5. 判错：始终基于 `error_code` 分支；`dependency_missing` 说明环境缺西占 backend，不是入参问题。
 6. 溯源：保存原输入、run_metadata、replay overrides 与精度字段；固定 as_of 和环境后重新调用可核对业务结果。服务不按 run_id 查询或自动重放历史。
 
 ---
+
+## 家居风水接入
+
+七个 `fengshui_*` 工具由同一目录发布 REST、MCP 和 CLI。独立命卦／年盘可用简单字段，组合住宅请求使用 JSON；CLI 提供 `--request-file`，文件里的未知字段也会校验。`layers` 保留八宅宅盘／逐人命盘、砂水观察和年度盘；每层带版本与来源，`coverage` 区分缺失、未请求和未实现层。`partial` 是可用的部分结果，不能按计算失败重试；也不能把候选命卦或三层叠加改写成一个总分。复制调用示例见 [家居风水](fengshui.md)。
+
+问布局是否要改时使用通用 `fengshui_assess` 并设 `analyze_layout=true`，将已确认对象位置／朝向放入 `placements`。只知道朝向可省略位置并取部分计算；不得把朝向替代落宫。`layout_analysis` 返回跨层位置关联、按作用域反算的匹配方位、砂水调整分类与五行关系；其状态与原始盘分开。命卦可传 `birth_date`，非立春当日不强制出生时刻。所有风水工具描述均提供首轮字段；已知合同直接调用，缺定义时按工具名检索一次。
+
+室内入口可见性、直线、实体背靠使用 `form_observations`，可 `methods=[]` 独立算，不先索取生辰/宅向。照片仅作待确认假设，1.5米等数字不套吉凶阈值。问物件时用 `element_adjustments` 绑定实际计算目标与作用域；作者代表物只作为有条件选项，不推缺五行或要求购物。年度方案显式选 `pang_2026_annual_v1`，只覆盖2026年南5/西北2，不外推年份。物件方案还应解释 `cross_scope_effects` 和作者分歧，不能宣称一件物品对所有层都有利。完整峦头、距离阈值、物件效果大小保持未实现。
+
+玄空宅盘须显式调用 `fengshui_xuankong_natal` 或合参选择 `xuankong_natal`。宅盘按历史资料定运并记录事件依据、版本及来源，年度 `current_period` 不能当作宅运。兼向按本版本中州派规则，角度分界候选保持 `partial`，不自行裁成唯一盘。输入例子与独立验证见 [玄空宅盘](fengshui-xuankong.md)。
 
 ## 相关文档
 
@@ -371,13 +388,3 @@ fatebridge profile --systems bazi,ziwei,astro \
 - [scenario-routing.md](scenario-routing.md)：场景到工具的路由矩阵、调用纪律、交叉印证与去重策略
 - [getting-started.md](getting-started.md)：从零启动服务
 - [troubleshooting.md](troubleshooting.md)：依赖缺失、精度、快照导出等常见问题
-
-## 家居风水接入
-
-七个 `fengshui_*` 工具由同一目录发布 REST、MCP 和 CLI。独立命卦／年盘可用简单字段，组合住宅请求使用 JSON；CLI 提供 `--request-file`，文件里的未知字段也会校验。`layers` 保留八宅宅盘／逐人命盘、砂水观察和年度盘；每层带版本与来源，`coverage` 区分缺失、未请求和未实现层。`partial` 是可用的部分结果，不能按计算失败重试；也不能把候选命卦或三层叠加改写成一个总分。复制调用示例见 [家居风水](fengshui.md)。
-
-问布局是否要改时使用通用 `fengshui_assess` 并设 `analyze_layout=true`，将已确认对象位置／朝向放入 `placements`。只知道朝向可省略位置并取部分计算；不得把朝向替代落宫。`layout_analysis` 返回跨层位置关联、按作用域反算的匹配方位、砂水调整分类与五行关系；其状态与原始盘分开。命卦可传 `birth_date`，非立春当日不强制出生时刻。所有风水工具描述均提供首轮字段，按工具名检索一次后直接调用。
-
-室内入口可见性、直线、实体背靠使用 `form_observations`，可 `methods=[]` 独立算，不先索取生辰/宅向。照片仅作待确认假设，1.5米等数字不套吉凶阈值。问物件时用 `element_adjustments` 绑定实际计算目标与作用域；作者代表物只作为有条件选项，不推缺五行或要求购物。年度方案显式选 `pang_2026_annual_v1`，只覆盖2026年南5/西北2，不外推年份。物件方案还应解释 `cross_scope_effects` 和作者分歧，不能宣称一件物品对所有层都有利。完整峦头、距离阈值、物件效果大小保持未实现。
-
-玄空宅盘须显式调用 `fengshui_xuankong_natal` 或合参选择 `xuankong_natal`。宅盘按历史资料定运并记录事件依据、版本及来源，年度 `current_period` 不能当作宅运。兼向按本版本中州派规则，角度分界候选保持 `partial`，不自行裁成唯一盘。输入例子与独立验证见 [玄空宅盘](fengshui-xuankong.md)。

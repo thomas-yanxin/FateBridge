@@ -47,7 +47,7 @@ mypy src/fatebridge/
 git diff --check
 ```
 
-纯文档变更可先运行 [文档合同与示例检查](docs/development-guide.md#文档维护与验证)，再检查链接和代码围栏。报告实际测试结果与跳过项，不将本地通过写成 CI 已通过。
+纯文档变更运行 `python scripts/check_docs.py` 与[文档合同和示例检查](docs/development-guide.md#文档维护与验证)；修改生成源后重新生成并检查派生文件。报告实际测试结果与跳过项，不将本地通过写成 CI 已通过。
 
 版本与数据打包变更还需检查 `pyproject.toml`、版本常量、CHANGELOG 和 wheel 的数据文件；发布流程见 [开发指南](docs/development-guide.md#ci打包与发布)。
 

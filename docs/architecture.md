@@ -108,23 +108,18 @@ Swiss Ephemeris 存在共享 C 状态。直接调用与会修改目录的第三�
 
 ## 内聚与依赖边界
 
-依赖按实际职责组织：入口和协议适配器调用应用层，应用层调用领域服务，领域服务调用 `core`、`analysis` 与共享工具。`services/tool_catalog.py` 是装配入口，声明哪些服务绑定哪些工具，因此依赖应用层的 `ToolSpec` 与绑定工厂是合理的；普通领域服务不依赖协议适配器。
+入口和协议适配器调用应用层，应用层调用领域服务，领域服务调用 `core`、`analysis` 与公共工具。`services/tool_catalog.py` 是装配入口，可以依赖应用层的 `ToolSpec` 与绑定工厂；普通领域服务不依赖协议适配器。`application` 不导入 FastAPI / FastMCP，动态协议签名由 `transports` 生成。
 
-旧 `core/tool_spec.py`、`core/discovery.py`、`core/scenarios.py` 已删除。调用方直接依赖 `application` 与 `transports` 的定义模块。`application` 不导入 FastAPI/FastMCP；动态协议签名在 `transports` 中生成，仍保留真实类型注解。
+| 关注点 | 当前模块与维护规则 |
+| --- | --- |
+| 出生公共计算 | `services/birth_context.py` 复用归一化、四柱与历法；`birth_payload.py` 构造公共命盘响应 |
+| 时运与日历 | `services/timing.py` 编排时运，`timing_state.py` 计算各层状态，`timing_snapshots.py` 组织文本；日历查询用 `calendar_tools.py` / `calendar_input.py` |
+| 星盘 | `core/astro/` 按出生、几何、星历、宫位、盘面与关系盘拆分；公共星座、庙旺和界表位于 `core/astrology_tables.py` |
+| 请求模型 | `core/requests/base.py` 管理未知字段和日期校验；`birth.py` 管理出生基类，领域模块直接导入所需类型 |
+| 工具声明 | `services/catalog/` 各领域拥有 `SPECS`、绑定和延迟服务代理；不反向导入中央装配器或提前加载计算引擎 |
+| 输入与展示 | `utils/birth_input.py`、`solar_time.py`、`formatting.py`、`analysis_clock.py`、`elements.py` 各自承担单一公共职责 |
 
-出生计算上下文集中在 `services/birth_context.py`，让八字、时运与配合度服务复用同一份归一化、四柱、历法和元素计算。`core/astrology_tables.py` 管理共用星座、庙旺与埃及界表，星盘、古典规则和推运共享这些值，古典规则不再为了取常量加载推运后端。
-
-星盘实现位于 `core/astro/`：`birth.py` 构造出生信息；`geometry.py`、`orbits.py` 管理角度与近似轨道；`ephemeris.py`、`layout.py` 组织星历位置和宫位；`parts.py`、`aspects.py`、`classical.py` 构造盘面组成；`chart.py` 组装本命/变体盘；`relationship_charts.py` 构造各关系盘，`relationship.py` 组织模式、焦点和最终响应。`profiles.py` 负责宫制/黄道选项与精度来源，`reference.py` 保存引擎配置表。`runtime.py` 统一星盘的后端可用性和故障日志状态，仍复用 `core/ephemeris_runtime.py` 的调用锁与路径保护。旧 `core/astrology.py` 已删除，消费者直接依赖定义模块。
-
-时运用例保留在 `services/timing.py`，复用 `timing_state.py` 的各时间层状态、五维评分和时间线补全；`timing_snapshots.py` 只根据传入的数据组织文本。节气与农历查询由 `calendar_tools.py` 编排，日历专用解析由 `calendar_input.py` 承担。命盘公共响应由 `birth_payload.py::build_destiny_payload` 构造，八字、综合分析和配合度共同调用它。时运和 calculation 的历史私有别名已删除，调用方直接使用共享定义模块。
-
-`core/requests/base.py` 保留禁止未知字段、延迟 Schema 编译和真实公历日期校验；`birth.py` 保留中式与西式出生基类。其他模型按八字、配合度、时运、日历、占卜、术数、查询/导出、星盘和西占技法划分，各模块直接导入所需基类和嵌套类型。类体、继承、字段顺序、别名和默认值沿用原实现。
-
-`services/catalog` 的领域模块拥有声明、相应绑定与延迟服务代理，星盘特殊绑定放在 `astro_bindings.py`。领域模块不导入中央装配器或真实计算服务；`tool_catalog.py` 按历史顺序汇总领域 `SPECS`，统一附加输出合同和重现策略，然后供各端筛选。每个工具只声明一次；装配器不再重导出领域绑定或服务代理。
-
-旧 `utils/helpers.py` 已删除。`birth_input` 负责输入校验与出生民用时刻，`solar_time` 负责太阳钟和地点/时区来源，`formatting` 负责四柱表示及 JSON/错误/日期展示，`analysis_clock` 复用共享分析时钟，`elements` 提供五行关系说明。各计算层直接依赖相应模块。
-
-`tests/test_architecture_boundaries.py` 检查核心/分析/工具层不得依赖应用编排和协议层、应用与服务不得依赖协议适配器或旧兼容入口，并检查包含函数内导入的全限定静态导入图无循环。旧模块不得重新出现或被内部导入；该检查不分析动态 `importlib` 调用或第三方库内部依赖。
+`tests/test_architecture_boundaries.py` 检查核心/分析/工具层不依赖应用与协议层、应用与服务不依赖协议适配器或旧兼容入口，并核对含函数内导入的静态导入图无循环。它不分析动态 `importlib` 调用或第三方库内部依赖。
 
 ## 运行配置与边界
 
@@ -142,23 +137,4 @@ REST 默认监听 `0.0.0.0:8010`，可选 API Key 鉴权；CORS、运维路径�
 
 ## 旧入口迁移
 
-历史兼容模块、重导出、文本包装及旧路由已退出支持。Python 调用方应直接导入职责模块，协议调用方使用正式路由或原生 MCP Client。
-
-| 已删除的入口 | 当前入口 |
-| --- | --- |
-| `core/tool_spec.py` | `application.tool_spec`、`bindings`、`execution`、`projection`、`description`；协议注册使用 `transports.rest/mcp` |
-| `core/discovery.py`、`core/scenarios.py` | `application.discovery`、`application.scenarios` |
-| `core/request_models.py` | `core.requests` 中各领域的定义模块 |
-| `core/astrology.py` | `core.astro` 中的职责模块；共用表使用 `core.astrology_tables` |
-| `utils/helpers.py` | `utils.birth_input/solar_time/formatting/analysis_clock/elements` |
-| `core.predictive`、`core.local_techniques`、`core.metaphysics` 的包级重导出 | 按技法导入具体子模块 |
-| `services.calculation` 的出生构造器/响应私有别名 | `services.birth_context.build_birth_computation_context`、`birth_payload.build_destiny_payload` |
-| `services.timing` 的日历查询和私有 helper 重导出 | `services.calendar_tools/calendar_input/timing_state/timing_snapshots` |
-| `services.tool_catalog` 的绑定/服务代理重导出 | `services.catalog` 中相应领域模块；中央目录只负责装配和合同补全 |
-| `api` 的请求模型、服务和历史 handler 别名 | 请求模型直接导入定义模块；HTTP 调用正式路由 |
-| `mcp_server.<tool>.fn` 文本包装 | 原生 FastMCP Client；结果包含 JSON text、`structuredContent` 与原生 `isError` |
-| `POST /api/calculate`、CLI `calculate_legacy` | 独立命盘使用 `/api/cn/bazi/birth` / `bazi_birth`，字段位于 `bazi_birth` 对象；综合分析使用 MCP / CLI `analyze_destiny` |
-
-公开请求字段统一使用模型的 Python 字段名，例如 `gps_lat`、`gps_lon`、`use_true_solar_time`、`planet_info`、`astro_meaning`。历史 camelCase 请求别名已移除，未知字段在三端返回输入校验错误。关系盘只接受 `relative_mode`；比较盘使用 `compare`，影响盘使用 `synastry` / `influence`，合成盘使用 `composite`。关系盘方向字段只保留 snake_case，单盘结果放在 `chart`，不再重复返回 `composite_chart`。
-
-主限赤经推运使用唯一方法名 `equatorial`；`legacy_reference` 和 `legacy_equatorial` 已移除。导出章节按当前注册名称精确匹配，不映射历史标题。当前 FastMCP 最低版本为 3.4.2，直接使用其原生 `ToolResult`，不保留旧版本结果子类。
+旧路由、字段别名、包级重导出与 `.fn` 包装的替换表统一见 [迁移指南](migration.md)。当前代码直接导入职责模块，协议调用使用正式路由或原生 MCP Client。

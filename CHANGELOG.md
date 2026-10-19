@@ -12,6 +12,8 @@ by a published GitHub Release through `.github/workflows/publish.yml`.
 
 ### Added
 
+- 新增文档离线校验命令 `scripts/check_docs.py` 与 CI 检查，覆盖本地链接、标题锚点、围栏及 JSON 语法；新增迁移指南和按用途组织的请求示例索引。
+
 - 补齐九类八字专题、宿曜双向关系、知识目录/来源/查询及导出模板/动态设置/分段的嵌套输出合同，并复用到各工具 snapshot_export；严格校验保持可空事实、扩展字段、部分投影及既有整数/浮点数原样输出。
 
 - 专业输出补齐主限坐标与命中、递归时主、寿限、古典/关系盘及中国术数的嵌套合同；三端共用校验和发现 schema，保留动态键、扩展字段、可空事实、部分投影及既有数值。嵌套类型违规在投影前按内部失败处理。
@@ -59,6 +61,8 @@ by a published GitHub Release through `.github/workflows/publish.yml`.
   REST/MCP/CLI. CLI command syntax errors retain exit 2 / usage_error.
 
 ### Changed
+
+- 重整 README 与文档中心，集中安装配置、接口约定和迁移说明；风水路由归入 API 端点家族，统一已知契约直接调用、完整结果交付及文档信源维护流程。
 - Synchronize maintained guides with nine Onda skills and ten discovery scenarios;
   complete Feng Shui topic navigation and the seven-tool entry table, and correct
   Xuan Kong examples to port 8010. Document same-run full export, post-projection
