@@ -1,0 +1,35 @@
+{
+  "profile_id": "ziping_zhenquan_month_command_text_v1",
+  "school": "《子平真诠》正文的月令格局法，本项目限域整理；不代表所有子平流派",
+  "edition": "《秘本子平真诠》，世界书局发行，国家图书馆藏本，NLC416-11jh010455-35296",
+  "source_id": "ZP-WORLDBOOK-NLC",
+  "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+  "pagination": "pdf_page 为 PDF 从 1 起的页序；printed_page 为版心页码；竖排自右至左",
+  "editorial_policy": "以扫描正文为主，东里转录只作导航、校异线索；沈氏正文、后人评注、转录校记、本次形式化分层，均不混入同一权威层",
+  "terminology": {
+    "yongshen": "依月令与透干会支而取的格局用神，不等同于扶抑有利五行",
+    "xiangshen": "协助格局成立的关键字或作用，不一定是生扶日主之字",
+    "jishen": "在指定格局、位置与作用中破坏成格的条件，不输出永久忌某一五行",
+    "strength": "以月令、通根与全局损益合参；正文未给总强弱时保留 unknown，不从官职故事倒推"
+  },
+  "independence": {
+    "case_origin": "扫描书中既有命例，独立于生产代码及既有测试命盘",
+    "label_origin": "本次助手目读原页并手工录入，先冻结后运行生产分析；不是独立专家盲审",
+    "split": "development 与 reserved 按整例分离；同书同流派，不是跨作者外部泛化；全部已由整理者读过，reserved 只保留给首次程序比较",
+    "source_limit": "书中人物生平未核实，规则一致性不证明现实预测效果；转录与扫描同源不算第二独立裁判",
+    "birth_input": "只使用原书四柱；不补公历日期、地点、性别、生辰秒数，不验证上游历法"
+  },
+  "scope": [
+    "旺衰原文标签对比",
+    "月令格局与成败救应原例裁定",
+    "格局用神与相神、条件喜忌区分",
+    "版本及原书内部异议保留"
+  ],
+  "excluded": [
+    "按身强弱统一输出五行喜忌",
+    "从格和化气格的通用算法",
+    "八字以外体系",
+    "历史官职或现实效果验证"
+  ]
+}

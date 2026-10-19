@@ -1,0 +1,79 @@
+{
+  "status": "post_first_comparison_source_crosscheck",
+  "does_not_change_frozen_case_labels": true,
+  "rules": [
+    {
+      "id": "ZP10-RETURN",
+      "source_id": "ZP-WORLDBOOK-NLC",
+      "chapter": 10,
+      "pdf_pages": [
+        31,
+        32
+      ],
+      "printed_pages": [
+        22,
+        23
+      ],
+      "verified_excerpt": "乙生申月透壬化印而又透戊則財能生官印逢財而退位難通月氣格成正官而印為兼格",
+      "supports_cases": [
+        "ZP31-XUE"
+      ],
+      "conclusion": "不失本格与兼格条件确认正官个案标注；不可把透干优先简单算法当作完整本书规则",
+      "version_note": "扫描难通月气，东里校记称中州本虽通月令；分列不校改扫描"
+    },
+    {
+      "id": "ZP16-MULTI",
+      "source_id": "ZP-WORLDBOOK-NLC",
+      "chapter": 16,
+      "pdf_pages": [
+        41,
+        42,
+        43
+      ],
+      "printed_pages": [
+        32,
+        33,
+        34
+      ],
+      "verified_excerpt": "一透則一用兼透則兼用透而又會則透與會並用",
+      "supports_cases": [
+        "ZP31-LONE",
+        "ZP31-XUAN"
+      ],
+      "conclusion": "多个透干、会支的相成相背必须同时审，不能固定先本气再中气余气选唯一神即结束"
+    },
+    {
+      "id": "ZP27-BRANCH",
+      "source_id": "ZP-WORLDBOOK-NLC",
+      "chapter": 27,
+      "pdf_pages": [
+        59,
+        60,
+        61
+      ],
+      "printed_pages": [
+        50,
+        51,
+        52
+      ],
+      "supports_disagreement": "D-LI-MIXING",
+      "conclusion": "保留李例与干支混杂边界的解释问题，不将网络编者按当正文或最终否定"
+    }
+  ],
+  "adapter_errata": [
+    {
+      "issue": "第一次适配器只读 structure_profile，漏读已有 determine_monthly_structure",
+      "correction": "补录该原有层，报告取格名称8/10而成格10例仍未覆盖；原始运行保留在外部包",
+      "source_labels_changed": false
+    }
+  ],
+  "new_disagreements": [
+    {
+      "id": "D-XUE-EDITION",
+      "kind": "text_variant",
+      "primary": "p32 难通月气",
+      "alternative": "东里校记称中州本虽通月令，未取得该本原页",
+      "scope": "两句难/虽差异影响解释字义；同段主格正官、印兼格结语在本扫描明确"
+    }
+  ]
+}
