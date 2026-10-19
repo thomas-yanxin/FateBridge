@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg)](pyproject.toml)
-[![CI](https://github.com/Yonder-Lab/FateBridge/actions/workflows/ci.yml/badge.svg)](https://github.com/Yonder-Lab/FateBridge/actions/workflows/ci.yml)
+[![CI](https://github.com/thomas-yanxin/FateBridge/actions/workflows/ci.yml/badge.svg)](https://github.com/thomas-yanxin/FateBridge/actions/workflows/ci.yml)
 
 FateBridge 是一个可在本地运行的 Python 后端能力库，把八字、紫微、传统占术、西方占星与风水规则组织成可调用、可复算、带来源的计算接口。应用通过 REST 接入，Agent 通过 MCP 调用，脚本通过 CLI 运行；当前版本为 **0.1.0**。
 
@@ -44,7 +44,7 @@ python -m pip install fatebridge==0.1.0
 源码开发安装需要 Git，以下为 macOS / Linux 示例；Windows 和全部配置见 [快速入门](docs/getting-started.md#安装)。
 
 ```bash
-git clone https://github.com/Yonder-Lab/FateBridge.git
+git clone https://github.com/thomas-yanxin/FateBridge.git
 cd FateBridge
 uv venv --python 3.12
 source .venv/bin/activate

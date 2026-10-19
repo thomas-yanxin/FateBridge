@@ -2,7 +2,7 @@ name: Publish to PyPI
 
 # Publishes on a GitHub Release. Trusted Publishing (OIDC) — no API tokens or
 # secrets. One-time setup on PyPI: Project → Publishing → add a GitHub
-# publisher for repo Yonder-Lab/FateBridge, workflow `publish.yml`,
+# publisher for repo thomas-yanxin/FateBridge, workflow `publish.yml`,
 # environment `pypi`.
 on:
   release:

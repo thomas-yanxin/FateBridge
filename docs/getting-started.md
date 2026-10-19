@@ -13,7 +13,7 @@ python -m pip install fatebridge==0.1.0
 需要修改源码时再使用 Git 安装；当前 `src/` 布局不能仅靠切到仓库根目录导入包：
 
 ```bash
-git clone https://github.com/Yonder-Lab/FateBridge.git
+git clone https://github.com/thomas-yanxin/FateBridge.git
 cd FateBridge
 uv venv --python 3.12
 source .venv/bin/activate

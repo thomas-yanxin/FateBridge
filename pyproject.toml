@@ -58,10 +58,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Yonder-Lab/FateBridge"
-Repository = "https://github.com/Yonder-Lab/FateBridge"
-Issues = "https://github.com/Yonder-Lab/FateBridge/issues"
-Changelog = "https://github.com/Yonder-Lab/FateBridge/blob/master/CHANGELOG.md"
+Homepage = "https://github.com/thomas-yanxin/FateBridge"
+Repository = "https://github.com/thomas-yanxin/FateBridge"
+Issues = "https://github.com/thomas-yanxin/FateBridge/issues"
+Changelog = "https://github.com/thomas-yanxin/FateBridge/blob/master/CHANGELOG.md"
 
 [project.scripts]
 fatebridge = "fatebridge.cli:main"
