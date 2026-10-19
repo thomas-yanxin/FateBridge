@@ -1,20 +1,64 @@
 name: Publish to PyPI
 
-# Publishes on a GitHub Release. Trusted Publishing (OIDC) — no API tokens or
-# secrets. One-time setup on PyPI: Project → Publishing → add a GitHub
-# publisher for repo thomas-yanxin/FateBridge, workflow `publish.yml`,
-# environment `pypi`.
+# Publishes new versions after master push CI succeeds, or on a GitHub Release.
+# PyPI Trusted Publishing must trust this repository, publish.yml and the pypi
+# environment. No API token is needed.
 on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [master]
   release:
     types: [published]
 
+permissions:
+  contents: read
+
+# Serialize the version check and upload across both entry points. A release
+# must not cancel another upload, or race a master run for the same version.
+concurrency:
+  group: pypi-publish
+  cancel-in-progress: false
+
 jobs:
+  check:
+    if: >-
+      github.event_name == 'release' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'master' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    outputs:
+      should_publish: ${{ steps.version.outputs.should_publish }}
+    steps:
+      - name: Checkout the release or CI-tested commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check package version against PyPI
+        id: version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: python scripts/check_pypi_release.py
+
   build:
+    needs: check
+    if: needs.check.outputs.should_publish == 'true'
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
           # setuptools reads __version__ from source (static), but keep full
           # history so any future switch to a git-tag version scheme works.
           fetch-depth: 0
@@ -28,25 +72,6 @@ jobs:
         uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
-
-      - name: Verify release tag matches package version
-        env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: |
-          python - <<'PY'
-          import ast, os
-          from pathlib import Path
-          module = ast.parse(Path("src/fatebridge/__init__.py").read_text())
-          version = next(
-              ast.literal_eval(node.value)
-              for node in module.body
-              if isinstance(node, ast.Assign)
-              and any(isinstance(target, ast.Name) and target.id == "__version__"
-                      for target in node.targets)
-          )
-          assert os.environ["RELEASE_TAG"] == f"v{version}", "release tag/version mismatch"
-          print(f"Release version: {version}")
-          PY
 
       - name: Build sdist and wheel
         run: uv build --no-sources
