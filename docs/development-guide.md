@@ -4,24 +4,28 @@
 
 ## 环境准备
 
-推荐用 [uv](https://docs.astral.sh/uv/) 安装依赖：
+统一用 [uv](https://docs.astral.sh/uv/) 管理依赖、虚拟环境与构建；源码环境默认使用 `.python-version` 中的 Python 3.12：
 
 ```bash
 git clone https://github.com/Yonder-Lab/FateBridge.git
 cd FateBridge
 
-uv venv --python 3.12
+uv sync --locked --extra dev
 source .venv/bin/activate
-uv pip install -e ".[dev]"
 ```
 
-如果你更习惯 pip，也可以这样操作：
+`uv.lock` 由 uv 生成并随源码提交，`--locked` 会在锁文件与声明不一致时报错。依赖调整后先更新锁文件，再验证：
 
 ```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e ".[dev]"
+uv add <package>
+uv add --optional dev <package>
+uv remove <package>
+uv lock --upgrade-package <package>
+uv lock --check
+uv sync --locked --extra dev
 ```
+
+开发依赖继续声明在 `project.optional-dependencies.dev`，兼容既有的 dev extra。日常命令可以在激活后运行，也可使用 `uv run --locked --extra dev <command>`。提交依赖变更时同时审查 `pyproject.toml` 和 `uv.lock`；不要手改锁文件。
 
 环境变量可以按需复制一份：
 
@@ -104,7 +108,7 @@ pytest tests/test_astrology_tools.py -q
 pytest tests/test_chinese_metaphysics.py -q
 ```
 
-测试需要在已安装 `.[dev]` 的 Python 3.10–3.13 环境里跑，这跟 CI 矩阵保持一致。注意不要用系统自带的解释器，否则容易出现伪失败。例如异步测试在缺少 `pytest-asyncio` 时不会真正执行，而是直接报 `FAILED`，错误信息通常是 `async def functions are not natively supported`。这类失败是环境问题，不是代码问题：先确认当前解释器里已经执行过 `pip install -e ".[dev]"`，再判断测试本身是否有错。同理，`black`、`isort`、`mypy` 也都来自 `.[dev]`，系统解释器里一般没有。
+测试需要在已安装 dev extra 的 Python 3.10–3.13 环境里跑，这跟 CI 矩阵保持一致。注意不要用系统自带的解释器，否则容易出现伪失败。例如异步测试在缺少 `pytest-asyncio` 时不会真正执行，而是直接报 `FAILED`，错误信息通常是 `async def functions are not natively supported`。这类失败是环境问题，不是代码问题：先执行 `uv sync --locked --extra dev` 并确认已激活对应环境，再判断测试本身是否有错。同理，`black`、`isort`、`mypy` 也都来自 dev extra，系统解释器里一般没有。
 
 ### 格式化与静态检查
 
@@ -254,6 +258,13 @@ git diff --check
 ## CI、打包与发布
 
 发布从干净 checkout 构建，并核对 wheel 的 Python 模块和 JSON 与当前源码清单一致。删除源模块后，旧 `build/lib` 的增量残留可能仍进入 wheel，因此发布构建应使用全新的工作目录。
+
+```bash
+uv build
+uvx --from twine twine check dist/*
+```
+
+CI 的 `locked` 作业检查 `uv.lock` 并在锁定环境中验证命令入口与真实 stdio MCP。现有最新版依赖矩阵和最低依赖作业使用独立的 `uv pip` 环境，不受开发锁文件约束。
 
 `.github/workflows/ci.yml` 的 `test` 作业在 Ubuntu 24.04 上覆盖 Python 3.10–3.13，执行 pytest、black、isort、mypy；`floor` 在 Python 3.10 按最低直接依赖运行测试。黄金快照字节比对仅在受支持的 Linux x86_64 / Python 3.12 环境启用，其他环境跳过不代表该项通过。 每个作业记录解析后的完整依赖清单并上传 JUnit；`floor` 必须用 `uv pip install --system --resolution lowest-direct -e ".[dev]"` 在全新环境解析，不能仅固定 FastMCP 3.4.2 来代替全部最低直接依赖验证。
 

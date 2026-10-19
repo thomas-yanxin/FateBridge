@@ -38,7 +38,7 @@ FateBridge 是一个可在本地运行的 Python 后端能力库，把八字、�
 需要 Python 3.10+，当前 CI 覆盖 3.10–3.13。通过 PyPI 安装：
 
 ```bash
-python -m pip install fatebridge==0.1.0
+uv tool install fatebridge==0.1.0
 ```
 
 源码开发安装需要 Git，以下为 macOS / Linux 示例；Windows 和全部配置见 [快速入门](docs/getting-started.md#安装)。
@@ -46,9 +46,8 @@ python -m pip install fatebridge==0.1.0
 ```bash
 git clone https://github.com/thomas-yanxin/FateBridge.git
 cd FateBridge
-uv venv --python 3.12
+uv sync --locked
 source .venv/bin/activate
-uv pip install -e .
 ```
 
 ### CLI：安装后直接调用
@@ -97,7 +96,7 @@ MCP 使用 stdio。先运行 `fatebridge doctor --mcp --scenario onda-shiye`，�
 安装开发依赖后运行：
 
 ```bash
-uv pip install -e ".[dev]"
+uv sync --locked --extra dev
 python scripts/check_docs.py
 python -m pytest -q tests/test_doc_tool_counts.py tests/test_scenario_routing_coverage.py
 ```

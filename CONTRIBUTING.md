@@ -14,12 +14,11 @@ cd FateBridge
 git remote add upstream https://github.com/Yonder-Lab/FateBridge.git
 git fetch upstream
 git switch -c codex/your-change upstream/master
-uv venv --python 3.12
+uv sync --locked --extra dev
 source .venv/bin/activate
-uv pip install -e ".[dev]"
 ```
 
-没有 uv 时使用 `python3.12 -m venv .venv`，激活后执行 `python -m pip install -e ".[dev]"`。Windows 环境命令见 [快速入门](docs/getting-started.md)。PR 目标分支为 `master`。
+包管理统一使用 uv；依赖变更使用 `uv add`／`uv remove`，同时提交 `pyproject.toml` 和 `uv.lock`。开发工具依赖使用 `uv add --optional dev <package>`。Windows 环境命令见 [快速入门](docs/getting-started.md)。PR 目标分支为 `master`。
 
 ## 报告问题
 

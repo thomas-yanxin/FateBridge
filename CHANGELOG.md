@@ -10,6 +10,12 @@ by a published GitHub Release through `.github/workflows/publish.yml`.
 
 ## [Unreleased]
 
+### Changed
+
+- 包管理统一使用 uv：提交 `uv.lock` 与默认 Python 3.12 配置，源码安装使用
+  `uv sync --locked`，开发环境追加 `--extra dev`；发布构建使用 `uv build`，
+  CI 增加锁定环境检查并保留最新版与最低依赖版本回归。
+
 ## [0.1.0] - 2026-10-19
 
 首次正式发布到 PyPI，包版本统一为 `0.1.0`，Git 标签为 `v0.1.0`。

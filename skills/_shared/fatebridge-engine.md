@@ -25,7 +25,7 @@ REST/CLI 默认继续完整交付，可显式设置 `response_char_limit` / `--r
 在本仓库使用本地后备时，优先已存在且已安装 FateBridge 的 `.venv/bin/python`，例如 `.venv/bin/python -m fatebridge.cli describe <tool>`。下方 `python3` 是已安装环境的通用写法，不表示系统默认解释器可导入本包；咨询不因解释器缺包而安装依赖、接受系统许可或修改用户配置。解析软链接用 shell 内建 `pwd -P` 即可，不依赖 Python 或 Xcode。
 
 ```bash
-# 先在虚拟环境安装本仓库：python -m pip install -e .
+# 先通过 uv sync --locked 安装本仓库并激活 .venv
 # python3 必须来自该环境，src 布局不能仅靠切到仓库根目录导入
 python3 -m fatebridge.cli <tool> [参数...]
 

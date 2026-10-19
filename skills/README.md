@@ -70,7 +70,7 @@ skills/
 
 引擎侧加工具的方法看 [开发指南](../docs/development-guide.md#新增或修改一个领域能力)：领域声明位于 `src/fatebridge/services/catalog/`，`services/tool_catalog.py` 负责中央装配；声明对应 surface 后由注册器派生入口。嵌套 CLI 输入须显式启用 JSON 请求合同，不能假定每条目录记录三端均可执行。
 
-任何在 Skill 里引用的 CLI 命令，提交前都要真跑一遍。先在虚拟环境安装本仓库（`python -m pip install -e ".[dev]"`，见 [开发指南](../docs/development-guide.md)）。运行 CLI 不用起 REST 服务；`python3` 必须指向已安装包的解释器：
+任何在 Skill 里引用的 CLI 命令，提交前都要真跑一遍。先通过 `uv sync --locked --extra dev` 安装本仓库并激活 `.venv`（见 [开发指南](../docs/development-guide.md)）。运行 CLI 不用起 REST 服务；`python3` 必须指向已安装包的解释器：
 
 ```bash
 python3 -m fatebridge.cli list

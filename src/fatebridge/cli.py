@@ -473,7 +473,7 @@ def _parse_yaml_subject(text: str, path: str) -> Any:
         import yaml
     except ImportError as error:  # pyyaml is an optional dependency
         raise ValueError(
-            f"解析 YAML subject 档案 {path} 需要 pyyaml；请 `pip install pyyaml` "
+            f"解析 YAML subject 档案 {path} 需要 pyyaml；请用 uv 为当前环境安装 pyyaml "
             "或改用 JSON 档案。"
         ) from error
     try:

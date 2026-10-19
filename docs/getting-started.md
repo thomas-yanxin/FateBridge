@@ -4,33 +4,24 @@
 
 ## 安装
 
-需要 Python 3.10+；当前 CI 覆盖 3.10–3.13，建议首次使用 Python 3.12。依赖与三个控制台入口由 `pyproject.toml` 声明，先安装再运行：
+包管理统一使用 [uv](https://docs.astral.sh/uv/getting-started/installation/)。需要 Python 3.10+；当前 CI 覆盖 3.10–3.13，源码环境默认使用 `.python-version` 中的 Python 3.12。依赖与三个控制台入口由 `pyproject.toml` 声明。从 PyPI 安装独立命令工具：
 
 ```bash
-python -m pip install fatebridge==0.1.0
+uv tool install fatebridge==0.1.0
 ```
 
-需要修改源码时再使用 Git 安装；当前 `src/` 布局不能仅靠切到仓库根目录导入包：
+该命令会在独立工具环境中提供 `fatebridge`、`fatebridge-api` 和 `fatebridge-mcp`。需要将包安装到已有虚拟环境时使用 `uv pip install fatebridge==0.1.0`。需要修改源码时使用 Git 安装；当前 `src/` 布局不能仅靠切到仓库根目录导入包：
 
 ```bash
 git clone https://github.com/thomas-yanxin/FateBridge.git
 cd FateBridge
-uv venv --python 3.12
+uv sync --locked
 source .venv/bin/activate
-uv pip install -e .
 ```
 
-未安装 uv 时，使用可用的 Python 3.12：
+先按 uv 官方说明安装 uv。`uv sync --locked` 根据 `uv.lock` 创建环境并以 editable 方式安装本仓库。以上是 macOS / Linux 激活命令；Windows PowerShell 同样先执行 `uv sync --locked`，再用 `.\.venv\Scripts\Activate.ps1` 激活。也可使用 `uv run --locked fatebridge list`，无需激活环境。
 
-```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e .
-```
-
-以上是 macOS / Linux 命令。Windows PowerShell 用 `py -3.12 -m venv .venv` 创建环境，再用 `.\.venv\Scripts\Activate.ps1` 激活。
-
-开发者安装 `.[dev]`，见 [开发指南](development-guide.md)。确认当前解释器加载的是预期包：
+开发者执行 `uv sync --locked --extra dev`，见 [开发指南](development-guide.md)。源码安装后确认当前解释器加载的是预期包：
 
 ```bash
 python -c "import fatebridge; print(fatebridge.__version__, fatebridge.__file__)"

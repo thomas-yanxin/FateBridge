@@ -22,20 +22,20 @@
 
 ```bash
 cd /path/to/FateBridge
+uv sync --locked
 source .venv/bin/activate
-python -m pip install -e .
 python -c "import sys, fatebridge; print(sys.executable); print(fatebridge.__version__, fatebridge.__file__)"
 ```
 
-Windows 激活命令见 [快速入门](getting-started.md#安装)。测试和静态检查还需安装 `.[dev]`。
+Windows 激活命令见 [快速入门](getting-started.md#安装)。测试和静态检查使用 `uv sync --locked --extra dev` 安装依赖。
 
 ### 安装失败或异步测试不能执行
 
-保存完整的 pip/uv 错误和 Python 版本，确认满足 Python 3.10+；当前 CI 为 3.10–3.13。可先更新 pip 再重试：
+保存完整的 uv 错误和 Python 版本，确认满足 Python 3.10+；当前 CI 为 3.10–3.13。先检查锁文件并同步开发环境：
 
 ```bash
-python -m pip install --upgrade pip
-python -m pip install -e ".[dev]"
+uv lock --check
+uv sync --locked --extra dev
 ```
 
 `async def functions are not natively supported` 通常说明当前测试解释器没有 `pytest-asyncio`，检查是否安装了 dev 依赖。缺少 `swisseph` / `kerykeion` 时核对的是 Python 包依赖；缺 `.se1` 时核对的是星历数据，二者不同。
