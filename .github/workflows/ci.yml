@@ -7,8 +7,34 @@ on:
       - master
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  scope:
+    runs-on: ubuntu-24.04
+    outputs:
+      full_tests: ${{ steps.scope.outputs.full_tests }}
+    steps:
+      - name: Checkout repository and comparison history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Classify the complete change
+        id: scope
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: python3 scripts/ci_scope.py --event "$EVENT_NAME" --base "$BASE_SHA" --head "$HEAD_SHA"
+
   locked:
+    needs: scope
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
@@ -30,12 +56,27 @@ jobs:
           uv sync --locked --extra dev
 
       - name: Verify installed commands and real stdio MCP
+        if: needs.scope.outputs.full_tests == 'true'
         run: |
           uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye
-          uv run --locked --extra dev python scripts/check_docs.py
           uv run --locked --extra dev python -m pytest -q tests/test_cli.py tests/test_api_alignment.py
 
+      - name: Check documentation
+        run: uv run --locked --extra dev python scripts/check_docs.py
+
+      - name: Validate documentation contracts and runnable examples
+        if: needs.scope.outputs.full_tests == 'false'
+        run: |
+          uv run --locked --extra dev python scripts/build_scenario_manifest.py --check
+          uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
+          uv run --locked --extra dev python -m pytest -q \
+            tests/test_documentation_integrity.py tests/test_doc_tool_counts.py \
+            tests/test_skills_interface_contract.py tests/test_skills_engine_contract.py \
+            tests/test_codex_call_contracts.py tests/test_ci_scope.py
+
   test:
+    needs: scope
+    if: needs.scope.outputs.full_tests == 'true'
     # 固定到 ubuntu-24.04（而非 ubuntu-latest）：golden 基线是平台相关的字节锁，
     # runner OS 升级会改变 libm/星历浮点，必须与基线冻结平台锁步。
     runs-on: ubuntu-24.04
@@ -69,16 +110,16 @@ jobs:
       - name: Run tests
         run: pytest -q --junitxml=pytest-results.xml
 
-      - name: Check documentation
-        run: python scripts/check_docs.py
-
       - name: Check formatting
+        if: matrix.python-version == '3.12'
         run: black --check src/fatebridge scripts tests
 
       - name: Check import order
+        if: matrix.python-version == '3.12'
         run: isort --check-only src/fatebridge scripts tests
 
       - name: Run type checks
+        if: matrix.python-version == '3.12'
         run: mypy src/fatebridge/
 
       - name: Save regression evidence
@@ -91,6 +132,8 @@ jobs:
             pytest-results.xml
 
   floor:
+    needs: scope
+    if: needs.scope.outputs.full_tests == 'true'
     # Install every direct dependency at its declared minimum so a too-low
     # version floor surfaces here instead of in a user's environment. The main
     # `test` job always resolves to the latest releases and would never catch it.
@@ -132,3 +175,31 @@ jobs:
           path: |
             resolved-dependencies.txt
             pytest-results.xml
+
+  ci:
+    name: CI result
+    if: always()
+    needs: [scope, locked, test, floor]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require the selected checks to pass
+        env:
+          SCOPE_RESULT: ${{ needs.scope.result }}
+          LOCKED_RESULT: ${{ needs.locked.result }}
+          FULL_TESTS: ${{ needs.scope.outputs.full_tests }}
+          TEST_RESULT: ${{ needs.test.result }}
+          FLOOR_RESULT: ${{ needs.floor.result }}
+        run: |
+          test "$SCOPE_RESULT" = success
+          test "$LOCKED_RESULT" = success
+          case "$FULL_TESTS" in
+            true)
+              test "$TEST_RESULT" = success
+              test "$FLOOR_RESULT" = success
+              ;;
+            false)
+              test "$TEST_RESULT" = skipped
+              test "$FLOOR_RESULT" = skipped
+              ;;
+            *) exit 1 ;;
+          esac

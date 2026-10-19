@@ -110,6 +110,14 @@ pytest tests/test_chinese_metaphysics.py -q
 
 测试需要在已安装 dev extra 的 Python 3.10–3.13 环境里跑，这跟 CI 矩阵保持一致。注意不要用系统自带的解释器，否则容易出现伪失败。例如异步测试在缺少 `pytest-asyncio` 时不会真正执行，而是直接报 `FAILED`，错误信息通常是 `async def functions are not natively supported`。这类失败是环境问题，不是代码问题：先执行 `uv sync --locked --extra dev` 并确认已激活对应环境，再判断测试本身是否有错。同理，`black`、`isort`、`mypy` 也都来自 dev extra，系统解释器里一般没有。
 
+### CI 运行范围
+
+CI 对整个 push 的前后提交或整个 PR 的 merge-base 差异分流；同一分支或 PR 有新提交时会取消旧 CI。源码、测试、依赖、工作流、技能、`AGENTS.md`、`docs/examples/` 和 `docs/validation/` 的变更继续运行 Python 3.10–3.13 全量测试及最低依赖测试，数值基线仍由 Linux x86_64 / Python 3.12 校验。无法取得完整差异或出现未识别路径时也运行全量。
+
+仅根目录的 README、CHANGELOG、CONTRIBUTING、SECURITY，`docs/` 下的普通 Markdown，以及 `docs/audits/`、`docs/research/` 的 JSON、日志、文本、XML、CSV 归档可走文档分支。该分支仍安装锁定开发环境，检查链接、JSON、接口计数、生成合同、技能接口和可运行 CLI 示例。Python 归档文件也按代码变更处理。
+
+Black、isort 和 mypy 在全量矩阵的 Python 3.12 作业检查一次；通用文档检查统一由 locked 作业执行。`CI result` 始终汇总本次选中的检查，文档分支跳过的全量作业不等于失败，已选作业的失败或意外跳过也不会被汇总为成功。
+
 ### 格式化与静态检查
 
 ```bash
