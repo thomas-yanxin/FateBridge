@@ -121,7 +121,7 @@ def test_all_published_schemas_preserve_object_projection_compatibility(rest, ca
 
     async def native_schemas():
         async with Client(mcp.app) as client:
-            return {tool.name: tool.outputSchema for tool in await client.list_tools()}
+            return {tool.name: tool.output_schema for tool in await client.list_tools()}
 
     published = asyncio.run(native_schemas())
     assert set(published) == {spec.tool_name for spec in CATALOG if spec.mcp_name}
@@ -176,7 +176,7 @@ def test_each_ruleset_field_projects_on_native_mcp_rest_and_cli(
     async def native_calls():
         async with Client(mcp.app) as client:
             tools = {tool.name: tool for tool in await client.list_tools()}
-            schema = tools[spec.tool_name].outputSchema
+            schema = tools[spec.tool_name].output_schema
             results = []
             for field, _ in cases:
                 # Leave native client schema validation enabled. A renderer-only

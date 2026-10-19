@@ -1,4 +1,4 @@
 interface:
-  display_name: "星盘 · 占星自观"
-  short_description: "用日月上升、重点宫位和实际相位，看清特点、相处张力与可尝试的安排"
-  default_prompt: "使用 $onda-xingpan 解读我关心的本命或关系主题，给出两三处真实盘面依据与可对照的现实建议。"
+  display_name: 命盘与指定方法解读
+  short_description: 直接满足用户指定的命盘、流派与技法，按相关主题解释实际字段并保留精度范围
+  default_prompt: 使用 $onda-xingpan 围绕我这次的问题，按主题、对象与时间范围选择有价值的依据，解释差异与可核对的安排。

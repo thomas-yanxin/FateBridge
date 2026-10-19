@@ -1,6 +1,17 @@
 # FateBridge 开发者 / Agent 接入指南
 
-这份文档写给两类调用方：想在自己的应用或脚本里集成 FateBridge 的开发者，以及把 FateBridge 当作工具集让模型自主调用的 Agent。
+本页说明如何把 FateBridge 接入应用、脚本或 Agent：选择调用通道、发现所需工具、处理错误，并保存同一次计算的完整结果。开始前请完成[安装](getting-started.md#安装)。本文的 shell 命令在已激活的环境中运行；源码环境也可统一加 `uv run --locked --extra dev` 前缀。
+
+| 集成任务 | 入口 |
+| --- | --- |
+| 选择 REST、MCP 或 CLI | [按通道接入](#按通道接入) |
+| 根据用户问题选择工具 | [自助发现](#自助发现别硬编码工具列表) |
+| 处理失败、快照和字段投影 | [公共调用约定](#公共调用约定) |
+| 保存完整 JSON 和校验散列 | [完整结果交付与同次导出](#完整结果交付与同次导出) |
+| 收集出生资料和时间条件 | [出生信息](#出生信息一次说清) |
+| 实现咨询 Agent 或风水集成 | [Agent 接入建议](#agent-接入建议) · [家居风水接入](#家居风水接入) |
+
+输入、投影、快照、交付与回执的关系见[核心概念](concepts.md)。
 
 Codex 用户可直接从 [Codex 使用指南](codex-guide.md) 开始：独立 stdio 诊断、原生 TOML/CLI 配置、虚构对话示例、结果裁剪和错误恢复。
 
@@ -12,9 +23,7 @@ FateBridge 的领域能力通过三条通道暴露出来：
 
 三条通道共用 `src/fatebridge/services/tool_catalog.py` 装配的中央目录，领域声明位于 `services/catalog/`，请求字段定义于 `core/requests/`。共享领域计算和错误字段，各端仍有名称、绑定和校验阶段差异。
 
-> 目前 REST 暴露 86 个工具，MCP 暴露 87 个工具；目录共有 88 条记录，其中 CLI 可执行 87 条。`astro_relative` 是嵌套 REST 请求，与 MCP 的扁平请求存在对应关系，不是所有记录都能按同名跨端调用。完整算法清单见 [algorithm-coverage.md](algorithm-coverage.md)，完整端点说明见 [api-reference.md](api-reference.md)。
-
----
+目前 REST 暴露 86 个工具，MCP 暴露 87 个工具；目录共有 88 条记录，其中 CLI 可执行 87 条。`astro_relative` 是嵌套 REST 请求，与 MCP 的扁平请求存在对应关系，不是所有记录都能按同名跨端调用。完整算法清单见 [algorithm-coverage.md](algorithm-coverage.md)，完整端点说明见 [api-reference.md](api-reference.md)。
 
 ## 自助发现：别硬编码工具列表
 
@@ -27,7 +36,9 @@ FateBridge 的领域能力通过三条通道暴露出来：
 | 已确定工具，仅缺参数定义 | REST 单工具记录、CLI `describe --detail input` 或 MCP `fatebridge://tools/{tool}/input` |
 | 需要更细输出字段 | 单工具完整契约；不要展开无关候选 |
 
-场景发现使用 REST `/api/scenarios?detail=summary`、CLI `fatebridge scenarios` 或 MCP `fatebridge://scenarios`；`discover --scenario onda-shiye` 可缩小候选。替代工具组不要求全部调用，路由不是自动执行计划。
+场景发现使用 REST `/api/scenarios?detail=summary`、CLI `fatebridge scenarios` 或 MCP `fatebridge://scenarios`；`discover --scenario onda-shiye` 可缩小候选。替代工具组不要求全部调用，路由不是自动执行计划。场景返回 consultation.kind/topics 和共享咨询策略：按本轮主题、任务、时间与深度选依据，追问复用相关视角，禁区请求在调用前停止。
+
+咨询组织见[技能分布](../skills/README.md)、[时间选择](../skills/_shared/timing-selection.md)与[硬边界](../skills/_shared/safety-boundaries.md)。公共接口拒绝已知明确的生死／临床请求，卜卦不公开 death/health/pregnancy，择时不公开 surgery。文本拦截不能替代调用方的跨轮语义判断。
 
 ### REST：`GET /api/tools`
 
@@ -79,8 +90,6 @@ fatebridge list --family astro --json # 文本 list 可按需改为 JSON 摘要
 MCP 默认通过标准 `tools/list` 公开全部工具。host 可设置 `FATEBRIDGE_MCP_FAMILIES=bazi,knowledge` 只注册所需分类，拼错分类会在启动时失败。通过 `resources/read` 读取 `fatebridge://catalog/summary`、`fatebridge://families/bazi` 和 `fatebridge://tools/bazi_birth`，可获得当前公开集合的摘要及单工具完整契约。资源错误属于资源协议错误，工具失败仍使用 `isError`。
 
 `FATEBRIDGE_MCP_SCENARIOS` 可按场景筛选，与 family 配置取交集；隐藏工具不可调用，场景 `availability` 明示缺口。配置与发现参数见 [渐进发现](api-reference.md#27-渐进发现与执行提示)。
-
----
 
 ## 公共调用约定
 
@@ -172,8 +181,6 @@ fatebridge bazi_birth --birth-year 1990 --birth-month 6 --birth-day 15 \
     --birth-hour 10 --gender male --fields snapshot_text bazi_birth.day_master
 ```
 
----
-
 ## 完整结果交付与同次导出
 
 MCP 默认 `response_char_limit=8192`，REST / CLI 默认 `0`（不限制）。成功结果超出非零预算时，响应包含 `result_delivery`，保留完整回执及预算内的业务字段；剩余字段从同一 run 的交付物读取，不重新计算。允许的预算为 `0` 或 `4096–65536`，错误响应不按业务字段裁剪。
@@ -235,14 +242,14 @@ Path("full-result.json").write_bytes(raw)
 
 出生输入由 `fatebridge.utils.birth_input` 构造，真太阳时归一化由 `fatebridge.utils.solar_time` 处理，地点与时区解析分别由 `utils.places`、`utils.timezones` 提供。结果会回显在 `person_info.time_adjustment`。需要高精度占星盘时，优先显式传经纬度和 IANA 时区；地点/经度推断不包含完整历史夏令时信息。小时是必填项，当前没有可省略小时的“无时盘”入口。
 
----
-
 ## 按通道接入
 
 ### REST（HTTP）
 
+先按[快速入门](getting-started.md#启动-rest-并检查状态)启动服务。业务输入放在 JSON 请求体，`fields`、`strict_fields`、`as_of` 等通用控制项放在 URL 查询参数。以下示例假设已开启密钥鉴权；未开启时可省略密钥头。
+
 ```bash
-curl -X POST http://localhost:8010/api/cn/bazi/wealth \
+curl -X POST 'http://localhost:8010/api/cn/bazi/wealth?fields=wealth_analysis&strict_fields=true&include_snapshot_text=false' \
   -H "Content-Type: application/json" \
   -H "X-API-Key: replace-me" \
   -d '{"gender":"男","birth_year":1990,"birth_month":5,"birth_day":15,
@@ -259,6 +266,11 @@ import requests
 resp = requests.post(
     "http://localhost:8010/api/cn/bazi/wealth",
     headers={"X-API-Key": "replace-me"},
+    params={
+        "fields": ["wealth_analysis"],
+        "strict_fields": "true",
+        "include_snapshot_text": "false",
+    },
     json={
         "gender": "男", "birth_year": 1990, "birth_month": 5, "birth_day": 15,
         "birth_hour": 10, "birth_timezone": "Asia/Shanghai", "birth_place": "北京",
@@ -275,7 +287,11 @@ print(data["wealth_analysis"])
 **JavaScript（fetch）示例：**
 
 ```js
-const res = await fetch("http://localhost:8010/api/cn/bazi/wealth", {
+const url = new URL("http://localhost:8010/api/cn/bazi/wealth");
+url.searchParams.append("fields", "wealth_analysis");
+url.searchParams.set("strict_fields", "true");
+url.searchParams.set("include_snapshot_text", "false");
+const res = await fetch(url, {
   method: "POST",
   headers: { "Content-Type": "application/json", "X-API-Key": "replace-me" },
   body: JSON.stringify({
@@ -335,6 +351,8 @@ fatebridge-mcp
 
 ### CLI（脚本 / 自动化）
 
+单次调用无需启动 REST 或 MCP 服务。先用 `describe` 核对所选工具的输入，再运行它；进程退出码决定是否继续读取业务结果。
+
 ```bash
 fatebridge list
 fatebridge describe ziwei_birth
@@ -358,9 +376,9 @@ fatebridge profile --systems bazi,ziwei,astro \
 
 `profile` 保留各体系默认太阳时策略，不是全工具并行运行。支持 `--fields profile.bazi.bazi_birth.day_master`、`--strict-fields`、`--compact` 与 `--no-include-snapshot-text`；后者移除各子结果顶层快照。投影保留已选子结果的运行凭据和所有失败项，任一体系失败仍退出 1。按实际工具去重，空体系列表会失败；选项以 `profile --help` 为准。
 
----
-
 ## Agent 接入建议
+
+面向人的咨询流程与接口发现是不同层次：技能决定本轮问题、解释方式及边界，Schema 决定能提交哪些参数。接入后用一条完整的虚构对话验证采集、调用、解释及追问；仅连接成功不能验证这些行为。
 
 1. 发现：已知 Schema 且工具公开时直接调用；有缺口时按场景 / family 获取摘要或单工具契约。
 2. 路由：按用户意图选 family，例如八字走 `bazi`、运势走 `timing`、星盘走 `astro`、术数走 `metaphysics` / `divination`。场景级取舍（谁主谁次、怎么省 token、怎么避免结论打架）见 [scenario-routing.md](scenario-routing.md)。
@@ -368,8 +386,6 @@ fatebridge profile --systems bazi,ziwei,astro \
 4. 裁剪：摘要用严格 `fields` 与快照开关；完整导出首次保留全文，`selected_sections` 仅控制所支持工具的导出文本。
 5. 判错：始终基于 `error_code` 分支；`dependency_missing` 说明环境缺西占 backend，不是入参问题。
 6. 溯源：保存原输入、run_metadata、replay overrides 与精度字段；固定 as_of 和环境后重新调用可核对业务结果。服务不按 run_id 查询或自动重放历史。
-
----
 
 ## 家居风水接入
 

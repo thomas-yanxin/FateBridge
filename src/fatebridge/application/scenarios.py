@@ -94,6 +94,7 @@ def discover_scenarios(
             key: definition[key]
             for key in ("id", "name", "version", "summary", "triggers", "boundary")
         }
+        record["consultation"] = definition["consultation"]
         record["tool_count"] = len(exposed)
         record["availability"] = {"complete": not missing, "missing_tool_keys": missing}
         if detail == "full":
@@ -151,6 +152,7 @@ def discover_scenarios(
         records.append(record)
     return {
         "schema_version": bundle["schema_version"],
+        "consultation_policy": bundle["consultation_policy"],
         "detail": detail,
         "matched_count": len(records),
         "scenarios": records,

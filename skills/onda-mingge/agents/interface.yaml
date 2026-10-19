@@ -1,47 +1,45 @@
-# Machine-readable interface for the onda-mingge skill.
-# Enforced by tests/test_skills_interface_contract.py against the FateBridge
-# engine catalog and this skill's SKILL.md. Keep in sync or CI fails.
 name: onda-mingge
 version: 0.2.0
-scenario: 认识自己 · 性格天赋
-summary: 聚焦性格、天赋、学业、亲子或六亲的一项问题，用真实经历核对传统特点并给一项小尝试
+scenario: 认识自己与个人发展
+summary: 解释性格与做事方式的实际区别，按所问范围对照相关体系，给可核对的参考
+consultation:
+  kind: topic
+  topics:
+  - self
+  scope: current_question
+  time_selection: shared
+  safety_policy: consultation_boundaries_v1
 triggers:
-  - 我是个什么样的人
-  - 我的性格
-  - 天赋适合什么
-  - 学业
-  - 考试运
-  - 孩子的命
-  - 跟父母
-  - 兄弟的关系
-  - 原生家庭
-  - 我适合走什么路
-  - 紫微命盘
+- 性格
+- 天赋
+- 做事方式
+- 优势与限制
 engine_tools:
-  - analyze_destiny
-  - astro_chart
-  - bazi_birth
-  - bazi_children
-  - bazi_education
-  - bazi_personality
-  - bazi_relatives
-  - canping
-  - heluo
-  - ziwei_birth
-  - ziwei_rules
-required_inputs:
-  - birth_year
-  - birth_month
-  - birth_day
-  - birth_hour
-  - gender
-  - birth_place
+- analyze_destiny
+- astro_chart
+- bazi_birth
+- bazi_personality
+- canping
+- firdaria
+- heluo
+- timing_analysis
+- western_timing_analysis
+- ziwei_birth
+- ziwei_horoscope
+- ziwei_rules
+required_inputs: []
+input_notes:
+- 按当前问题与所选工具实际 Schema 核对必要资料；不是完整问卷
+- 主题、对象与时间范围沿用当前聊天，限定方法优先，缺项仅限制对应层
 reads:
-  - ../../_shared/fatebridge-engine.md
-  - ../../_shared/onda-counsel.md
+- ../../_shared/consultation-routing.md
+- ../../_shared/safety-boundaries.md
+- ../../_shared/fatebridge-engine.md
+- ../../_shared/onda-counsel.md
+- ../../_shared/timing-selection.md
 output:
-  kind: interpretation        # 人类可读解读，非原始命盘字段
-  grounding: engine_fields    # 结论溯源到引擎字段，AI 不手算
+  kind: interpretation
+  grounding: engine_fields
   voice: onda-counsel
-boundary: 传统术数与占星的文化参考视角，不是决定论，不替代医疗、心理、法律、财务等专业意见。
+boundary: 传统文化参考；禁止生死寿命、重大灾祸断言、临床诊断治疗与医疗择时；多工具不扩大本轮范围。
 license: Apache-2.0

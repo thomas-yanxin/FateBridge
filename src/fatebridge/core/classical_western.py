@@ -516,7 +516,7 @@ def build_topic_almutens(
 # ── Phase 3: Arabic lots (parts) ──
 
 # Lot formulas: lon = (a + b − c) mod 360, with day/night reversal. Marker keys
-# index into the longitude table (asc / sun / moon / planets / eighth cusp).
+# index into the longitude table (asc / sun / moon / planets).
 # Ported verbatim from horosa data/lots.js (卜卦构建清单 §1.5).
 LOTS: Dict[str, Dict[str, Any]] = {
     "fortune": {
@@ -542,12 +542,6 @@ LOTS: Dict[str, Dict[str, Any]] = {
         "use": "子嗣（五宫）",
         "day": ["asc", "jupiter", "saturn"],
         "night": ["asc", "saturn", "jupiter"],
-    },
-    "death": {
-        "cn": "死亡点",
-        "use": "八宫·危难",
-        "day": ["eighth", "saturn", "moon"],
-        "night": ["eighth", "saturn", "moon"],
     },
 }
 

@@ -56,6 +56,7 @@ class ParameterError(ValueError):
 def validation_error_result(error: Any) -> Dict[str, Any]:
     """Normalize Pydantic/FastAPI validation without echoing personal input."""
     issues = []
+    restricted = False
     for item in error.errors():
         loc = list(item.get("loc", ()))
         if loc and loc[0] in {"body", "query"}:
@@ -67,6 +68,10 @@ def validation_error_result(error: Any) -> Dict[str, Any]:
             if key in context
         }
         path = ".".join(str(part) for part in loc)
+        if item["type"] == "consultation_restricted":
+            restricted = True
+            path = context.get("path", "request")
+            constraints = {"policy": context["policy"]}
         if item["type"] == "invalid_calendar_date":
             path = context.get("prefix", "date") + "date"
         issue = {"path": path or "request", "code": item["type"]}
@@ -74,8 +79,10 @@ def validation_error_result(error: Any) -> Dict[str, Any]:
             issue["constraints"] = constraints
         issues.append(issue)
     return {
-        "error": "请求参数无效",
-        "error_code": VALIDATION_ERROR_CODE,
+        "error": "此请求超出允许的咨询范围" if restricted else "请求参数无效",
+        "error_code": (
+            "consultation_restricted" if restricted else VALIDATION_ERROR_CODE
+        ),
         "status_code": 422,
         "retryable": False,
         "issues": issues,

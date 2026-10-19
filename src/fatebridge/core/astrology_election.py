@@ -92,12 +92,6 @@ TOPIC_MASTER: Dict[str, Dict[str, Any]] = {
         "mercury_hard": True,
         "label": "签约",
     },
-    "surgery": {
-        "house": 1,
-        "significator": "Mars",
-        "mercury_hard": False,
-        "label": "手术",
-    },
     "travel": {
         "house": 9,
         "significator": "Mercury",
@@ -175,7 +169,8 @@ def _factor(
 
 def build_election_payload(subject: Any, *, topic_id: str) -> Dict[str, Any]:
     """Score a candidate moment for ``topic_id`` and return itemised factors + verdict."""
-    topic_id = topic_id if topic_id in TOPIC_MASTER else "marriage"
+    if topic_id not in TOPIC_MASTER:
+        raise ValueError("不支持的择日主题；医疗择时不开放")
     topic = TOPIC_MASTER[topic_id]
 
     views = {planet: _planet_view(subject, planet) for planet in PLANET_ATTRIBUTES}

@@ -1,6 +1,10 @@
 # 通用风水布局补充规则的证据与边界
 
+[场景技能](../SKILL.md) · [基础规则](rule-sources.md) · [室内两端关系](sourced-interior-rules.md) · [请求示例](../../../docs/examples/README.md)
+
 `fengshui_assess` 的室内形态、元素目标及年度作者规则使用通用输入，不另设工位专用工具。规则数据位于 `src/fatebridge/data/fengshui/layout-supplements-v1.json`，记录原始文件 SHA-256、作者、检索日期与版本；运行时离线使用规则，不访问这些网站。
+
+本页核对三类补充规则的来源和排除范围；具体请求及输出分支见[工程说明](../../../docs/fengshui.md#室内形态与有条件物件规则)。镜照床、厨卫和梁管等明确两端关系另查[室内规则](sourced-interior-rules.md)，不由本页入口视野条件代替。
 
 ## 室内形态
 

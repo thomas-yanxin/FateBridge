@@ -19,6 +19,15 @@ from fatebridge.utils.errors import (
 
 def execute_spec(spec: ToolSpec, request: BaseModel) -> ServiceResult:
     """Run and validate a bound domain service call."""
+    from fatebridge.core.consultation_policy import (
+        restricted_intent_path,
+        restriction_result,
+    )
+
+    # Also guard callers using model_construct/model_copy rather than validation.
+    restricted = restricted_intent_path(request.model_dump())
+    if restricted:
+        return restriction_result(restricted)
     service, args, kwargs = spec.bind(request)
     result = service(*args, **kwargs)
     validate_output(spec, result)

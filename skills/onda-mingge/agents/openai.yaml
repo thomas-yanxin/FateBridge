@@ -1,4 +1,4 @@
 interface:
-  display_name: "认识自己 · 性格天赋"
-  short_description: "聚焦性格、学业或家人问题，把传统特点与真实经历对照，再选一项小尝试"
-  default_prompt: "使用 $onda-mingge 只分析我关心的这一项性格、天赋、学业或家人问题，用实际依据说明特点，并给一个可从日常反馈核对的小尝试。"
+  display_name: 认识自己与个人发展
+  short_description: 解释性格与做事方式的实际区别，按所问范围对照相关体系，给可核对的参考
+  default_prompt: 使用 $onda-mingge 围绕我这次的问题，按主题、对象与时间范围选择有价值的依据，解释差异与可核对的安排。

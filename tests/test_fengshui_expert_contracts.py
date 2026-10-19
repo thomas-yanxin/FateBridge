@@ -263,7 +263,7 @@ def test_no_compass_observations_close_as_limited_review_without_invented_taboo(
 
 
 def test_explicit_unknown_orientation_does_not_block_independent_indoor_form_review():
-    from tests.test_fengshui_expert_policy_review import form
+    from tests.test_fengshui_method_boundaries import form
 
     result = assess(
         scene="workstation",
@@ -312,8 +312,8 @@ def test_published_mcp_schema_exposes_context_without_birth_requirements():
             tool = next(
                 t for t in await client.list_tools() if t.name == "fengshui_assess"
             )
-            Draft202012Validator(tool.inputSchema).validate(context_request())
-            return tool.inputSchema
+            Draft202012Validator(tool.input_schema).validate(context_request())
+            return tool.input_schema
 
     schema = asyncio.run(inspect())
     assert "environmental_context" in schema["properties"]

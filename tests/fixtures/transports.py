@@ -38,7 +38,7 @@ def _mcp_schemas():
 
     async def load():
         async with Client(app) as client:
-            return {tool.name: tool.inputSchema for tool in await client.list_tools()}
+            return {tool.name: tool.input_schema for tool in await client.list_tools()}
 
     return asyncio.run(load())
 

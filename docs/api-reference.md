@@ -1,17 +1,15 @@
 # FateBridge API 参考
 
-本文档按“能力域”描述 FateBridge 当前对外接口，而不是按历史模块拆散说明。当前仓库同时提供：
+本页供实现客户端或排查字段时查阅，覆盖 REST、MCP 与 CLI 的公共合同、请求族、路由映射及响应字段。首次运行请先看[快速入门](getting-started.md)，可复制的客户端代码见[接入指南](agent-guide.md)。
 
-- REST API：FastAPI，默认 `http://localhost:8010`
-- FastMCP：`python -m fatebridge.mcp_server` 启动的 MCP 工具面
-
-> 当前实际暴露 86 个业务 REST 路由（另含 `/health`、`/ready`、`/metrics` 三个运维端点）和 87 个 FastMCP 工具。两个数字由中央目录派生，并由 `tests/test_doc_tool_counts.py` 锁定。
+当前实际暴露 86 个业务 REST 路由（另含 `/health`、`/ready`、`/metrics` 三个运维端点）和 87 个 FastMCP 工具。两个数字由中央目录派生，并由 `tests/test_doc_tool_counts.py` 锁定。版本之间的准确字段约束以当前服务的 `/openapi.json`、MCP `tools/list` 或 CLI `describe` 为准。
 
 ## 阅读导航
 
 | 要查什么 | 章节 |
 | --- | --- |
 | 错误、快照、三端映射、投影、复现 | [公共约定](#2-公共约定) |
+| 主题限制与调用前检查 | [咨询范围与禁区校验](#咨询范围与禁区校验) |
 | 输入字段与默认值 | [共享请求族](#3-共享请求族)；具体约束以实际 Schema 为准 |
 | REST 路由与风水入口 | [端点家族](#4-rest-端点家族) · [家居风水](#411-家居风水family-fengshui) |
 | 可复制的 HTTP 调用 | [REST 示例](#5-rest-调用示例) |
@@ -28,6 +26,10 @@
 - Swagger UI：`/docs`
 - ReDoc：`/redoc`
 - Content-Type：`application/json`
+- 业务输入：JSON 请求体；通用控制项：URL 查询参数
+- 完整 Schema：`/openapi.json`；能力发现：`/api/tools`
+
+例如 `POST /api/cn/bazi/birth?fields=bazi_birth.day_master&strict_fields=true` 的请求体只放出生信息。多个 `fields` 重复写查询参数；不要放进请求体，未知请求字段会被拒绝。
 
 ### FastMCP
 
@@ -184,7 +186,7 @@ REST 对应 `GET /api/results/{result_id}` 和 `GET /api/results/{result_id}/pag
 
 ### 2.7 渐进发现与执行提示
 
-场景发现使用 `GET /api/scenarios?detail=summary`，按 `scenario=onda-shiyun` 读取完整 manifest；CLI 对应 `fatebridge scenarios --scenario onda-shiyun --detail full`。10 个场景从 9 个 Onda YAML 接口与住宅路由表生成，包括 `onda-fengshui` 咨询和 `fengshui` 基础计算两个独立入口，保留意图、主证/旁证/深调、条件和替代工具组。`required_inputs` 是技能层采集指引，每个工具的 `required_parameters` 与输入 Schema 才是调用要求；路由不是自动执行计划。
+场景发现使用 `GET /api/scenarios?detail=summary`，按 `scenario=onda-shiyun` 读取完整 manifest；CLI 对应 `fatebridge scenarios --scenario onda-shiyun --detail full`。14 个场景从13个 Onda YAML 接口、共享规则与住宅路由表生成，包括 `onda-fengshui` 咨询和 `fengshui` 基础计算两个独立入口，保留意图、主证/旁证/深调、条件和替代工具组。`required_inputs` 是技能层采集指引，每个工具的 `required_parameters` 与输入 Schema 才是调用要求；路由不是自动执行计划。
 
 `/api/tools`、CLI `discover` / `list --json` 新增 `scenario` 筛选（CLI 为 `--scenario`），支持逗号并集，与 family / q / surface 取交集。未知场景返回 422 / CLI 退出 1。嵌套 REST 与扁平 MCP/CLI 孪生工具由中央目录关联实际入口。MCP resources 新增 `fatebridge://scenarios` 摘要与 `fatebridge://scenarios/{scenario}` 完整路由；只列当前配置可调用工具，通过 `availability` 和路由组 `available=false` 明示缺失能力，不将旁证升级为主证。
 
@@ -284,6 +286,7 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | `analysis_year` / `analysis_month` / `analysis_day` | int | 目标分析日期 |
+| `analysis_hour` / `analysis_minute` | int | 目标钟时，分别为 `0..23` / `0..59`；省略时分别沿用出生小时 / 分钟 |
 | `return_longitude` / `return_latitude` / `return_timezone` | mixed | 返照或行运地点 |
 | `house_system` | string | 例如 `P` 表示 Placidus |
 | `zodiac_type` | string | 例如 `Tropic` |
@@ -298,7 +301,7 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 
 两项法达参数可独立组合，同时适用于综合时运和独立 `firdaria`，REST / MCP 同名，CLI 使用 `--firdaria-night-order` / `--firdaria-year-basis`。公历周年的闰日、UTC 七等分、时区异常拒绝及分钟展示规则见[法达兼容约定](firdaria-compatibility.md#8-生产接口选择)。默认组合保留现有返回结构，非默认组合在法达对象内增加 `calculation_options` 回执。
 
-完整非法分析日期返回 `validation_error`；只给部分年月日时逐字段补齐默认值，部分日期补齐时可约束到月底。复现计算请显式传齐目标日期、出生时区与返照/行运地点。
+完整非法分析日期返回 `validation_error`；只给部分年月日时逐字段补齐默认值，部分日期补齐时可约束到月底。目标日期与钟时按 `birth_timezone` 解释，`return_timezone` 用于转换同一时刻。指定某日某时应同时传齐五项 `analysis_*`，核对聚合结果的 `analysis_context.analysis_datetime`；`as_of` 不替代目标钟时。复现计算还应保留出生时区与返照/行运地点。
 
 ### 3.4 本地技法请求约定
 
@@ -353,7 +356,7 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 | 婚姻 | `/api/cn/bazi/marriage` | `spouse_star`（配偶星：正/偏财为妻、正官/七杀为夫）、`spouse_palace`（配偶宫=日支稳定性）、`marriage_quality`（0–100 评分）、`marriage_timing`、`risk_factors`、`suggestions` |
 | 事业 | `/api/cn/bazi/career` | `dominant_ten_gods`（事业类型）、`industry_analysis`（喜用神行业）、`career_structure`、`entrepreneurship`（创业 vs 打工）、`career_timing`、`noble_direction`（贵人方位）、`suggestions` |
 | 财运 | `/api/cn/bazi/wealth` | `wealth_stars`（正/偏财含藏干）、`wealth_structure`（身财两停/财多身弱…）、`wealth_storage`（墓库财）、`wealth_style` / `wealth_direction`、`wealth_risk`、`wealth_timing` |
-| 健康 | `/api/cn/bazi/health` | `constitution`（强弱+调候）、`organ_analysis`（五行脏腑）、`disease_risks`、`health_timing`、`regimen`（仅命理参考，非医学诊断） |
+| 健康 | `/api/cn/bazi/health` | `constitution`（盘内强弱／寒暖分类）、`organ_analysis`（权重与传统名称对照）、`health_timing`（仅传统关系）；不提供疾病风险或调理处方 |
 | 子女 | `/api/cn/bazi/children` | `child_star`（男命官杀/女命食伤）、`child_palace`（时柱）、`affinity`、`relationship`、`children_timing` |
 | 学业 | `/api/cn/bazi/education` | `study_stars`（印/食伤/官/财）、`education_level`、`wenchang`（文昌）、`subject_orientation`（文理）、`exam_timing` |
 | 性格 | `/api/cn/bazi/personality` | 日主五行心性、主导十神性格、刚柔内外向、优劣势与调适建议 |
@@ -535,7 +538,7 @@ descriptor 形如：
 
 ## 5. REST 调用示例
 
-以下示例默认未开启 API Key 鉴权；开启后加 `-H "X-API-Key: <secret>"`。
+以下人物资料均为虚构示例，默认未开启 API Key 鉴权；开启后加 `-H "X-API-Key: <secret>"`。
 
 ### 5.1 旧入口迁移
 
@@ -615,10 +618,12 @@ curl -X POST http://localhost:8010/api/export/parse \
 
 ## 6. FastMCP 工具面
 
+下表按 family 列出公开名称。MCP host 的配置与结构化结果处理见[接入指南](agent-guide.md#fastmcpagent-host)，Codex 配置见[专用指南](codex-guide.md)。
+
 ### 6.1 启动
 
 ```bash
-python -m fatebridge.mcp_server
+uv run --locked --extra dev python -m fatebridge.mcp_server
 ```
 
 ### 6.2 MCP 工具分组
@@ -780,3 +785,13 @@ python -m fatebridge.mcp_server
 - [architecture.md](architecture.md)
 - [algorithm-coverage.md](algorithm-coverage.md)
 - [troubleshooting.md](troubleshooting.md)
+
+## 咨询范围与禁区校验
+
+场景按9主题、3服务和1多主题组合组织，另有风水基础计算。机器发现返回 consultation 元数据与共享策略，细则见 [技能分布](../skills/README.md)。
+
+生死寿命、灾祸断言、临床诊断治疗与医疗择时不提供。卜卦 category 不再接受 death、health、pregnancy，择时 topic_id 不再接受 surgery；直接服务／核心调用亦不能将这些类别静默回退为 general 或 marriage。对已知明确的禁区问法，REST／MCP／CLI 在计算前返回非重试错误 consultation_restricted，issues 保留安全路径而不回显问题。其他无效枚举仍按 validation_error 处理。调用方须在选工具前完成语义判断；有限文本检测不是完整语义安全保证。
+
+健康返回仅含盘内文化分类与对应，旧疾病风险根保留但禁用。没有中医辨证／体质问卷能力，不能据五行制定饮食、药物或治疗。
+
+子女专项保留命主视角的星／宫与传统关系，不提供数量预测字段；时间信号不提供备孕、添丁或生育建议。孩子本人分析需使用孩子资料。普通星盘已移除死亡点计算及输出，剩余阿拉伯点不用于生死解释。

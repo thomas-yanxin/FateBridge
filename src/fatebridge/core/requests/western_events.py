@@ -85,8 +85,6 @@ class AstroHoraryRequest(_DeferredModel):
         "wealth",
         "family",
         "property",
-        "pregnancy",
-        "health",
         "marriage",
         "lawsuit",
         "theft",
@@ -94,12 +92,12 @@ class AstroHoraryRequest(_DeferredModel):
         "career",
         "hope",
         "enemy",
-        "death",
     ] = Field(
         default="general",
         description=(
             "Question topic, selecting the quesited house: general/wealth/family/"
-            "property/pregnancy/health/marriage/lawsuit/theft/travel/career/hope/enemy/death"
+            "property/marriage/lawsuit/theft/travel/career/hope/enemy; "
+            "生死、疾病与生育临床判断不开放"
         ),
     )
     house_system: Union[int, str] = Field(
@@ -149,7 +147,6 @@ class AstroElectionRequest(_DeferredModel):
         "trade",
         "buy_car",
         "contract",
-        "surgery",
         "travel",
         "job_hunt",
         "general",
@@ -157,7 +154,7 @@ class AstroElectionRequest(_DeferredModel):
         default="marriage",
         description=(
             "Undertaking type, selecting the rule pack: marriage/business/move_in/"
-            "buy_property/trade/buy_car/contract/surgery/travel/job_hunt/general"
+            "buy_property/trade/buy_car/contract/travel/job_hunt/general; 不提供医疗择时"
         ),
     )
     house_system: Union[int, str] = Field(

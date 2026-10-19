@@ -418,7 +418,7 @@ def test_scene_constraints_and_proposals_match_all_transports(
     async def call():
         async with Client(create_mcp_app()) as client:
             public = {t.name: t for t in await client.list_tools()}["fengshui_assess"]
-            Draft202012Validator(public.inputSchema).validate(inputs)
+            Draft202012Validator(public.input_schema).validate(inputs)
             return await client.call_tool("fengshui_assess", {**inputs, **controls})
 
     rest = rest_client(monkeypatch).post(

@@ -1,0 +1,4 @@
+interface:
+  display_name: 人际与合作
+  short_description: 区分个人交往方式和双人合作，解释分工、支持与磨合，不用分数认定现实信用
+  default_prompt: 使用 $onda-renji 围绕我这次的问题，按主题、对象与时间范围选择有价值的依据，解释差异与可核对的安排。

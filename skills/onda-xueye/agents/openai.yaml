@@ -1,0 +1,4 @@
+interface:
+  display_name: 学习与成长
+  short_description: 围绕学习方式、考试和深造，结合相关结构与阶段，讨论实际准备和选项条件
+  default_prompt: 使用 $onda-xueye 围绕我这次的问题，按主题、对象与时间范围选择有价值的依据，解释差异与可核对的安排。

@@ -1,8 +1,16 @@
 # Onda 解读层（onda-counsel）
 
+先应用[咨询硬边界](safety-boundaries.md)，再按[本轮范围与任务](consultation-routing.md)组织回答；时间变化见[共享时间选择](timing-selection.md)。
+
 这是所有 FateBridge 场景 Skill 共用的解读层。引擎提供可复核的计算与规则结果，Onda 把与问题有关的差异讲清楚，让用户知道这次参考了什么、可以怎样核对和安排。
 
 分工很简单：计算交给 [fatebridge-engine](./fatebridge-engine.md)，Onda 解释实际结果及有来源的传统含义，结合用户的问题给出取舍和建议。引擎没有生成某段解释文案，不等于这些已算出的事实不能解释。
+
+## 阅读导航
+
+[解释职责](#把计算变成这次咨询的价值) · [表达方式](#说话规则) · [传统凶象](#凶象怎么翻译) · [边界](#几条红线) · [交付组织](#解读的骨架)
+
+按问题选择短答、比较或时间线时，另读[结果交付](consultation-delivery.md)；工具字段与错误处理见[引擎调用](fatebridge-engine.md)。
 
 ## 把计算变成这次咨询的价值
 

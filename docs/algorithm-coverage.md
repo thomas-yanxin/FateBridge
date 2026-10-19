@@ -1,6 +1,10 @@
 # FateBridge 算法与能力覆盖矩阵
 
+[文档中心](README.md) · [核心概念](concepts.md) · [API 参考](api-reference.md)
+
 本文档列出当前工具、实际实现范围、精度依赖与未覆盖项目。工具名按 MCP 集合统计；输入参数查 [API 参考](api-reference.md)，按用户问题选工具查[场景路由](scenario-routing.md)。
+
+查找某项能力先看[总览](#1-总览13-个-family--87-个工具)和[工具清单](#2-逐-family-工具清单)；评估结果精度再看[依赖说明](#3-精度与依赖说明)与[快照覆盖](#4-快照协议覆盖)。八字和双人模型的版本分别见[八字判定](bazi-assessment.md)、[双人评分](compatibility-scoring.md)，风水规则见[家居风水](fengshui.md)。
 
 状态分类：
 
@@ -59,8 +63,8 @@
 | `bazi_marriage` | 婚姻：配偶星/宫、婚期信号、婚姻质量 | Implemented |
 | `bazi_career` | 事业：事业类型、行业、创业倾向、贵人方位 | Implemented |
 | `bazi_wealth` | 财运：正偏财、财库、求财方式/方位、破财风险 | Implemented |
-| `bazi_health` | 传统健康文化：体质标签、五行脏腑对应与养护参考；不作疾病判断 | Implemented |
-| `bazi_children` | 子女：子女星/宫、缘分、生育时机 | Implemented |
+| `bazi_health` | 传统健康文化：盘内权重／寒暖分类和传统名称对应；疾病风险禁用，不作体质诊断或调理处方 | Implemented |
+| `bazi_children` | 命主视角的子女星／宫传统对应；不推数量、生育能力或生育时间 | Implemented |
 | `bazi_education` | 学业：印星/食伤/官星、学历倾向、文昌、考试时机 | Implemented |
 | `bazi_personality` | 性格：日主心性、十神性格、刚柔内外向 | Implemented |
 | `bazi_relatives` | 六亲：父母/兄弟姐妹星、六亲宫位、贵人 | Implemented |

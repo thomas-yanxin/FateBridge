@@ -1,8 +1,18 @@
 # 家居风水基础计算
 
+[文档中心](README.md) · [请求示例](examples/README.md) · [玄空宅盘](fengshui-xuankong.md) · [咨询技能](../skills/onda-fengshui/SKILL.md)
+
 当前提供七个工具：公共方位、个人命卦、八宅、金锁玉关基础砂水、年度紫白飞星、玄空历史宅盘和分层合参。三端来自同一目录，核心规则离线计算，不依赖外部风水服务。布局、室内关系、材质及候选方案通过 `fengshui_assess` 的独立分支审查。结果表示选定传统规则中的关系；规则来源、计算一致性和现实预测效力是不同事项。
 
 本项目采用的专家访谈口径以九宫飞星、金锁玉关和八宅为主要方法；局部工位／合租先考虑飞星、次金锁，八宅命卦独立处理。政策是用户提供的专家口径，来源、方法细节及环境上下文各自有版本；不将本人或周围人的八字／紫微喜忌代入房屋五行。现代 BTB 仅用户明确另选时作为作者辅助，不作默认替代。
+
+| 你要完成什么 | 从哪里开始 |
+| --- | --- |
+| 运行一个请求 | [入口与最小输入](#入口与最小输入)、[三端例子](#三端例子) |
+| 区分个人命卦、宅盘与年盘 | [规则与版本](#规则与版本)、[输入语义和边界](#输入语义和边界) |
+| 关联门床桌灶或比较候选 | [布局对象](#布局对象的通用计算)、[候选布局合同](../skills/onda-fengshui/references/scene-planning.md) |
+| 判断结果是否完整、是否可以执行 | [分层结果与覆盖状态](#分层结果与覆盖状态) |
+| 维护实现与验收 | [实现与规则数据](#实现与规则数据)、[验证与维护](#验证与维护) |
 
 ## 入口与最小输入
 
@@ -24,7 +34,9 @@
 
 ## 三端例子
 
-将以下内容保存为 `home.json`。仓库另提供可直接运行的 [示例文件](examples/fengshui-home.json)。
+先按[快速入门](getting-started.md)安装项目。以下命令在仓库根目录执行，REST 示例要求本地服务已启动；API Key 请求头按服务配置提供。
+
+将以下虚构输入保存为 `home.json`，用于查看原始分层结果；它没有启用家具布局分析。仓库另提供含布局对象的 [完整示例文件](examples/fengshui-home.json)。示例的年份、方向和人物均须按现场事实替换。
 
 ```json
 {
@@ -57,14 +69,14 @@ curl -X POST http://localhost:8010/api/fengshui/assess \
   -H 'Content-Type: application/json' --data-binary @home.json
 
 # CLI：完整 JSON 请求，适用于住宅、住户和环境嵌套对象。
-fatebridge fengshui_assess --request-file home.json --compact
+uv run --locked --extra dev fatebridge fengshui_assess --request-file home.json --compact
 
 # 简单工具也支持普通参数。
-fatebridge fengshui_minggua --effective-birth-year 1990 --gender-convention female
-fatebridge fengshui_annual_stars --query-at '2026-02-04T04:03:00+08:00'
+uv run --locked --extra dev fatebridge fengshui_minggua --effective-birth-year 1990 --gender-convention female
+uv run --locked --extra dev fatebridge fengshui_annual_stars --query-at '2026-02-04T04:03:00+08:00'
 
 # 复杂字段可用 JSON 参数；显式字段覆盖请求文件同名顶层字段。
-fatebridge fengshui_assess --request-file home.json \
+uv run --locked --extra dev fatebridge fengshui_assess --request-file home.json \
   --methods '["annual_stars"]' --effective-year 2027
 ```
 
@@ -76,7 +88,7 @@ from fastmcp import Client
 
 async def main():
     async with Client({"mcpServers": {"fatebridge": {
-        "command": "fatebridge-mcp", "args": []
+        "command": "uv", "args": ["run", "--locked", "--extra", "dev", "fatebridge-mcp"]
     }}}) as client:
         inputs = json.loads(Path("home.json").read_text())
         result = await client.call_tool("fengshui_assess", inputs, raise_on_error=False)
@@ -112,9 +124,13 @@ asyncio.run(main())
 
 `method_policy.priority_review_status` 与每法 `not_selected_reason` 单独报告优先审查范围，区分自动缺输入和显式排除；不改变已选方法的计算完成状态，也不把未选方法算成已审。局部所需飞星／金锁缺资料时保留范围，不为了 complete 补事实；用户排除或仅问其他已选范围时不强追资料。
 
+### 方位与分宫
+
 角度范围0–360，360归零；八方中心间隔45°，半宽22.5°；24山中心间隔15°，半宽7.5°。正好22.5°归东北／丑山。宅向推导坐山时加180°；同时提供 `sitting_trigram` 必须一致。基础方位／八宅角度必须声明 `north_reference=magnetic|true`（玄空当前版本要求 magnetic），不自动校正磁偏角。只有已确认宅卦时可直接提供 `sitting_trigram`。
 
 `house.division_method` 只接受 `confirmed_angular_sectors`。八方角区、九等分网格和示意九宫图不是同一个几何计算；当前不自动识别户型图片、不自动定中心，也不推断不规则户型分宫。
+
+### 环境与实际使用范围
 
 `environmental_context` 可独立保存方位／图纸对齐与中心确认、同住家庭辈分／排行、独立确认生肖、各楼层／院落与明确形态观察；不要求为这些事实提交生辰。输出位于 `layout_analysis.environmental_context`，其中上下文宫位绑定须经过方向、户型对齐与立极三个门槛。该模块不计算飞星，也不把家庭象征索引当成现实人物受影响结论。院落归第一层但共享整体关系仍需复核；局限本层且异层适宜有依据时，不自动将该局部不利归给异层住户。厨卫、材质和器形事实不自动变成禁忌，未有具体判据的项目保留未覆盖。具体字段以当前输入 Schema 为准，核对流程见[风水咨询闭环](../skills/onda-fengshui/references/consultation.md)。
 
@@ -126,11 +142,15 @@ asyncio.run(main())
 
 `floors[].subject_ids` 是正向使用名单，省略不等于无人或某人不使用。仅在需要作负向排除时，相关作用空间完整使用范围须以 `usage_confirmed=true` 与成对 `usage_evidence` 明确确认；否则保持待确认，不能据其他适宜层的住户名单自动豁免本层／共享影响。
 
+### 出生日期与查询时间
+
 时间输入必须含 UTC 偏移或Z，`timezone_name` 默认为 `Asia/Shanghai`，可用 IANA 名称或偏移。每个出生／查询时刻与对应有效年字段二选一。显式有效生年表示调用方已确认换年，无需出生小时或真太阳时。未知 `gender_convention` 应省略或传 null，返回男女候选并标记 `partial`，不会默认男性。支持有效年1800–2199、带时区输入1801–2199；区间结束可延伸下一年。
 
 命卦另接受公历 `birth_date`，与有效生年、出生时刻三选一。按所选时区计算立春所在日期；之前取上一有效生年，之后取本年，立春当日保留 `partial` 并要求出生时刻。选择 `january_1` 时日期即可确定生年。该路径不构造虚假的出生小时，也不使用真太阳时。
 
 年盘有效期是 `[立春, 下次立春)`，不硬编码2月4日午夜，也不按春节。节气沿用现有 `almanac`：优先 Swiss，可能回退线性近似；输出 `timing` 说明供应函数、Swiss可用性、可能回退及独立核验范围。登记的外部参考核对2026立春日期和分钟，不认证现有引擎的秒级精度。
+
+### 物件位置与朝向
 
 布局对象分别提供 `location_direction` 与可选 `facing_direction`。后者必须配套用途语义：门 `door_facing`、床头 `headboard`、书桌 `desk_facing`、灶 `fire_mouth`。灶座按凶方约定、已确认火门按吉方约定；现代燃气旋钮不是自动等同古火门。床头与书桌朝向是本版本明确的应用约定。住宅宅盘与每位住户命盘分别输出；`subject_id` 只筛选一位布局关联住户，`subject_ids` 选择明确的多人使用集合，两者互斥；不传二者则保留应用全部已提供住户的语义，均不修改宅卦。多人列表非空、成员唯一且必须引用已提供住户。对象实际使用者与全宅住户分开，不能把同住自动当共用。未知住户引用、重复住户／布局 ID 被拒绝。
 
@@ -188,6 +208,8 @@ asyncio.run(main())
 
 ## 分层结果与覆盖状态
 
+先检查协议成功与否，再看原始盘、布局及具体请求分支的状态。最后分别核对规则覆盖、未选方法与动作可行性；这些状态回答不同问题，不能只读顶层 `status`。通用区别见[结果状态](concepts.md#状态与覆盖分开阅读)。
+
 实际结果的主字段：
 
 ```text
@@ -220,7 +242,7 @@ run_metadata: 三端通用运行元数据
 可用通用 `fields` 投影及快照开关降低体积：
 
 ```bash
-fatebridge fengshui_assess --request-file home.json \
+uv run --locked --extra dev fatebridge fengshui_assess --request-file home.json \
   --fields layers.annual_stars.palaces.S coverage --no-include-snapshot-text --compact
 ```
 
@@ -229,7 +251,7 @@ fatebridge fengshui_assess --request-file home.json \
 ## 验证与维护
 
 ```bash
-pytest -q tests/test_fengshui.py tests/test_fengshui_surfaces.py
+uv run --locked --extra dev pytest -q tests/test_fengshui.py tests/test_fengshui_surfaces.py
 ```
 
 离线测试用[固定参考事实](../tests/fixtures/fengshui-reference.json)登记的提交／SHA-256核对1900–2099男女命卦400项、独立八宅字典64项，并测试纪元／世纪／五数寄宫、立春前后与时区等价、方位边界、坐向反转、门床灶用途、不同住户、未知／混合砂水、来源版本、三端真实调用／校验／投影／请求文件。2026九宫另用作者出版年盘核对。代表性输入加入现有全端与 golden 覆盖，新增快照不重写旧工具数值基线。

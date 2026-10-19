@@ -1,5 +1,4 @@
 import asyncio
-import sys
 from datetime import datetime
 
 import pytest
@@ -173,9 +172,6 @@ def test_analyze_liuri_effects_reuses_precomputed_liuri(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_heavy_api_routes_honor_shared_concurrency_limit(monkeypatch):
-    if sys.version_info < (3, 10):
-        pytest.skip("api.py requires Python 3.10+ to import")
-
     import fatebridge.api as api_module
     from fatebridge.core.requests.timing import TimingAnalysisRequest
 

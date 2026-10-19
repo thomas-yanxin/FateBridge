@@ -1,8 +1,12 @@
 # 法达版本兼容参考与验收约定
 
-本文将 2026-10-19 用户提供的法达计算说明整理为可复现的工程参考。来稿未提供作者、版本或可核验的第三方实现；其中关于“测测端”的描述只代表来稿，不证明该产品的实际算法。
+本文说明法达的夜盘顺序、年长与时间边界，供调用者选择参数、维护者核对兼容性。独立 `firdaria` 与综合 `western_timing_analysis` 共用两项选择；默认组合保持既有结果。
 
-**公历周年版本已接入生产代码，现有法达默认组合保持原结果和返回结构。** 两个独立参数 `firdaria_night_order` 与 `firdaria_year_basis` 同时适用于独立 `firdaria` 和综合 `western_timing_analysis`，见第 8 节。下文 profile ID 仍是文档和测试标签，不是接口参数；它们只标识四种可选组合中的两种。
+[文档中心](README.md) · [算法覆盖](algorithm-coverage.md) · [API 参考](api-reference.md)
+
+直接调用先看[生产接口选择](#8-生产接口选择)；比较日期差异看[两套口径](#1-两套口径)及[显示示例](#6-显示与两个原文示例)；修改实现先核对[时区](#4-时区约定)、[边界算法](#5-公历周年闰日与等分)与[验收范围](#7-验收用例与判定范围)。
+
+两个独立参数 `firdaria_night_order` 与 `firdaria_year_basis` 同时适用于独立 `firdaria` 和综合 `western_timing_analysis`，见第 8 节。下文 profile ID 仍是文档和测试标签，不是接口参数；它们只标识四种可选组合中的两种。
 
 ## 1. 两套口径
 
@@ -23,6 +27,8 @@
 
 ## 2. 来源与工程补充的边界
 
+本参考的来稿于 2026-10-19 由用户提供，未含作者、版本或可核验的第三方实现；其中关于“测测端”的描述只代表来稿，不证明该产品的实际算法。
+
 - 来稿提供：九段年限、日夜顺序、七等分小运、交点不分小运、两个分钟显示示例。
 - [Öner Döşer《Astrological Prediction》节选，第 38–40 页](https://bendykes.com/wp-content/uploads/2016/08/ap-extract.pdf)：列出总计 75 年的九段及七等分规则，采用夜盘交点位于火星之后的版本。
 - [Steven Birchfield《Firdar》，2020 修订，第 2–6 页及附表](https://birchfieldastrology.com/wp-content/uploads/2020/07/firdar_revision-02-2020-07-13.pdf)：引述 Abu Maʿshār 的夜盘水星后接交点规则，并讨论通常归于 Bonatti 的另一种理解。因此本文用 `bonatti` 作版本标签，不将历史归属争议写成已无争议的事实。
@@ -34,7 +40,7 @@
 
 固定年限为太阳 10、金星 8、水星 13、月亮 9、土星 11、木星 12、火星 7、北交 3、南交 2，总和严格为 75。
 
-| 大运 | 日盘名义年龄 | 当前夜盘名义年龄 | 来稿夜盘名义年龄 |
+| 大运 | 日盘名义年龄 | 默认夜盘名义年龄 | 来稿夜盘名义年龄 |
 | --- | --- | --- | --- |
 | 太阳 | 0–10 | 39–49 | 44–54 |
 | 金星 | 10–18 | 49–57 | 54–62 |
@@ -52,11 +58,11 @@
 
 ## 4. 时区约定
 
-### 当前引擎的可观测行为
+### 默认固定年模式的可观测行为
 
 出生钟时按 `birth_timezone` 解析，未传时区时沿用地点推断及共享构造器回退行为。分析钟时也按出生时区解释；验收始终显式提供时区和分析钟时，不依赖系统现在、出生小时的默认回填或未知地点。
 
-时间线从带时区的 `birth_info.local_datetime` 出发，直接做本地 `timedelta` 加法并输出 `isoformat()`，没有先统一到 UTC。在 IANA 时区跨夏令时时，墙上钟时加法与真实 UTC 历时可能相差一小时；不能宣称当前算法对所有 IANA 时区均采用恒定 UTC 秒数。当前接口也没有法达专用的出生 `fold` 消歧参数。
+默认固定年模式的时间线从带时区的 `birth_info.local_datetime` 出发，直接做本地 `timedelta` 加法并输出 `isoformat()`，没有先统一到 UTC。在 IANA 时区跨夏令时时，墙上钟时加法与真实 UTC 历时可能相差一小时；不能宣称当前算法对所有 IANA 时区均采用恒定 UTC 秒数。当前接口也没有法达专用的出生 `fold` 消歧参数。
 
 ### 参考版本的新增约定
 
@@ -93,7 +99,7 @@ k = 0..7，量化单位为微秒
 
 参考版本的原始边界保留微秒；分钟展示只在时区转换之后将秒、微秒归零。展示值不回写计算，也不影响边界归属。名义年龄使用整数累计年限，第一周期结束固定标为 75，原文的 `75.1` 仅作为未核验的产品展示描述保留。
 
-| 场景（时区补充为 Asia/Shanghai） | 参考精确小运结束 | 参考分钟展示 | 当前引擎小运结束 |
+| 场景（时区补充为 Asia/Shanghai） | 参考精确小运结束 | 参考分钟展示 | 默认固定年模式小运结束 |
 | --- | --- | --- | --- |
 | 1997-12-28 18:25，夜盘月亮首段 | 1999-04-12T08:07:51.428571+08:00 | 1999-04-12 08:07 +08:00 | 1999-04-12T08:45:24+08:00 |
 | 2001-10-12 11:40，日盘太阳首段 | 2003-03-18T04:48:34.285714+08:00 | 2003-03-18 04:48 +08:00 | 2003-03-18T06:16:00+08:00 |
@@ -115,7 +121,7 @@ k = 0..7，量化单位为微秒
 
 ```bash
 uv sync --locked --extra dev
-uv run --no-sync pytest -q tests/test_firdaria_reference.py tests/test_firdaria_transports.py
+uv run --locked --extra dev pytest -q tests/test_firdaria_reference.py tests/test_firdaria_transports.py
 ```
 
 生产核心没有依赖测试内的参考函数。通过这些用例表示本地生产路径和三端协议通过验收，不表示已部署到其他环境或已核验第三方产品。返回时间线仍最多 12 段，`current_major/current_sub` 独立覆盖查询时刻。默认法达完整时间线与已有冻结数据比对，不重写黄金基线。
@@ -149,7 +155,7 @@ REST 请求体与 MCP `firdaria` 参数使用相同字段，例如（地点明�
 REST 地址为 `POST /api/astro/timing/firdaria`；综合接口为 `POST /api/astro/timing`，MCP 对应 `western_timing_analysis`。CLI 对应：
 
 ```bash
-uv run --no-sync fatebridge firdaria \
+uv run --locked --extra dev fatebridge firdaria \
   --birth-year 2001 --birth-month 10 --birth-day 12 \
   --birth-hour 11 --birth-minute 40 --birth-timezone Asia/Shanghai \
   --birth-longitude 121.4737 --birth-latitude 31.2304 \

@@ -292,6 +292,41 @@
       "analysis_day": 14,
       "analysis_hour": 12,
       "analysis_minute": 0
+    },
+    "ziwei_horoscope": {
+      "name": "演示甲",
+      "gender": "男",
+      "birth_year": 1990,
+      "birth_month": 5,
+      "birth_day": 15,
+      "birth_hour": 10,
+      "birth_minute": 30,
+      "birth_timezone": "Asia/Shanghai",
+      "birth_place": "北京",
+      "birth_longitude": 116.4074,
+      "birth_latitude": 39.9042,
+      "target_year": 2026,
+      "target_month": 10,
+      "target_day": 12,
+      "target_hour": 12
+    },
+    "firdaria": {
+      "name": "演示甲",
+      "gender": "男",
+      "birth_year": 1990,
+      "birth_month": 5,
+      "birth_day": 15,
+      "birth_hour": 10,
+      "birth_minute": 30,
+      "birth_timezone": "Asia/Shanghai",
+      "birth_place": "北京",
+      "birth_longitude": 116.4074,
+      "birth_latitude": 39.9042,
+      "analysis_year": 2026,
+      "analysis_month": 10,
+      "analysis_day": 14,
+      "analysis_hour": 12,
+      "analysis_minute": 0
     }
   },
   "suggested_fields": {
@@ -341,6 +376,12 @@
       "ziwei_birth.shen_gong",
       "ziwei_birth.palaces",
       "ziwei_birth.sihua"
+    ],
+    "ziwei_horoscope": [
+      "analysis_context",
+      "ziwei_horoscope.nominal_age",
+      "ziwei_horoscope.calendar_rules",
+      "ziwei_horoscope.scopes"
     ],
     "astro_chart": [
       "angles",
@@ -484,6 +525,18 @@
       "directions.solar_arc.arc_degrees",
       "transits.current_transit.analysis_datetime",
       "transits.current_transit.sun"
+    ],
+    "firdaria": [
+      "analysis_context",
+      "firdaria.current_major",
+      "firdaria.current_sub"
+    ],
+    "bazi_health": [
+      "health_analysis.constitution",
+      "health_analysis.organ_analysis",
+      "health_analysis.health_timing",
+      "health_analysis.scope",
+      "health_analysis.is_medical_assessment"
     ]
   },
   "call_guidance": {
@@ -518,6 +571,19 @@
       "target_clock": "analysis_hour/minute 是目标钟时，按 birth_timezone；显式0有效。省略分别沿用出生小时/分钟，仅兼容日期级调用。return_timezone转换同一时刻。",
       "delivery": "MCP默认8192字符，完整结果超限返回result_delivery。用其manifest_uri按所需字段或分页读取同一run；完整JSON重组核对sha256，不重新计算，不解析截断片段。",
       "complete_export": "用户要求完整JSON、全部时间线或完整文件时，首次fields=null，保留默认响应预算，再读取result_delivery；first_view仅用于摘要咨询，不能先投影摘要再补算全文。"
+    },
+    "ziwei_horoscope": {
+      "projection": "普通摘要显式使用 suggested_fields；strict_fields=true 配合 fields=null 仍是全量，不会自动精简。",
+      "scopes": "scopes数组只能整体投影；按本轮粒度解释所需层，不编造scopes.流年或数字索引路径，不默认读取snapshot_export。"
+    },
+    "firdaria": {
+      "scope": "普通人生阶段问题的正常候选，窄查只用本工具，不默认运行全部西占时运。",
+      "field_root": "单项读 firdaria.current_major/current_sub；聚合读 time_lords.firdaria.current_major/current_sub，不复制前缀。",
+      "time": "保留实际主运／分运起止、夜盘顺序和年长口径；阶段切换不等于现实事件日期。"
+    },
+    "bazi_health": {
+      "scope": "仅盘内文化分类与传统对应，不是中医体质辨识、辨证或医学评估。",
+      "scope_limits": "只解释盘内分类、传统对应与关系变化，不推疾病风险，不据喜用开调理处方。"
     }
   }
 }

@@ -4,7 +4,9 @@ Validate existing payloads without reserialization; dynamic map keys and
 extension fields remain open. Definitions follow the service builders.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
+
+from pydantic import ConfigDict, model_validator
 
 from fatebridge.core.output_base import PartialOutput
 
@@ -236,6 +238,7 @@ class Constitution(PartialOutput):
     warm_strength: Optional[float] = None
     cold_strength: Optional[float] = None
     notes: Optional[List[str]] = None
+    reference_scope: Optional[str] = None
 
 
 class OrganFinding(PartialOutput):
@@ -249,24 +252,34 @@ class OrganAnalysis(PartialOutput):
     element_distribution: Optional[Dict[str, float]] = None
     findings: Optional[List[OrganFinding]] = None
     summary: Optional[str] = None
-
-
-class DiseaseRisks(PartialOutput):
-    risks: Optional[List[str]] = None
-
-
-class Regimen(PartialOutput):
-    favorable_elements: Optional[List[str]] = None
-    advice: Optional[List[str]] = None
+    reference_scope: Optional[str] = None
 
 
 class HealthAnalysis(DimensionOutput):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "not": {
+                "anyOf": [
+                    {"required": ["disease_risks"]},
+                    {"required": ["regimen"]},
+                ]
+            }
+        }
+    )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _validate_cultural_scope(cls, data: Any) -> Any:
+        if isinstance(data, dict) and {"disease_risks", "regimen"} & data.keys():
+            raise ValueError("健康文化结果不提供疾病风险或调理处方区块")
+        return data
+
     constitution: Optional[Constitution] = None
     organ_analysis: Optional[OrganAnalysis] = None
-    disease_risks: Optional[DiseaseRisks] = None
     health_timing: Optional[TimingSignals] = None
-    regimen: Optional[Regimen] = None
     disclaimer: Optional[str] = None
+    scope: Optional[str] = None
+    is_medical_assessment: Optional[Literal[False]] = None
 
 
 class ChildStar(PartialOutput):
@@ -286,7 +299,6 @@ class ChildPalace(PartialOutput):
 class ChildAffinity(PartialOutput):
     score: Optional[int] = None
     tendency: Optional[str] = None
-    count_hint: Optional[str] = None
     notes: Optional[List[str]] = None
 
 

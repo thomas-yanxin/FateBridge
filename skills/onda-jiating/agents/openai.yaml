@@ -1,0 +1,4 @@
+interface:
+  display_name: 家庭与亲子
+  short_description: 区分命主家庭对应、家人本人和亲子互动，解释相关依据，联系真实责任与安排
+  default_prompt: 使用 $onda-jiating 围绕我这次的问题，按主题、对象与时间范围选择有价值的依据，解释差异与可核对的安排。

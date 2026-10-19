@@ -3,7 +3,12 @@ import json
 import pytest
 
 from fatebridge.core.ephemeris_runtime import swe
-from fatebridge.core.local_techniques.chart import _build_local_chart_response
+from fatebridge.core.local_techniques.chart import (
+    _build_local_chart_response,
+    _normalize_date_text,
+    _normalize_time_text,
+)
+from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.core.requests.divination import (
     GuaLookupRequest,
     GuaMeiyiRequest,
@@ -1498,3 +1503,42 @@ def test_meihua_uses_distinct_cuo_and_zong_fields(lunar_day, hour_branch):
     cuo_name = meihua["cuo_hexagram"]["name"]
     assert interpretation["cuo_reading"].startswith(f"错卦{cuo_name}")
     assert interpretation["cuo_oracle"]["name"] == cuo_name
+
+
+def test_normalize_date_text_zero_pads_single_digits() -> None:
+    # Both slash and dash separators, padded or not, must normalize.
+    assert _normalize_date_text("2026/4/23") == "2026-04-23"
+    assert _normalize_date_text("2026/04/23") == "2026-04-23"
+    assert _normalize_date_text("2026-4-23") == "2026-04-23"
+    assert _normalize_date_text("2026-04-23") == "2026-04-23"
+    # Non-matching inputs pass through unchanged so callers get a useful
+    # fromisoformat error message rather than silently corrupted data.
+    assert _normalize_date_text("not-a-date") == "not-a-date"
+
+
+def test_normalize_time_text_zero_pads_hours_and_seconds() -> None:
+    assert _normalize_time_text("9:15") == "09:15:00"
+    assert _normalize_time_text("9:5:3") == "09:05:03"
+    assert _normalize_time_text("") == "00:00:00"
+    assert _normalize_time_text("12:00:00") == "12:00:00"
+
+
+def test_sixyao_moving_lines_honor_supplied_codes() -> None:
+    """If caller passes gua_code and changed_code but no lines, the change
+    flags must be derived from the codes (not from the placeholder seed,
+    which would report lines 3 and 6 as moving for any request)."""
+    result = build_sixyao_result(
+        date="2026/04/23",
+        time="12:00",
+        zone="+08:00",
+        lat="31n13",
+        lon="121e28",
+        question="audit",
+        gua_code="111000",
+        changed_code="110000",
+    )
+    assert result["moving_lines"] == [3]
+    # Line 6 (上爻) had a hardcoded change=True in the old default seed — it
+    # must now correctly report no change.
+    assert result["lines"][5]["change"] is False
+    assert "is_fuyin_line" not in result["lines"][5]

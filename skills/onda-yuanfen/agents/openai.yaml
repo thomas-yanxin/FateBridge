@@ -1,4 +1,4 @@
 interface:
-  display_name: "缘分 · 感情相处"
-  short_description: "分清个人倾向与双人配合，说明相处中的异同，找到一个值得谈清的问题"
-  default_prompt: "使用 $onda-yuanfen 分析我的感情问题，依据实际结果说明最相关的配合与张力，并给一项能观察真实回应的沟通建议。"
+  display_name: 感情与伴侣关系
+  short_description: 区分单人感情方式、双方互动与所问时段，解释相关依据和分歧，保留现实选择
+  default_prompt: 使用 $onda-yuanfen 围绕我这次的问题，按主题、对象与时间范围选择有价值的依据，解释差异与可核对的安排。

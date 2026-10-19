@@ -9,21 +9,27 @@
 - 使用当前聊天已确认的资料。人物资料完整的独立咨询是自包含任务，不查仓库、项目历史或记忆；用户明确要求沿用历史资料时再核对。
 - 用户用日常语言说明问题与已知资料即可。助手负责选择方法、解析可支持的城市、整理时区和接口字段；专业术语、坐标、规则版本和对象 ID 不作为通用咨询门槛。概念解释无需先收个人资料。
 - 按本次所选计算一次核对真正必要的资料；缺失或日期无效时用 1–3 句说明影响并简短追问，同时交付已有依据能回答的部分。用户明确不知道或无法提供后，停止追问同项，说明当前可做的具体范围；可选精度、其他方法缺项和执行条件不升级为本次前置要求。八字／紫微缺出生时刻不能猜，仅有时段时保留排盘不确定性，也不能把接口默认值或示例当作用户资料。命卦支持 `birth_date`，非立春当日无需出生小时；双人关系类型未说明时用 `general`。
-- 按问题选择一项主证，必要时补旁证。专项分析已自动推算大运／流年，不重复计算已有结果。
+- 先按[咨询硬边界](skills/_shared/safety-boundaries.md)检查请求，再按[用户问题与范围](skills/_shared/consultation-routing.md)识别主题、对象、任务与时间范围。禁止生死寿命、灾祸断言、临床诊断／治疗与医疗择时；不先计算后加免责声明。
+- 专题综合咨询主动评估有价值的多视角，各依据负责结构、互动、阶段或目标时段；不固定单体系为全部领域主证。单项或限定方法按其范围，后台多工具不扩大正文主题。首轮明确要求全面就覆盖；追问只补新增范围并保留已有相关视角。
+- 时间贯穿所有主题，按[共享时间选择](skills/_shared/timing-selection.md)考虑大运／流年、紫微运限、法达等分期及相应粒度；专项已自动推算的层不重复计算。
 
-| 咨询问题 | 场景技能 | 首选计算 |
+| 咨询问题 | 场景技能 | 本轮组织方式 |
 | --- | --- | --- |
-| 事业、换工作、创业、财运 | [onda-shiye](skills/onda-shiye/SKILL.md) | 事业用 `bazi_career`，财运按技能选择 |
-| 姻缘、桃花、双人相处 | [onda-yuanfen](skills/onda-yuanfen/SKILL.md) | 双人用 `two_person_compatibility`，单人按技能选择 |
-| 综合时运、大运流年、择时 | [onda-shiyun](skills/onda-shiyun/SKILL.md) | `timing_analysis` 或所选体系／粒度 |
-| 传统健康文化、身心养护参考 | [onda-jiankang](skills/onda-jiankang/SKILL.md) | 按技能选择；具体不适优先现实求助 |
-| 单项性格、天赋、学业、六亲 | [onda-mingge](skills/onda-mingge/SKILL.md) | 按具体问题选择专项或命盘 |
-| 西占本命盘、流派盘、关系盘 | [onda-xingpan](skills/onda-xingpan/SKILL.md) | 按流派与盘型选择 |
-| 起卦、具体决定、问事 | [onda-zhanbu](skills/onda-zhanbu/SKILL.md) | 按问题与起卦方式选择 |
-| 明确要求多维度、八字紫微西占全面画像 | [onda-zige](skills/onda-zige/SKILL.md) | 三体系对照，保留缺失层 |
-| 风水空间、布局与物件 | [onda-fengshui](skills/onda-fengshui/SKILL.md) | 布局主入口 `fengshui_assess` |
+| 性格、天赋、做事方式 | [onda-mingge](skills/onda-mingge/SKILL.md) | 认识自己，按问题选相关命盘／性格依据 |
+| 事业、岗位、晋升、跳槽、创业角色 | [onda-shiye](skills/onda-shiye/SKILL.md) | 事业结构、多视角与所需时间层 |
+| 收入、消费、积累、回款、共同资金 | [onda-caiwu](skills/onda-caiwu/SKILL.md) | 财务任务与时间变化，不自动展开事业报告 |
+| 恋爱、桃花、伴侣、婚姻相处 | [onda-yuanfen](skills/onda-yuanfen/SKILL.md) | 单人、双人、时机分别取证 |
+| 学习、考试、深造、专业、留学 | [onda-xueye](skills/onda-xueye/SKILL.md) | 学习特点、阶段与现实选项 |
+| 原生家庭、六亲、亲子 | [onda-jiating](skills/onda-jiating/SKILL.md) | 命主、家人本人及双方互动分开 |
+| 朋友、同事、团队、合伙、人际支持 | [onda-renji](skills/onda-renji/SKILL.md) | 非浪漫关系与真实分工，不判断信用或心意 |
+| 传统身心／中医文化解释 | [onda-jiankang](skills/onda-jiankang/SKILL.md) | 文化分类、传统含义、独立健康信息分层；不诊断 |
+| 风水空间、布局与物件 | [onda-fengshui](skills/onda-fengshui/SKILL.md) | 布局主入口与实际空间规则 |
+| 无限定主题的整体时运、人生阶段、候选择时 | [onda-shiyun](skills/onda-shiyun/SKILL.md) | 时间服务；主题明确则保留该主题主持 |
+| 指定本命盘、流派盘、关系盘或技法 | [onda-xingpan](skills/onda-xingpan/SKILL.md) | 指定方法服务，按主题解释实际结果 |
+| 明确起卦、问事 | [onda-zhanbu](skills/onda-zhanbu/SKILL.md) | 所选卜法，不自动介入普通决定 |
+| 多主题全面画像 | [onda-zige](skills/onda-zige/SKILL.md) | 多主题组合入口，综合能力由各主题共享 |
 
-- 先读取匹配的场景技能再计算；已有工具合同不替代技能的解读规则。单项性格与全面画像按用户范围区分，不为完整画像误选单项技能。技能从软链接入口发现时，先解析 `SKILL.md` 的真实路径，再以真实目录解析引用；共享资料路径不能按 `.agents` 的父目录拼接。
+- 先读取匹配的场景技能再计算；已有工具合同不替代技能的解读规则。单主题多体系与多主题画像按用户范围区分，不为一个主题扩成人生报告。技能从软链接入口发现时，先解析 `SKILL.md` 的真实路径，再以真实目录解析引用；共享资料路径不能按 `.agents` 的父目录拼接。
 
 - 下方生成合同已覆盖的工具，资料齐全且连接公开时直接调用。其他工具以已连接 MCP 的实际 Schema 和描述为准；需检索时按工具名限定 `ALL_TOOLS`，一次取得完整说明与参数定义后计算。只有选择确有歧义时才展开候选，不先列工具名再重复检索。
 - 使用已验证的首轮 `fields`，设置 `strict_fields=true`、`include_snapshot_text=false`。完整契约、全年时间线及其他分支只在问题需要时展开。
