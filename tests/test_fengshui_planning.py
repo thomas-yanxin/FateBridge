@@ -106,7 +106,7 @@ def test_scene_selection_uses_inputs_and_explicit_choice_wins():
 
 
 def test_empty_scene_is_partial_and_legacy_raw_request_keeps_its_layers():
-    result = assess(scene="workstation")
+    result = assess(scene="workstation", analyze_layout=True)
     assert result["status"] == "partial"
     assert result["coverage"]["analysis_progress"]["assessment_complete"] is False
     assert set(assess()["layers"]) == {"bazhai", "jinsuo", "annual_stars"}
