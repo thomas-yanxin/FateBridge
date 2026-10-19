@@ -7,7 +7,7 @@ Codex 用户可直接从 [Codex 使用指南](codex-guide.md) 开始：独立 st
 FateBridge 的领域能力通过三条通道暴露出来：
 
 - REST：`python -m fatebridge.api`，默认监听 `:8010`，适合 Web、后端服务或脚本调用
-- FastMCP：`python -m fatebridge.mcp_server`，供 Claude / Cursor / Codex 等 MCP host 使用
+- FastMCP：`fatebridge-mcp`（等价写法：`python -m fatebridge.mcp_server`），供 Claude / Cursor / Codex 等 MCP host 使用
 - CLI：`fatebridge <tool> ...`，适合 Agentic 流程、shell 或自动化脚本
 
 三条通道共用 `src/fatebridge/services/tool_catalog.py` 装配的中央目录，领域声明位于 `services/catalog/`，请求字段定义于 `core/requests/`。共享领域计算和错误字段，各端仍有名称、绑定和校验阶段差异。
@@ -287,7 +287,8 @@ console.log(data.wealth_analysis);
 启动：
 
 ```bash
-python -m fatebridge.mcp_server
+fatebridge-mcp
+# 等价于 python -m fatebridge.mcp_server
 ```
 
 将 stdio 进程注册到支持 `mcpServers` 配置的 MCP host（以下是结构示例，路径需替换为实际安装目录）：
@@ -298,6 +299,18 @@ python -m fatebridge.mcp_server
     "fatebridge": {
       "command": "/absolute/path/to/FateBridge/.venv/bin/python",
       "args": ["-m", "fatebridge.mcp_server"]
+    }
+  }
+}
+```
+
+也可直接使用安装后的脚本，GUI host 同样建议使用绝对路径：
+
+```json
+{
+  "mcpServers": {
+    "fatebridge": {
+      "command": "/absolute/path/to/FateBridge/.venv/bin/fatebridge-mcp"
     }
   }
 }
