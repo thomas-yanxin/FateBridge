@@ -4,7 +4,13 @@
 
 ## 安装
 
-需要 Git 和 Python 3.10+；当前 CI 覆盖 3.10–3.13，建议首次使用 Python 3.12。依赖与三个控制台入口由 `pyproject.toml` 声明，先安装再运行：当前 `src/` 布局不能仅靠切到仓库根目录导入包。
+需要 Python 3.10+；当前 CI 覆盖 3.10–3.13，建议首次使用 Python 3.12。依赖与三个控制台入口由 `pyproject.toml` 声明，先安装再运行：
+
+```bash
+python -m pip install fatebridge==0.1.0
+```
+
+需要修改源码时再使用 Git 安装；当前 `src/` 布局不能仅靠切到仓库根目录导入包：
 
 ```bash
 git clone https://github.com/Yonder-Lab/FateBridge.git

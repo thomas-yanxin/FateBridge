@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg)](pyproject.toml)
 [![CI](https://github.com/Yonder-Lab/FateBridge/actions/workflows/ci.yml/badge.svg)](https://github.com/Yonder-Lab/FateBridge/actions/workflows/ci.yml)
 
-FateBridge 是一个可在本地运行的 Python 后端能力库，把八字、紫微、传统占术、西方占星与风水规则组织成可调用、可复算、带来源的计算接口。应用通过 REST 接入，Agent 通过 MCP 调用，脚本通过 CLI 运行；当前版本为 **Beta 0.2.0**。
+FateBridge 是一个可在本地运行的 Python 后端能力库，把八字、紫微、传统占术、西方占星与风水规则组织成可调用、可复算、带来源的计算接口。应用通过 REST 接入，Agent 通过 MCP 调用，脚本通过 CLI 运行；当前版本为 **0.1.0**。
 
 当前提供 **86 个业务 REST 路由**、**87 个 FastMCP 工具**；中央目录含 88 条记录，CLI 可执行其中87条。三端共用领域计算，名称和请求形态见 [三端能力边界](docs/api-reference.md#24-三端能力边界)。完整 **13 family / 87 工具** 清单见 [算法覆盖矩阵](docs/algorithm-coverage.md)。
 
@@ -35,7 +35,13 @@ FateBridge 是一个可在本地运行的 Python 后端能力库，把八字、�
 
 ## 快速开始
 
-需要 Git 和 Python 3.10+，当前 CI 覆盖 3.10–3.13。以下为 macOS / Linux 示例；Windows、pip 安装和全部配置见 [快速入门](docs/getting-started.md#安装)。
+需要 Python 3.10+，当前 CI 覆盖 3.10–3.13。通过 PyPI 安装：
+
+```bash
+python -m pip install fatebridge==0.1.0
+```
+
+源码开发安装需要 Git，以下为 macOS / Linux 示例；Windows 和全部配置见 [快速入门](docs/getting-started.md#安装)。
 
 ```bash
 git clone https://github.com/Yonder-Lab/FateBridge.git

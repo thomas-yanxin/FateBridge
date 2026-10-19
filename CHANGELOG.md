@@ -10,6 +10,16 @@ by a published GitHub Release through `.github/workflows/publish.yml`.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-19
+
+首次正式发布到 PyPI，包版本统一为 `0.1.0`，Git 标签为 `v0.1.0`。
+此前 `0.2.0` 为未发布的开发版本；下方保留其开发记录。
+
+- 提供 `pip install fatebridge==0.1.0` 安装方式，以及
+  `fatebridge`、`fatebridge-api`、`fatebridge-mcp` 三个命令入口。
+- 随安装包分发计算规则、知识与场景 JSON、`py.typed`、LICENSE 和 NOTICE；
+  场景技能随 Git 仓库提供，外部星历文件另行获取。
+
 ### Added
 
 - 新增文档离线校验命令 `scripts/check_docs.py` 与 CI 检查，覆盖本地链接、标题锚点、围栏及 JSON 语法；新增迁移指南和按用途组织的请求示例索引。
@@ -147,7 +157,7 @@ by a published GitHub Release through `.github/workflows/publish.yml`.
 - README status badge and "项目状态" section said Alpha `0.1.0`; corrected to
   Beta `0.2.0` to match the `Development Status` classifier.
 
-## [0.2.0] - 2026-07-01
+## 0.2.0 development notes - 2026-07-01 (unpublished)
 
 First packaging-hardening release: the distribution is now installable and
 usable from a wheel (previously the reference-data JSON was omitted, so several
@@ -175,12 +185,11 @@ engines crashed at runtime after `pip install`).
   `License :: OSI Approved ::` classifier. `build-system` now requires
   `setuptools>=77.0.0` (first version to support the SPDX expression).
 
-## [0.1.0] - initial
+## Initial development (unpublished)
 
 - Initial FateBridge engine: 80 tools across 13 families exposed over three
   transports (FastAPI REST, FastMCP, `fatebridge` CLI) from a single central
   tool catalog. Golden-master numeric locks and a 4-version CI matrix.
 
-[Unreleased]: https://github.com/Yonder-Lab/FateBridge/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/Yonder-Lab/FateBridge/releases/tag/v0.2.0
+[Unreleased]: https://github.com/Yonder-Lab/FateBridge/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/Yonder-Lab/FateBridge/releases/tag/v0.1.0

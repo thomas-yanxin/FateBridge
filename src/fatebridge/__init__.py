@@ -19,7 +19,7 @@ subcommand is derived from it). This top-level module intentionally exposes only
 metadata; deeper capabilities live under ``fatebridge.services`` / ``.core``.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.1.0"
 __author__ = "thomas-yanxin"
 
 __all__ = ["__version__", "__author__"]
