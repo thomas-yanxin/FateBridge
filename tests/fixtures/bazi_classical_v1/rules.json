@@ -1,0 +1,138 @@
+[
+  {
+    "id": "ZP06-ROOTS",
+    "chapter": 6,
+    "title": "论十干得时不旺失时不弱",
+    "pdf_pages": [
+      22,
+      23
+    ],
+    "printed_pages": [
+      13,
+      14
+    ],
+    "source_paraphrase": "月令为重但全局有损益；得时可不旺、失时可不弱；干多不如根重",
+    "formalization_limit": "不得把同类干数或单一季节直接转换成总强弱；此章不给 1.5/0.7 数值阈值",
+    "source_id": "ZP-WORLDBOOK-NLC"
+  },
+  {
+    "id": "ZP06-YIN",
+    "chapter": 6,
+    "title": "论十干得时不旺失时不弱",
+    "pdf_pages": [
+      23
+    ],
+    "printed_pages": [
+      14
+    ],
+    "source_paraphrase": "乙逢戌、丁逢丑不作墓库通根；阴长生乙午、丁酉仍列有根，比余气",
+    "formalization_limit": "阴长生根与藏干同元素根是不同字段；保留本书口径与现代藏干根口径分歧",
+    "source_id": "ZP-WORLDBOOK-NLC"
+  },
+  {
+    "id": "ZP08-ANCHOR",
+    "chapter": 8,
+    "title": "论用神",
+    "pdf_pages": [
+      26,
+      27
+    ],
+    "printed_pages": [
+      17,
+      18
+    ],
+    "source_paraphrase": "用神专求月令；不可将官印、食财、杀印等不看月令而归并",
+    "formalization_limit": "月令本气不是永远唯一格；透干、会支、杂气、建禄月劫需另审",
+    "source_id": "ZP-WORLDBOOK-NLC"
+  },
+  {
+    "id": "ZP09-FORM",
+    "chapter": 9,
+    "title": "论用神成败救应",
+    "pdf_pages": [
+      28,
+      29,
+      30
+    ],
+    "printed_pages": [
+      19,
+      20,
+      21
+    ],
+    "source_paraphrase": "成、败、带忌、救应分开；伤官佩印要求伤官旺且印有根",
+    "formalization_limit": "十神共现只产生线索，不能自动成格；身强弱、根、位置、合制均须逐项核对",
+    "source_id": "ZP-WORLDBOOK-NLC"
+  },
+  {
+    "id": "ZP15-ASSIST",
+    "chapter": 15,
+    "title": "论相神紧要",
+    "pdf_pages": [
+      39,
+      40
+    ],
+    "printed_pages": [
+      30,
+      31
+    ],
+    "source_paraphrase": "官用财为相，财用官为相，杀用食为相；全局赖此字而成者为相",
+    "formalization_limit": "同一十神在不同结构中角色相反，不能固定映射成某个有利五行",
+    "source_id": "ZP-WORLDBOOK-NLC"
+  },
+  {
+    "id": "ZP31-OFFICER",
+    "chapter": 31,
+    "title": "论正官",
+    "pdf_pages": [
+      65,
+      66,
+      67
+    ],
+    "printed_pages": [
+      56,
+      57,
+      58
+    ],
+    "source_paraphrase": "财印位置相隔与相合不同；遇伤佩印，混杀取清",
+    "formalization_limit": "个案裁定保留位置和救应，不能从全盘共现计数代替",
+    "source_id": "ZP-WORLDBOOK-NLC"
+  },
+  {
+    "id": "ZP37-FOOD",
+    "chapter": 37,
+    "title": "论食神",
+    "pdf_pages": [
+      76,
+      77,
+      78
+    ],
+    "printed_pages": [
+      67,
+      68,
+      69
+    ],
+    "source_paraphrase": "食神生财须财有根；身强食旺财透是书中例示条件",
+    "formalization_limit": "不把食神和财星共现直接作为全局成格裁定",
+    "source_id": "ZP-WORLDBOOK-NLC"
+  },
+  {
+    "id": "ZP41-HURT",
+    "chapter": 41,
+    "title": "论伤官",
+    "pdf_pages": [
+      82,
+      83,
+      84,
+      85
+    ],
+    "printed_pages": [
+      73,
+      74,
+      75,
+      76
+    ],
+    "source_paraphrase": "佩印要伤旺、身稍弱、印根深；印太重可用财，财印隔位与相合不同",
+    "formalization_limit": "伤官佩印、生财、调候可以有不同作用；不得用一个元素列表抹去先后与位置",
+    "source_id": "ZP-WORLDBOOK-NLC"
+  }
+]

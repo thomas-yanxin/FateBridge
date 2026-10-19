@@ -1,0 +1,16 @@
+{
+  "stage": "corrected_source_transcription_frozen_before_first_production_evaluation",
+  "production_modified": false,
+  "labeler": "current_assistant_not_third_party_expert",
+  "files": {
+    "cases.json": "eb316664cc78d988029d16766ff6e7c70be4b4b306e4e2cfce15c886f44d18f7",
+    "disagreements.json": "21c9f2c02382d34057e5b36fd19d4ff09259911496c78de3e085f16dd90b3012",
+    "probes.json": "0935facb11742e2c07a93074482fe891542d0836250585e10c3e6734fe2838f4",
+    "profile.json": "3a28b613c3c95f312a066694543951fafca1134d9f6107918ce2744bc2b4b10c",
+    "rules.json": "7f1bd1aefacf8521ccefbdeda01013c8a538bc55863e5480f9abb9226179301a"
+  },
+  "errata_before_run": [
+    "按扫描 p83 将索罗平章姓名与中州本孛罗平章分列，不改变命式或强弱标签",
+    "按 p84 改都统制书中称呼；补入已目读的短引文与列位置"
+  ]
+}

@@ -1,0 +1,120 @@
+[
+  {
+    "id": "R-ROOT-NOT",
+    "split": "development",
+    "source_rule": "ZP06-YIN",
+    "input": {
+      "day_stem": "乙",
+      "branch": "戌"
+    },
+    "expected": {
+      "hidden_stem_root": false,
+      "text_root": false
+    },
+    "scope": "局部通根反例，不补四柱，不判全局旺衰"
+  },
+  {
+    "id": "R-FIRE-NOT",
+    "split": "reserved",
+    "source_rule": "ZP06-YIN",
+    "input": {
+      "day_stem": "丁",
+      "branch": "丑"
+    },
+    "expected": {
+      "hidden_stem_root": false,
+      "text_root": false
+    },
+    "scope": "局部通根反例"
+  },
+  {
+    "id": "R-YIN-WOOD",
+    "split": "development",
+    "source_rule": "ZP06-YIN",
+    "input": {
+      "day_stem": "乙",
+      "branch": "午"
+    },
+    "expected": {
+      "hidden_stem_root": false,
+      "text_root": true
+    },
+    "scope": "正文阴长生根口径；与藏干根不同，不按现有字段名直接判实现错误"
+  },
+  {
+    "id": "R-YIN-FIRE",
+    "split": "reserved",
+    "source_rule": "ZP06-YIN",
+    "input": {
+      "day_stem": "丁",
+      "branch": "酉"
+    },
+    "expected": {
+      "hidden_stem_root": false,
+      "text_root": true
+    },
+    "scope": "阴长生对照"
+  },
+  {
+    "id": "R-STORE-WATER",
+    "split": "development",
+    "source_rule": "ZP06-ROOTS",
+    "input": {
+      "day_stem": "壬",
+      "branch": "辰"
+    },
+    "expected": {
+      "hidden_stem_root": true,
+      "text_root": true
+    },
+    "scope": "墓库通根，不要求刑冲开库"
+  },
+  {
+    "id": "R-STORE-FIRE",
+    "split": "reserved",
+    "source_rule": "ZP06-ROOTS",
+    "input": {
+      "day_stem": "丙",
+      "branch": "戌"
+    },
+    "expected": {
+      "hidden_stem_root": true,
+      "text_root": true
+    },
+    "scope": "墓库通根，不要求刑冲开库"
+  },
+  {
+    "id": "R-UNKNOWN-HOUR",
+    "split": "reserved",
+    "source_rule": "ZP09-FORM",
+    "input": {
+      "pillars": [
+        "壬申",
+        "丙午",
+        "甲午",
+        null
+      ]
+    },
+    "expected": {
+      "total_strength": null,
+      "formation": null
+    },
+    "scope": "人工未知输入，不把原书某例时柱偷偷补回；不送生产四柱分析"
+  },
+  {
+    "id": "R-COUNTER-PRINT",
+    "split": "development",
+    "source_rule": "ZP41-HURT",
+    "input": {
+      "facts": [
+        "伤轻",
+        "身重",
+        "印绶多见"
+      ]
+    },
+    "expected": {
+      "formation": "不能仅凭伤印并见判佩印成立"
+    },
+    "scope": "原书反例条件，不伪造完整命式和日期"
+  }
+]

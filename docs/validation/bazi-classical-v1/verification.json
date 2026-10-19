@@ -1,0 +1,37 @@
+{
+  "scope": "independent_classical_case_adjudication_not_production_algorithm_release",
+  "target_worktree": "/Users/thomas/.codex/worktrees/bazi-chain-evidence/FateBridge",
+  "main_workspace_latest_not_audited": true,
+  "classical_acceptance": {
+    "full_cases": 10,
+    "month_pattern_matches": 8,
+    "month_pattern_disagreements": 2,
+    "strength_adjudicated": 3,
+    "strength_matches": 1,
+    "strength_disagreements": 2,
+    "strength_unknown_in_source": 7,
+    "formation_unsupported": 10,
+    "useful_role_semantics_not_accepted": 10,
+    "local_or_unknown_probes": 8,
+    "classical_acceptance_passed": false,
+    "real_world_efficacy": "not_tested"
+  },
+  "tests": {
+    "passed": 146,
+    "new_audit_tests": 8,
+    "log": "check-0.txt",
+    "cross_transport": "existing local REST/MCP/CLI checks included; no shared calculation modified",
+    "real_model_dialogue": "not_run_in_this_batch",
+    "linux_golden": "not_run_in_this_batch"
+  },
+  "format_checks": {
+    "black": "pass for two new Python files",
+    "isort": "pass for two new Python files",
+    "git_diff_check": "pass"
+  },
+  "production_changes": false,
+  "weights_changed": false,
+  "preexisting_baseline_files_preserved": 610,
+  "independent_human_expert_review": false,
+  "reserved_first_comparison_consumed": true
+}

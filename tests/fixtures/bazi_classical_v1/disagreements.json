@@ -1,0 +1,73 @@
+[
+  {
+    "id": "D-LIANG-HOUR",
+    "kind": "source_variant_unverified_secondary_witness",
+    "cases": [
+      "ZP37-LIANG"
+    ],
+    "primary": "本扫描 p76 癸丑",
+    "alternative": "东里校记称《渊海子平》作癸亥，本次未取得该版本原页",
+    "adjudication": "主本与替代输入分别运行，不合并成唯一出生事实，不修改主本预期",
+    "downstream": [
+      "根气位置",
+      "合会",
+      "藏干十神",
+      "旺衰计数",
+      "喜用候选"
+    ]
+  },
+  {
+    "id": "D-LI-MIXING",
+    "kind": "internal_text_interpretation",
+    "cases": [
+      "ZP31-LI"
+    ],
+    "primary": "论正官此例判庚混酉官，乙合庚留官",
+    "alternative": "论喜忌干支有别等章区分透干庚辛与支申酉；东里编者提出与此例可能不一致的质疑",
+    "adjudication": "保留该例局部裁定与一致性疑问，未裁成普遍官杀混杂算法",
+    "downstream": [
+      "成格/取清条件",
+      "乙相神角色",
+      "金五行喜忌不可直接合并"
+    ]
+  },
+  {
+    "id": "D-ROOT-TYPE",
+    "kind": "within_school_definition_vs_project_field",
+    "cases": [
+      "R-YIN-WOOD",
+      "R-YIN-FIRE"
+    ],
+    "primary": "正文阴长生仍为有根，比得一余气",
+    "alternative": "生产 roots 按同五行藏干列根，乙午、丁酉不列",
+    "adjudication": "根类型范围差异；欲宣称本书完整根法须新增类型，不给原藏干根列表补假藏干",
+    "downstream": [
+      "旺衰证据",
+      "不可由未列藏干根推无任何根"
+    ]
+  },
+  {
+    "id": "D-USEFUL-SEMANTICS",
+    "kind": "school_semantics",
+    "cases": [
+      "ZP31-XUE",
+      "ZP31-LONE",
+      "ZP31-XUAN",
+      "ZP31-LI",
+      "ZP37-LIANG",
+      "ZP37-XIE",
+      "ZP41-BO",
+      "ZP41-QIN",
+      "ZP41-DUTONG",
+      "ZP41-CHENGXIANG"
+    ],
+    "primary": "月令格局用神、相神、成败喜忌分立",
+    "alternative": "当前 layered_conflict_review_v1 按扶抑与共现候选五行汇总",
+    "adjudication": "两个语义对象不可用列表相等判对错；当前不算本书成格取用已通过",
+    "downstream": [
+      "行业类比",
+      "旺衰喜忌解释",
+      "成格宣称"
+    ]
+  }
+]

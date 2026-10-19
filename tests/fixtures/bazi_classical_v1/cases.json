@@ -1,0 +1,496 @@
+[
+  {
+    "id": "ZP31-XUE",
+    "split": "development",
+    "name_as_printed": "薛相公",
+    "input_kind": "source_four_pillars",
+    "pillars": [
+      "甲申",
+      "壬申",
+      "乙巳",
+      "戊寅"
+    ],
+    "source": {
+      "source_id": "ZP-WORLDBOOK-NLC",
+      "chapter": 31,
+      "pdf_pages": [
+        65
+      ],
+      "printed_pages": [
+        56
+      ],
+      "locator": "p65 左侧薛相公命式与末两列",
+      "verified_excerpt_no_punctuation": "壬印戊財以乙隔之水與土不相礙"
+    },
+    "adjudication": {
+      "status": "source_case_annotation_not_general_engine",
+      "month_pattern": "正官",
+      "strength": null,
+      "strength_basis": "正文未明确给总强弱，不从大贵逆推",
+      "formation": "财印并透而两不相碍，原文作格局可用的正例",
+      "required_reasoning": [
+        "申中庚为乙之正官；壬印在月、戊财在时，中隔日干乙",
+        "原书此处不以寅申冲直接否定此例，不能附加一见冲即破的程序规则"
+      ],
+      "roles": {
+        "yongshen": "申中庚官",
+        "xiangshen": "壬印、戊财相辅，位置有隔",
+        "conditional_ji": "财印相伤的作用，此例原文认为未发生"
+      },
+      "not_adjudicated": [
+        "通用五行喜忌全集",
+        "现实职业适合度",
+        "未在原文明确的全局旺衰"
+      ],
+      "label_authority": "正文个案论述的本次手工标注；未获第二位专家复核"
+    },
+    "disagreements": [],
+    "variant": null
+  },
+  {
+    "id": "ZP31-LONE",
+    "split": "development",
+    "name_as_printed": "孤官无辅例",
+    "input_kind": "source_four_pillars",
+    "pillars": [
+      "壬戌",
+      "丁未",
+      "戊申",
+      "乙卯"
+    ],
+    "source": {
+      "source_id": "ZP-WORLDBOOK-NLC",
+      "chapter": 31,
+      "pdf_pages": [
+        65,
+        66
+      ],
+      "printed_pages": [
+        56,
+        57
+      ],
+      "locator": "p66 右起第1-2列，命式接前页末",
+      "verified_excerpt_no_punctuation": "而壬財丁印二者相合仍以孤官無輔論"
+    },
+    "adjudication": {
+      "status": "source_case_annotation_not_general_engine",
+      "month_pattern": "杂气正官",
+      "strength": null,
+      "strength_basis": "正文未给总强弱",
+      "formation": "壬财丁印相合，仍以孤官无辅论；不偷换为完全破格",
+      "required_reasoning": [
+        "未中乙官透时干，卯未会支；不只取月令本气己",
+        "壬在年、丁在月相合，财印辅官作用受损"
+      ],
+      "roles": {
+        "yongshen": "乙官",
+        "xiangshen": "壬财、丁印受相合影响",
+        "conditional_ji": "财印相合失辅"
+      },
+      "not_adjudicated": [
+        "通用五行喜忌全集",
+        "现实职业适合度",
+        "未在原文明确的全局旺衰"
+      ],
+      "label_authority": "正文个案论述的本次手工标注；未获第二位专家复核"
+    },
+    "disagreements": [],
+    "variant": null
+  },
+  {
+    "id": "ZP31-XUAN",
+    "split": "development",
+    "name_as_printed": "宣参国",
+    "input_kind": "source_four_pillars",
+    "pillars": [
+      "己卯",
+      "辛未",
+      "壬寅",
+      "辛亥"
+    ],
+    "source": {
+      "source_id": "ZP-WORLDBOOK-NLC",
+      "chapter": 31,
+      "pdf_pages": [
+        66
+      ],
+      "printed_pages": [
+        57
+      ],
+      "locator": "p66 中部宣参国命式前后",
+      "verified_excerpt_no_punctuation": "未中己官透干用清支會木局兩辛解之是遇傷而佩印也"
+    },
+    "adjudication": {
+      "status": "source_case_annotation_not_general_engine",
+      "month_pattern": "杂气正官",
+      "strength": null,
+      "strength_basis": "正文未给总强弱",
+      "formation": "官遇伤，佩印救应",
+      "required_reasoning": [
+        "未中己官透年；亥卯未木局引出伤官问题",
+        "月时两辛解伤，不把木局一律算成有利泄秀"
+      ],
+      "roles": {
+        "yongshen": "己官",
+        "xiangshen": "两辛印",
+        "conditional_ji": "木伤官攻官，须连同辛印解伤看"
+      },
+      "not_adjudicated": [
+        "通用五行喜忌全集",
+        "现实职业适合度",
+        "未在原文明确的全局旺衰"
+      ],
+      "label_authority": "正文个案论述的本次手工标注；未获第二位专家复核"
+    },
+    "disagreements": [],
+    "variant": null
+  },
+  {
+    "id": "ZP31-LI",
+    "split": "development",
+    "name_as_printed": "李参政",
+    "input_kind": "source_four_pillars",
+    "pillars": [
+      "庚寅",
+      "乙酉",
+      "甲子",
+      "戊辰"
+    ],
+    "source": {
+      "source_id": "ZP-WORLDBOOK-NLC",
+      "chapter": 31,
+      "pdf_pages": [
+        66
+      ],
+      "printed_pages": [
+        57
+      ],
+      "locator": "p66 李参政命式后数列",
+      "verified_excerpt_no_punctuation": "甲用酉官庚金混雜乙以合之合煞留官是雜煞而取清也"
+    },
+    "adjudication": {
+      "status": "source_case_annotation_not_general_engine",
+      "month_pattern": "正官",
+      "strength": null,
+      "strength_basis": "正文未给总强弱",
+      "formation": "合杀留官，取清",
+      "required_reasoning": [
+        "甲用酉官；庚杀透年，乙在月合庚",
+        "合去是正文该例解释，不等于所有相合皆消失或合化金"
+      ],
+      "roles": {
+        "yongshen": "酉中辛官",
+        "xiangshen": "乙合庚以取清",
+        "conditional_ji": "庚杀混官"
+      },
+      "not_adjudicated": [
+        "通用五行喜忌全集",
+        "现实职业适合度",
+        "未在原文明确的全局旺衰"
+      ],
+      "label_authority": "正文个案论述的本次手工标注；未获第二位专家复核"
+    },
+    "disagreements": [
+      "D-LI-MIXING"
+    ],
+    "variant": null
+  },
+  {
+    "id": "ZP37-LIANG",
+    "split": "development",
+    "name_as_printed": "梁丞相",
+    "input_kind": "source_four_pillars",
+    "pillars": [
+      "丁未",
+      "癸卯",
+      "癸亥",
+      "癸丑"
+    ],
+    "source": {
+      "source_id": "ZP-WORLDBOOK-NLC",
+      "chapter": 37,
+      "pdf_pages": [
+        76
+      ],
+      "printed_pages": [
+        67
+      ],
+      "locator": "p76 右起第3-5列及梁丞相命式",
+      "verified_excerpt_no_punctuation": "如身強食旺而財透大貴之格"
+    },
+    "adjudication": {
+      "status": "source_case_annotation_not_general_engine",
+      "month_pattern": "食神",
+      "strength": "强",
+      "strength_basis": "本段先说身强食旺财透，接列梁、谢二例；是段落归属裁定，非逐例另有强字",
+      "formation": "食神生财正例",
+      "required_reasoning": [
+        "卯中乙食神；丁财透年",
+        "财要有根，丁在未；癸身有亥丑根",
+        "小时照本扫描癸丑，不按转录异本擅改"
+      ],
+      "roles": {
+        "yongshen": "卯中乙食神",
+        "xiangshen": "丁财",
+        "conditional_ji": "财无根或财偏正叠出须另审"
+      },
+      "not_adjudicated": [
+        "通用五行喜忌全集",
+        "现实职业适合度"
+      ],
+      "label_authority": "正文个案论述的本次手工标注；未获第二位专家复核"
+    },
+    "disagreements": [
+      "D-LIANG-HOUR"
+    ],
+    "variant": {
+      "pillars": [
+        "丁未",
+        "癸卯",
+        "癸亥",
+        "癸亥"
+      ],
+      "source_kind": "东里校记转述《渊海子平》异文，原本未取得，本次不作同级裁定"
+    }
+  },
+  {
+    "id": "ZP37-XIE",
+    "split": "development",
+    "name_as_printed": "谢阁老",
+    "input_kind": "source_four_pillars",
+    "pillars": [
+      "己未",
+      "壬申",
+      "戊子",
+      "庚申"
+    ],
+    "source": {
+      "source_id": "ZP-WORLDBOOK-NLC",
+      "chapter": 37,
+      "pdf_pages": [
+        76
+      ],
+      "printed_pages": [
+        67
+      ],
+      "locator": "p76 梁例紧接谢例，两例同属身强食旺财透段",
+      "verified_excerpt_no_punctuation": "己未壬申戊子庚申謝閣老是也"
+    },
+    "adjudication": {
+      "status": "source_case_annotation_not_general_engine",
+      "month_pattern": "食神",
+      "strength": "强",
+      "strength_basis": "同段身强食旺财透所举第二例；保留原文段落标签而非本次重算",
+      "formation": "食神生财正例",
+      "required_reasoning": [
+        "申中庚食神透时，壬财透月",
+        "日主戊在两申藏戊、未中土根；不能只数本气金水而略去根"
+      ],
+      "roles": {
+        "yongshen": "申中庚食神",
+        "xiangshen": "壬财",
+        "conditional_ji": "身食财强弱及财根须合参"
+      },
+      "not_adjudicated": [
+        "通用五行喜忌全集",
+        "现实职业适合度"
+      ],
+      "label_authority": "正文个案论述的本次手工标注；未获第二位专家复核"
+    },
+    "disagreements": [],
+    "variant": null
+  },
+  {
+    "id": "ZP41-BO",
+    "split": "reserved",
+    "name_as_printed": "索罗平章",
+    "input_kind": "source_four_pillars",
+    "pillars": [
+      "壬申",
+      "丙午",
+      "甲午",
+      "壬申"
+    ],
+    "source": {
+      "source_id": "ZP-WORLDBOOK-NLC",
+      "chapter": 41,
+      "pdf_pages": [
+        83
+      ],
+      "printed_pages": [
+        74
+      ],
+      "locator": "p83 伤官佩印段及索罗平章命式",
+      "verified_excerpt_no_punctuation": "傷官旺印根深身又弱又是夏木逢潤"
+    },
+    "adjudication": {
+      "status": "source_case_annotation_not_general_engine",
+      "month_pattern": "伤官",
+      "strength": "弱",
+      "strength_basis": "原文紧接命例明言伤官旺、印根深、身又弱",
+      "formation": "伤官佩印正例",
+      "required_reasoning": [
+        "午中丁伤官旺；两壬印、两申为印根",
+        "原文把印根深与日主身弱分开，不可由两壬两申直接推身强"
+      ],
+      "roles": {
+        "yongshen": "午中丁伤官",
+        "xiangshen": "壬印",
+        "conditional_ji": "印宜根深而不必数量多；须保留身弱条件"
+      },
+      "not_adjudicated": [
+        "通用五行喜忌全集",
+        "现实职业适合度"
+      ],
+      "label_authority": "正文个案论述的本次手工标注；未获第二位专家复核"
+    },
+    "disagreements": [],
+    "variant": null,
+    "name_variants": [
+      "东里校记称中州本作孛罗平章；姓名异文不改变命式"
+    ]
+  },
+  {
+    "id": "ZP41-QIN",
+    "split": "reserved",
+    "name_as_printed": "秦龙图",
+    "input_kind": "source_four_pillars",
+    "pillars": [
+      "己卯",
+      "丁丑",
+      "丙寅",
+      "庚寅"
+    ],
+    "source": {
+      "source_id": "ZP-WORLDBOOK-NLC",
+      "chapter": 41,
+      "pdf_pages": [
+        83
+      ],
+      "printed_pages": [
+        74
+      ],
+      "locator": "p83 秦龙图命式后",
+      "verified_excerpt_no_punctuation": "己與庚同根月令是也"
+    },
+    "adjudication": {
+      "status": "source_case_annotation_not_general_engine",
+      "month_pattern": "伤官",
+      "strength": null,
+      "strength_basis": "正文说己庚同根月令与财伤有情，不明确总身强弱",
+      "formation": "伤官生财，财伤有情",
+      "required_reasoning": [
+        "己伤、庚财同根丑月；两寅供丙根的事实不能代替原文总强弱结论"
+      ],
+      "roles": {
+        "yongshen": "丑中己伤官透年",
+        "xiangshen": "庚财",
+        "conditional_ji": "财伤作用有情，非泛化所有土金均有利"
+      },
+      "not_adjudicated": [
+        "通用五行喜忌全集",
+        "现实职业适合度",
+        "未在原文明确的全局旺衰"
+      ],
+      "label_authority": "正文个案论述的本次手工标注；未获第二位专家复核"
+    },
+    "disagreements": [],
+    "variant": null
+  },
+  {
+    "id": "ZP41-DUTONG",
+    "split": "reserved",
+    "name_as_printed": "都统制",
+    "input_kind": "source_four_pillars",
+    "pillars": [
+      "丁酉",
+      "己酉",
+      "戊子",
+      "壬子"
+    ],
+    "source": {
+      "source_id": "ZP-WORLDBOOK-NLC",
+      "chapter": 41,
+      "pdf_pages": [
+        84
+      ],
+      "printed_pages": [
+        75
+      ],
+      "locator": "p84 右侧开头至都统制例",
+      "verified_excerpt_no_punctuation": "財太重而帶印而丁與壬隔以戊己兩不相礙"
+    },
+    "adjudication": {
+      "status": "source_case_annotation_not_general_engine",
+      "month_pattern": "伤官",
+      "strength": null,
+      "strength_basis": "原文财太重，不等同于明确给日主总弱标签",
+      "formation": "财太重而带印，丁壬以戊己相隔而两不相碍",
+      "required_reasoning": [
+        "酉中辛伤官；壬财与丁印在时年，两者中隔己戊",
+        "不能一见财克印便判破，须保留位置"
+      ],
+      "roles": {
+        "yongshen": "酉中辛伤官",
+        "xiangshen": "丁印调停重财",
+        "conditional_ji": "财印直接相伤；本例隔位不碍"
+      },
+      "not_adjudicated": [
+        "通用五行喜忌全集",
+        "现实职业适合度",
+        "未在原文明确的全局旺衰"
+      ],
+      "label_authority": "正文个案论述的本次手工标注；未获第二位专家复核"
+    },
+    "disagreements": [],
+    "variant": null
+  },
+  {
+    "id": "ZP41-CHENGXIANG",
+    "split": "reserved",
+    "name_as_printed": "丞相",
+    "input_kind": "source_four_pillars",
+    "pillars": [
+      "壬戌",
+      "己酉",
+      "戊午",
+      "丁巳"
+    ],
+    "source": {
+      "source_id": "ZP-WORLDBOOK-NLC",
+      "chapter": 41,
+      "pdf_pages": [
+        84
+      ],
+      "printed_pages": [
+        75
+      ],
+      "locator": "p84 右中丞相命式前后",
+      "verified_excerpt_no_punctuation": "印太重而帶財亦隔戊己而丁與壬不相礙"
+    },
+    "adjudication": {
+      "status": "source_case_annotation_not_general_engine",
+      "month_pattern": "伤官",
+      "strength": null,
+      "strength_basis": "原文说印太重，不补身强标签",
+      "formation": "印太重而带财，壬与丁相隔，作用相济",
+      "required_reasoning": [
+        "酉中辛伤官；丁印根在午巳，印太重",
+        "壬财在年，丁印在时，非财印一并出现就相战"
+      ],
+      "roles": {
+        "yongshen": "酉中辛伤官",
+        "xiangshen": "壬财调停重印",
+        "conditional_ji": "印太重或财印相伤均须辨位置"
+      },
+      "not_adjudicated": [
+        "通用五行喜忌全集",
+        "现实职业适合度",
+        "未在原文明确的全局旺衰"
+      ],
+      "label_authority": "正文个案论述的本次手工标注；未获第二位专家复核"
+    },
+    "disagreements": [],
+    "variant": null
+  }
+]
