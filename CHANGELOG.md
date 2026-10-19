@@ -205,5 +205,5 @@ engines crashed at runtime after `pip install`).
   transports (FastAPI REST, FastMCP, `fatebridge` CLI) from a single central
   tool catalog. Golden-master numeric locks and a 4-version CI matrix.
 
-[Unreleased]: https://github.com/Yonder-Lab/FateBridge/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/Yonder-Lab/FateBridge/releases/tag/v0.1.0
+[Unreleased]: https://github.com/thomas-yanxin/FateBridge/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/thomas-yanxin/FateBridge/releases/tag/v0.1.0

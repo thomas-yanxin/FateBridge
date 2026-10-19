@@ -11,7 +11,7 @@
 统一用 [uv](https://docs.astral.sh/uv/) 管理依赖、虚拟环境与构建；源码环境默认使用 `.python-version` 中的 Python 3.12：
 
 ```bash
-git clone https://github.com/Yonder-Lab/FateBridge.git
+git clone https://github.com/thomas-yanxin/FateBridge.git
 cd FateBridge
 
 uv sync --locked --extra dev

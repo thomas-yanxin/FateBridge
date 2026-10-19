@@ -182,7 +182,7 @@ CLI 不自动读取 `.env`，`SE_EPHE_PATH` 应在启动前设进程环境。GUI
 
 ## 最小复现材料
 
-先用虚构输入复现，再到[项目 Issues](https://github.com/Yonder-Lab/FateBridge/issues)报告。记录以下信息，便于维护者在相同入口重现问题：
+先用虚构输入复现，再到[项目 Issues](https://github.com/thomas-yanxin/FateBridge/issues)报告。记录以下信息，便于维护者在相同入口重现问题：
 
 ```text
 预期行为：
