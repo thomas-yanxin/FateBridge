@@ -3,7 +3,7 @@
 Use this policy to report vulnerabilities privately and understand which security
 controls FateBridge provides. For installation and configuration, see
 [Getting started](docs/getting-started.md); ordinary defects belong in
-[GitHub Issues](https://github.com/Yonder-Lab/FateBridge/issues).
+[GitHub Issues](https://github.com/thomas-yanxin/FateBridge/issues).
 
 On this page: [Supported Versions](#supported-versions) ·
 [Reporting a Vulnerability](#reporting-a-vulnerability) ·
@@ -29,7 +29,7 @@ Please do not open a public issue containing vulnerability details or sensitive
 reproduction material.
 
 Report privately via GitHub's
-[Report a vulnerability](https://github.com/Yonder-Lab/FateBridge/security/advisories/new)
+[Report a vulnerability](https://github.com/thomas-yanxin/FateBridge/security/advisories/new)
 (Security → Advisories), or email **yx20001210@163.com** with:
 
 - a description of the issue, its impact and any required access,
