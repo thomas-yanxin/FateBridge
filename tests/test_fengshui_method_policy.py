@@ -511,7 +511,12 @@ def test_actual_mcp_default_and_materialized_null_keep_automatic_priority(
             tool = next(
                 t for t in await client.list_tools() if t.name == "fengshui_assess"
             )
-            assert tool.input_schema["properties"]["methods"]["default"] is None
+            assert (
+                tool.model_dump(by_alias=True)["inputSchema"]["properties"]["methods"][
+                    "default"
+                ]
+                is None
+            )
             return await client.call_tool(
                 "fengshui_assess",
                 {

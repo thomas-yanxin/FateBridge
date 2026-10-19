@@ -489,7 +489,7 @@ def test_published_schema_rejects_unknown_rules_and_strict_boolean_facts():
     async def check():
         async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
             schema = next(
-                t.input_schema
+                t.model_dump(by_alias=True)["inputSchema"]
                 for t in await client.list_tools()
                 if t.name == "fengshui_assess"
             )

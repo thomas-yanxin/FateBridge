@@ -13,6 +13,8 @@
 
 ## 安装
 
+本页描述当前开发分支。PyPI `0.1.0` 为已发布版本；需要本文最新场景与接口范围时，选择下方源码安装。版本差异见 [CHANGELOG](../CHANGELOG.md#unreleased)，已发布版本的使用说明以对应 Git 标签为准。
+
 包管理统一使用 [uv](https://docs.astral.sh/uv/getting-started/installation/)。需要 Python 3.10+；当前 CI 覆盖 3.10–3.13，源码环境默认使用 `.python-version` 中的 Python 3.12。依赖与三个控制台入口由 `pyproject.toml` 声明。从 PyPI 安装独立命令工具：
 
 ```bash

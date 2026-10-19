@@ -248,7 +248,10 @@ def test_published_schema_leaves_and_rejections_match(rest, capsys):
 
     async def schemas():
         async with Client(mcp.app) as client:
-            return {tool.name: tool.output_schema for tool in await client.list_tools()}
+            return {
+                tool.name: tool.model_dump(by_alias=True)["outputSchema"]
+                for tool in await client.list_tools()
+            }
 
     advertised = asyncio.run(schemas())
     for key, path, expected in SCHEMA_LEAVES:

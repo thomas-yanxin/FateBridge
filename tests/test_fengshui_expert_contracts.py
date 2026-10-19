@@ -312,8 +312,10 @@ def test_published_mcp_schema_exposes_context_without_birth_requirements():
             tool = next(
                 t for t in await client.list_tools() if t.name == "fengshui_assess"
             )
-            Draft202012Validator(tool.input_schema).validate(context_request())
-            return tool.input_schema
+            Draft202012Validator(
+                tool.model_dump(by_alias=True)["inputSchema"]
+            ).validate(context_request())
+            return tool.model_dump(by_alias=True)["inputSchema"]
 
     schema = asyncio.run(inspect())
     assert "environmental_context" in schema["properties"]

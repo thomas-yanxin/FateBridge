@@ -51,7 +51,9 @@ def test_real_mcp_omission_and_explicit_solar_flags(name, payload):
 
     async def run():
         async with Client(_app(spec)) as client:
-            schema = (await client.list_tools())[0].input_schema
+            schema = (await client.list_tools())[0].model_dump(by_alias=True)[
+                "inputSchema"
+            ]
             solar = schema["properties"]["use_true_solar_time"]
             assert solar["type"] == "boolean"
             assert solar["default"] is True
@@ -142,7 +144,9 @@ def test_real_mcp_exposes_constraints_descriptions_and_keeps_canonical_names():
 
     async def run():
         async with Client(_app(spec)) as client:
-            schema = (await client.list_tools())[0].input_schema
+            schema = (await client.list_tools())[0].model_dump(by_alias=True)[
+                "inputSchema"
+            ]
             month = schema["properties"]["birth_month"]
             reference = FateBridgeRequest.model_json_schema()["properties"][
                 "birth_month"

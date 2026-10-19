@@ -275,7 +275,7 @@ def test_live_schema_publishes_usage_and_household_scope():
         async with Client(create_mcp_app(scenarios="onda-fengshui")) as client:
             return next(
                 t for t in await client.list_tools() if t.name == "fengshui_assess"
-            ).input_schema
+            ).model_dump(by_alias=True)["inputSchema"]
 
     schema = asyncio.run(inspect())
     encoded = json.dumps(schema)
