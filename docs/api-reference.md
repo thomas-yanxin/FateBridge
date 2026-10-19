@@ -292,7 +292,11 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 | `pd_type` | int | `0=direct`，`1=converse` |
 | `pd_aspects` | int[] | 主限相位列表 |
 | `show_pd_bounds` | bool | 主限图盘是否带界限层 |
+| `firdaria_night_order` | string | `nodes_at_end`（默认）或 `nodes_after_mars`；只影响法达夜盘顺序 |
+| `firdaria_year_basis` | string | `fixed_365_2425`（默认）或 `calendar_anniversary`；只影响法达日期计算 |
 | `selected_sections` | string[] | 仅独立 timing tools 支持 |
+
+两项法达参数可独立组合，同时适用于综合时运和独立 `firdaria`，REST / MCP 同名，CLI 使用 `--firdaria-night-order` / `--firdaria-year-basis`。公历周年的闰日、UTC 七等分、时区异常拒绝及分钟展示规则见[法达兼容约定](firdaria-compatibility.md#8-生产接口选择)。默认组合保留现有返回结构，非默认组合在法达对象内增加 `calculation_options` 回执。
 
 完整非法分析日期返回 `validation_error`；只给部分年月日时逐字段补齐默认值，部分日期补齐时可约束到月底。复现计算请显式传齐目标日期、出生时区与返照/行运地点。
 
@@ -632,6 +636,8 @@ python -m fatebridge.mcp_server
 
 - `two_person_compatibility`
 - `sukuyo_compatibility`
+
+`two_person_compatibility` 的 `summary.scoring` 返回实际分项、关系权重、加权贡献和双方旺衰／喜用输入模型版本。它区分上游模型变化与关系权重变化；独立传统净分仍不并入综合分。分项权重、版本追踪与回归依据见[双人评分计算说明](compatibility-scoring.md)。
 
 #### 时运与历法（family `timing`）
 

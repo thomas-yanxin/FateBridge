@@ -110,3 +110,5 @@ python -m pytest -q tests/test_doc_tool_counts.py tests/test_scenario_routing_co
 核心星盘支持本地星历与近似路径，应检查实际返回的 `chart_profile.ephemeris_model` 和 `run_metadata.engine_is_approximate`；西占推运、事件与生命周期工具缺少后端依赖时明确报错。项目包含后端、CLI 与技能资料，前端与部署控制由接入方提供。
 
 代码采用 [Apache-2.0](LICENSE)，第三方组件见 [NOTICE](NOTICE)；星历数据单独获取，见 [星历数据与精度](docs/getting-started.md#星历数据与精度)。
+
+八字旺衰、喜用分层与冲突处理的具体范围见 [八字判定说明](docs/bazi-assessment.md)。

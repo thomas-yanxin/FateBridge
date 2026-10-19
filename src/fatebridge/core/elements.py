@@ -15,6 +15,7 @@ from ..utils.data import (
     get_ten_god,
 )
 from .element_relations import adjust_element_counts
+from .strength import assess_strength
 
 
 class ElementAnalysis:
@@ -34,10 +35,6 @@ class ElementAnalysis:
     - 生克关系：五行相生相克的影响
     - 季节因素：月令对五行旺衰的影响
     """
-
-    # 月令（月支当令）对日主旺衰的加权量级。月令是子平判旺衰最重要的因素，
-    # 故在普通五行计数（天干1 / 本气1 / 藏干0.5）之外额外加权约两个单位。
-    MONTH_COMMAND_WEIGHT = 2.0
 
     # element_distribution 的统计口径说明：它是结构计数，不是旺衰强弱。
     DISTRIBUTION_BASIS = (
@@ -129,73 +126,23 @@ class ElementAnalysis:
         day_master_stem = pillars["day"][0]
         day_master_element, day_master_polarity = STEM_ELEMENTS[day_master_stem]
 
-        # Count supporting and opposing elements
         element_counts = ElementAnalysis.count_elements(pillars)
-
-        # Elements that support day master
-        same_element_count = element_counts.get(day_master_element, 0.0)
-        generating_element = None
-        for element_enum, generated_element in GENERATION_CYCLE.items():
-            if generated_element == day_master_element:
-                generating_element = element_enum
-                break
-
-        support_strength: float = same_element_count
-        if generating_element:
-            support_strength += element_counts.get(generating_element, 0)
-
-        # Elements that weaken day master
-        element_generated_by_day_master = GENERATION_CYCLE.get(day_master_element)
-        element_destroyed_by_day_master = DESTRUCTION_CYCLE.get(day_master_element)
-        element_destroying_day_master = None
-        for element_enum, destroyed_element in DESTRUCTION_CYCLE.items():
-            if destroyed_element == day_master_element:
-                element_destroying_day_master = element_enum
-                break
-
-        weaken_strength: float = 0
-        if element_generated_by_day_master:
-            weaken_strength += element_counts.get(element_generated_by_day_master, 0)
-        if element_destroyed_by_day_master:
-            weaken_strength += element_counts.get(element_destroyed_by_day_master, 0)
-        if element_destroying_day_master:
-            weaken_strength += element_counts.get(element_destroying_day_master, 0)
-
-        # 月令加权：月支当令是日主旺衰最重要的因素（得令 / 失令）。
-        # 月支与日主同类或生日主 → 得令（扶）；否则（泄/耗/克）→ 失令（抑）。
-        # 该加权在普通五行计数之外额外计入，以反映月令的主导地位。
-        month_branch = pillars["month"][1]
-        month_element = BRANCH_ELEMENTS[month_branch][0]
-        if month_element == day_master_element or month_element == generating_element:
-            support_strength += ElementAnalysis.MONTH_COMMAND_WEIGHT
-        else:
-            weaken_strength += ElementAnalysis.MONTH_COMMAND_WEIGHT
-
-        # Determine strength level
-        if support_strength > weaken_strength * 1.5:
-            strength_level = "强"
-        elif support_strength < weaken_strength * 0.7:
-            strength_level = "弱"
-        else:
-            strength_level = "中和"
-
-        # Convert to percentage format
         element_percentages = ElementAnalysis.convert_to_percentage(element_counts)
-
-        # 关系调整后的分布：在静态计数上叠加刑冲克害 / 合化（见 element_relations）。
-        # 静态字段保持不变，调整结果以新增字段承载，确保现有契约零破坏。
         adjusted_counts, element_relations = adjust_element_counts(
             element_counts, pillars
         )
         adjusted_percentages = ElementAnalysis.convert_to_percentage(adjusted_counts)
-
+        assessment = assess_strength(
+            pillars, ElementAnalysis.seasonal_phases(pillars["month"][1])
+        )
         return {
+            "assessment": assessment,
             "day_master": day_master_stem,
             "day_element": day_master_element.value,
             "day_polarity": day_master_polarity.value,
-            "support_strength": support_strength,
-            "weaken_strength": weaken_strength,
-            "strength_level": strength_level,
+            "support_strength": assessment["support_strength"],
+            "weaken_strength": assessment["weaken_strength"],
+            "strength_level": assessment["strength_level"],
             "element_distribution": element_percentages,
             "element_distribution_raw": {
                 element_enum.value: count
@@ -208,7 +155,9 @@ class ElementAnalysis:
             },
             "element_relations": element_relations,
             "element_distribution_basis": ElementAnalysis.DISTRIBUTION_BASIS,
-            "element_seasonal_phase": ElementAnalysis.seasonal_phases(month_branch),
+            "element_seasonal_phase": ElementAnalysis.seasonal_phases(
+                pillars["month"][1]
+            ),
         }
 
     @staticmethod
@@ -269,6 +218,12 @@ class ElementAnalysis:
                 f"Unknown day element: {day_master_analysis['day_element']!r}"
             )
 
+        assessment = day_master_analysis.get("assessment", {})
+        if (
+            assessment.get("requires_special_structure_review")
+            or assessment.get("status") == "boundary_sensitive"
+        ):
+            return []
         day_master_strength_level = day_master_analysis["strength_level"]
 
         if day_master_strength_level == "强":
@@ -303,9 +258,8 @@ class ElementAnalysis:
                     break
 
         else:  # 中和
-            # Balanced day master - depends on seasonal and other factors
-            # For simplicity, we'll include elements that provide balance
-            favorable_elements = [day_master_element]
+            # A middle score supplies no directional preference by itself.
+            favorable_elements = []
 
         return favorable_elements
 

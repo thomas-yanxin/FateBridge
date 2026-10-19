@@ -19,6 +19,7 @@ from fatebridge.cli import run
 from fatebridge.core.requests.compatibility import TwoPersonCompatibilityRequest
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
+from tests.fixtures.compatibility import assert_score_reference
 
 SPECS = {
     spec.key: spec
@@ -105,18 +106,11 @@ def test_invalid_relationship_matches_all_transports(
 
 
 @pytest.mark.parametrize(
-    "kind,expected_score",
-    [
-        (None, 54.5),
-        ("general", 54.5),
-        ("marriage", 51.1),
-        ("friendship", 56.8),
-        ("business", 56.9),
-        ("family", 51.2),
-    ],
+    "kind",
+    [None, "general", "marriage", "friendship", "business", "family"],
 )
-def test_supported_relationship_scores_preserved_across_transports(
-    monkeypatch, tmp_path, capsys, kind, expected_score
+def test_revised_relationship_scores_match_across_transports(
+    monkeypatch, tmp_path, capsys, kind
 ):
     # Existing public fictional example, never a real person's consultation.
     tool = "two_person_compatibility"
@@ -132,7 +126,9 @@ def test_supported_relationship_scores_preserved_across_transports(
     bodies = [rest.json(), protocol.structured_content, cli]
     for body in bodies:
         assert body["summary"]["relationship_type"] == (kind or "general")
-        assert body["summary"]["overall_score"] == expected_score
+        assert_score_reference(
+            body["summary"], body["detailed_analysis"], kind or "general"
+        )
         assert "不是关系成功概率" in body["summary"]["score_basis"]
     assert bodies[0]["summary"] == bodies[1]["summary"] == bodies[2]["summary"]
 

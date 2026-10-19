@@ -12,6 +12,7 @@ from jsonschema import ValidationError, validate
 from fatebridge.application.examples import example_input, suggested_fields
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
+from tests.fixtures.compatibility import assert_score_reference
 
 ROOT = Path(__file__).resolve().parents[1]
 _spec = importlib.util.spec_from_file_location(
@@ -106,7 +107,7 @@ async def test_only_preloaded_inputs_and_views_are_enough_for_real_mcp_calls():
                 assert payload["career_analysis"]["career_structure"]["score"] == 75
                 assert "timing_context" in payload["career_analysis"]
             elif record["tool"] == "two_person_compatibility":
-                assert payload["summary"]["overall_score"] == 54.5
+                assert_score_reference(payload["summary"], payload["detailed_analysis"])
                 assert "score_basis" in payload["traditional_compatibility"]
             elif record["tool"] == "timing_analysis":
                 assert "analysis_calendar" in payload

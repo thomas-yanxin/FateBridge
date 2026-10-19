@@ -95,7 +95,8 @@ class AdvancedCompatibility:
         # 定义各维度权重（总计100%）
         weights = AdvancedCompatibility._get_dimension_weights(relationship_type)
 
-        # 1. 五行平衡分析 (权重: 25%)
+        # 各项权重统一读取上方关系类型表，避免注释中的固定百分比误导。
+        # 1. 五行平衡分析
         element_analysis = AdvancedCompatibility._analyze_element_balance(
             analysis1, analysis2
         )
@@ -103,7 +104,7 @@ class AdvancedCompatibility:
         weighted_element_score = element_analysis["score"] * weights["element_balance"]
         result["overall_score"] += weighted_element_score
 
-        # 2. 喜用神互助分析 (权重: 30%)
+        # 2. 喜用神互助分析
         favorable_analysis = AdvancedCompatibility._analyze_favorable_synergy(
             analysis1, analysis2
         )
@@ -113,7 +114,7 @@ class AdvancedCompatibility:
         )
         result["overall_score"] += weighted_favorable_score
 
-        # 3. 十神关系分析 (权重: 25%)
+        # 3. 十神关系分析
         ten_gods_analysis = AdvancedCompatibility._analyze_ten_gods_relationship(
             analysis1, analysis2, relationship_type
         )
@@ -123,7 +124,7 @@ class AdvancedCompatibility:
         )
         result["overall_score"] += weighted_ten_gods_score
 
-        # 4. 格局配合分析 (权重: 15%)
+        # 4. 格局配合分析
         pattern_analysis = AdvancedCompatibility._analyze_pattern_synergy(
             analysis1, analysis2
         )
@@ -131,7 +132,7 @@ class AdvancedCompatibility:
         weighted_pattern_score = pattern_analysis["score"] * weights["pattern_synergy"]
         result["overall_score"] += weighted_pattern_score
 
-        # 5. 传统刑冲克害分析 (权重: 5%)
+        # 5. 传统刑冲克害分析
         # 使用新的规则计算传统分析分数
         # 由于calculate_compatibility_score可能还没有更新，我们手动计算
         traditional_score = 50.0  # 基础分
@@ -194,6 +195,57 @@ class AdvancedCompatibility:
             normalized_traditional_score * weights["traditional_analysis"]
         )
         result["overall_score"] += weighted_traditional_score
+
+        # Preserve the actual terms used above, not a second scoring algorithm.
+        # Input-model upgrades can change the score even when these weights and
+        # the relationship rules stay unchanged; expose that provenance.
+        components = {
+            "element_balance": (element_analysis["score"], weighted_element_score),
+            "favorable_synergy": (
+                favorable_analysis["score"],
+                weighted_favorable_score,
+            ),
+            "ten_gods_relationship": (
+                ten_gods_analysis["score"],
+                weighted_ten_gods_score,
+            ),
+            "pattern_synergy": (pattern_analysis["score"], weighted_pattern_score),
+            "traditional_analysis": (
+                normalized_traditional_score,
+                weighted_traditional_score,
+            ),
+        }
+        input_methods = {}
+        for label, natal in (("person1", analysis1), ("person2", analysis2)):
+            day_master = natal.get("day_master", {})
+            day_master = day_master if isinstance(day_master, dict) else {}
+            assessment = day_master.get("assessment", {}) or {}
+            profile = natal.get("structure_profile", {}) or {}
+            input_methods[label] = {
+                "strength_method_id": assessment.get("method_id", "unversioned"),
+                "strength": day_master.get("strength"),
+                "strength_status": assessment.get("status", "not_provided"),
+                "useful_resolution_policy": profile.get(
+                    "resolution_policy", "unversioned"
+                ),
+                "useful_assessment_status": profile.get(
+                    "assessment_status", "not_provided"
+                ),
+            }
+        result["scoring"] = {
+            "method_id": "compatibility_weighted_rules_v1",
+            "input_methods": input_methods,
+            "dimensions": {
+                name: {
+                    "score": score,
+                    "weight": weights[name],
+                    "weighted_score": round(weighted, 10),
+                }
+                for name, (score, weighted) in components.items()
+            },
+            "unrounded_score": round(result["overall_score"], 10),
+            "rounding": "clip_0_100_then_python_round_1_decimal",
+        }
 
         # 确保总分在0-100范围内；round 到一位小数以避免浮点累加产生的显示噪声
         result["overall_score"] = round(

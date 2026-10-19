@@ -70,43 +70,11 @@
       "tendency": "强烈创业倾向"
     },
     "industry_analysis": {
-      "avoid_industries": [
-        {
-          "element": "木",
-          "industries": [
-            "教育培训",
-            "文化出版",
-            "园林绿化"
-          ],
-          "reason": "忌神为木，木行业需谨慎"
-        },
-        {
-          "element": "火",
-          "industries": [
-            "互联网科技",
-            "电子电器",
-            "能源电力"
-          ],
-          "reason": "忌神为火，火行业需谨慎"
-        },
-        {
-          "element": "土",
-          "industries": [
-            "房地产建筑",
-            "农业畜牧",
-            "矿业资源"
-          ],
-          "reason": "忌神为土，土行业需谨慎"
-        },
-        {
-          "element": "水",
-          "industries": [
-            "贸易流通",
-            "物流运输",
-            "旅游酒店"
-          ],
-          "reason": "忌神为水，水行业需谨慎"
-        }
+      "avoid_industries": [],
+      "conditional_elements": [
+        "火",
+        "土",
+        "水"
       ],
       "element_distribution": {
         "土": 1.7,
@@ -115,44 +83,24 @@
         "火": 2.4,
         "金": 4.6
       },
-      "favorable_elements": [
-        "金"
-      ],
-      "recommended_industries": [
-        {
-          "direction": "西方",
-          "element": "金",
-          "industries": [
-            "金融银行",
-            "法律司法",
-            "机械制造",
-            "汽车交通",
-            "珠宝首饰",
-            "医疗器械",
-            "军事国防",
-            "体育竞技",
-            "IT硬件",
-            "精密仪器"
-          ],
-          "reason": "喜用神为金，适合金相关行业"
-        }
-      ]
+      "favorable_elements": [],
+      "recommended_industries": [],
+      "reference_scope": "layered_conflict_review_v1"
     },
     "interpretation_scope": "个人命盘的传统事业规则分析；不测量实际能力、收入或创业成功概率，不能据此决定辞职、投资或创业。",
     "noble_direction": {
-      "favorable_directions": [
-        {
-          "direction": "西方",
-          "element": "金",
-          "reason": "喜用神金对应西方方"
-        }
-      ]
+      "conditional_elements": [
+        "火",
+        "土",
+        "水"
+      ],
+      "favorable_directions": [],
+      "reference_scope": "layered_conflict_review_v1"
     },
     "suggestions": [
       "主导事业类型为独立经营，建议发挥自身优势",
       "事业格局中等，稳扎稳打，步步为营",
-      "本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职",
-      "推荐行业：金融银行、法律司法、机械制造等"
+      "本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职"
     ],
     "timing_context": {
       "dayun_pillar": "壬戌",
@@ -170,7 +118,7 @@
     "tool_name": "bazi_career"
   },
   "snapshot_export": {
-    "export_text": "[概要]\n类型：八字事业分析\ninterpretation_scope：个人命盘的传统事业规则分析；不测量实际能力、收入或创业成功概率，不能据此决定辞职、投资或创业。\n\n[dominant_ten_gods]\ntop_gods：\n  - ten_god=比肩，weight=2.0，career_type=独立经营，traits=自主性强、竞争意识强、适合独立创业或合伙经营\n    suitable_roles：\n      - 创业\n      - 合伙经营\n      - 自由职业\n      - 体育竞技\n  - ten_god=劫财，weight=2.0，career_type=竞争型，traits=行动力强、敢于冒险、适合高竞争行业\n    suitable_roles：\n      - 销售\n      - 市场营销\n      - 投机行业\n      - 体育\n  - ten_god=七杀，weight=1.0，career_type=权威型，traits=果断有魄力、适合高压环境\n    suitable_roles：\n      - 军警\n      - 外科医生\n      - 高管\n      - 创业\nprimary_career_type：独立经营\n\n[industry_analysis]\n喜用神：\n  - 金\nrecommended_industries：\n  - 五行=金，方位=西方，reason=喜用神为金，适合金相关行业\n    industries：\n      - 金融银行\n      - 法律司法\n      - 机械制造\n      - 汽车交通\n      - 珠宝首饰\n      - 医疗器械\n      - 军事国防\n      - 体育竞技\n      - IT硬件\n      - 精密仪器\navoid_industries：\n  - 五行=木，reason=忌神为木，木行业需谨慎\n    industries：\n      - 教育培训\n      - 文化出版\n      - 园林绿化\n  - 五行=火，reason=忌神为火，火行业需谨慎\n    industries：\n      - 互联网科技\n      - 电子电器\n      - 能源电力\n  - 五行=土，reason=忌神为土，土行业需谨慎\n    industries：\n      - 房地产建筑\n      - 农业畜牧\n      - 矿业资源\n  - 五行=水，reason=忌神为水，水行业需谨慎\n    industries：\n      - 贸易流通\n      - 物流运输\n      - 旅游酒店\n五行分布：\n  木：0.3\n  火：2.4\n  土：1.7\n  金：4.6\n  水：0.3\n\n[career_structure]\n评分：75\nscore_kind：traditional_rule_index\nscope：individual_natal_career_structure\n计分依据：以60为基准，按官印、食伤与财、财官及日主强弱规则加减，限制在30–95；不是事业成就或收入概率。\n层级：中等格局\n说明：\n  - 官印相生，为事业格局加分；总体层级以综合评分为准\n\n[entrepreneurship]\n评分：73\nscore_kind：traditional_rule_index\nscope：individual_natal_entrepreneurship_tendency\n计分依据：以50为基准，按正偏十神权重、食神制杀或杀印相生规则加减，限制在20–90；只表示本规则的创业倾向，不是成功率或行动建议。\ntendency：强烈创业倾向\n说明：\n  - 偏星为主，传统规则提高自主经营倾向评分\n  - 杀印相生，传统规则关联管理型自主经营倾向\n\n[career_timing]\ntiming_signals：\n  - 大运壬戌见食伤，传统规则关联创意与表达议题\n  - 流年丁卯见官杀，传统规则关联当年的事业与责任议题\n\n[noble_direction]\nfavorable_directions：\n  - 五行=金，方位=西方，reason=喜用神金对应西方方\n\n[建议]\n- 主导事业类型为独立经营，建议发挥自身优势\n- 事业格局中等，稳扎稳打，步步为营\n- 本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职\n- 推荐行业：金融银行、法律司法、机械制造等\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是",
+    "export_text": "[概要]\n类型：八字事业分析\ninterpretation_scope：个人命盘的传统事业规则分析；不测量实际能力、收入或创业成功概率，不能据此决定辞职、投资或创业。\n\n[dominant_ten_gods]\ntop_gods：\n  - ten_god=比肩，weight=2.0，career_type=独立经营，traits=自主性强、竞争意识强、适合独立创业或合伙经营\n    suitable_roles：\n      - 创业\n      - 合伙经营\n      - 自由职业\n      - 体育竞技\n  - ten_god=劫财，weight=2.0，career_type=竞争型，traits=行动力强、敢于冒险、适合高竞争行业\n    suitable_roles：\n      - 销售\n      - 市场营销\n      - 投机行业\n      - 体育\n  - ten_god=七杀，weight=1.0，career_type=权威型，traits=果断有魄力、适合高压环境\n    suitable_roles：\n      - 军警\n      - 外科医生\n      - 高管\n      - 创业\nprimary_career_type：独立经营\n\n[industry_analysis]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n五行分布：\n  木：0.3\n  火：2.4\n  土：1.7\n  金：4.6\n  水：0.3\n\n[career_structure]\n评分：75\nscore_kind：traditional_rule_index\nscope：individual_natal_career_structure\n计分依据：以60为基准，按官印、食伤与财、财官及日主强弱规则加减，限制在30–95；不是事业成就或收入概率。\n层级：中等格局\n说明：\n  - 官印相生，为事业格局加分；总体层级以综合评分为准\n\n[entrepreneurship]\n评分：73\nscore_kind：traditional_rule_index\nscope：individual_natal_entrepreneurship_tendency\n计分依据：以50为基准，按正偏十神权重、食神制杀或杀印相生规则加减，限制在20–90；只表示本规则的创业倾向，不是成功率或行动建议。\ntendency：强烈创业倾向\n说明：\n  - 偏星为主，传统规则提高自主经营倾向评分\n  - 杀印相生，传统规则关联管理型自主经营倾向\n\n[career_timing]\ntiming_signals：\n  - 大运壬戌见食伤，传统规则关联创意与表达议题\n  - 流年丁卯见官杀，传统规则关联当年的事业与责任议题\n\n[noble_direction]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n\n[建议]\n- 主导事业类型为独立经营，建议发挥自身优势\n- 事业格局中等，稳扎稳打，步步为营\n- 本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是",
     "missing_selected_sections": [
       "起盘信息"
     ],
@@ -201,7 +149,7 @@
         "title": "dominant_ten_gods"
       },
       {
-        "content": "[industry_analysis]\n喜用神：\n  - 金\nrecommended_industries：\n  - 五行=金，方位=西方，reason=喜用神为金，适合金相关行业\n    industries：\n      - 金融银行\n      - 法律司法\n      - 机械制造\n      - 汽车交通\n      - 珠宝首饰\n      - 医疗器械\n      - 军事国防\n      - 体育竞技\n      - IT硬件\n      - 精密仪器\navoid_industries：\n  - 五行=木，reason=忌神为木，木行业需谨慎\n    industries：\n      - 教育培训\n      - 文化出版\n      - 园林绿化\n  - 五行=火，reason=忌神为火，火行业需谨慎\n    industries：\n      - 互联网科技\n      - 电子电器\n      - 能源电力\n  - 五行=土，reason=忌神为土，土行业需谨慎\n    industries：\n      - 房地产建筑\n      - 农业畜牧\n      - 矿业资源\n  - 五行=水，reason=忌神为水，水行业需谨慎\n    industries：\n      - 贸易流通\n      - 物流运输\n      - 旅游酒店\n五行分布：\n  木：0.3\n  火：2.4\n  土：1.7\n  金：4.6\n  水：0.3",
+        "content": "[industry_analysis]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n五行分布：\n  木：0.3\n  火：2.4\n  土：1.7\n  金：4.6\n  水：0.3",
         "included": false,
         "index": 3,
         "raw_title": "industry_analysis",
@@ -229,14 +177,14 @@
         "title": "career_timing"
       },
       {
-        "content": "[noble_direction]\nfavorable_directions：\n  - 五行=金，方位=西方，reason=喜用神金对应西方方",
+        "content": "[noble_direction]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1",
         "included": false,
         "index": 7,
         "raw_title": "noble_direction",
         "title": "noble_direction"
       },
       {
-        "content": "[建议]\n- 主导事业类型为独立经营，建议发挥自身优势\n- 事业格局中等，稳扎稳打，步步为营\n- 本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职\n- 推荐行业：金融银行、法律司法、机械制造等",
+        "content": "[建议]\n- 主导事业类型为独立经营，建议发挥自身优势\n- 事业格局中等，稳扎稳打，步步为营\n- 本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职",
         "included": false,
         "index": 8,
         "raw_title": "建议",
@@ -297,5 +245,5 @@
       "当前大运流年"
     ]
   },
-  "snapshot_text": "[概要]\n类型：八字事业分析\ninterpretation_scope：个人命盘的传统事业规则分析；不测量实际能力、收入或创业成功概率，不能据此决定辞职、投资或创业。\n\n[dominant_ten_gods]\ntop_gods：\n  - ten_god=比肩，weight=2.0，career_type=独立经营，traits=自主性强、竞争意识强、适合独立创业或合伙经营\n    suitable_roles：\n      - 创业\n      - 合伙经营\n      - 自由职业\n      - 体育竞技\n  - ten_god=劫财，weight=2.0，career_type=竞争型，traits=行动力强、敢于冒险、适合高竞争行业\n    suitable_roles：\n      - 销售\n      - 市场营销\n      - 投机行业\n      - 体育\n  - ten_god=七杀，weight=1.0，career_type=权威型，traits=果断有魄力、适合高压环境\n    suitable_roles：\n      - 军警\n      - 外科医生\n      - 高管\n      - 创业\nprimary_career_type：独立经营\n\n[industry_analysis]\n喜用神：\n  - 金\nrecommended_industries：\n  - 五行=金，方位=西方，reason=喜用神为金，适合金相关行业\n    industries：\n      - 金融银行\n      - 法律司法\n      - 机械制造\n      - 汽车交通\n      - 珠宝首饰\n      - 医疗器械\n      - 军事国防\n      - 体育竞技\n      - IT硬件\n      - 精密仪器\navoid_industries：\n  - 五行=木，reason=忌神为木，木行业需谨慎\n    industries：\n      - 教育培训\n      - 文化出版\n      - 园林绿化\n  - 五行=火，reason=忌神为火，火行业需谨慎\n    industries：\n      - 互联网科技\n      - 电子电器\n      - 能源电力\n  - 五行=土，reason=忌神为土，土行业需谨慎\n    industries：\n      - 房地产建筑\n      - 农业畜牧\n      - 矿业资源\n  - 五行=水，reason=忌神为水，水行业需谨慎\n    industries：\n      - 贸易流通\n      - 物流运输\n      - 旅游酒店\n五行分布：\n  木：0.3\n  火：2.4\n  土：1.7\n  金：4.6\n  水：0.3\n\n[career_structure]\n评分：75\nscore_kind：traditional_rule_index\nscope：individual_natal_career_structure\n计分依据：以60为基准，按官印、食伤与财、财官及日主强弱规则加减，限制在30–95；不是事业成就或收入概率。\n层级：中等格局\n说明：\n  - 官印相生，为事业格局加分；总体层级以综合评分为准\n\n[entrepreneurship]\n评分：73\nscore_kind：traditional_rule_index\nscope：individual_natal_entrepreneurship_tendency\n计分依据：以50为基准，按正偏十神权重、食神制杀或杀印相生规则加减，限制在20–90；只表示本规则的创业倾向，不是成功率或行动建议。\ntendency：强烈创业倾向\n说明：\n  - 偏星为主，传统规则提高自主经营倾向评分\n  - 杀印相生，传统规则关联管理型自主经营倾向\n\n[career_timing]\ntiming_signals：\n  - 大运壬戌见食伤，传统规则关联创意与表达议题\n  - 流年丁卯见官杀，传统规则关联当年的事业与责任议题\n\n[noble_direction]\nfavorable_directions：\n  - 五行=金，方位=西方，reason=喜用神金对应西方方\n\n[建议]\n- 主导事业类型为独立经营，建议发挥自身优势\n- 事业格局中等，稳扎稳打，步步为营\n- 本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职\n- 推荐行业：金融银行、法律司法、机械制造等\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是"
+  "snapshot_text": "[概要]\n类型：八字事业分析\ninterpretation_scope：个人命盘的传统事业规则分析；不测量实际能力、收入或创业成功概率，不能据此决定辞职、投资或创业。\n\n[dominant_ten_gods]\ntop_gods：\n  - ten_god=比肩，weight=2.0，career_type=独立经营，traits=自主性强、竞争意识强、适合独立创业或合伙经营\n    suitable_roles：\n      - 创业\n      - 合伙经营\n      - 自由职业\n      - 体育竞技\n  - ten_god=劫财，weight=2.0，career_type=竞争型，traits=行动力强、敢于冒险、适合高竞争行业\n    suitable_roles：\n      - 销售\n      - 市场营销\n      - 投机行业\n      - 体育\n  - ten_god=七杀，weight=1.0，career_type=权威型，traits=果断有魄力、适合高压环境\n    suitable_roles：\n      - 军警\n      - 外科医生\n      - 高管\n      - 创业\nprimary_career_type：独立经营\n\n[industry_analysis]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n五行分布：\n  木：0.3\n  火：2.4\n  土：1.7\n  金：4.6\n  水：0.3\n\n[career_structure]\n评分：75\nscore_kind：traditional_rule_index\nscope：individual_natal_career_structure\n计分依据：以60为基准，按官印、食伤与财、财官及日主强弱规则加减，限制在30–95；不是事业成就或收入概率。\n层级：中等格局\n说明：\n  - 官印相生，为事业格局加分；总体层级以综合评分为准\n\n[entrepreneurship]\n评分：73\nscore_kind：traditional_rule_index\nscope：individual_natal_entrepreneurship_tendency\n计分依据：以50为基准，按正偏十神权重、食神制杀或杀印相生规则加减，限制在20–90；只表示本规则的创业倾向，不是成功率或行动建议。\ntendency：强烈创业倾向\n说明：\n  - 偏星为主，传统规则提高自主经营倾向评分\n  - 杀印相生，传统规则关联管理型自主经营倾向\n\n[career_timing]\ntiming_signals：\n  - 大运壬戌见食伤，传统规则关联创意与表达议题\n  - 流年丁卯见官杀，传统规则关联当年的事业与责任议题\n\n[noble_direction]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n\n[建议]\n- 主导事业类型为独立经营，建议发挥自身优势\n- 事业格局中等，稳扎稳打，步步为营\n- 本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是"
 }

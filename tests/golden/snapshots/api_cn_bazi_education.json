@@ -22,10 +22,14 @@
       "wealth_weight": 0.5
     },
     "subject_orientation": {
-      "favorable_fields": [
-        "金：金融、法律、机械、军警、精密工科"
+      "conditional_elements": [
+        "火",
+        "土",
+        "水"
       ],
-      "inclination": "偏文科/学术理论型（印主），擅长记忆、研究、系统知识"
+      "favorable_fields": [],
+      "inclination": "偏文科/学术理论型（印主），擅长记忆、研究、系统知识",
+      "reference_scope": "layered_conflict_review_v1"
     },
     "suggestions": [
       "学历倾向：高学历潜质（本科以上/研究型）",
@@ -53,7 +57,7 @@
     "tool_name": "bazi_education"
   },
   "snapshot_export": {
-    "export_text": "[概要]\n类型：八字学业分析\n\n[study_stars]\nseal_weight：2.0\nfood_hurt_weight：0.5\nofficer_weight：1.5\nwealth_weight：0.5\n\n[education_level]\n评分：84\ntier：高学历潜质（本科以上/研究型）\n说明：\n  - 官印相生，学历层次高，利于体制内、学术与功名\n  - 印星有力，学习能力强、记忆专注佳，读书运好\n\n[wenchang]\nwenchang_branch：亥\nhas_wenchang：否\n说明：命无文昌（日干庚文昌在亥），逢亥之大运流年学运增强\n\n[subject_orientation]\ninclination：偏文科/学术理论型（印主），擅长记忆、研究、系统知识\nfavorable_fields：\n  - 金：金融、法律、机械、军警、精密工科\n\n[exam_timing]\ntiming_signals：\n  - 大运壬戌见食伤，思维活跃、表达灵感佳，利创作型考核\n  - 流年丁卯见官星，功名考运动，利考公、考编、竞争性考试\n\n[建议]\n- 学历倾向：高学历潜质（本科以上/研究型）\n- 学科方向：偏文科/学术理论型（印主），擅长记忆、研究、系统知识\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是",
+    "export_text": "[概要]\n类型：八字学业分析\n\n[study_stars]\nseal_weight：2.0\nfood_hurt_weight：0.5\nofficer_weight：1.5\nwealth_weight：0.5\n\n[education_level]\n评分：84\ntier：高学历潜质（本科以上/研究型）\n说明：\n  - 官印相生，学历层次高，利于体制内、学术与功名\n  - 印星有力，学习能力强、记忆专注佳，读书运好\n\n[wenchang]\nwenchang_branch：亥\nhas_wenchang：否\n说明：命无文昌（日干庚文昌在亥），逢亥之大运流年学运增强\n\n[subject_orientation]\ninclination：偏文科/学术理论型（印主），擅长记忆、研究、系统知识\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n\n[exam_timing]\ntiming_signals：\n  - 大运壬戌见食伤，思维活跃、表达灵感佳，利创作型考核\n  - 流年丁卯见官星，功名考运动，利考公、考编、竞争性考试\n\n[建议]\n- 学历倾向：高学历潜质（本科以上/研究型）\n- 学科方向：偏文科/学术理论型（印主），擅长记忆、研究、系统知识\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是",
     "missing_selected_sections": [
       "起盘信息"
     ],
@@ -97,7 +101,7 @@
         "title": "wenchang"
       },
       {
-        "content": "[subject_orientation]\ninclination：偏文科/学术理论型（印主），擅长记忆、研究、系统知识\nfavorable_fields：\n  - 金：金融、法律、机械、军警、精密工科",
+        "content": "[subject_orientation]\ninclination：偏文科/学术理论型（印主），擅长记忆、研究、系统知识\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1",
         "included": false,
         "index": 5,
         "raw_title": "subject_orientation",
@@ -171,5 +175,5 @@
       "当前大运流年"
     ]
   },
-  "snapshot_text": "[概要]\n类型：八字学业分析\n\n[study_stars]\nseal_weight：2.0\nfood_hurt_weight：0.5\nofficer_weight：1.5\nwealth_weight：0.5\n\n[education_level]\n评分：84\ntier：高学历潜质（本科以上/研究型）\n说明：\n  - 官印相生，学历层次高，利于体制内、学术与功名\n  - 印星有力，学习能力强、记忆专注佳，读书运好\n\n[wenchang]\nwenchang_branch：亥\nhas_wenchang：否\n说明：命无文昌（日干庚文昌在亥），逢亥之大运流年学运增强\n\n[subject_orientation]\ninclination：偏文科/学术理论型（印主），擅长记忆、研究、系统知识\nfavorable_fields：\n  - 金：金融、法律、机械、军警、精密工科\n\n[exam_timing]\ntiming_signals：\n  - 大运壬戌见食伤，思维活跃、表达灵感佳，利创作型考核\n  - 流年丁卯见官星，功名考运动，利考公、考编、竞争性考试\n\n[建议]\n- 学历倾向：高学历潜质（本科以上/研究型）\n- 学科方向：偏文科/学术理论型（印主），擅长记忆、研究、系统知识\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是"
+  "snapshot_text": "[概要]\n类型：八字学业分析\n\n[study_stars]\nseal_weight：2.0\nfood_hurt_weight：0.5\nofficer_weight：1.5\nwealth_weight：0.5\n\n[education_level]\n评分：84\ntier：高学历潜质（本科以上/研究型）\n说明：\n  - 官印相生，学历层次高，利于体制内、学术与功名\n  - 印星有力，学习能力强、记忆专注佳，读书运好\n\n[wenchang]\nwenchang_branch：亥\nhas_wenchang：否\n说明：命无文昌（日干庚文昌在亥），逢亥之大运流年学运增强\n\n[subject_orientation]\ninclination：偏文科/学术理论型（印主），擅长记忆、研究、系统知识\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n\n[exam_timing]\ntiming_signals：\n  - 大运壬戌见食伤，思维活跃、表达灵感佳，利创作型考核\n  - 流年丁卯见官星，功名考运动，利考公、考编、竞争性考试\n\n[建议]\n- 学历倾向：高学历潜质（本科以上/研究型）\n- 学科方向：偏文科/学术理论型（印主），擅长记忆、研究、系统知识\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是"
 }

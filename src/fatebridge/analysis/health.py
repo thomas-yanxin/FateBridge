@@ -21,6 +21,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
+from ..core.rules import BaZiRules
 from ..utils.data import (
     BRANCH_ELEMENTS,
     DESTRUCTION_CYCLE,
@@ -297,10 +298,8 @@ class HealthAnalysis:
     @staticmethod
     def _analyze_regimen(pillars: Dict[str, Tuple[str, str]]) -> Dict[str, Any]:
         """养生调理方向：以喜用神五行所主调养为先。"""
-        from ..core.elements import ElementAnalysis
-
-        dm_analysis = ElementAnalysis.analyze_day_master_strength(pillars)
-        favorable = ElementAnalysis.get_favorable_elements(dm_analysis)
+        profile = BaZiRules.chart_useful_profile(pillars)
+        favorable = [Element(value) for value in profile["useful_elements"]]
 
         advice: List[str] = []
         for elem in favorable:
@@ -314,5 +313,7 @@ class HealthAnalysis:
 
         return {
             "favorable_elements": [e.value for e in favorable],
+            "conditional_elements": profile["conditional_elements"],
+            "reference_scope": profile["resolution_policy"],
             "advice": advice,
         }

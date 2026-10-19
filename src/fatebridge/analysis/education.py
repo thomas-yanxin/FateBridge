@@ -21,6 +21,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
+from ..core.rules import BaZiRules
 from ..utils.data import (
     Element,
     TenGod,
@@ -223,10 +224,8 @@ class EducationAnalysis:
             inclination = "文理较均衡，可依兴趣选择"
 
         # 以喜用神五行给学科方向
-        from ..core.elements import ElementAnalysis
-
-        dm_analysis = ElementAnalysis.analyze_day_master_strength(pillars)
-        favorable = ElementAnalysis.get_favorable_elements(dm_analysis)
+        profile = BaZiRules.chart_useful_profile(pillars)
+        favorable = [Element(value) for value in profile["useful_elements"]]
         fields: List[str] = []
         for elem in favorable:
             subject = SEAL_SUBJECT.get(elem)
@@ -236,6 +235,8 @@ class EducationAnalysis:
         return {
             "inclination": inclination,
             "favorable_fields": fields,
+            "conditional_elements": profile["conditional_elements"],
+            "reference_scope": profile["resolution_policy"],
         }
 
     @staticmethod

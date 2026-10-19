@@ -75,6 +75,7 @@ def calculate_compatibility_analysis(
             "compatibility_level": advanced_analysis["summary"],
             "relationship_type": relationship_type,
             "score_basis": "多维度规则加权的 0–100 分；不是关系成功概率。",
+            "scoring": advanced_analysis["scoring"],
         },
         "detailed_analysis": {
             "element_balance": advanced_analysis["detailed_analysis"][

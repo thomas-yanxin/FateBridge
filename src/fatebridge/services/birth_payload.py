@@ -68,6 +68,7 @@ def build_destiny_payload(context: BirthComputationContext) -> Dict[str, Any]:
             "element": context.element_analysis["day_master"]["day_element"],
             "polarity": context.element_analysis["day_master"]["day_polarity"],
             "strength": context.element_analysis["day_master"]["strength_level"],
+            "assessment": context.element_analysis["day_master"]["assessment"],
         },
         "element_distribution": context.element_analysis["day_master"][
             "element_distribution"

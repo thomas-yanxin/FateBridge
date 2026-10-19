@@ -297,7 +297,15 @@
   "suggested_fields": {
     "analyze_destiny": [
       "four_pillars",
-      "day_master",
+      "day_master.stem",
+      "day_master.element",
+      "day_master.polarity",
+      "day_master.strength",
+      "day_master.assessment.method_id",
+      "day_master.assessment.status",
+      "day_master.assessment.support_share",
+      "day_master.assessment.structural_decision",
+      "day_master.assessment.sensitivity.candidate_strengths",
       "ten_gods",
       "structure_profile",
       "element_distribution",

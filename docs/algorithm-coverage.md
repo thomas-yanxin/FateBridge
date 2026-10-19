@@ -154,6 +154,8 @@
 | `firdaria` | 法达星限 | Implemented（依赖 backend） |
 | `decennials` | 十年星限 | Implemented（依赖 backend） |
 
+法达支持独立选择夜盘交点顺序和固定年／公历周年口径，默认行为保持；参数与日期边界见[版本兼容参考与验收约定](firdaria-compatibility.md)。
+
 ### 2.8 `western_event` —— 事件占星（Implemented，依赖 backend）
 
 求解天文时刻后起盘的一组事件类工具，走 `fatebridge.core.astrology_events` / `astrology_horary` / `astrology_election`。

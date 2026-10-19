@@ -56,11 +56,15 @@
     },
     "regimen": {
       "advice": [
-        "喜金：宜养护肺、大肠（呼吸、皮肤、鼻、免疫），相关饮食起居为调养重点"
+        "以五行平衡为养生总则，作息规律、情志平和"
       ],
-      "favorable_elements": [
-        "金"
-      ]
+      "conditional_elements": [
+        "火",
+        "土",
+        "水"
+      ],
+      "favorable_elements": [],
+      "reference_scope": "layered_conflict_review_v1"
     },
     "timing_context": {
       "dayun_pillar": "壬戌",
@@ -78,7 +82,7 @@
     "tool_name": "bazi_health"
   },
   "snapshot_export": {
-    "export_text": "[概要]\n类型：八字健康分析\ndisclaimer：本分析仅供命理参考，不构成医学诊断；身体不适请及时就医。\n\n[constitution]\n日主强弱：中和\nclimate：寒暖均衡\nwarm_strength：4.1\ncold_strength：4.9\n说明：\n  - 日主中和，体质较为均衡，重在保持平衡、防外感与情志失调\n  - 寒暖调候大致均衡\n\n[organ_analysis]\n五行分布：\n  木：0.3\n  火：2.4\n  土：1.7\n  金：4.6\n  水：0.3\n要点：\n  - 五行=木，organs=肝、胆，status=偏弱，concern=木偏弱，肝、胆宜调养：肝胆虚弱、视力差、易疲劳、抑郁\n  - 五行=金，organs=肺、大肠，status=过旺，concern=金过旺，肺、大肠易亢：肺燥、咳喘、皮肤干燥、易上火\n  - 五行=水，organs=肾、膀胱，status=偏弱，concern=水偏弱，肾、膀胱宜调养：肾气虚、腰膝酸软、生殖泌尿弱、耳鸣、骨弱\n小结：存在五行偏颇，相关脏腑为健康关注重点\n\n[disease_risks]\n风险：\n  - 木受金强克且自身偏弱，肝、胆为薄弱环节：肝胆虚弱、视力差、易疲劳、抑郁\n\n[health_timing]\ntiming_signals：\n  - 大运壬戌冲日支辰，身体易有波动，注意休息与体检\n  - 大运壬戌（土）克水，肾、膀胱相关为当期调养重点\n  - 流年丁卯（木）克土，脾、胃相关为当期调养重点\n\n[regimen]\n喜用神：\n  - 金\nadvice：\n  - 喜金：宜养护肺、大肠（呼吸、皮肤、鼻、免疫），相关饮食起居为调养重点\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是",
+    "export_text": "[概要]\n类型：八字健康分析\ndisclaimer：本分析仅供命理参考，不构成医学诊断；身体不适请及时就医。\n\n[constitution]\n日主强弱：中和\nclimate：寒暖均衡\nwarm_strength：4.1\ncold_strength：4.9\n说明：\n  - 日主中和，体质较为均衡，重在保持平衡、防外感与情志失调\n  - 寒暖调候大致均衡\n\n[organ_analysis]\n五行分布：\n  木：0.3\n  火：2.4\n  土：1.7\n  金：4.6\n  水：0.3\n要点：\n  - 五行=木，organs=肝、胆，status=偏弱，concern=木偏弱，肝、胆宜调养：肝胆虚弱、视力差、易疲劳、抑郁\n  - 五行=金，organs=肺、大肠，status=过旺，concern=金过旺，肺、大肠易亢：肺燥、咳喘、皮肤干燥、易上火\n  - 五行=水，organs=肾、膀胱，status=偏弱，concern=水偏弱，肾、膀胱宜调养：肾气虚、腰膝酸软、生殖泌尿弱、耳鸣、骨弱\n小结：存在五行偏颇，相关脏腑为健康关注重点\n\n[disease_risks]\n风险：\n  - 木受金强克且自身偏弱，肝、胆为薄弱环节：肝胆虚弱、视力差、易疲劳、抑郁\n\n[health_timing]\ntiming_signals：\n  - 大运壬戌冲日支辰，身体易有波动，注意休息与体检\n  - 大运壬戌（土）克水，肾、膀胱相关为当期调养重点\n  - 流年丁卯（木）克土，脾、胃相关为当期调养重点\n\n[regimen]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\nadvice：\n  - 以五行平衡为养生总则，作息规律、情志平和\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是",
     "missing_selected_sections": [
       "起盘信息"
     ],
@@ -128,7 +132,7 @@
         "title": "health_timing"
       },
       {
-        "content": "[regimen]\n喜用神：\n  - 金\nadvice：\n  - 喜金：宜养护肺、大肠（呼吸、皮肤、鼻、免疫），相关饮食起居为调养重点",
+        "content": "[regimen]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\nadvice：\n  - 以五行平衡为养生总则，作息规律、情志平和",
         "included": false,
         "index": 6,
         "raw_title": "regimen",
@@ -187,5 +191,5 @@
       "当前大运流年"
     ]
   },
-  "snapshot_text": "[概要]\n类型：八字健康分析\ndisclaimer：本分析仅供命理参考，不构成医学诊断；身体不适请及时就医。\n\n[constitution]\n日主强弱：中和\nclimate：寒暖均衡\nwarm_strength：4.1\ncold_strength：4.9\n说明：\n  - 日主中和，体质较为均衡，重在保持平衡、防外感与情志失调\n  - 寒暖调候大致均衡\n\n[organ_analysis]\n五行分布：\n  木：0.3\n  火：2.4\n  土：1.7\n  金：4.6\n  水：0.3\n要点：\n  - 五行=木，organs=肝、胆，status=偏弱，concern=木偏弱，肝、胆宜调养：肝胆虚弱、视力差、易疲劳、抑郁\n  - 五行=金，organs=肺、大肠，status=过旺，concern=金过旺，肺、大肠易亢：肺燥、咳喘、皮肤干燥、易上火\n  - 五行=水，organs=肾、膀胱，status=偏弱，concern=水偏弱，肾、膀胱宜调养：肾气虚、腰膝酸软、生殖泌尿弱、耳鸣、骨弱\n小结：存在五行偏颇，相关脏腑为健康关注重点\n\n[disease_risks]\n风险：\n  - 木受金强克且自身偏弱，肝、胆为薄弱环节：肝胆虚弱、视力差、易疲劳、抑郁\n\n[health_timing]\ntiming_signals：\n  - 大运壬戌冲日支辰，身体易有波动，注意休息与体检\n  - 大运壬戌（土）克水，肾、膀胱相关为当期调养重点\n  - 流年丁卯（木）克土，脾、胃相关为当期调养重点\n\n[regimen]\n喜用神：\n  - 金\nadvice：\n  - 喜金：宜养护肺、大肠（呼吸、皮肤、鼻、免疫），相关饮食起居为调养重点\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是"
+  "snapshot_text": "[概要]\n类型：八字健康分析\ndisclaimer：本分析仅供命理参考，不构成医学诊断；身体不适请及时就医。\n\n[constitution]\n日主强弱：中和\nclimate：寒暖均衡\nwarm_strength：4.1\ncold_strength：4.9\n说明：\n  - 日主中和，体质较为均衡，重在保持平衡、防外感与情志失调\n  - 寒暖调候大致均衡\n\n[organ_analysis]\n五行分布：\n  木：0.3\n  火：2.4\n  土：1.7\n  金：4.6\n  水：0.3\n要点：\n  - 五行=木，organs=肝、胆，status=偏弱，concern=木偏弱，肝、胆宜调养：肝胆虚弱、视力差、易疲劳、抑郁\n  - 五行=金，organs=肺、大肠，status=过旺，concern=金过旺，肺、大肠易亢：肺燥、咳喘、皮肤干燥、易上火\n  - 五行=水，organs=肾、膀胱，status=偏弱，concern=水偏弱，肾、膀胱宜调养：肾气虚、腰膝酸软、生殖泌尿弱、耳鸣、骨弱\n小结：存在五行偏颇，相关脏腑为健康关注重点\n\n[disease_risks]\n风险：\n  - 木受金强克且自身偏弱，肝、胆为薄弱环节：肝胆虚弱、视力差、易疲劳、抑郁\n\n[health_timing]\ntiming_signals：\n  - 大运壬戌冲日支辰，身体易有波动，注意休息与体检\n  - 大运壬戌（土）克水，肾、膀胱相关为当期调养重点\n  - 流年丁卯（木）克土，脾、胃相关为当期调养重点\n\n[regimen]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\nadvice：\n  - 以五行平衡为养生总则，作息规律、情志平和\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是"
 }

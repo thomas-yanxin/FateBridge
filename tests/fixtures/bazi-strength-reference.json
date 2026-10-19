@@ -1,0 +1,245 @@
+{
+  "source": {
+    "title": "滴天髓阐微·衰旺（任氏注所列二十造）",
+    "url": "https://www.shicihui.com/zh-tw/book/ditiansuichanwei/16287",
+    "accessed": "2026-10-19",
+    "scope": "只校验原文强弱方向，不校验身世、吉凶及取用；历史四柱录文，不验证出生历法。"
+  },
+  "protocol": "数字参数先固定；原文对照用于验证及发现规则遗漏，不宣称盲测或预测准确率。首轮衰旺篇18/20；修正规则门槛及根气结构判断，数字系数不变。用户命例不在参考集。",
+  "cases": [
+    {
+      "id": "ditian_shuaiwang_01",
+      "pillars": {
+        "year": "甲辰",
+        "month": "丁卯",
+        "day": "甲子",
+        "hour": "戊辰"
+      },
+      "source_label": "木太旺",
+      "expected_strength": "强"
+    },
+    {
+      "id": "ditian_shuaiwang_02",
+      "pillars": {
+        "year": "癸卯",
+        "month": "乙卯",
+        "day": "甲寅",
+        "hour": "乙亥"
+      },
+      "source_label": "木旺极",
+      "expected_strength": "强"
+    },
+    {
+      "id": "ditian_shuaiwang_03",
+      "pillars": {
+        "year": "乙丑",
+        "month": "甲申",
+        "day": "甲申",
+        "hour": "辛未"
+      },
+      "source_label": "木太衰",
+      "expected_strength": "弱"
+    },
+    {
+      "id": "ditian_shuaiwang_04",
+      "pillars": {
+        "year": "己巳",
+        "month": "己巳",
+        "day": "乙酉",
+        "hour": "丙戌"
+      },
+      "source_label": "木衰极",
+      "expected_strength": "弱"
+    },
+    {
+      "id": "ditian_shuaiwang_05",
+      "pillars": {
+        "year": "乙丑",
+        "month": "壬午",
+        "day": "丙戌",
+        "hour": "甲午"
+      },
+      "source_label": "火太旺",
+      "expected_strength": "强"
+    },
+    {
+      "id": "ditian_shuaiwang_06",
+      "pillars": {
+        "year": "戊寅",
+        "month": "丁巳",
+        "day": "丙寅",
+        "hour": "甲午"
+      },
+      "source_label": "火旺极",
+      "expected_strength": "强"
+    },
+    {
+      "id": "ditian_shuaiwang_07",
+      "pillars": {
+        "year": "辛巳",
+        "month": "丁酉",
+        "day": "丁酉",
+        "hour": "辛丑"
+      },
+      "source_label": "火衰",
+      "expected_strength": "弱"
+    },
+    {
+      "id": "ditian_shuaiwang_08",
+      "pillars": {
+        "year": "辛亥",
+        "month": "壬辰",
+        "day": "丙申",
+        "hour": "己亥"
+      },
+      "source_label": "火衰极",
+      "expected_strength": "弱"
+    },
+    {
+      "id": "ditian_shuaiwang_09",
+      "pillars": {
+        "year": "戊辰",
+        "month": "戊午",
+        "day": "戊申",
+        "hour": "己未"
+      },
+      "source_label": "土太旺",
+      "expected_strength": "强"
+    },
+    {
+      "id": "ditian_shuaiwang_10",
+      "pillars": {
+        "year": "戊戌",
+        "month": "丙辰",
+        "day": "己巳",
+        "hour": "己巳"
+      },
+      "source_label": "土旺极",
+      "expected_strength": "强"
+    },
+    {
+      "id": "ditian_shuaiwang_11",
+      "pillars": {
+        "year": "壬辰",
+        "month": "辛亥",
+        "day": "戊子",
+        "hour": "癸丑"
+      },
+      "source_label": "土太衰",
+      "expected_strength": "弱"
+    },
+    {
+      "id": "ditian_shuaiwang_12",
+      "pillars": {
+        "year": "癸酉",
+        "month": "甲子",
+        "day": "戊子",
+        "hour": "戊午"
+      },
+      "source_label": "土衰极",
+      "expected_strength": "弱"
+    },
+    {
+      "id": "ditian_shuaiwang_13",
+      "pillars": {
+        "year": "壬申",
+        "month": "己酉",
+        "day": "庚子",
+        "hour": "庚辰"
+      },
+      "source_label": "金太旺",
+      "expected_strength": "强"
+    },
+    {
+      "id": "ditian_shuaiwang_14",
+      "pillars": {
+        "year": "庚申",
+        "month": "乙酉",
+        "day": "庚戌",
+        "hour": "庚辰"
+      },
+      "source_label": "金旺极",
+      "expected_strength": "强"
+    },
+    {
+      "id": "ditian_shuaiwang_15",
+      "pillars": {
+        "year": "己卯",
+        "month": "庚午",
+        "day": "辛卯",
+        "hour": "甲午"
+      },
+      "source_label": "金太衰",
+      "expected_strength": "弱"
+    },
+    {
+      "id": "ditian_shuaiwang_16",
+      "pillars": {
+        "year": "己亥",
+        "month": "丁卯",
+        "day": "庚寅",
+        "hour": "丙子"
+      },
+      "source_label": "金衰极",
+      "expected_strength": "弱"
+    },
+    {
+      "id": "ditian_shuaiwang_17",
+      "pillars": {
+        "year": "壬寅",
+        "month": "辛亥",
+        "day": "壬子",
+        "hour": "辛丑"
+      },
+      "source_label": "水太旺",
+      "expected_strength": "强"
+    },
+    {
+      "id": "ditian_shuaiwang_18",
+      "pillars": {
+        "year": "癸亥",
+        "month": "癸亥",
+        "day": "壬子",
+        "hour": "庚子"
+      },
+      "source_label": "水旺极",
+      "expected_strength": "强"
+    },
+    {
+      "id": "ditian_shuaiwang_19",
+      "pillars": {
+        "year": "丙辰",
+        "month": "乙未",
+        "day": "壬午",
+        "hour": "癸卯"
+      },
+      "source_label": "水太衰",
+      "expected_strength": "弱"
+    },
+    {
+      "id": "ditian_shuaiwang_20",
+      "pillars": {
+        "year": "癸卯",
+        "month": "戊午",
+        "day": "壬寅",
+        "hour": "丙午"
+      },
+      "source_label": "水衰极",
+      "expected_strength": "弱"
+    }
+  ],
+  "additional_cases": [
+    {
+      "id": "ditian_zhonghe_wang_example",
+      "pillars": {
+        "year": "己酉",
+        "month": "丙子",
+        "day": "癸未",
+        "hour": "戊午"
+      },
+      "expected_strength": "弱",
+      "source_label": "财杀太重，旺中变弱",
+      "source_url": "https://www.shicihui.com/zh-tw/book/ditiansuichanwei/16288"
+    }
+  ]
+}

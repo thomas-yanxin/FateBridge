@@ -7,75 +7,80 @@
   ],
   "detailed_analysis": {
     "element_balance": {
-      "balance_type": "相克制约",
+      "balance_type": "相克有情",
       "details": [
-        "火克金，互动中容易出现压制感",
+        "火克金：金是第二人的喜用，第二人克之为有用之财",
         "第一人在水上偏弱，第二人在水上能形成补位"
       ],
       "mutual_support": [],
-      "score": 60.0
+      "score": 73.0
     },
     "favorable_synergy": {
       "details": [
-        "第二人金具备一定承接力，对第一人略有帮助",
-        "第一人火占比高，能明显补到第二人的可用之气"
+        "第一人土较旺，对第二人有稳定补益",
+        "第一人金占比高，能明显补到第二人的可用之气"
       ],
       "mutual_help": [
-        "第二人金具备一定承接力，对第一人略有帮助",
-        "第一人火占比高，能明显补到第二人的可用之气"
+        "第一人土较旺，对第二人有稳定补益",
+        "第一人金占比高，能明显补到第二人的可用之气"
       ],
       "risk_reasons": [
-        "第一人的可用五行金落在第二人的回避区间",
-        "第二人的可用五行木, 火落在第一人的回避区间"
+        "未见明显的喜用-回避五行正面冲突"
       ],
-      "score": 56.0,
+      "score": 77.0,
       "score_basis": [
-        "第二人金具备一定承接力，对第一人略有帮助(+4)",
-        "第一人火占比高，能明显补到第二人的可用之气(+10)",
-        "第一人的可用五行金落在第二人的回避区间(-8)",
-        "第二人的可用五行木, 火落在第一人的回避区间(-8)"
+        "第一人土较旺，对第二人有稳定补益(+7)",
+        "第一人金占比高，能明显补到第二人的可用之气(+10)"
       ],
       "supportive_patterns": [
         {
-          "description": "第二人金具备一定承接力，对第一人略有帮助",
-          "element": "金",
-          "source": "第二人",
-          "target": "第一人"
+          "description": "第一人土较旺，对第二人有稳定补益",
+          "element": "土",
+          "source": "第一人",
+          "target": "第二人"
         },
         {
-          "description": "第一人火占比高，能明显补到第二人的可用之气",
-          "element": "火",
+          "description": "第一人金占比高，能明显补到第二人的可用之气",
+          "element": "金",
           "source": "第一人",
           "target": "第二人"
         }
       ],
-      "synergy_level": "互助有限",
+      "synergy_level": "双向互助",
       "tension_patterns": [],
-      "useful_ten_gods_support": [
-        {
-          "common_ten_gods": [
-            "劫财",
-            "比肩"
-          ],
-          "description": "双方在可用十神上存在交集，格局取向更容易对齐。"
-        }
-      ]
+      "useful_ten_gods_support": []
     },
     "pattern_synergy": {
       "details": [
         "一方受益而另一方承压，属于拉扯型事件。",
         "一方受益而另一方承压，属于拉扯型事件。",
+        "一方受益而另一方承压，属于拉扯型事件。",
+        "一方受益而另一方承压，属于拉扯型事件。",
         "事件带来明显张力，需要结合格局取用判断。",
         "事件带来明显张力，需要结合格局取用判断。",
-        "对双方格局都形成明显干扰。",
-        "对双方格局都形成明显干扰。",
-        "冲击双方可用之气，风险较高。",
-        "冲击双方可用之气，风险较高。"
+        "事件带来明显张力，需要结合格局取用判断。",
+        "事件带来明显张力，需要结合格局取用判断。"
       ],
-      "pattern_combination": "寅午半合火局",
-      "risk_patterns": [
+      "pattern_combination": "申辰半合水局",
+      "risk_patterns": [],
+      "score": 36.0,
+      "score_basis": [
+        "申辰半合水局：一方受益而另一方承压，属于拉扯型事件。(-4)",
+        "寅午半合火局：一方受益而另一方承压，属于拉扯型事件。(-4)",
+        "巳丑半合金局：一方受益而另一方承压，属于拉扯型事件。(-4)",
+        "巳申六合：一方受益而另一方承压，属于拉扯型事件。(-4)",
+        "寅申六冲：事件带来明显张力，需要结合格局取用判断。(-4)",
+        "丑午六害：事件带来明显张力，需要结合格局取用判断。(-4)",
+        "寅巳六害：事件带来明显张力，需要结合格局取用判断。(-4)",
+        "寅巳申三刑：事件带来明显张力，需要结合格局取用判断。(-4)"
+      ],
+      "supportive_patterns": [],
+      "synergy_effects": [
+        "格局层面以中性互动为主"
+      ],
+      "tension_patterns": [
         {
-          "description": "对双方格局都形成明显干扰。",
+          "description": "一方受益而另一方承压，属于拉扯型事件。",
           "label": "申辰半合水局",
           "result_element": "水",
           "source_map": {
@@ -102,109 +107,6 @@
           "source_scope": "cross_person",
           "type": "half_harmony"
         },
-        {
-          "description": "对双方格局都形成明显干扰。",
-          "label": "巳申六合",
-          "result_element": "水",
-          "source_map": {
-            "巳": [
-              {
-                "person": "person1",
-                "pillar": "month",
-                "stem": "辛"
-              },
-              {
-                "person": "person1",
-                "pillar": "hour",
-                "stem": "辛"
-              }
-            ],
-            "申": [
-              {
-                "person": "person2",
-                "pillar": "year",
-                "stem": "壬"
-              }
-            ]
-          },
-          "source_scope": "cross_person",
-          "type": "six_harmony"
-        },
-        {
-          "description": "冲击双方可用之气，风险较高。",
-          "label": "寅申六冲",
-          "result_element": null,
-          "source_map": {
-            "寅": [
-              {
-                "person": "person2",
-                "pillar": "month",
-                "stem": "壬"
-              }
-            ],
-            "申": [
-              {
-                "person": "person2",
-                "pillar": "year",
-                "stem": "壬"
-              }
-            ]
-          },
-          "source_scope": "person2",
-          "type": "six_clash"
-        },
-        {
-          "description": "冲击双方可用之气，风险较高。",
-          "label": "寅巳申三刑",
-          "result_element": null,
-          "source_map": {
-            "寅": [
-              {
-                "person": "person2",
-                "pillar": "month",
-                "stem": "壬"
-              }
-            ],
-            "巳": [
-              {
-                "person": "person1",
-                "pillar": "month",
-                "stem": "辛"
-              },
-              {
-                "person": "person1",
-                "pillar": "hour",
-                "stem": "辛"
-              }
-            ],
-            "申": [
-              {
-                "person": "person2",
-                "pillar": "year",
-                "stem": "壬"
-              }
-            ]
-          },
-          "source_scope": "cross_person",
-          "type": "three_punishment"
-        }
-      ],
-      "score": 8.0,
-      "score_basis": [
-        "寅午半合火局：一方受益而另一方承压，属于拉扯型事件。(-4)",
-        "巳丑半合金局：一方受益而另一方承压，属于拉扯型事件。(-4)",
-        "丑午六害：事件带来明显张力，需要结合格局取用判断。(-4)",
-        "寅巳六害：事件带来明显张力，需要结合格局取用判断。(-4)",
-        "申辰半合水局：对双方格局都形成明显干扰。(-10)",
-        "巳申六合：对双方格局都形成明显干扰。(-10)",
-        "寅申六冲：冲击双方可用之气，风险较高。(-12)",
-        "寅巳申三刑：冲击双方可用之气，风险较高。(-12)"
-      ],
-      "supportive_patterns": [],
-      "synergy_effects": [
-        "格局层面以中性互动为主"
-      ],
-      "tension_patterns": [
         {
           "description": "一方受益而另一方承压，属于拉扯型事件。",
           "label": "寅午半合火局",
@@ -257,6 +159,57 @@
           "type": "half_harmony"
         },
         {
+          "description": "一方受益而另一方承压，属于拉扯型事件。",
+          "label": "巳申六合",
+          "result_element": "水",
+          "source_map": {
+            "巳": [
+              {
+                "person": "person1",
+                "pillar": "month",
+                "stem": "辛"
+              },
+              {
+                "person": "person1",
+                "pillar": "hour",
+                "stem": "辛"
+              }
+            ],
+            "申": [
+              {
+                "person": "person2",
+                "pillar": "year",
+                "stem": "壬"
+              }
+            ]
+          },
+          "source_scope": "cross_person",
+          "type": "six_harmony"
+        },
+        {
+          "description": "事件带来明显张力，需要结合格局取用判断。",
+          "label": "寅申六冲",
+          "result_element": null,
+          "source_map": {
+            "寅": [
+              {
+                "person": "person2",
+                "pillar": "month",
+                "stem": "壬"
+              }
+            ],
+            "申": [
+              {
+                "person": "person2",
+                "pillar": "year",
+                "stem": "壬"
+              }
+            ]
+          },
+          "source_scope": "person2",
+          "type": "six_clash"
+        },
+        {
           "description": "事件带来明显张力，需要结合格局取用判断。",
           "label": "丑午六害",
           "result_element": null,
@@ -306,76 +259,100 @@
           },
           "source_scope": "cross_person",
           "type": "six_harm"
+        },
+        {
+          "description": "事件带来明显张力，需要结合格局取用判断。",
+          "label": "寅巳申三刑",
+          "result_element": null,
+          "source_map": {
+            "寅": [
+              {
+                "person": "person2",
+                "pillar": "month",
+                "stem": "壬"
+              }
+            ],
+            "巳": [
+              {
+                "person": "person1",
+                "pillar": "month",
+                "stem": "辛"
+              },
+              {
+                "person": "person1",
+                "pillar": "hour",
+                "stem": "辛"
+              }
+            ],
+            "申": [
+              {
+                "person": "person2",
+                "pillar": "year",
+                "stem": "壬"
+              }
+            ]
+          },
+          "source_scope": "cross_person",
+          "type": "three_punishment"
         }
       ]
     },
     "ten_gods_relationship": {
-      "compatibility_aspects": [
-        "共同取用一致"
-      ],
+      "compatibility_aspects": [],
       "details": [
-        "第一人命局提供比肩，正好契合第二人当前格局所需",
-        "第一人命局提供劫财，正好契合第二人当前格局所需",
-        "第一人命局提供偏印，正好契合第二人当前格局所需",
-        "第二人命局提供比肩，正好契合第一人当前格局所需",
-        "第二人命局提供劫财，正好契合第一人当前格局所需"
+        "第一人命局提供正财，正好契合第二人当前格局所需",
+        "第一人命局提供食神，正好契合第二人当前格局所需",
+        "第一人命局提供偏财，正好契合第二人当前格局所需",
+        "第一人命局提供伤官，正好契合第二人当前格局所需",
+        "第一人命局提供七杀，正好契合第二人当前格局所需"
       ],
-      "relationship_dynamics": [
-        "双方共同认可能用的十神为：劫财, 比肩"
-      ],
+      "relationship_dynamics": [],
       "risk_reasons": [
         "未见明显的十神级高风险冲突"
       ],
-      "score": 77.0,
+      "score": 94.0,
       "score_basis": [
-        "第一人命局提供比肩，正好契合第二人当前格局所需(+2)",
-        "第一人命局提供劫财，正好契合第二人当前格局所需(+5)",
-        "第一人命局提供偏印，正好契合第二人当前格局所需(+2)",
-        "第一人带来七杀之气，对第二人属于张力型输入(-2)",
-        "第二人命局提供比肩，正好契合第一人当前格局所需(+2)",
+        "第一人命局提供正财，正好契合第二人当前格局所需(+14)",
+        "第一人命局提供食神，正好契合第二人当前格局所需(+2)",
+        "第一人命局提供偏财，正好契合第二人当前格局所需(+11)",
+        "第一人命局提供伤官，正好契合第二人当前格局所需(+4)",
+        "第一人命局提供七杀，正好契合第二人当前格局所需(+2)",
         "第二人带来七杀之气，对第一人属于张力型输入(-2)",
-        "第二人带来正官之气，对第一人属于张力型输入(-2)",
-        "第二人命局提供劫财，正好契合第一人当前格局所需(+1)"
+        "第二人带来正官之气，对第一人属于张力型输入(-2)"
       ],
       "supportive_patterns": [
         {
-          "description": "第一人命局提供比肩，正好契合第二人当前格局所需",
-          "label": "比肩可用承接",
+          "description": "第一人命局提供正财，正好契合第二人当前格局所需",
+          "label": "正财可用承接",
           "provider": "第一人",
           "target": "第二人"
         },
         {
-          "description": "第一人命局提供劫财，正好契合第二人当前格局所需",
-          "label": "劫财可用承接",
+          "description": "第一人命局提供食神，正好契合第二人当前格局所需",
+          "label": "食神可用承接",
           "provider": "第一人",
           "target": "第二人"
         },
         {
-          "description": "第一人命局提供偏印，正好契合第二人当前格局所需",
-          "label": "偏印可用承接",
+          "description": "第一人命局提供偏财，正好契合第二人当前格局所需",
+          "label": "偏财可用承接",
           "provider": "第一人",
           "target": "第二人"
         },
         {
-          "description": "第二人命局提供比肩，正好契合第一人当前格局所需",
-          "label": "比肩可用承接",
-          "provider": "第二人",
-          "target": "第一人"
+          "description": "第一人命局提供伤官，正好契合第二人当前格局所需",
+          "label": "伤官可用承接",
+          "provider": "第一人",
+          "target": "第二人"
         },
         {
-          "description": "第二人命局提供劫财，正好契合第一人当前格局所需",
-          "label": "劫财可用承接",
-          "provider": "第二人",
-          "target": "第一人"
+          "description": "第一人命局提供七杀，正好契合第二人当前格局所需",
+          "label": "七杀可用承接",
+          "provider": "第一人",
+          "target": "第二人"
         }
       ],
       "tension_patterns": [
-        {
-          "description": "第一人带来七杀之气，对第二人属于张力型输入",
-          "label": "七杀张力",
-          "provider": "第一人",
-          "target": "第二人"
-        },
         {
           "description": "第二人带来七杀之气，对第一人属于张力型输入",
           "label": "七杀张力",
@@ -391,38 +368,38 @@
       ],
       "useful_ten_gods_support": [
         {
-          "description": "第一人命局提供比肩，正好契合第二人当前格局所需",
+          "description": "第一人命局提供正财，正好契合第二人当前格局所需",
           "provider": "第一人",
           "target": "第二人",
-          "ten_god": "比肩",
-          "weight": 0.5
+          "ten_god": "正财",
+          "weight": 2.6
         },
         {
-          "description": "第一人命局提供劫财，正好契合第二人当前格局所需",
+          "description": "第一人命局提供食神，正好契合第二人当前格局所需",
           "provider": "第一人",
           "target": "第二人",
-          "ten_god": "劫财",
-          "weight": 1.0
-        },
-        {
-          "description": "第一人命局提供偏印，正好契合第二人当前格局所需",
-          "provider": "第一人",
-          "target": "第二人",
-          "ten_god": "偏印",
+          "ten_god": "食神",
           "weight": 0.3
         },
         {
-          "description": "第二人命局提供比肩，正好契合第一人当前格局所需",
-          "provider": "第二人",
-          "target": "第一人",
-          "ten_god": "比肩",
-          "weight": 0.5
+          "description": "第一人命局提供偏财，正好契合第二人当前格局所需",
+          "provider": "第一人",
+          "target": "第二人",
+          "ten_god": "偏财",
+          "weight": 2.0
         },
         {
-          "description": "第二人命局提供劫财，正好契合第一人当前格局所需",
-          "provider": "第二人",
-          "target": "第一人",
-          "ten_god": "劫财",
+          "description": "第一人命局提供伤官，正好契合第二人当前格局所需",
+          "provider": "第一人",
+          "target": "第二人",
+          "ten_god": "伤官",
+          "weight": 0.9
+        },
+        {
+          "description": "第一人命局提供七杀，正好契合第二人当前格局所需",
+          "provider": "第一人",
+          "target": "第二人",
+          "ten_god": "七杀",
           "weight": 0.2
         }
       ]
@@ -450,9 +427,7 @@
     "person1": {
       "birth_datetime": "1990年05月15日 10时30分",
       "day_master": "庚(金)",
-      "favorable_elements": [
-        "金"
-      ],
+      "favorable_elements": [],
       "name": "甲",
       "strength": "中和"
     },
@@ -460,11 +435,12 @@
       "birth_datetime": "1992年03月02日 08时18分",
       "day_master": "丁(火)",
       "favorable_elements": [
-        "火",
-        "木"
+        "土",
+        "金",
+        "水"
       ],
       "name": "乙",
-      "strength": "弱"
+      "strength": "强"
     }
   },
   "recommendations": [
@@ -476,7 +452,7 @@
     "tool_name": "two_person_compatibility"
   },
   "snapshot_export": {
-    "export_text": "[概要]\n类型：双人配合度分析\n\n[小结]\n综合分：51.1\n配合层级：需要努力，存在一些挑战，但通过努力可以改善\nrelationship_type：marriage\n计分依据：多维度规则加权的 0–100 分；不是关系成功概率。\n\n[detailed_analysis]\n五行互补：\n  评分：60.0\n  details：\n    - 火克金，互动中容易出现压制感\n    - 第一人在水上偏弱，第二人在水上能形成补位\n  balance_type：相克制约\n共同喜用：\n  评分：56.0\n  details：\n    - 第二人金具备一定承接力，对第一人略有帮助\n    - 第一人火占比高，能明显补到第二人的可用之气\n  mutual_help：\n    - 第二人金具备一定承接力，对第一人略有帮助\n    - 第一人火占比高，能明显补到第二人的可用之气\n  synergy_level：互助有限\n  计分依据：\n    - 第二人金具备一定承接力，对第一人略有帮助(+4)\n    - 第一人火占比高，能明显补到第二人的可用之气(+10)\n    - 第一人的可用五行金落在第二人的回避区间(-8)\n    - 第二人的可用五行木, 火落在第一人的回避区间(-8)\n  useful_ten_gods_support：\n    - description=双方在可用十神上存在交集，格局取向更容易对齐。\n      common_ten_gods：\n        - 劫财\n        - 比肩\n  supportive_patterns：\n    - 五行=金，source=第二人，target=第一人，description=第二人金具备一定承接力，对第一人略有帮助\n    - 五行=火，source=第一人，target=第二人，description=第一人火占比高，能明显补到第二人的可用之气\n  risk_reasons：\n    - 第一人的可用五行金落在第二人的回避区间\n    - 第二人的可用五行木, 火落在第一人的回避区间\nten_gods_relationship：\n  评分：77.0\n  details：\n    - 第一人命局提供比肩，正好契合第二人当前格局所需\n    - 第一人命局提供劫财，正好契合第二人当前格局所需\n    - 第一人命局提供偏印，正好契合第二人当前格局所需\n    - 第二人命局提供比肩，正好契合第一人当前格局所需\n    - 第二人命局提供劫财，正好契合第一人当前格局所需\n  relationship_dynamics：\n    - 双方共同认可能用的十神为：劫财, 比肩\n  compatibility_aspects：\n    - 共同取用一致\n  计分依据：\n    - 第一人命局提供比肩，正好契合第二人当前格局所需(+2)\n    - 第一人命局提供劫财，正好契合第二人当前格局所需(+5)\n    - 第一人命局提供偏印，正好契合第二人当前格局所需(+2)\n    - 第一人带来七杀之气，对第二人属于张力型输入(-2)\n    - 第二人命局提供比肩，正好契合第一人当前格局所需(+2)\n    - 第二人带来七杀之气，对第一人属于张力型输入(-2)\n    - 第二人带来正官之气，对第一人属于张力型输入(-2)\n    - 第二人命局提供劫财，正好契合第一人当前格局所需(+1)\n  useful_ten_gods_support：\n    - provider=第一人，target=第二人，ten_god=比肩，weight=0.5，description=第一人命局提供比肩，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=劫财，weight=1.0，description=第一人命局提供劫财，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=偏印，weight=0.3，description=第一人命局提供偏印，正好契合第二人当前格局所需\n    - provider=第二人，target=第一人，ten_god=比肩，weight=0.5，description=第二人命局提供比肩，正好契合第一人当前格局所需\n    - provider=第二人，target=第一人，ten_god=劫财，weight=0.2，description=第二人命局提供劫财，正好契合第一人当前格局所需\n  supportive_patterns：\n    - label=比肩可用承接，description=第一人命局提供比肩，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=劫财可用承接，description=第一人命局提供劫财，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=偏印可用承接，description=第一人命局提供偏印，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=比肩可用承接，description=第二人命局提供比肩，正好契合第一人当前格局所需，provider=第二人，target=第一人\n    - label=劫财可用承接，description=第二人命局提供劫财，正好契合第一人当前格局所需，provider=第二人，target=第一人\n  tension_patterns：\n    - label=七杀张力，description=第一人带来七杀之气，对第二人属于张力型输入，provider=第一人，target=第二人\n    - label=七杀张力，description=第二人带来七杀之气，对第一人属于张力型输入，provider=第二人，target=第一人\n    - label=正官张力，description=第二人带来正官之气，对第一人属于张力型输入，provider=第二人，target=第一人\n  risk_reasons：\n    - 未见明显的十神级高风险冲突\npattern_synergy：\n  评分：8.0\n  details：\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 对双方格局都形成明显干扰。\n    - 对双方格局都形成明显干扰。\n    - 冲击双方可用之气，风险较高。\n    - 冲击双方可用之气，风险较高。\n  pattern_combination：寅午半合火局\n  synergy_effects：\n    - 格局层面以中性互动为主\n  计分依据：\n    - 寅午半合火局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 巳丑半合金局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 丑午六害：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 寅巳六害：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 申辰半合水局：对双方格局都形成明显干扰。(-10)\n    - 巳申六合：对双方格局都形成明显干扰。(-10)\n    - 寅申六冲：冲击双方可用之气，风险较高。(-12)\n    - 寅巳申三刑：冲击双方可用之气，风险较高。(-12)\n  tension_patterns：\n    - label=寅午半合火局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=火，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        午：\n          （1 条，略）\n    - label=巳丑半合金局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=金，source_scope=cross_person\n      source_map：\n        巳：\n          （2 条，略）\n        丑：\n          （1 条，略）\n    - label=丑午六害，type=six_harm，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        丑：\n          （1 条，略）\n        午：\n          （1 条，略）\n    - label=寅巳六害，type=six_harm，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        巳：\n          （2 条，略）\n  risk_patterns：\n    - label=申辰半合水局，type=half_harmony，description=对双方格局都形成明显干扰。，result_element=水，source_scope=cross_person\n      source_map：\n        申：\n          （1 条，略）\n        辰：\n          （2 条，略）\n    - label=巳申六合，type=six_harmony，description=对双方格局都形成明显干扰。，result_element=水，source_scope=cross_person\n      source_map：\n        巳：\n          （2 条，略）\n        申：\n          （1 条，略）\n    - label=寅申六冲，type=six_clash，description=冲击双方可用之气，风险较高。，result_element=None，source_scope=person2\n      source_map：\n        寅：\n          （1 条，略）\n        申：\n          （1 条，略）\n    - label=寅巳申三刑，type=three_punishment，description=冲击双方可用之气，风险较高。，result_element=None，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        巳：\n          （2 条，略）\n        申：\n          （1 条，略）\ntraditional_analysis：\n  traditional_deviation：-1.1\n  normalized_score：39.0\n  details：\n    - 午与丑六害\n    - 巳与寅六害\n    - 巳与寅六害\n    - 合盘构成寅巳申三刑\n  评分：39.0\n  计分依据：从 50 分起，按跨盘冲、害、刑扣分并截断至 0–100；是综合分的一个维度，与 traditional_compatibility 的净分独立。\n\n[优势]\n- 第一人命局提供比肩，正好契合第二人当前格局所需\n- 第一人命局提供劫财，正好契合第二人当前格局所需\n\n[挑战]\n- 一方受益而另一方承压，属于拉扯型事件。\n- 事件带来明显张力，需要结合格局取用判断。\n- 午与丑六害\n- 巳与寅六害\n\n[建议]\n- 婚姻关系建议重视五行互补和精神契合\n\n[person_info]\nperson1：\n  name：甲\n  birth_datetime：1990年05月15日 10时30分\n  日主：庚(金)\n  强弱：中和\n  喜用神：\n    - 金\nperson2：\n  name：乙\n  birth_datetime：1992年03月02日 08时18分\n  日主：丁(火)\n  强弱：弱\n  喜用神：\n    - 火\n    - 木\n\n[element_relationship]\nperson1_element：金\nperson2_element：火\nrelationship_type：相克\ndescription：火克金\n\n[traditional_compatibility]\n评分：8\n层级：非常匹配\ndetails：\n  - 一方年支午 × 二方月支寅：半合寅午戌局\n  - 一方年支午 × 二方日支丑：六害\n  - 一方月支巳 × 二方年支申：六合\n  - 一方月支巳 × 二方月支寅：六害\n  - 一方月支巳 × 二方日支丑：半合巳酉丑局\n  - 一方日支辰 × 二方年支申：半合申子辰局\n  - 一方时支巳 × 二方年支申：六合\n  - 一方时支巳 × 二方月支寅：六害\n  - 一方时支巳 × 二方日支丑：半合巳酉丑局\n  - 合盘构成寅巳申三刑\n计分依据：合与冲、刑、害等规则加减后的净分，0 为中性；不是 0–100 分。level 只评价该净分，不能替代 summary 的综合等级；与 detailed_analysis.traditional_analysis 使用不同计分规则。",
+    "export_text": "[概要]\n类型：双人配合度分析\n\n[小结]\n综合分：69.6\n配合层级：一般匹配，有优势也有挑战，需要相互理解\nrelationship_type：marriage\n计分依据：多维度规则加权的 0–100 分；不是关系成功概率。\nscoring：\n  method_id：compatibility_weighted_rules_v1\n  input_methods：\n    person1：\n      strength_method_id：season_root_revelation_relations_v2\n      强弱：中和\n      strength_status：rule_based\n      useful_resolution_policy：layered_conflict_review_v1\n      useful_assessment_status：conditional\n    person2：\n      strength_method_id：season_root_revelation_relations_v2\n      强弱：强\n      strength_status：rule_based\n      useful_resolution_policy：layered_conflict_review_v1\n      useful_assessment_status：conditional\n  dimensions：\n    五行互补：\n      评分：73.0\n      weight：0.25\n      weighted_score：18.25\n    共同喜用：\n      评分：77.0\n      weight：0.35\n      weighted_score：26.95\n    ten_gods_relationship：\n      评分：94.0\n      weight：0.17\n      weighted_score：15.98\n    pattern_synergy：\n      评分：36.0\n      weight：0.18\n      weighted_score：6.48\n    traditional_analysis：\n      评分：39.0\n      weight：0.05\n      weighted_score：1.95\n  unrounded_score：69.61\n  rounding：clip_0_100_then_python_round_1_decimal\n\n[detailed_analysis]\n五行互补：\n  评分：73.0\n  details：\n    - 火克金：金是第二人的喜用，第二人克之为有用之财\n    - 第一人在水上偏弱，第二人在水上能形成补位\n  balance_type：相克有情\n共同喜用：\n  评分：77.0\n  details：\n    - 第一人土较旺，对第二人有稳定补益\n    - 第一人金占比高，能明显补到第二人的可用之气\n  mutual_help：\n    - 第一人土较旺，对第二人有稳定补益\n    - 第一人金占比高，能明显补到第二人的可用之气\n  synergy_level：双向互助\n  计分依据：\n    - 第一人土较旺，对第二人有稳定补益(+7)\n    - 第一人金占比高，能明显补到第二人的可用之气(+10)\n  supportive_patterns：\n    - 五行=土，source=第一人，target=第二人，description=第一人土较旺，对第二人有稳定补益\n    - 五行=金，source=第一人，target=第二人，description=第一人金占比高，能明显补到第二人的可用之气\n  risk_reasons：\n    - 未见明显的喜用-回避五行正面冲突\nten_gods_relationship：\n  评分：94.0\n  details：\n    - 第一人命局提供正财，正好契合第二人当前格局所需\n    - 第一人命局提供食神，正好契合第二人当前格局所需\n    - 第一人命局提供偏财，正好契合第二人当前格局所需\n    - 第一人命局提供伤官，正好契合第二人当前格局所需\n    - 第一人命局提供七杀，正好契合第二人当前格局所需\n  计分依据：\n    - 第一人命局提供正财，正好契合第二人当前格局所需(+14)\n    - 第一人命局提供食神，正好契合第二人当前格局所需(+2)\n    - 第一人命局提供偏财，正好契合第二人当前格局所需(+11)\n    - 第一人命局提供伤官，正好契合第二人当前格局所需(+4)\n    - 第一人命局提供七杀，正好契合第二人当前格局所需(+2)\n    - 第二人带来七杀之气，对第一人属于张力型输入(-2)\n    - 第二人带来正官之气，对第一人属于张力型输入(-2)\n  useful_ten_gods_support：\n    - provider=第一人，target=第二人，ten_god=正财，weight=2.6，description=第一人命局提供正财，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=食神，weight=0.3，description=第一人命局提供食神，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=偏财，weight=2.0，description=第一人命局提供偏财，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=伤官，weight=0.9，description=第一人命局提供伤官，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=七杀，weight=0.2，description=第一人命局提供七杀，正好契合第二人当前格局所需\n  supportive_patterns：\n    - label=正财可用承接，description=第一人命局提供正财，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=食神可用承接，description=第一人命局提供食神，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=偏财可用承接，description=第一人命局提供偏财，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=伤官可用承接，description=第一人命局提供伤官，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=七杀可用承接，description=第一人命局提供七杀，正好契合第二人当前格局所需，provider=第一人，target=第二人\n  tension_patterns：\n    - label=七杀张力，description=第二人带来七杀之气，对第一人属于张力型输入，provider=第二人，target=第一人\n    - label=正官张力，description=第二人带来正官之气，对第一人属于张力型输入，provider=第二人，target=第一人\n  risk_reasons：\n    - 未见明显的十神级高风险冲突\npattern_synergy：\n  评分：36.0\n  details：\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 事件带来明显张力，需要结合格局取用判断。\n  pattern_combination：申辰半合水局\n  synergy_effects：\n    - 格局层面以中性互动为主\n  计分依据：\n    - 申辰半合水局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 寅午半合火局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 巳丑半合金局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 巳申六合：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 寅申六冲：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 丑午六害：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 寅巳六害：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 寅巳申三刑：事件带来明显张力，需要结合格局取用判断。(-4)\n  tension_patterns：\n    - label=申辰半合水局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=水，source_scope=cross_person\n      source_map：\n        申：\n          （1 条，略）\n        辰：\n          （2 条，略）\n    - label=寅午半合火局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=火，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        午：\n          （1 条，略）\n    - label=巳丑半合金局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=金，source_scope=cross_person\n      source_map：\n        巳：\n          （2 条，略）\n        丑：\n          （1 条，略）\n    - label=巳申六合，type=six_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=水，source_scope=cross_person\n      source_map：\n        巳：\n          （2 条，略）\n        申：\n          （1 条，略）\n    - label=寅申六冲，type=six_clash，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=person2\n      source_map：\n        寅：\n          （1 条，略）\n        申：\n          （1 条，略）\n    - label=丑午六害，type=six_harm，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        丑：\n          （1 条，略）\n        午：\n          （1 条，略）\n    - label=寅巳六害，type=six_harm，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        巳：\n          （2 条，略）\n    - label=寅巳申三刑，type=three_punishment，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        巳：\n          （2 条，略）\n        申：\n          （1 条，略）\ntraditional_analysis：\n  traditional_deviation：-1.1\n  normalized_score：39.0\n  details：\n    - 午与丑六害\n    - 巳与寅六害\n    - 巳与寅六害\n    - 合盘构成寅巳申三刑\n  评分：39.0\n  计分依据：从 50 分起，按跨盘冲、害、刑扣分并截断至 0–100；是综合分的一个维度，与 traditional_compatibility 的净分独立。\n\n[优势]\n- 火克金：金是第二人的喜用，第二人克之为有用之财\n- 第一人在水上偏弱，第二人在水上能形成补位\n- 第一人土较旺，对第二人有稳定补益\n- 第一人金占比高，能明显补到第二人的可用之气\n- 第一人命局提供正财，正好契合第二人当前格局所需\n- 第一人命局提供食神，正好契合第二人当前格局所需\n\n[挑战]\n- 一方受益而另一方承压，属于拉扯型事件。\n- 事件带来明显张力，需要结合格局取用判断。\n- 午与丑六害\n- 巳与寅六害\n\n[建议]\n- 婚姻关系建议重视五行互补和精神契合\n\n[person_info]\nperson1：\n  name：甲\n  birth_datetime：1990年05月15日 10时30分\n  日主：庚(金)\n  强弱：中和\nperson2：\n  name：乙\n  birth_datetime：1992年03月02日 08时18分\n  日主：丁(火)\n  强弱：强\n  喜用神：\n    - 土\n    - 金\n    - 水\n\n[element_relationship]\nperson1_element：金\nperson2_element：火\nrelationship_type：相克\ndescription：火克金\n\n[traditional_compatibility]\n评分：8\n层级：非常匹配\ndetails：\n  - 一方年支午 × 二方月支寅：半合寅午戌局\n  - 一方年支午 × 二方日支丑：六害\n  - 一方月支巳 × 二方年支申：六合\n  - 一方月支巳 × 二方月支寅：六害\n  - 一方月支巳 × 二方日支丑：半合巳酉丑局\n  - 一方日支辰 × 二方年支申：半合申子辰局\n  - 一方时支巳 × 二方年支申：六合\n  - 一方时支巳 × 二方月支寅：六害\n  - 一方时支巳 × 二方日支丑：半合巳酉丑局\n  - 合盘构成寅巳申三刑\n计分依据：合与冲、刑、害等规则加减后的净分，0 为中性；不是 0–100 分。level 只评价该净分，不能替代 summary 的综合等级；与 detailed_analysis.traditional_analysis 使用不同计分规则。",
     "missing_selected_sections": [
       "起盘信息"
     ],
@@ -500,21 +476,21 @@
         "title": "概要"
       },
       {
-        "content": "[小结]\n综合分：51.1\n配合层级：需要努力，存在一些挑战，但通过努力可以改善\nrelationship_type：marriage\n计分依据：多维度规则加权的 0–100 分；不是关系成功概率。",
+        "content": "[小结]\n综合分：69.6\n配合层级：一般匹配，有优势也有挑战，需要相互理解\nrelationship_type：marriage\n计分依据：多维度规则加权的 0–100 分；不是关系成功概率。\nscoring：\n  method_id：compatibility_weighted_rules_v1\n  input_methods：\n    person1：\n      strength_method_id：season_root_revelation_relations_v2\n      强弱：中和\n      strength_status：rule_based\n      useful_resolution_policy：layered_conflict_review_v1\n      useful_assessment_status：conditional\n    person2：\n      strength_method_id：season_root_revelation_relations_v2\n      强弱：强\n      strength_status：rule_based\n      useful_resolution_policy：layered_conflict_review_v1\n      useful_assessment_status：conditional\n  dimensions：\n    五行互补：\n      评分：73.0\n      weight：0.25\n      weighted_score：18.25\n    共同喜用：\n      评分：77.0\n      weight：0.35\n      weighted_score：26.95\n    ten_gods_relationship：\n      评分：94.0\n      weight：0.17\n      weighted_score：15.98\n    pattern_synergy：\n      评分：36.0\n      weight：0.18\n      weighted_score：6.48\n    traditional_analysis：\n      评分：39.0\n      weight：0.05\n      weighted_score：1.95\n  unrounded_score：69.61\n  rounding：clip_0_100_then_python_round_1_decimal",
         "included": false,
         "index": 2,
         "raw_title": "小结",
         "title": "小结"
       },
       {
-        "content": "[detailed_analysis]\n五行互补：\n  评分：60.0\n  details：\n    - 火克金，互动中容易出现压制感\n    - 第一人在水上偏弱，第二人在水上能形成补位\n  balance_type：相克制约\n共同喜用：\n  评分：56.0\n  details：\n    - 第二人金具备一定承接力，对第一人略有帮助\n    - 第一人火占比高，能明显补到第二人的可用之气\n  mutual_help：\n    - 第二人金具备一定承接力，对第一人略有帮助\n    - 第一人火占比高，能明显补到第二人的可用之气\n  synergy_level：互助有限\n  计分依据：\n    - 第二人金具备一定承接力，对第一人略有帮助(+4)\n    - 第一人火占比高，能明显补到第二人的可用之气(+10)\n    - 第一人的可用五行金落在第二人的回避区间(-8)\n    - 第二人的可用五行木, 火落在第一人的回避区间(-8)\n  useful_ten_gods_support：\n    - description=双方在可用十神上存在交集，格局取向更容易对齐。\n      common_ten_gods：\n        - 劫财\n        - 比肩\n  supportive_patterns：\n    - 五行=金，source=第二人，target=第一人，description=第二人金具备一定承接力，对第一人略有帮助\n    - 五行=火，source=第一人，target=第二人，description=第一人火占比高，能明显补到第二人的可用之气\n  risk_reasons：\n    - 第一人的可用五行金落在第二人的回避区间\n    - 第二人的可用五行木, 火落在第一人的回避区间\nten_gods_relationship：\n  评分：77.0\n  details：\n    - 第一人命局提供比肩，正好契合第二人当前格局所需\n    - 第一人命局提供劫财，正好契合第二人当前格局所需\n    - 第一人命局提供偏印，正好契合第二人当前格局所需\n    - 第二人命局提供比肩，正好契合第一人当前格局所需\n    - 第二人命局提供劫财，正好契合第一人当前格局所需\n  relationship_dynamics：\n    - 双方共同认可能用的十神为：劫财, 比肩\n  compatibility_aspects：\n    - 共同取用一致\n  计分依据：\n    - 第一人命局提供比肩，正好契合第二人当前格局所需(+2)\n    - 第一人命局提供劫财，正好契合第二人当前格局所需(+5)\n    - 第一人命局提供偏印，正好契合第二人当前格局所需(+2)\n    - 第一人带来七杀之气，对第二人属于张力型输入(-2)\n    - 第二人命局提供比肩，正好契合第一人当前格局所需(+2)\n    - 第二人带来七杀之气，对第一人属于张力型输入(-2)\n    - 第二人带来正官之气，对第一人属于张力型输入(-2)\n    - 第二人命局提供劫财，正好契合第一人当前格局所需(+1)\n  useful_ten_gods_support：\n    - provider=第一人，target=第二人，ten_god=比肩，weight=0.5，description=第一人命局提供比肩，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=劫财，weight=1.0，description=第一人命局提供劫财，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=偏印，weight=0.3，description=第一人命局提供偏印，正好契合第二人当前格局所需\n    - provider=第二人，target=第一人，ten_god=比肩，weight=0.5，description=第二人命局提供比肩，正好契合第一人当前格局所需\n    - provider=第二人，target=第一人，ten_god=劫财，weight=0.2，description=第二人命局提供劫财，正好契合第一人当前格局所需\n  supportive_patterns：\n    - label=比肩可用承接，description=第一人命局提供比肩，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=劫财可用承接，description=第一人命局提供劫财，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=偏印可用承接，description=第一人命局提供偏印，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=比肩可用承接，description=第二人命局提供比肩，正好契合第一人当前格局所需，provider=第二人，target=第一人\n    - label=劫财可用承接，description=第二人命局提供劫财，正好契合第一人当前格局所需，provider=第二人，target=第一人\n  tension_patterns：\n    - label=七杀张力，description=第一人带来七杀之气，对第二人属于张力型输入，provider=第一人，target=第二人\n    - label=七杀张力，description=第二人带来七杀之气，对第一人属于张力型输入，provider=第二人，target=第一人\n    - label=正官张力，description=第二人带来正官之气，对第一人属于张力型输入，provider=第二人，target=第一人\n  risk_reasons：\n    - 未见明显的十神级高风险冲突\npattern_synergy：\n  评分：8.0\n  details：\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 对双方格局都形成明显干扰。\n    - 对双方格局都形成明显干扰。\n    - 冲击双方可用之气，风险较高。\n    - 冲击双方可用之气，风险较高。\n  pattern_combination：寅午半合火局\n  synergy_effects：\n    - 格局层面以中性互动为主\n  计分依据：\n    - 寅午半合火局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 巳丑半合金局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 丑午六害：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 寅巳六害：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 申辰半合水局：对双方格局都形成明显干扰。(-10)\n    - 巳申六合：对双方格局都形成明显干扰。(-10)\n    - 寅申六冲：冲击双方可用之气，风险较高。(-12)\n    - 寅巳申三刑：冲击双方可用之气，风险较高。(-12)\n  tension_patterns：\n    - label=寅午半合火局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=火，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        午：\n          （1 条，略）\n    - label=巳丑半合金局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=金，source_scope=cross_person\n      source_map：\n        巳：\n          （2 条，略）\n        丑：\n          （1 条，略）\n    - label=丑午六害，type=six_harm，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        丑：\n          （1 条，略）\n        午：\n          （1 条，略）\n    - label=寅巳六害，type=six_harm，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        巳：\n          （2 条，略）\n  risk_patterns：\n    - label=申辰半合水局，type=half_harmony，description=对双方格局都形成明显干扰。，result_element=水，source_scope=cross_person\n      source_map：\n        申：\n          （1 条，略）\n        辰：\n          （2 条，略）\n    - label=巳申六合，type=six_harmony，description=对双方格局都形成明显干扰。，result_element=水，source_scope=cross_person\n      source_map：\n        巳：\n          （2 条，略）\n        申：\n          （1 条，略）\n    - label=寅申六冲，type=six_clash，description=冲击双方可用之气，风险较高。，result_element=None，source_scope=person2\n      source_map：\n        寅：\n          （1 条，略）\n        申：\n          （1 条，略）\n    - label=寅巳申三刑，type=three_punishment，description=冲击双方可用之气，风险较高。，result_element=None，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        巳：\n          （2 条，略）\n        申：\n          （1 条，略）\ntraditional_analysis：\n  traditional_deviation：-1.1\n  normalized_score：39.0\n  details：\n    - 午与丑六害\n    - 巳与寅六害\n    - 巳与寅六害\n    - 合盘构成寅巳申三刑\n  评分：39.0\n  计分依据：从 50 分起，按跨盘冲、害、刑扣分并截断至 0–100；是综合分的一个维度，与 traditional_compatibility 的净分独立。",
+        "content": "[detailed_analysis]\n五行互补：\n  评分：73.0\n  details：\n    - 火克金：金是第二人的喜用，第二人克之为有用之财\n    - 第一人在水上偏弱，第二人在水上能形成补位\n  balance_type：相克有情\n共同喜用：\n  评分：77.0\n  details：\n    - 第一人土较旺，对第二人有稳定补益\n    - 第一人金占比高，能明显补到第二人的可用之气\n  mutual_help：\n    - 第一人土较旺，对第二人有稳定补益\n    - 第一人金占比高，能明显补到第二人的可用之气\n  synergy_level：双向互助\n  计分依据：\n    - 第一人土较旺，对第二人有稳定补益(+7)\n    - 第一人金占比高，能明显补到第二人的可用之气(+10)\n  supportive_patterns：\n    - 五行=土，source=第一人，target=第二人，description=第一人土较旺，对第二人有稳定补益\n    - 五行=金，source=第一人，target=第二人，description=第一人金占比高，能明显补到第二人的可用之气\n  risk_reasons：\n    - 未见明显的喜用-回避五行正面冲突\nten_gods_relationship：\n  评分：94.0\n  details：\n    - 第一人命局提供正财，正好契合第二人当前格局所需\n    - 第一人命局提供食神，正好契合第二人当前格局所需\n    - 第一人命局提供偏财，正好契合第二人当前格局所需\n    - 第一人命局提供伤官，正好契合第二人当前格局所需\n    - 第一人命局提供七杀，正好契合第二人当前格局所需\n  计分依据：\n    - 第一人命局提供正财，正好契合第二人当前格局所需(+14)\n    - 第一人命局提供食神，正好契合第二人当前格局所需(+2)\n    - 第一人命局提供偏财，正好契合第二人当前格局所需(+11)\n    - 第一人命局提供伤官，正好契合第二人当前格局所需(+4)\n    - 第一人命局提供七杀，正好契合第二人当前格局所需(+2)\n    - 第二人带来七杀之气，对第一人属于张力型输入(-2)\n    - 第二人带来正官之气，对第一人属于张力型输入(-2)\n  useful_ten_gods_support：\n    - provider=第一人，target=第二人，ten_god=正财，weight=2.6，description=第一人命局提供正财，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=食神，weight=0.3，description=第一人命局提供食神，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=偏财，weight=2.0，description=第一人命局提供偏财，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=伤官，weight=0.9，description=第一人命局提供伤官，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=七杀，weight=0.2，description=第一人命局提供七杀，正好契合第二人当前格局所需\n  supportive_patterns：\n    - label=正财可用承接，description=第一人命局提供正财，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=食神可用承接，description=第一人命局提供食神，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=偏财可用承接，description=第一人命局提供偏财，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=伤官可用承接，description=第一人命局提供伤官，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=七杀可用承接，description=第一人命局提供七杀，正好契合第二人当前格局所需，provider=第一人，target=第二人\n  tension_patterns：\n    - label=七杀张力，description=第二人带来七杀之气，对第一人属于张力型输入，provider=第二人，target=第一人\n    - label=正官张力，description=第二人带来正官之气，对第一人属于张力型输入，provider=第二人，target=第一人\n  risk_reasons：\n    - 未见明显的十神级高风险冲突\npattern_synergy：\n  评分：36.0\n  details：\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 事件带来明显张力，需要结合格局取用判断。\n  pattern_combination：申辰半合水局\n  synergy_effects：\n    - 格局层面以中性互动为主\n  计分依据：\n    - 申辰半合水局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 寅午半合火局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 巳丑半合金局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 巳申六合：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 寅申六冲：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 丑午六害：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 寅巳六害：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 寅巳申三刑：事件带来明显张力，需要结合格局取用判断。(-4)\n  tension_patterns：\n    - label=申辰半合水局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=水，source_scope=cross_person\n      source_map：\n        申：\n          （1 条，略）\n        辰：\n          （2 条，略）\n    - label=寅午半合火局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=火，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        午：\n          （1 条，略）\n    - label=巳丑半合金局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=金，source_scope=cross_person\n      source_map：\n        巳：\n          （2 条，略）\n        丑：\n          （1 条，略）\n    - label=巳申六合，type=six_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=水，source_scope=cross_person\n      source_map：\n        巳：\n          （2 条，略）\n        申：\n          （1 条，略）\n    - label=寅申六冲，type=six_clash，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=person2\n      source_map：\n        寅：\n          （1 条，略）\n        申：\n          （1 条，略）\n    - label=丑午六害，type=six_harm，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        丑：\n          （1 条，略）\n        午：\n          （1 条，略）\n    - label=寅巳六害，type=six_harm，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        巳：\n          （2 条，略）\n    - label=寅巳申三刑，type=three_punishment，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        巳：\n          （2 条，略）\n        申：\n          （1 条，略）\ntraditional_analysis：\n  traditional_deviation：-1.1\n  normalized_score：39.0\n  details：\n    - 午与丑六害\n    - 巳与寅六害\n    - 巳与寅六害\n    - 合盘构成寅巳申三刑\n  评分：39.0\n  计分依据：从 50 分起，按跨盘冲、害、刑扣分并截断至 0–100；是综合分的一个维度，与 traditional_compatibility 的净分独立。",
         "included": false,
         "index": 3,
         "raw_title": "detailed_analysis",
         "title": "detailed_analysis"
       },
       {
-        "content": "[优势]\n- 第一人命局提供比肩，正好契合第二人当前格局所需\n- 第一人命局提供劫财，正好契合第二人当前格局所需",
+        "content": "[优势]\n- 火克金：金是第二人的喜用，第二人克之为有用之财\n- 第一人在水上偏弱，第二人在水上能形成补位\n- 第一人土较旺，对第二人有稳定补益\n- 第一人金占比高，能明显补到第二人的可用之气\n- 第一人命局提供正财，正好契合第二人当前格局所需\n- 第一人命局提供食神，正好契合第二人当前格局所需",
         "included": false,
         "index": 4,
         "raw_title": "优势",
@@ -535,7 +511,7 @@
         "title": "建议"
       },
       {
-        "content": "[person_info]\nperson1：\n  name：甲\n  birth_datetime：1990年05月15日 10时30分\n  日主：庚(金)\n  强弱：中和\n  喜用神：\n    - 金\nperson2：\n  name：乙\n  birth_datetime：1992年03月02日 08时18分\n  日主：丁(火)\n  强弱：弱\n  喜用神：\n    - 火\n    - 木",
+        "content": "[person_info]\nperson1：\n  name：甲\n  birth_datetime：1990年05月15日 10时30分\n  日主：庚(金)\n  强弱：中和\nperson2：\n  name：乙\n  birth_datetime：1992年03月02日 08时18分\n  日主：丁(火)\n  强弱：强\n  喜用神：\n    - 土\n    - 金\n    - 水",
         "included": false,
         "index": 7,
         "raw_title": "person_info",
@@ -603,16 +579,68 @@
       "traditional_compatibility"
     ]
   },
-  "snapshot_text": "[概要]\n类型：双人配合度分析\n\n[小结]\n综合分：51.1\n配合层级：需要努力，存在一些挑战，但通过努力可以改善\nrelationship_type：marriage\n计分依据：多维度规则加权的 0–100 分；不是关系成功概率。\n\n[detailed_analysis]\n五行互补：\n  评分：60.0\n  details：\n    - 火克金，互动中容易出现压制感\n    - 第一人在水上偏弱，第二人在水上能形成补位\n  balance_type：相克制约\n共同喜用：\n  评分：56.0\n  details：\n    - 第二人金具备一定承接力，对第一人略有帮助\n    - 第一人火占比高，能明显补到第二人的可用之气\n  mutual_help：\n    - 第二人金具备一定承接力，对第一人略有帮助\n    - 第一人火占比高，能明显补到第二人的可用之气\n  synergy_level：互助有限\n  计分依据：\n    - 第二人金具备一定承接力，对第一人略有帮助(+4)\n    - 第一人火占比高，能明显补到第二人的可用之气(+10)\n    - 第一人的可用五行金落在第二人的回避区间(-8)\n    - 第二人的可用五行木, 火落在第一人的回避区间(-8)\n  useful_ten_gods_support：\n    - description=双方在可用十神上存在交集，格局取向更容易对齐。\n      common_ten_gods：\n        - 劫财\n        - 比肩\n  supportive_patterns：\n    - 五行=金，source=第二人，target=第一人，description=第二人金具备一定承接力，对第一人略有帮助\n    - 五行=火，source=第一人，target=第二人，description=第一人火占比高，能明显补到第二人的可用之气\n  risk_reasons：\n    - 第一人的可用五行金落在第二人的回避区间\n    - 第二人的可用五行木, 火落在第一人的回避区间\nten_gods_relationship：\n  评分：77.0\n  details：\n    - 第一人命局提供比肩，正好契合第二人当前格局所需\n    - 第一人命局提供劫财，正好契合第二人当前格局所需\n    - 第一人命局提供偏印，正好契合第二人当前格局所需\n    - 第二人命局提供比肩，正好契合第一人当前格局所需\n    - 第二人命局提供劫财，正好契合第一人当前格局所需\n  relationship_dynamics：\n    - 双方共同认可能用的十神为：劫财, 比肩\n  compatibility_aspects：\n    - 共同取用一致\n  计分依据：\n    - 第一人命局提供比肩，正好契合第二人当前格局所需(+2)\n    - 第一人命局提供劫财，正好契合第二人当前格局所需(+5)\n    - 第一人命局提供偏印，正好契合第二人当前格局所需(+2)\n    - 第一人带来七杀之气，对第二人属于张力型输入(-2)\n    - 第二人命局提供比肩，正好契合第一人当前格局所需(+2)\n    - 第二人带来七杀之气，对第一人属于张力型输入(-2)\n    - 第二人带来正官之气，对第一人属于张力型输入(-2)\n    - 第二人命局提供劫财，正好契合第一人当前格局所需(+1)\n  useful_ten_gods_support：\n    - provider=第一人，target=第二人，ten_god=比肩，weight=0.5，description=第一人命局提供比肩，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=劫财，weight=1.0，description=第一人命局提供劫财，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=偏印，weight=0.3，description=第一人命局提供偏印，正好契合第二人当前格局所需\n    - provider=第二人，target=第一人，ten_god=比肩，weight=0.5，description=第二人命局提供比肩，正好契合第一人当前格局所需\n    - provider=第二人，target=第一人，ten_god=劫财，weight=0.2，description=第二人命局提供劫财，正好契合第一人当前格局所需\n  supportive_patterns：\n    - label=比肩可用承接，description=第一人命局提供比肩，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=劫财可用承接，description=第一人命局提供劫财，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=偏印可用承接，description=第一人命局提供偏印，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=比肩可用承接，description=第二人命局提供比肩，正好契合第一人当前格局所需，provider=第二人，target=第一人\n    - label=劫财可用承接，description=第二人命局提供劫财，正好契合第一人当前格局所需，provider=第二人，target=第一人\n  tension_patterns：\n    - label=七杀张力，description=第一人带来七杀之气，对第二人属于张力型输入，provider=第一人，target=第二人\n    - label=七杀张力，description=第二人带来七杀之气，对第一人属于张力型输入，provider=第二人，target=第一人\n    - label=正官张力，description=第二人带来正官之气，对第一人属于张力型输入，provider=第二人，target=第一人\n  risk_reasons：\n    - 未见明显的十神级高风险冲突\npattern_synergy：\n  评分：8.0\n  details：\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 对双方格局都形成明显干扰。\n    - 对双方格局都形成明显干扰。\n    - 冲击双方可用之气，风险较高。\n    - 冲击双方可用之气，风险较高。\n  pattern_combination：寅午半合火局\n  synergy_effects：\n    - 格局层面以中性互动为主\n  计分依据：\n    - 寅午半合火局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 巳丑半合金局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 丑午六害：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 寅巳六害：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 申辰半合水局：对双方格局都形成明显干扰。(-10)\n    - 巳申六合：对双方格局都形成明显干扰。(-10)\n    - 寅申六冲：冲击双方可用之气，风险较高。(-12)\n    - 寅巳申三刑：冲击双方可用之气，风险较高。(-12)\n  tension_patterns：\n    - label=寅午半合火局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=火，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        午：\n          （1 条，略）\n    - label=巳丑半合金局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=金，source_scope=cross_person\n      source_map：\n        巳：\n          （2 条，略）\n        丑：\n          （1 条，略）\n    - label=丑午六害，type=six_harm，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        丑：\n          （1 条，略）\n        午：\n          （1 条，略）\n    - label=寅巳六害，type=six_harm，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        巳：\n          （2 条，略）\n  risk_patterns：\n    - label=申辰半合水局，type=half_harmony，description=对双方格局都形成明显干扰。，result_element=水，source_scope=cross_person\n      source_map：\n        申：\n          （1 条，略）\n        辰：\n          （2 条，略）\n    - label=巳申六合，type=six_harmony，description=对双方格局都形成明显干扰。，result_element=水，source_scope=cross_person\n      source_map：\n        巳：\n          （2 条，略）\n        申：\n          （1 条，略）\n    - label=寅申六冲，type=six_clash，description=冲击双方可用之气，风险较高。，result_element=None，source_scope=person2\n      source_map：\n        寅：\n          （1 条，略）\n        申：\n          （1 条，略）\n    - label=寅巳申三刑，type=three_punishment，description=冲击双方可用之气，风险较高。，result_element=None，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        巳：\n          （2 条，略）\n        申：\n          （1 条，略）\ntraditional_analysis：\n  traditional_deviation：-1.1\n  normalized_score：39.0\n  details：\n    - 午与丑六害\n    - 巳与寅六害\n    - 巳与寅六害\n    - 合盘构成寅巳申三刑\n  评分：39.0\n  计分依据：从 50 分起，按跨盘冲、害、刑扣分并截断至 0–100；是综合分的一个维度，与 traditional_compatibility 的净分独立。\n\n[优势]\n- 第一人命局提供比肩，正好契合第二人当前格局所需\n- 第一人命局提供劫财，正好契合第二人当前格局所需\n\n[挑战]\n- 一方受益而另一方承压，属于拉扯型事件。\n- 事件带来明显张力，需要结合格局取用判断。\n- 午与丑六害\n- 巳与寅六害\n\n[建议]\n- 婚姻关系建议重视五行互补和精神契合\n\n[person_info]\nperson1：\n  name：甲\n  birth_datetime：1990年05月15日 10时30分\n  日主：庚(金)\n  强弱：中和\n  喜用神：\n    - 金\nperson2：\n  name：乙\n  birth_datetime：1992年03月02日 08时18分\n  日主：丁(火)\n  强弱：弱\n  喜用神：\n    - 火\n    - 木\n\n[element_relationship]\nperson1_element：金\nperson2_element：火\nrelationship_type：相克\ndescription：火克金\n\n[traditional_compatibility]\n评分：8\n层级：非常匹配\ndetails：\n  - 一方年支午 × 二方月支寅：半合寅午戌局\n  - 一方年支午 × 二方日支丑：六害\n  - 一方月支巳 × 二方年支申：六合\n  - 一方月支巳 × 二方月支寅：六害\n  - 一方月支巳 × 二方日支丑：半合巳酉丑局\n  - 一方日支辰 × 二方年支申：半合申子辰局\n  - 一方时支巳 × 二方年支申：六合\n  - 一方时支巳 × 二方月支寅：六害\n  - 一方时支巳 × 二方日支丑：半合巳酉丑局\n  - 合盘构成寅巳申三刑\n计分依据：合与冲、刑、害等规则加减后的净分，0 为中性；不是 0–100 分。level 只评价该净分，不能替代 summary 的综合等级；与 detailed_analysis.traditional_analysis 使用不同计分规则。",
+  "snapshot_text": "[概要]\n类型：双人配合度分析\n\n[小结]\n综合分：69.6\n配合层级：一般匹配，有优势也有挑战，需要相互理解\nrelationship_type：marriage\n计分依据：多维度规则加权的 0–100 分；不是关系成功概率。\nscoring：\n  method_id：compatibility_weighted_rules_v1\n  input_methods：\n    person1：\n      strength_method_id：season_root_revelation_relations_v2\n      强弱：中和\n      strength_status：rule_based\n      useful_resolution_policy：layered_conflict_review_v1\n      useful_assessment_status：conditional\n    person2：\n      strength_method_id：season_root_revelation_relations_v2\n      强弱：强\n      strength_status：rule_based\n      useful_resolution_policy：layered_conflict_review_v1\n      useful_assessment_status：conditional\n  dimensions：\n    五行互补：\n      评分：73.0\n      weight：0.25\n      weighted_score：18.25\n    共同喜用：\n      评分：77.0\n      weight：0.35\n      weighted_score：26.95\n    ten_gods_relationship：\n      评分：94.0\n      weight：0.17\n      weighted_score：15.98\n    pattern_synergy：\n      评分：36.0\n      weight：0.18\n      weighted_score：6.48\n    traditional_analysis：\n      评分：39.0\n      weight：0.05\n      weighted_score：1.95\n  unrounded_score：69.61\n  rounding：clip_0_100_then_python_round_1_decimal\n\n[detailed_analysis]\n五行互补：\n  评分：73.0\n  details：\n    - 火克金：金是第二人的喜用，第二人克之为有用之财\n    - 第一人在水上偏弱，第二人在水上能形成补位\n  balance_type：相克有情\n共同喜用：\n  评分：77.0\n  details：\n    - 第一人土较旺，对第二人有稳定补益\n    - 第一人金占比高，能明显补到第二人的可用之气\n  mutual_help：\n    - 第一人土较旺，对第二人有稳定补益\n    - 第一人金占比高，能明显补到第二人的可用之气\n  synergy_level：双向互助\n  计分依据：\n    - 第一人土较旺，对第二人有稳定补益(+7)\n    - 第一人金占比高，能明显补到第二人的可用之气(+10)\n  supportive_patterns：\n    - 五行=土，source=第一人，target=第二人，description=第一人土较旺，对第二人有稳定补益\n    - 五行=金，source=第一人，target=第二人，description=第一人金占比高，能明显补到第二人的可用之气\n  risk_reasons：\n    - 未见明显的喜用-回避五行正面冲突\nten_gods_relationship：\n  评分：94.0\n  details：\n    - 第一人命局提供正财，正好契合第二人当前格局所需\n    - 第一人命局提供食神，正好契合第二人当前格局所需\n    - 第一人命局提供偏财，正好契合第二人当前格局所需\n    - 第一人命局提供伤官，正好契合第二人当前格局所需\n    - 第一人命局提供七杀，正好契合第二人当前格局所需\n  计分依据：\n    - 第一人命局提供正财，正好契合第二人当前格局所需(+14)\n    - 第一人命局提供食神，正好契合第二人当前格局所需(+2)\n    - 第一人命局提供偏财，正好契合第二人当前格局所需(+11)\n    - 第一人命局提供伤官，正好契合第二人当前格局所需(+4)\n    - 第一人命局提供七杀，正好契合第二人当前格局所需(+2)\n    - 第二人带来七杀之气，对第一人属于张力型输入(-2)\n    - 第二人带来正官之气，对第一人属于张力型输入(-2)\n  useful_ten_gods_support：\n    - provider=第一人，target=第二人，ten_god=正财，weight=2.6，description=第一人命局提供正财，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=食神，weight=0.3，description=第一人命局提供食神，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=偏财，weight=2.0，description=第一人命局提供偏财，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=伤官，weight=0.9，description=第一人命局提供伤官，正好契合第二人当前格局所需\n    - provider=第一人，target=第二人，ten_god=七杀，weight=0.2，description=第一人命局提供七杀，正好契合第二人当前格局所需\n  supportive_patterns：\n    - label=正财可用承接，description=第一人命局提供正财，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=食神可用承接，description=第一人命局提供食神，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=偏财可用承接，description=第一人命局提供偏财，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=伤官可用承接，description=第一人命局提供伤官，正好契合第二人当前格局所需，provider=第一人，target=第二人\n    - label=七杀可用承接，description=第一人命局提供七杀，正好契合第二人当前格局所需，provider=第一人，target=第二人\n  tension_patterns：\n    - label=七杀张力，description=第二人带来七杀之气，对第一人属于张力型输入，provider=第二人，target=第一人\n    - label=正官张力，description=第二人带来正官之气，对第一人属于张力型输入，provider=第二人，target=第一人\n  risk_reasons：\n    - 未见明显的十神级高风险冲突\npattern_synergy：\n  评分：36.0\n  details：\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 一方受益而另一方承压，属于拉扯型事件。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 事件带来明显张力，需要结合格局取用判断。\n    - 事件带来明显张力，需要结合格局取用判断。\n  pattern_combination：申辰半合水局\n  synergy_effects：\n    - 格局层面以中性互动为主\n  计分依据：\n    - 申辰半合水局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 寅午半合火局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 巳丑半合金局：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 巳申六合：一方受益而另一方承压，属于拉扯型事件。(-4)\n    - 寅申六冲：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 丑午六害：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 寅巳六害：事件带来明显张力，需要结合格局取用判断。(-4)\n    - 寅巳申三刑：事件带来明显张力，需要结合格局取用判断。(-4)\n  tension_patterns：\n    - label=申辰半合水局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=水，source_scope=cross_person\n      source_map：\n        申：\n          （1 条，略）\n        辰：\n          （2 条，略）\n    - label=寅午半合火局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=火，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        午：\n          （1 条，略）\n    - label=巳丑半合金局，type=half_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=金，source_scope=cross_person\n      source_map：\n        巳：\n          （2 条，略）\n        丑：\n          （1 条，略）\n    - label=巳申六合，type=six_harmony，description=一方受益而另一方承压，属于拉扯型事件。，result_element=水，source_scope=cross_person\n      source_map：\n        巳：\n          （2 条，略）\n        申：\n          （1 条，略）\n    - label=寅申六冲，type=six_clash，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=person2\n      source_map：\n        寅：\n          （1 条，略）\n        申：\n          （1 条，略）\n    - label=丑午六害，type=six_harm，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        丑：\n          （1 条，略）\n        午：\n          （1 条，略）\n    - label=寅巳六害，type=six_harm，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        巳：\n          （2 条，略）\n    - label=寅巳申三刑，type=three_punishment，description=事件带来明显张力，需要结合格局取用判断。，result_element=None，source_scope=cross_person\n      source_map：\n        寅：\n          （1 条，略）\n        巳：\n          （2 条，略）\n        申：\n          （1 条，略）\ntraditional_analysis：\n  traditional_deviation：-1.1\n  normalized_score：39.0\n  details：\n    - 午与丑六害\n    - 巳与寅六害\n    - 巳与寅六害\n    - 合盘构成寅巳申三刑\n  评分：39.0\n  计分依据：从 50 分起，按跨盘冲、害、刑扣分并截断至 0–100；是综合分的一个维度，与 traditional_compatibility 的净分独立。\n\n[优势]\n- 火克金：金是第二人的喜用，第二人克之为有用之财\n- 第一人在水上偏弱，第二人在水上能形成补位\n- 第一人土较旺，对第二人有稳定补益\n- 第一人金占比高，能明显补到第二人的可用之气\n- 第一人命局提供正财，正好契合第二人当前格局所需\n- 第一人命局提供食神，正好契合第二人当前格局所需\n\n[挑战]\n- 一方受益而另一方承压，属于拉扯型事件。\n- 事件带来明显张力，需要结合格局取用判断。\n- 午与丑六害\n- 巳与寅六害\n\n[建议]\n- 婚姻关系建议重视五行互补和精神契合\n\n[person_info]\nperson1：\n  name：甲\n  birth_datetime：1990年05月15日 10时30分\n  日主：庚(金)\n  强弱：中和\nperson2：\n  name：乙\n  birth_datetime：1992年03月02日 08时18分\n  日主：丁(火)\n  强弱：强\n  喜用神：\n    - 土\n    - 金\n    - 水\n\n[element_relationship]\nperson1_element：金\nperson2_element：火\nrelationship_type：相克\ndescription：火克金\n\n[traditional_compatibility]\n评分：8\n层级：非常匹配\ndetails：\n  - 一方年支午 × 二方月支寅：半合寅午戌局\n  - 一方年支午 × 二方日支丑：六害\n  - 一方月支巳 × 二方年支申：六合\n  - 一方月支巳 × 二方月支寅：六害\n  - 一方月支巳 × 二方日支丑：半合巳酉丑局\n  - 一方日支辰 × 二方年支申：半合申子辰局\n  - 一方时支巳 × 二方年支申：六合\n  - 一方时支巳 × 二方月支寅：六害\n  - 一方时支巳 × 二方日支丑：半合巳酉丑局\n  - 合盘构成寅巳申三刑\n计分依据：合与冲、刑、害等规则加减后的净分，0 为中性；不是 0–100 分。level 只评价该净分，不能替代 summary 的综合等级；与 detailed_analysis.traditional_analysis 使用不同计分规则。",
   "strengths": [
-    "第一人命局提供比肩，正好契合第二人当前格局所需",
-    "第一人命局提供劫财，正好契合第二人当前格局所需"
+    "火克金：金是第二人的喜用，第二人克之为有用之财",
+    "第一人在水上偏弱，第二人在水上能形成补位",
+    "第一人土较旺，对第二人有稳定补益",
+    "第一人金占比高，能明显补到第二人的可用之气",
+    "第一人命局提供正财，正好契合第二人当前格局所需",
+    "第一人命局提供食神，正好契合第二人当前格局所需"
   ],
   "summary": {
-    "compatibility_level": "需要努力，存在一些挑战，但通过努力可以改善",
-    "overall_score": 51.1,
+    "compatibility_level": "一般匹配，有优势也有挑战，需要相互理解",
+    "overall_score": 69.6,
     "relationship_type": "marriage",
-    "score_basis": "多维度规则加权的 0–100 分；不是关系成功概率。"
+    "score_basis": "多维度规则加权的 0–100 分；不是关系成功概率。",
+    "scoring": {
+      "dimensions": {
+        "element_balance": {
+          "score": 73.0,
+          "weight": 0.25,
+          "weighted_score": 18.25
+        },
+        "favorable_synergy": {
+          "score": 77.0,
+          "weight": 0.35,
+          "weighted_score": 26.95
+        },
+        "pattern_synergy": {
+          "score": 36.0,
+          "weight": 0.18,
+          "weighted_score": 6.48
+        },
+        "ten_gods_relationship": {
+          "score": 94.0,
+          "weight": 0.17,
+          "weighted_score": 15.98
+        },
+        "traditional_analysis": {
+          "score": 39.0,
+          "weight": 0.05,
+          "weighted_score": 1.95
+        }
+      },
+      "input_methods": {
+        "person1": {
+          "strength": "中和",
+          "strength_method_id": "season_root_revelation_relations_v2",
+          "strength_status": "rule_based",
+          "useful_assessment_status": "conditional",
+          "useful_resolution_policy": "layered_conflict_review_v1"
+        },
+        "person2": {
+          "strength": "强",
+          "strength_method_id": "season_root_revelation_relations_v2",
+          "strength_status": "rule_based",
+          "useful_assessment_status": "conditional",
+          "useful_resolution_policy": "layered_conflict_review_v1"
+        }
+      },
+      "method_id": "compatibility_weighted_rules_v1",
+      "rounding": "clip_0_100_then_python_round_1_decimal",
+      "unrounded_score": 69.61
+    }
   },
   "traditional_compatibility": {
     "details": [

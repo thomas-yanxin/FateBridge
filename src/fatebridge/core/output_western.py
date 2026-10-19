@@ -252,11 +252,22 @@ class FirdariaPeriod(PartialOutput):
     planet_label: Optional[str] = None
     start: Optional[str] = None
     end: Optional[str] = None
+    start_display: Optional[str] = None
+    end_display: Optional[str] = None
 
 
 class FirdariaMajor(FirdariaPeriod):
     years: Optional[float] = None
     subperiods: Optional[List[FirdariaPeriod]] = None
+    nominal_start_age: Optional[int] = None
+    nominal_end_age: Optional[int] = None
+
+
+class FirdariaCalculationOptions(PartialOutput):
+    night_order: Optional[str] = None
+    year_basis: Optional[str] = None
+    subperiod_basis: Optional[str] = None
+    timezone: Optional[str] = None
 
 
 class Firdaria(PartialOutput):
@@ -265,6 +276,7 @@ class Firdaria(PartialOutput):
     current_major: Optional[FirdariaMajor] = None
     current_sub: Optional[FirdariaPeriod] = None
     timeline: Optional[List[FirdariaMajor]] = None
+    calculation_options: Optional[FirdariaCalculationOptions] = None
 
 
 class DecennialPeriod(PartialOutput):

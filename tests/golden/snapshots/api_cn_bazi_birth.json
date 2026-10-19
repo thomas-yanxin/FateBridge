@@ -860,6 +860,212 @@
       }
     },
     "day_master": {
+      "assessment": {
+        "branch_budgets": {
+          "day": {
+            "initial": 2.0,
+            "remaining": 2.0
+          },
+          "hour": {
+            "initial": 2.0,
+            "remaining": 2.0
+          },
+          "month": {
+            "initial": 4.0,
+            "remaining": 4.0
+          },
+          "year": {
+            "initial": 2.0,
+            "remaining": 2.0
+          }
+        },
+        "combination_contributions": [],
+        "effective_elements": {
+          "土": 4.0,
+          "木": 0.571429,
+          "水": 0.142857,
+          "火": 9.52381,
+          "金": 3.857143
+        },
+        "limitations": [
+          "数值系数为公开工程参数，古籍只支持规则关系，不提供这些系数或现实预测效度。",
+          "月令按月支季相处理，未细分节气后司令天数、湿燥土与寒暖调候。",
+          "合化采用化神当令、透化神、无争合及未受冲的保守条件；不认证化气格。",
+          "刑害有门派分歧；三刑取全组、子卯取成对，自刑轻减，六害不机械减根。",
+          "旺衰极端或参数敏感时停止自动扶抑取用，另行核对从格及专旺。"
+        ],
+        "method_id": "season_root_revelation_relations_v2",
+        "month_command": {
+          "branch": "巳",
+          "phase": "囚"
+        },
+        "parameters": {
+          "binding": 0.85,
+          "branch_budget": 2.0,
+          "clash_equal": 0.75,
+          "clash_loser": 0.5,
+          "clash_winner": 0.9,
+          "floating_stem": 0.25,
+          "month_multiplier": 2.0,
+          "partial_transfer": 0.2,
+          "punishment": 0.9,
+          "reveal_multiplier": 1.25,
+          "rooted_stem": 1.0,
+          "seasonal_spread": 1.0,
+          "strong_share": 0.6,
+          "transformation_transfer": 0.8,
+          "weak_share": 0.4
+        },
+        "relations": [],
+        "requires_special_structure_review": false,
+        "revealed_stems": [
+          {
+            "energy": 0.75,
+            "pillar": "year",
+            "root_mass": 1.714286,
+            "stem": "庚"
+          },
+          {
+            "energy": 0.75,
+            "pillar": "month",
+            "root_mass": 1.714286,
+            "stem": "辛"
+          },
+          {
+            "energy": 0.75,
+            "pillar": "hour",
+            "root_mass": 1.714286,
+            "stem": "辛"
+          }
+        ],
+        "roots": [
+          {
+            "branch": "巳",
+            "energy": 1.071429,
+            "pillar": "month",
+            "remaining_mass": 1.142857,
+            "stem": "庚"
+          },
+          {
+            "branch": "巳",
+            "energy": 0.535714,
+            "pillar": "hour",
+            "remaining_mass": 0.571429,
+            "stem": "庚"
+          }
+        ],
+        "seasonal_factors": {
+          "休": 1.0,
+          "囚": 0.75,
+          "旺": 2.0,
+          "死": 0.5,
+          "相": 1.5
+        },
+        "seasonal_phases": {
+          "土": "相",
+          "木": "休",
+          "水": "死",
+          "火": "旺",
+          "金": "囚"
+        },
+        "sensitivity": {
+          "candidate_strengths": [
+            "中和"
+          ],
+          "variants": [
+            {
+              "parameter": "branch_budget",
+              "scale": 0.85,
+              "strength": "中和",
+              "support_share": 0.446359
+            },
+            {
+              "parameter": "branch_budget",
+              "scale": 1.15,
+              "strength": "中和",
+              "support_share": 0.424883
+            },
+            {
+              "parameter": "month_multiplier",
+              "scale": 0.85,
+              "strength": "中和",
+              "support_share": 0.442042
+            },
+            {
+              "parameter": "month_multiplier",
+              "scale": 1.15,
+              "strength": "中和",
+              "support_share": 0.42718
+            },
+            {
+              "parameter": "seasonal_spread",
+              "scale": 0.85,
+              "strength": "中和",
+              "support_share": 0.451273
+            },
+            {
+              "parameter": "seasonal_spread",
+              "scale": 1.15,
+              "strength": "中和",
+              "support_share": 0.418419
+            },
+            {
+              "parameter": "reveal_multiplier",
+              "scale": 0.85,
+              "strength": "中和",
+              "support_share": 0.426571
+            },
+            {
+              "parameter": "reveal_multiplier",
+              "scale": 1.15,
+              "strength": "中和",
+              "support_share": 0.441649
+            }
+          ]
+        },
+        "sources": [
+          {
+            "id": "ditian_zhonghe",
+            "title": "滴天髓阐微·中和（财杀重而旺中变弱例）",
+            "url": "https://www.shicihui.com/zh-tw/book/ditiansuichanwei/16288"
+          },
+          {
+            "id": "ziping_6",
+            "title": "子平真诠·论十干得时不旺失时不弱",
+            "url": "https://www.donglishuzhai.net/chapter/3719.html"
+          },
+          {
+            "id": "ziping_7",
+            "title": "子平真诠·论刑冲会合解法",
+            "url": "https://www.donglishuzhai.net/chapter/3720.html"
+          },
+          {
+            "id": "ziping_5",
+            "title": "子平真诠·论十干合而不合",
+            "url": "https://www.donglishuzhai.net/chapter/3718.html"
+          },
+          {
+            "id": "ditian_branch",
+            "title": "滴天髓·地支论",
+            "url": "https://zh.wikisource.org/zh-hant/滴天髓/03"
+          }
+        ],
+        "status": "rule_based",
+        "strength_level": "中和",
+        "structural_decision": {
+          "numerical_label": "中和",
+          "rooted_controller_stems": 0,
+          "rooted_wealth_visible": false,
+          "rule": "weighted_balance",
+          "source_id": "ziping_6",
+          "support_visible_stems": 3,
+          "vigorous_roots": []
+        },
+        "support_share": 0.43421053,
+        "support_strength": 7.85714286,
+        "support_weaken_ratio": 0.76744186,
+        "weaken_strength": 10.23809524
+      },
       "element": "金",
       "polarity": "阳",
       "stem": "庚",
@@ -873,9 +1079,7 @@
       "金": 37.1
     },
     "engine": "fatebridge-offline",
-    "favorable_elements": [
-      "金"
-    ],
+    "favorable_elements": [],
     "four_pillars": {
       "day": {
         "branch": "辰",
@@ -1184,38 +1388,92 @@
       }
     ],
     "structure_profile": {
-      "avoid_elements": [
-        "木",
+      "assessment_status": "conditional",
+      "avoid_elements": [],
+      "conditional_elements": [
         "火",
         "土",
         "水"
       ],
+      "conflicts": [],
       "decision_basis": [
-        "未识别高影响白名单格局，当前按日主中和做扶抑调候。"
+        "未识别高影响白名单格局，当前按日主中和做扶抑参考。",
+        "扶抑、格局候选与调候分层保留；冲突及仅旁证支持的五行列为条件项，未入喜不自动为忌。"
       ],
       "dominant_structure": {
         "avoid_elements": [],
         "key": "default_support",
-        "label": "扶抑调候",
+        "label": "扶抑参考",
         "priority": 10,
         "reason": "未识别高影响白名单格局，按日主强弱与五行扶抑作为主判断。",
-        "useful_elements": [
-          "金"
-        ],
-        "useful_ten_gods": [
-          "比肩",
-          "劫财"
-        ]
+        "useful_elements": [],
+        "useful_ten_gods": []
       },
       "harmony_effects": [],
+      "layers": [
+        {
+          "avoid_elements": [],
+          "source": "扶抑",
+          "status": "heuristic",
+          "useful_elements": []
+        },
+        {
+          "avoid_elements": [],
+          "limitations": [
+            "日干与月支简表；未判断原局剂量、寒暖是否已调和或是否需要新增。"
+          ],
+          "source": "调候简表",
+          "status": "reference_only",
+          "stems": [
+            {
+              "hidden_in": [],
+              "priority": "primary",
+              "stem": "壬",
+              "visible_in": []
+            },
+            {
+              "hidden_in": [
+                "month",
+                "day",
+                "hour"
+              ],
+              "priority": "secondary",
+              "stem": "戊",
+              "visible_in": []
+            },
+            {
+              "hidden_in": [
+                "month",
+                "hour"
+              ],
+              "priority": "secondary",
+              "stem": "丙",
+              "visible_in": []
+            },
+            {
+              "hidden_in": [
+                "year"
+              ],
+              "priority": "secondary",
+              "stem": "丁",
+              "visible_in": []
+            }
+          ],
+          "useful_elements": [
+            "水",
+            "土",
+            "火"
+          ]
+        }
+      ],
+      "limitations": [
+        "喜忌为规则参考，非补充元素或行动处方；中和不默认喜日主本五行。",
+        "格局按十神共现识别为候选，未验证成格、制化力度和破格条件。",
+        "全局喜用仅保留主格局或扶抑支持且无反向规则的候选；调候与次格局独立保留。"
+      ],
       "metadata": {
-        "baseline_useful_elements": [
-          "金"
-        ],
-        "baseline_useful_ten_gods": [
-          "比肩",
-          "劫财"
-        ],
+        "baseline_useful_elements": [],
+        "baseline_useful_ten_gods": [],
         "clash_patterns": {
           "punishments": [],
           "six_clash": [],
@@ -1263,15 +1521,15 @@
           "many_treasuries": false
         }
       },
-      "recognized_structures": [],
-      "secondary_structures": [],
-      "useful_elements": [
+      "neutral_elements": [
+        "木",
         "金"
       ],
-      "useful_ten_gods": [
-        "比肩",
-        "劫财"
-      ]
+      "recognized_structures": [],
+      "resolution_policy": "layered_conflict_review_v1",
+      "secondary_structures": [],
+      "useful_elements": [],
+      "useful_ten_gods": []
     },
     "ten_gods": {
       "day": [

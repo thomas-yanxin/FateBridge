@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
+from ..core.rules import BaZiRules
 from ..utils.data import (
     STEM_ELEMENTS,
     Element,
@@ -295,10 +296,8 @@ class CareerAnalysis:
         element_counts = count_element_distribution(pillars)
 
         # 喜用神五行
-        from ..core.elements import ElementAnalysis
-
-        day_master_analysis = ElementAnalysis.analyze_day_master_strength(pillars)
-        favorable = ElementAnalysis.get_favorable_elements(day_master_analysis)
+        profile = BaZiRules.chart_useful_profile(pillars)
+        favorable = [Element(value) for value in profile["useful_elements"]]
 
         # 推荐行业基于喜用神
         recommended_industries: List[Dict[str, Any]] = []
@@ -315,7 +314,7 @@ class CareerAnalysis:
                 )
 
         # 忌神行业
-        avoid_elements = [e for e in Element if e not in favorable]
+        avoid_elements = [Element(value) for value in profile["avoid_elements"]]
         avoid_industries: List[Dict[str, Any]] = []
         for elem in avoid_elements:
             info = ELEMENT_INDUSTRIES.get(elem)
@@ -330,6 +329,8 @@ class CareerAnalysis:
 
         return {
             "favorable_elements": [e.value for e in favorable],
+            "conditional_elements": profile["conditional_elements"],
+            "reference_scope": profile["resolution_policy"],
             "recommended_industries": recommended_industries,
             "avoid_industries": avoid_industries,
             "element_distribution": {
@@ -542,10 +543,8 @@ class CareerAnalysis:
     ) -> Dict[str, Any]:
         """分析贵人方位。"""
         # 喜用神方位
-        from ..core.elements import ElementAnalysis
-
-        dm_analysis = ElementAnalysis.analyze_day_master_strength(pillars)
-        favorable = ElementAnalysis.get_favorable_elements(dm_analysis)
+        profile = BaZiRules.chart_useful_profile(pillars)
+        favorable = [Element(value) for value in profile["useful_elements"]]
 
         directions: List[Dict[str, Any]] = []
         for elem in favorable:
@@ -561,6 +560,8 @@ class CareerAnalysis:
 
         return {
             "favorable_directions": directions,
+            "conditional_elements": profile["conditional_elements"],
+            "reference_scope": profile["resolution_policy"],
         }
 
     @staticmethod

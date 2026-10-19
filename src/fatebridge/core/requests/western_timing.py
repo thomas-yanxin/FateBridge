@@ -37,6 +37,22 @@ class WesternTimingRequest(AstroBirthRequest):
             "If omitted, keeps the birth minute for date-only compatibility."
         ),
     )
+    firdaria_night_order: Literal["nodes_at_end", "nodes_after_mars"] = Field(
+        default="nodes_at_end",
+        description=(
+            "Firdaria night order: nodes_at_end (existing default, after Mercury) "
+            "or nodes_after_mars (Bonatti-labelled variant). Day order is unchanged."
+        ),
+    )
+    firdaria_year_basis: Literal["fixed_365_2425", "calendar_anniversary"] = Field(
+        default="fixed_365_2425",
+        description=(
+            "Firdaria year basis: fixed_365_2425 (existing local-wall arithmetic) "
+            "or calendar_anniversary (original-birth anniversaries, Feb 29 clamps "
+            "to Feb 28 then restores; UTC elapsed subperiods). Calendar mode rejects "
+            "ambiguous/nonexistent birth, analysis and generated anniversary clocks."
+        ),
+    )
     return_longitude: Optional[float] = Field(
         default=None, ge=-180, le=180, description="Return chart longitude"
     )

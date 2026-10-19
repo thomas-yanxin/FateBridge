@@ -18,6 +18,7 @@ from fatebridge.core.gua_meanings import HEXAGRAM_INTERPRETATIONS
 from fatebridge.diagnostics import diagnose, resolve_codex_cli
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
+from tests.fixtures.compatibility import assert_score_reference
 
 SUBJECT = str(Path(__file__).parents[1] / "examples/demo-subject.json")
 
@@ -100,7 +101,7 @@ def test_relationship_summary_deduplicates_without_losing_evidence(capsys):
     code, result, _ = invoke(capsys, *shlex.split(example)[1:])
     assert code == 0
     assert len(result["challenges"]) == len(set(result["challenges"]))
-    assert result["summary"]["overall_score"] == 51.1
+    assert_score_reference(result["summary"], result["detailed_analysis"], "marriage")
     assert result["detailed_analysis"]
     assert "0–100" in result["summary"]["score_basis"]
     assert "净分" in result["traditional_compatibility"]["score_basis"]
@@ -319,7 +320,10 @@ async def test_consultation_first_views_keep_interpretable_evidence_across_surfa
         assert payload["day_master"]["element"]
         assert payload["ten_gods"]
         assert payload["structure_profile"]["decision_basis"]
-        assert payload["structure_profile"]["useful_elements"]
+        profile = payload["structure_profile"]
+        assert profile["resolution_policy"] == "layered_conflict_review_v1"
+        assert set(profile["useful_elements"]).isdisjoint(profile["avoid_elements"])
+        assert profile["layers"] and profile["conditional_elements"]
         assert payload["person_info"]["normalized_birth_datetime"]
     elif key == "astro_chart":
         assert {"Sun", "Moon"} <= {p["id"] for p in payload["planets"]}
@@ -436,7 +440,7 @@ def test_relationship_example_and_default_do_not_assume_marriage(capsys):
     assert spec.request_model.model_validate(inputs).relationship_type == "general"
     code, result, _ = invoke(capsys, *shlex.split(cli._cli_example(spec, inputs))[1:])
     assert code == 0 and result["summary"]["relationship_type"] == "general"
-    assert result["summary"]["overall_score"] == 54.5
+    assert_score_reference(result["summary"], result["detailed_analysis"])
 
 
 @pytest.mark.asyncio

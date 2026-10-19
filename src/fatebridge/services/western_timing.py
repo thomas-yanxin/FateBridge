@@ -10,6 +10,10 @@ from fatebridge.core.predictive._common import (
     build_analysis_datetime,
     build_predictive_birth_info,
 )
+from fatebridge.core.predictive.firdaria import (
+    normalize_calendar_firdaria_birth,
+    validate_calendar_firdaria_inputs,
+)
 from fatebridge.core.predictive.western_timing import (
     build_western_timing_module_payload,
     build_western_timing_payload,
@@ -36,6 +40,8 @@ def calculate_western_timing_analysis(
     analysis_day: Optional[int] = None,
     analysis_hour: Optional[int] = None,
     analysis_minute: Optional[int] = None,
+    firdaria_night_order: str = "nodes_at_end",
+    firdaria_year_basis: str = "fixed_365_2425",
     return_longitude: Optional[float] = None,
     return_latitude: Optional[float] = None,
     return_timezone: Optional[str] = None,
@@ -64,6 +70,8 @@ def calculate_western_timing_analysis(
         name=name,
         birth_place=birth_place,
     )
+    if firdaria_year_basis == "calendar_anniversary":
+        birth_info = normalize_calendar_firdaria_birth(birth_info)
     analysis_datetime = build_analysis_datetime(
         birth_info,
         analysis_year=analysis_year,
@@ -72,9 +80,18 @@ def calculate_western_timing_analysis(
         analysis_hour=analysis_hour,
         analysis_minute=analysis_minute,
     )
+    if firdaria_year_basis == "calendar_anniversary":
+        # Request analysis fields are civil clocks in birth_timezone. Preserve
+        # that clock using IANA recurrence rules, including dates after 2038.
+        analysis_datetime = analysis_datetime.replace(
+            tzinfo=birth_info.local_datetime.tzinfo
+        )
+        validate_calendar_firdaria_inputs(birth_info, analysis_datetime)
     return build_western_timing_payload(
         birth_info,
         analysis_datetime=analysis_datetime,
+        firdaria_night_order=firdaria_night_order,
+        firdaria_year_basis=firdaria_year_basis,
         return_longitude=return_longitude,
         return_latitude=return_latitude,
         return_timezone=return_timezone,
@@ -107,6 +124,8 @@ def calculate_western_timing_module_analysis(
     analysis_day: Optional[int] = None,
     analysis_hour: Optional[int] = None,
     analysis_minute: Optional[int] = None,
+    firdaria_night_order: str = "nodes_at_end",
+    firdaria_year_basis: str = "fixed_365_2425",
     return_longitude: Optional[float] = None,
     return_latitude: Optional[float] = None,
     return_timezone: Optional[str] = None,
@@ -132,6 +151,8 @@ def calculate_western_timing_module_analysis(
         name=name,
         birth_place=birth_place,
     )
+    if technique == "firdaria" and firdaria_year_basis == "calendar_anniversary":
+        birth_info = normalize_calendar_firdaria_birth(birth_info)
     analysis_datetime = build_analysis_datetime(
         birth_info,
         analysis_year=analysis_year,
@@ -140,10 +161,17 @@ def calculate_western_timing_module_analysis(
         analysis_hour=analysis_hour,
         analysis_minute=analysis_minute,
     )
+    if technique == "firdaria" and firdaria_year_basis == "calendar_anniversary":
+        analysis_datetime = analysis_datetime.replace(
+            tzinfo=birth_info.local_datetime.tzinfo
+        )
+        validate_calendar_firdaria_inputs(birth_info, analysis_datetime)
     return build_western_timing_module_payload(
         birth_info,
         technique=technique,
         analysis_datetime=analysis_datetime,
+        firdaria_night_order=firdaria_night_order,
+        firdaria_year_basis=firdaria_year_basis,
         return_longitude=return_longitude,
         return_latitude=return_latitude,
         return_timezone=return_timezone,

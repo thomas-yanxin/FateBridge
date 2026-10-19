@@ -96,6 +96,7 @@ class DayMaster(PartialOutput):
     element: Optional[str] = None
     polarity: Optional[str] = None
     strength: Optional[str] = None
+    assessment: Optional[Object] = None
 
 
 class BaziBirth(PartialOutput):

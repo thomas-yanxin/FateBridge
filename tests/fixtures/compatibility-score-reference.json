@@ -1,0 +1,68 @@
+{
+  "case_id": "published_pair_strength_model_upgrade_2026_10_19",
+  "scope": "Fictional published pair; independent dimension ledger, not calibrated relationship probability. No weight or threshold is tuned to restore an older total.",
+  "compatibility_method_id": "compatibility_weighted_rules_v1",
+  "resolution_policy": "layered_conflict_review_v1",
+  "weights": {
+    "general": {"element_balance": 0.25, "favorable_synergy": 0.35, "ten_gods_relationship": 0.22, "pattern_synergy": 0.13, "traditional_analysis": 0.05},
+    "marriage": {"element_balance": 0.25, "favorable_synergy": 0.35, "ten_gods_relationship": 0.17, "pattern_synergy": 0.18, "traditional_analysis": 0.05},
+    "friendship": {"element_balance": 0.35, "favorable_synergy": 0.30, "ten_gods_relationship": 0.20, "pattern_synergy": 0.10, "traditional_analysis": 0.05},
+    "business": {"element_balance": 0.15, "favorable_synergy": 0.32, "ten_gods_relationship": 0.35, "pattern_synergy": 0.13, "traditional_analysis": 0.05},
+    "family": {"element_balance": 0.25, "favorable_synergy": 0.30, "ten_gods_relationship": 0.20, "pattern_synergy": 0.20, "traditional_analysis": 0.05}
+  },
+  "persons": [
+    {
+      "pillars": {"year": "庚午", "month": "辛巳", "day": "庚辰", "hour": "辛巳"},
+      "element": "金",
+      "distribution": {"金": 37.1, "火": 33.3, "土": 22.2, "木": 3.7, "水": 3.7}
+    },
+    {
+      "pillars": {"year": "壬申", "month": "壬寅", "day": "丁丑", "hour": "甲辰"},
+      "element": "火",
+      "distribution": {"水": 25.0, "金": 14.3, "土": 28.6, "木": 21.4, "火": 10.7}
+    }
+  ],
+  "versions": {
+    "static_v1": {
+      "strength_method_id": "static_count_month_bonus_v1",
+      "profiles": [
+        {"strength": "中和", "useful": [], "avoid": [], "conditional": ["火", "土", "水"], "neutral": ["木", "金"], "useful_ten_gods": []},
+        {"strength": "弱", "useful": ["木", "火"], "avoid": ["土", "水"], "conditional": ["金"], "neutral": [], "useful_ten_gods": ["偏印", "正印", "比肩", "劫财"]}
+      ],
+      "dimension_ledgers": {
+        "element_balance": [65, -8, 3],
+        "favorable_synergy": [60, 10],
+        "pattern_synergy": [68, 6, -4, -4, -4, -4, -4, -4, -4],
+        "traditional_analysis": [50, -2, -2, -2, -5]
+      },
+      "ten_gods_ledgers": {
+        "general": [65, 2, 1, 6, -2, -2, -2],
+        "marriage": [65, 2, 1, 6, -2, -2, -2],
+        "friendship": [65, 4, 1, 6, -2, -2, -2],
+        "business": [65, 2, 1, 6, -2, -2, -2, -5],
+        "family": [65, 3, 1, 6, -2, -2, -2]
+      }
+    },
+    "season_root_v2": {
+      "strength_method_id": "season_root_revelation_relations_v2",
+      "profiles": [
+        {"strength": "中和", "useful": [], "avoid": [], "conditional": ["火", "土", "水"], "neutral": ["木", "金"], "useful_ten_gods": []},
+        {"strength": "强", "useful": ["土", "金", "水"], "avoid": ["火"], "conditional": ["木"], "neutral": [], "useful_ten_gods": ["食神", "伤官", "偏财", "正财", "七杀", "正官"]}
+      ],
+      "dimension_ledgers": {
+        "element_balance": [65, 5, 3],
+        "favorable_synergy": [60, 7, 10],
+        "pattern_synergy": [68, -4, -4, -4, -4, -4, -4, -4, -4],
+        "traditional_analysis": [50, -2, -2, -2, -5]
+      },
+      "ten_gods_ledgers": {
+        "general": [65, 12, 2, 10, 4, 1, -2, -2],
+        "marriage": [65, 14, 2, 11, 4, 2, -2, -2],
+        "friendship": [65, 12, 4, 10, 4, 1, -2, -2],
+        "business": [65, 15, 4, 13, -5, 6, 1, -2, -2, -5],
+        "family": [65, 12, 2, 10, 4, 1, -2, -2]
+      }
+    }
+  },
+  "general_weighted_deltas": {"element_balance": 3.25, "favorable_synergy": 2.45, "ten_gods_relationship": 4.84, "pattern_synergy": -1.30, "traditional_analysis": 0.0}
+}

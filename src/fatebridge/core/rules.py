@@ -17,6 +17,7 @@ from ..utils.data import (
     TenGod,
     get_ten_god,
 )
+from .useful_elements import resolve_useful_elements
 
 
 class BaZiRules:
@@ -921,6 +922,8 @@ class BaZiRules:
                 }
             )
 
+        for candidate in candidates:
+            candidate["formation_status"] = "candidate_only"
         candidates.sort(key=lambda item: item["priority"], reverse=True)
         return candidates
 
@@ -995,33 +998,6 @@ class BaZiRules:
         if recognized_structures:
             dominant_structure = recognized_structures[0]
             secondary_structures = recognized_structures[1:]
-            useful_elements = BaZiRules._ordered_unique(
-                dominant_structure.get("useful_elements", []) + baseline_useful
-            )
-
-            # Prioritize structure-specific useful gods.
-            # Only add baseline gods if they are "Self" stars and DM is not strong.
-            structure_useful_gods = dominant_structure.get("useful_ten_gods", [])
-            filtered_baseline_gods = []
-            if "弱" in day_strength or "中和" in day_strength:
-                filtered_baseline_gods = [
-                    god
-                    for god in baseline_useful_ten_gods
-                    if god in [TenGod.COMPARE.value, TenGod.ROB_WEALTH.value]
-                ]
-
-            useful_ten_gods = BaZiRules._ordered_unique(
-                structure_useful_gods + filtered_baseline_gods
-            )
-
-            avoid_elements = BaZiRules._ordered_unique(
-                dominant_structure.get("avoid_elements", [])
-                + [
-                    element.value
-                    for element in Element
-                    if element.value not in useful_elements
-                ]
-            )
             decision_basis = [
                 f"识别到高影响格局：{dominant_structure['label']}。",
                 dominant_structure["reason"],
@@ -1030,7 +1006,7 @@ class BaZiRules:
         else:
             dominant_structure = {
                 "key": "default_support",
-                "label": "扶抑调候",
+                "label": "扶抑参考",
                 "priority": BaZiRules.STRUCTURE_PRIORITIES["default_support"],
                 "reason": "未识别高影响白名单格局，按日主强弱与五行扶抑作为主判断。",
                 "useful_elements": baseline_useful,
@@ -1038,18 +1014,23 @@ class BaZiRules:
                 "useful_ten_gods": baseline_useful_ten_gods,
             }
             secondary_structures = []
-            useful_elements = baseline_useful
-            useful_ten_gods = baseline_useful_ten_gods
-            avoid_elements = [
-                element.value
-                for element in Element
-                if element.value not in useful_elements
-            ]
             decision_basis = [
-                f"未识别高影响白名单格局，当前按日主{day_strength}做扶抑调候。",
+                f"未识别高影响白名单格局，当前按日主{day_strength}做扶抑参考。",
             ]
 
+        resolution = resolve_useful_elements(
+            pillars, element_analysis, recognized_structures
+        )
+        useful_elements = resolution["useful_elements"]
+        avoid_elements = resolution["avoid_elements"]
+        useful_ten_gods = BaZiRules._derive_ten_gods_from_elements(
+            day_stem, useful_elements
+        )
+        decision_basis.append(
+            "扶抑、格局候选与调候分层保留；冲突及仅旁证支持的五行列为条件项，未入喜不自动为忌。"
+        )
         structure_profile: Dict[str, Any] = {
+            **resolution,
             "dominant_structure": dominant_structure,
             "secondary_structures": secondary_structures,
             "recognized_structures": recognized_structures,
@@ -1084,6 +1065,15 @@ class BaZiRules:
 
         structure_profile["decision_basis"] = BaZiRules._ordered_unique(decision_basis)
         return structure_profile
+
+    @staticmethod
+    def chart_useful_profile(pillars: Dict[str, Tuple[str, str]]) -> Dict[str, Any]:
+        """Use the same layered resolver in birth and specialty analyses."""
+        from .elements import ElementAnalysis
+
+        return BaZiRules.build_structure_profile(
+            pillars, ElementAnalysis.comprehensive_analysis(pillars)
+        )
 
     @staticmethod
     def analyze_harmony_effects(

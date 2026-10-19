@@ -171,6 +171,8 @@ def build_western_timing_module_payload(
     *,
     technique: str,
     analysis_datetime: datetime,
+    firdaria_night_order: str = "nodes_at_end",
+    firdaria_year_basis: str = "fixed_365_2425",
     return_longitude: Optional[float] = None,
     return_latitude: Optional[float] = None,
     return_timezone: Optional[str] = None,
@@ -387,6 +389,8 @@ def build_western_timing_module_payload(
             birth_info,
             natal_subject,
             analysis_datetime=analysis_datetime,
+            firdaria_night_order=firdaria_night_order,
+            firdaria_year_basis=firdaria_year_basis,
         )
         result["time_lords"] = {"firdaria": firdaria_payload}
         result["summary"] = _build_western_timing_module_summary(
@@ -417,6 +421,8 @@ def build_western_timing_payload(
     birth_info: AstroBirthInfo,
     *,
     analysis_datetime: datetime,
+    firdaria_night_order: str = "nodes_at_end",
+    firdaria_year_basis: str = "fixed_365_2425",
     return_longitude: Optional[float] = None,
     return_latitude: Optional[float] = None,
     return_timezone: Optional[str] = None,
@@ -515,6 +521,8 @@ def build_western_timing_payload(
         birth_info,
         natal_subject,
         analysis_datetime=analysis_datetime,
+        firdaria_night_order=firdaria_night_order,
+        firdaria_year_basis=firdaria_year_basis,
     )
     decennials_payload = build_decennials_payload(
         birth_info,
@@ -552,7 +560,7 @@ def build_western_timing_payload(
         f"年小限落第{profection_payload['activated_house']}宫"
         f"{profection_payload['activated_sign_label']}，"
         f"法达 {firdaria_payload['current_major']['planet_label']}"
-        f"/{firdaria_payload['current_sub']['planet_label']}，"
+        f"/{(firdaria_payload['current_sub'] or {}).get('planet_label', '无小运')}，"
         f"Spirit 黄道释放 L1 {zr_spirit_current['sign_label']}，"
         f"太阳弧 {solar_arc_payload['arc_degrees']:.2f}°，"
         f"行运太阳 {transit_payload['sun']['sign_label']}"
