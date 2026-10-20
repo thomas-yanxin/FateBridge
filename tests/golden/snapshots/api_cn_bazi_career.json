@@ -2,14 +2,29 @@
   "analysis_type": "八字事业分析",
   "career_analysis": {
     "career_structure": {
+      "formation_status": "heuristic_candidate_only",
+      "interpretation_scope": "共现标签与分数只描述本实现的启发式线索；level是历史评分分档，不是古典成格或现实事业层级认证。",
       "level": "中等格局",
       "notes": [
-        "官印相生，为事业格局加分；总体层级以综合评分为准"
+        "官印相生候选：仅官杀与印星共现，按启发式规则加分；未验证古典成格条件"
+      ],
+      "rule_signals": [
+        {
+          "label": "官印相生",
+          "score_delta": 15,
+          "trigger": "官或杀与正印或偏印共现（非日柱天干及藏干）"
+        }
       ],
       "scope": "individual_natal_career_structure",
       "score": 75,
       "score_basis": "以60为基准，按官印、食伤与财、财官及日主强弱规则加减，限制在30–95；不是事业成就或收入概率。",
-      "score_kind": "traditional_rule_index"
+      "score_kind": "traditional_rule_index",
+      "unverified_conditions": [
+        "月令取格",
+        "透藏位置与根气",
+        "生克制化力度及救应",
+        "格局成败"
+      ]
     },
     "career_timing": {
       "timing_signals": [
@@ -18,7 +33,25 @@
       ]
     },
     "dominant_ten_gods": {
+      "counting_basis": {
+        "excluded_pillars": [
+          "day"
+        ],
+        "hidden_stem_weight": 0.5,
+        "included_pillars": [
+          "year",
+          "month",
+          "hour"
+        ],
+        "scope": "本事业规则跳过整个日柱（含日支藏干）；权重是计数约定，不是十神旺衰或实际能力。",
+        "stem_weight": 1.0
+      },
       "primary_career_type": "独立经营",
+      "primary_selection": "按权重降序、同权重沿十神枚举顺序取首项；并列不代表首项更强。",
+      "tied_primary_gods": [
+        "比肩",
+        "劫财"
+      ],
       "top_gods": [
         {
           "career_type": "独立经营",
@@ -56,18 +89,43 @@
           "traits": "果断有魄力、适合高压环境",
           "weight": 1.0
         }
-      ]
+      ],
+      "weighted_counts": {
+        "七杀": 1.0,
+        "伤官": 0.0,
+        "偏印": 1.0,
+        "偏财": 0.0,
+        "劫财": 2.0,
+        "正印": 0.5,
+        "正官": 0.5,
+        "正财": 0.0,
+        "比肩": 2.0,
+        "食神": 0.0
+      }
     },
     "entrepreneurship": {
+      "formation_status": "heuristic_candidate_only",
       "notes": [
         "偏星为主，传统规则提高自主经营倾向评分",
-        "杀印相生，传统规则关联管理型自主经营倾向"
+        "杀印相生候选：仅七杀与正印共现，未验证生化及成格条件"
+      ],
+      "rule_signals": [
+        {
+          "label": "杀印相生",
+          "score_delta": 8,
+          "trigger": "七杀与正印共现且无食神（非日柱天干及藏干）"
+        }
       ],
       "scope": "individual_natal_entrepreneurship_tendency",
       "score": 73,
       "score_basis": "以50为基准，按正偏十神权重、食神制杀或杀印相生规则加减，限制在20–90；只表示本规则的创业倾向，不是成功率或行动建议。",
       "score_kind": "traditional_rule_index",
-      "tendency": "强烈创业倾向"
+      "tendency": "强烈创业倾向",
+      "unverified_conditions": [
+        "日主与食杀印的旺衰根气",
+        "位置及制化力度",
+        "古典成格条件"
+      ]
     },
     "industry_analysis": {
       "avoid_industries": [],
@@ -98,8 +156,8 @@
       "reference_scope": "layered_conflict_review_v1"
     },
     "suggestions": [
-      "主导事业类型为独立经营，建议发挥自身优势",
-      "事业格局中等，稳扎稳打，步步为营",
+      "本规则最高计权并列为比肩（独立经营）、劫财（竞争型）；这些是职业类比，需结合实际职责与经验核验，首项不表示更强",
+      "本启发式评分的历史分档为“中等格局”；共现标签仍属候选，未验证古典成格条件，也不代表现实事业层级或机遇大小",
       "本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职"
     ],
     "timing_context": {
@@ -118,7 +176,7 @@
     "tool_name": "bazi_career"
   },
   "snapshot_export": {
-    "export_text": "[概要]\n类型：八字事业分析\ninterpretation_scope：个人命盘的传统事业规则分析；不测量实际能力、收入或创业成功概率，不能据此决定辞职、投资或创业。\n\n[dominant_ten_gods]\ntop_gods：\n  - ten_god=比肩，weight=2.0，career_type=独立经营，traits=自主性强、竞争意识强、适合独立创业或合伙经营\n    suitable_roles：\n      - 创业\n      - 合伙经营\n      - 自由职业\n      - 体育竞技\n  - ten_god=劫财，weight=2.0，career_type=竞争型，traits=行动力强、敢于冒险、适合高竞争行业\n    suitable_roles：\n      - 销售\n      - 市场营销\n      - 投机行业\n      - 体育\n  - ten_god=七杀，weight=1.0，career_type=权威型，traits=果断有魄力、适合高压环境\n    suitable_roles：\n      - 军警\n      - 外科医生\n      - 高管\n      - 创业\nprimary_career_type：独立经营\n\n[industry_analysis]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n五行分布：\n  木：0.3\n  火：2.4\n  土：1.7\n  金：4.6\n  水：0.3\n\n[career_structure]\n评分：75\nscore_kind：traditional_rule_index\nscope：individual_natal_career_structure\n计分依据：以60为基准，按官印、食伤与财、财官及日主强弱规则加减，限制在30–95；不是事业成就或收入概率。\n层级：中等格局\n说明：\n  - 官印相生，为事业格局加分；总体层级以综合评分为准\n\n[entrepreneurship]\n评分：73\nscore_kind：traditional_rule_index\nscope：individual_natal_entrepreneurship_tendency\n计分依据：以50为基准，按正偏十神权重、食神制杀或杀印相生规则加减，限制在20–90；只表示本规则的创业倾向，不是成功率或行动建议。\ntendency：强烈创业倾向\n说明：\n  - 偏星为主，传统规则提高自主经营倾向评分\n  - 杀印相生，传统规则关联管理型自主经营倾向\n\n[career_timing]\ntiming_signals：\n  - 大运壬戌见食伤，传统规则关联创意与表达议题\n  - 流年丁卯见官杀，传统规则关联当年的事业与责任议题\n\n[noble_direction]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n\n[建议]\n- 主导事业类型为独立经营，建议发挥自身优势\n- 事业格局中等，稳扎稳打，步步为营\n- 本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是",
+    "export_text": "[概要]\n类型：八字事业分析\ninterpretation_scope：个人命盘的传统事业规则分析；不测量实际能力、收入或创业成功概率，不能据此决定辞职、投资或创业。\n\n[dominant_ten_gods]\ntop_gods：\n  - ten_god=比肩，weight=2.0，career_type=独立经营，traits=自主性强、竞争意识强、适合独立创业或合伙经营\n    suitable_roles：\n      - 创业\n      - 合伙经营\n      - 自由职业\n      - 体育竞技\n  - ten_god=劫财，weight=2.0，career_type=竞争型，traits=行动力强、敢于冒险、适合高竞争行业\n    suitable_roles：\n      - 销售\n      - 市场营销\n      - 投机行业\n      - 体育\n  - ten_god=七杀，weight=1.0，career_type=权威型，traits=果断有魄力、适合高压环境\n    suitable_roles：\n      - 军警\n      - 外科医生\n      - 高管\n      - 创业\nweighted_counts：\n  比肩：2.0\n  劫财：2.0\n  食神：0.0\n  伤官：0.0\n  正财：0.0\n  偏财：0.0\n  正官：0.5\n  七杀：1.0\n  正印：0.5\n  偏印：1.0\ncounting_basis：\n  included_pillars：\n    - year\n    - month\n    - hour\n  excluded_pillars：\n    - day\n  stem_weight：1.0\n  hidden_stem_weight：0.5\n  scope：本事业规则跳过整个日柱（含日支藏干）；权重是计数约定，不是十神旺衰或实际能力。\ntied_primary_gods：\n  - 比肩\n  - 劫财\nprimary_selection：按权重降序、同权重沿十神枚举顺序取首项；并列不代表首项更强。\nprimary_career_type：独立经营\n\n[industry_analysis]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n五行分布：\n  木：0.3\n  火：2.4\n  土：1.7\n  金：4.6\n  水：0.3\n\n[career_structure]\n评分：75\nscore_kind：traditional_rule_index\nscope：individual_natal_career_structure\nformation_status：heuristic_candidate_only\nrule_signals：\n  - label=官印相生，trigger=官或杀与正印或偏印共现（非日柱天干及藏干），score_delta=15\nunverified_conditions：\n  - 月令取格\n  - 透藏位置与根气\n  - 生克制化力度及救应\n  - 格局成败\ninterpretation_scope：共现标签与分数只描述本实现的启发式线索；level是历史评分分档，不是古典成格或现实事业层级认证。\n计分依据：以60为基准，按官印、食伤与财、财官及日主强弱规则加减，限制在30–95；不是事业成就或收入概率。\n层级：中等格局\n说明：\n  - 官印相生候选：仅官杀与印星共现，按启发式规则加分；未验证古典成格条件\n\n[entrepreneurship]\n评分：73\nscore_kind：traditional_rule_index\nscope：individual_natal_entrepreneurship_tendency\nformation_status：heuristic_candidate_only\nrule_signals：\n  - label=杀印相生，trigger=七杀与正印共现且无食神（非日柱天干及藏干），score_delta=8\nunverified_conditions：\n  - 日主与食杀印的旺衰根气\n  - 位置及制化力度\n  - 古典成格条件\n计分依据：以50为基准，按正偏十神权重、食神制杀或杀印相生规则加减，限制在20–90；只表示本规则的创业倾向，不是成功率或行动建议。\ntendency：强烈创业倾向\n说明：\n  - 偏星为主，传统规则提高自主经营倾向评分\n  - 杀印相生候选：仅七杀与正印共现，未验证生化及成格条件\n\n[career_timing]\ntiming_signals：\n  - 大运壬戌见食伤，传统规则关联创意与表达议题\n  - 流年丁卯见官杀，传统规则关联当年的事业与责任议题\n\n[noble_direction]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n\n[建议]\n- 本规则最高计权并列为比肩（独立经营）、劫财（竞争型）；这些是职业类比，需结合实际职责与经验核验，首项不表示更强\n- 本启发式评分的历史分档为“中等格局”；共现标签仍属候选，未验证古典成格条件，也不代表现实事业层级或机遇大小\n- 本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是",
     "missing_selected_sections": [
       "起盘信息"
     ],
@@ -142,7 +200,7 @@
         "title": "概要"
       },
       {
-        "content": "[dominant_ten_gods]\ntop_gods：\n  - ten_god=比肩，weight=2.0，career_type=独立经营，traits=自主性强、竞争意识强、适合独立创业或合伙经营\n    suitable_roles：\n      - 创业\n      - 合伙经营\n      - 自由职业\n      - 体育竞技\n  - ten_god=劫财，weight=2.0，career_type=竞争型，traits=行动力强、敢于冒险、适合高竞争行业\n    suitable_roles：\n      - 销售\n      - 市场营销\n      - 投机行业\n      - 体育\n  - ten_god=七杀，weight=1.0，career_type=权威型，traits=果断有魄力、适合高压环境\n    suitable_roles：\n      - 军警\n      - 外科医生\n      - 高管\n      - 创业\nprimary_career_type：独立经营",
+        "content": "[dominant_ten_gods]\ntop_gods：\n  - ten_god=比肩，weight=2.0，career_type=独立经营，traits=自主性强、竞争意识强、适合独立创业或合伙经营\n    suitable_roles：\n      - 创业\n      - 合伙经营\n      - 自由职业\n      - 体育竞技\n  - ten_god=劫财，weight=2.0，career_type=竞争型，traits=行动力强、敢于冒险、适合高竞争行业\n    suitable_roles：\n      - 销售\n      - 市场营销\n      - 投机行业\n      - 体育\n  - ten_god=七杀，weight=1.0，career_type=权威型，traits=果断有魄力、适合高压环境\n    suitable_roles：\n      - 军警\n      - 外科医生\n      - 高管\n      - 创业\nweighted_counts：\n  比肩：2.0\n  劫财：2.0\n  食神：0.0\n  伤官：0.0\n  正财：0.0\n  偏财：0.0\n  正官：0.5\n  七杀：1.0\n  正印：0.5\n  偏印：1.0\ncounting_basis：\n  included_pillars：\n    - year\n    - month\n    - hour\n  excluded_pillars：\n    - day\n  stem_weight：1.0\n  hidden_stem_weight：0.5\n  scope：本事业规则跳过整个日柱（含日支藏干）；权重是计数约定，不是十神旺衰或实际能力。\ntied_primary_gods：\n  - 比肩\n  - 劫财\nprimary_selection：按权重降序、同权重沿十神枚举顺序取首项；并列不代表首项更强。\nprimary_career_type：独立经营",
         "included": false,
         "index": 2,
         "raw_title": "dominant_ten_gods",
@@ -156,14 +214,14 @@
         "title": "industry_analysis"
       },
       {
-        "content": "[career_structure]\n评分：75\nscore_kind：traditional_rule_index\nscope：individual_natal_career_structure\n计分依据：以60为基准，按官印、食伤与财、财官及日主强弱规则加减，限制在30–95；不是事业成就或收入概率。\n层级：中等格局\n说明：\n  - 官印相生，为事业格局加分；总体层级以综合评分为准",
+        "content": "[career_structure]\n评分：75\nscore_kind：traditional_rule_index\nscope：individual_natal_career_structure\nformation_status：heuristic_candidate_only\nrule_signals：\n  - label=官印相生，trigger=官或杀与正印或偏印共现（非日柱天干及藏干），score_delta=15\nunverified_conditions：\n  - 月令取格\n  - 透藏位置与根气\n  - 生克制化力度及救应\n  - 格局成败\ninterpretation_scope：共现标签与分数只描述本实现的启发式线索；level是历史评分分档，不是古典成格或现实事业层级认证。\n计分依据：以60为基准，按官印、食伤与财、财官及日主强弱规则加减，限制在30–95；不是事业成就或收入概率。\n层级：中等格局\n说明：\n  - 官印相生候选：仅官杀与印星共现，按启发式规则加分；未验证古典成格条件",
         "included": false,
         "index": 4,
         "raw_title": "career_structure",
         "title": "career_structure"
       },
       {
-        "content": "[entrepreneurship]\n评分：73\nscore_kind：traditional_rule_index\nscope：individual_natal_entrepreneurship_tendency\n计分依据：以50为基准，按正偏十神权重、食神制杀或杀印相生规则加减，限制在20–90；只表示本规则的创业倾向，不是成功率或行动建议。\ntendency：强烈创业倾向\n说明：\n  - 偏星为主，传统规则提高自主经营倾向评分\n  - 杀印相生，传统规则关联管理型自主经营倾向",
+        "content": "[entrepreneurship]\n评分：73\nscore_kind：traditional_rule_index\nscope：individual_natal_entrepreneurship_tendency\nformation_status：heuristic_candidate_only\nrule_signals：\n  - label=杀印相生，trigger=七杀与正印共现且无食神（非日柱天干及藏干），score_delta=8\nunverified_conditions：\n  - 日主与食杀印的旺衰根气\n  - 位置及制化力度\n  - 古典成格条件\n计分依据：以50为基准，按正偏十神权重、食神制杀或杀印相生规则加减，限制在20–90；只表示本规则的创业倾向，不是成功率或行动建议。\ntendency：强烈创业倾向\n说明：\n  - 偏星为主，传统规则提高自主经营倾向评分\n  - 杀印相生候选：仅七杀与正印共现，未验证生化及成格条件",
         "included": false,
         "index": 5,
         "raw_title": "entrepreneurship",
@@ -184,7 +242,7 @@
         "title": "noble_direction"
       },
       {
-        "content": "[建议]\n- 主导事业类型为独立经营，建议发挥自身优势\n- 事业格局中等，稳扎稳打，步步为营\n- 本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职",
+        "content": "[建议]\n- 本规则最高计权并列为比肩（独立经营）、劫财（竞争型）；这些是职业类比，需结合实际职责与经验核验，首项不表示更强\n- 本启发式评分的历史分档为“中等格局”；共现标签仍属候选，未验证古典成格条件，也不代表现实事业层级或机遇大小\n- 本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职",
         "included": false,
         "index": 8,
         "raw_title": "建议",
@@ -245,5 +303,5 @@
       "当前大运流年"
     ]
   },
-  "snapshot_text": "[概要]\n类型：八字事业分析\ninterpretation_scope：个人命盘的传统事业规则分析；不测量实际能力、收入或创业成功概率，不能据此决定辞职、投资或创业。\n\n[dominant_ten_gods]\ntop_gods：\n  - ten_god=比肩，weight=2.0，career_type=独立经营，traits=自主性强、竞争意识强、适合独立创业或合伙经营\n    suitable_roles：\n      - 创业\n      - 合伙经营\n      - 自由职业\n      - 体育竞技\n  - ten_god=劫财，weight=2.0，career_type=竞争型，traits=行动力强、敢于冒险、适合高竞争行业\n    suitable_roles：\n      - 销售\n      - 市场营销\n      - 投机行业\n      - 体育\n  - ten_god=七杀，weight=1.0，career_type=权威型，traits=果断有魄力、适合高压环境\n    suitable_roles：\n      - 军警\n      - 外科医生\n      - 高管\n      - 创业\nprimary_career_type：独立经营\n\n[industry_analysis]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n五行分布：\n  木：0.3\n  火：2.4\n  土：1.7\n  金：4.6\n  水：0.3\n\n[career_structure]\n评分：75\nscore_kind：traditional_rule_index\nscope：individual_natal_career_structure\n计分依据：以60为基准，按官印、食伤与财、财官及日主强弱规则加减，限制在30–95；不是事业成就或收入概率。\n层级：中等格局\n说明：\n  - 官印相生，为事业格局加分；总体层级以综合评分为准\n\n[entrepreneurship]\n评分：73\nscore_kind：traditional_rule_index\nscope：individual_natal_entrepreneurship_tendency\n计分依据：以50为基准，按正偏十神权重、食神制杀或杀印相生规则加减，限制在20–90；只表示本规则的创业倾向，不是成功率或行动建议。\ntendency：强烈创业倾向\n说明：\n  - 偏星为主，传统规则提高自主经营倾向评分\n  - 杀印相生，传统规则关联管理型自主经营倾向\n\n[career_timing]\ntiming_signals：\n  - 大运壬戌见食伤，传统规则关联创意与表达议题\n  - 流年丁卯见官杀，传统规则关联当年的事业与责任议题\n\n[noble_direction]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n\n[建议]\n- 主导事业类型为独立经营，建议发挥自身优势\n- 事业格局中等，稳扎稳打，步步为营\n- 本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是"
+  "snapshot_text": "[概要]\n类型：八字事业分析\ninterpretation_scope：个人命盘的传统事业规则分析；不测量实际能力、收入或创业成功概率，不能据此决定辞职、投资或创业。\n\n[dominant_ten_gods]\ntop_gods：\n  - ten_god=比肩，weight=2.0，career_type=独立经营，traits=自主性强、竞争意识强、适合独立创业或合伙经营\n    suitable_roles：\n      - 创业\n      - 合伙经营\n      - 自由职业\n      - 体育竞技\n  - ten_god=劫财，weight=2.0，career_type=竞争型，traits=行动力强、敢于冒险、适合高竞争行业\n    suitable_roles：\n      - 销售\n      - 市场营销\n      - 投机行业\n      - 体育\n  - ten_god=七杀，weight=1.0，career_type=权威型，traits=果断有魄力、适合高压环境\n    suitable_roles：\n      - 军警\n      - 外科医生\n      - 高管\n      - 创业\nweighted_counts：\n  比肩：2.0\n  劫财：2.0\n  食神：0.0\n  伤官：0.0\n  正财：0.0\n  偏财：0.0\n  正官：0.5\n  七杀：1.0\n  正印：0.5\n  偏印：1.0\ncounting_basis：\n  included_pillars：\n    - year\n    - month\n    - hour\n  excluded_pillars：\n    - day\n  stem_weight：1.0\n  hidden_stem_weight：0.5\n  scope：本事业规则跳过整个日柱（含日支藏干）；权重是计数约定，不是十神旺衰或实际能力。\ntied_primary_gods：\n  - 比肩\n  - 劫财\nprimary_selection：按权重降序、同权重沿十神枚举顺序取首项；并列不代表首项更强。\nprimary_career_type：独立经营\n\n[industry_analysis]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n五行分布：\n  木：0.3\n  火：2.4\n  土：1.7\n  金：4.6\n  水：0.3\n\n[career_structure]\n评分：75\nscore_kind：traditional_rule_index\nscope：individual_natal_career_structure\nformation_status：heuristic_candidate_only\nrule_signals：\n  - label=官印相生，trigger=官或杀与正印或偏印共现（非日柱天干及藏干），score_delta=15\nunverified_conditions：\n  - 月令取格\n  - 透藏位置与根气\n  - 生克制化力度及救应\n  - 格局成败\ninterpretation_scope：共现标签与分数只描述本实现的启发式线索；level是历史评分分档，不是古典成格或现实事业层级认证。\n计分依据：以60为基准，按官印、食伤与财、财官及日主强弱规则加减，限制在30–95；不是事业成就或收入概率。\n层级：中等格局\n说明：\n  - 官印相生候选：仅官杀与印星共现，按启发式规则加分；未验证古典成格条件\n\n[entrepreneurship]\n评分：73\nscore_kind：traditional_rule_index\nscope：individual_natal_entrepreneurship_tendency\nformation_status：heuristic_candidate_only\nrule_signals：\n  - label=杀印相生，trigger=七杀与正印共现且无食神（非日柱天干及藏干），score_delta=8\nunverified_conditions：\n  - 日主与食杀印的旺衰根气\n  - 位置及制化力度\n  - 古典成格条件\n计分依据：以50为基准，按正偏十神权重、食神制杀或杀印相生规则加减，限制在20–90；只表示本规则的创业倾向，不是成功率或行动建议。\ntendency：强烈创业倾向\n说明：\n  - 偏星为主，传统规则提高自主经营倾向评分\n  - 杀印相生候选：仅七杀与正印共现，未验证生化及成格条件\n\n[career_timing]\ntiming_signals：\n  - 大运壬戌见食伤，传统规则关联创意与表达议题\n  - 流年丁卯见官杀，传统规则关联当年的事业与责任议题\n\n[noble_direction]\nconditional_elements：\n  - 火\n  - 土\n  - 水\nreference_scope：layered_conflict_review_v1\n\n[建议]\n- 本规则最高计权并列为比肩（独立经营）、劫财（竞争型）；这些是职业类比，需结合实际职责与经验核验，首项不表示更强\n- 本启发式评分的历史分档为“中等格局”；共现标签仍属候选，未验证古典成格条件，也不代表现实事业层级或机遇大小\n- 本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职\n\n[当前大运流年]\n大运：壬戌\n流年：丁卯\nsource：explicit_pillar_overrides\n是否手动覆盖：\n  大运：是\n  流年：是"
 }

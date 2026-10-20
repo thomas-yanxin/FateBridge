@@ -13,7 +13,7 @@ from fatebridge.utils.errors import ParameterError
 @lru_cache(maxsize=1)
 def definitions() -> Dict[str, Any]:
     path = Path(__file__).resolve().parents[1] / "data/agent_scenarios.json"
-    return json.loads(path.read_text())  # type: ignore[no-any-return]
+    return json.loads(path.read_text(encoding="utf-8"))  # type: ignore[no-any-return]
 
 
 def dependency_closure(

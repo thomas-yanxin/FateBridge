@@ -1,7 +1,8 @@
 """Choose the CI test scope from the complete push or pull-request diff.
 
-Unknown paths or an unavailable diff always select the full suite. Example JSON
-and validation fixtures stay in that suite even though they live under docs/.
+Pushes always select the full suite: a docs-only push can supersede a cancelled
+or failed code run. Pull requests may use documentation checks for a docs-only
+diff. Unknown paths or an unavailable diff also select the full suite.
 """
 
 from __future__ import annotations
@@ -84,7 +85,7 @@ def main() -> int:
     parser.add_argument("--head", required=True)
     args = parser.parse_args()
     paths = changed_paths(args.base, args.head, args.event)
-    full_tests = not documentation_only(paths or [])
+    full_tests = args.event == "push" or not documentation_only(paths or [])
     print(json.dumps({"full_tests": full_tests, "changed_files": paths}))
     if output := os.environ.get("GITHUB_OUTPUT"):
         with Path(output).open("a", encoding="utf-8") as stream:

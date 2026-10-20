@@ -3,12 +3,14 @@
 import asyncio
 import json
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 from fastmcp import Client
 
 from fatebridge.application.discovery import select_specs
 from fatebridge.application.scenarios import (
+    definitions,
     dependency_closure,
     discover_scenarios,
     scenario_keys,
@@ -17,6 +19,25 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.build_scenario_manifest import build_manifest
 from tests.fixtures.surface_payloads import REST_POST_CASES
+
+
+def test_packaged_scenarios_load_with_a_non_utf8_system_default(monkeypatch):
+    original = Path.open
+
+    def legacy_open(path, mode="r", buffering=-1, encoding=None, **kwargs):
+        codec = "cp1252" if encoding in (None, "locale") else encoding
+        return original(path, mode, buffering, encoding=codec, **kwargs)
+
+    definitions.cache_clear()
+    try:
+        with monkeypatch.context() as patch:
+            patch.setattr(Path, "open", legacy_open)
+            record = next(
+                row for row in definitions()["scenarios"] if row["id"] == "onda-shiye"
+            )
+            assert "事业" in record["name"]
+    finally:
+        definitions.cache_clear()
 
 
 def test_dependency_validation_rejects_unknown_tools_targets_and_cycles():

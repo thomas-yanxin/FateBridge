@@ -33,6 +33,17 @@ def resolve_codex_cli() -> Dict[str, str]:
     }
 
 
+class _StdioProbeError(RuntimeError):
+    def __init__(self, stage: str, cause: Exception, stderr: str) -> None:
+        super().__init__(str(cause))
+        self.details = {
+            "stage": stage,
+            "error_type": type(cause).__name__,
+            "error": str(cause)[:2048],
+            "server_stderr": stderr,
+        }
+
+
 async def _probe_stdio(env: Dict[str, str]) -> Dict[str, Any]:
     from fastmcp import Client
     from fastmcp.client.transports import StdioTransport
@@ -40,60 +51,80 @@ async def _probe_stdio(env: Dict[str, str]) -> Dict[str, Any]:
     # A GUI host need not launch in the checkout. Verify that installed imports
     # and package data work from an unrelated working directory as well.
     with tempfile.TemporaryDirectory(prefix="fatebridge-doctor-") as directory:
-        with tempfile.TemporaryFile(mode="w+") as log:
+        with tempfile.TemporaryFile(
+            mode="w+", encoding="utf-8", errors="replace"
+        ) as log:
             transport = StdioTransport(
                 command=sys.executable,
-                args=["-m", "fatebridge.mcp_server"],
+                args=["-X", "utf8", "-m", "fatebridge.mcp_server"],
                 env=env,
                 cwd=directory,
                 log_file=log,
+                keep_alive=False,
             )
-            async with Client(transport, timeout=30) as client:
-                tools = await client.list_tools()
-                summary = await client.read_resource("fatebridge://catalog/summary")
-                catalog = json.loads(summary[0].text)
-                if {t.name for t in tools} != {t["tool"] for t in catalog["tools"]}:
-                    raise RuntimeError("MCP catalog and tools/list disagree")
-                output: Dict[str, Any] = {
-                    "ok": True,
-                    "scope": "initialize, tools/list, resources/read",
-                    "tool_count": len(tools),
-                    "tools_wire_bytes": len(
-                        json.dumps(
-                            [t.model_dump(mode="json", by_alias=True) for t in tools],
-                            ensure_ascii=False,
-                        ).encode()
-                    ),
-                    "summary_bytes": len(summary[0].text.encode()),
-                }
-                names = {tool.name for tool in tools}
-                candidate = next(
-                    (
-                        (spec, example_input(spec))
-                        for spec in CATALOG
-                        if spec.mcp_name in names and example_input(spec) is not None
-                    ),
-                    None,
-                )
-                if candidate is not None:
-                    spec, inputs = candidate
-                    response = await client.call_tool(
-                        spec.tool_name,
-                        {
-                            **(inputs or {}),
-                            "fields": ["run_metadata"],
-                            "strict_fields": True,
-                        },
-                        raise_on_error=False,
+            stage = "initialize"
+            try:
+                async with Client(transport, timeout=30) as client:
+                    stage = "tools/list"
+                    tools = await client.list_tools()
+                    stage = "resources/read"
+                    summary = await client.read_resource("fatebridge://catalog/summary")
+                    catalog = json.loads(summary[0].text)
+                    if {t.name for t in tools} != {t["tool"] for t in catalog["tools"]}:
+                        raise RuntimeError("MCP catalog and tools/list disagree")
+                    output: Dict[str, Any] = {
+                        "ok": True,
+                        "scope": "initialize, tools/list, resources/read",
+                        "tool_count": len(tools),
+                        "tools_wire_bytes": len(
+                            json.dumps(
+                                [
+                                    t.model_dump(mode="json", by_alias=True)
+                                    for t in tools
+                                ],
+                                ensure_ascii=False,
+                            ).encode()
+                        ),
+                        "summary_bytes": len(summary[0].text.encode()),
+                    }
+                    names = {tool.name for tool in tools}
+                    candidate = next(
+                        (
+                            (spec, example_input(spec))
+                            for spec in CATALOG
+                            if spec.mcp_name in names
+                            and example_input(spec) is not None
+                        ),
+                        None,
                     )
-                    if response.is_error:
-                        raise RuntimeError("MCP fictional smoke calculation failed")
-                    receipt = response.structured_content["run_metadata"]
-                    if receipt["tool_name"] != spec.run_metadata_name:
-                        raise RuntimeError("MCP smoke receipt has wrong tool name")
-                    output["smoke_tool"] = spec.tool_name
-                    output["scope"] += ", one fictional calculation"
+                    if candidate is not None:
+                        stage = "tools/call"
+                        spec, inputs = candidate
+                        response = await client.call_tool(
+                            spec.tool_name,
+                            {
+                                **(inputs or {}),
+                                "fields": ["run_metadata"],
+                                "strict_fields": True,
+                            },
+                            raise_on_error=False,
+                        )
+                        if response.is_error:
+                            raise RuntimeError("MCP fictional smoke calculation failed")
+                        receipt = response.structured_content["run_metadata"]
+                        if receipt["tool_name"] != spec.run_metadata_name:
+                            raise RuntimeError("MCP smoke receipt has wrong tool name")
+                        output["smoke_tool"] = spec.tool_name
+                        output["scope"] += ", one fictional calculation"
+                    stage = "shutdown"
                 return output
+            except Exception as exc:
+                # This diagnostic uses only bundled fictional inputs. Keep the
+                # child failure available without dumping the environment or an
+                # unbounded log, and close the child before the temporary files.
+                log.seek(0, os.SEEK_END)
+                log.seek(max(0, log.tell() - 8192))
+                raise _StdioProbeError(stage, exc, log.read()) from exc
 
 
 def diagnose(
@@ -170,4 +201,6 @@ def diagnose(
                 "error_type": type(exc).__name__,
                 "hint": "检查解释器、依赖和 MCP 分类/场景；用同一绝对路径启动进程复核日志。",
             }
+            if isinstance(exc, _StdioProbeError):
+                output["mcp"].update(exc.details)
     return output
