@@ -110,7 +110,8 @@ def ensure_private_directory(path: Path) -> Path:
             | win32con.FILE_SHARE_DELETE,
             None,
             win32con.OPEN_EXISTING,
-            win32con.FILE_FLAG_OPEN_REPARSE_POINT | win32con.FILE_FLAG_BACKUP_SEMANTICS,
+            win32file.FILE_FLAG_OPEN_REPARSE_POINT
+            | win32con.FILE_FLAG_BACKUP_SEMANTICS,
             None,
         )
         try:
@@ -155,7 +156,7 @@ def open_private_file(path: Path, flags: int) -> int:
                 | win32con.FILE_SHARE_DELETE,
                 _windows_security() if flags & os.O_CREAT else None,
                 creation,
-                win32con.FILE_FLAG_OPEN_REPARSE_POINT,
+                win32file.FILE_FLAG_OPEN_REPARSE_POINT,
                 None,
             )
         except pywintypes.error as exc:
