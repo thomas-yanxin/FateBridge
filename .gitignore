@@ -33,7 +33,7 @@ env/
 .venv
 
 # Swiss Ephemeris data files (.se1) are Astrodienst's, dual-licensed
-# AGPL-3.0 / commercial. FateBridge is MIT and must not redistribute them;
+# AGPL-3.0 / commercial. FateBridge is Apache-2.0; acquire the data separately;
 # fetch them per-checkout via `python -m fatebridge.fetch_ephe`.
 ephe/
 

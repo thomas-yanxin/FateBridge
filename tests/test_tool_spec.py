@@ -5,6 +5,7 @@ import inspect
 import pytest
 from pydantic import BaseModel
 
+from fatebridge.application.bindings import raw_invoke
 from fatebridge.application.execution import execute_spec, invalid_input_result
 from fatebridge.application.projection import project_fields
 from fatebridge.application.tool_spec import ToolSpec
@@ -14,6 +15,19 @@ from fatebridge.transports.mcp import _make_mcp_fn
 
 class _Empty(BaseModel):
     pass
+
+
+def test_request_service_drift_is_not_silently_ignored():
+    class Request(BaseModel):
+        value: int
+        new_option: bool = True
+
+    def service(value):
+        return {"value": value}
+
+    spec = _spec(service, bind=raw_invoke(service))
+    with pytest.raises(TypeError, match="new_option"):
+        execute_spec(spec, Request(value=1))
 
 
 def _spec(service, **overrides):

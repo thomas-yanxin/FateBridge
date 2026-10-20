@@ -14,7 +14,6 @@ from ..utils.data import (
     Element,
     get_ten_god,
 )
-from .element_relations import adjust_element_counts
 from .strength import assess_strength
 
 
@@ -128,10 +127,6 @@ class ElementAnalysis:
 
         element_counts = ElementAnalysis.count_elements(pillars)
         element_percentages = ElementAnalysis.convert_to_percentage(element_counts)
-        adjusted_counts, element_relations = adjust_element_counts(
-            element_counts, pillars
-        )
-        adjusted_percentages = ElementAnalysis.convert_to_percentage(adjusted_counts)
         assessment = assess_strength(
             pillars, ElementAnalysis.seasonal_phases(pillars["month"][1])
         )
@@ -148,12 +143,6 @@ class ElementAnalysis:
                 element_enum.value: count
                 for element_enum, count in element_counts.items()
             },  # Keep raw scores for internal calculations
-            "element_distribution_adjusted": adjusted_percentages,
-            "element_distribution_adjusted_raw": {
-                element_enum.value: count
-                for element_enum, count in adjusted_counts.items()
-            },
-            "element_relations": element_relations,
             "element_distribution_basis": ElementAnalysis.DISTRIBUTION_BASIS,
             "element_seasonal_phase": ElementAnalysis.seasonal_phases(
                 pillars["month"][1]

@@ -191,7 +191,6 @@ _FIELD_TYPES: Dict[str, Any] = {
     "domains": List[JsonValue],
     "element": str,
     "element_distribution_basis": str,
-    "element_relations": List[JsonValue],
     "engine": str,
     "export_text": str,
     "favorable_elements": List[JsonValue],
@@ -203,7 +202,6 @@ _FIELD_TYPES: Dict[str, Any] = {
     "in_to_out_contra_antiscia": List[JsonValue],
     "jiedelta": str,
     "jieqi": str,
-    "jieqi24": List[JsonValue],
     "jieqi_split_keys": List[JsonValue],
     "jieqi_timeline": List[JsonValue],
     "jieqi_year": List[JsonValue],
@@ -262,7 +260,7 @@ _FIELD_TYPES: Dict[str, Any] = {
 }
 
 _TOOL_FIELDS = {
-    "analyze_destiny": "calendar_context day_master element_distribution element_distribution_adjusted element_distribution_basis element_relations element_seasonal_phase favorable_elements four_pillars patterns person_info structure_profile ten_gods",
+    "analyze_destiny": "calendar_context day_master element_distribution element_distribution_basis element_seasonal_phase favorable_elements four_pillars patterns person_info structure_profile ten_gods",
     "bazi_birth": "analysis_type bazi_birth",
     "bazi_marriage": "analysis_type marriage_analysis",
     "bazi_career": "analysis_type career_analysis",
@@ -281,8 +279,8 @@ _TOOL_FIELDS = {
     "liuri_analysis": "analysis_calendar analysis_type calendar_context element_effects liuri_info personal_info summary",
     "liushi_analysis": "analysis_calendar analysis_type calendar_context detailed_analysis element_effects life_dimensions liushi_info personal_info summary",
     "jieqi_timeline_analysis": "analysis_type calendar_context jieqi_timeline personal_info summary target_year_jieqi",
-    "jieqi_year": "analysis_type jieqi24 jieqi_year query_context selected_jieqi summary year",
-    "nongli_time": "analysis_context analysis_type birth calendar_context day dayGanZi dayInt four_pillars input_context jiedelta jieqi leap lunar_calendar month monthGanZi monthInt nongli summary time timeGanZi year yearGanZi yearJieqi",
+    "jieqi_year": "analysis_type jieqi_year query_context selected_jieqi summary year",
+    "nongli_time": "analysis_context analysis_type birth calendar_context day dayGanZi dayInt four_pillars input_context jiedelta jieqi leap lunar_calendar month monthGanZi monthInt nongli summary timeGanZi yearGanZi yearJieqi",
     "gua_lookup": "analysis_type lookup_mode query result summary",
     "gua_meiyi": "analysis_type queries results summary",
     "meihua_analysis": "analysis_context analysis_type calendar_context four_pillars interpretation meihua summary",

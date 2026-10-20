@@ -44,10 +44,6 @@ class NongliTimeRequest(_DeferredModel):
             "接受 男/女、male/female/m/f 等写法；省略则不回显。"
         ),
     )
-    after23_new_day: bool = Field(
-        default=False,
-        description="Whether 23:00 counts as next day",
-    )
     time_alg: int = Field(
         default=0,
         description="Time algorithm: 0=true solar time (requires longitude), 1=direct clock time",

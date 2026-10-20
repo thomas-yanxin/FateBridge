@@ -73,12 +73,6 @@ def build_destiny_payload(context: BirthComputationContext) -> Dict[str, Any]:
         "element_distribution": context.element_analysis["day_master"][
             "element_distribution"
         ],
-        "element_distribution_adjusted": context.element_analysis["day_master"].get(
-            "element_distribution_adjusted"
-        ),
-        "element_relations": context.element_analysis["day_master"].get(
-            "element_relations", []
-        ),
         "element_distribution_basis": context.element_analysis["day_master"].get(
             "element_distribution_basis"
         ),

@@ -1,9 +1,9 @@
 """Download Swiss Ephemeris ``.se1`` data files for full-precision charts.
 
-FateBridge ships this fetcher (MIT) but never the data files themselves: the
+FateBridge ships this fetcher under Apache-2.0, but never the data files: the
 ``.se1`` ephemeris files are Astrodienst's, dual-licensed AGPL-3.0 / commercial.
-Running this script means *you* acquire them for your own use, which keeps the
-MIT-licensed project clear of redistributing AGPL data.
+Running this script acquires data separately; its licence is independent of
+FateBridge's source licence. See LICENSE and NOTICE.
 
 Usage::
 
@@ -20,7 +20,9 @@ precision — no environment variable required.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
+import tempfile
 import urllib.request
 from pathlib import Path
 from typing import List, Optional, Sequence
@@ -78,7 +80,16 @@ def fetch_one(
             f"(got {data[:16]!r}); check the source URL."
         )
     dest.mkdir(parents=True, exist_ok=True)
-    target.write_bytes(data)
+    fd, temporary = tempfile.mkstemp(prefix=f".{target.name}.", dir=dest)
+    pending = Path(temporary)
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(data)
+            handle.flush()
+            os.fsync(handle.fileno())
+        pending.replace(target)
+    finally:
+        pending.unlink(missing_ok=True)
     return target
 
 

@@ -10,11 +10,11 @@ back through the package facade.
 
 from __future__ import annotations
 
-import re
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
+from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 from fatebridge.utils.solar_time import (
     SOLAR_TIME_STRATEGY_APPARENT,
@@ -29,11 +29,6 @@ from ..almanac import (
 from ..astro.birth import AstroBirthInfo, build_astro_birth_info
 from ..astro.chart import build_core_chart_payload
 from ..calendar import BaZiCalendar
-
-GEO_COORDINATE_RE = re.compile(
-    r"^\s*(?P<degrees>-?\d+(?:\.\d+)?)(?:(?P<direction>[NSEWnsew])(?P<minutes>\d+(?:\.\d+)?))?\s*$"
-)
-
 
 SU28_NAMES = [
     "角",
@@ -191,29 +186,6 @@ def parse_local_datetime(
     return localize_datetime(moment, timezone_name or DEFAULT_BIRTH_TIMEZONE)
 
 
-def parse_geo_coordinate(value: Any) -> Optional[float]:
-    if value is None or value == "":
-        return None
-    if isinstance(value, (int, float)):
-        return float(value)
-
-    match = GEO_COORDINATE_RE.match(str(value))
-    if not match:
-        return None
-
-    degrees = float(match.group("degrees"))
-    direction = (match.group("direction") or "").upper()
-    minutes = float(match.group("minutes") or "0")
-
-    if direction:
-        decimal = abs(degrees) + minutes / 60.0
-        if direction in {"S", "W"}:
-            decimal *= -1
-        return decimal
-
-    return degrees
-
-
 def _julian_day(moment: datetime) -> float:
     utc_moment = moment.astimezone(timezone.utc) if moment.tzinfo else moment
     timestamp = utc_moment.timestamp()
@@ -250,9 +222,16 @@ def _resolve_coordinates(
     gps_lat: Optional[float] = None,
     gps_lon: Optional[float] = None,
 ) -> Tuple[float, float]:
-    latitude = gps_lat if gps_lat is not None else parse_geo_coordinate(lat)
-    longitude = gps_lon if gps_lon is not None else parse_geo_coordinate(lon)
-    return latitude or 31.2167, longitude or 121.4667
+    latitude = parse_geo_coordinate(
+        gps_lat if gps_lat is not None else lat, axis="latitude"
+    )
+    longitude = parse_geo_coordinate(
+        gps_lon if gps_lon is not None else lon, axis="longitude"
+    )
+    return (
+        31.2167 if latitude is None else latitude,
+        121.4667 if longitude is None else longitude,
+    )
 
 
 def _build_birth_info(

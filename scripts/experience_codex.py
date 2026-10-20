@@ -113,7 +113,9 @@ async def exercise(output):
                         assert not result.is_error, (key, result.structured_content)
                         data = result.structured_content
                         jsonschema.Draft202012Validator(
-                            tools[spec.tool_name].outputSchema
+                            tools[spec.tool_name].model_dump(by_alias=True)[
+                                "outputSchema"
+                            ]
                         ).validate(data)
                         save(output / f"{key}.json", {"input": inputs, "result": data})
                         business = [

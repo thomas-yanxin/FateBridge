@@ -400,6 +400,10 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 
 ### 4.4 Divination 与本地技法
 
+日历 helper 的全年列表位于 `jieqi_year`；农历查询的年柱、时柱分别使用
+`yearGanZi`、`timeGanZi`。梅易批量查询从 `results[query]` 读取条目。
+这些结果不再附带旧的重复根字段，详见[迁移指南](migration.md#五行依据与重复字段)。
+
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
 | `POST` | `/api/divination/meihua` | 梅花易数时卦 |

@@ -107,7 +107,7 @@ sequenceDiagram
 
 `application/result_delivery.py` 将超预算结果写入按操作系统用户隔离的私有临时目录。保留范围是投影与快照选项处理后的响应，不能从摘要交付恢复未选字段；完整导出须首次保留完整范围。原 JSON 保留 `payload`，字符分页用 UTF-8 字节边界索引 seek 原正文，散列与小型 manifest 在写入时生成；字段展开首次定位后仅保存索引，不复制正文或无限缓存用户结果。
 
-跨进程锁覆盖容量预留、提交、读取与回收，容量计量包含已提交 sidecar。缺少当前索引元数据的旧记录返回 `result_unavailable`，不会自动升级或改写；临时原子替换文件可能增加瞬时磁盘峰值。此机制提供同 run 展开，不提供咨询事实继承；`parent_run_id` 仍只是关联标记。
+跨进程锁覆盖容量预留、提交、读取与回收，容量计量包含已提交 sidecar。POSIX 使用 owner-only 权限和 flock；Windows 通过平台限定的 pywin32 使用用户 SID、私有 ACL 与原生文件锁，拒绝重解析点。缺少当前索引元数据的旧记录返回 `result_unavailable`，不会自动升级或改写；临时原子替换文件可能增加瞬时磁盘峰值。此机制提供同 run 展开，不提供咨询事实继承；`parent_run_id` 仍只是关联标记。
 
 原生 MCP 从投影后的字典直接生成 structuredContent 和 JSON text，不经过文本反解析。协议工具仅通过原生 FastMCP 调用，REST 通过已挂载路由调用；旧 Python 别名和模块级 `.fn` 包装已删除。内部导入使用定义模块（如 `utils.errors`、`core.requests`、`core.predictive` 的具体子模块），不依赖兼容重导出。
 

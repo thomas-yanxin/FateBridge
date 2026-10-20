@@ -1,11 +1,4 @@
-"""snapshot_text is now uniform across the formerly structured-only tools.
-
-Before this, the 9 BaZi dimensions, two_person_compatibility,
-sukuyo_compatibility and astro_relative_chart returned structured JSON with no
-snapshot_text, forcing every consumer to special-case them. These tests lock
-(a) the generic renderer's format + bounding and (b) that the BaZi-dimension
-and compatibility services now emit a round-tripping snapshot.
-"""
+"""Verify bounded structured rendering and service snapshot round-tripping."""
 
 from fatebridge.services.bazi import calculate_bazi_marriage, calculate_bazi_wealth
 from fatebridge.services.compatibility import calculate_compatibility_analysis

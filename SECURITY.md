@@ -85,7 +85,9 @@ and [NOTICE](NOTICE).
 Birth information may appear in responses, snapshots, client histories and
 calculation logs. When the response budget triggers full-result delivery, the
 service writes the selected result to a private temporary directory owned by
-the operating-system user. These artifacts have expiry and capacity limits;
+the operating-system user. POSIX uses owner-only modes and flock; Windows uses
+an owner-only ACL and native file locks, and rejects reparse points. These
+artifacts have expiry and capacity limits;
 they are not encrypted storage or a user account boundary.
 
 Treat exported JSON, snapshots, result references and logs as potentially

@@ -16,9 +16,7 @@ def lazy_service(module: str, name: str) -> Callable[..., ServiceResult]:
     Lets the tool catalog declare a tool's service without importing the
     (sometimes heavy — e.g. the kerykeion-backed western modules) service module
     until that tool is actually invoked. The proxy carries an ``__fb_lazy__``
-    marker so binders that introspect the service signature (``raw_invoke``)
-    resolve the *real* function rather than the proxy's ``(*args, **kwargs)``
-    signature, which would otherwise silently disable kwargs filtering.
+    marker so binders can resolve the real function before scheduling execution.
     """
     cell: List[Callable[..., ServiceResult]] = []
 
@@ -160,57 +158,32 @@ def pair_invoke(
     return _bind
 
 
-def _accepted_kwargs(service: Callable[..., Any]) -> Optional[set]:
-    """Return the set of keyword param names a service accepts, or None if it has **kwargs."""
-    sig = inspect.signature(service)
-    accepted = set()
-    for name, param in sig.parameters.items():
-        if param.kind is inspect.Parameter.VAR_KEYWORD:
-            return None  # accepts anything
-        if param.kind in (
-            inspect.Parameter.POSITIONAL_OR_KEYWORD,
-            inspect.Parameter.KEYWORD_ONLY,
-        ):
-            accepted.add(name)
-    return accepted
-
-
 def raw_invoke(
     service: Callable[..., ServiceResult],
     *,
     fixed: Optional[Dict[str, Any]] = None,
 ) -> Bind:
-    """Raw tools: bind to service(**model_dump), filtered to accepted kwargs.
-
-    Filtering lets a model carry inherited fields a service does not consume
-    (e.g. TaiyiAnalysisRequest inherits ``qimen_options`` from its base).
-
-    The accepted-kwargs set is computed lazily on first bind (against the
-    *resolved* service, so a lazy proxy is unwrapped to its real signature) and
-    memoised — this keeps a lazily-imported service module unloaded until the
-    tool is actually invoked.
-    """
+    """Bind every validated request field to the resolved service unchanged."""
     get_service = _resolver(service)
-    accepted_cache: List[Any] = []  # one-slot memo; the value itself may be None
+    explicit_solar_cache: List[bool] = []
 
     def _bind(
         req: BaseModel,
     ) -> Tuple[Callable[..., ServiceResult], tuple, Dict[str, Any]]:
         resolved = get_service()
-        if not accepted_cache:
-            accepted_cache.append(_accepted_kwargs(resolved))
-        accepted = accepted_cache[0]
+        if not explicit_solar_cache:
+            explicit_solar_cache.append(
+                "true_solar_explicit" in inspect.signature(resolved).parameters
+            )
         data = req.model_dump()
-        if accepted is not None:
-            data = {k: v for k, v in data.items() if k in accepted}
         # Thread whether the user explicitly asked for true solar time so the
         # service can fail-loud on an explicit request that lacks a longitude,
         # yet gracefully fall back to civil time when the flag merely defaulted
         # on (mirrors the person path in ``person_invoke``). Only inject into
         # services that explicitly declare the parameter — never into a
-        # ``**kwargs`` dispatcher (``accepted is None``), which would forward the
+        # ``**kwargs`` dispatcher, which would forward the
         # unknown kwarg to an inner service that does not accept it.
-        if accepted is not None and "true_solar_explicit" in accepted:
+        if explicit_solar_cache[0]:
             data["true_solar_explicit"] = "use_true_solar_time" in req.model_fields_set
         if fixed:
             data = {**data, **fixed}

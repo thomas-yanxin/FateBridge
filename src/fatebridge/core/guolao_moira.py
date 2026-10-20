@@ -84,7 +84,7 @@ _ZI_TO_SIGNIDX = {
     "亥": 11,
 }
 
-# 七政四余 神煞 起例（Phase 2a，键以年干/年支起例）。无 horosa 字节对照，且 贵人 之阳/阴
+# 七政四余 神煞 起例（键以年干/年支起例）。无 horosa 字节对照，且 贵人 之阳/阴
 # (昼/夜) 定向流派有别（《三命通会》与《三历会同》互异，FateBridge 既有 rules.py 日贵格亦为
 # 混用），故统一以 **单一权威源《三命通会》** 为准：
 #   阳贵(昼/天贵)：甲加丑「逆行」—— 甲丑 乙子 丙亥 丁酉 戊丑 己申 庚未 辛午 壬巳 癸卯
@@ -137,7 +137,7 @@ def purple_clouds_longitude(julian_day: float) -> float:
 
 
 def compute_god_signidx(year_stem: str, year_branch: str) -> Dict[str, int]:
-    """依《三命通会》起例，由年柱干支算出 Phase 2a 三神煞的星座序号。
+    """依《三命通会》起例，由年柱干支算出 天贵、玉贵、岁驾三神煞的星座序号。
 
     天贵(昼/阳贵)、玉贵(夜/阴贵) 以年干起例（《三命通会》甲加丑逆/甲加未顺，单一权威源，
     见上方常量注释）；岁驾(太岁) 即年支本位。地支经 戌将盘 ``_ZI_TO_SIGNIDX`` 映射为
@@ -306,7 +306,7 @@ def calculate(facts: Dict[str, Any]) -> List[Dict[str, Any]]:
           "is_winter": bool,                    # 冬令（月 ∈ {11,12,1}）
         }
 
-    ``god_signidx`` 由 :func:`compute_god_signidx` 依年柱算出（Phase 2a 起 天贵/玉贵/岁驾）；
+    ``god_signidx`` 由 :func:`compute_god_signidx` 依年柱算出（天贵/玉贵/岁驾）；
     留空则相应神煞格局（日月拱贵人/命登岁驾）失效，与 horosa 离线版一致。
 
     返回排序后的格局列表（good 在前、bad 在后），结构与 JS 一致。
@@ -384,7 +384,7 @@ def calculate(facts: Dict[str, Any]) -> List[Dict[str, Any]]:
             "?{金水会} & !?冬",
         )
 
-    # 日月拱贵人（喜）：神煞依赖，Phase 1 恒空（天贵/玉贵 未供）。
+    # 日月拱贵人（喜）：分别按昼夜取已计算的天贵／玉贵。
     noble = signof("天贵" if is_day else "玉贵")
     if (_same(sun, _rel(noble, 4)) and _same(moon, _rel(noble, -4))) or (
         _same(sun, _rel(noble, -4)) and _same(moon, _rel(noble, 4))
@@ -398,7 +398,7 @@ def calculate(facts: Dict[str, Any]) -> List[Dict[str, Any]]:
             "?昼/夜 & 日月拱贵人",
         )
 
-    # 命登岁驾（喜）：神煞依赖，Phase 1 恒空（岁驾 未供）。
+    # 命登岁驾（喜）：比较命度与已计算的岁驾。
     if _same(life_sign_idx, signof("岁驾")):
         _add(
             patterns,

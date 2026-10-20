@@ -7,13 +7,18 @@ import os
 import re
 import secrets
 import struct
-import tempfile
 import time
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, Tuple
 
 from fatebridge.utils.errors import ParameterError
+from fatebridge.utils.private_files import (
+    default_result_directory,
+    ensure_private_directory,
+    locked_private_file,
+    open_private_file,
+)
 
 DEFAULT_MCP_RESPONSE_CHARS = 8192
 PAGE_CHARS = 2048
@@ -48,41 +53,19 @@ class ResultStore:
     """
 
     def __init__(self, directory: Optional[Path] = None) -> None:
-        self.directory = directory or Path(tempfile.gettempdir()) / (
-            f"fatebridge-results-{os.getuid()}"
+        self.directory = (
+            directory if directory is not None else default_result_directory()
         )
 
     def _directory(self) -> Path:
-        self.directory.mkdir(mode=0o700, parents=True, exist_ok=True)
-        info = self.directory.lstat()
-        if self.directory.is_symlink() or info.st_uid != os.getuid():
-            raise RuntimeError("Result artifact directory is not owned by this user")
-        if info.st_mode & 0o077:
-            raise RuntimeError("Result artifact directory must be private")
-        return self.directory
+        return ensure_private_directory(self.directory)
 
     @contextmanager
     def _locked(self) -> Iterator[None]:
-        # flock coordinates separate REST/MCP/CLI processes and threads. Readers
+        # Kernel locks coordinate separate REST/MCP/CLI processes and threads. Readers
         # hold the lock through seek/read, so pruning cannot remove their source.
-        import fcntl
-
-        fd = os.open(
-            self._directory() / ".lock",
-            os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW,
-            0o600,
-        )
-        try:
-            info = os.fstat(fd)
-            if info.st_uid != os.getuid() or info.st_mode & 0o077:
-                raise RuntimeError("Result artifact lock must be private")
-            fcntl.flock(fd, fcntl.LOCK_EX)
-            try:
-                yield
-            finally:
-                fcntl.flock(fd, fcntl.LOCK_UN)
-        finally:
-            os.close(fd)
+        with locked_private_file(self._directory() / ".lock"):
+            yield
 
     def _path(self, result_id: str, suffix: str = "json") -> Path:
         if not _RESULT_ID.fullmatch(result_id):
@@ -138,7 +121,7 @@ class ResultStore:
 
     def _read_json(self, path: Path) -> Dict[str, Any]:
         try:
-            fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+            fd = open_private_file(path, os.O_RDONLY)
             with os.fdopen(fd, encoding="utf-8") as handle:
                 value = json.load(handle)
             if isinstance(value, dict):
@@ -177,7 +160,7 @@ class ResultStore:
             for path, content in files.items():
                 pending = path.with_name(path.name + ".pending")
                 staging.append(pending)
-                fd = os.open(pending, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+                fd = open_private_file(pending, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
                 with os.fdopen(fd, "wb") as handle:
                     handle.write(content)
             # Publish metadata last; incomplete writes stay unavailable to readers.
@@ -368,9 +351,7 @@ class ResultStore:
         start_block = offset // PAGE_CHARS
         stop_block = (end + PAGE_CHARS - 1) // PAGE_CHARS
         try:
-            fd = os.open(
-                self._path(result_id, index_suffix), os.O_RDONLY | os.O_NOFOLLOW
-            )
+            fd = open_private_file(self._path(result_id, index_suffix), os.O_RDONLY)
             with os.fdopen(fd, "rb") as handle:
                 handle.seek(start_block * _INDEX_ENTRY.size)
                 start_byte = _INDEX_ENTRY.unpack(handle.read(_INDEX_ENTRY.size))[0]
@@ -378,7 +359,7 @@ class ResultStore:
                 stop_byte = _INDEX_ENTRY.unpack(handle.read(_INDEX_ENTRY.size))[0]
             if not 0 <= start_byte <= stop_byte <= metadata["total_bytes"]:
                 raise ValueError("Invalid result page index")
-            fd = os.open(self._path(result_id), os.O_RDONLY | os.O_NOFOLLOW)
+            fd = open_private_file(self._path(result_id), os.O_RDONLY)
             with os.fdopen(fd, "rb") as handle:
                 handle.seek(metadata["body_offset"] + start_byte)
                 encoded = handle.read(stop_byte - start_byte)

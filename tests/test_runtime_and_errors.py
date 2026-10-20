@@ -22,26 +22,11 @@ from fatebridge.utils.runtime import (
     parse_allowed_origins,
     parse_api_keys,
 )
-from tests.fixtures.surface_payloads import REST_POST_CASES
+from tests.fixtures.surface_payloads import REST_POST_CASES, astro_payload
 from tests.fixtures.transports import rest_handler
 
 calculate_birth = rest_handler("bazi_birth")
 calculate_western_timing = rest_handler("western_timing_analysis")
-
-
-def _build_birth_payload() -> dict:
-    return {
-        "name": "测试者",
-        "birth_year": 1990,
-        "birth_month": 4,
-        "birth_day": 6,
-        "birth_hour": 9,
-        "birth_minute": 33,
-        "birth_timezone": "Asia/Shanghai",
-        "birth_longitude": 121.4667,
-        "birth_latitude": 31.2167,
-        "birth_place": "上海",
-    }
 
 
 def test_load_runtime_env_reads_local_env_without_overriding_existing_values(
@@ -192,7 +177,7 @@ def test_western_timing_route_uses_structured_service_error_status(monkeypatch):
 
     monkeypatch.setattr(api_module, "run_in_threadpool", fake_run_in_threadpool)
 
-    request = WesternTimingRequest(**_build_birth_payload())
+    request = WesternTimingRequest(**astro_payload())
 
     with pytest.raises(HTTPException) as exc_info:
         asyncio.run(calculate_western_timing(request))

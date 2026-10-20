@@ -10,7 +10,6 @@ from typing import Dict, Optional, Tuple
 from ..utils.data import (
     EARTHLY_BRANCHES,
     HEAVENLY_STEMS,
-    MONTH_BRANCHES,
     get_hour_branch,
 )
 from .almanac import (
@@ -79,14 +78,6 @@ class BaZiCalendar:
         branch_index = cls.get_stem_branch_index(0, year_offset, 12)  # 子 is index 0
 
         return HEAVENLY_STEMS[stem_index], EARTHLY_BRANCHES[branch_index]
-
-    @classmethod
-    def calculate_month_pillar(cls, year: int, month: int) -> Tuple[str, str]:
-        """Calculate the month pillar (月柱) for a given year and month."""
-        # Get the earthly branch for the month
-        month_branch = MONTH_BRANCHES[month]
-
-        return cls.calculate_month_pillar_by_branch(year, month_branch)
 
     @classmethod
     def calculate_month_pillar_by_branch(

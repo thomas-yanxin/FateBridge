@@ -211,6 +211,22 @@ def test_doctor_real_stdio_and_empty_intersection():
     assert not empty["ok"] and empty["mcp_tool_count"] == 0
 
 
+def test_doctor_checks_active_dependency_markers_and_skips_unselected_extras(
+    monkeypatch,
+):
+    monkeypatch.setattr(
+        "fatebridge.diagnostics.importlib.metadata.requires",
+        lambda _: [
+            "fastmcp>=3.4.2; python_version >= '3.10'",
+            "absent-platform-package; sys_platform == 'imaginary'",
+            "absent-dev-package; extra == 'dev'",
+        ],
+    )
+    result = diagnose()
+    assert result["ok"]
+    assert set(result["dependencies"]) == {"fastmcp"}
+
+
 @pytest.mark.asyncio
 async def test_mcp_resource_alias_respects_exposed_scope():
     async with Client(create_mcp_app(families="astro")) as client:

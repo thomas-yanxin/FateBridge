@@ -15,7 +15,6 @@ from pathlib import Path, PurePosixPath
 from typing import Sequence
 
 ROOT_DOCUMENTS = {"README.md", "CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md"}
-ARCHIVE_SUFFIXES = {".json", ".log", ".txt", ".xml", ".csv"}
 
 
 def documentation_only(paths: Sequence[str]) -> bool:
@@ -33,8 +32,6 @@ def documentation_only(paths: Sequence[str]) -> bool:
         ):
             return False
         if path.suffix == ".md":
-            continue
-        if path.parts[1] in {"audits", "research"} and path.suffix in ARCHIVE_SUFFIXES:
             continue
         return False
     return True

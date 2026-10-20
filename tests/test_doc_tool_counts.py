@@ -1,6 +1,6 @@
 """核对维护中指南的计数、能力清单与验证命令，防止文档随接口变化漂移。
 
-期望值来自实时中央目录和 CLI 支持策略；带日期的历史审计不属于本检查范围。
+期望值来自实时中央目录和 CLI 支持策略。
 """
 
 from __future__ import annotations
@@ -187,11 +187,7 @@ def test_documented_test_commands_reference_existing_files(rel_path: str) -> Non
 
 
 def test_api_md_documents_every_live_rest_route() -> None:
-    """api-reference.md 必须列出每一个真实 ``/api`` 路由——新增工具忘记写文档即 CI 失败。
-
-    历史上 api-reference.md 漏掉过 20+ 个真实端点（八字九大专项、astro event/lifespan 族等），
-    Agent 只读文档便发现不了它们。这里把「文档覆盖全部路由」固化为断言。
-    """
+    """API 参考必须列出每一个已发布的业务与发现路由。"""
     live_routes = {
         r.path for r in app.routes if getattr(r, "path", "").startswith("/api")
     }

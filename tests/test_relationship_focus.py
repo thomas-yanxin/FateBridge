@@ -1,26 +1,6 @@
 from fatebridge.core.astro.relationship import relationship_focus_block
 from fatebridge.services.astrology import calculate_relative_chart_analysis
-
-
-def _astro_payload(
-    *,
-    name: str,
-    birth_longitude: float,
-    birth_latitude: float,
-    birth_place: str,
-) -> dict:
-    return {
-        "name": name,
-        "birth_year": 1990,
-        "birth_month": 4,
-        "birth_day": 6,
-        "birth_hour": 9,
-        "birth_minute": 33,
-        "birth_timezone": "Asia/Shanghai",
-        "birth_longitude": birth_longitude,
-        "birth_latitude": birth_latitude,
-        "birth_place": birth_place,
-    }
+from tests.fixtures.surface_payloads import astro_payload
 
 
 def test_relationship_focus_block_romance_filters_to_significators():
@@ -57,13 +37,13 @@ def test_relationship_focus_block_general_does_not_filter():
 
 def test_relative_chart_attaches_focus_block_subset_of_synastry():
     result = calculate_relative_chart_analysis(
-        inner_payload=_astro_payload(
+        inner_payload=astro_payload(
             name="甲",
             birth_longitude=121.4667,
             birth_latitude=31.2167,
             birth_place="上海",
         ),
-        outer_payload=_astro_payload(
+        outer_payload=astro_payload(
             name="乙",
             birth_longitude=116.4074,
             birth_latitude=39.9042,

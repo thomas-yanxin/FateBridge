@@ -432,7 +432,6 @@
   },
   "input_context": {
     "ad": 1,
-    "after23_new_day": false,
     "date": "2028-04-01",
     "gender": null,
     "gps_lat": null,
@@ -820,7 +819,7 @@
     ],
     "sections": [
       {
-        "content": "[查询信息]\n输入公历：2028-04-01 09:00:00\n时区：Asia/Shanghai\n文本提示：未提供 / 121e28\ngender 透传：未提供\nafter23_new_day：否\ntime_alg：0（真太阳时）\nad：1\n有效经度：121.4667\n太阳时修正分钟：1.85\n摘要：2028-04-01 09:01:50 对应农历三月初七，当前节气为春分。",
+        "content": "[查询信息]\n输入公历：2028-04-01 09:00:00\n时区：Asia/Shanghai\n文本提示：未提供 / 121e28\ngender 透传：未提供\ntime_alg：0（真太阳时）\nad：1\n有效经度：121.4667\n太阳时修正分钟：1.85\n摘要：2028-04-01 09:01:50 对应农历三月初七，当前节气为春分。",
         "included": false,
         "index": 1,
         "raw_title": "查询信息",
@@ -893,11 +892,9 @@
     },
     "unknown_detected_sections": []
   },
-  "snapshot_text": "[查询信息]\n输入公历：2028-04-01 09:00:00\n时区：Asia/Shanghai\n文本提示：未提供 / 121e28\ngender 透传：未提供\nafter23_new_day：否\ntime_alg：0（真太阳时）\nad：1\n有效经度：121.4667\n太阳时修正分钟：1.85\n摘要：2028-04-01 09:01:50 对应农历三月初七，当前节气为春分。\n\n[农历上下文]\n换算时刻：2028-04-01 09:01:50\n农历：三月初七\n农历年月日：二零二八年三月初七\n当前节气：春分 / 2028-03-20 10:17:10\n下一节气：清明 / 2028-04-04 14:03:07\n节差：春分后第12天\n月令窗口：惊蛰 -> 清明\n是否闰月：否\n梅花时卦辅助：已生成\n\n[四柱上下文]\n年柱：戊申\n节气分年：戊申\n月柱：乙卯\n日柱：丙辰\n时柱：癸巳\n月令分支：卯\n距下个节气天数：3.2105\n\n[来源]\n来源：FateBridge 离线农历/节气算法\n引用：fatebridge.core.almanac.build_calendar_context / fatebridge.core.calendar.BaZiCalendar",
+  "snapshot_text": "[查询信息]\n输入公历：2028-04-01 09:00:00\n时区：Asia/Shanghai\n文本提示：未提供 / 121e28\ngender 透传：未提供\ntime_alg：0（真太阳时）\nad：1\n有效经度：121.4667\n太阳时修正分钟：1.85\n摘要：2028-04-01 09:01:50 对应农历三月初七，当前节气为春分。\n\n[农历上下文]\n换算时刻：2028-04-01 09:01:50\n农历：三月初七\n农历年月日：二零二八年三月初七\n当前节气：春分 / 2028-03-20 10:17:10\n下一节气：清明 / 2028-04-04 14:03:07\n节差：春分后第12天\n月令窗口：惊蛰 -> 清明\n是否闰月：否\n梅花时卦辅助：已生成\n\n[四柱上下文]\n年柱：戊申\n节气分年：戊申\n月柱：乙卯\n日柱：丙辰\n时柱：癸巳\n月令分支：卯\n距下个节气天数：3.2105\n\n[来源]\n来源：FateBridge 离线农历/节气算法\n引用：fatebridge.core.almanac.build_calendar_context / fatebridge.core.calendar.BaZiCalendar",
   "summary": "2028-04-01 09:01:50 对应农历三月初七，当前节气为春分。",
-  "time": "癸巳",
   "timeGanZi": "癸巳",
-  "year": "戊申",
   "yearGanZi": "戊申",
   "yearJieqi": "戊申"
 }

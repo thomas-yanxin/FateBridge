@@ -3,6 +3,7 @@
 import asyncio
 import hashlib
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -16,6 +17,7 @@ from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import ParameterError
+from fatebridge.utils.private_files import ensure_private_directory, open_private_file
 
 
 @pytest.fixture
@@ -70,8 +72,9 @@ def test_bounded_delivery_preserves_all_values_and_original_receipt(store, compa
         reconstruct(store, ref["result_id"], "time_lords.timeline.7")
         == original["time_lords"]["timeline"][7]
     )
-    assert store.directory.stat().st_mode & 0o777 == 0o700
-    assert Path(ref["file_path"]).stat().st_mode & 0o777 == 0o600
+    # These helpers verify POSIX ownership/mode or the Windows owner-only ACL.
+    ensure_private_directory(store.directory)
+    os.close(open_private_file(Path(ref["file_path"]), os.O_RDONLY))
     assert delivery.bound_response(original, 0) is original
 
 

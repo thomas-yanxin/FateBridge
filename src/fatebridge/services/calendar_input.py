@@ -1,22 +1,7 @@
-"""Calendar query parsing, coordinate coercion and input conventions."""
+"""Calendar date parsing and time algorithm conventions."""
 
-import re
 from datetime import datetime
-from typing import Any, Optional
-
-GEO_COORDINATE_RE = re.compile(
-    r"^\s*(?P<degrees>-?\d+(?:\.\d+)?)(?:(?P<direction>[NSEWnsew])(?P<minutes>\d+(?:\.\d+)?))?\s*$"
-)
-
-
-def _coerce_bool(value: Any) -> bool:
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, (int, float)):
-        return bool(value)
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "yes", "y", "on"}
-    return False
+from typing import Any
 
 
 def _parse_calendar_datetime(date_text: str, time_text: str) -> datetime:
@@ -39,26 +24,3 @@ def _parse_calendar_datetime(date_text: str, time_text: str) -> datetime:
 
 def _normalize_time_alg(value: Any) -> int:
     return 1 if value == 1 else 0
-
-
-def _parse_geo_coordinate(value: Any) -> Optional[float]:
-    if value is None or value == "":
-        return None
-    if isinstance(value, (int, float)):
-        return float(value)
-
-    match = GEO_COORDINATE_RE.match(str(value))
-    if not match:
-        return None
-
-    degrees = float(match.group("degrees"))
-    direction = (match.group("direction") or "").upper()
-    minutes = float(match.group("minutes") or "0")
-
-    if direction:
-        decimal = abs(degrees) + minutes / 60.0
-        if direction in {"S", "W"}:
-            decimal *= -1
-        return decimal
-
-    return degrees

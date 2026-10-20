@@ -107,7 +107,7 @@ def test_beijing_lichun_birth_and_metaphysics_paths_keep_civil_year_month():
         gps_lon=116.4074,
         time_alg=0,
     )
-    assert nongli["year"] == "甲辰"
+    assert nongli["yearGanZi"] == "甲辰"
     assert nongli["monthGanZi"] == "丙寅"
     assert nongli["jieqi"] == "立春"
 

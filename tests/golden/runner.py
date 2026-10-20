@@ -38,8 +38,8 @@ SNAPSHOT_DIR = Path(__file__).resolve().parent / "snapshots"
 # 1. 平台：星历（pyswisseph / kerykeion 的 Moshier 模型）走 C/libm，浮点结果随
 #    CPU 架构与 libm 实现而微变（实测 macOS arm64 与 Linux x86_64 月亮经度差
 #    约 0.01°，且渲染进 snapshot_text 字符串，浮点 round 够不着）。
-# 2. Python 版本：少数派生量（如五行百分比的 0.1 归一化补偿）在 3.11→3.12 间
-#    落点不同（金 37.0 vs 37.1）——引擎此处本就非跨版本确定（已记为后续修复项）。
+# 2. Python 版本和依赖版本：其数值实现与序列化差异仍可能影响字节级输出。
+#    五行百分比的残差补偿已使用量化规则，另有跨版本确定性回归。
 # 故基线统一在「参考环境」冻结，字节比对也只在该环境生效；其它环境（本地 macOS、
 # 非参考 py 版本）跳过比对，改用「同环境 regen 前后 diff」验证重构零漂移。
 BASELINE_PLATFORM = "Linux-x86_64"

@@ -618,15 +618,7 @@
     "火": 33.3,
     "金": 37.1
   },
-  "element_distribution_adjusted": {
-    "土": 22.2,
-    "木": 3.7,
-    "水": 3.7,
-    "火": 33.3,
-    "金": 37.1
-  },
   "element_distribution_basis": "结构计数（天干1 / 本气1 / 藏干0.5，四柱等权）；不含月令旺衰加权，亦不含刑冲合化。月令旺衰另见 element_seasonal_phase。",
-  "element_relations": [],
   "element_seasonal_phase": {
     "土": "相",
     "木": "休",

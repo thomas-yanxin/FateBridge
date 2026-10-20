@@ -284,7 +284,6 @@ def calculate_gua_meiyi(
         "analysis_type": "梅易卦义",
         "queries": queries,
         "results": results,
-        **results,
         "summary": summary,
         "snapshot_text": snapshot_text,
         "snapshot_export": snapshot_export,

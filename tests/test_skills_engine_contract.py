@@ -26,8 +26,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from fatebridge.application.description import spec_is_cli_safe
-from fatebridge.services.tool_catalog import CATALOG
+from tests.fixtures.catalog import cli_specs_by_name
 
 _SKILLS_ROOT = Path(__file__).resolve().parents[1] / "skills"
 
@@ -44,20 +43,6 @@ _GLOBAL_CLI_FLAGS = {
 _PLACEHOLDER_RE = re.compile(r"[<>\[\]]|\.\.\.")
 
 
-def _cli_specs_by_name() -> dict[str, object]:
-    # Authoritative CLI-exposability lives in the engine (the CLI registers
-    # commands with the same predicate); reuse it rather than mirror it, so the
-    # skills contract can never diverge from what the CLI actually exposes.
-    out: dict[str, object] = {}
-    for spec in CATALOG:
-        if not spec_is_cli_safe(spec):
-            continue
-        name = spec.mcp_name or spec.key
-        if name:
-            out[name] = spec
-    return out
-
-
 def _cli_flags_for_spec(spec: object) -> set[str]:
     """Valid ``--flag`` set for a tool: one per request-model field, derived the
     same way the CLI does (``field_name`` -> ``--field-name``), plus globals."""
@@ -69,7 +54,7 @@ def _cli_flags_for_spec(spec: object) -> set[str]:
 
 
 def _cli_tool_names() -> set[str]:
-    return set(_cli_specs_by_name())
+    return set(cli_specs_by_name())
 
 
 def _skills_backticked_tokens() -> set[str]:
@@ -133,7 +118,7 @@ def test_documented_examples_exist():
 def test_documented_cli_examples_use_real_flags():
     """Static gate (no engine execution, never flaky): every concrete example
     targets an existing CLI tool and uses only that tool's real flags."""
-    specs = _cli_specs_by_name()
+    specs = cli_specs_by_name()
     problems: list[str] = []
     for md, tool, line, flags in _documented_cli_examples():
         spec = specs.get(tool)

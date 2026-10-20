@@ -187,9 +187,7 @@ class BaZiRules:
             elif len(found_branches_in_set) == 2:
                 # 半合 requires the 旺神 (中神 / cardinal of the set, e.g. 午 in
                 # 寅午戌) to be present — a pair such as 寅戌 (no 午) does NOT
-                # form a half-combination. This mirrors the peak check in
-                # element_relations.adjust_element_counts so both engine paths
-                # agree on what counts as 半合.
+                # form a half-combination.
                 cardinal = next(
                     branch
                     for branch in triple_harmony_set

@@ -12,6 +12,7 @@ import pytest
 
 from fatebridge.application import result_delivery as delivery
 from fatebridge.utils.errors import ParameterError
+from fatebridge.utils.private_files import open_private_file
 
 
 def _reconstruct(store, result_id, path=None):
@@ -38,7 +39,10 @@ def test_indexed_utf8_pages_and_nested_fields_preserve_exact_canonical_document(
         "run_metadata": {"run_id": "fixed", "tool_name": "probe"},
     }
     ref = store.put(original)
-    assert json.loads(Path(ref["file_path"]).read_text())["payload"] == original
+    assert (
+        json.loads(Path(ref["file_path"]).read_text(encoding="utf-8"))["payload"]
+        == original
+    )
     assert _reconstruct(store, ref["result_id"]) == original
     for path, value in [
         ("中文.0.text", original["中文"][0]["text"]),
@@ -61,7 +65,7 @@ def test_indexed_utf8_pages_and_nested_fields_preserve_exact_canonical_document(
             == text[offset : offset + delivery.PAGE_CHARS]
         )
     for artifact in store.directory.iterdir():
-        assert artifact.stat().st_mode & 0o777 == 0o600
+        os.close(open_private_file(artifact, os.O_RDONLY))
 
 
 def test_repeated_pages_and_scope_do_not_load_serialize_or_hash_the_result(
@@ -164,7 +168,8 @@ def test_unindexed_record_is_rejected_without_rewriting_the_saved_result(tmp_pat
     payload = {"run_metadata": {"run_id": "legacy"}, "text": "旧结果🌳" * 1000}
     primary = directory / f"{result_id}.json"
     primary.write_text(
-        json.dumps({"expires_at": expires_at, "payload": payload}, indent=2)
+        json.dumps({"expires_at": expires_at, "payload": payload}, indent=2),
+        encoding="utf-8",
     )
     primary.chmod(0o600)
     original = primary.read_bytes()
@@ -266,7 +271,14 @@ def test_artifact_symlinks_are_never_followed(tmp_path, suffix):
     outside = tmp_path / "outside"
     outside.write_bytes(original)
     path.unlink()
-    path.symlink_to(outside)
+    try:
+        path.symlink_to(outside)
+    except OSError as exc:
+        if os.name == "nt" and getattr(exc, "winerror", None) == 1314:
+            pytest.skip(
+                "Windows account cannot create symlinks; junctions have a separate test"
+            )
+        raise
     with pytest.raises(ParameterError):
         store.page(ref["result_id"])
     assert outside.read_bytes() == original
@@ -287,9 +299,9 @@ def test_corrupt_metadata_or_page_indexes_fail_explicitly(tmp_path, suffix):
     ref = store.put({"text": "private" * 1000})
     target = store.directory / f"{ref['result_id']}.{suffix}"
     if suffix == "meta":
-        metadata = json.loads(target.read_text())
+        metadata = json.loads(target.read_text(encoding="utf-8"))
         metadata["body_offset"] = -1
-        target.write_text(json.dumps(metadata))
+        target.write_text(json.dumps(metadata), encoding="utf-8")
     else:
         target.write_bytes(
             delivery._INDEX_ENTRY.pack(0) + delivery._INDEX_ENTRY.pack(10**9)

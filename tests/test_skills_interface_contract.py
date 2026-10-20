@@ -24,8 +24,8 @@ from pathlib import Path
 
 import yaml
 
-from fatebridge.application.description import spec_is_cli_safe
 from fatebridge.services.tool_catalog import CATALOG
+from tests.fixtures.catalog import cli_specs_by_name
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _SKILLS_ROOT = _REPO_ROOT / "skills"
@@ -37,23 +37,6 @@ def _project_license() -> str:
     # start so it never catches ``license-files`` or an inline comment mention.
     text = (_REPO_ROOT / "pyproject.toml").read_text()
     return re.search(r'^license\s*=\s*"([^"]+)"', text, re.MULTILINE).group(1).strip()
-
-
-def _cli_specs_by_name() -> dict[str, object]:
-    # Use the engine's own CLI-exposability rule (the single source of truth the
-    # CLI itself uses to register commands) instead of re-deriving it. A private
-    # copy here drifted: it recursed into ``list[Model]`` generics and wrongly
-    # dropped tools the CLI actually exposes (e.g. ``sixyao``, whose optional
-    # manual-toss ``lines: list[...]`` field is not a top-level nested model),
-    # which silently exempted those tools from the interface contract.
-    out: dict[str, object] = {}
-    for spec in CATALOG:
-        if not spec_is_cli_safe(spec):
-            continue
-        name = spec.mcp_name or spec.key
-        if name:
-            out[name] = spec
-    return out
 
 
 def _skill_dirs() -> list[Path]:
@@ -96,7 +79,7 @@ def test_interface_name_matches_dir_and_frontmatter():
 
 
 def test_interface_engine_tools_match_docs_and_catalog():
-    cli_names = set(_cli_specs_by_name())
+    cli_names = set(cli_specs_by_name())
     problems = []
     for d in _skill_dirs():
         declared = set(_load(d).get("engine_tools") or [])
@@ -117,7 +100,7 @@ def test_interface_engine_tools_match_docs_and_catalog():
 
 
 def test_interface_required_inputs_are_real_fields():
-    specs = _cli_specs_by_name()
+    specs = cli_specs_by_name()
     problems = []
     for d in _skill_dirs():
         iface = _load(d)

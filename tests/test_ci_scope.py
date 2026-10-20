@@ -15,8 +15,6 @@ from scripts import ci_scope
     [
         ["README.md", "CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md"],
         ["docs/development-guide.md", "docs/scenario-routing.md"],
-        ["docs/audits/old/report.json", "docs/research/result.log"],
-        ["docs/audits/results.xml", "docs/research/numbers.csv", "docs/audits/a.txt"],
         ["docs/a space\nand newline.md"],
     ],
 )
@@ -42,6 +40,11 @@ def test_documentation_changes_use_the_lightweight_checks(paths):
         "docs/examples/README.md",
         "tests/fixtures/bazi_classical_v1/provenance/reference-freeze.json",
         "docs/audits/probe.py",
+        "docs/audits/report.json",
+        "docs/research/result.log",
+        "docs/audits/results.xml",
+        "docs/research/numbers.csv",
+        "docs/audits/notes.txt",
         "docs/unknown.json",
         "unknown-file",
     ],
@@ -181,7 +184,7 @@ def test_workflow_keeps_the_full_matrix_and_isolates_static_checks():
     assert "github.workflow" in WORKFLOW["concurrency"]["group"]
     assert "github.ref" in WORKFLOW["concurrency"]["group"]
     assert jobs["ci"]["if"] == "always()"
-    assert set(jobs["ci"]["needs"]) == {"scope", "locked", "test", "floor"}
+    assert set(jobs["ci"]["needs"]) == {"scope", "locked", "test", "floor", "windows"}
 
 
 @pytest.mark.parametrize(
@@ -213,6 +216,27 @@ def test_summary_gate_cannot_hide_failed_or_unexpectedly_skipped_jobs(
             "LOCKED_RESULT": locked,
             "TEST_RESULT": tests,
             "FLOOR_RESULT": floor,
+            "WINDOWS_RESULT": "success" if full_tests == "true" else "skipped",
         },
     )
     assert (result.returncode == 0) is success
+
+
+def test_windows_storage_checks_are_required_by_the_final_gate():
+    windows = WORKFLOW["jobs"]["windows"]
+    assert windows["runs-on"] == "windows-2022"
+    assert windows["if"] == "needs.scope.outputs.full_tests == 'true'"
+    script = WORKFLOW["jobs"]["ci"]["steps"][0]["run"]
+    result = subprocess.run(
+        ["bash", "-e", "-c", script],
+        env={
+            **os.environ,
+            "FULL_TESTS": "true",
+            "SCOPE_RESULT": "success",
+            "LOCKED_RESULT": "success",
+            "TEST_RESULT": "success",
+            "FLOOR_RESULT": "success",
+            "WINDOWS_RESULT": "failure",
+        },
+    )
+    assert result.returncode != 0

@@ -80,9 +80,9 @@
 
 本版尚未计算节气后逐日人元司令、燥湿土差别、完整生克流通、
 根气受损的所有门派异说，以及从格／化气格的成立。
-`element_distribution` 继续是原结构计数；旧 `element_distribution_adjusted` /
-`element_relations` 仅为兼容保留的分布模型，新旺衰实际依据以
-`day_master.assessment.relations / effective_elements` 为准，不能混用两套计分。
+`element_distribution` 是原结构计数；旺衰依据
+`day_master.assessment.relations / effective_elements`，分别说明关系处理与有效五行预算。
+两者的计算目的和计量口径不同，不能互相替代。
 
 ## 喜用分层与冲突
 

@@ -176,10 +176,37 @@ jobs:
             resolved-dependencies.txt
             pytest-results.xml
 
+  windows:
+    needs: scope
+    if: needs.scope.outputs.full_tests == 'true'
+    runs-on: windows-2022
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.2.0
+      - name: Install the locked development environment
+        run: uv sync --locked --extra dev
+      - name: Verify Windows startup and independent stdio MCP
+        run: uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye
+      - name: Check private storage, kernel locks and transport repairs on Windows
+        run: >-
+          uv run --locked --extra dev python -m pytest -q
+          tests/test_private_files.py tests/test_result_delivery.py
+          tests/test_result_delivery_storage.py tests/test_coordinates.py
+          tests/test_life_dimensions.py tests/test_coordinate_and_calendar_transports.py
+          tests/test_calendar_helper_tools.py tests/test_fetch_ephe.py
+
   ci:
     name: CI result
     if: always()
-    needs: [scope, locked, test, floor]
+    needs: [scope, locked, test, floor, windows]
     runs-on: ubuntu-24.04
     steps:
       - name: Require the selected checks to pass
@@ -189,6 +216,7 @@ jobs:
           FULL_TESTS: ${{ needs.scope.outputs.full_tests }}
           TEST_RESULT: ${{ needs.test.result }}
           FLOOR_RESULT: ${{ needs.floor.result }}
+          WINDOWS_RESULT: ${{ needs.windows.result }}
         run: |
           test "$SCOPE_RESULT" = success
           test "$LOCKED_RESULT" = success
@@ -196,10 +224,12 @@ jobs:
             true)
               test "$TEST_RESULT" = success
               test "$FLOOR_RESULT" = success
+              test "$WINDOWS_RESULT" = success
               ;;
             false)
               test "$TEST_RESULT" = skipped
               test "$FLOOR_RESULT" = skipped
+              test "$WINDOWS_RESULT" = skipped
               ;;
             *) exit 1 ;;
           esac

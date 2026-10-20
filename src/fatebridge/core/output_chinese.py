@@ -713,7 +713,6 @@ CHINESE_FIELDS: Dict[str, Any] = {
     "analysis_context": AnalysisContext,
     "birth_context": AnalysisContext,
     "calendar_context": CalendarContext,
-    "jieqi24": List[SolarTerm],
     "jieqi_year": List[SolarTerm],
     "selected_jieqi": List[SolarTerm],
     "target_year_jieqi": List[SolarTerm],

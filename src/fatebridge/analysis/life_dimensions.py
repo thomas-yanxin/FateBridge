@@ -11,10 +11,8 @@
 - learning (学习)
 - relationship (人际)
 
-设计原则（参见 HorizonX MEMORY.md Session 9）：
-本模块输出的是面向终端用户的"维度分值"，已脱离十神等命理术语；
-HorizonX backend 直接将这些分值塞入 EmotionCurvePoint.components，
-mobile UI 不再展示原始占星术语，只展示这五个维度。
+分值是本模块按固定权重生成的文化参考指标，不是现实成功概率。
+没有对应信号时使用中性值 50；未知性别不推断爱情维度的性别加成。
 
 十神 → 维度映射（gender-aware）：
 - 比肩 / 劫财  →  人际
@@ -66,7 +64,7 @@ class LifeDimensionAnalysis:
                 ``"dayun" / "liunian" / "liuyue" / "liuri" / "liushi"``。
                 None 或空字典时只使用本命基线。
             gender: ``"male" / "female" / "男" / "女"`` 等。None 时不做性别加成
-                （爱情维度可能偏低，回归到中性 50）。
+                （爱情维度回归到中性 50）。
 
         Returns:
             ``{"love": float, "wealth": float, "career": float,
@@ -193,9 +191,11 @@ class LifeDimensionAnalysis:
         """
         将原始十神计数映射到 0-100 区间。
 
-        采用 tanh 软挤压：以 raw=3.0 为大致中位（典型八字常见的十神计数量级），
-        50 为中性基线，正向计数推高，零信号回到 50。
+        零信号使用中性 50；非零信号保留既有 tanh 标度，以 raw=3.0 为中位。
+        缺信号与计数偏低是不同情况，不将缺失信息解释为低分。
         """
+        if raw_value == 0:
+            return 50.0
         centered = raw_value - 3.0
         score = 50.0 + 50.0 * math.tanh(centered / 3.0)
         # 软夹紧到 [0, 100]

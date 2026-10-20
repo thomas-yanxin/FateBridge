@@ -14,7 +14,7 @@ import fatebridge.mcp_server as mcp
 from fatebridge.cli import build_parser, run
 from fatebridge.services.catalog.western_timing import SPECS
 from fatebridge.services.western_timing_tools import calculate_firdaria
-from tests.fixtures.surface_payloads import _western_payload
+from tests.fixtures.surface_payloads import western_payload
 from tests.fixtures.transports import mcp_parameters
 from tests.test_firdaria_reference import VECTORS
 
@@ -296,9 +296,9 @@ def test_default_firdaria_payload_matches_existing_frozen_dates_and_structure():
             / "api_astro_timing_firdaria.json"
         ).read_text()
     )
-    implicit = calculate_firdaria(**_western_payload())
+    implicit = calculate_firdaria(**western_payload())
     explicit = calculate_firdaria(
-        **_western_payload(),
+        **western_payload(),
         firdaria_night_order="nodes_at_end",
         firdaria_year_basis="fixed_365_2425",
     )

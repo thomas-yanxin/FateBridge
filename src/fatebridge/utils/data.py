@@ -193,24 +193,6 @@ def get_ten_god(day_stem: str, other_stem: str) -> TenGod:
         raise ValueError(f"Invalid relationship between {day_stem} and {other_stem}")
 
 
-# 月份地支对应表 (Month to Branch mapping)
-# 说明：传统八字以节气为准；此表保留给无节气上下文时的兜底映射
-MONTH_BRANCHES = {
-    1: "丑",  # 一月 -> 丑月 (大寒-立春)
-    2: "寅",  # 二月 -> 寅月 (立春-惊蛰)
-    3: "卯",  # 三月 -> 卯月 (惊蛰-清明)
-    4: "辰",  # 四月 -> 辰月 (清明-立夏)
-    5: "巳",  # 五月 -> 巳月 (立夏-芒种)
-    6: "午",  # 六月 -> 午月 (芒种-小暑)
-    7: "未",  # 七月 -> 未月 (小暑-立秋)
-    8: "申",  # 八月 -> 申月 (立秋-白露)
-    9: "酉",  # 九月 -> 酉月 (白露-寒露)
-    10: "戌",  # 十月 -> 戌月 (寒露-立冬)
-    11: "亥",  # 十一月 -> 亥月 (立冬-大雪)
-    12: "子",  # 十二月 -> 子月 (大雪-大寒)
-}
-
-
 def get_hour_branch(hour: int) -> str:
     """Get the earthly branch for a given hour (0-23)."""
     # 传统时辰划分（每个时辰2小时）：

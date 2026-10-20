@@ -136,6 +136,11 @@ CI 对整个 push 的前后提交或整个 PR 的 merge-base 差异分流；同�
 
 Black、isort 和 mypy 在全量矩阵的 Python 3.12 作业检查一次；通用文档检查统一由 locked 作业执行。`CI result` 始终汇总本次选中的检查，文档分支跳过的全量作业不等于失败，已选作业的失败或意外跳过也不会被汇总为成功。
 
+全量分支还要求 Windows Server 2022 / Python 3.12 的 `windows` 作业通过：
+在锁定环境验证独立 stdio MCP 启动、私有 ACL、重解析点拒绝、线程与跨进程锁、
+完整分页，以及坐标与日历修复的三端回归。Windows 权限检查使用原生 ACL，
+不将 POSIX mode bits 当作 Windows 私有性的证明。
+
 ### 格式化与静态检查
 
 ```bash

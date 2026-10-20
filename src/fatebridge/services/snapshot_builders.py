@@ -1,17 +1,4 @@
-"""服务层共享的快照构造原语（单一信源）。
-
-历史上 ``_render_snapshot_text`` / ``_build_snapshot_export`` 在十余个 service
-模块里逐字重复。它们的意图完全一致：把 ``[标题] + 正文`` 块拼成人类可读的
-``snapshot_text``，再交给 ``parse_export_content`` 生成 ``snapshot_export``。
-本模块把这套原语收敛到一处，供各 service 直接复用，避免再各自维护一份。
-
-两种正文形态对应两个渲染函数：
-
-- :func:`render_snapshot_text`  —— 正文已是单个字符串（八字独立盘、各西占工具）
-- :func:`render_snapshot_lines` —— 正文是一组文本行（knowledge / divination / timing）
-
-二者的换行与空行规则**保持与历史实现逐字一致**，以满足 golden 快照零漂移。
-"""
+"""将服务结果分节渲染为快照文本，并构造对应的导出结构。"""
 
 from __future__ import annotations
 

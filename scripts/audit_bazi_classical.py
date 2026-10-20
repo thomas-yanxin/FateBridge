@@ -205,7 +205,6 @@ def audit(split: str = "all") -> dict[str, Any]:
                 ROOT / "src/fatebridge/core/rules.py",
                 ROOT / "src/fatebridge/core/classical.py",
                 ROOT / "src/fatebridge/core/strength.py",
-                ROOT / "src/fatebridge/core/element_relations.py",
                 ROOT / "src/fatebridge/core/useful_elements.py",
                 ROOT / "src/fatebridge/analysis/career.py",
                 ROOT / "src/fatebridge/utils/data.py",

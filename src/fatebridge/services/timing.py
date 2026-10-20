@@ -133,9 +133,8 @@ def calculate_comprehensive_timing(
             "direction": age_info.get("direction"),
             "summary": dayun_analysis["summary"],
         }
-        # Include element_effects so downstream consumers (e.g. HorizonX
-        # letters emotion curve) can score the dayun layer when they
-        # receive the comprehensive payload as a fallback.
+        # Preserve structured element changes for clients reading the combined
+        # timing response, without requiring them to parse summary text.
         if "element_effects" in dayun_analysis:
             dayun_section["element_effects"] = serialize_element_effects(
                 dayun_analysis["element_effects"]

@@ -57,7 +57,9 @@ async def call_contracts():
     return [
         {
             "tool": name,
-            "input": without_annotations(tools[name].inputSchema),
+            "input": without_annotations(
+                tools[name].model_dump(by_alias=True)["inputSchema"]
+            ),
             "first_view": {
                 "fields": suggested_fields(specs[name]),
                 "strict_fields": True,

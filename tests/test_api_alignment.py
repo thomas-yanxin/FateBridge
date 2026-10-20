@@ -44,6 +44,7 @@ from fatebridge.services.western_timing import (
     calculate_western_timing_analysis as service_calculate_western_timing_analysis,
 )
 from fatebridge.services.western_timing_tools import calculate_solarreturn
+from tests.fixtures.surface_payloads import western_payload
 from tests.fixtures.transports import mcp_text, rest_handler
 
 calculate_astro_chart = rest_handler("astro_chart")
@@ -84,28 +85,6 @@ def _build_astro_birth_payload(name: str, gender: str, birth_place: str) -> dict
     return {
         **_build_birth_payload(name, gender, birth_place),
         "birth_latitude": 31.2304 if birth_place == "上海" else 39.9042,
-    }
-
-
-def _build_western_timing_payload() -> dict:
-    return {
-        "name": "Alice",
-        "birth_year": 1990,
-        "birth_month": 5,
-        "birth_day": 17,
-        "birth_hour": 15,
-        "birth_minute": 30,
-        "birth_place": "上海",
-        "birth_timezone": "Asia/Shanghai",
-        "birth_longitude": 121.4737,
-        "birth_latitude": 31.2304,
-        "analysis_year": 2025,
-        "analysis_month": 5,
-        "analysis_day": 20,
-        "pd_method": "astroapp_alchabitius",
-        "pd_time_key": "Naibod",
-        "pd_aspects": [0, 90, 180],
-        "show_pd_bounds": True,
     }
 
 
@@ -238,7 +217,7 @@ PARITY_CASES = [
     (
         "solarreturn",
         lambda: WesternTimingModuleRequest(
-            **_build_western_timing_payload(),
+            **western_payload(),
             selected_sections=["起盘信息", "星盘信息"],
         ),
         calculate_solarreturn_module,
@@ -247,7 +226,7 @@ PARITY_CASES = [
     ),
     (
         "pdchart",
-        lambda: WesternTimingModuleRequest(**_build_western_timing_payload()),
+        lambda: WesternTimingModuleRequest(**western_payload()),
         calculate_pdchart_module,
         "pdchart",
         lambda request: request.model_dump(),
@@ -676,7 +655,7 @@ def test_western_timing_api_offloads_calculation_to_threadpool(monkeypatch):
         raising=False,
     )
 
-    request = WesternTimingRequest(**_build_western_timing_payload())
+    request = WesternTimingRequest(**western_payload())
     result = asyncio.run(calculate_western_timing(request))
 
     assert _payload_without_run_metadata(result) == expected
@@ -706,7 +685,7 @@ def test_western_timing_module_api_offloads_calculation_to_threadpool(monkeypatc
     )
 
     request = WesternTimingModuleRequest(
-        **_build_western_timing_payload(),
+        **western_payload(),
         selected_sections=["起盘信息"],
     )
     result = asyncio.run(calculate_solarreturn_module(request))

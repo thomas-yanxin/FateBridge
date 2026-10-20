@@ -23,28 +23,14 @@ from fatebridge.services.astrology import (
     calculate_germany_chart_analysis,
     calculate_relative_chart_analysis,
 )
+from tests.fixtures.surface_payloads import astro_payload
 from tests.fixtures.transports import mcp_parameters, rest_handler
 
 calculate_relative_chart_endpoint = rest_handler("astro_relative")
 
 
-def _build_birth_payload():
-    return {
-        "name": "测试者",
-        "birth_year": 1990,
-        "birth_month": 4,
-        "birth_day": 6,
-        "birth_hour": 9,
-        "birth_minute": 33,
-        "birth_timezone": "Asia/Shanghai",
-        "birth_longitude": 121.4667,
-        "birth_latitude": 31.2167,
-        "birth_place": "上海",
-    }
-
-
 def test_astro_request_models_accept_geo_fields():
-    request = AstroChartRequest(**_build_birth_payload(), hsys=0, zodiacal=1)
+    request = AstroChartRequest(**astro_payload(), hsys=0, zodiacal=1)
     place_only_request = AstroChartRequest(
         name="测试者",
         birth_year=1993,
@@ -56,10 +42,10 @@ def test_astro_request_models_accept_geo_fields():
         birth_place="北京",
     )
     default_relative_request = AstroRelativeRequest(
-        inner=AstroRelativePartyRequest(**_build_birth_payload()),
+        inner=AstroRelativePartyRequest(**astro_payload()),
         outer=AstroRelativePartyRequest(
             **{
-                **_build_birth_payload(),
+                **astro_payload(),
                 "name": "对盘者",
                 "birth_year": 1992,
                 "birth_month": 3,
@@ -70,10 +56,10 @@ def test_astro_request_models_accept_geo_fields():
         ),
     )
     modern_relative_request = AstroRelativeRequest(
-        inner=AstroRelativePartyRequest(**_build_birth_payload()),
+        inner=AstroRelativePartyRequest(**astro_payload()),
         outer=AstroRelativePartyRequest(
             **{
-                **_build_birth_payload(),
+                **astro_payload(),
                 "name": "对盘者",
                 "birth_year": 1992,
                 "birth_month": 3,
@@ -106,24 +92,22 @@ def test_astro_request_models_accept_geo_fields():
 
 
 def test_core_chart_variants_expose_variant_specific_fields():
-    chart = calculate_core_chart_analysis(
-        chart_variant="chart", **_build_birth_payload()
-    )
+    chart = calculate_core_chart_analysis(chart_variant="chart", **astro_payload())
     chart13 = calculate_core_chart_analysis(
         chart_variant="chart13",
-        **_build_birth_payload(),
+        **astro_payload(),
     )
     hellen = calculate_core_chart_analysis(
         chart_variant="hellen_chart",
-        **_build_birth_payload(),
+        **astro_payload(),
     )
     guolao = calculate_core_chart_analysis(
         chart_variant="guolao_chart",
-        **_build_birth_payload(),
+        **astro_payload(),
     )
     india = calculate_core_chart_analysis(
         chart_variant="india_chart",
-        **_build_birth_payload(),
+        **astro_payload(),
     )
 
     assert chart["chart_profile"]["chart_type"] == "chart"
@@ -157,9 +141,7 @@ def test_core_chart_variants_expose_variant_specific_fields():
 
 
 def test_core_chart_includes_snapshot_text_and_export():
-    chart = calculate_core_chart_analysis(
-        chart_variant="chart", **_build_birth_payload()
-    )
+    chart = calculate_core_chart_analysis(chart_variant="chart", **astro_payload())
 
     assert "[起盘信息]" in chart["snapshot_text"]
     assert "[宫位宫头]" in chart["snapshot_text"]
@@ -270,7 +252,7 @@ def test_core_chart_accepts_but_ignores_gender():
 
 def test_core_chart_prefers_local_ephemeris_runtime_when_available():
     swe = pytest.importorskip("swisseph")
-    birth_payload = _build_birth_payload()
+    birth_payload = astro_payload()
 
     chart = calculate_core_chart_analysis(chart_variant="chart", **birth_payload)
     # The core chart defaults to the civil (zone) clock per western convention;
@@ -306,24 +288,24 @@ def test_core_chart_prefers_local_ephemeris_runtime_when_available():
 def test_core_chart_offline_options_preserve_defaults_and_allow_overrides():
     default_chart = calculate_core_chart_analysis(
         chart_variant="chart",
-        **_build_birth_payload(),
+        **astro_payload(),
     )
     whole_sign_chart = calculate_core_chart_analysis(
         chart_variant="chart",
         hsys=0,
-        **_build_birth_payload(),
+        **astro_payload(),
     )
     equal_mc_sidereal_chart = calculate_core_chart_analysis(
         chart_variant="chart",
         hsys=8,
         zodiacal=1,
-        **_build_birth_payload(),
+        **astro_payload(),
     )
     india_tropical_placidus = calculate_core_chart_analysis(
         chart_variant="india_chart",
         hsys=3,
         zodiacal=0,
-        **_build_birth_payload(),
+        **astro_payload(),
     )
 
     assert default_chart["chart_profile"]["house_system"] == "placidus"
@@ -362,7 +344,7 @@ def test_core_chart_offline_options_preserve_defaults_and_allow_overrides():
 
 
 def test_germany_chart_returns_midpoint_payload():
-    result = calculate_germany_chart_analysis(**_build_birth_payload())
+    result = calculate_germany_chart_analysis(**astro_payload())
 
     assert result["chart_profile"]["chart_type"] == "germany"
     assert result["midpoints"]
@@ -372,7 +354,7 @@ def test_germany_chart_returns_midpoint_payload():
 
 def test_germany_chart_respects_core_house_and_zodiac_overrides():
     result = calculate_germany_chart_analysis(
-        **_build_birth_payload(),
+        **astro_payload(),
         hsys=0,
         zodiacal=1,
     )
@@ -385,7 +367,7 @@ def test_germany_chart_respects_core_house_and_zodiac_overrides():
 
 
 def test_germany_chart_inherits_runtime_precision_from_base_chart():
-    result = calculate_germany_chart_analysis(**_build_birth_payload())
+    result = calculate_germany_chart_analysis(**astro_payload())
     expected_precision = (
         "ephemeris_runtime_model" if swe is not None else "approximate_orbital_model"
     )
@@ -432,9 +414,9 @@ def test_hsys_int_family_defaults_are_consistent():
 
 def test_relative_chart_returns_canonical_layers_and_metadata():
     result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -484,7 +466,7 @@ def test_relative_derived_layers_inherit_runtime_precision_from_sources():
         "swisseph_api" if swe is not None else "fatebridge_approximate_orbital_model"
     )
     outer_payload = {
-        **_build_birth_payload(),
+        **astro_payload(),
         "name": "对盘者",
         "birth_year": 1992,
         "birth_month": 3,
@@ -494,19 +476,19 @@ def test_relative_derived_layers_inherit_runtime_precision_from_sources():
     }
 
     composite_result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload=outer_payload,
         relative_mode="Composite",
         hsys=0,
     )
     timespace_result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload=outer_payload,
         relative_mode="TimeSpace",
         hsys=0,
     )
     marks_result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload=outer_payload,
         relative_mode="Marks",
         hsys=0,
@@ -562,8 +544,8 @@ def test_relative_derived_layers_inherit_runtime_precision_from_sources():
 
 def test_relative_chart_rejects_retired_relationship_mode():
     parties = {
-        "inner": AstroRelativePartyRequest(**_build_birth_payload()),
-        "outer": AstroRelativePartyRequest(**_build_birth_payload()),
+        "inner": AstroRelativePartyRequest(**astro_payload()),
+        "outer": AstroRelativePartyRequest(**astro_payload()),
     }
     with pytest.raises(ValidationError) as caught:
         AstroRelativeRequest(**parties, relationship_mode="synastry")
@@ -572,9 +554,9 @@ def test_relative_chart_rejects_retired_relationship_mode():
 
 def test_relative_chart_modern_lowercase_synastry_maps_to_influence_mode():
     result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -597,9 +579,9 @@ def test_relative_chart_modern_lowercase_synastry_maps_to_influence_mode():
 
 def test_relative_chart_defaults_to_compare_mode_when_mode_omitted():
     result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -617,9 +599,9 @@ def test_relative_chart_defaults_to_compare_mode_when_mode_omitted():
 
 def test_relative_compare_and_composite_modes_expose_different_primary_layers():
     compare_result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -630,9 +612,9 @@ def test_relative_compare_and_composite_modes_expose_different_primary_layers():
         relative_mode=0,
     )
     composite_result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -665,9 +647,9 @@ def test_relative_compare_and_composite_modes_expose_different_primary_layers():
 
 def test_relative_influence_timespace_and_marks_modes_expose_distinct_primary_layers():
     influence_result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -679,9 +661,9 @@ def test_relative_influence_timespace_and_marks_modes_expose_distinct_primary_la
         hsys=0,
     )
     timespace_result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -693,9 +675,9 @@ def test_relative_influence_timespace_and_marks_modes_expose_distinct_primary_la
         hsys=0,
     )
     marks_result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -747,9 +729,9 @@ def test_relative_influence_timespace_and_marks_modes_expose_distinct_primary_la
 
 def test_relative_hsys_zero_and_eight_drive_supported_offline_house_systems():
     whole_sign_result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -761,9 +743,9 @@ def test_relative_hsys_zero_and_eight_drive_supported_offline_house_systems():
         hsys=0,
     )
     equal_result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -804,9 +786,9 @@ def test_relative_hsys_one_to_seven_are_available_offline():
 
     for hsys, expected_house_system in expected_house_systems.items():
         result = calculate_relative_chart_analysis(
-            inner_payload=_build_birth_payload(),
+            inner_payload=astro_payload(),
             outer_payload={
-                **_build_birth_payload(),
+                **astro_payload(),
                 "name": "对盘者",
                 "birth_year": 1992,
                 "birth_month": 3,
@@ -829,9 +811,9 @@ def test_relative_hsys_one_to_seven_are_available_offline():
 
 def test_relative_unsupported_hsys_returns_error_payload():
     result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -853,9 +835,9 @@ def test_relative_unsupported_hsys_returns_error_payload():
 
 def test_relative_zodiacal_one_switches_relative_layers_to_sidereal():
     tropical_result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -868,9 +850,9 @@ def test_relative_zodiacal_one_switches_relative_layers_to_sidereal():
         zodiacal=0,
     )
     sidereal_result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -907,9 +889,9 @@ def test_relative_zodiacal_one_switches_relative_layers_to_sidereal():
 
 def test_relative_unsupported_zodiacal_returns_error_payload():
     result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -932,9 +914,9 @@ def test_relative_unsupported_zodiacal_returns_error_payload():
 
 def test_relative_invalid_mode_returns_structured_validation_error():
     result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
+        inner_payload=astro_payload(),
         outer_payload={
-            **_build_birth_payload(),
+            **astro_payload(),
             "name": "对盘者",
             "birth_year": 1992,
             "birth_month": 3,
@@ -1157,8 +1139,8 @@ def test_relative_chart_computes_only_selected_single_chart(
 
         monkeypatch.setattr(relationship, name, traced)
     result = calculate_relative_chart_analysis(
-        inner_payload=_build_birth_payload(),
-        outer_payload={**_build_birth_payload(), "name": "对盘者", "birth_year": 1992},
+        inner_payload=astro_payload(),
+        outer_payload={**astro_payload(), "name": "对盘者", "birth_year": 1992},
         relative_mode=mode,
     )
     assert "error" not in result

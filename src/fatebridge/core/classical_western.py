@@ -1,11 +1,8 @@
 """Western classical-astrology primitives (Hellenistic / medieval).
 
-Phase 1 of the 西占古典深度段 project: per-planet essential + accidental
-condition, shared by ``astro_chart`` (the new ``classical`` layer) and the
-horary engine. Dignity tables are reused from :mod:`fatebridge.core.astrology_tables`
-(single source); only the genuinely
-missing pieces — Chaldean faces, Dorothean triplicity rulers, Lilly dignity
-scores, combustion / orientality / sect / joy — are added here.
+Shared by the ``astro_chart.classical`` layer and the horary engine. Includes
+planetary condition, rulership, lots, relational patterns and fixed stars.
+Dignity tables come from :mod:`fatebridge.core.astrology_tables`.
 
 Reference data ported verbatim from horosa `data/dignities.js` (Egyptian terms,
 Dorothean triplicity, Chaldean faces, Lilly scores); derivation logic follows
@@ -320,7 +317,7 @@ def out_of_bounds(declination: Optional[float]) -> Optional[bool]:
     return abs(declination) > OUT_OF_BOUNDS_LIMIT
 
 
-# ── Phase 2: almuten (essential-dignity rulership of a degree) + dispositors ──
+# ── almuten (essential-dignity rulership of a degree) + dispositors ──
 
 # Reverse of EXALTATION_SIGNS: sign → the planet exalted there (7 of 12 signs).
 EXALT_RULER_BY_SIGN: Dict[str, str] = {
@@ -513,7 +510,7 @@ def build_topic_almutens(
     return topic
 
 
-# ── Phase 3: Arabic lots (parts) ──
+# ── Arabic lots (parts) ──
 
 # Lot formulas: lon = (a + b − c) mod 360, with day/night reversal. Marker keys
 # index into the longitude table (asc / sun / moon / planets).
@@ -586,7 +583,7 @@ def build_lots_layer(lons: Dict[str, float], is_day: bool) -> Dict[str, Any]:
     return out
 
 
-# ── Phase 4 / 4b: [古典格局] relational patterns ──────────────────────────────
+# ── [古典格局] relational patterns ──────────────────────────────
 
 BENEFICS = frozenset({"Jupiter", "Venus"})
 MALEFICS = frozenset({"Mars", "Saturn"})
@@ -674,11 +671,10 @@ def build_classical_patterns(
 ) -> Dict[str, Any]:
     """``[古典格局]`` relational layer over the seven traditional planets.
 
-    Phase 4: aversion, overcoming (superior square), besiegement/enclosure by
-    body, bonification/maltreatment. Phase 4b (needs ``speeds`` /
-    ``node_longitude``, both from the ephemeris): translation & collection of
-    light (applying/separating) and nodal bending. The 4b blocks stay empty when
-    the inputs are absent (offline engine) rather than guessing.
+    Aversion, overcoming (superior square), besiegement/enclosure by body,
+    bonification/maltreatment, translation/collection of light and nodal bending.
+    Applying/separating checks need ephemeris ``speeds`` and nodal bending needs
+    ``node_longitude``; their blocks stay empty when the inputs are absent.
 
     Only structural configurations are emitted — *which* planets, *what* relation.
     What a configuration signifies is the skills layer's job, not the engine's.
@@ -739,7 +735,7 @@ def build_classical_patterns(
             elif source in MALEFICS:
                 bonification[target]["maltreated_by"].append(source)
 
-    # --- Phase 4b: translation & collection of light (need applying/separating) ---
+    # --- translation & collection of light (need applying/separating) ---
     # Aspect angle between two traditional planets, keyed by the unordered pair.
     pair_angle: Dict[frozenset, float] = {}
     for aspect in aspects:
@@ -807,7 +803,7 @@ def build_classical_patterns(
                         {"collector": collector, "from": sorted((first, second))}
                     )
 
-    # --- Phase 4b: nodal bending (a planet square the nodal axis) ---
+    # --- nodal bending (a planet square the nodal axis) ---
     nodal_bending: List[Dict[str, Any]] = []
     if node_longitude is not None:
         bending_points = {
@@ -843,7 +839,7 @@ def build_classical_patterns(
     }
 
 
-# ── Phase 3b: fixed stars (恒星) ──────────────────────────────────────────────
+# ── fixed stars (恒星) ──────────────────────────────────────────────
 
 # Curated classical catalogue: the 15 Behenian stars + 5 notable bright stars.
 # ``lon2000`` / ``lat`` are the J2000.0 tropical ecliptic coordinates extracted
@@ -1022,7 +1018,7 @@ def build_fixed_star_hits(
     return hits
 
 
-# ── Phase 5: dodekatemoria (12分度) + melothesia (身体部位) + temperament (气质) ──
+# ── dodekatemoria (12分度) + melothesia (身体部位) + temperament (气质) ──
 
 # Sign → governed body parts (head-to-foot). Ported verbatim from horosa
 # data/signs.js body_parts (卜卦构建清单 §1.6).

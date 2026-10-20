@@ -6,10 +6,8 @@ from typing import Any, Dict, List, Optional
 from fatebridge.core.almanac import build_calendar_context, get_jieqi_year_grid
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.services.calendar_input import (
-    _coerce_bool,
     _normalize_time_alg,
     _parse_calendar_datetime,
-    _parse_geo_coordinate,
 )
 from fatebridge.services.snapshot_builders import (
     build_snapshot_export as _build_snapshot_export,
@@ -18,6 +16,7 @@ from fatebridge.services.timing_snapshots import (
     _build_jieqi_year_snapshot_text,
     _build_nongli_time_snapshot_text,
 )
+from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.errors import calculation_guard
 from fatebridge.utils.formatting import create_pillar_dict
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
@@ -86,7 +85,6 @@ def calculate_jieqi_year(
             "requested_jieqis": requested_terms,
         },
         "year": normalized_year,
-        "jieqi24": annual_grid,
         "jieqi_year": annual_grid,
         "selected_jieqi": selected_terms,
         "summary": summary,
@@ -109,7 +107,6 @@ def calculate_nongli_time(
     gps_lat: Optional[float] = None,
     gps_lon: Optional[float] = None,
     gender: Optional[Any] = None,
-    after23_new_day: Optional[Any] = False,
     time_alg: int = 0,
     ad: int = 1,
     selected_sections: Optional[List[str]] = None,
@@ -126,7 +123,10 @@ def calculate_nongli_time(
     corrected_datetime = input_datetime
     analysis_datetime = input_datetime
     total_correction_minutes = 0.0
-    effective_longitude = gps_lon if gps_lon is not None else _parse_geo_coordinate(lon)
+    effective_longitude = parse_geo_coordinate(
+        gps_lon if gps_lon is not None else lon, axis="longitude"
+    )
+    parse_geo_coordinate(gps_lat if gps_lat is not None else lat, axis="latitude")
     time_algorithm_label = "直接时间"
     warnings: List[str] = []
 
@@ -147,13 +147,6 @@ def calculate_nongli_time(
             warnings.append(
                 "time_alg=0 需要 lon 或 gps_lon 才能计算真太阳时，已回退为直接时间。"
             )
-
-    # 晚子时 (23:00-23:59) 的日柱翻日由 BaZiCalendar.get_four_pillars
-    # 内部自动处理 (见 calendar.py 的 resolve_bazi_effective_date)。
-    # 此前的 `analysis_datetime += timedelta(days=1)` 会与内部翻日叠加
-    # 造成"双重翻日" (戊辰→己巳→庚午)。`after23_new_day` 现仅作
-    # 元数据透传，实际翻日逻辑统一由核心承担，避免语义冲突。
-    _ = _coerce_bool(after23_new_day)  # 保留解析以便校验输入
 
     pillars = BaZiCalendar.get_four_pillars(
         analysis_datetime,
@@ -196,7 +189,6 @@ def calculate_nongli_time(
         gps_lat=gps_lat,
         gps_lon=gps_lon,
         gender=gender,
-        after23_new_day=_coerce_bool(after23_new_day),
         time_alg=normalized_time_alg,
         time_algorithm_label=time_algorithm_label,
         ad=ad,
@@ -227,7 +219,6 @@ def calculate_nongli_time(
             "gps_lat": gps_lat,
             "gps_lon": gps_lon,
             "gender": gender,
-            "after23_new_day": _coerce_bool(after23_new_day),
             "time_alg": normalized_time_alg,
             "ad": ad,
         },
@@ -241,12 +232,10 @@ def calculate_nongli_time(
         },
         "birth": calendar_context["solar_datetime"],
         "nongli": nongli_display,
-        "year": year_ganzhi,
         "yearGanZi": year_ganzhi,
         "yearJieqi": lunar_calendar.get("year_jieqi_ganzhi", year_ganzhi),
         "monthGanZi": lunar_calendar.get("month_ganzhi", month_ganzhi),
         "dayGanZi": lunar_calendar.get("day_ganzhi", day_ganzhi),
-        "time": lunar_calendar.get("time_ganzhi", time_ganzhi),
         "timeGanZi": lunar_calendar.get("time_ganzhi", time_ganzhi),
         "jieqi": lunar_calendar.get("jieqi"),
         "jiedelta": lunar_calendar.get("jiedelta"),

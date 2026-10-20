@@ -87,3 +87,22 @@ def test_main_returns_error_on_failure(tmp_path, monkeypatch):
     rc = fetch_ephe.main(["--dest", str(tmp_path), "--files", "x.se1"])
 
     assert rc == 1
+
+
+@pytest.mark.parametrize("existing", [False, True])
+def test_failed_file_write_preserves_destination_and_removes_temporary_file(
+    tmp_path, monkeypatch, existing
+):
+    target = tmp_path / "sepl_18.se1"
+    if existing:
+        target.write_bytes(b"SW-old-data")
+    _stub_download(monkeypatch, b"SW-new-data")
+
+    def interrupted(_):
+        raise OSError("simulated disk interruption")
+
+    monkeypatch.setattr(fetch_ephe.os, "fsync", interrupted)
+    with pytest.raises(OSError, match="interruption"):
+        fetch_ephe.fetch_one(target.name, tmp_path, force=True)
+    assert target.read_bytes() == b"SW-old-data" if existing else not target.exists()
+    assert set(tmp_path.iterdir()) == ({target} if existing else set())

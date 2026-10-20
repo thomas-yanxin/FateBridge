@@ -10,7 +10,7 @@ from fatebridge.services.divination import calculate_gua_meiyi
 from tests.fixtures.transports import mcp_parameters, mcp_text
 
 
-def test_helper_request_models_accept_legacy_style_fields():
+def test_helper_request_models_accept_published_fields():
     jieqi_request = JieqiYearRequest(
         year=2028,
         zone="+08:00",
@@ -29,7 +29,6 @@ def test_helper_request_models_accept_legacy_style_fields():
         lon="121e28",
         gps_lat=31.2167,
         gps_lon=121.4667,
-        after23_new_day=True,
         time_alg=0,
         selected_sections=["农历上下文", "四柱上下文"],
     )
@@ -42,7 +41,6 @@ def test_helper_request_models_accept_legacy_style_fields():
     assert jieqi_payload["gps_lon"] == 121.4667
     assert jieqi_payload["jieqis"] == ["春分", "冬至"]
     assert jieqi_payload["selected_sections"] == ["查询信息", "重点节气"]
-    assert nongli_payload["after23_new_day"] is True
     assert nongli_payload["time_alg"] == 0
     assert nongli_payload["gps_lat"] == 31.2167
     assert nongli_payload["selected_sections"] == ["农历上下文", "四柱上下文"]
@@ -66,7 +64,7 @@ def test_calculate_jieqi_year_returns_year_grid_and_selected_terms():
     assert result["jieqi_year"][-1]["name"] == "冬至"
     assert [item["name"] for item in result["selected_jieqi"]] == ["春分", "冬至"]
     assert result["year"] == 2028
-    assert result["jieqi24"] == result["jieqi_year"]
+    assert "jieqi24" not in result
     assert "2028年" in result["summary"]
     assert "24个节气节点" in result["summary"]
     assert "[查询信息]" in result["snapshot_text"]
@@ -112,7 +110,8 @@ def test_calculate_nongli_time_returns_lunar_and_ganzhi_context():
     assert result["yearJieqi"] == "戊申"
     assert result["monthGanZi"] == "乙卯"
     assert result["dayGanZi"] == "丙辰"
-    assert result["time"] == "癸巳"
+    assert result["timeGanZi"] == "癸巳"
+    assert "year" not in result and "time" not in result
     assert result["month"] == "三月"
     assert result["day"] == "初七"
     assert result["monthInt"] == 3
@@ -251,12 +250,12 @@ def test_calculate_gua_meiyi_returns_batch_meiyi_explanations():
     assert result["results"]["111"]["name"] == "乾"
     assert result["results"]["111"]["lookup_type"] == "trigram"
     assert "主动开创" in result["results"]["111"]["desc"]
-    assert result["111"]["name"] == "乾"
-    assert result["111"]["text"] == result["results"]["111"]["desc"]
+    assert "111" not in result
+    assert result["results"]["111"]["text"] == result["results"]["111"]["desc"]
     assert result["results"]["000"]["name"] == "坤"
     assert result["results"]["000"]["lookup_type"] == "trigram"
     assert "承载顺势" in result["results"]["000"]["desc"]
-    assert result["000"]["name"] == "坤"
+    assert "000" not in result
     assert "乾" in result["summary"]
     assert "坤" in result["summary"]
 
@@ -301,3 +300,15 @@ def test_helper_mcp_tools_return_formatted_json_strings():
 def test_calendar_helper_tools_expose_selected_sections_parameter():
     assert "selected_sections" in mcp_parameters("jieqi_year")["properties"]
     assert "selected_sections" in mcp_parameters("nongli_time")["properties"]
+
+
+def test_nongli_rollover_uses_the_core_late_zi_rule_without_an_ignored_switch():
+    late = calculate_nongli_time(date="2026-12-31", time="23:30", time_alg=1)
+    early = calculate_nongli_time(date="2027-01-01", time="00:30", time_alg=1)
+    assert (
+        late["four_pillars"]["day"]
+        == early["four_pillars"]["day"]
+        == {"stem": "庚", "branch": "辰"}
+    )
+    assert late["dayGanZi"] == early["dayGanZi"] == "庚辰"
+    assert "after23_new_day" not in NongliTimeRequest.model_fields

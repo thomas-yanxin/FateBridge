@@ -117,11 +117,13 @@ def diagnose(
     env = {"FATEBRIDGE_MCP_FAMILIES": family, "FATEBRIDGE_MCP_SCENARIOS": scenario}
     dependencies: Dict[str, Any] = {}
     for dependency in importlib.metadata.requires("fatebridge") or []:
-        if ";" in dependency:  # optional development extras
-            continue
         from packaging.requirements import Requirement
 
         requirement = Requirement(dependency)
+        # Platform requirements are active on that platform; unselected extras
+        # and other inactive markers must not enter the required dependency set.
+        if requirement.marker and not requirement.marker.evaluate({"extra": ""}):
+            continue
         try:
             version = importlib.metadata.version(requirement.name)
             dependencies[requirement.name] = {

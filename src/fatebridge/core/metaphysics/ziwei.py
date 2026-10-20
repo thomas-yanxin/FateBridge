@@ -641,7 +641,7 @@ def build_ziwei_chart(seed: MetaphysicsSeed, gender: str) -> Dict[str, Any]:
     for palace in palaces:
         palace["stars"] = sorted(dict.fromkeys(palace["stars"]))
 
-    # --- Tier 1: attach brightness + parsed mutagen as an additive field ---
+    # Attach brightness and parsed mutagen to each star label.
     # `palace["stars"]` displays a list[str] of mutagen-suffixed labels;
     # `stars_detail` mirrors it 1:1 with structured data.
     for palace in palaces:
