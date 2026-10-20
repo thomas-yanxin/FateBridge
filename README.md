@@ -2,8 +2,6 @@
   <img src="asserts/fatebridge-banner.png" alt="FateBridge：银色莫比乌斯环与星轨横幅" width="100%">
 </p>
 
-<h1 align="center">FateBridge</h1>
-
 <p align="center">
   <strong>面向应用与 AI Agent 的传统术数与占星计算引擎</strong>
 </p>
