@@ -25,10 +25,13 @@ def _windows_user() -> Any:
     import win32con
     import win32security
 
-    with win32security.OpenProcessToken(
+    token = win32security.OpenProcessToken(
         win32api.GetCurrentProcess(), win32con.TOKEN_QUERY
-    ) as token:
+    )
+    try:
         return win32security.GetTokenInformation(token, win32security.TokenUser)[0]
+    finally:
+        token.Close()
 
 
 def _windows_security() -> Any:
@@ -99,7 +102,7 @@ def ensure_private_directory(path: Path) -> Path:
         except pywintypes.error as exc:
             if exc.winerror != 183:  # ERROR_ALREADY_EXISTS
                 raise
-        with win32file.CreateFile(
+        handle = win32file.CreateFile(
             str(path),
             win32con.READ_CONTROL | ntsecuritycon.FILE_READ_ATTRIBUTES,
             win32con.FILE_SHARE_READ
@@ -109,8 +112,11 @@ def ensure_private_directory(path: Path) -> Path:
             win32con.OPEN_EXISTING,
             win32con.FILE_FLAG_OPEN_REPARSE_POINT | win32con.FILE_FLAG_BACKUP_SEMANTICS,
             None,
-        ) as handle:
+        )
+        try:
             _validate_windows_handle(handle)
+        finally:
+            handle.Close()
         if not path.is_dir():
             raise RuntimeError("Result artifact directory is not a directory")
     else:

@@ -4,14 +4,48 @@ import os
 import subprocess
 import sys
 import threading
+from types import SimpleNamespace
 
 import pytest
 
 from fatebridge.utils.private_files import (
+    _windows_user,
     ensure_private_directory,
     locked_private_file,
     open_private_file,
 )
+
+
+@pytest.mark.parametrize("fail", [False, True])
+def test_windows_token_is_closed_without_assuming_a_context_manager(monkeypatch, fail):
+    closed = []
+    token = SimpleNamespace(Close=lambda: closed.append(True))
+
+    def information(handle, kind):
+        assert handle is token and kind == "user"
+        if fail:
+            raise OSError("token query failed")
+        return ("sid",)
+
+    monkeypatch.setitem(
+        sys.modules, "win32api", SimpleNamespace(GetCurrentProcess=lambda: "process")
+    )
+    monkeypatch.setitem(sys.modules, "win32con", SimpleNamespace(TOKEN_QUERY="query"))
+    monkeypatch.setitem(
+        sys.modules,
+        "win32security",
+        SimpleNamespace(
+            OpenProcessToken=lambda process, access: token,
+            GetTokenInformation=information,
+            TokenUser="user",
+        ),
+    )
+    if fail:
+        with pytest.raises(OSError, match="token query failed"):
+            _windows_user()
+    else:
+        assert _windows_user() == "sid"
+    assert closed == [True]
 
 
 def test_threads_cannot_enter_the_same_artifact_lock_together(tmp_path):
