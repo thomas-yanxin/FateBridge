@@ -1,15 +1,31 @@
-# FateBridge
+<p align="center">
+  <img src="asserts/fatebridge-banner.png" alt="FateBridge：银色莫比乌斯环与星轨横幅" width="100%">
+</p>
 
-**面向应用与 AI Agent 的传统术数与占星计算引擎**
+<h1 align="center">FateBridge</h1>
 
-[![PyPI](https://img.shields.io/pypi/v/fatebridge.svg)](https://pypi.org/project/fatebridge/)
-[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg)](pyproject.toml)
-[![CI](https://github.com/thomas-yanxin/FateBridge/actions/workflows/ci.yml/badge.svg)](https://github.com/thomas-yanxin/FateBridge/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+<p align="center">
+  <strong>面向应用与 AI Agent 的传统术数与占星计算引擎</strong>
+</p>
+
+<p align="center">
+  <a href="https://pypi.org/project/fatebridge/"><img src="https://img.shields.io/pypi/v/fatebridge.svg" alt="PyPI"></a>
+  <a href="pyproject.toml"><img src="https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg" alt="Python"></a>
+  <a href="https://github.com/thomas-yanxin/FateBridge/actions/workflows/ci.yml"><img src="https://github.com/thomas-yanxin/FateBridge/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License"></a>
+</p>
+
+<p align="center">
+  <a href="#快速开始">快速开始</a> ·
+  <a href="#接入-agent">接入 Agent</a> ·
+  <a href="#接入应用">接入应用</a> ·
+  <a href="docs/README.md">文档中心</a> ·
+  <a href="#参与贡献">参与贡献</a>
+</p>
 
 FateBridge 将八字、紫微、中国占术、西方占星与风水规则组织成可在本地运行的 Python 计算工具。通过 **MCP** 为 Agent 提供计算依据，通过 **REST** 接入应用，也可以用 **CLI** 在终端直接调用。
 
-[快速开始](#快速开始) · [接入 Agent](#接入-agent) · [接入应用](#接入应用) · [文档中心](docs/README.md) · [参与贡献](#参与贡献)
+---
 
 ## 核心特性
 
@@ -176,3 +192,13 @@ uv run --locked --extra dev python -m pytest -q \
 FateBridge 的计算验证关注历法、数值与所选规则的一致性。传统解释与分数用于文化参考，分数不代表现实成功概率，软件测试通过也不证明预测有效性。咨询不提供生死寿命、灾祸断言、临床诊断治疗与医疗择时，传统健康内容不作为医学结论；详见[咨询硬边界](skills/_shared/safety-boundaries.md)。
 
 项目提供后端、CLI 与技能资料，前端和部署由接入方负责。代码采用 [Apache-2.0](LICENSE)，第三方组件与来源见 [NOTICE](NOTICE)，依赖和星历数据遵循各自许可。
+
+---
+
+<p align="center">
+  <img src="asserts/fatebridge-logo-square.png" alt="FateBridge 莫比乌斯环 Logo" width="72" height="72">
+</p>
+
+<p align="center">
+  <a href="#fatebridge">返回顶部 ↑</a>
+</p>
