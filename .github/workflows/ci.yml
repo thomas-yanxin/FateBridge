@@ -196,12 +196,17 @@ jobs:
       - name: Verify Windows startup and independent stdio MCP
         run: uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye
       - name: Check private storage, kernel locks and transport repairs on Windows
+        if: ${{ !cancelled() }}
         run: >-
           uv run --locked --extra dev python -m pytest -q
           tests/test_private_files.py tests/test_result_delivery.py
           tests/test_result_delivery_storage.py tests/test_coordinates.py
           tests/test_life_dimensions.py tests/test_coordinate_and_calendar_transports.py
           tests/test_calendar_helper_tools.py tests/test_fetch_ephe.py
+          tests/test_scenario_dependency_closure.py
+      - name: Check doctor diagnostics on Windows
+        if: ${{ !cancelled() }}
+        run: uv run --locked --extra dev python -m pytest -q tests/test_codex_experience.py -k doctor
 
   ci:
     name: CI result

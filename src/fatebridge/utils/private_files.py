@@ -32,6 +32,7 @@ def _windows_user() -> Any:
 
 
 def _windows_security() -> Any:
+    import ntsecuritycon
     import pywintypes
     import win32con
     import win32security
@@ -41,7 +42,7 @@ def _windows_security() -> Any:
     acl.AddAccessAllowedAceEx(
         win32security.ACL_REVISION,
         win32con.OBJECT_INHERIT_ACE | win32con.CONTAINER_INHERIT_ACE,
-        win32con.FILE_ALL_ACCESS,
+        ntsecuritycon.FILE_ALL_ACCESS,
         user,
     )
     descriptor = win32security.SECURITY_DESCRIPTOR()
@@ -87,6 +88,7 @@ def _validate_windows_handle(handle: Any) -> None:
 
 def ensure_private_directory(path: Path) -> Path:
     if sys.platform == "win32":
+        import ntsecuritycon
         import pywintypes
         import win32con
         import win32file
@@ -99,7 +101,7 @@ def ensure_private_directory(path: Path) -> Path:
                 raise
         with win32file.CreateFile(
             str(path),
-            win32con.READ_CONTROL | win32con.FILE_READ_ATTRIBUTES,
+            win32con.READ_CONTROL | ntsecuritycon.FILE_READ_ATTRIBUTES,
             win32con.FILE_SHARE_READ
             | win32con.FILE_SHARE_WRITE
             | win32con.FILE_SHARE_DELETE,

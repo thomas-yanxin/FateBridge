@@ -15,7 +15,12 @@ from fatebridge.application.discovery import discover_specs
 from fatebridge.application.examples import example_input, suggested_fields
 from fatebridge.core.divination import lookup_hexagram_by_name
 from fatebridge.core.gua_meanings import HEXAGRAM_INTERPRETATIONS
-from fatebridge.diagnostics import diagnose, resolve_codex_cli
+from fatebridge.diagnostics import (
+    _probe_stdio,
+    _StdioProbeError,
+    diagnose,
+    resolve_codex_cli,
+)
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.compatibility import assert_score_reference
@@ -206,9 +211,33 @@ def test_doctor_real_stdio_and_empty_intersection():
     assert result["ok"], result
     assert result["mcp"]["tool_count"] == result["mcp_tool_count"]
     assert result["mcp"]["smoke_tool"]
-    assert result["codex"]["config"]["command"].startswith("/")
+    assert Path(result["codex"]["config"]["command"]).is_absolute()
     empty = diagnose(family="fengshui", scenario="onda-shiye")
     assert not empty["ok"] and empty["mcp_tool_count"] == 0
+
+
+@pytest.mark.asyncio
+async def test_doctor_keeps_the_child_startup_failure_and_stage():
+    with pytest.raises(_StdioProbeError) as caught:
+        await _probe_stdio({"FATEBRIDGE_MCP_SCENARIOS": "missing-scenario"})
+    details = caught.value.details
+    assert details["stage"] == "initialize"
+    assert details["error_type"]
+    assert "Traceback" in details["server_stderr"]
+    assert len(details["server_stderr"]) <= 8192
+
+
+def test_doctor_returns_structured_stdio_failure(monkeypatch):
+    async def fail(env):
+        raise _StdioProbeError("tools/list", OSError("probe failed"), "child stderr")
+
+    monkeypatch.setattr("fatebridge.diagnostics._probe_stdio", fail)
+    result = diagnose(mcp=True, scenario="onda-shiye")
+    assert not result["ok"]
+    assert result["mcp"]["stage"] == "tools/list"
+    assert result["mcp"]["error_type"] == "OSError"
+    assert result["mcp"]["error"] == "probe failed"
+    assert result["mcp"]["server_stderr"] == "child stderr"
 
 
 def test_doctor_checks_active_dependency_markers_and_skips_unselected_extras(

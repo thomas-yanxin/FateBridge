@@ -1,5 +1,25 @@
 {
   "analysis_context": {
+    "analysis_datetime": "2026-06-19 14:00:00",
+    "analysis_day": 19,
+    "analysis_hour": 14,
+    "analysis_minute": 0,
+    "analysis_month": 6,
+    "analysis_year": 2026,
+    "context_role": "target",
+    "corrected_datetime": "2026-06-19 14:00:00",
+    "current_jieqi": "芒种",
+    "input_datetime": "2026-06-19 14:00:00",
+    "longitude": null,
+    "lunar_display": "五月初五",
+    "next_jieqi": "夏至",
+    "time_algorithm": "直接时间",
+    "timezone": "Asia/Shanghai",
+    "total_correction_minutes": 0.0
+  },
+  "analysis_type": "紫微斗数运限",
+  "birth_context": {
+    "context_role": "birth",
     "corrected_datetime": "1994-08-23 14:30:00",
     "current_jieqi": "立秋",
     "input_datetime": "1994-08-23 14:30:00",
@@ -10,7 +30,6 @@
     "timezone": "Asia/Shanghai",
     "total_correction_minutes": 0.0
   },
-  "analysis_type": "紫微斗数运限",
   "person_info": {
     "birth_datetime": "1994年08月23日 14时30分",
     "birth_longitude": 121.4737,
@@ -27,7 +46,7 @@
     "tool_name": "ziwei_horoscope"
   },
   "snapshot_export": {
-    "export_text": "[起盘信息]\n出生：1994-08-23 14:30:00\n目标：2026-06-19 14:00:00\n虚岁：33\n\n[大限]\n宫位：田宅宫（戊辰）\n四化天干：戊\n四化：化禄=贪狼；化权=太阴；化科=右弼；化忌=天机\n\n[小限]\n宫位：兄弟宫（丙子）\n四化天干：丙\n四化：化禄=天同；化权=天机；化科=文昌；化忌=廉贞\n\n[流年]\n宫位：仆役宫（庚午）\n四化天干：丙\n四化：化禄=天同；化权=天机；化科=文昌；化忌=廉贞\n\n[流月]\n宫位：夫妻宫（乙亥）\n四化天干：甲\n四化：化禄=廉贞；化权=破军；化科=武曲；化忌=太阳\n\n[流日]\n宫位：福德宫（丁卯）\n四化天干：甲\n四化：化禄=廉贞；化权=破军；化科=武曲；化忌=太阳\n\n[流时]\n宫位：子女宫（甲戌）\n四化天干：辛\n四化：化禄=巨门；化权=太阳；化科=文曲；化忌=文昌",
+    "export_text": "[起盘信息]\n出生：1994-08-23 14:30:00\n目标：2026-06-19 14:00:00\n虚岁：33\n\n[大限]\n命宫活动索引所临本命宫：田宅宫（戊辰）\n四化天干：戊\n四化：化禄=贪狼；化权=太阴；化科=右弼；化忌=天机\n\n[小限]\n命宫活动索引所临本命宫：兄弟宫（丙子）\n四化天干：丙\n四化：化禄=天同；化权=天机；化科=文昌；化忌=廉贞\n\n[流年]\n命宫活动索引所临本命宫：仆役宫（庚午）\n四化天干：丙\n四化：化禄=天同；化权=天机；化科=文昌；化忌=廉贞\n\n[流月]\n命宫活动索引所临本命宫：夫妻宫（乙亥）\n四化天干：甲\n四化：化禄=廉贞；化权=破军；化科=武曲；化忌=太阳\n\n[流日]\n命宫活动索引所临本命宫：福德宫（丁卯）\n四化天干：甲\n四化：化禄=廉贞；化权=破军；化科=武曲；化忌=太阳\n\n[流时]\n命宫活动索引所临本命宫：子女宫（甲戌）\n四化天干：辛\n四化：化禄=巨门；化权=太阳；化科=文曲；化忌=文昌",
     "missing_selected_sections": [],
     "section_titles_detected": [
       "起盘信息",
@@ -47,42 +66,42 @@
         "title": "起盘信息"
       },
       {
-        "content": "[大限]\n宫位：田宅宫（戊辰）\n四化天干：戊\n四化：化禄=贪狼；化权=太阴；化科=右弼；化忌=天机",
+        "content": "[大限]\n命宫活动索引所临本命宫：田宅宫（戊辰）\n四化天干：戊\n四化：化禄=贪狼；化权=太阴；化科=右弼；化忌=天机",
         "included": true,
         "index": 2,
         "raw_title": "大限",
         "title": "大限"
       },
       {
-        "content": "[小限]\n宫位：兄弟宫（丙子）\n四化天干：丙\n四化：化禄=天同；化权=天机；化科=文昌；化忌=廉贞",
+        "content": "[小限]\n命宫活动索引所临本命宫：兄弟宫（丙子）\n四化天干：丙\n四化：化禄=天同；化权=天机；化科=文昌；化忌=廉贞",
         "included": true,
         "index": 3,
         "raw_title": "小限",
         "title": "小限"
       },
       {
-        "content": "[流年]\n宫位：仆役宫（庚午）\n四化天干：丙\n四化：化禄=天同；化权=天机；化科=文昌；化忌=廉贞",
+        "content": "[流年]\n命宫活动索引所临本命宫：仆役宫（庚午）\n四化天干：丙\n四化：化禄=天同；化权=天机；化科=文昌；化忌=廉贞",
         "included": true,
         "index": 4,
         "raw_title": "流年",
         "title": "流年"
       },
       {
-        "content": "[流月]\n宫位：夫妻宫（乙亥）\n四化天干：甲\n四化：化禄=廉贞；化权=破军；化科=武曲；化忌=太阳",
+        "content": "[流月]\n命宫活动索引所临本命宫：夫妻宫（乙亥）\n四化天干：甲\n四化：化禄=廉贞；化权=破军；化科=武曲；化忌=太阳",
         "included": true,
         "index": 5,
         "raw_title": "流月",
         "title": "流月"
       },
       {
-        "content": "[流日]\n宫位：福德宫（丁卯）\n四化天干：甲\n四化：化禄=廉贞；化权=破军；化科=武曲；化忌=太阳",
+        "content": "[流日]\n命宫活动索引所临本命宫：福德宫（丁卯）\n四化天干：甲\n四化：化禄=廉贞；化权=破军；化科=武曲；化忌=太阳",
         "included": true,
         "index": 6,
         "raw_title": "流日",
         "title": "流日"
       },
       {
-        "content": "[流时]\n宫位：子女宫（甲戌）\n四化天干：辛\n四化：化禄=巨门；化权=太阳；化科=文曲；化忌=文昌",
+        "content": "[流时]\n命宫活动索引所临本命宫：子女宫（甲戌）\n四化天干：辛\n四化：化禄=巨门；化权=太阳；化科=文曲；化忌=文昌",
         "included": true,
         "index": 7,
         "raw_title": "流时",
@@ -150,7 +169,7 @@
     },
     "unknown_detected_sections": []
   },
-  "snapshot_text": "[起盘信息]\n出生：1994-08-23 14:30:00\n目标：2026-06-19 14:00:00\n虚岁：33\n\n[大限]\n宫位：田宅宫（戊辰）\n四化天干：戊\n四化：化禄=贪狼；化权=太阴；化科=右弼；化忌=天机\n\n[小限]\n宫位：兄弟宫（丙子）\n四化天干：丙\n四化：化禄=天同；化权=天机；化科=文昌；化忌=廉贞\n\n[流年]\n宫位：仆役宫（庚午）\n四化天干：丙\n四化：化禄=天同；化权=天机；化科=文昌；化忌=廉贞\n\n[流月]\n宫位：夫妻宫（乙亥）\n四化天干：甲\n四化：化禄=廉贞；化权=破军；化科=武曲；化忌=太阳\n\n[流日]\n宫位：福德宫（丁卯）\n四化天干：甲\n四化：化禄=廉贞；化权=破军；化科=武曲；化忌=太阳\n\n[流时]\n宫位：子女宫（甲戌）\n四化天干：辛\n四化：化禄=巨门；化权=太阳；化科=文曲；化忌=文昌",
+  "snapshot_text": "[起盘信息]\n出生：1994-08-23 14:30:00\n目标：2026-06-19 14:00:00\n虚岁：33\n\n[大限]\n命宫活动索引所临本命宫：田宅宫（戊辰）\n四化天干：戊\n四化：化禄=贪狼；化权=太阴；化科=右弼；化忌=天机\n\n[小限]\n命宫活动索引所临本命宫：兄弟宫（丙子）\n四化天干：丙\n四化：化禄=天同；化权=天机；化科=文昌；化忌=廉贞\n\n[流年]\n命宫活动索引所临本命宫：仆役宫（庚午）\n四化天干：丙\n四化：化禄=天同；化权=天机；化科=文昌；化忌=廉贞\n\n[流月]\n命宫活动索引所临本命宫：夫妻宫（乙亥）\n四化天干：甲\n四化：化禄=廉贞；化权=破军；化科=武曲；化忌=太阳\n\n[流日]\n命宫活动索引所临本命宫：福德宫（丁卯）\n四化天干：甲\n四化：化禄=廉贞；化权=破军；化科=武曲；化忌=太阳\n\n[流时]\n命宫活动索引所临本命宫：子女宫（甲戌）\n四化天干：辛\n四化：化禄=巨门；化权=太阳；化科=文曲；化忌=文昌",
   "ziwei_horoscope": {
     "calendar_rules": {
       "late_zi": "晚子时本命农历日期算当天",
@@ -158,6 +177,16 @@
       "year_boundary": "农历正月初一"
     },
     "engine": "fatebridge-offline",
+    "interpretation_scope": {
+      "contract_version": "natal_scope_linkage_v1",
+      "full_scope_palaces_supported": false,
+      "limitations": [
+        "未提供完整运限十二宫旋宫表",
+        "未据此判定职业事件或吉凶"
+      ],
+      "scope_palace_meaning": "运限命宫活动索引所临的本命宫",
+      "transformation_meaning": "本层四化标记连接本命星所在宫，不是本层旋宫的功能宫"
+    },
     "nominal_age": 33,
     "scopes": [
       {
@@ -169,9 +198,57 @@
           "化禄": "贪狼",
           "化科": "右弼"
         },
+        "mutagen_natal_links": [
+          {
+            "natal_branch": "酉",
+            "natal_mutagen": null,
+            "natal_palace_ganzhi": "癸酉",
+            "natal_palace_name": "财帛宫",
+            "natal_star_brightness": "利",
+            "natal_star_label": "贪狼",
+            "star": "贪狼",
+            "status": "matched",
+            "transformation": "化禄"
+          },
+          {
+            "natal_branch": "申",
+            "natal_mutagen": null,
+            "natal_palace_ganzhi": "壬申",
+            "natal_palace_name": "疾厄宫",
+            "natal_star_brightness": "利",
+            "natal_star_label": "太阴",
+            "star": "太阴",
+            "status": "matched",
+            "transformation": "化权"
+          },
+          {
+            "natal_branch": "辰",
+            "natal_mutagen": null,
+            "natal_palace_ganzhi": "戊辰",
+            "natal_palace_name": "田宅宫",
+            "natal_star_brightness": null,
+            "natal_star_label": "右弼",
+            "star": "右弼",
+            "status": "matched",
+            "transformation": "化科"
+          },
+          {
+            "natal_branch": "申",
+            "natal_mutagen": null,
+            "natal_palace_ganzhi": "壬申",
+            "natal_palace_name": "疾厄宫",
+            "natal_star_brightness": "得",
+            "natal_star_label": "天机",
+            "star": "天机",
+            "status": "matched",
+            "transformation": "化忌"
+          }
+        ],
+        "natal_palace_name": "田宅宫",
         "palace_ganzhi": "戊辰",
         "palace_name": "田宅宫",
         "scope": "大限",
+        "scope_palace_role": "ming_palace_activity_index",
         "stem": "戊"
       },
       {
@@ -183,9 +260,57 @@
           "化禄": "天同",
           "化科": "文昌"
         },
+        "mutagen_natal_links": [
+          {
+            "natal_branch": "辰",
+            "natal_mutagen": null,
+            "natal_palace_ganzhi": "戊辰",
+            "natal_palace_name": "田宅宫",
+            "natal_star_brightness": "平",
+            "natal_star_label": "天同",
+            "star": "天同",
+            "status": "matched",
+            "transformation": "化禄"
+          },
+          {
+            "natal_branch": "申",
+            "natal_mutagen": null,
+            "natal_palace_ganzhi": "壬申",
+            "natal_palace_name": "疾厄宫",
+            "natal_star_brightness": "得",
+            "natal_star_label": "天机",
+            "star": "天机",
+            "status": "matched",
+            "transformation": "化权"
+          },
+          {
+            "natal_branch": "卯",
+            "natal_mutagen": null,
+            "natal_palace_ganzhi": "丁卯",
+            "natal_palace_name": "福德宫",
+            "natal_star_brightness": "利",
+            "natal_star_label": "文昌",
+            "star": "文昌",
+            "status": "matched",
+            "transformation": "化科"
+          },
+          {
+            "natal_branch": "丑",
+            "natal_mutagen": "化禄",
+            "natal_palace_ganzhi": "丁丑",
+            "natal_palace_name": "命宫",
+            "natal_star_brightness": "利",
+            "natal_star_label": "廉贞化禄",
+            "star": "廉贞",
+            "status": "matched",
+            "transformation": "化忌"
+          }
+        ],
+        "natal_palace_name": "兄弟宫",
         "palace_ganzhi": "丙子",
         "palace_name": "兄弟宫",
         "scope": "小限",
+        "scope_palace_role": "ming_palace_activity_index",
         "stem": "丙"
       },
       {
@@ -197,9 +322,57 @@
           "化禄": "天同",
           "化科": "文昌"
         },
+        "mutagen_natal_links": [
+          {
+            "natal_branch": "辰",
+            "natal_mutagen": null,
+            "natal_palace_ganzhi": "戊辰",
+            "natal_palace_name": "田宅宫",
+            "natal_star_brightness": "平",
+            "natal_star_label": "天同",
+            "star": "天同",
+            "status": "matched",
+            "transformation": "化禄"
+          },
+          {
+            "natal_branch": "申",
+            "natal_mutagen": null,
+            "natal_palace_ganzhi": "壬申",
+            "natal_palace_name": "疾厄宫",
+            "natal_star_brightness": "得",
+            "natal_star_label": "天机",
+            "star": "天机",
+            "status": "matched",
+            "transformation": "化权"
+          },
+          {
+            "natal_branch": "卯",
+            "natal_mutagen": null,
+            "natal_palace_ganzhi": "丁卯",
+            "natal_palace_name": "福德宫",
+            "natal_star_brightness": "利",
+            "natal_star_label": "文昌",
+            "star": "文昌",
+            "status": "matched",
+            "transformation": "化科"
+          },
+          {
+            "natal_branch": "丑",
+            "natal_mutagen": "化禄",
+            "natal_palace_ganzhi": "丁丑",
+            "natal_palace_name": "命宫",
+            "natal_star_brightness": "利",
+            "natal_star_label": "廉贞化禄",
+            "star": "廉贞",
+            "status": "matched",
+            "transformation": "化忌"
+          }
+        ],
+        "natal_palace_name": "仆役宫",
         "palace_ganzhi": "庚午",
         "palace_name": "仆役宫",
         "scope": "流年",
+        "scope_palace_role": "ming_palace_activity_index",
         "stem": "丙"
       },
       {
@@ -211,9 +384,57 @@
           "化禄": "廉贞",
           "化科": "武曲"
         },
+        "mutagen_natal_links": [
+          {
+            "natal_branch": "丑",
+            "natal_mutagen": "化禄",
+            "natal_palace_ganzhi": "丁丑",
+            "natal_palace_name": "命宫",
+            "natal_star_brightness": "利",
+            "natal_star_label": "廉贞化禄",
+            "star": "廉贞",
+            "status": "matched",
+            "transformation": "化禄"
+          },
+          {
+            "natal_branch": "巳",
+            "natal_mutagen": "化权",
+            "natal_palace_ganzhi": "己巳",
+            "natal_palace_name": "官禄宫",
+            "natal_star_brightness": "平",
+            "natal_star_label": "破军化权",
+            "star": "破军",
+            "status": "matched",
+            "transformation": "化权"
+          },
+          {
+            "natal_branch": "巳",
+            "natal_mutagen": "化科",
+            "natal_palace_ganzhi": "己巳",
+            "natal_palace_name": "官禄宫",
+            "natal_star_brightness": "平",
+            "natal_star_label": "武曲化科",
+            "star": "武曲",
+            "status": "matched",
+            "transformation": "化科"
+          },
+          {
+            "natal_branch": "午",
+            "natal_mutagen": "化忌",
+            "natal_palace_ganzhi": "庚午",
+            "natal_palace_name": "仆役宫",
+            "natal_star_brightness": "旺",
+            "natal_star_label": "太阳化忌",
+            "star": "太阳",
+            "status": "matched",
+            "transformation": "化忌"
+          }
+        ],
+        "natal_palace_name": "夫妻宫",
         "palace_ganzhi": "乙亥",
         "palace_name": "夫妻宫",
         "scope": "流月",
+        "scope_palace_role": "ming_palace_activity_index",
         "stem": "甲"
       },
       {
@@ -225,9 +446,57 @@
           "化禄": "廉贞",
           "化科": "武曲"
         },
+        "mutagen_natal_links": [
+          {
+            "natal_branch": "丑",
+            "natal_mutagen": "化禄",
+            "natal_palace_ganzhi": "丁丑",
+            "natal_palace_name": "命宫",
+            "natal_star_brightness": "利",
+            "natal_star_label": "廉贞化禄",
+            "star": "廉贞",
+            "status": "matched",
+            "transformation": "化禄"
+          },
+          {
+            "natal_branch": "巳",
+            "natal_mutagen": "化权",
+            "natal_palace_ganzhi": "己巳",
+            "natal_palace_name": "官禄宫",
+            "natal_star_brightness": "平",
+            "natal_star_label": "破军化权",
+            "star": "破军",
+            "status": "matched",
+            "transformation": "化权"
+          },
+          {
+            "natal_branch": "巳",
+            "natal_mutagen": "化科",
+            "natal_palace_ganzhi": "己巳",
+            "natal_palace_name": "官禄宫",
+            "natal_star_brightness": "平",
+            "natal_star_label": "武曲化科",
+            "star": "武曲",
+            "status": "matched",
+            "transformation": "化科"
+          },
+          {
+            "natal_branch": "午",
+            "natal_mutagen": "化忌",
+            "natal_palace_ganzhi": "庚午",
+            "natal_palace_name": "仆役宫",
+            "natal_star_brightness": "旺",
+            "natal_star_label": "太阳化忌",
+            "star": "太阳",
+            "status": "matched",
+            "transformation": "化忌"
+          }
+        ],
+        "natal_palace_name": "福德宫",
         "palace_ganzhi": "丁卯",
         "palace_name": "福德宫",
         "scope": "流日",
+        "scope_palace_role": "ming_palace_activity_index",
         "stem": "甲"
       },
       {
@@ -239,9 +508,57 @@
           "化禄": "巨门",
           "化科": "文曲"
         },
+        "mutagen_natal_links": [
+          {
+            "natal_branch": "戌",
+            "natal_mutagen": null,
+            "natal_palace_ganzhi": "甲戌",
+            "natal_palace_name": "子女宫",
+            "natal_star_brightness": "陷",
+            "natal_star_label": "巨门",
+            "star": "巨门",
+            "status": "matched",
+            "transformation": "化禄"
+          },
+          {
+            "natal_branch": "午",
+            "natal_mutagen": "化忌",
+            "natal_palace_ganzhi": "庚午",
+            "natal_palace_name": "仆役宫",
+            "natal_star_brightness": "旺",
+            "natal_star_label": "太阳化忌",
+            "star": "太阳",
+            "status": "matched",
+            "transformation": "化权"
+          },
+          {
+            "natal_branch": "亥",
+            "natal_mutagen": null,
+            "natal_palace_ganzhi": "乙亥",
+            "natal_palace_name": "夫妻宫",
+            "natal_star_brightness": "旺",
+            "natal_star_label": "文曲",
+            "star": "文曲",
+            "status": "matched",
+            "transformation": "化科"
+          },
+          {
+            "natal_branch": "卯",
+            "natal_mutagen": null,
+            "natal_palace_ganzhi": "丁卯",
+            "natal_palace_name": "福德宫",
+            "natal_star_brightness": "利",
+            "natal_star_label": "文昌",
+            "star": "文昌",
+            "status": "matched",
+            "transformation": "化忌"
+          }
+        ],
+        "natal_palace_name": "子女宫",
         "palace_ganzhi": "甲戌",
         "palace_name": "子女宫",
         "scope": "流时",
+        "scope_palace_role": "ming_palace_activity_index",
         "stem": "辛"
       }
     ]

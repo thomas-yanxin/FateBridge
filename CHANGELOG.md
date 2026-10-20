@@ -12,6 +12,8 @@ by a published GitHub Release through `.github/workflows/publish.yml`.
 
 ### Changed
 
+- 修复 Windows 私有文件权限常量与场景文件编码，MCP 安装诊断保留失败阶段及有界子进程日志；
+  主分支 push 始终运行全量 CI，避免文档提交掩盖未完成的代码检查。
 - 清理仅为旧响应保留的五行关系计分实现及专属测试，旺衰统一使用现有 assessment；
   删除 `jieqi24`、农历查询的 `year/time` 和梅易查询根部重复条目，迁移路径见迁移指南。
 - 请求绑定直接传递全部模型字段，删除静默丢参适配；移除已退出仓库的审计目录 CI 特例

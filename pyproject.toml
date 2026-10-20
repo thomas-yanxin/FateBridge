@@ -117,5 +117,6 @@ module = [
     "win32file",
     "win32security",
     "pywintypes",
+    "ntsecuritycon",
 ]
 ignore_missing_imports = true

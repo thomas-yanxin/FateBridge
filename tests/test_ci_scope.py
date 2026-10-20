@@ -146,6 +146,22 @@ def test_script_writes_a_boolean_output_even_when_diff_is_unknown(
     assert output.read_text() == "full_tests=true\n"
 
 
+@pytest.mark.parametrize(
+    "event,expected", [("push", "true"), ("pull_request", "false")]
+)
+def test_docs_push_cannot_replace_an_unfinished_code_run_with_partial_checks(
+    tmp_path, monkeypatch, event, expected
+):
+    monkeypatch.setattr(ci_scope, "changed_paths", lambda *args: ["docs/guide.md"])
+    monkeypatch.setattr(
+        "sys.argv", ["ci_scope", "--event", event, "--base", "", "--head", ""]
+    )
+    output = tmp_path / "output"
+    monkeypatch.setenv("GITHUB_OUTPUT", str(output))
+    assert ci_scope.main() == 0
+    assert output.read_text() == f"full_tests={expected}\n"
+
+
 WORKFLOW = yaml.safe_load(
     (Path(__file__).resolve().parents[1] / ".github/workflows/ci.yml").read_text()
 )

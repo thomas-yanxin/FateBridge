@@ -130,9 +130,9 @@ uv run --locked --extra dev python -m pytest -q tests/test_chinese_metaphysics.p
 
 ### CI 运行范围
 
-CI 对整个 push 的前后提交或整个 PR 的 merge-base 差异分流；同一分支或 PR 有新提交时会取消旧 CI。源码、测试（含 `tests/fixtures/` 原典标注与冻结清单）、依赖、工作流、技能、`AGENTS.md`、`docs/examples/` 和 `docs/validation/`（包括其中的 Markdown）的变更继续运行 Python 3.10–3.13 全量测试及最低依赖测试，数值基线仍由 Linux x86_64 / Python 3.12 校验。无法取得完整差异或出现未识别路径时也运行全量。
+主分支每次 push 都运行完整测试，避免文档提交取消先前代码检查后以局部检查代替验收。PR 按整个 merge-base 差异分流；同一分支或 PR 有新提交时会取消旧 CI。源码、测试（含 `tests/fixtures/` 原典标注与冻结清单）、依赖、工作流、技能、`AGENTS.md`、`docs/examples/` 和 `docs/validation/`（包括其中的 Markdown）的变更运行 Python 3.10–3.13 全量测试及最低依赖测试，数值基线由 Linux x86_64 / Python 3.12 校验。无法取得完整差异或出现未识别路径时也运行全量。
 
-仅根目录的 README、CHANGELOG、CONTRIBUTING、SECURITY，`docs/` 下排除 `examples/`、`validation/` 与 `AGENTS.md` 的普通 Markdown，以及 `docs/audits/`、`docs/research/` 的 JSON、日志、文本、XML、CSV 归档可走文档分支。该分支仍安装锁定开发环境，检查链接、JSON、接口计数、生成合同、技能接口和可运行 CLI 示例。Python 归档文件也按代码变更处理。
+PR 仅修改根目录的 README、CHANGELOG、CONTRIBUTING、SECURITY，或 `docs/` 下排除 `examples/`、`validation/` 与 `AGENTS.md` 的普通 Markdown 时，可走文档分支。该分支仍安装锁定开发环境，检查链接、JSON、接口计数、生成合同、技能接口和可运行 CLI 示例。JSON、日志等其他归档按非文档变更处理。
 
 Black、isort 和 mypy 在全量矩阵的 Python 3.12 作业检查一次；通用文档检查统一由 locked 作业执行。`CI result` 始终汇总本次选中的检查，文档分支跳过的全量作业不等于失败，已选作业的失败或意外跳过也不会被汇总为成功。
 
