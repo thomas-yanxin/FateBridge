@@ -22,6 +22,7 @@ CLI 可直接执行，无需启动 REST。REST 默认端口为 `8010`，MCP 默�
 | 任务 | 阅读入口 |
 | --- | --- |
 | 安装、配置环境变量或获取星历 | [快速入门](getting-started.md) |
+| 部署本地 stdio 或远程 HTTP MCP，升级与停用 | [MCP 部署指南](mcp-deployment.md) |
 | 注册 Codex 并完成第一次对话 | [Codex 使用指南](codex-guide.md) |
 | 发现工具、接入客户端或恢复错误 | [Agent 与应用接入指南](agent-guide.md) |
 | 保存完整 JSON 或全部时间线 | [完整结果交付与同次导出](agent-guide.md#完整结果交付与同次导出) |

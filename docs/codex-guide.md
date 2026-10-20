@@ -1,6 +1,6 @@
 # Codex 使用 FateBridge
 
-本页带你将本地 FateBridge 注册到 Codex，确认当前聊天已加载工具，并完成一次虚构咨询。前提是已按[快速入门](getting-started.md#安装)完成源码安装；无需启动 REST。其他 MCP host 请看[通用接入指南](agent-guide.md#fastmcpagent-host)。
+本页带你将本地 FateBridge 注册到 Codex，确认当前聊天已加载工具，并完成一次虚构咨询。本页的项目技能流程使用[源码安装](getting-started.md#安装)，无需启动 REST。仅使用已发布工具的 PyPI 安装、其他 MCP host、Windows 与远程 HTTP 接入见 [MCP 部署指南](mcp-deployment.md)。
 
 1. [确认安装与接入范围](#1-确认安装与接入范围)：运行 doctor，取得当前解释器的注册命令。
 2. [注册到 Codex](#2-注册到-codex)：保存配置并在新聊天检查工具。

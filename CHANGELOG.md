@@ -12,6 +12,9 @@ by a published GitHub Release through `.github/workflows/publish.yml`.
 
 ### Changed
 
+- 重写中英文 README 的安装与接入路径，补齐 stdio MCP 客户端配置、FastMCP HTTP
+  启动、版本与 Onda 技能分发说明；新增 MCP 部署指南，覆盖 Windows、远程接入、
+  协议验证、常驻服务及升级停用，并同步相关文档导航。
 - 包版本更新为 `0.1.1`。
 - 修复 Windows 私有文件权限常量与场景文件编码，MCP 安装诊断保留失败阶段及有界子进程日志；
   主分支 push 始终运行全量 CI，避免文档提交掩盖未完成的代码检查。

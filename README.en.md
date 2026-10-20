@@ -1,3 +1,5 @@
+# FateBridge
+
 <p align="center">
   <img src="asserts/fatebridge-banner.png" alt="FateBridge banner with a silver Möbius loop and star trails" width="100%">
 </p>
@@ -19,53 +21,64 @@
 
 <p align="center">
   <a href="#quick-start">Quick start</a> ·
-  <a href="#connect-an-agent">Connect an agent</a> ·
-  <a href="#connect-an-application">Connect an application</a> ·
+  <a href="#mcp-deployment">MCP deployment</a> ·
+  <a href="#rest-api">REST API</a> ·
   <a href="docs/README.md">Documentation</a> ·
   <a href="#contributing">Contributing</a>
 </p>
 
-FateBridge organizes BaZi, Zi Wei Dou Shu, Chinese divination, Western astrology, and Feng Shui rules into Python calculation tools that run locally. It provides calculation evidence to agents through **MCP**, serves applications through **REST**, and supports direct terminal use through the **CLI**.
+FateBridge is a local calculation toolkit for developers and AI agents. It exposes BaZi, Zi Wei Dou Shu, Western astrology, Chinese divination, and Feng Shui rules through **MCP, REST API, and CLI**. Shared domain calculations return structured data, rule coverage, and execution receipts for integration and inspection.
 
----
+The calculation service requires no LLM API key. Natural-language conversations use your chosen agent client and model. This repository provides the backend and Onda consultation skills; applications supply their own frontend.
 
-## Key features
+## Why FateBridge
 
-- **Chinese and Western systems through a shared interface**: BaZi, Zi Wei Dou Shu, Chinese divination, Western astrology, and Feng Shui calculations are organized into structured tools for applications and AI agents.
-- **Consultation organized around the question**: Onda selects relevant methods and timing layers for topics such as career, finances, relationships, and education, connects results to the question, and reuses relevant evidence in follow-ups.
-- **Open source, local execution, and flexible integration**: Connect agents through MCP, applications through REST, or use the CLI directly, with field selection and complete-result delivery from the same calculation.
+- **One integration across methods**: Shared input validation, tool catalog, error formats, and execution receipts reduce integration work across calculation systems.
+- **Inspectable results**: Responses retain timing assumptions, precision, rule sources, and coverage limits, with field projection and paged access to the same calculation result.
+- **Run in your own environment**: Use one-shot CLI commands, client-managed MCP processes, or an independent REST service. Installing dependencies and downloading ephemeris data require network access; local calculations do not depend on an online fortune-telling service.
+- **Organize agent work around questions**: Repository-distributed [Onda skills](skills/README.md) guide evidence selection and interpretation for career, finances, relationships, learning, and other topics, separating calculations, traditional interpretation, and practical advice.
 
-## Supported capabilities
+## Capabilities
 
-| Area | Main capabilities |
+| Domain | Coverage |
 | --- | --- |
-| BaZi and two-person relationships | Four Pillars charts, nine topic analyses including career and wealth, two-person compatibility, and Sukuyō compatibility |
-| Timing and calendars | Major luck periods, annual, monthly, daily, and hourly timing layers, solar terms, and the lunar calendar |
-| Chinese metaphysics and divination | Zi Wei Dou Shu, Qi Men Dun Jia, Liu Ren, Tai Yi, Jin Kou Jue, Mei Hua, Six Yao, and local techniques |
+| BaZi and relationships | Four Pillars charts, nine topic analyses including career and finances, two-person compatibility, lunar-mansion compatibility |
+| Timing and calendars | Luck periods, yearly/monthly/daily/hourly layers, solar terms, lunar calendar |
+| Chinese systems and divination | Zi Wei, Qi Men, Liu Ren, Tai Yi, Jin Kou Jue, Mei Hua, Six Yao, and local techniques |
 | Western astrology | Natal and tradition-specific charts, relationship charts, returns, transits, primary directions, and time-lord techniques |
-| Feng Shui | Eight Mansions, basic Jin Suo landform rules, annual stars, historical Xuan Kong house charts, and layered layout/object reviews |
+| Feng Shui | Eight Mansions, basic Jin Suo sand/water, annual stars, historical Xuan Kong natal charts, layered layout and object review |
 
-The current development branch provides **86 business REST routes** and **87 FastMCP tools**, covering **13 families / 87 tools**. The central catalog contains 88 records, of which 87 are executable through the CLI. Names and request shapes vary by interface; see [interface boundaries](docs/api-reference.md#24-三端能力边界). For each tool's implementation, precision, and limitations, see the [algorithm coverage matrix](docs/algorithm-coverage.md).
+Current source exposes **86 business REST routes** and **87 FastMCP tools** across **13 families / 87 tools**. The central catalog contains 88 records; the CLI can execute 87. Names and exposed surfaces differ: see [interface boundaries](docs/api-reference.md#24-三端能力边界) and the per-tool [algorithm coverage matrix](docs/algorithm-coverage.md).
 
 ## Quick start
 
-Requires **Python 3.10+** and [uv](https://docs.astral.sh/uv/getting-started/installation/). CI currently covers Python 3.10–3.13.
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/). The package requires Python 3.10+; CI currently covers 3.10–3.13. These commands select Python 3.12, which uv can download if needed.
 
-### Installation
+### 1. Install
 
-Install the latest release of the standalone command-line tools from PyPI:
-
-This page describes the current development branch; see [CHANGELOG](CHANGELOG.md#unreleased) for unpublished changes. To try the latest skills and interfaces, use the [source installation](#contributing).
+For the released CLI, REST, or MCP service, install an isolated tool environment from PyPI:
 
 ```bash
-uv tool install fatebridge
+uv tool install --python 3.12 fatebridge
+fatebridge doctor
 ```
 
-Installation provides three commands: `fatebridge`, `fatebridge-api`, and `fatebridge-mcp`. To run the current checkout or modify the code, use the [source installation](#contributing). Onda skills are distributed with the Git repository; the current wheel does not include the skills directory.
+This installs `fatebridge`, `fatebridge-api`, and `fatebridge-mcp`. If your terminal cannot find them, run `uv tool update-shell` and open a new terminal.
 
-### Run your first calculation
+**For current branch features, Onda skills, or development, install from source:**
 
-The CLI does not require a running service. This fictional example returns only three fields describing the BaZi Day Master:
+```bash
+git clone https://github.com/thomas-yanxin/FateBridge.git
+cd FateBridge
+uv sync --locked --extra dev
+uv run --locked --extra dev fatebridge doctor
+```
+
+Prefix source-environment commands with `uv run --locked --extra dev`. Bare `fatebridge` commands below refer to the isolated tool installation. Choose one installation; you do not need both. This page describes the development branch. For released packages, use the documentation at the [matching Git tag](https://github.com/thomas-yanxin/FateBridge/tags); see [CHANGELOG](CHANGELOG.md#unreleased) for unreleased changes. **The wheel does not include Onda skill files**, and an MCP connection does not install them.
+
+### 2. Run your first calculation
+
+No service is needed for CLI calls. This fictional example runs in macOS / Linux shells; see the [deployment guide](docs/mcp-deployment.md#windows-powershell) for PowerShell line continuation:
 
 ```bash
 fatebridge bazi_birth \
@@ -74,111 +87,201 @@ fatebridge bazi_birth \
   --birth-place 北京 --birth-timezone Asia/Shanghai \
   --fields bazi_birth.day_master.stem \
     bazi_birth.day_master.element bazi_birth.day_master.polarity \
-  --strict-fields
+  --strict-fields --no-include-snapshot-text
 ```
 
-Here, `男` means male and `北京` means Beijing. The business data is shown below; the response also includes a `run_metadata` execution receipt:
+On success, exit code `0` accompanies the following business data and a `run_metadata` receipt:
 
 ```json
 {
   "bazi_birth": {
-    "day_master": {
-      "stem": "庚",
-      "element": "金",
-      "polarity": "阳"
+    "day_master": {"stem": "庚", "element": "金", "polarity": "阳"}
+  }
+}
+```
+
+The values mean Geng, Metal, and Yang. Responses retain the domain's Chinese terminology.
+
+### 3. Choose an interface
+
+| Goal | Runtime | Next step |
+| --- | --- | --- |
+| Use Codex, Claude Desktop, or Cursor | Local MCP / stdio, managed by the client | [MCP deployment](#mcp-deployment) |
+| Serve an MCP client that accepts a URL | FastMCP / Streamable HTTP, independent process | [HTTP MCP](#http-mcp) |
+| Integrate a web, mobile, or backend application | REST API, independent HTTP process | [REST API](#rest-api) |
+| Batch jobs, scripts, or terminal use | CLI, exits after execution | `fatebridge discover --family bazi`, `fatebridge describe bazi_birth --detail input` |
+
+## MCP deployment
+
+### Local MCP: client-managed stdio
+
+Use this for desktop agents. **You do not need REST, an open port, or a separately started `fatebridge-mcp` process.** The client launches the configured process and communicates over stdin/stdout. A manually started stdio process waiting for input is normal.
+
+Verify MCP in your chosen installation:
+
+```bash
+# PyPI tool installation
+fatebridge doctor --mcp
+
+# Source installation: run from the repository root
+uv run --locked --extra dev fatebridge doctor --mcp
+```
+
+Run the appropriate command. `ok=true` means dependency checks, independent process initialization, tool discovery, resource reading, and one fictional calculation passed. Copy the returned **`executable` absolute path** into `command` below. This is the Python interpreter with FateBridge installed, independent of a desktop client's PATH or working directory.
+
+#### Codex
+
+Merge this into `~/.codex/config.toml`, replacing the interpreter path. Edit an existing `fatebridge` entry instead of adding a duplicate:
+
+```toml
+[mcp_servers.fatebridge]
+command = "/absolute/path/to/python"
+args = ["-m", "fatebridge.mcp_server"]
+startup_timeout_sec = 30
+tool_timeout_sec = 60
+
+[mcp_servers.fatebridge.env]
+FATEBRIDGE_MCP_FAMILIES = ""
+FATEBRIDGE_MCP_SCENARIOS = ""
+PYTHONUTF8 = "1"
+```
+
+Alternatively, run the `codex.add_command` returned by doctor to register absolute paths automatically. Desktop and terminal installations may use different Codex CLIs; prefer the path doctor identifies. Choose one registration method. See the [Codex guide](docs/codex-guide.md#2-注册到-codex) and [official Codex configuration](https://developers.openai.com/codex/mcp).
+
+#### Claude Desktop / Cursor
+
+Merge this entry into the client's `mcpServers`, preserving other servers and replacing the interpreter path:
+
+```json
+{
+  "mcpServers": {
+    "fatebridge": {
+      "command": "/absolute/path/to/python",
+      "args": ["-m", "fatebridge.mcp_server"],
+      "env": {
+        "FATEBRIDGE_MCP_FAMILIES": "",
+        "FATEBRIDGE_MCP_SCENARIOS": "",
+        "PYTHONUTF8": "1"
+      }
     }
   }
 }
 ```
 
-The returned values mean Geng, Metal, and Yang. Continue exploring tools and input contracts:
+[Claude Desktop](https://modelcontextprotocol.io/docs/develop/connect-local-servers) uses `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS or `%APPDATA%\Claude\claude_desktop_config.json` on Windows. [Cursor](https://cursor.com/docs/context/mcp) uses project-level `.cursor/mcp.json` or user-level `~/.cursor/mcp.json`; also add `"type": "stdio"` inside Cursor's server entry.
+
+A Windows source interpreter might be `C:\path\to\FateBridge\.venv\Scripts\python.exe`; escape backslashes as `\\` in JSON. See [Windows deployment](docs/mcp-deployment.md#windows-powershell) for full PowerShell and configuration examples.
+
+#### Verify the client connection
+
+Reload the MCP connection after saving. If needed, restart the client and open a new chat. Confirm FateBridge tools are available, then try this fictional prompt:
+
+> Use FateBridge to calculate the BaZi chart for a male born in Beijing on May 15, 1990 at 10:30 a.m., Gregorian calendar, local clock time. Explain only the traditional meaning of the day master.
+
+A successful actual tool call completes client setup. A saved configuration or passing doctor check alone does not verify the active chat.
+
+All tools are exposed by default. To narrow the tool scope, set `FATEBRIDGE_MCP_SCENARIOS=onda-shiye` for career consultations, or `FATEBRIDGE_MCP_FAMILIES=fengshui` for the Feng Shui family. Filters intersect; empty values impose no restriction. Restart MCP after changes. Run `fatebridge scenarios` to list scenarios.
+
+### HTTP MCP
+
+URL-capable clients can connect to the same `app` through the FastMCP runner. **This example uses the source installation.** Run from the repository root and keep the process running:
 
 ```bash
-fatebridge discover --family bazi
-fatebridge describe bazi_birth --detail input
+uv run --locked --extra dev fastmcp run src/fatebridge/mcp_server.py:app \
+  --transport http --host 127.0.0.1 --port 8011 --path /mcp
 ```
 
-See [Getting started](docs/getting-started.md) for installation and Windows instructions, environment variables, and ephemeris configuration. Detailed guides and tool output currently use Chinese terminology.
+The MCP URL is `http://127.0.0.1:8011/mcp`. The `fatebridge-mcp` entry point still uses stdio; these HTTP options belong to the [FastMCP runner](https://gofastmcp.com/deployment/running-server). REST on port `8010` and MCP on port `8011` are separate services.
 
-## Connect an agent
+A remote machine can keep its loopback binding and accept connections through an SSH tunnel. See the [MCP deployment guide](docs/mcp-deployment.md#http-与远程部署) for URL configurations, protocol verification, and a persistent-service template. **REST's `FATEBRIDGE_API_KEYS` does not protect MCP.** Public deployment requires separate TLS, MCP authentication, and access controls; this example does not provide tenant isolation.
 
-MCP uses **stdio**, with hosts such as Codex, Claude, or Cursor launching a local subprocess. First check the installation and connection, for example with the career scenario:
+### Onda consultation skills
 
-```bash
-fatebridge doctor --mcp --scenario onda-shiye
-```
+MCP supplies calculation tools; Onda supplies consultation workflows. When you use the source repository as a Codex project, `AGENTS.md` and `.agents/skills/` provide project guidance and skill entry points. Confirm discovery in a new chat. Other clients must load `skills/` through their own skill mechanisms; MCP does not transfer these files. See the [Onda skill index](skills/README.md).
 
-The diagnostic checks dependencies, an independent MCP process, tool discovery, resource reading, and a fictional calculation. Codex users can run the returned `codex.add_command` to register the connection; it uses absolute paths for the current installation. Other hosts can adapt `command`, `args`, and `env` from the returned `codex.config` to their own configuration format.
+## REST API
 
-After registration, confirm that tools are visible in a new chat, then ask in everyday language. For example:
-
-> Use FateBridge to explore my career. I am considering changing jobs and would like to understand which responsibilities might suit me. Use these fictional details: male, born May 15, 1990 at 10:30 a.m. in Beijing, recorded in local clock time using the Gregorian calendar. Analyze 2026 and explain the evidence in plain language.
-
-`--scenario onda-shiye` limits the connection to the career scenario's tool scope. To support other topics, change the scenario or clear the filter and restart the connection. [Onda skills](skills/README.md) organize consultations by life topic, task, and time range; a topic may draw on multiple perspectives, and follow-ups retain relevant results.
-
-See the [Codex guide](docs/codex-guide.md) for registration steps, configuration formats, and conversation examples. For other hosts, see the [Agent integration guide](docs/agent-guide.md#fastmcpagent-host).
-
-## Connect an application
-
-Start a local REST service. The following command is for macOS / Linux; for Windows configuration, see [Getting started](docs/getting-started.md#配置环境变量):
+Start a local service after installation. On macOS / Linux:
 
 ```bash
 API_HOST=127.0.0.1 fatebridge-api
+# Source: API_HOST=127.0.0.1 uv run --locked --extra dev fatebridge-api
 ```
 
-In another terminal, send a request:
+On Windows PowerShell:
+
+```powershell
+$env:API_HOST = "127.0.0.1"
+fatebridge-api
+```
+
+In another terminal, check the service and run the same fictional calculation:
 
 ```bash
-curl http://localhost:8010/health
-
-curl -X POST http://localhost:8010/api/cn/bazi/birth \
+curl --fail http://127.0.0.1:8010/health
+curl --fail http://127.0.0.1:8010/ready
+curl --fail 'http://127.0.0.1:8010/api/cn/bazi/birth?fields=bazi_birth.day_master&strict_fields=true&include_snapshot_text=false' \
   -H 'Content-Type: application/json' \
   -d '{
     "birth_year": 1990, "birth_month": 5, "birth_day": 15,
     "birth_hour": 10, "birth_minute": 30, "gender": "男",
-    "birth_place": "北京", "birth_timezone": "Asia/Shanghai",
-    "use_true_solar_time": true
+    "birth_place": "北京", "birth_timezone": "Asia/Shanghai"
   }'
 ```
 
-`/health` returns `{"status":"healthy"}`. The chart request returns business data under `bazi_birth`, alongside an execution receipt. Open [Swagger UI](http://localhost:8010/docs) in your browser to inspect request schemas and try the API.
+`/health` returns `{"status":"healthy"}`. The calculation returns `bazi_birth.day_master` and `run_metadata`. `/ready` reports required readiness checks, not verification of every algorithm or ephemeris file. Inspect schemas and try requests in [Swagger UI](http://127.0.0.1:8010/docs).
 
-The default bind address is `0.0.0.0`; the command above restricts access to the local machine. When `FATEBRIDGE_API_KEYS` is enabled, business requests must also send `X-API-Key` (the default header name). Configuration and deployment boundaries are covered in [Getting started](docs/getting-started.md#配置环境变量) and the [security policy](SECURITY.md). Python and JavaScript examples are available in the [integration guide](docs/agent-guide.md).
+The default binding is `0.0.0.0:8010`; the examples explicitly restrict it to the local machine. Before shared deployment, set `FATEBRIDGE_API_KEYS=client:replace-with-a-secret`, send `X-API-Key: replace-with-a-secret` on business requests, and provide TLS, access controls, and rate limits at a gateway. Keys do not create user accounts or result ownership boundaries. Operational routes including `/health`, `/ready`, `/metrics`, and API documentation are exempt from authentication; see the [security policy](SECURITY.md#scope-notes).
 
-## Results and reproducibility
+## Configuration, results, and precision
 
-Keep the original input and `run_metadata`, and check the timezone, solar-time policy, analysis time, and engine version. The receipt records calculation assumptions; reproduction also requires matching implementation, data, and runtime environment.
+| Setting | Purpose |
+| --- | --- |
+| `FATEBRIDGE_MCP_FAMILIES` / `FATEBRIDGE_MCP_SCENARIOS` | Filter exposed MCP tools; does not change REST / CLI |
+| `API_HOST` / `API_PORT` | REST bind address and port |
+| `FATEBRIDGE_API_KEYS` / `API_KEY_HEADER_NAME` | REST shared keys; authentication is off by default, default header is `X-API-Key` |
+| `ALLOWED_ORIGINS` | REST browser CORS origins; does not authenticate callers |
+| `SE_EPHE_PATH` | Local ephemeris directory |
+| `LOG_LEVEL` | Logging level, default `INFO` |
 
-- **Request only what you need**: Use `fields` to project results and `strict_fields=true` to reject invalid field paths.
-- **Plan complete exports from the first call**: For complete JSON or a full timeline, set `fields=null` on the first call and keep the default response budget. MCP's default budget is 8192 characters; when exceeded, follow `result_delivery` to read the result from the same run. A summary projection cannot recover fields that were not selected. See [complete-result delivery and same-run export](docs/agent-guide.md#完整结果交付与同次导出).
-- **Judge precision from the actual response**: Core charts support local ephemeris and approximation paths; inspect `chart_profile.ephemeris_model` and `run_metadata.engine_is_approximate`. Western predictive, event, and lifecycle tools report errors when required backend dependencies are missing. Ephemeris data is obtained separately; see [ephemeris data and precision](docs/getting-started.md#星历数据与精度).
+Source API / MCP processes load the repository-root `.env`; existing process variables take precedence. CLI does not automatically load `.env`. For isolated tool installations, inject settings through the launcher or client's `env`. See [Getting started](docs/getting-started.md#配置环境变量) for all variables and ephemeris downloads.
+
+- **Inputs**: Birth interfaces use Gregorian dates. Supply hours, timezone, and location according to each tool's schema; do not replace an unknown birth time with midnight. Chinese birth calculations default to true solar time; core Western charts default to civil time. Retain resolution and precision warnings.
+- **Results**: Check MCP `isError`, REST status codes, or CLI exit codes before reading business data. `fields` accepts dotted paths; `strict_fields=true` rejects invalid paths. REST projection options belong in query parameters, not the JSON body.
+- **Complete exports**: Set `fields=null` on the first call for complete JSON. MCP's default budget is 8192 characters; follow `result_delivery` to read the same run. Fields omitted by the initial projection cannot be recovered later. See [same-run exports](docs/agent-guide.md#完整结果交付与同次导出).
+- **Precision and reproduction**: Keep original inputs and `run_metadata`. External `.se1` ephemeris files are not bundled in the wheel. Inspect `chart_profile.ephemeris_model` and `run_metadata.engine_is_approximate`; an importable dependency alone does not establish that data files were loaded. Reproduction also requires matching implementation, data, and environment; see [ephemeris guidance](docs/getting-started.md#星历数据与精度).
+
+## Troubleshooting
+
+| Symptom | Action |
+| --- | --- |
+| Command not found / GUI launch failure | Run `uv tool update-shell` for tool installs; use doctor's absolute `executable` path in GUI clients |
+| `fatebridge-mcp` waits without output | stdio is waiting for client messages; register it with a client, or use the HTTP runner above |
+| Missing tools or new parameters | Check family / scenario intersection and package path; restart the connection and open a new chat |
+| MCP connection fails at `http://localhost:8010` | This is REST; use `command/args` for stdio or the HTTP MCP `/mcp` URL |
+| `partial`, approximation, or dependency errors | Check actual coverage, precision, inputs, backend dependencies, and ephemeris files |
+
+See [Troubleshooting](docs/troubleshooting.md) for further recovery steps and the [deployment guide](docs/mcp-deployment.md) for MCP verification, upgrades, and removal.
 
 ## Documentation
 
-| Your goal | Read |
-| --- | --- |
-| Install, configure, or troubleshoot | [Getting started](docs/getting-started.md) · [Troubleshooting](docs/troubleshooting.md) |
-| Consult through Codex or connect an agent | [Codex guide](docs/codex-guide.md) · [Agent integration guide](docs/agent-guide.md) |
-| Look up tools, fields, and interface differences | [API reference](docs/api-reference.md) · [Algorithm coverage](docs/algorithm-coverage.md) |
-| Choose tools and skills by question | [Scenario routing](docs/scenario-routing.md) · [Onda skills](skills/README.md) |
-| Understand tools, receipts, and result states | [Core concepts](docs/concepts.md) |
-| Understand domain rules and sources | [BaZi assessment](docs/bazi-assessment.md) · [Feng Shui](docs/fengshui.md) · [Compatibility scoring](docs/compatibility-scoring.md) |
-| Understand architecture, development, or upgrades | [Architecture](docs/architecture.md) · [Development guide](docs/development-guide.md) · [Migration](docs/migration.md) |
+Detailed guides are currently maintained in Chinese; commands and configuration keys are shared across languages.
 
-See the [documentation index](docs/README.md) for all guides and maintenance responsibilities, and [CHANGELOG](CHANGELOG.md) for version changes.
+| Goal | Guide |
+| --- | --- |
+| Install, configure, download ephemeris | [Getting started](docs/getting-started.md) |
+| Deploy local or remote MCP | [MCP deployment](docs/mcp-deployment.md) |
+| Consult through Codex | [Codex guide](docs/codex-guide.md) · [Onda skills](skills/README.md) |
+| Build an application or agent integration | [Integration guide](docs/agent-guide.md) · [API reference](docs/api-reference.md) |
+| Check implementation, methods, precision | [Algorithm coverage](docs/algorithm-coverage.md) · [Core concepts](docs/concepts.md) |
+| Find topic routes, rules, examples | [Scenario routing](docs/scenario-routing.md) · [Examples](docs/examples/README.md) · [Rule documentation](docs/README.md#理解计算与结果) |
+| Develop, migrate, troubleshoot | [Architecture](docs/architecture.md) · [Development](docs/development-guide.md) · [Migration](docs/migration.md) · [Troubleshooting](docs/troubleshooting.md) |
+
+See the full [documentation index](docs/README.md) and [CHANGELOG](CHANGELOG.md).
 
 ## Contributing
 
-Contributions to algorithms, interfaces, tests, documentation, and consultation skills are welcome. Source development uses the locked uv environment; no manual virtual-environment activation is required:
-
-```bash
-git clone https://github.com/thomas-yanxin/FateBridge.git
-cd FateBridge
-uv sync --locked --extra dev
-uv run --locked --extra dev fatebridge list
-```
-
-For documentation-only changes, start with:
+Algorithm fixes, interface improvements, tests, documentation, and skills are welcome. After source installation, verify documentation-only changes with:
 
 ```bash
 uv run --locked --extra dev python scripts/check_docs.py
@@ -186,20 +289,14 @@ uv run --locked --extra dev python -m pytest -q \
   tests/test_doc_tool_counts.py tests/test_scenario_routing_coverage.py
 ```
 
-Code changes also require domain tests and the applicable CI checks; see the [development guide](docs/development-guide.md). For the contribution and PR workflow, see [CONTRIBUTING.md](CONTRIBUTING.md). Report bugs and feature requests through [Issues](https://github.com/thomas-yanxin/FateBridge/issues); report security issues privately as described in [SECURITY.md](SECURITY.md).
+For code changes, run domain tests and applicable CI checks. Use `uv add` / `uv remove` for dependency changes and commit both `pyproject.toml` and `uv.lock`. See [CONTRIBUTING](CONTRIBUTING.md) for development and PR procedures. Report defects through [Issues](https://github.com/thomas-yanxin/FateBridge/issues) with version, OS, minimal fictional input, and actual error. Report security issues privately under [SECURITY.md](SECURITY.md).
 
 ## Scope and license
 
-FateBridge's calculation validation concerns calendar, numerical, and selected-rule consistency. Traditional interpretations and scores are cultural references: scores are not probabilities of real-world success, and passing software tests does not establish predictive validity. Consultations exclude lifespan/death prediction, assertions of disasters, clinical diagnosis or treatment, and medical timing. Traditional health content is not a medical conclusion; see the [consultation boundaries](skills/_shared/safety-boundaries.md).
+Traditional interpretations and scores are cultural references, not real-world success probabilities. Calculation tests check calendar, numerical, and selected-rule consistency; they do not establish predictive validity. Consultations exclude lifespan/death prediction, assertions of disasters, clinical diagnosis/treatment, and medical timing; see [consultation boundaries](skills/_shared/safety-boundaries.md).
 
-The project provides a backend, CLI, and skill materials; integrating applications manage their own frontend and deployment. Code is licensed under [Apache-2.0](LICENSE). Third-party components and sources are listed in [NOTICE](NOTICE); dependencies and ephemeris data retain their own licensing terms.
+Local execution still requires consideration of how agent clients, model providers, chat histories, and exported files handle personal data. Do not commit real birth records or include them in public Issues.
 
----
+Project code is licensed under [Apache-2.0](LICENSE). Third-party components and sources are listed in [NOTICE](NOTICE). Dependencies and ephemeris data retain their own licenses; review these separately before redistribution or commercial integration.
 
-<p align="center">
-  <img src="asserts/fatebridge-logo-square.png" alt="FateBridge Möbius loop logo" width="72" height="72">
-</p>
-
-<p align="center">
-  <a href="#fatebridge">Back to top ↑</a>
-</p>
+[Back to top ↑](#fatebridge)

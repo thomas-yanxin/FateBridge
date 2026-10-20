@@ -309,6 +309,8 @@ console.log(data.wealth_analysis);
 
 ### FastMCP（Agent host）
 
+安装、客户端配置、Windows、HTTP 运行、远程接入与升级见 [MCP 部署指南](mcp-deployment.md)。本节解释本地 stdio 的基础配置及协议合同。
+
 启动：
 
 ```bash

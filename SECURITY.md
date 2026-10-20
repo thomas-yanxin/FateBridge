@@ -12,12 +12,12 @@ On this page: [Supported Versions](#supported-versions) ·
 ## Supported Versions
 
 FateBridge is pre-1.0. Security fixes target the latest released version. The
-current release is `0.1.0`; `0.2.0` entries in the
+current release is `0.1.1`; `0.2.0` entries in the
 [Changelog](CHANGELOG.md) describe earlier, unpublished development work.
 
 | Version | Supported |
 | ------- | --------- |
-| 0.1.0   | Yes       |
+| 0.1.1   | Yes       |
 | Earlier or unpublished development versions | Upgrade to the current release |
 
 If a problem affects an older version, include that version in your report and

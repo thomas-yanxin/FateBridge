@@ -75,6 +75,8 @@ API_HOST=127.0.0.1 API_PORT=8011 python -m fatebridge.api
 
 默认 MCP 是 stdio 进程，不创建 HTTP URL。host 配置应使用已安装本仓库的解释器绝对路径，例如 `/absolute/path/to/FateBridge/.venv/bin/python` 和参数 `-m fatebridge.mcp_server`。不要依赖 GUI host 继承 shell 的环境激活状态。确认 host 的进程日志、解释器和包路径，配置结构见 [接入指南](agent-guide.md#fastmcpagent-host)。
 
+需要 URL 时，使用 [HTTP MCP 部署](mcp-deployment.md#http-与远程部署)中的 FastMCP runner，并通过 MCP Client 验证协议；REST 的 `8010` 地址不提供 MCP。SSH 隧道、Windows 配置和升级步骤同见该指南。
+
 ### 工具已连接但列表不完整
 
 查看 host 启动环境中的 `FATEBRIDGE_MCP_FAMILIES` 与 `FATEBRIDGE_MCP_SCENARIOS`，两者取交集。先用相同筛选运行 doctor，再检查当前连接的 `tools/list` 与场景 `availability`；读取单工具资源不能使隐藏工具恢复公开。扩大范围后重启连接，并在新聊天确认工具列表。

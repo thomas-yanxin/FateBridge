@@ -255,7 +255,7 @@ uv run --locked --extra dev mypy src/fatebridge/
 
 | 变更内容 | 权威信源 | 需要同步的文档 / 生成物 |
 | --- | --- | --- |
-| 安装、版本、入口与运行配置 | `pyproject.toml`、`__init__.py`、`utils/runtime.py`、`.env.example`、入口模块 | 快速入门；README 仅保留最短示例；安全配置还查 `SECURITY.md` |
+| 安装、版本、入口与运行配置 | `pyproject.toml`、`__init__.py`、`utils/runtime.py`、`.env.example`、入口模块 | 快速入门与 MCP 部署指南；中英文 README 保留可完成首次接入的命令和配置；安全配置还查 `SECURITY.md` |
 | 工具、字段、端口名称、公开数量 | `services/catalog/`、请求 / 响应模型、协议注册器、实时发现记录 | API 参考、算法矩阵；受影响的 README、接入例子和技能 |
 | 选法、首轮字段、解读与来源 | 场景 `SKILL.md`、`agents/interface.yaml`、共享字段及规则数据 | 场景路由、技能资料；重建场景 manifest / 调用合同 |
 | 模块职责和数据流 | 实际导入、绑定与执行代码 | 架构说明；已删除入口集中记录到迁移指南 |

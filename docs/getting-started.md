@@ -7,21 +7,21 @@
 | 在终端得到第一个结果 | [安装](#安装) → [选择运行方式](#选择运行方式) |
 | 在应用中调用 HTTP 接口 | [启动 REST](#启动-rest-并检查状态) → [第一条八字请求](#第一条八字请求) |
 | 在 Codex 中用自然语言咨询 | 安装后转到 [Codex 使用指南](codex-guide.md) |
-| 接入其他 MCP host | [MCP 与 CLI](#mcp-与-cli) |
+| 部署本地或远程 MCP、接入其他 host | [MCP 部署指南](mcp-deployment.md) |
 
 字段含义见 [API 参考](api-reference.md)，工具与场景等概念见 [核心概念](concepts.md)。
 
 ## 安装
 
-本页描述当前开发分支。PyPI `0.1.0` 为已发布版本；需要本文最新场景与接口范围时，选择下方源码安装。版本差异见 [CHANGELOG](../CHANGELOG.md#unreleased)，已发布版本的使用说明以对应 Git 标签为准。
+本页描述当前开发分支。下方 PyPI 命令安装最新已发布版本，实际版本可用 `fatebridge doctor` 确认；需要当前分支的场景、技能与接口范围时，选择源码安装。版本差异见 [CHANGELOG](../CHANGELOG.md#unreleased)，已发布版本的使用说明以对应 Git 标签为准。
 
 包管理统一使用 [uv](https://docs.astral.sh/uv/getting-started/installation/)。需要 Python 3.10+；当前 CI 覆盖 3.10–3.13，源码环境默认使用 `.python-version` 中的 Python 3.12。依赖与三个控制台入口由 `pyproject.toml` 声明。从 PyPI 安装独立命令工具：
 
 ```bash
-uv tool install fatebridge==0.1.0
+uv tool install --python 3.12 fatebridge
 ```
 
-该命令会在独立工具环境中提供 `fatebridge`、`fatebridge-api` 和 `fatebridge-mcp`。需要将包安装到已有虚拟环境时使用 `uv pip install fatebridge==0.1.0`。需要修改源码时使用 Git 安装；当前 `src/` 布局不能仅靠切到仓库根目录导入包：
+该命令会在独立工具环境中提供 `fatebridge`、`fatebridge-api` 和 `fatebridge-mcp`；命令找不到时运行 `uv tool update-shell` 并重开终端。需要将包安装到已有虚拟环境时使用 `uv pip install fatebridge`，需要复现特定发布版时加 `==<version>`。需要修改源码时使用 Git 安装；当前 `src/` 布局不能仅靠切到仓库根目录导入包：
 
 ```bash
 git clone https://github.com/thomas-yanxin/FateBridge.git
@@ -172,11 +172,13 @@ export SE_EPHE_PATH=/absolute/path/to/ephe
 通过 `uv tool install` 安装的用户可用独立运行环境下载到同一目录，无需寻找工具环境中的 Python：
 
 ```bash
-uv run --no-project --with fatebridge==0.1.0 python -m fatebridge.fetch_ephe \
+uv run --no-project --with fatebridge python -m fatebridge.fetch_ephe \
   --dest /absolute/path/to/ephe
 ```
 
 在各服务启动前设置 `SE_EPHE_PATH` 指向该目录；上面的 `export` 为 macOS / Linux 写法，Windows PowerShell 使用 `$env:SE_EPHE_PATH="C:\path\to\ephe"`。
+
+需要固定版本时，将 `--with fatebridge` 改为当前服务使用的 `fatebridge==<version>`。
 
 重启服务后检查核心盘的 `chart_profile.ephemeris_model`（如 `swieph`、`jpl`、`moshier`、`mixed`），以及 `run_metadata.engine_is_approximate`。`engine_backend` / `engine_precision` 不能单独证明加载了数据文件。数据路径、版本和算法限制见 [算法覆盖矩阵](algorithm-coverage.md)。
 
@@ -189,7 +191,7 @@ fatebridge-mcp
 # 等价于 python -m fatebridge.mcp_server
 ```
 
-host 应使用已安装 FateBridge 的虚拟环境解释器绝对路径。配置结构见 [接入指南](agent-guide.md#fastmcpagent-host)。
+host 应使用已安装 FateBridge 的虚拟环境解释器绝对路径，可从 `fatebridge doctor --mcp` 的 `executable` 取得。可复制的 Codex / Claude Desktop / Cursor 配置、Windows 路径、HTTP 运行、远程接入与升级步骤见 [MCP 部署指南](mcp-deployment.md)。HTTP 模式由 FastMCP runner 加载应用，REST 端口不是 MCP 地址。
 
 MCP 默认响应预算为 8192 字符，超限时返回 `result_delivery`；需要全文时读取同一次结果。完整 JSON 首次调用不做字段筛选，文件导出方法见 [完整结果交付](agent-guide.md#完整结果交付与同次导出)。三端投影、错误和快照规则查 [API 参考](api-reference.md)。出错时查看 [故障排除](troubleshooting.md)。
 
