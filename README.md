@@ -7,6 +7,10 @@
 </p>
 
 <p align="center">
+  简体中文 · <a href="README.en.md">English</a>
+</p>
+
+<p align="center">
   <a href="https://pypi.org/project/fatebridge/"><img src="https://img.shields.io/pypi/v/fatebridge.svg" alt="PyPI"></a>
   <a href="pyproject.toml"><img src="https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg" alt="Python"></a>
   <a href="https://github.com/thomas-yanxin/FateBridge/actions/workflows/ci.yml"><img src="https://github.com/thomas-yanxin/FateBridge/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
@@ -27,10 +31,9 @@ FateBridge 将八字、紫微、中国占术、西方占星与风水规则组织
 
 ## 核心特性
 
-- **一套计算支持三种入口**：REST、MCP 与 CLI 共用领域服务和工具目录，提供结构化输入、输出与错误信息。
-- **按问题组织 Agent 能力**：Onda 技能覆盖事业、财务、关系、学习等主题，按本轮问题选择依据、时间范围与解读方式，追问复用已有结果。
-- **保留计算口径**：成功结果附带 `run_metadata`，记录版本、有效时间及输入与结果摘要；结合原输入和相同运行环境复算。
-- **适配模型上下文**：用 `fields` 选择需要的字段，用 `strict_fields` 检查路径；超出 MCP 响应预算时，通过 `result_delivery` 读取同一次计算结果。
+- **中西多体系，统一调用**：覆盖八字、紫微、中国占术、西方占星与风水，将不同体系的计算组织成结构化工具，供应用与 AI Agent 使用。
+- **围绕问题组织咨询**：Onda 按事业、财务、关系、学习等主题选择相关方法与时间层，把计算结果联系到具体问题，追问沿用已有相关依据。
+- **开源、本地运行，灵活接入**：通过 MCP 接入 Agent，通过 REST 接入应用，也可直接使用 CLI；支持按需取数与同次结果的完整交付。
 
 ## 支持的能力
 
