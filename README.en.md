@@ -53,12 +53,12 @@ Requires **Python 3.10+** and [uv](https://docs.astral.sh/uv/getting-started/ins
 
 ### Installation
 
-Install the standalone command-line tools from PyPI. The current release is **0.1.0**:
+Install the latest release of the standalone command-line tools from PyPI:
 
-This page describes the current development branch. PyPI `0.1.0` is the published release; see [CHANGELOG](CHANGELOG.md#unreleased) for unpublished changes. To try the latest skills and interfaces, use the [source installation](#contributing).
+This page describes the current development branch; see [CHANGELOG](CHANGELOG.md#unreleased) for unpublished changes. To try the latest skills and interfaces, use the [source installation](#contributing).
 
 ```bash
-uv tool install fatebridge==0.1.0
+uv tool install fatebridge
 ```
 
 Installation provides three commands: `fatebridge`, `fatebridge-api`, and `fatebridge-mcp`. To run the current checkout or modify the code, use the [source installation](#contributing). Onda skills are distributed with the Git repository; the current wheel does not include the skills directory.

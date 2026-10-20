@@ -53,12 +53,12 @@ FateBridge 将八字、紫微、中国占术、西方占星与风水规则组织
 
 ### 安装
 
-从 PyPI 安装独立命令工具，当前版本为 **0.1.0**：
+从 PyPI 安装最新版独立命令工具：
 
-本页描述当前开发分支。PyPI `0.1.0` 是已发布版本，尚未发布的变更见 [CHANGELOG](CHANGELOG.md#unreleased)；体验最新技能与接口范围时，请使用[源码安装](#参与贡献)。
+本页描述当前开发分支，尚未发布的变更见 [CHANGELOG](CHANGELOG.md#unreleased)；体验最新技能与接口范围时，请使用[源码安装](#参与贡献)。
 
 ```bash
-uv tool install fatebridge==0.1.0
+uv tool install fatebridge
 ```
 
 安装后可使用 `fatebridge`、`fatebridge-api` 和 `fatebridge-mcp` 三个命令。需要运行当前仓库或修改源码时，使用[源码安装](#参与贡献)；Onda 技能随 Git 仓库分发，当前 wheel 不包含技能目录。
