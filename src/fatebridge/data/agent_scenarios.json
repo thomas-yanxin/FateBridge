@@ -1,7 +1,7 @@
 {
   "schema_version": "1.1",
   "sources_sha256": {
-    "docs/scenario-routing.md": "541c26d2318788cecd783803ba173527f34fc4fa715e8c1304a5c3bdf82f67f0",
+    "docs/scenario-routing.md": "9adb67bea247320649d778f35f31f00a2afb96057a9281d0b93805359510e8d4",
     "skills/_shared/bazi-topic-evidence.md": "5f3f18fc833e3f57ed750d7fbe249cdd5146120fe024f710b68ed36107fd31a0",
     "skills/_shared/consultation-delivery.md": "4a6f723231a6bf4d2f2ab61310e283e3bde7de9494de6731f929d73aeb73e4cc",
     "skills/_shared/consultation-routing.md": "f9226c03f9607a0b003bb236cacb83a7b97b59158e26975fb392fede992ad984",

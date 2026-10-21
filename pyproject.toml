@@ -9,7 +9,7 @@ name = "fatebridge"
 # Single source of truth: src/fatebridge/__init__.py::__version__. REST (api.py),
 # MCP (mcp_server.py) and the packaging metadata all read that one value.
 dynamic = ["version"]
-description = "FateBridge - A Model Context Protocol (MCP) server bridging ancient Chinese fortune telling wisdom with modern technology"
+description = "Local BaZi, Zi Wei, Western astrology, divination, and Feng Shui calculations for AI applications via MCP, REST API, and CLI"
 authors = [{name = "thomas-yanxin", email = "yx20001210@163.com"}]
 # PEP 639: SPDX expression + explicit license files (LICENSE + NOTICE, the
 # latter required by Apache-2.0 §4d). The old ``License ::`` classifier is

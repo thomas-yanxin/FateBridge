@@ -45,8 +45,10 @@ released, we will credit reporters who wish to be named.
 
 ## Scope Notes
 
-FateBridge is a backend calculation toolkit. Its access controls depend on the
-interface used:
+FateBridge is an open-source toolkit for running Chinese metaphysics and
+astrology calculations in your own environment. Applications and AI clients
+provide the user interface and model conversations. Its access controls depend
+on the interface used:
 
 | Interface | Built-in boundary | Deployment responsibility |
 | --- | --- | --- |

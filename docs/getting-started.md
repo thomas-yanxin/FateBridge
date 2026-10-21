@@ -1,6 +1,8 @@
 # FateBridge 快速入门
 
-本页带你安装 FateBridge、完成第一条计算，并按需要接入 REST 或 MCP。首次体验可只完成[安装](#安装)和[CLI 调用](#选择运行方式)，无需配置服务。所有人物资料均为虚构示例。
+从一条本地计算开始体验 FateBridge：安装后运行虚构请求，查看计算数据与运行回执，再按目标选择应用集成或 AI 助手接入。领域计算在本地完成，自然语言对话由所选客户端与模型提供。
+
+首次体验可只完成[安装](#安装)和[CLI 调用](#选择运行方式)，无需启动服务；后续使用路径见下表。所有人物资料均为虚构示例。
 
 | 你的目标 | 从这里开始 |
 | --- | --- |
@@ -13,7 +15,7 @@
 
 ## 安装
 
-本页描述当前开发分支。下方 PyPI 命令安装最新已发布版本，实际版本可用 `fatebridge doctor` 确认；需要当前分支的场景、技能与接口范围时，选择源码安装。版本差异见 [CHANGELOG](../CHANGELOG.md#unreleased)，已发布版本的使用说明以对应 Git 标签为准。
+下方 PyPI 命令安装最新已发布版本，实际版本可用 `fatebridge doctor` 确认；需要当前开发分支的场景、技能与接口范围时，选择源码安装。版本差异见 [CHANGELOG](../CHANGELOG.md#unreleased)，已发布版本的使用说明以对应 Git 标签为准。
 
 包管理统一使用 [uv](https://docs.astral.sh/uv/getting-started/installation/)。需要 Python 3.10+；当前 CI 覆盖 3.10–3.13，源码环境默认使用 `.python-version` 中的 Python 3.12。依赖与三个控制台入口由 `pyproject.toml` 声明。从 PyPI 安装独立命令工具：
 

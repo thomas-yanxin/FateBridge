@@ -1,6 +1,8 @@
 # Codex 使用 FateBridge
 
-本页带你将本地 FateBridge 注册到 Codex，确认当前聊天已加载工具，并完成一次虚构咨询。本页的项目技能流程使用[源码安装](getting-started.md#安装)，无需启动 REST。仅使用已发布工具的 PyPI 安装、其他 MCP host、Windows 与远程 HTTP 接入见 [MCP 部署指南](mcp-deployment.md)。
+在 Codex 中，可以用日常语言提出事业、关系或学习等问题，由 Codex 调用 FateBridge 计算，并结合 Onda 技能解释依据。从注册本地 MCP 开始，按下面三个步骤完成连接与一次虚构咨询。
+
+配合项目技能体验咨询时，使用[源码安装](getting-started.md#安装)，无需启动 REST。仅使用已发布工具的 PyPI 安装、其他 MCP host、Windows 与远程 HTTP 接入见 [MCP 部署指南](mcp-deployment.md)。
 
 1. [确认安装与接入范围](#1-确认安装与接入范围)：运行 doctor，取得当前解释器的注册命令。
 2. [注册到 Codex](#2-注册到-codex)：保存配置并在新聊天检查工具。

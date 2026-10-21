@@ -1,6 +1,8 @@
 # FateBridge API 参考
 
-本页供实现客户端或排查字段时查阅，覆盖 REST、MCP 与 CLI 的公共合同、请求族、路由映射及响应字段。首次运行请先看[快速入门](getting-started.md)，可复制的客户端代码见[接入指南](agent-guide.md)。
+正确调用一项计算，需要先确认输入要求、公开入口和结果结构。REST、MCP 与 CLI 的公共约定、请求族、路由映射及响应字段集中列在下方，供应用开发者与 Agent 维护者查询，并据此处理精度说明与错误信息。
+
+首次运行请先看[快速入门](getting-started.md)，可复制的客户端代码见[接入指南](agent-guide.md)，按日常问题选择方法见[场景路由](scenario-routing.md)。
 
 当前实际暴露 86 个业务 REST 路由（另含 `/health`、`/ready`、`/metrics` 三个运维端点）和 87 个 FastMCP 工具。两个数字由中央目录派生，并由 `tests/test_doc_tool_counts.py` 锁定。版本之间的准确字段约束以当前服务的 `/openapi.json`、MCP `tools/list` 或 CLI `describe` 为准。
 

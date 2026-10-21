@@ -1,6 +1,8 @@
 # FateBridge 故障排除
 
-本页从现象定位安装、连接、请求与结果问题。先保存原始错误和退出码，再进入对应章节；参数错误应修正输入，依赖错误应修复当前进程环境。接口字段与返回合同见 [API 参考](api-reference.md)，配置见 [快速入门](getting-started.md)。
+安装失败、工具不可见、请求报错或结果不完整时，可先按现象定位问题所在的环节。环境、客户端连接、请求输入与结果交付各有检查方式，修复后再继续计算或咨询。
+
+先保存原始错误和退出码，再进入下表对应章节；参数错误应修正输入，依赖错误应修复当前进程环境。接口字段与返回合同见 [API 参考](api-reference.md)，配置见 [快速入门](getting-started.md)。
 
 ## 按现象定位
 
@@ -26,7 +28,7 @@ uv run --locked --extra dev fatebridge doctor
 
 若问题只出现在 MCP host，再用相同环境运行 `fatebridge doctor --mcp --scenario onda-shiye`，将场景替换为实际范围。这会检查独立 stdio 进程；通过后仍需在 host 的新聊天确认工具已加载。REST 问题还应检查实际端口的 `/health` 与 `/ready`。
 
-本页后面的 `python` / `fatebridge` 简写假设已激活正确环境；源码用户可加 `uv run --locked --extra dev` 前缀。
+下文中的 `python` / `fatebridge` 简写假设已激活正确环境；源码用户可加 `uv run --locked --extra dev` 前缀。
 
 ## 安装和导入
 

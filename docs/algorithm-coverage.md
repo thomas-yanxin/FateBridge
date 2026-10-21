@@ -2,7 +2,9 @@
 
 [文档中心](README.md) · [核心概念](concepts.md) · [API 参考](api-reference.md)
 
-本文档列出当前工具、实际实现范围、精度依赖与未覆盖项目。工具名按 MCP 集合统计；输入参数查 [API 参考](api-reference.md)，按用户问题选工具查[场景路由](scenario-routing.md)。
+一项工具是否适合当前产品或咨询任务，取决于实际计算范围、数据依赖和精度。下表按 MCP 集合逐项列出工具与实现状态，说明可以使用的能力、近似路径与未覆盖内容，便于在接入和解读前核对。
+
+输入参数查 [API 参考](api-reference.md)，按用户问题选工具查[场景路由](scenario-routing.md)。
 
 查找某项能力先看[总览](#1-总览13-个-family--87-个工具)和[工具清单](#2-逐-family-工具清单)；评估结果精度再看[依赖说明](#3-精度与依赖说明)与[快照覆盖](#4-快照协议覆盖)。八字和双人模型的版本分别见[八字判定](bazi-assessment.md)、[双人评分](compatibility-scoring.md)，风水规则见[家居风水](fengshui.md)。
 

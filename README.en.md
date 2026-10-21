@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>Traditional Chinese metaphysics and astrology calculations for applications and AI agents</strong>
+  <strong>Inspectable Chinese metaphysics and astrology calculations for AI applications</strong>
 </p>
 
 <p align="center">
@@ -29,9 +29,11 @@
   <a href="#contributing">Contributing</a>
 </p>
 
-FateBridge is a local calculation toolkit for developers and AI agents. It exposes BaZi, Zi Wei Dou Shu, Western astrology, Chinese divination, and Feng Shui rules through **MCP, REST API, and CLI**. Shared domain calculations return structured data, rule coverage, and execution receipts for integration and inspection.
+FateBridge is an open-source calculation toolkit for developers and AI agents. It brings BaZi, Zi Wei Dou Shu, Western astrology, divination, and Feng Shui into AI applications, providing calculations for exploring personal patterns, career and relationships, life stages, and living or working spaces through traditional cultural frameworks.
 
-The calculation service requires no LLM API key. Natural-language conversations use your chosen agent client and model. This repository provides the backend and Onda consultation skills; applications supply their own frontend.
+Through **MCP, REST API, and CLI**, applications can call shared domain calculations, read structured results, and inspect timing, precision, and rule coverage. Paired with [Onda consultation skills](skills/README.md), agents can select methods and timing layers around everyday questions, keeping calculated facts, traditional interpretation, and practical advice distinct.
+
+The calculation service runs locally and requires no LLM API key. Natural-language conversations use your chosen agent client and model. This repository provides the backend and consultation skills; applications supply their own frontend.
 
 ## Contents
 
@@ -52,20 +54,20 @@ The calculation service requires no LLM API key. Natural-language conversations 
 
 ## Why FateBridge
 
-- **One integration across methods**: Shared input validation, tool catalog, error formats, and execution receipts reduce integration work across calculation systems.
-- **Inspectable results**: Responses retain timing assumptions, precision, rule sources, and coverage limits, with field projection and paged access to the same calculation result.
-- **Run in your own environment**: Use one-shot CLI commands, client-managed MCP processes, or an independent REST service. Installing dependencies and downloading ephemeris data require network access; local calculations do not depend on an online fortune-telling service.
-- **Organize agent work around questions**: Repository-distributed [Onda skills](skills/README.md) guide evidence selection and interpretation for career, finances, relationships, learning, and other topics, separating calculations, traditional interpretation, and practical advice.
+- **Start with the user's question**: Users describe questions such as “What patterns shape how I work?” or “Where might we need to adjust to each other?” and provide what they know. Onda guides agents in selecting evidence, explaining results, and handling follow-up questions; users need not learn tool names or API fields first.
+- **Explain the basis and scope**: Domain engines supply calculation data. Each tool reports timing conventions, precision, rule sources, and coverage as supported. Onda guides interpretation to retain disagreements and unknowns, helping users understand conclusions and developers inspect results.
+- **One integration, several ways to use it**: Connect AI assistants through MCP, integrate products through REST, or run calculations through the CLI. Shared input validation, a tool catalog, and error formats reduce integration and maintenance work across methods.
+- **Run in your own environment**: Once dependencies and ephemeris data are ready, local calculations do not depend on an online fortune-telling service. Use one-shot CLI commands, client-managed MCP processes, or an independent REST service, with your choice of conversation client and model.
 
 ## Capabilities
 
-| Domain | Coverage |
-| --- | --- |
-| BaZi and relationships | Four Pillars charts, nine topic analyses including career and finances, two-person compatibility, lunar-mansion compatibility |
-| Timing and calendars | Luck periods, yearly/monthly/daily/hourly layers, solar terms, lunar calendar |
-| Chinese systems and divination | Zi Wei, Qi Men, Liu Ren, Tai Yi, Jin Kou Jue, Mei Hua, Six Yao, and local techniques |
-| Western astrology | Natal and tradition-specific charts, relationship charts, returns, transits, primary directions, and time-lord techniques |
-| Feng Shui | Eight Mansions, basic Jin Suo sand/water, annual stars, historical Xuan Kong natal charts, layered layout and object review |
+| Domain | Coverage | Uses |
+| --- | --- | --- |
+| BaZi and relationships | Four Pillars charts, nine topic analyses including career and finances, two-person compatibility, lunar-mansion compatibility | Explore personal patterns, career directions, and ways of relating through traditional Chinese frameworks |
+| Timing and calendars | Luck periods, yearly/monthly/daily/hourly layers, solar terms, lunar calendar | Explore life stages and target periods at the granularity supported by the chosen method |
+| Chinese systems and divination | Zi Wei, Qi Men, Liu Ren, Tai Yi, Jin Kou Jue, Mei Hua, Six Yao, and local techniques | Generate charts in a specified system, explore traditional symbolism, or discuss a question when divination is explicitly requested |
+| Western astrology | Natal and tradition-specific charts, relationship charts, returns, transits, primary directions, and time-lord techniques | Explore personal configurations, relationship dynamics, and changes over time through astrology |
+| Feng Shui | Eight Mansions, basic Jin Suo sand/water, annual stars, historical Xuan Kong natal charts, layered layout and object review | Review homes, workstations, and layout options against actual spatial facts and the selected authors' rules |
 
 Current source exposes **86 business REST routes** and **87 FastMCP tools** across **13 families / 87 tools**. The central catalog contains 88 records; the CLI can execute 87. Names and exposed surfaces differ: see [interface boundaries](docs/api-reference.md#24-三端能力边界) and the per-tool [algorithm coverage matrix](docs/algorithm-coverage.md).
 

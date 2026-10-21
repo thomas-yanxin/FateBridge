@@ -2,9 +2,11 @@
 
 [文档中心](README.md) · [API 参考](api-reference.md) · [故障排除](troubleshooting.md)
 
-本页供使用旧版路由、字段或 Python 导入的调用方升级。先用 `fatebridge describe <tool> --detail input`、REST `/openapi.json` 或当前 MCP `tools/list` 核对目标契约；首次接入直接阅读[快速入门](getting-started.md)。具体发布变化见 [CHANGELOG](../CHANGELOG.md)。
+升级已有应用或 Agent 集成时，需要核对旧路由、字段和 Python 导入的替代方式，并比较升级前后的结果与错误行为。迁移表和验证步骤按这些变化组织，方便逐项调整。
 
-本页导航：[升级步骤](#升级步骤) · [入口与模块迁移](#入口与模块迁移) · [请求与响应变化](#请求与响应变化) · [升级后验证](#升级后验证)
+先用 `fatebridge describe <tool> --detail input`、REST `/openapi.json` 或当前 MCP `tools/list` 核对目标契约，再按下方步骤迁移与验证。首次接入直接阅读[快速入门](getting-started.md)，具体发布变化见 [CHANGELOG](../CHANGELOG.md)。
+
+阅读导航：[升级步骤](#升级步骤) · [入口与模块迁移](#入口与模块迁移) · [请求与响应变化](#请求与响应变化) · [升级后验证](#升级后验证)
 
 紫微运限的 `analysis_context` 已纠正为目标时刻回执；依赖旧版出生校正字段的客户端请改读 `birth_context`。请求参数及已有排盘数值不变。新增的运限宫位角色、四化本命关联、事业并列计权及日期锚点字段为附加证据，不表示新增完整旋宫或古典成格算法。连接中的 MCP 进程需重启后才能取得当前实现和新 Schema；已运行的进程不会因本地源文件修改自动升级。
 

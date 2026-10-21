@@ -1,6 +1,10 @@
 # FateBridge 场景路由矩阵
 
-机器入口为 `/api/scenarios`、CLI `scenarios` 与 MCP `fatebridge://scenarios`。维护源为本矩阵与 `skills/onda-*/agents/interface.yaml`；现有九个主题、三个服务、一个全面画像组合入口，加独立 `fengshui` 基础计算场景，共14项。机器发现包含 consultation.kind/topics、当轮范围与共享安全／时间策略。它是发现指引，不是自动执行计划。`engine_tools` 保留直接工具；接口的 `dependencies` 显式声明知识支撑、条件时间服务与组合主题，生成与运行时均校验依赖闭包、未知引用和循环。条件控制使用时机，工具公开不代表本轮必须调用。
+事业方向、关系磨合、学习方式与阶段变化，需要的计算依据各不相同。场景路由将这些日常问题连接到对应的咨询入口，指导 Agent 按结构、双方互动、人生阶段和目标时段选择相关方法。
+
+机器入口为 `/api/scenarios`、CLI `scenarios` 与 MCP `fatebridge://scenarios`。现有九个主题、三个服务、一个全面画像组合入口，加独立 `fengshui` 基础计算场景，共14项。机器发现包含 consultation.kind/topics、当轮范围与共享安全／时间策略，供 Agent 选择所需工具，不会自动执行整个清单。
+
+维护源为本矩阵与 `skills/onda-*/agents/interface.yaml`。`engine_tools` 保留直接工具；接口的 `dependencies` 显式声明知识支撑、条件时间服务与组合主题，生成与运行时均校验依赖闭包、未知引用和循环。条件控制使用时机，工具公开不代表本轮必须调用。
 
 ## 如何使用本页
 
