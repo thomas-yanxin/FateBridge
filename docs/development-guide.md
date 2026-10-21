@@ -308,6 +308,23 @@ CI 的 `locked` 作业检查 `uv.lock` 和文档；全量分支还在该环境�
 
 GitHub Release published 入口继续保留，并要求标签严格匹配 `v<包版本>`；已经由 `master` 自动发布的版本会跳过。两个入口串行执行，检查元数据、JSON 数据、`py.typed` 和安装包运行情况后，通过 PyPI Trusted Publishing 发布。PyPI 的 Trusted Publisher 须匹配仓库实际 owner/name、`publish.yml` 与 GitHub `pypi` environment；若该 environment 设置了人工审批，发布仍需审批。新增数据文件需确认被 `pyproject.toml` 的 package-data 覆盖；场景 `skills/` 目前随 Git 仓库分发，不由 wheel 包含。
 
+新版本的 PyPI 上传成功后，独立的 `github_release` 作业使用 `contents: write` 创建
+`v<包版本>` 标签和 GitHub Release，目标为同一个实际构建并发布的提交；其余作业继续
+保留各自最小权限。已有 Release 保持原样，已有标签须指向该发布提交，否则停止，
+不会移动标签。普通同版本提交跳过同步，不把较新的 master 冒充已发布包的源码。
+Release 自动附加变更记录，并按 GitHub 的版本／日期规则选择 Latest。
+
+若 PyPI 已上传而 GitHub 同步失败，优先在原工作流使用 **Re-run failed jobs**，保留
+成功的检查与上传作业及其输出。完整重跑会因版本已存在而跳过上传和同步。也可先从
+原发布作业的 checkout 日志及 PyPI provenance 核实完整源码 SHA，再用有仓库发布权限
+的 `GH_TOKEN` 或 `GITHUB_TOKEN` 执行以下恢复命令（将版本、SHA 与仓库替换为核实值）：
+
+```bash
+uv run --locked --extra dev python scripts/sync_github_release.py \
+  --version 0.1.1 --sha fee5e5a4373327e65f3b91e002121d49c18ee49c \
+  --repo thomas-yanxin/FateBridge
+```
+
 ## 依赖与运行时注意事项
 
 ### 核心占星盘

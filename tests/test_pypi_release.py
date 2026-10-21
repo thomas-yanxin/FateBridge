@@ -36,7 +36,9 @@ def test_pypi_files_control_build_and_publish(
 
     monkeypatch.setattr(check_pypi_release, "urlopen", request)
     assert check_pypi_release.main() == 0
-    assert release_workspace[1].read_text() == f"should_publish={expected}\n"
+    assert release_workspace[1].read_text() == (
+        f"should_publish={expected}\nversion=0.2.0\n"
+    )
 
 
 @pytest.mark.parametrize("status", [404, 403, 429, 500, 503])
@@ -47,7 +49,9 @@ def test_only_pypi_404_means_a_new_version(release_workspace, monkeypatch, statu
     monkeypatch.setattr(check_pypi_release, "urlopen", request)
     if status == 404:
         assert check_pypi_release.main() == 0
-        assert release_workspace[1].read_text() == "should_publish=true\n"
+        assert release_workspace[1].read_text() == (
+            "should_publish=true\nversion=0.2.0\n"
+        )
     else:
         with pytest.raises(HTTPError):
             check_pypi_release.main()
@@ -146,7 +150,7 @@ def test_workflow_entry_gate(event, conclusion, trigger, branch, same_repo, allo
 
 def test_both_jobs_checkout_the_tested_commit_and_existing_versions_skip_build():
     jobs = WORKFLOW["jobs"]
-    for name in ("check", "build"):
+    for name in ("check", "build", "github_release"):
         checkout = jobs[name]["steps"][0]
         assert checkout["with"]["ref"] == (
             "${{ github.event.workflow_run.head_sha || github.sha }}"
@@ -158,3 +162,25 @@ def test_both_jobs_checkout_the_tested_commit_and_existing_versions_skip_build()
     assert jobs["publish"]["environment"] == "pypi"
     assert jobs["publish"]["permissions"] == {"id-token": "write"}
     assert WORKFLOW["concurrency"]["cancel-in-progress"] is False
+
+
+@pytest.mark.parametrize("new_version", [True, False])
+@pytest.mark.parametrize(
+    "publish_result", ["success", "failure", "skipped", "cancelled"]
+)
+def test_github_release_requires_a_successful_new_pypi_upload(
+    new_version, publish_result
+):
+    job = WORKFLOW["jobs"]["github_release"]
+    needs = SimpleNamespace(
+        check=SimpleNamespace(
+            outputs=SimpleNamespace(should_publish=str(new_version).lower())
+        ),
+        publish=SimpleNamespace(result=publish_result),
+    )
+    assert eval(
+        job["if"].replace("&&", "and"), {"__builtins__": {}}, {"needs": needs}
+    ) is (new_version and publish_result == "success")
+    assert job["needs"] == ["check", "publish"]
+    assert job["permissions"] == {"contents": "write"}
+    assert WORKFLOW["permissions"] == {"contents": "read"}

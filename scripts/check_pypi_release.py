@@ -57,6 +57,7 @@ def main() -> int:
     if output := os.environ.get("GITHUB_OUTPUT"):
         with Path(output).open("a", encoding="utf-8") as stream:
             stream.write(f"should_publish={str(should_publish).lower()}\n")
+            stream.write(f"version={version}\n")
     if summary := os.environ.get("GITHUB_STEP_SUMMARY"):
         with Path(summary).open("a", encoding="utf-8") as stream:
             stream.write(message + "\n")

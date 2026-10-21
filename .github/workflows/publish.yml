@@ -1,6 +1,7 @@
 name: Publish to PyPI
 
-# Publishes new versions after master push CI succeeds, or on a GitHub Release.
+# Publishes new versions after master push CI succeeds, or on a GitHub Release,
+# then creates the matching GitHub tag and Release after the PyPI upload succeeds.
 # PyPI Trusted Publishing must trust this repository, publish.yml and the pypi
 # environment. No API token is needed.
 on:
@@ -31,6 +32,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       should_publish: ${{ steps.version.outputs.should_publish }}
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout the release or CI-tested commit
         uses: actions/checkout@v4
@@ -150,3 +152,32 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+
+  github_release:
+    needs: [check, publish]
+    # Existing PyPI versions must never be tagged at a later master commit.
+    # Failed-job retries retain the successful check/publish outputs.
+    if: needs.check.outputs.should_publish == 'true' && needs.publish.result == 'success'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout the published commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Create the matching tag and GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PACKAGE_VERSION: ${{ needs.check.outputs.version }}
+          PUBLISHED_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: >-
+          python scripts/sync_github_release.py
+          --version "$PACKAGE_VERSION" --sha "$PUBLISHED_SHA"

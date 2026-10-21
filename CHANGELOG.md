@@ -5,16 +5,24 @@ All notable changes to FateBridge are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 The version is single-sourced from `src/fatebridge/__init__.py::__version__`.
-A version bump updates package metadata; PyPI publication is triggered separately
-by a published GitHub Release through `.github/workflows/publish.yml`.
+A version bump updates package metadata. `.github/workflows/publish.yml` publishes
+new versions after master push CI succeeds (or a GitHub Release is published),
+then creates the matching tag and GitHub Release after a successful PyPI upload.
 
 ## [Unreleased]
 
 ### Changed
 
+- PyPI 自动发布成功后同步创建对应提交的 Git 标签与 GitHub Release；重复执行保留
+  已有发布，标签提交不匹配时停止，普通同版本提交不重打标签。
 - 重写中英文 README 的安装与接入路径，补齐 stdio MCP 客户端配置、FastMCP HTTP
   启动、版本与 Onda 技能分发说明；新增 MCP 部署指南，覆盖 Windows、远程接入、
   协议验证、常驻服务及升级停用，并同步相关文档导航。
+
+## [0.1.1] - 2026-10-20
+
+### Changed
+
 - 包版本更新为 `0.1.1`。
 - 修复 Windows 私有文件权限常量与场景文件编码，MCP 安装诊断保留失败阶段及有界子进程日志；
   主分支 push 始终运行全量 CI，避免文档提交掩盖未完成的代码检查。
@@ -225,5 +233,6 @@ engines crashed at runtime after `pip install`).
   transports (FastAPI REST, FastMCP, `fatebridge` CLI) from a single central
   tool catalog. Golden-master numeric locks and a 4-version CI matrix.
 
-[Unreleased]: https://github.com/thomas-yanxin/FateBridge/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/thomas-yanxin/FateBridge/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/thomas-yanxin/FateBridge/releases/tag/v0.1.1
 [0.1.0]: https://github.com/thomas-yanxin/FateBridge/releases/tag/v0.1.0
