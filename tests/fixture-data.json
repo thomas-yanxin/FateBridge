@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "repository": "thomas-yanxin/FateBridge",
+  "source_revision": "2b8a04cec06eb612222ac3abe3683bc6cfce4792",
+  "parts": [
+    {
+      "asset_id": 701506445,
+      "name": "fixture-access-probe.tar.gz",
+      "sha256": "d1334caf3863ebd941fc300b8fe19966337316a0066959cd1c3ef1855c1d7471",
+      "size": 3574,
+      "group": "core"
+    }
+  ]
+}

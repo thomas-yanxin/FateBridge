@@ -55,6 +55,12 @@ jobs:
           uv lock --check
           uv sync --locked --extra dev
 
+      - name: Restore pinned core test data
+        if: needs.scope.outputs.full_tests == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: uv run --locked --extra dev python scripts/restore_test_data.py --core-only
+
       - name: Verify installed commands and real stdio MCP
         if: needs.scope.outputs.full_tests == 'true'
         run: |
@@ -101,6 +107,11 @@ jobs:
 
       - name: Install dependencies
         run: uv pip install --system -e ".[dev]"
+
+      - name: Restore pinned test data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: uv run --locked --extra dev python scripts/restore_test_data.py
 
       - name: Record resolved dependencies
         run: |
@@ -185,6 +196,11 @@ jobs:
       - name: Install dependencies at declared minimums
         run: uv pip install --system --resolution lowest-direct -e ".[dev]"
 
+      - name: Restore pinned test data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: uv run --locked --extra dev python scripts/restore_test_data.py
+
       - name: Record lowest-direct dependencies
         run: |
           uv pip list --system > resolved-dependencies.txt
@@ -243,6 +259,10 @@ jobs:
         uses: astral-sh/setup-uv@v8.2.0
       - name: Install the locked development environment
         run: uv sync --locked --extra dev
+      - name: Restore pinned core test data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: uv run --locked --extra dev python scripts/restore_test_data.py --core-only
       - name: Verify Windows startup and independent stdio MCP
         run: uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye
       - name: Check private storage, kernel locks and transport repairs on Windows
