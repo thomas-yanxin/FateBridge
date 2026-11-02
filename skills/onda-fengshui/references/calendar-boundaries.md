@@ -1,12 +1,12 @@
 # 立春边界与时间政策
 
-[场景技能](../SKILL.md) · [基础规则来源](rule-sources.md) · [独立验收](../../../docs/fengshui-calendar.md)
+[场景技能](../SKILL.md) · [基础规则来源](rule-sources.md) · [独立验收](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-calendar.md)
 
 命卦、年星与历史宅运分别保留所选换年约定；日历计算不证明某个古本统一采用同一换年或定运事件。立春是地心太阳视黄经达到315°的交点，地点不改变同一交点的真实时刻，时区只影响当地日期与钟时标签。不把春节、2月4日午夜、真太阳时或当前年份替代该交点。
 
 有效年明确覆盖时，以已确认有效年为依据；无须交节求解的命卦不补一个时间或时间政策。仅有出生日期时，按既有日期／边界合同处理，不编造小时；近似线性回退的相邻日期仍不能确认跨界一侧。宅盘事件只决定历史宅运；年星查询时刻不改写宅运。
 
-保护区内，唯一有效年与年度有效期为null，模型暂取年仅供追踪，候选年区间另列。历史事件两个候选有效年若同运，可以确定宅运而保留年份待确认；跨运则返回完整候选运区间，不能以暂取年选唯一盘。快照和固定释义同步保留这个区别，字段与虚构示例见[事件有效年分层](../../../docs/fengshui-event-year-fidelity.md)。月层也逐项返回候选节月的有效期与实际交节来源；同年内换月仍保留已确定有效年，详见[月区间分层](../../../docs/fengshui-month-interval-fidelity.md)。
+保护区内，唯一有效年与年度有效期为null，模型暂取年仅供追踪，候选年区间另列。历史事件两个候选有效年若同运，可以确定宅运而保留年份待确认；跨运则返回完整候选运区间，不能以暂取年选唯一盘。快照和固定释义同步保留这个区别，字段与虚构示例见[事件有效年分层](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-event-year-fidelity.md)。月层也逐项返回候选节月的有效期与实际交节来源；同年内换月仍保留已确定有效年，详见[月区间分层](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-month-interval-fidelity.md)。
 
 ## 实际求解与精度
 
@@ -18,11 +18,11 @@
 
 数值模型的五秒边界保护与精度验收分开：年界的 `boundary_resolution.uncertainty_reason`、月界的 `precision_policy.boundary_model_policies`、宅运的 `confirmation_reason` 及日期命卦的 `boundary_precision_policy` 必须保留实际模型原因。保护范围内保留候选，不把它解释为误差上界或已经通过一秒门槛；不编造出生小时。线性回退仍按相邻日期政策处理，不借残留模型字段冒充数值求解。无需求交点的已确认有效出生年命卦不新增这些观测。
 
-需取得完整数据时用[安装配置](../../../docs/fengshui-ephemeris-setup.md)。逐文件身份、实际返回模型与独立天文门槛分别验收；仅安装成功不能升级现实预测或古典断语的证据等级。
+需取得完整数据时用[安装配置](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-ephemeris-setup.md)。逐文件身份、实际返回模型与独立天文门槛分别验收；仅安装成功不能升级现实预测或古典断语的证据等级。
 
-最新[独立24节气比对](../../../docs/fengshui-all-terms-calendar.md)覆盖1784–2204年10,104个TT交点，默认DE440原始根及输出钟时回算均在固定1秒门槛内。原421项立春及4,812项十二节协议保留，Moshier全量控制仍有1,196项失败。接近交界时，依据同次实际模型、保护原因和全部候选解释；五秒保护不表示已获绝对精度认证。TT软件相合不认证实际UTC钟时、原典日时选表或风水现实效果。
+最新[独立24节气比对](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-all-terms-calendar.md)覆盖1784–2204年10,104个TT交点，默认DE440原始根及输出钟时回算均在固定1秒门槛内。原421项立春及4,812项十二节协议保留，Moshier全量控制仍有1,196项失败。接近交界时，依据同次实际模型、保护原因和全部候选解释；五秒保护不表示已获绝对精度认证。TT软件相合不认证实际UTC钟时、原典日时选表或风水现实效果。
 
-上述Moshier数字属于实际运行该模型的控制记录，不能赋给自动模式或其他具名模型。旧Swiss、解析、SPK及严格JPL路线也按自己的参考、范围和门槛验收。[第二十二轮边界核验](../../../docs/fengshui-model-boundary-fidelity.md)保留当时修复范围，不追授新版模型、全本原典或现实预测成绩。
+上述Moshier数字属于实际运行该模型的控制记录，不能赋给自动模式或其他具名模型。旧Swiss、解析、SPK及严格JPL路线也按自己的参考、范围和门槛验收。[第二十二轮边界核验](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-model-boundary-fidelity.md)保留当时修复范围，不追授新版模型、全本原典或现实预测成绩。
 
 ## TT、历史UT1与未来UTC
 

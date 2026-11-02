@@ -382,4 +382,4 @@ python3 -m fatebridge.cli --no-metadata fengshui_annual_stars --effective-year 2
 fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json --compact
 ```
 
-太乙 `calculation_mode=day` 明确采用金钥匙积日法，见 [日计依据](../../docs/taiyi-day.md)。先设day再取 `daily_calendar` / `daily_essences`，零时日界不可套时计23时子初；天时和太乙数宫位未知、正文/课式异数需忠实解释。返回分页时读同一run载荷及哈希，不凭被延后字段作否定。
+太乙 `calculation_mode=day` 明确采用金钥匙积日法，见 [日计依据](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-day.md)。先设day再取 `daily_calendar` / `daily_essences`，零时日界不可套时计23时子初；天时和太乙数宫位未知、正文/课式异数需忠实解释。返回分页时读同一run载荷及哈希，不凭被延后字段作否定。

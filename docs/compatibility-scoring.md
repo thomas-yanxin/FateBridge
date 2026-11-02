@@ -7,7 +7,7 @@
 双人综合分使用 `compatibility_weighted_rules_v2`，将五项规则分数按关系类型加权。它表示模型内部的结构评价，不是现实关系的成功概率；其他关系技法的评分不适用这套权重。
 
 个人层取用现为`source_conditions_before_preference_v2`：旧共现首候选不再越级授予全局喜用，
-详见[月令与取用条件](bazi-month-paths.md)。示例账本保留此前全部版本及原始文件，
+详见[月令与取用条件](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-month-paths.md)。示例账本保留此前全部版本及原始文件，
 另立共享v5方法回执与新取用策略记录。该对示例的数值项不变；
 这不表示其他输入的个人取用或合盘分数不变，也没有为维持总分调整关系权重。
 

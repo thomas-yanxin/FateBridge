@@ -276,7 +276,7 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             "legacy_raw_difference_is_adjudicated_calendar_error": False,
             "source_integer_encoding_and_epoch_adjudicated": False,
             "meaning": "Old raw differences retain their supplied offsets. Completed days and a day number must be normalized together with the day label before identifying a calendar error.",
-            "guide": "docs/taiyi-day-count-encodings.md",
+            "guide": "https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-day-count-encodings.md",
         },
         "key_jishen_deductive_controls": jishen_controls,
         "key_jishen_historical_yin_examples": 0,

@@ -10,19 +10,19 @@
 
 验收路径上下文复核（本地数据：`validation/human-design-evaluation-path-context-v2/README.md`）进一步绑定显式相对路径的原始解析目录，避免源码快照或模型临时目录改变实际星历选择。原路径列表与JPL文件名保持原值，MCP从冻结源码的绝对脚本入口启动，防止数据目录里的同名Python包抢先导入。旧版记录不补造工作目录依据；路径声明、实际后端、源码绑定和物理准确度分别验证。
 
-[激活门与中心语境复核](human-design-gate-activation-context.md)区分activated、定义中心内的active和未定义中心内的dormant，同时保留公开资料对悬挂门的宽窄口径。完整结果逐一绑定实际联合见证，旧结果按明确契约兼容且不补发新增认证；原有数值、说明和失败案例保留。
+[激活门与中心语境复核](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/human-design-gate-activation-context.md)区分activated、定义中心内的active和未定义中心内的dormant，同时保留公开资料对悬挂门的宽窄口径。完整结果逐一绑定实际联合见证，旧结果按明确契约兼容且不补发新增认证；原有数值、说明和失败案例保留。
 
-[周期参考时刻小数单位复核](human-design-reference-fraction-precision.md)修复小数小时／分钟被误读为小数秒，以及字符串固定位置触发的闰秒误识别。保留原126项独立民用参考、原错误回执、全部旧案例和专业验收标准。
+[周期参考时刻小数单位复核](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/human-design-reference-fraction-precision.md)修复小数小时／分钟被误读为小数秒，以及字符串固定位置触发的闰秒误识别。保留原126项独立民用参考、原错误回执、全部旧案例和专业验收标准。
 
-[逐年采样与太阳遮掩视位置复核](human-design-calendar-span-precision.md)在原参考之外固定1200个出生TT，发现一个所选Swiss后端超差点，定位到太阳盘内的引力偏折约定分歧。原失败及原门槛保留；完整年代验收仍未通过。
+[逐年采样与太阳遮掩视位置复核](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/human-design-calendar-span-precision.md)在原参考之外固定1200个出生TT，发现一个所选Swiss后端超差点，定位到太阳盘内的引力偏折约定分歧。原失败及原门槛保留；完整年代验收仍未通过。
 
 ## 计算口径
 
 输入公历年月日、当地出生小时／分钟及明确时区；日期范围1800–2399，不自动转换历史儒略历。秒省略为0，仅表示采用记录分钟的起点。时区支持 IANA 或明确偏移，拒绝夏令时不存在／未消歧的重复时刻。无需经纬度：地心黄经不使用地表位置、宫制或上升，也不作真太阳时重定时。
 
-十进制小时偏移先精确计算，再按最近微秒取偶转换；确实量化时回显0.5微秒输入误差上界。亚秒UTC偏移在原生进程、周期输入排序及完整解释重放中保持一致。原先整秒舍入的24项独立有限案例和初版共享回归失败均保留，详见[十进制时区精度复核](human-design-decimal-offset-precision.md)；这不改变完整历法、原典及现实预测的未验收状态。
+十进制小时偏移先精确计算，再按最近微秒取偶转换；确实量化时回显0.5微秒输入误差上界。亚秒UTC偏移在原生进程、周期输入排序及完整解释重放中保持一致。原先整秒舍入的24项独立有限案例和初版共享回归失败均保留，详见[十进制时区精度复核](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/human-design-decimal-offset-precision.md)；这不改变完整历法、原典及现实预测的未验收状态。
 
-[闰秒小数标签复核](human-design-fractional-leap-precision.md)进一步覆盖全部27次已公布正闰秒的135个既有合法输入：主盘保留经日历表确认的原始UTC标签，实际浮点TT的逆算显示另按原观测保留，完整解释核验不再把两者混用。保留原先9微秒错误标签的误通过回执，并核对同一浮点TT上的周期先后；它不认证微秒级天文精度或真实地方钟。
+[闰秒小数标签复核](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/human-design-fractional-leap-precision.md)进一步覆盖全部27次已公布正闰秒的135个既有合法输入：主盘保留经日历表确认的原始UTC标签，实际浮点TT的逆算显示另按原观测保留，完整解释核验不再把两者混用。保留原先9微秒错误标签的误通过回执，并核对同一浮点TT上的周期先后；它不认证微秒级天文精度或真实地方钟。
 
 由民用 UTC 经公共时间层转换 TT，以 [Swiss Ephemeris](https://www.astro.com/swisseph/swephprg.htm)计算视位置、回归黄道、当日黄道坐标。返回每颗星实际 `return_flags` 和后端：无数据文件时可使用并明确标注 Moshier；`require_swiss_files=true` 时拒绝此降级。Swiss 不可用或星体返回异常时直接报错，不套粗略轨道替代。
 
@@ -261,7 +261,7 @@ uv run --locked --extra dev fatebridge human_design \
 
 本命固定采用[官方公开的同门／谐振门规则](https://jovianarchive.com/blogs/chart-interpretations-components/line-fixing-in-human-design-exaltation-detriment-and-juxtaposition)：指定星体可直接激活本线、同门的其他线或通道另一端，且须保留两侧每个实际触发位置。两极同时有触发则返回 `juxtaposition`，不以顺序覆盖。该公开文章署名Ryan Hanna，不能当作2001年原书逐线解释。极性不是优劣或能力分数，也不等同于西占的行星星座尊贵。官方乔布斯示例盘中的5个箭头仍保留原样验收，包括同门其他线和谐振门触发。
 
-[署名资料复核](human-design-primary-fixing-source-audit.md)另以IHDS2024年Lynda Bunnell说明核对两项11.4星体事实及14项披露的开发组合，保留原2001正文附加金星依据；公开Ra音频只作为带散列和时间位置的待复核线索。它不认证全部384线，也不改变既有失败和验收标准。
+[署名资料复核](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/human-design-primary-fixing-source-audit.md)另以IHDS2024年Lynda Bunnell说明核对两项11.4星体事实及14项披露的开发组合，保留原2001正文附加金星依据；公开Ra音频只作为带散列和时间位置的待复核线索。它不认证全部384线，也不改变既有失败和验收标准。
 
 规则集1.19.0修复了交点接受固定的缺口。[1997年6月30日通讯](https://humandesignsystem.com/archive/newsletters/0402.pdf)第2页Martin Grassinger的文章说交点不固定其他线，限制的是主动固定角色；不能由此推出交点位置不能接受行星固定。这段话此前误注为Ra，现已纠正。原有19份官方PDF中有11个交点位置带可见极性标记，例如1971年样本的设计北交点55.2，由人格地球39.1在谐振门触发下降极性。现在交点作为接受位置参与计算，仍不充当固定星体。
 
@@ -464,11 +464,11 @@ uv run --locked --extra dev fatebridge human_design \
 
 ## 复核与维护
 
-太阳附近的视位置约定、同次原生坐标及名义圆盘投影，见[视位置与解释依据](human-design-apparent-position-evidence.md)。该扩展保留原天文超差、原典分歧和全部未完成验收状态。
+太阳附近的视位置约定、同次原生坐标及名义圆盘投影，见[视位置与解释依据](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/human-design-apparent-position-evidence.md)。该扩展保留原天文超差、原典分歧和全部未完成验收状态。
 
-[基础／过渡角色分区](human-design-profile-partition.md)将实际日地角色与精确回退 88° 的理想分区分别记录，保留求根边界差别；新增证据视图、来源和解释均从同一完整计算包核验。本轮记录（本地数据：`validation/human-design-profile-continuation-v1/README.md`）保留 96/768 个官方组合、69 个名称失败和 Linux 旧凭据跨平台重放失败，未将冻结快照的 2457 项通过等同于完整专业验收。
+[基础／过渡角色分区](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/human-design-profile-partition.md)将实际日地角色与精确回退 88° 的理想分区分别记录，保留求根边界差别；新增证据视图、来源和解释均从同一完整计算包核验。本轮记录（本地数据：`validation/human-design-profile-continuation-v1/README.md`）保留 96/768 个官方组合、69 个名称失败和 Linux 旧凭据跨平台重放失败，未将冻结快照的 2457 项通过等同于完整专业验收。
 
-[跨平台投影算术](human-design-portable-projection.md)进一步以整数区间确定新回执的规范化 binary64 投影值和原有分类，完成新回执在 macOS / Linux 的双向严格重放。旧格式 24 份跨平台失败、原天文超差和原典要求继续保留。2470 项冻结回归通过只对应已声明的人类图及交付范围，不代表专业目标已完成。
+[跨平台投影算术](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/human-design-portable-projection.md)进一步以整数区间确定新回执的规范化 binary64 投影值和原有分类，完成新回执在 macOS / Linux 的双向严格重放。旧格式 24 份跨平台失败、原天文超差和原典要求继续保留。2470 项冻结回归通过只对应已声明的人类图及交付范围，不代表专业目标已完成。
 
 最终源码与 CI 复核（本地数据：`validation/human-design-portable-projection-ci-v1/README.md`）另保留格式、类型与生成器身份整理后的 2470 项回归、同一最终 wheel 的双向接口重放及全部旧拒绝。官方角色核对扩至 192/768，4992 门爻、192 份结构及当前固定模板一致；135 个名称失败、576 个缺项保留。全仓库 Black／isort／mypy 仍未通过，原 38 项标准仍有 4 失败、3 未完成。
 
@@ -517,11 +517,11 @@ uv run --locked --extra dev python scripts/build_human_design_depth_reference.py
 
 第二条需先自行取得上述原典PDF并安装 `pdftotext`。提取器保存数值事实与来源定位，不保存384线正文；不能先改冻结参考再宣称独立验收。当前人类图黄金快照已在Linux x86_64 / Python3.12.3参考进程核对；其回归字节一致不替代独立天文或完整专业验收。
 
-真实模型解释另有[8题开发验收记录](human-design-semantics-evaluation.md)：同一套预先固定标准下，桌面内置CLI完成8题，24条人工语义复核通过，141个原答单元及实际同run证据完整保留。旧PATH运行环境的两次失败及各7个未运行案例仍在原始记录中；它们没有被重新评分为通过。此开发样本没有独立留出集，人工判断也没有独立裁判认证；原38项要求中的完整模型忠实性只推进为未完成。投影文件、实际观察到的输出、完整业务盘和任意模型自由文本的验收范围分别保留，不能用字段或哈希绑定制造满分。
+真实模型解释另有[8题开发验收记录](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/human-design-semantics-evaluation.md)：同一套预先固定标准下，桌面内置CLI完成8题，24条人工语义复核通过，141个原答单元及实际同run证据完整保留。旧PATH运行环境的两次失败及各7个未运行案例仍在原始记录中；它们没有被重新评分为通过。此开发样本没有独立留出集，人工判断也没有独立裁判认证；原38项要求中的完整模型忠实性只推进为未完成。投影文件、实际观察到的输出、完整业务盘和任意模型自由文本的验收范围分别保留，不能用字段或哈希绑定制造满分。
 
-本轮[时区来源复核](human-design-timezone-source-evaluation.md)修复缓存规则与后读文件指纹不一致、以及冷启动缺失数据误报用户错误的问题。来源变化时拒绝计算，不静默重载后继续混用；18组提前冻结的正常完整结果保持一致。完整历法及原典验收门槛继续保留。
+本轮[时区来源复核](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/human-design-timezone-source-evaluation.md)修复缓存规则与后读文件指纹不一致、以及冷启动缺失数据误报用户错误的问题。来源变化时拒绝计算，不静默重载后继续混用；18组提前冻结的正常完整结果保持一致。完整历法及原典验收门槛继续保留。
 
-[参考目录来源视图](human-design-reference-snapshots.md)进一步将12份运行时事实目录的实际字节、解析值和指纹绑定，并在计算及完整解释核验中复核。原来6/2角色解释使用旧目录却引用新文件指纹的反例已保留；未核对的冷启动文件、目录中途变化及内存改写均拒绝。原14份参考、数值门槛及所有原典分歧继续保留，来源身份核验不替代完整线义或出版方母版认证。
+[参考目录来源视图](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/human-design-reference-snapshots.md)进一步将12份运行时事实目录的实际字节、解析值和指纹绑定，并在计算及完整解释核验中复核。原来6/2角色解释使用旧目录却引用新文件指纹的反例已保留；未核对的冷启动文件、目录中途变化及内存改写均拒绝。原14份参考、数值门槛及所有原典分歧继续保留，来源身份核验不替代完整线义或出版方母版认证。
 
 2026-10-25从IHDS当前页面新生成的公开链接重新下载后，确认PDF与此前Jovian预览逐字节相同（10页，SHA256为`5bbc572b33609ee1f23e33ee7a36645ddc565da9f256635a95043295369a33e6`）；这不增加原典页覆盖或独立教材内容。下载身份与初次失败均保留在本轮证据（本地数据：`validation/human-design-cycle-origin-v2/evidence/preview-identity.json`）。
 

@@ -21,7 +21,7 @@ uv run --locked --extra dev python scripts/evaluate_agent.py --output /tmp/fateb
 
 德国中点与 13 等分盘另有 5 个虚构用例（本地数据：`../tests/fixtures/agent_behavior/other_chart_cases.json`）：原文解释的生时条件、指定时刻推运 MC、假设天体与重复证据的错误前提、13 分区的跨界和天文星座区别、完整同 run 文件交付。全部为**单轮用例**，不冒充跨轮验收；评分标准在运行前保留于文件中。时间参数按实际时刻比较，等价时区偏移不判错；完整导出只允许一次成功排盘，合法失败后的恢复不计成重复成功。
 
-梅花另有[10个解释忠实度诊断案例](meihua-semantics-evaluation.md)。`--prepare-only` 只冻结材料与真实MCP参照，不启动模型；获授权的模型运行可为指定案例留存实际MCP回执与同run分页，机械通过和人工语义审阅继续分开。
+梅花另有[10个解释忠实度诊断案例](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/meihua-semantics-evaluation.md)。`--prepare-only` 只冻结材料与真实MCP参照，不启动模型；获授权的模型运行可为指定案例留存实际MCP回执与同run分页，机械通过和人工语义审阅继续分开。
 
 ```bash
 uv run --locked --extra dev python scripts/evaluate_agent.py \
@@ -54,8 +54,8 @@ uv run --locked --extra dev python scripts/evaluate_agent.py \
 
 官方依据：[技能测试](https://developers.openai.com/plugins/build/skills#test-the-skill)、[Agent 评测](https://developers.openai.com/api/docs/guides/agent-evals)。`strict_fields` 检查输出投影路径，不能当成 [OpenAI function calling strict 模式](https://developers.openai.com/api/docs/guides/function-calling#strict-mode)。
 
-太乙与三式另有[13个解释忠实度案例](taiyi-semantics-evaluation.md)，含52条预先固定语义要求，覆盖实际四计、来源差异、三值条件、天地盘推步、合参和完整同run交付。一个历史配置范围外案例按`expected_tool_errors`登记准确类型和值；`--prepare-only`可留存真实预期拒绝并继续其他参照，不将报错伪装成成功盘。常规工具错误仍失败，预期拒绝的空答、错误原因不符、回退成功或超过`max_total_calls`也失败。新评测说明及判据不进入模型工作目录；准备和真实模型评分仍分开。
+太乙与三式另有[13个解释忠实度案例](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-semantics-evaluation.md)，含52条预先固定语义要求，覆盖实际四计、来源差异、三值条件、天地盘推步、合参和完整同run交付。一个历史配置范围外案例按`expected_tool_errors`登记准确类型和值；`--prepare-only`可留存真实预期拒绝并继续其他参照，不将报错伪装成成功盘。常规工具错误仍失败，预期拒绝的空答、错误原因不符、回退成功或超过`max_total_calls`也失败。新评测说明及判据不进入模型工作目录；准备和真实模型评分仍分开。
 
-评分规则按运行前用例合同分版本：未声明`expected_tool_errors/max_total_calls`的旧用例继续由冻结的`grade/observations`执行；已声明者使用独立命名的拒绝规则。实际入口`grade_case`按声明分发，新记录保存`grading_policy`，不能按结果是否通过选择规则。八字33份原成绩及三函数AST保持，预声明拒绝规则和原测试断言也保留，见[版本隔离审计](bazi-grader-policy-audit.md)。
+评分规则按运行前用例合同分版本：未声明`expected_tool_errors/max_total_calls`的旧用例继续由冻结的`grade/observations`执行；已声明者使用独立命名的拒绝规则。实际入口`grade_case`按声明分发，新记录保存`grading_policy`，不能按结果是否通过选择规则。八字33份原成绩及三函数AST保持，预声明拒绝规则和原测试断言也保留，见[版本隔离审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-grader-policy-audit.md)。
 
-西方占星另有[八个解释忠实度诊断](western-semantics-evaluation.md)，预先固定44条人工要求。准备仅捕获参照，不启动模型；必须核对未来模型实际读到的同run回执。Marks双方个人盘、来源拒绝与末端缺失事件、历法／闰秒、宗派／行星时以及象征推运均分别验收。
+西方占星另有[八个解释忠实度诊断](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/western-semantics-evaluation.md)，预先固定44条人工要求。准备仅捕获参照，不启动模型；必须核对未来模型实际读到的同run回执。Marks双方个人盘、来源拒绝与末端缺失事件、历法／闰秒、宗派／行星时以及象征推运均分别验收。

@@ -118,7 +118,7 @@ MCP 默认通过标准 `tools/list` 公开全部工具。host 可设置 `FATEBRI
 - `validation_error`：领域计算参数错误返回 400；模型字段缺失、类型/范围/枚举错误、未知字段、完整公历日期无效返回 422；REST 非法 JSON 也返回 422
 - `authentication_required`：缺少或无效 API key（仅在配置了密钥时），REST 返回 401
 - `dependency_missing`：运行依赖缺失（例如西占 backend 不可用），REST 返回 503
-- `fengshui_calculation_inconsistent`：玄空内部数字或飞行记录矛盾，REST返回503且不可重试；停止解释，不用修改用户事实或挑选其余候选绕过，见[异常盘处理](fengshui-source-comparison.md#计算盘异常会停止交付)
+- `fengshui_calculation_inconsistent`：玄空内部数字或飞行记录矛盾，REST返回503且不可重试；停止解释，不用修改用户事实或挑选其余候选绕过，见[异常盘处理](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-source-comparison.md#计算盘异常会停止交付)
 - `internal_error`：服务内部异常，REST 返回 500
 - `timeout`：计算超时，REST 返回 504；是否重试以 `retryable` 为准
 

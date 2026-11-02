@@ -4,24 +4,24 @@
 
 读取时先核对模型和状态，再进入相应解释层；结构计数、有效力量与喜用候选分别承担不同含义，不能互相替代。
 
-交节来源另见[分钟判定与JPL SPK](bazi-spk-solar-audit.md)：一秒交点误差门槛不保证所有分钟输入换月正确；显式SPK路径保留实际文件、时标与有限对照范围，不改旺衰和取用算法。
+交节来源另见[分钟判定与JPL SPK](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-spk-solar-audit.md)：一秒交点误差门槛不保证所有分钟输入换月正确；显式SPK路径保留实际文件、时标与有限对照范围，不改旺衰和取用算法。
 
-后续源码接入[随包DE440默认交节](bazi-de440-default-audit.md)，把原始轨道系数用于默认计算，保留旧解析与原生对照。完整交点与分钟队列的通过只认证对应历法组件；原典26个不同输入分歧和全部解释、现实验证缺口继续保留。
+后续源码接入[随包DE440默认交节](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-de440-default-audit.md)，把原始轨道系数用于默认计算，保留旧解析与原生对照。完整交点与分钟队列的通过只认证对应历法组件；原典26个不同输入分歧和全部解释、现实验证缺口继续保留。
 
-[出生秒数与输入分量](bazi-birth-seconds-audit.md)补齐已知整秒的传递，并区分显式00分／秒与兼容默认值。省略分量不代表真实生时精确，也不自动生成误差区间。
+[出生秒数与输入分量](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-birth-seconds-audit.md)补齐已知整秒的传递，并区分显式00分／秒与兼容默认值。省略分量不代表真实生时精确，也不自动生成误差区间。
 
-[出生重复钟时与已知UTC偏移](bazi-birth-fold-audit.md)补齐八字与时运入口的重复钟时消歧；偏移须符合已解析的时区规则，后续交运保留原地区时区。未知偏移不猜选，跳过钟时继续拒绝。
+[出生重复钟时与已知UTC偏移](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-birth-fold-audit.md)补齐八字与时运入口的重复钟时消歧；偏移须符合已解析的时区规则，后续交运保留原地区时区。未知偏移不猜选，跳过钟时继续拒绝。
 
-[派生秒数与漏采事件](bazi-derived-clock-audit.md)修复历史偏移变更后范围样本被重新归零的问题。原始秒数仍可未知；连续范围内的中间候选和完整交运极值尚待完成，不由逐分钟结果代替。
+[派生秒数与漏采事件](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-derived-clock-audit.md)修复历史偏移变更后范围样本被重新归零的问题。原始秒数仍可未知；连续范围内的中间候选和完整交运极值尚待完成，不由逐分钟结果代替。
 
 [文档中心](README.md) · [能力覆盖](algorithm-coverage.md) · [双人评分](compatibility-scoring.md)
 
 综合与九专题的星位、根气、格局前提、运年触点及剩余盲区见
-[八字深化审查](bazi-depth-audit.md)。新证据链补充逐项核对，不替换本页旺衰权重或宣称原典验收已通过。
-所选月令、生克合路径及事业日支漏计修正见[原典路径审计](bazi-classical-routes-audit.md)。
-通关位置、日支藏印与一杀四制的数量单位见[通关与实数对照](bazi-passage.md)。
-天干合绊的完整精度修复及未通过的成化候选见[天干计力审查](bazi-stem-energy.md)。
-五行知识的原典分类、数字与现代类比见[限域编释](bazi-knowledge-curation.md)；出现量和旺衰标签不测量智力、品德或身体状态。最新完整能量诊断（本地数据：`validation/bazi-element-knowledge-audit-v1.md`）保留全部349份旧回执，简单删除印支持或季相乘数仍不能解决官制刃反例，未改变生产判级。
+[八字深化审查](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-depth-audit.md)。新证据链补充逐项核对，不替换本页旺衰权重或宣称原典验收已通过。
+所选月令、生克合路径及事业日支漏计修正见[原典路径审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-classical-routes-audit.md)。
+通关位置、日支藏印与一杀四制的数量单位见[通关与实数对照](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-passage.md)。
+天干合绊的完整精度修复及未通过的成化候选见[天干计力审查](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-stem-energy.md)。
+五行知识的原典分类、数字与现代类比见[限域编释](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-knowledge-curation.md)；出现量和旺衰标签不测量智力、品德或身体状态。最新完整能量诊断（本地数据：`validation/bazi-element-knowledge-audit-v1.md`）保留全部349份旧回执，简单删除印支持或季相乘数仍不能解决官制刃反例，未改变生产判级。
 
 | 要核对什么 | 阅读位置 |
 | --- | --- |
@@ -35,14 +35,14 @@
 `day_master.strength` 仍返回 `强 / 中和 / 弱`，底层现为
 `season_root_revelation_relations_v7`，已替换旧版计数加月令2分的判级。
 专项分析及 REST、MCP、CLI 均读取这一判级。实现见 [`core/strength.py`](../src/fatebridge/core/strength.py)。
-v3按所选原典区别四墓土冲动与一般冲克，参数及强弱阈值未为本次命例调优，见[四墓土冲动审计](bazi-storage-movement.md)。
+v3按所选原典区别四墓土冲动与一般冲克，参数及强弱阈值未为本次命例调优，见[四墓土冲动审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-storage-movement.md)。
 v4补上庚巳、壬申等实际阳长生重根在结构规则中的资格，逐柱记录原始根量、
-剩余根量及是否计入；数值预算、参数和覆盖规则门槛保持原值，见[结构根资格审计](bazi-root-qualification.md)。
+剩余根量及是否计入；数值预算、参数和覆盖规则门槛保持原值，见[结构根资格审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-root-qualification.md)。
 v5修复同一完整会合局的重复支被误判为竞争局，并将真实藏干通根与合成贡献分开。
-逐藏干剩余账本也分别供应身、印等角色核对，见[同局重支与实际根量](bazi-complete-bureaus.md)。
+逐藏干剩余账本也分别供应身、印等角色核对，见[同局重支与实际根量](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-complete-bureaus.md)。
 v6修复合绊扣减使用展示取整值的问题，改用完整精度并提供逐干能量账本；
 权重、阈值未调整，未启用未通过原典验收的局部成化候选。
-v7增加完整同类三会／三合且至少两个合格存留重根的结构判级，保留原数值分量。完整会局存在不等于全部成化；该规则是指定原页原则的工程编码。完整349条回放修复3个已知分歧，没有已匹配标签退步，仍有23个不同输入分歧；来源、版本与旧首败见[升级审计](bazi-calendar-point-and-bureau-adoption.md)。
+v7增加完整同类三会／三合且至少两个合格存留重根的结构判级，保留原数值分量。完整会局存在不等于全部成化；该规则是指定原页原则的工程编码。完整349条回放修复3个已知分歧，没有已匹配标签退步，仍有23个不同输入分歧；来源、版本与旧首败见[升级审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-calendar-point-and-bureau-adoption.md)。
 
 ### 原文原则与工程参数
 
@@ -105,37 +105,37 @@ v7增加完整同类三会／三合且至少两个合格存留重根的结构判
 第十二造时柱为壬子，旧转录为戊午；两套输入分别保留，不把两者都符合弱档当作版本已认证。
 三档强弱映射也未实现原典太旺、旺极、太衰、衰极的细分。
 
-[十九个声明分歧](bazi-nineteen-disagreements.md)已按原始书影逐例复核，原标签、异文和所有反例保留；
+[十九个声明分歧](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-nineteen-disagreements.md)已按原始书影逐例复核，原标签、异文和所有反例保留；
 同次工程收支核对一致，尚未解决日主与印合计、食财承载、通关与寒暖的原典力量判定。
 完整续读中和、源流、通关三单元仍未达到既定新源改善门槛，未采用候选或改动日常旺衰数值。
 
-[身印、司令与通关定点复核](bazi-body-month-passage-audit.md)另修复身印占比重复使用六位展示值的问题，
+[身印、司令与通关定点复核](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-body-month-passage-audit.md)另修复身印占比重复使用六位展示值的问题，
 改用同次未舍入分量；增加距节令的UTC经过秒数，司令干仍未裁定。
 18组公开回放的原有业务字段逐项保持，19个分歧仍未解决；这些精度与来源修复不增加原典符合数。
 
-[完整登记回归](bazi-source-corpus-audit.md)补齐后续三组已暴露章节，保留21组269条源记录、224个不同四柱输入。
+[完整登记回归](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-source-corpus-audit.md)补齐后续三组已暴露章节，保留21组269条源记录、224个不同四柱输入。
 原19例仍全部未解，另有2个已暴露输入不符；总计21个登记范围内的不同输入分歧。
 明确未知、没有身强弱标注、内部公式不一致及局部条件分别保留，不过滤或换算成通过率。
 
-随后[完整读取燥湿、隐显、众寡](bazi-conditional-force-audit.md)，9造中3个明确日主／日元素力量映射均未匹配，
+随后[完整读取燥湿、隐显、众寡](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-conditional-force-audit.md)，9造中3个明确日主／日元素力量映射均未匹配，
 原候选未改善、不采纳；另纳入共享工作树中新完整顺反局26造。
 截至该轮登记为23组304条、258个不同输入，24个不同输入分歧保留。
 新四条知识编释不改变生产旺衰，原78条知识保持，当前共82条。
 
-后续[根量与君臣母子检验](bazi-root-load-audit.md)虽消除旧候选的JC01退化，仍未达到新源改善门槛，继续拒绝采用。
+后续[根量与君臣母子检验](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-root-load-audit.md)虽消除旧候选的JC01退化，仍未达到新源改善门槛，继续拒绝采用。
 完整追加四章10造后，最新登记为24组314条、268个不同输入，25个不同输入分歧保留；原19例仍未解。
 
 无根受生候选也未采用：它在旧367条开发记录中只改善一条已曝光分歧，在预定的〈顺逆〉完整三造中未触发、没有新增纠正，未达到采用门槛。原未知标签和生产规则保持；完整协议、首次结果及八项冻结检查保存在本地材料 `validation/bazi-unrooted-reception-v1/`，不能把研究候选当成现行判级规则。
 
-[月令司事来源分层](bazi-month-duty-sources.md)补入原注与任注条件、三命完整两套月条及实际透藏，公开数字待核和日界未知。源文时长条目不作为藏干根或有效司令，旺衰公式、原标签与上述分歧保持。
+[月令司事来源分层](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-month-duty-sources.md)补入原注与任注条件、三命完整两套月条及实际透藏，公开数字待核和日界未知。源文时长条目不作为藏干根或有效司令，旺衰公式、原标签与上述分歧保持。
 
-[完整书影见证](bazi-month-duty-scan.md)另核CADAL卷二的全部月条，确认该印本也存在32／26／380的字面合计，保留字形读法与章末限日批评；没有据此改月内日界、藏干、旺衰或原19例标签。
+[完整书影见证](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-month-duty-scan.md)另核CADAL卷二的全部月条，确认该印本也存在32／26／380的字面合计，保留字形读法与章末限日批评；没有据此改月内日界、藏干、旺衰或原19例标签。
 
 后续读完同卷十干章9–35页，新增有原页依据的跨章身份层：艮土可对读戊，坤土仍未指定某干。保留章末不同土生说法及首次转录，不从术语身份升级为有效司令、根力或通关。349份旧证据与十工具原业务值全部保持；原19例与26个不同输入分歧没有因此减少。
 
-[完整结果依据校验](bazi-complete-anchors.md)另覆盖综合`analyze_destiny`、标准命盘及九专题11入口，拒绝143个人工缺项控制，并保留86份有效分支和合法投影。此前十工具记录指标准命盘加九专题，不能替代独立综合入口的协议证据。该修复没有提高原典符合数；8192字符通关视图的十项不分页门槛仍未通过，首次失败及其完整载荷保留。
+[完整结果依据校验](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-complete-anchors.md)另覆盖综合`analyze_destiny`、标准命盘及九专题11入口，拒绝143个人工缺项控制，并保留86份有效分支和合法投影。此前十工具记录指标准命盘加九专题，不能替代独立综合入口的协议证据。该修复没有提高原典符合数；8192字符通关视图的十项不分页门槛仍未通过，首次失败及其完整载荷保留。
 
-[节气重复小时交付](bazi-term-offset-audit.md)修复公开节气时刻丢失偏移与fold的问题，保留全部81个旧还原失败；原四柱、经过量与起运计算不变，旧本地钟面兼容，新增带偏移时刻供无损复核。该修复不增加原典符合数或认证绝对UTC精度。
+[节气重复小时交付](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-term-offset-audit.md)修复公开节气时刻丢失偏移与fold的问题，保留全部81个旧还原失败；原四柱、经过量与起运计算不变，旧本地钟面兼容，新增带偏移时刻供无损复核。该修复不增加原典符合数或认证绝对UTC精度。
 
 验证脚本对照21例，
 并对15个参数逐个±15%扰动，共630次。测试另覆盖月令与旺衰不等价、
@@ -171,7 +171,7 @@ v7增加完整同类三会／三合且至少两个合格存留重根的结构判
 - 四个列表互斥且覆盖五行；`conflicts` 记录正反来源。未列为喜不自动为忌。
 - `useful_ten_gods` 从最终喜用五行导出，避免元素与十神口径分离。
 
-原典依据、月令与兼格的区别、藏杀与透杀及九专题视图见[月令取用路径](bazi-month-paths.md)。
+原典依据、月令与兼格的区别、藏杀与透杀及九专题视图见[月令取用路径](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-month-paths.md)。
 这些是原典条件的有限形式化与规则冲突处理，不是已经完成的古典成格算法。
 `assessment_status=conditional`，顶层喜用也只是规则参考，不是新增元素处方。
 结构候选仍未检验制化力度、成格和破格的完整条件。
@@ -245,31 +245,27 @@ v7增加完整同类三会／三合且至少两个合格存留重根的结构判
 [东里书斋文本](https://www.donglishuzhai.net/chapter/3722.html)提供导航和校异线索，
 与扫描同源，不计作第二独立裁判。
 
-## 专题核查索引
+## 原典知识查询
 
-细分问题、反例和原始验证记录按主题查阅：
+概念查询不需要出生资料。`knowledge_registry` 可查看当前分类与查询键，`knowledge_read` 返回正文、作者及来源；REST、MCP、CLI 共享业务数据。四柱、年柱、月柱属于 `domain=bazi`、`category=basics`，例如：
 
-- [八字时标的重复舍入与边界语义](bazi-atomic-utc-audit.md)
-- [合会候选、当前筛选与同次事件的完整保留](bazi-branch-candidate-inventory.md)
-- [官杀根量、清浊与否定约束漏验](bazi-controller-root-load-audit.md)
-- [大运边界包络的分析上下文漏扫修复](bazi-dayun-boundary-clock-window-audit.md)
-- [大运分析时刻、十年闰日裁剪与未来回拨](bazi-dayun-state-clipping-audit.md)
-- [身印回执一致性：本地计算契约修复](bazi-force-receipt-coherence.md)
-- [藏干序位、司令与解释覆盖复核](bazi-hidden-rank-source-review.md)
-- [月令司令事实与解释验收：v70](bazi-month-command-integrity.md)
-- [原生节气根的点值换算、根回执与错误闭环](bazi-native-solar-point-repair.md)
-- [通关部分事实一致性与原19例复核](bazi-passage-partial-facts.md)
-- [解刑须有同次成立的会合：状态与算术修复](bazi-punishment-resolution.md)
-- [八字藏干根预算的单位边界修复](bazi-root-unit-arithmetic.md)
-- [三支受制候选与〈刚柔〉完整核对](bazi-rooted-controller-and-gangrou-audit.md)
-- [完整局与同目标附合：v69 核查](bazi-same-target-bureau.md)
-- [备用节气根的 TT 点值消费语义复现](bazi-scalar-solar-consumer-audit.md)
-- [解析与SPK节气根的显式TT点值修复](bazi-scalar-solar-point-repair.md)
-- [丙火十二月原典条件核对](bazi-seasonal-bing-source.md)
-- [原典集合约束与清气、浊气完整登记](bazi-source-bounds-audit.md)
-- [原19例条件校读的公开交付](bazi-source-condition-delivery.md)
-- [天干先后与月时五合复核](bazi-stem-order-review.md)
-- [八字精确预算的消费端复核](bazi-strength-consumers.md)
-- [旺衰阈值的精确算术](bazi-strength-thresholds.md)
-- [官印相生的相邻路径候选与真、假神完整核对](bazi-visible-seal-path-audit.md)
-- [二卯一子与一合一刑：完整条件实验及拒绝决定](bazi-zi-mao-multiplicity-rejection.md)
+```bash
+uv run --locked --extra dev fatebridge knowledge_read \
+  --domain bazi --key 四柱 \
+  --fields title lines citation provenance.entry_curation.source_refs \
+  --strict-fields --include-snapshot-text false
+```
+
+其他来源资料按以下分类读取，具体参数见[API 参考](api-reference.md)：
+
+| 分类 | 查询键示例 | 阅读范围 |
+| --- | --- | --- |
+| `source_vocabulary` | `旺衰与强弱的编者分层`、`得时得势得地的判读对象`、`五行取用表的适用范围` | 李雨田编者术语及完整30行取用表，保留正常五行与从、化、变格的适用条件 |
+| `classical_force_semantics` | `日元强弱与性情措辞` | 任氏五行四态的20项来源关系；来源比拟没有提供四态的可计算阈值 |
+| `source_contrasts` | `只换一字与干支联动` | 原典的字面比较、配月配时联动、未知条件与未印出的反事实盘 |
+
+`provenance.entry_curation` 区分原典释义、工程说明与编辑边界；补充包各自保留版本与来源绑定。数字转录核对不等于书影校勘，单读者校读不等于独立专家认证。词条不会改变生产强弱政策，也不抵扣原典分歧或现实预测缺口。来源文字、全部表格与完整结果应沿同一 run 的 `result_delivery` 继续读取。
+
+## 历史核查
+
+逐次修复、未采用候选、反例和初次失败保留在[固定版本文档](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-assessment.md#专题核查索引)及配套冻结数据中；它们说明对应版本的范围，不作为当前全量验收通过的声明。

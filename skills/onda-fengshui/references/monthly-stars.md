@@ -17,7 +17,7 @@
 
 5秒是工程候选保护窗口，不是原典口诀、宣称的误差上界或更宽的验收门槛。独立Skyfield/JPL DE440对1800–2200年全部4,812个十二节TT交点的一秒门槛保持不变：完整Swiss文件配置全部通过，最大差约0.115秒；Moshier的569项失败与最大约2.455秒差异完整保留。这个窗口防止在已知较弱模型的极近边界把错误月份写成唯一结果，不把保留候选算作数值通过或现实命中。年星、命卦和跨20年宅运边界共用相同保护，只有日期的命卦还保留窗口跨过的相邻民用日。完整Swiss配置与独立确认输入仍可计算，未来实际UTC闰秒和历史时标限制另行保留。
 
-交节待确认时，唯一 `valid_from/valid_until` 也为null；`provisional_interval` 单列模型暂取窗口，`candidate_months` 逐项保留候选区间及起止实际模型。端点的 `full_resolution_path` 指向同次 `candidate_boundary_resolutions` 中的完整交节记录。需完整逐根依据时，首次选入该记录或设 `fields=null`，再读同run分页；分页不能恢复首次投影舍弃的字段。固定释义列出各候选有效期，不把暂取窗口当已确认月份。字段、虚构示例与验收见[月区间分层](../../../docs/fengshui-month-interval-fidelity.md)。
+交节待确认时，唯一 `valid_from/valid_until` 也为null；`provisional_interval` 单列模型暂取窗口，`candidate_months` 逐项保留候选区间及起止实际模型。端点的 `full_resolution_path` 指向同次 `candidate_boundary_resolutions` 中的完整交节记录。需完整逐根依据时，首次选入该记录或设 `fields=null`，再读同run分页；分页不能恢复首次投影舍弃的字段。固定释义列出各候选有效期，不把暂取窗口当已确认月份。字段、虚构示例与验收见[月区间分层](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-month-interval-fidelity.md)。
 
 ## 来源与差异
 
@@ -35,7 +35,7 @@ MP1的六月节候栏原印“大暑、小暑”，与标准时间顺序相反�
 
 布局只按物件已确认的**位置**读取月星；朝向不能替代位置。`usage_interpretation=not_covered_not_inauspicious` 表示本版没有月星用途与行动规则，不判该宫不利，不生成搬动、摆水、施工或物件处方。候选方案在各自新位置重新读取同一时间月盘，不能沿用旧位置星数。
 
-`derived_monthly_numeric_consistency_verified`只给实际完整月盘；内部矛盾停止交付。保存的旧错误回执、新独立检查及完整公开年份分支验收见[月盘数式与历法消费端](../../../docs/fengshui-calendar-consumer-integrity.md)。候选保护通过仍不能抵消Moshier的数值超差，也不认证额外自由文字或现实效果。
+`derived_monthly_numeric_consistency_verified`只给实际完整月盘；内部矛盾停止交付。保存的旧错误回执、新独立检查及完整公开年份分支验收见[月盘数式与历法消费端](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-calendar-consumer-integrity.md)。候选保护通过仍不能抵消Moshier的数值超差，也不认证额外自由文字或现实效果。
 
 ## 调用
 

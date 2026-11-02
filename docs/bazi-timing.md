@@ -2,7 +2,7 @@
 
 本页对应当前源码开发分支。历法归属、传统关系、工程计权与现实效果是四种不同证据；结果可复算不等于现实预测有效。
 
-[起运整数展示修复](bazi-dayun-integer-age.md)另保留先取两位再向上取整的一岁误差与首次失败。`start_age_unrounded`是同次折算原值，旧名`start_age_precise`仍是两位展示，`start_age`为向上取整、至少1岁的整数展示；实际选运继续比较`start_at/end_at`，不能由整数4推成四周岁生日交运。完整矩阵验证状态单独记录，不替代既有历法与原典门槛。
+[起运整数展示修复](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-dayun-integer-age.md)另保留先取两位再向上取整的一岁误差与首次失败。`start_age_unrounded`是同次折算原值，旧名`start_age_precise`仍是两位展示，`start_age`为向上取整、至少1岁的整数展示；实际选运继续比较`start_at/end_at`，不能由整数4推成四周岁生日交运。完整矩阵验证状态单独记录，不替代既有历法与原典门槛。
 
 ## 本次找到并修复的原因
 
@@ -75,7 +75,7 @@
 
 返回的 `birth_time_sensitivity` 保留四柱候选、顺逆、目标时刻的大运候选及各步交运边界范围。`stable_on_minute_grid` 只表示采样的本命四柱、顺逆和当前大运未变；交运日期本身仍可随输入变化，见 `boundary_ranges_vary`。逐分钟采样没有证明两分钟之间的秒级稳定性，候选频次也不是概率。
 
-历史偏移变更可能让派生本地钟时出现非零秒。范围采样保留每个实际瞬间的秒数，原始秒数未知的事实仍保留；不能把名义00秒参考重新套到所有派生钟时。修复前对照与尚未补齐的中间事件候选见[派生秒数与漏采事件](bazi-derived-clock-audit.md)。
+历史偏移变更可能让派生本地钟时出现非零秒。范围采样保留每个实际瞬间的秒数，原始秒数未知的事实仍保留；不能把名义00秒参考重新套到所有派生钟时。修复前对照与尚未补齐的中间事件候选见[派生秒数与漏采事件](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-derived-clock-audit.md)。
 
 综合时运未提供性别时仍核对四柱范围和独立流年等时间层；只将顺逆与交运范围标为不可计算，列入 `unavailable_fields`。四柱未变时返回 `partial`，不能将未计算的大运写成已核对稳定。
 
@@ -116,7 +116,7 @@ uv run --locked --extra dev fatebridge timing_analysis \
 
 REST 对应 `/api/timing/dayun` 和 `/api/timing/comprehensive`；`fields`、`strict_fields` 是查询参数。
 MCP 对应 `dayun_analysis`、`timing_analysis`，参数来自同一请求模型。
-日期全部省略时，综合、流月、流日、流时及独立大运使用冻结时钟的完整当地瞬间，保留偏移、fold和秒微秒；不再替换为月初、月中或零点。`analysis_reference`记录实际比较时刻与补齐来源。提供部分日期时仍沿用各工具原补齐约定；独立大运缺年取当地当前年，缺月日取1，缺时分取0。显式不存在或重复的分析墙钟须消歧，已确认UTC瞬间通过`as_of`表达并保持出生时区，详见[分析瞬间修复](bazi-analysis-instant.md)。
+日期全部省略时，综合、流月、流日、流时及独立大运使用冻结时钟的完整当地瞬间，保留偏移、fold和秒微秒；不再替换为月初、月中或零点。`analysis_reference`记录实际比较时刻与补齐来源。提供部分日期时仍沿用各工具原补齐约定；独立大运缺年取当地当前年，缺月日取1，缺时分取0。显式不存在或重复的分析墙钟须消歧，已确认UTC瞬间通过`as_of`表达并保持出生时区，详见[分析瞬间修复](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-analysis-instant.md)。
 完整导出不投影，按默认响应预算及 `result_delivery` 读取同一run。
 任务字段视图 `interactions` 和 `dayun_timeline` 只是选字段参考，不是新请求参数。
 

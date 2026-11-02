@@ -472,4 +472,4 @@ uv run --locked --extra dev pytest -q tests/test_western_semantic_fidelity.py te
 uv run --locked --extra dev python scripts/audit_western_fidelity.py --output docs/validation/western-fidelity-evidence.json
 ```
 
-[西占真实模型解释诊断](western-semantics-evaluation.md)覆盖八个虚构场景、44条人工要求；仅准备参照或通过机械测试不提高语义验收状态，真实模型须按当前代理授权规则另行执行和审阅。
+[西占真实模型解释诊断](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/western-semantics-evaluation.md)覆盖八个虚构场景、44条人工要求；仅准备参照或通过机械测试不提高语义验收状态，真实模型须按当前代理授权规则另行执行和审阅。

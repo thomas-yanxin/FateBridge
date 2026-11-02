@@ -61,7 +61,7 @@
 `dependency_missing`（503）、`timeout`（504）、`internal_error`（500）。请基于 `error_code`
 而非 `error` 文案做分支判断。
 
-玄空内部盘数、身份或飞行记录矛盾返回 `fengshui_calculation_inconsistent`（503、`retryable=false`），`issues.path=runtime.fengshui.natal_chart`。此时无有效盘可交付；不能修改用户资料、丢弃失败候选或以字段投影绕过，维护者须修复计算一致性。详见[计算盘异常处理](fengshui-source-comparison.md#计算盘异常会停止交付)。
+玄空内部盘数、身份或飞行记录矛盾返回 `fengshui_calculation_inconsistent`（503、`retryable=false`），`issues.path=runtime.fengshui.natal_chart`。此时无有效盘可交付；不能修改用户资料、丢弃失败候选或以字段投影绕过，维护者须修复计算一致性。详见[计算盘异常处理](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-source-comparison.md#计算盘异常会停止交付)。
 
 常见状态码：
 
@@ -228,7 +228,7 @@ MCP 默认仍公开全部工具。host 可设置 `FATEBRIDGE_MCP_FAMILIES=bazi,k
 
 ### 2.8 确定性与复现元数据
 
-REST 查询参数与 MCP 参数支持 `as_of`、`trace_id`、`parent_run_id`；CLI 对应 `--as-of`、`--trace-id`、`--parent-run-id`。as_of 为含时区 ISO 8601 时刻，归一化到 UTC，例如 `2024-02-29T16:30:00Z`。省略时捕获本次执行开始时刻；显式日期优先，各工具的部分日期补齐规则仍分别适用。八字综合、流月、流日、流时及独立大运在分析日期全部省略时使用完整当地瞬间，`analysis_reference`保留偏移、fold和秒微秒；只有显式部分日期的流月才沿用缺日取15。不存在／重复的显式分析钟时不猜瞬间，详见[时钟与补齐规则](bazi-analysis-instant.md)。上下文按调用隔离，不修改进程时区或全局时间。
+REST 查询参数与 MCP 参数支持 `as_of`、`trace_id`、`parent_run_id`；CLI 对应 `--as-of`、`--trace-id`、`--parent-run-id`。as_of 为含时区 ISO 8601 时刻，归一化到 UTC，例如 `2024-02-29T16:30:00Z`。省略时捕获本次执行开始时刻；显式日期优先，各工具的部分日期补齐规则仍分别适用。八字综合、流月、流日、流时及独立大运在分析日期全部省略时使用完整当地瞬间，`analysis_reference`保留偏移、fold和秒微秒；只有显式部分日期的流月才沿用缺日取15。不存在／重复的显式分析钟时不猜瞬间，详见[时钟与补齐规则](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-analysis-instant.md)。上下文按调用隔离，不修改进程时区或全局时间。
 
 标识仅接受 1–128 字符的字母、数字、`_ . : -`。控制项非法为三端校验失败，不回显值；有效 trace / parent 标识传播到成功元数据和模型、领域、投影失败包络。失败可含顶层 `trace_id` / `parent_run_id`；CLI 参数语法错误仍退出 2，框架非法 RPC 与未知工具不属于该包络。
 
@@ -274,9 +274,9 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 
 中式模型缺省开启真太阳时但没有可解析经度时，会使用钟表时间并附 `resolution_advisory`；显式 true 且无经度则返回错误。时区应显式传入，IANA 名称可表达历史夏令时，固定偏移不能。年/月柱、节气与起运使用实际民用时刻；太阳钟修正用于日/时柱等既有规则。当前小时必填，不提供省略小时的无时盘模式。
 
-八字与时运的 `BaziClockRequest` 扩展基类以支持已知秒数；其他继承模型不因此获得此参数。`calendar_context.birth_time_input` 区分显式00分／秒与兼容默认值，回显计算参考与校正钟面。省略分量不代表真实记录精确，也不自动推定舍入方式或误差区间；完整路径和接口范围见[出生秒数与输入分量](bazi-birth-seconds-audit.md)。
+八字与时运的 `BaziClockRequest` 扩展基类以支持已知秒数；其他继承模型不因此获得此参数。`calendar_context.birth_time_input` 区分显式00分／秒与兼容默认值，回显计算参考与校正钟面。省略分量不代表真实记录精确，也不自动推定舍入方式或误差区间；完整路径和接口范围见[出生秒数与输入分量](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-birth-seconds-audit.md)。
 
-`BaziClockRequest` 的 `birth_utc_offset` 在重复小时中选择已确认的实际出生瞬间，回执包含实际UTC、fold、歧义状态和时区规则身份。偏移不推断地区时区、不认证记录精度，也不能令不存在的钟时有效；原IANA时区保留用于后续交运。紫微与六壬原有同名参数继续有效。见[重复钟时与UTC偏移](bazi-birth-fold-audit.md)。
+`BaziClockRequest` 的 `birth_utc_offset` 在重复小时中选择已确认的实际出生瞬间，回执包含实际UTC、fold、歧义状态和时区规则身份。偏移不推断地区时区、不认证记录精度，也不能令不存在的钟时有效；原IANA时区保留用于后续交运。紫微与六壬原有同名参数继续有效。见[重复钟时与UTC偏移](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-birth-fold-audit.md)。
 
 九大专项追加 `analysis_year/month/day`、`dayun_pillar`、`liunian_pillar`，`timing_context` 位于 `<dimension>_analysis` 内。时运子模型的必填字段各不相同；大运需要 `gender`，可选的 `analysis_age` 与显式分析日期互斥，日期全部省略时按 `as_of`／执行开始时刻选运。完整规则以 OpenAPI 为准。
 
@@ -364,7 +364,7 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 | `POST` | `/api/compatibility` | 双人配合分析 |
 | `POST` | `/api/compatibility/sukuyo` | 宿曜双人相性分析（三九の秘法，二十七宿） |
 
-`bazi_source_compare` 只接收明确给出的 `year_pillar`、`month_pillar`、`day_pillar`、`hour_pillar`，各为天干地支两字。先按当前模型计算，再核对所有同柱登记编释；`current_calculation` 与 `source_comparison.records` 分开返回。 经过图版修订的条目另附 `input_reading_revision`，保留原录文、旧索引条目及校读散列；`registered_document_scope` 说明引用的登记文档仍是原始转录。未知标签不会因输入修订而自动补定。 `editorial_annotation_provenance`另标记原登记编辑说明的文件、字段位置和散列；补回的说明保存在`annotation_basis`与`retained_context`，不冒称原典逐字引文或新的强弱裁定。相符、差异、未裁定和未收录各自保留，不重建历史生日，也不改写强弱。首轮字段视图为 `source_strength`，详见[原典材料与核对范围](bazi-source-corpus-audit.md)。
+`bazi_source_compare` 只接收明确给出的 `year_pillar`、`month_pillar`、`day_pillar`、`hour_pillar`，各为天干地支两字。先按当前模型计算，再核对所有同柱登记编释；`current_calculation` 与 `source_comparison.records` 分开返回。 经过图版修订的条目另附 `input_reading_revision`，保留原录文、旧索引条目及校读散列；`registered_document_scope` 说明引用的登记文档仍是原始转录。未知标签不会因输入修订而自动补定。 `editorial_annotation_provenance`另标记原登记编辑说明的文件、字段位置和散列；补回的说明保存在`annotation_basis`与`retained_context`，不冒称原典逐字引文或新的强弱裁定。相符、差异、未裁定和未收录各自保留，不重建历史生日，也不改写强弱。首轮字段视图为 `source_strength`，详见[原典材料与核对范围](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-source-corpus-audit.md)。
 
 #### 4.1.1 八字九大专项维度
 
@@ -386,7 +386,7 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 
 每个维度返回结构化分析对象，同时在 `<dimension>_analysis.timing_context` 中回显内部推算的大运/流年与起运年龄。各维度核心字段：
 
-九专题另提供 `<dimension>_analysis.evidence_chain`，含逐星透藏与根气、位置关系、五类格局有限前提审查、上游旺衰状态与主题运年触点；发现入口为 `evidence_views.depth`。未知性别仅限制自动大运顺逆，仍返回本命及独立流年，`timing_context.dayun_status=unavailable_gender_direction`；显式覆盖的大运标为 `explicit_override`。综合结果的位置为 `structure_profile.evidence_chain`，标准命盘为 `bazi_birth.structure_profile.evidence_chain`。条件审查不认证成格，详见[深化审查](bazi-depth-audit.md)。
+九专题另提供 `<dimension>_analysis.evidence_chain`，含逐星透藏与根气、位置关系、五类格局有限前提审查、上游旺衰状态与主题运年触点；发现入口为 `evidence_views.depth`。未知性别仅限制自动大运顺逆，仍返回本命及独立流年，`timing_context.dayun_status=unavailable_gender_direction`；显式覆盖的大运标为 `explicit_override`。综合结果的位置为 `structure_profile.evidence_chain`，标准命盘为 `bazi_birth.structure_profile.evidence_chain`。条件审查不认证成格，详见[深化审查](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-depth-audit.md)。
 
 | 维度 | 端点 | 主要返回字段 |
 | --- | --- | --- |
@@ -476,7 +476,7 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 | `POST` | `/api/cn/taiyi` | 太乙神数 |
 | `POST` | `/api/cn/jinkou` | 金口诀 |
 
-太乙年计可明确选择`year_profile=jinjing_year_historical_table_v1`（381—385晋历）或`jinjing_year_qiliang_table_v1`（501—505齐梁史历）；三式放入`taiyi_options`。两者按原表民用日期、只用于year，范围外拒绝。齐梁配置保留502年闰四月及未决算法候选，`historical_calendar.source_disagreements`与快照同源；不认证王氏古日积或另外两术古历。日期、来源及调用示例见[历史年计](taiyi-year-calendar.md)。
+太乙年计可明确选择`year_profile=jinjing_year_historical_table_v1`（381—385晋历）或`jinjing_year_qiliang_table_v1`（501—505齐梁史历）；三式放入`taiyi_options`。两者按原表民用日期、只用于year，范围外拒绝。齐梁配置保留502年闰四月及未决算法候选，`historical_calendar.source_disagreements`与快照同源；不认证王氏古日积或另外两术古历。日期、来源及调用示例见[历史年计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-year-calendar.md)。
 
 六壬起课、行年和金口诀支持 `is_diurnal` 显式选择昼贵/夜贵；`guiren_profile` 可选既有 `liuren_common_v1` 或《探原》贵人歌 `tanyuan_xieji_v1`。金口诀本课独立使用古本贵神表，配置仅影响其附带六壬盘。`di_fen` 仅接受十二地支，省略的时支回退会明确标注。金口诀分别返回 `seasonal_power`、`internal_power` 与 `internal_strength`；旧 `power` 仅为季节旺衰别名，多候选未裁定时课内旺衰为 null。原典疑文和验收范围见[专业能力审计](liuren-jinkou-audit.md)。三工具的 `describe` 已发布 `evidence_views.core`，可复制其中 `fields` 做严格摘要投影。
 

@@ -153,7 +153,7 @@ PYTHONPATH="$PWD:$PWD/src" UV_PROJECT_ENVIRONMENT="$PWD/.venv-nonuniform-referen
 
 主分支每次 push 都运行完整测试，避免文档提交取消先前代码检查后以局部检查代替验收。PR 按整个 merge-base 差异分流；同一分支或 PR 有新提交时会取消旧 CI。源码、测试（含 `tests/fixtures/` 原典标注与冻结清单）、依赖、工作流、技能、`AGENTS.md`、`docs/examples/` 和 `docs/validation/`（包括其中的 Markdown）的变更运行 Python 3.10–3.13 全量测试及最低依赖测试，数值基线由 Linux x86_64 / Python 3.12 校验。无法取得完整差异或出现未识别路径时也运行全量。
 
-黄金环境同时固定空星历目录与 `FATEBRIDGE_SOLAR_TERM_MODEL=native`，并在退出时恢复调用方策略；空目录或单独的Swiss探测标志不能证明实际交节采用Moshier。来源与元数据确有行为新增时，逐字段审核、保留旧结果并只更新受影响基线，不以重新冻结取得天文精度或原典符合。风水实例与已保留差异见[运行来源比较](fengshui-source-comparison.md)。
+黄金环境同时固定空星历目录与 `FATEBRIDGE_SOLAR_TERM_MODEL=native`，并在退出时恢复调用方策略；空目录或单独的Swiss探测标志不能证明实际交节采用Moshier。来源与元数据确有行为新增时，逐字段审核、保留旧结果并只更新受影响基线，不以重新冻结取得天文精度或原典符合。风水实例与已保留差异见[运行来源比较](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-source-comparison.md)。
 
 京本金口诀行年使用 `uv run --locked --extra dev python scripts/audit_jinkou_year_fate.py --output /tmp/jinkou-year-fate.json` 及 `tests/test_jinkou_year_fate.py` 核对。出生年干支、指定一岁起算岁序和性别分别保留；岁首与占时实际年龄联动未认证，另课地分是行年支推导，不能写成观测方位。原书标签、循环推导、业务合同与进程内三端分别报告；可选旧720盘基线不作为新占断答案，详见第四十六轮记录（本地数据：`validation/jinkou-year-fate-validation-2026-10-23.md`）。
 

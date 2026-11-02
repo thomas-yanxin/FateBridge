@@ -76,14 +76,14 @@ uv run --locked --extra dev python scripts/audit_fengshui_reading.py \
 
 作者子版本`wang_zhongzhou_timeliness_v1@1.1.0`增加先后天图位来源，固定释义1.2.0逐候选与山向角色解释。校验器把基本时令、互用成员和有向图位绑定回原盘星数及同次评价运；错误标签不能因与正文、回执互相吻合而通过。旧作者1.0.0仍检查原有基本时令和成员数字，图位覆盖计数为零。
 
-`author_geometry_record_count`表示核对的新版记录数，`author_geometry_derived_record_count`只计两条图位推导；五运和未知运分别进入`author_geometry_five_table_only_count`及`author_geometry_unknown_count`。只有确有推导且新版固定文本完整时，`author_geometry_coverage_verified`才为true。五运的原表数字不算图位推导通过，互用符合也不认证现场可用。详见[来源及保留的原始错误运行](../../../docs/fengshui-mutual-geometry.md)。
+`author_geometry_record_count`表示核对的新版记录数，`author_geometry_derived_record_count`只计两条图位推导；五运和未知运分别进入`author_geometry_five_table_only_count`及`author_geometry_unknown_count`。只有确有推导且新版固定文本完整时，`author_geometry_coverage_verified`才为true。五运的原表数字不算图位推导通过，互用符合也不认证现场可用。详见[来源及保留的原始错误运行](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-mutual-geometry.md)。
 
 ## 主客出入的内部一致性
 
-显式选择 `shen_2011_host_guest_v1@1.0.0` 后，固定释义1.2.0增加每候选八段盘层关系和两段原文对照，见[主客来源及差异](../../../docs/fengshui-host-guest.md)。独立校验先核原三盘、方向、主客角色、实际星数、五行定义及固定比较基准，再核回执与模板；同五行换星数和逐例换比较对象也不能通过。错误记录 `host_guest_inconsistent`，不会因为正文忠于错误数据而获得覆盖。
+显式选择 `shen_2011_host_guest_v1@1.0.0` 后，固定释义1.2.0增加每候选八段盘层关系和两段原文对照，见[主客来源及差异](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-host-guest.md)。独立校验先核原三盘、方向、主客角色、实际星数、五行定义及固定比较基准，再核回执与模板；同五行换星数和逐例换比较对象也不能通过。错误记录 `host_guest_inconsistent`，不会因为正文忠于错误数据而获得覆盖。
 
 `host_guest_relation_count`为实际核对关系数，`host_guest_coverage_verified`还要求1.2.0的关系文本完整。`host_guest_literal_source_matches`、`host_guest_literal_source_differences`、`host_guest_ambiguous_source_roles`单列原文槽状态；出现真实来源差异并不等同内部计算错误，前者完整保留后仍可交付，不能因此把全书符合标为true。旧响应不含该层时计数为零，旧1.0／1.1不追授新文本覆盖。
 
 ## 新运行的原书数表分支
 
-含 `source_comparison` 的运行，固定释义逐候选引用同次比较记录及实际宅盘。新比较版本2.0.0中，下卦核对正文四字段和图数；替卦仅核对起星图27数，说明卷五编者范围、正文与兼向条件未验证。七运申寅保留“原图五、计算二”；五运子午替卦保留南宫山星“原图九、计算六”。相合只限实际列出的数字成分，未算出宅盘没有比较信用。旧1.0.0比较记录与未含此分支的旧固定模板仍按原语境核验，不能追授起星图覆盖。任意自由模型正文仍未认证。完整来源见[运行来源比较](../../../docs/fengshui-source-comparison.md)。
+含 `source_comparison` 的运行，固定释义逐候选引用同次比较记录及实际宅盘。新比较版本2.0.0中，下卦核对正文四字段和图数；替卦仅核对起星图27数，说明卷五编者范围、正文与兼向条件未验证。七运申寅保留“原图五、计算二”；五运子午替卦保留南宫山星“原图九、计算六”。相合只限实际列出的数字成分，未算出宅盘没有比较信用。旧1.0.0比较记录与未含此分支的旧固定模板仍按原语境核验，不能追授起星图覆盖。任意自由模型正文仍未认证。完整来源见[运行来源比较](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-source-comparison.md)。

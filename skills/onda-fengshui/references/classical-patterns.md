@@ -48,7 +48,7 @@
 
 父母三般卦与普通三般卦、七星打劫、全局合十分别处理。普通连续组的传本文字仍有差异，本分支不把它补成统一循环，也不据父母组匹配推定打劫、外局、当下旺衰或动作已经合格。
 
-首轮按需投影选定 `structure.classical_patterns` 及来源。若返回 `result_delivery`，读取同一运行的完整结果，不能把尚未读取的部分当成false，也不为全文重算。工程验收见[深度记录](../../../docs/fengshui-depth-audit.md)。
+首轮按需投影选定 `structure.classical_patterns` 及来源。若返回 `result_delivery`，读取同一运行的完整结果，不能把尚未读取的部分当成false，也不为全文重算。工程验收见[深度记录](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-depth-audit.md)。
 
 ## 同宫合十与作者用语的外部核对
 

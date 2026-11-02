@@ -6,7 +6,7 @@
 
 当前提供八个工具：公共方位、个人命卦、八宅、金锁玉关基础砂水、年度紫白飞星、月紫白、玄空历史宅盘和分层合参。三端来自同一目录，核心规则离线计算，不依赖外部风水服务。布局、室内关系、材质及候选方案通过 `fengshui_assess` 的独立分支审查。结果表示选定传统规则中的关系；规则来源、计算一致性和现实预测效力是不同事项。
 
-[沈氏城门](fengshui-city-gate.md)作为玄空请求中的独立可选分支，显式参考运，计算同元龙门位与运星顺逆；现场水形另行确认，历史宅盘保持原值。
+[沈氏城门](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-city-gate.md)作为玄空请求中的独立可选分支，显式参考运，计算同元龙门位与运星顺逆；现场水形另行确认，历史宅盘保持原值。
 
 本项目采用的专家访谈口径以九宫飞星、金锁玉关和八宅为主要方法；局部工位／合租先考虑飞星、次金锁，八宅命卦独立处理。政策是用户提供的专家口径，来源、方法细节及环境上下文各自有版本；不将本人或周围人的八字／紫微喜忌代入房屋五行。现代 BTB 仅用户明确另选时作为作者辅助，不作默认替代。
 
@@ -33,7 +33,7 @@
 
 同一宅向的已知测量误差使用 `house.bearing_uncertainty_degrees`，在已选八宅及玄空层共同传播；旧玄空误差字段继续兼容。八宅跨宫时保留各自宅卦及布局条件，详见[共享宅向误差](../skills/onda-fengshui/references/house-bearing-uncertainty.md)。省略误差只沿用点输入约定，不认证现场误差为零。
 
-数值用JSON数值，日期和时刻按明确的ISO形式提交；布尔值、数字字符串或Unix时间戳不能冒充角度、运数及历法事实。范围内的整数值 `8.0` 仍可使用，非整数不舍入。详见[风水输入类型](fengshui-input-type-contract.md)。
+数值用JSON数值，日期和时刻按明确的ISO形式提交；布尔值、数字字符串或Unix时间戳不能冒充角度、运数及历法事实。范围内的整数值 `8.0` 仍可使用，非整数不舍入。详见[风水输入类型](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-input-type-contract.md)。
 
 可运行输入按用途列于[示例索引](examples/README.md)。完整约束见 `/openapi.json`、MCP `tools/list` 和 `fatebridge describe fengshui_assess`。新 family 是 `fengshui`；不加入个人 `analyze_destiny` 或 `profile` 默认系统。[月紫白参考](../skills/onda-fengshui/references/monthly-stars.md)说明立春有效年、十二节换月、原表标签差异与原始回执核验；合参可显式选择 `monthly_stars` 或提供独立 `monthly`。
 
@@ -121,7 +121,7 @@ asyncio.run(main())
 
 详见[基础规则与来源](../skills/onda-fengshui/references/rule-sources.md)。未知规则 ID 拒绝；改变纪元、换年、坐山起法或砂水规则时，应新增规则版本与独立样本，不能静默替换原版本。`january_1` 是命卦中显式可选的现代计算约定，不宣称所有《八宅明镜》古本都按立春换年。
 
-八宅1.1.0新增累计变爻与净变爻、宫星有向关系及伏位文本语境；历法输入拒绝不存在的地区钟时，并保留已指定重时时刻。专业缺口、独立来源样本与验证范围见[深度审计](fengshui-depth-audit.md#第二轮累计变爻宫星生克与无效钟时)。
+八宅1.1.0新增累计变爻与净变爻、宫星有向关系及伏位文本语境；历法输入拒绝不存在的地区钟时，并保留已指定重时时刻。专业缺口、独立来源样本与验证范围见[深度审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-depth-audit.md#第二轮累计变爻宫星生克与无效钟时)。
 
 定义 `wrap9(n) = (n - 1) % 9 + 1`，有效年为 Y：
 
@@ -137,7 +137,7 @@ asyncio.run(main())
 
 ### 方位与分宫
 
-角度范围0–360，360归零；八方中心间隔45°，半宽22.5°；24山中心间隔15°，半宽7.5°。正好22.5°归东北／丑山。宅向推导坐山时加180°；同时提供 `sitting_trigram` 必须一致。基础方位／八宅角度必须声明 `north_reference=magnetic|true`（玄空当前版本要求 magnetic），不自动改写宅向。`fengshui_directions.geomagnetic_reference` 可选提供WMM2025地磁参考与独立换算候选，详见[地磁合同](fengshui-geomagnetic.md)。只有已确认宅卦时可直接提供 `sitting_trigram`。
+角度范围0–360，360归零；八方中心间隔45°，半宽22.5°；24山中心间隔15°，半宽7.5°。正好22.5°归东北／丑山。宅向推导坐山时加180°；同时提供 `sitting_trigram` 必须一致。基础方位／八宅角度必须声明 `north_reference=magnetic|true`（玄空当前版本要求 magnetic），不自动改写宅向。`fengshui_directions.geomagnetic_reference` 可选提供WMM2025地磁参考与独立换算候选，详见[地磁合同](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-geomagnetic.md)。只有已确认宅卦时可直接提供 `sitting_trigram`。
 
 `house.division_method` 只接受 `confirmed_angular_sectors`。八方角区、九等分网格和示意九宫图不是同一个几何计算；当前不自动识别户型图片、不自动定中心，也不推断不规则户型分宫。
 
@@ -159,11 +159,11 @@ asyncio.run(main())
 
 命卦另接受公历 `birth_date`，与有效生年、出生时刻三选一。按所选时区计算立春所在日期；之前取上一有效生年，之后取本年，立春当日保留 `partial` 并要求出生时刻。选择 `january_1` 时日期即可确定生年。该路径不构造虚假的出生小时，也不使用真太阳时。
 
-年盘有效期是 `[立春, 下次立春)`，不硬编码2月4日午夜，也不按春节。节气沿用现有 `almanac`，逐端点报告实际求解器、星历返回模型及时间政策；固定气回退和Moshier降级分开。外部分钟表与独立421年TT实现比对各自保留，均不认证绝对UTC秒级精度；详见[立春验收](fengshui-calendar.md)。
+年盘有效期是 `[立春, 下次立春)`，不硬编码2月4日午夜，也不按春节。节气沿用现有 `almanac`，逐端点报告实际求解器、星历返回模型及时间政策；固定气回退和Moshier降级分开。外部分钟表与独立421年TT实现比对各自保留，均不认证绝对UTC秒级精度；详见[立春验收](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-calendar.md)。
 
 月层另有1800–2200年全部十二节4,812个独立TT参考交点，完整Swiss配置通过一秒实现门槛，Moshier保留569项失败。Moshier计算交节前后5秒使用候选保护，年星、命卦和宅运跨运边界共用；保护不改变原始数值验收门槛，也不证明现实准确率。只有日期的命卦会考虑该窗口跨过的相邻民用日。[月紫白参考](../skills/onda-fengshui/references/monthly-stars.md)给出模型、时标、候选与离线复核范围。
 
-源码与本地wheel可通过[完整星历安装配置](fengshui-ephemeris-setup.md)补齐宅运端点数据，并在新进程中发现已验证缓存。未取得数据的Moshier配置仍保留降级标记和原精度失败，不能借用完整配置的验收结果。
+源码与本地wheel可通过[完整星历安装配置](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-ephemeris-setup.md)补齐宅运端点数据，并在新进程中发现已验证缓存。未取得数据的Moshier配置仍保留降级标记和原精度失败，不能借用完整配置的验收结果。
 
 ### 物件位置与朝向
 

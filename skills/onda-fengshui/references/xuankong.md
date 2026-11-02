@@ -10,7 +10,7 @@
 
 本次锁定一套明确的中州派规则，新增历史影印替星全表与王亭之原书数字盘核对，不能把结果称为所有玄空门派统一结论，也不是《沈氏玄空学》原版的逐页复刻。规则版本为 `xuankong_zhongzhou_v1@1.4.0`；所有起盘计算交给 FateBridge，以下资料用于核对来源、输入和解释范围。
 
-1.1.0 返回 `chart/candidates.*.structure`，说明历史宅运当运数的山／向星落宫、到山到向／上山下水／双星到坐／双星到向及逐宫合十。它是历史数字结构，不能据此直接称当前旺局、布水有效或保证现实结果。来源审计与未解决转录分歧见[专业深度审计](../../../docs/fengshui-depth-audit.md)。
+1.1.0 返回 `chart/candidates.*.structure`，说明历史宅运当运数的山／向星落宫、到山到向／上山下水／双星到坐／双星到向及逐宫合十。它是历史数字结构，不能据此直接称当前旺局、布水有效或保证现实结果。来源审计与未解决转录分歧见[专业深度审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-depth-audit.md)。
 
 | 事项 | 本版本约定 | 核实来源与版本限制 |
 | --- | --- | --- |
@@ -36,9 +36,9 @@
 
 X2网页有明显笔误：“阳阳互兼用替”与随后同阳不替的例子冲突；所谓十一山清单重复列入13项口诀中的山、数量也不一致。本版本采用紧接其后的明确文字和图例，以13项口诀的24山补集界定其余11山，未照抄错误清单。X5也明确讨论不同寄法；不把这些寄卦概念直接混进外宫五黄入中。规则核实后的选版与校订范围均登记在 `conventions`。
 
-原典符合程度须带底本与范围。[2011整理／2016重印本卷四校勘](../../../docs/fengshui-lower-clause-collation.md)的完整216条种子／顺逆与程序为213条一致、3条不同；对应三图81数又与程序一致。四运卯酉、一运酉卯、六运巽乾存在同版图文冲突，旧影印正文吻合也不能把它们清除。解释时保留版本差别，不称网页单独出错、整部沈氏已通过或程序具有现实预测认证。
+原典符合程度须带底本与范围。[2011整理／2016重印本卷四校勘](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-lower-clause-collation.md)的完整216条种子／顺逆与程序为213条一致、3条不同；对应三图81数又与程序一致。四运卯酉、一运酉卯、六运巽乾存在同版图文冲突，旧影印正文吻合也不能把它们清除。解释时保留版本差别，不称网页单独出错、整部沈氏已通过或程序具有现实预测认证。
 
-[完整216图校勘](../../../docs/fengshui-lower-diagram-collation.md)另核5,832个星数，保留七运申山寅向东宫山星五／引擎二这一差异，两版原图均为五。程序按四入中顺飞得二，原图该层重复五、缺二；解释须区分飞布数式与原图印数，不删该数或用其他盘吻合宣称整本通过。这不增加真实住宅预测准确率。
+[完整216图校勘](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-lower-diagram-collation.md)另核5,832个星数，保留七运申山寅向东宫山星五／引擎二这一差异，两版原图均为五。程序按四入中顺飞得二，原图该层重复五、缺二；解释须区分飞布数式与原图印数，不删该数或用其他盘吻合宣称整本通过。这不增加真实住宅预测准确率。
 
 ### 三元龙与替星速查
 
@@ -64,9 +64,9 @@ X2网页有明显笔误：“阳阳互兼用替”与随后同阳不替的例子
 
 `period_context.timing` 记录历史区间首尾和事件年交节的实际 `provider`／`approximate`。`swisseph` 表示组件求解，不认证所用星历文件或秒精度；`linear_1900_fallback` 表示近似回退。若带时区时刻处于1864加20的整数倍这一跨运公历年，且该年立春求解回退，返回 `resolution_status=requires_confirmation`、`number=null`、两个 `candidate_period_numbers`、空宅盘及明确缺失项。调用方确认 `effective_event_year` 或 `period_number` 后可继续；非跨运年近似换年前后的宅运相同。
 
-实际返回`jpl_de440`时，按端点的`ephemeris_model`区分原打包模型与`fatebridge_de440_solar_historical_v1`。后者补足完整宅运区间所需的1784–2204范围，不扩大公开请求年份；来源与验收见[历史历法覆盖](../../../docs/fengshui-historical-calendar.md)。数值模型在交节附近保留候选，也会要求确认，不能一概解释成线性近似回退。依据本次模型、保护原因与候选解读；1秒TT软件对照通过不认证绝对UTC交节秒或现实吉凶。
+实际返回`jpl_de440`时，按端点的`ephemeris_model`区分原打包模型与`fatebridge_de440_solar_historical_v1`。后者补足完整宅运区间所需的1784–2204范围，不扩大公开请求年份；来源与验收见[历史历法覆盖](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-historical-calendar.md)。数值模型在交节附近保留候选，也会要求确认，不能一概解释成线性近似回退。依据本次模型、保护原因与候选解读；1秒TT软件对照通过不认证绝对UTC交节秒或现实吉凶。
 
-年份与宅运的状态分别解释：保护区内 `effective_event_year=null`，`candidate_effective_event_years` 保留年份候选，暂取年仅供追踪。同运候选可以确定宅运而不确认年份；跨运的 `timing.candidate_period_intervals` 保留候选历史窗口，不能把其中一个当作唯一有效期。快照和固定释义沿用同次计算记录，详见[有效年分层](../../../docs/fengshui-event-year-fidelity.md)。
+年份与宅运的状态分别解释：保护区内 `effective_event_year=null`，`candidate_effective_event_years` 保留年份候选，暂取年仅供追踪。同运候选可以确定宅运而不确认年份；跨运的 `timing.candidate_period_intervals` 保留候选历史窗口，不能把其中一个当作唯一有效期。快照和固定释义沿用同次计算记录，详见[有效年分层](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-event-year-fidelity.md)。
 
 缺少宅向或定运资料返回 `partial` 和逐项 `missing_inputs`；仅有坐山卦不能推出确定的二十四山。角度要求磁北，真北输入须在调用前完成用户确认的转换；[地磁参考](geomagnetic-reference.md)只提供待复测换算候选，不自动满足该确认条件；未知规则ID、越界数值、无时区时刻、冲突事件选择、未知字段均为校验错误。
 
@@ -87,4 +87,4 @@ X2网页有明显笔误：“阳阳互兼用替”与随后同阳不替的例子
 
 ## 原书数表差异随盘读取
 
-查看 `coverage.natal_source_comparison`，需要完整依据时保留 `layers.xuankong_natal.source_comparison`。新比较版本2.0.0分别核对固定整理本216条下卦正文、216张下卦图与216张起星图；所有方位和模式候选均保留。替卦只核对图数，逐候选读取 `source_section` 的卷别与编者范围、正文未核对状态；兼向选盘条件与星名未验证。中州规则、原图值和计算值分别解释，数字相合不能扩大为全本认证。旧比较版本1.0.0的替卦仍未覆盖，不能追授。字段与已知差异见[运行来源比较](../../../docs/fengshui-source-comparison.md)。
+查看 `coverage.natal_source_comparison`，需要完整依据时保留 `layers.xuankong_natal.source_comparison`。新比较版本2.0.0分别核对固定整理本216条下卦正文、216张下卦图与216张起星图；所有方位和模式候选均保留。替卦只核对图数，逐候选读取 `source_section` 的卷别与编者范围、正文未核对状态；兼向选盘条件与星名未验证。中州规则、原图值和计算值分别解释，数字相合不能扩大为全本认证。旧比较版本1.0.0的替卦仍未覆盖，不能追授。字段与已知差异见[运行来源比较](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-source-comparison.md)。

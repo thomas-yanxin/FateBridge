@@ -26,7 +26,7 @@
 
 原书紧接着说明基本表仅是大原则，并列出按先后天卦互用的数字。程序同时保留两表，不强制二选一：七运四绿在基本表为死，同时属于七运互用数 `[7,1,4]`；七运五黄为衰，却不在该互用数列。九运一白为生，一运八白为衰，循环不能只按数字大小判断。
 
-互用保留数字成员和整列数字，`application_status=numeric_reference_only_no_site_verdict`。1.1.0在`mutual_use_reference.geometry`另给两条先后天有向图位记录；原表顺序与推导路径顺序独立。五运仅列`[5,2,8]`而无第五卦推导，未知评价运保持未知。图位只解释数字来源，不证明现场卦位、形势或用途合格；`numeric_membership=false`也不能据此推出不可用。来源、字段与原始故障见[图位与时令校验](../../../docs/fengshui-mutual-geometry.md)。
+互用保留数字成员和整列数字，`application_status=numeric_reference_only_no_site_verdict`。1.1.0在`mutual_use_reference.geometry`另给两条先后天有向图位记录；原表顺序与推导路径顺序独立。五运仅列`[5,2,8]`而无第五卦推导，未知评价运保持未知。图位只解释数字来源，不证明现场卦位、形势或用途合格；`numeric_membership=false`也不能据此推出不可用。来源、字段与原始故障见[图位与时令校验](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-mutual-geometry.md)。
 
 同一扫描第17页还有未解决差异：基本表把七运九紫列为生，邻近正文却只列七、八两星可用。现有证据不足以判定原因，不认定笔误，也不选一处改写另一处。本版限定实现数表，`source_disagreements` 保留正文与表格；章节一致性验收为假。
 

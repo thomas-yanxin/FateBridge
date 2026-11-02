@@ -48,7 +48,7 @@ description: 用 FateBridge 围绕一个具体问题起卦或起局，呈现可�
 
 ## 固定问时，保留同一卦
 
-交节附近保留同次`calendar_conventions.cast_at`和`calendar_context.bazi_month_boundary`的完整小数秒与时区，核对实际使用的前后节界。农历与公历时刻字符串现在也保留计算消费的小数秒，不能自行截成整秒再据此解释换月。天文机构的分钟表只能提供该公布精度的对照，不把分值补成已知精确第0秒；数值求解的小数位也不是物理准确度证书。复核范围见[交节审计](../../docs/liuyao-solar-boundary-audit.md)。
+交节附近保留同次`calendar_conventions.cast_at`和`calendar_context.bazi_month_boundary`的完整小数秒与时区，核对实际使用的前后节界。农历与公历时刻字符串现在也保留计算消费的小数秒，不能自行截成整秒再据此解释换月。天文机构的分钟表只能提供该公布精度的对照，不把分值补成已知精确第0秒；数值求解的小数位也不是物理准确度证书。复核范围见[交节审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-solar-boundary-audit.md)。
 
 时间梅花需要明确起卦年月日时。用户指定时刻时原样保留日期、小时及已确认的分、秒和 `analysis_timezone`；未知分、秒省略或null，不把计算补00冒充用户提供。核对 `analysis_context.analysis_datetime/timezone/question`。按当下起卦才取得当前时间和相应时区，不用示例日期或默认时区冒充用户选择。`as_of` 不能代替所选工具的显式起卦参数。
 
@@ -178,11 +178,11 @@ description: 用 FateBridge 围绕一个具体问题起卦或起局，呈现可�
 
 ## 交付给用户的判断辅助
 
-金逢巳日读取同次`liuyao_evidence.conditional_analysis.growth_conditions`。`position_match`只是长生帝旺位置，`condition_match`才是本条资格；已核月令生扶可按此条件论长生，但不能删除月合、回头克、旬空或其他反制。原始火克金的五行关系仍保留，`day_control_in_calendar_oppositions=false`只说明该作用层在指定原典条件下没有同时把同一个巳日列作日克反制。无月扶而其他来源未审时保持未知，不凭“长生”二字作得生。角色支持采用`conditional_matched/conditional_atom_values`，月令事实沿`month_support_fact_paths`复核。[原典及修复范围](../../docs/liuyao-growth-audit.md)保持明确。
+金逢巳日读取同次`liuyao_evidence.conditional_analysis.growth_conditions`。`position_match`只是长生帝旺位置，`condition_match`才是本条资格；已核月令生扶可按此条件论长生，但不能删除月合、回头克、旬空或其他反制。原始火克金的五行关系仍保留，`day_control_in_calendar_oppositions=false`只说明该作用层在指定原典条件下没有同时把同一个巳日列作日克反制。无月扶而其他来源未审时保持未知，不凭“长生”二字作得生。角色支持采用`conditional_matched/conditional_atom_values`，月令事实沿`month_support_fact_paths`复核。[原典及修复范围](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-growth-audit.md)保持明确。
 
-土逢巳读取同次`liuyao_evidence.conditional_analysis.cessation_conditions`：`position_match`只是绝位，`condition_match=false`可表示已核独立生扶下本项论生不论绝，不能解释成全部无害；未知不补成真绝。保留另有回头克和变爻月破，角色条款采用`conditional_matched/conditional_atom_values`，旧原始匹配只供回溯。独立支持及其多段依赖以`support_fact_path`核对，不能用被判断的巳支或无外部根的相生循环证明其自身已生土。化散未裁定时，综合`changed_adverse`仍可未知。[原典及资格范围](../../docs/liuyao-cessation-audit.md)保持明确。
+土逢巳读取同次`liuyao_evidence.conditional_analysis.cessation_conditions`：`position_match`只是绝位，`condition_match=false`可表示已核独立生扶下本项论生不论绝，不能解释成全部无害；未知不补成真绝。保留另有回头克和变爻月破，角色条款采用`conditional_matched/conditional_atom_values`，旧原始匹配只供回溯。独立支持及其多段依赖以`support_fact_path`核对，不能用被判断的巳支或无外部根的相生循环证明其自身已生土。化散未裁定时，综合`changed_adverse`仍可未知。[原典及资格范围](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-cessation-audit.md)保持明确。
 
-巳寅申读取同次`liuyao_evidence.conditional_analysis.penalty_conditions`：`condition_match`仅指所列作用范围内三支齐备，`effect_condition_match=null`保留刑的总作用未裁定，不能据此断刑害或凶事。巳爻在寅日的`growth_conditions.condition_match=false`表示本条不再按该日长生、生扶计入，原木生火关系与长生位置仍在；申暗动资格未知时，本项也未知。别爻变支和静爻变盘支不借来补齐，伏神另读自身`reception.penalty`，不借飞神本位变支。`yin_generation_allowed`按第98页特定条款先于第10章一般回头生许可：三支齐备时，所列寅月、寅日、动寅及本位变寅不计为巳爻寅生扶；活动未定时资格未知。`back_generation_conditions.sources`的`raw_condition_match`保留一般空破门槛，`condition_match`才是综合资格，不能见原始木生火就复写为回头生已经许可。`generation_conditions.generations`的`condition_match`描述来源，`target_yin_generation_allowed`与`benefit_now`描述该目标，不能把只对巳爻的排除推广为寅爻对所有目标均失效。其他独立生扶与反制照实保留。[原典与修复范围](../../docs/liuyao-penalty-audit.md)保持明确。
+巳寅申读取同次`liuyao_evidence.conditional_analysis.penalty_conditions`：`condition_match`仅指所列作用范围内三支齐备，`effect_condition_match=null`保留刑的总作用未裁定，不能据此断刑害或凶事。巳爻在寅日的`growth_conditions.condition_match=false`表示本条不再按该日长生、生扶计入，原木生火关系与长生位置仍在；申暗动资格未知时，本项也未知。别爻变支和静爻变盘支不借来补齐，伏神另读自身`reception.penalty`，不借飞神本位变支。`yin_generation_allowed`按第98页特定条款先于第10章一般回头生许可：三支齐备时，所列寅月、寅日、动寅及本位变寅不计为巳爻寅生扶；活动未定时资格未知。`back_generation_conditions.sources`的`raw_condition_match`保留一般空破门槛，`condition_match`才是综合资格，不能见原始木生火就复写为回头生已经许可。`generation_conditions.generations`的`condition_match`描述来源，`target_yin_generation_allowed`与`benefit_now`描述该目标，不能把只对巳爻的排除推广为寅爻对所有目标均失效。其他独立生扶与反制照实保留。[原典与修复范围](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-penalty-audit.md)保持明确。
 
 先回答这次传统参考最值得留意什么，随即展示真实卦变或盘局依据，通常 200–300 字。一项支持推进的提示与一项需要留意的条件只有返回确实包含时才写；结果混合就把混合说清，不强迫落成“会／不会”。
 

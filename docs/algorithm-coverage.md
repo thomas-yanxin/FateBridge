@@ -81,9 +81,9 @@
 | `bazi_relatives` | 六亲：父母/兄弟姐妹星、六亲宫位、贵人 | Implemented |
 | `bazi_romance` | 正缘桃花：桃花咸池、红鸾天喜、异性缘星、正缘时机 | Implemented |
 
-八字11个出生资料入口与七个时运入口可接收已知整秒，提供秒数时须显式提供分钟；出生上下文保留省略分量与兼容00值，见[出生秒数与输入分量](bazi-birth-seconds-audit.md)。这是输入传递能力，不认证真实出生记录精度，也不提高原典或现实预测的验收等级。
+八字11个出生资料入口与七个时运入口可接收已知整秒，提供秒数时须显式提供分钟；出生上下文保留省略分量与兼容00值，见[出生秒数与输入分量](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-birth-seconds-audit.md)。这是输入传递能力，不认证真实出生记录精度，也不提高原典或现实预测的验收等级。
 
-上述入口可用已确认的 `birth_utc_offset` 消歧重复民用钟时；偏移须匹配已解析时区，未来交运保留原IANA地区规则。未知选择和跳过钟时继续拒绝，见[重复钟时审计](bazi-birth-fold-audit.md)。
+上述入口可用已确认的 `birth_utc_offset` 消歧重复民用钟时；偏移须匹配已解析时区，未来交运保留原IANA地区规则。未知选择和跳过钟时继续拒绝，见[重复钟时审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-birth-fold-audit.md)。
 
 ### 2.2 `compatibility` —— 双人配合（Implemented）
 
@@ -144,7 +144,7 @@
 | `liureng_gods` | 四课三传、天将、按探原总说推导的细课名，及同盘支位合冲刑破害并存依据；表注仍有差异 | Implemented（部分原典核对） |
 | `liureng_runyear` | 农历虚岁行年与分析时刻六壬课（不含逐流月预测） | Implemented |
 | `qimen` | [时家转盘](qimen-depth-audit.md)：置闰／拆补、寄宫及有来源的格局证据；原典片段验收，现实预测未验证 | Implemented（限定规则） |
-| `taiyi` | 《太乙金镜式经》年计及卷五年度十神、六纪节月与冬夏至时计的现代天文适配；阴阳144局两算、七类空间条件、卷四五将合取；年/月定计及[分法八门](taiyi-gates.md)，另有明选[金钥匙时计](taiyi-hour.md)完整积时与四门，及[金钥匙日计](taiyi-day.md)积日与分源十精；原表与定计课例分歧、古历异单位解释及引文异数保留，见[审计](taiyi-sanshi-audit.md)；显式[历史年计](taiyi-year-calendar.md)支持381—385晋历及501—505齐梁史历主表，502年闰标异说随结果保留，未据此认证原典古日计 | Partial |
+| `taiyi` | 《太乙金镜式经》年计及卷五年度十神、六纪节月与冬夏至时计的现代天文适配；阴阳144局两算、七类空间条件、卷四五将合取；年/月定计及[分法八门](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-gates.md)，另有明选[金钥匙时计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-hour.md)完整积时与四门，及[金钥匙日计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-day.md)积日与分源十精；原表与定计课例分歧、古历异单位解释及引文异数保留，见[审计](taiyi-sanshi-audit.md)；显式[历史年计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-year-calendar.md)支持381—385晋历及501—505齐梁史历主表，502年闰标异说随结果保留，未据此认证原典古日计 | Partial |
 | `jinkou` | 四位、阴阳用位及受克空破、五动三动、季节与有限课内旺衰、得气、六十四课钤逐条三态判定、四绝及岁日结构、三合齐缺与成员空破条件 | Implemented（58条课钤结构已评估，6条未决，全部64条以true/false/null区分命中、未命中、未判；四败仅临地分，大绝按显式本命支计算、缺命保留未知；支齐不等于合化，完整合化及综合取用未裁定） |
 
 > 紫微斗数以 iztro 2.5.8 为对齐基线，采用正月初一年界、虚岁自然年递增、本命晚子时算当天、闰月后半月算下月的规则。当前冻结 1,080 张本命软件参考盘及 18 个运限用例，分别核对本命星曜／长生博士等和六层落宫／四化；流月/流日/流时比较实际落宫索引，不能用历法地支代替。返回的 `branch` 是实际落宫，`palace_ganzhi` 是本命宫干支，`stem` 是该运限四化所用天干；后两者可能不同。另以 `childhood_limit` 独立返回原文明示一至六岁之命、财帛、疾厄、夫妻、福德、官禄宫及实际本命星曜；后续岁序留空，岁首及大限前替代关系未认证。既有起大限前童限替代与独立童限分别披露；农历日期或大限超出支持范围时明确报错。

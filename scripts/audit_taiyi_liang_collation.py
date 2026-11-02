@@ -241,7 +241,7 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
             "legacy_raw_difference_is_adjudicated_calendar_error": False,
             "source_integer_encoding_and_epoch_adjudicated": False,
             "meaning": "Original day8, corrected day9, quoted old accumulation and Shoushi in-cycle22 remain different claims; a coupled encoding match cannot replace their joint validation.",
-            "guide": "docs/taiyi-day-count-encodings.md",
+            "guide": "https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-day-count-encodings.md",
         },
         "production_calendar_installed_or_changed": False,
         "new_complete_dated_classical_cases_passed": 0,

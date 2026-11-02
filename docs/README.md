@@ -32,7 +32,7 @@ CLI 可直接执行，无需启动 REST。REST 默认端口为 `8010`，MCP 默�
 | 定位安装、MCP、参数或结果交付错误 | [故障排除](troubleshooting.md) |
 | 报告安全问题 | [安全策略](../SECURITY.md) |
 | 评估外部命例的输入质量、解释与边界 | [MingLi-Bench 外部评估](mingli-bench-evaluation.md) · [Agent 行为验收](agent-evaluation.md) |
-| 查询四柱、年柱、月柱及可核验来源 | [基础知识词条](bazi-foundations-knowledge.md) |
+| 查询四柱、年柱、月柱及可核验来源 | [八字知识查询](bazi-assessment.md#原典知识查询) |
 
 ## 理解计算与结果
 
@@ -55,7 +55,7 @@ CLI 可直接执行，无需启动 REST。REST 默认端口为 `8010`，MCP 默�
 | [占星骰](astrodice.md) | 骰面、原典关系、解释来源与验证边界 |
 | [家居风水](fengshui.md) · [玄空宅盘](fengshui-xuankong.md) | 分层规则、输入事实、作者版本与独立验证 |
 
-各专题页维护细分规则、历史差异和验证记录；接口字段与完整证据按对应入口查询。
+各专题页维护当前计算行为、来源与限制；接口字段与完整证据按对应入口查询。
 
 ## 查询接口与覆盖
 
@@ -79,12 +79,7 @@ CLI 可直接执行，无需启动 REST。REST 默认端口为 `8010`，MCP 默�
 | 作者、版本、方位与基础判据 | [规则来源](../skills/onda-fengshui/references/rule-sources.md) · [布局规则](../skills/onda-fengshui/references/layout-rules.md) |
 | 厨卫、镜、梁管、尖角、材质器形 | [室内关系与材质](../skills/onda-fengshui/references/sourced-interior-rules.md) |
 | 历史宅运、山水条件与有限解释 | [宅盘来源](../skills/onda-fengshui/references/xuankong.md) · [有限解释](../skills/onda-fengshui/references/xuankong-interpretation.md) |
-| 沈氏整理本216条下卦及同版图文冲突 | [条文校勘](fengshui-lower-clause-collation.md) |
-| 完整216张下卦盘的5,832个星数 | [盘图校勘](fengshui-lower-diagram-collation.md) |
-| 完整216张起星图的5,832个星数与兼向范围 | [起星图校勘](fengshui-replacement-diagram-collation.md) |
-| 宅盘实际返回的原书正文与图数差异 | [运行来源比较](fengshui-source-comparison.md) |
-| 事件有效年候选与已确定宅运分别读取 | [有效年分层](fengshui-event-year-fidelity.md) |
-| 候选节月、各自有效期与交节来源 | [月区间分层](fengshui-month-interval-fidelity.md) |
+| 宅运、兼向候选、盘层与来源差异 | [玄空宅盘](fengshui-xuankong.md) |
 | 工位活动、隔挡与材料条件 | [工位作者规则](../skills/onda-fengshui/references/workstation-authored.md) |
 | 用户明确另选的 BTB 桌面规则 | [桌面作者规则](../skills/onda-fengshui/references/surface-rules.md) |
 | 结果表达、逐物件与候选对照 | [结果交付](../skills/onda-fengshui/references/delivery.md) |
@@ -99,4 +94,4 @@ CLI 可直接执行，无需启动 REST。REST 默认端口为 `8010`，MCP 默�
 uv run --locked --extra dev python scripts/check_docs.py
 ```
 
-场景清单与调用合同由脚本生成，不手改生成区。仓库维护当前指南、规则资料、示例及回归测试；历史变更保留在 CHANGELOG 与 Git。一次性评审、运行回执和实现快照放在仓库外，`docs/reviews/` 只供本地临时使用，不入库。
+场景清单与调用合同由脚本生成，不手改生成区。仓库维护当前指南、规则资料、示例及回归测试；历史变更保留在 CHANGELOG 与 Git。逐轮审计、实验复盘和单次修复记录已从当前文档目录移除，被引用的依据使用固定提交链接；完整旧文档见[清理前版本](https://github.com/thomas-yanxin/FateBridge/tree/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs)。一次性评审、运行回执和实现快照放在仓库外，`docs/reviews/` 只供本地临时使用，不入库。

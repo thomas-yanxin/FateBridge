@@ -2,7 +2,7 @@
 
 `aa1996` 现已接入领域历法服务，使用 Moshier AA 5.6 的 1996 年地月质心级数、完整 Moshier 月球和重新计算的 Swiss 视位置流程。当前配置版本为 **1.1.0**，实际模型名是 `fatebridge_moshier_aa1996_solar_v1`，与原生 `moshier` 分别记账。默认 `auto` 配置未改变。
 
-来源与计算方法见[作者级数研究](liuyao-moshier-aa1996-audit.md)，接入记录见第三十七轮（本地数据：`validation/liuyao-v37/README.md`），内部运期范围与来源标签修复见第三十八轮（本地数据：`validation/liuyao-v38/README.md`）。本次没有用参考残差拟合修正表，也没有将宽松的候选保护时间当作数值门槛。
+来源与计算方法见[作者级数研究](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-moshier-aa1996-audit.md)，接入记录见第三十七轮（本地数据：`validation/liuyao-v37/README.md`），内部运期范围与来源标签修复见第三十八轮（本地数据：`validation/liuyao-v38/README.md`）。本次没有用参考残差拟合修正表，也没有将宽松的候选保护时间当作数值门槛。
 
 从项目根目录构建到一个尚不存在的绝对目录：
 

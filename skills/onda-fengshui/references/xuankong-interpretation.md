@@ -32,7 +32,7 @@
 
 另选 `interpretation.host_guest_ruleset_id="shen_2011_host_guest_v1"` 可读取 `host_guest_analysis`。坐山宫论山主、向首宫论向主；地运、运山、运向和山向分别列出，运星须取该宫实际数字。旁六宫与中宫保持未赋此主客规则，五黄保持土；主客生入不等于时令生气，也不直接断吉凶。
 
-每候选八条关系、两条原文比较均须解释其已返回内容。六处固定山向比较差异及两条重复山字的原句保留；不能为了吻合而临时改为运盘比较，亦不能未经校勘先称笔误。底本、各篇作者／藏者区别和全部432槽验收见[主客生克出入](../../../docs/fengshui-host-guest.md)。没有选择此版本不补出该层，也不把机械81种关系称作81对断语。
+每候选八条关系、两条原文比较均须解释其已返回内容。六处固定山向比较差异及两条重复山字的原句保留；不能为了吻合而临时改为运盘比较，亦不能未经校勘先称笔误。底本、各篇作者／藏者区别和全部432槽验收见[主客生克出入](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-host-guest.md)。没有选择此版本不补出该层，也不把机械81种关系称作81对断语。
 
 ### 评价时运与历史宅运分开
 
@@ -40,7 +40,7 @@
 
 基础层继续只判 `current/not_current`。可另行显式选择 `interpretation.timeliness_ruleset_id="wang_zhongzhou_timeliness_v1"`，读取王亭之上卷基本时令与互用数字；见[作者时令规则](wang-timeliness.md)。没有选择该版本时不能把 `not_current` 擅自细分为衰死；选择后也不能据基本标签拒用一个房间。网页另传的辅星／难星表有内部冲突，本版本不采用。
 
-作者子版本1.1.0返回互用数字的两条先后天图位来源，按同次候选与角色读取。五运保留原表`[5,2,8]`，没有第五卦的图位推导；未知评价运保持未知。图位数字、基本时令和现场取用各自解释，详见[图位证据与内部校验](../../../docs/fengshui-mutual-geometry.md)。
+作者子版本1.1.0返回互用数字的两条先后天图位来源，按同次候选与角色读取。五运保留原表`[5,2,8]`，没有第五卦的图位推导；未知评价运保持未知。图位数字、基本时令和现场取用各自解释，详见[图位证据与内部校验](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-mutual-geometry.md)。
 
 ### 外局存在条件
 
@@ -86,4 +86,4 @@
 
 ## 实际宅盘的来源数表比较
 
-历史宅盘默认还返回 `layers.xuankong_natal.source_comparison`，摘要在 `coverage.natal_source_comparison`。这份独立版本与起盘中州规则分别保留，逐候选显示固定沈氏整理本正文及图数相合、不合或替卦未覆盖；四处既有差异不能被一般来源声明遮盖。遇差异时同时解释原书值与计算值，不选更有利数值。完整来源、虚构实例与同run读取见[运行来源比较](../../../docs/fengshui-source-comparison.md)。
+历史宅盘默认还返回 `layers.xuankong_natal.source_comparison`，摘要在 `coverage.natal_source_comparison`。这份独立版本与起盘中州规则分别保留，逐候选显示固定沈氏整理本正文及图数相合、不合或替卦未覆盖；四处既有差异不能被一般来源声明遮盖。遇差异时同时解释原书值与计算值，不选更有利数值。完整来源、虚构实例与同run读取见[运行来源比较](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-source-comparison.md)。

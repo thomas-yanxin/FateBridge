@@ -1,12 +1,12 @@
 > 第102轮补充桧尾历法段／题记的工作读录及疑字，修复前瞻CLI写入中途失败留下损坏文件的问题；古代日界与闰小月先后仍未定。详见验证报告（本地数据：`validation/sukuyo-homa-primary-v102-validation.md`），原验收门与真实样本0保持。
 
-> 第101轮接入日本近世具名历法期别、置闰研究与改历月长差异说明，保留《宿曜帳》末格曜字冲突。详见验证报告（本地数据：`validation/sukuyo-calendar-columns-v101-validation.md`）及[近世历法资料](sukuyo-edo-calendar.md)，原验收门与真实样本0不变。
+> 第101轮接入日本近世具名历法期别、置闰研究与改历月长差异说明，保留《宿曜帳》末格曜字冲突。详见验证报告（本地数据：`validation/sukuyo-calendar-columns-v101-validation.md`）及[近世历法资料](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/sukuyo-edo-calendar.md)，原验收门与真实样本0不变。
 
 > 第100轮补齐《宿曜帳》20帧，新增保留疑字的月格条件审核，分开29／31处首录与勘误；古代日界、闰小月先后仍未定。详见验证报告（本地数据：`validation/sukuyo-manuscript-calendar-v100-validation.md`），原验收门和现实样本0保持。
 
 > 第99轮公开宿占已支持未知钟时，保留完整历日候选而不补星图；《宿曜帳》所选页读录和疑字分别保留。古代日界及闰小月先后仍未定。详见验证报告（本地数据：`validation/sukuyo-boundary-support-v99-validation.md`），原验收门与现实样本0不变。
 
-> 第98轮补齐未定半日的条件个人日与事项证据；善通寺74-52原尺寸图像39/39取得，古代钟界和补配优先仍未定。详见验证报告（本地数据：`validation/sukuyo-daybreak-overlap-v98-validation.md`）及[条件日证据说明](sukuyo-candidate-days.md)。新增14整答首评不替换原180门，真实样本仍0。
+> 第98轮补齐未定半日的条件个人日与事项证据；善通寺74-52原尺寸图像39/39取得，古代钟界和补配优先仍未定。详见验证报告（本地数据：`validation/sukuyo-daybreak-overlap-v98-validation.md`）及[条件日证据说明](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/sukuyo-candidate-days.md)。新增14整答首评不替换原180门，真实样本仍0。
 
 # 宿曜与宿占：历法、原典及验收边界
 
@@ -665,7 +665,7 @@ Taibai reference scope: the final T1299 chapter is a printed lunar-day direction
 第八十二轮：真福寺历法平行段与合配册分层（本地数据：`validation/sukuyo-composite-witness-v82-validation.md`）。新增影像定位及异读保全；原尺寸收图门槛仍失败，原历法与验收标准未改。
 
 
-第八十三轮补充馆方版次、旧阅览器页次与完整工程答复（本地数据：`validation/sukuyo-native-and-audit-v83-validation.md`）；工程取证按[完整答复指引](sukuyo-engineering-evidence.md)绑定实际问题及完整相关证据。原尺寸、古代日界、半日和闰小月先后未裁定，原180题失败及四轴原门槛继续保留。
+第八十三轮补充馆方版次、旧阅览器页次与完整工程答复（本地数据：`validation/sukuyo-native-and-audit-v83-validation.md`）；工程取证按[完整答复指引](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/sukuyo-engineering-evidence.md)绑定实际问题及完整相关证据。原尺寸、古代日界、半日和闰小月先后未裁定，原180题失败及四轴原门槛继续保留。
 
 ## 第八十四轮：所选影像研究随结果交付
 

@@ -17,7 +17,7 @@
 
 [月令领域实现](../src/fatebridge/core/classical.py)将建禄、阳刃的资格与“本气是比肩／劫财”分开；戊日未月不能因己土劫财直接命名月刃，戊巳建禄与戊午阳刃也不能只看主气判定。规则依据所选[《秘本子平真诠》书影](https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf)的《论阳刃》（PDF86–87，书页77–78），并以不同命式反例核对。
 
-杂气月增加“透干且有实际会支支持”的有限取格条件；仍保留所有候选，不把会支存在解释为已经合化或成格。PDF65的戊日丁未月命例因此从误报月刃改为正官。后续又按PDF65–66正官章补上本气正官、财印辅助的限定分支，同页乙日壬申月命例不再因印透自动改为印格；详细条件、旧标签和藏干根语义见[本轮四项验证](bazi-four-axis-validation.md)。`original_structure`、`seat_qualification`、`selection_rule`显示选择依据，不能把标签当完整原典裁定。
+杂气月增加“透干且有实际会支支持”的有限取格条件；仍保留所有候选，不把会支存在解释为已经合化或成格。PDF65的戊日丁未月命例因此从误报月刃改为正官。后续又按PDF65–66正官章补上本气正官、财印辅助的限定分支，同页乙日壬申月命例不再因印透自动改为印格；详细条件、旧标签和藏干根语义见[本轮四项验证](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-four-axis-validation.md)。`original_structure`、`seat_qualification`、`selection_rule`显示选择依据，不能把标签当完整原典裁定。
 
 ```bash
 uv run --locked --extra dev python scripts/audit_bazi_classical.py \
@@ -69,7 +69,7 @@ assert verification["status"] == "verified_structured_facts"
 
 通用评估器v4另核对每条预测与结果的 `study_plan_sha256`，其值为 `digest(StudyPlan.model_validate_json(plan_text).model_dump(mode="json"))`。它绑定整个校验后方案，包含事件、窗口、队列、基线及统计政策；不是原始文件字节散列。错配直接拒绝，缺少绑定的旧记录仍可作数值诊断，但列出 `missing_forecast_plan_commitment`／`missing_outcome_plan_commitment`，不能通过完整预注册或统计证据门槛。不能在看过结果后补字段并冒充当初承诺。具体反例、生成方法和虚构完整流程见方案绑定核验（本地数据：`validation/other-chart-study-plan-binding.md`）。审计脚本的输出路径必须尚不存在，避免覆盖以前的报告。
 
-输出包括准确率、[NIST Wilson 准确率区间](https://www.itl.nist.gov/div898/handbook/prc/section2/prc241.htm)、Brier分数、固定基线比较与覆盖率。10/10的样本全对，在独立样本假设下95% Wilson下界仍约为72.25%；不能据此宣称总体准确率为100%。现新增`statistical_evidence_gate_met`，以配对损失的Hoeffding保守单侧界检验注册的技能阈值，并对登记检验次数作Bonferroni分配；`preregistered_performance_gate_met`表示点估计、覆盖及协议完整门槛，`registered_numeric_gate_met`只表示数值门槛；统计门槛也不能绕过协议缺失。该方法不是Brier技能比值的专用区间，也不证明现实记录真实性。公式、假设及反例见[精度深化](bazi-accuracy-depth.md#现实预测点估计与证据门槛分开)。
+输出包括准确率、[NIST Wilson 准确率区间](https://www.itl.nist.gov/div898/handbook/prc/section2/prc241.htm)、Brier分数、固定基线比较与覆盖率。10/10的样本全对，在独立样本假设下95% Wilson下界仍约为72.25%；不能据此宣称总体准确率为100%。现新增`statistical_evidence_gate_met`，以配对损失的Hoeffding保守单侧界检验注册的技能阈值，并对登记检验次数作Bonferroni分配；`preregistered_performance_gate_met`表示点估计、覆盖及协议完整门槛，`registered_numeric_gate_met`只表示数值门槛；统计门槛也不能绕过协议缺失。该方法不是Brier技能比值的专用区间，也不证明现实记录真实性。公式、假设及反例见[精度深化](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-accuracy-depth.md#现实预测点估计与证据门槛分开)。
 
 `training_subject_ids`可声明训练主体匿名清单；与评估队列重叠会被拒绝，省略时报告`not_declared`，不能假定已经检查无泄漏。概率另按固定五档给出样本数、平均预测概率和实际发生比例；空档保留，不把小样本校准表当效度认证。
 

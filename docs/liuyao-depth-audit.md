@@ -359,55 +359,55 @@ uv run --locked --extra dev fatebridge sixyao --subject-file docs/examples/liuya
 
 ## 第十六轮：交节参考与小数秒回环
 
-新增[独立公布时刻对照及输出修复](liuyao-solar-boundary-audit.md)：旧根前后自检补上国立天文台2026年全部24节气分钟表，并复用已有DE440 TT参考作秒级对照。共享历法不再截掉计算消费的小数秒，避免交节两侧的不同月柱打印同一整秒时刻。分钟公布值、秒级开发参考、运行时自洽性测试分别计数；原全时期Moshier失败与全书原典未决项目保留。结果见第十六轮回执（本地数据：`validation/liuyao-depth-v16-verification.json`）。
+新增[独立公布时刻对照及输出修复](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-solar-boundary-audit.md)：旧根前后自检补上国立天文台2026年全部24节气分钟表，并复用已有DE440 TT参考作秒级对照。共享历法不再截掉计算消费的小数秒，避免交节两侧的不同月柱打印同一整秒时刻。分钟公布值、秒级开发参考、运行时自洽性测试分别计数；原全时期Moshier失败与全书原典未决项目保留。结果见第十六轮回执（本地数据：`validation/liuyao-depth-v16-verification.json`）。
 
 ## 第十七轮：土逢巳条件与生扶独立性
 
-新增[土逢巳条款审计](liuyao-cessation-audit.md)，将绝位与同版原典的论生不论绝条件分开，修复位置标记直接进入忌神化绝条款的问题。生扶依赖必须具有独立锚点，保留其他化克化破和化散未决，不改旧23条公式与原始匹配。九条先冻结合成上下文及后补工程依赖图分别计数，验收见第十七轮回执（本地数据：`validation/liuyao-depth-v17-verification.json`）。
+新增[土逢巳条款审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-cessation-audit.md)，将绝位与同版原典的论生不论绝条件分开，修复位置标记直接进入忌神化绝条款的问题。生扶依赖必须具有独立锚点，保留其他化克化破和化散未决，不改旧23条公式与原始匹配。九条先冻结合成上下文及后补工程依赖图分别计数，验收见第十七轮回执（本地数据：`validation/liuyao-depth-v17-verification.json`）。
 
 ## 第十八轮：金逢巳日的长生与日克资格
 
-新增[金逢巳日审计](liuyao-growth-audit.md)，将已核月令生扶的原典条件落实到共享作用计算及角色支持，修复长生已匹配却又保留同一日克反制的矛盾。原五行关系、18条阶段位置与23条公式保留，依赖强弱的值如实重算。源神作用、月合、回头克和受生爻旬空一并复核；未核其他生扶的分支仍待审，不造火多阈值。资料、首次输入错误及勘误单列，验收见第十八轮回执（本地数据：`validation/liuyao-depth-v18-verification.json`）。
+新增[金逢巳日审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-growth-audit.md)，将已核月令生扶的原典条件落实到共享作用计算及角色支持，修复长生已匹配却又保留同一日克反制的矛盾。原五行关系、18条阶段位置与23条公式保留，依赖强弱的值如实重算。源神作用、月合、回头克和受生爻旬空一并复核；未核其他生扶的分支仍待审，不造火多阈值。资料、首次输入错误及勘误单列，验收见第十八轮回执（本地数据：`validation/liuyao-depth-v18-verification.json`）。
 
 ## 第十九轮：交节来源与缓存身份
 
-新增[星历来源切换审计](liuyao-calendar-source-audit.md)，修复默认缓存绕过严格JPL校验的问题，并以所选文件元数据与实际加载闰秒政策绑定节气及四柱缓存。逐节气观察到来源变化时丢弃不一致年，不以它认证原子读或天文精度；验收见第十九轮回执（本地数据：`validation/liuyao-depth-v19-verification.json`）。
+新增[星历来源切换审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-calendar-source-audit.md)，修复默认缓存绕过严格JPL校验的问题，并以所选文件元数据与实际加载闰秒政策绑定节气及四柱缓存。逐节气观察到来源变化时丢弃不一致年，不以它认证原子读或天文精度；验收见第十九轮回执（本地数据：`validation/liuyao-depth-v19-verification.json`）。
 
 ## 第二十轮：巳寅申与不论生条件
 
-新增[三支条件审计](liuyao-penalty-audit.md)，把第98页原典的寅日长生、生扶排除落实到强弱、元忌、源资格、伏神和解释。原始生向与阶段位置保留，明动位置不等于刑害效力，暗动未知不算假；变支本位范围继续约束三支来源。三刑专章不支持见刑即断凶，本轮总作用保持未裁定。资料与首轮失败分别留存，验收见第二十轮回执（本地数据：`validation/liuyao-depth-v20-verification.json`）。
+新增[三支条件审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-penalty-audit.md)，把第98页原典的寅日长生、生扶排除落实到强弱、元忌、源资格、伏神和解释。原始生向与阶段位置保留，明动位置不等于刑害效力，暗动未知不算假；变支本位范围继续约束三支来源。三刑专章不支持见刑即断凶，本轮总作用保持未裁定。资料与首轮失败分别留存，验收见第二十轮回执（本地数据：`validation/liuyao-depth-v20-verification.json`）。
 
 ## 第二十一轮
 
-新增[寅生巳先后裁决](liuyao-penalty-precedence-audit.md)、[Moshier物理模型调查](bazi-moshier-model-audit.md)及五例真实模型审阅（本地数据：`validation/liuyao-v21-model-semantic-review.md`）。此前各轮“未运行”保留历史时点含义，当前试验回执仍不能认证现实预测效力或全局满分。
+新增[寅生巳先后裁决](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-penalty-precedence-audit.md)、[Moshier物理模型调查](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-moshier-model-audit.md)及五例真实模型审阅（本地数据：`validation/liuyao-v21-model-semantic-review.md`）。此前各轮“未运行”保留历史时点含义，当前试验回执仍不能认证现实预测效力或全局满分。
 
 ## 第二十二轮
 
-[修订指引后的实际模型复验与共享修复](liuyao-v22-revalidation.md)完成原五例、20条语义标准，过程未见投影纠错或相同输入成功重算；原共享三项失败已修复，629项共享检查通过。Moshier的501个原失败继续保留，另一个未上线的解析太阳候选在4,872节气及预声明240一般时点均满足原1秒线。扩展套件仍有4项完整事件历史失败，不以`unavailable`取代`computed`断言，也不将替代模型或工程通过认证为现实预测。源绑定、旧失败与各套件结果见本轮回执（本地数据：`validation/liuyao-depth-v22-verification.json`）。
+[修订指引后的实际模型复验与共享修复](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-v22-revalidation.md)完成原五例、20条语义标准，过程未见投影纠错或相同输入成功重算；原共享三项失败已修复，629项共享检查通过。Moshier的501个原失败继续保留，另一个未上线的解析太阳候选在4,872节气及预声明240一般时点均满足原1秒线。扩展套件仍有4项完整事件历史失败，不以`unavailable`取代`computed`断言，也不将替代模型或工程通过认证为现实预测。源绑定、旧失败与各套件结果见本轮回执（本地数据：`validation/liuyao-depth-v22-verification.json`）。
 
 ## 第二十三轮
 
-新增[具名解析太阳模型与共享历法接入](liuyao-v23-solar-model.md)。1800—2200年全部9,624节气达到原1秒TT线；默认无文件路径明确使用独立模型，保留原生Moshier的501个失败和旧完整事件历史四项失败。新增六壬/金口诀消费端接入、原生来源拒绝和来源回执，不改原典条款。真实模型五例仍绑定第二十二轮实际执行源码，本轮不冒称已重新对话。最终套件、公开服务回环、构建与失败沿革见第二十三轮回执（本地数据：`validation/liuyao-depth-v23-verification.json`）。
+新增[具名解析太阳模型与共享历法接入](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-v23-solar-model.md)。1800—2200年全部9,624节气达到原1秒TT线；默认无文件路径明确使用独立模型，保留原生Moshier的501个失败和旧完整事件历史四项失败。新增六壬/金口诀消费端接入、原生来源拒绝和来源回执，不改原典条款。真实模型五例仍绑定第二十二轮实际执行源码，本轮不冒称已重新对话。最终套件、公开服务回环、构建与失败沿革见第二十三轮回执（本地数据：`validation/liuyao-depth-v23-verification.json`）。
 
 ## 第二十四轮
 
-新增[月破临日值与实际模型复验](liuyao-month-break-audit.md)。同版日辰章的月令例外及额外动克、回头克反例一并进入强弱、生源、受生、飞伏和角色；原始月破及原公式不删。另修末端角色重新引入原月冲的矛盾，原失败保留。新五个真实对话已执行，固定20条标准中18条通过、2条覆盖不完整；模型自身散列核验未观察到，不能宣布解释与读取流程满分。试验后仅修通用来源／目标阅读指引，尚无新的模型复验。原652项、629项共享及新增三端／wheel检查通过，原生Moshier501个旧失败继续保留，见第二十四轮回执（本地数据：`validation/liuyao-depth-v24-verification.json`）。
+新增[月破临日值与实际模型复验](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-month-break-audit.md)。同版日辰章的月令例外及额外动克、回头克反例一并进入强弱、生源、受生、飞伏和角色；原始月破及原公式不删。另修末端角色重新引入原月冲的矛盾，原失败保留。新五个真实对话已执行，固定20条标准中18条通过、2条覆盖不完整；模型自身散列核验未观察到，不能宣布解释与读取流程满分。试验后仅修通用来源／目标阅读指引，尚无新的模型复验。原652项、629项共享及新增三端／wheel检查通过，原生Moshier501个旧失败继续保留，见第二十四轮回执（本地数据：`validation/liuyao-depth-v24-verification.json`）。
 
 ## 第二十五轮
 
-新增[焦点生源资格与2027年公布历表](liuyao-focus-fidelity-audit.md)。焦点同时列生源与受方的真、假、未决及同次引用，快照明确向外生扶受阻；没有改变作用谓词或借原爻资格替伏神、变爻。8,192组完整旧条件结果未变，新增23项及实际wheel70项交付检查通过。国立天文台与香港天文台2027年公布值另行固定，三路径均达到原60秒分钟线、1秒TT线及换月探针要求；不增加唯一TT事件数，不冲销原生501失败。原18／20真实模型记录保留，新复验候选和授权状态单列，见第二十五轮回执（本地数据：`validation/liuyao-depth-v25-verification.json`）。
+新增[焦点生源资格与2027年公布历表](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-focus-fidelity-audit.md)。焦点同时列生源与受方的真、假、未决及同次引用，快照明确向外生扶受阻；没有改变作用谓词或借原爻资格替伏神、变爻。8,192组完整旧条件结果未变，新增23项及实际wheel70项交付检查通过。国立天文台与香港天文台2027年公布值另行固定，三路径均达到原60秒分钟线、1秒TT线及换月探针要求；不增加唯一TT事件数，不冲销原生501失败。原18／20真实模型记录保留，新复验候选和授权状态单列，见第二十五轮回执（本地数据：`validation/liuyao-depth-v25-verification.json`）。
 
 ## 第三十四轮：金逢巳日的实际动土生扶
 
-新增[有界动土生扶审计](liuyao-metal-moving-support-audit.md)，将同版金长生条的实际动爻生扶落实为来源资格、活动资格与独立根证明，防止被判断金爻或巳日信用循环自证。原空破、回头克和其他反制保留，伏神应用明确同版第 110 页依据与跨章范围。最终冻结源 1790 项、实际 wheel 417 项、静态与生成 24 项检查通过，均无跳过；原 1751 个测试身份保留，两套件有交叠。原授权五个真实模型对话仍为 18／20，本轮不重复用该授权。旧、新二进制重算原 4872 个交点，Moshier 的原 501 项失败身份全部保留。当前工作树四项历法完整结果比较继续失败；缺失的旧缓存归档链与新候选独立恢复记录分别说明，不以冻结候选通过代替整个工作树或现实预测验收。详见第三十四轮回执（本地数据：`validation/liuyao-depth-v34-verification.json`）。
+新增[有界动土生扶审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-metal-moving-support-audit.md)，将同版金长生条的实际动爻生扶落实为来源资格、活动资格与独立根证明，防止被判断金爻或巳日信用循环自证。原空破、回头克和其他反制保留，伏神应用明确同版第 110 页依据与跨章范围。最终冻结源 1790 项、实际 wheel 417 项、静态与生成 24 项检查通过，均无跳过；原 1751 个测试身份保留，两套件有交叠。原授权五个真实模型对话仍为 18／20，本轮不重复用该授权。旧、新二进制重算原 4872 个交点，Moshier 的原 501 项失败身份全部保留。当前工作树四项历法完整结果比较继续失败；缺失的旧缓存归档链与新候选独立恢复记录分别说明，不以冻结候选通过代替整个工作树或现实预测验收。详见第三十四轮回执（本地数据：`validation/liuyao-depth-v34-verification.json`）。
 
 ## 第三十五轮：实际本位金化巳的资格与回头关系
 
-新增[本位化巳审计](liuyao-metal-own-si-audit.md)，按同版 PDF97–98 对已获独立生扶的实际金化巳另审长生资格，保留原始火克金，防止同一本位巳火在资格已核后仍无条件进入回头克。未核前提保留未知，普通化午、其他日月动克、原爻空破与目标承受仍分别处理；不将长生改成五行回头生。首轮 57 通过、1 失败揭示 v34 一项原期望与该条款冲突，原输入和失败未改，版本化裁决另存。冻结 R2 源码 1,841 项、实际 wheel 468 项、静态与生成 25 项通过，无跳过，原 1,790 个测试身份保留。实际恢复核对 5,643 个文件。当前四项完整结果比较、原生 Moshier 501 项及模型 18／20 仍保留；24 份交节对象的独立 TT 核查只复用 5 个既有事件，不增加独立样本或冲销原失败。详见第三十五轮回执（本地数据：`validation/liuyao-depth-v35-verification.json`）。
+新增[本位化巳审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-metal-own-si-audit.md)，按同版 PDF97–98 对已获独立生扶的实际金化巳另审长生资格，保留原始火克金，防止同一本位巳火在资格已核后仍无条件进入回头克。未核前提保留未知，普通化午、其他日月动克、原爻空破与目标承受仍分别处理；不将长生改成五行回头生。首轮 57 通过、1 失败揭示 v34 一项原期望与该条款冲突，原输入和失败未改，版本化裁决另存。冻结 R2 源码 1,841 项、实际 wheel 468 项、静态与生成 25 项通过，无跳过，原 1,790 个测试身份保留。实际恢复核对 5,643 个文件。当前四项完整结果比较、原生 Moshier 501 项及模型 18／20 仍保留；24 份交节对象的独立 TT 核查只复用 5 个既有事件，不增加独立样本或冲销原失败。详见第三十五轮回执（本地数据：`validation/liuyao-depth-v35-verification.json`）。
 
 ## 第三十六轮：Moshier 地月级数更新候选
 
-新增[Moshier AA1996 审计](liuyao-moshier-aa1996-audit.md)，从作者原包取得与当前旧表不同的地月质心级数，并将短月球偏移换为完整月球。完整改版流程重新计算地球速度与视位置，在原 4,872 交点、1800—2200 年全部 9,624 交点及 4,608 个分批固定的一般时点上满足原 1 秒线；交叠队列不相加为独立样本。原版对照完整重现原 501 项，单换地月质心的 15 项失败及 8 项新增退化保留。候选已实际编译和执行，正式包接入、三端及其他平台验收仍待完成，未改写原生失败或授予全书、模型解释满分。详见本轮回执（本地数据：`validation/liuyao-v36/README.md`）。
+新增[Moshier AA1996 审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-moshier-aa1996-audit.md)，从作者原包取得与当前旧表不同的地月质心级数，并将短月球偏移换为完整月球。完整改版流程重新计算地球速度与视位置，在原 4,872 交点、1800—2200 年全部 9,624 交点及 4,608 个分批固定的一般时点上满足原 1 秒线；交叠队列不相加为独立样本。原版对照完整重现原 501 项，单换地月质心的 15 项失败及 8 项新增退化保留。候选已实际编译和执行，正式包接入、三端及其他平台验收仍待完成，未改写原生失败或授予全书、模型解释满分。详见本轮回执（本地数据：`validation/liuyao-v36/README.md`）。
 
 ## 第三十七轮：显式 AA1996 领域接入
 
@@ -427,13 +427,13 @@ AA1996扩大年份的研究仍未通过原1秒TT门槛：1684—2304年14,904个
 
 细分问题、反例和原始验证记录按主题查阅：
 
-- [第二十六轮：跨时区日窗的实际 UTC 分段](liuyao-civil-windows-audit.md)
-- [当日冲空与同日日克的控制资格](liuyao-current-void-control-audit.md)
-- [六爻：默认 DE440、年份依赖与显式空值](liuyao-default-source-and-null-audit.md)
-- [六爻最终裁决与提示一致性审计](liuyao-final-context-explanation-audit.md)
-- [生源、受方与特定生向的逐路径说明](liuyao-generation-path-readout-audit.md)
-- [第二十七轮：交气模型差异、月令与近界反例](liuyao-model-boundary-audit.md)
-- [六爻：SPK 接入、未使用来源与同次结果证据](liuyao-spk-integration-audit.md)
+- [第二十六轮：跨时区日窗的实际 UTC 分段](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-civil-windows-audit.md)
+- [当日冲空与同日日克的控制资格](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-current-void-control-audit.md)
+- [六爻：默认 DE440、年份依赖与显式空值](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-default-source-and-null-audit.md)
+- [六爻最终裁决与提示一致性审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-final-context-explanation-audit.md)
+- [生源、受方与特定生向的逐路径说明](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-generation-path-readout-audit.md)
+- [第二十七轮：交气模型差异、月令与近界反例](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-model-boundary-audit.md)
+- [六爻：SPK 接入、未使用来源与同次结果证据](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/liuyao-spk-integration-audit.md)
 
 ## 共享历法与引文维护
 

@@ -1,6 +1,6 @@
 # 沈氏城门分支
 
-[场景技能](../SKILL.md) · [原文、规则与示例](../../../docs/fengshui-city-gate.md)
+[场景技能](../SKILL.md) · [原文、规则与示例](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-city-gate.md)
 
 本分支采用独立 `shen_city_gate_v1@1.0.0`，显式传 `city_gate`（独立宅盘工具）或 `xuankong.city_gate`（合参）。参考运和证据由当前咨询确认，不用历史宅运、年星或今天自动补出。只问数字门位时可先解释已有结果，无需历史定运或虚构现场观察。
 
@@ -14,7 +14,7 @@
 
 主要依据为《增广沈氏玄空学》卷一《论城门》历史影印，PDF57–60、印刷115–121页。已重新取得[上册扫描](https://vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4/%E6%B2%89%E6%B0%8F%E7%8E%84%E7%A9%BA_%E4%B8%8A.pdf)，与先前文件散列相同；确切出版印记仍未认证。
 
-另与[中央编译出版社整理本PDF](https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf)中的原文交叉核对：论城门在PDF90–94，五黄寄运在PDF128；沈竹礽编、姚国华与柯誉整理，ISBN978-7-5117-0801-4。PDF5的CIP记2011.3／2016.2重印，PDF6版权页版次另记2011年6月第1版、2016年2月第3次印刷，详见[书目页校核](../../../docs/fengshui-lower-clause-collation.md#底本和范围)；冻结旧夹具的CIP简写保留。采用原文数字及条件，现代译注和历史家运叙述不作为现实预测验证。
+另与[中央编译出版社整理本PDF](https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf)中的原文交叉核对：论城门在PDF90–94，五黄寄运在PDF128；沈竹礽编、姚国华与柯誉整理，ISBN978-7-5117-0801-4。PDF5的CIP记2011.3／2016.2重印，PDF6版权页版次另记2011年6月第1版、2016年2月第3次印刷，详见[书目页校核](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-lower-clause-collation.md#底本和范围)；冻结旧夹具的CIP简写保留。采用原文数字及条件，现代译注和历史家运叙述不作为现实预测验证。
 
 独立夹具（本地数据：`../../../tests/fixtures/fengshui_city_gate_v1/reference.json`）保留九运子门例、八项同元龙门位关系、三项特定数字例及四张原文页图指纹。关系中的两门按原文顺序记录，核验时比较无序集合，不能把列举先后当强弱排名。来源审计保留不适用的负例；修改预期值产生差异，删掉必需案例会拒绝验收。
 

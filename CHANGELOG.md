@@ -1,8 +1,8 @@
 # Changelog
 
-- 太乙武经旁证审计追加全部45旧未知的书影补读，明确13项、保留32未决及原45差异；生产算法未改。见[补读说明](docs/taiyi-wujing-facsimile.md)。
+- 太乙武经旁证审计追加全部45旧未知的书影补读，明确13项、保留32未决及原45差异；生产算法未改。见[补读说明](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-wujing-facsimile.md)。
 
-- 太乙日计及明确金钥匙时计补充同盘冬至选元说明，分列计数起点与冬至实刻切换；数值策略不变，原典年度启元未裁定。见[核对说明](docs/taiyi-origin-activation.md)。
+- 太乙日计及明确金钥匙时计补充同盘冬至选元说明，分列计数起点与冬至实刻切换；数值策略不变，原典年度启元未裁定。见[核对说明](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-origin-activation.md)。
 
 All notable changes to FateBridge are documented here.
 
@@ -15,35 +15,35 @@ then creates the matching tag and GitHub Release after a successful PyPI upload.
 
 ## [Unreleased]
 
-- 太乙金镜两算新增另一种代数实现的冻结参照，完整核查128计数输入及288原表两算，区分生产算术、源位置重算和原表内部差异；保留原11算差与3处始击分歧，生产数字未改。见[独立核查](docs/taiyi-independent-arithmetic.md)。
+- 太乙金镜两算新增另一种代数实现的冻结参照，完整核查128计数输入及288原表两算，区分生产算术、源位置重算和原表内部差异；保留原11算差与3处始击分歧，生产数字未改。见[独立核查](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-independent-arithmetic.md)。
 
-- 太乙武经旁证新增国图明刻本原页及无生产引擎依赖的288两算槽位条件核查；保留阴德／阳德名位冲突、阳四局55／25异文与全部旧成绩，不按较高相符数选定原典。见[两版与书内算路](docs/taiyi-wujing-internal-counts.md)。
+- 太乙武经旁证新增国图明刻本原页及无生产引擎依赖的288两算槽位条件核查；保留阴德／阳德名位冲突、阳四局55／25异文与全部旧成绩，不按较高相符数选定原典。见[两版与书内算路](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-wujing-internal-counts.md)。
 
-- 太乙武经旁证加入冻结的同书十六神名位，明确16个大族位置并揭示阴德／阳德35项映射冲突；完整1440字段及旧评分并列保留，生产金镜规则未改。见[同书名位核对](docs/taiyi-wujing-names.md)。
+- 太乙武经旁证加入冻结的同书十六神名位，明确16个大族位置并揭示阴德／阳德35项映射冲突；完整1440字段及旧评分并列保留，生产金镜规则未改。见[同书名位核对](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-wujing-names.md)。
 
-- 修复太乙及三式在显式DE440年份端点的邻年误拒、自动模式来源混用及奇门置闰年表的来源缓存；按民用输入年统一选择，并保留晚子时跨年的来源观察。独立全年范围、原置闰算路和太乙积数公式保持，见[输入年与邻年节气](docs/taiyi-solar-context-years.md)。
+- 修复太乙及三式在显式DE440年份端点的邻年误拒、自动模式来源混用及奇门置闰年表的来源缓存；按民用输入年统一选择，并保留晚子时跨年的来源观察。独立全年范围、原置闰算路和太乙积数公式保持，见[输入年与邻年节气](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-solar-context-years.md)。
 
-- 太乙月／日／时计交付同次节气对象和实际轨道模型，区分换节／换遁与冬至起元；摘要、快照及导出共用保存值。补齐验证用星历数据闭包，查明临时快照缺数据导致的Moshier回退与边界差异，保留原失败及古历未通过状态，见[来源核对](docs/taiyi-solar-sources.md)。
+- 太乙月／日／时计交付同次节气对象和实际轨道模型，区分换节／换遁与冬至起元；摘要、快照及导出共用保存值。补齐验证用星历数据闭包，查明临时快照缺数据导致的Moshier回退与边界差异，保留原失败及古历未通过状态，见[来源核对](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-solar-sources.md)。
 
 - 独立模型评测显式传递太阳模型及SPK文件选择，修复计划Native却可能实际采用默认DE440的来源错位。解释指导对照未稳定通过，候选已撤回，失败保留；只读结果读取障碍另已复现，见第五十八轮核对（本地数据：`docs/validation/numerology-explanation-conditions-audit.md`）。
 
 - 定位Native空目录的已知节气差异主要来自实际Moshier回退的上游位置模型；保留全部96点、12项超线与原1秒门槛。具名Swiss文件配置单列，不改生产算法或以另一配置通过覆盖失败，见第五十七轮诊断（本地数据：`docs/validation/heluo-native-precision-diagnosis.md`）。
 
-- 太乙及三式增加同盘完整计数的360／60／72周期分解、实际单位与摘要视图；快照及导出共用保存值。十卷所选题注逐条核对，保留相位矛盾与数值失败，不据分组认证古历或修改默认起点，见[周期与题注核对](docs/taiyi-counter-cycles.md)。
+- 太乙及三式增加同盘完整计数的360／60／72周期分解、实际单位与摘要视图；快照及导出共用保存值。十卷所选题注逐条核对，保留相位矛盾与数值失败，不据分组认证古历或修改默认起点，见[周期与题注核对](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-counter-cycles.md)。
 
 - 修复密集三式视图仍有重复回执定位信息挤占首屏业务字段的问题；在原预算内明确将完整回执放入同次manifest，首屏保留运行标识，完整事实及哈希可恢复，见本轮交付验证（本地数据：`docs/validation/taiyi-jinjing-v42/README.md`）。
 
 - 参评配运回执增加固定释文、书目、完整原句角色及时钟一致性校验，并绑定同次钟面、来源轨迹与快照段；冲突在字段裁剪前报不可重试503。六份正常结果保持，原模型遗漏不重判，见第五十六轮核对（本地数据：`docs/validation/canping-receipt-binding-audit.md`）。
 
-- 三式四维宫并列同次六壬两支实际神将与来源路径，继续标明寄支未定；抽出共享纯布将步骤，以金镜原例明确条件核对，保留朝暮差异、天空／天定异文与完整原例未通过状态，见[原例核对](docs/taiyi-dangshi-sectors.md)。
+- 三式四维宫并列同次六壬两支实际神将与来源路径，继续标明寄支未定；抽出共享纯布将步骤，以金镜原例明确条件核对，保留朝暮差异、天空／天定异文与完整原例未通过状态，见[原例核对](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-dangshi-sectors.md)。
 
 - 河洛补入泰否十二爻完整注文与标题，单次目校层各72／384；三处引卦保存实际段落条件，否九四引观不再受限于仅岁运段的引用结构。疑读不补字，原60条保持，见第五十五轮核对（本地数据：`docs/validation/heluo-taipi-commentary-audit.md`）。
 
-- 三式合参可显式选择已有六壬贵人表，新增同盘实际起贵本位与金镜明钞／四库当时法的逐版来源对照及导出；保留两版十项分歧，默认选表不变，朝暮判界与完整联合断法仍待核。同步月计1.2.0旧说明，见[贵人对照](docs/taiyi-dangshi-nobles.md)。
+- 三式合参可显式选择已有六壬贵人表，新增同盘实际起贵本位与金镜明钞／四库当时法的逐版来源对照及导出；保留两版十项分歧，默认选表不变，朝暮判界与完整联合断法仍待核。同步月计1.2.0旧说明，见[贵人对照](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-dangshi-nobles.md)。
 
 - 西占七曜日运动去掉冗余的 TT→UT1 试算，C04 有效末端仍可计算下一 TT 日位移；修正 Lahiri 偏移跨 360°／0° 时给全部行星速度叠加一整圈、误翻顺逆行的问题。原典例题差异和解释／现实验收缺口继续保留，见核验记录（本地数据：`docs/validation/western-lilly-daily-tt/report.md`）。
 
-- 修复默认金镜月计把大雪锚年重复减一而少计12个月的问题；按所求名义年生成完整积月、盘面和同次回执，规则实现升为1.2.0。补齐金钥匙附例及1561全年对照，保留全部古历失败和旧基线，见[名义年修正](docs/taiyi-key-worked-accumulation.md)。
+- 修复默认金镜月计把大雪锚年重复减一而少计12个月的问题；按所求名义年生成完整积月、盘面和同次回执，规则实现升为1.2.0。补齐金钥匙附例及1561全年对照，保留全部古历失败和旧基线，见[名义年修正](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-key-worked-accumulation.md)。
 
 - 修正固定四柱Python流年函数在未知公历年时沿用生日支、起运前套第一运的回退；保留相对干支及按需延展，公历年保持未知，并新增卷六PDF64替支释文回执，见第五十四轮核对（本地数据：`docs/validation/canping-relative-years-audit.md`）。
 - 修正旧命宫流年表在立春前从错误太岁起排，首年按实际年柱对应的年标签定位并纠正取数／岁运选文；保留旧配运未核UTC映射的范围，见第五十三轮核对（本地数据：`docs/validation/canping-legacy-year-label-audit.md`）。
@@ -89,7 +89,7 @@ then creates the matching tag and GitHub Release after a successful PyPI upload.
 
 - 西占新增Lilly昼夜同式福点、第145页独立28项表及第33页最近宫头五度效力回执；福点第六／八宫减分与七曜表分开，未知归属不补零。原书两个福点算式复现，第180页超五度归宫与累计差异仍明确失败，未扩大阈值或删行配平；见原图与接口核验（本地数据：`docs/validation/western-lilly-fortune-houses/report.md`）。
 
-- 八字新增暖局与用神、日元强弱与性情措辞、根位与有效接引三条限域知识，原82条保持。完整性情35造纳入回归，现349条记录中保留26个不同输入分歧；新承载候选零新修正而未采用。修复完整回归脚本直接启动的导入错误，见[整章检验](docs/bazi-mediated-capacity-audit.md)。
+- 八字新增暖局与用神、日元强弱与性情措辞、根位与有效接引三条限域知识，原82条保持。完整性情35造纳入回归，现349条记录中保留26个不同输入分歧；新承载候选零新修正而未采用。修复完整回归脚本直接启动的导入错误，见[整章检验](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-mediated-capacity-audit.md)。
 
 - 宋历来源组件新增精确辰刻及完整时支区间比较，区分一日百刻、初刻零起点、子正源日及子时两段；1206亥时跨交节时保留两侧可能，不补生时或偷换公开月柱，见第三十五轮核对（本地数据：`docs/validation/heluo-song-clock-audit.md`）。
 - 河洛历史历法研究新增统天／梅氏三位读法，复算两份印本演算工作表，保留分步舍入及累加端点差额；1206开禧旧例的纪日和“大雪前一日”冲突不改写，见第三十四轮核对（本地数据：`docs/validation/heluo-tongtian-audit.md`）。
@@ -97,37 +97,37 @@ then creates the matching tag and GitHub Release after a successful PyPI upload.
 
 - 西占新增Lilly1647第115页41行尊贵／减损回执，使用实际TT日位移、独立瞬时方向和历元恒星位置；日月不计顺行奖励，未知行不补零，起点坐标与来源变化拒绝混配。封存原页、勘误与单盘七曜应用，逐行累计仅复现原书3/7，日光束、三分、恒星等差异保留；新摘要卡与类型契约见全表核验（本地数据：`docs/validation/western-lilly-fortitudes/report.md`）。
 
-- 八字综合、流月、流日、流时及大运统一使用完整的默认分析瞬间，修复“当前”被月初、月中或零点替代的问题；补充实际时刻、UTC偏移／fold及缺省来源回执，拒绝显式歧义／不存在钟时，并用UTC区分月日缓存的重复钟时。保留有效部分日期查询原字段与原旺衰算法，见[分析瞬间修复](docs/bazi-analysis-instant.md)。
+- 八字综合、流月、流日、流时及大运统一使用完整的默认分析瞬间，修复“当前”被月初、月中或零点替代的问题；补充实际时刻、UTC偏移／fold及缺省来源回执，拒绝显式歧义／不存在钟时，并用UTC区分月日缓存的重复钟时。保留有效部分日期查询原字段与原旺衰算法，见[分析瞬间修复](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-analysis-instant.md)。
 
 - 河洛与参评公开推算格里历输入约定及同次历制证据，避免历史儒略历标签直接混用；四个原命例的五种题注读法与具名年号历表核对，保留三个日柱差异及一个年干支冲突。未改日期数值算法或声称完成宋代颁历复原，见第三十二轮核对（本地数据：`docs/validation/heluo-historical-calendar-audit.md`）。
 
 - 西占补充标称历元的太阳位置模型回执，区分原生未偏折视线位于太阳后方、前景凌日、圆面外及未知边界；本命、希腊盘、印度盘与卜卦公开 `solar_position_model` 字段卡。新增291个JPL开发对照，保留太阳后方默认视位置的0.02角秒比较失败；诊断不替换坐标或认证物理可见性，见位置模型核验（本地数据：`docs/validation/western-solar-position/report.md`）。
 
-- 八字按紫金山天文台原表完整提取1900–2025年46,021日，冻结后核对农历与纪日干支均一致；原HKO73,030完整格及19部分格保持，重合来源不累加独立样本。补充合法出生输入经真太阳时跨至表外的三端回归，保留未知农历、首次表头拦截及请求参数首败；未改历法数值或旺衰门槛，见[完整逐日核对](docs/bazi-pmo-calendar-audit.md)。
+- 八字按紫金山天文台原表完整提取1900–2025年46,021日，冻结后核对农历与纪日干支均一致；原HKO73,030完整格及19部分格保持，重合来源不累加独立样本。补充合法出生输入经真太阳时跨至表外的三端回归，保留未知农历、首次表头拦截及请求参数首败；未改历法数值或旺衰门槛，见[完整逐日核对](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-pmo-calendar-audit.md)。
 
 - 西占修复近太阳位置导数的假收敛，按已核对的太阳质量插值分段验证局部导数，保持原精度门槛和显示位置。固定84组源模型对照通过，2024年原中断历史恢复151个有限扫描事件；公开多层／方向／分段回执，并补齐成功历史的可空失败字段。近太阳严格位置诊断及完整原典仍未验收，见源模型与交付核验（本地数据：`docs/validation/western-solar-disc-motion/report.md`）。
 
 - 河洛修复月份表缓存期旧数据与新文件散列混配的问题，分开规则与数据版本；补齐八纯卦纳甲基础原页核对，实际六爻返回直接条目或基础推演来源，源表冲突明确失败；13条卦解与64卦软件应用分别计数，保留解卦两版次序未决。新增四条月份／纳甲句，坎的及時不指定月号，见第三十一轮核对（本地数据：`docs/validation/heluo-najia-foundations-audit.md`）。
 
-- 八字修订学业、子女、六亲及重复文昌共14条旧知识，补齐所选子平本的身印、财印、伤官用官与宫分条件，说明程序文昌只按日干及专题实际计数范围；其余68条、此前38个已编释条目保持。10条完成所声明条件校读，文昌两条及女命取象两条仍部分待校；原72条全部待独立外审，不新增原典命例或现实预测成绩。见[专题知识复核](docs/bazi-topic-knowledge-audit.md)。
+- 八字修订学业、子女、六亲及重复文昌共14条旧知识，补齐所选子平本的身印、财印、伤官用官与宫分条件，说明程序文昌只按日干及专题实际计数范围；其余68条、此前38个已编释条目保持。10条完成所声明条件校读，文昌两条及女命取象两条仍部分待校；原72条全部待独立外审，不新增原典命例或现实预测成绩。见[专题知识复核](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-topic-knowledge-audit.md)。
 
 - 河洛卦月条件修正月号未中时整句被误报否定的问题；九条月份／年命纳甲原句分列同阶段已知事实，连接范围与例外继续待定。新增离、井、涣十八项正纳原页核对，保留解卦次序差异，见第三十轮核对（本地数据：`docs/validation/heluo-najia-qualifiers-audit.md`）。
 
 - 西占卜卦按Lilly1647第107页原图修复混合容许度，明确支持两列源表；新增实际落宫、分别保留的宫位强弱序次／宫位分值，以及第126–127页居宫的月亮传递必要子条件。修复新视图在事件成功时请求缺失失败字段造成的严格投影422，保留原图、修改前反例和2024年金星导数未收敛缺口。完整原典和现实预测仍未认证，见原典与交付核验（本地数据：`docs/validation/western-lilly-orbs-houses/report.md`）。
 
-- 八字完整读取1947年任注《燥湿》《隐显》《众寡》九造并事前冻结三个不变算法；3个明确日主／日元素标注均未匹配，承载候选继续不采用。新增四条有版本、页码与程序边界的知识，原78条保持、当前82条；来源覆盖检查另拦截并完整纳入并行顺反局26造，当前23组304条记录、24个不同输入分歧。首败和未知均保留，见[完整三章检验](docs/bazi-conditional-force-audit.md)。
+- 八字完整读取1947年任注《燥湿》《隐显》《众寡》九造并事前冻结三个不变算法；3个明确日主／日元素标注均未匹配，承载候选继续不采用。新增四条有版本、页码与程序边界的知识，原78条保持、当前82条；来源覆盖检查另拦截并完整纳入并行顺反局26造，当前23组304条记录、24个不同输入分歧。首败和未知均保留，见[完整三章检验](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-conditional-force-audit.md)。
 
 - 参评土部三格原图复读，一格录晝字形、两格保留疑读；校勘层1.11.0为1123格确定、47格未决，3379原有正确转录保持。修复继承语料读取的可变缓存泄露，调用方不能污染后续旧文与文件散列的对应，见第二十九轮核对（本地数据：`docs/validation/canping-earth-rereading-audit.md`）。
 
-- 八字新增21组完整已暴露原典回归入口，补齐默认9组及季气18组以外的后续整章材料；保留269条原记录、重复与未知，当前登记范围有21个不同输入分歧，原19例均未解决。局部冲向、否定条件和录文内部一致性分别核对；修复旧回执新增审计字段与历史全对象比较冲突，原数值和判级仍精确保持，首次失败保留。见[完整回归审计](docs/bazi-source-corpus-audit.md)。
+- 八字新增21组完整已暴露原典回归入口，补齐默认9组及季气18组以外的后续整章材料；保留269条原记录、重复与未知，当前登记范围有21个不同输入分歧，原19例均未解决。局部冲向、否定条件和录文内部一致性分别核对；修复旧回执新增审计字段与历史全对象比较冲突，原数值和判级仍精确保持，首次失败保留。见[完整回归审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-source-corpus-audit.md)。
 
 - 参评按馆藏原图复读金部15格疑文，4格确定、11格仍未决，保留麴蘖与追遊世；3314时运仅明花字，不借用女文。当前1122格确定、48格未决，校勘层1.10.0追加金部批次并保留旧见证和疑读历史，见第二十八轮核对（本地数据：`docs/validation/canping-gold-rereading-audit.md`）。
 
-- 八字十九例继续核对身印、月令司令与通关，修复身印占比沿用展示舍入值的问题，补充同次未舍入分量及距节令UTC秒数；19个原典分歧和既定门槛保持。解释运行器公开既定工具限制并等待MCP就绪，第三轮11例机械通过、194句段开发者复核；前两轮失败、选择性文件读取与初版审阅索引均保留。见[定点审计](docs/bazi-body-month-passage-audit.md)与[解释验收](docs/bazi-semantics-evaluation.md)。无真实数据，预测效度仍未验证。
+- 八字十九例继续核对身印、月令司令与通关，修复身印占比沿用展示舍入值的问题，补充同次未舍入分量及距节令UTC秒数；19个原典分歧和既定门槛保持。解释运行器公开既定工具限制并等待MCP就绪，第三轮11例机械通过、194句段开发者复核；前两轮失败、选择性文件读取与初版审阅索引均保留。见[定点审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-body-month-passage-audit.md)与[解释验收](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-semantics-evaluation.md)。无真实数据，预测效度仍未验证。
 
 - 参评按原图复读木部四格正文疑读，三格确定、一格保留；撫手、玉藍、門帳按底本保留，傾□然不凭文义补齐。当前1118格确定、52格未决，追加木部批次并保留水火旧见证，见第二十七轮核对（本地数据：`docs/validation/canping-wood-rereading-audit.md`）。
 
-- 八字逐页复核并保留全部十九个旺衰分歧，新增连续中和／源流／通关单元核对，候选仍未达采用门槛。修复预测验证器极小损失下溢及负无穷JSON输出，区分真实零值与数值下溢；解释运行器隔离历史验收材料，顺序完成11个虚构用例，首次机械10例通过、综合例失败保留，204句段及表格行完成开发者复核，独立外审待完成。见[逐例复核](docs/bazi-nineteen-disagreements.md)与[现实验证流程](docs/bazi-prediction-workflow.md)。
+- 八字逐页复核并保留全部十九个旺衰分歧，新增连续中和／源流／通关单元核对，候选仍未达采用门槛。修复预测验证器极小损失下溢及负无穷JSON输出，区分真实零值与数值下溢；解释运行器隔离历史验收材料，顺序完成11个虚构用例，首次机械10例通过、综合例失败保留，204句段及表格行完成开发者复核，独立外审待完成。见[逐例复核](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-nineteen-disagreements.md)与[现实验证流程](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-prediction-workflow.md)。
 
 - 八字完整校勘1947年《衰旺》二十造，保留第十二造壬子／旧转录戊午时柱差异及原典极旺极衰状态，未将重复命例计作新改善。修复敏感性脚本混用新基线和旧扰动算法的问题，保存全部扰动数值、未知源标签和修复前源码；日常旺衰默认数值不变。
 
@@ -143,7 +143,7 @@ then creates the matching tag and GitHub Release after a successful PyPI upload.
 
 - 参评核读土部78行234格，修正“蚌內／虹內”等取文差异并恢复原页圈空，三格正文疑读保留；复用旧三格、净新增228格。全表1170格均已单次目读，1079格确定、91格未决，新增状态分开报告目读覆盖与读法确认，完整验收仍未通过，见第二十三轮核对（本地数据：`docs/validation/canping-earth-audit.md`）。
 
-- 八字补充所选1947年《任注滴天髓闡微》的身杀两停、旺衰冲向及干支位置语义，保留此前75条知识内容。整章43例及未知、首次计算、退化与未采纳结论可复跑；季相单项候选未替换旺衰默认算法，见[六冲力量审查](docs/bazi-clash-power-audit.md)。
+- 八字补充所选1947年《任注滴天髓闡微》的身杀两停、旺衰冲向及干支位置语义，保留此前75条知识内容。整章43例及未知、首次计算、退化与未采纳结论可复跑；季相单项候选未替换旺衰默认算法，见[六冲力量审查](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-clash-power-audit.md)。
 
 - 参评核读木部78行234格，修正陌上箏／恒上箏、權衡／權行及补写圈空等取文差异；四处遮损编号的三栏均保留未定。全表851格已确定、88格未决、231格未目读，见第二十二轮核对（本地数据：`docs/validation/canping-wood-audit.md`）。
 
@@ -151,13 +151,13 @@ then creates the matching tag and GitHub Release after a successful PyPI upload.
 
 - 参评核读金部78行234格，按所选底本修正末11行号文归属并保留继承旧文；计算编号不重映射。全表420格读法已确定、55格疑读、695格未目读，新增逐部覆盖；差异归因和独立复核仍待完成，见第二十轮核对（本地数据：`docs/validation/canping-gold-audit.md`）。
 
-- 八字按所选原典分列25条月令取用路径，保留本气与有限取神选择、变格兼格疑点、实际透藏及未裁定力量。旧共现首候选不再越级授予全局喜用，历史标签与账本完整保留；综合及九专题新增同次路径视图，见[月令与取用条件](docs/bazi-month-paths.md)。这未消除原典旺衰反例，也不认证完整成格或真实模型解释。
+- 八字按所选原典分列25条月令取用路径，保留本气与有限取神选择、变格兼格疑点、实际透藏及未裁定力量。旧共现首候选不再越级授予全局喜用，历史标签与账本完整保留；综合及九专题新增同次路径视图，见[月令与取用条件](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-month-paths.md)。这未消除原典旺衰反例，也不认证完整成格或真实模型解释。
 
 - 河洛新增逐先后天实际元堂的爻位偏好、二五君臣位与众宗式，拒绝仅凭五同一异而忽略实际用爻的匹配。快照将旧`dangWei`明确改称位序阴阳比较，原典阴月当位定义继续待核；不补十体评分或反面断语，见第十九轮核对（本地数据：`docs/validation/heluo-line-conditions-audit.md`）。
 
 - 河洛／参评统一公开与领域入口的省略／null时区为固定`+08:00`，修复历史夏令时期间可差一小时、改变时柱的默认政策分歧；显式地区时区保留历史规则，空白／非法时区拒绝。同次出生证据新增实际偏移、夏令时及规则库身份，见第十八轮核对（本地数据：`docs/validation/numerology-timezone-audit.md`）。
 
-- 八字旺衰升级为`season_root_revelation_relations_v3`，按《子平真诠》书影区分四墓土冲动与一般冲克；不再统一扣减土根，保留其他关系及实际剩余根量，新增严格回执与同次摘要。参数和冻结原典预期未调优，完整旺衰／成格验收仍未通过，见[四墓土冲动审计](docs/bazi-storage-movement.md)。
+- 八字旺衰升级为`season_root_revelation_relations_v3`，按《子平真诠》书影区分四墓土冲动与一般冲克；不再统一扣减土根，保留其他关系及实际剩余根量，新增严格回执与同次摘要。参数和冻结原典预期未调优，完整旺衰／成格验收仍未通过，见[四墓土冲动审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-storage-movement.md)。
 
 - 参评新增文明书局本36格局部对读，保留实际主选文、同栏对读文本及跨页编号、两版疑读与载入散列；更正此前把部分底本差异一概归为继承错字的结论，不替换主选文或增加已校数，见第十七轮核对（本地数据：`docs/validation/canping-witness-audit.md`）。
 - 参评整段核读水部78行234格，修正南山／商山、鐵杵／鐵柱及补写圈空等转录；新增原页局部圈空与编辑疑读的独立状态，累计201格已确定单次目校、40格疑读、929格未目读，未把疑读计入完成数，见第十六轮核对（本地数据：`docs/validation/canping-water-audit.md`）。
@@ -172,11 +172,11 @@ then creates the matching tag and GitHub Release after a successful PyPI upload.
 
 - 人类图与共享星历时间层补齐1960年UTC偏移／日漂移及1961年元旦5毫秒调整，保留原IERS13段；使用未修改的IAU SOFA C代码冻结233个独立时刻，修复可改变Tone／Base的毫秒级时标偏差，同步印占时间来源标签与三端对照。标准时标换算不认证实际出生钟记录。
 
-- 修订十神基础词条中的泛化结果断语，补充身强印旺、身重印轻与身轻印重的限域语义；JSON与快照逐条返回作者、版本、页码、原网址和编辑范围，旧上游时间与词条修订时间分开。保留原典旺衰反例；后续清理八个健康旧断语，区分六个医籍出处仍待校勘的条目与54个未改旧条目，不把措辞修订当原典验收。见[知识编释台账](docs/bazi-knowledge-curation.md)。
+- 修订十神基础词条中的泛化结果断语，补充身强印旺、身重印轻与身轻印重的限域语义；JSON与快照逐条返回作者、版本、页码、原网址和编辑范围，旧上游时间与词条修订时间分开。保留原典旺衰反例；后续清理八个健康旧断语，区分六个医籍出处仍待校勘的条目与54个未改旧条目，不把措辞修订当原典验收。见[知识编释台账](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-knowledge-curation.md)。
 
-- 调候摘要改为简表候选，保留全部120格兼容值；核对国图藏本甲木十二月提要和选定正文，公开申酉次序、未月半月条件及丑月操作次序与必要性的区别。综合及九专题新增同次来源与透藏位置视图；完整调候裁定与其他108格仍待完成，见[调候来源分层](docs/bazi-seasonal-source-layers.md)。
+- 调候摘要改为简表候选，保留全部120格兼容值；核对国图藏本甲木十二月提要和选定正文，公开申酉次序、未月半月条件及丑月操作次序与必要性的区别。综合及九专题新增同次来源与透藏位置视图；完整调候裁定与其他108格仍待完成，见[调候来源分层](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-seasonal-source-layers.md)。
 
-- 八字拒绝粗略线性节气回退参与年、月和时间边界计算；四柱、流月及流日窗口的派生缓存跟随星历环境，综合和九专题公开同次`calendar_basis`及实际模型。冻结4,872点DE440独立TT参考，保留Moshier的501个1秒门槛失败；超长运行环境通过同次交付物完整读取，避免挤掉首轮分析。见[模型与缓存审计](docs/bazi-ephemeris-context-audit.md)。
+- 八字拒绝粗略线性节气回退参与年、月和时间边界计算；四柱、流月及流日窗口的派生缓存跟随星历环境，综合和九专题公开同次`calendar_basis`及实际模型。冻结4,872点DE440独立TT参考，保留Moshier的501个1秒门槛失败；超长运行环境通过同次交付物完整读取，避免挤掉首轮分析。见[模型与缓存审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-ephemeris-context-audit.md)。
 
 - 按香港天文台2100年12个月首补齐农历至2100-12-31；326天逐日映射与73,058天旧值保留分开验证，返回版本和来源，未加入存在2057年30天分歧的候选库。时间轴保留节气边界小数秒，回放分钟跳过不存在／重复钟时，防止重复小时内回放到事件之前。
 
@@ -188,7 +188,7 @@ then creates the matching tag and GitHub Release after a successful PyPI upload.
 
 - 人类图生时范围改为10秒连续TT网格与检测到的速度变号候选细查，修复只看名义点和两端漏掉内部往返细分的缺口；保留闰秒/历史UTC调整样本、各变体见证与名义解释范围，不将有限采样标成连续稳定性认证。
 
-- 八字事业计数补回日支全部藏干，统一主导十神、共现信号及创业规则的口径，保留最高和第三位全部并列；索引与现代岗位类比不再使用事业层级断语。综合与九专题新增所选月令及八条原典星位路径、同根和财印隔位，提供可解析的同次证据引用与`classical_routes`字段视图；既有旺衰分歧仍保留，见[审计说明](docs/bazi-classical-routes-audit.md)。
+- 八字事业计数补回日支全部藏干，统一主导十神、共现信号及创业规则的口径，保留最高和第三位全部并列；索引与现代岗位类比不再使用事业层级断语。综合与九专题新增所选月令及八条原典星位路径、同根和财印隔位，提供可解析的同次证据引用与`classical_routes`字段视图；既有旺衰分歧仍保留，见[审计说明](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-classical-routes-audit.md)。
 
 - 修复人类图20–57通道误归Integration，按官方资料归为Knowing；增加完整通道的回路主题与逐句字段引用，区分四条整合通道及相邻Knowing/Centering。来源审计分别报告6条直接分类与30条端点标签推断，保留未完成的全本验收。
 
@@ -202,11 +202,11 @@ then creates the matching tag and GitHub Release after a successful PyPI upload.
 
 - 宿曜第三轮逐格保留T1299印本360格月建异表，增加黑白月30日名、18条事项规则和偈散昼夜差异；原生说明保留全部匹配条文，修正GPS零坐标显示及咨询入口旧算法误述，增加同run完整解释上下文核验。历史小月分宿、原典七曜时和模型语义盲评仍未完成，见三项验收（本地数据：`docs/validation/sukuyo-three-axis-validation.md`）。
 
-- 八字共享太阳时补充JPL独立参考：1900–2100年73,414个逐日午时样本，最终Swiss实现最大差异0.209秒；保留原Meeus/NOAA候选首次检验结果和来源，区别首次保留组与后续回归。综合／九专题增加原典根气层，修复财库冲与藏干财根遗漏及性格并列裁切；现实预测评估绑定解释政策、基线冻结与登记引用。各维度仍分别验收，见[审计说明](docs/bazi-solar-and-roots-audit.md)。
+- 八字共享太阳时补充JPL独立参考：1900–2100年73,414个逐日午时样本，最终Swiss实现最大差异0.209秒；保留原Meeus/NOAA候选首次检验结果和来源，区别首次保留组与后续回归。综合／九专题增加原典根气层，修复财库冲与藏干财根遗漏及性格并列裁切；现实预测评估绑定解释政策、基线冻结与登记引用。各维度仍分别验收，见[审计说明](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-solar-and-roots-audit.md)。
 
 - 河洛第三轮按影印本逐爻核对正纳与乾坤借用，修复上下纯卦表合并造成的年命纳甲误报及借用漏报，公开六爻命中位置与严格合同。指定岁运快照使用实际用爻，简化月表、日干及阴阳令比较不再冒称综合判断；新增香港天文台2026–2028年72节气参考和当前三维目标验收，详见第三轮审计（本地数据：`docs/validation/heluo-najia-audit.md`）。
 
-- 真太阳时改用真实UTC瞬间的Swiss均时差，增加366条NOAA原表缓存独立对照与时辰边界三端回归；八字新增保留阴长生异说的原典根类，分开墓库、余气与旺地根，保持未裁定根损及全局强弱状态。预测评估新增预登记检验次数、配对Brier保守证据界，保留旧点估计门槛含义，不用合成数据认证现实效度。详见[八字精度深化](docs/bazi-accuracy-depth.md)。
+- 真太阳时改用真实UTC瞬间的Swiss均时差，增加366条NOAA原表缓存独立对照与时辰边界三端回归；八字新增保留阴长生异说的原典根类，分开墓库、余气与旺地根，保持未裁定根损及全局强弱状态。预测评估新增预登记检验次数、配对Brier保守证据界，保留旧点估计门槛含义，不用合成数据认证现实效度。详见[八字精度深化](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-accuracy-depth.md)。
 
 - 宿占默认改为七曜视赤经与现代距星不等宽研究宿界，旧等分黄道图须显式选择；修复宿内度数跨30度显示，冻结42个JPL坐标样本。宿曜增加T1299六类活动条文，保留业日及危日婚姻矛盾；提供配对去重、文件冻结、预测封存、盲法结局表和到期Brier评价流程。当前无真实样本，未声称现实预测有效，见[审计与迁移](docs/sukuyo.md)。
 
@@ -221,7 +221,7 @@ then creates the matching tag and GitHub Release after a successful PyPI upload.
 
 - 河洛理数改用出生瞬间判断节气与至点半年，修正三元五寄宫循环及天地数归卦；参评数修复同支十三位和91岁后大运钳制，默认改为原典日支法 `gu`，月支变法须显式 `ming`。两工具增加规则轨迹、条文与来源、有限验证状态；不再把简化命中量宣称为综合葉否。新增原典算例、外部24节气及三端测试，详见[审计说明](docs/numerology-audit.md)。
 
-- 增加八字四项分离审计与事前二元预测记录评估；没有真实记录时不生成效果结论。补充正官财印辅助的限定取格规则、旧标签与藏干根语义，修复综合命盘默认日期时区，以及学业、六亲、桃花模板中的结果越界和同时合冲遗漏。详见 [四项验证](docs/bazi-four-axis-validation.md)。
+- 增加八字四项分离审计与事前二元预测记录评估；没有真实记录时不生成效果结论。补充正官财印辅助的限定取格规则、旧标签与藏干根语义，修复综合命盘默认日期时区，以及学业、六亲、桃花模板中的结果越界和同时合冲遗漏。详见 [四项验证](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-four-axis-validation.md)。
 
 - 八字月令取格校正建禄／阳刃坐支资格，增加杂气透干会支的有限选择证据，保留原典分歧；时运新增显式生时范围及当前大运候选，拒绝未消歧的夏令时出生钟。扩展72个独立节气时刻核对，增加同次计算结构化引用核验和预注册二元预测评估器；无现实数据时保持未检验状态，详见[四项独立验收](docs/prediction-validation.md)。
 

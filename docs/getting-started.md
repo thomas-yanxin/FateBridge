@@ -45,7 +45,7 @@ uv run --locked --extra dev fatebridge describe bazi_birth --detail input
 
 安装入口为 `fatebridge`、`fatebridge-api` 和 `fatebridge-mcp`。`pyswisseph` / `kerykeion` 都是常规依赖；FateBridge 的规则、知识与场景 JSON 随包安装，外部星历文件不随 FateBridge wheel 分发，见下文。
 
-当前源码构建另附无损裁取的DE440太阳轨道系数，供默认交节计算使用，不需要可选`jpl`依赖或外部SPK文件。[默认交节审计](bazi-de440-default-audit.md)列出数据体积、实际模型、适用范围和完整有限验收；已安装环境仍以自己的实际模型回执为准。
+当前源码构建另附无损裁取的DE440太阳轨道系数，供默认交节计算使用，不需要可选`jpl`依赖或外部SPK文件。[默认交节审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-de440-default-audit.md)列出数据体积、实际模型、适用范围和完整有限验收；已安装环境仍以自己的实际模型回执为准。
 
 ## 选择运行方式
 
@@ -141,7 +141,7 @@ curl -X POST http://localhost:8010/api/cn/bazi/birth \
 
 中式出生信息默认开启真太阳时，显式 true 时必须提供可解析地点或经度；没有经度且只使用模型默认值时，按钟表时间计算并附提示。小时必填。固定时区、经度和分析日期有助于复现。
 
-八字与七个时运入口可另传已知 `birth_second`（整数0—59，同时显式给出分钟）。未知秒数省略或传null；输入回执区分未知分量与兼容00值，不推定实际出生范围，见[出生时间分量](bazi-birth-seconds-audit.md)。
+八字与七个时运入口可另传已知 `birth_second`（整数0—59，同时显式给出分钟）。未知秒数省略或传null；输入回执区分未知分量与兼容00值，不推定实际出生范围，见[出生时间分量](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-birth-seconds-audit.md)。
 
 ## 第一条星盘请求
 

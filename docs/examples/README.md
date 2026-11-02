@@ -22,8 +22,8 @@
 | [早期宅运完整区间](fengshui-historical-period.json) | `fengshui_xuankong_natal` | 虚构1800年输入；1784–1804端点使用的实际轨道来源 |
 | [原书数表差异](fengshui-source-differences.json) | `fengshui_xuankong_natal` | 原图五与计算二分别保留，读取逐候选来源比较 |
 | [起星图数表差异](fengshui-replacement-source-differences.json) | `fengshui_xuankong_natal` | 五运子午替卦原图九与计算六、编者范围及未验证的兼向条件 |
-| [事件有效年候选](fengshui-event-year-candidates.json) | `fengshui_xuankong_natal` | 依[受控模型运行方法](../fengshui-event-year-fidelity.md#可复现的虚构示例)，分开读取候选有效年和已确定宅运 |
-| [候选节月有效期](fengshui-month-interval-candidates.json) | `fengshui_monthly_stars` | 依[受控模型运行方法](../fengshui-month-interval-fidelity.md#可复现的虚构输入)，读取各候选节月的完整区间与来源 |
+| [事件有效年候选](fengshui-event-year-candidates.json) | `fengshui_xuankong_natal` | 依[受控模型运行方法](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-event-year-fidelity.md#可复现的虚构示例)，分开读取候选有效年和已确定宅运 |
+| [候选节月有效期](fengshui-month-interval-candidates.json) | `fengshui_monthly_stars` | 依[受控模型运行方法](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-month-interval-fidelity.md#可复现的虚构输入)，读取各候选节月的完整区间与来源 |
 | [宅向误差支持角区](fengshui-bearing-support.json) | `fengshui_xuankong_natal` | 同一个宅盘由哪些测量角区与选盘理由支持 |
 | [WMM2025地磁参考](fengshui-geomagnetic.json) | `fengshui_directions` | NOAA数值测试例；原始方位与模型换算候选分别保留 |
 | [独立沈氏城门](fengshui-city-gate.json) | `fengshui_xuankong_natal` | 显式参考运、同元龙门位、顺逆；无需编造历史宅运 |
