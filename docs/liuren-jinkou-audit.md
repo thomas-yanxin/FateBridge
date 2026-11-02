@@ -356,3 +356,11 @@ uv run --locked --extra dev python scripts/audit_ren_classical.py \
 5. 报告覆盖率、Brier 分数、相对基线的改进、置信区间及适用范围；用新独立样本复现。比例区间参照 [NIST Wilson 方法](https://www.itl.nist.gov/div898/handbook/prc/section2/prc241.htm)。
 
 原典记载的应验故事属于历史文本，不是随机对照、独立留出或前瞻数据。任何有限样本即使全中，也只能说明那个样本的结果，不能认证所有问题、所有未来情境都满分。
+
+## 本地复核入口
+
+京本金口诀行年使用 `uv run --locked --extra dev python scripts/audit_jinkou_year_fate.py --output /tmp/jinkou-year-fate.json` 及 `tests/test_jinkou_year_fate.py` 核对。出生年干支、指定一岁起算岁序和性别分别保留；岁首与占时实际年龄联动未认证，另课地分是行年支推导，不能写成观测方位。原书标签、循环推导、业务合同与进程内三端分别报告；可选旧720盘基线不作为新占断答案，详见第四十六轮记录（本地数据：`validation/jinkou-year-fate-validation-2026-10-23.md`）。
+
+六壬／金口诀历史封套的受控补证使用 `scripts/audit_ren_golden_evidence.py --capture --candidate-dir <新目录> --output <审计文件>`，捕获真实REST结果后核对冻结原件、手算预期、原计算保持与限定路径；默认不写黄金文件。canonical收据缺少UUID与生成时间，业务主体与实际返回的完整收据分别验证。黄金时钟的进入失败、异常清理、UTC跨区及重复钟回归见 `tests/test_ren_golden_evidence.py`；不要重新替换已退役模块里的datetime入口。确切范围、旧误标及未迁移差异见第四十五轮记录（本地数据：`validation/ren-golden-evidence-validation-2026-10-23.md`）。
+
+历史补证结果缺少后续版本新增字段时，审计保留 `current_contract_error`，完整合同门槛仍为未通过，命令返回非零并拒绝写回黄金文件。旧对象的可逆补证、来源与原计算核验继续保留；当前响应另用严格完整合同验收。

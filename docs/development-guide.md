@@ -31,7 +31,7 @@ uv sync --locked --extra dev
 
 首次 `doctor` 应能识别包版本和已安装依赖；缺少外部星历文件时按返回的能力范围处理。Windows 的环境准备见[快速入门](getting-started.md)。
 
-历史验证原件、回归输入与黄金快照在 Git 之外按固定版本保存。按[仓库维护](repository-maintenance.md#恢复-ci-冻结数据)恢复与当前测试版本配套的数据到 `docs/validation/`、`tests/fixtures/` 和 `tests/golden/snapshots/`；当前 Python 测试辅助模块与维护文档仍由 Git 管理。CI 在测试前下载并核对固定资产的大小和 SHA-256，需要配置私有数据仓库的只读下载 Secret。数据或凭据缺失时保留失败，不通过重建基线或跳过断言替代验收。本文中的本地数据路径在恢复数据后可用。
+历史验证原件、回归输入与黄金快照只在本地按固定版本保存。按[仓库维护](repository-maintenance.md#本地恢复冻结数据)从本地归档恢复到 `docs/validation/`、`tests/fixtures/` 和 `tests/golden/snapshots/`；当前 Python 测试辅助模块仍由 Git 管理。云端仅运行不依赖这些资料的自包含检查，不上传或下载测试数据。执行本地全量前需准备匹配数据，缺失时保留失败，不重建基线或放宽断言。本文中的本地数据路径在恢复后可用。
 
 开发依赖继续声明在 `project.optional-dependencies.dev`，兼容既有的 dev extra。本页统一用 `uv run --locked --extra dev <command>` 运行仓库命令，无需激活虚拟环境。提交依赖变更时同时审查 `pyproject.toml` 和 `uv.lock`；不要手改锁文件。
 
@@ -138,7 +138,7 @@ uv run --locked --extra dev python -m pytest -q tests/test_chinese_metaphysics.p
 
 测试需要在已安装 dev extra 的 Python 3.10–3.13 环境里跑，这跟 CI 矩阵保持一致。注意不要用系统自带的解释器，否则容易出现伪失败。例如异步测试在缺少 `pytest-asyncio` 时不会真正执行，而是直接报 `FAILED`，错误信息通常是 `async def functions are not natively supported`。这类失败是环境问题，不是代码问题：先执行 `uv sync --locked --extra dev` 并通过 `uv run --locked --extra dev` 使用该环境，再判断测试本身是否有错。同理，`black`、`isort`、`mypy` 也都来自 dev extra，系统解释器里一般没有。
 
-非均匀节点的 SciPy 独立对照使用封存的专用锁文件；其依赖与主源码环境分别维护。CI 的 Python 3.12 作业额外执行同一检查，不能把主环境中缺少 SciPy 的跳过计作对照通过：
+非均匀节点的 SciPy 独立对照使用封存的专用锁文件；其依赖与主源码环境分别维护。该检查仅在本地专用环境执行；云端不恢复此环境或数据，不能把主环境中缺少 SciPy 的跳过计作对照通过：
 
 ```bash
 PYTHONPATH="$PWD:$PWD/src" UV_PROJECT_ENVIRONMENT="$PWD/.venv-nonuniform-reference" \
@@ -149,26 +149,21 @@ PYTHONPATH="$PWD:$PWD/src" UV_PROJECT_ENVIRONMENT="$PWD/.venv-nonuniform-referen
 
 梅花时间戳签名测试还需要支持 `ts -attime`、`-check_ss_sig` 的 OpenSSL。macOS 自带程序可能缺少这些选项；可将已安装的 OpenSSL 3 的 `bin` 目录放在本次测试命令的 `PATH` 前部，或向审计 CLI 显式传 `--openssl`。缺少能力应报告环境错误，不删验证参数，也不跳过签名验证。
 
-### CI 运行范围
-
-主分支每次 push 都运行完整测试，避免文档提交取消先前代码检查后以局部检查代替验收。PR 按整个 merge-base 差异分流；同一分支或 PR 有新提交时会取消旧 CI。源码、测试（含 `tests/fixtures/` 原典标注与冻结清单）、依赖、工作流、技能、`AGENTS.md`、`docs/examples/` 和 `docs/validation/`（包括其中的 Markdown）的变更运行 Python 3.10–3.13 全量测试及最低依赖测试，数值基线由 Linux x86_64 / Python 3.12 校验。无法取得完整差异或出现未识别路径时也运行全量。
-
 黄金环境同时固定空星历目录与 `FATEBRIDGE_SOLAR_TERM_MODEL=native`，并在退出时恢复调用方策略；空目录或单独的Swiss探测标志不能证明实际交节采用Moshier。来源与元数据确有行为新增时，逐字段审核、保留旧结果并只更新受影响基线，不以重新冻结取得天文精度或原典符合。风水实例与已保留差异见[运行来源比较](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-source-comparison.md)。
 
-京本金口诀行年使用 `uv run --locked --extra dev python scripts/audit_jinkou_year_fate.py --output /tmp/jinkou-year-fate.json` 及 `tests/test_jinkou_year_fate.py` 核对。出生年干支、指定一岁起算岁序和性别分别保留；岁首与占时实际年龄联动未认证，另课地分是行年支推导，不能写成观测方位。原书标签、循环推导、业务合同与进程内三端分别报告；可选旧720盘基线不作为新占断答案，详见第四十六轮记录（本地数据：`validation/jinkou-year-fate-validation-2026-10-23.md`）。
+黄金快照会规范化浮点，原始未舍入账本应先独立校验，再要求规范化结果与快照一致，不把舍入后的副本当作原始账本，也不放宽账本恒等式。
 
-六壬／金口诀历史封套的受控补证使用 `scripts/audit_ren_golden_evidence.py --capture --candidate-dir <新目录> --output <审计文件>`，捕获真实REST结果后核对冻结原件、手算预期、原计算保持与限定路径；默认不写黄金文件。canonical收据缺少UUID与生成时间，业务主体与实际返回的完整收据分别验证。黄金时钟的进入失败、异常清理、UTC跨区及重复钟回归见 `tests/test_ren_golden_evidence.py`；不要重新替换已退役模块里的datetime入口。确切范围、旧误标及未迁移差异见第四十五轮记录（本地数据：`validation/ren-golden-evidence-validation-2026-10-23.md`）。
+六壬／金口诀的行年核对、历史封套补证与完整合同门槛见[专题审计的本地复核入口](liuren-jinkou-audit.md#本地复核入口)。
 
-历史补证结果缺少后续版本新增字段时，审计保留 `current_contract_error`，完整合同门槛仍为未通过，命令返回非零并拒绝写回黄金文件。旧对象的可逆补证、来源与原计算核验继续保留；当前响应另用严格完整合同验收。黄金快照会规范化浮点，原始未舍入账本应先独立校验，再要求规范化结果与快照一致，不把舍入后的副本当作原始账本，也不放宽账本恒等式。
+### CI 运行范围
 
-PR 仅修改根目录的 README、CHANGELOG、CONTRIBUTING、SECURITY，或 `docs/` 下排除 `examples/`、`validation/` 与 `AGENTS.md` 的普通 Markdown 时，可走文档分支。该分支仍安装锁定开发环境，检查链接、JSON、接口计数、生成合同、技能接口和可运行 CLI 示例。JSON、日志等其他归档按非文档变更处理。
+每次主分支 push 和 PR 都运行同一组自包含检查；同一分支或 PR 的新提交会取消旧 CI。工作流只浅克隆当前源码，不为变更分流拉取完整历史。Python 3.10–3.13、最低直接依赖和 Windows 共用 `scripts/run_ci_checks.py` 的检查清单，锁定环境另外检查文档、生成合同与 stdio MCP。
 
-Black、isort 和 mypy 在全量矩阵的 Python 3.12 作业检查一次；通用文档检查统一由 locked 作业执行。`CI result` 始终汇总本次选中的检查，文档分支跳过的全量作业不等于失败，已选作业的失败或意外跳过也不会被汇总为成功。
+云端不下载冻结夹具、黄金快照、外部星历或独立参考。完整领域回归、数值基线、原典复放和 SciPy 独立对照保留在本地，使用原数据、断言与固定门槛执行；云端通过不能作为这些项目的验收结论。混合测试文件中依赖本地资料的用例标记为 `local_data`，默认本地 `pytest` 不排除它们。
 
-全量分支还要求 Windows Server 2022 / Python 3.12 的 `windows` 作业通过：
-在锁定环境验证独立 stdio MCP 启动、私有 ACL、重解析点拒绝、线程与跨进程锁、
-完整分页，以及坐标与日历修复的三端回归。Windows 权限检查使用原生 ACL，
-不将 POSIX mode bits 当作 Windows 私有性的证明。
+Black、isort 和 mypy 在 Python 3.12 作业检查一次；通用文档检查由 locked 作业执行。`CI result` 要求锁定环境、Python 矩阵、最低依赖和 Windows 作业全部成功，失败或意外跳过均不能通过汇总。
+
+Windows Server 2022 / Python 3.12 在没有外部测试数据的锁定环境验证 stdio MCP、私有 ACL、重解析点拒绝、线程与跨进程锁、完整分页及三端合同。Windows 权限检查使用原生 ACL，不将 POSIX mode bits 当作 Windows 私有性的证明。
 
 ### 格式化与静态检查
 
@@ -340,9 +335,11 @@ uv build
 uvx --from twine twine check dist/*
 ```
 
-CI 的 `locked` 作业检查 `uv.lock` 和文档；全量分支还在该环境验证命令入口与真实 stdio MCP。现有最新版依赖矩阵和最低依赖作业使用独立的 `uv pip` 环境，不受开发锁文件约束。
+CI 的 `locked` 作业检查 `uv.lock` 和文档；该环境还验证命令入口与真实 stdio MCP。现有最新版依赖矩阵和最低依赖作业使用独立的 `uv pip` 环境，不受开发锁文件约束。
 
-`.github/workflows/ci.yml` 的 `test` 作业在 Ubuntu 24.04 上覆盖 Python 3.10–3.13，在各版本执行 pytest，并在 Python 3.12 执行 Black、isort 和 mypy；`floor` 在 Python 3.10 按最低直接依赖运行测试。黄金快照字节比对仅在受支持的 Linux x86_64 / Python 3.12 环境启用，其他环境跳过不代表该项通过。每个作业记录解析后的完整依赖清单并上传 JUnit；`floor` 必须用 `uv pip install --system --resolution lowest-direct -e ".[dev]"` 在全新环境解析，不能仅固定 FastMCP 3.4.2 来代替全部最低直接依赖验证。
+`.github/workflows/ci.yml` 的 `test` 作业在 Ubuntu 24.04 / Python 3.10–3.13 执行自包含检查，Python 3.12 另检查 Black、isort 和 mypy；`floor` 在 Python 3.10 按最低直接依赖运行相同检查。每个作业记录依赖清单并上传自包含检查的 JUnit。`floor` 用 `uv pip install --system --resolution lowest-direct -e ".[dev]"` 在全新环境解析，不能仅固定 FastMCP 版本代替最低直接依赖验证。本地黄金快照比对仍限定受支持的 Linux x86_64 / Python 3.12 环境，其他环境跳过不代表通过。
+
+发布前另行完成与改动相关的本地领域及外部数据验收；云端 CI 只证明其明确列出的检查通过。
 
 版本来自 `src/fatebridge/__init__.py::__version__`。发布时递增该版本并同步更新 CHANGELOG；`publish.yml` 在 `master` 的 push CI 成功完成后，检出该次 CI 实际测试的提交，查询 PyPI，仅在版本尚未发布时构建 sdist/wheel。版本已存在则跳过构建与发布；查询失败则停止，不把网络错误当成新版本。流程不会自动递增版本，因此普通提交沿用已发布版本时不会更新 PyPI。
 

@@ -37,25 +37,31 @@ uv run --locked --extra dev python scripts/clean_repository.py --apply
 
 架构测试共用一次源码依赖图，集中检查领域与协议分层、内部循环依赖、目录装配及退役入口；已被全图检查覆盖的局部断言不重复维护。模块整理前后，保留其他测试的节点身份与原有验收阈值。
 
-`.gitignore` 排除历史验证与回归数据；已有跟踪数据使用 `git rm --cached` 取消跟踪，本地原件保留。执行全量测试或 CI 前恢复与测试版本匹配的数据，保留原有缺失检查、来源哈希、反例及数值阈值。维护文档以本地数据路径标明这些原件的位置。
+`.gitignore` 排除历史验证与回归数据；已有跟踪数据使用 `git rm --cached` 取消跟踪，本地原件保留。执行本地全量测试前恢复与测试版本匹配的数据，保留原有缺失检查、来源哈希、反例及数值阈值。维护文档以本地数据路径标明这些原件的位置。
 
 云端清理通过普通 Git 提交同步当前文件树。CI 回归产物保留14天；需长期保存的验收材料应另行下载归档。手动移除旧 Actions 产物或日志前，保存运行元数据、原始压缩包和校验摘要；最近运行及发布依据继续保留，历史失败不因清理改判。
 
-## 恢复 CI 冻结数据
+## 本地恢复冻结数据
 
-`tests/fixture-data.json` 固定数据源仓库、来源提交、Release 资产 ID、大小及 SHA-256。`scripts/restore_test_data.py` 在测试前逐包下载并核验，仅恢复夹具、黄金快照和历史验证目录；已有文件字节不同会停止，不覆盖现有参考。数据包更新须审阅原件及清单，不通过重算样本修补旧失败。
+测试数据只在本地保存。`tests/fixture-data.json` 固定来源提交、归档名称、大小和 SHA-256；清单不包含云端仓库或资产 ID。`scripts/restore_test_data.py` 只读取显式提供的本地归档目录，核验后恢复夹具、黄金快照和历史验证目录。已有文件字节不同会停止，不覆盖现有参考，也不重算样本。
 
 ```bash
-uv run --locked --extra dev python scripts/restore_test_data.py
-uv run --locked --extra dev python scripts/restore_test_data.py --core-only
 uv run --locked --extra dev python scripts/restore_test_data.py --archive-directory /path/to/frozen-archives
+uv run --locked --extra dev python scripts/restore_test_data.py --archive-directory /path/to/frozen-archives --core-only
+uv run --locked --extra dev python -m pytest -q
 ```
 
-Linux 完整矩阵和最低依赖任务恢复全部清单，Windows 任务和锁定环境的入口检查只恢复核心夹具。离线目录中的压缩包名称与清单一致，使用同一套大小及散列检查。
+归档名称必须与清单一致。缺少归档、来源哈希不符或本地参考不同仍然报错；数据缺失不算验收通过。外部星历、独立参考与专用锁环境按[开发指南](development-guide.md#测试)在本地准备。
 
-数据存放于私有 `thomas-yanxin/FateBridge-test-data` 仓库的固定 Release 资产。CI 下载使用 `FATEBRIDGE_FIXTURE_TOKEN` 仓库 Secret：凭据仅限该数据仓库，具有 `Contents: read` 权限；工作流自身的默认权限继续保持只读。缺少凭据时在下载前明确失败，不跳过依赖数据的测试。资产读取权限见 [GitHub 官方说明](https://docs.github.com/en/rest/releases/assets#get-a-release-asset)。
+## 云端自包含检查
 
-来自 fork 的 pull request 不会获得该 Secret，需要维护者在受信分支执行同一套回归。本地可使用 GitHub CLI 的已有登录，或通过离线压缩包目录恢复数据。
+云端不上传、下载或恢复外部测试数据。`scripts/run_ci_checks.py` 集中维护云端检查文件：覆盖架构、请求与响应合同、REST／MCP／CLI、私有存储、临时夹具和文档。Windows 使用跨平台集合，其他平台另检查文档、技能与 CI 配置。混合文件中需本地参考的用例用 `local_data` 标记，保留原断言并从云端集合中排除。
+
+```bash
+uv run --locked --extra dev python scripts/run_ci_checks.py
+```
+
+新增云端检查须在没有 `docs/validation/`、外部夹具、黄金快照与星历目录的干净 checkout 验证。默认 `pytest` 仍收集本地全部测试；历史原件、独立来源和数值门槛继续由本地全量与专题验证负责。云端检查通过不代表这些验证已执行或通过。
 
 ## 文档和依赖检查
 
@@ -72,3 +78,5 @@ uv run --locked --extra dev python -m pytest -q \
 默认 pytest 收集排除 `tests/fixtures/` 内的历史测试程序；当前 `tests/test_*.py` 仍通过夹具、来源哈希与独立复放核对这些材料。原程序保留，可在对应冻结环境显式复放。
 
 结构整理保留业务输出与公开合同；源码变化会自然改变实现指纹。算法、数据来源、数值阈值和黄金样本的修改应作为独立工程变更验证。完整开发与发布要求见[开发指南](development-guide.md)。
+
+Git 跟踪的文本统一以 LF 检出，避免 Windows 的 `core.autocrlf` 改变来源文件字节、触发哈希校验失败。需保留原始换行的文件在 `.gitattributes` 中用 `-text` 明确标注；冻结数据包继续保留原字节，不重算其哈希。

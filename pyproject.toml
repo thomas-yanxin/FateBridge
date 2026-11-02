@@ -94,7 +94,10 @@ fatebridge = ["py.typed", "data/**/*.json", "data/guolao/sefstars.txt", "data/we
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["native_engine_fault: inject a fault or spy inside a fresh native-engine test process"]
+markers = [
+    "native_engine_fault: inject a fault or spy inside a fresh native-engine test process",
+    "local_data: requires locally archived regression or independent reference data",
+]
 
 [tool.black]
 line-length = 88
