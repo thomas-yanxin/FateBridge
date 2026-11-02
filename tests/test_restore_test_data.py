@@ -18,12 +18,10 @@ def bundle(tmp_path, name="tests/fixtures/reference.json", content=b'{"value": 1
         tar.addfile(member, io.BytesIO(content))
     manifest = DataManifest.model_validate(
         {
-            "schema_version": 1,
-            "repository": "thomas-yanxin/FateBridge",
+            "schema_version": 2,
             "source_revision": "a" * 40,
             "parts": [
                 {
-                    "asset_id": 1,
                     "name": archive.name,
                     "sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
                     "size": archive.stat().st_size,
@@ -48,7 +46,7 @@ def test_exact_bytes_restored_and_repeat_restoration_keeps_existing_data(tmp_pat
     assert target.read_text() == "existing different reference"
 
 
-def test_corrupt_download_is_rejected_before_any_restoration(tmp_path):
+def test_corrupt_archive_is_rejected_before_any_restoration(tmp_path):
     archive, manifest = bundle(tmp_path)
     archive.write_bytes(archive.read_bytes() + b"corrupt")
     root = tmp_path / "checkout"
@@ -77,9 +75,9 @@ def test_core_jobs_leave_full_research_inputs_for_the_full_matrix(tmp_path):
     )
 
 
-def test_missing_ci_credential_reports_configuration_before_download(monkeypatch):
-    monkeypatch.setenv("GITHUB_ACTIONS", "true")
-    monkeypatch.delenv("GH_TOKEN", raising=False)
+def test_local_archive_directory_is_required_before_restoration(monkeypatch, capsys):
     monkeypatch.setattr("sys.argv", ["restore_test_data.py"])
-    with pytest.raises(RuntimeError, match="FATEBRIDGE_FIXTURE_TOKEN"):
+    with pytest.raises(SystemExit) as error:
         main()
+    assert error.value.code == 2
+    assert "--archive-directory" in capsys.readouterr().err

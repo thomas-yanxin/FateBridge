@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
 
+import pytest
+
 from fatebridge.core.requests.calendar import NongliTimeRequest
 from fatebridge.services.calendar_tools import (
     calculate_jieqi_year,
@@ -53,6 +55,7 @@ def test_calculate_jieqi_year_supports_selected_export_sections():
     assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
+@pytest.mark.local_data
 def test_calculate_nongli_time_returns_lunar_and_ganzhi_context():
     result = calculate_nongli_time(
         date="2028-04-01",
@@ -121,6 +124,7 @@ def test_calculate_nongli_time_supports_selected_export_sections():
     assert "[来源]" not in result["snapshot_export"]["export_text"]
 
 
+@pytest.mark.local_data
 def test_calculate_nongli_time_time_alg_zero_applies_true_solar_correction():
     direct_result = calculate_nongli_time(
         date="2020-01-01",

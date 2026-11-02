@@ -13,7 +13,6 @@ from jsonschema import ValidationError, validate
 from fatebridge.application.examples import example_input, suggested_fields
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from tests.compatibility_reference import assert_score_reference
 from tests.fixtures.mcp_result_delivery import first_page_uri
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -205,7 +204,10 @@ async def test_published_stage_view_retains_actual_period_boundaries():
 
 
 @pytest.mark.asyncio
+@pytest.mark.local_data
 async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls():
+    from tests.compatibility_reference import assert_score_reference
+
     records = await builder.call_contracts()
     specs = {s.tool_name: s for s in CATALOG}
     async with Client(create_mcp_app()) as client:

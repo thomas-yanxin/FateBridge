@@ -253,6 +253,7 @@ def test_invalid_manifest_has_a_clear_validation_error(tmp_path, invalid):
         load_ephemeris_manifest(file)
 
 
+@pytest.mark.local_data
 def test_packaged_catalog_matches_the_frozen_official_tree():
     catalog = load_ephemeris_manifest()
     fixture = Path(__file__).parent / "fixtures/swiss-ephemeris-upstream-tree.json"

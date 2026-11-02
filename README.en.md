@@ -418,11 +418,11 @@ uv run --locked --extra dev python -m pytest -q \
   tests/test_documentation_integrity.py tests/test_doc_tool_counts.py \
   tests/test_scenario_routing_coverage.py tests/test_skills_interface_contract.py \
   tests/test_skills_engine_contract.py tests/test_codex_call_contracts.py \
-  tests/test_ci_scope.py
+  tests/test_ci_workflow.py
 git diff --check
 ```
 
-CI separates locked-environment checks, the Python 3.10–3.13 latest-dependency matrix, and lowest-direct-dependency tests. A Windows / Python 3.12 job checks startup and storage. PRs changing only ordinary documentation use documentation checks; main-branch pushes run the full suite. Golden byte comparisons require the Linux x86_64 / Python 3.12 reference environment; skips on other platforms do not establish that check passed. See [CI scope](docs/development-guide.md#ci-运行范围).
+CI runs self-contained checks in the locked environment, across Python 3.10–3.13 and minimum direct dependencies, and on Windows. Test data stays local: CI does not restore external fixtures, ephemeris files, or golden snapshots. Full domain regression and numerical acceptance run separately with local data; a green CI result does not establish those results. See [CI scope](docs/development-guide.md#ci-运行范围).
 
 ## Deployment and upgrades
 

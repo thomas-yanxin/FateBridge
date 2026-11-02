@@ -418,11 +418,11 @@ uv run --locked --extra dev python -m pytest -q \
   tests/test_documentation_integrity.py tests/test_doc_tool_counts.py \
   tests/test_scenario_routing_coverage.py tests/test_skills_interface_contract.py \
   tests/test_skills_engine_contract.py tests/test_codex_call_contracts.py \
-  tests/test_ci_scope.py
+  tests/test_ci_workflow.py
 git diff --check
 ```
 
-CI 的锁定环境检查与 Python 3.10–3.13 最新依赖矩阵、最低直接依赖检查分开运行；另有 Windows / Python 3.12 的启动与存储检查。仅修改普通文档的 PR 使用文档检查分支，主分支 push 运行全量检查。黄金字节比对限定 Linux x86_64 / Python 3.12 参考环境，本地其他平台跳过不代表该项已通过。完整规则见[测试策略与 CI 范围](docs/development-guide.md#ci-运行范围)。
+CI 在锁定环境、Python 3.10–3.13 最新依赖、最低直接依赖和 Windows 环境运行自包含检查，所有提交采用同一检查范围。测试数据仅留本地，云端不恢复外部夹具、星历或黄金快照。完整领域回归与数值验收需在本地另行执行，云端通过不代表它们已通过。规则见[测试策略与 CI 范围](docs/development-guide.md#ci-运行范围)。
 
 ## 部署与升级
 

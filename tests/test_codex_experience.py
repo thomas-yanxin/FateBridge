@@ -23,7 +23,6 @@ from fatebridge.diagnostics import (
 )
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from tests.compatibility_reference import assert_score_reference
 from tests.fixtures.mcp_receipt import verified_inline_business
 
 SUBJECT = str(Path(__file__).parents[1] / "examples/demo-subject.json")
@@ -104,7 +103,10 @@ def test_all_hexagram_summaries_have_one_caution_prefix():
         assert result["caution"]
 
 
+@pytest.mark.local_data
 def test_relationship_summary_deduplicates_without_losing_evidence(capsys):
+    from tests.compatibility_reference import assert_score_reference
+
     spec = next(s for s in CATALOG if s.key == "two_person_compatibility")
     example = cli._cli_example(
         spec, {**example_input(spec), "relationship_type": "marriage"}
@@ -500,7 +502,10 @@ async def test_all_published_schemas_keep_valid_shared_references():
     assert total_wire == total_original
 
 
+@pytest.mark.local_data
 def test_relationship_example_and_default_do_not_assume_marriage(capsys):
+    from tests.compatibility_reference import assert_score_reference
+
     spec = next(s for s in CATALOG if s.key == "two_person_compatibility")
     inputs = example_input(spec)
     assert inputs["relationship_type"] == "general"
