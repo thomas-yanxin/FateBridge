@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from collections import Counter
+from fractions import Fraction
 from typing import Any, Dict, Iterable, List, Optional
 
 from fatebridge.core.astro.geometry import (
@@ -25,7 +26,7 @@ from fatebridge.core.astrology_tables import _opposite_sign as _opposite_sign
 
 
 def _essential_dignity(planet: str, sign: str) -> Optional[Dict[str, str]]:
-    """古典七曜在某星座的本质尊贵；非古典星体返回 None。"""
+    """Sign-only major dignity summary; not a full peregrine classification."""
     if planet not in DOMICILE_RULERS:
         return None
     if sign in DOMICILE_RULERS[planet]:
@@ -37,8 +38,12 @@ def _essential_dignity(planet: str, sign: str) -> Optional[Dict[str, str]]:
     elif sign == _opposite_sign(EXALTATION_SIGNS[planet]):
         dignity = "fall"
     else:
-        dignity = "peregrine"
-    return {"dignity": dignity, "status_zh": DIGNITY_LABELS_ZH[dignity]}
+        dignity = "no_major_dignity"
+    return {
+        "dignity": dignity,
+        "status_zh": DIGNITY_LABELS_ZH[dignity],
+        "scope": "sign_only_major_dignity; triplicity_term_face_and_peregrine_not_classified",
+    }
 
 
 def _build_houses(
@@ -46,6 +51,8 @@ def _build_houses(
     house_system: str,
     house_cusps: Optional[List[float]] = None,
     midheaven: Optional[float] = None,
+    *,
+    round_coordinates: bool = False,
 ) -> List[Dict[str, Any]]:
     houses: List[Dict[str, Any]] = []
     if house_cusps:
@@ -55,30 +62,45 @@ def _build_houses(
             houses.append(
                 {
                     "house": house_number,
-                    "cusp_longitude": round(normalized_cusp, 4),
+                    "cusp_longitude": (
+                        round(normalized_cusp, 4)
+                        if round_coordinates
+                        else normalized_cusp
+                    ),
                     "sign": sign,
                     "sign_zh": SIGN_LABELS_ZH[sign],
                 }
             )
         return houses
     if house_system == "whole_sign":
-        first_cusp = math.floor(ascendant / 30.0) * 30.0
+        first_cusp = float(((Fraction(ascendant) % 360) // 30) * 30)
     elif house_system == "equal_mc" and midheaven is not None:
         # Equal houses anchored on the midheaven (swisseph code 'D'): the MC is
         # the 10th cusp, so the 1st cusp sits 90° later. The true ascendant is
         # deliberately NOT the anchor here — using it silently degrades the
         # system into plain `equal` and shifts every house by one when the
         # ascendant and MC+90 fall in different signs.
-        first_cusp = normalize_angle(midheaven + 90.0)
+        first_cusp = midheaven
     else:
         first_cusp = ascendant
     for house_number in range(1, 13):
-        cusp = normalize_angle(first_cusp + (house_number - 1) * 30.0)
+        offset = (
+            (house_number - 10) * 30
+            if house_system == "equal_mc" and midheaven is not None
+            else (house_number - 1) * 30
+        )
+        # Rotate the original anchor once. Rounding MC+90 before rotating
+        # again can even move cusp 10 away from the supplied MC. Preserve
+        # the exact input's zodiac partition at representational boundaries.
+        exact_cusp = (Fraction(first_cusp) + offset) % 360
+        cusp = float(exact_cusp)
+        if int(cusp // 30) != int(exact_cusp // 30):
+            cusp = math.nextafter(cusp, -math.inf)
         sign = _sign_name(cusp)
         houses.append(
             {
                 "house": house_number,
-                "cusp_longitude": round(cusp, 4),
+                "cusp_longitude": round(cusp, 4) if round_coordinates else cusp,
                 "sign": sign,
                 "sign_zh": SIGN_LABELS_ZH[sign],
             }
@@ -87,18 +109,9 @@ def _build_houses(
 
 
 def _build_thirteen_sectors(ascendant: float) -> List[Dict[str, Any]]:
-    sectors: List[Dict[str, Any]] = []
-    step = 360.0 / 13.0
-    for sector_number in range(1, 14):
-        cusp = normalize_angle(ascendant + (sector_number - 1) * step)
-        sectors.append(
-            {
-                "sector": sector_number,
-                "cusp_longitude": round(cusp, 4),
-                "sign": _sign_name(cusp),
-            }
-        )
-    return sectors
+    from fatebridge.core.astro.sectors import thirteen_sectors
+
+    return thirteen_sectors(ascendant)
 
 
 def _build_planet_record(
@@ -114,32 +127,51 @@ def _build_planet_record(
     include_sector13: bool = False,
     include_nakshatra: bool = False,
     include_su28: bool = False,
+    zodiac_longitude: Optional[float] = None,
+    projected_house_position: Optional[float] = None,
 ) -> Dict[str, Any]:
     effective_longitude = (
-        normalize_angle(longitude - ayanamsha)
-        if sidereal
-        else normalize_angle(longitude)
+        normalize_angle(zodiac_longitude)
+        if zodiac_longitude is not None
+        else (
+            normalize_angle(longitude - ayanamsha)
+            if sidereal
+            else normalize_angle(longitude)
+        )
     )
     sign = _sign_name(effective_longitude)
     record = {
         "id": planet,
-        "longitude": round(effective_longitude, 4),
-        "latitude": round(latitude, 4),
+        "longitude": effective_longitude,
+        "latitude": latitude,
         "sign": sign,
         "sign_zh": SIGN_LABELS_ZH[sign],
-        "degree_in_sign": round(_degree_in_sign(effective_longitude), 4),
-        "house": _house_for_longitude(
-            effective_longitude,
-            ascendant,
-            house_system,
-            house_cusps=house_cusps,
+        "degree_in_sign": _degree_in_sign(effective_longitude),
+        "house": (
+            int(projected_house_position)
+            if projected_house_position is not None
+            else _house_for_longitude(
+                effective_longitude,
+                ascendant,
+                house_system,
+                house_cusps=house_cusps,
+            )
         ),
         "element": ELEMENT_BY_SIGN[sign],
         "modality": MODALITY_BY_SIGN[sign],
         "dignity": _essential_dignity(planet, sign),
     }
+    if projected_house_position is not None:
+        record["ecliptic_house_position"] = projected_house_position
     if include_sector13:
         record["sector13"] = _sector13_for_longitude(effective_longitude, ascendant)
+        record["sector13_evidence"] = {
+            "longitude_unrounded": effective_longitude,
+            "ascendant_unrounded": ascendant,
+            "interval_convention": "[start,end), ascendant-relative 360/13",
+            "rule_id": "fatebridge.equal13.exact_partition.v1",
+            "birth_time_uncertainty": "not_assessed",
+        }
     if include_nakshatra:
         record["nakshatra"] = _nakshatra(effective_longitude)
     if include_su28:

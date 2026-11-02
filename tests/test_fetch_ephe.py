@@ -6,9 +6,23 @@ The download itself is always stubbed so the suite never touches the network.
 import pytest
 
 from fatebridge import fetch_ephe
+from tests.fixtures.ephemeris_manifest import manifest_for_payloads
+
+
+def _stub_manifest(monkeypatch, payload):
+    manifest = manifest_for_payloads(
+        {
+            name: payload
+            for name in ["sepl_18.se1", "semo_18.se1", "a.se1", "b.se1", "x.se1"]
+        }
+    )
+    monkeypatch.setattr(
+        fetch_ephe, "load_ephemeris_manifest", lambda path=None: manifest
+    )
 
 
 def _stub_download(monkeypatch, payload=b"SWdata"):
+    _stub_manifest(monkeypatch, payload)
     monkeypatch.setattr(fetch_ephe, "_download", lambda url, timeout=60: payload)
 
 
@@ -34,6 +48,7 @@ def test_fetch_one_rejects_non_ephemeris_content(tmp_path, monkeypatch):
 def test_fetch_one_skips_existing_file(tmp_path, monkeypatch):
     target = tmp_path / "semo_18.se1"
     target.write_bytes(b"SW-existing")
+    _stub_manifest(monkeypatch, b"SW-existing")
     calls = []
     monkeypatch.setattr(
         fetch_ephe, "_download", lambda url, timeout=60: calls.append(url) or b"SW-new"
@@ -78,7 +93,9 @@ def test_main_reports_success(tmp_path, monkeypatch, capsys):
     assert "Done." in capsys.readouterr().out
 
 
-def test_main_returns_error_on_failure(tmp_path, monkeypatch):
+def test_main_returns_error_on_failure(tmp_path, monkeypatch, capsys):
+    _stub_manifest(monkeypatch, b"SW-expected")
+
     def boom(url, timeout=60):
         raise OSError("network down")
 
@@ -87,6 +104,7 @@ def test_main_returns_error_on_failure(tmp_path, monkeypatch):
     rc = fetch_ephe.main(["--dest", str(tmp_path), "--files", "x.se1"])
 
     assert rc == 1
+    assert "network down" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("existing", [False, True])

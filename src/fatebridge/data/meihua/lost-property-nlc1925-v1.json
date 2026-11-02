@@ -1,0 +1,385 @@
+{
+  "id": "meihua_lost_property_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本失物初始条款与变用方位类象",
+  "selected_edition_id": "nlc_1925",
+  "source": {
+    "id": "nlc_1925",
+    "title": "文明書局《梅花易數》卷二失物占第十五",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_indices": [
+      69,
+      70
+    ],
+    "paper_pages": [
+      "卷二一六",
+      "卷二一七"
+    ],
+    "attribution_scope": "Hosting catalogue metadata; no independent authorship certification"
+  },
+  "comparison_source": {
+    "id": "wikisource_1441921",
+    "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二",
+    "revision": 1441921,
+    "raw_wikitext_sha256": "239523c6bb8b59d7ed3fe229c681cd1a1124a5216617e198f05dbf19cc6d2939",
+    "saved_fixed_transcription_text_sha256": "903b109b37071584ccbf54e15ee10813d32c702bb3d7e690e15d5b77cd0ff7cb"
+  },
+  "topics": {
+    "lost_property": {
+      "label": "失物",
+      "section": "失物占第十五",
+      "use_role": "失物",
+      "header": "占失物以體為主用為失物",
+      "pdf_index": 70
+    }
+  },
+  "rules": [
+    {
+      "id": "lost_property_body_controls_use",
+      "topic": "lost_property",
+      "relation": "体克用",
+      "source_id": "nlc_1925",
+      "section": "失物占第十五",
+      "quote": "體尅用可尋遲得",
+      "reading": "所选本取可寻但迟得的传统象义；迟得没有数值期限",
+      "semantic_tags": [
+        "source_symbol_not_verified_loss_or_recovery"
+      ],
+      "delay_scope": "relative_delay_only",
+      "source_witness": {
+        "original_pdf_indices": [
+          70
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體克用，可尋遲得",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "lost_property_use_controls_body",
+      "topic": "lost_property",
+      "relation": "用克体",
+      "source_id": "nlc_1925",
+      "section": "失物占第十五",
+      "quote": "用尅體不可尋",
+      "reading": "所选本取难以寻得的传统象义；不是停止寻找的指令或实际失而不得的核实",
+      "semantic_tags": [
+        "source_symbol_not_verified_loss_or_recovery"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          70
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用克體，不可尋",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "lost_property_body_generates_use",
+      "topic": "lost_property",
+      "relation": "体生用",
+      "source_id": "nlc_1925",
+      "section": "失物占第十五",
+      "quote": "體生用物難見",
+      "reading": "所选本取物难见的传统象义；未核定物品状态",
+      "semantic_tags": [
+        "source_symbol_not_verified_loss_or_recovery"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          70
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體生用，物難見",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "lost_property_use_generates_body",
+      "topic": "lost_property",
+      "relation": "用生体",
+      "source_id": "nlc_1925",
+      "section": "失物占第十五",
+      "quote": "用生體物易尋",
+      "reading": "所选本取物易寻的传统象义；未核定寻获或概率",
+      "semantic_tags": [
+        "source_symbol_not_verified_loss_or_recovery"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          70
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用生體，物易尋",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "lost_property_same_element",
+      "topic": "lost_property",
+      "relation": "体用比和",
+      "source_id": "nlc_1925",
+      "section": "失物占第十五",
+      "quote": "體用比和物不失矣",
+      "reading": "物不失矣仅为原文占辞，不能否认已报遗失，也不能据此断定未丢或已找回",
+      "semantic_tags": [
+        "source_symbol_not_verified_loss_or_recovery"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          70
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體用比和，物不失矣",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    }
+  ],
+  "location_header": "又以變卦為失物之所在",
+  "location_rules": [
+    {
+      "id": "lost_property_location_1",
+      "trigram": "乾",
+      "direction_symbol": "西北",
+      "quote": "如變是乾則覓於西北或公廨樓閣之所或金石之傍或圓器之中或高亢之地",
+      "place_symbols": [
+        "公廨樓閣之所",
+        "金石之傍",
+        "圓器之中",
+        "高亢之地"
+      ],
+      "source_witness": {
+        "original_pdf_indices": [
+          70
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "如變是乾，則覓於西北或公榭樓閣之所，或金石之傍，或圓器之中，或高亢之地",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "lost_property_location_2",
+      "trigram": "坤",
+      "direction_symbol": "西南",
+      "quote": "變卦是坤則覓於西南方或田野之所或倉廩之處或稼穡之處或土窖穴藏之所或瓦器方器之中",
+      "place_symbols": [
+        "田野之所",
+        "倉廩之處",
+        "稼穡之處",
+        "土窖穴藏之所",
+        "瓦器方器之中"
+      ],
+      "source_witness": {
+        "original_pdf_indices": [
+          70
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "變卦是坤，則覓于西南方，或田野之所，或倉稟之處，或稼穡之處，或土窖穴藏之所，或瓦器方器之中",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "lost_property_location_3",
+      "trigram": "震",
+      "direction_symbol": "东方",
+      "quote": "震則尋於東方或山林之所或叢棘之內鐘鼓之傍或鬧市之地或大途之所",
+      "place_symbols": [
+        "山林之所",
+        "叢棘之內",
+        "鐘鼓之傍",
+        "鬧市之地",
+        "大途之所"
+      ],
+      "source_witness": {
+        "original_pdf_indices": [
+          70
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "震則尋於東方，或山林之所，或叢棘之內，鐘鼓之傍，或鬧市之地，或大途之所",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "lost_property_location_4",
+      "trigram": "巽",
+      "direction_symbol": "东南",
+      "quote": "巽則尋於東南方或山林之所或寺觀之地或菜蔬之園或舟車之間或木器之內",
+      "place_symbols": [
+        "山林之所",
+        "寺觀之地",
+        "菜蔬之園",
+        "舟車之間",
+        "木器之內"
+      ],
+      "source_witness": {
+        "original_pdf_indices": [
+          70
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "巽則尋於東南方，或山林之所，或寺觀之地，或菜蔬之園，或舟居之間，或木器之內",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "lost_property_location_5",
+      "trigram": "坎",
+      "direction_symbol": "北方",
+      "quote": "坎則尋於北方多藏於水邊或溪井溝渠之所或酒醋之邊或魚鹽之地",
+      "place_symbols": [
+        "水邊",
+        "溪井溝渠之所",
+        "酒醋之邊",
+        "魚鹽之地"
+      ],
+      "source_witness": {
+        "original_pdf_indices": [
+          70
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "坎則尋於北方，多藏於水邊或溪井溝渠之處，或酒醋之邊，或魚鹽之地",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "lost_property_location_6",
+      "trigram": "离",
+      "direction_symbol": "南方",
+      "quote": "離則尋於南方或庖廚之間或爐之傍或在明窓或遺虛室或在文書之側或在煙火之地",
+      "place_symbols": [
+        "庖廚之間",
+        "爐之傍",
+        "明窓",
+        "虛室",
+        "文書之側",
+        "煙火之地"
+      ],
+      "source_witness": {
+        "original_pdf_indices": [
+          70
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "離則尋於南方，或皰廚之間，或爐冶之傍，或在明窗，或遺虛室，或在文書之側，或在煙火之地",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "lost_property_location_7",
+      "trigram": "艮",
+      "direction_symbol": "东北",
+      "quote": "艮則尋於東北方或山林之內或近路邊或岩石傍或藏土穴",
+      "place_symbols": [
+        "山林之內",
+        "路邊",
+        "岩石傍",
+        "土穴"
+      ],
+      "source_witness": {
+        "original_pdf_indices": [
+          70
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "艮則尋於東北方，或山林之內，或近路邊，或岩石傍，或藏土穴",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "lost_property_location_8",
+      "trigram": "兑",
+      "direction_symbol": "西方",
+      "quote": "兌則尋於西方或居澤畔或敗垣破壁之內或廢井缺沼之中",
+      "place_symbols": [
+        "澤畔",
+        "敗垣破壁之內",
+        "廢井缺沼之中"
+      ],
+      "source_witness": {
+        "original_pdf_indices": [
+          70
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "兌則尋於西方，或居澤畔，或敗垣破壁之內，或廢井缺沼之中",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    }
+  ],
+  "location_selection_policy": {
+    "scope": "changed_use_trigram",
+    "meaning": "Changed moving three-line trigram, retaining the original static body; selected operational reading of 變卦, not a uniquely adjudicated chapter interpretation",
+    "supporting_term_usage": {
+      "section": "卷一觀梅占",
+      "quote_fragments": [
+        "是為澤火革。初爻變咸",
+        "幸變為艮土"
+      ],
+      "source_revision": 2690596,
+      "raw_wikitext_sha256": "f5245837e94bf82420e619fa61644cac1a1242cc59e1c5da5f776dcfd985ac99",
+      "scope": "Corroborates whole changed hexagram vs changed three-line trigram terminology; does not independently settle the lost-property chapter scope"
+    },
+    "unique_classical_scope_adjudicated": false,
+    "directions_from_lost_property_chapter_not_early_heaven_numbers": true,
+    "physical_reference_origin": null,
+    "numeric_bearings": null,
+    "geographic_coordinates": null,
+    "search_permission": null,
+    "real_location": null,
+    "outcome": null
+  }
+}

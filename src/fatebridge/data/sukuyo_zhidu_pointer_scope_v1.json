@@ -1,0 +1,129 @@
+{
+  "id": "sukuyo_zhidu_pointer_scope_v1",
+  "expected_legacy": {
+    "raw_source_sha256": "b140a869f1b4a13eb8e1ab72061160393118d17f9ee9b3867f08a1a80fc5d3c2",
+    "canonical_facts_sha256": "5b6846ff81f7a097ab9cc00d2fb09f928c09119c21e2738604235a1d3f4a7cff",
+    "source_data_id": "sukuyo_zhidu_month_context_v1"
+  },
+  "counting_policy": {
+    "record_container": "TEI back descendants",
+    "record_tags": [
+      "note",
+      "app"
+    ],
+    "record_count_includes_records_without_own_locating_attributes": true,
+    "locating_attributes": [
+      "target",
+      "from",
+      "to"
+    ],
+    "locating_tokens": "Only whitespace-separated tokens beginning with # in these own attributes",
+    "resolution_basis": "exact xml:id in the complete frozen XML",
+    "excluded_from_legacy_locating_denominator": [
+      "corresp",
+      "wit",
+      "resp",
+      "other_unlisted_linking_attributes"
+    ],
+    "zero_unresolved_applies_only_to_declared_locating_scope": true
+  },
+  "sources": {
+    "T1509": {
+      "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T25/T25n1509.xml",
+      "source_sha256": "f1f8be755336c8745f6a92d8a8a749998fc331d1f50d631ca1e88f5c0e153619",
+      "source_bytes": 17164919,
+      "legacy_counts_snapshot": {
+        "all_back_note_app_records": 53980,
+        "all_pointer_tokens": 71497,
+        "unresolved": 0,
+        "selected_records": 13,
+        "counts_are_not_witness_counts": true
+      },
+      "all_back_note_app_records": 53980,
+      "records_with_own_local_locating_tokens": 52467,
+      "records_without_own_local_locating_tokens": 1513,
+      "own_local_locating_tokens": 71497,
+      "own_tokens_by_attribute": {
+        "from": 19030,
+        "to": 19030,
+        "target": 33437
+      },
+      "own_unresolved_exact_xml_id": 0,
+      "own_tokens_outside_body_ids": 0,
+      "separate_corresp_diagnostic": {
+        "tokens": 2390,
+        "tokens_not_matching_exact_xml_id": 2390,
+        "scope": "Separate raw-fragment xml:id diagnostic; not added to original locating-pointer denominator or interpreted as invalid number-based associations. Full semantic audit of these association records was not performed."
+      },
+      "selected_reuse": {
+        "from": "#beg_61c",
+        "to": "#end_61c",
+        "corresp": "#0409025",
+        "own_range_matches_exact_xml_ids": true,
+        "corresp_matches_exact_xml_id": false,
+        "matching_note_number": "0409025",
+        "matching_note_records": [
+          {
+            "type": "mod",
+            "n": "0409025",
+            "target": "#nkr_note_mod_0409025",
+            "literal": "月【大】＊，日【石】＊"
+          },
+          {
+            "type": "orig",
+            "n": "0409025",
+            "target": "#nkr_note_orig_0409025",
+            "literal": "月＝日【石】＊"
+          }
+        ],
+        "association_basis": "Matching note number, star mark and corresponding readings; not a direct xml:id resolution or a new manuscript."
+      }
+    },
+    "T2122": {
+      "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T53/T53n2122.xml",
+      "source_sha256": "6e846f801caa9a9471192132140506e476bbf664a293b1e52c04c937d36124c9",
+      "source_bytes": 16406153,
+      "legacy_counts_snapshot": {
+        "all_back_note_app_records": 54770,
+        "all_pointer_tokens": 72189,
+        "unresolved": 0,
+        "selected_records": 6,
+        "counts_are_not_witness_counts": true
+      },
+      "all_back_note_app_records": 54770,
+      "records_with_own_local_locating_tokens": 53035,
+      "records_without_own_local_locating_tokens": 1735,
+      "own_local_locating_tokens": 72189,
+      "own_tokens_by_attribute": {
+        "from": 19154,
+        "to": 19154,
+        "target": 33881
+      },
+      "own_unresolved_exact_xml_id": 0,
+      "own_tokens_outside_body_ids": 0,
+      "separate_corresp_diagnostic": {
+        "tokens": 2136,
+        "tokens_not_matching_exact_xml_id": 2136,
+        "scope": "Separate raw-fragment xml:id diagnostic; not added to original locating-pointer denominator or interpreted as invalid number-based associations. Full semantic audit of these association records was not performed."
+      }
+    }
+  },
+  "interpretation_flags": {
+    "all_TEI_associations_semantically_verified": false,
+    "independent_manuscript_identity_certified": false,
+    "ancient_day_boundary_established": false,
+    "modern_clock_mapping_established": false,
+    "hinoo_half_clock_established": false,
+    "leap_short_month_priority_established": false,
+    "calendar_or_mansion_override_applied": false,
+    "real_prediction_efficacy_established": false
+  },
+  "evidence": {
+    "raw_XML_recount_receipt_sha256": "52e3d062c33eb144cf725181db963a4d07346086b197543842d7fcc170e06caf",
+    "source_scope_review_first_sha256": "2fef795019472802fa765cfdfdc1c2129815396e3247509f4b6246c066e4cf51",
+    "historical_counting_script_sha256": "96f87d283f279c8e003fdec27c2c5cede91a4c922d841a85d0868397e278ad89",
+    "new_independent_manuscripts": 0,
+    "real_samples": 0
+  },
+  "scope": "Qualification of existing locator counts and separate association diagnostics. Original source JSON, counts, numerical quantities, apparatus, prior firsts and physical/calendar uncertainties are retained; reacquisition is not novelty."
+}

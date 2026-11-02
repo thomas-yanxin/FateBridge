@@ -69,7 +69,15 @@
     "ruleset_id": "expert_fengshui_methods_v1",
     "version": "1.1.0",
     "method": "fengshui_method_reference",
-    "source_ids": ["EXPERT_20261015", "SHUOGUA_PRIMARY", "ZHOUYI_ZHENGYI_PRIMARY", "FOUNDATION_S4", "FOUNDATION_S5", "FOUNDATION_S3", "FATEBRIDGE_OBSERVATION_REFERENCE"],
+    "source_ids": [
+      "EXPERT_20261015",
+      "SHUOGUA_PRIMARY",
+      "ZHOUYI_ZHENGYI_PRIMARY",
+      "FOUNDATION_S4",
+      "FOUNDATION_S5",
+      "FOUNDATION_S3",
+      "FATEBRIDGE_OBSERVATION_REFERENCE"
+    ],
     "scope": "三法选法与作用域、固定宫与临星的独立参考、来源分层的古典人物器物与有限现代教学例；不增加职业预测、自动分类或处方",
     "conventions": [
       "局部空间先展开九宫飞星，再展开金锁玉关；八宅个人命卦单独处理",
@@ -80,72 +88,470 @@
   },
   "policy": {
     "local_method_priority": [
-      {"rank": 1, "method": "nine_palace_flying_stars", "label": "九宫飞星", "engine_layers": ["xuankong_natal", "annual_stars"], "source_ids": ["EXPERT_20261015"]},
-      {"rank": 2, "method": "jinsuo", "label": "金锁玉关", "engine_layers": ["jinsuo"], "source_ids": ["EXPERT_20261015"]},
-      {"rank": 3, "method": "bazhai", "label": "八宅法", "engine_layers": ["bazhai"], "source_ids": ["EXPERT_20261015"]}
+      {
+        "rank": 1,
+        "method": "nine_palace_flying_stars",
+        "label": "九宫飞星",
+        "engine_layers": [
+          "xuankong_natal",
+          "annual_stars",
+          "monthly_stars"
+        ],
+        "source_ids": [
+          "EXPERT_20261015"
+        ]
+      },
+      {
+        "rank": 2,
+        "method": "jinsuo",
+        "label": "金锁玉关",
+        "engine_layers": [
+          "jinsuo"
+        ],
+        "source_ids": [
+          "EXPERT_20261015"
+        ]
+      },
+      {
+        "rank": 3,
+        "method": "bazhai",
+        "label": "八宅法",
+        "engine_layers": [
+          "bazhai"
+        ],
+        "source_ids": [
+          "EXPERT_20261015"
+        ]
+      }
     ],
     "domains": {
-      "nine_palace_flying_stars": {"primary_subject": "objective_environment", "person_relationship": "house_palace_correspondence_when_independently_confirmed", "excluded_inputs": ["personal_bazi_favorable_elements", "personal_ziwei_chart", "other_people_natal_preferences"], "source_ids": ["EXPERT_20261015"]},
-      "jinsuo": {"primary_subject": "objective_environment", "person_relationship": "house_palace_correspondence_when_independently_confirmed", "excluded_inputs": ["personal_bazi_favorable_elements", "personal_ziwei_chart", "other_people_natal_preferences"], "source_ids": ["EXPERT_20261015"]},
-      "bazhai": {"primary_subject": "person_minggua_and_house_relation", "person_relationship": "fixed_minggua_calculated_under_declared_birth_year_convention", "excluded_inputs": ["bazi_favorable_elements_as_minggua", "ziwei_chart_as_minggua", "decision_maker_as_household_override"], "source_ids": ["EXPERT_20261015", "FOUNDATION_S3"]}
+      "nine_palace_flying_stars": {
+        "primary_subject": "objective_environment",
+        "person_relationship": "house_palace_correspondence_when_independently_confirmed",
+        "excluded_inputs": [
+          "personal_bazi_favorable_elements",
+          "personal_ziwei_chart",
+          "other_people_natal_preferences"
+        ],
+        "source_ids": [
+          "EXPERT_20261015"
+        ]
+      },
+      "jinsuo": {
+        "primary_subject": "objective_environment",
+        "person_relationship": "house_palace_correspondence_when_independently_confirmed",
+        "excluded_inputs": [
+          "personal_bazi_favorable_elements",
+          "personal_ziwei_chart",
+          "other_people_natal_preferences"
+        ],
+        "source_ids": [
+          "EXPERT_20261015"
+        ]
+      },
+      "bazhai": {
+        "primary_subject": "person_minggua_and_house_relation",
+        "person_relationship": "fixed_minggua_calculated_under_declared_birth_year_convention",
+        "excluded_inputs": [
+          "bazi_favorable_elements_as_minggua",
+          "ziwei_chart_as_minggua",
+          "decision_maker_as_household_override"
+        ],
+        "source_ids": [
+          "EXPERT_20261015",
+          "FOUNDATION_S3"
+        ]
+      }
     },
-    "direction_policy": {"required_fact": "confirmed_compass_orientation_and_object_sector_for_physical_palace_judgment", "unknown_orientation": "retain_partial_layers_and_review_independent_confirmed_forms", "forbidden_substitutions": ["personal_natal_chart", "relative_left_right", "desktop_btb_zone", "photograph_blank_space"], "source_ids": ["EXPERT_20261015"]},
-    "chart_input_policy": {"annual_stars": "explicit_effective_year_or_query_at_for_automatic_scene_selection", "xuankong_natal": "independent_historical_house_period_and_measured_house_facing", "unavailable_higher_priority": "keep_missing_scope_without_fabricating_chart_inputs", "source_ids": ["EXPERT_20261015"]}
+    "direction_policy": {
+      "required_fact": "confirmed_compass_orientation_and_object_sector_for_physical_palace_judgment",
+      "unknown_orientation": "retain_partial_layers_and_review_independent_confirmed_forms",
+      "forbidden_substitutions": [
+        "personal_natal_chart",
+        "relative_left_right",
+        "desktop_btb_zone",
+        "photograph_blank_space"
+      ],
+      "source_ids": [
+        "EXPERT_20261015"
+      ]
+    },
+    "chart_input_policy": {
+      "annual_stars": "explicit_effective_year_or_query_at_for_automatic_scene_selection",
+      "xuankong_natal": "independent_historical_house_period_and_measured_house_facing",
+      "unavailable_higher_priority": "keep_missing_scope_without_fabricating_chart_inputs",
+      "source_ids": [
+        "EXPERT_20261015"
+      ],
+      "monthly_stars": "explicit_monthly_input_or_explicit_method_with_aware_query_no_gregorian_or_lunar_month_guess"
+    }
   },
   "method_details": {
     "nine_palace_flying_stars": {
       "label": "九宫飞星",
-      "scope": "以客观空间的落宫与飞星层次为主证；年盘与历史宅盘分开",
-      "engine_layers": {"annual_stars": "立春换年的年度紫白顺飞参考，不能替代山向宅盘", "xuankong_natal": "依据历史定运、宅向与测量误差生成运/山/向盘，有限解释须独立启用"},
-      "required_facts": ["物件或房间相对所选空间中心的已确认方位", "年盘的评价日期或有效年", "历史宅盘的定运依据、磁北宅向及误差"],
+      "scope": "以客观空间的落宫与飞星层次为主证；年盘、节月盘与历史宅盘分开",
+      "engine_layers": {
+        "annual_stars": "立春换年的年度紫白顺飞参考，不能替代山向宅盘",
+        "xuankong_natal": "依据历史定运、宅向与测量误差生成运/山/向盘，有限解释须独立启用",
+        "monthly_stars": "十二节交节时刻的中性月紫白落宫；有效年独立确认，不替代年盘、宅盘或月星用途判断"
+      },
+      "required_facts": [
+        "物件或房间相对所选空间中心的已确认方位",
+        "年盘的评价日期或有效年",
+        "历史宅盘的定运依据、磁北宅向及误差",
+        "月盘的含时区时刻或已确认有效年与节月"
+      ],
       "element_scope": "fixed_palace_element_and_each_star_role_element_remain_distinct",
       "person_scope": "先确定环境宫位，再在已确认家庭关系范围内关联人物；不导入个人八字/紫微喜忌",
-      "not_covered": ["完整81星组合断法", "完整现代职业与九星一一对应表", "由象意或教学主题预测职业成败", "家具摆位、数量及病灾财运处方"],
-      "source_ids": ["EXPERT_20261015", "FOUNDATION_S4"]
+      "not_covered": [
+        "完整81星组合断法",
+        "完整现代职业与九星一一对应表",
+        "由象意或教学主题预测职业成败",
+        "家具摆位、数量及病灾财运处方"
+      ],
+      "source_ids": [
+        "EXPERT_20261015",
+        "FOUNDATION_S4"
+      ]
     },
     "jinsuo": {
       "label": "金锁玉关",
       "scope": "对已确认方位和砂水分类的实际环境特征逐项比较，不调用个人命盘",
-      "basic_preference": {"sand_palace_numbers": [1, 2, 3, 4], "water_palace_numbers": [6, 7, 8, 9], "center_palace_number": 5, "center_rule": "no_independent_eight_palace_preference"},
-      "sand_water_convention": {"sand": "yang", "water": "yin", "classification": "requires_independent_observation_and_confirmation"},
-      "required_facts": ["相对所选空间中心的已确认方向", "对象实际形态、高低、动静、用途及砂水分类依据"],
+      "basic_preference": {
+        "sand_palace_numbers": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "water_palace_numbers": [
+          6,
+          7,
+          8,
+          9
+        ],
+        "center_palace_number": 5,
+        "center_rule": "no_independent_eight_palace_preference"
+      },
+      "sand_water_convention": {
+        "sand": "yang",
+        "water": "yin",
+        "classification": "requires_independent_observation_and_confirmation"
+      },
+      "required_facts": [
+        "相对所选空间中心的已确认方向",
+        "对象实际形态、高低、动静、用途及砂水分类依据"
+      ],
       "person_scope": "按房屋宫位所对应角色另行关联，不以生肖或八字制造物理方向",
-      "not_covered": ["24山砂水计算细断（所引形态例不代表启用）", "形态距离组合自动断吉凶（仅提供观察条件参考）", "由缺水反推有砂", "疾病死亡财富必然断语"],
-      "source_ids": ["EXPERT_20261015", "FOUNDATION_S5"]
+      "not_covered": [
+        "24山砂水计算细断（所引形态例不代表启用）",
+        "形态距离组合自动断吉凶（仅提供观察条件参考）",
+        "由缺水反推有砂",
+        "疾病死亡财富必然断语"
+      ],
+      "source_ids": [
+        "EXPERT_20261015",
+        "FOUNDATION_S5"
+      ]
     },
     "bazhai": {
       "label": "八宅法",
       "scope": "先保留个人命卦，再比较人与宅、位置或用途明确的朝向；宅卦结果和各使用人结果分开",
-      "required_facts": ["计算个人命卦所需的出生日期/有效生年、传统男女起算法与换年约定", "宅坐山或已确认宅向", "对象位置/用途朝向与实际使用人"],
+      "required_facts": [
+        "计算个人命卦所需的出生日期/有效生年、传统男女起算法与换年约定",
+        "宅坐山或已确认宅向",
+        "对象位置/用途朝向与实际使用人"
+      ],
       "person_scope": "个人命卦不等于八字喜用；共用对象只分析实际使用人，不以某人结果覆盖同住者",
       "application_scope": "门床桌灶的用途、位置和朝向分别处理；灶座与已确认火门不同",
-      "not_covered": ["从八字喜用推导命卦", "按家庭实际决策权覆盖家人", "以八宅结果抵消飞星或砂水的不利条件"],
-      "source_ids": ["EXPERT_20261015", "FOUNDATION_S3"]
+      "not_covered": [
+        "从八字喜用推导命卦",
+        "按家庭实际决策权覆盖家人",
+        "以八宅结果抵消飞星或砂水的不利条件"
+      ],
+      "source_ids": [
+        "EXPERT_20261015",
+        "FOUNDATION_S3"
+      ]
     }
   },
   "direction_references": {
-    "N": {"classical_images": ["水流", "沟渠", "藏伏"], "occupation_reference": {"status": "not_covered", "roles": [], "note": "古典水象不直接等于某个现代职业"}, "furniture_observation_prompts": ["水槽、饮水或排水设施需核对实际用途、运行状态与位置；名称不等于水类结论"], "reference_kind": "classical_images_and_authored_observation_prompts", "source_ids": ["SHUOGUA_PRIMARY", "ZHOUYI_ZHENGYI_PRIMARY", "FOUNDATION_S4", "FATEBRIDGE_OBSERVATION_REFERENCE"]},
-    "NE": {"classical_images": ["山体", "石块", "门阙", "止息"], "occupation_reference": {"status": "limited_classical_role", "roles": ["古代守门或守卫角色"], "note": "来自艮的阍寺取象；不是安保职业成败或住宅吉凶预测"}, "furniture_observation_prompts": ["门、石材或柜体可记录实际尺寸、材质、边角与阻挡情况，不能由艮象推出固定摆法"], "reference_kind": "classical_images_and_authored_observation_prompts", "source_ids": ["SHUOGUA_PRIMARY", "ZHOUYI_ZHENGYI_PRIMARY", "FOUNDATION_S4", "FATEBRIDGE_OBSERVATION_REFERENCE"]},
-    "E": {"classical_images": ["雷动", "生长的竹木", "动起"], "occupation_reference": {"status": "not_covered", "roles": [], "note": "雷动或生长象不自动映射现代电子业、创业或职业运"}, "furniture_observation_prompts": ["木质家具、竹木或绿化分别核对真实材质、存活状态、高低和形态，不由物名决定砂水"], "reference_kind": "classical_images_and_authored_observation_prompts", "source_ids": ["SHUOGUA_PRIMARY", "ZHOUYI_ZHENGYI_PRIMARY", "FOUNDATION_S4", "FATEBRIDGE_OBSERVATION_REFERENCE"]},
-    "SE": {"classical_images": ["风", "木材", "绳直", "进入"], "occupation_reference": {"status": "limited_classical_role", "roles": ["工匠"], "note": "来自巽的工匠取象；具体现代行业与职业结果未覆盖"}, "furniture_observation_prompts": ["木制品和通风设施可作材质或环境观察项；不能把风扇名称直接判为某种风水处方"], "reference_kind": "classical_images_and_authored_observation_prompts", "source_ids": ["SHUOGUA_PRIMARY", "ZHOUYI_ZHENGYI_PRIMARY", "FOUNDATION_S4", "FATEBRIDGE_OBSERVATION_REFERENCE"]},
-    "S": {"classical_images": ["火", "日光", "明亮", "外坚内附"], "occupation_reference": {"status": "not_covered", "roles": [], "note": "明亮或火象不自动映射传媒、科技或个人事业喜忌"}, "furniture_observation_prompts": ["灶具与照明分别核对实际火源、热量、用途和相邻关系；电器或红色不自动等于火类处方"], "reference_kind": "classical_images_and_authored_observation_prompts", "source_ids": ["SHUOGUA_PRIMARY", "ZHOUYI_ZHENGYI_PRIMARY", "FOUNDATION_S4", "FATEBRIDGE_OBSERVATION_REFERENCE"]},
-    "SW": {"classical_images": ["土地", "承载", "布帛", "烹煮容器"], "occupation_reference": {"status": "not_covered", "roles": [], "note": "土地、承载和母象不自动映射农业、地产或照护职业"}, "furniture_observation_prompts": ["织物、器皿和陶土石材分别核对真实材质、器形与用途，不能把材质认定等同有利摆位"], "reference_kind": "classical_images_and_authored_observation_prompts", "source_ids": ["SHUOGUA_PRIMARY", "ZHOUYI_ZHENGYI_PRIMARY", "FOUNDATION_S4", "FATEBRIDGE_OBSERVATION_REFERENCE"]},
-    "W": {"classical_images": ["泽水", "口与言语", "悦"], "occupation_reference": {"status": "limited_classical_role", "roles": ["古代祭祀或言说角色"], "note": "来自兑的巫与口舌取象；不能直接断定销售、法律等现代职业适合与否"}, "furniture_observation_prompts": ["容器开口、金属部件和真实水体分别观察；物件有开口或是金属不自动构成兑宫处方"], "reference_kind": "classical_images_and_authored_observation_prompts", "source_ids": ["SHUOGUA_PRIMARY", "ZHOUYI_ZHENGYI_PRIMARY", "FOUNDATION_S4", "FATEBRIDGE_OBSERVATION_REFERENCE"]},
-    "NW": {"classical_images": ["天", "圆形", "金属", "刚健"], "occupation_reference": {"status": "limited_classical_role", "roles": ["古代君长或统领角色"], "note": "来自乾的君象；不等于现实当家人、领导职位或事业结果的固定对应"}, "furniture_observation_prompts": ["金属家具与圆形器物可核对材质、重量和器形；不是西北必须摆金属或圆物的处方"], "reference_kind": "classical_images_and_authored_observation_prompts", "source_ids": ["SHUOGUA_PRIMARY", "ZHOUYI_ZHENGYI_PRIMARY", "FOUNDATION_S4", "FATEBRIDGE_OBSERVATION_REFERENCE"]},
-    "C": {"classical_images": [], "occupation_reference": {"status": "not_covered", "roles": [], "note": "中宫不是第九个家庭卦，不补配人物或职业"}, "family_role": null, "furniture_observation_prompts": ["中心通行、家具占用和器形可独立记录；本参考不建立中宫物件吉凶处方"], "reference_kind": "fixed_palace_and_authored_observation_prompts", "source_ids": ["FOUNDATION_S4", "FATEBRIDGE_OBSERVATION_REFERENCE"]}
+    "N": {
+      "classical_images": [
+        "水流",
+        "沟渠",
+        "藏伏"
+      ],
+      "occupation_reference": {
+        "status": "not_covered",
+        "roles": [],
+        "note": "古典水象不直接等于某个现代职业"
+      },
+      "furniture_observation_prompts": [
+        "水槽、饮水或排水设施需核对实际用途、运行状态与位置；名称不等于水类结论"
+      ],
+      "reference_kind": "classical_images_and_authored_observation_prompts",
+      "source_ids": [
+        "SHUOGUA_PRIMARY",
+        "ZHOUYI_ZHENGYI_PRIMARY",
+        "FOUNDATION_S4",
+        "FATEBRIDGE_OBSERVATION_REFERENCE"
+      ]
+    },
+    "NE": {
+      "classical_images": [
+        "山体",
+        "石块",
+        "门阙",
+        "止息"
+      ],
+      "occupation_reference": {
+        "status": "limited_classical_role",
+        "roles": [
+          "古代守门或守卫角色"
+        ],
+        "note": "来自艮的阍寺取象；不是安保职业成败或住宅吉凶预测"
+      },
+      "furniture_observation_prompts": [
+        "门、石材或柜体可记录实际尺寸、材质、边角与阻挡情况，不能由艮象推出固定摆法"
+      ],
+      "reference_kind": "classical_images_and_authored_observation_prompts",
+      "source_ids": [
+        "SHUOGUA_PRIMARY",
+        "ZHOUYI_ZHENGYI_PRIMARY",
+        "FOUNDATION_S4",
+        "FATEBRIDGE_OBSERVATION_REFERENCE"
+      ]
+    },
+    "E": {
+      "classical_images": [
+        "雷动",
+        "生长的竹木",
+        "动起"
+      ],
+      "occupation_reference": {
+        "status": "not_covered",
+        "roles": [],
+        "note": "雷动或生长象不自动映射现代电子业、创业或职业运"
+      },
+      "furniture_observation_prompts": [
+        "木质家具、竹木或绿化分别核对真实材质、存活状态、高低和形态，不由物名决定砂水"
+      ],
+      "reference_kind": "classical_images_and_authored_observation_prompts",
+      "source_ids": [
+        "SHUOGUA_PRIMARY",
+        "ZHOUYI_ZHENGYI_PRIMARY",
+        "FOUNDATION_S4",
+        "FATEBRIDGE_OBSERVATION_REFERENCE"
+      ]
+    },
+    "SE": {
+      "classical_images": [
+        "风",
+        "木材",
+        "绳直",
+        "进入"
+      ],
+      "occupation_reference": {
+        "status": "limited_classical_role",
+        "roles": [
+          "工匠"
+        ],
+        "note": "来自巽的工匠取象；具体现代行业与职业结果未覆盖"
+      },
+      "furniture_observation_prompts": [
+        "木制品和通风设施可作材质或环境观察项；不能把风扇名称直接判为某种风水处方"
+      ],
+      "reference_kind": "classical_images_and_authored_observation_prompts",
+      "source_ids": [
+        "SHUOGUA_PRIMARY",
+        "ZHOUYI_ZHENGYI_PRIMARY",
+        "FOUNDATION_S4",
+        "FATEBRIDGE_OBSERVATION_REFERENCE"
+      ]
+    },
+    "S": {
+      "classical_images": [
+        "火",
+        "日光",
+        "明亮",
+        "外坚内附"
+      ],
+      "occupation_reference": {
+        "status": "not_covered",
+        "roles": [],
+        "note": "明亮或火象不自动映射传媒、科技或个人事业喜忌"
+      },
+      "furniture_observation_prompts": [
+        "灶具与照明分别核对实际火源、热量、用途和相邻关系；电器或红色不自动等于火类处方"
+      ],
+      "reference_kind": "classical_images_and_authored_observation_prompts",
+      "source_ids": [
+        "SHUOGUA_PRIMARY",
+        "ZHOUYI_ZHENGYI_PRIMARY",
+        "FOUNDATION_S4",
+        "FATEBRIDGE_OBSERVATION_REFERENCE"
+      ]
+    },
+    "SW": {
+      "classical_images": [
+        "土地",
+        "承载",
+        "布帛",
+        "烹煮容器"
+      ],
+      "occupation_reference": {
+        "status": "not_covered",
+        "roles": [],
+        "note": "土地、承载和母象不自动映射农业、地产或照护职业"
+      },
+      "furniture_observation_prompts": [
+        "织物、器皿和陶土石材分别核对真实材质、器形与用途，不能把材质认定等同有利摆位"
+      ],
+      "reference_kind": "classical_images_and_authored_observation_prompts",
+      "source_ids": [
+        "SHUOGUA_PRIMARY",
+        "ZHOUYI_ZHENGYI_PRIMARY",
+        "FOUNDATION_S4",
+        "FATEBRIDGE_OBSERVATION_REFERENCE"
+      ]
+    },
+    "W": {
+      "classical_images": [
+        "泽水",
+        "口与言语",
+        "悦"
+      ],
+      "occupation_reference": {
+        "status": "limited_classical_role",
+        "roles": [
+          "古代祭祀或言说角色"
+        ],
+        "note": "来自兑的巫与口舌取象；不能直接断定销售、法律等现代职业适合与否"
+      },
+      "furniture_observation_prompts": [
+        "容器开口、金属部件和真实水体分别观察；物件有开口或是金属不自动构成兑宫处方"
+      ],
+      "reference_kind": "classical_images_and_authored_observation_prompts",
+      "source_ids": [
+        "SHUOGUA_PRIMARY",
+        "ZHOUYI_ZHENGYI_PRIMARY",
+        "FOUNDATION_S4",
+        "FATEBRIDGE_OBSERVATION_REFERENCE"
+      ]
+    },
+    "NW": {
+      "classical_images": [
+        "天",
+        "圆形",
+        "金属",
+        "刚健"
+      ],
+      "occupation_reference": {
+        "status": "limited_classical_role",
+        "roles": [
+          "古代君长或统领角色"
+        ],
+        "note": "来自乾的君象；不等于现实当家人、领导职位或事业结果的固定对应"
+      },
+      "furniture_observation_prompts": [
+        "金属家具与圆形器物可核对材质、重量和器形；不是西北必须摆金属或圆物的处方"
+      ],
+      "reference_kind": "classical_images_and_authored_observation_prompts",
+      "source_ids": [
+        "SHUOGUA_PRIMARY",
+        "ZHOUYI_ZHENGYI_PRIMARY",
+        "FOUNDATION_S4",
+        "FATEBRIDGE_OBSERVATION_REFERENCE"
+      ]
+    },
+    "C": {
+      "classical_images": [],
+      "occupation_reference": {
+        "status": "not_covered",
+        "roles": [],
+        "note": "中宫不是第九个家庭卦，不补配人物或职业"
+      },
+      "family_role": null,
+      "furniture_observation_prompts": [
+        "中心通行、家具占用和器形可独立记录；本参考不建立中宫物件吉凶处方"
+      ],
+      "reference_kind": "fixed_palace_and_authored_observation_prompts",
+      "source_ids": [
+        "FOUNDATION_S4",
+        "FATEBRIDGE_OBSERVATION_REFERENCE"
+      ]
+    }
   },
   "sand_water_reference": {
     "status": "observation_candidates_only",
     "sand_convention": "偏阳的高起、实体或相对静态形势；具体现代对象必须单独确认",
     "water_convention": "偏阴的低开、流动或真实水体形势；不能只凭名称归类",
     "candidate_observations": [
-      {"objects": ["高楼", "围墙", "高柜"], "observe": ["相对高低", "实体体量", "与使用位置的关系"], "classification": "requires_confirmation"},
-      {"objects": ["道路", "通道", "空地"], "observe": ["实际高低", "开敞程度", "动静与通行情况"], "classification": "requires_confirmation"},
-      {"objects": ["水槽", "池水", "排水设施"], "observe": ["是否真实有水", "水是否运行", "形态和用途"], "classification": "requires_confirmation"},
-      {"objects": ["树木", "院落绿化", "盆栽"], "observe": ["真实存活状态", "高低与密度", "形态、器形和所在层级"], "classification": "requires_confirmation"}
+      {
+        "objects": [
+          "高楼",
+          "围墙",
+          "高柜"
+        ],
+        "observe": [
+          "相对高低",
+          "实体体量",
+          "与使用位置的关系"
+        ],
+        "classification": "requires_confirmation"
+      },
+      {
+        "objects": [
+          "道路",
+          "通道",
+          "空地"
+        ],
+        "observe": [
+          "实际高低",
+          "开敞程度",
+          "动静与通行情况"
+        ],
+        "classification": "requires_confirmation"
+      },
+      {
+        "objects": [
+          "水槽",
+          "池水",
+          "排水设施"
+        ],
+        "observe": [
+          "是否真实有水",
+          "水是否运行",
+          "形态和用途"
+        ],
+        "classification": "requires_confirmation"
+      },
+      {
+        "objects": [
+          "树木",
+          "院落绿化",
+          "盆栽"
+        ],
+        "observe": [
+          "真实存活状态",
+          "高低与密度",
+          "形态、器形和所在层级"
+        ],
+        "classification": "requires_confirmation"
+      }
     ],
-    "not_equivalent": ["金锁砂水分类与玄空外部山形水形", "物件材质五行与砂水", "照片候选观察与已确认分类", "未见水与确定有砂"],
-    "source_ids": ["EXPERT_20261015", "FOUNDATION_S5", "FATEBRIDGE_OBSERVATION_REFERENCE"]
+    "not_equivalent": [
+      "金锁砂水分类与玄空外部山形水形",
+      "物件材质五行与砂水",
+      "照片候选观察与已确认分类",
+      "未见水与确定有砂"
+    ],
+    "source_ids": [
+      "EXPERT_20261015",
+      "FOUNDATION_S5",
+      "FATEBRIDGE_OBSERVATION_REFERENCE"
+    ]
   },
   "limitations": [
     "参考条目说明传统象意和需要核对的环境事实，不是已发生影响、预测有效性或可立即执行建议",

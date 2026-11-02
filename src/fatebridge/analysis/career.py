@@ -1,18 +1,7 @@
-"""
-事业分析模块
+"""Career occurrence counts, modern role analogies and explicit rule indices.
 
-基于八字命理的事业分析功能，综合以下经典技法：
-- 十神看事业类型与方向
-- 五行看行业选择
-- 格局看事业高度
-- 大运流年看事业时机
-
-核心分析维度：
-1. 事业类型与适合行业
-2. 事业格局与高度
-3. 事业时机（大运/流年）
-4. 创业 vs 打工倾向
-5. 贵人与小人
+Day-branch hidden stems are included. Scores and role labels are not source
+formation judgments or measurements of job competence or entrepreneurship.
 """
 
 from __future__ import annotations
@@ -124,61 +113,61 @@ TEN_GOD_CAREER = {
     TenGod.COMPARE: {
         "label": "比肩",
         "career_type": "独立经营",
-        "traits": "自主性强、竞争意识强、适合独立创业或合伙经营",
+        "traits": "现代讨论主题：自主职责、同辈竞争与合作分工",
         "suitable": ["创业", "合伙经营", "自由职业", "体育竞技"],
     },
     TenGod.ROB_WEALTH: {
         "label": "劫财",
         "career_type": "竞争型",
-        "traits": "行动力强、敢于冒险、适合高竞争行业",
+        "traits": "现代讨论主题：竞争任务、行动节奏与风险约束",
         "suitable": ["销售", "市场营销", "投机行业", "体育"],
     },
     TenGod.FOOD_GOD: {
         "label": "食神",
         "career_type": "才华型",
-        "traits": "才华横溢、创意丰富、适合文化产业",
+        "traits": "现代讨论主题：产品输出、表达与持续创作",
         "suitable": ["艺术创作", "餐饮美食", "教育培训", "文化出版"],
     },
     TenGod.HURT_OFFICER: {
         "label": "伤官",
         "career_type": "创新型",
-        "traits": "思维独特、不拘常规、适合创新领域",
+        "traits": "现代讨论主题：规则质疑、改进与表达方式",
         "suitable": ["技术研发", "设计创意", "自媒体", "律师"],
     },
     TenGod.POSITIVE_WEALTH: {
         "label": "正财",
         "career_type": "稳健型",
-        "traits": "踏实稳健、理财能力强、适合传统行业",
+        "traits": "现代讨论主题：持续经营、预算与资源管理",
         "suitable": ["财务管理", "银行金融", "会计审计", "实业经营"],
     },
     TenGod.PARTIAL_WEALTH: {
         "label": "偏财",
         "career_type": "投资型",
-        "traits": "眼光独到、善于把握机会、适合投资领域",
+        "traits": "现代讨论主题：项目交易与非固定资源，不判断投资能力",
         "suitable": ["投资理财", "股票期货", "贸易经商", "地产"],
     },
     TenGod.POSITIVE_OFFICER: {
         "label": "正官",
         "career_type": "管理型",
-        "traits": "有领导力、守规矩、适合体制内或大企业管理",
+        "traits": "现代讨论主题：制度责任、流程与岗位授权",
         "suitable": ["公务员", "企业管理", "行政管理", "法律"],
     },
     TenGod.SEVEN_KILLER: {
         "label": "七杀",
         "career_type": "权威型",
-        "traits": "果断有魄力、适合高压环境",
+        "traits": "现代讨论主题：约束、决策责任与任务压力",
         "suitable": ["军警", "外科医生", "高管", "创业"],
     },
     TenGod.POSITIVE_SEAL: {
         "label": "正印",
         "career_type": "学术型",
-        "traits": "好学上进、有文化底蕴、适合学术教育",
+        "traits": "现代讨论主题：学习支持、知识传递与规范",
         "suitable": ["教师", "研究员", "公务员", "文化行业"],
     },
     TenGod.PARTIAL_SEAL: {
         "label": "偏印",
         "career_type": "技术型",
-        "traits": "思维敏捷、专业技能强、适合技术领域",
+        "traits": "现代讨论主题：专业方法、非标准知识与独立研究",
         "suitable": ["技术研发", "医疗", "玄学", "IT"],
     },
 }
@@ -258,12 +247,15 @@ class CareerAnalysis:
         day_stem: str,
     ) -> Dict[str, Any]:
         """分析命局中主导的十神，确定事业类型。"""
-        # career 跳过整个日柱（连日支藏干也不计）
-        god_counts = count_ten_gods(pillars, day_stem, skip_day_pillar=True)
+        # 排除日干自身，保留日支全部藏干；与共享十神证据同口径。
+        god_counts = count_ten_gods(pillars, day_stem, skip_day_pillar=False)
 
         # 排序取前三
         sorted_gods = sorted(god_counts.items(), key=lambda x: x[1], reverse=True)
-        top_gods = [(god, count) for god, count in sorted_gods if count > 0][:3]
+        positive = [(god, count) for god, count in sorted_gods if count > 0]
+        cutoff = positive[min(2, len(positive) - 1)][1] if positive else 0
+        top_gods = [(god, count) for god, count in positive if count >= cutoff]
+        tied = [god for god, count in positive if count == positive[0][1]]
 
         career_profiles = []
         for god, count in top_gods:
@@ -280,24 +272,35 @@ class CareerAnalysis:
 
         return {
             "top_gods": career_profiles,
+            "mapping_scope": "职业标签、traits及suitable_roles均为本工具的现代类比；不是原典岗位判定或能力测量。",
             "weighted_counts": {
                 god.value: weight for god, weight in god_counts.items()
             },
             "counting_basis": {
-                "included_pillars": [name for name in pillars if name != "day"],
-                "excluded_pillars": ["day"],
+                "included_pillars": [
+                    n for n in ("year", "month", "day", "hour") if n in pillars
+                ],
+                "excluded_pillars": [],
+                "excluded_stem_positions": ["day"],
                 "stem_weight": 1.0,
                 "hidden_stem_weight": 0.5,
-                "scope": "本事业规则跳过整个日柱（含日支藏干）；权重是计数约定，不是十神旺衰或实际能力。",
+                "scope": "非日干每次1、四柱每个藏干每次0.5；排除日干自身，保留日支藏干。计数不等于旺衰或实际能力。",
             },
             "tied_primary_gods": [
                 god.value
                 for god, weight in sorted_gods
                 if weight > 0 and weight == sorted_gods[0][1]
             ],
-            "primary_selection": "按权重降序、同权重沿十神枚举顺序取首项；并列不代表首项更强。",
+            "primary_selection": "最高项及第三位全部并列保留，不以枚举顺序确定唯一主导。",
             "primary_career_type": (
-                career_profiles[0]["career_type"] if career_profiles else "综合型"
+                (
+                    "并列："
+                    + "、".join(str(TEN_GOD_CAREER[g]["career_type"]) for g in tied)
+                )
+                if len(tied) > 1
+                else (
+                    career_profiles[0]["career_type"] if career_profiles else "未见计数"
+                )
             ),
         }
 
@@ -325,7 +328,7 @@ class CareerAnalysis:
                         "element": info["label"],
                         "industries": info["industries"],
                         "direction": info["direction"],
-                        "reason": f"喜用神为{info['label']}，适合{info['label']}相关行业",
+                        "reason": f"规则候选{info['label']}对应本工具的现代行业类比，需核实现实职责与经验",
                     }
                 )
 
@@ -339,7 +342,7 @@ class CareerAnalysis:
                     {
                         "element": info["label"],
                         "industries": info["industries"][:3],
-                        "reason": f"忌神为{info['label']}，{info['label']}行业需谨慎",
+                        "reason": f"反向规则涉及{info['label']}；行业为本工具类比，不能据此排除职业",
                     }
                 )
 
@@ -347,6 +350,7 @@ class CareerAnalysis:
             "favorable_elements": [e.value for e in favorable],
             "conditional_elements": profile["conditional_elements"],
             "reference_scope": profile["resolution_policy"],
+            "mapping_status": "modern_analogy_not_classical_or_aptitude_validation",
             "recommended_industries": recommended_industries,
             "avoid_industries": avoid_industries,
             "element_distribution": {
@@ -367,7 +371,7 @@ class CareerAnalysis:
         # 1. 官印相生 is one positive contribution, not the overall grade.
         has_officer = False
         has_seal = False
-        for e in iter_pillar_gods(pillars, day_stem, skip_day_pillar=True):
+        for e in iter_pillar_gods(pillars, day_stem, skip_day_pillar=False):
             if e.ten_god in (TenGod.POSITIVE_OFFICER, TenGod.SEVEN_KILLER):
                 has_officer = True
             if e.ten_god in (TenGod.POSITIVE_SEAL, TenGod.PARTIAL_SEAL):
@@ -381,7 +385,7 @@ class CareerAnalysis:
             rule_signals.append(
                 {
                     "label": "官印相生",
-                    "trigger": "官或杀与正印或偏印共现（非日柱天干及藏干）",
+                    "trigger": "官或杀与正印或偏印共现（非日干及四柱藏干）",
                     "score_delta": 15,
                 }
             )
@@ -389,24 +393,21 @@ class CareerAnalysis:
         # 2. 食伤生财 → 经商格局
         has_food_hurt = False
         has_wealth = False
-        for p_name, (stem, branch) in pillars.items():
-            if p_name == "day":
-                continue
-            god = get_ten_god(day_stem, stem)
-            if god in (TenGod.FOOD_GOD, TenGod.HURT_OFFICER):
+        for entry in iter_pillar_gods(pillars, day_stem):
+            if entry.ten_god in (TenGod.FOOD_GOD, TenGod.HURT_OFFICER):
                 has_food_hurt = True
-            if god in (TenGod.POSITIVE_WEALTH, TenGod.PARTIAL_WEALTH):
+            if entry.ten_god in (TenGod.POSITIVE_WEALTH, TenGod.PARTIAL_WEALTH):
                 has_wealth = True
 
         if has_food_hurt and has_wealth:
             score += 10
             notes.append(
-                "食伤生财候选：仅非日柱天干共现，未验证生化条件；不据此预测收入"
+                "食伤生财候选：非日干及四柱藏干共现，未验证生化条件；不据此预测收入"
             )
             rule_signals.append(
                 {
                     "label": "食伤生财",
-                    "trigger": "食神或伤官与正财或偏财共现（仅非日柱天干）",
+                    "trigger": "食神或伤官与正财或偏财共现（非日干及四柱藏干）",
                     "score_delta": 10,
                 }
             )
@@ -420,7 +421,7 @@ class CareerAnalysis:
             rule_signals.append(
                 {
                     "label": "财官双美",
-                    "trigger": "官杀（非日柱天干及藏干）与财星（仅非日柱天干）共现",
+                    "trigger": "官杀（非日干及四柱藏干）与财星（非日干及四柱藏干）共现",
                     "score_delta": 8,
                 }
             )
@@ -450,7 +451,7 @@ class CareerAnalysis:
 
         return {
             "score": score,
-            "score_kind": "traditional_rule_index",
+            "score_kind": "uncalibrated_rule_index",
             "scope": "individual_natal_career_structure",
             "formation_status": "heuristic_candidate_only",
             "rule_signals": rule_signals,
@@ -460,12 +461,13 @@ class CareerAnalysis:
                 "生克制化力度及救应",
                 "格局成败",
             ],
-            "interpretation_scope": "共现标签与分数只描述本实现的启发式线索；level是历史评分分档，不是古典成格或现实事业层级认证。",
+            "interpretation_scope": "共现标签与分数只描述本实现的启发式线索；level为规则索引；legacy_level只保留旧评分分档供迁移，不是古典成格或现实事业层级认证。",
             "score_basis": (
                 "以60为基准，按官印、食伤与财、财官及日主强弱规则加减，"
                 "限制在30–95；不是事业成就或收入概率。"
             ),
-            "level": level,
+            "level": f"规则索引{score}（未裁定古典格局）",
+            "legacy_level": level,
             "notes": notes,
         }
 
@@ -481,7 +483,7 @@ class CareerAnalysis:
 
         # 统计十神
         god_counts: Dict[str, float] = {}
-        for e in iter_pillar_gods(pillars, day_stem, skip_day_pillar=True):
+        for e in iter_pillar_gods(pillars, day_stem, skip_day_pillar=False):
             key = e.ten_god.value
             god_counts[key] = god_counts.get(key, 0) + e.weight
 
@@ -524,7 +526,7 @@ class CareerAnalysis:
                 rule_signals.append(
                     {
                         "label": "食神制杀",
-                        "trigger": "食神与七杀共现（非日柱天干及藏干）",
+                        "trigger": "食神与七杀共现（非日干及四柱藏干）",
                         "score_delta": 10,
                     }
                 )
@@ -534,7 +536,7 @@ class CareerAnalysis:
                 rule_signals.append(
                     {
                         "label": "杀印相生",
-                        "trigger": "七杀与正印共现且无食神（非日柱天干及藏干）",
+                        "trigger": "七杀与正印共现且无食神（非日干及四柱藏干）",
                         "score_delta": 8,
                     }
                 )
@@ -550,7 +552,10 @@ class CareerAnalysis:
 
         return {
             "score": entrepreneur_score,
-            "score_kind": "traditional_rule_index",
+            "weighted_counts": god_counts,
+            "partial_star_weight": partial_stars,
+            "normal_star_weight": normal_stars,
+            "score_kind": "uncalibrated_rule_index",
             "scope": "individual_natal_entrepreneurship_tendency",
             "formation_status": "heuristic_candidate_only",
             "rule_signals": rule_signals,
@@ -561,9 +566,11 @@ class CareerAnalysis:
             ],
             "score_basis": (
                 "以50为基准，按正偏十神权重、食神制杀或杀印相生规则加减，"
-                "限制在20–90；只表示本规则的创业倾向，不是成功率或行动建议。"
+                "偏星多加15、正星多减10；有七杀及食神加10，否则有七杀及正印加8；"
+                "限制在20–90。计数包含日支藏干，指数未校准为创业适合度或成功率。"
             ),
-            "tendency": tendency,
+            "tendency": f"未校准规则索引{entrepreneur_score}；不据此决定创业或就业",
+            "legacy_tendency": tendency,
             "notes": notes,
         }
 
@@ -639,6 +646,7 @@ class CareerAnalysis:
             "favorable_directions": directions,
             "conditional_elements": profile["conditional_elements"],
             "reference_scope": profile["resolution_policy"],
+            "mapping_status": "modern_analogy_not_classical_or_aptitude_validation",
         }
 
     @staticmethod
@@ -679,16 +687,9 @@ class CareerAnalysis:
                 f"历史规则评分分档为“{level}”；单凭分档不能确认古典成格或现实事业层级"
             )
 
-        # 基于创业倾向
-        tendency = entrepreneurship.get("tendency", "")
-        if "创业" in tendency:
-            suggestions.append(
-                "本规则呈现创业相关倾向；是否创业需验证需求、现金流与执行能力，不能据此决定辞职"
-            )
-        elif "稳定" in tendency:
-            suggestions.append(
-                "本规则较偏向稳定工作；职业选择仍需结合能力、工作条件和实际机会"
-            )
+        suggestions.append(
+            f"创业模块规则索引为{entrepreneurship['score']}；现实选择须核对需求、资金、职责和执行记录"
+        )
 
         # 基于行业
         rec = industry.get("recommended_industries", [])

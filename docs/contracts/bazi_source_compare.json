@@ -1,0 +1,183 @@
+{
+  "call_guidance": {
+    "input_scope": "Only confirmedliteral4pillars, no birthdate/gender/timezone needed or inferred. Do not substitute examples.",
+    "interpretation": "Keepcomputedgrade and sourceannotations distinct; never use matchingannotation to overwrite calculation or claim fullbook/realityvalidation. Calendarformula conflicts are literalinput observations, not a repairedbirthday.",
+    "source_scope": "Exactexposedreference retrieval and currentmodel comparison, all known/unknown/conflictingrecords retained."
+  },
+  "evidence_views": {
+    "branch_candidates": {
+      "fields": [
+        "input_context",
+        "current_calculation.method_id",
+        "current_calculation.branch_combination_candidates",
+        "current_calculation.assessment.relations"
+      ],
+      "label": "合会候选与同次筛选回执",
+      "purpose": "保留现有v8目录中的完整局、字面六合及含旺支半合候选，包括被冲、占位或邻接条件筛掉的图形。候选、筛选与实际事件分别解释，不据候选认定合化、通关或旺衰；未提供或未知方法保留未知。视图字段复制到fields，视图名不是请求参数。"
+    },
+    "energy_sources": {
+      "fields": [
+        "four_pillars",
+        "input_context",
+        "current_calculation.strength_level",
+        "current_calculation.energy_provenance"
+      ],
+      "label": "同次身印等五类能量来源",
+      "purpose": "分开真实藏干、支合成贡献和非日干天干，按未舍入回执核对能量闭合；不把合成贡献当物理根，不据工程分量认证原典身印轻重、月令司令或通关成立。缺失回执保留未知，不重算盘。视图字段复制到fields，视图名不是请求参数。"
+    },
+    "source_conditions": {
+      "fields": [
+        "source_comparison.status",
+        "source_comparison.computed_strength",
+        "source_comparison.calculation_overridden",
+        "source_comparison.records"
+      ],
+      "label": "原19例的原页条件校读",
+      "purpose": "所选原页的开发者条件校读，按旧命例及来源逐项保留身印、通关及原文相对时序；不重判旧标签，不据相对天数推定出生瞬间或司令生效，不认证独立专家或模型解释验收。视图字段复制到fields，视图名不是请求参数。"
+    },
+    "source_strength": {
+      "fields": [
+        "four_pillars",
+        "input_context",
+        "current_calculation.strength_level",
+        "source_comparison",
+        "summary"
+      ],
+      "label": "字面四柱与强弱编释核对",
+      "purpose": "读取当前计算、全部同柱记录及差异或未知；不是原典或预测准确率"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "four_pillars",
+      "input_context",
+      "current_calculation.strength_level",
+      "source_comparison",
+      "summary"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "day_pillar": {
+        "description": "原样日柱，天干与地支各一字",
+        "maxLength": 2,
+        "minLength": 2,
+        "pattern": "^[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]$",
+        "type": "string"
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "hour_pillar": {
+        "description": "原样时柱；必须已经明确，不能猜生时或套示例",
+        "maxLength": 2,
+        "minLength": 2,
+        "pattern": "^[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]$",
+        "type": "string"
+      },
+      "include_snapshot_text": {
+        "default": false,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "month_pillar": {
+        "description": "原样月柱；现代起月干关系另行核对，不擅改录文",
+        "maxLength": 2,
+        "minLength": 2,
+        "pattern": "^[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]$",
+        "type": "string"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "year_pillar": {
+        "description": "原样年柱，天干与地支各一字；不推造出生日期",
+        "maxLength": 2,
+        "minLength": 2,
+        "pattern": "^[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]$",
+        "type": "string"
+      }
+    },
+    "required": [
+      "year_pillar",
+      "month_pillar",
+      "day_pillar",
+      "hour_pillar"
+    ],
+    "type": "object"
+  },
+  "tool": "bazi_source_compare"
+}

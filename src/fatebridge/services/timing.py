@@ -1,6 +1,6 @@
 """Timing use cases composed from shared states and separate snapshot renderers."""
 
-from datetime import datetime
+from copy import deepcopy
 from typing import Any, Dict, List, Optional
 
 from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
@@ -14,6 +14,14 @@ from fatebridge.services.birth_context import build_birth_computation_context
 from fatebridge.services.snapshot_builders import (
     build_snapshot_export as _build_snapshot_export,
 )
+from fatebridge.services.snapshot_builders import (
+    render_snapshot_lines as _render_snapshot_text,
+)
+from fatebridge.services.timing_clock import (
+    age_only_reference,
+    analysis_clock_snapshot_lines,
+    resolve_analysis_moment,
+)
 from fatebridge.services.timing_snapshots import (
     _build_comprehensive_timing_snapshot_text,
     _build_dayun_snapshot_text,
@@ -25,15 +33,60 @@ from fatebridge.services.timing_snapshots import (
 )
 from fatebridge.services.timing_state import (
     build_current_timing_state,
+    calculate_analysis_age,
     compute_life_dimensions_for_moment,
     enrich_jieqi_timeline,
     enrich_liuyue_timeline,
     serialize_element_effects,
 )
-from fatebridge.utils.analysis_clock import get_current_analysis_date
-from fatebridge.utils.birth_input import PersonInfo
+from fatebridge.services.timing_uncertainty import analyze_birth_time_range
+from fatebridge.utils.birth_clock import birth_clock_snapshot_lines
+from fatebridge.utils.birth_input import PersonInfo, normalize_gender
 from fatebridge.utils.errors import calculation_guard
-from fatebridge.utils.formatting import create_pillar_dict
+from fatebridge.utils.formatting import create_pillar_dict, format_clock_datetime
+
+
+def _with_birth_clock_reference(
+    result: Dict[str, Any], *, technique: str, selected_sections: Optional[List[str]]
+) -> Dict[str, Any]:
+    lines = birth_clock_snapshot_lines(result["calendar_context"]["birth_time_input"])
+    # Keep this evidence inside the published query section so filtered exports
+    # retain it. Unknown section titles are deliberately excluded by the parser.
+    marker = "[查询信息]\n"
+    if marker not in result["snapshot_text"]:
+        raise ValueError("时运快照缺少查询信息，无法交付出生钟时输入依据")
+    result["snapshot_text"] = result["snapshot_text"].replace(
+        marker, marker + "\n".join(lines) + "\n", 1
+    )
+    result["snapshot_export"] = _build_snapshot_export(
+        technique=technique,
+        snapshot_text=result["snapshot_text"],
+        selected_sections=selected_sections,
+    )
+    return result
+
+
+def _with_analysis_reference(
+    result: Dict[str, Any],
+    reference: Dict[str, Any],
+    *,
+    technique: str,
+    selected_sections: Optional[List[str]],
+) -> Dict[str, Any]:
+    result["analysis_reference"] = reference
+    lines = analysis_clock_snapshot_lines(reference)
+    if lines:
+        result["snapshot_text"] += "\n\n" + _render_snapshot_text(
+            [("分析时刻依据", lines)]
+        )
+        result["snapshot_export"] = _build_snapshot_export(
+            technique=technique,
+            snapshot_text=result["snapshot_text"],
+            selected_sections=selected_sections,
+        )
+    return _with_birth_clock_reference(
+        result, technique=technique, selected_sections=selected_sections
+    )
 
 
 @calculation_guard("时运分析计算")
@@ -46,6 +99,7 @@ def calculate_comprehensive_timing(
     analysis_hour: Optional[int] = None,
     analysis_minute: Optional[int] = None,
     selected_sections: Optional[List[str]] = None,
+    birth_time_uncertainty_minutes: Optional[int] = None,
 ) -> Dict:
     """
     计算时运分析，包括大运、流年、流月、流日、流时的影响分析
@@ -55,23 +109,17 @@ def calculate_comprehensive_timing(
     input_birth_datetime = normalized_birth_time.input_datetime
     birth_date = normalized_birth_time.corrected_datetime
 
-    # 设置分析日期
-    analysis_year, analysis_month = get_current_analysis_date(
-        analysis_year, analysis_month
+    resolution = resolve_analysis_moment(
+        "timing_analysis",
+        normalized_birth_time.timezone,
+        analysis_year=analysis_year,
+        analysis_month=analysis_month,
+        analysis_day=analysis_day,
+        analysis_hour=analysis_hour,
+        analysis_minute=analysis_minute,
     )
-    if analysis_day is None:
-        analysis_day = 1
-    if analysis_hour is None:
-        analysis_hour = 0
-    if analysis_minute is None:
-        analysis_minute = 0
-    analysis_date = datetime(
-        analysis_year,
-        analysis_month,
-        analysis_day,
-        analysis_hour,
-        analysis_minute,
-    )
+    analysis_date = resolution.moment
+    analysis_year, analysis_month = analysis_date.year, analysis_date.month
     analysis_calendar_context = build_calendar_context(
         analysis_date,
         timezone_name=normalized_birth_time.timezone,
@@ -99,9 +147,13 @@ def calculate_comprehensive_timing(
         "analysis_type": "综合时运分析",
         "personal_info": {
             "name": person.name,
-            "birth_datetime": input_birth_datetime.strftime("%Y-%m-%d %H:%M"),
-            "normalized_birth_datetime": birth_date.strftime("%Y-%m-%d %H:%M"),
-            "gender": person.gender,
+            "birth_datetime": format_clock_datetime(
+                input_birth_datetime, include_seconds=person.birth_second is not None
+            ),
+            "normalized_birth_datetime": format_clock_datetime(
+                birth_date, include_seconds=person.birth_second is not None
+            ),
+            "gender": normalize_gender(person.gender),
             "analysis_date": analysis_date.strftime("%Y-%m-%d"),
             "analysis_datetime": analysis_date.strftime("%Y-%m-%d %H:%M"),
             "current_age": current_age,
@@ -128,9 +180,14 @@ def calculate_comprehensive_timing(
             "branch": dayun_info["branch"],
             "start_age": age_info["start_age"],
             "start_age_precise": age_info.get("start_age_precise"),
+            "start_age_unrounded": age_info.get("start_age_unrounded"),
             "dayun_age": age_info["dayun_age"],
             "years_in_period": age_info["years_in_period"],
             "direction": age_info.get("direction"),
+            "selection_basis": age_info["selection_basis"],
+            "elapsed_year_basis": age_info["elapsed_year_basis"],
+            "start_at": dayun_info["start_at"],
+            "end_at": dayun_info["end_at"],
             "summary": dayun_analysis["summary"],
         }
         # Preserve structured element changes for clients reading the combined
@@ -142,8 +199,10 @@ def calculate_comprehensive_timing(
         result["dayun_analysis"] = dayun_section
     else:
         result["dayun_analysis"] = {
-            "error": dayun_analysis.get("message", "大运信息不可用")
+            "error": dayun_analysis.get("message", "大运信息不可用"),
+            "status": dayun_analysis.get("status"),
         }
+    result["dayun_analysis"]["timing_context"] = dayun_analysis["timing_context"]
 
     # 流年分析
     liunian_analysis = timing_result["liunian_analysis"]
@@ -194,6 +253,14 @@ def calculate_comprehensive_timing(
     # 综合影响
     combined_effects = timing_result["combined_effects"]
     result["combined_effects"] = serialize_element_effects(combined_effects)
+    result["interaction_analysis"] = timing_result["interaction_analysis"]
+    if birth_time_uncertainty_minutes is not None:
+        result["birth_time_sensitivity"] = analyze_birth_time_range(
+            person,
+            birth_time_uncertainty_minutes,
+            analysis_moment=analysis_date if analysis_age is None else None,
+            analysis_age=analysis_age,
+        )
 
     # 综合总结
     result["comprehensive_summary"] = timing_result["comprehensive_summary"]
@@ -212,6 +279,8 @@ def calculate_comprehensive_timing(
         liushi_info=result["liushi_analysis"],
         combined_effects=result["combined_effects"],
         summary=result["comprehensive_summary"],
+        birth_time_sensitivity=result.get("birth_time_sensitivity"),
+        interaction_analysis=result["interaction_analysis"],
     )
     result["snapshot_export"] = _build_snapshot_export(
         technique="timing_analysis",
@@ -219,14 +288,33 @@ def calculate_comprehensive_timing(
         selected_sections=selected_sections,
     )
 
-    return result
+    # Keep every current-period fact/status. The starter view omits only the
+    # complete twelve-period table; full JSON retains its original timeline.
+    first_view = deepcopy(result["dayun_analysis"])
+    context = first_view.get("timing_context")
+    timeline = context.get("timeline") if isinstance(context, dict) else None
+    if isinstance(timeline, dict):
+        timeline.pop("periods", None)
+    result["dayun_analysis"]["first_view"] = first_view
+    return _with_analysis_reference(
+        result,
+        resolution.reference,
+        technique="timing_analysis",
+        selected_sections=selected_sections,
+    )
 
 
 @calculation_guard("大运分析计算")
 def calculate_dayun_analysis(
     person: PersonInfo,
-    analysis_age: int,
+    analysis_age: Optional[int] = None,
     selected_sections: Optional[List[str]] = None,
+    analysis_year: Optional[int] = None,
+    analysis_month: Optional[int] = None,
+    analysis_day: Optional[int] = None,
+    analysis_hour: Optional[int] = None,
+    analysis_minute: Optional[int] = None,
+    birth_time_uncertainty_minutes: Optional[int] = None,
 ) -> Dict:
     """
     大运分析工具 - 专门分析指定年龄的大运情况
@@ -235,6 +323,33 @@ def calculate_dayun_analysis(
     normalized_birth_time = birth_context.normalized_birth_time
     birth_date = normalized_birth_time.corrected_datetime
 
+    date_parts = (
+        analysis_year,
+        analysis_month,
+        analysis_day,
+        analysis_hour,
+        analysis_minute,
+    )
+    if analysis_age is not None and any(part is not None for part in date_parts):
+        raise ValueError("analysis_age年龄参考不能与analysis_*分析日期同时使用")
+    analysis_moment = None
+    analysis_reference = age_only_reference()
+    if analysis_age is None:
+        resolution = resolve_analysis_moment(
+            "dayun_analysis",
+            normalized_birth_time.timezone,
+            analysis_year=analysis_year,
+            analysis_month=analysis_month,
+            analysis_day=analysis_day,
+            analysis_hour=analysis_hour,
+            analysis_minute=analysis_minute,
+        )
+        analysis_moment = resolution.moment
+        analysis_reference = resolution.reference
+        analysis_age = calculate_analysis_age(
+            normalized_birth_time.input_datetime, analysis_moment
+        )
+
     dayun_result = TimingEffectsAnalysis.analyze_dayun_effects(
         birth_context.birth_pillars,
         normalized_birth_time.input_datetime,
@@ -242,6 +357,7 @@ def calculate_dayun_analysis(
         analysis_age,
         timezone_name=normalized_birth_time.timezone,
         original_element_counts=birth_context.original_element_counts,
+        analysis_moment=analysis_moment,
     )
 
     result: Dict[str, Any] = {
@@ -250,10 +366,13 @@ def calculate_dayun_analysis(
             "name": person.name,
             "gender": person.gender,
             "analysis_age": analysis_age,
-            "birth_datetime": normalized_birth_time.input_datetime.strftime(
-                "%Y-%m-%d %H:%M"
+            "birth_datetime": format_clock_datetime(
+                normalized_birth_time.input_datetime,
+                include_seconds=person.birth_second is not None,
             ),
-            "normalized_birth_datetime": birth_date.strftime("%Y-%m-%d %H:%M"),
+            "normalized_birth_datetime": format_clock_datetime(
+                birth_date, include_seconds=person.birth_second is not None
+            ),
             "time_adjustment": normalized_birth_time.as_dict(),
         },
         "calendar_context": birth_context.birth_calendar_context,
@@ -272,22 +391,41 @@ def calculate_dayun_analysis(
             "stem": dayun_info["stem"],
             "branch": dayun_info["branch"],
             "start_age": age_info["start_age"],
-            # start_age is the classical ceil-rounded display value;
-            # ``dayun_age`` and ``years_in_period`` are computed from the
-            # precise fractional起运岁, so surface it too to let callers
-            # reconcile ``age - start_age_precise ≈ dayun_age``.
+            # Ceiling/minimum-one is a software display convention.
+            # Keep the raw conversion beside its legacy two-decimal display
+            # so an age just above3 can explain an integer display4.
             "start_age_precise": age_info.get("start_age_precise"),
+            "start_age_unrounded": age_info.get("start_age_unrounded"),
             "dayun_age": age_info["dayun_age"],
             "years_in_period": age_info["years_in_period"],
             "direction": age_info.get("direction"),
+            "selection_basis": age_info["selection_basis"],
+            "elapsed_year_basis": age_info["elapsed_year_basis"],
+            "start_at": dayun_info["start_at"],
+            "end_at": dayun_info["end_at"],
         }
 
         result["element_effects"] = serialize_element_effects(element_effects)
 
         result["summary"] = dayun_result["summary"]
     else:
-        result["error"] = dayun_result.get("message", "大运信息不可用")
-        result["summary"] = result["error"]
+        result["summary"] = dayun_result.get("message", "大运信息不可用")
+        result["dayun_info"] = {
+            "status": dayun_result["status"],
+            "current_dayun": None,
+            "message": result["summary"],
+            "selection_basis": dayun_result["timing_context"]["selection_basis"],
+            "first_start_at": dayun_result["timing_context"]["timeline"]["start_at"],
+        }
+
+    result["timing_context"] = dayun_result["timing_context"]
+    if birth_time_uncertainty_minutes is not None:
+        result["birth_time_sensitivity"] = analyze_birth_time_range(
+            person,
+            birth_time_uncertainty_minutes,
+            analysis_moment=analysis_moment,
+            analysis_age=analysis_age if analysis_moment is None else None,
+        )
 
     snapshot_text = _build_dayun_snapshot_text(
         person_name=person.name,
@@ -298,6 +436,7 @@ def calculate_dayun_analysis(
         dayun_info=result.get("dayun_info") or dayun_info,
         element_effects=result.get("element_effects", element_effects),
         summary=result.get("summary", "大运信息不可用"),
+        birth_time_sensitivity=result.get("birth_time_sensitivity"),
     )
     result["snapshot_text"] = snapshot_text
     result["snapshot_export"] = _build_snapshot_export(
@@ -306,7 +445,12 @@ def calculate_dayun_analysis(
         selected_sections=selected_sections,
     )
 
-    return result
+    return _with_analysis_reference(
+        result,
+        analysis_reference,
+        technique="dayun_analysis",
+        selected_sections=selected_sections,
+    )
 
 
 @calculation_guard("流年分析计算")
@@ -352,10 +496,13 @@ def calculate_liunian_analysis(
         "personal_info": {
             "name": person.name,
             "target_year": target_year,
-            "birth_datetime": normalized_birth_time.input_datetime.strftime(
-                "%Y-%m-%d %H:%M"
+            "birth_datetime": format_clock_datetime(
+                normalized_birth_time.input_datetime,
+                include_seconds=person.birth_second is not None,
             ),
-            "normalized_birth_datetime": birth_date.strftime("%Y-%m-%d %H:%M"),
+            "normalized_birth_datetime": format_clock_datetime(
+                birth_date, include_seconds=person.birth_second is not None
+            ),
             "time_adjustment": normalized_birth_time.as_dict(),
         },
         "calendar_context": birth_context.birth_calendar_context,
@@ -374,7 +521,9 @@ def calculate_liunian_analysis(
     }
 
     result["summary"] = summary
-    return result
+    return _with_birth_clock_reference(
+        result, technique="liunian_analysis", selected_sections=selected_sections
+    )
 
 
 @calculation_guard("流月分析计算")
@@ -394,29 +543,18 @@ def calculate_liuyue_analysis(
     normalized_birth_time = birth_context.normalized_birth_time
     birth_date = normalized_birth_time.corrected_datetime
 
-    now = current_local_datetime(normalized_birth_time.timezone)
-    if analysis_year is None:
-        analysis_year = now.year
-    if analysis_month is None:
-        analysis_month = now.month
-    if analysis_day is None:
-        # 节气月起点 (立春/惊蛰/清明/立夏...) 大多落在阳历月上旬 5-9 日；
-        # 若 user 只指定 analysis_month 而未指定 day，取日=15 能稳定落到
-        # 该阳历月"主导"的节气月中段，避免默认到 day=1 时仍滞留在上一节气月，
-        # 产生 "四月流月=卯月" 这种反直觉结果。
-        analysis_day = 15
-    if analysis_hour is None:
-        analysis_hour = 0
-    if analysis_minute is None:
-        analysis_minute = 0
-
-    analysis_date = datetime(
-        analysis_year,
-        analysis_month,
-        analysis_day,
-        analysis_hour,
-        analysis_minute,
+    resolution = resolve_analysis_moment(
+        "liuyue_analysis",
+        normalized_birth_time.timezone,
+        analysis_year=analysis_year,
+        analysis_month=analysis_month,
+        analysis_day=analysis_day,
+        analysis_hour=analysis_hour,
+        analysis_minute=analysis_minute,
     )
+    analysis_date = resolution.moment
+    analysis_year, analysis_month = analysis_date.year, analysis_date.month
+    analysis_day = analysis_date.day
     analysis_calendar_context = build_calendar_context(
         analysis_date,
         timezone_name=normalized_birth_time.timezone,
@@ -486,10 +624,13 @@ def calculate_liuyue_analysis(
             "name": person.name,
             "analysis_date": analysis_date.strftime("%Y-%m-%d"),
             "analysis_datetime": analysis_date.strftime("%Y-%m-%d %H:%M"),
-            "birth_datetime": normalized_birth_time.input_datetime.strftime(
-                "%Y-%m-%d %H:%M"
+            "birth_datetime": format_clock_datetime(
+                normalized_birth_time.input_datetime,
+                include_seconds=person.birth_second is not None,
             ),
-            "normalized_birth_datetime": birth_date.strftime("%Y-%m-%d %H:%M"),
+            "normalized_birth_datetime": format_clock_datetime(
+                birth_date, include_seconds=person.birth_second is not None
+            ),
             "time_adjustment": normalized_birth_time.as_dict(),
         },
         "calendar_context": birth_context.birth_calendar_context,
@@ -528,7 +669,12 @@ def calculate_liuyue_analysis(
         }
 
     result["summary"] = summary
-    return result
+    return _with_analysis_reference(
+        result,
+        resolution.reference,
+        technique="liuyue_analysis",
+        selected_sections=selected_sections,
+    )
 
 
 @calculation_guard("流日分析计算")
@@ -548,25 +694,18 @@ def calculate_liuri_analysis(
     normalized_birth_time = birth_context.normalized_birth_time
     birth_date = normalized_birth_time.corrected_datetime
 
-    now = current_local_datetime(normalized_birth_time.timezone)
-    if analysis_year is None:
-        analysis_year = now.year
-    if analysis_month is None:
-        analysis_month = now.month
-    if analysis_day is None:
-        analysis_day = now.day
-    if analysis_hour is None:
-        analysis_hour = 0
-    if analysis_minute is None:
-        analysis_minute = 0
-
-    analysis_date = datetime(
-        analysis_year,
-        analysis_month,
-        analysis_day,
-        analysis_hour,
-        analysis_minute,
+    resolution = resolve_analysis_moment(
+        "liuri_analysis",
+        normalized_birth_time.timezone,
+        analysis_year=analysis_year,
+        analysis_month=analysis_month,
+        analysis_day=analysis_day,
+        analysis_hour=analysis_hour,
+        analysis_minute=analysis_minute,
     )
+    analysis_date = resolution.moment
+    analysis_year, analysis_month = analysis_date.year, analysis_date.month
+    analysis_day = analysis_date.day
     analysis_calendar_context = build_calendar_context(
         analysis_date,
         timezone_name=normalized_birth_time.timezone,
@@ -608,10 +747,13 @@ def calculate_liuri_analysis(
         "analysis_type": "流日专项分析",
         "personal_info": {
             "name": person.name,
-            "birth_datetime": normalized_birth_time.input_datetime.strftime(
-                "%Y-%m-%d %H:%M"
+            "birth_datetime": format_clock_datetime(
+                normalized_birth_time.input_datetime,
+                include_seconds=person.birth_second is not None,
             ),
-            "normalized_birth_datetime": birth_date.strftime("%Y-%m-%d %H:%M"),
+            "normalized_birth_datetime": format_clock_datetime(
+                birth_date, include_seconds=person.birth_second is not None
+            ),
             "analysis_date": analysis_date.strftime("%Y-%m-%d"),
             "analysis_datetime": analysis_date.strftime("%Y-%m-%d %H:%M"),
             "time_adjustment": normalized_birth_time.as_dict(),
@@ -633,7 +775,12 @@ def calculate_liuri_analysis(
         "snapshot_export": snapshot_export,
     }
 
-    return result
+    return _with_analysis_reference(
+        result,
+        resolution.reference,
+        technique="liuri_analysis",
+        selected_sections=selected_sections,
+    )
 
 
 @calculation_guard("流时分析计算")
@@ -653,25 +800,18 @@ def calculate_liushi_analysis(
     normalized_birth_time = birth_context.normalized_birth_time
     birth_date = normalized_birth_time.corrected_datetime
 
-    now = current_local_datetime(normalized_birth_time.timezone)
-    if analysis_year is None:
-        analysis_year = now.year
-    if analysis_month is None:
-        analysis_month = now.month
-    if analysis_day is None:
-        analysis_day = now.day
-    if analysis_hour is None:
-        analysis_hour = now.hour
-    if analysis_minute is None:
-        analysis_minute = 0
-
-    analysis_date = datetime(
-        analysis_year,
-        analysis_month,
-        analysis_day,
-        analysis_hour,
-        analysis_minute,
+    resolution = resolve_analysis_moment(
+        "liushi_analysis",
+        normalized_birth_time.timezone,
+        analysis_year=analysis_year,
+        analysis_month=analysis_month,
+        analysis_day=analysis_day,
+        analysis_hour=analysis_hour,
+        analysis_minute=analysis_minute,
     )
+    analysis_date = resolution.moment
+    analysis_year, analysis_month = analysis_date.year, analysis_date.month
+    analysis_day = analysis_date.day
     analysis_calendar_context = build_calendar_context(
         analysis_date,
         timezone_name=normalized_birth_time.timezone,
@@ -716,14 +856,17 @@ def calculate_liushi_analysis(
         selected_sections=selected_sections,
     )
 
-    return {
+    result = {
         "analysis_type": "流时专项分析",
         "personal_info": {
             "name": person.name,
-            "birth_datetime": normalized_birth_time.input_datetime.strftime(
-                "%Y-%m-%d %H:%M"
+            "birth_datetime": format_clock_datetime(
+                normalized_birth_time.input_datetime,
+                include_seconds=person.birth_second is not None,
             ),
-            "normalized_birth_datetime": birth_date.strftime("%Y-%m-%d %H:%M"),
+            "normalized_birth_datetime": format_clock_datetime(
+                birth_date, include_seconds=person.birth_second is not None
+            ),
             "analysis_date": analysis_date.strftime("%Y-%m-%d"),
             "analysis_datetime": analysis_date.strftime("%Y-%m-%d %H:%M"),
             "time_adjustment": normalized_birth_time.as_dict(),
@@ -756,6 +899,13 @@ def calculate_liushi_analysis(
         "snapshot_text": snapshot_text,
         "snapshot_export": snapshot_export,
     }
+
+    return _with_analysis_reference(
+        result,
+        resolution.reference,
+        technique="liushi_analysis",
+        selected_sections=selected_sections,
+    )
 
 
 @calculation_guard("节气时间轴分析计算")
@@ -800,15 +950,18 @@ def calculate_jieqi_timeline_analysis(
         selected_sections=selected_sections,
     )
 
-    return {
+    result = {
         "analysis_type": "节气节点时间轴分析",
         "personal_info": {
             "name": person.name,
             "target_year": target_year,
-            "birth_datetime": normalized_birth_time.input_datetime.strftime(
-                "%Y-%m-%d %H:%M"
+            "birth_datetime": format_clock_datetime(
+                normalized_birth_time.input_datetime,
+                include_seconds=person.birth_second is not None,
             ),
-            "normalized_birth_datetime": birth_date.strftime("%Y-%m-%d %H:%M"),
+            "normalized_birth_datetime": format_clock_datetime(
+                birth_date, include_seconds=person.birth_second is not None
+            ),
             "time_adjustment": normalized_birth_time.as_dict(),
         },
         "calendar_context": birth_context.birth_calendar_context,
@@ -818,3 +971,6 @@ def calculate_jieqi_timeline_analysis(
         "snapshot_text": snapshot_text,
         "snapshot_export": snapshot_export,
     }
+    return _with_birth_clock_reference(
+        result, technique="jieqi_timeline_analysis", selected_sections=selected_sections
+    )

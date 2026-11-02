@@ -1,0 +1,828 @@
+{
+  "id": "t2465_shinpukuji_context_working_v94_v1",
+  "evidence_snapshot_as_of_utc": "2026-10-27T08:50:45.047420+00:00",
+  "previous_completion_id": "nijl_selected_native_completion_2026_10_27_v1",
+  "previous_completion_bundle_sha256": "bcb826c8f27544af3d80c4f54d5fd0e55d99c13038e3492df18170ef9bc7d786",
+  "taisho_binding": {
+    "publisher_html_response_sha256": "74c63f5151c2b8c3ac554f7a0acae0776e5247e740a712834e1b600a065050e6",
+    "downloaded_calendar_windows": [
+      {
+        "locator": "T2465_.78.0030c13-21",
+        "text": "若有閏月時。其正月直宿即亦重直閏月。謂假令十二月有閏月。而其十二月一日直宿是虚宿。十五日直宿是星宿。乃至三十日直宿是星宿。如是閏十二月直宿亦同之。更無異也。先月是正十二月。閏月是傍十二月也。故傍月･直宿三十日皆用正十二月直宿更不異宿也。餘月聞月准之知耳。"
+      },
+      {
+        "locator": "T2465_.78.0030c21-26",
+        "text": "取小月闕第三十日直宿之法。假令正月小闕第三十日。雖無其第三十日。而彼日分直宿猶有故。次二月初一日半已上者。正月闕日之分宿直也。半已下者即彼當日宿直。故雖大小異日有増減。而小月闕日直宿無日不得。次月初一日眞宿無改代也｣"
+      }
+    ],
+    "calendar_apparatus": [
+      {
+        "line": "0030c14",
+        "notes_html": [
+          "訣＝説<sup>イ</sup>＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c17",
+        "notes_html": [
+          "十＝月＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c18",
+        "notes_html": [
+          "〔是正･･･月〕十六字<sup>イ</sup>－＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c20",
+        "notes_html": [
+          "〔宿〕－＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c23",
+        "notes_html": [
+          "半＋（也）＜甲＞"
+        ]
+      }
+    ]
+  },
+  "witness": {
+    "catalogue_id": "100183249",
+    "holding_institution": "真福寺大須文庫",
+    "call_number": "72-25",
+    "title": "檜尾鈔",
+    "catalogue_url": "https://kokusho.nijl.ac.jp/biblio/100183249",
+    "manifest_sha256": "4e03baf4838b4a7484e9c4e92215059298a60f90f74522fd0cb121e6a48a8093",
+    "canvas_numbers_are_manuscript_folio_numbers": false,
+    "identified_as_Taisho_base_or_witness_A": false,
+    "independent_lineage_established": false
+  },
+  "frames": [
+    {
+      "frame": 33,
+      "sha256": "de84fff8148920570b2b962fcdc6b39c69322103948de13a537e1dfea6738565",
+      "bytes": 2132259,
+      "pixels": [
+        6112,
+        4672
+      ],
+      "source": "newv94",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100183249/canvas/33",
+      "image_url": "https://kokusho.nijl.ac.jp/api/iiif/100183249/v4/0278/0278-007402/0278-007402-0032.tif/full/full/0/default.jpg",
+      "actual_bytes_rechecked_before_code": true
+    },
+    {
+      "frame": 34,
+      "sha256": "460f5cb4ee81164f00ac4a23e462b40c7b982dc421377715bef92e20bc3d2730",
+      "bytes": 2128967,
+      "pixels": [
+        6112,
+        4672
+      ],
+      "source": "reusedv92native;notnewacquisitionorindependentwitness",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100183249/canvas/34",
+      "image_url": "https://kokusho.nijl.ac.jp/api/iiif/100183249/v4/0278/0278-007402/0278-007402-0033.tif/full/full/0/default.jpg",
+      "actual_bytes_rechecked_before_code": true
+    },
+    {
+      "frame": 35,
+      "sha256": "3bfabac0fdd829deb5795aebe6191ef6e71ac7f72f92494db4d58e51c05c1ef5",
+      "bytes": 2066705,
+      "pixels": [
+        6112,
+        4672
+      ],
+      "source": "reusedv92native;notnewacquisitionorindependentwitness",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100183249/canvas/35",
+      "image_url": "https://kokusho.nijl.ac.jp/api/iiif/100183249/v4/0278/0278-007402/0278-007402-0034.tif/full/full/0/default.jpg",
+      "actual_bytes_rechecked_before_code": true
+    },
+    {
+      "frame": 36,
+      "sha256": "1895d042ebeb7df04d0f1bda40099b4a56c6eb86695a37435466b62ab6164d56",
+      "bytes": 2079156,
+      "pixels": [
+        6112,
+        4672
+      ],
+      "source": "newv94",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100183249/canvas/36",
+      "image_url": "https://kokusho.nijl.ac.jp/api/iiif/100183249/v4/0278/0278-007402/0278-007402-0035.tif/full/full/0/default.jpg",
+      "actual_bytes_rechecked_before_code": true
+    }
+  ],
+  "historical_source_records": [
+    {
+      "name": "context-acquisition-first.json",
+      "sha256": "b7134cddee7e218648a54fe080a4a22ee3f28293e994fad34b55ef2354aa3772"
+    },
+    {
+      "name": "reading-packet-before-two-roles.json",
+      "sha256": "6f2dec7844468d7a0356f8edddc0934499a64956d1090204349159c7c1f2549c"
+    },
+    {
+      "name": "generator-hinoo-context-first.json",
+      "sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4"
+    },
+    {
+      "name": "reviewer-hinoo-context-first.json",
+      "sha256": "63a4483a2c4d47d470fea1731a3ec0787ebc9ebbbd331e88a25edb5ae00e7551"
+    },
+    {
+      "name": "root-context-reread-first.json",
+      "sha256": "4c2226dfca19ade2f9e615d8d4f630ca740e83fe9cdf9b81f387160a224e4b38"
+    },
+    {
+      "name": "root-feedback-qualified-correction.json",
+      "sha256": "05546528fbdaa64b881503b1abcb07ffb5b3ccf154ea79854de492fe80c289a4"
+    }
+  ],
+  "attributed_calendar_columns": [
+    {
+      "role": "generator",
+      "stage": "v94_first",
+      "source_record_sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4",
+      "json_pointer": "/transcriptions/2",
+      "record": {
+        "frame": 34,
+        "locator": "左页自右数第4栏下部",
+        "layer": "正文中的引入字句",
+        "literal": "勅宿曜經取閏月之宿",
+        "uncertain_glyphs": [
+          {
+            "position": "句首字",
+            "working_reading": "勅",
+            "certainty": "中",
+            "note": "按本次可见笔形作工作读法；不据此补出引书关系、作者身份或缺失标点。"
+          }
+        ],
+        "layout_note": "这串字位于前一栏下部；以下的分宿法题头从下一栏较高处开始。原图没有现代段落标点。"
+      }
+    },
+    {
+      "role": "generator",
+      "stage": "v94_first",
+      "source_record_sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4",
+      "json_pointer": "/transcriptions/3",
+      "record": {
+        "frame": 34,
+        "locator": "左页自右数第5栏，上部题头及其下正文",
+        "layer": "题头与正文",
+        "heading_literal": "大小月之闕日分宿法",
+        "body_literal": "若有閏月時其正月直",
+        "uncertain_glyphs": [],
+        "layout_note": "题头与下接正文连写在同一大字栏；题头末的「法」附近另有较小字，不并入正文。"
+      }
+    },
+    {
+      "role": "generator",
+      "stage": "v94_first",
+      "source_record_sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4",
+      "json_pointer": "/transcriptions/4",
+      "record": {
+        "frame": 34,
+        "locator": "左页第5栏「法」旁的小字",
+        "layer": "小字旁写",
+        "literal": null,
+        "uncertain_glyphs": [
+          {
+            "position": "「法」旁两字",
+            "candidates": [
+              "振知",
+              "振如"
+            ],
+            "certainty": "低",
+            "note": "首字近「振」，次字未定；不认作已经确认的署名、校者名或方法名称。"
+          }
+        ]
+      }
+    },
+    {
+      "role": "generator",
+      "stage": "v94_first",
+      "source_record_sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4",
+      "json_pointer": "/transcriptions/5",
+      "record": {
+        "frame": 34,
+        "locator": "左页自右数第6栏",
+        "layer": "正文",
+        "literal": "宿即〔上／止〕重直閏月〔譬？〕假令十二月有閏月而其十三",
+        "uncertain_glyphs": [
+          {
+            "position": "「即」后一字",
+            "candidates": [
+              "上",
+              "止"
+            ],
+            "certainty": "未定"
+          },
+          {
+            "position": "「閏月」后、「假令」前",
+            "candidates": [
+              "譬"
+            ],
+            "certainty": "低",
+            "note": "该字笔画较密，未据通行文句补成唯一字。"
+          }
+        ],
+        "connection": "上接第5栏末「直」，下接第7栏首「月」。"
+      }
+    },
+    {
+      "role": "generator",
+      "stage": "v94_first",
+      "source_record_sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4",
+      "json_pointer": "/transcriptions/6",
+      "record": {
+        "frame": 34,
+        "locator": "左页自右数第7栏",
+        "layer": "正文",
+        "literal": "月一日直宿是虛宿十五日直宿是星宿乃至卅日",
+        "uncertain_glyphs": [
+          {
+            "position": "「十五日直」后的「宿」",
+            "working_reading": "宿",
+            "certainty": "中",
+            "note": "墨色较淡，仍可辨为工作读法；没有用配宿算法补定。"
+          }
+        ],
+        "connection": "与前栏合读为「其十三月一日……」，「卅日」的直宿接下一栏。"
+      }
+    },
+    {
+      "role": "generator",
+      "stage": "v94_first",
+      "source_record_sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4",
+      "json_pointer": "/transcriptions/7",
+      "record": {
+        "frame": 34,
+        "locator": "左页自右数第8栏，即左侧末栏",
+        "layer": "正文",
+        "literal": "直宿是室宿如是閏十二月直宿〔亦？〕同之更無異也",
+        "uncertain_glyphs": [
+          {
+            "position": "第二个「直宿」后的一字",
+            "working_reading": "亦",
+            "certainty": "中低"
+          }
+        ],
+        "pixel_note": "卅日所接宿字的本次工作读法为「室」：上部见宀形，下部见至形，不以别本星／室分歧或计算相合裁字。「同之」保留所见连写，不因句法另行改字。",
+        "connection": "下一帧35右页继续解释正十二月与傍十三月。"
+      }
+    },
+    {
+      "role": "generator",
+      "stage": "v94_first",
+      "source_record_sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4",
+      "json_pointer": "/transcriptions/8",
+      "record": {
+        "frame": 35,
+        "locator": "右页自右数第1栏",
+        "layer": "正文",
+        "literal": "先月是正十二月閏月是傍十三月也故傍月直宿卅",
+        "uncertain_glyphs": [],
+        "connection": "栏末「卅」接第2栏首「日」。"
+      }
+    },
+    {
+      "role": "generator",
+      "stage": "v94_first",
+      "source_record_sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4",
+      "json_pointer": "/transcriptions/9",
+      "record": {
+        "frame": 35,
+        "locator": "右页自右数第2栏",
+        "layer": "正文",
+        "literal": "日皆用正十二月直宿更不異宿也應所閏月準之知耳",
+        "uncertain_glyphs": [],
+        "connection": "结束本例闰月复用说明，下一栏另起小月缺日条文。"
+      }
+    },
+    {
+      "role": "generator",
+      "stage": "v94_first",
+      "source_record_sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4",
+      "json_pointer": "/transcriptions/10",
+      "record": {
+        "frame": 35,
+        "locator": "右页自右数第3栏",
+        "layer": "正文中的第二项说明及例子",
+        "literal": "取小月闕第卅日直宿之法假令正月小闕第卅日雖",
+        "uncertain_glyphs": [],
+        "layout_note": "「取小月……之法」是正文中的新说明起点，未见它被写成夹注。"
+      }
+    },
+    {
+      "role": "generator",
+      "stage": "v94_first",
+      "source_record_sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4",
+      "json_pointer": "/transcriptions/11",
+      "record": {
+        "frame": 35,
+        "locator": "右页自右数第4栏",
+        "layer": "正文",
+        "literal": "無其第〔卅／廿〕日而後日分有直宿猶有故次二月初一日半〔已／己／巳〕",
+        "uncertain_glyphs": [
+          {
+            "position": "「無其第」后数字",
+            "candidates": [
+              "卅",
+              "廿"
+            ],
+            "working_reading": "卅",
+            "certainty": "中",
+            "note": "仍保留局部连笔辨读余地；不因上一栏已写卅而强行校定。"
+          },
+          {
+            "position": "栏末「半」后一字",
+            "candidates": [
+              "已",
+              "己",
+              "巳"
+            ],
+            "working_reading": "已",
+            "certainty": "未唯一确定"
+          }
+        ],
+        "connection": "栏末接第5栏首「上者」。"
+      }
+    },
+    {
+      "role": "generator",
+      "stage": "v94_first",
+      "source_record_sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4",
+      "json_pointer": "/transcriptions/12",
+      "record": {
+        "frame": 35,
+        "locator": "右页自右数第5栏",
+        "layer": "正文",
+        "literal": "上者正月闕日之分宿直也半〔已／己／巳〕下者即彼當日宿",
+        "uncertain_glyphs": [
+          {
+            "position": "「半」后、「下者」前",
+            "candidates": [
+              "已",
+              "己",
+              "巳"
+            ],
+            "working_reading": "已",
+            "certainty": "未唯一确定"
+          }
+        ],
+        "connection": "上接第4栏的「半□」，下接第6栏首「直」。",
+        "pixel_note": "这里保留「半□上／半□下」的可见对举，不把疑字静默改成「日」，也不直接改写为现代上午／下午。"
+      }
+    },
+    {
+      "role": "generator",
+      "stage": "v94_first",
+      "source_record_sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4",
+      "json_pointer": "/transcriptions/13",
+      "record": {
+        "frame": 35,
+        "locator": "右页自右数第6栏",
+        "layer": "正文",
+        "literal": "直故雖大小異日有分宿故而小月闕日直宿無〔日？〕不得",
+        "uncertain_glyphs": [
+          {
+            "position": "「直宿無」后的一字",
+            "working_reading": "日",
+            "certainty": "低至中",
+            "note": "整句末部语法未据意义整理；保留疑字，不补成更通顺的另一句话。"
+          }
+        ]
+      }
+    },
+    {
+      "role": "generator",
+      "stage": "v94_first",
+      "source_record_sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4",
+      "json_pointer": "/transcriptions/14",
+      "record": {
+        "frame": 35,
+        "locator": "右页自右数第7栏上部",
+        "layer": "历法段末句",
+        "literal": "次月初一日直宿無改代也",
+        "uncertain_glyphs": [],
+        "layout_note": "本句后同栏下部开始「相向爐更不安卅七尊位」一类仪轨文字，题材已经转移，不能把它接作历法执行步骤。"
+      }
+    },
+    {
+      "role": "reviewer",
+      "stage": "v94_first",
+      "source_record_sha256": "63a4483a2c4d47d470fea1731a3ec0787ebc9ebbbd331e88a25edb5ae00e7551",
+      "json_pointer": "/transcriptions/1/columns/0",
+      "frame": 34,
+      "page": "左",
+      "record": {
+        "column": 5,
+        "heading_literal": "又小月之闕日分宿法",
+        "body_after_heading_literal": "若有閏月時其正月直",
+        "layout": "题头与随后正文在同一大栏连续书写，法与若之间另有较小字，未将小字并入大字正文。",
+        "small_annotation": {
+          "visible_working_fragments": [
+            "振□",
+            "□説"
+          ],
+          "accepted_complete_reading": null,
+          "candidate_notes": "右侧第二字形近口，另一短栏首字形近決，但不足以唯一接受，也不据此认定人物或注写归属。"
+        }
+      }
+    },
+    {
+      "role": "reviewer",
+      "stage": "v94_first",
+      "source_record_sha256": "63a4483a2c4d47d470fea1731a3ec0787ebc9ebbbd331e88a25edb5ae00e7551",
+      "json_pointer": "/transcriptions/1/columns/1",
+      "frame": 34,
+      "page": "左",
+      "record": {
+        "column": 6,
+        "literal": "宿即上重其閏月謂□令十二月有閏月而其十二",
+        "uncertain": [
+          {
+            "position": "謂□令",
+            "accepted": null,
+            "candidates": [
+              "假",
+              "倣"
+            ],
+            "note": "左侧人旁及右部复合笔画可见，暂不以熟悉的假令句式填定。"
+          }
+        ]
+      }
+    },
+    {
+      "role": "reviewer",
+      "stage": "v94_first",
+      "source_record_sha256": "63a4483a2c4d47d470fea1731a3ec0787ebc9ebbbd331e88a25edb5ae00e7551",
+      "json_pointer": "/transcriptions/1/columns/2",
+      "frame": 34,
+      "page": "左",
+      "record": {
+        "column": 7,
+        "literal": "月一日直宿是虛宿十五日直□是星宿乃至卅日",
+        "uncertain": [
+          {
+            "position": "十五日直□是星宿",
+            "accepted": null,
+            "candidates": [
+              "宿"
+            ],
+            "note": "直之后有明显淡字或重叠笔迹；候选宿保留，未判为已确定的改写层。"
+          }
+        ]
+      }
+    },
+    {
+      "role": "reviewer",
+      "stage": "v94_first",
+      "source_record_sha256": "63a4483a2c4d47d470fea1731a3ec0787ebc9ebbbd331e88a25edb5ae00e7551",
+      "json_pointer": "/transcriptions/1/columns/3",
+      "frame": 34,
+      "page": "左",
+      "record": {
+        "column": 8,
+        "literal": "直宿是室宿如是閏十三月直宿必同之更无異也",
+        "target_notes": [
+          "卅日后的宿名工作读室；上部宀形及下部至形可辨，没有按现有配宿算法选字。",
+          "閏十三月及必同之更无異也可读；不把上重改写成其他熟悉词。"
+        ]
+      }
+    },
+    {
+      "role": "reviewer",
+      "stage": "v94_first",
+      "source_record_sha256": "63a4483a2c4d47d470fea1731a3ec0787ebc9ebbbd331e88a25edb5ae00e7551",
+      "json_pointer": "/transcriptions/2/columns/0",
+      "frame": 35,
+      "page": "右",
+      "record": {
+        "column": 1,
+        "literal": "先月是正十二月閏月是傍十三月故傍月直宿卅",
+        "target_notes": [
+          "正十二月与傍十三月分别核看原生完整栏，没有把二、三按预期互换。",
+          "本栏与34左末栏连续讨论十二月有闰月的例子。"
+        ]
+      }
+    },
+    {
+      "role": "reviewer",
+      "stage": "v94_first",
+      "source_record_sha256": "63a4483a2c4d47d470fea1731a3ec0787ebc9ebbbd331e88a25edb5ae00e7551",
+      "json_pointer": "/transcriptions/2/columns/1",
+      "frame": 35,
+      "page": "右",
+      "record": {
+        "column": 2,
+        "literal": "日皆用正十二月直宿更不異□之餘月閏月准之知耳",
+        "uncertain": [
+          {
+            "position": "更不異□之",
+            "accepted": null,
+            "candidates": [
+              "有",
+              "宿"
+            ],
+            "note": "该字上部与内部笔画连写，未唯一接受；其后之餘月閏月准之知耳为工作读法。"
+          }
+        ]
+      }
+    },
+    {
+      "role": "reviewer",
+      "stage": "v94_first",
+      "source_record_sha256": "63a4483a2c4d47d470fea1731a3ec0787ebc9ebbbd331e88a25edb5ae00e7551",
+      "json_pointer": "/transcriptions/2/columns/2",
+      "frame": 35,
+      "page": "右",
+      "record": {
+        "column": 3,
+        "literal": "取小月闕第卅日直宿之法假令正月小闕第卅日雖",
+        "layout": "取小月闕第卅日直宿之法另起一栏引出小月缺日用法；不因它排在闰月例后便补出交叠优先规则。"
+      }
+    },
+    {
+      "role": "reviewer",
+      "stage": "v94_first",
+      "source_record_sha256": "63a4483a2c4d47d470fea1731a3ec0787ebc9ebbbd331e88a25edb5ae00e7551",
+      "json_pointer": "/transcriptions/2/columns/3",
+      "frame": 35,
+      "page": "右",
+      "record": {
+        "column": 4,
+        "literal": "无其第卅日而彼日分有直宿猶有故次二月初一日半□",
+        "uncertain": [
+          {
+            "position": "次二月初一日半□",
+            "accepted": null,
+            "candidates": [
+              "已",
+              "己",
+              "也"
+            ],
+            "note": "半后可见弯折及下部延伸笔，未唯一接受为某字，也不补成日。"
+          }
+        ]
+      }
+    },
+    {
+      "role": "reviewer",
+      "stage": "v94_first",
+      "source_record_sha256": "63a4483a2c4d47d470fea1731a3ec0787ebc9ebbbd331e88a25edb5ae00e7551",
+      "json_pointer": "/transcriptions/2/columns/4",
+      "frame": 35,
+      "page": "右",
+      "record": {
+        "column": 5,
+        "literal": "上者正月闕日之分宿直也半□下者即彼當日宿",
+        "uncertain": [
+          {
+            "position": "半□下者",
+            "accepted": null,
+            "candidates": [
+              "己",
+              "已"
+            ],
+            "note": "此处字形有上横、内折及长弯底笔，工作形近己／已；与上一栏半后字分别保留，不先假定两处必为同字。"
+          }
+        ]
+      }
+    },
+    {
+      "role": "reviewer",
+      "stage": "v94_first",
+      "source_record_sha256": "63a4483a2c4d47d470fea1731a3ec0787ebc9ebbbd331e88a25edb5ae00e7551",
+      "json_pointer": "/transcriptions/2/columns/5",
+      "frame": 35,
+      "page": "右",
+      "record": {
+        "column": 6,
+        "literal": "直故雖大小異日有增減而小月闕日直宿无日不得"
+      }
+    },
+    {
+      "role": "reviewer",
+      "stage": "v94_first",
+      "source_record_sha256": "63a4483a2c4d47d470fea1731a3ec0787ebc9ebbbd331e88a25edb5ae00e7551",
+      "json_pointer": "/transcriptions/2/columns/6",
+      "frame": 35,
+      "page": "右",
+      "record": {
+        "column": 7,
+        "literal": "次月初一日直宿无改代也",
+        "target_notes": [
+          "末句中的次月初一日、直宿、无改代也可辨。",
+          "没有用旧电子末句或算法相合补改这个工作读法。"
+        ]
+      }
+    }
+  ],
+  "root_first_working_fragments": {
+    "frame34": [
+      "若有閏月時其正月直宿即亦重直閏月",
+      "十二月一日直宿是虛宿",
+      "十五日直宿是星宿",
+      "乃至卅日直宿是室宿",
+      "如是閏十二月直宿亦同之更無異也"
+    ],
+    "frame35": [
+      "先月是正十二月閏月是傍十二月也",
+      "故傍月直宿卅日皆用正十二月直宿更不異宿也餘月閏月准之知耳",
+      "取小月闕第卅日直宿之法",
+      "次二月初一日半〔已？〕上者正月闕日之分宿直也",
+      "半已下者即彼當日宿直",
+      "次月初一日直宿無改代也"
+    ]
+  },
+  "root_feedback_qualified_correction": {
+    "at": "2026-10-27T08:50:45.047420+00:00",
+    "task": "v94-root-feedback-qualified-correction",
+    "root_first_sha256": "4c2226dfca19ade2f9e615d8d4f630ca740e83fe9cdf9b81f387160a224e4b38",
+    "generator_first_sha256": "2579cae9a5b8fbbe97b1311231d69d15b8b66624cb2f231727fd331e123caea4",
+    "reviewer_first_sha256": "63a4483a2c4d47d470fea1731a3ec0787ebc9ebbbd331e88a25edb5ae00e7551",
+    "firsts_unchanged": true,
+    "changes": [
+      {
+        "location": "34leftending and35right firstcolumn intercalaryexample",
+        "root_first": "閏十二月／傍十二月",
+        "current_selected_working_reading": "閏十三月／傍十三月",
+        "evidence": "root afterfeedback viewednative034ending and wider035monthcolumn; differs from SAT傍十二月. Rootnormalregularmonth remains正十二月.",
+        "canonical_manuscript_edition_accepted": false
+      },
+      {
+        "location": "34calendarheading",
+        "root_first_candidates": [
+          "取",
+          "次"
+        ],
+        "current_root_working_candidate": "又",
+        "other_role_firsts": [
+          "大小月",
+          "又小月"
+        ],
+        "canonical": null
+      },
+      {
+        "location": "smallnote alongside法",
+        "root_first_candidate": "大流云",
+        "current_root_candidate": "振口 and otherunacceptedleftsmallcharacters",
+        "canonical": null,
+        "scope": "earliercandidate notadopted; noauthor orlineageidentification"
+      }
+    ],
+    "first_feedback_focus_crop_limitation": {
+      "file": "crops/root-feedback-035-regular-and-intercalary-month.png",
+      "decoded_pixels_correspond_to_requested_rectangle": true,
+      "target_column_left_part_cut_off": true,
+      "not_used_alone_to_certify_complete_monthword": true
+    },
+    "wider_focus_crop": {
+      "file": "crops/root-feedback-035-month-column-wider.png",
+      "xywh": [
+        4700,
+        650,
+        900,
+        2400
+      ],
+      "sha256": "918269dd9233af07508c137edd9d1fdd489da906b361a15232f34741138d13c6",
+      "actually_viewed_native": true
+    },
+    "unchanged_limits": [
+      "halfpostglyphsnotuniquelyaccepted",
+      "wholebooknotcollated",
+      "modernclock/half/overlappriorityunknown",
+      "SAT-specificnewmeaningdataunchangedandnotnormalizedfromShin13",
+      "no newindependentfirstorvote"
+    ],
+    "scope": "Rootcorrectionafterrolefeedback, not an independent first. Preserve literal differences bynamedsource andlocation."
+  },
+  "qualified_comparisons": [
+    {
+      "id": "antecedent_month_34_column6",
+      "location": "034左第6栏末至第7栏首，其□月",
+      "generator_first_working_reading": "其十三月",
+      "reviewer_first_working_reading": "其十二月",
+      "canonical_reading": null
+    },
+    {
+      "id": "intercalary_month_34_column8",
+      "location": "034左末栏，如是閏□月",
+      "generator_first_working_reading": "閏十二月",
+      "reviewer_first_working_reading": "閏十三月",
+      "root_first_working_reading": "閏十二月",
+      "root_after_feedback_working_reading": "閏十三月",
+      "canonical_reading": null
+    },
+    {
+      "id": "regular_and_intercalary_35_column1",
+      "location": "035右首栏，先月是正□月閏月是傍□月",
+      "generator_first_working_reading": "正十二月／傍十三月",
+      "reviewer_first_working_reading": "正十二月／傍十三月",
+      "root_first_working_reading": "正十二月／傍十二月",
+      "root_after_feedback_working_reading": "正十二月／傍十三月",
+      "SAT_bound_text": "正十二月／傍十二月",
+      "canonical_manuscript_reading": null,
+      "ordinary_thirteenth_month_established": false
+    },
+    {
+      "id": "day30_mansion_34_column8",
+      "location": "034左末栏承前栏乃至卅日",
+      "generator_first_working_reading": "室",
+      "reviewer_first_working_reading": "室",
+      "root_first_working_reading": "室",
+      "SAT_bound_text": "星",
+      "canonical_manuscript_reading": null,
+      "algorithm_agreement_proves_glyph": false
+    },
+    {
+      "id": "calendar_heading_34_column5",
+      "location": "034左第5栏题头",
+      "generator_first_working_reading": "大小月之闕日分宿法",
+      "reviewer_first_working_reading": "又小月之闕日分宿法",
+      "root_first_candidates": [
+        "取",
+        "次"
+      ],
+      "root_after_feedback_candidate": "又",
+      "canonical_reading": null
+    },
+    {
+      "id": "half_upper_35_column4",
+      "location": "035右第4栏末半后一字",
+      "generator_candidates": [
+        "已",
+        "己",
+        "巳"
+      ],
+      "reviewer_candidates": [
+        "已",
+        "己",
+        "也"
+      ],
+      "canonical_reading": null
+    },
+    {
+      "id": "half_lower_35_column5",
+      "location": "035右第5栏半后下者前一字",
+      "generator_candidates": [
+        "已",
+        "己",
+        "巳"
+      ],
+      "reviewer_candidates": [
+        "己",
+        "已"
+      ],
+      "canonical_reading": null,
+      "same_glyph_as_upper_established": false
+    }
+  ],
+  "positive_semantics": {
+    "relative_month_is_same_named_regular_month": true,
+    "short_month_example_is_month1_followed_by_month2": true,
+    "omitted_day30_assignment_retained": true,
+    "next_day1_own_assignment_retained": true,
+    "paragraph_order_proves_executable_priority": false,
+    "leap_example_explicitly_also_short": false,
+    "short_month_example_explicitly_also_intercalary": false
+  },
+  "scope": {
+    "context_window": [
+      33,
+      34,
+      35,
+      36
+    ],
+    "new_v94_frames": [
+      33,
+      36
+    ],
+    "reused_v92_frames": [
+      34,
+      35
+    ],
+    "new_frames_in_original17_denominator": false,
+    "original17_required": 17,
+    "original17_acquired_before_new_context": 17,
+    "adjacent_ritual_pages_fully_transcribed": false,
+    "local_context_absence_proves_whole_book_absence": false,
+    "complete_transcription_accepted": false,
+    "complete_critical_edition_accepted": false,
+    "strict_blind_reading": false,
+    "independent_human_acceptance": false,
+    "shared_provider_history_and_filesystem": true,
+    "prior_target_glyph_exposure": true,
+    "modern_clock": null,
+    "daybreak_clock": null,
+    "solar_altitude_degrees": null,
+    "hinoo_half_clock": null,
+    "half_endpoint_inclusion": null,
+    "leap_short_month_execution_priority": null,
+    "calendar_policy_changed": false,
+    "SAT_normalized_from_working_manuscript_readings": false,
+    "real_samples": 0
+  }
+}

@@ -1,0 +1,569 @@
+{
+  "call_guidance": {
+    "additional_balas": "Dig用实际上升/天顶角点，不用整宫起点；自然力为固定系数。Drik按Raman113-120方向差、附加特殊值、正负四分之一，未经裁定的水星性质保留scenarios，summary=null不当零；特殊附加值可超过60，不擅自截断。读source_id、nature_context、source_disagreements及shadbala_assessment；Kala/Cheshta须各自核对条件与模型状态，不拼完整六力总量。",
+    "cheshta_model": "明确要求五星运动力或深度力量时，可选择simon1994_j2000：Simon1994完整平均黄经、独立几何J2000真位置、原有角度公式。模型仅在1900-2050出生TT窗口承认；analysis_year不改变本命窗口。默认unadjudicated及窗口外保留五星缺失。不是原书1900表校勘、完整六力或预测验证。",
+    "configuration": "Lahiri sidereal + whole_sign 才计算本核心。显式旧式黄道/宫制覆盖返回configuration_not_supported，不另猜分盘。",
+    "divisions": "可选2,3,7,9,10,12,30，D1始终计算。D30不等长区段仅给星座及整宫，无唯一盘内度数；任何分盘不套物理状态。",
+    "ephemeris": "ephemeris_policy=auto回显实际逐星后端；require_data_files拒绝七个物理天体的分析模型降级，包括生时抽样。后端来源不证明预测有效。 ephemeris_model_scope=physical_bodies只汇总七个物理天体及其实际赤道/所选运动帧；Rahu/Ketu见nonphysical_factor_models，平交点为swisseph_analytical_mean_node。native_node_return_flags回显的请求位不证明交点读取了物理矢量文件。physical_backend_policy=strict_jpl表示运行者强制JPL；黄经、赤道、运动力几何与支撑太阳事件均遵守，原生与运动帧共用配置锁。缺失、损坏或越界为来源错误，不默退Moshier；这些来源声明不认证原典或预测效果。",
+    "full_export": "完整结果fields=null，从同run的result_delivery取回。",
+    "historical_clock": "v12支持已明确的birth_clock_basis=civil/local_mean_solar/local_apparent_solar；日期为公历，不猜原始钟制。LMT/LAT省略birth_timezone且use_true_solar_time=false，按已确认地点取经度；birth_second/microsecond仅保留已知或转换数值精度，不证明原记录准确。读india.profile.clock_context及person_info.clock_conversion，区分原始无时区钟面与转换UTC载体。",
+    "lunar_nature": "Raman53第八日窗口与117-118盈亏表述并不相同。nature_context.moon_readings保留差异；边界及有分歧角距保留两种传统分类，不把旧版单一盈亏标签当作者唯一结论。",
+    "physical_clock": "出生资料为民用钟时，use_true_solar_time默认false。v11起true只另报太阳钟标签，不改变记录钟时所指的物理时刻、盘面、达沙或模型出生年代窗口。读india.profile.clock_context；solar_wall_datetime无时区，不当另一出生时间，不当分析日期。不能把已知LAT/LMT记录直接当民用资料后开此开关。",
+    "physical_conditions": "D1 physical_state含度数区间、Baladi、0–60 Virupa Uchcha Bala分量、运动及Santhanam注释的太阳角距条件；核对combustion的source_layer、顺逆行、阈值和未裁定边界，不当作真实可见性或现实失能；D9/D10不套物理状态。dispositor_relationship为有方向的星体关系。",
+    "reading_fidelity": "reading_basis保留名义生时、未评估与抽样候选；不把未给误差当精确。星宿/宿足候选与分盘候选同一UTC网格，计数不是概率。主题力量calculation_context直接携带同run分支数值、约束与字段路径；computed_consensus/conditional_results/unavailable/partially_computed分开，null不一概为0或用户资料不足。不能只选高分支、自动全盘否定或宣称已完成独立文本盲审。Vimshottari敏感性对目标早于候选出生的样本显式列omitted_samples。",
+    "scope": "读取india内独立Parashari规则；顶层西占字段仅为历史兼容参考，不能冒充印占。",
+    "sensitivity": "None不是精确生时；只传用户确认的正负范围。",
+    "solar_component_scope": "Kala太阳依赖分开：日主/时主读连续日出对，三分力读当前相邻昼夜端点；partial_solar_brackets只限制对应分量。读取solar_context及同run constraints，不因缺其他日落抹去已有结果，也不补假日出。网格状态计数不是概率。",
+    "solar_event_scope": "日出／日落支撑窗口逐项检索同一UT1日界内的连续事件；不假定每天仅一个同类事件。solar_events.enumeration的1秒仅是检索防重复步长，不是出生记录或实测精度。",
+    "solar_uncertainty": "仅传用户确认的误差；太阳钟输入先换算原钟面区间两端，再取最长30秒物理UTC网格。保留clock_interval原始标签、转换端点、非对称offset及全部候选；覆盖计数非概率，不当连续区间证明。require_data_files同样检查LAT求解和端点换算的每次太阳坐标，不用最后一次成功掩盖中途降级。",
+    "sthana_sources": "Saptavargaja与Drekkana独立选源；默认Drekkana为santhanam_27_6。Raman36详细条文与例12取15，摘要105取60冲突仍保留在source_reading_conflicts；比较读法不挑最高值，也不认证完整单一原典六力。",
+    "strength": "Sthana五分量用Virupa，60=1Rupa；saptavargaja_profile仅切换七分盘系数与moolatrikona作用域。默认Santhanam27逐字七盘读法；Raman30不改其余四分量，特别Drekkana第二/三段分组仍为Santhanam。需读profile，不用总量认证吉凶、能力或成功概率。",
+    "temporal_balas": "Kala与Cheshta均为出生时刻的本命分量，不是analysis_year/as_of的时运。Natha按视太阳过中天，Hora按日出后等长平均小时，不套西占不等时小时；日主日出换日，岁/月主为360/30日传统口径。月亮第八日窗口与盈亏读法、水星性质保留scenarios；星战金额按Raman76-77固定系数及本次前置力量条件计算，读取yuddha_bala.evidence/upstream_profile。同经、黄经零点、多星交战、缺少前置量仍为partial，保留同一分支关联，不把规则胜负当现实胜负。太阳/月亮运动力按所选Ayana/Paksha，五星默认未选择平均模型而保留null；可显式选择cheshta_model=simon1994_j2000，在1900-2050出生TT窗口计算现代长期平均模型，读取model_context，不冒充Raman1900表；不填零、不拼完整六力总分。",
+    "time_scales": "profile.time_scale_context区分TT、模型UT1及冻结IERS闰秒假设；过期表后的future_leap_seconds_assumed_unchanged不能解释为已知未来时间精度。"
+  },
+  "evidence_views": {
+    "ashtakavarga": {
+      "fields": [
+        "india.ashtakavarga",
+        "india.birth_time_sensitivity",
+        "india.rulesets",
+        "india.rule_trace"
+      ],
+      "when": "未削减八分法：按具名Rao2000规则读取PAV/BAV/SAV、贡献者及本次分盘方法；计数不是概率，生时抽样变体另读敏感性。"
+    },
+    "ashtakavarga_reductions": {
+      "fields": [
+        "india.ashtakavarga.charts",
+        "india.birth_time_sensitivity",
+        "india.rulesets",
+        "india.rule_trace"
+      ],
+      "when": "按具名Rao2000七曜占据口径读取reduction_analysis：原始BAV不改，未决相等分支为空值，保留每步来源与七曜加权。Pinda未接入事件择时或概率。"
+    },
+    "ashtakavarga_source_profiles": {
+      "fields": [
+        "india.ashtakavarga.charts.D1.source_profile_comparison",
+        "india.ashtakavarga.charts.D1.bhinna",
+        "india.ashtakavarga.charts.D1.samudaya",
+        "india.birth_time_sensitivity.ashtakavarga_variants",
+        "india.rulesets",
+        "india.rule_trace"
+      ],
+      "when": "印度盘按来源比较原始BAV与削减：Rao默认保留，Aiyar1905使用自己的七曜672单元及自身削减；旧的仅换削减读法与完整原始表口径分开，不拼其他作者的Pinda或事件概率。"
+    },
+    "aspect_motion": {
+      "fields": [
+        "person_info",
+        "planets",
+        "aspects",
+        "classical_patterns",
+        "interpretation.scope"
+      ],
+      "purpose": "Legacy Western compatibility view only. Inspect interpretation.scope, application_policy and aspect_motion. Not Parashari graha drishti or a validated Tajika implementation; no future perfection, complete source-method acceptance or event probability. Bodily latitude status is a separate bounded Western I.24 condition, possibly missing; it does not establish full bodily application.",
+      "when": "仅检查本工具历史西占兼容层的入相／出相或光的传递／聚集；不是本核心Parashari相位，也不代表已实现印度Tajika技法。"
+    },
+    "career": {
+      "fields": [
+        "summary",
+        "india.profile",
+        "india.reading_basis",
+        "india.charts.D1",
+        "india.nakshatras",
+        "india.birth_time_sensitivity",
+        "india.rulesets",
+        "india.rule_trace",
+        "india.coverage",
+        "india.interpretation_scope",
+        "india.charts.D10",
+        "india.topic_evidence.career",
+        "india.strengths.sthana_bala.summary",
+        "india.strengths.sthana_bala.profile",
+        "india.strengths.dig_bala",
+        "india.strengths.naisargika_bala",
+        "india.strengths.drik_bala",
+        "india.strengths.shadbala_assessment",
+        "india.strengths.kala_bala",
+        "india.strengths.cheshta_bala"
+      ],
+      "when": "印占事业结构；D1与D10分层，先核对生时敏感性。"
+    },
+    "divisions": {
+      "fields": [
+        "india.profile",
+        "india.reading_basis",
+        "india.charts",
+        "india.nakshatras",
+        "india.birth_time_sensitivity",
+        "india.rulesets",
+        "india.rule_trace",
+        "india.coverage"
+      ],
+      "when": "明确D2/D3/D7/D9/D10/D12/D30分盘；D30只给星座，其他坐标是声明的线性显示约定。"
+    },
+    "fixed_stars": {
+      "fields": [
+        "person_info",
+        "chart_profile",
+        "planets",
+        "angles",
+        "fixed_stars"
+      ],
+      "when": "用户明确问恒星与本命星体／角度联系；读取实际命中与容许度，不将恒星标签当命定事件；核对同黄道、TT与星表来源，读取原典程度限定，未计算不等于无合相。"
+    },
+    "natal": {
+      "fields": [
+        "summary",
+        "india.profile",
+        "india.reading_basis",
+        "india.charts.D1",
+        "india.nakshatras",
+        "india.birth_time_sensitivity",
+        "india.rulesets",
+        "india.rule_trace",
+        "india.coverage",
+        "india.interpretation_scope",
+        "india.topic_evidence",
+        "india.strengths.sthana_bala.summary",
+        "india.strengths.sthana_bala.profile",
+        "india.strengths.dig_bala",
+        "india.strengths.naisargika_bala",
+        "india.strengths.drik_bala",
+        "india.strengths.shadbala_assessment",
+        "india.strengths.kala_bala",
+        "india.strengths.cheshta_bala"
+      ],
+      "when": "指定印占本命、九曜、星宿与宫主。"
+    },
+    "relationship": {
+      "fields": [
+        "summary",
+        "india.profile",
+        "india.reading_basis",
+        "india.charts.D1",
+        "india.nakshatras",
+        "india.birth_time_sensitivity",
+        "india.rulesets",
+        "india.rule_trace",
+        "india.coverage",
+        "india.interpretation_scope",
+        "india.charts.D9",
+        "india.topic_evidence.relationship",
+        "india.strengths.sthana_bala.summary",
+        "india.strengths.sthana_bala.profile",
+        "india.strengths.dig_bala",
+        "india.strengths.naisargika_bala",
+        "india.strengths.drik_bala",
+        "india.strengths.shadbala_assessment",
+        "india.strengths.kala_bala",
+        "india.strengths.cheshta_bala"
+      ],
+      "when": "单人伴侣相处视角；不代替双人互动证据。"
+    },
+    "santhanam_drishti_witnesses": {
+      "fields": [
+        "india.strengths.drik_bala.method",
+        "india.strengths.drik_bala.source_witness",
+        "india.strengths.drik_bala.source_reading_conflicts",
+        "india.strengths.drik_bala.alternative_source_witnesses",
+        "india.strengths.drik_bala.source_disagreements",
+        "india.strengths.drik_bala.matrix",
+        "india.strengths.drik_bala.summary",
+        "india.strengths.drik_bala.nature_context",
+        "india.rule_trace"
+      ],
+      "when": "核对 Santhanam 26/27.19 的译文、注解和 540 行普通相位表来源（含两处坐标标注冲突）；该来源未应用于当前 Raman Drik 计算。"
+    },
+    "solar_conditions": {
+      "fields": [
+        "person_info",
+        "chart_profile",
+        "planets",
+        "classical.solar_condition_policy",
+        "classical.planets"
+      ],
+      "purpose": "Legacy Western compatibility only, not Parashara/Tajika criteria. Named Lilly solar definitions only: 17 arcminutes, same-sign 8.5-degree combustion, 17-degree beams. Keep the contradictory printed ten-degree example and explicit boundary convention unresolved; no whole-page or event-validity certification.",
+      "when": "询问日心、焦伤或日下；先核对Lilly 1647第113页的明文定义、同星座条件、实际状态及未解决的原文示例冲突。"
+    },
+    "solar_position_model": {
+      "fields": [
+        "chart_profile.apparent_position_policy",
+        "chart_profile.ephemeris_model",
+        "chart_profile.julian_day_tt"
+      ],
+      "purpose": "Read nominal-epoch finite unbent-ray geometry and the inspected native solar mass model. A background solar-disc position is a virtual continuous extension; foreground transits differ. Unknown geometry remains unknown. This is not an optical occultation, limb-contact, detectability or physical-error certificate. Never replace native positions with a no-deflection diagnostic to pass a reference comparison.",
+      "when": "核对近太阳位置的原生偏折模型、太阳后方的虚拟模型视位置与太阳前方的凌日几何。"
+    },
+    "strength": {
+      "fields": [
+        "india.profile",
+        "india.reading_basis",
+        "india.charts.D1",
+        "india.strengths",
+        "india.birth_time_sensitivity",
+        "india.rulesets",
+        "india.rule_trace",
+        "india.coverage"
+      ],
+      "when": "所实现的位置力、方向力、固定自然力、条件相位力及完整六力未覆盖分支；保留作者口径，不计算未完成的六力总量。"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "summary",
+      "india.profile",
+      "india.reading_basis",
+      "india.charts.D1",
+      "india.nakshatras",
+      "india.birth_time_sensitivity",
+      "india.rulesets",
+      "india.rule_trace",
+      "india.coverage",
+      "india.interpretation_scope",
+      "india.topic_evidence",
+      "india.strengths.sthana_bala.summary",
+      "india.strengths.sthana_bala.profile",
+      "india.strengths.dig_bala",
+      "india.strengths.naisargika_bala",
+      "india.strengths.drik_bala",
+      "india.strengths.shadbala_assessment",
+      "india.strengths.kala_bala",
+      "india.strengths.cheshta_bala"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "birth_clock_basis": {
+        "default": "civil",
+        "description": "Basis explicitly identified in the birth record. LMT/LAT requires birth_timezone omitted and use_true_solar_time=false; east-positive longitude and shared TT/UT1 convert it to an instant. Never infer an unknown clock basis by fitting the chart or outcomes.",
+        "enum": [
+          "civil",
+          "local_mean_solar",
+          "local_apparent_solar"
+        ],
+        "type": "string"
+      },
+      "birth_day": {
+        "description": "Birth day (1-31)",
+        "maximum": 31,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "birth_hour": {
+        "description": "Birth hour (0-23)",
+        "maximum": 23,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_latitude": {
+        "anyOf": [
+          {
+            "maximum": 90,
+            "minimum": -90,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth latitude. Optional for core chart endpoints when FateBridge can infer it from a supported birth_place."
+      },
+      "birth_longitude": {
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth longitude. Optional for core chart endpoints when FateBridge can infer it from a supported birth_place."
+      },
+      "birth_microsecond": {
+        "default": 0,
+        "description": "Numerical fraction of the supplied second, including explicitly converted clocks; does not certify source clock precision.",
+        "maximum": 999999,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_minute": {
+        "default": 0,
+        "description": "Birth minute (0-59)",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_month": {
+        "description": "Birth month (1-12)",
+        "maximum": 12,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "birth_place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "Birth place"
+      },
+      "birth_second": {
+        "default": 0,
+        "description": "Recorded second, if known; omitted uses the beginning of the minute, not a claim of exact recording precision. Leap-second labels are not represented.",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_time_uncertainty_minutes": {
+        "anyOf": [
+          {
+            "maximum": 120,
+            "minimum": 0,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "User-confirmed +/- minutes. Civil input uses elapsed minutes around its resolved instant; LMT/LAT uses a recorded solar-wall interval whose endpoints are converted first. None means unknown, not exact. A physical UTC grid of at most30 seconds includes endpoints and nominal instant."
+      },
+      "birth_timezone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Civil birth timezone: explicit IANA name or UTC offset, or supported unambiguous birth_place inference. Unresolved civil timezones are rejected before sky calculations; coordinates, analysis_timezone and a solar-display request cannot establish the recorded zone. Explicit UTC is valid. Explicit LMT/LAT input requires this field omitted and a confirmed noncivil birth_clock_basis."
+      },
+      "birth_year": {
+        "description": "Birth year, e.g., 1990",
+        "type": "integer"
+      },
+      "cheshta_model": {
+        "default": "unadjudicated",
+        "description": "Five-star motional mean model: default keeps missing values; simon1994_j2000 explicitly selects modern secular means and separate geometric J2000 true positions, admitted1900-2050 TT only. Not Raman1900 tables, complete Shadbala or real-world predictive evidence. Sun/Moon rules remain separate.",
+        "enum": [
+          "unadjudicated",
+          "simon1994_j2000"
+        ],
+        "type": "string"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "divisions": {
+        "default": [
+          9,
+          10
+        ],
+        "description": "Parashari charts to include: D2 traditional Sun/Moon Hora, D3, D7, D9, D10, D12, D30 unequal sign assignments only (no invented D30 longitude). Default [9,10]; D1 always included, [] requests D1 only.",
+        "items": {
+          "enum": [
+            2,
+            3,
+            7,
+            9,
+            10,
+            12,
+            30
+          ],
+          "type": "integer"
+        },
+        "maxItems": 7,
+        "type": "array"
+      },
+      "drekkana_profile": {
+        "default": "santhanam_27_6",
+        "description": "D1 decanate positional strength, independently of Saptavargaja: Santhanam27.6 gives Moon/Venus the middle decanate, Mercury/Saturn the last; Raman36 reverses them. Both use15 Virupa. Raman's detailed section36 and Example12 are selected explicitly; its conflicting summary60 remains unresolved. Not D3 chart longitude or whole-book acceptance.",
+        "enum": [
+          "santhanam_27_6",
+          "raman_36"
+        ],
+        "type": "string"
+      },
+      "ephemeris_policy": {
+        "default": "auto",
+        "description": "auto reports actual Swiss/Moshier provenance; require_data_files rejects analytical fallback for physical coordinates, sensitivity/rise-set samples and every Sun call resolving LAT clocks and their interval endpoints. Does not certify empirical prediction accuracy.",
+        "enum": [
+          "auto",
+          "require_data_files"
+        ],
+        "type": "string"
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "gender": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未知",
+        "description": "性别（可选，仅用于结果标识；西方星盘计算不使用性别）。接受此字段是为了让同一套出生信息可以原样喂给八字/紫微/星盘等工具，避免批量调用时'有的工具收、有的不收'造成的反复试错。"
+      },
+      "hsys": {
+        "anyOf": [
+          {
+            "maximum": 8,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional offline house system override; if omitted, FateBridge keeps each chart variant's historical default. Explicit values currently support 0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, 4=Koch, 5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc Explicit values must be integer codes0..8; boolean, floating-point, blank and out-of-range values are rejected."
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "Name (optional)"
+      },
+      "node_mode": {
+        "default": "mean",
+        "description": "Rahu: mean or true lunar node; Ketu is opposite.",
+        "enum": [
+          "mean",
+          "true"
+        ],
+        "type": "string"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "saptavargaja_profile": {
+        "default": "santhanam_27",
+        "description": "Saptavargaja coefficients and moolatrikona scope: Santhanam27 literal seven-sign reading or Raman30 D1-only exception. Changes this component only; Drekkana is independently selected by drekkana_profile. Neither certifies full Shadbala or predictive validity.",
+        "enum": [
+          "santhanam_27",
+          "raman_30"
+        ],
+        "type": "string"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "use_true_solar_time": {
+        "default": false,
+        "description": "Report an apparent-solar wall-clock label separately. Recorded civil birth time and its physical ephemeris instant are preserved with either setting; this option cannot select a different birth date, dasha start or mean-model window. A known historical LAT/LMT record is not a civil input and must not be guessed with this switch.",
+        "type": "boolean"
+      },
+      "zodiacal": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional offline zodiac override; if omitted, FateBridge keeps each chart variant's historical default. Explicit values currently support 0=tropical and 1=sidereal(Lahiri-like)"
+      }
+    },
+    "required": [
+      "birth_year",
+      "birth_month",
+      "birth_day",
+      "birth_hour"
+    ],
+    "type": "object"
+  },
+  "tool": "astro_india_chart"
+}

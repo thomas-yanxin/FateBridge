@@ -1,0 +1,99 @@
+{
+  "ruleset_id": "zengshan_structural_v1",
+  "sources_by_chapter": {
+    "3": {
+      "title": "增刪卜易/3",
+      "revision": 2100295,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F3&oldid=2100295",
+      "wikitext_sha256": "b85578ad07a50204ef404a0fad9ade07f0a9d7f7b7e5fa5b2b0d56ab7ebe803d"
+    },
+    "4": {
+      "title": "增刪卜易/4",
+      "revision": 2100293,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F4&oldid=2100293",
+      "wikitext_sha256": "e5f02e6c0958b9daf5296b1b688a8b6484e191e9417b91ac1fd0ef550757228c"
+    },
+    "5": {
+      "title": "增刪卜易/5",
+      "revision": 2100292,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F5&oldid=2100292",
+      "wikitext_sha256": "14fe89ecc058462ff968c07898a2f85d57c2bc461044a32d16eda7906f5c6a1d"
+    },
+    "6": {
+      "title": "增刪卜易/6",
+      "revision": 2100291,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F6&oldid=2100291",
+      "wikitext_sha256": "d667af9e7782eadbbd263d0819eda7d7f17f365a3f5bc415d041e7817fcc4d7b"
+    },
+    "7": {
+      "title": "增刪卜易/7",
+      "revision": 2100290,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F7&oldid=2100290",
+      "wikitext_sha256": "dd055b46d8752711e5e87d3dfd30dfafa11593172d5afb9796b780a0cba096bc"
+    },
+    "16": {
+      "title": "增刪卜易/16",
+      "revision": 2100331,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F16&oldid=2100331",
+      "wikitext_sha256": "a053736328564883e7ebec893cee6b8bb8ed8a16918900c887ba955d73b6f21d"
+    },
+    "17": {
+      "title": "增刪卜易/17",
+      "revision": 2100338,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F17&oldid=2100338",
+      "wikitext_sha256": "e70bfbed847449facf08d1801c5cfe37c3655761ad635b484d7c24e5a4361623"
+    },
+    "18": {
+      "title": "增刪卜易/18",
+      "revision": 2101727,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F18&oldid=2101727",
+      "wikitext_sha256": "187ce31c14b4a798dd6372abe81b9531fd686ace4e7a319f356670f33177217f"
+    },
+    "19": {
+      "title": "增刪卜易/19",
+      "revision": 2100447,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F19&oldid=2100447",
+      "wikitext_sha256": "087c35339f209c6d1359c01d8a918a535eb6151729973fc09ef960c1195f3fdf"
+    },
+    "20": {
+      "title": "增刪卜易/20",
+      "revision": 2100449,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F20&oldid=2100449",
+      "wikitext_sha256": "8aec9b6625a18b4c487e45e92c9de662929597fa74a3653ce9ed9dd2d0b7e49b"
+    },
+    "25": {
+      "title": "增刪卜易/25",
+      "revision": 2100458,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F25&oldid=2100458",
+      "wikitext_sha256": "10c6f672b4b68ea46217d8f053a8668034a757d5899447fda3f0934b82537fa2"
+    },
+    "26": {
+      "title": "增刪卜易/26",
+      "revision": 2100460,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F26&oldid=2100460",
+      "wikitext_sha256": "29213289bfd323be3206860ee2904f61c05f6f9941313745ae5e8b2bc6620d41"
+    },
+    "27": {
+      "title": "增刪卜易",
+      "revision": 2572918,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93&oldid=2572918",
+      "wikitext_sha256": "897f963b938ec4582bc892465301b831a6439216f317841f44b888117704ca07"
+    },
+    "28": {
+      "title": "增刪卜易",
+      "revision": 2572918,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93&oldid=2572918",
+      "wikitext_sha256": "897f963b938ec4582bc892465301b831a6439216f317841f44b888117704ca07"
+    },
+    "29": {
+      "title": "增刪卜易",
+      "revision": 2572918,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93&oldid=2572918",
+      "wikitext_sha256": "897f963b938ec4582bc892465301b831a6439216f317841f44b888117704ca07"
+    }
+  },
+  "corrections": [
+    "第四章转录辰在內/辰在外按八卦结构读作艮；保留原始转录供复核"
+  ],
+  "scope": "指定转录本的结构层参考；未作全书影印校勘或预测效力认证"
+}

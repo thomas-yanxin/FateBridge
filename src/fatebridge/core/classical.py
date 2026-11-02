@@ -1,23 +1,30 @@
-"""Classical 子平 charting algorithms previously missing from the engine.
+"""Finite 月令 selection rules, 十二长生 lookup and a seasonal reference table.
 
-These three lookups are the computable core of the advanced 格局 / 调候 books in
-the ``八字/`` corpus (崔进祥《子平八字王·子平格局》, 晋文《八字命理内部网授班》, and the
-《穷通宝鉴》/《造化元钥》 调候 tables). They are deterministic table lookups — they
-emit *structured facts*, never interpretation or teaching prose — so they fit
-FateBridge's agentic split: the engine computes, the LLM reads and interprets.
-
-Each function takes the already-computed four pillars and returns plain data,
-mirroring :func:`fatebridge.services.bazi._build_shensha_entries`. Nothing here
-does I/O, raises on bad data, or formats user-facing explanations.
+Selection exposes its method, legacy label and declared source scope. It does
+not adjudicate every transformation, formation, rescue or school disagreement.
+Growth phases and actual hidden-stem roots are separate observations. The
+seasonal table is a circulating baseline, not a fully verified critical edition.
 """
 
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
+from fatebridge.core.classical_roots import build_classical_root_profile
+from fatebridge.core.classical_seasonal import seasonal_reference_layers
+from fatebridge.core.classical_stages import (
+    LU_SEATS,
+    STAGE_PROFILE_ID,
+    TWELVE_STAGES,
+    YANG_BLADE_SEATS,
+    twelve_life_stage,
+)
 from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
+    BRANCH_TRIPLE_COMBINATIONS,
     EARTHLY_BRANCHES,
+    STEM_ELEMENTS,
+    TRIPLE_COMBINATION_PEAK,
     get_shishen,
 )
 
@@ -27,48 +34,10 @@ PillarMap = Dict[str, Tuple[str, str]]
 # 十二长生 (Twelve Life Stages)
 # --------------------------------------------------------------------------- #
 # Day-master energy state at each branch. 阳干顺行、阴干逆行 from the 长生 branch.
-# Classical and fully deterministic; quantifies 通根/旺衰 per pillar.
+# A deterministic phase lookup; the stage alone does not establish 通根/旺衰.
 
-TWELVE_STAGES: Tuple[str, ...] = (
-    "长生",
-    "沐浴",
-    "冠带",
-    "临官",
-    "帝旺",
-    "衰",
-    "病",
-    "死",
-    "墓",
-    "绝",
-    "胎",
-    "养",
-)
-
-# day stem -> (长生 branch, direction). +1 = 顺行 (阳干), -1 = 逆行 (阴干).
-_CHANGSHENG_START: Dict[str, Tuple[str, int]] = {
-    "甲": ("亥", +1),
-    "丙": ("寅", +1),
-    "戊": ("寅", +1),
-    "庚": ("巳", +1),
-    "壬": ("申", +1),
-    "乙": ("午", -1),
-    "丁": ("酉", -1),
-    "己": ("酉", -1),
-    "辛": ("子", -1),
-    "癸": ("卯", -1),
-}
-
-# 临官/帝旺 = the day-master's own 禄/刃 seats — the strongest roots.
+# Historical phase bucket, NOT proof of hidden-stem roots (notably 阴长生).
 _STRONG_STAGES = frozenset({"临官", "帝旺", "长生"})
-
-
-def twelve_life_stage(day_stem: str, branch: str) -> str:
-    """Return the 十二长生 stage of ``day_stem`` sitting on ``branch``."""
-    start_branch, direction = _CHANGSHENG_START[day_stem]
-    start_idx = EARTHLY_BRANCHES.index(start_branch)
-    branch_idx = EARTHLY_BRANCHES.index(branch)
-    steps = ((branch_idx - start_idx) * direction) % 12
-    return TWELVE_STAGES[steps]
 
 
 def life_stages_for_pillars(pillars: PillarMap) -> Dict[str, Any]:
@@ -80,10 +49,23 @@ def life_stages_for_pillars(pillars: PillarMap) -> Dict[str, Any]:
         for key in ("year", "month", "day", "hour")
     }
     rooted = [pos for pos, stage in per_pillar.items() if stage in _STRONG_STAGES]
+    day_element = STEM_ELEMENTS[day_stem][0]
+    hidden_roots = [
+        labels[key]
+        for key in ("year", "month", "day", "hour")
+        if any(
+            STEM_ELEMENTS[stem][0] == day_element
+            for stem in BRANCH_HIDDEN_STEMS[pillars[key][1]]
+        )
+    ]
     return {
         "day_stem": day_stem,
+        "life_stage_profile_id": STAGE_PROFILE_ID,
         "per_pillar": per_pillar,
         "strong_roots": rooted,
+        "strong_roots_scope": "兼容字段，仅表示长生、临官、帝旺阶段命中，不是藏干通根或强根裁定。",
+        "hidden_stem_roots": hidden_roots,
+        "hidden_stem_root_scope": "仅核对藏干同五行是否存在，不裁定根深、根损或有效力量。",
     }
 
 
@@ -110,33 +92,89 @@ _TEN_GOD_TO_STRUCTURE: Dict[str, str] = {
 _HIDDEN_ROLES: Tuple[str, ...] = ("本气", "中气", "余气")
 
 
-def _select_structure_god(candidates: List[Dict[str, Any]]) -> Dict[str, Any]:
+def _select_structure_god(
+    candidates: List[Dict[str, Any]], day_stem: str, pillars: PillarMap
+) -> Dict[str, Any]:
     """Pick which month-branch hidden stem defines the 格 (the tunable rule).
 
-    This is the one genuinely school-dependent decision in 取格. The mainstream
-    子平 rule used here:
-
-    1. 禄/刃 special case — if 本气 is 比肩(建禄) or 劫财(月刃), the month branch is
-       the day master's own 禄/刃 seat; it takes no 用神 from the 格, so 本气 wins
-       outright and the result is flagged ``is_special``.
-    2. Otherwise prefer a hidden stem that is **透出** on the other stems, by
-       role priority 本气 > 中气 > 余气 (透干者优先取格). 比劫 transparent in 中气/
-       余气 are skipped — 比劫 only defines a 格 as the 本气 禄/刃 of case 1.
-    3. If no eligible 透出 stem, fall back to 本气 (本气为格).
-
-    Adjust the ordering / eligibility here to match a specific lineage's 取格 convention.
+    Qualify the actual lu/yang-blade seat before choosing a 比劫 god. For
+    miscellaneous qi, retain revealed meeting support before the historical
+    revealed-rank fallback. Selection is not a formation adjudication.
     """
     primary = candidates[0]
-    if primary["ten_god"] in ("比肩", "劫财"):
-        return {**primary, "is_special": True}
+    month_branch = pillars["month"][1]
+    if month_branch == LU_SEATS[day_stem]:
+        lu_god = next(c for c in candidates if c["ten_god"] == "比肩")
+        return {**lu_god, "is_special": True, "selection_rule": "qualified_lu_seat"}
+    if month_branch == YANG_BLADE_SEATS.get(day_stem):
+        blade_god = next(c for c in candidates if c["ten_god"] == "劫财")
+        return {
+            **blade_god,
+            "is_special": True,
+            "selection_rule": "qualified_yang_blade_seat",
+        }
 
     transparent = [
         c
         for c in candidates
         if c["transparent"] and c["ten_god"] not in ("比肩", "劫财")
     ]
-    chosen = transparent[0] if transparent else primary
-    return {**chosen, "is_special": False}
+    # 《子平真诠》正官章（核对藏本 PDF65–66）：财、印可辅官，
+    # 不因印透就一律改取印格。这只是下列有限条件的取格候选，非成格判定。
+    other_gods = {
+        get_shishen(day_stem, pillars[p][0]) for p in ("year", "month", "hour")
+    }
+    if (
+        primary["ten_god"] == "正官"
+        and month_branch not in "辰戌丑未"
+        and transparent
+        and all(
+            c["ten_god"] in ("正官", "正财", "偏财", "正印", "偏印")
+            for c in transparent
+        )
+        and not other_gods.intersection({"伤官", "食神", "七杀"})
+        and not any(
+            set(group).issubset({b for _, b in pillars.values()})
+            for group in BRANCH_TRIPLE_COMBINATIONS
+            if month_branch in group
+        )
+    ):
+        return {
+            **primary,
+            "is_special": False,
+            "selection_rule": "officer_with_wealth_seal_support",
+        }
+    # 杂气透干会支: preserve a revealed candidate supported by an actual
+    # full/peak-containing half triad. This does not certify 合化 or 成格.
+    meeting_supported = []
+    branches = {branch for _, branch in pillars.values()}
+    if month_branch in "辰戌丑未":
+        for candidate in transparent:
+            element = STEM_ELEMENTS[candidate["stem"]][0].value
+            for group, bureau in BRANCH_TRIPLE_COMBINATIONS.items():
+                present = set(group) & branches
+                if (
+                    month_branch in group
+                    and bureau.startswith(element)
+                    and len(present) >= 2
+                    and TRIPLE_COMBINATION_PEAK[group] in present
+                ):
+                    meeting_supported.append(candidate)
+                    break
+    chosen = (
+        meeting_supported[0]
+        if len(meeting_supported) == 1
+        else transparent[0] if transparent else primary
+    )
+    return {
+        **chosen,
+        "is_special": False,
+        "selection_rule": (
+            "misc_revealed_meeting_support"
+            if len(meeting_supported) == 1
+            else "revealed_rank" if transparent else "primary_fallback"
+        ),
+    }
 
 
 def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> Dict[str, Any]:
@@ -163,12 +201,22 @@ def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> Dict[str, 
             }
         )
 
-    god = _select_structure_god(candidates)
+    god = _select_structure_god(candidates, day_stem, pillars)
+    # Historical v1 made every primary 比/劫 a 禄/刃 and otherwise selected
+    # the first revealed hidden stem. Keep its label so changed decisions can
+    # be audited; it is never used to override qualified selection.
+    legacy_god = candidates[0]
+    if legacy_god["ten_god"] not in ("比肩", "劫财"):
+        legacy_god = next((c for c in candidates if c["transparent"]), legacy_god)
     label = _TEN_GOD_TO_STRUCTURE.get(god["ten_god"], f"{god['ten_god']}格")
+    if not god["is_special"] and god["ten_god"] in ("比肩", "劫财"):
+        label = "比劫待取格"
 
     transparency = "透干" if god["transparent"] else "未透（本气取格）"
     if god["is_special"]:
-        basis = f"月令{month_branch}为日主{day_stem}之禄刃，本气取{label}。"
+        basis = (
+            f"月令{month_branch}经实际禄刃位置核对，取{label}；不以本气比劫推定资格。"
+        )
     else:
         basis = (
             f"月令{month_branch}藏{god['stem']}（{god['role']}），"
@@ -176,11 +224,31 @@ def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> Dict[str, 
         )
 
     return {
+        "method_id": "month_command_qualified_officer_v3",
+        "legacy_label": _TEN_GOD_TO_STRUCTURE[legacy_god["ten_god"]],
         "month_branch": month_branch,
         "label": label,
         "structure_god": god,
         "is_special": god["is_special"],
         "hidden_stems": candidates,
+        "original_structure": {
+            "stem": candidates[0]["stem"],
+            "ten_god": candidates[0]["ten_god"],
+            "scope": "月令本气关系，不自动等于最终取格或成格",
+        },
+        "seat_qualification": {
+            "lu_seat": LU_SEATS[day_stem],
+            "yang_blade_seat": YANG_BLADE_SEATS.get(day_stem),
+            "is_lu": month_branch == LU_SEATS[day_stem],
+            "is_yang_blade": month_branch == YANG_BLADE_SEATS.get(day_stem),
+        },
+        "selection_rule": god["selection_rule"],
+        "selection_source": {
+            "profile_id": "ziping_zhenquan_month_command_text_v1",
+            "locator": "论用神变化 PDF31–32；论正官 PDF65–66",
+            "scope": "有限规则形式化；透干会支、兼格、成败救应未完整裁定",
+        },
+        "selection_scope": "透干排序与杂气会支是本版本有限选择；并列、原典个案与兼格仍需分开审查，不能据标签认证成格。",
         "basis": basis,
     }
 
@@ -336,15 +404,23 @@ _DIAOHOU_TABLE: Dict[str, Dict[str, Tuple[str, Tuple[str, ...]]]] = {
 }
 
 
-def seasonal_climate_god(day_stem: str, month_branch: str) -> Dict[str, Any]:
-    """Return the 调候用神 (primary + secondary stems) for ``day_stem`` in ``month_branch``."""
+def seasonal_climate_god(
+    day_stem: str, month_branch: str, pillars: Optional[PillarMap] = None
+) -> Dict[str, Any]:
+    """Return table candidates, source layers and optional factual positions."""
     entry: Optional[Tuple[str, Tuple[str, ...]]] = _DIAOHOU_TABLE.get(day_stem, {}).get(
         month_branch
     )
     if entry is None:
-        return {"primary": None, "secondary": [], "available": False}
+        lookup: Dict[str, Any] = {"primary": None, "secondary": [], "available": False}
+        return seasonal_reference_layers(day_stem, month_branch, lookup, pillars)
     primary, secondary = entry
-    return {"primary": primary, "secondary": list(secondary), "available": True}
+    return seasonal_reference_layers(
+        day_stem,
+        month_branch,
+        {"primary": primary, "secondary": list(secondary), "available": True},
+        pillars,
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -358,8 +434,9 @@ def build_classical_overview(pillars: PillarMap) -> Dict[str, Any]:
     month_branch = pillars["month"][1]
     return {
         "monthly_structure": determine_monthly_structure(pillars, day_stem),
-        "seasonal_climate": seasonal_climate_god(day_stem, month_branch),
+        "seasonal_climate": seasonal_climate_god(day_stem, month_branch, pillars),
         "life_stages": life_stages_for_pillars(pillars),
+        "root_profile": build_classical_root_profile(pillars),
     }
 
 
@@ -369,20 +446,48 @@ def classical_snapshot_lines(overview: Dict[str, Any]) -> List[str]:
     climate = overview["seasonal_climate"]
     stages = overview["life_stages"]
 
-    lines = [f"月令格局：{structure['label']}（{structure['basis']}）"]
+    lines = [
+        f"月令格局参考：{structure['label']}（{structure['basis']}）；成格与取用未裁定。"
+    ]
+    original = structure.get("original_structure", {})
+    selected = structure.get("structure_god", {})
+    if original.get("ten_god") != selected.get("ten_god"):
+        lines.append(
+            f"月令本气为{original.get('ten_god')}，有限规则所选为{selected.get('ten_god')}；变格、兼格及是否仍用本格须另判。"
+        )
 
     if climate["available"]:
         secondary = "、".join(climate["secondary"]) if climate["secondary"] else "无"
-        lines.append(f"调候用神：主用{climate['primary']}，辅用{secondary}")
+        lines.append(
+            f"调候简表候选：首列{climate['primary']}，另列{secondary}；全盘取用未裁定。"
+        )
     else:
-        lines.append("调候用神：暂无对应表项")
+        lines.append("调候简表候选：暂无对应表项")
+    if climate.get("source_layers"):
+        body = climate["source_layers"]["body"]
+        pages = "、".join(str(p) for p in body["pdf_pages"])
+        lines.append(
+            f"所选《穷通宝鉴评注》正文（PDF{pages}）：{body['sequence_semantics']}；"
+            f"{body['paraphrase']}"
+        )
+    else:
+        lines.append("调候简表的对应原典条目仍待逐条校勘。")
 
     stage_text = " / ".join(
         f"{pos}{stage}" for pos, stage in stages["per_pillar"].items()
     )
-    roots = (
-        "、".join(stages["strong_roots"]) if stages["strong_roots"] else "无显著强根"
+    roots = "、".join(stages["hidden_stem_roots"]) or "未见"
+    lines.append(
+        f"日主十二长生：{stage_text}；同五行藏干根位置：{roots}（不裁定根的有效力量）"
     )
-    lines.append(f"日主十二长生：{stage_text}（强根：{roots}）")
+    profile = overview.get("root_profile")
+    if profile:
+        positions = {"year": "年支", "month": "月支", "day": "日支", "hour": "时支"}
+        categories = " / ".join(
+            f"{positions[r['pillar']]}{r['branch']}：{r['label']}"
+            for r in profile["roots"]
+        )
+        lines.append(f"原典根类（未判根损）：{categories}")
+        lines.append("根类不替代全局旺衰；阴长生参考不补造藏干，冲只列候选。")
 
     return lines

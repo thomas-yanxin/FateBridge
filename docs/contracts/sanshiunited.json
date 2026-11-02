@@ -1,0 +1,712 @@
+{
+  "call_guidance": {
+    "conditions": "五将/门具问题读取conditions视图（合参taiyi_conditions）；全部阻断按同次patterns路径解释。年/月计以实际门盘合取；时计三门未评估/null不能改成满足。即使两层满足也不推出实际成败。",
+    "count_sources": "核count_source_assessment时分开当前二目/算数、所选原表字面、书影校读和源位置重算。三者不互相覆盖；两算相符不认证目位或全盘相符，原表差异仍未裁定。适用于年/月/日/时计循环核心。",
+    "daily": "calculation_mode=day明确选金钥匙冬至前甲子积日；合参置taiyi_options。按所选钟面零时换日，不乘十二；同日甲子纳入是现代约定，不能套用时计720时相位不变。日计专用daily_calendar/daily_essences视图需先设day，保留十精未知、正文与课式异数，全年十神不当作十精。 天时按十二支通则计算，有年度第10数亥及金镜/统宗补证；日44例坤与实际酉并列为差异，不能将源文坤写成实际计算值。太乙数只给局序，四宫语义仍未知。",
+    "elemental_relations": "读取elemental_guan_assessment以核二目纳音所选十六神五行片段。天目/地目按原文语境与文昌主、始击客对应，不套六十甲子日柱纳音；空间关和五将合取不由本项覆盖。",
+    "enclosures": "提挟读取enclosures（合参taiyi_enclosures）：李法太乙与一将夹正宫、同方大小二将短弧夹太乙或对方目将分层。间神按原位读取，不并八门扇区，几何命中不认证完整挟闭。pattern_paths指向同盘各自记录；二将完整记录在enclosure_assessment.two_general_enclosure.patterns，旧全局patterns保持；完整挟闭、四郭固杜未评估，未命中不代替不存在，不套用现实胜负断语。",
+    "gates": "年/月按预先所选王法核三门；李法四盘及定计目门盘另列比较。默认至点时计的门盘/定计仍未算；明确选key_hour_winter_jiazi_v1可算完整积时、时支合神、定计和阴阳四门，但三门主体未决仍为null。各配置不按结果择优，不借奇门门盘补齐。",
+    "god_yin_scope": "类神阴神按实际天将所乘支再查上神，天乙依所选昼夜表互取；与四课第二、四课的阴神称谓分层。年命上神缺项保留未知，季节本空事实不替代有效空亡及日辰德合相生，综合类神可用性仍未裁。金口诀附带六壬盘的本层不替代金口诀四位取用。",
+    "historical_dates": "输入日期统一为推算公历；儒略历日期须先明确转换。calendar_rules.historical_date_reference只对选定金钥匙课例返回独立历表日期、原积数及实际积数，逐项核对匹配，不代表完整古历、全盘原典符合或应验。固定现代时区及代表钟面须明示，不能把未知古例时地补造成事实。",
+    "historical_year": "year_profile仅用于year：jinjing_year_historical_table_v1选381—385晋历主表；jinjing_year_qiliang_table_v1选501—505齐梁史历表，保留502闰四月及未决闰五月／六月候选。两者各62个月1831日、范围外拒绝；默认现代农历保持，不自动按日期选配置。historical_year_calendar视图保留同次日期、原儒略历与推算公历、作者版本及未裁定范围；历表不是王氏同元古历或其他两术古历，年栏不裁定逐日改元。",
+    "hour_profiles": "hour_profile仅用于hour；默认jinjing_hour_solstice_v1是现代至点置一。key_hour_winter_jiazi_v1按金钥匙冬至前甲子连续积时，calendar_rules.hour_origin保存同盘日期、完整积时和现代23时子初约定。合参放在taiyi_options。不可把只求太乙宫的甲己捷数代替完整积时，也不宣称古历复原。",
+    "interpretation": "三式共用输入与历法，不能当三份独立证据；未定义统一事件规则，不输出综合胜率。",
+    "monthly": "仅month可选month_profile。省略保留金镜六纪节月；key_month_tianzheng_jie_v1按金钥匙完年乘十二、加天地二正与本月名义序，仍按现代节月边界。full积月及1504截数分别返回，不先约360求240门周。KEY直门加定计目，原门段684/184/死4与本盘原例相位695/215/惊5并列，三门主体未裁定。独立历表若显示农历月与节月不符须明示，不按吉凶改选方法。 独立历表的朔月比较是一项假设；source_calendar_basis=not_adjudicated时，不能声称原书已证实采用朔月。",
+    "options": "taiyi_options.calculation_mode选择year/month/day/hour；accNum/acc_num仅兼容0，日/时计不接受rotation覆盖阴阳遁。",
+    "paged_first_view": "先核对result_delivery.deferred_fields：若仅run_metadata.runtime延后，业务依据已内联，可据所选字段解读，环境复核再读取同run完整runtime。若业务字段延后，须沿first_page_uri/next_uri读回同run投影载荷并核对sha256后解释该字段；不能当作不存在或重算全文替代。",
+    "qimen_profiles": "首读保留已选八神、九星旺相、三奇入墓配置的id、书名、来源及异文说明；具体顺序、旺相映射和未采用候选按同次qimen.rule_profiles续读。配置说明不能代替实际宫位事实，未读取不视为不存在。",
+    "qimen_stem_scope": "合参首读保留日/时取用、甲日是否自动替代和来源。岁干、月朔、时干支入墓细节仍在同盘qimen.stem_context，按主题续读；首读未选这些字段不等于格局不存在。",
+    "scope": "按synthesis.time_scopes解释年/月/日/时计；palace_correspondences按真实方位联接五将与星门神，太乙宫数不可直接套奇门宫数。",
+    "sources": "首读source_profiles保留实际规则版本、作者、原典链接及未决条数；完整未决内容按source_path回原盘rulesets/ruleset读取，摘要不表示已全书验收。",
+    "year_calendar": "年计核对year_calendar视图（合参taiyi_year_calendar）：civil_lunar_calendar保留输入钟表日期实际换算的年月日及本次来源；historical_calendar保留明确所选历史历表。analysis_context.lunar_display仅为校正钟面上下文，真太阳时跨日时不能替代年计日期。未单列conversion_source不补造逐日权威认证；岁首工程约定与原典裁定仍分开。"
+  },
+  "evidence_views": {
+    "annual_cycles": {
+      "fields": [
+        "taiyi.calendar_summary",
+        "taiyi.long_cycles",
+        "synthesis.time_scopes"
+      ],
+      "purpose": "在三式中独立核查太乙年度十神起元和原表异文，不将年运当作奇门六壬的同一时刻结论。"
+    },
+    "counter_cycles": {
+      "fields": [
+        "synthesis.time_scopes",
+        "taiyi.counter_cycles",
+        "taiyi.calendar_summary",
+        "taiyi.ruleset.id",
+        "taiyi.ruleset.classical_acceptance_passed",
+        "taiyi.ruleset.real_world_efficacy"
+      ],
+      "purpose": "核太乙所选计法的完整计数与60/72组内位置；先区分年/月/日/时层，不把局号当完整时实或实际时柱。"
+    },
+    "daily_calendar": {
+      "fields": [
+        "analysis_context",
+        "taiyi.calendar_rules",
+        "taiyi.core_board",
+        "taiyi.day_source_comparisons",
+        "taiyi.determinate_calculation",
+        "taiyi.ruleset"
+      ],
+      "purpose": "仅calculation_mode=day：核查所选钟面、冬至前甲子起点、日数与未决另一锚点；同盘主客和定计，不冒称历史古历转换。"
+    },
+    "daily_essences": {
+      "fields": [
+        "taiyi.calendar_summary",
+        "taiyi.ten_jing.ruleset_id",
+        "taiyi.ten_jing.version",
+        "taiyi.ten_jing.author",
+        "taiyi.ten_jing.classical_author",
+        "taiyi.ten_jing.source",
+        "taiyi.ten_jing.classical_acceptance_passed",
+        "taiyi.ten_jing.scope",
+        "taiyi.ten_jing.records.emperor.label",
+        "taiyi.ten_jing.records.emperor.status",
+        "taiyi.ten_jing.records.emperor.palace",
+        "taiyi.ten_jing.records.emperor.reason",
+        "taiyi.ten_jing.records.earth.label",
+        "taiyi.ten_jing.records.earth.status",
+        "taiyi.ten_jing.records.earth.palace",
+        "taiyi.ten_jing.records.earth.reason",
+        "taiyi.ten_jing.records.flying_bird.label",
+        "taiyi.ten_jing.records.flying_bird.status",
+        "taiyi.ten_jing.records.flying_bird.palace",
+        "taiyi.ten_jing.records.flying_bird.reason",
+        "taiyi.ten_jing.records.heaven_venerable.label",
+        "taiyi.ten_jing.records.heaven_venerable.status",
+        "taiyi.ten_jing.records.heaven_venerable.palace",
+        "taiyi.ten_jing.records.heaven_venerable.reason",
+        "taiyi.ten_jing.records.five_elements.label",
+        "taiyi.ten_jing.records.five_elements.status",
+        "taiyi.ten_jing.records.five_elements.palace",
+        "taiyi.ten_jing.records.five_elements.reason",
+        "taiyi.ten_jing.records.eight_winds.label",
+        "taiyi.ten_jing.records.eight_winds.status",
+        "taiyi.ten_jing.records.eight_winds.palace",
+        "taiyi.ten_jing.records.eight_winds.reason",
+        "taiyi.ten_jing.records.five_winds.label",
+        "taiyi.ten_jing.records.five_winds.status",
+        "taiyi.ten_jing.records.five_winds.palace",
+        "taiyi.ten_jing.records.five_winds.reason",
+        "taiyi.ten_jing.records.three_winds.label",
+        "taiyi.ten_jing.records.three_winds.status",
+        "taiyi.ten_jing.records.three_winds.palace",
+        "taiyi.ten_jing.records.three_winds.reason",
+        "taiyi.ten_jing.records.heaven_time.label",
+        "taiyi.ten_jing.records.heaven_time.status",
+        "taiyi.ten_jing.records.heaven_time.palace",
+        "taiyi.ten_jing.records.heaven_time.reason",
+        "taiyi.ten_jing.records.heaven_time.source_comparisons",
+        "taiyi.ten_jing.records.heaven_time.rule_evidence",
+        "taiyi.ten_jing.records.taiyi_ordinal.label",
+        "taiyi.ten_jing.records.taiyi_ordinal.status",
+        "taiyi.ten_jing.records.taiyi_ordinal.palace",
+        "taiyi.ten_jing.records.taiyi_ordinal.reason",
+        "taiyi.ten_jing.records.eight_winds.source_comparisons",
+        "taiyi.ten_jing.records.heaven_time.candidates",
+        "taiyi.ten_jing.records.taiyi_ordinal.ordinal",
+        "taiyi.day_source_comparisons"
+      ],
+      "purpose": "仅calculation_mode=day：首读金钥匙十精的实际位置、未决宫位及原文对照；具体周期与序列按同盘ten_jing.records续读。不替代年度十神或完整天气断语。"
+    },
+    "historical_year_calendar": {
+      "fields": [
+        "taiyi.calendar_summary",
+        "taiyi.calendar_rules.historical_calendar",
+        "taiyi.core_board.kook_number",
+        "taiyi.core_board.taiyi_number",
+        "taiyi.core_board.suijun",
+        "taiyi.ruleset.classical_acceptance_passed",
+        "taiyi.ruleset.real_world_efficacy",
+        "synthesis.time_scopes",
+        "synthesis.limitations"
+      ],
+      "purpose": "先明确year_profile=jinjing_year_historical_table_v1（381—385晋历）或jinjing_year_qiliang_table_v1（501—505齐梁史历，含502闰标分歧）；合参置taiyi_options。仅year可用，保留实际日期、来源及范围，不认证完整古历或其他两术古历。"
+    },
+    "liuren_cross_harmony": {
+      "fields": [
+        "four_pillars",
+        "liureng.cross_harmony",
+        "liureng.ruleset"
+      ],
+      "purpose": "核对干上神与日支、支上神与日干寄宫的两边六合，以及五个干支同宫日的排除条件；按所选原文列实际支位和来源。"
+    },
+    "liuren_day_placement_patterns": {
+      "fields": [
+        "four_pillars",
+        "liureng.day_placement_patterns",
+        "liureng.ruleset"
+      ],
+      "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合两条未知保留。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。"
+    },
+    "monthly_key_calendar": {
+      "fields": [
+        "taiyi.calendar_summary",
+        "taiyi.calendar_rules.month_origin",
+        "taiyi.core_board",
+        "taiyi.gates.counter",
+        "taiyi.gates.moving_frame.anchor_palace",
+        "taiyi.gates.source_comparisons",
+        "taiyi.gates.source_counter_alternatives",
+        "taiyi.gates.ruleset",
+        "taiyi.condition_assessment.three_gates",
+        "taiyi.ruleset.classical_acceptance_passed"
+      ],
+      "purpose": "仅calculation_mode=month且month_profile=key_month_tianzheng_jie_v1；合参置taiyi_options。读取完年积月、天地二正、截数、古月首与现代节月差异及原门段冲突，非全书古历认证。"
+    },
+    "noble_sources": {
+      "fields": [
+        "analysis_context",
+        "subresults.liureng_gods.four_pillars.day",
+        "liureng.meta",
+        "liureng.month_general",
+        "liureng.ruleset",
+        "synthesis.noble_source_assessment",
+        "synthesis.time_scopes"
+      ],
+      "purpose": "核对本次实际六壬贵人配置、起贵本位与金镜明钞／四库当时法的同干朝暮读数；本位相符不认证朝暮边界、四维寄支或完整合参断法。"
+    },
+    "palace_correspondences": {
+      "fields": [
+        "synthesis.time_scopes",
+        "synthesis.palace_correspondences",
+        "taiyi.ruleset",
+        "qimen.stem_context.day",
+        "qimen.stem_context.hour",
+        "qimen.stem_context.source",
+        "qimen.stem_context.day_jia_policy_automatically_selected",
+        "qimen.rule_profiles.god.id",
+        "qimen.rule_profiles.god.title",
+        "qimen.rule_profiles.god.source",
+        "qimen.rule_profiles.god.variant_note",
+        "qimen.rule_profiles.season.id",
+        "qimen.rule_profiles.season.title",
+        "qimen.rule_profiles.season.source",
+        "qimen.rule_profiles.season.variant_note",
+        "qimen.rule_profiles.wonder_tomb.id",
+        "qimen.rule_profiles.wonder_tomb.title",
+        "qimen.rule_profiles.wonder_tomb.source",
+        "qimen.rule_profiles.wonder_tomb.variant_note",
+        "qimen.rule_profiles.wonder_tomb.source_priority_resolved",
+        "qimen.rule_profiles.wonder_tomb.whole_book_conformance_established",
+        "synthesis.source_profiles.qimen",
+        "liureng.ruleset.id",
+        "liureng.ruleset.version",
+        "liureng.ruleset.source_title",
+        "liureng.ruleset.source_urls",
+        "liureng.ruleset.classical_conformance",
+        "liureng.ruleset.classical_acceptance_passed",
+        "liureng.ruleset.real_world_efficacy"
+      ],
+      "purpose": "查五将同方位的奇门星门神；六壬四正直接对应，四维并列同方位两支实际神将且不选寄支，中五不寄宫。"
+    },
+    "scoped_evidence": {
+      "fields": [
+        "analysis_context",
+        "taiyi.calendar_summary",
+        "taiyi.core_board",
+        "taiyi.pattern_summary",
+        "taiyi.ruleset",
+        "qimen.ju_text",
+        "qimen.zhifu",
+        "qimen.zhishi",
+        "qimen.stem_context.day",
+        "qimen.stem_context.hour",
+        "qimen.stem_context.source",
+        "qimen.stem_context.day_jia_policy_automatically_selected",
+        "qimen.rule_profiles.god.id",
+        "qimen.rule_profiles.god.title",
+        "qimen.rule_profiles.god.source",
+        "qimen.rule_profiles.god.variant_note",
+        "qimen.rule_profiles.season.id",
+        "qimen.rule_profiles.season.title",
+        "qimen.rule_profiles.season.source",
+        "qimen.rule_profiles.season.variant_note",
+        "qimen.rule_profiles.wonder_tomb.id",
+        "qimen.rule_profiles.wonder_tomb.title",
+        "qimen.rule_profiles.wonder_tomb.source",
+        "qimen.rule_profiles.wonder_tomb.variant_note",
+        "qimen.rule_profiles.wonder_tomb.source_priority_resolved",
+        "qimen.rule_profiles.wonder_tomb.whole_book_conformance_established",
+        "synthesis.source_profiles.qimen",
+        "liureng.month_general",
+        "liureng.three_transmissions",
+        "liureng.patterns",
+        "liureng.ruleset.id",
+        "liureng.ruleset.version",
+        "liureng.ruleset.source_title",
+        "liureng.ruleset.source_urls",
+        "liureng.ruleset.classical_conformance",
+        "liureng.ruleset.classical_acceptance_passed",
+        "liureng.ruleset.real_world_efficacy",
+        "synthesis.noble_source_assessment",
+        "synthesis.time_scopes",
+        "synthesis.limitations",
+        "synthesis.real_world_efficacy"
+      ],
+      "purpose": "首轮读取三式关键事实与来源、贵人本位逐版对照，保留完整三传；四课、太乙逐项依据或宫位对应按需深读，未读内容不视为不存在。"
+    },
+    "solar_anchors": {
+      "fields": [
+        "synthesis.time_scopes",
+        "taiyi.solar_anchors",
+        "taiyi.solar_anchor_scope",
+        "taiyi.calendar_summary",
+        "taiyi.ruleset.id",
+        "taiyi.ruleset.classical_acceptance_passed"
+      ],
+      "purpose": "仅月/日/时计：核本次换节/换遁与冬至起元的实际节气对象、轨道模型和TT点。provider不能替代model，完整文件数据与UTC前物理精度不据本字段认证。"
+    },
+    "taiyi_conditions": {
+      "fields": [
+        "taiyi.calendar_summary",
+        "taiyi.condition_assessment",
+        "taiyi.patterns",
+        "taiyi.ruleset",
+        "synthesis.time_scopes"
+      ],
+      "purpose": "核卷四五将三项及全部实际阻断；含文昌与四将同宫为关、始击掩将的注例补证读法与版本范围。三门另核，未知时门具将发保留null，不借用奇门门盘。"
+    },
+    "taiyi_count_sources": {
+      "fields": [
+        "taiyi.calendar_summary",
+        "taiyi.count_source_assessment",
+        "taiyi.ruleset.classical_acceptance_passed",
+        "taiyi.ruleset.real_world_efficacy",
+        "synthesis.time_scopes"
+      ],
+      "purpose": "分辨主客算差异在源位置还是同位置加总；保留原字、所选书影层和当前同盘事实。仅选定卷三四位置/两算，不认证全书或古历。"
+    },
+    "taiyi_counts": {
+      "fields": [
+        "taiyi.calendar_summary",
+        "taiyi.count_assessment",
+        "taiyi.ruleset.classical_acceptance_passed",
+        "taiyi.ruleset.real_world_efficacy",
+        "synthesis.time_scopes"
+      ],
+      "purpose": "核查主客算的原条缺数、足数推导、杜塞数格、分源和数与太乙/二目各自阴阳配数；保留源差异和未决，不裁成总体胜负。"
+    },
+    "taiyi_depth": {
+      "fields": [
+        "analysis_context",
+        "taiyi.core_board",
+        "taiyi.calendar_rules",
+        "taiyi.rule_trace",
+        "taiyi.patterns",
+        "taiyi.ruleset",
+        "synthesis.time_scopes",
+        "synthesis.limitations"
+      ],
+      "purpose": "进一步核查所选年/月/时计的计算与原典依据；结合已有奇门六壬证据。"
+    },
+    "taiyi_determinate": {
+      "fields": [
+        "taiyi.calendar_summary",
+        "taiyi.determinate_calculation",
+        "taiyi.core_board.dingmu",
+        "taiyi.core_board.set_count",
+        "taiyi.core_board.set_general",
+        "taiyi.core_board.set_vice_general"
+      ],
+      "purpose": "核年/月或明确选择金钥匙时计的定目旋转、逐项定算和定大/定参；默认至点时计未附加，不把重审之算当新独立证据。"
+    },
+    "taiyi_elemental_relations": {
+      "fields": [
+        "taiyi.calendar_summary",
+        "taiyi.elemental_guan_assessment",
+        "taiyi.ruleset.classical_acceptance_passed",
+        "taiyi.ruleset.real_world_efficacy",
+        "synthesis.time_scopes"
+      ],
+      "purpose": "按同盘文昌/始击实际十六神核二目五行生克，与旧空间同宫关分开；保留卷四日计适用和角色语境，原断不裁为整体胜负。"
+    },
+    "taiyi_enclosures": {
+      "fields": [
+        "taiyi.calendar_summary",
+        "taiyi.enclosure_assessment",
+        "taiyi.pattern_summary",
+        "taiyi.taiyi_palace",
+        "taiyi.wenchang_palace",
+        "taiyi.core_board.shiji",
+        "taiyi.core_board.main_general",
+        "taiyi.core_board.main_vice_general",
+        "taiyi.core_board.guest_general",
+        "taiyi.core_board.guest_vice_general",
+        "taiyi.ruleset.classical_acceptance_passed",
+        "taiyi.ruleset.real_world_efficacy"
+      ],
+      "purpose": "分读李法正宫与同方二将夹持几何，保留实际宫位、源路径和未决；间神不并宫，不以未命中否定全部挟闭/四郭。"
+    },
+    "taiyi_gate_comparison": {
+      "fields": [
+        "taiyi.calendar_summary",
+        "taiyi.gates.status",
+        "taiyi.gates.reason",
+        "taiyi.gates.selected_profile",
+        "taiyi.gates.old_open_summary",
+        "taiyi.gates.dingmu_comparison_frame",
+        "taiyi.gates.dingmu_comparison_source",
+        "taiyi.gates.ruleset"
+      ],
+      "purpose": "比较李法太乙/主/客/定计大将常开四盘摘要及金钥匙定计目加临盘；原始门行按source_path续读，不静默择优或覆盖所选王法。"
+    },
+    "taiyi_gates": {
+      "fields": [
+        "taiyi.calendar_summary",
+        "taiyi.gates.status",
+        "taiyi.gates.reason",
+        "taiyi.gates.selected_profile",
+        "taiyi.gates.counter",
+        "taiyi.gates.moving_frame",
+        "taiyi.gates.ruleset",
+        "taiyi.condition_assessment.three_gates",
+        "taiyi.condition_assessment.menju_jiangfa",
+        "taiyi.condition_assessment.summary"
+      ],
+      "purpose": "核所选王希明门法的240单位直门、实际八门及三门条件；时计天正时实未复原则明确未计算。"
+    },
+    "taiyi_oppositions": {
+      "fields": [
+        "taiyi.calendar_summary",
+        "taiyi.opposition_assessment",
+        "taiyi.ruleset.classical_acceptance_passed",
+        "taiyi.ruleset.real_world_efficacy",
+        "synthesis.time_scopes"
+      ],
+      "purpose": "核六主体实际对宫，中五无环向；主方格/对原名并列，保留阳53附带外迫不符。几何事实不代替五将合取或原典名称统一验收。"
+    },
+    "taiyi_shiji_derivation": {
+      "fields": [
+        "taiyi.calendar_summary",
+        "taiyi.wenchang_palace",
+        "taiyi.core_board.jishen",
+        "taiyi.core_board.shiji",
+        "taiyi.shiji_derivation",
+        "taiyi.count_source_assessment.summary",
+        "taiyi.ruleset.classical_acceptance_passed",
+        "taiyi.ruleset.real_world_efficacy",
+        "synthesis.time_scopes"
+      ],
+      "purpose": "核本盘计神加和德艮后顺行十六神的逐步天地对应，以实际文昌取始击；步数为间隔，不是主客算。原表差异继续保留，不把推步相符当全书符合。"
+    },
+    "taiyi_victory_matrix": {
+      "fields": [
+        "taiyi.victory_matrix_assessment.source_cell",
+        "taiyi.victory_matrix_assessment.comparison_summary",
+        "taiyi.victory_matrix_assessment.ruleset",
+        "taiyi.victory_matrix_assessment.role_scope",
+        "taiyi.victory_matrix_assessment.method_scope",
+        "taiyi.victory_matrix_assessment.scope",
+        "taiyi.victory_matrix_assessment.source_outcome_applied",
+        "taiyi.victory_matrix_assessment.actual_geometry",
+        "taiyi.victory_matrix_assessment.status",
+        "taiyi.victory_matrix_assessment.table_applicability_verified",
+        "taiyi.victory_matrix_assessment.classical_acceptance_passed",
+        "taiyi.victory_matrix_assessment.real_world_efficacy",
+        "taiyi.calendar_summary",
+        "taiyi.ruleset.classical_acceptance_passed",
+        "taiyi.ruleset.real_world_efficacy"
+      ],
+      "purpose": "核同次盘对应胜败钤原栏、几何比较与未决范围；原栏胜败不直接应用于本盘。"
+    },
+    "taiyi_year_calendar": {
+      "fields": [
+        "analysis_context.input_datetime",
+        "analysis_context.corrected_datetime",
+        "analysis_context.timezone",
+        "analysis_context.time_algorithm",
+        "analysis_context.total_correction_minutes",
+        "analysis_context.lunar_display",
+        "taiyi.calendar_summary",
+        "taiyi.calendar_rules",
+        "taiyi.core_board.accumulation",
+        "taiyi.core_board.kook_number",
+        "taiyi.core_board.suijun",
+        "taiyi.core_board.heshen",
+        "taiyi.ruleset.id",
+        "taiyi.ruleset.version",
+        "taiyi.ruleset.classical_acceptance_passed",
+        "taiyi.ruleset.real_world_efficacy",
+        "synthesis.time_scopes",
+        "synthesis.limitations"
+      ],
+      "purpose": "先设year，核对输入钟时、校正钟面、实际年计农历及换算来源；兼容明确所选历史历表，不把时间上下文农历替代年计日期。"
+    },
+    "winter_origin_selection": {
+      "fields": [
+        "taiyi.winter_origin_selection",
+        "taiyi.solar_anchors.winter_origin",
+        "taiyi.calendar_summary",
+        "taiyi.ruleset.id",
+        "taiyi.ruleset.classical_acceptance_passed"
+      ],
+      "purpose": "仅日计及明确选择key_hour_winter_jiazi_v1的时计：区分计数起点钟面与冬至实刻选元切换，核同盘来源；原典年度启元时点未裁定。"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "analysis_context",
+      "taiyi.calendar_summary",
+      "taiyi.core_board",
+      "taiyi.pattern_summary",
+      "taiyi.ruleset",
+      "qimen.ju_text",
+      "qimen.zhifu",
+      "qimen.zhishi",
+      "qimen.stem_context.day",
+      "qimen.stem_context.hour",
+      "qimen.stem_context.source",
+      "qimen.stem_context.day_jia_policy_automatically_selected",
+      "qimen.rule_profiles.god.id",
+      "qimen.rule_profiles.god.title",
+      "qimen.rule_profiles.god.source",
+      "qimen.rule_profiles.god.variant_note",
+      "qimen.rule_profiles.season.id",
+      "qimen.rule_profiles.season.title",
+      "qimen.rule_profiles.season.source",
+      "qimen.rule_profiles.season.variant_note",
+      "qimen.rule_profiles.wonder_tomb.id",
+      "qimen.rule_profiles.wonder_tomb.title",
+      "qimen.rule_profiles.wonder_tomb.source",
+      "qimen.rule_profiles.wonder_tomb.variant_note",
+      "qimen.rule_profiles.wonder_tomb.source_priority_resolved",
+      "qimen.rule_profiles.wonder_tomb.whole_book_conformance_established",
+      "synthesis.source_profiles.qimen",
+      "liureng.month_general",
+      "liureng.three_transmissions",
+      "liureng.patterns",
+      "liureng.ruleset.id",
+      "liureng.ruleset.version",
+      "liureng.ruleset.source_title",
+      "liureng.ruleset.source_urls",
+      "liureng.ruleset.classical_conformance",
+      "liureng.ruleset.classical_acceptance_passed",
+      "liureng.ruleset.real_world_efficacy",
+      "synthesis.time_scopes",
+      "synthesis.limitations",
+      "synthesis.real_world_efficacy"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "date": {
+        "description": "推算公历日期，例如2028-04-06；历史儒略历标签须先明确转换，不自动切换历制。",
+        "type": "string"
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "gps_lat": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "GPS latitude"
+      },
+      "gps_lon": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "GPS longitude"
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "lat": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "31n13",
+        "description": "Latitude text or decimal"
+      },
+      "liureng_guiren_profile": {
+        "default": "liuren_common_v1",
+        "description": "六壬贵人本位：liuren_common_v1（默认通行表）或tanyuan_xieji_v1（探原协纪表）。与金镜明钞／四库当时法的本位逐版对照，不自动择优；昼夜边界、四维寄支及完整合参断法另待验收。",
+        "enum": [
+          "liuren_common_v1",
+          "tanyuan_xieji_v1"
+        ],
+        "type": "string"
+      },
+      "liureng_is_diurnal": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional liureng day/night override"
+      },
+      "liureng_yue": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional liureng month-general override"
+      },
+      "lon": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "121e28",
+        "description": "Longitude text or decimal"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "qimen_options": {
+        "additionalProperties": true,
+        "default": {},
+        "description": "奇门：ju_method=zhirun（置闰）/chaibu（拆补）；god_profile=yanyi_text（默认卷三正文）/yanyi_diagrams（卷四圆图）；season_profile=yanyi_vol1_verse（默认卷一赋）/yanyi_vol3_table/yanyi_vol3_prose；仅支持转盘layout=direct和零平移",
+        "type": "object"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "selected_sections": {
+        "default": [],
+        "description": "Optional snapshot section titles for filtered export payload",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "taiyi_options": {
+        "additionalProperties": true,
+        "default": {},
+        "description": "太乙calculation_mode=year/month/day/hour，默认year；仅year可设year_profile=jinjing_year_historical_table_v1选381—385晋历主表，或jinjing_year_qiliang_table_v1选501—505齐梁史历表并保留502年闰标分歧；范围外拒绝，其他两术古历不因而认证；默认年计仍为通用现代农历。仅month可设month_profile=jinjing_month_jie_360_v1（默认金镜）/key_month_tianzheng_jie_v1（金钥匙天地二正，现代节月适配，门数分歧及三门未知保留）；day为金钥匙冬至前甲子积日、所选钟面零时换日，附十精及异数；仅hour可设hour_profile=jinjing_hour_solstice_v1（默认现代至点置一）或key_hour_winter_jiazi_v1（金钥匙完整积时/时支合神/四门，三门主体未决）。仅兼容accNum/acc_num=0；年/月可兼容顺布，日/时计不接受rotation覆盖。日计古历日期仍未复原，不按吉凶择法。",
+        "type": "object"
+      },
+      "time": {
+        "description": "Time string, e.g. 09:33:00",
+        "type": "string"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "use_true_solar_time": {
+        "default": true,
+        "description": "Enable local true solar time correction before sanshi aggregation (default on — 式占 keys off the apparent-solar 时辰)",
+        "type": "boolean"
+      },
+      "zone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "+08:00",
+        "description": "Timezone spec"
+      }
+    },
+    "required": [
+      "date",
+      "time"
+    ],
+    "type": "object"
+  },
+  "tool": "sanshiunited"
+}

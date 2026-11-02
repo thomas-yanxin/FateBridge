@@ -1,0 +1,735 @@
+{
+  "schema_version": 1,
+  "source": {
+    "id": "witte1925_solar_arc_table",
+    "author": "Alfred Witte",
+    "title": "Der Lauf der Erde (Sonnenbogen) in Tagen vom Geburtstage an",
+    "publication": "Astrologische Rundschau XVII/3, July1925, printed pp87-88",
+    "url": "https://www.astrax.de/pdf/45_Der%20Lauf%20der%20Erde_Sonnenbogen_in%20Tagen%20vom%20Gebtage%20an.pdf",
+    "source_pdf_sha256": "62c0c6414e478a35e68dbb8d044cbb663745e256fc0c2703a809868a5a10594a"
+  },
+  "scope": "Complete raw printed table and one printed worked example, not a verified birth chart or a fully resolved date-to-arc model.",
+  "transcription": "Manually read from enlarged hash-pinned original before implementation or any modern ephemeris comparison. Single-token cells are minutes only, with no missing degree silently inserted. The final January6 belongs to the next-year extension.",
+  "age_columns_years": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90
+  ],
+  "rows": [
+    {
+      "row": 0,
+      "printed_date": "01-01",
+      "common_year_day_offset": 0,
+      "raw_age_cells": [
+        "10 11",
+        "20 22",
+        "30 32",
+        "40 40",
+        "50 46",
+        "60 49",
+        "70 49",
+        "80 46",
+        "90 40"
+      ],
+      "raw_until_january_zero_arcminutes": 61
+    },
+    {
+      "row": 1,
+      "printed_date": "01-11",
+      "common_year_day_offset": 10,
+      "raw_age_cells": [
+        "11",
+        "21",
+        "29",
+        "35",
+        "38",
+        "38",
+        "35",
+        "28",
+        "18"
+      ],
+      "raw_until_january_zero_arcminutes": 60
+    },
+    {
+      "row": 2,
+      "printed_date": "01-21",
+      "common_year_day_offset": 20,
+      "raw_age_cells": [
+        "10",
+        "18",
+        "24",
+        "27",
+        "27",
+        "24",
+        "17",
+        "07",
+        "89 54"
+      ],
+      "raw_until_january_zero_arcminutes": 58
+    },
+    {
+      "row": 3,
+      "printed_date": "01-31",
+      "common_year_day_offset": 30,
+      "raw_age_cells": [
+        "08",
+        "14",
+        "17",
+        "17",
+        "14",
+        "07",
+        "69 57",
+        "79 44",
+        "28"
+      ],
+      "raw_until_january_zero_arcminutes": 55
+    },
+    {
+      "row": 4,
+      "printed_date": "02-10",
+      "common_year_day_offset": 40,
+      "raw_age_cells": [
+        "06",
+        "09",
+        "09",
+        "06",
+        "49 59",
+        "59 49",
+        "36",
+        "20",
+        "00"
+      ],
+      "raw_until_january_zero_arcminutes": 53
+    },
+    {
+      "row": 5,
+      "printed_date": "02-20",
+      "common_year_day_offset": 50,
+      "raw_age_cells": [
+        "03",
+        "03",
+        "00",
+        "39 54",
+        "44",
+        "30",
+        "14",
+        "78 55",
+        "88 33"
+      ],
+      "raw_until_january_zero_arcminutes": 51
+    },
+    {
+      "row": 6,
+      "printed_date": "03-02",
+      "common_year_day_offset": 60,
+      "raw_age_cells": [
+        "00",
+        "57",
+        "29 50",
+        "40",
+        "27",
+        "11",
+        "68 51",
+        "30",
+        "06"
+      ],
+      "raw_until_january_zero_arcminutes": 50
+    },
+    {
+      "row": 7,
+      "printed_date": "03-12",
+      "common_year_day_offset": 70,
+      "raw_age_cells": [
+        "9 57",
+        "51",
+        "40",
+        "27",
+        "11",
+        "58 51",
+        "31",
+        "06",
+        "87 40"
+      ],
+      "raw_until_january_zero_arcminutes": 48
+    },
+    {
+      "row": 8,
+      "printed_date": "03-22",
+      "common_year_day_offset": 80,
+      "raw_age_cells": [
+        "54",
+        "44",
+        "30",
+        "14",
+        "48 55",
+        "33",
+        "09",
+        "77 43",
+        "16"
+      ],
+      "raw_until_january_zero_arcminutes": 46
+    },
+    {
+      "row": 9,
+      "printed_date": "04-01",
+      "common_year_day_offset": 90,
+      "raw_age_cells": [
+        "50",
+        "37",
+        "20",
+        "01",
+        "39",
+        "15",
+        "67 49",
+        "22",
+        "86 55"
+      ],
+      "raw_until_january_zero_arcminutes": 44
+    },
+    {
+      "row": 10,
+      "printed_date": "04-11",
+      "common_year_day_offset": 100,
+      "raw_age_cells": [
+        "47",
+        "32",
+        "11",
+        "38 49",
+        "25",
+        "57 59",
+        "32",
+        "05",
+        "37"
+      ],
+      "raw_until_january_zero_arcminutes": 43
+    },
+    {
+      "row": 11,
+      "printed_date": "04-21",
+      "common_year_day_offset": 110,
+      "raw_age_cells": [
+        "44",
+        "24",
+        "02",
+        "38",
+        "13",
+        "46",
+        "18",
+        "76 50",
+        "19"
+      ],
+      "raw_until_january_zero_arcminutes": 41
+    },
+    {
+      "row": 12,
+      "printed_date": "05-01",
+      "common_year_day_offset": 120,
+      "raw_age_cells": [
+        "41",
+        "19",
+        "28 55",
+        "29",
+        "02",
+        "34",
+        "06",
+        "39",
+        "12"
+      ],
+      "raw_until_january_zero_arcminutes": 39
+    },
+    {
+      "row": 13,
+      "printed_date": "05-11",
+      "common_year_day_offset": 130,
+      "raw_age_cells": [
+        "38",
+        "14",
+        "48",
+        "21",
+        "47 54",
+        "26",
+        "66 58",
+        "31",
+        "06"
+      ],
+      "raw_until_january_zero_arcminutes": 37
+    },
+    {
+      "row": 14,
+      "printed_date": "05-21",
+      "common_year_day_offset": 140,
+      "raw_age_cells": [
+        "36",
+        "10",
+        "43",
+        "16",
+        "47",
+        "20",
+        "53",
+        "28",
+        "04"
+      ],
+      "raw_until_january_zero_arcminutes": 36
+    },
+    {
+      "row": 15,
+      "printed_date": "05-31",
+      "common_year_day_offset": 150,
+      "raw_age_cells": [
+        "34",
+        "07",
+        "40",
+        "11",
+        "44",
+        "17",
+        "52",
+        "28",
+        "07"
+      ],
+      "raw_until_january_zero_arcminutes": 34
+    },
+    {
+      "row": 16,
+      "printed_date": "06-10",
+      "common_year_day_offset": 160,
+      "raw_age_cells": [
+        "33",
+        "05",
+        "37",
+        "10",
+        "43",
+        "18",
+        "54",
+        "33",
+        "14"
+      ],
+      "raw_until_january_zero_arcminutes": 32
+    },
+    {
+      "row": 17,
+      "printed_date": "06-20",
+      "common_year_day_offset": 170,
+      "raw_age_cells": [
+        "32",
+        "04",
+        "37",
+        "10",
+        "44",
+        "21",
+        "67 00",
+        "41",
+        "26"
+      ],
+      "raw_until_january_zero_arcminutes": 30
+    },
+    {
+      "row": 18,
+      "printed_date": "06-30",
+      "common_year_day_offset": 180,
+      "raw_age_cells": [
+        "32",
+        "04",
+        "38",
+        "12",
+        "49",
+        "28",
+        "09",
+        "53",
+        "41"
+      ],
+      "raw_until_january_zero_arcminutes": 29
+    },
+    {
+      "row": 19,
+      "printed_date": "07-10",
+      "common_year_day_offset": 190,
+      "raw_age_cells": [
+        "32",
+        "06",
+        "40",
+        "17",
+        "55",
+        "37",
+        "21",
+        "77 09",
+        "87 00"
+      ],
+      "raw_until_january_zero_arcminutes": 27
+    },
+    {
+      "row": 20,
+      "printed_date": "07-20",
+      "common_year_day_offset": 200,
+      "raw_age_cells": [
+        "33",
+        "08",
+        "44",
+        "23",
+        "48 04",
+        "49",
+        "37",
+        "27",
+        "22"
+      ],
+      "raw_until_january_zero_arcminutes": 26
+    },
+    {
+      "row": 21,
+      "printed_date": "07-30",
+      "common_year_day_offset": 210,
+      "raw_age_cells": [
+        "34",
+        "11",
+        "50",
+        "31",
+        "16",
+        "58 03",
+        "54",
+        "48",
+        "46"
+      ],
+      "raw_until_january_zero_arcminutes": 24
+    },
+    {
+      "row": 22,
+      "printed_date": "08-09",
+      "common_year_day_offset": 220,
+      "raw_age_cells": [
+        "37",
+        "16",
+        "57",
+        "41",
+        "29",
+        "20",
+        "68 14",
+        "78 13",
+        "88 12"
+      ],
+      "raw_until_january_zero_arcminutes": 22
+    },
+    {
+      "row": 23,
+      "printed_date": "08-19",
+      "common_year_day_offset": 230,
+      "raw_age_cells": [
+        "39",
+        "20",
+        "29 05",
+        "52",
+        "43",
+        "37",
+        "35",
+        "36",
+        "40"
+      ],
+      "raw_until_january_zero_arcminutes": 21
+    },
+    {
+      "row": 24,
+      "printed_date": "08-29",
+      "common_year_day_offset": 240,
+      "raw_age_cells": [
+        "41",
+        "26",
+        "13",
+        "39 04",
+        "59",
+        "56",
+        "57",
+        "79 01",
+        "89 07"
+      ],
+      "raw_until_january_zero_arcminutes": 19
+    },
+    {
+      "row": 25,
+      "printed_date": "09-08",
+      "common_year_day_offset": 250,
+      "raw_age_cells": [
+        "44",
+        "32",
+        "23",
+        "17",
+        "49 15",
+        "59 16",
+        "69 20",
+        "26",
+        "35"
+      ],
+      "raw_until_january_zero_arcminutes": 18
+    },
+    {
+      "row": 26,
+      "printed_date": "09-18",
+      "common_year_day_offset": 260,
+      "raw_age_cells": [
+        "48",
+        "38",
+        "33",
+        "31",
+        "31",
+        "36",
+        "42",
+        "50",
+        "90 00"
+      ],
+      "raw_until_january_zero_arcminutes": 17
+    },
+    {
+      "row": 27,
+      "printed_date": "09-28",
+      "common_year_day_offset": 270,
+      "raw_age_cells": [
+        "51",
+        "45",
+        "43",
+        "44",
+        "48",
+        "54",
+        "70 02",
+        "80 13",
+        "24"
+      ],
+      "raw_until_january_zero_arcminutes": 15
+    },
+    {
+      "row": 28,
+      "printed_date": "10-08",
+      "common_year_day_offset": 280,
+      "raw_age_cells": [
+        "54",
+        "52",
+        "53",
+        "57",
+        "50 03",
+        "60 12",
+        "22",
+        "33",
+        "45"
+      ],
+      "raw_until_january_zero_arcminutes": 13
+    },
+    {
+      "row": 29,
+      "printed_date": "10-18",
+      "common_year_day_offset": 290,
+      "raw_age_cells": [
+        "58",
+        "58",
+        "30 02",
+        "40 09",
+        "17",
+        "28",
+        "39",
+        "50",
+        "91 02"
+      ],
+      "raw_until_january_zero_arcminutes": 12
+    },
+    {
+      "row": 30,
+      "printed_date": "10-28",
+      "common_year_day_offset": 300,
+      "raw_age_cells": [
+        "10 01",
+        "20 05",
+        "11",
+        "20",
+        "30",
+        "41",
+        "52",
+        "81 04",
+        "14"
+      ],
+      "raw_until_january_zero_arcminutes": 10
+    },
+    {
+      "row": 31,
+      "printed_date": "11-07",
+      "common_year_day_offset": 310,
+      "raw_age_cells": [
+        "04",
+        "10",
+        "19",
+        "29",
+        "40",
+        "52",
+        "71 03",
+        "14",
+        "23"
+      ],
+      "raw_until_january_zero_arcminutes": 8
+    },
+    {
+      "row": 32,
+      "printed_date": "11-17",
+      "common_year_day_offset": 320,
+      "raw_age_cells": [
+        "06",
+        "15",
+        "25",
+        "36",
+        "48",
+        "59",
+        "10",
+        "19",
+        "26"
+      ],
+      "raw_until_january_zero_arcminutes": 7
+    },
+    {
+      "row": 33,
+      "printed_date": "11-27",
+      "common_year_day_offset": 330,
+      "raw_age_cells": [
+        "08",
+        "19",
+        "30",
+        "41",
+        "53",
+        "61 04",
+        "12",
+        "19",
+        "24"
+      ],
+      "raw_until_january_zero_arcminutes": 5
+    },
+    {
+      "row": 34,
+      "printed_date": "12-07",
+      "common_year_day_offset": 340,
+      "raw_age_cells": [
+        "10",
+        "22",
+        "33",
+        "44",
+        "55",
+        "04",
+        "11",
+        "16",
+        "17"
+      ],
+      "raw_until_january_zero_arcminutes": 3
+    },
+    {
+      "row": 35,
+      "printed_date": "12-17",
+      "common_year_day_offset": 350,
+      "raw_age_cells": [
+        "11",
+        "23",
+        "34",
+        "45",
+        "54",
+        "01",
+        "05",
+        "07",
+        "06"
+      ],
+      "raw_until_january_zero_arcminutes": 2
+    },
+    {
+      "row": 36,
+      "printed_date": "12-27",
+      "common_year_day_offset": 360,
+      "raw_age_cells": [
+        "11",
+        "23",
+        "33",
+        "43",
+        "49",
+        "60 54",
+        "70 56",
+        "80 55",
+        "90 50"
+      ],
+      "raw_until_january_zero_arcminutes": 0
+    },
+    {
+      "row": 37,
+      "printed_date": "01-06+1",
+      "common_year_day_offset": 370,
+      "raw_age_cells": [
+        "12",
+        "22",
+        "31",
+        "38",
+        "43",
+        "44",
+        "43",
+        "38",
+        "30"
+      ],
+      "raw_until_january_zero_arcminutes": 1
+    }
+  ],
+  "unresolved_degree_marker": [
+    {
+      "row": 6,
+      "age_years": 20,
+      "raw_cell": "57",
+      "scope": "At this minute rollover, no explicit new degree is legible in the scan. Do not choose a degree by matching a modern ephemeris. Propagate unresolved degree until the next explicit marker."
+    }
+  ],
+  "printed_worked_example": {
+    "birth_date_label": "1859-01-27",
+    "target_date_label": "1914-08-01",
+    "clock_or_timezone_given": false,
+    "until_january_zero_arcminutes": 56,
+    "full_years": 54,
+    "full_year_arc_degrees_minutes": [
+      54,
+      17
+    ],
+    "partial_year_months": 7,
+    "partial_year_printed_arcminutes": 34,
+    "partial_year_printed_operations": "7 months *5 arcminutes minus1 arcminute; the text says the 54th-year rate is0.5 arcminute less than60 arcminutes",
+    "fifty_year_date_interpolation": {
+      "first_row": 2,
+      "last_row": 3,
+      "fraction_parts": [
+        6,
+        10
+      ],
+      "printed_subtracted_arcminutes": 8,
+      "printed_result_degrees_minutes": [
+        50,
+        19
+      ]
+    },
+    "sixty_year_date_interpolation": {
+      "first_row": 2,
+      "last_row": 3,
+      "fraction_parts": [
+        6,
+        10
+      ],
+      "printed_subtracted_arcminutes": 10,
+      "printed_result_degrees_minutes": [
+        60,
+        14
+      ]
+    },
+    "inter_year_difference_arcminutes": 5,
+    "four_year_printed_reduction_arcminutes": 2,
+    "printed_total_degrees_minutes": [
+      55,
+      47
+    ]
+  },
+  "limits": {
+    "missing_degree_adopted": false,
+    "final_extension_sign_resolved": false,
+    "subday_or_leap_day_policy_resolved": false,
+    "source_rounding_policy_fully_specified": false,
+    "table_epoch_or_unrounded_solar_model_known": false,
+    "full_original_method_accepted": false,
+    "empirical_outcomes": 0
+  }
+}

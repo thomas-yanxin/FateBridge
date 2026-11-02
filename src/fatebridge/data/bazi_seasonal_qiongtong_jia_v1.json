@@ -1,0 +1,410 @@
+{
+  "method_id": "qiongtong_jia_reference_layers_v1",
+  "source": {
+    "id": "qiongtong_xu_qianqian_jia_v1",
+    "title": "窮通寶鑑評註",
+    "compiler": "余春台",
+    "commentator": "徐樂吾",
+    "edition": "國家圖書館藏本 NLC416-12jh004238-48608，乾乾書社出版；封面題東海樂吾氏評註",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/9/93/NLC416-12jh004238-48608_%E7%AA%AE%E9%80%9A%E5%AF%B6%E9%91%91%E8%A9%95%E8%A8%BB.pdf",
+    "source_sha256": "b7f17fc7fcb7d8faa991efa74d0db391c5066a3793b3fc6787d2612bc6b350a8",
+    "pdf_page_count": 277,
+    "cover_pdf_pages": [
+      1,
+      2
+    ],
+    "summary_pdf_pages": [
+      13
+    ],
+    "text_layer_policy": "提要、余氏原編大字正文與徐氏小字評註分開；只摘錄命理條件，不實作人生成敗或醫療斷語。"
+  },
+  "scope": "甲木十二月的選定提要與正文對照；不是全120格校勘、全盤調候裁定或獨立專家驗收。",
+  "months": {
+    "寅": {
+      "summary": {
+        "top_listed_stem": "丙",
+        "listed_stems": [
+          "丙",
+          "癸"
+        ],
+        "enumeration_scope": "所选提要的上列干与列举集合；集合中的排列不作全盘优先级裁定。",
+        "pdf_pages": [
+          13
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          15,
+          16
+        ],
+        "stem_sequence": [
+          "丙",
+          "癸"
+        ],
+        "sequence_semantics": "丙癸并提，丙透癸藏另有专段",
+        "passage_locator": "丙癸并提与透藏条件",
+        "paraphrase": "正文另分丙癸并透、癸藏丙透；单见某干不足以裁定。",
+        "review_status": "selected_passages_collated_not_full_chapter_adjudication"
+      },
+      "comparison": "summary_and_body_have_compatible_stems",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "卯": {
+      "summary": {
+        "top_listed_stem": "庚",
+        "listed_stems": [
+          "庚",
+          "丙",
+          "丁",
+          "戊",
+          "己"
+        ],
+        "enumeration_scope": "所选提要的上列干与列举集合；集合中的排列不作全盘优先级裁定。",
+        "pdf_pages": [
+          13
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          19
+        ],
+        "stem_sequence": [
+          "庚"
+        ],
+        "sequence_semantics": "庚金得所，阳刃架杀",
+        "passage_locator": "庚金得所",
+        "paraphrase": "仍须核对庚的得所、丁食制杀与癸水等分支，不能从提要首干直接定格。",
+        "review_status": "selected_passages_collated_not_full_chapter_adjudication"
+      },
+      "comparison": "summary_and_body_have_compatible_stems",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "辰": {
+      "summary": {
+        "top_listed_stem": "庚",
+        "listed_stems": [
+          "庚",
+          "丁",
+          "壬"
+        ],
+        "enumeration_scope": "所选提要的上列干与列举集合；集合中的排列不作全盘优先级裁定。",
+        "pdf_pages": [
+          13
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          20,
+          21
+        ],
+        "stem_sequence": [
+          "庚",
+          "壬"
+        ],
+        "sequence_semantics": "先庚后壬",
+        "passage_locator": "先用庚金次用壬水",
+        "paraphrase": "正文对丁另附金局等条件，不表示所有辰月甲木都统一先丁后壬。",
+        "review_status": "selected_passages_collated_not_full_chapter_adjudication"
+      },
+      "comparison": "secondary_conditions_not_encoded_by_flat_table",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "巳": {
+      "summary": {
+        "top_listed_stem": "癸",
+        "listed_stems": [
+          "癸",
+          "庚",
+          "丁"
+        ],
+        "enumeration_scope": "所选提要的上列干与列举集合；集合中的排列不作全盘优先级裁定。",
+        "pdf_pages": [
+          13
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          22,
+          23
+        ],
+        "stem_sequence": [
+          "癸",
+          "丁"
+        ],
+        "sequence_semantics": "先癸后丁",
+        "passage_locator": "先癸後丁",
+        "paraphrase": "评注明确区分原局根润木强与木性枯焦；庚多、火旺、水透另有条件。",
+        "review_status": "selected_passages_collated_not_full_chapter_adjudication"
+      },
+      "comparison": "secondary_conditions_not_encoded_by_flat_table",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "午": {
+      "summary": {
+        "top_listed_stem": "癸",
+        "listed_stems": [
+          "癸",
+          "庚",
+          "丁"
+        ],
+        "enumeration_scope": "所选提要的上列干与列举集合；集合中的排列不作全盘优先级裁定。",
+        "pdf_pages": [
+          13
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          24,
+          25
+        ],
+        "stem_sequence": [
+          "癸",
+          "丁"
+        ],
+        "sequence_semantics": "五月先癸后丁，另有六月专段",
+        "passage_locator": "五月先癸後丁",
+        "paraphrase": "须分五月、六月及火盛、木盛、癸透等条件；不能把五六月合论代替每盘判定。",
+        "review_status": "selected_passages_collated_not_full_chapter_adjudication"
+      },
+      "comparison": "summary_and_body_have_compatible_stems",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "未": {
+      "summary": {
+        "top_listed_stem": "癸",
+        "listed_stems": [
+          "癸",
+          "庚",
+          "丁"
+        ],
+        "enumeration_scope": "所选提要的上列干与列举集合；集合中的排列不作全盘优先级裁定。",
+        "pdf_pages": [
+          13
+        ],
+        "review_status": "selected_summary_stems_collated",
+        "partition_note": "上半月同五月用癸；下半月用庚丁。原文半月界尚未形式化，不能从民用日期或月支猜选。"
+      },
+      "body": {
+        "pdf_pages": [
+          13,
+          24,
+          25,
+          26
+        ],
+        "stem_sequence": [
+          "丁",
+          "庚",
+          "癸"
+        ],
+        "sequence_semantics": "六月专段先丁、次庚；五六月合论另列五月先癸后丁",
+        "passage_locator": "六月三伏生寒丁火退氣先用丁火",
+        "paraphrase": "提要另列上半月同五月用癸、下半月用庚丁；当前只有月支，没有据原文校定半月界或裁定分支。",
+        "review_status": "selected_passages_collated_not_full_chapter_adjudication"
+      },
+      "comparison": "month_partition_and_body_conditions_unresolved",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "申": {
+      "summary": {
+        "top_listed_stem": "庚",
+        "listed_stems": [
+          "庚",
+          "丁",
+          "壬"
+        ],
+        "enumeration_scope": "所选提要的上列干与列举集合；集合中的排列不作全盘优先级裁定。",
+        "pdf_pages": [
+          13
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          29,
+          30,
+          32
+        ],
+        "stem_sequence": [
+          "丁",
+          "庚"
+        ],
+        "sequence_semantics": "正文丁为尊、庚次且不可少",
+        "passage_locator": "丁火為尊庚金次之",
+        "paraphrase": "提要首列庚，正文以丁为尊；两层不合并为一个无条件最终顺序，还须看金根与壬水阻隔。",
+        "review_status": "selected_passages_collated_not_full_chapter_adjudication"
+      },
+      "comparison": "outline_and_body_order_differ",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "酉": {
+      "summary": {
+        "top_listed_stem": "庚",
+        "listed_stems": [
+          "庚",
+          "丁",
+          "丙"
+        ],
+        "enumeration_scope": "所选提要的上列干与列举集合；集合中的排列不作全盘优先级裁定。",
+        "pdf_pages": [
+          13
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          33,
+          34
+        ],
+        "stem_sequence": [
+          "丁",
+          "丙",
+          "庚"
+        ],
+        "sequence_semantics": "丁先、丙次、庚再次",
+        "passage_locator": "丁火為先次用丙火庚金再次",
+        "paraphrase": "提要首列庚；正文另说明丁制金、丙调候的不同职责，不能把庚首列解释成全盘最终用神。",
+        "review_status": "selected_passages_collated_not_full_chapter_adjudication"
+      },
+      "comparison": "outline_and_body_order_differ",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "戌": {
+      "summary": {
+        "top_listed_stem": "庚",
+        "listed_stems": [
+          "庚",
+          "甲",
+          "丁",
+          "壬",
+          "癸"
+        ],
+        "enumeration_scope": "所选提要的上列干与列举集合；集合中的排列不作全盘优先级裁定。",
+        "pdf_pages": [
+          13
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          13,
+          35,
+          36,
+          37
+        ],
+        "stem_sequence": [
+          "丁",
+          "壬",
+          "癸"
+        ],
+        "sequence_semantics": "独爱丁，壬癸滋扶",
+        "passage_locator": "獨愛丁火壬癸滋扶",
+        "paraphrase": "提要区分土旺用甲、木旺用庚，正文及评注还讨论燥土、庚与火水配置；力量未判定时不能自动择一路。",
+        "review_status": "selected_passages_collated_not_full_chapter_adjudication"
+      },
+      "comparison": "conditional_priorities_not_encoded_by_flat_table",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "亥": {
+      "summary": {
+        "top_listed_stem": "庚",
+        "listed_stems": [
+          "庚",
+          "丁",
+          "丙",
+          "戊"
+        ],
+        "enumeration_scope": "所选提要的上列干与列举集合；集合中的排列不作全盘优先级裁定。",
+        "pdf_pages": [
+          13
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          40,
+          41
+        ],
+        "stem_sequence": [
+          "庚",
+          "丁",
+          "丙"
+        ],
+        "sequence_semantics": "庚丁并要，丙次",
+        "passage_locator": "庚丁為要丙火次之",
+        "paraphrase": "戊制壬水受原局水势条件限制；同列不能理解成四干同时为喜。",
+        "review_status": "selected_passages_collated_not_full_chapter_adjudication"
+      },
+      "comparison": "conditional_auxiliary_not_unconditional",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "子": {
+      "summary": {
+        "top_listed_stem": "丁",
+        "listed_stems": [
+          "丁",
+          "庚",
+          "丙"
+        ],
+        "enumeration_scope": "所选提要的上列干与列举集合；集合中的排列不作全盘优先级裁定。",
+        "pdf_pages": [
+          13
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          41,
+          42
+        ],
+        "stem_sequence": [
+          "丁",
+          "庚",
+          "丙"
+        ],
+        "sequence_semantics": "丁先庚后，丙佐",
+        "passage_locator": "丁先庚後丙火佐之",
+        "paraphrase": "须另查癸水与壬水、丁透庚藏和制救，提要不能跳过这些前提。",
+        "review_status": "selected_passages_collated_not_full_chapter_adjudication"
+      },
+      "comparison": "summary_and_body_have_compatible_stems",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "丑": {
+      "summary": {
+        "top_listed_stem": "丁",
+        "listed_stems": [
+          "丁",
+          "庚",
+          "丙"
+        ],
+        "enumeration_scope": "所选提要的上列干与列举集合；集合中的排列不作全盘优先级裁定。",
+        "pdf_pages": [
+          13
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          13,
+          43,
+          44
+        ],
+        "stem_sequence": [
+          "庚",
+          "丁"
+        ],
+        "sequence_semantics": "正文先庚劈甲引丁，同时强调丁不可少",
+        "passage_locator": "先用庚劈甲方引丁火",
+        "paraphrase": "提要丁先，正文操作次序先庚引丁，又说乏庚略可乏丁无用；操作次序与不可缺项不同，不能压为单一总排名。",
+        "review_status": "selected_passages_collated_not_full_chapter_adjudication"
+      },
+      "comparison": "ordering_semantics_differ",
+      "chart_conditions_status": "not_adjudicated"
+    }
+  }
+}

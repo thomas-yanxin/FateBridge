@@ -69,7 +69,7 @@ def test_outputs_stable_across_simulated_clock_change():
         assert baseline[slug] == snapshot_text, (
             f"{slug}（FROZEN_NOW）输出与快照不符；"
             "freeze_clock() 可能未覆盖该工具的 now() 路径，或快照未在 FROZEN_NOW 下生成。"
-            "请检查 _DATETIME_PATCH_TARGETS，并用 python -m tests.golden.runner 重新冻结基线。"
+            "请检查 freeze_clock 的实际时钟入口，并用 python -m tests.golden.runner 重新冻结基线。"
         )
 
         # 2. 拨 400 天后输出必须与快照不同，证明冻结时刻有效驱动了日历字段。

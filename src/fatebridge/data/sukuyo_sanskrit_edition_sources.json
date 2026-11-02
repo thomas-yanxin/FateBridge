@@ -1,0 +1,143 @@
+{
+  "source_data": {
+    "id": "sukuyo_sanskrit_editions_v80",
+    "editions": [
+      {
+        "id": "cowell_neil_1886",
+        "kind": "printed_editorial_edition_scan",
+        "editors": [
+          "E. B. Cowell",
+          "R. A. Neil"
+        ],
+        "year": 1886,
+        "capture": "cowell-neil-1886.pdf",
+        "pdf_pages": 720,
+        "selected_printed_pages": [
+          642,
+          643,
+          644,
+          645,
+          655
+        ],
+        "pdf_index_rule": "For these printed Arabic pages PDF page = printed page + 4. Title PDF7. Scan is not a manuscript.",
+        "water_chain_counts": [
+          2,
+          4,
+          40,
+          31,
+          2
+        ],
+        "blink_chain_counts": [
+          16,
+          16,
+          64,
+          30,
+          30,
+          12
+        ],
+        "thread_chain_counts": [
+          120,
+          60,
+          30,
+          30
+        ],
+        "annual_literal_not_normalized": "ete punar akṣinimeṣeṇa ṣoḍaśa kāṣṭhā aṣṭapañcāśac ca śatasahasrāṇi tad evaṃ māpitaḥ",
+        "annual_literal_location": "printed645 lines6-8; retain wording, not a resolved numeric total",
+        "omission_note": "printed655: A170a–A184a complete; thereafter chapter heads only until narrative resumes A211b; the editors state the whole avadana was not edited."
+      },
+      {
+        "id": "mukhopadhyaya_1954_titus",
+        "kind": "electronic_text_based_on_named_print_not_print_scan",
+        "editor": "Sujitkumar Mukhopadhyaya",
+        "year": 1954,
+        "digitizer": "Mizue Sugita 1998-05-07",
+        "titus_version_dates": [
+          "2000-05-19",
+          "2000-06-01",
+          "2005-11-20",
+          "2008-12-03"
+        ],
+        "capture": "titus-1954-roman.html",
+        "companion_same_digital_work": "titus-1954-deva.html",
+        "numbering": "I/II added by TITUS; compound boundary ^ changed to -; Paragraph52 and53 occur twice in I; preserve occurrence.",
+        "water_chain_counts": [
+          2,
+          8,
+          16,
+          30,
+          2
+        ],
+        "blink_chain_counts": [
+          16,
+          16,
+          60,
+          30,
+          30,
+          12
+        ],
+        "thread_chain_counts": [
+          120,
+          60,
+          30,
+          30
+        ],
+        "annual_words_counts": {
+          "crore": 16,
+          "hundred_thousand": 58,
+          "thousand": 88
+        },
+        "annual_literal_location": "I, Paragraph58 occurrence1 Verse2",
+        "leap_literal": "tatra tr̥tīye varṣe +adʰiko māso yujyate /",
+        "leap_locator": "I, Paragraph103 occurrence1 Verse1",
+        "leap_schedule_established": false,
+        "fixed_day_night_and_mobile_counts": [
+          12,
+          12,
+          6
+        ],
+        "mobile_locator": "I, Paragraph105 occurrence1 Verse1",
+        "mobile_names": [
+          "nairr̥ta",
+          "varuṇa",
+          "vāyava",
+          "bʰarga deva",
+          "raudra",
+          "vicāri"
+        ],
+        "clock_or_Chinese_mapping_established": false
+      }
+    ],
+    "source_specific_conditional_arithmetic_only": true,
+    "cross_edition_named_units_equated": false,
+    "modern_seconds_per_unit": null,
+    "Chinese_T1300_T1301_emendation": false,
+    "T1299_dawn_clock_resolved": false,
+    "T2465_half_day_clock_resolved": false,
+    "leap_short_month_priority_resolved": false,
+    "physical_witness_independence_verified": false,
+    "all_original_four_axis_gates_preserved": true,
+    "real_world_samples": 0
+  },
+  "captures": [
+    {
+      "id": "titus-1954-roman.html",
+      "sha256": "443696d230216caff6f7f06d2e668b8536c01ada39f1ece4edee7ba6f60463b6",
+      "bytes": 2213317
+    },
+    {
+      "id": "titus-1954-deva.html",
+      "sha256": "4afeff6ba2e6e11423e8cf4b07fb0330e6badfc5d3a1f9970dc3fd0e788bf182",
+      "bytes": 2792147
+    },
+    {
+      "id": "cowell-neil-1886.pdf",
+      "sha256": "7e08af253177cdae9ba43a4c2dd2ec52af89c337bae5610ea2a7137d316fb756",
+      "bytes": 26677163
+    },
+    {
+      "id": "cowell-neil-1886-scandata.xml",
+      "sha256": "368b3e14f5a64ae5e037bb0f36a8060ae4e94bb5a25e161c181732727e8dc822",
+      "bytes": 255621
+    }
+  ]
+}

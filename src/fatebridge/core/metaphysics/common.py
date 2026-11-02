@@ -171,6 +171,8 @@ class MetaphysicsSeed:
     total_correction_minutes: float
     pillars: Dict[str, Tuple[str, str]]
     calendar_context: Dict[str, Any]
+    birth_time_normalization: Optional[Dict[str, Any]] = None
+    solar_time_adjustment: Optional[Dict[str, Any]] = None
 
 
 def require_lunar_month_day(
@@ -257,8 +259,8 @@ def status_against_anchor(anchor: str, target: str) -> str:
     if ELEMENT_GENERATES[target] == anchor:
         return "休"
     if ELEMENT_CONTROLS[anchor] == target:
-        return "囚"
-    return "死"
+        return "死"
+    return "囚"
 
 
 def chinese_numeral(value: int) -> str:

@@ -1,0 +1,18 @@
+{
+  "profile_id": "gujin36_37_45_fixed_qice_civil_months_research",
+  "qice_days": "15.2184375",
+  "month_days": "29.530593",
+  "runying_days": "20.2050",
+  "qiying_days": "55.06",
+  "sources": [
+    {"author": "邢云路", "title": "古今律历考", "volume": 36, "revision": 771682, "url": "https://zh.wikisource.org/w/index.php?title=古今律厯考_(四庫全書本)/卷36&oldid=771682", "locators": ["求次氣", "推天正閏餘", "中氣去經朔", "氣候"]},
+    {"author": "邢云路", "title": "古今律历考", "volume": 37, "url": "https://zh.wikisource.org/wiki/古今律厯考_(四庫全書本)/卷37", "locators": ["求朔弦望定日", "DjVu432"]}
+  ],
+  "limitations": [
+    "固定卷36刊载气策累加24气；未以百年消长后的有效岁实重新缩放气策",
+    "按朔日午夜至次朔日午夜归属中气；同日中气早于合朔仍归新月的政策尚未通过全部历史边界验收",
+    "仅重建两冬至所在月之间的12或13个月，不等同完整正月至腊月年历",
+    "刊表空格、缺少必要邻朔和中气冲突保持未定，不补值或挑选更有利流派",
+    "未统一历史舍入、绝对历元或古今时标，未接入原生果老出生盘"
+  ]
+}

@@ -1,0 +1,2308 @@
+{
+  "corpus_id": "heluo_nlc_volume3_line_poems_v2",
+  "version": "2.6.0",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/NLC416-12jh000123-33185_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "catalog_url": "https://commons.wikimedia.org/wiki/File:NLC416-12jh000123-33185_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "source_pdf_sha256": "4a04e1e32a42719f001b56936e3c7561b5f68563ae54f0a23ed004af146cfcd7",
+  "source_pdf_pages": 154,
+  "source_title": "河洛理數（上海文明書局印行本）第三冊·卷三六十四卦詩訣",
+  "catalog_publication_date": "[1926]; catalog metadata, not an independently resolved colophon",
+  "review_status": "PDF_2_through_16_single_reader_native_pixel_visual_collation; includes_disclosed_unresolved_glyph_choices; independent_second_review_pending",
+  "scope": "QianKunTunMengXuSongShiBi48ordinarylinegroups contain117poems;336groupspending. Previous42groups101poems exact. NewBi8 contains16poems in2/3/3/3/2/3order; firstreader15count withdrawn. Whole-gua總訣 excluded. PriorSongheadingcountconflict and all earlier uncertainties retained; no automatic choice or whole-book certification.",
+  "transcription_policy": "Modern punctuation supplied; prior Qian conventions retained. New Kun/Tun preserve printed 兎/啣/畧/効/尅/隄/儘 and unusual lexical orders; not diplomatic glyph reproduction. Printed clause boundaries are retained; modern comma/fullstop normalization never moves a boundary. printed_clauses records those boundaries for the27 newly reviewed Kun/Tun poems. NewMeng4retains visible納婿/牛途/有河開/羣/四八尋and original printed clause boundaries. Odd wording is not replaced by a familiar phrase; no age/date is decoded from數詞. NewXu5preserves16poems and actual heading/text page boundaries, including跨页second/sixthgroups. Rare clauses桃開際祿會/白羊成一楚/身職起/那逢not replaced by familiar phrases;亨/享twochoices remain tentative; no date/age/star-sign inference from白羊or三人. NewSong6retains16poems, actualclauseboundaries andcrosspagecontinuation. Nativeembedded1bitpixelrecheck selects嘹喨/末稍却/不須懽/困來, preserving printedforms ratherthan a preferredmeaning or familiarphrase. AllsixpreviousSongreadingchoices andsupersededcandidates remain in historicalfixtures; currentnotesexplain eachselectedglyph. This is one mainreader, not independentcertification. 王事/名懼and inherited歡/困werealreadycorrect in theirrespective earlierrecords. Oneversusthreeheadingcountconflict remains; no date/age or personaloutcome is inferred. NewShi7 keepsall14ordinarylinepoems andprintedclauseboundaries, includingthirdgroupcrosspage. Firstdraft拯/人邦/巍巍 andmisplacedboundary withdrawn beforecandidate; originaldraftskept. 未能/事勿勿/勞而/青蠅/人人/屬 preserve selectedpixels, not smootherphrases. 堪variantfamilyand突咎alternatives remainunresolved; noage/date/destination/clinicalorpersonaldisasterinference. NewBi8 retains16poems andprintedboundaries; fourheading15/text16boundaryexplicit. Firstreaderomission,常/鹿/蹉/詢 andpunctuationwithdrawals retained. 隄/堤 and人/入 and脚信 remainunresolved. No animal,date,age,officeorpersonaloutcome inference. SubsequentnativepixelreviewwithdrawstwoBi4无codings toprinted無 afterfirstcandidate51pass; bothinitialsourceandgreenrunretained. This isnotanewinheriteddefect.",
+  "selection_policy": "Retain every poem in printed order. No applicability or automatic choice of a favorable poem is inferred from the group number.",
+  "total_line_poem_groups": 384,
+  "entries": [
+    {
+      "hexagram": "乾為天",
+      "line": 1,
+      "heading_pdf_page": 2,
+      "pdf_pages": [
+        2,
+        3
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "陽氣方生昧未明，潛藏勿用破幽榮。離明一照四方火，進位高攀便出群。",
+          "pdf_pages": [
+            3
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "玉韞石，珠藏淵。羽翼一旦上青天，名利須知有異緣。",
+          "pdf_pages": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 2,
+      "heading_pdf_page": 3,
+      "pdf_pages": [
+        3
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "得意宜逢貴，如龍已出淵。利名終有望，十五月團圓。",
+          "pdf_pages": [
+            3
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "已出塵泥迹，聲名動四方。風雲將際會，千載遇明良。",
+          "pdf_pages": [
+            3
+          ]
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "text": "龍見田中立，身心同貴人。利名應可見，進退有科名。",
+          "pdf_pages": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 3,
+      "heading_pdf_page": 3,
+      "pdf_pages": [
+        3
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "步履無行阻，先憂後必昌。飛龍形不見，西北是其鄉。",
+          "pdf_pages": [
+            3
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "憂且不成憂，憂裏笑盈眸。聲名相久遇，目下暫淹留。",
+          "pdf_pages": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 4,
+      "heading_pdf_page": 3,
+      "pdf_pages": [
+        3
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "欲行懷珠，片帆千里。玉藏遠山，徘徊未已。",
+          "pdf_pages": [
+            3
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "天布彤雲色，花繁落影多。霏霏斜日照，帆便泛漢波。",
+          "pdf_pages": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 5,
+      "heading_pdf_page": 3,
+      "pdf_pages": [
+        3,
+        4
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "隱姓埋名實待時，飛龍天上大人輝。正當守位動無咎，終保聲名四海知。",
+          "pdf_pages": [
+            3
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "上下皆同德，風雲際遇時。如天施雨露，萬物盡光輝。",
+          "pdf_pages": [
+            4
+          ]
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "text": "日邊音信至，佳會在風雲。青紫人相引，時和到處春。",
+          "pdf_pages": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 6,
+      "heading_pdf_page": 4,
+      "pdf_pages": [
+        4
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "知進當知退，居安必慮危。心中無過咎，雖悔必堪追。",
+          "pdf_pages": [
+            4
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "安靜宜無咎，思來便有災。前途飛走處，憂事更防來。",
+          "pdf_pages": [
+            4
+          ]
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "text": "心戚戚，口啾啾。一番思慮一番憂，宜欲休時便好休。",
+          "pdf_pages": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 1,
+      "heading_pdf_page": 4,
+      "heading_text": "坤卦初爻訣二首",
+      "pdf_pages": [
+        4
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "陰氣方濃始履霜，待時亨動見陽剛。雲中一力扶持起，水畔行人在北方。",
+          "pdf_pages": [
+            4
+          ],
+          "printed_clauses": [
+            "陰氣方濃始履霜",
+            "待時亨動見陽剛",
+            "雲中一力扶持起",
+            "水畔行人在北方"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "事每因馴致，凝成戒履霜。善應有餘福，不善有餘殃。",
+          "pdf_pages": [
+            4
+          ],
+          "printed_clauses": [
+            "事每因馴致",
+            "凝成戒履霜",
+            "善應有餘福",
+            "不善有餘殃"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 2,
+      "heading_pdf_page": 4,
+      "heading_text": "坤卦二爻訣二首",
+      "pdf_pages": [
+        4,
+        5
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "萬丈波濤無點亂，一天風雨更幽閑。客行已在經綸內，名利何勞自作難。",
+          "pdf_pages": [
+            5
+          ],
+          "printed_clauses": [
+            "萬丈波濤無點亂",
+            "一天風雨更幽閑",
+            "客行已在經綸內",
+            "名利何勞自作難"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "敬義存中正，前程事事通。自然無不利，不習已成功。",
+          "pdf_pages": [
+            5
+          ],
+          "printed_clauses": [
+            "敬義存中正",
+            "前程事事通",
+            "自然無不利",
+            "不習已成功"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 3,
+      "heading_pdf_page": 5,
+      "heading_text": "坤卦三爻訣三首",
+      "pdf_pages": [
+        5
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "待命含章終必吉，強謀前進未亨昌。兎啣刀到黃金上，萬里鵬程羽翼忙。",
+          "pdf_pages": [
+            5
+          ],
+          "printed_clauses": [
+            "待命含章終必吉",
+            "強謀前進未亨昌",
+            "兎啣刀到黃金上",
+            "萬里鵬程羽翼忙"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "始則難，終則易。相合相從，天時地利。",
+          "pdf_pages": [
+            5
+          ],
+          "printed_clauses": [
+            "始則難",
+            "終則易",
+            "相合相從",
+            "天時地利"
+          ]
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "text": "含章雖有喜，進退且需時。丹詔從天下，風雲際會時。",
+          "pdf_pages": [
+            5
+          ],
+          "printed_clauses": [
+            "含章雖有喜",
+            "進退且需時",
+            "丹詔從天下",
+            "風雲際會時"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 4,
+      "heading_pdf_page": 5,
+      "heading_text": "坤卦四爻訣三首",
+      "pdf_pages": [
+        5
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "路不通，門閉塞。謹隄防，月雲黑。",
+          "pdf_pages": [
+            5
+          ],
+          "printed_clauses": [
+            "路不通",
+            "門閉塞",
+            "謹隄防",
+            "月雲黑"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "守慎宜無咎，包藏似括囊。震雷轟發後，利涉總安康。",
+          "pdf_pages": [
+            5
+          ],
+          "printed_clauses": [
+            "守慎宜無咎",
+            "包藏似括囊",
+            "震雷轟發後",
+            "利涉總安康"
+          ]
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "text": "事機宜謹慎，無是亦無非。守靜宜恬退，深處陷禍機。",
+          "pdf_pages": [
+            5
+          ],
+          "printed_clauses": [
+            "事機宜謹慎",
+            "無是亦無非",
+            "守靜宜恬退",
+            "深處陷禍機"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 5,
+      "heading_pdf_page": 5,
+      "heading_text": "坤卦五爻訣二首",
+      "pdf_pages": [
+        5
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "世道垂衣治，安身文史中。不須操武畧，名利在西東。",
+          "pdf_pages": [
+            5
+          ],
+          "printed_clauses": [
+            "世道垂衣治",
+            "安身文史中",
+            "不須操武畧",
+            "名利在西東"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "安居中守分，能順以承天。至美利元吉，西南喜慶全。",
+          "pdf_pages": [
+            5
+          ],
+          "printed_clauses": [
+            "安居中守分",
+            "能順以承天",
+            "至美利元吉",
+            "西南喜慶全"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 6,
+      "heading_pdf_page": 5,
+      "heading_text": "坤卦六爻訣三首",
+      "pdf_pages": [
+        5,
+        6
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "鏡破釵分，月缺花殘。行來休往，事始安然。",
+          "pdf_pages": [
+            6
+          ],
+          "printed_clauses": [
+            "鏡破釵分",
+            "月缺花殘",
+            "行來休往",
+            "事始安然"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "剛柔兩戰傷，其血須玄黃。龍馬生悔吝，極終已悔亡。",
+          "pdf_pages": [
+            6
+          ],
+          "printed_clauses": [
+            "剛柔兩戰傷",
+            "其血須玄黃",
+            "龍馬生悔吝",
+            "極終已悔亡"
+          ]
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "text": "有名無實効，謀事更遲遲。訟病多刑尅，施為總未宜。",
+          "pdf_pages": [
+            6
+          ],
+          "printed_clauses": [
+            "有名無實効",
+            "謀事更遲遲",
+            "訟病多刑尅",
+            "施為總未宜"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 1,
+      "heading_pdf_page": 6,
+      "heading_text": "屯卦初爻訣二首",
+      "pdf_pages": [
+        6
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "不當進步且盤桓，一得民心含此章。駐馬問人溪上事，水中還有萬人觀。",
+          "pdf_pages": [
+            6
+          ],
+          "printed_clauses": [
+            "不當進步且盤桓",
+            "一得民心含此章",
+            "駐馬問人溪上事",
+            "水中還有萬人觀"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "守不失，求不成。近謀遠遂，貴客通津。",
+          "pdf_pages": [
+            6
+          ],
+          "printed_clauses": [
+            "守不失",
+            "求不成",
+            "近謀遠遂",
+            "貴客通津"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 2,
+      "heading_pdf_page": 6,
+      "heading_text": "屯卦二爻訣三首",
+      "pdf_pages": [
+        6
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "屯難繇來已十年，一朝反本便更遷。婚姻不利謀斯卜，有個佳音在水邊。",
+          "pdf_pages": [
+            6
+          ],
+          "printed_clauses": [
+            "屯難繇來已十年",
+            "一朝反本便更遷",
+            "婚姻不利謀斯卜",
+            "有個佳音在水邊"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "事遲志速，尚且反覆。等閒家間，花殘果熟。",
+          "pdf_pages": [
+            6
+          ],
+          "printed_clauses": [
+            "事遲志速",
+            "尚且反覆",
+            "等閒家間",
+            "花殘果熟"
+          ]
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "text": "迍邅方不利，欲進阻前程。凡事宜求緩，婚姻久乃成。",
+          "pdf_pages": [
+            6
+          ],
+          "printed_clauses": [
+            "迍邅方不利",
+            "欲進阻前程",
+            "凡事宜求緩",
+            "婚姻久乃成"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 3,
+      "heading_pdf_page": 6,
+      "heading_text": "屯卦三爻訣二首",
+      "pdf_pages": [
+        6,
+        7
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "逐鹿還失鹿，求名未得名。林中有佳信，去後尚榮榮。",
+          "pdf_pages": [
+            7
+          ],
+          "printed_clauses": [
+            "逐鹿還失鹿",
+            "求名未得名",
+            "林中有佳信",
+            "去後尚榮榮"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "無處而即鹿，妄動必無功。君子能先見，毋令往反窮。",
+          "pdf_pages": [
+            7
+          ],
+          "printed_clauses": [
+            "無處而即鹿",
+            "妄動必無功",
+            "君子能先見",
+            "毋令往反窮"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 4,
+      "heading_pdf_page": 7,
+      "heading_text": "屯卦四爻訣",
+      "pdf_pages": [
+        7
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "乘馬班如進，求婚媾吉貞。得人相濟助，何事不光亨。",
+          "pdf_pages": [
+            7
+          ],
+          "printed_clauses": [
+            "乘馬班如進",
+            "求婚媾吉貞",
+            "得人相濟助",
+            "何事不光亨"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 5,
+      "heading_pdf_page": 7,
+      "heading_text": "屯卦五爻訣二首",
+      "pdf_pages": [
+        7
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "門前小事吉，心下大謀凶。一片山前處，防生反覆蒙。",
+          "pdf_pages": [
+            7
+          ],
+          "printed_clauses": [
+            "門前小事吉",
+            "心下大謀凶",
+            "一片山前處",
+            "防生反覆蒙"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "西向宜求望，秋冬漸出屯。不須更猶豫，儘可自經綸。",
+          "pdf_pages": [
+            7
+          ],
+          "printed_clauses": [
+            "西向宜求望",
+            "秋冬漸出屯",
+            "不須更猶豫",
+            "儘可自經綸"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 6,
+      "heading_pdf_page": 7,
+      "heading_text": "屯卦六爻訣二首",
+      "pdf_pages": [
+        7
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "持刀井畔立，井畔舞佳人。出馬四足病，防生泣血聲。",
+          "pdf_pages": [
+            7
+          ],
+          "printed_clauses": [
+            "持刀井畔立",
+            "井畔舞佳人",
+            "出馬四足病",
+            "防生泣血聲"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "居屯謀盡用，憂懼不遑寧。要問前程路，還同風裏燈。",
+          "pdf_pages": [
+            7
+          ],
+          "printed_clauses": [
+            "居屯謀盡用",
+            "憂懼不遑寧",
+            "要問前程路",
+            "還同風裏燈"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 1,
+      "heading_pdf_page": 8,
+      "heading_text": "蒙卦初爻訣三首",
+      "pdf_pages": [
+        8
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "門戶起干戈。親姻兩不和。朱衣臨日月。始覺笑呵呵。",
+          "pdf_pages": [
+            8
+          ],
+          "printed_clauses": [
+            "門戶起干戈",
+            "親姻兩不和",
+            "朱衣臨日月",
+            "始覺笑呵呵"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "驚憂成損總堪悲。匹馬東西未見歸。馬嘶有風宜坐守。不防冬去不防危。",
+          "pdf_pages": [
+            8
+          ],
+          "printed_clauses": [
+            "驚憂成損總堪悲",
+            "匹馬東西未見歸",
+            "馬嘶有風宜坐守",
+            "不防冬去不防危"
+          ]
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "text": "蒙昧須當發。惟宜在小懲。既懲應暫舍。不爾反侵凌。",
+          "pdf_pages": [
+            8
+          ],
+          "printed_clauses": [
+            "蒙昧須當發",
+            "惟宜在小懲",
+            "既懲應暫舍",
+            "不爾反侵凌"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 2,
+      "heading_pdf_page": 8,
+      "heading_text": "蒙卦二爻訣二首",
+      "pdf_pages": [
+        8
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "花謝枝頭果實多。好音來矣莫蹉跎。含容納婿宜家吉。不比初謀悔吝過。",
+          "pdf_pages": [
+            8
+          ],
+          "printed_clauses": [
+            "花謝枝頭果實多",
+            "好音來矣莫蹉跎",
+            "含容納婿宜家吉",
+            "不比初謀悔吝過"
+          ],
+          "reading_notes": [
+            "所選詩訣底本原字納婿，繼承稿作納婦；這是具名底本讀文，不據性別自動代選詩或婚配條款。"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "片月漸圓明。花殘子又青。牛途不了事。此舉一回新。",
+          "pdf_pages": [
+            8
+          ],
+          "printed_clauses": [
+            "片月漸圓明",
+            "花殘子又青",
+            "牛途不了事",
+            "此舉一回新"
+          ],
+          "reading_notes": [
+            "原像素讀作牛途，未按熟語改半途；所指未裁定。"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 3,
+      "heading_pdf_page": 8,
+      "heading_text": "蒙卦三爻訣二首",
+      "pdf_pages": [
+        8
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "聘女無攸利。花開又值秋。嚴霜將降土。退步不堪求。",
+          "pdf_pages": [
+            8
+          ],
+          "printed_clauses": [
+            "聘女無攸利",
+            "花開又值秋",
+            "嚴霜將降土",
+            "退步不堪求"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "切忌花間酒。莫貪無義金。失身無所利。暗室枉欺心。",
+          "pdf_pages": [
+            8
+          ],
+          "printed_clauses": [
+            "切忌花間酒",
+            "莫貪無義金",
+            "失身無所利",
+            "暗室枉欺心"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 4,
+      "heading_pdf_page": 8,
+      "heading_text": "蒙卦四爻訣二首",
+      "pdf_pages": [
+        8
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "久困猶嫌未濟來。江邊水闊有河開。文書有口不當說。當得從心果不諧。",
+          "pdf_pages": [
+            8
+          ],
+          "printed_clauses": [
+            "久困猶嫌未濟來",
+            "江邊水闊有河開",
+            "文書有口不當說",
+            "當得從心果不諧"
+          ],
+          "reading_notes": [
+            "有河開按所見保留，未用另一熟語改舟開。"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "窮困方蒙昧。中心吝可憂。須求誠實者。方可免貽羞。",
+          "pdf_pages": [
+            8
+          ],
+          "printed_clauses": [
+            "窮困方蒙昧",
+            "中心吝可憂",
+            "須求誠實者",
+            "方可免貽羞"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 5,
+      "heading_pdf_page": 8,
+      "heading_text": "蒙卦五爻訣二首",
+      "pdf_pages": [
+        8,
+        9
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "君象吉童蒙。身安應在東。大川涉无咎。海際得帆風。",
+          "pdf_pages": [
+            9
+          ],
+          "printed_clauses": [
+            "君象吉童蒙",
+            "身安應在東",
+            "大川涉无咎",
+            "海際得帆風"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "乘病馬。上危坡。防失跌。莫蹉跎。",
+          "pdf_pages": [
+            9
+          ],
+          "printed_clauses": [
+            "乘病馬",
+            "上危坡",
+            "防失跌",
+            "莫蹉跎"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 6,
+      "heading_pdf_page": 9,
+      "heading_text": "蒙卦六爻訣二首",
+      "pdf_pages": [
+        9
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "率師戰萬里。威武冠羣英。借問成功日。須還四八尋。",
+          "pdf_pages": [
+            9
+          ],
+          "printed_clauses": [
+            "率師戰萬里",
+            "威武冠羣英",
+            "借問成功日",
+            "須還四八尋"
+          ],
+          "reading_notes": [
+            "原字尋清楚，四八尋所指未定，不改四八春，不據此生成具體年齡或日期；繼承稿此句本已作尋，不計生產修復。"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "彼且方蒙昧。何須用意攻。但當宜謹密。自固免遭凶。",
+          "pdf_pages": [
+            9
+          ],
+          "printed_clauses": [
+            "彼且方蒙昧",
+            "何須用意攻",
+            "但當宜謹密",
+            "自固免遭凶"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "水天需",
+      "line": 1,
+      "heading_pdf_page": 9,
+      "pdf_pages": [
+        9
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "pdf_pages": [
+            9
+          ],
+          "text": "兇險雖難退。暫休且喜安。離明聽北角。天外見飛鸞。",
+          "printed_clauses": [
+            "兇險雖難退",
+            "暫休且喜安",
+            "離明聽北角",
+            "天外見飛鸞"
+          ],
+          "reading_notes": []
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "pdf_pages": [
+            9
+          ],
+          "text": "過盡前灘與後灘。前灘縱險不為難。一朝若得清風便。相送扁舟過遠山。",
+          "printed_clauses": [
+            "過盡前灘與後灘",
+            "前灘縱險不為難",
+            "一朝若得清風便",
+            "相送扁舟過遠山"
+          ],
+          "reading_notes": []
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "pdf_pages": [
+            9
+          ],
+          "text": "需須宜且待。欲速反為災。守靜方無咎。安常福自來。",
+          "printed_clauses": [
+            "需須宜且待",
+            "欲速反為災",
+            "守靜方無咎",
+            "安常福自來"
+          ],
+          "reading_notes": []
+        }
+      ]
+    },
+    {
+      "hexagram": "水天需",
+      "line": 2,
+      "heading_pdf_page": 9,
+      "pdf_pages": [
+        9,
+        10
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "pdf_pages": [
+            10
+          ],
+          "text": "欲進不防危。安居必慮之。桃開際祿會。花發不違時。",
+          "printed_clauses": [
+            "欲進不防危",
+            "安居必慮之",
+            "桃開際祿會",
+            "花發不違時"
+          ],
+          "reading_notes": [
+            "桃開際祿會按本诗卷原印暂读，词义及际字所指待核，不改成涉字或另补顺口句。"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "pdf_pages": [
+            10
+          ],
+          "text": "險難將相及。剛中且待時。浮言雖小害。終是吉無疑。",
+          "printed_clauses": [
+            "險難將相及",
+            "剛中且待時",
+            "浮言雖小害",
+            "終是吉無疑"
+          ],
+          "reading_notes": []
+        }
+      ]
+    },
+    {
+      "hexagram": "水天需",
+      "line": 3,
+      "heading_pdf_page": 10,
+      "pdf_pages": [
+        10
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "pdf_pages": [
+            10
+          ],
+          "text": "戶要牢關。物宜謹守。休往休來。終為長久。",
+          "printed_clauses": [
+            "戶要牢關",
+            "物宜謹守",
+            "休往休來",
+            "終為長久"
+          ],
+          "reading_notes": []
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "pdf_pages": [
+            10
+          ],
+          "text": "有阻亦有節。先憂後則昌。水邊難退步。進步不相傷。",
+          "printed_clauses": [
+            "有阻亦有節",
+            "先憂後則昌",
+            "水邊難退步",
+            "進步不相傷"
+          ],
+          "reading_notes": []
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "pdf_pages": [
+            10
+          ],
+          "text": "用剛求速進。寇盜自先招。謹慎終無敗。災消禍亦消。",
+          "printed_clauses": [
+            "用剛求速進",
+            "寇盜自先招",
+            "謹慎終無敗",
+            "災消禍亦消"
+          ],
+          "reading_notes": []
+        }
+      ]
+    },
+    {
+      "hexagram": "水天需",
+      "line": 4,
+      "heading_pdf_page": 10,
+      "pdf_pages": [
+        10
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "pdf_pages": [
+            10
+          ],
+          "text": "進不穩。退便休。宜守宜順。可望可求。",
+          "printed_clauses": [
+            "進不穩",
+            "退便休",
+            "宜守宜順",
+            "可望可求"
+          ],
+          "reading_notes": []
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "pdf_pages": [
+            10
+          ],
+          "text": "君子終升小人阻。提防征戰主離苦。前頭自有吉人迎。信在白羊成一楚。",
+          "printed_clauses": [
+            "君子終升小人阻",
+            "提防征戰主離苦",
+            "前頭自有吉人迎",
+            "信在白羊成一楚"
+          ],
+          "reading_notes": [
+            "白羊成一楚按原印字序保留，指代和语义待核；不据白羊指定星座、月份、日期或具体应期。"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "水天需",
+      "line": 5,
+      "heading_pdf_page": 10,
+      "pdf_pages": [
+        10
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "pdf_pages": [
+            10
+          ],
+          "text": "所需今已得。有欲儘從心。宴飲耽和樂。居亨吉慶臨。",
+          "printed_clauses": [
+            "所需今已得",
+            "有欲儘從心",
+            "宴飲耽和樂",
+            "居亨吉慶臨"
+          ],
+          "reading_notes": [
+            "居亨的亨暂读；与享的字形选择未完全解决，不能以通行词倒定。"
+          ],
+          "review_status": "single_reader_native_pixel_collation; glyph_choice_unresolved; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "pdf_pages": [
+            10
+          ],
+          "text": "鳳閣鸞臺去有家。亨衢進退莫咨嗟。桃溪咫尺青雲路。便見東風可散花。",
+          "printed_clauses": [
+            "鳳閣鸞臺去有家",
+            "亨衢進退莫咨嗟",
+            "桃溪咫尺青雲路",
+            "便見東風可散花"
+          ],
+          "reading_notes": [
+            "亨衢的亨暂读；享候选尚未完全排除，待独立复核，不擅据熟语改文。"
+          ],
+          "review_status": "single_reader_native_pixel_collation; glyph_choice_unresolved; independent_second_review_pending"
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "pdf_pages": [
+            10
+          ],
+          "text": "久歷撐波艇。乘風得到瀛。太平身職起。目下有來音。",
+          "printed_clauses": [
+            "久歷撐波艇",
+            "乘風得到瀛",
+            "太平身職起",
+            "目下有來音"
+          ],
+          "reading_notes": [
+            "太平身職起保留所见職字，不改成身識、身積等顺口读法。"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "水天需",
+      "line": 6,
+      "heading_pdf_page": 10,
+      "pdf_pages": [
+        10,
+        11
+      ],
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "pdf_pages": [
+            11
+          ],
+          "text": "人立危橋下。舟行起怒濤。兢兢未登地。思慮轉煎熬。",
+          "printed_clauses": [
+            "人立危橋下",
+            "舟行起怒濤",
+            "兢兢未登地",
+            "思慮轉煎熬"
+          ],
+          "reading_notes": []
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "pdf_pages": [
+            11
+          ],
+          "text": "期會三人至。成榮自敬之。得全名利日。恩澤四方施。",
+          "printed_clauses": [
+            "期會三人至",
+            "成榮自敬之",
+            "得全名利日",
+            "恩澤四方施"
+          ],
+          "reading_notes": []
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "pdf_pages": [
+            11
+          ],
+          "text": "先是身悲險。那逢意外憂。待客宜敬順。終吉免他求。",
+          "printed_clauses": [
+            "先是身悲險",
+            "那逢意外憂",
+            "待客宜敬順",
+            "終吉免他求"
+          ],
+          "reading_notes": [
+            "那逢意外憂保留原印那字，不据句义改成哪或却。"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 1,
+      "heading_pdf_page": 11,
+      "pdf_pages": [
+        11
+      ],
+      "heading_text": "訟卦初爻訣二首",
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "pdf_pages": [
+            11
+          ],
+          "text": "嘹喨征鴻獨出羣。高飛羽翼未離分。正宜奮起行前進。好個聲音處處聞。",
+          "printed_clauses": [
+            "嘹喨征鴻獨出羣",
+            "高飛羽翼未離分",
+            "正宜奮起行前進",
+            "好個聲音處處聞"
+          ],
+          "reading_notes": [
+            "原PDF嵌入的一位图像复核作嘹喨：第二字为口旁、右作亮，非嘵的堯旁。保留印本喨字，不改成无口旁的亮。前稿嘵撤回；仍为同一读者复核，独立复核未完成。"
+          ],
+          "review_status": "single_reader_embedded_pixel_recheck; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "pdf_pages": [
+            11
+          ],
+          "text": "處事宜中正。當知不可長。但當明辯訟。終是獲休祥。",
+          "printed_clauses": [
+            "處事宜中正",
+            "當知不可長",
+            "但當明辯訟",
+            "終是獲休祥"
+          ],
+          "reading_notes": []
+        }
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 2,
+      "heading_pdf_page": 11,
+      "pdf_pages": [
+        11
+      ],
+      "heading_text": "訟卦二爻訣三首",
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "pdf_pages": [
+            11
+          ],
+          "text": "目下皆雙怨。時間理未明。且宜先退讓。方可免災危。",
+          "printed_clauses": [
+            "目下皆雙怨",
+            "時間理未明",
+            "且宜先退讓",
+            "方可免災危"
+          ],
+          "reading_notes": [
+            "时间理未明按原读保留，未字否定不改成義明；皆雙怨保留所选双隹字形。"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "pdf_pages": [
+            11
+          ],
+          "text": "不進須當退。方無否塞憂。貴人相佑下。王事出奇留。",
+          "printed_clauses": [
+            "不進須當退",
+            "方無否塞憂",
+            "貴人相佑下",
+            "王事出奇留"
+          ],
+          "reading_notes": [
+            "原PDF完整佑／下／王／事栏复核，王为三横一竖，上方没有主字的点。先前王／主分歧据该像素选王；继承王原已存在，不计为新发现的旧文错误。独立复核未完成。"
+          ],
+          "review_status": "single_reader_embedded_pixel_recheck; independent_second_review_pending"
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "pdf_pages": [
+            11
+          ],
+          "text": "事不足。防反覆。月落寒江。一榮一辱。",
+          "printed_clauses": [
+            "事不足",
+            "防反覆",
+            "月落寒江",
+            "一榮一辱"
+          ],
+          "reading_notes": [
+            "按原印句读分为事不足、防反覆、月落寒江、一榮一辱；首稿一棹错误已撤回，继承一榮原已存在。"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 3,
+      "heading_pdf_page": 12,
+      "pdf_pages": [
+        12
+      ],
+      "heading_text": "訟卦三爻訣一首",
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "pdf_pages": [
+            12
+          ],
+          "text": "積德相隨便可期。庭前枯木鳳來棲。好將短事成長事。莫聽傍言說是非。",
+          "printed_clauses": [
+            "積德相隨便可期",
+            "庭前枯木鳳來棲",
+            "好將短事成長事",
+            "莫聽傍言說是非"
+          ],
+          "reading_notes": [
+            "原题訟卦三爻訣一首，实见其二及其三；保留三首和原题，不把原书计数改成三首，也不删诗满足一首。"
+          ]
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "pdf_pages": [
+            12
+          ],
+          "text": "運方興。笑語頻。降玉女。在河邊。",
+          "printed_clauses": [
+            "運方興",
+            "笑語頻",
+            "降玉女",
+            "在河邊"
+          ],
+          "reading_notes": []
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "pdf_pages": [
+            12
+          ],
+          "text": "守舊安居正。雖危獲吉亨。狂謀圖進用。枉費覺無功。",
+          "printed_clauses": [
+            "守舊安居正",
+            "雖危獲吉亨",
+            "狂謀圖進用",
+            "枉費覺無功"
+          ],
+          "reading_notes": [
+            "狂謀按可见犭王保留；源文首稿在謀错误在对照后撤回，继承狂字原已存在，不计为产品修复。"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 4,
+      "heading_pdf_page": 12,
+      "pdf_pages": [
+        12
+      ],
+      "heading_text": "訟卦四爻訣三首",
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "pdf_pages": [
+            12
+          ],
+          "text": "遇時方未利。詞辨未能寧。改變從貞吉。應須不失情。",
+          "printed_clauses": [
+            "遇時方未利",
+            "詞辨未能寧",
+            "改變從貞吉",
+            "應須不失情"
+          ],
+          "reading_notes": []
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "pdf_pages": [
+            12
+          ],
+          "text": "名懼親君位。安貞吉有餘。得人相瞻處。澤地有安居。",
+          "printed_clauses": [
+            "名懼親君位",
+            "安貞吉有餘",
+            "得人相瞻處",
+            "澤地有安居"
+          ],
+          "reading_notes": [
+            "原PDF嵌入像素复核懼字右上为双目，下为隹；与同页不須懽的艹、双口结构有别。本处保留名懼，撤回此前懋／懽候选，不以语句是否顺口代替字形判断。独立复核未完成。",
+            "相瞻与澤地按所见保留，不据旧相贈／擇地或顺口词替换。"
+          ],
+          "review_status": "single_reader_embedded_pixel_recheck; independent_second_review_pending"
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "pdf_pages": [
+            12
+          ],
+          "text": "風吹雲散月華明。枯木開花滿戶庭。舊恨新懷且休問。須知從此復安榮。",
+          "printed_clauses": [
+            "風吹雲散月華明",
+            "枯木開花滿戶庭",
+            "舊恨新懷且休問",
+            "須知從此復安榮"
+          ],
+          "reading_notes": []
+        }
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 5,
+      "heading_pdf_page": 12,
+      "pdf_pages": [
+        12
+      ],
+      "heading_text": "訟卦五爻訣三首",
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "pdf_pages": [
+            12
+          ],
+          "text": "心中從正道。聽訟得其平。公訟如逢此。公庭理必伸。",
+          "printed_clauses": [
+            "心中從正道",
+            "聽訟得其平",
+            "公訟如逢此",
+            "公庭理必伸"
+          ],
+          "reading_notes": []
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "pdf_pages": [
+            12
+          ],
+          "text": "元吉無迍事所宜。君尊臨下有功歸。策鞭可取木邊子。便見平生不負虧。",
+          "printed_clauses": [
+            "元吉無迍事所宜",
+            "君尊臨下有功歸",
+            "策鞭可取木邊子",
+            "便見平生不負虧"
+          ],
+          "reading_notes": [
+            "無迍保留辶屯字形，不改为无事或无逆等释义。"
+          ]
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "pdf_pages": [
+            12
+          ],
+          "text": "簷前鵲噪喜翩翩。憂慮潛消理自然。一人進兮一人退。末稍却有好姻緣。",
+          "printed_clauses": [
+            "簷前鵲噪喜翩翩",
+            "憂慮潛消理自然",
+            "一人進兮一人退",
+            "末稍却有好姻緣"
+          ],
+          "reading_notes": [
+            "原PDF完整像素中末字上横长、下横短，与同页遇時方未利的未字相反，选录末稍却。较早局部裁切截去上横，不能用来裁定该字。却字保留所见；末字不自行生成时段或姻缘结论。独立复核未完成。"
+          ],
+          "review_status": "single_reader_embedded_pixel_recheck; independent_second_review_pending"
+        }
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 6,
+      "heading_pdf_page": 12,
+      "pdf_pages": [
+        12,
+        13
+      ],
+      "heading_text": "訟卦六爻訣二首",
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "pdf_pages": [
+            12
+          ],
+          "text": "有錫不須懽。時當隱遁安。困來宜擇避。枯木奈嚴寒。",
+          "printed_clauses": [
+            "有錫不須懽",
+            "時當隱遁安",
+            "困來宜擇避",
+            "枯木奈嚴寒"
+          ],
+          "reading_notes": [
+            "原PDF嵌入像素中懽右作雚，可见艹与双口，区别于同页名懼的双目。教育部字典释懽同歡；本句不須懽不能再释为无需畏惧。前稿懼撤回，继承歡原有的喜乐义不作为新发现的旧文错误。独立复核未完成。",
+            "原PDF完整框内字可见木的横、竖及两斜笔，选困來，不作只有人部件的囚。首稿与继承困原已正确，前次暂选囚撤回。仍是同一读者复核，独立复核未完成。"
+          ],
+          "review_status": "single_reader_embedded_pixel_recheck; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "pdf_pages": [
+            13
+          ],
+          "text": "口啾啾。人事尚須憂。心戚戚。恍惚兩三頭。",
+          "printed_clauses": [
+            "口啾啾",
+            "人事尚須憂",
+            "心戚戚",
+            "恍惚兩三頭"
+          ],
+          "reading_notes": [
+            "第二首接13页，在師卦总诀前，不能混入師总诀或漏掉尾诗。"
+          ]
+        }
+      ]
+    },
+    {
+      "hexagram": "地水師",
+      "line": 1,
+      "heading_pdf_page": 13,
+      "pdf_pages": [
+        13
+      ],
+      "heading_text": "師卦初爻訣三首",
+      "printed_heading_count": 3,
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "出律方無咎。隄防破克功。一輪明月蝕。自覺否藏凶。",
+          "pdf_pages": [
+            13
+          ],
+          "printed_clauses": [
+            "出律方無咎",
+            "隄防破克功",
+            "一輪明月蝕",
+            "自覺否藏凶"
+          ],
+          "reading_notes": [
+            "隄防、破克功、否藏凶依原頁完整字欄保留；不因古經常見否臧而自動刪去艹或改寫此印。獨立復核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "心鬱鬱。事勿勿。勞而未有功。危橋立盡休回首。此去青雲路可通。",
+          "pdf_pages": [
+            13
+          ],
+          "printed_clauses": [
+            "心鬱鬱",
+            "事勿勿",
+            "勞而未有功",
+            "危橋立盡休回首",
+            "此去青雲路可通"
+          ],
+          "reading_notes": [
+            "事勿勿、勞而未有功依原生像素保留，非匆匆、榮而；危橋立盡休回首按完整欄保留，不以順口詞改字。鬱鬱映射為Unicode，非逐筆復刻；獨立復核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "text": "凡百事當謀。善始可善終。師道宜和衆。猶憂失律凶。",
+          "pdf_pages": [
+            13
+          ],
+          "printed_clauses": [
+            "凡百事當謀",
+            "善始可善終",
+            "師道宜和衆",
+            "猶憂失律凶"
+          ],
+          "reading_notes": [],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        }
+      ]
+    },
+    {
+      "hexagram": "地水師",
+      "line": 2,
+      "heading_pdf_page": 13,
+      "pdf_pages": [
+        13
+      ],
+      "heading_text": "師卦二爻訣二首",
+      "printed_heading_count": 2,
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "未能堪服衆。方遇貴人持。別有非常道。乘龍到玉墀。",
+          "pdf_pages": [
+            13
+          ],
+          "printed_clauses": [
+            "未能堪服衆",
+            "方遇貴人持",
+            "別有非常道",
+            "乘龍到玉墀"
+          ],
+          "reading_notes": [
+            "未能按原生像素未字選錄，舊朱能不符；堪為繼承原有選字，不計新增舊文缺陷。首稿拯撤回。暫選土甚的堪，但教育部拯字另收土旁𡏈，完整異體家族及本字印形仍待獨立覆核，不能由土旁一項宣布全無疑義。"
+          ],
+          "review_status": "single_reader_visual_collation_with_unresolved_variant_family; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "錫命從天降。承之寵澤貞。師權當健德。佳信發天津。",
+          "pdf_pages": [
+            13
+          ],
+          "printed_clauses": [
+            "錫命從天降",
+            "承之寵澤貞",
+            "師權當健德",
+            "佳信發天津"
+          ],
+          "reading_notes": [
+            "健德保留所見亻，不依熟悉詞改建德。天津是原文用語，不生成個人目的地或行程。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        }
+      ]
+    },
+    {
+      "hexagram": "地水師",
+      "line": 3,
+      "heading_pdf_page": 13,
+      "pdf_pages": [
+        13,
+        14
+      ],
+      "heading_text": "師卦三爻訣三首",
+      "printed_heading_count": 3,
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "六三爻不定。雖吉也成凶。若也能專一。終當立大功。",
+          "pdf_pages": [
+            13
+          ],
+          "printed_clauses": [
+            "六三爻不定",
+            "雖吉也成凶",
+            "若也能專一",
+            "終當立大功"
+          ],
+          "reading_notes": [],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "進退皆無位。輿尸出衆凶。馬奔坤地遠。天道又疑東。",
+          "pdf_pages": [
+            14
+          ],
+          "printed_clauses": [
+            "進退皆無位",
+            "輿尸出衆凶",
+            "馬奔坤地遠",
+            "天道又疑東"
+          ],
+          "reading_notes": [
+            "坤地與疑東按所見暫錄，不以方位常識改西或以吉凶句型改凶。尸／屍待字形覆核；原句不應用為個人災禍斷言。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "text": "青蠅終復舊。枝上果生風。莫為一時利。重為此象凶。",
+          "pdf_pages": [
+            14
+          ],
+          "printed_clauses": [
+            "青蠅終復舊",
+            "枝上果生風",
+            "莫為一時利",
+            "重為此象凶"
+          ],
+          "reading_notes": [
+            "青蠅依虫旁黽形保留，不作舊青氈；果生風、重為此象凶按原欄錄，不為順句改詞或生成個人災禍斷言。獨立復核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        }
+      ]
+    },
+    {
+      "hexagram": "地水師",
+      "line": 4,
+      "heading_pdf_page": 14,
+      "pdf_pages": [
+        14
+      ],
+      "heading_text": "師卦四爻訣二首",
+      "printed_heading_count": 2,
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "擇地堪居左。師行左次貞。牛行西北地。觸目自光輝。",
+          "pdf_pages": [
+            14
+          ],
+          "printed_clauses": [
+            "擇地堪居左",
+            "師行左次貞",
+            "牛行西北地",
+            "觸目自光輝"
+          ],
+          "reading_notes": [
+            "左與貞為原印點號之前的句末字，不把左移給師行或把貞移給牛行以求順口；西北不自動成為個人方位建議。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "進行退。退行進。進退好隨機。眼前人人不信。",
+          "pdf_pages": [
+            14
+          ],
+          "printed_clauses": [
+            "進行退",
+            "退行進",
+            "進退好隨機",
+            "眼前人人不信"
+          ],
+          "reading_notes": [
+            "原頁眼前人人不信有連續兩個人，不按舊文本刪一字；進行退、退行進的原印次與句界全保留。獨立復核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        }
+      ]
+    },
+    {
+      "hexagram": "地水師",
+      "line": 5,
+      "heading_pdf_page": 14,
+      "pdf_pages": [
+        14
+      ],
+      "heading_text": "師卦五爻訣二首",
+      "printed_heading_count": 2,
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "禽作田禾殃入邦。皆當繫縛執思傷。一朝天錫佳音至。功業階勳冠萬邦。",
+          "pdf_pages": [
+            14
+          ],
+          "printed_clauses": [
+            "禽作田禾殃入邦",
+            "皆當繫縛執思傷",
+            "一朝天錫佳音至",
+            "功業階勳冠萬邦"
+          ],
+          "reading_notes": [
+            "原印點號在邦後，殃後無點；首稿錯將句界移到殃後並把入暫作人，撤回。保留殃入邦及執思傷，不為順句改寫。",
+            "完整欄可見階的阝皆、勳的熏力形，撤回巍巍；舊階勛的詞彙原已存在，不計新增舊文詞義缺陷。勳／勛為所選字形編碼，獨立復核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "恩成怨。怨成恩。和合兩相番。突咎恐外生。",
+          "pdf_pages": [
+            14
+          ],
+          "printed_clauses": [
+            "恩成怨",
+            "怨成恩",
+            "和合兩相番",
+            "突咎恐外生"
+          ],
+          "reading_notes": [
+            "本輪仍暫錄突咎，候選灾咎／災咎／突咨保留；原生像素的上部與下部筆形尚待獨立裁定。教育部收灾為災異體只能說明字形家族，不能單獨證明本印一定作灾；不從舊災咎或順口成語改字。",
+            "兩相番依原印次與點號保留，不改兩相翻。未決詞不生成個人災禍或確定事件。"
+          ],
+          "review_status": "single_reader_visual_collation_with_unresolved_glyph; independent_second_review_pending"
+        }
+      ]
+    },
+    {
+      "hexagram": "地水師",
+      "line": 6,
+      "heading_pdf_page": 14,
+      "pdf_pages": [
+        14
+      ],
+      "heading_text": "師卦六爻訣二首",
+      "printed_heading_count": 2,
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "君子當思吉。爻辭屬小人。邦保民可保。邦固自咸寧。",
+          "pdf_pages": [
+            14
+          ],
+          "printed_clauses": [
+            "君子當思吉",
+            "爻辭屬小人",
+            "邦保民可保",
+            "邦固自咸寧"
+          ],
+          "reading_notes": [
+            "爻辭屬小人按尸部禺形錄，不作舊厲；邦保民可保、邦固自咸寧依原欄錄，不改寫順口句。獨立復核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "吉士時逢泰。承家日漸豐。小人當此象。得寵反成凶。",
+          "pdf_pages": [
+            14
+          ],
+          "printed_clauses": [
+            "吉士時逢泰",
+            "承家日漸豐",
+            "小人當此象",
+            "得寵反成凶"
+          ],
+          "reading_notes": [],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        }
+      ]
+    },
+    {
+      "line": 1,
+      "heading_pdf_page": 15,
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "比貴相親輔。雖常盡信誠。所為元有素。他吉亦相成。",
+          "pdf_pages": [
+            15
+          ],
+          "printed_clauses": [
+            "比貴相親輔",
+            "雖常盡信誠",
+            "所為元有素",
+            "他吉亦相成"
+          ],
+          "reading_notes": [
+            "常、元依原欄；首稿當撤回，繼承常原已正確，不計產品新缺陷。獨立覆核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "一人去。一人來。清風明月兩疑猜。獲得金鱗下釣臺。",
+          "pdf_pages": [
+            15
+          ],
+          "printed_clauses": [
+            "一人去",
+            "一人來",
+            "清風明月兩疑猜",
+            "獲得金鱗下釣臺"
+          ],
+          "reading_notes": [
+            "所有原印次與句界保留，未自動擇用詩首。獨立覆核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        }
+      ],
+      "hexagram": "水地比",
+      "heading_text": "比卦初爻訣二首",
+      "printed_heading_count": 2,
+      "pdf_pages": [
+        15
+      ]
+    },
+    {
+      "line": 2,
+      "heading_pdf_page": 15,
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "己身無過失。家宅亦安寧。所得惟中正。安然自吉亨。",
+          "pdf_pages": [
+            15
+          ],
+          "printed_clauses": [
+            "己身無過失",
+            "家宅亦安寧",
+            "所得惟中正",
+            "安然自吉亨"
+          ],
+          "reading_notes": [
+            "惟中正依所見忄錄，不作繼承帷；吉亨原句保留。獨立覆核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "遇險方成福。逢凶皆可升。佳珍良匠琢。得寶在逡巡。",
+          "pdf_pages": [
+            15
+          ],
+          "printed_clauses": [
+            "遇險方成福",
+            "逢凶皆可升",
+            "佳珍良匠琢",
+            "得寶在逡巡"
+          ],
+          "reading_notes": [
+            "逡巡依原印辶夋選字，不作繼承駿巡；佳珍不因熟悉佳人才改字。獨立覆核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "text": "老蚌產珠。石中懷玉。風靜波平。雲中人鹿。",
+          "pdf_pages": [
+            15
+          ],
+          "printed_clauses": [
+            "老蚌產珠",
+            "石中懷玉",
+            "風靜波平",
+            "雲中人鹿"
+          ],
+          "reading_notes": [
+            "風靜波平依原欄，不作繼承海穩波平；人鹿可見鹿形，首稿陸及阝說明撤回，繼承鹿原已正確。怪句不換成語義較順的雲中人降。獨立覆核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        }
+      ],
+      "hexagram": "水地比",
+      "heading_text": "比卦二爻訣三首",
+      "printed_heading_count": 3,
+      "pdf_pages": [
+        15
+      ]
+    },
+    {
+      "line": 3,
+      "heading_pdf_page": 15,
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "蹇難先謀避。行舟風雨多。片帆搖逆浪。去計苦蹉跎。",
+          "pdf_pages": [
+            15
+          ],
+          "printed_clauses": [
+            "蹇難先謀避",
+            "行舟風雨多",
+            "片帆搖逆浪",
+            "去計苦蹉跎"
+          ],
+          "reading_notes": [
+            "蹇難、搖逆浪與蹉跎依完整原欄；首稿嗟撤回，繼承蹉原已正確，搖不作繼承撐。獨立覆核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "pdf_pages": [
+            15
+          ],
+          "text": "無端風雨欺春去。落盡枝頭桃李花。枕畔有人歌且笑。教君心緒亂如麻。",
+          "printed_clauses": [
+            "無端風雨欺春去",
+            "落盡枝頭桃李花",
+            "枕畔有人歌且笑",
+            "教君心緒亂如麻"
+          ],
+          "reading_notes": [
+            "原印其二確實存在，初稿漏讀撤回；全組是三首，繼承原有此詩，不計產品新增缺漏。心緒為所選Unicode字形，非逐筆復刻。獨立覆核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "text": "比貴相親附。皆非可信人。隄防為鬼賊。侵害反傷身。",
+          "pdf_pages": [
+            15
+          ],
+          "printed_clauses": [
+            "比貴相親附",
+            "皆非可信人",
+            "隄防為鬼賊",
+            "侵害反傷身"
+          ],
+          "reading_notes": [
+            "原印其三，首稿誤置其二撤回；隄防暫選阝旁隄，堤仍待獨立覆核，不採繼承提防去消除疑讀。"
+          ],
+          "review_status": "single_reader_visual_collation_with_unresolved_glyph; independent_second_review_pending"
+        }
+      ],
+      "hexagram": "水地比",
+      "heading_text": "比卦三爻訣三首",
+      "printed_heading_count": 3,
+      "pdf_pages": [
+        15
+      ]
+    },
+    {
+      "line": 4,
+      "heading_pdf_page": 15,
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "猿猴脚信至。人國利賓亨。外比貞無咎。移根本自榮。",
+          "pdf_pages": [
+            16
+          ],
+          "printed_clauses": [
+            "猿猴脚信至",
+            "人國利賓亨",
+            "外比貞無咎",
+            "移根本自榮"
+          ],
+          "reading_notes": [
+            "猿猴脚信依原印暫錄猿及脚，不把怪句改回繼承羊猴銜信或較順腳信；人國暫選人，入仍為未決候選。無依原頁所見保留；原先暫錄无撤回，不能以Unicode映射或逐筆轉錄之限替代本印字形。"
+          ],
+          "review_status": "single_reader_visual_collation_with_unresolved_glyph; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "東風催促便登舟。歌笑徘徊古渡頭。雲外佳音終有望。錦鱗釣得在金鈎。",
+          "pdf_pages": [
+            16
+          ],
+          "printed_clauses": [
+            "東風催促便登舟",
+            "歌笑徘徊古渡頭",
+            "雲外佳音終有望",
+            "錦鱗釣得在金鈎"
+          ],
+          "reading_notes": [
+            "金鈎保留所選金句形，不因規範字鉤改寫印本；原頁印次與句界保留。獨立覆核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "text": "所交宜謹擇。貞正可無虞。親附賢君子。優游吉自如。",
+          "pdf_pages": [
+            16
+          ],
+          "printed_clauses": [
+            "所交宜謹擇",
+            "貞正可無虞",
+            "親附賢君子",
+            "優游吉自如"
+          ],
+          "reading_notes": [
+            "三首正文全在16，15只有組標題，不能以標題頁代替詩文頁。無依原頁所見保留；原先暫錄无撤回，不能以Unicode映射或逐筆轉錄之限替代本印字形。獨立覆核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        }
+      ],
+      "hexagram": "水地比",
+      "heading_text": "比卦四爻訣三首",
+      "printed_heading_count": 3,
+      "pdf_pages": [
+        15,
+        16
+      ]
+    },
+    {
+      "line": 5,
+      "heading_pdf_page": 16,
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "一得其中一失期。當時何用苦傷悲。地中雷震隨時起。詢問白羊歸未遲。",
+          "pdf_pages": [
+            16
+          ],
+          "printed_clauses": [
+            "一得其中一失期",
+            "當時何用苦傷悲",
+            "地中雷震隨時起",
+            "詢問白羊歸未遲"
+          ],
+          "reading_notes": [
+            "詢問依右旬形，首稿試撤回，繼承詢原已正確；白羊是來源詞，不轉為星座、生肖、日期或年齡。獨立覆核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "舍一人。就一人。明月上層樓。光輝萬里秋。",
+          "pdf_pages": [
+            16
+          ],
+          "printed_clauses": [
+            "舍一人",
+            "就一人",
+            "明月上層樓",
+            "光輝萬里秋"
+          ],
+          "reading_notes": [
+            "第一人及第二人後均有圈點；首稿六字合一分句撤回，繼承分句原已正確，不能按節奏移動原印句界。獨立覆核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        }
+      ],
+      "hexagram": "水地比",
+      "heading_text": "比卦五爻訣二首",
+      "printed_heading_count": 2,
+      "pdf_pages": [
+        16
+      ]
+    },
+    {
+      "line": 6,
+      "heading_pdf_page": 16,
+      "poems": [
+        {
+          "index": 1,
+          "printed_label": null,
+          "text": "有始無終實可嗟。田頭方足未堪誇。跨鹿無足失馬放。黑雲外人更脱靴。",
+          "pdf_pages": [
+            16
+          ],
+          "printed_clauses": [
+            "有始無終實可嗟",
+            "田頭方足未堪誇",
+            "跨鹿無足失馬放",
+            "黑雲外人更脱靴"
+          ],
+          "reading_notes": [
+            "田頭方足、跨鹿無足失馬放、黑雲外人依本印完整欄保留，不因難解改寫；脱為所選Unicode字形，非逐筆復刻。獨立覆核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 2,
+          "printed_label": "其二",
+          "text": "獨行居北極。無援更無依。始善終方吉。終凶悔莫遲。",
+          "pdf_pages": [
+            16
+          ],
+          "printed_clauses": [
+            "獨行居北極",
+            "無援更無依",
+            "始善終方吉",
+            "終凶悔莫遲"
+          ],
+          "reading_notes": [
+            "終凶悔莫遲依原欄辶及犀形選遲，不以繼承逼替換；全詩與印次保留。獨立覆核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        },
+        {
+          "index": 3,
+          "printed_label": "其三",
+          "text": "喜未穩。悲已遭。驟雨狂風號木古。人人盡道不堅牢。",
+          "pdf_pages": [
+            16
+          ],
+          "printed_clauses": [
+            "喜未穩",
+            "悲已遭",
+            "驟雨狂風號木古",
+            "人人盡道不堅牢"
+          ],
+          "reading_notes": [
+            "喜未穩、悲已遭後均有原印圈點；號木古不按較順語意改為另一詞，也不生成實際事件或災禍斷言。獨立覆核未完成。"
+          ],
+          "review_status": "single_reader_visual_collation; independent_second_review_pending"
+        }
+      ],
+      "hexagram": "水地比",
+      "heading_text": "比卦六爻訣三首",
+      "printed_heading_count": 3,
+      "pdf_pages": [
+        16
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "naoj_hutime_declared_bibliography_20261024_v1",
+  "provider_statements": [
+    {
+      "provider": "NAOJ",
+      "source_url": "https://eco.mtk.nao.ac.jp/koyomi/wiki/C2C0B1A2C2C0CDDBCEF12FC6FCCBDCA4CECEF1C6FCA5C7A1BCA5BFA5D9A1BCA5B9.html",
+      "source_html_sha256": "11ec8b833c5fca68c5c62c56762ae6e48020ed1cc3ecde6af6eeceefdf60bae7",
+      "source_bytes": 102703,
+      "source_encoding": "euc_jp",
+      "locator": "Overview first bullet and footnote *1",
+      "selected_bibliographic_titles": ["日本暦日原典"],
+      "author_literal": "内田正男",
+      "edition_in_selected_statement": null,
+      "statement_paraphrase": "The provider says it calculates calendars using this work and almanacs, and compares/corrects calculations against this work and other material."
+    },
+    {
+      "provider": "HuTime",
+      "source_url": "https://www.hutime.jp/basicdata/calendar/calendars/Japanese.html",
+      "source_html_sha256": "94c27aff74baf3cf25ad907e93347129eea9d34c6182f613881923f464895bb2",
+      "source_bytes": 12658,
+      "source_encoding": "utf-8",
+      "locator": "典拠 / 暦日, second period",
+      "selected_bibliographic_titles": ["日本暦日原典"],
+      "author_literal": "内田正男",
+      "edition_in_selected_statement": "第四版",
+      "declared_period_literal": "允恭天皇34年1月1日から明治5年12月2日まで",
+      "statement_paraphrase": "The provider assigns intercalary months and month lengths in this period according to the named work. This concerns the historical Japanese calendar, not the separate modern 1002.1 continuation."
+    }
+  ],
+  "shared_bibliographic_titles": ["日本暦日原典"],
+  "statement_snapshot_date": "2026-10-24",
+  "source_books_independently_collated": false,
+  "same_physical_edition_established": false,
+  "per_record_dependency_established": false,
+  "independent_whole_range_verification": false,
+  "independent_historical_observations_added": 0,
+  "scope": "Current provider-declared bibliographic overlap only. Does not prove identical algorithms, editions, all input records, historical day boundaries or independent physical verification. Original frozen calendar facts remain unchanged."
+}

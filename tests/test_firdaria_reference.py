@@ -9,7 +9,6 @@ from calendar import monthrange
 from datetime import datetime, timedelta, timezone
 from fractions import Fraction
 from pathlib import Path
-from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -18,7 +17,7 @@ from dateutil import tz
 from fatebridge.core.astro.birth import AstroBirthInfo
 from fatebridge.core.predictive.firdaria import (
     _calendar_anniversary,
-    build_firdaria_payload,
+    build_firdaria_for_sect,
 )
 
 VECTORS = json.loads(
@@ -96,11 +95,9 @@ def _production(birth, sect, target=None, **options):
         local_datetime=birth,
         utc_datetime=birth.astimezone(UTC),
     )
-    sun_house = "Tenth_House" if sect == "day" else "Fifth_House"
-    subject = SimpleNamespace(sun=SimpleNamespace(house=sun_house))
-    return build_firdaria_payload(
+    return build_firdaria_for_sect(
         info,
-        subject,
+        sect,
         analysis_datetime=target if target is not None else birth,
         **options,
     )
@@ -398,3 +395,25 @@ def test_reference_minute_display_always_truncates_without_mutating_instant(
         "2003-03-18 12:48+08:00"
     )
     assert exact.isoformat() == original
+
+
+@pytest.mark.parametrize("hour,sect", [(6, "day"), (0, "night")])
+def test_native_horizon_sect_feeds_the_explicit_calendar_arithmetic(hour, sect):
+    from fatebridge.core.astro.birth import build_astro_birth_info
+    from fatebridge.core.predictive._common import build_natal_subject
+    from fatebridge.core.predictive.firdaria import build_firdaria_payload
+
+    info = build_astro_birth_info(
+        birth_year=2024,
+        birth_month=3,
+        birth_day=20,
+        birth_hour=hour,
+        birth_minute=30,
+        birth_timezone="UTC",
+        birth_longitude=0,
+        birth_latitude=51.5,
+    )
+    subject = build_natal_subject(info, house_system="W")
+    assert build_firdaria_payload(
+        info, subject, analysis_datetime=info.local_datetime
+    ) == build_firdaria_for_sect(info, sect, analysis_datetime=info.local_datetime)

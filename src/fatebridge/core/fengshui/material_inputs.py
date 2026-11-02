@@ -4,8 +4,7 @@ from typing import Literal, Optional
 
 from pydantic import Field, StrictBool, field_validator, model_validator
 
-from fatebridge.core.requests.base import _DeferredModel
-
+from .numeric_inputs import FengshuiInput as _DeferredModel
 from .workstation_inputs import MaterialApplication
 
 Material = Literal[

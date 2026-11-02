@@ -1,0 +1,153 @@
+{
+  "id": "naj_ming_limits_v1",
+  "version": "1.0.0",
+  "source_url": "https://www.digital.archives.go.jp/item/4468520",
+  "printed_volume": "三",
+  "manual_reader_count": 1,
+  "daxian": {
+    "frame": 80,
+    "section": "安大限訣",
+    "quote": "陽男陰女從命前一宮起是父母宮 陰男陽女從命後一宮起是兄弟宮",
+    "initial_palace_by_direction": {
+      "forward": "父母宫",
+      "reverse": "兄弟宫"
+    },
+    "direction_by_stem_polarity_and_gender": {
+      "yang_male": "forward",
+      "yin_female": "forward",
+      "yin_male": "reverse",
+      "yang_female": "reverse"
+    },
+    "age_basis": "Adopt the visible bureau-associated ages as first-decade ages and ten-year periods. Historical age/year boundary convention is not independently certified here."
+  },
+  "visible_ages": [
+    {
+      "bureau": 2,
+      "frame": 85,
+      "quote": "坎水宮中二歲行"
+    },
+    {
+      "bureau": 3,
+      "frame": 85,
+      "quote": "生逢木宮三歲將"
+    },
+    {
+      "bureau": 4,
+      "frame": 84,
+      "quote": "紫微金宮四歲花"
+    },
+    {
+      "bureau": 5,
+      "frame": 86,
+      "quote": "戊土五歲居其中"
+    },
+    {
+      "bureau": 6,
+      "frame": 86,
+      "quote": "離火宮中六歲奇"
+    }
+  ],
+  "xiaoxian": {
+    "frame": 80,
+    "section": "安小限訣",
+    "quote": "不論陰陽男俱順數 不論陰陽女俱逆數 寅午戌人起辰宮 申子辰人起戌宮 巳酉丑人起未宮 亥卯未人起丑宮",
+    "anchors": [
+      {
+        "year_branches": "寅午戌",
+        "branch": "辰"
+      },
+      {
+        "year_branches": "申子辰",
+        "branch": "戌"
+      },
+      {
+        "year_branches": "巳酉丑",
+        "branch": "未"
+      },
+      {
+        "year_branches": "亥卯未",
+        "branch": "丑"
+      }
+    ],
+    "direction_by_gender": {
+      "男": "forward",
+      "女": "reverse"
+    },
+    "scope": "Positions conditional on supplied age ordinal, with one as first step. The modern lunar-new-year age counter is an explicit separate assumption."
+  },
+  "doujun": {
+    "frame": 79,
+    "section": "安斗君訣",
+    "quote": "於流年太歲宮起正月逆至本生月又從本生月起子順數至本生時安斗君",
+    "scope": "Dou Jun position only, conditional on ordinary birth month and hour; no stated leap rule, nor a full flowing month/day/hour or transformation system."
+  },
+  "fire_bell": {
+    "frame": 76,
+    "section": "安火鈴二星訣",
+    "quote": "寅午戌人丑卯方 申子辰人寅戌揚 巳酉丑人卯戌位 亥卯未人酉戌房",
+    "pairs": [
+      {
+        "year_branches": "寅午戌",
+        "fire": "丑",
+        "bell": "卯"
+      },
+      {
+        "year_branches": "申子辰",
+        "fire": "寅",
+        "bell": "戌"
+      },
+      {
+        "year_branches": "巳酉丑",
+        "fire": "卯",
+        "bell": "戌"
+      },
+      {
+        "year_branches": "亥卯未",
+        "fire": "酉",
+        "bell": "戌"
+      }
+    ],
+    "adopted_reading": "year_branch_only_no_birth_hour_progression",
+    "unique_hour_interpretation_certified": false,
+    "reading_support": "author-preface.json"
+  },
+  "childhood": {
+    "frame": 80,
+    "section": "安童限訣",
+    "quote": "一命二財三疾厄 四妻五福六官祿 餘年一派順流行 十五命宮看端的",
+    "first_six_palaces": [
+      "命宫",
+      "财帛宫",
+      "疾厄宫",
+      "夫妻宫",
+      "福德宫",
+      "官禄宫"
+    ],
+    "scope": "Only six explicit ordinal palace labels; no certification of using this record as a substitute for pre-decade scope, nor of later childhood positions."
+  },
+  "modern_reading_support": {
+    "id": "he_zhongcai_preface_1991",
+    "title": "紫微斗數全書講義",
+    "authors": [
+      "何仲財",
+      "莊雪櫻"
+    ],
+    "publisher": "武陵出版社",
+    "publication_date": "1991-06-01",
+    "isbn": "9573503220",
+    "url": "https://www.chinyuan.com.tw/all_book/more?id=785",
+    "source_kind": "author_preface_reproduced_by_bookseller",
+    "short_quotes": [
+      "本書由兄弟宮、父母宮起大限",
+      "本書以生年支安之"
+    ],
+    "scope": "Author describes his own edition reading, corroborating the existence of the chosen interpretation; not proof of every Ming-edition rule or empirical accuracy."
+  },
+  "limits": [
+    "One manual reader of one Ming edition. No expert double adjudication or whole-book acceptance.",
+    "The quoted fire/bell verse does not explicitly say there is or is not a birth-hour walk. A year-only reading is selected and supported by a separately identified author preface; no unique historical interpretation claim.",
+    "Normal-month Dou Jun is compared; leap birth months and all downstream flowing periods remain separately unverified.",
+    "Lunar-new-year age convention and scope transformations still include explicit software assumptions.",
+    "Modern author accuracy claims are not used as predictive evidence."
+  ]
+}

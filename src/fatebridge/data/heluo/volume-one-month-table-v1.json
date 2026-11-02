@@ -1,0 +1,465 @@
+{
+  "corpus_id": "heluo_wenming_volume_one_month_table_v1",
+  "version": "1.0.0",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "source_pdf_sha256": "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c",
+  "section": "八宮所屬",
+  "pdf_pages": [
+    17,
+    18,
+    19
+  ],
+  "review_status": "single_visual_review; independent_second_review_pending",
+  "reviewed_at_utc": "2026-10-25T14:44:36.751772+00:00",
+  "development_disclosure": "Transcribed after exploratory exposure to existing intro readings; not a blind holdout. Jin first low-resolution guess12 corrected to10 on 600dpi detail before production edits; Jie7 found on original-size crop. All64 retained. No independent second reviewer.",
+  "assigned_months": [
+    {
+      "gua": "乾為天",
+      "palace": "乾",
+      "month": 4,
+      "page": 17,
+      "literal": "乾為天四月"
+    },
+    {
+      "gua": "天風姤",
+      "palace": "乾",
+      "month": 5,
+      "page": 17,
+      "literal": "天風姤五月"
+    },
+    {
+      "gua": "天山遯",
+      "palace": "乾",
+      "month": 6,
+      "page": 17,
+      "literal": "天山遯六月"
+    },
+    {
+      "gua": "天地否",
+      "palace": "乾",
+      "month": 7,
+      "page": 17,
+      "literal": "天地否七月"
+    },
+    {
+      "gua": "風地觀",
+      "palace": "乾",
+      "month": 8,
+      "page": 17,
+      "literal": "風地觀八月"
+    },
+    {
+      "gua": "山地剝",
+      "palace": "乾",
+      "month": 9,
+      "page": 17,
+      "literal": "山地剝九月"
+    },
+    {
+      "gua": "火地晉",
+      "palace": "乾",
+      "month": 10,
+      "page": 17,
+      "literal": "火地晉十月"
+    },
+    {
+      "gua": "火天大有",
+      "palace": "乾",
+      "month": 1,
+      "page": 17,
+      "literal": "火天大有正月"
+    },
+    {
+      "gua": "坎為水",
+      "palace": "坎",
+      "month": 10,
+      "page": 18,
+      "literal": "坎為水十月"
+    },
+    {
+      "gua": "水澤節",
+      "palace": "坎",
+      "month": 7,
+      "page": 18,
+      "literal": "水澤節七月"
+    },
+    {
+      "gua": "水雷屯",
+      "palace": "坎",
+      "month": 6,
+      "page": 18,
+      "literal": "水雷屯六月"
+    },
+    {
+      "gua": "水火既濟",
+      "palace": "坎",
+      "month": 1,
+      "page": 18,
+      "literal": "水火既濟正月"
+    },
+    {
+      "gua": "澤火革",
+      "palace": "坎",
+      "month": 2,
+      "page": 18,
+      "literal": "澤火革二月"
+    },
+    {
+      "gua": "雷火豐",
+      "palace": "坎",
+      "month": 9,
+      "page": 18,
+      "literal": "雷火豐九月"
+    },
+    {
+      "gua": "地火明夷",
+      "palace": "坎",
+      "month": 8,
+      "page": 18,
+      "literal": "地火明夷八月"
+    },
+    {
+      "gua": "地水師",
+      "palace": "坎",
+      "month": 7,
+      "page": 18,
+      "literal": "地水師七月"
+    },
+    {
+      "gua": "艮為山",
+      "palace": "艮",
+      "month": 4,
+      "page": 18,
+      "literal": "艮為山四月"
+    },
+    {
+      "gua": "山火賁",
+      "palace": "艮",
+      "month": 11,
+      "page": 18,
+      "literal": "山火賁十一月"
+    },
+    {
+      "gua": "山天大畜",
+      "palace": "艮",
+      "month": 12,
+      "page": 18,
+      "literal": "山天大畜十二月"
+    },
+    {
+      "gua": "山澤損",
+      "palace": "艮",
+      "month": 7,
+      "page": 18,
+      "literal": "山澤損七月"
+    },
+    {
+      "gua": "火澤睽",
+      "palace": "艮",
+      "month": 3,
+      "page": 18,
+      "literal": "火澤睽三月"
+    },
+    {
+      "gua": "天澤履",
+      "palace": "艮",
+      "month": 3,
+      "page": 18,
+      "literal": "天澤履三月"
+    },
+    {
+      "gua": "風澤中孚",
+      "palace": "艮",
+      "month": 8,
+      "page": 18,
+      "literal": "風澤中孚八月"
+    },
+    {
+      "gua": "風山漸",
+      "palace": "艮",
+      "month": 1,
+      "page": 18,
+      "literal": "風山漸正月"
+    },
+    {
+      "gua": "震為雷",
+      "palace": "震",
+      "month": 12,
+      "page": 18,
+      "literal": "震為雷十二月"
+    },
+    {
+      "gua": "雷地豫",
+      "palace": "震",
+      "month": 5,
+      "page": 18,
+      "literal": "雷地豫五月"
+    },
+    {
+      "gua": "雷水解",
+      "palace": "震",
+      "month": 12,
+      "page": 18,
+      "literal": "雷水解十二月"
+    },
+    {
+      "gua": "雷風恆",
+      "palace": "震",
+      "month": 1,
+      "page": 18,
+      "literal": "雷風恆正月"
+    },
+    {
+      "gua": "地風升",
+      "palace": "震",
+      "month": 8,
+      "page": 18,
+      "literal": "地風升八月"
+    },
+    {
+      "gua": "水風井",
+      "palace": "震",
+      "month": 3,
+      "page": 18,
+      "literal": "水風井三月"
+    },
+    {
+      "gua": "澤風大過",
+      "palace": "震",
+      "month": 2,
+      "page": 18,
+      "literal": "澤風大過二月"
+    },
+    {
+      "gua": "澤雷隨",
+      "palace": "震",
+      "month": 7,
+      "page": 18,
+      "literal": "澤雷隨七月"
+    },
+    {
+      "gua": "巽為風",
+      "palace": "巽",
+      "month": 4,
+      "page": 18,
+      "literal": "巽為風四月"
+    },
+    {
+      "gua": "風天小畜",
+      "palace": "巽",
+      "month": 11,
+      "page": 18,
+      "literal": "風天小畜十一月"
+    },
+    {
+      "gua": "風火家人",
+      "palace": "巽",
+      "month": 6,
+      "page": 18,
+      "literal": "風火家人六月"
+    },
+    {
+      "gua": "風雷益",
+      "palace": "巽",
+      "month": 7,
+      "page": 18,
+      "literal": "風雷益七月"
+    },
+    {
+      "gua": "天雷無妄",
+      "palace": "巽",
+      "month": 8,
+      "page": 18,
+      "literal": "天雷無妄八月"
+    },
+    {
+      "gua": "火雷噬嗑",
+      "palace": "巽",
+      "month": 9,
+      "page": 18,
+      "literal": "火雷噬嗑九月"
+    },
+    {
+      "gua": "山雷頤",
+      "palace": "巽",
+      "month": 8,
+      "page": 18,
+      "literal": "山雷頤八月"
+    },
+    {
+      "gua": "山風蠱",
+      "palace": "巽",
+      "month": 1,
+      "page": 18,
+      "literal": "山風蠱正月"
+    },
+    {
+      "gua": "離為火",
+      "palace": "離",
+      "month": 4,
+      "page": 18,
+      "literal": "離為火四月"
+    },
+    {
+      "gua": "火山旅",
+      "palace": "離",
+      "month": 5,
+      "page": 18,
+      "literal": "火山旅五月"
+    },
+    {
+      "gua": "火風鼎",
+      "palace": "離",
+      "month": 12,
+      "page": 18,
+      "literal": "火風鼎十二月"
+    },
+    {
+      "gua": "火水未濟",
+      "palace": "離",
+      "month": 7,
+      "page": 18,
+      "literal": "火水未濟七月"
+    },
+    {
+      "gua": "山水蒙",
+      "palace": "離",
+      "month": 8,
+      "page": 18,
+      "literal": "山水蒙八月"
+    },
+    {
+      "gua": "風水渙",
+      "palace": "離",
+      "month": 3,
+      "page": 18,
+      "literal": "風水渙三月"
+    },
+    {
+      "gua": "天水訟",
+      "palace": "離",
+      "month": 2,
+      "page": 19,
+      "literal": "天水訟二月"
+    },
+    {
+      "gua": "天火同人",
+      "palace": "離",
+      "month": 1,
+      "page": 19,
+      "literal": "天火同人正月"
+    },
+    {
+      "gua": "坤為地",
+      "palace": "坤",
+      "month": 10,
+      "page": 19,
+      "literal": "坤為地十月"
+    },
+    {
+      "gua": "地雷復",
+      "palace": "坤",
+      "month": 11,
+      "page": 19,
+      "literal": "地雷復十一月"
+    },
+    {
+      "gua": "地澤臨",
+      "palace": "坤",
+      "month": 12,
+      "page": 19,
+      "literal": "地澤臨十二月"
+    },
+    {
+      "gua": "地天泰",
+      "palace": "坤",
+      "month": 1,
+      "page": 19,
+      "literal": "地天泰正月"
+    },
+    {
+      "gua": "雷天大壯",
+      "palace": "坤",
+      "month": 2,
+      "page": 19,
+      "literal": "雷天大壯二月"
+    },
+    {
+      "gua": "澤天夬",
+      "palace": "坤",
+      "month": 3,
+      "page": 19,
+      "literal": "澤天夬三月"
+    },
+    {
+      "gua": "水天需",
+      "palace": "坤",
+      "month": 8,
+      "page": 19,
+      "literal": "水天需八月"
+    },
+    {
+      "gua": "水地比",
+      "palace": "坤",
+      "month": 7,
+      "page": 19,
+      "literal": "水地比七月"
+    },
+    {
+      "gua": "兌為澤",
+      "palace": "兌",
+      "month": 10,
+      "page": 19,
+      "literal": "兌為澤十月"
+    },
+    {
+      "gua": "澤水困",
+      "palace": "兌",
+      "month": 5,
+      "page": 19,
+      "literal": "澤水困五月"
+    },
+    {
+      "gua": "澤地萃",
+      "palace": "兌",
+      "month": 6,
+      "page": 19,
+      "literal": "澤地萃六月"
+    },
+    {
+      "gua": "澤山咸",
+      "palace": "兌",
+      "month": 1,
+      "page": 19,
+      "literal": "澤山咸正月"
+    },
+    {
+      "gua": "水山蹇",
+      "palace": "兌",
+      "month": 8,
+      "page": 19,
+      "literal": "水山蹇八月"
+    },
+    {
+      "gua": "地山謙",
+      "palace": "兌",
+      "month": 9,
+      "page": 19,
+      "literal": "地山謙九月"
+    },
+    {
+      "gua": "雷山小過",
+      "palace": "兌",
+      "month": 2,
+      "page": 19,
+      "literal": "雷山小過二月"
+    },
+    {
+      "gua": "雷澤歸妹",
+      "palace": "兌",
+      "month": 7,
+      "page": 19,
+      "literal": "雷澤歸妹七月"
+    }
+  ]
+}

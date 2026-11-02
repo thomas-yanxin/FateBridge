@@ -1,0 +1,235 @@
+{
+  "schema": "gujin40_exact_solar_generation_v1",
+  "profile_id": "gujin40_exact_recurrence_v1",
+  "author": "邢云路",
+  "source_url": "https://commons.wikimedia.org/w/index.php?curid=71219540",
+  "source_locator": "古今律历考四库787册卷40；DjVu457下半页及460下半页两至立成首行，卷36求盈缩差三次系数",
+  "column_fen_per_ancient_du": "10000",
+  "coefficient_polynomial_du_divisor": "100000000",
+  "source_column_fen_is_not_100perdu_angle_fen": true,
+  "exact_recurrence_no_rounding": true,
+  "recurrence_update_order_is_reconstruction_checked_against_volume36": true,
+  "native_birth_chart_integration": false,
+  "branches": {
+    "winter": {
+      "volume36_polynomial_coefficients": [
+        "5133200",
+        "24600",
+        "31"
+      ],
+      "volume40_initial_correction_increment_fen": "510.8569",
+      "volume40_initial_combined_difference_fen": "4.9386",
+      "difference_step_from_six_times_cubic_coefficient_divided_by10000": true,
+      "terminal_cumulative_index": 89,
+      "motion_sign": 1,
+      "source_initial_cumulative_cell": null,
+      "initial_cumulative_zero_is_empty_sum_not_a_transcribed_zero": true
+    },
+    "summer": {
+      "volume36_polynomial_coefficients": [
+        "4870600",
+        "22100",
+        "27"
+      ],
+      "volume40_initial_correction_increment_fen": "484.8473",
+      "volume40_initial_combined_difference_fen": "4.4362",
+      "difference_step_from_six_times_cubic_coefficient_divided_by10000": true,
+      "terminal_cumulative_index": 94,
+      "motion_sign": -1,
+      "source_initial_cumulative_cell": null,
+      "initial_cumulative_zero_is_empty_sum_not_a_transcribed_zero": true
+    }
+  },
+  "literal_checkpoints": {
+    "winter": [
+      {
+        "index": 0,
+        "combined_difference_fen": "4.9386",
+        "correction_increment_fen": "510.8569",
+        "cumulative_correction_fen": null
+      },
+      {
+        "index": 1,
+        "combined_difference_fen": "4.9572",
+        "correction_increment_fen": "505.9183",
+        "cumulative_correction_fen": "510.8569"
+      },
+      {
+        "index": 2,
+        "combined_difference_fen": "4.9758",
+        "correction_increment_fen": "500.9611",
+        "cumulative_correction_fen": "1016.7752"
+      },
+      {
+        "index": 3,
+        "combined_difference_fen": "4.9944",
+        "correction_increment_fen": "495.9853",
+        "cumulative_correction_fen": "1517.7363"
+      },
+      {
+        "index": 4,
+        "combined_difference_fen": "5.0130",
+        "correction_increment_fen": "490.9909",
+        "cumulative_correction_fen": "2013.7216"
+      },
+      {
+        "index": 5,
+        "combined_difference_fen": "5.0316",
+        "correction_increment_fen": "485.9779",
+        "cumulative_correction_fen": "2504.7125"
+      },
+      {
+        "index": 6,
+        "combined_difference_fen": "5.0502",
+        "correction_increment_fen": "480.9463",
+        "cumulative_correction_fen": "2990.6904"
+      },
+      {
+        "index": 7,
+        "combined_difference_fen": "5.0688",
+        "correction_increment_fen": "475.8961",
+        "cumulative_correction_fen": "3471.6367"
+      },
+      {
+        "index": 8,
+        "combined_difference_fen": "5.0874",
+        "correction_increment_fen": "470.273",
+        "cumulative_correction_fen": "3947.5338"
+      },
+      {
+        "index": 9,
+        "combined_difference_fen": "5.1060",
+        "correction_increment_fen": "465.7399",
+        "cumulative_correction_fen": "4418.3601"
+      },
+      {
+        "index": 87,
+        "combined_difference_fen": "6.5568",
+        "correction_increment_fen": "11.6161",
+        "cumulative_correction_fen": "23997.7407"
+      },
+      {
+        "index": 88,
+        "combined_difference_fen": "6.5754",
+        "correction_increment_fen": "5.0593",
+        "cumulative_correction_fen": "24009.3568"
+      },
+      {
+        "index": 89,
+        "combined_difference_fen": null,
+        "correction_increment_fen": null,
+        "cumulative_correction_fen": "24014.4161"
+      }
+    ],
+    "summer": [
+      {
+        "index": 0,
+        "combined_difference_fen": "4.4362",
+        "correction_increment_fen": "484.8473",
+        "cumulative_correction_fen": null
+      },
+      {
+        "index": 1,
+        "combined_difference_fen": "4.4524",
+        "correction_increment_fen": "480.4211",
+        "cumulative_correction_fen": "484.8473"
+      },
+      {
+        "index": 2,
+        "combined_difference_fen": "4.4686",
+        "correction_increment_fen": "475.9587",
+        "cumulative_correction_fen": "965.2584"
+      },
+      {
+        "index": 3,
+        "combined_difference_fen": "4.4848",
+        "correction_increment_fen": "471.4901",
+        "cumulative_correction_fen": "1441.2171"
+      },
+      {
+        "index": 4,
+        "combined_difference_fen": "4.5010",
+        "correction_increment_fen": "467.0053",
+        "cumulative_correction_fen": "1912.7072"
+      },
+      {
+        "index": 5,
+        "combined_difference_fen": "4.5172",
+        "correction_increment_fen": "462.5043",
+        "cumulative_correction_fen": "2379.7125"
+      },
+      {
+        "index": 6,
+        "combined_difference_fen": "4.5334",
+        "correction_increment_fen": "457.9871",
+        "cumulative_correction_fen": "2842.2168"
+      },
+      {
+        "index": 7,
+        "combined_difference_fen": "4.5496",
+        "correction_increment_fen": "453.4537",
+        "cumulative_correction_fen": "3300.2039"
+      },
+      {
+        "index": 8,
+        "combined_difference_fen": "4.5658",
+        "correction_increment_fen": "448.9041",
+        "cumulative_correction_fen": "3753.6576"
+      },
+      {
+        "index": 9,
+        "combined_difference_fen": "4.5820",
+        "correction_increment_fen": "444.3383",
+        "cumulative_correction_fen": "4202.5617"
+      },
+      {
+        "index": 10,
+        "combined_difference_fen": "4.5982",
+        "correction_increment_fen": "439.7563",
+        "cumulative_correction_fen": "4646.9000"
+      },
+      {
+        "index": 11,
+        "combined_difference_fen": "4.6144",
+        "correction_increment_fen": "435.2581",
+        "cumulative_correction_fen": "5086.6563"
+      },
+      {
+        "index": 12,
+        "combined_difference_fen": "4.6306",
+        "correction_increment_fen": "430.5437",
+        "cumulative_correction_fen": "5521.8144"
+      },
+      {
+        "index": 92,
+        "combined_difference_fen": "5.9266",
+        "correction_increment_fen": "8.9037",
+        "cumulative_correction_fen": "24001.6234"
+      },
+      {
+        "index": 93,
+        "combined_difference_fen": "5.9428",
+        "correction_increment_fen": "2.9771",
+        "cumulative_correction_fen": "24010.5262"
+      },
+      {
+        "index": 94,
+        "combined_difference_fen": null,
+        "correction_increment_fen": null,
+        "cumulative_correction_fen": "24013.5033"
+      }
+    ]
+  },
+  "checkpoint_transcription_scope": {
+    "rows": 29,
+    "numeric_cells": 81,
+    "printed_empty_cells": 6,
+    "complete_Gujin40_table_transcribed": false,
+    "single_unblinded_collator": true,
+    "independent_second_expert": false,
+    "source_value_470_273_keeps_three_fractional_digits_without_padding": true
+  },
+  "retained_anchor_profile": "gujin43_siku318_literal_motion",
+  "generated_daily_profile": "gujin40_exact_recurrence_on_g43_span_anchors",
+  "calendar_and_epoch_mapping_accepted": false
+}

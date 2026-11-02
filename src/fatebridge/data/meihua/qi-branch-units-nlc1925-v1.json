@@ -1,0 +1,289 @@
+{
+  "id": "meihua_qi_branch_units_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "章句实际卦气角色与年、月、日、时明列地支原子",
+  "source": {
+    "id": "nlc_1925",
+    "raw_pdf_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "original_pdf_indices": [
+      33,
+      35,
+      38,
+      41,
+      43,
+      46,
+      48,
+      51,
+      67,
+      68
+    ],
+    "reader": "assistant selected clear named branch spans; not independent human expert authentication or full numeric/element/time-text collation"
+  },
+  "unit_branch_atoms": {
+    "乾": {
+      "trigram": "乾",
+      "shared_named_branch_span": "戌亥年月日時",
+      "original_pdf_index": 33,
+      "unit_branches": {
+        "year": [
+          "戌",
+          "亥"
+        ],
+        "month": [
+          "戌",
+          "亥"
+        ],
+        "day": [
+          "戌",
+          "亥"
+        ],
+        "hour": [
+          "戌",
+          "亥"
+        ]
+      },
+      "month_only_additional_spans": []
+    },
+    "坤": {
+      "trigram": "坤",
+      "shared_named_branch_span": "未申年月日時",
+      "original_pdf_index": 35,
+      "unit_branches": {
+        "year": [
+          "未",
+          "申"
+        ],
+        "month": [
+          "辰",
+          "戌",
+          "丑",
+          "未",
+          "申"
+        ],
+        "day": [
+          "未",
+          "申"
+        ],
+        "hour": [
+          "未",
+          "申"
+        ]
+      },
+      "month_only_additional_spans": [
+        "辰戌丑未月"
+      ]
+    },
+    "震": {
+      "trigram": "震",
+      "shared_named_branch_span": "卯年月日時",
+      "original_pdf_index": 38,
+      "unit_branches": {
+        "year": [
+          "卯"
+        ],
+        "month": [
+          "卯"
+        ],
+        "day": [
+          "卯"
+        ],
+        "hour": [
+          "卯"
+        ]
+      },
+      "month_only_additional_spans": []
+    },
+    "巽": {
+      "trigram": "巽",
+      "shared_named_branch_span": "辰巳年月日時",
+      "original_pdf_index": 41,
+      "unit_branches": {
+        "year": [
+          "辰",
+          "巳"
+        ],
+        "month": [
+          "辰",
+          "巳"
+        ],
+        "day": [
+          "辰",
+          "巳"
+        ],
+        "hour": [
+          "辰",
+          "巳"
+        ]
+      },
+      "month_only_additional_spans": []
+    },
+    "坎": {
+      "trigram": "坎",
+      "shared_named_branch_span": "子年月日時",
+      "original_pdf_index": 43,
+      "unit_branches": {
+        "year": [
+          "子"
+        ],
+        "month": [
+          "子"
+        ],
+        "day": [
+          "子"
+        ],
+        "hour": [
+          "子"
+        ]
+      },
+      "month_only_additional_spans": []
+    },
+    "离": {
+      "trigram": "离",
+      "shared_named_branch_span": "午火年月日時",
+      "original_pdf_index": 46,
+      "unit_branches": {
+        "year": [
+          "午"
+        ],
+        "month": [
+          "午"
+        ],
+        "day": [
+          "午"
+        ],
+        "hour": [
+          "午"
+        ]
+      },
+      "month_only_additional_spans": []
+    },
+    "艮": {
+      "trigram": "艮",
+      "shared_named_branch_span": "丑寅年月日時",
+      "original_pdf_index": 48,
+      "unit_branches": {
+        "year": [
+          "丑",
+          "寅"
+        ],
+        "month": [
+          "丑",
+          "寅"
+        ],
+        "day": [
+          "丑",
+          "寅"
+        ],
+        "hour": [
+          "丑",
+          "寅"
+        ]
+      },
+      "month_only_additional_spans": []
+    },
+    "兑": {
+      "trigram": "兑",
+      "shared_named_branch_span": "酉年月日時",
+      "original_pdf_index": 51,
+      "unit_branches": {
+        "year": [
+          "酉"
+        ],
+        "month": [
+          "酉"
+        ],
+        "day": [
+          "酉"
+        ],
+        "hour": [
+          "酉"
+        ]
+      },
+      "month_only_additional_spans": []
+    }
+  },
+  "chapter_selectors": {
+    "wealth_gain": {
+      "topic": "wealth",
+      "relation": "用生体",
+      "quote": "欲知得財之日生體之卦氣定之",
+      "section": "求財占第十",
+      "original_pdf_index": 68
+    },
+    "wealth_loss": {
+      "topic": "wealth",
+      "relation": "用克体",
+      "quote": "欲知破財之日尅體之卦氣定之",
+      "section": "求財占第十",
+      "original_pdf_index": 68
+    },
+    "reputation_completion": {
+      "topic": "reputation",
+      "relation": "用生体",
+      "quote": "欲知名成之日生體之卦氣詳之",
+      "section": "求名占第九",
+      "original_pdf_index": 67
+    },
+    "reputation_office": {
+      "topic": "reputation",
+      "relation": "用克体",
+      "quote": "其日期尅體之卦氣者於八卦萬物所屬時序類中斷之",
+      "section": "求名占第九",
+      "original_pdf_index": 68,
+      "requires_declared_historical_in_office_context": true
+    },
+    "reputation_body_without_attacker": {
+      "topic": "reputation",
+      "role": "body",
+      "quote": "若無尅體之卦則名易就止看卦體時序之類以定日期",
+      "section": "求名占第九",
+      "original_pdf_index": 67,
+      "full_inner_outer_no_attacker_not_assumed": true
+    }
+  },
+  "chapter_selector_reference": "Reused prior frozen literal chapter selections, not a newly generated source oracle",
+  "unparsed_legacy_time_text": {
+    "乾": "秋九十月之交戌亥年月日時五金年月日時",
+    "坤": "辰戌丑未月未申年月日時八五十月日",
+    "震": "春二月卯年月日時四三八月日",
+    "巽": "春夏之交三五八之時日月三月辰巳年月日時四月",
+    "坎": "冬十一月子年月日時一六之月日",
+    "离": "夏五月午火年月日時三二七日",
+    "艮": "冬春之月十二月丑寅年月日時七五十數月日土年月日時",
+    "兑": "秋八月酉年月日時金年月日二四九數月日"
+  },
+  "legacy_full_time_profile_sha256": "b73ec8c22c261c47673a0b89bfc3bc714da30806962a9883bf0c0c10ec03b26c",
+  "selected_source_text_changed": false,
+  "nominal_month_labels": {
+    "1": "寅",
+    "2": "卯",
+    "3": "辰",
+    "4": "巳",
+    "5": "午",
+    "6": "未",
+    "7": "申",
+    "8": "酉",
+    "9": "戌",
+    "10": "亥",
+    "11": "子",
+    "12": "丑"
+  },
+  "nominal_month_label_source": {
+    "url": "https://www.hko.gov.hk/tc/gts/time/stemsandbranches.htm",
+    "sha256": "32750aab702f63b684ba82426ac1c53197005ce161b446e05c5be42eea2c01b3",
+    "scope": "Table maps numbered months to branches; applying it yields a named nominal-month label, not independent adjudication of leap-month ganzhi or the source timing month basis"
+  },
+  "policies": [
+    "Every source unit uses its own literal branch list; 坤 earth-month-only clause does not add day/year/hour labels",
+    "Only existing known seed/year/hour, day-qi candidates, declared/computed seasonal month branch and nominal lunar month number are consumed",
+    "Original lunar-year branch is not replaced by a Li Chun year or by an alternate zi-start date",
+    "Seasonal jie-month and nominal lunar-month labels are separately retained; no favorable match selection, vote or conflation",
+    "A nominal leap-month label repeats its supplied number only; leap status and full source month condition remain explicit and unadjudicated",
+    "All countercontrol and strength retain separate qualification; a matching branch is not full timing applicability or an event",
+    "No stem predicate is inferred from 五金, 午火, 土 or an element-strength label",
+    "All numeric/month-transition/element/season phrases, dates, physical horizons and full source synthesis remain unadjudicated"
+  ],
+  "full_original_conformance": false,
+  "predictive_efficacy_established": false
+}

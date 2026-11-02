@@ -1,0 +1,914 @@
+{
+  "id": "t1299_lower_nature_weekday_v2",
+  "author": "不空译；下卷七类宿性与七曜占",
+  "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
+  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+  "nature_locator": "T21n1299_p0396c02-0397a25",
+  "weekday_locator": "T21n1299_p0398c09-0399b20",
+  "membership_basis": "Explicit member lists; 轻 label from body 此等五是輕宿 with 大正 軫 / 明 輕 heading variant retained. 牛 stays in reference table, never added to a 27-mansion calendar.",
+  "selected_text": "大正主文；明本异文只展示，不用于合并扩大规则",
+  "nature_groups": [
+    {
+      "name": "安重",
+      "literal_heading": "安重",
+      "members": [
+        "毕",
+        "翼",
+        "斗",
+        "壁"
+      ],
+      "locator": "T21n1299_p0396c02-09",
+      "source_excerpts": [
+        "安重，畢、翼、斗、壁。此四是安重宿"
+      ],
+      "textual_variants": []
+    },
+    {
+      "name": "和善",
+      "literal_heading": "和善",
+      "members": [
+        "觜",
+        "角",
+        "房",
+        "奎"
+      ],
+      "locator": "T21n1299_p0396c10-15",
+      "source_excerpts": [
+        "和善，觜、角、房、奎。此等四是和善宿"
+      ],
+      "textual_variants": []
+    },
+    {
+      "name": "毒害",
+      "literal_heading": "毒害",
+      "members": [
+        "参",
+        "柳",
+        "心",
+        "尾"
+      ],
+      "locator": "T21n1299_p0396c16-23",
+      "source_excerpts": [
+        "毒害，參、柳、心、尾。此等四是毒害宿"
+      ],
+      "textual_variants": []
+    },
+    {
+      "name": "急速",
+      "literal_heading": "急速",
+      "members": [
+        "鬼",
+        "轸",
+        "牛",
+        "娄"
+      ],
+      "locator": "T21n1299_p0396c24-0397a01",
+      "source_excerpts": [
+        "急速，鬼、軫、牛、婁。此等四是急速宿"
+      ],
+      "textual_variants": [
+        {
+          "apparatus_id": "0396032",
+          "main_literal": "賣",
+          "ming_literal": "買賣",
+          "meaning": "本条买卖范围按大正主文的卖交关；明本加买字另存，不自动用于购入。"
+        }
+      ]
+    },
+    {
+      "name": "猛恶",
+      "literal_heading": "猛惡",
+      "members": [
+        "胃",
+        "星",
+        "张",
+        "箕",
+        "室"
+      ],
+      "locator": "T21n1299_p0397a02-08",
+      "source_excerpts": [
+        "猛惡，胃、星、張、箕、室。此五是猛惡宿"
+      ],
+      "textual_variants": []
+    },
+    {
+      "name": "轻",
+      "literal_heading": "軫",
+      "members": [
+        "井",
+        "亢",
+        "女",
+        "虚",
+        "危"
+      ],
+      "locator": "T21n1299_p0397a09-15",
+      "source_excerpts": [
+        "井、亢、女、虛、危。此等五是輕宿，或名行宿"
+      ],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397004",
+          "main_literal": "軫",
+          "ming_literal": "輕",
+          "meaning": "大正主文标题作軫，明本作輕；依本段明列的井亢女虚危五成员索引，不把标题误加为第六宿，也不改写主文字面。"
+        }
+      ]
+    },
+    {
+      "name": "刚柔",
+      "literal_heading": "剛柔",
+      "members": [
+        "昴",
+        "氐"
+      ],
+      "locator": "T21n1299_p0397a16-25",
+      "source_excerpts": [
+        "剛柔，昴、氐。此二是剛柔宿，或名平等宿"
+      ],
+      "textual_variants": []
+    }
+  ],
+  "weekday_records": [
+    {
+      "luminary": "日",
+      "literal_title": "太陽直日",
+      "locator": "T21n1299_p0398c09-19"
+    },
+    {
+      "luminary": "月",
+      "literal_title": "大陰直日",
+      "locator": "T21n1299_p0398c20-0399a02"
+    },
+    {
+      "luminary": "火",
+      "literal_title": "熒惑直日",
+      "locator": "T21n1299_p0399a03-13"
+    },
+    {
+      "luminary": "水",
+      "literal_title": "辰星直日",
+      "locator": "T21n1299_p0399a14-22"
+    },
+    {
+      "luminary": "木",
+      "literal_title": "歲星直日",
+      "locator": "T21n1299_p0399a23-0399b04"
+    },
+    {
+      "luminary": "金",
+      "literal_title": "太白直日",
+      "locator": "T21n1299_p0399b05-12"
+    },
+    {
+      "luminary": "土",
+      "literal_title": "鎮星直日",
+      "locator": "T21n1299_p0399b13-20"
+    }
+  ],
+  "rules": [
+    {
+      "rule_id": "t1299_lower_method_nature_01",
+      "layer": "lower_nature",
+      "selectors": [
+        "安重"
+      ],
+      "activities": [
+        "social",
+        "marriage",
+        "study"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0396c04-07",
+      "source_excerpts": [
+        "納交投友、成禮為婚",
+        "并就師學"
+      ],
+      "meaning": "下卷安重宿列结交投友、成礼为婚及就师学；学习仅按从师受教核对。",
+      "activity_conditions": {
+        "study": {
+          "any_of": [
+            "learning_with_teacher"
+          ],
+          "condition": "下卷安重宿列结交投友、成礼为婚及就师学；学习仅按从师受教核对。"
+        },
+        "social": {
+          "any_of": [
+            "forming_friendship"
+          ],
+          "condition": "结交／交友行为须明确，不限首次相识；不能由一般聚会代填本次结交行为。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_nature_02",
+      "layer": "lower_nature",
+      "selectors": [
+        "安重"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0396c07-09",
+      "source_excerpts": [
+        "唯不宜舉債"
+      ],
+      "meaning": "下卷安重宿不宜举债，只对应借入，不同于上卷索债。",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "borrowing"
+          ],
+          "condition": "下卷安重宿不宜举债，只对应借入，不同于上卷索债。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_nature_03",
+      "layer": "lower_nature",
+      "selectors": [
+        "安重"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0396c07-09",
+      "source_excerpts": [
+        "遠行進路"
+      ],
+      "meaning": "下卷安重宿不宜远行进路，仅在已知远行时匹配。",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "long_distance_journey"
+          ],
+          "condition": "下卷安重宿不宜远行进路，仅在已知远行时匹配。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_nature_04",
+      "layer": "lower_nature",
+      "selectors": [
+        "和善"
+      ],
+      "activities": [
+        "study",
+        "marriage",
+        "travel",
+        "social"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0396c10-15",
+      "source_excerpts": [
+        "問學、伎藝",
+        "成禮求婚",
+        "進途、結親友"
+      ],
+      "meaning": "下卷和善宿列问学伎艺、成礼求婚、进途与结亲友；不把宗教专属事项另泛化。",
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "forming_friendship"
+          ],
+          "condition": "结交／交友行为须明确，不限首次相识；不能由一般聚会代填本次结交行为。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_nature_05",
+      "layer": "lower_nature",
+      "selectors": [
+        "和善"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0396c12-15",
+      "source_excerpts": [
+        "還錢舉債",
+        "作交關、營家業"
+      ],
+      "meaning": "下卷和善宿列还钱、举债及交关营家业；还钱是偿债，不等同返还任意物品。",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "repaying_debt",
+            "borrowing",
+            "purchase",
+            "sale",
+            "sale_livestock",
+            "sale_lactating_livestock",
+            "business_operation"
+          ],
+          "condition": "下卷和善宿列还钱、举债及交关营家业；还钱是偿债，不等同返还任意物品。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_nature_06",
+      "layer": "lower_nature",
+      "selectors": [
+        "急速"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0396c24-26",
+      "source_excerpts": [
+        "宜放錢貸債、賣交關"
+      ],
+      "meaning": "下卷急速宿主文列放钱贷债及卖交关；只计出借或出售，明本买卖异文不代入购入。",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "lending",
+            "sale",
+            "sale_livestock",
+            "sale_lactating_livestock"
+          ],
+          "condition": "下卷急速宿主文列放钱贷债及卖交关；只计出借或出售，明本买卖异文不代入购入。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_nature_07",
+      "layer": "lower_nature",
+      "selectors": [
+        "急速"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0396c24-26",
+      "source_excerpts": [
+        "行途進路"
+      ],
+      "meaning": "下卷急速宿列行途进路，原文未额外限远行。"
+    },
+    {
+      "rule_id": "t1299_lower_method_nature_08",
+      "layer": "lower_nature",
+      "selectors": [
+        "急速"
+      ],
+      "activities": [
+        "study"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0396c26-28",
+      "source_excerpts": [
+        "習讀經書、教人典誥、學諸伎能"
+      ],
+      "meaning": "下卷急速宿列习读经书、教人典诰及学诸伎能，分别对应研读经典、教授经典或技能学习；不把经书任意限为宗教典籍。",
+      "activity_conditions": {
+        "study": {
+          "any_of": [
+            "classical_text_study",
+            "teaching_classics",
+            "skill_learning"
+          ],
+          "condition": "下卷急速宿列习读经书、教人典诰及学诸伎能，分别对应研读经典、教授经典或技能学习；不把经书任意限为宗教典籍。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_nature_09",
+      "layer": "lower_nature",
+      "selectors": [
+        "轻"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397a12-14",
+      "source_excerpts": [
+        "買賣興販"
+      ],
+      "meaning": "下卷轻宿／行宿列买卖兴贩，按买卖或经营核对。",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "purchase",
+            "sale",
+            "sale_livestock",
+            "sale_lactating_livestock",
+            "business_operation"
+          ],
+          "condition": "下卷轻宿／行宿列买卖兴贩，按买卖或经营核对。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_nature_10",
+      "layer": "lower_nature",
+      "selectors": [
+        "轻"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397a11-12",
+      "source_excerpts": [
+        "汎舟繫棹、渡水浮江，奉使騁域"
+      ],
+      "meaning": "下卷轻宿列舟行渡水及奉使聘域，只对应已知水路行程或使节任务。",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "water_journey",
+            "diplomatic_mission"
+          ],
+          "condition": "下卷轻宿列舟行渡水及奉使聘域，只对应已知水路行程或使节任务。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_nature_11",
+      "layer": "lower_nature",
+      "selectors": [
+        "轻"
+      ],
+      "activities": [
+        "study"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397a09-11",
+      "source_excerpts": [
+        "宜學乘騎象馬驢騾駝䮫及水牛等諸畜"
+      ],
+      "meaning": "下卷轻宿的学乘骑按学习骑乘核对，不扩大成所有技能或考试。",
+      "activity_conditions": {
+        "study": {
+          "any_of": [
+            "riding_training"
+          ],
+          "condition": "下卷轻宿的学乘骑按学习骑乘核对，不扩大成所有技能或考试。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_nature_12",
+      "layer": "lower_nature",
+      "selectors": [
+        "刚柔"
+      ],
+      "activities": [
+        "relocation"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397a21-24",
+      "source_excerpts": [
+        "移入新宅"
+      ],
+      "meaning": "下卷刚柔宿列移入新宅；不以炼金属等工艺推成所有交易。"
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_01",
+      "layer": "lower_weekday",
+      "selectors": [
+        "日"
+      ],
+      "activities": [
+        "travel",
+        "study"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0398c10-14",
+      "source_excerpts": [
+        "王公百官等東西南北遠行",
+        "入學"
+      ],
+      "meaning": "下卷日曜列远行及入学，分别核对远距离行程和开始入学。",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [],
+          "all_of": [
+            "long_distance_journey",
+            "royal_or_official_traveler"
+          ],
+          "condition": "下卷本条同时限定王公百官等行旅者及远行；须明确行旅身份与远距离行程。普通远行、出差、方位或使节任务均不能补造此身份；上卷远行条文另行保留。"
+        },
+        "study": {
+          "any_of": [
+            "beginning_study"
+          ],
+          "condition": "下卷日曜列远行及入学，分别核对远距离行程和开始入学。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_02",
+      "layer": "lower_weekday",
+      "selectors": [
+        "月"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0398c21-24",
+      "source_excerpts": [
+        "買賣財物、倉庫內財"
+      ],
+      "meaning": "下卷月曜列买卖财物和仓库内财；买卖与明确收入分别核对。",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "purchase",
+            "sale",
+            "sale_livestock",
+            "sale_lactating_livestock",
+            "receiving_property"
+          ],
+          "condition": "下卷月曜列买卖财物和仓库内财；买卖与明确收入分别核对。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_03",
+      "layer": "lower_weekday",
+      "selectors": [
+        "月"
+      ],
+      "activities": [
+        "marriage",
+        "relocation",
+        "social",
+        "travel"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0398c25-26",
+      "source_excerpts": [
+        "不嫁娶、入宅、結交",
+        "私情出行不問近遠"
+      ],
+      "meaning": "下卷月曜不嫁娶、入宅、结交；私情出行不论近远，不能扩大成所有出行。",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "private_journey"
+          ],
+          "condition": "下卷私情出行按明确因私行程核对，近远均可；本人启程或远行本身不证明因私，不由未声明因私反推公务。"
+        },
+        "social": {
+          "any_of": [
+            "forming_friendship"
+          ],
+          "condition": "结交／交友行为须明确，不限首次相识；不能由一般聚会代填本次结交行为。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_04",
+      "layer": "lower_weekday",
+      "selectors": [
+        "月"
+      ],
+      "activities": [
+        "social"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0398c21-22",
+      "source_excerpts": [
+        "作喜樂朋僚"
+      ],
+      "meaning": "下卷月曜列朋僚喜乐，仅对应已知朋友聚会；与同卷不结交条文分别保留。",
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "social_gathering"
+          ],
+          "condition": "下卷月曜列朋僚喜乐，仅对应已知朋友聚会；与同卷不结交条文分别保留。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_05",
+      "layer": "lower_weekday",
+      "selectors": [
+        "火"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0399a04-05",
+      "source_excerpts": [
+        "買金寶、置牛羊群"
+      ],
+      "meaning": "下卷火曜列买金宝与置牛羊群，限定贵重金宝或牲畜购入，不扩大所有购买。",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "purchase_precious_goods",
+            "purchase_livestock"
+          ],
+          "condition": "下卷火曜列买金宝与置牛羊群，限定贵重金宝或牲畜购入，不扩大所有购买。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_06",
+      "layer": "lower_weekday",
+      "selectors": [
+        "火"
+      ],
+      "activities": [
+        "marriage",
+        "relocation",
+        "social"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0399a08-09",
+      "source_excerpts": [
+        "其日成親",
+        "入宅、結交",
+        "皆不吉"
+      ],
+      "meaning": "下卷火曜称成亲、入宅、结交不吉；保留与上卷火曜结婚为宜的相反证言。",
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "forming_friendship"
+          ],
+          "condition": "结交／交友行为须明确，不限首次相识；不能由一般聚会代填本次结交行为。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_07",
+      "layer": "lower_weekday",
+      "selectors": [
+        "火"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0399a08-09",
+      "source_excerpts": [
+        "火下出財皆不吉"
+      ],
+      "meaning": "下卷火曜称出财不吉，仅对应支出。",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "spending_property"
+          ],
+          "condition": "下卷火曜称出财不吉，仅对应支出。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_08",
+      "layer": "lower_weekday",
+      "selectors": [
+        "火"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0399a09",
+      "source_excerpts": [
+        "宜徵債"
+      ],
+      "meaning": "下卷火曜宜征债，与上卷不得出财征债不同，索债证据不静默选边。",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "collecting_debt"
+          ],
+          "condition": "下卷火曜宜征债，与上卷不得出财征债不同，索债证据不静默选边。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_09",
+      "layer": "lower_weekday",
+      "selectors": [
+        "水"
+      ],
+      "activities": [
+        "study",
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0399a15-16",
+      "source_excerpts": [
+        "宜入學，及學一切諸工巧皆成",
+        "收債本利具獲"
+      ],
+      "meaning": "下卷水曜列入学、工巧学习和收债，学习与索债细节分别匹配；不据此保证收回本利。",
+      "activity_conditions": {
+        "study": {
+          "any_of": [
+            "beginning_study",
+            "skill_learning"
+          ],
+          "condition": "下卷水曜列入学、工巧学习和收债，学习与索债细节分别匹配；不据此保证收回本利。"
+        },
+        "commerce": {
+          "any_of": [
+            "collecting_debt"
+          ],
+          "condition": "下卷水曜列入学、工巧学习和收债，学习与索债细节分别匹配；不据此保证收回本利。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_10",
+      "layer": "lower_weekday",
+      "selectors": [
+        "木"
+      ],
+      "activities": [
+        "study",
+        "social",
+        "marriage",
+        "relocation"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0399a24-27",
+      "source_excerpts": [
+        "學論議、受法禮拜",
+        "成親、交喜樂、入宅",
+        "嫁娶"
+      ],
+      "meaning": "下卷木曜列学论议、受法礼拜、成亲嫁娶、交喜乐及入宅；学习论辩或经教学法分别核对，交喜乐按聚会细节。",
+      "activity_conditions": {
+        "study": {
+          "any_of": [
+            "debate_learning",
+            "religious_learning"
+          ],
+          "condition": "下卷木曜列学论议、受法礼拜、成亲嫁娶、交喜乐及入宅；学习论辩或经教学法分别核对，交喜乐按聚会细节。"
+        },
+        "social": {
+          "any_of": [
+            "social_gathering"
+          ],
+          "condition": "下卷木曜列学论议、受法礼拜、成亲嫁娶、交喜乐及入宅；学习论辩或经教学法分别核对，交喜乐按聚会细节。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_11",
+      "layer": "lower_weekday",
+      "selectors": [
+        "木"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0399a26",
+      "source_excerpts": [
+        "修倉庫內財"
+      ],
+      "meaning": "下卷木曜列仓库内财，只对应明确财物收入。",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "receiving_property"
+          ],
+          "condition": "下卷木曜列仓库内财，只对应明确财物收入。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_12",
+      "layer": "lower_weekday",
+      "selectors": [
+        "金"
+      ],
+      "activities": [
+        "marriage",
+        "social"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0399b06-08",
+      "source_excerpts": [
+        "成親、平章婚事、結交友、會朋流"
+      ],
+      "meaning": "下卷金曜列成亲、议婚、结交与会友；置宅舍不自动代替迁居。",
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "forming_friendship",
+            "social_gathering"
+          ],
+          "condition": "原文分别列结交及欢宴聚会，按明确结交或聚会匹配；两种动作不互相推断。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_13",
+      "layer": "lower_weekday",
+      "selectors": [
+        "土"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0399b14",
+      "source_excerpts": [
+        "買賣田地"
+      ],
+      "meaning": "下卷土曜列买卖田地，只对应田地购入或出售，不扩大成所有财务事项。",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "land_purchase",
+            "land_sale"
+          ],
+          "condition": "下卷土曜列买卖田地，只对应田地购入或出售，不扩大成所有财务事项。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_14",
+      "layer": "lower_weekday",
+      "selectors": [
+        "土"
+      ],
+      "activities": [
+        "relocation"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0399b15-16",
+      "source_excerpts": [
+        "入宅吉"
+      ],
+      "meaning": "下卷土曜明确入宅吉，营建与迁居不相互替代。"
+    },
+    {
+      "rule_id": "t1299_lower_method_weekday_15",
+      "layer": "lower_weekday",
+      "selectors": [
+        "土"
+      ],
+      "activities": [
+        "marriage",
+        "travel",
+        "social"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0399b16-17",
+      "source_excerpts": [
+        "不宜結婚、作喜樂、服新衣及遠行"
+      ],
+      "meaning": "下卷土曜不宜结婚、作喜乐和远行；旅行须明确远行，社交只对应聚会庆祝。",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "long_distance_journey"
+          ],
+          "condition": "下卷土曜不宜结婚、作喜乐和远行；旅行须明确远行，社交只对应聚会庆祝。"
+        },
+        "social": {
+          "any_of": [
+            "social_gathering"
+          ],
+          "condition": "下卷土曜不宜结婚、作喜乐和远行；旅行须明确远行，社交只对应聚会庆祝。"
+        }
+      }
+    }
+  ],
+  "scope": "下卷选定六类非伤害事项证言，独立保留与上卷差异；不是全书学术验收、物理宿界或现实结果。"
+}

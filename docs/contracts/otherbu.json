@@ -1,0 +1,301 @@
+{
+  "call_guidance": {
+    "context": "仅骰面解读省略date/time/zone/经纬度；若请求独立天象背景，完整传入实际资料。tradition/hsys/zodiacal仅作用于天象背景，不改变骰面。天象背景按astronomical_context视图选择fields，分页时读回同run完整投影结果。保留ephemerisReferencePoints中的系统质心、本体中心、近似及未确认参考点，不将质心写成本体中心。",
+    "input": "planet/sign/house必须是本次实际骰面；实际第N宫传house=N-1。中文、英文和符号可直接传入；缺项追问，不猜测或抽取替代结果。",
+    "interpretation": "以symbolic_details和rule_trace为依据，保留rulesets版本和来源。区分自定位与未给出的其他定位星；喜乐宫是宫号关系，不是星座尊贵或成功概率。diceChart为假设整宫示意，无真实度数、相位或ASC/MC；不得从天象背景补写骰面定位星、互容或应期。",
+    "longitude_motion": "天象背景的十个物理天体按实际热带或Lahiri黄道读取chart.params.chart_profile.longitude_motion与chart.chart.objects[].motion。保留native_longitude_speed及修正分项，method_id来自实际求导记录；Moshier完整视位置求导不改变解析轨道，未收敛明确不应用。Lahiri包含所选零点的运动，不能复制热带速度。月亮未采用独立光行时分项不表示完整位置求导未执行；分项与整体状态分别核对。这些速度不能证明精确驻留时刻、原典整例或现实预测。",
+    "validation": "星座条件只覆盖指定原典的部分关系；外行星/交点不套七曜尊贵。validation.prediction=not_validated，不把解释或规则关系换算成功概率。"
+  },
+  "evidence_views": {
+    "astronomical_context": {
+      "fields": [
+        "method_id",
+        "planet",
+        "sign",
+        "house",
+        "input_normalized",
+        "chart",
+        "validation"
+      ],
+      "purpose": "完整提供实际时间地点后读取同次独立天象、输入与计算依据；分页须读回同run，不用天象补选骰面昼夜、定位星或应期。"
+    },
+    "astronomical_motion": {
+      "fields": [
+        "method_id",
+        "planet",
+        "sign",
+        "house",
+        "input_normalized",
+        "chart.params.zodiacMode",
+        "chart.params.chart_profile.ephemeris_model",
+        "chart.params.chart_profile.physical_ephemeris_source",
+        "chart.params.chart_profile.nonphysical_factor_models",
+        "chart.params.chart_profile.longitude_motion",
+        "chart.params.motionPolicy",
+        "chart.chart.objects",
+        "validation"
+      ],
+      "purpose": "完整提供实际时空输入后核对独立天象的瞬时黄经日速、显示黄道参考系、实际文件来源与缺失状态；原生速度缺失不得解释为顺行，零日速不定位留站，不能改写骰面条件。"
+    },
+    "symbolic": {
+      "fields": [
+        "method_id",
+        "planet",
+        "sign",
+        "house",
+        "symbolic_details",
+        "interpretation",
+        "rulesets",
+        "rule_trace",
+        "validation"
+      ],
+      "purpose": "忠实解读用户已有的三骰结果，不默认抽骰或附加天象。"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "method_id",
+      "planet",
+      "sign",
+      "house",
+      "symbolic_details",
+      "interpretation",
+      "rulesets",
+      "rule_trace",
+      "validation"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "date": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional Gregorian date for a separate sky chart; provide time/zone/coordinates too"
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "fortune_method": {
+        "default": "sect_reversing",
+        "description": "Separate sky Fortune only: sect_reversing uses day/night reversal; ptolemy_iii10 follows Robbins 1940 III.10 (ASC+Moon-Sun both day and night). Does not alter dice interpretation.",
+        "enum": [
+          "sect_reversing",
+          "ptolemy_iii10"
+        ],
+        "type": "string"
+      },
+      "gps_lat": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "GPS latitude"
+      },
+      "gps_lon": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "GPS longitude"
+      },
+      "house": {
+        "description": "Actual dice house INDEX (0-11): printed house N must be submitted as N-1",
+        "maximum": 11,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "hsys": {
+        "default": 8,
+        "description": "House system 0..8 for the separate sky chart; does not change the symbolic wheel",
+        "maximum": 8,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "lat": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Latitude text or decimal; no assumed location"
+      },
+      "lon": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Longitude text or decimal; no assumed location"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "planet": {
+        "description": "Actual face: Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn/Uranus/Neptune/Pluto/NorthNode/SouthNode; Chinese names and glyphs accepted",
+        "type": "string"
+      },
+      "question": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Question or topic"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "sign": {
+        "description": "Actual dice sign: English name, Chinese name or zodiac glyph; never guessed",
+        "type": "string"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "time": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional civil time for a separate sky chart"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "tradition": {
+        "default": false,
+        "description": "Exclude outer planets only from the separate sky chart; never alter the rolled face",
+        "type": "boolean"
+      },
+      "zodiacal": {
+        "default": 0,
+        "description": "Separate sky chart only: 0=tropical, 1=sidereal(Lahiri); never reinterprets a dice sign",
+        "maximum": 1,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "zone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Explicit IANA timezone or UTC offset for the separate sky chart"
+      }
+    },
+    "required": [
+      "sign",
+      "house",
+      "planet"
+    ],
+    "type": "object"
+  },
+  "tool": "otherbu"
+}

@@ -1,0 +1,221 @@
+{
+  "id": "naoj1992_shogonji_two_daily_annotations_v1",
+  "authors": [
+    "神田泰",
+    "伊藤節子",
+    "岡田芳朗"
+  ],
+  "title": "荘厳寺で発見された仮名暦の調査",
+  "publication": "国立天文台報 1(3), 229–292 (1992)",
+  "source_url": "https://naoj-repository.repo.nii.ac.jp/record/80/files/daiho1992_1-3-3.pdf",
+  "publisher_pdf_sha256": "dbe9e50e2be0bbcd11058df49fe293610819eeb54ac0ac5f3e58258d4fa761dc",
+  "pre_comparison_transcription_sha256": "dee0ac03d48a1c47df96430042828a5423c51d269aabe3024bf8b3c44a5436a4",
+  "records": [
+    {
+      "id": "koei5-sixth-month-rausaku",
+      "lunar_year_author_assignment": 1346,
+      "era_year_author_label": "康永五年",
+      "month": 6,
+      "leap": false,
+      "annotation_literal": "らうさく",
+      "original_position": {
+        "day": 21,
+        "pdf_page": 35,
+        "printed_page": 263,
+        "location": "日付上部欄外",
+        "day_ganzhi_kana": "つちのへたつ",
+        "day_ganzhi_normalized": "戊辰"
+      },
+      "author_suggested_position": {
+        "day": 20,
+        "pdf_page": 35,
+        "printed_page": 263,
+        "day_ganzhi_kana": "ひのとのう",
+        "day_ganzhi_normalized": "丁卯"
+      },
+      "author_note": {
+        "pdf_page": 4,
+        "printed_page": 232,
+        "section": "康永5年",
+        "number": 2,
+        "literal": "6月21日の日付上部欄外暦注「らうさく」は20日であるべきである。"
+      }
+    },
+    {
+      "id": "koei5-eighth-month-rausaku",
+      "lunar_year_author_assignment": 1346,
+      "era_year_author_label": "康永五年",
+      "month": 8,
+      "leap": false,
+      "annotation_literal": "らうさく",
+      "original_position": {
+        "day": 5,
+        "pdf_page": 38,
+        "printed_page": 266,
+        "location": "日付上部欄外",
+        "day_ganzhi_kana": "かのとのゐ",
+        "day_ganzhi_normalized": "辛亥"
+      },
+      "author_suggested_position": {
+        "day": 3,
+        "pdf_page": 37,
+        "printed_page": 265,
+        "day_ganzhi_kana": "つちのとのとり",
+        "day_ganzhi_normalized": "己酉"
+      },
+      "author_note": {
+        "pdf_page": 4,
+        "printed_page": 232,
+        "section": "康永5年",
+        "number": 3,
+        "literal": "8月5日の日付上部欄外暦注「らうさく」は3日であるべきである。"
+      }
+    }
+  ],
+  "scope": "Two daily marginal annotations and four date headings read from study-author transcriptions. Existing month headings, calendar theory and author notes were known; not blind or independent original-scroll collation. Frozen before opening current calculator outputs for these four days. Kana and Hanzi normalization are separate; author-suggested relocation is not an observed original position.",
+  "term_reference": {
+    "annotation_literal": "らうさく",
+    "normalized_candidate": "狼藉",
+    "candidate_is_original_hanzi_transcription": false,
+    "study_classification": {
+      "printed_page": 233,
+      "group": "三箇悪日"
+    },
+    "equivalent_to_t1299_rasetsu": false,
+    "lexical_normalization_is_day_rule_validation": false,
+    "ndl_reference": {
+      "url": "https://www.ndl.go.jp/koyomi/chapter3/s5.html",
+      "response_sha256": "452c9cf48fb360967856057b0df3770b650185f8c5accb7fe9c7363007b2aa9f",
+      "heading_literal": "大禍日（たいかにち）、狼籍日（ろうじゃくにち）、滅門日（めつもんにち）",
+      "table_column_literal": "狼藉日",
+      "table_first_header_literal": "生年",
+      "birth_year_condition_removed": false,
+      "birth_year_supplied": false,
+      "month_convention_established": false,
+      "rule_applied": false,
+      "scope": "Library explanatory exhibit. Its 生年 header must not be removed to invent an unconditional month-to-day rule. Heading 狼籍 and table 狼藉 are retained separately."
+    },
+    "rekirin_primary_reference": {
+      "title": "暦林問答集",
+      "catalogue_edition": "文化八年刊 (1811; catalogue metadata)",
+      "catalogue_id": "国文学研究資料館 鵜飼文庫 200019259",
+      "source_url": "https://codh.rois.ac.jp/pmjt/book/200019259/index.html.ja",
+      "manifest_url": "https://codh.rois.ac.jp/pmjt/book/200019259/manifest.json",
+      "manifest_sha256": "192ca70a43862b69c1e5963f1590f5120e801515787128c7b81a237bd4216442",
+      "attribution": "国文学研究資料館・人文学オープンデータ共同利用センター (CODH)",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "selected_images": [
+        {
+          "frame": 71,
+          "canvas_id": "http://codh.rois.ac.jp/pmjt/iiif/200019259/canvas/00071",
+          "url": "https://codh.rois.ac.jp/pmjt/iiif/200019259/200019259_00071.tif/full/full/0/default.jpg",
+          "sha256": "e8e5d807480e49d6d949a224b087f5147d5a271a246e67019e51d91b2f9f5966",
+          "bytes": 2122011,
+          "path": "rekirin-primary/frame-071.jpg"
+        },
+        {
+          "frame": 72,
+          "canvas_id": "http://codh.rois.ac.jp/pmjt/iiif/200019259/canvas/00072",
+          "url": "https://codh.rois.ac.jp/pmjt/iiif/200019259/200019259_00072.tif/full/full/0/default.jpg",
+          "sha256": "1e9bba54443e00de4bbceb83d2bf3499eff330564bb98ff22f60d9f63a7ea868",
+          "bytes": 2119720,
+          "path": "rekirin-primary/frame-072.jpg"
+        },
+        {
+          "frame": 73,
+          "canvas_id": "http://codh.rois.ac.jp/pmjt/iiif/200019259/canvas/00073",
+          "url": "https://codh.rois.ac.jp/pmjt/iiif/200019259/200019259_00073.tif/full/full/0/default.jpg",
+          "sha256": "5510f851851d6530e245effcfd8f02c334416cfc1cb1c8fd311888f515c60f81",
+          "bytes": 2138841,
+          "path": "rekirin-primary/frame-073.jpg"
+        },
+        {
+          "frame": 74,
+          "canvas_id": "http://codh.rois.ac.jp/pmjt/iiif/200019259/canvas/00074",
+          "url": "https://codh.rois.ac.jp/pmjt/iiif/200019259/200019259_00074.tif/full/full/0/default.jpg",
+          "sha256": "6cd65169a71b2511b89b6e62a591a4cdcdd4af7626af1bd6555c901e59e468f6",
+          "bytes": 2170994,
+          "path": "rekirin-primary/frame-074.jpg"
+        }
+      ],
+      "distinct_chapter_titles": [
+        {
+          "frame": 72,
+          "literal": "釋滅門大禍狼藉第六十一"
+        },
+        {
+          "frame": 73,
+          "literal": "釋羅刹第六十二"
+        }
+      ],
+      "chapter_61_attribution_literal": "宿曜經云",
+      "attribution_proves_passage_in_selected_t1299": false,
+      "chapter_64_selected_literals": [
+        {
+          "frame": 74,
+          "literal": "此三寶類皆以可忌之餘無咎"
+        },
+        {
+          "frame": 74,
+          "literal": "雖有吉文不辯支干之吉者勿用之"
+        }
+      ],
+      "selected_interpretation": "This named book restricts the four adverse days in its discussion to 三寶類 ritual use and also requires 支干之吉 for its auspicious-day discussion. These are separate book-specific interpretations, not a replacement for current T1299 activity rules.",
+      "chapter_62_ambiguous_prefix_transcribed": false,
+      "colophon_independently_dated": false,
+      "whole_book_collated": false,
+      "applied_to_primary_mansion_or_activity": false
+    },
+    "baba_research_reference": {
+      "author": "馬場真理子",
+      "title": "暦の「正理」—『暦林問答集』における暦注の解説を中心に—",
+      "publication": "宗教学年報 XXXIV, 105–125 (2017)",
+      "source_url": "https://rirc.or.jp/media/pdfs/baba_201703.pdf",
+      "pdf_sha256": "4db869603e8982e1f5b02ec87bdc2a3a9a4ade53f80a4e591e49f9fbebff59f9",
+      "note_11_witness": "天理大学天理図書館 吉田文庫 147-イ5",
+      "note_11_emendation_reference": "中村璋八 (1985)",
+      "quotes_are_unmodified_original_transcription": false,
+      "same_physical_witness_as_1811_print": false
+    },
+    "t1299_edition_reference": {
+      "repository": "cbeta-org/xml-p5",
+      "path": "T/T21/T21n1299.xml",
+      "selected_release": "2026.R2",
+      "selected_commit": "dbdea41071e1e260ad84b72faefd4587333cf76d",
+      "selected_source_url": "https://github.com/cbeta-org/xml-p5/blob/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T21/T21n1299.xml",
+      "selected_file_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+      "selected_git_blob_sha": "c6a36e22a9382895c2eb05fd3c401ce329aa024e",
+      "header_publication_date_literal": "2025-01-30 01:37:50 +0800",
+      "header_date_is_release_year": false,
+      "control_release": "2025.R1",
+      "control_commit": "a43b24e84dd1093af01bcf442285b4db6bf6f92d",
+      "control_file_sha256": "259172d5f220aaa041617c35f62fced97fd2f64353ea700fd63684d27f29899b",
+      "full_text_and_back_apparatus_equal": true,
+      "gaiji_equal_ignoring_indentation": true,
+      "full_text_literal_queries_after_whitespace_removal": {
+        "狼藉": 0,
+        "狼籍": 0,
+        "三箇之凶": 0,
+        "三箇之兇": 0,
+        "羅剎": 2
+      },
+      "all_historical_recensions_searched": false,
+      "scope": "Exact-byte release comparison. Selected full <text>, including back apparatus, equals 2025.R1; header metadata/formatting differ. Literal query absence does not prove absence from all historical recensions or invalidate the Rekirin attribution."
+    }
+  },
+  "acceptance": {
+    "source_annotations": 2,
+    "related_date_headings": 4,
+    "independent_original_scroll_collations": 0,
+    "real_world_prediction_samples": 0,
+    "all_daily_annotations_transcribed": false,
+    "annotation_records_half_or_clock": false,
+    "one_global_day_shift_explains_author_suggestions": false,
+    "ancient_day_boundary_accepted": false,
+    "leap_short_month_priority_accepted": false,
+    "author_suggestions_applied_to_input_date": false,
+    "reference_applied_to_primary_mansion_or_activity": false
+  },
+  "absence_policy": "Outside the two selected source positions and two author-suggested positions no daily reference is returned; this is not a claim that the original calendar has no annotation."
+}

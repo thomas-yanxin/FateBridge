@@ -1,0 +1,56 @@
+{
+  "id": "meihua_obstruction_days_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本占卦诀生克并见时的所列阻节日数",
+  "source": {
+    "selected_edition": "nlc_1925",
+    "raw_pdf_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "raw_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "original_pdf_indices": [
+      107,
+      12
+    ],
+    "printed_leaves": [
+      "卷三六",
+      "卷一一"
+    ],
+    "reading_method": "assistant visual; no independent human expert review"
+  },
+  "clause": "若有生體之卦又有尅體之卦則事有阻節好中不足便看尅體卦氣阻於幾日若乾尅體阻一日兌尅體阻二日之類推之",
+  "required_scenario": "favorable_matter",
+  "explicit_day_examples": {
+    "乾": 1,
+    "兑": 2
+  },
+  "trigram_numbers": {
+    "乾": 1,
+    "兑": 2,
+    "离": 3,
+    "震": 4,
+    "巽": 5,
+    "坎": 6,
+    "艮": 7,
+    "坤": 8
+  },
+  "body_elements": {
+    "乾": "金",
+    "兑": "金",
+    "离": "火",
+    "震": "木",
+    "巽": "木",
+    "坎": "水",
+    "艮": "土",
+    "坤": "土"
+  },
+  "analogy_status": "remaining six counts derived from 之類推之 with 八卦數, not six separately printed delay examples",
+  "scope_limits": [
+    "not added to a base completion time",
+    "no start-date or inclusive-day convention given",
+    "no sum/min/max over multiple attackers",
+    "same trigram occurrences are not independent delays",
+    "no body-use redefinition",
+    "existing countercontrol and month/day strength retained without numeric adjustment",
+    "no absolute event date or physical outcome guarantee",
+    "no medical/mortality/childbirth timing implementation"
+  ]
+}

@@ -1,0 +1,76 @@
+"""Evaluation preparation is scoped, pending and separate from blind acceptance."""
+
+import json
+from pathlib import Path
+
+from fatebridge.application.discovery import select_mcp_specs
+from fatebridge.services.tool_catalog import CATALOG
+from scripts.evaluate_agent import grade, reference_scenarios
+
+DATASET = Path(__file__).parent / "fixtures/agent_behavior/jyotish_semantic_cases.json"
+
+
+def test_preparation_selects_the_actual_indian_tools_instead_of_only_divination():
+    cases = json.loads(DATASET.read_text())["cases"]
+    available = {
+        s.tool_name
+        for s in select_mcp_specs(
+            CATALOG, scenario=reference_scenarios(cases), tool_scope="complete"
+        )
+    }
+    assert {"astro_india_chart", "astro_vimshottari"} <= available
+    wrong = {
+        s.tool_name
+        for s in select_mcp_specs(
+            CATALOG, scenario="onda-zhanbu", tool_scope="complete"
+        )
+    }
+    assert "astro_india_chart" not in wrong
+    mixed = cases + [{"scenario": "onda-zhanbu"}]
+    selected = {
+        s.tool_name
+        for s in select_mcp_specs(
+            CATALOG, scenario=reference_scenarios(mixed), tool_scope="complete"
+        )
+    }
+    assert {"astro_india_chart", "jinkou"} <= selected
+
+
+def test_known_debugging_cases_cannot_be_relabelled_as_independent_holdouts():
+    data = json.loads(DATASET.read_text())
+    cases = data["cases"]
+    assert data["cohort_role"] == "known_development_regressions"
+    assert data["independent_held_out_cases"] == 0
+    assert data["semantic_acceptance"] == "not_run"
+    assert len(cases) == len({c["id"] for c in cases}) == 6
+    assert all(c["manual_review"] and c["capture_payloads"] for c in cases)
+    for case in cases:
+        request = case["reference_request"]
+        assert request["arguments"]["divisions"] == []
+        event = {
+            "type": "item.completed",
+            "item": {
+                "type": "mcp_tool_call",
+                "server": "fatebridge",
+                "tool": request["tool"],
+                "arguments": request["arguments"],
+                "status": "completed",
+            },
+        }
+        skill = {
+            "type": "item.completed",
+            "item": {
+                "type": "command_execution",
+                "command": "cat skills/onda-xingpan/SKILL.md",
+            },
+        }
+        assert grade(case, [skill, event], "placeholder, never a semantic grade", 0)[
+            "mechanical_checks_passed"
+        ]
+        event["item"]["arguments"] = {
+            **request["arguments"],
+            "birth_hour": (request["arguments"]["birth_hour"] + 1) % 24,
+        }
+        assert not grade(case, [skill, event], "placeholder", 0)[
+            "mechanical_checks_passed"
+        ]

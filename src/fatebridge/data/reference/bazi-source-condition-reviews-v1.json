@@ -1,0 +1,822 @@
+{
+  "method_id": "original19_source_conditions_public_v1",
+  "parent_index_path": "src/fatebridge/data/reference/bazi-source-annotations-v8.json",
+  "parent_index_sha256": "ab26713020bee9e373c694e9f305f960272e541b61627e64741d4c9d49310ef5",
+  "registered_developer_review_path": "docs/validation/bazi-condition-evaluation-files-v1/reviewer-only-all19-source-conditions-first.json",
+  "registered_developer_review_sha256": "3b7c9a19060f350b0faf2c6d12457e84cdd5b98ddd12bd0b83b87ebbb419b320",
+  "review_count": 19,
+  "record_binding_count": 21,
+  "reviews": [
+    {
+      "case_id": "ZP37-LIANG",
+      "reference_bindings": [
+        {
+          "reference_id": "original:ZP37-LIANG",
+          "parent_record_sha256": "cf0fd187f36c959678311439abe098a68e02850debeac3f20f4ad00f3646d66c"
+        },
+        {
+          "reference_id": "prior_routes:ZP37-LIANG",
+          "parent_record_sha256": "914b8f26cf4e6b0acebe8056af48afe2c5fbb462de8acfc2cc5d9b8005c0de8e"
+        }
+      ],
+      "parent_review_row_sha256": "3454150bac333d9d288e530369e90db835c9144747487eb27ef61857dba2de06",
+      "review": {
+        "review_id": "original19-source-conditions:ZP37-LIANG",
+        "case_id": "ZP37-LIANG",
+        "pillars": [
+          "丁未",
+          "癸卯",
+          "癸亥",
+          "癸丑"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "conditional_category_with_named_example",
+        "source_pdf_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 76,
+            "image_sha256": "47c5b4f77e2d78e9b1ec1f7ce6211462d43a8c98325feadbe8472ad8c6cfc15d"
+          }
+        ],
+        "reading_excerpt": "如身強食旺而財透，大貴之格",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "癸日、亥根与印星辛金须分列；此段同时要求食旺、财透、财有根，不能只将食财能量相加便否定所举身强。",
+        "passage_conditions": "原局明见亥卯未，完整关系回执中的合绊或转化状态须照录，不能据元素连续断通关。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "ZP37-XIE",
+      "reference_bindings": [
+        {
+          "reference_id": "original:ZP37-XIE",
+          "parent_record_sha256": "d3d755bc856570adbd7f07063b6f0e9ff29a26a36b69a4b9bb54b2a0338f7ba3"
+        },
+        {
+          "reference_id": "prior_routes:ZP37-XIE",
+          "parent_record_sha256": "432e5363b14d9e9e482208d9300d79e8021b07223a18cf00a7be7bc1187e3bd8"
+        }
+      ],
+      "parent_review_row_sha256": "b4ef766c2c5016c9c99e0de7d442bfd112a1d45dc7b53cdecc264ebafe7ee3bc",
+      "review": {
+        "review_id": "original19-source-conditions:ZP37-XIE",
+        "case_id": "ZP37-XIE",
+        "pillars": [
+          "己未",
+          "壬申",
+          "戊子",
+          "庚申"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "shared_paragraph_named_example",
+        "source_pdf_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 76,
+            "image_sha256": "47c5b4f77e2d78e9b1ec1f7ce6211462d43a8c98325feadbe8472ad8c6cfc15d"
+          }
+        ],
+        "reading_excerpt": "如身強食旺而財透，大貴之格",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "与梁例共用同段分类；两申藏戊及未土的物理根不能抹去，也不能因此直接判定工程强档。",
+        "passage_conditions": "壬财和庚食神有透不等于全部食神生财条件已通过；保留原典类别与工程弱的差异。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "ZP41-SHI",
+      "reference_bindings": [
+        {
+          "reference_id": "hurt:ZP41-SHI",
+          "parent_record_sha256": "38985aff0a9769560c72744a94d22757c35fe9eef8027f148a19bbcb96e9b121"
+        }
+      ],
+      "parent_review_row_sha256": "e6e598e242aaa297d7db7144b6cf5fee4c346fb5ba6256505425262ee2e678c5",
+      "review": {
+        "review_id": "original19-source-conditions:ZP41-SHI",
+        "case_id": "ZP41-SHI",
+        "pillars": [
+          "壬午",
+          "己酉",
+          "戊辰",
+          "庚申"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "conditional_category_with_named_example",
+        "source_pdf_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 82,
+            "image_sha256": "dc6c84cf50aa953808a473a47199956365de86ae294900d46d77e454cd76bc13"
+          }
+        ],
+        "reading_excerpt": "只要身強而財有根，便為貴格",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "“如壬午己酉戊辰庚申史春芳命”接在条件后；戊土自身根、午印与财根各核，不把印计入本体。",
+        "passage_conditions": "伤官生财是该段格局条件；工程图的存在性不能替代财根与身强条件。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "ZP-PROSPECTIVE-02-YANG",
+      "reference_bindings": [
+        {
+          "reference_id": "root:ZP-PROSPECTIVE-02-YANG",
+          "parent_record_sha256": "cd395f6b9718cd7cdeb6733a218360444287cfae31a6747247c13173eb1052ad"
+        }
+      ],
+      "parent_review_row_sha256": "4d7391ce2b67b84a6e8700acd54fd17154fdaee9f75ef8c68962d3cd26043e13",
+      "review": {
+        "review_id": "original19-source-conditions:ZP-PROSPECTIVE-02-YANG",
+        "case_id": "ZP-PROSPECTIVE-02-YANG",
+        "pillars": [
+          "壬寅",
+          "壬寅",
+          "庚辰",
+          "辛巳"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "shared_paragraph_named_example",
+        "source_pdf_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 69,
+            "image_sha256": "190c96c30976433d5e8d6af304e68db013ce3ead6787e3477f53c590caba0bb9"
+          }
+        ],
+        "reading_excerpt": "身強而不露官，略帶一位比肩，益覺有情",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "杨侍郎例接在身强条件后；寅月失令不能独自定弱，辰土印、巳根及比肩分列。",
+        "passage_conditions": "壬水财、庚日与辛比肩各自位置和相互作用需要完整记录；本段没有给统一通关系数。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "ZP-PROSPECTIVE-17-MAO-HEAVY",
+      "reference_bindings": [
+        {
+          "reference_id": "root:ZP-PROSPECTIVE-17-MAO-HEAVY",
+          "parent_record_sha256": "810e9914ffae3a8b159407fc592db9307f7795b83f31cd9ddfddf9f3f8ae0e14"
+        }
+      ],
+      "parent_review_row_sha256": "d46b03129ea47e0ce80f0ad3fc6031aa304af6a6a07c7f1006c1ad7e5f969188",
+      "review": {
+        "review_id": "original19-source-conditions:ZP-PROSPECTIVE-17-MAO-HEAVY",
+        "case_id": "ZP-PROSPECTIVE-17-MAO-HEAVY",
+        "pillars": [
+          "壬寅",
+          "戊申",
+          "壬辰",
+          "壬寅"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_body_and_seal_separately",
+        "source_pdf_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 73,
+            "image_sha256": "ff262123f33324bda2c055b472e73afdf2a7ebe32c7d2a4c171009e20d8a1d13"
+          }
+        ],
+        "reading_excerpt": "此身重印輕也",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "原页所印姓名为馬參政，旧编号及旧登记名保留。身重、印轻是两个主语判断；工程body_greater只比较两种能量，不等于原典强弱已裁定。",
+        "passage_conditions": "不能由戊土、申金、壬水存在就宣布杀印相生有效；原文此处论印格分类。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "ZP-PROSPECTIVE-18-MA-LIGHT",
+      "reference_bindings": [
+        {
+          "reference_id": "root:ZP-PROSPECTIVE-18-MA-LIGHT",
+          "parent_record_sha256": "fafe1fa8a9665ddb2747f6f2f36592d7e7f1ca3d6c3f3bbfb180ce16e30a2608"
+        }
+      ],
+      "parent_review_row_sha256": "c7616d9ac74611628a3ee4b5a4ecfd62330e54bbbc9da485eb10059afdb7dd45",
+      "review": {
+        "review_id": "original19-source-conditions:ZP-PROSPECTIVE-18-MA-LIGHT",
+        "case_id": "ZP-PROSPECTIVE-18-MA-LIGHT",
+        "pillars": [
+          "己巳",
+          "癸酉",
+          "癸未",
+          "庚申"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_body_and_seal_separately",
+        "source_pdf_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 73,
+            "image_sha256": "ff262123f33324bda2c055b472e73afdf2a7ebe32c7d2a4c171009e20d8a1d13"
+          }
+        ],
+        "reading_excerpt": "此身輕印重也",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "原页所印姓名为茅狀元，旧编号及旧登记名保留。癸日轻与金印重并陈，最直接反证“印多必身强”。",
+        "passage_conditions": "金印重不自动证明金水生扶可全部承受；工程强与原映射弱的矛盾保持。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "DTCW1947-TG-01",
+      "reference_bindings": [
+        {
+          "reference_id": "passage:DTCW1947-TG-01",
+          "parent_record_sha256": "4d2c4e70ada6e01ccb49f943a63c96c3a530886926d58afd673210510e1cdf60"
+        }
+      ],
+      "parent_review_row_sha256": "d93aa31f10b61e86229347e142ec292ad92ff0dde50b5a2c530a1f2614698704",
+      "review": {
+        "review_id": "original19-source-conditions:DTCW1947-TG-01",
+        "case_id": "DTCW1947-TG-01",
+        "pillars": [
+          "癸酉",
+          "甲子",
+          "丁卯",
+          "丙午"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_day_master_strength_with_passage_conditions",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 199,
+            "image_sha256": "a8dd68204d2e12e76d6a46460ff6cc251e632854f2a8c27dce373ce625620fe7"
+          }
+        ],
+        "reading_excerpt": "日主弱中變旺；自然不隔不占無阻節之物",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "癸杀生甲印，甲印生丁身，并论丙午时归禄旺；不是仅见甲木印便改强。",
+        "passage_conditions": "水、木、火路径之外，原文还要求无隔阻：金见水不克木、木见火生火、水仍能生木、金仍能生水。现图只登记条件，未证明效力。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "DTCW1947-GS-01",
+      "reference_bindings": [
+        {
+          "reference_id": "prior_root_v4:DTCW1947-GS-01",
+          "parent_record_sha256": "1cec2ccb6a9713ff95d993854f7e1470405f046abb849caf21cdccd3a64d1f1d"
+        }
+      ],
+      "parent_review_row_sha256": "61d73f23959aa1a893e32bb076831f16660a40954a261761fa1640bf696de5ef",
+      "review": {
+        "review_id": "original19-source-conditions:DTCW1947-GS-01",
+        "case_id": "DTCW1947-GS-01",
+        "pillars": [
+          "己酉",
+          "丙寅",
+          "庚申",
+          "庚辰"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_day_master_strength_with_roots",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 203,
+            "image_sha256": "9b1c2204a9bafca65607bf2652d3fa14a623d755603397eb5be39c8fcec04a57"
+          }
+        ],
+        "reading_excerpt": "印比幫身，弱中變旺",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "原文先叙春金失令，再叙地支两逢禄旺及辰时印比帮助。季相、两庚身与己土印须分别核。",
+        "passage_conditions": "原文另有“木嫩金坚”与无火/无木反事实；不能将原局的丙火作为无条件坏作用。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "DTCW1947-GS-03",
+      "reference_bindings": [
+        {
+          "reference_id": "prior_root_v4:DTCW1947-GS-03",
+          "parent_record_sha256": "9aff1fe8665e5f7673f1f5f8fbc4038d77ae2903d3c8b0dd22d99ca053bef5b2"
+        }
+      ],
+      "parent_review_row_sha256": "205ccb3be9938fdaab4852498ef290ca98ac910396c3793794c7d6ea7afd5327",
+      "review": {
+        "review_id": "original19-source-conditions:DTCW1947-GS-03",
+        "case_id": "DTCW1947-GS-03",
+        "pillars": [
+          "戊子",
+          "甲寅",
+          "戊午",
+          "甲寅"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_day_master_strength_in_paired_contrast",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 205,
+            "image_sha256": "a01d130f481a61298d0a80dee2f6b7751d054316c6fc4af4d9fb563565db6ac7"
+          }
+        ],
+        "reading_excerpt": "前則坐下印綬，七殺皆來生拱，而日主堅旺",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "与下例印坐长生作对比：本例日坐午印，寅午生拱；后例财坐日下、印遇财冲。主语和例次不可串用。",
+        "passage_conditions": "不是“有印有根”即可一律生身；财冲印、季节浅深、承载及反事实差异须另审。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "DTCW1947-GS-12",
+      "reference_bindings": [
+        {
+          "reference_id": "prior_root_v4:DTCW1947-GS-12",
+          "parent_record_sha256": "72c3eebb58c264a9a584bcfbf48f8e1acbf41a68bc7c361f70a7db406ad77b18"
+        }
+      ],
+      "parent_review_row_sha256": "3030a6019e37933810ec64d151a5e48912f81249a19ec311dcabba56446e4081",
+      "review": {
+        "review_id": "original19-source-conditions:DTCW1947-GS-12",
+        "case_id": "DTCW1947-GS-12",
+        "pillars": [
+          "癸丑",
+          "戊午",
+          "丙午",
+          "壬辰"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_day_master_strength_and_no_transformation",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 209,
+            "image_sha256": "1148b9e625e9762d9f2eb69a665a1bc933ea36b8b6c5a9651993a665d877d9f2"
+          }
+        ],
+        "reading_excerpt": "此造火長夏天，旺之極矣；通根雖合而不化也",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "丙午日午月，癸丑、壬辰被另论有根、蓄水；戊癸合不能吞掉癸水或冒充化火已经成立。",
+        "passage_conditions": "原文合而不化同时保留丑、辰根；数值存在合绊不等于可直接采用化火候选。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "DTCW1947-HJ-01",
+      "reference_bindings": [
+        {
+          "reference_id": "prior_stem_transformation:DTCW1947-HJ-01",
+          "parent_record_sha256": "970c5b27ef573639b023df9ae268fa1d5cd158a510428e084787cd39bec25bdf"
+        }
+      ],
+      "parent_review_row_sha256": "2670a29d34de67a9fef7d3824342946b985b956306d21e10c5ddf4e6b13bacad",
+      "review": {
+        "review_id": "original19-source-conditions:DTCW1947-HJ-01",
+        "case_id": "DTCW1947-HJ-01",
+        "pillars": [
+          "辛亥",
+          "庚寅",
+          "丙子",
+          "乙未"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_fire_weakness_with_early_season",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 414,
+            "image_sha256": "8f780d29959c2178a5e097f98ae3c79778ffc2482063901b627f9b4f1d3b61ac"
+          }
+        ],
+        "reading_excerpt": "火虛木嫩，用神在木，忌神在金",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "“春初”限定火虚木嫩；印木数量大不能倒推丙身强。辛亥、庚寅、丙子、乙未各层仍保留。",
+        "passage_conditions": "亥水流通金性、合寅生木及乙木盘根制未土均为所选段条件；工程生克图未算出完整清浊和承载。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "DTCW1947-HJ-06",
+      "reference_bindings": [
+        {
+          "reference_id": "prior_stem_transformation:DTCW1947-HJ-06",
+          "parent_record_sha256": "5702cd110a6d9485bbcfb6b61a640d72a4995fedaafcf4ad5f730bcd7ef1af16"
+        }
+      ],
+      "parent_review_row_sha256": "ad874f7ff0617c369ebefa052be70362076333dbfc517689cb65422ff8de1b99",
+      "review": {
+        "review_id": "original19-source-conditions:DTCW1947-HJ-06",
+        "case_id": "DTCW1947-HJ-06",
+        "pillars": [
+          "丁未",
+          "壬寅",
+          "甲子",
+          "丙寅"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_body_context_with_source_transformation_claim",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 416,
+            "image_sha256": "5c8ad058e5cf9f6f0f13e730ba3e087fe214be73f8784c527fb56fa4f4e59edb"
+          }
+        ],
+        "reading_excerpt": "木嫩氣虛；最喜丁壬之合化木，反生丙火",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "寅月寅时仍被作者称木嫩气虚，寒暖与生长阶段不能被“当令=强”替代。",
+        "passage_conditions": "原文丁壬合化木属该例作者论断；当前工程仅列关系/候选时，应并列差异，不擅自把候选改成已化或更改系数。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "DZ-12",
+      "reference_bindings": [
+        {
+          "reference_id": "prior_dizhi:DZ-12",
+          "parent_record_sha256": "6a00283f6ea95e4642b4fc2f2adcefc5a14483211df61d319b0590d45664a9bb"
+        }
+      ],
+      "parent_review_row_sha256": "b0c34bb832f26f50d40d911da43387b09ff7a25bdaa34ca46c0da89138ca1abb",
+      "review": {
+        "review_id": "original19-source-conditions:DZ-12",
+        "case_id": "DZ-12",
+        "pillars": [
+          "戊辰",
+          "辛酉",
+          "丙午",
+          "癸巳"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_later_example_backreference",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 91,
+            "image_sha256": "c692a0c9341f0a140b7a5d755403eac8f85b86b3c82a32634ea41b2cb547c238"
+          }
+        ],
+        "reading_excerpt": "前造身財並旺",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "PDF91下例回指同页上例；只用此回指作为原强标签依据，不能从身出富家或事后传记生成强标签。",
+        "passage_conditions": "上例另说午火帮身、无木、癸水为病；须分清原局与子运等后续时间层。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "GH-15",
+      "reference_bindings": [
+        {
+          "reference_id": "prior_ganzhi:GH-15",
+          "parent_record_sha256": "620585f426670e10a86e806501fa7e3763be3ed0efbe125d22064f5622570a53"
+        }
+      ],
+      "parent_review_row_sha256": "5cc195f2024e4f53be9a5d1c0b1206cccaaddbdf031e5a5648e393339f26a4be",
+      "review": {
+        "review_id": "original19-source-conditions:GH-15",
+        "case_id": "GH-15",
+        "pillars": [
+          "丙子",
+          "己亥",
+          "乙酉",
+          "壬午"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_body_weakness_despite_seal",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 106,
+            "image_sha256": "833b1903a628600f3a6b830116c52f5c9d34fc737045a946b188c6604811ee7d"
+          }
+        ],
+        "reading_excerpt": "日主本衰，未嘗不喜其生",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "乙日冬令，壬印紧贴与丙火向阳、己土砥水是不同作用；水印大不等于乙身已强。",
+        "passage_conditions": "原文强调壬水远隔与日主紧贴的区别及天干地支各立门户；不能把所有水印统一当作有效生扶。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "XX-16",
+      "reference_bindings": [
+        {
+          "reference_id": "prior_shape_bureau:XX-16",
+          "parent_record_sha256": "516e7ca681da716a4429b14e4625b3e0ae4859d3decf291db700d67202454f94"
+        }
+      ],
+      "parent_review_row_sha256": "c8892d7775df65cb4209cf129e0fddee184a4d565eee0f227739728536249b4e",
+      "review": {
+        "review_id": "original19-source-conditions:XX-16",
+        "case_id": "XX-16",
+        "pillars": [
+          "己巳",
+          "辛未",
+          "丙午",
+          "丁酉"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_fire_extreme_strength",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 132,
+            "image_sha256": "ba9635b95543870409ac74012739684b3c8933b2c3dbd4fb322c3537f3e6ef76"
+          },
+          {
+            "pdf_page": 133,
+            "image_sha256": "6605f36042565b44686057bad415cda12ceb5e7d0d3eb040830552115dc1fcb4"
+          }
+        ],
+        "reading_excerpt": "此造火長夏天，支類南方，旺之極矣",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "这是原19中先前已符合者，继续纳入完整分母；巳午未方、丁火透与无湿气并列，不新增通过信用。",
+        "passage_conditions": "后续北方运与暗会金局不是原局已存在的通关路径，须分清运和局。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "XX-19",
+      "reference_bindings": [
+        {
+          "reference_id": "prior_shape_bureau:XX-19",
+          "parent_record_sha256": "34e150741bb3c0e44d2693289e0db99b0dc604e06daf1e758115044d65370452"
+        }
+      ],
+      "parent_review_row_sha256": "13c38c0be55c8fbb68851b2b6d86d73357ec62f081ffcc4b075f98f08d51c06c",
+      "review": {
+        "review_id": "original19-source-conditions:XX-19",
+        "case_id": "XX-19",
+        "pillars": [
+          "庚申",
+          "辛巳",
+          "丙辰",
+          "乙未"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_day_master_weakness_and_damaged_seal",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 137,
+            "image_sha256": "724ad0cbd4807b9cf48398fedd6dd51c1cc15486f4233d5634bc6e2309a12aae"
+          }
+        ],
+        "reading_excerpt": "獨印受傷，弱可知矣；此財多身弱",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "巳月建禄不保证身强；庚辛叠透根深、乙印受伤和无根是原文明示条件。",
+        "passage_conditions": "“帮之则有功”在这里带条件，不能把任何印路径认定已通关，或拿后续甲申乙酉发财改写原局标签。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "FJ-08",
+      "reference_bindings": [
+        {
+          "reference_id": "prior_shape_bureau:FJ-08",
+          "parent_record_sha256": "f435df11a4622895c30b6f07f091e85434f1a4a252a722076231a91b0c9d206e"
+        }
+      ],
+      "parent_review_row_sha256": "1c92364adb511611eb58dd9b2f98aa65674e9679d6ed7961ebbc5e4b0dd2a777",
+      "review": {
+        "review_id": "original19-source-conditions:FJ-08",
+        "case_id": "FJ-08",
+        "pillars": [
+          "癸卯",
+          "丙辰",
+          "甲辰",
+          "丙寅"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_day_master_strength",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 147,
+            "image_sha256": "db966d4cde74b065451458c740f1e74e9a3183df7f741f17f5c61eb5f66042f2"
+          }
+        ],
+        "reading_excerpt": "當以財星為用，丙火食神為喜，癸水為忌，身旺用財",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "甲日、辰月、丙食生财均应分别呈现；这例也是先前已符合者，保留在19分母不新增信用。",
+        "passage_conditions": "原文反对不察财官之势机械论成方成局，不能由寅卯辰或图路径一出现便判同一用法。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "SP-02",
+      "reference_bindings": [
+        {
+          "reference_id": "prior_body_spirit_month_hour:SP-02",
+          "parent_record_sha256": "937d6eda3f7a01364e0917df7673e804b3299235908d625822705ef03ab2d8a3"
+        }
+      ],
+      "parent_review_row_sha256": "b58179a9a4a26cb57987fb1b4c694203150f591ae0ca4895b8cf2811f65b3b87",
+      "review": {
+        "review_id": "original19-source-conditions:SP-02",
+        "case_id": "SP-02",
+        "pillars": [
+          "癸未",
+          "乙卯",
+          "丙辰",
+          "庚寅"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "contextual_semantic_mapping_needs_expert_adjudication",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 169,
+            "image_sha256": "68c773aea8cf7a54eb3b4df6443f0e291828c4b496c811c0617bc9647fc4a9ed"
+          },
+          {
+            "pdf_page": 170,
+            "image_sha256": "cf99ded0c28b2f3f62629d82891a05e3571e66485726cca2ff1e48cd72a46084"
+          }
+        ],
+        "reading_excerpt": "木之勢愈旺而火熾，火熾則氣餒",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "本例确为癸未乙卯丙辰庚寅，PDF169左栏续170首行；不是170另列的四柱皆土命。旧弱标签为“气馁”到丙身弱的人工语义映射，不是逐字身弱判词，保持但不新增认可。",
+        "passage_conditions": "需结合168精气神论的不同所指，不能将“火炽”单词或“气馁”单词直接变成统一强弱档；19例复核仍记分歧，不借此删除负例。",
+        "relative_timing_statements": [],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    },
+    {
+      "case_id": "ML-02",
+      "reference_bindings": [
+        {
+          "reference_id": "prior_body_spirit_month_hour:ML-02",
+          "parent_record_sha256": "48ae0b53496b4babe4198e617d0c59ba321e6b73fc598c24b4da11a658214e9a"
+        }
+      ],
+      "parent_review_row_sha256": "8afafeb630a5b481c3de43a888db712068c36e17cd91753c160cfde954e05492",
+      "review": {
+        "review_id": "original19-source-conditions:ML-02",
+        "case_id": "ML-02",
+        "pillars": [
+          "甲戌",
+          "丙寅",
+          "戊辰",
+          "庚申"
+        ],
+        "review_kind": "same_developer_primary_image_reading",
+        "claim_shape": "explicit_day_master_strength_with_relative_duty_statement",
+        "source_pdf_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "source_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_page_anchors": [
+          {
+            "pdf_page": 172,
+            "image_sha256": "5c60daa59425c64c06481aa84f34ceec69dfc947ae416e0ba687e97000fbcd58"
+          },
+          {
+            "pdf_page": 173,
+            "image_sha256": "9c7e4b1f58847edc40330dde6c95bd906e458275a1b718dfc3d2fe4f88182a2e"
+          }
+        ],
+        "reading_excerpt": "日支坐辰通根身旺；生于立春後六日，正戊土司令",
+        "excerpt_kind": "developer_transcription_for_scope",
+        "body_seal_conditions": "原文戊辰日坐根并述戊土司令、丙火生身；“立春后六日”为本书相对时序陈述，不能改成独立天文出生时刻已知。",
+        "passage_conditions": "寅申冲、辰戌冲及杀印作用需同次回执；selected_stem=None保留工程未裁定，不能抹去源文戊令，也不能随意选一表以追求命中。",
+        "relative_timing_statements": [
+          {
+            "statement_kind": "relative_solar_term_day_statement",
+            "source_term": "立春",
+            "source_elapsed_days": 6,
+            "source_duty_stem": "戊",
+            "reading_excerpt": "生于立春後六日，正戊土司令",
+            "calendar_instant_reconstructed": false,
+            "day_count_convention": "not_adjudicated",
+            "effective_duty_assigned": false
+          }
+        ],
+        "independent_expert_review": "not_completed",
+        "effective_force_adjudication": "not_adjudicated",
+        "effective_passage_adjudication": "not_adjudicated",
+        "strength_annotation_assigned_or_regraded": false,
+        "new_independent_validation_credit": 0,
+        "calculation_effect": "none"
+      }
+    }
+  ],
+  "scope": "Same-developer source-condition readings,not independent adjudication,model answers or a new strength calculation;do not synthesize a birth instant or duty calendar from a relative source day statement."
+}

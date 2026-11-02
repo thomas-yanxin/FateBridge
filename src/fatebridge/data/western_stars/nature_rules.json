@@ -1,0 +1,263 @@
+{
+  "author": "Claudius Ptolemy",
+  "edition": "Tetrabiblos; F. E. Robbins; Loeb 1940",
+  "chapter": "I.9",
+  "source_url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/1B%2A.html#9",
+  "source_html_sha256": "39222a252fa86724ebf6be2a7acdeaf10fa237a04acf089aef86f8a76b4fbd9e",
+  "identification_policy": "Modern named objects mapped to the described star or constellation region; regional attribution is not a claim that Ptolemy explicitly used every modern name. No numerical strength weights or event judgements inferred.",
+  "annotation": "Manual source reading; not independent expert textual criticism. unqualified means no relative-strength qualifier in the selected passage, not equal numeric strength.",
+  "stars": {
+    "Algol": {
+      "region": "Perseus",
+      "components": [
+        {
+          "planet": "Jupiter",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Saturn",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Alcyone": {
+      "region": "Taurus: Pleiades",
+      "components": [
+        {
+          "planet": "Moon",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Jupiter",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Aldebaran": {
+      "region": "Taurus: bright reddish Hyad (Torch)",
+      "components": [
+        {
+          "planet": "Mars",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Rigel": {
+      "region": "Orion: bright stars other than shoulders",
+      "components": [
+        {
+          "planet": "Jupiter",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Saturn",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Capella": {
+      "region": "Auriga: bright stars",
+      "components": [
+        {
+          "planet": "Mars",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Mercury",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Betelgeuse": {
+      "region": "Orion: shoulders",
+      "components": [
+        {
+          "planet": "Mars",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Mercury",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Sirius": {
+      "region": "Canis: bright star in mouth",
+      "components": [
+        {
+          "planet": "Jupiter",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Mars",
+          "qualifier": "lesser_degree"
+        }
+      ]
+    },
+    "Pollux": {
+      "region": "Gemini: following head (Hercules)",
+      "components": [
+        {
+          "planet": "Mars",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Procyon": {
+      "region": "Procyon",
+      "components": [
+        {
+          "planet": "Mercury",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Mars",
+          "qualifier": "lesser_degree"
+        }
+      ]
+    },
+    "Regulus": {
+      "region": "Leo: heart (Regulus)",
+      "components": [
+        {
+          "planet": "Mars",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Jupiter",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Denebola": {
+      "region": "Leo: bright star in tail",
+      "components": [
+        {
+          "planet": "Saturn",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Venus",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Algorab": {
+      "region": "Corvus",
+      "components": [
+        {
+          "planet": "Mars",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Saturn",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Spica": {
+      "region": "Virgo: Spica",
+      "components": [
+        {
+          "planet": "Venus",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Mars",
+          "qualifier": "lesser_degree"
+        }
+      ]
+    },
+    "Arcturus": {
+      "region": "Bootes: bright tawny Arcturus",
+      "components": [
+        {
+          "planet": "Jupiter",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Mars",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Alphecca": {
+      "region": "Corona Septentrionalis",
+      "components": [
+        {
+          "planet": "Venus",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Mercury",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Antares": {
+      "region": "Scorpio: middle bright tawny star (Antares)",
+      "components": [
+        {
+          "planet": "Mars",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Jupiter",
+          "qualifier": "some_degree"
+        }
+      ]
+    },
+    "Vega": {
+      "region": "Lyra",
+      "components": [
+        {
+          "planet": "Venus",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Mercury",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Deneb Algedi": {
+      "region": "Capricorn: tail",
+      "components": [
+        {
+          "planet": "Saturn",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Jupiter",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Fomalhaut": {
+      "region": "Piscis Australis: bright star in mouth",
+      "components": [
+        {
+          "planet": "Venus",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Mercury",
+          "qualifier": "unqualified"
+        }
+      ]
+    },
+    "Markab": {
+      "region": "Horse: bright stars",
+      "components": [
+        {
+          "planet": "Mars",
+          "qualifier": "unqualified"
+        },
+        {
+          "planet": "Mercury",
+          "qualifier": "unqualified"
+        }
+      ]
+    }
+  }
+}

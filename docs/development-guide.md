@@ -31,6 +31,8 @@ uv sync --locked --extra dev
 
 首次 `doctor` 应能识别包版本和已安装依赖；缺少外部星历文件时按返回的能力范围处理。Windows 的环境准备见[快速入门](getting-started.md)。
 
+历史验证原件、回归输入与黄金快照在 Git 之外单独保存。完整验收前，需将与当前测试版本配套的冻结数据恢复到 `docs/validation/`、`tests/fixtures/` 和 `tests/golden/snapshots/`；当前 Python 测试辅助模块与维护文档仍由 Git 管理。CI 也需要预先提供同一份数据。数据缺失时保留原测试失败，不通过重建基线或跳过断言替代验收。本文中的本地数据路径在恢复数据后可用。
+
 开发依赖继续声明在 `project.optional-dependencies.dev`，兼容既有的 dev extra。本页统一用 `uv run --locked --extra dev <command>` 运行仓库命令，无需激活虚拟环境。提交依赖变更时同时审查 `pyproject.toml` 和 `uv.lock`；不要手改锁文件。
 
 环境变量可以按需复制一份：
@@ -119,6 +121,14 @@ curl http://localhost:8010/health
 
 ### 测试
 
+原生星历与独立 DE440 参考用例需要先准备固定来源数据；获取过程校验声明的哈希，数据不入库：
+
+```bash
+uv run --locked --extra dev python -m fatebridge.fetch_ephe --year-range 1 9999
+uv run --locked --extra dev python -m fatebridge.fetch_ephe --files seas_12.se1 seas_18.se1 seas_24.se1
+uv run --locked --extra dev python scripts/prepare_reference_kernel.py
+```
+
 ```bash
 uv run --locked --extra dev python -m pytest -q
 uv run --locked --extra dev python -m pytest -q tests/test_api_alignment.py
@@ -128,9 +138,28 @@ uv run --locked --extra dev python -m pytest -q tests/test_chinese_metaphysics.p
 
 测试需要在已安装 dev extra 的 Python 3.10–3.13 环境里跑，这跟 CI 矩阵保持一致。注意不要用系统自带的解释器，否则容易出现伪失败。例如异步测试在缺少 `pytest-asyncio` 时不会真正执行，而是直接报 `FAILED`，错误信息通常是 `async def functions are not natively supported`。这类失败是环境问题，不是代码问题：先执行 `uv sync --locked --extra dev` 并通过 `uv run --locked --extra dev` 使用该环境，再判断测试本身是否有错。同理，`black`、`isort`、`mypy` 也都来自 dev extra，系统解释器里一般没有。
 
+非均匀节点的 SciPy 独立对照使用封存的专用锁文件；其依赖与主源码环境分别维护。CI 的 Python 3.12 作业额外执行同一检查，不能把主环境中缺少 SciPy 的跳过计作对照通过：
+
+```bash
+PYTHONPATH="$PWD:$PWD/src" UV_PROJECT_ENVIRONMENT="$PWD/.venv-nonuniform-reference" \
+  uv run --project tests/fixtures/astrodice-nonuniform-v1/solver-environment \
+  --python 3.12 --locked --extra dev python -m pytest -q \
+  tests/test_astrodice_nonuniform_reference.py::test_exact_interval_contains_analytic_derivative_on_asymmetric_nodes
+```
+
+梅花时间戳签名测试还需要支持 `ts -attime`、`-check_ss_sig` 的 OpenSSL。macOS 自带程序可能缺少这些选项；可将已安装的 OpenSSL 3 的 `bin` 目录放在本次测试命令的 `PATH` 前部，或向审计 CLI 显式传 `--openssl`。缺少能力应报告环境错误，不删验证参数，也不跳过签名验证。
+
 ### CI 运行范围
 
 主分支每次 push 都运行完整测试，避免文档提交取消先前代码检查后以局部检查代替验收。PR 按整个 merge-base 差异分流；同一分支或 PR 有新提交时会取消旧 CI。源码、测试（含 `tests/fixtures/` 原典标注与冻结清单）、依赖、工作流、技能、`AGENTS.md`、`docs/examples/` 和 `docs/validation/`（包括其中的 Markdown）的变更运行 Python 3.10–3.13 全量测试及最低依赖测试，数值基线由 Linux x86_64 / Python 3.12 校验。无法取得完整差异或出现未识别路径时也运行全量。
+
+黄金环境同时固定空星历目录与 `FATEBRIDGE_SOLAR_TERM_MODEL=native`，并在退出时恢复调用方策略；空目录或单独的Swiss探测标志不能证明实际交节采用Moshier。来源与元数据确有行为新增时，逐字段审核、保留旧结果并只更新受影响基线，不以重新冻结取得天文精度或原典符合。风水实例与已保留差异见[运行来源比较](fengshui-source-comparison.md)。
+
+京本金口诀行年使用 `uv run --locked --extra dev python scripts/audit_jinkou_year_fate.py --output /tmp/jinkou-year-fate.json` 及 `tests/test_jinkou_year_fate.py` 核对。出生年干支、指定一岁起算岁序和性别分别保留；岁首与占时实际年龄联动未认证，另课地分是行年支推导，不能写成观测方位。原书标签、循环推导、业务合同与进程内三端分别报告；可选旧720盘基线不作为新占断答案，详见第四十六轮记录（本地数据：`validation/jinkou-year-fate-validation-2026-10-23.md`）。
+
+六壬／金口诀历史封套的受控补证使用 `scripts/audit_ren_golden_evidence.py --capture --candidate-dir <新目录> --output <审计文件>`，捕获真实REST结果后核对冻结原件、手算预期、原计算保持与限定路径；默认不写黄金文件。canonical收据缺少UUID与生成时间，业务主体与实际返回的完整收据分别验证。黄金时钟的进入失败、异常清理、UTC跨区及重复钟回归见 `tests/test_ren_golden_evidence.py`；不要重新替换已退役模块里的datetime入口。确切范围、旧误标及未迁移差异见第四十五轮记录（本地数据：`validation/ren-golden-evidence-validation-2026-10-23.md`）。
+
+历史补证结果缺少后续版本新增字段时，审计保留 `current_contract_error`，完整合同门槛仍为未通过，命令返回非零并拒绝写回黄金文件。旧对象的可逆补证、来源与原计算核验继续保留；当前响应另用严格完整合同验收。黄金快照会规范化浮点，原始未舍入账本应先独立校验，再要求规范化结果与快照一致，不把舍入后的副本当作原始账本，也不放宽账本恒等式。
 
 PR 仅修改根目录的 README、CHANGELOG、CONTRIBUTING、SECURITY，或 `docs/` 下排除 `examples/`、`validation/` 与 `AGENTS.md` 的普通 Markdown 时，可走文档分支。该分支仍安装锁定开发环境，检查链接、JSON、接口计数、生成合同、技能接口和可运行 CLI 示例。JSON、日志等其他归档按非文档变更处理。
 
@@ -185,6 +214,10 @@ uv run --locked --extra dev mypy src/fatebridge/
 
 ## 设计约束
 
+### 保持逻辑直接，明确校验边界
+
+编码与审查遵循 [AGENTS.md 的代码简洁与边界原则](../AGENTS.md#代码简洁与边界)。请求、文件和第三方返回在各自边界校验，内部使用已确定的类型；协议错误转换、资源清理及动态字段投影保留必要检查。
+
 ### 输入归一化不要分散实现
 
 涉及出生时间、地点、时区、真太阳时修正时，优先复用：
@@ -226,6 +259,8 @@ uv run --locked --extra dev mypy src/fatebridge/
 测试从已安装的 `src` 包导入，仓库根 `conftest.py` 负责 `tests.*` 命名空间；测试文件不再单独修改 `sys.path`。请求模型从 `core.requests` 领域模块导入，工具实现从定义模块导入。`tests/fixtures/transports.py` 提供已挂载 REST endpoint 查询及原生 FastMCP Client 调用，协议测试检查 text JSON 与 structuredContent 一致。`test_retired_entries.py` 检查旧模块、路由和包装保持移除，并验证原生协议成功/错误响应；`test_request_catalog_isolation.py` 在新进程验证独立嵌套模型 Schema、延迟编译与目录不加载计算引擎。
 
 修改合同缓存时运行 `tests/test_schema_cache.py`，检查副本隔离、并发冷启动、同名类／输出覆写、模型重建、失败不缓存及逐次业务执行。不要缓存业务输入或结果。核心数值变更之外的清理，应先保存同环境的业务输出和发现合同，再与修改后结果比较；黄金快照仍需在规定的 Linux 环境完整核对，不应为清理重新冻结。
+
+清理测试时，先确认保留用例覆盖同一输入、行为与失败方式，再移除重复检查。已有完整接口测试和领域断言覆盖的冒烟测试、仅把请求字段原样读回的测试无需重复维护；多版本实现的相同行为可用参数化保留各版本输入和故障场景。原典参考、独立数值对照、历史失败记录与封存源码属于验证证据，不因文件多或体积大而删除。
 
 ### 什么时候补 API/MCP 对齐测试
 
@@ -280,11 +315,11 @@ uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 git diff --check
 ```
 
-`check_docs.py` 只使用标准库，检查根目录、`docs/`（排除本地 `reviews/`）与 `skills/` 的 Markdown 内联链接、本地标题锚点、代码围栏、JSON 代码块及示例 JSON 语法。它不访问外网，不执行代码块，也不证明自然语言或接口参数正确；外部来源保留版本，按受影响内容另行核对。CI 由 `locked` 作业执行该检查。
+`check_docs.py` 只使用标准库，默认检查根目录、`docs/` 中的当前维护文档与 `skills/` 的 Markdown 内联链接、本地标题锚点、代码围栏、JSON 代码块及示例 JSON 语法。`docs/validation/` 中的历史记录、冻结源码与第三方文档保留原文，使用 `--include-archives` 单独检查；当前文档指向历史材料的文件和标题仍须存在。本地 `reviews/` 始终排除。它不访问外网，不执行代码块，也不证明自然语言或接口参数正确；外部来源保留版本，按受影响内容另行核对。CI 由 `locked` 作业执行当前维护文档检查。
 
 现有文档测试把计数、路由覆盖、技能与生成合同关联到实时目录；`test_skills_engine_contract.py` 还会实际执行 CLI 示例，绑定测试进程解释器。修改可运行请求时，按[示例索引](examples/README.md)选择对应工具，验证模型与实际结果；结构校验成功不能替代三端或真实模型体验。
 
-`AGENTS.md` 的 `codex-call-contracts` 区块由 `scripts/build_codex_call_contracts.py` 从实际 MCP 输入 Schema 和共享首轮字段生成，不能手改生成区。接口或首轮字段变化后先运行生成器，再用 `--check` 核对。场景矩阵或技能接口变化后同样重新生成 `data/agent_scenarios.json`，其中包含源文件散列，纯文案变更也可能需要同步生成物。
+`docs/contracts/` 的逐工具 JSON 与索引由 `scripts/build_codex_call_contracts.py` 从实际 MCP 输入 Schema 和共享首轮字段生成，不能手改生成文件。根 `AGENTS.md` 不嵌入这些大合同。接口或首轮字段变化后先运行生成器，再用 `--check` 核对。场景矩阵或技能接口变化后同样重新生成 `data/agent_scenarios.json`，其中包含源文件散列，纯文案变更也可能需要同步生成物。
 
 新增工具还须在 `core/response_models.py` 声明完整结果的必需业务根，目录装配缺声明会失败；不要为了让错误的 service 输出通过而放宽要求。公共投影模型允许字段缺失与合法 null，完整执行的必需根则不可缺失或为 null。相关回归包括 `tests/test_complete_output_contracts.py`、`tests/test_fengshui_analysis_progress.py`、`tests/test_relationship_and_career_semantics.py`、`tests/test_result_delivery_storage.py` 和 `tests/test_response_budget_contract.py`；验证跨端成功／失败、合法投影、状态转移、字符无损读取及多进程容量，而非只冻结一个用户答案。
 
@@ -297,6 +332,8 @@ git diff --check
 ## CI、打包与发布
 
 发布从干净 checkout 构建，并核对 wheel 的 Python 模块和 JSON 与当前源码清单一致。删除源模块后，旧 `build/lib` 的增量残留可能仍进入 wheel，因此发布构建应使用全新的工作目录。
+
+日常整理使用[仓库维护](repository-maintenance.md)中的预览与清理命令。构建缓存、当前源码、冻结回归材料和历史运行证据各自维护，不能按扩展名批量删除日志或哈希。
 
 ```bash
 uv build
@@ -361,3 +398,7 @@ uv run --locked --extra dev python scripts/sync_github_release.py \
 - 架构说明：[architecture.md](architecture.md)
 - API 参考：[api-reference.md](api-reference.md)
 - 故障排除：[troubleshooting.md](troubleshooting.md)
+
+真实模型行为与激活评测按[Agent 行为验收](agent-evaluation.md)执行，分别报告机械判据与人工解释质量；安装分发见[Onda 插件](onda-plugin.md)。
+
+[MingLi-Bench 外部评估](mingli-bench-evaluation.md)另行维护固定来源、完整题目分类和命例级开发／留出划分。运行 `uv run --locked --extra dev python scripts/build_mingli_evaluation.py --check` 核对清洗产物漂移；普通测试不启动模型，真实对话继续使用上述运行器，分别保留机械成绩和待人工审阅状态。

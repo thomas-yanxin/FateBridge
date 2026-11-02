@@ -89,8 +89,8 @@ def _local_golden_projection():
         zone="+08:00",
         lat="31n13",
         lon="121e28",
-        qimen_options={"layout": "fly"},
-        taiyi_options={"accNum": 1},
+        qimen_options={"layout": "direct"},
+        taiyi_options={"accNum": 0},
         liureng_yue="申",
         liureng_is_diurnal=False,
     )
@@ -220,7 +220,7 @@ def test_local_request_models_accept_alias_and_nested_fields():
         zone="+08:00",
         gps_lat=31.2,
         gps_lon=121.4,
-        lines=[{"value": 1, "change": True}],
+        lines=[{"value": 1, "change": True}] * 6,
     )
     suzhan_request = SuZhanRequest(
         date="2028-04-06",
@@ -233,6 +233,9 @@ def test_local_request_models_accept_alias_and_nested_fields():
     otherbu_request = OtherBuRequest(
         date="2028-04-06",
         time="09:33:00",
+        zone="+08:00",
+        lat="31n13",
+        lon="121e28",
         sign="Aries",
         house=3,
         planet="Sun",
@@ -242,8 +245,8 @@ def test_local_request_models_accept_alias_and_nested_fields():
     sanshiunited_request = SanShiUnitedRequest(
         date="2028-04-06",
         time="09:33:00",
-        qimen_options={"layout": "fly"},
-        taiyi_options={"accNum": 1},
+        qimen_options={"layout": "direct"},
+        taiyi_options={"accNum": 0},
         selected_sections=["起盘信息", "离九宫"],
         liureng_yue="辰",
         liureng_is_diurnal=True,
@@ -266,7 +269,7 @@ def test_local_request_models_accept_alias_and_nested_fields():
     assert otherbu_request.house == 3
     assert otherbu_payload["hsys"] == 0
     assert otherbu_payload["zodiacal"] == 1
-    assert sanshiunited_request.qimen_options["layout"] == "fly"
+    assert sanshiunited_request.qimen_options["layout"] == "direct"
     assert sanshiunited_request.selected_sections == ["起盘信息", "离九宫"]
     assert sanshiunited_request.liureng_is_diurnal is True
     assert sanshi_payload["liureng_is_diurnal"] is True
@@ -368,8 +371,8 @@ def test_fastmcp_sanshiunited_compact_mode_can_drop_snapshot_text():
         zone="+08:00",
         lat="31n13",
         lon="121e28",
-        qimen_options={"layout": "fly"},
-        taiyi_options={"accNum": 1},
+        qimen_options={"layout": "direct"},
+        taiyi_options={"accNum": 0},
         liureng_yue="申",
         liureng_is_diurnal=False,
         compact=True,
@@ -427,7 +430,10 @@ def test_calculate_meihua_analysis_returns_expected_hexagram_chain():
     assert interpretation["moving_line_oracle"]["changed_hexagram"]["name"] == "火风鼎"
     assert interpretation["moving_line_oracle"]["body_trigram"] == "离"
     assert interpretation["moving_line_oracle"]["use_trigram"] == "乾"
-    assert "第一步踩稳" in interpretation["moving_line_oracle"]["judgement"]
+    assert "第一步踩稳" in interpretation["moving_line_oracle"]["position_hint"]
+    assert (
+        "无交害，匪咎，艱則无咎。" in interpretation["moving_line_oracle"]["judgement"]
+    )
     assert "试探、起步" in interpretation["moving_line_oracle"]["favorable"]
     assert "起手过满" in interpretation["moving_line_oracle"]["caution"]
     assert "里程碑先钉牢" in interpretation["moving_line_oracle"]["domain_hint"]
@@ -454,8 +460,8 @@ def test_calculate_meihua_analysis_returns_expected_hexagram_chain():
     assert "站错队" in interpretation["risk_hint"]
     assert len(interpretation["judgement_outline"]) == 7
     assert "事业/项目" in result["summary"]
-    assert "起念与启动" in result["summary"]
-    assert "第一步踩稳" in result["summary"]
+    assert "无交害，匪咎，艱則无咎。" in result["summary"]
+    assert "传统体用解读" in result["summary"]
 
 
 def test_calculate_tongshefa_analysis_returns_expected_local_structure():
@@ -708,7 +714,12 @@ def test_suzhan_uses_shared_local_chart_runtime():
 
     assert local_chart["chart"]["houses"] == suzhan_result["chart"]["houses"]
     assert local_chart["chart"]["angles"] == suzhan_result["chart"]["angles"]
-    assert local_sun == suzhan_sun
+    # Physical zodiac/house facts still use the same chart runtime. 宿位 now
+    # comes from the declared unequal RA model instead of the local equal band.
+    assert {k: v for k, v in local_sun.items() if k != "su28"} == {
+        k: suzhan_sun[k] for k in local_sun if k != "su28"
+    }
+    assert suzhan_sun["su28_method"] == "modern_equatorial_research_anchors_v1"
     assert local_chart["params"]["enginePrecision"] == expected_precision
     assert local_chart["params"]["engineBackend"] == expected_backend
 
@@ -888,7 +899,7 @@ def test_calculate_suzhan_analysis_rejects_unsupported_offline_modes():
     )
 
     assert invalid_hsys_result == {
-        "error": "核心星盘离线模式暂仅支持 hsys=0..8（整宫制、Alcabitus、Regiomontanus、Placidus、Koch、Vehlow Equal、Polich Page、Sripati、天顶为10宫中点等宫制）。",
+        "error": "核心星盘离线模式暂仅支持 hsys=0..8（整宫制、Alcabitus、Regiomontanus、Placidus、Koch、Vehlow Equal、Polich Page、Sripati、天顶为第10宫宫头的等宫制）。",
         "error_code": "validation_error",
         "status_code": 400,
         "retryable": False,
@@ -928,7 +939,8 @@ def test_calculate_otherbu_analysis_supports_traditional_mode():
     assert not any(item["id"] == "Uranus" for item in natal_objects)
     assert "Sun主核心意志" in result["interpretation"]["summary"]
     assert "星座：Aries" in result["snapshot_text"]
-    assert "问题：合作" in result["snapshot_text"]
+    assert '问题原文（JSON引用）："合作"' in result["snapshot_text"]
+    assert result["question"] == result["input_normalized"]["question"] == "合作"
     assert "[骰子盘宫位与星体]" in result["snapshot_text"]
     assert "[天象盘宫位与星体]" in result["snapshot_text"]
 
@@ -1004,8 +1016,8 @@ def test_calculate_otherbu_analysis_exposes_runtime_engine_metadata():
 
     assert result["chart"]["params"]["enginePrecision"] == expected_precision
     assert result["chart"]["params"]["engineBackend"] == expected_backend
-    assert result["diceChart"]["params"]["enginePrecision"] == expected_precision
-    assert result["diceChart"]["params"]["engineBackend"] == expected_backend
+    assert result["diceChart"]["params"]["enginePrecision"] == "sign_and_house_only"
+    assert result["diceChart"]["params"]["engineBackend"] == "symbolic_rules"
 
 
 def test_calculate_otherbu_analysis_supports_extended_offline_house_systems():
@@ -1078,6 +1090,9 @@ def test_calculate_otherbu_analysis_rejects_unsupported_offline_modes():
         lat="31n13",
         lon="121e28",
         hsys=9,
+        planet="Sun",
+        sign="Aries",
+        house=0,
     )
     invalid_zodiac_result = calculate_otherbu_analysis(
         date="2028-04-06",
@@ -1086,16 +1101,19 @@ def test_calculate_otherbu_analysis_rejects_unsupported_offline_modes():
         lat="31n13",
         lon="121e28",
         zodiacal=2,
+        planet="Sun",
+        sign="Aries",
+        house=0,
     )
 
     assert invalid_hsys_result == {
-        "error": "核心星盘离线模式暂仅支持 hsys=0..8（整宫制、Alcabitus、Regiomontanus、Placidus、Koch、Vehlow Equal、Polich Page、Sripati、天顶为10宫中点等宫制）。",
+        "error": "hsys必须为0..8的整数，仅用于附加天象盘",
         "error_code": "validation_error",
         "status_code": 400,
         "retryable": False,
     }
     assert invalid_zodiac_result == {
-        "error": "核心星盘离线模式暂仅支持 zodiacal=0(回归黄道) 或 zodiacal=1(恒星黄道/Lahiri)。",
+        "error": "zodiacal必须为0或1的整数，仅用于附加天象盘",
         "error_code": "validation_error",
         "status_code": 400,
         "retryable": False,
@@ -1117,13 +1135,13 @@ def test_calculate_otherbu_analysis_keeps_dice_chart_house_geometry_consistent()
     dice_sun = next(
         item for item in result["diceChart"]["chart"]["objects"] if item["id"] == "Sun"
     )
-    actual_house = _house_id_for_longitude(
-        result["diceChart"]["chart"]["houses"], dice_sun["lon"]
-    )
+    symbolic_house = result["diceChart"]["chart"]["houses"][6]
 
     assert dice_sun["house"] == "House7"
-    assert actual_house == "House7"
-    assert dice_sun["house"] == actual_house
+    assert symbolic_house["sign"] == dice_sun["sign"] == "Aries"
+    assert "lon" not in dice_sun
+    assert "signlon" not in dice_sun
+    assert "su28" not in dice_sun
 
 
 def test_calculate_sanshiunited_analysis_returns_local_aggregation():
@@ -1187,83 +1205,23 @@ def test_calculate_sanshiunited_analysis_respects_liureng_overrides():
 
 
 def test_calculate_sanshiunited_analysis_applies_qimen_and_taiyi_options():
-    default_result = calculate_sanshiunited_analysis(
-        date="2028-04-06",
-        time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
+    payload = dict(
+        date="2028-04-06", time="09:33:00", zone="+08:00", lat="31n13", lon="121e28"
     )
+    default_result = calculate_sanshiunited_analysis(**payload)
     optioned_result = calculate_sanshiunited_analysis(
-        date="2028-04-06",
-        time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
-        qimen_options={"layout": "fly"},
-        taiyi_options={"accNum": 1},
+        **payload, qimen_options={"ju_method": "chaibu"}, taiyi_options={"accNum": 0}
     )
-
-    assert optioned_result["qimen"] != default_result["qimen"]
-    assert optioned_result["qimen"]["palaces"] != default_result["qimen"]["palaces"]
-    assert optioned_result["taiyi"] != default_result["taiyi"]
-    assert (
-        optioned_result["taiyi"]["taiyi_palace"]
-        != default_result["taiyi"]["taiyi_palace"]
-    )
+    assert optioned_result["qimen"]["ju_method"] == "chaibu"
+    assert optioned_result["qimen"]["ju_term"] == "清明"
+    assert optioned_result["qimen"]["ju_number"] == 7
+    assert default_result["qimen"]["ju_number"] == 6
+    assert optioned_result["taiyi"] == default_result["taiyi"]
     assert optioned_result["subresults"]["qimen"]["pan"] == optioned_result["qimen"]
     assert optioned_result["subresults"]["taiyi"]["pan"] == optioned_result["taiyi"]
-    assert optioned_result["snapshot_text"] != default_result["snapshot_text"]
-    assert "内容来源：" in optioned_result["snapshot_text"]
-    assert (
-        "坎一宫：天盘干：丁；地盘干：己；八神：螣蛇；九星：天冲；八门：惊门；内容来源：兑七宫 / 兑"
-        in optioned_result["snapshot_text"]
+    assert all(
+        p["content_palace"] == p["name"] for p in optioned_result["qimen"]["palaces"]
     )
-    optioned_zhifu_palace = next(
-        palace
-        for palace in optioned_result["qimen"]["palaces"]
-        if palace["name"] == optioned_result["qimen"]["zhifu"]["palace"]
-    )
-    optioned_zhishi_palace = next(
-        palace
-        for palace in optioned_result["qimen"]["palaces"]
-        if palace["name"] == optioned_result["qimen"]["zhishi"]["palace"]
-    )
-    assert optioned_result["qimen"]["zhifu"]["star"] == optioned_zhifu_palace["star"]
-    assert (
-        optioned_result["qimen"]["zhifu"]["trigram"] == optioned_zhifu_palace["trigram"]
-    )
-    assert (
-        optioned_result["qimen"]["zhifu"]["content_palace"]
-        == optioned_zhifu_palace["content_palace"]
-    )
-    assert (
-        optioned_result["qimen"]["zhifu"]["content_trigram"]
-        == optioned_zhifu_palace["content_trigram"]
-    )
-    assert optioned_result["qimen"]["zhifu"]["code"]
-    assert optioned_result["qimen"]["zhishi"]["door"] == optioned_zhishi_palace["door"]
-    assert (
-        optioned_result["qimen"]["zhishi"]["trigram"]
-        == optioned_zhishi_palace["trigram"]
-    )
-    assert (
-        optioned_result["qimen"]["zhishi"]["content_palace"]
-        == optioned_zhishi_palace["content_palace"]
-    )
-    assert (
-        optioned_result["qimen"]["zhishi"]["content_trigram"]
-        == optioned_zhishi_palace["content_trigram"]
-    )
-    assert optioned_result["qimen"]["zhishi"]["code"]
-    assert optioned_zhifu_palace["content_palace"]
-    assert optioned_zhifu_palace["content_trigram"]
-    assert any(
-        palace["content_palace"] != palace["name"]
-        or palace["content_trigram"] != palace["trigram"]
-        for palace in optioned_result["qimen"]["palaces"]
-    )
-    assert optioned_result["qimen"]["palaces"][0]["trigram"] == "坎"
 
 
 def test_calculate_sanshiunited_analysis_supports_selected_export_sections():
@@ -1358,9 +1316,6 @@ def test_local_offline_golden_samples_match_current_contract():
                 "id": "Sun",
                 "house": "House7",
                 "sign": "Aries",
-                "signlon": 15.0,
-                "lon": 15.0,
-                "su28": "亢",
             },
         },
         "sanshiunited": {
@@ -1369,28 +1324,28 @@ def test_local_offline_golden_samples_match_current_contract():
                 "ju_text": "阳遁六局下元",
                 "zhifu": {
                     "star": "天任",
-                    "palace": "中五宫",
-                    "trigram": "中",
+                    "palace": "坤二宫",
+                    "trigram": "坤",
                     "content_palace": "坤二宫",
                     "content_trigram": "坤",
                     "code": "任",
                 },
                 "zhishi": {
                     "door": "生门",
-                    "palace": "坤二宫",
-                    "trigram": "坤",
+                    "palace": "艮八宫",
+                    "trigram": "艮",
                     "content_palace": "艮八宫",
                     "content_trigram": "艮",
                     "code": "生",
                 },
-                "layout": "fly",
-                "reference": "门迫逢旺，先阻后成。",
+                "layout": "direct",
+                "reference": None,
             },
             "taiyi": {
-                "main_calculation": "陽遁五十七局（积数+1）",
-                "taiyi_palace": "寅",
-                "big_pattern": "龙德扶身格",
-                "small_pattern": "六合入局",
+                "main_calculation": "陽遁五十七局",
+                "taiyi_palace": "艮",
+                "big_pattern": None,
+                "small_pattern": None,
             },
             "liureng": {
                 "month_general": {"branch": "申", "name": "传送"},

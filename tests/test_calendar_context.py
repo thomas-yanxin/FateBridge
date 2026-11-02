@@ -150,7 +150,7 @@ def test_comprehensive_timing_returns_jieqi_grid_and_analysis_calendar():
 
 
 def test_build_calendar_context_marks_out_of_range_lunar_support():
-    moment = datetime(2100, 2, 9, 12, 0, 0)
+    moment = datetime(2101, 1, 1, 12, 0, 0)
     pillars = BaZiCalendar.get_four_pillars(moment, timezone_name="Asia/Shanghai")
 
     calendar_context = build_calendar_context(
@@ -162,8 +162,8 @@ def test_build_calendar_context_marks_out_of_range_lunar_support():
     assert calendar_context["lunar_calendar"] is None
     assert calendar_context["lunar_calendar_support"]["supported"] is False
     assert calendar_context["lunar_calendar_support"]["supported_range"] == {
-        "start": "1900-01-31",
-        "end": "2100-02-08",
+        "start": "1900-01-01",
+        "end": "2100-12-31",
     }
 
 

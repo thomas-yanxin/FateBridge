@@ -1,0 +1,678 @@
+{
+  "id": "taiyi-qiliang-year-months-v1",
+  "source": {
+    "title": "兩千年中西曆對照表",
+    "authors": "薛仲三、歐陽頤",
+    "edition": "商務印書館1940",
+    "holding_institution": "國立臺灣大學圖書館",
+    "url": "https://commons.wikimedia.org/wiki/File:NTUL-9900013521F02_兩千年中西曆對照表.pdf",
+    "pdf_sha256": "6ae47386aa8fa645da9e7540b81170ba95fc09407cef3194c33818dcd8ca9e1d",
+    "pdf_bytes": 99925249,
+    "pdf_page": 7,
+    "printed_page": 101,
+    "western_calendar": "julian",
+    "reading_file": "tests/fixtures/taiyi_jinjing_v35/historical-months-initial.json",
+    "reading_sha256": "6d080a4010d9ce6ebff2bbd7790572ad0973787a119246a262e8bb77ec4f5acc",
+    "reading_freeze_sha256": "e24226d89c43f82c39d8b57ff6f9264ef449bfcf2c9f88828533d1704e36aa2e"
+  },
+  "supported_years": [
+    501,
+    505
+  ],
+  "calendar_tradition": "南齐／梁史历主表（按原书年栏；未复原并立北朝异历）",
+  "year_label_basis": "原表年栏的名义年度；不裁定朝代移交及改元发生日",
+  "counter_policy": "原表Week与Cycle是加农历日序的基数。星期日零基=(Week+day)%7；甲子一基=(Cycle+day-1)%60+1。仅月首时，Week恰等于星期一零基、Cycle恰等于甲子零基，不能推广到非月首。",
+  "scope": "整页501至505完整五年62个月及506正月终界，按所选史历表逐日映射；原儒略历先转换为推算公历，输入仍用所选钟面民用日期。502闰四月与元嘉诊断闰五月／六月不同，未裁定孰是；非王氏同元四分历、完整古历时实或原典岁首裁定。",
+  "source_disagreements": [
+    {
+      "id": "qiliang_502_leap_month",
+      "year": 502,
+      "printed_leap_month": 4,
+      "alternative_hypotheses": [
+        {
+          "method": "yuanjia_mean_civil_day",
+          "leap_month": 5
+        },
+        {
+          "method": "yuanjia_mean_exact_fraction",
+          "leap_month": 6
+        }
+      ],
+      "adjudicated": false,
+      "scope": "所选史历表保留闰四月；两项元嘉中气归属诊断分别为闰五月／六月，算法或来源误差尚未裁定，不以候选替换原表。"
+    }
+  ],
+  "months": [
+    {
+      "year": 501,
+      "month": 1,
+      "is_leap_month": false,
+      "julian_start": "0501-02-04",
+      "printed_week_counter": 6,
+      "printed_cycle_counter": 32,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 501,
+      "month": 2,
+      "is_leap_month": false,
+      "julian_start": "0501-03-05",
+      "printed_week_counter": 0,
+      "printed_cycle_counter": 1,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 501,
+      "month": 3,
+      "is_leap_month": false,
+      "julian_start": "0501-04-04",
+      "printed_week_counter": 2,
+      "printed_cycle_counter": 31,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 501,
+      "month": 4,
+      "is_leap_month": false,
+      "julian_start": "0501-05-03",
+      "printed_week_counter": 3,
+      "printed_cycle_counter": 0,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 501,
+      "month": 5,
+      "is_leap_month": false,
+      "julian_start": "0501-06-02",
+      "printed_week_counter": 5,
+      "printed_cycle_counter": 30,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 501,
+      "month": 6,
+      "is_leap_month": false,
+      "julian_start": "0501-07-01",
+      "printed_week_counter": 6,
+      "printed_cycle_counter": 59,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 501,
+      "month": 7,
+      "is_leap_month": false,
+      "julian_start": "0501-07-31",
+      "printed_week_counter": 1,
+      "printed_cycle_counter": 29,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 501,
+      "month": 8,
+      "is_leap_month": false,
+      "julian_start": "0501-08-30",
+      "printed_week_counter": 3,
+      "printed_cycle_counter": 59,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 501,
+      "month": 9,
+      "is_leap_month": false,
+      "julian_start": "0501-09-28",
+      "printed_week_counter": 4,
+      "printed_cycle_counter": 28,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 501,
+      "month": 10,
+      "is_leap_month": false,
+      "julian_start": "0501-10-28",
+      "printed_week_counter": 6,
+      "printed_cycle_counter": 58,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 501,
+      "month": 11,
+      "is_leap_month": false,
+      "julian_start": "0501-11-26",
+      "printed_week_counter": 0,
+      "printed_cycle_counter": 27,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 501,
+      "month": 12,
+      "is_leap_month": false,
+      "julian_start": "0501-12-26",
+      "printed_week_counter": 2,
+      "printed_cycle_counter": 57,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 502,
+      "month": 1,
+      "is_leap_month": false,
+      "julian_start": "0502-01-24",
+      "printed_week_counter": 3,
+      "printed_cycle_counter": 26,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 502,
+      "month": 2,
+      "is_leap_month": false,
+      "julian_start": "0502-02-23",
+      "printed_week_counter": 5,
+      "printed_cycle_counter": 56,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 502,
+      "month": 3,
+      "is_leap_month": false,
+      "julian_start": "0502-03-24",
+      "printed_week_counter": 6,
+      "printed_cycle_counter": 25,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 502,
+      "month": 4,
+      "is_leap_month": false,
+      "julian_start": "0502-04-23",
+      "printed_week_counter": 1,
+      "printed_cycle_counter": 55,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 502,
+      "month": 4,
+      "is_leap_month": true,
+      "julian_start": "0502-05-22",
+      "printed_week_counter": 2,
+      "printed_cycle_counter": 24,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 502,
+      "month": 5,
+      "is_leap_month": false,
+      "julian_start": "0502-06-21",
+      "printed_week_counter": 4,
+      "printed_cycle_counter": 54,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 502,
+      "month": 6,
+      "is_leap_month": false,
+      "julian_start": "0502-07-20",
+      "printed_week_counter": 5,
+      "printed_cycle_counter": 23,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 502,
+      "month": 7,
+      "is_leap_month": false,
+      "julian_start": "0502-08-19",
+      "printed_week_counter": 0,
+      "printed_cycle_counter": 53,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 502,
+      "month": 8,
+      "is_leap_month": false,
+      "julian_start": "0502-09-17",
+      "printed_week_counter": 1,
+      "printed_cycle_counter": 22,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 502,
+      "month": 9,
+      "is_leap_month": false,
+      "julian_start": "0502-10-17",
+      "printed_week_counter": 3,
+      "printed_cycle_counter": 52,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 502,
+      "month": 10,
+      "is_leap_month": false,
+      "julian_start": "0502-11-15",
+      "printed_week_counter": 4,
+      "printed_cycle_counter": 21,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 502,
+      "month": 11,
+      "is_leap_month": false,
+      "julian_start": "0502-12-15",
+      "printed_week_counter": 6,
+      "printed_cycle_counter": 51,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 502,
+      "month": 12,
+      "is_leap_month": false,
+      "julian_start": "0503-01-14",
+      "printed_week_counter": 1,
+      "printed_cycle_counter": 21,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 503,
+      "month": 1,
+      "is_leap_month": false,
+      "julian_start": "0503-02-12",
+      "printed_week_counter": 2,
+      "printed_cycle_counter": 50,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 503,
+      "month": 2,
+      "is_leap_month": false,
+      "julian_start": "0503-03-14",
+      "printed_week_counter": 4,
+      "printed_cycle_counter": 20,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 503,
+      "month": 3,
+      "is_leap_month": false,
+      "julian_start": "0503-04-12",
+      "printed_week_counter": 5,
+      "printed_cycle_counter": 49,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 503,
+      "month": 4,
+      "is_leap_month": false,
+      "julian_start": "0503-05-12",
+      "printed_week_counter": 0,
+      "printed_cycle_counter": 19,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 503,
+      "month": 5,
+      "is_leap_month": false,
+      "julian_start": "0503-06-10",
+      "printed_week_counter": 1,
+      "printed_cycle_counter": 48,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 503,
+      "month": 6,
+      "is_leap_month": false,
+      "julian_start": "0503-07-10",
+      "printed_week_counter": 3,
+      "printed_cycle_counter": 18,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 503,
+      "month": 7,
+      "is_leap_month": false,
+      "julian_start": "0503-08-08",
+      "printed_week_counter": 4,
+      "printed_cycle_counter": 47,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 503,
+      "month": 8,
+      "is_leap_month": false,
+      "julian_start": "0503-09-07",
+      "printed_week_counter": 6,
+      "printed_cycle_counter": 17,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 503,
+      "month": 9,
+      "is_leap_month": false,
+      "julian_start": "0503-10-06",
+      "printed_week_counter": 0,
+      "printed_cycle_counter": 46,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 503,
+      "month": 10,
+      "is_leap_month": false,
+      "julian_start": "0503-11-05",
+      "printed_week_counter": 2,
+      "printed_cycle_counter": 16,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 503,
+      "month": 11,
+      "is_leap_month": false,
+      "julian_start": "0503-12-04",
+      "printed_week_counter": 3,
+      "printed_cycle_counter": 45,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 503,
+      "month": 12,
+      "is_leap_month": false,
+      "julian_start": "0504-01-03",
+      "printed_week_counter": 5,
+      "printed_cycle_counter": 15,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 504,
+      "month": 1,
+      "is_leap_month": false,
+      "julian_start": "0504-02-01",
+      "printed_week_counter": 6,
+      "printed_cycle_counter": 44,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 504,
+      "month": 2,
+      "is_leap_month": false,
+      "julian_start": "0504-03-02",
+      "printed_week_counter": 1,
+      "printed_cycle_counter": 14,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 504,
+      "month": 3,
+      "is_leap_month": false,
+      "julian_start": "0504-04-01",
+      "printed_week_counter": 3,
+      "printed_cycle_counter": 44,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 504,
+      "month": 4,
+      "is_leap_month": false,
+      "julian_start": "0504-04-30",
+      "printed_week_counter": 4,
+      "printed_cycle_counter": 13,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 504,
+      "month": 5,
+      "is_leap_month": false,
+      "julian_start": "0504-05-30",
+      "printed_week_counter": 6,
+      "printed_cycle_counter": 43,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 504,
+      "month": 6,
+      "is_leap_month": false,
+      "julian_start": "0504-06-28",
+      "printed_week_counter": 0,
+      "printed_cycle_counter": 12,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 504,
+      "month": 7,
+      "is_leap_month": false,
+      "julian_start": "0504-07-28",
+      "printed_week_counter": 2,
+      "printed_cycle_counter": 42,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 504,
+      "month": 8,
+      "is_leap_month": false,
+      "julian_start": "0504-08-26",
+      "printed_week_counter": 3,
+      "printed_cycle_counter": 11,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 504,
+      "month": 9,
+      "is_leap_month": false,
+      "julian_start": "0504-09-25",
+      "printed_week_counter": 5,
+      "printed_cycle_counter": 41,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 504,
+      "month": 10,
+      "is_leap_month": false,
+      "julian_start": "0504-10-24",
+      "printed_week_counter": 6,
+      "printed_cycle_counter": 10,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 504,
+      "month": 11,
+      "is_leap_month": false,
+      "julian_start": "0504-11-23",
+      "printed_week_counter": 1,
+      "printed_cycle_counter": 40,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 504,
+      "month": 12,
+      "is_leap_month": false,
+      "julian_start": "0504-12-22",
+      "printed_week_counter": 2,
+      "printed_cycle_counter": 9,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 505,
+      "month": 1,
+      "is_leap_month": false,
+      "julian_start": "0505-01-21",
+      "printed_week_counter": 4,
+      "printed_cycle_counter": 39,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 505,
+      "month": 2,
+      "is_leap_month": false,
+      "julian_start": "0505-02-19",
+      "printed_week_counter": 5,
+      "printed_cycle_counter": 8,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 505,
+      "month": 2,
+      "is_leap_month": true,
+      "julian_start": "0505-03-21",
+      "printed_week_counter": 0,
+      "printed_cycle_counter": 38,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 505,
+      "month": 3,
+      "is_leap_month": false,
+      "julian_start": "0505-04-19",
+      "printed_week_counter": 1,
+      "printed_cycle_counter": 7,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 505,
+      "month": 4,
+      "is_leap_month": false,
+      "julian_start": "0505-05-19",
+      "printed_week_counter": 3,
+      "printed_cycle_counter": 37,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 505,
+      "month": 5,
+      "is_leap_month": false,
+      "julian_start": "0505-06-17",
+      "printed_week_counter": 4,
+      "printed_cycle_counter": 6,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 505,
+      "month": 6,
+      "is_leap_month": false,
+      "julian_start": "0505-07-17",
+      "printed_week_counter": 6,
+      "printed_cycle_counter": 36,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 505,
+      "month": 7,
+      "is_leap_month": false,
+      "julian_start": "0505-08-16",
+      "printed_week_counter": 1,
+      "printed_cycle_counter": 6,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 505,
+      "month": 8,
+      "is_leap_month": false,
+      "julian_start": "0505-09-14",
+      "printed_week_counter": 2,
+      "printed_cycle_counter": 35,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 505,
+      "month": 9,
+      "is_leap_month": false,
+      "julian_start": "0505-10-14",
+      "printed_week_counter": 4,
+      "printed_cycle_counter": 5,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 505,
+      "month": 10,
+      "is_leap_month": false,
+      "julian_start": "0505-11-12",
+      "printed_week_counter": 5,
+      "printed_cycle_counter": 34,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 505,
+      "month": 11,
+      "is_leap_month": false,
+      "julian_start": "0505-12-12",
+      "printed_week_counter": 0,
+      "printed_cycle_counter": 4,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 505,
+      "month": 12,
+      "is_leap_month": false,
+      "julian_start": "0506-01-10",
+      "printed_week_counter": 1,
+      "printed_cycle_counter": 33,
+      "pdf_page": 7,
+      "printed_page": 101
+    },
+    {
+      "year": 506,
+      "month": 1,
+      "is_leap_month": false,
+      "julian_start": "0506-02-09",
+      "printed_week_counter": 3,
+      "printed_cycle_counter": 3,
+      "pdf_page": 8,
+      "printed_page": 102,
+      "role": "exclusive_end_sentinel"
+    }
+  ]
+}

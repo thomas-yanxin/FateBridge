@@ -1,0 +1,162 @@
+{
+  "id": "quanshu_v2_symbolic_properties_v1",
+  "source_url": "https://zh.wikisource.org/w/index.php?title=紫微斗數全書/卷二&oldid=1963110",
+  "revision": 1963110,
+  "scope": "historical_symbolic_text_not_event_prediction",
+  "textual_hua_terms_are_sihua": false,
+  "entries": [
+    {
+      "star": "紫微",
+      "source_name": "紫微",
+      "elements": [
+        "土"
+      ],
+      "quote": "紫微属土中天星南北斗化帝座为官禄主",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "天机",
+      "source_name": "天机",
+      "elements": [
+        "木"
+      ],
+      "quote": "天机属木南斗化善为兄弟主",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "太阳",
+      "source_name": "太阳",
+      "elements": [
+        "火"
+      ],
+      "quote": "太阳属火南北斗化贵为官禄主",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "天同",
+      "source_name": "天同",
+      "elements": [
+        "水",
+        "金"
+      ],
+      "quote": "天同属水金南斗化福为福德主",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "廉贞",
+      "source_name": "廉真",
+      "elements": [
+        "火"
+      ],
+      "quote": "廉真属火北斗化杀囚在官禄为官禄主在身命为次桃花",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "武曲",
+      "source_name": "武曲",
+      "elements": [
+        "金"
+      ],
+      "quote": "武曲属金北斗化财为财帛主",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "天府",
+      "source_name": "天府",
+      "elements": [
+        "土"
+      ],
+      "quote": "天府属土南斗化令星为财帛田宅主",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "太阴",
+      "source_name": "太阴",
+      "elements": [
+        "水"
+      ],
+      "quote": "太阴属水南北斗化富为财帛田宅主",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "贪狼",
+      "source_name": "贪狼",
+      "elements": [
+        "水",
+        "木"
+      ],
+      "quote": "贪狼属水木北斗化桃花杀主祸福",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "巨门",
+      "source_name": "巨门",
+      "elements": [
+        "水"
+      ],
+      "quote": "巨门属水北斗化暗主是非",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "天相",
+      "source_name": "天相",
+      "elements": [
+        "水"
+      ],
+      "quote": "天相属水南斗化印为官禄主",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "天梁",
+      "source_name": "天梁",
+      "elements": [
+        "土"
+      ],
+      "quote": "天梁属土南斗化荫主寿星",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "七杀",
+      "source_name": "七杀",
+      "elements": [
+        "火",
+        "金"
+      ],
+      "quote": "七杀属火金南斗降星遇帝为权",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "破军",
+      "source_name": "破军",
+      "elements": [
+        "水"
+      ],
+      "quote": "破军属水北斗化耗司夫妻子女奴仆",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "文昌",
+      "source_name": "文昌",
+      "elements": [
+        "金"
+      ],
+      "quote": "文昌属金南北斗司科甲乃文魁之首",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    },
+    {
+      "star": "文曲",
+      "source_name": "文曲",
+      "elements": [
+        "水"
+      ],
+      "quote": "文曲属水北斗主科甲星",
+      "section": "论诸星分属南北斗化吉凶并分属五行"
+    }
+  ],
+  "element_collation_source": "https://www.digital.archives.go.jp/img/4468520#82",
+  "element_collation_frames": [
+    82,
+    83
+  ],
+  "element_collation_scope": "Element glyphs only in selected Ming scan; source_quote remains the pinned online transcription"
+}

@@ -1,0 +1,139 @@
+{
+  "id": "hinoo_calendar_clause_meanings_v1",
+  "scope": "Literal contextual meanings and attributed scholarly half interpretation; not a new numerical calendar algorithm, manuscript identity or modern clock mapping.",
+  "primary_binding": {
+    "publisher_html_response_sha256": "74c63f5151c2b8c3ac554f7a0acae0776e5247e740a712834e1b600a065050e6",
+    "downloaded_calendar_windows": [
+      {
+        "locator": "T2465_.78.0030c13-21",
+        "text": "若有閏月時。其正月直宿即亦重直閏月。謂假令十二月有閏月。而其十二月一日直宿是虚宿。十五日直宿是星宿。乃至三十日直宿是星宿。如是閏十二月直宿亦同之。更無異也。先月是正十二月。閏月是傍十二月也。故傍月･直宿三十日皆用正十二月直宿更不異宿也。餘月聞月准之知耳。"
+      },
+      {
+        "locator": "T2465_.78.0030c21-26",
+        "text": "取小月闕第三十日直宿之法。假令正月小闕第三十日。雖無其第三十日。而彼日分直宿猶有故。次二月初一日半已上者。正月闕日之分宿直也。半已下者即彼當日宿直。故雖大小異日有増減。而小月闕日直宿無日不得。次月初一日眞宿無改代也｣"
+      }
+    ],
+    "calendar_apparatus": [
+      {
+        "line": "0030c14",
+        "notes_html": [
+          "訣＝説<sup>イ</sup>＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c17",
+        "notes_html": [
+          "十＝月＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c18",
+        "notes_html": [
+          "〔是正･･･月〕十六字<sup>イ</sup>－＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c20",
+        "notes_html": [
+          "〔宿〕－＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c23",
+        "notes_html": [
+          "半＋（也）＜甲＞"
+        ]
+      }
+    ]
+  },
+  "relative_month": {
+    "locator": "T2465_.78.0030c14-21",
+    "term": "其正月",
+    "meaning": "相对于所举闰月的同名非闰月",
+    "literal_context": [
+      "謂假令十二月有閏月",
+      "先月是正十二月",
+      "閏月是傍十二月也"
+    ],
+    "not_a_universal_first_lunar_month": true,
+    "example_lunar_month": 12,
+    "scope": "同名普通月与闰月相对；这里不是命令所有闰月复用农历一月。"
+  },
+  "short_month_example": {
+    "locator": "T2465_.78.0030c21-26",
+    "term": "假令正月",
+    "meaning": "本段具体举农历一月为小月的例子",
+    "example_short_lunar_month": 1,
+    "example_following_lunar_month": 2,
+    "omitted_lunar_day": 30,
+    "next_first_day_ordinary_assignment_preserved": true,
+    "nominal_assignment_not_observed_moon_transit": true,
+    "scope": "缺失三十日的分宿仍须安置；下一月初一的当日宿没有被全天替换。"
+  },
+  "textual_halves": {
+    "locator": "T2465_.78.0030c23-24",
+    "literal_fragments": [
+      "半已上者",
+      "半已下者"
+    ],
+    "main_text_and_apparatus_not_merged": true,
+    "scholarly_interpretation": {
+      "author": "Jeffrey Kotyk",
+      "year": 2022,
+      "doi": "https://doi.org/10.3390/rel13050458",
+      "title": "Astronomy and Calendrical Science in Early Mikkyō in Japan: Challenges and Adaptations",
+      "printed_page": 9,
+      "preserved_pdf_sha256": "7693cf602eacfa476e03d518c19ac631a64bec890f25ba6c5c3ffb49ec236bb3",
+      "first_half": "缺失三十日的分宿",
+      "second_half": "当日宿",
+      "attribution": "本档案前半／后半名称采用该论文对此段的翻译解释；不是新增一条原文字面，也不是钟时换算。"
+    },
+    "modern_half_clock": null,
+    "daybreak_clock": null,
+    "solar_altitude": null,
+    "universal_date_boundary_established": false
+  },
+  "interaction": {
+    "leap_reuse_and_short_month_assignment_are_distinct_clauses": true,
+    "source_rule_priority_established": false,
+    "paragraph_order_is_an_executable_priority": false,
+    "two_modern_reconstructions_are_two_explicit_source_algorithms": false,
+    "scope": "段落前后排列不等于两规则交叠时的程序执行顺序；原先的条件候选与已可确定部分分别保留。"
+  },
+  "manuscript_context_scope": {
+    "catalogue_id": "100183249",
+    "title": "檜尾鈔",
+    "call_number": "72-25",
+    "selected_calendar_frames": [
+      34,
+      35
+    ],
+    "fixed_adjacent_context_frames": [
+      33,
+      34,
+      35,
+      36
+    ],
+    "additional_native_frames": [
+      33,
+      36
+    ],
+    "reading_packet_sha256": "6f2dec7844468d7a0356f8edddc0934499a64956d1090204349159c7c1f2549c",
+    "selected_working_readings_are_not_a_critical_edition": true,
+    "identified_as_T2465_base_or_ko": false,
+    "independent_lineage_accepted": false,
+    "not_used_to_normalize_SAT_star_or_half_glyphs": true
+  },
+  "source_evidence": {
+    "evidence_artifact_namespace": "sukuyo-hinoo-context-v94",
+    "before-research-plan.json": "48933a614afa6aaa1208ddbb7f1cddc9e281c7276b87cc56633093a88c9d1cec",
+    "context-acquisition-first.json": "b7134cddee7e218648a54fe080a4a22ee3f28293e994fad34b55ef2354aa3772",
+    "root-context-reread-first.json": "4c2226dfca19ade2f9e615d8d4f630ca740e83fe9cdf9b81f387160a224e4b38",
+    "kotyk-half-interpretation-recheck-before-code.json": "f9bc21c528fcd05e7e94cb9285afde81b5264669e3f79a7f28c866d1a250bfcf"
+  },
+  "calendar_policy_changed": false,
+  "complete_collation_accepted": false,
+  "original180_regraded": false,
+  "real_samples": 0,
+  "real_world_efficacy": "not_established"
+}

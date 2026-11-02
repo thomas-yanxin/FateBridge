@@ -1,0 +1,81 @@
+{
+  "method_id": "human_design_public_cycles_reference_v1",
+  "author": "Jovian Archive public teaching; sixth-line article attributed to Ra Uru Hu",
+  "sources": {
+    "dictionary": {
+      "url": "https://jovianarchive.com/pages/human-design-dictionary",
+      "html_sha256": "2e2316117a5ceeabd6aed00386b6a82f1843be6550f80c990a5daeaa5d0b657b",
+      "captured_date": "2026-10-22"
+    },
+    "six_lines": {
+      "url": "https://jovianarchive.com/blogs/chart-interpretations-components/the-six-lines-of-the-hexagram",
+      "html_sha256": "8d9d0c69a09a143c7f1463afcffa797ddce1d6bfb5e460efd512d8ef2b484d74",
+      "captured_date": "2026-10-22"
+    },
+    "cycles": {
+      "url": "https://jovianarchive.com/pages/cycle-analysis-in-human-design",
+      "html_sha256": "89f0482a6679e50aa4870c4e8e27a66b27e0dde9f3cd2cfe1bb8b592b42e76b7",
+      "captured_date": "2026-10-22"
+    },
+    "uranus_origin_followup": {
+      "url": "https://jovianarchive.com/pages/human-design-dictionary",
+      "html_sha256": "282b87fa9875d9e635db941ea0a25e21ae520843806aa804bec583d0ddeeac0e",
+      "captured_date": "2026-10-25",
+      "heading": "Uranus Opposition",
+      "quote": "Technically, the Uranus opposition occurs when the transiting Uranus reaches a point exactly opposite its position at birth.",
+      "quote_sha256": "646ed48912a1ab4e834c38c210067699b6f403c6e7178ff626ee2272787852b8"
+    }
+  },
+  "bounded_facts": {
+    "return": "A completed cycle returning an imprinting element to its originating position.",
+    "sixth_line_profiles": [
+      "3/6",
+      "4/6",
+      "6/2",
+      "6/3"
+    ],
+    "sixth_line_sequence": [
+      "before_Saturn_return",
+      "Saturn_to_Kiron_return",
+      "after_Kiron_return"
+    ],
+    "cycle_events": [
+      "Saturn_return",
+      "Uranus_opposition",
+      "Kiron_return"
+    ],
+    "teaching_ages_are_approximate": true
+  },
+  "unresolved_conventions": [
+    "Personality versus Design origin for Saturn and Kiron contacts is not resolved by the captured definitions. The separately recorded Uranus opposition definition explicitly names birth; it does not settle any multiple-contact priority.",
+    "Priority among multiple retrograde contacts is not resolved by the captured definitions."
+  ],
+  "scope": "Compact source facts only. Uranus birth-origin definition has explicit public evidence; its binding to the calculated Personality epoch is separately explained. Saturn/Kiron origins and all multiple-contact priorities remain unresolved. No full-text, full-cycle-chart, empirically measured maturation or real-world prediction certification.",
+  "event_origin_evidence": {
+    "Uranus": {
+      "source_origin_status": "explicit_birth_position_definition",
+      "source_origin": "birth_position",
+      "numerical_origin": "personality_birth_epoch",
+      "epoch_binding_basis": "Published Human Design Calculation definition assigns birth calculation to Personality; exact word Personality is not in the Uranus-opposition sentence.",
+      "source_key": "uranus_origin_followup",
+      "contact_priority": "unresolved_in_captured_primary_sources",
+      "unique_traditional_phase_assigned": false
+    },
+    "Saturn": {
+      "source_origin_status": "unresolved_in_captured_primary_sources",
+      "source_origin": null,
+      "numerical_origin": "personality_birth_epoch_explicit_computational_convention",
+      "source_key": null,
+      "contact_priority": "unresolved_in_captured_primary_sources",
+      "unique_traditional_phase_assigned": false
+    },
+    "Chiron": {
+      "source_origin_status": "unresolved_in_captured_primary_sources",
+      "source_origin": null,
+      "numerical_origin": "personality_birth_epoch_explicit_computational_convention",
+      "source_key": null,
+      "contact_priority": "unresolved_in_captured_primary_sources",
+      "unique_traditional_phase_assigned": false
+    }
+  }
+}

@@ -1,27 +1,18 @@
-"""
-财运分析模块
+"""Wealth-star positions, root prerequisites and actual storage/clash relations.
 
-基于八字命理的财运分析功能，综合以下经典技法：
-- 子平正格：身财两停、财多身弱、身旺财旺等财富格局判断
-- 墓库财法：辰戌丑未财库、冲库发财（参《八字中墓库对发财和破财》系列）
-- 盲派求财技法：正财偏财辨财源、食伤生财、比劫夺财
-- 德盛《八字中财富格局祸福的五大核心法门》《八字中看是否有钱和财富高低四大命脉》
-
-核心分析维度：
-1. 财星定位（正财/偏财所在与强弱）
-2. 财富格局评估（身财平衡、富贵层次）
-3. 墓库财分析（财库与冲开时机）
-4. 求财方式与方位（正业/投资、喜用神方位）
-5. 破财风险（比劫夺财、财星受冲）
-6. 财运时机（大运/流年发财与破财信号）
+Fixed rule indices are retained as uncalibrated compatibility fields, never
+wealth levels, investment probabilities or forecasts of financial outcomes.
+《秘本子平真诠》PDF44–45 rejects universal storage-opening rules; PDF76
+requires examining wealth roots and relative body/food/wealth force.
 """
 
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
+from ..core.bazi_root_context import wealth_rule_context
 from ..utils.data import (
-    BRANCH_ELEMENTS,
+    BRANCH_HIDDEN_STEMS,
     DESTRUCTION_CYCLE,
     STEM_ELEMENTS,
     Element,
@@ -46,12 +37,12 @@ WEALTH_STAR_STYLE = {
     TenGod.POSITIVE_WEALTH: {
         "label": "正财",
         "source": "正业、固定收入、薪资、稳健经营",
-        "traits": "踏实积累、量入为出、财来有道",
+        "traits": "持续性收入的现代类比，不测量实际收入或品行",
     },
     TenGod.PARTIAL_WEALTH: {
         "label": "偏财",
         "source": "投资、投机、副业、经商、意外之财",
-        "traits": "眼光独到、敢于把握机会、财来财去波动大",
+        "traits": "项目与交易类收入的现代类比，不判断投资能力或收益",
     },
 }
 
@@ -100,11 +91,13 @@ class WealthAnalysis:
         direction = WealthAnalysis._analyze_wealth_direction(wealth_element)
         risk = WealthAnalysis._analyze_wealth_risk(pillars, day_stem, wealth_element)
         timing = WealthAnalysis._analyze_wealth_timing(
-            day_stem, wealth_element, dayun_pillar, liunian_pillar
+            day_stem, wealth_element, dayun_pillar, liunian_pillar, pillars=pillars
         )
         suggestions = WealthAnalysis._generate_suggestions(structure, style, risk)
 
         return {
+            "counting_basis": "非日干每次1、每个藏干每次0.5；计数不等于有效力量。wealth_strength另按元素计权，非财旺裁定。",
+            "classical_context": wealth_rule_context(pillars),
             "wealth_element": wealth_element.value,
             "wealth_stars": wealth_stars,
             "wealth_structure": structure,
@@ -144,11 +137,11 @@ class WealthAnalysis:
 
         total = round(zheng_count + pian_count, 1)
         if total == 0:
-            visibility = "命局无明财，财星藏而不露或须从大运流年引动"
+            visibility = "本次天干和全部藏干均未见财星；不代表现实无收入"
         elif zheng_count >= pian_count:
-            visibility = "以正财为主，财源稳定正当"
+            visibility = "正财加权计数不低于偏财；不判断实际财源稳定性或正当性"
         else:
-            visibility = "以偏财为主，财源灵活、利于投资经商"
+            visibility = "偏财加权计数较高；不据此判断经商或投资结果"
 
         return {
             "positions": positions,
@@ -164,7 +157,7 @@ class WealthAnalysis:
         day_stem: str,
         wealth_element: Element,
     ) -> Dict[str, Any]:
-        """评估财富格局：身财平衡决定守财与得财能力。"""
+        """保留旧固定指数，显式区分模型分类、计数与原典成格。"""
         from ..core.elements import ElementAnalysis
 
         dm_analysis = ElementAnalysis.analyze_day_master_strength(pillars)
@@ -183,22 +176,24 @@ class WealthAnalysis:
         if strength == "强" and has_wealth:
             score += 18
             pattern = "身旺财旺"
-            notes.append("身旺能任财，财星亦旺，财富层次高，得财守财俱佳")
+            notes.append(
+                "扶抑模型为强且财元素计权达到1.5；不能据计数认定财旺或财富层次"
+            )
         elif strength == "中和" and has_wealth:
             score += 12
             pattern = "身财两停"
-            notes.append("身财平衡，得财顺遂，理财有度，富格之象")
+            notes.append("扶抑模型为中和且财元素计权达到1.5；不等于原典身财两停")
         elif strength == "弱" and wealth_strength >= 2.5:
             score -= 12
             pattern = "财多身弱"
-            notes.append("财多身弱，富屋贫人，见财而难守，宜先扶身（比劫、印星）再求财")
+            notes.append("扶抑模型为弱且财元素计权至少2.5；不推断现实贫富或守财能力")
         elif strength == "强" and not has_wealth:
             score -= 5
             pattern = "身旺财轻"
-            notes.append("身旺财轻，须行食伤运通关生财，或靠才华技术致富")
+            notes.append("扶抑模型为强且财元素计权低于1.5；不推断致富路径")
         else:
             pattern = "财星平常"
-            notes.append("财星力量一般，财运平稳，宜稳健积累")
+            notes.append("未命中上述模型和计数阈值分支；不能把规则未命中解释为财务平稳")
 
         # 食伤生财：财源活水
         has_food_hurt = False
@@ -209,22 +204,29 @@ class WealthAnalysis:
                 has_food_hurt = True
         if has_food_hurt and has_wealth:
             score += 8
-            notes.append("食伤生财，财源有根，越做越旺，利于经营与才华变现")
+            notes.append(
+                "非日干见食伤且财元素计权达到阈值；财根、相对力量与成格条件另查classical_context"
+            )
 
         score = max(30, min(95, score))
         if score >= 82:
-            level = "财富层次高"
+            level = "规则索引82–95"
         elif score >= 68:
-            level = "财运良好"
+            level = "规则索引68–81"
         elif score >= 55:
-            level = "财运平稳"
+            level = "规则索引55–67"
         else:
-            level = "求财较辛苦，重在守成"
+            level = "规则索引30–54"
 
         return {
             "day_master_strength": strength,
             "wealth_strength": wealth_strength,
-            "pattern": pattern,
+            "pattern": f"模型{strength}／财元素计权{wealth_strength:g}（未裁定格局）",
+            "legacy_pattern": pattern,
+            "formation_status": "not_adjudicated",
+            "score_kind": "uncalibrated_rule_index",
+            "score_basis": "基础60；旧模型强且财计权达1.5加18，中和且达1.5加12，弱且达2.5减12，强且低于1.5减5；非日干见食伤且财达阈值加8；截断30–95。非概率。",
+            "wealth_strength_kind": "element_occurrence_weight",
             "score": score,
             "level": level,
             "notes": notes,
@@ -235,41 +237,37 @@ class WealthAnalysis:
         pillars: Dict[str, Tuple[str, str]],
         wealth_element: Element,
     ) -> Dict[str, Any]:
-        """墓库财分析：财库见冲方能开库进财。"""
+        """只记录墓库对应与实际冲；不套四墓喜冲的普遍规则。"""
         storage_hits: List[Dict[str, Any]] = []
-        branches = [branch for _, branch in pillars.values()]
-
-        for p_name, (_, branch) in pillars.items():
-            stored = STORAGE_BRANCHES.get(branch)
-            if stored == wealth_element:
-                # 检查是否被其他地支冲开
-                opened = any(
-                    other != branch and check_branch_conflict(branch, other)
-                    for other in branches
-                )
-                storage_hits.append(
-                    {
-                        "pillar": p_name,
-                        "branch": branch,
-                        "stores": f"{wealth_element.value}（财库）",
-                        "opened": opened,
-                        "note": (
-                            "财库逢冲，开库进财，主大财或不动产"
-                            if opened
-                            else "财库未冲，财气封藏，逢冲库之运流年易得大财"
-                        ),
-                    }
-                )
-
-        if storage_hits:
-            summary = "命带财库，财富有积聚之象，关键看冲开时机"
-        else:
-            summary = "命无财库，财以流通见用，不主大额积聚"
-
+        for name, (_, branch) in pillars.items():
+            if STORAGE_BRANCHES.get(branch) != wealth_element:
+                continue
+            clashes = [
+                {"other_pillar": other, "other_branch": value[1]}
+                for other, value in pillars.items()
+                if other != name and check_branch_conflict(branch, value[1])
+            ]
+            storage_hits.append(
+                {
+                    "pillar": name,
+                    "branch": branch,
+                    "stores": f"{wealth_element.value}（四墓类比）",
+                    "opened": None,
+                    "clash_present": bool(clashes),
+                    "clashes": clashes,
+                    "note": "仅记录四墓对应与实际六冲；刑冲不自动开库，也不自动进财。",
+                }
+            )
         return {
             "has_storage": bool(storage_hits),
             "storage_hits": storage_hits,
-            "summary": summary,
+            "summary": (
+                "按四墓对应查见财元素库支；未裁定开库、聚财或进财"
+                if storage_hits
+                else "本四墓映射未命中财元素库支；不能据此判断资产积聚能力"
+            ),
+            "effect_status": "storage_symbol_not_financial_prediction",
+            "source_ref": "ziping_prerequisites_v1:storage_clash",
         }
 
     @staticmethod
@@ -286,14 +284,14 @@ class WealthAnalysis:
             info = WEALTH_STAR_STYLE[TenGod.PARTIAL_WEALTH]
             recommendations.append(f"偏财：{info['source']}（{info['traits']}）")
         if not recommendations:
-            recommendations.append("命局财星不显，宜靠印绶（专业、技能）或官贵间接得财")
+            recommendations.append("本次未见财星；不能据此指定实际收入来源")
 
         if pian > zheng:
-            primary = "偏财为主，适合投资、经商、副业拓展"
+            primary = "偏财计数较高；可讨论项目收入类比，需核实现实收入结构"
         elif zheng > pian:
-            primary = "正财为主，适合稳定职业、固定收入与稳健理财"
+            primary = "正财计数较高；可讨论持续收入类比，需核实现实收入结构"
         else:
-            primary = "正偏财均衡，可正业为本、兼以投资增益"
+            primary = "正偏财计数相同；不据此选择职业或投资方式"
 
         return {
             "primary_style": primary,
@@ -306,7 +304,7 @@ class WealthAnalysis:
         return {
             "wealth_element": wealth_element.value,
             "direction": ELEMENT_DIRECTION.get(wealth_element, "本地"),
-            "note": f"财星五行为{wealth_element.value}，求财、置业可参考{ELEMENT_DIRECTION.get(wealth_element, '本地')}",
+            "note": f"五行方位查表：{wealth_element.value}对应{ELEMENT_DIRECTION.get(wealth_element, '本地')}；不据此判断投资、置业或迁移结果",
         }
 
     @staticmethod
@@ -318,37 +316,44 @@ class WealthAnalysis:
         """破财风险：比劫夺财、财星受冲。"""
         risks: List[str] = []
 
-        # 比劫数量
         bijie = sum(
             e.weight
             for e in iter_pillar_gods(pillars, day_stem)
             if e.ten_god in (TenGod.COMPARE, TenGod.ROB_WEALTH)
         )
-
-        if bijie >= 2.5:
-            risks.append("比劫旺而夺财，易因合伙、借贷、兄弟朋友耗财，忌合伙与担保")
-        elif bijie >= 1.5:
-            risks.append("比劫稍重，理财需防被借被分，宜账目清晰")
-
-        # 财星受冲
-        branches = [branch for _, branch in pillars.values()]
-        for p_name, (_, branch) in pillars.items():
-            b_elem = BRANCH_ELEMENTS[branch][0]
-            if b_elem == wealth_element:
-                if any(
-                    o != branch and check_branch_conflict(branch, o) for o in branches
-                ):
-                    risks.append(
-                        f"{p_name}支财星受冲，财来财去、收入不稳，宜留现金储备"
+        if bijie >= 1.5:
+            risks.append(
+                f"比劫加权计数{bijie:g}；未裁定夺财，不据此判断借贷、合伙或损失"
+            )
+        relations = []
+        for name, (_, branch) in pillars.items():
+            wealth_hidden = [
+                stem
+                for stem in BRANCH_HIDDEN_STEMS[branch]
+                if STEM_ELEMENTS[stem][0] == wealth_element
+            ]
+            if not wealth_hidden:
+                continue
+            for other, (_, other_branch) in pillars.items():
+                if other != name and check_branch_conflict(branch, other_branch):
+                    relations.append(
+                        {
+                            "wealth_pillar": name,
+                            "wealth_branch": branch,
+                            "wealth_hidden_stems": wealth_hidden,
+                            "other_pillar": other,
+                            "other_branch": other_branch,
+                        }
                     )
-                    break
-
+        if relations:
+            risks.append("含财藏干的柱支有实际六冲；尚未裁定财根损益或现实收入变化")
         if not risks:
-            risks.append("命局无明显破财结构，财务相对安稳")
-
+            risks.append("未命中本模块计数阈值及含财藏干支的六冲；不代表现实财务安稳")
         return {
             "bijie_weight": round(bijie, 1),
             "risks": risks,
+            "relations": relations,
+            "assessment_status": "structural_candidates_not_loss_prediction",
         }
 
     @staticmethod
@@ -357,35 +362,56 @@ class WealthAnalysis:
         wealth_element: Element,
         dayun_pillar: Optional[Tuple[str, str]] = None,
         liunian_pillar: Optional[Tuple[str, str]] = None,
+        *,
+        pillars: Optional[Dict[str, Tuple[str, str]]] = None,
     ) -> Dict[str, Any]:
-        """大运/流年财运信号。"""
+        """实际天干对应与本命库支的六冲触点，不预测收益。"""
         signals: List[str] = []
-
-        def _assess(label: str, pillar: Tuple[str, str]) -> None:
+        storage_events: List[Dict[str, Any]] = []
+        for label, pillar in (("大运", dayun_pillar), ("流年", liunian_pillar)):
+            if pillar is None:
+                continue
             stem, branch = pillar
             god = get_ten_god(day_stem, stem)
-            if god in (TenGod.POSITIVE_WEALTH, TenGod.PARTIAL_WEALTH):
+            if god in (
+                TenGod.POSITIVE_WEALTH,
+                TenGod.PARTIAL_WEALTH,
+                TenGod.FOOD_GOD,
+                TenGod.HURT_OFFICER,
+                TenGod.COMPARE,
+                TenGod.ROB_WEALTH,
+            ):
                 signals.append(
-                    f"{label}{stem}{branch}见财星，财运转旺，利于求财、投资与正业增收"
+                    f"{label}{stem}{branch}天干对应{god.value}；仅为传统主题触点"
                 )
-            elif god in (TenGod.FOOD_GOD, TenGod.HURT_OFFICER):
-                signals.append(
-                    f"{label}{stem}{branch}见食伤，食伤生财，利于以才华、项目、副业生财"
-                )
-            elif god in (TenGod.COMPARE, TenGod.ROB_WEALTH):
-                signals.append(f"{label}{stem}{branch}见比劫，防破财、被借贷与合伙纠纷")
-            # 地支引动财库/财星
             if STORAGE_BRANCHES.get(branch) == wealth_element:
                 signals.append(
-                    f"{label}支为{wealth_element.value}财库，逢冲开库主进大财或不动产变现"
+                    f"{label}支{branch}为本四墓表的{wealth_element.value}库；出现库支不等于开库或进财"
                 )
-
-        if dayun_pillar:
-            _assess("大运", dayun_pillar)
-        if liunian_pillar:
-            _assess("流年", liunian_pillar)
-
-        return {"timing_signals": signals}
+            for name, (_, natal_branch) in (pillars or {}).items():
+                if STORAGE_BRANCHES.get(
+                    natal_branch
+                ) == wealth_element and check_branch_conflict(natal_branch, branch):
+                    storage_events.append(
+                        {
+                            "layer": label,
+                            "timing_pillar": stem + branch,
+                            "natal_pillar": name,
+                            "storage_branch": natal_branch,
+                            "relation": "六冲",
+                            "effect_status": "not_adjudicated",
+                        }
+                    )
+        provided = dayun_pillar is not None or liunian_pillar is not None
+        return {
+            "timing_signals": signals,
+            "storage_events": storage_events,
+            "assessment_status": (
+                "matched"
+                if signals or storage_events
+                else "no_matching_rule" if provided else "missing_timing_input"
+            ),
+        }
 
     @staticmethod
     def _generate_suggestions(
@@ -394,20 +420,8 @@ class WealthAnalysis:
         risk: Dict[str, Any],
     ) -> List[str]:
         """生成财运建议。"""
-        suggestions: List[str] = []
-        suggestions.append(f"财富格局：{structure['pattern']}（{structure['level']}）")
-
-        pattern = structure["pattern"]
-        if pattern == "财多身弱":
-            suggestions.append(
-                "宜先强身（结交贵人、提升专业、稳固根基）再图大财，切忌贪多冒进"
-            )
-        elif pattern in ("身旺财旺", "身财两停"):
-            suggestions.append("身能任财，可积极进取，把握行财运、食伤运的发财窗口")
-        elif pattern == "身旺财轻":
-            suggestions.append("宜走食伤生财之路，以技术、才华、内容变现，胜于死守正财")
-
-        suggestions.append(style["primary_style"])
-        if risk["risks"] and "无明显破财" not in risk["risks"][0]:
-            suggestions.append("防破财：" + risk["risks"][0])
-        return suggestions
+        return [
+            "传统解读：先核对财星透藏、财根、食伤路径及实际运年触点，不能只凭数量称财旺",
+            "现实核实：依据真实收支、现金流、合同义务及可承受损失作财务安排",
+            "现代类比：" + style["primary_style"],
+        ]

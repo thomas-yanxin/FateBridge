@@ -123,7 +123,9 @@ def _build_context(result: Dict[str, Any], label: str) -> Dict[str, Any]:
         "house_system_label_zh": analysis_context.get("house_system_label_zh"),
         "zodiac_type": analysis_context.get("zodiac_type"),
         "return_location": analysis_context.get("return_location"),
-        "engine": "fatebridge-offline",
+        "engine": result.get("natal_reference", {})
+        .get("calculation_basis", {})
+        .get("engine_backend", "fatebridge-offline"),
     }
 
 
@@ -300,9 +302,17 @@ def _build_sections(
         ]
 
     if section_kind == "decennials":
+        # The complete native witnesses remain in the structured reference.
+        # Do not repeat them in snapshot_text and each export representation.
+        display_reference = dict(natal_reference)
+        display_reference["calculation_basis"] = {
+            key: value
+            for key, value in natal_reference.get("calculation_basis", {}).items()
+            if key not in {"longitude_motion", "apparent_position_policy"}
+        }
         return [
             ("起盘信息", _json_block(context)),
-            ("星盘信息", _json_block(natal_reference)),
+            ("星盘信息", _json_block(display_reference)),
             (
                 "十年大运设置",
                 _json_block(
@@ -352,7 +362,9 @@ def _calculate_tool(
 
         return {
             "analysis_type": spec["analysis_type"],
-            "engine": "fatebridge-offline",
+            "engine": result.get("natal_reference", {})
+            .get("calculation_basis", {})
+            .get("engine_backend", "fatebridge-offline"),
             "analysis_context": result.get("analysis_context"),
             "natal_reference": result.get("natal_reference"),
             tool_name: payload,

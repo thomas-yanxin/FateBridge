@@ -1,0 +1,63 @@
+{
+  "ruleset_id": "zengshan_fanfu_v6",
+  "ruleset_version": "6.0.0",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "method": "Selected original scan pages visually read; detail crops preserve source pixels."
+  },
+  "clauses": [
+    {
+      "id": "hexagram-versus-line",
+      "pdf_pages": [
+        88,
+        89
+      ],
+      "quote": "卦有卦變爻有爻變卦變者內外動而反吟同一卦也如乾變坤是也爻變者內外動而反吟者非同一卦也如升之觀是也"
+    },
+    {
+      "id": "separate-inner-outer",
+      "pdf_pages": [
+        89
+      ],
+      "quote": "又有外卦反吟而內卦不動者如觀之坤是也又有內卦反吟而外卦不動者如巽之觀是也"
+    },
+    {
+      "id": "fu-example",
+      "pdf_pages": [
+        91
+      ],
+      "quote": "伏吟卦者有內外而伏吟也如無妄之大壯是也"
+    },
+    {
+      "id": "fu-strength-conditions",
+      "pdf_pages": [
+        92
+      ],
+      "quote": "伏吟之卦用神旺相沖開之年月其志則伸用神休囚沖開之年月憂鬱而已"
+    }
+  ],
+  "explicit_hexagram_examples": [
+    {
+      "base_code": "111111",
+      "changed_code": "000000",
+      "kind": "反吟",
+      "pdf_page": 88
+    }
+  ],
+  "textual_issues": [
+    {
+      "id": "fan-versus-fanfu-in-transcription",
+      "transcription": "Chapter 25 first four structural paragraphs use 反伏",
+      "scan": "PDF88-89 uses 反吟 there, followed by separate 伏吟 section on PDF91-92",
+      "action": "Keep frozen transcription unchanged; apply separately read scan wording"
+    },
+    {
+      "id": "no-universal-complement-table",
+      "finding": "PDF88 explicitly gives Qian to Kun; selected chapter does not enumerate every body-reversal pair",
+      "action": "Recognize this source example; do not invent a complete eight-trigram or 32-complement Fan table from it"
+    }
+  ],
+  "scope": "Classical structure only: original active-line branch changes, separate inner/outer chart-branch comparisons, and explicitly printed body examples. Chart branches at static positions are comparison data, not transformed-line actors. No outcome or efficacy verdict."
+}

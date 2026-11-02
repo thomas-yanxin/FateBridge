@@ -1,0 +1,1612 @@
+{
+  "schema": "named_source_half_night_tables_v1",
+  "day_cycle_fen": "10000",
+  "dawn_dusk_fen": "250",
+  "declination_rate_fen_per_du_divisor": "100",
+  "source_theoretical_quadrant_du": "91.314375",
+  "source_half_year_days": "182.62125",
+  "local_solstice_formula_declination_normalizer_du": "23.9",
+  "basis": "dadu_source_table",
+  "profiles": {
+    "gujin37_siku": {
+      "profile_id": "gujin37_siku_dadu_night_table_research_v1",
+      "source_url": "https://commons.wikimedia.org/w/index.php?curid=71219540",
+      "source_locator": "古今律历考卷37，DjVu436–438（原书页码431–433）",
+      "witness_kind": "printed_facsimile_single_unblinded_collator_aided_by_digital_edition",
+      "rows": [
+        {
+          "argument_du": "0",
+          "declination_du": "23.9030",
+          "declination_drop_fen": "0.33",
+          "summer_half_night_fen": "1907.96",
+          "winter_half_night_fen": "3092.04",
+          "day_night_difference_fen": "0.09",
+          "source_page": 436
+        },
+        {
+          "argument_du": "1",
+          "declination_du": "23.8997",
+          "declination_drop_fen": "0.99",
+          "summer_half_night_fen": "1908.05",
+          "winter_half_night_fen": "3091.95",
+          "day_night_difference_fen": "0.29",
+          "source_page": 436
+        },
+        {
+          "argument_du": "2",
+          "declination_du": "23.8898",
+          "declination_drop_fen": "1.66",
+          "summer_half_night_fen": "1908.34",
+          "winter_half_night_fen": "3091.66",
+          "day_night_difference_fen": "0.47",
+          "source_page": 436
+        },
+        {
+          "argument_du": "3",
+          "declination_du": "23.8732",
+          "declination_drop_fen": "2.31",
+          "summer_half_night_fen": "1908.81",
+          "winter_half_night_fen": "3091.19",
+          "day_night_difference_fen": "0.66",
+          "source_page": 436
+        },
+        {
+          "argument_du": "4",
+          "declination_du": "23.8501",
+          "declination_drop_fen": "2.99",
+          "summer_half_night_fen": "1909.47",
+          "winter_half_night_fen": "3090.53",
+          "day_night_difference_fen": "0.85",
+          "source_page": 436
+        },
+        {
+          "argument_du": "5",
+          "declination_du": "23.8202",
+          "declination_drop_fen": "3.65",
+          "summer_half_night_fen": "1910.32",
+          "winter_half_night_fen": "3089.68",
+          "day_night_difference_fen": "1.04",
+          "source_page": 436
+        },
+        {
+          "argument_du": "6",
+          "declination_du": "23.7837",
+          "declination_drop_fen": "4.32",
+          "summer_half_night_fen": "1911.36",
+          "winter_half_night_fen": "3088.64",
+          "day_night_difference_fen": "1.22",
+          "source_page": 436
+        },
+        {
+          "argument_du": "7",
+          "declination_du": "23.7405",
+          "declination_drop_fen": "4.98",
+          "summer_half_night_fen": "1912.58",
+          "winter_half_night_fen": "3087.42",
+          "day_night_difference_fen": "1.41",
+          "source_page": 436
+        },
+        {
+          "argument_du": "8",
+          "declination_du": "23.6907",
+          "declination_drop_fen": "5.65",
+          "summer_half_night_fen": "1914.00",
+          "winter_half_night_fen": "3086.00",
+          "day_night_difference_fen": "1.61",
+          "source_page": 436
+        },
+        {
+          "argument_du": "9",
+          "declination_du": "23.6342",
+          "declination_drop_fen": "6.36",
+          "summer_half_night_fen": "1915.61",
+          "winter_half_night_fen": "3084.39",
+          "day_night_difference_fen": "1.79",
+          "source_page": 436
+        },
+        {
+          "argument_du": "10",
+          "declination_du": "23.5706",
+          "declination_drop_fen": "7.02",
+          "summer_half_night_fen": "1917.40",
+          "winter_half_night_fen": "3082.60",
+          "day_night_difference_fen": "1.99",
+          "source_page": 436
+        },
+        {
+          "argument_du": "11",
+          "declination_du": "23.5004",
+          "declination_drop_fen": "7.69",
+          "summer_half_night_fen": "1919.39",
+          "winter_half_night_fen": "3080.61",
+          "day_night_difference_fen": "2.18",
+          "source_page": 436
+        },
+        {
+          "argument_du": "12",
+          "declination_du": "23.4235",
+          "declination_drop_fen": "8.39",
+          "summer_half_night_fen": "1921.57",
+          "winter_half_night_fen": "3078.43",
+          "day_night_difference_fen": "2.37",
+          "source_page": 436
+        },
+        {
+          "argument_du": "13",
+          "declination_du": "23.3396",
+          "declination_drop_fen": "9.08",
+          "summer_half_night_fen": "1923.94",
+          "winter_half_night_fen": "3076.06",
+          "day_night_difference_fen": "2.56",
+          "source_page": 436
+        },
+        {
+          "argument_du": "14",
+          "declination_du": "23.2488",
+          "declination_drop_fen": "9.75",
+          "summer_half_night_fen": "1926.50",
+          "winter_half_night_fen": "3073.50",
+          "day_night_difference_fen": "2.74",
+          "source_page": 436
+        },
+        {
+          "argument_du": "15",
+          "declination_du": "23.1513",
+          "declination_drop_fen": "10.47",
+          "summer_half_night_fen": "1929.24",
+          "winter_half_night_fen": "3070.76",
+          "day_night_difference_fen": "2.94",
+          "source_page": 436
+        },
+        {
+          "argument_du": "16",
+          "declination_du": "23.0466",
+          "declination_drop_fen": "11.14",
+          "summer_half_night_fen": "1932.18",
+          "winter_half_night_fen": "3067.82",
+          "day_night_difference_fen": "3.14",
+          "source_page": 436
+        },
+        {
+          "argument_du": "17",
+          "declination_du": "22.9352",
+          "declination_drop_fen": "11.85",
+          "summer_half_night_fen": "1935.32",
+          "winter_half_night_fen": "3064.68",
+          "day_night_difference_fen": "3.30",
+          "source_page": 436
+        },
+        {
+          "argument_du": "18",
+          "declination_du": "22.8167",
+          "declination_drop_fen": "12.54",
+          "summer_half_night_fen": "1938.62",
+          "winter_half_night_fen": "3061.38",
+          "day_night_difference_fen": "3.51",
+          "source_page": 436
+        },
+        {
+          "argument_du": "19",
+          "declination_du": "22.6913",
+          "declination_drop_fen": "13.25",
+          "summer_half_night_fen": "1942.13",
+          "winter_half_night_fen": "3057.87",
+          "day_night_difference_fen": "3.69",
+          "source_page": 436
+        },
+        {
+          "argument_du": "20",
+          "declination_du": "22.5588",
+          "declination_drop_fen": "13.95",
+          "summer_half_night_fen": "1945.82",
+          "winter_half_night_fen": "3054.18",
+          "day_night_difference_fen": "3.88",
+          "source_page": 436
+        },
+        {
+          "argument_du": "21",
+          "declination_du": "22.4193",
+          "declination_drop_fen": "14.66",
+          "summer_half_night_fen": "1949.70",
+          "winter_half_night_fen": "3050.30",
+          "day_night_difference_fen": "4.07",
+          "source_page": 436
+        },
+        {
+          "argument_du": "22",
+          "declination_du": "22.2727",
+          "declination_drop_fen": "15.37",
+          "summer_half_night_fen": "1953.77",
+          "winter_half_night_fen": "3046.23",
+          "day_night_difference_fen": "4.26",
+          "source_page": 436
+        },
+        {
+          "argument_du": "23",
+          "declination_du": "22.1190",
+          "declination_drop_fen": "16.06",
+          "summer_half_night_fen": "1958.03",
+          "winter_half_night_fen": "3041.97",
+          "day_night_difference_fen": "4.43",
+          "source_page": 436
+        },
+        {
+          "argument_du": "24",
+          "declination_du": "21.9584",
+          "declination_drop_fen": "16.78",
+          "summer_half_night_fen": "1962.46",
+          "winter_half_night_fen": "3037.54",
+          "day_night_difference_fen": "4.62",
+          "source_page": 436
+        },
+        {
+          "argument_du": "25",
+          "declination_du": "21.7906",
+          "declination_drop_fen": "17.47",
+          "summer_half_night_fen": "1967.08",
+          "winter_half_night_fen": "3032.92",
+          "day_night_difference_fen": "4.80",
+          "source_page": 436
+        },
+        {
+          "argument_du": "26",
+          "declination_du": "21.6159",
+          "declination_drop_fen": "18.20",
+          "summer_half_night_fen": "1971.88",
+          "winter_half_night_fen": "3028.12",
+          "day_night_difference_fen": "4.98",
+          "source_page": 436
+        },
+        {
+          "argument_du": "27",
+          "declination_du": "21.4339",
+          "declination_drop_fen": "18.90",
+          "summer_half_night_fen": "1976.86",
+          "winter_half_night_fen": "3023.14",
+          "day_night_difference_fen": "5.16",
+          "source_page": 436
+        },
+        {
+          "argument_du": "28",
+          "declination_du": "21.2449",
+          "declination_drop_fen": "19.60",
+          "summer_half_night_fen": "1982.02",
+          "winter_half_night_fen": "3017.98",
+          "day_night_difference_fen": "5.35",
+          "source_page": 436
+        },
+        {
+          "argument_du": "29",
+          "declination_du": "21.0489",
+          "declination_drop_fen": "20.27",
+          "summer_half_night_fen": "1987.37",
+          "winter_half_night_fen": "3012.63",
+          "day_night_difference_fen": "5.49",
+          "source_page": 436
+        },
+        {
+          "argument_du": "30",
+          "declination_du": "20.8462",
+          "declination_drop_fen": "20.99",
+          "summer_half_night_fen": "1992.86",
+          "winter_half_night_fen": "3007.14",
+          "day_night_difference_fen": "5.67",
+          "source_page": 436
+        },
+        {
+          "argument_du": "31",
+          "declination_du": "20.6363",
+          "declination_drop_fen": "21.68",
+          "summer_half_night_fen": "1998.53",
+          "winter_half_night_fen": "3001.47",
+          "day_night_difference_fen": "5.85",
+          "source_page": 437
+        },
+        {
+          "argument_du": "32",
+          "declination_du": "20.4195",
+          "declination_drop_fen": "22.35",
+          "summer_half_night_fen": "2004.38",
+          "winter_half_night_fen": "2995.62",
+          "day_night_difference_fen": "6.01",
+          "source_page": 437
+        },
+        {
+          "argument_du": "33",
+          "declination_du": "20.1960",
+          "declination_drop_fen": "23.03",
+          "summer_half_night_fen": "2010.39",
+          "winter_half_night_fen": "2989.61",
+          "day_night_difference_fen": "6.16",
+          "source_page": 437
+        },
+        {
+          "argument_du": "34",
+          "declination_du": "19.9657",
+          "declination_drop_fen": "23.71",
+          "summer_half_night_fen": "2016.55",
+          "winter_half_night_fen": "2983.45",
+          "day_night_difference_fen": "6.33",
+          "source_page": 437
+        },
+        {
+          "argument_du": "35",
+          "declination_du": "19.7286",
+          "declination_drop_fen": "24.37",
+          "summer_half_night_fen": "2022.88",
+          "winter_half_night_fen": "2977.12",
+          "day_night_difference_fen": "6.48",
+          "source_page": 437
+        },
+        {
+          "argument_du": "36",
+          "declination_du": "19.4849",
+          "declination_drop_fen": "25.03",
+          "summer_half_night_fen": "2029.36",
+          "winter_half_night_fen": "2970.64",
+          "day_night_difference_fen": "6.63",
+          "source_page": 437
+        },
+        {
+          "argument_du": "37",
+          "declination_du": "19.2346",
+          "declination_drop_fen": "25.66",
+          "summer_half_night_fen": "2035.99",
+          "winter_half_night_fen": "2964.01",
+          "day_night_difference_fen": "6.78",
+          "source_page": 437
+        },
+        {
+          "argument_du": "38",
+          "declination_du": "18.9780",
+          "declination_drop_fen": "26.31",
+          "summer_half_night_fen": "2042.77",
+          "winter_half_night_fen": "2957.23",
+          "day_night_difference_fen": "6.92",
+          "source_page": 437
+        },
+        {
+          "argument_du": "39",
+          "declination_du": "18.7149",
+          "declination_drop_fen": "26.93",
+          "summer_half_night_fen": "2049.69",
+          "winter_half_night_fen": "2950.31",
+          "day_night_difference_fen": "7.05",
+          "source_page": 437
+        },
+        {
+          "argument_du": "40",
+          "declination_du": "18.4456",
+          "declination_drop_fen": "27.52",
+          "summer_half_night_fen": "2056.74",
+          "winter_half_night_fen": "2943.26",
+          "day_night_difference_fen": "7.19",
+          "source_page": 437
+        },
+        {
+          "argument_du": "41",
+          "declination_du": "18.1704",
+          "declination_drop_fen": "28.14",
+          "summer_half_night_fen": "2063.93",
+          "winter_half_night_fen": "2936.07",
+          "day_night_difference_fen": "7.32",
+          "source_page": 437
+        },
+        {
+          "argument_du": "42",
+          "declination_du": "17.8890",
+          "declination_drop_fen": "28.72",
+          "summer_half_night_fen": "2071.25",
+          "winter_half_night_fen": "2928.75",
+          "day_night_difference_fen": "7.44",
+          "source_page": 437
+        },
+        {
+          "argument_du": "43",
+          "declination_du": "17.6018",
+          "declination_drop_fen": "29.29",
+          "summer_half_night_fen": "2078.69",
+          "winter_half_night_fen": "2921.31",
+          "day_night_difference_fen": "7.56",
+          "source_page": 437
+        },
+        {
+          "argument_du": "44",
+          "declination_du": "17.3089",
+          "declination_drop_fen": "29.84",
+          "summer_half_night_fen": "2086.25",
+          "winter_half_night_fen": "2913.75",
+          "day_night_difference_fen": "7.68",
+          "source_page": 437
+        },
+        {
+          "argument_du": "45",
+          "declination_du": "17.0105",
+          "declination_drop_fen": "30.38",
+          "summer_half_night_fen": "2093.93",
+          "winter_half_night_fen": "2906.07",
+          "day_night_difference_fen": "7.78",
+          "source_page": 437
+        },
+        {
+          "argument_du": "46",
+          "declination_du": "16.7067",
+          "declination_drop_fen": "30.90",
+          "summer_half_night_fen": "2101.71",
+          "winter_half_night_fen": "2898.29",
+          "day_night_difference_fen": "7.89",
+          "source_page": 437
+        },
+        {
+          "argument_du": "47",
+          "declination_du": "16.3977",
+          "declination_drop_fen": "31.41",
+          "summer_half_night_fen": "2109.60",
+          "winter_half_night_fen": "2890.40",
+          "day_night_difference_fen": "7.98",
+          "source_page": 437
+        },
+        {
+          "argument_du": "48",
+          "declination_du": "16.0836",
+          "declination_drop_fen": "31.91",
+          "summer_half_night_fen": "2117.58",
+          "winter_half_night_fen": "2882.42",
+          "day_night_difference_fen": "8.08",
+          "source_page": 437
+        },
+        {
+          "argument_du": "49",
+          "declination_du": "15.7645",
+          "declination_drop_fen": "32.36",
+          "summer_half_night_fen": "2125.66",
+          "winter_half_night_fen": "2874.34",
+          "day_night_difference_fen": "8.17",
+          "source_page": 437
+        },
+        {
+          "argument_du": "50",
+          "declination_du": "15.4409",
+          "declination_drop_fen": "32.85",
+          "summer_half_night_fen": "2133.83",
+          "winter_half_night_fen": "2866.17",
+          "day_night_difference_fen": "8.26",
+          "source_page": 437
+        },
+        {
+          "argument_du": "51",
+          "declination_du": "15.1124",
+          "declination_drop_fen": "33.26",
+          "summer_half_night_fen": "2142.09",
+          "winter_half_night_fen": "2857.91",
+          "day_night_difference_fen": "8.32",
+          "source_page": 437
+        },
+        {
+          "argument_du": "52",
+          "declination_du": "14.7798",
+          "declination_drop_fen": "33.64",
+          "summer_half_night_fen": "2150.41",
+          "winter_half_night_fen": "2849.59",
+          "day_night_difference_fen": "8.40",
+          "source_page": 437
+        },
+        {
+          "argument_du": "53",
+          "declination_du": "14.4434",
+          "declination_drop_fen": "34.07",
+          "summer_half_night_fen": "2158.81",
+          "winter_half_night_fen": "2841.19",
+          "day_night_difference_fen": "8.46",
+          "source_page": 437
+        },
+        {
+          "argument_du": "54",
+          "declination_du": "14.1027",
+          "declination_drop_fen": "34.45",
+          "summer_half_night_fen": "2167.27",
+          "winter_half_night_fen": "2832.73",
+          "day_night_difference_fen": "8.54",
+          "source_page": 437
+        },
+        {
+          "argument_du": "55",
+          "declination_du": "13.7582",
+          "declination_drop_fen": "34.81",
+          "summer_half_night_fen": "2175.81",
+          "winter_half_night_fen": "2824.19",
+          "day_night_difference_fen": "8.59",
+          "source_page": 437
+        },
+        {
+          "argument_du": "56",
+          "declination_du": "13.4101",
+          "declination_drop_fen": "35.15",
+          "summer_half_night_fen": "2184.40",
+          "winter_half_night_fen": "2815.60",
+          "day_night_difference_fen": "8.64",
+          "source_page": 437
+        },
+        {
+          "argument_du": "57",
+          "declination_du": "13.0586",
+          "declination_drop_fen": "35.47",
+          "summer_half_night_fen": "2193.04",
+          "winter_half_night_fen": "2806.96",
+          "day_night_difference_fen": "8.69",
+          "source_page": 437
+        },
+        {
+          "argument_du": "58",
+          "declination_du": "12.7039",
+          "declination_drop_fen": "35.78",
+          "summer_half_night_fen": "2201.73",
+          "winter_half_night_fen": "2798.27",
+          "day_night_difference_fen": "8.75",
+          "source_page": 437
+        },
+        {
+          "argument_du": "59",
+          "declination_du": "12.3461",
+          "declination_drop_fen": "36.07",
+          "summer_half_night_fen": "2210.48",
+          "winter_half_night_fen": "2789.52",
+          "day_night_difference_fen": "8.78",
+          "source_page": 437
+        },
+        {
+          "argument_du": "60",
+          "declination_du": "11.9854",
+          "declination_drop_fen": "36.33",
+          "summer_half_night_fen": "2219.26",
+          "winter_half_night_fen": "2780.74",
+          "day_night_difference_fen": "8.81",
+          "source_page": 437
+        },
+        {
+          "argument_du": "61",
+          "declination_du": "11.6221",
+          "declination_drop_fen": "36.59",
+          "summer_half_night_fen": "2228.07",
+          "winter_half_night_fen": "2771.93",
+          "day_night_difference_fen": "8.84",
+          "source_page": 437
+        },
+        {
+          "argument_du": "62",
+          "declination_du": "11.2562",
+          "declination_drop_fen": "36.83",
+          "summer_half_night_fen": "2236.91",
+          "winter_half_night_fen": "2763.09",
+          "day_night_difference_fen": "8.89",
+          "source_page": 437
+        },
+        {
+          "argument_du": "63",
+          "declination_du": "10.8879",
+          "declination_drop_fen": "37.05",
+          "summer_half_night_fen": "2245.80",
+          "winter_half_night_fen": "2754.20",
+          "day_night_difference_fen": "8.90",
+          "source_page": 438
+        },
+        {
+          "argument_du": "64",
+          "declination_du": "10.5174",
+          "declination_drop_fen": "37.24",
+          "summer_half_night_fen": "2254.70",
+          "winter_half_night_fen": "2745.30",
+          "day_night_difference_fen": "8.92",
+          "source_page": 438
+        },
+        {
+          "argument_du": "65",
+          "declination_du": "10.1450",
+          "declination_drop_fen": "37.44",
+          "summer_half_night_fen": "2263.62",
+          "winter_half_night_fen": "2736.38",
+          "day_night_difference_fen": "8.94",
+          "source_page": 438
+        },
+        {
+          "argument_du": "66",
+          "declination_du": "9.7706",
+          "declination_drop_fen": "37.61",
+          "summer_half_night_fen": "2272.56",
+          "winter_half_night_fen": "2727.44",
+          "day_night_difference_fen": "8.97",
+          "source_page": 438
+        },
+        {
+          "argument_du": "67",
+          "declination_du": "9.3945",
+          "declination_drop_fen": "37.76",
+          "summer_half_night_fen": "2281.53",
+          "winter_half_night_fen": "2718.47",
+          "day_night_difference_fen": "8.97",
+          "source_page": 438
+        },
+        {
+          "argument_du": "68",
+          "declination_du": "9.0169",
+          "declination_drop_fen": "37.91",
+          "summer_half_night_fen": "2290.50",
+          "winter_half_night_fen": "2709.50",
+          "day_night_difference_fen": "8.98",
+          "source_page": 438
+        },
+        {
+          "argument_du": "69",
+          "declination_du": "8.6378",
+          "declination_drop_fen": "38.07",
+          "summer_half_night_fen": "2299.48",
+          "winter_half_night_fen": "2700.52",
+          "day_night_difference_fen": "9.00",
+          "source_page": 438
+        },
+        {
+          "argument_du": "70",
+          "declination_du": "8.2571",
+          "declination_drop_fen": "38.17",
+          "summer_half_night_fen": "2308.48",
+          "winter_half_night_fen": "2691.52",
+          "day_night_difference_fen": "9.00",
+          "source_page": 438
+        },
+        {
+          "argument_du": "71",
+          "declination_du": "7.8754",
+          "declination_drop_fen": "38.28",
+          "summer_half_night_fen": "2317.48",
+          "winter_half_night_fen": "2682.52",
+          "day_night_difference_fen": "9.01",
+          "source_page": 438
+        },
+        {
+          "argument_du": "72",
+          "declination_du": "7.4926",
+          "declination_drop_fen": "38.38",
+          "summer_half_night_fen": "2326.49",
+          "winter_half_night_fen": "2673.51",
+          "day_night_difference_fen": "9.01",
+          "source_page": 438
+        },
+        {
+          "argument_du": "73",
+          "declination_du": "7.1088",
+          "declination_drop_fen": "38.47",
+          "summer_half_night_fen": "2335.50",
+          "winter_half_night_fen": "2664.50",
+          "day_night_difference_fen": "9.01",
+          "source_page": 438
+        },
+        {
+          "argument_du": "74",
+          "declination_du": "6.7241",
+          "declination_drop_fen": "38.54",
+          "summer_half_night_fen": "2344.51",
+          "winter_half_night_fen": "2655.49",
+          "day_night_difference_fen": "9.01",
+          "source_page": 438
+        },
+        {
+          "argument_du": "75",
+          "declination_du": "6.3387",
+          "declination_drop_fen": "38.62",
+          "summer_half_night_fen": "2353.52",
+          "winter_half_night_fen": "2646.48",
+          "day_night_difference_fen": "9.01",
+          "source_page": 438
+        },
+        {
+          "argument_du": "76",
+          "declination_du": "5.9525",
+          "declination_drop_fen": "38.67",
+          "summer_half_night_fen": "2362.53",
+          "winter_half_night_fen": "2637.47",
+          "day_night_difference_fen": "9.01",
+          "source_page": 438
+        },
+        {
+          "argument_du": "77",
+          "declination_du": "5.5658",
+          "declination_drop_fen": "38.73",
+          "summer_half_night_fen": "2371.54",
+          "winter_half_night_fen": "2628.46",
+          "day_night_difference_fen": "9.00",
+          "source_page": 438
+        },
+        {
+          "argument_du": "78",
+          "declination_du": "5.1785",
+          "declination_drop_fen": "38.77",
+          "summer_half_night_fen": "2380.54",
+          "winter_half_night_fen": "2619.46",
+          "day_night_difference_fen": "9.00",
+          "source_page": 438
+        },
+        {
+          "argument_du": "79",
+          "declination_du": "4.7908",
+          "declination_drop_fen": "38.81",
+          "summer_half_night_fen": "2389.54",
+          "winter_half_night_fen": "2610.46",
+          "day_night_difference_fen": "9.00",
+          "source_page": 438
+        },
+        {
+          "argument_du": "80",
+          "declination_du": "4.4027",
+          "declination_drop_fen": "38.85",
+          "summer_half_night_fen": "2398.54",
+          "winter_half_night_fen": "2601.46",
+          "day_night_difference_fen": "9.00",
+          "source_page": 438
+        },
+        {
+          "argument_du": "81",
+          "declination_du": "4.0142",
+          "declination_drop_fen": "38.88",
+          "summer_half_night_fen": "2407.54",
+          "winter_half_night_fen": "2592.46",
+          "day_night_difference_fen": "9.00",
+          "source_page": 438
+        },
+        {
+          "argument_du": "82",
+          "declination_du": "3.6254",
+          "declination_drop_fen": "38.89",
+          "summer_half_night_fen": "2416.54",
+          "winter_half_night_fen": "2583.46",
+          "day_night_difference_fen": "8.97",
+          "source_page": 438
+        },
+        {
+          "argument_du": "83",
+          "declination_du": "3.2365",
+          "declination_drop_fen": "38.90",
+          "summer_half_night_fen": "2425.51",
+          "winter_half_night_fen": "2574.49",
+          "day_night_difference_fen": "8.97",
+          "source_page": 438
+        },
+        {
+          "argument_du": "84",
+          "declination_du": "2.8475",
+          "declination_drop_fen": "38.92",
+          "summer_half_night_fen": "2434.48",
+          "winter_half_night_fen": "2565.52",
+          "day_night_difference_fen": "8.97",
+          "source_page": 438
+        },
+        {
+          "argument_du": "85",
+          "declination_du": "2.4583",
+          "declination_drop_fen": "38.93",
+          "summer_half_night_fen": "2443.45",
+          "winter_half_night_fen": "2556.55",
+          "day_night_difference_fen": "8.97",
+          "source_page": 438
+        },
+        {
+          "argument_du": "86",
+          "declination_du": "2.0690",
+          "declination_drop_fen": "38.94",
+          "summer_half_night_fen": "2452.42",
+          "winter_half_night_fen": "2547.58",
+          "day_night_difference_fen": "8.96",
+          "source_page": 438
+        },
+        {
+          "argument_du": "87",
+          "declination_du": "1.6796",
+          "declination_drop_fen": "38.94",
+          "summer_half_night_fen": "2461.38",
+          "winter_half_night_fen": "2538.62",
+          "day_night_difference_fen": "8.96",
+          "source_page": 438
+        },
+        {
+          "argument_du": "88",
+          "declination_du": "1.2902",
+          "declination_drop_fen": "38.95",
+          "summer_half_night_fen": "2470.34",
+          "winter_half_night_fen": "2529.66",
+          "day_night_difference_fen": "8.96",
+          "source_page": 438
+        },
+        {
+          "argument_du": "89",
+          "declination_du": "0.9007",
+          "declination_drop_fen": "38.95",
+          "summer_half_night_fen": "2479.30",
+          "winter_half_night_fen": "2520.70",
+          "day_night_difference_fen": "8.96",
+          "source_page": 438
+        },
+        {
+          "argument_du": "90",
+          "declination_du": "0.5112",
+          "declination_drop_fen": "38.95",
+          "summer_half_night_fen": "2488.26",
+          "winter_half_night_fen": "2511.74",
+          "day_night_difference_fen": "8.95",
+          "source_page": 438
+        },
+        {
+          "argument_du": "91",
+          "declination_du": "0.1217",
+          "declination_drop_fen": "38.95",
+          "summer_half_night_fen": "2497.21",
+          "winter_half_night_fen": "2502.79",
+          "day_night_difference_fen": "8.95",
+          "source_page": 438
+        },
+        {
+          "argument_du": "91.3125",
+          "declination_du": null,
+          "declination_drop_fen": null,
+          "summer_half_night_fen": "2500.00",
+          "winter_half_night_fen": "2500.00",
+          "day_night_difference_fen": null,
+          "source_page": 438
+        }
+      ]
+    },
+    "yuanshi55_digital": {
+      "profile_id": "yuanshi55_wikisource_1959440_dadu_night_table_research_v1",
+      "source_url": "https://zh.wikisource.org/w/index.php?title=元史/卷055&oldid=1959440",
+      "source_locator": "授时历经下·步中星第五，明确采用数字校本校后字",
+      "witness_kind": "corrected_digital_edition_with_critical_marks_not_Gujin_facsimile",
+      "rows": [
+        {
+          "argument_du": "0",
+          "declination_du": "23903/1000",
+          "declination_drop_fen": "33/100",
+          "summer_half_night_fen": "47699/25",
+          "winter_half_night_fen": "77301/25",
+          "day_night_difference_fen": "9/100"
+        },
+        {
+          "argument_du": "1",
+          "declination_du": "238997/10000",
+          "declination_drop_fen": "99/100",
+          "summer_half_night_fen": "38161/20",
+          "winter_half_night_fen": "61839/20",
+          "day_night_difference_fen": "29/100"
+        },
+        {
+          "argument_du": "2",
+          "declination_du": "119449/5000",
+          "declination_drop_fen": "83/50",
+          "summer_half_night_fen": "95417/50",
+          "winter_half_night_fen": "154583/50",
+          "day_night_difference_fen": "47/100"
+        },
+        {
+          "argument_du": "3",
+          "declination_du": "59683/2500",
+          "declination_drop_fen": "231/100",
+          "summer_half_night_fen": "190881/100",
+          "winter_half_night_fen": "309119/100",
+          "day_night_difference_fen": "33/50"
+        },
+        {
+          "argument_du": "4",
+          "declination_du": "238501/10000",
+          "declination_drop_fen": "299/100",
+          "summer_half_night_fen": "190947/100",
+          "winter_half_night_fen": "309053/100",
+          "day_night_difference_fen": "17/20"
+        },
+        {
+          "argument_du": "5",
+          "declination_du": "119101/5000",
+          "declination_drop_fen": "73/20",
+          "summer_half_night_fen": "47758/25",
+          "winter_half_night_fen": "77242/25",
+          "day_night_difference_fen": "26/25"
+        },
+        {
+          "argument_du": "6",
+          "declination_du": "237837/10000",
+          "declination_drop_fen": "108/25",
+          "summer_half_night_fen": "47784/25",
+          "winter_half_night_fen": "77216/25",
+          "day_night_difference_fen": "61/50"
+        },
+        {
+          "argument_du": "7",
+          "declination_du": "47481/2000",
+          "declination_drop_fen": "249/50",
+          "summer_half_night_fen": "95629/50",
+          "winter_half_night_fen": "154371/50",
+          "day_night_difference_fen": "71/50"
+        },
+        {
+          "argument_du": "8",
+          "declination_du": "236907/10000",
+          "declination_drop_fen": "113/20",
+          "summer_half_night_fen": "1914",
+          "winter_half_night_fen": "3086",
+          "day_night_difference_fen": "161/100"
+        },
+        {
+          "argument_du": "9",
+          "declination_du": "118171/5000",
+          "declination_drop_fen": "159/25",
+          "summer_half_night_fen": "191561/100",
+          "winter_half_night_fen": "308439/100",
+          "day_night_difference_fen": "179/100"
+        },
+        {
+          "argument_du": "10",
+          "declination_du": "117853/5000",
+          "declination_drop_fen": "351/50",
+          "summer_half_night_fen": "9587/5",
+          "winter_half_night_fen": "15413/5",
+          "day_night_difference_fen": "199/100"
+        },
+        {
+          "argument_du": "11",
+          "declination_du": "58751/2500",
+          "declination_drop_fen": "769/100",
+          "summer_half_night_fen": "191939/100",
+          "winter_half_night_fen": "308061/100",
+          "day_night_difference_fen": "109/50"
+        },
+        {
+          "argument_du": "12",
+          "declination_du": "46847/2000",
+          "declination_drop_fen": "839/100",
+          "summer_half_night_fen": "192157/100",
+          "winter_half_night_fen": "307843/100",
+          "day_night_difference_fen": "237/100"
+        },
+        {
+          "argument_du": "13",
+          "declination_du": "58349/2500",
+          "declination_drop_fen": "227/25",
+          "summer_half_night_fen": "96197/50",
+          "winter_half_night_fen": "153803/50",
+          "day_night_difference_fen": "64/25"
+        },
+        {
+          "argument_du": "14",
+          "declination_du": "29061/1250",
+          "declination_drop_fen": "39/4",
+          "summer_half_night_fen": "3853/2",
+          "winter_half_night_fen": "6147/2",
+          "day_night_difference_fen": "137/50"
+        },
+        {
+          "argument_du": "15",
+          "declination_du": "231513/10000",
+          "declination_drop_fen": "1047/100",
+          "summer_half_night_fen": "48231/25",
+          "winter_half_night_fen": "76769/25",
+          "day_night_difference_fen": "147/50"
+        },
+        {
+          "argument_du": "16",
+          "declination_du": "115233/5000",
+          "declination_drop_fen": "557/50",
+          "summer_half_night_fen": "96609/50",
+          "winter_half_night_fen": "153391/50",
+          "day_night_difference_fen": "157/50"
+        },
+        {
+          "argument_du": "17",
+          "declination_du": "28669/1250",
+          "declination_drop_fen": "237/20",
+          "summer_half_night_fen": "48383/25",
+          "winter_half_night_fen": "76617/25",
+          "day_night_difference_fen": "33/10"
+        },
+        {
+          "argument_du": "18",
+          "declination_du": "228167/10000",
+          "declination_drop_fen": "627/50",
+          "summer_half_night_fen": "96931/50",
+          "winter_half_night_fen": "153069/50",
+          "day_night_difference_fen": "351/100"
+        },
+        {
+          "argument_du": "19",
+          "declination_du": "226913/10000",
+          "declination_drop_fen": "53/4",
+          "summer_half_night_fen": "194213/100",
+          "winter_half_night_fen": "305787/100",
+          "day_night_difference_fen": "369/100"
+        },
+        {
+          "argument_du": "20",
+          "declination_du": "56397/2500",
+          "declination_drop_fen": "279/20",
+          "summer_half_night_fen": "97291/50",
+          "winter_half_night_fen": "152709/50",
+          "day_night_difference_fen": "97/25"
+        },
+        {
+          "argument_du": "21",
+          "declination_du": "224193/10000",
+          "declination_drop_fen": "733/50",
+          "summer_half_night_fen": "19497/10",
+          "winter_half_night_fen": "30503/10",
+          "day_night_difference_fen": "407/100"
+        },
+        {
+          "argument_du": "22",
+          "declination_du": "222727/10000",
+          "declination_drop_fen": "1537/100",
+          "summer_half_night_fen": "195377/100",
+          "winter_half_night_fen": "304623/100",
+          "day_night_difference_fen": "213/50"
+        },
+        {
+          "argument_du": "23",
+          "declination_du": "22119/1000",
+          "declination_drop_fen": "803/50",
+          "summer_half_night_fen": "195803/100",
+          "winter_half_night_fen": "304197/100",
+          "day_night_difference_fen": "443/100"
+        },
+        {
+          "argument_du": "24",
+          "declination_du": "13724/625",
+          "declination_drop_fen": "839/50",
+          "summer_half_night_fen": "98123/50",
+          "winter_half_night_fen": "151877/50",
+          "day_night_difference_fen": "231/50"
+        },
+        {
+          "argument_du": "25",
+          "declination_du": "108953/5000",
+          "declination_drop_fen": "1747/100",
+          "summer_half_night_fen": "49177/25",
+          "winter_half_night_fen": "75823/25",
+          "day_night_difference_fen": "24/5"
+        },
+        {
+          "argument_du": "26",
+          "declination_du": "216159/10000",
+          "declination_drop_fen": "91/5",
+          "summer_half_night_fen": "49297/25",
+          "winter_half_night_fen": "75703/25",
+          "day_night_difference_fen": "249/50"
+        },
+        {
+          "argument_du": "27",
+          "declination_du": "214339/10000",
+          "declination_drop_fen": "189/10",
+          "summer_half_night_fen": "98843/50",
+          "winter_half_night_fen": "151157/50",
+          "day_night_difference_fen": "129/25"
+        },
+        {
+          "argument_du": "28",
+          "declination_du": "212449/10000",
+          "declination_drop_fen": "98/5",
+          "summer_half_night_fen": "99101/50",
+          "winter_half_night_fen": "150899/50",
+          "day_night_difference_fen": "107/20"
+        },
+        {
+          "argument_du": "29",
+          "declination_du": "210489/10000",
+          "declination_drop_fen": "2027/100",
+          "summer_half_night_fen": "198737/100",
+          "winter_half_night_fen": "301263/100",
+          "day_night_difference_fen": "549/100"
+        },
+        {
+          "argument_du": "30",
+          "declination_du": "104231/5000",
+          "declination_drop_fen": "2099/100",
+          "summer_half_night_fen": "99643/50",
+          "winter_half_night_fen": "150357/50",
+          "day_night_difference_fen": "567/100"
+        },
+        {
+          "argument_du": "31",
+          "declination_du": "206363/10000",
+          "declination_drop_fen": "542/25",
+          "summer_half_night_fen": "199853/100",
+          "winter_half_night_fen": "300147/100",
+          "day_night_difference_fen": "117/20"
+        },
+        {
+          "argument_du": "32",
+          "declination_du": "40839/2000",
+          "declination_drop_fen": "447/20",
+          "summer_half_night_fen": "100219/50",
+          "winter_half_night_fen": "149781/50",
+          "day_night_difference_fen": "601/100"
+        },
+        {
+          "argument_du": "33",
+          "declination_du": "5049/250",
+          "declination_drop_fen": "2303/100",
+          "summer_half_night_fen": "201039/100",
+          "winter_half_night_fen": "298961/100",
+          "day_night_difference_fen": "154/25"
+        },
+        {
+          "argument_du": "34",
+          "declination_du": "199657/10000",
+          "declination_drop_fen": "2371/100",
+          "summer_half_night_fen": "40331/20",
+          "winter_half_night_fen": "59669/20",
+          "day_night_difference_fen": "633/100"
+        },
+        {
+          "argument_du": "35",
+          "declination_du": "98643/5000",
+          "declination_drop_fen": "2437/100",
+          "summer_half_night_fen": "50572/25",
+          "winter_half_night_fen": "74428/25",
+          "day_night_difference_fen": "162/25"
+        },
+        {
+          "argument_du": "36",
+          "declination_du": "194849/10000",
+          "declination_drop_fen": "2503/100",
+          "summer_half_night_fen": "50734/25",
+          "winter_half_night_fen": "74266/25",
+          "day_night_difference_fen": "663/100"
+        },
+        {
+          "argument_du": "37",
+          "declination_du": "96173/5000",
+          "declination_drop_fen": "1283/50",
+          "summer_half_night_fen": "203599/100",
+          "winter_half_night_fen": "296401/100",
+          "day_night_difference_fen": "339/50"
+        },
+        {
+          "argument_du": "38",
+          "declination_du": "9489/500",
+          "declination_drop_fen": "2631/100",
+          "summer_half_night_fen": "204277/100",
+          "winter_half_night_fen": "295723/100",
+          "day_night_difference_fen": "173/25"
+        },
+        {
+          "argument_du": "39",
+          "declination_du": "187149/10000",
+          "declination_drop_fen": "2693/100",
+          "summer_half_night_fen": "204969/100",
+          "winter_half_night_fen": "295031/100",
+          "day_night_difference_fen": "703/100"
+        },
+        {
+          "argument_du": "40",
+          "declination_du": "23057/1250",
+          "declination_drop_fen": "688/25",
+          "summer_half_night_fen": "102837/50",
+          "winter_half_night_fen": "147163/50",
+          "day_night_difference_fen": "719/100"
+        },
+        {
+          "argument_du": "41",
+          "declination_du": "22713/1250",
+          "declination_drop_fen": "1407/50",
+          "summer_half_night_fen": "206393/100",
+          "winter_half_night_fen": "293607/100",
+          "day_night_difference_fen": "183/25"
+        },
+        {
+          "argument_du": "42",
+          "declination_du": "17889/1000",
+          "declination_drop_fen": "718/25",
+          "summer_half_night_fen": "8285/4",
+          "winter_half_night_fen": "11715/4",
+          "day_night_difference_fen": "186/25"
+        },
+        {
+          "argument_du": "43",
+          "declination_du": "88009/5000",
+          "declination_drop_fen": "2929/100",
+          "summer_half_night_fen": "207869/100",
+          "winter_half_night_fen": "292131/100",
+          "day_night_difference_fen": "189/25"
+        },
+        {
+          "argument_du": "44",
+          "declination_du": "173089/10000",
+          "declination_drop_fen": "746/25",
+          "summer_half_night_fen": "8345/4",
+          "winter_half_night_fen": "11655/4",
+          "day_night_difference_fen": "192/25"
+        },
+        {
+          "argument_du": "45",
+          "declination_du": "34021/2000",
+          "declination_drop_fen": "1519/50",
+          "summer_half_night_fen": "209393/100",
+          "winter_half_night_fen": "290607/100",
+          "day_night_difference_fen": "389/50"
+        },
+        {
+          "argument_du": "46",
+          "declination_du": "167067/10000",
+          "declination_drop_fen": "309/10",
+          "summer_half_night_fen": "210171/100",
+          "winter_half_night_fen": "289829/100",
+          "day_night_difference_fen": "789/100"
+        },
+        {
+          "argument_du": "47",
+          "declination_du": "163977/10000",
+          "declination_drop_fen": "3141/100",
+          "summer_half_night_fen": "10548/5",
+          "winter_half_night_fen": "14452/5",
+          "day_night_difference_fen": "399/50"
+        },
+        {
+          "argument_du": "48",
+          "declination_du": "40209/2500",
+          "declination_drop_fen": "3191/100",
+          "summer_half_night_fen": "105879/50",
+          "winter_half_night_fen": "144121/50",
+          "day_night_difference_fen": "202/25"
+        },
+        {
+          "argument_du": "49",
+          "declination_du": "31529/2000",
+          "declination_drop_fen": "809/25",
+          "summer_half_night_fen": "106283/50",
+          "winter_half_night_fen": "143717/50",
+          "day_night_difference_fen": "817/100"
+        },
+        {
+          "argument_du": "50",
+          "declination_du": "154409/10000",
+          "declination_drop_fen": "657/20",
+          "summer_half_night_fen": "213383/100",
+          "winter_half_night_fen": "286617/100",
+          "day_night_difference_fen": "413/50"
+        },
+        {
+          "argument_du": "51",
+          "declination_du": "37781/2500",
+          "declination_drop_fen": "1663/50",
+          "summer_half_night_fen": "214209/100",
+          "winter_half_night_fen": "285791/100",
+          "day_night_difference_fen": "208/25"
+        },
+        {
+          "argument_du": "52",
+          "declination_du": "73899/5000",
+          "declination_drop_fen": "841/25",
+          "summer_half_night_fen": "215041/100",
+          "winter_half_night_fen": "284959/100",
+          "day_night_difference_fen": "42/5"
+        },
+        {
+          "argument_du": "53",
+          "declination_du": "72217/5000",
+          "declination_drop_fen": "3407/100",
+          "summer_half_night_fen": "215881/100",
+          "winter_half_night_fen": "284119/100",
+          "day_night_difference_fen": "423/50"
+        },
+        {
+          "argument_du": "54",
+          "declination_du": "141027/10000",
+          "declination_drop_fen": "689/20",
+          "summer_half_night_fen": "216727/100",
+          "winter_half_night_fen": "283273/100",
+          "day_night_difference_fen": "427/50"
+        },
+        {
+          "argument_du": "55",
+          "declination_du": "68791/5000",
+          "declination_drop_fen": "3481/100",
+          "summer_half_night_fen": "217581/100",
+          "winter_half_night_fen": "282419/100",
+          "day_night_difference_fen": "859/100"
+        },
+        {
+          "argument_du": "56",
+          "declination_du": "134101/10000",
+          "declination_drop_fen": "703/20",
+          "summer_half_night_fen": "10922/5",
+          "winter_half_night_fen": "14078/5",
+          "day_night_difference_fen": "216/25"
+        },
+        {
+          "argument_du": "57",
+          "declination_du": "65293/5000",
+          "declination_drop_fen": "3547/100",
+          "summer_half_night_fen": "54826/25",
+          "winter_half_night_fen": "70174/25",
+          "day_night_difference_fen": "869/100"
+        },
+        {
+          "argument_du": "58",
+          "declination_du": "127039/10000",
+          "declination_drop_fen": "1789/50",
+          "summer_half_night_fen": "220173/100",
+          "winter_half_night_fen": "279827/100",
+          "day_night_difference_fen": "35/4"
+        },
+        {
+          "argument_du": "59",
+          "declination_du": "123461/10000",
+          "declination_drop_fen": "3607/100",
+          "summer_half_night_fen": "55262/25",
+          "winter_half_night_fen": "69738/25",
+          "day_night_difference_fen": "439/50"
+        },
+        {
+          "argument_du": "60",
+          "declination_du": "59927/5000",
+          "declination_drop_fen": "3633/100",
+          "summer_half_night_fen": "110963/50",
+          "winter_half_night_fen": "139037/50",
+          "day_night_difference_fen": "881/100"
+        },
+        {
+          "argument_du": "61",
+          "declination_du": "116221/10000",
+          "declination_drop_fen": "3659/100",
+          "summer_half_night_fen": "222807/100",
+          "winter_half_night_fen": "277193/100",
+          "day_night_difference_fen": "221/25"
+        },
+        {
+          "argument_du": "62",
+          "declination_du": "56281/5000",
+          "declination_drop_fen": "3683/100",
+          "summer_half_night_fen": "223691/100",
+          "winter_half_night_fen": "276309/100",
+          "day_night_difference_fen": "889/100"
+        },
+        {
+          "argument_du": "63",
+          "declination_du": "108879/10000",
+          "declination_drop_fen": "741/20",
+          "summer_half_night_fen": "11229/5",
+          "winter_half_night_fen": "13771/5",
+          "day_night_difference_fen": "89/10"
+        },
+        {
+          "argument_du": "64",
+          "declination_du": "52587/5000",
+          "declination_drop_fen": "931/25",
+          "summer_half_night_fen": "22547/10",
+          "winter_half_night_fen": "27453/10",
+          "day_night_difference_fen": "223/25"
+        },
+        {
+          "argument_du": "65",
+          "declination_du": "2029/200",
+          "declination_drop_fen": "936/25",
+          "summer_half_night_fen": "113181/50",
+          "winter_half_night_fen": "136819/50",
+          "day_night_difference_fen": "447/50"
+        },
+        {
+          "argument_du": "66",
+          "declination_du": "48853/5000",
+          "declination_drop_fen": "3761/100",
+          "summer_half_night_fen": "56814/25",
+          "winter_half_night_fen": "68186/25",
+          "day_night_difference_fen": "897/100"
+        },
+        {
+          "argument_du": "67",
+          "declination_du": "18789/2000",
+          "declination_drop_fen": "944/25",
+          "summer_half_night_fen": "228153/100",
+          "winter_half_night_fen": "271847/100",
+          "day_night_difference_fen": "897/100"
+        },
+        {
+          "argument_du": "68",
+          "declination_du": "90169/10000",
+          "declination_drop_fen": "3791/100",
+          "summer_half_night_fen": "4581/2",
+          "winter_half_night_fen": "5419/2",
+          "day_night_difference_fen": "449/50"
+        },
+        {
+          "argument_du": "69",
+          "declination_du": "43189/5000",
+          "declination_drop_fen": "3807/100",
+          "summer_half_night_fen": "57487/25",
+          "winter_half_night_fen": "67513/25",
+          "day_night_difference_fen": "9"
+        },
+        {
+          "argument_du": "70",
+          "declination_du": "82571/10000",
+          "declination_drop_fen": "3817/100",
+          "summer_half_night_fen": "57712/25",
+          "winter_half_night_fen": "67288/25",
+          "day_night_difference_fen": "9"
+        },
+        {
+          "argument_du": "71",
+          "declination_du": "39377/5000",
+          "declination_drop_fen": "957/25",
+          "summer_half_night_fen": "57937/25",
+          "winter_half_night_fen": "67063/25",
+          "day_night_difference_fen": "901/100"
+        },
+        {
+          "argument_du": "72",
+          "declination_du": "37463/5000",
+          "declination_drop_fen": "1919/50",
+          "summer_half_night_fen": "232649/100",
+          "winter_half_night_fen": "267351/100",
+          "day_night_difference_fen": "901/100"
+        },
+        {
+          "argument_du": "73",
+          "declination_du": "4443/625",
+          "declination_drop_fen": "3847/100",
+          "summer_half_night_fen": "4671/2",
+          "winter_half_night_fen": "5329/2",
+          "day_night_difference_fen": "901/100"
+        },
+        {
+          "argument_du": "74",
+          "declination_du": "67241/10000",
+          "declination_drop_fen": "1927/50",
+          "summer_half_night_fen": "234451/100",
+          "winter_half_night_fen": "265549/100",
+          "day_night_difference_fen": "901/100"
+        },
+        {
+          "argument_du": "75",
+          "declination_du": "63387/10000",
+          "declination_drop_fen": "1931/50",
+          "summer_half_night_fen": "58838/25",
+          "winter_half_night_fen": "66162/25",
+          "day_night_difference_fen": "901/100"
+        },
+        {
+          "argument_du": "76",
+          "declination_du": "2381/400",
+          "declination_drop_fen": "3867/100",
+          "summer_half_night_fen": "236253/100",
+          "winter_half_night_fen": "263747/100",
+          "day_night_difference_fen": "901/100"
+        },
+        {
+          "argument_du": "77",
+          "declination_du": "27829/5000",
+          "declination_drop_fen": "3873/100",
+          "summer_half_night_fen": "118577/50",
+          "winter_half_night_fen": "131423/50",
+          "day_night_difference_fen": "9"
+        },
+        {
+          "argument_du": "78",
+          "declination_du": "10357/2000",
+          "declination_drop_fen": "3877/100",
+          "summer_half_night_fen": "119027/50",
+          "winter_half_night_fen": "130973/50",
+          "day_night_difference_fen": "9"
+        },
+        {
+          "argument_du": "79",
+          "declination_du": "11977/2500",
+          "declination_drop_fen": "3881/100",
+          "summer_half_night_fen": "119477/50",
+          "winter_half_night_fen": "130523/50",
+          "day_night_difference_fen": "9"
+        },
+        {
+          "argument_du": "80",
+          "declination_du": "44027/10000",
+          "declination_drop_fen": "777/20",
+          "summer_half_night_fen": "119927/50",
+          "winter_half_night_fen": "130073/50",
+          "day_night_difference_fen": "9"
+        },
+        {
+          "argument_du": "81",
+          "declination_du": "20071/5000",
+          "declination_drop_fen": "972/25",
+          "summer_half_night_fen": "120377/50",
+          "winter_half_night_fen": "129623/50",
+          "day_night_difference_fen": "9"
+        },
+        {
+          "argument_du": "82",
+          "declination_du": "18127/5000",
+          "declination_drop_fen": "3889/100",
+          "summer_half_night_fen": "120827/50",
+          "winter_half_night_fen": "129173/50",
+          "day_night_difference_fen": "897/100"
+        },
+        {
+          "argument_du": "83",
+          "declination_du": "6473/2000",
+          "declination_drop_fen": "389/10",
+          "summer_half_night_fen": "242551/100",
+          "winter_half_night_fen": "257449/100",
+          "day_night_difference_fen": "897/100"
+        },
+        {
+          "argument_du": "84",
+          "declination_du": "1139/400",
+          "declination_drop_fen": "973/25",
+          "summer_half_night_fen": "60862/25",
+          "winter_half_night_fen": "64138/25",
+          "day_night_difference_fen": "897/100"
+        },
+        {
+          "argument_du": "85",
+          "declination_du": "24583/10000",
+          "declination_drop_fen": "3893/100",
+          "summer_half_night_fen": "48869/20",
+          "winter_half_night_fen": "51131/20",
+          "day_night_difference_fen": "897/100"
+        },
+        {
+          "argument_du": "86",
+          "declination_du": "2069/1000",
+          "declination_drop_fen": "1947/50",
+          "summer_half_night_fen": "122621/50",
+          "winter_half_night_fen": "127379/50",
+          "day_night_difference_fen": "224/25"
+        },
+        {
+          "argument_du": "87",
+          "declination_du": "4199/2500",
+          "declination_drop_fen": "1947/50",
+          "summer_half_night_fen": "123069/50",
+          "winter_half_night_fen": "126931/50",
+          "day_night_difference_fen": "224/25"
+        },
+        {
+          "argument_du": "88",
+          "declination_du": "6451/5000",
+          "declination_drop_fen": "779/20",
+          "summer_half_night_fen": "123517/50",
+          "winter_half_night_fen": "126483/50",
+          "day_night_difference_fen": "224/25"
+        },
+        {
+          "argument_du": "89",
+          "declination_du": "9007/10000",
+          "declination_drop_fen": "779/20",
+          "summer_half_night_fen": "24793/10",
+          "winter_half_night_fen": "25207/10",
+          "day_night_difference_fen": "224/25"
+        },
+        {
+          "argument_du": "90",
+          "declination_du": "639/1250",
+          "declination_drop_fen": "779/20",
+          "summer_half_night_fen": "124413/50",
+          "winter_half_night_fen": "125587/50",
+          "day_night_difference_fen": "179/20"
+        },
+        {
+          "argument_du": "91",
+          "declination_du": "1217/10000",
+          "declination_drop_fen": "1217/100",
+          "summer_half_night_fen": "249721/100",
+          "winter_half_night_fen": "250279/100",
+          "day_night_difference_fen": "279/100"
+        },
+        {
+          "argument_du": "9131/100",
+          "declination_du": null,
+          "declination_drop_fen": null,
+          "summer_half_night_fen": "2500",
+          "winter_half_night_fen": "2500",
+          "day_night_difference_fen": null
+        }
+      ]
+    }
+  },
+  "automatic_midnight_solar_argument_or_global_fold": false,
+  "source_tables_adjudicated_as_physical_truth": false,
+  "real_world_prediction_subjects": 0
+}

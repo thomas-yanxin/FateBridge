@@ -1,0 +1,31 @@
+{
+  "ruleset_id": "heluo_wenming_baike_clock_v1",
+  "version": "1.0.0",
+  "source_title": "河洛理數 文明書局本 卷一 定時刻法",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "source_pdf_sha256": "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c",
+  "source_pdf_pages": [
+    41
+  ],
+  "review_status": "single_visual_reading; independent_second_review_pending",
+  "day_ke": 100,
+  "twelve_base_total_ke": 96,
+  "extra_branches_in_printed_order": [
+    "寅",
+    "申",
+    "巳",
+    "亥"
+  ],
+  "extra_branch_ke": 9,
+  "nominal_year_days": 360,
+  "printed_year_days": 365,
+  "extra_month_shi": 5,
+  "months": 12,
+  "extra_year_shi": 60,
+  "daily_extra_ke": 1,
+  "daily_extra_fen": 7,
+  "source_fen_per_ke": null,
+  "scope": "Selected volume-one source clock arithmetic. Cyclic branch origin, physical clock mapping and fen scale are not established by this passage; not merged with volume-seven eight-ke hours.",
+  "block_nominal_days": 6,
+  "block_extra_shi": 1
+}

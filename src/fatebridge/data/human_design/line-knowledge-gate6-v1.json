@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "version": 7,
+  "catalogue_id": "human_design_gate6_editorial_v7",
+  "parent_version": 6,
+  "parent_catalogue_sha256": "26023136d1135eefd98d1c6d3293d1d2dc6d654a33f497ff1bf595cfc55162df",
+  "source_pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495",
+  "curated_by": "FateBridge primary agent; bounded visual source reading, not independent review",
+  "required_line_count": 384,
+  "expected_local_paraphrase_count": 36,
+  "independently_accepted_line_count": 0,
+  "publisher_master_authenticated": false,
+  "complete384_line_meanings_accepted": false,
+  "source_conditions_exhaustively_reviewed": false,
+  "publisher_direct_body_corroboration_available": false,
+  "rows": [
+    {
+      "key": "6.1",
+      "source_pdf_page_one_based": 17,
+      "source_layout_block_sha256": "90cd795e484eaf5a2f23c1e597511fbd01682d2bf720f01b569bd8f14e03069b",
+      "source_line_heading": "Retreat",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "退让与再生",
+        "exaltation": "接受退让与再生。",
+        "detriment": "把退让当成个人软弱。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "不耗尽资源对抗压倒性力量。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：不耗尽资源对抗压倒性力量。",
+        "情绪描述不等于临床诊断。"
+      ],
+      "source_polarity_planets": {
+        "exaltation": [
+          "Pluto"
+        ],
+        "detriment": [
+          "Mercury"
+        ]
+      },
+      "source_polarity_text_note": null
+    },
+    {
+      "key": "6.2",
+      "source_pdf_page_one_based": 17,
+      "source_layout_block_sha256": "f979b32ae0e7017bb1cc6c69bc126676b779053644d33c0e86def1a2b34c0033",
+      "source_line_heading": "The guerilla",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "进退与敏察",
+        "exaltation": "敏察冲突中的薄弱处。",
+        "detriment": "欠缺敏察而盲入冲突。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "弱势处境中的适时进退。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：弱势处境中的适时进退。",
+        "战争比喻不是现实军事或危险行动指令。"
+      ],
+      "source_polarity_planets": {
+        "exaltation": [
+          "Venus"
+        ],
+        "detriment": [
+          "Mars"
+        ]
+      },
+      "source_polarity_text_note": null
+    },
+    {
+      "key": "6.3",
+      "source_pdf_page_one_based": 17,
+      "source_layout_block_sha256": "2bca38d50a8fa1e94fc7c9dcb49806275d54b432ab32e5f4dee200c66f5f8c1e",
+      "source_line_heading": "Allegiance",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "联合与控制感",
+        "exaltation": "以感受深度丰富联合。",
+        "detriment": "抗拒控制而可能拒绝亲近。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "弱势中争取支持，另有6–59限定。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：弱势中争取支持，另有6–59限定。",
+        "6–59限定属于引导语中的命名句，不把整条线义或整个上升极性设为该条件。",
+        "原文生物性叙述只作来源记录，不据盘图判断生育、临床结果或生理指标。"
+      ],
+      "source_polarity_planets": {
+        "exaltation": [
+          "Neptune"
+        ],
+        "detriment": [
+          "Pluto"
+        ]
+      },
+      "source_polarity_text_note": null
+    },
+    {
+      "key": "6.4",
+      "source_pdf_page_one_based": 17,
+      "source_layout_block_sha256": "db5fc700b92ed6309b7790b0796406a15715796532bb2ea8075b239cc192a089",
+      "source_line_heading": "Triumph",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "力量与克制",
+        "exaltation": "力量伴随宽厚与智慧。",
+        "detriment": "情绪失控与关系破坏。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "力量位置及其责任。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：力量位置及其责任。",
+        "线名中的胜利不表示已计算出现实胜负。"
+      ],
+      "source_polarity_planets": {
+        "exaltation": [
+          "Sun"
+        ],
+        "detriment": [
+          "Pluto"
+        ]
+      },
+      "source_polarity_text_note": null
+    },
+    {
+      "key": "6.5",
+      "source_pdf_page_one_based": 17,
+      "source_layout_block_sha256": "6ab8c2d2820b1d317746e76a5f507e0768df376ea3bcb2b3605ef5fde1d21773",
+      "source_line_heading": "Arbitration",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "仲裁与偏私",
+        "exaltation": "避开冲突，也可能避开亲近。",
+        "detriment": "只接受对自身有利的裁决。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "审慎分析、情绪控制与仲裁。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：审慎分析、情绪控制与仲裁。",
+        "仲裁叙述中的更高权威不替换本盘计算出的内在权威。"
+      ],
+      "source_polarity_planets": {
+        "exaltation": [
+          "Venus"
+        ],
+        "detriment": [
+          "Moon"
+        ]
+      },
+      "source_polarity_text_note": null
+    },
+    {
+      "key": "6.6",
+      "source_pdf_page_one_based": 17,
+      "source_layout_block_sha256": "12e5129bff1cd708ba2c3a04513dbf4f4ab665ecf8a3f3d48c2aed251b4aea54",
+      "source_line_heading": "The peacemaker",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "调停与条件",
+        "exaltation": "顾及他人感受而息争。",
+        "detriment": "只在自身条件满足后息争。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "优势一方单方面停止冲突。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：优势一方单方面停止冲突。"
+      ],
+      "source_polarity_planets": {
+        "exaltation": [
+          "Mercury"
+        ],
+        "detriment": [
+          "Venus"
+        ]
+      },
+      "source_polarity_text_note": null
+    }
+  ]
+}

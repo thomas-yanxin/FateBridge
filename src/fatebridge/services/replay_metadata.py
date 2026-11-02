@@ -1,8 +1,9 @@
 """Portable, privacy-conscious execution receipts for the shared registrar."""
 
 import hashlib
-import json
+import os
 import platform
+import re
 from functools import lru_cache
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
@@ -12,20 +13,11 @@ from pydantic import BaseModel
 
 from fatebridge import __version__
 from fatebridge.core.execution_context import CallClock, ExecutionOptions
+from fatebridge.core.reproducibility import BAZI_ANALYSIS_CLOCK_TOOLS
 from fatebridge.core.schema_cache import contract_fingerprint
+from fatebridge.utils.json_digest import digest
 
 METADATA_SCHEMA_VERSION = "1.0"
-
-
-def digest(value: Any) -> str:
-    encoded = json.dumps(
-        value,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-        allow_nan=False,
-    ).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
 
 
 def _file_digests(root: Path, pattern: str) -> Dict[str, str]:
@@ -48,6 +40,7 @@ def environment_receipt() -> Dict[str, Any]:
         "lunardate",
         "python-dateutil",
         "pytz",
+        "pygeomag",
     ):
         try:
             dependencies[package] = version(package)
@@ -68,25 +61,62 @@ def ephemeris_inventory() -> Dict[str, Any]:
     """Fingerprint configured file inventory, not a claim about files actually used."""
     from fatebridge.core import ephemeris_runtime
 
-    directory = ephemeris_runtime.configured_ephemeris_path()
+    directory = ephemeris_runtime.effective_ephemeris_search_path()
     return _ephemeris_inventory(directory)
 
 
-@lru_cache(maxsize=8)
+@lru_cache(maxsize=64)
+def _large_ephemeris_digest(filename: str, signature: tuple[int, ...]) -> str:
+    path = Path(filename)
+    hasher = hashlib.sha256()
+    with path.open("rb") as handle:
+        for piece in iter(lambda: handle.read(1024 * 1024), b""):
+            hasher.update(piece)
+    if _stat_signature(path) != signature:
+        raise ValueError("Ephemeris file changed while its inventory was hashed")
+    return hasher.hexdigest()
+
+
+def _stat_signature(path: Path) -> tuple[int, ...]:
+    stat = path.stat()
+    return (stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_ino, stat.st_dev)
+
+
+def _ephemeris_directories(directory: Any) -> List[Path]:
+    if not directory:
+        return []
+    separators = r"[;:]" if os.pathsep == ":" else r";"
+    return [Path(item or ".") for item in re.split(separators, str(directory))]
+
+
 def _ephemeris_inventory(directory: Any) -> Dict[str, Any]:
     files: Dict[str, str] = {}
     if directory:
-        # Swiss Ephemeris accepts a platform-delimited search path.
-        import os
-
-        for index, item in enumerate(str(directory).split(os.pathsep)):
-            root = Path(item)
+        # Swiss also accepts semicolons on Unix; preserve Windows drive colons.
+        for index, root in enumerate(_ephemeris_directories(directory)):
             for path in sorted(root.glob("*.se1")):
-                files[f"{index}/{path.name}"] = hashlib.sha256(
-                    path.read_bytes()
-                ).hexdigest()
+                if path.is_file():
+                    files[f"{index}/{path.name}"] = _large_ephemeris_digest(
+                        str(path.resolve()), _stat_signature(path)
+                    )
+            for name in (
+                "seorbel.txt",
+                "sefstars.txt",
+                "seleapsec.txt",
+                "seasnam.txt",
+                "swe_deltat.txt",
+                "sedeltat.txt",
+            ):
+                path = root / name
+                if path.is_file():
+                    # Small source files can immediately change a calculation
+                    # at the same directory. Never cache solely by path/stat.
+                    files[f"{index}/{name}"] = hashlib.sha256(
+                        path.read_bytes()
+                    ).hexdigest()
     return {
-        "scope": "configured_se1_inventory; actual model is reported separately",
+        "scope": "effective_se1_and_auxiliary_inventory; actual models/sources are reported separately",
+        "freshness": "Auxiliary text bytes hashed each receipt; large se1 hashes cached by size/mtime/ctime/inode/device, not a continuous immutability proof",
         "files": files,
         "sha256": digest(files),
     }
@@ -107,6 +137,7 @@ def provenance_values(payload: Dict[str, Any]) -> Dict[str, List[str]]:
         "engine_precision",
         "ruleset_id",
         "bundle_version",
+        "method_id",
     }
     found: Dict[str, set[str]] = {}
     queue: List[Any] = [payload]
@@ -143,28 +174,80 @@ def execution_receipt(
     as_of = clock.instant.isoformat().replace("+00:00", "Z")
     inputs = request.model_dump(mode="json")
 
-    # Presence of these flags changes fail-loud true-solar behavior even when
-    # their default values equal the submitted values. Other explicit defaults
-    # have identical semantics, including MCP's expanded signature defaults.
-    def solar_presence(model: BaseModel, prefix: str = "") -> List[str]:
+    # These omissions affect either fail-loud solar behavior or the declared
+    # birth-clock input components, even when the nominal values are equal.
+    # A null/omitted second has the same unknown meaning and needs no extra bit.
+    def semantic_presence(model: BaseModel, prefix: str = "") -> List[str]:
         present = []
         for field in type(model).model_fields:
             value = getattr(model, field)
             if isinstance(value, BaseModel):
-                present.extend(solar_presence(value, prefix + field + "."))
+                present.extend(semantic_presence(value, prefix + field + "."))
             elif (
-                field.endswith("use_true_solar_time")
-                and field in model.model_fields_set
-            ):
+                field.endswith(("use_true_solar_time", "birth_minute"))
+                or (
+                    spec.key == "meihua_analysis"
+                    and not prefix
+                    and field == "analysis_minute"
+                    and value is not None
+                )
+            ) and field in model.model_fields_set:
                 present.append(prefix + field)
         return present
 
-    presence = sorted(solar_presence(request))
+    presence = sorted(semantic_presence(request))
     input_digest = digest(
         {"tool_key": spec.key, "inputs": inputs, "presence": presence}
     )
+    body = {key: value for key, value in result.items() if key != "run_metadata"}
+    observed_provenance = provenance_values(body)
     environment = environment_receipt()
-    environment = {**environment, "ephemeris": ephemeris_inventory()}
+    from fatebridge.core.solar_model_policy import (
+        ENVIRONMENT_NAME,
+        MODES,
+        solar_model_environment_receipt,
+    )
+
+    configured_solar_mode = os.environ.get(ENVIRONMENT_NAME, "auto").strip().lower()
+    from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_MODEL_ID
+
+    vsop2013_observed = VSOP2013_MODEL_ID in observed_provenance.get(
+        "ephemeris_model", []
+    )
+    spk_observed = "fatebridge_jpl_spk_solar_v1" in observed_provenance.get(
+        "ephemeris_model", []
+    )
+    from fatebridge.core.de440_solar import (
+        EXTENDED_MODEL_ID,
+    )
+    from fatebridge.core.de440_solar import MODEL_ID as DE440_MODEL_ID
+
+    de440_observed_models = sorted(
+        {DE440_MODEL_ID, EXTENDED_MODEL_ID}
+        & set(observed_provenance.get("ephemeris_model", []))
+    )
+    de440_observed = bool(de440_observed_models)
+    if (
+        (configured_solar_mode == "vsop2013" and not vsop2013_observed)
+        or (configured_solar_mode == "spk" and not spk_observed)
+        or (configured_solar_mode in {"auto", "de440"} and not de440_observed)
+        or configured_solar_mode not in MODES
+    ):
+        solar_policy_receipt = solar_model_environment_receipt(resolve_source=False)
+    else:
+        solar_policy_receipt = solar_model_environment_receipt(
+            observed_de440_models=(
+                de440_observed_models
+                if EXTENDED_MODEL_ID in de440_observed_models
+                else None
+            )
+        )
+
+    environment = {
+        **environment,
+        "ephemeris": ephemeris_inventory(),
+        "solar_term_policy": solar_policy_receipt,
+    }
     environment["environment_sha256"] = digest(
         {
             key: value
@@ -175,13 +258,18 @@ def execution_receipt(
     time_defaults = [
         field for field in policy.current_time_fields if inputs.get(field) is None
     ]
+    if spec.key in BAZI_ANALYSIS_CLOCK_TOOLS:
+        # Read the resolver's actual decision. Missing fields may be fixed
+        # constants in explicit partial queries, rather than clock-derived.
+        reference = result.get("analysis_reference")
+        if isinstance(reference, dict):
+            time_defaults = list(reference["defaulted_from_clock"])
     random_used = False
     if spec.key == "sixyao":
         from fatebridge.core.local_techniques.sixyao import needs_random_coin_cast
 
         random_used = needs_random_coin_cast(inputs)
     overrides = {"seed": inputs["seed"]} if random_used else {}
-    body = {key: value for key, value in result.items() if key != "run_metadata"}
     return {
         "metadata_schema_version": METADATA_SCHEMA_VERSION,
         "package_version": __version__,
@@ -202,7 +290,7 @@ def execution_receipt(
             "scope": "business payload in identical implementation/data/runtime; metadata IDs and duration vary",
         },
         "runtime": environment,
-        "provenance": provenance_values(body),
+        "provenance": observed_provenance,
         "replay": {
             "as_of": as_of,
             "overrides": overrides,

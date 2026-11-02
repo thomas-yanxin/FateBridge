@@ -1,0 +1,457 @@
+{
+  "call_guidance": {
+    "branch_stars_scope": "京本PDF118–120所选七项神煞只给历法目标与三位本支事实。驿马条用月建支，天赦比完整日干支；不以名称或条件推出现实结局，不借六壬日马、月将或贵神落宫替代。",
+    "god_yin_scope": "类神阴神按实际天将所乘支再查上神，天乙依所选昼夜表互取；与四课第二、四课的阴神称谓分层。年命上神缺项保留未知，季节本空事实不替代有效空亡及日辰德合相生，综合类神可用性仍未裁。金口诀附带六壬盘的本层不替代金口诀四位取用。",
+    "month_general_scope": "jinkou.overview.month_general是依中气确定的月将本位；兼容字段yuejiang是月将加时后落在地分的将神，对应四位将神行。两支可不同，解释分别说明，不将落地分的支称为中气月将本位。快照使用月将本位、将神落地分两个标签。",
+    "natal_course_scope": "jinkou.natal_course以已确认本命支另起完整四位课；未给本命支及明确出生年干支则course=null。它不是出生时刻命盘，不需要猜生时、性别或岁序；本命支作派生地分，主课原地分保留，日干、占时、月将、昼夜选择不改。不因重复提问自动换将或换日，也不宣称原典全书或预测有效。",
+    "published_term_dates_scope": "逐项读取实际solar_term_dependencies中的published_date_reference：按固定UTC+08对照香港天文台1901—2100逐日表，日期相符只表示同一天，不认证交气秒数或全部历法。date_mismatch保留两日期，不能称官方一致或移动交界凑表；outside_published_range是无资料，不能说相符或不符。与分析时区、真太阳钟、历史时间约定及未来闰秒假设分列，金口诀仍按同次四位解释。",
+    "seasonal_evidence_scope": "探原季节五态用本次月建支，不用月将支。当前季月整月配置分别计算支神、天将固有五行和地盘五态，日干五态不替代它们。真空／半空只列支神本空与季节状态的条件，天空天将及坐空不替换本空；季末十八日异法、扶助冲剋及角色例外后的有效真半未裁，不把原文效力折扣说成成功率。金口诀本课与附带六壬分开，不能借本层代替金口诀日下五态或综合取用。",
+    "transmission_progression_scope": "探原PDF110–111三传连茹／间断：sequence_direction只指支序；raw_branch_empty_conditional_*仅在支神本空适用假设下释读，不把坐空或天将天空替代本空。effective_direction和comprehensive_judgement仍未裁定，不从进退字样推成败、概率或应期。"
+  },
+  "evidence_views": {
+    "branch_stars": {
+      "fields": [
+        "four_pillars",
+        "jinkou.rows",
+        "jinkou.branch_stars",
+        "jinkou.ruleset"
+      ],
+      "purpose": "京本所选七项历法神煞的目标及三位本支匹配；驿马按月建，不借日支；名义月序与综合效力边界明确。"
+    },
+    "core": {
+      "fields": [
+        "analysis_context",
+        "four_pillars",
+        "jinkou.overview",
+        "jinkou.rows",
+        "jinkou.motions",
+        "jinkou.internal_strength",
+        "jinkou.qi_evidence",
+        "jinkou.position_interactions",
+        "jinkou.branch_breaks",
+        "jinkou.stem_relations",
+        "jinkou.combinations",
+        "jinkou.ruleset",
+        "jinkou.rule_trace"
+      ],
+      "purpose": "四位、旺衰、阴阳取用、动象、三合齐缺、原文破支配对与空破条件及来源；破局效力、合化与实际应期未裁定，保留地分回退和原典疑文。"
+    },
+    "definition_witnesses": {
+      "fields": [
+        "four_pillars",
+        "jinkou.overview",
+        "jinkou.rows",
+        "jinkou.stem_relations.day_stem",
+        "jinkou.definition_evidence",
+        "jinkou.patterns.evaluation_counts",
+        "jinkou.patterns.unresolved",
+        "jinkou.ruleset"
+      ],
+      "purpose": "六条未裁定课式的书影异文、同课昼夜换算及起丁路径候选；候选条件不进入课式命中，完整原典符合仍为false。"
+    },
+    "liuren_branch_relations": {
+      "fields": [
+        "four_pillars",
+        "liureng.month_general",
+        "liureng.four_lessons",
+        "liureng.three_transmissions",
+        "liureng.branch_relations",
+        "liureng.ruleset"
+      ],
+      "purpose": "只核对附带大六壬盘的支位并存条件；不将探原大六壬规则替换金口诀本课四位规则。"
+    },
+    "liuren_cross_harmony": {
+      "fields": [
+        "four_pillars",
+        "liureng.cross_harmony",
+        "liureng.ruleset"
+      ],
+      "purpose": "核对干上神与日支、支上神与日干寄宫的两边六合，以及五个干支同宫日的排除条件；按所选原文列实际支位和来源。"
+    },
+    "liuren_day_placement_patterns": {
+      "fields": [
+        "four_pillars",
+        "liureng.day_placement_patterns",
+        "liureng.ruleset"
+      ],
+      "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合两条未知保留。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。"
+    },
+    "liuren_seasonal_evidence": {
+      "fields": [
+        "four_pillars",
+        "liureng.month_general",
+        "liureng.three_transmissions",
+        "liureng.seasonal_evidence",
+        "liureng.emptiness_evidence",
+        "liureng.ruleset"
+      ],
+      "purpose": "探原季节五态用本次月建支，不用月将支。当前季月整月配置分别计算支神、天将固有五行和地盘五态，日干五态不替代它们。真空／半空只列支神本空与季节状态的条件，天空天将及坐空不替换本空；季末十八日异法、扶助冲剋及角色例外后的有效真半未裁，不把原文效力折扣说成成功率。金口诀本课与附带六壬分开，不能借本层代替金口诀日下五态或综合取用。"
+    },
+    "liuren_transmission_progression": {
+      "fields": [
+        "four_pillars",
+        "liureng.three_transmissions",
+        "liureng.transmission_progression",
+        "liureng.emptiness_evidence",
+        "liureng.ruleset"
+      ],
+      "purpose": "探原PDF110–111三传连茹／间断：sequence_direction只指支序；raw_branch_empty_conditional_*仅在支神本空适用假设下释读，不把坐空或天将天空替代本空。effective_direction和comprehensive_judgement仍未裁定，不从进退字样推成败、概率或应期。"
+    },
+    "natal_absolute": {
+      "fields": [
+        "four_pillars",
+        "jinkou.rows",
+        "jinkou.relations.si_jue",
+        "jinkou.relations.source_url",
+        "jinkou.relations.source_sha256",
+        "jinkou.ruleset"
+      ],
+      "purpose": "已确认本命支与本次将神的京本大绝配对；省略本命支时保留未知，不从占时或行年替代，不据结构断言现实结局。"
+    },
+    "natal_course": {
+      "fields": [
+        "four_pillars",
+        "jinkou.overview",
+        "jinkou.rows",
+        "jinkou.natal_course",
+        "jinkou.ruleset"
+      ],
+      "purpose": "京本次客法所选本命另课：只用已确认本命支或明确出生年支作派生地分，复用本次日时月将与昼夜选择，保留原主课；与行年课分列，不以派生方位冒充观测，不判现实应验。"
+    },
+    "published_term_dates": {
+      "fields": [
+        "analysis_context",
+        "four_pillars",
+        "jinkou.calendar_policy"
+      ],
+      "purpose": "逐项读取实际solar_term_dependencies中的published_date_reference：按固定UTC+08对照香港天文台1901—2100逐日表，日期相符只表示同一天，不认证交气秒数或全部历法。date_mismatch保留两日期，不能称官方一致或移动交界凑表；outside_published_range是无资料，不能说相符或不符。与分析时区、真太阳钟、历史时间约定及未来闰秒假设分列，金口诀仍按同次四位解释。"
+    },
+    "year_fate": {
+      "fields": [
+        "four_pillars",
+        "jinkou.overview",
+        "jinkou.rows",
+        "jinkou.year_fate",
+        "jinkou.ruleset",
+        "jinkou.rule_trace"
+      ],
+      "purpose": "按明确出生年干支与一岁起算岁序核对京本行年及另课；性别未知或资料不足保留未算，喜用条文疑义未裁。"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "analysis_context",
+      "four_pillars",
+      "jinkou.overview",
+      "jinkou.rows",
+      "jinkou.motions",
+      "jinkou.internal_strength",
+      "jinkou.qi_evidence",
+      "jinkou.position_interactions",
+      "jinkou.branch_breaks",
+      "jinkou.stem_relations",
+      "jinkou.patterns",
+      "jinkou.use_evidence",
+      "jinkou.relations",
+      "jinkou.calendar_policy",
+      "jinkou.ruleset",
+      "jinkou.rule_trace",
+      "jinkou.natal_course.status",
+      "jinkou.natal_course.natal_branch"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "analysis_day": {
+        "description": "Analysis day (1-31)",
+        "maximum": 31,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "analysis_hour": {
+        "description": "Analysis hour (0-23)",
+        "maximum": 23,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "analysis_longitude": {
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis longitude"
+      },
+      "analysis_minute": {
+        "default": 0,
+        "description": "Analysis minute (0-59)",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "analysis_month": {
+        "description": "Analysis month (1-12)",
+        "maximum": 12,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "analysis_second": {
+        "default": 0,
+        "description": "起课钟表秒数，保留交中气和太阳时辰边界；不代表秒级预测能力。",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "analysis_timezone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis timezone (IANA name or UTC offset)"
+      },
+      "analysis_utc_offset": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "起课民用钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone共同核对并选择重复时刻，不替换命名时区规则。省略时拒绝歧义或不存在的钟时。"
+      },
+      "analysis_year": {
+        "description": "Analysis year, e.g., 2026",
+        "type": "integer"
+      },
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "birth_year_ganzhi": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "已确认的完整出生年干支，须属六十甲子；供京本六甲旬起行年、本命年支和本命另课。本命另课不要求性别或岁序。不是公历年份，不从占时、年龄反推或代猜岁首。"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "di_fen": {
+        "anyOf": [
+          {
+            "enum": [
+              "子",
+              "丑",
+              "寅",
+              "卯",
+              "辰",
+              "巳",
+              "午",
+              "未",
+              "申",
+              "酉",
+              "戌",
+              "亥"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "地分十二地支；不填按时支作软件回退，并非已观测的来人方位。"
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "gender": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未知",
+        "description": "性别（可选）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法；省略默认 未知。"
+      },
+      "guiren_profile": {
+        "default": "liuren_common_v1",
+        "description": "大六壬昼夜贵人表：liuren_common_v1 为既有表；tanyuan_xieji_v1 按探原日夜贵人歌。金口诀仅影响附带六壬盘，本课独立用古本表。",
+        "enum": [
+          "liuren_common_v1",
+          "tanyuan_xieji_v1"
+        ],
+        "type": "string"
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "is_diurnal": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "显式昼贵/夜贵：true 昼、false 夜；省略按卯至申昼、酉至寅夜。未自动计算当地星没星出。"
+      },
+      "natal_branch": {
+        "anyOf": [
+          {
+            "enum": [
+              "子",
+              "丑",
+              "寅",
+              "卯",
+              "辰",
+              "巳",
+              "午",
+              "未",
+              "申",
+              "酉",
+              "戌",
+              "亥"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "问课对象已确认的本命年支，用于京本将命大绝配对及本命另课。另课以本命支作派生地分，保留本次占时，与原地分主课分列。省略且已给birth_year_ganzhi时取其明确年支；两者并给须一致。不由占时、地分或行年推定，不要求补猜出生时刻。"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "selected_sections": {
+        "default": [],
+        "description": "Optional snapshot section titles for filtered export payload",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "use_true_solar_time": {
+        "default": true,
+        "description": "Enable true solar time correction (default on — 式占 keys off the apparent-solar 时辰)",
+        "type": "boolean"
+      },
+      "year_fate_age": {
+        "anyOf": [
+          {
+            "maximum": 150,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "明确提供的一岁起算行年岁序，非周岁或寿限。与出生年干支及已知男/女齐备才另起行年课；不由生日、占时推算，也未认证原典换岁边界。"
+      }
+    },
+    "required": [
+      "analysis_year",
+      "analysis_month",
+      "analysis_day",
+      "analysis_hour"
+    ],
+    "type": "object"
+  },
+  "tool": "jinkou"
+}

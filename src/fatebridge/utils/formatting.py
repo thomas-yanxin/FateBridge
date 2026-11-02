@@ -2,18 +2,40 @@
 
 import json
 from datetime import datetime
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from fatebridge.utils.errors import error_response_payload
 
 
 def format_birth_datetime_display(
-    birth_datetime: datetime, include_minutes: bool = False
+    birth_datetime: datetime,
+    include_minutes: bool = False,
+    *,
+    include_seconds: bool = False,
 ) -> str:
     """Format birth datetime for user-facing API responses."""
+    if include_seconds:
+        fraction = (
+            f".{birth_datetime.microsecond:06d}" if birth_datetime.microsecond else ""
+        )
+        return birth_datetime.strftime("%Y年%m月%d日 %H时%M分%S") + fraction + "秒"
     if include_minutes:
         return birth_datetime.strftime("%Y年%m月%d日 %H时%M分")
     return birth_datetime.strftime("%Y年%m月%d日 %H时")
+
+
+def format_clock_datetime(
+    moment: datetime, *, include_seconds: Optional[bool] = None
+) -> str:
+    """Retain computed subminute values without changing old whole-minute labels."""
+    if include_seconds is False:
+        return moment.strftime("%Y-%m-%d %H:%M")
+    timespec = (
+        "microseconds"
+        if moment.microsecond
+        else "seconds" if include_seconds or moment.second else "minutes"
+    )
+    return moment.isoformat(sep=" ", timespec=timespec)
 
 
 def create_pillar_dict(

@@ -72,3 +72,28 @@ def test_execution_receipt_scrub_cannot_hide_business_numbers_or_sources():
         {**b, "provenance": {"ruleset_version": "1.0.0"}}
     )
     assert canonical_json(b) != canonical_json({**b, "warnings": []})
+
+
+def test_canonicalization_cannot_manufacture_out_of_range_coordinate_values():
+    import json
+    import math
+
+    values = {
+        "longitude": math.nextafter(360.0, 0.0),
+        "degree_in_sign": math.nextafter(30.0, 0.0),
+    }
+    result = json.loads(canonical_json(values))
+    assert result == values
+    assert result["longitude"] < 360
+    assert result["degree_in_sign"] < 30
+
+
+def test_canonicalization_preserves_both_sides_of_every_sign_boundary():
+    import json
+    import math
+
+    for boundary in range(0, 361, 30):
+        for direction in (-math.inf, math.inf):
+            value = math.nextafter(float(boundary), direction)
+            result = json.loads(canonical_json({"coordinate": value}))["coordinate"]
+            assert result // 30.0 == value // 30.0

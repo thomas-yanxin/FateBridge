@@ -1,0 +1,530 @@
+{
+  "schema": "nlc3150_literal210_limit_intervals_v1",
+  "profile_id": "nlc3150_literal210_v1",
+  "source": {
+    "id": "nlc892_411999021002_92845_3150",
+    "title": "欽定古今圖書集成 第3150冊 博物彙編藝術典 星命部彙考五",
+    "compilers": "蔣廷錫、陳夢雷等輯",
+    "edition": "內府清雍正四年（1726）銅活字印本",
+    "holding": "中國國家圖書館，善本書號12072",
+    "access_url": "https://commons.wikimedia.org/wiki/File:NLC892-411999021002-92845_欽定古今圖書集成_第3150冊.pdf",
+    "commons_revision": 979686527,
+    "pdf_sha256": "2766952041ab8a829dedcc0404a24dd7c22d0b31d3f549cb66752d42d58c315c",
+    "locator": "PDF第35頁左葉 定行限度法（版心三十三）；第36頁 逐年行限度法（版心三十四）；第37頁 欽天監校正授時過宮度（版心三十五）",
+    "credit": "中國國家圖書館藏；Wikimedia Commons所載原掃描，保留可見水印；PD-scan / Public Domain Mark 1.0"
+  },
+  "old_rate_data_sha256": "58bdfd666c7bd0ab64d04f3608debf05d79131815ab9f780aa98523992129ba3",
+  "literal_reading_sha256": "5f7b95ef615deaf3fe33f3cc90ab6c2fb435cc15bb4969b0cc5ca1851fbfbae7",
+  "source_date_convention": "local_limit_ordinal_12_months_30_days_not_birth_or_civil_calendar",
+  "year_context_policy": "inherit_last_explicit_year_marker_in_printed_right_to_left_order_without_automatic_year_rollover",
+  "normalization": "modern_standard_Chinese_numerals_and_palace_spellings_not_diplomatic_glyph_transcription; printed_heading_retained",
+  "first_reading_collated": true,
+  "independent_second_collation_completed": false,
+  "source_intervals_corrected_by_formula": false,
+  "used_in_native_birth_chart": false,
+  "rows": [
+    {
+      "group": "fude",
+      "printed_heading": "福德十一年／夫妻十一年",
+      "cells": [
+        "一年正月初一|五月十二",
+        "五月十三|九月二十四",
+        "九月二十五|二年二月初六",
+        "二月初七|六月十八",
+        "六月十九|十月三十",
+        "十一月初一|三年三月十二",
+        "三月十三|七月二十四",
+        "七月二十五|十二月初六",
+        "十二月初七|四年四月十八",
+        "四月十九|八月三十",
+        "九月初一|五年正月十二",
+        "正月十三|五月二十四",
+        "五月二十五|十月初六",
+        "十月初七|六年二月十八",
+        "二月十九|六月三十",
+        "七月初一|十一月十二",
+        "十一月十三|七年三月二十四",
+        "三月二十五|八月初六",
+        "八月初七|十二月十八",
+        "十二月十九|八年四月三十",
+        "五月初一|九月十二",
+        "九月十三|九年正月二十四",
+        "正月二十五|六月初六",
+        "六月初七|十月十八",
+        "十月十九|十年二月三十",
+        "三月初一|七月十二",
+        "七月十三|十一月二十四",
+        "十一月二十五|十一年四月初六",
+        "四月初七|八月十八",
+        "八月十九|十二月三十"
+      ],
+      "palaces": [
+        "福德",
+        "妻妾"
+      ]
+    },
+    {
+      "group": "qianyi",
+      "printed_heading": "遷移八年",
+      "cells": [
+        "一年正月初一|四月初六",
+        "四月初七|七月十二",
+        "七月十三|十月十八",
+        "十月十九|二年正月二十四",
+        "正月二十五|四月三十",
+        "五月初一|八月初六",
+        "八月初七|十一月十二",
+        "十一月十三|三年二月十八",
+        "二月十九|五月二十四",
+        "五月二十五|八月三十",
+        "九月初一|十二月初六",
+        "十二月初七|四年三月十二",
+        "三月十三|六月十八",
+        "六月十九|九月二十四",
+        "九月二十五|十二月三十",
+        "五年正月初一|四月初六",
+        "四月初七|七月十二",
+        "七月十三|十月十八",
+        "十月十九|六年正月二十四",
+        "正月二十五|四月三十",
+        "五月初一|八月初六",
+        "八月初七|十一月十二",
+        "十一月十三|七年二月十八",
+        "二月十九|五月二十四",
+        "五月二十五|八月三十",
+        "九月初一|十二月初六",
+        "十二月初七|八年三月十三",
+        "三月十四|六月十八",
+        "六月十九|九月二十四",
+        "九月二十五|十二月三十"
+      ],
+      "palaces": [
+        "迁移"
+      ]
+    },
+    {
+      "group": "jie",
+      "printed_heading": "疾厄七年",
+      "cells": [
+        "一年正月初一|二月二十四",
+        "三月二十五|六月十八",
+        "六月十九|九月十二",
+        "九月十三|十二月初六",
+        "十二月初七|二年二月三十",
+        "三月初一|五月二十四",
+        "五月二十五|八月十八",
+        "八月十九|十一月十二",
+        "十一月十三|三年二月初六",
+        "二月初七|四月三十",
+        "五月初一|七月二十四",
+        "七月二十五|十月十八",
+        "十月十九|四年正月十二",
+        "正月十三|四月初六",
+        "四月初七|六月三十",
+        "七月初一|九月二十四",
+        "九月二十五|十二月十八",
+        "十二月十九|五年三月十一",
+        "三月十二|六月初六",
+        "六月初七|八月三十",
+        "九月初一|十一月二十四",
+        "十一月二十五|六年二月十八",
+        "二月十九|五月十二",
+        "五月十三|八月初六",
+        "八月初七|十月三十",
+        "十一月初一|七年正月二十四",
+        "正月二十五|四月十八",
+        "四月十九|七月十二",
+        "七月十三|十月初六",
+        "十月初七|十二月三十"
+      ],
+      "palaces": [
+        "疾厄"
+      ]
+    },
+    {
+      "group": "nupu",
+      "printed_heading": "奴僕四年半／男女四年半／田宅四年半",
+      "cells": [
+        "一年正月初一|二月二十四",
+        "二月二十五|四月十八",
+        "四月十九|六月十二",
+        "六月十三|八月初六",
+        "八月初七|九月三十",
+        "十月初一|十一月二十四",
+        "十一月二十五|二年正月十八",
+        "正月十九|三月十二",
+        "三月十三|五月初六",
+        "五月初七|六月三十",
+        "七月初一|八月二十四",
+        "八月二十五|十月十八",
+        "十月十九|三年正月十二",
+        "正月十三|二月初六",
+        "二月初七|三月三十",
+        "四月初一|五月二十四",
+        "五月二十五|七月十八",
+        "七月十九|九月十二",
+        "九月十三|十一月初六",
+        "十一月初七|十二月三十",
+        "四年正月初一|二月二十四",
+        "二月二十五|四月十八",
+        "四月十九|六月十二",
+        "六月十三|八月初六",
+        "八月初七|九月三十",
+        "十月初一|十一月二十四",
+        "十一月二十五|五年正月十八",
+        "正月十九|三月十二",
+        "三月十三|五月初六",
+        "五月初七|六月三十"
+      ],
+      "palaces": [
+        "奴仆",
+        "男女",
+        "田宅"
+      ]
+    },
+    {
+      "group": "xiangmao",
+      "printed_heading": "相貌十年",
+      "cells": [
+        "一年正月初一|四月三十",
+        "五月初一|八月三十",
+        "九月初一|十二月三十",
+        "二年正月初一|四月三十",
+        "五月初一|八月三十",
+        "九月初一|十二月三十",
+        "三年正月初一|四月三十",
+        "五月初一|八月三十",
+        "九月初一|十二月三十",
+        "四年正月初一|四月三十",
+        "五月初一|八月三十",
+        "九月初一|十二月三十",
+        "五年正月初一|四月三十",
+        "五月初一|八月三十",
+        "九月初一|十二月三十",
+        "六年正月初一|四月三十",
+        "五月初一|八月三十",
+        "九月初一|十二月三十",
+        "七年正月初一|四月三十",
+        "五月初一|八月三十",
+        "九月初一|十二月三十",
+        "八年正月初一|四月三十",
+        "五月初一|八月三十",
+        "九月初一|十二月三十",
+        "九年正月初一|四月三十",
+        "五月初一|八月三十",
+        "九月初一|十二月三十",
+        "十年正月初一|四月三十",
+        "五月初一|八月三十",
+        "九月初一|十二月三十"
+      ],
+      "palaces": [
+        "相貌"
+      ]
+    },
+    {
+      "group": "guanlu",
+      "printed_heading": "官祿十五年",
+      "cells": [
+        "一年正月初一|六月三十",
+        "七月初一|十二月三十",
+        "二年正月初一|六月三十",
+        "七月初一|十二月三十",
+        "三年正月初一|六月三十",
+        "七月初一|十二月三十",
+        "四年正月初一|六月三十",
+        "七月初一|十二月三十",
+        "五年正月初一|六月三十",
+        "七月初一|十二月三十",
+        "六年正月初一|六月三十",
+        "七月初一|十二月三十",
+        "七年正月初一|六月三十",
+        "七月初一|十二月三十",
+        "八年正月初一|六月三十",
+        "七月初一|十二月三十",
+        "九年正月初一|六月三十",
+        "七月初一|十二月三十",
+        "十年正月初一|六月三十",
+        "七月初一|十二月三十",
+        "十一年正月初一|六月三十",
+        "七月初一|十二月三十",
+        "十二年正月初一|六月三十",
+        "七月初一|十二月三十",
+        "十三年正月初一|六月三十",
+        "七月初一|十二月三十",
+        "十四年正月初一|六月三十",
+        "七月初一|十二月三十",
+        "十五年正月初一|六月三十",
+        "七月初一|十二月三十"
+      ],
+      "palaces": [
+        "官禄"
+      ]
+    },
+    {
+      "group": "xiongdi",
+      "printed_heading": "兄弟五年／財帛五年",
+      "cells": [
+        "一年正月初一|二月三十",
+        "三月初一|四月三十",
+        "五月初一|六月三十",
+        "七月初一|八月三十",
+        "九月初一|十月三十",
+        "十一月初一|十二月三十",
+        "二年正月初一|二月三十",
+        "三月初一|四月三十",
+        "五月初一|六月三十",
+        "七月初一|八月三十",
+        "九月初一|十月三十",
+        "十一月初一|十二月三十",
+        "三年正月初一|二月三十",
+        "三月初一|四月三十",
+        "五月初一|六月三十",
+        "七月初一|八月三十",
+        "九月初一|十月三十",
+        "十一月初一|十二月三十",
+        "四年正月初一|二月三十",
+        "三月初一|四月三十",
+        "五月初一|六月三十",
+        "七月初一|八月三十",
+        "九月初一|十月三十",
+        "十一月初一|十二月三十",
+        "五年正月初一|二月三十",
+        "三月初一|四月三十",
+        "五月初一|六月三十",
+        "七月初一|八月三十",
+        "九月初一|十月三十",
+        "十一月初一|十二月三十"
+      ],
+      "palaces": [
+        "兄弟",
+        "财帛"
+      ]
+    }
+  ],
+  "read_views": [
+    {
+      "row": "fude",
+      "leaf": "cols01-14",
+      "path": "fude-cols01-14.png",
+      "read_view_crop": [
+        2180,
+        1140,
+        1990,
+        370
+      ],
+      "dpi": 72,
+      "source_page": 36,
+      "role": "poppler_read_view_same_scan_not_independent_witness",
+      "sha256": "54e4af2fd85f06902750fa2b2a9c2ae63d374f05b26588bc0c329726bbf6e5b8",
+      "bytes": 419352
+    },
+    {
+      "row": "fude",
+      "leaf": "cols15-30",
+      "path": "fude-cols15-30.png",
+      "read_view_crop": [
+        190,
+        1140,
+        1900,
+        370
+      ],
+      "dpi": 72,
+      "source_page": 36,
+      "role": "poppler_read_view_same_scan_not_independent_witness",
+      "sha256": "8648a66364d49a6861184ab0cb98f9286c41e8d77aafff1d28c91b1645eae1b4",
+      "bytes": 404354
+    },
+    {
+      "row": "qianyi",
+      "leaf": "cols01-14",
+      "path": "qianyi-cols01-14.png",
+      "read_view_crop": [
+        2180,
+        1450,
+        1990,
+        370
+      ],
+      "dpi": 72,
+      "source_page": 36,
+      "role": "poppler_read_view_same_scan_not_independent_witness",
+      "sha256": "cdcfb626e6e87b3302a398a3f15964d26f520dad107e0388ebd86950e0552d48",
+      "bytes": 388834
+    },
+    {
+      "row": "qianyi",
+      "leaf": "cols15-30",
+      "path": "qianyi-cols15-30.png",
+      "read_view_crop": [
+        190,
+        1450,
+        1900,
+        370
+      ],
+      "dpi": 72,
+      "source_page": 36,
+      "role": "poppler_read_view_same_scan_not_independent_witness",
+      "sha256": "3852c1d6f8c3ec7b5545b952918ad8c53fc9d536539c53b7e95dda7fc3e2ea47",
+      "bytes": 385959
+    },
+    {
+      "row": "jie",
+      "leaf": "cols01-14",
+      "path": "jie-cols01-14.png",
+      "read_view_crop": [
+        2180,
+        1750,
+        1990,
+        370
+      ],
+      "dpi": 72,
+      "source_page": 36,
+      "role": "poppler_read_view_same_scan_not_independent_witness",
+      "sha256": "d31a22ba17923f060872116010f6332e6bea66b0d982a6c243cf1b705dac083c",
+      "bytes": 382043
+    },
+    {
+      "row": "jie",
+      "leaf": "cols15-30",
+      "path": "jie-cols15-30.png",
+      "read_view_crop": [
+        190,
+        1750,
+        1900,
+        370
+      ],
+      "dpi": 72,
+      "source_page": 36,
+      "role": "poppler_read_view_same_scan_not_independent_witness",
+      "sha256": "1f574a5a5168c730f34e17b5abdc9849bf8302ab359a7f6fba56372d54dbba8b",
+      "bytes": 389284
+    },
+    {
+      "row": "nupu",
+      "leaf": "cols01-14",
+      "path": "nupu-cols01-14.png",
+      "read_view_crop": [
+        2180,
+        2050,
+        1990,
+        370
+      ],
+      "dpi": 72,
+      "source_page": 36,
+      "role": "poppler_read_view_same_scan_not_independent_witness",
+      "sha256": "f31b90ad436f4a6747ee4656eb4dfdb01b3a121580fd72beb29a28e48433d196",
+      "bytes": 403246
+    },
+    {
+      "row": "nupu",
+      "leaf": "cols15-30",
+      "path": "nupu-cols15-30.png",
+      "read_view_crop": [
+        190,
+        2050,
+        1900,
+        370
+      ],
+      "dpi": 72,
+      "source_page": 36,
+      "role": "poppler_read_view_same_scan_not_independent_witness",
+      "sha256": "5f39d5d06e0192f208c4301e3d174f925caf72b9f7d66741e03ab6a97f4e5435",
+      "bytes": 379572
+    },
+    {
+      "row": "xiangmao",
+      "leaf": "cols01-14",
+      "path": "xiangmao-cols01-14.png",
+      "read_view_crop": [
+        2180,
+        2360,
+        1990,
+        370
+      ],
+      "dpi": 72,
+      "source_page": 36,
+      "role": "poppler_read_view_same_scan_not_independent_witness",
+      "sha256": "bfabad642b0006432bded20592c364aa5111ff79f9a36adb13b028b07bf8de0c",
+      "bytes": 400047
+    },
+    {
+      "row": "xiangmao",
+      "leaf": "cols15-30",
+      "path": "xiangmao-cols15-30.png",
+      "read_view_crop": [
+        190,
+        2360,
+        1900,
+        370
+      ],
+      "dpi": 72,
+      "source_page": 36,
+      "role": "poppler_read_view_same_scan_not_independent_witness",
+      "sha256": "713f8be39211d411138c3286a0449e7821349b7da137ec53ae90fcf7cdb2e40a",
+      "bytes": 405601
+    },
+    {
+      "row": "guanlu",
+      "leaf": "cols01-14",
+      "path": "guanlu-cols01-14.png",
+      "read_view_crop": [
+        2180,
+        2660,
+        1990,
+        370
+      ],
+      "dpi": 72,
+      "source_page": 36,
+      "role": "poppler_read_view_same_scan_not_independent_witness",
+      "sha256": "fc1fe4d978a369a2ddf7cbf560d0d7daaf2eab3b782127833eca7c23af396698",
+      "bytes": 394612
+    },
+    {
+      "row": "guanlu",
+      "leaf": "cols15-30",
+      "path": "guanlu-cols15-30.png",
+      "read_view_crop": [
+        190,
+        2660,
+        1900,
+        370
+      ],
+      "dpi": 72,
+      "source_page": 36,
+      "role": "poppler_read_view_same_scan_not_independent_witness",
+      "sha256": "9ca608ea7b52bdf6890aef708ba367563ea26589d70ecfe902ecf728d050c4e5",
+      "bytes": 410536
+    },
+    {
+      "row": "xiongdi",
+      "leaf": "cols01-14",
+      "path": "xiongdi-cols01-14.png",
+      "read_view_crop": [
+        2180,
+        2960,
+        1990,
+        370
+      ],
+      "dpi": 72,
+      "source_page": 36,
+      "role": "poppler_read_view_same_scan_not_independent_witness",
+      "sha256": "3699d5326f1a16b1a35ebb9d778f8700f022a4366ab72283f136fe8f51eee002",
+      "bytes": 421442
+    },
+    {
+      "row": "xiongdi",
+      "leaf": "cols15-30",
+      "path": "xiongdi-cols15-30.png",
+      "read_view_crop": [
+        190,
+        2960,
+        1900,
+        370
+      ],
+      "dpi": 72,
+      "source_page": 36,
+      "role": "poppler_read_view_same_scan_not_independent_witness",
+      "sha256": "bc33f699afc7e7dab0634b86c56f87dd3243c2831848c0f74e4ac20e91fad92e",
+      "bytes": 411266
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "id": "xuanying_c1163_pushya_source_chain_v65",
+  "title": "一切經音義",
+  "source_edition": "中華大藏經（中華書局版）數位版",
+  "author_header": "唐 玄應撰",
+  "header_work_coverage": "第1卷-第15卷",
+  "selected_juan": 8,
+  "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/C/C056/C056n1163.xml",
+  "capture_sha256": "4bdef1f67c2980550795600bcf8b62993f106c1692bdbb5ba4319fe3fa95ff70",
+  "capture_bytes": 2657169,
+  "selected_locator": "C056n1163_p0945b10-14",
+  "selected_entry": "沸星",
+  "selected_literal": "沸星或云佛星或作孛星或言弗沙星皆音字訛也正音富沙依諸經云如来成道出家皆用二月八日鬼宿合時依日藏分經二月九日曙夜分属九日故也。",
+  "T2216_context": {
+    "publisher_capture_sha256": "5c62eaa9078aef1b28e7e84e496296d327fe9ef569ff5590ead238a9888143f4",
+    "direct_quotation_locator": "T2216_.59.0055c17-21",
+    "direct_quote_name_variant": {
+      "C1163_literal": "佛星",
+      "T2216_literal": "弗星",
+      "one_reading_applied_to_other_source": false
+    },
+    "later_commentary_quote_locator": "T2216_.59.0055c23-29",
+    "later_commentary_attribution_literal": "章實紳鏡鈔",
+    "later_commentary_readings": [
+      "件宿出寅時",
+      "卯時以前出八日分",
+      "寅剋以後可屬晝分",
+      "仍爲九日宿"
+    ],
+    "standalone_selected_passage_mentions_yin_mao_branches": false,
+    "cited_exemplar_identity_established": false,
+    "C1163_juan8_and_T2216_inline_9_17_note_reconciled": false
+  },
+  "facsimile_reference": {
+    "publisher_url": "https://www.ling.sinica.edu.tw/item/zh-tw?act=publish_book&bookID=28&code=view",
+    "download_url": "https://www.ling.sinica.edu.tw/item/zh-tw?act=publish_book&article_id=555&code=download&type=article",
+    "title_on_selected_title_page": "玄應一切經音義",
+    "editor_on_title_page": "周法高編製索引",
+    "publisher_description": "弘教書院排印之高麗藏本影印；來源说明本身不证明谱系独立",
+    "actual_pdf_sha256": "e9a9f733fc2dfc7d316967c8ddd69f3c1b2141e81ad326ad3a456a68cd4803e4",
+    "actual_pdf_bytes": 17537215,
+    "pdf_pages": 302,
+    "selected_pdf_page_one_based": 92,
+    "visible_added_zhuang_page_label": "383",
+    "selected_image_clear_fragments": [
+      "二月八日鬼宿合時",
+      "二月九日",
+      "夜分屬九日故也"
+    ],
+    "glyph_before_night": {
+      "accepted_unique_glyph": null,
+      "xml_reading": "曙",
+      "scope": "root raster reading retained as uncertain; do not backfill from XML"
+    },
+    "root_selected_reading_only": true,
+    "full_text_collation_completed": false,
+    "same_physical_exemplar_as_C1163_or_T2216_proved": false
+  },
+  "interpretation_scope": {
+    "standalone_named_edition_selected_passage_acquired": true,
+    "all_T2216_nested_originals_acquired": false,
+    "historical_daybreak_mapping_established": false,
+    "modern_clock_mapping_established": false,
+    "hinoo_half_mapping_established": false,
+    "leap_short_month_priority_established": false,
+    "birth_date_shift_applied": false,
+    "new_independent_historical_observations": 0,
+    "real_samples": 0,
+    "scope": "直接取得具名玄应条目与另一影印选页；不等于T2216实际引用本、章實抄本、唐代原件或古代钟时认证。选条未记寅卯，不推成全书无相关条文。"
+  }
+}

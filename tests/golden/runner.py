@@ -14,12 +14,12 @@ import json
 import os
 import platform
 import sys
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 from datetime import datetime as _RealDatetime
-from datetime import timezone
+from datetime import timezone, tzinfo
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Dict, Generator
+from typing import Any, Dict, Generator
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
@@ -94,25 +94,20 @@ def golden_diff_skip_reason() -> str:
 # ---------------------------------------------------------------------------
 # 凡是不提供 analysis_* 日期的 payload（如 /api/cn/bazi/birth）
 # 都会在服务层落到 datetime.now() 回退路径，导致基线随日历漂移。
-# 在 compute_outputs() 期间把所有工具模块里的 datetime 替换成此固定子类，
-# 使 now()/today() 永远返回同一瞬间，无需任何三方库。
+# compute_outputs() 期间只冻结实际 UTC 提供者与两个保留的历史民用钟别名；
+# 前者锁定同一瞬间，后者保留旧夹具的各区同一钟面约定。
 #
 # 日期选 2026-01-01T12:00:00：处于历法「平稳期」，远离节气边界，方便人工核查。
 FROZEN_NOW = _RealDatetime(2026, 1, 1, 12, 0, 0)
 
-# 所有通过 ``from datetime import datetime`` 引入、且在输出路径上调用
-# now()/today() 的模块。新增工具若在输出路径用了 datetime.now()，须在此补记。
-_DATETIME_PATCH_TARGETS = [
-    # 默认"当前时刻"现集中在 almanac.current_local_datetime()，其内部的
-    # datetime.now(tz) 是真正落地的 now() 调用点，必须冻结。
-    "fatebridge.core.almanac.datetime",
-    "fatebridge.services.bazi.datetime",
-    "fatebridge.services.timing.datetime",
-    "fatebridge.analysis.timing_effects.datetime",
-    "fatebridge.utils.birth_input.datetime",
-    "fatebridge.core.timing.datetime",
-    "fatebridge.core.predictive._common.datetime",
-]
+# These are the two retained historical wall-clock fixture aliases. The real
+# per-call UTC clock is frozen separately below. Do not patch datetime classes
+# merely because a module imports them: those imports may only parse values,
+# and retired module attributes must not prevent a new fixture from running.
+_LEGACY_WALL_CLOCK_TARGETS = (
+    "fatebridge.core.almanac.current_datetime",
+    "fatebridge.core.predictive._common.current_datetime",
+)
 
 # analyze_destiny 是唯一没有 rest_path 的独立工具，通过 MCP 面覆盖。
 # key → slug 前缀，value → MCP_CASES 里对应的 key。
@@ -121,14 +116,24 @@ _MCP_ONLY_CASES: Dict[str, str] = {
 }
 
 
-def _make_frozen_datetime(frozen: _RealDatetime) -> type:
+def _make_frozen_datetime(
+    frozen: _RealDatetime, *, instant: bool = False
+) -> type[_RealDatetime]:
     """返回一个 datetime 子类，其 now()/today() 固定返回 ``frozen``。"""
 
     class FrozenDatetime(_RealDatetime):
-        # now() 可带 tz 参数；忽略时区仅返回裸 naive datetime，与 bazi.py 保持一致。
+        # Historical fixtures retain a fixed local wall clock. The execution
+        # provider instead converts one fixed UTC instant into the chosen zone.
         @classmethod
-        def now(cls, tz=None):  # type: ignore[override]
+        def now(cls, tz: tzinfo | None = None) -> _RealDatetime:  # type: ignore[override]
             if tz is not None:
+                if instant:
+                    moment = (
+                        frozen
+                        if frozen.tzinfo is not None
+                        else frozen.replace(tzinfo=timezone.utc)
+                    )
+                    return moment.astimezone(tz)
                 # 服务层偶尔传 tz（astrology_predictive）；返回 aware 固定值。
                 return _RealDatetime(
                     frozen.year,
@@ -142,7 +147,7 @@ def _make_frozen_datetime(frozen: _RealDatetime) -> type:
             return frozen
 
         @classmethod
-        def today(cls):  # type: ignore[override]
+        def today(cls) -> _RealDatetime:  # type: ignore[override]
             return frozen
 
     FrozenDatetime.__name__ = "FrozenDatetime"
@@ -157,23 +162,18 @@ def freeze_clock(frozen: _RealDatetime = FROZEN_NOW) -> Generator[None, None, No
     只替换模块属性，不影响其他 stdlib 使用者；退出时自动恢复。
     """
     frozen_cls = _make_frozen_datetime(frozen)
-    patches = [patch(target, frozen_cls) for target in _DATETIME_PATCH_TARGETS]
 
     # Preserve this historical fixture's fixed local wall clock in every zone.
     # Production instead uses one UTC instant per execution; replay/isolation
     # tests validate that contract independently. Golden metadata is stripped.
-    def frozen_current_datetime(zone, timezone_name=None, **kwargs):
+    def frozen_current_datetime(
+        zone: tzinfo, timezone_name: str | None = None, **kwargs: Any
+    ) -> _RealDatetime:
         return frozen_cls.now(zone)
 
-    patches.extend(
-        [
-            patch("fatebridge.core.almanac.current_datetime", frozen_current_datetime),
-            patch(
-                "fatebridge.core.predictive._common.current_datetime",
-                frozen_current_datetime,
-            ),
-        ]
-    )
+    patches = [
+        patch(target, frozen_current_datetime) for target in _LEGACY_WALL_CLOCK_TARGETS
+    ]
     # The shared registrar now creates a per-call UTC clock. The fixture epoch
     # is Shanghai civil noon, so freeze that clock to the same *instant*, rather
     # than letting receipt timestamps drive current-time business calculations.
@@ -185,16 +185,15 @@ def freeze_clock(frozen: _RealDatetime = FROZEN_NOW) -> Generator[None, None, No
     patches.append(
         patch(
             "fatebridge.core.execution_context.datetime",
-            _make_frozen_datetime(utc_frozen.replace(tzinfo=None)),
+            _make_frozen_datetime(utc_frozen.replace(tzinfo=None), instant=True),
         )
     )
-    for p in patches:
-        p.start()
-    try:
-        yield
-    finally:
+    # ExitStack also unwinds earlier patches when a later __enter__ fails.
+    # A try/finally around yield alone cannot cover that partial-entry case.
+    with ExitStack() as stack:
         for p in patches:
-            p.stop()
+            stack.enter_context(p)
+        yield
 
 
 def _slug(path: str) -> str:
@@ -207,8 +206,7 @@ def _clear_ephemeris_dependent_caches() -> None:
     from fatebridge.core.almanac import get_solar_terms_for_year
     from fatebridge.core.calendar import BaZiCalendar
     from fatebridge.core.metaphysics.qimen import (
-        _qimen_build_year_term_seed,
-        _qimen_build_yinyangdun_map,
+        _qimen_build_yinyangdun_map_from_seeds,
     )
     from fatebridge.core.timing import _calculate_liuyue_cached
 
@@ -216,10 +214,12 @@ def _clear_ephemeris_dependent_caches() -> None:
         get_solar_terms_for_year,
         BaZiCalendar._get_four_pillars_cached,
         _calculate_liuyue_cached,
-        _qimen_build_year_term_seed,
-        _qimen_build_yinyangdun_map,
+        _qimen_build_yinyangdun_map_from_seeds,
     ):
-        cached.cache_clear()
+        clear = getattr(cached, "cache_clear", None)
+        if not callable(clear):
+            raise RuntimeError("Golden ephemeris cache has no callable cache_clear")
+        clear()
 
 
 @contextmanager
@@ -230,10 +230,15 @@ def golden_ephemeris() -> Generator[None, None, None]:
     with TemporaryDirectory(prefix="fatebridge-golden-") as empty_directory:
         with runtime._EPHEMERIS_LOCK:
             previous_env = os.environ.get("SE_EPHE_PATH")
+            previous_solar_model = os.environ.get("FATEBRIDGE_SOLAR_TERM_MODEL")
             previous_path = runtime.configured_ephemeris_path()
+            previous_configured = runtime._configured_path
         try:
             with runtime._EPHEMERIS_LOCK:
                 os.environ["SE_EPHE_PATH"] = empty_directory
+                # Auto may choose an analytic Sun even when a direct Swiss
+                # probe falls back to Moshier. Pin the actual term solver too.
+                os.environ["FATEBRIDGE_SOLAR_TERM_MODEL"] = "native"
                 runtime.configure_ephemeris_path(empty_directory)
                 _clear_ephemeris_dependent_caches()
             # REST workers also acquire this lock; never hold it across requests.
@@ -244,11 +249,17 @@ def golden_ephemeris() -> Generator[None, None, None]:
                     os.environ.pop("SE_EPHE_PATH", None)
                 else:
                     os.environ["SE_EPHE_PATH"] = previous_env
+                if previous_solar_model is None:
+                    os.environ.pop("FATEBRIDGE_SOLAR_TERM_MODEL", None)
+                else:
+                    os.environ["FATEBRIDGE_SOLAR_TERM_MODEL"] = previous_solar_model
                 try:
                     if runtime.swe is not None:
                         runtime.swe.set_ephe_path(previous_path or "")
                 finally:
-                    runtime._configured_path = previous_path
+                    # Restore the internal choice separately from its env
+                    # override, so later removal of SE_EPHE_PATH is unchanged.
+                    runtime._configured_path = previous_configured
                     _clear_ephemeris_dependent_caches()
 
 

@@ -1,26 +1,8 @@
-"""
-太乙神数 (Tai Yi) 命法 board construction for the FateBridge metaphysics package.
+"""Taiyi entry point and historical kintaiyi differential reference.
 
-This is a FAITHFUL pure-Python port of the 太乙統宗 人道命法 ("year-counting"
-life chart, ``ji_style=0`` / ``taiyi_acumyear=0`` path) from the reference
-implementation ``kintaiyi`` by kentang2017 (https://github.com/kentang2017/kintaiyi,
-MIT License). The vendored algorithm and the lookup tables below are transcribed
-from that project's ``kintaiyi.py`` and ``config.py``; see the NOTICE block at the
-bottom of this module for full attribution.
-
-Net-zero new runtime deps: kintaiyi's ``numpy``/``cn2an`` usages are replaced with
-plain Python lists and FateBridge's existing ``chinese_numeral``; its
-``ephem``/``sxtwl`` calendar engine is NOT used — the four 干支 pillars and the
-lunar year come from FateBridge's own swisseph-backed calendar via
-``MetaphysicsSeed``. The life chart (``ji_style=0``) depends only on the four
-pillars plus the lunar year, so 节气 boundaries do not enter this path.
-
-The output keeps the historical FateBridge taiyi contract keys
-(``style_label``, ``accumulation_label``, ``rotation``, ``life_method``,
-``taiyi_palace``, ``wenchang_palace``, ``core_board.*``, ``palace_marks``) but now
-populated with REAL values, and extends it with the genuine markers
-(始击/定目/主算/客算/君臣民基 …) under ``core_board`` and the per-palace star
-placements under ``palace_marks``.
+Public calculations use ``taiyi_year`` and its source-scoped annual rules.
+The private legacy life-chart port and tables remain for regression comparison,
+with MIT attribution below; they are not an independent classical oracle.
 """
 
 from __future__ import annotations
@@ -28,7 +10,7 @@ from __future__ import annotations
 import itertools
 from typing import Any, Dict, List, Optional, TypeVar
 
-from .common import MetaphysicsSeed, chinese_numeral, require_lunar_month_day
+from .common import MetaphysicsSeed, chinese_numeral
 
 _T = TypeVar("_T")
 
@@ -246,39 +228,6 @@ _YING_CAL = [
     [31, 15, 1],
 ]
 
-_NUMDICT = {
-    1: "雜陰",
-    2: "純陰",
-    3: "純陽",
-    4: "雜陽",
-    6: "純陰",
-    7: "雜陰",
-    8: "雜陽",
-    9: "純陽",
-    11: "陰中重陽",
-    12: "下和",
-    13: "雜重陽",
-    14: "上和",
-    16: "下和",
-    17: "陰中重陽",
-    18: "上和",
-    19: "雜重陽",
-    22: "純陰",
-    23: "次和",
-    24: "雜重陰",
-    26: "純陰",
-    27: "下和",
-    28: "雜重陰",
-    29: "次和",
-    31: "雜重陽",
-    32: "次和",
-    33: "純陽",
-    34: "下和",
-    37: "雜重陽",
-    38: "下和",
-    39: "純陽",
-}
-
 # 16-palace display order (FateBridge output contract for palace_marks list).
 TAIYI_PALACE16_ORDER = [
     "巽",
@@ -308,26 +257,6 @@ TAIYI_PALACE16_ORDER = [
 def _new_list(values: List[_T], start: _T) -> List[_T]:
     index = values.index(start)
     return values[index:] + values[:index]
-
-
-def _num2gong(num: Optional[int]) -> Optional[str]:
-    return dict(zip(range(1, 10), list("乾午艮卯中酉坤子巽"))).get(num)  # type: ignore[arg-type]
-
-
-def _cal_des(num: int) -> List[str]:
-    tnum: List[str] = []
-    if num > 10 and num % 10 > 5:
-        tnum.append("三才足數")
-    if num < 10:
-        tnum.append("無天，二曜虛蝕、五緯失度、慧孛飛流、霜雹為害")
-    if num % 10 < 5:
-        tnum.append("無地，有崩地震、川竭蝗蝻之象")
-    if num % 10 == 0:
-        tnum.append("無人，口舌妖言更相殘賊，疾疫、遷移、流亡")
-    extra = _NUMDICT.get(num)
-    if extra is not None:
-        tnum.append(extra)
-    return tnum
 
 
 def _find_cal(yingyang: str, num: int) -> List[int]:
@@ -735,132 +664,41 @@ class _TaiyiLife:
 # --------------------------------------------------------------------------- #
 
 
-def build_taiyi_board(seed: MetaphysicsSeed, gender: str) -> Dict[str, Any]:
-    """Build the 太乙統宗 人道命法 (life) board for ``seed``.
+def build_taiyi_board(
+    seed: MetaphysicsSeed,
+    gender: str,
+    *,
+    calculation_mode: str = "year",
+    hour_profile: Optional[str] = None,
+    month_profile: Optional[str] = None,
+    year_profile: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Build the selected year/month/day/hour frame with explicit source profiles.
 
-    Computation is byte-identical to ``kintaiyi.Taiyi(...).taiyi_life`` for the
-    ``ji_style=0`` markers, given the same four pillars and lunar year.
+    The private ``_TaiyiLife`` implementation is retained for migration and
+    differential tests only. Software parity does not adjudicate classical rules.
     """
-    lunar, _lunar_month, _lunar_day = require_lunar_month_day(seed, "太乙神数")
-    lunar_year = lunar.get("year")
-    if lunar_year is None:
-        raise ValueError("太乙神数需要农历年，无法起盘：农历换算缺少年份")
+    from .taiyi_year import build_year_board
 
-    year_gz = f"{seed.pillars['year'][0]}{seed.pillars['year'][1]}"
-    month_gz = f"{seed.pillars['month'][0]}{seed.pillars['month'][1]}"
-    day_gz = f"{seed.pillars['day'][0]}{seed.pillars['day'][1]}"
-    hour_gz = f"{seed.pillars['hour'][0]}{seed.pillars['hour'][1]}"
+    if year_profile is not None and calculation_mode != "year":
+        raise ValueError("year_profile仅用于year年计")
 
-    engine = _TaiyiLife(year_gz, month_gz, day_gz, hour_gz, int(lunar_year))
+    if month_profile is not None and calculation_mode != "month":
+        raise ValueError("month_profile仅用于month月计")
 
-    acc = engine.accnum()
-    kook = engine.kook()
-    taiyi_num = engine.ty()
-    taiyi_palace = engine.ty_gong()
-    skyeyes = engine.skyeyes()  # 文昌 (天目) 地支宫
-    sf = engine.sf()  # 始击
-    se = engine.se()  # 定目
-    home_cal = engine.home_cal()  # 主算
-    away_cal = engine.away_cal()  # 客算
-    set_cal = engine.set_cal()  # 定算
-    home_general = engine.home_general()
-    home_vgen = engine.home_vgen()
-    away_general = engine.away_general()
-    away_vgen = engine.away_vgen()
-    hegod = engine.hegod()
-    jigod = engine.jigod()
-    kingbase = engine.kingbase()
-    officerbase = engine.officerbase()
-    pplbase = engine.pplbase()
-    skyyi = engine.skyyi()
-    earthyi = engine.earthyi()
-    fgd = engine.fgd()
-    zhifu = engine.zhifu()
-    wufu = _wufu(acc)
-    taishui = engine.taishui()
+    if hour_profile is not None and calculation_mode != "hour":
+        raise ValueError("hour_profile仅用于hour时计，不能用于年计、月计或日计")
+    if calculation_mode == "year":
+        return build_year_board(seed, gender, year_profile)
+    if calculation_mode == "day":
+        from .taiyi_day import build_key_day_board
 
-    # 文昌 lands on the 地支宫 returned by skyeyes; 太乙 lands on ty_gong (八卦/地支宫).
-    wenchang_palace = skyeyes
+        return build_key_day_board(seed, gender)
+    from .taiyi_periods import build_period_board
 
-    # --- per-palace star placements (palace_marks list, 16-palace display order) ---- #
-    # Place each star marker on its palace label. Markers whose palace is a 八卦
-    # name (乾坤艮巽) belong to those; the 16-palace display order uses 巽/坤/艮/乾 for the
-    # four corners. num2gong markers (主大/客大 …) yield 八卦 labels too.
-    marks: Dict[str, List[str]] = {palace: [] for palace in TAIYI_PALACE16_ORDER}
-
-    def _place(palace: Optional[str], label: str) -> None:
-        if palace in marks:
-            marks[palace].append(label)
-
-    _place(taiyi_palace, "太乙")
-    _place(skyeyes, "文昌")
-    _place(sf, "始击")
-    _place(se, "定目")
-    _place(taishui, "太歲")
-    _place(hegod, "合神")
-    _place(jigod, "計神")
-    _place(kingbase, "君基")
-    _place(officerbase, "臣基")
-    _place(pplbase, "民基")
-    _place(skyyi, "天乙")
-    _place(earthyi, "地乙")
-    _place(fgd, "四神")
-    _place(zhifu, "值符")
-    _place(_num2gong(wufu), "五福")
-    _place(_num2gong(home_general), "主大")
-    _place(_num2gong(home_vgen), "主參")
-    _place(_num2gong(away_general), "客大")
-    _place(_num2gong(away_vgen), "客參")
-
-    yangjiu = _yangjiu(int(lunar_year))
-    baliu = _baliu(int(lunar_year))
-    _place(yangjiu, "陽九")
-    _place(baliu, "百六")
-
-    return {
-        "style_label": "太乙统宗",
-        "accumulation_label": f"命法积年数：{acc}",
-        "rotation": "顺布",  # 人道命法 ji_style=0 恒为阳遁顺布
-        "life_method": f"{gender}命",
-        "taiyi_palace": taiyi_palace,
-        "wenchang_palace": wenchang_palace,
-        "core_board": {
-            "main_calculation": kook["文"],
-            "kook_number": kook["數"],
-            "kook_year": kook["年"],
-            "taiyi_position": f"太乙在{taiyi_palace}宫（{taiyi_num}）",
-            "wenchang_position": f"文昌在{wenchang_palace}宫",
-            "suijun": taishui,
-            "heshen": hegod,
-            "jishen": jigod,
-            "shiji": sf,
-            "dingmu": se,
-            "main_count": home_cal,
-            "guest_count": away_cal,
-            "set_count": set_cal,
-            "main_count_des": _cal_des(home_cal),
-            "guest_count_des": _cal_des(away_cal),
-            "main_general": home_general,
-            "main_vice_general": home_vgen,
-            "guest_general": away_general,
-            "guest_vice_general": away_vgen,
-            "junji": kingbase,
-            "chenji": officerbase,
-            "minji": pplbase,
-            "tianyi": skyyi,
-            "diyi": earthyi,
-            "sishen": fgd,
-            "zhifu": zhifu,
-            "wufu": wufu,
-        },
-        "palace_marks": [
-            {
-                "palace": palace,
-                "markers": sorted(dict.fromkeys(marks[palace])),
-            }
-            for palace in TAIYI_PALACE16_ORDER
-        ],
-    }
+    return build_period_board(
+        seed, gender, calculation_mode, hour_profile, month_profile
+    )
 
 
 # --------------------------------------------------------------------------- #

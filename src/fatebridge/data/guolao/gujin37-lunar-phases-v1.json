@@ -1,0 +1,41 @@
+{
+  "model_id": "gujin37_named_lunar_phases_research_v1",
+  "profile_id": "gujin36_37_45_floor_table_lunar_phases_research",
+  "mean_synodic_month_days": "29.530593",
+  "mean_quarter_step_days": "7.38264825",
+  "source_circle_ancient_du": "365.2575",
+  "phase_kinds": [
+    "new_moon",
+    "first_quarter",
+    "full_moon",
+    "last_quarter"
+  ],
+  "phase_names": [
+    "朔",
+    "上弦",
+    "望",
+    "下弦"
+  ],
+  "phase_targets_ancient_du": [
+    "0",
+    "91.314375",
+    "182.62875",
+    "273.943125"
+  ],
+  "sunrise_rollback_kinds": [
+    "first_quarter",
+    "full_moon",
+    "last_quarter"
+  ],
+  "sunrise_comparison": "event_fraction_le_source_sunrise_fraction",
+  "sunrise_default": null,
+  "source_url": "https://commons.wikimedia.org/w/index.php?curid=71219540",
+  "locators": [
+    "DjVu430/printed787-425:弦策及上弦望下弦古度",
+    "DjVu432/printed787-427:求朔弦望定日与仅弦望的日出退日规则"
+  ],
+  "source_text_cross_check": "NLC CBM1408 volume12 PDF61 and64; same-collator corroboration, not independent double collation",
+  "source_reference_sha256": "717df5625619caff03fc334545764358358625e8724f3a085e65b9b1796f416b",
+  "modern_phase_time_validated": false,
+  "used_in_native_birth_chart": false
+}

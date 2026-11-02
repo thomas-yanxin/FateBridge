@@ -1,0 +1,48 @@
+{
+  "model_id": "luwei_nijl_month_limit_ordinal_v1",
+  "source_id": "nijl_100238879_luwei_month_limit",
+  "title": "新編評註通玄先生張果星宗大全・定小限例續頁",
+  "source_url": "https://kokusho.nijl.ac.jp/biblio/100238879",
+  "source_image_url": "https://kokusho.nijl.ac.jp/api/iiif/100238879/v4/THKW/THKW-04306/THKW-04306-00009.tif/full/full/0/default.jpg",
+  "source_image_sha256": "48a9e2c3edc20670546825b190c54a2bb51cbcda251a87c7893b9fe5d52df64a",
+  "locator": "國文學研究資料館100238879，藤原文庫4232，canvas標籤9，右頁右上定小限例續文",
+  "credit": "新編評註通玄先生張果星宗大全（東北大学附属図書館所蔵），国文学研究資料館提供",
+  "ordinal_rule": "小限宮中起生月",
+  "example": {
+    "life_branch": "寅",
+    "birth_year_branch": "子",
+    "target_year_branch": "辰",
+    "annual_branch": "戌",
+    "birth_month": 5,
+    "month_branches": {
+      "1": "寅",
+      "2": "丑",
+      "3": "子",
+      "4": "亥",
+      "5": "戌",
+      "6": "酉",
+      "7": "申",
+      "8": "未",
+      "9": "午",
+      "10": "巳",
+      "11": "辰",
+      "12": "卯"
+    }
+  },
+  "collation": {
+    "method": "manual reading of the preserved original image, not engine-generated expected values",
+    "independent_second_collator": false,
+    "full_month_cycle_collated": true,
+    "calendar_basis_adjudicated": false,
+    "leap_month_policy_adjudicated": false,
+    "year_boundary_adjudicated": false,
+    "modern_date_supplied_by_example": false,
+    "editorial_attribution": "同頁小字記小限、童限例為鄭希誠兼諸家說並存，不稱張果本人親述"
+  },
+  "acceptance": {
+    "ordinal_cycle": true,
+    "modern_calendar_mapping": false,
+    "complete_temporal_system": false,
+    "real_world_predictive_validity": false
+  }
+}

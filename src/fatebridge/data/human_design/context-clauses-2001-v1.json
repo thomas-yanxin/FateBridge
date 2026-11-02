@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "catalogue_id": "human_design_line_context_annotations_v4",
+  "version": 4,
+  "parent_version": 3,
+  "parent_manifest_sha256": "60f844ca3a00ee1ad9b3836a94f68d74553089a3127e8240dc9694b2e3f99ec3",
+  "source_pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495",
+  "local_paraphrase_count": 18,
+  "independently_accepted_line_count": 0,
+  "publisher_master_authenticated": false,
+  "complete384_line_meanings_accepted": false,
+  "source_conditions_exhaustively_reviewed": false,
+  "annotations": [
+    {
+      "annotation_id": "rave2001_2_3_context_v1",
+      "key": "2.3",
+      "source_pdf_page_one_based": 9,
+      "source_layout_block_sha256": "ae92216a9d646c6c8c70880fd5605be5eeea4e044fb17dd912dad439542b6e6f",
+      "normalized_clause_sha256": "8e412f58a60749b2a85a3a77720181610af084d0038564de3afa7d0776823d3a",
+      "source_role": "exaltation",
+      "source_force": "conditional_named_clause",
+      "source_explicitly_says_permanent": true,
+      "named_channel_gates": [
+        2,
+        14
+      ],
+      "editorial_summary_zh": "原文上升段中有永久2–14通道的限定句；仅限定该句，不把回报视为保证。",
+      "unassessed_qualifiers": [],
+      "observation_models": [
+        "direct_named_channel"
+      ],
+      "selected_source_interpretation": null,
+      "source_interpretation_resolved": false,
+      "personal_condition_satisfied": null,
+      "automatic_application": false,
+      "complete_line_meaning_accepted": false,
+      "independent_semantic_review_completed": false,
+      "existing_v2_clause": true,
+      "scope": "named_clause_only_not_whole_line_or_pole"
+    },
+    {
+      "annotation_id": "rave2001_6_3_context_v1",
+      "key": "6.3",
+      "source_pdf_page_one_based": 17,
+      "source_layout_block_sha256": "2bca38d50a8fa1e94fc7c9dcb49806275d54b432ab32e5f4dee200c66f5f8c1e",
+      "normalized_clause_sha256": "501075e63754dd27004e60eaccc8d207c0b36489207dd3b201fc15ddaafc4736",
+      "source_role": "line_intro",
+      "source_force": "conditional_named_clause",
+      "source_explicitly_says_permanent": false,
+      "named_channel_gates": [
+        6,
+        59
+      ],
+      "editorial_summary_zh": "引导语含6–59连接限定及生物结果叙述；只记录盘图结构，不自动评估生育或临床结果。",
+      "unassessed_qualifiers": [
+        "biological_outcome_not_assessed"
+      ],
+      "observation_models": [
+        "direct_named_channel"
+      ],
+      "selected_source_interpretation": null,
+      "source_interpretation_resolved": false,
+      "personal_condition_satisfied": null,
+      "automatic_application": false,
+      "complete_line_meaning_accepted": false,
+      "independent_semantic_review_completed": false,
+      "existing_v2_clause": false,
+      "scope": "named_clause_only_not_whole_line_or_pole"
+    },
+    {
+      "annotation_id": "rave2001_7_2_context_v1",
+      "key": "7.2",
+      "source_pdf_page_one_based": 19,
+      "source_layout_block_sha256": "97d0427bc3bf1d372b48f522243510b620c22dc6066935c97ea0aa1d7c34a3da",
+      "normalized_clause_sha256": "3ddfbfc341936e19f738ce09822fecd25874ee7a8707e8703cbfdaf8276164c2",
+      "source_role": "exaltation",
+      "source_force": "conditional_named_clause",
+      "source_explicitly_says_permanent": false,
+      "named_channel_gates": [
+        7,
+        31
+      ],
+      "editorial_summary_zh": "上升段含7–31连接的限定；领导潜能还涉及被选择，不能由通道推出社会影响已经发生。",
+      "unassessed_qualifiers": [
+        "being_chosen_not_assessed",
+        "social_effect_not_assessed"
+      ],
+      "observation_models": [
+        "direct_named_channel"
+      ],
+      "selected_source_interpretation": null,
+      "source_interpretation_resolved": false,
+      "personal_condition_satisfied": null,
+      "automatic_application": false,
+      "complete_line_meaning_accepted": false,
+      "independent_semantic_review_completed": false,
+      "existing_v2_clause": false,
+      "scope": "named_clause_only_not_whole_line_or_pole"
+    },
+    {
+      "annotation_id": "rave2001_12_6_context_v1",
+      "key": "12.6",
+      "source_pdf_page_one_based": 29,
+      "source_layout_block_sha256": "a17a975f7a2471fa8e25ecc3e6d92faaa9e80fedccad8ded22b3f90c572f2fda",
+      "normalized_clause_sha256": "7c494c97bc9c4189af2fea44f7de671d4f1fd526af1d7eda73313b8534f2ec2f",
+      "source_role": "exaltation",
+      "source_force": "conditional_named_clause",
+      "source_explicitly_says_permanent": false,
+      "named_channel_gates": [
+        12,
+        22
+      ],
+      "editorial_summary_zh": "上升段把创造性转变与12–22连接相联；结构观察不保证社会形式改变，也不推断行动时机或情绪清晰度。",
+      "unassessed_qualifiers": [
+        "social_effect_not_assessed",
+        "emotional_clarity_and_timing_not_assessed"
+      ],
+      "observation_models": [
+        "direct_named_channel"
+      ],
+      "selected_source_interpretation": null,
+      "source_interpretation_resolved": false,
+      "personal_condition_satisfied": null,
+      "automatic_application": false,
+      "complete_line_meaning_accepted": false,
+      "independent_semantic_review_completed": false,
+      "existing_v2_clause": false,
+      "scope": "named_clause_only_not_whole_line_or_pole"
+    },
+    {
+      "annotation_id": "rave2001_42_1_context_v1",
+      "key": "42.1",
+      "source_pdf_page_one_based": 89,
+      "source_layout_block_sha256": "2d6a7f2860f315717224f283761154511d6959aa7deb3fb7f216b9de71f04ace",
+      "normalized_clause_sha256": "edda22b4fb2d6e355afec32f450138d5a02efbc5f2730729a9718beabb040a39",
+      "source_role": "exaltation",
+      "source_force": "particular_emphasis_not_necessity",
+      "source_explicitly_says_permanent": false,
+      "named_channel_gates": [
+        42,
+        53
+      ],
+      "editorial_summary_zh": "上升段以资源有余为背景，并特别提到与根部的定义关系；直接42–53与骶骨到根部的连通两种观察并列，原典具体口径未解决。",
+      "unassessed_qualifiers": [
+        "surplus_resources_not_assessed",
+        "root_topology_interpretation_unresolved"
+      ],
+      "observation_models": [
+        "direct_named_channel",
+        "sacral_root_connected_component"
+      ],
+      "selected_source_interpretation": null,
+      "source_interpretation_resolved": false,
+      "personal_condition_satisfied": null,
+      "automatic_application": false,
+      "complete_line_meaning_accepted": false,
+      "independent_semantic_review_completed": false,
+      "existing_v2_clause": false,
+      "scope": "named_clause_only_not_whole_line_or_pole"
+    }
+  ]
+}

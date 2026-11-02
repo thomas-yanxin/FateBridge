@@ -1,0 +1,17 @@
+{
+  "id": "meihua_wikisource_variant_inline_v1",
+  "version": "1.0.0",
+  "source": {
+    "title": "Template:另",
+    "revision": 5438530,
+    "url": "https://zh.wikisource.org/w/index.php?title=Template:%E5%8F%A6&oldid=5438530",
+    "wikitext_sha256": "ae0c04ee1274a24709cf9aed437b6ff745dbe30aea37b70ca8946bd4a0312abe"
+  },
+  "grammar": "Exact two positional arguments: {{另|main|alternative}}; no named parameters, nesting or other markup is resolved.",
+  "display_policy": "Keep the source argument order and both complete readings: main〔一作「alternative」〕. Do not split an alternative containing Chinese enumeration punctuation.",
+  "raw_text_policy": "Preserve the original corpus and raw verse without normalization; offsets use Python Unicode code points, zero based and end exclusive.",
+  "unresolved_policy": "Keep raw text, mark unresolved_markup and set display_text to null; never issue a partially rendered quotation as resolved.",
+  "scope": "Meihua verse display only; this template reading is not a collated ancient edition or a rule for choosing a prediction.",
+  "critical_edition_adjudicated": false,
+  "predictive_efficacy_established": false
+}

@@ -1,0 +1,396 @@
+{
+  "id": "nijl_selected_native_completion_2026_10_27_v1",
+  "capture_snapshot_as_of_utc": "2026-10-27T07:23:08.996769+00:00",
+  "status_is_frozen_followup_not_live_network": true,
+  "previous_followup_id": "nijl_selected_native_followup_2026_10_27_v1",
+  "previous_followup_source_sha256": "71828e22d3313dc886256530e42d228fc096349ec8032a1a97926bbff9f80479",
+  "scope": "Selected original17 acquisition completion and attributed native-image working readings. Not a critical edition, lineage proof, numerical calendar policy or efficacy evidence.",
+  "evidence_artifact_namespace": "sukuyo-daybreak-native-v93",
+  "source_evidence_sha256": {
+    "before-research-plan.json": "8dd142de86d3306c8eba6ef0427d23dc92415dffe43bbcd8ca907e86b760d9cd",
+    "primary-acquisition-first.json": "07fe2c4feb8989e07a9d24e516496f3e19e0c415f479185eef6a7c91a215452d",
+    "original17-union-current-verification.json": "2adc9284efe32b45852d8325a22c14daf35ac8d03e793d42ca382c4ccfeacc03",
+    "reading-packet-before-two-roles.json": "5f4072b4222c40a5627c432cfa2b10925dd72183d5cb89da2e22f5ce1d6f429d",
+    "root-native-first.json": "f0b8c37cea7ff7359ab288f91d467d0d7aae6d8014aace20dfff1b95faf324a8",
+    "generator-native-daybreak-first.json": "95e8754ebd9522cb72d1ce4f9ddfe97a0302f329a5dc1e4386f68f4c70872ed7",
+    "reviewer-native-daybreak-first.json": "32169146e912c1ade17e057e6fc3728a93ebd96ce40a3fead2db4db8c5526a93",
+    "root-feedback-qualified-correction.json": "5bd4c30de053a6e54bbf8f0fc29227d3d66b3bcf4804f06b7bc855a3a526d5d7",
+    "calculation-before-code-first.json": "1e74ceb38b8ee2d7e79747cd96f14fa9017b9481c351a048afd54d4df2585da4"
+  },
+  "capture_summary": {
+    "required": 17,
+    "union_acquired": 17,
+    "missing": [],
+    "actual_existing_read_hash_and_full_decode_verified": 17,
+    "original_resolution_gate_met": true,
+    "original_queue_unchanged": true,
+    "historical_first_acquired": 0,
+    "previous_followup_acquired": 10,
+    "new_original_queue_members_acquired": 7,
+    "additional_timing_pages": 2,
+    "additional_pages_in_original17_denominator": false,
+    "old_preview_first_saved": 196,
+    "old_preview_first_planned": 197,
+    "historical_firsts_unchanged": true
+  },
+  "unchanged_original17_verified_members": [
+    {
+      "catalogue_id": "100183249",
+      "frame": 34,
+      "sha256": "460f5cb4ee81164f00ac4a23e462b40c7b982dc421377715bef92e20bc3d2730",
+      "bytes": 2128967,
+      "actual_decoded_pixels": [
+        6112,
+        4672
+      ],
+      "manifest_sha256": "4e03baf4838b4a7484e9c4e92215059298a60f90f74522fd0cb121e6a48a8093",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100183249/canvas/34",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100183249/v4/0278/0278-007402/0278-007402-0033.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100183249",
+      "frame": 35,
+      "sha256": "3bfabac0fdd829deb5795aebe6191ef6e71ac7f72f92494db4d58e51c05c1ef5",
+      "bytes": 2066705,
+      "actual_decoded_pixels": [
+        6112,
+        4672
+      ],
+      "manifest_sha256": "4e03baf4838b4a7484e9c4e92215059298a60f90f74522fd0cb121e6a48a8093",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100183249/canvas/35",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100183249/v4/0278/0278-007402/0278-007402-0034.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100183249",
+      "frame": 38,
+      "sha256": "7b88a391b37050c79c1341e4873f3fcb80ab0b3bff33578499edab919aaa759b",
+      "bytes": 1978348,
+      "actual_decoded_pixels": [
+        6112,
+        4672
+      ],
+      "manifest_sha256": "4e03baf4838b4a7484e9c4e92215059298a60f90f74522fd0cb121e6a48a8093",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100183249/canvas/38",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100183249/v4/0278/0278-007402/0278-007402-0037.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100183249",
+      "frame": 39,
+      "sha256": "d9331fb99ee8afeb220d0cf1b07bacfc1480a952d21b1efd18b771bb61a074bb",
+      "bytes": 1822371,
+      "actual_decoded_pixels": [
+        6112,
+        4672
+      ],
+      "manifest_sha256": "4e03baf4838b4a7484e9c4e92215059298a60f90f74522fd0cb121e6a48a8093",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100183249/canvas/39",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100183249/v4/0278/0278-007402/0278-007402-0038.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100265591",
+      "frame": 13,
+      "sha256": "2c5c6ed4498ffd3d79f2240bf3ba042b2250da1ed78ae1411b35f29d894fc186",
+      "bytes": 2126812,
+      "actual_decoded_pixels": [
+        5616,
+        3744
+      ],
+      "manifest_sha256": "adbbdbdc51e7510c9916eb5ab9636663972a0d9c389b28c4fcd7e25af3fe22ce",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100265591/canvas/13",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100265591/v4/NAOJ/NAOJ-00315/NAOJ-00315-00012.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100265591",
+      "frame": 14,
+      "sha256": "35ebbcf85e9b2f12a65c83097ae4c8ad57e41022701d2f4cb6b3b220623475a0",
+      "bytes": 2305121,
+      "actual_decoded_pixels": [
+        5616,
+        3744
+      ],
+      "manifest_sha256": "adbbdbdc51e7510c9916eb5ab9636663972a0d9c389b28c4fcd7e25af3fe22ce",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100265591/canvas/14",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100265591/v4/NAOJ/NAOJ-00315/NAOJ-00315-00013.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100265591",
+      "frame": 15,
+      "sha256": "6bb4e0aabf01da89c2798dd3e26331bfafdd15aa92b7137cc269c582ba57f99f",
+      "bytes": 2507019,
+      "actual_decoded_pixels": [
+        5616,
+        3744
+      ],
+      "manifest_sha256": "adbbdbdc51e7510c9916eb5ab9636663972a0d9c389b28c4fcd7e25af3fe22ce",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100265591/canvas/15",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100265591/v4/NAOJ/NAOJ-00315/NAOJ-00315-00014.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100265591",
+      "frame": 77,
+      "sha256": "64ebc1ff17567b5180a1c711104cfa6bece6220d27c00ca589e301d5c7a93a3d",
+      "bytes": 2384422,
+      "actual_decoded_pixels": [
+        5616,
+        3744
+      ],
+      "manifest_sha256": "adbbdbdc51e7510c9916eb5ab9636663972a0d9c389b28c4fcd7e25af3fe22ce",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100265591/canvas/77",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100265591/v4/NAOJ/NAOJ-00315/NAOJ-00315-00076.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100265591",
+      "frame": 78,
+      "sha256": "486f1941e2238428751e7fecd4d9f7b45eaab32bc0d759417cb7daa8c4f2d32f",
+      "bytes": 1938875,
+      "actual_decoded_pixels": [
+        5616,
+        3744
+      ],
+      "manifest_sha256": "adbbdbdc51e7510c9916eb5ab9636663972a0d9c389b28c4fcd7e25af3fe22ce",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100265591/canvas/78",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100265591/v4/NAOJ/NAOJ-00315/NAOJ-00315-00077.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 8,
+      "sha256": "e8dde11399609aabaee377246f2929b64a8cb46b47be89c472620e93acb29326",
+      "bytes": 1159310,
+      "actual_decoded_pixels": [
+        6464,
+        4672
+      ],
+      "manifest_sha256": "8cc76ad935d419d307acb52c44e54588400b0a3a26ea74d1bc2f7fafc057d460",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/8",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0007.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 17,
+      "sha256": "aa68dcba64d7c6694f6d689f4664088a2f562c00f3c994c2bd418c5a8ba9e8a4",
+      "bytes": 1264615,
+      "actual_decoded_pixels": [
+        6464,
+        4672
+      ],
+      "manifest_sha256": "8cc76ad935d419d307acb52c44e54588400b0a3a26ea74d1bc2f7fafc057d460",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/17",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0016.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 38,
+      "sha256": "0158c562b3cc1ff62135c8b91d1dc492aeaa2fb2e6a2fdf0c5c592bba00ab61c",
+      "bytes": 1299763,
+      "actual_decoded_pixels": [
+        6464,
+        4672
+      ],
+      "manifest_sha256": "8cc76ad935d419d307acb52c44e54588400b0a3a26ea74d1bc2f7fafc057d460",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/38",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0037.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 39,
+      "sha256": "2ba4ea8fedd2f522f4f4d9708e5fac514e885ae158ad046980a8ed4d991d4a85",
+      "bytes": 1481864,
+      "actual_decoded_pixels": [
+        6464,
+        4672
+      ],
+      "manifest_sha256": "8cc76ad935d419d307acb52c44e54588400b0a3a26ea74d1bc2f7fafc057d460",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/39",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0038.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 65,
+      "sha256": "2654f48a54b08bde6872d757f9cac9c3f1ec0fa608319210041242c3ed4a7339",
+      "bytes": 1383458,
+      "actual_decoded_pixels": [
+        6464,
+        4672
+      ],
+      "manifest_sha256": "8cc76ad935d419d307acb52c44e54588400b0a3a26ea74d1bc2f7fafc057d460",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/65",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0064.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 67,
+      "sha256": "fbad5090cef7485f87878bf9c885502165c21f81b1a48dee90fdef10104c9776",
+      "bytes": 443402,
+      "actual_decoded_pixels": [
+        6464,
+        4672
+      ],
+      "manifest_sha256": "8cc76ad935d419d307acb52c44e54588400b0a3a26ea74d1bc2f7fafc057d460",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/67",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0066.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 68,
+      "sha256": "271e7b3cf525f0663a7b890434875c0c6528d51b0e75176e0ab2b0ebeee516f2",
+      "bytes": 1223770,
+      "actual_decoded_pixels": [
+        6464,
+        4672
+      ],
+      "manifest_sha256": "8cc76ad935d419d307acb52c44e54588400b0a3a26ea74d1bc2f7fafc057d460",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/68",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0067.tif/full/full/0/default.jpg"
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 75,
+      "sha256": "86ec27fd9a1cf2cba8d116b076f1d866dd70f98e82fca47fba11e3a29d0803b2",
+      "bytes": 1522070,
+      "actual_decoded_pixels": [
+        6464,
+        4672
+      ],
+      "manifest_sha256": "8cc76ad935d419d307acb52c44e54588400b0a3a26ea74d1bc2f7fafc057d460",
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/75",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0074.tif/full/full/0/default.jpg"
+    }
+  ],
+  "additional_timing_members_not_original17": [
+    {
+      "catalogue_id": "100265591",
+      "frame": 69,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100265591/canvas/69",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100265591/v4/NAOJ/NAOJ-00315/NAOJ-00315-00068.tif/full/full/0/default.jpg",
+      "manifest_sha256": "adbbdbdc51e7510c9916eb5ab9636663972a0d9c389b28c4fcd7e25af3fe22ce",
+      "sha256": "b37ee4cd5ef9dbf628b0d3ddd24eb2247af4af06c735209c8c8d59a3d2c5ea84",
+      "bytes": 2036639,
+      "declared_pixels": [
+        5616,
+        3744
+      ]
+    },
+    {
+      "catalogue_id": "100265591",
+      "frame": 70,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100265591/canvas/70",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100265591/v4/NAOJ/NAOJ-00315/NAOJ-00315-00069.tif/full/full/0/default.jpg",
+      "manifest_sha256": "adbbdbdc51e7510c9916eb5ab9636663972a0d9c389b28c4fcd7e25af3fe22ce",
+      "sha256": "b6cef2f8386619d3155d9ccf8e06c442764298c13ba7c363a2a152d7b640bf05",
+      "bytes": 2326254,
+      "declared_pixels": [
+        5616,
+        3744
+      ]
+    }
+  ],
+  "selected_timing": {
+    "witnesses": [
+      {
+        "catalogue_id": "100265591",
+        "frame": 70,
+        "page": "right",
+        "columns_right_to_left": [
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      {
+        "catalogue_id": "100436698",
+        "frame": 68,
+        "page": "right",
+        "columns_right_to_left": [
+          4,
+          5,
+          6,
+          7
+        ]
+      }
+    ],
+    "status": "selected_native_working_readings_not_complete_transcription",
+    "working_fragments": [
+      "其曜亦每日分為八時平明即是所直之曜",
+      "乃至〔酉／西〕戌則八時而周夜亦分為八時",
+      "轉到明日曉時即次後曜當直",
+      "如是細解用之萬不失一"
+    ],
+    "evening_glyph_role_firsts": {
+      "root": "西",
+      "generator": {
+        "working": "酉",
+        "candidates": [
+          "酉",
+          "西"
+        ],
+        "canonical": null
+      },
+      "reviewer": "酉"
+    },
+    "canonical_evening_glyph": null,
+    "next_day_glyph_working_reading": "曉",
+    "qualitative_dawn_to_next_weekday_handover_supported": true,
+    "textual_day_slots": 8,
+    "textual_night_slots": 8,
+    "qualitative_interpretation": "平明与当日所直之曜相连，昼夜分别分八时，转到明日晓时由次后一曜当直。此为所选段落定性解释。",
+    "root_failed_firsts_preserved": {
+      "NAOJ070": "所直之曜乃至西戌即入夜亦分爲",
+      "NAGO068": "乃至西戌則入時而周夜"
+    },
+    "root_correction_feedback_exposed": true,
+    "root_failed_literals_not_adopted": [
+      "即入夜",
+      "入時"
+    ],
+    "NAOJ069_070_selected_continuation": "右件七曜上運行於天下直於人間其精靈／神驗内外典籍具備",
+    "modern_clock": null,
+    "solar_altitude": null,
+    "endpoint_inclusivity": null,
+    "complete_hourly_weekday_sequence": null,
+    "universal_lunar_date_boundary_established": false,
+    "hinoo_half_clock_established": false,
+    "leap_short_overlap_priority_established": false,
+    "source_efficacy_claim": "萬不失一",
+    "source_claim_is_measured_predictive_accuracy": false
+  },
+  "NAGO075_selected_colophon": {
+    "status": "selected_native_working_readings_not_full_colophon_collation",
+    "volume_working_reading": "下卷",
+    "printed_character_count_working_reading": "八千四百二十字",
+    "cost_working_reading": "四兩九錢三分",
+    "inscription_working_reading": "徹微印開識",
+    "separate_date_phrases": [
+      "庚子年",
+      "順治十八年五月日",
+      "延寶九年龍集辛酉季春上浣日"
+    ],
+    "historical_preview_readings_unchanged": true,
+    "full_text_recounted": false,
+    "all_leaves_dated_by_one_phrase": false,
+    "same_physical_copy_accepted": false,
+    "independent_lineage_accepted": false
+  },
+  "image_reading_method": {
+    "whole_images_display_downscaled": true,
+    "critical_glyphs_also_read_native_integer_crops": true,
+    "crop_path": "Pillow JPEG decode, integer crop, PNG encode, reopen and compare complete decoded mode/size/bytes in that path; no resize, OCR or enhancement",
+    "crop_equality_certifies_all_decoders_or_display": false,
+    "roles_share_provider_history_and_filesystem": true,
+    "strict_blind_or_independent_human_acceptance": false
+  },
+  "acceptance": {
+    "original17_image_acquisition": true,
+    "full_collation": false,
+    "critical_evening_glyph": false,
+    "modern_daybreak_clock": false,
+    "hinoo_half_clock": false,
+    "leap_short_overlap_priority": false,
+    "physical_copy_or_independent_lineage": false,
+    "original180_semantic_gate": false,
+    "predictive_efficacy": false
+  },
+  "real_world_samples": 0,
+  "prospective_status": "draft_not_registered",
+  "calendar_policy_changed": false
+}

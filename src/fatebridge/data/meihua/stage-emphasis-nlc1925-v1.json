@@ -1,0 +1,247 @@
+{
+  "id": "meihua_stage_emphasis_nlc1925_v1",
+  "version": "1.1.0",
+  "title": "文明书局卷三内卦紧次与生体迟速条件",
+  "selected_source": {
+    "edition_id": "nlc_1925",
+    "title": "文明書局《梅花易數》卷三占卦訣、體用互變之訣所选片段",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_pdf_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "raw_pdf_bytes": 5621631,
+    "original_pdf_indices": [
+      107,
+      108
+    ],
+    "printed_pages": [
+      "卷三六",
+      "卷三七"
+    ],
+    "reading_method": "assistant visual selected-span reading; no independent human expert review",
+    "metadata_authentication": "hosting catalog attribution; no independent authorship authentication",
+    "comparison": {
+      "fixed_revision": 1441927,
+      "local_file": "tests/fixtures/meihua_v1/sources/volume-3.txt",
+      "sha256": "40dc414defbc2cf93f5a3c398e16a1cb3d0b62f7ad5db14603be7dba2e37e7f6",
+      "selected_fixed_wordings": [
+        "如生體是用卦，則事即成。",
+        "生體是互卦，則漸成。",
+        "生體是變卦，則稍遲耳。"
+      ],
+      "selected_edition_differences": "影印即成就、渐渐成、稍稍迟耳不静默改成转录简句；体用互侧的整段跨107、108页，体互最紧用互次之短句本身全在108页。"
+    },
+    "scope_limits": [
+      "Nine selected clauses, not complete chapter conformity",
+      "问事情境只用调用方明示，未知时不采集，任何主题或问题关键词均不自动补真",
+      "Source ordinal emphasis is not an event probability or numeric weight",
+      "No sum/min/max winner among multiple support roles",
+      "Existing countercontrol and seasonal qualifications retained; no priority for net effects adjudicated",
+      "互 in relative timing has not been adjudicated as only one side: actual body_mutual/use_mutual separately exposed",
+      "No exact event timing, success verdict or physical harm claim"
+    ]
+  },
+  "rules": [
+    {
+      "id": "stage_emphasis_order",
+      "section": "體用互變之訣",
+      "pdf_indices": [
+        107
+      ],
+      "quote": "卦用最緊互次之變卦又次之",
+      "kind": "ordinal_emphasis",
+      "reading": "初用、互、变为三个依次的分析层次；原文紧次不转换为数值权重或抵消规则",
+      "quote_pdf_indices": [
+        107
+      ]
+    },
+    {
+      "id": "mutual_emphasis_order",
+      "section": "體用互變之訣",
+      "pdf_indices": [
+        107,
+        108
+      ],
+      "quote": "體互最緊用互次之",
+      "kind": "ordinal_emphasis",
+      "reading": "互层中体互先于用互；不删除用互或把它改成没有作用",
+      "quote_pdf_indices": [
+        108
+      ]
+    },
+    {
+      "id": "support_use_relative",
+      "section": "占卦訣",
+      "pdf_indices": [
+        107
+      ],
+      "quote": "如生體是用卦則事即成就",
+      "kind": "conditional_relative_timing",
+      "required_scenario": "favorable_matter",
+      "role_group": "use",
+      "relative_wording": "即成就",
+      "reading": "若此问属于原文问吉事情境，生体在用卦的原文措辞为即成就；不是已确认立即发生",
+      "quote_pdf_indices": [
+        107
+      ]
+    },
+    {
+      "id": "support_mutual_relative",
+      "section": "占卦訣",
+      "pdf_indices": [
+        107
+      ],
+      "quote": "生體是互卦則漸漸成",
+      "kind": "conditional_relative_timing",
+      "required_scenario": "favorable_matter",
+      "role_group": "mutual",
+      "relative_wording": "漸漸成",
+      "reading": "若此问属于原文问吉事情境，生体在互层的原文措辞为渐渐成；体互与用互分别保留，不合成一个生体互卦",
+      "quote_pdf_indices": [
+        107
+      ]
+    },
+    {
+      "id": "support_changed_relative",
+      "section": "占卦訣",
+      "pdf_indices": [
+        107
+      ],
+      "quote": "生體是變卦則稍稍遲耳",
+      "kind": "conditional_relative_timing",
+      "required_scenario": "favorable_matter",
+      "role_group": "changed_use",
+      "relative_wording": "稍稍遲耳",
+      "reading": "若此问属于原文问吉事情境，生体在变卦的原文措辞为稍稍迟；不是已计算的等待天数",
+      "quote_pdf_indices": [
+        107
+      ]
+    },
+    {
+      "id": "generation_and_control",
+      "section": "占卦訣",
+      "pdf_indices": [
+        107
+      ],
+      "quote": "若有生體之卦又有尅體之卦則事有阻節好中不足",
+      "kind": "conditional_joint_structure",
+      "required_scenario": "favorable_matter",
+      "reading": "若此问属于原文问吉事情境，卦中生体与克体同见，原文仍保留阻节、好中不足；不能只读生体迟速句",
+      "quote_pdf_indices": [
+        107
+      ]
+    },
+    {
+      "id": "favorable_without_generation_with_control",
+      "quote": "如占吉事無生體之卦有尅體之卦則事不諧矣",
+      "required_scenario": "favorable_matter",
+      "structural_condition": "no_generation_and_some_control",
+      "reading": "按调用方所报问吉事情境，所列内卦无生体且有克体时，原句作事不谐；这是所选条件断语，不是现实成败保证",
+      "section": "占卦訣",
+      "kind": "conditional_scenario_structure",
+      "pdf_indices": [
+        107
+      ],
+      "quote_pdf_indices": [
+        107
+      ]
+    },
+    {
+      "id": "unfavorable_with_generation",
+      "quote": "又如占不吉之事卦中有生體之卦則有救無害",
+      "required_scenario": "unfavorable_matter",
+      "structural_condition": "some_generation",
+      "reading": "按调用方所报问不吉之事情境，所列内卦有生体时，原句作有救无害；仍保留生助受制等资格，不据此作真实无害保证",
+      "section": "占卦訣",
+      "kind": "conditional_scenario_structure",
+      "pdf_indices": [
+        107
+      ],
+      "quote_pdf_indices": [
+        107
+      ]
+    },
+    {
+      "id": "unfavorable_without_generation",
+      "quote": "如無生體之卦事必不吉矣",
+      "required_scenario": "unfavorable_matter",
+      "structural_condition": "no_generation",
+      "reading": "按调用方所报问不吉之事情境，所列内卦无生体时，原句作事必不吉；只为所选传统条件断语，非灾祸、临床或现实结果判定",
+      "section": "占卦訣",
+      "kind": "conditional_scenario_structure",
+      "pdf_indices": [
+        107
+      ],
+      "quote_pdf_indices": [
+        107
+      ]
+    }
+  ],
+  "scope": "Selected ordinal emphasis and inner-role clause conditions under caller-declared source scenario; no context inference, net outcome or event date",
+  "independent_human_expert_review": false,
+  "predictive_efficacy_established": false,
+  "source_locator_supplement": {
+    "recorded_at": "2026-10-22T12:56:24.285326+00:00",
+    "original_source_reading_bytes_unchanged": true,
+    "rule_id": "mutual_emphasis_order",
+    "quote": "體互最緊用互次之",
+    "quote_original_pdf_indices": [
+      108
+    ],
+    "paragraph_context_original_pdf_indices": [
+      107,
+      108
+    ],
+    "correction": "Initial source-reading comparison note said the emphasis quote crossed107and108; the body/use mutual paragraph crosses pages, but this short quote itself is wholly on108. Broad initial pdf_indices kept as context; exact quote locator supplemented.",
+    "does_not_change_quote_or_expected_diagrams": true
+  },
+  "scenario_source_supplement": {
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "source_edition": "nlc_1925",
+    "raw_pdf_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_index": 107,
+    "printed_page": "卷三六",
+    "section": "占卦訣",
+    "source_character_review": "assistant selected-span visual reading; not independent human expert authentication",
+    "new_rules": [
+      {
+        "id": "favorable_without_generation_with_control",
+        "quote": "如占吉事無生體之卦有尅體之卦則事不諧矣",
+        "required_scenario": "favorable_matter",
+        "structural_condition": "no_generation_and_some_control",
+        "reading": "按调用方所报问吉事情境，所列内卦无生体且有克体时，原句作事不谐；这是所选条件断语，不是现实成败保证"
+      },
+      {
+        "id": "unfavorable_with_generation",
+        "quote": "又如占不吉之事卦中有生體之卦則有救無害",
+        "required_scenario": "unfavorable_matter",
+        "structural_condition": "some_generation",
+        "reading": "按调用方所报问不吉之事情境，所列内卦有生体时，原句作有救无害；仍保留生助受制等资格，不据此作真实无害保证"
+      },
+      {
+        "id": "unfavorable_without_generation",
+        "quote": "如無生體之卦事必不吉矣",
+        "required_scenario": "unfavorable_matter",
+        "structural_condition": "no_generation",
+        "reading": "按调用方所报问不吉之事情境，所列内卦无生体时，原句作事必不吉；只为所选传统条件断语，非灾祸、临床或现实结果判定"
+      }
+    ],
+    "unresolved": [
+      {
+        "quote": "無尅體之卦則吉事必可成就矣",
+        "reason": "Whether previous no-generation condition carries over is not adjudicated; no unconditional success rule added"
+      },
+      {
+        "quote": "生體是互卦則漸漸成",
+        "reason": "Both actual mutual sides retained; full clause stays unresolved for matched mutual scope even when favorable scenario supplied"
+      },
+      {
+        "topic": "net effects",
+        "reason": "Simultaneous clauses, control of support, seasonal strength and external omens do not acquire an automatic final priority"
+      }
+    ],
+    "scenario_semantics": "Caller confirms whether the subject is 原文问吉事 or 原文问不吉之事. Not inferred from wish, question words, topic or actual future outcome. Declaration itself unverified."
+  },
+  "supported_scenarios": [
+    "favorable_matter",
+    "unfavorable_matter"
+  ]
+}

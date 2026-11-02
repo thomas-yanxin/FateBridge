@@ -47,14 +47,15 @@
 
 ### 事业与工作（onda-shiye）
 
-| 用户任务 | `bazi_career` `analyze_destiny` | `ziwei_birth` | `astro_chart` | `timing_analysis` `ziwei_horoscope` `western_timing_analysis` `firdaria` | `astro_election` |
+| 用户任务 | `bazi_career` `analyze_destiny` | `ziwei_birth` | `astro_chart` `astro_india_chart` | `timing_analysis` `ziwei_horoscope` `western_timing_analysis` `firdaria` `astro_vimshottari` | `astro_election` |
 | --- | --- | --- | --- | --- | --- |
 | 工作方向／岗位／创业角色 | 主（专项优先，整体结构按需） | 旁（相关职业结构） | 旁（相关职业配置） |  |  |
 | 今年／未来几年事业 | 主（复用已有时机） | 旁（已有结构） | 旁（已有结构） | 主（仅补所需时间层） |  |
 | 给定求职／签约候选时刻 |  |  |  | 旁（独立背景） | 主（给定候选，非区间最优搜索） |
 
 详细选择与读法见 [事业与工作](../skills/onda-shiye/SKILL.md)。
-本入口可用清单（非必调）：`analyze_destiny`、`astro_chart`、`astro_election`、`bazi_career`、`firdaria`、`timing_analysis`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
+印占的 D1/D9/D10 与 Vimshottari 按[独立取证规则](../skills/_shared/vedic-evidence.md)解释；仅在本轮有价值或明确指定时选择。
+本入口可用清单（非必调）：`astro_india_chart`、`astro_vimshottari`、`analyze_destiny`、`astro_chart`、`astro_election`、`bazi_career`、`firdaria`、`timing_analysis`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
 ### 财务与资源（onda-caiwu）
 
@@ -68,14 +69,15 @@
 
 ### 感情与伴侣关系（onda-yuanfen）
 
-| 用户任务 | `bazi_marriage` `bazi_romance` | `two_person_compatibility` `sukuyo_compatibility` | `ziwei_birth` | `astro_chart` `astro_relative_chart` | `timing_analysis` `ziwei_horoscope` `western_timing_analysis` `firdaria` `liuyue_analysis` |
+| 用户任务 | `bazi_marriage` `bazi_romance` | `two_person_compatibility` `sukuyo_compatibility` | `ziwei_birth` | `astro_chart` `astro_relative_chart` `astro_india_chart` | `timing_analysis` `ziwei_horoscope` `western_timing_analysis` `firdaria` `astro_vimshottari` `liuyue_analysis` |
 | --- | --- | --- | --- | --- | --- |
 | 单人相处方式／婚恋文化 | 主（按婚姻或桃花任务） |  | 旁 | 旁（本命相关配置） |  |
 | 双方互动综合 |  | 主（跨盘、双向范围） | 旁（各自结构） | 主（明确星盘互动） |  |
 | 年度／阶段／月份变化 | 主（已有时机复用） |  |  |  | 主（仅补所需粒度） |
 
 详细选择与读法见 [感情与伴侣关系](../skills/onda-yuanfen/SKILL.md)。
-本入口可用清单（非必调）：`astro_chart`、`astro_relative_chart`、`bazi_marriage`、`bazi_romance`、`firdaria`、`liunian_analysis`、`liuyue_analysis`、`meihua_analysis`、`sixyao`、`sukuyo_compatibility`、`timing_analysis`、`two_person_compatibility`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
+印占的 D1/D9/D10 与 Vimshottari 按[独立取证规则](../skills/_shared/vedic-evidence.md)解释；仅在本轮有价值或明确指定时选择。
+本入口可用清单（非必调）：`astro_india_chart`、`astro_vimshottari`、`astro_chart`、`astro_relative_chart`、`bazi_marriage`、`bazi_romance`、`firdaria`、`liunian_analysis`、`liuyue_analysis`、`meihua_analysis`、`sixyao`、`sukuyo_compatibility`、`timing_analysis`、`two_person_compatibility`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
 ### 学习与成长（onda-xueye）
 
@@ -122,7 +124,7 @@
 
 ### 整体时运与阶段（onda-shiyun）
 
-| 用户任务 | `timing_analysis` `dayun_analysis` | `ziwei_horoscope` | `western_timing_analysis` `firdaria` `zr` `decennials` | `liunian_analysis` `liuyue_analysis` `liuri_analysis` `liushi_analysis` | `solarreturn` `lunarreturn` `transit` `solararc` `givenyear` `profection` `pd` `pdchart` | `astro_election` |
+| 用户任务 | `timing_analysis` `dayun_analysis` | `ziwei_horoscope` | `western_timing_analysis` `firdaria` `astro_vimshottari` `zr` `decennials` | `liunian_analysis` `liuyue_analysis` `liuri_analysis` `liushi_analysis` | `solarreturn` `lunarreturn` `transit` `solararc` `givenyear` `profection` `pd` `pdchart` | `astro_election` |
 | --- | --- | --- | --- | --- | --- | --- |
 | 整体年度／未来几年 | 主（中式选择） | 主（紫微选择） | 主（西占选择） |  |  |  |
 | 人生阶段／何时换阶段 | 主（大运与精度） | 主（大限） | 主（法达等实际分期） |  | 深（本轮确需） |  |
@@ -130,28 +132,37 @@
 | 活动候选时刻比较 |  |  |  |  |  | 主（给定非医疗候选） |
 
 详细选择与读法见 [整体时运与阶段](../skills/onda-shiyun/SKILL.md)。其他生命周期／历法方法按共享时间参考与技法参考选择，不自动全调用。
-本入口可用清单（非必调）：`astro_agepoint`、`astro_balbillus`、`astro_distributions`、`astro_election`、`astro_extrareturns`、`astro_harmonic`、`astro_jaynesprog`、`astro_keypoints`、`astro_lunation_phase`、`astro_mundane`、`astro_persiandirected`、`astro_planetary_ages`、`astro_planetaryarc`、`astro_triplicity_rulers`、`astro_vedicprog`、`astro_yearsystem129`、`dayun_analysis`、`decennials`、`firdaria`、`givenyear`、`jieqi_timeline_analysis`、`jieqi_year`、`liunian_analysis`、`liuri_analysis`、`liushi_analysis`、`liuyue_analysis`、`lunarreturn`、`nongli_time`、`pd`、`pdchart`、`profection`、`solararc`、`solarreturn`、`timing_analysis`、`transit`、`western_timing_analysis`、`ziwei_horoscope`、`zr`。
+印占的 D1/D9/D10 与 Vimshottari 按[独立取证规则](../skills/_shared/vedic-evidence.md)解释；仅在本轮有价值或明确指定时选择。
+本入口可用清单（非必调）：`astro_india_chart`、`astro_vimshottari`、`astro_agepoint`、`astro_balbillus`、`astro_distributions`、`astro_election`、`astro_extrareturns`、`astro_harmonic`、`astro_jaynesprog`、`astro_keypoints`、`astro_lunation_phase`、`astro_mundane`、`astro_persiandirected`、`astro_planetary_ages`、`astro_planetaryarc`、`astro_triplicity_rulers`、`astro_vedicprog`、`astro_yearsystem129`、`dayun_analysis`、`decennials`、`firdaria`、`givenyear`、`jieqi_timeline_analysis`、`jieqi_year`、`liunian_analysis`、`liuri_analysis`、`liushi_analysis`、`liuyue_analysis`、`lunarreturn`、`nongli_time`、`pd`、`pdchart`、`profection`、`solararc`、`solarreturn`、`timing_analysis`、`transit`、`western_timing_analysis`、`ziwei_horoscope`、`zr`。
 
 ### 命盘与指定方法解读（onda-xingpan）
 
-| 用户任务 | `bazi_birth` `analyze_destiny` | `ziwei_birth` `ziwei_horoscope` | `astro_chart` `astro_chart13` `astro_hellen_chart` `astro_guolao_chart` `astro_india_chart` `astro_germany_chart` | `astro_relative_chart` | `western_timing_analysis` `firdaria` `dayun_analysis` `liunian_analysis` |
-| --- | --- | --- | --- | --- | --- |
-| 指定八字／紫微命盘 | 主（原始或综合） | 主（本命或动态） |  |  |  |
-| 西占本命／指定流派 |  |  | 主（择一，不重复） |  |  |
-| 指定星盘关系盘 |  |  |  | 主（明确盘型） |  |
-| 指定阶段方法／法达 |  |  |  |  | 主（按用户所选窄查询） |
+| 用户任务 | `bazi_birth` `analyze_destiny` | `ziwei_birth` `ziwei_horoscope` | `human_design` `astro_chart` `astro_chart13` `astro_hellen_chart` `astro_guolao_chart` `astro_india_chart` `astro_germany_chart` | `astro_relative_chart` | `western_timing_analysis` `firdaria` `astro_vimshottari` `dayun_analysis` `liunian_analysis` | `heluo` `canping` |
+| --- | --- | --- | --- | --- | --- | --- |
+| 指定八字／紫微命盘 | 主（原始或综合） | 主（本命或动态） |  |  |  |  |
+| 西占本命／指定流派 |  |  | 主（择一，不重复） |  |  |  |
+| 人类图／类型／权威 |  |  | 主（按人类图字段与来源） |  |  |  |
+| 指定星盘关系盘 |  |  |  | 主（明确盘型） |  |  |
+| 指定阶段方法／法达 |  |  |  |  | 主（按用户所选窄查询） |  |
+| 指定河洛／参评数 |  |  |  |  |  | 主（按指定方法） |
 
 详细选择与读法见 [命盘与指定方法解读](../skills/onda-xingpan/SKILL.md)。
-本入口可用清单（非必调）：`analyze_destiny`、`astro_chart`、`astro_chart13`、`astro_germany_chart`、`astro_guolao_chart`、`astro_hellen_chart`、`astro_india_chart`、`astro_relative_chart`、`bazi_birth`、`dayun_analysis`、`firdaria`、`liunian_analysis`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
+印占的 D1/D9/D10 与 Vimshottari 按[独立取证规则](../skills/_shared/vedic-evidence.md)解释；仅在本轮有价值或明确指定时选择。
+原典已给出四柱时，可用 `bazi_source_compare` 核对登记编释；不补造生日，保留差异与未裁定。
+本入口可用清单（非必调）：`bazi_source_compare`、`human_design`、`astro_india_chart`、`astro_vimshottari`、`analyze_destiny`、`astro_chart`、`astro_chart13`、`astro_germany_chart`、`astro_guolao_chart`、`astro_hellen_chart`、`astro_relative_chart`、`bazi_birth`、`canping`、`heluo`、`dayun_analysis`、`firdaria`、`liunian_analysis`、`western_timing_analysis`、`ziwei_birth`、`ziwei_horoscope`。
 
 ### 具体问事与占卜（onda-zhanbu）
 
-| 用户任务 | `meihua_analysis` `sixyao` | `qimen` `liureng_gods` `liureng_runyear` `jinkou` | `taiyi` `suzhan` `sanshiunited` `otherbu` `tongshefa` | `astro_horary` | `gua_lookup` `gua_meiyi` |
+太乙年／月／日／时计及三式合参的技法核对、已有结果解释也使用本入口，读取太乙分层参考。只核计算时沿用已确认的日期和配置，不追加现实占问或出生资料；指定占式方法不转成本命盘请求。 历史年计可明确选择381—385晋历或501—505齐梁史历表，参数与日期范围见[年计历表](taiyi-year-calendar.md)；保留502年闰标争议，不自动改用另一配置或扩展为原书日计。
+
+| 用户任务 | `meihua_analysis` `meihua_cast` `sixyao` | `qimen` `liureng_gods` `liureng_runyear` `jinkou` | `taiyi` `suzhan` `sanshiunited` `otherbu` `tongshefa` | `astro_horary` | `gua_lookup` `gua_meiyi` |
 | --- | --- | --- | --- | --- | --- |
 | 明确求卦／已选卜法 | 主（按所选方式） | 主（按所选方式） | 主（按所选方式与实际输入） | 主（非禁区类别） | 旁（只查义，不重起） |
 
 详细选择与读法见 [具体问事与占卜](../skills/onda-zhanbu/SKILL.md)。
-本入口可用清单（非必调）：`astro_horary`、`gua_lookup`、`gua_meiyi`、`jinkou`、`liureng_gods`、`liureng_runyear`、`meihua_analysis`、`otherbu`、`qimen`、`sanshiunited`、`sixyao`、`suzhan`、`taiyi`、`tongshefa`。
+本入口可用清单（非必调）：`astro_horary`、`gua_lookup`、`gua_meiyi`、`jinkou`、`liureng_gods`、`liureng_runyear`、`meihua_analysis`、`meihua_cast`、`otherbu`、`qimen`、`sanshiunited`、`sixyao`、`suzhan`、`taiyi`、`tongshefa`。
+
+金口诀将命大绝使用已确认的问课对象本命年支 `natal_branch`；未提供时只限制这一关系，保留未知并继续解释已有四位，不从占时年、日、时或行年支代入。
 
 ### 全面画像多主题组合（onda-zige）
 
@@ -165,19 +176,20 @@
 
 ### 风水 · 空间布局（onda-fengshui）
 
-| 用户问题 | `fengshui_assess` | `fengshui_minggua` | `fengshui_bazhai` | `fengshui_directions` | `fengshui_jinsuo` | `fengshui_annual_stars` | `fengshui_xuankong_natal` |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 布局审查及行动方案 | 主（scene=workstation/home按事实选层，显式methods优先；analyze_layout=true） | | | | | | |
-| 多方案布局比较与家具搬转限制 | 主（layout_constraints保存许可；layout_alternatives独立观察与可行性，逐规则比较） | | | | | | |
-| 独立室内形态 | 主（form_observations，methods=[]） | | | | | | |
-| 书桌工作／学习玄空用途、入口隔挡、材料施用条件 | 主（显式工位作者版本；用途按落宫取向星，物件资格不推摆位） | | | | | | |
-| 桌面物件风水摆法 | 主（BTB 须明确另选；非 BTB 桌面摆放仅作者参考） | | | | | | |
-| 个人命卦八方 | | 主（三选一生年路径） | | | | | |
-| 单层八宅关系 | | | 主（宅与人、位置与朝向分开） | | | | |
-| 参考北与固定宫数 | | | | 主（不推断进阶吉凶） | | | |
-| 已确认砂水关系 | | | | | 主（分类及依据） | | |
-| 某年九宫年星 | | | | | | 主（立春边界） | |
-| 历史玄空宅盘 | | | | | | | 主（磁北宅向及历史定运依据） |
+| 用户问题 | `fengshui_assess` | `fengshui_minggua` | `fengshui_bazhai` | `fengshui_directions` | `fengshui_jinsuo` | `fengshui_annual_stars` | `fengshui_monthly_stars` | `fengshui_xuankong_natal` |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 布局审查及行动方案 | 主（scene=workstation/home按事实选层，显式methods优先；analyze_layout=true） | | | | | | | |
+| 多方案布局比较与家具搬转限制 | 主（layout_constraints保存许可；layout_alternatives独立观察与可行性，逐规则比较） | | | | | | | |
+| 独立室内形态 | 主（form_observations，methods=[]） | | | | | | | |
+| 书桌工作／学习玄空用途、入口隔挡、材料施用条件 | 主（显式工位作者版本；用途按落宫取向星，物件资格不推摆位） | | | | | | | |
+| 桌面物件风水摆法 | 主（BTB 须明确另选；非 BTB 桌面摆放仅作者参考） | | | | | | | |
+| 个人命卦八方 | | 主（三选一生年路径） | | | | | | |
+| 单层八宅关系 | | | 主（宅与人、位置与朝向分开） | | | | | |
+| 参考北与固定宫数 | | | | 主（不推断进阶吉凶） | | | | |
+| 已确认砂水关系 | | | | | 主（分类及依据） | | | |
+| 某年九宫年星 | | | | | | 主（立春边界） | | |
+| 某节月九宫月星 | | | | | | | 主（十二节瞬间；有效年与公历年分开） | |
+| 历史玄空宅盘 | | | | | | | | 主（磁北宅向及历史定运依据） |
 
 技能入口与资料／来源／执行闭环见 [onda-fengshui](../skills/onda-fengshui/SKILL.md)。不为形态或桌面咨询强制收集生辰；聚合已算的层不重复计算。
 
@@ -193,6 +205,7 @@
 | 宅卦与各住户布局 | `fengshui_bazhai` | 宅坐山与住户分开；位置和朝向分别提供，禁止户主覆盖全家 |
 | 金锁基础砂水 | `fengshui_jinsuo` | 使用已确认分类与依据；标签不自动决定砂水 |
 | 某年九宫年星 | `fengshui_annual_stars` | 立春换年；固定宫数与年星数分开，不能冒充完整山向宅盘 |
+| 某节月九宫月星 | `fengshui_monthly_stars` | 含时区时刻或已确认有效年/节月；十二节瞬间换月，公历一月可能归前一有效年；只解释数字与落宫 |
 | 历史玄空宅盘 | `fengshui_xuankong_natal` | 必须确认磁北宅向和历史定运依据；中州派版本，山界候选不裁成唯一盘，年星独立 |
 | 三法合参 | `fengshui_assess` | 聚合调用保留三层与差异，不平均评分；缺失资料明确 partial |
 | 工位/家居多方案与动作限制 | `fengshui_assess` | layout_constraints记录搬位/转向/新增许可；layout_alternatives独立重算新位置事实；ready仅指所选门槛满足，不评分、不选综合赢家 |
@@ -227,6 +240,7 @@
 
 - `analyze_destiny` — 命格综合主证
 - `bazi_birth` — 核心命盘
+- `bazi_source_compare` — 已明确的原样四柱与全部同柱登记编释核对
 - `bazi_personality` — 命格
 - `bazi_education` — 学习
 - `bazi_children` — 家庭亲子
@@ -248,8 +262,10 @@
 - `astro_chart13` — 星盘（13 扇区扩展）
 - `astro_hellen` — 星盘（希腊流派）
 - `astro_guolao` — 星盘（果老流派）
-- `astro_india` — 星盘（印度流派）
+- `astro_india` — 星盘（印度 D1/D9/D10）
+- `astro_vimshottari` — 印占 Moon-nakshatra 主运／次运
 - `astro_germany` — 星盘（德国盘）
+- `human_design` — 人类图类型、权威、定义与原典依据
 - `astro_relative` — 关系盘（REST 端）
 - `astro_relative_chart` — 关系盘（MCP 端）
 - `western_timing_analysis` — 时运聚合主证
@@ -284,6 +300,7 @@
 - `two_person_compatibility` — 合婚/合作
 - `sukuyo_compatibility` — 宿曜旁证
 - `meihua_analysis` — 问事
+- `meihua_cast` — 原始声音、字形、长度、端法或既有卦，不换时间重起
 - `sixyao` — 问事
 - `tongshefa` — 问事
 - `suzhan` — 问事
@@ -313,6 +330,7 @@
 - `fengshui_bazhai` — 家居八宅
 - `fengshui_jinsuo` — 家居基础砂水
 - `fengshui_annual_stars` — 家居年度飞星
+- `fengshui_monthly_stars` — 家居节月紫白
 - `fengshui_xuankong_natal` — 家居玄空运山向宅盘
 - `fengshui_assess` — 家居三法及可选宅盘分层合参
 

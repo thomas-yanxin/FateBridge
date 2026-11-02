@@ -1,0 +1,69 @@
+{
+  "ruleset": {
+    "ruleset_id": "shen_fixed_lingzheng_v1",
+    "version": "1.0.0",
+    "method": "fixed_lingzheng_with_separate_flying_star_comparison",
+    "title": "沈氏卷一固定零正方位及署名形勢條件",
+    "source_ids": [
+      "SFL1",
+      "SFL2",
+      "SFL3"
+    ],
+    "scope": "明確評價運的固定正零方位、五運分段及指定高實／低窪河流條件；與實際山向當令星要求分開列示",
+    "conventions": [
+      "正文與志伊、王則先按語分開，固定地盤不代替運山向飛星",
+      "評價運由調用方明確確認，不取歷史宅運、年星或系統日期",
+      "五運前十年五黃寄坤零八，後十年寄艮零二；分段未知保留兩候選，不自選有利方案",
+      "正神檢查高山實地存在，零神同時檢查低窪與河流存在，無山不推定低窪、無水不推定高實",
+      "匹配僅為原文指定存在條件，不證明距離、形態、納氣、用途、全宅吉凶或現實效果",
+      "五運寄宮不改宅盤星數、五黃五行或替星種子順逆；不把山順水逆誤作排盤順逆規則"
+    ]
+  },
+  "sources": {
+    "SFL1": {
+      "title": "增廣沈氏玄空學 卷一 論陰陽零正",
+      "author": "沈竹礽正文",
+      "url": "https://vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4/%E6%B2%89%E6%B0%8F%E7%8E%84%E7%A9%BA_%E4%B8%8A.pdf",
+      "kind": "historical_facsimile",
+      "retrieved_sha256": "30d653cd53a768a957d2416d2c1586b65310f3aad3b103c90cf8af4347e4a490",
+      "locator": "PDF40／印刷81，正文首段及五運寄宮；續PDF41／印刷82",
+      "source_version": "歷史影印上冊，確切印記未認證，以完整文件SHA-256固定",
+      "retrieved_at": "2026-10-22",
+      "scope": "當元正神數、對待零神數；五運前十年寄坤零八、後十年寄艮零二；不把山順水逆當作山盤一律順飛水盤一律逆飛"
+    },
+    "SFL2": {
+      "title": "增廣沈氏玄空學 卷一 論陰陽零正 志伊謹案",
+      "author": "志伊署名按語，引用溫明遠",
+      "url": "https://vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4/%E6%B2%89%E6%B0%8F%E7%8E%84%E7%A9%BA_%E4%B8%8A.pdf",
+      "kind": "attributed_historical_commentary",
+      "retrieved_sha256": "30d653cd53a768a957d2416d2c1586b65310f3aad3b103c90cf8af4347e4a490",
+      "locator": "PDF41／印刷82–83",
+      "source_version": "同一歷史影印件，與沈氏正文分開署名",
+      "retrieved_at": "2026-10-22",
+      "scope": "區分飛星語境的山上排龍、水裏排龍；不以此取代固定地盤"
+    },
+    "SFL3": {
+      "title": "增廣沈氏玄空學 卷一 論陰陽零正 則先謹按",
+      "author": "王則先署名按語",
+      "url": "https://vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4/%E6%B2%89%E6%B0%8F%E7%8E%84%E7%A9%BA_%E4%B8%8A.pdf",
+      "kind": "attributed_historical_commentary",
+      "retrieved_sha256": "30d653cd53a768a957d2416d2c1586b65310f3aad3b103c90cf8af4347e4a490",
+      "locator": "PDF41–42／印刷83–84",
+      "source_version": "同一歷史影印件，與沈氏正文分開署名",
+      "retrieved_at": "2026-10-22",
+      "scope": "零正固定地盤隨運而異，山向飛星隨運隨向變遷，二者相資；正神高山實地、零神河流低窪。只檢查這些存在條件，不外推完整現場或應驗"
+    }
+  },
+  "five_period_hosting": {
+    "first_decade": {
+      "zheng_direction": "SW",
+      "ling_direction": "NE",
+      "ling_number": 8
+    },
+    "second_decade": {
+      "zheng_direction": "NE",
+      "ling_direction": "SW",
+      "ling_number": 2
+    }
+  }
+}

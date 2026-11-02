@@ -1,0 +1,79 @@
+{
+  "bundle_version": "1.0.0",
+  "ruleset": {
+    "ruleset_id": "monthly_zibai_jie_v1",
+    "version": "1.0.0",
+    "method": "monthly_stars",
+    "source_ids": [
+      "MP1",
+      "MP2",
+      "MP3"
+    ],
+    "scope": "三组年支逐月逆取入中数、九宫顺飞；以立春换年、十二个节的实际时刻换月，独立于年盘与宅盘",
+    "conventions": [
+      "有效年年支以4 CE为子年作十二支余数映射；不是以公历一月一日或农历春节换年。",
+      "1=立春寅月，12=下一公历年的小寒丑月；节中间的中气不换月。",
+      "36个入中数来自所引沈氏整理本；具体时刻换月另有作者资料和天文历法来源，不将混合来源说成全本认证。",
+      "六月节候栏原印大暑、小暑倒序保留；本层按独立来源小暑起月，大暑为中气，不修改原始表格。",
+      "月星只返回中性数字、名称、五行与落宫，不继承基础年星表的通用吉凶标签，不推定摆水、施工或现实效力。",
+      "Moshier交节前后5秒保留月候选；这是工程保护，不是原典口诀、误差上界或放宽数值验收。完整4812项TT基准的一秒门槛与569项Moshier原始失败继续保留。"
+    ]
+  },
+  "sources": {
+    "MP1": {
+      "title": "沈氏玄空学·玄空辑要·月紫白九星入中表",
+      "author": "沈竹礽编，王则先辑要；姚国华、柯誉整理",
+      "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
+      "kind": "published_original_text_reprint",
+      "source_version": "中央编译出版社2011.3出版、2016.2重印，ISBN978-7-5117-0801-4，以完整PDF散列固定",
+      "retrieved_sha256": "b0c2a7af0a1b94f36cf1cc9f0d2ce4b65e8ea49bd793bc128b8fdc525b5ba847",
+      "locator": "PDF731，三组年支与十二节月的36个入中数；PDF730为表题",
+      "scope": "只采用36个星数与三组年支，六月节候栏的大暑、小暑倒序另记，不采用吉凶断语或认证全书"
+    },
+    "MP2": {
+      "title": "2026 Flying Star Chart: 2026 monthly flying star charts",
+      "author": "Sean Chan",
+      "url": "https://www.masterseanchan.com/fengshui-2026-flying-star-chart/",
+      "kind": "author_published_teaching",
+      "source_version": "网页署Last updated 24 September 2026，2026-10-22读取",
+      "scope": "十二节的时刻换月、立春前一月属前一有效年、十二张九宫月图；网页分钟仅交叉检查，不作秒精度或应验认证"
+    },
+    "MP3": {
+      "title": "香港天文台二十四节气时刻表",
+      "author": "香港天文台",
+      "url": "https://www.hko.gov.hk/en/gts/astronomy/Solar_Term.htm",
+      "kind": "official_astronomical_calendar",
+      "source_version": "冻结官方XML及香港时间分钟对照另见验收夹具",
+      "scope": "只认证已公布年份的节气名称、日期与分钟级时刻，不认证风水规则或现实预测"
+    }
+  },
+  "year_groups": [
+    {
+      "branches": [
+        "子",
+        "午",
+        "卯",
+        "酉"
+      ],
+      "first_month_center": 8
+    },
+    {
+      "branches": [
+        "辰",
+        "戌",
+        "丑",
+        "未"
+      ],
+      "first_month_center": 5
+    },
+    {
+      "branches": [
+        "寅",
+        "申",
+        "巳",
+        "亥"
+      ],
+      "first_month_center": 2
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "ruleset_id": "zengshan_clash_v10",
+  "ruleset_version": "10.0.0",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "method": "Original PDF67,81,84-86 visually read at page resolution before implementation; no OCR oracle."
+  },
+  "clauses": [
+    {
+      "id": "dark-or-day-break",
+      "pdf_pages": [
+        67,
+        84
+      ],
+      "quote": "沖旺相之靜爻卽爲暗動沖衰弱之靜爻則爲日破"
+    },
+    {
+      "id": "fill-void-by-day-clash",
+      "pdf_pages": [
+        67
+      ],
+      "quote": "爻遇旬空日辰沖起而爲用謂之沖空則實"
+    },
+    {
+      "id": "yi-day-fill",
+      "pdf_pages": [
+        81
+      ],
+      "quote": "辰土財爻持世因值旬空戌日沖空則實本日卽得"
+    },
+    {
+      "id": "moving-scatter-not-automatic",
+      "pdf_pages": [
+        85
+      ],
+      "quote": "旺相者沖之不散有氣者沖之不散休囚者間有沖散亦千百中之一二也"
+    },
+    {
+      "id": "moving-not-permanently-cancelled",
+      "pdf_pages": [
+        85
+      ],
+      "quote": "雖則今日受制後逢値日而不散矣"
+    },
+    {
+      "id": "huan-same-position-generation",
+      "pdf_pages": [
+        85,
+        86
+      ],
+      "quote": "卯木父爻動而生世又化子水回頭生"
+    },
+    {
+      "id": "back-clash-not-back-control",
+      "pdf_pages": [
+        81
+      ],
+      "quote": "此卦世爻酉金化卯沖世而不尅世又得辰日沖動戌財生世"
+    }
+  ],
+  "textual_issues": [
+    {
+      "id": "gu-not-zhan",
+      "pdf_page": 85,
+      "scan": "古以日辰沖動爻",
+      "frozen_transcription": "占以日辰而沖動爻",
+      "action": "Preserve raw transcription; record original wording separately."
+    },
+    {
+      "id": "chen-month-versus-day",
+      "pdf_page": 81,
+      "scan_readings": [
+        "午月丙辰日",
+        "幸辰月合之",
+        "又得辰日沖動戌財生世"
+      ],
+      "status": "same_page_wording_inconsistency_retained",
+      "action": "Keep supplied month Wu/day Bing-Chen and the contradictory word; do not silently substitute a different calendar input."
+    },
+    {
+      "id": "weak-moving-scatter-generality",
+      "pdf_pages": [
+        67,
+        85
+      ],
+      "scan_readings": [
+        "爻衰而動沖之則散",
+        "休囚者間有沖散亦千百中之一二也"
+      ],
+      "status": "qualification_in_named_scatter_chapter_preserved",
+      "action": "Use chapter23 conditional wording; do not turn a weak moving clash into certain scattering or a modern empirical rate."
+    }
+  ],
+  "scope": "Day-break, dark activity, current-day void filling and moving-scatter conditions are distinct. No clash alone certifies injury, scattering, permanent incapacity or event outcome. Same-day peer support plus clash remains unresolved without an independent pre-clash ground. Static scatter is not adjudicated as the moving-scatter rule. Rare-event prose is not a numeric success probability."
+}

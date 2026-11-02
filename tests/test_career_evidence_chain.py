@@ -60,12 +60,13 @@ def test_primary_tie_preserves_heuristic_formation_conditions():
         person(), analysis_year=2027, analysis_month=6, analysis_day=15
     )["career_analysis"]
     dominant = career["dominant_ten_gods"]
-    assert (
-        dominant["weighted_counts"]["劫财"] == dominant["weighted_counts"]["正官"] == 2
-    )
-    assert set(dominant["tied_primary_gods"]) == {"劫财", "正官"}
-    assert dominant["primary_career_type"] == "竞争型"  # Compatibility only.
-    assert dominant["counting_basis"]["excluded_pillars"] == ["day"]
+    assert dominant["weighted_counts"]["劫财"] == 2.5
+    # 癸亥日支壬劫财、甲伤官各0.5；这两项旧版漏计。
+    assert dominant["weighted_counts"]["正官"] == 2
+    assert dominant["weighted_counts"]["伤官"] == 0.5
+    assert set(dominant["tied_primary_gods"]) == {"劫财"}
+    assert dominant["primary_career_type"] == "竞争型"
+    assert dominant["counting_basis"]["excluded_pillars"] == []
     assert dominant["counting_basis"]["hidden_stem_weight"] == 0.5
     for name in ["career_structure", "entrepreneurship"]:
         assert career[name]["formation_status"] == "heuristic_candidate_only"
@@ -76,7 +77,7 @@ def test_primary_tie_preserves_heuristic_formation_conditions():
     assert signal["label"] == "食神制杀" and signal["score_delta"] == 10
 
 
-def test_counting_excludes_day_branch_and_preserves_all_primary_ties():
+def test_changing_day_branch_changes_its_hidden_counts_and_preserves_actual_ties():
     pillars = {
         "year": ("甲", "子"),
         "month": ("乙", "丑"),
@@ -87,7 +88,11 @@ def test_counting_excludes_day_branch_and_preserves_all_primary_ties():
     b = CareerAnalysis._analyze_dominant_ten_gods(
         {**pillars, "day": ("丙", "午")}, "丙"
     )
-    assert a == b
+    # 丙寅的甲丙戊改为丙午的丁己；日干自身仍不额外计入。
+    delta = {"偏印": -0.5, "比肩": -0.5, "食神": -0.5, "劫财": 0.5, "伤官": 0.5}
+    assert {
+        g: b["weighted_counts"][g] - a["weighted_counts"][g] for g in delta
+    } == delta
     counts = a["weighted_counts"]
     assert set(a["tied_primary_gods"]) == {
         g for g, v in counts.items() if v == max(counts.values())
@@ -149,7 +154,7 @@ def test_career_projection_preserves_primary_tie_and_scope_across_transports(
     assert business(http.json()) == business(protocol.structured_content) == output
     career = output["career_analysis"]
     assert career["interpretation_scope"]
-    assert set(career["dominant_ten_gods"]["tied_primary_gods"]) == {"劫财", "正官"}
+    assert set(career["dominant_ten_gods"]["tied_primary_gods"]) == {"劫财"}
     assert career["career_structure"]["formation_status"] == "heuristic_candidate_only"
     if view != "direction":
         assert (
@@ -259,7 +264,7 @@ def test_omitted_target_date_uses_person_timezone_at_frozen_utc_across_transport
 @pytest.mark.parametrize(
     "case_input,expected_score",
     [
-        (D1, 80),
+        (D1, 95),
         (
             dict(
                 birth_year=1965,
@@ -274,7 +279,7 @@ def test_omitted_target_date_uses_person_timezone_at_frozen_utc_across_transport
                 analysis_month=2,
                 analysis_day=4,
             ),
-            88,
+            95,
         ),
     ],
 )

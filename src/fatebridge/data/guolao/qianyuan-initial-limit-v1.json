@@ -1,0 +1,55 @@
+{
+  "id": "qianyuan_nlc416_solar_days_initial_limit_v1",
+  "title": "乾元祕旨",
+  "author_as_title_page": "舒繼英",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/45/NLC416-06jh007406-1827_%E4%B8%89%E5%91%BD%E6%8C%87%E8%BF%B7%E8%B3%A6_%E7%AC%AC2%E5%8D%B7.pdf",
+  "digital_transcription_url": "https://zh.wikisource.org/zh/乾元秘旨",
+  "transport_filename_not_edition_identity": "NLC416-06jh007406-1827_三命指迷賦_第2卷.pdf",
+  "original_sha256": "134fa332970170fd01322931b3f1eb9a77a8d55006a04cc4515a38a283e1a178",
+  "original_bytes": 1230893,
+  "pdf_pages": 36,
+  "locator": "PDF page14, printed page十二, 出童限行大限",
+  "transcription": "Normalized punctuation and glyph spacing from visually inspected PDF rendering; not an independent second collation",
+  "rule_text": "童限管十五年此其常也不及則十歲後即出太過則二十歲纔出總查太陽過宮之淺深以定行限之遲早太陽過宮三日管一年三十日管十年須扣算實數起",
+  "method_id": "qianyuan_three_source_days_per_year_initial_limit_v1",
+  "quantity_basis": "qianyuan_solar_palace_elapsed_source_days",
+  "base_source_years": "10",
+  "source_days_per_source_year": "3",
+  "source_hours_per_day": "12",
+  "source_months_per_year": "12",
+  "cases": [
+    {
+      "id": "two_days_six_source_hours",
+      "elapsed_source_days": "5/2",
+      "printed_years": 10,
+      "printed_months": 10,
+      "expected_total_source_years": "65/6",
+      "input_components": {
+        "days": "2",
+        "hours": "6"
+      },
+      "source_text": "倘未滿三日只二日零六個時即十歲零十個月行限",
+      "printed_calendar_example": "如七月初一生必至十一歲六月三十滿十歲再加十個月行限則十二歲五月初一纔起"
+    },
+    {
+      "id": "thirty_days_less_nine_source_hours",
+      "elapsed_source_days": "117/4",
+      "printed_years": 19,
+      "printed_months": 9,
+      "expected_total_source_years": "79/4",
+      "input_components": {
+        "days_before_next": "30",
+        "hours_short": "9"
+      },
+      "source_text": "將滿三十日只缺少九個時即十九歲零九個月行限",
+      "printed_calendar_example": "如六月初十生必至二十歲六月初九滿十九歲再加九個月行限則二十一歲三月初十纔起"
+    }
+  ],
+  "implementation_scope": "source-day ratio only; no angular degree shortcut, no modern solar-entry epoch or civil-date conversion, no LuWei chart replacement",
+  "luwei_circular_rows_resolved": false,
+  "luwei_two_numeric_counterexamples_overridden": false,
+  "native_birth_chart_changed": false,
+  "full_original_acceptance": false,
+  "predictive_effectiveness_verified": false,
+  "literal_reference_sha256": "d8e1449f45a984d4e60bccb4abbbed57642c7fbc556734ed68e6cfac184edbb6"
+}

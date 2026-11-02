@@ -1,0 +1,178 @@
+{
+  "id": "zentsuji_109_4_later_reading_v1",
+  "status": "selected_model_working_readings_not_critical_edition",
+  "expected_legacy": {
+    "source_bundle_sha256": "2c97bd5ed40e8d053205dc0b3bd279c78cd74a84d1530637b17250bba6586aaa",
+    "id": "t2465_zentsuji_109_4_selected_reference_v1",
+    "image_sha256": "55cd7cea03bb02435d0e805e5fc256b4f02032a24f7dd3bc954015178622e602",
+    "manifest_sha256": "dc41c230e83b2d4dcaf094b21e1d93df3d5a4c6a86763d35f062e0934c9b3f59",
+    "call_number": "109-4"
+  },
+  "evidence_records": [
+    {
+      "id": "v102-complete-selected-calendar-columns",
+      "sha256": "f817d02527467f26ab48ed2a349839412f2968fe9972e2d65ed48a7afa4952b1",
+      "record": "sukuyo-homa-primary-v102-calendar-colophon-reviewer-first.json"
+    },
+    {
+      "id": "v103-native-primary-reading",
+      "sha256": "e577d22c4128819b90992ba6b6f8d42189023d60b89ce117e7b619b9d258f25b",
+      "record": "sukuyo-whole-question-v103-native-primary-reading-reviewer-first.json"
+    }
+  ],
+  "calendar_columns": [
+    {
+      "sequence": 1,
+      "page": "右",
+      "literal": "勘宿曜經取閏月之宿及小月之闕日分宿法依口"
+    },
+    {
+      "sequence": 2,
+      "page": "右",
+      "literal": "説若有閏月時其正月直宿即亦重直閏月謂假令"
+    },
+    {
+      "sequence": 3,
+      "page": "右",
+      "literal": "十二月有閏月而其十二月一日直宿是虛宿十五"
+    },
+    {
+      "sequence": 4,
+      "page": "左",
+      "literal": "日直宿是星宿乃至三十日直宿是室宿如是閏十"
+    },
+    {
+      "sequence": 5,
+      "page": "左",
+      "literal": "二月直宿亦同之更無異也先月是正十二月閏月"
+    },
+    {
+      "sequence": 6,
+      "page": "左",
+      "literal": "是傍十二月也故傍月直宿三十日皆用正十二月"
+    },
+    {
+      "sequence": 7,
+      "page": "左",
+      "literal": "直宿更不異宿也餘月閏月準之知耳取小月闕第"
+    },
+    {
+      "sequence": 8,
+      "page": "左",
+      "literal": "三十日直宿之法假令正月小闕第三十日雖無其"
+    },
+    {
+      "sequence": 9,
+      "page": "左",
+      "literal": "第三十日而被日分直宿猶有故次二月初一日半"
+    },
+    {
+      "sequence": 10,
+      "page": "左",
+      "literal": "也上者正月闕日之分宿直也半〔己形〕下者即彼當日"
+    },
+    {
+      "sequence": 11,
+      "page": "左",
+      "literal": "宿直故雖大小異日有增減而小月闕日直宿無日"
+    },
+    {
+      "sequence": 12,
+      "page": "左",
+      "literal": "不得次月初一日直宿無〔改／放〕代也"
+    }
+  ],
+  "unresolved_calendar_readings": [
+    {
+      "id": "half-before-upper",
+      "legacy_selected": "也候选，未接纳定字",
+      "later_working": "也",
+      "accepted_literal": null,
+      "candidates": [
+        "也"
+      ],
+      "scope": "Visible working reading does not decide whether a scribal form should be interpreted as 已 or provide a clock boundary.",
+      "location_zh": "半与上者之间"
+    },
+    {
+      "id": "half-before-lower",
+      "legacy_selected": "己／已候选，未接纳定字",
+      "later_working": "己形",
+      "accepted_literal": null,
+      "candidates": [
+        "己",
+        "已"
+      ],
+      "scope": "No normalization by expected meaning.",
+      "location_zh": "半与下者之间"
+    },
+    {
+      "id": "preceding-day-pronoun",
+      "legacy_selected": "彼日分直宿",
+      "later_working": "被日分直宿",
+      "accepted_literal": null,
+      "candidates": [
+        "彼",
+        "被"
+      ],
+      "scope": "Legacy root fragment and later reviewer working reading coexist; no current unified reading selected.",
+      "location_zh": "前日代词"
+    },
+    {
+      "id": "closing-clause",
+      "legacy_selected": "次月初一日直宿無改代也",
+      "later_working": "無日不得次月初一日直宿無〔改／放〕代也",
+      "accepted_literal": null,
+      "candidates": [
+        "改",
+        "放形"
+      ],
+      "scope": "Keep full cross-column 無日 sequence; do not silently delete 日 or use prose fluency/calculated results to settle the disputed glyph.",
+      "location_zh": "历法末句"
+    }
+  ],
+  "native_colophon_followup": {
+    "canvas_one_based": 33,
+    "image_url": "https://kokusho.nijl.ac.jp/api/iiif/100223663/v4/XSE1/XSE1-25903/XSE1-25903-0032.tif/full/full/0/default.jpg",
+    "image_sha256": "90c8f76fcc64462f497be98e51b8ec9db05e8f1c483d447f667e8cab26627eb1",
+    "image_bytes": 919282,
+    "image_dimensions": [
+      6153,
+      4677
+    ],
+    "status": "native_image_acquired_and_selected_working_read",
+    "title_working": "檜尾口訣全",
+    "long_column_working": "明和七年十月法眼光恕拜寫訖同月十七日校合故識",
+    "separate_signature_working": "僧正光國",
+    "name_working": "光恕",
+    "name_independently_human_accepted": false,
+    "writing_day_given": false,
+    "collation_day_literal": "同月十七日",
+    "legacy_1800_preview_and_download_failures_retained": true,
+    "scope": "Image text self-report, not physical object dating, independent textual lineage or allocation of writer/collator roles."
+  },
+  "ritual_time_context": {
+    "canvases": [
+      8,
+      14
+    ],
+    "selected_literals": [
+      "眞言七遍",
+      "不動尊為主時以四種忿怒為伴耶",
+      "何故請時誦一金剛部百字耶"
+    ],
+    "scope": "Recitation counts, seals, invocation and ritual roles; selected context does not define a civil day boundary, modern clock or rule precedence."
+  },
+  "acceptance_flags": {
+    "independent_human_transcription_accepted": false,
+    "complete_manuscript_collation": false,
+    "physical_object_date_established": false,
+    "taisho_base_or_ko_identity_established": false,
+    "independent_textual_lineage_established": false,
+    "leap_short_month_priority_established": false,
+    "modern_clock_mapping_established": false,
+    "algorithm_override_applied": false
+  },
+  "reading_exposure": "Same authorized reviewer/provider/history/shared filesystem; earlier readings seen. Not strictly blind, independent human collation or a new manuscript witness.",
+  "scope": "Later evidence alongside immutable legacy first record. Calendar calculations, original half-day conditions and rule alternatives retain their prior meaning."
+}

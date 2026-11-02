@@ -1,0 +1,433 @@
+{
+  "call_guidance": {
+    "birth_clock": "numerology_evidence.birth_clock保存同次民用时刻、UTC瞬间、所选计算钟面、经度来源与是否使用。钟表时未给经度为null；太阳钟面不是新的物理瞬间。可用birth_clock视图读取。",
+    "body_relations": "judge.deTi按年柱纳音与先后天实际上下体、两互体分列五行关系，完整present=null。旧日干查卦位于judge.day_stem_mapping，不再称为得体。第51页generating_qi必须同时满足无元气且卦体生纳音；第87页双向相生另列，不能反向覆盖。金人、土人口径及完整得体、合理仍待核。",
+    "body_structure": "body_structure视图按逐阶段实际六爻返回渐卦段的八条结构记录，区分三爻倒序、上下互体、全卦倒序及抽第三爻移顶。八条含六个三爻体及两个六爻卦，不是八个互体；literal_case_match为false时只是明确算子推演，不能称该卦原例已核。五命干支字表不自动选柱或用年纳音替代。此层不替换deTi或后天换卦，不直接裁定葉否。",
+    "evidence": "按实际chart元堂读取numerology_evidence的轨迹、条文、来源和未决规则；judge.xie仅基础命中，不能选定葉者或不葉者分支。",
+    "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放zone；显式零点有效。真太阳时默认开启，须明确lon或gps_lon；GPS优先，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
+    "line_conditions": "judge.line_conditions逐先后天实际元堂计算二五位、众宗及主本阴元堂阳应爻有援式。source_youyuan分别给出同阶段实际应位、阴阳和clause_match；按主本阴爻读法，不以偶数爻位代替，别本阴位字面保留。yuanTang.youYing仅先天通用阴阳相异，反向相应不能称该原句命中；未中不推出无援、现实孤立或十体总评。位序偏好不是评分，dangWei仅旧位序阴阳别名；source_dangwei.match=null，阴月未定不以至点半年补定义。可用line_conditions视图读取。",
+    "month_affinity": "judge.deTime仅卦属月匹配；64卦总论目校含63项明确属月，无妄本月仍未确认。judge.month_affinity区分离散月份、跨年区间、季节、及时和失时；month_label_match仅月号，附加条件未决时即使月号未中也保持match=null。十三条原句的natal_najia_clause分别列月号和同一先／后天阶段出生年干支的正纳／借用位置；不可借另一阶段或deSheng合并布尔替代。及字连接范围与解卦例外未决，两项事实均不裁成整条吉凶。乾八月与颐九月边界为null；随正月相反条件同时保留，不选有利段覆盖。月界与完整得体仍待核。",
+    "najia": "judge.najia逐阶段列出实际六爻正纳、借用、出生年干支命中位置和source。basis=hexagram_entry表示该卦条目已核；pure_trigram_rule仅按已核纯卦内外位推演，不能说该复卦已逐爻原页核对。najia_collation区分8个纯卦48/12基础位置与13条卦解78/18观察；其余51卦未逐卦核，64卦384位置的软件比对不是384个原典命例。解卦source_issues保留两印本列举次序问题，不改计算爻序或以纳甲命中断完整得势。可用najia视图读取。",
+    "pillar_links": "pillar_links视图核numerology_evidence.pillar_links的实际年柱起月干、所用日柱起时干、原句起头与顺行步数。立春前不用公历年干，晚子及太阳钟跨日不用未换日日干替代。干序衔接匹配不证明原典月界、日界、历史钟制或全历法准确；原书个别形式算例含衔接冲突，不能据数算可复现当真实出生盘。",
+    "qi_phases": "judge.qi_phases分别给出先后天正反元气、化工的上下体／互体位置及得失；旧聚合字段仅为并集。反化工春分至夏至按所核两版本同时保留离、巽。土用约定、乙亥例乾化工冲突与气虚制化仍待核；命中不自动裁定葉否或现实吉凶。 yuanqi_opposition按出生年干支核对正反候选，再逐阶段计算无正而有反前提；正反同时出现不匹配该式。上下体／两互体为具名范围，direct_only_condition_match只作另一范围的比较；不能借另一阶段的元气补本阶段。rescue_match为null，节气浅深、气虚和尅制未定，不据此自动裁定反中有救或葉否。 solar_term.boundary_context按原民用年选共享节气窗口，保存当前节气、最近至点及下一四立的真实来源和绝对时刻，并与calendar_context核对。二数时令也用同一民用年上下文；相邻年求根不授权越界公开年份。TT参考与历史／未来UTC、原典日期桥接分开，不能因来源字段或数值分辨率就称全历法已验。",
+    "seasonal_numbers": "judge.seasonal_numbers分别给出正数比较、至弱太过、十一数式及六个时令窗口。重叠全部保留；numeric_band_match只判断绝对数段，得中为null未量化，不能把25/30或不在窗口推成综合吉凶。",
+    "source_clock": "岁运year_context绑定实际cycleYear与出生年柱，不能拿公历出生年或另一干支年替代。source_clock列卷一百刻式：寅申巳亥各九刻，其余八刻。时支循环原点及一刻七分的分制未由所核段确立；等长时辰假设推得18分一刻只是数式相合条件，不能选它凑原典符合。physical_clock_applied与calendar_mapping_complete均false；不可把源刻序换成当前出生钟面、实际日卦日期或预测应期。 六日进一支的branch_shift_projection保留八／九刻不等长，六十块总365源日是支初相对推演；不用选18分制，仍不解决日内添分、任意刻内转移或节月实日。 jiehou_evidence把节卦与候卦分开：按本次节气名选四正卦爻，现代节气间隔不用15／90日替代。原列72标签有爻名差异；连续爻序与首卦轮满六日两种具名模型分别对照原例及节候表，吻合程度不同而不暗选。原印、卦形、推演分别解释，selected_hou及huagong_assessment保持null，不推出实际日卦或吉凶。",
+    "text_collation": "乾坤屯蒙需讼师比小畜履六十条注文单次目校，commentary_sections按原文分段但applicability=null；旧文另存inherited_detail。不能借judge.xie选葉否或把歲運段用作本命断语；龍妾、掌無權、正即、無舊、女人為女人等本印本文字保留，初读撤回不计作继承错录。师六三commentary_cross_references仅核有条件引升三的单爻变，applicability=null且不改后天盘；比六二不混入全卦纳甲条件，该条件仍在month_affinity与najia。小畜九三未另印不葉者，实际三段与condition_labels_not_separately_printed不表示条件false；葉者段不等于吉类。小畜初引巽初与正式后天巽四同卦异爻，不能换爻辞；履上變為引兌不自动换卦。字兆和數凶者等嵌套条件未求值，不映射现代姓名或现实结果。诗歌不见于已核的这些爻解段落，来源待核，旧verdict摘要标签未获底本认证。标题与注文各有载入字节sha256和锁定该版文字／标签／元数据的content_sha256；JSON排版变化可以保留内容身份，但换正文或交换分支不得沿用已校身份。内容身份不证明读法、全书符合或预测有效。来源缺失／损坏是不可重试内部来源故障，不归咎用户出生参数。",
+    "timing": "heluo_timing按影印页规则给出流年、月卦与日卦定式；analysis_year为年标签，month_index/day_index为原典序号，不能当公历年月日或精确应期；不指定年时不自动取当前年。",
+    "validation": "原典部分核验、语料未全量校勘、现实预测未验证；周易参照不替代河洛注文。",
+    "yuantang": "用yuantang视图核对chart.yuantang_derivation的实际性别、时组、逐位序列、至点半年和换卦。counterfactuals仅比较阴阳令敏感性，实际选择以half_year.value为准；不能据反事实改算出生盘。half_year.value或heLi为null时不补成阴令或异类。公开日期工具按出生绝对瞬间确定半年，不用整个子月或午月猜。"
+  },
+  "evidence_views": {
+    "birth_clock": {
+      "fields": [
+        "input_normalized",
+        "analysis_context",
+        "four_pillars",
+        "numerology_evidence.birth_clock"
+      ],
+      "purpose": "核对实际民用／太阳钟面、经度来源及是否使用，不补默认出生地点。"
+    },
+    "body_relations": {
+      "fields": [
+        "four_pillars",
+        "judge.deTi",
+        "judge.deTi_policy",
+        "judge.day_stem_mapping",
+        "numerology_evidence.rulesets",
+        "numerology_evidence.unresolved_rules"
+      ],
+      "purpose": "核对年纳音、实际上下及互体的有向五行关系、无元气前提；完整得体未决，旧日干映射另列。"
+    },
+    "body_structure": {
+      "fields": [
+        "chart.xian",
+        "chart.hou",
+        "judge.body_structure",
+        "numerology_evidence.rule_trace",
+        "numerology_evidence.rulesets"
+      ],
+      "purpose": "核对渐卦原例的混合爻数结构、原爻位映射及逐阶段推演来源，避免把八条结构误当八个互体。"
+    },
+    "clock_basis": {
+      "description": "岁运年上下文与卷一百刻／寄时原式；计数可核对，物理钟面与日期桥接仍未完成。",
+      "fields": [
+        "heluo_timing.year_context",
+        "heluo_timing.source_clock",
+        "heluo_timing.calendar_policy",
+        "numerology_evidence.rule_trace",
+        "numerology_evidence.rulesets"
+      ]
+    },
+    "jiehou": {
+      "description": "已算节气标签的四正节卦、原候卦组和未解决的六日重建差异，不自动选实际候卦或化工。",
+      "fields": [
+        "jiehou_evidence",
+        "solar_term",
+        "numerology_evidence.rulesets",
+        "numerology_evidence.rule_trace"
+      ]
+    },
+    "line_conditions": {
+      "fields": [
+        "chart.xian",
+        "chart.hou",
+        "judge.line_conditions",
+        "judge.yuanTang",
+        "numerology_evidence.rule_trace",
+        "numerology_evidence.rulesets"
+      ],
+      "purpose": "按实际先后天元堂核二五位、众宗及主本阴元堂阳应爻有援式，保留同阶段应位和阴阳事实；不把通用相应、偶数爻位或未中原句合成十体总评。"
+    },
+    "month_affinity": {
+      "fields": [
+        "judge.deTime",
+        "judge.deTime_policy",
+        "judge.month_affinity",
+        "numerology_evidence.rulesets",
+        "numerology_evidence.unresolved_rules"
+      ],
+      "purpose": "区分卦属本月与原文另述跨月窗口，核对原页、边界月和完整判断尚未完成的范围。"
+    },
+    "najia": {
+      "fields": [
+        "four_pillars.year",
+        "judge.deSheng",
+        "judge.deSheng_policy",
+        "judge.najia",
+        "numerology_evidence.najia_collation"
+      ],
+      "purpose": "逐阶段核对年命正纳与借用的实际位置、直接原页或纯卦推演来源，以及未决列举次序。"
+    },
+    "natal": {
+      "fields": [
+        "input_normalized",
+        "four_pillars",
+        "chart",
+        "solar_term",
+        "judge",
+        "numerology_evidence"
+      ],
+      "purpose": "先后天卦、元堂、实际条文及计算和原典限制。"
+    },
+    "number_conditions": {
+      "fields": [
+        "chart.tian",
+        "chart.di",
+        "judge.seasonal_numbers",
+        "numerology_evidence.rulesets",
+        "numerology_evidence.unresolved_rules"
+      ],
+      "purpose": "核对原典十一数式、六个时令窗口及重叠；绝对数段与时令条件分开读取，不据此裁定综合葉否。"
+    },
+    "periods": {
+      "fields": [
+        "chart",
+        "dayun",
+        "heluo_timing.ruleset_id",
+        "heluo_timing.calendar_policy",
+        "heluo_timing.selected_annual",
+        "heluo_timing.selected_month",
+        "heluo_timing.selected_day",
+        "heluo_timing.selected_texts",
+        "numerology_evidence"
+      ],
+      "purpose": "指定年标签后的实际岁运卦爻与条文，保留日期桥接未决项；全量卦序仅在明确需要时展开。"
+    },
+    "pillar_links": {
+      "fields": [
+        "four_pillars",
+        "numerology_evidence.pillar_links",
+        "numerology_evidence.birth_clock",
+        "numerology_evidence.rule_trace",
+        "numerology_evidence.rulesets"
+      ],
+      "purpose": "核对实际四柱的起月起时原句、基准干与顺行支序；保留历法边界验收范围。"
+    },
+    "qi_phases": {
+      "description": "按先后天与实际卦体读取正反元气、化工及得失，保留重叠与未决条件。",
+      "fields": [
+        "chart.xian",
+        "chart.hou",
+        "judge.qi_phases",
+        "solar_term",
+        "numerology_evidence.rule_trace"
+      ]
+    },
+    "selected_texts": {
+      "fields": [
+        "input_normalized",
+        "numerology_evidence.birth_clock",
+        "chart.xian",
+        "chart.hou",
+        "numerology_evidence.selected_texts",
+        "numerology_evidence.yaoci_collation",
+        "numerology_evidence.commentary_collation",
+        "numerology_evidence.poem_collation",
+        "numerology_evidence.interpretation_constraints",
+        "numerology_evidence.rule_trace"
+      ],
+      "purpose": "读取本次实际先后天元堂的底本注文、条件段落、异文与独立来源状态；不自动裁定葉否。 同时保留本次归一输入与实际计算钟面，供核验所用资料。 卷三诗诀另列底本、爻组与首数；象曰不借诗诀认证，多首诗按原次序全列。"
+    },
+    "yuantang": {
+      "fields": [
+        "four_pillars",
+        "chart.gender",
+        "chart.xian",
+        "chart.hou",
+        "chart.yangLing",
+        "chart.yangLingBasis",
+        "chart.yuantang_derivation",
+        "judge.yuanTang",
+        "numerology_evidence.rulesets",
+        "numerology_evidence.rule_trace",
+        "numerology_evidence.unresolved_rules"
+      ],
+      "purpose": "核对实际元堂配时、阴阳令来源、两半年的敏感性及后天换卦；反事实不是两个出生盘或现实预测。"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "input_normalized",
+      "four_pillars",
+      "chart",
+      "solar_term",
+      "judge",
+      "numerology_evidence"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "analysis_year": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "可选：选择干支年对应的公历年标签，如2028；不是公历整年或精确年界区间，不填时不自动选当前年"
+      },
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "birth_utc_offset": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional confirmed birth UTC offset ±HH:MM[:SS]. With an IANA zone, verifies or selects the occurrence of a repeated birth clock while retaining regional rules for later boundaries. Never infer an unknown offset; cannot make a nonexistent local time valid or replace birth-record precision."
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "date": {
+        "description": "Birth date YYYY-MM-DD in the proleptic Gregorian calendar, including before 1582; no automatic Julian/Gregorian cutover or historical lunar/era conversion. Historical source dates require a separately evidenced conversion.",
+        "type": "string"
+      },
+      "day_index": {
+        "anyOf": [
+          {
+            "maximum": 30,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "原典三十日定式序号1..30，须传month_index；不是公历或农历生日，不提供精确应期"
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "gender": {
+        "description": "性别 男/女 — 影响起命相盪与元堂推导。接受 男/女、male/female 等写法；必须明确提供，不默认性别。",
+        "type": "string"
+      },
+      "gps_lat": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "GPS latitude"
+      },
+      "gps_lon": {
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Explicit numeric GPS longitude; preferred over lon; zero is valid"
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "lat": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Latitude text or decimal (optional)"
+      },
+      "lon": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Longitude text or decimal; required when true solar time is on"
+      },
+      "month_assignment_method": {
+        "default": "intro_preferred_v1",
+        "description": "卦属月原文位置：intro_preferred_v1默认优先卦条63项，无妄缺号采用卷首8月；volume_one_table_v1采用卷首64项。晋、节、睽、震、井有底本内异号，输出保留双方；只影响卦月匹配，不解决月界或综合得时。",
+        "enum": [
+          "intro_preferred_v1",
+          "volume_one_table_v1"
+        ],
+        "type": "string"
+      },
+      "month_index": {
+        "anyOf": [
+          {
+            "maximum": 12,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "原典月卦序号1..12，须传analysis_year；不是公历月份，未确定实际日期映射"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "time": {
+        "description": "Known birth local time HH:MM[:SS[.ffffff]], up to six fractional digits; required, blank is not midnight; timezone goes in zone. Supplied components are retained separately from zero calculation defaults. Textual digits do not certify birth-record precision or imply an uncertainty interval.",
+        "type": "string"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "use_true_solar_time": {
+        "default": true,
+        "description": "Apply true solar time correction (needs lon); default on — 数算 derives from the BaZi pillars",
+        "type": "boolean"
+      },
+      "zone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "+08:00",
+        "description": "IANA zone or UTC offset; omitted/null means fixed +08:00, not historical Asia/Shanghai. Blank/invalid zones and nonexistent clocks are rejected. Repeated clocks require a confirmed birth_utc_offset; the IANA zone remains in use for later boundaries."
+      }
+    },
+    "required": [
+      "date",
+      "time",
+      "gender"
+    ],
+    "type": "object"
+  },
+  "tool": "heluo"
+}

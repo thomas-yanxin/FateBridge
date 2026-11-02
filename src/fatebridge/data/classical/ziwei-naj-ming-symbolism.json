@@ -1,0 +1,753 @@
+{
+  "id": "naj_ming_symbolic_definitions_v1",
+  "version": "1.0.0",
+  "title": "新鋟希夷陳先生紫微斗数全書",
+  "source_url": "https://www.digital.archives.go.jp/item/4468520",
+  "catalog_url": "https://www.digital.archives.go.jp/file/1078787",
+  "printed_volume": "三",
+  "section": "論諸星分屬南北斗化吉凶并分屬五行",
+  "manual_reader_count": 1,
+  "clauses": [
+    {
+      "id": "ziwei",
+      "frame": 82,
+      "quote": "紫微為土中天星南北斗化帝座為官祿主",
+      "elements": [
+        "土"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "紫微"
+        }
+      ]
+    },
+    {
+      "id": "tianji",
+      "frame": 82,
+      "quote": "天機屬木南斗化善為兄弟主",
+      "elements": [
+        "木"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "天机"
+        }
+      ]
+    },
+    {
+      "id": "lucun",
+      "frame": 82,
+      "quote": "祿存屬土北斗司爵貴壽星",
+      "elements": [
+        "土"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "禄存"
+        }
+      ]
+    },
+    {
+      "id": "taiyang",
+      "frame": 82,
+      "quote": "太陽屬火南北斗化貴為官祿主",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "太阳"
+        }
+      ]
+    },
+    {
+      "id": "tiantong",
+      "frame": 82,
+      "quote": "天同屬水金南斗化福為福德主",
+      "elements": [
+        "水",
+        "金"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "天同"
+        }
+      ]
+    },
+    {
+      "id": "lianzhen",
+      "frame": 82,
+      "quote": "廉貞屬火北斗化殺囚在官祿為官祿主在身命為次桃花",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "廉贞"
+        }
+      ]
+    },
+    {
+      "id": "wuqu",
+      "frame": 83,
+      "quote": "武曲為金北斗化財為財帛主",
+      "elements": [
+        "金"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "武曲"
+        }
+      ]
+    },
+    {
+      "id": "tianfu",
+      "frame": 83,
+      "quote": "天府屬土南斗化令星為財帛田宅主",
+      "elements": [
+        "土"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "天府"
+        }
+      ]
+    },
+    {
+      "id": "taiyin",
+      "frame": 83,
+      "quote": "太陰屬水南北斗化富為財帛田宅主",
+      "elements": [
+        "水"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "太阴"
+        }
+      ]
+    },
+    {
+      "id": "tanlang",
+      "frame": 83,
+      "quote": "貪狼屬水木北斗化桃花殺主禍福",
+      "elements": [
+        "水",
+        "木"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "贪狼"
+        }
+      ]
+    },
+    {
+      "id": "jumen",
+      "frame": 83,
+      "quote": "巨門屬水北斗化暗主是非",
+      "elements": [
+        "水"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "巨门"
+        }
+      ]
+    },
+    {
+      "id": "tianxiang",
+      "frame": 83,
+      "quote": "天相屬水南斗化印為官祿主",
+      "elements": [
+        "水"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "天相"
+        }
+      ]
+    },
+    {
+      "id": "tianliang",
+      "frame": 83,
+      "quote": "天梁屬土南斗化陰主壽星",
+      "elements": [
+        "土"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "天梁"
+        }
+      ],
+      "glyph_note": "原字陰保留，不默改成轉錄的蔭或荫"
+    },
+    {
+      "id": "qisha",
+      "frame": 83,
+      "quote": "七殺屬火金南斗將星遇帝為權",
+      "elements": [
+        "火",
+        "金"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "七杀"
+        }
+      ],
+      "glyph_note": "原字將不同於線上轉錄降"
+    },
+    {
+      "id": "pojun",
+      "frame": 83,
+      "quote": "破軍屬水北斗化耗司夫妻子女奴僕",
+      "elements": [
+        "水"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "破军"
+        }
+      ]
+    },
+    {
+      "id": "wenchang",
+      "frame": 83,
+      "quote": "文昌屬金南北斗司科甲乃文魁之宿",
+      "elements": [
+        "金"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "文昌"
+        }
+      ],
+      "glyph_note": "原字宿不同於線上轉錄首"
+    },
+    {
+      "id": "wenqu",
+      "frame": 83,
+      "quote": "文曲屬水北斗主科甲星",
+      "elements": [
+        "水"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "文曲"
+        }
+      ]
+    },
+    {
+      "id": "fubi",
+      "frame": 83,
+      "quote": "輔弼二星屬土南北斗善佐帝令星",
+      "elements": [
+        "土"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "左辅"
+        },
+        {
+          "kind": "natal_star",
+          "name": "右弼"
+        }
+      ]
+    },
+    {
+      "id": "kuiyue",
+      "frame": 83,
+      "quote": "魁鉞二星屬火",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "天魁"
+        },
+        {
+          "kind": "natal_star",
+          "name": "天钺"
+        }
+      ]
+    },
+    {
+      "id": "tianma",
+      "frame": 83,
+      "quote": "天馬屬火",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "天马"
+        }
+      ]
+    },
+    {
+      "id": "qingyang",
+      "frame": 83,
+      "quote": "擎羊屬金北斗浮星化刑",
+      "elements": [
+        "金"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "擎羊"
+        }
+      ]
+    },
+    {
+      "id": "tuoluo",
+      "frame": 83,
+      "quote": "陀羅屬金北斗助星化忌",
+      "elements": [
+        "金"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "陀罗"
+        }
+      ]
+    },
+    {
+      "id": "huoxing",
+      "frame": 83,
+      "quote": "火星屬火南斗助星",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "火星"
+        }
+      ]
+    },
+    {
+      "id": "lingxing",
+      "frame": 83,
+      "quote": "鈴星屬火南斗助星",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "铃星"
+        }
+      ]
+    },
+    {
+      "id": "kongjie",
+      "frame": 83,
+      "quote": "天空地劫屬火",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "地空"
+        },
+        {
+          "kind": "natal_star",
+          "name": "地劫"
+        }
+      ],
+      "source_names": [
+        "天空",
+        "地劫"
+      ],
+      "name_mapping": "本段天空對應本系統地空；不對應軟體另列的年支天空"
+    },
+    {
+      "id": "shangshi",
+      "frame": 83,
+      "quote": "天傷天使屬水",
+      "elements": [
+        "水"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "天伤"
+        },
+        {
+          "kind": "natal_star",
+          "name": "天使"
+        }
+      ]
+    },
+    {
+      "id": "hualu",
+      "frame": 83,
+      "quote": "化祿屬土喜見祿存",
+      "elements": [
+        "土"
+      ],
+      "entities": [
+        {
+          "kind": "natal_transformation",
+          "name": "化禄"
+        }
+      ]
+    },
+    {
+      "id": "huaquan",
+      "frame": 83,
+      "quote": "化權屬木喜會巨門武曲",
+      "elements": [
+        "木"
+      ],
+      "entities": [
+        {
+          "kind": "natal_transformation",
+          "name": "化权"
+        }
+      ]
+    },
+    {
+      "id": "huake",
+      "frame": 84,
+      "quote": "化科屬水喜會魁鉞",
+      "elements": [
+        "水"
+      ],
+      "entities": [
+        {
+          "kind": "natal_transformation",
+          "name": "化科"
+        }
+      ]
+    },
+    {
+      "id": "huaji",
+      "frame": 84,
+      "quote": "化忌屬水即計都星",
+      "elements": [
+        "水"
+      ],
+      "entities": [
+        {
+          "kind": "natal_transformation",
+          "name": "化忌"
+        }
+      ],
+      "identity_note": "歷史象義原句，不將本命化忌改成另一天體或其他術數的計都計算"
+    },
+    {
+      "id": "luanxi",
+      "frame": 84,
+      "quote": "紅鸞天喜屬水",
+      "elements": [
+        "水"
+      ],
+      "entities": [
+        {
+          "kind": "natal_star",
+          "name": "红鸾"
+        },
+        {
+          "kind": "natal_star",
+          "name": "天喜"
+        }
+      ]
+    },
+    {
+      "id": "suijun",
+      "frame": 84,
+      "quote": "歲君屬火",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "unassigned_source_label",
+          "name": "歲君"
+        }
+      ]
+    },
+    {
+      "id": "boshi",
+      "frame": 84,
+      "quote": "博士屬木主聰明",
+      "elements": [
+        "木"
+      ],
+      "entities": [
+        {
+          "kind": "boshi_cycle_label",
+          "name": "博士"
+        }
+      ]
+    },
+    {
+      "id": "lishi",
+      "frame": 84,
+      "quote": "力士屬火主權勢",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "boshi_cycle_label",
+          "name": "力士"
+        }
+      ]
+    },
+    {
+      "id": "qinglong",
+      "frame": 84,
+      "quote": "青龍屬水主喜氣",
+      "elements": [
+        "水"
+      ],
+      "entities": [
+        {
+          "kind": "boshi_cycle_label",
+          "name": "青龙"
+        }
+      ]
+    },
+    {
+      "id": "haos",
+      "frame": 84,
+      "quote": "大小耗屬火小耗錢財大耗退祖",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "boshi_cycle_label",
+          "name": "小耗"
+        },
+        {
+          "kind": "boshi_cycle_label",
+          "name": "大耗"
+        }
+      ]
+    },
+    {
+      "id": "jiangjun",
+      "frame": 84,
+      "quote": "將軍屬木主威猛",
+      "elements": [
+        "木"
+      ],
+      "entities": [
+        {
+          "kind": "boshi_cycle_label",
+          "name": "将军"
+        }
+      ],
+      "quote_scope": "legible_prefix",
+      "unresolved_tail_candidates": [
+        "入和",
+        "人和"
+      ],
+      "unresolved_tail_note": "後兩字及其語義未裁定；不從字面候選推論現實性格"
+    },
+    {
+      "id": "zoushu",
+      "frame": 84,
+      "quote": "奏書屬金主福祿",
+      "elements": [
+        "金"
+      ],
+      "entities": [
+        {
+          "kind": "boshi_cycle_label",
+          "name": "奏书"
+        }
+      ]
+    },
+    {
+      "id": "feilian",
+      "frame": 84,
+      "quote": "飛廉屬火主孤",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "boshi_cycle_label",
+          "name": "飞廉"
+        }
+      ],
+      "name_mapping": "僅博士循環飛廉，不映射年支星蜚廉"
+    },
+    {
+      "id": "xishen",
+      "frame": 84,
+      "quote": "喜神屬火主喜氣",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "boshi_cycle_label",
+          "name": "喜神"
+        }
+      ]
+    },
+    {
+      "id": "fubing",
+      "frame": 84,
+      "quote": "伏兵屬火主口舌",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "boshi_cycle_label",
+          "name": "伏兵"
+        }
+      ]
+    },
+    {
+      "id": "bingfu",
+      "frame": 84,
+      "quote": "病符主病",
+      "elements": [],
+      "entities": [
+        {
+          "kind": "boshi_cycle_label",
+          "name": "病符"
+        }
+      ],
+      "element_status": "not_stated_in_visible_line"
+    },
+    {
+      "id": "guanfu",
+      "frame": 84,
+      "quote": "官府主官符",
+      "elements": [],
+      "entities": [
+        {
+          "kind": "boshi_cycle_label",
+          "name": "官府"
+        }
+      ],
+      "element_status": "not_stated_in_visible_line",
+      "name_mapping": "不把下文官符火的五行自行補入本條官府"
+    },
+    {
+      "id": "sangmen",
+      "frame": 84,
+      "quote": "喪門木",
+      "elements": [
+        "木"
+      ],
+      "entities": [
+        {
+          "kind": "unassigned_source_label",
+          "name": "丧门"
+        }
+      ]
+    },
+    {
+      "id": "diaoke",
+      "frame": 84,
+      "quote": "吊客火",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "unassigned_source_label",
+          "name": "吊客"
+        }
+      ]
+    },
+    {
+      "id": "baihu",
+      "frame": 84,
+      "quote": "白虎金",
+      "elements": [
+        "金"
+      ],
+      "entities": [
+        {
+          "kind": "unassigned_source_label",
+          "name": "白虎"
+        }
+      ]
+    },
+    {
+      "id": "guanfusymbol",
+      "frame": 84,
+      "quote": "官符火",
+      "elements": [
+        "火"
+      ],
+      "entities": [
+        {
+          "kind": "unassigned_source_label",
+          "name": "官符"
+        }
+      ]
+    }
+  ],
+  "orthography": "Only whitespace and line wrapping removed from quotes; printed 陰/將/宿 retained. Modern names are explicit calculation joins, not replacement of source glyphs.",
+  "positive_star_count_note": {
+    "printed_quote": "已上自紫微至輔弼一十八星俱南北斗正曜",
+    "printed_count": 18,
+    "enumerated_modern_star_names": 19,
+    "status": "count_not_reconciled_do_not_change_classification_to_force_agreement"
+  },
+  "conditional_reading": {
+    "lianzhen_career": "Actual natal 官禄宫 is the explicit 在官祿 premise",
+    "lianzhen_mingshen": "Selected inclusive reading: at Ming or at Shen; both factual flags are shown; no unique historical adjudication claimed",
+    "qisha": "遇帝 does not specify encounter geometry here; report actual 紫微/七杀 geometry and leave condition_match null"
+  },
+  "scope": "Definitions from the visible three-page section with one unresolved tail; joins are source-conditioned textual references, not real-world traits or new 四化 assignments",
+  "full_section_transcription_certified": false,
+  "whole_book_acceptance_passed": false,
+  "image_conditions_url": "https://www.digital.archives.go.jp/secondary-use",
+  "unresolved_relational_definitions": [
+    {
+      "definition_id": "hualu",
+      "source_phrase": "喜見祿存",
+      "condition_match": null,
+      "status": "source_does_not_define_a_unique_placement_or_encounter_test_here"
+    },
+    {
+      "definition_id": "huaquan",
+      "source_phrase": "喜會巨門武曲",
+      "condition_match": null,
+      "status": "source_does_not_define_a_unique_placement_or_encounter_test_here"
+    },
+    {
+      "definition_id": "huake",
+      "source_phrase": "喜會魁鉞",
+      "condition_match": null,
+      "status": "source_does_not_define_a_unique_placement_or_encounter_test_here"
+    }
+  ],
+  "source_frames": [
+    82,
+    83,
+    84
+  ]
+}

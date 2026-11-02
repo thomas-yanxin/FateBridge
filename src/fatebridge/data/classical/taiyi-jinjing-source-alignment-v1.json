@@ -1,0 +1,6913 @@
+{
+  "author": "FateBridge contributors",
+  "classical_author": "王希明编录，四库本卷二/卷三",
+  "count_rule_source": "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷02#推太乙運式法",
+  "facsimile_collation_manifest_sha256": "62a40d4517386efea5557598b081aab1e99a1db1d8b58895ae8901ab8a54eced",
+  "facsimile_correction_manifest_sha256": "fe5acfabb611c2b65563315c431a20b9c929380243a16882ba1f575976b2b778",
+  "facsimile_source": "https://commons.wikimedia.org/wiki/File:CADAL06056494_太乙金鏡式經·卷一~卷四.djvu",
+  "id": "jinjing_core_table_alignment_v1",
+  "rows": [
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3,
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 106
+      },
+      "id": "yang-01",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大武",
+        "wenchang_literal": "武徳"
+      },
+      "ju": 1,
+      "positions": {
+        "jishen": "寅",
+        "shiji": "坤",
+        "taiyi_number": 1,
+        "wenchang_palace": "申"
+      },
+      "selected_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大武",
+        "wenchang_literal": "武徳"
+      },
+      "table_counts": {
+        "guest_count": 13,
+        "main_count": 7
+      },
+      "transcription_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大武",
+        "wenchang_literal": "武徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 106
+      },
+      "id": "yang-02",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "太蔟"
+      },
+      "ju": 2,
+      "positions": {
+        "jishen": "丑",
+        "shiji": "戌",
+        "taiyi_number": 1,
+        "wenchang_palace": "酉"
+      },
+      "selected_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "太蔟"
+      },
+      "table_counts": {
+        "guest_count": 1,
+        "main_count": 6
+      },
+      "transcription_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "太蔟"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 106
+      },
+      "id": "yang-03",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大義",
+        "wenchang_literal": "隂主"
+      },
+      "ju": 3,
+      "positions": {
+        "jishen": "子",
+        "shiji": "亥",
+        "taiyi_number": 1,
+        "wenchang_palace": "戌"
+      },
+      "selected_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大義",
+        "wenchang_literal": "隂主"
+      },
+      "table_counts": {
+        "guest_count": 40,
+        "main_count": 1
+      },
+      "transcription_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大義",
+        "wenchang_literal": "隂主"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 106
+      },
+      "id": "yang-04",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "隂徳"
+      },
+      "ju": 4,
+      "positions": {
+        "jishen": "亥",
+        "shiji": "丑",
+        "taiyi_number": 2,
+        "wenchang_palace": "乾"
+      },
+      "selected_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "隂徳"
+      },
+      "table_counts": {
+        "guest_count": 17,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "隂徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 106
+      },
+      "id": "yang-05",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "隂徳"
+      },
+      "ju": 5,
+      "positions": {
+        "jishen": "戌",
+        "shiji": "寅",
+        "taiyi_number": 2,
+        "wenchang_palace": "乾"
+      },
+      "selected_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "隂徳"
+      },
+      "table_counts": {
+        "guest_count": 14,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "隂徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 107
+      },
+      "id": "yang-06",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大義"
+      },
+      "ju": 6,
+      "positions": {
+        "jishen": "酉",
+        "shiji": "辰",
+        "taiyi_number": 2,
+        "wenchang_palace": "亥"
+      },
+      "selected_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大義"
+      },
+      "table_counts": {
+        "guest_count": 10,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大義"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 107
+      },
+      "id": "yang-07",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大神",
+        "wenchang_literal": "地主"
+      },
+      "ju": 7,
+      "positions": {
+        "jishen": "申",
+        "shiji": "巳",
+        "taiyi_number": 3,
+        "wenchang_palace": "子"
+      },
+      "selected_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大神",
+        "wenchang_literal": "地主"
+      },
+      "table_counts": {
+        "guest_count": 25,
+        "main_count": 8
+      },
+      "transcription_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大神",
+        "wenchang_literal": "地主"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 107
+      },
+      "id": "yang-08",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "大武",
+        "wenchang_literal": "陽徳"
+      },
+      "ju": 8,
+      "positions": {
+        "jishen": "未",
+        "shiji": "坤",
+        "taiyi_number": 3,
+        "wenchang_palace": "丑"
+      },
+      "selected_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "大武",
+        "wenchang_literal": "陽徳"
+      },
+      "table_counts": {
+        "guest_count": 22,
+        "main_count": 1
+      },
+      "transcription_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "大武",
+        "wenchang_literal": "陽徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 107
+      },
+      "id": "yang-09",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "和徳"
+      },
+      "ju": 9,
+      "positions": {
+        "jishen": "午",
+        "shiji": "酉",
+        "taiyi_number": 3,
+        "wenchang_palace": "艮"
+      },
+      "selected_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "和徳"
+      },
+      "table_counts": {
+        "guest_count": 15,
+        "main_count": 3
+      },
+      "transcription_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "和徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 107
+      },
+      "id": "yang-10",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "隂徳",
+        "wenchang_literal": "吕申"
+      },
+      "ju": 10,
+      "positions": {
+        "jishen": "巳",
+        "shiji": "乾",
+        "taiyi_number": 4,
+        "wenchang_palace": "寅"
+      },
+      "selected_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "隂徳",
+        "wenchang_literal": "吕申"
+      },
+      "table_counts": {
+        "guest_count": 12,
+        "main_count": 1
+      },
+      "transcription_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "隂徳",
+        "wenchang_literal": "吕申"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 107
+      },
+      "id": "yang-11",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "髙叢"
+      },
+      "ju": 11,
+      "positions": {
+        "jishen": "辰",
+        "shiji": "丑",
+        "taiyi_number": 4,
+        "wenchang_palace": "卯"
+      },
+      "selected_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "髙叢"
+      },
+      "table_counts": {
+        "guest_count": 4,
+        "main_count": 4
+      },
+      "transcription_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "髙叢"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 107
+      },
+      "id": "yang-12",
+      "initial_manual_literal_differences": {
+        "jishen_literal": {
+          "frozen_transcription": "夘",
+          "initial_manual": "卯"
+        }
+      },
+      "initial_manual_literals": {
+        "jishen_literal": "卯",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "太陽"
+      },
+      "ju": 12,
+      "positions": {
+        "jishen": "卯",
+        "shiji": "寅",
+        "taiyi_number": 4,
+        "wenchang_palace": "辰"
+      },
+      "selected_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "太陽"
+      },
+      "table_counts": {
+        "guest_count": 1,
+        "main_count": 37
+      },
+      "transcription_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "太陽"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 107
+      },
+      "id": "yang-13",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大炅"
+      },
+      "ju": 13,
+      "positions": {
+        "jishen": "寅",
+        "shiji": "辰",
+        "taiyi_number": 6,
+        "wenchang_palace": "巽"
+      },
+      "selected_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大炅"
+      },
+      "table_counts": {
+        "guest_count": 19,
+        "main_count": 18
+      },
+      "transcription_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大炅"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 108
+      },
+      "id": "yang-14",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大神"
+      },
+      "ju": 14,
+      "positions": {
+        "jishen": "丑",
+        "shiji": "午",
+        "taiyi_number": 6,
+        "wenchang_palace": "巳"
+      },
+      "selected_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大神"
+      },
+      "table_counts": {
+        "guest_count": 9,
+        "main_count": 10
+      },
+      "transcription_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大神"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 108
+      },
+      "id": "yang-15",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大武",
+        "wenchang_literal": "大威"
+      },
+      "ju": 15,
+      "positions": {
+        "jishen": "子",
+        "shiji": "坤",
+        "taiyi_number": 6,
+        "wenchang_palace": "午"
+      },
+      "selected_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大武",
+        "wenchang_literal": "大威"
+      },
+      "table_counts": {
+        "guest_count": 7,
+        "main_count": 9
+      },
+      "transcription_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大武",
+        "wenchang_literal": "大威"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 108
+      },
+      "id": "yang-16",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "天道"
+      },
+      "ju": 16,
+      "positions": {
+        "jishen": "亥",
+        "shiji": "酉",
+        "taiyi_number": 7,
+        "wenchang_palace": "未"
+      },
+      "selected_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "天道"
+      },
+      "table_counts": {
+        "guest_count": 33,
+        "main_count": 1
+      },
+      "transcription_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "天道"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 108
+      },
+      "id": "yang-17",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "大義",
+        "wenchang_literal": "大武"
+      },
+      "ju": 17,
+      "positions": {
+        "jishen": "戌",
+        "shiji": "亥",
+        "taiyi_number": 7,
+        "wenchang_palace": "坤"
+      },
+      "selected_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "大義",
+        "wenchang_literal": "大武"
+      },
+      "table_counts": {
+        "guest_count": 27,
+        "main_count": 7
+      },
+      "transcription_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "大義",
+        "wenchang_literal": "大武"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 108
+      },
+      "id": "yang-18",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大武"
+      },
+      "ju": 18,
+      "positions": {
+        "jishen": "酉",
+        "shiji": "子",
+        "taiyi_number": 7,
+        "wenchang_palace": "坤"
+      },
+      "selected_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大武"
+      },
+      "table_counts": {
+        "guest_count": 26,
+        "main_count": 7
+      },
+      "transcription_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大武"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 108
+      },
+      "id": "yang-19",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "武徳"
+      },
+      "ju": 19,
+      "positions": {
+        "jishen": "申",
+        "shiji": "艮",
+        "taiyi_number": 8,
+        "wenchang_palace": "申"
+      },
+      "selected_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "武徳"
+      },
+      "table_counts": {
+        "guest_count": 32,
+        "main_count": 8
+      },
+      "transcription_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "武徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 108
+      },
+      "id": "yang-20",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "太蔟"
+      },
+      "ju": 20,
+      "positions": {
+        "jishen": "未",
+        "shiji": "辰",
+        "taiyi_number": 8,
+        "wenchang_palace": "酉"
+      },
+      "selected_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "太蔟"
+      },
+      "table_counts": {
+        "guest_count": 26,
+        "main_count": 7
+      },
+      "transcription_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "太蔟"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 108
+      },
+      "id": "yang-21",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大神",
+        "wenchang_literal": "隂主"
+      },
+      "ju": 21,
+      "positions": {
+        "jishen": "午",
+        "shiji": "巳",
+        "taiyi_number": 8,
+        "wenchang_palace": "戌"
+      },
+      "selected_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大神",
+        "wenchang_literal": "隂主"
+      },
+      "table_counts": {
+        "guest_count": 17,
+        "main_count": 2
+      },
+      "transcription_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大神",
+        "wenchang_literal": "隂主"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 109
+      },
+      "id": "yang-22",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "天道",
+        "wenchang_literal": "隂徳"
+      },
+      "ju": 22,
+      "positions": {
+        "jishen": "巳",
+        "shiji": "未",
+        "taiyi_number": 9,
+        "wenchang_palace": "乾"
+      },
+      "selected_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "天道",
+        "wenchang_literal": "隂徳"
+      },
+      "table_counts": {
+        "guest_count": 30,
+        "main_count": 16
+      },
+      "transcription_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "天道",
+        "wenchang_literal": "隂徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 109
+      },
+      "id": "yang-23",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "隂徳"
+      },
+      "ju": 23,
+      "positions": {
+        "jishen": "辰",
+        "shiji": "申",
+        "taiyi_number": 9,
+        "wenchang_palace": "乾"
+      },
+      "selected_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "隂徳"
+      },
+      "table_counts": {
+        "guest_count": 23,
+        "main_count": 16
+      },
+      "transcription_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "隂徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 109
+      },
+      "id": "yang-24",
+      "initial_manual_literal_differences": {
+        "jishen_literal": {
+          "frozen_transcription": "夘",
+          "initial_manual": "卯"
+        }
+      },
+      "initial_manual_literals": {
+        "jishen_literal": "卯",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大義"
+      },
+      "ju": 24,
+      "positions": {
+        "jishen": "卯",
+        "shiji": "戌",
+        "taiyi_number": 9,
+        "wenchang_palace": "亥"
+      },
+      "selected_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大義"
+      },
+      "table_counts": {
+        "guest_count": 17,
+        "main_count": 16
+      },
+      "transcription_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大義"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 109
+      },
+      "id": "yang-25",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大義",
+        "wenchang_literal": "地主"
+      },
+      "ju": 25,
+      "positions": {
+        "jishen": "寅",
+        "shiji": "亥",
+        "taiyi_number": 1,
+        "wenchang_palace": "子"
+      },
+      "selected_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大義",
+        "wenchang_literal": "地主"
+      },
+      "table_counts": {
+        "guest_count": 40,
+        "main_count": 39
+      },
+      "transcription_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大義",
+        "wenchang_literal": "地主"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 109
+      },
+      "id": "yang-26",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "陽徳"
+      },
+      "ju": 26,
+      "positions": {
+        "jishen": "丑",
+        "shiji": "艮",
+        "taiyi_number": 1,
+        "wenchang_palace": "丑"
+      },
+      "selected_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "陽徳"
+      },
+      "table_counts": {
+        "guest_count": 31,
+        "main_count": 32
+      },
+      "transcription_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "陽徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 109
+      },
+      "id": "yang-27",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "和徳"
+      },
+      "ju": 27,
+      "positions": {
+        "jishen": "子",
+        "shiji": "卯",
+        "taiyi_number": 1,
+        "wenchang_palace": "艮"
+      },
+      "selected_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "和徳"
+      },
+      "table_counts": {
+        "guest_count": 28,
+        "main_count": 31
+      },
+      "transcription_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "和徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 109
+      },
+      "id": "yang-28",
+      "initial_manual_literal_differences": {
+        "wenchang_literal": {
+          "frozen_transcription": "呂申",
+          "initial_manual": "吕申"
+        }
+      },
+      "initial_manual_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "大炅",
+        "wenchang_literal": "吕申"
+      },
+      "ju": 28,
+      "positions": {
+        "jishen": "亥",
+        "shiji": "巽",
+        "taiyi_number": 2,
+        "wenchang_palace": "寅"
+      },
+      "selected_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "大炅",
+        "wenchang_literal": "呂申"
+      },
+      "table_counts": {
+        "guest_count": 9,
+        "main_count": 14
+      },
+      "transcription_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "大炅",
+        "wenchang_literal": "呂申"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 109
+      },
+      "id": "yang-29",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "天道",
+        "wenchang_literal": "髙叢"
+      },
+      "ju": 29,
+      "positions": {
+        "jishen": "戌",
+        "shiji": "未",
+        "taiyi_number": 2,
+        "wenchang_palace": "卯"
+      },
+      "selected_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "天道",
+        "wenchang_literal": "髙叢"
+      },
+      "table_counts": {
+        "guest_count": 39,
+        "main_count": 13
+      },
+      "transcription_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "天道",
+        "wenchang_literal": "髙叢"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 110
+      },
+      "id": "yang-30",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "太陽"
+      },
+      "ju": 30,
+      "positions": {
+        "jishen": "酉",
+        "shiji": "申",
+        "taiyi_number": 2,
+        "wenchang_palace": "辰"
+      },
+      "selected_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "太陽"
+      },
+      "table_counts": {
+        "guest_count": 32,
+        "main_count": 10
+      },
+      "transcription_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "太陽"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 110
+      },
+      "id": "yang-31",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大炅"
+      },
+      "ju": 31,
+      "positions": {
+        "jishen": "申",
+        "shiji": "戌",
+        "taiyi_number": 3,
+        "wenchang_palace": "巽"
+      },
+      "selected_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大炅"
+      },
+      "table_counts": {
+        "guest_count": 10,
+        "main_count": 33
+      },
+      "transcription_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大炅"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 110
+      },
+      "id": "yang-32",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大神"
+      },
+      "ju": 32,
+      "positions": {
+        "jishen": "未",
+        "shiji": "子",
+        "taiyi_number": 3,
+        "wenchang_palace": "巳"
+      },
+      "selected_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大神"
+      },
+      "table_counts": {
+        "guest_count": 8,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大神"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 110
+      },
+      "id": "yang-33",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "大威"
+      },
+      "ju": 33,
+      "positions": {
+        "jishen": "午",
+        "shiji": "艮",
+        "taiyi_number": 3,
+        "wenchang_palace": "午"
+      },
+      "selected_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "大威"
+      },
+      "table_counts": {
+        "guest_count": 3,
+        "main_count": 24
+      },
+      "transcription_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "大威"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 110
+      },
+      "id": "yang-34",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "天道"
+      },
+      "ju": 34,
+      "positions": {
+        "jishen": "巳",
+        "shiji": "卯",
+        "taiyi_number": 4,
+        "wenchang_palace": "未"
+      },
+      "selected_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "天道"
+      },
+      "table_counts": {
+        "guest_count": 4,
+        "main_count": 26
+      },
+      "transcription_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "天道"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 110
+      },
+      "id": "yang-35",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "大神",
+        "wenchang_literal": "大武"
+      },
+      "ju": 35,
+      "positions": {
+        "jishen": "辰",
+        "shiji": "巳",
+        "taiyi_number": 4,
+        "wenchang_palace": "坤"
+      },
+      "selected_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "大神",
+        "wenchang_literal": "大武"
+      },
+      "table_counts": {
+        "guest_count": 28,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "大神",
+        "wenchang_literal": "大武"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 110
+      },
+      "id": "yang-36",
+      "initial_manual_literal_differences": {
+        "jishen_literal": {
+          "frozen_transcription": "夘",
+          "initial_manual": "卯"
+        }
+      },
+      "initial_manual_literals": {
+        "jishen_literal": "卯",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大武"
+      },
+      "ju": 36,
+      "positions": {
+        "jishen": "卯",
+        "shiji": "午",
+        "taiyi_number": 4,
+        "wenchang_palace": "坤"
+      },
+      "selected_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大武"
+      },
+      "table_counts": {
+        "guest_count": 27,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大武"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 110
+      },
+      "id": "yang-37",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大武",
+        "wenchang_literal": "武徳"
+      },
+      "ju": 37,
+      "positions": {
+        "jishen": "寅",
+        "shiji": "坤",
+        "taiyi_number": 6,
+        "wenchang_palace": "申"
+      },
+      "selected_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大武",
+        "wenchang_literal": "武徳"
+      },
+      "table_counts": {
+        "guest_count": 7,
+        "main_count": 1
+      },
+      "transcription_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大武",
+        "wenchang_literal": "武徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 111
+      },
+      "id": "yang-38",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "太蔟"
+      },
+      "ju": 38,
+      "positions": {
+        "jishen": "丑",
+        "shiji": "戌",
+        "taiyi_number": 6,
+        "wenchang_palace": "酉"
+      },
+      "selected_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "太蔟"
+      },
+      "table_counts": {
+        "guest_count": 35,
+        "main_count": 6
+      },
+      "transcription_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "太蔟"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 111
+      },
+      "id": "yang-39",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大義",
+        "wenchang_literal": "隂主"
+      },
+      "ju": 39,
+      "positions": {
+        "jishen": "子",
+        "shiji": "亥",
+        "taiyi_number": 6,
+        "wenchang_palace": "戌"
+      },
+      "selected_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大義",
+        "wenchang_literal": "隂主"
+      },
+      "table_counts": {
+        "guest_count": 34,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大義",
+        "wenchang_literal": "隂主"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 111
+      },
+      "id": "yang-40",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "隂徳"
+      },
+      "ju": 40,
+      "positions": {
+        "jishen": "亥",
+        "shiji": "丑",
+        "taiyi_number": 7,
+        "wenchang_palace": "乾"
+      },
+      "selected_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "隂徳"
+      },
+      "table_counts": {
+        "guest_count": 19,
+        "main_count": 27
+      },
+      "transcription_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "隂徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [
+        {
+          "facsimile_reading": "戌",
+          "field": "jishen_literal",
+          "id": "yang-41",
+          "page": 111,
+          "selected_reading": "facsimile",
+          "status": "transcription_differs_from_facsimile",
+          "text_reading": "戊"
+        }
+      ],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 111
+      },
+      "id": "yang-41",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "戊",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "隂徳"
+      },
+      "ju": 41,
+      "positions": {
+        "jishen": "戌",
+        "shiji": "寅",
+        "taiyi_number": 7,
+        "wenchang_palace": "乾"
+      },
+      "selected_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "隂徳"
+      },
+      "table_counts": {
+        "guest_count": 16,
+        "main_count": 27
+      },
+      "transcription_literals": {
+        "jishen_literal": "戊",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "隂徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 111
+      },
+      "id": "yang-42",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大義"
+      },
+      "ju": 42,
+      "positions": {
+        "jishen": "酉",
+        "shiji": "辰",
+        "taiyi_number": 7,
+        "wenchang_palace": "亥"
+      },
+      "selected_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大義"
+      },
+      "table_counts": {
+        "guest_count": 12,
+        "main_count": 27
+      },
+      "transcription_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大義"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 111
+      },
+      "id": "yang-43",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大神",
+        "wenchang_literal": "地主"
+      },
+      "ju": 43,
+      "positions": {
+        "jishen": "申",
+        "shiji": "巳",
+        "taiyi_number": 8,
+        "wenchang_palace": "子"
+      },
+      "selected_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大神",
+        "wenchang_literal": "地主"
+      },
+      "table_counts": {
+        "guest_count": 17,
+        "main_count": 8
+      },
+      "transcription_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大神",
+        "wenchang_literal": "地主"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 111
+      },
+      "id": "yang-44",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "大武",
+        "wenchang_literal": "陽徳"
+      },
+      "ju": 44,
+      "positions": {
+        "jishen": "未",
+        "shiji": "坤",
+        "taiyi_number": 8,
+        "wenchang_palace": "丑"
+      },
+      "selected_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "大武",
+        "wenchang_literal": "陽徳"
+      },
+      "table_counts": {
+        "guest_count": 14,
+        "main_count": 33
+      },
+      "transcription_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "大武",
+        "wenchang_literal": "陽徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 111
+      },
+      "id": "yang-45",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "和徳"
+      },
+      "ju": 45,
+      "positions": {
+        "jishen": "午",
+        "shiji": "酉",
+        "taiyi_number": 8,
+        "wenchang_palace": "艮"
+      },
+      "selected_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "和徳"
+      },
+      "table_counts": {
+        "guest_count": 7,
+        "main_count": 32
+      },
+      "transcription_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "和徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 112
+      },
+      "id": "yang-46",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "隂徳",
+        "wenchang_literal": "吕申"
+      },
+      "ju": 46,
+      "positions": {
+        "jishen": "巳",
+        "shiji": "乾",
+        "taiyi_number": 9,
+        "wenchang_palace": "寅"
+      },
+      "selected_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "隂徳",
+        "wenchang_literal": "吕申"
+      },
+      "table_counts": {
+        "guest_count": 16,
+        "main_count": 5
+      },
+      "transcription_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "隂徳",
+        "wenchang_literal": "吕申"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 112
+      },
+      "id": "yang-47",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "髙叢"
+      },
+      "ju": 47,
+      "positions": {
+        "jishen": "辰",
+        "shiji": "丑",
+        "taiyi_number": 9,
+        "wenchang_palace": "卯"
+      },
+      "selected_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "髙叢"
+      },
+      "table_counts": {
+        "guest_count": 8,
+        "main_count": 4
+      },
+      "transcription_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "髙叢"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 112
+      },
+      "id": "yang-48",
+      "initial_manual_literal_differences": {
+        "jishen_literal": {
+          "frozen_transcription": "夘",
+          "initial_manual": "卯"
+        }
+      },
+      "initial_manual_literals": {
+        "jishen_literal": "卯",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "太陽"
+      },
+      "ju": 48,
+      "positions": {
+        "jishen": "卯",
+        "shiji": "寅",
+        "taiyi_number": 9,
+        "wenchang_palace": "辰"
+      },
+      "selected_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "太陽"
+      },
+      "table_counts": {
+        "guest_count": 5,
+        "main_count": 1
+      },
+      "transcription_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "太陽"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 112
+      },
+      "id": "yang-49",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大炅"
+      },
+      "ju": 49,
+      "positions": {
+        "jishen": "寅",
+        "shiji": "辰",
+        "taiyi_number": 1,
+        "wenchang_palace": "巽"
+      },
+      "selected_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大炅"
+      },
+      "table_counts": {
+        "guest_count": 25,
+        "main_count": 24
+      },
+      "transcription_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大炅"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 112
+      },
+      "id": "yang-50",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大神"
+      },
+      "ju": 50,
+      "positions": {
+        "jishen": "丑",
+        "shiji": "午",
+        "taiyi_number": 1,
+        "wenchang_palace": "巳"
+      },
+      "selected_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大神"
+      },
+      "table_counts": {
+        "guest_count": 15,
+        "main_count": 6
+      },
+      "transcription_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大神"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 112
+      },
+      "id": "yang-51",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大武",
+        "wenchang_literal": "大威"
+      },
+      "ju": 51,
+      "positions": {
+        "jishen": "子",
+        "shiji": "坤",
+        "taiyi_number": 1,
+        "wenchang_palace": "午"
+      },
+      "selected_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大武",
+        "wenchang_literal": "大威"
+      },
+      "table_counts": {
+        "guest_count": 13,
+        "main_count": 15
+      },
+      "transcription_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大武",
+        "wenchang_literal": "大威"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 112
+      },
+      "id": "yang-52",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "天道"
+      },
+      "ju": 52,
+      "positions": {
+        "jishen": "亥",
+        "shiji": "酉",
+        "taiyi_number": 2,
+        "wenchang_palace": "未"
+      },
+      "selected_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "天道"
+      },
+      "table_counts": {
+        "guest_count": 31,
+        "main_count": 39
+      },
+      "transcription_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "天道"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 112
+      },
+      "id": "yang-53",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "大義",
+        "wenchang_literal": "大武"
+      },
+      "ju": 53,
+      "positions": {
+        "jishen": "戌",
+        "shiji": "亥",
+        "taiyi_number": 2,
+        "wenchang_palace": "坤"
+      },
+      "selected_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "大義",
+        "wenchang_literal": "大武"
+      },
+      "table_counts": {
+        "guest_count": 25,
+        "main_count": 38
+      },
+      "transcription_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "大義",
+        "wenchang_literal": "大武"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 113
+      },
+      "id": "yang-54",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大武"
+      },
+      "ju": 54,
+      "positions": {
+        "jishen": "酉",
+        "shiji": "子",
+        "taiyi_number": 2,
+        "wenchang_palace": "坤"
+      },
+      "selected_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大武"
+      },
+      "table_counts": {
+        "guest_count": 24,
+        "main_count": 38
+      },
+      "transcription_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大武"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 113
+      },
+      "id": "yang-55",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "武徳"
+      },
+      "ju": 55,
+      "positions": {
+        "jishen": "申",
+        "shiji": "艮",
+        "taiyi_number": 3,
+        "wenchang_palace": "申"
+      },
+      "selected_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "武徳"
+      },
+      "table_counts": {
+        "guest_count": 3,
+        "main_count": 16
+      },
+      "transcription_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "武徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 113
+      },
+      "id": "yang-56",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "太蔟"
+      },
+      "ju": 56,
+      "positions": {
+        "jishen": "未",
+        "shiji": "辰",
+        "taiyi_number": 3,
+        "wenchang_palace": "酉"
+      },
+      "selected_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "太蔟"
+      },
+      "table_counts": {
+        "guest_count": 34,
+        "main_count": 15
+      },
+      "transcription_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "太蔟"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 113
+      },
+      "id": "yang-57",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大神",
+        "wenchang_literal": "隂主"
+      },
+      "ju": 57,
+      "positions": {
+        "jishen": "午",
+        "shiji": "巳",
+        "taiyi_number": 3,
+        "wenchang_palace": "戌"
+      },
+      "selected_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大神",
+        "wenchang_literal": "隂主"
+      },
+      "table_counts": {
+        "guest_count": 25,
+        "main_count": 10
+      },
+      "transcription_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大神",
+        "wenchang_literal": "隂主"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 113
+      },
+      "id": "yang-58",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "天道",
+        "wenchang_literal": "隂徳"
+      },
+      "ju": 58,
+      "positions": {
+        "jishen": "巳",
+        "shiji": "未",
+        "taiyi_number": 4,
+        "wenchang_palace": "乾"
+      },
+      "selected_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "天道",
+        "wenchang_literal": "隂徳"
+      },
+      "table_counts": {
+        "guest_count": 26,
+        "main_count": 12
+      },
+      "transcription_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "天道",
+        "wenchang_literal": "隂徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 113
+      },
+      "id": "yang-59",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "隂徳"
+      },
+      "ju": 59,
+      "positions": {
+        "jishen": "辰",
+        "shiji": "申",
+        "taiyi_number": 4,
+        "wenchang_palace": "乾"
+      },
+      "selected_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "隂徳"
+      },
+      "table_counts": {
+        "guest_count": 19,
+        "main_count": 12
+      },
+      "transcription_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "隂徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 113
+      },
+      "id": "yang-60",
+      "initial_manual_literal_differences": {
+        "jishen_literal": {
+          "frozen_transcription": "夘",
+          "initial_manual": "卯"
+        }
+      },
+      "initial_manual_literals": {
+        "jishen_literal": "卯",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大義"
+      },
+      "ju": 60,
+      "positions": {
+        "jishen": "卯",
+        "shiji": "戌",
+        "taiyi_number": 4,
+        "wenchang_palace": "亥"
+      },
+      "selected_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大義"
+      },
+      "table_counts": {
+        "guest_count": 13,
+        "main_count": 12
+      },
+      "transcription_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大義"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 113
+      },
+      "id": "yang-61",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大義",
+        "wenchang_literal": "地主"
+      },
+      "ju": 61,
+      "positions": {
+        "jishen": "寅",
+        "shiji": "亥",
+        "taiyi_number": 6,
+        "wenchang_palace": "子"
+      },
+      "selected_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大義",
+        "wenchang_literal": "地主"
+      },
+      "table_counts": {
+        "guest_count": 34,
+        "main_count": 33
+      },
+      "transcription_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大義",
+        "wenchang_literal": "地主"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 114
+      },
+      "id": "yang-62",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "陽徳"
+      },
+      "ju": 62,
+      "positions": {
+        "jishen": "丑",
+        "shiji": "艮",
+        "taiyi_number": 6,
+        "wenchang_palace": "丑"
+      },
+      "selected_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "陽徳"
+      },
+      "table_counts": {
+        "guest_count": 25,
+        "main_count": 26
+      },
+      "transcription_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "陽徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 114
+      },
+      "id": "yang-63",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "和徳"
+      },
+      "ju": 63,
+      "positions": {
+        "jishen": "子",
+        "shiji": "卯",
+        "taiyi_number": 6,
+        "wenchang_palace": "艮"
+      },
+      "selected_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "和徳"
+      },
+      "table_counts": {
+        "guest_count": 22,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "和徳"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 114
+      },
+      "id": "yang-64",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "大炅",
+        "wenchang_literal": "吕申"
+      },
+      "ju": 64,
+      "positions": {
+        "jishen": "亥",
+        "shiji": "巽",
+        "taiyi_number": 7,
+        "wenchang_palace": "寅"
+      },
+      "selected_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "大炅",
+        "wenchang_literal": "吕申"
+      },
+      "table_counts": {
+        "guest_count": 11,
+        "main_count": 16
+      },
+      "transcription_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "大炅",
+        "wenchang_literal": "吕申"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 114
+      },
+      "id": "yang-65",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "天道",
+        "wenchang_literal": "髙叢"
+      },
+      "ju": 65,
+      "positions": {
+        "jishen": "戌",
+        "shiji": "未",
+        "taiyi_number": 7,
+        "wenchang_palace": "卯"
+      },
+      "selected_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "天道",
+        "wenchang_literal": "髙叢"
+      },
+      "table_counts": {
+        "guest_count": 1,
+        "main_count": 15
+      },
+      "transcription_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "天道",
+        "wenchang_literal": "髙叢"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 114
+      },
+      "id": "yang-66",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "太陽"
+      },
+      "ju": 66,
+      "positions": {
+        "jishen": "酉",
+        "shiji": "申",
+        "taiyi_number": 7,
+        "wenchang_palace": "辰"
+      },
+      "selected_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "太陽"
+      },
+      "table_counts": {
+        "guest_count": 34,
+        "main_count": 12
+      },
+      "transcription_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "太陽"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 114
+      },
+      "id": "yang-67",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "太炅"
+      },
+      "ju": 67,
+      "positions": {
+        "jishen": "申",
+        "shiji": "戌",
+        "taiyi_number": 8,
+        "wenchang_palace": "巽"
+      },
+      "selected_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "太炅"
+      },
+      "table_counts": {
+        "guest_count": 2,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "太炅"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 114
+      },
+      "id": "yang-68",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大神"
+      },
+      "ju": 68,
+      "positions": {
+        "jishen": "未",
+        "shiji": "子",
+        "taiyi_number": 8,
+        "wenchang_palace": "巳"
+      },
+      "selected_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大神"
+      },
+      "table_counts": {
+        "guest_count": 8,
+        "main_count": 17
+      },
+      "transcription_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大神"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 114
+      },
+      "id": "yang-69",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "大威"
+      },
+      "ju": 69,
+      "positions": {
+        "jishen": "午",
+        "shiji": "艮",
+        "taiyi_number": 8,
+        "wenchang_palace": "午"
+      },
+      "selected_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "大威"
+      },
+      "table_counts": {
+        "guest_count": 32,
+        "main_count": 16
+      },
+      "transcription_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "大威"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 115
+      },
+      "id": "yang-70",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "天道"
+      },
+      "ju": 70,
+      "positions": {
+        "jishen": "巳",
+        "shiji": "卯",
+        "taiyi_number": 9,
+        "wenchang_palace": "未"
+      },
+      "selected_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "天道"
+      },
+      "table_counts": {
+        "guest_count": 4,
+        "main_count": 30
+      },
+      "transcription_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "天道"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 115
+      },
+      "id": "yang-71",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "大神",
+        "wenchang_literal": "大武"
+      },
+      "ju": 71,
+      "positions": {
+        "jishen": "辰",
+        "shiji": "巳",
+        "taiyi_number": 9,
+        "wenchang_palace": "坤"
+      },
+      "selected_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "大神",
+        "wenchang_literal": "大武"
+      },
+      "table_counts": {
+        "guest_count": 32,
+        "main_count": 29
+      },
+      "transcription_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "大神",
+        "wenchang_literal": "大武"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 115
+      },
+      "id": "yang-72",
+      "initial_manual_literal_differences": {
+        "jishen_literal": {
+          "frozen_transcription": "夘",
+          "initial_manual": "卯"
+        }
+      },
+      "initial_manual_literals": {
+        "jishen_literal": "卯",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大武"
+      },
+      "ju": 72,
+      "positions": {
+        "jishen": "卯",
+        "shiji": "午",
+        "taiyi_number": 9,
+        "wenchang_palace": "坤"
+      },
+      "selected_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大武"
+      },
+      "table_counts": {
+        "guest_count": 31,
+        "main_count": 29
+      },
+      "transcription_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大武"
+      },
+      "yin": false
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7,
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 115
+      },
+      "id": "yin-01",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大武",
+        "wenchang_literal": "吕申"
+      },
+      "ju": 1,
+      "positions": {
+        "jishen": "申",
+        "shiji": "坤",
+        "taiyi_number": 9,
+        "wenchang_palace": "寅"
+      },
+      "selected_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大武",
+        "wenchang_literal": "吕申"
+      },
+      "table_counts": {
+        "guest_count": 29,
+        "main_count": 5
+      },
+      "transcription_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大武",
+        "wenchang_literal": "吕申"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 116
+      },
+      "id": "yin-02",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "髙叢"
+      },
+      "ju": 2,
+      "positions": {
+        "jishen": "未",
+        "shiji": "戌",
+        "taiyi_number": 9,
+        "wenchang_palace": "卯"
+      },
+      "selected_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "髙叢"
+      },
+      "table_counts": {
+        "guest_count": 17,
+        "main_count": 4
+      },
+      "transcription_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "髙叢"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 116
+      },
+      "id": "yin-03",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大義",
+        "wenchang_literal": "太陽"
+      },
+      "ju": 3,
+      "positions": {
+        "jishen": "午",
+        "shiji": "亥",
+        "taiyi_number": 9,
+        "wenchang_palace": "辰"
+      },
+      "selected_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大義",
+        "wenchang_literal": "太陽"
+      },
+      "table_counts": {
+        "guest_count": 16,
+        "main_count": 1
+      },
+      "transcription_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大義",
+        "wenchang_literal": "太陽"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 116
+      },
+      "id": "yin-04",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "大炅"
+      },
+      "ju": 4,
+      "positions": {
+        "jishen": "巳",
+        "shiji": "丑",
+        "taiyi_number": 8,
+        "wenchang_palace": "巽"
+      },
+      "selected_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "大炅"
+      },
+      "table_counts": {
+        "guest_count": 33,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "大炅"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 116
+      },
+      "id": "yin-05",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "大炅"
+      },
+      "ju": 5,
+      "positions": {
+        "jishen": "辰",
+        "shiji": "寅",
+        "taiyi_number": 8,
+        "wenchang_palace": "巽"
+      },
+      "selected_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "大炅"
+      },
+      "table_counts": {
+        "guest_count": 30,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "大炅"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 116
+      },
+      "id": "yin-06",
+      "initial_manual_literal_differences": {
+        "jishen_literal": {
+          "frozen_transcription": "夘",
+          "initial_manual": "卯"
+        }
+      },
+      "initial_manual_literals": {
+        "jishen_literal": "卯",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大神"
+      },
+      "ju": 6,
+      "positions": {
+        "jishen": "卯",
+        "shiji": "辰",
+        "taiyi_number": 8,
+        "wenchang_palace": "巳"
+      },
+      "selected_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大神"
+      },
+      "table_counts": {
+        "guest_count": 26,
+        "main_count": 17
+      },
+      "transcription_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大神"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 116
+      },
+      "id": "yin-07",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大神",
+        "wenchang_literal": "大威"
+      },
+      "ju": 7,
+      "positions": {
+        "jishen": "寅",
+        "shiji": "巳",
+        "taiyi_number": 7,
+        "wenchang_palace": "午"
+      },
+      "selected_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大神",
+        "wenchang_literal": "大威"
+      },
+      "table_counts": {
+        "guest_count": 3,
+        "main_count": 2
+      },
+      "transcription_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大神",
+        "wenchang_literal": "大威"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 116
+      },
+      "id": "yin-08",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "大武",
+        "wenchang_literal": "天道"
+      },
+      "ju": 8,
+      "positions": {
+        "jishen": "丑",
+        "shiji": "坤",
+        "taiyi_number": 7,
+        "wenchang_palace": "未"
+      },
+      "selected_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "大武",
+        "wenchang_literal": "天道"
+      },
+      "table_counts": {
+        "guest_count": 7,
+        "main_count": 1
+      },
+      "transcription_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "大武",
+        "wenchang_literal": "天道"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 116
+      },
+      "id": "yin-09",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "大武"
+      },
+      "ju": 9,
+      "positions": {
+        "jishen": "子",
+        "shiji": "酉",
+        "taiyi_number": 7,
+        "wenchang_palace": "坤"
+      },
+      "selected_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "大武"
+      },
+      "table_counts": {
+        "guest_count": 33,
+        "main_count": 7
+      },
+      "transcription_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "大武"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 117
+      },
+      "id": "yin-10",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "隂徳",
+        "wenchang_literal": "武徳"
+      },
+      "ju": 10,
+      "positions": {
+        "jishen": "亥",
+        "shiji": "乾",
+        "taiyi_number": 6,
+        "wenchang_palace": "申"
+      },
+      "selected_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "隂徳",
+        "wenchang_literal": "武徳"
+      },
+      "table_counts": {
+        "guest_count": 34,
+        "main_count": 1
+      },
+      "transcription_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "隂徳",
+        "wenchang_literal": "武徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 117
+      },
+      "id": "yin-11",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "太蔟"
+      },
+      "ju": 11,
+      "positions": {
+        "jishen": "戌",
+        "shiji": "丑",
+        "taiyi_number": 6,
+        "wenchang_palace": "酉"
+      },
+      "selected_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "太蔟"
+      },
+      "table_counts": {
+        "guest_count": 36,
+        "main_count": 6
+      },
+      "transcription_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "太蔟"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 117
+      },
+      "id": "yin-12",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "隂主"
+      },
+      "ju": 12,
+      "positions": {
+        "jishen": "酉",
+        "shiji": "寅",
+        "taiyi_number": 6,
+        "wenchang_palace": "戌"
+      },
+      "selected_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "隂主"
+      },
+      "table_counts": {
+        "guest_count": 23,
+        "main_count": 35
+      },
+      "transcription_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "隂主"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 117
+      },
+      "id": "yin-13",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "隂徳"
+      },
+      "ju": 13,
+      "positions": {
+        "jishen": "申",
+        "shiji": "辰",
+        "taiyi_number": 4,
+        "wenchang_palace": "乾"
+      },
+      "selected_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "隂徳"
+      },
+      "table_counts": {
+        "guest_count": 37,
+        "main_count": 12
+      },
+      "transcription_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "隂徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 117
+      },
+      "id": "yin-14",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大義"
+      },
+      "ju": 14,
+      "positions": {
+        "jishen": "未",
+        "shiji": "午",
+        "taiyi_number": 4,
+        "wenchang_palace": "亥"
+      },
+      "selected_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大義"
+      },
+      "table_counts": {
+        "guest_count": 27,
+        "main_count": 12
+      },
+      "transcription_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大義"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 117
+      },
+      "id": "yin-15",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大武",
+        "wenchang_literal": "地主"
+      },
+      "ju": 15,
+      "positions": {
+        "jishen": "午",
+        "shiji": "坤",
+        "taiyi_number": 4,
+        "wenchang_palace": "子"
+      },
+      "selected_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大武",
+        "wenchang_literal": "地主"
+      },
+      "table_counts": {
+        "guest_count": 29,
+        "main_count": 11
+      },
+      "transcription_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大武",
+        "wenchang_literal": "地主"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 117
+      },
+      "id": "yin-16",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "陽徳"
+      },
+      "ju": 16,
+      "positions": {
+        "jishen": "巳",
+        "shiji": "酉",
+        "taiyi_number": 3,
+        "wenchang_palace": "丑"
+      },
+      "selected_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "陽徳"
+      },
+      "table_counts": {
+        "guest_count": 15,
+        "main_count": 1
+      },
+      "transcription_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "陽徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 117
+      },
+      "id": "yin-17",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "大義",
+        "wenchang_literal": "和徳"
+      },
+      "ju": 17,
+      "positions": {
+        "jishen": "辰",
+        "shiji": "亥",
+        "taiyi_number": 3,
+        "wenchang_palace": "艮"
+      },
+      "selected_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "大義",
+        "wenchang_literal": "和徳"
+      },
+      "table_counts": {
+        "guest_count": 9,
+        "main_count": 3
+      },
+      "transcription_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "大義",
+        "wenchang_literal": "和徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 118
+      },
+      "id": "yin-18",
+      "initial_manual_literal_differences": {
+        "jishen_literal": {
+          "frozen_transcription": "夘",
+          "initial_manual": "卯"
+        }
+      },
+      "initial_manual_literals": {
+        "jishen_literal": "卯",
+        "shiji_literal": "地主",
+        "wenchang_literal": "和徳"
+      },
+      "ju": 18,
+      "positions": {
+        "jishen": "卯",
+        "shiji": "子",
+        "taiyi_number": 3,
+        "wenchang_palace": "艮"
+      },
+      "selected_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "地主",
+        "wenchang_literal": "和徳"
+      },
+      "table_counts": {
+        "guest_count": 8,
+        "main_count": 3
+      },
+      "transcription_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "地主",
+        "wenchang_literal": "和徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 118
+      },
+      "id": "yin-19",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "吕申"
+      },
+      "ju": 19,
+      "positions": {
+        "jishen": "寅",
+        "shiji": "艮",
+        "taiyi_number": 2,
+        "wenchang_palace": "寅"
+      },
+      "selected_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "吕申"
+      },
+      "table_counts": {
+        "guest_count": 16,
+        "main_count": 14
+      },
+      "transcription_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "吕申"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 118
+      },
+      "id": "yin-20",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "髙叢"
+      },
+      "ju": 20,
+      "positions": {
+        "jishen": "丑",
+        "shiji": "辰",
+        "taiyi_number": 2,
+        "wenchang_palace": "卯"
+      },
+      "selected_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "髙叢"
+      },
+      "table_counts": {
+        "guest_count": 10,
+        "main_count": 13
+      },
+      "transcription_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "髙叢"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 118
+      },
+      "id": "yin-21",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大神",
+        "wenchang_literal": "太陽"
+      },
+      "ju": 21,
+      "positions": {
+        "jishen": "子",
+        "shiji": "巳",
+        "taiyi_number": 2,
+        "wenchang_palace": "辰"
+      },
+      "selected_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大神",
+        "wenchang_literal": "太陽"
+      },
+      "table_counts": {
+        "guest_count": 1,
+        "main_count": 10
+      },
+      "transcription_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大神",
+        "wenchang_literal": "太陽"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 118
+      },
+      "id": "yin-22",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "天道",
+        "wenchang_literal": "大炅"
+      },
+      "ju": 22,
+      "positions": {
+        "jishen": "亥",
+        "shiji": "未",
+        "taiyi_number": 1,
+        "wenchang_palace": "巽"
+      },
+      "selected_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "天道",
+        "wenchang_literal": "大炅"
+      },
+      "table_counts": {
+        "guest_count": 14,
+        "main_count": 24
+      },
+      "transcription_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "天道",
+        "wenchang_literal": "大炅"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 118
+      },
+      "id": "yin-23",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "大炅"
+      },
+      "ju": 23,
+      "positions": {
+        "jishen": "戌",
+        "shiji": "申",
+        "taiyi_number": 1,
+        "wenchang_palace": "巽"
+      },
+      "selected_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "大炅"
+      },
+      "table_counts": {
+        "guest_count": 7,
+        "main_count": 24
+      },
+      "transcription_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "大炅"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 118
+      },
+      "id": "yin-24",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大神"
+      },
+      "ju": 24,
+      "positions": {
+        "jishen": "酉",
+        "shiji": "戌",
+        "taiyi_number": 1,
+        "wenchang_palace": "巳"
+      },
+      "selected_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大神"
+      },
+      "table_counts": {
+        "guest_count": 1,
+        "main_count": 16
+      },
+      "transcription_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大神"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 118
+      },
+      "id": "yin-25",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大義",
+        "wenchang_literal": "大威"
+      },
+      "ju": 25,
+      "positions": {
+        "jishen": "申",
+        "shiji": "亥",
+        "taiyi_number": 9,
+        "wenchang_palace": "午"
+      },
+      "selected_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大義",
+        "wenchang_literal": "大威"
+      },
+      "table_counts": {
+        "guest_count": 16,
+        "main_count": 21
+      },
+      "transcription_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大義",
+        "wenchang_literal": "大威"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 119
+      },
+      "id": "yin-26",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "天道"
+      },
+      "ju": 26,
+      "positions": {
+        "jishen": "未",
+        "shiji": "艮",
+        "taiyi_number": 9,
+        "wenchang_palace": "未"
+      },
+      "selected_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "天道"
+      },
+      "table_counts": {
+        "guest_count": 7,
+        "main_count": 31
+      },
+      "transcription_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "天道"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 119
+      },
+      "id": "yin-27",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "大武"
+      },
+      "ju": 27,
+      "positions": {
+        "jishen": "午",
+        "shiji": "卯",
+        "taiyi_number": 9,
+        "wenchang_palace": "坤"
+      },
+      "selected_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "大武"
+      },
+      "table_counts": {
+        "guest_count": 4,
+        "main_count": 39
+      },
+      "transcription_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "大武"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 119
+      },
+      "id": "yin-28",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "大炅",
+        "wenchang_literal": "武徳"
+      },
+      "ju": 28,
+      "positions": {
+        "jishen": "巳",
+        "shiji": "巽",
+        "taiyi_number": 8,
+        "wenchang_palace": "申"
+      },
+      "selected_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "大炅",
+        "wenchang_literal": "武徳"
+      },
+      "table_counts": {
+        "guest_count": 25,
+        "main_count": 8
+      },
+      "transcription_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "大炅",
+        "wenchang_literal": "武徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 119
+      },
+      "id": "yin-29",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "天道",
+        "wenchang_literal": "太蔟"
+      },
+      "ju": 29,
+      "positions": {
+        "jishen": "辰",
+        "shiji": "未",
+        "taiyi_number": 8,
+        "wenchang_palace": "酉"
+      },
+      "selected_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "天道",
+        "wenchang_literal": "太蔟"
+      },
+      "table_counts": {
+        "guest_count": 15,
+        "main_count": 7
+      },
+      "transcription_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "天道",
+        "wenchang_literal": "太蔟"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 119
+      },
+      "id": "yin-30",
+      "initial_manual_literal_differences": {
+        "jishen_literal": {
+          "frozen_transcription": "夘",
+          "initial_manual": "卯"
+        }
+      },
+      "initial_manual_literals": {
+        "jishen_literal": "卯",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "隂主"
+      },
+      "ju": 30,
+      "positions": {
+        "jishen": "卯",
+        "shiji": "申",
+        "taiyi_number": 8,
+        "wenchang_palace": "戌"
+      },
+      "selected_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "隂主"
+      },
+      "table_counts": {
+        "guest_count": 8,
+        "main_count": 2
+      },
+      "transcription_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "隂主"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 119
+      },
+      "id": "yin-31",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "隂徳"
+      },
+      "ju": 31,
+      "positions": {
+        "jishen": "寅",
+        "shiji": "戌",
+        "taiyi_number": 7,
+        "wenchang_palace": "乾"
+      },
+      "selected_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "隂徳"
+      },
+      "table_counts": {
+        "guest_count": 28,
+        "main_count": 27
+      },
+      "transcription_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "隂徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 119
+      },
+      "id": "yin-32",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大義"
+      },
+      "ju": 32,
+      "positions": {
+        "jishen": "丑",
+        "shiji": "子",
+        "taiyi_number": 7,
+        "wenchang_palace": "亥"
+      },
+      "selected_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大義"
+      },
+      "table_counts": {
+        "guest_count": 26,
+        "main_count": 27
+      },
+      "transcription_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大義"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 119
+      },
+      "id": "yin-33",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "地主"
+      },
+      "ju": 33,
+      "positions": {
+        "jishen": "子",
+        "shiji": "艮",
+        "taiyi_number": 7,
+        "wenchang_palace": "子"
+      },
+      "selected_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "地主"
+      },
+      "table_counts": {
+        "guest_count": 18,
+        "main_count": 26
+      },
+      "transcription_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "地主"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 120
+      },
+      "id": "yin-34",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "陽徳"
+      },
+      "ju": 34,
+      "positions": {
+        "jishen": "亥",
+        "shiji": "卯",
+        "taiyi_number": 6,
+        "wenchang_palace": "丑"
+      },
+      "selected_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "陽徳"
+      },
+      "table_counts": {
+        "guest_count": 22,
+        "main_count": 26
+      },
+      "transcription_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "陽徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 120
+      },
+      "id": "yin-35",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "大神",
+        "wenchang_literal": "和徳"
+      },
+      "ju": 35,
+      "positions": {
+        "jishen": "戌",
+        "shiji": "巳",
+        "taiyi_number": 6,
+        "wenchang_palace": "艮"
+      },
+      "selected_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "大神",
+        "wenchang_literal": "和徳"
+      },
+      "table_counts": {
+        "guest_count": 10,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "大神",
+        "wenchang_literal": "和徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 120
+      },
+      "id": "yin-36",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "大威",
+        "wenchang_literal": "和徳"
+      },
+      "ju": 36,
+      "positions": {
+        "jishen": "酉",
+        "shiji": "午",
+        "taiyi_number": 6,
+        "wenchang_palace": "艮"
+      },
+      "selected_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "大威",
+        "wenchang_literal": "和徳"
+      },
+      "table_counts": {
+        "guest_count": 9,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "大威",
+        "wenchang_literal": "和徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [
+        {
+          "facsimile_reading": "大威",
+          "field": "shiji_literal",
+          "id": "yin-37",
+          "page": 120,
+          "selected_reading": "facsimile",
+          "status": "facsimile_confirms_literal",
+          "text_reading": "大威"
+        }
+      ],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 120
+      },
+      "id": "yin-37",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大威",
+        "wenchang_literal": "吕申"
+      },
+      "ju": 37,
+      "positions": {
+        "jishen": "申",
+        "shiji": "午",
+        "taiyi_number": 4,
+        "wenchang_palace": "寅"
+      },
+      "selected_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大威",
+        "wenchang_literal": "吕申"
+      },
+      "table_counts": {
+        "guest_count": 25,
+        "main_count": 1
+      },
+      "transcription_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大威",
+        "wenchang_literal": "吕申"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 120
+      },
+      "id": "yin-38",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "髙叢"
+      },
+      "ju": 38,
+      "positions": {
+        "jishen": "未",
+        "shiji": "戌",
+        "taiyi_number": 4,
+        "wenchang_palace": "卯"
+      },
+      "selected_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "髙叢"
+      },
+      "table_counts": {
+        "guest_count": 13,
+        "main_count": 4
+      },
+      "transcription_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "髙叢"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 120
+      },
+      "id": "yin-39",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大義",
+        "wenchang_literal": "太陽"
+      },
+      "ju": 39,
+      "positions": {
+        "jishen": "午",
+        "shiji": "亥",
+        "taiyi_number": 4,
+        "wenchang_palace": "辰"
+      },
+      "selected_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大義",
+        "wenchang_literal": "太陽"
+      },
+      "table_counts": {
+        "guest_count": 12,
+        "main_count": 37
+      },
+      "transcription_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大義",
+        "wenchang_literal": "太陽"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 120
+      },
+      "id": "yin-40",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "大炅"
+      },
+      "ju": 40,
+      "positions": {
+        "jishen": "巳",
+        "shiji": "丑",
+        "taiyi_number": 3,
+        "wenchang_palace": "巽"
+      },
+      "selected_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "大炅"
+      },
+      "table_counts": {
+        "guest_count": 1,
+        "main_count": 33
+      },
+      "transcription_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "大炅"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 120
+      },
+      "id": "yin-41",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "大炅"
+      },
+      "ju": 41,
+      "positions": {
+        "jishen": "辰",
+        "shiji": "寅",
+        "taiyi_number": 3,
+        "wenchang_palace": "巽"
+      },
+      "selected_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "大炅"
+      },
+      "table_counts": {
+        "guest_count": 38,
+        "main_count": 33
+      },
+      "transcription_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "吕申",
+        "wenchang_literal": "大炅"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 121
+      },
+      "id": "yin-42",
+      "initial_manual_literal_differences": {
+        "jishen_literal": {
+          "frozen_transcription": "夘",
+          "initial_manual": "卯"
+        }
+      },
+      "initial_manual_literals": {
+        "jishen_literal": "卯",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大神"
+      },
+      "ju": 42,
+      "positions": {
+        "jishen": "卯",
+        "shiji": "辰",
+        "taiyi_number": 3,
+        "wenchang_palace": "巳"
+      },
+      "selected_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大神"
+      },
+      "table_counts": {
+        "guest_count": 34,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "大神"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [
+        {
+          "facsimile_reading": "大武",
+          "field": "shiji_literal",
+          "id": "yin-43",
+          "page": 121,
+          "selected_reading": "facsimile",
+          "status": "facsimile_confirms_literal",
+          "text_reading": "大武"
+        }
+      ],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 121
+      },
+      "id": "yin-43",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大武",
+        "wenchang_literal": "大威"
+      },
+      "ju": 43,
+      "positions": {
+        "jishen": "寅",
+        "shiji": "坤",
+        "taiyi_number": 2,
+        "wenchang_palace": "午"
+      },
+      "selected_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大武",
+        "wenchang_literal": "大威"
+      },
+      "table_counts": {
+        "guest_count": 38,
+        "main_count": 2
+      },
+      "transcription_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "大武",
+        "wenchang_literal": "大威"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [
+        {
+          "facsimile_reading": "太蔟",
+          "field": "shiji_literal",
+          "id": "yin-44",
+          "page": 121,
+          "selected_reading": "facsimile",
+          "status": "facsimile_confirms_literal",
+          "text_reading": "太蔟"
+        }
+      ],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 121
+      },
+      "id": "yin-44",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "天道"
+      },
+      "ju": 44,
+      "positions": {
+        "jishen": "丑",
+        "shiji": "酉",
+        "taiyi_number": 2,
+        "wenchang_palace": "未"
+      },
+      "selected_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "天道"
+      },
+      "table_counts": {
+        "guest_count": 31,
+        "main_count": 39
+      },
+      "transcription_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "天道"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 121
+      },
+      "id": "yin-45",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "大武"
+      },
+      "ju": 45,
+      "positions": {
+        "jishen": "子",
+        "shiji": "酉",
+        "taiyi_number": 2,
+        "wenchang_palace": "坤"
+      },
+      "selected_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "大武"
+      },
+      "table_counts": {
+        "guest_count": 31,
+        "main_count": 38
+      },
+      "transcription_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "大武"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [
+        {
+          "facsimile_reading": "陰徳",
+          "field": "shiji_literal",
+          "id": "yin-46",
+          "page": 121,
+          "selected_reading": "transcription",
+          "status": "graphic_variant_same_name",
+          "text_reading": "隂徳"
+        }
+      ],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 121
+      },
+      "id": "yin-46",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "隂徳",
+        "wenchang_literal": "武徳"
+      },
+      "ju": 46,
+      "positions": {
+        "jishen": "亥",
+        "shiji": "乾",
+        "taiyi_number": 1,
+        "wenchang_palace": "申"
+      },
+      "selected_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "隂徳",
+        "wenchang_literal": "武徳"
+      },
+      "table_counts": {
+        "guest_count": 2,
+        "main_count": 7
+      },
+      "transcription_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "隂徳",
+        "wenchang_literal": "武徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 121
+      },
+      "id": "yin-47",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "太蔟"
+      },
+      "ju": 47,
+      "positions": {
+        "jishen": "戌",
+        "shiji": "丑",
+        "taiyi_number": 1,
+        "wenchang_palace": "酉"
+      },
+      "selected_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "太蔟"
+      },
+      "table_counts": {
+        "guest_count": 32,
+        "main_count": 6
+      },
+      "transcription_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "陽徳",
+        "wenchang_literal": "太蔟"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 121
+      },
+      "id": "yin-48",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "呂申",
+        "wenchang_literal": "隂主"
+      },
+      "ju": 48,
+      "positions": {
+        "jishen": "酉",
+        "shiji": "寅",
+        "taiyi_number": 1,
+        "wenchang_palace": "戌"
+      },
+      "selected_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "呂申",
+        "wenchang_literal": "隂主"
+      },
+      "table_counts": {
+        "guest_count": 29,
+        "main_count": 1
+      },
+      "transcription_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "呂申",
+        "wenchang_literal": "隂主"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 121
+      },
+      "id": "yin-49",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "隂徳"
+      },
+      "ju": 49,
+      "positions": {
+        "jishen": "申",
+        "shiji": "辰",
+        "taiyi_number": 9,
+        "wenchang_palace": "乾"
+      },
+      "selected_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "隂徳"
+      },
+      "table_counts": {
+        "guest_count": 1,
+        "main_count": 16
+      },
+      "transcription_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "隂徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 122
+      },
+      "id": "yin-50",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大義"
+      },
+      "ju": 50,
+      "positions": {
+        "jishen": "未",
+        "shiji": "午",
+        "taiyi_number": 9,
+        "wenchang_palace": "亥"
+      },
+      "selected_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大義"
+      },
+      "table_counts": {
+        "guest_count": 31,
+        "main_count": 16
+      },
+      "transcription_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "大威",
+        "wenchang_literal": "大義"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 122
+      },
+      "id": "yin-51",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大武",
+        "wenchang_literal": "地主"
+      },
+      "ju": 51,
+      "positions": {
+        "jishen": "午",
+        "shiji": "坤",
+        "taiyi_number": 9,
+        "wenchang_palace": "子"
+      },
+      "selected_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大武",
+        "wenchang_literal": "地主"
+      },
+      "table_counts": {
+        "guest_count": 29,
+        "main_count": 15
+      },
+      "transcription_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "大武",
+        "wenchang_literal": "地主"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 122
+      },
+      "id": "yin-52",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "陽徳"
+      },
+      "ju": 52,
+      "positions": {
+        "jishen": "巳",
+        "shiji": "酉",
+        "taiyi_number": 8,
+        "wenchang_palace": "丑"
+      },
+      "selected_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "陽徳"
+      },
+      "table_counts": {
+        "guest_count": 7,
+        "main_count": 33
+      },
+      "transcription_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "太蔟",
+        "wenchang_literal": "陽徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 122
+      },
+      "id": "yin-53",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "大義",
+        "wenchang_literal": "和徳"
+      },
+      "ju": 53,
+      "positions": {
+        "jishen": "辰",
+        "shiji": "亥",
+        "taiyi_number": 8,
+        "wenchang_palace": "艮"
+      },
+      "selected_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "大義",
+        "wenchang_literal": "和徳"
+      },
+      "table_counts": {
+        "guest_count": 1,
+        "main_count": 32
+      },
+      "transcription_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "大義",
+        "wenchang_literal": "和徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 122
+      },
+      "id": "yin-54",
+      "initial_manual_literal_differences": {
+        "jishen_literal": {
+          "frozen_transcription": "夘",
+          "initial_manual": "卯"
+        }
+      },
+      "initial_manual_literals": {
+        "jishen_literal": "卯",
+        "shiji_literal": "地主",
+        "wenchang_literal": "和徳"
+      },
+      "ju": 54,
+      "positions": {
+        "jishen": "卯",
+        "shiji": "子",
+        "taiyi_number": 8,
+        "wenchang_palace": "艮"
+      },
+      "selected_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "地主",
+        "wenchang_literal": "和徳"
+      },
+      "table_counts": {
+        "guest_count": 8,
+        "main_count": 32
+      },
+      "transcription_literals": {
+        "jishen_literal": "夘",
+        "shiji_literal": "地主",
+        "wenchang_literal": "和徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 122
+      },
+      "id": "yin-55",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "吕申"
+      },
+      "ju": 55,
+      "positions": {
+        "jishen": "寅",
+        "shiji": "艮",
+        "taiyi_number": 7,
+        "wenchang_palace": "寅"
+      },
+      "selected_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "吕申"
+      },
+      "table_counts": {
+        "guest_count": 18,
+        "main_count": 16
+      },
+      "transcription_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "吕申"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 122
+      },
+      "id": "yin-56",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "髙叢"
+      },
+      "ju": 56,
+      "positions": {
+        "jishen": "丑",
+        "shiji": "辰",
+        "taiyi_number": 7,
+        "wenchang_palace": "卯"
+      },
+      "selected_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "髙叢"
+      },
+      "table_counts": {
+        "guest_count": 12,
+        "main_count": 15
+      },
+      "transcription_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "太陽",
+        "wenchang_literal": "髙叢"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 122
+      },
+      "id": "yin-57",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大神",
+        "wenchang_literal": "太陽"
+      },
+      "ju": 57,
+      "positions": {
+        "jishen": "子",
+        "shiji": "巳",
+        "taiyi_number": 7,
+        "wenchang_palace": "辰"
+      },
+      "selected_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大神",
+        "wenchang_literal": "太陽"
+      },
+      "table_counts": {
+        "guest_count": 3,
+        "main_count": 12
+      },
+      "transcription_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "大神",
+        "wenchang_literal": "太陽"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 123
+      },
+      "id": "yin-58",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "天道",
+        "wenchang_literal": "大炅"
+      },
+      "ju": 58,
+      "positions": {
+        "jishen": "亥",
+        "shiji": "未",
+        "taiyi_number": 6,
+        "wenchang_palace": "巽"
+      },
+      "selected_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "天道",
+        "wenchang_literal": "大炅"
+      },
+      "table_counts": {
+        "guest_count": 8,
+        "main_count": 18
+      },
+      "transcription_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "天道",
+        "wenchang_literal": "大炅"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [
+        {
+          "facsimile_reading": "大炅",
+          "field": "wenchang_literal",
+          "id": "yin-59",
+          "initial_manual_reading": "大神",
+          "page": 123,
+          "selected_reading": "facsimile",
+          "status": "initial_manual_entry_differs_from_source_and_facsimile",
+          "text_reading": "大炅"
+        }
+      ],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 123
+      },
+      "id": "yin-59",
+      "initial_manual_literal_differences": {
+        "wenchang_literal": {
+          "frozen_transcription": "大炅",
+          "initial_manual": "大神"
+        }
+      },
+      "initial_manual_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "大神"
+      },
+      "ju": 59,
+      "positions": {
+        "jishen": "戌",
+        "shiji": "申",
+        "taiyi_number": 6,
+        "wenchang_palace": "巽"
+      },
+      "selected_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "大炅"
+      },
+      "table_counts": {
+        "guest_count": 1,
+        "main_count": 18
+      },
+      "transcription_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "大炅"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 123
+      },
+      "id": "yin-60",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大神"
+      },
+      "ju": 60,
+      "positions": {
+        "jishen": "酉",
+        "shiji": "戌",
+        "taiyi_number": 6,
+        "wenchang_palace": "巳"
+      },
+      "selected_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大神"
+      },
+      "table_counts": {
+        "guest_count": 35,
+        "main_count": 10
+      },
+      "transcription_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "大神"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 123
+      },
+      "id": "yin-61",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大義",
+        "wenchang_literal": "大威"
+      },
+      "ju": 61,
+      "positions": {
+        "jishen": "申",
+        "shiji": "亥",
+        "taiyi_number": 4,
+        "wenchang_palace": "午"
+      },
+      "selected_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大義",
+        "wenchang_literal": "大威"
+      },
+      "table_counts": {
+        "guest_count": 12,
+        "main_count": 27
+      },
+      "transcription_literals": {
+        "jishen_literal": "申",
+        "shiji_literal": "大義",
+        "wenchang_literal": "大威"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 123
+      },
+      "id": "yin-62",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "天道"
+      },
+      "ju": 62,
+      "positions": {
+        "jishen": "未",
+        "shiji": "艮",
+        "taiyi_number": 4,
+        "wenchang_palace": "未"
+      },
+      "selected_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "天道"
+      },
+      "table_counts": {
+        "guest_count": 3,
+        "main_count": 26
+      },
+      "transcription_literals": {
+        "jishen_literal": "未",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "天道"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 123
+      },
+      "id": "yin-63",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "大武"
+      },
+      "ju": 63,
+      "positions": {
+        "jishen": "午",
+        "shiji": "卯",
+        "taiyi_number": 4,
+        "wenchang_palace": "坤"
+      },
+      "selected_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "大武"
+      },
+      "table_counts": {
+        "guest_count": 4,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "午",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "大武"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 123
+      },
+      "id": "yin-64",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "大炅",
+        "wenchang_literal": "武徳"
+      },
+      "ju": 64,
+      "positions": {
+        "jishen": "巳",
+        "shiji": "巽",
+        "taiyi_number": 3,
+        "wenchang_palace": "申"
+      },
+      "selected_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "大炅",
+        "wenchang_literal": "武徳"
+      },
+      "table_counts": {
+        "guest_count": 33,
+        "main_count": 16
+      },
+      "transcription_literals": {
+        "jishen_literal": "巳",
+        "shiji_literal": "大炅",
+        "wenchang_literal": "武徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          8
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 123
+      },
+      "id": "yin-65",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "天道",
+        "wenchang_literal": "太蔟"
+      },
+      "ju": 65,
+      "positions": {
+        "jishen": "辰",
+        "shiji": "未",
+        "taiyi_number": 3,
+        "wenchang_palace": "酉"
+      },
+      "selected_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "天道",
+        "wenchang_literal": "太蔟"
+      },
+      "table_counts": {
+        "guest_count": 23,
+        "main_count": 15
+      },
+      "transcription_literals": {
+        "jishen_literal": "辰",
+        "shiji_literal": "天道",
+        "wenchang_literal": "太蔟"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          1
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 124
+      },
+      "id": "yin-66",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "卯",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "隂主"
+      },
+      "ju": 66,
+      "positions": {
+        "jishen": "卯",
+        "shiji": "申",
+        "taiyi_number": 3,
+        "wenchang_palace": "戌"
+      },
+      "selected_literals": {
+        "jishen_literal": "卯",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "隂主"
+      },
+      "table_counts": {
+        "guest_count": 16,
+        "main_count": 10
+      },
+      "transcription_literals": {
+        "jishen_literal": "卯",
+        "shiji_literal": "武徳",
+        "wenchang_literal": "隂主"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          2
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 124
+      },
+      "id": "yin-67",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "隂徳"
+      },
+      "ju": 67,
+      "positions": {
+        "jishen": "寅",
+        "shiji": "戌",
+        "taiyi_number": 2,
+        "wenchang_palace": "乾"
+      },
+      "selected_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "隂徳"
+      },
+      "table_counts": {
+        "guest_count": 26,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "寅",
+        "shiji_literal": "隂主",
+        "wenchang_literal": "隂徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          3
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 124
+      },
+      "id": "yin-68",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大義"
+      },
+      "ju": 68,
+      "positions": {
+        "jishen": "丑",
+        "shiji": "子",
+        "taiyi_number": 2,
+        "wenchang_palace": "亥"
+      },
+      "selected_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大義"
+      },
+      "table_counts": {
+        "guest_count": 24,
+        "main_count": 25
+      },
+      "transcription_literals": {
+        "jishen_literal": "丑",
+        "shiji_literal": "地主",
+        "wenchang_literal": "大義"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          4
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 124
+      },
+      "id": "yin-69",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "地主"
+      },
+      "ju": 69,
+      "positions": {
+        "jishen": "子",
+        "shiji": "艮",
+        "taiyi_number": 2,
+        "wenchang_palace": "子"
+      },
+      "selected_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "地主"
+      },
+      "table_counts": {
+        "guest_count": 16,
+        "main_count": 24
+      },
+      "transcription_literals": {
+        "jishen_literal": "子",
+        "shiji_literal": "和徳",
+        "wenchang_literal": "地主"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          5
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 124
+      },
+      "id": "yin-70",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "陽徳"
+      },
+      "ju": 70,
+      "positions": {
+        "jishen": "亥",
+        "shiji": "卯",
+        "taiyi_number": 1,
+        "wenchang_palace": "丑"
+      },
+      "selected_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "陽徳"
+      },
+      "table_counts": {
+        "guest_count": 28,
+        "main_count": 22
+      },
+      "transcription_literals": {
+        "jishen_literal": "亥",
+        "shiji_literal": "髙叢",
+        "wenchang_literal": "陽徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          6
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 124
+      },
+      "id": "yin-71",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "大神",
+        "wenchang_literal": "和徳"
+      },
+      "ju": 71,
+      "positions": {
+        "jishen": "戌",
+        "shiji": "巳",
+        "taiyi_number": 1,
+        "wenchang_palace": "艮"
+      },
+      "selected_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "大神",
+        "wenchang_literal": "和徳"
+      },
+      "table_counts": {
+        "guest_count": 16,
+        "main_count": 31
+      },
+      "transcription_literals": {
+        "jishen_literal": "戌",
+        "shiji_literal": "大神",
+        "wenchang_literal": "和徳"
+      },
+      "yin": true
+    },
+    {
+      "evidence_level": "full_selected_columns_native_facsimile_semantic_collation",
+      "facsimile_checks": [],
+      "facsimile_semantic_collation": {
+        "columns_from_right": [
+          7
+        ],
+        "fields": [
+          "taiyi_number",
+          "wenchang_palace",
+          "shiji",
+          "jishen",
+          "main_count",
+          "guest_count"
+        ],
+        "page": 124
+      },
+      "id": "yin-72",
+      "initial_manual_literal_differences": {},
+      "initial_manual_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "大威",
+        "wenchang_literal": "和徳"
+      },
+      "ju": 72,
+      "positions": {
+        "jishen": "酉",
+        "shiji": "午",
+        "taiyi_number": 1,
+        "wenchang_palace": "艮"
+      },
+      "selected_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "大威",
+        "wenchang_literal": "和徳"
+      },
+      "table_counts": {
+        "guest_count": 15,
+        "main_count": 31
+      },
+      "transcription_literals": {
+        "jishen_literal": "酉",
+        "shiji_literal": "大威",
+        "wenchang_literal": "和徳"
+      },
+      "yin": true
+    }
+  ],
+  "scope": "144局四位置和两算已按原生书影核读语义，异体神名按声明索引；不认证逐字字形、日期历法、四将全盘或全书。初录/订正、旧转录与书影并存，通则重算不自动裁定原表异数。",
+  "source": "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷03",
+  "source_manifest_sha256": "5f8d272c55d567c1cb127daa4fb3a3f97f9094b98b389392b9b5ba178df5c9d3",
+  "source_title": "太乙金鏡式經·四庫全書本卷三立成表、卷二通则",
+  "transcription_collation_manifest_sha256": "4711cec76085817188df2b61e3cf124baaa0653244a74e9f676f125a3bfad006",
+  "version": "1.1.0"
+}

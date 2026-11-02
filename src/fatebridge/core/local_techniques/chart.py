@@ -20,6 +20,8 @@ from fatebridge.utils.solar_time import (
     SOLAR_TIME_STRATEGY_APPARENT,
     calculate_solar_time_adjustment,
 )
+from fatebridge.utils.solar_time_provenance import solar_time_receipt
+from fatebridge.utils.timezones import validate_local_clock
 
 from ..almanac import (
     DAY_GANZHI_STRATEGY_STANDARD,
@@ -105,13 +107,6 @@ SANSHI_REFERENCES = [
     "外部有助，内部更要对齐。",
     "此局贵在先定边界后发力。",
 ]
-
-
-def _option_value(options: Dict[str, Any], *keys: str) -> Any:
-    for key in keys:
-        if key in options and options[key] is not None:
-            return options[key]
-    return None
 
 
 def _rotate_items(items: List[Any], shift: int) -> List[Any]:
@@ -257,6 +252,8 @@ def _build_birth_info(
         birth_day=moment.day,
         birth_hour=moment.hour,
         birth_minute=moment.minute,
+        birth_second=moment.second,
+        birth_microsecond=moment.microsecond,
         birth_timezone=timezone_name or DEFAULT_BIRTH_TIMEZONE,
         birth_longitude=longitude,
         birth_latitude=latitude,
@@ -416,6 +413,7 @@ def _adapt_chart_objects(
     tradition: bool,
     include_su28: bool,
     houses: List[Dict[str, Any]],
+    preserve_core_houses: bool = False,
 ) -> List[Dict[str, Any]]:
     objects: List[Dict[str, Any]] = []
     for item in core_payload.get("planets", []):
@@ -425,9 +423,16 @@ def _adapt_chart_objects(
         if tradition and point_id in OUTER_PLANETS:
             continue
         longitude = round(float(item.get("longitude", 0.0)), 4)
+        # The core assigns houses before formatting longitudes/cusps. Repeating
+        # that comparison on four-decimal display values can cross a cusp.
+        house_id = (
+            f"House{item['house']}"
+            if preserve_core_houses
+            else _house_id_for_houses(longitude, houses)
+        )
         payload: Dict[str, Any] = {
             "id": point_id,
-            "house": _house_id_for_houses(longitude, houses),
+            "house": house_id,
             "sign": item.get("sign"),
             "signlon": round(float(item.get("degree_in_sign", 0.0)), 4),
             "lon": longitude,
@@ -450,25 +455,14 @@ def _adapt_chart_objects(
             )
         )
 
-    sun = next((item for item in objects if item.get("id") == "Sun"), None)
-    moon = next((item for item in objects if item.get("id") == "Moon"), None)
-    if sun is not None and moon is not None:
-        try:
-            sun_house = int(str(sun["house"]).removeprefix("House"))
-        except (TypeError, ValueError):
-            sun_house = 7
-        if sun_house >= 7:
-            fortuna_longitude = (
-                float(houses[0]["lon"]) + moon["lon"] - sun["lon"]
-            ) % 360.0
-        else:
-            fortuna_longitude = (
-                float(houses[0]["lon"]) + sun["lon"] - moon["lon"]
-            ) % 360.0
+    # Reuse the canonical lot, computed from the true ASC and solar horizon.
+    # First cusp != ASC for whole-sign/equal-MC/Vehlow; a Sun in H1 can be day.
+    fortune = ((core_payload.get("classical") or {}).get("lots") or {}).get("fortune")
+    if fortune is not None:
         objects.append(
             _build_point_object(
                 point_id="Pars Fortuna",
-                longitude=fortuna_longitude,
+                longitude=float(fortune["longitude"]),
                 houses=houses,
                 include_su28=include_su28,
             )
@@ -495,6 +489,9 @@ def _build_local_chart_response(
     zodiacal: Optional[int] = None,
     extra_params: Optional[Dict[str, Any]] = None,
     allow_extended_hsys: bool = False,
+    include_calculation_metadata: bool = False,
+    preserve_context_geometry: bool = False,
+    context_fortune_method: str = "sect_reversing",
 ) -> Dict[str, Any]:
     birth_info, latitude, longitude = _build_birth_info(
         date_text=date_text,
@@ -504,6 +501,15 @@ def _build_local_chart_response(
         lon=lon,
         gps_lat=gps_lat,
         gps_lon=gps_lon,
+    )
+    geometry_options: Dict[str, Any] = (
+        {
+            "include_context_geometry": True,
+            "include_physical_source": True,
+            "context_fortune_method": context_fortune_method,
+        }
+        if preserve_context_geometry
+        else {}
     )
     resolved_hsys = None
     if chart_variant == "chart" and (hsys is not None or zodiacal is not None):
@@ -516,9 +522,12 @@ def _build_local_chart_response(
             chart_variant,
             hsys=resolved_hsys,
             zodiacal=resolved_zodiacal,
+            **geometry_options,
         )
     else:
-        core_payload = build_core_chart_payload(birth_info, chart_variant)
+        core_payload = build_core_chart_payload(
+            birth_info, chart_variant, **geometry_options
+        )
     houses, house1_longitude, house_step_degrees = _build_houses(
         core_payload,
         house_start_mode=house_start_mode,
@@ -530,7 +539,24 @@ def _build_local_chart_response(
         tradition=tradition,
         include_su28=include_su28,
         houses=houses,
+        preserve_core_houses=allow_extended_hsys
+        and house_start_mode != 2
+        and not shape_mode % 2,
     )
+    geometry = (
+        core_payload.get("context_geometry") if preserve_context_geometry else None
+    )
+    if geometry is not None:
+        if house_start_mode == 2 or shape_mode % 2 or include_su28:
+            raise ValueError(
+                "Unrounded context geometry requires the original house layout and no mansion overlay"
+            )
+        houses = geometry["houses"]
+        objects = [
+            item
+            for item in geometry["objects"]
+            if not tradition or item["id"] not in OUTER_PLANETS
+        ]
     params = {
         "date": _normalize_date_text(date_text),
         "time": _normalize_time_text(time_text),
@@ -568,20 +594,52 @@ def _build_local_chart_response(
         params["ayanamsha"] = ayanamsha
     if extra_params:
         params.update(extra_params)
+    if include_calculation_metadata:
+        params["chart_profile"] = dict(core_payload.get("chart_profile") or {})
+        params["calculationTimeLocal"] = birth_info.local_datetime.isoformat()
+        params["calculationTimeUtc"] = birth_info.utc_isoformat
+        params["houseAssignmentBasis"] = "core_geometry_before_display_rounding"
+        params["auxiliaryPointSources"] = {
+            "Pars Fortuna": "core.classical.lots.fortune"
+        }
+        if geometry is not None:
+            params["birthLatitude"] = latitude
+            params["birthLongitude"] = longitude
+            params["coordinatePolicy"] = geometry["coordinate_policy"]
+            params["intervalConvention"] = geometry["interval_convention"]
+            params["auxiliaryPointSources"] = geometry["auxiliary_point_sources"]
+            params["fortuneDefinition"] = geometry["fortune_definition"]
+            if "motion_policy" in geometry:
+                params["motionPolicy"] = geometry["motion_policy"]
+            if "ephemeris_reference_points" in geometry:
+                params["ephemerisReferencePoints"] = geometry[
+                    "ephemeris_reference_points"
+                ]
+            params["housePositionMethod"] = "ecliptic_longitude_cusp_intervals"
+            if "house_position_projection" in geometry:
+                projection = geometry["house_position_projection"]
+                params["housePositionMethod"] = projection["method"]
+                params["housePositionProjection"] = projection
+                params["houseOrientation"] = "native_nonprograde_cusps"
+            params["lunarNodeModel"] = "mean_node_and_its_opposite"
     return {
         "params": params,
         "chart": {
             "ok": True,
             "houses": houses,
             "objects": objects,
-            "angles": {
-                "ascendant": round(
-                    float(core_payload["angles"]["ascendant"]["longitude"]), 4
-                ),
-                "midheaven": round(
-                    float(core_payload["angles"]["midheaven"]["longitude"]), 4
-                ),
-            },
+            "angles": (
+                geometry["angles"]
+                if geometry is not None
+                else {
+                    "ascendant": round(
+                        float(core_payload["angles"]["ascendant"]["longitude"]), 4
+                    ),
+                    "midheaven": round(
+                        float(core_payload["angles"]["midheaven"]["longitude"]), 4
+                    ),
+                }
+            ),
         },
     }
 
@@ -626,8 +684,15 @@ def _build_metaphysics_seed(
         f"{_normalize_date_text(date_text)} {_normalize_time_text(time_text)}"
     )
     input_datetime = localize_datetime(input_datetime_naive, timezone_value)
+    # A bare wall clock needs gap/fold validation. An explicit ISO offset
+    # already identifies one physical instant: converting it into a named
+    # zone may legitimately land in either side of a fold. Keep that instant
+    # rather than rejecting it merely because its local label repeats.
+    if input_datetime_naive.utcoffset() is None:
+        validate_local_clock(input_datetime)
     corrected_datetime = input_datetime
     total_correction_minutes = 0.0
+    solar_adjustment_evidence = None
     _, longitude = _resolve_coordinates(
         lat=lat,
         lon=lon,
@@ -637,15 +702,28 @@ def _build_metaphysics_seed(
 
     if use_true_solar_time:
         adjustment = calculate_solar_time_adjustment(
-            input_datetime_naive,
+            input_datetime,
             timezone_value,
             longitude,
             strategy=SOLAR_TIME_STRATEGY_APPARENT,
         )
         total_correction_minutes = adjustment["total_correction_minutes"]
+        # The adjustment maps this zone's civil wall clock to a solar label;
+        # it is not an elapsed-time shift of the physical input instant. An
+        # ISO input can carry a different UTC offset. Adding to that original
+        # clock and then converting zones can cross DST a second time, making
+        # equivalent inputs differ by an hour (and even a day/hour pillar).
         corrected_datetime = localize_datetime(
-            input_datetime_naive + timedelta(minutes=total_correction_minutes),
+            input_datetime.replace(tzinfo=None)
+            + timedelta(minutes=total_correction_minutes),
             timezone_value,
+        )
+        solar_adjustment_evidence = solar_time_receipt(
+            civil_instant=input_datetime,
+            corrected_label=corrected_datetime,
+            timezone_name=timezone_value,
+            longitude=longitude,
+            adjustment=adjustment,
         )
 
     pillars = BaZiCalendar.get_four_pillars(
@@ -669,14 +747,8 @@ def _build_metaphysics_seed(
         total_correction_minutes=total_correction_minutes,
         pillars=pillars,
         calendar_context=calendar_context,
+        solar_time_adjustment=solar_adjustment_evidence,
     )
-
-
-def _normalize_canping_gender(value: Any) -> str:
-    text = f"{value if value is not None else ''}".strip().lower()
-    if text in {"女", "f", "female", "0"}:
-        return "女"
-    return "男"
 
 
 def _build_metaphysics_analysis_context(seed: MetaphysicsSeed) -> Dict[str, Any]:
@@ -700,6 +772,11 @@ def _render_qimen_palace_sections(qimen: Dict[str, Any]) -> List[Tuple[str, str]
     for palace in qimen.get("palaces", []) or []:
         if not isinstance(palace, dict):
             continue
+        evidence = palace.get("evidence") or {}
+        god_meaning = evidence.get("god_interpretation") or {}
+        tomb = evidence.get("wonder_tomb") or {}
+        punishment = evidence.get("six_instrument_punishment") or {}
+        gate_relation = evidence.get("door_palace_relation") or {}
         content_palace = palace.get("content_palace")
         content_trigram = palace.get("content_trigram")
         content_line = ""
@@ -715,11 +792,37 @@ def _render_qimen_palace_sections(qimen: Dict[str, Any]) -> List[Tuple[str, str]
                     [
                         f"宫卦：{palace.get('trigram', '无')}",
                         content_line,
-                        f"天盘干：{palace.get('heaven_stem', '无')}",
-                        f"地盘干：{palace.get('earth_stem', '无')}",
-                        f"八神：{palace.get('god', '无')}",
-                        f"九星：{palace.get('star', '无')}",
-                        f"八门：{palace.get('door', '无')}",
+                        f"天盘干：{'/'.join(palace.get('heaven_stems', [])) or '无'}",
+                        f"地盘干：{'/'.join(palace.get('earth_stems', [])) or palace.get('earth_stem') or '无'}",
+                        f"八神：{palace.get('god') or '无'}",
+                        f"九星：{'/'.join([palace['star'], *palace.get('hosted_stars', [])]) if palace.get('star') else '无'}",
+                        (
+                            f"九星月令：{evidence['season_month_branch']}月（{evidence['season_month_element']}），{evidence['star_season_state']}；依据{evidence['star_season_source_section']}"
+                            if evidence.get("star_season_state")
+                            else ""
+                        ),
+                        (
+                            f"八神传统象义：{god_meaning['traditional_role']}"
+                            if god_meaning
+                            else ""
+                        ),
+                        god_meaning.get("source_qualification", ""),
+                        (
+                            f"三奇入墓对照：王璋口径本宫命中{'/'.join(tomb['selected_matched_stems']) or '无'}；段首字面候选命中{'/'.join(tomb['unadopted_literal_candidate_matched_stems']) or '无'}，候选未采纳，释读及优先关系待核"
+                            if tomb.get("disputed_stems_at_this_palace")
+                            else ""
+                        ),
+                        (
+                            f"非本时直符六仪的落刑宫几何观察：{'/'.join(punishment['non_current_geometric_stems'])}；按暂定广义取法保留匹配，本时直符窄读候选另列，原文范围未裁定"
+                            if punishment.get("non_current_geometric_stems")
+                            else ""
+                        ),
+                        f"八门：{palace.get('door') or '无'}",
+                        (
+                            f"门宫生克：{gate_relation['door']}（{gate_relation['door_element']}）／{palace['trigram']}宫（{gate_relation['palace_element']}），{gate_relation['relation_text']}；歌诀门迫{'是' if gate_relation['verse_door_pressure'] else '否'}；正文关系名{gate_relation['prose_label'] or '本段未另命名'}，不作现实吉凶结论"
+                            if gate_relation
+                            else ""
+                        ),
                         f"门卦：{(palace.get('door_hexagram') or {}).get('name', '无')}",
                     ]
                 ),
@@ -732,11 +835,11 @@ def _build_qimen_palace_overview_lines(qimen: Dict[str, Any]) -> List[str]:
     return [
         (
             f"{palace.get('name', '宫位')}："
-            f"天盘干：{palace.get('heaven_stem', '无')}；"
-            f"地盘干：{palace.get('earth_stem', '无')}；"
-            f"八神：{palace.get('god', '无')}；"
-            f"九星：{palace.get('star', '无')}；"
-            f"八门：{palace.get('door', '无')}"
+            f"天盘干：{'/'.join(palace.get('heaven_stems', [])) or '无'}；"
+            f"地盘干：{'/'.join(palace.get('earth_stems', [])) or palace.get('earth_stem') or '无'}；"
+            f"八神：{palace.get('god') or '无'}；"
+            f"九星：{'/'.join([palace['star'], *palace.get('hosted_stars', [])]) if palace.get('star') else '无'}；"
+            f"八门：{palace.get('door') or '无'}"
             + (
                 f"；内容来源：{palace.get('content_palace', '无')} / {palace.get('content_trigram', '无')}"
                 if palace.get("content_palace")

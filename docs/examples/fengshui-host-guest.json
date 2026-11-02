@@ -1,0 +1,14 @@
+{
+  "house": {
+    "facing_degrees": 135,
+    "north_reference": "magnetic"
+  },
+  "period": {
+    "basis": "expert_confirmed",
+    "period_number": 6,
+    "evidence": "虚构固定历史宅盘，仅用于主客算法与原文对照复现，不是真实住宅证据"
+  },
+  "interpretation": {
+    "host_guest_ruleset_id": "shen_2011_host_guest_v1"
+  }
+}

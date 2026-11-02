@@ -1,0 +1,153 @@
+{
+  "id": "gujin_main_opposition_annotations_v1",
+  "source_title": "欽定古今圖書集成 藝術典693至696 時計陽遁成局",
+  "scope": "完整72陽局中明列主大/主參向太乙格或對的12條所選幾何注記；僅24個原文宮數、12個源名及陽53附帶外迫，非12完整盤或12次歷史應驗。",
+  "records": [
+    {
+      "id": "gujin-yang-13",
+      "ju": 13,
+      "yin": false,
+      "general_field": "main_vice_general",
+      "expected_taiyi_number": 6,
+      "expected_general_number": 4,
+      "source_name": "格",
+      "source_reading": "主參將四宮格太乙凡事格易",
+      "source_url": "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第693卷#太乙陽遁十三局",
+      "additional_readings": []
+    },
+    {
+      "id": "gujin-yang-16",
+      "ju": 16,
+      "yin": false,
+      "general_field": "main_vice_general",
+      "expected_taiyi_number": 7,
+      "expected_general_number": 3,
+      "source_name": "格",
+      "source_reading": "主參將三宮格太乙關客大",
+      "source_url": "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第693卷#太乙陽遁十六局",
+      "additional_readings": []
+    },
+    {
+      "id": "gujin-yang-21",
+      "ju": 21,
+      "yin": false,
+      "general_field": "main_general",
+      "expected_taiyi_number": 8,
+      "expected_general_number": 2,
+      "source_name": "對",
+      "source_reading": "主大將二宮對太乙",
+      "source_url": "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第694卷#太乙陽遁二十一局",
+      "additional_readings": []
+    },
+    {
+      "id": "gujin-yang-25",
+      "ju": 25,
+      "yin": false,
+      "general_field": "main_general",
+      "expected_taiyi_number": 1,
+      "expected_general_number": 9,
+      "source_name": "格",
+      "source_reading": "主大將九宮格",
+      "source_url": "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第694卷#太乙陽遁二十五局",
+      "additional_readings": []
+    },
+    {
+      "id": "gujin-yang-34",
+      "ju": 34,
+      "yin": false,
+      "general_field": "main_general",
+      "expected_taiyi_number": 4,
+      "expected_general_number": 6,
+      "source_name": "對",
+      "source_reading": "主大將六宮對太乙",
+      "source_url": "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第694卷#太乙陽遁三十四局",
+      "additional_readings": []
+    },
+    {
+      "id": "gujin-yang-45",
+      "ju": 45,
+      "yin": false,
+      "general_field": "main_general",
+      "expected_taiyi_number": 8,
+      "expected_general_number": 2,
+      "source_name": "格",
+      "source_reading": "主大將二宮格太乙",
+      "source_url": "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第695卷#太乙陽遁四十五局",
+      "additional_readings": []
+    },
+    {
+      "id": "gujin-yang-48",
+      "ju": 48,
+      "yin": false,
+      "general_field": "main_general",
+      "expected_taiyi_number": 9,
+      "expected_general_number": 1,
+      "source_name": "格",
+      "source_reading": "主大將一宮直格太乙",
+      "source_url": "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第695卷#太乙陽遁四十八局",
+      "additional_readings": []
+    },
+    {
+      "id": "gujin-yang-53",
+      "ju": 53,
+      "yin": false,
+      "general_field": "main_general",
+      "expected_taiyi_number": 2,
+      "expected_general_number": 8,
+      "source_name": "格",
+      "source_reading": "主大將八宮外迫又格太乙宮",
+      "source_url": "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第695卷#太乙陽遁五十三局",
+      "additional_readings": [
+        "外迫"
+      ]
+    },
+    {
+      "id": "gujin-yang-54",
+      "ju": 54,
+      "yin": false,
+      "general_field": "main_general",
+      "expected_taiyi_number": 2,
+      "expected_general_number": 8,
+      "source_name": "格",
+      "source_reading": "主大將八宮格太乙",
+      "source_url": "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第695卷#太乙陽遁五十四局",
+      "additional_readings": []
+    },
+    {
+      "id": "gujin-yang-58",
+      "ju": 58,
+      "yin": false,
+      "general_field": "main_vice_general",
+      "expected_taiyi_number": 4,
+      "expected_general_number": 6,
+      "source_name": "格",
+      "source_reading": "主參將六宮關客大格太乙",
+      "source_url": "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第696卷#太乙陽遁五十八局",
+      "additional_readings": []
+    },
+    {
+      "id": "gujin-yang-59",
+      "ju": 59,
+      "yin": false,
+      "general_field": "main_vice_general",
+      "expected_taiyi_number": 4,
+      "expected_general_number": 6,
+      "source_name": "格",
+      "source_reading": "主參將六宮直格",
+      "source_url": "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第696卷#太乙陽遁五十九局",
+      "additional_readings": []
+    },
+    {
+      "id": "gujin-yang-60",
+      "ju": 60,
+      "yin": false,
+      "general_field": "main_vice_general",
+      "expected_taiyi_number": 4,
+      "expected_general_number": 6,
+      "source_name": "格",
+      "source_reading": "主參將六宮格",
+      "source_url": "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第696卷#太乙陽遁六十局",
+      "additional_readings": []
+    }
+  ]
+}

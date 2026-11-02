@@ -3,12 +3,15 @@
 These encode conclusions cross-checked against horosa's own readable formulas
 (`data/dignities.js`, `lifespanEngine.js` computeAlmuten, `data/lots.js`):
 - almuten winner (incl. tiebreak) matched horosa at all 360°×day/night points;
-- Arabic-lot longitudes matched horosa `computeLot` byte-for-byte.
+- Arabic-lot longitudes use an independent exact-decimal arithmetic oracle.
 They are platform-invariant (strings / integers / exact arithmetic), so they
 hold on every CI Python version without touching goldens.
 """
 
 from __future__ import annotations
+
+import math
+from decimal import Decimal, localcontext
 
 from fatebridge.core.classical_western import (
     LOTS,
@@ -72,7 +75,7 @@ def test_arabic_lot_table_frozen_to_canonical_formulas():
 
 
 def test_compute_lot_is_exact_modular_arithmetic():
-    # lon = (a + b − c) mod 360, exact (matches horosa computeLot byte-for-byte).
+    # Independent exact decimal arithmetic; do not lock a lossy double-modulo implementation.
     for k in range(60):
         v = {
             m: (i * 37.3 + k * 11.7) % 360
@@ -84,7 +87,19 @@ def test_compute_lot_is_exact_modular_arithmetic():
             for is_day in (True, False):
                 formula = LOTS[lot_id]["day" if is_day else "night"]
                 a, b, c = (v[formula[0]], v[formula[1]], v[formula[2]])
-                assert compute_lot(formula, v) == ((a + b - c) % 360.0 + 360.0) % 360.0
+                with localcontext() as context:
+                    context.prec = 1100
+                    exact = (
+                        Decimal.from_float(a)
+                        + Decimal.from_float(b)
+                        - Decimal.from_float(c)
+                    ) % 360
+                    if exact < 0:
+                        exact += 360
+                    expected = float(exact)
+                    if expected == 360.0:
+                        expected = math.nextafter(360.0, 0.0)
+                assert compute_lot(formula, v) == expected
 
 
 def test_dignity_lords_at_has_all_five_rulers_off_node_signs():

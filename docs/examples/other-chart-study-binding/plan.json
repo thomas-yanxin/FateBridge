@@ -1,0 +1,28 @@
+{
+  "study_id": "synthetic-bound-record-workflow",
+  "data_kind": "synthetic",
+  "preregistered_at": "2026-10-22T00:00:00Z",
+  "window_start": "2027-01-01T00:00:00Z",
+  "window_end": "2028-01-01T00:00:00Z",
+  "target_definition": "虚构二元事件：仅核验方案归属和评分流程；不是现实预测或已验证星盘概率模型",
+  "model_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "baseline_probability": 0.5,
+  "decision_threshold": 0.5,
+  "confidence_level": 0.95,
+  "minimum_evaluable": 2,
+  "minimum_brier_skill": 0.0,
+  "cohort": [
+    {
+      "case_id": "example-1",
+      "subject_id": "fictional-person-1"
+    },
+    {
+      "case_id": "example-2",
+      "subject_id": "fictional-person-2"
+    }
+  ],
+  "interpretation_policy_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "baseline_frozen_at": "2026-10-20T00:00:00Z",
+  "training_subject_ids": [],
+  "registration_reference": "synthetic-example:no-real-external-registration"
+}

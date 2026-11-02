@@ -1,0 +1,2966 @@
+{
+  "author": "FateBridge contributors",
+  "cells": [
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 97,
+          "slot_from_top": 1
+        },
+        "text": "參將囚"
+      },
+      "id": "申-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 98,
+          "slot_from_top": 1
+        },
+        "text": "主人小敗"
+      },
+      "source_spirit": "武德",
+      "taiyi_number": 1,
+      "wenchang_position": "申"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 97,
+          "slot_from_top": 2
+        },
+        "text": "大將囚"
+      },
+      "id": "申-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 98,
+          "slot_from_top": 2
+        },
+        "text": "主人小勝"
+      },
+      "source_spirit": "武德",
+      "taiyi_number": 2,
+      "wenchang_position": "申"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 97,
+          "slot_from_top": 3
+        },
+        "text": "門具將發"
+      },
+      "id": "申-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 98,
+          "slot_from_top": 3
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "武德",
+      "taiyi_number": 3,
+      "wenchang_position": "申"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 97,
+          "slot_from_top": 4
+        },
+        "text": "大將迫"
+      },
+      "id": "申-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 98,
+          "slot_from_top": 4
+        },
+        "text": "主人小勝"
+      },
+      "source_spirit": "武德",
+      "taiyi_number": 4,
+      "wenchang_position": "申"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 98,
+          "slot_from_top": 1
+        },
+        "text": "天目內迫／大將迫"
+      },
+      "id": "申-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 98,
+          "slot_from_top": 1
+        },
+        "text": "主人小勝"
+      },
+      "source_spirit": "武德",
+      "taiyi_number": 6,
+      "wenchang_position": "申"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 98,
+          "slot_from_top": 2
+        },
+        "text": "天目外迫／參將內迫"
+      },
+      "id": "申-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 98,
+          "slot_from_top": 2
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "武德",
+      "taiyi_number": 7,
+      "wenchang_position": "申"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 98,
+          "slot_from_top": 3
+        },
+        "text": "大將迫"
+      },
+      "id": "申-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 98,
+          "slot_from_top": 3
+        },
+        "text": "主小勝"
+      },
+      "source_spirit": "武德",
+      "taiyi_number": 8,
+      "wenchang_position": "申"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 98,
+          "slot_from_top": 4
+        },
+        "text": "參將囚"
+      },
+      "id": "申-9",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 98,
+          "slot_from_top": 4
+        },
+        "text": "主小敗"
+      },
+      "source_spirit": "武德",
+      "taiyi_number": 9,
+      "wenchang_position": "申"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 98,
+          "slot_from_top": 1
+        },
+        "text": "天目內迫"
+      },
+      "id": "酉-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 98,
+          "slot_from_top": 1
+        },
+        "text": "主人小勝"
+      },
+      "source_spirit": "太蔟",
+      "taiyi_number": 1,
+      "wenchang_position": "酉"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 98,
+          "slot_from_top": 2
+        },
+        "text": "門具將發"
+      },
+      "id": "酉-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 98,
+          "slot_from_top": 2
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "太蔟",
+      "taiyi_number": 2,
+      "wenchang_position": "酉"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 98,
+          "slot_from_top": 3
+        },
+        "text": "八門杜；先起敗／天目格；參將囚"
+      },
+      "id": "酉-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 98,
+          "slot_from_top": 3
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "太蔟",
+      "taiyi_number": 3,
+      "wenchang_position": "酉"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 98,
+          "slot_from_top": 4
+        },
+        "text": "大將囚"
+      },
+      "id": "酉-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 98,
+          "slot_from_top": 4
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "太蔟",
+      "taiyi_number": 4,
+      "wenchang_position": "酉"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 98,
+          "slot_from_top": 1
+        },
+        "text": "門具將發"
+      },
+      "id": "酉-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 98,
+          "slot_from_top": 1
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "太蔟",
+      "taiyi_number": 6,
+      "wenchang_position": "酉"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 98,
+          "slot_from_top": 2
+        },
+        "text": "門具將發"
+      },
+      "id": "酉-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 98,
+          "slot_from_top": 2
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "太蔟",
+      "taiyi_number": 7,
+      "wenchang_position": "酉"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 98,
+          "slot_from_top": 3
+        },
+        "text": "大將迫"
+      },
+      "id": "酉-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 98,
+          "slot_from_top": 3
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "太蔟",
+      "taiyi_number": 8,
+      "wenchang_position": "酉"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 98,
+          "slot_from_top": 4
+        },
+        "text": "小將迫／主人勝"
+      },
+      "id": "酉-9",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 98,
+          "slot_from_top": 4
+        },
+        "text": "主小勝"
+      },
+      "source_spirit": "太蔟",
+      "taiyi_number": 9,
+      "wenchang_position": "酉"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 98,
+          "slot_from_top": 1
+        },
+        "text": "天目囚迫／大將囚"
+      },
+      "id": "戌-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 99,
+          "slot_from_top": 1
+        },
+        "text": "主小勝"
+      },
+      "source_spirit": "陰主",
+      "taiyi_number": 1,
+      "wenchang_position": "戌"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 98,
+          "slot_from_top": 2
+        },
+        "text": "門具將發"
+      },
+      "id": "戌-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 99,
+          "slot_from_top": 2
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "陰主",
+      "taiyi_number": 2,
+      "wenchang_position": "戌"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 98,
+          "slot_from_top": 3
+        },
+        "text": "參將囚"
+      },
+      "id": "戌-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 99,
+          "slot_from_top": 3
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "陰主",
+      "taiyi_number": 3,
+      "wenchang_position": "戌"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 98,
+          "slot_from_top": 4
+        },
+        "text": "大小將迫"
+      },
+      "id": "戌-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 99,
+          "slot_from_top": 4
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "陰主",
+      "taiyi_number": 4,
+      "wenchang_position": "戌"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 99,
+          "slot_from_top": 1
+        },
+        "text": "門杜外迫"
+      },
+      "id": "戌-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 99,
+          "slot_from_top": 1
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "陰主",
+      "taiyi_number": 6,
+      "wenchang_position": "戌"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 99,
+          "slot_from_top": 2
+        },
+        "text": "門具將發"
+      },
+      "id": "戌-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 99,
+          "slot_from_top": 2
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "陰主",
+      "taiyi_number": 7,
+      "wenchang_position": "戌"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 99,
+          "slot_from_top": 3
+        },
+        "text": "大將格"
+      },
+      "id": "戌-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 99,
+          "slot_from_top": 3
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "陰主",
+      "taiyi_number": 8,
+      "wenchang_position": "戌"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 99,
+          "slot_from_top": 4
+        },
+        "text": "門具將發"
+      },
+      "id": "戌-9",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 99,
+          "slot_from_top": 4
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "陰主",
+      "taiyi_number": 9,
+      "wenchang_position": "戌"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 99,
+          "slot_from_top": 1
+        },
+        "text": "闗囚"
+      },
+      "id": "乾-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 99,
+          "slot_from_top": 1
+        },
+        "text": "主勝"
+      },
+      "source_spirit": "陰德",
+      "taiyi_number": 1,
+      "wenchang_position": "乾"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 99,
+          "slot_from_top": 2
+        },
+        "text": "門杜"
+      },
+      "id": "乾-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 99,
+          "slot_from_top": 2
+        },
+        "text": "客敗"
+      },
+      "source_spirit": "陰德",
+      "taiyi_number": 2,
+      "wenchang_position": "乾"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 99,
+          "slot_from_top": 3
+        },
+        "text": "門具將發"
+      },
+      "id": "乾-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 99,
+          "slot_from_top": 3
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "陰德",
+      "taiyi_number": 3,
+      "wenchang_position": "乾"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 99,
+          "slot_from_top": 4
+        },
+        "text": "門具將發"
+      },
+      "id": "乾-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 99,
+          "slot_from_top": 4
+        },
+        "text": "主勝"
+      },
+      "source_spirit": "陰德",
+      "taiyi_number": 4,
+      "wenchang_position": "乾"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 99,
+          "slot_from_top": 1
+        },
+        "text": "天目外格／大將格"
+      },
+      "id": "乾-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 99,
+          "slot_from_top": 1
+        },
+        "text": "主勝"
+      },
+      "source_spirit": "陰德",
+      "taiyi_number": 6,
+      "wenchang_position": "乾"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 99,
+          "slot_from_top": 2
+        },
+        "text": "門囚"
+      },
+      "id": "乾-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 99,
+          "slot_from_top": 2
+        },
+        "text": "客敗"
+      },
+      "source_spirit": "陰德",
+      "taiyi_number": 7,
+      "wenchang_position": "乾"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 99,
+          "slot_from_top": 3
+        },
+        "text": "大將天目"
+      },
+      "id": "乾-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 99,
+          "slot_from_top": 3
+        },
+        "text": "主勝；內外迫／先起敗"
+      },
+      "source_spirit": "陰德",
+      "taiyi_number": 8,
+      "wenchang_position": "乾"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 99,
+          "slot_from_top": 4
+        },
+        "text": "天目格"
+      },
+      "id": "乾-9",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 99,
+          "slot_from_top": 4
+        },
+        "text": "主人敗"
+      },
+      "source_spirit": "陰德",
+      "taiyi_number": 9,
+      "wenchang_position": "乾"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 99,
+          "slot_from_top": 1
+        },
+        "text": "天目外迫"
+      },
+      "id": "亥-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 100,
+          "slot_from_top": 1
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "大義",
+      "taiyi_number": 1,
+      "wenchang_position": "亥"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 99,
+          "slot_from_top": 2
+        },
+        "text": "杜門"
+      },
+      "id": "亥-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 100,
+          "slot_from_top": 2
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "大義",
+      "taiyi_number": 2,
+      "wenchang_position": "亥"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 99,
+          "slot_from_top": 3
+        },
+        "text": "門具將發"
+      },
+      "id": "亥-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 100,
+          "slot_from_top": 3
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "大義",
+      "taiyi_number": 3,
+      "wenchang_position": "亥"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 99,
+          "slot_from_top": 4
+        },
+        "text": "門具將發"
+      },
+      "id": "亥-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 100,
+          "slot_from_top": 4
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "大義",
+      "taiyi_number": 4,
+      "wenchang_position": "亥"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 100,
+          "slot_from_top": 1
+        },
+        "text": "大將格"
+      },
+      "id": "亥-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 100,
+          "slot_from_top": 1
+        },
+        "text": "主人小勝"
+      },
+      "source_spirit": "大義",
+      "taiyi_number": 6,
+      "wenchang_position": "亥"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 100,
+          "slot_from_top": 2
+        },
+        "text": "大將囚"
+      },
+      "id": "亥-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 100,
+          "slot_from_top": 2
+        },
+        "text": "客小勝"
+      },
+      "source_spirit": "大義",
+      "taiyi_number": 7,
+      "wenchang_position": "亥"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 100,
+          "slot_from_top": 3
+        },
+        "text": "天目內迫"
+      },
+      "id": "亥-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 100,
+          "slot_from_top": 3
+        },
+        "text": "大小將迫／客大敗"
+      },
+      "source_spirit": "大義",
+      "taiyi_number": 8,
+      "wenchang_position": "亥"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 100,
+          "slot_from_top": 4
+        },
+        "text": "門具將發"
+      },
+      "id": "亥-9",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 100,
+          "slot_from_top": 4
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "大義",
+      "taiyi_number": 9,
+      "wenchang_position": "亥"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 100,
+          "slot_from_top": 1
+        },
+        "text": "天目外迫"
+      },
+      "id": "子-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 100,
+          "slot_from_top": 1
+        },
+        "text": "主人小勝"
+      },
+      "source_spirit": "地主",
+      "taiyi_number": 1,
+      "wenchang_position": "子"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 100,
+          "slot_from_top": 2
+        },
+        "text": "天目格"
+      },
+      "id": "子-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 100,
+          "slot_from_top": 2
+        },
+        "text": "小將囚／客小勝"
+      },
+      "source_spirit": "地主",
+      "taiyi_number": 2,
+      "wenchang_position": "子"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 100,
+          "slot_from_top": 3
+        },
+        "text": "門具將發"
+      },
+      "id": "子-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 100,
+          "slot_from_top": 3
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "地主",
+      "taiyi_number": 3,
+      "wenchang_position": "子"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 100,
+          "slot_from_top": 4
+        },
+        "text": "天目內迫"
+      },
+      "id": "子-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 100,
+          "slot_from_top": 4
+        },
+        "text": "大小將迫／客大勝"
+      },
+      "source_spirit": "地主",
+      "taiyi_number": 4,
+      "wenchang_position": "子"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 100,
+          "slot_from_top": 1
+        },
+        "text": "門杜"
+      },
+      "id": "子-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 100,
+          "slot_from_top": 1
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "地主",
+      "taiyi_number": 6,
+      "wenchang_position": "子"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 100,
+          "slot_from_top": 2
+        },
+        "text": "門具將發"
+      },
+      "id": "子-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 100,
+          "slot_from_top": 2
+        },
+        "text": "先勝後負"
+      },
+      "source_spirit": "地主",
+      "taiyi_number": 7,
+      "wenchang_position": "子"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 100,
+          "slot_from_top": 3
+        },
+        "text": "天目囚"
+      },
+      "id": "子-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 100,
+          "slot_from_top": 3
+        },
+        "text": "大將門囚／主人小勝"
+      },
+      "source_spirit": "地主",
+      "taiyi_number": 8,
+      "wenchang_position": "子"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 100,
+          "slot_from_top": 4
+        },
+        "text": "八門杜"
+      },
+      "id": "子-9",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 100,
+          "slot_from_top": 4
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "地主",
+      "taiyi_number": 9,
+      "wenchang_position": "子"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 100,
+          "slot_from_top": 1
+        },
+        "text": "門具將發"
+      },
+      "id": "丑-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 101,
+          "slot_from_top": 1
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "陽德",
+      "taiyi_number": 1,
+      "wenchang_position": "丑"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 100,
+          "slot_from_top": 2
+        },
+        "text": "大將外迫"
+      },
+      "id": "丑-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 101,
+          "slot_from_top": 2
+        },
+        "text": "客小勝"
+      },
+      "source_spirit": "陽德",
+      "taiyi_number": 2,
+      "wenchang_position": "丑"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 100,
+          "slot_from_top": 3
+        },
+        "text": "天目內迫"
+      },
+      "id": "丑-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 101,
+          "slot_from_top": 3
+        },
+        "text": "小將囚／客小勝"
+      },
+      "source_spirit": "陽德",
+      "taiyi_number": 3,
+      "wenchang_position": "丑"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 100,
+          "slot_from_top": 4
+        },
+        "text": "大將囚"
+      },
+      "id": "丑-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 101,
+          "slot_from_top": 4
+        },
+        "text": "主小勝"
+      },
+      "source_spirit": "陽德",
+      "taiyi_number": 4,
+      "wenchang_position": "丑"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 101,
+          "slot_from_top": 1
+        },
+        "text": "大將囚"
+      },
+      "id": "丑-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 101,
+          "slot_from_top": 1
+        },
+        "text": "客小勝"
+      },
+      "source_spirit": "陽德",
+      "taiyi_number": 6,
+      "wenchang_position": "丑"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 101,
+          "slot_from_top": 2
+        },
+        "text": "天目外迫"
+      },
+      "id": "丑-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 101,
+          "slot_from_top": 2
+        },
+        "text": "大將迫／主勝"
+      },
+      "source_spirit": "陽德",
+      "taiyi_number": 7,
+      "wenchang_position": "丑"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 101,
+          "slot_from_top": 3
+        },
+        "text": "參將囚"
+      },
+      "id": "丑-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 101,
+          "slot_from_top": 3
+        },
+        "text": "主勝"
+      },
+      "source_spirit": "陽德",
+      "taiyi_number": 8,
+      "wenchang_position": "丑"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 101,
+          "slot_from_top": 4
+        },
+        "text": "門具將發"
+      },
+      "id": "丑-9",
+      "reading_status": "lacuna_retained",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 101,
+          "slot_from_top": 4
+        },
+        "text": "客大〔缺〕"
+      },
+      "source_spirit": "陽德",
+      "taiyi_number": 9,
+      "wenchang_position": "丑"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 101,
+          "slot_from_top": 1
+        },
+        "text": "大將闗囚"
+      },
+      "id": "艮-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 101,
+          "slot_from_top": 1
+        },
+        "text": "主大勝"
+      },
+      "source_spirit": "和德",
+      "taiyi_number": 1,
+      "wenchang_position": "艮"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 101,
+          "slot_from_top": 2
+        },
+        "text": "門具將發"
+      },
+      "id": "艮-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 101,
+          "slot_from_top": 2
+        },
+        "text": "客勝"
+      },
+      "source_spirit": "和德",
+      "taiyi_number": 2,
+      "wenchang_position": "艮"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 101,
+          "slot_from_top": 3
+        },
+        "text": "天目囚"
+      },
+      "id": "艮-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 101,
+          "slot_from_top": 3
+        },
+        "text": "大將闗囚／主人勝"
+      },
+      "source_spirit": "和德",
+      "taiyi_number": 3,
+      "wenchang_position": "艮"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 101,
+          "slot_from_top": 4
+        },
+        "text": "天目內迫"
+      },
+      "id": "艮-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 101,
+          "slot_from_top": 4
+        },
+        "text": "先起敗"
+      },
+      "source_spirit": "和德",
+      "taiyi_number": 4,
+      "wenchang_position": "艮"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 101,
+          "slot_from_top": 1
+        },
+        "text": "八門杜"
+      },
+      "id": "艮-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 101,
+          "slot_from_top": 1
+        },
+        "text": "大小將囚／主人大勝"
+      },
+      "source_spirit": "和德",
+      "taiyi_number": 6,
+      "wenchang_position": "艮"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 101,
+          "slot_from_top": 2
+        },
+        "text": "門具將發"
+      },
+      "id": "艮-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 101,
+          "slot_from_top": 2
+        },
+        "text": "客勝"
+      },
+      "source_spirit": "和德",
+      "taiyi_number": 7,
+      "wenchang_position": "艮"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 101,
+          "slot_from_top": 3
+        },
+        "text": "天目外迫"
+      },
+      "id": "艮-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 101,
+          "slot_from_top": 3
+        },
+        "text": "客敗"
+      },
+      "source_spirit": "和德",
+      "taiyi_number": 8,
+      "wenchang_position": "艮"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 101,
+          "slot_from_top": 4
+        },
+        "text": "門具將發"
+      },
+      "id": "艮-9",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 101,
+          "slot_from_top": 4
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "和德",
+      "taiyi_number": 9,
+      "wenchang_position": "艮"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 101,
+          "slot_from_top": 1
+        },
+        "text": "大將格客"
+      },
+      "id": "寅-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 102,
+          "slot_from_top": 1
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "呂申",
+      "taiyi_number": 1,
+      "wenchang_position": "寅"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 101,
+          "slot_from_top": 2
+        },
+        "text": "大將闗囚"
+      },
+      "id": "寅-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 102,
+          "slot_from_top": 2
+        },
+        "text": "大將囚／主人勝"
+      },
+      "source_spirit": "呂申",
+      "taiyi_number": 2,
+      "wenchang_position": "寅"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 101,
+          "slot_from_top": 3
+        },
+        "text": "天目外迫"
+      },
+      "id": "寅-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 102,
+          "slot_from_top": 3
+        },
+        "text": "大小將迫／客大敗"
+      },
+      "source_spirit": "呂申",
+      "taiyi_number": 3,
+      "wenchang_position": "寅"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 101,
+          "slot_from_top": 4
+        },
+        "text": "門具將發"
+      },
+      "id": "寅-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 102,
+          "slot_from_top": 4
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "呂申",
+      "taiyi_number": 4,
+      "wenchang_position": "寅"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 102,
+          "slot_from_top": 1
+        },
+        "text": "大將闗囚"
+      },
+      "id": "寅-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 102,
+          "slot_from_top": 1
+        },
+        "text": "主人小勝"
+      },
+      "source_spirit": "呂申",
+      "taiyi_number": 6,
+      "wenchang_position": "寅"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 102,
+          "slot_from_top": 2
+        },
+        "text": "大將外迫"
+      },
+      "id": "寅-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 102,
+          "slot_from_top": 2
+        },
+        "text": "主小勝"
+      },
+      "source_spirit": "呂申",
+      "taiyi_number": 7,
+      "wenchang_position": "寅"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 102,
+          "slot_from_top": 3
+        },
+        "text": "八門杜"
+      },
+      "id": "寅-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 102,
+          "slot_from_top": 3
+        },
+        "text": "先起敗"
+      },
+      "source_spirit": "呂申",
+      "taiyi_number": 8,
+      "wenchang_position": "寅"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 102,
+          "slot_from_top": 4
+        },
+        "text": "先勝後敗"
+      },
+      "id": "寅-9",
+      "reading_status": "blank_column_retained",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 102,
+          "slot_from_top": 4
+        },
+        "text": null
+      },
+      "source_spirit": "呂申",
+      "taiyi_number": 9,
+      "wenchang_position": "寅"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 102,
+          "slot_from_top": 1
+        },
+        "text": "大將外迫"
+      },
+      "id": "卯-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 102,
+          "slot_from_top": 1
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "高叢",
+      "taiyi_number": 1,
+      "wenchang_position": "卯"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 102,
+          "slot_from_top": 2
+        },
+        "text": "門具將發"
+      },
+      "id": "卯-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 102,
+          "slot_from_top": 2
+        },
+        "text": "主小勝"
+      },
+      "source_spirit": "高叢",
+      "taiyi_number": 2,
+      "wenchang_position": "卯"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 102,
+          "slot_from_top": 3
+        },
+        "text": "天目外迫"
+      },
+      "id": "卯-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 102,
+          "slot_from_top": 3
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "高叢",
+      "taiyi_number": 3,
+      "wenchang_position": "卯"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 102,
+          "slot_from_top": 4
+        },
+        "text": "天目囚／大將闗"
+      },
+      "id": "卯-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 102,
+          "slot_from_top": 4
+        },
+        "text": "客小勝"
+      },
+      "source_spirit": "高叢",
+      "taiyi_number": 4,
+      "wenchang_position": "卯"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 102,
+          "slot_from_top": 1
+        },
+        "text": "天目格／參將囚"
+      },
+      "id": "卯-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 102,
+          "slot_from_top": 1
+        },
+        "text": "客先起／後敗"
+      },
+      "source_spirit": "高叢",
+      "taiyi_number": 6,
+      "wenchang_position": "卯"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 102,
+          "slot_from_top": 2
+        },
+        "text": "八門杜"
+      },
+      "id": "卯-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 102,
+          "slot_from_top": 2
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "高叢",
+      "taiyi_number": 7,
+      "wenchang_position": "卯"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 102,
+          "slot_from_top": 3
+        },
+        "text": "門具將發"
+      },
+      "id": "卯-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 102,
+          "slot_from_top": 3
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "高叢",
+      "taiyi_number": 8,
+      "wenchang_position": "卯"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 102,
+          "slot_from_top": 4
+        },
+        "text": "天目內迫"
+      },
+      "id": "卯-9",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 102,
+          "slot_from_top": 4
+        },
+        "text": "大小將迫／客敗"
+      },
+      "source_spirit": "高叢",
+      "taiyi_number": 9,
+      "wenchang_position": "卯"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 102,
+          "slot_from_top": 1
+        },
+        "text": "八門杜／主勝"
+      },
+      "id": "辰-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 103,
+          "slot_from_top": 1
+        },
+        "text": "客敗；不利／先起"
+      },
+      "source_spirit": "太陽",
+      "taiyi_number": 1,
+      "wenchang_position": "辰"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 102,
+          "slot_from_top": 2
+        },
+        "text": "門具將發"
+      },
+      "id": "辰-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 103,
+          "slot_from_top": 2
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "太陽",
+      "taiyi_number": 2,
+      "wenchang_position": "辰"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 102,
+          "slot_from_top": 3
+        },
+        "text": "大將外迫"
+      },
+      "id": "辰-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 103,
+          "slot_from_top": 3
+        },
+        "text": "主小勝"
+      },
+      "source_spirit": "太陽",
+      "taiyi_number": 3,
+      "wenchang_position": "辰"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 102,
+          "slot_from_top": 4
+        },
+        "text": "大小將發"
+      },
+      "id": "辰-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 103,
+          "slot_from_top": 4
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "太陽",
+      "taiyi_number": 4,
+      "wenchang_position": "辰"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 103,
+          "slot_from_top": 1
+        },
+        "text": "門具將發"
+      },
+      "id": "辰-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 103,
+          "slot_from_top": 1
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "太陽",
+      "taiyi_number": 6,
+      "wenchang_position": "辰"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 103,
+          "slot_from_top": 2
+        },
+        "text": "小將闗囚"
+      },
+      "id": "辰-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 103,
+          "slot_from_top": 2
+        },
+        "text": "主小勝"
+      },
+      "source_spirit": "太陽",
+      "taiyi_number": 7,
+      "wenchang_position": "辰"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 103,
+          "slot_from_top": 3
+        },
+        "text": "小將闗囚"
+      },
+      "id": "辰-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 103,
+          "slot_from_top": 3
+        },
+        "text": "客小敗"
+      },
+      "source_spirit": "太陽",
+      "taiyi_number": 8,
+      "wenchang_position": "辰"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 103,
+          "slot_from_top": 4
+        },
+        "text": "天目內迫／小將格"
+      },
+      "id": "辰-9",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 103,
+          "slot_from_top": 4
+        },
+        "text": "主勝"
+      },
+      "source_spirit": "太陽",
+      "taiyi_number": 9,
+      "wenchang_position": "辰"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 103,
+          "slot_from_top": 1
+        },
+        "text": "天目格"
+      },
+      "id": "巽-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 103,
+          "slot_from_top": 1
+        },
+        "text": "大小將發／主人勝"
+      },
+      "source_spirit": "大炅",
+      "taiyi_number": 1,
+      "wenchang_position": "巽"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 103,
+          "slot_from_top": 2
+        },
+        "text": "天目內迫"
+      },
+      "id": "巽-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 103,
+          "slot_from_top": 2
+        },
+        "text": "大小將囚／客大敗"
+      },
+      "source_spirit": "大炅",
+      "taiyi_number": 2,
+      "wenchang_position": "巽"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 103,
+          "slot_from_top": 3
+        },
+        "text": "大將闗囚"
+      },
+      "id": "巽-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 103,
+          "slot_from_top": 3
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "大炅",
+      "taiyi_number": 3,
+      "wenchang_position": "巽"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 103,
+          "slot_from_top": 4
+        },
+        "text": "天目外迫"
+      },
+      "id": "巽-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 103,
+          "slot_from_top": 4
+        },
+        "text": "大將格／客敗"
+      },
+      "source_spirit": "大炅",
+      "taiyi_number": 4,
+      "wenchang_position": "巽"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 103,
+          "slot_from_top": 1
+        },
+        "text": "門具將發"
+      },
+      "id": "巽-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 103,
+          "slot_from_top": 1
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "大炅",
+      "taiyi_number": 6,
+      "wenchang_position": "巽"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 103,
+          "slot_from_top": 2
+        },
+        "text": "門具將發"
+      },
+      "id": "巽-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 103,
+          "slot_from_top": 2
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "大炅",
+      "taiyi_number": 7,
+      "wenchang_position": "巽"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 103,
+          "slot_from_top": 3
+        },
+        "text": "八門杜"
+      },
+      "id": "巽-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 103,
+          "slot_from_top": 3
+        },
+        "text": "不利先起"
+      },
+      "source_spirit": "大炅",
+      "taiyi_number": 8,
+      "wenchang_position": "巽"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 103,
+          "slot_from_top": 4
+        },
+        "text": "天目闗囚"
+      },
+      "id": "巽-9",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 103,
+          "slot_from_top": 4
+        },
+        "text": "大將闗囚／主勝客敗"
+      },
+      "source_spirit": "大炅",
+      "taiyi_number": 9,
+      "wenchang_position": "巽"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 103,
+          "slot_from_top": 1
+        },
+        "text": "大小將迫"
+      },
+      "id": "巳-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 104,
+          "slot_from_top": 1
+        },
+        "text": "主勝客敗"
+      },
+      "source_spirit": "大神",
+      "taiyi_number": 1,
+      "wenchang_position": "巳"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 103,
+          "slot_from_top": 2
+        },
+        "text": "天目外迫"
+      },
+      "id": "巳-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 104,
+          "slot_from_top": 2
+        },
+        "text": "大小將發／主人勝"
+      },
+      "source_spirit": "大神",
+      "taiyi_number": 2,
+      "wenchang_position": "巳"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 103,
+          "slot_from_top": 3
+        },
+        "text": "八門杜"
+      },
+      "id": "巳-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 104,
+          "slot_from_top": 3
+        },
+        "text": "不利先起"
+      },
+      "source_spirit": "大神",
+      "taiyi_number": 3,
+      "wenchang_position": "巳"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 103,
+          "slot_from_top": 4
+        },
+        "text": "大小將闗"
+      },
+      "id": "巳-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 104,
+          "slot_from_top": 4
+        },
+        "text": "囚主小勝"
+      },
+      "source_spirit": "大神",
+      "taiyi_number": 4,
+      "wenchang_position": "巳"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 104,
+          "slot_from_top": 1
+        },
+        "text": "大將外迫"
+      },
+      "id": "巳-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 104,
+          "slot_from_top": 1
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "大神",
+      "taiyi_number": 6,
+      "wenchang_position": "巳"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 104,
+          "slot_from_top": 2
+        },
+        "text": "門具將發"
+      },
+      "id": "巳-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 104,
+          "slot_from_top": 2
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "大神",
+      "taiyi_number": 7,
+      "wenchang_position": "巳"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 104,
+          "slot_from_top": 3
+        },
+        "text": "門具將發"
+      },
+      "id": "巳-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 104,
+          "slot_from_top": 3
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "大神",
+      "taiyi_number": 8,
+      "wenchang_position": "巳"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 104,
+          "slot_from_top": 4
+        },
+        "text": "天目外迫"
+      },
+      "id": "巳-9",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 104,
+          "slot_from_top": 4
+        },
+        "text": "大將外迫／主人勝"
+      },
+      "source_spirit": "大神",
+      "taiyi_number": 9,
+      "wenchang_position": "巳"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 104,
+          "slot_from_top": 1
+        },
+        "text": "八門杜"
+      },
+      "id": "午-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 104,
+          "slot_from_top": 1
+        },
+        "text": "主勝客敗"
+      },
+      "source_spirit": "大威",
+      "taiyi_number": 1,
+      "wenchang_position": "午"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 104,
+          "slot_from_top": 2
+        },
+        "text": "天目大將闗"
+      },
+      "id": "午-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 104,
+          "slot_from_top": 2
+        },
+        "text": "主勝"
+      },
+      "source_spirit": "大威",
+      "taiyi_number": 2,
+      "wenchang_position": "午"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 104,
+          "slot_from_top": 3
+        },
+        "text": null
+      },
+      "id": "午-3",
+      "reading_status": "blank_column_retained",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 104,
+          "slot_from_top": 3
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "大威",
+      "taiyi_number": 3,
+      "wenchang_position": "午"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 104,
+          "slot_from_top": 4
+        },
+        "text": "大將外迫"
+      },
+      "id": "午-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 104,
+          "slot_from_top": 4
+        },
+        "text": "主大勝"
+      },
+      "source_spirit": "大威",
+      "taiyi_number": 4,
+      "wenchang_position": "午"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 104,
+          "slot_from_top": 1
+        },
+        "text": "門具將發"
+      },
+      "id": "午-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 104,
+          "slot_from_top": 1
+        },
+        "text": "主大勝"
+      },
+      "source_spirit": "大威",
+      "taiyi_number": 6,
+      "wenchang_position": "午"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 104,
+          "slot_from_top": 2
+        },
+        "text": "門具將發"
+      },
+      "id": "午-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 104,
+          "slot_from_top": 2
+        },
+        "text": "主人小勝"
+      },
+      "source_spirit": "大威",
+      "taiyi_number": 7,
+      "wenchang_position": "午"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 104,
+          "slot_from_top": 3
+        },
+        "text": "天目內迫"
+      },
+      "id": "午-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 104,
+          "slot_from_top": 3
+        },
+        "text": "大將格／主大勝"
+      },
+      "source_spirit": "大威",
+      "taiyi_number": 8,
+      "wenchang_position": "午"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 104,
+          "slot_from_top": 4
+        },
+        "text": "先起敗囚"
+      },
+      "id": "午-9",
+      "reading_status": "blank_column_retained",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 104,
+          "slot_from_top": 4
+        },
+        "text": null
+      },
+      "source_spirit": "大威",
+      "taiyi_number": 9,
+      "wenchang_position": "午"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 104,
+          "slot_from_top": 1
+        },
+        "text": "門具將發"
+      },
+      "id": "未-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 105,
+          "slot_from_top": 1
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "天道",
+      "taiyi_number": 1,
+      "wenchang_position": "未"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 104,
+          "slot_from_top": 2
+        },
+        "text": "天目外迫"
+      },
+      "id": "未-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 105,
+          "slot_from_top": 2
+        },
+        "text": "主人勝"
+      },
+      "source_spirit": "天道",
+      "taiyi_number": 2,
+      "wenchang_position": "未"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 104,
+          "slot_from_top": 3
+        },
+        "text": "大將囚"
+      },
+      "id": "未-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 105,
+          "slot_from_top": 3
+        },
+        "text": "客勝"
+      },
+      "source_spirit": "天道",
+      "taiyi_number": 3,
+      "wenchang_position": "未"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 8,
+          "scan_page": 104,
+          "slot_from_top": 4
+        },
+        "text": "大將格"
+      },
+      "id": "未-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 2,
+          "scan_page": 105,
+          "slot_from_top": 4
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "天道",
+      "taiyi_number": 4,
+      "wenchang_position": "未"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 105,
+          "slot_from_top": 1
+        },
+        "text": "門具將發"
+      },
+      "id": "未-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 105,
+          "slot_from_top": 1
+        },
+        "text": "主人小勝"
+      },
+      "source_spirit": "天道",
+      "taiyi_number": 6,
+      "wenchang_position": "未"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 105,
+          "slot_from_top": 2
+        },
+        "text": "天目內迫"
+      },
+      "id": "未-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 105,
+          "slot_from_top": 2
+        },
+        "text": "參將格"
+      },
+      "source_spirit": "天道",
+      "taiyi_number": 7,
+      "wenchang_position": "未"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 105,
+          "slot_from_top": 3
+        },
+        "text": "八門杜"
+      },
+      "id": "未-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 105,
+          "slot_from_top": 3
+        },
+        "text": "利先起"
+      },
+      "source_spirit": "天道",
+      "taiyi_number": 8,
+      "wenchang_position": "未"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 1,
+          "scan_page": 105,
+          "slot_from_top": 4
+        },
+        "text": "參將囚"
+      },
+      "id": "未-9",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 3,
+          "scan_page": 105,
+          "slot_from_top": 4
+        },
+        "text": "客勝"
+      },
+      "source_spirit": "天道",
+      "taiyi_number": 9,
+      "wenchang_position": "未"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 105,
+          "slot_from_top": 1
+        },
+        "text": "門具將發"
+      },
+      "id": "坤-1",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 105,
+          "slot_from_top": 1
+        },
+        "text": "大將格／主人勝"
+      },
+      "source_spirit": "大武",
+      "taiyi_number": 1,
+      "wenchang_position": "坤"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 105,
+          "slot_from_top": 2
+        },
+        "text": "天目外迫"
+      },
+      "id": "坤-2",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 105,
+          "slot_from_top": 2
+        },
+        "text": "客小勝"
+      },
+      "source_spirit": "大武",
+      "taiyi_number": 2,
+      "wenchang_position": "坤"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 105,
+          "slot_from_top": 3
+        },
+        "text": "天目格"
+      },
+      "id": "坤-3",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 105,
+          "slot_from_top": 3
+        },
+        "text": "先起敗"
+      },
+      "source_spirit": "大武",
+      "taiyi_number": 3,
+      "wenchang_position": "坤"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 4,
+          "scan_page": 105,
+          "slot_from_top": 4
+        },
+        "text": "八門杜"
+      },
+      "id": "坤-4",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 6,
+          "scan_page": 105,
+          "slot_from_top": 4
+        },
+        "text": "大小將迫／主大勝"
+      },
+      "source_spirit": "大武",
+      "taiyi_number": 4,
+      "wenchang_position": "坤"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 105,
+          "slot_from_top": 1
+        },
+        "text": "天目囚"
+      },
+      "id": "坤-6",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 105,
+          "slot_from_top": 1
+        },
+        "text": "大小將囚／客大敗"
+      },
+      "source_spirit": "大武",
+      "taiyi_number": 6,
+      "wenchang_position": "坤"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 105,
+          "slot_from_top": 2
+        },
+        "text": "門具將發"
+      },
+      "id": "坤-7",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 105,
+          "slot_from_top": 2
+        },
+        "text": "客大勝"
+      },
+      "source_spirit": "大武",
+      "taiyi_number": 7,
+      "wenchang_position": "坤"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 105,
+          "slot_from_top": 3
+        },
+        "text": "大將囚"
+      },
+      "id": "坤-8",
+      "reading_status": "literal_columns_only",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 105,
+          "slot_from_top": 3
+        },
+        "text": "主小勝"
+      },
+      "source_spirit": "大武",
+      "taiyi_number": 8,
+      "wenchang_position": "坤"
+    },
+    {
+      "condition_column": {
+        "locator": {
+          "column_from_right": 5,
+          "scan_page": 105,
+          "slot_from_top": 4
+        },
+        "text": "客大勝"
+      },
+      "id": "坤-9",
+      "reading_status": "blank_column_retained",
+      "result_column": {
+        "locator": {
+          "column_from_right": 7,
+          "scan_page": 105,
+          "slot_from_top": 4
+        },
+        "text": null
+      },
+      "source_spirit": "大武",
+      "taiyi_number": 9,
+      "wenchang_position": "坤"
+    }
+  ],
+  "classical_acceptance_passed": false,
+  "classical_author": "唐·王希明",
+  "column_layout": "每神四栏：一至四宫条件、六至九宫条件、一至四宫结果、六至九宫结果。卷三表头天目沿卷二十六神位置对应本盘文昌；不将此称名扩展到卷四的另一语境。",
+  "editorial_policy": "德/徳、內/内、將/将、陰/隂、叢/藂、闗/關统一为当前录字；／保留小字并行，分号只帮助阅读，不断句为合取。空栏为null，缺字为〔缺〕；条件栏中的胜败语及结果栏中的条件仍留原栏，不擅自移动。",
+  "id": "jinjing_victory_matrix_columns_v1",
+  "method_scope": "原格只给天目与太乙；完整门盘、客目、主客指代及时间计法适用仍待裁定，门具将发不是本盘三门五将条件已全真的证明。",
+  "real_world_efficacy": "not_tested",
+  "role_scope": "本表天目按卷二十六神名位对应本盘文昌；未标客主的大将、参将保留双方候选，不能据数字较合就裁为某方。",
+  "scope": "原栏胜败只是未完成适用核验的传统引文；几何比较不认证整格、不覆盖现有条件合取、不产生本次实际胜负。",
+  "source_manifest_sha256": "ce8639f43579def116d76649c4606f992808a7669d63722d8cdde001887889a4",
+  "source_title": "太乙金镜式经四库本卷三三门五将立成胜败钤",
+  "source_urls": [
+    "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷03#太乙三門五將立成勝敗鈐",
+    "https://commons.wikimedia.org/wiki/File:CADAL06056494_太乙金鏡式經·卷一~卷四.djvu",
+    "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷02#推十六神名義"
+  ],
+  "version": "1.0.0"
+}

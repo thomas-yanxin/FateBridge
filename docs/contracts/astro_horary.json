@@ -1,0 +1,641 @@
+{
+  "call_guidance": {
+    "calendar_input": "Date labels use the explicit question_calendar/candidate_calendar, default proleptic Gregorian. Read calendar_conversion and analysis_context.input_calendar/input_date before explaining normalized datetimes. Julian dates use CE Jan1 years; do not infer regional reforms, March25 years or historical LMT/LAT. With explicit noon hour origin, retain raw calendar labels and read clock_conversion.hour_origin_conversion for the final canonical wall date; validate range after nominal day carry.",
+    "clock_input": "Use explicit question_clock_basis only from confirmed clock evidence: civil / local_mean_solar / local_apparent_solar. Solar bases must omit/null timezone_name; civil omission preserves the legacy +08:00 default, not evidence of a known zone. Read clock_conversion with calendar_conversion: first normalize date labels, then resolve the declared clock to TT/UT1. Geocentric LAT is not a topocentric sundial reconstruction. Before1960 UTC-named carriers denote UT1 model labels. Never infer an original clock from ASC fit or outcome; numerical residual is not record accuracy.",
+    "hour_origin": "Use question_hour_origin=noon only for confirmed noon-based clock-hour labels such as Lilly1647 pp30-31 ephemeris tables. Default midnight preserves modern labels. Noon0=same-date12:00; noon12..23=next-date00:00..11:00. Read clock_conversion.hour_origin_conversion, raw calendar date/clock, and canonical question_datetime together. Calendar-normalized_local_datetime is a raw hour label and can be null for an unrepresentable intermediate date rescued by the carry; final wall time is separate. This is not physical elapsed duration, a timezone/EOT/JD offset, a house-table coordinate, a regional reform or proof of LMT/LAT. Do not infer the author's convention from a fitted chart. Apply declared hour origin before civil zone/DST validation or solar-clock inversion.",
+    "interpretation_boundary": "Use horary.verdict, reasoning and rule_profile with the actual moon.motion_basis. Never turn candidate=true, same_ruler, instantaneous applying or the legacy heuristic_verdict into a verified source judgement or event probability.",
+    "physical_epoch": "太阳时反解的有效时刻可能落在UTC闰秒。converted_utc可含23:59:60；按clock_conversion.utc_representation区分标签与datetime可表示性，计算使用原生TT/UT1。不能把不能解析datetime说成计算失败，也不能将秒60截断、平滑或移到次日；数值标签精度不代表实测钟时精度。",
+    "ut1_source": "ut1_source默认swiss_delta_t；显式iers_c04使用固定IERS20 C04每日实测合成UT1，仅覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的时刻超范围拒绝；地心TT黄经事件搜索不需要在试算时刻取得UT1，不因C04边界自动变成未知。读取clock_conversion.ut1_reference与calculation_basis.earth_rotation，区分已发布日值和TT上连续UT1-TAI线性插值。只应用UT1，未应用极移、CIP偏移或日内潮汐，形式标准差不是瞬时物理误差界；不得声称完整EOP、史料钟时精度或预测效力。"
+  },
+  "evidence_views": {
+    "calendar_input": {
+      "fields": [
+        "analysis_context",
+        "calendar_conversion",
+        "clock_conversion.hour_origin_conversion",
+        "horary.calculation_basis.calendar",
+        "horary.calculation_basis.time_scale",
+        "horary.calculation_basis.julian_day_tt",
+        "horary.calculation_basis.julian_day_ut1"
+      ],
+      "purpose": "核对显式儒略历／延伸格里历日期、转换后的本地钟时与实际TT/UT1；不推断地区改历、旧式年份或历史钟时，不把日期换算当原图复现。"
+    },
+    "clock_input": {
+      "fields": [
+        "analysis_context",
+        "calendar_conversion",
+        "clock_conversion",
+        "horary.calculation_basis.time_scale",
+        "horary.calculation_basis.julian_day_tt",
+        "horary.calculation_basis.julian_day_ut1"
+      ],
+      "purpose": "核对已确认的民用／地方平太阳／地心视太阳钟时、历法转换次序及同一物理TT/UT1；未知原书钟时不拟合，数值残差不充当史料精度。"
+    },
+    "data_files": {
+      "fields": [
+        "ephemeris_data_policy"
+      ],
+      "scope": "Available when ephemeris_policy=require_data_files. Read the actual observed physical models, file hashes, reference zeros and private-worker reports. Native event-internal reads, fixed-star catalogue formulae and absolute accuracy are not certified. This card does not set the input policy."
+    },
+    "event_paths": {
+      "fields": [
+        "analysis_context",
+        "horary.calculation_basis",
+        "horary.rule_profile",
+        "horary.planets",
+        "horary.significators",
+        "horary.perfection.event_history",
+        "horary.perfection.lilly_conditions.event_paths",
+        "horary.perfection.perfects",
+        "horary.verdict",
+        "horary.reasoning"
+      ],
+      "purpose": "Read actual seven-planet TT roots in the explicit ±30-day scan, distinct principal/principal and carrier/source prior contacts, all intervening carrier contacts, event-epoch receptions with numerical boundary uncertainty, and selected Lilly p111 prohibition/refranation patterns. Product radius and radical sect policies, unknown conditions, finite horizon, frame-specific station timing and incomplete whole-method acceptance remain explicit. A satisfied sequence subset is not a full judgement or outcome proof.",
+      "when": "核对主星、传光星与聚光星的实际历史／未来事件顺序、停滞折返及不同事件历元的接纳。"
+    },
+    "hour_origin": {
+      "fields": [
+        "analysis_context",
+        "calendar_conversion",
+        "clock_conversion.input_hour_origin",
+        "clock_conversion.hour_origin_conversion",
+        "clock_conversion.input_wall_datetime",
+        "clock_conversion.converted_utc",
+        "horary.calculation_basis.julian_day_tt",
+        "horary.calculation_basis.julian_day_ut1"
+      ],
+      "purpose": "核对已确认的午夜／正午起算小时标签：原历法日期、原小时与进位后的标准钟面分别读取，再看实际TT／UT1；不推断原图口径，不当作时区修正或实际持续时长。"
+    },
+    "lilly_fortitudes": {
+      "fields": [
+        "analysis_context",
+        "horary.fortitudes.method_id",
+        "horary.fortitudes.summary",
+        "horary.fortitudes.physical_inputs.status",
+        "horary.fortitudes.physical_inputs.daily_motion_policy",
+        "horary.fortitudes.physical_inputs.star_position_policy",
+        "horary.fortitudes.source_method_scope",
+        "horary.fortitudes.source_conflicts",
+        "horary.fortitudes.full_original_text_acceptance",
+        "horary.fortitudes.full_judgement_accepted",
+        "horary.verdict"
+      ],
+      "purpose": "Read all41-row summary including inapplicable and unknown conditions. Daily displacement differs from instantaneous direction; dated stellar astrometry differs from printed1647 coordinates. Literal row sums do not reproduce every original worked total. Expand fortitudes.planets.<Planet>.rows for exact predicates; unknown rows are not zero, and points are not success probabilities or a complete judgement.",
+      "when": "逐行核对Lilly1647第115页本质／偶然尊贵表的已算条件、24小时运动与未知项。"
+    },
+    "lilly_fortune": {
+      "fields": [
+        "analysis_context",
+        "horary.fortune.method_id",
+        "horary.fortune.longitude",
+        "horary.fortune.formula",
+        "horary.fortune.house_assignment",
+        "horary.fortune.status",
+        "horary.fortune.known_fortitudes",
+        "horary.fortune.known_debilities",
+        "horary.fortune.literal_table_balance",
+        "horary.fortune.unknown_rows",
+        "horary.fortune.applied_conditions",
+        "horary.fortune.interpretation_policies",
+        "horary.fortune.source_method_scope",
+        "horary.fortune.full_original_text_acceptance",
+        "horary.rule_profile.cusp_virtue_policy",
+        "horary.verdict"
+      ],
+      "purpose": "Lilly pp143-144 uses physical ASC+Moon-Sun day and night. Keep geometric occupancy, nearest-cusp virtue and significator roles separate. The28 p145 rows include neutral Aries and Fortune-specific sixth/eighth-house weights. Exact planetary rays and p179 stellar range transfer are disclosed conventions. P180 beyond-five-degree assignment and row discrepancies remain failed controls; unknowns never equal zero; no wealth amount, success probability or complete judgement follows.",
+      "when": "核对Lilly1647福点昼夜同式、宫头五度效力归属和第145页独立强弱表。"
+    },
+    "lilly_orbs_houses": {
+      "fields": [
+        "analysis_context",
+        "horary.rule_profile",
+        "horary.planets",
+        "horary.significators",
+        "horary.perfection.lilly_conditions.p126_127_dwelling",
+        "horary.perfection.lilly_conditions.event_paths",
+        "horary.perfection.perfects",
+        "horary.moon",
+        "horary.verdict",
+        "horary.reasoning"
+      ],
+      "purpose": "Read selected p107 full-orb column and declared equality convention; house is the significator role, occupied_house is actual chart occupancy. P48 rank assumes otherwise equal dignity; p115 house points are a separate partial row. P126-127 dwelling requires lunar transfer; finite ordered Moon contacts and current rays are necessary subconditions, not complete transfer, full judgement or reality proof. Preserve missing histories, collisions and numerical ambiguity.",
+      "when": "核对Lilly1647第107页两列容许度、第48／115页宫位事实，以及第126–127页不可仅凭居宫断成的条件。"
+    },
+    "lilly_radicality": {
+      "fields": [
+        "analysis_context",
+        "horary.radicality.method_id",
+        "horary.radicality.hour_inputs",
+        "horary.radicality.hour_affinity",
+        "horary.radicality.reported_context",
+        "horary.radicality.ascendant_degree_gate",
+        "horary.radicality.clauses",
+        "horary.radicality.unknown_clauses",
+        "horary.radicality.safe_to_judge",
+        "horary.radicality.safe_to_judge_scope",
+        "horary.radicality.full_original_text_acceptance",
+        "horary.radicality.full_judgement_accepted",
+        "horary.verdict"
+      ],
+      "purpose": "Read all12 clauses in the pp121-123 manual inventory, actual unequal-hour geometry, selected p104 triplicity and own-nature affinity, prerequisites, exceptions and attributed variants. The Moon late-degree cutoff is unspecified; no27degree threshold or p115 weighted balance0 is invented. Optional context is caller-reported only: a known question timestamp is not a certain timed event, and no age/appearance/strength is inferred. safe_to_judge remains null for the uncertified full method, not false/true reality prediction. Compute the supplied instant without changing it to clear a caution.",
+      "when": "核对Lilly1647起盘审慎条件、时主对应、原文例外与未知定义，避免仅凭上升度数认定整盘可判断。"
+    },
+    "lilly_reception_conditions": {
+      "fields": [
+        "analysis_context",
+        "horary.calculation_basis",
+        "horary.rule_profile",
+        "horary.planets",
+        "horary.significators",
+        "horary.perfection.lilly_conditions",
+        "horary.verdict",
+        "horary.reasoning"
+      ],
+      "purpose": "Selected Lilly1647 seven-planet dignity/reception table and p125-126 route conditions, including actual finite event sequences in event_paths. Preserve receiver/guest direction, radical chart sect, event epochs, explicit numerical boundary ambiguity and selected p107 orb column, literal occupied-house facts and incomplete full house/epoch interpretation. Sidereal is an extension, not original-edition acceptance.",
+      "when": "核对Lilly1647指定版本的本质尊贵、谁接纳谁、互纳与第125–126页路径的逐项条件；同时读取七曜原始状态与未核验项。"
+    },
+    "lilly_sign_rays": {
+      "fields": [
+        "analysis_context",
+        "horary.calculation_basis",
+        "horary.rule_profile",
+        "horary.significators",
+        "horary.verdict",
+        "horary.reasoning"
+      ],
+      "purpose": "Caster-to-receiver direction from Lilly1647 pp108-109, separate from reception host/guest and Hellenistic overcoming. Preserve the32printed ordered inconjunct pairs and16pairs absent from both tables. Same-sign co-presence does not establish bodily conjunction. Compare the sign table to the selected degree/orb candidate without replacing it, adding strength points or certifying event perfection. Sidereal is an extension.",
+      "when": "核对Lilly1647第108–109页由求问者主星向所问主星发出的左相／右相、冲相、同星座和原表不相照关系，并与实际度数相位候选分别核对。"
+    },
+    "motion_conditions": {
+      "fields": [
+        "analysis_context",
+        "horary.calculation_basis",
+        "horary.rule_profile",
+        "horary.significators",
+        "horary.planets",
+        "horary.moon",
+        "horary.radicality",
+        "horary.perfection",
+        "horary.verdict",
+        "horary.reasoning"
+      ],
+      "purpose": "Read actual lunar before-ingress and finite seven-planet TT event histories, nominal geometry, selected Lilly receptions and event-path conditions separately. Physical roots and named source predicates do not establish a complete source-method judgement; native failure and unsearched times remain unknown.",
+      "when": "用户按明确提问时刻询问卜卦相位与传统条件；先读实际月亮事件、候选路径与未核验条件，原型规则倾向不能当作完整Lilly判断。"
+    },
+    "physical_epoch": {
+      "description": "输入钟时、原生TT/UT1及UTC显示标签；太阳时物理轴保留秒60。普通civil分支utc_representation可为null，未宣称原始资料或实测EOP已认证。",
+      "fields": [
+        "analysis_context",
+        "clock_conversion",
+        "horary.calculation_basis.julian_day_tt",
+        "horary.calculation_basis.julian_day_ut1"
+      ]
+    },
+    "reference_points": {
+      "fields": [
+        "analysis_context",
+        "horary.calculation_basis",
+        "horary.perfection.event_history.status",
+        "horary.perfection.event_history.unavailable_reason",
+        "horary.perfection.event_history.unavailable_code",
+        "horary.perfection.event_history.failed_sample",
+        "horary.perfection.event_history.completeness_scope",
+        "horary.perfection.event_history.ephemeris_reference_points",
+        "horary.perfection.event_history.longitude_motion",
+        "horary.perfection.event_history.question_states",
+        "horary.moon.motion_basis.status",
+        "horary.moon.motion_basis.ephemeris_reference_points",
+        "horary.moon.motion_basis.longitude_motion",
+        "horary.perfection.perfects",
+        "horary.perfection.lilly_conditions.event_paths.status",
+        "horary.rule_profile",
+        "horary.verdict",
+        "horary.reasoning"
+      ],
+      "purpose": "Read declared body/system centers and actual physical model summary separately from analytical nodes; inspect native speed and applied source-derived/display-frame corrections. Root brackets are numerical resolution. Matched-reference-point validation is not body-center accuracy, full original method or reality prediction certification. Unavailable event histories remain explicit; empty events do not establish absence.",
+      "when": "核对星历采用本体中心还是行星系统质心、物理后端与交点模型、以及成相／停滞所用日速来源。"
+    },
+    "solar_position_model": {
+      "fields": [
+        "horary.calculation_basis.apparent_position_policy",
+        "horary.calculation_basis.ephemeris_model",
+        "horary.calculation_basis.julian_day_tt"
+      ],
+      "purpose": "Read nominal-epoch finite unbent-ray geometry and the inspected native solar mass model. A background solar-disc position is a virtual continuous extension; foreground transits differ. Unknown geometry remains unknown. This is not an optical occultation, limb-contact, detectability or physical-error certificate. Never replace native positions with a no-deflection diagnostic to pass a reference comparison.",
+      "when": "核对近太阳位置的原生偏折模型、太阳后方的虚拟模型视位置与太阳前方的凌日几何。"
+    },
+    "ut1_input": {
+      "fields": [
+        "analysis_context",
+        "clock_conversion",
+        "horary.calculation_basis.earth_rotation",
+        "horary.calculation_basis.julian_day_tt",
+        "horary.calculation_basis.julian_day_ut1"
+      ],
+      "purpose": "核对明确选择的模型或IERS20 C04 UT1来源、固定覆盖期、源文件指纹、插值区间与未应用修正；盘面与地平计算仍要求覆盖内UT1；地心TT黄经事件不外推UT1即可跨边界搜索，未取得瞬时观测误差或现实预测证据。"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "analysis_context",
+      "calendar_conversion",
+      "clock_conversion",
+      "horary.calculation_basis",
+      "horary.rule_profile",
+      "horary.significators",
+      "horary.moon",
+      "horary.radicality",
+      "horary.perfection",
+      "horary.verdict",
+      "horary.reasoning"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "category": {
+        "default": "general",
+        "description": "Question topic, selecting the quesited house: general/wealth/family/property/marriage/lawsuit/theft/travel/career/hope/enemy; 生死、疾病与生育临床判断不开放",
+        "enum": [
+          "general",
+          "wealth",
+          "family",
+          "property",
+          "marriage",
+          "lawsuit",
+          "theft",
+          "travel",
+          "career",
+          "hope",
+          "enemy"
+        ],
+        "type": "string"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "ephemeris_policy": {
+        "default": "auto",
+        "description": "auto retains and reports actual available models. require_data_files rejects analytical/orbital fallback for observed physical coordinates throughout the request, including clocks and samples; checks data contexts and endpoint hashes. Native rise/set query/result epochs are probed, but internal solver reads are not fully observable. Analytical points, fictitious elements, reference zeros and Earth rotation are separate; this is not an astronomical-accuracy or prediction certificate.",
+        "enum": [
+          "auto",
+          "require_data_files"
+        ],
+        "type": "string",
+        "x-fatebridge-western-data-policy": true
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "house_system": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string"
+          }
+        ],
+        "default": "R",
+        "description": "House system, any convention (SE letter / key / integer code 0..8); Regiomontanus (R, code 2) is traditional for horary. Explicit values must be supported letters/names or integer codes0..8; unknown, blank, boolean and floating-point selections are rejected without substitution. Gauquelin (G) has36 clockwise sectors and is unavailable here."
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "latitude": {
+        "description": "Latitude where the question was asked",
+        "maximum": 90,
+        "minimum": -90,
+        "type": "number"
+      },
+      "longitude": {
+        "description": "Longitude where the question was asked",
+        "maximum": 180,
+        "minimum": -180,
+        "type": "number"
+      },
+      "name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional chart name"
+      },
+      "orb_profile": {
+        "default": "lilly_1647_p107_first",
+        "description": "Lilly1647 p107 printed full-orb column. Both source variants are supported; pair radius is their half-sum. First column matches the printed Saturn/Venus moiety example.",
+        "enum": [
+          "lilly_1647_p107_first",
+          "lilly_1647_p107_second"
+        ],
+        "type": "string"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "question_calendar": {
+        "default": "proleptic_gregorian",
+        "description": "Explicit calendar for question date labels; CE year starts Jan1. No country reform, March25 year rollover or historical clock inferred. Converted before the supplied timezone is applied.",
+        "enum": [
+          "proleptic_gregorian",
+          "julian"
+        ],
+        "type": "string"
+      },
+      "question_clock_basis": {
+        "default": "civil",
+        "description": "Explicit question clock: civil zone clock, local mean solar (UT1 + east longitude/360), or geocentric local apparent solar (adds EOT). Do not infer an original author's clock by fitting the chart. Solar labels require timezone_name omitted/null.",
+        "enum": [
+          "civil",
+          "local_mean_solar",
+          "local_apparent_solar"
+        ],
+        "type": "string"
+      },
+      "question_day": {
+        "description": "Day the question was asked (1-31)",
+        "maximum": 31,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "question_hour": {
+        "description": "Hour the question was asked (0-23)",
+        "maximum": 23,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "question_hour_origin": {
+        "default": "midnight",
+        "description": "Hour-label origin, independent of civil/LMT/LAT: midnight(default) hour0=00:00; noon hour0=same-date12:00 and hour12..23=next-date00:00..11:00. Select noon only for confirmed noon-based labels, e.g. Lilly1647 pp30-31 ephemeris tables, not all charts. Nominal labels, not elapsed duration, timezone or JD epoch correction. Calendar and day carry normalize before timezone validation.",
+        "enum": [
+          "midnight",
+          "noon"
+        ],
+        "type": "string"
+      },
+      "question_minute": {
+        "default": 0,
+        "description": "Minute the question was asked",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "question_month": {
+        "description": "Month the question was asked (1-12)",
+        "maximum": 12,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "question_year": {
+        "description": "Year the question was asked",
+        "type": "integer"
+      },
+      "radicality_context": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "description": "Optional caller reports for source exceptions, never inferred facts.",
+            "properties": {
+              "age_degree_agreement_reported": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "equal_fortune_infortune_testimonies_reported": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Reported testimony balance; not derived from p115 weighted score0. All context reports are unverified and optional."
+              },
+              "event_time_certain_reported": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Caller reports a certain event instant; a valid date or known question time does not establish this."
+              },
+              "figure_origin": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "propounded_question",
+                      "timed_event",
+                      "unknown"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Optional reported origin; timed_event only supplies context for the p122 exception, not a complete event-astrology method. Omission uses this API's question-instant convention."
+              },
+              "principal_significators_very_strong_reported": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "rising_description_agreement_reported": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "seventh_cusp_afflicted_reported": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "seventh_lord_impeded_reported": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "seventh_lord_unfortunate_reported": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "very_young_querent_reported": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              }
+            },
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional already-known reports for Lilly pp121-123 prerequisites and exceptions. Unknown reports remain unknown; do not infer age, appearance, affliction or event certainty to clear a caution."
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "timezone_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Civil question timezone (IANA or UTC offset). Omitted/null with civil preserves legacy +08:00; supply the known zone explicitly. Solar clock bases must omit/null this field to prevent double correction."
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "ut1_source": {
+        "default": "swiss_delta_t",
+        "description": "Earth-rotation time source: legacy Swiss Delta T model(default), or pinned IERS20 C04 final daily UT1 series,1962-01-01T00:00UTC..2026-09-19T00:00UTC. C04 uses continuous UT1-TAI interpolation; no out-of-range prediction/extrapolation/model fallback. Does not apply polar motion,CIP offsets or subdaily tides and does not certify clock-record precision. Geocentric TT longitude-event searches need no trial UT1; houses and horizon calculations still require covered UT1 epochs.",
+        "enum": [
+          "swiss_delta_t",
+          "iers_c04"
+        ],
+        "type": "string"
+      },
+      "zodiac_type": {
+        "default": "Tropic",
+        "description": "Zodiac type, e.g. Tropic or Sidereal",
+        "type": "string"
+      }
+    },
+    "required": [
+      "question_year",
+      "question_month",
+      "question_day",
+      "question_hour",
+      "longitude",
+      "latitude"
+    ],
+    "type": "object"
+  },
+  "tool": "astro_horary"
+}

@@ -1,0 +1,569 @@
+{
+  "id": "seibunkan_1900_selected_comparison_v1",
+  "source_kind": "NDL所藏具名近代注释刊本的选页对照；不是唐代抄本或T2465新见证",
+  "catalogue_publication_date": "明33.11（1900）",
+  "imprint_colophon_date_personally_verified": false,
+  "manifests": [
+    {
+      "pid": "760661",
+      "manifest_url": "https://dl.ndl.go.jp/api/iiif/760661/manifest.json",
+      "manifest_sha256": "8a062d9938484eee77d2e2cd26536e3fc30510fbb6481c4db503d801611a2608",
+      "title": "二十八宿詳解 : 真言秘密. 天之巻",
+      "metadata": [
+        {
+          "label": "Persistent ID",
+          "value": "info:ndljp/pid/760661"
+        },
+        {
+          "label": "Title",
+          "value": "二十八宿詳解 : 真言秘密.天之巻"
+        },
+        {
+          "label": "Creator",
+          "value": "星文館々主 著"
+        },
+        {
+          "label": "Publisher",
+          "value": "矢島誠進堂"
+        },
+        {
+          "label": "Publication Date",
+          "value": "明33.11"
+        },
+        {
+          "label": "Publication Date (W3CDTF fortmat)",
+          "value": "1900"
+        },
+        {
+          "label": "Call Number",
+          "value": "特21-954"
+        },
+        {
+          "label": "Bibliographic ID",
+          "value": "000000423548"
+        },
+        {
+          "label": "DOI",
+          "value": "10.11501/760661"
+        },
+        {
+          "label": "Access Restrictions",
+          "value": "PDM"
+        },
+        {
+          "label": "URL",
+          "value": "https://dl.ndl.go.jp/info:ndljp/pid/760661"
+        }
+      ],
+      "total_canvases": 74
+    },
+    {
+      "pid": "760662",
+      "manifest_url": "https://dl.ndl.go.jp/api/iiif/760662/manifest.json",
+      "manifest_sha256": "f9992d4f664c2102b8266aedb9b2c73e4a5aef2f9604ba8463352a43e8aa08b4",
+      "title": "二十八宿詳解 : 真言秘密. 地之巻",
+      "metadata": [
+        {
+          "label": "Persistent ID",
+          "value": "info:ndljp/pid/760662"
+        },
+        {
+          "label": "Title",
+          "value": "二十八宿詳解 : 真言秘密.地之巻"
+        },
+        {
+          "label": "Creator",
+          "value": "星文館々主 著"
+        },
+        {
+          "label": "Publisher",
+          "value": "矢島誠進堂"
+        },
+        {
+          "label": "Publication Date",
+          "value": "明33.11"
+        },
+        {
+          "label": "Publication Date (W3CDTF fortmat)",
+          "value": "1900"
+        },
+        {
+          "label": "Call Number",
+          "value": "特21-954"
+        },
+        {
+          "label": "Bibliographic ID",
+          "value": "000000423548"
+        },
+        {
+          "label": "DOI",
+          "value": "10.11501/760662"
+        },
+        {
+          "label": "Access Restrictions",
+          "value": "PDM"
+        },
+        {
+          "label": "URL",
+          "value": "https://dl.ndl.go.jp/info:ndljp/pid/760662"
+        }
+      ],
+      "total_canvases": 78
+    }
+  ],
+  "selected_images": [
+    {
+      "pid": "760661",
+      "canvas_ordinal": 2,
+      "bytes": 4047692,
+      "sha256": "23ee74202d5459379da54e67e21b559e8dd7225dc4bbc25a43db5a7af826b8ff",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 9,
+      "bytes": 1853711,
+      "sha256": "a081826cac46082bd39820054e274b58dc769b4eb0dc83f25d2b31baae5f0ace",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 10,
+      "bytes": 2520162,
+      "sha256": "6696ed27f339a7110dce830bd4672154a3b38141f6e1f2011787c733e502bb06",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 11,
+      "bytes": 2551088,
+      "sha256": "20f2496e3a648a385061d9796a946f075dd729d8c7d1d23ddc898f020d77a89b",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 12,
+      "bytes": 1336169,
+      "sha256": "4b49ea1b1517b36f91ec7de7633d089245e0139095ef9ca0697ed3c1a9c0b560",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 13,
+      "bytes": 1170823,
+      "sha256": "9607320fa63ee5e16f7d77eba9a138953ed8e1b927c06be396350f0823ce5e7c",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 14,
+      "bytes": 3426135,
+      "sha256": "4608c481b6763b4f63ef923b60bb45360525bb49353b35cbdd4cf78a92b26e65",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 31,
+      "bytes": 2074730,
+      "sha256": "71a023707e42b8056470e31381bb36a3ec842b71c6bc357424f4c6ed74fdb519",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 32,
+      "bytes": 1983866,
+      "sha256": "a21eb011e17d7718044671013d9924dd3275636ce4986501acd6b22a8e6a6494",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 33,
+      "bytes": 2176332,
+      "sha256": "914602d5d3ccc174dc5053e2484c60b2fed24899edc459b1f401e50117b60a33",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 56,
+      "bytes": 2455274,
+      "sha256": "4d87ed8ec72be1f914654430cf5c2633eb54b25e4cf96ad633a8daa0f2586d86",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 57,
+      "bytes": 2916098,
+      "sha256": "5273fde8f3a51c977274117ac873f24ce58e5458bc3831c95b054fbd99e58e4b",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 58,
+      "bytes": 2844676,
+      "sha256": "5271180fc4269b315884a949163fcbcaa1a78e5228112a51b3f9c8cd1f74bad2",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 59,
+      "bytes": 2714087,
+      "sha256": "a24f19e4ee1638b1189a19307a56054dbeb6181557a0a62915e82c43ad201d52",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 60,
+      "bytes": 2572033,
+      "sha256": "2f6d38952e16b1dc7e6cdef7f6e10ea72bc79ed5ed0f88b71cbd7100a2642a0c",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 61,
+      "bytes": 2825004,
+      "sha256": "50576003aae60ea5f1bccc4559d301d26ed7c0aa7509289b695301e95aa0eaac",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 62,
+      "bytes": 2544062,
+      "sha256": "871b59c4fc2711f1b2cdc4dd332ee791bd5625598140be9366d63598ea5356b7",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 73,
+      "bytes": 1019525,
+      "sha256": "6530ee41f0df467394a12572eb1be1946e77d374140fbb7dd65c0e3f0acca979",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760661",
+      "canvas_ordinal": 74,
+      "bytes": 2244065,
+      "sha256": "aca367a935fc0a00a5b85d790a52638357eaad57539b0ece72f66bb12b8e0237",
+      "native_size": [
+        3539,
+        3010
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760662",
+      "canvas_ordinal": 13,
+      "bytes": 3042262,
+      "sha256": "3a97fd7ff1b3d5360a67f71257c987663b380bfba8f5cba437a5978d753275bb",
+      "native_size": [
+        3492,
+        3063
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760662",
+      "canvas_ordinal": 14,
+      "bytes": 3034912,
+      "sha256": "e499f181f0b41febe7f99ddc145fe129d894d4c7c291833e128f28cbd96d3c1d",
+      "native_size": [
+        3492,
+        3063
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760662",
+      "canvas_ordinal": 15,
+      "bytes": 2912534,
+      "sha256": "96e723ae1961b819939afa48fe87cd5fc0cdad3329336649560e1f49f145f765",
+      "native_size": [
+        3492,
+        3063
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760662",
+      "canvas_ordinal": 34,
+      "bytes": 2903027,
+      "sha256": "54aeed25c274f0a3ffdb900670019b7a27efa943ec823ba2f6d952519710bf63",
+      "native_size": [
+        3492,
+        3063
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760662",
+      "canvas_ordinal": 35,
+      "bytes": 2707418,
+      "sha256": "132bd37ca5392731c12ac8813f7243bb824845f073a20183e22240fe05f51f46",
+      "native_size": [
+        3492,
+        3063
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760662",
+      "canvas_ordinal": 36,
+      "bytes": 2908658,
+      "sha256": "6b9c1eb32e0a81e1cb5585c0b97ad5d13d5d8f460b50559e339b49aa3a4e2538",
+      "native_size": [
+        3492,
+        3063
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760662",
+      "canvas_ordinal": 77,
+      "bytes": 1293578,
+      "sha256": "84dedaaefdd17fbedf8c63f0b7e413882d6a5878adb9964db02ea2bca6b4c19f",
+      "native_size": [
+        3492,
+        3063
+      ],
+      "mode": "RGB"
+    },
+    {
+      "pid": "760662",
+      "canvas_ordinal": 78,
+      "bytes": 3342609,
+      "sha256": "e463a349b715055b53be26af31df4189ad3e7636e7c3f8a118c58fb6fba089dc",
+      "native_size": [
+        3492,
+        3063
+      ],
+      "mode": "RGB"
+    }
+  ],
+  "selected_canvases": 27,
+  "total_manifest_canvases": 152,
+  "whole_book_collated": false,
+  "calendar_meanings_binding": {
+    "id": "hinoo_calendar_clause_meanings_v1",
+    "source_bundle_sha256": "8700121b9b7b150f0619afda4d09f3109ac139e6d310eb7600a0b66a890d683e"
+  },
+  "taisho_binding": {
+    "publisher_html_response_sha256": "74c63f5151c2b8c3ac554f7a0acae0776e5247e740a712834e1b600a065050e6",
+    "downloaded_calendar_windows": [
+      {
+        "locator": "T2465_.78.0030c13-21",
+        "text": "若有閏月時。其正月直宿即亦重直閏月。謂假令十二月有閏月。而其十二月一日直宿是虚宿。十五日直宿是星宿。乃至三十日直宿是星宿。如是閏十二月直宿亦同之。更無異也。先月是正十二月。閏月是傍十二月也。故傍月･直宿三十日皆用正十二月直宿更不異宿也。餘月聞月准之知耳。"
+      },
+      {
+        "locator": "T2465_.78.0030c21-26",
+        "text": "取小月闕第三十日直宿之法。假令正月小闕第三十日。雖無其第三十日。而彼日分直宿猶有故。次二月初一日半已上者。正月闕日之分宿直也。半已下者即彼當日宿直。故雖大小異日有増減。而小月闕日直宿無日不得。次月初一日眞宿無改代也｣"
+      }
+    ],
+    "calendar_apparatus": [
+      {
+        "line": "0030c14",
+        "notes_html": [
+          "訣＝説<sup>イ</sup>＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c17",
+        "notes_html": [
+          "十＝月＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c18",
+        "notes_html": [
+          "〔是正･･･月〕十六字<sup>イ</sup>－＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c20",
+        "notes_html": [
+          "〔宿〕－＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c23",
+        "notes_html": [
+          "半＋（也）＜甲＞"
+        ]
+      }
+    ]
+  },
+  "leap_month": {
+    "locator": "NDL760661 canvas10右页《凡例》二、末栏下部",
+    "literal_working_excerpt": "潤月は其月の朔日の宿を用ひ",
+    "meaning": "该书凡例说明闰月复用相应本月朔宿；不据此确定桧尾闰小月交叠先后",
+    "layer": "该近代刊本凡例",
+    "applied_as_hinoo_rule_override": false,
+    "tail_working_readings": [
+      {
+        "role": "generator7_first",
+        "text": "本月と準じと了解せよ"
+      },
+      {
+        "role": "reviewer7_first",
+        "text": "本月と準じて了解せよ"
+      }
+    ],
+    "canonical_tail_reading": null
+  },
+  "table_layers": {
+    "upper_locator": "NDL760661 canvases32–33，印页34–37",
+    "upper_contains_ox_mansion": true,
+    "complete360_cells_transcribed": false,
+    "lower_critique_locator": "NDL760662 canvas13左页，印页21",
+    "lower_critique_kind": "注者推测图可能为后人插入",
+    "historical_interpolation_proved": false,
+    "lower_excludes_ox_locator": "NDL760662 canvas13右页小字",
+    "lower_excludes_ox_literal": "唐用二十八宿。西國除牛宿。",
+    "upper_table_same_as_criticized_figure_established": false
+  },
+  "natal_example": {
+    "locator": "NDL760662 canvases14–15，印页23–24",
+    "lunar_month": 2,
+    "lunar_day": 17,
+    "added_number": 13,
+    "printed_sum": 30,
+    "cycle_length": 27,
+    "remainder": 3,
+    "literal_result_mansion": "氏",
+    "modern_mansion_label_for_comparison": "氐",
+    "print_glyph_rewritten": false,
+    "scope": "一个该版明列的算例，不是天文观测或全域验收"
+  },
+  "weekday": {
+    "locator": "NDL760662 canvas35左页，印页65",
+    "first_literal": "平明即是所直之曜",
+    "next_literal": "轉到明日曉時。即次後曜當直",
+    "day_parts": 8,
+    "night_parts": 8,
+    "middle_glyph_working_readings": [
+      {
+        "role": "root_first",
+        "location": "first note did not separate Chinese and Japanese",
+        "text": "西成"
+      },
+      {
+        "role": "generator20_first",
+        "location": "Chinese",
+        "text": "酉〔成／戌未定〕"
+      },
+      {
+        "role": "generator20_first",
+        "location": "Japanese",
+        "text": "西成"
+      },
+      {
+        "role": "reviewer20_first",
+        "location": "Chinese",
+        "text": "西戌"
+      },
+      {
+        "role": "reviewer20_first",
+        "location": "Japanese",
+        "text": "西戌"
+      }
+    ],
+    "middle_canonical_reading": null,
+    "modern_clock": null,
+    "solar_altitude": null
+  },
+  "scope": {
+    "original20_selected_intake_preserved": true,
+    "later7_intake_separate": true,
+    "root_first_normalized_氐_note_then_native_crop_氏_correction_retained": true,
+    "independent_human_collation": false,
+    "strict_blind_or_provider_independence": false,
+    "hinoo_half_clock": null,
+    "leap_short_month_execution_priority": null,
+    "calendar_policy_changed": false,
+    "original180_regraded": false,
+    "real_samples": 0,
+    "real_study_status": "draft_not_registered",
+    "cover_publisher_working_dispute": {
+      "generator20_first": "春陽堂",
+      "reviewer20_first": "矢島誠進堂",
+      "catalogue_publisher": "矢島誠進堂",
+      "canonical_cover_reading_admitted": null
+    }
+  },
+  "source_reading_firsts": {
+    "generator20_sha256": "bed78aa1b158aed05b4a9440cf5250a3ef98dca6e554144e57c42c000c083ff1",
+    "reviewer20_sha256": "2379147c778ccc8429112ef7b92509222d8a7b0fb856cbe47acbfc3790038559",
+    "reviewer7_sha256": "7a5784c79d0a6818fee4949378ff7dc215bffb0bcdfb335120ab5118fd8246f5",
+    "generator7_sha256": "a47d3e4b8182e37bb043f8ed6d69b79be65f280afa931e998ff5b3ba1af4db09"
+  }
+}

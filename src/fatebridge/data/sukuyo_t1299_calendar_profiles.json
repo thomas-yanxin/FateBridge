@@ -1,0 +1,191 @@
+{
+  "id": "t1299_lower_fullmoon27_v1",
+  "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
+  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+  "edition": "大正藏T21 No.1299; CBETA TEI P5 header 2025-01-30",
+  "author": "不空译；下卷二十七宿望日逆顺法",
+  "fullmoon_anchors": [
+    {
+      "month": 1,
+      "fullmoon_mansion": "翼",
+      "locator": "T21n1299_p0394c20-28"
+    },
+    {
+      "month": 2,
+      "fullmoon_mansion": "角",
+      "locator": "T21n1299_p0394c20-28"
+    },
+    {
+      "month": 3,
+      "fullmoon_mansion": "氐",
+      "locator": "T21n1299_p0394c20-28"
+    },
+    {
+      "month": 4,
+      "fullmoon_mansion": "心",
+      "locator": "T21n1299_p0394c20-28"
+    },
+    {
+      "month": 5,
+      "fullmoon_mansion": "箕",
+      "locator": "T21n1299_p0394c20-28"
+    },
+    {
+      "month": 6,
+      "fullmoon_mansion": "女",
+      "locator": "T21n1299_p0394c20-28"
+    },
+    {
+      "month": 7,
+      "fullmoon_mansion": "室",
+      "locator": "T21n1299_p0394c20-28"
+    },
+    {
+      "month": 8,
+      "fullmoon_mansion": "婁",
+      "locator": "T21n1299_p0394c20-28"
+    },
+    {
+      "month": 9,
+      "fullmoon_mansion": "昴",
+      "locator": "T21n1299_p0394c20-28"
+    },
+    {
+      "month": 10,
+      "fullmoon_mansion": "觜",
+      "locator": "T21n1299_p0394c20-28"
+    },
+    {
+      "month": 11,
+      "fullmoon_mansion": "鬼",
+      "locator": "T21n1299_p0394c20-28"
+    },
+    {
+      "month": 12,
+      "fullmoon_mansion": "星",
+      "locator": "T21n1299_p0394c20-28"
+    }
+  ],
+  "direct_count_locator": "T21n1299_p0394c20-0395a04; p0395b01-03",
+  "shortcut_locator": "T21n1299_p0395b04-08",
+  "hinoo_addendum": {
+    "id": "hinoo_t1299_host27_research_v1",
+    "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?mode=detail&s=&useid=2465_%2C01",
+    "author": "实慧《桧尾口诀》",
+    "leap_locator": "T2465_.78.0030c13-21",
+    "short_month_locator": "T2465_.78.0030c21-26",
+    "scope": "在T1299望宿27宿主表上应用闰月复用和小月缺日次月初一前/后半分配；不自动把半日等同民用12:00，不重建日本旧历。",
+    "textual_variant": {
+      "locator": "T2465_.78.0030c16-17",
+      "literal": "十二月十五日星、三十日星",
+      "host_algorithm": "T1299下卷望日星，三十日室",
+      "policy": "本档案使用T1299通用望宿算法；保留T2465示例的星/室差异，不以该字面示例覆写月日算法。",
+      "critical_study": "https://doi.org/10.3390/rel13050458",
+      "critical_study_locator": "pp.7,9; notes 13,15"
+    },
+    "provenance_scope": "顶层source_sha256指T1299完整TEI。T2465另列直接下载的SAT完整HTML响应指纹、选定段落及校记；旧缓存摘录保留为历史取证记录。完整HTML响应不等于原抄本、嵌入字图全部取得或影印校勘。",
+    "half_interpretation": "前半/后半的解读参照Kotyk 2022 pp.7-9；保留原典半日身份，不自动映射为民用钟时。",
+    "cached_primary_excerpt": {
+      "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?kaeri=&mode=detail&nonum=1&useid=2465_,01,0026",
+      "retrieval_kind": "web_tool_cached_publisher_page_selected_excerpt",
+      "retrieved_on": "2026-10-22",
+      "normalization": "Visible SAT text manually transcribed, line wrapping and footnote button markers removed; source 閏/聞 and 半已上/半已下 retained. These hashes identify these normalized UTF-8 excerpts only.",
+      "windows": [
+        {
+          "locator": "T2465_.78.0030c13-21",
+          "text": "若有閏月時。其正月直宿即亦重直閏月。謂假令十二月有閏月。而其十二月一日直宿是虚宿。十五日直宿是星宿。乃至三十日直宿是星宿。如是閏十二月直宿亦同之。更無異也。先月是正十二月。閏月是傍十二月也。故傍月･直宿三十日皆用正十二月直宿更不異宿也。餘月聞月准之知耳。",
+          "normalized_excerpt_utf8_sha256": "9c25fa5ed2b28ac259ae4a4b0d1b4236698056232d31fe034187127c8a9d100b"
+        },
+        {
+          "locator": "T2465_.78.0030c21-26",
+          "text": "取小月闕第三十日直宿之法。假令正月小闕第三十日。雖無其第三十日。而彼日分直宿猶有故。次二月初一日半已上者。正月闕日之分宿直也。半已下者即彼當日宿直。故雖大小異日有増減。而小月闕日直宿無日不得。次月初一日眞宿無改代也。",
+          "normalized_excerpt_utf8_sha256": "8ed3da93960d02b933f5eaebde0dff2f69359f6448cf279df22050f72ccfbfcd"
+        }
+      ],
+      "complete_original_source_bytes_sha256": null,
+      "facsimile_collation_complete": false,
+      "current_live_availability": "Publisher emergency-maintenance notice verified in browser; PHP functions temporarily suspended. Cached text is not a newly downloaded complete edition.",
+      "scope": "Selected cached primary passages, not full T2465 bytes, a facsimile or an independent scholarly collation; half-clock mapping and leap/short-month precedence remain unestablished.",
+      "reading_notes": [
+        "闰月段其正月、正十二月与傍十二月对称，按正文十二月例释为所重复的正月（普通月），不指所有闰月都重复一月；小月段假令正月则举一月为例。",
+        "半已上、半已下保留原字，前后半解读沿用Kotyk 2022；没有据此确定民用12:00或太阳时半日边界。",
+        "原段没有明确闰月复用与小月分宿交叠时的先后；本档案保留现代重建分支，不把它们称作原典明定的两条算法。"
+      ]
+    },
+    "active_primary_evidence": "downloaded_primary_edition",
+    "cached_primary_excerpt_is_historical_snapshot": true,
+    "downloaded_primary_edition": {
+      "publisher_html_response_sha256": "74c63f5151c2b8c3ac554f7a0acae0776e5247e740a712834e1b600a065050e6",
+      "publisher_html_response_bytes": 166529,
+      "publisher_response_line_anchor_count": 691,
+      "publisher_response_line_extent": [
+        "0024a01",
+        "0031c29"
+      ],
+      "edition_witness_note_html": "＜原＞建久六年寫高山寺藏本, ＜甲＞寶暦十一年寫智山專門學校藏本",
+      "calendar_apparatus": [
+        {
+          "line": "0030c14",
+          "notes_html": [
+            "訣＝説<sup>イ</sup>＜甲＞"
+          ]
+        },
+        {
+          "line": "0030c17",
+          "notes_html": [
+            "十＝月＜甲＞"
+          ]
+        },
+        {
+          "line": "0030c18",
+          "notes_html": [
+            "〔是正･･･月〕十六字<sup>イ</sup>－＜甲＞"
+          ]
+        },
+        {
+          "line": "0030c20",
+          "notes_html": [
+            "〔宿〕－＜甲＞"
+          ]
+        },
+        {
+          "line": "0030c23",
+          "notes_html": [
+            "半＋（也）＜甲＞"
+          ]
+        }
+      ],
+      "downloaded_calendar_windows": [
+        {
+          "locator": "T2465_.78.0030c13-21",
+          "text": "若有閏月時。其正月直宿即亦重直閏月。謂假令十二月有閏月。而其十二月一日直宿是虚宿。十五日直宿是星宿。乃至三十日直宿是星宿。如是閏十二月直宿亦同之。更無異也。先月是正十二月。閏月是傍十二月也。故傍月･直宿三十日皆用正十二月直宿更不異宿也。餘月聞月准之知耳。"
+        },
+        {
+          "locator": "T2465_.78.0030c21-26",
+          "text": "取小月闕第三十日直宿之法。假令正月小闕第三十日。雖無其第三十日。而彼日分直宿猶有故。次二月初一日半已上者。正月闕日之分宿直也。半已下者即彼當日宿直。故雖大小異日有増減。而小月闕日直宿無日不得。次月初一日眞宿無改代也｣"
+        }
+      ],
+      "calendar_window_sha256": [
+        "9c25fa5ed2b28ac259ae4a4b0d1b4236698056232d31fe034187127c8a9d100b",
+        "1ccf7577124a4afcb307ba81ebc2938138d47b131bb5ed6a9e798015544cf102"
+      ],
+      "cached_calendar_windows_exactly_match_downloaded_quotations": false,
+      "cached_quotation_discrepancies": [
+        {
+          "locator": "T2465_.78.0030c26",
+          "cached_terminal_text": "眞宿無改代也。",
+          "downloaded_terminal_text": "眞宿無改代也｣",
+          "meaning_changed": false,
+          "old_cached_fixture_modified": false
+        }
+      ],
+      "facsimile_collation_complete": false,
+      "independent_scholarly_acceptance": false,
+      "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?mode=detail&useid=2465_",
+      "id": "sat_T2465_taisho_primary_response_20261022_v1",
+      "retrieved_at_response_header_utc": "2026-10-22T01:31:24Z",
+      "full_html_capture_distribution": "private_local_research_capture_not_redistributed",
+      "scope": "采用SAT所载大正底本文字，原本注为建久六年写高山寺藏本、甲本注为宝历十一年写智山专门学校藏本。保留五条校记的原始HTML，不把イ读法或甲本与底本合成唯一正文；半日钟时及闰月／小月规则次序仍未校定。"
+    }
+  }
+}

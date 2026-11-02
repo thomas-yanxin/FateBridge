@@ -1,0 +1,2181 @@
+{
+  "id": "vinaya_upstream_daybreak_v1",
+  "sources": [
+    {
+      "id": "T1461",
+      "title": "律二十二明了論",
+      "sha256": "93510d2bad3248508ae6cf70557e87b81dd02b24f28061f11fea96daad837180",
+      "bytes": 125999,
+      "capture_file": "T1461.xml",
+      "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T24/T24n1461.xml",
+      "title_stmt_authors": [
+        "弗陀多羅多造　陳 真諦譯"
+      ],
+      "body_byline_forms": [
+        "正量部弗陀多羅多法師造",
+        "陳天竺三藏真諦譯"
+      ],
+      "windows": {
+        "summer": {
+          "first_line": "0669c25",
+          "last_line": "0669c29",
+          "lines": {
+            "0669c25": {
+              "main": "偈曰：解五能成夏住因。釋曰：由五種因",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0669c26": {
+              "main": "緣，夏月安居得成。五種因緣者：一若處所",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0669c27": {
+              "main": "有覆、二若夏初十六日、三若東方已赤、四若",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0669c28": {
+              "main": "人在別住中起安居心、五若此有覆中無五",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0669c29": {
+              "main": "種過失，夏月安居則成。偈曰：及解夏住",
+              "inline_notes": [],
+              "gaiji_refs": []
+            }
+          },
+          "main_literal": "偈曰：解五能成夏住因。釋曰：由五種因緣，夏月安居得成。五種因緣者：一若處所有覆、二若夏初十六日、三若東方已赤、四若人在別住中起安居心、五若此有覆中無五種過失，夏月安居則成。偈曰：及解夏住",
+          "body_blocks": [
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT24p0669c2501"
+              },
+              "start_line": "0669c25",
+              "end_line": "0669c25",
+              "literal_with_inline_content": "偈曰：解五能成夏住因。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xml:id=\"pT24p0669c2501\">偈曰：解五能成夏住因。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT24p0669c2510",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0669c25",
+              "end_line": "0669c29",
+              "literal_with_inline_content": "釋曰：由五種因緣，夏月安居得成。五種因緣者：一若處所有覆、二若夏初十六日、三若東方已赤、四若人在別住中起安居心、五若此有覆中無五種過失，夏月安居則成。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT24p0669c2510\" ns1:place=\"inline\">釋曰：由五種因\n<ns0:lb n=\"0669c26\" ed=\"T\" />緣，夏月安居得成。五種因緣者：一若處所\n<ns0:lb n=\"0669c27\" ed=\"T\" />有覆、二若夏初十六日、三若東方已赤、四若\n<ns0:lb n=\"0669c28\" ed=\"T\" />人在別住中起安居心、五若此有覆中無五\n<ns0:lb n=\"0669c29\" ed=\"T\" />種過失，夏月安居則成。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT24p0669c2910",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0669c29",
+              "end_line": "0670a01",
+              "literal_with_inline_content": "偈曰：及解夏住八種難。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT24p0669c2910\" ns1:place=\"inline\">偈曰：及解夏住\n<ns0:pb n=\"0670a\" ed=\"T\" xml:id=\"T24.1461.0670a\" />\n<ns0:lb n=\"0670a01\" ed=\"T\" />八種難。</ns0:p>"
+            }
+          ],
+          "window_boundary_is_not_sentence_completion": true
+        }
+      },
+      "all_selected_linked_postposed_records": [],
+      "whole_body_main_and_p_inline_literal_counts_across_lb": {
+        "東方已赤": 1,
+        "阿留那": 0,
+        "阿樓那": 0,
+        "明相": 1,
+        "地了": 0,
+        "地了時": 0,
+        "地色": 0,
+        "二刻": 0
+      },
+      "counts_are_not_numbers_of_dawn_definitions": true,
+      "source_layer": "Electronic body main/p-inline, note-inline and postposed apparatus separately recorded; no printed identity certification."
+    },
+    {
+      "id": "T1462",
+      "title": "善見律毘婆沙",
+      "sha256": "5971e6573bfb669cfa9cf880655f43a39fdad794c288ca728984e5b4d06adcaa",
+      "bytes": 3107414,
+      "capture_file": "T1462.xml",
+      "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T24/T24n1462.xml",
+      "title_stmt_authors": [
+        "蕭齊 僧伽跋陀羅譯"
+      ],
+      "body_byline_forms": [
+        "簫齊外國三藏僧伽跋陀羅譯",
+        "蕭齊外國三藏僧伽跋陀羅譯"
+      ],
+      "windows": {
+        "aruna": {
+          "first_line": "0771c26",
+          "last_line": "0772a05",
+          "lines": {
+            "0771c26": {
+              "main": "婆興伽。是名六衣。若一一衣十日內應說",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0771c27": {
+              "main": "淨者，若長二磔手、廣一磔手應說淨，若不",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0771c28": {
+              "main": "說，過十日犯捨墮。是故律本中說，我聽諸",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0771c29": {
+              "main": "比丘說淨，衣長八指，是修伽陀指，廣四指，",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0772a01": {
+              "main": "此是最下衣。尼薩耆者，漢言捨，此是律法，",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0772a02": {
+              "main": "波夜提罪應懺悔。」法師曰：「何時尼薩耆？阿",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0772a03": {
+              "main": "留那出時，漢言明相，得罪。若多衣縛束一",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0772a04": {
+              "main": "處，過十日得一罪。若散衣不縛束，計衣多",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0772a05": {
+              "main": "少隨得罪，捨已然後懺悔。」法師曰：「云何捨？",
+              "inline_notes": [],
+              "gaiji_refs": []
+            }
+          },
+          "main_literal": "婆興伽。是名六衣。若一一衣十日內應說淨者，若長二磔手、廣一磔手應說淨，若不說，過十日犯捨墮。是故律本中說，我聽諸比丘說淨，衣長八指，是修伽陀指，廣四指，此是最下衣。尼薩耆者，漢言捨，此是律法，波夜提罪應懺悔。」法師曰：「何時尼薩耆？阿留那出時，漢言明相，得罪。若多衣縛束一處，過十日得一罪。若散衣不縛束，計衣多少隨得罪，捨已然後懺悔。」法師曰：「云何捨？",
+          "body_blocks": [
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT24p0771c2106",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0771c21",
+              "end_line": "0772a02",
+              "literal_with_inline_content": "法師曰：「此八事騫陀迦別當說。共僧捨者，作白羯磨捨。十日者，時剋也，此衣十日內聽畜，不得過十日。六種衣中若一一衣者，何謂為六？一者驅磨，二者古貝，三者句賒耶，四者欽婆羅，五者娑那，六者婆興伽。是名六衣。若一一衣十日內應說淨者，若長二磔手、廣一磔手應說淨，若不說，過十日犯捨墮。是故律本中說，我聽諸比丘說淨，衣長八指，是修伽陀指，廣四指，此是最下衣。尼薩耆者，漢言捨，此是律法，波夜提罪應懺悔。」",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT24p0771c2106\" ns1:place=\"inline\">法師曰：「此八事<ns0:anchor xml:id=\"nkr_note_orig_0771026\" n=\"0771026\" /><ns0:anchor xml:id=\"nkr_note_mod_0771026\" n=\"0771026\" /><ns0:anchor xml:id=\"nkr_note_foreign_0771026\" n=\"0771026\" />騫陀迦別當\n<ns0:lb n=\"0771c22\" ed=\"T\" />說。共僧捨者，作白羯磨捨。十日者，時剋也，\n<ns0:lb n=\"0771c23\" ed=\"T\" />此衣十日內聽畜，不得過十日。六種衣中\n<ns0:lb n=\"0771c24\" ed=\"T\" />若一一衣者，何謂為六？一者<ns0:anchor xml:id=\"nkr_note_orig_0771027\" n=\"0771027\" /><ns0:anchor xml:id=\"nkr_note_mod_0771027\" n=\"0771027\" /><ns0:anchor xml:id=\"nkr_note_foreign_0771027\" n=\"0771027\" />驅磨，二者<ns0:anchor xml:id=\"nkr_note_orig_0771028\" n=\"0771028\" /><ns0:anchor xml:id=\"nkr_note_mod_0771028\" n=\"0771028\" /><ns0:anchor xml:id=\"beg0771028\" n=\"0771028\" />古<ns0:anchor xml:id=\"end0771028\" />\n<ns0:lb n=\"0771c25\" ed=\"T\" />貝，三者句賒耶，四者欽婆羅，五者娑那，六者\n<ns0:lb n=\"0771c26\" ed=\"T\" />婆<ns0:anchor xml:id=\"nkr_note_orig_0771029\" n=\"0771029\" /><ns0:anchor xml:id=\"nkr_note_mod_0771029\" n=\"0771029\" /><ns0:anchor xml:id=\"beg0771029\" n=\"0771029\" />興<ns0:anchor xml:id=\"end0771029\" />伽。是名六衣。若一一衣十日內應說\n<ns0:lb n=\"0771c27\" ed=\"T\" />淨者，若長二<ns0:anchor xml:id=\"nkr_note_orig_0771030\" n=\"0771030\" /><ns0:anchor xml:id=\"nkr_note_mod_0771030\" n=\"0771030\" /><ns0:anchor xml:id=\"beg0771030\" n=\"0771030\" />磔<ns0:anchor xml:id=\"end0771030\" />手、廣一<ns0:anchor xml:id=\"beg_147\" type=\"star\" />磔<ns0:anchor xml:id=\"end_147\" />手應說淨，若不\n<ns0:lb n=\"0771c28\" ed=\"T\" />說，過十日犯捨墮。是故律本中說，我聽諸\n<ns0:lb n=\"0771c29\" ed=\"T\" />比丘說淨，衣長八指，是<ns0:anchor xml:id=\"nkr_note_orig_0771031\" n=\"0771031\" /><ns0:anchor xml:id=\"nkr_note_mod_0771031\" n=\"0771031\" /><ns0:anchor xml:id=\"nkr_note_foreign_0771031\" n=\"0771031\" />修伽陀指，廣四指，\n<ns0:pb n=\"0772a\" ed=\"T\" xml:id=\"T24.1462.0772a\" />\n<ns0:lb n=\"0772a01\" ed=\"T\" />此是最下衣。<ns0:anchor xml:id=\"nkr_note_orig_0772001\" n=\"0772001\" /><ns0:anchor xml:id=\"nkr_note_mod_0772001\" n=\"0772001\" /><ns0:anchor xml:id=\"nkr_note_foreign_0772001\" n=\"0772001\" />尼薩耆者，漢言捨，此是律法，\n<ns0:lb n=\"0772a02\" ed=\"T\" />波夜提罪應懺悔。」</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT24p0772a0208",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0772a02",
+              "end_line": "0772a05",
+              "literal_with_inline_content": "法師曰：「何時尼薩耆？阿留那出時，漢言明相，得罪。若多衣縛束一處，過十日得一罪。若散衣不縛束，計衣多少隨得罪，捨已然後懺悔。」",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT24p0772a0208\" ns1:place=\"inline\">法師曰：「何時尼薩耆？<ns0:anchor xml:id=\"nkr_note_orig_0772002\" n=\"0772002\" /><ns0:anchor xml:id=\"nkr_note_mod_0772002\" n=\"0772002\" /><ns0:anchor xml:id=\"nkr_note_foreign_0772002\" n=\"0772002\" />阿\n<ns0:lb n=\"0772a03\" ed=\"T\" />留那出時，漢言明相，得罪。若多衣縛束一\n<ns0:lb n=\"0772a04\" ed=\"T\" />處，過十日得一罪。若散衣不縛束，計衣多\n<ns0:lb n=\"0772a05\" ed=\"T\" />少隨得罪，捨已然後懺悔。」</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT24p0772a0511",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0772a05",
+              "end_line": "0772b08",
+              "literal_with_inline_content": "法師曰：「云何捨？如律本中說，佛語諸比丘：『汝當如是捨。整衣服偏袒右肩來至僧中，先禮上座長跪叉手，作如是言：「大德僧憶念，我比丘某甲，故畜長衣過十日，犯捨墮，今捨與僧。」』若一衣言一，若二衣言二，若三衣、若眾多，道言眾多。眾中了了解法比丘，應作白羯磨，受彼比丘懺悔：『大德僧聽！比丘某甲，故畜長衣過十日，犯捨墮。今見罪，僧中發露懺悔。若僧時到、僧忍聽，我受某甲比丘懺悔。』白如是。羯磨已問彼比丘言：『汝見罪不？』答言：『見。』『汝當來罪莫犯。』答言：『善。』然後受懺悔。若捨與一人，捨二人、捨三人中，作是言：『大德憶念，我比丘某甲，畜長財過十日，犯捨墮。今捨與諸大德，波夜提罪今懺悔。』三人中一人應白二人言：『諸長老憶念，我受某甲比丘懺悔，當憶持。』受懺悔者問彼比丘，答對如僧中無異。僧中一人應三唱，還彼比丘衣，作是言：『此尼薩耆衣，僧今捨與長老。』如是三唱，此為作法故捨。眾僧下至一人，應還彼比丘衣善，若不還者，犯突吉羅罪。若犯捨墮，衣不捨不懺悔，隨著一一突吉羅罪。若一著不脫乃至破，一突吉羅罪。若犯尼薩耆，衣無罪者，於十日內若說淨若失，是名無罪。諸比丘自作是念：『如來聽畜三衣，我今長雨衣、尼師檀、覆瘡衣、敷具、手巾、朱羅波利迦羅衣，不知當云何？為說淨、為受持？』作如是念已，往白世尊。佛告諸比丘：『三衣受持不須說淨；雨衣四月受持，過四月已說淨；尼師檀受持不須說淨；覆瘡衣不須說淨，瘡差已說淨；敷具受持不須說淨；朱羅波利迦羅衣受持不須說淨；手巾受持不須說淨。』」",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT24p0772a0511\" ns1:place=\"inline\">法師曰：「云何捨？\n<ns0:lb n=\"0772a06\" ed=\"T\" />如律本中說，佛語諸比丘：『汝當如是捨。整\n<ns0:lb n=\"0772a07\" ed=\"T\" />衣服偏袒右肩來至僧中，先禮上座長跪\n<ns0:lb n=\"0772a08\" ed=\"T\" />叉手，作如是言：「大德僧憶念，我比丘某甲，\n<ns0:lb n=\"0772a09\" ed=\"T\" />故畜長衣過十日，犯捨墮，今捨與僧。」』若一\n<ns0:lb n=\"0772a10\" ed=\"T\" />衣言一，若二衣言二，若三衣、若眾多，道言\n<ns0:lb n=\"0772a11\" ed=\"T\" />眾多。眾中了了解法比丘，應作白羯磨，受\n<ns0:lb n=\"0772a12\" ed=\"T\" />彼比丘懺悔：『大德僧聽！比丘某甲，故畜長\n<ns0:lb n=\"0772a13\" ed=\"T\" />衣過十日，犯捨墮。今見罪，僧中發露懺悔。\n<ns0:lb n=\"0772a14\" ed=\"T\" />若僧時到、僧忍聽，我受某甲比丘懺悔。』白如\n<ns0:lb n=\"0772a15\" ed=\"T\" />是。羯磨已問彼比丘言：『汝見罪不？』答言：『見。』\n<ns0:lb n=\"0772a16\" ed=\"T\" />『汝當來罪莫犯。』答言：『善。』然後受懺悔。若捨\n<ns0:lb n=\"0772a17\" ed=\"T\" />與一人，捨二人、捨三人中，作是言：『大德憶\n<ns0:lb n=\"0772a18\" ed=\"T\" />念，我比丘某甲，畜長財過十日，犯捨墮。今\n<ns0:lb n=\"0772a19\" ed=\"T\" />捨與諸大德，波夜提罪今懺悔。』三人中一人\n<ns0:lb n=\"0772a20\" ed=\"T\" />應白二人言：『諸長老憶念，我受某甲比丘\n<ns0:lb n=\"0772a21\" ed=\"T\" />懺悔，當憶持。』受懺悔者問彼比丘，答對如\n<ns0:lb n=\"0772a22\" ed=\"T\" />僧中無異。僧中一人應三唱，還彼比丘衣，\n<ns0:lb n=\"0772a23\" ed=\"T\" />作是言：『此尼薩耆衣，僧今捨與長老。』如是\n<ns0:lb n=\"0772a24\" ed=\"T\" />三唱，此為作法故捨。眾僧下至一人，應還\n<ns0:lb n=\"0772a25\" ed=\"T\" />彼比丘衣善，若不還者，犯突吉羅罪。若犯\n<ns0:lb n=\"0772a26\" ed=\"T\" />捨墮，衣不捨不懺悔，隨著一一突吉羅罪。\n<ns0:lb n=\"0772a27\" ed=\"T\" />若一著不脫乃至破，一突吉羅罪。若犯尼薩\n<ns0:lb n=\"0772a28\" ed=\"T\" />耆，衣無罪者，於十日內若說淨若失，是名\n<ns0:lb n=\"0772a29\" ed=\"T\" />無罪。諸比丘自作是念：『如來聽畜三衣，我\n<ns0:pb n=\"0772b\" ed=\"T\" xml:id=\"T24.1462.0772b\" />\n<ns0:lb n=\"0772b01\" ed=\"T\" />今<ns0:anchor xml:id=\"nkr_note_orig_0772003\" n=\"0772003\" /><ns0:anchor xml:id=\"nkr_note_mod_0772003\" n=\"0772003\" /><ns0:anchor xml:id=\"nkr_note_foreign_0772003\" n=\"0772003\" />長雨衣、尼師<ns0:anchor xml:id=\"nkr_note_orig_0772004\" n=\"0772004\" /><ns0:anchor xml:id=\"nkr_note_mod_0772004\" n=\"0772004\" /><ns0:anchor xml:id=\"beg0772004\" n=\"0772004\" />檀<ns0:anchor xml:id=\"end0772004\" />、覆瘡衣、敷具、手巾、朱羅波\n<ns0:lb n=\"0772b02\" ed=\"T\" /><ns0:anchor xml:id=\"nkr_note_orig_0772005\" n=\"0772005\" /><ns0:anchor xml:id=\"nkr_note_mod_0772005\" n=\"0772005\" /><ns0:anchor xml:id=\"beg0772005\" n=\"0772005\" />利<ns0:anchor xml:id=\"end0772005\" />迦羅衣，不知當云何？為說淨、為受持？』\n<ns0:lb n=\"0772b03\" ed=\"T\" />作如是念已，往白世尊。佛告諸比丘：『三衣\n<ns0:lb n=\"0772b04\" ed=\"T\" />受持不須說淨；雨衣四月受持，過四月已\n<ns0:lb n=\"0772b05\" ed=\"T\" />說淨；尼師<ns0:anchor xml:id=\"beg_148\" type=\"star\" />檀<ns0:anchor xml:id=\"end_148\" />受持不須說淨；覆瘡衣不須\n<ns0:lb n=\"0772b06\" ed=\"T\" />說淨，瘡差已說淨；敷具受持不須說淨；朱\n<ns0:lb n=\"0772b07\" ed=\"T\" />羅波利迦羅衣受持不須說淨；手巾受持不\n<ns0:lb n=\"0772b08\" ed=\"T\" />須說淨。』」</ns0:p>"
+            }
+          ],
+          "window_boundary_is_not_sentence_completion": true
+        },
+        "robe": {
+          "first_line": "0773b29",
+          "last_line": "0773c03",
+          "lines": {
+            "0773b29": {
+              "main": "在阿蘭若處，竟夜坐禪，天欲曉患眼睡，脫",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0773c01": {
+              "main": "衣置岸上，入池洗浴，洗浴未竟明相出，此",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0773c02": {
+              "main": "衣便成離宿，犯尼薩耆罪。若未捨未懺悔，若",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0773c03": {
+              "main": "著突吉羅罪。若露身上岸，復犯突吉羅罪。」",
+              "inline_notes": [],
+              "gaiji_refs": []
+            }
+          },
+          "main_literal": "在阿蘭若處，竟夜坐禪，天欲曉患眼睡，脫衣置岸上，入池洗浴，洗浴未竟明相出，此衣便成離宿，犯尼薩耆罪。若未捨未懺悔，若著突吉羅罪。若露身上岸，復犯突吉羅罪。」",
+          "body_blocks": [
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT24p0773b1005",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0773b10",
+              "end_line": "0773c03",
+              "literal_with_inline_content": "法師曰：「次第文句易可解耳。重閣者，或五重或七重，各一界有別界。云何一界？若上下重悉屬一主，衣在此重閣，不失衣，是名一界。云何別界？此重閣多人共住，若住處各異，衣在上重，比丘在下重，比丘應往衣所，若不往衣所失衣，是名別界。車界者，若比丘置衣車上，比丘應隨逐車行，不得遠，若明相未出時，離車十五肘內，不失衣。若出十五肘外失衣，是名車界。若寄衣置車，車若翻倒或敗壞，車上物分張多聚，衣隨聚處，比丘應往衣邊，不得離。樹界者，日正中時影所覆處，若樹枝葉蔬蔭不相連接，衣在日中，比丘在樹下失衣。若樹枝偏長，衣在枝蔭下，比丘在樹根，不失。阿蘭若界者，如毘梨吒毘林無異，漢言大樹，亦如海洲，人所不及處。林界者，若衣在林中，衣在十四肘內，不失衣。海洲亦如是，方十四肘內不失衣。此林若有人來往，無十四肘界，衣應隨身，若不隨失衣。比丘在阿蘭若處，竟夜坐禪，天欲曉患眼睡，脫衣置岸上，入池洗浴，洗浴未竟明相出，此衣便成離宿，犯尼薩耆罪。若未捨未懺悔，若著突吉羅罪。若露身上岸，復犯突吉羅罪。」",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT24p0773b1005\" ns1:place=\"inline\">法師曰：「次第文句易可解耳。重\n<ns0:lb n=\"0773b11\" ed=\"T\" />閣者，或五重或七重，各一界有別界。云何一\n<ns0:lb n=\"0773b12\" ed=\"T\" />界？若上下重悉屬一主，衣在此重閣，不失\n<ns0:lb n=\"0773b13\" ed=\"T\" />衣，是名一界。云何別界？此重閣多人共住，\n<ns0:lb n=\"0773b14\" ed=\"T\" />若住處各異，衣在上重，比丘在下重，比丘\n<ns0:lb n=\"0773b15\" ed=\"T\" />應往衣所，若不往衣所失衣，是名別界。\n<ns0:lb n=\"0773b16\" ed=\"T\" />車界者，若比丘置衣車上，比丘應隨逐車\n<ns0:lb n=\"0773b17\" ed=\"T\" />行，不得遠，若明相未出時，離車十五肘內，\n<ns0:lb n=\"0773b18\" ed=\"T\" />不失衣。若出十五肘外失衣，是名車界。若\n<ns0:lb n=\"0773b19\" ed=\"T\" />寄衣置車，車若翻倒或敗壞，車上物分張多\n<ns0:lb n=\"0773b20\" ed=\"T\" />聚，衣隨聚處，比丘應往衣邊，不得離。樹\n<ns0:lb n=\"0773b21\" ed=\"T\" />界者，日正中時影所覆處，若樹枝葉蔬蔭不\n<ns0:lb n=\"0773b22\" ed=\"T\" />相連接，衣在日中，比丘在樹下失衣。若樹\n<ns0:lb n=\"0773b23\" ed=\"T\" />枝偏長，衣在枝蔭下，比丘在樹根，不失。阿\n<ns0:lb n=\"0773b24\" ed=\"T\" />蘭若界者，如<ns0:anchor xml:id=\"nkr_note_orig_0773007\" n=\"0773007\" /><ns0:anchor xml:id=\"nkr_note_mod_0773007\" n=\"0773007\" /><ns0:anchor xml:id=\"nkr_note_foreign_0773007\" n=\"0773007\" />毘梨<ns0:anchor xml:id=\"nkr_note_orig_0773008\" n=\"0773008\" /><ns0:anchor xml:id=\"nkr_note_mod_0773008\" n=\"0773008\" /><ns0:anchor xml:id=\"beg0773008\" n=\"0773008\" />吒<ns0:anchor xml:id=\"end0773008\" />毘林無異，漢言大\n<ns0:lb n=\"0773b25\" ed=\"T\" /><ns0:anchor xml:id=\"nkr_note_orig_0773009\" n=\"0773009\" /><ns0:anchor xml:id=\"nkr_note_mod_0773009\" n=\"0773009\" /><ns0:anchor xml:id=\"beg0773009\" n=\"0773009\" />樹<ns0:anchor xml:id=\"end0773009\" />，亦如海洲，人所不及處。林界者，若衣\n<ns0:lb n=\"0773b26\" ed=\"T\" />在林中，衣在十四肘內，不失衣。海洲亦如\n<ns0:lb n=\"0773b27\" ed=\"T\" />是，方十四肘內不失衣。此林若有人來往，\n<ns0:lb n=\"0773b28\" ed=\"T\" />無十四肘界，衣應隨身，若不隨失衣。比丘\n<ns0:lb n=\"0773b29\" ed=\"T\" />在阿蘭若處，竟夜坐禪，天欲曉患眼睡，脫\n<ns0:pb n=\"0773c\" ed=\"T\" xml:id=\"T24.1462.0773c\" />\n<ns0:lb n=\"0773c01\" ed=\"T\" />衣置岸上，入池洗浴，洗浴未竟明相出，此\n<ns0:lb n=\"0773c02\" ed=\"T\" />衣便成離宿，犯尼薩耆罪。若未捨未懺悔，若\n<ns0:lb n=\"0773c03\" ed=\"T\" />著突吉羅罪。若露身上岸，復犯突吉羅罪。」</ns0:p>\n"
+            }
+          ],
+          "window_boundary_is_not_sentence_completion": true
+        },
+        "ordination": {
+          "first_line": "0785c11",
+          "last_line": "0785c13",
+          "lines": {
+            "0785c11": {
+              "main": "竟。若年不滿二十，欲受具足戒，聽數胎",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0785c12": {
+              "main": "月閏月數，十四日布薩，足滿二十得受戒。",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0785c13": {
+              "main": "與賊眾議共道行者，此是制罪。與比丘尼",
+              "inline_notes": [],
+              "gaiji_refs": []
+            }
+          },
+          "main_literal": "竟。若年不滿二十，欲受具足戒，聽數胎月閏月數，十四日布薩，足滿二十得受戒。與賊眾議共道行者，此是制罪。與比丘尼",
+          "body_blocks": [
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT24p0785c0805",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0785c08",
+              "end_line": "0785c20",
+              "literal_with_inline_content": "「若比丘知他比丘麁罪已覆藏，第二比丘復覆藏，如是百千人共覆藏，皆犯波夜提。此是性罪，因身心起。覆藏他罪戒竟。若年不滿二十，欲受具足戒，聽數胎月閏月數，十四日布薩，足滿二十得受戒。與賊眾議共道行者，此是制罪。與比丘尼議共道行者，此是制罪。律中已說。阿栗挓邪見者，摩著細滑，不遮天道，不遮解脫道。阿栗咤所以生此邪見者，言須陀洹、斯陀含有婦兒亦不障道，牽此自比，言摩著細滑不能障道。若言細滑能障道者，一切氈褥及隱囊亦細滑，那獨言女人細滑能障道耶？阿栗咤邪見戒廣說竟。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT24p0785c0805\" ns1:place=\"inline\">「若比丘知他比丘麁罪<ns0:anchor xml:id=\"beg_183\" type=\"star\" />已<ns0:anchor xml:id=\"end_183\" />覆藏，\n<ns0:lb n=\"0785c09\" ed=\"T\" />第二比丘復覆藏，如是百千人共覆藏，皆犯\n<ns0:lb n=\"0785c10\" ed=\"T\" />波夜提。此是性罪，因身心起。覆藏他罪戒\n<ns0:lb n=\"0785c11\" ed=\"T\" />竟。<ns0:anchor xml:id=\"nkr_note_orig_0785019\" n=\"0785019\" /><ns0:anchor xml:id=\"nkr_note_mod_0785019\" n=\"0785019\" /><ns0:anchor xml:id=\"nkr_note_foreign_0785019\" n=\"0785019\" />若年不滿二十，欲受具足戒，聽數胎\n<ns0:lb n=\"0785c12\" ed=\"T\" />月閏月數，十四日布薩，足滿二十得受戒。<ns0:anchor xml:id=\"nkr_note_orig_0785020\" n=\"0785020\" /><ns0:anchor xml:id=\"nkr_note_mod_0785020\" n=\"0785020\" /><ns0:anchor xml:id=\"nkr_note_foreign_0785020\" n=\"0785020\" />\n<ns0:lb n=\"0785c13\" ed=\"T\" />與賊眾議共道行者，此是制罪。與比丘尼\n<ns0:lb n=\"0785c14\" ed=\"T\" /><ns0:anchor xml:id=\"nkr_note_orig_0785021\" n=\"0785021\" /><ns0:anchor xml:id=\"nkr_note_mod_0785021\" n=\"0785021\" /><ns0:anchor xml:id=\"beg0785021\" n=\"0785021\" />議共<ns0:anchor xml:id=\"end0785021\" />道行者，此是制罪。律中已說。<ns0:anchor xml:id=\"nkr_note_orig_0785022\" n=\"0785022\" /><ns0:anchor xml:id=\"nkr_note_mod_0785022\" n=\"0785022\" /><ns0:anchor xml:id=\"nkr_note_foreign_0785022\" n=\"0785022\" /><ns0:anchor xml:id=\"nkr_note_orig_0785023\" n=\"0785023\" /><ns0:anchor xml:id=\"nkr_note_mod_0785023\" n=\"0785023\" /><ns0:anchor xml:id=\"nkr_note_foreign_0785023\" n=\"0785023\" />阿<ns0:anchor xml:id=\"nkr_note_orig_0785024\" n=\"0785024\" /><ns0:anchor xml:id=\"nkr_note_mod_0785024\" n=\"0785024\" /><ns0:anchor xml:id=\"beg0785024\" n=\"0785024\" />栗<ns0:anchor xml:id=\"end0785024\" />\n<ns0:lb n=\"0785c15\" ed=\"T\" /><ns0:anchor xml:id=\"nkr_note_orig_0785025\" n=\"0785025\" /><ns0:anchor xml:id=\"nkr_note_mod_0785025\" n=\"0785025\" /><ns0:anchor xml:id=\"beg0785025\" n=\"0785025\" />挓<ns0:anchor xml:id=\"end0785025\" />邪見者，摩著細滑，不遮天道，不遮解\n<ns0:lb n=\"0785c16\" ed=\"T\" />脫道。阿<ns0:anchor xml:id=\"beg_184\" type=\"star\" />栗<ns0:anchor xml:id=\"end_184\" />咤所以生此邪見者，言須陀洹、\n<ns0:lb n=\"0785c17\" ed=\"T\" />斯陀含有婦兒亦不障道，牽此自比，言摩\n<ns0:lb n=\"0785c18\" ed=\"T\" />著細滑不能障道。若言細滑能障道者，一\n<ns0:lb n=\"0785c19\" ed=\"T\" />切氈褥及隱囊亦細滑，那獨言女人細滑能障\n<ns0:lb n=\"0785c20\" ed=\"T\" />道耶？阿<ns0:anchor xml:id=\"beg_185\" type=\"star\" />栗<ns0:anchor xml:id=\"end_185\" /><ns0:anchor xml:id=\"fxT24p0785c04\" />咤邪見戒廣說竟。<ns0:anchor xml:id=\"nkr_note_orig_0785026\" n=\"0785026\" /><ns0:anchor xml:id=\"nkr_note_mod_0785026\" n=\"0785026\" /><ns0:anchor xml:id=\"nkr_note_foreign_0785026\" n=\"0785026\" /></ns0:p>"
+            }
+          ],
+          "window_boundary_is_not_sentence_completion": true
+        }
+      },
+      "all_selected_linked_postposed_records": [
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0771029",
+            "to": "#end0771029"
+          },
+          "body_anchor_lines": [
+            "0771c26"
+          ],
+          "literal_with_inline_content": "興與",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0771029\" to=\"#end0771029\"><ns0:lem wit=\"#wit.orig\">興</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4 #wit5\">與</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0771030",
+            "to": "#end0771030"
+          },
+          "body_anchor_lines": [
+            "0771c27"
+          ],
+          "literal_with_inline_content": "磔搩",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0771030\" to=\"#end0771030\"><ns0:lem wit=\"#wit.orig\">磔</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit5\">搩</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg_147",
+            "to": "#end_147",
+            "corresp": "#0771030"
+          },
+          "body_anchor_lines": [
+            "0771c27"
+          ],
+          "literal_with_inline_content": "磔搩",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg_147\" to=\"#end_147\" corresp=\"#0771030\"><ns0:lem wit=\"#wit.orig\">磔</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit5\">搩</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0771029",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0771029"
+          },
+          "body_anchor_lines": [
+            "0771c26"
+          ],
+          "literal_with_inline_content": "興【大】，與【宋】【元】【明】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0771029\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0771029\">興【大】，與【宋】【元】【明】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0771030",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0771030"
+          },
+          "body_anchor_lines": [
+            "0771c27"
+          ],
+          "literal_with_inline_content": "磔【大】＊，搩【宋】【元】【宮】＊",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0771030\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0771030\">磔【大】＊，搩【宋】【元】【宮】＊</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0771031",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0771031"
+          },
+          "body_anchor_lines": [
+            "0771c29"
+          ],
+          "literal_with_inline_content": "Sugataṅgula.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0771031\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0771031\">Sugataṅgula.</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0772001",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0772001"
+          },
+          "body_anchor_lines": [
+            "0772a01"
+          ],
+          "literal_with_inline_content": "Nissaggiya.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0772001\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0772001\">Nissaggiya.</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0772002",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0772002"
+          },
+          "body_anchor_lines": [
+            "0772a02"
+          ],
+          "literal_with_inline_content": "Aruṇuggamana.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0772002\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0772002\">Aruṇuggamana.</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0785019",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0785019"
+          },
+          "body_anchor_lines": [
+            "0785c11"
+          ],
+          "literal_with_inline_content": "Duṭṭhullasikkhāpadaṃcatutthaṃ.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0785019\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0785019\">Duṭṭhullasikkhāpadaṃ catutthaṃ.</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0785020",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0785020"
+          },
+          "body_anchor_lines": [
+            "0785c12"
+          ],
+          "literal_with_inline_content": "Ūnavīsativassasikkhāpadaṃpañcamaṃ.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0785020\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0785020\">Ūnavīsativassasikkhāpadaṃ pañcamaṃ.</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0771029",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0771029"
+          },
+          "body_anchor_lines": [
+            "0771c26"
+          ],
+          "literal_with_inline_content": "興＝與【三】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0771029\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0771029\">興＝與【三】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0771030",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0771030"
+          },
+          "body_anchor_lines": [
+            "0771c27"
+          ],
+          "literal_with_inline_content": "磔＝搩【宋】【元】【宮】＊",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0771030\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0771030\">磔＝搩【宋】【元】【宮】＊</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0771031",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0771031"
+          },
+          "body_anchor_lines": [
+            "0771c29"
+          ],
+          "literal_with_inline_content": "Sugataṅgula.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0771031\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0771031\">Sugataṅgula.</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0772001",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0772001"
+          },
+          "body_anchor_lines": [
+            "0772a01"
+          ],
+          "literal_with_inline_content": "Nissaggiya.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0772001\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0772001\">Nissaggiya.</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0772002",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0772002"
+          },
+          "body_anchor_lines": [
+            "0772a02"
+          ],
+          "literal_with_inline_content": "Aruṇuggamana.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0772002\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0772002\">Aruṇuggamana.</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0785019",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0785019"
+          },
+          "body_anchor_lines": [
+            "0785c11"
+          ],
+          "literal_with_inline_content": "Duṭṭhullasikkhāpadaṃcatutthaṃ.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0785019\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0785019\">Duṭṭhullasikkhāpadaṃ catutthaṃ.</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0785020",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0785020"
+          },
+          "body_anchor_lines": [
+            "0785c12"
+          ],
+          "literal_with_inline_content": "Ūnavīsativassasikkhāpadaṃpañcamaṃ.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0785020\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0785020\">Ūnavīsativassasikkhāpadaṃ pañcamaṃ.</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "target": "#nkr_note_foreign_0771031"
+          },
+          "body_anchor_lines": [
+            "0771c29"
+          ],
+          "literal_with_inline_content": "Sugataṅgula.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" target=\"#nkr_note_foreign_0771031\"><ns0:foreign n=\"0771031\" ns1:resp=\"#resp2\" xml:lang=\"pi\" ns1:place=\"foot\">Sugataṅgula.</ns0:foreign></ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "target": "#nkr_note_foreign_0772001"
+          },
+          "body_anchor_lines": [
+            "0772a01"
+          ],
+          "literal_with_inline_content": "Nissaggiya.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" target=\"#nkr_note_foreign_0772001\"><ns0:foreign n=\"0772001\" ns1:resp=\"#resp2\" xml:lang=\"pi\" ns1:place=\"foot\">Nissaggiya.</ns0:foreign></ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "target": "#nkr_note_foreign_0772002"
+          },
+          "body_anchor_lines": [
+            "0772a02"
+          ],
+          "literal_with_inline_content": "Aruṇuggamana.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" target=\"#nkr_note_foreign_0772002\"><ns0:foreign n=\"0772002\" ns1:resp=\"#resp2\" xml:lang=\"pi\" ns1:place=\"foot\">Aruṇuggamana.</ns0:foreign></ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "target": "#nkr_note_foreign_0785019"
+          },
+          "body_anchor_lines": [
+            "0785c11"
+          ],
+          "literal_with_inline_content": "Duṭṭhullasikkhāpadaṃcatutthaṃ.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" target=\"#nkr_note_foreign_0785019\"><ns0:foreign n=\"0785019\" ns1:resp=\"#resp2\" xml:lang=\"pi\" ns1:place=\"foot\">Duṭṭhullasikkhāpadaṃ catutthaṃ.</ns0:foreign></ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "target": "#nkr_note_foreign_0785020"
+          },
+          "body_anchor_lines": [
+            "0785c12"
+          ],
+          "literal_with_inline_content": "Ūnavīsativassasikkhāpadaṃpañcamaṃ.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" target=\"#nkr_note_foreign_0785020\"><ns0:foreign n=\"0785020\" ns1:resp=\"#resp2\" xml:lang=\"pi\" ns1:place=\"foot\">Ūnavīsativassasikkhāpadaṃ pañcamaṃ.</ns0:foreign></ns0:note>\n"
+        }
+      ],
+      "whole_body_main_and_p_inline_literal_counts_across_lb": {
+        "東方已赤": 0,
+        "阿留那": 1,
+        "阿樓那": 0,
+        "明相": 25,
+        "地了": 0,
+        "地了時": 0,
+        "地色": 0,
+        "二刻": 0
+      },
+      "counts_are_not_numbers_of_dawn_definitions": true,
+      "source_layer": "Electronic body main/p-inline, note-inline and postposed apparatus separately recorded; no printed identity certification."
+    },
+    {
+      "id": "T1435",
+      "title": "十誦律",
+      "sha256": "dc4e2504365443afcc1f3bcff60d49a3fd66117c98713e5f6147d14babe868be",
+      "bytes": 10507329,
+      "capture_file": "T1435.xml",
+      "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T23/T23n1435.xml",
+      "title_stmt_authors": [
+        "後秦 弗若多羅共羅什譯"
+      ],
+      "body_byline_forms": [
+        "後秦北印度三藏弗若多羅共羅什譯",
+        "後秦北印度三藏弗若多羅譯",
+        "東晉罽賓三藏卑摩羅叉續譯"
+      ],
+      "windows": {
+        "time_terms": {
+          "first_line": "0023c20",
+          "last_line": "0024a02",
+          "lines": {
+            "0023c20": {
+              "main": "名釋子，不失比丘法，是名不異分。片須臾片",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0023c21": {
+              "main": "者，諸威儀中事，是名為片，亦名須臾片。諍",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0023c22": {
+              "main": "者，諍有四種：鬪訟諍、相助諍、犯罪諍、常所",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0023c23": {
+              "main": "行事諍。是中犯者，若比丘地了時，見餘比丘",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0023c24": {
+              "main": "犯僧伽婆尸沙，是比丘僧伽婆尸沙中定生",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0023c25": {
+              "main": "僧伽婆尸沙想，不見他犯波羅夷，言：「我見犯。」",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0023c26": {
+              "main": "一一語中，僧伽婆尸沙。日出時、日出已、中前、",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0023c27": {
+              "main": "日中、中後、晡時、日沒、日沒已、初夜、初分、初夜",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0023c28": {
+              "main": "中分、初夜後分、中夜初分、中夜中分、中夜後",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0023c29": {
+              "main": "分、後夜初分、後夜中分、後夜後分亦如是。有",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0024a01": {
+              "main": "比丘地了時，見餘比丘犯罪：若波逸提、若波",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0024a02": {
+              "main": "羅提提舍尼、若突吉羅。是比丘突吉羅罪中",
+              "inline_notes": [],
+              "gaiji_refs": []
+            }
+          },
+          "main_literal": "名釋子，不失比丘法，是名不異分。片須臾片者，諸威儀中事，是名為片，亦名須臾片。諍者，諍有四種：鬪訟諍、相助諍、犯罪諍、常所行事諍。是中犯者，若比丘地了時，見餘比丘犯僧伽婆尸沙，是比丘僧伽婆尸沙中定生僧伽婆尸沙想，不見他犯波羅夷，言：「我見犯。」一一語中，僧伽婆尸沙。日出時、日出已、中前、日中、中後、晡時、日沒、日沒已、初夜、初分、初夜中分、初夜後分、中夜初分、中夜中分、中夜後分、後夜初分、後夜中分、後夜後分亦如是。有比丘地了時，見餘比丘犯罪：若波逸提、若波羅提提舍尼、若突吉羅。是比丘突吉羅罪中",
+          "body_blocks": [
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0023c1613",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0023c16",
+              "end_line": "0023c20",
+              "literal_with_inline_content": "不異分者，十三事、二不定法、三十捨墮法、九十墮法、四波羅提提舍尼法、眾多學法、七止諍法，是名不異分。何以故？若犯是事，故名比丘，故名釋子，不失比丘法，是名不異分。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0023c1613\" ns1:place=\"inline\">不異分者，\n<ns0:lb n=\"0023c17\" ed=\"T\" />十三事、二不定法、三十捨墮法、九十墮法、\n<ns0:lb n=\"0023c18\" ed=\"T\" />四波羅提提舍尼法、眾多學法、七止諍法，是\n<ns0:lb n=\"0023c19\" ed=\"T\" />名不異分。何以故？若犯是事，故名比丘，故\n<ns0:lb n=\"0023c20\" ed=\"T\" />名釋子，不失比丘法，是名不異分。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0023c2014",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0023c20",
+              "end_line": "0023c21",
+              "literal_with_inline_content": "片須臾片者，諸威儀中事，是名為片，亦名須臾片。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0023c2014\" ns1:place=\"inline\">片須臾片\n<ns0:lb n=\"0023c21\" ed=\"T\" />者，諸威儀中事，是名為片，亦名須臾片。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0023c2116",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0023c21",
+              "end_line": "0023c23",
+              "literal_with_inline_content": "諍者，諍有四種：鬪訟諍、相助諍、犯罪諍、常所行事諍。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0023c2116\" ns1:place=\"inline\">諍\n<ns0:lb n=\"0023c22\" ed=\"T\" />者，諍有四種：鬪訟諍、相助諍、犯罪諍、常所\n<ns0:lb n=\"0023c23\" ed=\"T\" />行事諍。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0023c2304",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0023c23",
+              "end_line": "0023c29",
+              "literal_with_inline_content": "是中犯者，若比丘地了時，見餘比丘犯僧伽婆尸沙，是比丘僧伽婆尸沙中定生僧伽婆尸沙想，不見他犯波羅夷，言：「我見犯。」一一語中，僧伽婆尸沙。日出時、日出已、中前、日中、中後、晡時、日沒、日沒已、初夜、初分、初夜中分、初夜後分、中夜初分、中夜中分、中夜後分、後夜初分、後夜中分、後夜後分亦如是。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0023c2304\" ns1:place=\"inline\">是中犯者，若比丘地了時，見餘比丘\n<ns0:lb n=\"0023c24\" ed=\"T\" />犯僧伽婆尸沙，是比丘僧伽婆尸沙中定生\n<ns0:lb n=\"0023c25\" ed=\"T\" />僧伽婆尸沙想，不見他犯波羅夷，言：「我見犯。」\n<ns0:lb n=\"0023c26\" ed=\"T\" />一一語中，僧伽婆尸沙。日出時、日出已、中前、\n<ns0:lb n=\"0023c27\" ed=\"T\" />日中、中後、晡時、日沒、日沒已、初夜、初分、初夜\n<ns0:lb n=\"0023c28\" ed=\"T\" />中分、初夜後分、中夜初分、中夜中分、中夜後\n<ns0:lb n=\"0023c29\" ed=\"T\" />分、後夜初分、後夜中分、後夜後分亦如是。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0023c2917",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0023c29",
+              "end_line": "0024a05",
+              "literal_with_inline_content": "有比丘地了時，見餘比丘犯罪：若波逸提、若波羅提提舍尼、若突吉羅。是比丘突吉羅罪中定生突吉羅想，不見他犯波羅夷，言：「我見犯。」一一語中，僧伽婆尸沙。乃至後夜後分亦如是。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0023c2917\" ns1:place=\"inline\">有\n<ns0:pb n=\"0024a\" ed=\"T\" xml:id=\"T23.1435.0024a\" />\n<ns0:lb n=\"0024a01\" ed=\"T\" />比丘地了時，見餘比丘犯罪：若波逸提、若波\n<ns0:lb n=\"0024a02\" ed=\"T\" />羅提提舍尼、若突吉羅。是比丘突吉羅罪中\n<ns0:lb n=\"0024a03\" ed=\"T\" />定生突吉羅想，不見他犯波羅夷，言：「我見犯。」\n<ns0:lb n=\"0024a04\" ed=\"T\" />一一語中，僧伽婆尸沙。乃至後夜<ns0:anchor xml:id=\"nkr_note_orig_0024001\" n=\"0024001\" /><ns0:anchor xml:id=\"nkr_note_mod_0024001\" n=\"0024001\" /><ns0:anchor xml:id=\"beg0024001\" n=\"0024001\" />後<ns0:anchor xml:id=\"end0024001\" />分亦如\n<ns0:lb n=\"0024a05\" ed=\"T\" />是。</ns0:p>"
+            }
+          ],
+          "window_boundary_is_not_sentence_completion": true
+        },
+        "robe_night": {
+          "first_line": "0031b27",
+          "last_line": "0031c04",
+          "lines": {
+            "0031b27": {
+              "main": "呵已，語諸比丘：「以十利故與諸比丘結戒。",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0031b28": {
+              "main": "從今是戒應如是說：若比丘，衣竟捨迦絺那",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0031b29": {
+              "main": "衣已，三衣中若離一衣，乃至一夜宿，尼薩耆",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0031c01": {
+              "main": "波逸提，除僧羯磨。」一夜者，從日沒至明相",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0031c02": {
+              "main": "未出。三衣中若離一衣者，若離僧伽梨、若",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0031c03": {
+              "main": "離欝多羅僧、若離安陀衛。除僧羯磨者，僧",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0031c04": {
+              "main": "羯磨名如大迦葉，以因緣故，留僧伽梨耆闍",
+              "inline_notes": [],
+              "gaiji_refs": []
+            }
+          },
+          "main_literal": "呵已，語諸比丘：「以十利故與諸比丘結戒。從今是戒應如是說：若比丘，衣竟捨迦絺那衣已，三衣中若離一衣，乃至一夜宿，尼薩耆波逸提，除僧羯磨。」一夜者，從日沒至明相未出。三衣中若離一衣者，若離僧伽梨、若離欝多羅僧、若離安陀衛。除僧羯磨者，僧羯磨名如大迦葉，以因緣故，留僧伽梨耆闍",
+          "body_blocks": [
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0031b1001"
+              },
+              "start_line": "0031b10",
+              "end_line": "0031c01",
+              "literal_with_inline_content": "佛在王舍城。爾時六群比丘處處留衣，著上下衣遊行諸國，趣著弊衣無有威儀。諸受寄舊比丘，與六群比丘架上取衣舒曬抖擻，卷牒著衣囊中繫舉，以是因緣妨廢讀經坐禪行道。是中有比丘少欲知足行頭陀，聞是事心不喜，種種因緣呵責六群比丘：「云何名比丘，處處留衣，著上下衣遊行諸國，趣著弊衣無有威儀。諸受寄舊比丘與汝架上取衣舒曬抖擻，卷牒著衣囊中繫舉，以是因緣妨廢讀經坐禪行道？」諸比丘如是呵已，向佛廣說。佛以是事集比丘僧，佛知而故問六群比丘：「汝實作是事不？」答言：「實作。世尊！」佛以種種因緣呵責六群比丘：「云何名比丘，處處留衣，著上下衣遊行諸國，趣著弊衣無有威儀。諸受寄舊比丘與汝架上取衣舒曬抖擻，卷牒著衣囊中繫舉，以是因緣妨廢讀經坐禪行道？」佛以是事種種因緣呵已，語諸比丘：「以十利故與諸比丘結戒。從今是戒應如是說：若比丘，衣竟捨迦絺那衣已，三衣中若離一衣，乃至一夜宿，尼薩耆波逸提，除僧羯磨。」",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xml:id=\"pT23p0031b1001\">佛在王舍城。爾時六群比丘處處留衣，著\n<ns0:lb n=\"0031b11\" ed=\"T\" />上下衣遊行諸國，趣著弊衣無有威儀。諸\n<ns0:lb n=\"0031b12\" ed=\"T\" />受寄舊比丘，與六群比丘架上取衣舒曬\n<ns0:lb n=\"0031b13\" ed=\"T\" />抖擻，卷<ns0:anchor xml:id=\"nkr_note_orig_0031007\" n=\"0031007\" /><ns0:anchor xml:id=\"nkr_note_mod_0031007\" n=\"0031007\" /><ns0:anchor xml:id=\"beg0031007\" n=\"0031007\" />牒<ns0:anchor xml:id=\"end0031007\" />著衣囊中繫舉，以是因緣妨廢讀\n<ns0:lb n=\"0031b14\" ed=\"T\" />經坐禪行道。是中有比丘少欲知足行頭\n<ns0:lb n=\"0031b15\" ed=\"T\" />陀，聞是事心不喜，種種因緣呵責六群比\n<ns0:lb n=\"0031b16\" ed=\"T\" />丘：「云何名比丘，處處留衣，著上下衣遊行\n<ns0:lb n=\"0031b17\" ed=\"T\" />諸國，趣著弊衣無有威儀。諸受寄舊比丘\n<ns0:lb n=\"0031b18\" ed=\"T\" />與汝架上取衣舒曬抖擻，卷<ns0:anchor xml:id=\"beg_87\" type=\"star\" />牒<ns0:anchor xml:id=\"end_87\" />著衣囊中繫\n<ns0:lb n=\"0031b19\" ed=\"T\" />舉，以是因緣妨廢讀經坐禪行道？」諸比丘如\n<ns0:lb n=\"0031b20\" ed=\"T\" />是呵已，向佛廣說。佛以是事集比丘僧，<ns0:anchor xml:id=\"nkr_note_orig_0031008\" n=\"0031008\" /><ns0:anchor xml:id=\"nkr_note_mod_0031008\" n=\"0031008\" /><ns0:anchor xml:id=\"beg0031008\" n=\"0031008\" />佛<ns0:anchor xml:id=\"end0031008\" />\n<ns0:lb n=\"0031b21\" ed=\"T\" />知而故問六群比丘：「汝實作是事不？」答言：\n<ns0:lb n=\"0031b22\" ed=\"T\" />「實作。世尊！」佛以種種因緣呵責六群比丘：「云\n<ns0:lb n=\"0031b23\" ed=\"T\" />何名比丘，處處留衣，著上下衣遊行諸國，趣\n<ns0:lb n=\"0031b24\" ed=\"T\" />著弊衣無有威儀。諸受寄舊比丘與汝架上\n<ns0:lb n=\"0031b25\" ed=\"T\" />取衣舒曬抖擻，卷<ns0:anchor xml:id=\"beg_88\" type=\"star\" />牒<ns0:anchor xml:id=\"end_88\" />著衣囊中繫舉，以是因\n<ns0:lb n=\"0031b26\" ed=\"T\" />緣妨廢讀經坐禪行道？」佛以是事種種因緣\n<ns0:lb n=\"0031b27\" ed=\"T\" />呵已，語諸比丘：「以十利故與諸比丘結戒。\n<ns0:lb n=\"0031b28\" ed=\"T\" />從今是戒應如是說：若比丘，衣竟捨迦絺那\n<ns0:lb n=\"0031b29\" ed=\"T\" />衣已，三衣中若離一衣，乃至一夜<ns0:anchor xml:id=\"nkr_note_orig_0031009\" n=\"0031009\" /><ns0:anchor xml:id=\"nkr_note_mod_0031009\" n=\"0031009\" /><ns0:anchor xml:id=\"beg0031009\" n=\"0031009\" />宿<ns0:anchor xml:id=\"end0031009\" />，尼薩耆\n<ns0:pb n=\"0031c\" ed=\"T\" xml:id=\"T23.1435.0031c\" />\n<ns0:lb n=\"0031c01\" ed=\"T\" />波逸提，除僧羯磨。」</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0031c0108",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0031c01",
+              "end_line": "0031c02",
+              "literal_with_inline_content": "一夜者，從日沒至明相未出。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0031c0108\" ns1:place=\"inline\">一夜者，從日沒至明相\n<ns0:lb n=\"0031c02\" ed=\"T\" />未出。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0031c0203",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0031c02",
+              "end_line": "0031c03",
+              "literal_with_inline_content": "三衣中若離一衣者，若離僧伽梨、若離欝多羅僧、若離安陀衛。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0031c0203\" ns1:place=\"inline\">三衣中若離一衣者，若離僧伽梨、若\n<ns0:lb n=\"0031c03\" ed=\"T\" />離欝多羅僧、若離安陀衛。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0031c0311",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0031c03",
+              "end_line": "0031c27",
+              "literal_with_inline_content": "除僧羯磨者，僧羯磨名如大迦葉，以因緣故，留僧伽梨耆闍崛山中，著上下衣來入竹園。時遇天雨，不得還上耆闍崛山，離僧伽梨宿。是大迦葉語諸比丘：「我以因緣故，留僧伽梨耆闍崛山中，今遇天雨不得還山，離僧伽梨宿。今當云何？」諸比丘以是事白佛，佛以是事集比丘僧，佛知而故問大迦葉：「汝實留僧伽梨山中，著上下衣來入竹園，時天雨不得還山。是事問諸比丘：『我留僧伽梨耆闍崛山中，著上下衣來入竹園，今遇天雨不得還山。今當云何？』汝實爾不？」答言：「實爾。世尊！」佛以種種因緣讚戒、讚持戒，讚戒、讚持戒已，語諸比丘：「從今日聽一布薩共住處結不離衣羯磨。不離衣羯磨法者，一心和合僧，一比丘應僧中唱：『大德僧聽！是一布薩共住處僧先所結共布薩界，是中除聚落及聚落界、取空地及住處。若僧時到僧忍聽，僧一布薩共住處作不離衣羯磨。白如是。』『大德僧聽！是一布薩共住處僧先所結共布薩界，是中除聚落及聚落界、取空地及住處，作不離衣羯磨。誰諸長老忍是一布薩共住處作不離衣羯磨者默然，誰不忍者是長老說。』『僧已結一布薩共住處作不離衣羯磨竟，僧忍，默然故，是事如是持！』是名除僧羯磨。」",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0031c0311\" ns1:place=\"inline\">除僧羯磨者，僧\n<ns0:lb n=\"0031c04\" ed=\"T\" />羯磨名如大迦葉，以因緣故，留僧伽梨耆闍\n<ns0:lb n=\"0031c05\" ed=\"T\" />崛山中，著上下衣來入竹園。時遇天雨，不得\n<ns0:lb n=\"0031c06\" ed=\"T\" />還<ns0:anchor xml:id=\"nkr_note_orig_0031010\" n=\"0031010\" /><ns0:anchor xml:id=\"nkr_note_mod_0031010\" n=\"0031010\" /><ns0:anchor xml:id=\"beg0031010\" n=\"0031010\" />上耆闍崛<ns0:anchor xml:id=\"end0031010\" />山，離僧伽梨宿。是大迦葉語\n<ns0:lb n=\"0031c07\" ed=\"T\" />諸比丘：「我以因緣故，留僧伽梨耆闍崛山中，\n<ns0:lb n=\"0031c08\" ed=\"T\" />今遇天雨不得還山，離僧伽梨宿。今當云何？」\n<ns0:lb n=\"0031c09\" ed=\"T\" />諸比丘以是事白佛，佛以是事集比丘僧，<ns0:anchor xml:id=\"beg_89\" type=\"star\" />佛<ns0:anchor xml:id=\"end_89\" />\n<ns0:lb n=\"0031c10\" ed=\"T\" />知而故問大迦葉：「汝實留僧伽梨<ns0:anchor xml:id=\"nkr_note_orig_0031011\" n=\"0031011\" /><ns0:anchor xml:id=\"nkr_note_mod_0031011\" n=\"0031011\" /><ns0:anchor xml:id=\"beg0031011\" n=\"0031011\" />山<ns0:anchor xml:id=\"end0031011\" />中，著上\n<ns0:lb n=\"0031c11\" ed=\"T\" />下衣來入竹園，<ns0:anchor xml:id=\"nkr_note_orig_0031012\" n=\"0031012\" /><ns0:anchor xml:id=\"nkr_note_mod_0031012\" n=\"0031012\" /><ns0:anchor xml:id=\"beg0031012\" n=\"0031012\" />時<ns0:anchor xml:id=\"end0031012\" />天雨不得還山。是事問諸\n<ns0:lb n=\"0031c12\" ed=\"T\" />比丘：『我留僧伽梨耆闍崛山中，著上下衣來\n<ns0:lb n=\"0031c13\" ed=\"T\" />入竹園，今遇天雨不得還山。今當云何？』汝實\n<ns0:lb n=\"0031c14\" ed=\"T\" />爾不？」答言：「實爾。世尊！」佛以種種因緣讚戒、讚\n<ns0:lb n=\"0031c15\" ed=\"T\" />持戒，讚戒、讚持戒已，語諸比丘：「從今<ns0:anchor xml:id=\"nkr_note_orig_0031013\" n=\"0031013\" /><ns0:anchor xml:id=\"nkr_note_mod_0031013\" n=\"0031013\" /><ns0:anchor xml:id=\"beg0031013\" n=\"0031013\" />日<ns0:anchor xml:id=\"end0031013\" />聽\n<ns0:lb n=\"0031c16\" ed=\"T\" />一布薩共住處結不離衣羯磨。不離衣羯磨\n<ns0:lb n=\"0031c17\" ed=\"T\" />法者，<ns0:anchor xml:id=\"nkr_note_orig_0031014\" n=\"0031014\" /><ns0:anchor xml:id=\"nkr_note_mod_0031014\" n=\"0031014\" /><ns0:anchor xml:id=\"beg0031014\" n=\"0031014\" />一心和合僧<ns0:anchor xml:id=\"end0031014\" />，一比丘應僧中唱：『大德\n<ns0:lb n=\"0031c18\" ed=\"T\" />僧聽！是一布薩共住處僧先所結共布薩界，\n<ns0:lb n=\"0031c19\" ed=\"T\" />是中除聚落及聚落界、取空地及住處。若僧\n<ns0:lb n=\"0031c20\" ed=\"T\" />時到僧忍聽，僧一布薩共住處作不離衣羯\n<ns0:lb n=\"0031c21\" ed=\"T\" />磨。白如是。』『大德僧聽！是一布薩共住處僧\n<ns0:lb n=\"0031c22\" ed=\"T\" />先所結共布薩界，是中除聚落及聚落界、取\n<ns0:lb n=\"0031c23\" ed=\"T\" />空地及住處，作不離衣羯磨。誰諸長老忍是\n<ns0:lb n=\"0031c24\" ed=\"T\" />一布薩共住處作不離衣羯磨者默然，誰不\n<ns0:lb n=\"0031c25\" ed=\"T\" />忍者是長老說。』『僧已結一布薩共住處作不\n<ns0:lb n=\"0031c26\" ed=\"T\" />離衣羯磨竟，僧忍，默然故，是事如是持！』是名\n<ns0:lb n=\"0031c27\" ed=\"T\" />除僧羯磨。」</ns0:p>"
+            }
+          ],
+          "window_boundary_is_not_sentence_completion": true
+        },
+        "diliao_robe": {
+          "first_line": "0032b07",
+          "last_line": "0032b10",
+          "lines": {
+            "0032b07": {
+              "main": "箭射所及處。若比丘在一聚落，衣在餘聚落，",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0032b08": {
+              "main": "比丘應取衣來，若至衣所，若受餘衣；若不",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0032b09": {
+              "main": "取衣來，不至衣所，不受餘衣，至地了時，尼",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0032b10": {
+              "main": "薩耆波逸提。相接聚落界者，若容十桄梯、若",
+              "inline_notes": [],
+              "gaiji_refs": []
+            }
+          },
+          "main_literal": "箭射所及處。若比丘在一聚落，衣在餘聚落，比丘應取衣來，若至衣所，若受餘衣；若不取衣來，不至衣所，不受餘衣，至地了時，尼薩耆波逸提。相接聚落界者，若容十桄梯、若",
+          "body_blocks": [
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0032b0505",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0032b05",
+              "end_line": "0032b10",
+              "literal_with_inline_content": "不相接聚落界者，若雞飛所及處、若棄糞掃所及處、若有慚愧人所大便處、若箭射所及處。若比丘在一聚落，衣在餘聚落，比丘應取衣來，若至衣所，若受餘衣；若不取衣來，不至衣所，不受餘衣，至地了時，尼薩耆波逸提。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0032b0505\" ns1:place=\"inline\">不相接聚落界者，若雞飛所及處、\n<ns0:lb n=\"0032b06\" ed=\"T\" />若棄糞掃所及處、若有慚愧人所<ns0:anchor xml:id=\"nkr_note_orig_0032004\" n=\"0032004\" /><ns0:anchor xml:id=\"nkr_note_mod_0032004\" n=\"0032004\" /><ns0:anchor xml:id=\"beg0032004\" n=\"0032004\" />大<ns0:anchor xml:id=\"end0032004\" />便處、若\n<ns0:lb n=\"0032b07\" ed=\"T\" />箭射所及處。若比丘在一聚落，衣在餘聚落，\n<ns0:lb n=\"0032b08\" ed=\"T\" /><ns0:anchor xml:id=\"nkr_note_orig_0032005\" n=\"0032005\" /><ns0:anchor xml:id=\"nkr_note_mod_0032005\" n=\"0032005\" /><ns0:anchor xml:id=\"beg0032005\" n=\"0032005\" />比丘<ns0:anchor xml:id=\"end0032005\" />應取衣來，若至衣所，若受餘衣；若不\n<ns0:lb n=\"0032b09\" ed=\"T\" />取衣來，不至衣所，不受餘衣，至地了時，尼\n<ns0:lb n=\"0032b10\" ed=\"T\" />薩耆波逸提。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0032b1006",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0032b10",
+              "end_line": "0032b17",
+              "literal_with_inline_content": "相接聚落界者，若容十桄梯、若十二桄梯、若容載梁車迴轉、若聚落有牆壁籬圍遶外至幾許名為界。是中界者，謂牆外容作事處、若聚落有塹圍遶，外至幾許名為界。是中界者，謂擲糞掃所及處。若比丘在一聚落，衣在餘聚落，比丘應取衣來，若至衣所，若受餘衣。若不取衣來，不至衣所，不受餘衣，至地了時，尼薩耆波逸提。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0032b1006\" ns1:place=\"inline\">相接聚落界者，若容十桄梯、若\n<ns0:lb n=\"0032b11\" ed=\"T\" />十二桄<ns0:anchor xml:id=\"nkr_note_add_0032b1101\" n=\"0032b1101\" /><ns0:anchor xml:id=\"beg0032b1101\" n=\"0032b1101\" />梯<ns0:anchor xml:id=\"end0032b1101\" />、若容載梁車迴轉、若聚落有牆壁\n<ns0:lb n=\"0032b12\" ed=\"T\" />籬圍遶外至幾許名為界。是中界者，謂牆外\n<ns0:lb n=\"0032b13\" ed=\"T\" />容作事處、若聚落有塹圍遶，外至幾許名為\n<ns0:lb n=\"0032b14\" ed=\"T\" />界。是中界者，謂擲糞掃所及處。若比丘在\n<ns0:lb n=\"0032b15\" ed=\"T\" />一聚落，衣在餘聚落，比丘應取衣來，若至\n<ns0:lb n=\"0032b16\" ed=\"T\" />衣所，若受餘衣。若不取衣來，不至衣所，不\n<ns0:lb n=\"0032b17\" ed=\"T\" />受餘衣，至地了時，尼薩耆波逸提。</ns0:p>"
+            }
+          ],
+          "window_boundary_is_not_sentence_completion": true
+        },
+        "rain_leap": {
+          "first_line": "0059a07",
+          "last_line": "0059a27",
+          "lines": {
+            "0059a07": {
+              "main": "何名比丘，我聽畜雨浴衣，便冬春一切時",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a08": {
+              "main": "畜？」種種因緣呵已，語諸比丘：「以十利故與",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a09": {
+              "main": "比丘結戒。從今是戒應如是說：若比丘春",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a10": {
+              "main": "殘一月，應求作雨浴衣，半月應受持。若比丘",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a11": {
+              "main": "未至春殘一月求作，過半月受持者，尼薩耆",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a12": {
+              "main": "波夜提。」是中云何求？云何作？云何持？求者，",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a13": {
+              "main": "從他乞是衣。作者，若浣染割截𭢗。縫持者，",
+              "inline_notes": [],
+              "gaiji_refs": [
+                "#CB01767"
+              ]
+            },
+            "0059a14": {
+              "main": "若是衣受用。尼薩耆波夜提者，是衣應捨，波",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a15": {
+              "main": "夜提罪應悔過。是中犯者，若比丘有閏月處",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a16": {
+              "main": "求雨浴衣，往無閏月處安居，是中從外求",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a17": {
+              "main": "來作來，皆突吉羅。從受持來，尼薩耆波",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a18": {
+              "main": "夜提。若有閏處比丘遣使往，語無閏處比丘",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a19": {
+              "main": "言：「諸大德！小待，共自恣。」若無閏處比丘受",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a20": {
+              "main": "是語待者，是無閏處比丘從求來作，皆突吉",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a21": {
+              "main": "羅。從受持來，尼薩耆波夜提。若比丘有閏",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a22": {
+              "main": "處求雨浴衣，有閏處安居，不犯。持竟，夏前",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a23": {
+              "main": "三月便捨之。無閏處者，已入八月熱時已",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a24": {
+              "main": "過，故犯。有閏者，謂此國晚熱、謂閏春末月，",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a25": {
+              "main": "則閏月內求之。若求得者，三月末便應受",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a26": {
+              "main": "持。不能得者，四月十六日應受持，即得不",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0059a27": {
+              "main": "應停過十五日。",
+              "inline_notes": [
+                "二十八事竟"
+              ],
+              "gaiji_refs": []
+            }
+          },
+          "main_literal": "何名比丘，我聽畜雨浴衣，便冬春一切時畜？」種種因緣呵已，語諸比丘：「以十利故與比丘結戒。從今是戒應如是說：若比丘春殘一月，應求作雨浴衣，半月應受持。若比丘未至春殘一月求作，過半月受持者，尼薩耆波夜提。」是中云何求？云何作？云何持？求者，從他乞是衣。作者，若浣染割截𭢗。縫持者，若是衣受用。尼薩耆波夜提者，是衣應捨，波夜提罪應悔過。是中犯者，若比丘有閏月處求雨浴衣，往無閏月處安居，是中從外求來作來，皆突吉羅。從受持來，尼薩耆波夜提。若有閏處比丘遣使往，語無閏處比丘言：「諸大德！小待，共自恣。」若無閏處比丘受是語待者，是無閏處比丘從求來作，皆突吉羅。從受持來，尼薩耆波夜提。若比丘有閏處求雨浴衣，有閏處安居，不犯。持竟，夏前三月便捨之。無閏處者，已入八月熱時已過，故犯。有閏者，謂此國晚熱、謂閏春末月，則閏月內求之。若求得者，三月末便應受持。不能得者，四月十六日應受持，即得不應停過十五日。",
+          "body_blocks": [
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0058c2801"
+              },
+              "start_line": "0058c28",
+              "end_line": "0059a12",
+              "literal_with_inline_content": "佛在王舍城。爾時六群比丘作是言：「佛聽我等畜雨浴衣。」便春冬一切時畜。是中有比丘少欲知足行頭陀，聞是事心不喜種種因緣呵責：「云何名比丘，佛聽畜雨浴衣故，便冬春一切時畜？佛聽畜三衣，雨浴衣乃是第四衣。」是諸比丘種種呵已，是事白佛。佛以是事集比丘僧，知而故問六群比丘：「汝實作是事不？」答言：「實作。世尊！」佛以種種因緣呵責：「云何名比丘，我聽畜雨浴衣，便冬春一切時畜？」種種因緣呵已，語諸比丘：「以十利故與比丘結戒。從今是戒應如是說：若比丘春殘一月，應求作雨浴衣，半月應受持。若比丘未至春殘一月求作，過半月受持者，尼薩耆波夜提。」",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xml:id=\"pT23p0058c2801\">佛在王舍城。爾時六群比丘作是言：「佛聽我\n<ns0:lb n=\"0058c29\" ed=\"T\" />等畜雨浴衣。」便<ns0:anchor xml:id=\"nkr_note_orig_0058021\" n=\"0058021\" /><ns0:anchor xml:id=\"nkr_note_mod_0058021\" n=\"0058021\" /><ns0:anchor xml:id=\"beg0058021\" n=\"0058021\" />春冬<ns0:anchor xml:id=\"end0058021\" />一切時畜。是中有比\n<ns0:pb n=\"0059a\" ed=\"T\" xml:id=\"T23.1435.0059a\" />\n<ns0:lb n=\"0059a01\" ed=\"T\" />丘少欲知足行頭陀，聞是事心不喜種種因\n<ns0:lb n=\"0059a02\" ed=\"T\" />緣呵責：「云何名比丘，佛聽畜雨浴衣故，便冬\n<ns0:lb n=\"0059a03\" ed=\"T\" />春一切時畜？佛聽畜三衣，雨浴衣乃是第四\n<ns0:lb n=\"0059a04\" ed=\"T\" />衣。」是諸比丘種種呵已，是事白佛。佛以是事\n<ns0:lb n=\"0059a05\" ed=\"T\" />集比丘僧，知而故問六群比丘：「汝實作是事\n<ns0:lb n=\"0059a06\" ed=\"T\" />不？」答言：「實作。世尊！」佛以種種因緣呵責：「云\n<ns0:lb n=\"0059a07\" ed=\"T\" />何名比丘，我聽畜雨浴<ns0:anchor xml:id=\"nkr_note_orig_0059001\" n=\"0059001\" /><ns0:anchor xml:id=\"nkr_note_mod_0059001\" n=\"0059001\" /><ns0:anchor xml:id=\"beg0059001\" n=\"0059001\" />衣<ns0:anchor xml:id=\"end0059001\" />，便冬春一切時\n<ns0:lb n=\"0059a08\" ed=\"T\" />畜？」種種因緣呵已，語諸比丘：「以十利故與\n<ns0:lb n=\"0059a09\" ed=\"T\" /><ns0:anchor xml:id=\"beg_12b\" type=\"star\" />比丘<ns0:anchor xml:id=\"end_12b\" />結戒。從今是戒應如是說：若比丘春\n<ns0:lb n=\"0059a10\" ed=\"T\" />殘一月，應求作雨浴衣，半月應受持。若比丘\n<ns0:lb n=\"0059a11\" ed=\"T\" />未至春殘一月求作，過半月受持者，尼薩耆\n<ns0:lb n=\"0059a12\" ed=\"T\" />波夜提。」</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0059a1204",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0059a12",
+              "end_line": "0059a14",
+              "literal_with_inline_content": "是中云何求？云何作？云何持？求者，從他乞是衣。作者，若浣染割截𭢗。縫持者，若是衣受用。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0059a1204\" ns1:place=\"inline\">是中云何求？云何作？云何持？求者，\n<ns0:lb n=\"0059a13\" ed=\"T\" />從他乞是衣。作者，若浣染割截<ns0:anchor xml:id=\"nkr_note_orig_0059002\" n=\"0059002\" /><ns0:anchor xml:id=\"nkr_note_mod_0059002\" n=\"0059002\" /><ns0:anchor xml:id=\"beg0059002\" n=\"0059002\" /><ns0:g ref=\"#CB01767\">𭢗</ns0:g><ns0:anchor xml:id=\"end0059002\" />。縫持者，\n<ns0:lb n=\"0059a14\" ed=\"T\" />若是衣受用。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0059a1406",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0059a14",
+              "end_line": "0059a15",
+              "literal_with_inline_content": "尼薩耆波夜提者，是衣應捨，波夜提罪應悔過。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0059a1406\" ns1:place=\"inline\">尼薩耆波夜提者，是衣應捨，波\n<ns0:lb n=\"0059a15\" ed=\"T\" />夜提罪應悔過。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0059a1507",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0059a15",
+              "end_line": "0059a18",
+              "literal_with_inline_content": "是中犯者，若比丘有閏月處求雨浴衣，往無閏月處安居，是中從外求來作來，皆突吉羅。從受持來，尼薩耆波夜提。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0059a1507\" ns1:place=\"inline\">是中犯者，若比丘有閏月處\n<ns0:lb n=\"0059a16\" ed=\"T\" />求雨浴衣，往無閏月處安居，是<ns0:anchor xml:id=\"nkr_note_orig_0059003\" n=\"0059003\" /><ns0:anchor xml:id=\"nkr_note_mod_0059003\" n=\"0059003\" /><ns0:anchor xml:id=\"beg0059003\" n=\"0059003\" />中<ns0:anchor xml:id=\"end0059003\" />從外求\n<ns0:lb n=\"0059a17\" ed=\"T\" />來<ns0:anchor xml:id=\"nkr_note_orig_0059004\" n=\"0059004\" /><ns0:anchor xml:id=\"nkr_note_mod_0059004\" n=\"0059004\" /><ns0:anchor xml:id=\"beg0059004\" n=\"0059004\" />作<ns0:anchor xml:id=\"end0059004\" />來，皆突吉<ns0:anchor xml:id=\"nkr_note_orig_0059005\" n=\"0059005\" /><ns0:anchor xml:id=\"nkr_note_mod_0059005\" n=\"0059005\" /><ns0:anchor xml:id=\"beg0059005\" n=\"0059005\" />羅<ns0:anchor xml:id=\"end0059005\" />。從受持來，尼薩耆波\n<ns0:lb n=\"0059a18\" ed=\"T\" />夜提。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0059a1803",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0059a18",
+              "end_line": "0059a21",
+              "literal_with_inline_content": "若有閏處比丘遣使往，語無閏處比丘言：「諸大德！小待，共自恣。」若無閏處比丘受是語待者，是無閏處比丘從求來作，皆突吉羅。從受持來，尼薩耆波夜提。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0059a1803\" ns1:place=\"inline\">若有閏處比丘遣使往，語無閏處比丘\n<ns0:lb n=\"0059a19\" ed=\"T\" />言：「諸大德！小待，共自恣。」若無閏處比丘受\n<ns0:lb n=\"0059a20\" ed=\"T\" />是語待者，是無閏處比丘從求來<ns0:anchor xml:id=\"nkr_note_orig_0059006\" n=\"0059006\" /><ns0:anchor xml:id=\"nkr_note_mod_0059006\" n=\"0059006\" /><ns0:anchor xml:id=\"beg0059006\" n=\"0059006\" />作<ns0:anchor xml:id=\"end0059006\" />，皆突吉\n<ns0:lb n=\"0059a21\" ed=\"T\" />羅。從受持來，尼薩耆波夜提。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0059a2112",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0059a21",
+              "end_line": "0059a24",
+              "literal_with_inline_content": "若比丘有閏處求雨浴衣，有閏處安居，不犯。持竟，夏前三月便捨之。無閏處者，已入八月熱時已過，故犯。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0059a2112\" ns1:place=\"inline\">若比丘有閏\n<ns0:lb n=\"0059a22\" ed=\"T\" />處求雨浴衣，有閏處安居，不犯。<ns0:anchor xml:id=\"nkr_note_orig_0059007\" n=\"0059007\" /><ns0:anchor xml:id=\"nkr_note_mod_0059007a\" n=\"0059007a\" /><ns0:anchor xml:id=\"beg0059007a\" n=\"0059007a\" />持竟，夏前\n<ns0:lb n=\"0059a23\" ed=\"T\" />三月便捨之。<ns0:anchor xml:id=\"nkr_note_orig_0059008\" n=\"0059008\" /><ns0:anchor xml:id=\"nkr_note_mod_0059008\" n=\"0059008\" /><ns0:anchor xml:id=\"beg0059008\" n=\"0059008\" />無<ns0:anchor xml:id=\"end0059008\" />閏處者，已入八月熱時已\n<ns0:lb n=\"0059a24\" ed=\"T\" />過，故犯。<ns0:anchor xml:id=\"end0059007a\" /></ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0059a2404",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0059a24",
+              "end_line": "0059a27",
+              "literal_with_inline_content": "有閏者，謂此國晚熱、謂閏春末月，則閏月內求之。若求得者，三月末便應受持。不能得者，四月十六日應受持，即得不應停過十五日。二十八事竟",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0059a2404\" ns1:place=\"inline\"><ns0:anchor xml:id=\"nkr_note_mod_0059007b\" n=\"0059007b\" /><ns0:anchor xml:id=\"beg0059007b\" n=\"0059007b\" />有閏者，謂此國晚熱、謂閏春末月，\n<ns0:lb n=\"0059a25\" ed=\"T\" />則閏月內求之。<ns0:anchor xml:id=\"nkr_note_orig_0059009\" n=\"0059009\" /><ns0:anchor xml:id=\"nkr_note_mod_0059009\" n=\"0059009\" /><ns0:anchor xml:id=\"beg0059009\" n=\"0059009\" />若求得者，三月末便應受\n<ns0:lb n=\"0059a26\" ed=\"T\" />持。不能得者，四月十六日應受持，即得不\n<ns0:lb n=\"0059a27\" ed=\"T\" />應停過十五日<ns0:anchor xml:id=\"end0059009\" /><ns0:anchor xml:id=\"end0059007b\" />。<ns0:note place=\"inline\">二十八事竟</ns0:note></ns0:p>\n"
+            }
+          ],
+          "window_boundary_is_not_sentence_completion": true
+        },
+        "night": {
+          "first_line": "0308a07",
+          "last_line": "0308a16",
+          "lines": {
+            "0308a07": {
+              "main": "從今是戒應如是說：若比丘尼一身獨宿，乃",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0308a08": {
+              "main": "至一夜，是法初犯僧伽婆尸沙可悔過。」夜者，",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0308a09": {
+              "main": "從日沒至地未了，是中間名夜。僧伽婆尸沙",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0308a10": {
+              "main": "者，是罪屬僧，僧中有殘，因僧前悔過除滅，是",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0308a11": {
+              "main": "名僧伽婆尸沙。是中犯者，若比丘尼，日沒時",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0308a12": {
+              "main": "一身獨宿，至地了時，犯僧伽婆尸沙。日沒已，",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0308a13": {
+              "main": "初夜初分、初夜中分、初夜後分，中夜初分、中",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0308a14": {
+              "main": "夜中分、中夜後分，後夜初分、後夜中分、後夜",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0308a15": {
+              "main": "後分亦如是。又比丘尼，地了時一身獨宿，乃",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0308a16": {
+              "main": "至明日地了時，犯僧伽婆尸沙。若共行比丘",
+              "inline_notes": [],
+              "gaiji_refs": []
+            }
+          },
+          "main_literal": "從今是戒應如是說：若比丘尼一身獨宿，乃至一夜，是法初犯僧伽婆尸沙可悔過。」夜者，從日沒至地未了，是中間名夜。僧伽婆尸沙者，是罪屬僧，僧中有殘，因僧前悔過除滅，是名僧伽婆尸沙。是中犯者，若比丘尼，日沒時一身獨宿，至地了時，犯僧伽婆尸沙。日沒已，初夜初分、初夜中分、初夜後分，中夜初分、中夜中分、中夜後分，後夜初分、後夜中分、後夜後分亦如是。又比丘尼，地了時一身獨宿，乃至明日地了時，犯僧伽婆尸沙。若共行比丘",
+          "body_blocks": [
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0307c1501"
+              },
+              "start_line": "0307c15",
+              "end_line": "0308a08",
+              "literal_with_inline_content": "佛在舍衛國。爾時有比丘尼，名跋陀，是加毘羅婆羅門女。跋陀比丘尼有姊死，往問訊姊夫，因為說法，遂至日沒。比丘尼作是念：「我若還精舍，恐道中有賊。」即住居士舍。是居士思惟：「此比丘尼不還去者，必欲得反戒，我當求令代其姊處。」作是念已語比丘尼言：「我舍多有財物珍寶，汝姊所有手脚頭面莊嚴具悉在。我若更取餘人作婦，則不能好看我兒，兒亦不愛樂。汝若欲反戒者，作我兒母，汝看我兒如兒，我兒等看汝如母。」比丘尼作是念：「若我違逆是語者，或強逼我。何不默然！」即默然坐。居士心念謂欲反戒，但以姊新死故默然，中夜復作是語，後夜復作是語。地了時是比丘尼，從急惱處得脫，還至精舍，向諸比丘尼廣說是事。是中有比丘尼，少欲知足行頭陀，聞是事心不喜，種種因緣呵責言：「云何名比丘尼，一身獨宿？」種種因緣呵已，向佛廣說。佛以是事集二部僧，知而故問跋陀比丘尼汝實作是事不？答言：「實作。世尊！」佛以種種因緣呵責言：「云何名比丘尼，一身獨宿？」種種因緣呵已，語諸比丘：「以十利故與比丘尼結戒。從今是戒應如是說：若比丘尼一身獨宿，乃至一夜，是法初犯僧伽婆尸沙可悔過。」",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xml:id=\"pT23p0307c1501\"><ns0:anchor type=\"circle\" /><ns0:anchor xml:id=\"nkr_note_orig_0307012\" n=\"0307012\" /><ns0:anchor xml:id=\"nkr_note_mod_0307012\" n=\"0307012\" />佛在舍衛國。爾時有比丘尼，名跋陀，是加\n<ns0:lb n=\"0307c16\" ed=\"T\" />毘羅婆羅門女。跋陀比丘尼有姊死，往問訊\n<ns0:lb n=\"0307c17\" ed=\"T\" />姊夫，因為說法，遂至日沒。比丘尼作是念：「我\n<ns0:lb n=\"0307c18\" ed=\"T\" />若還精舍，恐道中有賊。」即住居士舍。是居士\n<ns0:lb n=\"0307c19\" ed=\"T\" />思惟：「此比丘尼不還去者，必欲得反戒，我當\n<ns0:lb n=\"0307c20\" ed=\"T\" />求令代其姊處。」作是念已語比丘尼言：「我舍\n<ns0:lb n=\"0307c21\" ed=\"T\" />多有財物珍寶，汝姊所有手脚頭面莊嚴具\n<ns0:lb n=\"0307c22\" ed=\"T\" />悉在。我若更取餘人作婦，則不能好看我兒，\n<ns0:lb n=\"0307c23\" ed=\"T\" />兒亦不愛樂。汝若欲反戒者，作我兒母，汝看\n<ns0:lb n=\"0307c24\" ed=\"T\" />我兒如兒，我兒等看汝如母。」比丘尼作是念：\n<ns0:lb n=\"0307c25\" ed=\"T\" />「若我違逆是語者，或強逼我。何不默然！」即默\n<ns0:lb n=\"0307c26\" ed=\"T\" />然坐。居士心念謂欲反戒，但以姊新死故默\n<ns0:lb n=\"0307c27\" ed=\"T\" />然，中夜復作是語，後夜復作是語。地了時是\n<ns0:lb n=\"0307c28\" ed=\"T\" />比丘尼，從急惱處得脫，還至精舍，向諸比丘\n<ns0:lb n=\"0307c29\" ed=\"T\" />尼廣說是事。是中有比丘尼，少欲知足行頭\n<ns0:pb n=\"0308a\" ed=\"T\" xml:id=\"T23.1435.0308a\" />\n<ns0:lb n=\"0308a01\" ed=\"T\" />陀，聞是事心不喜，種種因緣呵責言：「云何名\n<ns0:lb n=\"0308a02\" ed=\"T\" />比丘尼，一身獨宿？」種種因緣呵已，向佛廣說。\n<ns0:lb n=\"0308a03\" ed=\"T\" />佛以是事集二部僧，知而故問跋陀比丘尼\n<ns0:lb n=\"0308a04\" ed=\"T\" />汝實作是事不？答言：「實作。世尊！」佛以種種因\n<ns0:lb n=\"0308a05\" ed=\"T\" />緣呵責言：「云何名比丘尼，一身獨宿？」種種因\n<ns0:lb n=\"0308a06\" ed=\"T\" />緣呵已，語諸比丘：「以十利故與比丘尼結戒。\n<ns0:lb n=\"0308a07\" ed=\"T\" />從今是戒應如是說：若比丘尼一身獨宿，乃\n<ns0:lb n=\"0308a08\" ed=\"T\" />至一夜，是法初犯僧伽婆尸沙可悔過。」</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0308a0816",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0308a08",
+              "end_line": "0308a09",
+              "literal_with_inline_content": "夜者，從日沒至地未了，是中間名夜。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0308a0816\" ns1:place=\"inline\">夜者，\n<ns0:lb n=\"0308a09\" ed=\"T\" />從日沒至地未了，是中間名夜。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0308a0913",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0308a09",
+              "end_line": "0308a11",
+              "literal_with_inline_content": "僧伽婆尸沙者，是罪屬僧，僧中有殘，因僧前悔過除滅，是名僧伽婆尸沙。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0308a0913\" ns1:place=\"inline\">僧伽婆尸沙\n<ns0:lb n=\"0308a10\" ed=\"T\" />者，是罪屬僧，僧中有殘，因僧前悔過除滅，是\n<ns0:lb n=\"0308a11\" ed=\"T\" />名僧伽婆尸沙。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0308a1107",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0308a11",
+              "end_line": "0308a15",
+              "literal_with_inline_content": "是中犯者，若比丘尼，日沒時一身獨宿，至地了時，犯僧伽婆尸沙。日沒已，初夜初分、初夜中分、初夜後分，中夜初分、中夜中分、中夜後分，後夜初分、後夜中分、後夜後分亦如是。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0308a1107\" ns1:place=\"inline\">是中犯者，若比丘尼，日沒時\n<ns0:lb n=\"0308a12\" ed=\"T\" />一身獨宿，至地了時，犯僧伽婆尸沙。日沒已，\n<ns0:lb n=\"0308a13\" ed=\"T\" />初夜初分、初夜中分、初夜後分，中夜初分、中\n<ns0:lb n=\"0308a14\" ed=\"T\" />夜中分、中夜後分，後夜初分、後夜中分、後夜\n<ns0:lb n=\"0308a15\" ed=\"T\" />後分亦如是。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0308a1506",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0308a15",
+              "end_line": "0308a16",
+              "literal_with_inline_content": "又比丘尼，地了時一身獨宿，乃至明日地了時，犯僧伽婆尸沙。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0308a1506\" ns1:place=\"inline\">又比丘尼，地了時一身獨宿，乃\n<ns0:lb n=\"0308a16\" ed=\"T\" />至明日地了時，犯僧伽婆尸沙。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0308a1613",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0308a16",
+              "end_line": "0308a18",
+              "literal_with_inline_content": "若共行比丘尼，若反戒、若死、若入外道、若八難中隨有一一難起，不犯。第六戒有四事中一事竟",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0308a1613\" ns1:place=\"inline\">若共行比丘\n<ns0:lb n=\"0308a17\" ed=\"T\" />尼，若反戒、若死、若入外道、若八難中隨有一\n<ns0:lb n=\"0308a18\" ed=\"T\" />一難起，不犯。<ns0:anchor xml:id=\"nkr_note_orig_0308001\" n=\"0308001\" /><ns0:anchor xml:id=\"nkr_note_mod_0308001\" n=\"0308001\" /><ns0:anchor xml:id=\"beg0308001\" n=\"0308001\" /><ns0:note place=\"inline\">第六<ns0:anchor xml:id=\"nkr_note_orig_0308002\" n=\"0308002\" /><ns0:anchor xml:id=\"nkr_note_mod_0308002\" n=\"0308002\" /><ns0:anchor xml:id=\"beg0308002\" n=\"0308002\" />戒有四事中一<ns0:anchor xml:id=\"end0308002\" />事竟</ns0:note><ns0:anchor xml:id=\"end0308001\" /></ns0:p>\n"
+            }
+          ],
+          "window_boundary_is_not_sentence_completion": true
+        },
+        "day": {
+          "first_line": "0308b06",
+          "last_line": "0308b11",
+          "lines": {
+            "0308b06": {
+              "main": "是說：若比丘尼，若夜、若晝，一身獨行到白衣",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0308b07": {
+              "main": "家，是法初犯僧伽婆尸沙可悔過。」晝日者，從",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0308b08": {
+              "main": "地了至日未沒，是中間名晝日。是中犯者，若",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0308b09": {
+              "main": "比丘尼一身獨行，地了時去、至日沒時來，犯",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0308b10": {
+              "main": "僧伽婆尸沙。日出時、日出已，中前日、中日昳，",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0308b11": {
+              "main": "晡時、日沒時去、日沒已來還，皆僧伽婆尸沙。",
+              "inline_notes": [],
+              "gaiji_refs": []
+            }
+          },
+          "main_literal": "是說：若比丘尼，若夜、若晝，一身獨行到白衣家，是法初犯僧伽婆尸沙可悔過。」晝日者，從地了至日未沒，是中間名晝日。是中犯者，若比丘尼一身獨行，地了時去、至日沒時來，犯僧伽婆尸沙。日出時、日出已，中前日、中日昳，晡時、日沒時去、日沒已來還，皆僧伽婆尸沙。",
+          "body_blocks": [
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0308a1901"
+              },
+              "start_line": "0308a19",
+              "end_line": "0308b07",
+              "literal_with_inline_content": "佛在舍衛國。爾時有比丘尼，名偷蘭難陀，多知多識，喜入出諸家。是比丘尼早起著衣，入一家出一家，出一家復入一家。晡時來還大疲極，僧房中臥，自言：「脚痛、𨄔痛、脇痛、背痛。」語諸比丘尼：「與我按摩。」諸比丘尼言：「善女！從何處來？」答言：「入某家出某家，出某家復入某家。」問言：「汝為佛事僧事耶？」答言：「不為！」諸比丘尼言：「若不為佛事僧事去者，何以故為作是行得大疲極？」是中有比丘尼，少欲知足行頭陀，聞是事心不喜，種種因緣呵責言：「云何名比丘尼，晝日一身獨行？」種種因緣呵已，向佛廣說。佛以是事集二部僧，知而故問偷羅難陀比丘尼：「汝實作是事不？」答言：「實作。世尊！」佛以種種因緣呵責言：「云何名比丘尼，晝日一身獨行到白衣家？」種種因緣呵已，語諸比丘：「以十利故與比丘尼結戒。從今是戒應如是說：若比丘尼，若夜、若晝，一身獨行到白衣家，是法初犯僧伽婆尸沙可悔過。」",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xml:id=\"pT23p0308a1901\">佛在舍衛國。爾時有比丘尼，名偷<ns0:anchor xml:id=\"nkr_note_orig_0308003\" n=\"0308003\" /><ns0:anchor xml:id=\"nkr_note_mod_0308003\" n=\"0308003\" /><ns0:anchor xml:id=\"beg0308003\" n=\"0308003\" />蘭<ns0:anchor xml:id=\"end0308003\" />難陀，\n<ns0:lb n=\"0308a20\" ed=\"T\" />多知多識，喜入出諸家。是比丘尼早起著衣，\n<ns0:lb n=\"0308a21\" ed=\"T\" />入一家出一家，出一家復入一家。晡時來還\n<ns0:lb n=\"0308a22\" ed=\"T\" />大疲極，僧房中臥，自言：「脚痛、<ns0:anchor xml:id=\"nkr_note_orig_0308004\" n=\"0308004\" /><ns0:anchor xml:id=\"nkr_note_mod_0308004\" n=\"0308004\" /><ns0:anchor xml:id=\"beg0308004\" n=\"0308004\" /><ns0:g ref=\"#CB13416\">𨄔</ns0:g><ns0:anchor xml:id=\"end0308004\" />痛、脇痛、背痛。」\n<ns0:lb n=\"0308a23\" ed=\"T\" />語諸比丘尼：「與我按摩。」諸比丘尼言：「善女！從\n<ns0:lb n=\"0308a24\" ed=\"T\" />何處來？」答言：「入某家出某家，出某家復入某\n<ns0:lb n=\"0308a25\" ed=\"T\" />家。」問言：「汝為佛事僧事耶？」答言：「不為！」諸比\n<ns0:lb n=\"0308a26\" ed=\"T\" />丘尼言：「若不為佛事僧事去者，何以故為作\n<ns0:lb n=\"0308a27\" ed=\"T\" />是行得大疲極？」是中有比丘尼，少欲知足行\n<ns0:lb n=\"0308a28\" ed=\"T\" />頭陀，聞是事心不喜，種種因緣呵責言：「云何\n<ns0:lb n=\"0308a29\" ed=\"T\" />名比丘尼，晝日一身獨行？」種種因緣呵已，向\n<ns0:pb n=\"0308b\" ed=\"T\" xml:id=\"T23.1435.0308b\" />\n<ns0:lb n=\"0308b01\" ed=\"T\" />佛廣說。佛以是事集二部僧，知而故問偷羅\n<ns0:lb n=\"0308b02\" ed=\"T\" />難陀比丘尼：「汝實作是事不？」答言：「實作。世尊！」\n<ns0:lb n=\"0308b03\" ed=\"T\" />佛以種種因緣呵責<ns0:anchor xml:id=\"nkr_note_orig_0308005\" n=\"0308005\" /><ns0:anchor xml:id=\"nkr_note_mod_0308005\" n=\"0308005\" /><ns0:anchor xml:id=\"beg0308005\" n=\"0308005\" />言<ns0:anchor xml:id=\"end0308005\" />：「云何名比丘尼，晝日\n<ns0:lb n=\"0308b04\" ed=\"T\" />一身獨行到白衣家？」種種因緣呵已，語諸比\n<ns0:lb n=\"0308b05\" ed=\"T\" />丘：「以十利故與比丘尼結戒。從今是戒應如\n<ns0:lb n=\"0308b06\" ed=\"T\" />是說：若比丘尼，若夜、若晝，一身獨行到白衣\n<ns0:lb n=\"0308b07\" ed=\"T\" />家，是法初犯僧伽婆尸沙可悔過。」</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0308b0714",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0308b07",
+              "end_line": "0308b08",
+              "literal_with_inline_content": "晝日者，從地了至日未沒，是中間名晝日。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0308b0714\" ns1:place=\"inline\">晝日者，從\n<ns0:lb n=\"0308b08\" ed=\"T\" />地了至日未沒，是中間名晝日。</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0308b0813",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0308b08",
+              "end_line": "0308b11",
+              "literal_with_inline_content": "是中犯者，若比丘尼一身獨行，地了時去、至日沒時來，犯僧伽婆尸沙。日出時、日出已，中前日、中日昳，晡時、日沒時去、日沒已來還，皆僧伽婆尸沙。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0308b0813\" ns1:place=\"inline\">是中犯者，若\n<ns0:lb n=\"0308b09\" ed=\"T\" />比丘尼一身獨行，地了時去、至日沒時來，犯\n<ns0:lb n=\"0308b10\" ed=\"T\" />僧伽婆尸沙。日出時、日出已，中前日、中日昳，\n<ns0:lb n=\"0308b11\" ed=\"T\" />晡時、日沒時去、日沒已來還，皆僧伽婆尸沙。</ns0:p>\n"
+            }
+          ],
+          "window_boundary_is_not_sentence_completion": true
+        },
+        "local_time": {
+          "first_line": "0394b19",
+          "last_line": "0394b24",
+          "lines": {
+            "0394b19": {
+              "main": "淨食、若淨食不淨食雜，不得波逸提。」問：「頗",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0394b20": {
+              "main": "比丘別眾食，不得波逸提耶？」答：「有！受一切",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0394b21": {
+              "main": "時故無罪。」問：「拘耶尼國用何時應食？」答：「若",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0394b22": {
+              "main": "此間宿，用此間時。若彼間宿，用彼間時。餘",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0394b23": {
+              "main": "二方亦如是。」問：「拘耶尼國殘宿食，應食不？」",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0394b24": {
+              "main": "答言：「不得。弗婆提亦如是。」問：「欝單越殘宿",
+              "inline_notes": [],
+              "gaiji_refs": []
+            }
+          },
+          "main_literal": "淨食、若淨食不淨食雜，不得波逸提。」問：「頗比丘別眾食，不得波逸提耶？」答：「有！受一切時故無罪。」問：「拘耶尼國用何時應食？」答：「若此間宿，用此間時。若彼間宿，用彼間時。餘二方亦如是。」問：「拘耶尼國殘宿食，應食不？」答言：「不得。弗婆提亦如是。」問：「欝單越殘宿",
+          "body_blocks": [
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0394b1513",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0394b15",
+              "end_line": "0394b19",
+              "literal_with_inline_content": "問：「頗比丘知比丘食已，不受殘食法，從座處起語言：『汝自恣食。』欲惱令疑悔故，不得波逸提耶？」答：「有！若除五種食，勸食餘食、若勸食不淨食、若淨食不淨食雜，不得波逸提。」",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0394b1513\" ns1:place=\"inline\">問：「頗比丘\n<ns0:lb n=\"0394b16\" ed=\"T\" />知比丘食已，不受殘食法，從座處起<ns0:anchor xml:id=\"nkr_note_orig_0394014\" n=\"0394014\" /><ns0:anchor xml:id=\"nkr_note_mod_0394014\" n=\"0394014\" /><ns0:anchor xml:id=\"beg0394014\" n=\"0394014\" />語<ns0:anchor xml:id=\"end0394014\" />言：\n<ns0:lb n=\"0394b17\" ed=\"T\" />『汝自恣食。』欲惱令疑悔故，不得波逸提耶？」\n<ns0:lb n=\"0394b18\" ed=\"T\" /><ns0:anchor xml:id=\"beg_b11\" type=\"star\" />答：「有<ns0:anchor xml:id=\"end_b11\" />！<ns0:anchor xml:id=\"nkr_note_orig_0394015\" n=\"0394015\" /><ns0:anchor xml:id=\"nkr_note_mod_0394015\" n=\"0394015\" /><ns0:anchor xml:id=\"beg0394015\" n=\"0394015\" />若<ns0:anchor xml:id=\"end0394015\" />除五種食，勸食餘食、若勸食不\n<ns0:lb n=\"0394b19\" ed=\"T\" />淨食、若淨食不淨食<ns0:anchor xml:id=\"beg_b12\" type=\"star\" />雜<ns0:anchor xml:id=\"end_b12\" />，不得波逸提。」</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0394b1915",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0394b19",
+              "end_line": "0394b23",
+              "literal_with_inline_content": "問：「頗比丘別眾食，不得波逸提耶？」答：「有！受一切時故無罪。」問：「拘耶尼國用何時應食？」答：「若此間宿，用此間時。若彼間宿，用彼間時。餘二方亦如是。」",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0394b1915\" ns1:place=\"inline\">問：「頗\n<ns0:lb n=\"0394b20\" ed=\"T\" />比丘別<ns0:anchor xml:id=\"nkr_note_add_0394b2001\" n=\"0394b2001\" /><ns0:anchor xml:id=\"beg0394b2001\" n=\"0394b2001\" />眾<ns0:anchor xml:id=\"end0394b2001\" />食，不得波逸提耶？」<ns0:anchor xml:id=\"beg_b13\" type=\"star\" />答：「有<ns0:anchor xml:id=\"end_b13\" />！受一切\n<ns0:lb n=\"0394b21\" ed=\"T\" />時故無罪。」問：「拘耶尼國用何時應食？」<ns0:anchor xml:id=\"nkr_note_orig_0394016\" n=\"0394016\" /><ns0:anchor xml:id=\"nkr_note_mod_0394016\" n=\"0394016\" /><ns0:anchor xml:id=\"beg0394016\" n=\"0394016\" />答<ns0:anchor xml:id=\"end0394016\" />：「若\n<ns0:lb n=\"0394b22\" ed=\"T\" />此間宿，用此間時。若彼間宿，用彼間時。餘\n<ns0:lb n=\"0394b23\" ed=\"T\" />二<ns0:anchor xml:id=\"nkr_note_orig_0394017\" n=\"0394017\" /><ns0:anchor xml:id=\"nkr_note_mod_0394017\" n=\"0394017\" /><ns0:anchor xml:id=\"beg0394017\" n=\"0394017\" />方<ns0:anchor xml:id=\"end0394017\" />亦如是。」</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0394b2306",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0394b23",
+              "end_line": "0394b24",
+              "literal_with_inline_content": "問：「拘耶尼國殘宿食，應食不？」答言：「不得。弗婆提亦如是。」",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0394b2306\" ns1:place=\"inline\">問：「拘耶尼國殘宿食，應食不？」\n<ns0:lb n=\"0394b24\" ed=\"T\" />答<ns0:anchor xml:id=\"beg_b14\" type=\"star\" />言<ns0:anchor xml:id=\"end_b14\" />：「不得。弗婆提亦如是。」</ns0:p>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pT23p0394b2411",
+                "{http://www.cbeta.org/ns/1.0}place": "inline"
+              },
+              "start_line": "0394b24",
+              "end_line": "0394b26",
+              "literal_with_inline_content": "問：「欝單越殘宿食，應食不？」答：「彼無我所、無所屬隨意食，無罪。」",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" xml:id=\"pT23p0394b2411\" ns1:place=\"inline\">問：「欝單越殘宿\n<ns0:lb n=\"0394b25\" ed=\"T\" />食，應食不？」答：「彼無我所、無所屬隨意食，\n<ns0:lb n=\"0394b26\" ed=\"T\" />無罪。」</ns0:p>"
+            }
+          ],
+          "window_boundary_is_not_sentence_completion": true
+        }
+      },
+      "all_selected_linked_postposed_records": [
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0031009",
+            "to": "#end0031009"
+          },
+          "body_anchor_lines": [
+            "0031b29"
+          ],
+          "literal_with_inline_content": "宿",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0031009\" to=\"#end0031009\"><ns0:lem wit=\"#wit.orig\">宿</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4\"><ns0:space quantity=\"0\" /></ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0032005",
+            "to": "#end0032005"
+          },
+          "body_anchor_lines": [
+            "0032b08"
+          ],
+          "literal_with_inline_content": "比丘",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0032005\" to=\"#end0032005\"><ns0:lem wit=\"#wit.orig\">比丘</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4\"><ns0:space quantity=\"0\" /></ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0059001",
+            "to": "#end0059001"
+          },
+          "body_anchor_lines": [
+            "0059a07"
+          ],
+          "literal_with_inline_content": "衣衣故",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0059001\" to=\"#end0059001\"><ns0:lem wit=\"#wit.orig\">衣</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4 #wit1\">衣故</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg_12b",
+            "to": "#end_12b",
+            "corresp": "#0054006"
+          },
+          "body_anchor_lines": [
+            "0059a09"
+          ],
+          "literal_with_inline_content": "比丘諸比丘",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg_12b\" to=\"#end_12b\" corresp=\"#0054006\"><ns0:lem wit=\"#wit.orig\">比丘</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4 #wit1\">諸比丘</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0059002",
+            "to": "#end0059002"
+          },
+          "body_anchor_lines": [
+            "0059a13"
+          ],
+          "literal_with_inline_content": "𭢗簪",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0059002\" to=\"#end0059002\"><ns0:lem wit=\"#wit.orig\"><ns0:g ref=\"#CB01767\">𭢗</ns0:g></ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4 #wit1\">簪</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0059003",
+            "to": "#end0059003"
+          },
+          "body_anchor_lines": [
+            "0059a16"
+          ],
+          "literal_with_inline_content": "中人",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0059003\" to=\"#end0059003\"><ns0:lem wit=\"#wit.orig\">中</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4 #wit1\">人</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0059004",
+            "to": "#end0059004"
+          },
+          "body_anchor_lines": [
+            "0059a17"
+          ],
+          "literal_with_inline_content": "作作衣",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0059004\" to=\"#end0059004\"><ns0:lem wit=\"#wit.orig\">作</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4 #wit1\">作衣</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0059005",
+            "to": "#end0059005"
+          },
+          "body_anchor_lines": [
+            "0059a17"
+          ],
+          "literal_with_inline_content": "羅羅罪",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0059005\" to=\"#end0059005\"><ns0:lem wit=\"#wit.orig\">羅</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4 #wit1\">羅罪</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0059006",
+            "to": "#end0059006"
+          },
+          "body_anchor_lines": [
+            "0059a20"
+          ],
+          "literal_with_inline_content": "作作者作來",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0059006\" to=\"#end0059006\"><ns0:lem wit=\"#wit.orig\">作</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4\">作者</ns0:rdg><ns0:rdg resp=\"#resp2\" wit=\"#wit1\">作來</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0059008",
+            "to": "#end0059008"
+          },
+          "body_anchor_lines": [
+            "0059a23"
+          ],
+          "literal_with_inline_content": "無至無",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0059008\" to=\"#end0059008\"><ns0:lem wit=\"#wit.orig\">無</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4 #wit1\">至無</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0059007a",
+            "to": "#end0059007a"
+          },
+          "body_anchor_lines": [
+            "0059a22"
+          ],
+          "literal_with_inline_content": "持竟，夏前三月便捨之。（至）＋無【三】【宮】無【大】，至無【宋】【元】【明】【宮】無至無閏處者，已入八月熱時已過，故犯。持竟夏前三月便捨之無閏處者已入八月熱時已過故犯",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0059007a\" to=\"#end0059007a\"><ns0:lem wit=\"#wit.orig\">持竟，夏前<ns0:lb n=\"0059a23\" ed=\"T\" />三月便捨之。<ns0:note n=\"0059008\" resp=\"#resp2\" type=\"orig\" place=\"foot text\">（至）＋無【三】【宮】</ns0:note><ns0:note n=\"0059008\" resp=\"#resp1\" type=\"mod\">無【大】，至無【宋】【元】【明】【宮】</ns0:note><ns0:app n=\"0059008\"><ns0:lem wit=\"#wit.orig\">無</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4 #wit1\">至無</ns0:rdg></ns0:app>閏處者，已入八月熱時已<ns0:lb n=\"0059a24\" ed=\"T\" />過，故犯。</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1\"><ns0:note place=\"inline\">持竟夏前三月便捨之無閏處者已入八月熱時已過故犯</ns0:note></ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "{http://www.cbeta.org/ns/1.0}word-count": "32",
+            "from": "#beg0059009",
+            "to": "#end0059009"
+          },
+          "body_anchor_lines": [
+            "0059a25"
+          ],
+          "literal_with_inline_content": "若求得者，三月末便應受持。不能得者，四月十六日應受持，即得不應停過十五日",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" ns1:word-count=\"32\" from=\"#beg0059009\" to=\"#end0059009\"><ns0:lem wit=\"#wit.orig\">若求得者，三月末便應受<ns0:lb n=\"0059a26\" ed=\"T\" />持。不能得者，四月十六日應受持，即得不<ns0:lb n=\"0059a27\" ed=\"T\" />應停過十五日</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit1\"><ns0:space quantity=\"0\" /></ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0059007b",
+            "to": "#end0059007b"
+          },
+          "body_anchor_lines": [
+            "0059a24"
+          ],
+          "literal_with_inline_content": "有閏者，謂此國晚熱、謂閏春末月，則閏月內求之。〔若求得者…日〕三十二字－【宮】（若求得者…日）三十二字【大】，〔－〕【宮】若求得者，三月末便應受持。不能得者，四月十六日應受持，即得不應停過十五日有閏者謂此國晚熱謂閏春末月則閏月內求之若求得者三月末便應受持不能得者四月十六日應受持即得不應停過十五日",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" from=\"#beg0059007b\" to=\"#end0059007b\"><ns0:lem wit=\"#wit.orig\">有閏者，謂此國晚熱、謂閏春末月，<ns0:lb n=\"0059a25\" ed=\"T\" />則閏月內求之。<ns0:note n=\"0059009\" resp=\"#resp2\" type=\"orig\" place=\"foot text\">〔若求得者…日〕三十二字－【宮】</ns0:note><ns0:note n=\"0059009\" resp=\"#resp1\" type=\"mod\">（若求得者…日）三十二字【大】，〔－〕【宮】</ns0:note><ns0:app n=\"0059009\" ns1:word-count=\"32\"><ns0:lem wit=\"#wit.orig\">若求得者，三月末便應受<ns0:lb n=\"0059a26\" ed=\"T\" />持。不能得者，四月十六日應受持，即得不<ns0:lb n=\"0059a27\" ed=\"T\" />應停過十五日</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit1\"><ns0:space quantity=\"0\" /></ns0:rdg></ns0:app></ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1\"><ns0:note place=\"inline\">有閏者謂此國晚熱謂閏春末月則閏月內求之若求得者三月末便應受持不能得者四月十六日應受持即得不應停過十五日</ns0:note></ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg_b12",
+            "to": "#end_b12",
+            "corresp": "#0394007"
+          },
+          "body_anchor_lines": [
+            "0394b19"
+          ],
+          "literal_with_inline_content": "雜合",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg_b12\" to=\"#end_b12\" corresp=\"#0394007\"><ns0:lem wit=\"#wit.orig\">雜</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit1\">合</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0394b2001",
+            "to": "#end0394b2001"
+          },
+          "body_anchor_lines": [
+            "0394b20"
+          ],
+          "literal_with_inline_content": "眾K21n0890_p1060b05象",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0394b2001\" to=\"#end0394b2001\"><ns0:lem resp=\"#resp3\" wit=\"#wit.cbeta #wit5\">眾<ns0:note type=\"cf1\">K21n0890_p1060b05</ns0:note></ns0:lem><ns0:rdg wit=\"#wit.orig\">象</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg_b13",
+            "to": "#end_b13",
+            "corresp": "#0392017"
+          },
+          "body_anchor_lines": [
+            "0394b20"
+          ],
+          "literal_with_inline_content": "答：「有答曰有",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg_b13\" to=\"#end_b13\" corresp=\"#0392017\"><ns0:lem wit=\"#wit.orig\">答：「有</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4 #wit1\">答曰有</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0394016",
+            "to": "#end0394016"
+          },
+          "body_anchor_lines": [
+            "0394b21"
+          ],
+          "literal_with_inline_content": "答答曰",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0394016\" to=\"#end0394016\"><ns0:lem wit=\"#wit.orig\">答</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4 #wit1\">答曰</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg0394017",
+            "to": "#end0394017"
+          },
+          "body_anchor_lines": [
+            "0394b23"
+          ],
+          "literal_with_inline_content": "方天下",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0394017\" to=\"#end0394017\"><ns0:lem wit=\"#wit.orig\">方</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4 #wit1\">天下</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "app",
+          "attributes": {
+            "from": "#beg_b14",
+            "to": "#end_b14",
+            "corresp": "#0390014"
+          },
+          "body_anchor_lines": [
+            "0394b24"
+          ],
+          "literal_with_inline_content": "言曰",
+          "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg_b14\" to=\"#end_b14\" corresp=\"#0390014\"><ns0:lem wit=\"#wit.orig\">言</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit4 #wit1\">曰</ns0:rdg></ns0:app>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0031009",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0031009"
+          },
+          "body_anchor_lines": [
+            "0031b29"
+          ],
+          "literal_with_inline_content": "宿【大】，〔－〕【宋】【元】【明】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0031009\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0031009\">宿【大】，〔－〕【宋】【元】【明】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0032005",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0032005"
+          },
+          "body_anchor_lines": [
+            "0032b08"
+          ],
+          "literal_with_inline_content": "比丘【大】，〔－〕【宋】【元】【明】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0032005\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0032005\">比丘【大】，〔－〕【宋】【元】【明】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059001",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0059001"
+          },
+          "body_anchor_lines": [
+            "0059a07"
+          ],
+          "literal_with_inline_content": "衣【大】，衣故【宋】【元】【明】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059001\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0059001\">衣【大】，衣故【宋】【元】【明】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059002",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0059002"
+          },
+          "body_anchor_lines": [
+            "0059a13"
+          ],
+          "literal_with_inline_content": "𭢗【大】，簪【宋】【元】【明】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059002\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0059002\"><ns0:g ref=\"#CB01767\">𭢗</ns0:g>【大】，簪【宋】【元】【明】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059003",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0059003"
+          },
+          "body_anchor_lines": [
+            "0059a16"
+          ],
+          "literal_with_inline_content": "中【大】，人【宋】【元】【明】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059003\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0059003\">中【大】，人【宋】【元】【明】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059004",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0059004"
+          },
+          "body_anchor_lines": [
+            "0059a17"
+          ],
+          "literal_with_inline_content": "作【大】，作衣【宋】【元】【明】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059004\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0059004\">作【大】，作衣【宋】【元】【明】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059005",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0059005"
+          },
+          "body_anchor_lines": [
+            "0059a17"
+          ],
+          "literal_with_inline_content": "羅【大】，羅罪【宋】【元】【明】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059005\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0059005\">羅【大】，羅罪【宋】【元】【明】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059006",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0059006"
+          },
+          "body_anchor_lines": [
+            "0059a20"
+          ],
+          "literal_with_inline_content": "作【大】，作者【宋】【元】【明】，作來【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059006\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0059006\">作【大】，作者【宋】【元】【明】，作來【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059007a",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0059007a"
+          },
+          "body_anchor_lines": [
+            "0059a22"
+          ],
+          "literal_with_inline_content": "持竟夏前三月便捨之無閏處者已入八月熱時已過故犯【大】，持竟夏前三月便捨之無閏處者已入八月熱時已過故犯【宋】【元】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059007a\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0059007a\">持竟夏前三月便捨之無閏處者已入八月熱時已過故犯【大】，<ns0:note place=\"inline\">持竟夏前三月便捨之無閏處者已入八月熱時已過故犯</ns0:note>【宋】【元】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059008",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0059008"
+          },
+          "body_anchor_lines": [
+            "0059a23"
+          ],
+          "literal_with_inline_content": "無【大】，至無【宋】【元】【明】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059008\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0059008\">無【大】，至無【宋】【元】【明】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059007b",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0059007b"
+          },
+          "body_anchor_lines": [
+            "0059a24"
+          ],
+          "literal_with_inline_content": "有閏者謂此國晚熱謂閏春末月則閏月內求之若求得者三月末便應受持不能得者四月十六日應受持即得不應停過十五日【大】，有閏者謂此國晚熱謂閏春末月則閏月內求之若求得者三月末便應受持不能得者四月十六日應受持即得不應停過十五日【宋】【元】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059007b\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0059007b\">有閏者謂此國晚熱謂閏春末月則閏月內求之若求得者三月末便應受持不能得者四月十六日應受持即得不應停過十五日【大】，<ns0:note place=\"inline\">有閏者謂此國晚熱謂閏春末月則閏月內求之若求得者三月末便應受持不能得者四月十六日應受持即得不應停過十五日</ns0:note>【宋】【元】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059009",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0059009"
+          },
+          "body_anchor_lines": [
+            "0059a25"
+          ],
+          "literal_with_inline_content": "（若求得者…日）三十二字【大】，〔－〕【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059009\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0059009\">（若求得者…日）三十二字【大】，〔－〕【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0394016",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0394016"
+          },
+          "body_anchor_lines": [
+            "0394b21"
+          ],
+          "literal_with_inline_content": "答【大】，答曰【宋】【元】【明】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0394016\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0394016\">答【大】，答曰【宋】【元】【明】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0394017",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0394017"
+          },
+          "body_anchor_lines": [
+            "0394b23"
+          ],
+          "literal_with_inline_content": "方【大】，天下【宋】【元】【明】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0394017\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0394017\">方【大】，天下【宋】【元】【明】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0031009",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0031009"
+          },
+          "body_anchor_lines": [
+            "0031b29"
+          ],
+          "literal_with_inline_content": "〔宿〕－【三】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0031009\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0031009\">〔宿〕－【三】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0032005",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0032005"
+          },
+          "body_anchor_lines": [
+            "0032b08"
+          ],
+          "literal_with_inline_content": "〔比丘〕－【三】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0032005\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0032005\">〔比丘〕－【三】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059001",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0059001"
+          },
+          "body_anchor_lines": [
+            "0059a07"
+          ],
+          "literal_with_inline_content": "衣＋（故）【三】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059001\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0059001\">衣＋（故）【三】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059002",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0059002"
+          },
+          "body_anchor_lines": [
+            "0059a13"
+          ],
+          "literal_with_inline_content": "𭢗＝簪【三】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059002\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0059002\"><ns0:g ref=\"#CB01767\">𭢗</ns0:g>＝簪【三】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059003",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0059003"
+          },
+          "body_anchor_lines": [
+            "0059a16"
+          ],
+          "literal_with_inline_content": "中＝人【三】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059003\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0059003\">中＝人【三】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059004",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0059004"
+          },
+          "body_anchor_lines": [
+            "0059a17"
+          ],
+          "literal_with_inline_content": "作＋（衣）【三】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059004\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0059004\">作＋（衣）【三】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059005",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0059005"
+          },
+          "body_anchor_lines": [
+            "0059a17"
+          ],
+          "literal_with_inline_content": "羅＋（罪）【三】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059005\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0059005\">羅＋（罪）【三】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059006",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0059006"
+          },
+          "body_anchor_lines": [
+            "0059a20"
+          ],
+          "literal_with_inline_content": "作＋（者）【三】，（來）【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059006\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0059006\">作＋（者）【三】，（來）【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059007",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0059007"
+          },
+          "body_anchor_lines": [
+            "0059a22"
+          ],
+          "literal_with_inline_content": "持竟乃至日七十四字宋元宮三本作夾註",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059007\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0059007\">持竟乃至日七十四字宋元宮三本作夾註</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059008",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0059008"
+          },
+          "body_anchor_lines": [
+            "0059a23"
+          ],
+          "literal_with_inline_content": "（至）＋無【三】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059008\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0059008\">（至）＋無【三】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0059009",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0059009"
+          },
+          "body_anchor_lines": [
+            "0059a25"
+          ],
+          "literal_with_inline_content": "〔若求得者…日〕三十二字－【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0059009\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0059009\">〔若求得者…日〕三十二字－【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0394016",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0394016"
+          },
+          "body_anchor_lines": [
+            "0394b21"
+          ],
+          "literal_with_inline_content": "答＋（曰）【三】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0394016\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0394016\">答＋（曰）【三】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0394017",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0394017"
+          },
+          "body_anchor_lines": [
+            "0394b23"
+          ],
+          "literal_with_inline_content": "方＝天下【三】【宮】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0394017\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0394017\">方＝天下【三】【宮】</ns0:note>\n"
+        },
+        {
+          "kind": "note",
+          "attributes": {
+            "n": "0394b2001",
+            "resp": "#resp1",
+            "type": "add",
+            "{http://www.cbeta.org/ns/1.0}note_key": "T23.0394b20.04",
+            "target": "#nkr_note_add_0394b2001"
+          },
+          "body_anchor_lines": [
+            "0394b20"
+          ],
+          "literal_with_inline_content": "眾【CB】【麗-CB】，象【大】",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" n=\"0394b2001\" resp=\"#resp1\" type=\"add\" ns1:note_key=\"T23.0394b20.04\" target=\"#nkr_note_add_0394b2001\">眾【CB】【麗-CB】，象【大】</ns0:note>\n"
+        }
+      ],
+      "whole_body_main_and_p_inline_literal_counts_across_lb": {
+        "東方已赤": 0,
+        "阿留那": 0,
+        "阿樓那": 0,
+        "明相": 4,
+        "地了": 306,
+        "地了時": 280,
+        "地色": 0,
+        "二刻": 0
+      },
+      "counts_are_not_numbers_of_dawn_definitions": true,
+      "source_layer": "Electronic body main/p-inline, note-inline and postposed apparatus separately recorded; no printed identity certification."
+    },
+    {
+      "id": "X0741",
+      "title": "行事鈔諸家記標目",
+      "sha256": "16bee60602c05a506157675540aaacb0c64b0dcd461839559878a133ae073ee1",
+      "bytes": 24610,
+      "capture_file": "X0741.xml",
+      "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/X/X44/X44n0741.xml",
+      "title_stmt_authors": [
+        "宋 慧顯集　日本 戒月改錄"
+      ],
+      "body_byline_forms": [
+        "後學釋戒月改錄"
+      ],
+      "windows": {
+        "catalog": {
+          "first_line": "0305a01",
+          "last_line": "0305a06",
+          "lines": {
+            "0305a01": {
+              "main": "行事鈔集解記十二卷",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0305a02": {
+              "main": "右一部，宋越州普濟律師述。",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0305a03": {
+              "main": "行事鈔音義指歸三卷",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0305a04": {
+              "main": "右一部，宋京兆天壽寺通慧大師贊寧述。",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0305a05": {
+              "main": "行事鈔正言記十卷",
+              "inline_notes": [],
+              "gaiji_refs": []
+            },
+            "0305a06": {
+              "main": "右一部，宋昇州德明律師述。",
+              "inline_notes": [],
+              "gaiji_refs": []
+            }
+          },
+          "main_literal": "行事鈔集解記十二卷右一部，宋越州普濟律師述。行事鈔音義指歸三卷右一部，宋京兆天壽寺通慧大師贊寧述。行事鈔正言記十卷右一部，宋昇州德明律師述。",
+          "body_blocks": [
+            {
+              "tag": "item",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "itemX44p0305a0101"
+              },
+              "start_line": "0305a01",
+              "end_line": "0305a01",
+              "literal_with_inline_content": "行事鈔集解記十二卷",
+              "xml_element": "<ns0:item xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xml:id=\"itemX44p0305a0101\">行事鈔集解記十二卷</ns0:item>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pX44p0305a0201",
+                "style": "margin-left:2em"
+              },
+              "start_line": "0305a02",
+              "end_line": "0305a02",
+              "literal_with_inline_content": "右一部，宋越州普濟律師述。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xml:id=\"pX44p0305a0201\" style=\"margin-left:2em\">右一部，宋越州普濟律師述。</ns0:p>\n"
+            },
+            {
+              "tag": "item",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "itemX44p0305a0301"
+              },
+              "start_line": "0305a03",
+              "end_line": "0305a03",
+              "literal_with_inline_content": "行事鈔音義指歸三卷",
+              "xml_element": "<ns0:item xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xml:id=\"itemX44p0305a0301\">行事鈔音義指歸三卷</ns0:item>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pX44p0305a0401",
+                "style": "margin-left:2em"
+              },
+              "start_line": "0305a04",
+              "end_line": "0305a04",
+              "literal_with_inline_content": "右一部，宋京兆天壽寺通慧大師贊寧述。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xml:id=\"pX44p0305a0401\" style=\"margin-left:2em\">右一部，宋京兆天壽寺通慧大師贊寧述。</ns0:p>\n"
+            },
+            {
+              "tag": "item",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "itemX44p0305a0501"
+              },
+              "start_line": "0305a05",
+              "end_line": "0305a05",
+              "literal_with_inline_content": "行事鈔正言記十卷",
+              "xml_element": "<ns0:item xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xml:id=\"itemX44p0305a0501\">行事鈔正言記十卷</ns0:item>"
+            },
+            {
+              "tag": "p",
+              "attributes": {
+                "{http://www.w3.org/XML/1998/namespace}id": "pX44p0305a0601",
+                "style": "margin-left:2em"
+              },
+              "start_line": "0305a06",
+              "end_line": "0305a06",
+              "literal_with_inline_content": "右一部，宋昇州德明律師述。",
+              "xml_element": "<ns0:p xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xml:id=\"pX44p0305a0601\" style=\"margin-left:2em\">右一部，宋昇州德明律師述。</ns0:p>\n"
+            }
+          ],
+          "window_boundary_is_not_sentence_completion": true
+        }
+      },
+      "all_selected_linked_postposed_records": [],
+      "whole_body_main_and_p_inline_literal_counts_across_lb": {
+        "東方已赤": 0,
+        "阿留那": 0,
+        "阿樓那": 0,
+        "明相": 0,
+        "地了": 0,
+        "地了時": 0,
+        "地色": 0,
+        "二刻": 0
+      },
+      "counts_are_not_numbers_of_dawn_definitions": true,
+      "source_layer": "Electronic body main/p-inline, note-inline and postposed apparatus separately recorded; no printed identity certification."
+    }
+  ],
+  "textual_spans": {
+    "T1435_night": {
+      "from_literal": "日沒",
+      "to_literal": "地未了",
+      "context": "比丘尼独宿戒释文"
+    },
+    "T1435_day": {
+      "from_literal": "地了",
+      "to_literal": "日未沒",
+      "context": "比丘尼独行戒释文"
+    }
+  },
+  "acquisition": {
+    "T1461_candidate_text_acquired": true,
+    "T1462_candidate_text_acquired": true,
+    "T1435_electronic_text_acquired": true,
+    "X0741_catalog_acquired": true,
+    "Zhigui_three_volume_body_acquired": false,
+    "exact_X0744_T2131_quoted_exemplar_identified": false,
+    "T1435_ground_color_definition_exact_located": false
+  },
+  "context_controls": {
+    "eastern_red_is_summer_residence_third_condition": true,
+    "T1461_explanation_is_body_p_inline_not_postposed_note": true,
+    "T1462_aruna_crosses_line_break": true,
+    "T1435_separately_names_diliao_and_sunrise": true,
+    "rain_leap_passage_is_robe_and_residence_context": true,
+    "ordination_fetal_leap_count_is_general_birth_age_rule": false,
+    "X0741_catalog_is_Zhigui_body": false,
+    "printed_identity_or_direct_transmission_certified": false
+  },
+  "scope": {
+    "modern_seconds_per_ke": null,
+    "solar_altitude_degrees": null,
+    "modern_clock_conversion_established": false,
+    "endpoint_inclusion_model_established": false,
+    "T1299_pingming_equivalence_established": false,
+    "hinoo_half_mapping_established": false,
+    "leap_short_month_priority_established": false,
+    "birth_calendar_override_applied": false,
+    "full_source_collation_accepted": false,
+    "new_instrument_observations": 0,
+    "real_samples": 0
+  }
+}

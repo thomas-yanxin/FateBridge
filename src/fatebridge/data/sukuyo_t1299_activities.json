@@ -1,0 +1,826 @@
+{
+  "id": "t1299_activity_comparison_v4",
+  "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
+  "edition": "大正藏T21 No.1299; CBETA TEI P5, header 2025-01-30",
+  "author": "不空译，上卷杨景风修注",
+  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+  "selection_method": "Manual source-based topic mapping; upper/lower variants explicitly distinguished. Omitted topics remain uncovered, never inferred negative.",
+  "rules": [
+    {
+      "rule_id": "t1299_activity_01",
+      "layer": "sanjiu",
+      "selectors": [
+        "命",
+        "胎"
+      ],
+      "activities": [
+        "social",
+        "marriage",
+        "travel",
+        "relocation",
+        "commerce",
+        "study"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0391b19",
+      "meaning": "上卷不宜举动百事。",
+      "volume": "upper",
+      "source_excerpts": [
+        "不宜舉動百事"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_02",
+      "layer": "sanjiu",
+      "selectors": [
+        "業"
+      ],
+      "activities": [
+        "social",
+        "marriage",
+        "travel",
+        "relocation",
+        "commerce",
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0391b19-20",
+      "meaning": "上卷称所作皆吉祥。",
+      "volume": "upper",
+      "source_excerpts": [
+        "業宿直日，所作皆吉祥"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_03",
+      "layer": "sanjiu",
+      "selectors": [
+        "衰",
+        "危",
+        "壊"
+      ],
+      "activities": [
+        "travel",
+        "relocation",
+        "commerce"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0391b20-21",
+      "meaning": "上卷不宜远行、出入迁移及买卖。",
+      "volume": "upper",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "long_distance_journey"
+          ],
+          "condition": "原文远行，须明确为远距离行程"
+        },
+        "commerce": {
+          "any_of": [
+            "purchase",
+            "sale",
+            "sale_livestock",
+            "sale_lactating_livestock"
+          ],
+          "condition": "原文买卖，按明确购入或出售核对，不扩大为所有资金行为"
+        }
+      },
+      "source_excerpts": [
+        "不宜遠行",
+        "出入遷移",
+        "買賣"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_04",
+      "layer": "sanjiu",
+      "selectors": [
+        "安"
+      ],
+      "activities": [
+        "travel",
+        "relocation"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0391b22-23",
+      "meaning": "上卷宜移动远行及修园宅卧具。",
+      "volume": "upper",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "long_distance_journey"
+          ],
+          "condition": "原文远行，须明确为远距离行程"
+        }
+      },
+      "source_excerpts": [
+        "安日，移動遠行",
+        "修園宅臥具"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_05",
+      "layer": "sanjiu",
+      "selectors": [
+        "危"
+      ],
+      "activities": [
+        "social",
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0391b23-24",
+      "meaning": "上卷宜结交婚姻、欢会宴聚。",
+      "volume": "upper",
+      "source_excerpts": [
+        "危日，宜結交婚姻",
+        "歡會宴聚吉"
+      ],
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "forming_friendship",
+            "social_gathering"
+          ],
+          "condition": "原文分别列结交及欢宴聚会，按明确结交或聚会匹配；两种动作不互相推断。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_activity_06",
+      "layer": "sanjiu",
+      "selectors": [
+        "成"
+      ],
+      "activities": [
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0391b24-25",
+      "meaning": "上卷保留修学问道条文。",
+      "volume": "upper",
+      "source_excerpts": [
+        "成日，修學問道"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_07",
+      "layer": "sanjiu",
+      "selectors": [
+        "友",
+        "親"
+      ],
+      "activities": [
+        "social"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0391b25",
+      "meaning": "上卷宜结交朋友。",
+      "volume": "upper",
+      "source_excerpts": [
+        "友、親日，宜結交朋友大吉"
+      ],
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "forming_friendship"
+          ],
+          "condition": "结交／交友行为须明确，不限首次相识；不能由一般聚会代填本次结交行为。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_activity_08",
+      "layer": "sanjiu",
+      "selectors": [
+        "栄"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0397c25-26",
+      "meaning": "下卷荣宿日宜兴营买卖。",
+      "volume": "lower",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "purchase",
+            "sale",
+            "sale_livestock",
+            "sale_lactating_livestock",
+            "business_operation"
+          ],
+          "condition": "原文兴营买卖，按明确经营或买卖核对"
+        }
+      },
+      "source_excerpts": [
+        "興營買賣"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_09",
+      "layer": "sanjiu",
+      "selectors": [
+        "命",
+        "胎"
+      ],
+      "activities": [
+        "social",
+        "marriage",
+        "travel",
+        "relocation",
+        "commerce",
+        "study"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0398a07",
+      "meaning": "下卷不宜举动百事。",
+      "volume": "lower",
+      "source_excerpts": [
+        "命宿日、胎宿日，不宜舉動百事"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_10",
+      "layer": "sanjiu",
+      "selectors": [
+        "業"
+      ],
+      "activities": [
+        "social",
+        "marriage",
+        "travel",
+        "relocation",
+        "commerce",
+        "study"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0398a07-08",
+      "meaning": "下卷称所作善恶亦不成就，与上卷不同。",
+      "volume": "lower",
+      "source_excerpts": [
+        "值業宿日，所作善惡亦不成就"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_11",
+      "layer": "sanjiu",
+      "selectors": [
+        "危"
+      ],
+      "activities": [
+        "social",
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0398a02",
+      "meaning": "下卷一处宜结交、定婚姻、欢宴聚会。",
+      "volume": "lower",
+      "source_excerpts": [
+        "宜結交、定婚姻，歡宴聚會並吉"
+      ],
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "forming_friendship",
+            "social_gathering"
+          ],
+          "condition": "原文分别列结交及欢宴聚会，按明确结交或聚会匹配；两种动作不互相推断。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_activity_12",
+      "layer": "sanjiu",
+      "selectors": [
+        "危",
+        "壊"
+      ],
+      "activities": [
+        "travel",
+        "relocation",
+        "commerce",
+        "marriage"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0398a09-10",
+      "meaning": "下卷另一处将危坏日婚姻等列为不宜，须保留与前条的冲突。",
+      "volume": "lower",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "purchase",
+            "sale",
+            "sale_livestock",
+            "sale_lactating_livestock"
+          ],
+          "condition": "原文买卖，按明确购入或出售核对，不扩大为所有资金行为"
+        },
+        "travel": {
+          "any_of": [
+            "long_distance_journey"
+          ],
+          "condition": "本段远行条文只按明确远距离行程核对；又一说的进路另列，不混成所有出行。"
+        }
+      },
+      "source_excerpts": [
+        "並不宜遠行出、入移徙、買賣、婚姻"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_13",
+      "layer": "sanjiu",
+      "selectors": [
+        "友",
+        "親"
+      ],
+      "activities": [
+        "social",
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0398a05-06",
+      "meaning": "下卷宜结交、定婚姻、欢宴聚会。",
+      "volume": "lower",
+      "source_excerpts": [
+        "宜結交、定婚姻，歡宴聚會並吉"
+      ],
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "forming_friendship",
+            "social_gathering"
+          ],
+          "condition": "原文分别列结交及欢宴聚会，按明确结交或聚会匹配；两种动作不互相推断。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_activity_14",
+      "layer": "sanjiu",
+      "selectors": [
+        "成"
+      ],
+      "activities": [
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0398a03-04",
+      "meaning": "下卷保留修道学问条文。",
+      "volume": "lower",
+      "source_excerpts": [
+        "宜修道學問"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_15",
+      "layer": "nature",
+      "selectors": [
+        "安重"
+      ],
+      "activities": [
+        "social",
+        "marriage",
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0390c16-22",
+      "meaning": "上卷安重宿宜结交、婚姻；设学仅对应设立学校或教学场所。",
+      "volume": "upper",
+      "activity_conditions": {
+        "study": {
+          "any_of": [
+            "founding_school"
+          ],
+          "condition": "设学：设立学校或教学场所，不能代替所有学习"
+        },
+        "social": {
+          "any_of": [
+            "forming_friendship"
+          ],
+          "condition": "结交／交友行为须明确，不限首次相识；不能由一般聚会代填本次结交行为。"
+        }
+      },
+      "source_excerpts": [
+        "結交朋友、婚姻",
+        "設學"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_16",
+      "layer": "nature",
+      "selectors": [
+        "安重"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0390c20-22",
+      "meaning": "上卷安重宿不宜远行。",
+      "volume": "upper",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "long_distance_journey"
+          ],
+          "condition": "原文远行，须明确为远距离行程"
+        }
+      },
+      "source_excerpts": [
+        "唯不宜遠行"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_17",
+      "layer": "nature",
+      "selectors": [
+        "和善"
+      ],
+      "activities": [
+        "marriage",
+        "study",
+        "travel"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0390c23-0391a02",
+      "meaning": "上卷和善宿宜问学、求婚、冠带出行；不把概括吉祥词扩成所有社交事项。",
+      "volume": "upper",
+      "source_excerpts": [
+        "問學技藝",
+        "求婚",
+        "冠帶出行"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_18",
+      "layer": "nature",
+      "selectors": [
+        "急速"
+      ],
+      "activities": [
+        "commerce",
+        "travel",
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0391a07-10",
+      "meaning": "上卷急速宿列放债贷钱、买卖交关、进路出行及入学受业，按对应具体行为核对。",
+      "volume": "upper",
+      "activity_conditions": {
+        "study": {
+          "any_of": [
+            "beginning_study",
+            "learning_with_teacher"
+          ],
+          "condition": "原文入学受业，按入学或从师受业核对，不擅加必须首次受业"
+        },
+        "commerce": {
+          "any_of": [
+            "purchase",
+            "sale",
+            "sale_livestock",
+            "sale_lactating_livestock",
+            "lending"
+          ],
+          "condition": "原文放债贷钱、买卖交关；不能扩为所有借入或收支"
+        }
+      },
+      "source_excerpts": [
+        "放債貸錢",
+        "買賣交關",
+        "進路出行",
+        "入學受業"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_19",
+      "layer": "nature",
+      "selectors": [
+        "刚柔"
+      ],
+      "activities": [
+        "commerce",
+        "relocation"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0391a22-25",
+      "meaning": "上卷刚柔宿宜买卖、入宅。",
+      "volume": "upper",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "purchase",
+            "sale",
+            "sale_livestock",
+            "sale_lactating_livestock"
+          ],
+          "condition": "原文买卖，按明确购入或出售核对，不扩大为所有资金行为"
+        }
+      },
+      "source_excerpts": [
+        "買賣之事",
+        "入宅"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_20",
+      "layer": "weekday",
+      "selectors": [
+        "日"
+      ],
+      "activities": [
+        "travel",
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0391c11-13",
+      "meaning": "上卷日曜宜远行、入学。",
+      "volume": "upper",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "long_distance_journey"
+          ],
+          "condition": "原文远行，须明确为远距离行程"
+        },
+        "study": {
+          "any_of": [
+            "beginning_study"
+          ],
+          "condition": "原文入学或受业：开始入学受业，不泛化全部学习或考试"
+        }
+      },
+      "source_excerpts": [
+        "遠行",
+        "入學"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_21",
+      "layer": "weekday",
+      "selectors": [
+        "月"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0391c18-21",
+      "meaning": "上卷月曜宜买卖财物。",
+      "volume": "upper",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "purchase",
+            "sale",
+            "sale_livestock",
+            "sale_lactating_livestock"
+          ],
+          "condition": "原文买卖，按明确购入或出售核对，不扩大为所有资金行为"
+        }
+      },
+      "source_excerpts": [
+        "買賣財物"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_22",
+      "layer": "weekday",
+      "selectors": [
+        "月"
+      ],
+      "activities": [
+        "marriage",
+        "relocation",
+        "social"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0391c21-23",
+      "meaning": "上卷月曜不宜婚嫁、入宅、结交；私情出行不泛化为所有旅行。",
+      "volume": "upper",
+      "source_excerpts": [
+        "不宜婚嫁、入宅、結交"
+      ],
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "forming_friendship"
+          ],
+          "condition": "结交／交友行为须明确，不限首次相识；不能由一般聚会代填本次结交行为。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_activity_23",
+      "layer": "weekday",
+      "selectors": [
+        "火"
+      ],
+      "activities": [
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0391c26-29",
+      "meaning": "上卷火曜列结婚为宜。",
+      "volume": "upper",
+      "source_excerpts": [
+        "結婚"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_24",
+      "layer": "weekday",
+      "selectors": [
+        "水"
+      ],
+      "activities": [
+        "study",
+        "travel"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0392a04-06",
+      "meaning": "上卷水曜宜入学事师长、学工巧伎能及出行。",
+      "volume": "upper",
+      "activity_conditions": {
+        "study": {
+          "any_of": [
+            "beginning_study",
+            "learning_with_teacher",
+            "skill_learning"
+          ],
+          "condition": "原文入学事师长、学工巧伎能，不泛化所有考试或专业选择"
+        }
+      },
+      "source_excerpts": [
+        "入學事師長",
+        "學工巧伎能",
+        "出行"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_25",
+      "layer": "weekday",
+      "selectors": [
+        "木"
+      ],
+      "activities": [
+        "study",
+        "marriage",
+        "social",
+        "relocation"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0392a10-13",
+      "meaning": "上卷木曜宜学问、嫁娶、结交及入宅。",
+      "volume": "upper",
+      "source_excerpts": [
+        "學問",
+        "嫁娶",
+        "結交、入宅"
+      ],
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "forming_friendship"
+          ],
+          "condition": "结交／交友行为须明确，不限首次相识；不能由一般聚会代填本次结交行为。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_activity_26",
+      "layer": "weekday",
+      "selectors": [
+        "金"
+      ],
+      "activities": [
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0392a16-18",
+      "meaning": "上卷金曜宜求亲结婚。",
+      "volume": "upper",
+      "source_excerpts": [
+        "求親結婚"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_27",
+      "layer": "weekday",
+      "selectors": [
+        "土"
+      ],
+      "activities": [
+        "marriage",
+        "travel"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0392a22-24",
+      "meaning": "上卷土曜不宜结婚及出行。",
+      "volume": "upper",
+      "source_excerpts": [
+        "唯不宜結婚冠帶及出行"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_28",
+      "layer": "special_day",
+      "selectors": [
+        "罗刹"
+      ],
+      "activities": [
+        "social",
+        "marriage",
+        "travel",
+        "relocation",
+        "commerce",
+        "study"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0392c25-28",
+      "meaning": "上卷罗刹日不宜举动百事；不输出伤害性例外操作。",
+      "volume": "upper",
+      "source_excerpts": [
+        "不宜舉動百事"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_29",
+      "layer": "weekday",
+      "selectors": [
+        "火"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0391c28-29",
+      "meaning": "上卷火曜不得出财征债，只对应支出或征收债款。",
+      "volume": "upper",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "spending_property",
+            "collecting_debt"
+          ],
+          "condition": "上卷火曜不得出财征债，只对应支出或征收债款。"
+        }
+      },
+      "source_excerpts": [
+        "不得出財徵債"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_30",
+      "layer": "nature",
+      "selectors": [
+        "安重"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0390c20-21",
+      "meaning": "上卷安重宿不宜索债，不扩大为所有收入。",
+      "volume": "upper",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "collecting_debt"
+          ],
+          "condition": "上卷安重宿不宜索债，不扩大为所有收入。"
+        }
+      },
+      "source_excerpts": [
+        "索債"
+      ]
+    },
+    {
+      "rule_id": "t1299_activity_31",
+      "layer": "weekday",
+      "selectors": [
+        "水"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0392a05",
+      "meaning": "上卷水曜宜举债，仅对应借入债款。",
+      "volume": "upper",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "borrowing"
+          ],
+          "condition": "上卷水曜宜举债，仅对应借入债款。"
+        }
+      },
+      "source_excerpts": [
+        "宜舉債"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3954 @@
+{
+  "id": "rizang_T0397_literal_comparison_v66",
+  "title": "大方等大集經／日藏分中星宿品第八之二",
+  "juan": 42,
+  "source_edition": "大正新脩大藏經第13冊／CBETA固定提交電子文本",
+  "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T13/T13n0397.xml",
+  "source_sha256": "64d0dbf21d28e11d76488a2bf7ff0f651883f1f7d5d76392616b97da5d38ce17",
+  "source_bytes": 6969939,
+  "source_previously_acquired_in_v65": true,
+  "compared_xuanying_capture_sha256": "4bdef1f67c2980550795600bcf8b62993f106c1692bdbb5ba4319fe3fa95ff70",
+  "before_production_reference_sha256": "a9b29a300dea185d5a4539191585590c68a38c9f65e88cadca26b32afbfba4e0",
+  "context_reference_sha256": "5cfd0d9beb2ed8af7bb12b21184145d4953a184157018b83c7531a30bfd0bd47",
+  "explicit_fortnight_paragraphs": [
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "juan": "42",
+      "paragraph_id": "pT13p0280b0801",
+      "literal": "「『九月黑月，一日合畢、二日合觜、三日合參、四日合井、五日合鬼、六日合柳、七日合星、八日合張、九日合翼、十日合軫、十一日合角、十二日合亢、十三日合氐、十四日合房、十五日合心，是黑月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "畢"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "觜"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "參"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "井"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "鬼"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "柳"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "星"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "張"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "翼"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "軫"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "角"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "亢"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "氐"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "房"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "心"
+        }
+      ]
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "juan": "42",
+      "paragraph_id": "pT13p0280b1301",
+      "literal": "「『白月，一日合尾、二日合箕、三日合斗、四日合牛、五日合女、六日合虛、七日合危、八日合室、九日合辟、十日合奎、十一日合婁、十二日合胃、十三日合昴、十四日合畢、十五日合觜是白月滿。九月合觜宿滿，晝十四時、夜十六時，日午之影長八脚跡，日行南陸，昴宿夜行、尾在日前。其九月時歲星用事，為一切天之所尊敬，得失諸事皆悉由之。是九月時，射神主當。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "尾"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "箕"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "斗"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "牛"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "女"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "虛"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "危"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "室"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "辟"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "奎"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "婁"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "胃"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "昴"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "畢"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "觜"
+        }
+      ]
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "juan": "42",
+      "paragraph_id": "pT13p0280b2201",
+      "literal": "「『十月黑月，一日合參、二日合井、三日合鬼、四日合柳、五日合星、六日合張、七日合翼、八日合軫、九日合角、十日合亢、十一日合氐、十二日合房、十三日合心、十四日合尾、十五日合箕，是黑月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "參"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "井"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "鬼"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "柳"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "星"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "張"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "翼"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "軫"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "角"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "亢"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "氐"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "房"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "心"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "尾"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "箕"
+        }
+      ]
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "juan": "42",
+      "paragraph_id": "pT13p0280b2701",
+      "literal": "「『白月，一日合斗、二日合牛、三日合女虛、四日合危、五日合室、六日合辟、七日合奎、八日合婁、九日合胃、十日合昴、十一日合畢、十二日合觜、十三日合參、十四日合井、十五日合鬼，是白月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "斗"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "牛"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "女虛"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "危"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "室"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "辟"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "奎"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "婁"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "胃"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "昴"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "畢"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "觜"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "參"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "井"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "鬼"
+        }
+      ]
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "juan": "42",
+      "paragraph_id": "pT13p0280c0601",
+      "literal": "「『十一月黑月之內，一日合柳、二日合七星、三日合張、四日合翼、五日合軫、六日合角、七日合亢、八日合氐、九日合房、十日合心、十一日合尾、十二日合箕、十三日合斗、十四日合牛、十五日合女，是為黑月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "柳"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "七星"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "張"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "翼"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "軫"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "角"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "亢"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "氐"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "房"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "心"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "尾"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "箕"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "斗"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "牛"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "女"
+        }
+      ]
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "juan": "42",
+      "paragraph_id": "pT13p0280c1011",
+      "literal": "「『白月，一日合虛、二日合危、三日合室、四日合辟、五日合奎、六日合婁、七日合胃、八日合昴、九日合畢、十日合觜、十一日合參、十二日合井、十三日合鬼、十四日合柳、十五日合七星，是白月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "虛"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "危"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "室"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "辟"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "奎"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "婁"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "胃"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "昴"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "畢"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "觜"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "參"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "井"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "鬼"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "柳"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "七星"
+        }
+      ]
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "juan": "42",
+      "paragraph_id": "pT13p0280c1801",
+      "literal": "「『十二月黑月，一日合張、二日合翼、三日合軫、四日合角、五日合亢、六日合氐、七日合房、八日合心、九日合尾、十日合箕、十一日合斗、十二日合牛、十三日合女、十四日合虛、十五日合危，是黑月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "張"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "翼"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "軫"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "角"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "亢"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "氐"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "房"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "心"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "尾"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "箕"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "斗"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "牛"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "女"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "虛"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "危"
+        }
+      ]
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "juan": "42",
+      "paragraph_id": "pT13p0280c2301",
+      "literal": "「『白月，一日合室、二日合辟、三日合奎、四日合婁、五日合胃、六日合昴、七日合畢、八日合觜、九日合參、十日合井、十一日合鬼、十二日合柳、十三日合七星、十四日合張、十五日合翼，是白月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "室"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "辟"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "奎"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "婁"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "胃"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "昴"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "畢"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "觜"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "參"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "井"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "鬼"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "柳"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "七星"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "張"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "翼"
+        }
+      ]
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "juan": "42",
+      "paragraph_id": "pT13p0281a0301",
+      "literal": "「『正月黑月，一日合軫、二日合角、三日合亢、四日合氐、五日合房、六日合心、七日合尾、八日合箕、九日合斗、十日合牛、十一日合女、十二日合虛、十三日合危、十四日合室、十五日合辟，是黑月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "軫"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "角"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "亢"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "氐"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "房"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "心"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "尾"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "箕"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "斗"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "牛"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "女"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "虛"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "危"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "室"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "辟"
+        }
+      ]
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "juan": "42",
+      "paragraph_id": "pT13p0281a0801",
+      "literal": "「『白月，一日合奎、二日合婁、三日合胃、四日合昴、五日合畢、六日合觜、七日合參、八日合井、九日合鬼、十日合柳、十一日合七星、十二日合張、十三日合翼、十四日合軫、十五日合角，是白月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "奎"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "婁"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "胃"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "昴"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "畢"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "觜"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "參"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "井"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "鬼"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "柳"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "七星"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "張"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "翼"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "軫"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "角"
+        }
+      ]
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "juan": "42",
+      "paragraph_id": "pT13p0281a1701",
+      "literal": "「『二月黑月，一日合亢、二日合氐、三日合房、四日合心、五日合尾、六日合箕、七日合斗、八日合牛、九日合女、十日合虛、十一日合危、十二日合室、十三日合辟、十四日合奎、十五日合婁，是黑月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "亢"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "氐"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "房"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "心"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "尾"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "箕"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "斗"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "牛"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "女"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "虛"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "危"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "室"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "辟"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "奎"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "婁"
+        }
+      ]
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "juan": "42",
+      "paragraph_id": "pT13p0281a2201",
+      "literal": "「『白月，一日合胃、二日合昴、三日合畢、四日合觜、五日合參、六日合井、七日合鬼、八日合柳、九日合星、十日合張、十一日合翼、十二日合軫、十三日合角、十四日合亢、十五日合氐，是白月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "胃"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "昴"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "畢"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "觜"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "參"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "井"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "鬼"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "柳"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "星"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "張"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "翼"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "軫"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "角"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "亢"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "氐"
+        }
+      ]
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "juan": "42",
+      "paragraph_id": "pT13p0281b0201",
+      "literal": "「『三月黑月，一日合房、二日合心、三日合尾、四日合箕、五日合斗、六日合牛、七日合女、八日合虛、九日合危、十日合室、十一日合辟、十二日合奎、十三日合婁、十四日合胃、十五日合昴，是黑月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "房"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "心"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "尾"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "箕"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "斗"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "牛"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "女"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "虛"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "危"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "室"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "辟"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "奎"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "婁"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "胃"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "昴"
+        }
+      ]
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "juan": "42",
+      "paragraph_id": "pT13p0281b0701",
+      "literal": "「『白月，一日合畢、二日合觜、三日合參、四日合井、五日合鬼、六日合柳、七日合星、八日合張、九日合翼、十日合軫、十一日合角、十二日合亢、十三日合氐、十四日合房、十五日合心，是白月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "畢"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "觜"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "參"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "井"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "鬼"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "柳"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "星"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "張"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "翼"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "軫"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "角"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "亢"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "氐"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "房"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "心"
+        }
+      ]
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "juan": "42",
+      "paragraph_id": "pT13p0281b1601",
+      "literal": "「『四月黑月，一日合尾、二日合箕、三日合斗、四日合牛、五日合女、六日合虛、七日合危、八日合室、九日合辟、十日合奎、十一日合婁、十二日合胃、十三日合昴、十四日合畢、十五日合觜，是黑月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "尾"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "箕"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "斗"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "牛"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "女"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "虛"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "危"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "室"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "辟"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "奎"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "婁"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "胃"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "昴"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "畢"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "觜"
+        }
+      ]
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "juan": "42",
+      "paragraph_id": "pT13p0281b2101",
+      "literal": "「『白月，一日合參、二日合井、三日合鬼、四日合柳、五日合七星、六日合張、七日合翼、八日合軫、九日合角、十日合亢、十一日合氐、十二日合房、十三日合心、十四日合尾、十五日合箕，是白月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "參"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "井"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "鬼"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "柳"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "七星"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "張"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "翼"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "軫"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "角"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "亢"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "氐"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "房"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "心"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "尾"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "箕"
+        }
+      ]
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "juan": "42",
+      "paragraph_id": "pT13p0281b2901",
+      "literal": "「『五月黑月，一日合斗、二日合牛女、三日合虛、四日合危、五日合室、六日合辟、七日合奎、八日合婁、九日合胃、十日合昴、十一日合畢、十二日合觜、十三日合參、十四日合井、十五日合鬼，是黑月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "斗"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "牛女"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "虛"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "危"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "室"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "辟"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "奎"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "婁"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "胃"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "昴"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "畢"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "觜"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "參"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "井"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "鬼"
+        }
+      ]
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "juan": "42",
+      "paragraph_id": "pT13p0281c0501",
+      "literal": "「『白月，一日合柳、二日合七星、三日合張、四日合翼、五日合軫、六日合角、七日合亢、八日合氐、九日合房、十日合心、十一日合尾、十二日合箕、十三日合斗、十四日合牛、十五日合女，是白月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "柳"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "七星"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "張"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "翼"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "軫"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "角"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "亢"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "氐"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "房"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "心"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "尾"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "箕"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "斗"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "牛"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "女"
+        }
+      ]
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "juan": "42",
+      "paragraph_id": "pT13p0281c1401",
+      "literal": "「『六月黑月，一日合虛、二日合危、三日合室、四日合辟、五日合奎、六日合婁、七日合胃、八日合昴、九日合畢、十日合觜、十一日合參、十二日合井、十三日合鬼、十四日合柳、十五日合七星，是黑月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "虛"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "危"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "室"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "辟"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "奎"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "婁"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "胃"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "昴"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "畢"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "觜"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "參"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "井"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "鬼"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "柳"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "七星"
+        }
+      ]
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "juan": "42",
+      "paragraph_id": "pT13p0281c1901",
+      "literal": "「『白月，一日合張、二日合翼、三日合軫、四日合角、五日合亢、六日合氐、七日合房、八日合心、九日合尾、十日合箕、十一日合斗、十二日合牛女、十三日合虛、十四日合危、十五日合室，是白月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "張"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "翼"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "軫"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "角"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "亢"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "氐"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "房"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "心"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "尾"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "箕"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "斗"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "牛女"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "虛"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "危"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "室"
+        }
+      ]
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "juan": "42",
+      "paragraph_id": "pT13p0281c2801",
+      "literal": "「『七月黑月，一日合辟、二日合奎、三日合婁、四日合胃、五日合昴、六日合畢、七日合觜、八日合參、九日合井、十日合鬼、十一日合柳、十二日合七星、十三日合張、十四日合翼、十五日合軫，是黑月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "辟"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "奎"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "婁"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "胃"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "昴"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "畢"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "觜"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "參"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "井"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "鬼"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "柳"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "七星"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "張"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "翼"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "軫"
+        }
+      ]
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "juan": "42",
+      "paragraph_id": "pT13p0282a0401",
+      "literal": "「『白月，一日合角、二日合亢、三日合氐、四日合房、五日合心、六日合尾、七日合箕、八日合斗、九日合牛女、十日合虛、十一日合危、十二日合室、十三日合辟、十四日合奎、十五日合婁，是白月滿。",
+      "days": [
+        {
+          "day": 1,
+          "mansion_literal": "角"
+        },
+        {
+          "day": 2,
+          "mansion_literal": "亢"
+        },
+        {
+          "day": 3,
+          "mansion_literal": "氐"
+        },
+        {
+          "day": 4,
+          "mansion_literal": "房"
+        },
+        {
+          "day": 5,
+          "mansion_literal": "心"
+        },
+        {
+          "day": 6,
+          "mansion_literal": "尾"
+        },
+        {
+          "day": 7,
+          "mansion_literal": "箕"
+        },
+        {
+          "day": 8,
+          "mansion_literal": "斗"
+        },
+        {
+          "day": 9,
+          "mansion_literal": "牛女"
+        },
+        {
+          "day": 10,
+          "mansion_literal": "虛"
+        },
+        {
+          "day": 11,
+          "mansion_literal": "危"
+        },
+        {
+          "day": 12,
+          "mansion_literal": "室"
+        },
+        {
+          "day": 13,
+          "mansion_literal": "辟"
+        },
+        {
+          "day": 14,
+          "mansion_literal": "奎"
+        },
+        {
+          "day": 15,
+          "mansion_literal": "婁"
+        }
+      ]
+    }
+  ],
+  "literal_slots": [
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 1,
+      "mansion_literal": "畢",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 2,
+      "mansion_literal": "觜",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 3,
+      "mansion_literal": "參",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 4,
+      "mansion_literal": "井",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 5,
+      "mansion_literal": "鬼",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 6,
+      "mansion_literal": "柳",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 7,
+      "mansion_literal": "星",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 8,
+      "mansion_literal": "張",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 9,
+      "mansion_literal": "翼",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 10,
+      "mansion_literal": "軫",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 11,
+      "mansion_literal": "角",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 12,
+      "mansion_literal": "亢",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 13,
+      "mansion_literal": "氐",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 14,
+      "mansion_literal": "房",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "black",
+      "day": 15,
+      "mansion_literal": "心",
+      "paragraph_id": "pT13p0280b0801"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 1,
+      "mansion_literal": "尾",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 2,
+      "mansion_literal": "箕",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 3,
+      "mansion_literal": "斗",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 4,
+      "mansion_literal": "牛",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 5,
+      "mansion_literal": "女",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 6,
+      "mansion_literal": "虛",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 7,
+      "mansion_literal": "危",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 8,
+      "mansion_literal": "室",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 9,
+      "mansion_literal": "辟",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 10,
+      "mansion_literal": "奎",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 11,
+      "mansion_literal": "婁",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 12,
+      "mansion_literal": "胃",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 13,
+      "mansion_literal": "昴",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 14,
+      "mansion_literal": "畢",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 9,
+      "fortnight": "white",
+      "day": 15,
+      "mansion_literal": "觜",
+      "paragraph_id": "pT13p0280b1301"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 1,
+      "mansion_literal": "參",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 2,
+      "mansion_literal": "井",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 3,
+      "mansion_literal": "鬼",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 4,
+      "mansion_literal": "柳",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 5,
+      "mansion_literal": "星",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 6,
+      "mansion_literal": "張",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 7,
+      "mansion_literal": "翼",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 8,
+      "mansion_literal": "軫",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 9,
+      "mansion_literal": "角",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 10,
+      "mansion_literal": "亢",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 11,
+      "mansion_literal": "氐",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 12,
+      "mansion_literal": "房",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 13,
+      "mansion_literal": "心",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 14,
+      "mansion_literal": "尾",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "black",
+      "day": 15,
+      "mansion_literal": "箕",
+      "paragraph_id": "pT13p0280b2201"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 1,
+      "mansion_literal": "斗",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 2,
+      "mansion_literal": "牛",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 3,
+      "mansion_literal": "女虛",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 4,
+      "mansion_literal": "危",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 5,
+      "mansion_literal": "室",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 6,
+      "mansion_literal": "辟",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 7,
+      "mansion_literal": "奎",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 8,
+      "mansion_literal": "婁",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 9,
+      "mansion_literal": "胃",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 10,
+      "mansion_literal": "昴",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 11,
+      "mansion_literal": "畢",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 12,
+      "mansion_literal": "觜",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 13,
+      "mansion_literal": "參",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 14,
+      "mansion_literal": "井",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 15,
+      "mansion_literal": "鬼",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 1,
+      "mansion_literal": "柳",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 2,
+      "mansion_literal": "七星",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 3,
+      "mansion_literal": "張",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 4,
+      "mansion_literal": "翼",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 5,
+      "mansion_literal": "軫",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 6,
+      "mansion_literal": "角",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 7,
+      "mansion_literal": "亢",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 8,
+      "mansion_literal": "氐",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 9,
+      "mansion_literal": "房",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 10,
+      "mansion_literal": "心",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 11,
+      "mansion_literal": "尾",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 12,
+      "mansion_literal": "箕",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 13,
+      "mansion_literal": "斗",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 14,
+      "mansion_literal": "牛",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "black",
+      "day": 15,
+      "mansion_literal": "女",
+      "paragraph_id": "pT13p0280c0601"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 1,
+      "mansion_literal": "虛",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 2,
+      "mansion_literal": "危",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 3,
+      "mansion_literal": "室",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 4,
+      "mansion_literal": "辟",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 5,
+      "mansion_literal": "奎",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 6,
+      "mansion_literal": "婁",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 7,
+      "mansion_literal": "胃",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 8,
+      "mansion_literal": "昴",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 9,
+      "mansion_literal": "畢",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 10,
+      "mansion_literal": "觜",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 11,
+      "mansion_literal": "參",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 12,
+      "mansion_literal": "井",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 13,
+      "mansion_literal": "鬼",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 14,
+      "mansion_literal": "柳",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 11,
+      "fortnight": "white",
+      "day": 15,
+      "mansion_literal": "七星",
+      "paragraph_id": "pT13p0280c1011"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 1,
+      "mansion_literal": "張",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 2,
+      "mansion_literal": "翼",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 3,
+      "mansion_literal": "軫",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 4,
+      "mansion_literal": "角",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 5,
+      "mansion_literal": "亢",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 6,
+      "mansion_literal": "氐",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 7,
+      "mansion_literal": "房",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 8,
+      "mansion_literal": "心",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 9,
+      "mansion_literal": "尾",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 10,
+      "mansion_literal": "箕",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 11,
+      "mansion_literal": "斗",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 12,
+      "mansion_literal": "牛",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 13,
+      "mansion_literal": "女",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 14,
+      "mansion_literal": "虛",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "black",
+      "day": 15,
+      "mansion_literal": "危",
+      "paragraph_id": "pT13p0280c1801"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 1,
+      "mansion_literal": "室",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 2,
+      "mansion_literal": "辟",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 3,
+      "mansion_literal": "奎",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 4,
+      "mansion_literal": "婁",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 5,
+      "mansion_literal": "胃",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 6,
+      "mansion_literal": "昴",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 7,
+      "mansion_literal": "畢",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 8,
+      "mansion_literal": "觜",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 9,
+      "mansion_literal": "參",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 10,
+      "mansion_literal": "井",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 11,
+      "mansion_literal": "鬼",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 12,
+      "mansion_literal": "柳",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 13,
+      "mansion_literal": "七星",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 14,
+      "mansion_literal": "張",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 12,
+      "fortnight": "white",
+      "day": 15,
+      "mansion_literal": "翼",
+      "paragraph_id": "pT13p0280c2301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 1,
+      "mansion_literal": "軫",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 2,
+      "mansion_literal": "角",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 3,
+      "mansion_literal": "亢",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 4,
+      "mansion_literal": "氐",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 5,
+      "mansion_literal": "房",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 6,
+      "mansion_literal": "心",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 7,
+      "mansion_literal": "尾",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 8,
+      "mansion_literal": "箕",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 9,
+      "mansion_literal": "斗",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 10,
+      "mansion_literal": "牛",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 11,
+      "mansion_literal": "女",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 12,
+      "mansion_literal": "虛",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 13,
+      "mansion_literal": "危",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 14,
+      "mansion_literal": "室",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "black",
+      "day": 15,
+      "mansion_literal": "辟",
+      "paragraph_id": "pT13p0281a0301"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 1,
+      "mansion_literal": "奎",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 2,
+      "mansion_literal": "婁",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 3,
+      "mansion_literal": "胃",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 4,
+      "mansion_literal": "昴",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 5,
+      "mansion_literal": "畢",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 6,
+      "mansion_literal": "觜",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 7,
+      "mansion_literal": "參",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 8,
+      "mansion_literal": "井",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 9,
+      "mansion_literal": "鬼",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 10,
+      "mansion_literal": "柳",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 11,
+      "mansion_literal": "七星",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 12,
+      "mansion_literal": "張",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 13,
+      "mansion_literal": "翼",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 14,
+      "mansion_literal": "軫",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 1,
+      "fortnight": "white",
+      "day": 15,
+      "mansion_literal": "角",
+      "paragraph_id": "pT13p0281a0801"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 1,
+      "mansion_literal": "亢",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 2,
+      "mansion_literal": "氐",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 3,
+      "mansion_literal": "房",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 4,
+      "mansion_literal": "心",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 5,
+      "mansion_literal": "尾",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 6,
+      "mansion_literal": "箕",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 7,
+      "mansion_literal": "斗",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 8,
+      "mansion_literal": "牛",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 9,
+      "mansion_literal": "女",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 10,
+      "mansion_literal": "虛",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 11,
+      "mansion_literal": "危",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 12,
+      "mansion_literal": "室",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 13,
+      "mansion_literal": "辟",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 14,
+      "mansion_literal": "奎",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "black",
+      "day": 15,
+      "mansion_literal": "婁",
+      "paragraph_id": "pT13p0281a1701"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 1,
+      "mansion_literal": "胃",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 2,
+      "mansion_literal": "昴",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 3,
+      "mansion_literal": "畢",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 4,
+      "mansion_literal": "觜",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 5,
+      "mansion_literal": "參",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 6,
+      "mansion_literal": "井",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 7,
+      "mansion_literal": "鬼",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 8,
+      "mansion_literal": "柳",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 9,
+      "mansion_literal": "星",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 10,
+      "mansion_literal": "張",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 11,
+      "mansion_literal": "翼",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 12,
+      "mansion_literal": "軫",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 13,
+      "mansion_literal": "角",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 14,
+      "mansion_literal": "亢",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 2,
+      "fortnight": "white",
+      "day": 15,
+      "mansion_literal": "氐",
+      "paragraph_id": "pT13p0281a2201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 1,
+      "mansion_literal": "房",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 2,
+      "mansion_literal": "心",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 3,
+      "mansion_literal": "尾",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 4,
+      "mansion_literal": "箕",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 5,
+      "mansion_literal": "斗",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 6,
+      "mansion_literal": "牛",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 7,
+      "mansion_literal": "女",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 8,
+      "mansion_literal": "虛",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 9,
+      "mansion_literal": "危",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 10,
+      "mansion_literal": "室",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 11,
+      "mansion_literal": "辟",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 12,
+      "mansion_literal": "奎",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 13,
+      "mansion_literal": "婁",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 14,
+      "mansion_literal": "胃",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "black",
+      "day": 15,
+      "mansion_literal": "昴",
+      "paragraph_id": "pT13p0281b0201"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 1,
+      "mansion_literal": "畢",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 2,
+      "mansion_literal": "觜",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 3,
+      "mansion_literal": "參",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 4,
+      "mansion_literal": "井",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 5,
+      "mansion_literal": "鬼",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 6,
+      "mansion_literal": "柳",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 7,
+      "mansion_literal": "星",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 8,
+      "mansion_literal": "張",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 9,
+      "mansion_literal": "翼",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 10,
+      "mansion_literal": "軫",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 11,
+      "mansion_literal": "角",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 12,
+      "mansion_literal": "亢",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 13,
+      "mansion_literal": "氐",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 14,
+      "mansion_literal": "房",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 3,
+      "fortnight": "white",
+      "day": 15,
+      "mansion_literal": "心",
+      "paragraph_id": "pT13p0281b0701"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 1,
+      "mansion_literal": "尾",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 2,
+      "mansion_literal": "箕",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 3,
+      "mansion_literal": "斗",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 4,
+      "mansion_literal": "牛",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 5,
+      "mansion_literal": "女",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 6,
+      "mansion_literal": "虛",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 7,
+      "mansion_literal": "危",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 8,
+      "mansion_literal": "室",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 9,
+      "mansion_literal": "辟",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 10,
+      "mansion_literal": "奎",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 11,
+      "mansion_literal": "婁",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 12,
+      "mansion_literal": "胃",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 13,
+      "mansion_literal": "昴",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 14,
+      "mansion_literal": "畢",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "black",
+      "day": 15,
+      "mansion_literal": "觜",
+      "paragraph_id": "pT13p0281b1601"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 1,
+      "mansion_literal": "參",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 2,
+      "mansion_literal": "井",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 3,
+      "mansion_literal": "鬼",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 4,
+      "mansion_literal": "柳",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 5,
+      "mansion_literal": "七星",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 6,
+      "mansion_literal": "張",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 7,
+      "mansion_literal": "翼",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 8,
+      "mansion_literal": "軫",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 9,
+      "mansion_literal": "角",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 10,
+      "mansion_literal": "亢",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 11,
+      "mansion_literal": "氐",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 12,
+      "mansion_literal": "房",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 13,
+      "mansion_literal": "心",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 14,
+      "mansion_literal": "尾",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 4,
+      "fortnight": "white",
+      "day": 15,
+      "mansion_literal": "箕",
+      "paragraph_id": "pT13p0281b2101"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 1,
+      "mansion_literal": "斗",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 2,
+      "mansion_literal": "牛女",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 3,
+      "mansion_literal": "虛",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 4,
+      "mansion_literal": "危",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 5,
+      "mansion_literal": "室",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 6,
+      "mansion_literal": "辟",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 7,
+      "mansion_literal": "奎",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 8,
+      "mansion_literal": "婁",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 9,
+      "mansion_literal": "胃",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 10,
+      "mansion_literal": "昴",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 11,
+      "mansion_literal": "畢",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 12,
+      "mansion_literal": "觜",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 13,
+      "mansion_literal": "參",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 14,
+      "mansion_literal": "井",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 15,
+      "mansion_literal": "鬼",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 1,
+      "mansion_literal": "柳",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 2,
+      "mansion_literal": "七星",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 3,
+      "mansion_literal": "張",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 4,
+      "mansion_literal": "翼",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 5,
+      "mansion_literal": "軫",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 6,
+      "mansion_literal": "角",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 7,
+      "mansion_literal": "亢",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 8,
+      "mansion_literal": "氐",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 9,
+      "mansion_literal": "房",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 10,
+      "mansion_literal": "心",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 11,
+      "mansion_literal": "尾",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 12,
+      "mansion_literal": "箕",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 13,
+      "mansion_literal": "斗",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 14,
+      "mansion_literal": "牛",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "white",
+      "day": 15,
+      "mansion_literal": "女",
+      "paragraph_id": "pT13p0281c0501"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 1,
+      "mansion_literal": "虛",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 2,
+      "mansion_literal": "危",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 3,
+      "mansion_literal": "室",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 4,
+      "mansion_literal": "辟",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 5,
+      "mansion_literal": "奎",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 6,
+      "mansion_literal": "婁",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 7,
+      "mansion_literal": "胃",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 8,
+      "mansion_literal": "昴",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 9,
+      "mansion_literal": "畢",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 10,
+      "mansion_literal": "觜",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 11,
+      "mansion_literal": "參",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 12,
+      "mansion_literal": "井",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 13,
+      "mansion_literal": "鬼",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 14,
+      "mansion_literal": "柳",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "black",
+      "day": 15,
+      "mansion_literal": "七星",
+      "paragraph_id": "pT13p0281c1401"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 1,
+      "mansion_literal": "張",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 2,
+      "mansion_literal": "翼",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 3,
+      "mansion_literal": "軫",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 4,
+      "mansion_literal": "角",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 5,
+      "mansion_literal": "亢",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 6,
+      "mansion_literal": "氐",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 7,
+      "mansion_literal": "房",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 8,
+      "mansion_literal": "心",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 9,
+      "mansion_literal": "尾",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 10,
+      "mansion_literal": "箕",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 11,
+      "mansion_literal": "斗",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 12,
+      "mansion_literal": "牛女",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 13,
+      "mansion_literal": "虛",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 14,
+      "mansion_literal": "危",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 15,
+      "mansion_literal": "室",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 1,
+      "mansion_literal": "辟",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 2,
+      "mansion_literal": "奎",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 3,
+      "mansion_literal": "婁",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 4,
+      "mansion_literal": "胃",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 5,
+      "mansion_literal": "昴",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 6,
+      "mansion_literal": "畢",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 7,
+      "mansion_literal": "觜",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 8,
+      "mansion_literal": "參",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 9,
+      "mansion_literal": "井",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 10,
+      "mansion_literal": "鬼",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 11,
+      "mansion_literal": "柳",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 12,
+      "mansion_literal": "七星",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 13,
+      "mansion_literal": "張",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 14,
+      "mansion_literal": "翼",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "black",
+      "day": 15,
+      "mansion_literal": "軫",
+      "paragraph_id": "pT13p0281c2801"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 1,
+      "mansion_literal": "角",
+      "paragraph_id": "pT13p0282a0401"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 2,
+      "mansion_literal": "亢",
+      "paragraph_id": "pT13p0282a0401"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 3,
+      "mansion_literal": "氐",
+      "paragraph_id": "pT13p0282a0401"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 4,
+      "mansion_literal": "房",
+      "paragraph_id": "pT13p0282a0401"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 5,
+      "mansion_literal": "心",
+      "paragraph_id": "pT13p0282a0401"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 6,
+      "mansion_literal": "尾",
+      "paragraph_id": "pT13p0282a0401"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 7,
+      "mansion_literal": "箕",
+      "paragraph_id": "pT13p0282a0401"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 8,
+      "mansion_literal": "斗",
+      "paragraph_id": "pT13p0282a0401"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 9,
+      "mansion_literal": "牛女",
+      "paragraph_id": "pT13p0282a0401"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 10,
+      "mansion_literal": "虛",
+      "paragraph_id": "pT13p0282a0401"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 11,
+      "mansion_literal": "危",
+      "paragraph_id": "pT13p0282a0401"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 12,
+      "mansion_literal": "室",
+      "paragraph_id": "pT13p0282a0401"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 13,
+      "mansion_literal": "辟",
+      "paragraph_id": "pT13p0282a0401"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 14,
+      "mansion_literal": "奎",
+      "paragraph_id": "pT13p0282a0401"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 15,
+      "mansion_literal": "婁",
+      "paragraph_id": "pT13p0282a0401"
+    }
+  ],
+  "compound_literal_slots": [
+    {
+      "textual_month": 10,
+      "fortnight": "white",
+      "day": 3,
+      "mansion_literal": "女虛",
+      "paragraph_id": "pT13p0280b2701"
+    },
+    {
+      "textual_month": 5,
+      "fortnight": "black",
+      "day": 2,
+      "mansion_literal": "牛女",
+      "paragraph_id": "pT13p0281b2901"
+    },
+    {
+      "textual_month": 6,
+      "fortnight": "white",
+      "day": 12,
+      "mansion_literal": "牛女",
+      "paragraph_id": "pT13p0281c1901"
+    },
+    {
+      "textual_month": 7,
+      "fortnight": "white",
+      "day": 9,
+      "mansion_literal": "牛女",
+      "paragraph_id": "pT13p0282a0401"
+    }
+  ],
+  "textual_months_with_complete_explicit_fortnights": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    9,
+    10,
+    11,
+    12
+  ],
+  "month8_context_anchors": [
+    {
+      "paragraph_id": "pT13p0276a2303",
+      "locator": "T13n0397_p0276a23-27",
+      "literal": "「佉盧虱吒仙人言：『月合諸星起昴終胃，月行宿訖一月將滿，八月黑初月合在胃，如是次第輪轉不息。我今復說剎那之數，一千六百剎那名一迦羅，六十迦羅名摸呼律多，三十摸呼律多為一日夜。"
+    },
+    {
+      "paragraph_id": "pT13p0280a2701",
+      "locator": "T13n0397_p0280a27-0280b07",
+      "literal": "「『胃宿十四日用事，人生吉凶造作善惡疾病等事如上說了。月行虛空周匝宿訖還更起昴，是故言日。虛空月滿三十晝夜，亦名月滿。八月滿者起胃終昴，其月如是。夜十五時晝十五時，日午之影長六脚跡。婁宿夜行、房在日前，熒惑日子是時隨日。是八月時蝎神主當，昴宿為業，前已說竟。是白月內，次十五日昴又用事，月合昴星是八月滿，昴與月合一日夜訖；其次復轉合於畢宿，九月初日畢用事也。"
+    }
+  ],
+  "xuanying_citation_comparison": {
+    "C1163_literal": "依日藏分經二月九日曙夜分属九日故也",
+    "cited_fortnight_explicitly_stated": false,
+    "critical_named_edition_cells": [
+      {
+        "textual_month": 1,
+        "fortnight": "white",
+        "day": 9,
+        "mansion_literal": "鬼"
+      },
+      {
+        "textual_month": 2,
+        "fortnight": "white",
+        "day": 7,
+        "mansion_literal": "鬼"
+      },
+      {
+        "textual_month": 2,
+        "fortnight": "white",
+        "day": 8,
+        "mansion_literal": "柳"
+      },
+      {
+        "textual_month": 2,
+        "fortnight": "white",
+        "day": 9,
+        "mansion_literal": "星"
+      },
+      {
+        "textual_month": 2,
+        "fortnight": "black",
+        "day": 9,
+        "mansion_literal": "女"
+      }
+    ],
+    "cited_exemplar_identity_established": false,
+    "citation_and_named_table_reconciled": false,
+    "different_textual_months_relabelled_to_match": false,
+    "selected_table_words_accepted_as_Xuanying_verbatim_quote": false,
+    "scope": "具名现行T0397表与玄应引文分开保留。正月白九鬼不能改名为二月以配合引文；二月白七鬼、白八柳、白九星及黑九女均保留。未裁定玄应错引、实际底本、纪月对应或日期平移。"
+  },
+  "interpretation_scope": {
+    "full_book_collation_completed": false,
+    "independent_transmission_established": false,
+    "physical_moon_measurements": false,
+    "historical_daybreak_mapping_established": false,
+    "modern_clock_mapping_established": false,
+    "hinoo_half_mapping_established": false,
+    "leap_short_month_priority_established": false,
+    "applied_to_current_calendar": false,
+    "new_independent_historical_observations": 0,
+    "real_samples": 0,
+    "scope": "330个具名字面表槽与八月叙述锚点是文献参考，不补齐八月30个显式表槽，不把牛女／女虛拆分或补成唯一宿，不据30摸呼律多换成30现代小时。"
+  }
+}

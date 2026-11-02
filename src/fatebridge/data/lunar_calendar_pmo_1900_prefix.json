@@ -1,0 +1,17 @@
+{
+  "method_id": "pmo_1900_january_prefix_v1",
+  "solar_start": "1900-01-01",
+  "solar_end": "1900-01-30",
+  "lunar_year": 1899,
+  "lunar_month": 12,
+  "lunar_first_day": 1,
+  "is_leap_month": false,
+  "source": {
+    "publisher": "中国科学院紫金山天文台",
+    "title": "1900—2025年日历",
+    "url": "https://www.pmo.cas.cn/xwdt2019/kpdt2019/202203/P020250414456381274062.pdf",
+    "raw_sha256": "dc7ed4cb5dae55c1de5a0bdc97f09256a7d6b6d7fe3c553a542e9f9f7758aba4",
+    "source_pdf_pages": "2,3",
+    "calendar_convention": "PMO compilation explicitly retains Qing Shixianshu dates for 1900-1911; labels apply to the supplied civil calendar date, not all timezone moon observations."
+  }
+}

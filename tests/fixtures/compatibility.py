@@ -9,15 +9,25 @@ REFERENCE = json.loads(
         encoding="utf-8"
     )
 )
-CURRENT_VERSION = "season_root_v2"
+CURRENT_VERSION = "source_conditions_v2_v6"
+# Preserve every historical input and numerical ledger. The v5 record changes
+# method provenance for this pair, whose numeric rule terms remain unchanged.
+# v6 repairs unrounded binding; neither fixed input has a binding stem pair.
+CURRENT_STRENGTH_METHOD_ID = "season_root_revelation_relations_v6"
+CURRENT_RESOLUTION_POLICY = "source_conditions_before_preference_v3"
+# The fixed pair does not enter the from-child screen. Keep all frozen v2
+# ledgers and profiles intact; current provenance separately reports v3.
 
 
 def reference_dimensions(kind="general", version=CURRENT_VERSION):
     reference = REFERENCE["versions"][version]
     values = {
-        name: sum(terms) for name, terms in reference["dimension_ledgers"].items()
+        name: min(100, max(0, sum(terms)))
+        for name, terms in reference["dimension_ledgers"].items()
     }
-    values["ten_gods_relationship"] = sum(reference["ten_gods_ledgers"][kind])
+    values["ten_gods_relationship"] = min(
+        100, max(0, sum(reference["ten_gods_ledgers"][kind]))
+    )
     return values
 
 
@@ -55,9 +65,9 @@ def assert_score_reference(summary, detailed_analysis=None, kind="general"):
     for name in ("person1", "person2"):
         assert (
             receipt["input_methods"][name]["strength_method_id"]
-            == REFERENCE["versions"][CURRENT_VERSION]["strength_method_id"]
+            == CURRENT_STRENGTH_METHOD_ID
         )
         assert (
             receipt["input_methods"][name]["useful_resolution_policy"]
-            == REFERENCE["resolution_policy"]
+            == CURRENT_RESOLUTION_POLICY
         )

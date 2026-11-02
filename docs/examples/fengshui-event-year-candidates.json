@@ -1,0 +1,12 @@
+{
+  "house": {
+    "facing_degrees": 270,
+    "north_reference": "magnetic"
+  },
+  "period": {
+    "basis": "first_occupancy",
+    "event_at": "2025-02-03T14:10:28.729293+00:00",
+    "timezone_name": "UTC",
+    "evidence": "虚构立春边界回归事件；用于展示候选有效年，不是真实住宅资料"
+  }
+}

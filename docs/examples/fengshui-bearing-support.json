@@ -1,0 +1,14 @@
+{
+  "house": {
+    "object_id": "synthetic-home",
+    "facing_degrees": 4,
+    "north_reference": "magnetic",
+    "orientation_basis": "user_confirmed"
+  },
+  "period": {
+    "basis": "expert_confirmed",
+    "period_number": 7,
+    "evidence": "虚构数值示例，不代表实际住宅"
+  },
+  "bearing_uncertainty_degrees": 1
+}

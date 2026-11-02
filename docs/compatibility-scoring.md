@@ -4,7 +4,12 @@
 
 双人配合结果可以拆开阅读：先看各项规则怎样评价双方结构，再看关系类型如何影响权重，最后结合具体互动讨论相处与磨合。以下计算说明适用于 `two_person_compatibility` 的分数解释与版本核对。
 
-双人综合分使用 `compatibility_weighted_rules_v1`，将五项规则分数按关系类型加权。它表示模型内部的结构评价，不是现实关系的成功概率；其他关系技法的评分不适用这套权重。
+双人综合分使用 `compatibility_weighted_rules_v2`，将五项规则分数按关系类型加权。它表示模型内部的结构评价，不是现实关系的成功概率；其他关系技法的评分不适用这套权重。
+
+个人层取用现为`source_conditions_before_preference_v2`：旧共现首候选不再越级授予全局喜用，
+详见[月令与取用条件](bazi-month-paths.md)。示例账本保留此前全部版本及原始文件，
+另立共享v5方法回执与新取用策略记录。该对示例的数值项不变；
+这不表示其他输入的个人取用或合盘分数不变，也没有为维持总分调整关系权重。
 
 首次接入先按 [API 参考](api-reference.md) 提供两人的已确认资料；关系类型未指定时使用 `general`。读取结果时依次核对[分项权重](#分项权重与舍入)、[计算回执](#计算回执)和[解释范围](#解释范围)。
 
@@ -18,8 +23,10 @@
 | 朋友 `friendship` | 0.35 | 0.30 | 0.20 | 0.10 | 0.05 |
 | 家庭 `family` | 0.25 | 0.30 | 0.20 | 0.20 | 0.05 |
 
-总分先求各项 `score × weight` 之和，再截到 0–100，按 Python `round(..., 1)`
-保留一位小数。独立传统净分 `traditional_compatibility` 不加入综合分，
+总分用声明的十进制分项及权重求各项 `score × weight` 之和，再截到 0–100，
+按十进制 half-even（恰好一半时取偶数）保留一位小数。
+v2保留全部关系权重，修正v1二进制累加在半分位可能改变舍入方向的问题。
+独立传统净分 `traditional_compatibility` 不加入综合分，
 与上表中的传统分析维度分开读取。
 
 分项在 `summary.scoring.dimensions` 中使用下列键名，便于对照原始结果：
@@ -63,10 +70,16 @@
 ## 回归依据
 
 固定输入、五种关系权重和逐条加减项保存在
-[`compatibility-score-reference.json`](../tests/fixtures/compatibility-score-reference.json)。
+`compatibility-score-reference.json`（本地数据：`../tests/fixtures/compatibility-score-reference.json`）。
 [`test_compatibility_score_provenance.py`](../tests/test_compatibility_score_provenance.py)
 使用独立十进制账本核对历史与当前输入、单人输入升级的影响、分项贡献、
 旺衰与喜用版本，以及 REST、MCP、CLI 的计算回执。
+
+账本保留静态v1、旺衰v2及结构根v4三组输入。公开虚构示例在旺衰v4中，
+第一人因两处庚巳阳长生根计入原有结构规则，从中和改为强；第二人仍为强。
+一般关系精确总和由71.63变为80.03，显示80.0；这是上游变化，不是权重调优。
+家庭关系精确总和75.85按half-even显示75.8，避免原浮点累加误显示75.9。
+十神分项的原始加减和超过100时仍按原规则截到100，账本保留截取前的逐项值。
 
 ```bash
 uv run --locked --extra dev pytest -q \

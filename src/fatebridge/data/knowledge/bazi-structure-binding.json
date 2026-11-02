@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "review_id": "bazi_structure_implementation_revalidation_v1",
+  "keys": [
+    "正官格",
+    "七杀格",
+    "食神格",
+    "伤官格",
+    "正财格",
+    "偏财格",
+    "正印格",
+    "偏印格",
+    "建禄格",
+    "羊刃驾杀格"
+  ],
+  "previous_ref": {
+    "source_path": "src/fatebridge/core/classical.py",
+    "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
+    "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+  },
+  "current_package_files": {
+    "core/classical.py": "2b2a3a42abc2ed55b586d607892f7789023149ab769873b630ab1474b068464a",
+    "core/classical_stages.py": "4c02cc728f583680ec48e08afe0a7920e80af0456690756fc1c4f98ef716ead9",
+    "utils/data.py": "19da28049dfa33e35ffde82e1d9e095ef426214ed26d2b6cdbddfd2ed8a23272"
+  },
+  "unchanged_month_function_ast_sha256": {
+    "_select_structure_god": "bd01b1c1486a79d435be8a1ed5be1d9a63cb852724294143226447b3b5ae032d",
+    "determine_monthly_structure": "bb5bf54184ba914acbbfd200224ce90361a571f22d792ce7e119b52a499218be"
+  },
+  "change_scope": "classical.py adds STAGE_PROFILE_ID import and life_stage_profile_id output only; month selection functions and seat tables unchanged. Stage module adds explicit profile provenance without replacing lookup values.",
+  "policy_equivalence_scope": "Selected month-command functions, lu/blade seat tables and utility dependency; synthetic regression equivalence is not classical adjudication, a holdout or predictive validity."
+}

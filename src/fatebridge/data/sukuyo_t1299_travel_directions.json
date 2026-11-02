@@ -1,0 +1,747 @@
+{
+  "id": "t1299_lower_travel_direction_v1",
+  "author": "不空译；下卷行动禁闭法，大正主文及所载明本校记",
+  "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
+  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+  "locator": "T21n1299_p0397a26-0397b15",
+  "selected_text": "大正主文；明本只保留校记，不混入当前规则",
+  "selection_policy": "Four explicit mansion prohibitions plus all twelve literal palace/day rows. Following 已上 binds each immediately preceding paired row; no physical palace or natal palace is computed. Do not normalize the unidentified 互 token or merge Ming 吉 with main-text 凶.",
+  "rules": [
+    {
+      "rule_id": "t1299_direction_01",
+      "layer": "travel_direction",
+      "selectors": [
+        "轸"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0397a27",
+      "source_excerpts": [
+        "日屬軫宿，不得向北路行縱吉時亦不可行。"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向北出行列为禁行条（原文不得）；不扩大成其他方向或现实结局保证。夹注称纵吉时亦不可行，不能用吉时抵销此项原典限制。",
+      "direction": "north",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "northbound_journey"
+      ],
+      "topic_condition": "只有明确向北出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "explicit_in_own_clause",
+      "direction_locator": "T21n1299_p0397a27",
+      "literal_palace_ordinal": null,
+      "literal_palace_name": null,
+      "unparsed_selector_literals": [],
+      "textual_variants": [],
+      "textual_assessment_variant": false,
+      "auspicious_time_cannot_release": true
+    },
+    {
+      "rule_id": "t1299_direction_02",
+      "layer": "travel_direction",
+      "selectors": [
+        "女"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0397a28",
+      "source_excerpts": [
+        "日屬女宿，不得向東行縱吉時亦不可行。"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向东出行列为禁行条（原文不得）；不扩大成其他方向或现实结局保证。夹注称纵吉时亦不可行，不能用吉时抵销此项原典限制。",
+      "direction": "east",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "eastbound_journey"
+      ],
+      "topic_condition": "只有明确向东出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "explicit_in_own_clause",
+      "direction_locator": "T21n1299_p0397a28",
+      "literal_palace_ordinal": null,
+      "literal_palace_name": null,
+      "unparsed_selector_literals": [],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397010",
+          "locator": "CBETA orig note 0397010",
+          "literal": "（路）＋行【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        }
+      ],
+      "textual_assessment_variant": false,
+      "auspicious_time_cannot_release": true
+    },
+    {
+      "rule_id": "t1299_direction_03",
+      "layer": "travel_direction",
+      "selectors": [
+        "鬼"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0397a29",
+      "source_excerpts": [
+        "日屬鬼宿，不得向西行縱吉時亦不可行。"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向西出行列为禁行条（原文不得）；不扩大成其他方向或现实结局保证。夹注称纵吉时亦不可行，不能用吉时抵销此项原典限制。",
+      "direction": "west",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "westbound_journey"
+      ],
+      "topic_condition": "只有明确向西出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "explicit_in_own_clause",
+      "direction_locator": "T21n1299_p0397a29",
+      "literal_palace_ordinal": null,
+      "literal_palace_name": null,
+      "unparsed_selector_literals": [],
+      "textual_variants": [],
+      "textual_assessment_variant": false,
+      "auspicious_time_cannot_release": true
+    },
+    {
+      "rule_id": "t1299_direction_04",
+      "layer": "travel_direction",
+      "selectors": [
+        "娄"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b01",
+      "source_excerpts": [
+        "日屬婁宿，不得向南行縱吉時亦不可行。"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为禁行条（原文不得）；不扩大成其他方向或现实结局保证。夹注称纵吉时亦不可行，不能用吉时抵销此项原典限制。",
+      "direction": "south",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "southbound_journey"
+      ],
+      "topic_condition": "只有明确向南出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "explicit_in_own_clause",
+      "direction_locator": "T21n1299_p0397b01",
+      "literal_palace_ordinal": null,
+      "literal_palace_name": null,
+      "unparsed_selector_literals": [],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397010",
+          "locator": "CBETA orig note 0397010",
+          "literal": "（路）＋行【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        }
+      ],
+      "textual_assessment_variant": false,
+      "auspicious_time_cannot_release": true
+    },
+    {
+      "rule_id": "t1299_direction_05",
+      "layer": "travel_direction",
+      "selectors": [
+        "角",
+        "亢"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b02-03",
+      "source_excerpts": [
+        "第七秤宮取角、亢日",
+        "第十一瓶宮取危、室日，已上東行大吉"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向东出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "direction": "east",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "eastbound_journey"
+      ],
+      "topic_condition": "只有明确向东出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "following_已上_clause_for_paired_rows",
+      "direction_locator": "T21n1299_p0397b03",
+      "literal_palace_ordinal": 7,
+      "literal_palace_name": "秤宮",
+      "unparsed_selector_literals": [],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397011",
+          "locator": "CBETA orig note 0397011",
+          "literal": "日＋（東行大吉）【明】",
+          "witness": "明",
+          "applied_to_selected_text": false
+        },
+        {
+          "apparatus_id": "0397012",
+          "locator": "CBETA orig note 0397012",
+          "literal": "〔已上〕－【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        }
+      ],
+      "textual_assessment_variant": false,
+      "auspicious_time_cannot_release": false
+    },
+    {
+      "rule_id": "t1299_direction_06",
+      "layer": "travel_direction",
+      "selectors": [
+        "危",
+        "室"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b03",
+      "source_excerpts": [
+        "第十一瓶宮取危、室日，已上東行大吉"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向东出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "direction": "east",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "eastbound_journey"
+      ],
+      "topic_condition": "只有明确向东出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "explicit_in_own_clause",
+      "direction_locator": "T21n1299_p0397b03",
+      "literal_palace_ordinal": 11,
+      "literal_palace_name": "瓶宮",
+      "unparsed_selector_literals": [],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397012",
+          "locator": "CBETA orig note 0397012",
+          "literal": "〔已上〕－【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        }
+      ],
+      "textual_assessment_variant": false,
+      "auspicious_time_cannot_release": false
+    },
+    {
+      "rule_id": "t1299_direction_07",
+      "layer": "travel_direction",
+      "selectors": [
+        "星",
+        "张"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b04-05",
+      "source_excerpts": [
+        "第五獅子宮取星、張日",
+        "第九弓宮取尾、箕、斗日，已上西行大吉"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向西出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "direction": "west",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "westbound_journey"
+      ],
+      "topic_condition": "只有明确向西出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "following_已上_clause_for_paired_rows",
+      "direction_locator": "T21n1299_p0397b05",
+      "literal_palace_ordinal": 5,
+      "literal_palace_name": "獅子宮",
+      "unparsed_selector_literals": [],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397013",
+          "locator": "CBETA orig note 0397013",
+          "literal": "日＋（西行大吉）【明】",
+          "witness": "明",
+          "applied_to_selected_text": false
+        },
+        {
+          "apparatus_id": "0397014",
+          "locator": "CBETA orig note 0397014",
+          "literal": "〔尾〕－【明】",
+          "witness": "明",
+          "applied_to_selected_text": false
+        },
+        {
+          "apparatus_id": "0397012",
+          "locator": "CBETA orig note 0397012",
+          "literal": "〔已上〕－【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        }
+      ],
+      "textual_assessment_variant": false,
+      "auspicious_time_cannot_release": false
+    },
+    {
+      "rule_id": "t1299_direction_08",
+      "layer": "travel_direction",
+      "selectors": [
+        "尾",
+        "箕",
+        "斗"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b05",
+      "source_excerpts": [
+        "第九弓宮取尾、箕、斗日，已上西行大吉"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向西出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "direction": "west",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "westbound_journey"
+      ],
+      "topic_condition": "只有明确向西出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "explicit_in_own_clause",
+      "direction_locator": "T21n1299_p0397b05",
+      "literal_palace_ordinal": 9,
+      "literal_palace_name": "弓宮",
+      "unparsed_selector_literals": [],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397014",
+          "locator": "CBETA orig note 0397014",
+          "literal": "〔尾〕－【明】",
+          "witness": "明",
+          "applied_to_selected_text": false
+        },
+        {
+          "apparatus_id": "0397012",
+          "locator": "CBETA orig note 0397012",
+          "literal": "〔已上〕－【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        }
+      ],
+      "textual_assessment_variant": false,
+      "auspicious_time_cannot_release": false
+    },
+    {
+      "rule_id": "t1299_direction_09",
+      "layer": "travel_direction",
+      "selectors": [
+        "房",
+        "心"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b06-07",
+      "source_excerpts": [
+        "第八蝎宮取互、房、心日",
+        "第十二魚宮取壁、奎日，已上向南行大吉"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "direction": "south",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "southbound_journey"
+      ],
+      "topic_condition": "只有明确向南出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "following_已上_clause_for_paired_rows",
+      "direction_locator": "T21n1299_p0397b07",
+      "literal_palace_ordinal": 8,
+      "literal_palace_name": "蝎宮",
+      "unparsed_selector_literals": [
+        "互"
+      ],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397015",
+          "locator": "CBETA orig note 0397015",
+          "literal": "〔互〕－【明】",
+          "witness": "明",
+          "applied_to_selected_text": false
+        },
+        {
+          "apparatus_id": "0397016",
+          "locator": "CBETA orig note 0397016",
+          "literal": "心＋（尾）【明】",
+          "witness": "明",
+          "applied_to_selected_text": false
+        },
+        {
+          "apparatus_id": "0397017",
+          "locator": "CBETA orig note 0397017",
+          "literal": "日＋（南行大吉）【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        },
+        {
+          "apparatus_id": "0397018",
+          "locator": "CBETA orig note 0397018",
+          "literal": "〔向〕－【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        },
+        {
+          "apparatus_id": "0397012",
+          "locator": "CBETA orig note 0397012",
+          "literal": "〔已上〕－【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        }
+      ],
+      "textual_assessment_variant": false,
+      "auspicious_time_cannot_release": false
+    },
+    {
+      "rule_id": "t1299_direction_10",
+      "layer": "travel_direction",
+      "selectors": [
+        "壁",
+        "奎"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b07",
+      "source_excerpts": [
+        "第十二魚宮取壁、奎日，已上向南行大吉"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "direction": "south",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "southbound_journey"
+      ],
+      "topic_condition": "只有明确向南出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "explicit_in_own_clause",
+      "direction_locator": "T21n1299_p0397b07",
+      "literal_palace_ordinal": 12,
+      "literal_palace_name": "魚宮",
+      "unparsed_selector_literals": [],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397017",
+          "locator": "CBETA orig note 0397017",
+          "literal": "日＋（南行大吉）【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        },
+        {
+          "apparatus_id": "0397018",
+          "locator": "CBETA orig note 0397018",
+          "literal": "〔向〕－【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        },
+        {
+          "apparatus_id": "0397012",
+          "locator": "CBETA orig note 0397012",
+          "literal": "〔已上〕－【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        }
+      ],
+      "textual_assessment_variant": false,
+      "auspicious_time_cannot_release": false
+    },
+    {
+      "rule_id": "t1299_direction_11",
+      "layer": "travel_direction",
+      "selectors": [
+        "翼",
+        "轸"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b08-09",
+      "source_excerpts": [
+        "第六女宮取翼、軫日",
+        "第四蟹宮取鬼、柳，日已上向南行大吉"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "direction": "south",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "southbound_journey"
+      ],
+      "topic_condition": "只有明确向南出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "following_已上_clause_for_paired_rows",
+      "direction_locator": "T21n1299_p0397b09",
+      "literal_palace_ordinal": 6,
+      "literal_palace_name": "女宮",
+      "unparsed_selector_literals": [],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397017",
+          "locator": "CBETA orig note 0397017",
+          "literal": "日＋（南行大吉）【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        },
+        {
+          "apparatus_id": "0397018",
+          "locator": "CBETA orig note 0397018",
+          "literal": "〔向〕－【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        },
+        {
+          "apparatus_id": "0397012",
+          "locator": "CBETA orig note 0397012",
+          "literal": "〔已上〕－【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        }
+      ],
+      "textual_assessment_variant": false,
+      "auspicious_time_cannot_release": false
+    },
+    {
+      "rule_id": "t1299_direction_12",
+      "layer": "travel_direction",
+      "selectors": [
+        "鬼",
+        "柳"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b09",
+      "source_excerpts": [
+        "第四蟹宮取鬼、柳，日已上向南行大吉"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "direction": "south",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "southbound_journey"
+      ],
+      "topic_condition": "只有明确向南出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "explicit_in_own_clause",
+      "direction_locator": "T21n1299_p0397b09",
+      "literal_palace_ordinal": 4,
+      "literal_palace_name": "蟹宮",
+      "unparsed_selector_literals": [],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397017",
+          "locator": "CBETA orig note 0397017",
+          "literal": "日＋（南行大吉）【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        },
+        {
+          "apparatus_id": "0397018",
+          "locator": "CBETA orig note 0397018",
+          "literal": "〔向〕－【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        },
+        {
+          "apparatus_id": "0397012",
+          "locator": "CBETA orig note 0397012",
+          "literal": "〔已上〕－【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        }
+      ],
+      "textual_assessment_variant": false,
+      "auspicious_time_cannot_release": false
+    },
+    {
+      "rule_id": "t1299_direction_13",
+      "layer": "travel_direction",
+      "selectors": [
+        "参",
+        "井"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b10",
+      "source_excerpts": [
+        "第三男女宮至參、井日，東行大吉"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向东出行列为宜条；不扩大成其他方向或现实结局保证。",
+      "direction": "east",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "eastbound_journey"
+      ],
+      "topic_condition": "只有明确向东出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "explicit_in_own_clause",
+      "direction_locator": "T21n1299_p0397b10",
+      "literal_palace_ordinal": 3,
+      "literal_palace_name": "男女宮",
+      "unparsed_selector_literals": [],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397019",
+          "locator": "CBETA orig note 0397019",
+          "literal": "〔大〕－【明】",
+          "witness": "明",
+          "applied_to_selected_text": false
+        }
+      ],
+      "textual_assessment_variant": false,
+      "auspicious_time_cannot_release": false
+    },
+    {
+      "rule_id": "t1299_direction_14",
+      "layer": "travel_direction",
+      "selectors": [
+        "女",
+        "虚"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b11",
+      "source_excerpts": [
+        "第十摩竭宮至女、虛日，南行大凶"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向南出行列为慎用条；不扩大成其他方向或现实结局保证。此处大正主文作凶，明本校记作吉；当前按大正列慎用，未合并为一致判断。",
+      "direction": "south",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "southbound_journey"
+      ],
+      "topic_condition": "只有明确向南出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "explicit_in_own_clause",
+      "direction_locator": "T21n1299_p0397b11",
+      "literal_palace_ordinal": 10,
+      "literal_palace_name": "摩竭宮",
+      "unparsed_selector_literals": [],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397020",
+          "locator": "CBETA orig note 0397020",
+          "literal": "凶＝吉【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        }
+      ],
+      "textual_assessment_variant": true,
+      "auspicious_time_cannot_release": false
+    },
+    {
+      "rule_id": "t1299_direction_15",
+      "layer": "travel_direction",
+      "selectors": [
+        "娄",
+        "胃",
+        "昴"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b12",
+      "source_excerpts": [
+        "第一羊宮至婁、胃、昴日，西行大凶"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向西出行列为慎用条；不扩大成其他方向或现实结局保证。此处大正主文作凶，明本校记作吉；当前按大正列慎用，未合并为一致判断。",
+      "direction": "west",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "westbound_journey"
+      ],
+      "topic_condition": "只有明确向西出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "explicit_in_own_clause",
+      "direction_locator": "T21n1299_p0397b12",
+      "literal_palace_ordinal": 1,
+      "literal_palace_name": "羊宮",
+      "unparsed_selector_literals": [],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397020",
+          "locator": "CBETA orig note 0397020",
+          "literal": "凶＝吉【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        }
+      ],
+      "textual_assessment_variant": true,
+      "auspicious_time_cannot_release": false
+    },
+    {
+      "rule_id": "t1299_direction_16",
+      "layer": "travel_direction",
+      "selectors": [
+        "毕",
+        "觜"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b13",
+      "source_excerpts": [
+        "第二牛宮至畢、觜日，北行大凶"
+      ],
+      "meaning": "下卷行动禁闭法按本段明列日宿，将向北出行列为慎用条；不扩大成其他方向或现实结局保证。此处大正主文作凶，明本校记作吉；当前按大正列慎用，未合并为一致判断。",
+      "direction": "north",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "northbound_journey"
+      ],
+      "topic_condition": "只有明确向北出行时适用；未给方向时只列条件证言。",
+      "direction_binding_basis": "explicit_in_own_clause",
+      "direction_locator": "T21n1299_p0397b13",
+      "literal_palace_ordinal": 2,
+      "literal_palace_name": "牛宮",
+      "unparsed_selector_literals": [],
+      "textual_variants": [
+        {
+          "apparatus_id": "0397020",
+          "locator": "CBETA orig note 0397020",
+          "literal": "凶＝吉【明】＊",
+          "witness": "明",
+          "applied_to_selected_text": false
+        }
+      ],
+      "textual_assessment_variant": true,
+      "auspicious_time_cannot_release": false
+    }
+  ],
+  "textual_issues": [
+    {
+      "locator": "T21n1299_p0397b06",
+      "literal": "互",
+      "issue": "蝎宫首字作互，非已识别27宿；明本校记删互、心后加尾。未猜作氐，也未把明本的尾加入大正蝎宫。",
+      "attribution_status": "unparsed_selector_not_applied",
+      "applied_to_activity": false
+    }
+  ],
+  "scope": "按本章明列日宿及用户明确出行方向查条文；宫名和序号仅为本段字面标签，与上卷师子起序足表和现代黄道宫、House分别保留。方向不从出生地点、GPS、目的地或角度猜测；未建立东北等扇区或角宽，不补齐未列方向。未核定平明日界，不给现实必然结局。"
+}

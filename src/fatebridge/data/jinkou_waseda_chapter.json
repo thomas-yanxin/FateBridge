@@ -1,0 +1,553 @@
+{
+  "chapter_inventory": {
+    "all_definitions_transcribed": false,
+    "all_diagrams_transcribed": false,
+    "chapter_end_pdf_page": 59,
+    "chapter_heading": "六十四課鈐",
+    "chapter_heading_inventory_complete": true,
+    "chapter_start_pdf_page": 50,
+    "chronological_priority_established": false,
+    "classical_predicates_adjudicated": 0,
+    "direct_observations": [
+      {
+        "id": "merged_full_body_example",
+        "observation": "全身課至朝元課之間未見獨立奇全課題名，全身課所接圖為乙／朱雀／太沖／巳。",
+        "occurrences": [
+          "W003",
+          "W004"
+        ]
+      },
+      {
+        "id": "repeated_lock_heading",
+        "observation": "鎖課題名出現兩次，第一次戌地分例圖，第二次卯地分例圖；不得去掉一次以湊計數。",
+        "occurrences": [
+          "W013",
+          "W018"
+        ]
+      },
+      {
+        "id": "ten_heading_gap",
+        "observation": "空亡課例圖及說明後直接接覆盂相克課；本章未見鬼空、四大空亡、分局相生、分局相克、合局相生、合局相克、連茹、階升相生、階升相克、覆盂相生十題名。",
+        "occurrences": [
+          "W026",
+          "W027"
+        ]
+      },
+      {
+        "id": "mixed_cross_generation_heading",
+        "observation": "自內隔生課／利用卦／自上隔生於下，後接隔克課；此章未見獨立自外隔生課題名，不能據此裁定兩課交換。",
+        "occurrences": [
+          "W042",
+          "W043"
+        ]
+      }
+    ],
+    "duplicate_raw_headings": [
+      "鎖課"
+    ],
+    "full_classical_conformance": false,
+    "headings": [
+      {
+        "occurrence_id": "W001",
+        "pdf_page": 50,
+        "raw_heading": "鬼合身課",
+        "reading_note": null,
+        "selected_alias": "陰害卦",
+        "selected_definition": "三合全本位克身是也",
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W002",
+        "pdf_page": 50,
+        "raw_heading": "官祿全身課",
+        "reading_note": null,
+        "selected_alias": "進達卦",
+        "selected_definition": "三合全卻鬼動克人元是也",
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W003",
+        "pdf_page": 51,
+        "raw_heading": "全身課",
+        "reading_note": null,
+        "selected_alias": "順從卦",
+        "selected_definition": "三合無官鬼無劫煞只財動是也",
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W004",
+        "pdf_page": 51,
+        "raw_heading": "朝元課",
+        "reading_note": null,
+        "selected_alias": "德載卦",
+        "selected_definition": "四位本家事",
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W005",
+        "pdf_page": 51,
+        "raw_heading": "俱比課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W006",
+        "pdf_page": 51,
+        "raw_heading": "正比課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W007",
+        "pdf_page": 52,
+        "raw_heading": "近比課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W008",
+        "pdf_page": 52,
+        "raw_heading": "次比課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W009",
+        "pdf_page": 52,
+        "raw_heading": "遠比課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W010",
+        "pdf_page": 52,
+        "raw_heading": "將位伏吟課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W011",
+        "pdf_page": 52,
+        "raw_heading": "神將伏吟課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W012",
+        "pdf_page": 52,
+        "raw_heading": "反吟課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W013",
+        "pdf_page": 53,
+        "raw_heading": "鎖課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": "卯上見金鎖",
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W014",
+        "pdf_page": 53,
+        "raw_heading": "神將反吟課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W015",
+        "pdf_page": 53,
+        "raw_heading": "反鬼入門課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W016",
+        "pdf_page": 53,
+        "raw_heading": "關課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W017",
+        "pdf_page": 53,
+        "raw_heading": "隔課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W018",
+        "pdf_page": 54,
+        "raw_heading": "鎖課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": "卯上見金為鎖",
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W019",
+        "pdf_page": 54,
+        "raw_heading": "斬關課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W020",
+        "pdf_page": 54,
+        "raw_heading": "毀隔課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W021",
+        "pdf_page": 54,
+        "raw_heading": "叩鍵課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W022",
+        "pdf_page": 54,
+        "raw_heading": "官合課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W023",
+        "pdf_page": 54,
+        "raw_heading": "正合課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W024",
+        "pdf_page": 55,
+        "raw_heading": "鬼合課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W025",
+        "pdf_page": 55,
+        "raw_heading": "日時比合課",
+        "reading_note": null,
+        "selected_alias": "結綬卦",
+        "selected_definition": "將與干皆比是也",
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W026",
+        "pdf_page": 55,
+        "raw_heading": "空亡課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": "三位落空是也",
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W027",
+        "pdf_page": 55,
+        "raw_heading": "覆盂相克課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": "自上次第克本位是也",
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W028",
+        "pdf_page": 55,
+        "raw_heading": "陰陽并比課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W029",
+        "pdf_page": 55,
+        "raw_heading": "陰陽并克課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W030",
+        "pdf_page": 55,
+        "raw_heading": "并來克身課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W031",
+        "pdf_page": 56,
+        "raw_heading": "并來生身課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W032",
+        "pdf_page": 56,
+        "raw_heading": "并來克位課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W033",
+        "pdf_page": 56,
+        "raw_heading": "并來生位課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W034",
+        "pdf_page": 56,
+        "raw_heading": "歸來相克課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W035",
+        "pdf_page": 56,
+        "raw_heading": "歸來相生課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W036",
+        "pdf_page": 57,
+        "raw_heading": "進休相克課",
+        "reading_note": "題名字形讀作休，與另一見證體字不同；不擅自歸一。",
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W037",
+        "pdf_page": 57,
+        "raw_heading": "進休相生課",
+        "reading_note": "題名字形讀作休，與另一見證體字不同；不擅自歸一。",
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W038",
+        "pdf_page": 57,
+        "raw_heading": "將神同源克主客課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W039",
+        "pdf_page": 57,
+        "raw_heading": "將神同源生主客課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W040",
+        "pdf_page": 57,
+        "raw_heading": "主客同源克將神課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W041",
+        "pdf_page": 57,
+        "raw_heading": "主客同源生將神課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W042",
+        "pdf_page": 57,
+        "raw_heading": "自內隔生課",
+        "reading_note": null,
+        "selected_alias": "利用卦",
+        "selected_definition": "自上隔生於下是也",
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W043",
+        "pdf_page": 58,
+        "raw_heading": "隔克課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W044",
+        "pdf_page": 58,
+        "raw_heading": "天地并來克身課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W045",
+        "pdf_page": 58,
+        "raw_heading": "換神課",
+        "reading_note": null,
+        "selected_alias": "玄機卦",
+        "selected_definition": "晝夜未分貴神相交是也",
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W046",
+        "pdf_page": 58,
+        "raw_heading": "向空課",
+        "reading_note": null,
+        "selected_alias": "谷響卦",
+        "selected_definition": "晝將夜位夜將晝位是也",
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W047",
+        "pdf_page": 58,
+        "raw_heading": "背神課",
+        "reading_note": null,
+        "selected_alias": "違戾卦",
+        "selected_definition": "位在天乙後而帶天乙前位是也",
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W048",
+        "pdf_page": 58,
+        "raw_heading": "丁鬼入門課",
+        "reading_note": null,
+        "selected_alias": "傳尸卦",
+        "selected_definition": "丁酉入鬼作鬼是也",
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W049",
+        "pdf_page": 59,
+        "raw_heading": "主來刑客課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W050",
+        "pdf_page": 59,
+        "raw_heading": "神來克將課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W051",
+        "pdf_page": 59,
+        "raw_heading": "客來克主課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "R"
+      },
+      {
+        "occurrence_id": "W052",
+        "pdf_page": 59,
+        "raw_heading": "地戶入天門課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      },
+      {
+        "occurrence_id": "W053",
+        "pdf_page": 59,
+        "raw_heading": "天門入地戶課",
+        "reading_note": null,
+        "selected_alias": null,
+        "selected_definition": null,
+        "side": "L"
+      }
+    ],
+    "independent_transmission_established": false,
+    "inventory_id": "waseda_jinkou_chapter_v1",
+    "observed_heading_occurrences": 53,
+    "raw_inventory_sha256": "5a395c1b5d2b586f3f755d9d6eda6782195e5e0be9e6f009d54077bfdd8f3f86",
+    "reviewed_pdf_pages": [
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60
+    ],
+    "scope": "连续核对PDF49至60的章界及50至59的全部可见题名，实录53次题名、52个不同写法，锁课两次均保留。只选录14条定义和10幅例图，不是全册转录或完整64课答案，也不裁定六条疑义、不证明版本先后或独立传承。",
+    "source_pdf_pages": 90,
+    "unique_raw_headings": 52,
+    "whole_volume_transcription_complete": false
+  },
+  "full_scan_sha256": "94553ff1aba40c0e60f51f229c2c368912e133a09547fb6d7edaa57706f1f220",
+  "full_scan_url": "https://upload.wikimedia.org/wikipedia/commons/2/25/WUL-ro14_02466_%E6%B9%96%E7%A4%BE%E5%8F%A2%E8%A9%B1_06.pdf"
+}

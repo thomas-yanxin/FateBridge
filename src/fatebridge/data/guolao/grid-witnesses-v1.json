@@ -1,0 +1,169 @@
+{
+  "id": "guolao_four_grid_loci_three_scans_v1",
+  "base_binding": {
+    "source_id": "tohoku_luwei_1141_image78_grid_v1",
+    "source_image_sha256": "36d3768ce39dbecb8c07d7669cfd57628ffab0ea09ca536dd4f18b8a669da408",
+    "data_sha256": "ee5f3b6fe1f8871dd62699f07b083b31569fb9fb42c7cc809bb6dfa6b48bf3ab",
+    "marker_data_sha256": "ef191428088c06b5715c88773de0d19b24b94d00b501e2209cb1ce3861b8a92e"
+  },
+  "witnesses": [
+    {
+      "id": "nijl_100238879_image77",
+      "title": "新編評註通玄先生張果星宗大全",
+      "holding": "東北大学附属図書館 藤原文庫4232",
+      "source_url": "https://kokusho.nijl.ac.jp/biblio/100238879",
+      "image_url": "https://kokusho.nijl.ac.jp/api/iiif/100238879/v4/THKW/THKW-04306/THKW-04306-00077.tif/full/full/0/default.jpg",
+      "source_sha256": "28d84dfea60c2410c4bb40ee596f54311b65aa54b93fdc7b32e07dfe0699d3a0",
+      "locator": "NIJL canvas label77 欽天監校正授時過宮度",
+      "credit": "新編評註通玄先生張果星宗大全（東北大学附属図書館所蔵），国文学研究資料館提供"
+    },
+    {
+      "id": "nlc3150_pdf37",
+      "title": "欽定古今圖書集成 第3150冊 博物彙編藝術典 星命部彙考五",
+      "holding": "中國國家圖書館，善本書號12072",
+      "source_url": "https://commons.wikimedia.org/wiki/File:NLC892-411999021002-92845_欽定古今圖書集成_第3150冊.pdf",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/5/5e/NLC892-411999021002-92845_%E6%AC%BD%E5%AE%9A%E5%8F%A4%E4%BB%8A%E5%9C%96%E6%9B%B8%E9%9B%86%E6%88%90_%E7%AC%AC3150%E5%86%8A.pdf",
+      "source_sha256": "2766952041ab8a829dedcc0404a24dd7c22d0b31d3f549cb66752d42d58c315c",
+      "locator": "PDF page37, printed folio35 欽天監校正授時過宮度",
+      "credit": "中國國家圖書館藏；Wikimedia Commons所載原掃描，保留可見水印；PD-scan / Public Domain Mark 1.0"
+    }
+  ],
+  "loci": [
+    {
+      "palace": "子",
+      "column": 1,
+      "readings": [
+        {
+          "witness_id": "nijl_100238879_image77",
+          "cell": {
+            "mansion_marker": "危",
+            "numeral_value": null,
+            "initial_marker": false
+          },
+          "attached": {
+            "mansion": "危",
+            "kind": "integer",
+            "text": "十一",
+            "integer_value": 11
+          }
+        },
+        {
+          "witness_id": "nlc3150_pdf37",
+          "cell": {
+            "mansion_marker": "危",
+            "numeral_value": null,
+            "initial_marker": false
+          },
+          "attached": {
+            "mansion": "危",
+            "kind": "integer",
+            "text": "十一",
+            "integer_value": 11
+          }
+        }
+      ]
+    },
+    {
+      "palace": "辰",
+      "column": 23,
+      "readings": [
+        {
+          "witness_id": "nijl_100238879_image77",
+          "cell": {
+            "mansion_marker": "轸",
+            "numeral_value": null,
+            "initial_marker": false
+          },
+          "attached": {
+            "mansion": "轸",
+            "kind": "integer",
+            "text": "十七",
+            "integer_value": 17
+          }
+        },
+        {
+          "witness_id": "nlc3150_pdf37",
+          "cell": {
+            "mansion_marker": "轸",
+            "numeral_value": null,
+            "initial_marker": false
+          },
+          "attached": {
+            "mansion": "轸",
+            "kind": "integer",
+            "text": "十七",
+            "integer_value": 17
+          }
+        }
+      ]
+    },
+    {
+      "palace": "午",
+      "column": 21,
+      "readings": [
+        {
+          "witness_id": "nijl_100238879_image77",
+          "cell": {
+            "mansion_marker": "柳",
+            "numeral_value": null,
+            "initial_marker": false
+          },
+          "attached": {
+            "mansion": "柳",
+            "kind": "integer",
+            "text": "十三",
+            "integer_value": 13
+          }
+        },
+        {
+          "witness_id": "nlc3150_pdf37",
+          "cell": {
+            "mansion_marker": "柳",
+            "numeral_value": null,
+            "initial_marker": false
+          },
+          "attached": {
+            "mansion": "柳",
+            "kind": "integer",
+            "text": "十三",
+            "integer_value": 13
+          }
+        }
+      ]
+    },
+    {
+      "palace": "午",
+      "column": 15,
+      "readings": [
+        {
+          "witness_id": "nijl_100238879_image77",
+          "cell": {
+            "mansion_marker": "星",
+            "numeral_value": null,
+            "initial_marker": false
+          },
+          "attached": {
+            "mansion": "星",
+            "kind": "integer",
+            "text": "六",
+            "integer_value": 6
+          }
+        },
+        {
+          "witness_id": "nlc3150_pdf37",
+          "cell": {
+            "mansion_marker": "星",
+            "numeral_value": null,
+            "initial_marker": false
+          },
+          "attached": {
+            "mansion": "星",
+            "kind": "integer",
+            "text": "六",
+            "integer_value": 6
+          }
+        }
+      ]
+    }
+  ]
+}

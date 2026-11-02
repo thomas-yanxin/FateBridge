@@ -1,0 +1,359 @@
+{
+  "id": "meihua_household_clauses_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本家宅与屋舍条款及家宅转引条件",
+  "selected_edition_id": "nlc_1925",
+  "source": {
+    "id": "nlc_1925",
+    "title": "文明書局《梅花易數》卷二家宅與屋舍選段",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_indices": [
+      65
+    ],
+    "attribution_scope": "Hosting catalogue metadata; no independent authorship certification"
+  },
+  "comparison_source": {
+    "id": "wikisource_1441921",
+    "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二",
+    "revision": 1441921,
+    "saved_fixed_transcription_wikitext_sha256": "239523c6bb8b59d7ed3fe229c681cd1a1124a5216617e198f05dbf19cc6d2939",
+    "representation": "wikitext",
+    "inherited_plain_text_extraction_sha256": "903b109b37071584ccbf54e15ee10813d32c702bb3d7e690e15d5b77cd0ff7cb",
+    "representations_are_byte_identical": false
+  },
+  "topics": {
+    "household": {
+      "label": "家宅",
+      "section": "家宅占第三",
+      "use_role": "家宅",
+      "header": "凡占家宅以體為主用為家宅",
+      "pdf_index": 65,
+      "original_body_role": "主",
+      "annotation": null
+    },
+    "dwelling": {
+      "label": "屋舍",
+      "section": "屋舍占第四",
+      "use_role": "屋舍",
+      "header": "凡占屋舍以體為主用為屋舍",
+      "pdf_index": 65,
+      "original_body_role": "主",
+      "annotation": "此占卜選居之吉凶"
+    }
+  },
+  "rules": [
+    {
+      "id": "household_body_controls_use",
+      "topic": "household",
+      "relation": "体克用",
+      "source_id": "nlc_1925",
+      "section": "家宅占第三",
+      "quote": "體尅用則家宅多吉",
+      "reading": "所选本记家宅多吉的传统象义，未核定实际居住结果",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_relation_condition": true,
+      "selection_status": "explicit_original_body_use_relation",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體克用，則家宅多吉",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "household_use_controls_body",
+      "topic": "household",
+      "relation": "用克体",
+      "source_id": "nlc_1925",
+      "section": "家宅占第三",
+      "quote": "用尅體則家宅多凶",
+      "reading": "所选本记家宅多凶的历史象义，未据此断言现实住宅危险或灾祸",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_relation_condition": true,
+      "selection_status": "explicit_original_body_use_relation",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用克體，則家宅多凶",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "household_body_generates_use",
+      "topic": "household",
+      "relation": "体生用",
+      "source_id": "nlc_1925",
+      "section": "家宅占第三",
+      "quote": "體生用多耗散或防失盜之憂",
+      "reading": "所选本并记耗散与防失盗之忧；或字保留为原文候选，不断言盗窃已发生或必将发生",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_relation_condition": true,
+      "selection_status": "explicit_original_body_use_relation",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體生用，多耗散，或防失盜之憂",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "household_use_generates_body",
+      "topic": "household",
+      "relation": "用生体",
+      "source_id": "nlc_1925",
+      "section": "家宅占第三",
+      "quote": "用生體多進益或有饋送之喜",
+      "reading": "所选本并记进益与馈送之喜；或字保留为原文候选，未核实收入或实际馈赠",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_relation_condition": true,
+      "selection_status": "explicit_original_body_use_relation",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用生體，多進益，或有饋送之喜",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "household_bili_unadjudicated",
+      "topic": "household",
+      "relation": "体用比和",
+      "source_id": "nlc_1925",
+      "section": "家宅占第三",
+      "quote": "體用比利家宅安穩",
+      "reading": "所选影印印作比利，固定转录作比和；该词与比和的对应尚未裁定，不能仅因五行相同就自动套用家宅安稳句",
+      "semantic_tags": [
+        "source_relation_term_unadjudicated",
+        "same_element_not_automatic_favorable_clause"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_relation_condition": null,
+      "selection_status": "unadjudicated_original_relation_term",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體用比和，家宅安穩",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "dwelling_body_controls_use",
+      "topic": "dwelling",
+      "relation": "体克用",
+      "source_id": "nlc_1925",
+      "section": "屋舍占第四",
+      "quote": "體尅用居之吉",
+      "reading": "所选本记居之吉的传统象义，未核定住宅适居性、结构安全或入住结果",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_relation_condition": true,
+      "selection_status": "explicit_original_body_use_relation",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體克用，居之吉",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "dwelling_use_controls_body",
+      "topic": "dwelling",
+      "relation": "用克体",
+      "source_id": "nlc_1925",
+      "section": "屋舍占第四",
+      "quote": "用尅體居之凶",
+      "reading": "所选本记居之凶的历史象义，未据此断言现实危险或作出迁居决定",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_relation_condition": true,
+      "selection_status": "explicit_original_body_use_relation",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用克體，居之凶",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "dwelling_body_generates_use",
+      "topic": "dwelling",
+      "relation": "体生用",
+      "source_id": "nlc_1925",
+      "section": "屋舍占第四",
+      "quote": "體生用主資財冷退",
+      "reading": "所选影印印作資財冷退，固定转录作資財衰退；保留两处文字，未将传统象义认定为实际财务损失",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_relation_condition": true,
+      "selection_status": "explicit_original_body_use_relation",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體生用，主資財衰退",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "dwelling_use_generates_body",
+      "topic": "dwelling",
+      "relation": "用生体",
+      "source_id": "nlc_1925",
+      "section": "屋舍占第四",
+      "quote": "用生體則門戶興隆",
+      "reading": "所选本记门户兴隆的传统象义，未核实家庭、资产或居住结果",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_relation_condition": true,
+      "selection_status": "explicit_original_body_use_relation",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用生體，則門戶興隆",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "dwelling_same_element",
+      "topic": "dwelling",
+      "relation": "体用比和",
+      "source_id": "nlc_1925",
+      "section": "屋舍占第四",
+      "quote": "體用比和自然安穩",
+      "reading": "所选本记自然安稳的传统象义，未核实住宅安全或实际居住状态",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_relation_condition": true,
+      "selection_status": "explicit_original_body_use_relation",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體用比和，自然安穩",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    }
+  ],
+  "household_support_reference": {
+    "id": "household_refer_to_human_matters_when_generated",
+    "quote": "如有生體之卦即以前章人事占斷之",
+    "comparison_quote": "如有生體之卦，即以前章人事占斷之",
+    "original_pdf_indices": [
+      65
+    ],
+    "selected_actor_scope": "four_actual_internal_auxiliary_roles_use_body_mutual_use_mutual_changed_use",
+    "source_actor_scope_uniquely_adjudicated": false,
+    "reference_destination": "人事占第二",
+    "reference_destination_pdf_indices": [
+      64
+    ],
+    "scope": "Retain actual raw generation roles and the source cross-reference; not a complete cross-chapter or net verdict"
+  },
+  "source_term_adjudications": [
+    {
+      "term": "比利",
+      "topic": "household",
+      "selected_quote": "體用比利家宅安穩",
+      "comparison_quote": "體用比和，家宅安穩",
+      "same_element_is_automatically_source_condition": false,
+      "source_condition_for_same_element": null,
+      "status": "unadjudicated_original_relation_term"
+    },
+    {
+      "term": "冷退",
+      "topic": "dwelling",
+      "selected_quote": "體生用主資財冷退",
+      "comparison_quote": "體生用，主資財衰退",
+      "relationship_condition_changed": false,
+      "status": "literal_witness_difference_retained_not_silently_emended"
+    }
+  ],
+  "scope": "Two explicitly selected human-matter chapters. Raw original body/use clauses and one chapter cross-reference; not field fengshui, a home inspection, actual safety/financial/hazard outcome, or full source synthesis",
+  "unresolved": [
+    "家宅比利与比和是否同义未独立裁定",
+    "生體之卦的全内外范围及完整跨章合参未裁定",
+    "完整互变旺衰及净作用未综合",
+    "未来应期、真实居住状况与现实预测效力未建立"
+  ]
+}

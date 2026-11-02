@@ -1,0 +1,320 @@
+{
+  "call_guidance": {
+    "birth_clock": "numerology_evidence.birth_clock保存同次民用时刻、UTC瞬间、所选计算钟面、经度来源与是否使用。钟表时未给经度为null；太阳钟面不是新的物理瞬间。可用birth_clock视图读取。",
+    "evidence": "按年纳音部、顺逆编号与实际男女或岁运条文解释，缺条和缺字只表示语料缺口。",
+    "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放zone；显式零点有效。真太阳时默认开启，须明确lon或gps_lon；GPS优先，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
+    "method": "默认gu用真实日支，ming为显式月支变法；二者规则来源与结果分别说明。",
+    "pillar_links": "pillar_links视图核numerology_evidence.pillar_links的实际年柱起月干、所用日柱起时干、原句起头与顺行步数。立春前不用公历年干，晚子及太阳钟跨日不用未换日日干替代。干序衔接匹配不证明原典月界、日界、历史钟制或全历法准确；原书个别形式算例含衔接冲突，不能据数算可复现当真实出生盘。",
+    "text_selection": "按benming或实际查询当段verses的selectionShun/selectionNi读五行、编号和上男／中女／下共用岁运栏，不能串栏。pair_resolution区分顺逆同号与两号、单向有文；原书允许顺有逆无或逆有顺无，本地缺行不等于原典圈空，也不能断现实灾祸。1123格经首次目校及同一审阅者原图复读确定；水、火、木、金、土各234格全段目读，其中分别10、11、13、11、2格未决；全表1170格均已目读，47格未决不计入已确定数；目读覆盖不等于读法全部确认、原典全书符合或独立复核完成；火2743、2248及木2816、2917、3315、2424编号经原图复查仍有印章遮盖或首位淡损，暂按继承键定位，number_attribution_status=provisional_inherited_key，三栏均保留未定，正文或圈空可辨不代表号文归属已核；number_reading_evidence保留原图编号片段和unresolved状态，body_reading_status仅分列此前字面正文可读／全圈空／局部圈空／编辑疑读，body_evidence_basis说明非本轮新校正文；14格正文可读不增加已确定数，六行十八格整体仍source_reading_uncertain；part_coverage分部列明覆盖，仍待独立复核。 reading_revision保留原图复读前疑读，rereading_witness记录同馆藏IIIF原图区域；additional_rereading_witnesses另存后续各批，水部旧见证不被覆盖；土部三格复读一格确定、两格仍未定；3377女文晝字形不代表词义已定，晝亦可作畫异体。3379原有檠／晝文字保持，拟改撤回，不生成虚假修订或新增确认数；金部15格旧疑读复读4格确定、11格仍未定，保留麴蘖／追遊世；3314时运只明花字且仍带□，不得抄同号女文或计为整格已核，金部末十一条号文归属问题与字形校勘分开；木部四格旧疑读复读三格确定、一格仍未定，保留撫手／玉藍／門帳字面；2519只补明傾而后一字□不补，不将部分改读计为整格已核；火部11格旧疑读复读六格确定、五格仍未定，旧鴛□改蒼鷹、浩雲按原图保留，暗字可辨但末字仍□不升级，不依熟语改文；水部旧40格疑读经复读30格确定、10格仍未决，新增编号格、独立审阅者、命例和历法时刻均为0，不按典故补字。金部末十一行按所选底本原页号文归属取条，继承同号旧文保留，计算编号不重映射；差异原因及继承语料来源未明，不泛称所有版本错排。○为原页圈空，□为编辑未定；不得按典故补字；2869附诗编号与公式不合、适用未明，未作为通用补文。 所选格的witnesses为文明书局本局部对读，主选文仍为textShun/Ni；不得按吉凶择本、串栏或以对读文补主本○/□。different_text只指字符串不同，未自动裁定版本异文或错字；同一审阅者对读不算独立复核，主本1123格校勘数不随对读36格增加。",
+    "timing": "dayun_method默认bazi_appendix_v1为卷七整数借除，continuous为现代连续折算，legacy为未核旧命宫排法。配运先读timing_policy视图：schedule_basis逐原句标applied_rule／对照，区分所选附法、另书十年背景和现代落点约定；first_row为同次实际首行，旧法保留年龄标签和取文；first_period仅为已映射日期首运摘要，旧法为null，两者均非查询当段。查询读selected，未起运不取首运代替；全运再取periods，完整立春用calendar_boundaries。",
+    "validation": "本命起数有限核对通过不代表起运大运体系或现实预测已经验证。"
+  },
+  "evidence_views": {
+    "birth_clock": {
+      "fields": [
+        "input_normalized",
+        "analysis_context",
+        "four_pillars",
+        "numerology_evidence.birth_clock"
+      ],
+      "purpose": "核对实际民用／太阳钟面、经度来源及是否使用，不补默认出生地点。"
+    },
+    "calendar_boundaries": {
+      "fields": [
+        "canping_timing.solar_year_context",
+        "canping_timing.selected",
+        "liunian_series.solar_context",
+        "liunian_series.year_boundaries",
+        "numerology_evidence.rule_trace"
+      ],
+      "purpose": "核对完整年序的实际立春、所选查询两端及未来钟面条件；派生事件许可不扩大公开模型年份，不解释为寿命或预测认证。"
+    },
+    "natal": {
+      "fields": [
+        "input_normalized",
+        "four_pillars",
+        "element",
+        "benming",
+        "canping_timing.profile_id",
+        "canping_timing.schedule_basis",
+        "numerology_evidence"
+      ],
+      "purpose": "本命取数、实际条文和流派来源。"
+    },
+    "periods": {
+      "fields": [
+        "canping_timing",
+        "dayun",
+        "numerology_evidence"
+      ],
+      "purpose": "完整配运对象、12运及所查询段；仅核方法／首运／当前段可用timing_policy，免首轮连带整组立春来源。完整120年segments按需读取liunian_series。"
+    },
+    "pillar_links": {
+      "fields": [
+        "four_pillars",
+        "numerology_evidence.pillar_links",
+        "numerology_evidence.birth_clock",
+        "numerology_evidence.rule_trace",
+        "numerology_evidence.rulesets"
+      ],
+      "purpose": "核对实际四柱的起月起时原句、基准干与顺行支序；保留历法边界验收范围。"
+    },
+    "text_selection": {
+      "fields": [
+        "input_normalized",
+        "numerology_evidence.birth_clock",
+        "element",
+        "benming",
+        "canping_timing.selected",
+        "numerology_evidence.selected_texts",
+        "numerology_evidence.canping_text_collation",
+        "numerology_evidence.rule_trace",
+        "numerology_evidence.interpretation_constraints"
+      ],
+      "purpose": "核对本命及已查询岁运的实际编号、栏目、缺行／圈空、同号及局部校勘来源。 同时保留本次归一输入与实际计算钟面，供核验所用资料。"
+    },
+    "timing_policy": {
+      "fields": [
+        "input_normalized",
+        "four_pillars",
+        "element",
+        "benming",
+        "numerology_evidence.birth_clock",
+        "canping_timing.profile_id",
+        "canping_timing.schedule_basis",
+        "canping_timing.first_row",
+        "canping_timing.first_period",
+        "canping_timing.selected"
+      ],
+      "purpose": "首轮配运取证：同次出生钟面、实际方法、具名原句／现代日期映射、首运及所查询段；全运或121个立春按需另取。first_row保留同次dayun[0]的编号／栏目与条文；旧命宫法first_period仍为null，首行只有年龄标签，不补日期。"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "input_normalized",
+      "four_pillars",
+      "element",
+      "benming",
+      "canping_timing.profile_id",
+      "canping_timing.schedule_basis",
+      "numerology_evidence"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "analysis_datetime": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "可选带时区ISO时刻，查询实际交运和立春年界后的当段参评数；无默认当前时刻，legacy方法不支持精确时刻查询。"
+      },
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "birth_utc_offset": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional confirmed birth UTC offset ±HH:MM[:SS]. With an IANA zone, verifies or selects the occurrence of a repeated birth clock while retaining regional rules for later boundaries. Never infer an unknown offset; cannot make a nonexistent local time valid or replace birth-record precision."
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "date": {
+        "description": "Birth date YYYY-MM-DD in the proleptic Gregorian calendar, including before 1582; no automatic Julian/Gregorian cutover or historical lunar/era conversion. Historical source dates require a separately evidenced conversion.",
+        "type": "string"
+      },
+      "dayun_method": {
+        "default": "bazi_appendix_v1",
+        "description": "配运政策：默认卷七附子平月柱顺逆、三日折岁借除整日；continuous为现代连续折算；legacy仅复核旧命宫顺排一岁起运，未获原典认证。不是河洛六九年大限。",
+        "enum": [
+          "bazi_appendix_v1",
+          "bazi_continuous_v1",
+          "legacy_minggong_v1"
+        ],
+        "type": "string"
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "gender": {
+        "description": "需明确男/女：选择男女条文及附子平法配运方向；接受male/female，不默认性别。",
+        "type": "string"
+      },
+      "gps_lat": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "GPS latitude"
+      },
+      "gps_lon": {
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Explicit numeric GPS longitude; preferred over lon; zero is valid"
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "lat": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Latitude text or decimal (optional)"
+      },
+      "lon": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Longitude text or decimal; required when true solar time is on"
+      },
+      "method": {
+        "default": "gu",
+        "description": "取法: gu（默认，卷六金锁银匙用八字日支、不用月令）；ming 为月支反向变法，非该段原典算法",
+        "enum": [
+          "gu",
+          "ming"
+        ],
+        "type": "string"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "time": {
+        "description": "Known birth local time HH:MM[:SS[.ffffff]], up to six fractional digits; required, blank is not midnight; timezone goes in zone. Supplied components are retained separately from zero calculation defaults. Textual digits do not certify birth-record precision or imply an uncertainty interval.",
+        "type": "string"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "use_true_solar_time": {
+        "default": true,
+        "description": "Apply true solar time correction (needs lon); default on — 数算 derives from the BaZi pillars",
+        "type": "boolean"
+      },
+      "zone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "+08:00",
+        "description": "IANA zone or UTC offset; omitted/null means fixed +08:00, not historical Asia/Shanghai. Blank/invalid zones and nonexistent clocks are rejected. Repeated clocks require a confirmed birth_utc_offset; the IANA zone remains in use for later boundaries."
+      }
+    },
+    "required": [
+      "date",
+      "time",
+      "gender"
+    ],
+    "type": "object"
+  },
+  "tool": "canping"
+}

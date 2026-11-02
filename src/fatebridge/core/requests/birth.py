@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from typing import Optional
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from fatebridge.core.requests.base import _DeferredModel
+from fatebridge.utils.birth_input import MAX_PERSON_BIRTH_YEAR, MIN_PERSON_BIRTH_YEAR
 
 
 class FateBridgeRequest(_DeferredModel):
@@ -23,7 +24,11 @@ class FateBridgeRequest(_DeferredModel):
             "接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法。"
         ),
     )
-    birth_year: int = Field(description="Birth year, e.g., 1990")
+    birth_year: int = Field(
+        ge=MIN_PERSON_BIRTH_YEAR,
+        le=MAX_PERSON_BIRTH_YEAR,
+        description="Birth year (1900–2100, the existing individual-birth service range)",
+    )
     birth_month: int = Field(ge=1, le=12, description="Birth month (1-12)")
     birth_day: int = Field(ge=1, le=31, description="Birth day (1-31)")
     birth_hour: int = Field(ge=0, le=23, description="Birth hour (0-23)")
@@ -41,10 +46,46 @@ class FateBridgeRequest(_DeferredModel):
         default=True,
         description=(
             "Rebase the birth clock onto true solar time (longitude + equation of "
-            "time). Default on: 八字/紫微 traditionally define the hour pillar / "
-            "命宫 from apparent solar time. Set false for the raw civil clock."
+            "time). Default on in the current software policy; this option does "
+            "not certify a classical text's clock rule. Set false for the raw civil clock."
         ),
     )
+
+
+class BaziClockRequest(FateBridgeRequest):
+    """Known clock components and explicit civil-offset selection for BaZi."""
+
+    birth_utc_offset: Optional[str] = Field(
+        default=None,
+        strict=True,
+        description=(
+            "已确认的出生民用UTC偏移，格式±HH:MM或±HH:MM:SS；用于消歧重复钟时。"
+            "必须与解析出的birth_timezone在该钟时的规则一致；不据此猜测时区，"
+            "不替未知的重复小时选边，不能使跳过的钟时有效。保留原IANA时区用于"
+            "后续交运边界；不认证出生记录精度。未知请省略或传null。"
+        ),
+    )
+
+    birth_second: Optional[int] = Field(
+        default=None,
+        ge=0,
+        le=59,
+        strict=True,
+        description=(
+            "已知出生秒数0–59；提供时必须显式提供birth_minute。"
+            "未知请省略或传null；沿用00秒作为兼容计算参考，并返回省略分量说明，"
+            "不代表已知出生在整分、不推定误差区间或记录精度。不接受闰秒60。"
+        ),
+    )
+
+    @model_validator(mode="after")
+    def seconds_require_minute(self) -> BaziClockRequest:
+        if (
+            self.birth_second is not None
+            and "birth_minute" not in self.model_fields_set
+        ):
+            raise ValueError("birth_second需要显式提供birth_minute；不能替未知分钟填0")
+        return self
 
 
 class AstroBirthRequest(_DeferredModel):
@@ -60,12 +101,11 @@ class AstroBirthRequest(_DeferredModel):
         default=None,
         description=(
             "Birth timezone (IANA name or UTC offset). Optional: when omitted, "
-            "FateBridge infers it from birth_place (same as the BaZi/ZiWei engines) "
-            "and only falls back to UTC if no place is recognized. The default is "
-            "None — never 'UTC' — because a truthy 'UTC' default silently treats an "
-            "eastern wall-clock time as UTC and rotates the whole chart; every "
-            "subclass (chart / relative / timing / lifespan) therefore inherits the "
-            "safe place-inference behavior automatically."
+            "FateBridge may resolve it from a supported birth_place. Western "
+            "charts and timing reject an unresolved civil timezone; coordinates "
+            "alone do not establish a zone. Supply UTC explicitly when that is "
+            "the confirmed recorded basis. Place inference does not certify "
+            "historical clock accuracy."
         ),
     )
     birth_longitude: float = Field(ge=-180, le=180, description="Birth longitude")

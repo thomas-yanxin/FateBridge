@@ -1,0 +1,433 @@
+{
+  "catalogue_id": "letters_1996_archival_circuit_pages_v1",
+  "plan_sha256": "1a7696403a8339c6e3d044a9f722388e344de7add4dfcb0d74505c3252eb63f3",
+  "source": {
+    "title": "From the Book of Letters",
+    "author": "Ra Uru Hu",
+    "copyright_year": 1995,
+    "revision": "Chaitanyo, November1996",
+    "publisher": "New Sun Services International",
+    "url": "https://www.barlenoble.nl/_downloads/2d09d9adaf77b157456f399f0e067b41",
+    "pdf_sha256": "5f24e769126d8dd7f784751e1021fe938417b309f3fee9a19e72359a1dfae6e5",
+    "page_count": 288,
+    "source_kind": "author_attributed_archival_scan_from_public_mirror",
+    "publisher_master_authenticity_certified": false,
+    "scope": "Gate-pair classification facts read from seven scanned channel lists. No original prose, page images or book PDF redistributed."
+  },
+  "topologies": [
+    {
+      "id": "integration",
+      "pdf_page_one_based": 67,
+      "printed_page": 61,
+      "image_read_listed_gate_pairs": [
+        [
+          57,
+          34
+        ],
+        [
+          34,
+          20
+        ],
+        [
+          57,
+          10
+        ],
+        [
+          10,
+          20
+        ]
+      ],
+      "ocr_observed_gate_pairs": [
+        [
+          51,
+          34
+        ],
+        [
+          34,
+          20
+        ],
+        [
+          51,
+          10
+        ],
+        [
+          10,
+          20
+        ]
+      ],
+      "ocr_disagreements": [
+        {
+          "index": 0,
+          "ocr_pair": [
+            51,
+            34
+          ],
+          "image_read_pair": [
+            57,
+            34
+          ],
+          "reason": "Digit 7 in the source image was recognized as 1 in the PDF text layer."
+        },
+        {
+          "index": 2,
+          "ocr_pair": [
+            51,
+            10
+          ],
+          "image_read_pair": [
+            57,
+            10
+          ],
+          "reason": "Digit 7 in the source image was recognized as 1 in the PDF text layer."
+        }
+      ]
+    },
+    {
+      "id": "individual_knowing",
+      "pdf_page_one_based": 70,
+      "printed_page": 64,
+      "image_read_listed_gate_pairs": [
+        [
+          61,
+          24
+        ],
+        [
+          43,
+          23
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          2,
+          14
+        ],
+        [
+          3,
+          60
+        ],
+        [
+          39,
+          55
+        ],
+        [
+          12,
+          22
+        ],
+        [
+          38,
+          28
+        ],
+        [
+          57,
+          20
+        ]
+      ],
+      "ocr_observed_gate_pairs": [
+        [
+          61,
+          24
+        ],
+        [
+          43,
+          23
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          2,
+          14
+        ],
+        [
+          3,
+          60
+        ],
+        [
+          39,
+          55
+        ],
+        [
+          12,
+          22
+        ],
+        [
+          38,
+          28
+        ],
+        [
+          57,
+          20
+        ]
+      ],
+      "ocr_disagreements": []
+    },
+    {
+      "id": "individual_centering",
+      "pdf_page_one_based": 71,
+      "printed_page": 65,
+      "image_read_listed_gate_pairs": [
+        [
+          34,
+          10
+        ],
+        [
+          51,
+          25
+        ]
+      ],
+      "ocr_observed_gate_pairs": [
+        [
+          34,
+          10
+        ],
+        [
+          51,
+          25
+        ]
+      ],
+      "ocr_disagreements": []
+    },
+    {
+      "id": "collective_understanding",
+      "pdf_page_one_based": 72,
+      "printed_page": 66,
+      "image_read_listed_gate_pairs": [
+        [
+          63,
+          4
+        ],
+        [
+          17,
+          62
+        ],
+        [
+          31,
+          7
+        ],
+        [
+          15,
+          5
+        ],
+        [
+          9,
+          52
+        ],
+        [
+          58,
+          18
+        ],
+        [
+          48,
+          16
+        ]
+      ],
+      "ocr_observed_gate_pairs": [
+        [
+          63,
+          4
+        ],
+        [
+          17,
+          62
+        ],
+        [
+          31,
+          7
+        ],
+        [
+          15,
+          5
+        ],
+        [
+          9,
+          52
+        ],
+        [
+          58,
+          18
+        ],
+        [
+          48,
+          16
+        ]
+      ],
+      "ocr_disagreements": []
+    },
+    {
+      "id": "collective_sensing",
+      "pdf_page_one_based": 74,
+      "printed_page": 67,
+      "image_read_listed_gate_pairs": [
+        [
+          64,
+          47
+        ],
+        [
+          11,
+          56
+        ],
+        [
+          33,
+          13
+        ],
+        [
+          46,
+          29
+        ],
+        [
+          42,
+          53
+        ],
+        [
+          30,
+          41
+        ],
+        [
+          35,
+          36
+        ]
+      ],
+      "ocr_observed_gate_pairs": [
+        [
+          64,
+          47
+        ],
+        [
+          11,
+          56
+        ],
+        [
+          33,
+          13
+        ],
+        [
+          46,
+          29
+        ],
+        [
+          42,
+          53
+        ],
+        [
+          30,
+          41
+        ],
+        [
+          35,
+          36
+        ]
+      ],
+      "ocr_disagreements": []
+    },
+    {
+      "id": "tribal_ego",
+      "pdf_page_one_based": 75,
+      "printed_page": 68,
+      "image_read_listed_gate_pairs": [
+        [
+          54,
+          32
+        ],
+        [
+          44,
+          26
+        ],
+        [
+          19,
+          49
+        ],
+        [
+          37,
+          40
+        ],
+        [
+          21,
+          45
+        ]
+      ],
+      "ocr_observed_gate_pairs": [
+        [
+          54,
+          32
+        ],
+        [
+          44,
+          26
+        ],
+        [
+          19,
+          49
+        ],
+        [
+          37,
+          40
+        ],
+        [
+          21,
+          45
+        ]
+      ],
+      "ocr_disagreements": []
+    },
+    {
+      "id": "tribal_defense",
+      "pdf_page_one_based": 76,
+      "printed_page": 69,
+      "image_read_listed_gate_pairs": [
+        [
+          59,
+          6
+        ],
+        [
+          27,
+          50
+        ]
+      ],
+      "ocr_observed_gate_pairs": [
+        [
+          59,
+          6
+        ],
+        [
+          27,
+          50
+        ]
+      ],
+      "ocr_disagreements": []
+    }
+  ],
+  "other_source_disagreements": [
+    {
+      "id": "defense_motor_heading_conflict",
+      "circuit": "tribal_defense",
+      "pdf_page_one_based": 76,
+      "printed_page": 69,
+      "printed_motor_names": [
+        "Root",
+        "Solar Plexus"
+      ],
+      "listed_channel_gate_pairs": [
+        [
+          59,
+          6
+        ],
+        [
+          27,
+          50
+        ]
+      ],
+      "endpoint_implied_motor_centers": [
+        "sacral",
+        "solar_plexus"
+      ],
+      "endpoint_center_basis": "Frozen 2001 gate-center facts; compare actual listed endpoints rather than adopting a heading as a center definition.",
+      "publisher_erratum_obtained": false,
+      "resolved": false
+    }
+  ],
+  "scope": "Direct observations of 36 channel-to-topology assignments in this attributed scan. Separate from six current official direct classifications, 30 old endpoint inferences and modern group membership. No whole-book, semantic, publisher-master or reality certification.",
+  "observation_fixture_sha256": "84f474f27db707323e17ec397e423f6a2b1028d11bcd3abd27c5eda4de8410c7"
+}

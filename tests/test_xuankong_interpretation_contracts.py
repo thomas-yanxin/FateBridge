@@ -12,6 +12,7 @@ from jsonschema import Draft202012Validator
 from fatebridge.application import result_delivery as delivery
 from fatebridge.application.examples import call_guidance, suggested_fields
 from fatebridge.cli import run
+from fatebridge.core import solar_model_policy
 from fatebridge.core.fengshui.models import (
     XuankongInterpretationRequest,
     XuankongRequest,
@@ -19,9 +20,11 @@ from fatebridge.core.fengshui.models import (
 from fatebridge.core.fengshui.natal_interpretation import analyze_natal_interpretation
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.mcp_server import create_mcp_app
+from fatebridge.services import replay_metadata
 from fatebridge.services.fengshui import assess, calculate_xuankong_natal
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.fengshui import payload
+from tests.fixtures.mcp_receipt import assert_same_run_receipt
 from tests.test_fengshui_surfaces import mcp_call, rest_client, without_transport
 
 
@@ -631,9 +634,34 @@ def test_strict_nested_projection_matches_all_transports(monkeypatch, tmp_path, 
     Draft202012Validator(FengshuiOutput.model_json_schema()).validate(cli)
 
 
+@pytest.mark.parametrize(
+    "inventory_count,policy_padding", [(0, 0), (100, 0), (0, 1500)]
+)
 def test_bounded_interpretation_is_read_back_from_the_original_mcp_run(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path, inventory_count, policy_padding
 ):
+    # Delivery fixtures only: neither these file names nor hashes are claimed
+    # to be real ephemeris files or astronomical acceptance observations.
+    files = {
+        f"fixture/{i}.se1": hashlib.sha256(str(i).encode()).hexdigest()
+        for i in range(inventory_count)
+    }
+    monkeypatch.setattr(
+        replay_metadata, "environment_receipt", lambda: {"fixture_only": True}
+    )
+    monkeypatch.setattr(
+        replay_metadata,
+        "ephemeris_inventory",
+        lambda: {"files": files, "sha256": replay_metadata.digest(files)},
+    )
+    # An empty inventory does not imply small runtime metadata: a model policy
+    # can be large on its own. Pin both dimensions explicitly in these fixtures.
+    policy = {"fixture_only": True, "padding": "x" * policy_padding}
+    monkeypatch.setattr(
+        solar_model_policy,
+        "solar_model_environment_receipt",
+        lambda *, observed_de440_models: policy,
+    )
     store = delivery.ResultStore(tmp_path / "results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)
 
@@ -648,12 +676,28 @@ def test_bounded_interpretation_is_read_back_from_the_original_mcp_run(
                 },
             )
             assert not result.is_error
+            assert len(result.content[0].text) <= 4096
             shaped = result.structured_content
             ref = shaped["result_delivery"]
+            if inventory_count or policy_padding:
+                assert (
+                    shaped["run_metadata"]["runtime"]["delivery_path"]
+                    == "run_metadata.runtime"
+                )
+                assert "run_metadata.runtime" in ref["deferred_fields"]
+            else:
+                assert "delivery_path" not in shaped["run_metadata"]["runtime"]
             manifest = json.loads(
                 (await client.read_resource(ref["manifest_uri"]))[0].text
             )
-            assert manifest["run_metadata"] == shaped["run_metadata"]
+            runtime = manifest["run_metadata"]["runtime"]
+            assert runtime["ephemeris"]["files"] == files
+            assert runtime["solar_term_policy"] == policy
+            runtime_chars = len(
+                json.dumps(runtime, ensure_ascii=False, separators=(",", ":"))
+            )
+            assert (runtime_chars > 512) is bool(inventory_count or policy_padding)
+            assert_same_run_receipt(shaped["run_metadata"], manifest["run_metadata"])
             parts = []
             offset = 0
             while True:
@@ -666,7 +710,8 @@ def test_bounded_interpretation_is_read_back_from_the_original_mcp_run(
             raw = "".join(parts)
             assert hashlib.sha256(raw.encode()).hexdigest() == page["sha256"]
             full = json.loads(raw)
-            assert full["run_metadata"] == shaped["run_metadata"]
+            assert full["run_metadata"] == manifest["run_metadata"]
+            assert_same_run_receipt(shaped["run_metadata"], full["run_metadata"])
             assert full["layers"]["xuankong_natal"]["interpretation"]
             return full
 

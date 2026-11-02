@@ -303,7 +303,7 @@ def test_all_cli_catalog_commands_accept_profiles_and_match_schemas(
             else MCP_CASES[spec.tool_name][1]
         )
         return spec.request_model.model_validate(factory()).model_dump(
-            exclude_unset=True
+            mode="json", exclude_unset=True
         )
 
     async def protocol_outputs():

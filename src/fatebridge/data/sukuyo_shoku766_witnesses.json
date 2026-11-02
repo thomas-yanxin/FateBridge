@@ -1,0 +1,84 @@
+{
+  "key": {
+    "lunar_year": 766,
+    "lunar_month": 2,
+    "is_leap_month": false,
+    "research_row_number": 8
+  },
+  "work": "續日本紀卷二十七・天平神護二年",
+  "event_content_anchor": "募運近江國近郡稻穀五萬斛、貯納於松原倉",
+  "retrospective_event_month": 6,
+  "retrospective_event_ganzhi_literal": "丙申",
+  "retrospective_referred_month": 2,
+  "retrospective_referred_day": 20,
+  "same_edict_link_kind": "internal_retrospective_content_match_in_same_work",
+  "genealogical_independence_established": false,
+  "witnesses": [
+    {
+      "witness_id": "ndl_kokushi1897",
+      "catalog_url": "https://ndlsearch.ndl.go.jp/books/R100000039-I991092",
+      "manifest_url": "https://dl.ndl.go.jp/api/iiif/991092/manifest.json",
+      "edition": "経済雑誌社1897年国史大系第2巻・黒板勝美校訂",
+      "locators": [
+        "卷二十七・印页456・frame234右页",
+        "卷二十七・印页461・frame236左页"
+      ],
+      "event_day_ganzhi_literal": "丙午",
+      "retrospective_date_literal": "去二月廿日",
+      "editorial_note_literal": "丙午、原作甲午、據一本改、丙午廿日也、下文六月丙申勅可以證",
+      "editorial_note_witness_identified": false,
+      "february_event_has_literal_day20": false,
+      "images": [
+        {
+          "frame": 234,
+          "sha256": "ad72451fe390320cd91bd41f0a73643f9c24be30a09fc58e068456695522f688",
+          "url": "https://dl.ndl.go.jp/api/iiif/991092/R0000234/full/full/0/default.jpg"
+        },
+        {
+          "frame": 236,
+          "sha256": "f90e54e573b57e4e01c61ca2a7eb786aa97d323cf2fef674f332de9a46612300",
+          "url": "https://dl.ndl.go.jp/api/iiif/991092/R0000236/full/full/0/default.jpg"
+        }
+      ]
+    },
+    {
+      "witness_id": "nijl_ukai_print",
+      "catalog_url": "https://codh.rois.ac.jp/pmjt/book/200018998/",
+      "manifest_url": "https://codh.rois.ac.jp/pmjt/book/200018998/manifest.json",
+      "edition": "国文研鵜飼文庫刊本・目録序跋欄は明暦3年立野春節跋、刊年確定とはしない",
+      "locators": [
+        "卷二十七・叶2・frame701右页",
+        "卷二十七・叶9・frame708左页"
+      ],
+      "event_day_ganzhi_literal": "甲午",
+      "retrospective_date_literal": "去二月二十日",
+      "editorial_note_literal": null,
+      "editorial_note_witness_identified": false,
+      "february_event_has_literal_day20": false,
+      "images": [
+        {
+          "frame": 701,
+          "sha256": "a3cbd8f5a6f77c561b8e1b432993b0456edede1410619b4d5e3aaa15db9c47ec",
+          "url": "https://codh.rois.ac.jp/pmjt/iiif/200018998/200018998_00701.tif/full/full/0/default.jpg"
+        },
+        {
+          "frame": 708,
+          "sha256": "7a57ffa28b32c8af4d0ce850263bf7c112086a2fab0d08eb04d1da36a2aebad3",
+          "url": "https://codh.rois.ac.jp/pmjt/iiif/200018998/200018998_00708.tif/full/full/0/default.jpg"
+        }
+      ]
+    }
+  ],
+  "source_id": "shoku766_selected_witnesses_v1",
+  "before_production_source_facts_sha256": "f207ffd8d4adf29ac9f6d51c5328eb3ce8ed8087ef7388b101bbc69f9453967d",
+  "evaluation_policy": {
+    "root_model_selected_image_reading": true,
+    "human_or_blind_collation": false,
+    "february_day20_is_retrospective_link_not_literal": true,
+    "all327_original_records_collated": false,
+    "all_cited_works_acquired": false,
+    "unique_historical_calendar_adjudicated": false,
+    "selected_host_rewritten": false,
+    "day_boundary_or_leap_short_precedence_established": false
+  }
+}

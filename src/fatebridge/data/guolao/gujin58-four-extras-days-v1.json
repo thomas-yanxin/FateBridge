@@ -1,0 +1,418 @@
+{
+  "model_id": "gujin58_printed_four_extras_days_v1",
+  "source": {
+    "author": "明 邢云路",
+    "title": "古今律历考卷58，文渊阁四库全书787册",
+    "source_url": "https://commons.wikimedia.org/w/index.php?curid=71219540",
+    "text_revision_url": "https://zh.wikisource.org/w/index.php?title=古今律厯考_(四庫全書本)/卷58&oldid=771724",
+    "upstream_djvu_sha1_from_api_not_full_local_verification": "7c6f1c78f8bb9d363156af7b87a45986db69663a",
+    "licence": "PD-old / public-domain historical work and mechanical scans",
+    "independent_second_collator": false
+  },
+  "half_node_period_days": "3396.7216",
+  "tables": {
+    "purple": {
+      "direction": "forward",
+      "entry_kind": "initial_degree",
+      "phase_origin": "箕初",
+      "period_days": "10227.1792",
+      "printed_days_per_du": "28",
+      "intervals": [
+        {
+          "mansion": "箕",
+          "end_phase_days": "268.52"
+        },
+        {
+          "mansion": "斗",
+          "end_phase_days": "925.68"
+        },
+        {
+          "mansion": "牛",
+          "end_phase_days": "1118.88"
+        },
+        {
+          "mansion": "女",
+          "end_phase_days": "1430.24"
+        },
+        {
+          "mansion": "虚",
+          "end_phase_days": "1682.4192"
+        },
+        {
+          "mansion": "危",
+          "end_phase_days": "2129.0192"
+        },
+        {
+          "mansion": "室",
+          "end_phase_days": "2641.9792"
+        },
+        {
+          "mansion": "壁",
+          "end_phase_days": "2903.4992"
+        },
+        {
+          "mansion": "奎",
+          "end_phase_days": "3403.8592"
+        },
+        {
+          "mansion": "娄",
+          "end_phase_days": "3749.9392"
+        },
+        {
+          "mansion": "胃",
+          "end_phase_days": "4192.6192"
+        },
+        {
+          "mansion": "昴",
+          "end_phase_days": "4502.8592"
+        },
+        {
+          "mansion": "毕",
+          "end_phase_days": "4964.8592"
+        },
+        {
+          "mansion": "觜",
+          "end_phase_days": "4966.2592"
+        },
+        {
+          "mansion": "参",
+          "end_phase_days": "5254.0992"
+        },
+        {
+          "mansion": "井",
+          "end_phase_days": "6122.9392"
+        },
+        {
+          "mansion": "鬼",
+          "end_phase_days": "6182.0192"
+        },
+        {
+          "mansion": "柳",
+          "end_phase_days": "6546.0192"
+        },
+        {
+          "mansion": "星",
+          "end_phase_days": "6722.6992"
+        },
+        {
+          "mansion": "张",
+          "end_phase_days": "7220.8192"
+        },
+        {
+          "mansion": "翼",
+          "end_phase_days": "7783.3392"
+        },
+        {
+          "mansion": "轸",
+          "end_phase_days": "8308.3392"
+        },
+        {
+          "mansion": "角",
+          "end_phase_days": "8668.6992"
+        },
+        {
+          "mansion": "亢",
+          "end_phase_days": "8936.3792"
+        },
+        {
+          "mansion": "氐",
+          "end_phase_days": "9395.5792"
+        },
+        {
+          "mansion": "房",
+          "end_phase_days": "9549.0192"
+        },
+        {
+          "mansion": "心",
+          "end_phase_days": "9724.5792"
+        },
+        {
+          "mansion": "尾",
+          "end_phase_days": "10227.1792"
+        }
+      ],
+      "image_pages": [
+        647,
+        648
+      ]
+    },
+    "apogee": {
+      "direction": "forward",
+      "entry_kind": "initial_degree",
+      "phase_origin": "箕初",
+      "period_days": "3231.9684",
+      "printed_days_per_du": "8.848492",
+      "intervals": [
+        {
+          "mansion": "箕",
+          "end_phase_days": "84.8570"
+        },
+        {
+          "mansion": "斗",
+          "end_phase_days": "292.5312"
+        },
+        {
+          "mansion": "牛",
+          "end_phase_days": "353.5858"
+        },
+        {
+          "mansion": "女",
+          "end_phase_days": "451.9810"
+        },
+        {
+          "mansion": "虚",
+          "end_phase_days": "531.6741"
+        },
+        {
+          "mansion": "危",
+          "end_phase_days": "672.8075"
+        },
+        {
+          "mansion": "室",
+          "end_phase_days": "834.9119"
+        },
+        {
+          "mansion": "壁",
+          "end_phase_days": "917.5568"
+        },
+        {
+          "mansion": "奎",
+          "end_phase_days": "1075.6793"
+        },
+        {
+          "mansion": "娄",
+          "end_phase_days": "1185.0467"
+        },
+        {
+          "mansion": "胃",
+          "end_phase_days": "1324.9414"
+        },
+        {
+          "mansion": "昴",
+          "end_phase_days": "1422.9827"
+        },
+        {
+          "mansion": "毕",
+          "end_phase_days": "1568.9828"
+        },
+        {
+          "mansion": "觜",
+          "end_phase_days": "1569.4252"
+        },
+        {
+          "mansion": "参",
+          "end_phase_days": "1660.3877"
+        },
+        {
+          "mansion": "井",
+          "end_phase_days": "1934.9564"
+        },
+        {
+          "mansion": "鬼",
+          "end_phase_days": "1953.6267"
+        },
+        {
+          "mansion": "柳",
+          "end_phase_days": "2068.6571"
+        },
+        {
+          "mansion": "星",
+          "end_phase_days": "2124.4911"
+        },
+        {
+          "mansion": "张",
+          "end_phase_days": "2281.9058"
+        },
+        {
+          "mansion": "翼",
+          "end_phase_days": "2459.6720"
+        },
+        {
+          "mansion": "轸",
+          "end_phase_days": "2625.5812"
+        },
+        {
+          "mansion": "角",
+          "end_phase_days": "2739.4613"
+        },
+        {
+          "mansion": "亢",
+          "end_phase_days": "2824.0529"
+        },
+        {
+          "mansion": "氐",
+          "end_phase_days": "2969.1682"
+        },
+        {
+          "mansion": "房",
+          "end_phase_days": "3017.6579"
+        },
+        {
+          "mansion": "心",
+          "end_phase_days": "3073.1380"
+        },
+        {
+          "mansion": "尾",
+          "end_phase_days": "3231.9684"
+        }
+      ],
+      "image_pages": [
+        648,
+        649
+      ]
+    },
+    "nodes": {
+      "direction": "reverse",
+      "entry_kind": "final_degree",
+      "phase_origin": "尾末",
+      "period_days": "6793.4432",
+      "printed_days_per_du": "18.59910776",
+      "intervals": [
+        {
+          "mansion": "尾",
+          "end_phase_days": "333.8539"
+        },
+        {
+          "mansion": "心",
+          "end_phase_days": "450.4704"
+        },
+        {
+          "mansion": "房",
+          "end_phase_days": "552.3935"
+        },
+        {
+          "mansion": "氐",
+          "end_phase_days": "857.4188"
+        },
+        {
+          "mansion": "亢",
+          "end_phase_days": "1035.2263"
+        },
+        {
+          "mansion": "角",
+          "end_phase_days": "1274.5968"
+        },
+        {
+          "mansion": "轸",
+          "end_phase_days": "1623.3301"
+        },
+        {
+          "mansion": "翼",
+          "end_phase_days": "1996.9862"
+        },
+        {
+          "mansion": "张",
+          "end_phase_days": "2327.8643"
+        },
+        {
+          "mansion": "星",
+          "end_phase_days": "2445.2247"
+        },
+        {
+          "mansion": "柳",
+          "end_phase_days": "2687.0131"
+        },
+        {
+          "mansion": "鬼",
+          "end_phase_days": "2726.2572"
+        },
+        {
+          "mansion": "井",
+          "end_phase_days": "3303.3876"
+        },
+        {
+          "mansion": "参",
+          "end_phase_days": "3494.5864"
+        },
+        {
+          "mansion": "觜",
+          "end_phase_days": "3495.5164"
+        },
+        {
+          "mansion": "毕",
+          "end_phase_days": "3802.4016"
+        },
+        {
+          "mansion": "昴",
+          "end_phase_days": "4008.4797"
+        },
+        {
+          "mansion": "胃",
+          "end_phase_days": "4302.5316"
+        },
+        {
+          "mansion": "娄",
+          "end_phase_days": "4532.4166"
+        },
+        {
+          "mansion": "奎",
+          "end_phase_days": "4864.7826"
+        },
+        {
+          "mansion": "壁",
+          "end_phase_days": "5038.4983"
+        },
+        {
+          "mansion": "室",
+          "end_phase_days": "5379.2340"
+        },
+        {
+          "mansion": "危",
+          "end_phase_days": "5675.8897"
+        },
+        {
+          "mansion": "虚",
+          "end_phase_days": "5843.4007"
+        },
+        {
+          "mansion": "女",
+          "end_phase_days": "6050.2228"
+        },
+        {
+          "mansion": "牛",
+          "end_phase_days": "6178.5567"
+        },
+        {
+          "mansion": "斗",
+          "end_phase_days": "6615.0777"
+        },
+        {
+          "mansion": "箕",
+          "end_phase_days": "6793.4432"
+        }
+      ],
+      "image_pages": [
+        650,
+        651
+      ]
+    }
+  },
+  "factors": {
+    "purple": {
+      "name": "紫气",
+      "offset_days": "1256.5224",
+      "table": "purple"
+    },
+    "apogee": {
+      "name": "月孛",
+      "offset_days": "2384.1092",
+      "table": "apogee"
+    },
+    "rahu": {
+      "name": "罗睺",
+      "offset_days": "1680.8602",
+      "table": "nodes"
+    },
+    "ketu": {
+      "name": "计都",
+      "offset_days": "5077.5818",
+      "table": "nodes"
+    }
+  },
+  "entry_semantics": "Printed cumulative value under mansion X is the exit from X and entry into the next mansion along the declared direction. Exact endpoints use the newly entered mansion; no historical fractional-degree interpolation accepted for apogee/nodes.",
+  "printed_cumulative_days_authoritative_for_placement": true,
+  "period_or_widths_normalized": false,
+  "modern_epoch_calibrated": false,
+  "used_in_native_birth_chart": false,
+  "gujin58_header_variants_resolved": false
+}

@@ -1,0 +1,31 @@
+{
+  "source": {
+    "publisher": "Jovian Archive",
+    "title": "Part 2: Stephen King's Definition & Channels",
+    "url": "https://jovianarchive.com/blogs/chart-interpretations-components/keynoting-stephen-kings-design-part-2",
+    "download_sha256": "fc9247824a3ed4658a08577d48fe113b8f16b636eaebb2916008294a487f9992",
+    "section": "The Hard Wiring: Definition & Channels",
+    "scope": "Six channel classifications explicitly identified in the official teaching. Biographical, health and predictive claims are not adopted; no birth-clock authentication inferred."
+  },
+  "group_source": {
+    "publisher": "Jovian Archive",
+    "title": "What is Circuitry in Human Design?",
+    "url": "https://jovianarchive.com/pages/what-is-circuitry-in-human-design",
+    "download_sha256": "11fec3c1d8dede92bae2ee5a0553deca41069e2e6aaa245dacfa0a8237ea9ec4",
+    "scope": "Three circuit groups and keynotes; Integration is reported separately from Knowing/Centering. No personality measurement or reality-based inference."
+  },
+  "coupled_channels": [
+    {"gates": [10, 20], "circuit": "integration"},
+    {"gates": [10, 57], "circuit": "integration"},
+    {"gates": [20, 34], "circuit": "integration"},
+    {"gates": [34, 57], "circuit": "integration"},
+    {"gates": [10, 34], "circuit": "individual_centering"},
+    {"gates": [20, 57], "circuit": "individual_knowing"}
+  ],
+  "circuit_groups": {
+    "individual": {"keynote": "empowerment", "circuits": ["individual_knowing", "individual_centering"]},
+    "collective": {"keynote": "sharing", "circuits": ["collective_understanding", "collective_sensing"]},
+    "tribal": {"keynote": "support", "circuits": ["tribal_ego", "tribal_defense"]}
+  },
+  "scope": "Independent factual transcription; not generated from FateBridge's channel table. Other channel classifications may only be inferred from matching endpoint labels in the 2001 source and must retain that weaker evidence status."
+}

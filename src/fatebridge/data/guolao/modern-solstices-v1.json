@@ -1,0 +1,457 @@
+{
+  "schema": "guolao_horizons_seasons_tt_clock_reference_v1",
+  "profile_id": "guolao_horizons_seasons_tt_clock_reference_v1",
+  "source_urls": [
+    "https://ssd.jpl.nasa.gov/horizons/manual.html",
+    "https://ssd-api.jpl.nasa.gov/doc/horizons_file.html"
+  ],
+  "plan": {
+    "model_id": "guolao_horizons_seasons_tt_clock_reference_v1",
+    "cohort": [
+      {
+        "id": "winter1277",
+        "year": 1277,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      {
+        "id": "summer1278",
+        "year": 1278,
+        "kind": "summer",
+        "target_deg": 90,
+        "gregorian_month": 6,
+        "start_day": 18
+      },
+      {
+        "id": "winter1278",
+        "year": 1278,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      {
+        "id": "summer1279",
+        "year": 1279,
+        "kind": "summer",
+        "target_deg": 90,
+        "gregorian_month": 6,
+        "start_day": 18
+      },
+      {
+        "id": "winter1279",
+        "year": 1279,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      {
+        "id": "winter1280",
+        "year": 1280,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      {
+        "id": "winter1598",
+        "year": 1598,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      {
+        "id": "spring1599",
+        "year": 1599,
+        "kind": "spring",
+        "target_deg": 0,
+        "gregorian_month": 3,
+        "start_day": 18
+      },
+      {
+        "id": "summer1599",
+        "year": 1599,
+        "kind": "summer",
+        "target_deg": 90,
+        "gregorian_month": 6,
+        "start_day": 18
+      },
+      {
+        "id": "autumn1599",
+        "year": 1599,
+        "kind": "autumn",
+        "target_deg": 180,
+        "gregorian_month": 9,
+        "start_day": 21
+      },
+      {
+        "id": "winter1599",
+        "year": 1599,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      {
+        "id": "winter1607",
+        "year": 1607,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      {
+        "id": "winter2000",
+        "year": 2000,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      {
+        "id": "winter2026",
+        "year": 2026,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      }
+    ],
+    "window_days": 5,
+    "coarse_step_days": "1/4",
+    "reference_bisection_rounds": 15,
+    "target_reference_bracket_width_seconds": "0.6591796875",
+    "collector_imports_fatebridge": false,
+    "prior_paper_and_source_dates_known": true,
+    "independent_or_unseen_holdout": false,
+    "geocenter_quantities": "30,31",
+    "timescale": "TT",
+    "calendar": "proleptic_gregorian",
+    "observer": "500@399",
+    "atmosphere": "AIRLESS",
+    "requested_reference_backend": "DE441",
+    "expected_native_comparison_backend": "moshier",
+    "nominal_comparison_warning_seconds": 60,
+    "warning_line_is_accuracy_certificate": false,
+    "clock_reference_site": {
+      "longitude_east_deg": "116.4",
+      "latitude_deg": "40",
+      "height_km": "0",
+      "role": "declared_approximate_meridian_clock_comparison_site_not_verified_historical_observatory"
+    },
+    "clock_quantities": "30,34",
+    "site_tuned_from_comparison": false,
+    "source_55_06_constant_to_be_changed": false,
+    "source_time_calibration_accepted": false
+  },
+  "reference_brackets": [
+    {
+      "case": {
+        "id": "winter1277",
+        "year": 1277,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      "lower_tt_jd_exact": "286763192751/131072",
+      "upper_tt_jd_exact": "17922699547/8192",
+      "lower_longitude": "269.9999926",
+      "upper_longitude": "270.0000004"
+    },
+    {
+      "case": {
+        "id": "summer1278",
+        "year": 1278,
+        "kind": "summer",
+        "target_deg": 90,
+        "gregorian_month": 6,
+        "start_day": 18
+      },
+      "lower_tt_jd_exact": "143393561883/65536",
+      "upper_tt_jd_exact": "286787123767/131072",
+      "lower_longitude": "89.9999970",
+      "upper_longitude": "90.0000042"
+    },
+    {
+      "case": {
+        "id": "winter1278",
+        "year": 1278,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      "lower_tt_jd_exact": "286811065271/131072",
+      "upper_tt_jd_exact": "35851383159/16384",
+      "lower_longitude": "269.9999961",
+      "upper_longitude": "270.0000038"
+    },
+    {
+      "case": {
+        "id": "summer1279",
+        "year": 1279,
+        "kind": "summer",
+        "target_deg": 90,
+        "gregorian_month": 6,
+        "start_day": 18
+      },
+      "lower_tt_jd_exact": "143417498261/65536",
+      "upper_tt_jd_exact": "286834996523/131072",
+      "lower_longitude": "89.9999969",
+      "upper_longitude": "90.0000042"
+    },
+    {
+      "case": {
+        "id": "winter1279",
+        "year": 1279,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      "lower_tt_jd_exact": "286858937925/131072",
+      "upper_tt_jd_exact": "143429468963/65536",
+      "lower_longitude": "269.9999961",
+      "upper_longitude": "270.0000038"
+    },
+    {
+      "case": {
+        "id": "winter1280",
+        "year": 1280,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      "lower_tt_jd_exact": "71726702739/32768",
+      "upper_tt_jd_exact": "286906810957/131072",
+      "lower_longitude": "269.9999976",
+      "upper_longitude": "270.0000054"
+    },
+    {
+      "case": {
+        "id": "winter1598",
+        "year": 1598,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      "lower_tt_jd_exact": "302130458225/131072",
+      "upper_tt_jd_exact": "151065229113/65536",
+      "lower_longitude": "269.9999965",
+      "upper_longitude": "270.0000042"
+    },
+    {
+      "case": {
+        "id": "spring1599",
+        "year": 1599,
+        "kind": "spring",
+        "target_deg": 0,
+        "gregorian_month": 3,
+        "start_day": 18
+      },
+      "lower_tt_jd_exact": "151071072465/65536",
+      "upper_tt_jd_exact": "302142144931/131072",
+      "lower_longitude": "359.9999928",
+      "upper_longitude": "0.0000003"
+    },
+    {
+      "case": {
+        "id": "summer1599",
+        "year": 1599,
+        "kind": "summer",
+        "target_deg": 90,
+        "gregorian_month": 6,
+        "start_day": 18
+      },
+      "lower_tt_jd_exact": "75538585271/32768",
+      "upper_tt_jd_exact": "302154341085/131072",
+      "lower_longitude": "89.9999939",
+      "upper_longitude": "90.0000012"
+    },
+    {
+      "case": {
+        "id": "autumn1599",
+        "year": 1599,
+        "kind": "autumn",
+        "target_deg": 180,
+        "gregorian_month": 9,
+        "start_day": 21
+      },
+      "lower_tt_jd_exact": "151083295877/65536",
+      "upper_tt_jd_exact": "302166591755/131072",
+      "lower_longitude": "179.9999947",
+      "upper_longitude": "180.0000022"
+    },
+    {
+      "case": {
+        "id": "winter1599",
+        "year": 1599,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      "lower_tt_jd_exact": "151089165497/65536",
+      "upper_tt_jd_exact": "302178330995/131072",
+      "lower_longitude": "269.9999948",
+      "upper_longitude": "270.0000025"
+    },
+    {
+      "case": {
+        "id": "winter1607",
+        "year": 1607,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      "lower_tt_jd_exact": "37820164621/16384",
+      "upper_tt_jd_exact": "302561316969/131072",
+      "lower_longitude": "269.9999947",
+      "upper_longitude": "270.0000024"
+    },
+    {
+      "case": {
+        "id": "winter2000",
+        "year": 2000,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      "lower_tt_jd_exact": "160687722883/65536",
+      "upper_tt_jd_exact": "321375445767/131072",
+      "lower_longitude": "269.9999930",
+      "upper_longitude": "270.0000008"
+    },
+    {
+      "case": {
+        "id": "winter2026",
+        "year": 2026,
+        "kind": "winter",
+        "target_deg": 270,
+        "gregorian_month": 12,
+        "start_day": 19
+      },
+      "lower_tt_jd_exact": "322620144881/131072",
+      "upper_tt_jd_exact": "161310072441/65536",
+      "lower_longitude": "269.9999929",
+      "upper_longitude": "270.0000007"
+    }
+  ],
+  "historical_clock_rows": [
+    {
+      "case_id": "winter1277",
+      "year": 1277,
+      "tt_jd_exact": "573526385503/262144",
+      "TDB_minus_UT1_seconds": "733.278643",
+      "apparent_solar_hours": "8.3862231753"
+    },
+    {
+      "case_id": "summer1278",
+      "year": 1278,
+      "tt_jd_exact": "573574247533/262144",
+      "TDB_minus_UT1_seconds": "732.179425",
+      "apparent_solar_hours": "22.2837018331"
+    },
+    {
+      "case_id": "winter1278",
+      "year": 1278,
+      "tt_jd_exact": "573622130543/262144",
+      "TDB_minus_UT1_seconds": "731.080742",
+      "apparent_solar_hours": "14.1070453432"
+    },
+    {
+      "case_id": "summer1279",
+      "year": 1279,
+      "tt_jd_exact": "573669993045/262144",
+      "TDB_minus_UT1_seconds": "729.983540",
+      "apparent_solar_hours": "4.0475114643"
+    },
+    {
+      "case_id": "winter1279",
+      "year": 1279,
+      "tt_jd_exact": "573717875851/262144",
+      "TDB_minus_UT1_seconds": "728.886877",
+      "apparent_solar_hours": "19.8523655848"
+    },
+    {
+      "case_id": "winter1280",
+      "year": 1280,
+      "tt_jd_exact": "573813621913/262144",
+      "TDB_minus_UT1_seconds": "726.696991",
+      "apparent_solar_hours": "1.6666783650"
+    },
+    {
+      "case_id": "winter1598",
+      "year": 1598,
+      "tt_jd_exact": "604260916451/262144",
+      "TDB_minus_UT1_seconds": "112.090762",
+      "apparent_solar_hours": "6.9191287644"
+    },
+    {
+      "case_id": "spring1599",
+      "year": 1599,
+      "tt_jd_exact": "604284289861/262144",
+      "TDB_minus_UT1_seconds": "111.702751",
+      "apparent_solar_hours": "10.6778004609"
+    },
+    {
+      "case_id": "summer1599",
+      "year": 1599,
+      "tt_jd_exact": "604308682169/262144",
+      "TDB_minus_UT1_seconds": "111.298357",
+      "apparent_solar_hours": "11.9747130380"
+    },
+    {
+      "case_id": "autumn1599",
+      "year": 1599,
+      "tt_jd_exact": "604333183509/262144",
+      "TDB_minus_UT1_seconds": "110.892703",
+      "apparent_solar_hours": "23.2811267538"
+    },
+    {
+      "case_id": "winter1599",
+      "year": 1599,
+      "tt_jd_exact": "604356661989/262144",
+      "TDB_minus_UT1_seconds": "110.504499",
+      "apparent_solar_hours": "12.6854764626"
+    },
+    {
+      "case_id": "winter1607",
+      "year": 1607,
+      "tt_jd_exact": "605122633937/262144",
+      "TDB_minus_UT1_seconds": "98.133443",
+      "apparent_solar_hours": "11.5156474968"
+    }
+  ],
+  "reference_backend": "DE441",
+  "actual_signature": {
+    "source": "NASA/JPL Horizons API",
+    "version": "1.0"
+  },
+  "clock_reference_site": {
+    "longitude_east_deg": "116.4",
+    "latitude_deg": "40",
+    "height_km": "0",
+    "role": "declared_approximate_meridian_clock_comparison_site_not_verified_historical_observatory"
+  },
+  "source_component_data_hashes": {
+    "gnomon-epoch-v1.json": "643a9b7ebcd5d9797cc57ce17aebf3c7df95f4dca8011851ce224b09a19b4e3b",
+    "gnomon-epoch-collation-v1.json": "3b44557a61cc9b840d27197527e5c35f11daa9766977cd2674701b346cbdc31d",
+    "calendar-date-bridge-v1.json": "6857f16f84c94d01d3b401a8a0985a9a5851886cf09e3af21e231c0ea3f31644",
+    "shoushi-year-labels-v1.json": "17a9e2f7383d718eec56ec1e81d8b98583f256c01be36dea22888ebc58f019d3",
+    "gujin43-cardinals-v1.json": "6eac47d7bc6c12f96c73a548de940780513bf261dba78930ca240c22d2fe6a3d",
+    "huangchi-v1.json": "525a0deeca8c2f3f1c024162531b4f4d8b8cf18922378ad23d523d60e4b821bd"
+  },
+  "historical_clock_uncertainty_quantified": false,
+  "source_epoch_calibrated": false,
+  "used_in_native_birth_chart": false
+}

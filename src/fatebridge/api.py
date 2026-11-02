@@ -270,10 +270,9 @@ REQUEST_METRICS = RuntimeMetrics()
 
 
 def _build_readiness_payload() -> Dict[str, Any]:
-    western_kerykeion_available = (
-        astrology_predictive_core.AstrologicalSubjectFactory is not None
-        and astrology_predictive_core.PlanetaryReturnFactory is not None
-    )
+    from importlib.util import find_spec
+
+    western_swisseph_available = astrology_predictive_core.swe is not None
     checks: Dict[str, Dict[str, Any]] = {
         "core_api": {
             "ok": True,
@@ -287,11 +286,11 @@ def _build_readiness_payload() -> Dict[str, Any]:
             "fallback_available": True,
         },
         "western_predictive_runtime": {
-            "ok": western_kerykeion_available
-            and astrology_predictive_core.swe is not None,
+            "ok": western_swisseph_available,
             "required": False,
             "swisseph_available": astrology_predictive_core.swe is not None,
-            "kerykeion_available": western_kerykeion_available,
+            "kerykeion_available": find_spec("kerykeion") is not None,
+            "engine_backend": "fatebridge_swisseph_native",
         },
         "api_key_auth": {
             "ok": True,
@@ -427,14 +426,13 @@ async def _request_validation_error_envelope(
     request: Request, exc: RequestValidationError
 ) -> JSONResponse:
     # Validation errors may contain the submitted body or secrets in messages.
+    result = correlate_error(
+        validation_error_result(exc),
+        safe_correlation(dict(request.query_params)),
+    )
     return JSONResponse(
-        status_code=422,
-        content=_build_error_detail(
-            correlate_error(
-                validation_error_result(exc),
-                safe_correlation(dict(request.query_params)),
-            )
-        ),
+        status_code=result["status_code"],
+        content=_build_error_detail(result),
     )
 
 
@@ -617,6 +615,28 @@ async def result_page(
         return RESULT_STORE.page(result_id, offset, path)
     except ParameterError as exc:
         raise HTTPException(status_code=404, detail=exc.as_result()) from None
+
+
+@app.get("/api/results/{result_id}/verified")
+async def verified_result_page(
+    result_id: str,
+    expected_sha256: str = Query(pattern=r"^[0-9a-f]{64}$"),
+    expected_run_id: str = Query(pattern=r"^[A-Za-z0-9_-]{1,128}$"),
+    offset: int = Query(default=0, ge=0),
+    path: Optional[str] = Query(default=None, max_length=1000),
+) -> Dict[str, Any]:
+    """Verify the full original payload before reading one bounded page."""
+    try:
+        return await run_in_threadpool(
+            RESULT_STORE.verified_page,
+            result_id,
+            expected_sha256,
+            expected_run_id,
+            offset,
+            path,
+        )
+    except ParameterError as exc:
+        raise HTTPException(status_code=422, detail=exc.as_result()) from None
 
 
 @app.get("/api/tools")

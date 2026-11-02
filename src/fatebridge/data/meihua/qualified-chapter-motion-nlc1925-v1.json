@@ -1,0 +1,95 @@
+{
+  "id": "meihua_qualified_chapter_motion_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本出行初体与行人初用的多字限定读法",
+  "source": {
+    "id": "nlc_1925",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_indices": [
+      69
+    ],
+    "printed_leaf": "卷二一六",
+    "reader": "assistant direct visual reading; scoped grammatical interpretation; no independent expert review"
+  },
+  "lexical_reference": {
+    "title": "教育部重編國語辭典修訂本 多",
+    "url": "https://dict.revised.moe.edu.tw/dictView.jsp?ID=2316&la=0&powerMode=0",
+    "raw_sha256": "f1b62d54c38fbf56db503125ea0e5c83dd15528740bc57f86bc12cbb9d99b557",
+    "support": "Adverbial senses are licensed; this does not authenticate the book reading."
+  },
+  "reading_status": "declared_scoped_grammatical_reading_not_independent_expert_adjudication",
+  "rows": [
+    {
+      "id": "travel_body_qian_zhen",
+      "topic": "travel",
+      "source_subject": "體卦",
+      "role": "body",
+      "role_key": "body_trigram",
+      "trigrams": [
+        "乾",
+        "震"
+      ],
+      "quote": "體卦乾震多主動",
+      "qualified_predicate": "多主動"
+    },
+    {
+      "id": "travel_body_kun_gen",
+      "topic": "travel",
+      "source_subject": "體卦 (inherited subject in the adjacent parallel clause)",
+      "role": "body",
+      "role_key": "body_trigram",
+      "trigrams": [
+        "坤",
+        "艮"
+      ],
+      "quote": "坤艮多主不動",
+      "qualified_predicate": "多主不動"
+    },
+    {
+      "id": "traveler_use_zhen",
+      "topic": "traveler",
+      "source_subject": "又以用卦為行人之盈旺",
+      "role": "use",
+      "role_key": "use_trigram",
+      "trigrams": [
+        "震"
+      ],
+      "quote": "震多不寧",
+      "qualified_predicate": "多不寧"
+    },
+    {
+      "id": "traveler_use_gen",
+      "topic": "traveler",
+      "source_subject": "又以用卦為行人之盈旺",
+      "role": "use",
+      "role_key": "use_trigram",
+      "trigrams": [
+        "艮"
+      ],
+      "quote": "艮多有阻",
+      "qualified_predicate": "多有阻"
+    }
+  ],
+  "summary_templates": {
+    "matched": "限定主体读法：{role_label}{trigram}对应“{quote}”，仅列“{qualified_predicate}”的原典限定象义；未量化“多”，不替代内卦角色动静或现场事实。",
+    "not_matched": "限定主体读法：{role_label}{trigram}未触及本读法所列多字句，未由此推出相反结论；未量化“多”，不替代内卦角色动静或现场事实。"
+  },
+  "inner_role_comparison": {
+    "original_pdf_index": 110,
+    "printed_leaf": "卷三九",
+    "quote": "夫體卦為靜互卦為靜用卦變卦則動也此內卦之動靜也",
+    "scope": "separate inner symbolic-role motion, not cancelled by the chapter category reading"
+  },
+  "scope": [
+    "Each candidate owns its original body/use; do not reuse the primary cast actor on alternatives.",
+    "No inference from nonmatching category to the opposite outcome.",
+    "Month strength, control edges, initial body-use clauses and calendar results retain their original values.",
+    "No route, hazard, location, return-time, actual person-state or real outcome is asserted.",
+    "Preserve the 多 qualifier in every applied predicate and user-facing sentence."
+  ],
+  "independent_human_expert_review": false,
+  "unique_all_school_reading_established": false,
+  "empirical_probability": null,
+  "predictive_efficacy_established": false
+}

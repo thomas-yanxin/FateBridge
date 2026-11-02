@@ -1,0 +1,37 @@
+{
+  "source_catalog_id": "human_design_2001_explicit_additional_planets_v1",
+  "source": {
+    "title": "The Complete Rave I'Ching",
+    "author": "Ra Uru Hu",
+    "edition_year": 2001,
+    "url": "https://www.myhumandesign.be/downloads/Rave-I%27Ching.pdf",
+    "pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495",
+    "glyph_catalog_sha256": "6fd06279b49f071dabb34aa293070f51f840cd1773986304aecbbbaa6be2270b"
+  },
+  "scanned_line_count": 384,
+  "facts": [
+    {
+      "fact_id": "11.4.exaltation.Venus",
+      "gate": 11,
+      "line": 4,
+      "role": "exaltation",
+      "primary_marker_planet": "Moon",
+      "additional_planet": "Venus",
+      "source_pdf_page_one_based": 27,
+      "source_clause_sha256": "25dadefa76ea956219e1ecf5331e71125cfb89fcdb3e7a7f55bea31e6a5d30ba"
+    },
+    {
+      "fact_id": "25.4.exaltation.Jupiter",
+      "gate": 25,
+      "line": 4,
+      "role": "exaltation",
+      "primary_marker_planet": "Venus",
+      "additional_planet": "Jupiter",
+      "source_pdf_page_one_based": 55,
+      "source_clause_sha256": "c001cd8d3299b967fb849055256d8aa2bb3adf7af71ab19bb2c13af22d23bc18"
+    }
+  ],
+  "full_line_meanings_accepted": false,
+  "publisher_master_authenticated": false,
+  "scope": "Only explicitly named additional planet-role clauses in the fixed2001copy. Primary printed glyphs remain unchanged;2extra facts are not a complete384line semantic interpretation, publisher erratum or empirical validation."
+}

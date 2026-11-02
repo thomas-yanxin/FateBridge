@@ -1,0 +1,914 @@
+{
+  "id": "sukuyo_zhidu_month_context_v1",
+  "reference_frozen_at": "2026-10-25T23:16:36.686484+00:00",
+  "source_data_snapshot_round": 89,
+  "sources": {
+    "T1509": {
+      "id": "T1509",
+      "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T25/T25n1509.xml",
+      "commit": "dbdea41071e1e260ad84b72faefd4587333cf76d",
+      "bytes": 17164919,
+      "sha256": "f1f8be755336c8745f6a92d8a8a749998fc331d1f50d631ca1e88f5c0e153619",
+      "source_previously_bound_in_existing_data": true,
+      "new_independent_clock_observation": false,
+      "selected_complete_main_paragraphs": [
+        {
+          "xml_id": "pT25p0409b2502",
+          "main_literal": "「日月歲節」者，日名從旦至旦，初分、中分、後分；夜亦三分。一日一夜有三十時：春、秋分時，十五時屬晝，十五時屬夜；餘時增減——五月至，晝十八時，夜十二時；十一月至，夜十八時，晝十二時。"
+        },
+        {
+          "xml_id": "pT25p0409b2906",
+          "main_literal": "一月，或三十日、或三十日半、或二十九日、或二十七日半。"
+        },
+        {
+          "xml_id": "pT25p0409c0111",
+          "main_literal": "有四種月：一者、日月，二者、世間月，三者、月月，四者、星宿月。"
+        },
+        {
+          "xml_id": "pT25p0409c0301",
+          "main_literal": "日月者，三十日半；世間月者，三十日；月月者，二十九日加六十二分之三十；星宿月者，二十七日加六十七分之二十一。"
+        },
+        {
+          "xml_id": "pT25p0409c0514",
+          "main_literal": "閏月者，從日月、世間月二事中出，是名十三月。"
+        },
+        {
+          "xml_id": "pT25p0409c0615",
+          "main_literal": "或十二月、或十三月，名一歲。是歲三百六十六日，周而復始。菩薩知日中分時，前分已過，後分未生，中分中無住處，無相可取，日分空無所有。到三十日時，二十九日已滅，云何和合成月？月無故，云何和合而為歲？以是故，佛言：「世間法如幻、如夢，但是誑心法。」菩薩能知世間日、月、歲和合，能知破散無所有，是名「巧分別」。"
+        }
+      ],
+      "source_layer": "CBETA electronic Taisho main text, orig/mod/app and inline note separately retained",
+      "apparatus_counts": {
+        "all_back_note_app_records": 53980,
+        "all_pointer_tokens": 71497,
+        "unresolved": 0,
+        "selected_records": 13,
+        "counts_are_not_witness_counts": true
+      },
+      "work_identity": {
+        "title": "大智度論",
+        "canon": "大正新脩大藏經第25册，第1509号",
+        "extent_in_header": "100卷",
+        "header_author_literal": "龍樹菩薩造　後秦 鳩摩羅什譯",
+        "volume": 48,
+        "volume_heading_locator": "T25n1509_p0402c14",
+        "volume_heading_literal": "大智度論釋四念處品第十九",
+        "inline_volume_label": "卷四十八",
+        "body_author_locators": "0402c16–17",
+        "body_author_literal": "龍樹菩薩造／後秦龜茲國三藏鳩摩羅什譯",
+        "identity_limit": "以上为本电子文件的题头和署名，不是本轮独立认证历史作者身份。"
+      },
+      "edition": {
+        "format": "XML TEI P5",
+        "sourceDesc": "大正新脩大藏經",
+        "publication_date_literal": "2026-06-15 07:11:47 +0800",
+        "punctuation": "文件声明采用新式标点，projectDesc列厚觀法師提供新式標點；标点不能当原刊圈点或古代作者原有句读。",
+        "availability_literal": "Available for non-commercial use when distributed with this header intact.",
+        "physical_witness_examined_this_round": false
+      },
+      "context": {
+        "sutra_layer": "0408a17–29列举受持字门所得二十功德，其中0408a25有“得巧分別日月歲節”。",
+        "commentary_layer": "0408b01起明确标“【論】釋曰”。0409b25起是对“日月歲節”的解释；随后由日、月、岁计数转入缘成、已灭及无相可取的论述。",
+        "scope": "这不是在本窗口直接颁布一部逐年历书或一套宿曜配宿操作表。"
+      },
+      "selected_apparatus": [
+        {
+          "locator": "0409c01，beg0409024–end0409024",
+          "body": "二十七日半",
+          "orig_note": "七＝九【石】",
+          "mod_note": "七【大】，九【石】",
+          "app": "lem为七、wit.orig；rdg为九、wit6。",
+          "meaning": "此处电子校记另载【石】读“二十九日半”；不能静默把正文七改成九，也不能删掉这个差异。"
+        },
+        {
+          "locators": [
+            "0409c02，beg0409025–end0409025",
+            "0409c03，beg_61c–end_61c"
+          ],
+          "body": "第三种名“月月”，其后定义处再次出现“月月”。",
+          "orig_note": "月＝日【石】＊",
+          "mod_note": "月【大】＊，日【石】＊",
+          "app": "两处均对首个月字列月／日；第二处app另有corresp=\"#0409025\"。",
+          "meaning": "该校记适用于两处字，不是两份新见证；按此异读会形成“日月”，与第一种名重叠的问题仍须保留，不能按预期月制名称消除。"
+        },
+        {
+          "locator": "0409c09，beg0409026–end0409026",
+          "body": "後分未生",
+          "orig_note": "生＝至【明】",
+          "mod_note": "生【大】，至【明】",
+          "meaning": "属于后续日分无相论述的异读，不是古代钟时定义。"
+        },
+        {
+          "locator": "0409c10，beg0409027–end0409027",
+          "body": "二十九日已滅",
+          "orig_note": "〔日〕－【三】【宮】【聖】",
+          "mod_note": "日【大】，〔－〕【宋】【元】【明】【宮】【聖】",
+          "meaning": "原注与整理注分别保留；整理层展开了原注【三】的集合表示。不能把这组标记当本轮亲见各本的证据。"
+        }
+      ],
+      "source_body_literal_search": {
+        "topic": "已检索与未检出范围",
+        "method": "对完整body串接文本去除排版空白后作字面检索，避免仅逐行检索漏掉跨行词串；另查看全部旦字命中上下文。",
+        "results": {
+          "日月歲節": 2,
+          "從旦至旦": 1,
+          "從旦至夕": 0,
+          "平明": 0,
+          "曉時": 0,
+          "宿曜經": 0,
+          "檜尾": 0,
+          "桧尾": 0,
+          "閏月": 1,
+          "三百六十六": 1
+        },
+        "interpretation": "这些是此固定电子正文的指定字串结果，不是古典全域不存在这些观念的证明，也不排除别称、其他版本或间接联系。其余旦字命中包括叙事、清旦、明旦、从旦至食及非计时用法；本次所读命中上下文未给出可直接移用到T1299或T2465的太阳阈值。"
+      },
+      "tail_scope": {
+        "literal_windows": [
+          {
+            "locator": "0409c14–15",
+            "literal": "名「巧分別」。如是等種種分別，是名「菩薩摩訶薩摩訶衍」。",
+            "layers": "前一句结束原日月岁节解释段；后一句另为pT25p0409c1405。"
+          },
+          {
+            "locator": "0409c16",
+            "main_literal": "大智度論卷第四十八",
+            "inline_note_literal": "釋第十九品",
+            "structure": "cb:juan n=\"048\" fun=\"close\""
+          },
+          {
+            "locator": "0409c16之后、0409c17行标之前",
+            "structure": "milestone unit=\"juan\" n=\"49\"",
+            "meaning": "这是电子结构边界标记，不把它当另印一行正文。"
+          },
+          {
+            "locator": "0409c19",
+            "main_literal": "大智度論釋發趣品第二十",
+            "inline_note_literal": "卷四十九",
+            "structure": "cb:juan n=\"049\" fun=\"open\""
+          },
+          {
+            "locator": "0409c21–22",
+            "literal": "龍樹菩薩造／後秦龜茲國三藏鳩摩羅什譯",
+            "scope": "下卷题头所载署名，不是本轮独立认证作者。"
+          },
+          {
+            "locator": "0409c23–24",
+            "main_literal": "【經】佛告須菩提：「汝問：『云何菩薩摩訶薩大乘發趣？』若菩薩摩訶薩行六波羅蜜時，從一",
+            "electronic_mulu": "20 發趣品",
+            "scope": "本指定窗口在從一之后截断，句尚未完；电子mulu与正文【經】标识分别记录。"
+          }
+        ],
+        "finding": "当前电子主文在0409c16关闭卷48，于0409c19开启卷49《發趣品第二十》，0409c23开始其经文。不能把下卷题头及经文并入前一日月岁节原段，也不能把阿鞞跋致引用当作这里的实际品题。"
+      },
+      "tail_apparatus": {
+        "statistics": {
+          "exact_window": "0409c14–0409c24",
+          "own_pointer_records": 21,
+          "app": 7,
+          "orig_note": 7,
+          "mod_note": 7,
+          "prior_calendar_window_records": 13,
+          "prior_count_unchanged": true,
+          "counting_limit": "外层app的lem中另嵌其他校记的重复展示，已读取但不重复计为有自身指针的新记录；记录数不是见证数。"
+        },
+        "entries": [
+          {
+            "n": "0409028",
+            "locator": "0409c16题名末字論",
+            "app_range": [
+              "#beg0409028",
+              "#end0409028"
+            ],
+            "app_readings": {
+              "【大】": "論",
+              "【聖】": "經論"
+            },
+            "orig": "（經）＋論【聖】",
+            "mod": "論【大】，經論【聖】"
+          },
+          {
+            "n": "0409029",
+            "locator": "0409c16卷数四十八",
+            "app_range": [
+              "#beg0409029",
+              "#end0409029"
+            ],
+            "app_readings": {
+              "【大】": "四十八",
+              "【石】": "十五"
+            },
+            "orig": "四十八＝十五【石】",
+            "mod": "四十八【大】，十五【石】",
+            "scope": "原样保留十五，不凭相邻卷序或常识改成其他数。"
+          },
+          {
+            "n": "0409030",
+            "locator": "0409c16完整内联注釋第十九品",
+            "app_range": [
+              "#beg0409030",
+              "#end0409030"
+            ],
+            "app_readings": {
+              "【大】": "釋第十九品，note place=\"inline\"",
+              "【宮】": "空读，space quantity=\"0\""
+            },
+            "orig": "〔釋第十九品〕－【宮】",
+            "mod": "釋第十九品【大】，〔－〕【宮】",
+            "nested_structure": "此app的lem内重复嵌有0409031的orig、mod及无独立from/to的app展示；没有把这些显示文字混进主文。"
+          },
+          {
+            "n": "0409031",
+            "locator": "0409c16内联注中的十九品",
+            "app_range": [
+              "#beg0409031",
+              "#end0409031"
+            ],
+            "app_readings": {
+              "【大】": "十九品",
+              "【聖】": "十八品",
+              "【石】": "八品竟"
+            },
+            "orig": "十九品＝十八品【聖】，八品竟【石】",
+            "mod": "十九品【大】，十八品【聖】，八品竟【石】"
+          },
+          {
+            "n": "0409032",
+            "locator": "0409c19下卷整个题头",
+            "app_range": [
+              "#beg0409032",
+              "#end0409032"
+            ],
+            "app_word_count_attribute": "15",
+            "app_readings": {
+              "【大】": {
+                "main": "大智度論釋發趣品第二十",
+                "inline_note": "卷四十九"
+              },
+              "【聖】": "大智度經論卷第四十九釋第十九品上",
+              "【石】": "摩訶般若波羅蜜品第十九發趣品卷五十一"
+            },
+            "orig": "（（大智…九））十五字＝（（大智度經論卷第四十九釋第十九品上））十六字【聖】，（（摩訶般若波羅蜜品第十九發趣品卷五十一））十八字【石】",
+            "mod": "（大智…九）十五字【大】，大智度經論卷第四十九釋第十九品上【聖】，摩訶般若波羅蜜品第十九發趣品卷五十一【石】",
+            "nested_structure": "其lem内重复嵌有0409033的校记展示，不另增自身指针记录数。"
+          },
+          {
+            "n": "0409033",
+            "locator": "0409c19第二十的末十",
+            "app_range": [
+              "#beg0409033",
+              "#end0409033"
+            ],
+            "app_readings": {
+              "【大】": "十",
+              "【宮】": "十品"
+            },
+            "orig": "十＋（品）【宮】",
+            "mod": "十【大】，十品【宮】"
+          },
+          {
+            "n": "0409034",
+            "locator": "0409c23【經】标识",
+            "app_range": [
+              "#beg0409034",
+              "#end0409034"
+            ],
+            "app_readings": {
+              "【大】": "【經】",
+              "【宋】【宮】【聖】": "空读，space quantity=\"0\""
+            },
+            "orig": "〔經〕－【宋】【宮】【聖】＊",
+            "mod": "【經】【大】＊，〔－〕【宋】【宮】【聖】＊",
+            "outside_window_star_reuse": {
+              "locator": "0412c22",
+              "paragraph_id": "pT25p0412c2201",
+              "body_literal": "【經】",
+              "app_range": [
+                "#beg_620",
+                "#end_620"
+              ],
+              "corresp": "#0409034",
+              "app_readings": "【經】【大】／空读【宋】【宮】【聖】",
+              "counting": "这一个窗口外复用app另列，不并入本次尾窗21条，也不倒填旧13条。"
+            }
+          }
+        ],
+        "version_number_findings": [
+          "当前主文末卷数为四十八、末注为释第十九品；下卷为卷四十九、发趣品第二十。",
+          "【聖】末注作十八品，下卷完整题头另作卷第四十九释第十九品上。",
+          "【石】末卷数校记作十五、末注作八品竟；下卷完整题头校记却载品第十九发趣品卷五十一。这里仅交付所载差异，未据这些局部记录重建该本完整卷序或判定哪一数字错误。",
+          "【宮】删除前卷末释第十九品整注，并在下卷末十后加品。其范围与【聖】【石】不同，不能拼成一个混合校订题头。"
+        ]
+      },
+      "sigla": {
+        "wit.orig": "【大】",
+        "wit1": "【宋】",
+        "wit2": "【元】",
+        "wit3": "【宮】",
+        "wit4": "【明】",
+        "wit5": "【聖】",
+        "wit6": "【石】"
+      }
+    },
+    "T2122": {
+      "id": "T2122",
+      "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T53/T53n2122.xml",
+      "commit": "dbdea41071e1e260ad84b72faefd4587333cf76d",
+      "bytes": 16406153,
+      "sha256": "6e846f801caa9a9471192132140506e476bbf664a293b1e52c04c937d36124c9",
+      "source_previously_bound_in_existing_data": null,
+      "new_independent_clock_observation": false,
+      "selected_complete_main_paragraphs": [
+        {
+          "xml_id": "pT53p0298a0201",
+          "main_literal": "智度論云。如阿鞞跋致品中所說。日月歲節者。日名從旦至旦。初分中分後分。夜亦有三分。一日一夜有三十時。春秋分時十五時屬晝。十五時屬夜。餘時增減。若五月至晝十八時。夜十二時。十一月至夜十八時。晝十二時。一月或三十日半。或三十日。或二十九日半。或二十七日半。有四種月。一者日月。二者世間月。三者月月。四者星宿月。日月者三十日半。世間月者三十日。月月者二十九日。加六十二分之三十。星宿月者。二十七日加六十分之二十一。閏月者從日月世間月二事中出。是名十三月。或十三月名一歲。是歲三百六十六日。周而復始。菩薩知日中分時。前分已過。後分未生。中分無住處。無相可取日分。空空無所有。到三十日。時二十九日減。云何和合成日月。無故云何和合而為歲。以是故。佛言。世間法如幻如夢。但是誑心法。菩薩能知世間日月歲和合。能知破散無所有。是名巧分別。"
+        }
+      ],
+      "source_layer": "CBETA electronic Taisho main text, orig/mod/app and inline note separately retained",
+      "apparatus_counts": {
+        "all_back_note_app_records": 54770,
+        "all_pointer_tokens": 72189,
+        "unresolved": 0,
+        "selected_records": 6,
+        "counts_are_not_witness_counts": true
+      },
+      "header_title": "法苑珠林",
+      "header_author_literal": "唐 道世撰",
+      "header_punctuation_literal": "原書標點",
+      "header_punctuation_is_authenticity_proof": false,
+      "location_layers": {
+        "volume": {
+          "locator": "T53n2122_p0293a02",
+          "literal": "法苑珠林卷第四"
+        },
+        "body_author": {
+          "locator": "0293a04",
+          "literal": "西明寺沙門釋道世撰",
+          "limit": "记录电子正文署名，不独立认证历史作者或具体实物。"
+        },
+        "chapter": {
+          "locator": "0293a05",
+          "head_literal": "日月篇第三",
+          "inline_note": "此有一十三部",
+          "electronic_mulu_literal": "3 日月篇(四)",
+          "distinction": "电子目录中的括号四不是把正文篇名改成日月篇第四；实际卷为四、正文篇号为三。"
+        },
+        "section": {
+          "locator": "0297c04",
+          "head_literal": "虧盈部第七"
+        },
+        "target": {
+          "locator": "0298a02–20",
+          "paragraph_id": "pT53p0298a0201",
+          "citation_introduction": "智度論云",
+          "following_section": "0298a21起为昇雲部第八。"
+        },
+        "preceding_context": [
+          {
+            "locator": "0297c05起",
+            "literal": "依立世阿毘曇論云。云何黑半。云何白半。",
+            "scope": "同部前一具名引文讨论黑白半月，不能改称日内前后半。"
+          },
+          {
+            "locator": "0297c21–0298a01",
+            "literal_start": "又起世經。問言。復有何因緣。於冬分時夜長晝短。",
+            "scope": "这是先于智度论引文的另一来源段，不并入T1509原文。"
+          }
+        ],
+        "punctuation_limit": "T2122 header称原书标点，T1509另声明新式标点。这些仍是电子编制层声明，不能由本次XML读取认证古作者句读或亲见印页。"
+      },
+      "selected_apparatus": [
+        {
+          "note_number": "0298001",
+          "locator": "0298a03",
+          "position": "日名從旦至旦中的末旦，即從旦至之后的字。",
+          "app": {
+            "from": "#beg0298001",
+            "to": "#end0298001",
+            "lem": "旦",
+            "lem_witness": "【大】",
+            "rdg": "日",
+            "rdg_witnesses": [
+              "【宋】",
+              "【明】",
+              "【宮】"
+            ]
+          },
+          "orig": {
+            "target": "#nkr_note_orig_0298001",
+            "literal": "旦＝日【宋】【明】【宮】"
+          },
+          "mod": {
+            "target": "#nkr_note_mod_0298001",
+            "literal": "旦【大】，日【宋】【明】【宮】"
+          },
+          "scope": "这是T2122末旦／日的校记，不是T1509月月术语的月／日校记，也不是T2217夕／且校记。"
+        },
+        {
+          "note_number": "0298002",
+          "locator": "0298a20内联注",
+          "position": "日月災變的災字。",
+          "app": {
+            "from": "#beg0298002",
+            "to": "#end0298002",
+            "lem": "災",
+            "lem_witness": "【大】",
+            "readings": [
+              {
+                "literal": "交",
+                "witnesses": [
+                  "【宋】",
+                  "【元】",
+                  "【明】"
+                ]
+              },
+              {
+                "literal": "央",
+                "witnesses": [
+                  "【宮】"
+                ]
+              }
+            ]
+          },
+          "orig": {
+            "target": "#nkr_note_orig_0298002",
+            "literal": "災＝交【三】，央【宮】"
+          },
+          "mod": {
+            "target": "#nkr_note_mod_0298002",
+            "literal": "災【大】，交【宋】【元】【明】，央【宮】"
+          },
+          "scope": "该校记归于内联注，不归于智度论主引文的计时或月制数词。"
+        }
+      ],
+      "heading_apparatus": [
+        {
+          "note_number": "0293001",
+          "locator": "0293a05日月篇题头起点",
+          "orig": "前頁[16]不分卷【明】，（日月篇第三）＋日【宋】【元】",
+          "mod": "日【大】，日月篇第三日【宋】【元】，前頁[16]不分卷【明】",
+          "app_intersecting_this_head_for_this_note": null,
+          "scope": "保留电子校记所载分卷及题头差异，不以当前大正卷四编号认证所有所列版本同样分卷。"
+        },
+        {
+          "note_number": "0293002",
+          "locator": "0293a05篇号三",
+          "app": {
+            "from": "#beg0293002",
+            "to": "#end0293002",
+            "lem": "三【大】",
+            "rdg": "三之一【明】"
+          },
+          "orig": "三＋（之一）【明】",
+          "mod": "三【大】，三之一【明】"
+        },
+        {
+          "note_number": "0293003",
+          "locator": "0293a05题头内联说明附近",
+          "orig": "〔此有…部〕四十五字－【明】",
+          "mod": "（此有…部）四十五字【大】，〔－〕【明】",
+          "app_intersecting_this_head_for_this_note": null,
+          "scope": "校记明确说四十五字；不能将其范围缩写成只删“此有一十三部”这几个字。"
+        },
+        {
+          "note_number": "0297012",
+          "locator": "0297c04虧盈部第七",
+          "app": {
+            "from": "#beg0297012",
+            "to": "#end0297012",
+            "lem": "第七【大】",
+            "rdg": "空读，space quantity=\"0\"，对应【明】"
+          },
+          "orig": "〔第七〕－【明】",
+          "mod": "第七【大】，〔－〕【明】"
+        }
+      ],
+      "inline_note": {
+        "source": "T2122",
+        "locator": "0298a20",
+        "layer": "note place=\"inline\"",
+        "literal": "依經人多薄福日月災變。或有赤日赤月。種種徵惡。具如經說",
+        "scope": "该文字在XML中是内联注，不冒充所引T1509正文。仅记录文献说法，不转成灾变事实或个体预测。"
+      },
+      "sigla": {
+        "wit.orig": "【大】",
+        "wit1": "【元】",
+        "wit2": "【明】",
+        "wit3": "【宋】",
+        "wit4": "【宮】"
+      },
+      "heading_boundary_qualification": {
+        "current_main_boundary": [
+          {
+            "locator": "0292c28",
+            "literal": "法苑珠林卷第三",
+            "structure": "cb:juan n=\"003\" fun=\"close\""
+          },
+          {
+            "between": "0292c28之后与0293a02题头之前",
+            "structure": "milestone n=\"4\" unit=\"juan\"；随后为0293a页标"
+          },
+          {
+            "locator": "0293a02",
+            "literal": "法苑珠林卷第四",
+            "structure": "cb:juan n=\"004\" fun=\"open\"",
+            "own_pointer_records_intersecting_this_volume_heading": 0
+          },
+          {
+            "locator": "0293a05",
+            "literal": "日月篇第三",
+            "inline_note": "此有一十三部",
+            "mulu": "3 日月篇(四)"
+          },
+          {
+            "locator": "0297c04",
+            "literal": "虧盈部第七"
+          }
+        ],
+        "heading_record_counts": {
+          "日月篇题头": {
+            "total": 7,
+            "app": 1,
+            "orig": 3,
+            "mod": 3
+          },
+          "虧盈部题头": {
+            "total": 3,
+            "app": 1,
+            "orig": 1,
+            "mod": 1
+          },
+          "previous_page_textual_cross_reference": {
+            "total": 2,
+            "orig": 1,
+            "mod": 1,
+            "counted_separately": true
+          }
+        },
+        "records": [
+          {
+            "n": "0293001",
+            "locator": "0293a05日月篇题头起点",
+            "orig_target": "#nkr_note_orig_0293001",
+            "orig": "前頁[16]不分卷【明】，（日月篇第三）＋日【宋】【元】",
+            "mod_target": "#nkr_note_mod_0293001",
+            "mod": "日【大】，日月篇第三日【宋】【元】，前頁[16]不分卷【明】",
+            "app_with_own_pointer_intersecting_this_heading_for_this_note": null
+          },
+          {
+            "n": "0292016",
+            "locator": "0292c27，0293001所指前页[16]",
+            "orig_target": "#nkr_note_orig_0292016",
+            "orig": "次頁[01]不分卷【明】",
+            "mod_target": "#nkr_note_mod_0292016",
+            "mod": "次頁[01]不分卷【明】",
+            "scope": "与次页0293001互指，明确将不分卷归于【明】。不能因当前电子主文具有卷三／卷四边界，就认证【明】具有相同边界。"
+          },
+          {
+            "n": "0293002",
+            "locator": "0293a05篇号三",
+            "app_range": [
+              "#beg0293002",
+              "#end0293002"
+            ],
+            "app_readings": {
+              "【大】": "三",
+              "【明】": "三之一"
+            },
+            "orig": "三＋（之一）【明】",
+            "mod": "三【大】，三之一【明】"
+          },
+          {
+            "n": "0293003",
+            "locator": "0293a05题头及部目说明",
+            "orig": "〔此有…部〕四十五字－【明】",
+            "mod": "（此有…部）四十五字【大】，〔－〕【明】",
+            "app_with_own_pointer_intersecting_this_heading_for_this_note": null,
+            "scope": "保留校记的四十五字范围说明，不缩成只删内联注此有一十三部。"
+          },
+          {
+            "n": "0297012",
+            "locator": "0297c04虧盈部第七",
+            "app_range": [
+              "#beg0297012",
+              "#end0297012"
+            ],
+            "app_readings": {
+              "【大】": "第七",
+              "【明】": "空读，space quantity=\"0\""
+            },
+            "orig": "〔第七〕－【明】",
+            "mod": "第七【大】，〔－〕【明】"
+          }
+        ],
+        "finding": "当前大正电子主文的定位是卷四、日月篇第三、虧盈部第七；【明】校记同时保留不分卷、篇号三之一、部目说明省略及第七省略等差异。不能用一个统一编号覆盖这些版本层。"
+      }
+    }
+  },
+  "month_definitions": {
+    "T1509": [
+      {
+        "slot_id": "month_1",
+        "main_term": "日月",
+        "main_literal": "日月者，三十日半",
+        "definition_kind": "half_increment",
+        "locator": "T25n1509_p0409c03-05",
+        "reported_term_alternatives": []
+      },
+      {
+        "slot_id": "month_2",
+        "main_term": "世間月",
+        "main_literal": "世間月者，三十日",
+        "definition_kind": "whole",
+        "locator": "T25n1509_p0409c03-05",
+        "reported_term_alternatives": []
+      },
+      {
+        "slot_id": "month_3",
+        "main_term": "月月",
+        "main_literal": "月月者，二十九日加六十二分之三十",
+        "definition_kind": "fraction_increment",
+        "locator": "T25n1509_p0409c03-05",
+        "reported_term_alternatives": [
+          {
+            "term": "日月",
+            "siglum": "【石】",
+            "note": "0409025; first月 to日 at name and definition via＊/corresp; no complete石text reconstructed"
+          }
+        ]
+      },
+      {
+        "slot_id": "month_4",
+        "main_term": "星宿月",
+        "main_literal": "星宿月者，二十七日加六十七分之二十一",
+        "definition_kind": "fraction_increment",
+        "locator": "T25n1509_p0409c03-05",
+        "reported_term_alternatives": []
+      }
+    ],
+    "T2122": [
+      {
+        "slot_id": "month_1",
+        "main_term": "日月",
+        "main_literal": "日月者三十日半",
+        "definition_kind": "half_increment",
+        "locator": "T53n2122_p0298a09-12",
+        "reported_term_alternatives": []
+      },
+      {
+        "slot_id": "month_2",
+        "main_term": "世間月",
+        "main_literal": "世間月者三十日",
+        "definition_kind": "whole",
+        "locator": "T53n2122_p0298a09-12",
+        "reported_term_alternatives": []
+      },
+      {
+        "slot_id": "month_3",
+        "main_term": "月月",
+        "main_literal": "月月者二十九日。加六十二分之三十",
+        "definition_kind": "fraction_increment",
+        "locator": "T53n2122_p0298a09-12",
+        "reported_term_alternatives": []
+      },
+      {
+        "slot_id": "month_4",
+        "main_term": "星宿月",
+        "main_literal": "星宿月者。二十七日加六十分之二十一",
+        "definition_kind": "fraction_increment",
+        "locator": "T53n2122_p0298a09-12",
+        "reported_term_alternatives": []
+      }
+    ]
+  },
+  "month_enumerations": {
+    "T1509": {
+      "main_literal": "一月，或三十日、或三十日半、或二十九日、或二十七日半。",
+      "same_order_as_named_definitions_established": false,
+      "fourth_item_reported_variant": {
+        "main": "二十七日半",
+        "reported": "二十九日半",
+        "siglum": "【石】",
+        "note": "0409024",
+        "does_not_modify_month4_detailed_definition": true
+      }
+    },
+    "T2122": {
+      "main_literal": "一月或三十日半。或三十日。或二十九日半。或二十七日半。",
+      "same_order_as_named_definitions_established": false
+    }
+  },
+  "intercalation_and_year": {
+    "T1509": {
+      "literal": "閏月者，從日月、世間月二事中出，是名十三月。",
+      "year_literal": "或十二月、或十三月，名一歲。是歲三百六十六日，周而復始。",
+      "explicit_selected_year_alternatives": [
+        "十二月",
+        "十三月"
+      ],
+      "intercalation_schedule_established": false,
+      "all_years_necessarily13_months": false,
+      "hinoo_leap_short_priority_established": false
+    },
+    "T2122": {
+      "literal": "閏月者從日月世間月二事中出。是名十三月。",
+      "year_literal": "或十三月名一歲。是歲三百六十六日。周而復始。",
+      "explicit_selected_year_alternatives": [
+        "十三月"
+      ],
+      "intercalation_schedule_established": false,
+      "all_years_necessarily13_months": false,
+      "hinoo_leap_short_priority_established": false
+    }
+  },
+  "quotation_comparisons": {
+    "T1509_X0439_T2217": [
+      "T1509主文是“日名從旦至旦”；冻结X0439电子正文亦作旦至旦。冻结T2217 SAT主文则作旦至夕，另有“夕＝且＜甲＞”校记。这些是不同来源层的实际读数，不能用上游旦字覆盖后引夕字或甲号且字。",
+      "T1509写“五月至，晝十八時，夜十二時；十一月至，夜十八時，晝十二時”。X0439及T2217所录引文省去这些位置的至字，并把十一月的具体两数缩为“十一月翻……”式表述。",
+      "X0439当前电子标点为“十一月翻。此言十五時屬晝，三分中各五時也”；T2217记录为“十一月翻此。言十五時屬晝三分中各五時也”。标点层和实际字串须分别保留。",
+      "“三分中各五時也”不在T1509所核日段中，是后引尾部的解释性展开，不能反写成上游原句。",
+      "两部所核后引到这一说明为止，没有交付T1509紧接着的四种月、分数、闰月、岁数及日月岁缘成论述。"
+    ],
+    "T2122_T1509": [
+      {
+        "topic": "实际卷篇部与阿鞞跋致句的指代",
+        "finding": "本次T2122所在位置是卷四、日月篇第三、亏盈部第七。T1509该日月岁节段实际在卷48《四念處品第十九》。T1509“如阿鞞跋致品中所說”属于前一“巧知往來坐起等”的解释段；T2122将这句纳入当前引文开头，不能据此重标两处实际品题。"
+      },
+      {
+        "topic": "昼夜计数",
+        "T2122": "夜亦有三分；春秋分十五／十五；若五月至昼十八、夜十二；十一月至夜十八、昼十二。",
+        "T1509": "夜亦三分；春秋分十五／十五；五月至昼十八、夜十二；十一月至夜十八、昼十二。",
+        "difference": "T2122有“有”和“若”等文字差别。两书相关计数对应，但这不等于已认证其全部时间制度、单位长度或实际测量相同。"
+      },
+      {
+        "topic": "月长概列",
+        "T2122": "一月或三十日半。或三十日。或二十九日半。或二十七日半。",
+        "T1509": "一月，或三十日、或三十日半、或二十九日、或二十七日半。",
+        "difference": "前三十日与三十日半的顺序不同；二十九日半与二十九日不同。T1509二十七日半还另有七／九【石】校记。不得将概列强行统一。"
+      },
+      {
+        "topic": "月月与星宿月的详细分数",
+        "T2122": "月月者二十九日。加六十二分之三十。星宿月者。二十七日加六十分之二十一。",
+        "T1509": "月月者，二十九日加六十二分之三十；星宿月者，二十七日加六十七分之二十一。",
+        "difference": "月月的数值对应；星宿月分母明确为六十／六十七。T2122目标段相交校注没有提供改动这个分母的记录，T1509对应窗口也没有改动六十七的校注。这里保留两个正文值，不按现代月长或算术接近程度择优。"
+      },
+      {
+        "topic": "闰月与岁",
+        "T2122": "閏月者從日月世間月二事中出。是名十三月。或十三月名一歲。是歲三百六十六日。周而復始。",
+        "T1509": "閏月者，從日月、世間月二事中出，是名十三月。或十二月、或十三月，名一歲。是歲三百六十六日，周而復始。",
+        "difference": "T2122未载T1509的“或十二月”分支；不能替它补写，也不能因只见“或十三月”就改说本书规定每年一律十三个月。两处366日原数均保留。"
+      },
+      {
+        "topic": "中分、空空及月岁缘成",
+        "T2122": "中分無住處。無相可取日分。空空無所有。到三十日。時二十九日減。云何和合成日月。無故云何和合而為歲。",
+        "T1509": "中分中無住處，無相可取，日分空無所有。到三十日時，二十九日已滅，云何和合成月？月無故，云何和合而為歲？",
+        "difference": "T2122少一个中，实际写空空，并有減／已滅、成日月／成月及后续月字、句读位置等差别。没有把T2122改排为T1509的流畅句法，也没有删掉重出的空字。"
+      },
+      {
+        "topic": "校记归属",
+        "finding": "T2122末旦／日校记与T1509月月术语的月／日校记是不同文件、不同位置、不同见证集合。T2122内联注的災／交／央又是第三个位置。它们都不能挪作星宿月分母、T2217夕／且或T1299平明的校记。"
+      }
+    ],
+    "concrete_ancient_exemplar_or_complete_transmission_chain_identified": false
+  },
+  "printed_pages": {
+    "T1509": {
+      "url": "https://imgsrv.dhii.jp/iipsrv/iipsrv.fcgi?IIIF=/taisho/25/25_0409.tif/full/full/0/default.jpg",
+      "bytes": 2215380,
+      "sha256": "47f96501565e597d719f81b9b776385c3c866ba30863fbf33d32e6337beda0c3",
+      "actual_service_pixels": [
+        2000,
+        2823
+      ],
+      "info_declared_pixels": [
+        2000,
+        2823
+      ],
+      "source_layer": "selected official-service Taisho printed page, not the quoted ancient physical exemplar",
+      "page_and_volume_layers": {
+        "page_number_literal": "四〇九",
+        "margin_header_literal": "大智度論卷第四十九",
+        "target_location": "中段左部起，续至下段右部及中央",
+        "target_following_volume_end_literal": "大智度論卷第四十八",
+        "new_volume_heading_after_divider": "大智度論釋發趣品第二十",
+        "new_volume_heading_small_text": "卷第四十九",
+        "new_volume_attribution_visible": [
+          "龍樹菩薩造",
+          "後秦龜茲國三藏鳩摩羅什譯"
+        ],
+        "working_assignment": "目标历法段在本页卷第四十八卷末之前；页眉所标卷第四十九对应本页随后新起的卷。不能仅凭整页页眉把目标段归为卷四十九。"
+      },
+      "selected_numeric_working_readings": {
+        "T1509_stellar_fraction": "六十七分之二十一",
+        "T2122_stellar_fraction": "六十分之二十一",
+        "both_third_month_fraction": "六十二分之三十",
+        "T1509_year_alternatives": "或十二月或十三月",
+        "T2122_year_alternatives": "或十三月"
+      },
+      "full_page_or_master_resolution_certified": false,
+      "complete_page_transcription_accepted": false,
+      "note29": {
+        "accepted_printed_working_reading": "四十八＝十五【石】",
+        "root_first_misread_retained": "四十八＝三十五【石】",
+        "basis": "Root native footer reread and separate role's first pixel reading both show equality marker then十五; original/mod XML own note0409029 also reports十五. Not a majority vote or proof of actual石manuscript volume sequence."
+      },
+      "printed_note32_fully_transcribed": false,
+      "no_running_header_only_volume_assignment": true
+    },
+    "T2122": {
+      "url": "https://imgsrv.dhii.jp/iipsrv/iipsrv.fcgi?IIIF=/taisho/53/53_0298.tif/full/full/0/default.jpg",
+      "bytes": 3167303,
+      "sha256": "0eadcf32aea188a501932d7173aa9500ab5e37a3fda5c6da5af6ac9ce67bceae",
+      "actual_service_pixels": [
+        2000,
+        2881
+      ],
+      "info_declared_pixels": [
+        2000,
+        2881
+      ],
+      "source_layer": "selected official-service Taisho printed page, not the quoted ancient physical exemplar",
+      "page_and_volume_layers": {
+        "page_number_literal": "二九八",
+        "margin_header_literal": "法苑珠林卷第四",
+        "target_location": "上段右起，跨上段中部，至上段左部",
+        "quotation_introduction_literal": "智度論云。如阿鞞跋致品中所說。",
+        "following_section_heading_literal": "昇雲部第八",
+        "following_section_opening_literal": "依起世經云。",
+        "working_assignment": "本页页眉为法苑珠林卷第四；所看页内未见卷末或另起新卷题头。目标后转入昇雲部第八，是部题变化，不据此改作新卷。"
+      },
+      "selected_numeric_working_readings": {
+        "T1509_stellar_fraction": "六十七分之二十一",
+        "T2122_stellar_fraction": "六十分之二十一",
+        "both_third_month_fraction": "六十二分之三十",
+        "T1509_year_alternatives": "或十二月或十三月",
+        "T2122_year_alternatives": "或十三月"
+      },
+      "full_page_or_master_resolution_certified": false,
+      "complete_page_transcription_accepted": false,
+      "inline_small_text": {
+        "accepted_printed_working_reading": "或有赤日赤月",
+        "reviewer_first_misread_retained": "或有赤月赤日",
+        "basis": "Reread follows right small column downward through赤日, then continues at top of left column赤月; exact crop pixels verified. No source XML silently substituted into initial pixel transcript."
+      },
+      "punctuation_reread": {
+        "accepted_visible_working_sequence": "無相可取日分。空空無所有。",
+        "reviewer_first_punctuation_retained": "無相可取。日分空空無所有。",
+        "basis": "Local R2 reports no clear circle after取 and a visible circle after分. Whole original first remains intact."
+      },
+      "after_twenty_ninth_day": {
+        "unique_printed_character": null,
+        "printed_candidates": [
+          "滅",
+          "減"
+        ],
+        "root_and_reviewer_working_reading": "滅",
+        "XML_main_character": "減",
+        "established_print_XML_character_discrepancy": false,
+        "basis": "At2000-wide service pixels, reviewer R2 cannot uniquely exclude減. Preserve both candidates; do not report an established transcription error."
+      }
+    }
+  },
+  "conditional_arithmetic_assumptions": [
+    "Treat the written quantities as uniform formal source-day quantities for arithmetic only.",
+    "Choose12 first-definition periods and separately12 second-definition periods; this alignment is an added hypothesis, not supplied year-step rules.",
+    "Repeat the same difference across5 identical formal cycles.",
+    "Compare its cumulative quantity with one30-unit second-definition period; no actual year, month or intercalation sequence follows."
+  ],
+  "scope": {
+    "source_nominal_day_is_modern_86400_seconds": false,
+    "source_term_matches_modern_astronomical_period_certified": false,
+    "enumeration_aligned_to_definitions_by_position": false,
+    "repeated_terms_merged": false,
+    "complete_alternate_witness_text_reconstructed": false,
+    "daily_half_chosen_from_month_length_half": false,
+    "T1299_pingming_modern_clock_established": false,
+    "T2465_half_clock_established": false,
+    "leap_short_priority_established": false,
+    "calendar_or_mansion_override_applied": false,
+    "five_uniform_cycles_are_historical_intercalation_rule": false,
+    "real_prediction_efficacy_established": false,
+    "independent_ancient_observation_count": null,
+    "real_samples": 0
+  },
+  "first_evidence_sha256": {
+    "upstream-zhidu-first.json": "662c9dab1c5c4a3e76a8ac5ffd7744791190e026144f00e2eb8d07a3eb74834a",
+    "t2122-quotation-first.json": "c73b8ac362153ee1bd690b46024c2901f52284337ca2d9ed4efdf216bfb7ff85",
+    "volume-tail-first.json": "bac5edde1450f88ac9caa421f7c3a13e53331deb347e634dcd6b491436cbe5e6",
+    "printed-root-reading-first.json": "da70245f2c1dbbf90d21f40be74cd3aa147e0afebaa0e9022ab2d6d22a27f41f",
+    "printed-root-reading-r2.json": "af65ec00994e1d5db357b4ecc9fc01cdae352ddd9a805cbba5ac37858f2ab5a0",
+    "printed-calendar-reviewer-first.json": "6d5de5cdb492fa0f742b8ff5d15e31d22a1f82861febba40b71352e12b880a38",
+    "printed-calendar-reviewer-r2.json": "17560790c7c82b47de26ef12e44854bdad9e99ff011de46c6cfa89db4871aa8f",
+    "printed-acceptance-before-code.json": "9b842becd2be3e293a00652c79206da1ad86e35d34ced59fec35e23dd69fa589"
+  },
+  "source_match_scope": {
+    "baseline_members": 8018,
+    "baseline_sha256": "1c686015fc33fa91a30056198a95e16f27ab9fa0dd220680944be2441f60d211",
+    "report_sha256": "891d1fabbcb5bcb2ac14ba6e26b177df3a87d145020ac35836f76eec9ac8880d",
+    "T1509_fixed_XML_state": "fingerprint_previously_recorded",
+    "T2122_fixed_XML_state": "not_found_in_this_text_baseline",
+    "not_found_is_not_global_project_novelty_or_no_prior_capture": true,
+    "binary_archives_and_URI_aliases_not_searched": true,
+    "independent_ancient_witness_count": null
+  }
+}

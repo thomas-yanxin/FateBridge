@@ -1,0 +1,364 @@
+{
+  "call_guidance": {
+    "calendar_input": "Date labels use the explicit question_calendar/candidate_calendar, default proleptic Gregorian. Read calendar_conversion and analysis_context.input_calendar/input_date before explaining normalized datetimes. Julian dates use CE Jan1 years; do not infer regional reforms, March25 years or historical LMT/LAT. With explicit noon hour origin, retain raw calendar labels and read clock_conversion.hour_origin_conversion for the final canonical wall date; validate range after nominal day carry.",
+    "candidate_inputs": "Use the recorded candidate instant, timezone and coordinates; this is not an interval-wide optimum search.",
+    "clock_input": "Use explicit candidate_clock_basis only from confirmed clock evidence: civil / local_mean_solar / local_apparent_solar. Solar bases must omit/null timezone_name; civil omission preserves the legacy +08:00 default, not evidence of a known zone. Read clock_conversion with calendar_conversion: first normalize date labels, then resolve the declared clock to TT/UT1. Geocentric LAT is not a topocentric sundial reconstruction. Before1960 UTC-named carriers denote UT1 model labels. Never infer an original clock from ASC fit or outcome; numerical residual is not record accuracy.",
+    "evidence_boundary": "Read calculation_conditions together: native lunar events, physical axes, solar policy, factors, nullable score and unresolved contributions.",
+    "hour_origin": "Use candidate_hour_origin=noon only for confirmed noon-based clock-hour labels such as Lilly1647 pp30-31 ephemeris tables. Default midnight preserves modern labels. Noon0=same-date12:00; noon12..23=next-date00:00..11:00. Read clock_conversion.hour_origin_conversion, raw calendar date/clock, and canonical candidate_datetime together. Calendar-normalized_local_datetime is a raw hour label and can be null for an unrepresentable intermediate date rescued by the carry; final wall time is separate. This is not physical elapsed duration, a timezone/EOT/JD offset, a house-table coordinate, a regional reform or proof of LMT/LAT. Do not infer the author's convention from a fitted chart. Apply declared hour origin before civil zone/DST validation or solar-clock inversion.",
+    "incomplete_score": "A null score is incomplete, not zero; score_bounds cover only declared unknown weights, not confidence or outcome probability.",
+    "interpretation_boundary": "All numeric weights/bands remain uncalibrated product policy; solar definitions and before-ingress event scope do not certify a full original-text election method.",
+    "physical_epoch": "太阳时反解的有效时刻可能落在UTC闰秒。converted_utc可含23:59:60；按clock_conversion.utc_representation区分标签与datetime可表示性，计算使用原生TT/UT1。不能把不能解析datetime说成计算失败，也不能将秒60截断、平滑或移到次日；数值标签精度不代表实测钟时精度。",
+    "ut1_source": "ut1_source默认swiss_delta_t；显式iers_c04使用固定IERS20 C04每日实测合成UT1，仅覆盖1962-01-01 00:00至2026-09-19 00:00 UTC，需要UT1的时刻超范围拒绝；地心TT黄经事件搜索不需要在试算时刻取得UT1，不因C04边界自动变成未知。读取clock_conversion.ut1_reference与calculation_basis.earth_rotation，区分已发布日值和TT上连续UT1-TAI线性插值。只应用UT1，未应用极移、CIP偏移或日内潮汐，形式标准差不是瞬时物理误差界；不得声称完整EOP、史料钟时精度或预测效力。"
+  },
+  "evidence_views": {
+    "calculation_conditions": {
+      "fields": [
+        "analysis_context",
+        "election.calculation_basis",
+        "election.planets",
+        "election.axes",
+        "election.moon",
+        "election.ascendant",
+        "election.solar_condition_policy",
+        "election.scoring_policy",
+        "election.score_evidence",
+        "election.score",
+        "election.score_bounds",
+        "election.factors",
+        "election.unresolved_factors",
+        "election.has_hard_block",
+        "election.verdict",
+        "election.recommendation"
+      ],
+      "purpose": "Native TT lunar events and named physical axes, not house-cusp substitutes. Keep nullable score/hard status and fixed-policy bounds with unknown factor reasons. Solar states use selected Lilly1647 p113 definitions; old score weights/bands remain uncalibrated product policy, not full source judgement or outcome probability.",
+      "when": "按明确候选时刻核对择日的原生月亮事件、太阳状态、物理ASC/MC、已知因子与未核算项；完整分数缺失时先读范围及原因。"
+    },
+    "calendar_input": {
+      "fields": [
+        "analysis_context",
+        "calendar_conversion",
+        "clock_conversion.hour_origin_conversion",
+        "election.calculation_basis.calendar",
+        "election.calculation_basis.time_scale",
+        "election.calculation_basis.julian_day_tt",
+        "election.calculation_basis.julian_day_ut1"
+      ],
+      "purpose": "核对显式儒略历／延伸格里历日期、转换后的本地钟时与实际TT/UT1；不推断地区改历、旧式年份或历史钟时，不把日期换算当原图复现。"
+    },
+    "clock_input": {
+      "fields": [
+        "analysis_context",
+        "calendar_conversion",
+        "clock_conversion",
+        "election.calculation_basis.time_scale",
+        "election.calculation_basis.julian_day_tt",
+        "election.calculation_basis.julian_day_ut1"
+      ],
+      "purpose": "核对已确认的民用／地方平太阳／地心视太阳钟时、历法转换次序及同一物理TT/UT1；未知原书钟时不拟合，数值残差不充当史料精度。"
+    },
+    "data_files": {
+      "fields": [
+        "ephemeris_data_policy"
+      ],
+      "scope": "Available when ephemeris_policy=require_data_files. Read the actual observed physical models, file hashes, reference zeros and private-worker reports. Native event-internal reads, fixed-star catalogue formulae and absolute accuracy are not certified. This card does not set the input policy."
+    },
+    "hour_origin": {
+      "fields": [
+        "analysis_context",
+        "calendar_conversion",
+        "clock_conversion.input_hour_origin",
+        "clock_conversion.hour_origin_conversion",
+        "clock_conversion.input_wall_datetime",
+        "clock_conversion.converted_utc",
+        "election.calculation_basis.julian_day_tt",
+        "election.calculation_basis.julian_day_ut1"
+      ],
+      "purpose": "核对已确认的午夜／正午起算小时标签：原历法日期、原小时与进位后的标准钟面分别读取，再看实际TT／UT1；不推断原图口径，不当作时区修正或实际持续时长。"
+    },
+    "physical_epoch": {
+      "description": "输入钟时、原生TT/UT1及UTC显示标签；太阳时物理轴保留秒60。普通civil分支utc_representation可为null，未宣称原始资料或实测EOP已认证。",
+      "fields": [
+        "analysis_context",
+        "clock_conversion",
+        "election.calculation_basis.julian_day_tt",
+        "election.calculation_basis.julian_day_ut1"
+      ]
+    },
+    "ut1_input": {
+      "fields": [
+        "analysis_context",
+        "clock_conversion",
+        "election.calculation_basis.earth_rotation",
+        "election.calculation_basis.julian_day_tt",
+        "election.calculation_basis.julian_day_ut1"
+      ],
+      "purpose": "核对明确选择的模型或IERS20 C04 UT1来源、固定覆盖期、源文件指纹、插值区间与未应用修正；盘面与地平计算仍要求覆盖内UT1；地心TT黄经事件不外推UT1即可跨边界搜索，未取得瞬时观测误差或现实预测证据。"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "analysis_context",
+      "calendar_conversion",
+      "clock_conversion",
+      "election.calculation_basis",
+      "election.planets",
+      "election.axes",
+      "election.moon",
+      "election.ascendant",
+      "election.solar_condition_policy",
+      "election.scoring_policy",
+      "election.score_evidence",
+      "election.score",
+      "election.score_bounds",
+      "election.factors",
+      "election.unresolved_factors",
+      "election.has_hard_block",
+      "election.verdict",
+      "election.recommendation"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "candidate_calendar": {
+        "default": "proleptic_gregorian",
+        "description": "Explicit calendar for candidate date labels; CE Jan1 years, no automatic regional reform or old-style year/clock reconstruction. Normalize date labels before applying timezone.",
+        "enum": [
+          "proleptic_gregorian",
+          "julian"
+        ],
+        "type": "string"
+      },
+      "candidate_clock_basis": {
+        "default": "civil",
+        "description": "Explicit candidate clock: civil, local mean solar (UT1 + east longitude/360), or geocentric local apparent solar (adds EOT). Solar labels require timezone_name omitted/null; unknown original clocks stay unknown.",
+        "enum": [
+          "civil",
+          "local_mean_solar",
+          "local_apparent_solar"
+        ],
+        "type": "string"
+      },
+      "candidate_day": {
+        "description": "Day of the candidate moment (1-31)",
+        "maximum": 31,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "candidate_hour": {
+        "description": "Hour of the candidate moment (0-23)",
+        "maximum": 23,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "candidate_hour_origin": {
+        "default": "midnight",
+        "description": "Explicit hour-label origin: midnight(default) hour0=00:00; noon hour0=same-date12:00 and hour12..23=next-date00:00..11:00. Confirm the source convention first; independent of civil/LMT/LAT, never an elapsed duration, timezone offset or automatic historical inference. Normalize calendar/day carry before applying timezone.",
+        "enum": [
+          "midnight",
+          "noon"
+        ],
+        "type": "string"
+      },
+      "candidate_minute": {
+        "default": 0,
+        "description": "Minute of the candidate moment",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "candidate_month": {
+        "description": "Month of the candidate moment (1-12)",
+        "maximum": 12,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "candidate_year": {
+        "description": "Year of the candidate moment being evaluated",
+        "type": "integer"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "ephemeris_policy": {
+        "default": "auto",
+        "description": "auto retains and reports actual available models. require_data_files rejects analytical/orbital fallback for observed physical coordinates throughout the request, including clocks and samples; checks data contexts and endpoint hashes. Native rise/set query/result epochs are probed, but internal solver reads are not fully observable. Analytical points, fictitious elements, reference zeros and Earth rotation are separate; this is not an astronomical-accuracy or prediction certificate.",
+        "enum": [
+          "auto",
+          "require_data_files"
+        ],
+        "type": "string",
+        "x-fatebridge-western-data-policy": true
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "house_system": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string"
+          }
+        ],
+        "default": "R",
+        "description": "House system, any convention (SE letter / key / integer code 0..8); Regiomontanus (R, code 2) is traditional for elections. Explicit values must be supported letters/names or integer codes0..8; unknown, blank, boolean and floating-point selections are rejected without substitution. Gauquelin (G) has36 clockwise sectors and is unavailable here."
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "latitude": {
+        "description": "Latitude where the act will take place",
+        "maximum": 90,
+        "minimum": -90,
+        "type": "number"
+      },
+      "longitude": {
+        "description": "Longitude where the act will take place",
+        "maximum": 180,
+        "minimum": -180,
+        "type": "number"
+      },
+      "name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional chart name"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "timezone_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Civil candidate timezone (IANA or UTC offset). Omitted/null with civil preserves legacy +08:00; use the known zone explicitly. Omit/null for solar clock bases, never combine both corrections."
+      },
+      "topic_id": {
+        "default": "marriage",
+        "description": "Undertaking type, selecting the rule pack: marriage/business/move_in/buy_property/trade/buy_car/contract/travel/job_hunt/general; 不提供医疗择时",
+        "enum": [
+          "marriage",
+          "business",
+          "move_in",
+          "buy_property",
+          "trade",
+          "buy_car",
+          "contract",
+          "travel",
+          "job_hunt",
+          "general"
+        ],
+        "type": "string"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "ut1_source": {
+        "default": "swiss_delta_t",
+        "description": "Earth-rotation time source: legacy Swiss Delta T model(default), or pinned IERS20 C04 final daily UT1 series,1962-01-01T00:00UTC..2026-09-19T00:00UTC. No prediction/extrapolation/model fallback outside coverage; UT1-only correction, not full EOP. Geocentric TT longitude-event searches need no trial UT1; houses and horizon calculations still require covered UT1 epochs.",
+        "enum": [
+          "swiss_delta_t",
+          "iers_c04"
+        ],
+        "type": "string"
+      },
+      "zodiac_type": {
+        "default": "Tropic",
+        "description": "Zodiac type, e.g. Tropic or Sidereal",
+        "type": "string"
+      }
+    },
+    "required": [
+      "candidate_year",
+      "candidate_month",
+      "candidate_day",
+      "candidate_hour",
+      "longitude",
+      "latitude"
+    ],
+    "type": "object"
+  },
+  "tool": "astro_election"
+}

@@ -6,6 +6,7 @@
 提供深层次的命理分析合盘分析，超越简单的刑冲克害
 """
 
+from decimal import ROUND_HALF_EVEN, Decimal
 from enum import Enum
 from typing import Any, Dict, List
 
@@ -101,36 +102,24 @@ class AdvancedCompatibility:
             analysis1, analysis2
         )
         result["detailed_analysis"]["element_balance"] = element_analysis
-        weighted_element_score = element_analysis["score"] * weights["element_balance"]
-        result["overall_score"] += weighted_element_score
 
         # 2. 喜用神互助分析
         favorable_analysis = AdvancedCompatibility._analyze_favorable_synergy(
             analysis1, analysis2
         )
         result["detailed_analysis"]["favorable_synergy"] = favorable_analysis
-        weighted_favorable_score = (
-            favorable_analysis["score"] * weights["favorable_synergy"]
-        )
-        result["overall_score"] += weighted_favorable_score
 
         # 3. 十神关系分析
         ten_gods_analysis = AdvancedCompatibility._analyze_ten_gods_relationship(
             analysis1, analysis2, relationship_type
         )
         result["detailed_analysis"]["ten_gods_relationship"] = ten_gods_analysis
-        weighted_ten_gods_score = (
-            ten_gods_analysis["score"] * weights["ten_gods_relationship"]
-        )
-        result["overall_score"] += weighted_ten_gods_score
 
         # 4. 格局配合分析
         pattern_analysis = AdvancedCompatibility._analyze_pattern_synergy(
             analysis1, analysis2
         )
         result["detailed_analysis"]["pattern_synergy"] = pattern_analysis
-        weighted_pattern_score = pattern_analysis["score"] * weights["pattern_synergy"]
-        result["overall_score"] += weighted_pattern_score
 
         # 5. 传统刑冲克害分析
         # 使用新的规则计算传统分析分数
@@ -191,30 +180,22 @@ class AdvancedCompatibility:
         }
 
         result["detailed_analysis"]["traditional_analysis"] = traditional_analysis
-        weighted_traditional_score = (
-            normalized_traditional_score * weights["traditional_analysis"]
-        )
-        result["overall_score"] += weighted_traditional_score
-
-        # Preserve the actual terms used above, not a second scoring algorithm.
+        # Compute once from the declared decimal scores and weights. Binary
+        # accumulation could turn an exact 75.85 tie into 75.85000000000001.
         # Input-model upgrades can change the score even when these weights and
         # the relationship rules stay unchanged; expose that provenance.
         components = {
-            "element_balance": (element_analysis["score"], weighted_element_score),
-            "favorable_synergy": (
-                favorable_analysis["score"],
-                weighted_favorable_score,
-            ),
-            "ten_gods_relationship": (
-                ten_gods_analysis["score"],
-                weighted_ten_gods_score,
-            ),
-            "pattern_synergy": (pattern_analysis["score"], weighted_pattern_score),
-            "traditional_analysis": (
-                normalized_traditional_score,
-                weighted_traditional_score,
-            ),
+            "element_balance": element_analysis["score"],
+            "favorable_synergy": favorable_analysis["score"],
+            "ten_gods_relationship": ten_gods_analysis["score"],
+            "pattern_synergy": pattern_analysis["score"],
+            "traditional_analysis": normalized_traditional_score,
         }
+        weighted_components = {
+            name: Decimal(str(score)) * Decimal(str(weights[name]))
+            for name, score in components.items()
+        }
+        unrounded = sum(weighted_components.values(), Decimal(0))
         input_methods = {}
         for label, natal in (("person1", analysis1), ("person2", analysis2)):
             day_master = natal.get("day_master", {})
@@ -233,23 +214,24 @@ class AdvancedCompatibility:
                 ),
             }
         result["scoring"] = {
-            "method_id": "compatibility_weighted_rules_v1",
+            "method_id": "compatibility_weighted_rules_v2",
             "input_methods": input_methods,
             "dimensions": {
                 name: {
                     "score": score,
                     "weight": weights[name],
-                    "weighted_score": round(weighted, 10),
+                    "weighted_score": float(weighted_components[name]),
                 }
-                for name, (score, weighted) in components.items()
+                for name, score in components.items()
             },
-            "unrounded_score": round(result["overall_score"], 10),
-            "rounding": "clip_0_100_then_python_round_1_decimal",
+            "unrounded_score": float(unrounded),
+            "rounding": "clip_0_100_then_decimal_half_even_1_decimal",
         }
 
-        # 确保总分在0-100范围内；round 到一位小数以避免浮点累加产生的显示噪声
-        result["overall_score"] = round(
-            min(100.0, max(0.0, result["overall_score"])), 1
+        result["overall_score"] = float(
+            min(Decimal(100), max(Decimal(0), unrounded)).quantize(
+                Decimal("0.1"), rounding=ROUND_HALF_EVEN
+            )
         )
 
         # 6. 根据关系类型调整分析重点

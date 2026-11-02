@@ -1,0 +1,93 @@
+{
+  "model_id": "shoushi_named_mean_lunations_v1",
+  "profiles": {
+    "gujin36_shoushi": {
+      "title": "邢云路古今律历考卷36授时历；卷58算例及月数钤",
+      "runying_days": "20.2050",
+      "synodic_month_days": "29.530593",
+      "qiying_days": "55.06",
+      "source_url": "https://commons.wikimedia.org/w/index.php?curid=71219540",
+      "constant_locator": "787册DjVu418，印页787-413，闰应二十日二十刻五十分",
+      "formula_locator": "DjVu419，印页787-414，推天正闰余及天正经朔",
+      "month_table_locator": "DjVu647，印页787-642，初十一月至十月，月数0..11",
+      "month_table_applicable": true
+    },
+    "yuanshi54_nlc166": {
+      "title": "国图藏元史卷54授时历经上",
+      "runying_days": "20.1850",
+      "synodic_month_days": "29.530593",
+      "qiying_days": "55.06",
+      "source_url": "https://commons.wikimedia.org/w/index.php?title=File:NLC892-312002017339-363669_二十四史_第166冊.pdf&oldid=1270279566",
+      "constant_locator": "原PDF53左页，日周一万；闰应二十万一千八百五十分",
+      "formula_locator": "原PDF54右页，推天正经朔",
+      "month_table_applicable": false
+    }
+  },
+  "gujin58_month_table": [
+    {
+      "lunation_index": 0,
+      "unintercalated_slot_label": "初十一月",
+      "cumulative_days": "0"
+    },
+    {
+      "lunation_index": 1,
+      "unintercalated_slot_label": "十二月",
+      "cumulative_days": "29.530593"
+    },
+    {
+      "lunation_index": 2,
+      "unintercalated_slot_label": "正月",
+      "cumulative_days": "59.061186"
+    },
+    {
+      "lunation_index": 3,
+      "unintercalated_slot_label": "二月",
+      "cumulative_days": "88.591779"
+    },
+    {
+      "lunation_index": 4,
+      "unintercalated_slot_label": "三月",
+      "cumulative_days": "118.122372"
+    },
+    {
+      "lunation_index": 5,
+      "unintercalated_slot_label": "四月",
+      "cumulative_days": "147.652965"
+    },
+    {
+      "lunation_index": 6,
+      "unintercalated_slot_label": "五月",
+      "cumulative_days": "177.183558"
+    },
+    {
+      "lunation_index": 7,
+      "unintercalated_slot_label": "六月",
+      "cumulative_days": "206.714151"
+    },
+    {
+      "lunation_index": 8,
+      "unintercalated_slot_label": "七月",
+      "cumulative_days": "236.244744"
+    },
+    {
+      "lunation_index": 9,
+      "unintercalated_slot_label": "八月",
+      "cumulative_days": "265.775337"
+    },
+    {
+      "lunation_index": 10,
+      "unintercalated_slot_label": "九月",
+      "cumulative_days": "295.305930"
+    },
+    {
+      "lunation_index": 11,
+      "unintercalated_slot_label": "十月",
+      "cumulative_days": "324.836523"
+    }
+  ],
+  "profile_policy": "Explicit named profile required; no mixed runying or guessed true-conjunction dates. Gujin month-table labels are unintercalated mean slots, not accepted civil lunar months.",
+  "true_new_moon_calibrated": false,
+  "intercalation_reconstructed": false,
+  "modern_epoch_calibrated": false,
+  "used_in_native_birth_chart": false
+}

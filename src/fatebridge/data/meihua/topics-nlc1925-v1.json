@@ -1,0 +1,526 @@
+{
+  "id": "meihua_topic_clauses_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本四章初始体用条款",
+  "selected_edition_id": "nlc_1925",
+  "source": {
+    "id": "nlc_1925",
+    "title": "文明書局《梅花易數》卷二选段",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_indices": [
+      67,
+      68
+    ],
+    "attribution_scope": "Publication metadata follows hosting catalogue; authenticity or Song authorship not independently certified"
+  },
+  "comparison_source": {
+    "id": "wikisource_1441921",
+    "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二",
+    "revision": 1441921,
+    "raw_sha256": "903b109b37071584ccbf54e15ee10813d32c702bb3d7e690e15d5b77cd0ff7cb"
+  },
+  "topics": {
+    "planning": {
+      "label": "求谋",
+      "section": "求謀占第八",
+      "use_role": "所謀之應",
+      "pdf_index": 67,
+      "header": "占求謀以體為主用為所謀之應"
+    },
+    "reputation": {
+      "label": "求名",
+      "section": "求名占第九",
+      "use_role": "名",
+      "pdf_index": 67,
+      "header": "凡占求名以體為主用為名"
+    },
+    "wealth": {
+      "label": "求财",
+      "section": "求財占第十",
+      "use_role": "財",
+      "pdf_index": 68,
+      "header": "占求財以體為主以用為財"
+    },
+    "transaction": {
+      "label": "交易",
+      "section": "交易占第十一",
+      "use_role": "交易之應",
+      "pdf_index": 68,
+      "header": "占交易以體為主用為交易之應"
+    }
+  },
+  "rules": [
+    {
+      "id": "planning_body_controls_use",
+      "topic": "planning",
+      "relation": "体克用",
+      "source_id": "nlc_1925",
+      "section": "求謀占第八",
+      "quote": "體尅用謀雖可成但成遲",
+      "reading": "所选文明书局本在此体用关系下取谋可成而迟之象；迟仅为相对措辞，未计算日期",
+      "semantic_tags": [
+        "relative_delay"
+      ],
+      "delay_scope": "relative_delay_without_numeric_window",
+      "source_witness": {
+        "original_pdf_index": 67,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體克用，謀雖可成，但成遲",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "planning_use_controls_body",
+      "topic": "planning",
+      "relation": "用克体",
+      "source_id": "nlc_1925",
+      "section": "求謀占第八",
+      "quote": "用尅體求謀不成成亦有害",
+      "reading": "所选本取求谋难成及成亦有害之象",
+      "semantic_tags": [
+        "unfavorable_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 67,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用克體，求謀不成，謀亦有害",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "planning_body_generates_use",
+      "topic": "planning",
+      "relation": "体生用",
+      "source_id": "nlc_1925",
+      "section": "求謀占第八",
+      "quote": "體生用則多謀少遂",
+      "reading": "所选本取多谋少遂之象",
+      "semantic_tags": [
+        "difficulty_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 67,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體生用，多謀少遂",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "planning_use_generates_body",
+      "topic": "planning",
+      "relation": "用生体",
+      "source_id": "nlc_1925",
+      "section": "求謀占第八",
+      "quote": "用生體不謀而成",
+      "reading": "所选本取不谋而成之象",
+      "semantic_tags": [
+        "favorable_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 67,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用生體。不謀而成",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "planning_same_element",
+      "topic": "planning",
+      "relation": "体用比和",
+      "source_id": "nlc_1925",
+      "section": "求謀占第八",
+      "quote": "體用比和求謀稱意",
+      "reading": "所选本取求谋称意之象",
+      "semantic_tags": [
+        "favorable_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 67,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體用比和，求謀稱意",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "reputation_body_controls_use",
+      "topic": "reputation",
+      "relation": "体克用",
+      "source_id": "nlc_1925",
+      "section": "求名占第九",
+      "quote": "體尅用名可成但成遲",
+      "reading": "所选本取名可成而迟之象；未计算成名日期",
+      "semantic_tags": [
+        "relative_delay"
+      ],
+      "delay_scope": "relative_delay_without_numeric_window",
+      "source_witness": {
+        "original_pdf_index": 67,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體克用，名可成，但成遲",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "reputation_use_controls_body",
+      "topic": "reputation",
+      "relation": "用克体",
+      "source_id": "nlc_1925",
+      "section": "求名占第九",
+      "quote": "用尅體名不可成",
+      "reading": "所选本取名不可成之象",
+      "semantic_tags": [
+        "unfavorable_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 67,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用克體，名不可成",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "reputation_body_generates_use",
+      "topic": "reputation",
+      "relation": "体生用",
+      "source_id": "nlc_1925",
+      "section": "求名占第九",
+      "quote": "體生用名不可就或因名有喪",
+      "reading": "所选本取名难就或有损失之象",
+      "semantic_tags": [
+        "loss_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 67,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體生用，名不可就，或因名有喪",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "reputation_use_generates_body",
+      "topic": "reputation",
+      "relation": "用生体",
+      "source_id": "nlc_1925",
+      "section": "求名占第九",
+      "quote": "用生體名易成或因名有得",
+      "reading": "所选本取名易成或有所得之象",
+      "semantic_tags": [
+        "gain_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 67,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用生體，名易成，或因名有得",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "reputation_same_element",
+      "topic": "reputation",
+      "relation": "体用比和",
+      "source_id": "nlc_1925",
+      "section": "求名占第九",
+      "quote": "體用比和功名稱意",
+      "reading": "所选本取功名称意之象",
+      "semantic_tags": [
+        "favorable_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 67,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體用比和，功名稱意",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "wealth_body_controls_use",
+      "topic": "wealth",
+      "relation": "体克用",
+      "source_id": "nlc_1925",
+      "section": "求財占第十",
+      "quote": "體尅用有財",
+      "reading": "所选本取有财之象",
+      "semantic_tags": [
+        "gain_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 68,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體克用，有財",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "wealth_use_controls_body",
+      "topic": "wealth",
+      "relation": "用克体",
+      "source_id": "nlc_1925",
+      "section": "求財占第十",
+      "quote": "用尅體無財",
+      "reading": "所选本取无财之象",
+      "semantic_tags": [
+        "unfavorable_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 68,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用克體，無財",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "wealth_body_generates_use",
+      "topic": "wealth",
+      "relation": "体生用",
+      "source_id": "nlc_1925",
+      "section": "求財占第十",
+      "quote": "體生用財有損耗之憂",
+      "reading": "所选本取财有损耗之忧象",
+      "semantic_tags": [
+        "loss_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 68,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體生用，財有損耗之憂",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "wealth_use_generates_body",
+      "topic": "wealth",
+      "relation": "用生体",
+      "source_id": "nlc_1925",
+      "section": "求財占第十",
+      "quote": "用生體財有進益之喜",
+      "reading": "所选本取财有进益之喜象",
+      "semantic_tags": [
+        "gain_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 68,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用生體，財有進益之喜",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "wealth_same_element",
+      "topic": "wealth",
+      "relation": "体用比和",
+      "source_id": "nlc_1925",
+      "section": "求財占第十",
+      "quote": "體用比和財利快意",
+      "reading": "所选本取财利快意之象",
+      "semantic_tags": [
+        "favorable_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 68,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體用比和，財利快意",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "transaction_body_controls_use",
+      "topic": "transaction",
+      "relation": "体克用",
+      "source_id": "nlc_1925",
+      "section": "交易占第十一",
+      "quote": "體尅用交易成遲",
+      "reading": "所选文明书局本在此关系下取交易成迟之象；固定转录另作有财，不能混作同一句",
+      "semantic_tags": [
+        "relative_delay"
+      ],
+      "delay_scope": "relative_delay_without_numeric_window",
+      "source_witness": {
+        "original_pdf_index": 68,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體克用，有財",
+        "semantic_status": "explicit_difference_in_selected_reading"
+      }
+    },
+    {
+      "id": "transaction_use_controls_body",
+      "topic": "transaction",
+      "relation": "用克体",
+      "source_id": "nlc_1925",
+      "section": "交易占第十一",
+      "quote": "用尅體不成",
+      "reading": "所选本取交易不成之象",
+      "semantic_tags": [
+        "unfavorable_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 68,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用克體，不成",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "transaction_body_generates_use",
+      "topic": "transaction",
+      "relation": "体生用",
+      "source_id": "nlc_1925",
+      "section": "交易占第十一",
+      "quote": "體生用難成或有交易之失",
+      "reading": "所选本取交易难成或有损失之象",
+      "semantic_tags": [
+        "difficulty_symbol",
+        "loss_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 68,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體生用，難成，或因交易有失",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "transaction_use_generates_body",
+      "topic": "transaction",
+      "relation": "用生体",
+      "source_id": "nlc_1925",
+      "section": "交易占第十一",
+      "quote": "用生體即成成必有財",
+      "reading": "所选本取交易即成且有财之象",
+      "semantic_tags": [
+        "gain_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 68,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用生體，即成，成必有財",
+        "semantic_status": "not_adjudicated"
+      }
+    },
+    {
+      "id": "transaction_same_element",
+      "topic": "transaction",
+      "relation": "体用比和",
+      "source_id": "nlc_1925",
+      "section": "交易占第十一",
+      "quote": "體用比和易成",
+      "reading": "所选本取交易易成之象",
+      "semantic_tags": [
+        "favorable_symbol"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_index": 68,
+        "reader": "assistant visual selected-span reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體用比和，易成",
+        "semantic_status": "not_adjudicated"
+      }
+    }
+  ],
+  "policies": {
+    "topic_selection": "Explicit parameter, never inferred from question keywords",
+    "selected_relation": "Original static body versus original moving-use trigram only",
+    "stages_and_strength": "Retain separately; no vote, sum or automatic replacement of the selected initial clause",
+    "relative_delay": "Only source phrase, no day or clock conversion",
+    "other_edition": "Comparison only, cannot replace selected clause according to desired outcome",
+    "probability_or_real_outcome": "not_computed",
+    "unflagged_comparison_does_not_prove_semantic_equivalence": true
+  },
+  "scope": "Four chapters initial five relation clauses only. Further stage/strength synthesis, full thematic chapters, timing/direction and observed predictive efficacy are not accepted."
+}

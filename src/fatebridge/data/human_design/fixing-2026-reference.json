@@ -1,0 +1,5191 @@
+{
+  "catalogue_id": "official_visible_natal_fixing_markers_2026_v1",
+  "plan_sha256": "db7b67310c74752c5b50a860b3e9ec59f33e23563ee3e9a366d9ac1ed56f3998",
+  "plan": {
+    "scope": "All19 unchanged official chart PDFs, all26 activation slots each. Observe visible grayscale triangle orientation independently of FateBridge. Blank slots are no_visible_marker, never automatically unfixed. No birth inputs or PDF facts may be replaced after comparison.",
+    "column_dimensions": [
+      200,
+      800
+    ],
+    "marker_rgb": [
+      124,
+      124,
+      124
+    ],
+    "row_centres": {
+      "first": 90,
+      "step": 56,
+      "count": 13
+    },
+    "component_connectivity": 8,
+    "candidate_minimum_pixels": 8,
+    "triangle_bounding_box_limits": [
+      5,
+      14
+    ],
+    "triangle_minimum_pixels": 20,
+    "orientation": "Compare component centroid y with its bounding-box midpoint; positive offset means upward triangle (exaltation). Negative offset means downward triangle (detriment). Reject symmetric or out-of-row candidates."
+  },
+  "cohort_sources": [
+    {
+      "fixture": "human-design-official-charts.json",
+      "sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
+      "source": {
+        "publisher": "Jovian Archive / Maia Mechanics",
+        "url": "https://jovianarchive.com/pages/get-your-human-design-chart",
+        "collection": "Normal interactive public page; fictitious inputs, optional email omitted. Direct validity API returned 401 and was not used for calculation. Rendered SVG numeric labels and properties copied independently of FateBridge results; every PDF downloaded through the page.",
+        "page_sha256": "47be250ac9cdf491c48c17ec012a3bae22eda2d6f4b760df409dc0927df7d448",
+        "widget_script_sha256": "aeb530d406f29b81341543641b436b451138ed6d8f88e22ba717c8d5bdbcdd07",
+        "collected_at": "2026-10-21T22:23:01.227273+00:00"
+      },
+      "selection_scope": "Eight fixed winter inputs, one city, three core Types and Generator subtypes, three authorities, three profiles, one Cross and eight distinct Variable codes. No Reflector case, all profiles/crosses coverage, real birth-record authentication, universal node-convention or physical-subdivision precision certification. Only visible numerical facts and labels retained; source PDFs are not republished."
+    },
+    {
+      "fixture": "human-design-official-authority-charts.json",
+      "sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
+      "source": {
+        "publisher": "Jovian Archive / Maia Mechanics",
+        "url": "https://jovianarchive.com/pages/get-your-human-design-chart",
+        "collection": "Normal interactive public page, 11 fictitious frozen inputs; optional email omitted; no account or direct calculation API. Gate.lines and defined graph copied from rendered SVG; properties independently read from downloaded PDF and checked against rendered page. PDFs retained locally under /tmp/fatebridge-human-design-authority-sources; only hashes and bounded factual transcription are redistributed.",
+        "collected_at": "2026-10-21T23:50:54.990801+00:00",
+        "transcription_crosscheck": {
+          "rendered_observation_count": 11,
+          "canonical_ascii_json_bytes": 4663,
+          "fnv1a32": "dc5fd65d",
+          "scope": "Non-cryptographic transcription crosscheck only: normalized page facts equal the separate local SVG/PDF transcription. PDF SHA-256 binds source artifacts; the frozen plan never supplies expected values."
+        },
+        "property_whitespace": "Whitespace normalized between rendered page and PDF; case/spelling unchanged. Upheaval has two spaces before the parenthesis on the page and one in the PDF."
+      },
+      "selection_scope": "Finite conformance to 11 engine-selected branch-coverage examples; inputs frozen before official outputs. Engine-selected stratification is not a blind or population benchmark. All observations retained, including failures. Official displayed gate.lines and structure do not independently establish Color, Tone, Base, astronomical precision, every original rule or real-world predictive validity."
+    }
+  ],
+  "scope": "All 19 original PDFs and 494 activation slots, no selection after comparison. Gate.lines are the unchanged printed cohort observations. Raster triangle polarity is observed independently of FateBridge. Not an independent birth-clock or astronomy reference.",
+  "rendering_limit": "Public widget references a combined fixing symbol but its fixing asset object only defines exalted and detriment. No visible marker does not identify unfixed versus juxtaposition or other hidden states. The 356 blank slots cannot certify full fixing states.",
+  "node_agency_source": {
+    "url": "https://humandesignsystem.com/archive/newsletters/0402.pdf",
+    "author": "Martin Grassinger",
+    "article": "Raise the Titanic",
+    "pdf_page_one_based": 2,
+    "date": "1997-06-30",
+    "scope": "Nodes do not fix other lines; this is donor agency, not a prohibition on receiving planetary fixing."
+  },
+  "fixing_rule_source": {
+    "url": "https://jovianarchive.com/blogs/chart-interpretations-components/line-fixing-in-human-design-exaltation-detriment-and-juxtaposition",
+    "author": "Ryan Hanna",
+    "date": "2026-06-09",
+    "scope": "Current official public explanation, not claimed to be the 2001 primary text."
+  },
+  "complete_fixing_statuses_certified": false,
+  "full_384_line_meaning_acceptance": false,
+  "cases": [
+    {
+      "case_id": "winter-1900",
+      "pdf_sha256": "8ad52f0b894bbdd06f626f27547572e3ce9611b7a5f0797739d35a7ad2021f9c",
+      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "48.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              135,
+              87,
+              144,
+              95
+            ],
+            "centroid_y": 92.11320754716981,
+            "row": 0,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "21.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              143,
+              144,
+              151
+            ],
+            "centroid_y": 145.7450980392157,
+            "row": 1,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "50.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "11.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "12.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "57.2",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              368,
+              144,
+              375
+            ],
+            "centroid_y": 372.37254901960785,
+            "row": 5,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "57.3",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              424,
+              144,
+              431
+            ],
+            "centroid_y": 428.47058823529414,
+            "row": 6,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "44.3",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              480,
+              144,
+              487
+            ],
+            "centroid_y": 484.47058823529414,
+            "row": 7,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "44.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "26.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "34.6",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 46,
+            "bbox": [
+              135,
+              648,
+              144,
+              655
+            ],
+            "centroid_y": 650.4347826086956,
+            "row": 10,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "12.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "35.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "38.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 52,
+            "bbox": [
+              53,
+              87,
+              61,
+              95
+            ],
+            "centroid_y": 89.76923076923077,
+            "row": 0,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "39.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "38.1",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 52,
+            "bbox": [
+              53,
+              199,
+              61,
+              207
+            ],
+            "centroid_y": 201.76923076923077,
+            "row": 2,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "26.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              255,
+              61,
+              263
+            ],
+            "centroid_y": 257.79245283018867,
+            "row": 3,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "45.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "26.3",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              367,
+              61,
+              375
+            ],
+            "centroid_y": 369.79245283018867,
+            "row": 5,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "41.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "38.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "34.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              535,
+              61,
+              543
+            ],
+            "centroid_y": 537.9056603773585,
+            "row": 8,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "11.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "9.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "12.3",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 48,
+            "bbox": [
+              53,
+              704,
+              61,
+              711
+            ],
+            "centroid_y": 708.4375,
+            "row": 11,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "35.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "winter-1955",
+      "pdf_sha256": "4f881834c15fc245e5732291ceed2991982d3998bc30f57ac151488ac1caeddf",
+      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "48.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "21.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "61.2",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              135,
+              199,
+              144,
+              207
+            ],
+            "centroid_y": 204.26415094339623,
+            "row": 2,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "38.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "39.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "44.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "43.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "54.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "56.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "44.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "56.2",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 50,
+            "bbox": [
+              135,
+              648,
+              144,
+              655
+            ],
+            "centroid_y": 652.44,
+            "row": 10,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "32.5",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 47,
+            "bbox": [
+              135,
+              704,
+              144,
+              711
+            ],
+            "centroid_y": 706.5106382978723,
+            "row": 11,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "29.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "38.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "39.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "17.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "58.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "52.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "38.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "14.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "22.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              53,
+              479,
+              61,
+              487
+            ],
+            "centroid_y": 481.85185185185185,
+            "row": 7,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "56.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "1.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "62.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "50.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "29.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "winter-1965",
+      "pdf_sha256": "fc66072fab26077435261a925f9cb6671050ca4a92f9bddc9cf767141081ff3f",
+      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "48.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              135,
+              87,
+              144,
+              95
+            ],
+            "centroid_y": 92.11320754716981,
+            "row": 0,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "21.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              143,
+              144,
+              151
+            ],
+            "centroid_y": 145.7450980392157,
+            "row": 1,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "57.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "12.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "11.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              312,
+              144,
+              319
+            ],
+            "centroid_y": 316.37254901960785,
+            "row": 4,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "18.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "59.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "33.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "8.1",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              536,
+              144,
+              543
+            ],
+            "centroid_y": 540.4705882352941,
+            "row": 8,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "30.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "64.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "1.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 47,
+            "bbox": [
+              135,
+              704,
+              144,
+              711
+            ],
+            "centroid_y": 706.5106382978723,
+            "row": 11,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "64.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "38.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "39.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "11.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              199,
+              61,
+              207
+            ],
+            "centroid_y": 204.16981132075472,
+            "row": 2,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "12.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "11.1",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              53,
+              311,
+              61,
+              319
+            ],
+            "centroid_y": 316.2156862745098,
+            "row": 4,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "26.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "5.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "6.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "2.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "55.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 52,
+            "bbox": [
+              53,
+              591,
+              61,
+              599
+            ],
+            "centroid_y": 593.9615384615385,
+            "row": 9,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "64.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "43.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "64.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "winter-1971",
+      "pdf_sha256": "4f015cc8731fa01b99c11bb886d72a5b39e3a764ca564c1c69de4782d511229f",
+      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "48.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              135,
+              87,
+              144,
+              95
+            ],
+            "centroid_y": 92.11320754716981,
+            "row": 0,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "21.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              143,
+              144,
+              151
+            ],
+            "centroid_y": 145.7450980392157,
+            "row": 1,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "5.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "55.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              255,
+              144,
+              263
+            ],
+            "centroid_y": 257.7450980392157,
+            "row": 3,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "59.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 52,
+            "bbox": [
+              135,
+              311,
+              144,
+              319
+            ],
+            "centroid_y": 313.78846153846155,
+            "row": 4,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "6.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "43.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "47.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "44.2",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              536,
+              144,
+              543
+            ],
+            "centroid_y": 540.4705882352941,
+            "row": 8,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "23.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "18.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "14.5",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 47,
+            "bbox": [
+              135,
+              704,
+              144,
+              711
+            ],
+            "centroid_y": 706.5106382978723,
+            "row": 11,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "6.6",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 50,
+            "bbox": [
+              135,
+              760,
+              144,
+              767
+            ],
+            "centroid_y": 764.44,
+            "row": 12,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "38.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "39.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "55.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "49.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "4.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "10.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              367,
+              61,
+              375
+            ],
+            "centroid_y": 369.79245283018867,
+            "row": 5,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "14.1",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              53,
+              423,
+              61,
+              431
+            ],
+            "centroid_y": 428.2156862745098,
+            "row": 6,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "1.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "14.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "2.3",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 49,
+            "bbox": [
+              53,
+              592,
+              61,
+              599
+            ],
+            "centroid_y": 596.4081632653061,
+            "row": 9,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "48.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "34.3",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 46,
+            "bbox": [
+              53,
+              704,
+              61,
+              711
+            ],
+            "centroid_y": 706.4782608695652,
+            "row": 11,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "46.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "winter-1990",
+      "pdf_sha256": "b7de2730c4b0a0e5561f7fe9e626f32427b248be5035956fa83125e4ab138234",
+      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "48.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              135,
+              87,
+              144,
+              95
+            ],
+            "centroid_y": 92.11320754716981,
+            "row": 0,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "21.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              143,
+              144,
+              151
+            ],
+            "centroid_y": 145.7450980392157,
+            "row": 1,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "26.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "49.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "4.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "6.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "14.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "48.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "39.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "58.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "10.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 50,
+            "bbox": [
+              135,
+              648,
+              144,
+              655
+            ],
+            "centroid_y": 652.44,
+            "row": 10,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "38.1",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 50,
+            "bbox": [
+              135,
+              704,
+              144,
+              711
+            ],
+            "centroid_y": 708.44,
+            "row": 11,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "1.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "38.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "39.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "55.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              199,
+              61,
+              207
+            ],
+            "centroid_y": 204.16981132075472,
+            "row": 2,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "13.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "7.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "61.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "41.5",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              53,
+              423,
+              61,
+              431
+            ],
+            "centroid_y": 425.85185185185185,
+            "row": 6,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "9.5",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              53,
+              479,
+              61,
+              487
+            ],
+            "centroid_y": 484.2156862745098,
+            "row": 7,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "52.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              535,
+              61,
+              543
+            ],
+            "centroid_y": 537.9056603773585,
+            "row": 8,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "54.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "58.3",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 49,
+            "bbox": [
+              53,
+              648,
+              61,
+              655
+            ],
+            "centroid_y": 652.4081632653061,
+            "row": 10,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "38.3",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 48,
+            "bbox": [
+              53,
+              704,
+              61,
+              711
+            ],
+            "centroid_y": 708.4375,
+            "row": 11,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "1.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "winter-2000",
+      "pdf_sha256": "af68d1c1ddf3a1a46454ccdfa93b04ea271951e29d9495bcda0be1e2fd5e4d5f",
+      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "48.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              135,
+              87,
+              144,
+              95
+            ],
+            "centroid_y": 92.11320754716981,
+            "row": 0,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "21.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              143,
+              144,
+              151
+            ],
+            "centroid_y": 145.7450980392157,
+            "row": 1,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "59.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "33.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "19.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "50.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "29.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "26.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "27.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "2.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "19.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "60.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "9.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "38.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "39.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "1.1",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              199,
+              61,
+              207
+            ],
+            "centroid_y": 204.16981132075472,
+            "row": 2,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "31.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "41.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "10.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              367,
+              61,
+              375
+            ],
+            "centroid_y": 369.79245283018867,
+            "row": 5,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "34.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              53,
+              423,
+              61,
+              431
+            ],
+            "centroid_y": 425.85185185185185,
+            "row": 6,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "30.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "42.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "24.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "13.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "41.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 46,
+            "bbox": [
+              53,
+              704,
+              61,
+              711
+            ],
+            "centroid_y": 706.4782608695652,
+            "row": 11,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "5.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "winter-2024",
+      "pdf_sha256": "db379b9e6f6373aa43f5309187b66038693e997c69aeb54d81232e223bcc7c61",
+      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "48.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              135,
+              87,
+              144,
+              95
+            ],
+            "centroid_y": 92.11320754716981,
+            "row": 0,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "21.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              143,
+              144,
+              151
+            ],
+            "centroid_y": 145.7450980392157,
+            "row": 1,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "52.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "42.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "32.5",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 52,
+            "bbox": [
+              135,
+              311,
+              144,
+              319
+            ],
+            "centroid_y": 313.78846153846155,
+            "row": 4,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "46.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "29.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              135,
+              423,
+              144,
+              431
+            ],
+            "centroid_y": 425.9259259259259,
+            "row": 6,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "32.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "2.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "55.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              135,
+              591,
+              144,
+              599
+            ],
+            "centroid_y": 593.925925925926,
+            "row": 9,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "23.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "36.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "60.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "38.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "39.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "64.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "42.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "32.1",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              311,
+              61,
+              319
+            ],
+            "centroid_y": 313.79245283018867,
+            "row": 4,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "26.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "34.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "11.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "27.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              53,
+              535,
+              61,
+              543
+            ],
+            "centroid_y": 540.2156862745098,
+            "row": 8,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "55.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "23.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "36.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "60.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "winter-2026",
+      "pdf_sha256": "21aec80e8b4d1c376c8a4298cccb470d5a841e8db0808957a3f97312ccabde62",
+      "cohort_sha256": "77e5e322dd87230a307a1e8413f4e38b1890d3f27da0b6a71c3a612d146d3225",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "48.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              135,
+              87,
+              144,
+              95
+            ],
+            "centroid_y": 92.11320754716981,
+            "row": 0,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "21.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              143,
+              144,
+              151
+            ],
+            "centroid_y": 145.7450980392157,
+            "row": 1,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "36.6",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              199,
+              144,
+              207
+            ],
+            "centroid_y": 201.7450980392157,
+            "row": 2,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "22.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "47.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "50.3",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              135,
+              367,
+              144,
+              375
+            ],
+            "centroid_y": 369.9259259259259,
+            "row": 5,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "47.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "44.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              135,
+              479,
+              144,
+              487
+            ],
+            "centroid_y": 481.9259259259259,
+            "row": 7,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "62.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "36.6",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              135,
+              591,
+              144,
+              599
+            ],
+            "centroid_y": 593.925925925926,
+            "row": 9,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "20.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "25.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "60.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "38.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "39.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "35.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              199,
+              61,
+              207
+            ],
+            "centroid_y": 204.16981132075472,
+            "row": 2,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "37.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "40.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "10.2",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              53,
+              367,
+              61,
+              375
+            ],
+            "centroid_y": 372.2156862745098,
+            "row": 5,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "38.1",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              53,
+              423,
+              61,
+              431
+            ],
+            "centroid_y": 425.85185185185185,
+            "row": 6,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "38.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              53,
+              479,
+              61,
+              487
+            ],
+            "centroid_y": 481.85185185185185,
+            "row": 7,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "62.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "36.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 52,
+            "bbox": [
+              53,
+              591,
+              61,
+              599
+            ],
+            "centroid_y": 593.9615384615385,
+            "row": 9,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "8.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "25.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "41.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "branch-1980-09-09",
+      "pdf_sha256": "767e06a572b530054ddd77a5addaa5ae9bb69e9b636252ad008d5b9873aae095",
+      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "45.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "26.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "27.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "4.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "49.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "39.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "12.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "64.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "59.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "47.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "43.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "26.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "57.5",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 50,
+            "bbox": [
+              135,
+              760,
+              144,
+              767
+            ],
+            "centroid_y": 764.44,
+            "row": 12,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "64.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "63.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "47.1",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              199,
+              61,
+              207
+            ],
+            "centroid_y": 204.16981132075472,
+            "row": 2,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "4.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "49.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "46.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "56.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "28.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "47.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "46.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "43.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "26.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "57.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "branch-1980-11-13",
+      "pdf_sha256": "cfcb6598373be4d1b7caf5e7d71b382056d7539f12ac7e6061ee38a819f5c869",
+      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "4.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "49.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "32.1",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              199,
+              144,
+              207
+            ],
+            "centroid_y": 201.7450980392157,
+            "row": 2,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "4.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "49.2",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              312,
+              144,
+              319
+            ],
+            "centroid_y": 316.37254901960785,
+            "row": 4,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "33.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "52.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "32.1",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              135,
+              479,
+              144,
+              487
+            ],
+            "centroid_y": 481.9259259259259,
+            "row": 7,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "64.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "6.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "43.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "26.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "57.5",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 50,
+            "bbox": [
+              135,
+              760,
+              144,
+              767
+            ],
+            "centroid_y": 764.44,
+            "row": 12,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "43.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "23.3",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              143,
+              61,
+              151
+            ],
+            "centroid_y": 148.16981132075472,
+            "row": 1,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "61.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "7.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "13.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "28.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "57.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "11.1",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              53,
+              479,
+              61,
+              487
+            ],
+            "centroid_y": 481.85185185185185,
+            "row": 7,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "46.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "18.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "14.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "26.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "32.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "branch-1980-11-18",
+      "pdf_sha256": "e9069a837d24bc335b996cd398b85a4a413e8a054ae91cc964d235872df79b0c",
+      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "29.5",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              135,
+              87,
+              144,
+              95
+            ],
+            "centroid_y": 92.11320754716981,
+            "row": 0,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "30.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "11.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "4.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "49.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "4.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "39.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "32.5",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              135,
+              479,
+              144,
+              487
+            ],
+            "centroid_y": 481.9259259259259,
+            "row": 7,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "64.5",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              135,
+              535,
+              144,
+              543
+            ],
+            "centroid_y": 537.925925925926,
+            "row": 8,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "6.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "43.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "26.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "57.5",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 50,
+            "bbox": [
+              135,
+              760,
+              144,
+              767
+            ],
+            "centroid_y": 764.44,
+            "row": 12,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "14.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "8.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 52,
+            "bbox": [
+              53,
+              143,
+              61,
+              151
+            ],
+            "centroid_y": 145.76923076923077,
+            "row": 1,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "25.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "7.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "13.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "28.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "32.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "11.5",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              53,
+              479,
+              61,
+              487
+            ],
+            "centroid_y": 484.2156862745098,
+            "row": 7,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "18.1",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              535,
+              61,
+              543
+            ],
+            "centroid_y": 537.9056603773585,
+            "row": 8,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "18.3",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 52,
+            "bbox": [
+              53,
+              591,
+              61,
+              599
+            ],
+            "centroid_y": 593.9615384615385,
+            "row": 9,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "14.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "26.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "32.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "branch-1981-07-04",
+      "pdf_sha256": "3fd1c37daa2b63fc92bd2f7e4c749ca780f3eae075e801b00818d75c3982474d",
+      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "21.6",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 52,
+            "bbox": [
+              135,
+              87,
+              144,
+              94
+            ],
+            "centroid_y": 89.53846153846153,
+            "row": 0,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "48.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "17.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "33.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "19.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "36.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "21.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "21.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "18.1",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              135,
+              535,
+              144,
+              543
+            ],
+            "centroid_y": 537.925925925926,
+            "row": 8,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "18.3",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              135,
+              591,
+              144,
+              599
+            ],
+            "centroid_y": 593.925925925926,
+            "row": 9,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "14.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "11.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "32.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "39.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 52,
+            "bbox": [
+              53,
+              87,
+              61,
+              95
+            ],
+            "centroid_y": 89.76923076923077,
+            "row": 0,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "38.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "7.5",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              199,
+              61,
+              207
+            ],
+            "centroid_y": 204.16981132075472,
+            "row": 2,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "56.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "60.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "12.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              367,
+              61,
+              375
+            ],
+            "centroid_y": 369.79245283018867,
+            "row": 5,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "31.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              53,
+              423,
+              61,
+              431
+            ],
+            "centroid_y": 428.2156862745098,
+            "row": 6,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "45.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              53,
+              479,
+              61,
+              487
+            ],
+            "centroid_y": 481.85185185185185,
+            "row": 7,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "46.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "46.6",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 49,
+            "bbox": [
+              53,
+              592,
+              61,
+              599
+            ],
+            "centroid_y": 596.4081632653061,
+            "row": 9,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "14.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "11.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "32.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "branch-1988-03-18",
+      "pdf_sha256": "e9ec1bdd7af8f2b6fe6e986e8355a77a9af48b87aee870634d9d3df266b3a31c",
+      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "10.2",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              135,
+              87,
+              144,
+              95
+            ],
+            "centroid_y": 92.11320754716981,
+            "row": 0,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "15.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              143,
+              144,
+              151
+            ],
+            "centroid_y": 145.7450980392157,
+            "row": 1,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "61.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "36.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "6.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "10.2",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              368,
+              144,
+              375
+            ],
+            "centroid_y": 372.37254901960785,
+            "row": 5,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "60.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "1.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "51.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "11.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "11.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "58.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 47,
+            "bbox": [
+              135,
+              704,
+              144,
+              711
+            ],
+            "centroid_y": 706.5106382978723,
+            "row": 11,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "44.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "36.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "6.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "25.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "36.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "6.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "55.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "2.1",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              53,
+              423,
+              61,
+              431
+            ],
+            "centroid_y": 428.2156862745098,
+            "row": 6,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "54.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              53,
+              479,
+              61,
+              487
+            ],
+            "centroid_y": 481.85185185185185,
+            "row": 7,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "27.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "10.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "10.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "38.1",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 48,
+            "bbox": [
+              53,
+              704,
+              61,
+              711
+            ],
+            "centroid_y": 708.4375,
+            "row": 11,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "44.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "branch-1980-01-14",
+      "pdf_sha256": "6e8d482495dcb38459f42508cb29b69c867530fbba085546694684ec4e0ae895",
+      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "32.6",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              135,
+              87,
+              144,
+              95
+            ],
+            "centroid_y": 92.11320754716981,
+            "row": 0,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "42.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "18.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "40.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "37.3",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              312,
+              144,
+              319
+            ],
+            "centroid_y": 316.37254901960785,
+            "row": 4,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "1.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "44.3",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              135,
+              423,
+              144,
+              431
+            ],
+            "centroid_y": 425.9259259259259,
+            "row": 6,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "7.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "59.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "47.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "43.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "26.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "57.5",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 50,
+            "bbox": [
+              135,
+              760,
+              144,
+              767
+            ],
+            "centroid_y": 764.44,
+            "row": 12,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "61.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "62.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "9.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "29.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "30.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "54.5",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              53,
+              367,
+              61,
+              375
+            ],
+            "centroid_y": 372.2156862745098,
+            "row": 5,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "30.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "64.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "40.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "6.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "14.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "26.5",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 46,
+            "bbox": [
+              53,
+              704,
+              61,
+              711
+            ],
+            "centroid_y": 706.4782608695652,
+            "row": 11,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "32.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "branch-1980-03-28",
+      "pdf_sha256": "49aea177312e9cd8cd5f7f9b345f4014ef2b8e81e5f4f6a277ce30fc98bde03a",
+      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "38.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "39.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "12.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "59.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "55.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "10.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "19.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "64.3",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              480,
+              144,
+              487
+            ],
+            "centroid_y": 484.47058823529414,
+            "row": 7,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "40.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "6.5",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              135,
+              591,
+              144,
+              599
+            ],
+            "centroid_y": 593.925925925926,
+            "row": 9,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "43.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "26.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "32.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "17.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "18.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "59.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "29.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "30.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "37.6",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              367,
+              61,
+              375
+            ],
+            "centroid_y": 369.79245283018867,
+            "row": 5,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "23.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "29.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "59.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "47.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "14.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "11.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "32.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "branch-1980-06-12",
+      "pdf_sha256": "e5a1d522cb1efc75fd1d47b9e693064ee6eaa622138be27c3a6be95e310b589a",
+      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "36.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 52,
+            "bbox": [
+              135,
+              87,
+              144,
+              94
+            ],
+            "centroid_y": 89.53846153846153,
+            "row": 0,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "6.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "13.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "29.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "30.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "37.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "24.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "29.6",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              480,
+              144,
+              487
+            ],
+            "centroid_y": 484.47058823529414,
+            "row": 7,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "59.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "6.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "14.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "11.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "32.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "45.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "26.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "35.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "4.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "49.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "53.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "12.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "64.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "59.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "47.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 49,
+            "bbox": [
+              53,
+              592,
+              61,
+              599
+            ],
+            "centroid_y": 596.4081632653061,
+            "row": 9,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "43.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "26.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "57.5",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 48,
+            "bbox": [
+              53,
+              760,
+              61,
+              767
+            ],
+            "centroid_y": 764.4375,
+            "row": 12,
+            "visible_marker": "exaltation"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "branch-1982-08-27",
+      "pdf_sha256": "ba047c188bf0edef1ccd739dd97082845f8e85811fa9d968cb8beb6cea882ab0",
+      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "16.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "9.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "31.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              135,
+              199,
+              144,
+              207
+            ],
+            "centroid_y": 204.26415094339623,
+            "row": 2,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "39.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "38.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "35.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "42.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "46.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "50.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "57.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "34.3",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 50,
+            "bbox": [
+              135,
+              648,
+              144,
+              655
+            ],
+            "centroid_y": 652.44,
+            "row": 10,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "11.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "32.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "59.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "55.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "5.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "39.3",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              255,
+              61,
+              263
+            ],
+            "centroid_y": 257.79245283018867,
+            "row": 3,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "38.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "46.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "7.3",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              53,
+              423,
+              61,
+              431
+            ],
+            "centroid_y": 428.2156862745098,
+            "row": 6,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "1.2",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              53,
+              479,
+              61,
+              487
+            ],
+            "centroid_y": 481.85185185185185,
+            "row": 7,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "28.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              53,
+              535,
+              61,
+              543
+            ],
+            "centroid_y": 540.2156862745098,
+            "row": 8,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "57.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "34.1",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 49,
+            "bbox": [
+              53,
+              648,
+              61,
+              655
+            ],
+            "centroid_y": 652.4081632653061,
+            "row": 10,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "11.2",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 48,
+            "bbox": [
+              53,
+              704,
+              61,
+              711
+            ],
+            "centroid_y": 708.4375,
+            "row": 11,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "32.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "branch-1980-01-02",
+      "pdf_sha256": "b8086f24e690e8ff24ed76bf39c6c6740eaa88f58c3ffb6cd4dce8ed9884b2c3",
+      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "48.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              135,
+              87,
+              144,
+              95
+            ],
+            "centroid_y": 92.11320754716981,
+            "row": 0,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "21.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              143,
+              144,
+              151
+            ],
+            "centroid_y": 145.7450980392157,
+            "row": 1,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "3.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "40.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "37.3",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              312,
+              144,
+              319
+            ],
+            "centroid_y": 316.37254901960785,
+            "row": 4,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "50.4",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "32.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "31.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "59.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "47.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              592,
+              144,
+              599
+            ],
+            "centroid_y": 596.4705882352941,
+            "row": 9,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "43.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "26.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "57.5",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 50,
+            "bbox": [
+              135,
+              760,
+              144,
+              767
+            ],
+            "centroid_y": 764.44,
+            "row": 12,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "38.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "39.2",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              143,
+              61,
+              151
+            ],
+            "centroid_y": 148.16981132075472,
+            "row": 1,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "39.4",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              53,
+              199,
+              61,
+              207
+            ],
+            "centroid_y": 204.16981132075472,
+            "row": 2,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "59.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "55.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "10.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "19.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "64.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              53,
+              479,
+              61,
+              487
+            ],
+            "centroid_y": 481.85185185185185,
+            "row": 7,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "40.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "6.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "43.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "26.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "32.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    },
+    {
+      "case_id": "branch-1988-03-22",
+      "pdf_sha256": "5d587ea7509371219e9385724200354de6819260aa0088b6e46073a33b4544ff",
+      "cohort_sha256": "552d68813be5b40076981aa07f4e34c2965c5ecc6444537a539ffec06df6ecc7",
+      "observations": [
+        {
+          "side": "design",
+          "body": "Sun",
+          "gate_line": "58.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Earth",
+          "gate_line": "52.1",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 53,
+            "bbox": [
+              135,
+              143,
+              144,
+              151
+            ],
+            "centroid_y": 148.11320754716982,
+            "row": 1,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Moon",
+          "gate_line": "22.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "NorthNode",
+          "gate_line": "36.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "SouthNode",
+          "gate_line": "6.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Mercury",
+          "gate_line": "58.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Venus",
+          "gate_line": "41.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 54,
+            "bbox": [
+              135,
+              423,
+              144,
+              431
+            ],
+            "centroid_y": 425.9259259259259,
+            "row": 6,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Mars",
+          "gate_line": "43.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Jupiter",
+          "gate_line": "51.6",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 51,
+            "bbox": [
+              135,
+              536,
+              144,
+              543
+            ],
+            "centroid_y": 540.4705882352941,
+            "row": 8,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Saturn",
+          "gate_line": "11.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Uranus",
+          "gate_line": "11.6",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "design",
+          "body": "Neptune",
+          "gate_line": "58.4",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 47,
+            "bbox": [
+              135,
+              704,
+              144,
+              711
+            ],
+            "centroid_y": 706.5106382978723,
+            "row": 11,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "design",
+          "body": "Pluto",
+          "gate_line": "44.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Sun",
+          "gate_line": "25.5",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 52,
+            "bbox": [
+              53,
+              87,
+              61,
+              95
+            ],
+            "centroid_y": 89.76923076923077,
+            "row": 0,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Earth",
+          "gate_line": "46.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Moon",
+          "gate_line": "20.1",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 52,
+            "bbox": [
+              53,
+              199,
+              61,
+              207
+            ],
+            "centroid_y": 201.76923076923077,
+            "row": 2,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "NorthNode",
+          "gate_line": "36.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "SouthNode",
+          "gate_line": "6.1",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mercury",
+          "gate_line": "37.3",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Venus",
+          "gate_line": "2.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Mars",
+          "gate_line": "54.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Jupiter",
+          "gate_line": "27.2",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Saturn",
+          "gate_line": "10.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        },
+        {
+          "side": "personality",
+          "body": "Uranus",
+          "gate_line": "10.3",
+          "visible_marker": "detriment",
+          "component": {
+            "pixels": 46,
+            "bbox": [
+              53,
+              648,
+              61,
+              655
+            ],
+            "centroid_y": 650.4782608695652,
+            "row": 10,
+            "visible_marker": "detriment"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Neptune",
+          "gate_line": "38.1",
+          "visible_marker": "exaltation",
+          "component": {
+            "pixels": 48,
+            "bbox": [
+              53,
+              704,
+              61,
+              711
+            ],
+            "centroid_y": 708.4375,
+            "row": 11,
+            "visible_marker": "exaltation"
+          }
+        },
+        {
+          "side": "personality",
+          "body": "Pluto",
+          "gate_line": "44.5",
+          "visible_marker": "no_visible_marker",
+          "component": null
+        }
+      ]
+    }
+  ]
+}

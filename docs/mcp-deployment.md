@@ -112,6 +112,13 @@ uv run --locked --extra dev fatebridge bazi_birth `
 
 默认不筛选工具。可在客户端的 `env` 中明确设置：
 
+以下 topic 开关需当前源码环境，已发布版本按对应标签的文档。支持延迟工具加载时可保留完整目录；不支持时在选定场景下加 `FATEBRIDGE_MCP_TOOL_SCOPE=topic`。默认 `complete` 保留条件依赖，topic 只公开直接工具和知识支撑。隐藏分支在场景 `availability` 中如实标缺，不会通过通用调度工具绕过过滤；需要条件技法时切回 complete 并重启连接。未指定场景的 topic 配置启动失败。
+
+```bash
+uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye --tool-scope topic
+```
+
+
 | 目标 | `FATEBRIDGE_MCP_FAMILIES` | `FATEBRIDGE_MCP_SCENARIOS` |
 | --- | --- | --- |
 | 全部工具 | `""` | `""` |

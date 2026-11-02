@@ -1,0 +1,294 @@
+{
+  "id": "t1299_taibai_lunar_direction_v1",
+  "author": "不空译；T1299下卷太白所在章",
+  "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
+  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+  "locator": "T21n1299_p0399b29-0399c18",
+  "title_literal": "釋大白所在八方天上地下吉凶法",
+  "selected_witness": "lower_taisho",
+  "witnesses": [
+    "lower_taisho",
+    "ming_apparatus_reconstruction"
+  ],
+  "rows": [
+    {
+      "row_id": "t1299_taibai_01",
+      "lunar_days": [
+        1,
+        11,
+        21
+      ],
+      "locator": "T21n1299_p0399c02",
+      "taisho_text": "一日十一日二十一日大白常在東方",
+      "ming_apparatus_text": "一日十一日二十一日太白常在東方",
+      "ming_row_present": true,
+      "literal_location": "東方",
+      "horizontal_direction": "east",
+      "realm": "horizontal"
+    },
+    {
+      "row_id": "t1299_taibai_02",
+      "lunar_days": [
+        2,
+        12,
+        22
+      ],
+      "locator": "T21n1299_p0399c03",
+      "taisho_text": "二日十二日二十二日常在東南",
+      "ming_apparatus_text": "二日十二日二十二日常在東南方",
+      "ming_row_present": true,
+      "literal_location": "東南",
+      "horizontal_direction": "southeast",
+      "realm": "horizontal"
+    },
+    {
+      "row_id": "t1299_taibai_03",
+      "lunar_days": [
+        3,
+        13,
+        23
+      ],
+      "locator": "T21n1299_p0399c04",
+      "taisho_text": "三日十三日二十三日常在南方",
+      "ming_apparatus_text": "三日十三日二十三日常在正南方",
+      "ming_row_present": true,
+      "literal_location": "南方",
+      "horizontal_direction": "south",
+      "realm": "horizontal"
+    },
+    {
+      "row_id": "t1299_taibai_04",
+      "lunar_days": [
+        4,
+        14,
+        24
+      ],
+      "locator": "T21n1299_p0399c05",
+      "taisho_text": "四日十四日二十四日常在西南",
+      "ming_apparatus_text": "四日十四日二十四日常在西南方",
+      "ming_row_present": true,
+      "literal_location": "西南",
+      "horizontal_direction": "southwest",
+      "realm": "horizontal"
+    },
+    {
+      "row_id": "t1299_taibai_05",
+      "lunar_days": [
+        5,
+        15,
+        25
+      ],
+      "locator": "T21n1299_p0399c06",
+      "taisho_text": "五日十五日二十五日常在西方",
+      "ming_apparatus_text": "五日十五日二十五日常在西方",
+      "ming_row_present": true,
+      "literal_location": "西方",
+      "horizontal_direction": "west",
+      "realm": "horizontal"
+    },
+    {
+      "row_id": "t1299_taibai_06",
+      "lunar_days": [
+        6,
+        16,
+        26
+      ],
+      "locator": "T21n1299_p0399c07",
+      "taisho_text": "六日十六日二十六日常在西北",
+      "ming_apparatus_text": "六日十六日二十六日常在西北方",
+      "ming_row_present": true,
+      "literal_location": "西北",
+      "horizontal_direction": "northwest",
+      "realm": "horizontal"
+    },
+    {
+      "row_id": "t1299_taibai_07",
+      "lunar_days": [
+        7,
+        17,
+        27
+      ],
+      "locator": "T21n1299_p0399c08",
+      "taisho_text": "七日十七日二十七日常在北方",
+      "ming_apparatus_text": "七日十七日二十七日常在北方",
+      "ming_row_present": true,
+      "literal_location": "北方",
+      "horizontal_direction": "north",
+      "realm": "horizontal"
+    },
+    {
+      "row_id": "t1299_taibai_08",
+      "lunar_days": [
+        8,
+        18,
+        28
+      ],
+      "locator": "T21n1299_p0399c09",
+      "taisho_text": "八日十八日二十八日常在東北",
+      "ming_apparatus_text": "八日十八日二十八日常在東北方",
+      "ming_row_present": true,
+      "literal_location": "東北",
+      "horizontal_direction": "northeast",
+      "realm": "horizontal"
+    },
+    {
+      "row_id": "t1299_taibai_09",
+      "lunar_days": [
+        9,
+        19,
+        29
+      ],
+      "locator": "T21n1299_p0399c10",
+      "taisho_text": "九日十九日二十九日常在中央入地",
+      "ming_apparatus_text": "九日十九日二十九日常在中央入地",
+      "ming_row_present": true,
+      "literal_location": "中央入地",
+      "horizontal_direction": null,
+      "realm": "below_ground"
+    },
+    {
+      "row_id": "t1299_taibai_10",
+      "lunar_days": [
+        10,
+        20,
+        30
+      ],
+      "locator": "T21n1299_p0399c11",
+      "taisho_text": "十日二十日三十日常在天上",
+      "ming_apparatus_text": "",
+      "ming_row_present": false,
+      "literal_location": "天上",
+      "horizontal_direction": null,
+      "realm": "above_sky"
+    }
+  ],
+  "apparatus": [
+    {
+      "begin": "beg0399017",
+      "end": "end0399017",
+      "corresp": null,
+      "taisho_text": "釋",
+      "ming_text": "擇"
+    },
+    {
+      "begin": "beg_6c",
+      "end": "end_6c",
+      "corresp": "#0398016",
+      "taisho_text": "大",
+      "ming_text": "太"
+    },
+    {
+      "begin": "beg0399018",
+      "end": "end0399018",
+      "corresp": null,
+      "taisho_text": "有",
+      "ming_text": "月"
+    },
+    {
+      "begin": "beg_6d",
+      "end": "end_6d",
+      "corresp": "#0398016",
+      "taisho_text": "大",
+      "ming_text": "太"
+    },
+    {
+      "begin": "beg0399019",
+      "end": "end0399019",
+      "corresp": null,
+      "taisho_text": "南",
+      "ming_text": "南方"
+    },
+    {
+      "begin": "beg0399020",
+      "end": "end0399020",
+      "corresp": null,
+      "taisho_text": "南",
+      "ming_text": "正南"
+    },
+    {
+      "begin": "beg_6e",
+      "end": "end_6e",
+      "corresp": "#0399019",
+      "taisho_text": "南",
+      "ming_text": "南方"
+    },
+    {
+      "begin": "beg0399021",
+      "end": "end0399021",
+      "corresp": null,
+      "taisho_text": "北",
+      "ming_text": "北方"
+    },
+    {
+      "begin": "beg_6f",
+      "end": "end_6f",
+      "corresp": "#0399021",
+      "taisho_text": "北",
+      "ming_text": "北方"
+    },
+    {
+      "begin": "beg0399022",
+      "end": "end0399022",
+      "corresp": null,
+      "taisho_text": "十日二十日三十日常在天上",
+      "ming_text": ""
+    },
+    {
+      "begin": "beg0399023",
+      "end": "end0399023",
+      "corresp": null,
+      "taisho_text": "年疫死後多虛耗",
+      "ming_text": "轉無休息至日月在時未來世已來年月日亦然常轉無盡"
+    },
+    {
+      "begin": "beg0399024",
+      "end": "end0399024",
+      "corresp": null,
+      "taisho_text": "人",
+      "ming_text": "此"
+    },
+    {
+      "begin": "beg0399025",
+      "end": "end0399025",
+      "corresp": null,
+      "taisho_text": "用",
+      "ming_text": "作"
+    }
+  ],
+  "monthly_repetition_excerpt": "右太白，如上一月轉者，每月亦然，恒常隨天。年疫死後多虛耗，太白是鬪戰大將軍，常須順行，勿令逆之。若准人出入、移徙、遠行及嫁娶、拜官、鬪戰，世間雜事等造用行用，皆如上日時順行用者，大勝吉利。如逆行，不順此太白所在行法者皆凶，戰不勝，所有移徙、遠行等亦無利益。常須順之，凡舉事皆吉。",
+  "doctrine": {
+    "taisho_text": "右太白，如上一月轉者，每月亦然，恒常隨天。年疫死後多虛耗，太白是鬪戰大將軍，常須順行，勿令逆之。若准人出入、移徙、遠行及嫁娶、拜官、鬪戰，世間雜事等造用行用，皆如上日時順行用者，大勝吉利。如逆行，不順此太白所在行法者皆凶，戰不勝，所有移徙、遠行等亦無利益。常須順之，凡舉事皆吉。",
+    "ming_apparatus_reading": "右太白，如上一月轉者，每月亦然，恒常隨天。轉無休息至日月在時未來世已來年月日亦然常轉無盡，太白是鬪戰大將軍，常須順行，勿令逆之。若准此出入、移徙、遠行及嫁娶、拜官、鬪戰，世間雜事等造作行用，皆如上日時順行用者，大勝吉利。如逆行，不順此太白所在行法者皆凶，戰不勝，所有移徙、遠行等亦無利益。常須順之，凡舉事皆吉。",
+    "locator": "T21n1299_p0399c12-18",
+    "relative_motion_rule": "常須順行，勿令逆之",
+    "movement_alignment_definition_established": false,
+    "claim_is_empirical_validation": false
+  },
+  "publisher_primary": {
+    "url": "https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?mode=detail&useid=1299_,00,0399&nonum=&kaeri=",
+    "response_sha256": "2807fa2a7dc244709be30e75a12e9393007e24af91baa718a1aa7f5b1f71b84f",
+    "response_bytes": 123921,
+    "quotation_fixture": "sukuyo-taibai-primary.json",
+    "scope": "Selected publisher HTML quotations retained; complete HTML kept privately. Not manuscript or facsimile collation.",
+    "known_apparatus_literal_differences": [
+      {
+        "line": "0399c13",
+        "cbeta_lemma": "年疫死後多虛耗",
+        "sat_lemma_citation": "年疫死後多虚消耗",
+        "kind": "SAT apparatus quotation has an extra 消 relative to its main line and CBETA lemma; exact apparatus identity is not asserted."
+      },
+      {
+        "line": "0399c13",
+        "cbeta_ming_fragment": "已來",
+        "sat_ming_fragment": "巳來",
+        "kind": "Distinct printed characters in the electronic apparatus are retained, not silently normalized into a unique Ming reading."
+      }
+    ],
+    "response_text_extent": [
+      "0393a01",
+      "0399c22"
+    ],
+    "complete_t1299_text_response": false
+  },
+  "scope": "按所选宿主历法实际入月日查T1299下卷太白方位表，分别交付大正主文和明本校记重建。不是实测金星方位、方位角或天文逆行；顺逆相对何种行路关系尚未核定，不据表位决定出行、婚姻或事项宜忌。明本删去初十、二十、三十天上行，缺文不等于没有太白或可以任意行动。"
+}

@@ -1,0 +1,466 @@
+{
+  "id": "nijl_selected_native_followup_2026_10_27_v1",
+  "capture_snapshot_as_of_utc": "2026-10-27T04:53:10.679516+00:00",
+  "status_is_frozen_followup_not_live_network": true,
+  "previous_research_source_sha256": "e92a9221bf3b49263be147d74fb0c79162ff23677e0aa112bdcfe582ad325518",
+  "previous_research_id": "nijl_selected_calendar_witnesses_2026_10_25_v1",
+  "scope": "Later acquisition and attributed native-pixel reading followup; preserve the complete old capture record and every failed or disputed first. Not a critical edition or calendar policy.",
+  "evidence_artifact_namespace": "sukuyo-hinoo-originals-v92",
+  "source_evidence_sha256": {
+    "before-research-plan.json": "27bcba49b941aa6ce3b50bc0dcc9111baab12488f1507b6662c11255da267820",
+    "primary-acquisition-first.json": "d0a3ede8320e369a1dd0db409add02f940a4cca291443e5067b2ac7374cd0d34",
+    "curl-followup-plan-before-network.json": "b01d1d81a770bf17ecf6e3339f1a48cb8bbd328b00add78755f94a46f63d370c",
+    "curl-followup-first.json": "31dd58910382ecf4d08ae32d6abbe32dfa9fe2039fb82e1955560216298854f8",
+    "reading-packet-before-two-roles.json": "c900dec7630b5ec2e6d95f5cb5e341d0a16654cbcde043474a7c5c7ce3513fb9",
+    "generator-native-image-first.json": "932430aed3c6e940bcb9f74e3c707cc238c45ff6875d9670e3c1d1ccec89b197",
+    "reviewer-native-image-first.json": "ed28dd69c25f23481ea8d32274f10604b6eba63640f1d628cd780a93748b6457",
+    "root-native-image-first.json": "ef4ff663c407395105948524864f324d57f18ef5b859fb28124ae2d8db10374d",
+    "root-half-focused-reread.json": "c84cc96e149b4e78086f9acd9a7e9c5c5edf20c49d4810dfa8a71a5cccc14eb6",
+    "naoj-count-packet-before-two-roles.json": "9ff52ea34183e7f8a5b4048c3112017cb0d7968820ced125d4515a3566825b62",
+    "generator-naoj-count-first.json": "b7faf4b5a35b1c8114ae027496972b8f2c16eae7f37e40aec1523168d8289184",
+    "reviewer-naoj-count-first.json": "164e5b7404720edc7246379abed71cbb1a0440ad35cd561343c504500d351492",
+    "root-naoj-count-first.json": "e2652721c76589445b7e88f118a6d8664374c40ad319c777b371b8c1f5fa6b71",
+    "crop-format-failure-first.json": "1c9d83b4f6145afa65fb7a9d0fe1b9f68bb26020f5518c156099fc2bb287d44a",
+    "calculation-before-code-first.json": "c3a0b4508bcaa86d8a891f0b35b1f1e8751ce1c85fb4ba26162f231c33fe1e0e",
+    "calculation-enum-failure-first.json": "1639ad1ca66ee99e171de9c2f28830a6a90c6557945d94e83fb880d7379ca4c8",
+    "calculation-scope-failure-first.json": "015a7ddf582e228ccfad788248722e49e1af0eba90eec01df3be60264be85e57"
+  },
+  "unchanged_old17_requirements": [
+    {
+      "catalogue_id": "100183249",
+      "frame": 34,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100183249/canvas/34",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100183249/v4/0278/0278-007402/0278-007402-0033.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        6112,
+        4672
+      ],
+      "attempted": true,
+      "native_acquired": true,
+      "sha256": "460f5cb4ee81164f00ac4a23e462b40c7b982dc421377715bef92e20bc3d2730",
+      "decoded_pixels": [
+        6112,
+        4672
+      ],
+      "bytes": 2128967,
+      "first_error": null,
+      "first_unattempted_reason": null
+    },
+    {
+      "catalogue_id": "100183249",
+      "frame": 35,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100183249/canvas/35",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100183249/v4/0278/0278-007402/0278-007402-0034.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        6112,
+        4672
+      ],
+      "attempted": true,
+      "native_acquired": true,
+      "sha256": "3bfabac0fdd829deb5795aebe6191ef6e71ac7f72f92494db4d58e51c05c1ef5",
+      "decoded_pixels": [
+        6112,
+        4672
+      ],
+      "bytes": 2066705,
+      "first_error": null,
+      "first_unattempted_reason": null
+    },
+    {
+      "catalogue_id": "100183249",
+      "frame": 38,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100183249/canvas/38",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100183249/v4/0278/0278-007402/0278-007402-0037.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        6112,
+        4672
+      ],
+      "attempted": true,
+      "native_acquired": true,
+      "sha256": "7b88a391b37050c79c1341e4873f3fcb80ab0b3bff33578499edab919aaa759b",
+      "decoded_pixels": [
+        6112,
+        4672
+      ],
+      "bytes": 1978348,
+      "first_error": null,
+      "first_unattempted_reason": null
+    },
+    {
+      "catalogue_id": "100183249",
+      "frame": 39,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100183249/canvas/39",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100183249/v4/0278/0278-007402/0278-007402-0038.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        6112,
+        4672
+      ],
+      "attempted": true,
+      "native_acquired": true,
+      "sha256": "d9331fb99ee8afeb220d0cf1b07bacfc1480a952d21b1efd18b771bb61a074bb",
+      "decoded_pixels": [
+        6112,
+        4672
+      ],
+      "bytes": 1822371,
+      "first_error": null,
+      "first_unattempted_reason": null
+    },
+    {
+      "catalogue_id": "100265591",
+      "frame": 13,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100265591/canvas/13",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100265591/v4/NAOJ/NAOJ-00315/NAOJ-00315-00012.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        5616,
+        3744
+      ],
+      "attempted": true,
+      "native_acquired": true,
+      "sha256": "2c5c6ed4498ffd3d79f2240bf3ba042b2250da1ed78ae1411b35f29d894fc186",
+      "decoded_pixels": [
+        5616,
+        3744
+      ],
+      "bytes": 2126812,
+      "first_error": null,
+      "first_unattempted_reason": null
+    },
+    {
+      "catalogue_id": "100265591",
+      "frame": 14,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100265591/canvas/14",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100265591/v4/NAOJ/NAOJ-00315/NAOJ-00315-00013.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        5616,
+        3744
+      ],
+      "attempted": true,
+      "native_acquired": true,
+      "sha256": "35ebbcf85e9b2f12a65c83097ae4c8ad57e41022701d2f4cb6b3b220623475a0",
+      "decoded_pixels": [
+        5616,
+        3744
+      ],
+      "bytes": 2305121,
+      "first_error": null,
+      "first_unattempted_reason": null
+    },
+    {
+      "catalogue_id": "100265591",
+      "frame": 15,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100265591/canvas/15",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100265591/v4/NAOJ/NAOJ-00315/NAOJ-00315-00014.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        5616,
+        3744
+      ],
+      "attempted": true,
+      "native_acquired": true,
+      "sha256": "6bb4e0aabf01da89c2798dd3e26331bfafdd15aa92b7137cc269c582ba57f99f",
+      "decoded_pixels": [
+        5616,
+        3744
+      ],
+      "bytes": 2507019,
+      "first_error": null,
+      "first_unattempted_reason": null
+    },
+    {
+      "catalogue_id": "100265591",
+      "frame": 77,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100265591/canvas/77",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100265591/v4/NAOJ/NAOJ-00315/NAOJ-00315-00076.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        5616,
+        3744
+      ],
+      "attempted": true,
+      "native_acquired": true,
+      "sha256": "64ebc1ff17567b5180a1c711104cfa6bece6220d27c00ca589e301d5c7a93a3d",
+      "decoded_pixels": [
+        5616,
+        3744
+      ],
+      "bytes": 2384422,
+      "first_error": null,
+      "first_unattempted_reason": null
+    },
+    {
+      "catalogue_id": "100265591",
+      "frame": 78,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100265591/canvas/78",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100265591/v4/NAOJ/NAOJ-00315/NAOJ-00315-00077.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        5616,
+        3744
+      ],
+      "attempted": true,
+      "native_acquired": true,
+      "sha256": "486f1941e2238428751e7fecd4d9f7b45eaab32bc0d759417cb7daa8c4f2d32f",
+      "decoded_pixels": [
+        5616,
+        3744
+      ],
+      "bytes": 1938875,
+      "first_error": null,
+      "first_unattempted_reason": null
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 8,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/8",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0007.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        6464,
+        4672
+      ],
+      "attempted": true,
+      "native_acquired": true,
+      "sha256": "e8dde11399609aabaee377246f2929b64a8cb46b47be89c472620e93acb29326",
+      "decoded_pixels": [
+        6464,
+        4672
+      ],
+      "bytes": 1159310,
+      "first_error": null,
+      "first_unattempted_reason": null
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 17,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/17",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0016.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        6464,
+        4672
+      ],
+      "attempted": true,
+      "native_acquired": false,
+      "sha256": null,
+      "decoded_pixels": null,
+      "bytes": null,
+      "first_error": "<urlopen error _ssl.c:993: The handshake operation timed out>",
+      "first_unattempted_reason": null
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 38,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/38",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0037.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        6464,
+        4672
+      ],
+      "attempted": true,
+      "native_acquired": false,
+      "sha256": null,
+      "decoded_pixels": null,
+      "bytes": null,
+      "first_error": "<urlopen error _ssl.c:993: The handshake operation timed out>",
+      "first_unattempted_reason": null
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 39,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/39",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0038.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        6464,
+        4672
+      ],
+      "attempted": true,
+      "native_acquired": false,
+      "sha256": null,
+      "decoded_pixels": null,
+      "bytes": null,
+      "first_error": "<urlopen error _ssl.c:993: The handshake operation timed out>",
+      "first_unattempted_reason": null
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 65,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/65",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0064.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        6464,
+        4672
+      ],
+      "attempted": false,
+      "native_acquired": false,
+      "sha256": null,
+      "decoded_pixels": null,
+      "bytes": null,
+      "first_error": null,
+      "first_unattempted_reason": "three consecutive image errors; requirement retained"
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 67,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/67",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0066.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        6464,
+        4672
+      ],
+      "attempted": false,
+      "native_acquired": false,
+      "sha256": null,
+      "decoded_pixels": null,
+      "bytes": null,
+      "first_error": null,
+      "first_unattempted_reason": "three consecutive image errors; requirement retained"
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 68,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/68",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0067.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        6464,
+        4672
+      ],
+      "attempted": false,
+      "native_acquired": false,
+      "sha256": null,
+      "decoded_pixels": null,
+      "bytes": null,
+      "first_error": null,
+      "first_unattempted_reason": "three consecutive image errors; requirement retained"
+    },
+    {
+      "catalogue_id": "100436698",
+      "frame": 75,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/75",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0074.tif/full/full/0/default.jpg",
+      "declared_pixels": [
+        6464,
+        4672
+      ],
+      "attempted": false,
+      "native_acquired": false,
+      "sha256": null,
+      "decoded_pixels": null,
+      "bytes": null,
+      "first_error": null,
+      "first_unattempted_reason": "three consecutive image errors; requirement retained"
+    }
+  ],
+  "capture_summary": {
+    "historical_v82_first_acquired": 0,
+    "first_v92_acquired": 10,
+    "curl_later_additional_acquired": 0,
+    "union_acquired": 10,
+    "required": 17,
+    "all17_gate_met": false,
+    "missing": [
+      [
+        "100436698",
+        17
+      ],
+      [
+        "100436698",
+        38
+      ],
+      [
+        "100436698",
+        39
+      ],
+      [
+        "100436698",
+        65
+      ],
+      [
+        "100436698",
+        67
+      ],
+      [
+        "100436698",
+        68
+      ],
+      [
+        "100436698",
+        75
+      ]
+    ],
+    "first_v92_attempted": 13,
+    "later_curl_attempted": 3,
+    "same_three_fresh_manifests": true
+  },
+  "shinpukuji": {
+    "catalogue_id": "100183249",
+    "frames": [
+      34,
+      35,
+      38,
+      39
+    ],
+    "selected_calendar_frames": [
+      34,
+      35
+    ],
+    "working_day30_literal": "室",
+    "day30_pixel_reading_roles": [
+      "root",
+      "generator",
+      "reviewer"
+    ],
+    "literal_reading_is_not_T2465_emendation": true,
+    "half_phrase_role_firsts": {
+      "root": "半晝上者／其□下者",
+      "generator": "半〔已／己／巳〕上者／半〔已／己／巳〕下者",
+      "reviewer": "半〔已？／也？〕上者／半已下者"
+    },
+    "root_focused_reread": "半后字不唯一；原首读正月卅日更正工作读法为正月闕日，保留首败。",
+    "half_phrase_canonical_glyph": null,
+    "other_word_and_column_disagreements_retained": true,
+    "complete_selected_transcription_accepted": false,
+    "modern_day_boundary": null,
+    "modern_half_clock": null,
+    "leap_short_overlap_priority_established": false,
+    "identified_as_T2465_base_or_ko": false,
+    "whole_manuscript_collated": false
+  },
+  "naoj_count": {
+    "native_catalogue_id": "100265591",
+    "native_frame": 77,
+    "legacy_catalogue_row": 143,
+    "legacy_frame": 78,
+    "selected_native_working_reading": "八千四百二十字",
+    "selected_legacy_working_reading": "八千四百二十字",
+    "selected_working_cost": "四兩九錢三分",
+    "current_reading_roles": [
+      "root",
+      "generator",
+      "reviewer"
+    ],
+    "basis": "在百与十之间各图分别可见二的两横；题记印文的工作读法，不是重新统计全文。",
+    "historical_root_first": "八千四百二十字",
+    "historical_reviewer_first": "八千四百一十字",
+    "historical_root_correction": "八千四百一十字",
+    "historical_correction_itself_misread": true,
+    "all_firsts_preserved": true,
+    "same_physical_copy_accepted": false,
+    "independent_lineage_accepted": false,
+    "applies_to_NAGO075": false
+  },
+  "reading_method_limits": [
+    "原JPEG已完整解码验证实际尺寸；full/full请求本身不作为原图取得证明。",
+    "全图经工具缩小显示；关键字另看原生大小裁区。sips裁片无尺寸重采样；复核角色报告真福寺四裁片与Pillow解码原JPEG的RGB最大通道差1级，天文台077裁片三通道最大差12／6／15级；未认证解码RGB逐值相同，关键字另直接读原JPEG内存裁区。",
+    "两代理和主角色复用提供方、既有历史、反馈和共享文件系统；不是严格盲读、外部独立提供方或人工古籍校勘。",
+    "原页取得、所选字可读、两角色一致、程序相合、解释测试与现实效力分别记账。"
+  ],
+  "acceptance": {
+    "new_calendar_policy_applied": false,
+    "complete_critical_edition_accepted": false,
+    "strict_blind_human_collation": false,
+    "ancient_day_boundary_established": false,
+    "half_clock_established": false,
+    "leap_short_precedence_established": false,
+    "independent_historical_observations_added": 0,
+    "real_samples": 0,
+    "real_world_efficacy_established": false,
+    "original180_gate_replaced": false,
+    "whole_four_axis_goal_complete": false
+  }
+}

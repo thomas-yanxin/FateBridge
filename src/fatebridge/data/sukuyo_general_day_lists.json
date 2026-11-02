@@ -1,0 +1,106 @@
+{
+  "id": "t1299_general_day_prose_reference_v1",
+  "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
+  "pinned_xml_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T21/T21n1299.xml",
+  "source_xml_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+  "source_scope": "Selected upper and lower prose general-day lists. Favorable and conditional list membership does not override phase restrictions, individual day clauses, mansion/weekday rules, or actual outcomes. Unlisted is not a taboo.",
+  "witnesses": [
+    {
+      "witness": "upper_prose",
+      "classification_locator": "T21n1299_p0393a01-11",
+      "favorable_lunar_days": [
+        1,
+        3,
+        5,
+        7,
+        10,
+        11,
+        13,
+        16,
+        18,
+        20,
+        22,
+        25,
+        26,
+        28
+      ],
+      "conditional_lunar_days": [
+        2,
+        6,
+        9,
+        12,
+        17,
+        21,
+        24,
+        27,
+        29
+      ],
+      "favorable_source_paragraphs": [
+        {
+          "xml_id": "pT21p0393a0101",
+          "text": "凡月有黑白兩分，從一日至十五日為白月分，從十六日至三十日為黑分。每月白月一日三日五日七日十日十一日十三日，黑月一日三日五日七日十日十一日十三日，所向皆成就，名為吉祥日。"
+        }
+      ],
+      "conditional_source_paragraphs": [
+        {
+          "xml_id": "pT21p0393a0901",
+          "text": "又白月二日六日九日十二日，又黑月二日六日九日十二日十四日，此等平平時，隨立宿曜為吉凶。"
+        }
+      ]
+    },
+    {
+      "witness": "lower_prose",
+      "classification_locator": "T21n1299_p0394a01-16",
+      "favorable_lunar_days": [
+        1,
+        3,
+        5,
+        7,
+        10,
+        11,
+        13,
+        16,
+        18,
+        20,
+        22,
+        25,
+        26,
+        28
+      ],
+      "conditional_lunar_days": [
+        2,
+        6,
+        9,
+        12,
+        14,
+        17,
+        19,
+        21,
+        23,
+        24,
+        27,
+        30
+      ],
+      "favorable_source_paragraphs": [
+        {
+          "xml_id": "pT21p0394a0101",
+          "text": "每入月，一日十六日、三日十八日、五日二十日、七日二十二日、十日二十五日、十一日二十六日、十三日二十八日。"
+        },
+        {
+          "xml_id": "pT21p0394a0401",
+          "text": "已上是吉日，所作吉祥事必成就。"
+        }
+      ],
+      "conditional_source_paragraphs": [
+        {
+          "xml_id": "pT21p0394a1101",
+          "text": "入月，二日六日、九日十二日、十四日十七日、十九日二十一日、二十三日二十四、日二十七日三十日。"
+        },
+        {
+          "xml_id": "pT21p0394a1401",
+          "text": "已上平日，若與好宿好曜并者即吉，如與惡宿惡曜并者即凶。夫凶惡晝日中已後通吉用，凶惡夜半已後亦通吉用。"
+        }
+      ]
+    }
+  ]
+}

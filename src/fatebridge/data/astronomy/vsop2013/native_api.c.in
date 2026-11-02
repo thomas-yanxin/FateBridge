@@ -1,0 +1,29 @@
+/* Only this checked Sun ABI is exported. No raw Swiss coordinate entry. */
+#include <math.h>
+#include <stdio.h>
+#include "swephexp.h"
+#define FB_API __attribute__((visibility("default")))
+extern int vsop2013_init_embedded(void);
+extern int vsop2013_ready(void);
+FB_API char *fatebridge_vsop2013_native_version(char *out) { return swe_version(out); }
+FB_API int fatebridge_vsop2013_initialize(void) { return vsop2013_init_embedded(); }
+FB_API int fatebridge_vsop2013_solar(double tt, double *out, char *error) {
+    if (out == NULL) { if (error) snprintf(error, AS_MAXCH, "vsop2013_output_required"); return -1; }
+    for (int i=0; i<6; i++) out[i] = NAN;
+    if (!vsop2013_ready()) { if (error) snprintf(error, AS_MAXCH, "vsop2013_not_initialized"); return -1; }
+    if (!isfinite(tt) || tt < @WORKING_LOW@ || tt > @WORKING_HIGH@) {
+        if (error) snprintf(error, AS_MAXCH, "vsop2013_tt_range"); return -1;
+    }
+    int flags = swe_calc(tt, SE_SUN, SEFLG_MOSEPH | SEFLG_SPEED, out, error);
+    int valid = flags == (SEFLG_MOSEPH | SEFLG_SPEED);
+    for (int i=0; i<6; i++) valid = valid && isfinite(out[i]);
+    if (!valid) {
+        /* Partial native state may already carry this epoch. A later call at
+           the same TT must recompute after the fault has been repaired. */
+        swe_close();
+        for (int i=0; i<6; i++) out[i] = NAN;
+        if (error) snprintf(error, AS_MAXCH, "vsop2013_calculation_failed");
+        return -1;
+    }
+    return flags;
+}

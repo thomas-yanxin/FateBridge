@@ -1,0 +1,72 @@
+{
+  "ruleset_id": "zengshan_strength_tombs_v5",
+  "ruleset_version": "5.0.1",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "method": "Selected original scan pages visually read; detail crops preserve source pixels."
+  },
+  "clauses": [
+    {
+      "id": "meaning-of-supported",
+      "pages": [
+        99
+      ],
+      "quote": "但得用臨日月或遇日月動爻變爻生扶或用爻遇長生逢帝旺皆謂之旺",
+      "quotation_revision": "43.0.0"
+    },
+    {
+      "id": "three-tomb-locations",
+      "pages": [
+        100
+      ],
+      "quote": "用爻入日墓入動墓動而化墓以上謂之三墓非古之世墓身墓命墓也"
+    },
+    {
+      "id": "true-tomb-exclusions",
+      "pages": [
+        127
+      ],
+      "quote": "世爻旺相者非真代占看用神用神旺相者非真惟世爻用爻休囚被剋而又入墓者是也"
+    },
+    {
+      "id": "tomb-broken",
+      "pages": [
+        127
+      ],
+      "quote": "墓神被日月動爻沖破亦非真也墓破即如破網容易而出矣"
+    },
+    {
+      "id": "no-strong-from-rootless",
+      "pages": [
+        54
+      ],
+      "quote": "此謂之用神無根元神有力亦難生"
+    }
+  ],
+  "resolution_notes": [
+    "PDF53 prints five tombs, but the same edition explicitly defines the three locations on PDF100 and repeats three on PDF127. Preserve the PDF53 numeral as a variant; do not invent five mechanisms.",
+    "Grounding confirms supported/unopposed and harmed/unsupported cases. Conflicting support/control or unresolved actor viability remains unknown, not a weighted vote.",
+    "Incoming transformations are limited to the original parent; day/month cannot be attacked by original lines. Tomb-effect opening is distinct from scattering an entire moving line.",
+    "This does not prove a complete total-strength, rootlessness or event-outcome adjudicator."
+  ],
+  "scope": "Visible-line grounded support and three-location tomb adjudication with explicit unknown states. No disease, life/death or reality outcome calculation.",
+  "quotation_errata": [
+    {
+      "artifact": "liuyao-strength-v5.json",
+      "clause_id": "meaning-of-supported",
+      "original_profile_sha256": "4957e2151c97d4a8e00a13101247a8107813a1000ad26944bb8c36cc86153482",
+      "published_before_sha256": "4957e2151c97d4a8e00a13101247a8107813a1000ad26944bb8c36cc86153482",
+      "old_quote": "但得用神臨日月或遇日月動爻變爻生扶或用爻遇長生逢帝旺皆謂之旺",
+      "new_quote": "但得用臨日月或遇日月動爻變爻生扶或用爻遇長生逢帝旺皆謂之旺",
+      "new_ruleset_version": "5.0.1",
+      "source_sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+      "pdf_page": 99,
+      "passage_id": "supported-definition",
+      "source_image_sha256": "a0d72f580423e26c45204331de4d12f82a64ba35f144c454f3dc07961a3dc6d1",
+      "revision": "43.0.0",
+      "reason": "Verbatim quotation corrected against the same frozen edition; computations and stage tables unchanged"
+    }
+  ]
+}

@@ -1,0 +1,4803 @@
+{
+  "id": "sukuyo_selected_calendar_witness_layers_v70",
+  "before_production_R1_sha256": "ab9411bf06c314bacaec0e061f0c592f85e2cd8447a852633c5b4e90b0c0ed42",
+  "before_production_R2_sha256": "df09baffaa7f95a65602aeb17a846bb9c254340668614d1d1ba2ad37fab2380c",
+  "parent_fortnight_source_bundle_sha256": "e4486a41d1e4b8cd7d78d5f50119d69f2a516e1cc1d138a0b3069f53ef6a947e",
+  "actual_sources": {
+    "T51n2087.xml": {
+      "sha256": "ac50f33584ac90ecb9fd61a1fbfa1f8a802464103b4eb6a26d20ff6f9d578763",
+      "bytes": 2599669,
+      "reported_witness_labels": {
+        "wit.cbeta": "【CB】",
+        "wit.orig": "【大】",
+        "wit1": "【乙】",
+        "wit10": "【磧-CB】",
+        "wit11": "【思溪-CB】",
+        "wit12": "【丙】",
+        "wit13": "【補編-CB】",
+        "wit2": "【甲】",
+        "wit3": "【麗-CB】",
+        "wit4": "【宋】",
+        "wit5": "【元】",
+        "wit6": "【明】",
+        "wit7": "【宮】",
+        "wit8": "【磧乙-CB】",
+        "wit9": "【？】"
+      },
+      "reported_responsibility_labels": {},
+      "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T51/T51n2087.xml"
+    },
+    "T41n1821.xml": {
+      "sha256": "397d2bd4c31fdbd1a69181b613e0b43c13bb71cf63a913ba94e7bcd84b836069",
+      "bytes": 6447506,
+      "reported_witness_labels": {
+        "wit.cbeta": "【CB】",
+        "wit.orig": "【大】",
+        "wit1": "【甲】",
+        "wit2": "【原】",
+        "wit3": "【？】",
+        "wit4": "【乙】",
+        "wit5": "【宮】",
+        "wit6": "【卍續-CB】"
+      },
+      "reported_responsibility_labels": {},
+      "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T41/T41n1821.xml"
+    },
+    "T41n1822.xml": {
+      "sha256": "eee95b9d6970c953060ca208f859549e6354a9a363621d4a630d787fd297656e",
+      "bytes": 7579060,
+      "reported_witness_labels": {
+        "wit.cbeta": "【CB】",
+        "wit.orig": "【大】",
+        "wit1": "【甲】",
+        "wit2": "【乙】",
+        "wit3": "【原】",
+        "wit4": "【卍續-CB】"
+      },
+      "reported_responsibility_labels": {},
+      "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T41/T41n1822.xml"
+    },
+    "T32n1644.xml": {
+      "sha256": "ba452e0d2a9dc4499c8bed61fd5aa5d7abe5c10e03bd62104b9e340a0120b92f",
+      "bytes": 797348,
+      "reported_witness_labels": {
+        "wit.cbeta": "【CB】",
+        "wit.orig": "【大】",
+        "wit1": "【明】",
+        "wit2": "【宋】",
+        "wit3": "【元】",
+        "wit4": "【麗-CB】",
+        "wit5": "【磧-CB】",
+        "wit6": "【磧乙-CB】",
+        "wit7": "【嘉興乙-CB】",
+        "wit8": "【宮】",
+        "wit9": "【思溪乙-CB】"
+      },
+      "reported_responsibility_labels": {},
+      "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T32/T32n1644.xml"
+    }
+  },
+  "all_five_selected_paragraphs": [
+    {
+      "source_file": "T51n2087.xml",
+      "paragraph_id": "pT51p0875c1501",
+      "body_main_sha256": "ba6da3f6a505c35d899daf265c038be59410c4085a0c93ba2793f48f4824708a",
+      "body_main_literal": "若乃陰陽曆運，日月次舍，稱謂雖殊，時候無異，隨其星建，以標月名。時極短者，謂剎那也。百二十剎那為一呾剎那，六十呾剎那為一臘縛，三十臘縛為一牟呼栗多，五牟呼栗多為一時，六時合成一日一夜。居俗日夜分為八時。月盈至滿謂之白分，月虧至晦謂之黑分，黑分或十四日、十五日，月有小大故也。黑前白後，合為一月。六月合為一行。日遊在內，北行也；日遊在外，南行也。總此二行，合為一歲。又分一歲以為六時：正月十六日至三月十五日，漸熱也；三月十六日至五月十五日，盛熱也；五月十六日至七月十五日，雨時也；七月十六日至九月十五日，茂時也；九月十六日至十一月十五日，漸寒也；十一月十六日至正月十五日，盛寒也。如來聖教歲為三時：正月十六日至五月十五日，熱時也；五月十六日至九月十五日，雨時也；九月十六日至正月十五日，寒時也。或為四時，春、夏、秋、冬也。春三月謂制呾羅月、吠舍佉月、逝瑟吒月，當此從正月十六日至四月十五日。夏三月謂頞沙荼月、室羅伐拏月、婆羅鉢陀月，當此從四月十六日至七月十五日。秋三月謂頞濕縛庾闍月、迦剌底迦月、末伽始羅月，當此從七月十六日至十月十五日。冬三月謂報沙月、磨袪月、頗勒窶拏月，當此從十月十六日至正月十五日。故印度僧徒依佛聖教坐兩安居，或前三月，或後三月。前三月當此從五月十六日至八月十五日，後三月當此從六月十六日至九月十五日。前代譯經律者，或云坐夏，或云坐臘，斯皆邊裔殊俗，不達中國正音，或方言未融，而傳譯有謬。又推如來入胎、初生、出家、成佛、涅槃日月，皆有參差，語在後記。",
+      "apparatus_entries": [
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg0875033",
+          "to_anchor": "end0875033",
+          "from_line": "0875c19",
+          "to_line": "0875c19",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            85,
+            86
+          ],
+          "adopted_layer_literal": "合",
+          "app_attributes": {
+            "from": "#beg0875033",
+            "to": "#end0875033"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "合",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">合</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2"
+              },
+              "literal_excluding_notes": "念",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2\">念</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "合",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg0875034",
+          "to_anchor": "end0875034",
+          "from_line": "0875c19",
+          "to_line": "0875c19",
+          "text_layer_id": "inline_note_1",
+          "text_layer": {
+            "kind": "inline_note",
+            "attributes": {
+              "place": "inline"
+            }
+          },
+          "layer_offsets": [
+            0,
+            3
+          ],
+          "adopted_layer_literal": "晝三夜",
+          "app_attributes": {
+            "from": "#beg0875034",
+            "to": "#end0875034"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "晝三夜",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">晝三夜</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit4 #wit5 #wit6"
+              },
+              "literal_excluding_notes": "夜三晝",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit4 #wit5 #wit6\">夜三晝</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "晝三夜",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg0875035",
+          "to_anchor": "end0875035",
+          "from_line": "0875c20",
+          "to_line": "0875c20",
+          "text_layer_id": "inline_note_2",
+          "text_layer": {
+            "kind": "inline_note",
+            "attributes": {
+              "place": "inline"
+            }
+          },
+          "layer_offsets": [
+            5,
+            6
+          ],
+          "adopted_layer_literal": "於",
+          "app_attributes": {
+            "from": "#beg0875035",
+            "to": "#end0875035"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "於",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">於</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit6"
+              },
+              "literal_excluding_notes": "于",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit6\">于</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "於",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg0875036",
+          "to_anchor": "end0875036",
+          "from_line": "0875c20",
+          "to_line": "0875c20",
+          "text_layer_id": "inline_note_2",
+          "text_layer": {
+            "kind": "inline_note",
+            "attributes": {
+              "place": "inline"
+            }
+          },
+          "layer_offsets": [
+            6,
+            8
+          ],
+          "adopted_layer_literal": "一一",
+          "app_attributes": {
+            "from": "#beg0875036",
+            "to": "#end0875036"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "一一",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">一一</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2"
+              },
+              "literal_excluding_notes": "二",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2\">二</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "一一",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg0875037",
+          "to_anchor": "end0875037",
+          "from_line": "0875c21",
+          "to_line": "0875c21",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            116,
+            117
+          ],
+          "adopted_layer_literal": "黑",
+          "app_attributes": {
+            "from": "#beg0875037",
+            "to": "#end0875037"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "黑",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">黑</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2"
+              },
+              "literal_excluding_notes": "里",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2\">里</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "黑",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg_32",
+          "to_anchor": "end_32",
+          "from_line": "0875c21",
+          "to_line": "0875c21",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            119,
+            120
+          ],
+          "adopted_layer_literal": "黑",
+          "app_attributes": {
+            "from": "#beg_32",
+            "to": "#end_32",
+            "corresp": "#0875037"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "黑",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">黑</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2"
+              },
+              "literal_excluding_notes": "里",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2\">里</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "黑",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": "#0875037"
+        },
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg0875038",
+          "to_anchor": "end0875038",
+          "from_line": "0875c21",
+          "to_line": "0875c21",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            120,
+            121
+          ],
+          "adopted_layer_literal": "分",
+          "app_attributes": {
+            "from": "#beg0875038",
+            "to": "#end0875038"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "分",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">分</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2"
+              },
+              "literal_excluding_notes": "分月",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2\">分月</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "分",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg_33",
+          "to_anchor": "end_33",
+          "from_line": "0875c22",
+          "to_line": "0875c22",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            137,
+            138
+          ],
+          "adopted_layer_literal": "黑",
+          "app_attributes": {
+            "from": "#beg_33",
+            "to": "#end_33",
+            "corresp": "#0875037"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "黑",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">黑</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2"
+              },
+              "literal_excluding_notes": "里",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2\">里</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "黑",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": "#0875037"
+        },
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg0875039",
+          "to_anchor": "end0875039",
+          "from_line": "0875c29",
+          "to_line": "0875c29",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            273,
+            274
+          ],
+          "adopted_layer_literal": "一",
+          "app_attributes": {
+            "from": "#beg0875039",
+            "to": "#end0875039"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "一",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">一</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "一",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg0876001",
+          "to_anchor": "end0876001",
+          "from_line": "0876a05",
+          "to_line": "0876a05",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            366,
+            367
+          ],
+          "adopted_layer_literal": "羅",
+          "app_attributes": {
+            "from": "#beg0876001",
+            "to": "#end0876001"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "羅",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">羅</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit4 #wit5 #wit6 #wit1"
+              },
+              "literal_excluding_notes": "邏",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit4 #wit5 #wit6 #wit1\">邏</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "羅",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg0876002",
+          "to_anchor": "end0876002",
+          "from_line": "0876a07",
+          "to_line": "0876a07",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            398,
+            399
+          ],
+          "adopted_layer_literal": "頞",
+          "app_attributes": {
+            "from": "#beg0876002",
+            "to": "#end0876002"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "頞",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">頞</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2"
+              },
+              "literal_excluding_notes": "類",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2\">類</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "頞",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg0876003",
+          "to_anchor": "end0876003",
+          "from_line": "0876a08",
+          "to_line": "0876a08",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            409,
+            410
+          ],
+          "adopted_layer_literal": "婆",
+          "app_attributes": {
+            "from": "#beg0876003",
+            "to": "#end0876003"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "婆",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">婆</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit4 #wit5 #wit6 #wit2 #wit1"
+              },
+              "literal_excluding_notes": "婆達",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit4 #wit5 #wit6 #wit2 #wit1\">婆達</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "婆",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg_34",
+          "to_anchor": "end_34",
+          "from_line": "0876a09",
+          "to_line": "0876a09",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            434,
+            435
+          ],
+          "adopted_layer_literal": "頞",
+          "app_attributes": {
+            "from": "#beg_34",
+            "to": "#end_34",
+            "corresp": "#0876002"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "頞",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">頞</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2"
+              },
+              "literal_excluding_notes": "類",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2\">類</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "頞",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": "#0876002"
+        },
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg0876004",
+          "to_anchor": "end0876004",
+          "from_line": "0876a09",
+          "to_line": "0876a09",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            437,
+            438
+          ],
+          "adopted_layer_literal": "庾",
+          "app_attributes": {
+            "from": "#beg0876004",
+            "to": "#end0876004"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "庾",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">庾</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit4 #wit5 #wit6"
+              },
+              "literal_excluding_notes": "庫",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit4 #wit5 #wit6\">庫</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "庾",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T51n2087.xml",
+          "paragraph_id": "pT51p0875c1501",
+          "from_anchor": "beg0876005",
+          "to_anchor": "end0876005",
+          "from_line": "0876a10",
+          "to_line": "0876a10",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            447,
+            448
+          ],
+          "adopted_layer_literal": "末",
+          "app_attributes": {
+            "from": "#beg0876005",
+            "to": "#end0876005"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "末",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">末</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit4 #wit5 #wit6"
+              },
+              "literal_excluding_notes": "未",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit4 #wit5 #wit6\">未</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "末",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        }
+      ],
+      "all_projected_text_layers": {
+        "body_main": {
+          "kind": "body_main",
+          "literal": "若乃陰陽曆運，日月次舍，稱謂雖殊，時候無異，隨其星建，以標月名。時極短者，謂剎那也。百二十剎那為一呾剎那，六十呾剎那為一臘縛，三十臘縛為一牟呼栗多，五牟呼栗多為一時，六時合成一日一夜。居俗日夜分為八時。月盈至滿謂之白分，月虧至晦謂之黑分，黑分或十四日、十五日，月有小大故也。黑前白後，合為一月。六月合為一行。日遊在內，北行也；日遊在外，南行也。總此二行，合為一歲。又分一歲以為六時：正月十六日至三月十五日，漸熱也；三月十六日至五月十五日，盛熱也；五月十六日至七月十五日，雨時也；七月十六日至九月十五日，茂時也；九月十六日至十一月十五日，漸寒也；十一月十六日至正月十五日，盛寒也。如來聖教歲為三時：正月十六日至五月十五日，熱時也；五月十六日至九月十五日，雨時也；九月十六日至正月十五日，寒時也。或為四時，春、夏、秋、冬也。春三月謂制呾羅月、吠舍佉月、逝瑟吒月，當此從正月十六日至四月十五日。夏三月謂頞沙荼月、室羅伐拏月、婆羅鉢陀月，當此從四月十六日至七月十五日。秋三月謂頞濕縛庾闍月、迦剌底迦月、末伽始羅月，當此從七月十六日至十月十五日。冬三月謂報沙月、磨袪月、頗勒窶拏月，當此從十月十六日至正月十五日。故印度僧徒依佛聖教坐兩安居，或前三月，或後三月。前三月當此從五月十六日至八月十五日，後三月當此從六月十六日至九月十五日。前代譯經律者，或云坐夏，或云坐臘，斯皆邊裔殊俗，不達中國正音，或方言未融，而傳譯有謬。又推如來入胎、初生、出家、成佛、涅槃日月，皆有參差，語在後記。"
+        },
+        "inline_note_1": {
+          "kind": "inline_note",
+          "attributes": {
+            "place": "inline"
+          },
+          "literal": "晝三夜三"
+        },
+        "inline_note_2": {
+          "kind": "inline_note",
+          "attributes": {
+            "place": "inline"
+          },
+          "literal": "晝四夜四，於一一時各有四分"
+        }
+      },
+      "inline_note_layers_unchanged": [
+        {
+          "publisher_place": "inline",
+          "literal": "晝三夜三"
+        },
+        {
+          "publisher_place": "inline",
+          "literal": "晝四夜四，於一一時各有四分"
+        }
+      ],
+      "standoff_apparatus_entry_count": 15,
+      "scope": "Body text is CBETA adopted text. #wit.orig readings and other witness sigla are supplied apparatus reports, not actual new manuscript inspections, full witness reconstruction or a historical calendar."
+    },
+    {
+      "source_file": "T41n1821.xml",
+      "paragraph_id": "pT41p0187c1604",
+      "body_main_sha256": "0f067abbb1ac75819b6afbdac580cbedaafcf2c801e4a7011850637b281d4916",
+      "body_main_literal": "「日行此洲至晝則漸增」者，言晝夜增減者，印度國法分十二月為三際，一熱際有四月、二雨際有四月、三寒際有四月，隨其方俗立三際不同。又以十六日為月一日，以十五日為月滿日。復分一月為二，前十五日為黑半、後十五日為白半。若依泰法師意解，從二月十六日至六月十五日為熱際四月，從六月十六日至十月十五日為雨際四月，從十月十六日至二月十五日為寒際四月。是即雨際第二月後半第九日夜漸增，當此間八月九日。寒際第四月後半第九日晝漸增，當此間二月九日。從秋分日已去乃至春分日已前說夜增，雖冬至日已去晝漸增，夜仍長晝，故說夜增。從春分日已去乃至秋分日已前說晝增，雖夏至日已去夜漸增，晝仍長夜，故說晝增。若作此解，即與此論相違。此論云「日行此洲向南向北，如其次第夜增晝增。」准此論文，日向南夜增，如何從冬至日已去日向北說夜增？准此論文，日向北晝增，如何從夏至日已去日向南說晝增？又與《婆沙》一百三十六相違，彼論云「至摩伽陀月白半之日，夜有十八，晝有十二。從此以後晝增夜減。」又云「至室羅筏拏月白半之日，夜有十二，晝有十八。從此以後晝減夜增。」以此文證，准知夜極長已去說晝增夜減，晝極長已去說夜增晝減。若說秋分已去夜增晝減，春分已去晝增夜減，即與此文相違。又真諦法師立三際云：「從此間正月十六日至五月十五日為熱際四月，從五月十六日至九月十五日為雨際四月，從九月十六日至正月十五日為寒際四月。雨際第二月後半第九日夜漸增，當此間七月九日。寒際第四月後半第九日夜漸減，當此間正月九日。」難曰：此亦非理。若言七月九日說夜漸增，為據何時？若言夜極短已去說夜增，即夏至已過。若言晝夜齊等已去說夜增，復秋分日未至。若言正月九日說夜漸減，為據何時？若言夜極長已去說夜減，即冬至日已過。若言晝夜齊等已去說夜減，復春分日未至。此即與理相違，又與此論及《婆沙》相違。此即與文相違。此真諦立三際，約此間節氣以分，乍看似順，細尋即違。又有一解云：從十二月十六日至四月十五日為熱際四月，從四月十六日至八月十五日為雨際四月，從八月十六日至十二月十五日為寒際四月。雨際第二月後半第九日夜漸增，當此間六月九日。寒際第四月後半第九日夜漸減，當此間十二月九日。難云：若言六月九日說夜增，夏至日已過、秋分未至，還同前過。若言十二月九日說夜減，冬至已過、春分未至，還同前過。故亦非理，又論相違。今解云：西方諸國寒、熱、雨三時節不定，還隨方俗立三際異。世親菩薩造論處立三際，當此間從十一月十六日至三月十五日為熱際四月，從三月十六日至七月十五日為雨際四月，從七月十六日至十一月十五日為寒際四月。其雨際第二月從後半第九日夜漸增，當此間五月九日，與夏至日稍得相當，此即夜極短已去說夜增。其寒際第四月後半第九日夜漸減，當此間十一月九日，與冬至日稍得相當，此即夜極長已去說夜減。說晝增減，翻夜應知。此解乍看與此方節氣不同，然順論文。故論云「日行此洲向南向北，如其次第夜增晝增。」亦順《婆沙》，文如前說。",
+      "apparatus_entries": [
+        {
+          "source_file": "T41n1821.xml",
+          "paragraph_id": "pT41p0187c1604",
+          "from_anchor": "beg0188001",
+          "to_anchor": "end0188001",
+          "from_line": "0188a15",
+          "to_line": "0188a15",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            515,
+            516
+          ],
+          "adopted_layer_literal": "法",
+          "app_attributes": {
+            "from": "#beg0188001",
+            "to": "#end0188001"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "法",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">法</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "法",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1821.xml",
+          "paragraph_id": "pT41p0187c1604",
+          "from_anchor": "beg0188002",
+          "to_anchor": "end0188002",
+          "from_line": "0188a21",
+          "to_line": "0188a21",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            625,
+            626
+          ],
+          "adopted_layer_literal": "曰",
+          "app_attributes": {
+            "from": "#beg0188002",
+            "to": "#end0188002"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "曰",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">曰</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1"
+              },
+              "literal_excluding_notes": "云",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1\">云</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "曰",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1821.xml",
+          "paragraph_id": "pT41p0187c1604",
+          "from_anchor": "beg0188003",
+          "to_anchor": "end0188003",
+          "from_line": "0188b08",
+          "to_line": "0188b08",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            910,
+            911
+          ],
+          "adopted_layer_literal": "日",
+          "app_attributes": {
+            "from": "#beg0188003",
+            "to": "#end0188003"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "日",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">日</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "日",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1821.xml",
+          "paragraph_id": "pT41p0187c1604",
+          "from_anchor": "beg0188004",
+          "to_anchor": "end0188004",
+          "from_line": "0188b17",
+          "to_line": "0188b17",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1064,
+            1065
+          ],
+          "adopted_layer_literal": "從",
+          "app_attributes": {
+            "from": "#beg0188004",
+            "to": "#end0188004"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "從",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">從</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "從",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        }
+      ],
+      "all_projected_text_layers": {
+        "body_main": {
+          "kind": "body_main",
+          "literal": "「日行此洲至晝則漸增」者，言晝夜增減者，印度國法分十二月為三際，一熱際有四月、二雨際有四月、三寒際有四月，隨其方俗立三際不同。又以十六日為月一日，以十五日為月滿日。復分一月為二，前十五日為黑半、後十五日為白半。若依泰法師意解，從二月十六日至六月十五日為熱際四月，從六月十六日至十月十五日為雨際四月，從十月十六日至二月十五日為寒際四月。是即雨際第二月後半第九日夜漸增，當此間八月九日。寒際第四月後半第九日晝漸增，當此間二月九日。從秋分日已去乃至春分日已前說夜增，雖冬至日已去晝漸增，夜仍長晝，故說夜增。從春分日已去乃至秋分日已前說晝增，雖夏至日已去夜漸增，晝仍長夜，故說晝增。若作此解，即與此論相違。此論云「日行此洲向南向北，如其次第夜增晝增。」准此論文，日向南夜增，如何從冬至日已去日向北說夜增？准此論文，日向北晝增，如何從夏至日已去日向南說晝增？又與《婆沙》一百三十六相違，彼論云「至摩伽陀月白半之日，夜有十八，晝有十二。從此以後晝增夜減。」又云「至室羅筏拏月白半之日，夜有十二，晝有十八。從此以後晝減夜增。」以此文證，准知夜極長已去說晝增夜減，晝極長已去說夜增晝減。若說秋分已去夜增晝減，春分已去晝增夜減，即與此文相違。又真諦法師立三際云：「從此間正月十六日至五月十五日為熱際四月，從五月十六日至九月十五日為雨際四月，從九月十六日至正月十五日為寒際四月。雨際第二月後半第九日夜漸增，當此間七月九日。寒際第四月後半第九日夜漸減，當此間正月九日。」難曰：此亦非理。若言七月九日說夜漸增，為據何時？若言夜極短已去說夜增，即夏至已過。若言晝夜齊等已去說夜增，復秋分日未至。若言正月九日說夜漸減，為據何時？若言夜極長已去說夜減，即冬至日已過。若言晝夜齊等已去說夜減，復春分日未至。此即與理相違，又與此論及《婆沙》相違。此即與文相違。此真諦立三際，約此間節氣以分，乍看似順，細尋即違。又有一解云：從十二月十六日至四月十五日為熱際四月，從四月十六日至八月十五日為雨際四月，從八月十六日至十二月十五日為寒際四月。雨際第二月後半第九日夜漸增，當此間六月九日。寒際第四月後半第九日夜漸減，當此間十二月九日。難云：若言六月九日說夜增，夏至日已過、秋分未至，還同前過。若言十二月九日說夜減，冬至已過、春分未至，還同前過。故亦非理，又論相違。今解云：西方諸國寒、熱、雨三時節不定，還隨方俗立三際異。世親菩薩造論處立三際，當此間從十一月十六日至三月十五日為熱際四月，從三月十六日至七月十五日為雨際四月，從七月十六日至十一月十五日為寒際四月。其雨際第二月從後半第九日夜漸增，當此間五月九日，與夏至日稍得相當，此即夜極短已去說夜增。其寒際第四月後半第九日夜漸減，當此間十一月九日，與冬至日稍得相當，此即夜極長已去說夜減。說晝增減，翻夜應知。此解乍看與此方節氣不同，然順論文。故論云「日行此洲向南向北，如其次第夜增晝增。」亦順《婆沙》，文如前說。"
+        },
+        "inline_note_1": {
+          "kind": "inline_note",
+          "attributes": {
+            "place": "inline"
+          },
+          "literal": "當此間十一月"
+        },
+        "inline_note_2": {
+          "kind": "inline_note",
+          "attributes": {
+            "place": "inline"
+          },
+          "literal": "解云：十八牟呼栗多"
+        },
+        "inline_note_3": {
+          "kind": "inline_note",
+          "attributes": {
+            "place": "inline"
+          },
+          "literal": "解云：十二牟呼栗多"
+        },
+        "inline_note_4": {
+          "kind": "inline_note",
+          "attributes": {
+            "place": "inline"
+          },
+          "literal": "當此間五月"
+        }
+      },
+      "inline_note_layers_unchanged": [
+        {
+          "publisher_place": "inline",
+          "literal": "當此間十一月"
+        },
+        {
+          "publisher_place": "inline",
+          "literal": "解云：十八牟呼栗多"
+        },
+        {
+          "publisher_place": "inline",
+          "literal": "解云：十二牟呼栗多"
+        },
+        {
+          "publisher_place": "inline",
+          "literal": "當此間五月"
+        }
+      ],
+      "standoff_apparatus_entry_count": 4,
+      "scope": "Body text is CBETA adopted text. #wit.orig readings and other witness sigla are supplied apparatus reports, not actual new manuscript inspections, full witness reconstruction or a historical calendar."
+    },
+    {
+      "source_file": "T41n1822.xml",
+      "paragraph_id": "pT41p0453a0804",
+      "body_main_sha256": "a646723c4994001c5d2a2d4f1c78ebcae1041ded2109cb57d743ca1278d1c9b8",
+      "body_main_literal": "一、會初轉法輪時者，於中有四：一定成道日、二定轉法輪日、三述中間事別、四會說不同。一、定成道日者，依《長阿含經》第四云「八日如來生，八日佛出家，八日成菩提，八日取滅度。」次文云「二月如來生，二月佛出家，二月成菩提，二月取涅槃。」又《灌佛經》云「佛告諸天人：『十方諸佛皆用四月八日夜半時生，皆用四月八日夜半時出家，皆用四月八日夜半時成道，皆用四月八日夜半時而般涅槃。』」諸經八日皆同，說月有異，唯二、四別，不言餘月。准上二說，說雖有異，成道月日即是同也。所以得知，略有二理：一以立正異故。婆羅門國以建子立正，此方先時以建寅立正，建子四月即建寅二月，故存梵本者而言四月，依此方者即云二月，根本一也。二准《智論》及《婆沙》計，梵王請前五十七日，四月調根兼觀機等總有六月，即是二月八日成道。至八月八日轉法輪定，如下引文。以此故知，二月八日成道為定，去八月八日有六月故。若是四月八日，即無六月。去轉法輪四月，無文證故。又釋律論云「佛與五比丘，四月十六日結前安居。」安居去四月八日唯有九日，即與《法華》、《智論》、《毘婆》沙等眾多經論日月相違。准此故知，二月八日成道為定。問：若爾，何故《菩薩處胎經》云「二月八日成道，二月八日轉法輪，二月八日降魔，二月八日般涅槃。」答：此有二釋。一《處胎經》說菩薩處胎亦轉法輪，此為蜜眾，非為顯眾也。成道之日即轉法輪，義亦准此。今言為五比丘轉法輪日，諸說不同，非是蜜眾。二諸經中錯二月為四月者，由建正不同，已如前釋。錯八月為二月、四月者，以迦栗底迦是八月卯星之名，二月又是建卯地之月。星、地詮別，卯名同也。若知迦栗底迦是酉地之卯翻為八月，若謂迦栗底迦是震地之卯，翻為二月、四月，由此轉法輪等日有二、四、八不同，般涅槃日八、四、二月之異。詳多教理，度五比丘八月為定。會涅槃日，如別章釋。",
+      "apparatus_entries": [
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0453a0804",
+          "from_anchor": "beg0453005",
+          "to_anchor": "end0453005",
+          "from_line": "0453b07",
+          "to_line": "0453b07",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            552,
+            553
+          ],
+          "adopted_layer_literal": "蜜",
+          "app_attributes": {
+            "from": "#beg0453005",
+            "to": "#end0453005"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "蜜",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">蜜</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "密",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">密</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "蜜",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0453a0804",
+          "from_anchor": "beg0453006",
+          "to_anchor": "end0453006",
+          "from_line": "0453b13",
+          "to_line": "0453b13",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            667,
+            668
+          ],
+          "adopted_layer_literal": "栗",
+          "app_attributes": {
+            "from": "#beg0453006",
+            "to": "#end0453006"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.cbeta",
+                "resp": "#resp3",
+                "{http://www.cbeta.org/ns/1.0}provider": "CBETA 新式標點專案 (2023-02-15)"
+              },
+              "literal_excluding_notes": "栗",
+              "notes": [
+                {
+                  "attributes": {
+                    "type": "cf1"
+                  },
+                  "literal": "《俱舍論疏》（日本國立公文書館藏明治二十年刊本第1冊第4圖左欄第10行）"
+                },
+                {
+                  "attributes": {
+                    "type": "cf2"
+                  },
+                  "literal": "T41n1822_p0453b12"
+                }
+              ],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" wit=\"#wit.cbeta\" resp=\"#resp3\" ns1:provider=\"CBETA 新式標點專案 (2023-02-15)\">栗<ns0:note type=\"cf1\">《俱舍論疏》（日本國立公文書館藏明治二十年刊本第1冊第4圖左欄第10行）</ns0:note><ns0:note type=\"cf2\">T41n1822_p0453b12</ns0:note></ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "粟",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">粟</ns0:rdg>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "栗",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">栗</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "粟",
+          "body_differs_from_reported_orig": true,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0453a0804",
+          "from_anchor": "beg0453b1401",
+          "to_anchor": "end0453b1401",
+          "from_line": "0453b14",
+          "to_line": "0453b14",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            683,
+            684
+          ],
+          "adopted_layer_literal": "栗",
+          "app_attributes": {
+            "from": "#beg0453b1401",
+            "to": "#end0453b1401"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.cbeta",
+                "resp": "#resp3",
+                "{http://www.cbeta.org/ns/1.0}provider": "CBETA 新式標點專案 (2023-02-15)"
+              },
+              "literal_excluding_notes": "栗",
+              "notes": [
+                {
+                  "attributes": {
+                    "type": "cf1"
+                  },
+                  "literal": "《俱舍論疏》（日本國立公文書館藏明治二十年刊本第1冊第5圖右欄第1行）"
+                },
+                {
+                  "attributes": {
+                    "type": "cf2"
+                  },
+                  "literal": "T41n1822_p0453b12"
+                }
+              ],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" wit=\"#wit.cbeta\" resp=\"#resp3\" ns1:provider=\"CBETA 新式標點專案 (2023-02-15)\">栗<ns0:note type=\"cf1\">《俱舍論疏》（日本國立公文書館藏明治二十年刊本第1冊第5圖右欄第1行）</ns0:note><ns0:note type=\"cf2\">T41n1822_p0453b12</ns0:note></ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "粟",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\"><ns0:anchor xml:id=\"fxT41p0453b01_back\" />粟</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "粟",
+          "body_differs_from_reported_orig": true,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0453a0804",
+          "from_anchor": "beg0453007",
+          "to_anchor": "end0453007",
+          "from_line": "0453b17",
+          "to_line": "0453b17",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            729,
+            730
+          ],
+          "adopted_layer_literal": "詳",
+          "app_attributes": {
+            "from": "#beg0453007",
+            "to": "#end0453007"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "詳",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">詳</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2"
+              },
+              "literal_excluding_notes": "證",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2\">證</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "詳",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        }
+      ],
+      "all_projected_text_layers": {
+        "body_main": {
+          "kind": "body_main",
+          "literal": "一、會初轉法輪時者，於中有四：一定成道日、二定轉法輪日、三述中間事別、四會說不同。一、定成道日者，依《長阿含經》第四云「八日如來生，八日佛出家，八日成菩提，八日取滅度。」次文云「二月如來生，二月佛出家，二月成菩提，二月取涅槃。」又《灌佛經》云「佛告諸天人：『十方諸佛皆用四月八日夜半時生，皆用四月八日夜半時出家，皆用四月八日夜半時成道，皆用四月八日夜半時而般涅槃。』」諸經八日皆同，說月有異，唯二、四別，不言餘月。准上二說，說雖有異，成道月日即是同也。所以得知，略有二理：一以立正異故。婆羅門國以建子立正，此方先時以建寅立正，建子四月即建寅二月，故存梵本者而言四月，依此方者即云二月，根本一也。二准《智論》及《婆沙》計，梵王請前五十七日，四月調根兼觀機等總有六月，即是二月八日成道。至八月八日轉法輪定，如下引文。以此故知，二月八日成道為定，去八月八日有六月故。若是四月八日，即無六月。去轉法輪四月，無文證故。又釋律論云「佛與五比丘，四月十六日結前安居。」安居去四月八日唯有九日，即與《法華》、《智論》、《毘婆》沙等眾多經論日月相違。准此故知，二月八日成道為定。問：若爾，何故《菩薩處胎經》云「二月八日成道，二月八日轉法輪，二月八日降魔，二月八日般涅槃。」答：此有二釋。一《處胎經》說菩薩處胎亦轉法輪，此為蜜眾，非為顯眾也。成道之日即轉法輪，義亦准此。今言為五比丘轉法輪日，諸說不同，非是蜜眾。二諸經中錯二月為四月者，由建正不同，已如前釋。錯八月為二月、四月者，以迦栗底迦是八月卯星之名，二月又是建卯地之月。星、地詮別，卯名同也。若知迦栗底迦是酉地之卯翻為八月，若謂迦栗底迦是震地之卯，翻為二月、四月，由此轉法輪等日有二、四、八不同，般涅槃日八、四、二月之異。詳多教理，度五比丘八月為定。會涅槃日，如別章釋。"
+        }
+      },
+      "inline_note_layers_unchanged": [],
+      "standoff_apparatus_entry_count": 4,
+      "scope": "Body text is CBETA adopted text. #wit.orig readings and other witness sigla are supplied apparatus reports, not actual new manuscript inspections, full witness reconstruction or a historical calendar."
+    },
+    {
+      "source_file": "T41n1822.xml",
+      "paragraph_id": "pT41p0617a0804",
+      "body_main_sha256": "efbe6870f25b443fbce4a869d24983e52ecf71759854fefa899d0cf732f52ddd",
+      "body_main_literal": "論「日行此洲至晝即漸增」，述日夜增減。汎言夜增晝增、夜減晝減，有其兩義：一夜短其晝已去晝增，晝短其夜已去名夜增。若取此義，即秋分已後是夜增，春分已去名晝增。二起此時已去夜漸進長，即第二日長第一日等名夜增。晝增翻此。若依此義，即夏至日已去名夜增，冬至日已去名晝增也。問：此論所明增減為是何者？答准：論云「日行此洲向南向北，如其次第夜增晝增。」即夏至已後至冬至日夜增，冬至日已後至夏至日晝增。《婆娑》一百三十六云「然晝與夜增減相違，雖各二時而無四位。晝夜增減各一臘縛，則各一牟呼栗多，三十牟呼栗多成一晝夜。於中晝夜多少四類不同，增位極長不過十八，減位極短唯有十二，晝夜停位各有十五。謂羯栗底迦月白半第八日，晝夜各有十五牟呼栗多，從此已後晝減夜增。」釋曰：西方以黑月為先、白月為後。羯栗底迦是此方八月，若以此方七月十六日為月初，白半即當此方八月八日；若以此方八月十六日為月初，白半即當此方九月八日。晝夜停時，當此方八月十五日，以八日後晝減、夜增故。亦即是節氣月日，非是月生、月盡月日，此月生、月盡晝夜增減不定故。若以此方八月八日晝夜停，西方節氣先於此方七日；若以此方九月八日晝夜停，西方節氣晚於此方二十三日。准輪圍山徑一百二十萬八百七十五踰繕那，略計西洲、南洲相去三十萬踰繕那。南洲節氣不同，計有九十日異。此國去彼國無四五萬里，節氣七日不同是即不違；若二十三日不同，理即令隔。應以七月十六日為羯栗底迦月，為月初定。又《婆娑》云「至末伽始羅月白半第八日，夜有十六牟呼栗多，晝十四。至報沙月白半第八日，夜有十七，晝十三。至摩迦月白半第八日，夜有十八，晝十二。從此已後，夜減晝增各一臘縛。至頗勒窶那月白半第八日，夜有十七，晝有十三。至制怛羅月白半第八日，夜有十六，晝有十四。至吠舍佉月白半第八日，晝夜各十五。從此以後夜減晝增各一臘縛。至誓瑟搋月白半第八日，夜有十四，晝有十六。至阿沙荼月白半第八日，夜有十三，晝有十七。至室羅筏拏月白半第八日，夜有十二，晝十八。從此已後晝減夜增各一臘縛。至婆達羅鉢陀月白半第八日，夜有十三，晝十七。至阿濕縛庾闍月白半第八日，夜有十四，晝十六。如是復至羯栗底迦月白半第八日，晝夜停等。是名略說時之分齊。」准上論文，日向北六月夜減，向南六月夜增。然標晝夜增減，言於四處至羯栗底迦月白半第八，晝夜各十五牟呼栗多。此後復云從此已後晝減夜增，至摩迦月白半第八日，夜十八，晝十二牟呼栗多，是夜極長。於此已後亦言從此已後夜減晝增。至吠舍佉月白半第八日，晝夜各十五牟呼栗多。此後亦云從此已後夜減晝增。至室羅筏拏月白半第八日，夜有十二，晝十八，此後亦云從此已後晝減夜增，當九日也。此論云「日行此洲路有差別，故令晝夜有減有增」者，當《婆沙》云「然晝與夜增減相違，雖各二時而無四位。」論云「從雨際第二月後半第九日夜漸增」，此說五月九日、八月九日，皆悉不違《婆沙》所說。於此雨際第八日後，皆言從此後晝減夜增故。准此論文，五月九日《婆沙》云白半，此論云後半，故知第二月初即是四月十六日，第一月初即是三月十六日。論云「從寒際第四月後半第九日夜漸減」，此說十一月九日、二月九日，皆悉不違《婆沙》所說。於此兩月第八日後，皆言從此後夜減晝增故。准此論文，日向南夜增晝減故云後半，婆娑云白半，故知是此方十一月九日，夜極長也。若以五月為雨際第二月，即此方四月十六日為雨際第二月初，與《四分律》不同，《四分律》以四月十六日為雨際第一月故。若以八月為雨際第二月，即此方六月十六日為雨際第一月初。若以十一月為寒際第四月，即此方七月十六日為寒際之初，與《四分律》不同。若以二月為寒際第四月，即十月十六日為寒際初，皆不違《婆沙》文也。然取順此方時，應以六月十六日為雨際之初，此方立秋已去多雨故。唐三藏以三月十六日為雨際之初，取五月九日夜增，亦不違《婆沙》。然太法師釋，以六月十六日是雨際之初者，取八月後半第九日夜增，亦不違《婆沙》。依《四分律》等，以四月十六日為雨際之初，此是譯家誤以此方五月十六日為雨際第二月初。以此方六月前十五日，為五月白半第八日也。亦可通云：《毘婆沙》是迦濕彌羅國，《四分律》非有部宗，是其別國，寒熱不同兩月有異，故不同也。《西域記》云「有國亦以十二月為雨際，彼國冬多雨故。」其《婆沙》五月、八月白半第九日皆說夜增，《俱舍》但說日行向南夜增，即是《婆沙》五月白半第九日也。今釋《俱舍》雨際第二月白半第九日，即是此方五月第九日為定。然《婆沙》皆說白半第八日晝夜增減，此方皆十五日為冬至、夏至日。春分、秋分者，竝是節氣日月也，所以不同也。節氣從西向東也，以日從西向東，故南方夏、西方秋、北方冬、東方春。南方夜極短，北方夜極長，東、西方晝夜停。",
+      "apparatus_entries": [
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617001",
+          "to_anchor": "end0617001",
+          "from_line": "0617a08",
+          "to_line": "0617a08",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            7,
+            8
+          ],
+          "adopted_layer_literal": "晝",
+          "app_attributes": {
+            "from": "#beg0617001",
+            "to": "#end0617001"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "晝",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">晝</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "盡",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">盡</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "晝",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617002",
+          "to_anchor": "end0617002",
+          "from_line": "0617a16",
+          "to_line": "0617a16",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            149,
+            150
+          ],
+          "adopted_layer_literal": "云",
+          "app_attributes": {
+            "from": "#beg0617002",
+            "to": "#end0617002"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "云",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">云</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "曰",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">曰</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "云",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617003",
+          "to_anchor": "end0617003",
+          "from_line": "0617a20",
+          "to_line": "0617a20",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            219,
+            220
+          ],
+          "adopted_layer_literal": "無",
+          "app_attributes": {
+            "from": "#beg0617003",
+            "to": "#end0617003"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "無",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">無</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "立",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">立</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "無",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617004",
+          "to_anchor": "end0617004",
+          "from_line": "0617a20",
+          "to_line": "0617a20",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            221,
+            222
+          ],
+          "adopted_layer_literal": "位",
+          "app_attributes": {
+            "from": "#beg0617004",
+            "to": "#end0617004"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "位",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">位</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "位",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617005",
+          "to_anchor": "end0617005",
+          "from_line": "0617a28",
+          "to_line": "0617a28",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            372,
+            373
+          ],
+          "adopted_layer_literal": "若",
+          "app_attributes": {
+            "from": "#beg0617005",
+            "to": "#end0617005"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "若",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">若</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "若以此方八月十六日為月初白半即當此方八月八日若",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">若以此方八月十六日為月初白半即當此方八月八日若</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "若",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617006",
+          "to_anchor": "end0617006",
+          "from_line": "0617b01",
+          "to_line": "0617b01",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            422,
+            423
+          ],
+          "adopted_layer_literal": "即",
+          "app_attributes": {
+            "from": "#beg0617006",
+            "to": "#end0617006"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "即",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">即</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "即",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617007",
+          "to_anchor": "end0617007",
+          "from_line": "0617b02",
+          "to_line": "0617b02",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            431,
+            432
+          ],
+          "adopted_layer_literal": "月",
+          "app_attributes": {
+            "from": "#beg0617007",
+            "to": "#end0617007"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "月",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">月</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "日",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">日</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "月",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617008",
+          "to_anchor": "end0617008",
+          "from_line": "0617b02",
+          "to_line": "0617b02",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            434,
+            436
+          ],
+          "adopted_layer_literal": "月盡",
+          "app_attributes": {
+            "from": "#beg0617008",
+            "to": "#end0617008"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "月盡",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">月盡</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "晝",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">晝</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "月盡",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617009",
+          "to_anchor": "end0617009",
+          "from_line": "0617b03",
+          "to_line": "0617b03",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            444,
+            445
+          ],
+          "adopted_layer_literal": "盡",
+          "app_attributes": {
+            "from": "#beg0617009",
+            "to": "#end0617009"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "盡",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">盡</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "盡",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617010",
+          "to_anchor": "end0617010",
+          "from_line": "0617b04",
+          "to_line": "0617b04",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            469,
+            470
+          ],
+          "adopted_layer_literal": "先",
+          "app_attributes": {
+            "from": "#beg0617010",
+            "to": "#end0617010"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "先",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">先</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "順",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">順</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "先",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617011",
+          "to_anchor": "end0617011",
+          "from_line": "0617b04",
+          "to_line": "0617b06",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            473,
+            496
+          ],
+          "adopted_layer_literal": "七日；若以此方九月八日晝夜停，西方節氣晚於此方",
+          "app_attributes": {
+            "{http://www.cbeta.org/ns/1.0}word-count": "21",
+            "from": "#beg0617011",
+            "to": "#end0617011"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "七日；若以此方九月八日晝夜停，西方節氣晚於此方",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">七日；若<ns0:lb n=\"0617b05\" ed=\"T\" />以此方九月八日晝夜停，西方節氣晚於此<ns0:lb n=\"0617b06\" ed=\"T\" />方</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "七日；若以此方九月八日晝夜停，西方節氣晚於此方",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617012",
+          "to_anchor": "end0617012",
+          "from_line": "0617b10",
+          "to_line": "0617b10",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            582,
+            584
+          ],
+          "adopted_layer_literal": "令隔",
+          "app_attributes": {
+            "from": "#beg0617012",
+            "to": "#end0617012"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "令隔",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">令隔</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "羯",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">羯</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "令隔",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617013",
+          "to_anchor": "end0617013",
+          "from_line": "0617b13",
+          "to_line": "0617b13",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            628,
+            629
+          ],
+          "adopted_layer_literal": "呼",
+          "app_attributes": {
+            "from": "#beg0617013",
+            "to": "#end0617013"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "呼",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">呼</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "呼",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617014",
+          "to_anchor": "end0617014",
+          "from_line": "0617b14",
+          "to_line": "0617b14",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            656,
+            658
+          ],
+          "adopted_layer_literal": "摩迦",
+          "app_attributes": {
+            "from": "#beg0617014",
+            "to": "#end0617014"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "摩迦",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">摩迦</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "磨伽",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">磨伽</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "摩迦",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617015",
+          "to_anchor": "end0617015",
+          "from_line": "0617b17",
+          "to_line": "0617b17",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            706,
+            707
+          ],
+          "adopted_layer_literal": "有",
+          "app_attributes": {
+            "from": "#beg0617015",
+            "to": "#end0617015"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "有",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">有</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "有",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617016",
+          "to_anchor": "end0617016",
+          "from_line": "0617b18",
+          "to_line": "0617b18",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            729,
+            730
+          ],
+          "adopted_layer_literal": "四",
+          "app_attributes": {
+            "from": "#beg0617016",
+            "to": "#end0617016"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "四",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">四</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2"
+              },
+              "literal_excluding_notes": "五",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2\">五</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "四",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617017",
+          "to_anchor": "end0617017",
+          "from_line": "0617b19",
+          "to_line": "0617b19",
+          "text_layer_id": "inline_note_1",
+          "text_layer": {
+            "kind": "inline_note",
+            "attributes": {
+              "place": "inline"
+            }
+          },
+          "layer_offsets": [
+            9,
+            11
+          ],
+          "adopted_layer_literal": "亦云",
+          "app_attributes": {
+            "from": "#beg0617017",
+            "to": "#end0617017"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "亦云",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">亦云</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "去",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">去</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "亦云",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617018",
+          "to_anchor": "end0617018",
+          "from_line": "0617b25",
+          "to_line": "0617b26",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            860,
+            866
+          ],
+          "adopted_layer_literal": "阿濕縛庾闍月",
+          "app_attributes": {
+            "from": "#beg0617018",
+            "to": "#end0617018"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "阿濕縛庾闍月",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">阿濕<ns0:lb n=\"0617b26\" ed=\"T\" />縛庾闍月</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "阿濕縛疾縛庾闍月",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">阿濕縛疾縛庾闍月</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "阿濕縛庾闍月",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617019",
+          "to_anchor": "end0617019",
+          "from_line": "0617c01",
+          "to_line": "0617c01",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            942,
+            943
+          ],
+          "adopted_layer_literal": "至",
+          "app_attributes": {
+            "from": "#beg0617019",
+            "to": "#end0617019"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "至",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">至</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "有",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">有</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "至",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617020",
+          "to_anchor": "end0617020",
+          "from_line": "0617c02",
+          "to_line": "0617c02",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            965,
+            966
+          ],
+          "adopted_layer_literal": "復",
+          "app_attributes": {
+            "from": "#beg0617020",
+            "to": "#end0617020"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "復",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">復</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "復",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617021",
+          "to_anchor": "end0617021",
+          "from_line": "0617c03",
+          "to_line": "0617c03",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            972,
+            973
+          ],
+          "adopted_layer_literal": "減",
+          "app_attributes": {
+            "from": "#beg0617021",
+            "to": "#end0617021"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "減",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">減</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "減",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617022",
+          "to_anchor": "end0617022",
+          "from_line": "0617c03",
+          "to_line": "0617c08",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            975,
+            1051
+          ],
+          "adopted_layer_literal": "，至摩迦月白半第八日，夜十八，晝十二牟呼栗多，是夜極長。於此已後亦言從此已後夜減晝增。至吠舍佉月白半第八日，晝夜各十五牟呼栗多。此後亦云從此已後夜減晝增",
+          "app_attributes": {
+            "{http://www.cbeta.org/ns/1.0}word-count": "90",
+            "from": "#beg0617022",
+            "to": "#end0617022"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "，至摩迦月白半第八日，夜十八，晝十二牟呼栗多，是夜極長。於此已後亦言從此已後夜減晝增。至吠舍佉月白半第八日，晝夜各十五牟呼栗多。此後亦云從此已後夜減晝增",
+              "notes": [
+                {
+                  "attributes": {
+                    "place": "inline"
+                  },
+                  "literal": "此當此方八月九日，西方八月二十四日"
+                },
+                {
+                  "attributes": {
+                    "place": "inline"
+                  },
+                  "literal": "當此方十一月"
+                }
+              ],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\"><ns0:note place=\"inline\">此當此方八月九日，西方八月二十四日</ns0:note>，<ns0:lb n=\"0617c04\" ed=\"T\" />至摩迦月白半第八日，夜十八，晝十二牟呼<ns0:lb n=\"0617c05\" ed=\"T\" />栗多<ns0:note place=\"inline\">當此方十一月</ns0:note>，是夜極長。於此已後亦言從此<ns0:lb n=\"0617c06\" ed=\"T\" />已後夜減晝增。至吠舍佉月白半第八日，晝<ns0:lb n=\"0617c07\" ed=\"T\" />夜各十五牟呼栗多。此後亦云從此已後<ns0:lb n=\"0617c08\" ed=\"T\" />夜減晝增</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "，至摩迦月白半第八日，夜十八，晝十二牟呼栗多，是夜極長。於此已後亦言從此已後夜減晝增。至吠舍佉月白半第八日，晝夜各十五牟呼栗多。此後亦云從此已後夜減晝增",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617023",
+          "to_anchor": "end0617023",
+          "from_line": "0617c08",
+          "to_line": "0617c08",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1053,
+            1054
+          ],
+          "adopted_layer_literal": "室",
+          "app_attributes": {
+            "from": "#beg0617023",
+            "to": "#end0617023"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "室",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">室</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "審",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">審</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "室",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617024",
+          "to_anchor": "end0617024",
+          "from_line": "0617c09",
+          "to_line": "0617c09",
+          "text_layer_id": "inline_note_7",
+          "text_layer": {
+            "kind": "inline_note",
+            "attributes": {
+              "place": "inline"
+            }
+          },
+          "layer_offsets": [
+            13,
+            14
+          ],
+          "adopted_layer_literal": "二",
+          "app_attributes": {
+            "from": "#beg0617024",
+            "to": "#end0617024"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "二",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">二</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "二",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617025",
+          "to_anchor": "end0617025",
+          "from_line": "0617c15",
+          "to_line": "0617c15",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1178,
+            1179
+          ],
+          "adopted_layer_literal": "沙",
+          "app_attributes": {
+            "from": "#beg0617025",
+            "to": "#end0617025"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "沙",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">沙</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "娑",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">娑</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "沙",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617026",
+          "to_anchor": "end0617026",
+          "from_line": "0617c15",
+          "to_line": "0617c15",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1185,
+            1187
+          ],
+          "adopted_layer_literal": "雨際",
+          "app_attributes": {
+            "from": "#beg0617026",
+            "to": "#end0617026"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "雨際",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">雨際</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "兩月",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">兩月</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "雨際",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg_11e",
+          "to_anchor": "end_11e",
+          "from_line": "0617c17",
+          "to_line": "0617c17",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1214,
+            1215
+          ],
+          "adopted_layer_literal": "沙",
+          "app_attributes": {
+            "from": "#beg_11e",
+            "to": "#end_11e",
+            "corresp": "#0617025"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "沙",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">沙</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "娑",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">娑</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "沙",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": "#0617025"
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617027",
+          "to_anchor": "end0617027",
+          "from_line": "0617c17",
+          "to_line": "0617c17",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1224,
+            1225
+          ],
+          "adopted_layer_literal": "半",
+          "app_attributes": {
+            "from": "#beg0617027",
+            "to": "#end0617027"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "半",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">半</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "半",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg_11f",
+          "to_anchor": "end_11f",
+          "from_line": "0617c21",
+          "to_line": "0617c21",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1290,
+            1291
+          ],
+          "adopted_layer_literal": "沙",
+          "app_attributes": {
+            "from": "#beg_11f",
+            "to": "#end_11f",
+            "corresp": "#0617025"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "沙",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">沙</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "娑",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">娑</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "沙",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": "#0617025"
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617028",
+          "to_anchor": "end0617028",
+          "from_line": "0617c22",
+          "to_line": "0617c22",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1310,
+            1311
+          ],
+          "adopted_layer_literal": "減",
+          "app_attributes": {
+            "from": "#beg0617028",
+            "to": "#end0617028"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "減",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">減</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "減",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617029",
+          "to_anchor": "end0617029",
+          "from_line": "0617c24",
+          "to_line": "0617c24",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1355,
+            1356
+          ],
+          "adopted_layer_literal": "以",
+          "app_attributes": {
+            "from": "#beg0617029",
+            "to": "#end0617029"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "以",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">以</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "以",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617030",
+          "to_anchor": "end0617030",
+          "from_line": "0617c27",
+          "to_line": "0617c27",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1401,
+            1402
+          ],
+          "adopted_layer_literal": "為",
+          "app_attributes": {
+            "from": "#beg0617030",
+            "to": "#end0617030"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "為",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">為</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "為",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617031",
+          "to_anchor": "end0617031",
+          "from_line": "0617c28",
+          "to_line": "0617c28",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1423,
+            1424
+          ],
+          "adopted_layer_literal": "六",
+          "app_attributes": {
+            "from": "#beg0617031",
+            "to": "#end0617031"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "六",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">六</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "七",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">七</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "六",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617032",
+          "to_anchor": "end0617032",
+          "from_line": "0617c28",
+          "to_line": "0617c28",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1429,
+            1430
+          ],
+          "adopted_layer_literal": "雨",
+          "app_attributes": {
+            "from": "#beg0617032",
+            "to": "#end0617032"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "雨",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">雨</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "寒",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">寒</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "雨",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0617033",
+          "to_anchor": "end0617033",
+          "from_line": "0617c29",
+          "to_line": "0618a01",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1431,
+            1459
+          ],
+          "adopted_layer_literal": "第一月初。若以十一月為寒際第四月，即此方七月十六日為寒際",
+          "app_attributes": {
+            "{http://www.cbeta.org/ns/1.0}word-count": "26",
+            "from": "#beg0617033",
+            "to": "#end0617033"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "第一月初。若以十一月為寒際第四月，即此方七月十六日為寒際",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">第一月初。若以十一月為寒際第四月，<ns0:lb n=\"0618a01\" ed=\"T\" />即此方七月十六日為寒際</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "第一月初。若以十一月為寒際第四月，即此方七月十六日為寒際",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0618001",
+          "to_anchor": "end0618001",
+          "from_line": "0618a16",
+          "to_line": "0618a16",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1744,
+            1745
+          ],
+          "adopted_layer_literal": "月",
+          "app_attributes": {
+            "from": "#beg0618001",
+            "to": "#end0618001"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "月",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">月</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "日",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">日</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "月",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0618002",
+          "to_anchor": "end0618002",
+          "from_line": "0618a19",
+          "to_line": "0618a19",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1806,
+            1807
+          ],
+          "adopted_layer_literal": "第",
+          "app_attributes": {
+            "from": "#beg0618002",
+            "to": "#end0618002"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "第",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">第</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "第",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0618003",
+          "to_anchor": "end0618003",
+          "from_line": "0618a21",
+          "to_line": "0618a21",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1841,
+            1842
+          ],
+          "adopted_layer_literal": "日",
+          "app_attributes": {
+            "from": "#beg0618003",
+            "to": "#end0618003"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "日",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">日</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "日",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0618004",
+          "to_anchor": "end0618004",
+          "from_line": "0618a22",
+          "to_line": "0618a22",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1862,
+            1863
+          ],
+          "adopted_layer_literal": "也",
+          "app_attributes": {
+            "from": "#beg0618004",
+            "to": "#end0618004"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "也",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">也</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "者",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">者</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "也",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T41n1822.xml",
+          "paragraph_id": "pT41p0617a0804",
+          "from_anchor": "beg0618005",
+          "to_anchor": "end0618005",
+          "from_line": "0618a24",
+          "to_line": "0618a24",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1902,
+            1907
+          ],
+          "adopted_layer_literal": "北方夜極長",
+          "app_attributes": {
+            "from": "#beg0618005",
+            "to": "#end0618005"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "北方夜極長",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">北方夜極長</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit1 #wit2"
+              },
+              "literal_excluding_notes": "",
+              "notes": [],
+              "spaces": [
+                {
+                  "quantity": "0"
+                }
+              ],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\"><ns0:space quantity=\"0\" /></ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "北方夜極長",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        }
+      ],
+      "all_projected_text_layers": {
+        "body_main": {
+          "kind": "body_main",
+          "literal": "論「日行此洲至晝即漸增」，述日夜增減。汎言夜增晝增、夜減晝減，有其兩義：一夜短其晝已去晝增，晝短其夜已去名夜增。若取此義，即秋分已後是夜增，春分已去名晝增。二起此時已去夜漸進長，即第二日長第一日等名夜增。晝增翻此。若依此義，即夏至日已去名夜增，冬至日已去名晝增也。問：此論所明增減為是何者？答准：論云「日行此洲向南向北，如其次第夜增晝增。」即夏至已後至冬至日夜增，冬至日已後至夏至日晝增。《婆娑》一百三十六云「然晝與夜增減相違，雖各二時而無四位。晝夜增減各一臘縛，則各一牟呼栗多，三十牟呼栗多成一晝夜。於中晝夜多少四類不同，增位極長不過十八，減位極短唯有十二，晝夜停位各有十五。謂羯栗底迦月白半第八日，晝夜各有十五牟呼栗多，從此已後晝減夜增。」釋曰：西方以黑月為先、白月為後。羯栗底迦是此方八月，若以此方七月十六日為月初，白半即當此方八月八日；若以此方八月十六日為月初，白半即當此方九月八日。晝夜停時，當此方八月十五日，以八日後晝減、夜增故。亦即是節氣月日，非是月生、月盡月日，此月生、月盡晝夜增減不定故。若以此方八月八日晝夜停，西方節氣先於此方七日；若以此方九月八日晝夜停，西方節氣晚於此方二十三日。准輪圍山徑一百二十萬八百七十五踰繕那，略計西洲、南洲相去三十萬踰繕那。南洲節氣不同，計有九十日異。此國去彼國無四五萬里，節氣七日不同是即不違；若二十三日不同，理即令隔。應以七月十六日為羯栗底迦月，為月初定。又《婆娑》云「至末伽始羅月白半第八日，夜有十六牟呼栗多，晝十四。至報沙月白半第八日，夜有十七，晝十三。至摩迦月白半第八日，夜有十八，晝十二。從此已後，夜減晝增各一臘縛。至頗勒窶那月白半第八日，夜有十七，晝有十三。至制怛羅月白半第八日，夜有十六，晝有十四。至吠舍佉月白半第八日，晝夜各十五。從此以後夜減晝增各一臘縛。至誓瑟搋月白半第八日，夜有十四，晝有十六。至阿沙荼月白半第八日，夜有十三，晝有十七。至室羅筏拏月白半第八日，夜有十二，晝十八。從此已後晝減夜增各一臘縛。至婆達羅鉢陀月白半第八日，夜有十三，晝十七。至阿濕縛庾闍月白半第八日，夜有十四，晝十六。如是復至羯栗底迦月白半第八日，晝夜停等。是名略說時之分齊。」准上論文，日向北六月夜減，向南六月夜增。然標晝夜增減，言於四處至羯栗底迦月白半第八，晝夜各十五牟呼栗多。此後復云從此已後晝減夜增，至摩迦月白半第八日，夜十八，晝十二牟呼栗多，是夜極長。於此已後亦言從此已後夜減晝增。至吠舍佉月白半第八日，晝夜各十五牟呼栗多。此後亦云從此已後夜減晝增。至室羅筏拏月白半第八日，夜有十二，晝十八，此後亦云從此已後晝減夜增，當九日也。此論云「日行此洲路有差別，故令晝夜有減有增」者，當《婆沙》云「然晝與夜增減相違，雖各二時而無四位。」論云「從雨際第二月後半第九日夜漸增」，此說五月九日、八月九日，皆悉不違《婆沙》所說。於此雨際第八日後，皆言從此後晝減夜增故。准此論文，五月九日《婆沙》云白半，此論云後半，故知第二月初即是四月十六日，第一月初即是三月十六日。論云「從寒際第四月後半第九日夜漸減」，此說十一月九日、二月九日，皆悉不違《婆沙》所說。於此兩月第八日後，皆言從此後夜減晝增故。准此論文，日向南夜增晝減故云後半，婆娑云白半，故知是此方十一月九日，夜極長也。若以五月為雨際第二月，即此方四月十六日為雨際第二月初，與《四分律》不同，《四分律》以四月十六日為雨際第一月故。若以八月為雨際第二月，即此方六月十六日為雨際第一月初。若以十一月為寒際第四月，即此方七月十六日為寒際之初，與《四分律》不同。若以二月為寒際第四月，即十月十六日為寒際初，皆不違《婆沙》文也。然取順此方時，應以六月十六日為雨際之初，此方立秋已去多雨故。唐三藏以三月十六日為雨際之初，取五月九日夜增，亦不違《婆沙》。然太法師釋，以六月十六日是雨際之初者，取八月後半第九日夜增，亦不違《婆沙》。依《四分律》等，以四月十六日為雨際之初，此是譯家誤以此方五月十六日為雨際第二月初。以此方六月前十五日，為五月白半第八日也。亦可通云：《毘婆沙》是迦濕彌羅國，《四分律》非有部宗，是其別國，寒熱不同兩月有異，故不同也。《西域記》云「有國亦以十二月為雨際，彼國冬多雨故。」其《婆沙》五月、八月白半第九日皆說夜增，《俱舍》但說日行向南夜增，即是《婆沙》五月白半第九日也。今釋《俱舍》雨際第二月白半第九日，即是此方五月第九日為定。然《婆沙》皆說白半第八日晝夜增減，此方皆十五日為冬至、夏至日。春分、秋分者，竝是節氣日月也，所以不同也。節氣從西向東也，以日從西向東，故南方夏、西方秋、北方冬、東方春。南方夜極短，北方夜極長，東、西方晝夜停。"
+        },
+        "inline_note_1": {
+          "kind": "inline_note",
+          "attributes": {
+            "place": "inline"
+          },
+          "literal": "此當此方二月八日，亦云從此已後夜減晝增"
+        },
+        "inline_note_2": {
+          "kind": "inline_note",
+          "attributes": {
+            "place": "inline"
+          },
+          "literal": "此當此方五月八日"
+        },
+        "inline_note_3": {
+          "kind": "inline_note",
+          "attributes": {
+            "place": "inline"
+          },
+          "literal": "當此方八月八日，西方八月二十三日"
+        },
+        "inline_note_4": {
+          "kind": "inline_note",
+          "attributes": {
+            "place": "inline"
+          },
+          "literal": "此當此方八月九日，西方八月二十四日"
+        },
+        "inline_note_5": {
+          "kind": "inline_note",
+          "attributes": {
+            "place": "inline"
+          },
+          "literal": "當此方十一月"
+        },
+        "inline_note_6": {
+          "kind": "inline_note",
+          "attributes": {
+            "place": "inline"
+          },
+          "literal": "當此方二月九日"
+        },
+        "inline_note_7": {
+          "kind": "inline_note",
+          "attributes": {
+            "place": "inline"
+          },
+          "literal": "此當此方五月八日，西方五月二十三日"
+        }
+      },
+      "inline_note_layers_unchanged": [
+        {
+          "publisher_place": "inline",
+          "literal": "此當此方二月八日，亦云從此已後夜減晝增"
+        },
+        {
+          "publisher_place": "inline",
+          "literal": "此當此方五月八日"
+        },
+        {
+          "publisher_place": "inline",
+          "literal": "當此方八月八日，西方八月二十三日"
+        },
+        {
+          "publisher_place": "inline",
+          "literal": "此當此方八月九日，西方八月二十四日"
+        },
+        {
+          "publisher_place": "inline",
+          "literal": "當此方十一月"
+        },
+        {
+          "publisher_place": "inline",
+          "literal": "當此方二月九日"
+        },
+        {
+          "publisher_place": "inline",
+          "literal": "此當此方五月八日，西方五月二十三日"
+        }
+      ],
+      "standoff_apparatus_entry_count": 40,
+      "scope": "Body text is CBETA adopted text. #wit.orig readings and other witness sigla are supplied apparatus reports, not actual new manuscript inspections, full witness reconstruction or a historical calendar."
+    },
+    {
+      "source_file": "T32n1644.xml",
+      "paragraph_id": "pT32p0195c1601",
+      "body_main_sha256": "e3ae087a0560c861499ac2b7860b178cfc50d3abeaa9975a1fa94a609a78630e",
+      "body_main_literal": "「日恒行一由旬半又一由旬九分之一。其一一日出時如是，入亦如是。六月日中從內路出，至於外路。六月日從外路入，至內路。月恒行十九由旬又一由旬三分之一。其一一日出亦如是，入亦如是。十五日從內路至外路，十五日從外路至內路。日若行東弗婆提內路，取東弗婆提地南際，相去六百八十三由旬又一由旬三分之一，是中日行內路。日若行剡浮提內路，取剡浮提地南際，相去三百五十由旬，是中日行內路。日若行西瞿耶尼內路，取西瞿耶尼地南際，相去六百八十三由旬又一由旬三分之一，是中日行內路。日若行北欝單越內路，取北欝單越地南際，相去三百五十由旬，是中日行內路。日若行東弗婆提外路，從地南際取日外路，三百九十三由旬又一由旬三分之一，日於中行。若日行剡浮提外路，從地南際至日外路，六十由旬，是中日行外路。若日行西瞿耶尼外路，取地南際至日外路，三百九十三由旬又一由旬三分之一，是中日行。若日行北欝單越外路，取地南際六十由旬，是中日行。若日行東弗婆提內路，則行西瞿耶尼外路，則行南剡浮提、北欝單越中路，是時東弗婆提日最長，十八牟休多，是時夜最短，十二牟休多；西瞿耶尼夜最長，十八牟休多，日最短十二牟休多；剡浮提、北欝單越日夜等分，並十五牟休多，其六牟休多恒動，二十四牟休多不動。若日行東弗婆提外路，則行西瞿耶尼內路，則行南剡浮提、北欝單越中路。是時東弗婆提夜最長，十八牟休多，日最短十二牟休多；西瞿耶尼日最長，十八牟休多，夜最短十二牟休多；南剡浮提、北欝單越等分，日夜並十五牟休多。若日行剡浮提內路，則行北欝單越外路，則行東弗婆提、西瞿耶尼中路。是剡浮提日最長，十八牟休多，夜最短十二牟休多；北欝單越夜最長，十八牟休多，日最短十二牟休多；東弗婆提、西瞿耶尼日夜等分，並十五牟休多。日若行南剡浮提外路，則行北欝單越內路，則行東弗婆提、西瞿耶尼中路。是時剡浮提夜最長，十八牟休多，日最短十二牟休多；北欝單越日最長，十八牟休多，夜最短十二牟休多；東弗婆提、西瞿耶尼日夜等分，並十五牟休多。西瞿耶尼、北欝單越並如是說。若世間中三十牟休多，決定恒為一日夜。其一牟休多有三十分，是一一分名曰羅婆。日若增時，日一羅婆，日若減，亦一羅婆；夜亦如是。若日減時，夜增一羅婆；若夜減時，日增一羅婆。若日最長十八牟休多，是時夜則最短十二牟休多。若夜最長十八牟休多，是時日則最短十二牟休多。若日夜等時，日十五牟休多，夜十五牟休多。若五月十五日正圓滿，西國始結夏時，漢地安居已滿一月，是時日則最長十八牟休多，夜則最短十二牟休多。從十六日減一羅婆，月減一牟休多，第二月又減一牟休多，第三月又減一牟休多，至八月十五日西國自恣時，漢地受迦絺那衣時，日夜平等，各十五牟休多。又從十六日乃至一月，復減一牟休多，第二月又減一牟休多，第三月又減一牟休多，至十一月十五日，其夜最長十八牟休多，其日最短十二牟休多。是夜從此時，日減一羅婆，一月日則夜減一牟休多，第二月又減一牟休多，第三月又減一牟休多，至二月十五日夜平等，各十五牟休多。又從十六日乃至一月，復減一牟休多，第二月復減一牟休多，第三月復減一牟休多，至五月十五日，其日最長十八牟休多，其夜最短十二牟休多。復有別時，若西國夏分，第一月月中第二半第九日，是為六月九日，是時日最長十八牟休多，夜最短十二牟休多。至九月九日，日夜平等各十五牟休多。十一月九日，是夜最長十八牟休多，日最短十二牟休多。三月九日，日夜平等，各十五牟休多。如此迴轉，具足五年，有一遊伽，即兩閏月。其一從月、其二從日。五年中間十二日、又九日、又六日、又三日、又十五日，此中日夜是其長短。月者分別三用：一者分別月、二分別十五日、三分別圓滿。日者分別夜日、分別夏、冬、秋節，分別年。是三用從日得成。閏月有兩者，一從月、二從日。是閏月者，從月所作。四月日應作兩小月：一小月者是第三半中，第二小月是第七半中。一年之中應六小月，五年足少三十日。此三十日，應補五年中。若不作小月，則月圓不當時。是小月者從日所作，依世間說，以三十牟休多決定是一日夜，分三十牟休多為六十分，日行疾故五十九分便周，長餘一分。因是事故，二月則長一日，又二月復長一日，乃至一年足長六日。如是五年，則長一月。用是一月，補五年中，是為日家閏月。若不作閏者，時節及年差壞不當。復次五年應兩閏月，第一者在第三年，第二者在第五年。若月在剡浮提中，更三月日至西瞿耶尼，若北欝單越則六月日，東弗婆提則九月日，若周一年還至剡浮提。一天下中，恒有夏、冬、春三時，夏者為春所隨，冬者為夏所隨，春者為冬所隨。東弗婆提八月十五日自恣時，剡浮提是五月十五結夏時，西瞿耶尼二月十五，北欝單越十一月十五日。東弗婆提夏分三月已出，在東弗婆提、南剡浮提二洲中間。西瞿耶尼春分三月未出，在剡浮提、瞿耶尼二洲中間。瞿耶尼春一月已出，欝單越冬分二月未出，是為三月在瞿耶尼、欝單越二洲中間。欝單越冬分二月已出，弗婆提夏分一月未入，是為三月在欝單越、弗婆提二洲中間。須彌山王在四天下之中央，云何須彌山在四天下北邊？所謂隨日行分判。東弗婆提東方是剡浮提北方，東弗婆提西方是南剡浮提南方，東弗婆提北方是剡浮提西方，東弗婆提南方是剡浮提東方；北欝單越、西瞿耶尼亦復如是。南剡浮提、北欝單越正對，東弗婆提、西瞿耶尼正對。是時最初日月下生世間，相去甚遠。日下東弗婆提中央，月下西瞿耶尼中央，爾時光明遍照滿四天下，日照一半、月照一半。若日已過東弗婆提中央，北欝單越日已沒，南剡浮提日已出。若月已過西瞿耶尼中央，剡浮提已沒，欝單越已出。若滿月夜已至，欝單越月正中時，南剡浮提日則正中。日過剡浮提中，東弗婆提已沒，西瞿耶尼已出。若月過北欝單越中央，東弗婆提已出，西瞿耶尼已沒。東弗婆提若滿月夜月正中時，西瞿耶尼日則正中。日過西瞿耶尼中央，剡浮提已沒，欝單越已出。若月過東弗婆提中央，欝單越已沒，剡浮提已出。剡浮提滿月夜月正中時，北欝單越日則正中。云何日月合在一處？謂日恒逐月行。一一日相近四萬八千八十由旬，日日相離亦復如是。若相近時，日日月圓被覆三由旬又一由旬三分之一。以是事故，十五日月被覆則盡，是名黑半滿。日日離月亦四萬八千八十由旬，月日日開覆三由旬又一由旬三分之一，以是事故，十五日月則開淨圓滿，世間則名白半滿。日月若最相離行，是時月圓，世間則說白半圓滿。日月若共一處是合行，世間則曰黑半圓滿。日光經度七億二萬一千二百由旬，周迴二十一億六萬三千六百由旬。剡浮提日出時，欝單越日沒時，東弗婆提正中，西瞿耶尼正夜。是一天下四時，由日得成。」如是義者佛世尊說。如是我聞。",
+      "apparatus_entries": [
+        {
+          "source_file": "T32n1644.xml",
+          "paragraph_id": "pT32p0195c1601",
+          "from_anchor": "beg0196a1201",
+          "to_anchor": "end0196a1201",
+          "from_line": "0196a12",
+          "to_line": "0196a12",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            477,
+            478
+          ],
+          "adopted_layer_literal": "牟",
+          "app_attributes": {
+            "from": "#beg0196a1201",
+            "to": "#end0196a1201"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.cbeta",
+                "resp": "#resp1"
+              },
+              "literal_excluding_notes": "牟",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.cbeta\" resp=\"#resp1\">牟</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "矣",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">矣</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "矣",
+          "body_differs_from_reported_orig": true,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T32n1644.xml",
+          "paragraph_id": "pT32p0195c1601",
+          "from_anchor": "beg0196001",
+          "to_anchor": "end0196001",
+          "from_line": "0196a18",
+          "to_line": "0196a18",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            608,
+            613
+          ],
+          "adopted_layer_literal": "等分，日夜",
+          "app_attributes": {
+            "from": "#beg0196001",
+            "to": "#end0196001"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "等分，日夜",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">等分，日夜</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2 #wit3 #wit1"
+              },
+              "literal_excluding_notes": "日夜等分",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1\">日夜等分</ns0:rdg>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit8"
+              },
+              "literal_excluding_notes": "等分日夜等分",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit8\">等分日夜等分</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "等分，日夜",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T32n1644.xml",
+          "paragraph_id": "pT32p0195c1601",
+          "from_anchor": "beg0196002",
+          "to_anchor": "end0196002",
+          "from_line": "0196b06",
+          "to_line": "0196b06",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            939,
+            940
+          ],
+          "adopted_layer_literal": "若",
+          "app_attributes": {
+            "from": "#beg0196002",
+            "to": "#end0196002"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "若",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">若</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2 #wit3 #wit1 #wit8"
+              },
+              "literal_excluding_notes": "若日",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1 #wit8\">若日</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "若",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T32n1644.xml",
+          "paragraph_id": "pT32p0195c1601",
+          "from_anchor": "beg0196003",
+          "to_anchor": "end0196003",
+          "from_line": "0196b16",
+          "to_line": "0196b16",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1117,
+            1119
+          ],
+          "adopted_layer_literal": "月又",
+          "app_attributes": {
+            "from": "#beg0196003",
+            "to": "#end0196003"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "resp": "#resp3",
+                "wit": "#wit.cbeta #wit5"
+              },
+              "literal_excluding_notes": "月又",
+              "notes": [
+                {
+                  "attributes": {
+                    "type": "cf1"
+                  },
+                  "literal": "Q27_p0023a09"
+                }
+              ],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp3\" wit=\"#wit.cbeta #wit5\">月又<ns0:note type=\"cf1\">Q27_p0023a09</ns0:note></ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2 #wit3 #wit1 #wit8"
+              },
+              "literal_excluding_notes": "月又",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1 #wit8\">月又</ns0:rdg>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "月",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">月</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "月",
+          "body_differs_from_reported_orig": true,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T32n1644.xml",
+          "paragraph_id": "pT32p0195c1601",
+          "from_anchor": "beg0196b2301",
+          "to_anchor": "end0196b2301",
+          "from_line": "0196b23",
+          "to_line": "0196b23",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1257,
+            1258
+          ],
+          "adopted_layer_literal": "休",
+          "app_attributes": {
+            "from": "#beg0196b2301",
+            "to": "#end0196b2301"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.cbeta #wit4",
+                "resp": "#resp4"
+              },
+              "literal_excluding_notes": "休",
+              "notes": [
+                {
+                  "attributes": {
+                    "type": "cf1"
+                  },
+                  "literal": "K28n0967_p0964c12"
+                }
+              ],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.cbeta #wit4\" resp=\"#resp4\">休<ns0:note type=\"cf1\">K28n0967_p0964c12</ns0:note></ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "林",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">林</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "林",
+          "body_differs_from_reported_orig": true,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T32n1644.xml",
+          "paragraph_id": "pT32p0195c1601",
+          "from_anchor": "beg0196004",
+          "to_anchor": "end0196004",
+          "from_line": "0196b29",
+          "to_line": "0196b29",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1365,
+            1366
+          ],
+          "adopted_layer_literal": "八",
+          "app_attributes": {
+            "from": "#beg0196004",
+            "to": "#end0196004"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "八",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">八</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit8"
+              },
+              "literal_excluding_notes": "入",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit8\">入</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "八",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T32n1644.xml",
+          "paragraph_id": "pT32p0195c1601",
+          "from_anchor": "beg0196005",
+          "to_anchor": "end0196005",
+          "from_line": "0196c20",
+          "to_line": "0196c20",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1770,
+            1772
+          ],
+          "adopted_layer_literal": "至西",
+          "app_attributes": {
+            "from": "#beg0196005",
+            "to": "#end0196005"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "resp": "#resp3",
+                "wit": "#wit.cbeta #wit5"
+              },
+              "literal_excluding_notes": "至西",
+              "notes": [
+                {
+                  "attributes": {
+                    "type": "cf1"
+                  },
+                  "literal": "Q27_p0023b12"
+                }
+              ],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp3\" wit=\"#wit.cbeta #wit5\">至西<ns0:note type=\"cf1\">Q27_p0023b12</ns0:note></ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2 #wit3 #wit1 #wit8"
+              },
+              "literal_excluding_notes": "至西",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1 #wit8\">至西</ns0:rdg>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "至",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">至</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "至",
+          "body_differs_from_reported_orig": true,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T32n1644.xml",
+          "paragraph_id": "pT32p0195c1601",
+          "from_anchor": "beg0196006",
+          "to_anchor": "end0196006",
+          "from_line": "0196c24",
+          "to_line": "0196c25",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1861,
+            1862
+          ],
+          "adopted_layer_literal": "五",
+          "app_attributes": {
+            "from": "#beg0196006",
+            "to": "#end0196006"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "五",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">\n<ns0:lb n=\"0196c25\" ed=\"T\" />五</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2 #wit3 #wit1 #wit8"
+              },
+              "literal_excluding_notes": "五日",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1 #wit8\">五日</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "五",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T32n1644.xml",
+          "paragraph_id": "pT32p0195c1601",
+          "from_anchor": "beg_40",
+          "to_anchor": "end_40",
+          "from_line": "0196c25",
+          "to_line": "0196c25",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1873,
+            1874
+          ],
+          "adopted_layer_literal": "五",
+          "app_attributes": {
+            "from": "#beg_40",
+            "to": "#end_40",
+            "corresp": "#0196006"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "五",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">五</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2 #wit3 #wit1 #wit8"
+              },
+              "literal_excluding_notes": "五日",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1 #wit8\">五日</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "五",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": "#0196006"
+        },
+        {
+          "source_file": "T32n1644.xml",
+          "paragraph_id": "pT32p0195c1601",
+          "from_anchor": "beg0196007",
+          "to_anchor": "end0196007",
+          "from_line": "0196c25",
+          "to_line": "0196c25",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            1878,
+            1879
+          ],
+          "adopted_layer_literal": "越",
+          "app_attributes": {
+            "from": "#beg0196007",
+            "to": "#end0196007"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "越",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">越</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2 #wit3 #wit1 #wit8"
+              },
+              "literal_excluding_notes": "越是",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1 #wit8\">越是</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "越",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T32n1644.xml",
+          "paragraph_id": "pT32p0195c1601",
+          "from_anchor": "beg0197001",
+          "to_anchor": "end0197001",
+          "from_line": "0197a05",
+          "to_line": "0197a05",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            2047,
+            2048
+          ],
+          "adopted_layer_literal": "是",
+          "app_attributes": {
+            "from": "#beg0197001",
+            "to": "#end0197001"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "是",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">是</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2 #wit3 #wit1 #wit8"
+              },
+              "literal_excluding_notes": "是南",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1 #wit8\">是南</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "是",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        },
+        {
+          "source_file": "T32n1644.xml",
+          "paragraph_id": "pT32p0195c1601",
+          "from_anchor": "beg0197002",
+          "to_anchor": "end0197002",
+          "from_line": "0197b05",
+          "to_line": "0197b05",
+          "text_layer_id": "body_main",
+          "text_layer": {
+            "kind": "body_main"
+          },
+          "layer_offsets": [
+            2605,
+            2606
+          ],
+          "adopted_layer_literal": "欝",
+          "app_attributes": {
+            "from": "#beg0197002",
+            "to": "#end0197002"
+          },
+          "readings": [
+            {
+              "kind": "lem",
+              "attributes": {
+                "wit": "#wit.orig"
+              },
+              "literal_excluding_notes": "欝",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">欝</ns0:lem>"
+            },
+            {
+              "kind": "rdg",
+              "attributes": {
+                "resp": "#resp2",
+                "wit": "#wit2 #wit3 #wit1 #wit8"
+              },
+              "literal_excluding_notes": "北欝",
+              "notes": [],
+              "spaces": [],
+              "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1 #wit8\">北欝</ns0:rdg>"
+            }
+          ],
+          "reported_orig_literal": "欝",
+          "body_differs_from_reported_orig": false,
+          "related_apparatus_reference": null
+        }
+      ],
+      "all_projected_text_layers": {
+        "body_main": {
+          "kind": "body_main",
+          "literal": "「日恒行一由旬半又一由旬九分之一。其一一日出時如是，入亦如是。六月日中從內路出，至於外路。六月日從外路入，至內路。月恒行十九由旬又一由旬三分之一。其一一日出亦如是，入亦如是。十五日從內路至外路，十五日從外路至內路。日若行東弗婆提內路，取東弗婆提地南際，相去六百八十三由旬又一由旬三分之一，是中日行內路。日若行剡浮提內路，取剡浮提地南際，相去三百五十由旬，是中日行內路。日若行西瞿耶尼內路，取西瞿耶尼地南際，相去六百八十三由旬又一由旬三分之一，是中日行內路。日若行北欝單越內路，取北欝單越地南際，相去三百五十由旬，是中日行內路。日若行東弗婆提外路，從地南際取日外路，三百九十三由旬又一由旬三分之一，日於中行。若日行剡浮提外路，從地南際至日外路，六十由旬，是中日行外路。若日行西瞿耶尼外路，取地南際至日外路，三百九十三由旬又一由旬三分之一，是中日行。若日行北欝單越外路，取地南際六十由旬，是中日行。若日行東弗婆提內路，則行西瞿耶尼外路，則行南剡浮提、北欝單越中路，是時東弗婆提日最長，十八牟休多，是時夜最短，十二牟休多；西瞿耶尼夜最長，十八牟休多，日最短十二牟休多；剡浮提、北欝單越日夜等分，並十五牟休多，其六牟休多恒動，二十四牟休多不動。若日行東弗婆提外路，則行西瞿耶尼內路，則行南剡浮提、北欝單越中路。是時東弗婆提夜最長，十八牟休多，日最短十二牟休多；西瞿耶尼日最長，十八牟休多，夜最短十二牟休多；南剡浮提、北欝單越等分，日夜並十五牟休多。若日行剡浮提內路，則行北欝單越外路，則行東弗婆提、西瞿耶尼中路。是剡浮提日最長，十八牟休多，夜最短十二牟休多；北欝單越夜最長，十八牟休多，日最短十二牟休多；東弗婆提、西瞿耶尼日夜等分，並十五牟休多。日若行南剡浮提外路，則行北欝單越內路，則行東弗婆提、西瞿耶尼中路。是時剡浮提夜最長，十八牟休多，日最短十二牟休多；北欝單越日最長，十八牟休多，夜最短十二牟休多；東弗婆提、西瞿耶尼日夜等分，並十五牟休多。西瞿耶尼、北欝單越並如是說。若世間中三十牟休多，決定恒為一日夜。其一牟休多有三十分，是一一分名曰羅婆。日若增時，日一羅婆，日若減，亦一羅婆；夜亦如是。若日減時，夜增一羅婆；若夜減時，日增一羅婆。若日最長十八牟休多，是時夜則最短十二牟休多。若夜最長十八牟休多，是時日則最短十二牟休多。若日夜等時，日十五牟休多，夜十五牟休多。若五月十五日正圓滿，西國始結夏時，漢地安居已滿一月，是時日則最長十八牟休多，夜則最短十二牟休多。從十六日減一羅婆，月減一牟休多，第二月又減一牟休多，第三月又減一牟休多，至八月十五日西國自恣時，漢地受迦絺那衣時，日夜平等，各十五牟休多。又從十六日乃至一月，復減一牟休多，第二月又減一牟休多，第三月又減一牟休多，至十一月十五日，其夜最長十八牟休多，其日最短十二牟休多。是夜從此時，日減一羅婆，一月日則夜減一牟休多，第二月又減一牟休多，第三月又減一牟休多，至二月十五日夜平等，各十五牟休多。又從十六日乃至一月，復減一牟休多，第二月復減一牟休多，第三月復減一牟休多，至五月十五日，其日最長十八牟休多，其夜最短十二牟休多。復有別時，若西國夏分，第一月月中第二半第九日，是為六月九日，是時日最長十八牟休多，夜最短十二牟休多。至九月九日，日夜平等各十五牟休多。十一月九日，是夜最長十八牟休多，日最短十二牟休多。三月九日，日夜平等，各十五牟休多。如此迴轉，具足五年，有一遊伽，即兩閏月。其一從月、其二從日。五年中間十二日、又九日、又六日、又三日、又十五日，此中日夜是其長短。月者分別三用：一者分別月、二分別十五日、三分別圓滿。日者分別夜日、分別夏、冬、秋節，分別年。是三用從日得成。閏月有兩者，一從月、二從日。是閏月者，從月所作。四月日應作兩小月：一小月者是第三半中，第二小月是第七半中。一年之中應六小月，五年足少三十日。此三十日，應補五年中。若不作小月，則月圓不當時。是小月者從日所作，依世間說，以三十牟休多決定是一日夜，分三十牟休多為六十分，日行疾故五十九分便周，長餘一分。因是事故，二月則長一日，又二月復長一日，乃至一年足長六日。如是五年，則長一月。用是一月，補五年中，是為日家閏月。若不作閏者，時節及年差壞不當。復次五年應兩閏月，第一者在第三年，第二者在第五年。若月在剡浮提中，更三月日至西瞿耶尼，若北欝單越則六月日，東弗婆提則九月日，若周一年還至剡浮提。一天下中，恒有夏、冬、春三時，夏者為春所隨，冬者為夏所隨，春者為冬所隨。東弗婆提八月十五日自恣時，剡浮提是五月十五結夏時，西瞿耶尼二月十五，北欝單越十一月十五日。東弗婆提夏分三月已出，在東弗婆提、南剡浮提二洲中間。西瞿耶尼春分三月未出，在剡浮提、瞿耶尼二洲中間。瞿耶尼春一月已出，欝單越冬分二月未出，是為三月在瞿耶尼、欝單越二洲中間。欝單越冬分二月已出，弗婆提夏分一月未入，是為三月在欝單越、弗婆提二洲中間。須彌山王在四天下之中央，云何須彌山在四天下北邊？所謂隨日行分判。東弗婆提東方是剡浮提北方，東弗婆提西方是南剡浮提南方，東弗婆提北方是剡浮提西方，東弗婆提南方是剡浮提東方；北欝單越、西瞿耶尼亦復如是。南剡浮提、北欝單越正對，東弗婆提、西瞿耶尼正對。是時最初日月下生世間，相去甚遠。日下東弗婆提中央，月下西瞿耶尼中央，爾時光明遍照滿四天下，日照一半、月照一半。若日已過東弗婆提中央，北欝單越日已沒，南剡浮提日已出。若月已過西瞿耶尼中央，剡浮提已沒，欝單越已出。若滿月夜已至，欝單越月正中時，南剡浮提日則正中。日過剡浮提中，東弗婆提已沒，西瞿耶尼已出。若月過北欝單越中央，東弗婆提已出，西瞿耶尼已沒。東弗婆提若滿月夜月正中時，西瞿耶尼日則正中。日過西瞿耶尼中央，剡浮提已沒，欝單越已出。若月過東弗婆提中央，欝單越已沒，剡浮提已出。剡浮提滿月夜月正中時，北欝單越日則正中。云何日月合在一處？謂日恒逐月行。一一日相近四萬八千八十由旬，日日相離亦復如是。若相近時，日日月圓被覆三由旬又一由旬三分之一。以是事故，十五日月被覆則盡，是名黑半滿。日日離月亦四萬八千八十由旬，月日日開覆三由旬又一由旬三分之一，以是事故，十五日月則開淨圓滿，世間則名白半滿。日月若最相離行，是時月圓，世間則說白半圓滿。日月若共一處是合行，世間則曰黑半圓滿。日光經度七億二萬一千二百由旬，周迴二十一億六萬三千六百由旬。剡浮提日出時，欝單越日沒時，東弗婆提正中，西瞿耶尼正夜。是一天下四時，由日得成。」如是義者佛世尊說。如是我聞。"
+        }
+      },
+      "inline_note_layers_unchanged": [],
+      "standoff_apparatus_entry_count": 12,
+      "scope": "Body text is CBETA adopted text. #wit.orig readings and other witness sigla are supplied apparatus reports, not actual new manuscript inspections, full witness reconstruction or a historical calendar."
+    }
+  ],
+  "counts": {
+    "selected_paragraphs": 5,
+    "standoff_apparatus_entries": 75,
+    "corresp_repeat_entries": 6,
+    "inline_note_apparatus_entries": 5,
+    "body_differs_from_reported_orig_entries": 6
+  },
+  "all_six_body_vs_reported_orig_changes": [
+    {
+      "source_file": "T41n1822.xml",
+      "paragraph_id": "pT41p0453a0804",
+      "from_anchor": "beg0453006",
+      "to_anchor": "end0453006",
+      "from_line": "0453b13",
+      "to_line": "0453b13",
+      "text_layer_id": "body_main",
+      "text_layer": {
+        "kind": "body_main"
+      },
+      "layer_offsets": [
+        667,
+        668
+      ],
+      "adopted_layer_literal": "栗",
+      "app_attributes": {
+        "from": "#beg0453006",
+        "to": "#end0453006"
+      },
+      "readings": [
+        {
+          "kind": "lem",
+          "attributes": {
+            "wit": "#wit.cbeta",
+            "resp": "#resp3",
+            "{http://www.cbeta.org/ns/1.0}provider": "CBETA 新式標點專案 (2023-02-15)"
+          },
+          "literal_excluding_notes": "栗",
+          "notes": [
+            {
+              "attributes": {
+                "type": "cf1"
+              },
+              "literal": "《俱舍論疏》（日本國立公文書館藏明治二十年刊本第1冊第4圖左欄第10行）"
+            },
+            {
+              "attributes": {
+                "type": "cf2"
+              },
+              "literal": "T41n1822_p0453b12"
+            }
+          ],
+          "spaces": [],
+          "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" wit=\"#wit.cbeta\" resp=\"#resp3\" ns1:provider=\"CBETA 新式標點專案 (2023-02-15)\">栗<ns0:note type=\"cf1\">《俱舍論疏》（日本國立公文書館藏明治二十年刊本第1冊第4圖左欄第10行）</ns0:note><ns0:note type=\"cf2\">T41n1822_p0453b12</ns0:note></ns0:lem>"
+        },
+        {
+          "kind": "rdg",
+          "attributes": {
+            "wit": "#wit.orig"
+          },
+          "literal_excluding_notes": "粟",
+          "notes": [],
+          "spaces": [],
+          "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">粟</ns0:rdg>"
+        },
+        {
+          "kind": "rdg",
+          "attributes": {
+            "resp": "#resp2",
+            "wit": "#wit1 #wit2"
+          },
+          "literal_excluding_notes": "栗",
+          "notes": [],
+          "spaces": [],
+          "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit1 #wit2\">栗</ns0:rdg>"
+        }
+      ],
+      "reported_orig_literal": "粟",
+      "body_differs_from_reported_orig": true,
+      "related_apparatus_reference": null
+    },
+    {
+      "source_file": "T41n1822.xml",
+      "paragraph_id": "pT41p0453a0804",
+      "from_anchor": "beg0453b1401",
+      "to_anchor": "end0453b1401",
+      "from_line": "0453b14",
+      "to_line": "0453b14",
+      "text_layer_id": "body_main",
+      "text_layer": {
+        "kind": "body_main"
+      },
+      "layer_offsets": [
+        683,
+        684
+      ],
+      "adopted_layer_literal": "栗",
+      "app_attributes": {
+        "from": "#beg0453b1401",
+        "to": "#end0453b1401"
+      },
+      "readings": [
+        {
+          "kind": "lem",
+          "attributes": {
+            "wit": "#wit.cbeta",
+            "resp": "#resp3",
+            "{http://www.cbeta.org/ns/1.0}provider": "CBETA 新式標點專案 (2023-02-15)"
+          },
+          "literal_excluding_notes": "栗",
+          "notes": [
+            {
+              "attributes": {
+                "type": "cf1"
+              },
+              "literal": "《俱舍論疏》（日本國立公文書館藏明治二十年刊本第1冊第5圖右欄第1行）"
+            },
+            {
+              "attributes": {
+                "type": "cf2"
+              },
+              "literal": "T41n1822_p0453b12"
+            }
+          ],
+          "spaces": [],
+          "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" wit=\"#wit.cbeta\" resp=\"#resp3\" ns1:provider=\"CBETA 新式標點專案 (2023-02-15)\">栗<ns0:note type=\"cf1\">《俱舍論疏》（日本國立公文書館藏明治二十年刊本第1冊第5圖右欄第1行）</ns0:note><ns0:note type=\"cf2\">T41n1822_p0453b12</ns0:note></ns0:lem>"
+        },
+        {
+          "kind": "rdg",
+          "attributes": {
+            "wit": "#wit.orig"
+          },
+          "literal_excluding_notes": "粟",
+          "notes": [],
+          "spaces": [],
+          "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\"><ns0:anchor xml:id=\"fxT41p0453b01_back\" />粟</ns0:rdg>"
+        }
+      ],
+      "reported_orig_literal": "粟",
+      "body_differs_from_reported_orig": true,
+      "related_apparatus_reference": null
+    },
+    {
+      "source_file": "T32n1644.xml",
+      "paragraph_id": "pT32p0195c1601",
+      "from_anchor": "beg0196a1201",
+      "to_anchor": "end0196a1201",
+      "from_line": "0196a12",
+      "to_line": "0196a12",
+      "text_layer_id": "body_main",
+      "text_layer": {
+        "kind": "body_main"
+      },
+      "layer_offsets": [
+        477,
+        478
+      ],
+      "adopted_layer_literal": "牟",
+      "app_attributes": {
+        "from": "#beg0196a1201",
+        "to": "#end0196a1201"
+      },
+      "readings": [
+        {
+          "kind": "lem",
+          "attributes": {
+            "wit": "#wit.cbeta",
+            "resp": "#resp1"
+          },
+          "literal_excluding_notes": "牟",
+          "notes": [],
+          "spaces": [],
+          "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.cbeta\" resp=\"#resp1\">牟</ns0:lem>"
+        },
+        {
+          "kind": "rdg",
+          "attributes": {
+            "wit": "#wit.orig"
+          },
+          "literal_excluding_notes": "矣",
+          "notes": [],
+          "spaces": [],
+          "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">矣</ns0:rdg>"
+        }
+      ],
+      "reported_orig_literal": "矣",
+      "body_differs_from_reported_orig": true,
+      "related_apparatus_reference": null
+    },
+    {
+      "source_file": "T32n1644.xml",
+      "paragraph_id": "pT32p0195c1601",
+      "from_anchor": "beg0196003",
+      "to_anchor": "end0196003",
+      "from_line": "0196b16",
+      "to_line": "0196b16",
+      "text_layer_id": "body_main",
+      "text_layer": {
+        "kind": "body_main"
+      },
+      "layer_offsets": [
+        1117,
+        1119
+      ],
+      "adopted_layer_literal": "月又",
+      "app_attributes": {
+        "from": "#beg0196003",
+        "to": "#end0196003"
+      },
+      "readings": [
+        {
+          "kind": "lem",
+          "attributes": {
+            "resp": "#resp3",
+            "wit": "#wit.cbeta #wit5"
+          },
+          "literal_excluding_notes": "月又",
+          "notes": [
+            {
+              "attributes": {
+                "type": "cf1"
+              },
+              "literal": "Q27_p0023a09"
+            }
+          ],
+          "spaces": [],
+          "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp3\" wit=\"#wit.cbeta #wit5\">月又<ns0:note type=\"cf1\">Q27_p0023a09</ns0:note></ns0:lem>"
+        },
+        {
+          "kind": "rdg",
+          "attributes": {
+            "resp": "#resp2",
+            "wit": "#wit2 #wit3 #wit1 #wit8"
+          },
+          "literal_excluding_notes": "月又",
+          "notes": [],
+          "spaces": [],
+          "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1 #wit8\">月又</ns0:rdg>"
+        },
+        {
+          "kind": "rdg",
+          "attributes": {
+            "wit": "#wit.orig"
+          },
+          "literal_excluding_notes": "月",
+          "notes": [],
+          "spaces": [],
+          "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">月</ns0:rdg>"
+        }
+      ],
+      "reported_orig_literal": "月",
+      "body_differs_from_reported_orig": true,
+      "related_apparatus_reference": null
+    },
+    {
+      "source_file": "T32n1644.xml",
+      "paragraph_id": "pT32p0195c1601",
+      "from_anchor": "beg0196b2301",
+      "to_anchor": "end0196b2301",
+      "from_line": "0196b23",
+      "to_line": "0196b23",
+      "text_layer_id": "body_main",
+      "text_layer": {
+        "kind": "body_main"
+      },
+      "layer_offsets": [
+        1257,
+        1258
+      ],
+      "adopted_layer_literal": "休",
+      "app_attributes": {
+        "from": "#beg0196b2301",
+        "to": "#end0196b2301"
+      },
+      "readings": [
+        {
+          "kind": "lem",
+          "attributes": {
+            "wit": "#wit.cbeta #wit4",
+            "resp": "#resp4"
+          },
+          "literal_excluding_notes": "休",
+          "notes": [
+            {
+              "attributes": {
+                "type": "cf1"
+              },
+              "literal": "K28n0967_p0964c12"
+            }
+          ],
+          "spaces": [],
+          "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.cbeta #wit4\" resp=\"#resp4\">休<ns0:note type=\"cf1\">K28n0967_p0964c12</ns0:note></ns0:lem>"
+        },
+        {
+          "kind": "rdg",
+          "attributes": {
+            "wit": "#wit.orig"
+          },
+          "literal_excluding_notes": "林",
+          "notes": [],
+          "spaces": [],
+          "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">林</ns0:rdg>"
+        }
+      ],
+      "reported_orig_literal": "林",
+      "body_differs_from_reported_orig": true,
+      "related_apparatus_reference": null
+    },
+    {
+      "source_file": "T32n1644.xml",
+      "paragraph_id": "pT32p0195c1601",
+      "from_anchor": "beg0196005",
+      "to_anchor": "end0196005",
+      "from_line": "0196c20",
+      "to_line": "0196c20",
+      "text_layer_id": "body_main",
+      "text_layer": {
+        "kind": "body_main"
+      },
+      "layer_offsets": [
+        1770,
+        1772
+      ],
+      "adopted_layer_literal": "至西",
+      "app_attributes": {
+        "from": "#beg0196005",
+        "to": "#end0196005"
+      },
+      "readings": [
+        {
+          "kind": "lem",
+          "attributes": {
+            "resp": "#resp3",
+            "wit": "#wit.cbeta #wit5"
+          },
+          "literal_excluding_notes": "至西",
+          "notes": [
+            {
+              "attributes": {
+                "type": "cf1"
+              },
+              "literal": "Q27_p0023b12"
+            }
+          ],
+          "spaces": [],
+          "serialized_xml": "<ns0:lem xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp3\" wit=\"#wit.cbeta #wit5\">至西<ns0:note type=\"cf1\">Q27_p0023b12</ns0:note></ns0:lem>"
+        },
+        {
+          "kind": "rdg",
+          "attributes": {
+            "resp": "#resp2",
+            "wit": "#wit2 #wit3 #wit1 #wit8"
+          },
+          "literal_excluding_notes": "至西",
+          "notes": [],
+          "spaces": [],
+          "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1 #wit8\">至西</ns0:rdg>"
+        },
+        {
+          "kind": "rdg",
+          "attributes": {
+            "wit": "#wit.orig"
+          },
+          "literal_excluding_notes": "至",
+          "notes": [],
+          "spaces": [],
+          "serialized_xml": "<ns0:rdg xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" wit=\"#wit.orig\">至</ns0:rdg>"
+        }
+      ],
+      "reported_orig_literal": "至",
+      "body_differs_from_reported_orig": true,
+      "related_apparatus_reference": null
+    }
+  ],
+  "new_SAT_T1644_capture": {
+    "url": "https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?mode=detail&useid=1644_%2C32%2C0196",
+    "sha256": "712d43012d0a42c649c0b2fc5f9f643f350041ab4fbbe0d06e34b3ed0c0aea04",
+    "bytes": 93759,
+    "selected_actual_lines": [
+      {
+        "observed_line": "0196a12",
+        "reported_notes": [],
+        "main_literal": "牟休多。剡浮提北欝單越。日夜等分。並十五"
+      },
+      {
+        "observed_line": "0196b16",
+        "reported_notes": [
+          {
+            "title": "月＋（又）＜三＞＜宮＞",
+            "text": "3"
+          }
+        ],
+        "main_literal": "月減一牟休多。第三月又減一牟休多。至十"
+      },
+      {
+        "observed_line": "0196b23",
+        "reported_notes": [],
+        "main_literal": "三月復減一牟林多。至五月十五日。其日最"
+      },
+      {
+        "observed_line": "0196b28",
+        "reported_notes": [],
+        "main_literal": "各十五牟休多。十一月九日。是夜最長。十"
+      },
+      {
+        "observed_line": "0196b29",
+        "reported_notes": [
+          {
+            "title": "八＝入＜宮＞",
+            "text": "4"
+          }
+        ],
+        "main_literal": "八牟休多。日最短。十二牟休多。三月九日。"
+      },
+      {
+        "observed_line": "0196c20",
+        "reported_notes": [
+          {
+            "title": "至＋（西）＜三＞＜宮＞",
+            "text": "5"
+          }
+        ],
+        "main_literal": "提中。更三月。日 至瞿耶尼。若北欝單越。則"
+      },
+      {
+        "observed_line": "0196c25",
+        "reported_notes": [
+          {
+            "title": "越＋（是）＜三＞＜宮＞",
+            "text": "7"
+          }
+        ],
+        "main_literal": "五結夏時。西瞿耶尼二月十＊五。北欝單 越"
+      }
+    ],
+    "same_named_Taisho_edition_not_independent_manuscript_lineage": true
+  },
+  "interpretation_scope": {
+    "existing_body_and_inline_note_reference_unchanged": true,
+    "reported_witness_labels_are_file_local": true,
+    "standoff_corresp_entries_are_not_independent_manuscripts": true,
+    "reported_orig_projection_is_full_printed_edition_or_manuscript": false,
+    "CBETA_body_is_unemended_Taisho_main_text": false,
+    "new_Korea_source_or_images_obtained": false,
+    "all_readings_accepted_as_universal_original": false,
+    "date_clock_half_or_leap_precedence_changed": false,
+    "source_priority_established": false,
+    "real_samples": 0
+  },
+  "limits": [
+    "All 75 entries retained across main and inline-note layers, including long deletions/insertions and repeated corresp entries. Counts are electronic apparatus entries, not independent observations or witnesses.",
+    "Six adopted-body differences are editor choices recorded by this XML, not six actual transcription failures established from new manuscript pixels. No independent human/full-book collation.",
+    "Do not equate locally named 甲/乙 or CBETA suggestion labels with T2465 base/甲 witnesses.",
+    "T1644 eleven and T2251 explicitly corrected twelve remain. No apparatus at the precise eleven span in this captured selected XML is not proof that all historical witnesses agree. SAT capture is same named Taisho edition, not another independent manuscript.",
+    "The first K XML path returned404 and Dongguk request failed TLS verification; no source bytes from either adopted, no inference of general absence, no TLS bypass.",
+    "Original133whole questions, full82743gate,330slots80differences,327rows52different1unknown, first failures and four axes unchanged; synthetic prospective controls are not reality evidence."
+  ],
+  "actual_header_responsibilities": {
+    "T51n2087.xml": {
+      "null": {
+        "resp": [
+          "Electronic Version by"
+        ],
+        "name": [
+          "CBETA"
+        ]
+      },
+      "resp1": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA"
+        ]
+      },
+      "resp2": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "Taisho"
+        ]
+      },
+      "resp3": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.maha"
+        ]
+      },
+      "resp4": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.say"
+        ]
+      },
+      "resp5": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.march"
+        ]
+      },
+      "resp6": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.ting"
+        ]
+      },
+      "resp7": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.liyi"
+        ]
+      }
+    },
+    "T41n1821.xml": {
+      "null": {
+        "resp": [
+          "Electronic Version by"
+        ],
+        "name": [
+          "CBETA"
+        ]
+      },
+      "resp1": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA"
+        ]
+      },
+      "resp2": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "Taisho"
+        ]
+      },
+      "resp3": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.maha"
+        ]
+      },
+      "resp4": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.sy"
+        ]
+      },
+      "resp5": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.shin"
+        ]
+      },
+      "resp6": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.liyi"
+        ]
+      },
+      "resp7": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.ting"
+        ]
+      },
+      "resp8": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.eva"
+        ]
+      },
+      "resp9": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.poyung"
+        ]
+      }
+    },
+    "T41n1822.xml": {
+      "null": {
+        "resp": [
+          "Electronic Version by"
+        ],
+        "name": [
+          "CBETA"
+        ]
+      },
+      "resp1": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA"
+        ]
+      },
+      "resp2": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "Taisho"
+        ]
+      },
+      "resp3": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.sy"
+        ]
+      },
+      "resp4": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.shin"
+        ]
+      },
+      "resp5": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.ting"
+        ]
+      },
+      "resp6": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.liyi"
+        ]
+      },
+      "resp7": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.maha"
+        ]
+      },
+      "resp8": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.say"
+        ]
+      }
+    },
+    "T32n1644.xml": {
+      "null": {
+        "resp": [
+          "Electronic Version by"
+        ],
+        "name": [
+          "CBETA"
+        ]
+      },
+      "resp1": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA"
+        ]
+      },
+      "resp2": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "Taisho"
+        ]
+      },
+      "resp3": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.maha"
+        ]
+      },
+      "resp4": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.ting"
+        ]
+      },
+      "resp5": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.shin"
+        ]
+      },
+      "resp6": {
+        "resp": [
+          "corrections"
+        ],
+        "name": [
+          "CBETA.pan"
+        ]
+      }
+    }
+  },
+  "T1644_0196a12_digital_difference": {
+    "CBETA_adopted_body": "牟",
+    "CBETA_reported_wit_orig": "矣",
+    "actual_SAT_main": "牟",
+    "SAT_capture_sha256": "712d43012d0a42c649c0b2fc5f9f643f350041ab4fbbe0d06e34b3ed0c0aea04",
+    "same_named_edition_not_independent_manuscript": true,
+    "actual_printed_glyph_adjudicated": false,
+    "scope": "The selected SAT digital text does not confirm every CBETA-reported #wit.orig reading. Preserve this actual digital difference; no automatic correction of either reported record."
+  }
+}

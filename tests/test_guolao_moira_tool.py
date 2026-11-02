@@ -32,6 +32,11 @@ def test_matches_horosa_js_oracle():
     for case in _CASES:
         got = _names_levels(guolao_moira.calculate(case["facts"]))
         expected = [(p["name"], p["level"]) for p in case["expected"]]
+        if case["label"] == "孤月独明 (夜生月独居)":
+            # Preserve the original oracle as evidence: its omitted 紫气 cannot
+            # establish isolation. This is an intentional departure, not parity.
+            assert "炁" not in case["facts"]["planet_signidx"]
+            expected = [("日月失所", "bad")]
         assert (
             got == expected
         ), f"mismatch on case: {case['label']}\n  got={got}\n  exp={expected}"
@@ -144,10 +149,13 @@ def test_gu_yue_du_ming_counts_purple_clouds():
     assert not any(p["name"] == "孤月独明" for p in with_qi)
 
 
-def test_ming_zuo_liangqi_near_su_boundary():
-    """命坐两歧 近宿界（FB 等分宿口径）：命度近宿界但不近宫界亦应点亮。"""
-    # 等分宿界 1*(360/28)=12.857°；asc=12.9 近宿界(0.04°)，但 12.9 不近宫界(12.9°)。
-    near_su = guolao_moira.calculate({"asc_lon": 12.9, "planet_signidx": {}})
+def test_ming_zuo_liangqi_requires_declared_mansion_boundary():
+    """The former 360/28 cusp is not a real mansion boundary."""
+    unknown = guolao_moira.calculate({"asc_lon": 12.9, "planet_signidx": {}})
+    assert not any(p["name"] == "命坐两歧" for p in unknown)
+    near_su = guolao_moira.calculate(
+        {"asc_lon": 12.9, "planet_signidx": {}, "mansion_boundary_distance": 0.04}
+    )
     assert any(p["name"] == "命坐两歧" for p in near_su)
     # 远离宫界与宿界：命度居中（如 18° → 宫界 18°、宿界距 12.857/25.714 均 >1°）不点亮。
     clear = guolao_moira.calculate({"asc_lon": 18.0, "planet_signidx": {}})

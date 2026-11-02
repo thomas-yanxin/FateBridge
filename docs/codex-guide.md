@@ -24,7 +24,7 @@ Codex 负责理解问题、选择工具和解释结果，FateBridge 负责计算
 
 `codex.add_command` 给出使用当前解释器绝对路径的注册命令；`codex.cli` 记录 CLI 来源。桌面环境存在 `CODEX_CLI_PATH` 时优先使用桌面版自带 CLI，避免 PATH 中旧版 CLI 与账号可用模型不一致。诊断只输出配置，不修改 Codex 设置。`--scenario` 限制实际公开的工具，并展开场景声明的知识支撑、条件服务和组合主题依赖；这些工具按问题使用，不自动全部执行；`--family` 可以进一步筛选，二者取交集。没有筛选时检查全部 MCP 工具。无效分类和空交集返回失败，先修正筛选。
 
-普通安装检查可用 `fatebridge doctor`；它不启动 MCP，也不验证星历精度。全量工具 Schema 较大，首次接入可选当前问题对应的场景。下面的 `onda-shiye` 只公开事业场景所需工具；需要跨主题咨询时，扩大范围或清空筛选。配置含义见[核心概念](concepts.md)。
+普通安装检查可用 `fatebridge doctor`；它不启动 MCP，也不验证星历精度。全量工具 Schema 较大，首次接入可选当前问题对应的场景。下面的 `onda-shiye` 只公开事业场景所需工具；需要跨主题咨询时，扩大范围或清空筛选。配置含义见[核心概念](concepts.md)。 支持工具搜索的宿主可使用完整场景并按需加载；需要更小的固定目录时，doctor 加 `--tool-scope topic`，把注册配置中的 `FATEBRIDGE_MCP_TOOL_SCOPE` 同步设为 `topic`。该模式保留主题直接依据和知识支撑，条件技法如实标为未公开；需要时切回 `complete`，不把缺失分支说成已算。
 
 ## 2. 注册到 Codex
 
@@ -83,7 +83,7 @@ Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不�
 
 双人关系中，`summary.overall_score` 是 0–100 的规则加权分，`traditional_compatibility.score` 是加减净分，`detailed_analysis.traditional_analysis.score` 是独立摩擦维度；三处的 `score_basis` 说明口径。不能平均、视为成功概率或用一个子项等级替代整体评价。首轮建议字段保留完整依据、人物和建议，避免为了补解释再计算一遍。
 
-根目录 `AGENTS.md` 包含事业、双人相处、综合时运、风水布局和西占推运的实际输入合同与首轮字段。当前公历资料齐全、工具公开时可以直接调用，省去一次工具检索和模型往返。合同由 `scripts/build_codex_call_contracts.py` 从当前 MCP 生成，接口更新后的测试会检查是否同步，参数约束与完整服务端 Schema 保留。
+根目录 `AGENTS.md` 只保留工作规则和技能路由。常用输入合同与任务字段由 `scripts/build_codex_call_contracts.py` 从实际 MCP 生成到[按需合同目录](contracts/README.md)，一工具一文件，保留参数说明与完整约束。已连接且定义清楚时直接调用；仅离线核对或定义缺失时读取所选文件，不默认加载全部 Schema。
 
 合同未覆盖的工具可能仍需 `ALL_TOOLS` 检索。此时一次返回所需主证的完整条目，保留说明和参数定义；不要先展开全部候选、再检索同一工具，也不要只返回名称。用途确有歧义再展开候选。工具定义在当前对话已取得且未改变时，后续计算沿用已知合同，无需为解释已有结果重新发现或计算。当前聊天与新聊天的连接加载状态需分别核对。
 
@@ -148,4 +148,4 @@ uv run --locked --extra dev python scripts/experience_codex.py --output /tmp/fat
 
 脚本用虚构资料检查多种计算、输出 Schema、裁剪前后业务摘要、错误恢复和场景范围，输出报告及原始结果。它不启动另一位模型，也不修改 Codex 配置；实际 Codex 聊天的选工具与解读质量需在连接加载后另行观察。
 
-真实 Codex 聊天的工具选择、事实采集和解读质量可在正常连接后的人工体验中观察；项目回归测试验证 FateBridge 自身的计算和接口，不包含 Codex 宿主或桌面日志的测试。
+真实模型验收使用 `scripts/evaluate_agent.py` 与虚构任务集，检查技能读取、工具选择、必要资料、范围和完整导出，并保存原始事件、回答及机械判据。运行方法、人工评分与限制见[Agent 行为验收](agent-evaluation.md)。它独立于 pytest、协议体验及部署验收，不会在普通 CI 中自动消耗模型额度。

@@ -1,0 +1,1361 @@
+{
+  "data_id": "guolao_huangchi_table_v1",
+  "unit": "historical_du_not_modern_degrees",
+  "first_axis_roles": {
+    "solstice": "ecliptic_accumulation",
+    "equinox": "equatorial_accumulation"
+  },
+  "second_axis_roles": {
+    "solstice": "equatorial_accumulation",
+    "equinox": "ecliptic_accumulation"
+  },
+  "endpoint_first_axis_policy": "91 + printed first rate 0.31; retain terminal printed row marker separately; digital note15 cites Mei Wending 91.31",
+  "zero_policy": "blank cumulative at 初 denotes zero accumulation",
+  "profiles": {
+    "wikisource": {
+      "profile_id": "yuanshi_054_wikisource_huangchi_1959444",
+      "source_url": "https://zh.wikisource.org/w/index.php?title=元史/卷054&oldid=1959444",
+      "locator": "步日躔第三·黄赤道率、推黄道宿度、校勘记15",
+      "terminal_marker_text": "九十一（校记说明九十一三一）",
+      "rows": [
+        {
+          "row_index": 0,
+          "first_axis_du": "0",
+          "second_axis_du": "0",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0865"
+        },
+        {
+          "row_index": 1,
+          "first_axis_du": "1",
+          "second_axis_du": "1.0865",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0863"
+        },
+        {
+          "row_index": 2,
+          "first_axis_du": "2",
+          "second_axis_du": "2.1728",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0860"
+        },
+        {
+          "row_index": 3,
+          "first_axis_du": "3",
+          "second_axis_du": "3.2588",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0857"
+        },
+        {
+          "row_index": 4,
+          "first_axis_du": "4",
+          "second_axis_du": "4.3445",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0849"
+        },
+        {
+          "row_index": 5,
+          "first_axis_du": "5",
+          "second_axis_du": "5.4294",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0843"
+        },
+        {
+          "row_index": 6,
+          "first_axis_du": "6",
+          "second_axis_du": "6.5137",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0833"
+        },
+        {
+          "row_index": 7,
+          "first_axis_du": "7",
+          "second_axis_du": "7.5970",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0823"
+        },
+        {
+          "row_index": 8,
+          "first_axis_du": "8",
+          "second_axis_du": "8.6793",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0812"
+        },
+        {
+          "row_index": 9,
+          "first_axis_du": "9",
+          "second_axis_du": "9.7605",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0801"
+        },
+        {
+          "row_index": 10,
+          "first_axis_du": "10",
+          "second_axis_du": "10.8406",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0786"
+        },
+        {
+          "row_index": 11,
+          "first_axis_du": "11",
+          "second_axis_du": "11.9192",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0772"
+        },
+        {
+          "row_index": 12,
+          "first_axis_du": "12",
+          "second_axis_du": "12.9964",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0755"
+        },
+        {
+          "row_index": 13,
+          "first_axis_du": "13",
+          "second_axis_du": "14.0719",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0740"
+        },
+        {
+          "row_index": 14,
+          "first_axis_du": "14",
+          "second_axis_du": "15.1459",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0720"
+        },
+        {
+          "row_index": 15,
+          "first_axis_du": "15",
+          "second_axis_du": "16.2179",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0704"
+        },
+        {
+          "row_index": 16,
+          "first_axis_du": "16",
+          "second_axis_du": "17.2883",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0684"
+        },
+        {
+          "row_index": 17,
+          "first_axis_du": "17",
+          "second_axis_du": "18.3567",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0663"
+        },
+        {
+          "row_index": 18,
+          "first_axis_du": "18",
+          "second_axis_du": "19.4230",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0642"
+        },
+        {
+          "row_index": 19,
+          "first_axis_du": "19",
+          "second_axis_du": "20.4872",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0622"
+        },
+        {
+          "row_index": 20,
+          "first_axis_du": "20",
+          "second_axis_du": "21.5494",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0599"
+        },
+        {
+          "row_index": 21,
+          "first_axis_du": "21",
+          "second_axis_du": "22.6093",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0575"
+        },
+        {
+          "row_index": 22,
+          "first_axis_du": "22",
+          "second_axis_du": "23.6668",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0554"
+        },
+        {
+          "row_index": 23,
+          "first_axis_du": "23",
+          "second_axis_du": "24.7222",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0530"
+        },
+        {
+          "row_index": 24,
+          "first_axis_du": "24",
+          "second_axis_du": "25.7752",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0506"
+        },
+        {
+          "row_index": 25,
+          "first_axis_du": "25",
+          "second_axis_du": "26.8258",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0482"
+        },
+        {
+          "row_index": 26,
+          "first_axis_du": "26",
+          "second_axis_du": "27.8740",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0456"
+        },
+        {
+          "row_index": 27,
+          "first_axis_du": "27",
+          "second_axis_du": "28.9196",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0432"
+        },
+        {
+          "row_index": 28,
+          "first_axis_du": "28",
+          "second_axis_du": "29.9628",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0408"
+        },
+        {
+          "row_index": 29,
+          "first_axis_du": "29",
+          "second_axis_du": "31.0036",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0382"
+        },
+        {
+          "row_index": 30,
+          "first_axis_du": "30",
+          "second_axis_du": "32.0418",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0355"
+        },
+        {
+          "row_index": 31,
+          "first_axis_du": "31",
+          "second_axis_du": "33.0773",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0332"
+        },
+        {
+          "row_index": 32,
+          "first_axis_du": "32",
+          "second_axis_du": "34.1105",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0306"
+        },
+        {
+          "row_index": 33,
+          "first_axis_du": "33",
+          "second_axis_du": "35.1411",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0280"
+        },
+        {
+          "row_index": 34,
+          "first_axis_du": "34",
+          "second_axis_du": "36.1691",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0254"
+        },
+        {
+          "row_index": 35,
+          "first_axis_du": "35",
+          "second_axis_du": "37.1945",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0229"
+        },
+        {
+          "row_index": 36,
+          "first_axis_du": "36",
+          "second_axis_du": "38.2174",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0203"
+        },
+        {
+          "row_index": 37,
+          "first_axis_du": "37",
+          "second_axis_du": "39.2377",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0177"
+        },
+        {
+          "row_index": 38,
+          "first_axis_du": "38",
+          "second_axis_du": "40.2554",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0152"
+        },
+        {
+          "row_index": 39,
+          "first_axis_du": "39",
+          "second_axis_du": "41.2706",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0126"
+        },
+        {
+          "row_index": 40,
+          "first_axis_du": "40",
+          "second_axis_du": "42.2832",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0102"
+        },
+        {
+          "row_index": 41,
+          "first_axis_du": "41",
+          "second_axis_du": "43.2934",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0075"
+        },
+        {
+          "row_index": 42,
+          "first_axis_du": "42",
+          "second_axis_du": "44.3009",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0049"
+        },
+        {
+          "row_index": 43,
+          "first_axis_du": "43",
+          "second_axis_du": "45.3058",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0027"
+        },
+        {
+          "row_index": 44,
+          "first_axis_du": "44",
+          "second_axis_du": "46.3085",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0000"
+        },
+        {
+          "row_index": 45,
+          "first_axis_du": "45",
+          "second_axis_du": "47.3085",
+          "first_rate_du": "1",
+          "second_rate_du": ".9974"
+        },
+        {
+          "row_index": 46,
+          "first_axis_du": "46",
+          "second_axis_du": "48.3059",
+          "first_rate_du": "1",
+          "second_rate_du": ".9951"
+        },
+        {
+          "row_index": 47,
+          "first_axis_du": "47",
+          "second_axis_du": "49.3010",
+          "first_rate_du": "1",
+          "second_rate_du": ".9925"
+        },
+        {
+          "row_index": 48,
+          "first_axis_du": "48",
+          "second_axis_du": "50.2935",
+          "first_rate_du": "1",
+          "second_rate_du": ".9901"
+        },
+        {
+          "row_index": 49,
+          "first_axis_du": "49",
+          "second_axis_du": "51.2836",
+          "first_rate_du": "1",
+          "second_rate_du": ".9876"
+        },
+        {
+          "row_index": 50,
+          "first_axis_du": "50",
+          "second_axis_du": "52.2712",
+          "first_rate_du": "1",
+          "second_rate_du": ".9851"
+        },
+        {
+          "row_index": 51,
+          "first_axis_du": "51",
+          "second_axis_du": "53.2563",
+          "first_rate_du": "1",
+          "second_rate_du": ".9827"
+        },
+        {
+          "row_index": 52,
+          "first_axis_du": "52",
+          "second_axis_du": "54.2390",
+          "first_rate_du": "1",
+          "second_rate_du": ".9803"
+        },
+        {
+          "row_index": 53,
+          "first_axis_du": "53",
+          "second_axis_du": "55.2193",
+          "first_rate_du": "1",
+          "second_rate_du": ".9780"
+        },
+        {
+          "row_index": 54,
+          "first_axis_du": "54",
+          "second_axis_du": "56.1973",
+          "first_rate_du": "1",
+          "second_rate_du": ".9755"
+        },
+        {
+          "row_index": 55,
+          "first_axis_du": "55",
+          "second_axis_du": "57.1728",
+          "first_rate_du": "1",
+          "second_rate_du": ".9731"
+        },
+        {
+          "row_index": 56,
+          "first_axis_du": "56",
+          "second_axis_du": "58.1459",
+          "first_rate_du": "1",
+          "second_rate_du": ".9708"
+        },
+        {
+          "row_index": 57,
+          "first_axis_du": "57",
+          "second_axis_du": "59.1167",
+          "first_rate_du": "1",
+          "second_rate_du": ".9685"
+        },
+        {
+          "row_index": 58,
+          "first_axis_du": "58",
+          "second_axis_du": "60.0852",
+          "first_rate_du": "1",
+          "second_rate_du": ".9661"
+        },
+        {
+          "row_index": 59,
+          "first_axis_du": "59",
+          "second_axis_du": "61.0513",
+          "first_rate_du": "1",
+          "second_rate_du": ".9639"
+        },
+        {
+          "row_index": 60,
+          "first_axis_du": "60",
+          "second_axis_du": "62.0152",
+          "first_rate_du": "1",
+          "second_rate_du": ".9616"
+        },
+        {
+          "row_index": 61,
+          "first_axis_du": "61",
+          "second_axis_du": "62.9768",
+          "first_rate_du": "1",
+          "second_rate_du": ".9594"
+        },
+        {
+          "row_index": 62,
+          "first_axis_du": "62",
+          "second_axis_du": "63.9362",
+          "first_rate_du": "1",
+          "second_rate_du": ".9572"
+        },
+        {
+          "row_index": 63,
+          "first_axis_du": "63",
+          "second_axis_du": "64.8934",
+          "first_rate_du": "1",
+          "second_rate_du": ".9551"
+        },
+        {
+          "row_index": 64,
+          "first_axis_du": "64",
+          "second_axis_du": "65.8485",
+          "first_rate_du": "1",
+          "second_rate_du": ".9529"
+        },
+        {
+          "row_index": 65,
+          "first_axis_du": "65",
+          "second_axis_du": "66.8014",
+          "first_rate_du": "1",
+          "second_rate_du": ".9509"
+        },
+        {
+          "row_index": 66,
+          "first_axis_du": "66",
+          "second_axis_du": "67.7523",
+          "first_rate_du": "1",
+          "second_rate_du": ".9487"
+        },
+        {
+          "row_index": 67,
+          "first_axis_du": "67",
+          "second_axis_du": "68.7010",
+          "first_rate_du": "1",
+          "second_rate_du": ".9470"
+        },
+        {
+          "row_index": 68,
+          "first_axis_du": "68",
+          "second_axis_du": "69.6480",
+          "first_rate_du": "1",
+          "second_rate_du": ".9450"
+        },
+        {
+          "row_index": 69,
+          "first_axis_du": "69",
+          "second_axis_du": "70.5930",
+          "first_rate_du": "1",
+          "second_rate_du": ".9427"
+        },
+        {
+          "row_index": 70,
+          "first_axis_du": "70",
+          "second_axis_du": "71.5357",
+          "first_rate_du": "1",
+          "second_rate_du": ".9412"
+        },
+        {
+          "row_index": 71,
+          "first_axis_du": "71",
+          "second_axis_du": "72.4769",
+          "first_rate_du": "1",
+          "second_rate_du": ".9392"
+        },
+        {
+          "row_index": 72,
+          "first_axis_du": "72",
+          "second_axis_du": "73.4161",
+          "first_rate_du": "1",
+          "second_rate_du": ".9385"
+        },
+        {
+          "row_index": 73,
+          "first_axis_du": "73",
+          "second_axis_du": "74.3546",
+          "first_rate_du": "1",
+          "second_rate_du": ".9353"
+        },
+        {
+          "row_index": 74,
+          "first_axis_du": "74",
+          "second_axis_du": "75.2899",
+          "first_rate_du": "1",
+          "second_rate_du": ".9343"
+        },
+        {
+          "row_index": 75,
+          "first_axis_du": "75",
+          "second_axis_du": "76.2242",
+          "first_rate_du": "1",
+          "second_rate_du": ".9329"
+        },
+        {
+          "row_index": 76,
+          "first_axis_du": "76",
+          "second_axis_du": "77.1571",
+          "first_rate_du": "1",
+          "second_rate_du": ".9315"
+        },
+        {
+          "row_index": 77,
+          "first_axis_du": "77",
+          "second_axis_du": "78.0886",
+          "first_rate_du": "1",
+          "second_rate_du": ".9304"
+        },
+        {
+          "row_index": 78,
+          "first_axis_du": "78",
+          "second_axis_du": "79.0190",
+          "first_rate_du": "1",
+          "second_rate_du": ".9286"
+        },
+        {
+          "row_index": 79,
+          "first_axis_du": "79",
+          "second_axis_du": "79.9476",
+          "first_rate_du": "1",
+          "second_rate_du": ".9275"
+        },
+        {
+          "row_index": 80,
+          "first_axis_du": "80",
+          "second_axis_du": "80.8751",
+          "first_rate_du": "1",
+          "second_rate_du": ".9265"
+        },
+        {
+          "row_index": 81,
+          "first_axis_du": "81",
+          "second_axis_du": "81.8016",
+          "first_rate_du": "1",
+          "second_rate_du": ".9255"
+        },
+        {
+          "row_index": 82,
+          "first_axis_du": "82",
+          "second_axis_du": "82.7271",
+          "first_rate_du": "1",
+          "second_rate_du": ".9244"
+        },
+        {
+          "row_index": 83,
+          "first_axis_du": "83",
+          "second_axis_du": "83.6515",
+          "first_rate_du": "1",
+          "second_rate_du": ".9238"
+        },
+        {
+          "row_index": 84,
+          "first_axis_du": "84",
+          "second_axis_du": "84.5753",
+          "first_rate_du": "1",
+          "second_rate_du": ".9228"
+        },
+        {
+          "row_index": 85,
+          "first_axis_du": "85",
+          "second_axis_du": "85.4981",
+          "first_rate_du": "1",
+          "second_rate_du": ".9222"
+        },
+        {
+          "row_index": 86,
+          "first_axis_du": "86",
+          "second_axis_du": "86.4203",
+          "first_rate_du": "1",
+          "second_rate_du": ".9215"
+        },
+        {
+          "row_index": 87,
+          "first_axis_du": "87",
+          "second_axis_du": "87.3418",
+          "first_rate_du": "1",
+          "second_rate_du": ".9212"
+        },
+        {
+          "row_index": 88,
+          "first_axis_du": "88",
+          "second_axis_du": "88.2630",
+          "first_rate_du": "1",
+          "second_rate_du": ".9210"
+        },
+        {
+          "row_index": 89,
+          "first_axis_du": "89",
+          "second_axis_du": "89.1840",
+          "first_rate_du": "1",
+          "second_rate_du": ".9204"
+        },
+        {
+          "row_index": 90,
+          "first_axis_du": "90",
+          "second_axis_du": "90.1044",
+          "first_rate_du": "1",
+          "second_rate_du": ".9204"
+        },
+        {
+          "row_index": 91,
+          "first_axis_du": "91",
+          "second_axis_du": "91.0248",
+          "first_rate_du": "0.31",
+          "second_rate_du": ".2877"
+        },
+        {
+          "row_index": 92,
+          "first_axis_du": "91.31",
+          "second_axis_du": "91.3125",
+          "first_rate_du": null,
+          "second_rate_du": null
+        }
+      ]
+    },
+    "nlc166": {
+      "profile_id": "yuanshi_054_nlc166_huangchi_v1",
+      "source_url": "https://commons.wikimedia.org/w/index.php?title=File:NLC892-312002017339-363669_二十四史_第166冊.pdf&oldid=1270279566",
+      "locator": "国图武林竹简斋石印元史54，PDF页56全表前段、57表尾与算法",
+      "terminal_marker_text": "九十二",
+      "rows": [
+        {
+          "row_index": 0,
+          "first_axis_du": "0",
+          "second_axis_du": "0",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0865"
+        },
+        {
+          "row_index": 1,
+          "first_axis_du": "1",
+          "second_axis_du": "1.0865",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0863"
+        },
+        {
+          "row_index": 2,
+          "first_axis_du": "2",
+          "second_axis_du": "2.1728",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0860"
+        },
+        {
+          "row_index": 3,
+          "first_axis_du": "3",
+          "second_axis_du": "3.2588",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0857"
+        },
+        {
+          "row_index": 4,
+          "first_axis_du": "4",
+          "second_axis_du": "4.3445",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0849"
+        },
+        {
+          "row_index": 5,
+          "first_axis_du": "5",
+          "second_axis_du": "5.4294",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0843"
+        },
+        {
+          "row_index": 6,
+          "first_axis_du": "6",
+          "second_axis_du": "6.5137",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0833"
+        },
+        {
+          "row_index": 7,
+          "first_axis_du": "7",
+          "second_axis_du": "7.5970",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0823"
+        },
+        {
+          "row_index": 8,
+          "first_axis_du": "8",
+          "second_axis_du": "8.6793",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0812"
+        },
+        {
+          "row_index": 9,
+          "first_axis_du": "9",
+          "second_axis_du": "9.7605",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0801"
+        },
+        {
+          "row_index": 10,
+          "first_axis_du": "10",
+          "second_axis_du": "10.8406",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0786"
+        },
+        {
+          "row_index": 11,
+          "first_axis_du": "11",
+          "second_axis_du": "11.9192",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0772"
+        },
+        {
+          "row_index": 12,
+          "first_axis_du": "12",
+          "second_axis_du": "12.9964",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0755"
+        },
+        {
+          "row_index": 13,
+          "first_axis_du": "13",
+          "second_axis_du": "14.0719",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0740"
+        },
+        {
+          "row_index": 14,
+          "first_axis_du": "14",
+          "second_axis_du": "15.1459",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0720"
+        },
+        {
+          "row_index": 15,
+          "first_axis_du": "15",
+          "second_axis_du": "16.2179",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0704"
+        },
+        {
+          "row_index": 16,
+          "first_axis_du": "16",
+          "second_axis_du": "17.2883",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0684"
+        },
+        {
+          "row_index": 17,
+          "first_axis_du": "17",
+          "second_axis_du": "18.3567",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0663"
+        },
+        {
+          "row_index": 18,
+          "first_axis_du": "18",
+          "second_axis_du": "19.4230",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0642"
+        },
+        {
+          "row_index": 19,
+          "first_axis_du": "19",
+          "second_axis_du": "20.4872",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0622"
+        },
+        {
+          "row_index": 20,
+          "first_axis_du": "20",
+          "second_axis_du": "21.5494",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0599"
+        },
+        {
+          "row_index": 21,
+          "first_axis_du": "21",
+          "second_axis_du": "22.6093",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0575"
+        },
+        {
+          "row_index": 22,
+          "first_axis_du": "22",
+          "second_axis_du": "23.6668",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0554"
+        },
+        {
+          "row_index": 23,
+          "first_axis_du": "23",
+          "second_axis_du": "24.7222",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0530"
+        },
+        {
+          "row_index": 24,
+          "first_axis_du": "24",
+          "second_axis_du": "25.7752",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0506"
+        },
+        {
+          "row_index": 25,
+          "first_axis_du": "25",
+          "second_axis_du": "26.8258",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0482"
+        },
+        {
+          "row_index": 26,
+          "first_axis_du": "26",
+          "second_axis_du": "27.8740",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0456"
+        },
+        {
+          "row_index": 27,
+          "first_axis_du": "27",
+          "second_axis_du": "28.9196",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0432"
+        },
+        {
+          "row_index": 28,
+          "first_axis_du": "28",
+          "second_axis_du": "29.9628",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0408"
+        },
+        {
+          "row_index": 29,
+          "first_axis_du": "29",
+          "second_axis_du": "31.0063",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0382"
+        },
+        {
+          "row_index": 30,
+          "first_axis_du": "30",
+          "second_axis_du": "32.0418",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0355"
+        },
+        {
+          "row_index": 31,
+          "first_axis_du": "31",
+          "second_axis_du": "33.0773",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0333"
+        },
+        {
+          "row_index": 32,
+          "first_axis_du": "32",
+          "second_axis_du": "34.1105",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0306"
+        },
+        {
+          "row_index": 33,
+          "first_axis_du": "33",
+          "second_axis_du": "35.1411",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0280"
+        },
+        {
+          "row_index": 34,
+          "first_axis_du": "34",
+          "second_axis_du": "36.1691",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0254"
+        },
+        {
+          "row_index": 35,
+          "first_axis_du": "35",
+          "second_axis_du": "37.1945",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0229"
+        },
+        {
+          "row_index": 36,
+          "first_axis_du": "36",
+          "second_axis_du": "38.2174",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0203"
+        },
+        {
+          "row_index": 37,
+          "first_axis_du": "37",
+          "second_axis_du": "39.2377",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0177"
+        },
+        {
+          "row_index": 38,
+          "first_axis_du": "38",
+          "second_axis_du": "40.2554",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0152"
+        },
+        {
+          "row_index": 39,
+          "first_axis_du": "39",
+          "second_axis_du": "41.2706",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0126"
+        },
+        {
+          "row_index": 40,
+          "first_axis_du": "40",
+          "second_axis_du": "42.2832",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0101"
+        },
+        {
+          "row_index": 41,
+          "first_axis_du": "41",
+          "second_axis_du": "43.2934",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0075"
+        },
+        {
+          "row_index": 42,
+          "first_axis_du": "42",
+          "second_axis_du": "44.3009",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0049"
+        },
+        {
+          "row_index": 43,
+          "first_axis_du": "43",
+          "second_axis_du": "45.3058",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0027"
+        },
+        {
+          "row_index": 44,
+          "first_axis_du": "44",
+          "second_axis_du": "46.3085",
+          "first_rate_du": "1",
+          "second_rate_du": "1.0000"
+        },
+        {
+          "row_index": 45,
+          "first_axis_du": "45",
+          "second_axis_du": "47.3085",
+          "first_rate_du": "1",
+          "second_rate_du": ".9974"
+        },
+        {
+          "row_index": 46,
+          "first_axis_du": "46",
+          "second_axis_du": "48.3059",
+          "first_rate_du": "1",
+          "second_rate_du": ".9951"
+        },
+        {
+          "row_index": 47,
+          "first_axis_du": "47",
+          "second_axis_du": "49.3010",
+          "first_rate_du": "1",
+          "second_rate_du": ".9925"
+        },
+        {
+          "row_index": 48,
+          "first_axis_du": "48",
+          "second_axis_du": "50.2935",
+          "first_rate_du": "1",
+          "second_rate_du": ".9901"
+        },
+        {
+          "row_index": 49,
+          "first_axis_du": "49",
+          "second_axis_du": "51.2836",
+          "first_rate_du": "1",
+          "second_rate_du": ".9876"
+        },
+        {
+          "row_index": 50,
+          "first_axis_du": "50",
+          "second_axis_du": "52.2712",
+          "first_rate_du": "1",
+          "second_rate_du": ".9851"
+        },
+        {
+          "row_index": 51,
+          "first_axis_du": "51",
+          "second_axis_du": "53.2563",
+          "first_rate_du": "1",
+          "second_rate_du": ".9827"
+        },
+        {
+          "row_index": 52,
+          "first_axis_du": "52",
+          "second_axis_du": "54.2390",
+          "first_rate_du": "1",
+          "second_rate_du": ".9803"
+        },
+        {
+          "row_index": 53,
+          "first_axis_du": "53",
+          "second_axis_du": "55.2193",
+          "first_rate_du": "1",
+          "second_rate_du": ".9780"
+        },
+        {
+          "row_index": 54,
+          "first_axis_du": "54",
+          "second_axis_du": "56.1973",
+          "first_rate_du": "1",
+          "second_rate_du": ".9755"
+        },
+        {
+          "row_index": 55,
+          "first_axis_du": "55",
+          "second_axis_du": "57.1728",
+          "first_rate_du": "1",
+          "second_rate_du": ".9731"
+        },
+        {
+          "row_index": 56,
+          "first_axis_du": "56",
+          "second_axis_du": "58.1459",
+          "first_rate_du": "1",
+          "second_rate_du": ".9708"
+        },
+        {
+          "row_index": 57,
+          "first_axis_du": "57",
+          "second_axis_du": "59.1167",
+          "first_rate_du": "1",
+          "second_rate_du": ".9685"
+        },
+        {
+          "row_index": 58,
+          "first_axis_du": "58",
+          "second_axis_du": "60.0852",
+          "first_rate_du": "1",
+          "second_rate_du": ".9661"
+        },
+        {
+          "row_index": 59,
+          "first_axis_du": "59",
+          "second_axis_du": "61.0513",
+          "first_rate_du": "1",
+          "second_rate_du": ".9639"
+        },
+        {
+          "row_index": 60,
+          "first_axis_du": "60",
+          "second_axis_du": "62.0152",
+          "first_rate_du": "1",
+          "second_rate_du": ".9616"
+        },
+        {
+          "row_index": 61,
+          "first_axis_du": "61",
+          "second_axis_du": "62.9768",
+          "first_rate_du": "1",
+          "second_rate_du": ".9594"
+        },
+        {
+          "row_index": 62,
+          "first_axis_du": "62",
+          "second_axis_du": "63.9362",
+          "first_rate_du": "1",
+          "second_rate_du": ".9527"
+        },
+        {
+          "row_index": 63,
+          "first_axis_du": "63",
+          "second_axis_du": "64.8943",
+          "first_rate_du": "1",
+          "second_rate_du": ".9551"
+        },
+        {
+          "row_index": 64,
+          "first_axis_du": "64",
+          "second_axis_du": "65.8485",
+          "first_rate_du": "1",
+          "second_rate_du": ".9529"
+        },
+        {
+          "row_index": 65,
+          "first_axis_du": "65",
+          "second_axis_du": "66.8014",
+          "first_rate_du": "1",
+          "second_rate_du": ".9509"
+        },
+        {
+          "row_index": 66,
+          "first_axis_du": "66",
+          "second_axis_du": "67.7523",
+          "first_rate_du": "1",
+          "second_rate_du": ".9487"
+        },
+        {
+          "row_index": 67,
+          "first_axis_du": "67",
+          "second_axis_du": "68.7010",
+          "first_rate_du": "1",
+          "second_rate_du": ".9470"
+        },
+        {
+          "row_index": 68,
+          "first_axis_du": "68",
+          "second_axis_du": "69.6480",
+          "first_rate_du": "1",
+          "second_rate_du": ".9450"
+        },
+        {
+          "row_index": 69,
+          "first_axis_du": "69",
+          "second_axis_du": "70.5930",
+          "first_rate_du": "1",
+          "second_rate_du": ".9427"
+        },
+        {
+          "row_index": 70,
+          "first_axis_du": "70",
+          "second_axis_du": "71.5357",
+          "first_rate_du": "1",
+          "second_rate_du": ".9412"
+        },
+        {
+          "row_index": 71,
+          "first_axis_du": "71",
+          "second_axis_du": "72.4769",
+          "first_rate_du": "1",
+          "second_rate_du": ".9392"
+        },
+        {
+          "row_index": 72,
+          "first_axis_du": "72",
+          "second_axis_du": "73.4161",
+          "first_rate_du": "1",
+          "second_rate_du": ".9385"
+        },
+        {
+          "row_index": 73,
+          "first_axis_du": "73",
+          "second_axis_du": "74.3546",
+          "first_rate_du": "1",
+          "second_rate_du": ".9353"
+        },
+        {
+          "row_index": 74,
+          "first_axis_du": "74",
+          "second_axis_du": "75.2899",
+          "first_rate_du": "1",
+          "second_rate_du": ".9343"
+        },
+        {
+          "row_index": 75,
+          "first_axis_du": "75",
+          "second_axis_du": "76.2242",
+          "first_rate_du": "1",
+          "second_rate_du": ".9329"
+        },
+        {
+          "row_index": 76,
+          "first_axis_du": "76",
+          "second_axis_du": "77.1571",
+          "first_rate_du": "1",
+          "second_rate_du": ".9315"
+        },
+        {
+          "row_index": 77,
+          "first_axis_du": "77",
+          "second_axis_du": "78.0886",
+          "first_rate_du": "1",
+          "second_rate_du": ".9304"
+        },
+        {
+          "row_index": 78,
+          "first_axis_du": "78",
+          "second_axis_du": "79.0190",
+          "first_rate_du": "1",
+          "second_rate_du": ".9286"
+        },
+        {
+          "row_index": 79,
+          "first_axis_du": "79",
+          "second_axis_du": "79.9476",
+          "first_rate_du": "1",
+          "second_rate_du": ".9275"
+        },
+        {
+          "row_index": 80,
+          "first_axis_du": "80",
+          "second_axis_du": "80.8751",
+          "first_rate_du": "1",
+          "second_rate_du": ".9265"
+        },
+        {
+          "row_index": 81,
+          "first_axis_du": "81",
+          "second_axis_du": "81.8016",
+          "first_rate_du": "1",
+          "second_rate_du": ".9255"
+        },
+        {
+          "row_index": 82,
+          "first_axis_du": "82",
+          "second_axis_du": "82.7271",
+          "first_rate_du": "1",
+          "second_rate_du": ".9244"
+        },
+        {
+          "row_index": 83,
+          "first_axis_du": "83",
+          "second_axis_du": "83.6515",
+          "first_rate_du": "1",
+          "second_rate_du": ".9238"
+        },
+        {
+          "row_index": 84,
+          "first_axis_du": "84",
+          "second_axis_du": "84.5753",
+          "first_rate_du": "1",
+          "second_rate_du": ".9228"
+        },
+        {
+          "row_index": 85,
+          "first_axis_du": "85",
+          "second_axis_du": "85.4981",
+          "first_rate_du": "1",
+          "second_rate_du": ".9222"
+        },
+        {
+          "row_index": 86,
+          "first_axis_du": "86",
+          "second_axis_du": "86.4203",
+          "first_rate_du": "1",
+          "second_rate_du": ".9215"
+        },
+        {
+          "row_index": 87,
+          "first_axis_du": "87",
+          "second_axis_du": "87.3418",
+          "first_rate_du": "1",
+          "second_rate_du": ".9212"
+        },
+        {
+          "row_index": 88,
+          "first_axis_du": "88",
+          "second_axis_du": "88.2630",
+          "first_rate_du": "1",
+          "second_rate_du": ".9210"
+        },
+        {
+          "row_index": 89,
+          "first_axis_du": "89",
+          "second_axis_du": "89.1840",
+          "first_rate_du": "1",
+          "second_rate_du": ".9204"
+        },
+        {
+          "row_index": 90,
+          "first_axis_du": "90",
+          "second_axis_du": "90.1044",
+          "first_rate_du": "1",
+          "second_rate_du": ".9204"
+        },
+        {
+          "row_index": 91,
+          "first_axis_du": "91",
+          "second_axis_du": "91.0248",
+          "first_rate_du": "0.31",
+          "second_rate_du": ".2877"
+        },
+        {
+          "row_index": 92,
+          "first_axis_du": "91.31",
+          "second_axis_du": "91.3125",
+          "first_rate_du": null,
+          "second_rate_du": null
+        }
+      ],
+      "variants_against_wikisource": [
+        {
+          "row_index": 29,
+          "field": "second_axis_du",
+          "value": "31.0063"
+        },
+        {
+          "row_index": 31,
+          "field": "second_rate_du",
+          "value": "1.0333"
+        },
+        {
+          "row_index": 40,
+          "field": "second_rate_du",
+          "value": "1.0101"
+        },
+        {
+          "row_index": 62,
+          "field": "second_rate_du",
+          "value": ".9527"
+        },
+        {
+          "row_index": 63,
+          "field": "second_axis_du",
+          "value": "64.8943"
+        }
+      ]
+    }
+  }
+}

@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, cast
+from typing import cast
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from pydantic_core import PydanticCustomError
 
 
@@ -23,9 +23,57 @@ class _DeferredModel(BaseModel):
 
     model_config = ConfigDict(defer_build=True, extra="forbid")
 
+    @field_validator("house_system", mode="before", check_fields=False)
+    @classmethod
+    def _validate_house_system_selection(cls, value: object) -> object:
+        from fatebridge.utils.house_systems import (
+            GAUQUELIN_UNSUPPORTED_MESSAGE,
+            INVALID_HOUSE_SYSTEM_MESSAGE,
+            InvalidHouseSystemError,
+            UnsupportedGauquelinError,
+            normalize_house_system,
+        )
+
+        try:
+            if value is None:
+                raise InvalidHouseSystemError(INVALID_HOUSE_SYSTEM_MESSAGE)
+            normalize_house_system(value)
+        except UnsupportedGauquelinError:
+            raise PydanticCustomError(
+                "unsupported_house_system",
+                GAUQUELIN_UNSUPPORTED_MESSAGE,
+                {"system": "Gauquelin", "sector_count": 36},
+            ) from None
+        except InvalidHouseSystemError:
+            raise PydanticCustomError(
+                "invalid_house_system", INVALID_HOUSE_SYSTEM_MESSAGE
+            ) from None
+        return value
+
+    @field_validator("hsys", mode="before", check_fields=False)
+    @classmethod
+    def _validate_numeric_house_code(cls, value: object) -> object:
+        from fatebridge.utils.house_systems import (
+            INVALID_HOUSE_CODE_MESSAGE,
+            InvalidHouseCodeError,
+            parse_house_code,
+        )
+
+        if value is None:
+            return None
+        try:
+            parse_house_code(value)
+        except InvalidHouseCodeError:
+            raise PydanticCustomError(
+                "invalid_house_code", INVALID_HOUSE_CODE_MESSAGE
+            ) from None
+        # Preserve the original value so a domain's StrictInt can still reject
+        # digit strings rather than being bypassed by this shared guard.
+        return value
+
     @model_validator(mode="before")
     @classmethod
-    def _validate_consultation_scope(cls, data: Any) -> Any:
+    def _validate_consultation_scope(cls, data: object) -> object:
         from fatebridge.core.consultation_policy import (
             POLICY_ID,
             restricted_intent_path,
@@ -59,6 +107,46 @@ class _DeferredModel(BaseModel):
                 getattr(self, prefix + part, None) for part in ("year", "month", "day")
             ]
             if all(value is not None for value in date):
+                if (
+                    prefix in {"candidate_", "question_"}
+                    and getattr(self, prefix + "hour_origin", None) == "noon"
+                ):
+                    from fatebridge.core.western_clock_origin import event_wall_datetime
+
+                    try:
+                        event_wall_datetime(
+                            cast(int, date[0]),
+                            cast(int, date[1]),
+                            cast(int, date[2]),
+                            getattr(self, prefix + "hour"),
+                            getattr(self, prefix + "minute", 0),
+                            getattr(self, prefix + "calendar", "proleptic_gregorian"),
+                            "noon",
+                        )
+                    except (ValueError, TypeError):
+                        raise PydanticCustomError(
+                            "invalid_clock_origin_datetime",
+                            "无效的正午起算日期／小时标签，或最终钟面超出支持范围",
+                            {"prefix": prefix, "hour_origin": "noon"},
+                        ) from None
+                    continue
+                if getattr(self, prefix + "calendar", None) == "julian":
+                    from fatebridge.core.civil_calendar import gregorian_date
+
+                    try:
+                        gregorian_date(
+                            cast(int, date[0]),
+                            cast(int, date[1]),
+                            cast(int, date[2]),
+                            calendar="julian",
+                        )
+                    except (ValueError, TypeError):
+                        raise PydanticCustomError(
+                            "invalid_calendar_date",
+                            "无效的儒略历日期或换算结果超出支持范围",
+                            {"prefix": prefix, "calendar": "julian"},
+                        ) from None
+                    continue
                 try:
                     datetime(cast(int, date[0]), cast(int, date[1]), cast(int, date[2]))
                 except (ValueError, TypeError):

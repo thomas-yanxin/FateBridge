@@ -1,148 +1,436 @@
 {
   "schema_version": 1,
   "domain": "bazi",
-  "description": "八字命理知识库，包含十神、神煞、格局、五行、财运、健康、子女、学业等解释",
+  "description": "八字术语资料：十神、格局候选与成败条件、身印语义及健康范围分层整理；内容修订与原典出处核对分别记录，未审旧分类不构成原典或现实效力认证。",
   "categories": {
     "ten_gods": {
       "比肩": {
         "title": "比肩",
         "tips": [
           "比肩代表与日主同五行同阴阳的天干。",
-          "比肩主独立、自主、竞争、同辈。",
-          "比肩旺者性格独立，不喜依赖他人，有竞争意识。",
-          "比肩过多则固执己见，不易妥协，婚姻中易有第三者。",
-          "==",
-          "**事业：**适合独立经营、合伙创业、自由职业。",
-          "**财运：**理财能力强，但易因朋友破财。",
-          "**人际：**朋友多但知心少，同辈竞争明显。",
-          "**健康：**注意肝胆、筋骨方面的问题。"
-        ]
+          "比肩是星位关系名称；解释时区分天干透出、支中藏干、根气及月令，查看其对财、官杀和印食路径的实际作用。",
+          "《子平真诠》从月令及四柱的成败救应论取用。比肩不因数量多就完成喜忌、成格或身强裁定，建禄月劫还须分所用财官食伤。",
+          "同辈与资源共享是传统议题类比；具体合作方式、竞争情况和关系质量由相应现实资料核对。"
+        ],
+        "curation": {
+          "method_id": "bazi_ten_gods_scoped_v1",
+          "entry_revision": 1,
+          "classification": "algorithmic_definition_selected_classical_conditions_editorial_bounds",
+          "definition_basis": "首行是五行生克及干阴阳的程序命名约定，保留既有100干对独立环算核验；原典页码只支持后续分支条件，不冒充逐字定义引文。",
+          "classical_condition_tip_indexes": [
+            1,
+            2
+          ],
+          "editorial_tip_indexes": [
+            3
+          ],
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "source_pdf_pages": [
+                22,
+                28,
+                86,
+                87
+              ]
+            }
+          ],
+          "validation_status": "selected_source_conditions_not_full_classical_or_reality_acceptance",
+          "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF22,28,86,87；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
+          "source_attribution_rule": "首行是程序术语定义，其余为编辑编释；页码只归属明确点名的原典分支，现实与程序边界不是原典事实。",
+          "curated_on": "2026-10-22"
+        }
       },
       "劫财": {
         "title": "劫财",
         "tips": [
           "劫财代表与日主同五行异阴阳的天干。",
-          "劫财主行动力、冒险、竞争、破耗。",
-          "劫财旺者行动力强，敢于冒险，但易冲动。",
-          "劫财过多则破财、婚姻不稳、交友不慎。",
-          "==",
-          "**事业：**适合销售、市场营销、体育竞技等高竞争行业。",
-          "**财运：**财来财去，不易积蓄，需注意理财。",
-          "**人际：**交友广泛但易因财起纠纷。",
-          "**健康：**注意意外伤害、手术开刀。"
-        ]
+          "劫财与比肩同属比劫，区别在干的阴阳；原局的透藏、根气及财官食印互动须逐项列明。",
+          "建禄月劫的用财、用官、用食伤各有条件，不能将劫财名称直接当作已经发生的资金损失或关系问题。",
+          "可讨论共同资源和竞争的传统类比；财务往来、分工和关系事实需单独确认。"
+        ],
+        "curation": {
+          "method_id": "bazi_ten_gods_scoped_v1",
+          "entry_revision": 1,
+          "classification": "algorithmic_definition_selected_classical_conditions_editorial_bounds",
+          "definition_basis": "首行是五行生克及干阴阳的程序命名约定，保留既有100干对独立环算核验；原典页码只支持后续分支条件，不冒充逐字定义引文。",
+          "classical_condition_tip_indexes": [
+            1,
+            2
+          ],
+          "editorial_tip_indexes": [
+            3
+          ],
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "source_pdf_pages": [
+                22,
+                28,
+                86,
+                87
+              ]
+            }
+          ],
+          "validation_status": "selected_source_conditions_not_full_classical_or_reality_acceptance",
+          "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF22,28,86,87；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
+          "source_attribution_rule": "首行是程序术语定义，其余为编辑编释；页码只归属明确点名的原典分支，现实与程序边界不是原典事实。",
+          "curated_on": "2026-10-22"
+        }
       },
       "食神": {
         "title": "食神",
         "tips": [
           "食神代表日主所生同阴阳的天干。",
-          "食神主才华、口福、享乐、子女（女命）。",
-          "食神旺者才华横溢，口才好，生活品味高。",
-          "食神为吉星，主福气、衣食无忧。",
-          "==",
-          "**事业：**适合艺术创作、餐饮美食、教育培训、文化出版。",
-          "**财运：**衣食无忧，财运稳定。",
-          "**人际：**人缘好，社交能力强。",
-          "**健康：**注意饮食过度、消化系统问题。"
-        ]
+          "所选原典的食神分生财、制杀及逢印等路径；须核对所选月令、透藏、根气、位置和食财或食杀相对力量。",
+          "财制枭护食与食神生财是不同路径，星的共现只支持继续核验，不能单凭食神名称裁定成格。",
+          "表达与输出可作传统议题线索；收入、学习表现、子女情况及身体情况另有各自的现实依据。"
+        ],
+        "curation": {
+          "method_id": "bazi_ten_gods_scoped_v1",
+          "entry_revision": 1,
+          "classification": "algorithmic_definition_selected_classical_conditions_editorial_bounds",
+          "definition_basis": "首行是五行生克及干阴阳的程序命名约定，保留既有100干对独立环算核验；原典页码只支持后续分支条件，不冒充逐字定义引文。",
+          "classical_condition_tip_indexes": [
+            1,
+            2
+          ],
+          "editorial_tip_indexes": [
+            3
+          ],
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "source_pdf_pages": [
+                28,
+                76,
+                77,
+                78
+              ]
+            }
+          ],
+          "validation_status": "selected_source_conditions_not_full_classical_or_reality_acceptance",
+          "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF28,76,77,78；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
+          "source_attribution_rule": "首行是程序术语定义，其余为编辑编释；页码只归属明确点名的原典分支，现实与程序边界不是原典事实。",
+          "curated_on": "2026-10-22"
+        }
       },
       "伤官": {
         "title": "伤官",
         "tips": [
           "伤官代表日主所生异阴阳的天干。",
-          "伤官主才华、创新、叛逆、口舌。",
-          "伤官旺者思维独特，才华出众，但性格叛逆。",
-          "伤官见官为祸百端，女命伤官克夫。",
-          "==",
-          "**事业：**适合技术研发、设计创意、自媒体、律师。",
-          "**财运：**凭才华赚钱，但收入波动大。",
-          "**人际：**口才好但易得罪人，需注意言辞。",
-          "**健康：**注意呼吸系统、皮肤问题。"
-        ]
+          "原典区分伤官生财、佩印、带官及金水情境；每一分支都须检查透藏、根气、力量、位置与制化。",
+          "伤官见官是待分析的结构，须分有没有财印、制去或救应；不能把一个口诀转成确定的灾祸或伴侣品行判断。",
+          "创新和表达是传统类比；具体能力、职业结果及相处方式应由事实检验。"
+        ],
+        "curation": {
+          "method_id": "bazi_ten_gods_scoped_v1",
+          "entry_revision": 1,
+          "classification": "algorithmic_definition_selected_classical_conditions_editorial_bounds",
+          "definition_basis": "首行是五行生克及干阴阳的程序命名约定，保留既有100干对独立环算核验；原典页码只支持后续分支条件，不冒充逐字定义引文。",
+          "classical_condition_tip_indexes": [
+            1,
+            2
+          ],
+          "editorial_tip_indexes": [
+            3
+          ],
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "source_pdf_pages": [
+                28,
+                82,
+                83,
+                84,
+                85
+              ]
+            }
+          ],
+          "validation_status": "selected_source_conditions_not_full_classical_or_reality_acceptance",
+          "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF28,82,83,84,85；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
+          "source_attribution_rule": "首行是程序术语定义，其余为编辑编释；页码只归属明确点名的原典分支，现实与程序边界不是原典事实。",
+          "curated_on": "2026-10-22"
+        }
       },
       "正财": {
         "title": "正财",
         "tips": [
           "正财代表日主所克异阴阳的天干。",
-          "正财主正当收入、妻子（男命）、稳定、踏实。",
-          "正财旺者理财能力强，生活稳定，重视物质。",
-          "正财为吉星，主正当财富、稳定收入。",
-          "==",
-          "**事业：**适合财务管理、银行金融、会计审计、实业经营。",
-          "**财运：**正当收入稳定，理财能力强。",
-          "**婚姻：**男命正财为妻，正财旺则妻贤。",
-          "**健康：**注意脾胃、消化系统。"
-        ]
+          "财星是日主所克的星类。财用官、食伤生财和财印配合须按月令与全局分别分析，不能把星名直接等同某一收入渠道。",
+          "身财相对轻重、财根、透干、比劫与官食的路径及财印隔位都是需核对的条件；共现不是收益或事业层级。",
+          "亲属与资源的传统取象须分清所用映射和当事人资料；现实关系、职业和财务事实分别核实。"
+        ],
+        "curation": {
+          "method_id": "bazi_ten_gods_scoped_v1",
+          "entry_revision": 1,
+          "classification": "algorithmic_definition_selected_classical_conditions_editorial_bounds",
+          "definition_basis": "首行是五行生克及干阴阳的程序命名约定，保留既有100干对独立环算核验；原典页码只支持后续分支条件，不冒充逐字定义引文。",
+          "classical_condition_tip_indexes": [
+            1,
+            2
+          ],
+          "editorial_tip_indexes": [
+            3
+          ],
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "source_pdf_pages": [
+                22,
+                28,
+                65,
+                66,
+                76
+              ]
+            }
+          ],
+          "validation_status": "selected_source_conditions_not_full_classical_or_reality_acceptance",
+          "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF22,28,65,66,76；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
+          "source_attribution_rule": "首行是程序术语定义，其余为编辑编释；页码只归属明确点名的原典分支，现实与程序边界不是原典事实。",
+          "curated_on": "2026-10-22"
+        }
       },
       "偏财": {
         "title": "偏财",
         "tips": [
           "偏财代表日主所克同阴阳的天干。",
-          "偏财主意外之财、父亲、风流、大方。",
-          "偏财旺者眼光独到，善于把握机会，出手大方。",
-          "偏财过多则风流好色，财来财去。",
-          "==",
-          "**事业：**适合投资理财、股票期货、贸易经商、地产。",
-          "**财运：**偏财运佳，但不易积蓄。",
-          "**人际：**社交广泛，异性缘佳。",
-          "**健康：**注意泌尿系统、肾脏问题。"
-        ]
+          "偏财与正财同属财星，阴阳关系不同；其格局作用仍取决于月令、根气、位置及官食印比的制化。",
+          "偏字是传统分类名称，不表示实际有意外收入，也不指定股票、期货或其他投资品种。",
+          "家庭和资源议题须区分传统角色映射与真实亲属关系，命主的财富结构不能替代亲属本人的实际情况。"
+        ],
+        "curation": {
+          "method_id": "bazi_ten_gods_scoped_v1",
+          "entry_revision": 1,
+          "classification": "algorithmic_definition_selected_classical_conditions_editorial_bounds",
+          "definition_basis": "首行是五行生克及干阴阳的程序命名约定，保留既有100干对独立环算核验；原典页码只支持后续分支条件，不冒充逐字定义引文。",
+          "classical_condition_tip_indexes": [
+            1,
+            2
+          ],
+          "editorial_tip_indexes": [
+            3
+          ],
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "source_pdf_pages": [
+                22,
+                28,
+                65,
+                66,
+                76
+              ]
+            }
+          ],
+          "validation_status": "selected_source_conditions_not_full_classical_or_reality_acceptance",
+          "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF22,28,65,66,76；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
+          "source_attribution_rule": "首行是程序术语定义，其余为编辑编释；页码只归属明确点名的原典分支，现实与程序边界不是原典事实。",
+          "curated_on": "2026-10-22"
+        }
       },
       "正官": {
         "title": "正官",
         "tips": [
           "正官代表克日主异阴阳的天干。",
-          "正官主权力、地位、丈夫（女命）、规矩、约束。",
-          "正官旺者有领导力，守规矩，重视名誉。",
-          "正官为吉星，主正当权力、社会地位。",
-          "==",
-          "**事业：**适合公务员、企业管理、行政管理、法律。",
-          "**财运：**正当收入，地位带来财富。",
-          "**婚姻：**女命正官为夫，正官旺则夫贵。",
-          "**健康：**注意骨骼、牙齿问题。"
-        ]
+          "正官分财生官、印护官、伤官扰官及官杀去留等条件路径，须按实际星位、根气、月令与救应审查。",
+          "官的传统象义包括秩序、约束和名位；正字不认证现实道德、职位、升迁或关系稳定。",
+          "亲属与资源的传统取象须分清所用映射和当事人资料；现实关系、职业和财务事实分别核实。"
+        ],
+        "curation": {
+          "method_id": "bazi_ten_gods_scoped_v1",
+          "entry_revision": 1,
+          "classification": "algorithmic_definition_selected_classical_conditions_editorial_bounds",
+          "definition_basis": "首行是五行生克及干阴阳的程序命名约定，保留既有100干对独立环算核验；原典页码只支持后续分支条件，不冒充逐字定义引文。",
+          "classical_condition_tip_indexes": [
+            1,
+            2
+          ],
+          "editorial_tip_indexes": [
+            3
+          ],
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "source_pdf_pages": [
+                28,
+                30,
+                39,
+                40
+              ]
+            }
+          ],
+          "validation_status": "selected_source_conditions_not_full_classical_or_reality_acceptance",
+          "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF28,30,39,40；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
+          "source_attribution_rule": "首行是程序术语定义，其余为编辑编释；页码只归属明确点名的原典分支，现实与程序边界不是原典事实。",
+          "curated_on": "2026-10-22"
+        }
       },
       "七杀": {
         "title": "七杀",
         "tips": [
           "七杀代表克日主同阴阳的天干。",
-          "七杀主权威、魄力、压力、小人。",
-          "七杀旺者果断有魄力，但压力大。",
-          "七杀有制为偏官，无制则为七杀，主灾祸。",
-          "==",
-          "**事业：**适合军警、外科医生、高管、创业。",
-          "**财运：**有大起大落之象。",
-          "**人际：**易有小人，需防背后暗箭。",
-          "**健康：**注意意外伤害、血光之灾。"
-        ]
+          "七杀亦称偏官。制杀、化杀、生印、去留与合的路径须分别检查，不能由见杀或杀多直接断吉凶。",
+          "所选原典的食神制杀及合杀留官都有力量、位置和根气前提；相合不自动等于合去或已经救应。",
+          "约束与压力可作传统议题线索，具体危险、能力、道德与现实结果不是七杀定义的一部分。"
+        ],
+        "curation": {
+          "method_id": "bazi_ten_gods_scoped_v1",
+          "entry_revision": 1,
+          "classification": "algorithmic_definition_selected_classical_conditions_editorial_bounds",
+          "definition_basis": "首行是五行生克及干阴阳的程序命名约定，保留既有100干对独立环算核验；原典页码只支持后续分支条件，不冒充逐字定义引文。",
+          "classical_condition_tip_indexes": [
+            1,
+            2
+          ],
+          "editorial_tip_indexes": [
+            3
+          ],
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "source_pdf_pages": [
+                28,
+                30,
+                39,
+                66,
+                77
+              ]
+            }
+          ],
+          "validation_status": "selected_source_conditions_not_full_classical_or_reality_acceptance",
+          "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF28,30,39,66,77；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
+          "source_attribution_rule": "首行是程序术语定义，其余为编辑编释；页码只归属明确点名的原典分支，现实与程序边界不是原典事实。",
+          "curated_on": "2026-10-22"
+        }
       },
       "正印": {
         "title": "正印",
         "tips": [
           "正印代表生日主异阴阳的天干。",
-          "正印主母亲、学业、贵人、保护、文化。",
-          "正印旺者好学上进，有文化底蕴，贵人运佳。",
-          "正印为吉星，主学业有成、贵人相助。",
-          "==",
-          "**事业：**适合教师、研究员、公务员、文化行业。",
-          "**财运：**稳定收入，不愁吃穿。",
-          "**人际：**贵人运佳，长辈缘好。",
-          "**健康：**整体健康良好，但易肥胖。"
-        ]
+          "原典印格可用官杀、食伤或财等不同路径，须区分身的力量与印的力量，不能用身印合计标签替代两个条件。",
+          "身强印旺而用食伤，与身重印轻、身轻印重不是同一判断；根气、透藏、位置及实际生克路径仍须核对。",
+          "授受、文书和庇护属传统类比；学历、考试表现及亲属关系不能由印的有无或数量直接认定。"
+        ],
+        "curation": {
+          "method_id": "bazi_ten_gods_scoped_v1",
+          "entry_revision": 1,
+          "classification": "algorithmic_definition_selected_classical_conditions_editorial_bounds",
+          "definition_basis": "首行是五行生克及干阴阳的程序命名约定，保留既有100干对独立环算核验；原典页码只支持后续分支条件，不冒充逐字定义引文。",
+          "classical_condition_tip_indexes": [
+            1,
+            2
+          ],
+          "editorial_tip_indexes": [
+            3
+          ],
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "source_pdf_pages": [
+                22,
+                28,
+                72,
+                73,
+                74,
+                75
+              ]
+            }
+          ],
+          "validation_status": "selected_source_conditions_not_full_classical_or_reality_acceptance",
+          "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF22,28,72,73,74,75；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
+          "source_attribution_rule": "首行是程序术语定义，其余为编辑编释；页码只归属明确点名的原典分支，现实与程序边界不是原典事实。",
+          "curated_on": "2026-10-22"
+        }
       },
       "偏印": {
         "title": "偏印（枭神）",
         "tips": [
           "偏印代表生日主同阴阳的天干。",
-          "偏印主偏门学问、继母、孤独、技术。",
-          "偏印旺者思维敏捷，专业技能强，但性格孤僻。",
-          "偏印夺食为枭神，主灾祸。",
-          "==",
-          "**事业：**适合技术研发、医疗、玄学、IT。",
-          "**财运：**凭技术赚钱，收入不稳定。",
-          "**人际：**朋友少但质量高，内心孤独。",
-          "**健康：**注意精神压力、失眠、神经衰弱。"
-        ]
+          "偏印的作用须结合月令及官食财等结构。食神格中论枭，需审查财制枭护食及位置、根气和力量条件。",
+          "偏字和枭字不预设实际职业、品行或伤害；印用食伤也须先区分身强印旺等原典前提。",
+          "知识与资源的传统取象可作为讨论线索，学习结果、关系和身体状况仍需现实资料。"
+        ],
+        "curation": {
+          "method_id": "bazi_ten_gods_scoped_v1",
+          "entry_revision": 1,
+          "classification": "algorithmic_definition_selected_classical_conditions_editorial_bounds",
+          "definition_basis": "首行是五行生克及干阴阳的程序命名约定，保留既有100干对独立环算核验；原典页码只支持后续分支条件，不冒充逐字定义引文。",
+          "classical_condition_tip_indexes": [
+            1,
+            2
+          ],
+          "editorial_tip_indexes": [
+            3
+          ],
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "source_pdf_pages": [
+                28,
+                72,
+                73,
+                74,
+                75,
+                78
+              ]
+            }
+          ],
+          "validation_status": "selected_source_conditions_not_full_classical_or_reality_acceptance",
+          "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF28,72,73,74,75,78；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
+          "source_attribution_rule": "首行是程序术语定义，其余为编辑编释；页码只归属明确点名的原典分支，现实与程序边界不是原典事实。",
+          "curated_on": "2026-10-22"
+        }
       }
     },
     "shensha": {
@@ -162,14 +450,57 @@
       "文昌": {
         "title": "文昌贵人",
         "tips": [
-          "文昌贵人主聪明好学、文采出众。",
-          "命带文昌者，学习能力强，适合文职工作。",
-          "==",
-          "**查法：**以日干查四柱地支。",
-          "甲乙巳午报君知，丙戊申宫丁己鸡，庚猪辛鼠壬逢虎，癸人见卯入云梯。",
-          "==",
-          "**影响：**利考试、学业、文职、创作。"
-        ]
+          "所选《秘本子平真诠》论星辰无关格局，强调月令四柱配合；该章没有本工具的文昌十干表，不能把神煞命中当作格局成败。",
+          "本工具学业模块只按日干查四柱地支：甲巳、乙午、丙戊申、丁己酉、庚亥、辛子、壬寅、癸卯。wenchang_branch与hit_pillars分别返回目标支和全部命中柱位，不同时按年干另算。",
+          "该十干表的原始版本及异文仍待校勘；此处明确其当前程序依据，不把表与原典已核条件或现实效力混为一谈。",
+          "文昌是查表标签，不测量聪明、文采或学习能力；本学业模块也不由大运流年文昌计算考试成功概率。"
+        ],
+        "curation": {
+          "entry_revision": 1,
+          "review_status": "implementation_verified_classical_attribution_partial",
+          "validation_status": "topic_source_semantics_not_global_force_or_real_prediction",
+          "source_attribution_status": "partial_still_pending",
+          "source_refs": [
+            {
+              "source_id": "ziping_topic_conditions_v2",
+              "title": "秘本子平真诠",
+              "author": "沈孝瞻",
+              "edition": "国家图书馆藏本NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                49,
+                50,
+                51
+              ],
+              "scope": "只支持source_tip_indices标明的条件或范围；不支持现代学历、亲属状态、生育及考试效果，也不校定文昌表或女命规则。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/education.py",
+              "source_sha256": "e4b47876696af06ef1cbbfa297f42695279ab9eb5503bb9f1975f29f4be03872",
+              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+            }
+          ],
+          "source_tip_indices": [
+            0
+          ],
+          "implementation_tip_indices": [
+            1
+          ],
+          "editorial_tip_indices": [
+            3
+          ],
+          "source_pending_tip_indices": [
+            2
+          ],
+          "independent_expert_review": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF49,50,51；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；文昌表或女命对应仍待扫描本校勘。"
+        }
       },
       "桃花": {
         "title": "桃花（咸池）",
@@ -297,475 +628,2020 @@
     },
     "structures": {
       "正官格": {
-        "title": "正官格",
+        "title": "正官格：候选与成败条件",
         "tips": [
-          "正官格以正官为用神，喜财星生官、印星护官。",
-          "正官格者，品行端正，有领导力，适合仕途。",
-          "==",
-          "**成格条件：**月令正官透干，或四柱正官有力。",
-          "**喜用：**财星（生官）、印星（护官）。",
-          "**忌神：**伤官（克官）、比劫（争官）。",
-          "==",
-          "**事业方向：**公务员、企业管理、行政管理。"
-        ]
+          "所选原典以月令为取用入口，再以四柱配合辨成败；不是四柱任有正官就已成正官格。",
+          "财生官、印护官是条件路径；还须查伤官、刑冲、财印的位置与是否妨碍，不能列一组对所有官格都适用的喜忌。",
+          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "官格标签不证明品行、领导能力、职业资格或适合仕途。"
+        ],
+        "curation": {
+          "method_id": "bazi_structure_conditions_v1",
+          "entry_revision": 2,
+          "curated_on": "2026-10-22",
+          "review_status": "selected_month_command_semantics_not_formation_acceptance",
+          "validation_status": "source_condition_paraphrases_and_implementation_scope_not_complete_formation",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                26,
+                27,
+                28,
+                29,
+                30
+              ],
+              "support_scope": "所列月令取用与成败救应条件；不支持职业人格结果，也不是全局成格算法的验收。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/classical.py",
+              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
+              "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+            }
+          ],
+          "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
+          "implementation_ref_history": [
+            {
+              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
+              "previous_ref": {
+                "source_path": "src/fatebridge/core/classical.py",
+                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
+                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+              },
+              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
+            }
+          ]
+        }
       },
       "七杀格": {
-        "title": "七杀格",
+        "title": "七杀格：候选与成败条件",
         "tips": [
-          "七杀格以七杀为用神，需食神制杀或印星化杀。",
-          "七杀格者，有魄力有权威，但压力大。",
-          "==",
-          "**成格条件：**月令七杀透干，或四柱七杀有力。",
-          "**喜用：**食神（制杀）、印星（化杀）。",
-          "**忌神：**财星（生杀）、比劫（抗杀）。",
-          "==",
-          "**事业方向：**军警、外科医生、高管、创业。"
-        ]
+          "月令七杀候选与全局杀格成立是两层判断，七杀有字或有根不等于制化已适当。",
+          "原典列食神制杀、杀印等路径，须另查制化是否过重、财是否妨碍或另有合去；不可把财、比劫一概列忌。",
+          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "不由格名推断魄力、压力、危险、职业或现实成败。"
+        ],
+        "curation": {
+          "method_id": "bazi_structure_conditions_v1",
+          "entry_revision": 2,
+          "curated_on": "2026-10-22",
+          "review_status": "selected_month_command_semantics_not_formation_acceptance",
+          "validation_status": "source_condition_paraphrases_and_implementation_scope_not_complete_formation",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                26,
+                27,
+                28,
+                29,
+                30
+              ],
+              "support_scope": "所列月令取用与成败救应条件；不支持职业人格结果，也不是全局成格算法的验收。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/classical.py",
+              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
+              "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+            }
+          ],
+          "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
+          "implementation_ref_history": [
+            {
+              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
+              "previous_ref": {
+                "source_path": "src/fatebridge/core/classical.py",
+                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
+                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+              },
+              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
+            }
+          ]
+        }
       },
       "食神格": {
-        "title": "食神格",
+        "title": "食神格：候选与成败条件",
         "tips": [
-          "食神格以食神为用神，喜财星泄食。",
-          "食神格者，才华横溢，衣食无忧。",
-          "==",
-          "**成格条件：**月令食神透干，或四柱食神有力。",
-          "**喜用：**财星（泄食生财）。",
-          "**忌神：**枭神（夺食）、官杀（克身）。",
-          "==",
-          "**事业方向：**艺术创作、餐饮美食、教育培训。"
-        ]
+          "月令食神候选须再查生财、制杀、逢印等不同路径，不能由食神出现就断已成格。",
+          "原典食神生财分身食财相对力量与财根；食神逢印、杀印或财护食也各有前提，不能统一认定印必夺食、官杀必破格。",
+          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "食神名称不证明才华、收入保障、生活层次或某一行业适合度。"
+        ],
+        "curation": {
+          "method_id": "bazi_structure_conditions_v1",
+          "entry_revision": 2,
+          "curated_on": "2026-10-22",
+          "review_status": "selected_month_command_semantics_not_formation_acceptance",
+          "validation_status": "source_condition_paraphrases_and_implementation_scope_not_complete_formation",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                26,
+                27,
+                28,
+                29,
+                30
+              ],
+              "support_scope": "所列月令取用与成败救应条件；不支持职业人格结果，也不是全局成格算法的验收。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/classical.py",
+              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
+              "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+            }
+          ],
+          "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
+          "implementation_ref_history": [
+            {
+              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
+              "previous_ref": {
+                "source_path": "src/fatebridge/core/classical.py",
+                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
+                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+              },
+              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
+            }
+          ]
+        }
       },
       "伤官格": {
-        "title": "伤官格",
+        "title": "伤官格：候选与成败条件",
         "tips": [
-          "伤官格以伤官为用神，需配印星或财星。",
-          "伤官格者，才华出众，但性格叛逆。",
-          "==",
-          "**成格条件：**月令伤官透干，或四柱伤官有力。",
-          "**喜用：**印星（配印）、财星（生财）。",
-          "**忌神：**官星（伤官见官为祸）。",
-          "==",
-          "**事业方向：**技术研发、设计创意、自媒体、律师。"
-        ]
+          "所选月令为伤官时，仍须分生财、佩印、带杀及带官等条件路径。",
+          "原典对金水伤官等气候情境另论，不能把见官直接等同有祸；印与财的适用也须看身、伤、印及位置配置。",
+          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "格名不鉴定叛逆、创造力、职业水平或现实制度冲突。"
+        ],
+        "curation": {
+          "method_id": "bazi_structure_conditions_v1",
+          "entry_revision": 2,
+          "curated_on": "2026-10-22",
+          "review_status": "selected_month_command_semantics_not_formation_acceptance",
+          "validation_status": "source_condition_paraphrases_and_implementation_scope_not_complete_formation",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                26,
+                27,
+                28,
+                29,
+                30
+              ],
+              "support_scope": "所列月令取用与成败救应条件；不支持职业人格结果，也不是全局成格算法的验收。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/classical.py",
+              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
+              "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+            }
+          ],
+          "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
+          "implementation_ref_history": [
+            {
+              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
+              "previous_ref": {
+                "source_path": "src/fatebridge/core/classical.py",
+                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
+                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+              },
+              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
+            }
+          ]
+        }
       },
       "正财格": {
-        "title": "正财格",
+        "title": "正财格：候选与成败条件",
         "tips": [
-          "正财格以正财为用神，喜官星护财。",
-          "正财格者，理财能力强，生活稳定。",
-          "==",
-          "**成格条件：**月令正财透干，或四柱正财有力。",
-          "**喜用：**官星（护财）、印星（生身）。",
-          "**忌神：**比劫（争财）、伤官（泄财）。",
-          "==",
-          "**事业方向：**财务管理、银行金融、实业经营。"
-        ]
+          "月令正财候选不等于财富、理财能力或生活稳定性已经成立。",
+          "生克上食伤生财，不是“伤官泄财”；财生官、食神生财、财印并用等须各查力量、根气、位置及是否相碍，印也不是一律为喜。",
+          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "持续收入是现代讨论类比，不能由正财名称鉴定收益、收入正当性或职业适合度。"
+        ],
+        "curation": {
+          "method_id": "bazi_structure_conditions_v1",
+          "entry_revision": 2,
+          "curated_on": "2026-10-22",
+          "review_status": "selected_month_command_semantics_not_formation_acceptance",
+          "validation_status": "source_condition_paraphrases_and_implementation_scope_not_complete_formation",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                26,
+                27,
+                28,
+                29,
+                30
+              ],
+              "support_scope": "所列月令取用与成败救应条件；不支持职业人格结果，也不是全局成格算法的验收。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/classical.py",
+              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
+              "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+            }
+          ],
+          "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
+          "implementation_ref_history": [
+            {
+              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
+              "previous_ref": {
+                "source_path": "src/fatebridge/core/classical.py",
+                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
+                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+              },
+              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
+            }
+          ]
+        }
       },
       "偏财格": {
-        "title": "偏财格",
+        "title": "偏财格：候选与成败条件",
         "tips": [
-          "偏财格以偏财为用神，喜官杀护财。",
-          "偏财格者，眼光独到，善于投资。",
-          "==",
-          "**成格条件：**月令偏财透干，或四柱偏财有力。",
-          "**喜用：**官杀（护财）、食伤（生财）。",
-          "**忌神：**比劫（争财）。",
-          "==",
-          "**事业方向：**投资理财、贸易经商、地产。"
-        ]
+          "正财、偏财先是日主所克之干的阴阳分类；月令偏财候选须再看全局配合。",
+          "财生官、食神生财、财印相配和比劫争财不能只凭星名定喜忌，须查月令取用、透藏、财根及救应。",
+          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "偏财格不证明投资能力、横财、交易优势或经商适合度。"
+        ],
+        "curation": {
+          "method_id": "bazi_structure_conditions_v1",
+          "entry_revision": 2,
+          "curated_on": "2026-10-22",
+          "review_status": "selected_month_command_semantics_not_formation_acceptance",
+          "validation_status": "source_condition_paraphrases_and_implementation_scope_not_complete_formation",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                26,
+                27,
+                28,
+                29,
+                30
+              ],
+              "support_scope": "所列月令取用与成败救应条件；不支持职业人格结果，也不是全局成格算法的验收。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/classical.py",
+              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
+              "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+            }
+          ],
+          "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
+          "implementation_ref_history": [
+            {
+              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
+              "previous_ref": {
+                "source_path": "src/fatebridge/core/classical.py",
+                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
+                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+              },
+              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
+            }
+          ]
+        }
       },
       "正印格": {
-        "title": "正印格",
+        "title": "正印格：候选与成败条件",
         "tips": [
-          "正印格以正印为用神，喜官星生印。",
-          "正印格者，好学上进，有文化底蕴。",
-          "==",
-          "**成格条件：**月令正印透干，或四柱正印有力。",
-          "**喜用：**官星（生印）、比劫（助身）。",
-          "**忌神：**财星（坏印）、伤官（泄身）。",
-          "==",
-          "**事业方向：**教师、研究员、公务员、文化行业。"
-        ]
+          "所选印格条件须把日主与印分别判断；身印合计的工程强弱标签不能代替原典的身、印相对力量。",
+          "原典明确有身印两旺用食伤泄气、印多用财等分支，不能把食伤一概列为印格忌神，也不能把财一概判为坏印。",
+          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "印格不证明学历、记忆、文化修养或现实职称；既有原典强弱反例仍未解决。"
+        ],
+        "curation": {
+          "method_id": "bazi_structure_conditions_v1",
+          "entry_revision": 2,
+          "curated_on": "2026-10-22",
+          "review_status": "selected_month_command_semantics_not_formation_acceptance",
+          "validation_status": "source_condition_paraphrases_and_implementation_scope_not_complete_formation",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                26,
+                27,
+                28,
+                29,
+                30,
+                72,
+                73
+              ],
+              "support_scope": "所列月令取用与成败救应条件；不支持职业人格结果，也不是全局成格算法的验收。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/classical.py",
+              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
+              "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+            }
+          ],
+          "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30,72,73；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
+          "implementation_ref_history": [
+            {
+              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
+              "previous_ref": {
+                "source_path": "src/fatebridge/core/classical.py",
+                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
+                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+              },
+              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
+            }
+          ]
+        }
       },
       "偏印格": {
-        "title": "偏印格",
+        "title": "偏印格：候选与成败条件",
         "tips": [
-          "偏印格以偏印为用神，需配财星或食伤。",
-          "偏印格者，思维敏捷，专业技能强。",
-          "==",
-          "**成格条件：**月令偏印透干，或四柱偏印有力。",
-          "**喜用：**财星（制印）、食伤（泄秀）。",
-          "**忌神：**无特殊忌神，但偏印夺食需注意。",
-          "==",
-          "**事业方向：**技术研发、医疗、玄学、IT。"
-        ]
+          "偏印与正印先是生我之干的阴阳分类；印格的可用路径仍需所选月令与全局条件。",
+          "所选印格、食神段落分别讨论用食伤泄气、用财及逢枭等配置；偏印出现不自动成为夺食，也不意味着“无特殊忌神”。",
+          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "不从偏印格断技能高低、研究能力或某种职业资质。"
+        ],
+        "curation": {
+          "method_id": "bazi_structure_conditions_v1",
+          "entry_revision": 2,
+          "curated_on": "2026-10-22",
+          "review_status": "selected_month_command_semantics_not_formation_acceptance",
+          "validation_status": "source_condition_paraphrases_and_implementation_scope_not_complete_formation",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                26,
+                27,
+                28,
+                29,
+                30,
+                72,
+                73
+              ],
+              "support_scope": "所列月令取用与成败救应条件；不支持职业人格结果，也不是全局成格算法的验收。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/classical.py",
+              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
+              "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+            }
+          ],
+          "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30,72,73；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
+          "implementation_ref_history": [
+            {
+              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
+              "previous_ref": {
+                "source_path": "src/fatebridge/core/classical.py",
+                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
+                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+              },
+              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
+            }
+          ]
+        }
       },
       "建禄格": {
-        "title": "建禄格",
+        "title": "建禄格：候选与成败条件",
         "tips": [
-          "建禄格月令为日主之禄，日主强旺。",
-          "建禄格者，自立自强，不依赖祖业。",
-          "==",
-          "**成格条件：**月令为日主之禄（如甲日寅月、乙日卯月等）。",
-          "**喜用：**财官食伤（泄旺身）。",
-          "**忌神：**印比（助旺身）。",
-          "==",
-          "**事业方向：**适合独立创业、白手起家。"
-        ]
+          "建禄先核对日干实际禄位是否在月支；当前实现用明确禄座表，不把任意本气比劫都标建禄。",
+          "所选原典把建禄与月劫同论，以透干会支另查财、官、杀、食等取用。禄位成立不等于全局日主一定强旺，更不直接等于已成格。",
+          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "建禄不证明自立、祖业状况、创业能力或白手起家；禄座资格与全局力量分开核对。"
+        ],
+        "curation": {
+          "method_id": "bazi_structure_conditions_v1",
+          "entry_revision": 2,
+          "curated_on": "2026-10-22",
+          "review_status": "selected_month_command_semantics_not_formation_acceptance",
+          "validation_status": "source_condition_paraphrases_and_implementation_scope_not_complete_formation",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                26,
+                27,
+                28,
+                29,
+                30,
+                89,
+                90
+              ],
+              "support_scope": "所列月令取用与成败救应条件；不支持职业人格结果，也不是全局成格算法的验收。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/classical.py",
+              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
+              "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+            }
+          ],
+          "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30,89,90；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
+          "implementation_ref_history": [
+            {
+              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
+              "previous_ref": {
+                "source_path": "src/fatebridge/core/classical.py",
+                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
+                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+              },
+              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
+            }
+          ]
+        }
       },
       "羊刃驾杀格": {
-        "title": "羊刃驾杀格",
+        "title": "羊刃驾杀格：候选与成败条件",
         "tips": [
-          "羊刃驾杀格为大贵之格，需日主强旺、七杀有力。",
-          "此格者，有权威有魄力，适合军警或高管。",
-          "==",
-          "**成格条件：**日主坐羊刃（如甲日卯月），四柱有七杀。",
-          "**喜用：**七杀（制刃）、印星（化杀）。",
-          "**忌神：**食伤（制杀则刃无制）。",
-          "==",
-          "**事业方向：**军警、外科医生、高管、创业。"
-        ]
+          "保留旧查询键，先核对所选阳刃规则的五阳干及实际月支资格；“甲日卯月”描述月刃，不是日坐羊刃。",
+          "原典刃用官杀仍须核对根、制伏、合杀或合官是否使其失去作用、财印相随及伤食的具体角色；刃杀共现不认证驾杀成格。",
+          "实际输出应先核对monthly_structure.structure_god或evidence_chain.month_command.selected_god，再读透藏、根气、位置和制化前提；候选名与星的共现不认证成格。",
+          "阳刃或七杀不构成人身危险、权威、军警医疗职业或创业成败结论。"
+        ],
+        "curation": {
+          "method_id": "bazi_structure_conditions_v1",
+          "entry_revision": 2,
+          "curated_on": "2026-10-22",
+          "review_status": "selected_month_command_semantics_not_formation_acceptance",
+          "validation_status": "source_condition_paraphrases_and_implementation_scope_not_complete_formation",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                26,
+                27,
+                28,
+                29,
+                30,
+                86,
+                87,
+                88
+              ],
+              "support_scope": "所列月令取用与成败救应条件；不支持职业人格结果，也不是全局成格算法的验收。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/classical.py",
+              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
+              "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+            }
+          ],
+          "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30,86,87,88；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
+          "implementation_ref_history": [
+            {
+              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
+              "previous_ref": {
+                "source_path": "src/fatebridge/core/classical.py",
+                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
+                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
+              },
+              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
+            }
+          ]
+        }
       }
     },
     "elements": {
       "木": {
         "title": "木",
         "tips": [
-          "木主仁，代表生长、发展、条达。",
-          "木旺者性格仁慈、有同情心、善于规划。",
-          "木弱则优柔寡断、缺乏主见。",
-          "==",
-          "**方位：**东方",
-          "**季节：**春季",
-          "**颜色：**绿色、青色",
-          "**数字：**3、8",
-          "**行业：**教育、文化、园林、医药、纺织",
-          "==",
-          "**健康：**肝、胆、筋骨、眼睛"
-        ]
+          "传统象义：木主仁，以生发、条达作文化描述。所选《任注滴天髓闡微·性情》还须看五气中和、偏枯及顺逆条件，不以单一元素旺弱鉴定个人品德或能力。",
+          "**方位与时序：**《礼记·月令》以立春盛德在木、迎春东郊，属于春与东方的礼制时序对应；不能单凭这项对应选个人吉方、判断某月旺衰或指定出行时刻。",
+          "**颜色：**《月令》列青衣、苍玉；绿色是现代配色近似。古代颜色名、现代配色与个人幸运色效力是不同主张。",
+          "**数字：**《五行大义》分木的生数三、成数八；《月令》本项数为八。3、8是历史数理对应，不是已经验证的幸运数或预测概率。",
+          "**行业举例：**教育、文化、园林、医药、纺织属于本项目现代编辑类比，不是上述古籍给出的职业适配表；选择须结合能力、经验和实际岗位条件。",
+          "**医籍文化对应：**《素问·阴阳应象大论》列肝—筋—目，《灵枢·本输》列肝合胆。此为所选古代医籍的分类，不是八字测得的器官状态、疾病风险或现代解剖结论。",
+          "**计算层：**本程序的木元素出现量、工程旺衰与上述原典象义分别读取；旺弱标签不测量智力、诚信、主见或心理健康，也不据此认定身体、生育功能。",
+          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏不是《素问》的在藏对应。现代行业与配色另作编辑类比，未完成独立书影校勘或专家验收。"
+        ],
+        "curation": {
+          "method_id": "primary_element_correspondence_curation_v1",
+          "entry_revision": 1,
+          "classification": "selected_primary_digital_correspondences_and_modern_editorial_examples",
+          "classical_condition_tip_indexes": [
+            0,
+            1,
+            2,
+            3,
+            5
+          ],
+          "implementation_tip_indexes": [
+            6
+          ],
+          "editorial_tip_indexes": [
+            4,
+            7
+          ],
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微·性情",
+              "edition": "上海大東書局，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "source_pdf_pages": [
+                426,
+                427
+              ],
+              "support_scope": "五德、五气中和及偏枯的条件性象义；不为人格、IQ、诚信或任何工程旺衰系数背书。",
+              "supporting_tip_indexes": [
+                0
+              ]
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "禮記/月令",
+              "edition": "维基文库数字转录，固定修订11117084；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084",
+              "source_sha256": "a857b54e64d4c9876dd2d805420f53d6e2fa72e7b90a3bb0d93926bc99f9e9e0",
+              "source_revision_id": 11117084,
+              "supporting_tip_indexes": [
+                1,
+                2,
+                3
+              ],
+              "support_scope": "仅支持所列时序、礼制方位、颜色及本项数字；祭先不混作医籍藏体窍。"
+            },
+            {
+              "author": "蕭吉",
+              "title": "五行大義/1",
+              "edition": "维基文库数字转录，固定修订2361277；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277",
+              "source_sha256": "d98c622e402fa9704848024518ade43e564e3d6eb7db1dd5128212e483a5bb33",
+              "source_revision_id": 2361277,
+              "supporting_tip_indexes": [
+                3
+              ],
+              "support_scope": "卷一第二论五行及生成数的生数/成数；非幸运数效力或个体预测。"
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "黃帝內經/素問第二卷",
+              "edition": "维基文库数字转录，固定修订2627947；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947",
+              "source_sha256": "047c6a44d4fb6840df1c89d08ff82185953a93d18df382ee96630928341f807b",
+              "source_revision_id": 2627947,
+              "supporting_tip_indexes": [
+                5
+              ],
+              "support_scope": "阴阳应象大论的在地/在体/在藏/在窍原文分类；非现代医疗证据或个人诊断。"
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "黃帝內經/靈樞第一卷",
+              "edition": "维基文库数字转录，固定修订2099201；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201",
+              "source_sha256": "cc46078dd98a37b28158487cff5429f5259c56ce830460d12f89eadf6e109643",
+              "source_revision_id": 2099201,
+              "supporting_tip_indexes": [
+                5
+              ],
+              "support_scope": "本输第二的五藏合府配属；不转成个人风险、针灸或治疗建议。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/elements.py",
+              "source_sha256": "68f3f6ae850374e70ad70474f26c76802363dc4d740a3560ebdb6e981eab13f5",
+              "support_scope": "只支持元素出现量、季相和工程旺衰的程序定义；不为古籍、人格或医疗效度背书。"
+            }
+          ],
+          "tip_attribution": {
+            "0": "dtcw1947_xingqing",
+            "1": "liji;土另wuxingdayi和当前土支分类",
+            "2": "liji+明确标示的现代配色例",
+            "3": "wuxingdayi生数/成数与liji本项数分开",
+            "4": "modern_editorial_not_a_classical_industry_rule",
+            "5": "suwen2+lingshu1，仅医籍文化分类",
+            "6": "implementation_scope_not_empirical_measurement",
+            "7": "editorial_source_layer_and_review_limits"
+          },
+          "validation_status": "selected_textual_correspondences_not_medical_personality_or_efficacy_validation",
+          "review_status": "single_developer_digital_text_reading_scan_and_external_review_pending",
+          "known_overlap": "All5cards share the same four digitaltext captures and already exposed性情unit; no new charts or independent efficacy observations.",
+          "source_attribution_rule": "按tip索引区分原文、程序与现代编辑；礼制祭先、医籍在藏和命理象义不得互相充作来源。",
+          "citation": "FateBridge限域编释，非逐字引文；任鐵樵增注，李雨田校訂《任注滴天髓闡微·性情》上海大東書局，1947年4月初版 https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；古籍原文，成书与传承不作单一作者认定《禮記/月令》维基文库数字转录，固定修订11117084；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084；蕭吉《五行大義/1》维基文库数字转录，固定修订2361277；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277；古籍原文，成书与传承不作单一作者认定《黃帝內經/素問第二卷》维基文库数字转录，固定修订2627947；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947；古籍原文，成书与传承不作单一作者认定《黃帝內經/靈樞第一卷》维基文库数字转录，固定修订2099201；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201。任注性情PDF426–427；数字转录未完成书影独立校勘，原典分类与现代编辑另列，不代表人格、医疗或预测效度。",
+          "curated_on": "2026-10-22"
+        }
       },
       "火": {
         "title": "火",
         "tips": [
-          "火主礼，代表热情、光明、向上。",
-          "火旺者性格热情、有礼貌、有领导力。",
-          "火弱则缺乏热情、消极被动。",
-          "==",
-          "**方位：**南方",
-          "**季节：**夏季",
-          "**颜色：**红色、紫色",
-          "**数字：**2、7",
-          "**行业：**互联网、电子、餐饮、传媒、娱乐",
-          "==",
-          "**健康：**心脏、小肠、眼睛、血液"
-        ]
+          "传统象义：火主礼，以炎上、光明作文化描述。所选《任注滴天髓闡微·性情》还须看五气中和、偏枯及顺逆条件，不以单一元素旺弱鉴定个人品德或能力。",
+          "**方位与时序：**《礼记·月令》以立夏盛德在火、迎夏南郊，属于夏与南方的礼制时序对应；不能单凭这项对应选个人吉方、判断某月旺衰或指定出行时刻。",
+          "**颜色：**《月令》列朱衣、赤玉；紫色是现代配色类比。古代颜色名、现代配色与个人幸运色效力是不同主张。",
+          "**数字：**《五行大义》分火的生数二、成数七；《月令》本项数为七。2、7是历史数理对应，不是已经验证的幸运数或预测概率。",
+          "**行业举例：**互联网、电子、餐饮、传媒、娱乐属于本项目现代编辑类比，不是上述古籍给出的职业适配表；选择须结合能力、经验和实际岗位条件。",
+          "**医籍文化对应：**《素问·阴阳应象大论》列心—脉—舌，《灵枢·本输》列心合小肠。此为所选古代医籍的分类，不是八字测得的器官状态、疾病风险或现代解剖结论。",
+          "**计算层：**本程序的火元素出现量、工程旺衰与上述原典象义分别读取；旺弱标签不测量智力、诚信、主见或心理健康，也不据此认定身体、生育功能。",
+          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏不是《素问》的在藏对应。现代行业与配色另作编辑类比，未完成独立书影校勘或专家验收。"
+        ],
+        "curation": {
+          "method_id": "primary_element_correspondence_curation_v1",
+          "entry_revision": 1,
+          "classification": "selected_primary_digital_correspondences_and_modern_editorial_examples",
+          "classical_condition_tip_indexes": [
+            0,
+            1,
+            2,
+            3,
+            5
+          ],
+          "implementation_tip_indexes": [
+            6
+          ],
+          "editorial_tip_indexes": [
+            4,
+            7
+          ],
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微·性情",
+              "edition": "上海大東書局，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "source_pdf_pages": [
+                426,
+                427
+              ],
+              "support_scope": "五德、五气中和及偏枯的条件性象义；不为人格、IQ、诚信或任何工程旺衰系数背书。",
+              "supporting_tip_indexes": [
+                0
+              ]
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "禮記/月令",
+              "edition": "维基文库数字转录，固定修订11117084；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084",
+              "source_sha256": "a857b54e64d4c9876dd2d805420f53d6e2fa72e7b90a3bb0d93926bc99f9e9e0",
+              "source_revision_id": 11117084,
+              "supporting_tip_indexes": [
+                1,
+                2,
+                3
+              ],
+              "support_scope": "仅支持所列时序、礼制方位、颜色及本项数字；祭先不混作医籍藏体窍。"
+            },
+            {
+              "author": "蕭吉",
+              "title": "五行大義/1",
+              "edition": "维基文库数字转录，固定修订2361277；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277",
+              "source_sha256": "d98c622e402fa9704848024518ade43e564e3d6eb7db1dd5128212e483a5bb33",
+              "source_revision_id": 2361277,
+              "supporting_tip_indexes": [
+                3
+              ],
+              "support_scope": "卷一第二论五行及生成数的生数/成数；非幸运数效力或个体预测。"
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "黃帝內經/素問第二卷",
+              "edition": "维基文库数字转录，固定修订2627947；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947",
+              "source_sha256": "047c6a44d4fb6840df1c89d08ff82185953a93d18df382ee96630928341f807b",
+              "source_revision_id": 2627947,
+              "supporting_tip_indexes": [
+                5
+              ],
+              "support_scope": "阴阳应象大论的在地/在体/在藏/在窍原文分类；非现代医疗证据或个人诊断。"
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "黃帝內經/靈樞第一卷",
+              "edition": "维基文库数字转录，固定修订2099201；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201",
+              "source_sha256": "cc46078dd98a37b28158487cff5429f5259c56ce830460d12f89eadf6e109643",
+              "source_revision_id": 2099201,
+              "supporting_tip_indexes": [
+                5
+              ],
+              "support_scope": "本输第二的五藏合府配属；不转成个人风险、针灸或治疗建议。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/elements.py",
+              "source_sha256": "68f3f6ae850374e70ad70474f26c76802363dc4d740a3560ebdb6e981eab13f5",
+              "support_scope": "只支持元素出现量、季相和工程旺衰的程序定义；不为古籍、人格或医疗效度背书。"
+            }
+          ],
+          "tip_attribution": {
+            "0": "dtcw1947_xingqing",
+            "1": "liji;土另wuxingdayi和当前土支分类",
+            "2": "liji+明确标示的现代配色例",
+            "3": "wuxingdayi生数/成数与liji本项数分开",
+            "4": "modern_editorial_not_a_classical_industry_rule",
+            "5": "suwen2+lingshu1，仅医籍文化分类",
+            "6": "implementation_scope_not_empirical_measurement",
+            "7": "editorial_source_layer_and_review_limits"
+          },
+          "validation_status": "selected_textual_correspondences_not_medical_personality_or_efficacy_validation",
+          "review_status": "single_developer_digital_text_reading_scan_and_external_review_pending",
+          "known_overlap": "All5cards share the same four digitaltext captures and already exposed性情unit; no new charts or independent efficacy observations.",
+          "source_attribution_rule": "按tip索引区分原文、程序与现代编辑；礼制祭先、医籍在藏和命理象义不得互相充作来源。",
+          "citation": "FateBridge限域编释，非逐字引文；任鐵樵增注，李雨田校訂《任注滴天髓闡微·性情》上海大東書局，1947年4月初版 https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；古籍原文，成书与传承不作单一作者认定《禮記/月令》维基文库数字转录，固定修订11117084；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084；蕭吉《五行大義/1》维基文库数字转录，固定修订2361277；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277；古籍原文，成书与传承不作单一作者认定《黃帝內經/素問第二卷》维基文库数字转录，固定修订2627947；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947；古籍原文，成书与传承不作单一作者认定《黃帝內經/靈樞第一卷》维基文库数字转录，固定修订2099201；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201。任注性情PDF426–427；数字转录未完成书影独立校勘，原典分类与现代编辑另列，不代表人格、医疗或预测效度。",
+          "curated_on": "2026-10-22"
+        }
       },
       "土": {
         "title": "土",
         "tips": [
-          "土主信，代表稳定、包容、承载。",
-          "土旺者性格稳重、诚实守信、有包容心。",
-          "土弱则缺乏安全感、优柔寡断。",
-          "==",
-          "**方位：**中央",
-          "**季节：**四季月（辰戌丑未月）",
-          "**颜色：**黄色、棕色",
-          "**数字：**5、10",
-          "**行业：**房地产、农业、矿业、仓储、人力资源",
-          "==",
-          "**健康：**脾、胃、肌肉、口腔"
-        ]
+          "传统象义：土主信，以承载、稼穑作文化描述。所选《任注滴天髓闡微·性情》还须看五气中和、偏枯及顺逆条件，不以单一元素旺弱鉴定个人品德或能力。",
+          "**方位与时序：**《月令》另列中央土；《五行大义》另说土王四季、不独名一时。当前辰戌丑未的土支分类不等于每月全程土司令；分日说法有不同来源，须另核已选规则。",
+          "**颜色：**《月令》列黄衣、黄玉；棕色是现代配色类比。古代颜色名、现代配色与个人幸运色效力是不同主张。",
+          "**数字：**《五行大义》分土的生数五、成数十；《月令》本项数为五。5、10是历史数理对应，不是已经验证的幸运数或预测概率。",
+          "**行业举例：**房地产、农业、矿业、仓储、人力资源属于本项目现代编辑类比，不是上述古籍给出的职业适配表；选择须结合能力、经验和实际岗位条件。",
+          "**医籍文化对应：**《素问·阴阳应象大论》列脾—肉—口，《灵枢·本输》列脾合胃。此为所选古代医籍的分类，不是八字测得的器官状态、疾病风险或现代解剖结论。",
+          "**计算层：**本程序的土元素出现量、工程旺衰与上述原典象义分别读取；旺弱标签不测量智力、诚信、主见或心理健康，也不据此认定身体、生育功能。",
+          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏不是《素问》的在藏对应。现代行业与配色另作编辑类比，未完成独立书影校勘或专家验收。"
+        ],
+        "curation": {
+          "method_id": "primary_element_correspondence_curation_v1",
+          "entry_revision": 1,
+          "classification": "selected_primary_digital_correspondences_and_modern_editorial_examples",
+          "classical_condition_tip_indexes": [
+            0,
+            1,
+            2,
+            3,
+            5
+          ],
+          "implementation_tip_indexes": [
+            6
+          ],
+          "editorial_tip_indexes": [
+            4,
+            7
+          ],
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微·性情",
+              "edition": "上海大東書局，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "source_pdf_pages": [
+                426,
+                427
+              ],
+              "support_scope": "五德、五气中和及偏枯的条件性象义；不为人格、IQ、诚信或任何工程旺衰系数背书。",
+              "supporting_tip_indexes": [
+                0
+              ]
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "禮記/月令",
+              "edition": "维基文库数字转录，固定修订11117084；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084",
+              "source_sha256": "a857b54e64d4c9876dd2d805420f53d6e2fa72e7b90a3bb0d93926bc99f9e9e0",
+              "source_revision_id": 11117084,
+              "supporting_tip_indexes": [
+                1,
+                2,
+                3
+              ],
+              "support_scope": "仅支持所列时序、礼制方位、颜色及本项数字；祭先不混作医籍藏体窍。"
+            },
+            {
+              "author": "蕭吉",
+              "title": "五行大義/1",
+              "edition": "维基文库数字转录，固定修订2361277；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277",
+              "source_sha256": "d98c622e402fa9704848024518ade43e564e3d6eb7db1dd5128212e483a5bb33",
+              "source_revision_id": 2361277,
+              "supporting_tip_indexes": [
+                3
+              ],
+              "support_scope": "卷一第二论五行及生成数的生数/成数；非幸运数效力或个体预测。"
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "黃帝內經/素問第二卷",
+              "edition": "维基文库数字转录，固定修订2627947；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947",
+              "source_sha256": "047c6a44d4fb6840df1c89d08ff82185953a93d18df382ee96630928341f807b",
+              "source_revision_id": 2627947,
+              "supporting_tip_indexes": [
+                5
+              ],
+              "support_scope": "阴阳应象大论的在地/在体/在藏/在窍原文分类；非现代医疗证据或个人诊断。"
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "黃帝內經/靈樞第一卷",
+              "edition": "维基文库数字转录，固定修订2099201；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201",
+              "source_sha256": "cc46078dd98a37b28158487cff5429f5259c56ce830460d12f89eadf6e109643",
+              "source_revision_id": 2099201,
+              "supporting_tip_indexes": [
+                5
+              ],
+              "support_scope": "本输第二的五藏合府配属；不转成个人风险、针灸或治疗建议。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/elements.py",
+              "source_sha256": "68f3f6ae850374e70ad70474f26c76802363dc4d740a3560ebdb6e981eab13f5",
+              "support_scope": "只支持元素出现量、季相和工程旺衰的程序定义；不为古籍、人格或医疗效度背书。"
+            }
+          ],
+          "tip_attribution": {
+            "0": "dtcw1947_xingqing",
+            "1": "liji;土另wuxingdayi和当前土支分类",
+            "2": "liji+明确标示的现代配色例",
+            "3": "wuxingdayi生数/成数与liji本项数分开",
+            "4": "modern_editorial_not_a_classical_industry_rule",
+            "5": "suwen2+lingshu1，仅医籍文化分类",
+            "6": "implementation_scope_not_empirical_measurement",
+            "7": "editorial_source_layer_and_review_limits"
+          },
+          "validation_status": "selected_textual_correspondences_not_medical_personality_or_efficacy_validation",
+          "review_status": "single_developer_digital_text_reading_scan_and_external_review_pending",
+          "known_overlap": "All5cards share the same four digitaltext captures and already exposed性情unit; no new charts or independent efficacy observations.",
+          "source_attribution_rule": "按tip索引区分原文、程序与现代编辑；礼制祭先、医籍在藏和命理象义不得互相充作来源。",
+          "citation": "FateBridge限域编释，非逐字引文；任鐵樵增注，李雨田校訂《任注滴天髓闡微·性情》上海大東書局，1947年4月初版 https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；古籍原文，成书与传承不作单一作者认定《禮記/月令》维基文库数字转录，固定修订11117084；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084；蕭吉《五行大義/1》维基文库数字转录，固定修订2361277；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277；古籍原文，成书与传承不作单一作者认定《黃帝內經/素問第二卷》维基文库数字转录，固定修订2627947；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947；古籍原文，成书与传承不作单一作者认定《黃帝內經/靈樞第一卷》维基文库数字转录，固定修订2099201；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201。任注性情PDF426–427；数字转录未完成书影独立校勘，原典分类与现代编辑另列，不代表人格、医疗或预测效度。",
+          "curated_on": "2026-10-22"
+        }
       },
       "金": {
         "title": "金",
         "tips": [
-          "金主义，代表刚毅、果断、收敛。",
-          "金旺者性格果断、有正义感、追求完美。",
-          "金弱则缺乏魄力、优柔寡断。",
-          "==",
-          "**方位：**西方",
-          "**季节：**秋季",
-          "**颜色：**白色、银色",
-          "**数字：**4、9",
-          "**行业：**金融、法律、机械、汽车、珠宝",
-          "==",
-          "**健康：**肺、大肠、皮肤、骨骼"
-        ]
+          "传统象义：金主义，以收敛、从革作文化描述。所选《任注滴天髓闡微·性情》还须看五气中和、偏枯及顺逆条件，不以单一元素旺弱鉴定个人品德或能力。",
+          "**方位与时序：**《礼记·月令》以立秋盛德在金、迎秋西郊，属于秋与西方的礼制时序对应；不能单凭这项对应选个人吉方、判断某月旺衰或指定出行时刻。",
+          "**颜色：**《月令》列白衣、白玉；银色是现代材质配色类比。古代颜色名、现代配色与个人幸运色效力是不同主张。",
+          "**数字：**《五行大义》分金的生数四、成数九；《月令》本项数为九。4、9是历史数理对应，不是已经验证的幸运数或预测概率。",
+          "**行业举例：**金融、法律、机械、汽车、珠宝属于本项目现代编辑类比，不是上述古籍给出的职业适配表；选择须结合能力、经验和实际岗位条件。",
+          "**医籍文化对应：**《素问·阴阳应象大论》列肺—皮毛—鼻，《灵枢·本输》列肺合大肠。此为所选古代医籍的分类，不是八字测得的器官状态、疾病风险或现代解剖结论。",
+          "**计算层：**本程序的金元素出现量、工程旺衰与上述原典象义分别读取；旺弱标签不测量智力、诚信、主见或心理健康，也不据此认定身体、生育功能。",
+          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏不是《素问》的在藏对应。现代行业与配色另作编辑类比，未完成独立书影校勘或专家验收。"
+        ],
+        "curation": {
+          "method_id": "primary_element_correspondence_curation_v1",
+          "entry_revision": 1,
+          "classification": "selected_primary_digital_correspondences_and_modern_editorial_examples",
+          "classical_condition_tip_indexes": [
+            0,
+            1,
+            2,
+            3,
+            5
+          ],
+          "implementation_tip_indexes": [
+            6
+          ],
+          "editorial_tip_indexes": [
+            4,
+            7
+          ],
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微·性情",
+              "edition": "上海大東書局，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "source_pdf_pages": [
+                426,
+                427
+              ],
+              "support_scope": "五德、五气中和及偏枯的条件性象义；不为人格、IQ、诚信或任何工程旺衰系数背书。",
+              "supporting_tip_indexes": [
+                0
+              ]
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "禮記/月令",
+              "edition": "维基文库数字转录，固定修订11117084；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084",
+              "source_sha256": "a857b54e64d4c9876dd2d805420f53d6e2fa72e7b90a3bb0d93926bc99f9e9e0",
+              "source_revision_id": 11117084,
+              "supporting_tip_indexes": [
+                1,
+                2,
+                3
+              ],
+              "support_scope": "仅支持所列时序、礼制方位、颜色及本项数字；祭先不混作医籍藏体窍。"
+            },
+            {
+              "author": "蕭吉",
+              "title": "五行大義/1",
+              "edition": "维基文库数字转录，固定修订2361277；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277",
+              "source_sha256": "d98c622e402fa9704848024518ade43e564e3d6eb7db1dd5128212e483a5bb33",
+              "source_revision_id": 2361277,
+              "supporting_tip_indexes": [
+                3
+              ],
+              "support_scope": "卷一第二论五行及生成数的生数/成数；非幸运数效力或个体预测。"
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "黃帝內經/素問第二卷",
+              "edition": "维基文库数字转录，固定修订2627947；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947",
+              "source_sha256": "047c6a44d4fb6840df1c89d08ff82185953a93d18df382ee96630928341f807b",
+              "source_revision_id": 2627947,
+              "supporting_tip_indexes": [
+                5
+              ],
+              "support_scope": "阴阳应象大论的在地/在体/在藏/在窍原文分类；非现代医疗证据或个人诊断。"
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "黃帝內經/靈樞第一卷",
+              "edition": "维基文库数字转录，固定修订2099201；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201",
+              "source_sha256": "cc46078dd98a37b28158487cff5429f5259c56ce830460d12f89eadf6e109643",
+              "source_revision_id": 2099201,
+              "supporting_tip_indexes": [
+                5
+              ],
+              "support_scope": "本输第二的五藏合府配属；不转成个人风险、针灸或治疗建议。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/elements.py",
+              "source_sha256": "68f3f6ae850374e70ad70474f26c76802363dc4d740a3560ebdb6e981eab13f5",
+              "support_scope": "只支持元素出现量、季相和工程旺衰的程序定义；不为古籍、人格或医疗效度背书。"
+            }
+          ],
+          "tip_attribution": {
+            "0": "dtcw1947_xingqing",
+            "1": "liji;土另wuxingdayi和当前土支分类",
+            "2": "liji+明确标示的现代配色例",
+            "3": "wuxingdayi生数/成数与liji本项数分开",
+            "4": "modern_editorial_not_a_classical_industry_rule",
+            "5": "suwen2+lingshu1，仅医籍文化分类",
+            "6": "implementation_scope_not_empirical_measurement",
+            "7": "editorial_source_layer_and_review_limits"
+          },
+          "validation_status": "selected_textual_correspondences_not_medical_personality_or_efficacy_validation",
+          "review_status": "single_developer_digital_text_reading_scan_and_external_review_pending",
+          "known_overlap": "All5cards share the same four digitaltext captures and already exposed性情unit; no new charts or independent efficacy observations.",
+          "source_attribution_rule": "按tip索引区分原文、程序与现代编辑；礼制祭先、医籍在藏和命理象义不得互相充作来源。",
+          "citation": "FateBridge限域编释，非逐字引文；任鐵樵增注，李雨田校訂《任注滴天髓闡微·性情》上海大東書局，1947年4月初版 https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；古籍原文，成书与传承不作单一作者认定《禮記/月令》维基文库数字转录，固定修订11117084；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084；蕭吉《五行大義/1》维基文库数字转录，固定修订2361277；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277；古籍原文，成书与传承不作单一作者认定《黃帝內經/素問第二卷》维基文库数字转录，固定修订2627947；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947；古籍原文，成书与传承不作单一作者认定《黃帝內經/靈樞第一卷》维基文库数字转录，固定修订2099201；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201。任注性情PDF426–427；数字转录未完成书影独立校勘，原典分类与现代编辑另列，不代表人格、医疗或预测效度。",
+          "curated_on": "2026-10-22"
+        }
       },
       "水": {
         "title": "水",
         "tips": [
-          "水主智，代表智慧、灵活、流通。",
-          "水旺者聪明机敏、善于变通、有洞察力。",
-          "水弱则缺乏智慧、思维僵化。",
-          "==",
-          "**方位：**北方",
-          "**季节：**冬季",
-          "**颜色：**黑色、蓝色",
-          "**数字：**1、6",
-          "**行业：**贸易、物流、旅游、水产、咨询",
-          "==",
-          "**健康：**肾、膀胱、耳朵、生殖系统"
-        ]
+          "传统象义：水主智，以润下、流通作文化描述。所选《任注滴天髓闡微·性情》还须看五气中和、偏枯及顺逆条件，不以单一元素旺弱鉴定个人品德或能力。",
+          "**方位与时序：**《礼记·月令》以立冬盛德在水、迎冬北郊，属于冬与北方的礼制时序对应；不能单凭这项对应选个人吉方、判断某月旺衰或指定出行时刻。",
+          "**颜色：**《月令》列黑衣、玄玉；蓝色是现代配色类比。古代颜色名、现代配色与个人幸运色效力是不同主张。",
+          "**数字：**《五行大义》分水的生数一、成数六；《月令》本项数为六。1、6是历史数理对应，不是已经验证的幸运数或预测概率。",
+          "**行业举例：**贸易、物流、旅游、水产、咨询属于本项目现代编辑类比，不是上述古籍给出的职业适配表；选择须结合能力、经验和实际岗位条件。",
+          "**医籍文化对应：**《素问·阴阳应象大论》列肾—骨—耳，《灵枢·本输》列肾合膀胱。此为所选古代医籍的分类，不是八字测得的器官状态、疾病风险或现代解剖结论。",
+          "**计算层：**本程序的水元素出现量、工程旺衰与上述原典象义分别读取；旺弱标签不测量智力、诚信、主见或心理健康，也不据此认定身体、生育功能。",
+          "**出处与适用：**方位时序、颜色、数字和医籍分类按各自原文核对；《月令》的祭先脏不是《素问》的在藏对应。现代行业与配色另作编辑类比，未完成独立书影校勘或专家验收。"
+        ],
+        "curation": {
+          "method_id": "primary_element_correspondence_curation_v1",
+          "entry_revision": 1,
+          "classification": "selected_primary_digital_correspondences_and_modern_editorial_examples",
+          "classical_condition_tip_indexes": [
+            0,
+            1,
+            2,
+            3,
+            5
+          ],
+          "implementation_tip_indexes": [
+            6
+          ],
+          "editorial_tip_indexes": [
+            4,
+            7
+          ],
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微·性情",
+              "edition": "上海大東書局，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "source_pdf_pages": [
+                426,
+                427
+              ],
+              "support_scope": "五德、五气中和及偏枯的条件性象义；不为人格、IQ、诚信或任何工程旺衰系数背书。",
+              "supporting_tip_indexes": [
+                0
+              ]
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "禮記/月令",
+              "edition": "维基文库数字转录，固定修订11117084；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084",
+              "source_sha256": "a857b54e64d4c9876dd2d805420f53d6e2fa72e7b90a3bb0d93926bc99f9e9e0",
+              "source_revision_id": 11117084,
+              "supporting_tip_indexes": [
+                1,
+                2,
+                3
+              ],
+              "support_scope": "仅支持所列时序、礼制方位、颜色及本项数字；祭先不混作医籍藏体窍。"
+            },
+            {
+              "author": "蕭吉",
+              "title": "五行大義/1",
+              "edition": "维基文库数字转录，固定修订2361277；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277",
+              "source_sha256": "d98c622e402fa9704848024518ade43e564e3d6eb7db1dd5128212e483a5bb33",
+              "source_revision_id": 2361277,
+              "supporting_tip_indexes": [
+                3
+              ],
+              "support_scope": "卷一第二论五行及生成数的生数/成数；非幸运数效力或个体预测。"
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "黃帝內經/素問第二卷",
+              "edition": "维基文库数字转录，固定修订2627947；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947",
+              "source_sha256": "047c6a44d4fb6840df1c89d08ff82185953a93d18df382ee96630928341f807b",
+              "source_revision_id": 2627947,
+              "supporting_tip_indexes": [
+                5
+              ],
+              "support_scope": "阴阳应象大论的在地/在体/在藏/在窍原文分类；非现代医疗证据或个人诊断。"
+            },
+            {
+              "author": "古籍原文，成书与传承不作单一作者认定",
+              "title": "黃帝內經/靈樞第一卷",
+              "edition": "维基文库数字转录，固定修订2099201；未完成对应书影独立校勘",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201",
+              "source_sha256": "cc46078dd98a37b28158487cff5429f5259c56ce830460d12f89eadf6e109643",
+              "source_revision_id": 2099201,
+              "supporting_tip_indexes": [
+                5
+              ],
+              "support_scope": "本输第二的五藏合府配属；不转成个人风险、针灸或治疗建议。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/elements.py",
+              "source_sha256": "68f3f6ae850374e70ad70474f26c76802363dc4d740a3560ebdb6e981eab13f5",
+              "support_scope": "只支持元素出现量、季相和工程旺衰的程序定义；不为古籍、人格或医疗效度背书。"
+            }
+          ],
+          "tip_attribution": {
+            "0": "dtcw1947_xingqing",
+            "1": "liji;土另wuxingdayi和当前土支分类",
+            "2": "liji+明确标示的现代配色例",
+            "3": "wuxingdayi生数/成数与liji本项数分开",
+            "4": "modern_editorial_not_a_classical_industry_rule",
+            "5": "suwen2+lingshu1，仅医籍文化分类",
+            "6": "implementation_scope_not_empirical_measurement",
+            "7": "editorial_source_layer_and_review_limits"
+          },
+          "validation_status": "selected_textual_correspondences_not_medical_personality_or_efficacy_validation",
+          "review_status": "single_developer_digital_text_reading_scan_and_external_review_pending",
+          "known_overlap": "All5cards share the same four digitaltext captures and already exposed性情unit; no new charts or independent efficacy observations.",
+          "source_attribution_rule": "按tip索引区分原文、程序与现代编辑；礼制祭先、医籍在藏和命理象义不得互相充作来源。",
+          "citation": "FateBridge限域编释，非逐字引文；任鐵樵增注，李雨田校訂《任注滴天髓闡微·性情》上海大東書局，1947年4月初版 https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；古籍原文，成书与传承不作单一作者认定《禮記/月令》维基文库数字转录，固定修订11117084；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E7%A6%AE%E8%A8%98%2F%E6%9C%88%E4%BB%A4&oldid=11117084；蕭吉《五行大義/1》维基文库数字转录，固定修订2361277；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E4%BA%94%E8%A1%8C%E5%A4%A7%E7%BE%A9%2F1&oldid=2361277；古籍原文，成书与传承不作单一作者认定《黃帝內經/素問第二卷》维基文库数字转录，固定修订2627947；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E7%B4%A0%E5%95%8F%E7%AC%AC%E4%BA%8C%E5%8D%B7&oldid=2627947；古籍原文，成书与传承不作单一作者认定《黃帝內經/靈樞第一卷》维基文库数字转录，固定修订2099201；未完成对应书影独立校勘 https://zh.wikisource.org/w/index.php?title=%E9%BB%83%E5%B8%9D%E5%85%A7%E7%B6%93%2F%E9%9D%88%E6%A8%9E%E7%AC%AC%E4%B8%80%E5%8D%B7&oldid=2099201。任注性情PDF426–427；数字转录未完成书影独立校勘，原典分类与现代编辑另列，不代表人格、医疗或预测效度。",
+          "curated_on": "2026-10-22"
+        }
       }
     },
     "wealth": {
       "身财两停": {
         "title": "身财两停",
         "tips": [
-          "日主与财星力量相当，谓之身财两停，为富格之象。",
-          "身能任财，得财守财俱佳，财来有道、量入为出。",
-          "==",
-          "**用法：**身财平衡者宜稳健经营，行财运、食伤运财源更旺。"
+          "传统术语指身与财的相对力量适当，须审月令、根、位置和制化；计数相近或模型判中和不足以裁定。",
+          "本工具财务规则索引只是固定模型输出；实际收入、守财能力及财务稳定性须以现实记录核实。"
         ]
       },
       "财多身弱": {
         "title": "财多身弱",
         "tips": [
-          "命局财星过旺而日主衰弱，谓之财多身弱，富屋贫人之象。",
-          "见财而难守，易因贪多、投资、女色（男命）耗损。",
-          "==",
-          "**用法：**先扶身（比劫、印星、强根）再图财，忌盲目扩张与担保借贷。"
+          "传统结构候选：财与日主的相对力量需要原局条件裁定，不能只比较财星数量。",
+          "“弱”是所用模型的标签，不推出贫富、品行、伴侣行为或投资损失；不得据此套固定借贷或扩张结论。"
         ]
       },
       "身旺财旺": {
         "title": "身旺财旺",
         "tips": [
-          "日主旺而财星亦旺，身强能任旺财，财富层次高。",
-          "魄力与财源兼备，利于经商、投资与做大事业。",
-          "==",
-          "**用法：**逢行财乡、食伤生财之运大发，宜积极进取。"
+          "日主与财均有力量是传统候选描述；根、月令、位置及制化须分别验证，出现量不能直接测量有效力量。",
+          "不由这个标签认定财富层次、投资能力、经商适合度或某运发财。"
         ]
       },
       "食伤生财": {
         "title": "食伤生财",
         "tips": [
-          "食神、伤官生扶财星，谓之食伤生财，财源有活水之根。",
-          "以才华、技术、产品、内容变现，越做越旺。",
-          "==",
-          "**用法：**适合靠专业技能与创造力致富，胜于死守固定正财。"
+          "五行上食伤能生财；原典食神生财路径仍须核对月令、财根及身食财的相对力量，食伤与财共现不等于成格。",
+          "条文范围：《秘本子平真诠》国图藏本PDF76–78〈论食神〉；食神章条件不能直接泛化为所有伤官组合。",
+          "技术、产品或内容变现属于现代讨论类比，实际收益须由技能、需求、成本和执行记录核实。"
         ]
       },
       "比劫夺财": {
         "title": "比劫夺财",
         "tips": [
-          "比肩、劫财旺而克财，谓之比劫夺财，主破财、分财。",
-          "易因兄弟朋友、合伙、借贷、担保而损财。",
-          "==",
-          "**用法：**忌合伙与担保，账目宜清晰；得官杀制比劫则财可保。"
+          "比劫与财的传统制约关系须结合身财力量、位置、制化及救应判断；见比劫或数量偏高不足以认定夺财。",
+          "不从星数断朋友品行、合伙损失或债务结果；现实账目及合同是财务安排的依据。"
         ]
       },
       "财库": {
         "title": "财库（墓库财）",
         "tips": [
-          "辰戌丑未为四库，藏财者为财库：辰藏水财、戌藏火财、丑藏金财、未藏木财（以日主所克之五行入库论）。",
-          "财入库主积聚，但封藏不动；财库逢冲方能开库进财，主大财或不动产。",
-          "==",
-          "**用法：**命带财库者，逢冲库之大运流年易得大额钱财或置业变现。"
+          "本工具四墓对应：水辰、火戌、金丑、木未；财元素为日主所克。先核对实际库支、藏干和六冲端点。",
+          "条文范围：《秘本子平真诠》国图藏本PDF43–45〈论墓库刑冲之说〉，不支持普遍的“不冲不发”规则。",
+          "clash_present记录实际六冲，opened=null表示开库作用未裁定；库支、冲库与现实进财、置业是不同判断。",
+          "运年解释必须有原局库支和实际冲关系，不凭时间柱一个库字推出大额收益。"
         ]
       },
       "正财": {
         "title": "正财",
         "tips": [
-          "正财为日主所克且阴阳相异者，主正当、固定之财。",
-          "代表薪资、正业、稳健经营，财来有道、踏实积累。",
-          "==",
-          "**求财方式：**固定职业、稳定收入、量入为出的理财。"
+          "十神定义：日主所克、阴阳相异的干。透干及全部藏干的位置应分别保留。",
+          "持续收入、薪资或经营是现代类比；“正”不鉴定收入正当性、稳定性、品行或理财能力。"
         ]
       },
       "偏财": {
         "title": "偏财",
         "tips": [
-          "偏财为日主所克且阴阳相同者，主流动、意外之财。",
-          "代表投资、投机、副业、经商，眼光独到、财来财去波动大。",
-          "==",
-          "**求财方式：**投资、经商、副业拓展，宜把握时机、控制风险。"
+          "十神定义：日主所克、阴阳相同的干。透藏、根与位置不由单一出现量代替。",
+          "项目、交易或其他非固定收入是现代类比；“偏”不证明投资能力、横财、收益或风险偏好。"
         ]
       }
     },
     "health": {
       "五行藏象": {
-        "title": "五行藏象（五行配脏腑）",
+        "title": "五行藏象：旧术语与程序计数的区别",
         "tips": [
-          "木主肝胆、火主心与小肠、土主脾胃、金主肺与大肠、水主肾与膀胱。",
-          "五行以中和为贵，过旺过弱、缺失受克皆主对应脏腑之病。",
-          "==",
-          "**用法：**先看命局五行偏枯，再以受冲受克处定薄弱脏腑。"
-        ]
+          "旧资料用五行与脏腑名称作传统对应。本条只解释这一术语层，相关医籍版本的逐条校核仍待完成。",
+          "当前报告的element_distribution来自干支及藏干的符号计数和权重，findings.status只与五行平均权重作比较。",
+          "盘内缺失、偏多或偏少不构成脏腑功能、症状或疾病结论；现实身体情况需要现实医疗评估。"
+        ],
+        "curation": {
+          "method_id": "bazi_health_scope_cleanup_v1",
+          "entry_revision": 1,
+          "curated_on": "2026-10-22",
+          "classification": "computational_scope_and_legacy_terminology_cleanup",
+          "review_status": "computational_scope_only_correspondence_source_pending",
+          "validation_status": "medical_inference_not_supported_source_attribution_pending",
+          "source_refs": [],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/health.py",
+              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
+              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+            }
+          ],
+          "legacy_correspondence_status": "not_collated",
+          "citation": "FateBridge实现范围与旧术语释义；医籍对应的版本校核待完成，不作医学推断。"
+        }
       },
       "木主肝胆": {
-        "title": "木主肝胆",
+        "title": "木与肝胆：传统对应的范围",
         "tips": [
-          "木对应肝、胆、神经、筋膜、眼睛、情绪。",
-          "木过旺：肝火旺、易怒、头痛眩晕、筋骨酸痛。",
-          "木过弱或受克：肝胆虚弱、视力差、易疲劳、情志抑郁。"
-        ]
+          "木主肝胆是旧知识包的对应名称；本条保留查询键，医籍原文与印本归属尚待逐条校核，不把这个名称当作医学事实。",
+          "报告中的木只表示命盘五行符号及其权重；“盘内偏多”等标签描述木相对其他四类的计数，不是人体检查结果。",
+          "可解释木的透藏、计数和传统名称，不能据此推断肝胆、视力、神经或情绪疾病。"
+        ],
+        "curation": {
+          "method_id": "bazi_health_scope_cleanup_v1",
+          "entry_revision": 1,
+          "curated_on": "2026-10-22",
+          "classification": "computational_scope_and_legacy_terminology_cleanup",
+          "review_status": "computational_scope_only_correspondence_source_pending",
+          "validation_status": "medical_inference_not_supported_source_attribution_pending",
+          "source_refs": [],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/health.py",
+              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
+              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+            }
+          ],
+          "legacy_correspondence_status": "not_collated",
+          "citation": "FateBridge实现范围与旧术语释义；医籍对应的版本校核待完成，不作医学推断。"
+        }
       },
       "火主心": {
-        "title": "火主心与小肠",
+        "title": "火与心：传统对应的范围",
         "tips": [
-          "火对应心、小肠、血液循环、血压、精神。",
-          "火过旺：心火亢、失眠心悸、血压偏高、口舌生疮。",
-          "火过弱或受克：心气不足、循环不良、精神不振。"
-        ]
+          "火主心是旧知识包的传统对应名称，其医籍版本归属仍待逐条校核。",
+          "当前程序把火的干支权重列入五行分布；这与医学测得的循环或身体指标是不同数据来源。",
+          "火多火少可描述盘内结构，不能转换成心脏、血压、睡眠或精神健康判断。"
+        ],
+        "curation": {
+          "method_id": "bazi_health_scope_cleanup_v1",
+          "entry_revision": 1,
+          "curated_on": "2026-10-22",
+          "classification": "computational_scope_and_legacy_terminology_cleanup",
+          "review_status": "computational_scope_only_correspondence_source_pending",
+          "validation_status": "medical_inference_not_supported_source_attribution_pending",
+          "source_refs": [],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/health.py",
+              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
+              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+            }
+          ],
+          "legacy_correspondence_status": "not_collated",
+          "citation": "FateBridge实现范围与旧术语释义；医籍对应的版本校核待完成，不作医学推断。"
+        }
       },
       "土主脾胃": {
-        "title": "土主脾胃",
+        "title": "土与脾胃：传统对应的范围",
         "tips": [
-          "土对应脾、胃、消化、肌肉。",
-          "土过旺：脾湿、肠胃胀满、湿气重、易肥胖。",
-          "土过弱或受克：脾胃虚弱、消化不良、食欲差、易腹泻。"
-        ]
+          "土主脾胃是旧资料沿用的对应名称，相关原文与版本还未完成逐条核对。",
+          "程序中的土是干支五行分类与权重，偏多或偏少按同盘五类相对数值生成，不包含消化、体重或身体检查资料。",
+          "本条提供传统词语与计算范围说明，不从土的计数给出疾病或调理方向。"
+        ],
+        "curation": {
+          "method_id": "bazi_health_scope_cleanup_v1",
+          "entry_revision": 1,
+          "curated_on": "2026-10-22",
+          "classification": "computational_scope_and_legacy_terminology_cleanup",
+          "review_status": "computational_scope_only_correspondence_source_pending",
+          "validation_status": "medical_inference_not_supported_source_attribution_pending",
+          "source_refs": [],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/health.py",
+              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
+              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+            }
+          ],
+          "legacy_correspondence_status": "not_collated",
+          "citation": "FateBridge实现范围与旧术语释义；医籍对应的版本校核待完成，不作医学推断。"
+        }
       },
       "金主肺": {
-        "title": "金主肺与大肠",
+        "title": "金与肺：传统对应的范围",
         "tips": [
-          "金对应肺、大肠、呼吸、皮肤、鼻、免疫。",
-          "金过旺：肺燥、咳喘、皮肤干燥、易上火。",
-          "金过弱或受克：肺气虚、易感冒、呼吸道弱、皮肤过敏。"
-        ]
+          "金主肺是旧知识包的对应名称，医籍原文与版本仍待逐条校核。",
+          "报告中金的权重、透藏及其相对标签属于命盘符号资料，不包含呼吸、皮肤或免疫系统的测量。",
+          "可以解读金在该盘中的分类与生克关系，不把它转成器官功能、疾病风险或处置建议。"
+        ],
+        "curation": {
+          "method_id": "bazi_health_scope_cleanup_v1",
+          "entry_revision": 1,
+          "curated_on": "2026-10-22",
+          "classification": "computational_scope_and_legacy_terminology_cleanup",
+          "review_status": "computational_scope_only_correspondence_source_pending",
+          "validation_status": "medical_inference_not_supported_source_attribution_pending",
+          "source_refs": [],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/health.py",
+              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
+              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+            }
+          ],
+          "legacy_correspondence_status": "not_collated",
+          "citation": "FateBridge实现范围与旧术语释义；医籍对应的版本校核待完成，不作医学推断。"
+        }
       },
       "水主肾": {
-        "title": "水主肾与膀胱",
+        "title": "水与肾：传统对应的范围",
         "tips": [
-          "水对应肾、膀胱、泌尿、生殖、骨、耳、内分泌。",
-          "水过旺：水湿泛滥、水肿、肾水寒、泌尿频。",
-          "水过弱或受克：肾气虚、腰膝酸软、生殖泌尿弱、耳鸣骨弱。"
-        ]
+          "水主肾是旧资料的传统对应名称，其医籍出处与版本尚待逐条核对。",
+          "程序计量的是干支与藏干的水类权重，盘内有无与偏多少不表示人体水分、肾功能或生殖情况。",
+          "本条解释词语及软件范围，不由水的计数提出病症、生育能力或治疗时机结论。"
+        ],
+        "curation": {
+          "method_id": "bazi_health_scope_cleanup_v1",
+          "entry_revision": 1,
+          "curated_on": "2026-10-22",
+          "classification": "computational_scope_and_legacy_terminology_cleanup",
+          "review_status": "computational_scope_only_correspondence_source_pending",
+          "validation_status": "medical_inference_not_supported_source_attribution_pending",
+          "source_refs": [],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/health.py",
+              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
+              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+            }
+          ],
+          "legacy_correspondence_status": "not_collated",
+          "citation": "FateBridge实现范围与旧术语释义；医籍对应的版本校核待完成，不作医学推断。"
+        }
       },
       "七杀攻身": {
-        "title": "七杀攻身（健康风险）",
+        "title": "七杀克身：星位关系及制化前提",
         "tips": [
-          "七杀克身而无制化，主压力大、易劳损、意外伤灾。",
-          "岁运七杀引动、冲克日主之年，尤须减压防伤、注意体检。",
-          "==",
-          "**用法：**得食神制杀或印星化杀，则化险为夷。仅供参考，非医学诊断。"
-        ]
+          "七杀是克日主且同阴阳的干关系。“克身”首先描述这一符号关系，并不表示身体已经受伤。",
+          "所选子平原典区分食神制杀、印化、合与去留。实际分析须核对星位、根气、力量和制化，岁运触点也只说明何层关系进入讨论。",
+          "当前健康报告的health_timing保留干支触点与传统关系，不生成事故、劳损或医学风险指标。"
+        ],
+        "curation": {
+          "method_id": "bazi_health_scope_cleanup_v1",
+          "entry_revision": 1,
+          "curated_on": "2026-10-22",
+          "classification": "computational_scope_and_legacy_terminology_cleanup",
+          "review_status": "selected_classical_semantics_not_full_acceptance",
+          "validation_status": "source_semantics_and_implementation_scope_not_climate_adjudication",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                28,
+                39,
+                77
+              ],
+              "support_scope": "所列命理关系与格局/气候前提；不是医学判断、治疗依据或已完成的调候算法。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/health.py",
+              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
+              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+            }
+          ],
+          "legacy_correspondence_status": "not_used_for_medical_inference",
+          "citation": "FateBridge限域编释；所选《秘本子平真诠》PDF28,39,77；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；只支持命理语义及前提。"
+        }
       },
       "调候寒暖": {
-        "title": "调候寒暖燥湿",
+        "title": "调候与当前寒暖分组的区别",
         "tips": [
-          "命局火土过旺为燥热，水金过旺为寒湿，皆主病。",
-          "偏燥热宜滋阴润燥、清心降火；偏寒湿宜温阳祛湿、保暖健脾。",
-          "==",
-          "**用法：**以喜用神五行所主脏腑为调养重点。"
-        ]
+          "所选《子平真诠·论用神配气候得失》要求格局取用与时令气候互参，冬金、夏木等情境分别讨论；这是命理取用语义，不是医疗调理。",
+          "当前constitution.climate按火土权重之和与水金权重之和作工程分组，差值达到3才标为偏燥热或偏寒湿；这项规则未实现上述原典的月令调候裁定。",
+          "这些分组不表示人体寒热证候，不转成用药、调理或医疗择时方向；完整原典调候算法仍待补齐与独立验证。"
+        ],
+        "curation": {
+          "method_id": "bazi_health_scope_cleanup_v1",
+          "entry_revision": 1,
+          "curated_on": "2026-10-22",
+          "classification": "computational_scope_and_legacy_terminology_cleanup",
+          "review_status": "selected_classical_semantics_not_full_acceptance",
+          "validation_status": "source_semantics_and_implementation_scope_not_climate_adjudication",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                37,
+                38
+              ],
+              "support_scope": "所列命理关系与格局/气候前提；不是医学判断、治疗依据或已完成的调候算法。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/health.py",
+              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
+              "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
+            }
+          ],
+          "legacy_correspondence_status": "not_used_for_medical_inference",
+          "citation": "FateBridge限域编释；所选《秘本子平真诠》PDF37,38；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；只支持命理语义及前提。"
+        }
       }
     },
     "children": {
       "子女星": {
         "title": "子女星",
         "tips": [
-          "传统子平法：男命以官杀为子女，女命以食伤为子女。",
-          "子女星有力且为用，主子女缘厚、有出息；星弱不显则缘淡或晚得。",
-          "==",
-          "**用法：**结合子女宫（时柱）与岁运引动综合判断。"
-        ]
+          "所选《秘本子平真诠》以官杀配子女，同时明说不可拘于官杀，须另看时支、子星与全局喜忌；不能把一个星的有无当作结论。",
+          "当前模块按男命官杀、女命食伤取对应；女命食伤规则的扫描本出处本轮仍待校勘，不伪托为上述子平段落已经核准。",
+          "性别未知时程序保留官杀与食伤四类，并参计数；child_star.weight统计非日干每次1、各支每个对应藏干每次0.5，不是孩子人数或有效力量。",
+          "这些是命主盘内的传统对应，不判断子女性情、成就、亲疏、是否生育或何时生育；未见星也不表示亲人缺席。"
+        ],
+        "curation": {
+          "entry_revision": 1,
+          "review_status": "implementation_verified_classical_attribution_partial",
+          "validation_status": "topic_source_semantics_not_global_force_or_real_prediction",
+          "source_attribution_status": "partial_still_pending",
+          "source_refs": [
+            {
+              "source_id": "ziping_topic_conditions_v2",
+              "title": "秘本子平真诠",
+              "author": "沈孝瞻",
+              "edition": "国家图书馆藏本NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                52,
+                54,
+                55
+              ],
+              "scope": "只支持source_tip_indices标明的条件或范围；不支持现代学历、亲属状态、生育及考试效果，也不校定文昌表或女命规则。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/children.py",
+              "source_sha256": "aa000bb0f4c006e321fa646436584369a92d5225681d9eb14543d5ba374cab87",
+              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+            }
+          ],
+          "source_tip_indices": [
+            0
+          ],
+          "implementation_tip_indices": [
+            2
+          ],
+          "editorial_tip_indices": [
+            3
+          ],
+          "source_pending_tip_indices": [
+            1
+          ],
+          "independent_expert_review": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；文昌表或女命对应仍待扫描本校勘。"
+        }
       },
       "子女宫": {
         "title": "子女宫（时柱）",
         "tips": [
-          "时柱为子女宫，看子女缘分、成就与晚年得力。",
-          "时柱吉、逢生扶则子女得力孝顺；时支受冲则聚少离多、操心多。",
-          "==",
-          "**用法：**时柱十神定子女性情，时支冲合定亲子聚散。"
-        ]
+          "所选原典以时配子女，并将时支宫位与子星、全局喜忌分开核对；时柱不是孩子本人的命盘。",
+          "child_palace记录时支与年、月、日支的六合、六冲及本次是否命中；当前没有据此裁定合化、根损或完整子息吉凶。",
+          "冲、合或未命中仅描述命主盘内关系，不推断孝顺、亲疏、聚散、孩子状态或晚年赡养。"
+        ],
+        "curation": {
+          "entry_revision": 1,
+          "review_status": "selected_topic_conditions_not_full_acceptance",
+          "validation_status": "topic_source_semantics_not_global_force_or_real_prediction",
+          "source_attribution_status": "selected_source_conditions_collated",
+          "source_refs": [
+            {
+              "source_id": "ziping_topic_conditions_v2",
+              "title": "秘本子平真诠",
+              "author": "沈孝瞻",
+              "edition": "国家图书馆藏本NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                52,
+                54,
+                55
+              ],
+              "scope": "只支持source_tip_indices标明的条件或范围；不支持现代学历、亲属状态、生育及考试效果，也不校定文昌表或女命规则。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/children.py",
+              "source_sha256": "aa000bb0f4c006e321fa646436584369a92d5225681d9eb14543d5ba374cab87",
+              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+            }
+          ],
+          "source_tip_indices": [
+            0
+          ],
+          "implementation_tip_indices": [
+            1
+          ],
+          "editorial_tip_indices": [
+            2
+          ],
+          "source_pending_tip_indices": [],
+          "independent_expert_review": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+        }
       },
       "时柱十神看子女": {
         "title": "时柱十神看子女",
         "tips": [
-          "时见食神：子女聪慧温和孝顺；时见伤官：子女聪明才露而叛逆。",
-          "时见官星：子女端正有出息；时见七杀：子女刚强能成事而幼时费心。",
-          "时见印星：子女好学顾家；时见财星：子女务实善理财。"
-        ]
+          "原典把时支宫位、子星与全局条件分别讨论，没有把时干一个十神直接当作孩子的人格测评。",
+          "当前relationship.hour_ten_god为命主日干相对于时干的十神；trait及兼容字段achievement仅承载命主时柱的传统象意。",
+          "表达、责任、学习或资源是讨论主题，不推出孩子温和、叛逆、孝顺、学业、理财能力或未来职业；了解孩子应依据其实际表现。"
+        ],
+        "curation": {
+          "entry_revision": 1,
+          "review_status": "selected_topic_conditions_not_full_acceptance",
+          "validation_status": "topic_source_semantics_not_global_force_or_real_prediction",
+          "source_attribution_status": "selected_source_conditions_collated",
+          "source_refs": [
+            {
+              "source_id": "ziping_topic_conditions_v2",
+              "title": "秘本子平真诠",
+              "author": "沈孝瞻",
+              "edition": "国家图书馆藏本NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                52,
+                54,
+                55
+              ],
+              "scope": "只支持source_tip_indices标明的条件或范围；不支持现代学历、亲属状态、生育及考试效果，也不校定文昌表或女命规则。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/children.py",
+              "source_sha256": "aa000bb0f4c006e321fa646436584369a92d5225681d9eb14543d5ba374cab87",
+              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+            }
+          ],
+          "source_tip_indices": [
+            0
+          ],
+          "implementation_tip_indices": [
+            1
+          ],
+          "editorial_tip_indices": [
+            2
+          ],
+          "source_pending_tip_indices": [],
+          "independent_expert_review": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+        }
       },
       "生育时机": {
         "title": "生育时机",
         "tips": [
-          "大运流年引动子女星（男命官杀、女命食伤）之年，利于添丁。",
-          "流年合子女宫（时支）亦主子女缘分显现、生育之喜。",
-          "==",
-          "**用法：**冲子女宫之年备孕育儿宜多留意。"
-        ]
+          "所选原典论子女须合宫分、子星与全局条件，不提供已经过现代结果验证的生育窗口；原文人数、性别及经历断言不作当前预测依据。",
+          "children_timing只对已提供的大运、流年柱，记录其天干是否属当前子女星及其支是否与时支六合、六冲；没有计算日级受孕概率、妊娠状态或医学适宜性。",
+          "本轮未取得时间关系不表示没有子女缘；取得传统触点也不能据此安排备孕、生育、检查或治疗日期。"
+        ],
+        "curation": {
+          "entry_revision": 1,
+          "review_status": "selected_topic_conditions_not_full_acceptance",
+          "validation_status": "topic_source_semantics_not_global_force_or_real_prediction",
+          "source_attribution_status": "selected_source_conditions_collated",
+          "source_refs": [
+            {
+              "source_id": "ziping_topic_conditions_v2",
+              "title": "秘本子平真诠",
+              "author": "沈孝瞻",
+              "edition": "国家图书馆藏本NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                52,
+                54,
+                55
+              ],
+              "scope": "只支持source_tip_indices标明的条件或范围；不支持现代学历、亲属状态、生育及考试效果，也不校定文昌表或女命规则。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/children.py",
+              "source_sha256": "aa000bb0f4c006e321fa646436584369a92d5225681d9eb14543d5ba374cab87",
+              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+            }
+          ],
+          "source_tip_indices": [
+            0
+          ],
+          "implementation_tip_indices": [
+            1
+          ],
+          "editorial_tip_indices": [
+            2
+          ],
+          "source_pending_tip_indices": [],
+          "independent_expert_review": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+        }
       }
     },
     "education": {
       "印星主学历": {
         "title": "印星主学历",
         "tips": [
-          "印绶主学习力、记忆、文凭与文书，为看学历之首要十神。",
-          "印星有力且为用，主读书运好、学历高；命无印则学历靠后天努力或以技艺见长。",
-          "==",
-          "**用法：**印为忌而过旺，反主依赖、思想保守、学而不化。"
-        ]
+          "所选《秘本子平真诠》论印分印格用官、身印两旺用食伤及印重用财等条件；正偏印同格论，不把印的出现量等同有效力量。",
+          "本模块study_stars.seal_weight是正偏印的固定加权出现量；education_level是未校准规则索引，尚未裁定上述成格、旺衰及喜忌。",
+          "学历、记忆与学习能力需要实际学习记录和测评；不能由有印、无印或印多推出学历高低、依赖或思想保守。"
+        ],
+        "curation": {
+          "entry_revision": 1,
+          "review_status": "selected_topic_conditions_not_full_acceptance",
+          "validation_status": "topic_source_semantics_not_global_force_or_real_prediction",
+          "source_attribution_status": "selected_source_conditions_collated",
+          "source_refs": [
+            {
+              "source_id": "ziping_topic_conditions_v2",
+              "title": "秘本子平真诠",
+              "author": "沈孝瞻",
+              "edition": "国家图书馆藏本NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                28,
+                72,
+                73,
+                74,
+                75
+              ],
+              "scope": "只支持source_tip_indices标明的条件或范围；不支持现代学历、亲属状态、生育及考试效果，也不校定文昌表或女命规则。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/education.py",
+              "source_sha256": "e4b47876696af06ef1cbbfa297f42695279ab9eb5503bb9f1975f29f4be03872",
+              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+            }
+          ],
+          "source_tip_indices": [
+            0
+          ],
+          "implementation_tip_indices": [
+            1
+          ],
+          "editorial_tip_indices": [
+            2
+          ],
+          "source_pending_tip_indices": [],
+          "independent_expert_review": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,72,73,74,75；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+        }
       },
       "官印相生": {
         "title": "官印相生",
         "tips": [
-          "官星生印、印星护身，谓之官印相生，为高学历与功名之经典格。",
-          "利于体制内、学术研究与考试功名。",
-          "==",
-          "**用法：**官印相生而清纯有力者，多得高学历与名位。"
-        ]
+          "所选原典的印格用官需分官印双全、印根、身印轻重与是否被财食破坏；印生身、官生印是生克方向，官印共现不自动满足路径和成格。",
+          "当前模块把官杀与印的加权计数均至少1记为一项规则条件；此处合并官杀，不把七杀计数误说成已经成立的正官生印。",
+          "官印相生是传统条件术语，不由它认定高学历、考试录取、体制岗位或社会名位。"
+        ],
+        "curation": {
+          "entry_revision": 1,
+          "review_status": "selected_topic_conditions_not_full_acceptance",
+          "validation_status": "topic_source_semantics_not_global_force_or_real_prediction",
+          "source_attribution_status": "selected_source_conditions_collated",
+          "source_refs": [
+            {
+              "source_id": "ziping_topic_conditions_v2",
+              "title": "秘本子平真诠",
+              "author": "沈孝瞻",
+              "edition": "国家图书馆藏本NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                28,
+                72,
+                73,
+                75
+              ],
+              "scope": "只支持source_tip_indices标明的条件或范围；不支持现代学历、亲属状态、生育及考试效果，也不校定文昌表或女命规则。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/education.py",
+              "source_sha256": "e4b47876696af06ef1cbbfa297f42695279ab9eb5503bb9f1975f29f4be03872",
+              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+            }
+          ],
+          "source_tip_indices": [
+            0
+          ],
+          "implementation_tip_indices": [
+            1
+          ],
+          "editorial_tip_indices": [
+            2
+          ],
+          "source_pending_tip_indices": [],
+          "independent_expert_review": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,72,73,75；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+        }
       },
       "食伤主才华": {
         "title": "食伤主才华",
         "tips": [
-          "食神、伤官主聪明、才艺、表达与创造力。",
-          "食伤配印则才学兼备，宜深造；食伤无印则才高而定力不足。",
-          "==",
-          "**用法：**食伤旺者宜走才艺、技术、表达类学科。"
-        ]
+          "原典将食神、伤官分别讨论：生财、制杀、佩印或用官各有身、印、食伤的轻重、根气、季候和位置条件。身印两旺可用食伤泄气，不能一概称食伤无印便定力不足。",
+          "本模块food_hurt_weight合计食神与伤官出现量；subject_orientation按印、食伤、官杀计数列出全部最高项，表达与制作是现代主题类比。",
+          "传统吐秀、文学象义不测量智力或创造力，也不能据此决定专业、深造资格或孩子的才能。"
+        ],
+        "curation": {
+          "entry_revision": 1,
+          "review_status": "selected_topic_conditions_not_full_acceptance",
+          "validation_status": "topic_source_semantics_not_global_force_or_real_prediction",
+          "source_attribution_status": "selected_source_conditions_collated",
+          "source_refs": [
+            {
+              "source_id": "ziping_topic_conditions_v2",
+              "title": "秘本子平真诠",
+              "author": "沈孝瞻",
+              "edition": "国家图书馆藏本NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                28,
+                73,
+                76,
+                77,
+                78,
+                82,
+                83,
+                84,
+                85
+              ],
+              "scope": "只支持source_tip_indices标明的条件或范围；不支持现代学历、亲属状态、生育及考试效果，也不校定文昌表或女命规则。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/education.py",
+              "source_sha256": "e4b47876696af06ef1cbbfa297f42695279ab9eb5503bb9f1975f29f4be03872",
+              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+            }
+          ],
+          "source_tip_indices": [
+            0
+          ],
+          "implementation_tip_indices": [
+            1
+          ],
+          "editorial_tip_indices": [
+            2
+          ],
+          "source_pending_tip_indices": [],
+          "independent_expert_review": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,73,76,77,78,82,83,84,85；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+        }
       },
       "文昌贵人": {
         "title": "文昌贵人",
         "tips": [
-          "文昌以日干（或年干）查地支：甲巳、乙午、丙戊申、丁己酉、庚亥、辛子、壬寅、癸卯。",
-          "命带文昌主聪慧好学、利读书考试与文书。",
-          "==",
-          "**用法：**逢文昌之大运流年学运、考运增强。"
-        ]
+          "所选《秘本子平真诠》论星辰无关格局，强调月令四柱配合；该章没有本工具的文昌十干表，不能把神煞命中当作格局成败。",
+          "本工具学业模块只按日干查四柱地支：甲巳、乙午、丙戊申、丁己酉、庚亥、辛子、壬寅、癸卯。wenchang_branch与hit_pillars分别返回目标支和全部命中柱位，不同时按年干另算。",
+          "该十干表的原始版本及异文仍待校勘；此处明确其当前程序依据，不把表与原典已核条件或现实效力混为一谈。",
+          "文昌是查表标签，不测量聪明、文采或学习能力；本学业模块也不由大运流年文昌计算考试成功概率。"
+        ],
+        "curation": {
+          "entry_revision": 1,
+          "review_status": "implementation_verified_classical_attribution_partial",
+          "validation_status": "topic_source_semantics_not_global_force_or_real_prediction",
+          "source_attribution_status": "partial_still_pending",
+          "source_refs": [
+            {
+              "source_id": "ziping_topic_conditions_v2",
+              "title": "秘本子平真诠",
+              "author": "沈孝瞻",
+              "edition": "国家图书馆藏本NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                49,
+                50,
+                51
+              ],
+              "scope": "只支持source_tip_indices标明的条件或范围；不支持现代学历、亲属状态、生育及考试效果，也不校定文昌表或女命规则。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/education.py",
+              "source_sha256": "e4b47876696af06ef1cbbfa297f42695279ab9eb5503bb9f1975f29f4be03872",
+              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+            }
+          ],
+          "source_tip_indices": [
+            0
+          ],
+          "implementation_tip_indices": [
+            1
+          ],
+          "editorial_tip_indices": [
+            3
+          ],
+          "source_pending_tip_indices": [
+            2
+          ],
+          "independent_expert_review": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF49,50,51；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；文昌表或女命对应仍待扫描本校勘。"
+        }
       },
       "财破印": {
         "title": "财破印（学业破格）",
         "tips": [
-          "财星旺而克破印星，谓之财破印，主求学受外务、经济或逐利牵扯而中断。",
-          "==",
-          "**用法：**求学阶段宜专心、节制逐利；得比劫帮身或官星通关则解。"
-        ]
+          "财克印是生克关系，财是否破印仍须审所用之印、身印力量、财根、位置与合制。所选原典同时有印重身强用财、合财存印及合印存财等分支，不能把财印同现都判破格。",
+          "当前模块仅在财计数至少2且印计数大于0、不超过1时扣固定规则分；没有据此算出财已经克坏印，也未完成官星通关或比劫救应的有效力量裁定。",
+          "不从这个规则条件断求学中断、经济困境或动机；现实学习计划须依据课程、资金和实际时间安排。"
+        ],
+        "curation": {
+          "entry_revision": 1,
+          "review_status": "selected_topic_conditions_not_full_acceptance",
+          "validation_status": "topic_source_semantics_not_global_force_or_real_prediction",
+          "source_attribution_status": "selected_source_conditions_collated",
+          "source_refs": [
+            {
+              "source_id": "ziping_topic_conditions_v2",
+              "title": "秘本子平真诠",
+              "author": "沈孝瞻",
+              "edition": "国家图书馆藏本NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                28,
+                30,
+                73,
+                74,
+                75
+              ],
+              "scope": "只支持source_tip_indices标明的条件或范围；不支持现代学历、亲属状态、生育及考试效果，也不校定文昌表或女命规则。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/education.py",
+              "source_sha256": "e4b47876696af06ef1cbbfa297f42695279ab9eb5503bb9f1975f29f4be03872",
+              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+            }
+          ],
+          "source_tip_indices": [
+            0
+          ],
+          "implementation_tip_indices": [
+            1
+          ],
+          "editorial_tip_indices": [
+            2
+          ],
+          "source_pending_tip_indices": [],
+          "independent_expert_review": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,30,73,74,75；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+        }
       },
       "伤官见官": {
         "title": "伤官见官（学途波折）",
         "tips": [
-          "伤官见官而无印制化，主与师长、制度生摩擦，学途易有波折。",
-          "==",
-          "**用法：**得印星制伤护官，或伤官生财而不见官，则无碍。"
-        ]
+          "所选原典要求分别察气候、强弱、喜忌和位置；金水伤官用官以及非金水的化伤为财、生官等变法均有具体条件，不能把见官或缺印一概判败。",
+          "当前模块只检查非日干同时透伤官、正官且印计数低于1，触发固定规则扣分；未判定有效制伤、护官、化财或救应。",
+          "伤官见官不认证与师长冲突、学途波折或现实违规；缺印也不证明无人支持或不宜求学。"
+        ],
+        "curation": {
+          "entry_revision": 1,
+          "review_status": "selected_topic_conditions_not_full_acceptance",
+          "validation_status": "topic_source_semantics_not_global_force_or_real_prediction",
+          "source_attribution_status": "selected_source_conditions_collated",
+          "source_refs": [
+            {
+              "source_id": "ziping_topic_conditions_v2",
+              "title": "秘本子平真诠",
+              "author": "沈孝瞻",
+              "edition": "国家图书馆藏本NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                28,
+                30,
+                82,
+                83,
+                84,
+                85
+              ],
+              "scope": "只支持source_tip_indices标明的条件或范围；不支持现代学历、亲属状态、生育及考试效果，也不校定文昌表或女命规则。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/education.py",
+              "source_sha256": "e4b47876696af06ef1cbbfa297f42695279ab9eb5503bb9f1975f29f4be03872",
+              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+            }
+          ],
+          "source_tip_indices": [
+            0
+          ],
+          "implementation_tip_indices": [
+            1
+          ],
+          "editorial_tip_indices": [
+            2
+          ],
+          "source_pending_tip_indices": [],
+          "independent_expert_review": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,30,82,83,84,85；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+        }
       }
     },
     "personality": {
       "日主五行心性": {
         "title": "日主五行心性",
         "tips": [
-          "日主五行定基本心性：木主仁、火主礼、土主信、金主义、水主智。",
-          "木仁慈进取、火热情礼貌、土诚信稳重、金重义果断、水聪明灵活。",
-          "==",
-          "**用法：**五行过旺则其性偏激（如木过则固执、火过则急躁）。"
+          "木仁、火礼、土信、金义、水智是传统五行象义，可作为自我讨论词汇。",
+          "这些字不测量人格、智力、诚信或道德，也不从元素出现量断性格偏激。"
         ]
       },
       "十神定性格": {
         "title": "十神定性格",
         "tips": [
-          "主导十神决定行为风格：比劫独立竞争、食伤才华表达、财星务实交际、官杀自律魄力、印星仁厚好学。",
-          "==",
-          "**用法：**取命局力量最强的一两个十神断主性情。"
+          "比劫、食伤、财、官杀、印是相对日主的关系分类；行为风格映射属于本工具的现代类比。",
+          "按实际计数保留全部并列和次项，不由枚举顺序挑唯一主性格；权重不是经过心理测量的特质强度。",
+          "解释应对照用户的实际经历，不用十神标签认定他人的人格或行为。"
         ]
       },
       "强弱定刚柔": {
         "title": "身强身弱定刚柔内外",
         "tips": [
-          "日主强者主见足、外向主动，过则刚愎；日主弱者随和谦逊、内敛，过则依赖。",
-          "阳干主刚健主动，阴干主柔顺内敛。"
+          "日主强弱是所用扶抑计算模型的分类；原典根类、月令及数值计权应分别核对。",
+          "模型强弱、阴阳不直接测量外向、依赖、决断或人格刚柔，未裁定的相对力量继续保留未知。"
         ]
       }
     },
@@ -773,25 +2649,160 @@
       "六亲取象": {
         "title": "六亲取象",
         "tips": [
-          "子平六亲法：父为偏财、母为正印、兄弟姐妹为比劫、配偶为财（男）/官杀（女）、子女为官杀（男）/食伤（女）。",
-          "==",
-          "**用法：**星之有力旺相主缘厚得助，星弱受克主缘薄。"
-        ]
+          "所选《秘本子平真诠》以正印配母、偏财配父、正财配妻、官杀配子女、比肩配兄弟；原文另察所在柱位、喜忌与有力无力，取象不等于现实状况。",
+          "当前relatives模块只统计父星偏财、母星正印及比肩劫财同辈，性别参数不改变这两项父母星映射；不把它说成已测量亲疏或实际支持。",
+          "女命配偶及子女的另一套对应不由本段核准；其他原典的阴阳干取法差异也不能无声明混入当前计数，相关扫描本归属仍待校勘。",
+          "同一亲属的传统星、宫位和现实关系须分开；未见对应星不能断亲人缺席，计数高也不保证获得帮助。"
+        ],
+        "curation": {
+          "entry_revision": 1,
+          "review_status": "implementation_verified_classical_attribution_partial",
+          "validation_status": "topic_source_semantics_not_global_force_or_real_prediction",
+          "source_attribution_status": "partial_still_pending",
+          "source_refs": [
+            {
+              "source_id": "ziping_topic_conditions_v2",
+              "title": "秘本子平真诠",
+              "author": "沈孝瞻",
+              "edition": "国家图书馆藏本NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                52,
+                53
+              ],
+              "scope": "只支持source_tip_indices标明的条件或范围；不支持现代学历、亲属状态、生育及考试效果，也不校定文昌表或女命规则。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/relatives.py",
+              "source_sha256": "0fccc3f89b18dd9e37892d5538b9c7cce8108416225ba7d39f0401f63efe9782",
+              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+            }
+          ],
+          "source_tip_indices": [
+            0
+          ],
+          "implementation_tip_indices": [
+            1
+          ],
+          "editorial_tip_indices": [
+            3
+          ],
+          "source_pending_tip_indices": [
+            2
+          ],
+          "independent_expert_review": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,53；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；文昌表或女命对应仍待扫描本校勘。"
+        }
       },
       "六亲宫位": {
         "title": "六亲宫位",
         "tips": [
-          "年柱主祖上/父母，月柱主父母/兄弟，日支主配偶，时柱主子女。",
-          "宫逢生扶则亲厚得力，宫逢冲克则聚少离多或有刑伤。"
-        ]
+          "所选子平本宫分按年、月、日、时分别配祖、父、妻、子。星的取象与宫位另分，不能把年月日时的次序或月柱一概主兄弟说成该段原文。",
+          "当前模块保留年柱与月柱，分别检查它们的支与日支是否六合、六冲；模块沿用年柱祖上／父母、月柱父母／兄弟的说明，范围不等于上述原典宫分。",
+          "接口的未命中只表示这四项检查未命中，不代表现实关系平稳；合冲不推出离乡、聚散、刑伤或亲人遭遇。"
+        ],
+        "curation": {
+          "entry_revision": 1,
+          "review_status": "selected_topic_conditions_not_full_acceptance",
+          "validation_status": "topic_source_semantics_not_global_force_or_real_prediction",
+          "source_attribution_status": "selected_source_conditions_collated",
+          "source_refs": [
+            {
+              "source_id": "ziping_topic_conditions_v2",
+              "title": "秘本子平真诠",
+              "author": "沈孝瞻",
+              "edition": "国家图书馆藏本NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                52,
+                53,
+                54,
+                55
+              ],
+              "scope": "只支持source_tip_indices标明的条件或范围；不支持现代学历、亲属状态、生育及考试效果，也不校定文昌表或女命规则。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/relatives.py",
+              "source_sha256": "0fccc3f89b18dd9e37892d5538b9c7cce8108416225ba7d39f0401f63efe9782",
+              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+            }
+          ],
+          "source_tip_indices": [
+            0
+          ],
+          "implementation_tip_indices": [
+            1
+          ],
+          "editorial_tip_indices": [
+            2
+          ],
+          "source_pending_tip_indices": [],
+          "independent_expert_review": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,53,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+        }
       },
       "比劫论手足": {
         "title": "比劫论兄弟姐妹",
         "tips": [
-          "比劫为兄弟姐妹、朋友、同辈。比劫帮身（身弱）为助力，比劫夺财（身强）主竞争耗财。",
-          "==",
-          "**用法：**身弱喜比劫得手足之助，身旺忌比劫防被分夺。"
-        ]
+          "所选原典以比肩类比兄弟，并另审全局喜忌及有力无力；不能只凭身强弱标签就决定手足相助或分夺。",
+          "当前siblings.sibling_star_weight合计比肩、劫财的加权出现量，support另列印比计数；未裁定比劫帮身、夺财或实际资源大小。",
+          "传统同辈取象不换算兄弟姐妹人数、朋友品行、借贷或合伙结果；现实助力以沟通、资源和具体承诺核实。"
+        ],
+        "curation": {
+          "entry_revision": 1,
+          "review_status": "selected_topic_conditions_not_full_acceptance",
+          "validation_status": "topic_source_semantics_not_global_force_or_real_prediction",
+          "source_attribution_status": "selected_source_conditions_collated",
+          "source_refs": [
+            {
+              "source_id": "ziping_topic_conditions_v2",
+              "title": "秘本子平真诠",
+              "author": "沈孝瞻",
+              "edition": "国家图书馆藏本NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "source_pdf_pages": [
+                52,
+                53
+              ],
+              "scope": "只支持source_tip_indices标明的条件或范围；不支持现代学历、亲属状态、生育及考试效果，也不校定文昌表或女命规则。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/relatives.py",
+              "source_sha256": "0fccc3f89b18dd9e37892d5538b9c7cce8108416225ba7d39f0401f63efe9782",
+              "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
+            }
+          ],
+          "source_tip_indices": [
+            0
+          ],
+          "implementation_tip_indices": [
+            1
+          ],
+          "editorial_tip_indices": [
+            2
+          ],
+          "source_pending_tip_indices": [],
+          "independent_expert_review": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,53；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
+        }
       }
     },
     "romance": {
@@ -819,6 +2830,1009 @@
           "==",
           "**用法：**大运流年引动异性缘星或桃花，主感情际遇、正缘出现。"
         ]
+      }
+    },
+    "classical_force_semantics": {
+      "身强印旺与印用食伤": {
+        "title": "身强印旺：印格用食伤的前提",
+        "tips": [
+          "所选原典在印格用食伤处分列身强和印旺两个条件，讨论泄身以为秀气。两个条件不等于一个身印合计分数。",
+          "须分别考察日主与印的根气、透藏、力量和食伤路径；本系统的原典力量裁定仍为未完成，工程能量只列作模型观察。",
+          "原典列李状元例，所选扫描本印作乙亥时；按五鼠遁推得己亥的推导候选另行保存，目前未据此认定存在第二版本或静默改字。"
+        ],
+        "curation": {
+          "method_id": "ziping_force_terms_v1",
+          "entry_revision": 1,
+          "classification": "selected_classical_semantics_known_development_examples",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "source_pdf_pages": [
+                73,
+                74
+              ]
+            }
+          ],
+          "known_overlap": "bazi_root_force_experiment_v1; not new independent observations",
+          "validation_status": "text_semantics_not_model_force_adjudication",
+          "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF73,74；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
+          "curated_on": "2026-10-22"
+        }
+      },
+      "身重印轻": {
+        "title": "身重印轻：两个力量维度",
+        "tips": [
+          "所选原典直接称茅状元例为身重印轻，列壬寅、戊申、壬辰、壬寅，位于印格论用偏官的上下文。",
+          "身重与印轻是分别指向日主和印的判断，不能只看印星数量，也不能用一个现代合计标签替代。",
+          "此例已在既有34例开发后对照中登记，正式v2的中和与原文身重映射强的分歧仍保留；本条不是新增独立成功样本。"
+        ],
+        "curation": {
+          "method_id": "ziping_force_terms_v1",
+          "entry_revision": 1,
+          "classification": "selected_classical_semantics_known_development_examples",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "source_pdf_pages": [
+                73,
+                74
+              ]
+            }
+          ],
+          "known_overlap": "bazi_root_force_experiment_v1; not new independent observations",
+          "validation_status": "text_semantics_not_model_force_adjudication",
+          "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF73,74；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
+          "curated_on": "2026-10-22"
+        }
+      },
+      "身轻印重": {
+        "title": "身轻印重：身与印不能合并判定",
+        "tips": [
+          "所选原典直接称马参政例为身轻印重，列己巳、癸酉、癸未、庚申，与茅状元例并举。",
+          "印重可以与身轻同时成立；把生扶都合并为一个强弱指标，会丢失本段论用官杀或食伤所需的区分。",
+          "此例已在既有34例中登记。正式v2输出强而原文为身轻的分歧尚未解决；同次force_components分别列身印资料，未自动认证原典结论。"
+        ],
+        "curation": {
+          "method_id": "ziping_force_terms_v1",
+          "entry_revision": 1,
+          "classification": "selected_classical_semantics_known_development_examples",
+          "source_refs": [
+            {
+              "author": "沈孝瞻",
+              "title": "秘本子平真诠",
+              "edition": "国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf",
+              "source_sha256": "71402a780b0351b54edf121a51bc4a4a4ce5896496c35b954563ee06f1a6f620",
+              "support_scope": "所列原典分支及适用前提；编释不是逐字引文，也不覆盖现实结果或全部流派。",
+              "source_pdf_pages": [
+                73,
+                74
+              ]
+            }
+          ],
+          "known_overlap": "bazi_root_force_experiment_v1; not new independent observations",
+          "validation_status": "text_semantics_not_model_force_adjudication",
+          "citation": "FateBridge限域编释；沈孝瞻《秘本子平真诠》；国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行；PDF73,74；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典分支与编辑边界分开，非逐字引文。",
+          "curated_on": "2026-10-22"
+        }
+      },
+      "身杀两停": {
+        "title": "身杀两停",
+        "tips": [
+          "所选《任注滴天髓闡微》在壬申、丙午、庚辰、庚辰例分述丙火杀旺、壬水根固、日主有比肩之助及土的化生，随后称身杀两停。",
+          "两停是身与杀的相对配合；原文没有本系统的五行比例或中和阈值，不能直接把它转换成工程全局中和标签。",
+          "解释须分别列出身、杀及印比、食伤的根气、透藏和路径。本系统尚未完成该条件的原典力量裁定，不能因名词出现就宣称已经算出两停。",
+          "原文的仕途叙述不是本系统预测现实的验收资料。此条为选定版本的限域编释，未由第二位专家独立复核。"
+        ],
+        "curation": {
+          "method_id": "dtcw1947_force_terms_v1",
+          "entry_revision": 1,
+          "classification": "selected_classical_semantics_explicit_conditions_not_force_verdict",
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微",
+              "edition": "上海大東書局，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "support_scope": "所列本版原典语义与条件的编辑编释；非逐字引文，不覆盖所有版本、整部规则或现实效力。",
+              "source_pdf_pages": [
+                118
+              ]
+            }
+          ],
+          "classical_condition_tip_indexes": [
+            0
+          ],
+          "editorial_tip_indexes": [
+            1,
+            2,
+            3
+          ],
+          "review_status": "selected_classical_semantics_not_full_acceptance",
+          "validation_status": "text_semantics_not_model_force_adjudication",
+          "known_overlap": "bazi_clash_season_v1/v2 complete chapters; not new independent observations",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局1947年4月初版；PDF118；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，未完成独立专家、全局力量或现实效力验收。",
+          "curated_on": "2026-10-22"
+        }
+      },
+      "旺者冲衰与衰者冲旺": {
+        "title": "旺者冲衰与衰者冲旺",
+        "tips": [
+          "所选原典先辨全局何者旺、何者衰，再论冲的作用，并要求察大势与喜忌；不能只按支名相冲就裁定根已拔或事件吉凶。",
+          "正文例如午旺提纲且四柱无金、卯旺提纲且四柱有火无土，均有并列前提；午月本身不能代替午旺及其余条件。原文还有寅、巳等分支，不能合成一条季相乘数规则。",
+          "月令、根气、透干、生扶及制化要一起核对。引擎当前的预算和数值因子是工程策略，不能充当原典定量或自动裁定这些条件。",
+          "冲去一方的局部根、日主全局旺衰和现实事件是不同判断；条文编释不新增独立命例或现实预测通过率。"
+        ],
+        "curation": {
+          "method_id": "dtcw1947_force_terms_v1",
+          "entry_revision": 1,
+          "classification": "selected_classical_semantics_explicit_conditions_not_force_verdict",
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微",
+              "edition": "上海大東書局，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "support_scope": "所列本版原典语义与条件的编辑编释；非逐字引文，不覆盖所有版本、整部规则或现实效力。",
+              "source_pdf_pages": [
+                78,
+                79,
+                89,
+                90
+              ]
+            }
+          ],
+          "classical_condition_tip_indexes": [
+            0
+          ],
+          "editorial_tip_indexes": [
+            1,
+            2,
+            3
+          ],
+          "review_status": "selected_classical_semantics_not_full_acceptance",
+          "validation_status": "text_semantics_not_model_force_adjudication",
+          "known_overlap": "bazi_clash_season_v1/v2 complete chapters; not new independent observations",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局1947年4月初版；PDF78,79,89,90；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，未完成独立专家、全局力量或现实效力验收。",
+          "curated_on": "2026-10-22"
+        }
+      },
+      "盖头与干支位置": {
+        "title": "盖头与干支位置",
+        "tips": [
+          "所选底本在甲寅、戊辰、丙寅、丙申例论时柱比肩盖头使申金冲木无力；另一壬申、甲辰、丙寅、丙申例则论两申冲寅、甲木根拔及壬水泄金生木。两例不能只凭相同支名或一个金木总量合并解释。",
+          "丙子、己亥、乙酉、壬午与己亥、丙子、乙丑、壬午两表除了酉丑，年、月两柱位置也不同。正文分别论丙火在年与在月、隔己土及壬水相近，不能把它误当只改一个日支的对照。",
+          "盖头和生克距离只是所选命式的条件；不能据一个局部例子给所有命盘固定减根，或宣称已经完成全局力量算法。解释必须对应同次原始柱位、透藏及实际计算。",
+          "这些条目与已经公开的整章对照有来源重合，属于同一开发者的编释；不作为新的独立专家验收或现实结果标签。"
+        ],
+        "curation": {
+          "method_id": "dtcw1947_force_terms_v1",
+          "entry_revision": 1,
+          "classification": "selected_classical_semantics_explicit_conditions_not_force_verdict",
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微",
+              "edition": "上海大東書局，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "support_scope": "所列本版原典语义与条件的编辑编释；非逐字引文，不覆盖所有版本、整部规则或现实效力。",
+              "source_pdf_pages": [
+                106,
+                107,
+                108,
+                109
+              ]
+            }
+          ],
+          "classical_condition_tip_indexes": [
+            0
+          ],
+          "editorial_tip_indexes": [
+            1,
+            2,
+            3
+          ],
+          "review_status": "selected_classical_semantics_not_full_acceptance",
+          "validation_status": "text_semantics_not_model_force_adjudication",
+          "known_overlap": "bazi_clash_season_v1/v2 complete chapters; not new independent observations",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局1947年4月初版；PDF106,107,108,109；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，未完成独立专家、全局力量或现实效力验收。",
+          "curated_on": "2026-10-22"
+        }
+      },
+      "燥湿与生发条件": {
+        "title": "燥湿与生发条件",
+        "tips": [
+          "所选《燥湿》把主气、局气与水火相成并看，分别讨论夏木、冬金及原局燥湿；不是只按某五行字数取最多或最少。",
+          "任注在夏木情境区分丑辰湿土的培扶与未戌燥土的助火，也以两个寒金命式分别论湿土与燥土；不能据此给所有土都设同一生扶效果。",
+          "当前旺衰预算仍使用声明的季相、根预算与合冲参数，没有裁定本章完整生发与承载条件；寒暖或季相标签不能代替这层判断。",
+          "这里讨论命理原典的作用条件，不是人体寒热、气候测量或现实结果证据。"
+        ],
+        "curation": {
+          "method_id": "dtcw_conditional_generation_visibility_manyfew_v6",
+          "entry_revision": 1,
+          "classification": "named_source_semantics_and_explicit_implementation_scope",
+          "classical_condition_tip_indexes": [
+            0,
+            1
+          ],
+          "implementation_tip_indexes": [
+            2
+          ],
+          "editorial_tip_indexes": [
+            3
+          ],
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微",
+              "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "support_scope": "指定章页的生发、根与隐显众寡语境；编释非逐字引文，不认证通用力量算法、全书符合或现实效力。",
+              "source_pdf_pages": [
+                260,
+                261,
+                262,
+                263
+              ]
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/strength.py",
+              "source_sha256": "9e6a63fa40819a0fe9dc40345071fd79b6e0b4fcfd1c857ed8cfc1909b589ad6",
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+            }
+          ],
+          "validation_status": "text_semantics_not_model_force_adjudication",
+          "review_status": "single_developer_source_reading_external_review_pending",
+          "known_overlap": "These source observations and cards share the same three-chapter collection; not new independent observations or empirical efficacy samples.",
+          "source_attribution_rule": "原典条件与程序范围、编辑边界分开；出处不为程序系数背书。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF260,261,262,263；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量或现实预测。",
+          "curated_on": "2026-10-22"
+        }
+      },
+      "物理藏根与功能根": {
+        "title": "物理藏根与功能根",
+        "tips": [
+          "本书有丙火无根、甲木足以盘根及乙木无根等不同语境，须区分原局藏字、作者认为能否发挥作用，以及已经受哪些制化影响。",
+          "按当前藏干表，戊辰、乙丑、戊戌、辛酉的辰中有乙；《众寡》该例仍称乙木无根。这不允许删掉辰藏乙，也不允许用有字或剩余量为正直接推翻原文的功能判断。",
+          "当前物理藏根、工程剩余预算与原典有效根力分层保留；后者未裁定时，不能把前两者改写成已经能任财官、受印生或完成通关。",
+          "上述例子是单人原页复读后的有限编释，尚未经过独立专家全量裁定。",
+          "《官杀》相邻两造是癸丑、戊午、丙午、壬辰与癸巳、戊午、丙午、壬辰。前造最终以癸水仍得通根判戊癸合而不化，后造才明言合而必化；前造较早的化火为忌是假设，不能截作实际成化结论。",
+          "后造正文仍说壬水通根身库，同时说无金滋助而清枯。两造都有辰中水藏干；实际藏字、根类轻重与作者判断的有效滋助仍需区分，不能以有任意根就绝不化或没有重根就必化取代完整条件。",
+          "GS12的原强标签与局部不化分别保留；把本造改强却误判成化不能证明计算路径正确。这些已暴露对照不增加新命例或算法准确率，不能据两造拟合根量阈值，也不认证日主化气格或运年成化。"
+        ],
+        "curation": {
+          "method_id": "dtcw_conditional_generation_visibility_manyfew_v6",
+          "entry_revision": 2,
+          "classification": "named_source_semantics_and_explicit_implementation_scope",
+          "classical_condition_tip_indexes": [
+            0,
+            4,
+            5
+          ],
+          "implementation_tip_indexes": [
+            1,
+            2,
+            6
+          ],
+          "editorial_tip_indexes": [
+            3
+          ],
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微",
+              "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "support_scope": "指定章页的生发、根与隐显众寡语境；编释非逐字引文，不认证通用力量算法、全书符合或现实效力。",
+              "source_pdf_pages": [
+                261,
+                263,
+                267
+              ]
+            },
+            {
+              "author": "任鐵樵增注，李雨田校訂兼發行",
+              "title": "任注滴天髓闡微",
+              "edition": "上海大東書局經售，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "source_pdf_pages": [
+                209,
+                210
+              ],
+              "support_scope": "仅支持本条新增的相邻两造实际合化结论及正文仍通根而无滋助的差别；不为任意根气判级、全局力量、程序系数或现实效力背书。",
+              "tip_indexes": [
+                4,
+                5
+              ]
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/utils/data.py",
+              "source_sha256": "19da28049dfa33e35ffde82e1d9e095ef426214ed26d2b6cdbddfd2ed8a23272",
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+            },
+            {
+              "source_path": "src/fatebridge/core/classical_force.py",
+              "source_sha256": "22ce2befb45b2ea4756af9678331cb8660864dc3746d5609341bc0446b682347",
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+            },
+            {
+              "source_path": "src/fatebridge/core/classical_passage.py",
+              "source_sha256": "9b51f1e5c7068434d0b48ef33d13e802d12bcbcddb6f444b18a0bba6329510a6",
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+            },
+            {
+              "source_path": "scripts/audit_bazi_current_collation.py",
+              "source_sha256": "c2b35b2ee99696e8a8cc7e3fede922f600ecc65e74e88dfb589dd6bf19e6947e",
+              "support_scope": "完整重放同一历史预测，再按整段校勘对比现行预期；不修改数值计算、原强标签、采用门槛或未知状态。"
+            }
+          ],
+          "validation_status": "text_semantics_not_model_force_adjudication",
+          "review_status": "single_developer_source_reading_external_review_pending",
+          "known_overlap": "These source observations and cards share the same three-chapter collection; not new independent observations or empirical efficacy samples. GS12 and GS13 were exposed before this post-comparison correction; no new independent observations.",
+          "source_attribution_rule": "原典条件与程序范围、编辑边界分开；出处不为程序系数背书。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF261,263,267；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量或现实预测。 本条修订2另核PDF209–210相邻两造最终结论，先前假设与最后判断分开；已暴露校勘，不增加独立样本。",
+          "curated_on": "2026-10-22",
+          "revision_history": [
+            {
+              "previous_revision": 1,
+              "previous_bundle_sha256": "e069bd34cd32a31bc452158a257a17f421e3e4cf953ab204caaa418889b83df5",
+              "previous_entry_path": "tests/fixtures/bazi_current_collation_v1/before/src/fatebridge/data/knowledge/bazi.json",
+              "change": "Append full-passage conversion contrast; preserve all four existing tips and original cited source context."
+            }
+          ]
+        }
+      },
+      "隐显与制化": {
+        "title": "隐显与制化",
+        "tips": [
+          "所选《隐显》并非一律喜透忌藏：吉神显露而通根当令，或忌神深藏却失令休囚，均须按实际作用分析。",
+          "原文分别讨论忌神明透后的制化、藏支逢运引动，以及所喜之神藏支仍能泄火化劫；位置、得令、根与作用不能相互替代。",
+          "当前路径检查中的透藏出现或helper命中，仅是已观察前提；力量、阻碍和救应未裁定时，不称已成格或已取用。",
+          "原文运年叙事不能转换为未经计算的年月应期或现实吉凶保证。"
+        ],
+        "curation": {
+          "method_id": "dtcw_conditional_generation_visibility_manyfew_v6",
+          "entry_revision": 1,
+          "classification": "named_source_semantics_and_explicit_implementation_scope",
+          "classical_condition_tip_indexes": [
+            0,
+            1
+          ],
+          "implementation_tip_indexes": [
+            2
+          ],
+          "editorial_tip_indexes": [
+            3
+          ],
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微",
+              "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "support_scope": "指定章页的生发、根与隐显众寡语境；编释非逐字引文，不认证通用力量算法、全书符合或现实效力。",
+              "source_pdf_pages": [
+                263,
+                264,
+                265
+              ]
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/classical_candidate_selection.py",
+              "source_sha256": "cf370ce675ffed86aacbaed6bd946d2206850532d1110128a0c729d80d25e8dd",
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+            }
+          ],
+          "validation_status": "text_semantics_not_model_force_adjudication",
+          "review_status": "single_developer_source_reading_external_review_pending",
+          "known_overlap": "These source observations and cards share the same three-chapter collection; not new independent observations or empirical efficacy samples.",
+          "source_attribution_rule": "原典条件与程序范围、编辑边界分开；出处不为程序系数背书。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF263,264,265；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量或现实预测。",
+          "curated_on": "2026-10-22"
+        }
+      },
+      "众寡与日主符合": {
+        "title": "众寡与日主符合",
+        "tips": [
+          "任注要求分日主与四柱两个方面讨论众寡；众寡是相对力量语境，不是把天干、藏干或十神的出现次数相加后直接判胜负。",
+          "所列条件包括日主通根得气而能转化作用、寡官得财扶，以及身方与官杀方皆有势时求成平；全局成平不等于日主必为中和。",
+          "当前加权十神计数描述本实现的出现量，没有测得本章两方面的实际势力或已经完成日主符合条件。",
+          "不能以强众、敌寡等原典术语推断现实竞争胜率、岗位能力或人际关系结果。"
+        ],
+        "curation": {
+          "method_id": "dtcw_conditional_generation_visibility_manyfew_v6",
+          "entry_revision": 1,
+          "classification": "named_source_semantics_and_explicit_implementation_scope",
+          "classical_condition_tip_indexes": [
+            0,
+            1
+          ],
+          "implementation_tip_indexes": [
+            2
+          ],
+          "editorial_tip_indexes": [
+            3
+          ],
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微",
+              "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "support_scope": "指定章页的生发、根与隐显众寡语境；编释非逐字引文，不认证通用力量算法、全书符合或现实效力。",
+              "source_pdf_pages": [
+                265,
+                266,
+                267,
+                268
+              ]
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/analysis/career.py",
+              "source_sha256": "08f65da05c2c3f6b898c140889e1d347c177f586a2f7ef51729185147a518a1d",
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+            },
+            {
+              "source_path": "src/fatebridge/core/strength.py",
+              "source_sha256": "9e6a63fa40819a0fe9dc40345071fd79b6e0b4fcfd1c857ed8cfc1909b589ad6",
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+            }
+          ],
+          "validation_status": "text_semantics_not_model_force_adjudication",
+          "review_status": "single_developer_source_reading_external_review_pending",
+          "known_overlap": "These source observations and cards share the same three-chapter collection; not new independent observations or empirical efficacy samples.",
+          "source_attribution_rule": "原典条件与程序范围、编辑边界分开；出处不为程序系数背书。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF265,266,267,268；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量或现实预测。",
+          "curated_on": "2026-10-22"
+        }
+      },
+      "暖局与用神": {
+        "title": "暖局与用神",
+        "tips": [
+          "所选任注在周侍郎的甲子、丙子、庚辰、庚辰例承认丙火得甲木生扶而解冻，却明说用神不在丙火而在辰土，并有比肩佐之。暖局需要与本例实际所取用神分开。",
+          "熊忠丞学鹏的丁巳、壬子、辛巳、丁酉例，原注说丁火用于敌寒解冻，非用丁火，用神必在酉金；同时列酉时扶身、巳酉拱等条件。不能只凭冬金喜火便把火写成该例用神。",
+          "本条限定该版任注与两例完整上下文；不把任注用神名义强行换成其他书的月令用神定义，也不据两个例子推出所有冬金必用土金。",
+          "当前程序的调候参考、扶抑候选、月令路径与原典有效力量是不同层。实际取用尚未裁定时，只能按同次结果说明参考条件，不把暖局之火升级成已经选定的用神。",
+          "本条与完整性情35造共用来源，不增加独立命例、现实预测成绩或外部专家验收；寒暖在这里是原典术语，不是人体温度或医学诊断。"
+        ],
+        "curation": {
+          "method_id": "dtcw1947_xingqing_semantics_v1",
+          "entry_revision": 1,
+          "classification": "named_source_semantics_and_explicit_implementation_scope",
+          "classical_condition_tip_indexes": [
+            0,
+            1,
+            2
+          ],
+          "implementation_tip_indexes": [
+            3
+          ],
+          "editorial_tip_indexes": [
+            4
+          ],
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微",
+              "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "support_scope": "完整性情章中的主体、暖局、用神与位置条件；编释不冒作已算有效力量或全书、现实效度认证。",
+              "source_pdf_pages": [
+                450,
+                451
+              ]
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/strength.py",
+              "source_sha256": "9e6a63fa40819a0fe9dc40345071fd79b6e0b4fcfd1c857ed8cfc1909b589ad6",
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+            }
+          ],
+          "validation_status": "text_semantics_not_model_force_adjudication",
+          "review_status": "single_developer_source_reading_external_review_pending",
+          "known_overlap": "These3cards share the same complete35case性情 collection and its first failed adoption experiment. Not3new cohorts or independent external reviews.",
+          "source_attribution_rule": "原典条件与程序范围、编辑边界分开；出处不为程序系数背书。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF450,451；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量或现实预测。",
+          "curated_on": "2026-10-22"
+        }
+      },
+      "日元强弱与性情措辞": {
+        "title": "日元强弱与性情措辞",
+        "tips": [
+          "本章同时讨论日元、五行之性与人物性情。强拗可以形容人格，火烈可处于火势和燥热语境，柔软也有性情对象；解释前须核对主体与上下文，不能用单词自动给日主强弱打标签。",
+          "戊子、戊午、丙辰、戊戌例先说午提刃强当令，随后论子冲辰泄、三戊窃日主精华并说弱可知。刃强与日主弱可并述，不能只截刃强两字改判日主强。",
+          "庚午、乙酉、庚午、壬午例虽生仲秋，原注仍因三午官星制酉刃、五行无土论弱；得令、坐禄、有印字等单因都不能代替全局力量裁定。",
+          "当前工程强弱档、印比合计、根预算和原典旺衰不是同一测量。未给明确三档的源例保留未知；这些文字条件不能反过来冒称本系统已经算出全部原典判断。",
+          "人物品德、官位、家产或灾祸叙事不作原典力量标签，也不作现实预测验证。此条是同一开发者的限域编释，独立复核仍待完成。",
+          "《初学捷径》“衰旺强弱之别”是李雨田增补层：当令而无劫印生扶仍可作衰，失令而劫印重也可作旺；该页末列旺宜克、强宜泄、衰宜扶、弱宜抑。四词与附带条件须按本页语境保存，不能把末句直接套到当前程序的强／中和／弱三档，更不把它冒称任氏原话。",
+          "任氏《衰旺》反对只以得时便旺、失令便衰，举春木虽强而金重可危、秋木虽弱而根深亦强，并区分禄旺根、墓库与余气根，提出干多不如根重。得令、同类数量、根位与实际受生要分别核对，不能凭一个时令词或长生名目认证日主三档。",
+          "任氏另分太旺、旺极、太衰、衰极。按本段逐项保留的四态取用关系为：木：太旺似金宜火炼，旺极似火宜水克，太衰似水宜金生，衰极似土宜火生；火：太旺似水宜土止，旺极似土宜木克，太衰似木宜水生，衰极似金宜土生；土：太旺似木宜金克，旺极似金宜火炼，太衰似火宜木生，衰极似水宜金生；金：太旺似火宜水济，旺极似水宜土止，太衰似土宜火生，衰极似木宜水生；水：太旺似土宜木克，旺极似木宜金克，太衰似金宜土生，衰极似火宜木生。“所似”是该段有条件的取用比拟，不改字面五行，也未给出可直接套用的四态数值界限；未知四态不能由工程三档或人物际遇补造。"
+        ],
+        "curation": {
+          "method_id": "dtcw1947_body_vocabulary_semantics_v3",
+          "entry_revision": 3,
+          "classification": "named_source_semantics_and_explicit_implementation_scope",
+          "classical_condition_tip_indexes": [
+            0,
+            1,
+            2,
+            5,
+            6,
+            7
+          ],
+          "implementation_tip_indexes": [
+            3
+          ],
+          "editorial_tip_indexes": [
+            4
+          ],
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微",
+              "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "support_scope": "完整性情章中的主体、暖局、用神与位置条件；编释不冒作已算有效力量或全书、现实效度认证。",
+              "source_pdf_pages": [
+                428,
+                432,
+                433,
+                440,
+                441,
+                448
+              ]
+            },
+            {
+              "author": "李雨田增補",
+              "title": "初學捷徑·衰旺強弱之別（收入任注滴天髓闡微）",
+              "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "support_scope": "只支持李氏增补层的四词定义、当令与劫印条件和页末扶抑文字；不是任氏曰，未转成生产三档处方或数值界限。",
+              "source_pdf_pages": [
+                50
+              ]
+            },
+            {
+              "author": "任鐵樵增注（任氏曰）",
+              "title": "任注滴天髓闡微·衰旺（任氏曰段）",
+              "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "support_scope": "只支持任氏曰的得令反例、根气及太旺旺极太衰衰极四态全表；不以页内原注冒作任氏，也不从所似替换物理五行或推导工程系数。",
+              "source_pdf_pages": [
+                175,
+                176,
+                177,
+                178
+              ]
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/strength.py",
+              "source_sha256": "a6a52ba57159825b8f71ebf867e64442148c37f124982a4a9709e221f1b36c16",
+              "support_scope": "只说明所引用当前程序的工程三档、根预算与未裁定范围；不为李氏四词、任氏四态提供数值认证，也不证明现实结果。"
+            }
+          ],
+          "validation_status": "text_semantics_not_model_force_adjudication",
+          "review_status": "single_developer_source_reading_external_review_pending",
+          "known_overlap": "首版与暖局与用神、根位与有效接引共用完整35造性情资料及首次失败采用实验；本修订增加PDF50、175—178理论来源，不添加新命例、独立样本或外部复核。",
+          "source_attribution_rule": "首版性情条件保留；新增李氏初学增补与任氏曰衰旺分列，工程三档和编辑边界另列；原典所似和用词不为程序系数背书。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF428,432,433,440,441,448；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量或现实预测。 修订2另核：李雨田增補《初學捷徑·衰旺強弱之別》，PDF50；任鐵樵增注（任氏曰）《任注滴天髓闡微·衰旺》，PDF175,176,177,178；同版同源；两种声部和两组名目分开，不认证完整四态算法或现实效度。 修订3依据同版PDF177—178的20项关系表纠正木旺极、太衰、衰极三处摘要对应；全表逐项呈现，不认证数值分类器或独立复核。",
+          "curated_on": "2026-10-25",
+          "source_relation_binding": {
+            "method_id": "dtcw1947_four_state_source_rows_v1",
+            "tip_indexes": [
+              7
+            ],
+            "source_claim_id": "CENSUS-R539",
+            "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+            "source_pdf_pages": [
+              177,
+              178
+            ],
+            "source_rows_sha256": "ab91152988059b5cf32f67d20f4f10a93ec6ee951412024db17687b80eff83d9",
+            "rows": [
+              {
+                "element": "木",
+                "source_state": "太旺",
+                "analogous_element": "金",
+                "preferred_element": "火",
+                "source_action_on_analogy": "煉",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "木",
+                "source_state": "旺極",
+                "analogous_element": "火",
+                "preferred_element": "水",
+                "source_action_on_analogy": "剋",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "火",
+                "source_state": "太旺",
+                "analogous_element": "水",
+                "preferred_element": "土",
+                "source_action_on_analogy": "止",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "火",
+                "source_state": "旺極",
+                "analogous_element": "土",
+                "preferred_element": "木",
+                "source_action_on_analogy": "剋",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "土",
+                "source_state": "太旺",
+                "analogous_element": "木",
+                "preferred_element": "金",
+                "source_action_on_analogy": "剋",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "土",
+                "source_state": "旺極",
+                "analogous_element": "金",
+                "preferred_element": "火",
+                "source_action_on_analogy": "煉",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "金",
+                "source_state": "太旺",
+                "analogous_element": "火",
+                "preferred_element": "水",
+                "source_action_on_analogy": "濟",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "金",
+                "source_state": "旺極",
+                "analogous_element": "水",
+                "preferred_element": "土",
+                "source_action_on_analogy": "止",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "水",
+                "source_state": "太旺",
+                "analogous_element": "土",
+                "preferred_element": "木",
+                "source_action_on_analogy": "剋",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "水",
+                "source_state": "旺極",
+                "analogous_element": "木",
+                "preferred_element": "金",
+                "source_action_on_analogy": "剋",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "木",
+                "source_state": "太衰",
+                "analogous_element": "水",
+                "preferred_element": "金",
+                "source_action_on_analogy": "生",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "木",
+                "source_state": "衰極",
+                "analogous_element": "土",
+                "preferred_element": "火",
+                "source_action_on_analogy": "生",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "火",
+                "source_state": "太衰",
+                "analogous_element": "木",
+                "preferred_element": "水",
+                "source_action_on_analogy": "生",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "火",
+                "source_state": "衰極",
+                "analogous_element": "金",
+                "preferred_element": "土",
+                "source_action_on_analogy": "生",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "土",
+                "source_state": "太衰",
+                "analogous_element": "火",
+                "preferred_element": "木",
+                "source_action_on_analogy": "生",
+                "pdf_page": 177,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "土",
+                "source_state": "衰極",
+                "analogous_element": "水",
+                "preferred_element": "金",
+                "source_action_on_analogy": "生",
+                "pdf_page": 178,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "金",
+                "source_state": "太衰",
+                "analogous_element": "土",
+                "preferred_element": "火",
+                "source_action_on_analogy": "生",
+                "pdf_page": 178,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "金",
+                "source_state": "衰極",
+                "analogous_element": "木",
+                "preferred_element": "水",
+                "source_action_on_analogy": "生",
+                "pdf_page": 178,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "水",
+                "source_state": "太衰",
+                "analogous_element": "金",
+                "preferred_element": "土",
+                "source_action_on_analogy": "生",
+                "pdf_page": 178,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              },
+              {
+                "element": "水",
+                "source_state": "衰極",
+                "analogous_element": "火",
+                "preferred_element": "木",
+                "source_action_on_analogy": "生",
+                "pdf_page": 178,
+                "numeric_threshold": null,
+                "implemented_or_evaluated": false
+              }
+            ],
+            "numeric_classifier_implemented": false,
+            "independent_annotation_review": "not_certified"
+          },
+          "revision_correction": {
+            "supersedes_entry_revision": 2,
+            "corrected_relation_keys": [
+              "木/旺極",
+              "木/太衰",
+              "木/衰極"
+            ],
+            "reason": "修订2的木旺极取用写错，太衰与衰极对应互换；原页与既存全表一致。保留原修订及其工程验收记录。"
+          }
+        }
+      },
+      "根位与有效接引": {
+        "title": "根位与有效接引",
+        "tips": [
+          "丙寅、甲午、丙申、壬辰与丙申、甲午、丙寅、壬辰有同一组八字而年日支易位。所选任注分别论日坐申金生拱壬水有情，与申在年远隔且被比劫所夺；同五行总量不能代替根位和生扶路径。",
+          "辛丑、己亥、辛酉、癸巳例的巳火本可暖局，任注却继续论巳酉丑全金局、亥甲受伤及财官化枭印生劫。只看火字存在不能证明暖局或有效接引已经成立。",
+          "庚午、乙酉、庚午、壬午的原注五行无土，与当前藏干表午中有己分别保留。不能为贴合原文删除实际藏己，也不能因藏印存在或预算为正便证明它已能生身。",
+          "当前物理根、保留预算、柱位与关系候选可以逐项复核；生扶距离、受生与制化的有效程度仍未完整裁定。新增承载实验亦未通过新章采用门槛，生产旺衰并未据此修改。",
+          "这些条件属于指定底本的有限编释，不推广为统一距离权重、所有合局都已成化或确定吉凶；与同章命例和其他语义词条不重复计算独立验证数量。"
+        ],
+        "curation": {
+          "method_id": "dtcw1947_xingqing_semantics_v1",
+          "entry_revision": 1,
+          "classification": "named_source_semantics_and_explicit_implementation_scope",
+          "classical_condition_tip_indexes": [
+            0,
+            1,
+            2
+          ],
+          "implementation_tip_indexes": [
+            3
+          ],
+          "editorial_tip_indexes": [
+            4
+          ],
+          "source_refs": [
+            {
+              "author": "任鐵樵增注，李雨田校訂",
+              "title": "任注滴天髓闡微",
+              "edition": "李雨田校訂兼發行，上海大東書局經售，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "support_scope": "完整性情章中的主体、暖局、用神与位置条件；编释不冒作已算有效力量或全书、现实效度认证。",
+              "source_pdf_pages": [
+                445,
+                447,
+                448
+              ]
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/strength.py",
+              "source_sha256": "9e6a63fa40819a0fe9dc40345071fd79b6e0b4fcfd1c857ed8cfc1909b589ad6",
+              "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
+            }
+          ],
+          "validation_status": "text_semantics_not_model_force_adjudication",
+          "review_status": "single_developer_source_reading_external_review_pending",
+          "known_overlap": "These3cards share the same complete35case性情 collection and its first failed adoption experiment. Not3new cohorts or independent external reviews.",
+          "source_attribution_rule": "原典条件与程序范围、编辑边界分开；出处不为程序系数背书。",
+          "citation": "FateBridge限域编释；任鐵樵增注、李雨田校訂《任注滴天髓闡微》；上海大東書局經售，1947年4月初版；PDF445,447,448；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；非逐字引文，不认证模型有效力量或现实预测。",
+          "curated_on": "2026-10-22"
+        }
+      },
+      "藏干序位与人元司令": {
+        "title": "藏干序位与人元司令",
+        "tips": [
+          "藏干成员、目录序位、月内司令和有效力量分开核对。hidden_rank是当前目录的位置，不能单凭它认定身重、印重或有效通关。",
+          "所读《三命通会·论人元司事》同一巳月，开头列戊七日、庚五日、丙十八日，后表列丙十八日、戊七日、庚五日。两处日数相同而列次不同；本次校读不能由列次推出唯一根力排序。",
+          "同章醉醒子评议另论主客、初中末三气浅深，并反问岂可以三五七日为限。不能把分日数直接归一化为固定能量份额；没有明确计日规则与出生瞬间时，也不能选择当前司令干。",
+          "章末另有支中所藏只以月论、年日時不论的取用范围。该章的月令司事条目不能直接当作四柱统一藏干表；引擎若采用另一种范围，须另立来源与规则，不能据这一句直接删除已返回的其他柱藏根。",
+          "现行工程模型按目录位置分配三藏干的4/7、2/7、1/7，再结合柱位与既定作用规则。巳的当前目录为丙、庚、戊，因此庚与戊的份额分别为2/7、1/7。这是未校准工程预算，不是上述章节给出的力量系数，也不是司令天数。",
+          "交换目录中庚、戊会改变工程预算的归属；要核对同次账本和受影响条件，不能只因某批命例更符合标签就换序或改权重。本轮没有采用另一种排列。",
+          "解释身印、根气或通关时，分别读取原局成员、同次剩余预算、所选原典条件和未裁定字段；工程数值大小不能补成原典身印轻重，候选路径也不能补成有效接引。",
+          "本条为所选完整章节的同开发者书影校读与实现说明，未完成独立专家或新增条件的真实模型解释验收。旧反例与首次失败保留；可复现、出处对应和现实预测效度分别验证。"
+        ],
+        "curation": {
+          "method_id": "hidden_ordinal_and_month_duty_source_scope_v1",
+          "entry_revision": 1,
+          "curated_on": "2026-10-26",
+          "classification": "selected_complete_chapter_and_uncalibrated_engineering_policy",
+          "classical_condition_tip_indexes": [
+            1,
+            2,
+            3
+          ],
+          "implementation_tip_indexes": [
+            4,
+            5
+          ],
+          "editorial_tip_indexes": [
+            0,
+            6,
+            7
+          ],
+          "source_refs": [
+            {
+              "author": "明·萬民英；章末引醉醒子评议分层",
+              "title": "三命通會·卷二·論人元司事",
+              "edition": "欽定四庫全書本，浙江大学图书馆／CADAL06066038馆藏元数据",
+              "source_url": "https://archive.org/details/06066038.cn",
+              "source_sha256": "af4a8ca65cc4dfdf63d6294adc7925a868214563d0d52664c7ba779b833db14a",
+              "source_pdf_pages": [
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73
+              ],
+              "retained_context_pdf_pages": [
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74
+              ],
+              "supporting_tip_indexes": [
+                1,
+                2,
+                3
+              ],
+              "support_scope": "完整章首、十二月文字与表列、醉醒子评议及章末范围；不支持固定工程力权、已采用司令日历或全局旺衰定理。",
+              "developer_inferences": [
+                "列次变化不构成唯一力量排序",
+                "名义司事日数不直接用作现行预算系数"
+              ]
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/utils/data.py",
+              "source_sha256": "19da28049dfa33e35ffde82e1d9e095ef426214ed26d2b6cdbddfd2ed8a23272",
+              "supporting_tip_indexes": [
+                4,
+                5
+              ],
+              "support_scope": "只绑定本次目录及几何份额定义，未证明原典系数或预测效度。"
+            },
+            {
+              "source_path": "src/fatebridge/core/strength.py",
+              "source_sha256": "4dbf210329e41b72f44af0fe2d82e44f3448d4f6bde5afe85c09d6259cd07769",
+              "supporting_tip_indexes": [
+                4,
+                5
+              ],
+              "support_scope": "只绑定本次目录及几何份额定义，未证明原典系数或预测效度。"
+            }
+          ],
+          "validation_status": "selected_chapter_reading_and_implementation_definition_only",
+          "review_status": "same_developer_visual_collation_external_review_pending",
+          "independent_expert_review": "not_completed",
+          "actual_model_acceptance_for_new_conditions": "not_tested",
+          "real_world_predictive_validity": "not_tested",
+          "calculation_effect": "none",
+          "coefficient_adoption": "unchanged_uncalibrated_policy",
+          "citation": "明·萬民英《三命通會》卷二·論人元司事，CADAL06066038，原PDF66–73及74上下文；工程分配另据FateBridge当前实现。"
+        }
       }
     }
   }

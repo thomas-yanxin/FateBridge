@@ -1,0 +1,76 @@
+{
+  "model_id": "shoushi_named_conjunction_research_v1",
+  "profiles": {
+    "gujin36_37_printed_components": {
+      "half_year_days": "182.62125",
+      "surplus_initial_limit_days": "88.909225",
+      "deficit_initial_limit_days": "93.712025",
+      "anomalistic_month_days": "27.5546",
+      "runying_days": "20.2050",
+      "limit_duration_days": "0.0820",
+      "title": "古今律历考卷36、37四库本刊载角差",
+      "source_url": "https://commons.wikimedia.org/w/index.php?curid=71219540",
+      "zhuanying_days": "13.1904",
+      "lunar_limits_per_day": "12.2",
+      "terminal_limit_method": "printed_168_minus_limit",
+      "solar_polynomials": {
+        "surplus_initial_deficit_terminal": [
+          "5133200",
+          "24600",
+          "31"
+        ],
+        "deficit_initial_surplus_terminal": [
+          "4870600",
+          "22100",
+          "27"
+        ]
+      },
+      "locators": [
+        "DjVu422-423:半岁周、盈缩初末限及两式",
+        "DjVu430-432:转终、转应、12.2/168、迟疾式及定朔单位"
+      ],
+      "velocity_status": "not_adjudicated_do_not_borrow_paper_velocity"
+    },
+    "li_zhang_1996_printed_formula": {
+      "half_year_days": "182.62125",
+      "surplus_initial_limit_days": "88.909225",
+      "deficit_initial_limit_days": "93.712025",
+      "anomalistic_month_days": "27.5546",
+      "runying_days": "20.2050",
+      "limit_duration_days": "0.0820",
+      "mean_lunar_velocity_ancient_du_per_limit": "1.0962",
+      "title": "李勇、张培瑜1996中国古历定朔推步综述刊载公式",
+      "source_url": "https://shao.cas.cn/twxjz/wzll/199601/199601sp/202308/P020230823504692501891.pdf",
+      "zhuanying_days": "13.0205",
+      "lunar_limits_per_day": "500/41",
+      "terminal_limit_method": "half_month_minus_within_then_scale",
+      "solar_polynomials": {
+        "surplus_initial_deficit_terminal": [
+          "5133200",
+          "24600",
+          "31"
+        ],
+        "deficit_initial_surplus_terminal": [
+          "4870600",
+          "21000",
+          "27"
+        ]
+      },
+      "locators": [
+        "天文学进展14(1),66-76; PDF6-9,印页71-74,式10、12-27"
+      ],
+      "velocity_status": "published_continuous_reconstruction_not_gujin_table",
+      "known_discrepancies": [
+        "Paper N(C) prints21000; Gujin prints22100; table comparison must retain both",
+        "Table row13 correction prints negative despite positive sum",
+        "Table row14 conjunction is0.0100d above its printed mean plus correction"
+      ],
+      "scope": "fixed printed half-year and explicit lower-reckoning zhongji; no modern calendar dates"
+    }
+  },
+  "profile_policy": "Named witnesses only. No automatic emendation, rounded table fitting, or Gujin per-limit velocity substitution.",
+  "true_new_moon_calibrated": false,
+  "intercalation_reconstructed": false,
+  "modern_epoch_calibrated": false,
+  "used_in_native_birth_chart": false
+}

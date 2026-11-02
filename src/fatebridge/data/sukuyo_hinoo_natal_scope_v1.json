@@ -1,0 +1,88 @@
+{
+  "id": "hinoo_natal_half_application_scope_v1",
+  "primary_binding": {
+    "publisher_html_response_sha256": "74c63f5151c2b8c3ac554f7a0acae0776e5247e740a712834e1b600a065050e6",
+    "downloaded_calendar_windows": [
+      {
+        "locator": "T2465_.78.0030c13-21",
+        "text": "若有閏月時。其正月直宿即亦重直閏月。謂假令十二月有閏月。而其十二月一日直宿是虚宿。十五日直宿是星宿。乃至三十日直宿是星宿。如是閏十二月直宿亦同之。更無異也。先月是正十二月。閏月是傍十二月也。故傍月･直宿三十日皆用正十二月直宿更不異宿也。餘月聞月准之知耳。"
+      },
+      {
+        "locator": "T2465_.78.0030c21-26",
+        "text": "取小月闕第三十日直宿之法。假令正月小闕第三十日。雖無其第三十日。而彼日分直宿猶有故。次二月初一日半已上者。正月闕日之分宿直也。半已下者即彼當日宿直。故雖大小異日有増減。而小月闕日直宿無日不得。次月初一日眞宿無改代也｣"
+      }
+    ],
+    "calendar_apparatus": [
+      {
+        "line": "0030c14",
+        "notes_html": [
+          "訣＝説<sup>イ</sup>＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c17",
+        "notes_html": [
+          "十＝月＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c18",
+        "notes_html": [
+          "〔是正･･･月〕十六字<sup>イ</sup>－＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c20",
+        "notes_html": [
+          "〔宿〕－＜甲＞"
+        ]
+      },
+      {
+        "line": "0030c23",
+        "notes_html": [
+          "半＋（也）＜甲＞"
+        ]
+      }
+    ]
+  },
+  "meaning_reference_bundle_sha256": "8700121b9b7b150f0619afda4d09f3109ac139e6d310eb7600a0b66a890d683e",
+  "scholarship": {
+    "author": "Jeffrey Theodore Kotyk",
+    "title": "Buddhist Astrology and Astral Magic in the Tang Dynasty",
+    "year": 2017,
+    "publication_type": "Doctoral Thesis, Leiden University",
+    "official_catalogue_url": "https://scholarlypublications.universiteitleiden.nl/handle/1887/54858",
+    "official_chapter_url": "https://scholarlypublications.universiteitleiden.nl/download/1887/54858/7?col=81522199220002711&col=81522199610002711",
+    "official_chapter_pdf_sha256": "4e33ec574ee09fd7b3b8200de70db6e19d3857fb2ffa015884ef72a09398e28a",
+    "chapter": 4,
+    "printed_page": 118,
+    "chapter_pdf_page_one_based": 51,
+    "extraction_utf8_sha256": "3741f0b9493a382fce28ae5d7cd51cf7e097469a7e683bc3c3b6e9fcd4c4bf67",
+    "selected_page_render_sha256": "84964a3202d7ee0afe52dd27d538f4fa879d5d6fe0034b6d292ae1a16fe6baa1",
+    "selected_page_actually_viewed": true,
+    "short_literal_qualification_fragments": [
+      "This also presumably means that if someone were born on",
+      "although this is not explicitly stated"
+    ],
+    "paraphrase_zh": "作者把分半日用于出生者本命宿的说法表述为推测，并指出没有明文说明。",
+    "source_excerpt_is_a_scholarly_inference_not_a_new_ancient_witness": true
+  },
+  "application": {
+    "calendar_profile": "hinoo_t1299_host27",
+    "selected_T2465_clause_explicitly_assigns_natal_mansion_by_birth_half": false,
+    "natal_use_status": "declared_research_profile_inference",
+    "daily_missing_day_assignment_still_interpretable": true,
+    "explicit_textual_half_may_select_under_declared_profile": true,
+    "computed_status_proves_ancient_natal_applicability": false,
+    "calendar_policy_or_values_changed": false,
+    "historical_birth_time_to_half_mapping_established": false,
+    "modern_half_clock": null,
+    "daybreak_clock": null,
+    "solar_altitude_degrees": null,
+    "half_endpoint_inclusion": null,
+    "leap_short_month_execution_priority": null,
+    "complete_classical_acceptance": false,
+    "real_world_predictive_validation": false
+  },
+  "source_acquisition_scope": "Official chapter bytes acquired via the university catalogue observed link after web cache miss; saved PDF parsed and printed118 actually viewed. This is a named scholarly inference, not independent new historical practice or full chapter acceptance."
+}

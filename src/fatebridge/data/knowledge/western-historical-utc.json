@@ -1,0 +1,88 @@
+{
+  "source_url": "https://hpiers.obspm.fr/eoppc/bul/bulc/UTC-TAI.history",
+  "source_title": "IERS Earth Orientation Centre: relationship between TAI and UTC",
+  "source_sha256": "54e702abdc388ae3bf8cfc5f126900a5277829ad90e80f6773df6e714a133642",
+  "scope": "Factual affine TAI-UTC coefficients for 1961-01-01 through 1971-12-31. Earlier epochs are outside this IERS table. Fractional clock adjustments are not integer leap seconds.",
+  "formula": "TAI-UTC seconds = offset_seconds + (MJD_UTC - reference_mjd) * rate_seconds_per_day",
+  "valid_until": "1972-01-01",
+  "entries": [
+    {
+      "effective_date": "1961-01-01",
+      "offset_seconds": 1.422818,
+      "reference_mjd": 37300,
+      "rate_seconds_per_day": 0.001296
+    },
+    {
+      "effective_date": "1961-08-01",
+      "offset_seconds": 1.372818,
+      "reference_mjd": 37300,
+      "rate_seconds_per_day": 0.001296
+    },
+    {
+      "effective_date": "1962-01-01",
+      "offset_seconds": 1.845858,
+      "reference_mjd": 37665,
+      "rate_seconds_per_day": 0.0011232
+    },
+    {
+      "effective_date": "1963-11-01",
+      "offset_seconds": 1.945858,
+      "reference_mjd": 37665,
+      "rate_seconds_per_day": 0.0011232
+    },
+    {
+      "effective_date": "1964-01-01",
+      "offset_seconds": 3.24013,
+      "reference_mjd": 38761,
+      "rate_seconds_per_day": 0.001296
+    },
+    {
+      "effective_date": "1964-04-01",
+      "offset_seconds": 3.34013,
+      "reference_mjd": 38761,
+      "rate_seconds_per_day": 0.001296
+    },
+    {
+      "effective_date": "1964-09-01",
+      "offset_seconds": 3.44013,
+      "reference_mjd": 38761,
+      "rate_seconds_per_day": 0.001296
+    },
+    {
+      "effective_date": "1965-01-01",
+      "offset_seconds": 3.54013,
+      "reference_mjd": 38761,
+      "rate_seconds_per_day": 0.001296
+    },
+    {
+      "effective_date": "1965-03-01",
+      "offset_seconds": 3.64013,
+      "reference_mjd": 38761,
+      "rate_seconds_per_day": 0.001296
+    },
+    {
+      "effective_date": "1965-07-01",
+      "offset_seconds": 3.74013,
+      "reference_mjd": 38761,
+      "rate_seconds_per_day": 0.001296
+    },
+    {
+      "effective_date": "1965-09-01",
+      "offset_seconds": 3.84013,
+      "reference_mjd": 38761,
+      "rate_seconds_per_day": 0.001296
+    },
+    {
+      "effective_date": "1966-01-01",
+      "offset_seconds": 4.31317,
+      "reference_mjd": 39126,
+      "rate_seconds_per_day": 0.002592
+    },
+    {
+      "effective_date": "1968-02-01",
+      "offset_seconds": 4.21317,
+      "reference_mjd": 39126,
+      "rate_seconds_per_day": 0.002592
+    }
+  ]
+}

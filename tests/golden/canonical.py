@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import json
+import math
 from typing import Any
 
 #: 每次重算都会变、与命理计算无关的字段，冻结前一律剔除。
@@ -54,7 +55,13 @@ def _scrub(value: Any, *, execution_metadata: bool = False) -> Any:
     if isinstance(value, (list, tuple)):
         return [_scrub(item) for item in value]
     if isinstance(value, float):
-        return round(value, FLOAT_PRECISION)
+        rounded = round(value, FLOAT_PRECISION)
+        # A snapshot must not manufacture 30°/360° or change a sign-boundary
+        # side. Preserve the input double where fixed decimal rounding would
+        # cross a 30-degree partition. Non-finite values retain JSON's rejection.
+        if math.isfinite(value) and value // 30.0 != rounded // 30.0:
+            return value
+        return rounded
     return value
 
 

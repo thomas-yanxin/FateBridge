@@ -26,7 +26,7 @@ def build_secondary_progression_payload(
     zodiac_type: str = "Tropic",
 ) -> Dict[str, Any]:
     age_years = calculate_age_years(birth_info, analysis_datetime)
-    progressed_utc = birth_info.utc_datetime + timedelta(days=age_years)
+    progressed_utc = birth_info.require_utc_datetime + timedelta(days=age_years)
     progressed_local = progressed_utc.astimezone(
         parse_timezone_name(birth_info.timezone)
     )
@@ -45,6 +45,7 @@ def build_secondary_progression_payload(
         orb_limit=1.5,
     )
     return {
+        "calculation_basis": progressed_subject.calculation_basis,
         "progressed_datetime": progressed_local.isoformat(),
         "sun": point_to_dict("Sun", progressed_subject.sun),
         "moon": point_to_dict("Moon", progressed_subject.moon),

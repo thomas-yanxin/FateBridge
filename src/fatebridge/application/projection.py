@@ -1,9 +1,12 @@
 """Shared result field projection and invalid-path reporting."""
 
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List, Literal, Optional, Union
 
 from fatebridge.application.tool_spec import ServiceResult
 from fatebridge.utils.errors import ParameterError
+
+# True keeps a subtree whole; a mapping selects its children.
+SelectionTree = Dict[str, Union[Literal[True], "SelectionTree"]]
 
 
 def project_fields(
@@ -29,7 +32,7 @@ def project_fields(
     every invalid path. Strict projection rejects them before shaping any data.
     Paths traverse objects only; arrays and scalars must be selected whole.
     """
-    if not fields:
+    if fields is None:
         return result
     fields = list(fields)
     if not fields:
@@ -59,7 +62,7 @@ def _projection_issues(
         if any(not part or part.strip() != part for part in parts):
             code = "invalid_projection_path"
         else:
-            value: Any = result
+            value: object = result
             for part in parts:
                 if not isinstance(value, dict):
                     code = "non_object_projection_path"
@@ -73,9 +76,8 @@ def _projection_issues(
     return issues
 
 
-# A selection node is ``True`` ("keep this subtree whole") or a dict of children.
-def _build_selection_tree(fields: Iterable[str]) -> Dict[str, Any]:
-    root: Dict[str, Any] = {}
+def _build_selection_tree(fields: Iterable[str]) -> SelectionTree:
+    root: SelectionTree = {}
     for field in fields:
         node = root
         parts = field.split(".")
@@ -86,14 +88,14 @@ def _build_selection_tree(fields: Iterable[str]) -> Dict[str, Any]:
             child = node.get(part)
             if child is True:
                 break  # parent already requested whole; sub-path is subsumed
-            if not isinstance(child, dict):
+            if child is None:
                 child = {}
                 node[part] = child
             node = child
     return root
 
 
-def _apply_selection(value: Any, node: Any) -> Any:
+def _apply_selection(value: object, node: Literal[True] | SelectionTree) -> object:
     if node is True or not isinstance(value, dict):
         return value
     return {

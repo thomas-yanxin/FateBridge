@@ -1,0 +1,41 @@
+{
+  "method_id": "jovian_public_circuit_group_membership_2026_v1",
+  "publisher": "Jovian Archive",
+  "author": "Jovian Archive public glossary and circuitry overview",
+  "sources": {
+    "dictionary": {
+      "url": "https://jovianarchive.com/pages/human-design-dictionary",
+      "capture_sha256": "d13e2e327fa0e9cb7921a400793886fdfdd2285f1a4d400b731fb2d61495ceab",
+      "headings": [
+        "Individual",
+        "Collective",
+        "Circuit Group",
+        "Ego Circuit",
+        "Defense Circuit"
+      ]
+    },
+    "overview": {
+      "url": "https://jovianarchive.com/pages/what-is-circuitry-in-human-design",
+      "capture_sha256": "c2e2c6aa24eddbf2490dced862150f1456808ce9dc4c83575056856a2e2c1154",
+      "section": "Individual Circuit Group (Empowerment)"
+    }
+  },
+  "groups": {
+    "individual": [
+      "individual_knowing",
+      "individual_centering",
+      "integration"
+    ],
+    "collective": [
+      "collective_understanding",
+      "collective_sensing"
+    ],
+    "tribal": [
+      "tribal_ego",
+      "tribal_defense"
+    ]
+  },
+  "integration_group": "individual",
+  "integration_is_separately_reported_subset": true,
+  "scope": "Group membership facts only. Integration has separate topology while included in Individual group totals. This does not independently verify all36 channel-to-circuit assignments, full teachings or predictive/psychological claims."
+}

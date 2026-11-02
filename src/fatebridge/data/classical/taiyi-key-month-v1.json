@@ -1,0 +1,47 @@
+{
+  "id": "taiyi-key-month-v1",
+  "source": {
+    "title": "太乙金钥匙续集",
+    "author": "底本题署，续集作者未独立考定",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/19/NLC892-411999021066-66022_%E5%A4%AA%E4%B9%99%E9%87%91%E9%91%B0%E5%8C%99.pdf",
+    "pages": [
+      36,
+      37,
+      38
+    ]
+  },
+  "month_example": {
+    "year": 1561,
+    "nominal_month": 9,
+    "label": "嘉靖四十年辛酉九月戊戌",
+    "counter": 695,
+    "gate_input": 684,
+    "gate_remainder": 184,
+    "duty_gate": "死",
+    "unit_in_gate": 4,
+    "remaining_units": 26,
+    "chart_ju_fragment": "壬子元第四"
+  },
+  "calendar": {
+    "title": "两千年中西历对照表",
+    "authors": "薛仲三、欧阳颐",
+    "edition": "商务印书馆1940年本NTUL-9900013521F03",
+    "printed_page": 313,
+    "url": "https://commons.wikimedia.org/wiki/File:NTUL-9900013521F03_兩千年中西曆對照表.pdf",
+    "month_start": {
+      "julian": "1561-10-09",
+      "gregorian": "1561-10-19",
+      "day_ganzhi": "戊子",
+      "cycle_index": 24,
+      "weekday_monday_zero": 3
+    },
+    "next_month_start": {
+      "julian": "1561-11-07",
+      "gregorian": "1561-11-17",
+      "day_ganzhi": "丁巳",
+      "cycle_index": 53,
+      "weekday_monday_zero": 4
+    }
+  },
+  "scope": "来源月例与两个月首事实；实际节月与农历月不同时须明示不匹配。不能借代表钟面补造原例日时。"
+}

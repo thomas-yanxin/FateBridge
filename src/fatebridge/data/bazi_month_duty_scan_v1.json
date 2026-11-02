@@ -1,0 +1,762 @@
+{
+  "method_id": "month_duty_scanned_witness_v1",
+  "source": {
+    "id": "sanming_renyuan_cadal06066038",
+    "title": "三命通會·卷二·論人元司事",
+    "author": "明·萬民英",
+    "edition_as_holding_metadata": "欽定四庫全書本，浙江大学图书馆／CADAL06066038",
+    "url": "https://archive.org/details/06066038.cn",
+    "pdf_url": "https://archive.org/download/06066038.cn/06066038.cn.pdf",
+    "source_pdf_sha256": "af4a8ca65cc4dfdf63d6294adc7925a868214563d0d52664c7ba779b833db14a",
+    "source_pdf_pages": 232,
+    "chapter_original_pdf_pages": [
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73
+    ],
+    "retained_context_original_pdf_pages": [
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74
+    ],
+    "chapter_start": "原PDF66右起第5栏题論人元司事，后接夫一氣渾淪",
+    "chapter_end": "原PDF73人命重提綱厥有旨哉，后接論四時節氣",
+    "source_identity_with_shidian_underlying_copy": "not_established",
+    "review_status": "same_developer_visual_collation_not_independent_expert",
+    "reading_policy": "Retain literal quantities. 己 is a developer scan reading, not a silent normalization of the preserved digital 已. 艮土 and 坤土 stay unassigned."
+  },
+  "profiles": [
+    {
+      "id": "sanming_cadal_opening_prose",
+      "source_layer": "开头逐月文字",
+      "claim_kind": "nominal_durations_not_adopted_schedule",
+      "months": {
+        "寅": {
+          "month_branch": "寅",
+          "original_pdf_pages": [
+            67
+          ],
+          "literal_quote": "正月建寅寅中有艮土用事五日丙火長生五日甲木二十日",
+          "claims": [
+            {
+              "source_name": "艮土",
+              "canonical_stem": null,
+              "days": 5,
+              "identity_status": "unresolved_literal_soil_identity"
+            },
+            {
+              "source_name": "丙火",
+              "canonical_stem": "丙",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "甲木",
+              "canonical_stem": "甲",
+              "days": 20,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "卯": {
+          "month_branch": "卯",
+          "original_pdf_pages": [
+            67
+          ],
+          "literal_quote": "二月建卯卯中有甲木用事七日乙木二十三日",
+          "claims": [
+            {
+              "source_name": "甲木",
+              "canonical_stem": "甲",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "乙木",
+              "canonical_stem": "乙",
+              "days": 23,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "辰": {
+          "month_branch": "辰",
+          "original_pdf_pages": [
+            67
+          ],
+          "literal_quote": "三月建辰辰中有乙木用事七日壬水墓庫五日戊土一十八日",
+          "claims": [
+            {
+              "source_name": "乙木",
+              "canonical_stem": "乙",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "壬水",
+              "canonical_stem": "壬",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "戊土",
+              "canonical_stem": "戊",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "巳": {
+          "month_branch": "巳",
+          "original_pdf_pages": [
+            67,
+            68
+          ],
+          "literal_quote": "四月建巳巳中有戊土七日庚金長生五日丙火一十八日",
+          "claims": [
+            {
+              "source_name": "戊土",
+              "canonical_stem": "戊",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "庚金",
+              "canonical_stem": "庚",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "丙火",
+              "canonical_stem": "丙",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "午": {
+          "month_branch": "午",
+          "original_pdf_pages": [
+            68
+          ],
+          "literal_quote": "五月建午午中丙火用事七日丁火二十三日",
+          "claims": [
+            {
+              "source_name": "丙火",
+              "canonical_stem": "丙",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "丁火",
+              "canonical_stem": "丁",
+              "days": 23,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "未": {
+          "month_branch": "未",
+          "original_pdf_pages": [
+            68
+          ],
+          "literal_quote": "六月建未未中有丁火用事七日甲木墓庫五日己土一十八日",
+          "claims": [
+            {
+              "source_name": "丁火",
+              "canonical_stem": "丁",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "甲木",
+              "canonical_stem": "甲",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "己土",
+              "canonical_stem": "己",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "申": {
+          "month_branch": "申",
+          "original_pdf_pages": [
+            68
+          ],
+          "literal_quote": "七月建申申中有坤土用事五日壬水長生五日庚金二十日",
+          "claims": [
+            {
+              "source_name": "坤土",
+              "canonical_stem": null,
+              "days": 5,
+              "identity_status": "unresolved_literal_soil_identity"
+            },
+            {
+              "source_name": "壬水",
+              "canonical_stem": "壬",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "庚金",
+              "canonical_stem": "庚",
+              "days": 20,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "酉": {
+          "month_branch": "酉",
+          "original_pdf_pages": [
+            68
+          ],
+          "literal_quote": "八月建酉酉中有庚金用事七日辛金二十三日",
+          "claims": [
+            {
+              "source_name": "庚金",
+              "canonical_stem": "庚",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "辛金",
+              "canonical_stem": "辛",
+              "days": 23,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "戌": {
+          "month_branch": "戌",
+          "original_pdf_pages": [
+            68
+          ],
+          "literal_quote": "九月建戌戌中有辛金用事七日丙火墓庫五日戊土一十八日",
+          "claims": [
+            {
+              "source_name": "辛金",
+              "canonical_stem": "辛",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "丙火",
+              "canonical_stem": "丙",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "戊土",
+              "canonical_stem": "戊",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "亥": {
+          "month_branch": "亥",
+          "original_pdf_pages": [
+            68
+          ],
+          "literal_quote": "十月建亥亥中有戊土五日甲木長生五日壬水用事二十日",
+          "claims": [
+            {
+              "source_name": "戊土",
+              "canonical_stem": "戊",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "甲木",
+              "canonical_stem": "甲",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "壬水",
+              "canonical_stem": "壬",
+              "days": 20,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "子": {
+          "month_branch": "子",
+          "original_pdf_pages": [
+            68
+          ],
+          "literal_quote": "十一月建子子中有壬水用事七日癸水二十三日",
+          "claims": [
+            {
+              "source_name": "壬水",
+              "canonical_stem": "壬",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "癸水",
+              "canonical_stem": "癸",
+              "days": 23,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "丑": {
+          "month_branch": "丑",
+          "original_pdf_pages": [
+            68,
+            69
+          ],
+          "literal_quote": "十二月建丑丑中有癸水用事七日庚金墓庫五日己土一十八日",
+          "claims": [
+            {
+              "source_name": "癸水",
+              "canonical_stem": "癸",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "庚金",
+              "canonical_stem": "庚",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "己土",
+              "canonical_stem": "己",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        }
+      }
+    },
+    {
+      "id": "sanming_cadal_following_table",
+      "source_layer": "随后逐月表",
+      "claim_kind": "nominal_durations_not_adopted_schedule",
+      "months": {
+        "寅": {
+          "month_branch": "寅",
+          "original_pdf_pages": [
+            69
+          ],
+          "literal_quote": "正月寅立春雨水己土七日丙火五日甲木十八日",
+          "claims": [
+            {
+              "source_name": "己土",
+              "canonical_stem": "己",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "丙火",
+              "canonical_stem": "丙",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "甲木",
+              "canonical_stem": "甲",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "卯": {
+          "month_branch": "卯",
+          "original_pdf_pages": [
+            69
+          ],
+          "literal_quote": "二月卯驚蟄春分乙十八日甲九日癸三日",
+          "claims": [
+            {
+              "source_name": "乙",
+              "canonical_stem": "乙",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "甲",
+              "canonical_stem": "甲",
+              "days": 9,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "癸",
+              "canonical_stem": "癸",
+              "days": 3,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "辰": {
+          "month_branch": "辰",
+          "original_pdf_pages": [
+            69
+          ],
+          "literal_quote": "三月辰清明穀雨戊十八日乙九日癸三日",
+          "claims": [
+            {
+              "source_name": "戊",
+              "canonical_stem": "戊",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "乙",
+              "canonical_stem": "乙",
+              "days": 9,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "癸",
+              "canonical_stem": "癸",
+              "days": 3,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "巳": {
+          "month_branch": "巳",
+          "original_pdf_pages": [
+            70
+          ],
+          "literal_quote": "四月巳立夏小滿丙十八日戊七日庚五日",
+          "claims": [
+            {
+              "source_name": "丙",
+              "canonical_stem": "丙",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "戊",
+              "canonical_stem": "戊",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "庚",
+              "canonical_stem": "庚",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "午": {
+          "month_branch": "午",
+          "original_pdf_pages": [
+            70
+          ],
+          "literal_quote": "五月午芒種夏至丁十八日丙九日乙三日",
+          "claims": [
+            {
+              "source_name": "丁",
+              "canonical_stem": "丁",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "丙",
+              "canonical_stem": "丙",
+              "days": 9,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "乙",
+              "canonical_stem": "乙",
+              "days": 3,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "未": {
+          "month_branch": "未",
+          "original_pdf_pages": [
+            70
+          ],
+          "literal_quote": "六月未小暑大暑己十八日乙五日丁七日",
+          "claims": [
+            {
+              "source_name": "己",
+              "canonical_stem": "己",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "乙",
+              "canonical_stem": "乙",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "丁",
+              "canonical_stem": "丁",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "申": {
+          "month_branch": "申",
+          "original_pdf_pages": [
+            70
+          ],
+          "literal_quote": "七月申立秋處暑庚十七日己七日戊三日壬三日",
+          "claims": [
+            {
+              "source_name": "庚",
+              "canonical_stem": "庚",
+              "days": 17,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "己",
+              "canonical_stem": "己",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "戊",
+              "canonical_stem": "戊",
+              "days": 3,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "壬",
+              "canonical_stem": "壬",
+              "days": 3,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "酉": {
+          "month_branch": "酉",
+          "original_pdf_pages": [
+            70
+          ],
+          "literal_quote": "八月酉白露秋分辛二十日庚七日丁五日",
+          "claims": [
+            {
+              "source_name": "辛",
+              "canonical_stem": "辛",
+              "days": 20,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "庚",
+              "canonical_stem": "庚",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "丁",
+              "canonical_stem": "丁",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "戌": {
+          "month_branch": "戌",
+          "original_pdf_pages": [
+            70
+          ],
+          "literal_quote": "九月戌寒露霜降戊十八日辛七日丁五日",
+          "claims": [
+            {
+              "source_name": "戊",
+              "canonical_stem": "戊",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "辛",
+              "canonical_stem": "辛",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "丁",
+              "canonical_stem": "丁",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "亥": {
+          "month_branch": "亥",
+          "original_pdf_pages": [
+            70
+          ],
+          "literal_quote": "十月亥立冬小雪壬十八日甲五日戊七日",
+          "claims": [
+            {
+              "source_name": "壬",
+              "canonical_stem": "壬",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "甲",
+              "canonical_stem": "甲",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "戊",
+              "canonical_stem": "戊",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "子": {
+          "month_branch": "子",
+          "original_pdf_pages": [
+            70
+          ],
+          "literal_quote": "十一月子大雪冬至癸十八日壬五日辛三日",
+          "claims": [
+            {
+              "source_name": "癸",
+              "canonical_stem": "癸",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "壬",
+              "canonical_stem": "壬",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "辛",
+              "canonical_stem": "辛",
+              "days": 3,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        },
+        "丑": {
+          "month_branch": "丑",
+          "original_pdf_pages": [
+            71
+          ],
+          "literal_quote": "十二月丑小寒大寒己十八日癸七日辛五日",
+          "claims": [
+            {
+              "source_name": "己",
+              "canonical_stem": "己",
+              "days": 18,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "癸",
+              "canonical_stem": "癸",
+              "days": 7,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            },
+            {
+              "source_name": "辛",
+              "canonical_stem": "辛",
+              "days": 5,
+              "identity_status": "explicit_scan_stem_developer_reading"
+            }
+          ],
+          "chronological_order_adjudicated": false
+        }
+      }
+    }
+  ],
+  "annual_literal_claim": {
+    "original_pdf_pages": [
+      69
+    ],
+    "literal_quote": "再考玉井則以甲丙庚壬各三十五日乙丁辛癸各三十五日戊己各五十日共計三百六十日",
+    "groups": [
+      {
+        "source_names": [
+          "甲",
+          "丙",
+          "庚",
+          "壬"
+        ],
+        "each_days": 35
+      },
+      {
+        "source_names": [
+          "乙",
+          "丁",
+          "辛",
+          "癸"
+        ],
+        "each_days": 35
+      },
+      {
+        "source_names": [
+          "戊",
+          "己"
+        ],
+        "each_days": 50
+      }
+    ],
+    "stated_total_days": 360
+  },
+  "closing_critique": {
+    "original_pdf_pages": [
+      71,
+      72,
+      73
+    ],
+    "literal_quote": "醉醒子曰時行物生天道之常一歲之中雖有進退四時之內本無輕重故以金木水火分旺四時各得七十二日土旺四季各有十八日共三百六十日乃成歲焉立春之後則用陽木三十六日艮土分野丙戊長生驚蟄後六日則用陰木三十六日癸水寄生清明後十二日則用戊土十八日陽水歸庫陰水返魂夏秋冬亦如此淵源淵海則以立春之後己土餘氣幾日艮土分野幾日丙戊長生先後各得幾日卯月癸水寄生幾日辰月陽水歸庫陰水返魂亦各幾日殊不思丑月之用既足春後又何餘哉分野者聚一方之旺氣長生者歸母成孕先後者蓋有寅而後生丙有丙而後戊生寄生者徒有虛名乃無實位歸庫者絕其生氣而收藏返魂者續其死氣而變化此五行生死進退之玄機豈可以幾日為限哉且春之用木秋之用金固一定之理也若雜揉寓處之神占用幾日則本宮主氣之數未嘗不缺而虧矣則何以見春木夏火一氣流行各旺七十二日之數耶以四季配五行之用乃主有納客之數客無勝主之理但主氣之司權自有初中末三氣之淺深用之者特宜較量輕重言耳又豈可以三五七日為限哉其說足以破淵源之誤又支中所藏止以月論年日時不論人命重提綱厥有旨哉",
+    "attribution": "醉醒子曰及章末评议；其說足以破以下的编者语气按阅读标注，原页无现代引号",
+    "interpretation_scope": "本章保留两套数字又明确批评机械限日，要求主客、初中末浅深与轻重比较；不据此自动采用日期表或将字面条目添加为实体藏根。"
+  },
+  "source_comparison_scope": "Compare all69duration values with preserved Shidian transcript. Same numbers do not establish exact base-copy identity or independent predictive correctness.",
+  "independent_expert_review": "not_completed",
+  "calendar_mapping_status": "not_adopted",
+  "selected_duty_stem": null,
+  "effective_command_status": "not_adjudicated",
+  "calculation_effect": "none",
+  "real_world_predictive_validity": "not_tested"
+}

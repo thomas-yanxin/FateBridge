@@ -46,7 +46,7 @@ def test_local_links_encoded_paths_and_badges(tmp_path, monkeypatch):
     )
     (tmp_path / "LICENSE").touch()
     monkeypatch.chdir(tmp_path.parent)
-    assert check_docs.main() == 0
+    assert check_docs.main([]) == 0
 
 
 @pytest.mark.parametrize(
@@ -62,7 +62,7 @@ def test_broken_links_fail_with_source_location(
 ):
     monkeypatch.setattr(check_docs, "ROOT", tmp_path)
     (tmp_path / "README.md").write_text(text, encoding="utf-8")
-    assert check_docs.main() == 1
+    assert check_docs.main([]) == 1
     assert f"README.md:1: {expected}" in capsys.readouterr().out
 
 
@@ -71,5 +71,40 @@ def test_invalid_example_json_fails(tmp_path, monkeypatch, capsys):
     examples: Path = tmp_path / "docs" / "examples"
     examples.mkdir(parents=True)
     (examples / "broken.json").write_text("{broken}", encoding="utf-8")
-    assert check_docs.main() == 1
+    assert check_docs.main([]) == 1
     assert "docs/examples/broken.json: invalid JSON" in capsys.readouterr().out
+
+
+def test_historical_snapshots_are_separate_from_current_document_checks(
+    tmp_path, monkeypatch, capsys
+):
+    monkeypatch.setattr(check_docs, "ROOT", tmp_path)
+    archive = tmp_path / "docs/validation/old-run"
+    archive.mkdir(parents=True)
+    (archive / "README.md").write_text(
+        "# 原始报告\n\n[旧相对路径](missing.md)\n", encoding="utf-8"
+    )
+    (tmp_path / "README.md").write_text(
+        "[历史依据](docs/validation/old-run/README.md#原始报告)\n", encoding="utf-8"
+    )
+    assert check_docs.main([]) == 0
+    assert check_docs.main(["--include-archives"]) == 1
+    assert "old-run/README.md:3: missing local target" in capsys.readouterr().out
+
+
+def test_current_links_to_missing_historical_files_or_anchors_still_fail(
+    tmp_path, monkeypatch, capsys
+):
+    monkeypatch.setattr(check_docs, "ROOT", tmp_path)
+    archive = tmp_path / "docs/validation"
+    archive.mkdir(parents=True)
+    (archive / "report.md").write_text("# 存在的标题\n", encoding="utf-8")
+    (tmp_path / "README.md").write_text(
+        "[缺文件](docs/validation/missing.md)\n"
+        "[缺标题](docs/validation/report.md#absent)\n",
+        encoding="utf-8",
+    )
+    assert check_docs.main([]) == 1
+    output = capsys.readouterr().out
+    assert "missing local target" in output
+    assert "missing heading anchor" in output

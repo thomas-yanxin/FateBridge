@@ -63,6 +63,7 @@ _KEY_LABELS: Dict[str, str] = {
     "relationship_profile": "关系画像",
     "synastry_aspects": "互动相位",
     "compatibility": "配合度",
+    "compatibility_evidence": "自定义评分依据",
     # 八字核心结构键：未覆盖时会以英文原文漏进中文快照（_label 回退到原 key）。
     "day_master": "日主",
     "day_master_strength": "日主强弱",

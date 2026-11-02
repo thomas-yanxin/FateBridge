@@ -132,6 +132,21 @@ async def test_named_relationship_mode_keeps_its_primary_evidence(mode):
                     assert payload[side]["chart_profile"]["reference_frame"]
                     assert len(payload[side]["chart"]["planets"]) >= 10
                     assert len(payload[side]["chart"]["houses"]) == 12
+            elif mode == "marks":
+                assert set(payload["marks_charts"]) == {"inner", "outer"}
+                assert payload["relationship_profile"]["primary_chart_role"] == "inner"
+                for side in ["inner", "outer"]:
+                    personal = payload["marks_charts"][side]
+                    assert personal["chart_profile"]["chart_type"] == "marks"
+                    assert len(personal["planets"]) >= 10
+                    assert len(personal["houses"]) == 12
+                    assert personal["angles"] and personal["aspects"]
+                assert (
+                    payload["marks_charts"]["inner"]["planets"]
+                    != payload["marks_charts"]["outer"]["planets"]
+                )
+                if view is not None:
+                    assert "chart" not in payload
             else:
                 assert len(payload["chart"]["planets"]) >= 10
                 assert payload["chart"]["angles"] and payload["chart"]["aspects"]

@@ -1,30 +1,33 @@
 {
   "schema_version": "1.1",
   "sources_sha256": {
-    "docs/scenario-routing.md": "9adb67bea247320649d778f35f31f00a2afb96057a9281d0b93805359510e8d4",
-    "skills/_shared/bazi-topic-evidence.md": "5f3f18fc833e3f57ed750d7fbe249cdd5146120fe024f710b68ed36107fd31a0",
+    "docs/scenario-routing.md": "5fba5cc07a3c2e5370668e126dbc105efca7e7258f71e7958eb1b82597faa33d",
+    "skills/_shared/bazi-topic-evidence.md": "9dec9a6d661b6f8bb64e6b1415bde712994dce2a15bbbf651cb68bb0588e98af",
+    "skills/_shared/consultation-core.md": "077f6f361180d93458cff7e230bc0c28135519b086db67ca17c31d9e4d14d76a",
     "skills/_shared/consultation-delivery.md": "4a6f723231a6bf4d2f2ab61310e283e3bde7de9494de6731f929d73aeb73e4cc",
-    "skills/_shared/consultation-routing.md": "f9226c03f9607a0b003bb236cacb83a7b97b59158e26975fb392fede992ad984",
-    "skills/_shared/fatebridge-engine.md": "90ab1537234ed3d05332553bf4a6d1fa85fbe1fd9ada23da7aca75ebb1552f9d",
-    "skills/_shared/onda-counsel.md": "4fd8a4bae39f84e3d8d7fefbe43caf940cafd114ac95df653c3ae13b5d696c2c",
+    "skills/_shared/consultation-routing.md": "67987ebc83603e8f4c902958d8139ecad221b660e7a1ae134c9a552108693c08",
+    "skills/_shared/fatebridge-engine.md": "c8ec0e22ff951617349d6a2d0dc76f5300cea456bf4180f95fdfb7abc79185b0",
+    "skills/_shared/onda-counsel.md": "37b565a39296933e32569471e9e3423b243ad7fd7836970eeedafe092ae50d00",
     "skills/_shared/safety-boundaries.md": "5b0fffdc53369e684825515117b21cd5e1e9380459f4a12e89f856b5447a9cf3",
-    "skills/_shared/timing-selection.md": "9351f8874c067d72a2ccc3a52c3bcac4bf71ead55dabbd61ead206cc799ff357",
-    "skills/_shared/western-deep-evidence.md": "a9dd11be3b24c4fcd8a6de919d5afa3b746a93b1c3881bfa7ea51a9e319f68cb",
+    "skills/_shared/sukuyo-evidence.md": "8b819d50185e8f06f6a8e5da47ae3eca765726693a64404ff3f2404b34d41a4a",
+    "skills/_shared/timing-selection.md": "41b557e71e4b17250c85fafdce7c0131259a29d179d61d2446e018ec6ef2442e",
+    "skills/_shared/vedic-evidence.md": "1f13c0b2baba2eab0a03faae5ae11caba5183bfbd5d6fd4f2cf7906a8134394d",
+    "skills/_shared/western-deep-evidence.md": "5102fc8275b6c3456cc56278d14278440937147cceef1fadc69cc3ce2c78ea09",
     "skills/_shared/western-topic-evidence.md": "d4c9c29428efd852c7f15e1d499cdd7eb0f9c8f6f1945697f7f44c1f49fb015b",
-    "skills/_shared/ziwei-topic-evidence.md": "6d4a104e147cd76bc7fd59ccd48f6ef953838a7062b2e44f373c321f0d99df0c",
-    "skills/onda-caiwu/agents/interface.yaml": "2a6fb484f9e2394ae4645640547f42736b525891bedbb37651600485f797c539",
-    "skills/onda-fengshui/agents/interface.yaml": "0e4c1d9ef174ea1814b25b695404d6cecfe1bb2b4cfb05a23a80cfd0b1aed2bf",
-    "skills/onda-jiankang/agents/interface.yaml": "5d680f3a90ec20bc7071a894fe86a6c357bc662189d5d9d6390985feb283edb2",
-    "skills/onda-jiating/agents/interface.yaml": "d626f0c10535db49302a49b9669638f4cd72cc7b13fcadbd877c21765af53987",
-    "skills/onda-mingge/agents/interface.yaml": "77bbfae2293634ef0dd303919e1b5c9f307afee6664d9ade217645e8f195a260",
-    "skills/onda-renji/agents/interface.yaml": "1f333ac9fac1352b58ebefe255709905685339fc6e99ddc211856dc634df7aad",
-    "skills/onda-shiye/agents/interface.yaml": "4ba53103ca3845ed8ee659a8dc870249c367b69ae3dc58b3204fabbe5196e6c7",
-    "skills/onda-shiyun/agents/interface.yaml": "42307ba9f4e1aa0b69746c41fb6b534f61cc7c3f89ce3f900245d6da877369f6",
-    "skills/onda-xingpan/agents/interface.yaml": "21868faf3a5698e461e6c93fb4a0bbe10a23b2bd799a9121f93240e6542109b5",
-    "skills/onda-xueye/agents/interface.yaml": "7b51416d5804ae76f8b1744284a155ddcd155d93ef5f6e9fcd27767c95fe8b4f",
-    "skills/onda-yuanfen/agents/interface.yaml": "1dcb8af7838c66a86340463879d1473e7565a0a970e4d3d7b5977d89c1ade460",
-    "skills/onda-zhanbu/agents/interface.yaml": "abef443c3ccfaf45966cae4f215c1b49a7553db7f5ce3085c4c3f383ec1e943e",
-    "skills/onda-zige/agents/interface.yaml": "e635de961a59d0353fa1cb564dbb7de981b932415b61a87ea6256b163b997af1"
+    "skills/_shared/ziwei-topic-evidence.md": "0777108fcaa0ebd05e9a286a31debbd43e50cfdbb247671990cafb221bce857a",
+    "skills/onda-caiwu/agents/interface.yaml": "0f9e525315daca90ce61d3174df3c71f3ca5b09717fdc30d582279b4062f635b",
+    "skills/onda-fengshui/agents/interface.yaml": "be3359dcbc064f6a498133f6aac8a09f0a28d10e0408f893cb1f1382f63b1c56",
+    "skills/onda-jiankang/agents/interface.yaml": "a8c6c17b1ad5046c44ee1e2af65a0ffee7e48db06124d1ce929ca64f8ea4bbdb",
+    "skills/onda-jiating/agents/interface.yaml": "1c04e0e7f95451d98291017c6e4a9d071a6bad89a09472c30ec714757317de2f",
+    "skills/onda-mingge/agents/interface.yaml": "80ccb67be53606e8cf774aadc28a99a90c83efc2ce2d5767cd954a5ec09dac65",
+    "skills/onda-renji/agents/interface.yaml": "ca0af48e088d5d9302547ae32335f46d88decb5d753e2f9fa068191a83815bd6",
+    "skills/onda-shiye/agents/interface.yaml": "1115317a55f24ce5d8075ae6c04a0cb95029499726badd5eced65f27b84104d8",
+    "skills/onda-shiyun/agents/interface.yaml": "5ddac03bbdfbef54e3d2a7572fe00ba9f40e2cdadfa7e16f7528e31aeb2b7e0d",
+    "skills/onda-xingpan/agents/interface.yaml": "0c8493fa02a8d770947b5d515bbf913b6b5b7ff8d722522153a3c2b918075e1f",
+    "skills/onda-xueye/agents/interface.yaml": "9a961f7fecb947dc612a4107fa26fe937ed551a5e24a46179c42155569eed164",
+    "skills/onda-yuanfen/agents/interface.yaml": "4bd624728e6865279a4db4aff23cfd07421cb5d5832921094d4321def5990bdc",
+    "skills/onda-zhanbu/agents/interface.yaml": "efccb1bf7456f3d7dd6adbf6b94e6ee331df7953430e1c9718dc338267bc9800",
+    "skills/onda-zige/agents/interface.yaml": "c5fc64795fbac2ec5e6590736eac47430170b228c2d33d4d97345cb5e2503b22"
   },
   "consultation_policy": {
     "id": "consultation_boundaries_v1",
@@ -185,6 +188,7 @@
         "fengshui_directions",
         "fengshui_jinsuo",
         "fengshui_minggua",
+        "fengshui_monthly_stars",
         "fengshui_xuankong_natal"
       ],
       "dependencies": [
@@ -323,6 +327,18 @@
                 "fengshui_annual_stars"
               ],
               "condition": "立春边界"
+            }
+          ]
+        },
+        {
+          "intent": "某节月九宫月星",
+          "evidence": [
+            {
+              "role": "primary",
+              "alternatives": [
+                "fengshui_monthly_stars"
+              ],
+              "condition": "十二节瞬间；有效年与公历年分开"
             }
           ]
         },
@@ -867,6 +883,8 @@
         "创业角色"
       ],
       "engine_tools": [
+        "astro_india",
+        "astro_vimshottari",
         "analyze_destiny",
         "astro_chart",
         "astro_election",
@@ -922,7 +940,8 @@
             {
               "role": "supporting",
               "alternatives": [
-                "astro_chart"
+                "astro_chart",
+                "astro_india"
               ],
               "condition": "相关职业配置"
             }
@@ -949,7 +968,8 @@
             {
               "role": "supporting",
               "alternatives": [
-                "astro_chart"
+                "astro_chart",
+                "astro_india"
               ],
               "condition": "已有结构"
             },
@@ -959,7 +979,8 @@
                 "timing_analysis",
                 "ziwei_horoscope",
                 "western_timing_analysis",
-                "firdaria"
+                "firdaria",
+                "astro_vimshottari"
               ],
               "condition": "仅补所需时间层"
             }
@@ -974,7 +995,8 @@
                 "timing_analysis",
                 "ziwei_horoscope",
                 "western_timing_analysis",
-                "firdaria"
+                "firdaria",
+                "astro_vimshottari"
               ],
               "condition": "独立背景"
             },
@@ -1014,6 +1036,8 @@
         "择时"
       ],
       "engine_tools": [
+        "astro_india",
+        "astro_vimshottari",
         "astro_agepoint",
         "astro_balbillus",
         "astro_distributions",
@@ -1095,6 +1119,7 @@
               "alternatives": [
                 "western_timing_analysis",
                 "firdaria",
+                "astro_vimshottari",
                 "zr",
                 "decennials"
               ],
@@ -1125,6 +1150,7 @@
               "alternatives": [
                 "western_timing_analysis",
                 "firdaria",
+                "astro_vimshottari",
                 "zr",
                 "decennials"
               ],
@@ -1169,6 +1195,7 @@
               "alternatives": [
                 "western_timing_analysis",
                 "firdaria",
+                "astro_vimshottari",
                 "zr",
                 "decennials"
               ],
@@ -1218,7 +1245,7 @@
     {
       "id": "onda-xingpan",
       "name": "命盘与指定方法解读",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "summary": "直接满足用户指定的命盘、流派与技法，按相关主题解释实际字段并保留精度范围",
       "consultation": {
         "kind": "service",
@@ -1230,14 +1257,21 @@
         "safety_policy": "consultation_boundaries_v1"
       },
       "triggers": [
+        "人类图",
+        "BodyGraph",
         "星盘",
         "八字命盘",
         "紫微命盘",
         "流派盘",
         "关系盘",
-        "指定技法"
+        "指定技法",
+        "河洛理数",
+        "邵子参评",
+        "金锁银匙"
       ],
       "engine_tools": [
+        "human_design",
+        "astro_vimshottari",
         "analyze_destiny",
         "astro_chart",
         "astro_chart13",
@@ -1247,12 +1281,16 @@
         "astro_india",
         "astro_relative_chart",
         "bazi_birth",
+        "bazi_source_compare",
+        "canping",
+        "heluo",
         "dayun_analysis",
         "firdaria",
         "liunian_analysis",
         "western_timing_analysis",
         "ziwei_birth",
-        "ziwei_horoscope"
+        "ziwei_horoscope",
+        "ziwei_rules"
       ],
       "dependencies": [
         {
@@ -1305,6 +1343,7 @@
             {
               "role": "primary",
               "alternatives": [
+                "human_design",
                 "astro_chart",
                 "astro_chart13",
                 "astro_hellen",
@@ -1313,6 +1352,24 @@
                 "astro_germany"
               ],
               "condition": "择一，不重复"
+            }
+          ]
+        },
+        {
+          "intent": "人类图／类型／权威",
+          "evidence": [
+            {
+              "role": "primary",
+              "alternatives": [
+                "human_design",
+                "astro_chart",
+                "astro_chart13",
+                "astro_hellen",
+                "astro_guolao",
+                "astro_india",
+                "astro_germany"
+              ],
+              "condition": "按人类图字段与来源"
             }
           ]
         },
@@ -1336,10 +1393,24 @@
               "alternatives": [
                 "western_timing_analysis",
                 "firdaria",
+                "astro_vimshottari",
                 "dayun_analysis",
                 "liunian_analysis"
               ],
               "condition": "按用户所选窄查询"
+            }
+          ]
+        },
+        {
+          "intent": "指定河洛／参评数",
+          "evidence": [
+            {
+              "role": "primary",
+              "alternatives": [
+                "heluo",
+                "canping"
+              ],
+              "condition": "按指定方法"
             }
           ]
         }
@@ -1488,6 +1559,8 @@
         "复合"
       ],
       "engine_tools": [
+        "astro_india",
+        "astro_vimshottari",
         "astro_chart",
         "astro_relative_chart",
         "bazi_marriage",
@@ -1550,7 +1623,8 @@
               "role": "supporting",
               "alternatives": [
                 "astro_chart",
-                "astro_relative_chart"
+                "astro_relative_chart",
+                "astro_india"
               ],
               "condition": "本命相关配置"
             }
@@ -1578,7 +1652,8 @@
               "role": "primary",
               "alternatives": [
                 "astro_chart",
-                "astro_relative_chart"
+                "astro_relative_chart",
+                "astro_india"
               ],
               "condition": "明确星盘互动"
             }
@@ -1602,6 +1677,7 @@
                 "ziwei_horoscope",
                 "western_timing_analysis",
                 "firdaria",
+                "astro_vimshottari",
                 "liuyue_analysis"
               ],
               "condition": "仅补所需粒度"
@@ -1641,6 +1717,7 @@
         "liureng_gods",
         "liureng_runyear",
         "meihua_analysis",
+        "meihua_cast",
         "otherbu",
         "qimen",
         "sanshiunited",
@@ -1675,6 +1752,7 @@
               "role": "primary",
               "alternatives": [
                 "meihua_analysis",
+                "meihua_cast",
                 "sixyao"
               ],
               "condition": "按所选方式"
@@ -1893,6 +1971,7 @@
         "宅卦与各住户布局",
         "金锁基础砂水",
         "某年九宫年星",
+        "某节月九宫月星",
         "历史玄空宅盘",
         "三法合参",
         "工位/家居多方案与动作限制"
@@ -1904,6 +1983,7 @@
         "fengshui_bazhai",
         "fengshui_jinsuo",
         "fengshui_annual_stars",
+        "fengshui_monthly_stars",
         "fengshui_xuankong_natal"
       ],
       "dependencies": [
@@ -2016,6 +2096,18 @@
                 "fengshui_annual_stars"
               ],
               "condition": "立春换年；固定宫数与年星数分开，不能冒充完整山向宅盘"
+            }
+          ]
+        },
+        {
+          "intent": "某节月九宫月星",
+          "evidence": [
+            {
+              "role": "primary",
+              "alternatives": [
+                "fengshui_monthly_stars"
+              ],
+              "condition": "含时区时刻或已确认有效年/节月；十二节瞬间换月，公历一月可能归前一有效年；只解释数字与落宫"
             }
           ]
         },

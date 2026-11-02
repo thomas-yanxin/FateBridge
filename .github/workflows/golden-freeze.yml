@@ -2,7 +2,7 @@ name: Golden Freeze
 
 # 手动触发：在 CI 平台（ubuntu-24.04 x86_64，与 test 作业同口径）冻结 golden 基线，
 # 作为 artifact 上传。星历浮点是平台相关的，基线必须在此平台生成才能被 test 作业
-# 字节比对。用法：触发本工作流 → 下载 artifact → 覆盖 tests/golden/snapshots/ → 提交。
+# 字节比对。用法：触发本工作流 → 下载 artifact → 经审查后更新配套冻结数据。
 on:
   workflow_dispatch:
 

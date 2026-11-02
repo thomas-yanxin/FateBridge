@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "version": 5,
+  "catalogue_id": "human_design_gate4_editorial_v5",
+  "parent_version": 4,
+  "parent_catalogue_sha256": "cc82bc7418315c90edc182c3e510842b1e79cdd583aaf587f99a664b286b5d4b",
+  "source_pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495",
+  "curated_by": "FateBridge primary agent; bounded visual source reading, not independent review",
+  "required_line_count": 384,
+  "expected_local_paraphrase_count": 24,
+  "independently_accepted_line_count": 0,
+  "publisher_master_authenticated": false,
+  "complete384_line_meanings_accepted": false,
+  "source_conditions_exhaustively_reviewed": false,
+  "publisher_direct_body_corroboration_available": false,
+  "rows": [
+    {
+      "key": "4.1",
+      "source_pdf_page_one_based": 13,
+      "source_layout_block_sha256": "f7da07b608e4410821c6ccf5748b13fa792d564ea3f555f2463bfed6a5f83306",
+      "source_line_heading": "Pleasure",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "理解的时机",
+        "exaltation": "耐心辨认形成理解的时机。",
+        "detriment": "知道有时机，仍急于强求。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "愉悦涉及恰当时机。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：愉悦涉及恰当时机。",
+        "第4门的答案或公式是待检验的可能，不等同事实、解决方案或内在权威。",
+        "这里的时机不是已计算的事件日期。"
+      ]
+    },
+    {
+      "key": "4.2",
+      "source_pdf_page_one_based": 13,
+      "source_layout_block_sha256": "79aaae67e515934bcca49324c5c2462d96dddb68a71bee820b3ce7f94097837a",
+      "source_line_heading": "Acceptance",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "理解限度与包容",
+        "exaltation": "容许并非人人都能理解。",
+        "detriment": "借他人的理解不足抬高自我。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "认识局限可暂停判断。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：认识局限可暂停判断。",
+        "第4门的答案或公式是待检验的可能，不等同事实、解决方案或内在权威。"
+      ]
+    },
+    {
+      "key": "4.3",
+      "source_pdf_page_one_based": 13,
+      "source_layout_block_sha256": "9516afcf99d3d197abbb26812aebc3c91a81cb4ab1f0de35291b1cdb676031b1",
+      "source_line_heading": "Irresponsibility",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "公式与实践",
+        "exaltation": "欣赏公式而不追求实际用途。",
+        "detriment": "为不用心投入寻找合理说辞。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "能够少投入时倾向少投入。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：能够少投入时倾向少投入。",
+        "第4门的答案或公式是待检验的可能，不等同事实、解决方案或内在权威。",
+        "原上升段印作then；保留该字面疑点，不认证勘误。"
+      ]
+    },
+    {
+      "key": "4.4",
+      "source_pdf_page_one_based": 13,
+      "source_layout_block_sha256": "0b116640d392b68b5dca5cbff6d5ae41e5ff2c8fe420945052a3a6379740f8e4",
+      "source_line_heading": "The liar",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "想象与事实",
+        "exaltation": "借想象寻找或呈现公式。",
+        "detriment": "把想象误认成事实。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "引导语谈表演和角色扮演。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：引导语谈表演和角色扮演。",
+        "第4门的答案或公式是待检验的可能，不等同事实、解决方案或内在权威。",
+        "原线名不用于判断当事人是否撒谎。"
+      ]
+    },
+    {
+      "key": "4.5",
+      "source_pdf_page_one_based": 13,
+      "source_layout_block_sha256": "972aa92878cca2610ad24248ecfdfcd157db70adcd802b82b2e4e4ebfcd3ca1f",
+      "source_line_heading": "Seduction",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "借助他人理解",
+        "exaltation": "借他人的理解取得认可。",
+        "detriment": "因总须认可他人而形成犬儒态度。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "让他人担责以遮护自身。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：让他人担责以遮护自身。",
+        "第4门的答案或公式是待检验的可能，不等同事实、解决方案或内在权威。"
+      ]
+    },
+    {
+      "key": "4.6",
+      "source_pdf_page_one_based": 13,
+      "source_layout_block_sha256": "0f0c05a314baf29cd3bffb479b6a7d2074ba30538210e29da59d5bc7de71398f",
+      "source_line_heading": "Excess",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "未完成时的耐心",
+        "exaltation": "经验形成自制，等待理解成熟。",
+        "detriment": "已知尚未完整仍不愿等待。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "反复越界仍有约束。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：反复越界仍有约束。",
+        "第4门的答案或公式是待检验的可能，不等同事实、解决方案或内在权威。"
+      ]
+    }
+  ]
+}

@@ -77,9 +77,12 @@ def test_transit_timezone_conversion_preserves_the_instant(monkeypatch):
     import fatebridge.core.predictive.transit as transit
 
     captured = {}
-    monkeypatch.setattr(
-        transit, "build_subject", lambda **kwargs: captured.update(kwargs)
-    )
+
+    def capture_subject(**kwargs):
+        captured.update(kwargs)
+        return SimpleNamespace(calculation_basis={})
+
+    monkeypatch.setattr(transit, "build_subject", capture_subject)
     point = {"sign_label": "test", "house": 1}
     monkeypatch.setattr(
         transit,
@@ -105,54 +108,74 @@ def test_transit_timezone_conversion_preserves_the_instant(monkeypatch):
 
 
 @pytest.mark.parametrize("raises", [False, True])
-def test_kerykeion_subject_restores_path_even_on_failure(monkeypatch, raises):
+@pytest.mark.parametrize("env_path", [None, "/environment/ephe"])
+def test_native_subject_keeps_operator_path_even_on_failure(
+    monkeypatch, raises, env_path
+):
+    from fatebridge.core.predictive import native_chart
+
     paths = []
-    fake_swe = SimpleNamespace(set_ephe_path=paths.append)
-    monkeypatch.setattr(runtime, "swe", fake_swe)
+    original_set_path = runtime.swe.set_ephe_path
+
+    def set_path(path):
+        paths.append(path)
+        original_set_path(path)
+
+    monkeypatch.setattr(runtime.swe, "set_ephe_path", set_path)
     monkeypatch.setattr(runtime, "_configured_path", "/operator/ephe")
-
-    def from_birth_data(**kwargs):
-        fake_swe.set_ephe_path("/third-party/ephe")
-        if raises:
-            raise RuntimeError("third-party failure")
-        return "subject"
-
-    monkeypatch.setattr(
-        _common,
-        "AstrologicalSubjectFactory",
-        SimpleNamespace(from_birth_data=from_birth_data),
-    )
+    if env_path is None:
+        monkeypatch.delenv("SE_EPHE_PATH", raising=False)
+    else:
+        monkeypatch.setenv("SE_EPHE_PATH", env_path)
     if raises:
-        with pytest.raises(RuntimeError, match="third-party failure"):
+
+        def fail(*args, **kwargs):
+            raise RuntimeError("native ephemeris failure")
+
+        monkeypatch.setattr(native_chart, "_swisseph_planet_state", fail)
+        with pytest.raises(RuntimeError, match="native ephemeris failure"):
             _common.build_natal_subject(_birth_info())
     else:
-        assert _common.build_natal_subject(_birth_info()) == "subject"
-    assert paths == ["/third-party/ephe", "/operator/ephe"]
+        assert _common.build_natal_subject(_birth_info()).name
+    assert paths and set(paths) == {env_path or "/operator/ephe"}
 
 
-def test_return_factory_failure_restores_path(monkeypatch):
+@pytest.mark.parametrize("env_path", [None, "/environment/ephe"])
+def test_return_solver_failure_preserves_operator_path(monkeypatch, env_path):
+    subject = _common.build_natal_subject(_birth_info())
     paths = []
-    fake_swe = SimpleNamespace(set_ephe_path=paths.append)
-    monkeypatch.setattr(runtime, "swe", fake_swe)
-    monkeypatch.setattr(runtime, "_configured_path", "/operator/ephe")
+    original_set_path = runtime.swe.set_ephe_path
 
-    def factory(*args, **kwargs):
-        fake_swe.set_ephe_path("/third-party/returns")
+    def set_path(path):
+        paths.append(path)
+        original_set_path(path)
+
+    monkeypatch.setattr(runtime.swe, "set_ephe_path", set_path)
+    monkeypatch.setattr(runtime, "_configured_path", "/operator/ephe")
+    if env_path is None:
+        monkeypatch.delenv("SE_EPHE_PATH", raising=False)
+    else:
+        monkeypatch.setenv("SE_EPHE_PATH", env_path)
+
+    def fail(*args, **kwargs):
         raise RuntimeError("return failure")
 
-    monkeypatch.setattr(returns, "PlanetaryReturnFactory", factory)
+    monkeypatch.setattr(returns, "_longitude_tt", fail)
     with pytest.raises(RuntimeError, match="return failure"):
         returns.build_return_payload(
-            None,
-            analysis_datetime=datetime(2026, 10, 9),
+            subject,
+            analysis_datetime=datetime(2026, 10, 9, tzinfo=parse_timezone_name("UTC")),
             return_longitude=116.4,
             return_latitude=39.9,
             return_timezone="Asia/Shanghai",
         )
-    assert paths == ["/third-party/returns", "/operator/ephe"]
+    assert paths and set(paths) == {env_path or "/operator/ephe"}
 
 
-def test_concurrent_direct_call_waits_for_third_party_path_restoration(monkeypatch):
+@pytest.mark.parametrize("env_path", [None, "/environment/ephe"])
+def test_concurrent_direct_call_waits_for_third_party_path_restoration(
+    monkeypatch, env_path
+):
     state = {"path": "/operator/ephe"}
     attempted = Event()
     finished = Event()
@@ -162,6 +185,10 @@ def test_concurrent_direct_call_waits_for_third_party_path_restoration(monkeypat
     )
     monkeypatch.setattr(runtime, "swe", fake_swe)
     monkeypatch.setattr(runtime, "_configured_path", state["path"])
+    if env_path is None:
+        monkeypatch.delenv("SE_EPHE_PATH", raising=False)
+    else:
+        monkeypatch.setenv("SE_EPHE_PATH", env_path)
 
     def direct_call():
         attempted.set()
@@ -175,7 +202,7 @@ def test_concurrent_direct_call_waits_for_third_party_path_restoration(monkeypat
             future = executor.submit(direct_call)
             assert attempted.wait(2)
             assert not finished.wait(0.1)
-        assert future.result(timeout=2) == "/operator/ephe"
+        assert future.result(timeout=2) == (env_path or "/operator/ephe")
 
 
 def test_real_kerykeion_does_not_change_subsequent_core_precision(monkeypatch):

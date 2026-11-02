@@ -4,7 +4,7 @@ from typing import Any, List, Literal, Optional
 
 from pydantic import ConfigDict, Field, StrictBool, StrictInt, model_validator
 
-from fatebridge.core.requests.base import _DeferredModel
+from .numeric_inputs import FengshuiInput as _DeferredModel
 
 
 class ObservedCondition(_DeferredModel):

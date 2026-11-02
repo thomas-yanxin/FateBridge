@@ -1,0 +1,20 @@
+[
+  {
+    "case_id": "example-1",
+    "study_plan_sha256": "e7fac69b26b066f96da37c91a46dfdf98cbfdecff72c69c23493f1503f1c3383",
+    "occurred": true,
+    "event_at": "2027-06-01T00:00:00Z",
+    "recorded_at": "2028-01-02T00:00:00Z",
+    "source_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "source_reference": "synthetic engineering fixture; placeholder provenance only"
+  },
+  {
+    "case_id": "example-2",
+    "study_plan_sha256": "e7fac69b26b066f96da37c91a46dfdf98cbfdecff72c69c23493f1503f1c3383",
+    "occurred": false,
+    "event_at": null,
+    "recorded_at": "2028-01-02T00:00:00Z",
+    "source_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "source_reference": "synthetic engineering fixture; placeholder provenance only"
+  }
+]

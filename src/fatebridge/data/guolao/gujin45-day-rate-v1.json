@@ -1,0 +1,1254 @@
+{
+  "model_id": "gujin37_45_literal_day_rate_integer_formula_v1",
+  "profile_id": "gujin36_37_45_day_rate_integer_interpolation_research",
+  "source_url": "https://commons.wikimedia.org/w/index.php?curid=71219540",
+  "angular_text_source_url": "https://zh.wikisource.org/wiki/古今律厯考_(四庫全書本)/卷37",
+  "anomalistic_month_days": "27.5546",
+  "half_anomalistic_month_days": "13.7773",
+  "interpolation_divisor_days": "0.0820",
+  "day_rate_lookup_policy": "unique_adjacent_increasing_literal_bracket_excluding_closed_reversed_spans",
+  "origin_empty_semantics": "empty_cumulative_origin_interpreted_as_zero_only_not_velocity_endpoint",
+  "cumulative_reconstruction": "gujin37_integer_cubic_reflected_at_168_plus_three_collated_central_anchors_not_full_angular_table_transcription",
+  "full_angular_table_independently_collated": false,
+  "independent_second_collator": false,
+  "rows": [
+    {
+      "limit_index": 0,
+      "day_rate_days": "0.0000",
+      "djvu_page": 518,
+      "half": "upper",
+      "printed_empty_origin": true
+    },
+    {
+      "limit_index": 1,
+      "day_rate_days": "0.0820",
+      "djvu_page": 518,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 2,
+      "day_rate_days": "0.1640",
+      "djvu_page": 518,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 3,
+      "day_rate_days": "0.2460",
+      "djvu_page": 518,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 4,
+      "day_rate_days": "0.3280",
+      "djvu_page": 518,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 5,
+      "day_rate_days": "0.4100",
+      "djvu_page": 518,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 6,
+      "day_rate_days": "0.4920",
+      "djvu_page": 518,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 7,
+      "day_rate_days": "0.5740",
+      "djvu_page": 518,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 8,
+      "day_rate_days": "0.6560",
+      "djvu_page": 518,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 9,
+      "day_rate_days": "0.7380",
+      "djvu_page": 518,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 10,
+      "day_rate_days": "0.8200",
+      "djvu_page": 518,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 11,
+      "day_rate_days": "0.9020",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 12,
+      "day_rate_days": "0.9840",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 13,
+      "day_rate_days": "1.0661",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 14,
+      "day_rate_days": "1.1481",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 15,
+      "day_rate_days": "1.2301",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 16,
+      "day_rate_days": "1.3121",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 17,
+      "day_rate_days": "1.3941",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 18,
+      "day_rate_days": "1.4761",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 19,
+      "day_rate_days": "1.5581",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 20,
+      "day_rate_days": "1.6401",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 21,
+      "day_rate_days": "1.7221",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 22,
+      "day_rate_days": "1.8041",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 23,
+      "day_rate_days": "1.8861",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 24,
+      "day_rate_days": "1.9681",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 25,
+      "day_rate_days": "2.0502",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 26,
+      "day_rate_days": "2.1322",
+      "djvu_page": 518,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 27,
+      "day_rate_days": "2.2142",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 28,
+      "day_rate_days": "2.2962",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 29,
+      "day_rate_days": "2.3782",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 30,
+      "day_rate_days": "2.4602",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 31,
+      "day_rate_days": "2.5422",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 32,
+      "day_rate_days": "2.6242",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 33,
+      "day_rate_days": "2.7062",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 34,
+      "day_rate_days": "2.7882",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 35,
+      "day_rate_days": "2.8702",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 36,
+      "day_rate_days": "2.9522",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 37,
+      "day_rate_days": "3.0342",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 38,
+      "day_rate_days": "3.1163",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 39,
+      "day_rate_days": "3.1983",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 40,
+      "day_rate_days": "3.2803",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 41,
+      "day_rate_days": "3.3623",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 42,
+      "day_rate_days": "3.4443",
+      "djvu_page": 519,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 43,
+      "day_rate_days": "3.5263",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 44,
+      "day_rate_days": "3.6083",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 45,
+      "day_rate_days": "3.6903",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 46,
+      "day_rate_days": "3.7723",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 47,
+      "day_rate_days": "3.8543",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 48,
+      "day_rate_days": "3.9363",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 49,
+      "day_rate_days": "4.0183",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 50,
+      "day_rate_days": "4.1004",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 51,
+      "day_rate_days": "4.1824",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 52,
+      "day_rate_days": "4.2644",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 53,
+      "day_rate_days": "4.3464",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 54,
+      "day_rate_days": "4.4284",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 55,
+      "day_rate_days": "4.5104",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 56,
+      "day_rate_days": "4.5924",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 57,
+      "day_rate_days": "4.6744",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 58,
+      "day_rate_days": "4.7564",
+      "djvu_page": 519,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 59,
+      "day_rate_days": "4.8384",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 60,
+      "day_rate_days": "4.9204",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 61,
+      "day_rate_days": "5.0024",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 62,
+      "day_rate_days": "5.0844",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 63,
+      "day_rate_days": "5.1665",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 64,
+      "day_rate_days": "5.2485",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 65,
+      "day_rate_days": "5.3305",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 66,
+      "day_rate_days": "5.4125",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 67,
+      "day_rate_days": "5.4945",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 68,
+      "day_rate_days": "5.5765",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 69,
+      "day_rate_days": "5.6585",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 70,
+      "day_rate_days": "5.7405",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 71,
+      "day_rate_days": "5.8225",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 72,
+      "day_rate_days": "5.9045",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 73,
+      "day_rate_days": "5.9865",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 74,
+      "day_rate_days": "6.0685",
+      "djvu_page": 520,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 75,
+      "day_rate_days": "6.1506",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 76,
+      "day_rate_days": "6.2326",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 77,
+      "day_rate_days": "6.3146",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 78,
+      "day_rate_days": "6.3966",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 79,
+      "day_rate_days": "6.4786",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 80,
+      "day_rate_days": "6.5606",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 81,
+      "day_rate_days": "6.6426",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 82,
+      "day_rate_days": "6.7246",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 83,
+      "day_rate_days": "6.8066",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 84,
+      "day_rate_days": "6.8886",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 85,
+      "day_rate_days": "6.9706",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 86,
+      "day_rate_days": "7.0526",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 87,
+      "day_rate_days": "7.1346",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 88,
+      "day_rate_days": "7.2167",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 89,
+      "day_rate_days": "7.2987",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 90,
+      "day_rate_days": "7.2807",
+      "djvu_page": 520,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 91,
+      "day_rate_days": "7.4627",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 92,
+      "day_rate_days": "7.5447",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 93,
+      "day_rate_days": "7.6267",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 94,
+      "day_rate_days": "7.7087",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 95,
+      "day_rate_days": "7.7907",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 96,
+      "day_rate_days": "7.8727",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 97,
+      "day_rate_days": "7.9547",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 98,
+      "day_rate_days": "8.0367",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 99,
+      "day_rate_days": "8.1187",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 100,
+      "day_rate_days": "8.2008",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 101,
+      "day_rate_days": "8.2828",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 102,
+      "day_rate_days": "8.3648",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 103,
+      "day_rate_days": "8.4468",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 104,
+      "day_rate_days": "8.5288",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 105,
+      "day_rate_days": "8.6108",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 106,
+      "day_rate_days": "8.6928",
+      "djvu_page": 521,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 107,
+      "day_rate_days": "8.7748",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 108,
+      "day_rate_days": "8.8568",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 109,
+      "day_rate_days": "8.9388",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 110,
+      "day_rate_days": "9.0208",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 111,
+      "day_rate_days": "9.1028",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 112,
+      "day_rate_days": "9.1848",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 113,
+      "day_rate_days": "9.2669",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 114,
+      "day_rate_days": "9.3489",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 115,
+      "day_rate_days": "9.4309",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 116,
+      "day_rate_days": "9.5129",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 117,
+      "day_rate_days": "9.5949",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 118,
+      "day_rate_days": "9.6769",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 119,
+      "day_rate_days": "9.7589",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 120,
+      "day_rate_days": "9.8409",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 121,
+      "day_rate_days": "9.9229",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 122,
+      "day_rate_days": "10.0049",
+      "djvu_page": 521,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 123,
+      "day_rate_days": "10.0869",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 124,
+      "day_rate_days": "10.1689",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 125,
+      "day_rate_days": "10.2510",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 126,
+      "day_rate_days": "10.3330",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 127,
+      "day_rate_days": "10.4150",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 128,
+      "day_rate_days": "10.4970",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 129,
+      "day_rate_days": "10.5790",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 130,
+      "day_rate_days": "10.6610",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 131,
+      "day_rate_days": "10.7430",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 132,
+      "day_rate_days": "10.8250",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 133,
+      "day_rate_days": "10.9070",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 134,
+      "day_rate_days": "10.9890",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 135,
+      "day_rate_days": "11.0710",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 136,
+      "day_rate_days": "11.1530",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 137,
+      "day_rate_days": "11.2350",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 138,
+      "day_rate_days": "11.3171",
+      "djvu_page": 522,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 139,
+      "day_rate_days": "11.3991",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 140,
+      "day_rate_days": "11.4811",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 141,
+      "day_rate_days": "11.5631",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 142,
+      "day_rate_days": "11.6451",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 143,
+      "day_rate_days": "11.7271",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 144,
+      "day_rate_days": "11.8091",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 145,
+      "day_rate_days": "11.8911",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 146,
+      "day_rate_days": "11.9731",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 147,
+      "day_rate_days": "12.0551",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 148,
+      "day_rate_days": "12.1371",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 149,
+      "day_rate_days": "12.2191",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 150,
+      "day_rate_days": "12.3012",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 151,
+      "day_rate_days": "12.3832",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 152,
+      "day_rate_days": "12.4652",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 153,
+      "day_rate_days": "12.5472",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 154,
+      "day_rate_days": "12.6392",
+      "djvu_page": 522,
+      "half": "lower",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 155,
+      "day_rate_days": "12.7112",
+      "djvu_page": 523,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 156,
+      "day_rate_days": "12.7932",
+      "djvu_page": 523,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 157,
+      "day_rate_days": "12.8752",
+      "djvu_page": 523,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 158,
+      "day_rate_days": "12.9572",
+      "djvu_page": 523,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 159,
+      "day_rate_days": "13.0392",
+      "djvu_page": 523,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 160,
+      "day_rate_days": "13.1212",
+      "djvu_page": 523,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 161,
+      "day_rate_days": "13.2032",
+      "djvu_page": 523,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 162,
+      "day_rate_days": "13.2852",
+      "djvu_page": 523,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 163,
+      "day_rate_days": "13.3673",
+      "djvu_page": 523,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 164,
+      "day_rate_days": "13.4493",
+      "djvu_page": 523,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 165,
+      "day_rate_days": "13.5313",
+      "djvu_page": 523,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 166,
+      "day_rate_days": "13.6333",
+      "djvu_page": 523,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 167,
+      "day_rate_days": "13.6953",
+      "djvu_page": 523,
+      "half": "upper",
+      "printed_empty_origin": false
+    },
+    {
+      "limit_index": 168,
+      "day_rate_days": "13.7773",
+      "djvu_page": 523,
+      "half": "upper",
+      "printed_empty_origin": false
+    }
+  ],
+  "collated_cumulative_anchors": [
+    {
+      "limit_index": 82,
+      "cumulative_ancient_du": "5.42881000",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 83,
+      "cumulative_ancient_du": "5.42916616",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 84,
+      "cumulative_ancient_du": "5.42934424",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 85,
+      "cumulative_ancient_du": "5.42916616",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 86,
+      "cumulative_ancient_du": "5.42881000",
+      "djvu_page": 520,
+      "half": "lower"
+    }
+  ],
+  "known_literal_rate_conflicts": [
+    {
+      "limit_index": 90,
+      "printed": "7.2807",
+      "equal_step_diagnostic": "7.3807"
+    },
+    {
+      "limit_index": 154,
+      "printed": "12.6392",
+      "equal_step_diagnostic": "12.6292"
+    },
+    {
+      "limit_index": 166,
+      "printed": "13.6333",
+      "equal_step_diagnostic": "13.6133"
+    }
+  ],
+  "limitations": [
+    "单人影像核读，尚无第二位独立校读者",
+    "日率全部169格转录；积度仅82至86限核读，其余使用卷37整数公式重建，不能声称全表符合原刊",
+    "日率倒序及插值外推、边界不连续保留，不按吻合程度修表",
+    "具名研究算法，不认证整部古历、现代出生盘或现实预测"
+  ]
+}

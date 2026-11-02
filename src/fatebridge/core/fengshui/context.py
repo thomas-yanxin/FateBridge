@@ -31,7 +31,7 @@ def _rule(key: str) -> Dict[str, Any]:
 
 
 def _association_scope(methods: Iterable[str], household_scope: str) -> Dict[str, Any]:
-    applicable = ["annual_stars", "xuankong_natal", "jinsuo"]
+    applicable = ["annual_stars", "monthly_stars", "xuankong_natal", "jinsuo"]
     selected = [method for method in methods if method in applicable]
     return {
         "scope": "environmental_palace_symbolic_index_not_bazhai_minggua",
@@ -89,7 +89,8 @@ def analyze_environmental_context(
             "selected_environmental_methods": [
                 method
                 for method in methods
-                if method in {"annual_stars", "xuankong_natal", "jinsuo"}
+                if method
+                in {"annual_stars", "monthly_stars", "xuankong_natal", "jinsuo"}
             ],
             **_rule("separation"),
         },

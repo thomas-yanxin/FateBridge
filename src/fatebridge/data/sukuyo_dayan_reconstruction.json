@@ -1,0 +1,414 @@
+{
+  "id": "takesako2022_suga2025_dayan_A_D_reconstruction_v1",
+  "primary_research": {
+    "title": "大衍暦法による日食計算と進朔の検証",
+    "author": "竹迫忍",
+    "publication": "数学史研究208号2011 pp1–40; actual author-hosted PDF2022/12/30 red revision",
+    "url": "https://www.kotenmon.com/dld/papers/208.pdf",
+    "pdf_sha256": "565b983d6e5d61053ab2c0d34feda0c34417344bac66170cd52f93863311668a",
+    "pdf_pages_inspected": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "scope": "Named modern reconstruction and quoted classical instructions; original 新唐書 or 日本暦日原典 physical editions not newly acquired."
+  },
+  "computational_reference": {
+    "commit": "26751a8cce76b989680586e4b8ab15abb0ef3ad8",
+    "commit_date": "2025-12-10T10:09:45Z",
+    "tree": "fde679f43de2b461da18ab7b1b17754829829d98",
+    "reference_scope": "Third-party implementation based on named research, not an independent ancient calendar observation.",
+    "license": "MIT",
+    "code_path": "lib/when_exe/region/chinese/twins.rb and lib/when_exe/region/chinese.rb",
+    "source_tables_sha256": "45a88dbf9d13c9a953ba87af4fe5faad9cccc23b7fa4aaa9d5124be774a63963",
+    "source_algorithm_sha256": "b58999f5d6b9453e5884367bf452307918455c269c2b00c9af1890a43d1de657",
+    "coefficients_basis": "Exact decimal strings of the fixed reference table, not newly certified every-glyph transcription of paper table2. Root visually inspected paper example, constants and solar/moon tables; any paper/reference coefficient differences remain a collation task.",
+    "source_independent_historical_observation": false,
+    "repository_url": "https://github.com/suchowan/when_exe",
+    "author_literal": "Takashi SUGA",
+    "author_attribution_source_url": "https://github.com/suchowan/when_exe/blob/26751a8cce76b989680586e4b8ab15abb0ef3ad8/when_exe.gemspec",
+    "author_attribution_gemspec_literal": "  s.authors     = [\"Takashi SUGA\"]",
+    "author_attribution_source_sha256": "5951b152ea1bd6c7dd2b1bcb2a5fb20792b27cf1777bd7778fbbec110d97d3b1",
+    "author_attribution_git_blob_sha1": "6872a172d911e75fb1c96a4b9c5540431464a177",
+    "source_table_url": "https://github.com/suchowan/when_exe/blob/26751a8cce76b989680586e4b8ab15abb0ef3ad8/lib/when_exe/region/chinese/twins.rb",
+    "source_algorithm_url": "https://github.com/suchowan/when_exe/blob/26751a8cce76b989680586e4b8ab15abb0ef3ad8/lib/when_exe/region/chinese.rb",
+    "license_sha256": "29f4de7606a10c5bcb9cdd41f60838e5f6308f0b9387cba92d56d4a83b13b1d7",
+    "attribution_basis": "Actual pinned source gemspec authors literal and source-file copyright, not inferred from model id or independent personal-identity certification."
+  },
+  "constants": {
+    "day_units": 3040,
+    "year_units": 1110343,
+    "lunation_units": 89773,
+    "anomalistic_month_units": {
+      "numerator": 6701279,
+      "denominator": 80
+    },
+    "epoch_julian_day": {
+      "numerator": -70825495659,
+      "denominator": 2
+    },
+    "cycle_index_at_JDN0": 49,
+    "host_selector_max_nominal_days": 3
+  },
+  "solar_rows": [
+    {
+      "solar_term": "冬至",
+      "ahead_behind_units": 0,
+      "correction_at_term_units": 0,
+      "initial_rate_decimal": "+13.4524",
+      "daily_difference_decimal": "-0.1886"
+    },
+    {
+      "solar_term": "小寒",
+      "ahead_behind_units": -2353,
+      "correction_at_term_units": 176,
+      "initial_rate_decimal": "+10.5564",
+      "daily_difference_decimal": "-0.1634"
+    },
+    {
+      "solar_term": "大寒",
+      "ahead_behind_units": -4198,
+      "correction_at_term_units": 314,
+      "initial_rate_decimal": "+8.0408",
+      "daily_difference_decimal": "-0.1446"
+    },
+    {
+      "solar_term": "立春",
+      "ahead_behind_units": -5588,
+      "correction_at_term_units": 418,
+      "initial_rate_decimal": "+5.8160",
+      "daily_difference_decimal": "-0.1318"
+    },
+    {
+      "solar_term": "雨水",
+      "ahead_behind_units": -6564,
+      "correction_at_term_units": 491,
+      "initial_rate_decimal": "+3.7987",
+      "daily_difference_decimal": "-0.1240"
+    },
+    {
+      "solar_term": "啓蟄",
+      "ahead_behind_units": -7152,
+      "correction_at_term_units": 535,
+      "initial_rate_decimal": "+1.9265",
+      "daily_difference_decimal": "-0.1240"
+    },
+    {
+      "solar_term": "春分",
+      "ahead_behind_units": -7366,
+      "correction_at_term_units": 551,
+      "initial_rate_decimal": "-0.2048",
+      "daily_difference_decimal": "-0.1178"
+    },
+    {
+      "solar_term": "清明",
+      "ahead_behind_units": -7152,
+      "correction_at_term_units": 535,
+      "initial_rate_decimal": "-1.9968",
+      "daily_difference_decimal": "-0.1190"
+    },
+    {
+      "solar_term": "穀雨",
+      "ahead_behind_units": -6564,
+      "correction_at_term_units": 491,
+      "initial_rate_decimal": "-3.7956",
+      "daily_difference_decimal": "-0.1240"
+    },
+    {
+      "solar_term": "立夏",
+      "ahead_behind_units": -5588,
+      "correction_at_term_units": 418,
+      "initial_rate_decimal": "-5.6626",
+      "daily_difference_decimal": "-0.1324"
+    },
+    {
+      "solar_term": "小満",
+      "ahead_behind_units": -4198,
+      "correction_at_term_units": 314,
+      "initial_rate_decimal": "-7.6555",
+      "daily_difference_decimal": "-0.1436"
+    },
+    {
+      "solar_term": "芒種",
+      "ahead_behind_units": -2353,
+      "correction_at_term_units": 176,
+      "initial_rate_decimal": "-9.9405",
+      "daily_difference_decimal": "-0.1436"
+    },
+    {
+      "solar_term": "夏至",
+      "ahead_behind_units": 0,
+      "correction_at_term_units": 0,
+      "initial_rate_decimal": "-12.0819",
+      "daily_difference_decimal": "+0.1436"
+    },
+    {
+      "solar_term": "小暑",
+      "ahead_behind_units": 2353,
+      "correction_at_term_units": -176,
+      "initial_rate_decimal": "-9.7018",
+      "daily_difference_decimal": "+0.1324"
+    },
+    {
+      "solar_term": "大暑",
+      "ahead_behind_units": 4198,
+      "correction_at_term_units": -314,
+      "initial_rate_decimal": "-7.5450",
+      "daily_difference_decimal": "+0.1240"
+    },
+    {
+      "solar_term": "立秋",
+      "ahead_behind_units": 5588,
+      "correction_at_term_units": -418,
+      "initial_rate_decimal": "-5.5634",
+      "daily_difference_decimal": "+0.1190"
+    },
+    {
+      "solar_term": "処暑",
+      "ahead_behind_units": 6564,
+      "correction_at_term_units": -491,
+      "initial_rate_decimal": "-3.7038",
+      "daily_difference_decimal": "+0.1178"
+    },
+    {
+      "solar_term": "白露",
+      "ahead_behind_units": 7152,
+      "correction_at_term_units": -535,
+      "initial_rate_decimal": "-1.8954",
+      "daily_difference_decimal": "+0.1178"
+    },
+    {
+      "solar_term": "秋分",
+      "ahead_behind_units": 7366,
+      "correction_at_term_units": -551,
+      "initial_rate_decimal": "+0.1783",
+      "daily_difference_decimal": "+0.1240"
+    },
+    {
+      "solar_term": "寒露",
+      "ahead_behind_units": 7152,
+      "correction_at_term_units": -535,
+      "initial_rate_decimal": "+2.0042",
+      "daily_difference_decimal": "+0.1318"
+    },
+    {
+      "solar_term": "霜降",
+      "ahead_behind_units": 6564,
+      "correction_at_term_units": -491,
+      "initial_rate_decimal": "+3.8950",
+      "daily_difference_decimal": "+0.1446"
+    },
+    {
+      "solar_term": "立冬",
+      "ahead_behind_units": 5588,
+      "correction_at_term_units": -418,
+      "initial_rate_decimal": "+5.9214",
+      "daily_difference_decimal": "+0.1634"
+    },
+    {
+      "solar_term": "小雪",
+      "ahead_behind_units": 4198,
+      "correction_at_term_units": -314,
+      "initial_rate_decimal": "+8.1610",
+      "daily_difference_decimal": "+0.1886"
+    },
+    {
+      "solar_term": "大雪",
+      "ahead_behind_units": 2353,
+      "correction_at_term_units": -176,
+      "initial_rate_decimal": "+10.9010",
+      "daily_difference_decimal": "+0.1886"
+    }
+  ],
+  "lunar_rows": [
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": 297,
+      "source_day_label": "１日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": 259,
+      "source_day_label": "２日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": 220,
+      "source_day_label": "３日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": 180,
+      "source_day_label": "４日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": 139,
+      "source_day_label": "５日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": 97,
+      "source_day_label": "６日"
+    },
+    {
+      "segment_width_units": 2701,
+      "segment_increment_units": 48,
+      "source_day_label": "７日"
+    },
+    {
+      "segment_width_units": 339,
+      "segment_increment_units": -6,
+      "source_day_label": "７日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": -64,
+      "source_day_label": "８日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": -106,
+      "source_day_label": "９日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": -148,
+      "source_day_label": "10日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": -189,
+      "source_day_label": "11日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": -229,
+      "source_day_label": "12日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": -267,
+      "source_day_label": "13日"
+    },
+    {
+      "segment_width_units": 2363,
+      "segment_increment_units": -231,
+      "source_day_label": "14日"
+    },
+    {
+      "segment_width_units": 677,
+      "segment_increment_units": -66,
+      "source_day_label": "14日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": -289,
+      "source_day_label": "15日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": -250,
+      "source_day_label": "16日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": -211,
+      "source_day_label": "17日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": -171,
+      "source_day_label": "18日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": -130,
+      "source_day_label": "19日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": -87,
+      "source_day_label": "20日"
+    },
+    {
+      "segment_width_units": 2024,
+      "segment_increment_units": -36,
+      "source_day_label": "21日"
+    },
+    {
+      "segment_width_units": 1016,
+      "segment_increment_units": 18,
+      "source_day_label": "21日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": 73,
+      "source_day_label": "22日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": 116,
+      "source_day_label": "23日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": 157,
+      "source_day_label": "24日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": 198,
+      "source_day_label": "25日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": 237,
+      "source_day_label": "26日"
+    },
+    {
+      "segment_width_units": 3040,
+      "segment_increment_units": 276,
+      "source_day_label": "27日"
+    },
+    {
+      "segment_width_units": 1686,
+      "segment_increment_units": 165,
+      "source_day_label": "28日"
+    }
+  ],
+  "policy": {
+    "A": "solar and proportional lunar corrections evaluated at mean moon",
+    "D": "solar at mean moon; proportional lunar correction evaluated at mean plus solar correction",
+    "selected_2022_policy": "D for declared lunar_year793–819 inclusive; A otherwise, fixed from2022 note before output comparison",
+    "rounding": "solar initial_rate and accumulated_value truncate toward zero; fractional solar units truncate; fractional correction floor(x+1/2), also for negative values",
+    "selector": "Existing named host month ordinal selects unique closest mean lunation within fixed3days; not independent validation of host absolute date, month name or intercalation",
+    "advance_direction_computed": false,
+    "historical_day_boundary_or_leap_short_precedence_established": false,
+    "applied_to_current_calendar_date_or_mansion": false
+  },
+  "reference_all327_before_production_sha256": "27cd59eb079255e653bd504f38bb881338cfd7006878f60c9ed2c2a78ca7f4c5",
+  "new_independent_historical_observations": 0,
+  "real_samples": 0,
+  "all_month_reference_scope": {
+    "declared_lunar_year_begin": 764,
+    "declared_lunar_year_end": 861,
+    "reference_corpus_months": 1212,
+    "printed_2022_selected_rows": 327,
+    "reference_before_production_sha256": "4aab058c7b474aaf2b8e9238939534708af524c2531d3f53d4b49935091e85bb",
+    "reference_commit": "26751a8cce76b989680586e4b8ab15abb0ef3ad8",
+    "host_table_sha256_used_as_selector": "1d5c285d15339e264c85d87be7ec98aac8758354b6e27cb50a390c4a0735d440",
+    "reference_role": "numerical_implementation_conformance_not_independent_historical_observations",
+    "new_original_manuscript_images": 0,
+    "every_glyph_primary_coefficients_collation_certified": false,
+    "independent_host_month_labels_intercalation_and_absolute_dates_certified": false,
+    "real_world_efficacy_certified": false
+  }
+}

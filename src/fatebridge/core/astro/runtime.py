@@ -28,8 +28,8 @@ def _log_swe_runtime_failure(call: str, error: BaseException) -> None:
         return
     _SWE_RUNTIME_FAILURE_LOGGED = True
     logger.warning(
-        "Swiss Ephemeris %s raised %s (%s); falling back to the offline "
-        "approximation engine. Subsequent failures will be suppressed.",
+        "Swiss Ephemeris %s raised %s (%s); inspect calculation provenance "
+        "or error for the outcome. Subsequent failures will be suppressed.",
         call,
         type(error).__name__,
         error,

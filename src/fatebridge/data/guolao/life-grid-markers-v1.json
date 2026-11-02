@@ -1,0 +1,324 @@
+{
+  "profile_id": "tohoku_luwei_1141_image78_attached_readings_v1",
+  "matrix_source_id": "tohoku_luwei_1141_image78_grid_v1",
+  "matrix_data_sha256": "ee5f3b6fe1f8871dd62699f07b083b31569fb9fb42c7cc809bb6dfa6b48bf3ab",
+  "source_image_sha256": "36d3768ce39dbecb8c07d7669cfd57628ffab0ea09ca536dd4f18b8a669da408",
+  "credit": "新編評註通玄先生張果星宗大全（東北大学附属図書館所蔵），陸位輯校",
+  "transcription_policy": "Hand readings of visible attached glyphs only. Small horizontal groups read right-to-left and normalized to standard Chinese integer text. No number inferred from the next cell, mansion width or another edition. Not-visible means no attached text visible in this scan, not a zero. Values are labels without accepted coordinate semantics.",
+  "coordinate_semantics_accepted": false,
+  "independent_second_collator": false,
+  "readings": [
+    {
+      "palace": "子",
+      "column": 1,
+      "mansion": "危",
+      "kind": "integer",
+      "text": "一",
+      "integer_value": 1
+    },
+    {
+      "palace": "子",
+      "column": 12,
+      "mansion": "虚",
+      "kind": "integer",
+      "text": "九",
+      "integer_value": 9
+    },
+    {
+      "palace": "子",
+      "column": 21,
+      "mansion": "女",
+      "kind": "integer",
+      "text": "十一",
+      "integer_value": 11
+    },
+    {
+      "palace": "丑",
+      "column": 1,
+      "mansion": "女",
+      "kind": "integer",
+      "text": "一",
+      "integer_value": 1
+    },
+    {
+      "palace": "丑",
+      "column": 3,
+      "mansion": "牛",
+      "kind": "integer",
+      "text": "六",
+      "integer_value": 6
+    },
+    {
+      "palace": "丑",
+      "column": 10,
+      "mansion": "斗",
+      "kind": "not_visible",
+      "text": null,
+      "integer_value": null
+    },
+    {
+      "palace": "寅",
+      "column": 1,
+      "mansion": "斗",
+      "kind": "integer",
+      "text": "二",
+      "integer_value": 2
+    },
+    {
+      "palace": "寅",
+      "column": 4,
+      "mansion": "箕",
+      "kind": "integer",
+      "text": "十",
+      "integer_value": 10
+    },
+    {
+      "palace": "寅",
+      "column": 15,
+      "mansion": "尾",
+      "kind": "integer",
+      "text": "十八",
+      "integer_value": 18
+    },
+    {
+      "palace": "卯",
+      "column": 1,
+      "mansion": "尾",
+      "kind": "integer",
+      "text": "二",
+      "integer_value": 2
+    },
+    {
+      "palace": "卯",
+      "column": 3,
+      "mansion": "心",
+      "kind": "integer",
+      "text": "六",
+      "integer_value": 6
+    },
+    {
+      "palace": "卯",
+      "column": 9,
+      "mansion": "房",
+      "kind": "integer",
+      "text": "五",
+      "integer_value": 5
+    },
+    {
+      "palace": "卯",
+      "column": 15,
+      "mansion": "氐",
+      "kind": "integer",
+      "text": "十六",
+      "integer_value": 16
+    },
+    {
+      "palace": "辰",
+      "column": 1,
+      "mansion": "氐",
+      "kind": "initial",
+      "text": "初",
+      "integer_value": null
+    },
+    {
+      "palace": "辰",
+      "column": 2,
+      "mansion": "亢",
+      "kind": "integer",
+      "text": "九",
+      "integer_value": 9
+    },
+    {
+      "palace": "辰",
+      "column": 11,
+      "mansion": "角",
+      "kind": "integer",
+      "text": "十二",
+      "integer_value": 12
+    },
+    {
+      "palace": "辰",
+      "column": 23,
+      "mansion": "轸",
+      "kind": "integer",
+      "text": "十四",
+      "integer_value": 14
+    },
+    {
+      "palace": "巳",
+      "column": 1,
+      "mansion": "轸",
+      "kind": "integer",
+      "text": "九",
+      "integer_value": 9
+    },
+    {
+      "palace": "巳",
+      "column": 10,
+      "mansion": "翼",
+      "kind": "integer",
+      "text": "十九",
+      "integer_value": 19
+    },
+    {
+      "palace": "巳",
+      "column": 29,
+      "mansion": "张",
+      "kind": "integer",
+      "text": "十六",
+      "integer_value": 16
+    },
+    {
+      "palace": "午",
+      "column": 1,
+      "mansion": "张",
+      "kind": "integer",
+      "text": "十四",
+      "integer_value": 14
+    },
+    {
+      "palace": "午",
+      "column": 21,
+      "mansion": "柳",
+      "kind": "integer",
+      "text": "十二",
+      "integer_value": 12
+    },
+    {
+      "palace": "未",
+      "column": 1,
+      "mansion": "柳",
+      "kind": "integer",
+      "text": "三",
+      "integer_value": 3
+    },
+    {
+      "palace": "未",
+      "column": 5,
+      "mansion": "鬼",
+      "kind": "integer",
+      "text": "二",
+      "integer_value": 2
+    },
+    {
+      "palace": "未",
+      "column": 8,
+      "mansion": "井",
+      "kind": "integer",
+      "text": "三十",
+      "integer_value": 30
+    },
+    {
+      "palace": "申",
+      "column": 1,
+      "mansion": "井",
+      "kind": "integer",
+      "text": "七",
+      "integer_value": 7
+    },
+    {
+      "palace": "申",
+      "column": 9,
+      "mansion": "参",
+      "kind": "integer",
+      "text": "十",
+      "integer_value": 10
+    },
+    {
+      "palace": "申",
+      "column": 19,
+      "mansion": "觜",
+      "kind": "initial",
+      "text": "初",
+      "integer_value": null
+    },
+    {
+      "palace": "申",
+      "column": 20,
+      "mansion": "毕",
+      "kind": "integer",
+      "text": "十六",
+      "integer_value": 16
+    },
+    {
+      "palace": "酉",
+      "column": 1,
+      "mansion": "毕",
+      "kind": "integer",
+      "text": "五",
+      "integer_value": 5
+    },
+    {
+      "palace": "酉",
+      "column": 7,
+      "mansion": "昴",
+      "kind": "integer",
+      "text": "十",
+      "integer_value": 10
+    },
+    {
+      "palace": "酉",
+      "column": 18,
+      "mansion": "胃",
+      "kind": "integer",
+      "text": "十五",
+      "integer_value": 15
+    },
+    {
+      "palace": "戌",
+      "column": 1,
+      "mansion": "胃",
+      "kind": "integer",
+      "text": "二",
+      "integer_value": 2
+    },
+    {
+      "palace": "戌",
+      "column": 3,
+      "mansion": "娄",
+      "kind": "integer",
+      "text": "十二",
+      "integer_value": 12
+    },
+    {
+      "palace": "戌",
+      "column": 15,
+      "mansion": "奎",
+      "kind": "integer",
+      "text": "十六",
+      "integer_value": 16
+    },
+    {
+      "palace": "亥",
+      "column": 1,
+      "mansion": "奎",
+      "kind": "integer",
+      "text": "四",
+      "integer_value": 4
+    },
+    {
+      "palace": "亥",
+      "column": 2,
+      "mansion": "壁",
+      "kind": "integer",
+      "text": "八",
+      "integer_value": 8
+    },
+    {
+      "palace": "亥",
+      "column": 10,
+      "mansion": "室",
+      "kind": "integer",
+      "text": "十七",
+      "integer_value": 17
+    },
+    {
+      "palace": "亥",
+      "column": 27,
+      "mansion": "危",
+      "kind": "integer",
+      "text": "十五",
+      "integer_value": 15
+    }
+  ]
+}

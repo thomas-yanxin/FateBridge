@@ -662,6 +662,7 @@ def test_complete_usage_requires_explicit_nonblank_basis(confirmed, evidence):
         ([], []),
         (["bazhai"], []),
         (["jinsuo"], ["jinsuo"]),
+        (["monthly_stars", "bazhai"], ["monthly_stars"]),
         (
             ["annual_stars", "bazhai", "xuankong_natal"],
             ["annual_stars", "xuankong_natal"],
@@ -686,6 +687,7 @@ def test_household_and_zodiac_indices_are_explicitly_separate_from_bazhai_minggu
         )
         assert entry["applicable_methods"] == [
             "annual_stars",
+            "monthly_stars",
             "xuankong_natal",
             "jinsuo",
         ]

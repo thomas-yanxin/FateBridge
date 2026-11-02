@@ -69,7 +69,11 @@ FateBridge 是面向开发者与 AI Agent 的开源计算工具包，将八字�
 | 西方占星 | 本命与流派盘、关系盘、返照、行运、主限与时主等推运 | 从占星视角探索个人配置、双方互动与时间变化 |
 | 风水空间 | 八宅、金锁基础砂水、年星、玄空历史宅盘，以及分层的布局与物件审查 | 按实际空间事实与所选作者规则，审查住宅、工位和布局候选 |
 
-当前源码提供 **86 个业务 REST 路由**、**87 个 FastMCP 工具**，覆盖 **13 family / 87 工具**。中央目录含 88 条记录，CLI 可执行其中 87 条。各端的名称与公开范围见[三端能力边界](docs/api-reference.md#24-三端能力边界)，逐项实现与限制见[算法覆盖矩阵](docs/algorithm-coverage.md)。
+当前源码提供 **91 个业务 REST 路由**、**92 个 FastMCP 工具**，覆盖 **13 family / 92 工具**。中央目录含 93 条记录，CLI 可执行其中 92 条。各端的名称与公开范围见[三端能力边界](docs/api-reference.md#24-三端能力边界)，逐项实现与限制见[算法覆盖矩阵](docs/algorithm-coverage.md)。
+
+新增[人类图](docs/human-design.md)：太阳88°双时刻、门线细分、通道、类型与权威，保留原典数值分歧和四项独立验收状态。
+
+印度占星已提供 Lahiri 九曜、星宿四分段、D1／D9／D10、独立宫主／尊贵／相位规则与 Vimshottari 主运／次运，详见[计算范围、可复制示例与验证](docs/jyotish.md)。
 
 ## 技术栈与运行前提
 
@@ -283,6 +287,8 @@ Windows 的解释器示例为 `C:\path\to\FateBridge\.venv\Scripts\python.exe`�
 
 默认公开全部工具。需要减小工具范围时设置 `FATEBRIDGE_MCP_SCENARIOS=onda-shiye`（事业），或 `FATEBRIDGE_MCP_FAMILIES=fengshui`（风水）；两个筛选取交集，空值表示不限制。修改后重启 MCP。场景列表可用 `fatebridge scenarios` 查询。
 
+topic 开关由本次源码更改提供，发布前请使用源码环境。不支持延迟加载的客户端可同时设置场景与 `FATEBRIDGE_MCP_TOOL_SCOPE=topic`，仅公开主题直接工具和知识支撑；默认 `complete` 还包含条件依赖。topic 模式会在场景 `availability` 中标出未公开分支，需要这些技法时切回 complete。可用 `uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye --tool-scope topic` 验证。支持工具搜索的宿主可保留 complete 并按需加载；OpenAI 的少量初始工具建议不是服务器总数上限。
+
 ### HTTP MCP
 
 支持 URL 的客户端可通过 FastMCP 运行同一个 `app`。**以下是源码安装方式**，在仓库根目录启动并保持进程运行：
@@ -298,7 +304,7 @@ MCP URL 为 `http://127.0.0.1:8011/mcp`。`fatebridge-mcp` 入口本身仍使用
 
 ### 使用 Onda 咨询技能
 
-MCP 提供计算工具，Onda 提供按问题组织咨询的技能。使用源码仓库作为 Codex 项目时，仓库的 `AGENTS.md` 与 `.agents/skills/` 提供项目指导和技能入口；在新聊天确认发现状态。其他客户端需要按其技能机制加载 `skills/` 中的内容，不会因 MCP 连接自动获得这些文件。详见 [Onda 技能索引](skills/README.md)。
+MCP 提供计算工具，Onda 提供按问题组织咨询的技能。使用源码仓库作为 Codex 项目时，仓库的 `AGENTS.md` 与 `.agents/skills/` 提供项目指导和技能入口；在新聊天确认发现状态。其他客户端需要按其技能机制加载 `skills/` 中的内容，不会因 MCP 连接自动获得这些文件。详见 [Onda 技能索引](skills/README.md)。可按[插件构建指南](docs/onda-plugin.md)生成本地可安装包，携带共享引用、当前后端源码及锁定依赖清单，并用来源散列核对；首次启动需下载目标平台依赖，宿主安装另行验收。
 
 ModelScope 入口：[FateBridge MCP Server](https://www.modelscope.cn/mcp/servers/thomas/FateBridge) · [Onda Skills 合集](https://www.modelscope.cn/collections/thomas/Onda-Skills)。平台接入按对应页面说明操作，本地安装与配置按本文流程进行。
 
@@ -353,6 +359,7 @@ cp -n .env.example .env
 | `API_KEY_HEADER_NAME` | `X-API-Key` | REST 密钥请求头；发送 `secret`，不含 `client:` 前缀 |
 | `ALLOWED_ORIGINS` | `http://localhost:3000` | 逗号分隔的浏览器 CORS 来源 |
 | `FATEBRIDGE_MCP_FAMILIES` / `FATEBRIDGE_MCP_SCENARIOS` | 空，不筛选 | MCP 工具族／场景筛选，取交集；不改变 REST / CLI |
+| `FATEBRIDGE_MCP_TOOL_SCOPE` | `complete` | `topic` 须指定场景，仅公开直接工具及知识支撑，条件分支如实标缺 |
 | `SE_EPHE_PATH` | 未设置，尝试本地 `ephe/` | 指定星历目录；不在 `.env.example` 中 |
 | `FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY` | `min(4, max(1, CPU 数))` | 单 REST 进程重计算并发上限，至少为 1；不提供请求速率限制 |
 | `LOG_LEVEL` | `INFO` | 日志级别 |
@@ -369,9 +376,12 @@ uv run --locked --extra dev python -m fatebridge.fetch_ephe
 
 默认下载三个 `.se1` 文件到仓库 `ephe/`。其他年代或天体可能需要额外文件；数据许可独立于项目代码。独立工具用户使用[自定义目录下载流程](docs/getting-started.md#星历数据与精度)，并在服务启动环境设置 `SE_EPHE_PATH`。数据准备后重启服务，核对实际返回的星历模型。
 
+需要显式使用完整原始 DE441 时，可通过 `python -m fatebridge.fetch_jpl` 安装并校验文件，再按[星历数据与精度](docs/getting-started.md#星历数据与精度)设置严格 JPL 后端；下载本身不会切换计算模型。
+
 ### 输入、结果与精度
 
 - **输入**：出生接口使用公历；按各工具 Schema 提供小时、时区和地点，不能把未知出生时刻补成零点。中式出生计算默认开启真太阳时，西占核心盘默认使用民用时刻；保留实际解析和精度提示。
+- **地点**：离线库按来源版本覆盖大陆 397 个县级市、333 个地级行政单位，扩展至县区、台湾行政区及五大洲 6,333 座海外城市。支持同名地点按省市、国家/州消歧；坐标为城市/行政代表点，具体出生地址应传实际经纬度。来源、坐标系转换和已知缺项见[离线地点库](docs/place-catalog.md)。
 - **结果**：先检查 MCP `isError`、REST 状态码或 CLI 退出码，再读取业务字段。`fields` 支持点路径投影，`strict_fields=true` 拒绝无效路径；REST 投影选项放在 query，而非 JSON body。
 - **完整导出**：完整 JSON 首次调用设置 `fields=null`。MCP 默认预算为 8192 字符，超限后按 `result_delivery` 读取同一 run；未被首次选中的字段不能事后恢复。详见[同次完整导出](docs/agent-guide.md#完整结果交付与同次导出)。
 - **精度与复现**：保留原输入与 `run_metadata`。外部 `.se1` 星历不随 wheel 分发；检查 `chart_profile.ephemeris_model` 与 `run_metadata.engine_is_approximate`，不能仅凭依赖可导入就认定加载了高精度数据。重现还需匹配实现、数据与环境，见[星历说明](docs/getting-started.md#星历数据与精度)。

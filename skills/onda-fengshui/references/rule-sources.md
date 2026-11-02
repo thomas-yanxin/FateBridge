@@ -39,8 +39,13 @@
 | S6 | [Joey Yap 2026 教材](https://joeyyap.com/dlll312/TG26_Booklet%202026.pdf) | 印刷页 67／PDF 零基页 66，独立发表的九宫年盘数值对照 |
 | S7 | [Sean Chan 2026 年飞星说明](https://www.masterseanchan.com/fengshui-2026-flying-star-chart) | 作者自己的立春起止、年盘与月盘说明；用于核对当代操作约定 |
 | S8 | [香港天文台 2026 公农历对照](https://www.hko.gov.hk/tc/gts/time/calendar/pdf/files/2026.pdf) | 官方资料确认 2026 年立春在 2 月 4 日；此表不用于核验到秒的交节时刻 |
-| S9 | [fengshui-master 固定提交的命卦脚本](https://github.com/JackieL233/fengshui-master/blob/2666304c5cb4ac13091c8c1fcdd4e40c218b275a/fengshui-master/scripts/minggua.py) | 独立代码对照，支持 1900–2099；没有出生时刻换年处理 |
-| S10 | [同提交的飞星脚本](https://github.com/JackieL233/fengshui-master/blob/2666304c5cb4ac13091c8c1fcdd4e40c218b275a/fengshui-master/scripts/flying_stars.py) | 实际只有运盘洛书骨架，明确未实现年度、月度及宅命山向盘 |
+| S9 | [香港天文台二十四节气时刻表](https://www.hko.gov.hk/en/gts/astronomy/Solar_Term.htm) | 官方 XML 核对2024、2026–2028立春分钟及跨时区边界；不证明风水解释 |
+| S10 | [《八宅明镜》排印本所引星煞吉凶原文](https://vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4/%E5%85%AB%E5%AE%85%E6%98%8E%E9%95%9C_%E5%94%90_%E6%9D%A8%E7%AD%A0%E6%9D%BE%E8%91%97.pdf) | 印刷第022页／PDF第45页，8星五行与伏位木；不采用今译与事件保证 |
+| S11 | [八卦九星吉凶之源原文段](https://bazhaimingjing.5000yan.com/23/) | 累计七变56组关系；累计步骤不是净变化爻数，也不是流年 |
+| S12 | [九星五行原文段](https://bazhaimingjing.5000yan.com/64996.html) | 辅弼随门而化语境，与S10并列；本版本未自动依门改变伏位五行 |
+| S13 | [Larry Sang / AFSI 五行循环图](https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf) | 印刷第19、20页／PDF第36、37页，只核对有向生克，不认证物件处方与效力 |
+| V1 | [fengshui-master 固定提交的命卦脚本](https://github.com/JackieL233/fengshui-master/blob/2666304c5cb4ac13091c8c1fcdd4e40c218b275a/fengshui-master/scripts/minggua.py) | 独立代码对照，支持1900–2099；没有出生时刻换年处理，V1为本页验证文献标识 |
+| V2 | [同提交的飞星脚本](https://github.com/JackieL233/fengshui-master/blob/2666304c5cb4ac13091c8c1fcdd4e40c218b275a/fengshui-master/scripts/flying_stars.py) | 实际只有运盘洛书骨架，未实现年度、月度及宅命山向盘，V2不冒充运行规则来源 |
 
 这些资料支持有限范围的基础引擎，尚不足以替所有流派给出唯一完整解释。声称某原典／师承的完整版前，还须锁定底本、页码、转录校勘与完整规则清单。
 
@@ -64,7 +69,7 @@
 
 计算合同：0° 为北，顺时针增加；先明确磁北／真北，然后再归一化。八方按每宫 45°；二十四山按每山 15°。以子山中心为 0°，其半开区间为 `[352.5°, 360°) ∪ [0°, 7.5°)`。区间端点归属与测量误差必须明确。
 
-磁北和建筑图上的真北不能直接混算；转换需要地点、测量日期和磁偏角依据。工具不自动提供地磁换算，玄空宅盘要求已确认磁北输入。
+磁北和建筑图上的真北不能直接混算；转换需要地点、测量日期和磁偏角依据。可通过[地磁参考](geomagnetic-reference.md)显式取得模型换算候选；玄空宅盘仍要求已确认磁北输入，不自动采用候选。
 
 ### 3.2 宅向、门向、位置不是同一个输入
 
@@ -204,7 +209,19 @@ female_raw = wrap9(4 + r(Y))
 
 同一张关系表可以分别应用于宅卦和命卦，但输出必须保留起算依据。不能把宅盘北宫为伏位与某个住户北方为五鬼合并成一个“北方好／不好”。
 
-### 5.5 门、床、灶的作用不相同
+### 5.5 累计变爻与宫星关系
+
+`bazhai_sitting_v1@1.1.0` 的 `you_nian_trace` 保留累计变爻序列和净变化爻。爻由下向上编号1、2、3，累计操作顺序为3、2、1、2、3、2、1；第七步最终仅中爻变化，不能把 `operation_count=7` 解释为七条爻、七年或凶险程度。原文56组非同卦关系独立冻结核对，同卦伏位为0步。
+
+`palace_star_relationship` 以实际宫五行和八宅星五行分别计算宫生星、星生宫、宫克星、星克宫、宫星比和。前后角色有方向，星生宫不能读成宫生星；生克关系本身不等于全宅吉凶。`matches_convention_scope` 明确原 `matches_convention` 仅检查基本用途的星性偏好，不能因它为真就声称宫星所有条件已合。
+
+伏位当前按S10星表取木；S12另有“随门而化”的文本语境，由 `source_context_variation` 并列说明。本版本没有据此把坐山、门位、个人命卦互换，也不把固定木宣称为全本唯一讲法。
+
+布局的 `adjustment_options.scopes` 保留当前方位同一套变爻、生克和基本匹配依据；`matching_direction_evidence` 逐方位保留备选事实，通用规则、来源和编号约定集中在该作用域的 `matching_evidence_basis`。读取备选时将对应部分的公共元数据与该方位事实合读，不能沿用当前位置的宫五行或变爻数。`matching_stars` 仍只是一张星表，不能单靠星名把备选解释成全部条件合格。
+
+未知男女起法时，male／female 是两套未确认候选；同一住户、同一物件的 True／False 可以来自不同候选。逐条保留起法、`candidate_only`、宅／人作用域及位置／朝向角色；无已确认作用域时不建立共同推荐方位。快照逐条显示这些标识，不能把候选差异压成一句确定结论。
+
+### 5.6 门、床、灶的作用不相同
 
 《八宅明镜》对灶座与火门作明确区分：灶座按所在方位、火门按朝向；四凶方在某些用途中反而被取来安置灶座。因而不能制定“凡物件落凶方一律凶”的统一规则。[S3](https://xm.yi958.com/gsqm/4089)。
 

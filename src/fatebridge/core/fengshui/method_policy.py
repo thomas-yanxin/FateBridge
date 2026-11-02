@@ -18,6 +18,7 @@ def select_methods(value: Mapping[str, Any]) -> List[str]:
         value.get("scene") is None
         and not authored
         and value.get("environmental_context") is None
+        and value.get("monthly") is None
     ):
         # The original raw-chart entry point remains a compatibility surface.
         return ["bazhai", "jinsuo", "annual_stars"]
@@ -28,6 +29,8 @@ def select_methods(value: Mapping[str, Any]) -> List[str]:
         selected.append("xuankong_natal")
     if value.get("effective_year") is not None or value.get("query_at") is not None:
         selected.append("annual_stars")
+    if value.get("monthly") is not None:
+        selected.append("monthly_stars")
     if value.get("features") or any(
         (
             candidate.get("features")
@@ -115,7 +118,7 @@ def _input_scopes(value: Mapping[str, Any]) -> Dict[str, List[Dict[str, Any]]]:
                 ),
             }
         )
-    house = value.get("house") or {}
+    house = natal_house
     personal_missing = []
     if house.get("sitting_trigram") is None and house.get("facing_degrees") is None:
         personal_missing.append("house.sitting_trigram_or_confirmed_facing")
@@ -147,6 +150,27 @@ def _input_scopes(value: Mapping[str, Any]) -> Dict[str, List[Dict[str, Any]]]:
             }
         ],
     }
+    monthly = value.get("monthly") or {}
+    monthly_time_present = (
+        monthly.get("query_at") is not None
+        or (
+            monthly.get("effective_solar_year") is not None
+            and monthly.get("solar_month_number") is not None
+        )
+        or (not value.get("monthly") and value.get("query_at") is not None)
+    )
+    scopes["monthly_stars"] = [
+        {
+            **chart_scope,
+            "missing_inputs": (
+                []
+                if monthly_time_present
+                else [
+                    "monthly_stars.query_at_or_confirmed_effective_solar_year_and_solar_month"
+                ]
+            ),
+        }
+    ]
     for records in scopes.values():
         for record in records:
             record["input_presence_status"] = (
@@ -186,6 +210,7 @@ def method_policy(
     layer_families = {
         "xuankong_natal": "nine_palace_flying_stars",
         "annual_stars": "nine_palace_flying_stars",
+        "monthly_stars": "nine_palace_flying_stars",
         "jinsuo": "jinsuo",
         "bazhai": "bazhai",
     }

@@ -9,7 +9,7 @@ description: 用 FateBridge 区分单人感情倾向、年级桃花时机与双�
 
 ## 共用范围与安全
 
-先读[咨询硬边界](../_shared/safety-boundaries.md)与[本轮范围及多视角选择](../_shared/consultation-routing.md)。按当前问题展开，首轮明确要求详细就覆盖；不自动附带全部相关主题。时间追问读[共享时间选择](../_shared/timing-selection.md)，保留原主题与已有相关视角，只补需要的新层。生死、临床判断与医疗择时在选法前停止。
+先读短的[咨询核心](../_shared/consultation-core.md)。主题重叠或扩展才查[范围选择](../_shared/consultation-routing.md)，涉及目标时段才查[时间选择](../_shared/timing-selection.md)；遇生死、临床判断或医疗择时先按[硬边界](../_shared/safety-boundaries.md)停止相关计算。
 
 ## 用户能得到什么
 
@@ -31,10 +31,10 @@ description: 用 FateBridge 区分单人感情倾向、年级桃花时机与双�
 
 发现入口可能是软链接。优先进入入口目录后用 shell 内建 `pwd -P` 取得真实目录，再按它读取下面的相对引用；不要为解析路径调用未经核实的系统 `python3`。不能先裁剪 `.agents/skills/onda-*` 入口的字符串父目录，否则会误指到 `.agents/skills/_shared` 或 `.agents/docs`。读取已知引用无需搜索仓库。
 
-## 共用参考
-- 计算怎么调：[../_shared/fatebridge-engine.md](../_shared/fatebridge-engine.md)
-- 怎么开口说话：[../_shared/onda-counsel.md](../_shared/onda-counsel.md)
-- 场景取舍与去重：[../../docs/scenario-routing.md](../../docs/scenario-routing.md)
+## 按需参考
+- 参数、错误或分页不清楚时定位：[../_shared/fatebridge-engine.md](../_shared/fatebridge-engine.md)
+- 需要表达、来源或凶象细节时定位：[../_shared/onda-counsel.md](../_shared/onda-counsel.md)
+- 主题重叠或扩展时定位：[../../docs/scenario-routing.md](../../docs/scenario-routing.md)
 
 **铁律：干支/合婚分/桃花信号全部交给引擎算，不要手算。**
 
@@ -91,14 +91,8 @@ description: 用 FateBridge 区分单人感情倾向、年级桃花时机与双�
 
 ## 样例
 
-以下使用虚构资料。在已安装并激活的仓库虚拟环境中运行，环境准备见[引擎调用](../_shared/fatebridge-engine.md#怎么调引擎)。已有 MCP 时直接调用，无需执行本地命令。
-```bash
-python3 -m fatebridge.cli --no-metadata bazi_romance \
-  --gender 女 --birth-year 1995 --birth-month 4 --birth-day 12 --birth-hour 20 --birth-place 成都
+仅需要本地 CLI 复核时使用；已有 MCP 定义直接调用。 [读取本分支](references/examples.md)。
 
-python3 -m fatebridge.cli --no-metadata two_person_compatibility \
-  --person1-name 我 --person1-gender 女 --person1-birth-year 1995 --person1-birth-month 4 --person1-birth-day 12 --person1-birth-hour 20 \
-  --person2-name TA --person2-gender 男 --person2-birth-year 1993 --person2-birth-month 11 --person2-birth-day 3 --person2-birth-hour 7 \
-  --relationship-type general --strict-fields --no-include-snapshot-text \
-  --fields summary strengths challenges traditional_compatibility detailed_analysis recommendations person_info element_relationship
-```
+## 印度占星视角
+
+用户选择印占，或综合咨询中该视角能新增单人关系依据时，先读[印占取证](../_shared/vedic-evidence.md)。`astro_india_chart` 的 `relationship` 卡保留 D1 与 D9；D9 的传统范围也含 dharma，不能把单人第七宫或达沙当成双方互动、对方心意或结婚承诺。阶段补证只按实际 `astro_vimshottari` 主／次运，不替代既有关系事实。

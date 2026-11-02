@@ -23,6 +23,7 @@ from fatebridge.services.astrology import (
     calculate_germany_chart_analysis,
     calculate_relative_chart_analysis,
 )
+from fatebridge.utils.places import KNOWN_BIRTH_PLACE_ENTRIES
 from tests.fixtures.surface_payloads import astro_payload
 from tests.fixtures.transports import mcp_parameters, rest_handler
 
@@ -129,7 +130,10 @@ def test_core_chart_variants_expose_variant_specific_fields():
     assert "lot_of_fortune" in hellen["hellenistic"]
 
     assert guolao["chart_profile"]["chart_type"] == "guolao_chart"
-    assert guolao["guolao"]["lunar_mansion_system"] == "su28"
+    assert (
+        guolao["guolao"]["lunar_mansion_system"]
+        == "modern_equatorial_research_anchors_v1"
+    )
     assert len(guolao["guolao"]["planetary_mansions"]) >= 7
 
     assert india["chart_profile"]["chart_type"] == "india_chart"
@@ -164,6 +168,16 @@ def test_core_chart_includes_snapshot_text_and_export():
 
 
 def test_core_chart_can_infer_coordinates_from_birth_place():
+    # Integration with the published representative point, not an assertion
+    # that every birth in Beijing occurred at one surveyed location. AreaCity's
+    # GCJ-02 source point must not silently travel to the engine as WGS84.
+    beijing = next(r for r in KNOWN_BIRTH_PLACE_ENTRIES if r["id"] == "CN:110000")
+    assert beijing["source"] == "areacity"
+    assert beijing["coordinate_system"] == "WGS84_approx"
+    assert beijing["source_coordinates"] == [116.407387, 39.904179]
+    assert (beijing["longitude"], beijing["latitude"]) != tuple(
+        beijing["source_coordinates"]
+    )
     chart = calculate_core_chart_analysis(
         chart_variant="chart",
         name="测试者",
@@ -180,8 +194,8 @@ def test_core_chart_can_infer_coordinates_from_birth_place():
 
     assert chart["person_info"]["birth_place"] == "北京"
     assert chart["person_info"]["birth_timezone"] == "Asia/Shanghai"
-    assert chart["person_info"]["birth_longitude"] == 116.4074
-    assert chart["person_info"]["birth_latitude"] == 39.9042
+    assert chart["person_info"]["birth_longitude"] == beijing["longitude"]
+    assert chart["person_info"]["birth_latitude"] == beijing["latitude"]
     if swe is not None:
         birth_info = build_astro_birth_info(
             name="测试者",
@@ -191,8 +205,8 @@ def test_core_chart_can_infer_coordinates_from_birth_place():
             birth_hour=10,
             birth_minute=30,
             birth_timezone="Asia/Shanghai",
-            birth_longitude=116.4074,
-            birth_latitude=39.9042,
+            birth_longitude=beijing["longitude"],
+            birth_latitude=beijing["latitude"],
             birth_place="北京",
         )
         angle_state = _swisseph_angles(
@@ -259,9 +273,17 @@ def test_core_chart_prefers_local_ephemeris_runtime_when_available():
     # build the reference birth info the same way so the expected Swiss-Ephemeris
     # positions line up.
     birth_info = build_astro_birth_info(**birth_payload, use_true_solar_time=False)
-    julian_day = _julian_day(birth_info.utc_datetime)
-    expected_sun, _ = swe.calc_ut(julian_day, swe.SUN, swe.FLG_SWIEPH)
-    expected_moon, _ = swe.calc_ut(julian_day, swe.MOON, swe.FLG_SWIEPH)
+    # Public civil clock is UTC; planets require TT, not a UTC JD passed as UT1.
+    tt, _ = swe.utc_to_jd(
+        birth_info.utc_datetime.year,
+        birth_info.utc_datetime.month,
+        birth_info.utc_datetime.day,
+        birth_info.utc_datetime.hour,
+        birth_info.utc_datetime.minute,
+        birth_info.utc_datetime.second,
+    )
+    expected_sun, _ = swe.calc(tt, swe.SUN, swe.FLG_SWIEPH)
+    expected_moon, _ = swe.calc(tt, swe.MOON, swe.FLG_SWIEPH)
 
     sun = next(item for item in chart["planets"] if item["id"] == "Sun")
     moon = next(item for item in chart["planets"] if item["id"] == "Moon")
@@ -387,14 +409,13 @@ def test_hsys_int_family_defaults_are_consistent():
     # The Western tropical-quadrant charts (natal + relative/synastry) share one
     # default house system so a person's natal chart and its synastry chart agree
     # on houses. That default is Placidus (3), the de-facto Western convention.
-    # The 宿曜 suzhan/otherbu charts are a separate lunar-mansion tradition and
-    # keep their own neutral equal_mc (8) default — house system is incidental
-    # there, so they are intentionally NOT migrated to Placidus.
+    # Local suzhan and optional otherbu sky contexts keep equal_mc (8).
+    # Dice symbols themselves have no astronomical house-system calculation.
     from fatebridge.core.requests.astrology import AstroRelativeFlatRequest
     from fatebridge.core.requests.divination import OtherBuRequest, SuZhanRequest
 
     assert SuZhanRequest(date="2000-12-10", time="09:55:00").hsys == 8
-    assert OtherBuRequest(date="2000-12-10", time="09:55:00").hsys == 8
+    assert OtherBuRequest(planet="Sun", sign="Aries", house=0).hsys == 8
     flat = AstroRelativeFlatRequest(
         inner_birth_year=2000,
         inner_birth_month=12,
@@ -718,7 +739,9 @@ def test_relative_influence_timespace_and_marks_modes_expose_distinct_primary_la
     assert timespace_result["chart"]["chart_profile"]["house_system"] == "whole_sign"
 
     assert marks_result["relationship_profile"]["relative_mode_normalized"] == "marks"
-    assert marks_result["relationship_profile"]["primary_layer"] == "marks_chart"
+    assert marks_result["relationship_profile"]["primary_layer"] == "marks_chart_pair"
+    assert marks_result["chart"] == marks_result["marks_charts"]["inner"]
+    assert set(marks_result["marks_charts"]) == {"inner", "outer"}
     assert marks_result["chart"]["chart_profile"]["chart_type"] == "marks"
     assert marks_result["chart"]["chart_profile"]["house_system"] == "whole_sign"
     assert (
@@ -769,7 +792,7 @@ def test_relative_hsys_zero_and_eight_drive_supported_offline_house_systems():
     assert equal_result["chart"]["chart_profile"]["house_system"] == "equal_mc"
     assert (
         equal_result["relationship_profile"]["house_system_label_zh"]
-        == "天顶为10宫中点等宫制"
+        == "天顶为第10宫宫头的等宫制"
     )
 
 
@@ -826,7 +849,7 @@ def test_relative_unsupported_hsys_returns_error_payload():
     )
 
     assert result == {
-        "error": "relative 关系盘离线模式暂仅支持 hsys=0..8（整宫制、Alcabitus、Regiomontanus、Placidus、Koch、Vehlow Equal、Polich Page、Sripati、天顶为10宫中点等宫制）。",
+        "error": "relative 关系盘离线模式暂仅支持 hsys=0..8（整宫制、Alcabitus、Regiomontanus、Placidus、Koch、Vehlow Equal、Polich Page、Sripati、天顶为第10宫宫头的等宫制）。",
         "error_code": "validation_error",
         "status_code": 400,
         "retryable": False,
@@ -985,16 +1008,17 @@ def test_offline_angles_match_swisseph_across_charts():
             assert diff < 0.05, (key, year, offline[key], truth[key], diff)
 
 
-def test_julian_day_uses_julian_calendar_before_gregorian_cutover():
+def test_julian_day_uses_same_proleptic_gregorian_calendar_as_timing():
     from datetime import datetime, timezone
 
     swe = pytest.importorskip("swisseph")
     # Modern dates: proleptic Gregorian, unchanged.
     jd_modern = _julian_day(datetime(1990, 6, 15, 12, tzinfo=timezone.utc))
     assert jd_modern == pytest.approx(swe.julday(1990, 6, 15, 12.0, swe.GREG_CAL))
-    # Before the 1582-10-15 cutover: the Julian calendar (historical convention).
+    # ISO/Python datetime is Gregorian even before 1582. Julian civil input
+    # needs explicit conversion, never an implicit calendar switch.
     jd_old = _julian_day(datetime(1500, 1, 1, 12, tzinfo=timezone.utc))
-    assert jd_old == pytest.approx(swe.julday(1500, 1, 1, 12.0, swe.JUL_CAL))
+    assert jd_old == pytest.approx(swe.julday(1500, 1, 1, 12.0, swe.GREG_CAL))
 
 
 def test_astro_chart_request_accepts_use_true_solar_time_by_python_name():
@@ -1119,7 +1143,7 @@ def test_relative_requests_default_timezone_to_none_not_utc():
         ("Synastry", (0, 0, 0)),
         ("Composite", (1, 0, 0)),
         ("TimeSpace", (0, 1, 0)),
-        ("Marks", (1, 1, 1)),
+        ("Marks", (0, 1, 2)),
     ],
 )
 def test_relative_chart_computes_only_selected_single_chart(

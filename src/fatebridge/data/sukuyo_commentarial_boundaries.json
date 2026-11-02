@@ -1,0 +1,166 @@
+{
+  "id": "sukuyo_commentarial_day_boundaries_selected_v1",
+  "sources": [
+    {
+      "id": "T2216",
+      "title": "大日經疏演奧鈔",
+      "author_attribution": "杲寶撰; selected published commentary and nested quotations, not independently accepted originals of cited works",
+      "format": "SAT_HTML",
+      "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/T2216_,59,0054a01:2216_,59,0056a01.html",
+      "capture_sha256": "5c62eaa9078aef1b28e7e84e496296d327fe9ef569ff5590ead238a9888143f4",
+      "capture_bytes": 47173,
+      "selected_quotations": [
+        {
+          "locator": "T2216_.59.0055c13-17",
+          "first_line": "0055c13",
+          "last_line": "0055c17",
+          "literal": "補灑星合日。正月十一日。二月九日。三月七日。四月五日。五月三日。六月一日。七月二十五日。八月二十三日。九月二十日。十月十八日。十一月十五日。十二月十三日是也"
+        },
+        {
+          "locator": "T2216_.59.0055c22-29",
+          "first_line": "0055c22",
+          "last_line": "0055c29",
+          "literal": "取晝夜時分事二道相分。玄應一切經音義。件宿出寅時。仍卯時以前出八日分。故云合也。暦説寅剋以後可屬晝分。仍爲九日宿"
+        }
+      ]
+    },
+    {
+      "id": "T1788",
+      "title": "金光明最勝王經疏",
+      "source_header_author_literal": "唐 慧沼撰",
+      "format": "CBETA_TEI",
+      "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T39/T39n1788.xml",
+      "capture_sha256": "d9276b4990dc60047aee6fcddef129d6601d8b0563cda14ed7d0ac10bfd37c3d",
+      "capture_bytes": 1624365,
+      "selected_quotations": [
+        {
+          "locator": "T39n1788_p0312a01-04",
+          "first_line": "0312a01",
+          "last_line": "0312a04",
+          "literal": "準應但取白八與鬼星合日，未必白八日常與鬼星合"
+        }
+      ]
+    },
+    {
+      "id": "T0665",
+      "title": "金光明最勝王經",
+      "source_header_author_literal": "唐 義淨譯",
+      "format": "CBETA_TEI",
+      "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T16/T16n0665.xml",
+      "capture_sha256": "9be6dbde0f8a04ea5206cfda4cd7a7c5abaeed162b6f38ce0e4b3ed2737e1a48",
+      "capture_bytes": 956463,
+      "selected_quotations": [
+        {
+          "locator": "T16n0665_p0440c29",
+          "first_line": "0440c29",
+          "last_line": "0440c29",
+          "literal": "於白月八日布灑星合"
+        }
+      ]
+    }
+  ],
+  "monthly_pushya_reference": {
+    "locator": "T2216_.59.0055c11-17",
+    "quoted_work_title": "護摩法略鈔",
+    "quoted_work_independent_original_acquired": false,
+    "literal_days": [
+      {
+        "month": 1,
+        "day": 11
+      },
+      {
+        "month": 2,
+        "day": 9
+      },
+      {
+        "month": 3,
+        "day": 7
+      },
+      {
+        "month": 4,
+        "day": 5
+      },
+      {
+        "month": 5,
+        "day": 3
+      },
+      {
+        "month": 6,
+        "day": 1
+      },
+      {
+        "month": 7,
+        "day": 25
+      },
+      {
+        "month": 8,
+        "day": 23
+      },
+      {
+        "month": 9,
+        "day": 20
+      },
+      {
+        "month": 10,
+        "day": 18
+      },
+      {
+        "month": 11,
+        "day": 15
+      },
+      {
+        "month": 12,
+        "day": 13
+      }
+    ],
+    "claim_is_empirical_validation": false,
+    "quoted_mansion_literal": "補灑",
+    "normalized_mansion": "鬼",
+    "normalization_basis": "T1788 p0312a01-02 explicitly identifies 布灑 as 鬼星; T2216 p0055c17-25 gives the connected name and date discussion. Literal spelling remains separate."
+  },
+  "two_day_boundary_accounts": {
+    "locator": "T2216_.59.0055c17-29",
+    "context": "T2216 discusses the apparent second-month eighth/ninth Pushya discrepancy and quotes 章實紳鏡鈔 and 玄應一切經音義. These are nested attribution records, not independent editions acquired here.",
+    "accounts": [
+      {
+        "reported_account": "經音義 as quoted",
+        "rising_branch_literal": "寅時",
+        "day_assignment_literal": "卯時以前出八日分",
+        "assigned_lunar_day": 8
+      },
+      {
+        "reported_account": "暦説 as quoted",
+        "day_boundary_literal": "寅剋以後可屬晝分",
+        "assigned_lunar_day": 9
+      }
+    ],
+    "universal_boundary_established": false,
+    "mapped_to_modern_clock": false,
+    "inferred_solar_altitude_degrees": null,
+    "birth_date_shift_applied": false
+  },
+  "white_eighth_pushya_condition": {
+    "sutra_locator": "T16n0665_p0440c29",
+    "commentary_locator": "T39n1788_p0312a01-04",
+    "conditions": [
+      "白月八日",
+      "布灑／鬼星合"
+    ],
+    "all_white_eighth_days_assigned_pushya": false,
+    "actual_lunar_conjunction_computed": false,
+    "tithi_to_civil_date_mapping_established": false,
+    "ritual_instruction_or_action_permission_generated": false
+  },
+  "reading_scope": {
+    "selected_publisher_text_only": true,
+    "facsimile_collation_performed": false,
+    "independent_originals_of_T2216_nested_citations_acquired": false,
+    "root_prior_host_calculations_known": true,
+    "blinded_to_expected_mansions": false,
+    "historical_observation_count_added": 0,
+    "clock_convention_applied_to_runtime": false,
+    "hinoo_half_mapping_established": false,
+    "leap_short_month_priority_established": false,
+    "real_world_efficacy_established": false
+  }
+}

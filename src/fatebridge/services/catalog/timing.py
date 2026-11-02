@@ -70,6 +70,7 @@ SPECS: List[ToolSpec] = [
         summary=(
             "时运综合分析：一次性给出大运/流年/流月等多粒度的整合影响，想要全景时用它；"
             "只需单一粒度请用对应的 dayun/liunian/liuyue/liuri/liushi_analysis。"
+            "分析日期全省略时用as_of/执行开始的完整当地瞬间，实际时刻与补齐来源见analysis_reference。"
         ),
         operation_label_zh="时运综合分析",
         family="timing",
@@ -81,7 +82,7 @@ SPECS: List[ToolSpec] = [
         key="dayun_analysis",
         bind=person_invoke(calculate_dayun_analysis),
         request_model=DayunAnalysisRequest,
-        summary="单看大运（十年大运）一个粒度的运势影响；要多粒度整合用 timing_analysis。",
+        summary="大运交运时间轴与当前运：日期全省略时按as_of/执行开始的完整当地瞬间选运；analysis_age仅作显式年龄参考。analysis_reference记录实际时刻与补齐来源。要多粒度整合用 timing_analysis。",
         operation_label_zh="大运分析",
         family="timing",
         rest_path="/api/timing/dayun",
@@ -103,7 +104,7 @@ SPECS: List[ToolSpec] = [
         key="liuyue_analysis",
         bind=person_invoke(calculate_liuyue_analysis),
         request_model=LiuyueAnalysisRequest,
-        summary="单看某一流月的运势影响；要多粒度整合用 timing_analysis。",
+        summary="单看流月影响；日期全省略时用as_of/当前完整当地瞬间，显式部分日期仍缺日取15，见analysis_reference。solar_term_window是十二节换月窗口；二十四节气见analysis_calendar.analysis_date_context。要多粒度整合用 timing_analysis。",
         operation_label_zh="流月分析",
         family="timing",
         rest_path="/api/timing/liuyue",
@@ -114,7 +115,7 @@ SPECS: List[ToolSpec] = [
         key="liuri_analysis",
         bind=person_invoke(calculate_liuri_analysis),
         request_model=LiuriAnalysisRequest,
-        summary="单看某一流日的运势影响；要多粒度整合用 timing_analysis。",
+        summary="单看流日影响；日期全省略时用as_of/当前完整当地瞬间，保留晚子时换日；实际时刻与补齐见analysis_reference。底层solar_term_window是十二节换月窗口；二十四节气见analysis_calendar.analysis_date_context。要多粒度整合用 timing_analysis。",
         operation_label_zh="流日分析",
         family="timing",
         rest_path="/api/timing/liuri",
@@ -125,7 +126,7 @@ SPECS: List[ToolSpec] = [
         key="liushi_analysis",
         bind=person_invoke(calculate_liushi_analysis),
         request_model=LiushiAnalysisRequest,
-        summary="单看某一流时（时辰）的运势影响；要多粒度整合用 timing_analysis。",
+        summary="单看流时（时辰）影响；日期全省略时用as_of/当前完整当地瞬间，实际时刻与补齐见analysis_reference。时柱整点缓存不代替交气比较时刻。要多粒度整合用 timing_analysis。",
         operation_label_zh="流时分析",
         family="timing",
         rest_path="/api/timing/liushi",

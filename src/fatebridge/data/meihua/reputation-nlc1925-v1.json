@@ -1,0 +1,422 @@
+{
+  "id": "meihua_reputation_supplement_nlc1925_v1",
+  "version": "1.0.0",
+  "selected_edition_id": "nlc_1925",
+  "title": "求名補充條件與八卦時序方道選段",
+  "source": {
+    "id": "nlc_1925",
+    "title": "文明書局《梅花易數》卷二求名占補充及卷一時序方道選段",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "reader": "assistant selected-span visual reading",
+    "independent_human_expert_review": false,
+    "attribution_scope": "Hosting catalogue metadata; no independent authorship certification"
+  },
+  "comparison_sources": {
+    "volume1": {
+      "revision": 2690596,
+      "url": "https://zh.wikisource.org/w/index.php?oldid=2690596&title=梅花易數/卷一",
+      "raw_wikitext_sha256": "f5245837e94bf82420e619fa61644cac1a1242cc59e1c5da5f776dcfd985ac99"
+    },
+    "volume2": {
+      "revision": 1441921,
+      "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二",
+      "raw_wikitext_sha256": "239523c6bb8b59d7ed3fe229c681cd1a1124a5216617e198f05dbf19cc6d2939"
+    }
+  },
+  "rules": [
+    {
+      "id": "completion_time",
+      "quote": "欲知名成之日生體之卦氣詳之",
+      "section": "求名占第九",
+      "original_pdf_indices": [
+        67
+      ],
+      "comparison_reading": {
+        "quote": "欲知名成之日，生體之卦氣詳之",
+        "source_key": "volume2",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "appointment_direction",
+      "quote": "欲知職任之處變卦之方道決之",
+      "section": "求名占第九",
+      "original_pdf_indices": [
+        67
+      ],
+      "comparison_reading": {
+        "quote": "欲知職任之處，變卦之方道決之",
+        "source_key": "volume2",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "without_attacker",
+      "quote": "若無尅體之卦則名易就止看卦體時序之類以定日期",
+      "section": "求名占第九",
+      "original_pdf_indices": [
+        67
+      ],
+      "comparison_reading": {
+        "quote": "若無克體之卦，則名易就，止看卦體時序之類，以定日期",
+        "source_key": "volume2",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "in_office",
+      "quote": "若在任占卜最忌見尅體之卦如卦有尅體者即居官見禍輕則上責罰重則削官退職",
+      "section": "求名占第九",
+      "original_pdf_indices": [
+        67,
+        68
+      ],
+      "comparison_reading": {
+        "quote": "若在任占卜，最忌見克體之卦，如卦有克體者，即居官見禍，輕則上司責罰，重則削官退居",
+        "source_key": "volume2",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "office_time",
+      "quote": "其日期尅體之卦氣者於八卦萬物所屬時序類中斷之",
+      "section": "求名占第九",
+      "original_pdf_indices": [
+        68
+      ],
+      "comparison_reading": {
+        "quote": "其日期，看克體之卦氣者，於八卦所屬時序類中斷之",
+        "source_key": "volume2",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    }
+  ],
+  "time_classes": {
+    "乾": {
+      "trigram": "乾",
+      "category": "時序",
+      "quote": "秋九十月之交戌亥年月日時五金年月日時",
+      "selected_visual_groups": [
+        "秋",
+        "九十月之交",
+        "戌亥年月日時",
+        "五金年月日時"
+      ],
+      "original_pdf_indices": [
+        33
+      ],
+      "comparison_reading": {
+        "quote": "秋、九十月之交、戌亥年月日時、一四九年月日時",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "numeric_and_calendar_interpretation_adjudicated": false,
+      "gregorian_months_or_dates": null
+    },
+    "坤": {
+      "trigram": "坤",
+      "category": "時序",
+      "quote": "辰戌丑未月未申年月日時八五十月日",
+      "selected_visual_groups": [
+        "辰戌丑未月",
+        "未申年月日時",
+        "八五十月日"
+      ],
+      "original_pdf_indices": [
+        35
+      ],
+      "comparison_reading": {
+        "quote": "辰戌丑未月、未申年月日時、八五十月日",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "numeric_and_calendar_interpretation_adjudicated": false,
+      "gregorian_months_or_dates": null
+    },
+    "震": {
+      "trigram": "震",
+      "category": "時序",
+      "quote": "春二月卯年月日時四三八月日",
+      "selected_visual_groups": [
+        "春二月",
+        "卯年月日時",
+        "四三八月日"
+      ],
+      "original_pdf_indices": [
+        38
+      ],
+      "comparison_reading": {
+        "quote": "春三月、卯年月日時、四三八月日",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "numeric_and_calendar_interpretation_adjudicated": false,
+      "gregorian_months_or_dates": null
+    },
+    "巽": {
+      "trigram": "巽",
+      "category": "時序",
+      "quote": "春夏之交三五八之時日月三月辰巳年月日時四月",
+      "selected_visual_groups": [
+        "春夏之交",
+        "三五八之時日月",
+        "三月",
+        "辰巳年月日時",
+        "四月"
+      ],
+      "original_pdf_indices": [
+        41
+      ],
+      "comparison_reading": {
+        "quote": "春夏之交、三五八之時月日、辰巳月日時",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "numeric_and_calendar_interpretation_adjudicated": false,
+      "gregorian_months_or_dates": null
+    },
+    "坎": {
+      "trigram": "坎",
+      "category": "時序",
+      "quote": "冬十一月子年月日時一六之月日",
+      "selected_visual_groups": [
+        "冬十一月",
+        "子年月日時",
+        "一六之月日"
+      ],
+      "original_pdf_indices": [
+        43
+      ],
+      "comparison_reading": {
+        "quote": "冬十一月、子年月日時、一六月日",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "numeric_and_calendar_interpretation_adjudicated": false,
+      "gregorian_months_or_dates": null
+    },
+    "离": {
+      "trigram": "离",
+      "category": "時序",
+      "quote": "夏五月午火年月日時三二七日",
+      "selected_visual_groups": [
+        "夏五月",
+        "午火年月日時",
+        "三二七日"
+      ],
+      "original_pdf_indices": [
+        46
+      ],
+      "comparison_reading": {
+        "quote": "夏五月、午火年月日時、三二七日",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "numeric_and_calendar_interpretation_adjudicated": false,
+      "gregorian_months_or_dates": null
+    },
+    "艮": {
+      "trigram": "艮",
+      "category": "時序",
+      "quote": "冬春之月十二月丑寅年月日時七五十數月日土年月日時",
+      "selected_visual_groups": [
+        "冬春之月",
+        "十二月",
+        "丑寅年月日時",
+        "七五十數月日",
+        "土年月日時"
+      ],
+      "original_pdf_indices": [
+        48
+      ],
+      "comparison_reading": {
+        "quote": "冬春之月、十二月丑寅年月日時、七五十數月日、土年月日時",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "numeric_and_calendar_interpretation_adjudicated": false,
+      "gregorian_months_or_dates": null
+    },
+    "兑": {
+      "trigram": "兑",
+      "category": "時序",
+      "quote": "秋八月酉年月日時金年月日二四九數月日",
+      "selected_visual_groups": [
+        "秋八月",
+        "酉年月日時",
+        "金年月日",
+        "二四九數月日"
+      ],
+      "original_pdf_indices": [
+        51
+      ],
+      "comparison_reading": {
+        "quote": "秋八月、酉年月日時、二四九月日",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "numeric_and_calendar_interpretation_adjudicated": false,
+      "gregorian_months_or_dates": null
+    }
+  },
+  "fangdao_classes": {
+    "乾": {
+      "trigram": "乾",
+      "category": "方道",
+      "quote": "西北",
+      "original_pdf_indices": [
+        34
+      ],
+      "comparison_reading": {
+        "quote": "西北",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "intra_edition_parallel": [],
+      "source_direction_conflict": false,
+      "unique_physical_direction_adjudicated": false
+    },
+    "坤": {
+      "trigram": "坤",
+      "category": "方道",
+      "quote": "西南",
+      "original_pdf_indices": [
+        37
+      ],
+      "comparison_reading": {
+        "quote": "西南",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "intra_edition_parallel": [],
+      "source_direction_conflict": false,
+      "unique_physical_direction_adjudicated": false
+    },
+    "震": {
+      "trigram": "震",
+      "category": "方道",
+      "quote": "東",
+      "original_pdf_indices": [
+        40
+      ],
+      "comparison_reading": {
+        "quote": "東",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "intra_edition_parallel": [],
+      "source_direction_conflict": false,
+      "unique_physical_direction_adjudicated": false
+    },
+    "巽": {
+      "trigram": "巽",
+      "category": "方道",
+      "quote": "東",
+      "original_pdf_indices": [
+        42
+      ],
+      "comparison_reading": {
+        "quote": "東南",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "intra_edition_parallel": [
+        {
+          "category": "地理",
+          "quote": "東南方之地",
+          "original_pdf_indices": [
+            40
+          ],
+          "direction_symbol": "東南"
+        }
+      ],
+      "source_direction_conflict": true,
+      "unique_physical_direction_adjudicated": false
+    },
+    "坎": {
+      "trigram": "坎",
+      "category": "方道",
+      "quote": "北方",
+      "original_pdf_indices": [
+        45
+      ],
+      "comparison_reading": {
+        "quote": "北方",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "intra_edition_parallel": [],
+      "source_direction_conflict": false,
+      "unique_physical_direction_adjudicated": false
+    },
+    "离": {
+      "trigram": "离",
+      "category": "方道",
+      "quote": "南",
+      "original_pdf_indices": [
+        47
+      ],
+      "comparison_reading": {
+        "quote": "南",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "intra_edition_parallel": [],
+      "source_direction_conflict": false,
+      "unique_physical_direction_adjudicated": false
+    },
+    "艮": {
+      "trigram": "艮",
+      "category": "方道",
+      "quote": "東北方",
+      "original_pdf_indices": [
+        50
+      ],
+      "comparison_reading": {
+        "quote": "東北方",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "intra_edition_parallel": [],
+      "source_direction_conflict": false,
+      "unique_physical_direction_adjudicated": false
+    },
+    "兑": {
+      "trigram": "兑",
+      "category": "方道",
+      "quote": "西方",
+      "original_pdf_indices": [
+        52
+      ],
+      "comparison_reading": {
+        "quote": "西方",
+        "source_key": "volume1",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      },
+      "intra_edition_parallel": [],
+      "source_direction_conflict": false,
+      "unique_physical_direction_adjudicated": false
+    }
+  },
+  "operational_policy": {
+    "reference_body": "original_static_body_of_this_candidate",
+    "auxiliary_roles": [
+      "use",
+      "body_mutual",
+      "use_mutual",
+      "changed_use"
+    ],
+    "support_time_reference": "each_actual_use_generates_body_role_not_same_element_substitution",
+    "office_condition": "caller_declared_currently_in_office_and_any_actual_internal_attacker; unknown declarations never inferred",
+    "appointment_condition": "caller_declared_seeking_official_appointment; not inferred from generic_reputation_or_employment",
+    "direction_role": "changed_use_trigram_under_selected_operational_reading",
+    "direction_role_uniquely_adjudicated": false,
+    "direction_witness_policy": "Use the requested 方道 table as selected witness, preserve the same edition 地理 and fixed transcription separately; no single geographic direction adjudicated",
+    "no_attacker_scope": "Known four internal auxiliary roles only; any attacker refutes absence, absence internally does not authenticate full inner/outer absence",
+    "source_hazards_are_historical_words_not_real_personnel_or_hazard_verdicts": true,
+    "calendar_anchor": null,
+    "numeric_event_time": null,
+    "outcome_or_probability": null
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "ruleset_id": "heluo_wenming_line_conditions_v1",
+  "version": "1.1.0",
+  "source_title": "河洛理數（上海文明書局印行本）卷一·論六爻與十吉體小注",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "source_pdf_sha256": "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c",
+  "source_pdf_pages": [
+    45,
+    46,
+    47
+  ],
+  "review_status": "single_reviewer_two_printings; independent_second_review_pending",
+  "transcription_policy": "Selected literal clauses only; editorial punctuation and conventional character variants; counterpart 二五/五二 order retained. No outcome-based branch selection.",
+  "clauses": {
+    "position_order": {
+      "pdf_page": 45,
+      "text": "惟五位爲佳。二則次之。三四又次之。初上又次之。"
+    },
+    "ruler_minister": {
+      "pdf_page": 46,
+      "text": "二爻位吉",
+      "note": "如得二五君臣之位是也",
+      "counterpart_note": "如得五二君臣之位是也",
+      "scope": "The two printings reverse the order of 二五/五二; both name the same two positions. Not a complete favorable/unfavorable line verdict."
+    },
+    "zhongzong": {
+      "pdf_page": 46,
+      "text": "十衆宗",
+      "note": "如五陽一陰元堂坐一陰爻，五陰一陽元堂坐一陽爻謂之衆宗，觀姤剝復可見。",
+      "punctuation": "Editorial; 觀 is read as the verb introducing 姤/剝/復, not a fourth hexagram illustration."
+    },
+    "dangwei": {
+      "pdf_page": 46,
+      "text": "八當位",
+      "note": "如陰月生人元堂在陰爻是也",
+      "scope": "陰月 definition unresolved; no substitution of line-index parity or solstice half-year."
+    },
+    "support": {
+      "pdf_page": 46,
+      "text": "五有援",
+      "note": "元堂坐陰爻位應爻在陽爻是也",
+      "counterpart_note": "元堂坐陰位應爻在陽爻是也",
+      "reading_policy": "wenming_primary_yin_line_reading; counterpart_yin_position_wording_retained; no_outcome_selection",
+      "required_selected_yang": false,
+      "required_corresponding_yang": true,
+      "rule_id": "wenming_yin_yuantang_yang_corresponding_v1",
+      "scope": "Named primary yin-line/yang-corresponding clause only; not a general response-polarity or full ten-condition verdict. The counterpart omits 爻 after 陰; its wording is retained rather than silently harmonized."
+    }
+  },
+  "scope": "Position preference, two/five seat, five-plus-one Zhongzong and the named primary yin-line/yang-corresponding support clause. Full Dangwei, all support terminology, ten-condition synthesis and outcomes are not certified."
+}

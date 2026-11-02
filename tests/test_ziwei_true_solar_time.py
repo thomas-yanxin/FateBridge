@@ -5,7 +5,8 @@
 会在时辰边界附近落入不同的 hour pillar。真太阳时的严格定义本就含均时差，故紫微
 统一到 APPARENT。
 
-均时差为纯历法计算（不依赖星历），本测试跨平台确定，无需 golden 字节锁。
+均时差由共享天文算法按输入所代表的 UTC 时刻计算；本测试检查两条实际计算
+路径的一致性，不把一致性或秒级显示当成天文精度认证。
 """
 
 from fatebridge.services.metaphysics import calculate_ziwei_birth

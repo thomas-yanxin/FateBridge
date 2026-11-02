@@ -6,7 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, cast
 
-from fatebridge.core.divination import ELEMENT_CONTROLS, ELEMENT_GENERATES
+from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERATES
 
 from .bazhai import placement_polarity
 from .models import AssessRequest

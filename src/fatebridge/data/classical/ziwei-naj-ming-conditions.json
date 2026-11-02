@@ -1,0 +1,164 @@
+{
+  "id": "naj_ming_structural_conditions_v1",
+  "source_url": "https://www.digital.archives.go.jp/item/4469314",
+  "title": "新鋟希夷陳先生紫微斗数全書２",
+  "catalogued_edition": "明刊本，七卷二册；本批第二册两图五条",
+  "clauses": [
+    {
+      "id": "zifu_ming_jia",
+      "frame": 45,
+      "quote": "紫府同宮無殺湊甲人享福終身",
+      "annotation": "紫府同在寅申宮守命 六甲人富貴",
+      "stars": [
+        "紫微",
+        "天府"
+      ],
+      "geometry": "same_ming_palace",
+      "branches": [
+        "寅",
+        "申"
+      ],
+      "year_stems": [
+        "甲"
+      ],
+      "unresolved_conditions": [
+        "無殺湊的殺類與湊的幾何範圍本批未裁定"
+      ],
+      "literal_example": null
+    },
+    {
+      "id": "ziwei_fubi_conjunction",
+      "frame": 45,
+      "quote": "紫微輔弼同宮一呼百諾居上品",
+      "annotation": null,
+      "stars": [
+        "紫微",
+        "左辅",
+        "右弼"
+      ],
+      "geometry": "same_palace",
+      "branches": [],
+      "year_stems": [],
+      "unresolved_conditions": [
+        "三方替代條件及傳統品第不在本批幾何判定範圍",
+        "財帛小注兩位隔離讀者轉錄有分歧，未裁定唯一字串，不據此指定財帛或官祿條件"
+      ],
+      "literal_example": null,
+      "annotation_revision": {
+        "prior_annotation": "或在三方為次吉 在財帛宮為財賦之官",
+        "reader_annotations": [
+          "或在三方為次吉在財帛官宮為財賦之官",
+          "或在三方為次吉在財帛宮為財帛之官"
+        ],
+        "status": "unresolved_after_independent_rereading",
+        "reason": "兩份首次復讀對小注字串不一致；撤回唯一轉錄，保留原讀及兩份新讀，未以算法裁字。"
+      }
+    },
+    {
+      "id": "zifu_flank_ming",
+      "frame": 45,
+      "quote": "紫府夾命為貴格",
+      "annotation": "",
+      "stars": [
+        "紫微",
+        "天府"
+      ],
+      "geometry": "flank_ming",
+      "branches": [],
+      "year_stems": [],
+      "unresolved_conditions": [
+        "僅依兩側相鄰宮讀法核對幾何，不代斷原文貴格或現實結果"
+      ],
+      "literal_example": null
+    },
+    {
+      "id": "kuiyue_flank_ming",
+      "frame": 59,
+      "quote": "魁鉞夾命為奇格",
+      "annotation": "如命安在辰宮魁在卯鉞在巳宮是也",
+      "stars": [
+        "天魁",
+        "天钺"
+      ],
+      "geometry": "flank_ming",
+      "branches": [],
+      "year_stems": [],
+      "unresolved_conditions": [
+        "僅核本條夾命幾何及具體宮位例；完整奇格判斷未驗證。加吉方論屬相鄰魁鉞命身多折桂條，不併入本條"
+      ],
+      "literal_example": {
+        "ming": "辰",
+        "positions": {
+          "天魁": "卯",
+          "天钺": "巳"
+        }
+      },
+      "annotation_revision": {
+        "prior_annotation": "如命安在辰宮魁在卯鉞在巳宮是也 加吉方論在命身最妙三方次之",
+        "reader_annotations": [
+          "如命安在辰宮魁在卯鉞在巳宮是也",
+          "如命安在辰宮魁在卯鉞在巳宮是也"
+        ],
+        "status": "corrected_after_independent_rereading",
+        "reason": "原稿把相鄰魁鉞命身多折桂條的小注併入夾命條，現按原圖欄位歸屬更正。"
+      }
+    },
+    {
+      "id": "fubi_flank_ming",
+      "frame": 59,
+      "quote": "左右夾命為貴格",
+      "annotation": "如安命在丑左輔在子右弼在寅宮九月十一月生者是也不貴則大富",
+      "stars": [
+        "左辅",
+        "右弼"
+      ],
+      "geometry": "flank_ming",
+      "branches": [],
+      "year_stems": [],
+      "unresolved_conditions": [
+        "原注九月十一月按跨列字形更正；月份與具體宮位例的適用範圍未裁定，未據此修改安星或加設通用月份條件"
+      ],
+      "literal_example": {
+        "ming": "丑",
+        "positions": {
+          "左辅": "子",
+          "右弼": "寅"
+        }
+      },
+      "annotation_revision": {
+        "prior_annotation": "如安命在丑左輔在子右弼在寅宮 九月十月生者是也 不貴則大富",
+        "reader_annotations": [
+          "如安命在丑左輔在子右弼在寅宮九月十一月生者是也不貴則大富",
+          "如安命在丑左輔在子右弼在寅宮九月十一月生者是也不貴則大富"
+        ],
+        "status": "corrected_after_independent_rereading",
+        "reason": "小注右列末九接左列月十一月，原稿漏一；兩份隔離復讀一致，未由安星算法反推。"
+      }
+    }
+  ],
+  "version": "1.1.0",
+  "source_section": "选定紫微、魁钺、辅弼条",
+  "source_section_is_editorial_label": true,
+  "manual_reader_count": 1,
+  "flanking_reading": "two_distinct_adjacent_palaces_unordered_pair; rotation and either orientation are a declared geometric reading of the literal examples, not independent philological adjudication",
+  "scope": "Source-conditioned natal geometry only; no complete traditional judgment or real-world outcome assertion",
+  "source_revision": {
+    "id": "naj_ming_conditions_revision_r25_v1",
+    "source_manifest_sha256": "a60c6ac465966d1a776a85a2aa212aa5ead9c69fea200a90914c0b9fb3c72352",
+    "first_reading_sha256": "40bc7eb1a72b2ee962626040a391fc724feb3ec33ba5c6bcb919834d5264a8a1",
+    "primary_review_sha256": "e4c8145d5460437a307acb5cbfba88d3ce9a5842e91e3f8dfd7ec135708e3c20",
+    "peer_review_sha256": "e53fcc8a95ab69bd63aadb40f031ff2ac868e47208e89f8df54316ff6539ff9a",
+    "prior_collation_sha256": "e4302448793691cbc4e5da6c2e6a2b722408f1dcb8867a8e57b34a73e22cb52f",
+    "prior_compiled_sha256": "a017d353ecaa4b4e648dd4ccca490a0bd9ffc699f012f3cf0ffe4438b2887b68",
+    "changed_clause_ids": [
+      "ziwei_fubi_conjunction",
+      "kuiyue_flank_ming",
+      "fubi_flank_ming"
+    ],
+    "isolated_model_readers": 2,
+    "external_human_experts": 0,
+    "new_witnesses": 0,
+    "numeric_or_geometric_rules_modified": false,
+    "whole_book_acceptance_passed": false
+  }
+}

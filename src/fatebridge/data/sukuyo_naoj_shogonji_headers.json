@@ -1,0 +1,691 @@
+{
+  "format": "sukuyo_shogonji_header_transcription_v1",
+  "source_url": "https://naoj-repository.repo.nii.ac.jp/record/80/files/daiho1992_1-3-3.pdf",
+  "publisher_pdf_sha256": "dbe9e50e2be0bbcd11058df49fe293610819eeb54ac0ac5f3e58258d4fa761dc",
+  "scope": "All 37 month headings and day-one stem/branch entries from the study author transcription, plus only visible marginal annotations. Not a transcription of all days or all lower annotations.",
+  "method": "Primary agent visual reading of all 56 rotated top-header strips, followed by source-internal sexagenary continuity check; no implementation output for these years opened before freezing. Agent knew pre-existing profile theory, so not blind. Kana capitalization, cursive print readings, and phonetic normalization are editorial and are not a diplomatic manuscript edition.",
+  "source_relation": "1992 study author transcription; 1345 printed calendar with red stamps, 1346/1347 handwritten calendars. Not independently collated original manuscripts or independent human readings.",
+  "absence_policy": "Absent means not visible in the selected month-first header, not proof absent in the original manuscript. Generic author anchors on p233 do not fill missing entries.",
+  "placement_policy": "1345 red stamps can be displaced; May marginal is above the day-two column in the author table, assigned to month-first only by the author prose on p233. Kept displaced, not relabeled a day-two observation.",
+  "day_boundary_and_half": "No clock time or first/second half recorded in selected headers. They cannot determine ancient day boundary or Hinoo half-day/leap precedence.",
+  "generic_prose_anchors": {
+    "printed_page": 233,
+    "source": "Watanabe Toshio, Nihon no Koyomi, p83, as cited by study authors; not fresh month observations",
+    "literal_ninth_month": "氏",
+    "normalized_candidate": "氐",
+    "filled_missing_rows": false
+  },
+  "year_totals": {
+    "1345": 355,
+    "1346": 383,
+    "1347": 354
+  },
+  "records": [
+    {
+      "lunar_year": 1345,
+      "month": 1,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 9,
+      "printed_page": 237,
+      "day_one_ganzhi_kana": "ひのへいぬ",
+      "day_one_ganzhi": "丙戌",
+      "marginal_mansion_literal_candidates": [
+        "志ちすく"
+      ],
+      "marginal_mansion_normalized_candidate": "室",
+      "marginal_weekday_literal": "木えう",
+      "marginal_weekday_normalized_candidate": "木",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1345,
+      "month": 2,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 10,
+      "printed_page": 238,
+      "day_one_ganzhi_kana": "ひのへたつ",
+      "day_one_ganzhi": "丙辰",
+      "marginal_mansion_literal_candidates": [
+        "けいすく"
+      ],
+      "marginal_mansion_normalized_candidate": "奎",
+      "marginal_weekday_literal": "とえう",
+      "marginal_weekday_normalized_candidate": "土",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1345,
+      "month": 3,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 12,
+      "printed_page": 240,
+      "day_one_ganzhi_kana": "きのとのとり",
+      "day_one_ganzhi": "乙酉",
+      "marginal_mansion_literal_candidates": [],
+      "marginal_mansion_normalized_candidate": null,
+      "marginal_weekday_literal": null,
+      "marginal_weekday_normalized_candidate": null,
+      "marginal_status": "absent_in_selected_header"
+    },
+    {
+      "lunar_year": 1345,
+      "month": 4,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 13,
+      "printed_page": 241,
+      "day_one_ganzhi_kana": "きのとのう",
+      "day_one_ganzhi": "乙卯",
+      "marginal_mansion_literal_candidates": [
+        "ひちすく",
+        "ひつすく"
+      ],
+      "marginal_mansion_normalized_candidate": "畢",
+      "marginal_weekday_literal": "火えう",
+      "marginal_weekday_normalized_candidate": "火",
+      "marginal_status": "kana_glyph_uncertain"
+    },
+    {
+      "lunar_year": 1345,
+      "month": 5,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 15,
+      "printed_page": 243,
+      "day_one_ganzhi_kana": "きのへさる",
+      "day_one_ganzhi": "甲申",
+      "marginal_mansion_literal_candidates": [
+        "さんすく"
+      ],
+      "marginal_mansion_normalized_candidate": "参",
+      "marginal_weekday_literal": "すいえう",
+      "marginal_weekday_normalized_candidate": "水",
+      "marginal_status": "displaced_stamp"
+    },
+    {
+      "lunar_year": 1345,
+      "month": 6,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 16,
+      "printed_page": 244,
+      "day_one_ganzhi_kana": "ミつのとのうし",
+      "day_one_ganzhi": "癸丑",
+      "marginal_mansion_literal_candidates": [],
+      "marginal_mansion_normalized_candidate": null,
+      "marginal_weekday_literal": null,
+      "marginal_weekday_normalized_candidate": null,
+      "marginal_status": "absent_in_selected_header"
+    },
+    {
+      "lunar_year": 1345,
+      "month": 7,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 18,
+      "printed_page": 246,
+      "day_one_ganzhi_kana": "ミつのとのひつし",
+      "day_one_ganzhi": "癸未",
+      "marginal_mansion_literal_candidates": [],
+      "marginal_mansion_normalized_candidate": null,
+      "marginal_weekday_literal": null,
+      "marginal_weekday_normalized_candidate": null,
+      "marginal_status": "absent_in_selected_header"
+    },
+    {
+      "lunar_year": 1345,
+      "month": 8,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 19,
+      "printed_page": 247,
+      "day_one_ganzhi_kana": "ミつのへのね",
+      "day_one_ganzhi": "壬子",
+      "marginal_mansion_literal_candidates": [],
+      "marginal_mansion_normalized_candidate": null,
+      "marginal_weekday_literal": null,
+      "marginal_weekday_normalized_candidate": null,
+      "marginal_status": "absent_in_selected_header"
+    },
+    {
+      "lunar_year": 1345,
+      "month": 9,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 21,
+      "printed_page": 249,
+      "day_one_ganzhi_kana": "ミつのへのむま",
+      "day_one_ganzhi": "壬午",
+      "marginal_mansion_literal_candidates": [],
+      "marginal_mansion_normalized_candidate": null,
+      "marginal_weekday_literal": null,
+      "marginal_weekday_normalized_candidate": null,
+      "marginal_status": "absent_in_selected_header"
+    },
+    {
+      "lunar_year": 1345,
+      "month": 10,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 22,
+      "printed_page": 250,
+      "day_one_ganzhi_kana": "かのとのゐ",
+      "day_one_ganzhi": "辛亥",
+      "marginal_mansion_literal_candidates": [],
+      "marginal_mansion_normalized_candidate": null,
+      "marginal_weekday_literal": null,
+      "marginal_weekday_normalized_candidate": null,
+      "marginal_status": "absent_in_selected_header"
+    },
+    {
+      "lunar_year": 1345,
+      "month": 11,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 24,
+      "printed_page": 252,
+      "day_one_ganzhi_kana": "かのとのミ",
+      "day_one_ganzhi": "辛巳",
+      "marginal_mansion_literal_candidates": [],
+      "marginal_mansion_normalized_candidate": null,
+      "marginal_weekday_literal": null,
+      "marginal_weekday_normalized_candidate": null,
+      "marginal_status": "absent_in_selected_header"
+    },
+    {
+      "lunar_year": 1345,
+      "month": 12,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 25,
+      "printed_page": 253,
+      "day_one_ganzhi_kana": "かのとのゐ",
+      "day_one_ganzhi": "辛亥",
+      "marginal_mansion_literal_candidates": [],
+      "marginal_mansion_normalized_candidate": null,
+      "marginal_weekday_literal": null,
+      "marginal_weekday_normalized_candidate": null,
+      "marginal_status": "absent_in_selected_header"
+    },
+    {
+      "lunar_year": 1346,
+      "month": 1,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 27,
+      "printed_page": 255,
+      "day_one_ganzhi_kana": "かのとのミ",
+      "day_one_ganzhi": "辛巳",
+      "marginal_mansion_literal_candidates": [
+        "志ちすく"
+      ],
+      "marginal_mansion_normalized_candidate": "室",
+      "marginal_weekday_literal": "くわえう",
+      "marginal_weekday_normalized_candidate": "火",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1346,
+      "month": 2,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 28,
+      "printed_page": 256,
+      "day_one_ganzhi_kana": "かのへいぬ",
+      "day_one_ganzhi": "庚戌",
+      "marginal_mansion_literal_candidates": [
+        "けいすく"
+      ],
+      "marginal_mansion_normalized_candidate": "奎",
+      "marginal_weekday_literal": "すいえう",
+      "marginal_weekday_normalized_candidate": "水",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1346,
+      "month": 3,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 30,
+      "printed_page": 258,
+      "day_one_ganzhi_kana": "かのへたつ",
+      "day_one_ganzhi": "庚辰",
+      "marginal_mansion_literal_candidates": [
+        "ゐすく"
+      ],
+      "marginal_mansion_normalized_candidate": "胃",
+      "marginal_weekday_literal": "こんえう",
+      "marginal_weekday_normalized_candidate": "金",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1346,
+      "month": 4,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 31,
+      "printed_page": 259,
+      "day_one_ganzhi_kana": "つちのとのとり",
+      "day_one_ganzhi": "己酉",
+      "marginal_mansion_literal_candidates": [
+        "ひつすく"
+      ],
+      "marginal_mansion_normalized_candidate": "畢",
+      "marginal_weekday_literal": "とえう",
+      "marginal_weekday_normalized_candidate": "土",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1346,
+      "month": 5,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 33,
+      "printed_page": 261,
+      "day_one_ganzhi_kana": "つちのとのう",
+      "day_one_ganzhi": "己卯",
+      "marginal_mansion_literal_candidates": [
+        "しんすく"
+      ],
+      "marginal_mansion_normalized_candidate": "参",
+      "marginal_weekday_literal": "月えう",
+      "marginal_weekday_normalized_candidate": "月",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1346,
+      "month": 6,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 34,
+      "printed_page": 262,
+      "day_one_ganzhi_kana": "つちのへさる",
+      "day_one_ganzhi": "戊申",
+      "marginal_mansion_literal_candidates": [
+        "くゐすく"
+      ],
+      "marginal_mansion_normalized_candidate": "鬼",
+      "marginal_weekday_literal": "くわえう",
+      "marginal_weekday_normalized_candidate": "火",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1346,
+      "month": 7,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 36,
+      "printed_page": 264,
+      "day_one_ganzhi_kana": "ひのとのうし",
+      "day_one_ganzhi": "丁丑",
+      "marginal_mansion_literal_candidates": [
+        "ちやうすく"
+      ],
+      "marginal_mansion_normalized_candidate": "張",
+      "marginal_weekday_literal": "すいえう",
+      "marginal_weekday_normalized_candidate": "水",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1346,
+      "month": 8,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 37,
+      "printed_page": 265,
+      "day_one_ganzhi_kana": "ひのとのひつし",
+      "day_one_ganzhi": "丁未",
+      "marginal_mansion_literal_candidates": [
+        "かんすく"
+      ],
+      "marginal_mansion_normalized_candidate": "角",
+      "marginal_weekday_literal": "こんえう",
+      "marginal_weekday_normalized_candidate": "金",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1346,
+      "month": 9,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 39,
+      "printed_page": 267,
+      "day_one_ganzhi_kana": "ひのへのね",
+      "day_one_ganzhi": "丙子",
+      "marginal_mansion_literal_candidates": [
+        "ていすく"
+      ],
+      "marginal_mansion_normalized_candidate": "氐",
+      "marginal_weekday_literal": "とえう",
+      "marginal_weekday_normalized_candidate": "土",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1346,
+      "month": 9,
+      "leap": true,
+      "length_days": 29,
+      "pdf_page": 40,
+      "printed_page": 268,
+      "day_one_ganzhi_kana": "ひのへのむま",
+      "day_one_ganzhi": "丙午",
+      "marginal_mansion_literal_candidates": [
+        "ていすく"
+      ],
+      "marginal_mansion_normalized_candidate": "氐",
+      "marginal_weekday_literal": "月えう",
+      "marginal_weekday_normalized_candidate": "月",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1346,
+      "month": 10,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 42,
+      "printed_page": 270,
+      "day_one_ganzhi_kana": "きのとのゐ",
+      "day_one_ganzhi": "乙亥",
+      "marginal_mansion_literal_candidates": [
+        "しんすく"
+      ],
+      "marginal_mansion_normalized_candidate": "心",
+      "marginal_weekday_literal": "くわえう",
+      "marginal_weekday_normalized_candidate": "火",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1346,
+      "month": 11,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 43,
+      "printed_page": 271,
+      "day_one_ganzhi_kana": "きのとのミ",
+      "day_one_ganzhi": "乙巳",
+      "marginal_mansion_literal_candidates": [
+        "とすく"
+      ],
+      "marginal_mansion_normalized_candidate": "斗",
+      "marginal_weekday_literal": "もくえう",
+      "marginal_weekday_normalized_candidate": "木",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1346,
+      "month": 12,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 45,
+      "printed_page": 273,
+      "day_one_ganzhi_kana": "きのとのゐ",
+      "day_one_ganzhi": "乙亥",
+      "marginal_mansion_literal_candidates": [
+        "こすく"
+      ],
+      "marginal_mansion_normalized_candidate": "虚",
+      "marginal_weekday_literal": "とえう",
+      "marginal_weekday_normalized_candidate": "土",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1347,
+      "month": 1,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 47,
+      "printed_page": 275,
+      "day_one_ganzhi_kana": "きのへたつ",
+      "day_one_ganzhi": "甲辰",
+      "marginal_mansion_literal_candidates": [
+        "しちすく"
+      ],
+      "marginal_mansion_normalized_candidate": "室",
+      "marginal_weekday_literal": "日えう",
+      "marginal_weekday_normalized_candidate": "日",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1347,
+      "month": 2,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 48,
+      "printed_page": 276,
+      "day_one_ganzhi_kana": "きのへいぬ",
+      "day_one_ganzhi": "甲戌",
+      "marginal_mansion_literal_candidates": [
+        "けいすく"
+      ],
+      "marginal_mansion_normalized_candidate": "奎",
+      "marginal_weekday_literal": "火えう",
+      "marginal_weekday_normalized_candidate": "火",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1347,
+      "month": 3,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 50,
+      "printed_page": 278,
+      "day_one_ganzhi_kana": "きのへたつ",
+      "day_one_ganzhi": "甲辰",
+      "marginal_mansion_literal_candidates": [
+        "ゐすく"
+      ],
+      "marginal_mansion_normalized_candidate": "胃",
+      "marginal_weekday_literal": "木えう",
+      "marginal_weekday_normalized_candidate": "木",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1347,
+      "month": 4,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 51,
+      "printed_page": 279,
+      "day_one_ganzhi_kana": "ミつのとのとり",
+      "day_one_ganzhi": "癸酉",
+      "marginal_mansion_literal_candidates": [
+        "ひつすく"
+      ],
+      "marginal_mansion_normalized_candidate": "畢",
+      "marginal_weekday_literal": "こんえう",
+      "marginal_weekday_normalized_candidate": "金",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1347,
+      "month": 5,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 53,
+      "printed_page": 281,
+      "day_one_ganzhi_kana": "ミつのとのう",
+      "day_one_ganzhi": "癸卯",
+      "marginal_mansion_literal_candidates": [
+        "志んすく"
+      ],
+      "marginal_mansion_normalized_candidate": "参",
+      "marginal_weekday_literal": "日えう",
+      "marginal_weekday_normalized_candidate": "日",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1347,
+      "month": 6,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 54,
+      "printed_page": 282,
+      "day_one_ganzhi_kana": "ミつのへのさる",
+      "day_one_ganzhi": "壬申",
+      "marginal_mansion_literal_candidates": [
+        "きすく"
+      ],
+      "marginal_mansion_normalized_candidate": "鬼",
+      "marginal_weekday_literal": "月えう",
+      "marginal_weekday_normalized_candidate": "月",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1347,
+      "month": 7,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 56,
+      "printed_page": 284,
+      "day_one_ganzhi_kana": "かのとのうし",
+      "day_one_ganzhi": "辛丑",
+      "marginal_mansion_literal_candidates": [
+        "ちやうすく"
+      ],
+      "marginal_mansion_normalized_candidate": "張",
+      "marginal_weekday_literal": "火えう",
+      "marginal_weekday_normalized_candidate": "火",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1347,
+      "month": 8,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 57,
+      "printed_page": 285,
+      "day_one_ganzhi_kana": "かのとのひつし",
+      "day_one_ganzhi": "辛未",
+      "marginal_mansion_literal_candidates": [
+        "かんすく"
+      ],
+      "marginal_mansion_normalized_candidate": "角",
+      "marginal_weekday_literal": "木えう",
+      "marginal_weekday_normalized_candidate": "木",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1347,
+      "month": 9,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 58,
+      "printed_page": 286,
+      "day_one_ganzhi_kana": "かのへのね",
+      "day_one_ganzhi": "庚子",
+      "marginal_mansion_literal_candidates": [
+        "ていすく"
+      ],
+      "marginal_mansion_normalized_candidate": "氐",
+      "marginal_weekday_literal": "こんえう",
+      "marginal_weekday_normalized_candidate": "金",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1347,
+      "month": 10,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 60,
+      "printed_page": 288,
+      "day_one_ganzhi_kana": "かのへのむま",
+      "day_one_ganzhi": "庚午",
+      "marginal_mansion_literal_candidates": [
+        "志んすく"
+      ],
+      "marginal_mansion_normalized_candidate": "心",
+      "marginal_weekday_literal": "日えう",
+      "marginal_weekday_normalized_candidate": "日",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1347,
+      "month": 11,
+      "leap": false,
+      "length_days": 30,
+      "pdf_page": 61,
+      "printed_page": 289,
+      "day_one_ganzhi_kana": "つちのとのゐ",
+      "day_one_ganzhi": "己亥",
+      "marginal_mansion_literal_candidates": [
+        "とすく"
+      ],
+      "marginal_mansion_normalized_candidate": "斗",
+      "marginal_weekday_literal": "月えう",
+      "marginal_weekday_normalized_candidate": "月",
+      "marginal_status": "clear"
+    },
+    {
+      "lunar_year": 1347,
+      "month": 12,
+      "leap": false,
+      "length_days": 29,
+      "pdf_page": 63,
+      "printed_page": 291,
+      "day_one_ganzhi_kana": "つちのとのミ",
+      "day_one_ganzhi": "己巳",
+      "marginal_mansion_literal_candidates": [
+        "こすく"
+      ],
+      "marginal_mansion_normalized_candidate": "虚",
+      "marginal_weekday_literal": "すいえう",
+      "marginal_weekday_normalized_candidate": "水",
+      "marginal_status": "clear"
+    }
+  ],
+  "id": "naoj1992_shogonji_month_headers_v1",
+  "authors": [
+    "神田泰",
+    "伊藤節子",
+    "岡田芳朗"
+  ],
+  "title": "荘厳寺で発見された仮名暦の調査",
+  "publication": "国立天文台報 1(3), 1992, 229-292",
+  "pre_comparison_transcription_sha256": "5d089d06bdd7822d88c774e88b30cffcb9f0b2da2baa9db8ee3b59ffb4691564",
+  "full_manuscript_collation": false,
+  "original_manuscript_images_independently_read": false,
+  "ancient_day_boundary_accepted": false,
+  "hinoo_rule_priority_accepted": false,
+  "reference_replaces_calendar_kernel": false,
+  "year_header_variants": [
+    {
+      "lunar_year_author_assignment": 1345,
+      "author_year_label": "康永4年 / 1345",
+      "author_assignment_locators": [
+        "printed p229 abstract",
+        "printed p230 Table1",
+        "printed p231 Photo1 caption",
+        "printed p232-233 body"
+      ],
+      "appendix_year_header_literal": "康永二年",
+      "appendix_year_header_pdf_page": 9,
+      "appendix_year_header_printed_page": 237,
+      "same_header_year_ganzhi_literal": "乙酉",
+      "literal_digit_replaced": false,
+      "original_manuscript_digit_independently_collated": false,
+      "cause_or_author_erratum_established": false,
+      "calendar_kernel_year_reassigned": false
+    }
+  ],
+  "author_placement_notes": [
+    {
+      "lunar_year": 1345,
+      "month": 4,
+      "printed_page": 232,
+      "number": 3,
+      "note": "The red stamp lies between day 1 and day 2; authors say it should be above day 1. Preserve placement and author correction separately.",
+      "correction_is_author_judgment": true
+    },
+    {
+      "lunar_year": 1345,
+      "month": 5,
+      "printed_page": 232,
+      "number": 4,
+      "note": "The red stamp is above day 2; authors say it should be above day 1. Preserve placement and author correction separately.",
+      "correction_is_author_judgment": true
+    }
+  ]
+}

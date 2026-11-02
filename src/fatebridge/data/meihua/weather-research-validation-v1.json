@@ -1,0 +1,378 @@
+{
+  "id": "meihua_weather_research_validation_v1",
+  "version": "1.6.0",
+  "study_id": "meihua-weather-HKO-2025-locked-retrospective-v1",
+  "study_kind": "retrospective_before_data_retrieval_not_prospective",
+  "evaluated_base_ruleset": "meihua_weather_v1@1.0.0",
+  "weather_controls_included": false,
+  "evaluated_source_manifest_sha256": "04dbae949f04b5fe691b9f99335a07e534c47d821458970e8b25b218a2a00d3c",
+  "interpretation_policy": "rain_without_clear_sign_v1",
+  "cohort_days": 365,
+  "evaluable_days": 209,
+  "correct": 128,
+  "accuracy_on_evaluable_days": 0.6124401913875598,
+  "abstentions": 156,
+  "same_dates_always_dry_correct": 134,
+  "same_dates_always_dry_accuracy": 0.6411483253588517,
+  "beats_both_fixed_baselines": false,
+  "prospective_case_count": 0,
+  "scope": "本条旧版研究组合与additional_profile_audits的1.5.0研究分别保留；不能认证当前1.7.0新增朝暮时段及后续条款，也不能跨政策、年份或时间窗合并命中率。",
+  "result": "该组合未胜过固定基线；不以这批数据调参后宣称独立通过。",
+  "current_ruleset_efficacy_established": false,
+  "authority_certified": false,
+  "official_observation_source": "https://data.weather.gov.hk/weatherAPI/cis/csvfile/HKO/ALL/daily_HKO_RF_ALL.csv",
+  "preserved_observation_sha256": "5b6681c148ed5312d5c4b1c479a213263a744f0777737d14d18a94bd6c0d0d08",
+  "report": "docs/validation/meihua-weather-2025-pilot-v1.json",
+  "additional_profile_audits": [
+    {
+      "study_id": "meihua-current-1.5.0-HKO-2024-v2",
+      "study_kind": "additional_retrospective_audit_not_prospective_not_blinded_holdout",
+      "evaluated_ruleset": "meihua_weather_v1@1.5.0",
+      "weather_controls_included": true,
+      "interpretation_policy": "qualified_unambiguous_rain_clear_v2",
+      "source_manifest_sha256": "d89e94e461d2fa4e40564ecd47963a360665bf1556587b231c1e3235a578a01e",
+      "cohort_days": 366,
+      "evaluable_days": 29,
+      "correct": 16,
+      "accuracy_on_evaluable_days": 0.5517241379310345,
+      "abstentions": 337,
+      "same_dates_always_dry_correct": 16,
+      "full_cohort_correct_credit": 16,
+      "full_cohort_correct_credit_fraction": 0.04371584699453552,
+      "all_dates_always_dry_correct": 214,
+      "all_dates_always_rain_correct": 152,
+      "primary_full_cohort_gate_met": false,
+      "known_observation_days": 366,
+      "calendar_seed_date_checks": 366,
+      "calendar_seed_date_mismatches": 0,
+      "observation_data_previously_available": true,
+      "prospective_case_count": 0,
+      "authority_certified": false,
+      "scope": "实际当前源码、无气象条件输入、不补季节或多字阈值、前一日午时取数的2024完整日期网格。全队列正确贡献不是非弃权命中率；29日均标无雨，16/29与同日始终无雨相同。不能宣称独立盲验或前瞻通过。",
+      "report": "docs/validation/meihua-current-policy-2024-v2.json"
+    }
+  ],
+  "current_engine_ruleset": "meihua_weather_v1@1.7.0",
+  "current_profile_study": {
+    "primary_attainable_skill_bound": {
+      "vector_sha256": "6852bcd1686138fecbaeea5a7f467294cccda79c6ec0a76780705a161ce87115",
+      "file_commitment_verified": true,
+      "calculation_uses_only_cohort_ids_and_forecast_labels": true,
+      "study_plan_or_timestamp_authenticated": false,
+      "attainable_skill_bound": {
+        "bound_id": "full_cohort_binary_constant_credit_bound_v1",
+        "version": "1.0.0",
+        "endpoint": "correct_credit_over_all_locked_days",
+        "baseline": "better_of_always_rain_and_always_dry_over_full_cohort",
+        "cohort_days": 273,
+        "forecast_counts": {
+          "rain": 0,
+          "dry": 49,
+          "abstain": 224
+        },
+        "maximum_possible_correct_credit": 49,
+        "better_constant_credit_lower_bound": 137,
+        "exact_maximum_margin_over_better_constant": -88,
+        "strictly_below_better_constant_for_every_complete_outcome_vector": true,
+        "cannot_strictly_beat_better_constant_for_any_complete_outcome_vector": true,
+        "passing_is_possible_for_some_complete_binary_outcomes": false,
+        "necessary_categorical_days_for_strict_superiority": 138,
+        "both_forecast_classes_necessary_for_strict_superiority": true,
+        "constant_baselines_weakly_dominating_on_every_outcome_vector": [
+          "always_dry"
+        ],
+        "missing_forecasts_imputed": false,
+        "observed_outcomes_used": false,
+        "observed_accuracy": null,
+        "supplied_cohort_seal_authenticated": false,
+        "scope": "Conditional on this complete fixed forecast vector, binary complete outcomes, zero abstention credit and the specified full-cohort endpoint. Other models, inputs, targets or decision costs are not evaluated.",
+        "predictive_efficacy_established": false,
+        "authority_certified": false
+      },
+      "source_study_id": "meihua-weather1.7.0-scope-policy-v3-HKO",
+      "source_cohort": "primary_2026_ytd_through_last_complete_month",
+      "source_scenario": "calendar_season_supplied",
+      "source_vector_reference": "tests/fixtures/meihua_weather_feasibility_v1/primary273-vector.json",
+      "analysis_after_old_outcomes_were_public": true,
+      "scope_note": "Mathematical capacity of this fixed273-day forecast vector and full-cohort endpoint; not every Meihua input, actual daily weather or another evaluation protocol."
+    },
+    "study_id": "meihua-weather1.7.0-scope-policy-v3-HKO",
+    "evaluated_ruleset": "meihua_weather_v1@1.7.0",
+    "weather_controls_included": true,
+    "interpretation_policy": "qualified_scope_aware_daily_rain_clear_v3@1.0.0",
+    "study_kind": "retrospective_fixed_protocol_not_blinded_not_prospective",
+    "unique_target_dates": 1004,
+    "known_observation_target_dates": 1004,
+    "date_scenario_label_records": 2008,
+    "scenario_replications_are_not_independent_observations": true,
+    "primary_cohort": "2026-01-01 through2026-09-30, all273 days",
+    "primary_scenario": "calendar_season_supplied",
+    "primary": {
+      "cohort_days": 273,
+      "known_observation_days": 273,
+      "categorical_forecast_days": 49,
+      "correct": 29,
+      "accuracy_on_evaluable_days": 0.5918367346938775,
+      "abstentions": 224,
+      "missing_forecasts": 0,
+      "same_dates_always_dry_correct": 29,
+      "full_cohort_correct_credit": 29,
+      "all_dates_always_dry_correct": 158,
+      "all_dates_always_rain_correct": 115,
+      "primary_full_cohort_gate_met": false,
+      "all_observations_and_forecasts_present": true
+    },
+    "by_cohort_and_scenario": {
+      "primary_2026_ytd_through_last_complete_month": {
+        "calendar_season_supplied": {
+          "cohort_days": 273,
+          "known_observation_days": 273,
+          "categorical_forecast_days": 49,
+          "correct": 29,
+          "accuracy_on_evaluable_days": 0.5918367346938775,
+          "abstentions": 224,
+          "missing_forecasts": 0,
+          "same_dates_always_dry_correct": 29,
+          "full_cohort_correct_credit": 29,
+          "all_dates_always_dry_correct": 158,
+          "all_dates_always_rain_correct": 115,
+          "primary_full_cohort_gate_met": false,
+          "all_observations_and_forecasts_present": true
+        },
+        "season_not_supplied": {
+          "cohort_days": 273,
+          "known_observation_days": 273,
+          "categorical_forecast_days": 21,
+          "correct": 13,
+          "accuracy_on_evaluable_days": 0.6190476190476191,
+          "abstentions": 252,
+          "missing_forecasts": 0,
+          "same_dates_always_dry_correct": 13,
+          "full_cohort_correct_credit": 13,
+          "all_dates_always_dry_correct": 158,
+          "all_dates_always_rain_correct": 115,
+          "primary_full_cohort_gate_met": false,
+          "all_observations_and_forecasts_present": true
+        }
+      },
+      "retrospective_2024": {
+        "calendar_season_supplied": {
+          "cohort_days": 366,
+          "known_observation_days": 366,
+          "categorical_forecast_days": 63,
+          "correct": 33,
+          "accuracy_on_evaluable_days": 0.5238095238095238,
+          "abstentions": 303,
+          "missing_forecasts": 0,
+          "same_dates_always_dry_correct": 33,
+          "full_cohort_correct_credit": 33,
+          "all_dates_always_dry_correct": 214,
+          "all_dates_always_rain_correct": 152,
+          "primary_full_cohort_gate_met": false,
+          "all_observations_and_forecasts_present": true
+        },
+        "season_not_supplied": {
+          "cohort_days": 366,
+          "known_observation_days": 366,
+          "categorical_forecast_days": 29,
+          "correct": 16,
+          "accuracy_on_evaluable_days": 0.5517241379310345,
+          "abstentions": 337,
+          "missing_forecasts": 0,
+          "same_dates_always_dry_correct": 16,
+          "full_cohort_correct_credit": 16,
+          "all_dates_always_dry_correct": 214,
+          "all_dates_always_rain_correct": 152,
+          "primary_full_cohort_gate_met": false,
+          "all_observations_and_forecasts_present": true
+        }
+      },
+      "retrospective_2025": {
+        "calendar_season_supplied": {
+          "cohort_days": 365,
+          "known_observation_days": 365,
+          "categorical_forecast_days": 61,
+          "correct": 40,
+          "accuracy_on_evaluable_days": 0.6557377049180327,
+          "abstentions": 304,
+          "missing_forecasts": 0,
+          "same_dates_always_dry_correct": 40,
+          "full_cohort_correct_credit": 40,
+          "all_dates_always_dry_correct": 232,
+          "all_dates_always_rain_correct": 133,
+          "primary_full_cohort_gate_met": false,
+          "all_observations_and_forecasts_present": true
+        },
+        "season_not_supplied": {
+          "cohort_days": 365,
+          "known_observation_days": 365,
+          "categorical_forecast_days": 28,
+          "correct": 21,
+          "accuracy_on_evaluable_days": 0.75,
+          "abstentions": 337,
+          "missing_forecasts": 0,
+          "same_dates_always_dry_correct": 21,
+          "full_cohort_correct_credit": 21,
+          "all_dates_always_dry_correct": 232,
+          "all_dates_always_rain_correct": 133,
+          "primary_full_cohort_gate_met": false,
+          "all_observations_and_forecasts_present": true
+        }
+      }
+    },
+    "explicit_daypart_casts_by_scenario": {
+      "calendar_season_supplied": 0,
+      "season_not_supplied": 0
+    },
+    "daypart_readings_observationally_validated_in_this_cohort": false,
+    "source_manifest_sha256": "8c88eb61b8df6d78b73652af94a3a5619af73343d272a9f9775c78358a39cc77",
+    "protocol_sha256": "99a84a98c4d0477e8e95b1e766dab96667ad0b7d7528a13957ff24099479f7c1",
+    "forecast_seal_sha256": "97b810c9c36e498b9db09f17f391a5f090a6525a1153abea46d0d5f01e3b8e13",
+    "evaluation_report_sha256": "179cbb119d3d1472dfff67d2f3890d7d9b01bc211fa08d833e9e7f7467c869c0",
+    "observation_sha256": "5b6681c148ed5312d5c4b1c479a213263a744f0777737d14d18a94bd6c0d0d08",
+    "calendar_issue_date_checks": 1004,
+    "calendar_selected_field_mismatches": 0,
+    "research_assumptions": "Prior civil day Hong Kong noon cast; assign source scopes to next target civil day; unspecified clear to under0.1mm is an explicit proxy. Season maps the calculated issue-date solar month branch to four seasons; no prior-condition or 多 threshold filled.",
+    "result": "Both fixed scenarios failed full-cohort constant baselines in every cohort. Every issued categorical label was dry; same-date always-dry matches all their correct counts. No winning scenario selected.",
+    "prospective_case_count": 0,
+    "actual_model_runs": 0,
+    "current_ruleset_efficacy_established": false,
+    "authority_certified": false,
+    "scope": "Single HKO station, fixed1.7.0 source and v3 bridge only. Does not prove failure or success of all methods, dates, locations or original-text interpretations. Noon cohort never matched explicit朝暮 rules, so it cannot validate those rules in reality. Earlier2024/2025 reports and future frozen ledger are preserved.",
+    "report": "docs/validation/meihua-weather-scope-study-v3.json"
+  },
+  "reference_baseline_supplement": {
+    "id": "meihua_weather_reference_baseline_supplement_v1",
+    "kind": "posthoc_reference_baseline_supplement_not_preregistered_not_new_prediction_test",
+    "weather_ruleset_unchanged": "meihua_weather_v1@1.7.0",
+    "original_forecast_records_retained": 2008,
+    "unique_target_dates": 1004,
+    "new_meihua_forecasts": 0,
+    "persistence": "Last complete Hong Kong civil day before issue local date. Parent noon issues therefore use target minus2, never the unfinished issue-day daily total.",
+    "climatology": "Fixed1991..2020 same-calendar-month daily-rain majority; exact ties or any unknown training day unresolved. Modern empirical reference, not a cast probability.",
+    "training_days": 10958,
+    "all12_official_normals_match_published_precision": true,
+    "by_cohort": {
+      "primary_2026_ytd_through_last_complete_month": {
+        "cohort_days": 273,
+        "conditional_full_cohort_reference_correct": {
+          "persistence": 183,
+          "monthly_climatology": 190
+        },
+        "usable_reference_days_at_historic_issue": {
+          "persistence": 0,
+          "monthly_climatology": 0
+        },
+        "scenarios": {
+          "calendar_season_supplied": {
+            "weather_correct_credit": 29,
+            "weather_categorical_days": 49,
+            "weather_abstentions": 224,
+            "same_weather_categorical_dates_conditional_reference_correct": {
+              "persistence": 31,
+              "monthly_climatology": 31
+            },
+            "operational_superiority_gate": null
+          },
+          "season_not_supplied": {
+            "weather_correct_credit": 13,
+            "weather_categorical_days": 21,
+            "weather_abstentions": 252,
+            "same_weather_categorical_dates_conditional_reference_correct": {
+              "persistence": 13,
+              "monthly_climatology": 16
+            },
+            "operational_superiority_gate": null
+          }
+        }
+      },
+      "retrospective_2024": {
+        "cohort_days": 366,
+        "conditional_full_cohort_reference_correct": {
+          "persistence": 250,
+          "monthly_climatology": 252
+        },
+        "usable_reference_days_at_historic_issue": {
+          "persistence": 0,
+          "monthly_climatology": 0
+        },
+        "scenarios": {
+          "calendar_season_supplied": {
+            "weather_correct_credit": 33,
+            "weather_categorical_days": 63,
+            "weather_abstentions": 303,
+            "same_weather_categorical_dates_conditional_reference_correct": {
+              "persistence": 42,
+              "monthly_climatology": 41
+            },
+            "operational_superiority_gate": null
+          },
+          "season_not_supplied": {
+            "weather_correct_credit": 16,
+            "weather_categorical_days": 29,
+            "weather_abstentions": 337,
+            "same_weather_categorical_dates_conditional_reference_correct": {
+              "persistence": 21,
+              "monthly_climatology": 19
+            },
+            "operational_superiority_gate": null
+          }
+        }
+      },
+      "retrospective_2025": {
+        "cohort_days": 365,
+        "conditional_full_cohort_reference_correct": {
+          "persistence": 223,
+          "monthly_climatology": 260
+        },
+        "usable_reference_days_at_historic_issue": {
+          "persistence": 0,
+          "monthly_climatology": 0
+        },
+        "scenarios": {
+          "calendar_season_supplied": {
+            "weather_correct_credit": 40,
+            "weather_categorical_days": 61,
+            "weather_abstentions": 304,
+            "same_weather_categorical_dates_conditional_reference_correct": {
+              "persistence": 42,
+              "monthly_climatology": 42
+            },
+            "operational_superiority_gate": null
+          },
+          "season_not_supplied": {
+            "weather_correct_credit": 21,
+            "weather_categorical_days": 28,
+            "weather_abstentions": 337,
+            "same_weather_categorical_dates_conditional_reference_correct": {
+              "persistence": 20,
+              "monthly_climatology": 21
+            },
+            "operational_superiority_gate": null
+          }
+        }
+      }
+    },
+    "original_primary_endpoint_preserved": {
+      "cohort_days": 273,
+      "correct_credit": 29,
+      "all_dates_always_dry_correct": 158,
+      "gate_met": false
+    },
+    "historic_value_publication_times_known": false,
+    "conditional_evaluation_scope": "Counts assume the dated historical values. CurrentCSV and matching normals do not prove the exact values were available at issue. All reference labels under verified historic availability remain unresolved; no operational superiority or new preregistered performance gate.",
+    "primary_still_failed": true,
+    "no_winning_year_scenario_or_reference_selected": true,
+    "method_sources": [
+      "https://www.hko.gov.hk/tc/publica/reprint/files/r829.pdf",
+      "https://www.hko.gov.hk/en/cis/normal/1991_2020/normals.htm"
+    ],
+    "method_is_not_official_hko_scoring_or_classical_rule": true,
+    "report": "docs/validation/meihua-weather-reference-baselines-v1.json",
+    "report_sha256": "ab2c724d63923f4023f565e5b0c0cdedee740c4fc00106cd8789a4076891ebdd",
+    "actual_model_runs": 0,
+    "new_prospective_observations": 0,
+    "real_world_predictive_efficacy_established": false,
+    "authority_certified": false
+  }
+}

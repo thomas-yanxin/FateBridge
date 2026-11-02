@@ -330,15 +330,15 @@ def test_manual_or_time_casting_does_not_generate_a_seed(rest, override):
     assert result["run_metadata"]["replay"]["overrides"] == {}
 
 
-def test_normalized_blank_hexagrams_still_capture_the_random_seed(rest):
+def test_normalized_coin_method_still_captures_the_random_seed(rest):
     spec = next(spec for spec in CATALOG if spec.key == "sixyao")
     inputs = {
         **sixyao_inputs(),
         "method": " COIN ",
         "coins": None,
         "lines": [],
-        "gua_code": "  ",
-        "changed_code": "abc",
+        "gua_code": None,
+        "changed_code": None,
         "seed": None,
     }
     result = rest.post(spec.rest_path, json=inputs, params={"as_of": AS_OF}).json()
@@ -349,6 +349,27 @@ def test_normalized_blank_hexagrams_still_capture_the_random_seed(rest):
         params={"as_of": AS_OF},
     ).json()
     assert business(replay) == business(result)
+
+
+@pytest.mark.parametrize("field,value", [("gua_code", "  "), ("changed_code", "abc")])
+def test_invalid_hexagram_codes_cannot_be_silently_treated_as_random(
+    rest, field, value
+):
+    spec = next(spec for spec in CATALOG if spec.key == "sixyao")
+    inputs = {
+        **sixyao_inputs(),
+        "method": " COIN ",
+        "coins": None,
+        "lines": [],
+        "gua_code": None,
+        "changed_code": None,
+        "seed": None,
+        field: value,
+    }
+    result = rest.post(spec.rest_path, json=inputs, params={"as_of": AS_OF})
+    assert result.status_code == 422
+    assert result.json()["error_code"] == "validation_error"
+    assert "run_metadata" not in result.json()
 
 
 def test_pinned_partial_date_uses_existing_month_clamping_and_timezone_rules(rest):
@@ -371,13 +392,11 @@ def test_ephemeris_inventory_has_content_fingerprints_without_server_paths(
     monkeypatch.setattr(
         ephemeris_runtime, "configured_ephemeris_path", lambda: str(tmp_path)
     )
-    replay_metadata._ephemeris_inventory.cache_clear()
     inventory = replay_metadata.ephemeris_inventory()
     assert len(inventory["files"]["0/test.se1"]) == 64
     assert str(tmp_path) not in json.dumps(inventory)
     old = inventory["sha256"]
     data.write_bytes(b"changed-ephemeris")
-    replay_metadata._ephemeris_inventory.cache_clear()
     assert replay_metadata.ephemeris_inventory()["sha256"] != old
 
 

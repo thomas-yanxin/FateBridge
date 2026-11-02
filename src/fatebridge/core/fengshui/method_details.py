@@ -6,6 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, Optional, cast
 
+from .bazhai_interpretation import fuwei_element_context
 from .directions import rule_data
 from .materials import material_reference
 
@@ -36,6 +37,9 @@ def method_reference_provenance() -> Dict[str, Any]:
     record = reference_data("ruleset")
     sources = reference_data("sources")
     sources.update(deepcopy(_supplement()["sources"]))
+    foundation = rule_data("sources")
+    for key in ("S10", "S12"):
+        sources["FOUNDATION_" + key] = foundation[key]
     for source in material_reference()["ruleset"]["sources"]:
         source = deepcopy(source)
         source_id = source.pop("source_id")
@@ -102,6 +106,7 @@ def method_details(methods: Optional[Iterable[str]] = None) -> Dict[str, Any]:
     """
     families = {
         "annual_stars": "nine_palace_flying_stars",
+        "monthly_stars": "nine_palace_flying_stars",
         "xuankong_natal": "nine_palace_flying_stars",
         "nine_palace_flying_stars": "nine_palace_flying_stars",
         "jinsuo": "jinsuo",
@@ -170,7 +175,17 @@ def method_details(methods: Optional[Iterable[str]] = None) -> Dict[str, Any]:
                 "reference_frame": "bazhai_you_nian",
                 "lookup_key": "actual_bazhai_star_name",
                 "scope": "bazhai_relation_star_not_flying_star_number",
-                "source_ids": ["FOUNDATION_S3"],
+                "source_ids": ["FOUNDATION_S3", "FOUNDATION_S10"],
+                **(
+                    {
+                        "element_policy": "selected_star_table_fixed_fuwei_wood",
+                        "source_context_variation": fuwei_element_context(
+                            "FOUNDATION_"
+                        ),
+                    }
+                    if star["name"] == "伏位"
+                    else {}
+                ),
             }
             for star in rule_data("bazhai_stars").values()
         },

@@ -1,0 +1,297 @@
+{
+  "schema_version": 1,
+  "id": "fatebridge_bazi_foundations_v1",
+  "version": 2,
+  "domain": "bazi",
+  "description": "独立新增的四柱、年柱、月柱术语；旧85条基础包、台账和历史验收保持不变。",
+  "categories": {
+    "basics": {
+      "四柱": {
+        "title": "四柱",
+        "tips": [
+          "四柱是出生年、月、日、时的四组干支；每柱由一个天干和一个地支组成，合称八字。",
+          "《三命通会》卷二〈论年月日時〉以年月日时排成四柱，并说明遁月从年、遁时从日；这里是对固定数字转录选段的释义，非逐字引文。",
+          "FateBridge 以 year、month、day、hour 四组干支表达四柱。年、月使用所确认民用实际瞬间的立春年界和十二节月界，日、时另按所选钟时及换日约定处理。",
+          "解释术语无需个人生辰；真正排盘才核对所选工具的必要资料。未知生时不能补零点或中午，四柱也不能证明个人现实经历或预测效度。"
+        ],
+        "curation": {
+          "method_id": "bazi_foundations_scoped_v1",
+          "entry_revision": 2,
+          "curated_on": "2026-10-24",
+          "classification": "program_terminology_selected_classical_context_editorial_bounds",
+          "review_status": "selected_digital_source_and_implementation_not_full_acceptance",
+          "validation_status": "terminology_and_program_conventions_not_predictive_validation",
+          "definition_basis": "定义与年/月界的程序口径按实现逐项标注；古籍只归属所列选段背景，不把现代术语整理冒充逐字古文或所有流派共识。",
+          "source_tip_indices": [
+            1
+          ],
+          "implementation_tip_indices": [
+            0,
+            2
+          ],
+          "editorial_tip_indices": [
+            3
+          ],
+          "source_pending_tip_indices": [],
+          "source_refs": [
+            {
+              "source_id": "sanming_siku_vol02_rev761691",
+              "author": "萬民英",
+              "title": "三命通會",
+              "edition": "四庫全書本的維基文庫數字轉錄",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691",
+              "source_sha256": "748da85cc60441c0e0ffe783644db152b70b4320b134650d80a086bb27987273",
+              "source_kind": "primary_classical_digital_transcription_not_scan_collation",
+              "revision_id": 761691,
+              "revision_timestamp": "2016-10-24T13:12:21Z",
+              "source_locator": "卷二·論年月日時／論遁月時；維基文庫固定修訂761691",
+              "source_sections": [
+                "論年月日時",
+                "論遁月時"
+              ],
+              "selected_quotes": [
+                "凡論人命年月日時排成四柱遁月從年則以年為本遁時從日則以日為主",
+                "所以遁月從年遁時從日"
+              ],
+              "support_scope": "仅支持年月日时排成四柱、遁月从年及遁时从日的选段释义；不支持旁文的寿命、亲属遭遇、贵贱或现实预测。数字转录未完成影印校勘及独立专家审阅。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "tests/fixtures/bazi_foundations_v1/program/calendar.py.txt",
+              "source_sha256": "b002a383f47c99ad4be7bd6e509d57f27ba7d38eba3ffd7139b2fb776bbd89b3",
+              "functions": [
+                "calculate_year_pillar",
+                "calculate_month_pillar_by_branch",
+                "_get_four_pillars_cached"
+              ],
+              "support_scope": "source_path为审阅源码快照；current_source_path中所列函数按文本散列核对一致。只支持程序干支结构、立春年界、十二节月界与月干取法，不认证外部依赖精度、全部流派或现实预测。",
+              "current_source_path": "src/fatebridge/core/calendar.py",
+              "source_digest_scope": "reviewed_snapshot_file",
+              "function_text_sha256": {
+                "calculate_year_pillar": "3e070d439313cf689cebeb57e9de941e5a32ea865893e0c6dca76b694e4469e6",
+                "calculate_month_pillar_by_branch": "eb011a931a63f8d683abef9b0bd3ab820017e6d7156bb40a1f0ac054b40b908c",
+                "_get_four_pillars_cached": "58f936b2fc5d6afd4405a8d9e7b6b3647e27d7e2e8f7325ea42f2ce3a7a5a156"
+              }
+            },
+            {
+              "source_path": "tests/fixtures/bazi_foundations_v1/program/almanac.py.txt",
+              "source_sha256": "1257e9031da3d3d55777d261355bd8bcb0f85cba62e7ca7889d1872c1fb63db6",
+              "functions": [
+                "get_bazi_year",
+                "get_bazi_month_context",
+                "get_bazi_month_boundaries"
+              ],
+              "support_scope": "source_path为审阅源码快照；current_source_path中所列函数按文本散列核对一致。只支持程序干支结构、立春年界、十二节月界与月干取法，不认证外部依赖精度、全部流派或现实预测。",
+              "current_source_path": "src/fatebridge/core/almanac.py",
+              "source_digest_scope": "reviewed_snapshot_file",
+              "function_text_sha256": {
+                "get_bazi_year": "8ab5634cf91863ae17ac5d585fedc72a3f24eda4f0d13e171cc46052a030d412",
+                "get_bazi_month_context": "c1922bbb4823f80c7c8b084cc832cf0f415394107eac40a7af3b0377f5888cbb",
+                "get_bazi_month_boundaries": "6a723982f16e2a2b87f12e38eb7a71660321f07ae320746509800c3e5d58560d"
+              }
+            }
+          ],
+          "independent_expert_review": "not_completed",
+          "scan_collation": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_foundations_v1/curation-review.json",
+          "citation": "FateBridge术语整理，非逐字引文；萬民英《三命通會》四庫全書本数字转录，卷二〈論年月日時／論遁月時〉，維基文庫固定修订761691；https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691；原典选段与当前程序历法口径分别归属，未作影印、独立专家或现实效度认证。"
+        }
+      },
+      "年柱": {
+        "title": "年柱",
+        "tips": [
+          "年柱是四柱中的出生年干支，由年干和年支组成；一个公历年份数字或一个生肖名称都不是完整年柱。",
+          "所选《三命通会》〈论年月日時〉把年与月日时并列，〈论遁月时〉叙述遁月从年；此处仅作为术语与取法背景。",
+          "FateBridge 的八字年界按已确认的民用实际瞬间与立春瞬间比较，不直接以公历1月1日或农历春节替代。这是本程序口径，不声称其他历法、生肖习惯或所有流派都采用同一边界。",
+          "当前月干取法需结合已确定的八字年干与月支，不能只拿生肖名称推定月柱。",
+          "年柱只有一柱的信息；不能据年柱或生肖认定个性、能力、家庭经历、寿命或现实命运。"
+        ],
+        "curation": {
+          "method_id": "bazi_foundations_scoped_v1",
+          "entry_revision": 2,
+          "curated_on": "2026-10-24",
+          "classification": "program_terminology_selected_classical_context_editorial_bounds",
+          "review_status": "selected_digital_source_and_implementation_not_full_acceptance",
+          "validation_status": "terminology_and_program_conventions_not_predictive_validation",
+          "definition_basis": "定义与年/月界的程序口径按实现逐项标注；古籍只归属所列选段背景，不把现代术语整理冒充逐字古文或所有流派共识。",
+          "source_tip_indices": [
+            1
+          ],
+          "implementation_tip_indices": [
+            0,
+            2,
+            3
+          ],
+          "editorial_tip_indices": [
+            4
+          ],
+          "source_pending_tip_indices": [],
+          "source_refs": [
+            {
+              "source_id": "sanming_siku_vol02_rev761691",
+              "author": "萬民英",
+              "title": "三命通會",
+              "edition": "四庫全書本的維基文庫數字轉錄",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691",
+              "source_sha256": "748da85cc60441c0e0ffe783644db152b70b4320b134650d80a086bb27987273",
+              "source_kind": "primary_classical_digital_transcription_not_scan_collation",
+              "revision_id": 761691,
+              "revision_timestamp": "2016-10-24T13:12:21Z",
+              "source_locator": "卷二·論年月日時／論遁月時；維基文庫固定修訂761691",
+              "source_sections": [
+                "論年月日時",
+                "論遁月時"
+              ],
+              "selected_quotes": [
+                "凡論人命年月日時排成四柱遁月從年則以年為本遁時從日則以日為主",
+                "所以遁月從年遁時從日"
+              ],
+              "support_scope": "仅支持年月日时排成四柱、遁月从年及遁时从日的选段释义；不支持旁文的寿命、亲属遭遇、贵贱或现实预测。数字转录未完成影印校勘及独立专家审阅。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "tests/fixtures/bazi_foundations_v1/program/calendar.py.txt",
+              "source_sha256": "b002a383f47c99ad4be7bd6e509d57f27ba7d38eba3ffd7139b2fb776bbd89b3",
+              "functions": [
+                "calculate_year_pillar",
+                "calculate_month_pillar_by_branch",
+                "_get_four_pillars_cached"
+              ],
+              "support_scope": "source_path为审阅源码快照；current_source_path中所列函数按文本散列核对一致。只支持程序干支结构、立春年界、十二节月界与月干取法，不认证外部依赖精度、全部流派或现实预测。",
+              "current_source_path": "src/fatebridge/core/calendar.py",
+              "source_digest_scope": "reviewed_snapshot_file",
+              "function_text_sha256": {
+                "calculate_year_pillar": "3e070d439313cf689cebeb57e9de941e5a32ea865893e0c6dca76b694e4469e6",
+                "calculate_month_pillar_by_branch": "eb011a931a63f8d683abef9b0bd3ab820017e6d7156bb40a1f0ac054b40b908c",
+                "_get_four_pillars_cached": "58f936b2fc5d6afd4405a8d9e7b6b3647e27d7e2e8f7325ea42f2ce3a7a5a156"
+              }
+            },
+            {
+              "source_path": "tests/fixtures/bazi_foundations_v1/program/almanac.py.txt",
+              "source_sha256": "1257e9031da3d3d55777d261355bd8bcb0f85cba62e7ca7889d1872c1fb63db6",
+              "functions": [
+                "get_bazi_year",
+                "get_bazi_month_context",
+                "get_bazi_month_boundaries"
+              ],
+              "support_scope": "source_path为审阅源码快照；current_source_path中所列函数按文本散列核对一致。只支持程序干支结构、立春年界、十二节月界与月干取法，不认证外部依赖精度、全部流派或现实预测。",
+              "current_source_path": "src/fatebridge/core/almanac.py",
+              "source_digest_scope": "reviewed_snapshot_file",
+              "function_text_sha256": {
+                "get_bazi_year": "8ab5634cf91863ae17ac5d585fedc72a3f24eda4f0d13e171cc46052a030d412",
+                "get_bazi_month_context": "c1922bbb4823f80c7c8b084cc832cf0f415394107eac40a7af3b0377f5888cbb",
+                "get_bazi_month_boundaries": "6a723982f16e2a2b87f12e38eb7a71660321f07ae320746509800c3e5d58560d"
+              }
+            }
+          ],
+          "independent_expert_review": "not_completed",
+          "scan_collation": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_foundations_v1/curation-review.json",
+          "citation": "FateBridge术语整理，非逐字引文；萬民英《三命通會》四庫全書本数字转录，卷二〈論年月日時／論遁月時〉，維基文庫固定修订761691；https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691；原典选段与当前程序历法口径分别归属，未作影印、独立专家或现实效度认证。"
+        }
+      },
+      "月柱": {
+        "title": "月柱",
+        "tips": [
+          "月柱是出生月序对应的一组月干支，由月干和月支组成；月序须先确定采用的节月口径。",
+          "《三命通会》〈论遁月时〉叙述遁月从年及起月取法；本词条仅释该取法背景，不据数字转录校定所有歌诀字形。",
+          "FateBridge 以十二个“节”作为节月换界，不是二十四节气的每一项都换月；也不把公历月份号或农历月序（含闰月）直接当作月支。",
+          "月支确定后，程序结合八字年干和寅月起干的关系推出月干；具体交节时刻交引擎比较，不从日期或固定整点补造。",
+          "月柱、月令分析所用月支与节后人元司令不是同一字段。单凭月柱不能完成格局成败、身强弱或现实结果裁定。"
+        ],
+        "curation": {
+          "method_id": "bazi_foundations_scoped_v1",
+          "entry_revision": 2,
+          "curated_on": "2026-10-24",
+          "classification": "program_terminology_selected_classical_context_editorial_bounds",
+          "review_status": "selected_digital_source_and_implementation_not_full_acceptance",
+          "validation_status": "terminology_and_program_conventions_not_predictive_validation",
+          "definition_basis": "定义与年/月界的程序口径按实现逐项标注；古籍只归属所列选段背景，不把现代术语整理冒充逐字古文或所有流派共识。",
+          "source_tip_indices": [
+            1
+          ],
+          "implementation_tip_indices": [
+            0,
+            2,
+            3
+          ],
+          "editorial_tip_indices": [
+            4
+          ],
+          "source_pending_tip_indices": [],
+          "source_refs": [
+            {
+              "source_id": "sanming_siku_vol02_rev761691",
+              "author": "萬民英",
+              "title": "三命通會",
+              "edition": "四庫全書本的維基文庫數字轉錄",
+              "source_url": "https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691",
+              "source_sha256": "748da85cc60441c0e0ffe783644db152b70b4320b134650d80a086bb27987273",
+              "source_kind": "primary_classical_digital_transcription_not_scan_collation",
+              "revision_id": 761691,
+              "revision_timestamp": "2016-10-24T13:12:21Z",
+              "source_locator": "卷二·論年月日時／論遁月時；維基文庫固定修訂761691",
+              "source_sections": [
+                "論年月日時",
+                "論遁月時"
+              ],
+              "selected_quotes": [
+                "凡論人命年月日時排成四柱遁月從年則以年為本遁時從日則以日為主",
+                "所以遁月從年遁時從日"
+              ],
+              "support_scope": "仅支持年月日时排成四柱、遁月从年及遁时从日的选段释义；不支持旁文的寿命、亲属遭遇、贵贱或现实预测。数字转录未完成影印校勘及独立专家审阅。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "tests/fixtures/bazi_foundations_v1/program/calendar.py.txt",
+              "source_sha256": "b002a383f47c99ad4be7bd6e509d57f27ba7d38eba3ffd7139b2fb776bbd89b3",
+              "functions": [
+                "calculate_year_pillar",
+                "calculate_month_pillar_by_branch",
+                "_get_four_pillars_cached"
+              ],
+              "support_scope": "source_path为审阅源码快照；current_source_path中所列函数按文本散列核对一致。只支持程序干支结构、立春年界、十二节月界与月干取法，不认证外部依赖精度、全部流派或现实预测。",
+              "current_source_path": "src/fatebridge/core/calendar.py",
+              "source_digest_scope": "reviewed_snapshot_file",
+              "function_text_sha256": {
+                "calculate_year_pillar": "3e070d439313cf689cebeb57e9de941e5a32ea865893e0c6dca76b694e4469e6",
+                "calculate_month_pillar_by_branch": "eb011a931a63f8d683abef9b0bd3ab820017e6d7156bb40a1f0ac054b40b908c",
+                "_get_four_pillars_cached": "58f936b2fc5d6afd4405a8d9e7b6b3647e27d7e2e8f7325ea42f2ce3a7a5a156"
+              }
+            },
+            {
+              "source_path": "tests/fixtures/bazi_foundations_v1/program/almanac.py.txt",
+              "source_sha256": "1257e9031da3d3d55777d261355bd8bcb0f85cba62e7ca7889d1872c1fb63db6",
+              "functions": [
+                "get_bazi_year",
+                "get_bazi_month_context",
+                "get_bazi_month_boundaries"
+              ],
+              "support_scope": "source_path为审阅源码快照；current_source_path中所列函数按文本散列核对一致。只支持程序干支结构、立春年界、十二节月界与月干取法，不认证外部依赖精度、全部流派或现实预测。",
+              "current_source_path": "src/fatebridge/core/almanac.py",
+              "source_digest_scope": "reviewed_snapshot_file",
+              "function_text_sha256": {
+                "get_bazi_year": "8ab5634cf91863ae17ac5d585fedc72a3f24eda4f0d13e171cc46052a030d412",
+                "get_bazi_month_context": "c1922bbb4823f80c7c8b084cc832cf0f415394107eac40a7af3b0377f5888cbb",
+                "get_bazi_month_boundaries": "6a723982f16e2a2b87f12e38eb7a71660321f07ae320746509800c3e5d58560d"
+              }
+            }
+          ],
+          "independent_expert_review": "not_completed",
+          "scan_collation": "not_completed",
+          "new_independent_chart_cases": 0,
+          "reality_prediction_efficacy": "not_tested",
+          "review_record": "tests/fixtures/bazi_foundations_v1/curation-review.json",
+          "citation": "FateBridge术语整理，非逐字引文；萬民英《三命通會》四庫全書本数字转录，卷二〈論年月日時／論遁月時〉，維基文庫固定修订761691；https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691；原典选段与当前程序历法口径分别归属，未作影印、独立专家或现实效度认证。"
+        }
+      }
+    }
+  }
+}

@@ -45,9 +45,13 @@ def test_sensitive_strength_does_not_automatically_add_water():
 
 def test_original_case_preserves_wood_conflict_and_fire_reference():
     profile = BaZiRules.chart_useful_profile(PILLARS)
-    assert set(profile["useful_elements"]) == {"土", "金"}
+    assert profile["useful_elements"] == []
     assert profile["avoid_elements"] == []
-    assert set(profile["conditional_elements"]) == {"木", "火"}
+    assert set(profile["conditional_elements"]) == {"木", "火", "土", "金"}
+    # A sensitive baseline supplies no preference; an unadjudicated
+    # co-occurrence candidate must not reintroduce automatic useful elements.
+    assert profile["legacy_dominant_structure"]["key"] == "yang_ren_jia_sha"
+    assert profile["candidate_selection"]["chosen_path_id"] is None
     assert profile["neutral_elements"] == ["水"]
     wood = next(item for item in profile["conflicts"] if item["element"] == "木")
     assert "shang_guan_pei_yin" in wood["supporting_sources"]
@@ -103,12 +107,12 @@ def test_specialties_share_resolver_without_complement_avoidance():
     from fatebridge.analysis.education import EducationAnalysis
 
     career = CareerAnalysis._analyze_industries(PILLARS, "壬", Element.WATER)
-    assert set(career["favorable_elements"]) == {"土", "金"}
+    assert career["favorable_elements"] == []
     assert career["avoid_industries"] == []
     education = EducationAnalysis._analyze_subjects(
         PILLARS, "壬", {"seal_weight": 1, "food_hurt_weight": 1, "officer_weight": 1}
     )
-    assert set(education["conditional_elements"]) == {"木", "火"}
+    assert set(education["conditional_elements"]) == {"木", "火", "土", "金"}
 
 
 def test_birth_evidence_and_layers_match_rest_mcp_cli(capsys, monkeypatch):

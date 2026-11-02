@@ -61,6 +61,7 @@ PAYLOADS = {
         ]
     },
     "annual_stars": {"effective_year": 2026},
+    "monthly_stars": {"query_at": "2027-01-10T12:00:00+08:00"},
     "xuankong_natal": {
         "house": {
             "object_id": "home",

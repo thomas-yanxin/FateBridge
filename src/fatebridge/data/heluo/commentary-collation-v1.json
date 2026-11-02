@@ -1,0 +1,5245 @@
+{
+  "corpus_id": "heluo_nlc_line_commentary_v19",
+  "version": "19.0.0",
+  "source_title": "河洛理數 上海文明書局印行本 卷二上",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "source_pdf_sha256": "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c",
+  "review_status": "single_visual_collation; independent_second_review_pending",
+  "scope": "156/384 complete commentaries;228pending. Previous150 entries exact. Daxu26 adds24complete parent sections across180-182; Daxu3旛/幡 remains qualified. Two conditional references keep their actual叶者/不叶者 parents. No automatic applicability or certification.",
+  "transcription_policy": "Modern punctuation and section boundaries supplied; 无 normalized to 無, 叶 to 葉 and historical font forms mapped to Unicode. Lexical variants and awkward readings retained with notes. Not a diplomatic glyph transcription. Conditional subsections remain inside their literal parent section; applicability not computed. Prior96entries retain their recorded叶-to-葉convention unchanged. NewSui17retains printed叶rather than mechanical葉conversion; no personal叶/不叶criterion is thereby selected. Printed无is represented as無, 于/於and并retain selected forms. One Sui6glyph remains tentative with alternatives in reading_notes. NewGu18retains printed叶and source forms无/無,于/於,汚as recorded; two source-first draft mistakes夫/歷were withdrawn after source-pixel comparison, not counted as inherited errors. Gu2祗remains tentative. Patch12.0.1 withdraws introducedGu3太過/Gu4日生 in favor of visible大過/且生; original first candidate retained. NewLin19retains printed叶and无, unusual詔誤/未順命/顯越, source中字/行字 indications. Head/body pageboundary atLin4retained. Modernpunctuation is editorial, not a diplomatictypesetting reproduction. NewGuan20 retains printed叶/无/于 andfullcrosspageparents. Firstdraft顧/杜右 withdrawn to賴/柱石 beforecandidate; inherited賴/柱石 alreadycorrect. 外買/外賈unresolved inperentrynotes; originalform andeditorialpunctuation do notselectpersonalconditions. Shike21 preserves complete24sections andleafconditions across168/169/170. 叶者 does notmean uniformlypositive. Conditional晋/震references do notreplacechart. 積塵/積陳 and矍矍/瞿瞿 remainunresolved; no clinicalorpersonaldisaster inference. Ben22 retains printed叶 and selected无/于. All24parentsections andcross-pagecontinuations kept. Firstdraft節卲/興/易withdrawn fromsourcepixels beforelegacy comparison; notinheriteddefects. 棄/葉and喬readings remainqualified; DaChuquotation inannualsection doesnotreplaceformalHoutian orimplyprintedtargetline. Postcomparison pixel review withdraws ownBen1暫時in favor of掣肘; firstcandidate andfailedtests retained, notindependentsecondreview. Bo23 retains printed叶/无/于 and complete24parentsections. First source draft was sealed before legacy comparison. 深與/薄德後福/雲路/宮人/庇護/宮室 are source-selected, not normalization to a common allusion. Target Jin4 and Kun6 are printed conditional references, not natal transform replacements. Modern punctuation and Unicode selection remain editorial. Patch17.0.1 corrects only own Bo5 title-form note: printed無, while Bo3 remains无. All six commentary body texts unchanged; source-first draft and failed glyph check retained. Fu24 and Wuwang25 add48 complete parent sections. Wuwang1 and4 cross-page continuations are kept within their original parents. Source-first own errors倍/囚捨/正固 were withdrawn after native recrops to倚/回增/正自; inherited readings at these locations were correct and gain no repair credit. Fu4逐 and Fu5孝/考 remain unresolved. References name Mingyi and Yi without printed target positions; no inferred line or formal chart substitution. All poems and inherited verdicts unchanged. Daxu26 adds24complete parents. Line3 and6 cross-page continuations remain in their source parents. Initial own三世/曰/擔 drafts and all exposure receipts remain archived; no independent reading credit. Line2 names賁 without target position, while line6 explicitly names泰上爻 in不叶者. Daxu3五馬 dictionary explanation is clearly labeled editorial, not printed commentary or glyph evidence. All384poems and inherited verdicts unchanged.",
+  "total_line_commentaries": 384,
+  "poem_source_status": "inherited_poems_not_present_in_reviewed_line_sections; source_unverified",
+  "entries": [
+    {
+      "hexagram": "乾為天",
+      "line": 1,
+      "pdf_pages": [
+        119
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是隱德之象，而示以固守之占者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者固深學廣，心懶志疑，好靜無求，名利不耀。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者隱居下處，刑尅太重，奴僕少力。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕退阻，在士淹留，在商窒滯。惟僧道隱逸羽衣之流，則盤桓安樂。女命則興家業，孕生子。凡人利用幽靜，若一動作，即生災疾，謀事則有咎。且變得姤卦，謹防小人染污之患。"
+        }
+      ],
+      "reading_notes": [
+        "固深學廣按所見保留；不擅改作因深或其他通順讀法。"
+      ]
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 2,
+      "pdf_pages": [
+        120
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是大人德與時顯，而天下不失望者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者貴而有利名，龍象也，富有產業。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦主中直，多見潤澤。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕者逢明主，居要津；在士者擢高科，馳名譽；在農者進田園，增金帛；商賈獲利，僧道加持，常人得貴人提攜。然龍、田、德、普四字，或是官職姓名字也。若女命則居富配貴。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 3,
+      "pdf_pages": [
+        120
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是因占設戒，而示以憂勤補過之占也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者最是公正之人，有名利，勤學力行，見識之廣，憂慮之深，每逢難事，變而為易。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者乍勤乍怠，無敬畏之心，有躁動之失。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕必主兼職重之任，而事多繁冗，能惕若憂勤，則可免咎；在士進取艱辛，而佳會難逢；在常俗必往來不停，而財利艱獲。凡事詳審，躁動者失。女主性躁，刑尅太重，難於內助。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 4,
+      "pdf_pages": [
+        120,
+        121
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是能審於進退，而不輕於動者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者可行則行，可止則止，進德修業，及時行道，有志之士，多見科甲之遂。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者雖有富貴之慕，進退多疑，終不成事。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則停缺待職，在士則藏器待時，在庶俗則百為艱難，疑而未定。若女命與僧道，則安樂富貴矣。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 5,
+      "pdf_pages": [
+        121
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是德位之隆，而下觀不容已者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者立大功名，享大富貴。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者難當此任，雖有高飛遠舉之志，亦難克遂成立之願，如升天之不易也。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕未遂清高之職，在士必飛黃騰踏之有階，在庶俗必遇尊貴之擡舉，而謀遂志得。養晦者，或近勢大宦家，或造甲第王家，或建龍宮殿宇。女命則兼男權，難免孤尅。爻拆數凶者，有見官之兆。"
+        }
+      ],
+      "reading_notes": [
+        "未遂清高之職、爻拆按所見保留，不以文義推改。"
+      ]
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 6,
+      "pdf_pages": [
+        121
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是履盛之危者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者貴而無位，高而無名，能知謙戒，則可長守其富貴。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者自尊自大，欺公玩法，招尤啟釁，難于成立。"
+        },
+        {
+          "section_id": "female",
+          "condition_label": "若是女命",
+          "text": "若是女命，其性必悍，內助艱辛。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則退職遭貶，在士則高薦後當有損折，在庶俗則有過剛取凶之禍。五十以後者不壽。"
+        }
+      ],
+      "reading_notes": [
+        "高而無名按本印本，不以常見高而無民覆蓋。末句為歷史原文，未作壽命推斷。"
+      ]
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 1,
+      "pdf_pages": [
+        122
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是陰始生之象也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者必幼習詩書，壯得功名，蓋必生於陽月可也。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者則不中不正，違上習奸，損人益己，諫之則怨，諛之則喜，終不能善其後。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則防讒佞之禍，在士則防妒忌之嗟，在庶俗則防仇怨之虞。惟陰命則大興家業，坤道方長故也。"
+        }
+      ],
+      "reading_notes": [
+        "陽月、陰命為原文條件，未以性別或節氣陰陽令自動代入。"
+      ]
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 2,
+      "pdf_pages": [
+        122
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是盛德之至者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者為中正貴人，譽望高，力量大，且直、方、大三字，為兆甚多，或太常、太僕、太尹、方伯之類。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦忠實之人，多動少靜，而為鄉里之所推重。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則位高遷，在士則偉名上達，在庶俗則粟帛多增，在女命則為賢良起家。"
+        }
+      ],
+      "reading_notes": [
+        "力量、太尹按所見保留；不改作繼承文本的方量、大尹。"
+      ]
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 3,
+      "pdf_pages": [
+        122,
+        123
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是人能含晦章美者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者主學問充實，作一時之標準，主一生榮顯，享爵祿於無窮。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦韜光斂跡，公己公人，而為智愚謹厚之士也。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則職修而陞遷有期，在士則文華而進取有日，在庶俗則謀深而經營有獲，在女命則為德婦。"
+        }
+      ],
+      "reading_notes": [
+        "智愚按所見保留，不擅改成智慮等讀法。"
+      ]
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 4,
+      "pdf_pages": [
+        123
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是因時以自守者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者雖有居位食祿之美，而謀猷不能顯設，亦終不能任重致遠，徒小補而已。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者為謹厚朴實之人，而豐厚飽煖以有餘。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則謹守常職而難於陞遷，在士則艱於進取，在庶俗則經營阻滯。大凡宜謹固收斂，則無非橫之禍。女命則賢而起家。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 5,
+      "pdf_pages": [
+        123
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是有中順之德，而獲大善之吉者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者文章高世，科甲冠倫。黃字為黃榜、黃屋、黃門、宗室之兆。元字為解、會、殿三元之兆。又文字中字為兆甚多。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦施為公正，衣祿豐足，謹厚退遜，不招猜疑。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則為內授之選，在士則有飛黃之榮，在庶俗則有財利之招。事事安穩，災害不生。女命則為命婦德婦，而為內助之功人。"
+        }
+      ],
+      "reading_notes": [
+        "文字中字保持原文連文；未據字兆匹配現代姓名。"
+      ]
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 6,
+      "pdf_pages": [
+        123,
+        124
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是陰盛之禍者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者或為將帥而臨陣有功，或居高位而僭越無忌，或處勢危而威福自恣。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者性多凶狠，冒尊凌上，好大喜功，更變無定，甚則為軍戎歷其艱辛，吏卒受其苦楚，或好生而被殘傷，或好訟而苦其刑罰。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則見貶斥之禍，在士則為鏖戰於文場，雖有飛黃之榮，難免憂害破損之危，在庶俗則有爭鬭之擾，而破敗危亡之甚。"
+        }
+      ],
+      "reading_notes": [
+        "好生按所見保留，未以繼承文本的好爭反改底本。"
+      ]
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 1,
+      "pdf_pages": [
+        124
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是屯難之時，進則為民，退則守己。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者當位至公侯，職居藩門，但恐非太平之時，必在險要之地。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者雖守己居正，亦有威權而為人望，但處事遲疑而少果決。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則職修而有顯達之選，在士則從貴而有建明之議，在庶俗則安常守分而無躁動之處。大抵事事宜當審擇，躁妄則屯。女命則賢良婦而興家。"
+        }
+      ],
+      "reading_notes": [
+        "進則為民按原頁所見保留，不因語意改作君或官。",
+        "末句原頁止於興家，未補業字。"
+      ]
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 2,
+      "pdf_pages": [
+        125
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是進之有累、從之有道者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者先孤而後不孤，先困而後不困，則為鄉里善士，巖穴幽人，守節之女，甘貧之士。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者圖遠忘近，違親向疎，雖得尊上取用而招下猜疑。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則取班改職，必致五馬之榮，或禦兵邊而權柄日盛。在士則進取蹉跎，在庶俗則有婚嫁交締之美。男女之生，數凶者主辭訟勾連，程途阻滯，進退不決，而屯邅不遂矣。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 3,
+      "pdf_pages": [
+        125
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是妄行取困而深戒其妄行取困者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者知幾固守，順理安行，如舜與鹿豕遊，而險陷可免。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者飄泊生涯，殷勤活計，履危蹈險而不知避。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則招貪污之斥，在士則招停降之辱，在庶俗則遭禁獄之殃，不如守分安常為佳。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 4,
+      "pdf_pages": [
+        125,
+        126
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是求賢以濟屯而獲遂者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者初作賢才，終逢明主，進列清班，出為五馬，己不求人，人自仰己。若是女命，夫榮子貴。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者離鄉改祖，柔懦不能自立，雖遇提攜，亦難振作。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則祿美譽彰，而陞遷有地。在士則進取易為，而嘉命自至。在庶俗則人情和合，而百謀克遂。大抵得朋之助，交締之美，而吉無不利也。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 5,
+      "pdf_pages": [
+        126
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是德不下究而業不可大者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者稟中正之德，懷濟惠之心，則名小就。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者好大喜功，必遭凶禍。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，凡有為者，不可急躁妄誕以取凶，但要斟酌審處以避難也。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 6,
+      "pdf_pages": [
+        126
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是進無所之而憂懼甚切者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者進前退後，心志不堅，知古通今，功名難遂，生長悲感，多艱多難。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者親有刑傷，婚姻孤尅。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，居榮見辱，在仕防讒，在士防辱，在庶俗防損，數凶者無壽，防父母之喪。"
+        }
+      ],
+      "reading_notes": [
+        "數凶者等嵌套條件照錄，未據部分數值自動裁定或轉成現實斷言。"
+      ]
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 1,
+      "pdf_pages": [
+        126,
+        127
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是詳君子發蒙之道而因以戒之者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者親近尊貴，力勤德業，或不由進取成名，或不用文字改秩，甚則修國史而立典刑，掌無權而行賞罰。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦為良民善士，飽食煖衣，不受艱辛。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則為掌文教之職，或理刑名之任。在士則小試有發軔之美。在庶俗多主官訟，親朋不和，干戈爭鬥，暗昧是非，終得解脫，凶者有刑。"
+        }
+      ],
+      "reading_notes": [
+        "詳君子、掌無權按原頁所見保留，不擅改誨君子或掌兵權。"
+      ]
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 2,
+      "pdf_pages": [
+        127
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是任師道之美，著其象而善其占者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者必大賢君子、大量容物、和氣待人、孝養忠國。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦能起家立業，或得妻力，得貴子。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則守官職，在士則為師範，在庶俗則人情和協而百為有成，或結婚姻，或生子孫，尊賢交接，行藏遂志，動止平安。"
+        }
+      ],
+      "reading_notes": [
+        "著其象而善其占、葉者必大賢君子按原頁所見保留；初讀者／誓／以已撤回。"
+      ]
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 3,
+      "pdf_pages": [
+        127
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是溺於自暴自棄而不足與取者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者多學問，縱有利名，亦是棄本逐末，違正從邪。女命則為龍妾，先輕後重，為妮妓者可以招福。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者必有陰險搖唇鼓舌、虛而無實，徒奔走於塵途，碌碌難免。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則有貪婪取辱之斥，在士則有燕僻廢學之嗟，在庶俗則生是非，或陰人不睦，而有酒色聲音之咎。大抵宜靜而謹防為佳。"
+        }
+      ],
+      "reading_notes": [
+        "龍妾按原頁所見保留，未擅改為寵妾。",
+        "為妮妓者及燕僻等讀法照錄，仍待獨立複核；初讀好／儔已撤回。"
+      ]
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 4,
+      "pdf_pages": [
+        128
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是不能親賢者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者雖是才人，難逢明主，獨善一身，往居僻處。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者寡與人交，自誇己德，宜僧宜道，子孫難續。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則無引援而少陞遷，在士則無薦拔而進取艱辛，在庶俗則人情乖離而經營窒滯。大抵靜無咎而動有損。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 5,
+      "pdf_pages": [
+        128
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是至誠以任賢而治功成者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者幼而明敏，壯而謙恭，或幼童科甲早承祖蔭，致君澤民之道可以推行無阻。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦安常守分，和光同塵。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在士農工商，皆依附稱謀為攸順。"
+        }
+      ],
+      "reading_notes": [
+        "末句稱謀為攸順按所見保留，不擅改成稱心遂意等現代轉述。"
+      ]
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 6,
+      "pdf_pages": [
+        128
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是治蒙過剛，蘊其用而異其占者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者有名位利祿，或幼選之戰功，或節制兵師，主官刑獄。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦有志氣，能勝重任，大事不懼，小事不欺，為鄉里之豪傑。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則有司寇名職，在士則寇可奪、功可成，在庶俗則防爭訟寇盜之擾，或奴婢為災。"
+        }
+      ],
+      "reading_notes": [
+        "蘊其用而異其占、幼選之戰功及寇可奪按所見保留，不因語義慣用而改字；初讀擅已撤回。"
+      ]
+    },
+    {
+      "hexagram": "水天需",
+      "line": 1,
+      "pdf_pages": [
+        129
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是有遠險之象而示以不變之占者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者清廉公正，而為恬淡之官、郊外巡捕之職。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者隱處山林，隨分衣祿，毀譽喜怒之不事。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則守常職而黜陟不加，在士則宜從外路，雖有造就而志意不愜。經營者守舊安常，災不犯而禍不作。如數空者，葬於郊野。"
+        }
+      ],
+      "reading_notes": [
+        "數空者句存於相鄰歲運段末，不能據編輯分段認定其全部適用範圍；未裁定何為數空。"
+      ]
+    },
+    {
+      "hexagram": "水天需",
+      "line": 2,
+      "pdf_pages": [
+        129
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是擬人臣初進之象，先難而後獲者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者必有貴人。沙字之義，在文則宰相而行沙堤，或武則將軍而行沙塞。言字、終字吉兆甚多。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者奔走江湖，遊談鼓舌，或幼年知書，晚景獲福。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則入言路正論，或阻於邪議。在士則考較必遭言責，終可免身辱之危。在庶俗必主以是非、卑幼爭訟之擾，大抵宜寬緩以待人，則百結不辨而自明。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "水天需",
+      "line": 3,
+      "pdf_pages": [
+        130
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是身近於險而著其自取者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者雖有利名，常見憂愁，區區然而不出乎塵。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者性習剛強，身遭險陷，忠言不聽，妄語見信，而碌碌於叢棘之中。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕必遭貶逐而自貽伊戚，在士必受恥辱而無以自拔，在庶俗宜防寇盜失奪之嗟，行舟者被水厄。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "水天需",
+      "line": 4,
+      "pdf_pages": [
+        130
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是能遠乎害者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者必為正人，有才有德，觀變知幾，出險為夷，而身家可免傾危之患。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者主違親向疎，出家作旅，幼失恃怙，老倍富豪，下則為奴婢使令之人。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則能全身遠害，而寵辱不加，在士則國學者可出身以成名，府州則不得志矣。在庶俗則傷害去而平復之有漸，在囹圄者散，久淹者伸，旅處者無羈絆。數凶者則靜中退步，閑中生鬧，或爭競鞭刑，或血蠱產難，或憂長上，或損嬰兒。"
+        }
+      ],
+      "reading_notes": [
+        "寵辱、囹圄由本次初稿占位／誤讀更正，原繼承文這兩處保持；不作新增程式錯誤計數。",
+        "下則條件留在不葉者段，數凶者留在歲運段，未自動裁定適用性。"
+      ]
+    },
+    {
+      "hexagram": "水天需",
+      "line": 5,
+      "pdf_pages": [
+        130,
+        131
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是久於其道而化成者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者必大貴人，而功名無阻。中正二字之義，官職多端。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦是金穀豐盈，安靜享福，次則為飽煖之人。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在朝廷則有食邑榮生，在仕則有御宴飲食之加，在庶俗則必有粟帛婚姻之事。中字大中、中書、中順，正字即奉、正言、正即、正拜正字。"
+        }
+      ],
+      "reading_notes": [
+        "正字即奉、正言、正即、正拜正字按本印本字面保留，不以現代或通行官名補改。",
+        "食邑榮生與婚姻之事按所見連文保留，編輯標點不代表已定所有語義。"
+      ]
+    },
+    {
+      "hexagram": "水天需",
+      "line": 6,
+      "pdf_pages": [
+        131
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是加敬於非意之來而險可出者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者多為儒者，先勤後怠，早年銳志，功名晚歲棲身巖穴，親賢接善，無不順承。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者處順安常，卑牧謙恭，而得好人拔舉，可以出危為安，易險為夷。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則入內京，謹防讒邪之厄，在士則入國學，謹避危疑之損，在常俗則入幽谷，謹防倉卒之患。大凡要能謹慎，則久憂得散，久淹得伸。數凶者輕則係纍纏，重則埋坵塚。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 1,
+      "pdf_pages": [
+        131,
+        132
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是不能終訟，始雖屈而終得伸者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者心性明慧，度量寬宏，觀變之機，全身遠害，順則入言路、修國史，而終無尤孽之招。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦能酌事機、料時變，少有成就，次則有作為而不能長久。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕必遭讒謗，不辨而明，在士則小有言傷而終無大害，在庶俗則有是非，起次訟而終可獲伸，有病者不藥自愈，數凶者壽不延永。"
+        }
+      ],
+      "reading_notes": [
+        "歲運末的有病者、數凶者為原文條件，不能轉成對現實個體的醫療或壽命斷言。"
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 2,
+      "pdf_pages": [
+        132
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是訴訟之人以情中而得吉者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者或守宰戶曹，而貴不受殃，或隱居退處，而富不招孽。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者動則為難，心不服人，進則阻滯，退則守己，亦不失為守常之士。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則有食邑之榮，在士則保守而毀譽不遷，在庶俗則戶口安寧而無咎。如元數凶者，主訟起戶婚，甚則逐竄流逃而難反者也。"
+        }
+      ],
+      "reading_notes": [
+        "貴不受殃、富不招孽回原字核對；初稿殊／擎已撤回，不作繼承文改錯。"
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 3,
+      "pdf_pages": [
+        132
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是安分之人以退讓而獲吉者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者或承祖父之恩而蔭襲以承天寵，或守田園之業而因人以成其事功。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者先難後易，始辱終榮，剛而不虐，威而不猛，守常不競，自是無舊。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則恪守常職而難於陞除，在士則保全常分而停降不加，在常人則不失其常而百難不犯。"
+        }
+      ],
+      "reading_notes": [
+        "退讓回原字確認；無舊按本印本所見保留，不因語意改為無咎。"
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 4,
+      "pdf_pages": [
+        133
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是能自處以正而不陷於有過之地者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者志剛心慈，聞善必行，有過必改。命字、安字之義，有爵命、壽命、安國、安家之兆。女人為女人命婦貞潔。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者多越分凌節以犯上，不能察文理、就義以自省，吉不可得也。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則閑中復職，在士則進取不失，在庶俗則改過遷善而官訟不擾。吉則為平安，凶則為安置，又當預防之可也。"
+        }
+      ],
+      "reading_notes": [
+        "女人為女人命婦暫按字面保留，沒有為通順改作夫人；女命句不獨立裁為本次適用。"
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 5,
+      "pdf_pages": [
+        133
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是德位兼隆而為訟者之利見者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者文章高世，學問冠倫。其元字之義，有進取三元之兆。正字之義，有正郎、正卿之應。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦中正謙恭，知幾固守，而不失為鄉里之善士。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則除授封拜之大，在士則登科及第之顯，在庶俗則營謀求利之必遂。正字、正奉、正言、正拜。"
+        }
+      ],
+      "reading_notes": [
+        "封拜之大按初讀所見保留，不先以成語改作美。"
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 6,
+      "pdf_pages": [
+        133,
+        134
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是能終訟，始勝而終必敗者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者喜功貪謀，圖遠果敢，有為而不顧名分道理，行人之所不能行，可以僥爵苟祿。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者禍起蕭牆，悔生意外，始得終失，而身家難保。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則有成有敗、有進有退，在士則進取必見捷報之佳，在庶俗或見爭訟，或承重服，用之終訟則凶，以之自訟則吉。"
+        }
+      ],
+      "reading_notes": [
+        "用之終訟／以之自訟為原文相反條件，不能只摘吉句；承重服原樣保留。"
+      ]
+    },
+    {
+      "hexagram": "地水師",
+      "line": 1,
+      "pdf_pages": [
+        134
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是深戒行師之不可苟者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者威名服衆，恩愛及人，用心不私而富貴福澤享於無窮。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者心慕更新，事不師古，始則富貴，終則傾危。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則克盡臣道而天寵日加，在士則文義合式而功名可取，在庶俗則經營有法而財貨日增，但輕於動者成少敗多。數凶者行險傷壽。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "地水師",
+      "line": 2,
+      "pdf_pages": [
+        134,
+        135
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是將兵者善其戰，而將將者隆其任者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者剛而不虐，威而有惠，或執閫外之權而軍民共戴，或居大中之位而遐邇咸趨。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦一鄉之善，而上奬下譽之有地。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕必加寵錫天書爵命，在外入朝，在內出師，在士必成名而魁解可得，在庶俗則必遇貴而百謀稱心，僧道受恩，女命受封。"
+        }
+      ],
+      "reading_notes": [
+        "上奬下譽之有地依原頁保留；女命受封在歲運段內，未代選條件。"
+      ]
+    },
+    {
+      "hexagram": "地水師",
+      "line": 3,
+      "pdf_pages": [
+        135
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是輕敵以取敗者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者才德大弱，大衆不服，下人不信。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者壽算難遠。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，悲憂多至，或服丁憂。如與命相合者變升三爻，有升虛邑之辭。未仕者不阻，已仕者受職待缺，十二月生人又貴而吉。"
+        }
+      ],
+      "reading_notes": [
+        "大弱、大衆、或服丁憂依原頁；初稿變升二爻及升遷邑已撤回，原文為三爻及升虛邑。",
+        "如與命相合者為原文附加條件；十二月口徑未裁定；變升是原文引卦，不替代正式先後天變換。"
+      ]
+    },
+    {
+      "hexagram": "地水師",
+      "line": 4,
+      "pdf_pages": [
+        135
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是不倖成以取敗者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者明炳幾先，酌事應變，見用於治朝，免禍於亂世。左字之義，為兆頗多有左輔、左相、左選、左曹之類。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者退處卑約，宜靜安居，而為全身遠害之吉人。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則險要而居清冷之位，在士則為內舍監生之美，在庶俗則安居樂業而無妄動之危。或修造宮舍，或寄寓旅次，皆不失其常而禍害不招矣。"
+        }
+      ],
+      "reading_notes": [
+        "不倖成、明炳幾先、兆頗多、險要而居清冷之位依原頁保留；標點為編者所加。",
+        "左字之義是原文字兆，不套現代姓名；不自動代選葉否。"
+      ]
+    },
+    {
+      "hexagram": "地水師",
+      "line": 5,
+      "pdf_pages": [
+        135,
+        136
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是得用師之義而盡任將之道者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者進身有道，立功有德，彼動此應，先審後發，靖亂拯溺，而威聲大著於海宇。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者或居村野而有田園資畜，有學問，有權柄，長子可克家，小子多無壽。下此則妄言妄動，多阻多拙。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕或為諫政，或居言路而地位高顯，在士則進取成名，榜列后次，在庶俗則田税日增，職業日繁。但有委任得其人，則謀遂志得，須防小子之阨。"
+        }
+      ],
+      "reading_notes": [
+        "初稿漏讀135頁最左欄並誤稱無不葉者，已撤回；不葉者完整保留，下此不另列為等同條件。",
+        "諫政、榜列后次、田税日增、職業日繁、阨依136頁；阨初讀為師及暫疑帥均撤回。"
+      ]
+    },
+    {
+      "hexagram": "地水師",
+      "line": 6,
+      "pdf_pages": [
+        136
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是盡報功之典，而不濫於所施者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者正大君子，受恩寵，有壽命，或立朝廷之功，或承祖父之恩。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者少公道，恃時勢，欺良善，可與同患難，不可與安樂，而福澤淺薄。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕者當權立功，未仕者技藝成名，常人可立家計，或承繼宗祀，或增祀續。大抵宜防讒佞，恐生僭越之禍。"
+        }
+      ],
+      "reading_notes": [
+        "少公道、恃時勢、技藝、祀續、讒佞依原頁；未改作近義現代詞。"
+      ]
+    },
+    {
+      "hexagram": "水地比",
+      "line": 1,
+      "pdf_pages": [
+        136,
+        137
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是以誠感人，始無不得而終無不善者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者無虛浮，有真實，遇外賢，受正祿。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦優游安樂，而不歷艱辛，僧道技藝亦可立身。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則有額外之遷，在士則有登薦之榮，在常人則有知己之遇，而百謀無不稱心矣。"
+        }
+      ],
+      "reading_notes": [
+        "不歷艱辛、技藝、知己依原頁；未增全卦納甲條件。"
+      ]
+    },
+    {
+      "hexagram": "水地比",
+      "line": 2,
+      "pdf_pages": [
+        137
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是得其君而仕正而且吉者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者貴顯之大，福澤之厚，言發於真見，行出於本心。內字之義，為內翰內舍之兆。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦誠實之人，得妻家之力，貴人倚附勢。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則見內除，在士子則成名不出方州之中，在庶俗則得貴倚附而營謀協意。女命則得賢夫之配。"
+        }
+      ],
+      "reading_notes": [
+        "眞見依既有字形政策轉寫為真見；原頁無遠字，言發於真見、行出於本心的標點為編輯所加。",
+        "繼承文本混入的戊戌戊子等全卦納甲條件見136頁卦引，並非此爻注文；卦引條件仍由獨立卦月與納甲證據層保留。",
+        "內字為原文字兆；女命末句仍在歲運段內，未自動裁定適用。"
+      ]
+    },
+    {
+      "hexagram": "水地比",
+      "line": 3,
+      "pdf_pages": [
+        137
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是不擇交而取損者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者內無好親輔，而心有不足，外無好應與，而終有失志。縱能居位食祿，恐壽年虧而嗣續艱。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者進學無成，好親小人，甚則帶疾生災，放濫為非而傷損無日。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則防同僚不睦之愆，在士則防黜降之虞，在常俗則損友猜疑，氣血損傷。若女子所嫁必非良人，破家喪身之象。不然則有爭訟破財刑孝，多般撓括，未免徒流。"
+        }
+      ],
+      "reading_notes": [
+        "放濫、虞、刑孝、撓括、人身字句依原頁；不因語意突兀擅改。",
+        "女子與不然是原歲運段嵌套條件，沒有單列若是女命，不自動選用。"
+      ]
+    },
+    {
+      "hexagram": "水地比",
+      "line": 4,
+      "pdf_pages": [
+        137,
+        138
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是外比得其君正而且吉者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者虛己待人，盡節事君，身處於內，心比於外，而富貴可以長享。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦為人正大，而無阿諛苟合之行，鄉里推重，脫凡越俗。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕卑職得陞遷之榮，進取曹臺得利，在庶俗出而有為，多得知己之力而行無不遂。"
+        }
+      ],
+      "reading_notes": [
+        "虛己、在仕卑職、在庶俗依原頁；曹臺保留，不自動套現代職位。"
+      ]
+    },
+    {
+      "hexagram": "水地比",
+      "line": 5,
+      "pdf_pages": [
+        138
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是有德足以當天下之比者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者大公至正而致君澤民之有道。中正二字之義，有正奏、正言、大中、治中、給事中之兆，小則有食邑、宰邑之榮。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者有中正之德，不拒不追，殺氣纔起，仁心便生，度量寬弘，先孤而後不孤，先難而後不難。次則為勤苦罟網之徒而飽煖足食，或以文及武。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則有超遷之榮，在士則有貢舉之兆，在庶俗則有先逆後順之休，求謀有得，無往不利。"
+        }
+      ],
+      "reading_notes": [
+        "治中、纔、罟網、飽煖、或以文及武、先逆後順依原頁；中正為原文字兆，不作現代姓名判斷。"
+      ]
+    },
+    {
+      "hexagram": "水地比",
+      "line": 6,
+      "pdf_pages": [
+        138
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是無德而不能服天下之心者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者文清身正，多失機會，悔生不及。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者壽算難永，或孤獨失覆。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則衆不輔而處勢危，在士則上無援引而名難成，在常人則刑剋災殃而人情爭張，甚則壽終。"
+        }
+      ],
+      "reading_notes": [
+        "文清、壽算、孤獨失覆、人情爭張依原頁；歷史材料不轉為現實壽命斷言。"
+      ]
+    },
+    {
+      "hexagram": "風天小畜",
+      "line": 1,
+      "pdf_pages": [
+        139
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是進得其正而善其占者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者順理而行，知幾而止，小人不得以伺其隙，而致君澤民之心可以克遂而無阻。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦耿介之士，不慕浮華而快樂瀟洒之有地。次則獨立無助，僧道之儔耳。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則閑官復職，逆旅還鄉，常俗安靜，在士則克復肄業。數凶者變巽初爻，進退志疑，在有為者當防猜忌疑惑之禍。"
+        }
+      ],
+      "reading_notes": [
+        "數凶者變巽初爻為原文條件引卦；初稿異／交已撤回。數凶者定義未裁定，不據此改盤。",
+        "瀟洒、儔、閑官、常俗、猜忌依原頁與字形政策；未補繼承文在有為者後的又字。"
+      ]
+    },
+    {
+      "hexagram": "風天小畜",
+      "line": 2,
+      "pdf_pages": [
+        139
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是援同道以進，而道無不行者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者剛中自守，親賢取友而道行志伸。中字之義，有治中、中書省之兆。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者必與小人相交，有貴而不能大用。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則為儕長而牽引有階，在士則為道長而拔萃有地，在常人則聯同志以向往而營謀得遂。數凶者有牽連反復失事之兆。"
+        }
+      ],
+      "reading_notes": [
+        "儕長、向往依原頁；中字為原文字兆，不套現代姓名。"
+      ]
+    },
+    {
+      "hexagram": "風天小畜",
+      "line": 3,
+      "pdf_pages": [
+        140
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是剛健太過而見畜於小人者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者但小小營謀，而貪高望大之有反遭傷害。剛健太過，拘執不通，謀則不從，終當見阻，或君臣疏遠不孚，或夫妻乖違不睦，或朋友是非血氣損傷。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，榮而見辱，進而見退，或生足目之疾，或人口分別，百孽病生。"
+        }
+      ],
+      "reading_notes": [
+        "完整140頁九三段只列葉者及歲運逢之，未另印不葉者；不補造標籤或解釋為不匹配。",
+        "貪高望大之有、謀則不從、百孽病生依原頁；有字後標點為編輯所加。葉者段包含不利敘述，標籤不等同吉凶分類。"
+      ]
+    },
+    {
+      "hexagram": "風天小畜",
+      "line": 4,
+      "pdf_pages": [
+        140
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是誠心感人而得免於害者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者虛中柔順，謙己守正，遇貴人，逢知己，在內仕者外選，在國學者出選，易悲為歡，轉凶為吉，不失為正道之貴人。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者多猜忌而無定見，或生足疾氣蠱，內外不睦，憂愁度日。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則得同志舉拔，而久任者必至轉遷，在士則得上人合意，久淹者而志可伸，在庶俗則誠能感物，而人情和合，營謀頗遂。其數之凶者須防血肉之損。"
+        }
+      ],
+      "reading_notes": [
+        "得免於害、謙己、猜忌、氣蠱、上人合意、久淹依原頁，未為通順改詞。",
+        "在內仕／國學出選照錄，不改為今制或自動選人群條件。"
+      ]
+    },
+    {
+      "hexagram": "風天小畜",
+      "line": 5,
+      "pdf_pages": [
+        140,
+        141
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是德力足以感結乎人心，而可以禦暴者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者貴不自尊，富而濟物，彼此一體，親疏一心，而仰慕趨赴之有人。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者雖不得獨力自畜，亦必倚富而得受用，或得贊助之力，而膺備夫之福。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則上必信用，下必欽服而加位增之，在士則主同協意而功成名立，在庶俗則扶助有人而百謀稱心。"
+        }
+      ],
+      "reading_notes": [
+        "膺備夫、主同協意依原頁；僃字形按既有政策轉為備，不改為膺庸夫或主司。",
+        "初稿占位已補；跨140至141頁；獨力自畜不改作自奮。"
+      ]
+    },
+    {
+      "hexagram": "風天小畜",
+      "line": 6,
+      "pdf_pages": [
+        141
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是自尚乎陰德而君子受其害者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者積之厚，養之裕，而足食聚財而無損弊之嗟。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者利名纔至，破敗疊來。"
+        },
+        {
+          "section_id": "female",
+          "condition_label": "若是女命",
+          "text": "若是女命，性剛心悍，壽脆災生。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則逐於陰邪，在士則見斥於主司，在庶俗必見墮於小人之妒，而是非旋擾。惟閙中退步，樂處休貪，則可免災。"
+        }
+      ],
+      "reading_notes": [
+        "原文為而君子受其害，若是女命另列為實際印出標籤；適用仍未定。",
+        "纔、墮、小人之妒、閙依本印本與字形政策；不以歷史材料推實際壽命災害。"
+      ]
+    },
+    {
+      "hexagram": "天澤履",
+      "line": 1,
+      "pdf_pages": [
+        141,
+        142
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是達不離道而得尚進之宜者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者剛立有守，質實不浮，達則兼善天下，而無剝民坑君之志。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者獨善其身，而廉隅壁於清修之地，或儒科自奮，或遇親眷，或作僧道。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則弘化有道而陞遷及期，在士則幼學壯行而利名成就，在庶俗則營謀有計而財利日增，數凶者有縞素之象。"
+        }
+      ],
+      "reading_notes": [
+        "坑君、儒科、親眷、陞遷及期、縞素依原頁；初稿衿／禮撤回。",
+        "廉隅壁依原頁保留，不為語意改字；跨141至142頁。"
+      ]
+    },
+    {
+      "hexagram": "天澤履",
+      "line": 2,
+      "pdf_pages": [
+        142
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是以隱自高者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者抱道自樂，無欺於中，無鐘鼎之榮，有田里之樂。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者多作清閑之人，而榮辱不加，飢煖無求。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則有吉休之兆，在士則有難遇之嗟，在庶俗則有安居自足之美。大抵宜行實地，謀為審擇，則人事和諧而貞吉可得。數凶者有幽冥之應。"
+        }
+      ],
+      "reading_notes": [
+        "無欺、飢煖依原頁，不以通順改成無歉或飽暖。"
+      ]
+    },
+    {
+      "hexagram": "天澤履",
+      "line": 3,
+      "pdf_pages": [
+        142
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是失所履之道而有以致凶者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者自用自尊，而眇視天下，傍若無人，而謀猷難於設施，剛暴足以取禍。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者或為軍卒配徒之流，或為眇目跛足之輩，或為愚賤夭折之人。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則遭貶斥之禍，在士則招屈降之辱，在庶俗則招爭訟囚獄之擾，甚者家破身亡。"
+        }
+      ],
+      "reading_notes": [
+        "傍若無人、眇目、囚獄之擾依原頁；不把歷史材料病禍字轉為現實個體斷言。"
+      ]
+    },
+    {
+      "hexagram": "天澤履",
+      "line": 4,
+      "pdf_pages": [
+        142,
+        143
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是事君以敬而得其志者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者以敬慎事君，以柔順服強暴，雖行於今而志則懷乎古，可以易危為安，轉凶為吉。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者或艱辛起家，平易結果。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則有虎符將帥之兆，在士則有虎榜題名之應，在庶俗則有履危蹈險之患，惟謹畏自持可免災患。女命得此多是刑剋太重，敗家淫亂不良之婦也。"
+        }
+      ],
+      "reading_notes": [
+        "今而志則懷乎古依完整跨頁讀法；初稿平吉撤回，不計繼承缺陷。",
+        "虎符依原頁；女命得此仍在歲運段內，不另補若是女命標籤。"
+      ]
+    },
+    {
+      "hexagram": "天澤履",
+      "line": 5,
+      "pdf_pages": [
+        143
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是自恃其所履而有傷者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者勇於進德，力於行道，斥逐邪人，舉揚善類，而是非利害之不顧。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者人情寡合，徒汲汲塵途，而禍患旋踵，成立艱苦。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則功高天下而不賞，在士則道高人表而名不成，在庶俗則躁動妄行而禍患疊至。甚則喪亡無日矣。"
+        }
+      ],
+      "reading_notes": [
+        "自恃、徒汲汲、甚則依原頁；初稿妻則撤回，不另補妻之條件。"
+      ]
+    },
+    {
+      "hexagram": "天澤履",
+      "line": 6,
+      "pdf_pages": [
+        143
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是盡所履之道而有以致福者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者為高才大德之貴人，行無虧欠，福必厚裕。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者變為引兌之小人，行不正之道而福祉難獲。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，仕顯者退旋以享安靖和平之福。士人進取必作魁元，常人亦有財帛。數凶者有喪亡之兆。蓋考字之義故也，凡有為者不可輕易反聽信外言，恐有傷於後慮。"
+        }
+      ],
+      "reading_notes": [
+        "引兌、福祉難獲、退旋依原頁；初稿引分／難進撤回。變為引兌之小人不是已選換卦算法。",
+        "考字為原文字兆；數凶者等條件未求值，歷史材料不轉為現實喪亡斷言。"
+      ]
+    },
+    {
+      "hexagram": "地天泰",
+      "line": 1,
+      "pdf_pages": [
+        144
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是類進之象而與其大行之占者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者高明正大，親君子遠小人，公而忘私，國而忘家，立功名享富貴。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦朋輩協理，氣合道同而成立不難。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則同寅協恭而超遷有基，在士則同道尚德而飛騰有日，在庶俗則同志合謀則財利日增。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "地天泰",
+      "line": 2,
+      "pdf_pages": [
+        144,
+        145
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是有剛中之德而為保大之臣者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者量大能容，兼收並蓄，不以遠而遺，不以親而比，中正不阿，足以開太平之業而富貴悠久。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦不失為謹厚之士，而鄉里推重，富有殷實。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則有興邊疆守江湖，或大中中奉中書省之類，在士則進取成名，營謀者獲利，常俗必遇尊貴。如不入局不得位則變明夷。二爻防長上有損，言語有傷。"
+        }
+      ],
+      "reading_notes": [
+        "興邊疆按本次可見字形暫讀；語義及字形待獨立復核，不以繼承文禦字代定。大中中奉中書省未改為現代職銜。",
+        "原印明夷後有句點再列二爻；今保留其相鄰位置，不以標點證明正式後天卦。"
+      ]
+    },
+    {
+      "hexagram": "地天泰",
+      "line": 3,
+      "pdf_pages": [
+        145
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是治泰於將否之時終於致富者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者艱危其思慮，正固其施為，盡人事以挽回乎天意，而大寧之福可享於不替。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者或成或敗，艱中獲福。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕宜克艱厥任，當防小人妬忌之妨，在士宜保其所固有，不可圖倖進之名，在庶俗宜戰兢自持以保其身家，大抵宜艱難中退步則有功，謹厚則安，不然小人侵凌，每事見阻。"
+        }
+      ],
+      "reading_notes": [
+        "致富、大寧、妬忌之妨、倖進、自持依所見保留；不以通順或繼承文致福、太寧替換。"
+      ]
+    },
+    {
+      "hexagram": "地天泰",
+      "line": 4,
+      "pdf_pages": [
+        145
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是小人並進之時者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者多阻多疑，心志不一，或得或失，功名難全，奔馳作旅，辛苦成家。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者或倚托鄰貴，倚仗親富。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，已仕者退避，進取難成，營謀失利，居閑有謗。依止則脫禍，化工全則出仕於遠僻，勞碌不暇。"
+        }
+      ],
+      "reading_notes": [
+        "遠僻的僻字初稿誤分為備已撤回；葉者段含不利敘述，不能以葉標籤判吉。化工全仍為歲運段內嵌條件。"
+      ]
+    },
+    {
+      "hexagram": "地天泰",
+      "line": 5,
+      "pdf_pages": [
+        145,
+        146
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是下賢以誠而進以格天之治者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者富貴不驕，恭謙持己，或賢室助己，貴子克家，富貴不甚勞力，但權不由己。女命得此勤儉成家。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦中正吉人，不施威而人自平服，生平安樂，內助有功。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕主有遷除或有喜事，在士則有步蟾之兆，在庶俗主得人擡舉，或結姻生育而百福悠集。"
+        }
+      ],
+      "reading_notes": [
+        "女命得此位於葉者段內，不另造若是女命的獨立印本標籤；百福悠集依頁146續文。"
+      ]
+    },
+    {
+      "hexagram": "地天泰",
+      "line": 6,
+      "pdf_pages": [
+        146
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是欲保于治否之後而終以致差者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者卑約自處，庶幾小立規模，然終見阻挫而招咎。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者誇己逞強，家破身亡，自大化小。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕遭謫貶，在士遭羞辱，在庶俗有破損有疾病難於壽，惟謹厚免禍。"
+        }
+      ],
+      "reading_notes": [
+        "治否、致差按所見保留；致差字形及語義待獨立復核，不以繼承文致羞代定。"
+      ]
+    },
+    {
+      "hexagram": "天地否",
+      "line": 1,
+      "pdf_pages": [
+        146,
+        147
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是能反於正而得吉者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者多名譽之人，改祖外立，違近從遠，志在憂君，心不私己，不為國家之患，不失在己之福。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者度時而進，知幾而退，惟逢艱難之時，雖行中正之道，僅可保其身家而無傾危之憂。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕受職者待缺，居位者防譴，在士則機會難逢，在庶俗守舊，蓋小人道長之時，縱爻辭美不足羨也，防小人牽連之事。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "天地否",
+      "line": 2,
+      "pdf_pages": [
+        147
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是小人而無傷善之心而得吉者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者為中正貴人，寬而有容，靜以待動，自能撥亂反治，轉否為泰而福澤無虧，雖時阻挫亦無累也。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者為流俗處賢否之間，有名非正，有敵非真，惟宜愛護保守免禍。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕宜見幾早作，在士宜藏器待時，在庶俗宜包羞忍恥以保全身家，不然是非好惡難明而災害難避。"
+        }
+      ],
+      "reading_notes": [
+        "有敵非真依可見讀法保留；不以繼承文直祿非真代定。叶按既定政策作葉，不另造不時者標籤。"
+      ]
+    },
+    {
+      "hexagram": "天地否",
+      "line": 3,
+      "pdf_pages": [
+        147
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是小人志於傷善而未能者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者遇貴人君子，信用庇護，或有卑職，亦有停阻，虛名無實，惟僧道宜之。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者不能守道，窮斯濫矣。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕告休，在士防辱，在庶俗防是非爭訟之擾。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "天地否",
+      "line": 4,
+      "pdf_pages": [
+        147,
+        148
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是際天人之會而因與其同道之受福者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者功名之人，獲壽命納福祉。變為觀則觀光上國，利用賓于王，乃得志行道而無阻也。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦有福壽有田園多動少靜。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則朋僚助力而爵祿日加，在士則得人薦舉而名譽日著，在庶俗則田業日增而吉慶多集，或庇陰子孫而受福祉之遠。"
+        }
+      ],
+      "reading_notes": [
+        "變為觀位於葉者段中，觀光上國為所選印本文字，不改為周易經文觀國之光。",
+        "頁147末多動續頁148少靜；初稿漏動且誤靜為稱已撤回。"
+      ]
+    },
+    {
+      "hexagram": "天地否",
+      "line": 5,
+      "pdf_pages": [
+        148
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是與其開太平之人而示以保大之術者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者重德君子，防患有道，處事最公，謹慎詳審，固守不失，能休時之否而富貴可以長享。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者有德有才而難於設施，亦不失為中正之吉人，無咎無譽，平生安逸。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，舊禍已去，新福將來，忌我者退，尚遜者名利居家進田園桑麻足而倉廩實，且變為晉五爻，有憂者喜矣，失者得矣，在仕必居正位大夫之任。數凶者有損亡刑尅。"
+        }
+      ],
+      "reading_notes": [
+        "尚遜者依本次可見字形暫讀，詞義及字形仍待獨立復核；不增補助我者至等推測字句。失者得矣不改為疾者得安。",
+        "變晉五爻在歲運段；數凶者仍是其後另列嵌套條件，不自動套用現實吉凶。"
+      ]
+    },
+    {
+      "hexagram": "天地否",
+      "line": 6,
+      "pdf_pages": [
+        148
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是能傾時之否而獲亨者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者剛大之志，設施過人，先歷艱辛，後享安逸，蓋物極而必反故也。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者名利難遂，骨肉刑傷，惟僧道最宜。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕失職者得復職，閒缺者復補，在士停降者復取，淹滯者復伸，久困者利達，久訟者解散。數凶有變，故上爻有咨嗟涕淚之辭，壽算難久。"
+        }
+      ],
+      "reading_notes": [
+        "上爻咨嗟涕淚未明寫卦名，不據單爻變或熟悉經句補出萃卦來源。"
+      ]
+    },
+    {
+      "hexagram": "天火同人",
+      "line": 1,
+      "pdf_pages": [
+        149
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是為格物之象而必善其占者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者量大能容，至公無私。其門字之義為類甚多，小則為門館，大則為門下平章事、黃門、金門、轅門、帳門之類，當看卦爻推其輕重而詳之。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者多離祖戶，或就妻家，或作商旅，或作僧道。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則入內臺而陞遷有地，在士則出學門而登薦有機，在庶俗則協心同志，以其事而經營獲利，或出家遠行，或修造門戶，或身在於他門。"
+        }
+      ],
+      "reading_notes": [
+        "格物按所見原字保留，不以語義改成同人；門下平章事等原文官名不改為現代職務。"
+      ]
+    },
+    {
+      "hexagram": "天火同人",
+      "line": 2,
+      "pdf_pages": [
+        149
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是比而不葉者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者才高識廣，但心僻性偏，或為科目之魁，或為宗室之賓，或為宗師之官。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者終不遠大，常懷憂戚，或過房同宗、婚姻他室，或作山林之人。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則局於地位而爵祿不廣，在士則利于小試而飛黃難為，在庶俗事多不定，或宗族朋友不睦，或彼愛此惡而猜忌日招，或近合遠違而是非日起。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "天火同人",
+      "line": 3,
+      "pdf_pages": [
+        150
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是非分以相求而不能致其用者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者好強逞勢，欲前欲后，志向不一，多驚多慮，心事難測，或為吏卒，或為軍戎，或為草莽之耕士，或為丘陵之隱逸。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者放溢為非，玩法悖義，甚則招禍遭刑而悔不及。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕防失職，在士則有升高之兆，在庶俗則有喪親獄訟之患。"
+        }
+      ],
+      "reading_notes": [
+        "葉者段原含好強逞勢、心事難測等語，保留其原有條件，不因葉者標籤改為正面。"
+      ]
+    },
+    {
+      "hexagram": "天火同人",
+      "line": 4,
+      "pdf_pages": [
+        150
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是能以義裁勢而善之者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者見機而退，知足不貪，臨事而揆之以義，處物而能反之以理，或貴而鎮守邊城，或富而高大牆垣，非小器者比也。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者進取費力，卓立費心，或得上人信用、下人奉承。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則專城守土，修築城池，因功受爵；在士則有登墉弗克之嗟。在庶俗有疑忌爭鬭之事，榮中有辱，士後見榮。大槩凡事貴未然之防，則得吉也。"
+        }
+      ],
+      "reading_notes": [
+        "原印士後見榮，語義可疑；今保留所見士字，不據語意改成辱後見榮。大槩保留原字。"
+      ]
+    },
+    {
+      "hexagram": "天火同人",
+      "line": 5,
+      "pdf_pages": [
+        150,
+        151
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是先睽後合而不能不假於力者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者中正君子，有才德，有名利，初難後顯，或貴為師帥而總領大師，或為中書、中奉、直殿等之職。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者先歷艱辛，早見刑傷，晚雖有遇，福淺禍深。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則居言路，先謫後起，在士始阻終遇，在庶俗則先難後易，悲懽迭見，是非不一。"
+        }
+      ],
+      "reading_notes": [
+        "不葉者晚字在前頁，雖有遇福淺禍深在次頁續文；不得歸入歲運段。官名按原字保留，非現代職業預測。"
+      ]
+    },
+    {
+      "hexagram": "天火同人",
+      "line": 6,
+      "pdf_pages": [
+        151
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是特立自守而可以自得者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者心地寬大，才德清高，富貴瀟洒之流。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者為僧道而處於郊野，為商旅而志有未得。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則當出遠郡，未仕者則難逢嘉會，在庶俗則守舊安常，淡薄生涯，數凶者不利。"
+        }
+      ],
+      "reading_notes": []
+    },
+    {
+      "hexagram": "火天大有",
+      "line": 1,
+      "pdf_pages": [
+        151,
+        152
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是知富有不可以過盛而守其艱，可以免害者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者才清德重，未逢汲引，求名不足，求利有餘。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者常遭毀辱，每遇艱辛，保守固存，咎尤可免。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕宜見幾勇退，不可貪位貪祿；在士不可處進，以招摧抑；在庶俗則心緒憂煩，小人欺凌長上而有災害。艱危自持，庶免傾危。"
+        }
+      ],
+      "reading_notes": [
+        "在士不可處進按所見原字保留，不以語義改作躁進；小人欺凌長上而有災害的斷句屬編輯，原文的長上連接語義未裁定。",
+        "第152頁上而有災害至庶免傾危續第151頁初九歲運段，不歸入九二。",
+        "一名獨立模型先只讀原圖並封存首稿再比對；人工專家審校未完成。原圖叶按已宣告政策規範為葉；完整原字、圈點及全部分歧另有封存，不宣稱逐字摹刻。"
+      ],
+      "review_status": "independent_model_source_only_reread_completed; human_expert_review_pending"
+    },
+    {
+      "hexagram": "火天大有",
+      "line": 2,
+      "pdf_pages": [
+        152
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是任天下之重而無咎者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者有大才德，理大亂，立大功，如大車之載，可以積厚於中而無敗者也。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦有福有壽，居積致富，無憂無禍。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，閑官驛車，選召有大除拜，勇將出師戰勝攻取，士子進取成名，常人營謀厚載，財穀豐裕。或曰輭車之兆，不利老壽。"
+        }
+      ],
+      "reading_notes": [
+        "閑官驛車按所見字面保留，語義未定。獨立首稿後復核原圖為或曰輭車之兆；撤回此前輿車事之兆的錯讀和增事，全部舊稿保留。原圈點在選召之後，現代句讀屬編輯。",
+        "理大亂的斷句與才德相連處屬編輯；不葉者原仍列有福有壽等語，不把標籤當成固定負面。",
+        "一名獨立模型先只讀原圖並封存首稿再比對；人工專家審校未完成。原圖叶按已宣告政策規範為葉；完整原字、圈點及全部分歧另有封存，不宣稱逐字摹刻。"
+      ],
+      "review_status": "independent_model_source_only_reread_completed; human_expert_review_pending"
+    },
+    {
+      "hexagram": "火天大有",
+      "line": 3,
+      "pdf_pages": [
+        152
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是大臣得君以納其忠者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者才高德備，大公無我，得君行道，而平日之所抱負者，一一敷陳於廟廊之上。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者貪謀私己，必有大害；成立艱難，易滿易消。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕必勝朝廷之重任，在士必作大魁，在庶俗必招灾難，晦滯蹇塞，小輩欺凌，凶則變睽刑傷難免。"
+        }
+      ],
+      "reading_notes": [
+        "在仕必勝朝廷之重任及晦滯蹇塞按所見字面保留。初讀變哭經600 dpi原像素核實為變睽；前稿保留，不以取義或推卦結果代替讀字。另以600 dpi確認蹇字足部，改正初稿塞塞；此復讀晚於初次局部測試，不是獨立審閱。",
+        "在仕、在士、在庶俗均屬歲運逢之的下層語境，不把在庶俗的招災段無條件套用。",
+        "原文為凶則變睽，睽後有圈點；未印目標爻位或引其正文。睽對應卦名的索引屬編輯關聯，是否具操作效力未定；凶則及在庶俗的細條件未裁定，不能改正式後天卦。",
+        "一名獨立模型先只讀原圖並封存首稿再比對；人工專家審校未完成。原圖叶按已宣告政策規範為葉；完整原字、圈點及全部分歧另有封存，不宣稱逐字摹刻。",
+        "原圖招灾難作宀火灾；初九另作巛火災，各按所見保留。晦字原圖支持原稿，獨立首稿臨滯已在比對中撤回，首稿本身不改。"
+      ],
+      "review_status": "independent_model_source_only_reread_completed; human_expert_review_pending"
+    },
+    {
+      "hexagram": "火天大有",
+      "line": 4,
+      "pdf_pages": [
+        152,
+        153
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是大臣履盛滿而知所戒，可以寡過者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者大公無私，不驕淫，不矜誇，既明且哲，以保其身，善始善終。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者貪小易盈，遂成僭竊之禍，身家難保。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕安職，免凌逼之禍；在士待時，免褫革之虞；在庶俗守常，免毀傷之害。或有眼疾，明則損，故也。"
+        }
+      ],
+      "reading_notes": [
+        "第153頁安職以下續九四歲運段，不歸入六五。",
+        "褫革及明則損故也按所見字面保留；不據原文身體語句向個人提供醫療判斷。",
+        "一名獨立模型先只讀原圖並封存首稿再比對；人工專家審校未完成。原圖叶按已宣告政策規範為葉；完整原字、圈點及全部分歧另有封存，不宣稱逐字摹刻。",
+        "不矜誇中的矜為暫讀；獨立稿讀衿，左部仍不清，保留矜／衿未決，不能算已判清。原圖守常下部巾形，改正此前守當。"
+      ],
+      "review_status": "independent_model_source_only_reread_completed; human_expert_review_pending; glyph_disagreement_unresolved"
+    },
+    {
+      "hexagram": "火天大有",
+      "line": 5,
+      "pdf_pages": [
+        153
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是在君道而有威信以治民者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者恩威並行，德望並著，上下交孚，遐邇相應，足以立大功，享富貴。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者多委靡不振，恩徒施而反遭謗，澤雖布而反召怨。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕宜知幾而退，在士宜乘機而進，在庶俗宜相時而動，但不可輕慢驕縱以取禍。"
+        }
+      ],
+      "reading_notes": [
+        "一名獨立模型先只讀原圖並封存首稿再比對；人工專家審校未完成。原圖叶按已宣告政策規範為葉；完整原字、圈點及全部分歧另有封存，不宣稱逐字摹刻。",
+        "原圖反召怨的召無手旁，改正此前反招怨；不是依語義改字。"
+      ],
+      "review_status": "independent_model_source_only_reread_completed; human_expert_review_pending"
+    },
+    {
+      "hexagram": "火天大有",
+      "line": 6,
+      "pdf_pages": [
+        153
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是善處乎大有之時而必獲天眷者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者剛大而能謙讓，德之所施足以契天之心，行之所履足以動天之感，富貴有長享之慶，隨在皆自得之休。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦道德之士，豐厚富庶而平生無非橫之撓。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在官進職，在士成名，常人得尊上之庇，農家進業。"
+        }
+      ],
+      "reading_notes": [
+        "一名獨立模型先只讀原圖並封存首稿再比對；人工專家審校未完成。原圖叶按已宣告政策規範為葉；完整原字、圈點及全部分歧另有封存，不宣稱逐字摹刻。"
+      ],
+      "review_status": "independent_model_source_only_reread_completed; human_expert_review_pending"
+    },
+    {
+      "hexagram": "地山謙",
+      "line": 1,
+      "pdf_pages": [
+        154
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是行巽而達之得宜者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者退讓以明其禮，溫恭以宜其情，雖患難危厄之秋，亦可振險而投之夷，易危而措之安，在上信任，在下依歸，以牧字之義，有守土之兆。次則或修心養性，樂道優閑，災害不生。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者心懶，多進則見退，拙於施為，甘為人下。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕為牧民之職，在士宜懷珍待聘，在庶俗宜遠涉江湖，以作商旅。凶者變明夷之傷也。"
+        }
+      ],
+      "reading_notes": [
+        "振險原字有辰部，改正首稿拯險；行巽、依歸、牧字之義等按所見保留，不改成較熟語。",
+        "次則或修心養性仍在葉者段內；凶者變明夷之傷也仍屬歲運逢之段，凶者適用未判，原文未印目標爻號。",
+        "本條由同一審閱者先只看原圖形成首稿並封存，再作原像素局部復讀；獨立復核及人工專家審校未完成。原圖叶依既有政策規範為葉，原文詞義、句讀與條件適用分別保留；無自動葉否判斷。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "地山謙",
+      "line": 2,
+      "pdf_pages": [
+        154
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是名譽之隆，而示以居貞之善也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者無私無諂，有德有才，其鳴字之義，多是言路官職之兆。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦得人舉揚濟人。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕遷職，未仕進取成名，庶俗未可輕舉，惟宜退守。"
+        }
+      ],
+      "reading_notes": [
+        "原像素為舉揚濟人、在仕遷職，撤回首稿譽揚與還職；既有繼承文這兩處保留，不計作系統缺陷修復。其鳴字之義原字子部，不沿用繼承鳴宇。",
+        "無諂顯示暫沿用繼承諂；首讀候選謟保留，諂／謟右上部的字形選擇仍未判清，未算讀字已確認。",
+        "庶俗未已按原像素改正首稿求；所有首稿及復讀稿原樣保留。段落、句讀屬編輯，獨立復核與人工專家審校未完成。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending; glyph_choice_unresolved"
+    },
+    {
+      "hexagram": "地山謙",
+      "line": 3,
+      "pdf_pages": [
+        154,
+        155
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是讓功之善而與之者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者文章高世，道義過人，能勝重任，立大功勞。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者為人誠實，鄉里推重，施恩不求報，有德不自誇。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕必高遷，在士必得際遇，在庶俗必營謀獲利，又勞字主勞心費力。"
+        }
+      ],
+      "reading_notes": [
+        "第155頁頁首者為人誠實至又勞字主勞心費力承接第154頁九三，不歸入六四。",
+        "讓功之善而與之者也及不葉者仍有正面敘述，依原句保留，不依標籤轉成固定負面。",
+        "本條由同一審閱者先只看原圖形成首稿並封存，再作原像素局部復讀；獨立復核及人工專家審校未完成。原圖叶依既有政策規範為葉，原文詞義、句讀與條件適用分別保留；無自動葉否判斷。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "地山謙",
+      "line": 4,
+      "pdf_pages": [
+        155
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是行無不得而當益致其恭者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者有德有才，上信下服，修辭立言，恭謙無僞，足以立功名享富貴。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦親近尊貴，交接賢才，為鄉里之正人。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，無所不通，但士農工商宜固守退讓，蓋一變小過，往厲必戒勿用，此亦當卑約，不然取損害爾。"
+        }
+      ],
+      "reading_notes": [
+        "一變小過及往厲必戒勿用按原字保留；未印小過目標爻號，對應第四爻只能另作推導，不能寫成原文指定。",
+        "卑約與不然取損害爾按所見保留；首稿指害更正為損害。圈點及現代句讀不同，逗號屬編輯，不宣稱摹刻。",
+        "本條由同一審閱者先只看原圖形成首稿並封存，再作原像素局部復讀；獨立復核及人工專家審校未完成。原圖叶依既有政策規範為葉，原文詞義、句讀與條件適用分別保留；無自動葉否判斷。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "地山謙",
+      "line": 5,
+      "pdf_pages": [
+        155
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是人君謙德之化而因兩善其占者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者謙恭退讓，英雄豪傑，多入於彀中，以之而建立事功，以之而贊成德業，無不如意。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者或文中成名，武中立功，富概鄉鄰，威服頑悍。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則文武兼用，或掌兵刑，在士則有發科之兆，常人遇貴成事，則利倍獲，又主爭訟。"
+        }
+      ],
+      "reading_notes": [
+        "完整原像素顯示威服頑悍及則利倍獲，撤回首稿咸服頌懌與首次復讀咸服頌惇、財利；繼承原文這些讀法原為正確，不計新系統缺陷。",
+        "多入於彀中字暫錄彀；殼等形體候選仍有疑問，原像素與繼承毂分存，不以熟語強行判定，也不能稱該字已校清。",
+        "因兩善其占、富概鄉鄰按所見保留；未另印女命標籤，不憑常識增加女命分支。獨立復核與人工專家審校未完成。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending; glyph_choice_unresolved"
+    },
+    {
+      "hexagram": "地山謙",
+      "line": 6,
+      "pdf_pages": [
+        155,
+        156
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是能謙而為才位之所限者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者勤於學古，勇於行道，或作武貴，稍遂其志，或為縣邑督捕之官。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者多遇知己，少得助力，治家保身，小小規模。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕必有閫寄征伐之權，在士則利於小試而名譽稍彰，在庶俗有爭訟之擾，不辨自明，知幾免損，當官者貴以清心事為本，方免其悔。"
+        }
+      ],
+      "reading_notes": [
+        "勤於學古、勇於行道的連讀屬編輯句讀修訂，沒有增刪原字。",
+        "第156頁或為縣邑督捕之官以下至方免其悔承接上六，不歸入豫。閫寄、清心事為本按所見保留，不依熟語增寡欲等字。",
+        "本條由同一審閱者先只看原圖形成首稿並封存，再作原像素局部復讀；獨立復核及人工專家審校未完成。原圖叶依既有政策規範為葉，原文詞義、句讀與條件適用分別保留；無自動葉否判斷。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "雷地豫",
+      "line": 1,
+      "pdf_pages": [
+        156
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是得人之譽以自鳴者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者上有強援，得時主事，有所依附，而可成其小小營謀。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者淺狹之量，多縱欲敗度，以自招傾危。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則有待恩寵之患，在士則有一鳴驚人之兆，在庶俗則有驚憂口舌及阻厄之難。當官者自陳免禍。"
+        }
+      ],
+      "reading_notes": [
+        "同一讀者先只看原圖封存首稿，再對原像素裁片復讀；標點為編輯句讀，叶按既有政策轉為葉，非逐字形摹錄。獨立讀稿及人工專家審校未完成。",
+        "葉者、不葉者、歲運逢之各按印本父段保留；不自動裁定命局屬葉或不葉，不將條文或吉凶詞當現實已發生之事。",
+        "待恩寵、自陳免禍按所見保留，不以常見語義改成恃恩寵或自疏；當官者自陳免禍仍在歲運段內。",
+        "比對後寬裁片確認淺狹，撤回首稿褊狹；原繼承文字此處正確，非新增修復。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "雷地豫",
+      "line": 2,
+      "pdf_pages": [
+        156,
+        157
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是守中正見機之象而因以善其占者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者勤修德業，力行中正，見事敏捷，名譽高遠，而富貴不能淫，貧賤不能移，威武不能屈，耿介忠烈，可以柱石朝廷。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦介然固守，不瀆不諂，知機吉人。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕者急流勇退，始進取者可以成名，常人獲利。"
+        }
+      ],
+      "reading_notes": [
+        "同一讀者先只看原圖封存首稿，再對原像素裁片復讀；標點為編輯句讀，叶按既有政策轉為葉，非逐字形摹錄。獨立讀稿及人工專家審校未完成。",
+        "葉者、不葉者、歲運逢之各按印本父段保留；不自動裁定命局屬葉或不葉，不將條文或吉凶詞當現實已發生之事。",
+        "不瀆不諂首字暫沿繼承瀆，原像素與讀稿慣／憤候選尚未判清；瀆／慣／憤字形未決，不以語義偏好裁定。第二字原稿訥已按可見字形更正為諂。固守原圖有外框，與繼承有守不同，按可見固字記錄。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending; glyph_choice_unresolved"
+    },
+    {
+      "hexagram": "雷地豫",
+      "line": 3,
+      "pdf_pages": [
+        157
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是示人以為豫而知所悔焉，故可以無悔者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者雖援上賢，不能濟事，縱有卑職，多見阻挫。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者進退無定，心志不安。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，凡人所圖無實，乍進乍退，是非不一。"
+        }
+      ],
+      "reading_notes": [
+        "同一讀者先只看原圖封存首稿，再對原像素裁片復讀；標點為編輯句讀，叶按既有政策轉為葉，非逐字形摹錄。獨立讀稿及人工專家審校未完成。",
+        "葉者、不葉者、歲運逢之各按印本父段保留；不自動裁定命局屬葉或不葉，不將條文或吉凶詞當現實已發生之事。",
+        "縱有卑職、乍進乍退依原字保留；葉者段仍明列不能濟事、多見阻挫，不因葉者標籤改為有利結論。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "雷地豫",
+      "line": 4,
+      "pdf_pages": [
+        157
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是有致豫之功而示以保豫之道者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者名清德厚，權重功高，行大事，決大疑，主大難。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者亦福德之人，得衆尊欽，夫妻偕老。若陰命妻葉卦者，得福得壽，但不居正位。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，進取成名，常人經營獲利，在仕者必得知己薦舉。"
+        }
+      ],
+      "reading_notes": [
+        "同一讀者先只看原圖封存首稿，再對原像素裁片復讀；標點為編輯句讀，叶按既有政策轉為葉，非逐字形摹錄。獨立讀稿及人工專家審校未完成。",
+        "葉者、不葉者、歲運逢之各按印本父段保留；不自動裁定命局屬葉或不葉，不將條文或吉凶詞當現實已發生之事。",
+        "若陰命妻葉卦者是印本不葉者父段內的連續文字，妻字原樣保留；不能逕改為女命即適用，不能獨立自動選取。得福得壽但不居正位保持同一條件。爻辭末字簪有印墨覆疊，暫錄並標頭辭字形未決。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "雷地豫",
+      "line": 5,
+      "pdf_pages": [
+        157,
+        158
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是縱己之豫以自溺者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者或作貴人，正當憂阻，志多柔奸，權出他人，事不由己，在世雖顯，有疾延壽。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者柔懦不能自立，多見疾患臨身。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕多依附權勢，恃恩固寵，在士則援引無人而際遇無機，在庶俗多心事不足，災害難免，或心腹生疾。"
+        }
+      ],
+      "reading_notes": [
+        "同一讀者先只看原圖封存首稿，再對原像素裁片復讀；標點為編輯句讀，叶按既有政策轉為葉，非逐字形摹錄。獨立讀稿及人工專家審校未完成。",
+        "葉者、不葉者、歲運逢之各按印本父段保留；不自動裁定命局屬葉或不葉，不將條文或吉凶詞當現實已發生之事。",
+        "柔奸、有疾延壽及心腹生疾為原文記錄，不改成較熟的柔佞，也不作壽命、臨床或災禍斷言；歲運段跨PDF157—158頁完整保留。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "雷地豫",
+      "line": 6,
+      "pdf_pages": [
+        158
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是縱己以為豫，知所變焉則可以無咎者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "葉者",
+          "text": "葉者納言從諫，遷善改過，而利名頗得。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不葉者",
+          "text": "不葉者樂極生悲，終不能久。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕有貪污之謫，在士有昏冥差訛之辱，在庶俗有驕傲訟爭之擾，大抵宜遷善改過，悔思則可以免咎。"
+        }
+      ],
+      "reading_notes": [
+        "同一讀者先只看原圖封存首稿，再對原像素裁片復讀；標點為編輯句讀，叶按既有政策轉為葉，非逐字形摹錄。獨立讀稿及人工專家審校未完成。",
+        "葉者、不葉者、歲運逢之各按印本父段保留；不自動裁定命局屬葉或不葉，不將條文或吉凶詞當現實已發生之事。",
+        "悔思則可以免咎依原圖保留，不改作悔悟；改過條件與利名頗得同段保留，不宣稱必然免咎。",
+        "比對後寬裁片確認貪污之謫，撤回首稿譏；原繼承文字此處正確，非新增修復。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "澤雷隨",
+      "line": 1,
+      "pdf_pages": [
+        158,
+        159
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是隨人雖變其常，惟公正則可以無咎者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者，大才大德之貴人，必定大難，當大變，決大疑。門字正字之義，應兆甚多。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者，多依附權勢，公正不敗則與之協力者衆，故有功則可成立，或出外以營謀其家計。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則遷位以從正道，在士則多得佳會，在常人多獲利。"
+        }
+      ],
+      "reading_notes": [
+        "先只看原圖形成首稿與復讀稿，之後才比對繼承文字；同讀者同像素復讀不是獨立見證。",
+        "本卦保留原印叶者、不叶者，不機械轉成葉。字典的異體說明不能替代命局條件判定；段落適用性仍未裁定，原句不得當作現實已發生之事。",
+        "大才大德、當大變、正字之義按原印；門字正字的字兆義仍在原段，不推演姓名、具體日期或個人事件。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "澤雷隨",
+      "line": 2,
+      "pdf_pages": [
+        159
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是失所隨之人者也。夫"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者，小有才之人，立性不定，愛親邪媚之小人，不親正大之君子。女子元數叶者，必有配貴顯之夫，或得次子之力。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者，必為卑下僕隸之賤，侍妾婢使之輩。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，凡人皆不安寧，或小人是非之累，而有拘絆之災。當官者宜退避，進取者宜知幾。"
+        }
+      ],
+      "reading_notes": [
+        "先只看原圖形成首稿與復讀稿，之後才比對繼承文字；同讀者同像素復讀不是獨立見證。",
+        "本卦保留原印叶者、不叶者，不機械轉成葉。字典的異體說明不能替代命局條件判定；段落適用性仍未裁定，原句不得當作現實已發生之事。",
+        "原段夫叶者、愛親邪媚保留；女子元數叶者句仍在叶者父段內，不能用性別或judge.xie自動代選。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "澤雷隨",
+      "line": 3,
+      "pdf_pages": [
+        159
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是所隨得其正，因其勢之利而戒之者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者，得遇上人成引進名，凡有所求，其願無有不得。但不得奴僕之力，招小人毀謗之咎。心勿躁動，事宜遲緩。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者，雖有名利而無子力。女命必遭貴夫，或傷子媳。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕得人保舉而爵崇，在士則得主司援引而求名可得，在庶俗營謀可得。但皆宜道義自安，乃為得利也。數凶者，防小口陰人之嗟。"
+        }
+      ],
+      "reading_notes": [
+        "先只看原圖形成首稿與復讀稿，之後才比對繼承文字；同讀者同像素復讀不是獨立見證。",
+        "本卦保留原印叶者、不叶者，不機械轉成葉。字典的異體說明不能替代命局條件判定；段落適用性仍未裁定，原句不得當作現實已發生之事。",
+        "成引進名按可見字序保留，不按繼承稿或語意重排為引進成名。女命必遭貴夫或傷子媳仍在不叶者段內；正文不是現實婚育或醫療判斷。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "澤雷隨",
+      "line": 4,
+      "pdf_pages": [
+        159,
+        160
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是所隨雖履其危，然惟其誠正則可以無咎矣。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者，精誠積乎中，舉動合乎理，位極而無凌主之嫌，勢重而無專權之過。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者，有所獲而招凶，有所遂而招險，或得上之譴責，或惹下之猜忌，或為商或為賈而碌碌于道途。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕必居要路而專權，進取者必成而名可得，在庶俗必得好人擡舉而變凶為吉。道字明字之義宜加察焉，或地名人名云。"
+        }
+      ],
+      "reading_notes": [
+        "先只看原圖形成首稿與復讀稿，之後才比對繼承文字；同讀者同像素復讀不是獨立見證。",
+        "本卦保留原印叶者、不叶者，不機械轉成葉。字典的異體說明不能替代命局條件判定；段落適用性仍未裁定，原句不得當作現實已發生之事。",
+        "比對後回看原像素確認而專權，撤回首稿而事權；繼承稿這一處正確，不計生產修復。道字明字及地名人名云仍在歲運段末，不自行選字兆。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "澤雷隨",
+      "line": 5,
+      "pdf_pages": [
+        160
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是有任賢之誠，而獲用賢之效者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者，好賢忘勢，易知易從，有親有功，凝天命於無虞，孚天祿於無疆，中正二字為兆甚多。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者，亦有孚信，從中道而為善人吉士，彼無惡而此無射。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕有遷除之喜，在士有登薦之嘉，在庶俗有營謀順適之休，多喜慶之事。"
+        }
+      ],
+      "reading_notes": [
+        "先只看原圖形成首稿與復讀稿，之後才比對繼承文字；同讀者同像素復讀不是獨立見證。",
+        "本卦保留原印叶者、不叶者，不機械轉成葉。字典的異體說明不能替代命局條件判定；段落適用性仍未裁定，原句不得當作現實已發生之事。",
+        "不叶者段亦有孚信、善人吉士的正面敘述；不叶不是統一的負面結論。無射按原字，不換另一熟語。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "澤雷隨",
+      "line": 6,
+      "pdf_pages": [
+        160,
+        161
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是以誠隨人之象，而推其可通於神明者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者，謹恪誠實，溫良慈惠，明可以感乎人，而志無不遂，幽可以通乎神，而福無不降。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者，進則困窮，生計艱難，惟隱於山林則吉。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，多不永年，罣牽係慮，心志不能遂。在仕防讒，在士防辱，在庶俗防損并縲絆之憂。"
+        }
+      ],
+      "reading_notes": [
+        "先只看原圖形成首稿與復讀稿，之後才比對繼承文字；同讀者同像素復讀不是獨立見證。",
+        "本卦保留原印叶者、不叶者，不機械轉成葉。字典的異體說明不能替代命局條件判定；段落適用性仍未裁定，原句不得當作現實已發生之事。",
+        "歲運段末損并縲絆中的縲仍暫錄，候選纍／縈未定；源圖及放大顯示同像素均保留。不能因與任何繼承文字一致就宣稱已獨立確定，也不據疑讀推演具體事件。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; glyph_choice_unresolved; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山風蠱",
+      "line": 1,
+      "pdf_pages": [
+        161
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是能修業克肖夫先人而因以戒之者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者勇於進取，決於幹事，盡忠盡孝，經涉危難，建立事功，合先人之道義，為後人之規模。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者不靠祖業，自為活計，遇難不辭，見樂不傲。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則承朝廷之重任而革奸除弊，在士俗或承祖父之恩，或子孫以承考志，或謀為遂意。數凶者有憂愁，老者不壽，考字之義故也。考字又考試之義。"
+        }
+      ],
+      "reading_notes": [
+        "先封存只看书影的首稿与同读者复读，再比对继承稿；同像素复读不算独立见证。",
+        "本卦保留原印叶字；各分支applicability仍未裁定，原文不自动作为个人现实断语。",
+        "原印考无咎的无字形保留，不按其他经文版改为無；标点为编辑所加。",
+        "數凶者及老者句保留在歲運逢之父段；未综合裁定数凶，不据寿命旧句生成咨询断语。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山風蠱",
+      "line": 2,
+      "pdf_pages": [
+        161,
+        162
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是人臣贊君之業而示以祗順之道者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者有剛大之才，行中正之道，當懷直心，難遇知己，補弊救偏而飭治其緒業，為世所仰望。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者亦行中道而有為有守，而非鄙夫之可倫也。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕幹辦舊緒之有餘而祿位穩固，在庶俗士子為營父母遠大之事，改舊更新無不如意。女命勤儉持家而性忠直多言。"
+        }
+      ],
+      "reading_notes": [
+        "先封存只看书影的首稿与同读者复读，再比对继承稿；同像素复读不算独立见证。",
+        "本卦保留原印叶字；各分支applicability仍未裁定，原文不自动作为个人现实断语。",
+        "示以祗順中祗暂读；祇候选仍未完全排除，字形选择未定，不以熟语补定。",
+        "女命勤儉持家句在歲運逢之父段，未单列为适用于所有出生盘的女命分支。",
+        "保留當懷直心、難遇知己原序，不因顺口改成既定吉论。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; glyph_choice_unresolved; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山風蠱",
+      "line": 3,
+      "pdf_pages": [
+        162
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是治蠱過於剛者，所以不免悔也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者剛明勇決，當為則為而無所顧忌，雖有差失，善于補過，多利終無損喪，而為一世之偉士。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者遇其事幹，則易早歷憂勤，晚始受用。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕有建立主張大過之愆，在士庶修為有拂戾躁急之失，大凡躬行王道，勿信邪言，免悔。"
+        }
+      ],
+      "reading_notes": [
+        "先封存只看书影的首稿与同读者复读，再比对继承稿；同像素复读不算独立见证。",
+        "本卦保留原印叶字；各分支applicability仍未裁定，原文不自动作为个人现实断语。",
+        "早歷憂勤按原印保留，撤回本轮首稿早慮；继承稿歷字本已正确，不计字形生产修复。早晚不量化为具体年龄。",
+        "标题无大咎保留所见无字形，注文的無所顧忌、無損喪不统一替换。",
+        "大過按原印恢复；撤回第一候选太過误录，继承稿这里原本正确，不计生产修复。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山風蠱",
+      "line": 4,
+      "pdf_pages": [
+        162
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是大臣革弊而不能速改，而弊終不可革者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者性委靡，雖有大才不能設施。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者心多憂疑，事欠果斷，小謀則就，大用則損。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕主尸位素餐之誚，在士有燕僻廢業之失，在庶俗有盤樂怠傲之損，事事見憂，且生足疾。一變為鼎九四。"
+        }
+      ],
+      "reading_notes": [
+        "先封存只看书影的首稿与同读者复读，再比对继承稿；同像素复读不算独立见证。",
+        "本卦保留原印叶字；各分支applicability仍未裁定，原文不自动作为个人现实断语。",
+        "叶者段亦有性委靡、雖有大才不能設施等不利叙述；叶／不叶不是统一吉凶类别。",
+        "一變為鼎九四在歲運逢之父段；只核原文引卦及单爻变关系，不自动应用或替代正式后天盘。",
+        "且生按原印恢复；撤回第一候选日生误录，继承稿这里原本正确，不计生产修复。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山風蠱",
+      "line": 5,
+      "pdf_pages": [
+        162,
+        163
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是人君得賢以敷治斯隆美譽于天下者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者清才異俗，重德濟世，能成大業，所謂立身行道以顯父母者也。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者心力不開，亦能起家鄉里仰望。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕遷擢顯位而名譽遠播，在士登薦而聲名揚溢，在庶俗更變門戶，別立規模，多喜慶，進人口。"
+        }
+      ],
+      "reading_notes": [
+        "先封存只看书影的首稿与同读者复读，再比对继承稿；同像素复读不算独立见证。",
+        "本卦保留原印叶字；各分支applicability仍未裁定，原文不自动作为个人现实断语。",
+        "不叶者段含亦能起家鄉里仰望，不因标签概括为全凶；所有分支仍未裁定。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山風蠱",
+      "line": 6,
+      "pdf_pages": [
+        163
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是有德而不見用，唯隱居以求其志者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者有道可用，有德可尊，但高尚其志，而不輕於進取。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者亦清高異俗，淡薄生涯，不隨汚俗。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在官則告休，在士則待時，在庶俗則守舊。數吉者多有尊貴獎拔寵召之慶。"
+        }
+      ],
+      "reading_notes": [
+        "先封存只看书影的首稿与同读者复读，再比对继承稿；同像素复读不算独立见证。",
+        "本卦保留原印叶字；各分支applicability仍未裁定，原文不自动作为个人现实断语。",
+        "數吉者位于歲運逢之父段，不能按基础judge.xie代选或移成本命无条件规则。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "地澤臨",
+      "line": 1,
+      "pdf_pages": [
+        163,
+        164
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是有臨陰之善道者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者至大之才，至重之德，謙恭待上，慈愛及下，進修正道，排斥讒言，是為大貴人也。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者亦是公正，隨時俯仰，閭里推重。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕者知機相從，得人共濟而職位高遷；在士考校必臨於諸士之首而功名必遂；在庶俗必臨有道而營謀稱意。"
+        }
+      ],
+      "reading_notes": [
+        "先封存只看原图的首稿和同读者复读，再对照继承文本；分支适用仍未裁定。",
+        "本爻跨163、164页；不叶者的正面措辞仍留原段，不以叶否预设褒贬。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "地澤臨",
+      "line": 2,
+      "pdf_pages": [
+        164
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是擬其逼陰之象而深與之者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者進德之勸，行道之力，以順出逆，以仁易暴，道可行，志可伸，而動無所括，事可立，功可成，而行無所阻。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者亦作善士，能起家業而營蓄其利。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則去邪輔正而地位清高，在士則進取利達而無所阻滯，在庶俗營謀獲利。大抵要斟酌時宜，不然未順命之辭，亦美中不足戒之。"
+        }
+      ],
+      "reading_notes": [
+        "先封存只看原图的首稿和同读者复读，再对照继承文本；分支适用仍未裁定。",
+        "擬其逼陰、未順命按已读像素保留，不据通顺改成別詞。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "地澤臨",
+      "line": 3,
+      "pdf_pages": [
+        164
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是以甘臨下而深戒占者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者損過就中，矯偏居正，亦可以居上以臨下，但所處之位不當，不失為教諭訓導之職。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者專習邪言，巧於媚世，損物欺人，而憂思愁慮以度生。女命多言損行。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則有讒邪佞口之議，在士則有詔誤奔走之失，庶俗有悲愁怨苦之虞。"
+        }
+      ],
+      "reading_notes": [
+        "先封存只看原图的首稿和同读者复读，再对照继承文本；分支适用仍未裁定。",
+        "詔誤按原像素所选读法保留，不按现代习语改为訛誤；女命句留不叶者父段。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "地澤臨",
+      "line": 4,
+      "pdf_pages": [
+        164,
+        165
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是與人以誠而得補過之道者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者必中正貴人，朋黨相信而功業之易就。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者亦有福之人，而安逸少災，有技藝，有聲名。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則得僚友之力，在士則得麗澤之美，在庶俗則得人情和合而經營順遂。但變歸妹，愆期之辭，凡有為者審而後發方可。"
+        }
+      ],
+      "reading_notes": [
+        "先封存只看原图的首稿和同读者复读，再对照继承文本；分支适用仍未裁定。",
+        "标题在164页，完整注文在165页；歸妹及愆期之辭留歲運父段。原文未印所引目标爻位。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "地澤臨",
+      "line": 5,
+      "pdf_pages": [
+        165
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是不自用以盡乎君道則逸而有成者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者好賢禮士，恭謙明哲而為大貴，上承天寵，下係民望，中字官職之兆，行字行師之應。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者亦是福人。蓋變節卦，不傷財，不害民也。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則顯越，在士則登庸，在庶俗則謀為順遂。"
+        }
+      ],
+      "reading_notes": [
+        "先封存只看原图的首稿和同读者复读，再对照继承文本；分支适用仍未裁定。",
+        "首稿中宰已按像素撤回为中字，原稿留档。中与行是原句字兆说明，不自动推定当前输入官职或行动日期。",
+        "不伤财、不害民及變節均留不叶者父段；原文未印所引目标爻位。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "地澤臨",
+      "line": 6,
+      "pdf_pages": [
+        165
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是與人相親之厚而因善其占者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者為大貴人，一念惓惓，與同德以共濟，移風易俗，事業豐厚。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者年高德厚，改祖外立，家給人足。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕必居內侍內翰，士子進大學入內舍，在庶俗多獲利，近取遠取，無往不利。"
+        }
+      ],
+      "reading_notes": [
+        "先封存只看原图的首稿和同读者复读，再对照继承文本；分支适用仍未裁定。",
+        "惓惓与內舍按所见保留；不据此自动选择叶否、内职或现实结果。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "風地觀",
+      "line": 1,
+      "pdf_pages": [
+        166
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是無德不足以近君者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者，主幼性敏頴，習於童科，亦得賴一硏以聊生。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者，縱有利名，所見淺狹，所為鄙吝，習於下流，不能設施大事。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕艱難，地位窄狹。在士進取還回，在庶俗謀速應遲，算巧成拙，蒙而無見之童也。防小人暗昧之事。"
+        }
+      ],
+      "reading_notes": [
+        "亦得賴一硏按完整原生像素錄；首稿顧及顧右頁的說明撤回。左為束形，右負形；保留硏的石旁開形，非逐筆外交式轉錄。舊賴原已正確；亦可與原印亦得是另一項差異。",
+        "進取還回、算巧成拙保留本印所見，不改成較熟悉的遷回、弄巧。无咎按所錄印形保留。獨立復核未完成。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "風地觀",
+      "line": 2,
+      "pdf_pages": [
+        166
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是志卑而不能遠觀者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者，淺才薄德而卑職小官，暫獲安寧，終見醜拙。或得陰貴，或得富婦助力。若女命則有福有壽。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者，局量淺見，鄙陋生計。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，則有才力不及之嗟。在士有文理欠通之失，在庶俗之在家則暗，而在外則明，或喜或憂，或因婦人事起醜惡。大抵宜動不宜靜。此爻係女喜男悲。"
+        }
+      ],
+      "reading_notes": [
+        "闚觀依原頁門內規形，舊蘭觀不符；不以另一部經文替本印作證。或喜或憂、而卑職小官及鄙陋生計按完整原欄錄，不按舊詞序潤改。獨立復核未完成。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "風地觀",
+      "line": 3,
+      "pdf_pages": [
+        166,
+        167
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是審於進退，得守己之正者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者，進德修業，及時而行，建功立勳而無所阻塞，乃明哲之貴人。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者，乍進乍退，志向不定，卓立艱難。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕進退無常，在士爭奮不一，在庶俗得失無定。更宜計審而行，知難而避。"
+        }
+      ],
+      "reading_notes": [
+        "叶者的阻塞跨166末欄與167首欄，完整連讀到乃明哲之貴人；保留所有條件與歲運父段。爭奮、計審依所見保留，不因爭奪、詳審順口而改。獨立復核未完成。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "風地觀",
+      "line": 4,
+      "pdf_pages": [
+        167
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是際君之盛而示以從王之義者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者，才至德備，柱石於朝廷，禮樂典刑，無不在於監察之下。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者，亦清譽高才，為世所矜式，或為諸侯上客。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕或居內臺內翰清高之地。在士必擢科而觀光上國，在庶俗有出商外買之兆而獲大利。觀光賓三字，或為官職姓名而言也。"
+        }
+      ],
+      "reading_notes": [
+        "柱石據完整木主、石形改回，首稿杜右撤回；繼承柱石原已正確，不計本輪新舊文缺陷。",
+        "外買暫按上罒下貝選買；外賈仍是候選，字形判讀未決，不能從出商語意強制定字。獨立復核未完成。觀光賓三字僅為原文說明，不選定個人姓名、職位或適用。"
+      ],
+      "review_status": "single_reader_visual_collation_with_unresolved_glyph; independent_second_review_pending"
+    },
+    {
+      "hexagram": "風地觀",
+      "line": 5,
+      "pdf_pages": [
+        167
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是人君自審以為治，斯於君無愧者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者，以己之中正，化天下之不中不正，乃重望厚德之賢臣。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者，亦中正君子。生之一字，為不孤，為有壽。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則致君澤民之有道，而爵祿崇高。在士則為國學生，而文章冠世。在庶俗則有生涯生計，而利日沾。在婦人則有生育，在病者則有生命之兆也。"
+        }
+      ],
+      "reading_notes": [
+        "不叶者亦中正君子按原文保留，不為好壞二分改作否定。生之一字的文字說明、婦人及病者子句保留在本父段，但不自動選定個人條件或作生死、臨床、生育預測。獨立復核未完成。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "風地觀",
+      "line": 6,
+      "pdf_pages": [
+        167,
+        168
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是反身以自治，斯可以為民表者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者，有大才德，高出一世之上，可以為民之表儀，而仰其德者，知所興起，不失為賢人。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者，其中鬱鬱不伸，乃清修之吉人而未能發泄。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕宜退而修省以自得，在士則進取艱難而志有未平，在庶俗則營謀阻滯而心不足。但病者則得生，有孕者利於生育。"
+        }
+      ],
+      "reading_notes": [
+        "民之表儀跨167末欄與168首欄，連讀至本爻歲運末句後才到噬嗑，不能漏掉後頁或併入下一卦。發泄依所見氵世錄；鬱鬱字形映射為Unicode，不聲稱逐筆復刻。",
+        "病者得生、有孕利於生育是所錄歷史文字，僅保留來源，不自動選定個人條件或作生死、臨床、生育預測。獨立復核未完成。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "line": 1,
+      "pdf_pages": [
+        168
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是小惡有所懲，斯可以寡過者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者能防微杜漸，改行率德，先起卑賤，後至高大。蓋變為晋，獨行正之象也，亦可作貴人。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者卑下之人，鄙賤之輩，或心怯而退守，或足疾而難行。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕遭貶謫，在士則考校不遇其人，在庶俗防刑罰風疾，謹慎免禍。"
+        }
+      ],
+      "hexagram": "火雷噬嗑",
+      "reading_notes": [
+        "履校依本印字形選錄，不以另一部周易的屨替換；无及晋按所見選字，標點為編輯標注，非逐筆外交轉錄。",
+        "不叶者卑下之人依原欄錄，繼承卑賤之木不符。本爻變晋之引文位於叶者段；未印目標爻位，不能推稱已校晉初或替代正式后天卦。獨立覆核未完成。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "line": 2,
+      "pdf_pages": [
+        168,
+        169
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是治人而不免為其所傷，以其所遇之難制者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者大貴人也，志大敢為，機深能幹，大則為殺伐，小則為刑罰之官。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者或身帶殘疾，骨肉刑傷，隱名遁迹，修身養性，宜為僧道，不然多見睽背。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則受制於梗化之民而遭小傷，在士防辱，或考試不遇其人而有小疵，在庶俗進退艱難，是非撓括，或生暗疾，恐骨肉有傷。"
+        }
+      ],
+      "hexagram": "火雷噬嗑",
+      "reading_notes": [
+        "叶者之機在168頁末，深能幹在169頁首，完整父段連讀；原頁條件標籤叶者／不叶者保留，不因跨頁漏段。",
+        "遁迹按所選字形編碼；歷史刑傷、足疾與暗疾文字為來源存檔，不自動選定個人或作臨床、災禍斷言。獨立覆核未完成。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "line": 3,
+      "pdf_pages": [
+        169
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是德不足以治人，而人有不服者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者才弱志剛，銳志功名，徒能小就而未大。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者一籌莫展，動輒有悔，衣食有虧。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕才力不足而招損，在士才疏學淺而招辱，在庶俗易事難幹，或生心腹之災，或有驚險之至。"
+        }
+      ],
+      "hexagram": "火雷噬嗑",
+      "reading_notes": [
+        "腊肉依本印右昔形錄，不默改為繼承臘或通行字；小吝、无咎及所有條件段完整保留。",
+        "葉否與歲運各父段未自動選用；歷史身心文字不生成個人事件。獨立覆核未完成。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "line": 4,
+      "pdf_pages": [
+        169
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是得其用刑之宜，而示以慎刑之善者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者為大貴人，足勝朝廷之大任，遇大事當大險，不畏不怯，稟剛大之才，行正直之道。金矢二字之義，為兆甚多，金榜金門是也。矢者箭也，與薦同，在仕為薦拔，在未仕者為發薦。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者為富濁無德之人，一鄉巨蠹。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕必陞遷，在士必成名，在經商必獲利。"
+        }
+      ],
+      "hexagram": "火雷噬嗑",
+      "reading_notes": [
+        "胏、薦拔、陞遷按原頁選字；金榜金門與金矢、箭／薦之文字說明保留在叶者完整父段，不能換算為具體官職、考試結果或姓名。",
+        "首看疑傍、後據木旁選榜已在首稿封存前記錄；不把讀者撤回算成產品缺陷。獨立覆核未完成。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "line": 5,
+      "pdf_pages": [
+        169,
+        170
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是人君治人而人不服，而因戒其占者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者聰明撥亂反正之人。黃金為兆甚多，黃門黃榜黃堂，金榜金魚金門。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者亦為大富，豐衣足食，積塵蓄紅。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，病者得安，冤者得釋，士子進取成名，在仕用法去奸，常人亦利。"
+        }
+      ],
+      "hexagram": "火雷噬嗑",
+      "reading_notes": [
+        "本爻169—170跨頁，為兆甚多接黃門黃榜黃堂，金榜金魚金門；繼承金殿與積蓄塵紅不替代本印次序。",
+        "積塵蓄紅暫選塵，積陳蓄紅仍為待獨立覆核候選，不以文義強制定字。病者得安、冤者得釋為歷史來源，不作醫療或現實預測認證。"
+      ],
+      "review_status": "single_reader_visual_collation_with_unresolved_glyph; independent_second_review_pending"
+    },
+    {
+      "line": 6,
+      "pdf_pages": [
+        170
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是惡極而為罪之大者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者雖處富貴，常懷憂懼，蓋變震上爻，為索索矍矍之象。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者為強梁，為剛惡，履危蹈險，是非括撓，禍患旋踵，刑獄罹身。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕防讒污敗謫，在士防停降毀辱，在庶俗防爭訟，數凶者耳目不明，血氣不順，或喪身殞命。"
+        }
+      ],
+      "hexagram": "火雷噬嗑",
+      "reading_notes": [
+        "索索矍矍暫選矍，索索瞿瞿仍為候選，底部筆畫未決；不增補另一部經文常見的視字。",
+        "變震上爻是叶者條件內引文；上爻目標位置明印，未自動適用也不改本命或正式后天卦。虽處富貴仍常懷憂懼，不能把叶者標籤改成一律正面。",
+        "原注歷史耳目、血氣、生死與刑獄字句僅保留來源，不作個人生死、臨床或災禍斷言。獨立覆核未完成。"
+      ],
+      "review_status": "single_reader_visual_collation_with_unresolved_glyph; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山火賁",
+      "line": 1,
+      "pdf_pages": [
+        170,
+        171
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是安於下者著其義而象之也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者剛正文明，節躬厲行，達則振斯文於天下，窮則飾斯文於一身。大德大才，不以窮達爲憂喜。或進取主迂回辛苦。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者多是勞碌奔波，掣肘俯仰。或倚靠富豪立身。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕防退職之患，在士防黜降之辱。在庶俗奔走於道路，棄易從難，遠親向疏。靜凶而動吉也。"
+        }
+      ],
+      "reading_notes": [
+        "初爻170—171跨頁，不叶者的多是勞與次頁碌奔波連讀；所有父段完整保留。",
+        "節躬、文明為所選Unicode字形；初稿節卲／文眀撤回，不計繼承錯字。標點為編輯標注，非逐筆外交轉錄。",
+        "棄易從難暫錄棄；原印棄／葉的細部仍有疑讀未決，不以通順消除分歧。",
+        "對照後復看原生像素，並作整數最近鄰顯示，確認掣肘；撤回主讀者首稿及第一候選暫時，不以繼承制肘代替本印掣肘。此次復讀已接觸繼承稿，非獨立讀稿。"
+      ],
+      "review_status": "single_reader_visual_collation_with_unresolved_glyph; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山火賁",
+      "line": 2,
+      "pdf_pages": [
+        171
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是賁於人而與之振作者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者有文章，有學問，上以待君之求，而佐以文明之治。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者亦性敏學廣，好習上品，惡居下流，可以常享安靜之福。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則有因人成事之功而陞遷有地。在士則有文章之善，而得上應援。在庶俗得人提舉，而營爲無阻。但變得大畜輿脫輹之象，亦要相時而動，雖有知己，不可恃勢妄作以取摧抑之患。數凶者喪仆而難救，弱不能立也。"
+        }
+      ],
+      "reading_notes": [
+        "開頭與之、末段弱不能立依171原像復讀，初稿興之與易不能立撤回。",
+        "喪仆而難救弱不能立按所見保留，喪仆字形與語義仍待獨立復核，不擅改為通順文句。",
+        "但變得大畜輿脫輹之象在歲運父段，其後亦要相時而動、不可恃勢妄作完整保留；原印未載目標爻位，單爻結構對照不能補作原印位。"
+      ],
+      "review_status": "single_reader_visual_collation_with_unresolved_glyph; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山火賁",
+      "line": 3,
+      "pdf_pages": [
+        171
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是安逸之象，而示以處逸之道者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者文足以華國，道足以經時，必有清名重望而爲大貴顯官也。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者亦是見識過人，德行邁俗，或則財穀豐盈，衣足食給，壽算永遠，得人助力。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則贊助有人而美職是任，在士則提拔者多而名可成，在庶俗則與之協力者衆，不必勞己力而自然榮盛，縱有外撓是非，終不爲害也。"
+        }
+      ],
+      "reading_notes": [
+        "衣足食給、壽算永遠、外撓與全部歲運父段依171原頁選錄；不按常用四字語順序改寫。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山火賁",
+      "line": 4,
+      "pdf_pages": [
+        171,
+        172
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是其相聯之跡而象其相求之心也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者文高學廣，爲世標準，爲世老成。主先難後獲，進取迂回。又馬爲五馬，皤者高年，翰者飛騰，疑彼以爲寇者，反以爲我之親愛。或成名不暇於進取，或歷任不依乎次序。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者亦得晚景結果，但早年偃蹇。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕先阻後順，在士先失後得，在庶俗先睽後合，憂中有喜，暗底逢明。雖有危險，終得安寧。未合者婚媾，數凶者憂服。蓋有白馬之象故也。"
+        }
+      ],
+      "reading_notes": [
+        "標題在171末，全部注文在172；原頁皤、翰、先睽後合與不暇按所見選字，不以通行《周易》替換本印。",
+        "又馬為五馬、皤者高年等解字語屬叶者完整父段，不直接對應現代職位或年齡。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山火賁",
+      "line": 5,
+      "pdf_pages": [
+        172
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是人君以恭儉致天下之治，而因善其占者焉。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者多敦本尙實，雖傷於固陋，而不足以昭文采之觀，然禮奢寧儉，亦可敦淳厚之風，而不至於匱天下之財。不惟田園廣多，而且金帛積蓄，兼得壽慶，善終。其爲吉人可知。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者爲鄙吝喬野之逸士，而衣食不足。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕閑官招聘，見任者福祿，衰老終壽，貴人獲利，進取大難就，小有喜。"
+        }
+      ],
+      "reading_notes": [
+        "而因善、禮奢寧儉、閑官招聘依172原頁保留，不補通常引經的字。",
+        "鄙吝喬野暫錄喬；該字細部與語義仍有疑讀未決，不按喬野／其他通順候選消除差異。",
+        "在仕閑官招聘至小有喜為完整歲運父段；其中不同對象、進取大難就與小有喜並列，不歸成單一吉凶。"
+      ],
+      "review_status": "single_reader_visual_collation_with_unresolved_glyph; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山火賁",
+      "line": 6,
+      "pdf_pages": [
+        172,
+        173
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是賁極反本，而可免過者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者有古人質朴之德，學問貫世之名，而福澤豐裕。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者質直恬靜之人，而隨時衣食。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕必主陞遷，在士必主進取得志，在庶俗經營朴實而無浮蕩之失。數凶者必有服制，或有外戚之孝也。"
+        }
+      ],
+      "reading_notes": [
+        "上爻標題原印无形，選錄无，不機械轉為通行無；文字與標點不是逐筆外交式轉錄。",
+        "172末在士進取得志，接173在庶俗經營朴實；服制與外戚之孝的續文仍屬本爻歲運父段。原書歷史措辭保留，不生成個人受限推斷。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山地剝",
+      "line": 1,
+      "pdf_pages": [
+        173
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是擬小人害正之象，而因占以戒之者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者亦可為君子，惟貴氣淺，福量狹。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者足不停止，事無定規，或小人侵害，或自己生災，為斗筲之鄙夫。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕者則進，宜見機相時，以觀其用舍之道。其餘則或手足之疾，奴婢之損，或兄弟不睦。惟利於修造興土木之事，凶則身亡家破，營謀不遂。"
+        }
+      ],
+      "reading_notes": [
+        "在仕者則進按原像保留，不按句義改作退；其餘、惟利於、凶則續文保留在同一歲運父段。",
+        "本輪為同一審閱者目校；字形及現代標點不是外交式轉錄，未判斷個人叶/不叶適用性。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山地剝",
+      "line": 2,
+      "pdf_pages": [
+        173,
+        174
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是小人之禍愈近，君子不免於所傷者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者主富貴之人，常懷忠直之心，多招邪謀之譖。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者立足不閑，家計難立，親眷無倚，婚姻有虧。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕防黜降，士子進取難成，常人幹謀不遂，或卑者侵凌，尊者猜忌。"
+        }
+      ],
+      "reading_notes": [
+        "標題辨按當前像素選錄，中部細筆仍保留待獨立復核的疑讀；不以通行經文認證該字。",
+        "不閑按本頁選字，與繼承不閒分列為字形差異；邪謀之譖不按較常見語句改換。",
+        "歲運段由173頁末在仕防黜降接174頁首士子進取難成，全部角色語句仍屬同一父段。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山地剝",
+      "line": 3,
+      "pdf_pages": [
+        174
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是小人之能從善而深與之者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者多是貴人，特立獨奮，異俗超羣，學古之勤，行道之力。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者薄德後福。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕者遇明主，逢大臣。常人難遇知己，生涯薄淡，欲求名利，雲路為高。且小象有失上下之辭，或難免父母妻子之憂，須防之可也。"
+        }
+      ],
+      "reading_notes": [
+        "深與、薄德後福、雲路按本頁選讀；不能以語意順暢程度改作其他措辭。",
+        "小象有失上下之辭保留在歲運父段，不新增獨立爻判或個人適用條件；標題保留无。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山地剝",
+      "line": 4,
+      "pdf_pages": [
+        174
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是陰禍切身者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者以陰剝陽，權重勢盛，雖作貴人，終失大體。且變得晉四爻鼫鼠之厲，貪而畏人。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者機深禍大，作孽自戕，縱有利名，終無嗣續。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕防讒邪之害，在士難遇佳會，在庶俗履危蹈險，爭訟刑尅之疊生。"
+        }
+      ],
+      "reading_notes": [
+        "叶者原段包含終失大體及鼫鼠之厲，不能把叶者標籤一律解作吉。",
+        "且變得晉四爻是原印明示的條件引文，屬叶者父段；原印為四爻，沒有補印九字。鼫鼠之厲不以通行經文的貞厲代換。",
+        "讒、自戕在同一原生窗口復看後保留首稿選讀；不是另一位審閱者的獨立復核。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山地剝",
+      "line": 5,
+      "pdf_pages": [
+        174
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是率衆以從善，其獲利之大者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者為大貴人，或文武相兼，蓋親上九之正人。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者亦居小人之上，倚靠富豪而衣食自足。若女人有福有貴，必自卑下而致高大。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕必加官進職，位居權要。在士考校必居諸士之首，而名可成。在庶俗營謀拔萃，人情和合。宮觀住持，婦人進財，家和福生。"
+        }
+      ],
+      "reading_notes": [
+        "標題宮人與注文獲利之大按原頁選讀；卷三詩及繼承吉凶標籤未隨本輪校訂。",
+        "若女人仍在不叶者完整父段，不能移作所有女性或整盤的無條件結論；標題保留原印無，與第三爻的无分別記錄。",
+        "本輪首稿曾將標題無選成无；原生像素補看後撤回。繼承原稿的無本來正確，此撤回不計作修復繼承錯文。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山地剝",
+      "line": 6,
+      "pdf_pages": [
+        175
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是一陽存于剝盡之餘，而君子小人異其占者也。故"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "叶者居大位，乘車馬，服民心，而為弭亂開治之主。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者乃無德小人，破祖敗家，傷親犯上，縱有技藝，亦無用于世。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕有權柄，在士得薦舉，逢知己而名就。在庶俗而謹慎奉公守法，斯有庇護而可保無虞。經營者多生意，或修造宮室。數凶變坤上爻其血玄黃之象，防下人侵損，死喪將臨，少年不利，有子不孤。"
+        }
+      ],
+      "reading_notes": [
+        "于、用于按原印選錄；庇護、宮室在原生像素覆看後保持首稿選讀，未套用繼承庇覆、作室。",
+        "數凶是坤上爻其血玄黃引語的明示前提，仍在歲運父段。只核對單爻變幾何不等於已判斷數凶，也不替換正式後天卦。",
+        "保留完整歷史措辭作來源資料；不據此生成個人受限推斷。"
+      ],
+      "review_status": "single_reader_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "地雷復",
+      "line": 1,
+      "pdf_pages": [
+        175
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是善專其心，斯可以進於道者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者有剛大之才，順理而行，知機固守，為開基創始之吉人，而富貴福澤以厚其生。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者修身養性，樂道忘勢，不求文華，而為瀟洒清修之士。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則位高清而近君贊化，在士則進取奪高魁，經營獲利。"
+        }
+      ],
+      "reading_notes": [
+        "標題礻旁字先選祗；字形與祇的細筆仍待再次核定，不據通行《周易》替字。",
+        "『善專其心』『位高清』『贊化』依原生像素保留；先讀時的高後字與贊字誤辨已在接觸繼承稿前校正。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "地雷復",
+      "line": 2,
+      "pdf_pages": [
+        176
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是因人以復善，斯善皆為己有者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者中正君子，不驕不傲，事上以誠，待下以信，足以立功名，享富貴。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者亦安貧君子，知命達天。仁之一字，為生意，為長壽，為生育。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕謫貶者復職，在士停降者復取，在庶俗得倚富豪而獲利，臨危者得安，有疾者得愈。或數之凶者，有休官下第之兆。"
+        }
+      ],
+      "reading_notes": [
+        "『仁之一字』及其生意、長壽、生育語句仍在不叶者父段；不拆成另行適用的無條件判斷。",
+        "『或數之凶者』是歲運段的較窄前提；有休官下第之兆不能略去此條件。",
+        "原生局部確認『得倚富豪』，撤回首稿倍；繼承稿此字原正確，不計系統缺陷修復。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "地雷復",
+      "line": 3,
+      "pdf_pages": [
+        176
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是改過不吝，既斥而復與之者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者遷善敏德，不為貴人，未免乍進乍退，或是或非。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者難中取易，短中求長，憂慮抑鬱。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕爵難穩，更變無定。在士則變明夷，有得其大首之象，而名可成。在庶俗求速應遲，事多反復，疑惑差錯而無定主。"
+        }
+      ],
+      "reading_notes": [
+        "『既斥而復與之』『不為貴人』『爵難穩』保留原頁讀法，不以語意改字。",
+        "明夷引用位於歲運父段中的『在士』語境；原文未印目標爻位，不由『大首』推填六三。",
+        "『名可成』先讀曾誤辨為咎，原生裁圖後在接觸繼承稿前校正。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "地雷復",
+      "line": 4,
+      "pdf_pages": [
+        176
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是美其逐於衆，而美其不昧於所從者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者生亂世不為之污，處污世不為之浼，挺然自拔，以從乎中道，而居位食祿，富貴清標。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者為行旅，為兵師，為孤獨。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕復職，士在顯名，在庶俗獲利。"
+        }
+      ],
+      "reading_notes": [
+        "首句暫選『逐於衆』，逐字細筆仍待獨立核定，字形未決；語意不順不據常見說法改成從或遂。",
+        "『士在顯名』按原印語序，不倒為在士顯名。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending; glyph_choice_unresolved"
+    },
+    {
+      "hexagram": "地雷復",
+      "line": 5,
+      "pdf_pages": [
+        177
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是能復于善者，其與道為一者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者涵養熟，操存固。敦之一字為君子重厚之德，中之一字為仕宦官職之名。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者雖非貴人，亦有田穀廣積。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕有遷除，在士則登薦，在庶俗有積蓄，但要防服制，蓋孝字不利于父故也。"
+        }
+      ],
+      "reading_notes": [
+        "『涵養熟，操存固』『中之一字』依所見保留。歲運段孝／考細筆未決，暫讀孝並保留繼承考；不以服制語意判字，不計此處修復已成立。",
+        "防服制及孝字句保留在歲運父段，適用性未評估。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending; glyph_choice_unresolved"
+    },
+    {
+      "hexagram": "地雷復",
+      "line": 6,
+      "pdf_pages": [
+        177
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是終迷不復而得凶者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者改過自新，釋回增美，亦可常保其富貴而為吉人。蓋變為頤，吉。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者愚昧昏蒙，為疾厄傷殘，為破祖破家，為誤國累主。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕有貪位之誚，在士有取擢之辱，在庶俗有執迷取擊之嗟，靜吉而動否也。"
+        }
+      ],
+      "reading_notes": [
+        "原生裁圖確認『釋回增美』，撤回首稿囚捨；繼承稿回增原正確，不計系統缺陷。『取擢之辱』『執迷取擊之嗟』按所見保留。",
+        "『蓋變為頤，吉』位於叶者父段，原文未印目標爻位；先讀厲言之誤在原生裁圖後、接觸繼承稿前撤回。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "天雷無妄",
+      "line": 1,
+      "pdf_pages": [
+        177,
+        178
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是以誠而動，則行無不得者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者重德清心，知時識勢，謀猷大展，志願大遂，必為國家之重器，而福祿攸崇。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者亦為吉人，彼無惡，此無射，心有誠實，事無妄舉，平生安穩。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則得君得民，在士則進取成名，在庶俗主獲利。"
+        }
+      ],
+      "reading_notes": [
+        "叶者段跨PDF177至178頁，『必為國家之重器』是續文；不在換頁處另起新條件。",
+        "『彼無惡，此無射』依原印保留，未按其他經典補前後文。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "天雷無妄",
+      "line": 2,
+      "pdf_pages": [
+        178
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是心之公而行之利者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者中正之才，柔順之德，不謀利而利自得，不計功而功自至，富貴天然，平生安逸。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者意荒自恣，流蕩自驕，生計艱難，不務根本，志向無定。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則進職，在士則中式，皆不勞心。富人或進田產，商賈外求獲利，在庶俗則末利多而粱稻熟。"
+        }
+      ],
+      "reading_notes": [
+        "『末利多而粱稻熟』保留末與粱；先讀禾利的誤辨在原生裁圖後、接觸繼承稿前撤回。",
+        "不叶者首句選『意荒自恣』，不以意苦或意茫替換。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "天雷無妄",
+      "line": 3,
+      "pdf_pages": [
+        178
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是本無致災之由，而災自至者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者德足以禳災，善足以遺禍，而富貴福澤，可以常保於無虞。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者奔波訟訴，招尤啟禍，得失無常，憂樂不一，家業難興。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕利於郡守，行人之得也；不利邑宰，邑人之災也。田家或進羊財，商賈多獲利息。在庶俗或閑事係絆，破財損己；在士人必主難於進取。"
+        }
+      ],
+      "reading_notes": [
+        "『善足以遺禍』『招尤啟禍』『羊財』保留所選讀法，不為語意順暢替為弭禍、災禍或牛財。",
+        "郡守與邑宰兩句及其所引行人／邑人之得災對比均留在歲運父段，不以利之一字概括。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "天雷無妄",
+      "line": 4,
+      "pdf_pages": [
+        178,
+        179
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是能守正自，安斯可以寡過者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者為才德君子，守正不阿，執德不回，獨善其身，福量寬洪。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者亦平生安逸，衣食豐足。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕守其常職，在士保其當分，在庶俗守其舊業，圖謀有實，不致虛浮。"
+        }
+      ],
+      "reading_notes": [
+        "叶者『獨善』在PDF178頁末，『其身，福量寬洪』續於179頁，父段不因換頁而截斷。",
+        "原生局部確認『能守正自安』，撤回首稿固；繼承稿自原正確，不計系統缺陷修復。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "天雷無妄",
+      "line": 5,
+      "pdf_pages": [
+        179
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是君臣一德，而擬以意外之變，不勞而理之者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者有陽剛中正之德，足以拯溺亨屯，御災捍患，上有益於朝廷，下有益於身家，矜式當時，標準後世。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者有福之人，而災害不生，喜慶多至。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕進之列者，縱有變生不測，禍起無虞，不辯自明，不解自釋。在庶俗有病不藥自愈，謀為有成，生育可喜。"
+        }
+      ],
+      "reading_notes": [
+        "『拯溺亨屯』『矜式當時』『在仕進之列者』按原頁保留，不補改成通行詞。",
+        "『有病不藥自愈』『生育可喜』仍在歲運父段，未另立女命分支。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "天雷無妄",
+      "line": 6,
+      "pdf_pages": [
+        179
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是信之固，而卒用於信者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者執而能通，困而知變，足以防危杜患，身家可保，福澤無虧。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者志大謀拙，馳驅不停，孤獨不倚，災眚不離。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕不達於政，而貶逐難逃；在士不達於理，而耻辱難逃；在庶俗不諳於事，而是非迭生。惟變通以趨時免禍，數凶者不保其終。"
+        }
+      ],
+      "reading_notes": [
+        "『信之固，而卒用於信』『孤獨不倚』『耻辱』依原印所選字形保留，不改成常見說法。",
+        "『數凶者不保其終』留在歲運父段並保留較窄前提；不作無條件現實預測。"
+      ],
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山天大畜",
+      "line": 1,
+      "pdf_pages": [
+        180
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是不利於進而利於退者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者明哲保身，知機以圖存，災不犯而福有餘。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者處常處變，隨時定計。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕宜去位，在士宜待時，在庶俗宜守舊。不然變生不測，禍將臨矣。"
+        }
+      ],
+      "reading_notes": [
+        "按本页保留不叶者段“處常處變，隨時定計”；不因不叶标签补入未印的不利断语。"
+      ],
+      "review_status": "single_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山天大畜",
+      "line": 2,
+      "pdf_pages": [
+        180
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是深擬其自止之象也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者變為賁，有與上興之象。必有才德，心性明敏，聞見廣博，守正不移，時上之用。或急流勇退，或掛冠致仕。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者幼小不行，老大足疾，或生腰疾，數凶者難於壽考。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，防失脫灾非。"
+        }
+      ],
+      "reading_notes": [
+        "“深擬”“與上興”“時上之用”“掛冠致仕”按本页复读保留；不把挂冠退仕改读为授任。",
+        "叶者段只印賁卦名，未指定目标爻；引用及个人适用性均不替代正式后天盘。"
+      ],
+      "review_status": "single_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山天大畜",
+      "line": 3,
+      "pdf_pages": [
+        180,
+        181
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是擬其同升之象，而示以允升之道者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者文章學問，如良馬之捷，如大輿之堅，兵衞之臨，足以勝朝廷重任。馬字衞字，是節制軍馬茶馬司薄轉運皆佳兆也。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者雖與君子合志，或妄舉躁動，不自愛重，損失難免。縱有成就，亦起於艱辛。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕則有五馬朱旛之應，在士則有飛騰之應，在庶俗得尊上使用，知己相助，以濟其艱。或奔走勞役而後方可有獲。"
+        }
+      ],
+      "reading_notes": [
+        "九三标题按本页选日閑輿衞；允升、司薄及衞为所选字形映射，司薄不按常用官名改成司簿。",
+        "字形未决：五馬朱后字暂选旛，幡仍为候选，轓仅有词义参照而无本页字形认证；初稿擔撤回，不计为确定的继承纠错。",
+        "岁运段跨180／181页；不叶者段为雖與君子合志，非继承文本的難與君子合志。",
+        "编校词义说明（非原文，不作字形证据）：教育部《重編國語辭典修訂本》“五馬”词条释为太守称呼。此注只解释岁运段“在仕”句的历史用语，个人适用性未裁定。https://dict.revised.moe.edu.tw/dictView.jsp?ID=159452&la=0&powerMode=0"
+      ],
+      "review_status": "single_visual_collation; independent_second_review_pending; glyph_choice_unresolved"
+    },
+    {
+      "hexagram": "山天大畜",
+      "line": 4,
+      "pdf_pages": [
+        181
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是止惡於初而因善其占者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者或為童科，或為魁元，富貴雙全。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者為童僕近貴，或力小不能任重，或見淺而拙於謀。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，進取領解，蓋牛為解星，常人有喜添牛財，在仕有升遷之喜。"
+        }
+      ],
+      "reading_notes": [
+        "“因善其占”按本页保留，不改为固善；童科、魁元及常人／在仕各语仍连同原父段读取。"
+      ],
+      "review_status": "single_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山天大畜",
+      "line": 5,
+      "pdf_pages": [
+        181
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是制惡於著而因善其占者也。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者大才大德，出類拔萃，足以立大功，享富貴。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者志氣卑微，小小規模，生計狹隘，亦有喜事。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕陞擢，在士高遷，在庶俗多有吉慶，而營謀克遂。元氣失者福量淺狹。"
+        }
+      ],
+      "reading_notes": [
+        "“因善”“元氣失者”按本页保留；岁运段在仕陞擢、在士高遷未印则字，不补入。",
+        "元氣失者福量淺狹仍是原段附加限定，未据此自动评估个人元气或选择适用分支。"
+      ],
+      "review_status": "single_visual_collation; independent_second_review_pending"
+    },
+    {
+      "hexagram": "山天大畜",
+      "line": 6,
+      "pdf_pages": [
+        181,
+        182
+      ],
+      "sections": [
+        {
+          "section_id": "opening",
+          "condition_label": null,
+          "text": "此爻是畜極而通而其道之所施者廣矣。"
+        },
+        {
+          "section_id": "xie",
+          "condition_label": "叶者",
+          "text": "故叶者間世奇英，當時重望，功高千古，名播四夷，道德充大，足以開太平，繼絕學。"
+        },
+        {
+          "section_id": "buxie",
+          "condition_label": "不叶者",
+          "text": "不叶者志大心高，機深禍重，變泰上爻，有城復于隍之象。"
+        },
+        {
+          "section_id": "annual",
+          "condition_label": "歲運逢之",
+          "text": "歲運逢之，在仕者得薦舉登天，在士者進取成名，在庶俗謀為皆利。天衢二字，應兆非輕。"
+        }
+      ],
+      "reading_notes": [
+        "末句“應兆非輕”跨182页，仍接大畜上九；不并入下一頤卦。",
+        "變泰上爻、有城復于隍之象属不叶者父段，原页明确印上爻；并非岁运通用或自动后天换卦。",
+        "城復于隍为此处注文引语，未计作新校目标爻经文。"
+      ],
+      "review_status": "single_visual_collation; independent_second_review_pending"
+    }
+  ]
+}

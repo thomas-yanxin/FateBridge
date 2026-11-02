@@ -1,0 +1,1298 @@
+{
+  "source_data": {
+    "id": "matanga_time_and_intercalation_comparison_v79",
+    "sources": [
+      {
+        "id": "T1300",
+        "title_stmt": [
+          "Taishō Tripiṭaka",
+          "大正新脩大藏經",
+          "摩登伽經",
+          "Taishō Tripiṭaka, Electronic version, No. 1300 摩登伽經",
+          "大正新脩大藏經數位版, No. 1300 摩登伽經"
+        ],
+        "title_stmt_authors": [
+          "吳 竺律炎支謙共譯"
+        ],
+        "body_bylines": [
+          "吳天竺三藏竺律炎共支謙譯"
+        ],
+        "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T21/T21n1300.xml",
+        "sha256": "9e1dff6005a0b5753f2462d2e3dbba7c5f75ddca1a54b654f79bf6ff84ca0bbd",
+        "bytes": 194365,
+        "windows": [
+          {
+            "id": "thread_and_waterclock",
+            "locator": "T1300_0408c18-0409a20",
+            "lines": {
+              "0408c18": {
+                "main": "「『大婆羅門！我今更說晝夜分數長短時節，汝",
+                "inline": []
+              },
+              "0408c19": {
+                "main": "當善聽。冬十一月，其日最短，晝夜分別有三",
+                "inline": []
+              },
+              "0408c20": {
+                "main": "十分，晝十二分、夜十八分。五月夏至日，晝十",
+                "inline": []
+              },
+              "0408c21": {
+                "main": "八分、夜十二分。八月二月，晝夜停等。自從五",
+                "inline": []
+              },
+              "0408c22": {
+                "main": "月，日退夜進；至十一月，夜退日進。至於五",
+                "inline": []
+              },
+              "0408c23": {
+                "main": "月，日夜進退，亦一分進亦一分退。月朔起",
+                "inline": []
+              },
+              "0408c24": {
+                "main": "於初月一日，其月起於二月一日。節氣起春。",
+                "inline": []
+              },
+              "0408c25": {
+                "main": "「『我當復說剎那分數。婦人紡綖得長一尋，",
+                "inline": []
+              },
+              "0408c26": {
+                "main": "是則名為剎那時也。六十剎那名一羅婆，三",
+                "inline": []
+              },
+              "0408c27": {
+                "main": "十羅婆名為一時。此一時者，日一分也。凡三",
+                "inline": []
+              },
+              "0408c28": {
+                "main": "十分為一日夜。此三十分，各有名字。日初出",
+                "inline": []
+              },
+              "0408c29": {
+                "main": "分，名曰四月。二月一日日初出時，人影長",
+                "inline": []
+              },
+              "0409a01": {
+                "main": "於九十六尋。第二影長六十尋。第三名富影，",
+                "inline": []
+              },
+              "0409a02": {
+                "main": "長十二尋。第四名屋影，長六尋。五名大富",
+                "inline": []
+              },
+              "0409a03": {
+                "main": "影，長五尋。六名三圍影，長四尋。七名對面",
+                "inline": []
+              },
+              "0409a04": {
+                "main": "影，長三尋。第八名共，於日正中，影共人等。",
+                "inline": []
+              },
+              "0409a05": {
+                "main": "第九名尺影，長三尋。第十名勢影，長四尋。十",
+                "inline": []
+              },
+              "0409a06": {
+                "main": "一名勝影，長五尋。十二大堅影，長六尋。十",
+                "inline": []
+              },
+              "0409a07": {
+                "main": "三婆修影，十二尋。十四端正影，六十尋。十",
+                "inline": []
+              },
+              "0409a08": {
+                "main": "五凶惡影，九十六尋。此是一日十五分名。",
+                "inline": []
+              },
+              "0409a09": {
+                "main": "日沒名惡，二名星現，三名快攝，四名安隱，",
+                "inline": []
+              },
+              "0409a10": {
+                "main": "五名無邊，第六名忽，七名羅剎，第八名眠，",
+                "inline": []
+              },
+              "0409a11": {
+                "main": "第九名梵，第十名地提，十一鳥鳴，十二名",
+                "inline": []
+              },
+              "0409a12": {
+                "main": "才，十三名火，十四影足，十五近聚。此",
+                "inline": []
+              },
+              "0409a13": {
+                "main": "是晝夜三十分名。是三十分名一晝夜，三十",
+                "inline": []
+              },
+              "0409a14": {
+                "main": "晝夜名為一月，此十二月名為一歲也。",
+                "inline": []
+              },
+              "0409a15": {
+                "main": "「『大婆羅門！今復說漏刻之法。如人瞬頃，名",
+                "inline": []
+              },
+              "0409a16": {
+                "main": "一羅婆，此四羅婆名一迦啅，四十迦啅名",
+                "inline": []
+              },
+              "0409a17": {
+                "main": "一迦羅，三十迦羅則名一刻，如是二刻名為",
+                "inline": []
+              },
+              "0409a18": {
+                "main": "一分。一刻用水盈滿五升，圓筩四寸以承瓶",
+                "inline": []
+              },
+              "0409a19": {
+                "main": "下，黃金六銖以為此筩，漏水五升是名一",
+                "inline": []
+              },
+              "0409a20": {
+                "main": "刻。如是時法，我已分別。今說里數由旬之法。",
+                "inline": []
+              }
+            },
+            "main_literal": "「『大婆羅門！我今更說晝夜分數長短時節，汝當善聽。冬十一月，其日最短，晝夜分別有三十分，晝十二分、夜十八分。五月夏至日，晝十八分、夜十二分。八月二月，晝夜停等。自從五月，日退夜進；至十一月，夜退日進。至於五月，日夜進退，亦一分進亦一分退。月朔起於初月一日，其月起於二月一日。節氣起春。「『我當復說剎那分數。婦人紡綖得長一尋，是則名為剎那時也。六十剎那名一羅婆，三十羅婆名為一時。此一時者，日一分也。凡三十分為一日夜。此三十分，各有名字。日初出分，名曰四月。二月一日日初出時，人影長於九十六尋。第二影長六十尋。第三名富影，長十二尋。第四名屋影，長六尋。五名大富影，長五尋。六名三圍影，長四尋。七名對面影，長三尋。第八名共，於日正中，影共人等。第九名尺影，長三尋。第十名勢影，長四尋。十一名勝影，長五尋。十二大堅影，長六尋。十三婆修影，十二尋。十四端正影，六十尋。十五凶惡影，九十六尋。此是一日十五分名。日沒名惡，二名星現，三名快攝，四名安隱，五名無邊，第六名忽，七名羅剎，第八名眠，第九名梵，第十名地提，十一鳥鳴，十二名才，十三名火，十四影足，十五近聚。此是晝夜三十分名。是三十分名一晝夜，三十晝夜名為一月，此十二月名為一歲也。「『大婆羅門！今復說漏刻之法。如人瞬頃，名一羅婆，此四羅婆名一迦啅，四十迦啅名一迦羅，三十迦羅則名一刻，如是二刻名為一分。一刻用水盈滿五升，圓筩四寸以承瓶下，黃金六銖以為此筩，漏水五升是名一刻。如是時法，我已分別。今說里數由旬之法。",
+            "inline_notes": {}
+          },
+          {
+            "id": "leap_and_orbit",
+            "locator": "T1300_0410a10-0410a19",
+            "lines": {
+              "0410a10": {
+                "main": "分。如是等名月會宿法。我今更說出閏之要。",
+                "inline": []
+              },
+              "0410a11": {
+                "main": "於十九年凡有七閏。五年再閏，其日五月至",
+                "inline": []
+              },
+              "0410a12": {
+                "main": "於十月盡，皆南行，夜增一分、日減一分。從",
+                "inline": []
+              },
+              "0410a13": {
+                "main": "十一月至盡四月，皆俱北行，晝加一分、夜減",
+                "inline": []
+              },
+              "0410a14": {
+                "main": "一分。月形增損，由日遠近。日、月、熒惑、辰星、歲",
+                "inline": []
+              },
+              "0410a15": {
+                "main": "星、太白、鎮星，是為七曜。其歲星者，於十二歲",
+                "inline": []
+              },
+              "0410a16": {
+                "main": "始一周天。其鎮星者，二十八歲乃一周天。太",
+                "inline": []
+              },
+              "0410a17": {
+                "main": "白歲半始一周天，熒惑二歲始一周天，辰星",
+                "inline": []
+              },
+              "0410a18": {
+                "main": "一歲乃一周天。凡歲三百六十五日，日一周",
+                "inline": []
+              },
+              "0410a19": {
+                "main": "天；月三十日乃一周天。此是七曜周天數",
+                "inline": []
+              }
+            },
+            "main_literal": "分。如是等名月會宿法。我今更說出閏之要。於十九年凡有七閏。五年再閏，其日五月至於十月盡，皆南行，夜增一分、日減一分。從十一月至盡四月，皆俱北行，晝加一分、夜減一分。月形增損，由日遠近。日、月、熒惑、辰星、歲星、太白、鎮星，是為七曜。其歲星者，於十二歲始一周天。其鎮星者，二十八歲乃一周天。太白歲半始一周天，熒惑二歲始一周天，辰星一歲乃一周天。凡歲三百六十五日，日一周天；月三十日乃一周天。此是七曜周天數",
+            "inline_notes": {}
+          }
+        ],
+        "selected_direct_back_records": [
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg0408011",
+              "to": "#end0408011"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0408c25",
+                "0408c25"
+              ]
+            ],
+            "text_with_inline_content": "綖線",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0408011\" to=\"#end0408011\"><ns0:lem wit=\"#wit.orig\">綖</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1\">線</ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg0408012",
+              "to": "#end0408012"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0408c29",
+                "0408c29"
+              ]
+            ],
+            "text_with_inline_content": "月用",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0408012\" to=\"#end0408012\"><ns0:lem wit=\"#wit.orig\">月</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit3 #wit1\">用</ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg0409001",
+              "to": "#end0409001"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a08",
+                "0409a08"
+              ]
+            ],
+            "text_with_inline_content": "影",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0409001\" to=\"#end0409001\"><ns0:lem wit=\"#wit.orig\">影</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1\"><ns0:space quantity=\"0\" /></ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg0409002",
+              "to": "#end0409002"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a09",
+                "0409a09"
+              ]
+            ],
+            "text_with_inline_content": "快收",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0409002\" to=\"#end0409002\"><ns0:lem wit=\"#wit.orig\">快</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1\">收</ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg0409003",
+              "to": "#end0409003"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a12",
+                "0409a12"
+              ]
+            ],
+            "text_with_inline_content": "火大",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0409003\" to=\"#end0409003\"><ns0:lem wit=\"#wit.orig\">火</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1\">大</ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg0409004",
+              "to": "#end0409004"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a12",
+                "0409a12"
+              ]
+            ],
+            "text_with_inline_content": "近丘",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0409004\" to=\"#end0409004\"><ns0:lem wit=\"#wit.orig\">近</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1\">丘</ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg0409005",
+              "to": "#end0409005"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a14",
+                "0409a14"
+              ]
+            ],
+            "text_with_inline_content": "也",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0409005\" to=\"#end0409005\"><ns0:lem wit=\"#wit.orig\">也</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1\"><ns0:space quantity=\"0\" /></ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg0410002",
+              "to": "#end0410002"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0410a12",
+                "0410a12"
+              ]
+            ],
+            "text_with_inline_content": "日晝",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0410002\" to=\"#end0410002\"><ns0:lem wit=\"#wit.orig\">日</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3 #wit1\">晝</ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0408011",
+              "resp": "#resp1",
+              "type": "mod",
+              "target": "#nkr_note_mod_0408011"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0408c25",
+                "0408c25"
+              ]
+            ],
+            "text_with_inline_content": "綖【大】，線【宋】【元】【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0408011\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0408011\">綖【大】，線【宋】【元】【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0408012",
+              "resp": "#resp1",
+              "type": "mod",
+              "target": "#nkr_note_mod_0408012"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0408c29",
+                "0408c29"
+              ]
+            ],
+            "text_with_inline_content": "月【大】，用【元】【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0408012\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0408012\">月【大】，用【元】【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0409001",
+              "resp": "#resp1",
+              "type": "mod",
+              "target": "#nkr_note_mod_0409001"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a08",
+                "0409a08"
+              ]
+            ],
+            "text_with_inline_content": "影【大】，〔－〕【宋】【元】【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0409001\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0409001\">影【大】，〔－〕【宋】【元】【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0409002",
+              "resp": "#resp1",
+              "type": "mod",
+              "target": "#nkr_note_mod_0409002"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a09",
+                "0409a09"
+              ]
+            ],
+            "text_with_inline_content": "快【大】，收【宋】【元】【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0409002\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0409002\">快【大】，收【宋】【元】【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0409003",
+              "resp": "#resp1",
+              "type": "mod",
+              "target": "#nkr_note_mod_0409003"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a12",
+                "0409a12"
+              ]
+            ],
+            "text_with_inline_content": "火【大】，大【宋】【元】【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0409003\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0409003\">火【大】，大【宋】【元】【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0409004",
+              "resp": "#resp1",
+              "type": "mod",
+              "target": "#nkr_note_mod_0409004"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a12",
+                "0409a12"
+              ]
+            ],
+            "text_with_inline_content": "近【大】，丘【宋】【元】【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0409004\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0409004\">近【大】，丘【宋】【元】【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0409005",
+              "resp": "#resp1",
+              "type": "mod",
+              "target": "#nkr_note_mod_0409005"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a14",
+                "0409a14"
+              ]
+            ],
+            "text_with_inline_content": "也【大】，〔－〕【宋】【元】【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0409005\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0409005\">也【大】，〔－〕【宋】【元】【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0410002",
+              "resp": "#resp1",
+              "type": "mod",
+              "target": "#nkr_note_mod_0410002"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0410a12",
+                "0410a12"
+              ]
+            ],
+            "text_with_inline_content": "日【大】，晝【宋】【元】【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0410002\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0410002\">日【大】，晝【宋】【元】【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0408011",
+              "resp": "#resp2",
+              "type": "orig",
+              "place": "foot text",
+              "target": "#nkr_note_orig_0408011"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0408c25",
+                "0408c25"
+              ]
+            ],
+            "text_with_inline_content": "綖＝線【三】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0408011\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0408011\">綖＝線【三】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0408012",
+              "resp": "#resp2",
+              "type": "orig",
+              "place": "foot text",
+              "target": "#nkr_note_orig_0408012"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0408c29",
+                "0408c29"
+              ]
+            ],
+            "text_with_inline_content": "月＝用【元】【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0408012\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0408012\">月＝用【元】【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0409001",
+              "resp": "#resp2",
+              "type": "orig",
+              "place": "foot text",
+              "target": "#nkr_note_orig_0409001"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a08",
+                "0409a08"
+              ]
+            ],
+            "text_with_inline_content": "〔影〕－【三】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0409001\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0409001\">〔影〕－【三】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0409002",
+              "resp": "#resp2",
+              "type": "orig",
+              "place": "foot text",
+              "target": "#nkr_note_orig_0409002"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a09",
+                "0409a09"
+              ]
+            ],
+            "text_with_inline_content": "快＝收【三】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0409002\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0409002\">快＝收【三】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0409003",
+              "resp": "#resp2",
+              "type": "orig",
+              "place": "foot text",
+              "target": "#nkr_note_orig_0409003"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a12",
+                "0409a12"
+              ]
+            ],
+            "text_with_inline_content": "火＝大【三】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0409003\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0409003\">火＝大【三】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0409004",
+              "resp": "#resp2",
+              "type": "orig",
+              "place": "foot text",
+              "target": "#nkr_note_orig_0409004"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a12",
+                "0409a12"
+              ]
+            ],
+            "text_with_inline_content": "近＝丘【三】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0409004\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0409004\">近＝丘【三】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0409005",
+              "resp": "#resp2",
+              "type": "orig",
+              "place": "foot text",
+              "target": "#nkr_note_orig_0409005"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0409a14",
+                "0409a14"
+              ]
+            ],
+            "text_with_inline_content": "〔也〕－【三】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0409005\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0409005\">〔也〕－【三】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0410002",
+              "resp": "#resp2",
+              "type": "orig",
+              "place": "foot text",
+              "target": "#nkr_note_orig_0410002"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0410a12",
+                "0410a12"
+              ]
+            ],
+            "text_with_inline_content": "日＝晝【三】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0410002\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0410002\">日＝晝【三】</ns0:note>\n"
+          }
+        ],
+        "embedded_unlinked_record_nodes_inside_selected_parents": [],
+        "unresolved_pointers_in_whole_back_matter": [],
+        "apparatus_scope": "All note/app direct body-pointer spans intersecting the three selected windows; nested unlinked records separate. Whole captures retained. Not all notes from whole source or complete witness collation.",
+        "new_independent_observations": 0
+      },
+      {
+        "id": "T1301",
+        "title_stmt": [
+          "Taishō Tripiṭaka",
+          "大正新脩大藏經",
+          "舍頭諫太子二十八宿經",
+          "Taishō Tripiṭaka, Electronic version, No. 1301 舍頭諫太子二十八宿經",
+          "大正新脩大藏經數位版, No. 1301 舍頭諫太子二十八宿經"
+        ],
+        "title_stmt_authors": [
+          "西晉 竺法護譯"
+        ],
+        "body_bylines": [
+          "西晉三藏竺法護譯"
+        ],
+        "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T21/T21n1301.xml",
+        "sha256": "263e31a4314913bb68f7364ca1cb64a07f802934e1304d84021400671546ad72",
+        "bytes": 194776,
+        "windows": [
+          {
+            "id": "seasons_and_two_chains",
+            "locator": "T1301_0416b03-0416c03",
+            "lines": {
+              "0416b03": {
+                "main": "轉行安和晝夜？云何得長、如何短？』摩登王",
+                "inline": []
+              },
+              "0416b04": {
+                "main": "曰：『冬時十二月八日，夜有十八須臾，晝日適",
+                "inline": []
+              },
+              "0416b05": {
+                "main": "有十二須臾。春四月八日，晝日有十八須臾",
+                "inline": []
+              },
+              "0416b06": {
+                "main": "耳，夜有十二須臾。計夏七日，當其八日，晝",
+                "inline": []
+              },
+              "0416b07": {
+                "main": "十五須臾，夜亦十五須臾也。』又問：『何所是節？",
+                "inline": []
+              },
+              "0416b08": {
+                "main": "何所是限？何所須臾？』摩登王曰：『譬如有人切",
+                "inline": []
+              },
+              "0416b09": {
+                "main": "三尺縷，不長不短，是號為節。計六十節，名之",
+                "inline": []
+              },
+              "0416b10": {
+                "main": "曰限。計十二限，名曰須臾。如斯計之，晝夜流",
+                "inline": []
+              },
+              "0416b11": {
+                "main": "過又三十須臾。』又問：『是諸須臾，名曰何等？』",
+                "inline": []
+              },
+              "0416b12": {
+                "main": "答曰：『日初出時，人自度形，九丈六尺。其彼",
+                "inline": []
+              },
+              "0416b13": {
+                "main": "須臾，名曰為四。六尺影須臾，名曰為勝。一",
+                "inline": []
+              },
+              "0416b14": {
+                "main": "丈二尺，其影須臾，名曰富樂。六尺須臾影，名",
+                "inline": []
+              },
+              "0416b15": {
+                "main": "曰臥首。五尺影須臾，名曰富安。四尺影須臾，",
+                "inline": []
+              },
+              "0416b16": {
+                "main": "名曰離樂。三尺影須臾，名曰等善面。日中須",
+                "inline": []
+              },
+              "0416b17": {
+                "main": "臾，名曰金剛。中後須臾，名曰犁呵。四尺影須",
+                "inline": []
+              },
+              "0416b18": {
+                "main": "臾，名曰強力。五尺影須臾，名曰得勝。六尺影",
+                "inline": []
+              },
+              "0416b19": {
+                "main": "須臾，名曰皆實。一丈二尺須臾，名曰治業。六",
+                "inline": []
+              },
+              "0416b20": {
+                "main": "丈須臾，名曰善仁。初日入須臾九丈六尺影，",
+                "inline": []
+              },
+              "0416b21": {
+                "main": "名曰最猗，而懷恐懼。今吾當說向夜須臾。日",
+                "inline": []
+              },
+              "0416b22": {
+                "main": "沒須臾名曰凶弊，第二須臾名曰妙女，次名",
+                "inline": []
+              },
+              "0416b23": {
+                "main": "家英，次名憂合，次名無底，次名驢鳴，次名惡",
+                "inline": []
+              },
+              "0416b24": {
+                "main": "鬼。夜半須臾名曰阿摩，過半須臾名曰梵",
+                "inline": []
+              },
+              "0416b25": {
+                "main": "矣，次名彩畫，次名無懷，次名棄意，次名安",
+                "inline": []
+              },
+              "0416b26": {
+                "main": "樂，次名曰火，次名種火。是要晝夜則而計，",
+                "inline": []
+              },
+              "0416b27": {
+                "main": "有三十須臾。』",
+                "inline": []
+              },
+              "0416b28": {
+                "main": "「摩登王曰：『且復聽吾為仁分別。十五眴名",
+                "inline": []
+              },
+              "0416b29": {
+                "main": "曰為卒，二十卒則為一時，三十時名曰須臾，",
+                "inline": []
+              },
+              "0416c01": {
+                "main": "三十須臾為晝夜，三十日為一月，計十二月",
+                "inline": []
+              },
+              "0416c02": {
+                "main": "為一年。合集一年宿夜明眴，一億百六十萬",
+                "inline": []
+              },
+              "0416c03": {
+                "main": "五十。是為分別時節數。』",
+                "inline": []
+              }
+            },
+            "main_literal": "轉行安和晝夜？云何得長、如何短？』摩登王曰：『冬時十二月八日，夜有十八須臾，晝日適有十二須臾。春四月八日，晝日有十八須臾耳，夜有十二須臾。計夏七日，當其八日，晝十五須臾，夜亦十五須臾也。』又問：『何所是節？何所是限？何所須臾？』摩登王曰：『譬如有人切三尺縷，不長不短，是號為節。計六十節，名之曰限。計十二限，名曰須臾。如斯計之，晝夜流過又三十須臾。』又問：『是諸須臾，名曰何等？』答曰：『日初出時，人自度形，九丈六尺。其彼須臾，名曰為四。六尺影須臾，名曰為勝。一丈二尺，其影須臾，名曰富樂。六尺須臾影，名曰臥首。五尺影須臾，名曰富安。四尺影須臾，名曰離樂。三尺影須臾，名曰等善面。日中須臾，名曰金剛。中後須臾，名曰犁呵。四尺影須臾，名曰強力。五尺影須臾，名曰得勝。六尺影須臾，名曰皆實。一丈二尺須臾，名曰治業。六丈須臾，名曰善仁。初日入須臾九丈六尺影，名曰最猗，而懷恐懼。今吾當說向夜須臾。日沒須臾名曰凶弊，第二須臾名曰妙女，次名家英，次名憂合，次名無底，次名驢鳴，次名惡鬼。夜半須臾名曰阿摩，過半須臾名曰梵矣，次名彩畫，次名無懷，次名棄意，次名安樂，次名曰火，次名種火。是要晝夜則而計，有三十須臾。』「摩登王曰：『且復聽吾為仁分別。十五眴名曰為卒，二十卒則為一時，三十時名曰須臾，三十須臾為晝夜，三十日為一月，計十二月為一年。合集一年宿夜明眴，一億百六十萬五十。是為分別時節數。』",
+            "inline_notes": {}
+          }
+        ],
+        "selected_direct_back_records": [
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg0416012",
+              "to": "#end0416012"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b06",
+                "0416b06"
+              ]
+            ],
+            "text_with_inline_content": "耳",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0416012\" to=\"#end0416012\"><ns0:lem wit=\"#wit.orig\">耳</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit1 #wit2 #wit3\"><ns0:space quantity=\"0\" /></ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg0416013",
+              "to": "#end0416013"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b06",
+                "0416b06"
+              ]
+            ],
+            "text_with_inline_content": "夏七日夏七月當七月",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0416013\" to=\"#end0416013\"><ns0:lem wit=\"#wit.orig\">夏七日</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit1\">夏七月</ns0:rdg><ns0:rdg resp=\"#resp2\" wit=\"#wit2 #wit3\">當七月</ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg0416014",
+              "to": "#end0416014"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b11",
+                "0416b11"
+              ]
+            ],
+            "text_with_inline_content": "又有",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0416014\" to=\"#end0416014\"><ns0:lem wit=\"#wit.orig\">又</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit1 #wit2 #wit3\">有</ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg0416015",
+              "to": "#end0416015"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b12",
+                "0416b12"
+              ]
+            ],
+            "text_with_inline_content": "出坐",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0416015\" to=\"#end0416015\"><ns0:lem wit=\"#wit.orig\">出</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2\">坐</ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg0416016",
+              "to": "#end0416016"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b13",
+                "0416b13"
+              ]
+            ],
+            "text_with_inline_content": "六尺六丈",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0416016\" to=\"#end0416016\"><ns0:lem wit=\"#wit.orig\">六尺</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit3\">六丈</ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg0416017",
+              "to": "#end0416017"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b28",
+                "0416b28"
+              ]
+            ],
+            "text_with_inline_content": "眴瞬",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0416017\" to=\"#end0416017\"><ns0:lem wit=\"#wit.orig\">眴</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit1 #wit2 #wit3\">瞬</ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "app",
+            "attributes": {
+              "from": "#beg_14",
+              "to": "#end_14",
+              "corresp": "#0416017"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416c02",
+                "0416c02"
+              ]
+            ],
+            "text_with_inline_content": "眴瞬",
+            "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg_14\" to=\"#end_14\" corresp=\"#0416017\"><ns0:lem wit=\"#wit.orig\">眴</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit1 #wit2 #wit3\">瞬</ns0:rdg></ns0:app>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0416012",
+              "resp": "#resp1",
+              "type": "mod",
+              "target": "#nkr_note_mod_0416012"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b06",
+                "0416b06"
+              ]
+            ],
+            "text_with_inline_content": "耳【大】，〔－〕【宋】【元】【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0416012\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0416012\">耳【大】，〔－〕【宋】【元】【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0416013",
+              "resp": "#resp1",
+              "type": "mod",
+              "target": "#nkr_note_mod_0416013"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b06",
+                "0416b06"
+              ]
+            ],
+            "text_with_inline_content": "夏七日【大】，夏七月【宋】，當七月【元】【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0416013\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0416013\">夏七日【大】，夏七月【宋】，當七月【元】【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0416014",
+              "resp": "#resp1",
+              "type": "mod",
+              "target": "#nkr_note_mod_0416014"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b11",
+                "0416b11"
+              ]
+            ],
+            "text_with_inline_content": "又【大】，有【宋】【元】【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0416014\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0416014\">又【大】，有【宋】【元】【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0416015",
+              "resp": "#resp1",
+              "type": "mod",
+              "target": "#nkr_note_mod_0416015"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b12",
+                "0416b12"
+              ]
+            ],
+            "text_with_inline_content": "出【大】，坐【元】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0416015\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0416015\">出【大】，坐【元】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0416016",
+              "resp": "#resp1",
+              "type": "mod",
+              "target": "#nkr_note_mod_0416016"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b13",
+                "0416b13"
+              ]
+            ],
+            "text_with_inline_content": "六尺【大】，六丈【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0416016\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0416016\">六尺【大】，六丈【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0416017",
+              "resp": "#resp1",
+              "type": "mod",
+              "target": "#nkr_note_mod_0416017"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b28",
+                "0416b28"
+              ]
+            ],
+            "text_with_inline_content": "眴【大】＊，瞬【宋】＊【元】＊【明】＊",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0416017\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0416017\">眴【大】＊，瞬【宋】＊【元】＊【明】＊</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0416012",
+              "resp": "#resp2",
+              "type": "orig",
+              "place": "foot text",
+              "target": "#nkr_note_orig_0416012"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b06",
+                "0416b06"
+              ]
+            ],
+            "text_with_inline_content": "〔耳〕－【三】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0416012\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0416012\">〔耳〕－【三】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0416013",
+              "resp": "#resp2",
+              "type": "orig",
+              "place": "foot text",
+              "target": "#nkr_note_orig_0416013"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b06",
+                "0416b06"
+              ]
+            ],
+            "text_with_inline_content": "夏七日＝夏七月【宋】，當七月【元】【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0416013\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0416013\">夏七日＝夏七月【宋】，當七月【元】【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0416014",
+              "resp": "#resp2",
+              "type": "orig",
+              "place": "foot text",
+              "target": "#nkr_note_orig_0416014"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b11",
+                "0416b11"
+              ]
+            ],
+            "text_with_inline_content": "又＝有【三】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0416014\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0416014\">又＝有【三】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0416015",
+              "resp": "#resp2",
+              "type": "orig",
+              "place": "foot text",
+              "target": "#nkr_note_orig_0416015"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b12",
+                "0416b12"
+              ]
+            ],
+            "text_with_inline_content": "出＝坐【元】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0416015\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0416015\">出＝坐【元】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0416016",
+              "resp": "#resp2",
+              "type": "orig",
+              "place": "foot text",
+              "target": "#nkr_note_orig_0416016"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b13",
+                "0416b13"
+              ]
+            ],
+            "text_with_inline_content": "六尺＝六丈【明】",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0416016\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0416016\">六尺＝六丈【明】</ns0:note>\n"
+          },
+          {
+            "kind": "note",
+            "attributes": {
+              "n": "0416017",
+              "resp": "#resp2",
+              "type": "orig",
+              "place": "foot text",
+              "target": "#nkr_note_orig_0416017"
+            },
+            "body_pointer_line_spans": [
+              [
+                "0416b28",
+                "0416b28"
+              ]
+            ],
+            "text_with_inline_content": "眴＝瞬【三】＊",
+            "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0416017\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0416017\">眴＝瞬【三】＊</ns0:note>\n"
+          }
+        ],
+        "embedded_unlinked_record_nodes_inside_selected_parents": [],
+        "unresolved_pointers_in_whole_back_matter": [],
+        "apparatus_scope": "All note/app direct body-pointer spans intersecting the three selected windows; nested unlinked records separate. Whole captures retained. Not all notes from whole source or complete witness collation.",
+        "new_independent_observations": 0
+      }
+    ],
+    "unit_systems": [
+      {
+        "id": "T1300_thread_chain",
+        "source_id": "T1300",
+        "window": "thread_and_waterclock",
+        "base_literal": "婦人紡綖得長一尋",
+        "base_unit": "剎那",
+        "steps": [
+          {
+            "count": 60,
+            "unit": "剎那",
+            "per": "羅婆"
+          },
+          {
+            "count": 30,
+            "unit": "羅婆",
+            "per": "時"
+          },
+          {
+            "count": 30,
+            "unit": "時",
+            "per": "日夜"
+          }
+        ]
+      },
+      {
+        "id": "T1300_water_chain",
+        "source_id": "T1300",
+        "window": "thread_and_waterclock",
+        "base_literal": "如人瞬頃",
+        "base_unit": "羅婆",
+        "steps": [
+          {
+            "count": 4,
+            "unit": "羅婆",
+            "per": "迦啅"
+          },
+          {
+            "count": 40,
+            "unit": "迦啅",
+            "per": "迦羅"
+          },
+          {
+            "count": 30,
+            "unit": "迦羅",
+            "per": "刻"
+          },
+          {
+            "count": 2,
+            "unit": "刻",
+            "per": "分"
+          }
+        ]
+      },
+      {
+        "id": "T1301_thread_chain",
+        "source_id": "T1301",
+        "window": "seasons_and_two_chains",
+        "base_literal": "譬如有人切三尺縷",
+        "base_unit": "節",
+        "steps": [
+          {
+            "count": 60,
+            "unit": "節",
+            "per": "限"
+          },
+          {
+            "count": 12,
+            "unit": "限",
+            "per": "須臾"
+          },
+          {
+            "count": 30,
+            "unit": "須臾",
+            "per": "晝夜"
+          }
+        ]
+      },
+      {
+        "id": "T1301_blink_chain",
+        "source_id": "T1301",
+        "window": "seasons_and_two_chains",
+        "base_literal": "十五眴",
+        "base_unit": "眴",
+        "steps": [
+          {
+            "count": 15,
+            "unit": "眴",
+            "per": "卒"
+          },
+          {
+            "count": 20,
+            "unit": "卒",
+            "per": "時"
+          },
+          {
+            "count": 30,
+            "unit": "時",
+            "per": "須臾"
+          },
+          {
+            "count": 30,
+            "unit": "須臾",
+            "per": "晝夜"
+          },
+          {
+            "count": 30,
+            "unit": "日",
+            "per": "月"
+          },
+          {
+            "count": 12,
+            "unit": "月",
+            "per": "年"
+          }
+        ],
+        "day_and_daynight_identification": "Conditional product follows the successive thirty-day/twelve-month statements; no real elapsed year asserted."
+      }
+    ],
+    "year_total_literal": {
+      "source_id": "T1301",
+      "locator": "T1301_0416c02-0416c03",
+      "literal": "合集一年宿夜明眴，一億百六十萬五十。",
+      "ancient_numeral_scale_normalized": false,
+      "emended_to_calculated_product": false
+    },
+    "leap_formulations": {
+      "source_id": "T1300",
+      "locator": "T1300_0410a10-0410a12",
+      "literal": "於十九年凡有七閏。五年再閏，其日",
+      "strict_cycle_interpretation_is_extra_assumption": true,
+      "calendar_override_applied": false
+    },
+    "scope": {
+      "modern_seconds_per_unit": null,
+      "same_named_units_equated": false,
+      "textual_base_activities_equated": false,
+      "physical_dawn_or_T1299_boundary_established": false,
+      "hinoo_half_mapping_established": false,
+      "leap_short_month_priority_established": false,
+      "annual_total_literal_adjudicated": false,
+      "new_independent_ancient_witness_or_instrument_observations": 0,
+      "modern_paper_opinions_adopted": false,
+      "full_witness_collation_certified": false
+    }
+  },
+  "edition_identity": {
+    "sources": [
+      {
+        "source_id": "T1300",
+        "source_sha256": "9e1dff6005a0b5753f2462d2e3dbba7c5f75ddca1a54b654f79bf6ff84ca0bbd",
+        "list_wit_xml": "<ns0:listWit xmlns:ns0=\"http://www.tei-c.org/ns/1.0\">\n            <ns0:witness xml:id=\"wit.cbeta\">【CB】</ns0:witness>\n            <ns0:witness xml:id=\"wit.orig\">【大】</ns0:witness>\n            <ns0:witness xml:id=\"wit1\">【明】</ns0:witness>\n            <ns0:witness xml:id=\"wit2\">【宋】</ns0:witness>\n            <ns0:witness xml:id=\"wit3\">【元】</ns0:witness>\n            <ns0:witness xml:id=\"wit4\">【麗-CB】</ns0:witness>\n          </ns0:listWit>\n        ",
+        "source_specific_witness_map": {
+          "wit.cbeta": "【CB】",
+          "wit.orig": "【大】",
+          "wit1": "【明】",
+          "wit2": "【宋】",
+          "wit3": "【元】",
+          "wit4": "【麗-CB】"
+        },
+        "reused_note_links": [],
+        "selected_gaiji_with_actual_text": []
+      },
+      {
+        "source_id": "T1301",
+        "source_sha256": "263e31a4314913bb68f7364ca1cb64a07f802934e1304d84021400671546ad72",
+        "list_wit_xml": "<ns0:listWit xmlns:ns0=\"http://www.tei-c.org/ns/1.0\">\n            <ns0:witness xml:id=\"wit.cbeta\">【CB】</ns0:witness>\n            <ns0:witness xml:id=\"wit.orig\">【大】</ns0:witness>\n            <ns0:witness xml:id=\"wit1\">【宋】</ns0:witness>\n            <ns0:witness xml:id=\"wit2\">【元】</ns0:witness>\n            <ns0:witness xml:id=\"wit3\">【明】</ns0:witness>\n            <ns0:witness xml:id=\"wit4\">【麗-CB】</ns0:witness>\n          </ns0:listWit>\n        ",
+        "source_specific_witness_map": {
+          "wit.cbeta": "【CB】",
+          "wit.orig": "【大】",
+          "wit1": "【宋】",
+          "wit2": "【元】",
+          "wit3": "【明】",
+          "wit4": "【麗-CB】"
+        },
+        "reused_note_links": [
+          {
+            "reported_corresp": "#0416017",
+            "record_xml": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg_14\" to=\"#end_14\" corresp=\"#0416017\"><ns0:lem wit=\"#wit.orig\">眴</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit1 #wit2 #wit3\">瞬</ns0:rdg></ns0:app>\n",
+            "matching_actual_n_or_xml_id_records": [
+              {
+                "kind": "note",
+                "attributes": {
+                  "n": "0416017",
+                  "resp": "#resp1",
+                  "type": "mod",
+                  "target": "#nkr_note_mod_0416017"
+                },
+                "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0416017\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0416017\">眴【大】＊，瞬【宋】＊【元】＊【明】＊</ns0:note>\n"
+              },
+              {
+                "kind": "note",
+                "attributes": {
+                  "n": "0416017",
+                  "resp": "#resp2",
+                  "type": "orig",
+                  "place": "foot text",
+                  "target": "#nkr_note_orig_0416017"
+                },
+                "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0416017\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0416017\">眴＝瞬【三】＊</ns0:note>\n"
+              }
+            ],
+            "multiple_editorial_layers_are_not_independent_witnesses": true
+          }
+        ],
+        "selected_gaiji_with_actual_text": []
+      }
+    ],
+    "scope": "Each file owns its witness-ID namespace. Actual reported witness labels, original/mod/editorial layers and reused note links preserved; no physical witness identity or independence authenticated."
+  }
+}

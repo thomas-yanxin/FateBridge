@@ -157,8 +157,9 @@ def test_translation_of_light_fires():
     ]
 
 
-def test_translation_requires_the_endpoints_to_be_in_aversion():
-    # If Saturn and Jupiter DO aspect each other, no light needs carrying.
+def test_lilly_p111_translation_definition_allows_aspected_endpoints():
+    # Lilly's p.111 definition/example does not require aversion. The separate
+    # p.126 judgement conditions must not be substituted for the definition.
     planets = [
         {"id": "Moon", "sign": "Aries", "longitude": 11.0},
         {"id": "Saturn", "sign": "Aries", "longitude": 10.0},
@@ -171,7 +172,12 @@ def test_translation_requires_the_endpoints_to_be_in_aversion():
     ]
     speeds = {"Moon": 13.0, "Saturn": 0.03, "Jupiter": 0.08}
     result = build_classical_patterns(planets, aspects, "day", speeds=speeds)
-    assert result["translation_of_light"] == []
+    assert result["translation_of_light"] == [
+        {"translator": "Moon", "from": "Saturn", "to": "Jupiter"}
+    ]
+    assert (
+        result["light_configuration_policy"]["full_original_text_acceptance"] is False
+    )
 
 
 def test_collection_of_light_fires():
@@ -258,6 +264,6 @@ def test_snapshot_renders_light_and_nodal_configurations():
         }
     }
     text = _build_classical_patterns_lines(payload)
-    assert "光的传递：月亮 自 土星 递光至 木星" in text
-    assert "光的聚集：土星 聚 火星、金星 之光" in text
+    assert "光的传递（结构候选）：月亮 自 土星 递光至 木星" in text
+    assert "光的聚集（结构候选）：土星 聚 火星、金星 之光" in text
     assert "交点弯曲：火星北弯" in text

@@ -118,6 +118,36 @@ def register_discovery_resources(
             ensure_ascii=False,
         )
 
+    @app.resource(
+        "fatebridge://results/{result_id}/verified/{run_id}/{sha256}/{offset}",
+        mime_type="application/json",
+    )
+    def verified_result_page(
+        result_id: str, run_id: str, sha256: str, offset: int
+    ) -> str:
+        """Verify the entire original payload before reading one page."""
+        return json.dumps(
+            RESULT_STORE.verified_page(
+                result_id, sha256, run_id, offset, allowed_tools=allowed_receipts
+            ),
+            ensure_ascii=False,
+        )
+
+    @app.resource(
+        "fatebridge://results/{result_id}/verified/{run_id}/{sha256}/fields/{path}/{offset}",
+        mime_type="application/json",
+    )
+    def verified_result_field_page(
+        result_id: str, run_id: str, sha256: str, path: str, offset: int
+    ) -> str:
+        """Verify the full payload and select a field from those same bytes."""
+        return json.dumps(
+            RESULT_STORE.verified_page(
+                result_id, sha256, run_id, offset, path, allowed_tools=allowed_receipts
+            ),
+            ensure_ascii=False,
+        )
+
 
 def protocol_result(
     payload: Dict[str, Any], *, failed: bool, text: Optional[str] = None

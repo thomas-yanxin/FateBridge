@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from fatebridge.application.bindings import lazy_service, person_invoke
+from fatebridge.application.bindings import lazy_service, person_invoke, raw_invoke
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.requests.bazi import (
     BaziBirthRequest,
@@ -16,11 +16,15 @@ from fatebridge.core.requests.bazi import (
     BaziPersonalityRequest,
     BaziRelativesRequest,
     BaziRomanceRequest,
+    BaziSourceCompareRequest,
     BaziWealthRequest,
 )
-from fatebridge.core.requests.birth import FateBridgeRequest
+from fatebridge.core.requests.birth import BaziClockRequest
 
 calculate_bazi_birth = lazy_service("fatebridge.services.bazi", "calculate_bazi_birth")
+calculate_bazi_source_compare = lazy_service(
+    "fatebridge.services.source_comparison", "calculate_bazi_source_compare"
+)
 
 
 calculate_bazi_career = lazy_service(
@@ -106,7 +110,7 @@ SPECS: List[ToolSpec] = [
     ToolSpec(
         key="analyze_destiny",
         bind=person_invoke(calculate_destiny_analysis),
-        request_model=FateBridgeRequest,
+        request_model=BaziClockRequest,
         summary=(
             "八字综合命理分析：在命盘之上叠加喜用神判定与格局识别，"
             "输出最完整的命理画像；只需四柱/十神原始命盘用 bazi_birth。"
@@ -160,5 +164,17 @@ SPECS: List[ToolSpec] = [
     ),
     _bazi_dimension_spec(
         "romance", calculate_bazi_romance, BaziRomanceRequest, "八字正缘桃花分析"
+    ),
+    ToolSpec(
+        key="bazi_source_compare",
+        bind=raw_invoke(calculate_bazi_source_compare),
+        request_model=BaziSourceCompareRequest,
+        summary="按明确给出的字面四柱计算当前旺衰，并与全部已登记同柱原典编释核对。显示差异、未裁定及未收录；不改计算、不反推生日、不认证完整原典或现实预测。",
+        operation_label_zh="原典四柱核对",
+        family="bazi",
+        rest_path="/api/cn/bazi/source-compare",
+        mcp_name="bazi_source_compare",
+        cpu_bound=True,
+        include_snapshot_text=False,
     ),
 ]

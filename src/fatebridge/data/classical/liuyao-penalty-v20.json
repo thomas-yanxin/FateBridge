@@ -1,0 +1,68 @@
+{
+  "ruleset_id": "zengshan_si_yin_shen_growth_v20",
+  "ruleset_version": "2.0.0",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "method": "Same-edition PDF83,98 visually reread; PDF59 parent-only transformation scope inherited from its frozen scan. Web transcription used for navigation, never replaces this edition."
+  },
+  "clauses": [
+    {
+      "id": "si-yin-shen-growth-exclusion",
+      "pdf_pages": [
+        98
+      ],
+      "quote": "巳爻雖長生於寅倘日月動爻及變出之爻又逢申字者謂之三刑論刑不論生也"
+    },
+    {
+      "id": "penalty-not-automatic-outcome",
+      "pdf_pages": [
+        83
+      ],
+      "quote": "夫三刑者予屢試之或因用神休囚又兼他爻之尅內有兼犯三刑者則見凶災而獨犯三刑得驗者少"
+    },
+    {
+      "id": "changed-parent-scope",
+      "pdf_pages": [
+        59
+      ],
+      "quote": "變爻之巳火能回頭尅本位之酉金並不能生尅他爻"
+    }
+  ],
+  "interpretation": {
+    "presence": "For Si only, Yin and Shen are supplied by day/month, qualified actual motion or an actual own transformation. Explicit motion is a structural presence, not a claim of usable harmful action. Unresolved dark activity leaves presence unknown; static labels and other-parent transformations are not borrowed.",
+    "growth": "At Yin day, a matched scoped triad excludes both the same Yin day growth and its ordinary wood-generation credit. A pending triad leaves that credit pending. Other independent support, raw element relation and original stage position remain.",
+    "effect": "Triad presence does not prove injury, weakness, total loss of generation, a clinical event or any real-world outcome. Keep an explicitly unresolved opposition and keep unsupported-controlled-source false from being inferred solely from it.",
+    "scope": "Only Si-Yin-Shen and the stated original growth exclusion; no complete punishment table or novel count, strength vote, global precedence or outcome rule."
+  },
+  "scope": "同版巳寅申三支位置与寅日不论生条件；刑害总作用及现实结果未裁定。；第98页特定寅生巳排除先于第10章一般回头生许可，逐来源限定日月、本位变支与原动爻；原始关系、月令位置与空破门槛保留，刑的总作用仍未裁定。",
+  "quotation_errata": {
+    "profile_sha256": "d4ccd18a0eb72bd8d39e210d9fb1d57d80f9c71dbb64825b20cd93fc2bbd4754",
+    "clause_id": "changed-parent-scope",
+    "old_quote": "變爻能生尅沖合本位之動爻不能生尅他爻",
+    "new_quote": "變爻之巳火能回頭尅本位之酉金並不能生尅他爻",
+    "reason": "Initial text was an accurate scope paraphrase incorrectly labelled as a verbatim quotation. PDF59 was rerendered and visually inspected before integration; use its actual concrete Si/You wording. Frozen source and case expectations unchanged.",
+    "pdf_page": 59,
+    "source_sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa"
+  },
+  "precedence": {
+    "id": "liuyao_si_yin_shen_precedence_v21",
+    "version": "1.0.0",
+    "source_sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "reviewed_pdf_pages": [
+      53,
+      59,
+      83,
+      98
+    ],
+    "primary_clause": "巳爻雖長生於寅倘日月動爻及變出之爻又逢申字者謂之三刑論刑不論生也",
+    "classification": "Same-edition bounded cross-clause adjudication; the following scope is an interpretation, not a verbatim quotation. Synthetic structural regression cases, not independent events or outcome validation.",
+    "adjudication": "For a Si subject, scoped triad presence excludes the Yin actor from confirmed generation credits, before generic chapter10 own-back-generation permission. Applies to month/day Yin, actual own-changed Yin and eligible original Yin. True triad -> Yin credit False; pending triad -> Yin credit None. Preserve raw five-element relation, raw month strength, and generic empty/break gate; combine qualified gates using Kleene AND. Retain other independent support, target admission and unknown aggregate penalty effect. Foreign transformed labels never participate.",
+    "not_adjudicated": [
+      "Total penalty effect or real-world harm",
+      "All other triads or fire branches",
+      "Whole-book priority order"
+    ]
+  }
+}

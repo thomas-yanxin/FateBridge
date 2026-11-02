@@ -1,0 +1,80 @@
+{
+  "corpus_id": "canping_schedule_clauses_v1",
+  "version": "1.0.0",
+  "review_status": "single_primary_image_reading; no_independent_second_review",
+  "scope": "Six selected excerpts, not complete entries or complete books. Distinct books/editions retain distinct roles; a supplementary Zi Ping witness cannot fill an uncollated target-edition assertion.",
+  "sources": {
+    "heluo_najda": {
+      "title": "河洛理數 史應選校訂 卷七附八字法",
+      "url": "https://www.digital.archives.go.jp/DAS/contents/pdf/lossy/03050271000050/0001.pdf",
+      "pdf_sha256": "199c7c1100a86857bc6973da4f0cfb27be473fdd5ede7b0241fc8cdb101877ea",
+      "edition": "国立公文书馆305-0271，目录标明刊清印；确切印年未定"
+    },
+    "sanming_nlc": {
+      "title": "三命通會 卷二 論大運",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/2/23/NLC416-13jh000156-94145_%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83.pdf",
+      "pdf_sha256": "c6eac6fca6411e45cb801f9b771aca6dd6a6d2dfb57ecc36ea5f42ecf1ac8bf9",
+      "edition": "NLC416-13jh000156-94145；Commons转录目录标秦慎安校勘、文明書局1926；刊记未独立核验"
+    }
+  },
+  "clauses": [
+    {
+      "id": "appendix_attribution",
+      "source_id": "heluo_najda",
+      "pdf_page": 105,
+      "printed_page": null,
+      "locator": "左半页卷七序，非希夷著述句",
+      "text": "雖非希夷著述",
+      "kind": "attribution"
+    },
+    {
+      "id": "appendix_month_order",
+      "source_id": "heluo_najda",
+      "pdf_page": 106,
+      "printed_page": null,
+      "locator": "右半页起大運訣，首三行",
+      "text": "行運專在月下論甲丙戊庚壬人屬陽乙丁己辛癸生人屬陰其法陽男陰女順數月下未來謂之順運陰男陽女逆數月下已往謂之逆運",
+      "kind": "month_direction"
+    },
+    {
+      "id": "appendix_integer_rounding",
+      "source_id": "heluo_najda",
+      "pdf_page": 106,
+      "printed_page": null,
+      "locator": "右半页起大運訣，三日折歲与借除句",
+      "text": "但以三日為一歲多一日除一日少一日借一日也",
+      "kind": "integer_rounding"
+    },
+    {
+      "id": "heluo_period_distinction",
+      "source_id": "heluo_najda",
+      "pdf_page": 106,
+      "printed_page": null,
+      "locator": "左半页起大運訣结语前两行",
+      "text": "河洛數內只以陽爻九年陰爻六年為大運不用子平之運",
+      "kind": "method_distinction"
+    },
+    {
+      "id": "sanming_ten_year_step",
+      "source_id": "sanming_nlc",
+      "pdf_page": 114,
+      "printed_page": "卷二三六",
+      "locator": "論大運第三行，古人以大運句",
+      "text": "古人以大運則一辰十歲",
+      "kind": "supplementary_step"
+    },
+    {
+      "id": "sanming_decade_anniversary",
+      "source_id": "sanming_nlc",
+      "pdf_page": 115,
+      "printed_page": "卷二三七",
+      "locator": "論大運第四至五行之间，從此算後句",
+      "text": "從此算後十週年方換一運",
+      "kind": "supplementary_anniversary"
+    }
+  ],
+  "target_excerpt_ten_year_step_explicitly_collated": false,
+  "supplementary_step_witness_applied_as_target_edition_proof": false,
+  "whole_books_collated": false,
+  "real_world_efficacy_validated": false
+}

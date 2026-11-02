@@ -1,0 +1,56 @@
+{
+  "method_id": "jinkou_break_pair_textual_witnesses_v1",
+  "reader_count": 1,
+  "blinded": false,
+  "independent_expert_review": false,
+  "independent_transmission_established": false,
+  "witnesses": [
+    {
+      "id": "waseda_ro14_02466_05",
+      "title": "湖社叢話第五冊·金口訣·月破休囚",
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/WUL-ro14_02466_%E6%B9%96%E7%A4%BE%E5%8F%A2%E8%A9%B1_05.pdf",
+      "source_sha256": "112858e63ed94845ee0539d7e2d5d5f9e128ce6c54a0626db7008b48cc64a3bd",
+      "source_bytes": 51978477,
+      "source_pdf_pages": 73,
+      "reviewed_pdf_pages": [
+        47,
+        48,
+        49
+      ],
+      "phrase_pdf_page": 48,
+      "literal_break_sequence": "申破巳戌破未亥破寅破巳丑破辰午破卯酉破子",
+      "extra_phrase_present": true,
+      "reading_status": "literal_phrase_readable",
+      "enumerated_pair_count": null,
+      "note": "原行只写一个寅，保留亥破寅破巳的连写，不增写第二个寅；巳／已形按地支语境转写为巳。只旁证寅破巳字句，未裁定列表分句、作者原意、传本独立性或效力。"
+    },
+    {
+      "id": "cnts_00047977020",
+      "title": "金口訣·月破休囚（抄本镜像）",
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/CNTS-00047977020_%E9%87%91%E5%8F%A3%E8%A8%A3.pdf",
+      "source_sha256": "b04a7aa8ec1f745c3c764331ec633615c6ddbd74829f2ed453d1863a13062f8a",
+      "source_bytes": 25370640,
+      "source_pdf_pages": 102,
+      "reviewed_pdf_pages": [
+        20,
+        21,
+        22
+      ],
+      "phrase_pdf_page": 21,
+      "literal_break_sequence": null,
+      "extra_phrase_present": null,
+      "reading_status": "unresolved_dense_handwriting",
+      "enumerated_pair_count": null,
+      "note": "对应月破段字迹密集，本轮未可靠转录完整序列；未知不算未见寅破巳，不用京本或早稻田字句补填。"
+    }
+  ],
+  "extra_phrase_corroborated": true,
+  "readable_corroboration_count": 1,
+  "unresolved_witness_count": 1,
+  "author_intent": null,
+  "effective_break": null,
+  "effect_direction": null,
+  "whole_book_conformance": false,
+  "new_independent_real_events": 0,
+  "scope": "仅旁证寅破巳字句，不据传本数量多数决删改京本七组或网上六组；早稻田连写不补第二个寅，另一抄本未读清不改成否定。不能据此裁定作者原意、版本先后、独立传承、相互作用、有效破局或综合取用。"
+}

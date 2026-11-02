@@ -5,17 +5,145 @@ astrology_horary. Dictionary keys (planet, lot and diagnostic identifiers) stay
 open; their values have contracts. Labels and method names remain extensible.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
+
+from pydantic import Field
 
 from fatebridge.core.output_base import PartialOutput
+from fatebridge.core.output_charts import (
+    ApparentPositionPolicy,
+    BirthClockConversion,
+    EarthRotationPolicy,
+    EphemerisReferencePoints,
+    FixedStarProfile,
+    HouseAxisConvention,
+    HousePositionProjection,
+    LongitudeMotionPolicy,
+    PlanetaryHours,
+)
+from fatebridge.core.output_clock_labels import (
+    WesternUTCRepresentation as WesternUTCRepresentation,
+)
+from fatebridge.core.output_midpoints import PhysicalEphemerisSource
+from fatebridge.core.output_ut1 import C04UT1Evidence
+
+
+class CivilDateParts(PartialOutput):
+    year: Optional[int] = None
+    month: Optional[int] = None
+    day: Optional[int] = None
+
+
+class CivilClockParts(PartialOutput):
+    hour: Optional[int] = None
+    minute: Optional[int] = None
+
+
+class WesternCivilCalendarConversion(PartialOutput):
+    method_id: Optional[str] = None
+    input_calendar: Optional[str] = None
+    input_date: Optional[CivilDateParts] = None
+    input_clock: Optional[CivilClockParts] = None
+    normalized_calendar: Optional[str] = None
+    normalized_local_datetime: Optional[str] = None
+    normalized_date_representable: Optional[bool] = None
+    normalized_local_datetime_scope: Optional[str] = None
+    date_label_jdn: Optional[int] = None
+    date_label_jdn_scope: Optional[str] = None
+    same_label_gregorian_date_valid: Optional[bool] = None
+    same_label_gregorian_offset_days: Optional[int] = None
+    calendar_conversion_performed: Optional[bool] = None
+    clock_preserved: Optional[bool] = None
+    automatic_regional_reform_applied: Optional[bool] = None
+    year_numbering: Optional[str] = None
+    calendar_selection_source: Optional[str] = None
+    timezone_order: Optional[str] = None
+    historical_clock_reconstruction_performed: Optional[bool] = None
+    scope: Optional[str] = None
+
+
+class WesternHourOriginConversion(PartialOutput):
+    method_id: Optional[str] = None
+    input_hour_origin: Optional[str] = None
+    input_calendar: Optional[str] = None
+    input_date: Optional[CivilDateParts] = None
+    input_clock: Optional[CivilClockParts] = None
+    source_date_label_jdn: Optional[int] = None
+    source_date_gregorian_representable: Optional[bool] = None
+    calendar_normalized_label: Optional[str] = None
+    normalized_wall_calendar: Optional[str] = None
+    normalized_wall_datetime: Optional[str] = None
+    normalized_date_label_jdn: Optional[int] = None
+    day_carry: Optional[int] = None
+    nominal_label_shift_minutes: Optional[int] = None
+    normalization_performed: Optional[bool] = None
+    physical_duration_applied: Optional[bool] = None
+    timezone_applied: Optional[bool] = None
+    source_clock_identification_performed: Optional[bool] = None
+    selection_source: Optional[str] = None
+    rule_source: Optional[str] = None
+    rule_source_url: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    scope: Optional[str] = None
+
+
+class EventSolarObservation(PartialOutput):
+    phase: Optional[str] = None
+    julian_day_ut1: Optional[float] = None
+    julian_day_tt: Optional[float] = None
+    source_index: Optional[int] = None
+
+
+class EventSolarSources(PartialOutput):
+    status: Optional[str] = None
+    physical_ephemeris_sources: Optional[List[PhysicalEphemerisSource]] = None
+    has_unidentified_sources: Optional[bool] = None
+    observations: Optional[List[EventSolarObservation]] = None
+    scope: Optional[str] = None
+
+
+class EventSolarConversion(BirthClockConversion):
+    solar_source_comparison: Optional[EventSolarSources] = None
+
+
+class EventClockChartComparison(PartialOutput):
+    status: Optional[str] = None
+    chart_sun_source: Optional[PhysicalEphemerisSource] = None
+    has_unidentified_sources: Optional[bool] = None
+    scope: Optional[str] = None
+
+
+class WesternEventClockConversion(PartialOutput):
+    ut1_reference: Optional[C04UT1Evidence] = None
+    method_id: Optional[str] = None
+    input_hour_origin: Optional[str] = None
+    hour_origin_conversion: Optional[WesternHourOriginConversion] = None
+    input_clock_basis: Optional[str] = None
+    input_wall_datetime: Optional[str] = None
+    input_granularity: Optional[str] = None
+    input_timezone: Optional[str] = None
+    effective_civil_timezone: Optional[str] = None
+    timezone_selection_source: Optional[str] = None
+    chart_timezone: Optional[str] = None
+    converted_utc: Optional[str] = None
+    utc_representation: Optional[WesternUTCRepresentation] = None
+    julian_day_tt: Optional[float] = None
+    julian_day_ut1: Optional[float] = None
+    time_scale_method: Optional[str] = None
+    modeled_solar_conversion_performed: Optional[bool] = None
+    source_clock_identification_performed: Optional[bool] = None
+    input_clock_accuracy_certified: Optional[bool] = None
+    solar_conversion: Optional[EventSolarConversion] = None
+    clock_chart_source_comparison: Optional[EventClockChartComparison] = None
+    scope: Optional[str] = None
 
 
 class WesternPoint(PartialOutput):
     point: Optional[str] = None
     point_label: Optional[str] = None
-    absolute_degree: Optional[float] = None
-    degree: Optional[float] = None
-    longitude: Optional[float] = None
+    absolute_degree: Optional[float] = Field(default=None, ge=0, lt=360)
+    degree: Optional[float] = Field(default=None, ge=0, lt=30)
+    longitude: Optional[float] = Field(default=None, ge=0, lt=360)
     sign: Optional[str] = None
     sign_label: Optional[str] = None
     house: Optional[int] = None
@@ -35,7 +163,40 @@ class Sect(PartialOutput):
     label: Optional[str] = None
 
 
+class WesternCalculationBasis(PartialOutput):
+    angle_definition: Optional[Dict[str, Any]] = None
+    utc_representation: Optional[WesternUTCRepresentation] = None
+    apparent_position_policy: Optional[ApparentPositionPolicy] = None
+    ephemeris_reference_points: Optional[EphemerisReferencePoints] = None
+    longitude_motion: Optional[LongitudeMotionPolicy] = None
+    physical_ephemeris_source: Optional[PhysicalEphemerisSource] = None
+    house_axis_convention: Optional[HouseAxisConvention] = None
+    earth_rotation: Optional[EarthRotationPolicy] = None
+    house_position_projection: Optional[HousePositionProjection] = None
+    engine_backend: Optional[str] = None
+    engine_precision: Optional[str] = None
+    ephemeris_model: Optional[str] = None
+    calendar: Optional[str] = None
+    time_scale: Optional[str] = None
+    julian_day_tt: Optional[float] = None
+    julian_day_ut1: Optional[float] = None
+    future_leap_seconds_assumed_unchanged: Optional[bool] = None
+    horizon_method: Optional[str] = None
+    ayanamsha_model: Optional[str] = None
+    ayanamsha_degrees: Optional[float] = None
+
+
+class ReturnSolver(PartialOutput):
+    method_id: Optional[str] = None
+    julian_day_tt: Optional[float] = None
+    target_longitude: Optional[float] = None
+    solved_longitude: Optional[float] = None
+    residual_arcseconds: Optional[float] = None
+    event_not_after_analysis: Optional[bool] = None
+
+
 class NatalReference(PartialOutput):
+    calculation_basis: Optional[WesternCalculationBasis] = None
     ascendant: Optional[WesternPoint] = None
     medium_coeli: Optional[WesternPoint] = None
     sun: Optional[WesternPoint] = None
@@ -226,6 +387,9 @@ class HouseEmphasis(PartialOutput):
 
 
 class TimingChart(PartialOutput):
+    calculation_basis: Optional[WesternCalculationBasis] = None
+    solver: Optional[ReturnSolver] = None
+    return_datetime_utc: Optional[str] = None
     analysis_datetime: Optional[str] = None
     return_datetime: Optional[str] = None
     progressed_datetime: Optional[str] = None
@@ -638,6 +802,7 @@ class ExtraReturns(SystemOutput):
 
 
 class Mundane(SystemOutput):
+    calculation_basis: Optional[WesternCalculationBasis] = None
     ingress_term: Optional[str] = None
     ingress_datetime_local: Optional[str] = None
     ingress_datetime_utc: Optional[str] = None
@@ -646,12 +811,124 @@ class Mundane(SystemOutput):
     points: Optional[Dict[str, WesternPoint]] = None
 
 
+class LillyDignity(PartialOutput):
+    rule_id: Optional[str] = None
+    status: Optional[str] = None
+    planet: Optional[str] = None
+    longitude: Optional[float] = None
+    sign: Optional[str] = None
+    degree_in_sign: Optional[float] = None
+    chart_sect: Optional[str] = None
+    dignities: Optional[List[str]] = None
+    unknown_dignities: Optional[List[str]] = None
+    debilities: Optional[List[str]] = None
+    peregrine: Optional[bool] = None
+    lords: Optional[Dict[str, Optional[str]]] = None
+    bound_start_degree: Optional[int] = None
+    bound_end_degree: Optional[int] = None
+    exaltation_degree_in_sign: Optional[int] = None
+    source_pages: Optional[List[int]] = None
+    boundary_policy: Optional[str] = None
+
+
+class LillyReception(PartialOutput):
+    rule_id: Optional[str] = None
+    receiver: Optional[str] = None
+    guest: Optional[str] = None
+    guest_longitude: Optional[float] = None
+    guest_sign: Optional[str] = None
+    chart_sect: Optional[str] = None
+    allowed_dignities: Optional[List[str]] = None
+    dignities: Optional[List[str]] = None
+    unknown_dignities: Optional[List[str]] = None
+    receives: Optional[bool] = None
+    source_pages: Optional[List[int]] = None
+
+
+class LillyPairReception(PartialOutput):
+    rule_id: Optional[str] = None
+    status: Optional[str] = None
+    directions: Optional[List[LillyReception]] = None
+    mutual: Optional[bool] = None
+    mutual_same_kind: Optional[List[str]] = None
+
+
+class LillyCondition(PartialOutput):
+    code: Optional[str] = None
+    passed: Optional[bool] = None
+    status: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    detail: Optional[str] = None
+
+
+class LillyHouseCondition(PartialOutput):
+    occupied_house: Optional[int] = None
+    house_class: Optional[str] = None
+    p48_strength_rank: Optional[int] = None
+    p48_rank_condition: Optional[str] = None
+    p115_house_points: Optional[int] = None
+    points_scope: Optional[str] = None
+    assignment_policy: Optional[str] = None
+    house_system: Optional[str] = None
+    zodiac_type: Optional[str] = None
+    source_method_scope: Optional[str] = None
+    source_url: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    full_original_text_acceptance: Optional[bool] = None
+
+
+class LillyHouseAssignment(PartialOutput):
+    rule_id: Optional[str] = None
+    source_url: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    status: Optional[str] = None
+    unavailable_reason: Optional[str] = None
+    geometric_house: Optional[int] = None
+    assigned_house: Optional[int] = None
+    changed_from_geometric_house: Optional[bool] = None
+    five_degree_limit: Optional[int] = None
+    boundary_policy: Optional[str] = None
+    assignment_policy: Optional[str] = None
+    house_system: Optional[str] = None
+    zodiac_type: Optional[str] = None
+    source_method_scope: Optional[str] = None
+    source_exception: Optional[str] = None
+    full_original_text_acceptance: Optional[bool] = None
+    longitude: Optional[float] = None
+    lower_cusp: Optional[float] = None
+    next_cusp: Optional[float] = None
+    previous_cusp_gap_degrees: Optional[float] = None
+    next_cusp_gap_degrees: Optional[float] = None
+    previous_cusp_gap_exact_degrees: Optional[str] = None
+    next_cusp_gap_exact_degrees: Optional[str] = None
+    assigned_p115_house_points: Optional[int] = None
+    assigned_p145_house_points: Optional[int] = None
+    conditional_reading_zh: Optional[str] = None
+
+
 class HoraryPlanet(WesternPoint):
+    house_assignment: Optional[LillyHouseAssignment] = None
+    occupied_house: Optional[int] = None
+    house_condition: Optional[LillyHouseCondition] = None
     speed: Optional[float] = None
     dignities: Optional[List[str]] = None
+    essential_condition: Optional[LillyDignity] = None
 
 
 class HoraryAspect(PartialOutput):
+    orb_profile: Optional[str] = None
+    orb_limit: Optional[float] = None
+    separation: Optional[float] = None
+    ray_degrees: Optional[int] = None
+    after_days: Optional[float] = None
+    julian_day_tt: Optional[float] = None
+    root_bracket_tt: Optional[List[float]] = None
+    moon_longitude: Optional[float] = None
+    other_longitude: Optional[float] = None
+    moon_latitude: Optional[float] = None
+    other_latitude: Optional[float] = None
+    datetime_utc: Optional[str] = None
+    inside_current_orb: Optional[bool] = None
     angle: Optional[float] = None
     aspect: Optional[str] = None
     aspect_label: Optional[str] = None
@@ -662,7 +939,35 @@ class HoraryAspect(PartialOutput):
     phase: Optional[str] = None
 
 
+class HoraryMotionBasis(PartialOutput):
+    future_speed_policy: Optional[Dict[str, Any]] = None
+    ephemeris_reference_points: Optional[EphemerisReferencePoints] = None
+    longitude_motion: Optional[LongitudeMotionPolicy] = None
+    status: Optional[str] = None
+    method_id: Optional[str] = None
+    constant_velocity_projection: Optional[bool] = None
+    degrees_left_in_sign: Optional[float] = None
+    sign_exit_after_days: Optional[float] = None
+    sign_exit_julian_day_tt: Optional[float] = None
+    sign_exit_root_bracket_tt: Optional[List[float]] = None
+    start_julian_day_tt: Optional[float] = None
+    contacts: Optional[List[HoraryAspect]] = None
+    ambiguous_boundary_contacts: Optional[List[HoraryAspect]] = None
+    void_of_course: Optional[bool] = None
+    unavailable_reason: Optional[str] = None
+    source_url: Optional[str] = None
+    source_scope: Optional[str] = None
+    time_scale: Optional[str] = None
+    scan_step_days: Optional[float] = None
+    scan_guard_days: Optional[int] = None
+    monotonicity_evidence: Optional[str] = None
+    physical_ephemeris_source: Optional[PhysicalEphemerisSource] = None
+    longitude_frame: Optional[str] = None
+    datetime_utc: Optional[str] = None
+
+
 class HoraryMoon(PartialOutput):
+    motion_basis: Optional[HoraryMotionBasis] = None
     degrees_left_in_sign: Optional[float] = None
     next_aspect: Optional[HoraryAspect] = None
     sign: Optional[str] = None
@@ -671,13 +976,234 @@ class HoraryMoon(PartialOutput):
     void_of_course: Optional[bool] = None
 
 
+class LillyDirectedSignRelationship(PartialOutput):
+    method_id: Optional[str] = None
+    caster: Optional[str] = None
+    receiver: Optional[str] = None
+    caster_sign: Optional[str] = None
+    receiver_sign: Optional[str] = None
+    forward_sign_steps: Optional[int] = None
+    distinct_bodies: Optional[bool] = None
+    relation_status: Optional[
+        Literal["ray", "co_present", "listed_inconjunct", "not_in_either_table"]
+    ] = None
+    sign_ray: Optional[Literal["sextile", "square", "trine", "opposition"]] = None
+    ray_direction: Optional[Literal["dexter", "sinister"]] = None
+    listed_inconjunct: Optional[bool] = None
+    selected_degree_aspect: Optional[str] = None
+    selected_degree_aspect_agrees: Optional[bool] = None
+    coordinate_scope: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    source_url: Optional[str] = None
+    boundary_policy: Optional[str] = None
+    direction_policy: Optional[str] = None
+    quantitative_bonus_added: Optional[Literal[False]] = None
+    full_original_text_acceptance: Optional[Literal[False]] = None
+
+
 class HorarySignificators(PartialOutput):
     querent: Optional[HoraryPlanet] = None
     quesited: Optional[HoraryPlanet] = None
     moon_co_significator: Optional[HoraryPlanet] = None
+    directed_sign_relationship: Optional[LillyDirectedSignRelationship] = None
+
+
+class LillyRoute(PartialOutput):
+    mode: Optional[str] = None
+    actors: Optional[List[str]] = None
+    condition_epoch: Optional[str] = None
+    status: Optional[str] = None
+    conditions: Optional[List[LillyCondition]] = None
+    receptions: Optional[List[LillyReception]] = None
+    full_path_accepted: Optional[bool] = None
+    source_planet: Optional[str] = None
+    target_planet: Optional[str] = None
+    carrier: Optional[str] = None
+    collector: Optional[str] = None
+    aspect: Optional[HoraryAspect] = None
+    next_lunar_contact: Optional[HoraryAspect] = None
+
+
+class LillyConditionalReading(PartialOutput):
+    premise_satisfied: Optional[bool] = None
+    source_pages: Optional[List[int]] = None
+    conditional_reading_zh: Optional[str] = None
+    full_judgement_accepted: Optional[bool] = None
+
+
+class PlanetaryEventState(PartialOutput):
+    longitude: Optional[float] = None
+    latitude: Optional[float] = None
+    speed: Optional[float] = None
+    speed_native: Optional[float] = None
+    speed_light_time_correction: Optional[float] = None
+    speed_spatial_aberration_correction: Optional[float] = None
+    speed_lunar_source_remainder_correction: Optional[float] = None
+    speed_sidereal_origin_wrap_correction: Optional[float] = None
+    speed_rotation_correction: Optional[float] = None
+    speed_analytic_frame_correction: Optional[float] = None
+    speed_position_derivative_correction: Optional[float] = None
+    speed_display_offset_correction: Optional[float] = None
+
+
+class PlanetaryEventFailedSample(PartialOutput):
+    planet: Optional[str] = None
+    julian_day_tt: Optional[float] = None
+
+
+class PlanetaryEvent(PartialOutput):
+    kind: Optional[str] = None
+    bodies: Optional[List[str]] = None
+    julian_day_tt: Optional[float] = None
+    root_bracket_tt: Optional[List[float]] = None
+    epoch_relation: Optional[str] = None
+    states: Optional[Dict[str, PlanetaryEventState]] = None
+    state_brackets: Optional[Dict[str, List[PlanetaryEventState]]] = None
+    ray_degrees: Optional[int] = None
+    direction: Optional[int] = None
+    topology: Optional[str] = None
+    aspect: Optional[str] = None
+    datetime_utc: Optional[str] = None
+
+
+class PlanetaryUnresolvedInterval(PartialOutput):
+    kind: Optional[str] = None
+    bodies: Optional[List[str]] = None
+    interval_tt: Optional[List[float]] = None
+
+
+class PlanetaryEventHistory(PartialOutput):
+    apparent_position_policy: Optional[ApparentPositionPolicy] = None
+    ephemeris_reference_points: Optional[EphemerisReferencePoints] = None
+    longitude_motion: Optional[LongitudeMotionPolicy] = None
+    status: Optional[str] = None
+    method_id: Optional[str] = None
+    constant_velocity_projection: Optional[bool] = None
+    time_scale: Optional[str] = None
+    question_julian_day_tt: Optional[float] = None
+    window_tt: Optional[List[float]] = None
+    scan_step_days: Optional[float] = None
+    bodies: Optional[List[str]] = None
+    question_states: Optional[Dict[str, PlanetaryEventState]] = None
+    events: Optional[List[PlanetaryEvent]] = None
+    unresolved_intervals: Optional[List[PlanetaryUnresolvedInterval]] = None
+    completeness_scope: Optional[str] = None
+    full_original_text_acceptance: Optional[bool] = None
+    physical_ephemeris_source: Optional[PhysicalEphemerisSource] = None
+    longitude_frame: Optional[str] = None
+    unavailable_reason: Optional[str] = None
+    unavailable_code: Optional[str] = None
+    failed_sample: Optional[PlanetaryEventFailedSample] = None
+
+
+class EventReception(PartialOutput):
+    julian_day_tt: Optional[float] = None
+    root_bracket_tt: Optional[List[float]] = None
+    chart_sect: Optional[str] = None
+    reception: Optional[LillyReception] = None
+    endpoint_receptions: Optional[List[LillyReception]] = None
+    boundary_uncertainty: Optional[bool] = None
+
+
+class LillyEventPath(PartialOutput):
+    mode: Optional[str] = None
+    actors: Optional[List[str]] = None
+    conditions: Optional[List[LillyCondition]] = None
+    sequence_conditions_satisfied: Optional[bool] = None
+    status: Optional[str] = None
+    event_receptions: Optional[List[EventReception]] = None
+    full_path_accepted: Optional[bool] = None
+    prior_principal_contact: Optional[PlanetaryEvent] = None
+    prior_carrier_contact: Optional[PlanetaryEvent] = None
+    future_contact: Optional[PlanetaryEvent] = None
+    transitions: Optional[List[PlanetaryEvent]] = None
+    intervening_contacts: Optional[List[PlanetaryEvent]] = None
+    collection_contacts: Optional[List[PlanetaryEvent]] = None
+
+
+class RefranationPattern(PartialOutput):
+    applicant: Optional[str] = None
+    recipient: Optional[str] = None
+    station: Optional[PlanetaryEvent] = None
+    source_pages: Optional[List[int]] = None
+    scope: Optional[str] = None
+
+
+class ProhibitionPattern(PartialOutput):
+    interposer: Optional[str] = None
+    applicant: Optional[str] = None
+    recipient: Optional[str] = None
+    first_contact: Optional[PlanetaryEvent] = None
+    second_contact: Optional[PlanetaryEvent] = None
+    source_pages: Optional[List[int]] = None
+    scope: Optional[str] = None
+
+
+class LillyEventPaths(PartialOutput):
+    status: Optional[str] = None
+    paths: Optional[List[LillyEventPath]] = None
+    refranation_patterns: Optional[List[RefranationPattern]] = None
+    prohibition_patterns: Optional[List[ProhibitionPattern]] = None
+    reception_epoch_policy: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    scope: Optional[str] = None
+    full_original_text_acceptance: Optional[bool] = None
+    unavailable_reason: Optional[str] = None
+
+
+class LillyDwellingClause(PartialOutput):
+    rule_id: Optional[str] = None
+    source_url: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    quesited_occupied_house: Optional[int] = None
+    quesited_in_first_house: Optional[bool] = None
+    dwelling_alone_sufficient: Optional[bool] = None
+    distinct_lunar_transfer_actors: Optional[bool] = None
+    moon_last_contact_is_quesited: Optional[bool] = None
+    moon_next_contact_is_querent: Optional[bool] = None
+    moon_separating_from_prior_source_ray_now: Optional[bool] = None
+    moon_applying_to_next_recipient_ray_now: Optional[bool] = None
+    lunar_sequence_subconditions_satisfied: Optional[bool] = None
+    named_necessary_conditions_satisfied: Optional[bool] = None
+    prior_lunar_contact: Optional[PlanetaryEvent] = None
+    next_lunar_contact: Optional[PlanetaryEvent] = None
+    matching_p126_event_path_indexes: Optional[List[int]] = None
+    event_history_status: Optional[str] = None
+    event_history_unavailable_reason: Optional[str] = None
+    event_history_window_tt: Optional[List[float]] = None
+    event_history_completeness_scope: Optional[str] = None
+    scope: Optional[str] = None
+    conditional_reading_zh: Optional[str] = None
+    full_judgement_accepted: Optional[bool] = None
+    full_original_text_acceptance: Optional[bool] = None
+
+
+class LillyConditions(PartialOutput):
+    rule_id: Optional[str] = None
+    chart_sect: Optional[str] = None
+    coordinate_scope: Optional[str] = None
+    principal_reception: Optional[LillyPairReception] = None
+    p112_mutual_reception: Optional[LillyConditionalReading] = None
+    p126_127_dwelling: Optional[LillyDwellingClause] = None
+    routes: Optional[List[LillyRoute]] = None
+    event_paths: Optional[LillyEventPaths] = None
+    same_body_not_bilateral: Optional[bool] = None
+    full_original_text_acceptance: Optional[bool] = None
+    scope: Optional[str] = None
 
 
 class HoraryPerfection(PartialOutput):
+    lilly_conditions: Optional[LillyConditions] = None
+    event_history: Optional[PlanetaryEventHistory] = None
+    heuristic_perfection_signal: Optional[bool] = None
+    candidate: Optional[bool] = None
+    candidate_scope: Optional[str] = None
+    status: Optional[str] = None
+    missing_conditions: Optional[List[str]] = None
+    carrier: Optional[str] = None
+    carrier_label: Optional[str] = None
+    collector: Optional[str] = None
+    collector_label: Optional[str] = None
     mode: Optional[str] = None
     mode_label: Optional[str] = None
     perfects: Optional[bool] = None
@@ -688,19 +1214,280 @@ class HoraryPerfection(PartialOutput):
 class HoraryStricture(PartialOutput):
     code: Optional[str] = None
     detail: Optional[str] = None
+    source_clause: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    status: Optional[str] = None
+    exception_satisfied: Optional[bool] = None
+    exception_applicable: Optional[bool] = None
+    attributed_variant: Optional[bool] = None
+
+
+class LillyRadicalityReportedContext(PartialOutput):
+    figure_origin: Optional[str] = None
+    very_young_querent_reported: Optional[bool] = None
+    rising_description_agreement_reported: Optional[bool] = None
+    age_degree_agreement_reported: Optional[bool] = None
+    event_time_certain_reported: Optional[bool] = None
+    principal_significators_very_strong_reported: Optional[bool] = None
+    seventh_cusp_afflicted_reported: Optional[bool] = None
+    seventh_lord_impeded_reported: Optional[bool] = None
+    seventh_lord_unfortunate_reported: Optional[bool] = None
+    equal_fortune_infortune_testimonies_reported: Optional[bool] = None
+    figure_origin_source: Optional[str] = None
+    provided_fields: Optional[List[str]] = None
+    verification_scope: Optional[str] = None
+
+
+class LillyHourAffinity(PartialOutput):
+    hour_ruler: Optional[str] = None
+    ascendant_sign: Optional[str] = None
+    ascendant_lord: Optional[str] = None
+    chart_sect: Optional[str] = None
+    same_ruler: Optional[bool] = None
+    ascendant_triplicity: Optional[bool] = None
+    same_own_nature: Optional[bool] = None
+    selected_triplicity_lord: Optional[str] = None
+    listed_triplicity_lords: Optional[List[str]] = None
+    hour_ruler_in_any_listed_triplicity: Optional[bool] = None
+    hour_ruler_own_nature: Optional[List[str]] = None
+    ascendant_lord_own_nature: Optional[List[str]] = None
+    supported_under_declared_policy: Optional[bool] = None
+    triplicity_policy: Optional[str] = None
+    nature_policy: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    full_original_text_acceptance: Optional[bool] = None
+
+
+class LillyRadicalityHourInputs(PartialOutput):
+    status: Optional[str] = None
+    unavailable_reason: Optional[str] = None
+    hour: Optional[PlanetaryHours] = None
+    horizon_policy: Optional[str] = None
+    actual_solar_backend_verified: Optional[bool] = None
+    source_method_acceptance: Optional[bool] = None
+    epoch_jd_ut1: Optional[float] = None
+    geometric_chart_sect: Optional[str] = None
+    hour_and_geometric_sect_differ: Optional[bool] = None
+    sect_comparison_policy: Optional[str] = None
+
+
+class LillyConsideration(PartialOutput):
+    code: Optional[str] = None
+    condition: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    condition_present: Optional[bool] = None
+    applicable: Optional[bool] = None
+    exception_satisfied: Optional[bool] = None
+    exception_applicable: Optional[bool] = None
+    attributed_variant: Optional[bool] = None
+    status: Optional[str] = None
+    inputs: Optional[Dict[str, Any]] = None
+    conditional_reading_zh: Optional[str] = None
+
+
+class HoraryDegreeGate(PartialOutput):
+    early: Optional[bool] = None
+    late: Optional[bool] = None
+    early_exception_satisfied: Optional[bool] = None
+    late_exception_satisfied: Optional[bool] = None
+    certain_timed_event_exception: Optional[bool] = None
 
 
 class HoraryRadicality(PartialOutput):
+    method_id: Optional[str] = None
+    source_url: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    clause_count: Optional[int] = None
+    clauses: Optional[List[LillyConsideration]] = None
+    hour_inputs: Optional[LillyRadicalityHourInputs] = None
+    hour_affinity: Optional[LillyHourAffinity] = None
+    reported_context: Optional[LillyRadicalityReportedContext] = None
+    ascendant_degree_gate: Optional[HoraryDegreeGate] = None
+    unknown_clauses: Optional[List[str]] = None
+    status: Optional[str] = None
+    house_policy: Optional[str] = None
+    house_system: Optional[str] = None
+    zodiac_type: Optional[str] = None
+    source_method_scope: Optional[str] = None
+    conditional_reading_zh: Optional[str] = None
+    full_original_text_acceptance: Optional[bool] = None
+    full_judgement_accepted: Optional[bool] = None
+    real_world_prediction_established: Optional[bool] = None
+    safe_to_judge_scope: Optional[str] = None
     safe_to_judge: Optional[bool] = None
     strictures: Optional[List[HoraryStricture]] = None
 
 
+class LillyOrbTable(PartialOutput):
+    profile_id: Optional[str] = None
+    source_url: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    full_orbs_degrees: Optional[Dict[str, float]] = None
+    moieties_degrees: Optional[Dict[str, float]] = None
+    available_profiles: Optional[List[str]] = None
+    pair_rule: Optional[str] = None
+    boundary_convention: Optional[str] = None
+    default_selection_basis: Optional[str] = None
+    full_original_text_acceptance: Optional[bool] = None
+
+
+class LillyFortitudeSample(PartialOutput):
+    offset_days: Optional[float] = None
+    longitude: Optional[float] = None
+
+
+class LillyFortitudeMotion(PartialOutput):
+    nominal_coordinate_check: Optional[str] = None
+    nominal_coordinate_roundoff_allowance_degrees: Optional[float] = None
+    direction: Optional[str] = None
+    daily_motion_degrees: Optional[float] = None
+    daily_motion_exact_degrees: Optional[str] = None
+    status: Optional[str] = None
+    samples: Optional[List[LillyFortitudeSample]] = None
+    instantaneous_speed_degrees_per_day: Optional[float] = None
+    source_model: Optional[str] = None
+
+
+class LillyFortitudeInputs(PartialOutput):
+    status: Optional[str] = None
+    reason: Optional[str] = None
+    epoch_jd_tt: Optional[float] = None
+    motion: Optional[Dict[str, LillyFortitudeMotion]] = None
+    north_node_longitude: Optional[float] = None
+    node_model: Optional[str] = None
+    star_longitudes: Optional[Dict[str, float]] = None
+    star_position_policy: Optional[str] = None
+    daily_motion_policy: Optional[str] = None
+    day_interval_tt: Optional[List[float]] = None
+    longitude_frame: Optional[str] = None
+    physical_ephemeris_source: Optional[PhysicalEphemerisSource] = None
+    stars_profile: Optional[FixedStarProfile] = None
+
+
+class LillyFortitudeRow(PartialOutput):
+    code: Optional[str] = None
+    group: Optional[str] = None
+    condition: Optional[str] = None
+    label_zh: Optional[str] = None
+    points: Optional[int] = None
+    applicable: Optional[bool] = None
+    satisfied: Optional[bool] = None
+    contribution: Optional[int] = None
+    status: Optional[str] = None
+    inputs: Optional[Dict[str, Any]] = None
+    source_pages: Optional[List[int]] = None
+
+
+class LillyFortitudeAppliedCondition(PartialOutput):
+    code: Optional[str] = None
+    label_zh: Optional[str] = None
+    contribution: Optional[int] = None
+    source_pages: Optional[List[int]] = None
+
+
+class LillyFortitudeSummary(PartialOutput):
+    status: Optional[str] = None
+    known_fortitudes: Optional[int] = None
+    known_debilities: Optional[int] = None
+    known_balance: Optional[int] = None
+    literal_table_balance: Optional[int] = None
+    unknown_rows: Optional[List[str]] = None
+    applied_conditions: Optional[List[LillyFortitudeAppliedCondition]] = None
+    row_count: Optional[int] = None
+    points_are_success_probability: Optional[bool] = None
+    conditional_reading_zh: Optional[str] = None
+
+
+class LillyFortitudePlanet(LillyFortitudeSummary):
+    rows: Optional[List[LillyFortitudeRow]] = None
+
+
+class LillyFortitudes(PartialOutput):
+    method_id: Optional[str] = None
+    source_url: Optional[str] = None
+    source_edition: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    row_count_per_planet: Optional[int] = None
+    planets: Optional[Dict[str, LillyFortitudePlanet]] = None
+    summary: Optional[Dict[str, LillyFortitudeSummary]] = None
+    physical_inputs: Optional[LillyFortitudeInputs] = None
+    solar_policy: Optional[Dict[str, Any]] = None
+    zodiac_type: Optional[str] = None
+    house_system: Optional[str] = None
+    source_method_scope: Optional[str] = None
+    aggregation_policy: Optional[str] = None
+    source_conflicts: Optional[List[str]] = None
+    full_original_text_acceptance: Optional[bool] = None
+    full_judgement_accepted: Optional[bool] = None
+    real_world_prediction_established: Optional[bool] = None
+
+
+class LillyFortuneFormula(PartialOutput):
+    expression: Optional[str] = None
+    reverses_at_night: Optional[bool] = None
+    ascendant: Optional[float] = None
+    sun: Optional[float] = None
+    moon: Optional[float] = None
+    uses_physical_ascendant_not_first_cusp: Optional[bool] = None
+    source_pages: Optional[List[int]] = None
+    scope: Optional[str] = None
+
+
+class LillyFortune(LillyFortitudeSummary):
+    method_id: Optional[str] = None
+    source_url: Optional[str] = None
+    source_pages: Optional[List[int]] = None
+    longitude: Optional[float] = None
+    exact_longitude: Optional[str] = None
+    sign: Optional[str] = None
+    degree_in_sign: Optional[float] = None
+    formula: Optional[LillyFortuneFormula] = None
+    house_assignment: Optional[LillyHouseAssignment] = None
+    bound_lord: Optional[str] = None
+    solar_state: Optional[str] = None
+    rows: Optional[List[LillyFortitudeRow]] = None
+    source_method_scope: Optional[str] = None
+    interpretation_policies: Optional[List[str]] = None
+    full_original_text_acceptance: Optional[bool] = None
+    full_judgement_accepted: Optional[bool] = None
+    real_world_prediction_established: Optional[bool] = None
+
+
+class HoraryRuleProfile(PartialOutput):
+    sign_relationship_policy: Optional[str] = None
+    radicality_policy: Optional[str] = None
+    cusp_virtue_policy: Optional[str] = None
+    fortune_policy: Optional[str] = None
+    fortitudes_policy: Optional[str] = None
+    orb_table: Optional[LillyOrbTable] = None
+    house_axis_policy: Optional[str] = None
+    essential_dignity_policy: Optional[str] = None
+    rule_id: Optional[str] = None
+    source_edition: Optional[str] = None
+    source_url: Optional[str] = None
+    chapter_pages: Optional[List[int]] = None
+    full_original_text_acceptance: Optional[bool] = None
+    instantaneous_phase: Optional[str] = None
+    orb_policy: Optional[str] = None
+    moon_policy: Optional[str] = None
+    judgement_status: Optional[str] = None
+
+
 class Horary(SystemOutput):
+    reference_geometry: Optional[Dict[str, Any]] = None
+    backend_convention: Optional[Dict[str, Any]] = None
+    fortune: Optional[LillyFortune] = None
+    fortitudes: Optional[LillyFortitudes] = None
+    calculation_basis: Optional[WesternCalculationBasis] = None
+    heuristic_verdict: Optional[str] = None
+    heuristic_reasoning: Optional[str] = None
+    rule_profile: Optional[HoraryRuleProfile] = None
     category: Optional[str] = None
     category_label: Optional[str] = None
     ascendant: Optional[WesternPoint] = None
     moon: Optional[HoraryMoon] = None
     significators: Optional[HorarySignificators] = None
+    planets: Optional[Dict[str, HoraryPlanet]] = None
     perfection: Optional[HoraryPerfection] = None
     quesited_house: Optional[int] = None
     radicality: Optional[HoraryRadicality] = None
@@ -709,6 +1496,8 @@ class Horary(SystemOutput):
 
 
 WESTERN_FIELDS: Dict[str, Any] = {
+    "calendar_conversion": WesternCivilCalendarConversion,
+    "clock_conversion": WesternEventClockConversion,
     "natal_reference": NatalReference,
     "solarreturn": TimingChart,
     "lunarreturn": TimingChart,

@@ -92,6 +92,8 @@ class PersonalityAnalysis:
         advice = PersonalityAnalysis._advice(dominant, disposition)
 
         return {
+            "interpretation_scope": "五行、十神的传统象义与现代自省类比，不是人格测量；日主旺衰不测量内外向、决断力或心理健康。",
+            "counting_basis": "非日干每次1，每个藏干每次0.5；同分并列，计数不测量性格。",
             "day_master": f"{day_stem}（{day_element.value}）",
             "core_nature": core_nature,
             "dominant_traits": dominant,
@@ -107,8 +109,9 @@ class PersonalityAnalysis:
         return {
             "element": day_element.value,
             "virtue": info["virtue"],
-            "traits": info["traits"],
-            "shortcoming": info["short"],
+            "traits": "传统五行象义：" + info["traits"],
+            "shortcoming": "传统过度之象的自省类比：" + info["short"],
+            "reference_scope": "本项目文化类比词典，未逐条认证某部原典或现实人格特质。",
         }
 
     @staticmethod
@@ -117,17 +120,26 @@ class PersonalityAnalysis:
     ) -> Dict[str, Any]:
         counts = count_ten_gods(pillars, day_stem)
         ranked = sorted(counts.items(), key=lambda x: x[1], reverse=True)
-        top = [(g, c) for g, c in ranked if c > 0][:3]
+        present = [(g, c) for g, c in ranked if c > 0]
+        cutoff = present[min(2, len(present) - 1)][1] if present else 0
+        top = [(g, c) for g, c in present if c >= cutoff]
+        tied = [g.value for g, c in present if c == present[0][1]] if present else []
         return {
             "top_gods": [
                 {
                     "ten_god": g.value,
                     "weight": round(c, 1),
-                    "traits": TEN_GOD_PERSONALITY.get(g, ""),
+                    "traits": "传统十神象义：" + TEN_GOD_PERSONALITY.get(g, ""),
                 }
                 for g, c in top
             ],
-            "primary": top[0][0].value if top else "",
+            "primary": (
+                tied[0]
+                if len(tied) == 1
+                else "并列：" + "、".join(tied) if tied else ""
+            ),
+            "tied_primary_gods": tied,
+            "primary_selection": "按出现量排序，第三名同分全部保留；同分不按枚举先后认定性格主导。",
         }
 
     @staticmethod
@@ -139,16 +151,11 @@ class PersonalityAnalysis:
         dm = ElementAnalysis.analyze_day_master_strength(pillars)
         strength = dm["strength_level"]
         notes: List[str] = []
-        if strength == "强":
-            notes.append("日主旺，自我意识强、主见足、外向主动，但需防刚愎自用")
-        elif strength == "弱":
-            notes.append("日主弱，随和谦逊、依赖性较强、内敛，宜增强自信与决断")
-        else:
-            notes.append("日主中和，性格较平衡、能屈能伸")
-        yin_yang = (
-            "阳（刚健主动）" if day_polarity == Polarity.YANG else "阴（柔顺内敛）"
+        notes.append(
+            f"日主在本工程扶抑模型中归为{strength}；这不是内外向、自信或依赖性的测量"
         )
-        notes.append(f"日干为{yin_yang}")
+        yin_yang = "阳" if day_polarity == Polarity.YANG else "阴"
+        notes.append(f"日干阴阳查表为{yin_yang}；不据此判刚柔、行为或性别特质")
         return {
             "strength": strength,
             "polarity": "阳" if day_polarity == Polarity.YANG else "阴",
@@ -163,22 +170,11 @@ class PersonalityAnalysis:
         weaknesses = [core["shortcoming"]]
         if dominant["top_gods"]:
             strengths.append(dominant["top_gods"][0]["traits"])
-        if disposition["strength"] == "强":
-            weaknesses.append("过于强势、不易听取他人意见")
-        elif disposition["strength"] == "弱":
-            weaknesses.append("决断力不足、易受他人影响")
         return strengths, weaknesses
 
     @staticmethod
     def _advice(dominant: Dict[str, Any], disposition: Dict[str, Any]) -> List[str]:
-        advice: List[str] = []
-        primary = dominant.get("primary", "")
-        if primary in ("七杀", "伤官", "劫财"):
-            advice.append("个性偏刚锐，宜修心养性、控制情绪冲动，刚柔并济")
-        elif primary in ("正印", "偏印", "正官"):
-            advice.append("个性偏稳内敛，宜主动突破、增强行动力与表达")
-        if disposition["strength"] == "弱":
-            advice.append("宜培养自信与独立决断，借贵人之力成事")
-        if not advice:
-            advice.append("性格较为均衡，扬长避短、顺势而为即可")
-        return advice
+        return [
+            "将象义作为自省话题，用具体经历与他人反馈核实哪些描述适用",
+            "需要人格评估时使用经过验证的测量方法，不以十神计数或旺衰代替",
+        ]

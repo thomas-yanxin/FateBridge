@@ -1,0 +1,258 @@
+{
+  "witnesses": [
+    {
+      "id": "cnts_v2",
+      "title": "校正京本六壬神课金口诀",
+      "catalog_id": "CNTS-00047981961",
+      "catalog_url": "https://commons.wikimedia.org/wiki/File:CNTS-00047981961_2_六壬神課金口訣.pdf",
+      "scan_url": "https://upload.wikimedia.org/wikipedia/commons/1/10/CNTS-00047981961_2_六壬神課金口訣.pdf",
+      "source_sha256": "ee80bf68c7f87570540c88f073814af7adcd142b22ae71f6679253f59387785b",
+      "chronology": "本轮未鉴定版本先后"
+    },
+    {
+      "id": "waseda_book6",
+      "title": "湖社叢話 第六冊 金口訣",
+      "catalog_id": "早稻田大学図書館 ロ14 02466",
+      "catalog_url": "https://www.wul.waseda.ac.jp/kotenseki/html/ro14/ro14_02466/index.html",
+      "scan_url": "https://archive.wul.waseda.ac.jp/kosho/ro14/ro14_02466/ro14_02466_0006/ro14_02466_0006.html",
+      "source_sha256": null,
+      "chronology": "馆藏目录记写本、書写年不明；不得据此声称早于CNTS或独立传承"
+    }
+  ],
+  "entries": [
+    {
+      "pattern_id": "P52",
+      "name": "自内隔生课",
+      "witness_readings": [
+        {
+          "witness_id": "cnts_v2",
+          "locator": "PDF118",
+          "raw_heading": "自內隔生課",
+          "raw_alias": "匪棘卦",
+          "raw_definition": "自下隔生於上是也",
+          "literal_day_ganzhi": "戊申",
+          "literal_hour_branch": "酉",
+          "literal_four_positions": [
+            "甲",
+            "天后",
+            "太衝",
+            "子"
+          ]
+        },
+        {
+          "witness_id": "waseda_book6",
+          "locator": "p0057左末列至p0058右首列",
+          "raw_heading": "自內隔生課",
+          "raw_alias": "利用卦",
+          "raw_definition": "自上隔生於下是也",
+          "literal_day_ganzhi": "丁丑",
+          "literal_hour_branch": "申",
+          "literal_four_positions": [
+            "己",
+            "太陰",
+            "大吉",
+            "酉"
+          ]
+        }
+      ],
+      "status": "unresolved",
+      "adjudicated_match": null,
+      "unresolved_reason": "早稻田同一条的课名对齐P52而卦名、定义、例课对齐P53；且例课不能唯一确定跨位配对。"
+    },
+    {
+      "pattern_id": "P53",
+      "name": "自外隔生课",
+      "witness_readings": [
+        {
+          "witness_id": "cnts_v2",
+          "locator": "PDF119",
+          "raw_heading": "自外隔生課",
+          "raw_alias": "利用卦",
+          "raw_definition": "自上隔生於下是也",
+          "literal_day_ganzhi": "丁丑",
+          "literal_hour_branch": "申",
+          "literal_four_positions": [
+            "己",
+            "太陰",
+            "大吉",
+            "酉"
+          ]
+        },
+        {
+          "witness_id": "waseda_book6",
+          "locator": "p0057左末列至p0058右首列",
+          "raw_heading": "自內隔生課",
+          "raw_alias": "利用卦",
+          "raw_definition": "自上隔生於下是也",
+          "literal_day_ganzhi": "丁丑",
+          "literal_hour_branch": "申",
+          "literal_four_positions": [
+            "己",
+            "太陰",
+            "大吉",
+            "酉"
+          ]
+        }
+      ],
+      "status": "unresolved",
+      "adjudicated_match": null,
+      "unresolved_reason": "早稻田所见局部只列一条混合名称的隔生课，未据此认证全书条目数；跨位配对仍无唯一依据。"
+    },
+    {
+      "pattern_id": "P56",
+      "name": "换神课",
+      "witness_readings": [
+        {
+          "witness_id": "cnts_v2",
+          "locator": "PDF120",
+          "raw_heading": "換神課",
+          "raw_alias": "玄機卦",
+          "raw_definition": "晝夜未分貴神相交是也",
+          "literal_day_ganzhi": "甲辰",
+          "literal_hour_branch": "寅",
+          "literal_four_positions": [
+            "丙",
+            "天后換得白虎",
+            "河魁",
+            "子"
+          ]
+        },
+        {
+          "witness_id": "waseda_book6",
+          "locator": "p0058右末列至左首列",
+          "raw_heading": "換神課",
+          "raw_alias": "玄機卦",
+          "raw_definition": "晝夜未分貴神相交是也",
+          "literal_day_ganzhi": "甲辰",
+          "literal_hour_branch": "寅",
+          "literal_four_positions": [
+            "丙",
+            "天后換得白虎",
+            "河魁",
+            "子"
+          ]
+        }
+      ],
+      "status": "unresolved",
+      "adjudicated_match": null,
+      "unresolved_reason": "两种昼夜起贵可分别计算；原例寅时不能认证实际星出星没或交界。"
+    },
+    {
+      "pattern_id": "P57",
+      "name": "向空课",
+      "witness_readings": [
+        {
+          "witness_id": "cnts_v2",
+          "locator": "PDF120",
+          "raw_heading": "向空課",
+          "raw_alias": "谷響卦",
+          "raw_definition": "晝將夜位夜將晝位是也",
+          "literal_day_ganzhi": "甲辰",
+          "literal_hour_branch": "巳",
+          "literal_four_positions": [
+            "辛",
+            "天空",
+            "功曹",
+            "未"
+          ]
+        },
+        {
+          "witness_id": "waseda_book6",
+          "locator": "p0058左",
+          "raw_heading": "向空課",
+          "raw_alias": "谷響卦",
+          "raw_definition": "晝將夜位夜將晝位是也",
+          "literal_day_ganzhi": "甲辰",
+          "literal_hour_branch": "巳",
+          "literal_four_positions": [
+            "辛",
+            "天空",
+            "功曹",
+            "未"
+          ]
+        }
+      ],
+      "status": "unresolved",
+      "adjudicated_match": null,
+      "unresolved_reason": "晝將夜位、夜將晝位的原典所属口径未唯一裁定；地分等于异时贵人起点只是候选事实。"
+    },
+    {
+      "pattern_id": "P58",
+      "name": "背神课",
+      "witness_readings": [
+        {
+          "witness_id": "cnts_v2",
+          "locator": "PDF121",
+          "raw_heading": "背神課",
+          "raw_alias": "違戾卦",
+          "raw_definition": "位在天乙後而帶天乙前位是也",
+          "literal_day_ganzhi": "甲辰",
+          "literal_hour_branch": "申",
+          "literal_four_positions": [
+            "乙",
+            "朱雀",
+            "太衝",
+            "亥"
+          ]
+        },
+        {
+          "witness_id": "waseda_book6",
+          "locator": "p0058左",
+          "raw_heading": "背神課",
+          "raw_alias": "違戾卦",
+          "raw_definition": "位在天乙後而帶天乙前位是也",
+          "literal_day_ganzhi": "丙辰",
+          "literal_hour_branch": "申",
+          "literal_four_positions": [
+            "己",
+            "太陰",
+            "太衝",
+            "亥"
+          ]
+        }
+      ],
+      "status": "unresolved",
+      "adjudicated_match": null,
+      "unresolved_reason": "两书影均为而帶，网文作或在；两例占日、人元、贵神不同，不能择合算者覆盖另本；前后距离和带神口径未定。"
+    },
+    {
+      "pattern_id": "P59",
+      "name": "丁鬼入门课",
+      "witness_readings": [
+        {
+          "witness_id": "cnts_v2",
+          "locator": "PDF121",
+          "raw_heading": "丁鬼入門課",
+          "raw_alias": "傳尸卦",
+          "raw_definition": "丁酉入鬼作鬼是也",
+          "literal_day_ganzhi": "戊辰",
+          "literal_hour_branch": "辰",
+          "literal_four_positions": [
+            "辛",
+            "太常",
+            "太乙",
+            "酉"
+          ]
+        },
+        {
+          "witness_id": "waseda_book6",
+          "locator": "p0058左末至p0059右首",
+          "raw_heading": "丁鬼入門課",
+          "raw_alias": "傳尸卦",
+          "raw_definition": "丁酉入鬼作鬼是也",
+          "literal_day_ganzhi": "戊辰",
+          "literal_hour_branch": "辰",
+          "literal_four_positions": [
+            "辛",
+            "太常",
+            "太乙",
+            "酉"
+          ]
+        }
+      ],
+      "status": "unresolved",
+      "adjudicated_match": null,
+      "unresolved_reason": "两书影定义作丁酉入鬼作鬼，网文作丁入酉作鬼；原例日将遁干和人元再遁均得丁，不能唯一识别起丁路径。"
+    }
+  ]
+}

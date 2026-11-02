@@ -8,6 +8,8 @@ from typing import Callable, Iterator, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
+from fatebridge.utils.civil_clock import parse_iso_datetime
+
 
 class ExecutionOptions(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -29,7 +31,7 @@ class ExecutionOptions(BaseModel):
     def aware_timestamp(cls, value: Optional[str]) -> Optional[str]:
         if value is None:
             return value
-        moment = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        moment = parse_iso_datetime(value.replace("Z", "+00:00"))
         if moment.tzinfo is None or moment.utcoffset() is None:
             raise ValueError("as_of must include a timezone")
         return moment.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -46,10 +48,25 @@ _CLOCK: ContextVar[Optional[CallClock]] = ContextVar(
 )
 
 
+def clock_snapshot() -> Optional[str]:
+    """Carry the outer request's frozen instant into a private calculation."""
+    clock = _CLOCK.get()
+    return clock.instant.isoformat() if clock is not None else None
+
+
+def merge_clock_reads(reads: List[str]) -> None:
+    """Keep registrar provenance for timezone reads performed by a child."""
+    clock = _CLOCK.get()
+    if clock is not None:
+        for name in reads:
+            if name not in clock.reads:
+                clock.reads.append(name)
+
+
 @contextmanager
 def call_clock(as_of: Optional[str] = None) -> Iterator[CallClock]:
     instant = (
-        datetime.fromisoformat(as_of.replace("Z", "+00:00"))
+        parse_iso_datetime(as_of.replace("Z", "+00:00"))
         if as_of
         else datetime.now(timezone.utc)
     )

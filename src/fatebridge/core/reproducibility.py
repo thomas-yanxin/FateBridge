@@ -5,6 +5,16 @@ from typing import Any, Dict, Tuple, Type
 
 from pydantic import BaseModel
 
+BAZI_ANALYSIS_CLOCK_TOOLS = frozenset(
+    {
+        "timing_analysis",
+        "dayun_analysis",
+        "liuyue_analysis",
+        "liuri_analysis",
+        "liushi_analysis",
+    }
+)
+
 
 @dataclass(frozen=True)
 class ReproducibilityPolicy:
@@ -43,7 +53,9 @@ def policy_for(key: str, model: Type[BaseModel]) -> ReproducibilityPolicy:
     fields = model.model_fields
     clock_fields: Tuple[str, ...] = ()
     date_fields = ("analysis_year", "analysis_month", "analysis_day")
-    if (
+    if key in BAZI_ANALYSIS_CLOCK_TOOLS:
+        clock_fields = (*date_fields, "analysis_hour", "analysis_minute")
+    elif (
         key.startswith("bazi_")
         or key.startswith("astro_")
         or key
@@ -60,16 +72,11 @@ def policy_for(key: str, model: Type[BaseModel]) -> ReproducibilityPolicy:
             "zr",
             "firdaria",
             "decennials",
-            "liuri_analysis",
         }
     ):
         clock_fields = tuple(
             f for f in date_fields if f in fields and not fields[f].is_required()
         )
-    elif key in {"timing_analysis", "liuyue_analysis"}:
-        clock_fields = ("analysis_year", "analysis_month")
-    elif key == "liushi_analysis":
-        clock_fields = (*date_fields, "analysis_hour")
     elif key == "jieqi_timeline_analysis":
         clock_fields = ("target_year",)
     return ReproducibilityPolicy(

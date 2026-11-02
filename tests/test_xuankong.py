@@ -148,6 +148,9 @@ def test_confirmed_sitting_trigram_constrains_cross_palace_candidates(i):
 
 @pytest.mark.parametrize("failure", ["unavailable", "per_term_failure"])
 def test_changeover_event_does_not_certify_approximate_lichun(monkeypatch, failure):
+    # Fault the selected native provider. The packaged default is independent
+    # of Swiss availability and must not be relabelled as a linear fallback.
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     almanac.get_solar_terms_for_year.cache_clear()
     if failure == "unavailable":
         monkeypatch.setattr(almanac, "swe", None)
@@ -230,7 +233,12 @@ def test_house_event_periods_not_query_periods(year, number):
     assert p["interval_scope"] == "historical_event_period_window_not_natal_expiry"
 
 
-def test_house_event_datetime_lichun_and_timezone_equivalence():
+@pytest.mark.parametrize("model", ["native", "analytic", "de440"])
+def test_house_event_datetime_lichun_and_timezone_equivalence(
+    monkeypatch, tmp_path, model
+):
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", model)
+    monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     boundary = lichun(2024, "Asia/Shanghai")
 
     def resolve(moment):
@@ -242,15 +250,21 @@ def test_house_event_datetime_lichun_and_timezone_equivalence():
             )
         )
 
-    assert resolve(boundary - timedelta(seconds=1))["number"] == 8
-    assert resolve(boundary)["number"] == 9
+    # All three selected software models retain a five-second operational
+    # candidate guard. It is separate from the unchanged one-second TT gate.
+    for seconds in (-5, -1, 0, 1, 5):
+        result = resolve(boundary + timedelta(seconds=seconds))
+        assert result["number"] is None
+        assert result["candidate_period_numbers"] == [8, 9]
+    assert resolve(boundary - timedelta(seconds=6))["number"] == 8
+    assert resolve(boundary + timedelta(seconds=6))["number"] == 9
     assert resolve(boundary.astimezone(lichun(2024, "UTC").tzinfo)) == resolve(boundary)
 
 
 def test_changeover_date_matches_independent_published_minute():
     # An independent astronomy notice, not this engine's own boundary value.
-    # It certifies the minute only; the +/-1-second internal test above merely
-    # checks interval semantics against the engine's computed instant.
+    # It certifies the minute only. The model tests above check candidate
+    # preservation against the computed instant, not independent accuracy.
     reference = REFERENCE["house_period_calendar_reference"]
     assert (
         lichun(reference["year"], "Asia/Shanghai").isoformat(timespec="minutes")
@@ -436,8 +450,8 @@ def test_aggregate_rejects_unselected_or_inconsistent_nested_house():
 def test_rules_version_sources_and_data_copy_are_preserved():
     r = calculate_xuankong_natal(**payload("xuankong_natal"))
     rules = r["rulesets"][0]
-    assert (rules["ruleset_id"], rules["version"]) == ("xuankong_zhongzhou_v1", "1.0.1")
-    assert {"X1", "X2", "X3", "X4", "X5"} <= set(rules["source_ids"])
+    assert (rules["ruleset_id"], rules["version"]) == ("xuankong_zhongzhou_v1", "1.4.0")
+    assert {"X1", "X2", "X3", "X4", "X5", "X8", "X9"} <= set(rules["source_ids"])
     assert len(natal_rules()["replacement_stars"]) == 13
     edited = deepcopy(r)
     edited["layers"]["xuankong_natal"]["mountain_registry"][0]["name"] = "bad"

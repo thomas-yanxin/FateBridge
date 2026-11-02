@@ -1,0 +1,4699 @@
+{
+  "format_id": "fengshui_host_guest_source_v1",
+  "version": "1.0.0",
+  "source_reference_sha256": "4065bc975e47bfd583d302addfb55238177c2bce8a2546671abc73b3c54049a6",
+  "ruleset": {
+    "ruleset_id": "shen_2011_host_guest_v1",
+    "version": "1.0.0",
+    "method": "source_bound_axis_host_guest",
+    "title": "沈氏整理本所收主客生克出入定义",
+    "source_ids": [
+      "HGT1",
+      "HGT2",
+      "HGT3",
+      "HGT4"
+    ],
+    "scope": "坐山宫与向首宫的盘层主客及机械生克出入；不在旁六宫或中宫赋予此主客规则，不合成81组合断语与吉凶",
+    "source_angle_applicability_verified": false,
+    "whole_book_conformity_established": false,
+    "real_world_prediction_established": false
+  },
+  "sources": [
+    {
+      "source_id": "HGT1",
+      "title": "沈氏玄空学所收地理精纂·生克吉凶篇",
+      "author": "该篇未署作者；地理精纂题江阴杜振逵藏，藏者不作作者",
+      "locator": "PDF901为篇题；PDF909–910为主客出入定义、盘层关系与旁六宫范围",
+      "scope": "只取主客、出入名词和盘层；不合并吉凶、疾病或现实应验断语",
+      "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
+      "source_pdf_sha256": "b0c2a7af0a1b94f36cf1cc9f0d2ce4b65e8ea49bd793bc128b8fdc525b5ba847",
+      "edition": "中央编译出版社2011整理/2016重印本 ISBN978-7-5117-0801-4"
+    },
+    {
+      "source_id": "HGT2",
+      "title": "沈氏玄空学卷四·王则先谨按",
+      "author": "王则先",
+      "locator": "PDF452–453",
+      "scope": "论山山主、论向向主；保留其他比较对象与克出吉凶争论",
+      "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
+      "source_pdf_sha256": "b0c2a7af0a1b94f36cf1cc9f0d2ce4b65e8ea49bd793bc128b8fdc525b5ba847",
+      "edition": "中央编译出版社2011整理/2016重印本 ISBN978-7-5117-0801-4"
+    },
+    {
+      "source_id": "HGT3",
+      "title": "沈氏玄空学卷四·九宫挨星掌诀",
+      "author": "江志伊录；本卷所列掌诀",
+      "locator": "PDF283",
+      "scope": "九星卦位和二十四山组；南上图位不认证现场北向",
+      "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
+      "source_pdf_sha256": "b0c2a7af0a1b94f36cf1cc9f0d2ce4b65e8ea49bd793bc128b8fdc525b5ba847",
+      "edition": "中央编译出版社2011整理/2016重印本 ISBN978-7-5117-0801-4"
+    },
+    {
+      "source_id": "HGT4",
+      "title": "沈氏玄空学所收紫白诀上篇",
+      "author": "原诀作者未确，原注录姚廷銮本；不署为沈竹礽自著",
+      "locator": "PDF859–860",
+      "scope": "仅九星五行对应，不套用该篇八宅、层间与五子运的其他规则",
+      "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
+      "source_pdf_sha256": "b0c2a7af0a1b94f36cf1cc9f0d2ce4b65e8ea49bd793bc128b8fdc525b5ba847",
+      "edition": "中央编译出版社2011整理/2016重印本 ISBN978-7-5117-0801-4"
+    }
+  ],
+  "star_elements": {
+    "1": "水",
+    "2": "土",
+    "3": "木",
+    "4": "木",
+    "5": "土",
+    "6": "金",
+    "7": "金",
+    "8": "土",
+    "9": "火"
+  },
+  "fixed_earth_numbers": {
+    "N": 1,
+    "NE": 8,
+    "E": 3,
+    "SE": 4,
+    "S": 9,
+    "SW": 2,
+    "W": 7,
+    "NW": 6,
+    "C": 5
+  },
+  "host_guest_matrix": {
+    "木": {
+      "木": "比和",
+      "火": "生出",
+      "土": "克出",
+      "金": "克入",
+      "水": "生入"
+    },
+    "火": {
+      "木": "生入",
+      "火": "比和",
+      "土": "生出",
+      "金": "克出",
+      "水": "克入"
+    },
+    "土": {
+      "木": "克入",
+      "火": "生入",
+      "土": "比和",
+      "金": "生出",
+      "水": "克出"
+    },
+    "金": {
+      "木": "克出",
+      "火": "克入",
+      "土": "生入",
+      "金": "比和",
+      "水": "生出"
+    },
+    "水": {
+      "木": "生出",
+      "火": "克出",
+      "土": "克入",
+      "金": "生入",
+      "水": "比和"
+    }
+  },
+  "role_policy": {
+    "sitting_palace": {
+      "host": "mountain",
+      "guest": "facing"
+    },
+    "facing_palace": {
+      "host": "facing",
+      "guest": "mountain"
+    },
+    "earth_period": {
+      "host": "earth",
+      "guest": "period"
+    },
+    "period_mountain": {
+      "host": "period",
+      "guest": "mountain"
+    },
+    "period_facing": {
+      "host": "period",
+      "guest": "facing"
+    },
+    "other_six_palaces": "not_assigning_a_host_guest_under_this_source",
+    "center": "not_covered"
+  },
+  "sector_mountains": {
+    "N": "壬子癸",
+    "NE": "丑艮寅",
+    "E": "甲卯乙",
+    "SE": "辰巽巳",
+    "S": "丙午丁",
+    "SW": "未坤申",
+    "W": "庚酉辛",
+    "NW": "戌乾亥"
+  },
+  "lower_clauses": [
+    {
+      "period": 1,
+      "sitting_mountain": "子",
+      "facing_mountain": "午",
+      "page": 286,
+      "literal_full_clause": "一运挨星，六到山，五到向，飞星山顺向逆，犯下水，向比和吉，山生入吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/子-午-1-p286.png",
+          "page": 286
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "子",
+      "facing_mountain": "午",
+      "page": 287,
+      "literal_full_clause": "二运挨星，七到山，六到向，飞星山逆向顺，犯上山，向生出凶，山比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/子-午-2-p287.png",
+          "page": 287
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "子",
+      "facing_mountain": "午",
+      "page": 287,
+      "literal_full_clause": "三运挨星，八到山，七到向，飞星山顺向逆，犯下水，向比和吉，山克出凶。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/子-午-3-p287.png",
+          "page": 287
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "子",
+      "facing_mountain": "午",
+      "page": 288,
+      "literal_full_clause": "四运挨星，九到山，八到向，飞星山逆向顺，犯上山，向克出凶，山比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/子-午-4-p288.png",
+          "page": 288
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "子",
+      "facing_mountain": "午",
+      "page": 289,
+      "literal_full_clause": "五运挨星，一到山，九到向，飞星山向均逆，当旺向生出凶，山克入吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/子-午-5-p289.png",
+          "page": 289
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "子",
+      "facing_mountain": "午",
+      "page": 289,
+      "literal_full_clause": "六运挨星，二到山，一到向，飞星山顺向逆，犯下水，向比和吉，山生入吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/子-午-6-p289.png",
+          "page": 289
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "子",
+      "facing_mountain": "午",
+      "page": 290,
+      "literal_full_clause": "七运挨星，三到山，二到向，飞星山逆向顺，犯上山，向生入吉，山比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/子-午-7-p290.png",
+          "page": 290
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "子",
+      "facing_mountain": "午",
+      "page": 291,
+      "literal_full_clause": "八运挨星，四到山，三到向，飞星山顺向逆，犯下水，向比和吉，山克出凶。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/子-午-8-p291.png",
+          "page": 291
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "子",
+      "facing_mountain": "午",
+      "page": 291,
+      "literal_full_clause": "九运挨星，五到山，四到向，飞星山逆向顺，犯上山，向克出凶，山比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/子-午-9-p291.png",
+          "page": 291
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "午",
+      "facing_mountain": "子",
+      "page": 293,
+      "literal_full_clause": "一运挨星，五到山，六到向，飞星山逆向顺，犯上山，向生入吉，山比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/午-子-1-p293.png",
+          "page": 293
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "午",
+      "facing_mountain": "子",
+      "page": 294,
+      "literal_full_clause": "二运挨星，六到山，七到向，飞星山顺向逆，犯下水，向比和吉，山生出凶。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/午-子-2-p294.png",
+          "page": 294
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "午",
+      "facing_mountain": "子",
+      "page": 294,
+      "literal_full_clause": "三运挨星，七到山，八到向，飞星山逆向顺，犯上山，向克出凶，山比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/午-子-3-p294.png",
+          "page": 294
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "午",
+      "facing_mountain": "子",
+      "page": 295,
+      "literal_full_clause": "四运挨星，八到山，九到向，飞星山顺向逆，犯下水，向比和吉，山克出凶。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/午-子-4-p295.png",
+          "page": 295
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "午",
+      "facing_mountain": "子",
+      "page": 296,
+      "literal_full_clause": "五运挨星，九到山，一到向，飞星山向均逆，当旺向克入吉，山生出凶。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/午-子-5-p296.png",
+          "page": 296
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "午",
+      "facing_mountain": "子",
+      "page": 296,
+      "literal_full_clause": "六运挨星，一到山，二到向，飞星山逆向顺，犯上山，向生入吉，山比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/午-子-6-p296.png",
+          "page": 296
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "午",
+      "facing_mountain": "子",
+      "page": 297,
+      "literal_full_clause": "七运挨星，二到山，三到向，飞星山顺向逆，犯下水，山生入向比和吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/午-子-7-p297.png",
+          "page": 297
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "午",
+      "facing_mountain": "子",
+      "page": 298,
+      "literal_full_clause": "八运挨星，三到山，四到向，飞星山逆向顺，犯上山，山比和吉，向克出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/午-子-8-p298.png",
+          "page": 298
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "午",
+      "facing_mountain": "子",
+      "page": 298,
+      "literal_full_clause": "九运挨星，四到山，五到向，飞星山顺向逆，犯下水，山克出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/午-子-9-p298.png",
+          "page": 298
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "卯",
+      "facing_mountain": "酉",
+      "page": 300,
+      "literal_full_clause": "一运挨星，八到山，三到向，飞星山顺向逆，犯下水，向比和，山生入吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/卯-酉-1-p300.png",
+          "page": 300
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "卯",
+      "facing_mountain": "酉",
+      "page": 301,
+      "literal_full_clause": "二运挨星，九到山，四到向，飞星山逆向顺，犯上山，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/卯-酉-2-p301.png",
+          "page": 301
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "卯",
+      "facing_mountain": "酉",
+      "page": 301,
+      "literal_full_clause": "三运挨星，一到山，五到向，飞星山向均逆，当旺山克入吉，向克出吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/卯-酉-3-p301.png",
+          "page": 301
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "卯",
+      "facing_mountain": "酉",
+      "page": 302,
+      "literal_full_clause": "四运挨星，二到山，六到向，飞星山向均逆，犯上山下水，山生入吉，向克入吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/卯-酉-4-p302.png",
+          "page": 302
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "卯",
+      "facing_mountain": "酉",
+      "page": 303,
+      "literal_full_clause": "五运挨星，三到山，七到向，飞星山向均逆，当旺向克出凶，山生入吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/卯-酉-5-p303.png",
+          "page": 303
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "卯",
+      "facing_mountain": "酉",
+      "page": 303,
+      "literal_full_clause": "六运挨星，四到山，八到向，飞星山向均顺。犯上山下水，山生出凶，向生入吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/卯-酉-6-p303.png",
+          "page": 303
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "卯",
+      "facing_mountain": "酉",
+      "page": 304,
+      "literal_full_clause": "七运挨星，五到山，九到向，飞星山向均逆，当旺向克出凶，山生入吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/卯-酉-7-p304.png",
+          "page": 304
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "卯",
+      "facing_mountain": "酉",
+      "page": 305,
+      "literal_full_clause": "八运挨星，六到山，一到向，飞星山顺向逆，犯下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/卯-酉-8-p305.png",
+          "page": 305
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "卯",
+      "facing_mountain": "酉",
+      "page": 305,
+      "literal_full_clause": "九运挨星，七到山，二到向，飞星山逆向顺，犯上山，向克出凶，山比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/卯-酉-9-p305.png",
+          "page": 305
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "酉",
+      "facing_mountain": "卯",
+      "page": 307,
+      "literal_full_clause": "一运挨星，三到山，八到向，飞星山逆向逆，犯上山，山比和吉，向生入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/酉-卯-1-p307.png",
+          "page": 307
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "酉",
+      "facing_mountain": "卯",
+      "page": 308,
+      "literal_full_clause": "二运挨星，四到山，九到向，飞星山顺向逆，犯下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/酉-卯-2-p308.png",
+          "page": 308
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "酉",
+      "facing_mountain": "卯",
+      "page": 308,
+      "literal_full_clause": "三运挨星，五到山，一到向，飞星山向均逆，当旺山克出凶，向克入吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/酉-卯-3-p308.png",
+          "page": 308
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "酉",
+      "facing_mountain": "卯",
+      "page": 309,
+      "literal_full_clause": "四运挨星，六到山，二到向，飞星山向均顺，犯上山下水，山克入吉，向生入吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/酉-卯-4-p309.png",
+          "page": 309
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "酉",
+      "facing_mountain": "卯",
+      "page": 310,
+      "literal_full_clause": "五运挨星，七到山，三到向，飞星山向均逆，当旺山克出凶，向生入吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/酉-卯-5-p310.png",
+          "page": 310
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "酉",
+      "facing_mountain": "卯",
+      "page": 310,
+      "literal_full_clause": "六运挨星，八到山，四到向，飞星山向均顺，犯上山下水，山生入吉，向生出凶。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/酉-卯-6-p310.png",
+          "page": 310
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "酉",
+      "facing_mountain": "卯",
+      "page": 311,
+      "literal_full_clause": "七运挨星，九到山，五到向，飞星山向均逆，当旺山克出，向生入吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/酉-卯-7-p311.png",
+          "page": 311
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "酉",
+      "facing_mountain": "卯",
+      "page": 312,
+      "literal_full_clause": "八运挨星，一到山，六到向，飞星山逆向顺，犯上山，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/酉-卯-8-p312.png",
+          "page": 312
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "酉",
+      "facing_mountain": "卯",
+      "page": 312,
+      "literal_full_clause": "九运挨星，二到山，七到向，飞星山顺向逆，犯下水，山克出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/酉-卯-9-p312.png",
+          "page": 312
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "乾",
+      "facing_mountain": "巽",
+      "page": 314,
+      "literal_full_clause": "一运挨星，二到山，九到向，飞星山顺向逆，犯下水，向比和吉，山克出凶。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乾-巽-1-p314.png",
+          "page": 314
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "乾",
+      "facing_mountain": "巽",
+      "page": 315,
+      "literal_full_clause": "二运挨星，三到山，一到向，飞星山向均逆，当旺向克入吉，山生入吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乾-巽-2-p315.png",
+          "page": 315
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "乾",
+      "facing_mountain": "巽",
+      "page": 315,
+      "literal_full_clause": "三运挨星，四到山，二到向，飞星山向均顺，犯上山下水，向生出凶，山克入吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乾-巽-3-p315.png",
+          "page": 315
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "乾",
+      "facing_mountain": "巽",
+      "page": 316,
+      "literal_full_clause": "四运挨星，五到山，三到向，飞星山顺向逆，犯下水，山生入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乾-巽-4-p316.png",
+          "page": 316
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "乾",
+      "facing_mountain": "巽",
+      "page": 317,
+      "literal_full_clause": "五运挨星，六到山，四到向，飞星山向均顺，犯上山下水，山生入吉，向克出凶。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乾-巽-5-p317.png",
+          "page": 317
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "乾",
+      "facing_mountain": "巽",
+      "page": 317,
+      "literal_full_clause": "六运挨星，七到山，五到向，飞星山逆向顺，犯上山，向克入凶，山比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乾-巽-6-p317.png",
+          "page": 317
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "乾",
+      "facing_mountain": "巽",
+      "page": 318,
+      "literal_full_clause": "七运挨星，八到山，六到向，飞星山向均顺，犯上山下水，山克出凶，向生出凶。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乾-巽-7-p318.png",
+          "page": 318
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "乾",
+      "facing_mountain": "巽",
+      "page": 319,
+      "literal_full_clause": "八运挨星，九到山，七到向，飞星山向均逆，当旺山生出凶，向克出凶。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乾-巽-8-p319.png",
+          "page": 319
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "乾",
+      "facing_mountain": "巽",
+      "page": 319,
+      "literal_full_clause": "九运挨星，一到山，八到向，飞星山逆向顺，犯上山，山比和吉，向生入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乾-巽-9-p319.png",
+          "page": 319
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "巽",
+      "facing_mountain": "乾",
+      "page": 321,
+      "literal_full_clause": "一运挨星，九到山，二到向，飞星山逆向顺，犯上山，山比和，向克出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巽-乾-1-p321.png",
+          "page": 321
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "巽",
+      "facing_mountain": "乾",
+      "page": 322,
+      "literal_full_clause": "二运挨星，一到山，三到向，飞星山向均逆，当旺山克入吉，向生入吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巽-乾-2-p322.png",
+          "page": 322
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "巽",
+      "facing_mountain": "乾",
+      "page": 322,
+      "literal_full_clause": "三运挨星，二到山，四到向，飞星山向均顺，犯上山下水，山生出凶，向克入吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巽-乾-3-p322.png",
+          "page": 322
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "巽",
+      "facing_mountain": "乾",
+      "page": 323,
+      "literal_full_clause": "四运挨星，三到山，五到向，飞星山逆向顺，犯上山，山比和吉，向生入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巽-乾-4-p323.png",
+          "page": 323
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "巽",
+      "facing_mountain": "乾",
+      "page": 324,
+      "literal_full_clause": "五运挨星，四到山，六到向，飞星山向均顺，犯上山下水，山克出凶，向生入吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巽-乾-5-p324.png",
+          "page": 324
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "巽",
+      "facing_mountain": "乾",
+      "page": 324,
+      "literal_full_clause": "六运挨星，五到山，七到向，飞星山向均顺，犯下水，山克出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巽-乾-6-p324.png",
+          "page": 324
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "巽",
+      "facing_mountain": "乾",
+      "page": 325,
+      "literal_full_clause": "七运挨星，六到山，八到向，飞星山向均顺，犯上山下水，山生出凶，向克出凶。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巽-乾-7-p325.png",
+          "page": 325
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "巽",
+      "facing_mountain": "乾",
+      "page": 326,
+      "literal_full_clause": "八运挨星，七到山，九到向，飞星山向均逆，当旺山克出凶，向生出凶。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巽-乾-8-p326.png",
+          "page": 326
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "巽",
+      "facing_mountain": "乾",
+      "page": 326,
+      "literal_full_clause": "九运挨星，八到山，一到向。飞星山顺向逆，犯下水，山生入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巽-乾-9-p326.png",
+          "page": 326
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "艮",
+      "facing_mountain": "坤",
+      "page": 328,
+      "literal_full_clause": "一运挨星，四到山，七到向，飞星山顺向逆，犯下水，山克出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/艮-坤-1-p328.png",
+          "page": 328
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "艮",
+      "facing_mountain": "坤",
+      "page": 329,
+      "literal_full_clause": "二运挨星，五天星到山，八天星到向，飞星山向均顺，犯上山下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/艮-坤-2-p329.png",
+          "page": 329
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "艮",
+      "facing_mountain": "坤",
+      "page": 329,
+      "literal_full_clause": "三运挨星，六到山，九到向，飞星山顺向逆，犯下水，山克出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/艮-坤-3-p329.png",
+          "page": 329
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "艮",
+      "facing_mountain": "坤",
+      "page": 330,
+      "literal_full_clause": "四运挨星，七到山，一到向，飞星山向均逆，当旺山克入吉，向生入吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/艮-坤-4-p330.png",
+          "page": 330
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "艮",
+      "facing_mountain": "坤",
+      "page": 331,
+      "literal_full_clause": "五运挨星，八到山，二到向，飞星山向均顺，犯上山下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/艮-坤-5-p331.png",
+          "page": 331
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "艮",
+      "facing_mountain": "坤",
+      "page": 331,
+      "literal_full_clause": "六运挨星，九到山，三到向，飞星山向均逆。当旺山克入吉，向克出凶。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/艮-坤-6-p331.png",
+          "page": 331
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "艮",
+      "facing_mountain": "坤",
+      "page": 332,
+      "literal_full_clause": "七运挨星，一到山，四到向，飞星山逆向顺，犯上山，山比和吉，向生出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/艮-坤-7-p332.png",
+          "page": 332
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "艮",
+      "facing_mountain": "坤",
+      "page": 333,
+      "literal_full_clause": "八运挨星，二到山，五到向，飞星山向均顺，犯上山下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/艮-坤-8-p333.png",
+          "page": 333
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "艮",
+      "facing_mountain": "坤",
+      "page": 333,
+      "literal_full_clause": "九运挨星，三到山，六到向，飞星山逆向顺，犯上山，山比和吉，向克入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/艮-坤-9-p333.png",
+          "page": 333
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "坤",
+      "facing_mountain": "艮",
+      "page": 335,
+      "literal_full_clause": "一运挨星，七到山，四到向，飞星山逆向顺，犯上山，山比和，向克出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/坤-艮-1-p335.png",
+          "page": 335
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "坤",
+      "facing_mountain": "艮",
+      "page": 336,
+      "literal_full_clause": "二运挨星，八到山，五到向，飞星山向均顺，犯上山下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/坤-艮-2-p336.png",
+          "page": 336
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "坤",
+      "facing_mountain": "艮",
+      "page": 336,
+      "literal_full_clause": "三运挨星，九到山，六到向，飞星山逆向顺，犯上山，山比和吉，向克出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/坤-艮-3-p336.png",
+          "page": 336
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "坤",
+      "facing_mountain": "艮",
+      "page": 337,
+      "literal_full_clause": "四运挨星，一到山，七到向，飞星山向均逆，当旺山克入吉，向克入吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/坤-艮-4-p337.png",
+          "page": 337
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "坤",
+      "facing_mountain": "艮",
+      "page": 338,
+      "literal_full_clause": "五运挨星，二到山，八到向，飞星山向均顺，犯上山下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/坤-艮-5-p338.png",
+          "page": 338
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "坤",
+      "facing_mountain": "艮",
+      "page": 338,
+      "literal_full_clause": "六运挨星，三到山，九到向，飞星山向均逆，当旺山克出凶，向克入吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/坤-艮-6-p338.png",
+          "page": 338
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "坤",
+      "facing_mountain": "艮",
+      "page": 339,
+      "literal_full_clause": "七运挨星，四到山，一到向，飞星山顺向逆，犯下水，山生出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/坤-艮-7-p339.png",
+          "page": 339
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "坤",
+      "facing_mountain": "艮",
+      "page": 340,
+      "literal_full_clause": "八运挨星，五到山，二到向，飞星山向均顺，犯上山下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/坤-艮-8-p340.png",
+          "page": 340
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "坤",
+      "facing_mountain": "艮",
+      "page": 340,
+      "literal_full_clause": "九运挨星，六到山，三到向，飞星山顺向逆，犯下水，山克入凶，向比和吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/坤-艮-9-p340.png",
+          "page": 340
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "寅",
+      "facing_mountain": "申",
+      "page": 342,
+      "literal_full_clause": "一运挨星，四到山，七到向，飞星山顺向逆，犯下水，向比和吉，山克出凶。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/寅-申-1-p342.png",
+          "page": 342
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "寅",
+      "facing_mountain": "申",
+      "page": 343,
+      "literal_full_clause": "二运挨星，五天星到山，八天星到向，飞星山向均顺，犯上山下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/寅-申-2-p343.png",
+          "page": 343
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "寅",
+      "facing_mountain": "申",
+      "page": 343,
+      "literal_full_clause": "三运挨星，六到山，九到向，飞星山顺向逆，犯下水，山克出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/寅-申-3-p343.png",
+          "page": 343
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "寅",
+      "facing_mountain": "申",
+      "page": 344,
+      "literal_full_clause": "四运挨星，七到山，一到向，飞星山向均逆，当旺山克入吉，向生入吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/寅-申-4-p344.png",
+          "page": 344
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "寅",
+      "facing_mountain": "申",
+      "page": 345,
+      "literal_full_clause": "五运挨星，八到山，二到向，飞星山向均顺，犯上山下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/寅-申-5-p345.png",
+          "page": 345
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "寅",
+      "facing_mountain": "申",
+      "page": 345,
+      "literal_full_clause": "六运挨星，九到山，三到向，飞星山向均逆，当旺山克入吉，向克出凶。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/寅-申-6-p345.png",
+          "page": 345
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "寅",
+      "facing_mountain": "申",
+      "page": 346,
+      "literal_full_clause": "七运挨星，一天星到山，四天星到向，飞星山逆向顺，犯上山，山比和吉，向生出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/寅-申-7-p346.png",
+          "page": 346
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "寅",
+      "facing_mountain": "申",
+      "page": 347,
+      "literal_full_clause": "八运挨星，二天星到山，五天星到向，飞星山向均顺，犯上山下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/寅-申-8-p347.png",
+          "page": 347
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "寅",
+      "facing_mountain": "申",
+      "page": 347,
+      "literal_full_clause": "九运挨星，三到山，六到向，飞星山逆向顺，犯上山，山比和吉，向克入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/寅-申-9-p347.png",
+          "page": 347
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "申",
+      "facing_mountain": "寅",
+      "page": 349,
+      "literal_full_clause": "一运挨星，七到山，四到向，飞星山逆向顺，犯上山，山比和吉，向克出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/申-寅-1-p349.png",
+          "page": 349
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "申",
+      "facing_mountain": "寅",
+      "page": 350,
+      "literal_full_clause": "二运挨星，八到山，五到向，飞星山向均顺，犯上山下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/申-寅-2-p350.png",
+          "page": 350
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "申",
+      "facing_mountain": "寅",
+      "page": 350,
+      "literal_full_clause": "三运挨星，九到山，六到向，飞星山逆向顺，犯上山，山比和吉，向克出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/申-寅-3-p350.png",
+          "page": 350
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "申",
+      "facing_mountain": "寅",
+      "page": 351,
+      "literal_full_clause": "四运挨星，一到山，七到向，飞星山向均逆，当旺山生入吉，向克入吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/申-寅-4-p351.png",
+          "page": 351
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "申",
+      "facing_mountain": "寅",
+      "page": 352,
+      "literal_full_clause": "五运挨星，二到山，八到向，飞星山向均顺，犯上山下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/申-寅-5-p352.png",
+          "page": 352
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "申",
+      "facing_mountain": "寅",
+      "page": 352,
+      "literal_full_clause": "六运挨星，三到山，九到向，飞星山向均逆，当旺山克出凶，向克入吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/申-寅-6-p352.png",
+          "page": 352
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "申",
+      "facing_mountain": "寅",
+      "page": 353,
+      "literal_full_clause": "七运挨星，四到山，一到向，飞星山顺向逆，犯下水，山生出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/申-寅-7-p353.png",
+          "page": 353
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "申",
+      "facing_mountain": "寅",
+      "page": 354,
+      "literal_full_clause": "八运挨星，五到山，二到向，飞星山向均顺，犯上山下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/申-寅-8-p354.png",
+          "page": 354
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "申",
+      "facing_mountain": "寅",
+      "page": 354,
+      "literal_full_clause": "九运挨星，六天星到山，三天星到向，飞星山顺向逆，犯下水，山克入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/申-寅-9-p354.png",
+          "page": 354
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "巳",
+      "facing_mountain": "亥",
+      "page": 356,
+      "literal_full_clause": "一运挨星，九到山，二到向，飞星山逆向顺，犯上山，山比和吉，向克出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巳-亥-1-p356.png",
+          "page": 356
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "巳",
+      "facing_mountain": "亥",
+      "page": 357,
+      "literal_full_clause": "二运挨星，一到山，三到向，飞星山向均逆。当旺山克入吉，向生入吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巳-亥-2-p357.png",
+          "page": 357
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "巳",
+      "facing_mountain": "亥",
+      "page": 357,
+      "literal_full_clause": "三运挨星，二到山，四到向，飞星山向均顺，犯上山下水，山生出凶，向克入吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巳-亥-3-p357.png",
+          "page": 357
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "巳",
+      "facing_mountain": "亥",
+      "page": 358,
+      "literal_full_clause": "四运挨星，三到山，五到向，飞星山逆向顺，犯上山，山比和吉，向生入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巳-亥-4-p358.png",
+          "page": 358
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "巳",
+      "facing_mountain": "亥",
+      "page": 359,
+      "literal_full_clause": "五运挨星，四到山，六到向，飞星山向均顺，犯上山下水，山克出凶，向生入吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巳-亥-5-p359.png",
+          "page": 359
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "巳",
+      "facing_mountain": "亥",
+      "page": 359,
+      "literal_full_clause": "六运挨星，五到山，七到向，飞星山顺向逆，犯下水，山克出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巳-亥-6-p359.png",
+          "page": 359
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "巳",
+      "facing_mountain": "亥",
+      "page": 360,
+      "literal_full_clause": "七运挨星，六到山，八到向，飞星山向均顺，犯上山下水，山生出凶，向克出凶。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巳-亥-7-p360.png",
+          "page": 360
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "巳",
+      "facing_mountain": "亥",
+      "page": 361,
+      "literal_full_clause": "八运挨星，七到山，九到向，飞星山向均逆，当旺山克出凶，向生出凶。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巳-亥-8-p361.png",
+          "page": 361
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "巳",
+      "facing_mountain": "亥",
+      "page": 361,
+      "literal_full_clause": "九运挨星，八到山，一到向，飞星山顺向逆，犯下水，山生入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/巳-亥-9-p361.png",
+          "page": 361
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "亥",
+      "facing_mountain": "巳",
+      "page": 363,
+      "literal_full_clause": "一运挨星，二到山，九到向，飞星山顺向逆，犯下水，向比和吉，山克出凶。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/亥-巳-1-p363.png",
+          "page": 363
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "亥",
+      "facing_mountain": "巳",
+      "page": 364,
+      "literal_full_clause": "二运挨星，三到山，一到向，飞星山向均逆，当旺山生入吉，向克入吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/亥-巳-2-p364.png",
+          "page": 364
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "亥",
+      "facing_mountain": "巳",
+      "page": 364,
+      "literal_full_clause": "三运挨星，四到山，二到向，飞星山向均顺，犯上山下水，山克入吉，向生出凶。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/亥-巳-3-p364.png",
+          "page": 364
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "亥",
+      "facing_mountain": "巳",
+      "page": 365,
+      "literal_full_clause": "四运挨星，五到山，三到向，飞星山顺向逆，犯下水，向比和吉，山生入吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/亥-巳-4-p365.png",
+          "page": 365
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "亥",
+      "facing_mountain": "巳",
+      "page": 366,
+      "literal_full_clause": "五运挨星，六到山，四到向，飞星山向均顺，犯上山下水，山生入吉，向克出凶。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/亥-巳-5-p366.png",
+          "page": 366
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "亥",
+      "facing_mountain": "巳",
+      "page": 366,
+      "literal_full_clause": "六运挨星，七到山，五到向，飞星山逆向顺，犯上山，山比和吉，向克出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/亥-巳-6-p366.png",
+          "page": 366
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "亥",
+      "facing_mountain": "巳",
+      "page": 367,
+      "literal_full_clause": "七运挨星，八到山，六到向，飞星山向均顺，犯上山下水，山克出凶，向生出凶。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/亥-巳-7-p367.png",
+          "page": 367
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "亥",
+      "facing_mountain": "巳",
+      "page": 368,
+      "literal_full_clause": "八运挨星，九到山，七到向，飞星山向均逆，当旺山生出凶，向克出凶。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/亥-巳-8-p368.png",
+          "page": 368
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "亥",
+      "facing_mountain": "巳",
+      "page": 368,
+      "literal_full_clause": "九运挨星，一到山，八到向，飞星山逆向顺，犯上山，山比和吉，向生入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/亥-巳-9-p368.png",
+          "page": 368
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "乙",
+      "facing_mountain": "辛",
+      "page": 370,
+      "literal_full_clause": "一运挨星，八到山，三到向，飞星山顺向逆，犯下水，山生入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乙-辛-1-p370.png",
+          "page": 370
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "乙",
+      "facing_mountain": "辛",
+      "page": 371,
+      "literal_full_clause": "二运挨星，九到山，四到向，飞星山逆向顺，犯上山，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乙-辛-2-p371.png",
+          "page": 371
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "乙",
+      "facing_mountain": "辛",
+      "page": 371,
+      "literal_full_clause": "三运挨星，一到山，五到向，飞星山向均逆，当旺山克入吉，向克出吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乙-辛-3-p371.png",
+          "page": 371
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "乙",
+      "facing_mountain": "辛",
+      "page": 372,
+      "literal_full_clause": "四运挨星，二到山，六到向，飞星山向均顺，犯上山下水，山生入吉，向克入吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乙-辛-4-p372.png",
+          "page": 372
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "乙",
+      "facing_mountain": "辛",
+      "page": 373,
+      "literal_full_clause": "五运挨星，三到山，七到向，飞星山向均逆，当旺山生入吉，向克出凶。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乙-辛-5-p373.png",
+          "page": 373
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "乙",
+      "facing_mountain": "辛",
+      "page": 373,
+      "literal_full_clause": "六运挨星，四到山，八到向，飞星山向均顺，犯上山下水，山生出凶，向生入吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乙-辛-6-p373.png",
+          "page": 373
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "乙",
+      "facing_mountain": "辛",
+      "page": 374,
+      "literal_full_clause": "七运挨星，五到山，九到向，飞星山向均逆，当旺山生入吉，向克出凶。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乙-辛-7-p374.png",
+          "page": 374
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "乙",
+      "facing_mountain": "辛",
+      "page": 375,
+      "literal_full_clause": "八运挨星，六到山，一到向，飞星山顺向逆，犯下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乙-辛-8-p375.png",
+          "page": 375
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "乙",
+      "facing_mountain": "辛",
+      "page": 375,
+      "literal_full_clause": "九运挨星，七到山，二到向，飞星山逆向顺，犯上山，山比和吉，向克出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/乙-辛-9-p375.png",
+          "page": 375
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "辛",
+      "facing_mountain": "乙",
+      "page": 377,
+      "literal_full_clause": "一运挨星，三到山，八到向，飞星山逆向顺，犯上山，山比和吉，向生入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辛-乙-1-p377.png",
+          "page": 377
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "辛",
+      "facing_mountain": "乙",
+      "page": 378,
+      "literal_full_clause": "二运挨星，四到山，九到向，飞星山顺向逆，犯下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辛-乙-2-p378.png",
+          "page": 378
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "辛",
+      "facing_mountain": "乙",
+      "page": 378,
+      "literal_full_clause": "三运挨星，五到山，一到向，飞星山向均逆，当旺山克出凶，向克入凶。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辛-乙-3-p378.png",
+          "page": 378
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "辛",
+      "facing_mountain": "乙",
+      "page": 379,
+      "literal_full_clause": "四运挨星，六到山，二到向，飞星山向均顺，犯上山下水，山克入吉，向生入吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辛-乙-4-p379.png",
+          "page": 379
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "辛",
+      "facing_mountain": "乙",
+      "page": 380,
+      "literal_full_clause": "五运挨星，七到山，三到向，飞星山向均逆，当旺山克出凶，向生入吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辛-乙-5-p380.png",
+          "page": 380
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "辛",
+      "facing_mountain": "乙",
+      "page": 380,
+      "literal_full_clause": "六运挨星，八到山，四到向，飞星山向均顺，犯上山下水，山生入吉，向生出凶。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辛-乙-6-p380.png",
+          "page": 380
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "辛",
+      "facing_mountain": "乙",
+      "page": 381,
+      "literal_full_clause": "七运挨星，九到山，五到向，飞星山向均逆，当旺山克出凶，山生入吉。",
+      "labels": {
+        "山": [
+          "克出",
+          "生入"
+        ],
+        "向": []
+      },
+      "captures": [
+        {
+          "file": "captures/辛-乙-7-p381.png",
+          "page": 381
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "辛",
+      "facing_mountain": "乙",
+      "page": 382,
+      "literal_full_clause": "八运挨星，一到山，六到向，飞星山逆向顺，犯上山，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辛-乙-8-p382.png",
+          "page": 382
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "辛",
+      "facing_mountain": "乙",
+      "page": 382,
+      "literal_full_clause": "九运挨星，二到山，七到向，飞星山顺向逆，犯下水，山克出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辛-乙-9-p382.png",
+          "page": 382
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "丁",
+      "facing_mountain": "癸",
+      "page": 384,
+      "literal_full_clause": "一运挨星，五到山，六到向，飞星山逆向顺，犯上山，山比和吉，向生入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丁-癸-1-p384.png",
+          "page": 384
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "丁",
+      "facing_mountain": "癸",
+      "page": 385,
+      "literal_full_clause": "二运挨星，六天星到山，七天星到向，飞星山顺向逆，犯下水，山生出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丁-癸-2-p385.png",
+          "page": 385
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "丁",
+      "facing_mountain": "癸",
+      "page": 385,
+      "literal_full_clause": "三运挨星，七天星到山，八天星到向，飞星山逆向顺，犯上山，山比和吉，向克出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丁-癸-3-p385.png",
+          "page": 385
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "丁",
+      "facing_mountain": "癸",
+      "page": 386,
+      "literal_full_clause": "四运挨星，八天星到山，九天星到向，飞星山顺向逆，犯下水，山克出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丁-癸-4-p386.png",
+          "page": 386
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "丁",
+      "facing_mountain": "癸",
+      "page": 387,
+      "literal_full_clause": "五运挨星，九到山，一到向，飞星山向均逆，当旺山生出凶，向克入吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丁-癸-5-p387.png",
+          "page": 387
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "丁",
+      "facing_mountain": "癸",
+      "page": 387,
+      "literal_full_clause": "六运挨星，一到山，二到向，飞星山逆向顺，犯上山，山比和吉，向生入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丁-癸-6-p387.png",
+          "page": 387
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "丁",
+      "facing_mountain": "癸",
+      "page": 388,
+      "literal_full_clause": "七运挨星，二到山，三到向，飞星山顺向逆，犯下水，山生入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丁-癸-7-p388.png",
+          "page": 388
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "丁",
+      "facing_mountain": "癸",
+      "page": 389,
+      "literal_full_clause": "八运挨星，三到山，四到向，飞星山逆向顺，犯上山，山比和吉，向克出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丁-癸-8-p389.png",
+          "page": 389
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "丁",
+      "facing_mountain": "癸",
+      "page": 389,
+      "literal_full_clause": "九运挨星，四到山，五到向，飞星山顺向逆，犯下水，山克出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丁-癸-9-p389.png",
+          "page": 389
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "癸",
+      "facing_mountain": "丁",
+      "page": 391,
+      "literal_full_clause": "一运挨星，六到山，五到向，飞星山顺向逆，犯下水，山生入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/癸-丁-1-p391.png",
+          "page": 391
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "癸",
+      "facing_mountain": "丁",
+      "page": 392,
+      "literal_full_clause": "二运挨星，七到山，六到向，飞星山逆向顺，犯上山，山比和吉，向生出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/癸-丁-2-p392.png",
+          "page": 392
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "癸",
+      "facing_mountain": "丁",
+      "page": 392,
+      "literal_full_clause": "三运挨星，八到山，七到向，飞星山顺向逆，犯下水，山克出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/癸-丁-3-p392.png",
+          "page": 392
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "癸",
+      "facing_mountain": "丁",
+      "page": 393,
+      "literal_full_clause": "四运挨星，九到山，八到向，飞星山逆向顺，犯上山，山比和吉，向克出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/癸-丁-4-p393.png",
+          "page": 393
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "癸",
+      "facing_mountain": "丁",
+      "page": 394,
+      "literal_full_clause": "五运挨星，一到山，九到向，飞星山向均逆，当旺山克入吉，向生出凶。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/癸-丁-5-p394.png",
+          "page": 394
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "癸",
+      "facing_mountain": "丁",
+      "page": 394,
+      "literal_full_clause": "六运挨星，二到山，一到向，飞星山顺向逆，犯下水，山生入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/癸-丁-6-p394.png",
+          "page": 394
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "癸",
+      "facing_mountain": "丁",
+      "page": 395,
+      "literal_full_clause": "七运挨星，三到山，二到向，飞星山逆向顺，犯上山，山比和吉，向生入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/癸-丁-7-p395.png",
+          "page": 395
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "癸",
+      "facing_mountain": "丁",
+      "page": 396,
+      "literal_full_clause": "八运挨星，四到山，三到向，飞星山顺向逆，犯下水，山克出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/癸-丁-8-p396.png",
+          "page": 396
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "癸",
+      "facing_mountain": "丁",
+      "page": 396,
+      "literal_full_clause": "九运挨星，五到山，四到向，飞星山逆向顺，犯上山，山比和吉，向克出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/癸-丁-9-p396.png",
+          "page": 396
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "辰",
+      "facing_mountain": "戌",
+      "page": 398,
+      "literal_full_clause": "一运挨星，九到山，二到向，飞星山顺向逆，犯下水，山克入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辰-戌-1-p398.png",
+          "page": 398
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "辰",
+      "facing_mountain": "戌",
+      "page": 399,
+      "literal_full_clause": "二运挨星，一到山，三到向，飞星山向均顺，犯上山下水，山生出凶，向克出凶。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辰-戌-2-p399.png",
+          "page": 399
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "辰",
+      "facing_mountain": "戌",
+      "page": 399,
+      "literal_full_clause": "三运挨星，二到山，四到向，飞星山向均逆，当旺山克出凶，山生入吉。",
+      "labels": {
+        "山": [
+          "克出",
+          "生入"
+        ],
+        "向": []
+      },
+      "captures": [
+        {
+          "file": "captures/辰-戌-3-p399.png",
+          "page": 399
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "辰",
+      "facing_mountain": "戌",
+      "page": 400,
+      "literal_full_clause": "四运挨星，三到山，五到向，飞星山顺向逆，犯下水，山生出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辰-戌-4-p400.png",
+          "page": 400
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "辰",
+      "facing_mountain": "戌",
+      "page": 401,
+      "literal_full_clause": "五运挨星，四到山，六到向，飞星山向均逆，当旺山生出凶，向克入吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辰-戌-5-p401.png",
+          "page": 401
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "辰",
+      "facing_mountain": "戌",
+      "page": 401,
+      "literal_full_clause": "六运挨星，五到山，七到向，飞星山逆向顺，犯上山，山比和吉，向克入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辰-戌-6-p401.png",
+          "page": 401
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "辰",
+      "facing_mountain": "戌",
+      "page": 402,
+      "literal_full_clause": "七运挨星，六到山，八到向，飞星山向均逆，当旺山克入吉，向生入吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辰-戌-7-p402.png",
+          "page": 402
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "辰",
+      "facing_mountain": "戌",
+      "page": 403,
+      "literal_full_clause": "八运挨星，七到山，九到向，飞星山向均顺，犯上山下水，山生入吉，向克入吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辰-戌-8-p403.png",
+          "page": 403
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "辰",
+      "facing_mountain": "戌",
+      "page": 403,
+      "literal_full_clause": "九运挨星，八到山，一到向，飞星山逆向顺，犯上山，山比和吉，向生出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/辰-戌-9-p403.png",
+          "page": 403
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "戌",
+      "facing_mountain": "辰",
+      "page": 405,
+      "literal_full_clause": "一运挨星，二到山，九到向，飞星山逆向顺，犯上山，山比和吉，向克入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/戌-辰-1-p405.png",
+          "page": 405
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "戌",
+      "facing_mountain": "辰",
+      "page": 406,
+      "literal_full_clause": "二运挨星，三到山，一到向，飞星山向均顺，犯上山下水，山克出凶，向生出凶。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/戌-辰-2-p406.png",
+          "page": 406
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "戌",
+      "facing_mountain": "辰",
+      "page": 406,
+      "literal_full_clause": "三运挨星，四到山，二到向，飞星山向均逆，当旺山生入吉，向克出凶。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/戌-辰-3-p406.png",
+          "page": 406
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "戌",
+      "facing_mountain": "辰",
+      "page": 407,
+      "literal_full_clause": "四运挨星，五到山，三到向，飞星山逆向顺，犯上山，山比和吉，向生出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/戌-辰-4-p407.png",
+          "page": 407
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "戌",
+      "facing_mountain": "辰",
+      "page": 408,
+      "literal_full_clause": "五运挨星，六到山，四到向，飞星山向均逆，当旺山克入吉，向生出凶。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/戌-辰-5-p408.png",
+          "page": 408
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "戌",
+      "facing_mountain": "辰",
+      "page": 408,
+      "literal_full_clause": "六运挨星，七到山，五到向，飞星山顺向逆，犯下水，山克入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/戌-辰-6-p408.png",
+          "page": 408
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "戌",
+      "facing_mountain": "辰",
+      "page": 409,
+      "literal_full_clause": "七运挨星，八到山，六到向，飞星山向均逆，当旺山生入吉，向克入吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/戌-辰-7-p409.png",
+          "page": 409
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "戌",
+      "facing_mountain": "辰",
+      "page": 410,
+      "literal_full_clause": "八运挨星，九到山，七到向，飞星山向均顺，犯上山下水，山克入吉，向生入吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/戌-辰-8-p410.png",
+          "page": 410
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "戌",
+      "facing_mountain": "辰",
+      "page": 410,
+      "literal_full_clause": "九运挨星，一到山，八到向，飞星山顺向逆，犯下水，山生出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/戌-辰-9-p410.png",
+          "page": 410
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "丑",
+      "facing_mountain": "未",
+      "page": 412,
+      "literal_full_clause": "一运挨星，四到山，七到向，飞星山逆向顺，犯上山，山比和吉，向克入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丑-未-1-p412.png",
+          "page": 412
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "丑",
+      "facing_mountain": "未",
+      "page": 413,
+      "literal_full_clause": "二运挨星，五到山，八到向，飞星山向均逆，当旺山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丑-未-2-p413.png",
+          "page": 413
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "丑",
+      "facing_mountain": "未",
+      "page": 413,
+      "literal_full_clause": "三运挨星，六到山，九到向，飞星山逆向顺，犯上山，山比和吉，向克入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丑-未-3-p413.png",
+          "page": 413
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "丑",
+      "facing_mountain": "未",
+      "page": 414,
+      "literal_full_clause": "四运挨星，七到山，一到向，飞星山向均顺，犯上山下水，山生出凶，向克出凶。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丑-未-4-p414.png",
+          "page": 414
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "丑",
+      "facing_mountain": "未",
+      "page": 415,
+      "literal_full_clause": "五运挨星，八到山，二到向，飞星山向均逆，当旺山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丑-未-5-p415.png",
+          "page": 415
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "丑",
+      "facing_mountain": "未",
+      "page": 415,
+      "literal_full_clause": "六运挨星，九到山，三到向，飞星山向均顺，犯上山下水，山克入吉，向克出吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丑-未-6-p415.png",
+          "page": 415
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "丑",
+      "facing_mountain": "未",
+      "page": 416,
+      "literal_full_clause": "七运挨星，一到山，四到向，飞星山顺向逆，犯下水，山生入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丑-未-7-p416.png",
+          "page": 416
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "丑",
+      "facing_mountain": "未",
+      "page": 417,
+      "literal_full_clause": "八运挨星，二到山，五到向，飞星山向均逆，当旺山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丑-未-8-p417.png",
+          "page": 417
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "丑",
+      "facing_mountain": "未",
+      "page": 417,
+      "literal_full_clause": "九运挨星，三到山，六到向，飞星山顺向逆，犯下水，山克出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丑-未-9-p417.png",
+          "page": 417
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "未",
+      "facing_mountain": "丑",
+      "page": 419,
+      "literal_full_clause": "一运挨星，七到山，四到向，飞星山顺向逆，犯下水，山克入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/未-丑-1-p419.png",
+          "page": 419
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "未",
+      "facing_mountain": "丑",
+      "page": 420,
+      "literal_full_clause": "二运挨星，八到山，五到向，飞星山向均逆，当旺山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/未-丑-2-p420.png",
+          "page": 420
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "未",
+      "facing_mountain": "丑",
+      "page": 420,
+      "literal_full_clause": "三运挨星，九到山，六到向，飞星山顺向逆，犯下水，山克入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/未-丑-3-p420.png",
+          "page": 420
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "未",
+      "facing_mountain": "丑",
+      "page": 421,
+      "literal_full_clause": "四运挨星，一到山，七到向，飞星山向均顺，犯上山下水，山克出凶，向生出凶。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/未-丑-4-p421.png",
+          "page": 421
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "未",
+      "facing_mountain": "丑",
+      "page": 422,
+      "literal_full_clause": "五运挨星，二到山，八到向，飞星山向均逆，当旺山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/未-丑-5-p422.png",
+          "page": 422
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "未",
+      "facing_mountain": "丑",
+      "page": 422,
+      "literal_full_clause": "六运挨星，三到山，九到向，飞星山向均顺，犯上山下水，山克出凶，向克入吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/未-丑-6-p422.png",
+          "page": 422
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "未",
+      "facing_mountain": "丑",
+      "page": 423,
+      "literal_full_clause": "七运挨星，四到山，一到向，飞星山逆向顺，犯上山，山比和吉，向生入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/未-丑-7-p423.png",
+          "page": 423
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "未",
+      "facing_mountain": "丑",
+      "page": 424,
+      "literal_full_clause": "八运挨星，五到山，二到向，飞星山向均逆，当旺山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/未-丑-8-p424.png",
+          "page": 424
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "未",
+      "facing_mountain": "丑",
+      "page": 424,
+      "literal_full_clause": "九运挨星，六到山，三到向，飞星山逆向顺，犯上山，山比和吉，向克出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/未-丑-9-p424.png",
+          "page": 424
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "甲",
+      "facing_mountain": "庚",
+      "page": 426,
+      "literal_full_clause": "一运挨星，八到山，三到向，飞星山逆向顺，犯上山，山比和吉，向生出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/甲-庚-1-p426.png",
+          "page": 426
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "甲",
+      "facing_mountain": "庚",
+      "page": 427,
+      "literal_full_clause": "二运挨星，九到山，四到向，飞星山顺向逆，犯下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/甲-庚-2-p427.png",
+          "page": 427
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "甲",
+      "facing_mountain": "庚",
+      "page": 427,
+      "literal_full_clause": "三运挨星，一到山，五到向，飞星山向均顺，犯上山下水，山克入凶，向生出凶。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/甲-庚-3-p427.png",
+          "page": 427
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "甲",
+      "facing_mountain": "庚",
+      "page": 428,
+      "literal_full_clause": "四运挨星，二到山，六到向，飞星山向均逆，当旺山克出凶，向生出凶。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/甲-庚-4-p428.png",
+          "page": 428
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "甲",
+      "facing_mountain": "庚",
+      "page": 429,
+      "literal_full_clause": "五运挨星，三到山，七到向，飞星山向均顺，犯上山下水，山克入吉，向生出凶。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/甲-庚-5-p429.png",
+          "page": 429
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "甲",
+      "facing_mountain": "庚",
+      "page": 429,
+      "literal_full_clause": "六运挨星，四到山，八到向，飞星山向均逆，当旺山生出凶，向生入吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/甲-庚-6-p429.png",
+          "page": 429
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "甲",
+      "facing_mountain": "庚",
+      "page": 430,
+      "literal_full_clause": "七运挨星，五到山，九到向，飞星山向均顺，犯上山下水，山克入吉，向生出凶。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/甲-庚-7-p430.png",
+          "page": 430
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "甲",
+      "facing_mountain": "庚",
+      "page": 431,
+      "literal_full_clause": "八运挨星，六到山，一到向，飞星山逆向顺，犯上山，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/甲-庚-8-p431.png",
+          "page": 431
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "甲",
+      "facing_mountain": "庚",
+      "page": 431,
+      "literal_full_clause": "九运挨星，七到山，二到向，飞星山顺向逆，犯下水，山比和吉，向克入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/甲-庚-9-p431.png",
+          "page": 431
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "庚",
+      "facing_mountain": "甲",
+      "page": 433,
+      "literal_full_clause": "一运挨星，三到山，八到向，飞星山顺向逆，犯下水，山生出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/庚-甲-1-p433.png",
+          "page": 433
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "庚",
+      "facing_mountain": "甲",
+      "page": 434,
+      "literal_full_clause": "二运挨星，四到山，九到向，飞星山逆向顺，犯上山，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/庚-甲-2-p434.png",
+          "page": 434
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "庚",
+      "facing_mountain": "甲",
+      "page": 434,
+      "literal_full_clause": "三运挨星，五到山，一到向，飞星山向均顺，犯上山下水，山克出凶，向克入吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/庚-甲-3-p434.png",
+          "page": 434
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "庚",
+      "facing_mountain": "甲",
+      "page": 435,
+      "literal_full_clause": "四运挨星，六到山，二到向，飞星山向均逆，当旺山生出凶，向克出凶。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/庚-甲-4-p435.png",
+          "page": 435
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "庚",
+      "facing_mountain": "甲",
+      "page": 436,
+      "literal_full_clause": "五运挨星，七到山，三到向，飞星山向均顺，犯上山下水，山生出凶，向克入吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/庚-甲-5-p436.png",
+          "page": 436
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "庚",
+      "facing_mountain": "甲",
+      "page": 436,
+      "literal_full_clause": "六运挨星，八到山，四到向，飞星山向均逆，当旺山生入吉，向生出凶。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/庚-甲-6-p436.png",
+          "page": 436
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "庚",
+      "facing_mountain": "甲",
+      "page": 437,
+      "literal_full_clause": "七运挨星，九到山，五到向，飞星山向均顺，犯上山下水，山生出凶，向克入吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/庚-甲-7-p437.png",
+          "page": 437
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "庚",
+      "facing_mountain": "甲",
+      "page": 438,
+      "literal_full_clause": "八运挨星，一到山，六到向，飞星山顺向逆，犯下水，山向均比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/庚-甲-8-p438.png",
+          "page": 438
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "庚",
+      "facing_mountain": "甲",
+      "page": 438,
+      "literal_full_clause": "九运挨星，二到山，七到向，飞星山逆向顺，犯上山，山比和吉，向克入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/庚-甲-9-p438.png",
+          "page": 438
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "壬",
+      "facing_mountain": "丙",
+      "page": 440,
+      "literal_full_clause": "一运挨星，六到山，五到向，飞星山逆向顺，犯上山，山比和吉，向生出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/壬-丙-1-p440.png",
+          "page": 440
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "壬",
+      "facing_mountain": "丙",
+      "page": 441,
+      "literal_full_clause": "二运挨星，七到山，六到向，飞星山顺向逆，犯下水，山生入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/壬-丙-2-p441.png",
+          "page": 441
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "壬",
+      "facing_mountain": "丙",
+      "page": 441,
+      "literal_full_clause": "三运挨星，八到山，七到向，飞星山逆向顺，犯上山，山比和吉，向克入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/壬-丙-3-p441.png",
+          "page": 441
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "壬",
+      "facing_mountain": "丙",
+      "page": 442,
+      "literal_full_clause": "四运挨星，九到山，顺行，犯下水，八到向，逆行，向比和，山克入吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/壬-丙-4-p442.png",
+          "page": 442
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "壬",
+      "facing_mountain": "丙",
+      "page": 443,
+      "literal_full_clause": "五运挨星，一到山，九到向，飞星山向均顺，犯上山下水凶，山生入吉，向克出凶。",
+      "labels": {
+        "山": [
+          "生入"
+        ],
+        "向": [
+          "克出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/壬-丙-5-p443.png",
+          "page": 443
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "壬",
+      "facing_mountain": "丙",
+      "page": 443,
+      "literal_full_clause": "六运挨星，二到山，逆行，一到向，顺行，犯上山凶，向克入，山比和吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/壬-丙-6-p443.png",
+          "page": 443
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "壬",
+      "facing_mountain": "丙",
+      "page": 444,
+      "literal_full_clause": "七运挨星，三到山，二到向，飞星山顺向逆，犯下水凶，山生出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/壬-丙-7-p444.png",
+          "page": 444
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "壬",
+      "facing_mountain": "丙",
+      "page": 445,
+      "literal_full_clause": "八运挨星，四到山，三到向，飞星山逆向顺，犯上山，山比和吉，向克入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/壬-丙-8-p445.png",
+          "page": 445
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "壬",
+      "facing_mountain": "丙",
+      "page": 445,
+      "literal_full_clause": "九运挨星，五到山，四到向，飞星山顺向逆，犯下水，山克入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/壬-丙-9-p445.png",
+          "page": 445
+        }
+      ]
+    },
+    {
+      "period": 1,
+      "sitting_mountain": "丙",
+      "facing_mountain": "壬",
+      "page": 447,
+      "literal_full_clause": "一运挨星，五到山，六到向，飞星山顺向逆，犯下水，山生出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丙-壬-1-p447.png",
+          "page": 447
+        }
+      ]
+    },
+    {
+      "period": 2,
+      "sitting_mountain": "丙",
+      "facing_mountain": "壬",
+      "page": 448,
+      "literal_full_clause": "二运挨星，六到山，七到向，飞星山逆向顺，犯上山，山比和吉，向生入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丙-壬-2-p448.png",
+          "page": 448
+        }
+      ]
+    },
+    {
+      "period": 3,
+      "sitting_mountain": "丙",
+      "facing_mountain": "壬",
+      "page": 448,
+      "literal_full_clause": "三运挨星，七到山，八到向，飞星山顺向逆，犯下水，山克入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丙-壬-3-p448.png",
+          "page": 448
+        }
+      ]
+    },
+    {
+      "period": 4,
+      "sitting_mountain": "丙",
+      "facing_mountain": "壬",
+      "page": 449,
+      "literal_full_clause": "四运挨星，八到山，九到向，飞星山逆向顺，犯上山，山比和吉，向克入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丙-壬-4-p449.png",
+          "page": 449
+        }
+      ]
+    },
+    {
+      "period": 5,
+      "sitting_mountain": "丙",
+      "facing_mountain": "壬",
+      "page": 450,
+      "literal_full_clause": "五运挨星，九到山，一到向，飞星山向均顺，犯上山下水，山克出凶，向生入吉。",
+      "labels": {
+        "山": [
+          "克出"
+        ],
+        "向": [
+          "生入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丙-壬-5-p450.png",
+          "page": 450
+        }
+      ]
+    },
+    {
+      "period": 6,
+      "sitting_mountain": "丙",
+      "facing_mountain": "壬",
+      "page": 450,
+      "literal_full_clause": "六运挨星，一到山，二到向，飞星山顺向逆，犯下水，山生出凶，向比和吉。",
+      "labels": {
+        "山": [
+          "生出"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丙-壬-6-p450.png",
+          "page": 450
+        }
+      ]
+    },
+    {
+      "period": 7,
+      "sitting_mountain": "丙",
+      "facing_mountain": "壬",
+      "page": 451,
+      "literal_full_clause": "七运挨星，二到山，三到向，飞星山逆向顺，犯上山，山比和吉，向生出凶。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "生出"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丙-壬-7-p451.png",
+          "page": 451
+        }
+      ]
+    },
+    {
+      "period": 8,
+      "sitting_mountain": "丙",
+      "facing_mountain": "壬",
+      "page": 452,
+      "literal_full_clause": "八运挨星，三到山，四到向，飞星山顺向逆，犯下水，山克入吉，向比和吉。",
+      "labels": {
+        "山": [
+          "克入"
+        ],
+        "向": [
+          "比和"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丙-壬-8-p452.png",
+          "page": 452
+        }
+      ]
+    },
+    {
+      "period": 9,
+      "sitting_mountain": "丙",
+      "facing_mountain": "壬",
+      "page": 452,
+      "literal_full_clause": "九运挨星，四到山，五到向，飞星山逆向顺，犯上山，山比和吉，向克入吉。",
+      "labels": {
+        "山": [
+          "比和"
+        ],
+        "向": [
+          "克入"
+        ]
+      },
+      "captures": [
+        {
+          "file": "captures/丙-壬-9-p452.png",
+          "page": 452
+        }
+      ]
+    }
+  ],
+  "source_policy_notes": [
+    "PDF453以生入克入比和为吉、出为凶，又承认向首克出为吉的异说；PDF909–910另论克出为旺并细分山向，两个吉凶口径不合并。",
+    "完整216条的432个角色位均保留；两条重复写山而缺向，不按程序结果补字。",
+    "仅比较原文关系词和明示主客定义；文内吉凶字不作为本宅预测结论。",
+    "山向与运递生地盘不自动合成为吉凶评分；实际形势、时令、角度适用与输入真实性独立。",
+    "不覆盖完整81对专属断语，不从生入或克出直接推现实福祸。"
+  ]
+}

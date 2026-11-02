@@ -1,0 +1,235 @@
+{
+  "id": "meihua_traveler_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本行人初始条款与初用受生受克参照",
+  "selected_edition_id": "nlc_1925",
+  "source": {
+    "id": "nlc_1925",
+    "title": "文明書局《梅花易數》卷二行人占第十三",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_indices": [
+      69
+    ],
+    "paper_pages": [
+      "卷二一六"
+    ],
+    "attribution_scope": "Hosting catalogue metadata; no independent authorship certification"
+  },
+  "comparison_source": {
+    "id": "wikisource_1441921",
+    "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二",
+    "revision": 1441921,
+    "raw_wikitext_sha256": "239523c6bb8b59d7ed3fe229c681cd1a1124a5216617e198f05dbf19cc6d2939"
+  },
+  "topics": {
+    "traveler": {
+      "label": "行人",
+      "section": "行人占第十三",
+      "use_role": "行人",
+      "header": "占行人以體為主用為行人",
+      "pdf_index": 69
+    }
+  },
+  "rules": [
+    {
+      "id": "traveler_body_controls_use",
+      "topic": "traveler",
+      "relation": "体克用",
+      "source_id": "nlc_1925",
+      "section": "行人占第十三",
+      "quote": "體尅用行人歸遲",
+      "reading": "所选本取归迟的相对迟滞象义，未给出数值期限",
+      "semantic_tags": [
+        "source_symbol_not_verified_return_or_whereabouts"
+      ],
+      "delay_scope": "relative_wording_only_no_numeric_date",
+      "source_witness": {
+        "original_pdf_indices": [
+          69
+        ],
+        "reader": "assistant provisional selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體克用，行人歸遲",
+        "semantic_status": "separate_witness_not_override"
+      }
+    },
+    {
+      "id": "traveler_use_controls_body",
+      "topic": "traveler",
+      "relation": "用克体",
+      "source_id": "nlc_1925",
+      "section": "行人占第十三",
+      "quote": "用尅體行人不歸",
+      "reading": "不归仅为所选原文占辞，未核实是否返归或实际位置",
+      "semantic_tags": [
+        "source_symbol_not_verified_return_or_whereabouts"
+      ],
+      "delay_scope": "relative_wording_only_no_numeric_date",
+      "source_witness": {
+        "original_pdf_indices": [
+          69
+        ],
+        "reader": "assistant provisional selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用克體，行人不歸",
+        "semantic_status": "separate_witness_not_override"
+      }
+    },
+    {
+      "id": "traveler_body_generates_use",
+      "topic": "traveler",
+      "relation": "体生用",
+      "source_id": "nlc_1925",
+      "section": "行人占第十三",
+      "quote": "體生用行人未歸",
+      "reading": "所选本取未归象义，不能据此否认已报返归事实",
+      "semantic_tags": [
+        "source_symbol_not_verified_return_or_whereabouts"
+      ],
+      "delay_scope": "relative_wording_only_no_numeric_date",
+      "source_witness": {
+        "original_pdf_indices": [
+          69
+        ],
+        "reader": "assistant provisional selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體生用，行人未歸",
+        "semantic_status": "separate_witness_not_override"
+      }
+    },
+    {
+      "id": "traveler_use_generates_body",
+      "topic": "traveler",
+      "relation": "用生体",
+      "source_id": "nlc_1925",
+      "section": "行人占第十三",
+      "quote": "用生體行人即歸",
+      "reading": "所选本取即归的相对趋近象义，未给出具体日期或实际到达",
+      "semantic_tags": [
+        "source_symbol_not_verified_return_or_whereabouts"
+      ],
+      "delay_scope": "relative_wording_only_no_numeric_date",
+      "source_witness": {
+        "original_pdf_indices": [
+          69
+        ],
+        "reader": "assistant provisional selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用生體，行人即歸",
+        "semantic_status": "separate_witness_not_override"
+      }
+    },
+    {
+      "id": "traveler_same_element",
+      "topic": "traveler",
+      "relation": "体用比和",
+      "source_id": "nlc_1925",
+      "section": "行人占第十三",
+      "quote": "體用比和歸期不日矣",
+      "reading": "不日仅为相对措辞，未量化为天数、期限或保证返归",
+      "semantic_tags": [
+        "source_symbol_not_verified_return_or_whereabouts"
+      ],
+      "delay_scope": "relative_wording_only_no_numeric_date",
+      "source_witness": {
+        "original_pdf_indices": [
+          69
+        ],
+        "reader": "assistant provisional selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體用比和，歸期不日矣",
+        "semantic_status": "separate_witness_not_override"
+      }
+    }
+  ],
+  "supplement_header": {
+    "quote": "又以用卦為行人之盈旺",
+    "comparison_quote": "又以用卦看行人在外之情況",
+    "character_reading": "provisional visual reading; 盈旺 retained literally, no independent expert authentication",
+    "source_witness": {
+      "original_pdf_indices": [
+        69
+      ],
+      "reader": "assistant provisional selected-span visual reading",
+      "independent_human_expert_review": false
+    }
+  },
+  "selection_policy": {
+    "target_role": "use",
+    "target_stage": "initial",
+    "internal_actor_roles": [
+      "body",
+      "body_mutual",
+      "use_mutual",
+      "changed_use"
+    ],
+    "target_is_original_body": false,
+    "original_body_frame_preserved": true,
+    "scope": "four_other_internal_roles_against_original_use_static_body_once",
+    "unique_classical_scope_adjudicated": false,
+    "external_observations_rebased_to_use": false,
+    "absence_in_selected_scope_proves_full_clause_absence": false,
+    "seasonal_scope": "existing solar-term month branch 旺/衰 selected policy; 原文未定 is unknown; no full year-month-day synthesis"
+  },
+  "supplement_rules": [
+    {
+      "id": "traveler_receives_generation",
+      "quote": "逢生在外順快",
+      "comparison_quote": "逢生，在外順快",
+      "condition": "initial_use_receives_generation_from_selected_internal_actors"
+    },
+    {
+      "id": "traveler_weak_and_controlled",
+      "quote": "逢衰受尅在外災殃",
+      "comparison_quote": "逢衰受克，在外災殃",
+      "condition": "initial_use_weak_AND_initial_use_receives_control_in_selected_scope"
+    },
+    {
+      "id": "traveler_zhen_many",
+      "quote": "震多不寧",
+      "comparison_quote": "震多不寧",
+      "condition": "unadjudicated_many_scope_and_threshold",
+      "trigram": "震"
+    },
+    {
+      "id": "traveler_gen_many",
+      "quote": "艮多有阻",
+      "comparison_quote": "艮多有阻",
+      "condition": "unadjudicated_many_scope_and_threshold",
+      "trigram": "艮"
+    },
+    {
+      "id": "traveler_kan",
+      "quote": "坎有險難",
+      "comparison_quote": "坎有險難",
+      "condition": "selected_initial_use_trigram_only",
+      "trigram": "坎"
+    },
+    {
+      "id": "traveler_dui",
+      "quote": "兌主紛爭之應",
+      "comparison_quote": "兌主紛爭",
+      "condition": "selected_initial_use_trigram_only",
+      "trigram": "兑"
+    }
+  ],
+  "complete_selected_supplement": "又以用卦為行人之盈旺逢生在外順快逢衰受尅在外災殃震多不寧艮多有阻坎有險難兌主紛爭之應",
+  "full_chapter_conformance": false,
+  "real_world_prediction_validated": false
+}

@@ -31,6 +31,8 @@ CLI 可直接执行，无需启动 REST。REST 默认端口为 `8010`，MCP 默�
 | 升级旧接口 | [迁移指南](migration.md) · [变更记录](../CHANGELOG.md) |
 | 定位安装、MCP、参数或结果交付错误 | [故障排除](troubleshooting.md) |
 | 报告安全问题 | [安全策略](../SECURITY.md) |
+| 评估外部命例的输入质量、解释与边界 | [MingLi-Bench 外部评估](mingli-bench-evaluation.md) · [Agent 行为验收](agent-evaluation.md) |
+| 查询四柱、年柱、月柱及可核验来源 | [基础知识词条](bazi-foundations-knowledge.md) |
 
 ## 理解计算与结果
 
@@ -38,11 +40,22 @@ CLI 可直接执行，无需启动 REST。REST 默认端口为 `8010`，MCP 默�
 
 | 原理与专题 | 说明范围 |
 | --- | --- |
-| [架构说明](architecture.md) | 工具目录、请求、领域服务与三种传输入口如何协作 |
-| [八字判定说明](bazi-assessment.md) | 旺衰、喜用分层、原典与工程参数、回归及未覆盖范围 |
-| [双人配合评分](compatibility-scoring.md) | 分项权重、舍入、方向性和可解释范围 |
-| [法达兼容性](firdaria-compatibility.md) | 法达模式、时间口径、版本差异与对照方法 |
-| [玄空宅盘](fengshui-xuankong.md) | 历史定运、角区、来源版本与独立验证 |
+| [架构说明](architecture.md) | 工具目录、领域服务与三端数据流 |
+| [八字判定说明](bazi-assessment.md) · [八字时运](bazi-timing.md) | 旺衰、喜用、历法边界、原典条件与验证范围 |
+| [紫微斗数](ziwei.md) | 规则配置、历法、原典与专业验收 |
+| [双人配合评分](compatibility-scoring.md) | 分项权重、舍入、方向性与解释范围 |
+| [梅花易数](meihua.md) · [六爻与周易](liuyao-depth-audit.md) | 取数、动变、原文规则与验收边界 |
+| [河洛与参评数](numerology-audit.md) | 原典算例、交节边界、取数与解释来源 |
+| [奇门遁甲](qimen-depth-audit.md) · [太乙与三式](taiyi-sanshi-audit.md) · [六壬与金口诀](liuren-jinkou-audit.md) | 盘式规则、底本校勘与独立验证 |
+| [人类图](human-design.md) | 太阳求根、身体图、原典数值与未决分歧 |
+| [印度占星](jyotish.md) | Lahiri、本命／分盘、Vimshottari 与时间精度 |
+| [果老星宗](guolao.md) · [宿曜与宿占](sukuyo.md) | 七政四余、宿界、历法与来源限制 |
+| [西方占星](western-astrology.md) · [其他流派](other-chart-schools.md) | 时标、星历、宫制、德国盘与13等分扇区 |
+| [法达兼容性](firdaria-compatibility.md) | 模式、时间口径、版本差异与对照方法 |
+| [占星骰](astrodice.md) | 骰面、原典关系、解释来源与验证边界 |
+| [家居风水](fengshui.md) · [玄空宅盘](fengshui-xuankong.md) | 分层规则、输入事实、作者版本与独立验证 |
+
+各专题页维护细分规则、历史差异和验证记录；接口字段与完整证据按对应入口查询。
 
 ## 查询接口与覆盖
 
@@ -66,6 +79,12 @@ CLI 可直接执行，无需启动 REST。REST 默认端口为 `8010`，MCP 默�
 | 作者、版本、方位与基础判据 | [规则来源](../skills/onda-fengshui/references/rule-sources.md) · [布局规则](../skills/onda-fengshui/references/layout-rules.md) |
 | 厨卫、镜、梁管、尖角、材质器形 | [室内关系与材质](../skills/onda-fengshui/references/sourced-interior-rules.md) |
 | 历史宅运、山水条件与有限解释 | [宅盘来源](../skills/onda-fengshui/references/xuankong.md) · [有限解释](../skills/onda-fengshui/references/xuankong-interpretation.md) |
+| 沈氏整理本216条下卦及同版图文冲突 | [条文校勘](fengshui-lower-clause-collation.md) |
+| 完整216张下卦盘的5,832个星数 | [盘图校勘](fengshui-lower-diagram-collation.md) |
+| 完整216张起星图的5,832个星数与兼向范围 | [起星图校勘](fengshui-replacement-diagram-collation.md) |
+| 宅盘实际返回的原书正文与图数差异 | [运行来源比较](fengshui-source-comparison.md) |
+| 事件有效年候选与已确定宅运分别读取 | [有效年分层](fengshui-event-year-fidelity.md) |
+| 候选节月、各自有效期与交节来源 | [月区间分层](fengshui-month-interval-fidelity.md) |
 | 工位活动、隔挡与材料条件 | [工位作者规则](../skills/onda-fengshui/references/workstation-authored.md) |
 | 用户明确另选的 BTB 桌面规则 | [桌面作者规则](../skills/onda-fengshui/references/surface-rules.md) |
 | 结果表达、逐物件与候选对照 | [结果交付](../skills/onda-fengshui/references/delivery.md) |

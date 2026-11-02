@@ -1,0 +1,225 @@
+{
+  "id": "t2217_sho_second_comparison_v1",
+  "identification": {
+    "status": "strong_work_level_identification_specific_exemplar_unestablished",
+    "finding": "本次直接证据强力支持T2217第0620页“鈔第二”指向覺苑《大日經義釋演密鈔》卷二。依据包含卷次吻合、目标整段对应、多组邻近长引文按次序对应，以及T2217同一取回窗口明确使用“演密抄”书名，已超过孤立短句相似。",
+    "qualification": "本次尚未找到“鈔者即演密鈔”形式的缩称定义；不能据此认证T2217实际使用的具体抄本、刊本、传递中介或所有“鈔”字的统一所指。"
+  },
+  "sources": [
+    {
+      "id": "X0439_XML",
+      "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/master/X/X23/X23n0439.xml",
+      "citation": "[CBETA官方X0439 XML](https://raw.githubusercontent.com/cbeta-org/xml-p5/master/X/X23/X23n0439.xml)",
+      "access_state": "HTTP200，实际读取完整字节并解析",
+      "bytes": 1531569,
+      "sha256": "b071c54209bb727af1c89b404e03601ca0b112b193f90f28d28e15d4f7c6e142",
+      "identity": {
+        "header_title": "大日經義釋演密鈔",
+        "header_author": "遼 覺苑撰",
+        "extent": "10卷",
+        "electronic_date": "2025-09-01 13:14:49 +0800",
+        "volume_two_heading_locator": "X23n0439_p0535a11",
+        "volume_two_heading": "大毗盧遮那成佛神變加持經義釋演密鈔卷第二",
+        "volume_two_author_locators": "0535a12–13",
+        "volume_two_author_literal": "燕京圓福寺崇祿大夫檢校太保行崇祿卿／總秘大師　賜紫沙門　覺苑　撰"
+      }
+    },
+    {
+      "id": "T2217_SAT_TARGET_WINDOW",
+      "url": "https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?mode=detail&nonum=&kaeri=&mode2=2&useid=2217_,59,0620a01",
+      "citation": "[东京大学SAT T2217第0620页入口](https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?mode=detail&nonum=&kaeri=&mode2=2&useid=2217_,59,0620a01)",
+      "access_state": "HTTP200，实际读取HTML",
+      "bytes": 284488,
+      "sha256": "f31efc74b18571e8c34c15196e3ce8fa186e1aa4f99eb96b9fa076eca4f042b9",
+      "actual_returned_text_range": "T2217_.59.0613a01–0631c29",
+      "target_own_volume": "卷第四；0613b03题“大日經疏指心鈔卷第四”",
+      "distinction": "目标是《指心鈔》自身卷四引用另一书的卷二，不能把“鈔第二”解释为《指心鈔》自身卷二。"
+    },
+    {
+      "id": "T2217_SAT_OPENING_WINDOW",
+      "url": "https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?mode=detail&nonum=&kaeri=&mode2=2&useid=2217_,59,0579a01",
+      "access_state": "HTTP200，实际读取HTML",
+      "bytes": 245523,
+      "sha256": "e7776bb375543cffe477403101fea20363e60486dc4e4c0226743cbcbc471455",
+      "actual_returned_text_range": "T2217_.59.0571a01–0585c29",
+      "title_locator": "0571a03",
+      "title_literal": "大日經疏指心鈔卷第一",
+      "colophon_locators": "0585a15–16",
+      "colophon_literal": "文永十一年於高野山丈六堂坊草之／金剛資頼瑜生年四十九歳",
+      "scope": "记录本书所载题名与署记，不独立认证署记年代或现存实物年代。"
+    },
+    {
+      "id": "NTU_CBETA_PDF",
+      "url": "https://buddhism.lib.ntu.edu.tw/FULLTEXT/sutra/X/X23n0439.pdf",
+      "citation": "[台大佛学数字图书馆X0439电子PDF](https://buddhism.lib.ntu.edu.tw/FULLTEXT/sutra/X/X23n0439.pdf)",
+      "access_state": "HTTP200，实际取得全部字节；在内存渲染并查看相关页面",
+      "bytes": 1895951,
+      "sha256": "5d8d3a3fa1457f1cb68fb4a752bd3ff47086f58cd941f6a0bbefcd47f4becd53",
+      "page_count": 202,
+      "actually_viewed_pdf_pages_one_based": [
+        3,
+        34,
+        40
+      ],
+      "displayed_page_numbers": [
+        2,
+        33,
+        39
+      ],
+      "page_type": "CBETA电子排版PDF，非旧印本影像",
+      "identity_evidence": {
+        "metadata_title": "X0439 大日經義釋演密鈔",
+        "metadata_author": "遼 覺苑撰",
+        "creator_and_producer": "calibre (5.14.0)",
+        "editing_statement": "实际第3页注明资料来源为CBETA电子佛典集成Version 2023.Q4，修订字以红字表示。"
+      },
+      "visual_findings": [
+        "实际第34页顶端为“三十時等者”整段，可见“日名從旦至旦”，没有把第二个旦排成夕。",
+        "该页电子排版没有当前XML“三、十”“十一月翻。此言”的同样标点形式。",
+        "实际第40页再次可见“得巧分別日月歲節者謂日名從旦至旦……一日一夜有三十時等”。"
+      ]
+    },
+    {
+      "id": "D8863_SUPPLEMENTARY_XML",
+      "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/master/D/D18/D18n8863.xml",
+      "access_state": "HTTP200，实际读取完整字节并检索正文",
+      "bytes": 3126232,
+      "sha256": "b08844314e334fc768b562d83d05485d2a5ede460de614ae42503622c853941a",
+      "identity": "CBETA《國家圖書館善本佛典》D18n8863《大日經疏指心鈔》；sourceDesc称日本寬文元年野田庄右衛門刊本。",
+      "metadata_caution": "该电子文件author字段为“唐 釋一行撰”，不能据此覆盖SAT《指心鈔》正文所载頼瑜署记，也不能混同原疏作者与钞书作者。",
+      "target_locator": "D18n8863_p0131a09–12",
+      "target_observation": "此电子文本也写“鈔第二云智論云日名從旦至夕……”，但本次未看其原刊像素，未认证它与大正本的物理独立性。"
+    }
+  ],
+  "target_passages": [
+    {
+      "source_id": "X0439_XML",
+      "volume": 2,
+      "locator": "X23n0439_p0544b08–11；R037 0043b09–12",
+      "paragraph_id": "pX23p0544b0801",
+      "literal_with_current_electronic_punctuation": "【疏】三、十時等者，智論云：日名從旦至旦，初分、中分、後分，夜亦三分，一日一夜有三十時。春、秋分時，十五時屬晝，十五時屬夜，餘時增減。五月晝十八時，夜十二時，十一月翻。此言十五時屬晝，三分中各五時也。",
+      "layer": "演密鈔释疏段落中嵌套署为“智論云”的引文及解释。",
+      "punctuation_limit": "XML明确记载AI标点。保留“三、十”“十一月翻。此言”的电子标点，不将它们当古印句读、计数新异文，也不静默订正。",
+      "apparatus": {
+        "method": "按正文完整元素范围、xml:id及back note/app自身target/from/to检查关联范围，不只搜索行号字串。",
+        "back_records_with_own_pointers_checked": 847,
+        "globally_unresolved_pointers_found": 0,
+        "records_intersecting_target_paragraph": [],
+        "meaning": "当前取得XML未交付与该目标段相交的back校注记录；不等于所有古本均无异文。"
+      }
+    },
+    {
+      "source_id": "T2217_SAT_TARGET_WINDOW",
+      "locator": "T2217_.59.0620b11–16",
+      "literal": "日行四天下乃至三十時等者。鈔第二云。智論云。日名。從旦至夕初分中分後分。夜亦三分。一日一夜有三十時。春秋分時十五時屬晝十五時屬夜。餘時増減。五月晝十八時夜十二時。十一月翻此。言十五時屬晝三分中各五時也",
+      "apparatus": {
+        "locator": "0620b12",
+        "SAT_button_number": "6",
+        "literal": "夕＝且＜甲＞",
+        "scope": "实际HTML按钮的校记原字。不能把甲读且改写为旦，也不能因X0439作旦就覆盖SAT主文夕或此校记。"
+      },
+      "comparison": "整段结构、十五／十八／十二时数及末尾三分各五时解释对应；旦／夕／且仍分层保留。"
+    },
+    {
+      "source_id": "T2217_SAT_TARGET_WINDOW",
+      "locator": "0620b16–0621a04",
+      "context_read": "后续另引“又智證大師鈔云”，继而讨论昼夜合三十与各三十的解释；0620c04起用“私云”分析前抄、后抄。",
+      "selected_literal": "此甚難解。今文各字被初中後不及三十時歟。……若爾下文恐各字誤歟。可合字歟。……三十時者非牟呼栗多歟。",
+      "scope": "本书保留疑问和不同解释，并未由这一段确立统一计时量。前一“鈔第二”与后一“智證大師鈔”也不能合并为同一引书。"
+    },
+    {
+      "source_id": "X0439_XML",
+      "volume": 3,
+      "locator": "0548b07–08",
+      "literal": "得巧分別日月歲節者，謂日名從旦至旦，初分中分後分、夜亦三分，一日一夜有三十時等。",
+      "volume_evidence": "卷三起于0547b12，卷首题“大毗盧遮那成佛神變加持經義釋演密鈔卷第三”。",
+      "scope": "这是同一作品卷三的再次使用，不是卷二中的第二处，也不是新增独立见证。"
+    }
+  ],
+  "neighboring_citation_comparisons": [
+    {
+      "T2217_locator": "0617c14–18",
+      "T2217_literal": "鈔第二云。前云薩埵直呼於人。今云索多乃屬人之功業。即是忍樂修行堅持不捨。言聲明有如是法者即八轉聲法也。",
+      "X0439_locator": "卷二0543c22–0544a04",
+      "X0439_literal": "【疏】此索哆等者，前云薩埵，直呼於人；今云索哆，乃屬人之功業，即是忍樂修行，堅持不捨。言聲明有如是法者，即八轉聲法也。",
+      "finding": "连续解释与后续体声／业声次序对应，显著超过关键词相同；索多／索哆保留，不报逐字全同。"
+    },
+    {
+      "T2217_locator": "0618c06–08",
+      "T2217_literal": "鈔第二云。愚謂愚癡。童謂嬰童。取未會分別也下。經云。愚童凡夫類猶如羝羊",
+      "X0439_locator": "卷二0544a05–06",
+      "X0439_literal": "【疏】一者、愚童者，愚謂愚癡，童謂孾童，取未會分別也。下經云：愚童凡夫類，猶如羝羊。",
+      "finding": "相邻解释和引经连续对应；嬰／孾及标点区别不统一。"
+    },
+    {
+      "T2217_locator": "0618c14–16",
+      "T2217_literal": "鈔第二云。疏二者有識者謂有所識知者也。對前愚童故稱有識也",
+      "X0439_locator": "卷二0544a11–12",
+      "X0439_literal": "【疏】二者，有識者，謂有所識知者也。對前愚童，故稱有識也。",
+      "finding": "在上一愚童例后再次保持同序对应，支持同一卷二来源。"
+    },
+    {
+      "T2217_locator": "0626c05–09",
+      "T2217_literal": "鈔第二云。軌者法也。匠者工也。工匠之作不失於法也。如美玉蘊在石璞之中不得良工琢磨則不成至寶。",
+      "X0439_locator": "卷二0544c19–22",
+      "X0439_literal": "【疏】軌匠其心者，軌者，法也；匠者，工也；匠之作不失於法也。如美玉薀在石璞之中，不得良工琢磨，則不成至寶。",
+      "finding": "目标段之后仍有同卷长引文对应；工匠／匠及蘊／薀不同，不以相合为由校改。"
+    }
+  ],
+  "internal_name_evidence": {
+    "T2217_locator": "0628c06–08",
+    "T2217_literal": "演密抄釋序文云。三乘者二乘及菩薩爲三○又及者揀別三乘外有最上持明行法故",
+    "X0439_correspondence": [
+      {
+        "locator": "卷一0533b20–22",
+        "literal": "三乘者，二乘及菩薩為三運載名乘。"
+      },
+      {
+        "locator": "卷一0533c09–10",
+        "literal": "又及者，揀別。揀別三乘外有最上持明法故"
+      }
+    ],
+    "finding": "这是T2217实际使用“演密抄”书名并有可定位文本对应的内部证据，增强附近“鈔第二”所指作品的识别。",
+    "not_a_formal_definition": "它不是形式上的“凡称鈔者皆指演密鈔”定义；行字及节引差异继续保留。"
+  },
+  "abbreviation_search": {
+    "SAT_scope": [
+      "0571a01–0585c29",
+      "0613a01–0631c29"
+    ],
+    "supplementary_scope": "另对D18n8863完整body检索鈔者、抄者、演密及密抄／密鈔等实际字串。",
+    "result": "上述实读范围未找到“鈔者演密鈔”式定义。D电子正文有演密抄、演密鈔、密抄等称法，但这不能冒充SAT全书已逐字穷尽。",
+    "unestablished": "尚不能把未检出扩大为T2217所有版本绝无缩称定义。"
+  },
+  "root_pointer_verification": {
+    "back_records_with_own_pointers_checked": 847,
+    "globally_unresolved_pointers": 0,
+    "records_intersecting_target_paragraph": [],
+    "target_paragraph": "pX23p0544b0801"
+  },
+  "scope": {
+    "exact_quoted_exemplar_identified": false,
+    "every_sho_is_same_work": false,
+    "T2216_is_X0439": false,
+    "target_readings_unified": false,
+    "NTU_PDF_is_old_print_image": false,
+    "AI_punctuation_is_original_glyph": false,
+    "D_metadata_overrides_T2217_colophon": false,
+    "independent_ancient_witness_count": null,
+    "modern_seconds_per_time": null,
+    "T1299_pingming_mapping_established": false,
+    "hinoo_half_mapping_established": false,
+    "leap_short_month_priority_established": false,
+    "birth_calendar_override_applied": false,
+    "whole_work_collation_complete": false,
+    "real_samples": 0
+  },
+  "legacy_v87_status": "Original snapshot quote_chain.intermediate_work_identity=None remains the v87 acquisition state; current comparison provides strong work-level inference, not physical-copy identification.",
+  "reference_frozen_at": "2026-10-25T20:55:57.726458+00:00",
+  "reading_provenance": {
+    "source_observer": "existing authorized read-only sukuyo_semantic_reviewer, actual acquisition and selected PDF viewing recorded in source-quotation-first.json",
+    "root_reacquisition": "same source bytes re-obtained for XML/SAT/PDF; root did not claim to have viewed all role-rendered PDF pages",
+    "current_request_reacquisition": false,
+    "freeze_timestamp_is_not_individual_source_acquisition_time": true
+  }
+}

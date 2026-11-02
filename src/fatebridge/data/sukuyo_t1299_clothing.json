@@ -1,0 +1,1332 @@
+{
+  "id": "t1299_clothing_witnesses_and_actions_v1",
+  "author": "不空译；上卷杨景风修注",
+  "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
+  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+  "selected_witness": "lower_taisho",
+  "locator": "T21n1299_p0397b16-27",
+  "title_literal": "裁縫衣裳服著用宿法",
+  "verse_rows": [
+    {
+      "mansion": "昴",
+      "literal_mansion": "昴",
+      "taisho_text": "昴必火燒",
+      "ming_apparatus_text": "昴必火燒",
+      "locator": "T21n1299_p0397b17"
+    },
+    {
+      "mansion": "毕",
+      "literal_mansion": "畢",
+      "taisho_text": "畢饒事務",
+      "ming_apparatus_text": "畢饒事務",
+      "locator": "T21n1299_p0397b17"
+    },
+    {
+      "mansion": "觜",
+      "literal_mansion": "觜",
+      "taisho_text": "觜必鼠咬",
+      "ming_apparatus_text": "觜必鼠咬",
+      "locator": "T21n1299_p0397b17"
+    },
+    {
+      "mansion": "参",
+      "literal_mansion": "參",
+      "taisho_text": "參必逢厄",
+      "ming_apparatus_text": "參必逢厄",
+      "locator": "T21n1299_p0397b18"
+    },
+    {
+      "mansion": "井",
+      "literal_mansion": "井",
+      "taisho_text": "井必分相",
+      "ming_apparatus_text": "井必相分",
+      "locator": "T21n1299_p0397b18"
+    },
+    {
+      "mansion": "鬼",
+      "literal_mansion": "鬼",
+      "taisho_text": "鬼必吉祥",
+      "ming_apparatus_text": "鬼必吉祥",
+      "locator": "T21n1299_p0397b18"
+    },
+    {
+      "mansion": "柳",
+      "literal_mansion": "柳",
+      "taisho_text": "柳必棄失",
+      "ming_apparatus_text": "柳必棄失",
+      "locator": "T21n1299_p0397b19"
+    },
+    {
+      "mansion": "星",
+      "literal_mansion": "星",
+      "taisho_text": "星必喪服",
+      "ming_apparatus_text": "星必喪服",
+      "locator": "T21n1299_p0397b19"
+    },
+    {
+      "mansion": "张",
+      "literal_mansion": "張",
+      "taisho_text": "張必官奪",
+      "ming_apparatus_text": "張必官奪",
+      "locator": "T21n1299_p0397b19"
+    },
+    {
+      "mansion": "翼",
+      "literal_mansion": "翼",
+      "taisho_text": "翼必獲財",
+      "ming_apparatus_text": "翼必獲財",
+      "locator": "T21n1299_p0397b20"
+    },
+    {
+      "mansion": "轸",
+      "literal_mansion": "軫",
+      "taisho_text": "軫必恒久",
+      "ming_apparatus_text": "軫必恒久",
+      "locator": "T21n1299_p0397b20"
+    },
+    {
+      "mansion": "角",
+      "literal_mansion": "角",
+      "taisho_text": "角必安隱",
+      "ming_apparatus_text": "角必安隱",
+      "locator": "T21n1299_p0397b20"
+    },
+    {
+      "mansion": "亢",
+      "literal_mansion": "亢",
+      "taisho_text": "亢得美食",
+      "ming_apparatus_text": "亢得美食",
+      "locator": "T21n1299_p0397b21"
+    },
+    {
+      "mansion": "氐",
+      "literal_mansion": "氐",
+      "taisho_text": "氐必覩友",
+      "ming_apparatus_text": "氐必覩友",
+      "locator": "T21n1299_p0397b21"
+    },
+    {
+      "mansion": "房",
+      "literal_mansion": "房",
+      "taisho_text": "房必益衣",
+      "ming_apparatus_text": "房必益衣",
+      "locator": "T21n1299_p0397b21"
+    },
+    {
+      "mansion": "心",
+      "literal_mansion": "心",
+      "taisho_text": "心必盜賊",
+      "ming_apparatus_text": "心必盜賊",
+      "locator": "T21n1299_p0397b22"
+    },
+    {
+      "mansion": "尾",
+      "literal_mansion": "尾",
+      "taisho_text": "尾必壞爛",
+      "ming_apparatus_text": "尾必壞爛",
+      "locator": "T21n1299_p0397b22"
+    },
+    {
+      "mansion": "箕",
+      "literal_mansion": "箕",
+      "taisho_text": "箕必得病",
+      "ming_apparatus_text": "箕必得病",
+      "locator": "T21n1299_p0397b22"
+    },
+    {
+      "mansion": "斗",
+      "literal_mansion": "斗",
+      "taisho_text": "斗得美味",
+      "ming_apparatus_text": "斗得美味",
+      "locator": "T21n1299_p0397b23"
+    },
+    {
+      "mansion": "女",
+      "literal_mansion": "女",
+      "taisho_text": "女必得疾",
+      "ming_apparatus_text": "女必得疾",
+      "locator": "T21n1299_p0397b23"
+    },
+    {
+      "mansion": "虚",
+      "literal_mansion": "虛",
+      "taisho_text": "虛必得糧",
+      "ming_apparatus_text": "虛必得糧",
+      "locator": "T21n1299_p0397b23"
+    },
+    {
+      "mansion": "危",
+      "literal_mansion": "危",
+      "taisho_text": "危必毒厄",
+      "ming_apparatus_text": "危必毒厄",
+      "locator": "T21n1299_p0397b24"
+    },
+    {
+      "mansion": "室",
+      "literal_mansion": "室",
+      "taisho_text": "室必水厄",
+      "ming_apparatus_text": "室必水厄",
+      "locator": "T21n1299_p0397b24"
+    },
+    {
+      "mansion": "壁",
+      "literal_mansion": "壁",
+      "taisho_text": "壁必獲財",
+      "ming_apparatus_text": "壁必獲財",
+      "locator": "T21n1299_p0397b24"
+    },
+    {
+      "mansion": "奎",
+      "literal_mansion": "奎",
+      "taisho_text": "奎必獲寶",
+      "ming_apparatus_text": "奎必獲寶",
+      "locator": "T21n1299_p0397b25"
+    },
+    {
+      "mansion": "娄",
+      "literal_mansion": "婁",
+      "taisho_text": "婁必增衣",
+      "ming_apparatus_text": "婁必增衣",
+      "locator": "T21n1299_p0397b25"
+    },
+    {
+      "mansion": "胃",
+      "literal_mansion": "胃",
+      "taisho_text": "胃必減衣",
+      "ming_apparatus_text": "胃必減衣",
+      "locator": "T21n1299_p0397b25"
+    }
+  ],
+  "upper_literal_cutting_statements": [
+    {
+      "mansion": "昴",
+      "source_excerpt": "若用裁衣必被火燒。",
+      "xml_id": "pT21p0388c0801",
+      "locator": "T21n1299_p0388c08",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "毕",
+      "source_excerpt": "若用裁衣，必多饒事務。",
+      "xml_id": "pT21p0388c1501",
+      "locator": "T21n1299_p0388c15",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "觜",
+      "source_excerpt": "此日裁衣，被鼠咬。",
+      "xml_id": "pT21p0388c2201",
+      "locator": "T21n1299_p0388c22",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "参",
+      "source_excerpt": "若用裁衣，終慎鼠厄。",
+      "xml_id": "pT21p0388c2901",
+      "locator": "T21n1299_p0388c29",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "井",
+      "source_excerpt": "若用裁衣，必相分離。",
+      "xml_id": "pT21p0389a0501",
+      "locator": "T21n1299_p0389a05",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "鬼",
+      "source_excerpt": "若用裁衣，必有吉祥勝事。",
+      "xml_id": "pT21p0389a1301",
+      "locator": "T21n1299_p0389a13",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "柳",
+      "source_excerpt": "若用裁衣，後必遭失。",
+      "xml_id": "pT21p0389a2001",
+      "locator": "T21n1299_p0389a20",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "星",
+      "source_excerpt": "若用裁衣，後必損失。",
+      "xml_id": "pT21p0389a2601",
+      "locator": "T21n1299_p0389a26",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "张",
+      "source_excerpt": "若用裁衣，必被官奪。",
+      "xml_id": "pT21p0389b0501",
+      "locator": "T21n1299_p0389b05",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "翼",
+      "source_excerpt": "若用裁衣，後必更得財。",
+      "xml_id": "pT21p0389b1101",
+      "locator": "T21n1299_p0389b11",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "角",
+      "source_excerpt": "若用裁衣，終當逃亡。",
+      "xml_id": "pT21p0389b2301",
+      "locator": "T21n1299_p0389b23",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "亢",
+      "source_excerpt": "若用裁衣，後必得財。",
+      "xml_id": "pT21p0389b2901",
+      "locator": "T21n1299_p0389b29",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "氐",
+      "source_excerpt": "若用裁衣，多逢親識。",
+      "xml_id": "pT21p0389c0601",
+      "locator": "T21n1299_p0389c06",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "房",
+      "source_excerpt": "若用裁衣，後必更裁。",
+      "xml_id": "pT21p0389c1201",
+      "locator": "T21n1299_p0389c12",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "心",
+      "source_excerpt": "若用裁衣，必遭死亡盜賊。",
+      "xml_id": "pT21p0389c1801",
+      "locator": "T21n1299_p0389c18",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "尾",
+      "source_excerpt": "若用裁衣，必遭爛壞。",
+      "xml_id": "pT21p0389c2501",
+      "locator": "T21n1299_p0389c25",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "箕",
+      "source_excerpt": "若用裁衣，後必得病。",
+      "xml_id": "pT21p0390a0201",
+      "locator": "T21n1299_p0390a02",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "斗",
+      "source_excerpt": "若用裁衣，多得美味。",
+      "xml_id": "pT21p0390a0801",
+      "locator": "T21n1299_p0390a08",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "女",
+      "source_excerpt": "若用裁衣，必足病痛。",
+      "xml_id": "pT21p0390a1901",
+      "locator": "T21n1299_p0390a19",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "虚",
+      "source_excerpt": "若用裁衣，多得糧用。",
+      "xml_id": "pT21p0390a2601",
+      "locator": "T21n1299_p0390a26",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "危",
+      "source_excerpt": "若用裁衣，心遭毒厄。",
+      "xml_id": "pT21p0390b0601",
+      "locator": "T21n1299_p0390b06",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "室",
+      "source_excerpt": "若用裁衣，必遭水厄。",
+      "xml_id": "pT21p0390b1201",
+      "locator": "T21n1299_p0390b12",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "壁",
+      "source_excerpt": "若用裁衣，多得財物。",
+      "xml_id": "pT21p0390b1801",
+      "locator": "T21n1299_p0390b18",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation",
+      "literal_heading_mansion": "璧",
+      "identification_basis": "Same paragraph pT21p0390b1801 explicitly says 壁二星 and annotation repeats 壁二星; preserve heading 璧 instead of a global homophone substitution."
+    },
+    {
+      "mansion": "奎",
+      "source_excerpt": "若用裁衣，必得寶器。",
+      "xml_id": "pT21p0390b2401",
+      "locator": "T21n1299_p0390b24",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "娄",
+      "source_excerpt": "若用裁衣，必增益衣服。",
+      "xml_id": "pT21p0390c0301",
+      "locator": "T21n1299_p0390c03",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    },
+    {
+      "mansion": "胃",
+      "source_excerpt": "若用裁衣，必損減資福。",
+      "xml_id": "pT21p0390c0901",
+      "locator": "T21n1299_p0390c09",
+      "interpretation": "literal_forecast_not_aggregated_as_action_valuation"
+    }
+  ],
+  "primary_positive_mansions": [
+    "虚",
+    "奎",
+    "鬼",
+    "井",
+    "娄",
+    "毕",
+    "轸",
+    "角",
+    "亢",
+    "氐",
+    "房",
+    "翼",
+    "斗",
+    "壁"
+  ],
+  "ming_literal_list": [
+    "虛",
+    "奎",
+    "鬼",
+    "并",
+    "婁",
+    "畢",
+    "軫",
+    "角",
+    "亢",
+    "氐",
+    "房",
+    "翼",
+    "斗",
+    "壁"
+  ],
+  "ming_recognized_positive_mansions": [
+    "虚",
+    "奎",
+    "鬼",
+    "娄",
+    "毕",
+    "轸",
+    "角",
+    "亢",
+    "氐",
+    "房",
+    "翼",
+    "斗",
+    "壁"
+  ],
+  "ming_unresolved_tokens": [
+    "并"
+  ],
+  "summary_taisho": "虛、奎、鬼、井、婁、畢、軫、角、亢、氐、房、翼、斗、壁、此以上宿、可裁縫衣著衣裳、餘並失。",
+  "summary_ming_apparatus": "虛、奎、鬼、并、婁、畢、軫、角、亢、氐、房、翼、斗、壁、此以上宿、可裁縫衣著衣裳、並大吉。",
+  "ming_complement_assessment": null,
+  "verse_and_literal_forecasts_applied_to_aggregate": false,
+  "independent_ming_edition_collated": false,
+  "rules": [
+    {
+      "rule_id": "t1299_clothing_01",
+      "layer": "clothing_chapter",
+      "selectors": [
+        "favorable"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b26",
+      "source_excerpts": [
+        "虛、奎、鬼、井、婁、畢、軫、角、亢、氐、房、翼、斗、壁、此以上宿、可裁縫衣著衣裳、餘並失。"
+      ],
+      "meaning": "下卷专章主文列出的十四宿，用于裁缝或穿着衣裳；不把明本并字补为井。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "tailoring_garments",
+        "wearing_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "下卷专章主文列出的十四宿，用于裁缝或穿着衣裳；不把明本并字补为井。"
+    },
+    {
+      "rule_id": "t1299_clothing_02",
+      "layer": "clothing_chapter",
+      "selectors": [
+        "caution"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0397b26",
+      "source_excerpts": [
+        "虛、奎、鬼、井、婁、畢、軫、角、亢、氐、房、翼、斗、壁、此以上宿、可裁縫衣著衣裳、餘並失。"
+      ],
+      "meaning": "下卷专章大正主文以余并失限制未列十三宿；明本校记没有同一补集断语。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "tailoring_garments",
+        "wearing_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "下卷专章大正主文以余并失限制未列十三宿；明本校记没有同一补集断语。"
+    },
+    {
+      "rule_id": "t1299_clothing_03",
+      "layer": "clothing_upper_mansion",
+      "selectors": [
+        "张"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "upper",
+      "locator": "T21n1299_p0389b05",
+      "source_excerpts": [
+        "作新衣"
+      ],
+      "meaning": "本段衣事条文“作新衣”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "making_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_04",
+      "layer": "clothing_upper_mansion",
+      "selectors": [
+        "轸"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "upper",
+      "locator": "T21n1299_p0389b17",
+      "source_excerpts": [
+        "修理衣裳"
+      ],
+      "meaning": "本段衣事条文“修理衣裳”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "repairing_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_05",
+      "layer": "clothing_upper_mansion",
+      "selectors": [
+        "角"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "upper",
+      "locator": "T21n1299_p0389b23",
+      "source_excerpts": [
+        "造衣裳"
+      ],
+      "meaning": "本段衣事条文“造衣裳”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "making_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_06",
+      "layer": "clothing_upper_mansion",
+      "selectors": [
+        "斗"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "upper",
+      "locator": "T21n1299_p0390a08",
+      "source_excerpts": [
+        "宜著新衣"
+      ],
+      "meaning": "本段衣事条文“宜著新衣”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_07",
+      "layer": "clothing_upper_mansion",
+      "selectors": [
+        "女"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "caution",
+      "volume": "upper",
+      "locator": "T21n1299_p0390a19",
+      "source_excerpts": [
+        "不宜初著新衣"
+      ],
+      "meaning": "本段衣事条文“不宜初著新衣”列慎用；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_08",
+      "layer": "clothing_upper_mansion",
+      "selectors": [
+        "虚"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "upper",
+      "locator": "T21n1299_p0390a26",
+      "source_excerpts": [
+        "初著新衣"
+      ],
+      "meaning": "本段衣事条文“初著新衣”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_09",
+      "layer": "weekday",
+      "selectors": [
+        "月"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "upper",
+      "locator": "T21n1299_p0391c18",
+      "source_excerpts": [
+        "著新衣並吉"
+      ],
+      "meaning": "本段衣事条文“著新衣並吉”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_10",
+      "layer": "weekday",
+      "selectors": [
+        "木"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "upper",
+      "locator": "T21n1299_p0392a10",
+      "source_excerpts": [
+        "著新衣"
+      ],
+      "meaning": "本段衣事条文“著新衣”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_11",
+      "layer": "named_day",
+      "selectors": [
+        5,
+        20
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "upper",
+      "locator": "T21n1299_p0393b06",
+      "source_excerpts": [
+        "修營床帳及車乘衣服"
+      ],
+      "meaning": "本段衣事条文“修營床帳及車乘衣服”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "making_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_12",
+      "layer": "named_day",
+      "selectors": [
+        13,
+        28
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "upper",
+      "locator": "T21n1299_p0393b28",
+      "source_excerpts": [
+        "著衣服華鬘、金玉裝畫"
+      ],
+      "meaning": "本段衣事条文“著衣服華鬘、金玉裝畫”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_13",
+      "layer": "named_day",
+      "selectors": [
+        5,
+        20
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0394b03",
+      "source_excerpts": [
+        "作臥具床座、衣服莊飾物"
+      ],
+      "meaning": "本段衣事条文“作臥具床座、衣服莊飾物”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "making_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_14",
+      "layer": "named_day",
+      "selectors": [
+        7,
+        22
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0394b10",
+      "source_excerpts": [
+        "王者服新衣"
+      ],
+      "meaning": "王者身份和服新衣动作均须明确；不能泛化为普通人穿衣或买衣。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [],
+      "activity_detail_all_of": [
+        "royal_wearer",
+        "wearing_new_garments"
+      ],
+      "topic_condition": "王者身份和服新衣动作均须明确；不能泛化为普通人穿衣或买衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_15",
+      "layer": "lower_mansion",
+      "selectors": [
+        "毕"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0395b29",
+      "source_excerpts": [
+        "作衣服並吉"
+      ],
+      "meaning": "本段衣事条文“作衣服並吉”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "making_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_16",
+      "layer": "lower_mansion",
+      "selectors": [
+        "觜"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0395c04",
+      "source_excerpts": [
+        "著新衣"
+      ],
+      "meaning": "本段衣事条文“著新衣”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_17",
+      "layer": "lower_mansion",
+      "selectors": [
+        "柳"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0395c16",
+      "source_excerpts": [
+        "著新衣"
+      ],
+      "meaning": "本段衣事条文“著新衣”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_18",
+      "layer": "lower_mansion",
+      "selectors": [
+        "张"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0395c25",
+      "source_excerpts": [
+        "作衣服"
+      ],
+      "meaning": "本段衣事条文“作衣服”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "making_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_19",
+      "layer": "lower_mansion",
+      "selectors": [
+        "轸"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0396a01",
+      "source_excerpts": [
+        "服著衣裳"
+      ],
+      "meaning": "本段衣事条文“服著衣裳”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_20",
+      "layer": "lower_mansion",
+      "selectors": [
+        "斗"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0396b03",
+      "source_excerpts": [
+        "宜著新衣"
+      ],
+      "meaning": "本段衣事条文“宜著新衣”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_21",
+      "layer": "lower_mansion",
+      "selectors": [
+        "女"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0396b06",
+      "source_excerpts": [
+        "不宜著新衣"
+      ],
+      "meaning": "本段衣事条文“不宜著新衣”列慎用；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_22",
+      "layer": "lower_mansion",
+      "selectors": [
+        "虚"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0396b11",
+      "source_excerpts": [
+        "著衣著莊嚴具"
+      ],
+      "meaning": "本段衣事条文“著衣著莊嚴具”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_23",
+      "layer": "lower_mansion",
+      "selectors": [
+        "奎"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0396b23",
+      "source_excerpts": [
+        "著新衣"
+      ],
+      "meaning": "本段衣事条文“著新衣”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_24",
+      "layer": "lower_nature",
+      "selectors": [
+        "和善"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0396c10",
+      "source_excerpts": [
+        "服飾新衣裳"
+      ],
+      "meaning": "本段衣事条文“服飾新衣裳”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_25",
+      "layer": "sanjiu",
+      "selectors": [
+        "衰",
+        "危",
+        "壊"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "caution",
+      "volume": "upper",
+      "locator": "T21n1299_p0391b19",
+      "source_excerpts": [
+        "買賣裁衣、剃頭剪甲並不吉"
+      ],
+      "meaning": "本段衣事条文“買賣裁衣、剃頭剪甲並不吉”列慎用；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "tailoring_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_26",
+      "layer": "sanjiu",
+      "selectors": [
+        "栄"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0397c25",
+      "source_excerpts": [
+        "裁著新衣"
+      ],
+      "meaning": "本段衣事条文“裁著新衣”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "tailoring_garments",
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_27",
+      "layer": "sanjiu",
+      "selectors": [
+        "危",
+        "壊"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0398a09",
+      "source_excerpts": [
+        "裁衣"
+      ],
+      "meaning": "本段衣事条文“裁衣”列慎用；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "tailoring_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_28",
+      "layer": "sanjiu",
+      "selectors": [
+        "命",
+        "胎",
+        "危",
+        "壊"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0398a16",
+      "source_excerpts": [
+        "裁衣"
+      ],
+      "meaning": "下卷又一说，独立保留；不以另一条文覆盖此说。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "tailoring_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "下卷又一说，独立保留；不以另一条文覆盖此说。"
+    },
+    {
+      "rule_id": "t1299_clothing_29",
+      "layer": "lower_weekday",
+      "selectors": [
+        "月"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0398c21",
+      "source_excerpts": [
+        "著新衣並大吉"
+      ],
+      "meaning": "本段衣事条文“著新衣並大吉”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_30",
+      "layer": "lower_weekday",
+      "selectors": [
+        "火"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0399a04",
+      "source_excerpts": [
+        "著新衣"
+      ],
+      "meaning": "本段衣事条文“著新衣”列慎用；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_31",
+      "layer": "lower_weekday",
+      "selectors": [
+        "木"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0399a24",
+      "source_excerpts": [
+        "著新衣"
+      ],
+      "meaning": "本段衣事条文“著新衣”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_32",
+      "layer": "lower_weekday",
+      "selectors": [
+        "金"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "lower",
+      "locator": "T21n1299_p0399b06",
+      "source_excerpts": [
+        "著新衣冠帶"
+      ],
+      "meaning": "本段衣事条文“著新衣冠帶”列宜；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_33",
+      "layer": "lower_weekday",
+      "selectors": [
+        "土"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0399b14",
+      "source_excerpts": [
+        "不宜結婚、作喜樂、服新衣及遠行"
+      ],
+      "meaning": "本段衣事条文“不宜結婚、作喜樂、服新衣及遠行”列慎用；按明确动作核对。",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "wearing_new_garments"
+      ],
+      "activity_detail_all_of": [],
+      "topic_condition": "仅按所引衣事动作与明确细节核对，不泛化为购衣或所有日常穿衣。"
+    },
+    {
+      "rule_id": "t1299_clothing_34",
+      "layer": "sanjiu",
+      "selectors": [
+        "命",
+        "胎"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "caution",
+      "volume": "upper",
+      "locator": "T21n1299_p0391b19",
+      "source_excerpts": [
+        "不宜舉動百事"
+      ],
+      "meaning": "本段衣事条文“不宜舉動百事”列慎用；按明确动作核对。",
+      "applicability": "topic_level"
+    },
+    {
+      "rule_id": "t1299_clothing_35",
+      "layer": "sanjiu",
+      "selectors": [
+        "業"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "favorable",
+      "volume": "upper",
+      "locator": "T21n1299_p0391b19",
+      "source_excerpts": [
+        "所作皆吉祥"
+      ],
+      "meaning": "本段衣事条文“所作皆吉祥”列宜；按明确动作核对。",
+      "applicability": "topic_level"
+    },
+    {
+      "rule_id": "t1299_clothing_36",
+      "layer": "sanjiu",
+      "selectors": [
+        "命",
+        "胎"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0398a07",
+      "source_excerpts": [
+        "不宜舉動百事"
+      ],
+      "meaning": "本段衣事条文“不宜舉動百事”列慎用；按明确动作核对。",
+      "applicability": "topic_level"
+    },
+    {
+      "rule_id": "t1299_clothing_37",
+      "layer": "sanjiu",
+      "selectors": [
+        "業"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0398a07",
+      "source_excerpts": [
+        "所作善惡亦不成就"
+      ],
+      "meaning": "本段衣事条文“所作善惡亦不成就”列慎用；按明确动作核对。",
+      "applicability": "topic_level"
+    },
+    {
+      "rule_id": "t1299_clothing_38",
+      "layer": "lower_mansion",
+      "selectors": [
+        "室"
+      ],
+      "activities": [
+        "clothing"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0396b19",
+      "source_excerpts": [
+        "諸事並不宜作"
+      ],
+      "meaning": "本段衣事条文“諸事並不宜作”列慎用；按明确动作核对。",
+      "applicability": "topic_level"
+    }
+  ],
+  "publisher_primary": {
+    "url": "https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?mode=detail&useid=1299_,00,0397&nonum=&kaeri=",
+    "response_sha256": "fbf3b89fa3843d285b582851c0d818c348a621b68539b3015135e48f9217638b",
+    "response_bytes": 124407,
+    "scope": "Selected electronic main text and apparatus; not independent Ming print collation."
+  },
+  "unmapped_clothing_predicates": [
+    {
+      "locator": "T21n1299_p0391c18-20; p0398c21-23",
+      "literal": "教女人裁衣服",
+      "reason": "Teaching/actor predicate is not generalized to anyone doing garment cutting; only the separate wearing-new-clothes clause is mapped."
+    },
+    {
+      "locator": "T21n1299_p0396a05-09",
+      "literal": "初王者嚴服觀兵",
+      "reason": "Royal ceremonial/inspection condition not generalized to ordinary dressing."
+    },
+    {
+      "locator": "T21n1299_p0396b21-22",
+      "literal": "取衣取財",
+      "reason": "No silent conversion of 取衣 to clothing purchase; separate universal prohibition is retained."
+    }
+  ],
+  "scope": "所选大正主文专章的二十七句原字、十四宿正表及补集条件，另列校记重建和选定衣事条文；逐宿预测式断语仅作原文参考，未转成现实病灾断言或新评分。裁缝、制作、修理、穿衣与王者限定分别核对；未覆盖谓词另列，未作历史日界、半日钟时、全部版本、全典语义或现实效力认证。"
+}

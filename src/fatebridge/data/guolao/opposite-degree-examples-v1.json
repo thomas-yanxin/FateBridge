@@ -1,0 +1,91 @@
+{
+  "id": "guolao_cross_book_opposite_degree_candidates_v1",
+  "grid_binding": {
+    "source_id": "tohoku_luwei_1141_image78_grid_v1",
+    "source_image_sha256": "36d3768ce39dbecb8c07d7669cfd57628ffab0ea09ca536dd4f18b8a669da408",
+    "data_sha256": "ee5f3b6fe1f8871dd62699f07b083b31569fb9fb42c7cc809bb6dfa6b48bf3ab",
+    "marker_data_sha256": "ef191428088c06b5715c88773de0d19b24b94d00b501e2209cb1ce3861b8a92e"
+  },
+  "sources": [
+    {
+      "id": "luwei_nijl100238879_image8",
+      "title": "新編評註通玄先生張果星宗大全 入門命度例",
+      "author": "陸位輯校",
+      "source_url": "https://kokusho.nijl.ac.jp/biblio/100238879",
+      "locator": "NIJL label8 定限度法／以太陽之度對著命宮之度",
+      "credit": "新編評註通玄先生張果星宗大全（東北大学附属図書館所蔵），国文学研究資料館提供",
+      "source_sha256": "0f74d3df1ef39852b88fb340c7e8d86bbdfea2322bd72f2af925b7727ca90220",
+      "normalized_held_excerpt": "如太陽躔子宮虛六度對看午宮星五度即為命度如日躔女三度對看午宮柳四度是也",
+      "source_fractional_precision_adjudicated": false
+    },
+    {
+      "id": "wanminying_siku_cadal06054195",
+      "title": "星學大成 卷六 安命論",
+      "author": "萬民英",
+      "source_url": "https://commons.wikimedia.org/w/index.php?title=File:CADAL06054195_星學大成·卷六~卷七.djvu&oldid=1104180952",
+      "digital_transcription_url": "https://zh.wikisource.org/w/index.php?title=星學大成_(四庫全書本)/卷06&oldid=626736",
+      "locator": "CADAL06054195 DjVu pages3–4 卷六《安命論》; 對度例 on page4",
+      "credit": "CADAL/浙江大学，06054195；Wikimedia Commons原DJVu及馆页渲染",
+      "original_sha1": "37a4a82e01c7b806e75cdb7f6397947bb4d89d5c",
+      "original_sha256": "364d50b024323b83cc686754393fb2a3a20724b0b4973c8db488359138f697eb",
+      "original_bytes": 6284105,
+      "original_pages": 167,
+      "original_page_size": [
+        957,
+        1359
+      ],
+      "rights": "Commons PD-old / Public Domain Mark1.0; underlying historical original, no new CC license inferred",
+      "normalized_held_excerpt": "臺厯首論十二宮立命専考對度余命太陽在斗十九對度是張一當以張一度立命是也",
+      "source_fractional_precision_adjudicated": false
+    }
+  ],
+  "cases": [
+    {
+      "id": "luwei_xu6_xing5",
+      "source_document_id": "luwei_nijl100238879_image8",
+      "source_mansion": "虚",
+      "source_degree": 6,
+      "target_mansion": "星",
+      "target_degree": 5,
+      "source_branch": "子",
+      "target_branch": "午",
+      "declared_column": 15,
+      "branch_and_column_role": "explicit_base_grid_comparison_locations_not_birth_palaces_inferred_from_original",
+      "source_integer_semantics": "literal_numeral_fractional_precision_and_quantization_unadjudicated",
+      "birth_datetime_known": false
+    },
+    {
+      "id": "luwei_nv3_liu4",
+      "source_document_id": "luwei_nijl100238879_image8",
+      "source_mansion": "女",
+      "source_degree": 3,
+      "target_mansion": "柳",
+      "target_degree": 4,
+      "source_branch": "子",
+      "target_branch": "午",
+      "declared_column": 29,
+      "branch_and_column_role": "explicit_base_grid_comparison_locations_not_birth_palaces_inferred_from_original",
+      "source_integer_semantics": "literal_numeral_fractional_precision_and_quantization_unadjudicated",
+      "birth_datetime_known": false
+    },
+    {
+      "id": "wanminying_dou19_zhang1",
+      "source_document_id": "wanminying_siku_cadal06054195",
+      "source_mansion": "斗",
+      "source_degree": 19,
+      "target_mansion": "张",
+      "target_degree": 1,
+      "source_branch": "丑",
+      "target_branch": "午",
+      "declared_column": 14,
+      "branch_and_column_role": "explicit_base_grid_comparison_locations_not_birth_palaces_inferred_from_original",
+      "source_integer_semantics": "literal_numeral_fractional_precision_and_quantization_unadjudicated",
+      "birth_datetime_known": false
+    }
+  ],
+  "expected_case_ids": [
+    "luwei_xu6_xing5",
+    "luwei_nv3_liu4",
+    "wanminying_dou19_zhang1"
+  ]
+}

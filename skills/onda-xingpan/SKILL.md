@@ -1,6 +1,6 @@
 ---
 name: onda-xingpan
-description: 直接处理用户指定的星盘、八字、紫微本命与方法解读，包括流派盘、关系盘及法达等技法；按实际主题读取相关证据，不自动扩展其他体系。普通生活问题由相应主题主持，时间选择共享参考。
+description: 直接处理用户指定的人类图、星盘、八字、紫微本命与方法解读，包括河洛理数、邵子参评／金锁银匙、流派盘、关系盘及法达等技法；按实际主题读取相关证据，不自动扩展其他体系。普通生活问题由相应主题主持，时间选择共享参考。
 ---
 
 # 命盘与指定方法解读
@@ -9,32 +9,44 @@ description: 直接处理用户指定的星盘、八字、紫微本命与方法�
 
 ## 共用范围与安全
 
-先读[咨询硬边界](../_shared/safety-boundaries.md)与[本轮范围及多视角选择](../_shared/consultation-routing.md)。按当前问题展开，首轮明确要求详细就覆盖；不自动附带全部相关主题。时间追问读[共享时间选择](../_shared/timing-selection.md)，保留原主题与已有相关视角，只补需要的新层。生死、临床判断与医疗择时在选法前停止。
+先读短的[咨询核心](../_shared/consultation-core.md)。主题重叠或扩展才查[范围选择](../_shared/consultation-routing.md)，涉及目标时段才查[时间选择](../_shared/timing-selection.md)；遇生死、临床判断或医疗择时先按[硬边界](../_shared/safety-boundaries.md)停止相关计算。
 
-## 引用路径与必读资料
+## 引用路径与按需资料
 
 发现入口可能是软链接。先进入入口目录，以 shell 内建 `pwd -P` 取得真实目录，再解析相对引用；不要裁剪 `.agents/skills/onda-*` 的字符串父目录。
 
-- 计算与完整结果交付：[../_shared/fatebridge-engine.md](../_shared/fatebridge-engine.md)
-- 表达与事实边界：[../_shared/onda-counsel.md](../_shared/onda-counsel.md)
-- 场景取舍与去重：[../../docs/scenario-routing.md](../../docs/scenario-routing.md)
+- 参数不清楚或需要完整交付时定位：[../_shared/fatebridge-engine.md](../_shared/fatebridge-engine.md)
+- 需要表达或来源细则时定位：[../_shared/onda-counsel.md](../_shared/onda-counsel.md)
+- 主题重叠或扩展时定位：[../../docs/scenario-routing.md](../../docs/scenario-routing.md)
 
 所有位置、宫位、相位、尊贵与中点交给引擎。默认现代本命盘；用户已明确流派或盘型时直接按其选择，不先展示工具菜单。
 
 ## 指定中式方法
 
-明确要求原始八字用 `bazi_birth`，综合八字结构用 `analyze_destiny`，紫微本命用 `ziwei_birth`；紫微动态用 `ziwei_horoscope`。明确法达用 `firdaria`，八字大运／流年用 `dayun_analysis`／`liunian_analysis`，按共享时间选择核对所需目标。指定一法不先跑其他体系。跨体系主题解释按对应主题主持并复用已有结果。
+太乙年／月／日／时计、三式合参及其技法核对由[问事与占式入口](../onda-zhanbu/SKILL.md)处理，读取其中太乙参考；用户只核对已给日期或结果时，不另索现实占问或出生资料。指定占式的方法名不自动变成本命盘请求。
+
+明确六壬／金口诀时，即使只是核对起课技法、没有现实问事，也读取[问事与占卜](../onda-zhanbu/SKILL.md)及[六壬与金口诀取证](../onda-zhanbu/references/ren-evidence.md)，沿用已给时间、配置及同次结果；不为进入该分支另要现实问题。
+
+紫微规则与四化表来源可用已声明的 `ziwei_rules` 核对实际配置；查规则不另排命盘，也不将表项核对扩为整书认证。
+
+明确河洛理数用 `heluo`，邵子参评／金锁银匙用 `canping`；按[数术取证](references/numerology.md)区分起数、具名配运和原典序号，只解释同次实际卦爻、编号和选文。
+
+原典命例已明确四柱时，用 `bazi_source_compare` 取得当前旺衰和全部同柱编释，不反推生日、补生时或选择有利标注。差异、未知与未收录须按实际返回解释，相符也不能认证全书或现实预测。
+
+明确要求原始八字用 `bazi_birth`，综合八字结构用 `analyze_destiny`，紫微本命用 `ziwei_birth`；紫微动态用 `ziwei_horoscope`。宿曜／宿占按[宿曜取证](../_shared/sukuyo-evidence.md)区分历日27宿、原典异表和物理天文28宿。明确法达用 `firdaria`，八字大运／流年用 `dayun_analysis`／`liunian_analysis`，按共享时间选择核对所需目标。指定一法不先跑其他体系。跨体系主题解释按对应主题主持并复用已有结果。
 
 ## 选择实际盘型
 
 | 用户所问 | 主证工具 | 本次应让用户看到什么 |
 | --- | --- | --- |
 | 本命、日月上升、性格或某个生活主题 | `astro_chart` | 与主题有关的行星落点、角度与相位，连成两三条可对照的特点 |
+| 河洛理数／邵子参评／金锁银匙 | `heluo`／`canping`（按所选方法） | 起数、实际卦爻或编号、选文与来源；条件未定时保留未知 |
+| 人类图／BodyGraph | `human_design` | 按[人类图取证](references/human-design.md)解释实际类型、权威、定义和Profile；不套太阳时与西占宫位 |
 | 希腊／古典盘 | `astro_hellen_chart` | 实际昼夜属性、上升主星与角宫星；按问题进一步取古典条件 |
-| 果老星宗 | `astro_guolao_chart` | 实际七政四余、宿度／月宿与已匹配格局；保留所用计算口径 |
+| 果老星宗 | `astro_guolao_chart` | 按[果老取证](references/guolao-evidence.md)读七政四余、宫主度主与格局；核对底本顺数安命所用的研究输入，命度与历史宿界仍未验收 |
 | 印度盘 | `astro_india_chart` | 实际恒星黄道、岁差参数、上升宿与月宿；没有返回的分盘或达沙不能补写 |
-| 德国／中点盘 | `astro_germany_chart` | 本命中点与命中相位；不能把一个人的中点说成两人关系 |
-| 13 扇区盘 | `astro_chart13` | 实际 `thirteen_sectors` 与星体扇区；这是计算分区，不当作天文学星座边界 |
+| 德国／中点盘 | `astro_germany_chart` | 按[汉堡中点取证](references/hamburg-evidence.md)读原生因素、限定原文解释、生时误差及指定时刻太阳弧；本命与推运层分开 |
+| 13 扇区盘 | `astro_chart13` | 实际 `thirteen_sectors`、`sector13_evidence` 与生时误差；这是自定义等分规则，不当作天文学星座边界 |
 | 两人的比较、互动或组合盘 | `astro_relative_chart` | 先确认盘型，再解释双方实际交互相位或第三盘，区分各自本命特点 |
 | 未来阶段、行运、返照与推运 | `western_timing_analysis` | 按 onda-shiyun 处理所问时间范围；不从静态本命盘编出日期 |
 
@@ -66,21 +78,7 @@ description: 直接处理用户指定的星盘、八字、紫微本命与方法�
 
 ## 关系盘的读法
 
-首次调用前按工具公开的 `evidence_views` 选择与盘型同名的字段卡，复制其 `fields`，不要把卡名当成请求参数。默认联合视图保留安全主层，但已知模式时优先用对应卡，不能用通用摘要或跨盘相位替代指定主盘。计算后核对 `relationship_profile.relative_mode_normalized/primary_layer`，实际映射如下：
-
-| 用户盘型／规范值 | 常用输入别名 | 返回主层／实际应读 |
-| --- | --- | --- |
-| 比较盘 `compare` | `Comp`、`compare`、0 | `directional_synastry`：`synastry_aspects` 与双向 `in_to_out_aspects/out_to_in_aspects` |
-| 组合盘 `composite` | `Composite`、1 | `composite_chart`：`chart` 的实际星体、宫位、角度和相位 |
-| 影响盘 `influence` | `Synastry`、`synastry`、2 | `influence_chart_pair`：`inner/outer` 双方视角下的影响图盘，实际盘在各自 `.chart` |
-| 时空中点盘 `timespace` | `TimeSpace`、3 | `timespace_chart`：`chart`，双方出生时间与地理位置中点生成的第三盘 |
-| 马克斯盘 `marks` | `Marks`、4 | `marks_chart`：`chart`，本版本由组合盘与时空中点盘派生 |
-
-尤其 `Synastry` 在本引擎归一为影响盘；不能照其他软件惯例把它直接当 compare。普通“比较两个人”用 compare；已明确 Synastry／影响盘直接沿用，无需重问专业术语。`inner_chart/outer_chart` 是各自本命，不能误读为 `inner/outer` 影响图盘。`synastry_aspects` 的 inner／outer 表示实际两端归属；组合、时空和马克斯 `chart` 均为第三盘，不归给某一人。
-
-双向中点、映点／反映点等专业追问读[深层证据卡](../_shared/western-deep-evidence.md#关系盘的方向与深读)，按工具 `relationship_detail` 卡补证；不以单人的本命中点代替两人方向性命中。
-
-用户明确恋爱／婚姻时可用 `relationship_focus`，未说明取 general；合作、家人和朋友不强套浪漫或性吸引。围绕所选主层实际返回的相位、星体落宫或其他配置说明本次特点，再给一项能由双方回应检验的相处安排。影响盘可依据双方视角的实际落宫交付，不要求另加相位才有解释；没有保留相位时不补写。只有实际依据同时支持配合和张力时才分别说明，不为凑正负各一条编造。`compatibility` 的各分数保留名称，不解释为关系成功率。
+仅选择两人关系盘或用户追问关系盘细节时读取。 [读取本分支](references/relationship-reading.md)。
 
 ## 交付与复核
 
@@ -94,20 +92,8 @@ description: 直接处理用户指定的星盘、八字、紫微本命与方法�
 
 ## 可复核示例
 
-CLI 示例使用已安装并激活的仓库虚拟环境，准备方法见[引擎调用](../_shared/fatebridge-engine.md#怎么调引擎)。
+仅需要本地 CLI 复核时使用；已有 MCP 定义直接调用。 [读取本分支](references/examples.md)。
 
-以下为虚构资料；已有 MCP 时直接调用，不先运行 CLI。
+## 印度占星视角
 
-```bash
-python3 -m fatebridge.cli astro_chart \
-  --name Mia --birth-year 1995 --birth-month 6 --birth-day 1 --birth-hour 8 --birth-minute 20 \
-  --birth-latitude 31.23 --birth-longitude 121.47 --birth-place 上海 --birth-timezone Asia/Shanghai \
-  --strict-fields --no-include-snapshot-text --fields chart_profile angles planets aspects
-
-python3 -m fatebridge.cli astro_relative_chart \
-  --inner-name 我 --inner-birth-year 1995 --inner-birth-month 6 --inner-birth-day 1 --inner-birth-hour 8 \
-  --inner-birth-latitude 31.23 --inner-birth-longitude 121.47 --inner-birth-place 上海 \
-  --outer-name TA --outer-birth-year 1993 --outer-birth-month 11 --outer-birth-day 3 --outer-birth-hour 7 \
-  --outer-birth-latitude 39.90 --outer-birth-longitude 116.40 --outer-birth-place 北京 \
-  --strict-fields --no-include-snapshot-text --fields relationship_profile synastry_aspects in_to_out_aspects out_to_in_aspects compatibility
-```
+印度／吠陀／Jyotish 本命用 `astro_india_chart`；明确 D9、D10 使用 `divisions`，D1 始终保留。先读[印占取证](../_shared/vedic-evidence.md)，按 `natal/career/relationship/divisions` 卡选首次字段。Vimshottari 用 `astro_vimshottari` 的 `stage` 卡，不从本命静态盘补写达沙日期。

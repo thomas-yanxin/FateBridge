@@ -1,6 +1,7 @@
 """Large responses stay bounded while the original run remains fully readable."""
 
 import asyncio
+import copy
 import hashlib
 import json
 import os
@@ -18,6 +19,7 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.private_files import ensure_private_directory, open_private_file
+from tests.fixtures.mcp_receipt import assert_same_run_receipt
 
 
 @pytest.fixture
@@ -82,6 +84,231 @@ def test_small_payload_is_not_rewritten_or_stored(store):
     original = {"summary": "small"}
     assert delivery.bound_response(original, 8192) is original
     assert not store.directory.exists()
+
+
+@pytest.mark.parametrize("compact", [False, True])
+def test_current_cards_keep_facts_and_restore_every_deferred_child(store, compact):
+    original = {
+        key: {
+            "first_view": {
+                "status": "partial" if key == "left" else "current",
+                "current": {"stem": "甲", "start_at": "2026-01-01T00:00:00+08:00"},
+                "source_details": key * 12000,
+                "end_at": "2036-01-01T00:00:00+08:00",
+            }
+        }
+        for key in ("left", "right")
+    }
+    original["run_metadata"] = {"run_id": "same-run", "tool_name": "timing_analysis"}
+    before = copy.deepcopy(original)
+    result = delivery.bound_response(original, 4096, compact=compact)
+    assert len(delivery._json(result, compact)) <= 4096
+    ref = result["result_delivery"]
+    assert set(ref["deferred_fields"]) == {
+        "left.first_view.source_details",
+        "right.first_view.source_details",
+    }
+    assert len(ref["deferred_fields"]) == 2
+    restored = copy.deepcopy(result)
+    restored.pop("result_delivery")
+    for key in ("left", "right"):
+        for name in ("status", "current", "end_at"):
+            assert result[key]["first_view"][name] == before[key]["first_view"][name]
+    for path in ref["deferred_fields"]:
+        root, view, child = path.split(".")
+        restored[root][view][child] = reconstruct(store, ref["result_id"], path)
+    assert restored == reconstruct(store, ref["result_id"]) == before == original
+
+
+def test_supplementary_receipt_details_do_not_displace_complete_business(store):
+    original = {
+        "analysis": {"facts": "甲" * 5800},
+        "run_metadata": {
+            "run_id": "same-run",
+            "tool_name": "taiyi",
+            "business_output_sha256": "b" * 64,
+            "input_sha256": "c" * 64,
+            "contract_sha256": "d" * 64,
+            "runtime": {
+                "environment_sha256": "e" * 64,
+                "ephemeris": {"files": {"data.se1": "a" * 64}, "sha256": "f" * 64},
+                "details": "runtime" * 100,
+            },
+            "provenance": {"source": ["source" * 150]},
+            "determinism": {"scope": "same implementation" * 100},
+        },
+    }
+    before = copy.deepcopy(original)
+    result = delivery.bound_response(original, 8192)
+    assert len(delivery._json(result)) <= 8192
+    assert result["analysis"] == original["analysis"]
+    ref = result["result_delivery"]
+    assert ref["deferred_fields"] == [
+        "run_metadata.runtime",
+        "run_metadata.provenance",
+        "run_metadata.determinism",
+    ]
+    assert result["run_metadata"]["business_output_sha256"] == "b" * 64
+    assert result["run_metadata"]["runtime"]["ephemeris_files_count"] == 1
+    restored = copy.deepcopy(result["run_metadata"])
+    for path in ref["deferred_fields"]:
+        key = path.removeprefix("run_metadata.")
+        restored[key] = reconstruct(store, ref["result_id"], path)
+    assert restored == before["run_metadata"]
+    assert reconstruct(store, ref["result_id"]) == before == original
+
+
+def test_receipt_fields_stay_inline_when_the_full_reference_fits(store):
+    files = {f"reference-{i}.se1": "a" * 64 for i in range(120)}
+    inventory_hash = hashlib.sha256(
+        json.dumps(files, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    original = {
+        "analysis": {"facts": ["actual calculation"]},
+        "run_metadata": {
+            "run_id": "same-run",
+            "tool_name": "ziwei_birth",
+            "provenance": {"source": "keep this exact source"},
+            "determinism": {"scope": "keep this exact scope"},
+            "runtime": {
+                "environment_sha256": "b" * 64,
+                "ephemeris": {"files": files, "sha256": inventory_hash},
+            },
+        },
+    }
+    before = copy.deepcopy(original)
+    shaped = delivery.bound_response(original, 8192)
+    assert shaped["result_delivery"]["deferred_fields"] == ["run_metadata.runtime"]
+    assert not shaped["result_delivery"].get("compact_reference")
+    assert shaped["analysis"] == original["analysis"]
+    assert shaped["run_metadata"]["provenance"] == before["run_metadata"]["provenance"]
+    assert (
+        shaped["run_metadata"]["determinism"] == before["run_metadata"]["determinism"]
+    )
+    assert reconstruct(store, shaped["result_delivery"]["result_id"]) == before
+    assert original == before
+
+
+def test_duplicate_locators_do_not_displace_complete_business_facts(store):
+    files = {f"reference-{i}.se1": "a" * 64 for i in range(120)}
+    digest = hashlib.sha256(
+        json.dumps(
+            files, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode()
+    ).hexdigest()
+    original = {
+        "analysis_context": {"clock": "one run"},
+        "ziwei_birth": {"all_facts": ""},
+        "run_metadata": {
+            "run_id": "same-run",
+            "tool_name": "ziwei_birth",
+            "provenance": {"record": "p" * 500},
+            "runtime": {
+                "environment_sha256": "b" * 64,
+                "ephemeris": {"files": files, "sha256": digest},
+            },
+        },
+    }
+    # Construct a portable boundary fixture from actual locator overhead.
+    # This sizes synthetic text only; real chart fields are never reduced.
+    prototype = delivery.bound_response(original, 8192)
+    assert prototype["result_delivery"]["deferred_fields"] == ["run_metadata.runtime"]
+    original["ziwei_birth"]["all_facts"] = "中" * (
+        8192 + 50 - len(delivery._json(prototype))
+    )
+    before = copy.deepcopy(original)
+    shaped = delivery.bound_response(original, 8192)
+    ref = shaped["result_delivery"]
+    assert ref["compact_reference"] is True
+    assert ref["deferred_fields"] == ["run_metadata.runtime"]
+    assert len(delivery._json(shaped)) <= 8192
+    assert shaped["ziwei_birth"] == original["ziwei_birth"]
+    assert shaped["analysis_context"] == original["analysis_context"]
+    manifest = store.manifest(ref["result_id"])
+    assert manifest["sha256"] == ref["sha256"]
+    omitted = ("available_fields", "total_bytes", "page_chars", "rest_manifest_path")
+    assert all(k not in ref and k in manifest for k in omitted)
+    assert ref["file_path"] == manifest["file_path"]
+    assert ref["file_payload_path"] == manifest["file_payload_path"]
+    restored_full_reference = {
+        **ref,
+        **{k: manifest[k] for k in omitted},
+    }
+    restored_full_reference.pop("compact_reference")
+    assert (
+        len(delivery._json({**shaped, "result_delivery": restored_full_reference}))
+        > 8192
+    )
+    full = reconstruct(store, ref["result_id"])
+    assert full == before == original
+    assert_same_run_receipt(shaped["run_metadata"], full["run_metadata"])
+    record = json.loads(Path(manifest["file_path"]).read_text())
+    assert record[manifest["file_payload_path"]] == original
+
+
+@pytest.mark.parametrize("limit", [4096, 8192])
+def test_manifest_locator_preserves_sources_before_deferring_receipt_facts(
+    store, limit
+):
+    original = {
+        "analysis": {"facts": ""},
+        "run_metadata": {
+            "run_id": "same-run",
+            "provenance": {"source": "source" * 120},
+            "determinism": {"scope": "same exact implementation"},
+            "runtime": {
+                "environment_sha256": "e" * 64,
+                "ephemeris": {
+                    "files": {str(i): "a" * 64 for i in range(100)},
+                    "sha256": "f" * 64,
+                },
+            },
+        },
+    }
+    prototype = delivery.bound_response(original, limit)
+    reference = {
+        k: v
+        for k, v in prototype["result_delivery"].items()
+        if k
+        not in {
+            "available_fields",
+            "total_bytes",
+            "page_chars",
+            "rest_manifest_path",
+            "first_page_uri",
+            "file_path",
+            "file_payload_path",
+        }
+    }
+    reference["compact_reference"] = True
+    reference["deferred_fields"] = ["run_metadata.runtime"]
+    minimal = {**prototype, "result_delivery": reference}
+    # Size only synthetic text from real locator overhead, never alter a real
+    # business result or the requested budget to manufacture a passing case.
+    original["analysis"]["facts"] = "中" * (limit - len(delivery._json(minimal)) - 12)
+    before = copy.deepcopy(original)
+    shaped = delivery.bound_response(original, limit)
+    ref = shaped["result_delivery"]
+    assert len(delivery._json(shaped)) <= limit
+    assert ref["deferred_fields"] == ["run_metadata.runtime"]
+    assert "file_path" not in ref and "file_payload_path" not in ref
+    assert "first_page_uri" not in ref
+    assert ref["manifest_uri"].endswith(ref["result_id"])
+    assert shaped["analysis"] == before["analysis"]
+    assert shaped["run_metadata"]["provenance"] == before["run_metadata"]["provenance"]
+    assert (
+        shaped["run_metadata"]["determinism"] == before["run_metadata"]["determinism"]
+    )
+    manifest = store.manifest(ref["result_id"])
+    assert manifest["sha256"] == ref["sha256"]
+    assert Path(manifest["file_path"]).exists()
+    assert (
+        json.loads(Path(manifest["file_path"]).read_text())[
+            manifest["file_payload_path"]
+        ]
+        == before
+    )
+    assert reconstruct(store, ref["result_id"]) == before == original
 
 
 @pytest.mark.parametrize("result_id", ["../private", "a" * 47, "z" * 48])
@@ -186,7 +413,18 @@ def test_real_western_exact_time_and_delivery_match_all_transports(
             original["analysis_context"]["birth_datetime"]
             == "1990-05-15T10:30:00+09:00"
         )
-        assert original["run_metadata"] == shaped["run_metadata"]
+        inline_metadata = copy.deepcopy(shaped["run_metadata"])
+        runtime = inline_metadata["runtime"]
+        if "delivery_path" in runtime:
+            restored = reconstruct(store, ref["result_id"], runtime["delivery_path"])
+            assert (
+                len(restored["ephemeris"]["files"]) == runtime["ephemeris_files_count"]
+            )
+            assert (
+                restored["ephemeris"]["sha256"] == runtime["ephemeris_inventory_sha256"]
+            )
+            inline_metadata["runtime"] = restored
+        assert original["run_metadata"] == inline_metadata
         full.append({k: v for k, v in original.items() if k != "run_metadata"})
         page = rest.get(
             f"/api/results/{ref['result_id']}/pages",
@@ -213,7 +451,10 @@ def test_recommended_western_first_view_fits_default_budget(store):
 
     result = asyncio.run(invoke())
     assert not result.is_error
-    assert "result_delivery" not in result.structured_content
+    if "result_delivery" in result.structured_content:
+        assert result.structured_content["result_delivery"]["deferred_fields"] == [
+            "run_metadata.runtime"
+        ]
     assert (
         result.structured_content["transits"]["current_transit"]["analysis_datetime"]
         == "2026-10-14T12:00:00+08:00"

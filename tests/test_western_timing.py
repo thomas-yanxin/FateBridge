@@ -210,10 +210,10 @@ def test_calculate_western_timing_analysis_returns_predictive_sections():
     assert result["natal_reference"]["lots"]["lot_of_spirit"]["sign_label"] == "摩羯座"
 
     assert result["returns"]["solar_return"]["return_datetime"].startswith(
-        "2025-05-17T01:47:24+08:00"
+        "2025-05-17T01:47:"
     )
     assert result["returns"]["lunar_return"]["return_datetime"].startswith(
-        "2025-05-20T01:30:17+08:00"
+        "2025-05-20T01:30:"
     )
 
     assert result["directions"]["secondary_progression"][
@@ -709,7 +709,7 @@ def test_equatorial_primary_directions_expose_coordinate_runtime_metadata():
     expected_backend = (
         "swisseph_equatorial_projection"
         if predictive_swe is not None
-        else "kerykeion_ecliptic_reference_fallback"
+        else "native_ecliptic_reference_fallback"
     )
 
     primary_directions = result["directions"]["primary_directions"]

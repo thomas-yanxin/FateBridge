@@ -1,0 +1,2236 @@
+{
+  "method_id": "qiongtong_bing_reference_layers_v1",
+  "source": {
+    "id": "qiongtong_xu_qianqian_bing_v1",
+    "title": "窮通寶鑑評註",
+    "compiler": "余春台",
+    "commentator": "徐樂吾",
+    "edition": "國家圖書館藏本NLC416-12jh004238-48608，乾乾書社，民國二十六年[1937]",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/9/93/NLC416-12jh004238-48608_%E7%AA%AE%E9%80%9A%E5%AF%B6%E9%91%91%E8%A9%95%E8%A8%BB.pdf",
+    "source_sha256": "b7f17fc7fcb7d8faa991efa74d0db391c5066a3793b3fc6787d2612bc6b350a8",
+    "pdf_page_count": 277,
+    "summary_pdf_pages": [
+      75
+    ],
+    "body_pdf_pages": [
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101
+    ],
+    "general_fire_pdf_pages": [
+      71,
+      72,
+      73,
+      74
+    ],
+    "printed_volume": 2,
+    "text_layer_policy": "提要、余氏大字原編、徐氏小字評註分列；編釋不作原文全轉錄、力量演算法或現實斷語。"
+  },
+  "scope": "完整丙火十二月單元與論火通則的開發者目校；33例原樣，三檔唯一標注4、bounded1與比較詞分開；獨立專家未完成，不是全120格接受或全盤用神裁定。",
+  "months": {
+    "寅": {
+      "summary": {
+        "top_listed_stem": "壬",
+        "listed_stems": [
+          "壬",
+          "庚"
+        ],
+        "enumeration_scope": "所選提要首列和集合；不是全盤優先級。",
+        "pdf_pages": [
+          75
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          76,
+          77,
+          78,
+          79,
+          80
+        ],
+        "stem_sequence": [
+          "壬",
+          "庚"
+        ],
+        "condition_stems": [
+          "壬",
+          "庚",
+          "甲",
+          "乙",
+          "戊",
+          "己",
+          "辛",
+          "癸",
+          "丁"
+        ],
+        "sequence_semantics": "正文多分支和作用次序；不把所列干定為每盤共同喜用",
+        "passage_locator": "丙火十二月完整单元内对应月段",
+        "paraphrase": "丙火長生向旺，以壬為尊、庚佐；木多塞火可須財，水多無制又須印比，不能由印多推出身強。",
+        "conditions_not_evaluated": [
+          "木是否塞火",
+          "壬是否得源或有根",
+          "戊制與印比支援",
+          "火局及透藏次序"
+        ],
+        "review_status": "complete_unit_developer_reading_not_independent_acceptance",
+        "source_examples": [
+          {
+            "id": "QT-BING-01",
+            "pdf_pages": [
+              79
+            ],
+            "printed_volume": 2,
+            "printed_page": 8,
+            "pillars": [
+              "庚寅",
+              "戊寅",
+              "丙寅",
+              "庚寅"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-02",
+            "pdf_pages": [
+              80
+            ],
+            "printed_volume": 2,
+            "printed_page": 9,
+            "pillars": [
+              "庚寅",
+              "戊寅",
+              "丙寅",
+              "壬辰"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-03",
+            "pdf_pages": [
+              80
+            ],
+            "printed_volume": 2,
+            "printed_page": 9,
+            "pillars": [
+              "辛亥",
+              "庚寅",
+              "丙子",
+              "丁酉"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-04",
+            "pdf_pages": [
+              80
+            ],
+            "printed_volume": 2,
+            "printed_page": 9,
+            "pillars": [
+              "丁酉",
+              "壬寅",
+              "丙子",
+              "戊戌"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          }
+        ]
+      },
+      "comparison": "summary_candidates_and_body_conditions_retained_without_forcing_one_rank",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "卯": {
+      "summary": {
+        "top_listed_stem": "壬",
+        "listed_stems": [
+          "壬",
+          "己"
+        ],
+        "enumeration_scope": "所選提要首列和集合；不是全盤優先級。",
+        "pdf_pages": [
+          75
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          80,
+          81,
+          82
+        ],
+        "stem_sequence": [
+          "壬",
+          "己"
+        ],
+        "condition_stems": [
+          "壬",
+          "己",
+          "甲",
+          "乙",
+          "庚",
+          "辛",
+          "丁",
+          "戊"
+        ],
+        "sequence_semantics": "正文多分支和作用次序；不把所列干定為每盤共同喜用",
+        "passage_locator": "丙火十二月完整单元内对应月段",
+        "paraphrase": "卯木通水火，但丁壬合、木浮納水、辰丑濕土能否制壬均另論；無壬用己與用壬時忌混不是同一分支。",
+        "conditions_not_evaluated": [
+          "壬是否有根",
+          "丁壬是否牽制",
+          "濕土與燥土制水不同",
+          "木浮與接引"
+        ],
+        "review_status": "complete_unit_developer_reading_not_independent_acceptance",
+        "source_examples": [
+          {
+            "id": "QT-BING-05",
+            "pdf_pages": [
+              82
+            ],
+            "printed_volume": 2,
+            "printed_page": 11,
+            "pillars": [
+              "乙亥",
+              "己卯",
+              "丙申",
+              "己亥"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-06",
+            "pdf_pages": [
+              82
+            ],
+            "printed_volume": 2,
+            "printed_page": 11,
+            "pillars": [
+              "乙亥",
+              "丁卯",
+              "丙申",
+              "己亥"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          }
+        ]
+      },
+      "comparison": "summary_candidates_and_body_conditions_retained_without_forcing_one_rank",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "辰": {
+      "summary": {
+        "top_listed_stem": "壬",
+        "listed_stems": [
+          "壬",
+          "甲"
+        ],
+        "enumeration_scope": "所選提要首列和集合；不是全盤優先級。",
+        "pdf_pages": [
+          75
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          82,
+          83
+        ],
+        "stem_sequence": [
+          "壬",
+          "甲",
+          "庚"
+        ],
+        "condition_stems": [
+          "壬",
+          "甲",
+          "庚",
+          "乙",
+          "丁",
+          "戊",
+          "己"
+        ],
+        "sequence_semantics": "正文多分支和作用次序；不把所列干定為每盤共同喜用",
+        "passage_locator": "丙火十二月完整单元内对应月段",
+        "paraphrase": "三月土重晦光，壬與甲須配合；土局時甲疏、可用庚泄土生壬，不將土一律作印生身。",
+        "conditions_not_evaluated": [
+          "土重與會局",
+          "甲疏土",
+          "庚泄土生水",
+          "透藏及混雜"
+        ],
+        "review_status": "complete_unit_developer_reading_not_independent_acceptance",
+        "source_examples": [
+          {
+            "id": "QT-BING-07",
+            "pdf_pages": [
+              83
+            ],
+            "printed_volume": 2,
+            "printed_page": 12,
+            "pillars": [
+              "癸卯",
+              "丙辰",
+              "丙午",
+              "壬辰"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          }
+        ]
+      },
+      "comparison": "summary_candidates_and_body_conditions_retained_without_forcing_one_rank",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "巳": {
+      "summary": {
+        "top_listed_stem": "壬",
+        "listed_stems": [
+          "壬",
+          "庚",
+          "癸"
+        ],
+        "enumeration_scope": "所選提要首列和集合；不是全盤優先級。",
+        "pdf_pages": [
+          75
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          84,
+          85,
+          86
+        ],
+        "stem_sequence": [
+          "壬",
+          "庚",
+          "癸"
+        ],
+        "condition_stems": [
+          "壬",
+          "庚",
+          "癸",
+          "甲",
+          "乙",
+          "戊",
+          "己"
+        ],
+        "sequence_semantics": "正文多分支和作用次序；不把所列干定為每盤共同喜用",
+        "passage_locator": "丙火十二月完整单元内对应月段",
+        "paraphrase": "建祿火旺仍分壬的源根、庚發水、癸代用及戊己牽制；壬在申等有源不與無源混為一談。",
+        "conditions_not_evaluated": [
+          "水源及根",
+          "壬癸性質與代用條件",
+          "火局與炎上另審",
+          "戊己不可一概相同"
+        ],
+        "review_status": "complete_unit_developer_reading_not_independent_acceptance",
+        "source_examples": [
+          {
+            "id": "QT-BING-08",
+            "pdf_pages": [
+              86
+            ],
+            "printed_volume": 2,
+            "printed_page": 15,
+            "pillars": [
+              "丁巳",
+              "乙巳",
+              "丙午",
+              "戊子"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-09",
+            "pdf_pages": [
+              86
+            ],
+            "printed_volume": 2,
+            "printed_page": 15,
+            "pillars": [
+              "庚子",
+              "辛巳",
+              "丙寅",
+              "丙申"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-10",
+            "pdf_pages": [
+              88
+            ],
+            "printed_volume": 2,
+            "printed_page": 17,
+            "pillars": [
+              "庚寅",
+              "辛巳",
+              "丙戌",
+              "己亥"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          }
+        ]
+      },
+      "comparison": "summary_candidates_and_body_conditions_retained_without_forcing_one_rank",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "午": {
+      "summary": {
+        "top_listed_stem": "壬",
+        "listed_stems": [
+          "壬",
+          "庚"
+        ],
+        "enumeration_scope": "所選提要首列和集合；不是全盤優先級。",
+        "pdf_pages": [
+          75
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          87,
+          88,
+          89
+        ],
+        "stem_sequence": [
+          "壬",
+          "庚"
+        ],
+        "condition_stems": [
+          "壬",
+          "庚",
+          "甲",
+          "丁",
+          "癸",
+          "戊",
+          "己"
+        ],
+        "sequence_semantics": "正文多分支和作用次序；不把所列干定為每盤共同喜用",
+        "passage_locator": "丙火十二月完整单元内对应月段",
+        "paraphrase": "陽刃火炎以壬庚配合，但一壬無庚也有原文允許分支；火土枯燥與炎上不同，不能用無根禁用一條規則覆蓋。",
+        "conditions_not_evaluated": [
+          "壬得庚源",
+          "丁壬牽制",
+          "戊己混雜",
+          "炎上與火土偏枯不同"
+        ],
+        "review_status": "complete_unit_developer_reading_not_independent_acceptance",
+        "source_examples": [
+          {
+            "id": "QT-BING-11",
+            "pdf_pages": [
+              89
+            ],
+            "printed_volume": 2,
+            "printed_page": 18,
+            "pillars": [
+              "戊戌",
+              "戊午",
+              "丙午",
+              "己丑"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-12",
+            "pdf_pages": [
+              89
+            ],
+            "printed_volume": 2,
+            "printed_page": 18,
+            "pillars": [
+              "戊申",
+              "戊午",
+              "丙辰",
+              "甲午"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          }
+        ]
+      },
+      "comparison": "summary_candidates_and_body_conditions_retained_without_forcing_one_rank",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "未": {
+      "summary": {
+        "top_listed_stem": "壬",
+        "listed_stems": [
+          "壬",
+          "庚"
+        ],
+        "enumeration_scope": "所選提要首列和集合；不是全盤優先級。",
+        "pdf_pages": [
+          75
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          89,
+          90
+        ],
+        "stem_sequence": [
+          "壬",
+          "庚"
+        ],
+        "condition_stems": [
+          "壬",
+          "庚",
+          "甲",
+          "戊",
+          "己",
+          "丁"
+        ],
+        "sequence_semantics": "正文多分支和作用次序；不把所列干定為每盤共同喜用",
+        "passage_locator": "丙火十二月完整单元内对应月段",
+        "paraphrase": "六月丙火退氣而燥，論壬庚及土的清濁；同月土重身輕時另用甲制土接引，並非所有未月身旺。",
+        "conditions_not_evaluated": [
+          "土重泄氣",
+          "甲能否制土生身",
+          "壬被土塞",
+          "壬與金的生源"
+        ],
+        "review_status": "complete_unit_developer_reading_not_independent_acceptance",
+        "source_examples": [
+          {
+            "id": "QT-BING-13",
+            "pdf_pages": [
+              90
+            ],
+            "printed_volume": 2,
+            "printed_page": 19,
+            "pillars": [
+              "壬寅",
+              "丁未",
+              "丙申",
+              "壬辰"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-14",
+            "pdf_pages": [
+              90
+            ],
+            "printed_volume": 2,
+            "printed_page": 19,
+            "pillars": [
+              "壬寅",
+              "丁未",
+              "丙申",
+              "戊戌"
+            ],
+            "expected_strength": "弱",
+            "label_kind": "explicit_case_body_term",
+            "source_body_term": "土重身輕",
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          }
+        ]
+      },
+      "comparison": "summary_candidates_and_body_conditions_retained_without_forcing_one_rank",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "申": {
+      "summary": {
+        "top_listed_stem": "壬",
+        "listed_stems": [
+          "壬",
+          "戊"
+        ],
+        "enumeration_scope": "所選提要首列和集合；不是全盤優先級。",
+        "pdf_pages": [
+          75
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          90,
+          91,
+          92
+        ],
+        "stem_sequence": [
+          "壬",
+          "戊",
+          "甲"
+        ],
+        "condition_stems": [
+          "壬",
+          "戊",
+          "甲",
+          "乙",
+          "庚",
+          "辛",
+          "丁",
+          "癸"
+        ],
+        "sequence_semantics": "正文多分支和作用次序；不把所列干定為每盤共同喜用",
+        "passage_locator": "丙火十二月完整单元内对应月段",
+        "paraphrase": "丙至申衰，財滋殺須身能承受；原例兩申沖寅仍另論印相生日元不弱，不能由冲支刪去所有印根。",
+        "conditions_not_evaluated": [
+          "身強用殺與身弱用印劫分開",
+          "壬太多與戊制過度皆另審",
+          "辛財與從財不等於合化水"
+        ],
+        "review_status": "complete_unit_developer_reading_not_independent_acceptance",
+        "source_examples": [
+          {
+            "id": "QT-BING-15",
+            "pdf_pages": [
+              91
+            ],
+            "printed_volume": 2,
+            "printed_page": 20,
+            "pillars": [
+              "壬戌",
+              "戊申",
+              "丙申",
+              "壬辰"
+            ],
+            "expected_strength": "弱",
+            "label_kind": "explicit_case_body_term",
+            "source_body_term": "身弱極矣",
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-16",
+            "pdf_pages": [
+              92
+            ],
+            "printed_volume": 2,
+            "printed_page": 21,
+            "pillars": [
+              "乙未",
+              "甲申",
+              "丙申",
+              "庚寅"
+            ],
+            "expected_strength": null,
+            "label_kind": "bounded_not_weak_not_unique_three_bin",
+            "source_body_term": "日元不弱",
+            "negative_constraints": [
+              {
+                "kind": "strength_not",
+                "value": "弱",
+                "source_anchor": "日元不弱",
+                "pdf_page": 92
+              }
+            ],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          }
+        ]
+      },
+      "comparison": "summary_candidates_and_body_conditions_retained_without_forcing_one_rank",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "酉": {
+      "summary": {
+        "top_listed_stem": "壬",
+        "listed_stems": [
+          "壬",
+          "癸"
+        ],
+        "enumeration_scope": "所選提要首列和集合；不是全盤優先級。",
+        "pdf_pages": [
+          75
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          92,
+          93,
+          94
+        ],
+        "stem_sequence": [
+          "壬",
+          "癸"
+        ],
+        "condition_stems": [
+          "壬",
+          "癸",
+          "甲",
+          "乙",
+          "庚",
+          "辛",
+          "丁",
+          "戊"
+        ],
+        "sequence_semantics": "正文多分支和作用次序；不把所列干定為每盤共同喜用",
+        "passage_locator": "丙火十二月完整单元内对应月段",
+        "paraphrase": "用壬輔映須身能承受；支成金局與辛透仍須區別真從、假從、微根與比劫，不從丙辛共現認定化水。",
+        "conditions_not_evaluated": [
+          "原局身強條件",
+          "微根或比劫",
+          "壬癸不同作用",
+          "從財與化水分開"
+        ],
+        "review_status": "complete_unit_developer_reading_not_independent_acceptance",
+        "source_examples": [
+          {
+            "id": "QT-BING-17",
+            "pdf_pages": [
+              93
+            ],
+            "printed_volume": 2,
+            "printed_page": 22,
+            "pillars": [
+              "丙子",
+              "丁酉",
+              "丙午",
+              "丁酉"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-18",
+            "pdf_pages": [
+              93
+            ],
+            "printed_volume": 2,
+            "printed_page": 22,
+            "pillars": [
+              "丙寅",
+              "丁酉",
+              "丙午",
+              "壬辰"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-19",
+            "pdf_pages": [
+              94
+            ],
+            "printed_volume": 2,
+            "printed_page": 23,
+            "pillars": [
+              "己卯",
+              "癸酉",
+              "丙子",
+              "戊子"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          }
+        ]
+      },
+      "comparison": "summary_candidates_and_body_conditions_retained_without_forcing_one_rank",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "戌": {
+      "summary": {
+        "top_listed_stem": "甲",
+        "listed_stems": [
+          "甲",
+          "壬"
+        ],
+        "enumeration_scope": "所選提要首列和集合；不是全盤優先級。",
+        "pdf_pages": [
+          75
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          94,
+          95
+        ],
+        "stem_sequence": [
+          "甲",
+          "壬"
+        ],
+        "condition_stems": [
+          "甲",
+          "壬",
+          "戊",
+          "己",
+          "庚",
+          "辛",
+          "癸"
+        ],
+        "sequence_semantics": "正文多分支和作用次序；不把所列干定為每盤共同喜用",
+        "passage_locator": "丙火十二月完整单元内对应月段",
+        "paraphrase": "土晦火光先甲疏土、次壬；土重與水受制、火土燥烈的作用不同，原文亦提醒炎上條件不宜任套。",
+        "conditions_not_evaluated": [
+          "土燥與土重",
+          "甲是否受破",
+          "壬是否受土塞",
+          "炎上與偏枯"
+        ],
+        "review_status": "complete_unit_developer_reading_not_independent_acceptance",
+        "source_examples": [
+          {
+            "id": "QT-BING-20",
+            "pdf_pages": [
+              95
+            ],
+            "printed_volume": 2,
+            "printed_page": 24,
+            "pillars": [
+              "己亥",
+              "甲戌",
+              "丙子",
+              "戊子"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-21",
+            "pdf_pages": [
+              95
+            ],
+            "printed_volume": 2,
+            "printed_page": 24,
+            "pillars": [
+              "丙申",
+              "戊戌",
+              "丙午",
+              "戊戌"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-22",
+            "pdf_pages": [
+              95
+            ],
+            "printed_volume": 2,
+            "printed_page": 24,
+            "pillars": [
+              "戊戌",
+              "壬戌",
+              "丙寅",
+              "壬辰"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          }
+        ]
+      },
+      "comparison": "summary_candidates_and_body_conditions_retained_without_forcing_one_rank",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "亥": {
+      "summary": {
+        "top_listed_stem": "甲",
+        "listed_stems": [
+          "甲",
+          "戊",
+          "庚",
+          "壬"
+        ],
+        "enumeration_scope": "所選提要首列和集合；不是全盤優先級。",
+        "pdf_pages": [
+          75
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          96,
+          97
+        ],
+        "stem_sequence": [
+          "甲",
+          "戊",
+          "庚",
+          "壬"
+        ],
+        "condition_stems": [
+          "甲",
+          "戊",
+          "庚",
+          "壬",
+          "乙",
+          "己",
+          "辛"
+        ],
+        "sequence_semantics": "正文多分支和作用次序；不把所列干定為每盤共同喜用",
+        "passage_locator": "丙火十二月完整单元内对应月段",
+        "paraphrase": "冬丙先論甲接引，源文把亥中甲的接引稱為丙根；這不是亥中有火藏干。木旺、水旺、木浮又分用庚戊等。",
+        "conditions_not_evaluated": [
+          "亥甲有氣和接引",
+          "木浮與生機",
+          "木旺與財損印",
+          "制水反生甲",
+          "從殺和身印關係"
+        ],
+        "review_status": "complete_unit_developer_reading_not_independent_acceptance",
+        "source_examples": [
+          {
+            "id": "QT-BING-23",
+            "pdf_pages": [
+              97
+            ],
+            "printed_volume": 2,
+            "printed_page": 26,
+            "pillars": [
+              "甲申",
+              "乙亥",
+              "丙戌",
+              "庚寅"
+            ],
+            "expected_strength": "强",
+            "label_kind": "explicit_case_body_term",
+            "source_body_term": "印旺身強",
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-24",
+            "pdf_pages": [
+              97
+            ],
+            "printed_volume": 2,
+            "printed_page": 26,
+            "pillars": [
+              "壬辰",
+              "辛亥",
+              "丙戌",
+              "戊子"
+            ],
+            "expected_strength": "弱",
+            "label_kind": "explicit_case_body_term",
+            "source_body_term": "此造身弱",
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-25",
+            "pdf_pages": [
+              97
+            ],
+            "printed_volume": 2,
+            "printed_page": 26,
+            "pillars": [
+              "辛巳",
+              "己亥",
+              "丙子",
+              "壬辰"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          }
+        ]
+      },
+      "comparison": "summary_candidates_and_body_conditions_retained_without_forcing_one_rank",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "子": {
+      "summary": {
+        "top_listed_stem": "壬",
+        "listed_stems": [
+          "壬",
+          "戊",
+          "己"
+        ],
+        "enumeration_scope": "所選提要首列和集合；不是全盤優先級。",
+        "pdf_pages": [
+          75
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          98,
+          99
+        ],
+        "stem_sequence": [
+          "壬",
+          "戊",
+          "己",
+          "甲"
+        ],
+        "condition_stems": [
+          "壬",
+          "戊",
+          "己",
+          "甲",
+          "庚",
+          "癸"
+        ],
+        "sequence_semantics": "正文多分支和作用次序；不把所列干定為每盤共同喜用",
+        "passage_locator": "丙火十二月完整单元内对应月段",
+        "paraphrase": "原文區分冬至前後，弱中復強是節內語義；用壬庚須身強，身弱有比劫、制水及甲接引條件，不能只用子支判斷。",
+        "conditions_not_evaluated": [
+          "冬至前後需實際曆日",
+          "身強與身弱分支",
+          "甲不透時亥中甲",
+          "火助與源根",
+          "土制水與混水"
+        ],
+        "review_status": "complete_unit_developer_reading_not_independent_acceptance",
+        "source_examples": [
+          {
+            "id": "QT-BING-26",
+            "pdf_pages": [
+              99
+            ],
+            "printed_volume": 2,
+            "printed_page": 28,
+            "pillars": [
+              "辛亥",
+              "庚子",
+              "丙寅",
+              "庚寅"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-27",
+            "pdf_pages": [
+              99
+            ],
+            "printed_volume": 2,
+            "printed_page": 28,
+            "pillars": [
+              "辛丑",
+              "庚子",
+              "丙子",
+              "癸巳"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-28",
+            "pdf_pages": [
+              99
+            ],
+            "printed_volume": 2,
+            "printed_page": 28,
+            "pillars": [
+              "辛酉",
+              "庚子",
+              "丙戌",
+              "戊子"
+            ],
+            "expected_strength": null,
+            "label_kind": "comparative_with_preceding_chart_not_fixed_bin",
+            "source_body_term": "較為弱矣",
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true,
+            "relative_comparison": {
+              "reference": "QT-BING-27",
+              "scope": "先比較巳祿與戌根並論木與行運；不把相對語義縮成已驗證的數值大小。"
+            }
+          }
+        ]
+      },
+      "comparison": "summary_candidates_and_body_conditions_retained_without_forcing_one_rank",
+      "chart_conditions_status": "not_adjudicated"
+    },
+    "丑": {
+      "summary": {
+        "top_listed_stem": "壬",
+        "listed_stems": [
+          "壬",
+          "甲"
+        ],
+        "enumeration_scope": "所選提要首列和集合；不是全盤優先級。",
+        "pdf_pages": [
+          75
+        ],
+        "review_status": "selected_summary_stems_collated"
+      },
+      "body": {
+        "pdf_pages": [
+          99,
+          100,
+          101
+        ],
+        "stem_sequence": [
+          "壬",
+          "甲"
+        ],
+        "condition_stems": [
+          "壬",
+          "甲",
+          "庚",
+          "辛",
+          "丁",
+          "戊",
+          "己",
+          "癸"
+        ],
+        "sequence_semantics": "正文多分支和作用次序；不把所列干定為每盤共同喜用",
+        "passage_locator": "丙火十二月完整单元内对应月段",
+        "paraphrase": "十二月二陽進氣，土重另須甲；原例分寅甲受生、制土與比助，印的數量與實際解晦不可互換。",
+        "conditions_not_evaluated": [
+          "原述己土司令不由四柱倒推節後日數",
+          "土重須甲",
+          "官殺與印的配合",
+          "原盤與後來行運分開"
+        ],
+        "review_status": "complete_unit_developer_reading_not_independent_acceptance",
+        "source_examples": [
+          {
+            "id": "QT-BING-29",
+            "pdf_pages": [
+              100
+            ],
+            "printed_volume": 2,
+            "printed_page": 29,
+            "pillars": [
+              "癸卯",
+              "乙丑",
+              "丙午",
+              "壬辰"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-30",
+            "pdf_pages": [
+              101
+            ],
+            "printed_volume": 2,
+            "printed_page": 30,
+            "pillars": [
+              "己丑",
+              "丁丑",
+              "丙寅",
+              "庚寅"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-31",
+            "pdf_pages": [
+              101
+            ],
+            "printed_volume": 2,
+            "printed_page": 30,
+            "pillars": [
+              "乙酉",
+              "己丑",
+              "丙寅",
+              "己丑"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          },
+          {
+            "id": "QT-BING-32",
+            "pdf_pages": [
+              101
+            ],
+            "printed_volume": 2,
+            "printed_page": 30,
+            "pillars": [
+              "乙巳",
+              "己丑",
+              "丙申",
+              "癸巳"
+            ],
+            "expected_strength": null,
+            "label_kind": "initial_condition_followed_by_help_not_unique_final_bin",
+            "source_body_term": "氣勢不足",
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true,
+            "context": "下文另有年時兩己得祿與用財；保留原語，不隱去後續補助後只截成最終弱。"
+          },
+          {
+            "id": "QT-BING-33",
+            "pdf_pages": [
+              101
+            ],
+            "printed_volume": 2,
+            "printed_page": 30,
+            "pillars": [
+              "乙丑",
+              "己丑",
+              "丙午",
+              "庚寅"
+            ],
+            "expected_strength": null,
+            "label_kind": "not_uniquely_annotated",
+            "source_body_term": null,
+            "negative_constraints": [],
+            "absolute_birth_datetime": null,
+            "day_after_term": null,
+            "annotation_authority": "single_developer_source_reading_not_independent_expert",
+            "biography_not_validation": true
+          }
+        ]
+      },
+      "comparison": "summary_candidates_and_body_conditions_retained_without_forcing_one_rank",
+      "chart_conditions_status": "not_adjudicated"
+    }
+  },
+  "general_fire_context": [
+    {
+      "id": "FIRE-G01",
+      "pdf_pages": [
+        71
+      ],
+      "layer": "余氏大字原编",
+      "actors": [
+        "木",
+        "火",
+        "水"
+      ],
+      "paraphrase": "火以木為體、水為用的體用說，另論火多、木藏及宮位。",
+      "conditions_not_evaluated": [
+        "體用比喻不等於新增物理藏干或工程能量"
+      ],
+      "calculation_effect": "none"
+    },
+    {
+      "id": "FIRE-G02",
+      "pdf_pages": [
+        71,
+        72
+      ],
+      "layer": "徐氏小字评注",
+      "actors": [
+        "丙",
+        "丁",
+        "甲",
+        "壬"
+      ],
+      "paraphrase": "丙丁體用有別，四季所宜不同；需審月令地位及發用。",
+      "conditions_not_evaluated": [
+        "不以單一元素通則替代具體日干條件"
+      ],
+      "calculation_effect": "none"
+    },
+    {
+      "id": "FIRE-G03",
+      "pdf_pages": [
+        72
+      ],
+      "layer": "余氏大字原编及徐氏小字分别转述",
+      "actors": [
+        "木",
+        "火",
+        "水",
+        "土",
+        "金"
+      ],
+      "paraphrase": "春火母旺子相而木不宜過旺，旺木塞火、土多晦光；見水亦須有木化、水能潤木。",
+      "conditions_not_evaluated": [
+        "生扶與過旺分開",
+        "有木不自動可受生"
+      ],
+      "calculation_effect": "none"
+    },
+    {
+      "id": "FIRE-G04",
+      "pdf_pages": [
+        73
+      ],
+      "layer": "余氏大字原编及徐氏小字分别转述",
+      "actors": [
+        "壬",
+        "庚",
+        "辛",
+        "木",
+        "土"
+      ],
+      "paraphrase": "夏火須有源之水制、潤，土晦或助燥皆有條件；火土太過可使金水不能奏效。",
+      "conditions_not_evaluated": [
+        "有源",
+        "燥濕",
+        "不可由土或金出現直接決定"
+      ],
+      "calculation_effect": "none"
+    },
+    {
+      "id": "FIRE-G05",
+      "pdf_pages": [
+        73,
+        74
+      ],
+      "layer": "余氏大字原编及徐氏小字分别转述",
+      "actors": [
+        "甲",
+        "戊",
+        "己",
+        "火",
+        "水",
+        "金"
+      ],
+      "paraphrase": "秋火休息須木復明，水盛與土重各有風險；冬火弱而須接引及制水。",
+      "conditions_not_evaluated": [
+        "承載",
+        "接引",
+        "制水",
+        "不實作原書生死成敗斷語"
+      ],
+      "calculation_effect": "none"
+    }
+  ],
+  "examples": [
+    {
+      "id": "QT-BING-01",
+      "pdf_pages": [
+        79
+      ],
+      "printed_volume": 2,
+      "printed_page": 8,
+      "pillars": [
+        "庚寅",
+        "戊寅",
+        "丙寅",
+        "庚寅"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-02",
+      "pdf_pages": [
+        80
+      ],
+      "printed_volume": 2,
+      "printed_page": 9,
+      "pillars": [
+        "庚寅",
+        "戊寅",
+        "丙寅",
+        "壬辰"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-03",
+      "pdf_pages": [
+        80
+      ],
+      "printed_volume": 2,
+      "printed_page": 9,
+      "pillars": [
+        "辛亥",
+        "庚寅",
+        "丙子",
+        "丁酉"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-04",
+      "pdf_pages": [
+        80
+      ],
+      "printed_volume": 2,
+      "printed_page": 9,
+      "pillars": [
+        "丁酉",
+        "壬寅",
+        "丙子",
+        "戊戌"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-05",
+      "pdf_pages": [
+        82
+      ],
+      "printed_volume": 2,
+      "printed_page": 11,
+      "pillars": [
+        "乙亥",
+        "己卯",
+        "丙申",
+        "己亥"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-06",
+      "pdf_pages": [
+        82
+      ],
+      "printed_volume": 2,
+      "printed_page": 11,
+      "pillars": [
+        "乙亥",
+        "丁卯",
+        "丙申",
+        "己亥"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-07",
+      "pdf_pages": [
+        83
+      ],
+      "printed_volume": 2,
+      "printed_page": 12,
+      "pillars": [
+        "癸卯",
+        "丙辰",
+        "丙午",
+        "壬辰"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-08",
+      "pdf_pages": [
+        86
+      ],
+      "printed_volume": 2,
+      "printed_page": 15,
+      "pillars": [
+        "丁巳",
+        "乙巳",
+        "丙午",
+        "戊子"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-09",
+      "pdf_pages": [
+        86
+      ],
+      "printed_volume": 2,
+      "printed_page": 15,
+      "pillars": [
+        "庚子",
+        "辛巳",
+        "丙寅",
+        "丙申"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-10",
+      "pdf_pages": [
+        88
+      ],
+      "printed_volume": 2,
+      "printed_page": 17,
+      "pillars": [
+        "庚寅",
+        "辛巳",
+        "丙戌",
+        "己亥"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-11",
+      "pdf_pages": [
+        89
+      ],
+      "printed_volume": 2,
+      "printed_page": 18,
+      "pillars": [
+        "戊戌",
+        "戊午",
+        "丙午",
+        "己丑"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-12",
+      "pdf_pages": [
+        89
+      ],
+      "printed_volume": 2,
+      "printed_page": 18,
+      "pillars": [
+        "戊申",
+        "戊午",
+        "丙辰",
+        "甲午"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-13",
+      "pdf_pages": [
+        90
+      ],
+      "printed_volume": 2,
+      "printed_page": 19,
+      "pillars": [
+        "壬寅",
+        "丁未",
+        "丙申",
+        "壬辰"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-14",
+      "pdf_pages": [
+        90
+      ],
+      "printed_volume": 2,
+      "printed_page": 19,
+      "pillars": [
+        "壬寅",
+        "丁未",
+        "丙申",
+        "戊戌"
+      ],
+      "expected_strength": "弱",
+      "label_kind": "explicit_case_body_term",
+      "source_body_term": "土重身輕",
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-15",
+      "pdf_pages": [
+        91
+      ],
+      "printed_volume": 2,
+      "printed_page": 20,
+      "pillars": [
+        "壬戌",
+        "戊申",
+        "丙申",
+        "壬辰"
+      ],
+      "expected_strength": "弱",
+      "label_kind": "explicit_case_body_term",
+      "source_body_term": "身弱極矣",
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-16",
+      "pdf_pages": [
+        92
+      ],
+      "printed_volume": 2,
+      "printed_page": 21,
+      "pillars": [
+        "乙未",
+        "甲申",
+        "丙申",
+        "庚寅"
+      ],
+      "expected_strength": null,
+      "label_kind": "bounded_not_weak_not_unique_three_bin",
+      "source_body_term": "日元不弱",
+      "negative_constraints": [
+        {
+          "kind": "strength_not",
+          "value": "弱",
+          "source_anchor": "日元不弱",
+          "pdf_page": 92
+        }
+      ],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-17",
+      "pdf_pages": [
+        93
+      ],
+      "printed_volume": 2,
+      "printed_page": 22,
+      "pillars": [
+        "丙子",
+        "丁酉",
+        "丙午",
+        "丁酉"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-18",
+      "pdf_pages": [
+        93
+      ],
+      "printed_volume": 2,
+      "printed_page": 22,
+      "pillars": [
+        "丙寅",
+        "丁酉",
+        "丙午",
+        "壬辰"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-19",
+      "pdf_pages": [
+        94
+      ],
+      "printed_volume": 2,
+      "printed_page": 23,
+      "pillars": [
+        "己卯",
+        "癸酉",
+        "丙子",
+        "戊子"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-20",
+      "pdf_pages": [
+        95
+      ],
+      "printed_volume": 2,
+      "printed_page": 24,
+      "pillars": [
+        "己亥",
+        "甲戌",
+        "丙子",
+        "戊子"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-21",
+      "pdf_pages": [
+        95
+      ],
+      "printed_volume": 2,
+      "printed_page": 24,
+      "pillars": [
+        "丙申",
+        "戊戌",
+        "丙午",
+        "戊戌"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-22",
+      "pdf_pages": [
+        95
+      ],
+      "printed_volume": 2,
+      "printed_page": 24,
+      "pillars": [
+        "戊戌",
+        "壬戌",
+        "丙寅",
+        "壬辰"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-23",
+      "pdf_pages": [
+        97
+      ],
+      "printed_volume": 2,
+      "printed_page": 26,
+      "pillars": [
+        "甲申",
+        "乙亥",
+        "丙戌",
+        "庚寅"
+      ],
+      "expected_strength": "强",
+      "label_kind": "explicit_case_body_term",
+      "source_body_term": "印旺身強",
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-24",
+      "pdf_pages": [
+        97
+      ],
+      "printed_volume": 2,
+      "printed_page": 26,
+      "pillars": [
+        "壬辰",
+        "辛亥",
+        "丙戌",
+        "戊子"
+      ],
+      "expected_strength": "弱",
+      "label_kind": "explicit_case_body_term",
+      "source_body_term": "此造身弱",
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-25",
+      "pdf_pages": [
+        97
+      ],
+      "printed_volume": 2,
+      "printed_page": 26,
+      "pillars": [
+        "辛巳",
+        "己亥",
+        "丙子",
+        "壬辰"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-26",
+      "pdf_pages": [
+        99
+      ],
+      "printed_volume": 2,
+      "printed_page": 28,
+      "pillars": [
+        "辛亥",
+        "庚子",
+        "丙寅",
+        "庚寅"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-27",
+      "pdf_pages": [
+        99
+      ],
+      "printed_volume": 2,
+      "printed_page": 28,
+      "pillars": [
+        "辛丑",
+        "庚子",
+        "丙子",
+        "癸巳"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-28",
+      "pdf_pages": [
+        99
+      ],
+      "printed_volume": 2,
+      "printed_page": 28,
+      "pillars": [
+        "辛酉",
+        "庚子",
+        "丙戌",
+        "戊子"
+      ],
+      "expected_strength": null,
+      "label_kind": "comparative_with_preceding_chart_not_fixed_bin",
+      "source_body_term": "較為弱矣",
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true,
+      "relative_comparison": {
+        "reference": "QT-BING-27",
+        "scope": "先比較巳祿與戌根並論木與行運；不把相對語義縮成已驗證的數值大小。"
+      }
+    },
+    {
+      "id": "QT-BING-29",
+      "pdf_pages": [
+        100
+      ],
+      "printed_volume": 2,
+      "printed_page": 29,
+      "pillars": [
+        "癸卯",
+        "乙丑",
+        "丙午",
+        "壬辰"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-30",
+      "pdf_pages": [
+        101
+      ],
+      "printed_volume": 2,
+      "printed_page": 30,
+      "pillars": [
+        "己丑",
+        "丁丑",
+        "丙寅",
+        "庚寅"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-31",
+      "pdf_pages": [
+        101
+      ],
+      "printed_volume": 2,
+      "printed_page": 30,
+      "pillars": [
+        "乙酉",
+        "己丑",
+        "丙寅",
+        "己丑"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    },
+    {
+      "id": "QT-BING-32",
+      "pdf_pages": [
+        101
+      ],
+      "printed_volume": 2,
+      "printed_page": 30,
+      "pillars": [
+        "乙巳",
+        "己丑",
+        "丙申",
+        "癸巳"
+      ],
+      "expected_strength": null,
+      "label_kind": "initial_condition_followed_by_help_not_unique_final_bin",
+      "source_body_term": "氣勢不足",
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true,
+      "context": "下文另有年時兩己得祿與用財；保留原語，不隱去後續補助後只截成最終弱。"
+    },
+    {
+      "id": "QT-BING-33",
+      "pdf_pages": [
+        101
+      ],
+      "printed_volume": 2,
+      "printed_page": 30,
+      "pillars": [
+        "乙丑",
+        "己丑",
+        "丙午",
+        "庚寅"
+      ],
+      "expected_strength": null,
+      "label_kind": "not_uniquely_annotated",
+      "source_body_term": null,
+      "negative_constraints": [],
+      "absolute_birth_datetime": null,
+      "day_after_term": null,
+      "annotation_authority": "single_developer_source_reading_not_independent_expert",
+      "biography_not_validation": true
+    }
+  ],
+  "boundary_review": {
+    "start_pdf": 71,
+    "bing_summary_pdf": 75,
+    "bing_month_body_start": 76,
+    "last_bing_pdf": 101,
+    "next_ding_summary_pdf": 102,
+    "next_ding_body_pdf": 103,
+    "actual_new_force_rules_adopted": false
+  },
+  "independent_expert_review": "not_completed",
+  "calculation_effect": "none"
+}

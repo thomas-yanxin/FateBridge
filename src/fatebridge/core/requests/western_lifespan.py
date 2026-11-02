@@ -7,16 +7,19 @@ from typing import Optional, Union
 from pydantic import Field
 
 from fatebridge.core.requests.birth import AstroBirthRequest
+from fatebridge.core.requests.western_policy import WesternEphemerisRequest
+from fatebridge.utils.house_systems import TWELVE_HOUSE_SYSTEM_NOTE
 
 
-class AstroLifespanRequest(AstroBirthRequest):
+class AstroLifespanRequest(AstroBirthRequest, WesternEphemerisRequest):
     """Shared base for western *lifespan* techniques cast from a single natal chart."""
 
     house_system: Union[int, str] = Field(
         default="P",
         description="House system, any convention: SE letter ('P'=Placidus, "
         "'R'=Regiomontanus, 'W'=whole sign, 'D'=equal_mc), key ('placidus', "
-        "'equal_mc'), or integer code 0..8 (3=Placidus, 8=equal_mc).",
+        "'equal_mc'), or integer code 0..8 (3=Placidus, 8=equal_mc)."
+        + TWELVE_HOUSE_SYSTEM_NOTE,
     )
     zodiac_type: str = Field(
         default="Tropic", description="Zodiac type, e.g. Tropic or Sidereal"

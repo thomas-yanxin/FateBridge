@@ -1,0 +1,68 @@
+{
+  "id": "meihua_calendar_precision_v1",
+  "version": "1.0.0",
+  "source": {
+    "id": "hko-conversion-caveat",
+    "publisher": "香港天文台",
+    "title": "公曆與農曆對照表：註二",
+    "url": "https://www.hko.gov.hk/tc/gts/time/conversion.htm",
+    "raw_sha256": "895e11d871163f8b89c6faa6a615ff58bc914ae53b584ee2c707766ca98f485f",
+    "retrieved_on": "2026-10-22"
+  },
+  "source_scope": "Publisher names three future new moons whose civil-date labels may differ by one day. This metadata does not make HKO the runtime conversion provider and does not claim independent astronomical accuracy.",
+  "calendar_scope": {
+    "start": "1901-01-01",
+    "end": "2100-12-31"
+  },
+  "review_scope_policy": {
+    "kind": "software_conservative_published_month_and_preceding_date",
+    "start": "named_published_new_moon_date_minus_one_day",
+    "end_exclusive": "next_published_month_start",
+    "review_windows_are_not_published_hko_intervals": true,
+    "other_published_month_anchors_assumed_fixed_for_review_scope": true,
+    "no_shift_direction_probability_or_alternate_lunar_labels_inferred": true,
+    "unlisted_boundaries_are_not_certified_exact": true,
+    "solar_term_dates_in_same_source_not_treated_as_lunar_month_starts": true
+  },
+  "events": [
+    {
+      "id": "hko-new-moon-2057-09-28",
+      "published_new_moon_date": "2057-09-28",
+      "published_lunar_year": 2057,
+      "published_lunar_month": 9,
+      "published_next_month_start": "2057-10-28",
+      "review_start": "2057-09-27",
+      "review_end_exclusive": "2057-10-28",
+      "review_scope_kind": "software_conservative_published_month_and_preceding_date",
+      "review_window_is_not_a_published_hko_interval": true,
+      "shift_direction_or_probability": "not_specified_by_source",
+      "alternate_calendar_computed": false
+    },
+    {
+      "id": "hko-new-moon-2089-09-04",
+      "published_new_moon_date": "2089-09-04",
+      "published_lunar_year": 2089,
+      "published_lunar_month": 8,
+      "published_next_month_start": "2089-10-04",
+      "review_start": "2089-09-03",
+      "review_end_exclusive": "2089-10-04",
+      "review_scope_kind": "software_conservative_published_month_and_preceding_date",
+      "review_window_is_not_a_published_hko_interval": true,
+      "shift_direction_or_probability": "not_specified_by_source",
+      "alternate_calendar_computed": false
+    },
+    {
+      "id": "hko-new-moon-2097-08-07",
+      "published_new_moon_date": "2097-08-07",
+      "published_lunar_year": 2097,
+      "published_lunar_month": 7,
+      "published_next_month_start": "2097-09-06",
+      "review_start": "2097-08-06",
+      "review_end_exclusive": "2097-09-06",
+      "review_scope_kind": "software_conservative_published_month_and_preceding_date",
+      "review_window_is_not_a_published_hko_interval": true,
+      "shift_direction_or_probability": "not_specified_by_source",
+      "alternate_calendar_computed": false
+    }
+  ]
+}

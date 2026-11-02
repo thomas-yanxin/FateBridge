@@ -24,6 +24,10 @@
 
 MCP 默认响应字符预算为8192；超限返回 `result_delivery`，原结果没有被截断，仍由同一 run 保留。先读其 `manifest_uri`，按所需字段的资源取值；点路径支持对象和数组数字索引，资源模板为 `fatebridge://results/{result_id}/fields/{path}/{offset}`，首 offset 为0。每页是完整 JSON 包装，其中 `text` 是文档片段；需要完整字段时按 `next_offset` 拼接并核对 `sha256`，不把单页当全文解析，不重新计算。先取窄字段，不一次打印重组后的大对象。引用约一小时过期，也可能因容量回收失效；失效须如实说明。
 
+需要校验同run长结果时，优先使用确定性校验读取：资源模板为 `fatebridge://results/{result_id}/verified/{run_id}/{sha256}/fields/{path}/{offset}`，全文模板省去 `fields/{path}/`。三个身份参数必须来自原回执，offset从0起；接口先核对**完整保留payload**的散列和原run，再从同一读取对象选页。客户端不能读资源时，使用已安装环境的CLI：`fatebridge result-read RESULT_ID --sha256 ORIGINAL_SHA256 --run-id ORIGINAL_RUN_ID --path FIELD_PATH --offset 0`；源码环境可用`PYTHONPATH=src python -m fatebridge.cli result-read ...`，沿用已有依赖环境，不为咨询安装依赖。校验失败须停止使用该结果，不重新计算冒充旧run。
+
+返回的`verification.payload_sha256/run_id`是完整保留结果的核验，`sha256`是本次所选字段文档的散列。`text`仍至多2048字符，需要完整字段时继续`next_offset`，直到null；不能因完整payload核验成功就声称已读全部业务事实。没有`result_delivery`的小响应不需要虚构结果引用。自己读本地记录时仍须采用下述精确序列化，不能用外层文件散列或`sort_keys=True`替代。
+
 REST/CLI 默认继续完整交付，可显式设置 `response_char_limit` / `--response-char-limit` 获得同一限量合同。MCP 的 `response_char_limit=0` 仅供可保存完整 JSON 的程序客户端；聊天咨询不要用它规避分页，否则宿主仍可能截断。
 
 用户要求保存本机完整文件时，可读取 `file_path` 指向的私有临时记录，按 `file_payload_path`（当前为 `payload`）取出原结果，以 `ensure_ascii=False,separators=(",", ":")` 序列化后核对 `sha256` 并保存。外层记录还含过期时间，其文件散列不等于原结果散列；不把外层记录交付为完整计算结果。保存后的用户文件独立于临时引用保留。
@@ -91,14 +95,14 @@ fatebridge <tool> [参数...]
 
 **结构化字段怎么读（需要精确时）：**
 
-- `analyze_destiny` → 根字段 `four_pillars`、`day_master`、`ten_gods`、`structure_profile`、`element_distribution`、`element_distribution_basis`、`person_info`。普通画像首轮可取这七项；格局解释读完整 `structure_profile` 中的 `layers/conflicts/conditional_elements/limitations`、`dominant_structure.formation_status` 和 `decision_basis`，不能只取最终 `useful_elements`；按[八字专题取证](bazi-topic-evidence.md)区分月令格局、扶抑与调候。五行分布不等于喜用。
+- `analyze_destiny` → 根字段 `four_pillars`、`day_master`、`ten_gods`、`structure_profile`、`element_distribution`、`element_distribution_basis`、`person_info`。普通画像首轮可取这七项；格局解释读完整 `structure_profile` 的 `candidate_selection`、`layers/conflicts/conditional_elements/limitations`、`dominant_structure.formation_status` 和 `decision_basis`。月令主类、旧共现候选与尚未选定的原典取用路径分开，不能只取最终 `useful_elements`；按[八字专题取证](bazi-topic-evidence.md)区分月令格局、扶抑与调候。五行分布不等于喜用。
 - `bazi_birth` → `bazi_birth.four_pillars`、`bazi_birth.day_master` 等嵌套字段。它与 `analyze_destiny` 的输出根结构不同，不能共用 `bazi_birth.` 前缀。
 - `ziwei_birth` → `ziwei_birth.ming_gong/shen_gong/palaces/sihua`；核对出生处理口径时按需加 `person_info`、`analysis_context`。
 - `ziwei_horoscope` → 普通运限首轮可取 `analysis_context`、`birth_context`、`ziwei_horoscope.interpretation_scope`、`ziwei_horoscope.nominal_age`、`ziwei_horoscope.calendar_rules`、`ziwei_horoscope.scopes`，同时设 `strict_fields=true`、`include_snapshot_text=false`；省略 `fields` 并不会因严格模式自动变精简。`scopes` 是数组，当前投影必须整体取，不能编造 `scopes.流年` 或索引路径；按本轮粒度解释其中所需层，其余不展开，也不默认取 `snapshot_export`。核对 `analysis_context.context_role=target` 及 `analysis_datetime`，出生处理另读 `birth_context`；旧进程若返回出生 context，不能将它当目标时刻，也不凭字段名忽略实际值。本命／运限宫位身份与四化连接读[紫微专题取证](ziwei-topic-evidence.md)。
 - `astro_chart` → 根字段 `angles`、`chart_profile`、`planets`、`aspects`、`interpretation`、`person_info`。普通首轮的解释子项按工具公布的字段选择；出生钟时读 `person_info`。`western_timing_analysis` 的 `analysis_context` 不能移作本命盘字段。
 - 八字 9 专项 → `{"analysis_type": "...", "<dim>_analysis": {...}}`。解读读 `<dim>_analysis`，里面是该维度的子项。例如 `bazi_romance` → `romance_analysis.{peach_blossom, hongluan_tianxi, opposite_sex_star, peach_quality, romance_timing, timing_context}`；`bazi_wealth` → `wealth_analysis.{...}`。`timing_context` 段是引擎自动推算的当前大运/流年，看时机就看它。
 - `two_person_compatibility` → `summary`（`overall_score` / `compatibility_level`）、`traditional_compatibility`、`detailed_analysis`（`element_balance` / `favorable_synergy`）、`strengths`、`challenges`、`recommendations`。不同规则段的分数保留各自名称与作用域，不合成成功概率；`person_info` 中的个人内部结构不能直接解释为双方互动。建议列表为空时如实说明，现实沟通建议另作标记。
-- `sukuyo_compatibility` → 27 宿相性，**有方向**：`person1_to_person2` 与 `person2_to_person1` 各一套关系判定，别只读一边；另有 `pair`（双向综合）、`su27_basis`（各自本命宿）、`summary`。
+- `sukuyo_compatibility` → 现代中国农历月日及T1299下卷望宿两法定27宿，**有方向**：`person1_to_person2` 与 `person2_to_person1` 分别读取；`pair`仅为配对类别，`su27_basis`是算法版本，各自本命宿在 `person1/2.natal_su27`。闰月或可选桧尾半日/补配次序未定时保留候选；`candidate_relation_analysis`仅列条件组合，不能挑一行当已定结果；`source_table_variant`是T1299印本28宿月建表异文，不能替代三九所用27宿。
 - `astro_relative_chart` → `relationship_profile`、`inner_chart`、`outer_chart`、`synastry_aspects`、`chart`、`compatibility`。
 
 取 `snapshot_text` 的稳妥写法：
@@ -213,7 +217,7 @@ python3 -m fatebridge.cli --no-metadata bazi_birth <出生参数> \
 ### 配合度 · 双人（结构化 JSON）
 
 - `two_person_compatibility`：八字合婚 / 合作配合度，含综合分、五行互补、共同喜用、优势/挑战/建议。两人各一套 `--person1-*` / `--person2-*` 字段（名/年/月/日/时/性别）。
-- `sukuyo_compatibility`：宿曜 27 宿双人相性（按月亮经度），有方向性。两人各一套 `--person1-date/-time/-zone/-lat/-lon` 等字段。
+- `sukuyo_compatibility`：按固定UTC+08现代中国农历月日及T1299望宿法定27宿，有方向性，不按月亮经度。可选桧尾研究档案须明确原典半日，不能由民用钟时自动猜测。UTC+08历日可只给双方 `--person1-date/--person2-date`，未知生时不猜；经纬度兼容字段不参与本命宿计算。
 
 ### 时运 · 推命（snapshot_text）
 
@@ -228,11 +232,11 @@ python3 -m fatebridge.cli --no-metadata bazi_birth <出生参数> \
 - `tongshefa`：统摄四卦组合，读取实际 `taiyin/taiyang/shaoyang/shaoyin`；固定默认不是用户起卦，不实现蓍草十八变／大衍随机起卦。
 - `gua_lookup` / `gua_meiyi`：卦象查询 / 卦义。
 - `qimen`：奇门遁甲，起局 + 用神。
-- `taiyi`：太乙神数。
+- `taiyi`：太乙神数，支持明确选择年／月／日／时计；合参对应选项放入`taiyi_options`。先按[太乙取证](../onda-zhanbu/references/taiyi-sanshi.md)核模式、起元、钟面和实际证据，现代适配不冒称完整古历。年／月八门与定计用`gates`、`gate_comparison`、`determinate`分源深读；日计读`daily_calendar/daily_essences`，始击读`shiji_derivation`，原表读`count_sources`。`menju_jiangfa`为三值条件合取，时计三门仍未裁定；默认至点时计不附定计，显式`key_hour_winter_jiazi_v1`可读完整积时和定计并保留原例三项差异，不按有利结果换法。
 - `jinkou`：金口诀，`--di-fen` 地分 + 时间。
 - `liureng_gods`：大六壬起课。
 - `liureng_runyear`：六壬流年（行年）。
-- `suzhan`：宿占 / 二十八宿。
+- `suzhan`：历日27宿与七曜物理天文28宿分别读取。天文默认现代距星视赤经研究宿界，不当作唐代宿界；活动解释读取整个 `activity_assessment` 与 `calendar_day`，保留各卷条文、日名和昼夜例外。`conflicted`不能挑一条宜忌合成结论；`clock_evaluation_status=not_computed`不能写成具体时刻已验吉。六类标签和三九组序均不当成功概率或近中远距离。
 - `otherbu`：解读用户实际提供的行星／星座／宫位骰面；不自动随机抽骰，不能把默认骰面当本次抽取。
 - `sanshiunited`：三式合参（奇门 + 太乙 + 六壬同盘）。
 
@@ -377,3 +381,5 @@ python3 -m fatebridge.cli --no-metadata fengshui_minggua --effective-birth-year 
 python3 -m fatebridge.cli --no-metadata fengshui_annual_stars --effective-year 2026
 fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json --compact
 ```
+
+太乙 `calculation_mode=day` 明确采用金钥匙积日法，见 [日计依据](../../docs/taiyi-day.md)。先设day再取 `daily_calendar` / `daily_essences`，零时日界不可套时计23时子初；天时和太乙数宫位未知、正文/课式异数需忠实解释。返回分页时读同一run载荷及哈希，不凭被延后字段作否定。

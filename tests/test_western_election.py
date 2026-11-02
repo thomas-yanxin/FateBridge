@@ -31,7 +31,9 @@ def test_dignity_table():
     assert _dignity("Mars", "Libra") == "detriment"
     assert _dignity("Venus", "Libra") == "rulership"
     assert _dignity("Saturn", "Leo") == "detriment"  # opposite its domicile Aquarius
-    assert _dignity("Saturn", "Sagittarius") == "peregrine"  # no dignity nor debility
+    # Saturn at Sagittarius27 has a face in Lilly's table. Sign alone cannot
+    # establish peregrine; the election score only consumes major dignities.
+    assert _dignity("Saturn", "Sagittarius") == "no_major_dignity"
 
 
 def test_angular_gap_wraps():

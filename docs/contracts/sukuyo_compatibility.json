@@ -1,0 +1,453 @@
+{
+  "call_guidance": {
+    "calendar_profile": "默认t1299_fullmoon27直接采用T1299下卷十五日望宿逆顺法及生日加十三的含首位算法，两法互核；NAOJ朔日表仅作独立交叉核验。",
+    "calendar_reference": "读取calendar_reference的日期来源类别、数据指纹、支持范围及资料差异。2015起是出版方参考推算，不能说成已核对逐年神宫原刊；固定UTC+09不是历史日本地方时。旧月度候选仍拒绝接入，新后端来自完整逐日事实；文档到2033与LOD到2031的差异继续保留，范围外不能换中国历补齐。",
+    "candidates": "candidate_relation_analysis为已列候选的条件组合，未代入primary；完整性标志限于所声明重建口径，排列不是排名。主关系为null时不得从某一行挑选确定相性。",
+    "date_uncertainty": "未知出生时刻不补0点或中午。出生时区日期由date_support完整映射到所选UTC+08或UTC+09参考历日，calendar_candidates逐支保留农历、闰月/Hinoo候选，candidate_relation_analysis列日期来源。不能把某一候选或区间长度当主结果/概率；被整天跳过的当地日期应核对。完整候选若同宿，可只确定宿和关系，唯一历日和出生时刻仍未定；范围外分支使候选不穷尽。",
+    "historical_day_ganzhi": "NAOJ历史参考的day_ganzhi_reference由原始日干支锚点和民用日数递推，日界固定UTC+09午夜；不代表八字日柱、古代地方日界或平明已验收。保留source_anchor和elapsed_civil_days；编年史日期对照仅覆盖明确列出的月与日，不能推广成全部历史颁历认证。",
+    "historical_reference": "显式calendar_basis=japanese_naoj_historical_utc09使用NAOJ冻结月首参考，前推公历0001-01-01至1872-12-31、固定UTC+09；不因地点或古代出生年自动选择。阴历年0只作来源上下文，非公元0年输入。453阴历年及以前为儀鳳暦平朔回推；454起亦为具历史校正的参考，不能称当时颁历、观测或地方钟时已证明。",
+    "historical_source_variants": "NAOJ与HuTime1001.1完整月首对照保留210个分歧日期；calendar_reference.cross_source_comparison的control_fields未代入主结果，二者部分共用文献来源。即使配宿相同也须保留月/日/闰标志不同，不能称全历史历法一致。1872年旧历十二月只存两天；1873-01-01不延续旧历，不自动切现代日本参考。",
+    "interpretation": "引用同run计算字段与版本、原典位置；未知或partial不补造宿名、距离、概率或结论。",
+    "joint_reconstruction": "shared_reconstruction_analysis把原无约束候选矩阵与双方共同采用同一套现代重建的条件组合分开；解释全部rows和完整unconstrained_rows，逐条保留joint_support的模型身份、双方日期与各自半日，不将这些列表再次独立交叉。未知半日不绑定为相同；来源／算法／宿主历法身份不同不强加共享模型，支持覆盖不全不删原行。无共同模型支持仅限所声明共享假设，不证明原典禁止或古代各时期规则统一；宿名已定也不等于选定重建。不得靠只报有利行、同关系投票或缩减原矩阵认证唯一主宿、相性或现实效力。",
+    "leap_month": "默认档案unresolved保留同名月候选且不保证穷尽；repeat_month为明确约定。可选hinoo_t1299_host27在所选宿主历法上应用T2465闰月复用及小月补配，不称历史旧历复原。",
+    "lower_date_boundary": "固定时差的公元1年边界以完整区间代数保留0000-12-31来源分支及UTC端点；这是天文年编号的计算标签，不能说成已支持公元0年出生或历史UTC实测。读取epoch秒及范围外分支，未知钟时不补造。",
+    "palace_reference": "palace_reference仅按历日宿名查T1299上卷27宿四足/十二宫九足表；textual_pada是显式查表条件，不表示已排得出生足位。宫序不等星图House，太阳/太阴分不等昼夜生盘；不得据此断本命宫、现代月亮黄经或合成宫位相性。",
+    "scope": "双方共用calendar_basis，默认现代中国农历UTC+08；可明确选择HuTime日本旧历逐日参考UTC+09。出生时区仍各自声明，不能由日本参考默认猜为东京；经纬度和物理星图不决定历日宿。",
+    "shogonji_daily_annotations": "若返回manuscript_daily_annotations，逐分支解释本日是原始旁注所在日还是作者建议移置日；两条らうさく原在六月21／八月5，作者建议20／3，位移分别−1／−2。假名原读、狼藉汉字候选、作者意见与本次计算分开；不能当作T1299羅刹观测或统一换日误差。暦林問答集1811目录印本61章狼藉、62章羅刹分列；64章三宝仪式限制与支干吉前提属于该书，未替换T1299。馬場所据天理本及校改、NDL生年表头与未核月法、现用CBETA2026.R2固定提交及头部日期非发行年、逐字未检出不等所有传本无文均须保留。仅两条旁注四个相关日付，未独立校原卷，无半日钟时，不裁决古代日界、闰小月次序或现实效力；范围外未返回不等原卷无注。",
+    "shogonji_month_headers": "若返回manuscript_month_header，须解释该月首的原读、规范化候选、疑字／错位／未见朱注及非初一限制。荘厳寺37个月首来自1992研究作者转写，27条清晰、2条带限定、8处所选栏未见注；1092仅为月长合计，不能算逐日宿曜校勘或现实样本。1346／1347七月张注与Hinoo前半星不同，但朱注无半日钟时，不能判定规则胜负；1346闰九月两重建同氐，没有裁决次序的区分力。1345正文五行为纳音，非七曜。不能用渡边敏夫正文概表补缺注或据同名宿认证古代日界。 首年1345是作者归属；附录岁首字面康永二年与作者康永四年归属不同，同栏乙酉保留，未独立核原卷或认定刊误。四月朱印在一、二日之间，作者第232页说明3判断应属初一；这与宿注假名字形疑读分开解释。",
+    "source_capture": "规则JSON的source_bundle_sha256与原文source_sha256分别核对；Hinoo的active_primary_evidence指向downloaded_primary_edition，交付SAT完整HTML响应指纹、选定原段及五条校记。旧cached_primary_excerpt是历史记录，其摘录哈希不等于完整响应或抄本哈希；旧末句句号与下载原文闭引号的差异明示。SAT原/甲本不合成唯一正文；完整HTML不等于字图全部取得、影印或独立学术校勘，半日钟时与规则次序仍未定。",
+    "textual_half": "Hinoo短月补配的first_half/second_half必须明确给定；已知民用钟时不自动转换。闰月与补配规则次序未明时保留现代重建候选，不擅取唯一。"
+  },
+  "evidence_views": {
+    "calendar": {
+      "fields": [
+        "su27_basis",
+        "status",
+        "person1",
+        "person2",
+        "rulesets"
+      ],
+      "purpose": "核对双方公历转农历、闰月和本命宿口径"
+    },
+    "date_uncertainty": {
+      "fields": [
+        "status",
+        "person1",
+        "person2",
+        "candidate_relation_analysis",
+        "person1_to_person2",
+        "person2_to_person1",
+        "pair",
+        "interpretation_contract",
+        "rulesets",
+        "summary"
+      ],
+      "purpose": "未知时刻的当地日期完整映射、各中国历日候选及双向条件关系"
+    },
+    "padas": {
+      "fields": [
+        "status",
+        "person1",
+        "person2",
+        "person1_to_person2",
+        "person2_to_person1",
+        "pair",
+        "interpretation_contract",
+        "rulesets"
+      ],
+      "purpose": "双方按历日宿名查原典分足表，足序未给保留全部候选，不影响三九双向关系"
+    },
+    "profiles": {
+      "fields": [
+        "status",
+        "su27_basis",
+        "person1",
+        "person2",
+        "person1_to_person2",
+        "person2_to_person1",
+        "pair",
+        "candidate_relation_analysis",
+        "interpretation_contract",
+        "rulesets"
+      ],
+      "purpose": "核对双方望宿、半日及候选条件关系，不能将候选提升为主结果"
+    },
+    "relationship": {
+      "fields": [
+        "status",
+        "su27_basis",
+        "person1",
+        "person2",
+        "person1_to_person2",
+        "person2_to_person1",
+        "pair",
+        "candidate_relation_analysis",
+        "rulesets",
+        "interpretation_contract",
+        "validation",
+        "summary"
+      ],
+      "purpose": "原典三九双向关系与解释约束"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "status",
+      "su27_basis",
+      "person1",
+      "person2",
+      "person1_to_person2",
+      "person2_to_person1",
+      "pair",
+      "candidate_relation_analysis",
+      "rulesets",
+      "interpretation_contract",
+      "validation",
+      "summary"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "calendar_basis": {
+        "default": "chinese_hko_utc08",
+        "description": "双方共用一套宿主历法，独立于各自出生时区与配宿档案；默认现代中国农历UTC+08。japanese_hutime_1002_1_utc09为1872-02-09至2031-01-22的HuTime冻结逐日参考、固定UTC+09，2015起属出版方参考推算，非历史地方时或逐年神宫刊本验收；范围外不回退中国历。japanese_naoj_historical_utc09为公元0001-01-01至1872-12-31的NAOJ历史月朔参考、固定UTC+09；早期纪年属重建，改历末月仅两天，保留跨出版方异日，非历史地方时或全部颁历验收。",
+        "enum": [
+          "chinese_hko_utc08",
+          "japanese_hutime_1002_1_utc09",
+          "japanese_naoj_historical_utc09"
+        ],
+        "type": "string"
+      },
+      "calendar_profile": {
+        "default": "t1299_fullmoon27",
+        "description": "默认T1299下卷望日逆顺及生日加十三法；Hinoo研究档案应用T2465闰月和小月分宿规则，宿主历法由calendar_basis另选",
+        "enum": [
+          "t1299_fullmoon27",
+          "hinoo_t1299_host27"
+        ],
+        "type": "string"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "leap_month_policy": {
+        "default": "unresolved",
+        "description": "闰月默认仅返回候选；repeat_month显式约定沿用同名月，不宣称原典唯一算法",
+        "enum": [
+          "unresolved",
+          "repeat_month"
+        ],
+        "type": "string"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "person1_calendar_day_part": {
+        "anyOf": [
+          {
+            "enum": [
+              "first_half",
+              "second_half"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Hinoo档案下第一人的已确定原典日序前/后半；不按民用钟时猜测"
+      },
+      "person1_date": {
+        "description": "First person birth date, e.g. 1990-06-15",
+        "type": "string"
+      },
+      "person1_gps_lat": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "First person GPS latitude"
+      },
+      "person1_gps_lon": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "First person GPS longitude"
+      },
+      "person1_lat": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "31n13",
+        "description": "First person latitude text or decimal; 兼容旧参数，不参与定宿"
+      },
+      "person1_lon": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "121e28",
+        "description": "First person longitude text or decimal; 兼容旧参数，不参与定宿"
+      },
+      "person1_name": {
+        "default": "甲方",
+        "description": "First person name / label",
+        "type": "string"
+      },
+      "person1_textual_pada": {
+        "anyOf": [
+          {
+            "maximum": 4,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "第一人仅按历日宿名查原典分足表的显式足序；不表示已排得出生足位，省略保留四足"
+      },
+      "person1_time": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "已知出生时间；未知可省略，按当地日期保留所选宿主历法的全部可能日期，不猜生时"
+      },
+      "person1_zone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "+08:00",
+        "description": "第一人出生时区，默认+08:00；按calendar_basis转换，不因日本参考自动改成东京"
+      },
+      "person2_calendar_day_part": {
+        "anyOf": [
+          {
+            "enum": [
+              "first_half",
+              "second_half"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Hinoo档案下第二人的已确定原典日序前/后半；不按民用钟时猜测"
+      },
+      "person2_date": {
+        "description": "Second person birth date",
+        "type": "string"
+      },
+      "person2_gps_lat": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Second person GPS latitude"
+      },
+      "person2_gps_lon": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Second person GPS longitude"
+      },
+      "person2_lat": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "31n13",
+        "description": "Second person latitude text or decimal; 兼容旧参数，不参与定宿"
+      },
+      "person2_lon": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "121e28",
+        "description": "Second person longitude text or decimal; 兼容旧参数，不参与定宿"
+      },
+      "person2_name": {
+        "default": "乙方",
+        "description": "Second person name / label",
+        "type": "string"
+      },
+      "person2_textual_pada": {
+        "anyOf": [
+          {
+            "maximum": 4,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "第二人仅按历日宿名查原典分足表的显式足序；不表示已排得出生足位，省略保留四足"
+      },
+      "person2_time": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "已知出生时间；未知可省略，按当地日期保留所选宿主历法的全部可能日期，不猜生时"
+      },
+      "person2_zone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "+08:00",
+        "description": "第二人出生时区，默认+08:00；按calendar_basis转换，不因日本参考自动改成东京"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      }
+    },
+    "required": [
+      "person1_date",
+      "person2_date"
+    ],
+    "type": "object"
+  },
+  "tool": "sukuyo_compatibility"
+}

@@ -1,0 +1,1162 @@
+{
+  "schema_version": 1,
+  "source": "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷05#四神三元五紀立成",
+  "source_transcription_sha256": "02942f892c02223cce282ca956b19b6e06c2327b4b317d393af996f0cdaa3619",
+  "method": "manual_table_transcription; packaged_without_domain_calculation",
+  "columns": [
+    "sishen.upper",
+    "sishen.middle",
+    "sishen.lower",
+    "tianyi.upper",
+    "tianyi.middle",
+    "tianyi.lower",
+    "diyi.upper",
+    "diyi.middle",
+    "diyi.lower",
+    "zhifu.upper",
+    "zhifu.middle",
+    "zhifu.lower"
+  ],
+  "rows": [
+    {
+      "id": "vol5-01",
+      "year_index": 1,
+      "ganzhi": "甲子",
+      "expected": {
+        "sishen.upper": "1",
+        "sishen.middle": "9",
+        "sishen.lower": "5",
+        "tianyi.upper": "6",
+        "tianyi.middle": "2",
+        "tianyi.lower": "绛",
+        "diyi.upper": "9",
+        "diyi.middle": "5",
+        "diyi.lower": "1",
+        "zhifu.upper": "5",
+        "zhifu.middle": "1",
+        "zhifu.lower": "9"
+      }
+    },
+    {
+      "id": "vol5-02",
+      "year_index": 2,
+      "ganzhi": "乙丑",
+      "expected": {
+        "sishen.upper": "1",
+        "sishen.middle": "9",
+        "sishen.lower": "5",
+        "tianyi.upper": "6",
+        "tianyi.middle": "2",
+        "tianyi.lower": "绛",
+        "diyi.upper": "9",
+        "diyi.middle": "5",
+        "diyi.lower": "1",
+        "zhifu.upper": "5",
+        "zhifu.middle": "1",
+        "zhifu.lower": "9"
+      }
+    },
+    {
+      "id": "vol5-03",
+      "year_index": 3,
+      "ganzhi": "丙寅",
+      "expected": {
+        "sishen.upper": "1",
+        "sishen.middle": "9",
+        "sishen.lower": "5",
+        "tianyi.upper": "6",
+        "tianyi.middle": "2",
+        "tianyi.lower": "绛",
+        "diyi.upper": "9",
+        "diyi.middle": "5",
+        "diyi.lower": "1",
+        "zhifu.upper": "5",
+        "zhifu.middle": "1",
+        "zhifu.lower": "9"
+      }
+    },
+    {
+      "id": "vol5-04",
+      "year_index": 4,
+      "ganzhi": "丁卯",
+      "expected": {
+        "sishen.upper": "2",
+        "sishen.middle": "绛",
+        "sishen.lower": "6",
+        "tianyi.upper": "7",
+        "tianyi.middle": "3",
+        "tianyi.lower": "明",
+        "diyi.upper": "绛",
+        "diyi.middle": "6",
+        "diyi.lower": "2",
+        "zhifu.upper": "6",
+        "zhifu.middle": "2",
+        "zhifu.lower": "绛"
+      }
+    },
+    {
+      "id": "vol5-05",
+      "year_index": 5,
+      "ganzhi": "戊辰",
+      "expected": {
+        "sishen.upper": "2",
+        "sishen.middle": "绛",
+        "sishen.lower": "6",
+        "tianyi.upper": "7",
+        "tianyi.middle": "3",
+        "tianyi.lower": "明",
+        "diyi.upper": "绛",
+        "diyi.middle": "6",
+        "diyi.lower": "2",
+        "zhifu.upper": "6",
+        "zhifu.middle": "2",
+        "zhifu.lower": "绛"
+      }
+    },
+    {
+      "id": "vol5-06",
+      "year_index": 6,
+      "ganzhi": "己巳",
+      "expected": {
+        "sishen.upper": "2",
+        "sishen.middle": "绛",
+        "sishen.lower": "6",
+        "tianyi.upper": "7",
+        "tianyi.middle": "3",
+        "tianyi.lower": "明",
+        "diyi.upper": "绛",
+        "diyi.middle": "6",
+        "diyi.lower": "2",
+        "zhifu.upper": "6",
+        "zhifu.middle": "2",
+        "zhifu.lower": "绛"
+      }
+    },
+    {
+      "id": "vol5-07",
+      "year_index": 7,
+      "ganzhi": "庚午",
+      "expected": {
+        "sishen.upper": "3",
+        "sishen.middle": "明",
+        "sishen.lower": "7",
+        "tianyi.upper": "8",
+        "tianyi.middle": "4",
+        "tianyi.lower": "玉",
+        "diyi.upper": "明",
+        "diyi.middle": "7",
+        "diyi.lower": "3",
+        "zhifu.upper": "7",
+        "zhifu.middle": "3",
+        "zhifu.lower": "明"
+      }
+    },
+    {
+      "id": "vol5-08",
+      "year_index": 8,
+      "ganzhi": "辛未",
+      "expected": {
+        "sishen.upper": "3",
+        "sishen.middle": "明",
+        "sishen.lower": "7",
+        "tianyi.upper": "8",
+        "tianyi.middle": "4",
+        "tianyi.lower": "玉",
+        "diyi.upper": "明",
+        "diyi.middle": "7",
+        "diyi.lower": "3",
+        "zhifu.upper": "7",
+        "zhifu.middle": "3",
+        "zhifu.lower": "明"
+      }
+    },
+    {
+      "id": "vol5-09",
+      "year_index": 9,
+      "ganzhi": "壬申",
+      "expected": {
+        "sishen.upper": "3",
+        "sishen.middle": "明",
+        "sishen.lower": "7",
+        "tianyi.upper": "8",
+        "tianyi.middle": "4",
+        "tianyi.lower": "玉",
+        "diyi.upper": "明",
+        "diyi.middle": "7",
+        "diyi.lower": "3",
+        "zhifu.upper": "7",
+        "zhifu.middle": "3",
+        "zhifu.lower": "明"
+      }
+    },
+    {
+      "id": "vol5-10",
+      "year_index": 10,
+      "ganzhi": "癸酉",
+      "expected": {
+        "sishen.upper": "4",
+        "sishen.middle": "玉",
+        "sishen.lower": "8",
+        "tianyi.upper": "9",
+        "tianyi.middle": "5",
+        "tianyi.lower": "1",
+        "diyi.upper": "玉",
+        "diyi.middle": "8",
+        "diyi.lower": "4",
+        "zhifu.upper": "8",
+        "zhifu.middle": "4",
+        "zhifu.lower": "玉"
+      }
+    },
+    {
+      "id": "vol5-11",
+      "year_index": 11,
+      "ganzhi": "甲戌",
+      "expected": {
+        "sishen.upper": "4",
+        "sishen.middle": "玉",
+        "sishen.lower": "8",
+        "tianyi.upper": "9",
+        "tianyi.middle": "5",
+        "tianyi.lower": "1",
+        "diyi.upper": "玉",
+        "diyi.middle": "8",
+        "diyi.lower": "4",
+        "zhifu.upper": "8",
+        "zhifu.middle": "4",
+        "zhifu.lower": "玉"
+      }
+    },
+    {
+      "id": "vol5-12",
+      "year_index": 12,
+      "ganzhi": "乙亥",
+      "expected": {
+        "sishen.upper": "4",
+        "sishen.middle": "玉",
+        "sishen.lower": "8",
+        "tianyi.upper": "9",
+        "tianyi.middle": "5",
+        "tianyi.lower": "1",
+        "diyi.upper": "玉",
+        "diyi.middle": "8",
+        "diyi.lower": "4",
+        "zhifu.upper": "8",
+        "zhifu.middle": "4",
+        "zhifu.lower": "玉"
+      }
+    },
+    {
+      "id": "vol5-13",
+      "year_index": 13,
+      "ganzhi": "丙子",
+      "expected": {
+        "sishen.upper": "5",
+        "sishen.middle": "1",
+        "sishen.lower": "9",
+        "tianyi.upper": "绛",
+        "tianyi.middle": "6",
+        "tianyi.lower": "2",
+        "diyi.upper": "1",
+        "diyi.middle": "9",
+        "diyi.lower": "5",
+        "zhifu.upper": "9",
+        "zhifu.middle": "5",
+        "zhifu.lower": "1"
+      }
+    },
+    {
+      "id": "vol5-14",
+      "year_index": 14,
+      "ganzhi": "丁丑",
+      "expected": {
+        "sishen.upper": "5",
+        "sishen.middle": "1",
+        "sishen.lower": "9",
+        "tianyi.upper": "绛",
+        "tianyi.middle": "6",
+        "tianyi.lower": "2",
+        "diyi.upper": "1",
+        "diyi.middle": "9",
+        "diyi.lower": "5",
+        "zhifu.upper": "9",
+        "zhifu.middle": "5",
+        "zhifu.lower": "1"
+      }
+    },
+    {
+      "id": "vol5-15",
+      "year_index": 15,
+      "ganzhi": "戊寅",
+      "expected": {
+        "sishen.upper": "5",
+        "sishen.middle": "1",
+        "sishen.lower": "9",
+        "tianyi.upper": "绛",
+        "tianyi.middle": "6",
+        "tianyi.lower": "2",
+        "diyi.upper": "1",
+        "diyi.middle": "9",
+        "diyi.lower": "5",
+        "zhifu.upper": "9",
+        "zhifu.middle": "5",
+        "zhifu.lower": "1"
+      }
+    },
+    {
+      "id": "vol5-16",
+      "year_index": 16,
+      "ganzhi": "己卯",
+      "expected": {
+        "sishen.upper": "6",
+        "sishen.middle": "2",
+        "sishen.lower": "绛",
+        "tianyi.upper": "明",
+        "tianyi.middle": "7",
+        "tianyi.lower": "3",
+        "diyi.upper": "2",
+        "diyi.middle": "绛",
+        "diyi.lower": "6",
+        "zhifu.upper": "绛",
+        "zhifu.middle": "6",
+        "zhifu.lower": "2"
+      }
+    },
+    {
+      "id": "vol5-17",
+      "year_index": 17,
+      "ganzhi": "庚辰",
+      "expected": {
+        "sishen.upper": "6",
+        "sishen.middle": "2",
+        "sishen.lower": "绛",
+        "tianyi.upper": "明",
+        "tianyi.middle": "7",
+        "tianyi.lower": "3",
+        "diyi.upper": "2",
+        "diyi.middle": "绛",
+        "diyi.lower": "6",
+        "zhifu.upper": "绛",
+        "zhifu.middle": "6",
+        "zhifu.lower": "2"
+      }
+    },
+    {
+      "id": "vol5-18",
+      "year_index": 18,
+      "ganzhi": "辛巳",
+      "expected": {
+        "sishen.upper": "6",
+        "sishen.middle": "2",
+        "sishen.lower": "绛",
+        "tianyi.upper": "明",
+        "tianyi.middle": "7",
+        "tianyi.lower": "3",
+        "diyi.upper": "2",
+        "diyi.middle": "绛",
+        "diyi.lower": "6",
+        "zhifu.upper": "绛",
+        "zhifu.middle": "6",
+        "zhifu.lower": "2"
+      }
+    },
+    {
+      "id": "vol5-19",
+      "year_index": 19,
+      "ganzhi": "壬午",
+      "expected": {
+        "sishen.upper": "7",
+        "sishen.middle": "3",
+        "sishen.lower": "明",
+        "tianyi.upper": "玉",
+        "tianyi.middle": "8",
+        "tianyi.lower": "4",
+        "diyi.upper": "3",
+        "diyi.middle": "明",
+        "diyi.lower": "7",
+        "zhifu.upper": "明",
+        "zhifu.middle": "7",
+        "zhifu.lower": "3"
+      }
+    },
+    {
+      "id": "vol5-20",
+      "year_index": 20,
+      "ganzhi": "癸未",
+      "expected": {
+        "sishen.upper": "7",
+        "sishen.middle": "3",
+        "sishen.lower": "明",
+        "tianyi.upper": "玉",
+        "tianyi.middle": "8",
+        "tianyi.lower": "4",
+        "diyi.upper": "3",
+        "diyi.middle": "明",
+        "diyi.lower": "7",
+        "zhifu.upper": "明",
+        "zhifu.middle": "7",
+        "zhifu.lower": "3"
+      }
+    },
+    {
+      "id": "vol5-21",
+      "year_index": 21,
+      "ganzhi": "甲申",
+      "expected": {
+        "sishen.upper": "7",
+        "sishen.middle": "3",
+        "sishen.lower": "明",
+        "tianyi.upper": "玉",
+        "tianyi.middle": "8",
+        "tianyi.lower": "4",
+        "diyi.upper": "3",
+        "diyi.middle": "明",
+        "diyi.lower": "7",
+        "zhifu.upper": "明",
+        "zhifu.middle": "7",
+        "zhifu.lower": "3"
+      }
+    },
+    {
+      "id": "vol5-22",
+      "year_index": 22,
+      "ganzhi": "乙酉",
+      "expected": {
+        "sishen.upper": "8",
+        "sishen.middle": "4",
+        "sishen.lower": "玉",
+        "tianyi.upper": "1",
+        "tianyi.middle": "9",
+        "tianyi.lower": "5",
+        "diyi.upper": "4",
+        "diyi.middle": "玉",
+        "diyi.lower": "8",
+        "zhifu.upper": "玉",
+        "zhifu.middle": "8",
+        "zhifu.lower": "4"
+      }
+    },
+    {
+      "id": "vol5-23",
+      "year_index": 23,
+      "ganzhi": "丙戌",
+      "expected": {
+        "sishen.upper": "8",
+        "sishen.middle": "4",
+        "sishen.lower": "玉",
+        "tianyi.upper": "1",
+        "tianyi.middle": "9",
+        "tianyi.lower": "5",
+        "diyi.upper": "4",
+        "diyi.middle": "玉",
+        "diyi.lower": "8",
+        "zhifu.upper": "玉",
+        "zhifu.middle": "8",
+        "zhifu.lower": "4"
+      }
+    },
+    {
+      "id": "vol5-24",
+      "year_index": 24,
+      "ganzhi": "丁亥",
+      "expected": {
+        "sishen.upper": "8",
+        "sishen.middle": "4",
+        "sishen.lower": "玉",
+        "tianyi.upper": "1",
+        "tianyi.middle": "9",
+        "tianyi.lower": "5",
+        "diyi.upper": "4",
+        "diyi.middle": "玉",
+        "diyi.lower": "8",
+        "zhifu.upper": "玉",
+        "zhifu.middle": "8",
+        "zhifu.lower": "4"
+      }
+    },
+    {
+      "id": "vol5-25",
+      "year_index": 25,
+      "ganzhi": "戊子",
+      "expected": {
+        "sishen.upper": "9",
+        "sishen.middle": "5",
+        "sishen.lower": "1",
+        "tianyi.upper": "2",
+        "tianyi.middle": "绛",
+        "tianyi.lower": "6",
+        "diyi.upper": "5",
+        "diyi.middle": "1",
+        "diyi.lower": "9",
+        "zhifu.upper": "1",
+        "zhifu.middle": "9",
+        "zhifu.lower": "5"
+      }
+    },
+    {
+      "id": "vol5-26",
+      "year_index": 26,
+      "ganzhi": "己丑",
+      "expected": {
+        "sishen.upper": "9",
+        "sishen.middle": "5",
+        "sishen.lower": "1",
+        "tianyi.upper": "2",
+        "tianyi.middle": "绛",
+        "tianyi.lower": "6",
+        "diyi.upper": "5",
+        "diyi.middle": "1",
+        "diyi.lower": "9",
+        "zhifu.upper": "1",
+        "zhifu.middle": "9",
+        "zhifu.lower": "5"
+      }
+    },
+    {
+      "id": "vol5-27",
+      "year_index": 27,
+      "ganzhi": "庚寅",
+      "expected": {
+        "sishen.upper": "9",
+        "sishen.middle": "5",
+        "sishen.lower": "1",
+        "tianyi.upper": "2",
+        "tianyi.middle": "绛",
+        "tianyi.lower": "6",
+        "diyi.upper": "5",
+        "diyi.middle": "1",
+        "diyi.lower": "9",
+        "zhifu.upper": "1",
+        "zhifu.middle": "9",
+        "zhifu.lower": "5"
+      }
+    },
+    {
+      "id": "vol5-28",
+      "year_index": 28,
+      "ganzhi": "辛卯",
+      "expected": {
+        "sishen.upper": "绛",
+        "sishen.middle": "6",
+        "sishen.lower": "2",
+        "tianyi.upper": "3",
+        "tianyi.middle": "明",
+        "tianyi.lower": "7",
+        "diyi.upper": "6",
+        "diyi.middle": "2",
+        "diyi.lower": "绛",
+        "zhifu.upper": "2",
+        "zhifu.middle": "1",
+        "zhifu.lower": "6"
+      }
+    },
+    {
+      "id": "vol5-29",
+      "year_index": 29,
+      "ganzhi": "壬辰",
+      "expected": {
+        "sishen.upper": "绛",
+        "sishen.middle": "6",
+        "sishen.lower": "2",
+        "tianyi.upper": "3",
+        "tianyi.middle": "明",
+        "tianyi.lower": "7",
+        "diyi.upper": "6",
+        "diyi.middle": "2",
+        "diyi.lower": "绛",
+        "zhifu.upper": "2",
+        "zhifu.middle": "1",
+        "zhifu.lower": "6"
+      }
+    },
+    {
+      "id": "vol5-30",
+      "year_index": 30,
+      "ganzhi": "癸巳",
+      "expected": {
+        "sishen.upper": "绛",
+        "sishen.middle": "6",
+        "sishen.lower": "2",
+        "tianyi.upper": "3",
+        "tianyi.middle": "明",
+        "tianyi.lower": "7",
+        "diyi.upper": "6",
+        "diyi.middle": "2",
+        "diyi.lower": "绛",
+        "zhifu.upper": "2",
+        "zhifu.middle": "1",
+        "zhifu.lower": "6"
+      }
+    },
+    {
+      "id": "vol5-31",
+      "year_index": 31,
+      "ganzhi": "甲午",
+      "expected": {
+        "sishen.upper": "明",
+        "sishen.middle": "7",
+        "sishen.lower": "3",
+        "tianyi.upper": "4",
+        "tianyi.middle": "玉",
+        "tianyi.lower": "8",
+        "diyi.upper": "7",
+        "diyi.middle": "3",
+        "diyi.lower": "明",
+        "zhifu.upper": "3",
+        "zhifu.middle": "2",
+        "zhifu.lower": "7"
+      }
+    },
+    {
+      "id": "vol5-32",
+      "year_index": 32,
+      "ganzhi": "乙未",
+      "expected": {
+        "sishen.upper": "明",
+        "sishen.middle": "7",
+        "sishen.lower": "3",
+        "tianyi.upper": "4",
+        "tianyi.middle": "玉",
+        "tianyi.lower": "8",
+        "diyi.upper": "7",
+        "diyi.middle": "3",
+        "diyi.lower": "明",
+        "zhifu.upper": "3",
+        "zhifu.middle": "2",
+        "zhifu.lower": "7"
+      }
+    },
+    {
+      "id": "vol5-33",
+      "year_index": 33,
+      "ganzhi": "丙申",
+      "expected": {
+        "sishen.upper": "明",
+        "sishen.middle": "7",
+        "sishen.lower": "3",
+        "tianyi.upper": "4",
+        "tianyi.middle": "玉",
+        "tianyi.lower": "8",
+        "diyi.upper": "7",
+        "diyi.middle": "3",
+        "diyi.lower": "明",
+        "zhifu.upper": "3",
+        "zhifu.middle": "2",
+        "zhifu.lower": "7"
+      }
+    },
+    {
+      "id": "vol5-34",
+      "year_index": 34,
+      "ganzhi": "丁酉",
+      "expected": {
+        "sishen.upper": "玉",
+        "sishen.middle": "8",
+        "sishen.lower": "4",
+        "tianyi.upper": "5",
+        "tianyi.middle": "1",
+        "tianyi.lower": "9",
+        "diyi.upper": "8",
+        "diyi.middle": "4",
+        "diyi.lower": "玉",
+        "zhifu.upper": "4",
+        "zhifu.middle": "3",
+        "zhifu.lower": "8"
+      }
+    },
+    {
+      "id": "vol5-35",
+      "year_index": 35,
+      "ganzhi": "戊戌",
+      "expected": {
+        "sishen.upper": "玉",
+        "sishen.middle": "8",
+        "sishen.lower": "4",
+        "tianyi.upper": "5",
+        "tianyi.middle": "1",
+        "tianyi.lower": "9",
+        "diyi.upper": "8",
+        "diyi.middle": "4",
+        "diyi.lower": "玉",
+        "zhifu.upper": "4",
+        "zhifu.middle": "3",
+        "zhifu.lower": "8"
+      }
+    },
+    {
+      "id": "vol5-36",
+      "year_index": 36,
+      "ganzhi": "己亥",
+      "expected": {
+        "sishen.upper": "玉",
+        "sishen.middle": "8",
+        "sishen.lower": "4",
+        "tianyi.upper": "5",
+        "tianyi.middle": "1",
+        "tianyi.lower": "9",
+        "diyi.upper": "8",
+        "diyi.middle": "4",
+        "diyi.lower": "玉",
+        "zhifu.upper": "4",
+        "zhifu.middle": "3",
+        "zhifu.lower": "8"
+      }
+    },
+    {
+      "id": "vol5-37",
+      "year_index": 37,
+      "ganzhi": "庚子",
+      "expected": {
+        "sishen.upper": "1",
+        "sishen.middle": "9",
+        "sishen.lower": "5",
+        "tianyi.upper": "6",
+        "tianyi.middle": "2",
+        "tianyi.lower": "绛",
+        "diyi.upper": "9",
+        "diyi.middle": "5",
+        "diyi.lower": "1",
+        "zhifu.upper": "5",
+        "zhifu.middle": "4",
+        "zhifu.lower": "9"
+      }
+    },
+    {
+      "id": "vol5-38",
+      "year_index": 38,
+      "ganzhi": "辛丑",
+      "expected": {
+        "sishen.upper": "1",
+        "sishen.middle": "9",
+        "sishen.lower": "5",
+        "tianyi.upper": "6",
+        "tianyi.middle": "2",
+        "tianyi.lower": "绛",
+        "diyi.upper": "9",
+        "diyi.middle": "5",
+        "diyi.lower": "1",
+        "zhifu.upper": "5",
+        "zhifu.middle": "4",
+        "zhifu.lower": "9"
+      }
+    },
+    {
+      "id": "vol5-39",
+      "year_index": 39,
+      "ganzhi": "壬寅",
+      "expected": {
+        "sishen.upper": "1",
+        "sishen.middle": "9",
+        "sishen.lower": "5",
+        "tianyi.upper": "6",
+        "tianyi.middle": "2",
+        "tianyi.lower": "绛",
+        "diyi.upper": "9",
+        "diyi.middle": "5",
+        "diyi.lower": "1",
+        "zhifu.upper": "5",
+        "zhifu.middle": "4",
+        "zhifu.lower": "9"
+      }
+    },
+    {
+      "id": "vol5-40",
+      "year_index": 40,
+      "ganzhi": "癸卯",
+      "expected": {
+        "sishen.upper": "2",
+        "sishen.middle": "绛",
+        "sishen.lower": "6",
+        "tianyi.upper": "7",
+        "tianyi.middle": "3",
+        "tianyi.lower": "明",
+        "diyi.upper": "绛",
+        "diyi.middle": "6",
+        "diyi.lower": "2",
+        "zhifu.upper": "6",
+        "zhifu.middle": "5",
+        "zhifu.lower": "绛"
+      }
+    },
+    {
+      "id": "vol5-41",
+      "year_index": 41,
+      "ganzhi": "甲辰",
+      "expected": {
+        "sishen.upper": "2",
+        "sishen.middle": "绛",
+        "sishen.lower": "6",
+        "tianyi.upper": "7",
+        "tianyi.middle": "3",
+        "tianyi.lower": "明",
+        "diyi.upper": "绛",
+        "diyi.middle": "6",
+        "diyi.lower": "2",
+        "zhifu.upper": "6",
+        "zhifu.middle": "5",
+        "zhifu.lower": "绛"
+      }
+    },
+    {
+      "id": "vol5-42",
+      "year_index": 42,
+      "ganzhi": "乙巳",
+      "expected": {
+        "sishen.upper": "2",
+        "sishen.middle": "绛",
+        "sishen.lower": "6",
+        "tianyi.upper": "7",
+        "tianyi.middle": "3",
+        "tianyi.lower": "明",
+        "diyi.upper": "绛",
+        "diyi.middle": "6",
+        "diyi.lower": "2",
+        "zhifu.upper": "6",
+        "zhifu.middle": "5",
+        "zhifu.lower": "绛"
+      }
+    },
+    {
+      "id": "vol5-43",
+      "year_index": 43,
+      "ganzhi": "丙午",
+      "expected": {
+        "sishen.upper": "3",
+        "sishen.middle": "明",
+        "sishen.lower": "7",
+        "tianyi.upper": "8",
+        "tianyi.middle": "4",
+        "tianyi.lower": "玉",
+        "diyi.upper": "明",
+        "diyi.middle": "7",
+        "diyi.lower": "3",
+        "zhifu.upper": "7",
+        "zhifu.middle": "6",
+        "zhifu.lower": "明"
+      }
+    },
+    {
+      "id": "vol5-44",
+      "year_index": 44,
+      "ganzhi": "丁未",
+      "expected": {
+        "sishen.upper": "3",
+        "sishen.middle": "明",
+        "sishen.lower": "7",
+        "tianyi.upper": "8",
+        "tianyi.middle": "4",
+        "tianyi.lower": "玉",
+        "diyi.upper": "明",
+        "diyi.middle": "7",
+        "diyi.lower": "3",
+        "zhifu.upper": "7",
+        "zhifu.middle": "6",
+        "zhifu.lower": "明"
+      }
+    },
+    {
+      "id": "vol5-45",
+      "year_index": 45,
+      "ganzhi": "戊申",
+      "expected": {
+        "sishen.upper": "3",
+        "sishen.middle": "明",
+        "sishen.lower": "7",
+        "tianyi.upper": "8",
+        "tianyi.middle": "4",
+        "tianyi.lower": "玉",
+        "diyi.upper": "明",
+        "diyi.middle": "7",
+        "diyi.lower": "3",
+        "zhifu.upper": "7",
+        "zhifu.middle": "6",
+        "zhifu.lower": "明"
+      }
+    },
+    {
+      "id": "vol5-46",
+      "year_index": 46,
+      "ganzhi": "己酉",
+      "expected": {
+        "sishen.upper": "4",
+        "sishen.middle": "玉",
+        "sishen.lower": "8",
+        "tianyi.upper": "9",
+        "tianyi.middle": "5",
+        "tianyi.lower": "1",
+        "diyi.upper": "玉",
+        "diyi.middle": "8",
+        "diyi.lower": "4",
+        "zhifu.upper": "8",
+        "zhifu.middle": "7",
+        "zhifu.lower": "玉"
+      }
+    },
+    {
+      "id": "vol5-47",
+      "year_index": 47,
+      "ganzhi": "庚戌",
+      "expected": {
+        "sishen.upper": "4",
+        "sishen.middle": "玉",
+        "sishen.lower": "8",
+        "tianyi.upper": "9",
+        "tianyi.middle": "5",
+        "tianyi.lower": "1",
+        "diyi.upper": "玉",
+        "diyi.middle": "8",
+        "diyi.lower": "4",
+        "zhifu.upper": "8",
+        "zhifu.middle": "7",
+        "zhifu.lower": "玉"
+      }
+    },
+    {
+      "id": "vol5-48",
+      "year_index": 48,
+      "ganzhi": "辛亥",
+      "expected": {
+        "sishen.upper": "4",
+        "sishen.middle": "玉",
+        "sishen.lower": "8",
+        "tianyi.upper": "9",
+        "tianyi.middle": "5",
+        "tianyi.lower": "1",
+        "diyi.upper": "玉",
+        "diyi.middle": "8",
+        "diyi.lower": "4",
+        "zhifu.upper": "8",
+        "zhifu.middle": "7",
+        "zhifu.lower": "玉"
+      }
+    },
+    {
+      "id": "vol5-49",
+      "year_index": 49,
+      "ganzhi": "壬子",
+      "expected": {
+        "sishen.upper": "5",
+        "sishen.middle": "1",
+        "sishen.lower": "9",
+        "tianyi.upper": "绛",
+        "tianyi.middle": "6",
+        "tianyi.lower": "2",
+        "diyi.upper": "1",
+        "diyi.middle": "9",
+        "diyi.lower": "5",
+        "zhifu.upper": "9",
+        "zhifu.middle": "8",
+        "zhifu.lower": "1"
+      }
+    },
+    {
+      "id": "vol5-50",
+      "year_index": 50,
+      "ganzhi": "癸丑",
+      "expected": {
+        "sishen.upper": "5",
+        "sishen.middle": "1",
+        "sishen.lower": "9",
+        "tianyi.upper": "绛",
+        "tianyi.middle": "6",
+        "tianyi.lower": "2",
+        "diyi.upper": "1",
+        "diyi.middle": "9",
+        "diyi.lower": "5",
+        "zhifu.upper": "9",
+        "zhifu.middle": "8",
+        "zhifu.lower": "1"
+      }
+    },
+    {
+      "id": "vol5-51",
+      "year_index": 51,
+      "ganzhi": "甲寅",
+      "expected": {
+        "sishen.upper": "5",
+        "sishen.middle": "1",
+        "sishen.lower": "9",
+        "tianyi.upper": "绛",
+        "tianyi.middle": "6",
+        "tianyi.lower": "2",
+        "diyi.upper": "1",
+        "diyi.middle": "9",
+        "diyi.lower": "5",
+        "zhifu.upper": "9",
+        "zhifu.middle": "8",
+        "zhifu.lower": "1"
+      }
+    },
+    {
+      "id": "vol5-52",
+      "year_index": 52,
+      "ganzhi": "乙卯",
+      "expected": {
+        "sishen.upper": "6",
+        "sishen.middle": "2",
+        "sishen.lower": "绛",
+        "tianyi.upper": "明",
+        "tianyi.middle": "7",
+        "tianyi.lower": "3",
+        "diyi.upper": "2",
+        "diyi.middle": "绛",
+        "diyi.lower": "6",
+        "zhifu.upper": "绛",
+        "zhifu.middle": "9",
+        "zhifu.lower": "2"
+      }
+    },
+    {
+      "id": "vol5-53",
+      "year_index": 53,
+      "ganzhi": "丙辰",
+      "expected": {
+        "sishen.upper": "6",
+        "sishen.middle": "2",
+        "sishen.lower": "绛",
+        "tianyi.upper": "明",
+        "tianyi.middle": "7",
+        "tianyi.lower": "3",
+        "diyi.upper": "2",
+        "diyi.middle": "绛",
+        "diyi.lower": "6",
+        "zhifu.upper": "绛",
+        "zhifu.middle": "9",
+        "zhifu.lower": "2"
+      }
+    },
+    {
+      "id": "vol5-54",
+      "year_index": 54,
+      "ganzhi": "丁巳",
+      "expected": {
+        "sishen.upper": "6",
+        "sishen.middle": "2",
+        "sishen.lower": "绛",
+        "tianyi.upper": "明",
+        "tianyi.middle": "7",
+        "tianyi.lower": "3",
+        "diyi.upper": "2",
+        "diyi.middle": "绛",
+        "diyi.lower": "6",
+        "zhifu.upper": "绛",
+        "zhifu.middle": "9",
+        "zhifu.lower": "2"
+      }
+    },
+    {
+      "id": "vol5-55",
+      "year_index": 55,
+      "ganzhi": "戊午",
+      "expected": {
+        "sishen.upper": "7",
+        "sishen.middle": "3",
+        "sishen.lower": "明",
+        "tianyi.upper": "玉",
+        "tianyi.middle": "8",
+        "tianyi.lower": "4",
+        "diyi.upper": "3",
+        "diyi.middle": "明",
+        "diyi.lower": "7",
+        "zhifu.upper": "明",
+        "zhifu.middle": "绛",
+        "zhifu.lower": "3"
+      }
+    },
+    {
+      "id": "vol5-56",
+      "year_index": 56,
+      "ganzhi": "己未",
+      "expected": {
+        "sishen.upper": "7",
+        "sishen.middle": "3",
+        "sishen.lower": "明",
+        "tianyi.upper": "玉",
+        "tianyi.middle": "8",
+        "tianyi.lower": "4",
+        "diyi.upper": "3",
+        "diyi.middle": "明",
+        "diyi.lower": "7",
+        "zhifu.upper": "明",
+        "zhifu.middle": "绛",
+        "zhifu.lower": "3"
+      }
+    },
+    {
+      "id": "vol5-57",
+      "year_index": 57,
+      "ganzhi": "庚申",
+      "expected": {
+        "sishen.upper": "7",
+        "sishen.middle": "3",
+        "sishen.lower": "明",
+        "tianyi.upper": "玉",
+        "tianyi.middle": "8",
+        "tianyi.lower": "4",
+        "diyi.upper": "3",
+        "diyi.middle": "明",
+        "diyi.lower": "7",
+        "zhifu.upper": "明",
+        "zhifu.middle": "绛",
+        "zhifu.lower": "3"
+      }
+    },
+    {
+      "id": "vol5-58",
+      "year_index": 58,
+      "ganzhi": "辛酉",
+      "expected": {
+        "sishen.upper": "8",
+        "sishen.middle": "4",
+        "sishen.lower": "玉",
+        "tianyi.upper": "1",
+        "tianyi.middle": "9",
+        "tianyi.lower": "5",
+        "diyi.upper": "4",
+        "diyi.middle": "玉",
+        "diyi.lower": "8",
+        "zhifu.upper": "玉",
+        "zhifu.middle": "明",
+        "zhifu.lower": "4"
+      }
+    },
+    {
+      "id": "vol5-59",
+      "year_index": 59,
+      "ganzhi": "壬戌",
+      "expected": {
+        "sishen.upper": "8",
+        "sishen.middle": "4",
+        "sishen.lower": "玉",
+        "tianyi.upper": "1",
+        "tianyi.middle": "9",
+        "tianyi.lower": "5",
+        "diyi.upper": "4",
+        "diyi.middle": "玉",
+        "diyi.lower": "8",
+        "zhifu.upper": "玉",
+        "zhifu.middle": "明",
+        "zhifu.lower": "4"
+      }
+    },
+    {
+      "id": "vol5-60",
+      "year_index": 60,
+      "ganzhi": "癸亥",
+      "expected": {
+        "sishen.upper": "8",
+        "sishen.middle": "4",
+        "sishen.lower": "玉",
+        "tianyi.upper": "1",
+        "tianyi.middle": "9",
+        "tianyi.lower": "5",
+        "diyi.upper": "4",
+        "diyi.middle": "玉",
+        "diyi.lower": "8",
+        "zhifu.upper": "玉",
+        "zhifu.middle": "明",
+        "zhifu.lower": "4"
+      }
+    }
+  ]
+}

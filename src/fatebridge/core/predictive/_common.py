@@ -6,12 +6,22 @@ import math
 from calendar import monthrange
 from collections import Counter
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, cast
+from fractions import Fraction
+from typing import Any, Dict, List, Optional
 
-import pytz
-
-from fatebridge.core.astro.birth import AstroBirthInfo, build_astro_birth_info
-from fatebridge.core.astro.geometry import normalize_angle
+from fatebridge.core.astro.birth import (
+    AstroBirthInfo,
+    build_astro_birth_info,
+    require_resolved_birth_timezone,
+)
+from fatebridge.core.astro.geometry import (
+    angular_separation_fraction,
+    combine_longitudes,
+    normalize_angle,
+)
+from fatebridge.core.astro.horizon import horizon_altitude
+from fatebridge.core.astro.physical_epoch import PhysicalEpoch
+from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.astrology_tables import (
     EGYPTIAN_BOUNDS_BY_SIGN as EGYPTIAN_BOUNDS_BY_SIGN,
 )
@@ -26,19 +36,7 @@ from fatebridge.core.ephemeris_runtime import (
     swe,
 )
 from fatebridge.core.execution_context import current_datetime
-from fatebridge.utils.timezones import parse_timezone_name
-
-KERYKEION_IMPORT_ERROR: Optional[ImportError] = None
-try:
-    from kerykeion import AstrologicalSubjectFactory, PlanetaryReturnFactory
-except ImportError as exc:  # pragma: no cover - exercised via service error path
-    # Optional dependency: rebind imported classes to None so callers can detect
-    # absence via KERYKEION_IMPORT_ERROR. mypy cannot model rebinding an imported
-    # class to None, so these assignments are explicitly ignored.
-    AstrologicalSubjectFactory = None  # type: ignore[assignment,misc]
-    PlanetaryReturnFactory = None  # type: ignore[assignment,misc]
-    KERYKEION_IMPORT_ERROR = exc
-
+from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
 
 TROPICAL_YEAR_DAYS = 365.2425
 TIMING_POINT_NAMES = [
@@ -171,10 +169,8 @@ ZR_PHASE_LABELS = {
 
 
 def ensure_predictive_backend_available() -> None:
-    if AstrologicalSubjectFactory is None or PlanetaryReturnFactory is None:
-        raise ImportError(
-            "kerykeion / Swiss Ephemeris 未安装，无法启用西占推运能力。"
-        ) from KERYKEION_IMPORT_ERROR
+    if swe is None:
+        raise ImportError("Swiss Ephemeris 未安装，无法启用西占推运能力。")
 
 
 def build_predictive_birth_info(
@@ -201,6 +197,7 @@ def build_predictive_birth_info(
         birth_latitude=birth_latitude,
         name=name,
         birth_place=birth_place,
+        require_resolved_timezone=True,
     )
 
 
@@ -230,7 +227,7 @@ def build_analysis_datetime(
         if analysis_day is None
         else analysis_day
     )
-    return datetime(
+    target = datetime(
         year,
         month,
         day,
@@ -242,6 +239,11 @@ def build_analysis_datetime(
         ),
         tzinfo=tzinfo,
     )
+    try:
+        validate_local_clock(target)
+    except ValueError as error:
+        raise ValueError(str(error).replace("出生钟时", "分析钟时")) from error
+    return target
 
 
 def rebuild_local_datetime(moment: datetime, timezone_name: str) -> datetime:
@@ -363,8 +365,9 @@ def point_to_dict(point_name: str, point: Any) -> Dict[str, Any]:
         "point_label": planet_label(point_name),
         "sign": sign_name,
         "sign_label": sign_label(sign_name),
-        "degree": round(float(getattr(point, "position", 0.0)), 4),
-        "absolute_degree": round(float(getattr(point, "abs_pos", 0.0)), 4),
+        "degree": float(getattr(point, "position", 0.0)),
+        "absolute_degree": float(getattr(point, "abs_pos", 0.0)),
+        "longitude": float(getattr(point, "abs_pos", 0.0)),
         "house": house_number(house_name),
         "house_label": house_label(house_name),
         "retrograde": bool(getattr(point, "retrograde", False)),
@@ -372,7 +375,7 @@ def point_to_dict(point_name: str, point: Any) -> Dict[str, Any]:
 
 
 def longitude_to_point_dict(point_name: str, absolute_degree: float) -> Dict[str, Any]:
-    normalized_degree = absolute_degree % 360.0
+    normalized_degree = normalize_angle(absolute_degree)
     sign_index = int(normalized_degree // 30)
     sign_name = SIGNS[sign_index]
     return {
@@ -380,8 +383,9 @@ def longitude_to_point_dict(point_name: str, absolute_degree: float) -> Dict[str
         "point_label": planet_label(point_name),
         "sign": sign_name,
         "sign_label": sign_label(sign_name),
-        "degree": round(normalized_degree % 30, 4),
-        "absolute_degree": round(normalized_degree, 4),
+        "degree": normalized_degree % 30,
+        "absolute_degree": normalized_degree,
+        "longitude": normalized_degree,
     }
 
 
@@ -441,11 +445,19 @@ def build_lot_payloads(natal_subject: Any) -> Dict[str, Dict[str, Any]]:
     moon_longitude = point_absolute_position(natal_subject, "Moon")
     asc_longitude = point_absolute_position(natal_subject, "Ascendant")
     if sect == "day":
-        fortune_longitude = (asc_longitude + moon_longitude - sun_longitude) % 360.0
-        spirit_longitude = (asc_longitude + sun_longitude - moon_longitude) % 360.0
+        fortune_longitude = combine_longitudes(
+            asc_longitude, moon_longitude, -sun_longitude
+        )
+        spirit_longitude = combine_longitudes(
+            asc_longitude, sun_longitude, -moon_longitude
+        )
     else:
-        fortune_longitude = (asc_longitude + sun_longitude - moon_longitude) % 360.0
-        spirit_longitude = (asc_longitude + moon_longitude - sun_longitude) % 360.0
+        fortune_longitude = combine_longitudes(
+            asc_longitude, sun_longitude, -moon_longitude
+        )
+        spirit_longitude = combine_longitudes(
+            asc_longitude, moon_longitude, -sun_longitude
+        )
     return {
         "lot_of_fortune": build_lot_point_dict(
             "lot_of_fortune",
@@ -463,72 +475,27 @@ def build_lot_payloads(natal_subject: Any) -> Dict[str, Dict[str, Any]]:
 def build_subject(
     *,
     name: str,
-    local_datetime: datetime,
+    local_datetime: datetime | None = None,
     longitude: float,
     latitude: float,
     timezone_name: str,
     house_system: str = "P",
     zodiac_type: str = "Tropic",
+    physical_epoch: PhysicalEpoch | None = None,
 ) -> Any:
     ensure_predictive_backend_available()
-    local_datetime, timezone_name = adapt_datetime_for_kerykeion(
-        local_datetime,
-        timezone_name,
+    from .native_chart import build_native_subject
+
+    return build_native_subject(
+        name=name,
+        local_datetime=local_datetime,
+        longitude=longitude,
+        latitude=latitude,
+        timezone_name=timezone_name,
+        house_system=house_system,
+        zodiac_type=zodiac_type,
+        physical_epoch=physical_epoch,
     )
-    with preserve_ephemeris_path():
-        return AstrologicalSubjectFactory.from_birth_data(
-            name=name,
-            year=local_datetime.year,
-            month=local_datetime.month,
-            day=local_datetime.day,
-            hour=local_datetime.hour,
-            minute=local_datetime.minute,
-            seconds=local_datetime.second,
-            lng=longitude,
-            lat=latitude,
-            tz_str=timezone_name,
-            online=False,
-            houses_system_identifier=cast(Any, house_system),
-            zodiac_type=cast(Any, zodiac_type),
-        )
-
-
-def resolve_kerykeion_timezone_name(timezone_name: str) -> Optional[str]:
-    """Map fixed-offset strings into pytz-compatible timezone identifiers."""
-    try:
-        pytz.timezone(timezone_name)
-        return timezone_name
-    except Exception:
-        pass
-
-    tzinfo = parse_timezone_name(timezone_name)
-    reference_moment = datetime(2000, 1, 1, tzinfo=tzinfo)
-    offset = reference_moment.utcoffset()
-    if offset is None:
-        return None
-
-    total_minutes = int(offset.total_seconds() // 60)
-    if total_minutes == 0:
-        return "UTC"
-    if total_minutes % 60 != 0:
-        return None
-
-    hours = total_minutes // 60
-    # pytz's Etc/GMT zones invert the sign relative to UTC offsets.
-    sign = "-" if hours > 0 else "+"
-    return f"Etc/GMT{sign}{abs(hours)}"
-
-
-def adapt_datetime_for_kerykeion(
-    local_datetime: datetime,
-    timezone_name: str,
-) -> tuple[datetime, str]:
-    """Prepare datetime/timezone inputs for pytz-based predictive backends."""
-    backend_timezone = resolve_kerykeion_timezone_name(timezone_name)
-    if backend_timezone is not None:
-        return local_datetime, backend_timezone
-    utc_datetime = local_datetime.astimezone(parse_timezone_name("UTC"))
-    return utc_datetime, "UTC"
 
 
 def build_natal_subject(
@@ -537,6 +504,7 @@ def build_natal_subject(
     house_system: str = "P",
     zodiac_type: str = "Tropic",
 ) -> Any:
+    require_resolved_birth_timezone(birth_info.timezone_source)
     return build_subject(
         name=birth_info.name,
         local_datetime=birth_info.local_datetime,
@@ -549,10 +517,26 @@ def build_natal_subject(
 
 
 def determine_sect(subject: Any) -> str:
-    sun_house = house_number(getattr(subject.sun, "house", None))
-    if sun_house is not None and sun_house >= 7:
-        return "day"
-    return "night"
+    from .native_chart import NativeSubject
+
+    if isinstance(subject, NativeSubject):
+        # Native charts already used the physical TT Sun and UT1 horizon.
+        # Re-parsing a UTC display string would reject inserted second60.
+        return "day" if subject.is_diurnal else "night"
+    # Kerykeion's Sun in whole-sign house 1/7 is not a physical horizon test.
+    # Fetch tropical coordinates even when the subject uses a sidereal zodiac.
+    times = ephemeris_time(datetime.fromisoformat(subject.iso_formatted_utc_datetime))
+    coordinates, retflag = ephemeris_call("calc", times.jd_tt, swe.SUN, swe.FLG_SWIEPH)
+    if retflag < 0:
+        raise ValueError("Cannot determine sect: solar ephemeris failed")
+    altitude, _ = horizon_altitude(
+        times.jd_ut1,
+        subject.lng,
+        subject.lat,
+        float(coordinates[0]),
+        float(coordinates[1]),
+    )
+    return "day" if altitude >= 0.0 else "night"
 
 
 def sect_label(sect: str) -> str:
@@ -563,7 +547,7 @@ def calculate_age_years(
     birth_info: AstroBirthInfo,
     analysis_datetime: datetime,
 ) -> float:
-    birth_utc = birth_info.utc_datetime
+    birth_utc = birth_info.require_utc_datetime
     analysis_utc = analysis_datetime.astimezone(parse_timezone_name("UTC"))
     delta = analysis_utc - birth_utc
     return delta.total_seconds() / (TROPICAL_YEAR_DAYS * 86400.0)
@@ -621,28 +605,32 @@ def collect_aspect_hits(
     target_longitudes: Dict[str, float],
     orb_limit: float = 1.5,
 ) -> List[Dict[str, Any]]:
-    hits: List[Dict[str, Any]] = []
+    if not math.isfinite(orb_limit) or not 0 <= orb_limit <= 180:
+        raise ValueError("Aspect orb must be finite and within 0..180 degrees")
+    limit = Fraction(orb_limit)
+    hits = []
     for source_name, source_longitude in source_longitudes.items():
         for target_name, target_longitude in target_longitudes.items():
-            difference = abs(
-                ((source_longitude - target_longitude + 180.0) % 360.0) - 180.0
-            )
+            difference = angular_separation_fraction(source_longitude, target_longitude)
             for aspect_key, aspect_label_text, aspect_degree in ASPECT_DEGREES:
-                orb = abs(difference - aspect_degree)
-                if orb <= orb_limit:
+                orb = abs(difference - Fraction(aspect_degree))
+                if orb <= limit:
                     hits.append(
-                        {
-                            "source": source_name,
-                            "source_label": planet_label(source_name),
-                            "target": target_name,
-                            "target_label": planet_label(target_name),
-                            "aspect": aspect_key,
-                            "aspect_label": aspect_label_text,
-                            "orb": round(orb, 4),
-                        }
+                        (
+                            orb,
+                            {
+                                "source": source_name,
+                                "source_label": planet_label(source_name),
+                                "target": target_name,
+                                "target_label": planet_label(target_name),
+                                "aspect": aspect_key,
+                                "aspect_label": aspect_label_text,
+                                "orb": float(orb),
+                            },
+                        )
                     )
-    hits.sort(key=lambda item: item["orb"])
-    return hits
+    hits.sort(key=lambda item: item[0])
+    return [row for _, row in hits]
 
 
 def normalize_signed_angle(angle: float) -> float:

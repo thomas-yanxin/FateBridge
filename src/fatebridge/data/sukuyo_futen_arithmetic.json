@@ -1,0 +1,266 @@
+{
+  "id": "takesako2024_selected_futen_arithmetic_v1",
+  "source": {
+    "title": "謎の暦法・符天暦での暦日計算法と七曜暦の造暦",
+    "author": "竹迫忍",
+    "date": "2024-12-22",
+    "url": "https://www.kotenmon.com/dld/20241222/%E8%AC%8E%E3%81%AE%E6%9A%A6%E6%B3%95_%E7%AC%A6%E5%A4%A9%E6%9A%A6.pdf",
+    "sha256": "5932ea1718d4f034a8331c3520d0444280e42d49df41f15ba41e72605c03a83d",
+    "bytes": 5491346,
+    "pages": [
+      52,
+      53,
+      54,
+      55,
+      56
+    ],
+    "kind": "author_hosted_research_lecture_not_original_1164_manuscript",
+    "transcription": "Root visual reading of actual rendered PDF pages, with numerical text extraction cross-check; no independent human palaeographic certification."
+  },
+  "constants": {
+    "day_units": 10000,
+    "cycle_days": 60,
+    "epoch_year": 660,
+    "example_year": 1164,
+    "solar_year_units": 3652450,
+    "mean_lunation_units": 295306,
+    "anomalistic_month_units": 275544,
+    "qi_ying_units": 398535,
+    "run_ying_units": 8257,
+    "zhuan_ying_units": 32568
+  },
+  "printed_example": {
+    "accumulated_units": 1840834800,
+    "rain_cycle_units": 433335,
+    "unadjusted_run_remainder": 192502,
+    "adjusted_run_remainder": 200759,
+    "mean_cycle_units": 232576,
+    "anomaly_units": 40946,
+    "true_cycle_units": 230635,
+    "winter_to_mean_units": 407982,
+    "mean_cycle_name_literal": "壬午",
+    "mean_cycle_index_literal": 23,
+    "rain_fraction_denominator_literal": 1000,
+    "eleventh_label_literal": "11月1日",
+    "eleventh_step_lunation_offset": 11,
+    "eleventh_step_cycle_units": 480942,
+    "qi_ying_missing_from_mean_formula_literal": true
+  },
+  "threshold_labels": [
+    {
+      "model": "senmyo",
+      "source_pages": [
+        55,
+        56
+      ],
+      "printed_hour": 18,
+      "printed_threshold_units": 6400,
+      "day_units": 8400
+    },
+    {
+      "model": "futen",
+      "source_pages": [
+        55,
+        56
+      ],
+      "printed_hour": 18,
+      "printed_threshold_units": 7500,
+      "day_units": 10000
+    }
+  ],
+  "rows": [
+    {
+      "year": 1163,
+      "month": 11,
+      "is_leap_month": false,
+      "mean_cycle_index": 24,
+      "mean_remainder": 1964,
+      "printed_solar_correction_units": -680,
+      "printed_lunar_correction_units": -145,
+      "true_cycle_index": 24,
+      "true_remainder": 1139,
+      "lunation_offset": -2
+    },
+    {
+      "year": 1163,
+      "month": 12,
+      "is_leap_month": false,
+      "mean_cycle_index": 53,
+      "mean_remainder": 7270,
+      "printed_solar_correction_units": 438,
+      "printed_lunar_correction_units": -1996,
+      "true_cycle_index": 53,
+      "true_remainder": 5712,
+      "lunation_offset": -1
+    },
+    {
+      "year": 1164,
+      "month": 1,
+      "is_leap_month": false,
+      "mean_cycle_index": 23,
+      "mean_remainder": 2576,
+      "printed_solar_correction_units": 1309,
+      "printed_lunar_correction_units": -3250,
+      "true_cycle_index": 23,
+      "true_remainder": 635,
+      "lunation_offset": 0
+    },
+    {
+      "year": 1164,
+      "month": 2,
+      "is_leap_month": false,
+      "mean_cycle_index": 52,
+      "mean_remainder": 7882,
+      "printed_solar_correction_units": 1786,
+      "printed_lunar_correction_units": -3860,
+      "true_cycle_index": 52,
+      "true_remainder": 5808,
+      "lunation_offset": 1
+    },
+    {
+      "year": 1164,
+      "month": 3,
+      "is_leap_month": false,
+      "mean_cycle_index": 22,
+      "mean_remainder": 3188,
+      "printed_solar_correction_units": 1867,
+      "printed_lunar_correction_units": -3798,
+      "true_cycle_index": 22,
+      "true_remainder": 1257,
+      "lunation_offset": 2
+    },
+    {
+      "year": 1164,
+      "month": 4,
+      "is_leap_month": false,
+      "mean_cycle_index": 51,
+      "mean_remainder": 8494,
+      "printed_solar_correction_units": 1549,
+      "printed_lunar_correction_units": -3072,
+      "true_cycle_index": 51,
+      "true_remainder": 6971,
+      "lunation_offset": 3
+    },
+    {
+      "year": 1164,
+      "month": 5,
+      "is_leap_month": false,
+      "mean_cycle_index": 21,
+      "mean_remainder": 3800,
+      "printed_solar_correction_units": 831,
+      "printed_lunar_correction_units": -1701,
+      "true_cycle_index": 21,
+      "true_remainder": 2930,
+      "lunation_offset": 4
+    },
+    {
+      "year": 1164,
+      "month": 6,
+      "is_leap_month": false,
+      "mean_cycle_index": 50,
+      "mean_remainder": 9106,
+      "printed_solar_correction_units": -223,
+      "printed_lunar_correction_units": 208,
+      "true_cycle_index": 50,
+      "true_remainder": 9091,
+      "lunation_offset": 5
+    },
+    {
+      "year": 1164,
+      "month": 7,
+      "is_leap_month": false,
+      "mean_cycle_index": 20,
+      "mean_remainder": 4412,
+      "printed_solar_correction_units": -1163,
+      "printed_lunar_correction_units": 2030,
+      "true_cycle_index": 20,
+      "true_remainder": 5279,
+      "lunation_offset": 6
+    },
+    {
+      "year": 1164,
+      "month": 8,
+      "is_leap_month": false,
+      "mean_cycle_index": 49,
+      "mean_remainder": 9718,
+      "printed_solar_correction_units": -1721,
+      "printed_lunar_correction_units": 3273,
+      "true_cycle_index": 50,
+      "true_remainder": 1270,
+      "lunation_offset": 7
+    },
+    {
+      "year": 1164,
+      "month": 9,
+      "is_leap_month": false,
+      "mean_cycle_index": 19,
+      "mean_remainder": 5024,
+      "printed_solar_correction_units": -1883,
+      "printed_lunar_correction_units": 3864,
+      "true_cycle_index": 19,
+      "true_remainder": 7005,
+      "lunation_offset": 8
+    },
+    {
+      "year": 1164,
+      "month": 10,
+      "is_leap_month": false,
+      "mean_cycle_index": 49,
+      "mean_remainder": 330,
+      "printed_solar_correction_units": -1647,
+      "printed_lunar_correction_units": 3789,
+      "true_cycle_index": 49,
+      "true_remainder": 2472,
+      "lunation_offset": 9
+    },
+    {
+      "year": 1164,
+      "month": 11,
+      "is_leap_month": false,
+      "mean_cycle_index": 18,
+      "mean_remainder": 5636,
+      "printed_solar_correction_units": -1014,
+      "printed_lunar_correction_units": 3042,
+      "true_cycle_index": 18,
+      "true_remainder": 7664,
+      "lunation_offset": 10
+    },
+    {
+      "year": 1164,
+      "month": 11,
+      "is_leap_month": true,
+      "mean_cycle_index": 48,
+      "mean_remainder": 942,
+      "printed_solar_correction_units": 16,
+      "printed_lunar_correction_units": 1642,
+      "true_cycle_index": 48,
+      "true_remainder": 2600,
+      "lunation_offset": 11
+    },
+    {
+      "year": 1164,
+      "month": 12,
+      "is_leap_month": false,
+      "mean_cycle_index": 17,
+      "mean_remainder": 6248,
+      "printed_solar_correction_units": 1035,
+      "printed_lunar_correction_units": -260,
+      "true_cycle_index": 17,
+      "true_remainder": 7023,
+      "lunation_offset": 12
+    }
+  ],
+  "scope": {
+    "source_table_stage": "before the source describes retreating leap11 new moon and relabelling it11; relabelling not performed here",
+    "all_fifteen_selected_rows_retained": true,
+    "correction_functions_reconstructed": false,
+    "uses_printed_solar_and_lunar_corrections": true,
+    "historical_absolute_dates_assigned": false,
+    "historical_calendar_adjudicated": false,
+    "T1299_pingming_or_hinoo_half_established": false,
+    "leap_short_month_priority_established": false,
+    "applied_to_current_date_or_mansion": false,
+    "independent_historical_observations_added": 0,
+    "real_world_samples_added": 0
+  }
+}

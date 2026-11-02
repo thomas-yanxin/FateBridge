@@ -28,8 +28,8 @@ def _person(**overrides) -> PersonInfo:
 
 
 def test_province_fallback_emits_resolution_advisory():
-    # 宿迁未收录于市级地名库，故按省级（江苏）近似回退，触发 advisory。
-    nb = normalize_birth_time(_person(birth_place="江苏省宿迁市宿豫区"))
+    # 全量库已覆盖宿豫区；用明确的未收录地点保持省级降级分支的验证。
+    nb = normalize_birth_time(_person(birth_place="江苏省未收录地点"))
     summary = nb.as_dict()
     assert nb.applied is True
     assert summary["resolved_place"] == "江苏"
@@ -37,7 +37,7 @@ def test_province_fallback_emits_resolution_advisory():
     advisory = summary.get("resolution_advisory")
     assert advisory is not None
     # 提示须可操作：点名地点、说明是省级近似、并指向 birth_longitude。
-    assert "宿迁" in advisory
+    assert "未收录地点" in advisory
     assert "省级" in advisory
     assert "birth_longitude" in advisory
 
@@ -90,7 +90,6 @@ def test_nantong_prefecture_alone_still_resolves_to_itself():
 
 def test_nantong_county_siblings_each_resolve_distinctly():
     # 同府的其它县级单位也补齐，避免「南通X」全部塌回南通市区。
-    # 通州 故意不收录：其「通州区」别名与北京通州区撞名。
     for name in ("如皋", "启东", "海门", "如东"):
         r = resolve_birth_place_context(f"南通{name}")
         assert r.canonical_name == name, name
@@ -116,24 +115,25 @@ def test_kaizhou_resolves_to_county_not_chongqing_centroid():
         assert abs(r.latitude - 31.178) < 0.1, place
 
 
-def test_chongqing_centroid_and_near_districts_still_resolve_to_chongqing():
-    # 安全不变式：直辖市本名及未收录的近郊区(渝中区在市中心附近)仍解析到重庆中心，
-    # 区级条目只在显式收录时夺取匹配，绝不劫持直辖市回退。
-    for place in ("重庆", "重庆市", "重庆市渝中区"):
+def test_chongqing_and_its_district_resolve_at_the_requested_level():
+    for place in ("重庆", "重庆市"):
         r = resolve_birth_place_context(place)
         assert r.canonical_name == "重庆", place
         assert r.level == "municipality", place
+    assert resolve_birth_place_context("重庆市渝中区").canonical_name == "渝中区"
 
 
 def test_beijing_tongzhou_not_misresolved_to_jiangsu():
-    # 回归：county 级别若高于 municipality(或同级但更长别名胜出)，"北京通州区"
-    # 会被错判到江苏南通。通州不入库 + county==municipality 共同守住此用例。
+    # 同名区均收录后必须用行政上级区分，不能再退回北京市中心。
     r = resolve_birth_place_context("北京通州区")
-    assert r.canonical_name == "北京"
+    assert r.canonical_name == "通州区"
+    assert abs(r.longitude - 116.72) < 0.1
+    nantong = resolve_birth_place_context("南通通州区")
+    assert abs(nantong.longitude - 121.07) < 0.1
 
 
 def test_haian_no_longer_emits_province_advisory():
-    # 已精确到县级 → 不再触发省级近似 advisory（对比 宿迁 仍触发）。
+    # 已精确到县级 → 不再触发省级近似 advisory。
     nb = normalize_birth_time(_person(birth_place="江苏省南通市海安市"))
     summary = nb.as_dict()
     assert summary["resolved_place"] == "海安"

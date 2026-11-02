@@ -1,0 +1,631 @@
+{
+  "call_guidance": {
+    "activity": "逐层读取matched_rules、conditional_rules、source_excerpts及detail_match。普通出行不擅加远行限定；远行向外国须同时有long_distance_journey和journey_abroad。买卖、经营、借入、出借、索债分别核对，不能把所有资金行为当同一事项。",
+    "activity_details": "只填当前聊天已确认事实；purchase为购入，business_operation为明确经营，collecting_debt为索取债款。any_of为任选其一，all_of为全部具备；未满足或文本读法未校定的条款不进入汇总。未匹配不代表事实已被否定，不为得到有利结果补条件。",
+    "actor_purpose_social_scope": "forming_friendship是明确结交交友，不限首次相识，social_gathering是聚会，不互相推断。personal_departure本人启程不证明private_journey因私；下卷日曜远行另须royal_or_official_traveler与long_distance_journey同时明确，出差或使节任务不证明身份，上卷不同范围继续保留。conflicted只表示匹配证据兼有宜与忌，须说明动作、卷别和出处，不能自动断成同条件原文矛盾；原生文本中的本次适用条件也须一起解释。",
+    "astronomy": "默认equatorial_research28仅为已声明现代距星研究口径；天文宿与农历本命宿分别读取。",
+    "calendar_profile": "默认t1299_fullmoon27直接采用T1299下卷十五日望宿逆顺法及生日加十三的含首位算法，两法互核；NAOJ朔日表仅作独立交叉核验。",
+    "calendar_reference": "读取calendar_reference的日期来源类别、数据指纹、支持范围及资料差异。2015起是出版方参考推算，不能说成已核对逐年神宫原刊；固定UTC+09不是历史日本地方时。旧月度候选仍拒绝接入，新后端来自完整逐日事实；文档到2033与LOD到2031的差异继续保留，范围外不能换中国历补齐。",
+    "clock": "calendar_day.clock_doctrine保留平明起曜、昼夜各八时及未列明的逐时曜神序列；time_restrictions含下卷逐日日名证言。clock_evaluation_status=not_computed时不能按民用0/12点或西方24行星时给出原典精确时段；原文自称万不失一不是实证验收。 comparative_time_systems分别保留T1509从旦至旦及一日夜三十时、T2087正文六时与行内注昼三夜三及居俗昼四夜四；三十时不等于现代三十小时，T2087居俗八时不覆盖T1299昼八夜八，不证明旦=平明、现代钟时、太阳高度或桧尾半日。",
+    "clock_text_position": "clock_doctrine与special_day_evidence的textual_position_reference共指下卷一组段落移位：248字特殊日段和93字平明八时段由0398注15、0399注16互指，邻注0398注14另删前文一字一。∞为位置转换，不等于替字、删段、八改六、上卷火水曜位交换或T2465规则次序。两条注是一组异文，不算两份独立明本；所示不是完整明刻本重建，不改变主表、事项或钟时。古代日界、桧尾半日及闰月补配优先级仍未建立。",
+    "clothing": "activity=clothing区分裁缝tailoring_garments、制作making_garments、修理repairing_garments、穿着wearing_garments和穿新衣wearing_new_garments；裁缝可归制作，新衣穿着可归穿着，反向不推。royal_wearer仅为明确王者身份，衣事不代表购衣。clothing_reference保留主文十四宿及余并失补集、明本井→并及余并失→并大吉，不补并为井、不将明本未列宿补成同样慎用；口诀和上卷裁衣原句未进入宜忌汇总，不能把汇总列宜说成全部文献一致或现实无风险。完整候选共同的专章表项可单独成立，未定宿名仍保持未定；候选不穷尽时不据单个候选定宜。",
+    "complete_day_branches": "同run引用核验v4要求sukuyo.candidate_days；无跨日期分支时为空数组，有分支时必须完整保留各日证据。公开suzhan可省略time或给null，直接保留未知时刻日期集合；chart与astronomy为null且validation.calculation_layers说明未计算，不填示例或默认钟时。已知钟时继续计算完整星图。衣事须另保留clothing_reference，通用activity引用也不能省略；只引用一条宜文或一支候选不能通过。",
+    "conditional_mansion_days": "单一参考历日仍有未定宿时读取sukuyo.candidate_mansion_days，保留每支半日／现代重建支持、个人三九见证和事项条件；applied_to_primary=false。主宿与顶层事项不由候选回填。candidate_days仍为跨日期分支，各日期子项保留自身候选宿证据。候选完整性false不改为已穷尽；钟时不自动判半。",
+    "conjunction": "conjunction_doctrine仅按历日宿名给出六、十二、九宿的文献分组，末九成员为宿序推得；applied_to_physical_moon=false时不得称已修正月亮宿界、角距或过宿钟时。",
+    "detail_hierarchy": "activity_details保留已确认事实，effective_activity_details和detail_inferences明示行为子类归入父类；购入金宝/牲畜、田地购入/出售及骑乘学习可归入买/卖/技能。分类不推出路程、付款方式、现金流或开始时间。repaying_debt是偿还债款；classical_text_study/teaching_classics/debate_learning/religious_learning分别限研读经典/教授经典/学习论辩/宗教学法，不把经书任意限为宗教典籍；water_journey/diplomatic_mission限水路/使节任务。",
+    "documentary_layers": "calendar_day.japanese_selected_reference是善通寺109-5具名正文对照：13个日号与T1299一般吉日名单在9/10/16/24/25有差异，不覆盖classifications或事项；unlisted不是忌。未释旁注不补入，实物年代及T2465见证身份未核定。840年八日曜序是一组相关日序，不能作日内分时或八个新增独立验证。source_passages按出版方TEI区分正文和行内注，夹注作者身份未独立核定；方向章夹注与壁宿正文反向证言均须保留，不裁定优先权。古代日界、前后半、闰月补配次序仍未解决。 善通寺正文另有四日夜、八日昼、十一日夜、十五日昼、十八日夜、二十二日昼、二十五日夜、二十九日昼八条条件，必须与13日名单和840年逐日曜序分别保留；当前入月日不在八条内也不能把整个来源层省掉。未换算现代钟时，未代入事项；不得把T1299的日中后通用自动用于善通寺。解释实际输入时须呈现已确认activity_details，勿用上位学习类别代替宗教学法，勿把effective_activity_details的推导父类当成原始输入。",
+    "historical_clock_arithmetic": "clock_doctrine.historical_clock_arithmetic是相马等NAOJ2019研究的所选具注历时刻算术，不是本次日期的时刻复原或T1299原典。时点50刻/日、6分/刻、25分/辰，初为0、时正12.5分、4刻1分到下一辰边界；不等于古代换日。昼夜长度100刻、宣明历100刻84分、延喜式48刻一基数分别保留，不能混算或推出桧尾半日。英文摘要half koku与正文/表3分半的单位差别保留；日文摘要的半没有明定单位，不自行补刻。半分/半刻的144/864秒只是名义24小时单位比，非实际UTC/民用时。40组42读数保留6组8条非零残差及两组双读，不把它们调平、删除或计作42个独立历史观察。通日是省没日的360日平气轴，末段18是名义差；不直接加公历冬至、改用定气或混入滅日。论文对几何太阳中心过地平无大气差的定义是对所选记录的推断，未复现其物理比较，不能给T1299平明设0度或自动套现代上缘日出。研究的日出入记录只对应所记季节日；延喜式期间值与具注历单日值分开，未插值成当前日期。 交付全部conditional_rules的实质条文和慎用／宜用含义，以及每条尚缺条件或读法未校定、未计入汇总的原因；不能把下卷罗刹不宜举百事缩成冒／底字未识别，也不能反过来确定本日罗刹或事项宜忌。calendar_day_part若已显式给出，应交付前／后半及其声明身份；古代钟时映射未定不等于该输入未知。",
+    "historical_day_ganzhi": "NAOJ历史参考的day_ganzhi_reference由原始日干支锚点和民用日数递推，日界固定UTC+09午夜；不代表八字日柱、古代地方日界或平明已验收。保留source_anchor和elapsed_civil_days；编年史日期对照仅覆盖明确列出的月与日，不能推广成全部历史颁历认证。",
+    "historical_reference": "显式calendar_basis=japanese_naoj_historical_utc09使用NAOJ冻结月首参考，前推公历0001-01-01至1872-12-31、固定UTC+09；不因地点或古代出生年自动选择。阴历年0只作来源上下文，非公元0年输入。453阴历年及以前为儀鳳暦平朔回推；454起亦为具历史校正的参考，不能称当时颁历、观测或地方钟时已证明。",
+    "historical_source_variants": "NAOJ与HuTime1001.1完整月首对照保留210个分歧日期；calendar_reference.cross_source_comparison的control_fields未代入主结果，二者部分共用文献来源。即使配宿相同也须保留月/日/闰标志不同，不能称全历史历法一致。1872年旧历十二月只存两天；1873-01-01不延续旧历，不自动切现代日本参考。",
+    "interpretation": "引用同run计算字段与版本、原典位置；未知或partial不补造宿名、距离、概率或结论。",
+    "leap_month": "默认档案unresolved保留同名月候选且不保证穷尽；repeat_month为明确约定。可选hinoo_t1299_host27在所选宿主历法上应用T2465闰月复用及小月补配，不称历史旧历复原。",
+    "lower_date_boundary": "固定时差的公元1年边界以完整区间代数保留0000-12-31来源分支及UTC端点；这是天文年编号的计算标签，不能说成已支持公元0年出生或历史UTC实测。读取epoch秒及范围外分支，未知钟时不补造。",
+    "lower_methods": "lower_methods分别交付下卷七宿性与七曜证言，nature仍为上卷；火曜成亲、征债等相反条文必须全部解释。下卷轻宿标题軫/輕及急速卖/买卖校记保留，大正主文卖交关不自动扩大购入。",
+    "palace_reference": "palace_reference仅按历日宿名查T1299上卷27宿四足/十二宫九足表；textual_pada是显式查表条件，不表示已排得出生足位。宫序不等星图House，太阳/太阴分不等昼夜生盘；不得据此断本命宫、现代月亮黄经或合成宫位相性。",
+    "personal_day_witnesses": "有本命宿时读取personal_day.source_day_evidence，分别引用上卷、下卷和又一说；未说明距离不能套远行条文，personal_departure是启程，long_distance_traveler_entering_residence是远行人入宅，不限定回自己家，互不代推。荣日启请法要用monastic_dharma_request，须明确出家人身份和请教行为；religious_learning不反向推出身份。下卷长行历优先句保留，不擅自删除冲突证据或输出综合吉日。",
+    "scope": "sukuyo宿主默认chinese_hko_utc08；可明确选择japanese_hutime_1002_1_utc09的HuTime逐日参考，1872-02-09至2031-01-22、固定UTC+09。与出生时区、calendar_profile和天文模型分别保留，不称唐历、完整天保历或历史地方时已复原。",
+    "shogonji_daily_annotations": "若返回manuscript_daily_annotations，逐分支解释本日是原始旁注所在日还是作者建议移置日；两条らうさく原在六月21／八月5，作者建议20／3，位移分别−1／−2。假名原读、狼藉汉字候选、作者意见与本次计算分开；不能当作T1299羅刹观测或统一换日误差。暦林問答集1811目录印本61章狼藉、62章羅刹分列；64章三宝仪式限制与支干吉前提属于该书，未替换T1299。馬場所据天理本及校改、NDL生年表头与未核月法、现用CBETA2026.R2固定提交及头部日期非发行年、逐字未检出不等所有传本无文均须保留。仅两条旁注四个相关日付，未独立校原卷，无半日钟时，不裁决古代日界、闰小月次序或现实效力；范围外未返回不等原卷无注。",
+    "shogonji_month_headers": "若返回manuscript_month_header，须解释该月首的原读、规范化候选、疑字／错位／未见朱注及非初一限制。荘厳寺37个月首来自1992研究作者转写，27条清晰、2条带限定、8处所选栏未见注；1092仅为月长合计，不能算逐日宿曜校勘或现实样本。1346／1347七月张注与Hinoo前半星不同，但朱注无半日钟时，不能判定规则胜负；1346闰九月两重建同氐，没有裁决次序的区分力。1345正文五行为纳音，非七曜。不能用渡边敏夫正文概表补缺注或据同名宿认证古代日界。 首年1345是作者归属；附录岁首字面康永二年与作者康永四年归属不同，同栏乙酉保留，未独立核原卷或认定刊误。四月朱印在一、二日之间，作者第232页说明3判断应属初一；这与宿注假名字形疑读分开解释。",
+    "six_palaces": "six_palace_reference按已确认natal_mansion本身计一，交付命/事/意/聚/同/克六个本命相对位置；未给本命则status=natal_mansion_required。不得由日宿、星期、六类相性或十二宫足表补出本命，也不得把这些位置直接当已判定七曜凌犯、六害期间或现实灾祸；读取seven_luminary_transits_evaluated和三九参断evaluated。",
+    "source_capture": "规则JSON的source_bundle_sha256与原文source_sha256分别核对；Hinoo的active_primary_evidence指向downloaded_primary_edition，交付SAT完整HTML响应指纹、选定原段及五条校记。旧cached_primary_excerpt是历史记录，其摘录哈希不等于完整响应或抄本哈希；旧末句句号与下载原文闭引号的差异明示。SAT原/甲本不合成唯一正文；完整HTML不等于字图全部取得、影印或独立学术校勘，半日钟时与规则次序仍未定。",
+    "special_days": "special_day_labels仍采用上卷大正主表；special_day_evidence分别交付上下卷大正和所载明本校记表，明本仅作同底本重建，不代入主表或确定事项。冒/底未归并胃/氐；下卷标签完整性为false时不能把未匹配当无此特殊日。religious_learning才匹配甘露学道/经法，不泛化为一般学习或考试。下卷月与宿合仅作历日宿名查文献，physical_lunar_conjunction_evaluated=false时不能称已观察到物理月亮合宿。unresolved_source_rules_present及conditional_rules须一并解释，不能只摘宜条。 direct_printed_comparisons另列1897年脇田文绍缩刷本下卷的直接印本参考：金刚峰土曜尾、月曜女等与大正分别保留，不能归入明本校记重建；木曜罗刹宿字未定，巨/亢仅为未接纳字形候选，不补氐或亢，不据空标签断无此特殊日。仅20项宿字已识别，尚无完整21宿字转录、全本校勘或独立人工验收。 上卷明本金刚峰火曜昴来自正文水曜经水=火校记重建，水曜壁来自正文火曜经火=水重建；这是曜位互换，不是昴/壁宿字改变，也不扩为下卷或印本同样变曜。",
+    "taibai_direction_reference": "taibai_direction_reference按实际入月日查T1299下卷太白八方／地下／天上表，使用calendar.lunar_day，不能以公历日、tithi、桧尾补配宿序或实测金星替代。明本校记删去初十／二十／三十天上行，缺文不等于无太白或已获行动允许；其他行正南等措辞按原字保留。顺行／逆行与行路相对关系尚未核定，movement_alignment_evaluated=false、applied_to_activity_assessment=false；不是天文逆行或GPS方位角，不能用于覆盖既有宜忌。未知日期分支及原典时钟未定仍保留。",
+    "textual_half": "Hinoo短月补配的first_half/second_half必须明确给定；已知民用钟时不自动转换。闰月与补配规则次序未明时保留现代重建候选，不擅取唯一。",
+    "travel_directions": "directional_travel交付下卷行动禁闭法的日宿/方向证言；northbound_journey、eastbound_journey、southbound_journey、westbound_journey只填已确认方向，不由GPS、出生地、目的地或角度推定。纵吉时亦不可行的原注不能被吉时抵销；壁宿南行在逐宿章与此章有相反证言，须同时呈现。明本吉/凶等校记不能覆盖当前所选大正主文，互字未定不猜成氐。宫序仅本段标签，不是上卷足表宫序或个人本命宫。",
+    "unknown_time": "time省略/null只计算现有历法与事项证据；params.calculationMode=calendar_date_only，birthTimeImputed=false，chart/astronomy=null。input_normalized保留所选历法、时区与输入；经纬度、宫制和盘式选项没有用于日历层。读取calendar、candidate_days及每个日期的candidate_mansion_days，不把一个已列候选当已确定。不要为了取得星图补00:00、中午或示例钟时。",
+    "verse_abbreviation": "calendar_day.verse_abbreviation_resolution保留原典一夜字面及0393c26夹注：一夜指十一夜。下卷直接依注，上卷同偈与平行散文互证；不能把省文当初一夜限制或未决冲突。prose_verse_time_variant只是字面差别，语义冲突另看prose_verse_time_semantic_conflict；钟时未计算的限制仍保留。"
+  },
+  "evidence_views": {
+    "activity": {
+      "fields": [
+        "sukuyo.palace_reference",
+        "sukuyo.calendar",
+        "sukuyo.calendar_day",
+        "sukuyo.weekday",
+        "sukuyo.personal_day",
+        "sukuyo.lower_mansion_day",
+        "sukuyo.conjunction_doctrine",
+        "sukuyo.activity_assessment",
+        "sukuyo.reading_text",
+        "rulesets",
+        "validation",
+        "summary",
+        "sukuyo.lower_methods",
+        "sukuyo.directional_travel",
+        "sukuyo.special_day_evidence",
+        "sukuyo.six_palace_reference",
+        "sukuyo.taibai_direction_reference",
+        "sukuyo.day_mansion",
+        "sukuyo.nature",
+        "sukuyo.candidate_days",
+        "sukuyo.candidate_mansion_days"
+      ],
+      "when": "按事项核对三九、宿性、七曜宜忌及原典冲突。"
+    },
+    "astronomy": {
+      "fields": [
+        "astronomy",
+        "params",
+        "rulesets",
+        "validation"
+      ],
+      "when": "核对当日视赤经、不等宽宿界与现代距星来源，不能用于农历本命宿。"
+    },
+    "calendar": {
+      "fields": [
+        "sukuyo",
+        "rulesets",
+        "validation",
+        "summary",
+        "sukuyo.taibai_direction_reference"
+      ],
+      "purpose": "宿占历日宿、七曜与上卷宿性"
+    },
+    "calendar_date_only": {
+      "fields": [
+        "input_normalized",
+        "params",
+        "sukuyo",
+        "chart",
+        "astronomy",
+        "rulesets",
+        "validation",
+        "summary"
+      ],
+      "when": "钟时未知时读取完整历法、日期／宿候选和事项证据；核对天文与宫位的未计算状态。"
+    },
+    "clothing": {
+      "fields": [
+        "sukuyo.calendar",
+        "sukuyo.day_mansion",
+        "sukuyo.conjunction_doctrine",
+        "sukuyo.palace_reference",
+        "rulesets",
+        "sukuyo.calendar_day",
+        "sukuyo.weekday",
+        "sukuyo.nature",
+        "sukuyo.personal_day",
+        "sukuyo.six_palace_reference",
+        "sukuyo.taibai_direction_reference",
+        "sukuyo.activity_assessment",
+        "sukuyo.lower_mansion_day",
+        "sukuyo.lower_methods",
+        "sukuyo.directional_travel",
+        "sukuyo.special_day_evidence",
+        "sukuyo.candidate_days",
+        "sukuyo.clothing_reference",
+        "sukuyo.reading_text",
+        "input_normalized",
+        "validation",
+        "summary",
+        "sukuyo.candidate_mansion_days"
+      ],
+      "purpose": "完整衣事上下文。口诀和上卷预测式原句为单独文献见证，不作为新的现实预测或加权评分；源注与缺项完整保留。",
+      "when": "按明确衣事动作核对专章、跨卷条文、明本未识别字及半日候选；未宣称现实病灾。"
+    },
+    "diagram": {
+      "fields": [
+        "chart",
+        "params",
+        "rulesets"
+      ],
+      "purpose": "核对宿盘及所选天文宿位方法；现代研究宿界与legacy等分示意分开标注"
+    },
+    "lower_mansions": {
+      "fields": [
+        "sukuyo.palace_reference",
+        "sukuyo.day_mansion",
+        "sukuyo.lower_mansion_day",
+        "sukuyo.conjunction_doctrine",
+        "sukuyo.activity_assessment",
+        "sukuyo.reading_text",
+        "input_normalized",
+        "rulesets",
+        "sukuyo.lower_methods",
+        "sukuyo.directional_travel",
+        "sukuyo.candidate_mansion_days"
+      ],
+      "purpose": "下卷逐宿条文、文本归属问题及条件性事项；宿月配合分类不代替物理观测"
+    },
+    "lower_methods": {
+      "fields": [
+        "sukuyo.calendar",
+        "sukuyo.nature",
+        "sukuyo.weekday",
+        "sukuyo.lower_methods",
+        "sukuyo.activity_assessment",
+        "sukuyo.reading_text",
+        "input_normalized",
+        "rulesets",
+        "validation",
+        "sukuyo.special_day_evidence",
+        "sukuyo.candidate_mansion_days"
+      ],
+      "purpose": "下卷七类宿性、七曜章法、主文与校记、上下卷冲突及行为分类推导"
+    },
+    "padas": {
+      "fields": [
+        "sukuyo.calendar",
+        "sukuyo.day_mansion",
+        "sukuyo.palace_reference",
+        "sukuyo.reading_text",
+        "input_normalized",
+        "rulesets",
+        "validation"
+      ],
+      "purpose": "原典分足108格查表、跨宫候选及文献主曜；不能据历日宿补出生足位"
+    },
+    "personal_day_witnesses": {
+      "fields": [
+        "sukuyo.calendar",
+        "sukuyo.personal_day",
+        "sukuyo.activity_assessment",
+        "rulesets.personal_day_witnesses",
+        "input_normalized",
+        "sukuyo.candidate_mansion_days"
+      ],
+      "purpose": "本命三九日的卷别、启程与入宅范围；条件未定不代入。"
+    },
+    "profiles": {
+      "fields": [
+        "sukuyo.calendar",
+        "sukuyo.day_mansion",
+        "sukuyo.reading_text",
+        "input_normalized",
+        "rulesets",
+        "validation",
+        "sukuyo.candidate_mansion_days"
+      ],
+      "purpose": "核对望宿两法及可选桧尾补配、半日和规则次序候选"
+    },
+    "six_palaces": {
+      "fields": [
+        "sukuyo.six_palace_reference",
+        "sukuyo.personal_day",
+        "sukuyo.calendar",
+        "sukuyo.reading_text",
+        "rulesets.six_palace_positions",
+        "input_normalized"
+      ],
+      "purpose": "核对T1299六个本命相对位置及原文例题；运行犯宿未计算，不生成当日吉凶"
+    },
+    "source_capture": {
+      "fields": [
+        "sukuyo.calendar.profile_calculation",
+        "sukuyo.calendar.candidate_su27s",
+        "sukuyo.reading_text",
+        "rulesets.calendar",
+        "input_normalized"
+      ],
+      "purpose": "核对望宿表捕获指纹、缺日分支及Hinoo直接下载原段、校记与历史缓存差异"
+    },
+    "special_days": {
+      "fields": [
+        "sukuyo.calendar",
+        "sukuyo.weekday",
+        "sukuyo.day_mansion",
+        "sukuyo.special_day_labels",
+        "sukuyo.special_day_evidence",
+        "sukuyo.activity_assessment",
+        "sukuyo.reading_text",
+        "rulesets.special_days",
+        "input_normalized",
+        "sukuyo.candidate_mansion_days"
+      ],
+      "purpose": "核对上下卷大正特殊日、明本校记及未识别宿字；不将合宿原文变成物理观测"
+    },
+    "timing_gloss": {
+      "fields": [
+        "sukuyo.calendar",
+        "sukuyo.calendar_day",
+        "sukuyo.reading_text",
+        "rulesets.textual_resolutions",
+        "rulesets.unresolved",
+        "input_normalized"
+      ],
+      "purpose": "核对原典一夜省文、十一夜释义及有效时段证言；不是已定现代钟时"
+    },
+    "travel_directions": {
+      "fields": [
+        "sukuyo.calendar",
+        "sukuyo.day_mansion",
+        "sukuyo.directional_travel",
+        "sukuyo.activity_assessment",
+        "sukuyo.reading_text",
+        "rulesets.travel_directions",
+        "input_normalized",
+        "sukuyo.candidate_mansion_days"
+      ],
+      "purpose": "核对明确方向条件、吉时不能解除的原注、版本相反校记与逐宿章冲突；不计算地理角度或本命宫"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "sukuyo",
+      "rulesets",
+      "validation",
+      "summary",
+      "sukuyo.lower_methods"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "activity": {
+        "anyOf": [
+          {
+            "enum": [
+              "social",
+              "marriage",
+              "travel",
+              "relocation",
+              "commerce",
+              "study",
+              "clothing"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "按事项核对T1299三九、宿性、逐宿、七曜、日名及专章条文；clothing须区分裁缝tailoring_garments、制作making_garments、修理repairing_garments、穿着wearing_garments和穿新衣wearing_new_garments。royal_wearer仅为明确王者身份，不由穿礼服推断；衣事不等于买衣。其他事项亦读取已确认activity_details，保留冲突、版本异文及钟时缺项"
+      },
+      "activity_details": {
+        "default": [],
+        "description": "已确认的事项细节，须与activity对应；不从出生资料、GPS或目的地猜测。本人启程personal_departure不等于因私出行private_journey；王公百官行旅身份royal_or_official_traveler不由出差或使节任务推断。明确结交交友forming_friendship（不限首次相识）与聚会social_gathering分别核对，不互相代填。远行人入宅long_distance_traveler_entering_residence不自动当启程；出家人请教法要monastic_dharma_request需明确身份与动作。借贷、买卖、远近、方向及技艺等条件只在给定时匹配；空列表保留条件文，未列条件不等于已排除。",
+        "items": {
+          "enum": [
+            "tailoring_garments",
+            "making_garments",
+            "repairing_garments",
+            "wearing_garments",
+            "wearing_new_garments",
+            "royal_wearer",
+            "sale",
+            "borrowing",
+            "lending",
+            "long_distance_journey",
+            "journey_abroad",
+            "personal_departure",
+            "private_journey",
+            "royal_or_official_traveler",
+            "long_distance_traveler_entering_residence",
+            "southbound_journey",
+            "northbound_journey",
+            "eastbound_journey",
+            "westbound_journey",
+            "skill_learning",
+            "earning_money",
+            "sale_lactating_livestock",
+            "sale_livestock",
+            "spending_property",
+            "receiving_property",
+            "returning_property",
+            "wealth_competition",
+            "founding_school",
+            "beginning_study",
+            "learning_with_teacher",
+            "purchase",
+            "business_operation",
+            "collecting_debt",
+            "repaying_debt",
+            "religious_learning",
+            "monastic_dharma_request",
+            "teaching_classics",
+            "riding_training",
+            "water_journey",
+            "diplomatic_mission",
+            "purchase_precious_goods",
+            "purchase_livestock",
+            "land_purchase",
+            "land_sale",
+            "social_gathering",
+            "forming_friendship",
+            "classical_text_study",
+            "debate_learning"
+          ],
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "calendar_basis": {
+        "default": "chinese_hko_utc08",
+        "description": "宿主历法独立于出生时区和配宿档案。默认现代中国农历UTC+08；japanese_hutime_1002_1_utc09用1872-02-09至2031-01-22的HuTime逐日参考、固定UTC+09；2015起为出版方参考推算，非历史地方时或逐年神宫原刊验收，范围外不回退其他历法。japanese_naoj_historical_utc09为公元0001-01-01至1872-12-31的NAOJ历史月朔参考、固定UTC+09；早期纪年属重建，改历末月仅两天，保留跨出版方异日，非历史地方时或全部颁历验收。",
+        "enum": [
+          "chinese_hko_utc08",
+          "japanese_hutime_1002_1_utc09",
+          "japanese_naoj_historical_utc09"
+        ],
+        "type": "string"
+      },
+      "calendar_day_part": {
+        "anyOf": [
+          {
+            "enum": [
+              "first_half",
+              "second_half"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅Hinoo档案：已确定的原典日序前/后半；不由出生钟时自动推断，缺项保留候选"
+      },
+      "calendar_profile": {
+        "default": "t1299_fullmoon27",
+        "description": "历日27宿档案：默认T1299下卷望日逆顺/生日加十三法；hinoo_t1299_host27另用T2465闰月复用及小月分宿研究规则，仍非历史旧历复原",
+        "enum": [
+          "t1299_fullmoon27",
+          "hinoo_t1299_host27"
+        ],
+        "type": "string"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "date": {
+        "description": "公历日期；历日宿按显式calendar_basis选择宿主历法与参考日界，默认现代中国农历UTC+08",
+        "type": "string"
+      },
+      "doubing_su28": {
+        "default": true,
+        "description": "是否按mansion_method标注天文28宿；不用于农历本命宿；默认仅七个物理七曜有现代研究宿位",
+        "type": "boolean"
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "gps_lat": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "GPS latitude"
+      },
+      "gps_lon": {
+        "anyOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "GPS longitude"
+      },
+      "house_start_mode": {
+        "default": 1,
+        "description": "宫位起始模式（透传至宿曜引擎；默认 1）",
+        "type": "integer"
+      },
+      "hsys": {
+        "default": 8,
+        "description": "Offline house system selector; standard suzhan supports 0..8 with the same FateBridge local house semantics as core chart Explicit values must be integer codes0..8; boolean, floating-point, blank and out-of-range values are rejected.",
+        "maximum": 8,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "lat": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "31n13",
+        "description": "Latitude text or decimal"
+      },
+      "leap_month_policy": {
+        "default": "unresolved",
+        "description": "闰月配宿默认保留候选；repeat_month显式沿用同名月",
+        "enum": [
+          "unresolved",
+          "repeat_month"
+        ],
+        "type": "string"
+      },
+      "lon": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "121e28",
+        "description": "Longitude text or decimal"
+      },
+      "mansion_method": {
+        "default": "equatorial_research28",
+        "description": "天文28宿：默认采用当日视赤经和已声明现代距星的不等宽研究宿界（七曜）；legacy_equal28仅作旧版等分黄道示意；均不决定农历本命宿",
+        "enum": [
+          "equatorial_research28",
+          "legacy_equal28"
+        ],
+        "type": "string"
+      },
+      "natal_mansion": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "已核定的农历二十七宿本命宿（不含牛）；提供则计算本命六宫宿位置及命宿到历日宿的三九关系；七曜运行犯宿另未计算，不从黄经星图提取本命宿"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "szchart": {
+        "default": 0,
+        "description": "宿占盘模式开关（透传至宿曜引擎；默认 0）",
+        "type": "integer"
+      },
+      "szshape": {
+        "default": 0,
+        "description": "宿占盘形态开关（透传至宿曜引擎；默认 0）",
+        "type": "integer"
+      },
+      "textual_pada": {
+        "anyOf": [
+          {
+            "maximum": 4,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅按本次历日宿名查T1299分足表的显式第1..4足条件；非已排得出生足位，不能按钟时或现代月亮补造；省略保留四足候选"
+      },
+      "time": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "已确认的当地钟时；未知时省略或null，保留历法日期／半日候选，不计算星图、宫位或瞬时天文宿位，不补00:00或示例钟时。空字符串无效。"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "zodiacal": {
+        "default": 0,
+        "description": "Offline zodiac selector; standard suzhan supports 0=tropical and 1=sidereal(Lahiri-like)",
+        "type": "integer"
+      },
+      "zone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "+08:00",
+        "description": "Timezone spec"
+      }
+    },
+    "required": [
+      "date"
+    ],
+    "type": "object"
+  },
+  "tool": "suzhan"
+}

@@ -2,6 +2,8 @@
 
 import asyncio
 import copy
+import gzip
+import hashlib
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -19,6 +21,7 @@ import fatebridge.mcp_server as mcp
 from fatebridge.cli import run as cli_run
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES
+from tests.golden.canonical import canonical_json
 
 SPECS = {spec.key: spec for spec in CATALOG}
 SNAPSHOTS = Path(__file__).parent / "golden" / "snapshots"
@@ -81,8 +84,25 @@ def business(payload):
     return {k: v for k, v in payload.items() if k != "run_metadata"}
 
 
+@pytest.fixture(scope="module")
+def unrounded_linux_business():
+    path = (
+        Path(__file__).parent
+        / "fixtures/architecture_refactor_v1/linux-business-raw.json.gz"
+    )
+    packed = path.read_bytes()
+    assert hashlib.sha256(packed).hexdigest() == (
+        "bd405f02fc8af0c0271e6223ffacdc480448341b727e74a8e01bddc4204bac5e"
+    )
+    outputs = json.loads(gzip.decompress(packed))
+    assert len(outputs) == 92
+    return outputs
+
+
 @pytest.mark.parametrize("key", list(SPECS))
-def test_existing_golden_business_json_remains_valid_without_rewriting(key):
+def test_unrounded_business_validates_and_canonical_bytes_match_golden(
+    key, unrounded_linux_business
+):
     spec = SPECS[key]
     filename = (
         spec.rest_path.strip("/").replace("/", "_")
@@ -94,7 +114,22 @@ def test_existing_golden_business_json_remains_valid_without_rewriting(key):
         # The REST relationship spec has a separate flattened MCP alias.
         assert key == "astro_relative_chart"
         path = SNAPSHOTS / "api_astro_relative.json"
-    payload = business(json.loads(path.read_text()))
+    payload = unrounded_linux_business[path.stem]
+    golden = business(json.loads(path.read_text()))
+    comparable = payload
+    if key == "export_registry":
+        from tests.repair_business_reference import qualify_sixyao_registry
+
+        comparable = qualify_sixyao_registry(payload)
+    if key == "nongli_time":
+        from tests.repair_business_reference import qualify_nongli_clock_precision
+
+        comparable = qualify_nongli_clock_precision(payload)
+    if key == "decennials":
+        from tests.repair_business_reference import qualify_decennials_snapshot
+
+        comparable = qualify_decennials_snapshot(payload)
+    assert canonical_json(comparable) == canonical_json(golden)
     before = copy.deepcopy(payload)
     spec.output_model.model_validate(payload)
     Draft202012Validator(spec.output_model.model_json_schema()).validate(payload)
@@ -141,6 +176,22 @@ BAD_FACTS = [
     ("heluo", {"dayun": {"all": [{"ageStart": "3"}]}}),
     ("suzhan", {"chart": {"objects": [{"house": 1}]}}),
     ("sanshiunited", {"subresults": {"qimen": {"pan": {"ju_number": "9"}}}}),
+    (
+        "astro_horary",
+        {
+            "horary": {
+                "perfection": {
+                    "event_history": {
+                        "question_states": {
+                            "Moon": {
+                                "speed_analytic_frame_correction": "private-wrong-value"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+    ),
 ]
 
 

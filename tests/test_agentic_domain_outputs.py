@@ -290,17 +290,18 @@ def test_gender_and_timing_variants(dimension, gender, timing):
     result = execution.execute_tool(
         spec, spec.request_model.model_validate({**request, **patch})
     )
-    if gender == "未知" and timing != "both-overridden":
-        # Existing timing derivation rejects an unknown direction. Preserve
-        # that domain failure instead of guessing or changing the engine.
-        assert result["error_code"] == "validation_error"
-        assert result["status_code"] == 400
-        return
     assert "error" not in result, result
     spec.output_model.model_validate(result)
     Draft202012Validator(spec.output_model.model_json_schema()).validate(result)
     analysis = result[dimension.removeprefix("bazi_") + "_analysis"]
     assert "timing_context" in analysis
+    if gender == "未知" and timing != "both-overridden":
+        assert analysis["timing_context"]["dayun_status"] == (
+            "explicit_override"
+            if timing == "partial-override"
+            else "unavailable_gender_direction"
+        )
+        assert analysis["timing_context"]["liunian_pillar"]
     if timing == "both-overridden":
         assert analysis["timing_context"] == {
             "dayun_pillar": "甲子",
@@ -357,9 +358,10 @@ def test_all_knowledge_entries_have_valid_nested_contracts(domain):
     assert count > 0
 
 
-def test_all_sukuyo_offsets_include_null_distance_compatibility():
+def test_all_sukuyo_offsets_preserve_primary_text_groups_without_invented_distances():
     model = SPECS["sukuyo_compatibility"].output_model
     distances = set()
+    groups = set()
     for self_su in SU27_ORDER:
         for other_su in SU27_ORDER:
             relation = relation_between_su27(self_su, other_su)
@@ -370,7 +372,26 @@ def test_all_sukuyo_offsets_include_null_distance_compatibility():
             model.model_validate(payload)
             Draft202012Validator(model.model_json_schema()).validate(payload)
             distances.add(relation["distance"])
-    assert None in distances and len(distances) > 1
+            groups.add(relation["sequence_group"])
+    assert distances == {None}
+    assert groups == {1, 2, 3}
+
+
+@pytest.mark.parametrize("key", ["knowledge_registry", "knowledge_read"])
+def test_reference_responses_do_not_expose_cached_coverage(key):
+    spec = SPECS[key]
+    request = spec.request_model.model_validate(inputs(spec))
+    first = business(execution.execute_tool(spec, request))
+    expected = copy.deepcopy(first)
+    provenance = (
+        first["domains"][0]["provenance"]
+        if key == "knowledge_registry"
+        else first["provenance"]
+    )
+    coverage = provenance["coverage"]
+    coverage["future_fact"] = {"value": "caller-owned annotation"}
+    coverage["categories"][0]["keys_sample"].append("caller-owned key")
+    assert business(execution.execute_tool(spec, request)) == expected
 
 
 @pytest.mark.parametrize("key", [key for key, _ in PROJECTIONS])
@@ -382,6 +403,8 @@ def test_extensions_and_original_numeric_types_survive_validation(key):
 
     # Dynamic maps have typed values, so add extensions to model objects, not
     # to arbitrary dictionary namespaces (a new key there needs a valid value).
+    closed_objects = []
+
     def extend_objects(value, schema, root):
         if "$ref" in schema:
             schema = root["$defs"][schema["$ref"].split("/")[-1]]
@@ -396,7 +419,10 @@ def test_extensions_and_original_numeric_types_survive_validation(key):
                 for name, child in list(value.items()):
                     if name in properties:
                         extend_objects(child, properties[name], root)
-                value["future_fact"] = {"value": [None, 1, "原样保留"]}
+                if schema.get("additionalProperties") is False:
+                    closed_objects.append(value)
+                else:
+                    value["future_fact"] = {"value": [None, 1, "原样保留"]}
             elif isinstance(schema.get("additionalProperties"), dict):
                 for child in value.values():
                     extend_objects(child, schema["additionalProperties"], root)
@@ -415,6 +441,18 @@ def test_extensions_and_original_numeric_types_survive_validation(key):
         execution.execute_spec(fake, spec.request_model.model_validate(inputs(spec)))
         is payload
     )
+    if closed_objects:
+        # Closed fact records stay closed. Extension preservation must never
+        # be implemented by relaxing their published additionalProperties.
+        closed = closed_objects[0]
+        closed["future_fact"] = {"value": [None, 1, "必须拒绝"]}
+        try:
+            with pytest.raises(ValidationError):
+                spec.output_model.model_validate(payload)
+            with pytest.raises(SchemaError):
+                Draft202012Validator(schema).validate(payload)
+        finally:
+            del closed["future_fact"]
 
 
 @pytest.mark.parametrize(
@@ -494,7 +532,7 @@ def test_auto_timing_fractional_years_match_all_transports(
 @pytest.mark.parametrize(
     "dimension", [key for key, _ in PROJECTIONS if key.startswith("bazi_")]
 )
-def test_unknown_timing_direction_preserves_existing_domain_failure(
+def test_unknown_timing_direction_preserves_available_layers_across_transports(
     dimension, rest, tmp_path, capsys
 ):
     spec = SPECS[dimension]
@@ -509,11 +547,15 @@ def test_unknown_timing_direction_preserves_existing_domain_failure(
     )
     protocol = asyncio.run(native(spec, payload, trace_id="unknown-direction"))
     code, output = call_cli(
-        spec, payload, tmp_path, capsys, ["--trace-id", "unknown-direction"]
+        spec,
+        payload,
+        tmp_path,
+        capsys,
+        ["--trace-id", "unknown-direction", "--no-metadata"],
     )
-    assert http.status_code == 400 and protocol.is_error and code == 1
-    assert output["error_code"] == "validation_error" and output["retryable"] is False
-    assert http.json() == {k: v for k, v in output.items() if k != "status_code"}
-    assert {
-        k: v for k, v in protocol.structured_content.items() if k != "operation"
-    } == output
+    assert http.status_code == 200 and not protocol.is_error and code == 0
+    assert business(http.json()) == business(protocol.structured_content) == output
+    analysis = output[dimension.removeprefix("bazi_") + "_analysis"]
+    assert analysis["timing_context"]["dayun_status"] == "unavailable_gender_direction"
+    assert analysis["timing_context"]["dayun_pillar"] is None
+    assert analysis["timing_context"]["liunian_pillar"]

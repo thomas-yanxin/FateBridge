@@ -12,7 +12,7 @@ the ascendant and keep the "placidus" label, faking an approximation. So the
 guard re-raises a *clear* error instead.
 
 ``_planetary_hours`` is different: ``None`` is its documented "unavailable"
-contract, so a ``swe.revjul`` failure there degrades to ``None`` rather than
+contract, so a failed UT1-to-civil conversion there degrades to ``None`` rather than
 crashing the whole chart.
 """
 
@@ -58,22 +58,23 @@ def test_quadrant_house_swisseph_runtime_failure_fails_loud(monkeypatch):
     monkeypatch.setattr(astrology_core.swe, "houses_ex", _boom)
     info = build_astro_birth_info(**_NATAL)
 
-    with pytest.raises(ValueError, match="swisseph"):
+    with pytest.raises(ValueError, match="placidus.*原生宫头.*RuntimeError") as caught:
         build_core_chart_payload(info, "chart", hsys="placidus")
+    assert isinstance(caught.value.__cause__, RuntimeError)
+    assert str(caught.value.__cause__) == "swisseph houses_ex exploded"
 
 
 @_requires_swe
-def test_planetary_hours_degrades_to_none_when_revjul_fails(monkeypatch):
-    """A swe.revjul failure yields None (the documented "unavailable" contract),
-    rather than crashing on the failed tuple unpack."""
+def test_planetary_hours_degrades_to_none_when_civil_conversion_fails(monkeypatch):
+    """A failed UT1-to-civil conversion yields the documented unavailable value."""
     monkeypatch.setattr(astrology_core, "_SWE_RUNTIME_FAILURE_LOGGED", False)
     info = build_astro_birth_info(**_NATAL)
     julian_day = _julian_day(info.utc_datetime)
 
     def _boom(*args, **kwargs):
-        raise RuntimeError("swisseph revjul exploded")
+        raise RuntimeError("swisseph deltat_ex exploded")
 
-    monkeypatch.setattr(astrology_core.swe, "revjul", _boom)
+    monkeypatch.setattr(astrology_core.swe, "deltat_ex", _boom)
 
     result = _planetary_hours(
         julian_day, info.longitude, info.latitude, "Asia/Shanghai"

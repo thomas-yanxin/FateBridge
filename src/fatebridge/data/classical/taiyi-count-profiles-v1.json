@@ -1,0 +1,191 @@
+{
+  "id": "taiyi_count_literal_profiles_v1",
+  "profiles": [
+    {
+      "id": "siku_wang_vol2",
+      "title": "四库本卷二王注",
+      "source": "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷02",
+      "evidence_level": "primary_transcription",
+      "harmony_tiers": {
+        "上和": [
+          14,
+          18,
+          33
+        ],
+        "次和": [
+          23,
+          29,
+          32
+        ],
+        "下和": [
+          12,
+          16,
+          27,
+          34,
+          38
+        ]
+      },
+      "three_talents_explicit_list": null,
+      "source_reading": "十四十八三十三為上和二十三二十九三十二為次和十二十六二十七三十四三十八為下和"
+    },
+    {
+      "id": "ncl_vol2",
+      "title": "NCL-06604明钞卷二图39",
+      "source": "https://commons.wikimedia.org/wiki/File:NCL-06604_太乙金鏡式經.pdf",
+      "evidence_level": "facsimile_manually_verified",
+      "harmony_tiers": {
+        "上和": [
+          14,
+          18
+        ],
+        "次和": [
+          23,
+          29,
+          32
+        ],
+        "下和": [
+          12,
+          16,
+          27,
+          34,
+          38
+        ]
+      },
+      "three_talents_explicit_list": null,
+      "source_reading": "十四十八為上和二十三二十九三十二為次和十二十六二十七三十四三十八為下和"
+    },
+    {
+      "id": "taojin_verse",
+      "title": "淘金歌韵文",
+      "source": "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第687卷",
+      "evidence_level": "facsimile_manually_verified",
+      "harmony_tiers": {
+        "上和": [
+          14,
+          18
+        ],
+        "次和": [
+          23,
+          29
+        ],
+        "下和": [
+          12,
+          16,
+          27,
+          34,
+          38
+        ]
+      },
+      "three_talents_explicit_list": null,
+      "source_reading": "十四十八為上和二十三逢禎祥見經中更有說次和二十九并三六二",
+      "unadjudicated_readings": [
+        {
+          "reading": "三六二",
+          "scope": "缩写原样保留，不将未裁定的32/36成员补进韵文明列值。"
+        }
+      ]
+    },
+    {
+      "id": "taojin_prose",
+      "title": "淘金歌注文",
+      "source": "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第687卷",
+      "evidence_level": "facsimile_manually_verified",
+      "harmony_tiers": {
+        "上和": [
+          14,
+          18,
+          23
+        ],
+        "次和": [
+          29,
+          32,
+          36
+        ],
+        "下和": [
+          12,
+          16,
+          27,
+          34,
+          38
+        ]
+      },
+      "three_talents_explicit_list": [
+        16,
+        26,
+        36,
+        17,
+        27,
+        18,
+        28,
+        38,
+        19,
+        29,
+        39
+      ],
+      "source_reading": "十四十八二十三為上和二十九三十二三十六為次和十二十六二十七三十四三十八為下和",
+      "duse_explicit_list": [
+        5,
+        15,
+        25,
+        35
+      ]
+    },
+    {
+      "id": "mishu_transcription",
+      "title": "太乙秘书公开转录（底本待覆核）",
+      "source": "https://zh.wikisource.org/wiki/太乙秘書",
+      "evidence_level": "transcription_only_facsimile_not_adjudicated",
+      "harmony_tiers": {
+        "上和": [
+          14,
+          18
+        ],
+        "次和": [
+          23,
+          29,
+          32,
+          36
+        ],
+        "下和": [
+          12,
+          16,
+          21,
+          27,
+          34,
+          38
+        ]
+      },
+      "three_talents_explicit_list": [
+        16,
+        26,
+        36,
+        17,
+        27,
+        37,
+        18,
+        28,
+        38
+      ],
+      "source_reading": "十四十八為上和二十三二十九三十二三十六為次和十二十六二十一二十七三十四三十八為下和",
+      "out_of_range_readings": [
+        {
+          "reading": "四十四四十八為陽中重陰",
+          "values": [
+            44,
+            48
+          ],
+          "status": "outside_supported_1_to_40_not_corrected"
+        }
+      ],
+      "duse_explicit_list": [
+        5,
+        15,
+        25,
+        35
+      ]
+    }
+  ],
+  "membership_absence_is_negative": false,
+  "single_unified_harmony_judgment_adjudicated": false,
+  "three_talents_list_omissions_are_not_denials": true
+}

@@ -1,0 +1,53 @@
+{
+  "schema": "gujin318_midnight_recomputed_v1",
+  "profile_id": "gujin318_midnight_recomputed_v1",
+  "author": "邢云路",
+  "source_url": "https://commons.wikimedia.org/w/index.php?curid=71219540",
+  "edition": "文渊阁四库全书787册，卷39法文与卷43授时318算例分版比较",
+  "source_daily_data_sha256": "a6f05cda796da34b69eb3e6b37bf8d035bb4e6644fddca5726b489ccbc3a94c8",
+  "generator_parameter_sha256": "835e4a8e3ddff56cb1781e5dde584787c15ee1a57fe6cd3cae404e8b5f13ebae",
+  "source_event_operands_retained_from_existing_profile": true,
+  "gujin39_literal_selector_rates": {
+    "winter": "1.051085",
+    "summer": "0.951516",
+    "spring": {
+      "93": "0.999703",
+      "94": "1"
+    },
+    "autumn": {
+      "88": "1.000505",
+      "89": "1"
+    },
+    "next_winter": "1.051085"
+  },
+  "gujin43_explicit_generator_indices": [
+    {
+      "origin": "winter",
+      "index": 0
+    },
+    {
+      "origin": "summer",
+      "index": 93
+    },
+    {
+      "origin": "summer",
+      "index": 0
+    },
+    {
+      "origin": "winter",
+      "index": 88
+    },
+    {
+      "origin": "winter",
+      "index": 0
+    }
+  ],
+  "gujin43_spring_rate_source_lexeme": "初度九九九十〇三",
+  "gujin43_spring_legacy_numeric_normalization": "0.999103",
+  "gujin43_spring_lexeme_numeric_adjudication_complete": false,
+  "generated_index_choice_uses_Gujin43_named_indices_not_Gujin39_one_du_rule": true,
+  "single_unblinded_collator": true,
+  "independent_expert": false,
+  "modern_accuracy_used_to_choose_policy": false,
+  "native_birth_chart_integration": false
+}

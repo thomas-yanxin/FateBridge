@@ -1,0 +1,30 @@
+{
+  "method_id": "qiongtong_bing_literal_input_witness_v1",
+  "source_id": "qiongtong_xu_qianqian_bing_v1",
+  "source_sha256": "b7f17fc7fcb7d8faa991efa74d0db391c5066a3793b3fc6787d2612bc6b350a8",
+  "scope": "原書命式字樣與現行月時干公式分層；不據公式改抄原書，不補造生日，不排除疑例。",
+  "notes": [
+    {
+      "example_id": "QT-BING-06",
+      "month_branch": "卯",
+      "pdf_pages": [
+        82
+      ],
+      "printed_volume": 2,
+      "printed_page": 11,
+      "literal_pillars": [
+        "乙亥",
+        "丁卯",
+        "丙申",
+        "己亥"
+      ],
+      "status": "printed_month_stem_conflicts_with_current_calendar_formula",
+      "observed_printed_month_stem": "丁",
+      "current_formula_month_stem": "己",
+      "basis": "按現行乙年卯月的月干公式應為己；本印本放大書影字樣仍為丁卯。",
+      "interpretation_limit": "保留丁卯原字待校；沒有同等版本證據就不改成己卯，不能據此聲稱已恢復歷史出生瞬間。",
+      "calculation_effect": "none",
+      "independent_expert_review": "not_completed"
+    }
+  ]
+}

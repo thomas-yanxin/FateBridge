@@ -84,8 +84,13 @@ def test_build_structure_profile_detects_yang_ren_jia_sha():
         special_patterns=BaZiRules.analyze_special_patterns(pillars),
     )
 
-    assert structure_profile["dominant_structure"]["label"] == "羊刃驾杀"
-    assert "七杀" in structure_profile["useful_ten_gods"]
+    assert structure_profile["dominant_structure"]["label"] == "月刃格"
+    assert (
+        structure_profile["dominant_structure"]["formation_status"] == "not_adjudicated"
+    )
+    assert structure_profile["dominant_structure"]["useful_ten_gods"] == []
+    assert structure_profile["legacy_dominant_structure"]["label"] == "羊刃驾杀"
+    assert "七杀" in structure_profile["legacy_dominant_structure"]["useful_ten_gods"]
     assert any(
         item["label"] == "羊刃驾杀"
         for item in structure_profile["recognized_structures"]
@@ -271,10 +276,11 @@ def test_favorable_synergy_bidirectional_label_uses_actual_support_directions(
         ]
 
 
-def test_favorable_synergy_label_preserves_scores_events_and_three_surface_parity():
+def test_current_favorable_synergy_uses_versioned_scores_and_three_surface_parity():
     from fastapi.testclient import TestClient
 
     import fatebridge.api as api
+    from tests.compatibility_reference import assert_score_reference
     from tests.fixtures.surface_payloads import REST_POST_CASES
     from tests.test_agentic_replay import business, cli, native
 
@@ -296,33 +302,32 @@ def test_favorable_synergy_label_preserves_scores_events_and_three_surface_parit
     assert response.status_code == 200 and not protocol.is_error and code == 0
     expected = business(response.json())
     assert expected == business(protocol.structured_content) == business(output)
-    assert expected["summary"]["overall_score"] == 69.6
-    assert expected["summary"]["scoring"]["unrounded_score"] == 69.61
-    dimensions = expected["summary"]["scoring"]["dimensions"]
-    assert {key: item["score"] for key, item in dimensions.items()} == {
-        "element_balance": 73.0,
-        "favorable_synergy": 77.0,
-        "ten_gods_relationship": 94.0,
-        "pattern_synergy": 36.0,
-        "traditional_analysis": 39.0,
-    }
-    assert {key: item["weight"] for key, item in dimensions.items()} == {
-        "element_balance": 0.25,
-        "favorable_synergy": 0.35,
-        "ten_gods_relationship": 0.17,
-        "pattern_synergy": 0.18,
-        "traditional_analysis": 0.05,
-    }
+    assert_score_reference(
+        expected["summary"], expected["detailed_analysis"], "marriage"
+    )
+    assert expected["summary"]["scoring"]["unrounded_score"] == 76.83
     synergy = expected["detailed_analysis"]["favorable_synergy"]
-    assert synergy["synergy_level"] == "协同较好"
+    assert synergy["synergy_level"] == "强力互助"
     assert synergy["score_basis"] == [
+        "第二人木较旺，对第一人有稳定补益(+7)",
+        "第二人水占比高，能明显补到第一人的可用之气(+10)",
+        "第二人火具备一定承接力，对第一人略有帮助(+4)",
         "第一人土较旺，对第二人有稳定补益(+7)",
         "第一人金占比高，能明显补到第二人的可用之气(+10)",
+        "共同喜用五行：水，目标更容易同频(+4)",
+        "第一人的可用五行火落在第二人的回避区间(-8)",
+        "第二人的可用五行金落在第一人的回避区间(-8)",
     ]
-    assert [item["element"] for item in synergy["supportive_patterns"]] == ["土", "金"]
+    assert [item["element"] for item in synergy["supportive_patterns"]] == [
+        "木",
+        "水",
+        "火",
+        "土",
+        "金",
+    ]
     assert {
         (item["source"], item["target"]) for item in synergy["supportive_patterns"]
-    } == {("第一人", "第二人")}
+    } == {("第一人", "第二人"), ("第二人", "第一人")}
 
 
 def test_tian_ke_di_chong_is_reported_as_tension_pattern():

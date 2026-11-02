@@ -1,0 +1,95 @@
+{
+  "id": "meihua_postheaven_timing_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "端法成卦总数与占者行坐立的名义比例",
+  "source": {
+    "id": "nlc_1925",
+    "title": "文明書局《梅花易數》卷一端法占例、卷二先天後天論",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_indices": [
+      26,
+      27,
+      56
+    ],
+    "paper_pages": [
+      "卷一一五",
+      "卷一一六",
+      "卷二三"
+    ],
+    "reader": "assistant selected-span visual reading; punctuation added; no independent human expert authentication",
+    "authorship_certified": false
+  },
+  "comparison_sources": {
+    "volume1": {
+      "revision": 2690596,
+      "raw_wikitext_sha256": "f5245837e94bf82420e619fa61644cac1a1242cc59e1c5da5f776dcfd985ac99"
+    },
+    "volume2": {
+      "revision": 1441921,
+      "raw_wikitext_sha256": "239523c6bb8b59d7ed3fe229c681cd1a1124a5216617e198f05dbf19cc6d2939"
+    }
+  },
+  "accepted_casting_methods": [
+    "observed_trigrams",
+    "observed_categories"
+  ],
+  "method_scope": "explicit source-object/direction trigrams before their pre-heaven numbers; no inference from the resulting hexagram or question",
+  "total_rule": {
+    "quote": "又以乾一巽五之數加卯時四數總十數",
+    "general_quote": "後天則以卦數加時數總之而分行臥坐立之遲速以為事應之期",
+    "operation": "original upper pre-heaven number + original lower pre-heaven number + original hour branch number once; before modulo 6",
+    "modulo_six_remainder_is_duration": false
+  },
+  "scales": [
+    {
+      "activity": "walking",
+      "numerator": 1,
+      "denominator": 2,
+      "quote": "行則應速以逐成卦之數中分而取其半也",
+      "comparison_quote": "行則應速，以逐成卦之數，中分而取其半也"
+    },
+    {
+      "activity": "seated",
+      "numerator": 2,
+      "denominator": 1,
+      "quote": "坐則事應於遲當倍其成卦之數而定之也",
+      "comparison_quote": "坐則事應遲，當倍其成卦之數而定之也"
+    },
+    {
+      "activity": "standing",
+      "numerator": 1,
+      "denominator": 1,
+      "quote": "立則半遲半速止以成卦之數定之可也",
+      "comparison_quote": "立則半遲半速，止以成卦之數定之可也"
+    }
+  ],
+  "exception": {
+    "quote": "雖然如是又在變通如占牡丹及觀梅之類則二花皆朝夕之故豈待成數之久也",
+    "comparison_quote": "雖然如是，又在變通，如占牡丹及觀梅之類，則二日花皆朝夕之故，豈特成數之久也",
+    "variants": [
+      {
+        "selected": "二花",
+        "comparison": "二日花",
+        "not_a_two_day_duration": true
+      },
+      {
+        "selected": "待",
+        "comparison": "特"
+      }
+    ],
+    "policy": "retain literal exception; never parse 二日花 as an independently established two-day target window; flowers are not a generic timing override"
+  },
+  "unresolved": [
+    "universal time unit",
+    "fractional day or hour interpretation",
+    "numeric rounding",
+    "start instant and inclusive day counting",
+    "how contextual exception overrides nominal count",
+    "full pre-heaven 卦氣 method and mixed far-event method",
+    "lying/running numeric multiplier"
+  ],
+  "nominal_count_is_actual_duration": false,
+  "full_original_conformance": false,
+  "prediction_validated": false
+}

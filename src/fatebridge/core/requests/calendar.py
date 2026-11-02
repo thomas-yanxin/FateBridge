@@ -50,7 +50,7 @@ class NongliTimeRequest(_DeferredModel):
     )
     ad: int = Field(
         default=1,
-        description="Common era flag; offline nongli conversion supports ad=1 only within 1900-01-31 to 2100-02-08",
+        description="Common era flag; offline nongli conversion supports ad=1 only within 1900-01-01 to 2100-12-31",
     )
     selected_sections: List[str] = Field(
         default_factory=list,

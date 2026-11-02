@@ -1,0 +1,117 @@
+{
+  "id": "kyoto_rb00028238_quoted766_edict_v2",
+  "before_production_source_facts_sha256": "c0c6f02d1b1d0803efbe969a060f37bfff3be0eeac9dcda0670e9e1620c92df9",
+  "witness": {
+    "work": "類聚三代格",
+    "catalog_url": "https://rmda.kulib.kyoto-u.ac.jp/item/rb00028238",
+    "manifest_url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/metadata_manifest/RB00028238/manifest.json",
+    "record_id": "RB00028238",
+    "call_number": "菊||ル||1",
+    "catalog_form": "写・六巻(一、三、五、七、八、十二)・菊亭文庫",
+    "catalog_volume": "巻第08",
+    "physical_copy_year_established": false,
+    "selected_pages": [
+      {
+        "frame": 320,
+        "canvas_id": "https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00028238/canvas/p320",
+        "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00028238%2F08%2FRB00028238_00320_0.ptif/full/max/0/default.jpg",
+        "actual_url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00028238%2F08%2FRB00028238_00320_0.ptif/full/max/0/default.jpg",
+        "bytes": 2561316,
+        "sha256": "e3e7ac0ca28b0405ce49196e040cc2fc4ac6581c179acbf8339fe15ebecace07"
+      },
+      {
+        "frame": 321,
+        "canvas_id": "https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00028238/canvas/p321",
+        "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00028238%2F08%2FRB00028238_00321_0.ptif/full/max/0/default.jpg",
+        "actual_url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00028238%2F08%2FRB00028238_00321_0.ptif/full/max/0/default.jpg",
+        "bytes": 2545004,
+        "sha256": "4d2c2a4474b3f03f041907e4bf4c370281ac8642ff4f9797066a3086fab29468"
+      }
+    ],
+    "actual_catalog_sha256": "b4aba7de91191e5d410464c5e3f2bc520be906b63fa31ab83702db384dfe4b4e",
+    "actual_manifest_sha256": "870754c63d4d8acc8279f32f763eeb82a9d2ba202798f4a3d36a1f77bb533f79"
+  },
+  "transmitted_record": {
+    "reported_document_date_literal": "弘仁十三年三月廿八日",
+    "reported_document_date": {
+      "year": 822,
+      "month": 3,
+      "day": 28
+    },
+    "record_title_literal": "應運進一十萬斛",
+    "quoted_earlier_date_literal": "天平神護二年二月廿日勅書",
+    "quoted_earlier_date": {
+      "year": 766,
+      "month": 2,
+      "day": 20
+    },
+    "quoted_earlier_text_literal": "夫蓄貯者爲國之本、宜運近江國近郡五萬斛貯納於松原倉",
+    "quoted_earlier_day_ganzhi_literal": null,
+    "document_day_ganzhi_literal": null,
+    "quoted_earlier_quantity": {
+      "amount": 50000,
+      "unit_literal": "斛",
+      "context": "quoted earlier edict"
+    },
+    "document_total_quantity": {
+      "amount": 115000,
+      "unit_literal": "斛"
+    },
+    "document_transport_quantity": {
+      "amount": 100000,
+      "unit_literal": "斛"
+    },
+    "document_transport_fee_quantity": {
+      "amount": 15000,
+      "unit_literal": "斛"
+    },
+    "same_document_spans_frames": [
+      320,
+      321
+    ],
+    "quote_leap_marker_present": false,
+    "independently_adjudicated_leap_status": false,
+    "record_boundary": {
+      "target_starts_on_frame320_left": true,
+      "target_ends_on_frame321_right_before_next_heading": true,
+      "next_record_begins_on_frame321_right": true,
+      "frame322_is_not_target_record": true
+    }
+  },
+  "scope": {
+    "later_work_quotation_of_earlier_edict": true,
+    "different_work_from_shoku": true,
+    "genealogical_independence_from_shoku_established": false,
+    "extant_original_822_document_certified": false,
+    "original_766_edict_physically_acquired": false,
+    "kyoto_target_selected_images_acquired": true,
+    "ndl1900_target_image_acquired": false,
+    "author_citation_page352_edition_identified": false,
+    "waseda_kaosho_volume9_acquired": false,
+    "same_as_1897_unidentified_一本_established": false,
+    "selects_shoku_甲午_or_丙午": false,
+    "unique_historical_month_start_established": false,
+    "new_independent_historical_observation_count": 0,
+    "real_samples": 0
+  },
+  "reading_policy": "Root model selected image reading; modern punctuation and conventional character representation, not a diplomatic every-glyph human transcription. Reported dates, quoted date and absent ganzhi fields are separate.",
+  "binding_months": [
+    {
+      "month_key": [
+        766,
+        2,
+        false
+      ],
+      "role": "quoted_earlier_edict_month"
+    },
+    {
+      "month_key": [
+        822,
+        3,
+        false
+      ],
+      "role": "transmitted_document_month"
+    }
+  ],
+  "source_fact_correction_sha256": "c2ae313577ab507f863485e57e0f2d52d62fe70d897ad92a8abb2d471473c432"
+}

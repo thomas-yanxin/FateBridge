@@ -1,0 +1,91 @@
+{
+  "id": "meihua_volume5_four_state_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局卷五五行四时旺相休囚例原表对照",
+  "source": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "zero_based_pdf_indices": [
+      202,
+      203
+    ],
+    "printed_volume_pages": [
+      "卷五十五",
+      "卷五十六"
+    ],
+    "scope": "Assistant visual transcription of 20 printed cells and five headers; no independent human expert authentication"
+  },
+  "section": "五行四時旺相休囚例",
+  "chapter_context": "Volume five character-analysis collection; preceding character stroke clauses and following 五行相生地支 retained as context",
+  "columns": [
+    "春",
+    "夏",
+    "秋",
+    "冬",
+    "四季之月"
+  ],
+  "rows": {
+    "旺": [
+      "木",
+      "火",
+      "金",
+      "水",
+      "土"
+    ],
+    "相": [
+      "火",
+      "土",
+      "水",
+      "木",
+      "金"
+    ],
+    "休": [
+      "水",
+      "木",
+      "土",
+      "金",
+      "火"
+    ],
+    "囚": [
+      "土",
+      "金",
+      "木",
+      "火",
+      "水"
+    ]
+  },
+  "unlisted_elements_by_column": {
+    "春": "金",
+    "夏": "水",
+    "秋": "火",
+    "冬": "土",
+    "四季之月": "木"
+  },
+  "declared_month_branch_columns": {
+    "子": "冬",
+    "丑": "四季之月",
+    "寅": "春",
+    "卯": "春",
+    "辰": "四季之月",
+    "巳": "夏",
+    "午": "夏",
+    "未": "四季之月",
+    "申": "秋",
+    "酉": "秋",
+    "戌": "四季之月",
+    "亥": "冬"
+  },
+  "month_mapping_kind": "same_declared_solar_month_policy_as_existing_primary_reading_not_a_new_classical_time_boundary",
+  "source_decisions": [
+    "Retain exactly four rows 旺相休囚; do not insert a missing 死 row or replace 囚 cells with a conventional five-state table",
+    "Keep five unlisted element-column cells null, not weak, neutral or presumed dead",
+    "Only a declared month is compared; this table supplies no year/day aggregation or unique year-qi algorithm",
+    "Existing volume-one 旺衰 labels and volume-two/three qualification rules remain their own selected source definitions",
+    "The appendix context is not automatically made the governing human-affairs body/use doctrine; provide attributed comparison, not a net verdict",
+    "No changes to weather interpretation, frozen prediction policies, eligibility, denominators or real outcomes"
+  ],
+  "complete_five_state_table": false,
+  "governing_body_use_method_adjudicated": false,
+  "complete_year_month_day_synthesis": false,
+  "predictive_efficacy_established": false
+}

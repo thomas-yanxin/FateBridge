@@ -231,6 +231,20 @@ def _export_content() -> str:
 
 
 REST_POST_CASES = {
+    "/api/cn/bazi/source-compare": lambda: {
+        "year_pillar": "甲子",
+        "month_pillar": "丙寅",
+        "day_pillar": "甲子",
+        "hour_pillar": "甲子",
+    },
+    "/api/astro/human-design": lambda: {
+        "birth_year": 1990,
+        "birth_month": 4,
+        "birth_day": 6,
+        "birth_hour": 9,
+        "birth_minute": 33,
+        "birth_timezone": "Asia/Shanghai",
+    },
     "/api/cn/bazi/birth": lambda: _birth_payload(),
     "/api/cn/bazi/marriage": lambda: {
         **_birth_payload(),
@@ -350,6 +364,15 @@ REST_POST_CASES = {
         "analysis_timezone": "Asia/Shanghai",
         "question": "事业推进节奏",
     },
+    "/api/divination/meihua/cast": lambda: {
+        "casting": {
+            "method": "sound_groups",
+            "first_count": 1,
+            "second_count": 5,
+            "hour_branch": "酉",
+        },
+        "question": "虚构声音起卦验收",
+    },
     "/api/divination/tongshefa": lambda: {
         "taiyin": "巽",
         "taiyang": "坤",
@@ -396,8 +419,8 @@ REST_POST_CASES = {
     },
     "/api/divination/sanshiunited": lambda: {
         **_local_base(),
-        "qimen_options": {"layout": "fly"},
-        "taiyi_options": {"accNum": 1},
+        "qimen_options": {"layout": "direct"},
+        "taiyi_options": {"accNum": 0},
         "liureng_yue": "申",
         "liureng_is_diurnal": False,
     },
@@ -464,6 +487,12 @@ REST_POST_CASES = {
     "/api/astro/hellen": lambda: astro_payload(),
     "/api/astro/guolao": lambda: astro_payload(),
     "/api/astro/india": lambda: astro_payload(),
+    "/api/astro/vimshottari": lambda: {
+        **astro_payload(),
+        "analysis_year": 2026,
+        "analysis_month": 10,
+        "analysis_day": 22,
+    },
     "/api/astro/germany": lambda: astro_payload(),
     "/api/astro/relative": _relative_payload,
     "/api/astro/timing": western_payload,
@@ -538,6 +567,15 @@ REST_GET_CASES = {
 }
 
 MCP_CASES = {
+    "bazi_source_compare": (
+        "bazi_source_compare",
+        lambda: {
+            "year_pillar": "甲子",
+            "month_pillar": "丙寅",
+            "day_pillar": "甲子",
+            "hour_pillar": "甲子",
+        },
+    ),
     "analyze_destiny": ("analyze_destiny", _birth_payload),
     "bazi_birth": ("bazi_birth", _birth_payload),
     "bazi_marriage": (
@@ -616,6 +654,26 @@ MCP_CASES = {
     "astro_hellen_chart": ("astro_hellen_chart", astro_payload),
     "astro_guolao_chart": ("astro_guolao_chart", astro_payload),
     "astro_india_chart": ("astro_india_chart", astro_payload),
+    "astro_vimshottari": (
+        "astro_vimshottari",
+        lambda: {
+            **astro_payload(),
+            "analysis_year": 2026,
+            "analysis_month": 10,
+            "analysis_day": 22,
+        },
+    ),
+    "human_design": (
+        "human_design",
+        lambda: {
+            "birth_year": 1990,
+            "birth_month": 4,
+            "birth_day": 6,
+            "birth_hour": 9,
+            "birth_minute": 33,
+            "birth_timezone": "Asia/Shanghai",
+        },
+    ),
     "astro_germany_chart": ("astro_germany_chart", astro_payload),
     "export_registry": ("export_registry", lambda: {"technique": "qimen"}),
     "export_parse": (
@@ -672,6 +730,17 @@ MCP_CASES = {
             "query": "111111",
             "lookup_mode": "hexagram",
             "selected_sections": ["查询信息", "义理摘要"],
+        },
+    ),
+    "meihua_cast": (
+        "meihua_cast",
+        lambda: {
+            "casting": {
+                "method": "sound_groups",
+                "first_count": 1,
+                "second_count": 5,
+                "hour_branch": "酉",
+            }
         },
     ),
     "meihua_analysis": (
@@ -734,8 +803,8 @@ MCP_CASES = {
         "otherbu",
         lambda: {
             **_local_base(),
-            "gps_lat": 31.2,
-            "gps_lon": 121.4,
+            "gps_lat": 31 + 13 / 60,
+            "gps_lon": 121 + 28 / 60,
             "sign": "Aries",
             "house": 6,
             "planet": "Sun",
@@ -748,8 +817,8 @@ MCP_CASES = {
             **_local_base(),
             "gps_lat": 31.2,
             "gps_lon": 121.4,
-            "qimen_options": {"layout": "fly"},
-            "taiyi_options": {"accNum": 1},
+            "qimen_options": {"layout": "direct"},
+            "taiyi_options": {"accNum": 0},
             "liureng_yue": "申",
             "liureng_is_diurnal": False,
         },

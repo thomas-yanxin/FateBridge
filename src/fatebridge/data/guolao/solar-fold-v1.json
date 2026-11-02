@@ -1,0 +1,15 @@
+{
+  "schema": "named_source_solar_fold_v1",
+  "source_half_year_days": "182.62125",
+  "source_sui_quadrant_du": "91.310625",
+  "source_half_circle_du": "182.62875",
+  "source_celestial_quadrant_du": "91.314375",
+  "source_night_table_data_sha256": "6ded40b721454db8b7bc0e19ec9382139506dfcffa26df48096134ff0463f548",
+  "Qizheng_official_text_url": "https://sillok.history.go.kr/id/wda_50023002",
+  "Qizheng_constants_url": "https://sillok.history.go.kr/id/wda_500130",
+  "Gujin_source_url": "https://commons.wikimedia.org/w/index.php?curid=71219540",
+  "source_half_year_numeric_reduction_is_physical_day_degree_equivalence": false,
+  "Qizheng_full_night_table_transcribed": false,
+  "Gujin_unqualified_quadrant_adjudicated": false,
+  "native_birth_chart_integration": false
+}

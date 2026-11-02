@@ -1,0 +1,113 @@
+{
+  "ruleset": {
+    "ruleset_id": "wang_zhongzhou_timeliness_v1",
+    "version": "1.1.0",
+    "method": "author_period_phase_reference",
+    "title": "王亭之上卷九星基本時令與互用數字參考",
+    "source_ids": [
+      "WZT1"
+    ],
+    "scope": "明確評價運與實際山向星的基本旺生衰死；先後天互用僅數字列示，不生成形勢、用途或綜合吉凶；新增先后天有向图位的互用数字推导，五运仍仅列原数表",
+    "conventions": [
+      "顯式選擇本作者版本；基本表與先後天互用分開，互用不改基本時令標籤",
+      "旺為當運；生為循環未來一二運；衰為循環過去一二運；死為其餘四星，死是時令術語而非人的生死",
+      "作者明言基本表只是大原則，並列先後天互用數字；不得把衰死或非當令推定為一律不可用",
+      "評價時運獨立於歷史宅運、固定宮數與年星；不推斷未提供的當前運數",
+      "只計互用數字成員，不判現場取用已成立，不把生氣或互用星自動納入當令山水存在條件",
+      "同頁七運正文只列7、8可用，與基本表七運9為生存在未解差異；本版只實作表格，不據正文推導可用與否，也不推定筆誤",
+      "两条先后天图位对应保持方向和次序；原数表顺序独立保留。五运无独立第五卦，本版不补造寄宫或图位推导。"
+    ]
+  },
+  "source": {
+    "source_id": "WZT1",
+    "title": "中州派玄空學（上卷）",
+    "author": "王亭之",
+    "kind": "author_book_facsimile",
+    "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4/%E4%B8%AD%E5%B7%9E%E6%B4%BE%E7%8E%84%E7%A9%BA%E5%AD%A6_%E4%B8%8A%E5%86%8C_%E7%8E%8B%E4%BA%AD%E4%B9%8B.pdf",
+    "source_version": "藝微文化服務社有限公司掃描本；版次年未核實，以文件雜湊固定",
+    "retrieved_at": "2026-10-22",
+    "retrieved_sha256": "8fed6915f2deeaa60eaddcc2376abe0867b358f59d1d64f29f02580a4b98c7c5",
+    "locator": "第十六節 九星生旺衰死，印刷第16–17頁／PDF第18–19頁；作者署名PDF第2頁",
+    "scope": "只採基本九運生旺衰死及同頁先後天互用數表；不採疾病、壽命或現實成敗斷言；同页两张八卦图及七运互用例，仅解释图位来源，不认证现场应用",
+    "source_disagreements": [
+      {
+        "source_disagreement_id": "WZT1-P17-SEVEN",
+        "locator": "印刷第17頁／PDF第19頁，基本表與緊鄰正文",
+        "table": {
+          "period": 7,
+          "prosperous": [
+            7
+          ],
+          "growing": [
+            8,
+            9
+          ]
+        },
+        "adjacent_prose_usable_numbers": [
+          7,
+          8
+        ],
+        "resolution": "unresolved_not_assumed_typo",
+        "implementation_scope": "literal_basic_table_only_no_usable_or_unusable_verdict"
+      }
+    ]
+  },
+  "phase_labels": {
+    "unknown": null,
+    "prosperous": "旺",
+    "growing": "生",
+    "declining": "衰",
+    "dormant": "死"
+  },
+  "mutual_use_numbers": {
+    "1": [
+      1,
+      2,
+      7
+    ],
+    "2": [
+      2,
+      1,
+      4
+    ],
+    "3": [
+      3,
+      8,
+      9
+    ],
+    "4": [
+      4,
+      2,
+      7
+    ],
+    "5": [
+      5,
+      2,
+      8
+    ],
+    "6": [
+      6,
+      8,
+      9
+    ],
+    "7": [
+      7,
+      1,
+      4
+    ],
+    "8": [
+      8,
+      3,
+      6
+    ],
+    "9": [
+      9,
+      3,
+      6
+    ]
+  },
+  "limitations": [
+    "旺生衰死只描述所選作者基本時令，不能單獨推出房屋吉凶、現實事件或動作許可。",
+    "互用數表保留作者的大原則例外，數字符合不證明卦位、形勢和用途條件成立。"
+  ]
+}

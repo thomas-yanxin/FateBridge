@@ -1,0 +1,59 @@
+{
+  "method_id": "human_design_2008_identification_diagram_observations_v1",
+  "attributed_author": "Ra Uru Hu",
+  "attributed_publisher": "Jovian Archive Corporation / IHDS",
+  "title": "Incarnation Crosses by Profile",
+  "copyright_year": 2008,
+  "transcriber": "Patricia Balentine",
+  "proof_notice": "This transcription has not been proofed.",
+  "source_host_authentication": "public_CDN_copy_not_authenticated_publisher_master",
+  "observations": [
+    {
+      "id": "quarter-2-identification",
+      "quarter": 2,
+      "pdf_page_one_based": 105,
+      "printed_page": 95,
+      "angle": "left",
+      "gate_order": "personality_sun_earth_design_sun_earth",
+      "gates": [
+        16,
+        9,
+        63,
+        64
+      ],
+      "display_identifier": "Identification 1",
+      "section_profile": "5/1",
+      "source_url": "https://s3.amazonaws.com/kajabi-storefronts-production/file-uploads/sites/71623/themes/2152708825/downloads/70163f-880f-aa8c-b68-620a7ce376c1_Incarnation_Crosses_by_Profile-Quarter_2.pdf",
+      "pdf_sha256": "3f92beedcdd788f545a778173b4b3aaae5c324a744ab24e57f364bb9e3a16e2d",
+      "download_bytes": 5111262,
+      "transcription_proofed": false,
+      "publisher_master_authenticated": false,
+      "publisher_erratum": false,
+      "page_image_sha256": "0b5c30d5a4d926864b7b667bc19387b334519b5e3da71fb9021c3c16d740a952"
+    },
+    {
+      "id": "quarter-4-identification",
+      "quarter": 4,
+      "pdf_page_one_based": 93,
+      "printed_page": 83,
+      "angle": "left",
+      "gate_order": "personality_sun_earth_design_sun_earth",
+      "gates": [
+        9,
+        16,
+        64,
+        63
+      ],
+      "display_identifier": "Identification 2",
+      "section_profile": "5/1",
+      "source_url": "https://s3.amazonaws.com/kajabi-storefronts-production/file-uploads/sites/71623/themes/2152708825/downloads/04baf1-21e5-a374-d186-bfd72ccede3_Incarnation_Crosses_by_Profile-Quarter_4.pdf",
+      "pdf_sha256": "95a65c335c14b0325976bb3586b2944b53dbb149a00397d770088885aff1b1d2",
+      "download_bytes": 4985421,
+      "transcription_proofed": false,
+      "publisher_master_authenticated": false,
+      "publisher_erratum": false,
+      "page_image_sha256": "18ae403243ba1c7b7e4cc9d0c4223faf236e95c22e17937f5d993f536168b94e"
+    }
+  ],
+  "scope": "Two visually inspected numbered cross diagrams in an unproofed publicly reachable transcript. Facts only, no chapter or line prose reproduced. Match ordered gates and angle only; the diagram section is5/1, not a source-profile reading for another profile. Does not certify the2001edition, resolve the current16/6course listing, or constitute a publisher erratum."
+}

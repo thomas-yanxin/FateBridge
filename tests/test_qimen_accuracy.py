@@ -93,7 +93,7 @@ def test_sanshiunited_qimen_matches_dedicated_qimen_service() -> None:
     assert aggregate["qimen"]["fu_tou"] == dedicated["qimen"]["fu_tou"]
 
 
-def test_calculate_qimen_analysis_matches_horosa_local_reference_case() -> None:
+def test_calculate_qimen_analysis_keeps_day_reference_and_uses_hour_xun() -> None:
     result = calculate_qimen_analysis(
         analysis_year=2028,
         analysis_month=4,
@@ -108,7 +108,9 @@ def test_calculate_qimen_analysis_matches_horosa_local_reference_case() -> None:
     assert result["qimen"]["yuan"] == "下元"
     assert result["qimen"]["ju_number"] == 6
     assert result["qimen"]["fu_tou"] == "己未"
-    assert result["qimen"]["xun_head"] == "甲寅"
-    assert result["qimen"]["kongwang"] == "子丑空"
+    assert result["qimen"]["day_xun_head"] == "甲寅"
+    assert result["qimen"]["xun_head"] == "甲申"
+    assert result["qimen"]["day_kongwang"] == "子丑空"
+    assert result["qimen"]["kongwang"] == "午未空"
     assert result["qimen"]["zhifu"]["star"] == "天任"
     assert result["qimen"]["zhishi"]["door"] == "生门"

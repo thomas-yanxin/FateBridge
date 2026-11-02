@@ -1,0 +1,158 @@
+{
+  "id": "zentsuji1095_selected_pushya_dates_v1",
+  "source_reference": {
+    "title": "護摩法略抄（檜尾僧都抄）",
+    "holding_institution": "善通寺宝物館",
+    "shelfmark": "109-5",
+    "catalogue_url": "https://kokusho.nijl.ac.jp/biblio/100223664",
+    "doi": "10.20730/100223664",
+    "catalogue_author_literal": "実慧",
+    "catalogue_copy_category_literal": "写",
+    "physical_copy_date_established": false,
+    "identified_as_T2465_or_its_base_or_ko_witness": false,
+    "catalogue_frame_count": 46,
+    "manifest_canvas_count": 47,
+    "manifest_url": "https://kokusho.nijl.ac.jp/biblio/100223664/manifest",
+    "manifest_sha256": "3fde4de889e40b2ab265e3700d372ec6c4f593de4ed5f57ca0f54dbf619b20d4",
+    "attribution": "善通寺宝物館 国文学研究資料館",
+    "independent_human_transcription_accepted": false,
+    "whole_work_collation_complete": false,
+    "source_independent_historical_observation": false,
+    "image_reuse": "Raw institutional images retained only as private research captures; no full image republication in package.",
+    "images": [
+      {
+        "canvas_index_one_based": 28,
+        "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100223664/canvas/28",
+        "url": "https://kokusho.nijl.ac.jp/api/iiif/100223664/v4/XSE1/XSE1-25904/XSE1-25904-0027.tif/full/full/0/default.jpg",
+        "sha256": "549e9f892a73dc0a41ab9c3e5c49db13c7fda0c7c2005b6708e694e24e847f56",
+        "bytes": 1594630,
+        "width": 6153,
+        "height": 4677
+      },
+      {
+        "canvas_index_one_based": 29,
+        "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100223664/canvas/29",
+        "url": "https://kokusho.nijl.ac.jp/api/iiif/100223664/v4/XSE1/XSE1-25904/XSE1-25904-0028.tif/full/full/0/default.jpg",
+        "sha256": "a62fe34e3880ef8416d7afbacf8cdfe6bab335edbde85d0e30579872111429c7",
+        "bytes": 1542013,
+        "width": 6153,
+        "height": 4677
+      }
+    ],
+    "transcription_method": "Root fresh visual reading of selected date columns in retained full-resolution images and exact crops; no generative completion, not blind to previously known T2216 dates or host calculations."
+  },
+  "monthly_day_observations": [
+    {
+      "month": 1,
+      "day": 11,
+      "literal": "正月十一日",
+      "location": "NIJL100223664 canvas29 right page, body26"
+    },
+    {
+      "month": 2,
+      "day": 9,
+      "literal": "二月九日",
+      "location": "NIJL100223664 canvas29 right page, body26"
+    },
+    {
+      "month": 3,
+      "day": 7,
+      "literal": "三月七日",
+      "location": "NIJL100223664 canvas29 right page, body26"
+    },
+    {
+      "month": 4,
+      "day": 5,
+      "literal": "四月五日",
+      "location": "NIJL100223664 canvas29 right page, body26"
+    },
+    {
+      "month": 5,
+      "day": 3,
+      "literal": "五月三日",
+      "location": "NIJL100223664 canvas29 right page, body26"
+    },
+    {
+      "month": 6,
+      "day": 1,
+      "literal": "六月一日",
+      "location": "NIJL100223664 canvas29 right page, body26"
+    },
+    {
+      "month": 7,
+      "day": 25,
+      "literal": "七月二十五日",
+      "location": "NIJL100223664 canvas29 right page, body26"
+    },
+    {
+      "month": 8,
+      "day": 23,
+      "literal": "八月二十三日",
+      "location": "NIJL100223664 canvas29 right page, body26"
+    },
+    {
+      "month": 9,
+      "day": 20,
+      "literal": "九月二十日",
+      "location": "NIJL100223664 canvas29 right page, body26"
+    },
+    {
+      "month": 10,
+      "day": 18,
+      "literal": "十月十八日",
+      "location": "NIJL100223664 canvas29 right page, body26"
+    },
+    {
+      "month": 11,
+      "day": 15,
+      "literal": "十一月十五日",
+      "location": "NIJL100223664 canvas29 right page, body26"
+    },
+    {
+      "month": 12,
+      "day": 13,
+      "literal": "十二月十三日",
+      "location": "NIJL100223664 canvas29 right page, body26"
+    }
+  ],
+  "star_name_reference": {
+    "location": "canvas28 left final body column and canvas29 right first body column",
+    "safe_fragment": "補□星合",
+    "second_glyph_candidates": [
+      "灑",
+      "麗"
+    ],
+    "accepted_literal": null,
+    "marginal_note_selected_literal": "此字未詳",
+    "marginal_note_location": "canvas29 above first right-page body column",
+    "marginal_note_author_or_date_established": false,
+    "normalized_identity": "Pushya is a contextual comparison with the T2216 quoted passage, not an accepted unique manuscript glyph or measured lunar conjunction.",
+    "marginal_note_target_glyph_established": false
+  },
+  "introductory_word_reference": {
+    "manuscript_selected_fragment": "必得速成",
+    "location": "canvas29 right first body column",
+    "T2216_quoted_fragment": "皆得速成",
+    "variant_resolved": false
+  },
+  "T2216_comparison_context": {
+    "publisher_capture_sha256": "5c62eaa9078aef1b28e7e84e496296d327fe9ef569ff5590ead238a9888143f4",
+    "locator": "T2216_.59.0055c11-17",
+    "identified_as_exact_cited_exemplar": false,
+    "same_titled_physical_witness_available": true,
+    "independent_textual_lineage_established": false
+  },
+  "scope": {
+    "only_selected_month_day_columns_and_fragments": true,
+    "whole_work_collation_complete": false,
+    "independent_human_transcription_accepted": false,
+    "root_expected_dates_and_host_calculations_known": true,
+    "blinded_reading": false,
+    "new_independent_historical_observations": 0,
+    "birth_date_or_mansion_overridden": false,
+    "ancient_clock_mapping_established": false,
+    "hinoo_half_mapping_established": false,
+    "leap_short_month_priority_established": false,
+    "real_world_efficacy_established": false
+  }
+}

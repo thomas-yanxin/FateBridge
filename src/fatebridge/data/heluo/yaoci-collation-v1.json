@@ -1,0 +1,1223 @@
+{
+  "corpus_id": "heluo_nlc_yaoci_headers_v16",
+  "version": "16.0.0",
+  "source_title": "河洛理數 上海文明書局印行本 卷二上",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "source_pdf_sha256": "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c",
+  "scope": "156/384 headers through Daxu26;228pending. Previous150 entries exact. Daxu1己/已 remains unresolved; independent review and whole-book certification incomplete.",
+  "review_status": "single_visual_collation; independent_second_review_pending",
+  "transcription_policy": "Modern punctuation supplied. Existing recorded Unicode forms, including mixed 无/無, are retained without claiming uniform normalization; new Qian15 headers retain printed 无. Historical font forms are mapped to Unicode; lexical variants are not silently replaced by another edition. Not a diplomatic glyph transcription. Yu16 retains printed 于/恒/无 and records per-header reading status; an uncertain header is not silently certified through the corpus-wide review label. Sui17retains printed于and亨; punctuation editorial, independent second review pending. NewGu18retains printed无in two headers rather than retroactively applying another entry normalization; punctuation editorial. NewLin19preserves printed无forms; sixheaders on163/164/165, punctuation editorial. NewGuan20 retains printed闚/无/于, six completeheaders on166/167; punctuation editorial, independent review pending. Shike21 preserves selected履/腊/胏/何/无; editorialpunctuation disclosed. Independent review pending. Ben22 preserves selected于/无; headers170/171/172, editorial punctuation and independent review pending. Bo23 headers173/174/175 retain selected床/无/宮人; Bo2辨 is qualified in its entry. Editorial punctuation and Unicode forms do not establish independent certification. Patch14.0.1 withdraws own introduced Bo5无 for visibly printed無; Bo3无 remains. Firstdraft and firstcandidate preserved, no inherited-error credit. Fu24 and Wuwang25 retain selected printed无/穫/菑/畬 and 用行師 ordering. Fu1祗/祇 remains tentative in its header entry. Editorial punctuation and Unicode selection are not independent glyph certification. Daxu26 retains selected printed說/日/衞 and a qualified己/已 choice. Editorial Unicode mapping and punctuation are not independent glyph certification.",
+  "total_line_headers": 384,
+  "entries": [
+    {
+      "hexagram": "乾為天",
+      "line": 1,
+      "pdf_page": 119,
+      "yaoci": "潛龍勿用。"
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 2,
+      "pdf_page": 120,
+      "yaoci": "見龍在田，利見大人。"
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 3,
+      "pdf_page": 120,
+      "yaoci": "君子終日乾乾，夕惕若厲，無咎。"
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 4,
+      "pdf_page": 120,
+      "yaoci": "或躍在淵，無咎。"
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 5,
+      "pdf_page": 121,
+      "yaoci": "飛龍在天，利見大人。"
+    },
+    {
+      "hexagram": "乾為天",
+      "line": 6,
+      "pdf_page": 121,
+      "yaoci": "亢龍有悔。"
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 1,
+      "pdf_page": 122,
+      "yaoci": "履霜，堅冰至。"
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 2,
+      "pdf_page": 122,
+      "yaoci": "直方大，不習無不利。"
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 3,
+      "pdf_page": 122,
+      "yaoci": "含章可貞，或從王事，無成有終。"
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 4,
+      "pdf_page": 123,
+      "yaoci": "括囊，無咎，無譽。"
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 5,
+      "pdf_page": 123,
+      "yaoci": "黃裳，元吉。"
+    },
+    {
+      "hexagram": "坤為地",
+      "line": 6,
+      "pdf_page": 123,
+      "yaoci": "龍戰于野，其血玄黃。"
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 1,
+      "pdf_page": 124,
+      "yaoci": "盤桓，利居貞，利建侯。"
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 2,
+      "pdf_page": 125,
+      "yaoci": "屯如邅如，乘馬班如，匪寇婚媾，女子貞不字，十年乃字。"
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 3,
+      "pdf_page": 125,
+      "yaoci": "即鹿無虞，惟入于林中，君子幾不如舍，往吝。"
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 4,
+      "pdf_page": 125,
+      "yaoci": "乘馬班如，求婚媾，往吉，無不利。"
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 5,
+      "pdf_page": 126,
+      "yaoci": "屯其膏，小貞吉，大貞凶。"
+    },
+    {
+      "hexagram": "水雷屯",
+      "line": 6,
+      "pdf_page": 126,
+      "yaoci": "乘馬班如，泣血漣如。"
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 1,
+      "pdf_page": 126,
+      "yaoci": "發蒙，利用刑人，用脫桎梏，以往吝。"
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 2,
+      "pdf_page": 127,
+      "yaoci": "包蒙吉，納婦吉，子克家。"
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 3,
+      "pdf_page": 127,
+      "yaoci": "勿用取女，見金夫，不有躬，無攸利。"
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 4,
+      "pdf_page": 128,
+      "yaoci": "困蒙，吝。"
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 5,
+      "pdf_page": 128,
+      "yaoci": "童蒙，吉。"
+    },
+    {
+      "hexagram": "山水蒙",
+      "line": 6,
+      "pdf_page": 128,
+      "yaoci": "擊蒙，不利為寇，利禦寇。"
+    },
+    {
+      "hexagram": "水天需",
+      "line": 1,
+      "pdf_page": 129,
+      "yaoci": "需于郊，利用恆，無咎。"
+    },
+    {
+      "hexagram": "水天需",
+      "line": 2,
+      "pdf_page": 129,
+      "yaoci": "需于沙，小有言，終吉。"
+    },
+    {
+      "hexagram": "水天需",
+      "line": 3,
+      "pdf_page": 130,
+      "yaoci": "需于泥，致寇至。"
+    },
+    {
+      "hexagram": "水天需",
+      "line": 4,
+      "pdf_page": 130,
+      "yaoci": "需于血，出自穴。"
+    },
+    {
+      "hexagram": "水天需",
+      "line": 5,
+      "pdf_page": 130,
+      "yaoci": "需于酒食，貞吉。"
+    },
+    {
+      "hexagram": "水天需",
+      "line": 6,
+      "pdf_page": 131,
+      "yaoci": "入于穴，有不速之客三人來，敬之終吉。"
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 1,
+      "pdf_page": 131,
+      "yaoci": "不永所事，小有言，終吉。"
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 2,
+      "pdf_page": 132,
+      "yaoci": "不克訟，歸而逋，其邑人三百戶，無眚。"
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 3,
+      "pdf_page": 132,
+      "yaoci": "食舊德，貞厲，終吉，或從王事，無成。"
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 4,
+      "pdf_page": 132,
+      "yaoci": "不克訟，復即命渝，安貞吉。"
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 5,
+      "pdf_page": 133,
+      "yaoci": "訟，元吉。"
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 6,
+      "pdf_page": 133,
+      "yaoci": "或錫之鞶帶，終朝三褫之。"
+    },
+    {
+      "hexagram": "地水師",
+      "line": 1,
+      "pdf_page": 134,
+      "yaoci": "師出以律，否臧凶。"
+    },
+    {
+      "hexagram": "地水師",
+      "line": 2,
+      "pdf_page": 134,
+      "yaoci": "在師中吉，無咎，王三錫命。"
+    },
+    {
+      "hexagram": "地水師",
+      "line": 3,
+      "pdf_page": 135,
+      "yaoci": "師或輿尸，凶。"
+    },
+    {
+      "hexagram": "地水師",
+      "line": 4,
+      "pdf_page": 135,
+      "yaoci": "師左次，無咎。"
+    },
+    {
+      "hexagram": "地水師",
+      "line": 5,
+      "pdf_page": 135,
+      "yaoci": "田有禽，利執言，無咎，長子帥師，弟子輿尸，貞凶。"
+    },
+    {
+      "hexagram": "地水師",
+      "line": 6,
+      "pdf_page": 136,
+      "yaoci": "大君有命，開國承家，小人勿用。"
+    },
+    {
+      "hexagram": "水地比",
+      "line": 1,
+      "pdf_page": 136,
+      "yaoci": "有孚比之，無咎，有孚盈缶，終來有他吉。"
+    },
+    {
+      "hexagram": "水地比",
+      "line": 2,
+      "pdf_page": 137,
+      "yaoci": "比之自內，貞吉。"
+    },
+    {
+      "hexagram": "水地比",
+      "line": 3,
+      "pdf_page": 137,
+      "yaoci": "比之匪人。"
+    },
+    {
+      "hexagram": "水地比",
+      "line": 4,
+      "pdf_page": 137,
+      "yaoci": "外比之，貞吉。"
+    },
+    {
+      "hexagram": "水地比",
+      "line": 5,
+      "pdf_page": 138,
+      "yaoci": "顯比，王用三驅，失前禽，邑人不誡吉。"
+    },
+    {
+      "hexagram": "水地比",
+      "line": 6,
+      "pdf_page": 138,
+      "yaoci": "比之無首，凶。"
+    },
+    {
+      "hexagram": "風天小畜",
+      "line": 1,
+      "pdf_page": 139,
+      "yaoci": "復自道，何其咎，吉。"
+    },
+    {
+      "hexagram": "風天小畜",
+      "line": 2,
+      "pdf_page": 139,
+      "yaoci": "牽復，吉。"
+    },
+    {
+      "hexagram": "風天小畜",
+      "line": 3,
+      "pdf_page": 140,
+      "yaoci": "輿脫輻，夫妻反目。"
+    },
+    {
+      "hexagram": "風天小畜",
+      "line": 4,
+      "pdf_page": 140,
+      "yaoci": "有孚，血去惕出，無咎。"
+    },
+    {
+      "hexagram": "風天小畜",
+      "line": 5,
+      "pdf_page": 140,
+      "yaoci": "有孚攣如，富以其鄰。"
+    },
+    {
+      "hexagram": "風天小畜",
+      "line": 6,
+      "pdf_page": 141,
+      "yaoci": "既雨既處，尚德載，婦貞厲，月幾望，君子征凶。"
+    },
+    {
+      "hexagram": "天澤履",
+      "line": 1,
+      "pdf_page": 141,
+      "yaoci": "素履，往無咎。"
+    },
+    {
+      "hexagram": "天澤履",
+      "line": 2,
+      "pdf_page": 142,
+      "yaoci": "履道坦坦，幽人貞吉。"
+    },
+    {
+      "hexagram": "天澤履",
+      "line": 3,
+      "pdf_page": 142,
+      "yaoci": "眇能視，跛能履，履虎尾，咥人凶。武人為於大君。"
+    },
+    {
+      "hexagram": "天澤履",
+      "line": 4,
+      "pdf_page": 142,
+      "yaoci": "履虎尾，愬愬終吉。"
+    },
+    {
+      "hexagram": "天澤履",
+      "line": 5,
+      "pdf_page": 143,
+      "yaoci": "夬履，貞厲。"
+    },
+    {
+      "hexagram": "天澤履",
+      "line": 6,
+      "pdf_page": 143,
+      "yaoci": "視履考祥，其旋元吉。"
+    },
+    {
+      "hexagram": "地天泰",
+      "line": 1,
+      "pdf_page": 144,
+      "yaoci": "拔茅茹，以其彙，征吉。"
+    },
+    {
+      "hexagram": "地天泰",
+      "line": 2,
+      "pdf_page": 144,
+      "yaoci": "包荒，用馮河，不遐遺，朋亡，得尚於中行。"
+    },
+    {
+      "hexagram": "地天泰",
+      "line": 3,
+      "pdf_page": 145,
+      "yaoci": "無平不陂，無往不復，艱貞無咎，勿恤其孚，于食有福。"
+    },
+    {
+      "hexagram": "地天泰",
+      "line": 4,
+      "pdf_page": 145,
+      "yaoci": "翩翩，不富以其鄰，不戒以孚。"
+    },
+    {
+      "hexagram": "地天泰",
+      "line": 5,
+      "pdf_page": 145,
+      "yaoci": "帝乙歸妹，以祉元吉。"
+    },
+    {
+      "hexagram": "地天泰",
+      "line": 6,
+      "pdf_page": 146,
+      "yaoci": "城復於隍，勿用師，自邑告命，貞吝。"
+    },
+    {
+      "hexagram": "天地否",
+      "line": 1,
+      "pdf_page": 146,
+      "yaoci": "拔茅茹，以其彙，貞吉亨。"
+    },
+    {
+      "hexagram": "天地否",
+      "line": 2,
+      "pdf_page": 147,
+      "yaoci": "包承，小人吉，大人否亨。"
+    },
+    {
+      "hexagram": "天地否",
+      "line": 3,
+      "pdf_page": 147,
+      "yaoci": "包羞。"
+    },
+    {
+      "hexagram": "天地否",
+      "line": 4,
+      "pdf_page": 147,
+      "yaoci": "有命無咎，疇離祉。"
+    },
+    {
+      "hexagram": "天地否",
+      "line": 5,
+      "pdf_page": 148,
+      "yaoci": "休否，大人吉，其亡其亡，繫于苞桑。"
+    },
+    {
+      "hexagram": "天地否",
+      "line": 6,
+      "pdf_page": 148,
+      "yaoci": "傾否，先否後喜。"
+    },
+    {
+      "hexagram": "天火同人",
+      "line": 1,
+      "pdf_page": 149,
+      "yaoci": "同人于門，無咎。"
+    },
+    {
+      "hexagram": "天火同人",
+      "line": 2,
+      "pdf_page": 149,
+      "yaoci": "同人于宗，吝。"
+    },
+    {
+      "hexagram": "天火同人",
+      "line": 3,
+      "pdf_page": 150,
+      "yaoci": "伏戎于莽，升其高陵，三歲不興。"
+    },
+    {
+      "hexagram": "天火同人",
+      "line": 4,
+      "pdf_page": 150,
+      "yaoci": "乘其墉，弗克攻，吉。"
+    },
+    {
+      "hexagram": "天火同人",
+      "line": 5,
+      "pdf_page": 150,
+      "yaoci": "同人先號咷而後笑，大師克相遇。"
+    },
+    {
+      "hexagram": "天火同人",
+      "line": 6,
+      "pdf_page": 151,
+      "yaoci": "同人于郊，無悔。"
+    },
+    {
+      "hexagram": "火天大有",
+      "line": 1,
+      "pdf_page": 151,
+      "yaoci": "无交害，匪咎，艱則无咎。"
+    },
+    {
+      "hexagram": "火天大有",
+      "line": 2,
+      "pdf_page": 152,
+      "yaoci": "大車以載，有攸往，无咎。"
+    },
+    {
+      "hexagram": "火天大有",
+      "line": 3,
+      "pdf_page": 152,
+      "yaoci": "公用亨于天子，小人弗克。"
+    },
+    {
+      "hexagram": "火天大有",
+      "line": 4,
+      "pdf_page": 152,
+      "yaoci": "匪其彭，无咎。"
+    },
+    {
+      "hexagram": "火天大有",
+      "line": 5,
+      "pdf_page": 153,
+      "yaoci": "厥孚交如，威如，吉。"
+    },
+    {
+      "hexagram": "火天大有",
+      "line": 6,
+      "pdf_page": 153,
+      "yaoci": "自天祐之，吉无不利。"
+    },
+    {
+      "hexagram": "地山謙",
+      "line": 1,
+      "pdf_page": 154,
+      "yaoci": "謙謙君子，用涉大川，吉。"
+    },
+    {
+      "hexagram": "地山謙",
+      "line": 2,
+      "pdf_page": 154,
+      "yaoci": "鳴謙，貞吉。"
+    },
+    {
+      "hexagram": "地山謙",
+      "line": 3,
+      "pdf_page": 154,
+      "yaoci": "勞謙君子，有終吉。"
+    },
+    {
+      "hexagram": "地山謙",
+      "line": 4,
+      "pdf_page": 155,
+      "yaoci": "无不利，撝謙。"
+    },
+    {
+      "hexagram": "地山謙",
+      "line": 5,
+      "pdf_page": 155,
+      "yaoci": "不富以其鄰，利用侵伐，无不利。"
+    },
+    {
+      "hexagram": "地山謙",
+      "line": 6,
+      "pdf_page": 155,
+      "yaoci": "鳴謙，利用行師，征邑國。"
+    },
+    {
+      "hexagram": "雷地豫",
+      "line": 1,
+      "pdf_page": 156,
+      "yaoci": "鳴豫，凶。",
+      "review_status": "single_reader_native_pixel_header_collation; independent_second_review_pending",
+      "reading_notes": [
+        "該版爻辭標點為編輯句讀，保留原有于、无等字形映射。"
+      ]
+    },
+    {
+      "hexagram": "雷地豫",
+      "line": 2,
+      "pdf_page": 156,
+      "yaoci": "介于石，不終日，貞吉。",
+      "review_status": "single_reader_native_pixel_header_collation; independent_second_review_pending",
+      "reading_notes": [
+        "該版爻辭標點為編輯句讀，保留原有于、无等字形映射。"
+      ]
+    },
+    {
+      "hexagram": "雷地豫",
+      "line": 3,
+      "pdf_page": 157,
+      "yaoci": "盱豫，悔，遲有悔。",
+      "review_status": "single_reader_native_pixel_header_collation; independent_second_review_pending",
+      "reading_notes": [
+        "該版爻辭標點為編輯句讀，保留原有于、无等字形映射。"
+      ]
+    },
+    {
+      "hexagram": "雷地豫",
+      "line": 4,
+      "pdf_page": 157,
+      "yaoci": "由豫，大有得，勿疑，朋盍簪。",
+      "review_status": "single_reader_native_pixel_header_collation; independent_second_review_pending; glyph_choice_unresolved",
+      "reading_notes": [
+        "該版爻辭標點為編輯句讀，保留原有于、无等字形映射。",
+        "朋盍簪末字簪受印墨覆疊，暫錄；不以通行周易經文當作本版原字已核定。"
+      ]
+    },
+    {
+      "hexagram": "雷地豫",
+      "line": 5,
+      "pdf_page": 157,
+      "yaoci": "貞疾，恒不死。",
+      "review_status": "single_reader_native_pixel_header_collation; independent_second_review_pending",
+      "reading_notes": [
+        "該版爻辭標點為編輯句讀，保留原有于、无等字形映射。"
+      ]
+    },
+    {
+      "hexagram": "雷地豫",
+      "line": 6,
+      "pdf_page": 158,
+      "yaoci": "冥豫，成有渝，无咎。",
+      "review_status": "single_reader_native_pixel_header_collation; independent_second_review_pending",
+      "reading_notes": [
+        "該版爻辭標點為編輯句讀，保留原有于、无等字形映射。"
+      ]
+    },
+    {
+      "hexagram": "澤雷隨",
+      "line": 1,
+      "pdf_page": 158,
+      "yaoci": "官有渝，貞吉。出門交有功。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "按所選文明書局本原圖逐爻目讀；標點為編輯句讀，保留原印于、亨，不用另一部周易文字代替。",
+        "先封存源圖首稿與同讀者復讀，再比對繼承稿；沒有新增獨立讀稿或專家審校。"
+      ]
+    },
+    {
+      "hexagram": "澤雷隨",
+      "line": 2,
+      "pdf_page": 159,
+      "yaoci": "係小子，失丈夫。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "按所選文明書局本原圖逐爻目讀；標點為編輯句讀，保留原印于、亨，不用另一部周易文字代替。",
+        "先封存源圖首稿與同讀者復讀，再比對繼承稿；沒有新增獨立讀稿或專家審校。"
+      ]
+    },
+    {
+      "hexagram": "澤雷隨",
+      "line": 3,
+      "pdf_page": 159,
+      "yaoci": "係丈夫，失小子。隨有求得，利居貞。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "按所選文明書局本原圖逐爻目讀；標點為編輯句讀，保留原印于、亨，不用另一部周易文字代替。",
+        "先封存源圖首稿與同讀者復讀，再比對繼承稿；沒有新增獨立讀稿或專家審校。"
+      ]
+    },
+    {
+      "hexagram": "澤雷隨",
+      "line": 4,
+      "pdf_page": 159,
+      "yaoci": "隨有獲，貞凶。有孚在道，以明，何咎。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "按所選文明書局本原圖逐爻目讀；標點為編輯句讀，保留原印于、亨，不用另一部周易文字代替。",
+        "先封存源圖首稿與同讀者復讀，再比對繼承稿；沒有新增獨立讀稿或專家審校。"
+      ]
+    },
+    {
+      "hexagram": "澤雷隨",
+      "line": 5,
+      "pdf_page": 160,
+      "yaoci": "孚于嘉，吉。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "按所選文明書局本原圖逐爻目讀；標點為編輯句讀，保留原印于、亨，不用另一部周易文字代替。",
+        "先封存源圖首稿與同讀者復讀，再比對繼承稿；沒有新增獨立讀稿或專家審校。"
+      ]
+    },
+    {
+      "hexagram": "澤雷隨",
+      "line": 6,
+      "pdf_page": 160,
+      "yaoci": "拘係之，乃從維之。王用亨于西山。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "按所選文明書局本原圖逐爻目讀；標點為編輯句讀，保留原印于、亨，不用另一部周易文字代替。",
+        "先封存源圖首稿與同讀者復讀，再比對繼承稿；沒有新增獨立讀稿或專家審校。"
+      ]
+    },
+    {
+      "hexagram": "山風蠱",
+      "line": 1,
+      "pdf_page": 161,
+      "yaoci": "幹父之蠱，有子考无咎，厲終吉。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "本卦标题按所选文明书局本原图逐爻目读；两处无字形保留，未统一改成無，标点为编辑所加。",
+        "首稿与同读者复读封存后比对继承稿；没有新增独立读稿或专家审定。"
+      ]
+    },
+    {
+      "hexagram": "山風蠱",
+      "line": 2,
+      "pdf_page": 161,
+      "yaoci": "幹母之蠱，不可貞。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "本卦标题按所选文明书局本原图逐爻目读；两处无字形保留，未统一改成無，标点为编辑所加。",
+        "首稿与同读者复读封存后比对继承稿；没有新增独立读稿或专家审定。"
+      ]
+    },
+    {
+      "hexagram": "山風蠱",
+      "line": 3,
+      "pdf_page": 162,
+      "yaoci": "幹父之蠱，小有悔，无大咎。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "本卦标题按所选文明书局本原图逐爻目读；两处无字形保留，未统一改成無，标点为编辑所加。",
+        "首稿与同读者复读封存后比对继承稿；没有新增独立读稿或专家审定。"
+      ]
+    },
+    {
+      "hexagram": "山風蠱",
+      "line": 4,
+      "pdf_page": 162,
+      "yaoci": "裕父之蠱，往見吝。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "本卦标题按所选文明书局本原图逐爻目读；两处无字形保留，未统一改成無，标点为编辑所加。",
+        "首稿与同读者复读封存后比对继承稿；没有新增独立读稿或专家审定。"
+      ]
+    },
+    {
+      "hexagram": "山風蠱",
+      "line": 5,
+      "pdf_page": 162,
+      "yaoci": "幹父之蠱，用譽。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "本卦标题按所选文明书局本原图逐爻目读；两处无字形保留，未统一改成無，标点为编辑所加。",
+        "首稿与同读者复读封存后比对继承稿；没有新增独立读稿或专家审定。"
+      ]
+    },
+    {
+      "hexagram": "山風蠱",
+      "line": 6,
+      "pdf_page": 163,
+      "yaoci": "不事王侯，高尚其事。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "本卦标题按所选文明书局本原图逐爻目读；两处无字形保留，未统一改成無，标点为编辑所加。",
+        "首稿与同读者复读封存后比对继承稿；没有新增独立读稿或专家审定。"
+      ]
+    },
+    {
+      "hexagram": "地澤臨",
+      "line": 1,
+      "pdf_page": 163,
+      "yaoci": "咸臨，貞吉。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "按所选文明书局本原图逐爻目读，标点为编辑所加；未新增独立复核。"
+      ]
+    },
+    {
+      "hexagram": "地澤臨",
+      "line": 2,
+      "pdf_page": 164,
+      "yaoci": "咸臨，吉，无不利。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "按所选文明书局本原图逐爻目读，标点为编辑所加；未新增独立复核。"
+      ]
+    },
+    {
+      "hexagram": "地澤臨",
+      "line": 3,
+      "pdf_page": 164,
+      "yaoci": "甘臨，无攸利，既憂之，无咎。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "按所选文明书局本原图逐爻目读，标点为编辑所加；未新增独立复核。"
+      ]
+    },
+    {
+      "hexagram": "地澤臨",
+      "line": 4,
+      "pdf_page": 164,
+      "yaoci": "至臨，无咎。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "按所选文明书局本原图逐爻目读，标点为编辑所加；未新增独立复核。"
+      ]
+    },
+    {
+      "hexagram": "地澤臨",
+      "line": 5,
+      "pdf_page": 165,
+      "yaoci": "知臨，大君之宜，吉。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "按所选文明书局本原图逐爻目读，标点为编辑所加；未新增独立复核。"
+      ]
+    },
+    {
+      "hexagram": "地澤臨",
+      "line": 6,
+      "pdf_page": 165,
+      "yaoci": "敦臨，吉，无咎。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "按所选文明书局本原图逐爻目读，标点为编辑所加；未新增独立复核。"
+      ]
+    },
+    {
+      "hexagram": "風地觀",
+      "line": 1,
+      "pdf_page": 166,
+      "yaoci": "童觀，小人无咎，君子吝。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "本印闚／无／于等所選字形與現代標點保留，不以通行經文替本印作證。"
+      ]
+    },
+    {
+      "hexagram": "風地觀",
+      "line": 2,
+      "pdf_page": 166,
+      "yaoci": "闚觀，利女貞。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "本印闚／无／于等所選字形與現代標點保留，不以通行經文替本印作證。"
+      ]
+    },
+    {
+      "hexagram": "風地觀",
+      "line": 3,
+      "pdf_page": 166,
+      "yaoci": "觀我生，進退。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "本印闚／无／于等所選字形與現代標點保留，不以通行經文替本印作證。"
+      ]
+    },
+    {
+      "hexagram": "風地觀",
+      "line": 4,
+      "pdf_page": 167,
+      "yaoci": "觀國之光，利用賓于王。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "本印闚／无／于等所選字形與現代標點保留，不以通行經文替本印作證。"
+      ]
+    },
+    {
+      "hexagram": "風地觀",
+      "line": 5,
+      "pdf_page": 167,
+      "yaoci": "觀我生，君子无咎。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "本印闚／无／于等所選字形與現代標點保留，不以通行經文替本印作證。"
+      ]
+    },
+    {
+      "hexagram": "風地觀",
+      "line": 6,
+      "pdf_page": 167,
+      "yaoci": "觀其生，君子无咎。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "本印闚／无／于等所選字形與現代標點保留，不以通行經文替本印作證。"
+      ]
+    },
+    {
+      "hexagram": "火雷噬嗑",
+      "line": 1,
+      "pdf_page": 168,
+      "yaoci": "初九，履校滅趾，无咎。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "履／腊／胏／何／无依此印所選字形保留；現代標點為編輯標注，不以通行經文替本印作證；獨立覆核未完成。"
+      ]
+    },
+    {
+      "hexagram": "火雷噬嗑",
+      "line": 2,
+      "pdf_page": 168,
+      "yaoci": "六二，噬膚滅鼻，无咎。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "履／腊／胏／何／无依此印所選字形保留；現代標點為編輯標注，不以通行經文替本印作證；獨立覆核未完成。"
+      ]
+    },
+    {
+      "hexagram": "火雷噬嗑",
+      "line": 3,
+      "pdf_page": 169,
+      "yaoci": "六三，噬腊肉，遇毒，小吝，无咎。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "履／腊／胏／何／无依此印所選字形保留；現代標點為編輯標注，不以通行經文替本印作證；獨立覆核未完成。"
+      ]
+    },
+    {
+      "hexagram": "火雷噬嗑",
+      "line": 4,
+      "pdf_page": 169,
+      "yaoci": "九四，噬乾胏，得金矢，利艱貞吉。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "履／腊／胏／何／无依此印所選字形保留；現代標點為編輯標注，不以通行經文替本印作證；獨立覆核未完成。"
+      ]
+    },
+    {
+      "hexagram": "火雷噬嗑",
+      "line": 5,
+      "pdf_page": 169,
+      "yaoci": "六五，噬乾肉，得黃金，貞厲无咎。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "履／腊／胏／何／无依此印所選字形保留；現代標點為編輯標注，不以通行經文替本印作證；獨立覆核未完成。"
+      ]
+    },
+    {
+      "hexagram": "火雷噬嗑",
+      "line": 6,
+      "pdf_page": 170,
+      "yaoci": "上九，何校滅耳，凶。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "履／腊／胏／何／无依此印所選字形保留；現代標點為編輯標注，不以通行經文替本印作證；獨立覆核未完成。"
+      ]
+    },
+    {
+      "hexagram": "山火賁",
+      "line": 1,
+      "pdf_page": 170,
+      "yaoci": "賁其趾，舍車而徒。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "依本版原頁逐條選錄；標點為編輯標注，非逐筆外交式轉錄。"
+      ]
+    },
+    {
+      "hexagram": "山火賁",
+      "line": 2,
+      "pdf_page": 171,
+      "yaoci": "賁其須。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "依本版原頁逐條選錄；標點為編輯標注，非逐筆外交式轉錄。"
+      ]
+    },
+    {
+      "hexagram": "山火賁",
+      "line": 3,
+      "pdf_page": 171,
+      "yaoci": "賁如濡如，永貞吉。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "依本版原頁逐條選錄；標點為編輯標注，非逐筆外交式轉錄。"
+      ]
+    },
+    {
+      "hexagram": "山火賁",
+      "line": 4,
+      "pdf_page": 171,
+      "yaoci": "賁如皤如，白馬翰如，匪寇婚媾。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "依本版原頁逐條選錄；標點為編輯標注，非逐筆外交式轉錄。"
+      ]
+    },
+    {
+      "hexagram": "山火賁",
+      "line": 5,
+      "pdf_page": 172,
+      "yaoci": "賁于丘園，束帛戔戔，吝終吉。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "依本版原頁逐條選錄；標點為編輯標注，非逐筆外交式轉錄。",
+        "于按本印保留，不以繼承於或另一部經文替換。"
+      ]
+    },
+    {
+      "hexagram": "山火賁",
+      "line": 6,
+      "pdf_page": 172,
+      "yaoci": "白賁，无咎。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "依本版原頁逐條選錄；標點為編輯標注，非逐筆外交式轉錄。",
+        "无為本印所選字形，不機械轉作繼承無；獨立復核仍未完成。"
+      ]
+    },
+    {
+      "hexagram": "山地剝",
+      "line": 1,
+      "pdf_page": 173,
+      "yaoci": "剝床以足，蔑貞凶。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "依本版原頁選錄；標點為編輯標注，非逐筆外交式轉錄。"
+      ]
+    },
+    {
+      "hexagram": "山地剝",
+      "line": 2,
+      "pdf_page": 173,
+      "yaoci": "剝床以辨，蔑貞凶。",
+      "review_status": "single_reader_visual_collation_with_unresolved_glyph; independent_second_review_pending",
+      "reading_notes": [
+        "依本版原頁選錄；標點為編輯標注，非逐筆外交式轉錄。",
+        "辨按當前原像選錄，中部細筆仍有疑讀，待獨立復核；不以通行經文認證該字。"
+      ]
+    },
+    {
+      "hexagram": "山地剝",
+      "line": 3,
+      "pdf_page": 174,
+      "yaoci": "剝之，无咎。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "依本版原頁選錄；標點為編輯標注，非逐筆外交式轉錄。",
+        "本頁保留印本无的選錄形式，不機械轉作無。"
+      ]
+    },
+    {
+      "hexagram": "山地剝",
+      "line": 4,
+      "pdf_page": 174,
+      "yaoci": "剝床以膚，凶。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "依本版原頁選錄；標點為編輯標注，非逐筆外交式轉錄。"
+      ]
+    },
+    {
+      "hexagram": "山地剝",
+      "line": 5,
+      "pdf_page": 174,
+      "yaoci": "貫魚，以宮人寵，無不利。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "依本版原頁選錄；標點為編輯標注，非逐筆外交式轉錄。",
+        "原頁宮人，沒有按繼承宮入選錄；卷三詩不在本輪標題核讀範圍。",
+        "本爻原印為無，第三爻原印為无；撤回本輪首稿與首候選所加的无。繼承無字本來正確，不計作修復繼承缺陷。"
+      ]
+    },
+    {
+      "hexagram": "山地剝",
+      "line": 6,
+      "pdf_page": 175,
+      "yaoci": "碩果不食，君子得輿，小人剝廬。",
+      "review_status": "single_reader_visual_collation; independent_second_review_pending",
+      "reading_notes": [
+        "依本版原頁選錄；標點為編輯標注，非逐筆外交式轉錄。"
+      ]
+    },
+    {
+      "hexagram": "地雷復",
+      "line": 1,
+      "pdf_page": 175,
+      "yaoci": "不遠復，无祗悔，元吉。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending; glyph_choice_unresolved",
+      "reading_notes": [
+        "所選印本原頁目校，標點為編輯；无與無不跨條目機械統一。",
+        "祗／祇細筆字形未決，暫選祗；不能以通行經文認證。"
+      ]
+    },
+    {
+      "hexagram": "地雷復",
+      "line": 2,
+      "pdf_page": 176,
+      "yaoci": "休復，吉。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "所選印本原頁目校，標點為編輯；无與無不跨條目機械統一。"
+      ]
+    },
+    {
+      "hexagram": "地雷復",
+      "line": 3,
+      "pdf_page": 176,
+      "yaoci": "頻復，厲，无咎。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "所選印本原頁目校，標點為編輯；无與無不跨條目機械統一。"
+      ]
+    },
+    {
+      "hexagram": "地雷復",
+      "line": 4,
+      "pdf_page": 176,
+      "yaoci": "中行獨復。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "所選印本原頁目校，標點為編輯；无與無不跨條目機械統一。"
+      ]
+    },
+    {
+      "hexagram": "地雷復",
+      "line": 5,
+      "pdf_page": 177,
+      "yaoci": "敦復，无悔。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "所選印本原頁目校，標點為編輯；无與無不跨條目機械統一。"
+      ]
+    },
+    {
+      "hexagram": "地雷復",
+      "line": 6,
+      "pdf_page": 177,
+      "yaoci": "迷復，凶，有災眚，用行師，終有大敗，以其國君凶，至於十年不克征。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "所選印本原頁目校，標點為編輯；无與無不跨條目機械統一。"
+      ]
+    },
+    {
+      "hexagram": "天雷無妄",
+      "line": 1,
+      "pdf_page": 177,
+      "yaoci": "无妄，往吉。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "所選印本原頁目校，標點為編輯；无與無不跨條目機械統一。"
+      ]
+    },
+    {
+      "hexagram": "天雷無妄",
+      "line": 2,
+      "pdf_page": 178,
+      "yaoci": "不耕穫，不菑畬，則利有攸往。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "所選印本原頁目校，標點為編輯；无與無不跨條目機械統一。"
+      ]
+    },
+    {
+      "hexagram": "天雷無妄",
+      "line": 3,
+      "pdf_page": 178,
+      "yaoci": "无妄之災，或繫之牛，行人之得，邑人之災。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "所選印本原頁目校，標點為編輯；无與無不跨條目機械統一。"
+      ]
+    },
+    {
+      "hexagram": "天雷無妄",
+      "line": 4,
+      "pdf_page": 178,
+      "yaoci": "可貞，无咎。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "所選印本原頁目校，標點為編輯；无與無不跨條目機械統一。"
+      ]
+    },
+    {
+      "hexagram": "天雷無妄",
+      "line": 5,
+      "pdf_page": 179,
+      "yaoci": "无妄之疾，勿藥有喜。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "所選印本原頁目校，標點為編輯；无與無不跨條目機械統一。"
+      ]
+    },
+    {
+      "hexagram": "天雷無妄",
+      "line": 6,
+      "pdf_page": 179,
+      "yaoci": "无妄，行有眚，无攸利。",
+      "review_status": "single_reader_native_pixel_collation; independent_second_review_pending",
+      "reading_notes": [
+        "所選印本原頁目校，標點為編輯；无與無不跨條目機械統一。"
+      ]
+    },
+    {
+      "hexagram": "山天大畜",
+      "line": 1,
+      "pdf_page": 180,
+      "yaoci": "有厲利己。",
+      "review_status": "single_visual_collation; independent_second_review_pending; glyph_choice_unresolved",
+      "reading_notes": [
+        "字形未决：本页标题末字暂选己，已仍为候选；未据通行经文或语义强定，不计为确定纠错。"
+      ]
+    },
+    {
+      "hexagram": "山天大畜",
+      "line": 2,
+      "pdf_page": 180,
+      "yaoci": "輿說輹。",
+      "review_status": "single_visual_collation; independent_second_review_pending",
+      "reading_notes": []
+    },
+    {
+      "hexagram": "山天大畜",
+      "line": 3,
+      "pdf_page": 180,
+      "yaoci": "良馬逐，利艱貞，日閑輿衞，利有攸往。",
+      "review_status": "single_visual_collation; independent_second_review_pending",
+      "reading_notes": []
+    },
+    {
+      "hexagram": "山天大畜",
+      "line": 4,
+      "pdf_page": 181,
+      "yaoci": "童牛之牿，元吉。",
+      "review_status": "single_visual_collation; independent_second_review_pending",
+      "reading_notes": []
+    },
+    {
+      "hexagram": "山天大畜",
+      "line": 5,
+      "pdf_page": 181,
+      "yaoci": "豶豕之牙，吉。",
+      "review_status": "single_visual_collation; independent_second_review_pending",
+      "reading_notes": []
+    },
+    {
+      "hexagram": "山天大畜",
+      "line": 6,
+      "pdf_page": 181,
+      "yaoci": "何天之衢，亨。",
+      "review_status": "single_visual_collation; independent_second_review_pending",
+      "reading_notes": []
+    }
+  ]
+}

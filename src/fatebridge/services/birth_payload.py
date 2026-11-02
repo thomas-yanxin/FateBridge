@@ -2,6 +2,7 @@
 
 from typing import Any, Dict
 
+from fatebridge.core.bazi_evidence import build_natal_evidence
 from fatebridge.core.rules import BaZiRules
 from fatebridge.services.birth_context import BirthComputationContext
 from fatebridge.utils.formatting import (
@@ -39,6 +40,9 @@ def build_destiny_payload(context: BirthComputationContext) -> Dict[str, Any]:
         clash_patterns=clash_patterns,
         special_patterns=special_pattern_metadata,
     )
+    structure_profile["evidence_chain"] = build_natal_evidence(
+        context.birth_pillars, context.element_analysis["day_master"]
+    )
     special_patterns = {
         **special_pattern_metadata,
         "recognized_structures": structure_profile["recognized_structures"],
@@ -51,10 +55,12 @@ def build_destiny_payload(context: BirthComputationContext) -> Dict[str, Any]:
             "birth_datetime": format_birth_datetime_display(
                 birth_datetime,
                 include_minutes=include_minutes,
+                include_seconds=person.birth_second is not None,
             ),
             "normalized_birth_datetime": format_birth_datetime_display(
                 corrected_birth_datetime,
                 include_minutes=True,
+                include_seconds=person.birth_second is not None,
             ),
             "gender": person.gender or "未知",
             "birth_place": person.birth_place or "未提供",

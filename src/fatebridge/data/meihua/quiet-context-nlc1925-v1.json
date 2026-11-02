@@ -1,0 +1,42 @@
+{
+  "id": "meihua_quiet_context_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本静占闻见条件",
+  "source": {
+    "selected_edition": "nlc_1925",
+    "title": "文明書局《梅花易數》卷二靜占",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_index": 92,
+    "paper_volume_and_page": "卷二三九",
+    "attribution_scope": "Hosting bibliography; no independent author or dating authentication"
+  },
+  "section": "靜占",
+  "quote": "凡應占在靜室占無所聞見則無外卦即不論外卦但以全卦年月日值五行衰旺之氣以體用決之",
+  "comparison_source": {
+    "id": "wikisource_1441921",
+    "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二",
+    "revision": 1441921,
+    "saved_text_sha256": "903b109b37071584ccbf54e15ee10813d32c702bb3d7e690e15d5b77cd0ff7cb",
+    "quote": "凡占在靜室，無所聞見，則無外卦，即不論外卦。但以全卦年月日值五行衰旺之氣，以體用決之。",
+    "used_to_override_selected_edition": false
+  },
+  "witness_difference": "Selected NLC has凡應占 and静室占; comparison transcription omits those two characters. Keep both rather than normalizing the selected source.",
+  "related_motion_span": "吾心本靜人來占卜起念以應之即動也",
+  "related_motion_original_pdf_index": 91,
+  "source_decisions": [
+    "Same casting episode and observer; field meanings are caller declarations, not physical measurement or automatic scene interpretation",
+    "No context and a provided context with all unknown facts are distinct",
+    "Any explicit false makes this conjunction unmet, but does not imply external omens must exist; otherwise incomplete facts remain pending",
+    "All three true supports only this declared quiet-context clause; no independent verification of actual absence or entire casting eligibility",
+    "No claim of external hearing/vision can conflict with an actual sound/observed casting source; a fully declared quiet-no-perception state cannot simultaneously request external-omen records",
+    "Do not infer perception modality from object quantities, written text, description, observer walking, or inner moving-line symbols",
+    "Existing month strength and actual geometry remain available; complete year-month-day strength synthesis is not defined or implemented by this selected sentence",
+    "Not a retrospective exclusion or denominator change in any existing weather study; all old negative outcomes and future registrations retained"
+  ],
+  "conditions_scope": "Caller-declared source context for this casting episode and observer; not a decibel threshold, blindness/deafness claim, mental-state diagnosis, automatic scene classification or proof all real omens are absent",
+  "unimplemented": "Complete year-month-day strength synthesis and full静占judgement; allcasting trigger and mental stillness adjudication",
+  "independent_human_expert_review": false,
+  "predictive_efficacy_established": false,
+  "method_scope_clarification": "Actual sound_groups conflicts with nothing_heard=true. Observed methods conflict with the complete quiet-room/no-heard/no-seen premise; a single nothing_seen flag is not treated as proof of the modality of every supplied observation. Other casting methods and observer activity do not fill sensory flags."
+}

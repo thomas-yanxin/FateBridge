@@ -164,15 +164,11 @@ def test_input_discovery_does_not_materialize_output_schema():
         operation_label_zh="探针",
         family="test",
     )
-    clear_contract_caches()
-    try:
-        compact = describe_input_spec(spec)
-        assert Output.schema_calls == 0
-        assert compact["output_fields"] == ["value"]
-        full = describe_spec(spec)
-        assert Output.schema_calls == 1
-        assert {key: compact[key] for key in full if key != "output_schema"} == {
-            key: value for key, value in full.items() if key != "output_schema"
-        }
-    finally:
-        clear_contract_caches()
+    compact = describe_input_spec(spec)
+    assert Output.schema_calls == 0
+    assert compact["output_fields"] == ["value"]
+    full = describe_spec(spec)
+    assert Output.schema_calls == 1
+    assert {key: compact[key] for key in full if key != "output_schema"} == {
+        key: value for key, value in full.items() if key != "output_schema"
+    }

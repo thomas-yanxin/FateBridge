@@ -1,0 +1,458 @@
+{
+  "id": "t1299_sanjiu_day_witnesses_v1",
+  "author": "不空译；上卷杨景风修注；上、下卷条文及下卷又一说分别保留",
+  "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
+  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+  "relation_witnesses": [
+    {
+      "relation": "命",
+      "witnesses": [
+        {
+          "volume": "upper",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0391b19-25",
+          "source_excerpts": [
+            "凡命、胎宿直日，不宜舉動百事"
+          ],
+          "meaning": "上卷命、胎日列不宜举动百事。",
+          "primary_paragraph_id": "0391b1901"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0398a07",
+          "source_excerpts": [
+            "若命宿日、胎宿日，不宜舉動百事"
+          ],
+          "meaning": "下卷命、胎日列不宜举动百事。",
+          "primary_paragraph_id": "0398a0701"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "another_saying",
+          "locator": "T21n1299_p0398a16-17",
+          "source_excerpts": [
+            "又一說云：命宿、胎宿、危宿、壞宿，此宿日不得進路"
+          ],
+          "meaning": "下卷又一说另列命、胎、危、坏日不得进路；按明确启程核对，不把所有旅行活动都当作出发。",
+          "primary_paragraph_id": "0398a1601"
+        }
+      ],
+      "upper_day_entry_individually_listed": true
+    },
+    {
+      "relation": "胎",
+      "witnesses": [
+        {
+          "volume": "upper",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0391b19-25",
+          "source_excerpts": [
+            "凡命、胎宿直日，不宜舉動百事"
+          ],
+          "meaning": "上卷命、胎日列不宜举动百事。",
+          "primary_paragraph_id": "0391b1901"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0398a07",
+          "source_excerpts": [
+            "若命宿日、胎宿日，不宜舉動百事"
+          ],
+          "meaning": "下卷命、胎日列不宜举动百事。",
+          "primary_paragraph_id": "0398a0701"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "another_saying",
+          "locator": "T21n1299_p0398a16-17",
+          "source_excerpts": [
+            "又一說云：命宿、胎宿、危宿、壞宿，此宿日不得進路"
+          ],
+          "meaning": "下卷又一说另列命、胎、危、坏日不得进路；按明确启程核对，不把所有旅行活动都当作出发。",
+          "primary_paragraph_id": "0398a1601"
+        }
+      ],
+      "upper_day_entry_individually_listed": true
+    },
+    {
+      "relation": "業",
+      "witnesses": [
+        {
+          "volume": "upper",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0391b19-25",
+          "source_excerpts": [
+            "業宿直日，所作皆吉祥"
+          ],
+          "meaning": "上卷业日列所作皆吉祥。",
+          "primary_paragraph_id": "0391b1901"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0398a07-08",
+          "source_excerpts": [
+            "值業宿日，所作善惡亦不成就，甚衰"
+          ],
+          "meaning": "下卷业日列所作善恶亦不成就，与上卷相反。",
+          "primary_paragraph_id": "0398a0701"
+        }
+      ],
+      "upper_day_entry_individually_listed": true
+    },
+    {
+      "relation": "栄",
+      "witnesses": [
+        {
+          "volume": "lower",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0397c25-28",
+          "source_excerpts": [
+            "興營買賣"
+          ],
+          "meaning": "下卷荣日列兴营买卖。",
+          "primary_paragraph_id": "0397c2501"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0397c27-28",
+          "source_excerpts": [
+            "承事師主、啟請法要並吉"
+          ],
+          "meaning": "下卷在出家人段落列承事师主、启请法要；该身份与动作须明确，不能只凭宗教学法就补造出家人身份。",
+          "primary_paragraph_id": "0397c2501"
+        }
+      ],
+      "upper_day_entry_individually_listed": false
+    },
+    {
+      "relation": "衰",
+      "witnesses": [
+        {
+          "volume": "upper",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0391b19-25",
+          "source_excerpts": [
+            "衰、危、壞宿日，並不宜遠行"
+          ],
+          "meaning": "上卷远行条文须核对路程；迁徙、买卖另按事项核对。",
+          "primary_paragraph_id": "0391b1901"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0398a11",
+          "source_excerpts": [
+            "若衰日"
+          ],
+          "meaning": "下卷此行仅列本服务不交付的事项；没有据此补造六类事项的一般禁忌。",
+          "primary_paragraph_id": "0398a1101"
+        }
+      ],
+      "upper_day_entry_individually_listed": true
+    },
+    {
+      "relation": "安",
+      "witnesses": [
+        {
+          "volume": "upper",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0391b19-25",
+          "source_excerpts": [
+            "安日，移動遠行、修園宅臥具、作壇場並吉"
+          ],
+          "meaning": "上卷安日列移动远行及修园宅卧具。",
+          "primary_paragraph_id": "0391b1901"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0397c29-0398a01",
+          "source_excerpts": [
+            "若安宿日，移徙吉，遠行人入宅"
+          ],
+          "meaning": "下卷分别列移徙吉与远行人入宅；按明确远行人入宅查文献，不限定为回自己家，也不改写为所有出发均吉。",
+          "primary_paragraph_id": "0397c2901"
+        }
+      ],
+      "upper_day_entry_individually_listed": true
+    },
+    {
+      "relation": "危",
+      "witnesses": [
+        {
+          "volume": "upper",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0391b19-25",
+          "source_excerpts": [
+            "衰、危、壞宿日，並不宜遠行"
+          ],
+          "meaning": "上卷远行条文须核对路程；迁徙、买卖另按事项核对。",
+          "primary_paragraph_id": "0391b1901"
+        },
+        {
+          "volume": "upper",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0391b19-25",
+          "source_excerpts": [
+            "危日，宜結交婚姻、歡會宴聚吉"
+          ],
+          "meaning": "上卷危日结交婚姻和欢会宴聚列宜。",
+          "primary_paragraph_id": "0391b1901"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0398a02",
+          "source_excerpts": [
+            "若危宿日，宜結交、定婚姻，歡宴聚會並吉"
+          ],
+          "meaning": "下卷此处危日结交、定婚姻及宴聚列宜。",
+          "primary_paragraph_id": "0398a0201"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0398a09-10",
+          "source_excerpts": [
+            "若危壞日，並不宜遠行出、入移徙、買賣、婚姻"
+          ],
+          "meaning": "下卷此处列危、坏日远行、迁徙、买卖及婚姻不宜；保留远行条件及危日婚姻冲突。",
+          "primary_paragraph_id": "0398a0901"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "another_saying",
+          "locator": "T21n1299_p0398a16-17",
+          "source_excerpts": [
+            "又一說云：命宿、胎宿、危宿、壞宿，此宿日不得進路"
+          ],
+          "meaning": "下卷又一说另列命、胎、危、坏日不得进路；按明确启程核对，不把所有旅行活动都当作出发。",
+          "primary_paragraph_id": "0398a1601"
+        }
+      ],
+      "upper_day_entry_individually_listed": true
+    },
+    {
+      "relation": "成",
+      "witnesses": [
+        {
+          "volume": "upper",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0391b19-25",
+          "source_excerpts": [
+            "成日，修學問道"
+          ],
+          "meaning": "上卷成日修学问道条文。",
+          "primary_paragraph_id": "0391b1901"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0398a03-04",
+          "source_excerpts": [
+            "若成宿日，宜修道學問"
+          ],
+          "meaning": "下卷成日修道学问条文。",
+          "primary_paragraph_id": "0398a0301"
+        }
+      ],
+      "upper_day_entry_individually_listed": true
+    },
+    {
+      "relation": "壊",
+      "witnesses": [
+        {
+          "volume": "upper",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0391b19-25",
+          "source_excerpts": [
+            "衰、危、壞宿日，並不宜遠行"
+          ],
+          "meaning": "上卷远行条文须核对路程；迁徙、买卖另按事项核对。",
+          "primary_paragraph_id": "0391b1901"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0398a09-10",
+          "source_excerpts": [
+            "若危壞日，並不宜遠行出、入移徙、買賣、婚姻"
+          ],
+          "meaning": "下卷此处列危、坏日远行、迁徙、买卖及婚姻不宜；保留远行条件及危日婚姻冲突。",
+          "primary_paragraph_id": "0398a0901"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "another_saying",
+          "locator": "T21n1299_p0398a16-17",
+          "source_excerpts": [
+            "又一說云：命宿、胎宿、危宿、壞宿，此宿日不得進路"
+          ],
+          "meaning": "下卷又一说另列命、胎、危、坏日不得进路；按明确启程核对，不把所有旅行活动都当作出发。",
+          "primary_paragraph_id": "0398a1601"
+        }
+      ],
+      "upper_day_entry_individually_listed": true
+    },
+    {
+      "relation": "友",
+      "witnesses": [
+        {
+          "volume": "upper",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0391b19-25",
+          "source_excerpts": [
+            "友、親日，宜結交朋友大吉"
+          ],
+          "meaning": "上卷友、亲日列宜结交朋友。",
+          "primary_paragraph_id": "0391b1901"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0398a05-06",
+          "source_excerpts": [
+            "若友宿日、親宿日，宜結交、定婚姻，歡宴聚會並吉"
+          ],
+          "meaning": "下卷另列定婚姻与欢宴聚会，不把上卷只列结交当成下卷也未列婚姻。",
+          "primary_paragraph_id": "0398a0501"
+        }
+      ],
+      "upper_day_entry_individually_listed": true
+    },
+    {
+      "relation": "親",
+      "witnesses": [
+        {
+          "volume": "upper",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0391b19-25",
+          "source_excerpts": [
+            "友、親日，宜結交朋友大吉"
+          ],
+          "meaning": "上卷友、亲日列宜结交朋友。",
+          "primary_paragraph_id": "0391b1901"
+        },
+        {
+          "volume": "lower",
+          "source_witness": "main_text",
+          "locator": "T21n1299_p0398a05-06",
+          "source_excerpts": [
+            "若友宿日、親宿日，宜結交、定婚姻，歡宴聚會並吉"
+          ],
+          "meaning": "下卷另列定婚姻与欢宴聚会，不把上卷只列结交当成下卷也未列婚姻。",
+          "primary_paragraph_id": "0398a0501"
+        }
+      ],
+      "upper_day_entry_individually_listed": true
+    }
+  ],
+  "priority_clause": {
+    "volume": "lower",
+    "source_witness": "main_text",
+    "locator": "T21n1299_p0398a14-15",
+    "source_excerpts": [
+      "此所用三九法，於長行曆縱不是吉相，己身三九若吉，但用無妨。"
+    ],
+    "meaning": "下卷列己身三九吉相对于长行历的优先说明；没有明定本服务各层的完整覆盖范围，不据此删除相反条文或生成综合分数。",
+    "primary_paragraph_id": "0398a1401"
+  },
+  "activity_rules": [
+    {
+      "rule_id": "t1299_sanjiu_lower_15",
+      "selectors": [
+        "安"
+      ],
+      "activities": [
+        "relocation"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0397c29",
+      "source_excerpts": [
+        "若安宿日，移徙吉"
+      ],
+      "meaning": "下卷安宿日明列移徙吉。",
+      "source_witness": "main_text",
+      "layer": "sanjiu",
+      "volume": "lower"
+    },
+    {
+      "rule_id": "t1299_sanjiu_lower_16",
+      "selectors": [
+        "安"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0397c29-0398a01",
+      "source_excerpts": [
+        "遠行人入宅"
+      ],
+      "meaning": "下卷安宿日列远行人入宅，仅按明确远行人入宅查文献，不限定住宅归属，不把出发或未知旅行环节代入。",
+      "source_witness": "main_text",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "long_distance_traveler_entering_residence"
+      ],
+      "topic_condition": "须明确为远行人入宅，而非仅说出行或启程。",
+      "layer": "sanjiu",
+      "volume": "lower"
+    },
+    {
+      "rule_id": "t1299_sanjiu_lower_17",
+      "selectors": [
+        "栄"
+      ],
+      "activities": [
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0397c27-28",
+      "source_excerpts": [
+        "出家人",
+        "啟請法要並吉"
+      ],
+      "meaning": "下卷荣宿日在出家人段落列启请法要；须明确出家人请教法要，不把普通宗教学法或一般学习代入。",
+      "source_witness": "main_text",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "monastic_dharma_request"
+      ],
+      "topic_condition": "须明确出家人身份及请教法要的行为；religious_learning本身不能证明这两个条件。",
+      "layer": "sanjiu",
+      "volume": "lower"
+    },
+    {
+      "rule_id": "t1299_sanjiu_lower_18",
+      "selectors": [
+        "命",
+        "胎",
+        "危",
+        "壊"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0398a16-17",
+      "source_excerpts": [
+        "又一說云：命宿、胎宿、危宿、壞宿，此宿日不得進路"
+      ],
+      "meaning": "下卷又一说另列命、胎、危、坏日不得进路；按明确启程核对，不把所有旅行活动都当作出发。",
+      "source_witness": "another_saying",
+      "applicability": "activity_detail_required",
+      "activity_detail_any_of": [
+        "personal_departure"
+      ],
+      "topic_condition": "又一说的进路按明确本人启程核对；不据方向或入宅推定出发。",
+      "layer": "sanjiu",
+      "volume": "lower"
+    }
+  ],
+  "scope": "选定三九日事项见证；不是结交评等、全天吉凶或现实预测；逐条保留条件与冲突，长行历优先句未自动覆盖其他证据层。"
+}

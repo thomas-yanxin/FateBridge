@@ -1,0 +1,97 @@
+{
+  "ruleset_id": "zengshan_conditional_v2",
+  "ruleset_version": "2.1.0",
+  "sources_by_chapter": {
+    "8": {
+      "title": "增刪卜易/8",
+      "revision": 2100700,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F8&oldid=2100700",
+      "wikitext_sha256": "da83c3e47c04bb4813040e6cf5c3e43f8775e2293da3b32c9a8e2fb542e72a90"
+    },
+    "9": {
+      "title": "增刪卜易/9",
+      "revision": 2100299,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F9&oldid=2100299",
+      "wikitext_sha256": "e84db11ae9a316ba00cb301e4e25c71496b32d9fcc495f16e09a575eb2159412"
+    },
+    "10": {
+      "title": "增刪卜易/10",
+      "revision": 2100301,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F10&oldid=2100301",
+      "wikitext_sha256": "3afc338a9c87a3df29583d36cf608abe381d44a5736e33641ca6d95c1cf387b9"
+    },
+    "14": {
+      "title": "增刪卜易/14",
+      "revision": 2100320,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F14&oldid=2100320",
+      "wikitext_sha256": "504e79efe8093e13b40e6b9a0a55ff662e6094c70e7f3cb44d0e367251c330c8"
+    },
+    "15": {
+      "title": "增刪卜易/15",
+      "revision": 2100321,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F15&oldid=2100321",
+      "wikitext_sha256": "0df8223b0c65616826c8caf86b592526b46b1dee51332e0c2707486f2d7ee4e5"
+    },
+    "15又": {
+      "title": "增刪卜易/15又",
+      "revision": 2100323,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F15%E5%8F%88&oldid=2100323",
+      "wikitext_sha256": "f47fbd8f2afbbf5d85a2b77e62d8b93837aa6018c54afc2db833dcb922348bce"
+    },
+    "22": {
+      "title": "增刪卜易/22",
+      "revision": 2100453,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F22&oldid=2100453",
+      "wikitext_sha256": "c8d2e339a0bf86b1e09e290ff191eac06c6c0bfce190c3d1e7942cc3fab874d5"
+    },
+    "23": {
+      "title": "增刪卜易/23",
+      "revision": 2100454,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F23&oldid=2100454",
+      "wikitext_sha256": "5a178e3b65cc35def1a74452cacbc5f925b9f0968d1855e3da8cd70735b9f0e5"
+    },
+    "26又1": {
+      "title": "增刪卜易/26又1",
+      "revision": 2100461,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F26%E5%8F%881&oldid=2100461",
+      "wikitext_sha256": "630f38b037ae720e90e55faff10a1c044f7edf9e3a85ce7dc645b8693ada2008"
+    },
+    "26又3": {
+      "title": "增刪卜易/26又3",
+      "revision": 2100495,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F26%E5%8F%883&oldid=2100495",
+      "wikitext_sha256": "dc529f9dc18f3620c1975fe3463f744fd8732000c4f9d01eecf318d45528eea4"
+    },
+    "24": {
+      "title": "增刪卜易/24",
+      "revision": 2100456,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F24&oldid=2100456",
+      "wikitext_sha256": "ad746ef57988962474f4b58561fade3736772c67c6c6234be679f775ac7b380a"
+    },
+    "19": {
+      "title": "增刪卜易/19",
+      "revision": 2100447,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93%2F19&oldid=2100447",
+      "wikitext_sha256": "087c35339f209c6d1359c01d8a918a535eb6151729973fc09ef960c1195f3fdf"
+    },
+    "28": {
+      "title": "增刪卜易",
+      "revision": 2572918,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93&oldid=2572918",
+      "wikitext_sha256": "897f963b938ec4582bc892465301b831a6439216f317841f44b888117704ca07"
+    },
+    "29": {
+      "title": "增刪卜易",
+      "revision": 2572918,
+      "source_url": "https://zh.wikisource.org/w/index.php?title=%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93&oldid=2572918",
+      "wikitext_sha256": "897f963b938ec4582bc892465301b831a6439216f317841f44b888117704ca07"
+    }
+  },
+  "scope": "指定转录本的旺相、动静、用神与应期条件；条件匹配不是现实效力认证",
+  "textual_issues": [
+    "第15又章春季段金火土休囚为转录错字；1925书影PDF59明确金水土，原始转录保留",
+    "第10章忌神有力段退神为转录错误；1925书影PDF53明确化进神，不据旧错字制作有效性表",
+    "第26又1章未整列火四位，1925书影PDF97同样未整列；火长生寅及火墓戌有据，其余未补齐",
+    "第19章动化合称化扶，第9章午化未例与第26又3章又列合待冲；保留两种条件表述，合绊标记不是普遍失效裁定"
+  ]
+}

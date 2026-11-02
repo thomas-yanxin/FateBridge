@@ -103,7 +103,11 @@ def test_analyze_element_strength_changes_skips_full_comprehensive_analysis(
     )
 
     assert result["overall_effect"]
-    assert result["element_changes"]["木"]["change_type"] in {"增强", "减弱", "无变化"}
+    assert result["element_changes"]["木"]["change_type"] in {
+        "占比上升",
+        "占比下降",
+        "占比不变",
+    }
 
 
 def test_analyze_liuyue_effects_reuses_precomputed_liuyue(monkeypatch):

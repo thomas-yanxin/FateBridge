@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any, Iterator
 
 
-def default_result_directory() -> Path:
+def _result_directory_name() -> str:
     if sys.platform == "win32":
         # A SID distinguishes users even if TEMP points at a shared directory.
         import win32security
@@ -17,7 +17,43 @@ def default_result_directory() -> Path:
         identity = win32security.ConvertSidToStringSid(_windows_user())
     else:
         identity = str(os.getuid())
-    return Path(tempfile.gettempdir()) / f"fatebridge-results-{identity}"
+    return f"fatebridge-results-{identity}"
+
+
+def default_result_directory() -> Path:
+    return Path(tempfile.gettempdir()) / _result_directory_name()
+
+
+def result_directory_candidates() -> list[Path]:
+    """Locate existing artifacts without tempfile's writable-directory probe.
+
+    Use the documented tempfile search locations and its already cached choice.
+    These are candidates only: the caller must identify a unique original result
+    and validate the private directory/files. Never choose by a matching digest.
+    """
+    roots = [os.fsdecode(tempfile.tempdir)] if tempfile.tempdir is not None else []
+    roots.extend(
+        value for key in ("TMPDIR", "TEMP", "TMP") if (value := os.getenv(key))
+    )
+    if os.name == "nt":
+        roots.extend(
+            [
+                os.path.expanduser(r"~\AppData\Local\Temp"),
+                os.path.expandvars(r"%SYSTEMROOT%\Temp"),
+                r"c:\temp",
+                r"c:\tmp",
+                r"\temp",
+                r"\tmp",
+            ]
+        )
+    else:
+        roots.extend(["/tmp", "/var/tmp", "/usr/tmp"])
+    try:
+        roots.append(os.getcwd())
+    except OSError:
+        pass
+    name = _result_directory_name()
+    return list(dict.fromkeys(Path(root).absolute() / name for root in roots))
 
 
 def _windows_user() -> Any:
@@ -91,9 +127,7 @@ def _validate_windows_handle(handle: Any) -> None:
 
 def ensure_private_directory(path: Path) -> Path:
     if sys.platform == "win32":
-        import ntsecuritycon
         import pywintypes
-        import win32con
         import win32file
 
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -102,6 +136,18 @@ def ensure_private_directory(path: Path) -> Path:
         except pywintypes.error as exc:
             if exc.winerror != 183:  # ERROR_ALREADY_EXISTS
                 raise
+    else:
+        path.mkdir(mode=0o700, parents=True, exist_ok=True)
+    return validate_private_directory(path)
+
+
+def validate_private_directory(path: Path) -> Path:
+    """Check an existing directory without creating it or changing permissions."""
+    if sys.platform == "win32":
+        import ntsecuritycon
+        import win32con
+        import win32file
+
         handle = win32file.CreateFile(
             str(path),
             win32con.READ_CONTROL | ntsecuritycon.FILE_READ_ATTRIBUTES,
@@ -121,7 +167,6 @@ def ensure_private_directory(path: Path) -> Path:
         if not path.is_dir():
             raise RuntimeError("Result artifact directory is not a directory")
     else:
-        path.mkdir(mode=0o700, parents=True, exist_ok=True)
         info = path.lstat()
         if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid():
             raise RuntimeError("Result artifact directory is not owned by this user")

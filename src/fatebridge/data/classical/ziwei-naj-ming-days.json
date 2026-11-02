@@ -1,0 +1,2421 @@
+{
+  "id": "naj_ming_ziwei_day_tables_v1",
+  "version": "1.1.0",
+  "source_url": "https://www.digital.archives.go.jp/item/4468520",
+  "title": "新鋟希夷陳先生紫微斗数全書",
+  "reference_code": "子０６０－０００１-0001",
+  "printed_volume": "三",
+  "reader_count": 1,
+  "scope": "Ziwei branch given bureau and lunar day only; does not validate the resolved bureau or calendar conversion",
+  "direct_grid_positions": 147,
+  "prose_derived_positions": 1,
+  "unresolved_input_positions": 2,
+  "records": [
+    {
+      "bureau": 2,
+      "day": 1,
+      "branch": "丑",
+      "frame": 85,
+      "printed_labels": [
+        "初一"
+      ],
+      "candidates": [
+        {
+          "branch": "丑",
+          "printed_label": "初一"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 2,
+      "branch": "寅",
+      "frame": 85,
+      "printed_labels": [
+        "初二"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "初二"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 3,
+      "branch": "寅",
+      "frame": 85,
+      "printed_labels": [
+        "初三"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "初三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 4,
+      "branch": "卯",
+      "frame": 85,
+      "printed_labels": [
+        "初四"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "初四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 5,
+      "branch": "卯",
+      "frame": 85,
+      "printed_labels": [
+        "初五"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "初五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 6,
+      "branch": "辰",
+      "frame": 85,
+      "printed_labels": [
+        "初六"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "初六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 7,
+      "branch": "辰",
+      "frame": 85,
+      "printed_labels": [
+        "初七"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "初七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 8,
+      "branch": "巳",
+      "frame": 85,
+      "printed_labels": [
+        "初八"
+      ],
+      "candidates": [
+        {
+          "branch": "巳",
+          "printed_label": "初八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 9,
+      "branch": "巳",
+      "frame": 85,
+      "printed_labels": [
+        "初九"
+      ],
+      "candidates": [
+        {
+          "branch": "巳",
+          "printed_label": "初九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 10,
+      "branch": "午",
+      "frame": 85,
+      "printed_labels": [
+        "初十"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "初十"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 11,
+      "branch": "午",
+      "frame": 85,
+      "printed_labels": [
+        "十一"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "十一"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 12,
+      "branch": "未",
+      "frame": 85,
+      "printed_labels": [
+        "十二"
+      ],
+      "candidates": [
+        {
+          "branch": "未",
+          "printed_label": "十二"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 13,
+      "branch": "未",
+      "frame": 85,
+      "printed_labels": [
+        "十三"
+      ],
+      "candidates": [
+        {
+          "branch": "未",
+          "printed_label": "十三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 14,
+      "branch": "申",
+      "frame": 85,
+      "printed_labels": [
+        "十四"
+      ],
+      "candidates": [
+        {
+          "branch": "申",
+          "printed_label": "十四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 15,
+      "branch": "申",
+      "frame": 85,
+      "printed_labels": [
+        "十五"
+      ],
+      "candidates": [
+        {
+          "branch": "申",
+          "printed_label": "十五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 16,
+      "branch": "酉",
+      "frame": 85,
+      "printed_labels": [
+        "十六"
+      ],
+      "candidates": [
+        {
+          "branch": "酉",
+          "printed_label": "十六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 17,
+      "branch": "酉",
+      "frame": 85,
+      "printed_labels": [
+        "十七"
+      ],
+      "candidates": [
+        {
+          "branch": "酉",
+          "printed_label": "十七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 18,
+      "branch": "戌",
+      "frame": 85,
+      "printed_labels": [
+        "十八"
+      ],
+      "candidates": [
+        {
+          "branch": "戌",
+          "printed_label": "十八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 19,
+      "branch": "戌",
+      "frame": 85,
+      "printed_labels": [
+        "十九"
+      ],
+      "candidates": [
+        {
+          "branch": "戌",
+          "printed_label": "十九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 20,
+      "branch": "亥",
+      "frame": 85,
+      "printed_labels": [
+        "二十",
+        "廿"
+      ],
+      "candidates": [
+        {
+          "branch": "亥",
+          "printed_label": "二十"
+        },
+        {
+          "branch": "亥",
+          "printed_label": "廿"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 21,
+      "branch": "亥",
+      "frame": 85,
+      "printed_labels": [],
+      "candidates": [],
+      "source_kind": "prose_derived_with_unresolved_grid_label",
+      "source_quote": "初一起丑初二寅\n順行一宮安二日",
+      "derivation": "Day 1 is 丑. Days 2-3 寅, 4-5 卯, 6-7 辰, 8-9 巳, 10-11 午, 12-13 未, 14-15 申, 16-17 酉, 18-19 戌, 20-21 亥. This is a prose derivation, not a confident reading of the lower printed label at 亥."
+    },
+    {
+      "bureau": 2,
+      "day": 22,
+      "branch": "子",
+      "frame": 85,
+      "printed_labels": [
+        "廿二"
+      ],
+      "candidates": [
+        {
+          "branch": "子",
+          "printed_label": "廿二"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 23,
+      "branch": "子",
+      "frame": 85,
+      "printed_labels": [
+        "廿三"
+      ],
+      "candidates": [
+        {
+          "branch": "子",
+          "printed_label": "廿三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 24,
+      "branch": "丑",
+      "frame": 85,
+      "printed_labels": [
+        "廿四"
+      ],
+      "candidates": [
+        {
+          "branch": "丑",
+          "printed_label": "廿四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 25,
+      "branch": "丑",
+      "frame": 85,
+      "printed_labels": [
+        "廿五"
+      ],
+      "candidates": [
+        {
+          "branch": "丑",
+          "printed_label": "廿五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 26,
+      "branch": "寅",
+      "frame": 85,
+      "printed_labels": [
+        "廿六"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "廿六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 27,
+      "branch": "寅",
+      "frame": 85,
+      "printed_labels": [
+        "廿七"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "廿七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 28,
+      "branch": "卯",
+      "frame": 85,
+      "printed_labels": [
+        "廿八"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "廿八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 29,
+      "branch": "卯",
+      "frame": 85,
+      "printed_labels": [
+        "廿九"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "廿九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 2,
+      "day": 30,
+      "branch": "辰",
+      "frame": 85,
+      "printed_labels": [
+        "三十"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "三十"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 1,
+      "branch": "辰",
+      "frame": 85,
+      "printed_labels": [
+        "初一"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "初一"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 2,
+      "branch": "丑",
+      "frame": 85,
+      "printed_labels": [
+        "初二"
+      ],
+      "candidates": [
+        {
+          "branch": "丑",
+          "printed_label": "初二"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 3,
+      "branch": "寅",
+      "frame": 85,
+      "printed_labels": [
+        "初三"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "初三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 4,
+      "branch": "巳",
+      "frame": 85,
+      "printed_labels": [
+        "初四"
+      ],
+      "candidates": [
+        {
+          "branch": "巳",
+          "printed_label": "初四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 5,
+      "branch": "寅",
+      "frame": 85,
+      "printed_labels": [
+        "初五"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "初五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 6,
+      "branch": "卯",
+      "frame": 85,
+      "printed_labels": [
+        "初六"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "初六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 7,
+      "branch": "午",
+      "frame": 85,
+      "printed_labels": [
+        "初七"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "初七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 8,
+      "branch": "卯",
+      "frame": 85,
+      "printed_labels": [
+        "初八"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "初八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 9,
+      "branch": "辰",
+      "frame": 85,
+      "printed_labels": [
+        "初九"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "初九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 10,
+      "branch": "未",
+      "frame": 85,
+      "printed_labels": [
+        "初十"
+      ],
+      "candidates": [
+        {
+          "branch": "未",
+          "printed_label": "初十"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 11,
+      "branch": null,
+      "frame": 85,
+      "printed_labels": [],
+      "candidates": [],
+      "source_kind": "unresolved_missing_grid_day"
+    },
+    {
+      "bureau": 3,
+      "day": 12,
+      "branch": null,
+      "frame": 85,
+      "printed_labels": [
+        "十二",
+        "十二"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "十二"
+        },
+        {
+          "branch": "巳",
+          "printed_label": "十二"
+        }
+      ],
+      "source_kind": "unresolved_conflicting_grid_day"
+    },
+    {
+      "bureau": 3,
+      "day": 13,
+      "branch": "申",
+      "frame": 85,
+      "printed_labels": [
+        "十三"
+      ],
+      "candidates": [
+        {
+          "branch": "申",
+          "printed_label": "十三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 14,
+      "branch": "巳",
+      "frame": 85,
+      "printed_labels": [
+        "十四"
+      ],
+      "candidates": [
+        {
+          "branch": "巳",
+          "printed_label": "十四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 15,
+      "branch": "午",
+      "frame": 85,
+      "printed_labels": [
+        "十五"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "十五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 16,
+      "branch": "酉",
+      "frame": 85,
+      "printed_labels": [
+        "十六"
+      ],
+      "candidates": [
+        {
+          "branch": "酉",
+          "printed_label": "十六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 17,
+      "branch": "午",
+      "frame": 85,
+      "printed_labels": [
+        "十七"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "十七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 18,
+      "branch": "未",
+      "frame": 85,
+      "printed_labels": [
+        "十八"
+      ],
+      "candidates": [
+        {
+          "branch": "未",
+          "printed_label": "十八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 19,
+      "branch": "戌",
+      "frame": 85,
+      "printed_labels": [
+        "十九"
+      ],
+      "candidates": [
+        {
+          "branch": "戌",
+          "printed_label": "十九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 20,
+      "branch": "未",
+      "frame": 85,
+      "printed_labels": [
+        "二十"
+      ],
+      "candidates": [
+        {
+          "branch": "未",
+          "printed_label": "二十"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 21,
+      "branch": "申",
+      "frame": 85,
+      "printed_labels": [
+        "廿一"
+      ],
+      "candidates": [
+        {
+          "branch": "申",
+          "printed_label": "廿一"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 22,
+      "branch": "亥",
+      "frame": 85,
+      "printed_labels": [
+        "廿二"
+      ],
+      "candidates": [
+        {
+          "branch": "亥",
+          "printed_label": "廿二"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 23,
+      "branch": "申",
+      "frame": 85,
+      "printed_labels": [
+        "廿三"
+      ],
+      "candidates": [
+        {
+          "branch": "申",
+          "printed_label": "廿三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 24,
+      "branch": "酉",
+      "frame": 85,
+      "printed_labels": [
+        "廿四"
+      ],
+      "candidates": [
+        {
+          "branch": "酉",
+          "printed_label": "廿四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 25,
+      "branch": "子",
+      "frame": 85,
+      "printed_labels": [
+        "廿五"
+      ],
+      "candidates": [
+        {
+          "branch": "子",
+          "printed_label": "廿五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 26,
+      "branch": "酉",
+      "frame": 85,
+      "printed_labels": [
+        "廿六"
+      ],
+      "candidates": [
+        {
+          "branch": "酉",
+          "printed_label": "廿六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 27,
+      "branch": "戌",
+      "frame": 85,
+      "printed_labels": [
+        "廿七"
+      ],
+      "candidates": [
+        {
+          "branch": "戌",
+          "printed_label": "廿七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 28,
+      "branch": "丑",
+      "frame": 85,
+      "printed_labels": [
+        "廿八"
+      ],
+      "candidates": [
+        {
+          "branch": "丑",
+          "printed_label": "廿八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 29,
+      "branch": "戌",
+      "frame": 85,
+      "printed_labels": [
+        "廿九"
+      ],
+      "candidates": [
+        {
+          "branch": "戌",
+          "printed_label": "廿九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 3,
+      "day": 30,
+      "branch": "亥",
+      "frame": 85,
+      "printed_labels": [
+        "三十"
+      ],
+      "candidates": [
+        {
+          "branch": "亥",
+          "printed_label": "三十"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 1,
+      "branch": "亥",
+      "frame": 84,
+      "printed_labels": [
+        "初一"
+      ],
+      "candidates": [
+        {
+          "branch": "亥",
+          "printed_label": "初一"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 2,
+      "branch": "辰",
+      "frame": 84,
+      "printed_labels": [
+        "初二"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "初二"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 3,
+      "branch": "丑",
+      "frame": 84,
+      "printed_labels": [
+        "初三"
+      ],
+      "candidates": [
+        {
+          "branch": "丑",
+          "printed_label": "初三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 4,
+      "branch": "寅",
+      "frame": 84,
+      "printed_labels": [
+        "初四"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "初四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 5,
+      "branch": "子",
+      "frame": 84,
+      "printed_labels": [
+        "初五"
+      ],
+      "candidates": [
+        {
+          "branch": "子",
+          "printed_label": "初五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 6,
+      "branch": "巳",
+      "frame": 84,
+      "printed_labels": [
+        "初六"
+      ],
+      "candidates": [
+        {
+          "branch": "巳",
+          "printed_label": "初六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 7,
+      "branch": "寅",
+      "frame": 84,
+      "printed_labels": [
+        "初七"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "初七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 8,
+      "branch": "卯",
+      "frame": 84,
+      "printed_labels": [
+        "初八"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "初八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 9,
+      "branch": "丑",
+      "frame": 84,
+      "printed_labels": [
+        "初九"
+      ],
+      "candidates": [
+        {
+          "branch": "丑",
+          "printed_label": "初九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 10,
+      "branch": "午",
+      "frame": 84,
+      "printed_labels": [
+        "初十"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "初十"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 11,
+      "branch": "卯",
+      "frame": 84,
+      "printed_labels": [
+        "十一"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "十一"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 12,
+      "branch": "辰",
+      "frame": 84,
+      "printed_labels": [
+        "十二"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "十二"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 13,
+      "branch": "寅",
+      "frame": 84,
+      "printed_labels": [
+        "十三"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "十三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 14,
+      "branch": "未",
+      "frame": 84,
+      "printed_labels": [
+        "十四"
+      ],
+      "candidates": [
+        {
+          "branch": "未",
+          "printed_label": "十四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 15,
+      "branch": "辰",
+      "frame": 84,
+      "printed_labels": [
+        "十五"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "十五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 16,
+      "branch": "巳",
+      "frame": 84,
+      "printed_labels": [
+        "十六"
+      ],
+      "candidates": [
+        {
+          "branch": "巳",
+          "printed_label": "十六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 17,
+      "branch": "卯",
+      "frame": 84,
+      "printed_labels": [
+        "十七"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "十七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 18,
+      "branch": "申",
+      "frame": 84,
+      "printed_labels": [
+        "十八"
+      ],
+      "candidates": [
+        {
+          "branch": "申",
+          "printed_label": "十八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 19,
+      "branch": "巳",
+      "frame": 84,
+      "printed_labels": [
+        "十九"
+      ],
+      "candidates": [
+        {
+          "branch": "巳",
+          "printed_label": "十九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 20,
+      "branch": "午",
+      "frame": 84,
+      "printed_labels": [
+        "二十"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "二十"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 21,
+      "branch": "辰",
+      "frame": 84,
+      "printed_labels": [
+        "廿一"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "廿一"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 22,
+      "branch": "酉",
+      "frame": 84,
+      "printed_labels": [
+        "廿二"
+      ],
+      "candidates": [
+        {
+          "branch": "酉",
+          "printed_label": "廿二"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 23,
+      "branch": "午",
+      "frame": 84,
+      "printed_labels": [
+        "廿三"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "廿三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 24,
+      "branch": "未",
+      "frame": 84,
+      "printed_labels": [
+        "廿四"
+      ],
+      "candidates": [
+        {
+          "branch": "未",
+          "printed_label": "廿四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 25,
+      "branch": "巳",
+      "frame": 84,
+      "printed_labels": [
+        "廿五"
+      ],
+      "candidates": [
+        {
+          "branch": "巳",
+          "printed_label": "廿五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 26,
+      "branch": "戌",
+      "frame": 84,
+      "printed_labels": [
+        "廿六"
+      ],
+      "candidates": [
+        {
+          "branch": "戌",
+          "printed_label": "廿六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 27,
+      "branch": "未",
+      "frame": 84,
+      "printed_labels": [
+        "廿七"
+      ],
+      "candidates": [
+        {
+          "branch": "未",
+          "printed_label": "廿七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 28,
+      "branch": "申",
+      "frame": 84,
+      "printed_labels": [
+        "廿八"
+      ],
+      "candidates": [
+        {
+          "branch": "申",
+          "printed_label": "廿八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 29,
+      "branch": "午",
+      "frame": 84,
+      "printed_labels": [
+        "廿九"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "廿九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 4,
+      "day": 30,
+      "branch": "亥",
+      "frame": 84,
+      "printed_labels": [
+        "三十"
+      ],
+      "candidates": [
+        {
+          "branch": "亥",
+          "printed_label": "三十"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 1,
+      "branch": "午",
+      "frame": 86,
+      "printed_labels": [
+        "初一"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "初一"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 2,
+      "branch": "亥",
+      "frame": 86,
+      "printed_labels": [
+        "初二"
+      ],
+      "candidates": [
+        {
+          "branch": "亥",
+          "printed_label": "初二"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 3,
+      "branch": "辰",
+      "frame": 86,
+      "printed_labels": [
+        "初三"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "初三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 4,
+      "branch": "丑",
+      "frame": 86,
+      "printed_labels": [
+        "初四"
+      ],
+      "candidates": [
+        {
+          "branch": "丑",
+          "printed_label": "初四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 5,
+      "branch": "寅",
+      "frame": 86,
+      "printed_labels": [
+        "初五"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "初五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 6,
+      "branch": "未",
+      "frame": 86,
+      "printed_labels": [
+        "初六"
+      ],
+      "candidates": [
+        {
+          "branch": "未",
+          "printed_label": "初六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 7,
+      "branch": "子",
+      "frame": 86,
+      "printed_labels": [
+        "初七"
+      ],
+      "candidates": [
+        {
+          "branch": "子",
+          "printed_label": "初七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 8,
+      "branch": "巳",
+      "frame": 86,
+      "printed_labels": [
+        "初八"
+      ],
+      "candidates": [
+        {
+          "branch": "巳",
+          "printed_label": "初八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 9,
+      "branch": "寅",
+      "frame": 86,
+      "printed_labels": [
+        "初九"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "初九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 10,
+      "branch": "卯",
+      "frame": 86,
+      "printed_labels": [
+        "初十"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "初十"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 11,
+      "branch": "申",
+      "frame": 86,
+      "printed_labels": [
+        "十一"
+      ],
+      "candidates": [
+        {
+          "branch": "申",
+          "printed_label": "十一"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 12,
+      "branch": "丑",
+      "frame": 86,
+      "printed_labels": [
+        "十二"
+      ],
+      "candidates": [
+        {
+          "branch": "丑",
+          "printed_label": "十二"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 13,
+      "branch": "午",
+      "frame": 86,
+      "printed_labels": [
+        "十三"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "十三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 14,
+      "branch": "卯",
+      "frame": 86,
+      "printed_labels": [
+        "十四"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "十四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 15,
+      "branch": "辰",
+      "frame": 86,
+      "printed_labels": [
+        "十五"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "十五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 16,
+      "branch": "酉",
+      "frame": 86,
+      "printed_labels": [
+        "十六"
+      ],
+      "candidates": [
+        {
+          "branch": "酉",
+          "printed_label": "十六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 17,
+      "branch": "寅",
+      "frame": 86,
+      "printed_labels": [
+        "十七"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "十七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 18,
+      "branch": "未",
+      "frame": 86,
+      "printed_labels": [
+        "十八"
+      ],
+      "candidates": [
+        {
+          "branch": "未",
+          "printed_label": "十八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 19,
+      "branch": "辰",
+      "frame": 86,
+      "printed_labels": [
+        "十九"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "十九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 20,
+      "branch": "巳",
+      "frame": 86,
+      "printed_labels": [
+        "二十"
+      ],
+      "candidates": [
+        {
+          "branch": "巳",
+          "printed_label": "二十"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 21,
+      "branch": "戌",
+      "frame": 86,
+      "printed_labels": [
+        "廿一"
+      ],
+      "candidates": [
+        {
+          "branch": "戌",
+          "printed_label": "廿一"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 22,
+      "branch": "卯",
+      "frame": 86,
+      "printed_labels": [
+        "廿二"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "廿二"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 23,
+      "branch": "申",
+      "frame": 86,
+      "printed_labels": [
+        "廿三"
+      ],
+      "candidates": [
+        {
+          "branch": "申",
+          "printed_label": "廿三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 24,
+      "branch": "巳",
+      "frame": 86,
+      "printed_labels": [
+        "廿四"
+      ],
+      "candidates": [
+        {
+          "branch": "巳",
+          "printed_label": "廿四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 25,
+      "branch": "午",
+      "frame": 86,
+      "printed_labels": [
+        "廿五"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "廿五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 26,
+      "branch": "亥",
+      "frame": 86,
+      "printed_labels": [
+        "廿六"
+      ],
+      "candidates": [
+        {
+          "branch": "亥",
+          "printed_label": "廿六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 27,
+      "branch": "辰",
+      "frame": 86,
+      "printed_labels": [
+        "廿七"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "廿七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 28,
+      "branch": "酉",
+      "frame": 86,
+      "printed_labels": [
+        "廿八"
+      ],
+      "candidates": [
+        {
+          "branch": "酉",
+          "printed_label": "廿八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 29,
+      "branch": "午",
+      "frame": 86,
+      "printed_labels": [
+        "廿九"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "廿九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 5,
+      "day": 30,
+      "branch": "未",
+      "frame": 86,
+      "printed_labels": [
+        "三十"
+      ],
+      "candidates": [
+        {
+          "branch": "未",
+          "printed_label": "三十"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 1,
+      "branch": "酉",
+      "frame": 86,
+      "printed_labels": [
+        "初一"
+      ],
+      "candidates": [
+        {
+          "branch": "酉",
+          "printed_label": "初一"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 2,
+      "branch": "午",
+      "frame": 86,
+      "printed_labels": [
+        "初二"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "初二"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 3,
+      "branch": "亥",
+      "frame": 86,
+      "printed_labels": [
+        "初三"
+      ],
+      "candidates": [
+        {
+          "branch": "亥",
+          "printed_label": "初三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 4,
+      "branch": "辰",
+      "frame": 86,
+      "printed_labels": [
+        "初四"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "初四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 5,
+      "branch": "丑",
+      "frame": 86,
+      "printed_labels": [
+        "初五"
+      ],
+      "candidates": [
+        {
+          "branch": "丑",
+          "printed_label": "初五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 6,
+      "branch": "寅",
+      "frame": 86,
+      "printed_labels": [
+        "初六"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "初六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 7,
+      "branch": "戌",
+      "frame": 86,
+      "printed_labels": [
+        "初七"
+      ],
+      "candidates": [
+        {
+          "branch": "戌",
+          "printed_label": "初七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 8,
+      "branch": "未",
+      "frame": 86,
+      "printed_labels": [
+        "初八"
+      ],
+      "candidates": [
+        {
+          "branch": "未",
+          "printed_label": "初八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 9,
+      "branch": "子",
+      "frame": 86,
+      "printed_labels": [
+        "初九"
+      ],
+      "candidates": [
+        {
+          "branch": "子",
+          "printed_label": "初九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 10,
+      "branch": "巳",
+      "frame": 86,
+      "printed_labels": [
+        "初十"
+      ],
+      "candidates": [
+        {
+          "branch": "巳",
+          "printed_label": "初十"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 11,
+      "branch": "寅",
+      "frame": 86,
+      "printed_labels": [
+        "十一"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "十一"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 12,
+      "branch": "卯",
+      "frame": 86,
+      "printed_labels": [
+        "十二"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "十二"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 13,
+      "branch": "亥",
+      "frame": 86,
+      "printed_labels": [
+        "十三"
+      ],
+      "candidates": [
+        {
+          "branch": "亥",
+          "printed_label": "十三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 14,
+      "branch": "申",
+      "frame": 86,
+      "printed_labels": [
+        "十四"
+      ],
+      "candidates": [
+        {
+          "branch": "申",
+          "printed_label": "十四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 15,
+      "branch": "丑",
+      "frame": 86,
+      "printed_labels": [
+        "十五"
+      ],
+      "candidates": [
+        {
+          "branch": "丑",
+          "printed_label": "十五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 16,
+      "branch": "午",
+      "frame": 86,
+      "printed_labels": [
+        "十六"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "十六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 17,
+      "branch": "卯",
+      "frame": 86,
+      "printed_labels": [
+        "十七"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "十七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 18,
+      "branch": "辰",
+      "frame": 86,
+      "printed_labels": [
+        "十八"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "十八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 19,
+      "branch": "子",
+      "frame": 86,
+      "printed_labels": [
+        "十九"
+      ],
+      "candidates": [
+        {
+          "branch": "子",
+          "printed_label": "十九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 20,
+      "branch": "酉",
+      "frame": 86,
+      "printed_labels": [
+        "二十"
+      ],
+      "candidates": [
+        {
+          "branch": "酉",
+          "printed_label": "二十"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 21,
+      "branch": "寅",
+      "frame": 86,
+      "printed_labels": [
+        "廿一"
+      ],
+      "candidates": [
+        {
+          "branch": "寅",
+          "printed_label": "廿一"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 22,
+      "branch": "未",
+      "frame": 86,
+      "printed_labels": [
+        "廿二"
+      ],
+      "candidates": [
+        {
+          "branch": "未",
+          "printed_label": "廿二"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 23,
+      "branch": "辰",
+      "frame": 86,
+      "printed_labels": [
+        "廿三"
+      ],
+      "candidates": [
+        {
+          "branch": "辰",
+          "printed_label": "廿三"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 24,
+      "branch": "巳",
+      "frame": 86,
+      "printed_labels": [
+        "廿四"
+      ],
+      "candidates": [
+        {
+          "branch": "巳",
+          "printed_label": "廿四"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 25,
+      "branch": "丑",
+      "frame": 86,
+      "printed_labels": [
+        "廿五"
+      ],
+      "candidates": [
+        {
+          "branch": "丑",
+          "printed_label": "廿五"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 26,
+      "branch": "戌",
+      "frame": 86,
+      "printed_labels": [
+        "廿六"
+      ],
+      "candidates": [
+        {
+          "branch": "戌",
+          "printed_label": "廿六"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 27,
+      "branch": "卯",
+      "frame": 86,
+      "printed_labels": [
+        "廿七"
+      ],
+      "candidates": [
+        {
+          "branch": "卯",
+          "printed_label": "廿七"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 28,
+      "branch": "申",
+      "frame": 86,
+      "printed_labels": [
+        "廿八"
+      ],
+      "candidates": [
+        {
+          "branch": "申",
+          "printed_label": "廿八"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 29,
+      "branch": "巳",
+      "frame": 86,
+      "printed_labels": [
+        "廿九"
+      ],
+      "candidates": [
+        {
+          "branch": "巳",
+          "printed_label": "廿九"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    },
+    {
+      "bureau": 6,
+      "day": 30,
+      "branch": "午",
+      "frame": 86,
+      "printed_labels": [
+        "三十"
+      ],
+      "candidates": [
+        {
+          "branch": "午",
+          "printed_label": "三十"
+        }
+      ],
+      "source_kind": "direct_grid_cell"
+    }
+  ],
+  "limits": [
+    "All five diagrams inspected by one reader; no independent second adjudication",
+    "150 visible printed label occurrences resolve 147 unambiguous bureau/day positions; one additional case is derived from prose; wood-three days 11 and 12 have no unique printed expectation",
+    "The Ming wood-three grid itself has 十二 at both 辰 and 巳, with 十一 missing; both literal readings and the initial transcription error are retained",
+    "The lower water-two 亥 label is retained as 廿, with possible faded suffix unresolved; it is not credited as a directly read 廿一",
+    "Cropped regions may include neighbouring cells or marginal folio numerals; only text inside the named grid cell is transcribed",
+    "Matching comparable placements does not establish whole-book, calendar or real-world predictive validity"
+  ]
+}

@@ -1,0 +1,1352 @@
+{
+  "id": "meihua_weather_v1",
+  "version": "1.7.0",
+  "title": "《梅花易數》卷二天时占选定条款",
+  "sources": [
+    {
+      "id": "meihua-volume-2",
+      "title": "梅花易數/卷二",
+      "revision": 1441921,
+      "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二",
+      "scope": "Fixed transcription revision1441921. New seasonal clauses follow this text explicitly; absent subjects and graph differences in selected facsimiles are not silently harmonized."
+    },
+    {
+      "id": "meihua-gen-dejutang",
+      "title": "《梅花易數》德聚堂刊本，故宮珍本叢刊415影印",
+      "url": "https://commons.wikimedia.org/w/index.php?title=File:GGZBCK415_梅花易數_増補詳注六爻一撮金易數_官板大六壬神課金口訣_邵子易數_大六壬課經集.pdf&oldid=1155031066",
+      "scope": "Selected Gen, introductory, Li wording and pure-Kan suffix confirmations on original PDF page25, with chapter ordinal 第二 retained; no whole-chapter authentication.",
+      "original_pdf_index_for_gen_many": 25,
+      "bibliography_status": "Commons catalog reports Qing Dejutang edition; visible block title identifies 德聚堂梓. Date and authorship not independently authenticated."
+    },
+    {
+      "id": "meihua-gen-nlc-1925",
+      "title": "《梅花易數》文明書局本，NLC416-12jh005426-44577",
+      "url": "https://commons.wikimedia.org/w/index.php?title=File:NLC416-12jh005426-44577_梅花易數.pdf&oldid=808894944",
+      "scope": "Assistant visual reading of spans linked to the earlier35 rules plus three seasonal comparisons on original PDF pages62-64. Winter subject and spring graph differ from the fixed transcription; no full-character, full-semantic or independent human authentication. Two added atomic daypart readings share the selected span 離在艮上暮雨朝晴 on page64; following 離互艮宮 remains unadjudicated.",
+      "original_pdf_index_for_gen_many": 62,
+      "bibliography_status": "Commons catalog reports National Library of China copy and 1925 publication; cover visibly identifies 上海文明書局發行. Direct NLC catalog fetch timed out; do not claim independent catalog authentication."
+    }
+  ],
+  "entry_rule": {
+    "quote": "凡占天時，不分體用，全觀諸卦，詳推五行。",
+    "source_id": "meihua-volume-2",
+    "section": "天時占第一"
+  },
+  "policies": [
+    {
+      "id": "six_slots",
+      "kind": "software_convention",
+      "statement": "全观选择本、互、变上下六个位置；重复出现逐位置记录，无权重，无错综卦。原文未唯一规定计数分母。"
+    },
+    {
+      "id": "many",
+      "kind": "unadjudicated_quantifier",
+      "statement": "多没有原文数值阈值。仅在调用者事前明示many_min_count时按该软件约定检验；否则保留待定。六位置原始status保留，同时核对静卦只计一次的五位置候选；有分歧时effective_status及实际解读明确标为频数范围未裁定，不暗选分母或阈值。"
+    },
+    {
+      "id": "pair",
+      "kind": "software_convention",
+      "statement": "在上、两同或相逢等组合按同一个本/互/变重卦匹配，不把不同卦的两个位置擅自拼成上下组合。"
+    },
+    {
+      "id": "season",
+      "kind": "conditional_text_scope",
+      "statement": "雷电和霜雪条款结合章末夏天及冬月条件。时区、节月五行旺衰不替代已核定的气象季节。"
+    },
+    {
+      "id": "conflicts",
+      "kind": "software_convention",
+      "statement": "通象与专条全部保留；不投票、不累积分数、不以体用裁天气、不编造晴雨优先级或自动时间窗。"
+    },
+    {
+      "id": "retained_casts",
+      "kind": "software_evidence_convention",
+      "statement": "若取爻原数与卦序数产生不同实际候选，每套候选使用自身本互变、动爻与同一已确认天气条件计算同一规则。casting_variants供首轮分列，casting_variant_traces供完整核对；只报告所选条件下规则差异，不投票、合并计数或按已知天气选候选。"
+    },
+    {
+      "id": "gen_rain_stop_vs_clear",
+      "kind": "conditional_text_scope",
+      "statement": "一般久雨得艮的雨止象与艮多久雨必晴是分别核对的原文条款。后者须已确认久雨和明示多字阈值，并保留五／六位置分歧。久晴不雨得此亦然的指代仍未唯一裁定，不自动反推见艮必雨。"
+    },
+    {
+      "id": "source_wording_variants",
+      "kind": "textual_evidence_policy",
+      "statement": "保留固定转录引文及影印所选字句；四时必雨与四时多雨等差异逐条公开，不把影印目读写成独立专家认证，也不把多雨改写为百分之百有雨。"
+    },
+    {
+      "id": "seasonal_named_element_membership",
+      "kind": "software_convention_with_explicit_text_basis",
+      "statement": "乾兑金、坤艮土按所列卦类任一出现匹配，不要求两卦同现，不附加多字阈值；仍取实际本互变六位置。三条新增季节句以固定卷二转录1441921为计算依据；影像冬句缺主语、春句兑/艮字差异分别保留，不宣称两版一致或据五行纠正刻字。"
+    },
+    {
+      "id": "source_daypart_labels",
+      "kind": "source_scoped_temporal_representation",
+      "statement": "离在艮上暮雨朝晴拆为朝晴、暮雨两项原文时段，条件仍为实际同一重卦上离下艮。朝暮不换算钟时、日出日落或日期，也不假定已经定位同一具体公历日。原38条未定时段条款不解释为全天；保留同一时段、不同朝暮、未定时段之间的不同关系，不投票或自动交集。",
+      "unprovided_calendar_date": null,
+      "unprovided_clock_intervals": null
+    }
+  ],
+  "rules": [
+    {
+      "id": "symbol_li",
+      "kind": "symbol_association",
+      "conditions": {
+        "present": [
+          "离"
+        ]
+      },
+      "tags": [
+        "clear"
+      ],
+      "quote": "五行屬離屬火，主晴",
+      "reading": "离火在天时取晴象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "五行謂離屬火主晴",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "note": "謂 versus 屬 in the fixed transcription"
+        },
+        {
+          "source_id": "meihua-gen-dejutang",
+          "section": "天時占第二",
+          "original_pdf_index": 25,
+          "selected_span": "五行謂離屬火主晴",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "position": "upper half, small-type body beginning"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_facsimile_variants",
+      "fixed_transcription_selected_span": "五行屬離屬火主晴"
+    },
+    {
+      "id": "symbol_kan",
+      "kind": "symbol_association",
+      "conditions": {
+        "present": [
+          "坎"
+        ]
+      },
+      "tags": [
+        "rain"
+      ],
+      "quote": "坎為水，主雨",
+      "reading": "坎水在天时取雨象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "坎為水主雨",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "symbol_kun",
+      "kind": "symbol_association",
+      "conditions": {
+        "present": [
+          "坤"
+        ]
+      },
+      "tags": [
+        "cloudy"
+      ],
+      "quote": "坤為地氣，主陰",
+      "reading": "坤在天时取阴象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "坤為地氣主陰",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "symbol_qian",
+      "kind": "symbol_association",
+      "conditions": {
+        "present": [
+          "乾"
+        ]
+      },
+      "tags": [
+        "clear"
+      ],
+      "quote": "乾為天，主晴明",
+      "reading": "乾在天时取晴明象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "乾為天主晴明",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "symbol_xun",
+      "kind": "symbol_association",
+      "conditions": {
+        "present": [
+          "巽"
+        ]
+      },
+      "tags": [
+        "wind"
+      ],
+      "quote": "巽為風",
+      "reading": "巽在天时取风象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "巽為風",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "symbol_zhen",
+      "kind": "symbol_association",
+      "conditions": {
+        "present": [
+          "震"
+        ]
+      },
+      "tags": [
+        "thunder"
+      ],
+      "quote": "震為雷",
+      "reading": "震在天时取雷象，实际雷象还须审季节及制约",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "震為雷",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "symbol_gen",
+      "kind": "symbol_association",
+      "conditions": {
+        "present": [
+          "艮"
+        ]
+      },
+      "tags": [
+        "cloudy"
+      ],
+      "quote": "艮為山雲之氣",
+      "reading": "艮在天时取山云象，止雨条款另核前期天气",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "艮為山雲之氣",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "symbol_dui",
+      "kind": "symbol_association",
+      "conditions": {
+        "present": [
+          "兑"
+        ]
+      },
+      "tags": [
+        "cloudy"
+      ],
+      "quote": "兌為澤，故不雨亦陰",
+      "reading": "兑在天时取不雨亦阴之象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "兌為澤故不雨亦陰",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "many_li",
+      "kind": "conditional_rule",
+      "conditions": {
+        "many": "离"
+      },
+      "tags": [
+        "clear"
+      ],
+      "quote": "離多主晴",
+      "reading": "明示阈值下离多，原文取晴象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 62,
+          "selected_span": "離多主晴",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "many_kan",
+      "kind": "conditional_rule",
+      "conditions": {
+        "many": "坎"
+      },
+      "tags": [
+        "rain"
+      ],
+      "quote": "坎多主雨",
+      "reading": "明示阈值下坎多，原文取雨象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 62,
+          "selected_span": "坎多主雨",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "summer_li_without_kan",
+      "kind": "conditional_rule",
+      "conditions": {
+        "many": "离",
+        "absent": [
+          "坎"
+        ],
+        "season": "summer"
+      },
+      "tags": [
+        "drought",
+        "heat"
+      ],
+      "quote": "夏占離多而無坎，則亢旱炎炎。",
+      "reading": "夏季且离多无坎，原文取旱热象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 62,
+          "selected_span": "夏占離多而無坎則亢旱炎炎",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "winter_kan_without_li",
+      "kind": "conditional_rule",
+      "conditions": {
+        "many": "坎",
+        "absent": [
+          "离"
+        ],
+        "season": "winter"
+      },
+      "tags": [
+        "rain",
+        "snow"
+      ],
+      "quote": "冬占坎多而無離，則雨雪飄飄。",
+      "reading": "冬季且坎多无离，原文取雨雪象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 62,
+          "selected_span": "冬占坎多而無離則雨雪飄飄",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "long_rain_gen_stops",
+      "kind": "conditional_rule",
+      "conditions": {
+        "present": [
+          "艮"
+        ],
+        "prior_condition": "prolonged_rain"
+      },
+      "tags": [
+        "rain_stopping"
+      ],
+      "quote": "若雨久，得艮則當止。",
+      "reading": "已确认久雨且得艮，原文取雨止象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "若雨久得艮則當止",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "long_rain_qian_clears",
+      "kind": "conditional_rule",
+      "conditions": {
+        "present": [
+          "乾"
+        ],
+        "prior_condition": "prolonged_rain"
+      },
+      "tags": [
+        "clear"
+      ],
+      "quote": "乾為老陽之極，久雨必晴。",
+      "reading": "已确认久雨且得乾，原文取转晴象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "久雨必晴",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "note": "Closer source-image reading does not clearly corroborate the complete 乾為老陽之極 phrase in the NLC line. Retain only the clearly visible suffix; do not reconstruct missing/corrupt wording from the familiar transcription.",
+          "subject_status": "fixed_transcription_subject_not_confirmed_in_selected_facsimile"
+        }
+      ],
+      "textual_status": "fixed_transcription_subject_not_confirmed_in_selected_facsimile"
+    },
+    {
+      "id": "long_clear_kun_rain",
+      "kind": "conditional_rule",
+      "conditions": {
+        "present": [
+          "坤"
+        ],
+        "prior_condition": "prolonged_clear"
+      },
+      "tags": [
+        "rain"
+      ],
+      "quote": "坤為老陰之極，久晴必雨",
+      "reading": "已确认久晴且得坤，原文取转雨象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "坤為老陰之極而久晴必雨",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "note": "Visible connective 而, no new condition introduced"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_facsimile_variants",
+      "fixed_transcription_selected_span": "坤為老陰之極久晴必雨"
+    },
+    {
+      "id": "qian_kun_mixed",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "乾",
+            "坤"
+          ],
+          [
+            "坤",
+            "乾"
+          ]
+        ]
+      },
+      "tags": [
+        "variable"
+      ],
+      "quote": "乾、坤兩同，晴雨時變。",
+      "reading": "同一重卦乾坤并见，原文取晴雨变化象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "乾坤兩同晴雨時變",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "kun_gen_mixed",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "坤",
+            "艮"
+          ],
+          [
+            "艮",
+            "坤"
+          ]
+        ]
+      },
+      "tags": [
+        "cloudy",
+        "variable"
+      ],
+      "quote": "坤、艮兩並，陰晦不常。",
+      "reading": "同一重卦坤艮并见，原文取阴晦不常象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "坤艮兩雨並陰晦不常",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "note": "NLC visibly retains an extra 雨 in the selected line; not silently corrected"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_facsimile_variants",
+      "fixed_transcription_selected_span": "坤艮兩並陰晦不常"
+    },
+    {
+      "id": "kan_above_gen_fog",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "坎",
+            "艮"
+          ]
+        ]
+      },
+      "tags": [
+        "fog"
+      ],
+      "quote": "坎在艮上，布霧興雲",
+      "reading": "同一重卦坎在艮上，原文取雾云象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "坎在艮上布霧興雲",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "kan_above_dui_winter_snow",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "坎",
+            "兑"
+          ]
+        ],
+        "season": "winter"
+      },
+      "tags": [
+        "snow",
+        "frost"
+      ],
+      "quote": "若在兌上，凝霜作雪",
+      "reading": "坎在兑上并按章末冬月条件，原文取霜雪象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "若在兌上凝霜作雪",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "li_zhen_lightning",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "离",
+            "震"
+          ],
+          [
+            "震",
+            "离"
+          ]
+        ],
+        "season": "summer"
+      },
+      "tags": [
+        "thunder",
+        "lightning"
+      ],
+      "quote": "離為電，震為雷，重會而雷電俱作。",
+      "reading": "离震同卦且已确认夏季，原文取雷电象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "離為電震為雷重會而雷電俱作",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "kan_xun_wind_rain",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "坎",
+            "巽"
+          ],
+          [
+            "巽",
+            "坎"
+          ]
+        ]
+      },
+      "tags": [
+        "wind",
+        "rain"
+      ],
+      "quote": "坎為雨，巽為風，相逢而風雨驟興。",
+      "reading": "坎巽同卦，原文取风雨象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "坎為雨巽為風相逢而風雨驟興",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "pure_li_clear",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "离",
+            "离"
+          ]
+        ]
+      },
+      "tags": [
+        "clear"
+      ],
+      "quote": "爻純離，夏必旱，四季皆晴。",
+      "reading": "重离在所选章取晴象，夏旱须另核季节",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "夏必旱四季皆晴",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "note": "Selected clear suffix only; the preceding graph resembling 八/爻 is not independently adjudicated"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "pure_li_summer_drought",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "离",
+            "离"
+          ]
+        ],
+        "season": "summer"
+      },
+      "tags": [
+        "drought",
+        "heat"
+      ],
+      "quote": "爻純離，夏必旱，四季皆晴。",
+      "reading": "重离且已确认夏季，原文取旱热象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "夏必旱四季皆晴",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "note": "Selected clear suffix only; the preceding graph resembling 八/爻 is not independently adjudicated"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "pure_kan_rain",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "坎",
+            "坎"
+          ]
+        ]
+      },
+      "tags": [
+        "rain"
+      ],
+      "quote": "爻純坎，冬必寒，四時必雨。",
+      "reading": "重坎在所选章取雨象，冬寒须另核季节",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 64,
+          "selected_span": "冬必寒四時多雨",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "note": "Both selected facsimiles read 多; retain the fixed transcription 必 rather than overwrite it"
+        },
+        {
+          "source_id": "meihua-gen-dejutang",
+          "section": "天時占第二",
+          "original_pdf_index": 25,
+          "selected_span": "冬必寒四時多雨",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "position": "lower half, right continuation"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_facsimile_variants",
+      "fixed_transcription_selected_span": "冬必寒四時必雨"
+    },
+    {
+      "id": "pure_kan_winter_cold",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "坎",
+            "坎"
+          ]
+        ],
+        "season": "winter"
+      },
+      "tags": [
+        "cold"
+      ],
+      "quote": "爻純坎，冬必寒，四時必雨。",
+      "reading": "重坎且已确认冬季，原文取寒象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 64,
+          "selected_span": "冬必寒四時多雨",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "note": "Same selected span as pure_kan_rain, not another independent text observation"
+        },
+        {
+          "source_id": "meihua-gen-dejutang",
+          "section": "天時占第二",
+          "original_pdf_index": 25,
+          "selected_span": "冬必寒四時多雨",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "position": "same span as pure_kan_rain"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_facsimile_variants",
+      "fixed_transcription_selected_span": "冬必寒四時必雨"
+    },
+    {
+      "id": "jiji_weiji_variable",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "坎",
+            "离"
+          ],
+          [
+            "离",
+            "坎"
+          ]
+        ]
+      },
+      "tags": [
+        "variable"
+      ],
+      "quote": "又若水火既濟、火水未濟，四時不測風雲",
+      "reading": "既济或未济出现，原文取天气不定象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 64,
+          "selected_span": "又若水火既濟水火未濟四時不測風雲",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "note": "NLC visibly prints 水火 twice despite the distinct hexagram names; both orders already present in the runtime condition, so do not rewrite geometry to fit this witness"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_facsimile_variants",
+      "fixed_transcription_selected_span": "又若水火既濟火水未濟四時不測風雲"
+    },
+    {
+      "id": "zhongfu_daguo_winter",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "巽",
+            "兑"
+          ],
+          [
+            "兑",
+            "巽"
+          ]
+        ],
+        "season": "winter"
+      },
+      "tags": [
+        "rain",
+        "snow"
+      ],
+      "quote": "風澤中孚，澤風大過，三冬必然雨雪。",
+      "reading": "中孚或大过且已确认冬季，原文取雨雪象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 64,
+          "selected_span": "風澤中孚澤風大過三冬必然雨雪",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "jian_meng_rain",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "坎",
+            "艮"
+          ],
+          [
+            "艮",
+            "坎"
+          ]
+        ]
+      },
+      "tags": [
+        "rain"
+      ],
+      "quote": "水山蹇，山水蒙，百步必須執蓋。",
+      "reading": "蹇或蒙出现，原文取需备雨具的象义",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 64,
+          "selected_span": "水山蹇山水蒙百步必須執蓋",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "tai_xu_dim",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "坤",
+            "乾"
+          ],
+          [
+            "坎",
+            "乾"
+          ]
+        ]
+      },
+      "tags": [
+        "cloudy"
+      ],
+      "quote": "地天泰，水天需，昏蒙之象。",
+      "reading": "泰或需出现，原文取昏蒙象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "地天泰水天需昏濛之象",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "note": "濛 versus 蒙 retained"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_facsimile_variants",
+      "fixed_transcription_selected_span": "地天泰水天需昏蒙之象"
+    },
+    {
+      "id": "pi_bi_dark",
+      "kind": "conditional_rule",
+      "conditions": {
+        "pairs": [
+          [
+            "乾",
+            "坤"
+          ],
+          [
+            "坎",
+            "坤"
+          ]
+        ]
+      },
+      "tags": [
+        "cloudy"
+      ],
+      "quote": "天地否，水地比，黑暗之形。",
+      "reading": "否或比出现，原文取阴暗象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "天地否水地比黑暗之形",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "many_gen_long_rain_clear",
+      "kind": "conditional_rule",
+      "conditions": {
+        "many": "艮",
+        "prior_condition": "prolonged_rain"
+      },
+      "tags": [
+        "clear"
+      ],
+      "quote": "艮多則久雨必晴",
+      "reading": "已确认久雨且明示阈值下艮多，原文另取晴象；不把一般得艮止雨直接等同于放晴",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "facsimile_confirmation": {
+        "scope": "This one clause only; manual readings of two selected witnesses, not complete chapter authentication",
+        "readings_id": "gen_many_long_rain_clear",
+        "references": [
+          {
+            "edition": "德聚堂刊本，故宮珍本叢刊415影印",
+            "original_pdf_index": 25,
+            "position": "upper half, bold introductory weather text",
+            "source_id": "meihua-gen-dejutang",
+            "url": "https://commons.wikimedia.org/w/index.php?title=File:GGZBCK415_梅花易數_増補詳注六爻一撮金易數_官板大六壬神課金口訣_邵子易數_大六壬課經集.pdf&oldid=1155031066"
+          },
+          {
+            "edition": "文明書局本，NLC416-12jh005426-44577",
+            "original_pdf_index": 62,
+            "position": "left columns, introductory weather text",
+            "source_id": "meihua-gen-nlc-1925",
+            "url": "https://commons.wikimedia.org/w/index.php?title=File:NLC416-12jh005426-44577_梅花易數.pdf&oldid=808894944"
+          }
+        ]
+      },
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 62,
+          "selected_span": "艮多則久雨必晴",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "many_zhen_spring_summer",
+      "kind": "conditional_frequency_association",
+      "conditions": {
+        "many": "震",
+        "season": [
+          "spring",
+          "summer"
+        ]
+      },
+      "tags": [
+        "thunder"
+      ],
+      "quote": "震多則春夏雷轟",
+      "reading": "已确认春或夏且明示阈值下震多，原文取雷象；不据此推出秋冬非常雷或已发生雷电",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 62,
+          "selected_span": "震多則春夏雷轟",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "many_xun_all_seasons",
+      "kind": "conditional_frequency_association",
+      "conditions": {
+        "many": "巽"
+      },
+      "tags": [
+        "wind"
+      ],
+      "quote": "巽多則四時風烈",
+      "reading": "明示阈值下巽多，所选转录以风烈形容四时风象；影印选段作风列，不换算为已测风力等级",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 62,
+          "selected_span": "巽多則四時風列",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "note": "Both selected facsimiles visibly retain 列; strong-wind interpretation remains a reading, not a measured wind grade"
+        },
+        {
+          "source_id": "meihua-gen-dejutang",
+          "section": "天時占第二",
+          "original_pdf_index": 25,
+          "selected_span": "巽多則四時風列",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication",
+          "position": "upper half, bold opening"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_facsimile_variants",
+      "fixed_transcription_selected_span": "巽多則四時風烈"
+    },
+    {
+      "id": "many_dui_cloudy",
+      "kind": "conditional_frequency_association",
+      "conditions": {
+        "many": "兑"
+      },
+      "tags": [
+        "cloudy"
+      ],
+      "quote": "兌多則不雨亦陰",
+      "reading": "明示阈值下兑多，原文取即使不雨亦阴的象义；这不是已确认无雨，也不消除其他条款的雨象",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 62,
+          "selected_span": "兌多則不雨亦陰",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "gen_xun_wind_cloud",
+      "kind": "paired_symbol_association",
+      "conditions": {
+        "pairs": [
+          [
+            "艮",
+            "巽"
+          ],
+          [
+            "巽",
+            "艮"
+          ]
+        ]
+      },
+      "tags": [
+        "wind",
+        "cloudy"
+      ],
+      "quote": "艮、巽重逢，風雲際會",
+      "reading": "同一重卦艮巽并见，原文取风云际会之象；不从跨卦位置拼配，不量化为实测风力或灾害",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "section": "天時占第一",
+          "original_pdf_index": 63,
+          "selected_span": "艮巽重逢風雲際會",
+          "scope": "selected_readable_span_not_automatic_full_quote_authentication"
+        }
+      ],
+      "textual_status": "fixed_transcription_with_selected_facsimile_span"
+    },
+    {
+      "id": "autumn_metal_clear",
+      "quote": "乾、兌為金，秋明晴",
+      "conditions": {
+        "present_any": [
+          "乾",
+          "兑"
+        ],
+        "season": "autumn"
+      },
+      "tags": [
+        "clear"
+      ],
+      "reading": "按所选固定转录，已确认秋季且实际本互变见乾或兑，取秋金晴明象；不要求乾兑同现，不以此保证当地无雨",
+      "textual_status": "fixed_transcription_wei_vs_selected_facsimile_zhi",
+      "fixed_transcription_selected_span": "乾、兌為金，秋明晴",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "original_pdf_index": 63,
+          "section": "天時占第一",
+          "selected_span": "乾兌之金秋明晴",
+          "reviewer": "assistant_visual_reading_not_independent_human_expert",
+          "comparison": "固定转录為金，所选影像之金；晴明句义对照，字形分别保留"
+        }
+      ],
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "kind": "seasonal_qualification"
+    },
+    {
+      "id": "winter_kan_snow",
+      "quote": "坎之水，冬雪凜冽",
+      "conditions": {
+        "present": [
+          "坎"
+        ],
+        "season": "winter"
+      },
+      "tags": [
+        "snow",
+        "cold"
+      ],
+      "reading": "仅按所选固定转录的坎水冬雪句，已确认冬季且实际本互变见坎，取雪与凛冽象；所选文明书局影像此处未见坎之水，不能称影像同样明确此主语，也不保证实际降雪",
+      "textual_status": "fixed_transcription_subject_not_present_in_selected_facsimile",
+      "fixed_transcription_selected_span": "坎之水，冬雪凜冽",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "original_pdf_index": 63,
+          "section": "天時占第一",
+          "selected_span": "乾兌之金秋明晴冬雪凜冽",
+          "reviewer": "assistant_visual_reading_not_independent_human_expert",
+          "subject_status": "坎之水未见于所选位置；不凭固定转录补入影像，也未裁定冬句唯一主语"
+        }
+      ],
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "kind": "seasonal_qualification"
+    },
+    {
+      "id": "spring_earth_rain",
+      "quote": "坤、艮之土，春雨澤",
+      "conditions": {
+        "present_any": [
+          "坤",
+          "艮"
+        ],
+        "season": "spring"
+      },
+      "tags": [
+        "rain"
+      ],
+      "reading": "仅按所选固定转录的坤艮春雨句，已确认春季且实际本互变见坤或艮，取春雨润泽象；所选文明书局影像可见坤兌，不据五行常识把原字改为艮，也不把此雨象当成坎雨象一并取消",
+      "textual_status": "fixed_transcription_gen_vs_selected_facsimile_dui",
+      "fixed_transcription_selected_span": "坤、艮之土，春雨澤",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "original_pdf_index": 63,
+          "section": "天時占第一",
+          "selected_span": "坤兌之土春雨澤",
+          "reviewer": "assistant_visual_reading_not_independent_human_expert",
+          "graph_status": "固定转录艮、所选影像读兌；不静默校改，亦未由五行归类裁定底本文字"
+        }
+      ],
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "kind": "seasonal_qualification"
+    },
+    {
+      "id": "li_above_gen_morning_clear",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "kind": "source_daypart_clause",
+      "quote": "離在艮上，暮雨朝晴",
+      "conditions": {
+        "pairs": [
+          [
+            "离",
+            "艮"
+          ]
+        ]
+      },
+      "time_scope": "morning",
+      "tags": [
+        "clear"
+      ],
+      "reading": "实际同一重卦上离下艮，按离在艮上暮雨朝晴取朝晴象；这里只保留原文朝暮时段，不补某日几点、日出日落或全天晴雨",
+      "textual_status": "fixed_transcription_with_selected_daypart_span",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "original_pdf_index": 64,
+          "section": "天時占第一",
+          "selected_span": "離在艮上暮雨朝晴",
+          "reviewer": "assistant_visual_reading_not_independent_human_expert",
+          "scope": "原文朝暮顺序；不因此裁定后句離互艮宮的条件，也无具体钟时及日期"
+        }
+      ]
+    },
+    {
+      "id": "li_above_gen_evening_rain",
+      "source_id": "meihua-volume-2",
+      "section": "天時占第一",
+      "kind": "source_daypart_clause",
+      "quote": "離在艮上，暮雨朝晴",
+      "conditions": {
+        "pairs": [
+          [
+            "离",
+            "艮"
+          ]
+        ]
+      },
+      "time_scope": "evening",
+      "tags": [
+        "rain"
+      ],
+      "reading": "实际同一重卦上离下艮，按离在艮上暮雨朝晴取暮雨象；这里只保留原文朝暮时段，不补某日几点、日出日落或全天晴雨",
+      "textual_status": "fixed_transcription_with_selected_daypart_span",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-gen-nlc-1925",
+          "original_pdf_index": 64,
+          "section": "天時占第一",
+          "selected_span": "離在艮上暮雨朝晴",
+          "reviewer": "assistant_visual_reading_not_independent_human_expert",
+          "scope": "原文朝暮顺序；不因此裁定后句離互艮宮的条件，也无具体钟时及日期"
+        }
+      ]
+    }
+  ],
+  "unresolved": [
+    "全书天气制化尚未齐备；已列乾兑制震巽、坤艮制坎、坎制离的计数候选，但多字阈值、频数范围及制约者自身再受制的优先级仍未裁定",
+    "多、重会、全观诸卦等用语尚未完成影印本校勘",
+    "久晴不雨得此亦然及离互艮宫等语义未唯一裁定",
+    "现代地点、事件窗口与观测量阈值不由原文唯一决定",
+    "此层输出象义条款，没有经独立检验的单一气象预测政策",
+    "秋冬震多无制不能由未命中已列制约的反面推出；完整无制条件尚未实现，不输出非常雷的确定结论",
+    "新增三季节句仅按固定转录计算；文明书局选段冬句无坎之水、春句坤兌与转录坤艮不同，未裁定底本主语、刻误及夏火炎蒸主语，不把章节语义清单当作逐字引文",
+    "已列离在艮上朝暮句；朝暮没有数值钟时或定位日期，离互艮宫的结构及主语未唯一裁定，不套成互卦旅或补出相反朝暮规则"
+  ],
+  "textual_evidence_scope": {
+    "reader": "assistant direct visual source-image review",
+    "independent_human_expert_review": "not_performed",
+    "fixed_transcription_retained": true,
+    "source_witnesses_scope": "Selected readable spans, with duplicate references not independent observations. The fixed transcription quote remains attributed to its own source.",
+    "complete_chapter_character_collation_established": false,
+    "complete_chapter_semantic_conformance_established": false,
+    "chapter_labels": {
+      "meihua-gen-nlc-1925": "天時占第一",
+      "meihua-gen-dejutang": "天時占第二"
+    },
+    "unresolved_graphs": [
+      "Graph preceding 純離/純坎 resembles 八/爻; only clear suffixes used for these witnesses."
+    ]
+  }
+}

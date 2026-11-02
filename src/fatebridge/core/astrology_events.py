@@ -18,9 +18,11 @@ service layer's job, mirroring the rest of the western tools.
 
 from __future__ import annotations
 
+import math
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional
 
+from fatebridge.core.astro.time_scales import datetime_from_tt, ephemeris_time
 from fatebridge.core.ephemeris_runtime import ephemeris_call, swe
 
 # Cardinal solar ingresses → (target tropical longitude, anchor month/day used to
@@ -59,26 +61,21 @@ def _require_swe() -> None:
 
 
 def _julian_day(moment: datetime) -> float:
-    utc = moment.astimezone(timezone.utc)
-    return float(
-        swe.julday(
-            utc.year,
-            utc.month,
-            utc.day,
-            utc.hour + utc.minute / 60.0 + utc.second / 3600.0,
-        )
-    )
+    times = ephemeris_time(moment)
+    if times.jd_tt is None:
+        raise EphemerisUnavailableError("Swiss Ephemeris is required for TT events")
+    return times.jd_tt
 
 
 def _planet_longitude(jd: float, planet_id: int) -> float:
-    result, _err = ephemeris_call("calc_ut", jd, planet_id, swe.FLG_SWIEPH)
+    result, flag = ephemeris_call("calc", jd, planet_id, swe.FLG_SWIEPH | swe.FLG_SPEED)
+    if flag < 0:
+        raise ValueError("Astronomical event ephemeris failed")
     return float(result[0] % 360.0)
 
 
 def _jd_to_utc(jd: float) -> datetime:
-    year, month, day, hour_float = swe.revjul(jd, swe.GREG_CAL)
-    base = datetime(int(year), int(month), int(day), tzinfo=timezone.utc)
-    return base + timedelta(hours=float(hour_float))
+    return datetime_from_tt(jd)
 
 
 def _wrapped_diff(longitude: float, target: float) -> float:
@@ -140,7 +137,19 @@ def find_longitude_crossing_utc(
             low = mid
         else:
             high = mid
-    return _jd_to_utc((low + high) / 2.0)
+    # The civil representation must be on the post-crossing side, including
+    # retrograde crossings. TT→UTC→TT rounding can move one representable JD;
+    # inspect the recovered instant instead of assigning the requested sign.
+    for _ in range(8):
+        moment = _jd_to_utc(high)
+        recovered = _julian_day(moment)
+        value = _wrapped_diff(_planet_longitude(recovered, planet_id), target_longitude)
+        if value >= 0.0 if low_negative else value <= 0.0:
+            return moment
+        high = math.nextafter(high, math.inf)
+    raise EphemerisUnavailableError(
+        "Civil crossing instant could not preserve its crossing side"
+    )
 
 
 def planet_longitude_at_utc(planet_id: int, moment: datetime) -> float:

@@ -1,0 +1,73 @@
+{
+  "source_catalog_id": "human_design_public_personality_color_facts_v1",
+  "publisher": "Jovian Archive",
+  "sources": {
+    "motivation": {
+      "url": "https://jovianarchive.com/pages/the-gift-of-awareness-understanding-motivation-in-human-design",
+      "html_sha256": "46079ff951185c4f32144d0c4eaf7a4985a513e7c0ea32295d1ec0ff8dcf43cf",
+      "dependency": "personality_sun_color",
+      "attribution": "Jovian Archive current public learning page, attributed to Ra Uru Hu; not a dated source manuscript"
+    },
+    "view": {
+      "url": "https://jovianarchive.com/pages/seeing-through-your-unique-perspective-understanding-view-in-human-design",
+      "html_sha256": "bb56be7286fc088e6dae4573c8f52b2afad0b6b5184d378c19d95e8df8e92212",
+      "dependency": "personality_nodes_color",
+      "attribution": "Jovian Archive current public learning page, attributed to Ra Uru Hu; not a dated source manuscript"
+    }
+  },
+  "categories": {
+    "motivation": [
+      {
+        "color": 1,
+        "source_term": "Fear"
+      },
+      {
+        "color": 2,
+        "source_term": "Hope"
+      },
+      {
+        "color": 3,
+        "source_term": "Desire"
+      },
+      {
+        "color": 4,
+        "source_term": "Need"
+      },
+      {
+        "color": 5,
+        "source_term": "Guilt"
+      },
+      {
+        "color": 6,
+        "source_term": "Innocence"
+      }
+    ],
+    "view": [
+      {
+        "color": 1,
+        "source_term": "Survival"
+      },
+      {
+        "color": 2,
+        "source_term": "Possibility"
+      },
+      {
+        "color": 3,
+        "source_term": "Power"
+      },
+      {
+        "color": 4,
+        "source_term": "Wanting"
+      },
+      {
+        "color": 5,
+        "source_term": "Probability"
+      },
+      {
+        "color": 6,
+        "source_term": "Personal"
+      }
+    ]
+  },
+  "scope": "Twelve category labels and two explicitly stated Color dependencies only. No clinical, cognitive or personality measurement, observed transference/distraction state, complete original teaching or empirical forecast is accepted."
+}

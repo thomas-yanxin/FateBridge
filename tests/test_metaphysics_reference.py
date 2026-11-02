@@ -101,7 +101,8 @@ def test_liureng_all_day_hour_month_general_combinations_against_independent_ora
             selected = got["meta"]["selected_lesson_index"]
             marked = [l for l in got["four_lessons"] if l["use_candidate"]]
             if got["board_style"] in {"昴星", "别责", "八专"} or (
-                got["board_style"] == "返吟" and got["board_style_detail"] == "无依"
+                got["board_style"] == "返吟"
+                and got["three_transmissions"]["method"] == "返吟无亲"
             ):
                 # A derived initial god can coincide with a lesson's upper
                 # god (e.g. 己巳/offset=1 昴星); that is not lesson selection.
@@ -150,7 +151,9 @@ def test_jinkou_duplicate_upper_god_preserves_actual_selected_lesson():
     assert board["meta"]["selected_lesson_index"] == 4
     assert board["meta"]["selected_lesson_relation"] == "下贼上"
     assert [l["index"] for l in board["four_lessons"] if l["use_candidate"]] == [4]
-    assert result["jinkou"]["overview"]["use_position"] == "地分"
+    # Jin Kou has its own 四位阴阳 rule, independent of the selected Liu Ren lesson.
+    assert result["jinkou"]["overview"]["board_style_detail"] == "二阴二阳"
+    assert result["jinkou"]["overview"]["use_position"] == "将神"
 
 
 def test_liureng_god_rotation_includes_earth_xu():
@@ -159,7 +162,8 @@ def test_liureng_god_rotation_includes_earth_xu():
     )
     board = build_liureng_board(seed)
     assert board["meta"]["guiren_earth_branch"] == "戌"
-    assert board["board_order"] == "天盘逆布"
+    assert board["board_order"] == "天盘顺布"
+    assert board["guiren_order"] == "逆"
     gods = {p["earth_branch"]: p["god"] for p in board["twelve_board"]}
     assert gods["戌"] == "贵人"
     assert gods["酉"] == "螣蛇"
@@ -237,7 +241,7 @@ def test_ziwei_horoscope_rejects_unavailable_target_lunar_calendar():
         birth_year=1990, birth_month=5, birth_day=15, birth_hour=10, gender="男"
     )
     result = calculate_ziwei_horoscope(
-        person, target_year=2100, target_month=3, target_day=1, target_hour=10
+        person, target_year=2101, target_month=1, target_day=1, target_hour=10
     )
     assert result["status_code"] == 400
     assert "农历" in result["error"]

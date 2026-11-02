@@ -1,0 +1,923 @@
+{
+  "corpus_id": "canping_wenming_nlc43061_selected_v1",
+  "version": "1.2.0",
+  "source_title": "河洛理數 卷六 上海文明書局冊四 NLC MG/B221.5/21/:4",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/2/27/NLC416-13jh000628-43061_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "source_pdf_sha256": "9e979579139d2be3d94229a082af1eca6fa8421216333c407aa2710b91c22684",
+  "source_catalog_url": "https://commons.wikimedia.org/wiki/File:NLC416-13jh000628-43061_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "edition_date_status": "catalogued_1926; title page publisher visually checked; dated colophon not independently verified",
+  "review_status": "same_reviewer_selected_cross_edition_reading; independent_second_review_pending",
+  "scope": "72 source body cells observed: previous36water cells (34clear,2uncertain) unchanged, plus36gold cells including both printed3322occurrences on PDF87and94. Sixty-nine page-bound counterpart cells represent66distinct element-number-column keys; three clear2328cells remain unmatched, never assigned to3328or a computed key. Gold target-header screening covers78header positions on PDF84-95; ten of eleven requested numbers occur, with3322repeated and3328not observed in that gold section. Clear body text does not make repeated-number attribution unique. Zero primary-collation count increase; edition attribution and independent review remain unresolved.",
+  "transcription_policy": "Modern punctuation supplied. Printed ○ and editorial □ are separate. Different strings alone do not decide edition variants, glyph variants or transcription mistakes. No outcome-based source choice.",
+  "entries": [
+    {
+      "element": "水",
+      "number": 2231,
+      "kind": "male",
+      "text": "月在清波底，維舟向柳邊。",
+      "pdf_pages": [
+        50
+      ],
+      "body_pdf_page": 50
+    },
+    {
+      "element": "水",
+      "number": 2231,
+      "kind": "female",
+      "text": "年來十二月，月長日西沈。",
+      "pdf_pages": [
+        50
+      ],
+      "body_pdf_page": 50
+    },
+    {
+      "element": "水",
+      "number": 2231,
+      "kind": "luck",
+      "text": "酒醒何處去，柳岸晚風輕。",
+      "pdf_pages": [
+        50
+      ],
+      "body_pdf_page": 50
+    },
+    {
+      "element": "水",
+      "number": 2332,
+      "kind": "male",
+      "text": "商山秦嶺花，開向三冬雪。",
+      "pdf_pages": [
+        50
+      ],
+      "body_pdf_page": 50
+    },
+    {
+      "element": "水",
+      "number": 2332,
+      "kind": "female",
+      "text": "花果一時新，回首四面隔。",
+      "pdf_pages": [
+        50
+      ],
+      "body_pdf_page": 50
+    },
+    {
+      "element": "水",
+      "number": 2332,
+      "kind": "luck",
+      "text": "商山採藥去，意望作神仙。",
+      "pdf_pages": [
+        50
+      ],
+      "body_pdf_page": 50
+    },
+    {
+      "element": "水",
+      "number": 2433,
+      "kind": "male",
+      "text": "元宵好燈燭，卻向五更明。",
+      "pdf_pages": [
+        50,
+        51
+      ],
+      "body_pdf_page": 51
+    },
+    {
+      "element": "水",
+      "number": 2433,
+      "kind": "female",
+      "text": "紫燕語離情，新巢重引子。",
+      "pdf_pages": [
+        50,
+        51
+      ],
+      "body_pdf_page": 51
+    },
+    {
+      "element": "水",
+      "number": 2433,
+      "kind": "luck",
+      "text": "將軍欲斷橋，謀為何計策。",
+      "pdf_pages": [
+        50,
+        51
+      ],
+      "body_pdf_page": 51
+    },
+    {
+      "element": "水",
+      "number": 2635,
+      "kind": "male",
+      "text": "觀鼎取其象，稼穡下艱難。",
+      "pdf_pages": [
+        51
+      ],
+      "body_pdf_page": 51
+    },
+    {
+      "element": "水",
+      "number": 2635,
+      "kind": "female",
+      "text": "花上鶯聲急，東風歎短長。",
+      "pdf_pages": [
+        51
+      ],
+      "body_pdf_page": 51
+    },
+    {
+      "element": "水",
+      "number": 2635,
+      "kind": "luck",
+      "text": "蒼鷹與良犬，須日漸從遊。",
+      "pdf_pages": [
+        51
+      ],
+      "body_pdf_page": 51
+    },
+    {
+      "element": "水",
+      "number": 2536,
+      "kind": "male",
+      "text": "繡針為鐵柱，江海暗中瀛。",
+      "pdf_pages": [
+        52
+      ],
+      "body_pdf_page": 52
+    },
+    {
+      "element": "水",
+      "number": 2536,
+      "kind": "female",
+      "text": "鐵磬與銅盆，相剛方穩當。",
+      "pdf_pages": [
+        52
+      ],
+      "body_pdf_page": 52
+    },
+    {
+      "element": "水",
+      "number": 2536,
+      "kind": "luck",
+      "text": "得薪又無木，恍惚又憂惶。",
+      "pdf_pages": [
+        52
+      ],
+      "body_pdf_page": 52
+    },
+    {
+      "element": "水",
+      "number": 3041,
+      "kind": "male",
+      "text": "龍舟爭勝負，欲定一時名。",
+      "pdf_pages": [
+        53
+      ],
+      "body_pdf_page": 53
+    },
+    {
+      "element": "水",
+      "number": 3041,
+      "kind": "female",
+      "text": "東風滿柳花，西風何太急。",
+      "pdf_pages": [
+        53
+      ],
+      "body_pdf_page": 53
+    },
+    {
+      "element": "水",
+      "number": 3041,
+      "kind": "luck",
+      "text": "畫舫過洪波，棹短難得渡。",
+      "pdf_pages": [
+        53
+      ],
+      "body_pdf_page": 53
+    },
+    {
+      "element": "水",
+      "number": 2538,
+      "kind": "male",
+      "text": "坐井觀天象，明知八陣圖。",
+      "pdf_pages": [
+        54
+      ],
+      "body_pdf_page": 54
+    },
+    {
+      "element": "水",
+      "number": 2538,
+      "kind": "female",
+      "text": "荷葉疊青錢，鴛鴦水面風。",
+      "pdf_pages": [
+        54
+      ],
+      "body_pdf_page": 54
+    },
+    {
+      "element": "水",
+      "number": 2538,
+      "kind": "luck",
+      "text": "飛鷹思得兔，反獲豈容嗟。",
+      "pdf_pages": [
+        54
+      ],
+      "body_pdf_page": 54
+    },
+    {
+      "element": "水",
+      "number": 2542,
+      "kind": "male",
+      "text": "掌中秋月扇，舉動好風生。",
+      "pdf_pages": [
+        55
+      ],
+      "body_pdf_page": 55
+    },
+    {
+      "element": "水",
+      "number": 2542,
+      "kind": "female",
+      "text": "春風玉鏡臺，莫落他人手。",
+      "pdf_pages": [
+        55
+      ],
+      "body_pdf_page": 55
+    },
+    {
+      "element": "水",
+      "number": 2542,
+      "kind": "luck",
+      "text": "大鵬生六畜，其羽可為儀。",
+      "pdf_pages": [
+        55
+      ],
+      "body_pdf_page": 55
+    },
+    {
+      "element": "水",
+      "number": 2344,
+      "kind": "male",
+      "text": "蜂釀百花酒，其甘與世殊。",
+      "pdf_pages": [
+        58,
+        59
+      ],
+      "body_pdf_page": 59
+    },
+    {
+      "element": "水",
+      "number": 2344,
+      "kind": "female",
+      "text": "春歸當斷路，梅子釀酸時。",
+      "pdf_pages": [
+        58,
+        59
+      ],
+      "body_pdf_page": 59
+    },
+    {
+      "element": "水",
+      "number": 2344,
+      "kind": "luck",
+      "text": "卞和獻璞玉，先辱後榮恩。",
+      "pdf_pages": [
+        58,
+        59
+      ],
+      "body_pdf_page": 59
+    },
+    {
+      "element": "水",
+      "number": 2447,
+      "kind": "male",
+      "text": "初生嫩松柏，栽向雪霜中。",
+      "pdf_pages": [
+        59,
+        60
+      ],
+      "body_pdf_page": 60
+    },
+    {
+      "element": "水",
+      "number": 2447,
+      "kind": "female",
+      "text": "○○○○○，○○○○○。",
+      "pdf_pages": [
+        59,
+        60
+      ],
+      "body_pdf_page": 60
+    },
+    {
+      "element": "水",
+      "number": 2447,
+      "kind": "luck",
+      "text": "○○○○○，○○○○○。",
+      "pdf_pages": [
+        59,
+        60
+      ],
+      "body_pdf_page": 60
+    },
+    {
+      "element": "水",
+      "number": 2449,
+      "kind": "male",
+      "text": "紅添綠減處，鳥啼三月天。",
+      "pdf_pages": [
+        60
+      ],
+      "body_pdf_page": 60
+    },
+    {
+      "element": "水",
+      "number": 2449,
+      "kind": "female",
+      "text": "月娥□桂子，圓缺又同情。",
+      "pdf_pages": [
+        60
+      ],
+      "body_pdf_page": 60,
+      "reading_uncertainties": [
+        "□為對讀本本次目讀未定，不是底本圈空；不能據對讀本推定主底本缺字。"
+      ]
+    },
+    {
+      "element": "水",
+      "number": 2449,
+      "kind": "luck",
+      "text": "雞兒方出殼，各自奔前程。",
+      "pdf_pages": [
+        60
+      ],
+      "body_pdf_page": 60
+    },
+    {
+      "element": "水",
+      "number": 2249,
+      "kind": "male",
+      "text": "太歲屬木人，厥德從風偃。",
+      "pdf_pages": [
+        60,
+        61
+      ],
+      "body_pdf_page": 61
+    },
+    {
+      "element": "水",
+      "number": 2249,
+      "kind": "female",
+      "text": "莫羨□斯好，青天露不宜。",
+      "pdf_pages": [
+        60,
+        61
+      ],
+      "body_pdf_page": 61,
+      "reading_uncertainties": [
+        "□為對讀本本次目讀未定，不是底本圈空；不能據對讀本推定主底本缺字。"
+      ]
+    },
+    {
+      "element": "水",
+      "number": 2249,
+      "kind": "luck",
+      "text": "○○○○○，○○○○○。",
+      "pdf_pages": [
+        60,
+        61
+      ],
+      "body_pdf_page": 61
+    },
+    {
+      "element": "金",
+      "number": 2524,
+      "kind": "male",
+      "text": "圭田如玉潔，一點不生塵。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header1",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2524,
+      "kind": "female",
+      "text": "自得操持手，何須男子為。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header1",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2524,
+      "kind": "luck",
+      "text": "於斯有美玉，求善價沽諸。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header1",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 3322,
+      "kind": "male",
+      "text": "天河玉浪起，爭奮鴻雁飛。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header2",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 3322,
+      "kind": "female",
+      "text": "天台劉阮遇，時景又雲飛。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header2",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 3322,
+      "kind": "luck",
+      "text": "莫望紅塵遠，出門天地寬。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header2",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2223,
+      "kind": "male",
+      "text": "擊柝重門外，機邊看錦花。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header3",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2223,
+      "kind": "female",
+      "text": "佳人天上月，圓缺照誰家。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header3",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2223,
+      "kind": "luck",
+      "text": "錦機梭過處，隨即起波紋。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header3",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2324,
+      "kind": "male",
+      "text": "假山中草木，鳥獸豈容藏。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header4",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2324,
+      "kind": "female",
+      "text": "天邊有明月，何處照人間。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header4",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2324,
+      "kind": "luck",
+      "text": "春水初泮處，任便戲新魚。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header4",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2425,
+      "kind": "male",
+      "text": "大道藏無極，鴻濛隱八維。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header5",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2425,
+      "kind": "female",
+      "text": "金多必有傷，及早修緣事。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header5",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2425,
+      "kind": "luck",
+      "text": "殺雞煩鼠終，忠信自無疑。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header5",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 3324,
+      "kind": "male",
+      "text": "月華透梅雪，水淨見山陰。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header6",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 3324,
+      "kind": "female",
+      "text": "殘燈半空月，爭奈五更長。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header6",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 3324,
+      "kind": "luck",
+      "text": "花渠暗水流，出沒世難測。",
+      "pdf_pages": [
+        94
+      ],
+      "body_pdf_page": 94,
+      "source_occurrence_id": "nlc43061-gold-p094-header6",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2225,
+      "kind": "male",
+      "text": "形畫麒麟閣，毫端爭一莖。",
+      "pdf_pages": [
+        94,
+        95
+      ],
+      "body_pdf_page": 95,
+      "source_occurrence_id": "nlc43061-gold-p094-header7",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2225,
+      "kind": "female",
+      "text": "孤猿枝上啼，明月空中落。",
+      "pdf_pages": [
+        94,
+        95
+      ],
+      "body_pdf_page": 95,
+      "source_occurrence_id": "nlc43061-gold-p094-header7",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2225,
+      "kind": "luck",
+      "text": "陽氣喜初生，萌芽將復展。",
+      "pdf_pages": [
+        94,
+        95
+      ],
+      "body_pdf_page": 95,
+      "source_occurrence_id": "nlc43061-gold-p094-header7",
+      "header_pdf_page": 94
+    },
+    {
+      "element": "金",
+      "number": 2326,
+      "kind": "male",
+      "text": "牽牛過堂下，問是梁惠王。",
+      "pdf_pages": [
+        95
+      ],
+      "body_pdf_page": 95,
+      "source_occurrence_id": "nlc43061-gold-p095-header1",
+      "header_pdf_page": 95
+    },
+    {
+      "element": "金",
+      "number": 2326,
+      "kind": "female",
+      "text": "仙壇與佛塔，功果好修為。",
+      "pdf_pages": [
+        95
+      ],
+      "body_pdf_page": 95,
+      "source_occurrence_id": "nlc43061-gold-p095-header1",
+      "header_pdf_page": 95
+    },
+    {
+      "element": "金",
+      "number": 2326,
+      "kind": "luck",
+      "text": "大旱望雲霓，青天空霹靂。",
+      "pdf_pages": [
+        95
+      ],
+      "body_pdf_page": 95,
+      "source_occurrence_id": "nlc43061-gold-p095-header1",
+      "header_pdf_page": 95
+    },
+    {
+      "element": "金",
+      "number": 3326,
+      "kind": "male",
+      "text": "風行江上去，松竹竟爭春。",
+      "pdf_pages": [
+        95
+      ],
+      "body_pdf_page": 95,
+      "source_occurrence_id": "nlc43061-gold-p095-header2",
+      "header_pdf_page": 95
+    },
+    {
+      "element": "金",
+      "number": 3326,
+      "kind": "female",
+      "text": "古稱朱陳村，只恐花難老。",
+      "pdf_pages": [
+        95
+      ],
+      "body_pdf_page": 95,
+      "source_occurrence_id": "nlc43061-gold-p095-header2",
+      "header_pdf_page": 95
+    },
+    {
+      "element": "金",
+      "number": 3326,
+      "kind": "luck",
+      "text": "○○○○○，○○○○○。",
+      "pdf_pages": [
+        95
+      ],
+      "body_pdf_page": 95,
+      "source_occurrence_id": "nlc43061-gold-p095-header2",
+      "header_pdf_page": 95
+    },
+    {
+      "element": "金",
+      "number": 2227,
+      "kind": "male",
+      "text": "吾身何踐履，天外有煙霞。",
+      "pdf_pages": [
+        95
+      ],
+      "body_pdf_page": 95,
+      "source_occurrence_id": "nlc43061-gold-p095-header3",
+      "header_pdf_page": 95
+    },
+    {
+      "element": "金",
+      "number": 2227,
+      "kind": "female",
+      "text": "畫堂春正濃，楊柳輕飄絮。",
+      "pdf_pages": [
+        95
+      ],
+      "body_pdf_page": 95,
+      "source_occurrence_id": "nlc43061-gold-p095-header3",
+      "header_pdf_page": 95
+    },
+    {
+      "element": "金",
+      "number": 2227,
+      "kind": "luck",
+      "text": "社燕自營巢，不安期得便。",
+      "pdf_pages": [
+        95
+      ],
+      "body_pdf_page": 95,
+      "source_occurrence_id": "nlc43061-gold-p095-header3",
+      "header_pdf_page": 95
+    },
+    {
+      "element": "金",
+      "number": 3322,
+      "kind": "male",
+      "text": "重重又重重，好彈無絃琴。",
+      "pdf_pages": [
+        87
+      ],
+      "body_pdf_page": 87,
+      "header_pdf_page": 87,
+      "source_occurrence_id": "nlc43061-gold-p087-header7"
+    },
+    {
+      "element": "金",
+      "number": 3322,
+      "kind": "female",
+      "text": "鴛鴦飛水面，花落又花新。",
+      "pdf_pages": [
+        87
+      ],
+      "body_pdf_page": 87,
+      "header_pdf_page": 87,
+      "source_occurrence_id": "nlc43061-gold-p087-header7"
+    },
+    {
+      "element": "金",
+      "number": 3322,
+      "kind": "luck",
+      "text": "琴瑟忽斷絃，便不同音韻。",
+      "pdf_pages": [
+        87
+      ],
+      "body_pdf_page": 87,
+      "header_pdf_page": 87,
+      "source_occurrence_id": "nlc43061-gold-p087-header7"
+    }
+  ],
+  "unmatched_observations": [
+    {
+      "element": "金",
+      "number": 2328,
+      "kind": "male",
+      "text": "草作擎天柱，難當盛暑風。",
+      "pdf_pages": [
+        93,
+        94
+      ],
+      "body_pdf_page": 94,
+      "header_pdf_page": 93,
+      "matching_status": "unmatched_observation_not_assigned_to_a_computed_key",
+      "reason": "Printed2328 on PDF93; body continues on PDF94. Frozen target3328 is not substituted for the observed header.",
+      "source_occurrence_id": "nlc43061-gold-p093-header7"
+    },
+    {
+      "element": "金",
+      "number": 2328,
+      "kind": "female",
+      "text": "望月伴嫦娥，只空浮雲翳。",
+      "pdf_pages": [
+        93,
+        94
+      ],
+      "body_pdf_page": 94,
+      "header_pdf_page": 93,
+      "matching_status": "unmatched_observation_not_assigned_to_a_computed_key",
+      "reason": "Printed2328 on PDF93; body continues on PDF94. Frozen target3328 is not substituted for the observed header.",
+      "source_occurrence_id": "nlc43061-gold-p093-header7"
+    },
+    {
+      "element": "金",
+      "number": 2328,
+      "kind": "luck",
+      "text": "淡雲來掩日，殘雲暫收光。",
+      "pdf_pages": [
+        93,
+        94
+      ],
+      "body_pdf_page": 94,
+      "header_pdf_page": 93,
+      "matching_status": "unmatched_observation_not_assigned_to_a_computed_key",
+      "reason": "Printed2328 on PDF93; body continues on PDF94. Frozen target3328 is not substituted for the observed header.",
+      "source_occurrence_id": "nlc43061-gold-p093-header7"
+    }
+  ],
+  "gold_tail_alignment": {
+    "fixture_id": "canping_gold_wenming_alignment_v1",
+    "requested_numbers": [
+      2524,
+      3322,
+      2223,
+      2324,
+      2425,
+      3324,
+      2225,
+      2326,
+      3326,
+      2227,
+      3328
+    ],
+    "matched_numbers": [
+      2223,
+      2225,
+      2227,
+      2324,
+      2326,
+      2425,
+      2524,
+      3322,
+      3324,
+      3326
+    ],
+    "unmatched_target_numbers_in_reviewed_tail": [
+      3328
+    ],
+    "reviewed_pdf_pages": [
+      93,
+      94,
+      95
+    ],
+    "all_requested_same_number_counterparts_observed": false,
+    "observed_printed_other_number": 2328,
+    "unmatched_source_cells": 3,
+    "new_numbered_primary_cells": 0,
+    "new_independent_reviews": 0,
+    "primary_uncertainties_resolved": 0,
+    "calculation_numbers_remapped": false,
+    "reviewed_body_pdf_pages": [
+      87,
+      93,
+      94,
+      95
+    ],
+    "target_header_scan_pdf_pages": [
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95
+    ],
+    "gold_header_positions_screened": 78,
+    "unmatched_target_numbers_in_reviewed_gold": [
+      3328
+    ],
+    "all_matched_numbers_have_unique_counterpart": false,
+    "repeated_printed_numbers": [
+      3322
+    ],
+    "source_number_occurrences": [
+      {
+        "number": 3322,
+        "header_pdf_pages": [
+          87,
+          94
+        ],
+        "source_occurrence_ids": [
+          "nlc43061-gold-p087-header7",
+          "nlc43061-gold-p094-header2"
+        ],
+        "status": "printed_duplicate_attribution_unresolved"
+      }
+    ]
+  }
+}

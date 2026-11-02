@@ -23,12 +23,20 @@ from fatebridge.core.almanac import (
     get_solar_terms_for_year,
     localize_datetime,
 )
+from fatebridge.core.bazi_evidence import build_natal_evidence, build_topic_evidence
+from fatebridge.core.clash_comparison import clash_comparison_snapshot_lines
 from fatebridge.core.classical import (
     build_classical_overview,
     classical_snapshot_lines,
 )
+from fatebridge.core.classical_from_child import from_child_snapshot_lines
+from fatebridge.core.complete_bureaus import complete_bureau_snapshot_lines
 from fatebridge.core.export_parser import parse_export_content
+from fatebridge.core.hidden_carriers import hidden_carrier_snapshot_lines
 from fatebridge.core.metaphysics.common import SEXAGENARY_INDEX, kongwang_for_ganzhi
+from fatebridge.core.root_qualification import root_qualification_snapshot_lines
+from fatebridge.core.stem_effects import stem_energy_snapshot_lines
+from fatebridge.core.storage_movement import storage_movement_snapshot_lines
 from fatebridge.services.birth_context import (
     BirthComputationContext,
     build_birth_computation_context,
@@ -36,6 +44,7 @@ from fatebridge.services.birth_context import (
 from fatebridge.services.birth_payload import build_destiny_payload
 from fatebridge.services.structured_snapshot import render_structured_snapshot_text
 from fatebridge.services.timing_state import build_current_timing_state
+from fatebridge.utils.birth_clock import birth_clock_snapshot_lines
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
@@ -43,6 +52,7 @@ from fatebridge.utils.data import (
     HEAVENLY_STEMS,
     get_nayin,
     get_ten_god,
+    normalize_gender,
 )
 from fatebridge.utils.errors import (
     ParameterError,
@@ -295,6 +305,12 @@ def _resolve_analysis_date(
     *,
     timezone_name: Optional[str] = None,
 ) -> datetime:
+    if (
+        analysis_year is not None
+        and analysis_month is not None
+        and analysis_day is not None
+    ):
+        return datetime(analysis_year, analysis_month, analysis_day)
     now = (
         current_local_datetime(timezone_name)
         if timezone_name is not None
@@ -616,14 +632,20 @@ def _build_timing_overview(
         dayun_payload = {
             "pillar": dayun_result["dayun_info"]["pillar"],
             "start_age": dayun_result["age_info"]["start_age"],
+            "start_age_precise": dayun_result["age_info"].get("start_age_precise"),
+            "start_age_unrounded": dayun_result["age_info"].get("start_age_unrounded"),
             "dayun_age": dayun_result["age_info"]["dayun_age"],
             "years_in_period": dayun_result["age_info"]["years_in_period"],
+            "selection_basis": dayun_result["age_info"]["selection_basis"],
+            "start_at": dayun_result["dayun_info"]["start_at"],
+            "end_at": dayun_result["dayun_info"]["end_at"],
             "summary": dayun_result.get("summary", ""),
         }
     else:
         dayun_payload = {
             "pillar": None,
-            "summary": dayun_result.get("error", "大运信息不可用"),
+            "summary": dayun_result.get("message", "大运信息不可用"),
+            "status": dayun_result.get("status"),
         }
 
     liuyue_info = liuyue_result["liuyue_info"]
@@ -704,6 +726,8 @@ def _build_snapshot_text(
     shensha_entries: List[Dict[str, str]],
     timing_overview: Dict[str, Any],
     classical_overview: Dict[str, Any],
+    strength_assessment: Optional[Dict[str, Any]] = None,
+    structure_profile: Optional[Dict[str, Any]] = None,
     analysis_calendar_context: Optional[Dict[str, Any]] = None,
 ) -> str:
     include_minutes = (
@@ -725,8 +749,8 @@ def _build_snapshot_text(
     birth_context_lines = [
         f"姓名：{person.name or '未提供'}",
         f"性别：{person.gender or '未知'}",
-        f"出生时间：{format_birth_datetime_display(input_birth_datetime, include_minutes=include_minutes)}",
-        f"校正时间：{format_birth_datetime_display(normalized_birth_datetime, include_minutes=True)}",
+        f"出生时间：{format_birth_datetime_display(input_birth_datetime, include_minutes=include_minutes, include_seconds=person.birth_second is not None)}",
+        f"校正时间：{format_birth_datetime_display(normalized_birth_datetime, include_minutes=True, include_seconds=person.birth_second is not None or bool(normalized_birth_datetime.second or normalized_birth_datetime.microsecond))}",
         f"出生地：{person.birth_place or '未提供'}",
         f"时区：{timezone_name}",
         f"经度：{longitude if longitude is not None else '未提供'}",
@@ -735,6 +759,9 @@ def _build_snapshot_text(
         f"出生节气：{calendar_context['current_solar_term']['name']}",
         f"出生后节气：{calendar_context['next_solar_term']['name']}",
     ]
+    birth_context_lines.extend(
+        birth_clock_snapshot_lines(calendar_context["birth_time_input"])
+    )
     if acc_solar_term and acc_next_term:
         birth_context_lines.append(
             f"当下节气：{acc_solar_term}，后续节气：{acc_next_term}"
@@ -760,7 +787,20 @@ def _build_snapshot_text(
         ),
         (
             "格局调候",
-            "\n".join(classical_snapshot_lines(classical_overview)).strip(),
+            "\n".join(
+                classical_snapshot_lines(classical_overview)
+                + complete_bureau_snapshot_lines(strength_assessment or {})
+                + root_qualification_snapshot_lines(strength_assessment or {})
+                + stem_energy_snapshot_lines(strength_assessment or {})
+                + clash_comparison_snapshot_lines(strength_assessment or {})
+                + storage_movement_snapshot_lines(strength_assessment or {})
+                + from_child_snapshot_lines(structure_profile or {})
+                + hidden_carrier_snapshot_lines(
+                    (structure_profile or {})
+                    .get("evidence_chain", {})
+                    .get("natal_hidden_carriers", {})
+                )
+            ).strip(),
         ),
         (
             "流年行运概略",
@@ -815,8 +855,9 @@ def _build_base_bazi_payload(
     *,
     person: PersonInfo,
     analysis_date: datetime,
+    birth_context: Optional[BirthComputationContext] = None,
 ) -> Dict[str, Any]:
-    birth_context = build_birth_computation_context(person)
+    birth_context = birth_context or build_birth_computation_context(person)
     normalized_birth_time = birth_context.normalized_birth_time
     input_birth_datetime = normalized_birth_time.input_datetime
     normalized_birth_datetime = normalized_birth_time.corrected_datetime
@@ -852,6 +893,8 @@ def _build_base_bazi_payload(
         shensha_entries=shensha_entries,
         timing_overview=timing_overview,
         classical_overview=classical_overview,
+        strength_assessment=base_analysis["day_master"]["assessment"],
+        structure_profile=base_analysis["structure_profile"],
         analysis_calendar_context=analysis_calendar_context,
     )
     return {
@@ -878,8 +921,18 @@ def calculate_bazi_birth(
     analysis_day: Optional[int] = None,
     selected_sections: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
-    analysis_date = _resolve_analysis_date(analysis_year, analysis_month, analysis_day)
-    payload = _build_base_bazi_payload(person=person, analysis_date=analysis_date)
+    birth_context = build_birth_computation_context(person)
+    analysis_date = _resolve_analysis_date(
+        analysis_year,
+        analysis_month,
+        analysis_day,
+        timezone_name=birth_context.normalized_birth_time.timezone,
+    )
+    payload = _build_base_bazi_payload(
+        person=person,
+        analysis_date=analysis_date,
+        birth_context=birth_context,
+    )
     base_analysis = payload["base_analysis"]
     snapshot_text = payload["snapshot_text"]
     snapshot_export = parse_export_content(
@@ -944,7 +997,26 @@ def _derive_current_pillars(
     analysis_date: datetime,
 ) -> Tuple[Optional[Tuple[str, str]], Optional[Tuple[str, str]], Dict[str, Any]]:
     """从命盘 + 分析日期内部推算当前大运、流年柱（用户无需自己知道大运）。"""
-    state = build_current_timing_state(birth_context, analysis_date=analysis_date)
+    direction_known = normalize_gender(birth_context.person.gender) in (
+        "male",
+        "female",
+    )
+    if direction_known:
+        state = build_current_timing_state(birth_context, analysis_date=analysis_date)
+    else:
+        # Unknown 大运 direction limits that layer, not the natal chart or the
+        # solar-term year. Do not guess a direction or abort all nine topics.
+        from fatebridge.core.timing import TimingAnalysis
+
+        state = {
+            "liunian_analysis": {
+                "liunian_info": TimingAnalysis.calculate_liunian(
+                    analysis_date.year,
+                    moment=analysis_date,
+                    timezone_name=birth_context.normalized_birth_time.timezone,
+                )
+            }
+        }
     dayun_result = state.get("dayun_analysis", {}) or {}
     liunian_result = state.get("liunian_analysis", {}) or {}
     dayun_pillar_str = (dayun_result.get("dayun_info") or {}).get("pillar")
@@ -978,8 +1050,18 @@ def _derive_current_pillars(
         "dayun_pillar": dayun_pillar_str,
         "liunian_pillar": liunian_pillar_str,
         "dayun_age": (dayun_result.get("age_info") or {}).get("dayun_age"),
+        "dayun_selection_basis": (dayun_result.get("age_info") or {}).get(
+            "selection_basis"
+        ),
+        "dayun_start_at": (dayun_result.get("dayun_info") or {}).get("start_at"),
+        "dayun_end_at": (dayun_result.get("dayun_info") or {}).get("end_at"),
         "source": "auto-derived",
     }
+    if not direction_known:
+        context["dayun_status"] = "unavailable_gender_direction"
+        context["limitations"] = [
+            "未选定性别对应的大运顺逆；保留本命及独立流年，不推定大运柱。"
+        ]
     return (
         _parse_pillar_str(dayun_pillar_str),
         _parse_pillar_str(liunian_pillar_str),
@@ -1013,7 +1095,7 @@ def _run_bazi_dimension_analysis(
         birth_context = build_birth_computation_context(person)
         pillars = birth_context.birth_pillars
 
-        timing_context: Optional[Dict[str, Any]] = None
+        timing_context: Dict[str, Any]
         if dayun is None or liunian is None:
             analysis_date = _resolve_analysis_date(
                 analysis_year,
@@ -1035,10 +1117,15 @@ def _run_bazi_dimension_analysis(
             timing_context["dayun_pillar"] = "".join(dayun) if dayun else None
             timing_context["liunian_pillar"] = "".join(liunian) if liunian else None
             if timing_context["overridden"]["dayun_pillar"]:
+                if "dayun_status" in timing_context:
+                    timing_context["dayun_status"] = "explicit_override"
+                    timing_context["limitations"] = []
                 # Keep the published fractional-year reference projectable,
                 # without presenting it as the age of the override pillar.
                 timing_context["dayun_age_basis"] = (
                     "auto_derived_reference_not_override_pillar_age"
+                    if timing_context.get("dayun_age") is not None
+                    else "unavailable_for_override"
                 )
         else:
             # Explicit pillars still have a provenance contract. They do not
@@ -1056,9 +1143,50 @@ def _run_bazi_dimension_analysis(
             dayun_pillar=dayun,
             liunian_pillar=liunian,
         )
-        if isinstance(analysis, dict) and timing_context is not None:
-            analysis = {**analysis, "timing_context": timing_context}
-        snapshot_text = render_structured_snapshot_text(analysis, title=analysis_type)
+        # The analyzer returns a dict, and both timing branches supply context.
+        analysis = {
+            **analysis,
+            "calendar_context": birth_context.birth_calendar_context,
+            "timing_context": timing_context,
+        }
+        evidence = build_natal_evidence(
+            pillars, birth_context.element_analysis["day_master"]
+        )
+        evidence["topic"] = build_topic_evidence(
+            evidence,
+            pillars,
+            result_key.removesuffix("_analysis"),
+            person.gender,
+            dayun,
+            liunian,
+        )
+        analysis["evidence_chain"] = evidence
+        snapshot_text = render_structured_snapshot_text(
+            {
+                k: v
+                for k, v in analysis.items()
+                if k not in {"evidence_chain", "calendar_context"}
+            },
+            title=analysis_type,
+        )
+        snapshot_text += "\n\n[出生钟时输入]\n" + "\n".join(
+            birth_clock_snapshot_lines(
+                birth_context.birth_calendar_context["birth_time_input"]
+            )
+        )
+        checks = evidence["structure_checks"]
+        statuses = {
+            "not_applicable": "相关星未齐，不进入本路审查",
+            "prerequisite_not_met": "有明确前提未满足",
+            "pending_adjudication": "已查部分前提，成格待裁定",
+        }
+        snapshot_text += "\n\n[星位与格局条件]\n" + "\n".join(
+            [f"{c['label']}：{statuses[c['status']]}。" for c in checks]
+            + [
+                "逐星透藏、根气、财印位置及大运流年触点见 evidence_chain；不由共现认证成格。",
+                "来源：《秘本子平真诠》正文限域前提审查；位置及专题选择为 FateBridge v1 约定。",
+            ]
+        )
         snapshot_export = parse_export_content(
             technique="generic", content=snapshot_text
         )

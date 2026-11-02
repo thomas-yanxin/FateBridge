@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "supplement_id": "human_design_gate3_editorial_v1",
+  "base_catalogue_sha256": "e0be8121e433f1513fdd45ac560acd4c7519f67cf12d11bd86b966b0e011430e",
+  "source_pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495",
+  "curated_by": "FateBridge root-agent visual review and short original editorial notes",
+  "curated_on": "2026-10-28",
+  "independently_accepted_line_count": 0,
+  "publisher_master_authenticated": false,
+  "complete384_line_meanings_accepted": false,
+  "publisher_sample": {
+    "url": "https://cdn.shopify.com/s/files/1/0872/4984/6576/files/RA_1.6_-_The_Third_Gate_-_The_Power_of_Mutation_-_eBook_Sample.pdf?v=1757005762",
+    "linked_from": "https://jovianarchive.com/products/the-third-gate-the-power-of-mutation-ra-1-6",
+    "status": "downloaded",
+    "sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
+    "bytes": 918462,
+    "body_of_six_lines_available": false,
+    "publisher_master_authenticated": false
+  },
+  "rows": [
+    {
+      "key": "3.1",
+      "source_pdf_page_one_based": 11,
+      "source_layout_block_sha256": "48bbe0548276b5c848645f38f4f1a59ad7d6ba034409ebf55fc349a35c208b60",
+      "source_line_heading": "Synthesis",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "混乱与综合",
+        "exaltation": "容许混乱先于秩序。",
+        "detriment": "依赖理智忽略直觉，转向外求。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "分析全部相关因素后再整合。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：分析全部相关因素后再整合。"
+      ],
+      "heading_corroboration": {
+        "publisher": "Jovian Archive Media",
+        "sample_sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
+        "sample_pdf_page_one_based": 2,
+        "printed_contents_page": "i",
+        "listed_body_page": 6,
+        "literal_heading_matches": true,
+        "full_line_body_available_in_sample": false,
+        "full_line_semantics_corroborated": false
+      }
+    },
+    {
+      "key": "3.2",
+      "source_pdf_page_one_based": 11,
+      "source_layout_block_sha256": "45a0ce7948d9245388c5c411bb55a76ae8926c8d54255b47a3ecd5d90d11c5c5",
+      "source_line_heading": "Immaturity",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "引导与不稳定",
+        "exaltation": "持续成长的推动力。",
+        "detriment": "对外在权威一面接受一面抗拒。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "不加节制地接纳指引。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：不加节制地接纳指引。"
+      ],
+      "heading_corroboration": {
+        "publisher": "Jovian Archive Media",
+        "sample_sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
+        "sample_pdf_page_one_based": 2,
+        "printed_contents_page": "i",
+        "listed_body_page": 7,
+        "literal_heading_matches": true,
+        "full_line_body_available_in_sample": false,
+        "full_line_semantics_corroborated": false
+      }
+    },
+    {
+      "key": "3.3",
+      "source_pdf_page_one_based": 11,
+      "source_layout_block_sha256": "dc91bcdb1aa32f7017cc2805c22538c06334311e7359e4467dceb2d48556fa8b",
+      "source_line_heading": "Survival",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "协作与生物性变化",
+        "exaltation": "生物性创造潜能的辨别依赖协作。",
+        "detriment": "因反向抗拒而拒绝变化。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "分辨有产出与无产出的可能。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：分辨有产出与无产出的可能。",
+        "本段原语境涉及生物性变化；不据此评估生育能力或指导择偶。"
+      ],
+      "heading_corroboration": {
+        "publisher": "Jovian Archive Media",
+        "sample_sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
+        "sample_pdf_page_one_based": 2,
+        "printed_contents_page": "i",
+        "listed_body_page": 10,
+        "literal_heading_matches": true,
+        "full_line_body_available_in_sample": false,
+        "full_line_semantics_corroborated": false
+      }
+    },
+    {
+      "key": "3.4",
+      "source_pdf_page_one_based": 11,
+      "source_layout_block_sha256": "14549e38d4eecccf50cba902501bf9fc59f1964bd2c774ce9cad8f45e68a4c45",
+      "source_line_heading": "Charisma",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "吸引指引",
+        "exaltation": "感应吸引滋养，推动秩序形成。",
+        "detriment": "自我要求可能引起排斥。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "吸引有价值的引导。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：吸引有价值的引导。",
+        "上升段印作Physic，后句为psychic；保留字面疑点，不认证勘误。"
+      ],
+      "heading_corroboration": {
+        "publisher": "Jovian Archive Media",
+        "sample_sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
+        "sample_pdf_page_one_based": 2,
+        "printed_contents_page": "i",
+        "listed_body_page": 11,
+        "literal_heading_matches": true,
+        "full_line_body_available_in_sample": false,
+        "full_line_semantics_corroborated": false
+      }
+    },
+    {
+      "key": "3.5",
+      "source_pdf_page_one_based": 11,
+      "source_layout_block_sha256": "ed4d7b53b74520834aa30fd7b54b585d27d28a3a9a6732ca4e5a32d3443965a2",
+      "source_line_heading": "Victimization",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "信念与迁就",
+        "exaltation": "在混乱中坚持个人信念。",
+        "detriment": "受他人的秩序支配而迁就。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "摆脱混乱的行动可能疏离他人。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：摆脱混乱的行动可能疏离他人。"
+      ],
+      "heading_corroboration": {
+        "publisher": "Jovian Archive Media",
+        "sample_sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
+        "sample_pdf_page_one_based": 2,
+        "printed_contents_page": "i",
+        "listed_body_page": 13,
+        "literal_heading_matches": true,
+        "full_line_body_available_in_sample": false,
+        "full_line_semantics_corroborated": false
+      }
+    },
+    {
+      "key": "3.6",
+      "source_pdf_page_one_based": 11,
+      "source_layout_block_sha256": "a16d86bb86076662c66c0128159fd3108e9dc58633074a0e4a6f42e77698995c",
+      "source_line_heading": "Surrender",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "接纳过程",
+        "exaltation": "接纳秩序形成是持续过程。",
+        "detriment": "混乱压迫下出现无望体验。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "辨认无效抗争并停止。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：辨认无效抗争并停止。",
+        "这里只转述体系的情绪语言，不据盘作临床诊断；并非无条件放弃行动。"
+      ],
+      "heading_corroboration": {
+        "publisher": "Jovian Archive Media",
+        "sample_sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
+        "sample_pdf_page_one_based": 2,
+        "printed_contents_page": "i",
+        "listed_body_page": 14,
+        "literal_heading_matches": true,
+        "full_line_body_available_in_sample": false,
+        "full_line_semantics_corroborated": false
+      }
+    }
+  ]
+}

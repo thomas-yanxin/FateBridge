@@ -11,7 +11,7 @@ description: 用 FateBridge 的八字、紫微或西占时运计算，说明当�
 
 ## 共用范围与安全
 
-先读[咨询硬边界](../_shared/safety-boundaries.md)与[本轮范围及多视角选择](../_shared/consultation-routing.md)。按当前问题展开，首轮明确要求详细就覆盖；不自动附带全部相关主题。时间追问读[共享时间选择](../_shared/timing-selection.md)，保留原主题与已有相关视角，只补需要的新层。生死、临床判断与医疗择时在选法前停止。
+先读短的[咨询核心](../_shared/consultation-core.md)。主题重叠或扩展才查[范围选择](../_shared/consultation-routing.md)，涉及目标时段才查[时间选择](../_shared/timing-selection.md)；遇生死、临床判断或医疗择时先按[硬边界](../_shared/safety-boundaries.md)停止相关计算。
 
 ## 用户能得到什么
 
@@ -34,10 +34,10 @@ description: 用 FateBridge 的八字、紫微或西占时运计算，说明当�
 
 发现入口可能是软链接。优先进入入口目录后用 shell 内建 `pwd -P` 取得真实目录，再按它读取下面的相对引用；不要为解析路径调用未经核实的系统 `python3`。不能先裁剪 `.agents/skills/onda-*` 入口的字符串父目录，否则会误指到 `.agents/skills/_shared` 或 `.agents/docs`。读取已知引用无需搜索仓库。
 
-## 共用参考
-- 计算怎么调：[../_shared/fatebridge-engine.md](../_shared/fatebridge-engine.md)
-- 怎么开口说话：[../_shared/onda-counsel.md](../_shared/onda-counsel.md)
-- 场景取舍与去重：[../../docs/scenario-routing.md](../../docs/scenario-routing.md)
+## 按需参考
+- 参数、错误或分页不清楚时定位：[../_shared/fatebridge-engine.md](../_shared/fatebridge-engine.md)
+- 需要表达、来源或凶象细节时定位：[../_shared/onda-counsel.md](../_shared/onda-counsel.md)
+- 主题重叠或扩展时定位：[../../docs/scenario-routing.md](../../docs/scenario-routing.md)
 
 大运起运、流年干支、节气换月与星历推运全部交给引擎，不能用临时手算或模型记忆代替。
 
@@ -79,35 +79,8 @@ description: 用 FateBridge 的八字、紫微或西占时运计算，说明当�
 
 ## 样例
 
-以下使用虚构资料。在已安装并激活的仓库虚拟环境中运行，环境准备见[引擎调用](../_shared/fatebridge-engine.md#怎么调引擎)。已有 MCP 时直接调用，无需执行本地命令。
-```bash
-# 综合首轮：保留实际分析时间、时区及节气换月边界
-python3 -m fatebridge.cli --no-metadata timing_analysis \
-  --gender 男 --birth-year 1992 --birth-month 8 --birth-day 15 --birth-hour 14 --birth-place 北京 \
-  --analysis-year 2026 --analysis-month 10 --analysis-day 14 \
-  --strict-fields --no-include-snapshot-text \
-  --fields dayun_analysis liunian_analysis liuyue_analysis comprehensive_summary personal_info.analysis_datetime personal_info.time_adjustment analysis_calendar.analysis_date_context.timezone analysis_calendar.analysis_date_context.current_solar_term analysis_calendar.analysis_date_context.next_solar_term analysis_calendar.analysis_date_context.bazi_month_boundary
+仅需要本地 CLI 复核时使用；已有 MCP 定义直接调用。 [读取本分支](references/examples.md)。
 
-python3 -m fatebridge.cli --no-metadata liunian_analysis \
-  --gender 男 --birth-year 1992 --birth-month 8 --birth-day 15 --birth-hour 14 --birth-place 北京 --target-year 2026
+## 印度占星视角
 
-python3 -m fatebridge.cli --no-metadata profection \
-  --name 我 --birth-year 1992 --birth-month 8 --birth-day 15 --birth-hour 14 --birth-minute 30 \
-  --birth-latitude 39.90 --birth-longitude 116.40 --birth-place 北京 --analysis-year 2026
-
-# 生命周期：行星年龄，保留实际段界与主星条件
-python3 -m fatebridge.cli --no-metadata astro_planetary_ages \
-  --strict-fields --no-include-snapshot-text --fields analysis_context planetary_ages natal_reference \
-  --name 我 --birth-year 1992 --birth-month 8 --birth-day 15 --birth-hour 14 --birth-minute 30 \
-  --birth-latitude 39.90 --birth-longitude 116.40 --birth-place 北京 --analysis-year 2026
-
-# 月相推运：本命月相 + 八相时间轴（默认看到 90 岁）
-python3 -m fatebridge.cli --no-metadata astro_lunation_phase \
-  --name 我 --birth-year 1992 --birth-month 8 --birth-day 15 --birth-hour 14 --birth-minute 30 \
-  --birth-latitude 39.90 --birth-longitude 116.40 --birth-place 北京
-
-# 紫微运限：第三套时运体系，看目标时间点的六层运限+动态四化
-python3 -m fatebridge.cli --no-metadata ziwei_horoscope \
-  --gender 男 --birth-year 1992 --birth-month 8 --birth-day 15 --birth-hour 14 \
-  --target-year 2026 --target-month 6 --target-day 19 --target-hour 14 --fields summary
-```
+明确 Vimshottari／达沙用 `astro_vimshottari` 的 `stage` 卡；读[印占取证](../_shared/vedic-evidence.md)。保留年长、出生剩余运和真实 UTC 起止，按实际运星在 D1／相关分盘的上下文联系所问主题。仅需印占静态结构时用 `astro_india_chart`，达沙已有本命层不重算。完整时间线用 `fields=null` 从同 run 交付读取；120 年是规则周期，不能解释为寿命。`astro_vedicprog` 是恒星二次推运，不能替代达沙。

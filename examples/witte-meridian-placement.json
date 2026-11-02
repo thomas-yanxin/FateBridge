@@ -1,0 +1,13 @@
+{
+  "name": "虚构：完整方向子午宫示例",
+  "birth_year": 2000,
+  "birth_month": 1,
+  "birth_day": 1,
+  "birth_hour": 0,
+  "birth_minute": 0,
+  "birth_timezone": "UTC",
+  "birth_longitude": 0,
+  "birth_latitude": 0,
+  "use_true_solar_time": false,
+  "zodiacal": 0
+}

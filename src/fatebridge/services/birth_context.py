@@ -6,6 +6,7 @@ from typing import Any, Dict, Tuple
 from fatebridge.core.almanac import build_calendar_context
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.elements import ElementAnalysis
+from fatebridge.utils.birth_clock import birth_clock_input_receipt
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.data import Element
 from fatebridge.utils.solar_time import NormalizedBirthTime, normalize_birth_time
@@ -23,14 +24,6 @@ class BirthComputationContext:
     original_element_counts: Dict[Element, float]
 
 
-def _extract_original_element_counts(
-    element_analysis: Dict[str, Any],
-) -> Dict[Element, float]:
-    """Reuse raw element counts from comprehensive analysis when available."""
-    raw_counts = element_analysis["day_master"].get("element_distribution_raw") or {}
-    return {element: float(raw_counts.get(element.value, 0.0)) for element in Element}
-
-
 def build_birth_computation_context(person: PersonInfo) -> BirthComputationContext:
     """Build the shared birth context once so downstream services can reuse it."""
     normalized_birth_time = normalize_birth_time(person)
@@ -46,7 +39,12 @@ def build_birth_computation_context(person: PersonInfo) -> BirthComputationConte
         pillars=birth_pillars,
         civil_datetime=normalized_birth_time.input_datetime,
     )
+    birth_calendar_context["birth_time_input"] = birth_clock_input_receipt(
+        person, normalized_birth_time
+    )
     element_analysis = ElementAnalysis.comprehensive_analysis(birth_pillars)
+    # Raw distributions omit elements whose count is zero.
+    raw_counts = element_analysis["day_master"]["element_distribution_raw"]
 
     return BirthComputationContext(
         person=person,
@@ -54,5 +52,7 @@ def build_birth_computation_context(person: PersonInfo) -> BirthComputationConte
         birth_pillars=birth_pillars,
         birth_calendar_context=birth_calendar_context,
         element_analysis=element_analysis,
-        original_element_counts=_extract_original_element_counts(element_analysis),
+        original_element_counts={
+            element: float(raw_counts.get(element.value, 0.0)) for element in Element
+        },
     )

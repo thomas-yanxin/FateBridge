@@ -12,7 +12,6 @@ from fastmcp import Client
 
 import fatebridge.api as api
 import fatebridge.mcp_server as mcp
-from fatebridge.application.description import spec_is_cli_safe
 from fatebridge.services.tool_catalog import CATALOG
 
 RETIRED_MODULES = (
@@ -32,9 +31,6 @@ def test_retired_import_paths_do_not_resolve(module):
 
 def test_retired_route_and_command_are_absent(monkeypatch):
     assert all(spec.key != "calculate_legacy" for spec in CATALOG)
-    assert all(
-        spec.key != "calculate_legacy" for spec in CATALOG if spec_is_cli_safe(spec)
-    )
     assert "/api/calculate" not in api.app.openapi()["paths"]
     monkeypatch.setattr(
         api,

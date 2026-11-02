@@ -236,16 +236,17 @@ def test_non_traditional_bodies_have_no_essential_dignity():
 def test_combustion_thresholds_match_chartfacts():
     assert combustion_state(100.1, 100.0) == "cazimi"  # ≤17′
     assert combustion_state(105.0, 100.0) == "combust"  # <8.5°
-    assert combustion_state(112.0, 100.0) == "under_beams"  # <15°
+    assert combustion_state(112.0, 100.0) == "under_beams"  # <17°
     assert combustion_state(130.0, 100.0) is None
     assert combustion_state(100.0, None) is None
 
 
-def test_under_beams_orb_is_solar_moiety_15_degrees():
-    # The Sun's burning orb (moiety) is 15°, not 17°. A planet 16° from the
-    # Sun is clear of the beams; one at 14° is still under them.
+def test_under_beams_uses_lilly_p113_seventeen_degrees():
+    # Printed Lilly 1647 p.113 says the planet clears the beams at 17°.
+    # The pair-aspect ray allowance is a distinct quantity.
     assert combustion_state(114.0, 100.0) == "under_beams"  # 14° — under beams
-    assert combustion_state(116.0, 100.0) is None  # 16° — clear of beams
+    assert combustion_state(116.0, 100.0) == "under_beams"  # 16° — within printed 17°
+    assert combustion_state(117.0, 100.0) is None
 
 
 def test_triplicity_members_unordered_set_of_three():

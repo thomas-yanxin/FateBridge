@@ -1,0 +1,115 @@
+{
+  "id": "t2217_printed_daytext_collation_v1",
+  "work": {
+    "id": "T2217",
+    "title": "大日經疏指心鈔",
+    "author_metadata": "頼瑜撰",
+    "edition": "大正新脩大藏經第59卷",
+    "sigla_scope": "T2217_only"
+  },
+  "printed_readings": {
+    "body": {
+      "page": 620,
+      "locator": "T59n2217_p0620b11-b15",
+      "literal": "日行四天下乃至三十時等者。鈔第二云。智論云。日名。從旦至夕初分中分後分。夜亦三分。一日一夜有三十時。春秋分時十五時屬晝十五時屬夜。餘時増減。五月晝十八時夜十二時。十一月翻此。言十五時屬晝三分中",
+      "target_glyph": "夕",
+      "layer": "printed_Taisho_body"
+    },
+    "apparatus": {
+      "page": 620,
+      "note": "⑥",
+      "literal_transcription": "夕＝且〔甲〕",
+      "target_glyph": "且",
+      "layer": "printed_editorial_report_of_witness",
+      "brackets_represent_circled_siglum": true
+    }
+  },
+  "witness_key": {
+    "page": 571,
+    "note": "①",
+    "literal_transcription": "〔原〕寛文元年刊本、〔甲〕室町時代寫高野山寶龜院藏本",
+    "brackets_represent_circled_sigla": true,
+    "witnesses": {
+      "原": {
+        "description_literal": "寛文元年刊本",
+        "target_original_image_seen": false
+      },
+      "甲": {
+        "description_literal": "室町時代寫高野山寶龜院藏本",
+        "target_original_image_seen": false,
+        "shelfmark": null,
+        "current_custody_verified": false,
+        "physical_identity_verified": false
+      }
+    }
+  },
+  "quote_chain": {
+    "literal": "鈔第二云。智論云",
+    "intermediate_work_identity": null,
+    "is_direct_T1509_witness": false,
+    "normalized_target_glyph": null
+  },
+  "acquisition": {
+    "at": "2026-10-25T19:33:39.928765+00:00",
+    "manifest_url": "https://dzkimgs.l.u-tokyo.ac.jp/iiif/taisho/manifests/2217_59_manifest.json",
+    "manifest_sha256": "17cbf4ca22b9937324e4811dd33b1c541700f4732d5401967d223a9b2e9344a9",
+    "manifest_license": "http://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "images": [
+      {
+        "name": "T2217-p620.jpg",
+        "final_url": "https://imgsrv.dhii.jp/iipsrv/iipsrv.fcgi?IIIF=/taisho/59/59_0620.tif/full/full/0/default.jpg",
+        "bytes": 2242772,
+        "sha256": "9d480c4ee1658051c1ed1cc47bb17f727bae98b9fdec1335f4515e03274344f5",
+        "manifest_dimensions": [
+          4000,
+          5734
+        ],
+        "service_dimensions": [
+          2000,
+          2867
+        ],
+        "actual_dimensions": [
+          2000,
+          2867
+        ],
+        "info_final_url": "https://imgsrv.dhii.jp/iipsrv/iipsrv.fcgi?IIIF=/taisho/59/59_0620.tif/info.json",
+        "info_sha256": "517c34c8af9b41ed2cd86af6d819015aa8afda99c05fe20558c36d83ac8dc78b"
+      },
+      {
+        "name": "T2217-p571.jpg",
+        "final_url": "https://imgsrv.dhii.jp/iipsrv/iipsrv.fcgi?IIIF=/taisho/59/59_0571.tif/full/full/0/default.jpg",
+        "bytes": 2327709,
+        "sha256": "1554f6f061529ac0d31123054897093e98b623dcc088898a0413495dce1f8c13",
+        "manifest_dimensions": [
+          4000,
+          5747
+        ],
+        "service_dimensions": [
+          2000,
+          2874
+        ],
+        "actual_dimensions": [
+          2000,
+          2874
+        ],
+        "info_final_url": "https://imgsrv.dhii.jp/iipsrv/iipsrv.fcgi?IIIF=/taisho/59/59_0571.tif/info.json",
+        "info_sha256": "ecfbbf93ad52c2f2f54db25ba1b4178beb2c2392859bc9669fe86355cff3b424"
+      }
+    ],
+    "raw_images_bundled": false,
+    "highest_original_resolution_certified": false
+  },
+  "scope": {
+    "printed_page_selected_windows_read": true,
+    "full_work_collation_complete": false,
+    "independent_ancient_witness_count": null,
+    "modern_day_boundary": null,
+    "solar_altitude_degrees": null,
+    "T1299_pingming_mapping_established": false,
+    "hinoo_half_mapping_established": false,
+    "leap_short_month_priority_established": false,
+    "birth_calendar_override_applied": false,
+    "old17_image_queue_completed": 0,
+    "real_samples": 0
+  }
+}

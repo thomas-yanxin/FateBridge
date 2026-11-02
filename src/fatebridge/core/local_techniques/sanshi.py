@@ -6,13 +6,24 @@ Pure relocation from the package facade.
 
 from __future__ import annotations
 
-import copy
 from typing import Any, Dict, Optional
 
 from fatebridge.core.almanac import DAY_GANZHI_STRATEGY_STANDARD
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.liureng import build_liureng_board
+from fatebridge.core.metaphysics.ren_calendar import require_ren_calendar
+from fatebridge.core.metaphysics.ren_gods import DEFAULT_GUIREN_PROFILE, GuirenProfile
+from fatebridge.core.metaphysics.sanshi_correspondences import (
+    correspondence_text,
+    palace_correspondences,
+)
 from fatebridge.core.metaphysics.taiyi import build_taiyi_board
+from fatebridge.core.metaphysics.taiyi_dangshi import (
+    noble_source_assessment,
+    noble_source_text,
+)
+from fatebridge.core.metaphysics.taiyi_long_cycles import long_cycle_text
+from fatebridge.core.metaphysics.taiyi_year import evidence_text
 from fatebridge.utils.formatting import create_pillar_dict
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 
@@ -22,116 +33,97 @@ from .chart import (
     _build_qimen_palace_overview_lines,
     _join_lines,
     _normalize_date_text,
-    _normalize_mode,
     _normalize_time_text,
-    _option_value,
     _render_qimen_palace_sections,
     _render_snapshot_text,
-    _rotate_items,
 )
-from .qimen import build_qimen_with_options
-
-TAIYI_BIG_PATTERNS = [
-    "贵人顺行格",
-    "龙德扶身格",
-    "青龙转关格",
-    "朱雀投江格",
-    "白虎当关格",
-    "六合成局格",
-    "玄武伏吟格",
-    "太常合德格",
-    "天空反照格",
-    "天后持静格",
-    "勾陈守户格",
-    "腾蛇绕局格",
-]
-
-
-TAIYI_SMALL_PATTERNS = [
-    "青龙返首",
-    "六合入局",
-    "白虎守门",
-    "腾蛇绕身",
-    "九地蓄势",
-    "九天扬兵",
-    "太阴护局",
-    "玄武回环",
-]
+from .qimen import (
+    _qimen_stem_context_lines,
+    _render_qimen_pattern_line,
+    _render_qimen_source_disagreements,
+    build_qimen_with_options,
+)
 
 
 def _build_taiyi_with_options(
     seed: MetaphysicsSeed, options: Optional[Dict[str, Any]]
 ) -> Dict[str, Any]:
-    board = build_taiyi_board(seed, gender="未知")
-    normalized_options = dict(options or {})
-    if not normalized_options:
-        return board
-
-    acc_num = _normalize_mode(
-        _option_value(normalized_options, "accNum", "acc_num"), default=0
+    normalized = dict(options or {})
+    unknown = set(normalized) - {
+        "accNum",
+        "acc_num",
+        "rotation",
+        "calculation_mode",
+        "hour_profile",
+        "month_profile",
+        "year_profile",
+    }
+    if unknown:
+        raise ValueError("未实现的太乙选项：" + ", ".join(sorted(unknown)))
+    for key in ("accNum", "acc_num"):
+        if key in normalized and (
+            type(normalized[key]) is not int or normalized[key] != 0
+        ):
+            raise ValueError(
+                "太乙accNum任意积数偏移没有原典算法依据；仅支持0，请用实际日期起盘"
+            )
+    if "rotation" in normalized and (
+        not isinstance(normalized["rotation"], str)
+        or normalized["rotation"] not in {"顺布", "順布", "forward"}
+    ):
+        raise ValueError("太乙阴阳遁由所选计法及日期决定，rotation不能覆盖计算")
+    mode = normalized.get("calculation_mode", "year")
+    if not isinstance(mode, str) or mode not in {"year", "month", "day", "hour"}:
+        raise ValueError("太乙calculation_mode仅支持year、month、day、hour")
+    if mode in {"day", "hour"} and "rotation" in normalized:
+        raise ValueError("太乙日/时计阴阳遁由至点决定，不接受rotation覆盖")
+    profile = normalized.get("hour_profile")
+    if "hour_profile" in normalized and not isinstance(profile, str):
+        raise ValueError("hour_profile必须是已发布时计配置名称")
+    month_profile = normalized.get("month_profile")
+    if "month_profile" in normalized and not isinstance(month_profile, str):
+        raise ValueError("month_profile必须是已发布月计配置名称")
+    year_profile = normalized.get("year_profile")
+    if "year_profile" in normalized and not isinstance(year_profile, str):
+        raise ValueError("year_profile必须是已发布年计配置名称")
+    return build_taiyi_board(
+        seed,
+        gender="未知",
+        calculation_mode=mode,
+        hour_profile=profile,
+        month_profile=month_profile,
+        year_profile=year_profile,
     )
-    rotation = str(
-        _option_value(normalized_options, "rotation") or board.get("rotation", "")
-    ).strip() or board.get("rotation", "")
 
-    palace_marks = board.get("palace_marks", []) or []
-    palace_names = [
-        item.get("palace")
-        for item in palace_marks
-        if isinstance(item, dict) and item.get("palace")
-    ]
-    marker_rows = [
-        copy.deepcopy(item.get("markers", []))
-        for item in palace_marks
-        if isinstance(item, dict) and item.get("palace")
-    ]
 
-    if rotation.lower() in {"reverse", "逆布"}:
-        marker_rows = list(reversed(marker_rows))
-    marker_rows = _rotate_items(marker_rows, acc_num)
-    transformed_marks = [
-        {
-            "palace": palace,
-            "markers": rows,
+def _source_profiles(qimen: Dict[str, Any], liureng: Dict[str, Any]) -> Dict[str, Any]:
+    """Keep source identities in a first view without copying whole audits."""
+    result: Dict[str, Any] = {"qimen": [], "liureng": []}
+    raw = [("qimen", f"qimen.rulesets.{i}", r) for i, r in enumerate(qimen["rulesets"])]
+    raw.append(("liureng", "liureng.ruleset", liureng["ruleset"]))
+    for technique, path, ruleset in raw:
+        profile = {
+            key: ruleset[key]
+            for key in (
+                "id",
+                "version",
+                "author",
+                "classical_author",
+                "source",
+                "source_urls",
+                "classical_conformance",
+                "classical_acceptance_passed",
+                "real_world_efficacy",
+            )
+            if key in ruleset
         }
-        for palace, rows in zip(palace_names, marker_rows)
-    ]
-
-    palace_index_map = {name: index for index, name in enumerate(palace_names)}
-    taiyi_index = palace_index_map.get(board.get("taiyi_palace"), 0)
-    wenchang_index = palace_index_map.get(board.get("wenchang_palace"), 0)
-    transformed_taiyi_palace = palace_names[(taiyi_index + acc_num) % len(palace_names)]
-    transformed_wenchang_palace = palace_names[
-        (wenchang_index + acc_num) % len(palace_names)
-    ]
-
-    transformed_core_board = copy.deepcopy(board.get("core_board", {}))
-    transformed_core_board["main_calculation"] = (
-        f"{transformed_core_board.get('main_calculation', '太乙局')}（积数+{acc_num}）"
-    )
-    transformed_core_board["taiyi_position"] = f"太乙在{transformed_taiyi_palace}宫"
-    transformed_core_board["wenchang_position"] = (
-        f"文昌在{transformed_wenchang_palace}宫"
-    )
-
-    transformed_board = copy.deepcopy(board)
-    transformed_board.update(
-        {
-            "rotation": rotation,
-            "accumulation_label": f"{board.get('accumulation_label', '太乙积年')}偏移{acc_num}",
-            "taiyi_palace": transformed_taiyi_palace,
-            "wenchang_palace": transformed_wenchang_palace,
-            "core_board": transformed_core_board,
-            "palace_marks": transformed_marks,
-            "options_applied": {
-                "accNum": acc_num,
-                "rotation": rotation,
-            },
-            "big_pattern": TAIYI_BIG_PATTERNS[acc_num % len(TAIYI_BIG_PATTERNS)],
-            "small_pattern": TAIYI_SMALL_PATTERNS[acc_num % len(TAIYI_SMALL_PATTERNS)],
-        }
-    )
-    return transformed_board
+        profile.update(
+            source_path=path,
+            source_title=ruleset.get("source_title", ruleset.get("title", "")),
+            unresolved_count=len(ruleset.get("unresolved", [])),
+        )
+        result[technique].append(profile)
+    return result
 
 
 def _build_sanshi_snapshot_text(
@@ -141,6 +133,8 @@ def _build_sanshi_snapshot_text(
     qimen: Dict[str, Any],
     taiyi: Dict[str, Any],
     liureng: Dict[str, Any],
+    correspondences: Dict[str, Any],
+    noble_assessment: Dict[str, Any],
 ) -> str:
     qimen_display_seed = qimen_seed or seed
     palace_lines = _build_qimen_palace_overview_lines(qimen)
@@ -175,15 +169,22 @@ def _build_sanshi_snapshot_text(
             "起盘信息",
             _join_lines(
                 [
-                    f"农历：{(seed.calendar_context.get('lunar_calendar') or {}).get('display') or '无'}",
-                    f"直接时间：{qimen_display_seed.calendar_context['solar_datetime']}",
+                    (
+                        "时间上下文农历：未扩展；太乙历史历表日期见太乙规则依据（仅太乙年计使用）。"
+                        if (taiyi.get("calendar_rules") or {}).get(
+                            "historical_calendar"
+                        )
+                        else f"时间上下文农历：{(seed.calendar_context.get('lunar_calendar') or {}).get('display') or '未提供'}（父级钟面上下文，太乙年计日期见太乙规则依据）"
+                    ),
+                    f"奇门输入钟时：{qimen_display_seed.input_datetime.isoformat()}；时区：{qimen_display_seed.timezone}",
+                    f"奇门计算钟面：{qimen_display_seed.calendar_context['solar_datetime']}",
                     f"四柱：{qimen_display_seed.pillars['year'][0]}{qimen_display_seed.pillars['year'][1]}年/{qimen_display_seed.pillars['month'][0]}{qimen_display_seed.pillars['month'][1]}月/{qimen_display_seed.pillars['day'][0]}{qimen_display_seed.pillars['day'][1]}日/{qimen_display_seed.pillars['hour'][0]}{qimen_display_seed.pillars['hour'][1]}时",
                     (
                         "时间算法：真太阳时 + 本地节气换月"
                         if qimen_display_seed.applied_true_solar
                         else "时间算法：直接时间 + 本地节气换月"
                     ),
-                    "换日：子初换日",
+                    "换日：按各子盘注明的实际口径",
                     f"月将：{month_general.get('branch', '无')}({month_general.get('name', '无')})",
                     f"年命：{seed.pillars['year'][1]}",
                 ]
@@ -198,7 +199,13 @@ def _build_sanshi_snapshot_text(
                     f"空亡：{qimen.get('kongwang', '无')}",
                     f"值符：{(qimen.get('zhifu') or {}).get('star', '无')}在{(qimen.get('zhifu') or {}).get('palace', '无')}",
                     f"值使：{(qimen.get('zhishi') or {}).get('door', '无')}在{(qimen.get('zhishi') or {}).get('palace', '无')}",
+                    f"八神口径：{qimen['rule_profiles']['god']['title']}（{qimen['god_profile']}）",
+                    f"九星旺衰口径：{qimen['rule_profiles']['season']['title']}（{qimen['season_profile']}）",
+                    *_qimen_stem_context_lines(qimen),
                     f"伏使卦：{(qimen.get('fushi_hexagram') or {}).get('name', '无')}",
+                    "奇门格局按条件读取；下列结构不等于现实成败判断：",
+                    *_render_qimen_source_disagreements(qimen),
+                    *[_render_qimen_pattern_line(p) for p in qimen.get("patterns", [])],
                 ]
             ),
         ),
@@ -215,12 +222,21 @@ def _build_sanshi_snapshot_text(
                     (taiyi.get("core_board") or {}).get("main_calculation", "无"),
                     (taiyi.get("core_board") or {}).get("taiyi_position", "无"),
                     (taiyi.get("core_board") or {}).get("wenchang_position", "无"),
-                    f"岁君：{(taiyi.get('core_board') or {}).get('suijun', '无')}",
+                    f"{taiyi['core_board'].get('ruler_label', '岁君')}：{taiyi['core_board'].get('ruler_branch', taiyi['core_board'].get('suijun', '无'))}",
                     f"合神：{(taiyi.get('core_board') or {}).get('heshen', '无')}",
                 ]
             ),
         ),
         ("太乙十六宫", _join_lines(taiyi_mark_lines) or "无"),
+        ("太乙中宫", "、".join(taiyi["center_marks"]["markers"]) or "无星标"),
+        ("太乙规则依据", evidence_text(taiyi)),
+        ("太乙年运十神", long_cycle_text(taiyi.get("long_cycles"))),
+        ("三式宫位对应", correspondence_text(correspondences)),
+        ("三式贵人来源对照", noble_source_text(noble_assessment)),
+        (
+            "合参范围",
+            f"太乙采用{taiyi['life_method']}；奇门、六壬为本次时刻盘。尚未完成共同事件的全套合参断法，不能合成胜率或把三式视为三份独立证据。",
+        ),
         (
             "神煞",
             _join_lines(
@@ -266,6 +282,7 @@ def build_sanshiunited_result(
     taiyi_options: Optional[Dict[str, Any]] = None,
     liureng_yue: Optional[str] = None,
     liureng_is_diurnal: Optional[bool] = None,
+    liureng_guiren_profile: GuirenProfile = DEFAULT_GUIREN_PROFILE,
     use_true_solar_time: bool = False,
 ) -> Dict[str, Any]:
     input_normalized = {
@@ -280,6 +297,7 @@ def build_sanshiunited_result(
         "taiyi_options": taiyi_options or {},
         "liureng_yue": liureng_yue,
         "liureng_is_diurnal": liureng_is_diurnal,
+        "liureng_guiren_profile": liureng_guiren_profile,
         "use_true_solar_time": bool(use_true_solar_time),
     }
     seed = _build_metaphysics_seed(
@@ -305,19 +323,31 @@ def build_sanshiunited_result(
     )
     qimen = build_qimen_with_options(qimen_seed, qimen_options)
     taiyi = _build_taiyi_with_options(seed, taiyi_options)
+    seed.calendar_context["ren_calendar_policy"] = require_ren_calendar(
+        seed, month_general_override=liureng_yue
+    )
     liureng = build_liureng_board(
         seed,
         gender="未知",
         month_general_override=liureng_yue,
         is_diurnal_override=liureng_is_diurnal,
+        guiren_profile=liureng_guiren_profile,
     )
 
+    correspondences = palace_correspondences(taiyi, qimen, liureng)
+    noble_assessment = noble_source_assessment(
+        seed.pillars["day"][0],
+        liureng,
+        taiyi_mode=taiyi["calendar_summary"]["calculation_mode"],
+    )
     snapshot_text = _build_sanshi_snapshot_text(
         seed=seed,
         qimen_seed=qimen_seed,
         qimen=qimen,
         taiyi=taiyi,
         liureng=liureng,
+        correspondences=correspondences,
+        noble_assessment=noble_assessment,
     )
     analysis_context = _build_metaphysics_analysis_context(seed)
     four_pillars = create_pillar_dict(seed.pillars)
@@ -355,6 +385,57 @@ def build_sanshiunited_result(
         "taiyi": taiyi,
         "liureng": liureng,
         "subresults": subresults,
+        "synthesis": {
+            "source_profiles": _source_profiles(qimen, liureng),
+            "method": "scoped_evidence_aggregation_v1",
+            "status": "parallel_boards_without_validated_joint_prediction",
+            "time_scopes": {
+                "taiyi": taiyi["ruleset"]["time_granularity"],
+                "qimen": "casting_time",
+                "liureng": "casting_time",
+            },
+            "common_input": {
+                "date": input_normalized["date"],
+                "time": input_normalized["time"],
+                "timezone": input_normalized["zone"],
+            },
+            "facts": [
+                {
+                    "technique": "taiyi",
+                    "field": "taiyi.core_board.main_calculation",
+                    "value": taiyi["core_board"]["main_calculation"],
+                },
+                {
+                    "technique": "qimen",
+                    "field": "qimen.ju_text",
+                    "value": qimen["ju_text"],
+                },
+                {
+                    "technique": "liureng",
+                    "field": "liureng.patterns",
+                    "value": liureng.get("patterns", []),
+                },
+            ],
+            "palace_correspondences": correspondences,
+            "noble_source_assessment": noble_assessment,
+            "agreement": "not_assessed_without_shared_event_and_adjudication_rule",
+            "independent_evidence_count": None,
+            "real_world_efficacy": "not_tested",
+            "limitations": [
+                (
+                    (
+                        "共用民用输入；太乙年计另用所选齐梁史历表，502年闰标分歧保留；奇门/六壬仍用各自现代适配，未认证三式共同古历时刻，也不能假设统计独立。"
+                        if (taiyi.get("calendar_rules") or {}).get("year_profile")
+                        == "jinjing_year_qiliang_table_v1"
+                        else "共用民用输入；太乙年计另用所选历史晋历表，奇门/六壬仍用各自现代适配，未认证三式共同古历时刻，也不能假设统计独立。"
+                    )
+                    if (taiyi.get("calendar_rules") or {}).get("historical_calendar")
+                    else "各盘共用输入及历法，不能假设统计独立。"
+                ),
+                "各术原典符合度须独立验收；本次太乙规则修正不认证奇门或六壬。",
+                "太乙各计法按实际时间层解释；时计至点和时辰边界采用已声明的现代时钟适配，不能外推分钟级事件应验。",
+            ],
+        },
         "sources": {
             "four_pillars": four_pillars,
             "calendar_context": seed.calendar_context,

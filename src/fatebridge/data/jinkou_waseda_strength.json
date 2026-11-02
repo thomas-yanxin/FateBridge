@@ -1,0 +1,46 @@
+{
+  "primary_witness": {
+    "catalog_id": "早稻田大学図書館 ロ14 02466",
+    "catalog_url": "https://www.wul.waseda.ac.jp/kotenseki/html/ro14/ro14_02466/index.html",
+    "full_volume_collation": false,
+    "id": "waseda05_god_strength_examples_v1",
+    "independent_transmission_adjudicated": false,
+    "original_pdf_pages": [
+      54,
+      55,
+      56,
+      57,
+      58,
+      59
+    ],
+    "scan_url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/WUL-ro14_02466_%E6%B9%96%E7%A4%BE%E5%8F%A2%E8%A9%B1_05.pdf",
+    "source_bytes": 51978477,
+    "source_kind": "manuscript_scan",
+    "source_pdf_pages": 73,
+    "source_sha256": "112858e63ed94845ee0539d7e2d5d5f9e128ce6c54a0626db7008b48cc64a3bd",
+    "symbolic_example_count": 12,
+    "title": "湖社叢話第五冊·金口訣·貴神休旺所主"
+  },
+  "scope": "早稻田第五册十二条同章五行例作为原书旁证，与网上转录同属一组示例，不能计为新增独立占验。京本原字木及其原11/12结果保留；不据另本水裁定京本错字或版本先后，也不认证日下五态和综合取用。",
+  "witness_difference": {
+    "authorial_resolution": null,
+    "changed_position": "地分",
+    "id": "S01_vs_W01",
+    "original_elements": [
+      "土",
+      "土",
+      "火",
+      "木"
+    ],
+    "original_pdf_page": 130,
+    "primary_elements": [
+      "土",
+      "土",
+      "火",
+      "水"
+    ],
+    "primary_pdf_page": 55,
+    "stated_anchor": "土",
+    "stated_god_power": "旺"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "house": {
+    "object_id": "synthetic-home",
+    "facing_degrees": 315,
+    "north_reference": "magnetic",
+    "orientation_basis": "user_confirmed"
+  },
+  "city_gate": {
+    "reference_period_number": 2,
+    "period_evidence": "虚构原文数字示例，不是真实房屋或当前时运"
+  }
+}

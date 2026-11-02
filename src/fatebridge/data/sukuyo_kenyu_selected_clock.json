@@ -1,0 +1,425 @@
+{
+  "id": "kenyu_nijl100159236_selected_clock_v1",
+  "title": "宿曜經撮要追加七曜暦",
+  "author_catalogue": "堅雄",
+  "source_url": "https://doi.org/10.20730/100159236",
+  "manifest_url": "https://kokusho.nijl.ac.jp/biblio/100159236/manifest",
+  "manifest_sha256": "fbd4602119d733ed58b01e6206abba8fc271bd01262da6dfe672a3d9c19aca65",
+  "credit": "名古屋大学附属図書館 国文学研究資料館",
+  "catalogue": {
+    "holder": "名古屋大学附属図書館",
+    "call_number": "148.8-Ke",
+    "nagoya_material_id": "10050943",
+    "nagoya_url": "https://da.adm.thers.ac.jp/item/n004-20230901-00307",
+    "ndl_url": "https://ndlsearch.ndl.go.jp/books/R100000151-IN0042023090100307",
+    "nijl_work_year": "嘉永二刊（1849）",
+    "catalogue_copy_year": "1859; 内容より安政６年頃の成立; 無刊記",
+    "composition_note": "天保四癸巳年九月（1833）閣筆",
+    "preface_note": "嘉永２年秋日（1849）自序",
+    "impression_exact_year_established": false,
+    "transmission_claim_verified": false,
+    "manifest_canvas_count": 39,
+    "catalogue_frames": 38
+  },
+  "images": [
+    {
+      "frame": 8,
+      "canvas": "https://kokusho.nijl.ac.jp/biblio/100159236/canvas/8",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100159236/v4/0007/0007-004002/0007-004002-0007.tif/full/full/0/default.jpg",
+      "bytes": 1728516,
+      "sha256": "4b775fce10cd378f6b880a68aa2dc611c426bc428565b33a36aea2327c1cf544",
+      "retrieved_at": "2026-10-22T23:57:00.259482+00:00"
+    },
+    {
+      "frame": 17,
+      "canvas": "https://kokusho.nijl.ac.jp/biblio/100159236/canvas/17",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100159236/v4/0007/0007-004002/0007-004002-0016.tif/full/full/0/default.jpg",
+      "bytes": 1519652,
+      "sha256": "83b547ba5da76bffe8e179166c89a0514cf99005a49c26afce1570a922bb3945",
+      "retrieved_at": "2026-10-22T23:57:03.078600+00:00"
+    },
+    {
+      "frame": 18,
+      "canvas": "https://kokusho.nijl.ac.jp/biblio/100159236/canvas/18",
+      "url": "https://kokusho.nijl.ac.jp/api/iiif/100159236/v4/0007/0007-004002/0007-004002-0017.tif/full/full/0/default.jpg",
+      "bytes": 1693129,
+      "sha256": "a385211bdeda196fd4d79ef5d2ec3ede788b3f6c67cb7dbdcb483190d968a6ae",
+      "retrieved_at": "2026-10-22T23:57:07.961011+00:00"
+    }
+  ],
+  "clock_selected": {
+    "frame": 17,
+    "prose_location": "右页，時有萬倍力条；左页直時七曜图",
+    "heading_literal": "時有萬倍力",
+    "selected_literals": [
+      "七曜者直日曜右傍八支者",
+      "左傍四支者夜分時",
+      "若求日曜直日而午時之曜",
+      "當水曜",
+      "夜分者每一時二曜也",
+      "若土曜而求寅時則金為上",
+      "土為下刻餘可準知之"
+    ],
+    "ellipsis_and_punctuation": "选段分列，标点及分词为现代整理；未接纳整页逐字定本",
+    "day_columns": [
+      "日",
+      "月",
+      "火",
+      "水",
+      "木",
+      "金",
+      "土"
+    ],
+    "day_branches": [
+      "卯",
+      "辰",
+      "巳",
+      "午",
+      "未",
+      "申",
+      "酉",
+      "戌"
+    ],
+    "night_branches": [
+      "亥",
+      "子",
+      "丑",
+      "寅"
+    ],
+    "night_half_labels": [
+      "上",
+      "下"
+    ],
+    "table_rows": [
+      {
+        "row_one_based": 1,
+        "luminaries": [
+          "日",
+          "月",
+          "火",
+          "水",
+          "木",
+          "金",
+          "土"
+        ]
+      },
+      {
+        "row_one_based": 2,
+        "luminaries": [
+          "月",
+          "火",
+          "水",
+          "木",
+          "金",
+          "土",
+          "日"
+        ]
+      },
+      {
+        "row_one_based": 3,
+        "luminaries": [
+          "火",
+          "水",
+          "木",
+          "金",
+          "土",
+          "日",
+          "月"
+        ]
+      },
+      {
+        "row_one_based": 4,
+        "luminaries": [
+          "水",
+          "木",
+          "金",
+          "土",
+          "日",
+          "月",
+          "火"
+        ]
+      },
+      {
+        "row_one_based": 5,
+        "luminaries": [
+          "木",
+          "金",
+          "土",
+          "日",
+          "月",
+          "火",
+          "水"
+        ]
+      },
+      {
+        "row_one_based": 6,
+        "luminaries": [
+          "金",
+          "土",
+          "日",
+          "月",
+          "火",
+          "水",
+          "木"
+        ]
+      },
+      {
+        "row_one_based": 7,
+        "luminaries": [
+          "土",
+          "日",
+          "月",
+          "火",
+          "水",
+          "木",
+          "金"
+        ]
+      },
+      {
+        "row_one_based": 8,
+        "luminaries": [
+          "日",
+          "月",
+          "火",
+          "水",
+          "木",
+          "金",
+          "土"
+        ]
+      }
+    ],
+    "table_cell_count": 56,
+    "source_prose_examples": [
+      {
+        "day_luminary": "日",
+        "branch": "午",
+        "part": null,
+        "hour_luminary": "水"
+      },
+      {
+        "day_luminary": "土",
+        "branch": "寅",
+        "part": "上",
+        "hour_luminary": "金"
+      },
+      {
+        "day_luminary": "土",
+        "branch": "寅",
+        "part": "下",
+        "hour_luminary": "土"
+      }
+    ],
+    "day_numerals_accepted": null,
+    "night_numerals_accepted": null,
+    "day_numeral_candidates": [
+      6,
+      5,
+      4,
+      9,
+      8,
+      7,
+      6,
+      5
+    ],
+    "night_numeral_candidates": [
+      4,
+      9,
+      8,
+      7
+    ],
+    "unresolved_readings": [
+      {
+        "location": "右页八支者之后及表右侧分字之前",
+        "accepted_diplomatic_glyph": null,
+        "candidates": [
+          "晝",
+          "畫形字"
+        ],
+        "descriptive_reading": "昼分；不能据昼夜对举补定原字"
+      },
+      {
+        "location": "右页主時与曜之间",
+        "accepted_diplomatic_glyph": null,
+        "candidates": [
+          "之",
+          "ノ式附属表记"
+        ]
+      },
+      {
+        "location": "两侧支名旁数字、短划及上下标记",
+        "accepted_complete_transcription": null,
+        "scope": "数字候选保留，不设刻长或现代钟点单位"
+      },
+      {
+        "location": "右页金為上之后",
+        "accepted_diplomatic_glyph": null,
+        "reader1": "刻",
+        "reader2": "判",
+        "candidates": [
+          "刻",
+          "判"
+        ],
+        "scope": "上下位置与金土格值相合，原字不据相合补定"
+      },
+      {
+        "location": "正文所引经下卷小字行号",
+        "accepted_complete_transcription": null,
+        "reader1": "二丁；廿三行",
+        "reader2": "二丁左十三行",
+        "scope": "不以当前经文页码体系反填"
+      }
+    ]
+  },
+  "calendar_selected": {
+    "frame": 8,
+    "location": "左页第二轮及轮图用法",
+    "literal": "潤月朔宿全如本月",
+    "literal_glyph_retained": "潤",
+    "normalized_topic": "闰月朔宿沿用本月；文字不改成閏",
+    "full_rotating_calendar_reconstructed": false,
+    "leap_short_month_priority_established": false,
+    "hinoo_half_equivalence_established": false,
+    "selected_instructions": [
+      {
+        "literal": "第二ノ輪ハ七曜ノ周ル次第ナリ",
+        "role": "第二轮；七曜循环"
+      },
+      {
+        "role": "来源牛宿午时与越至女宿说；未应用到本次宿位",
+        "reader1_transcription": "天竺ノ曆法ハ牛宿ヲ毎日ノ午時ニ配ル故ニ日ニハ除クナリ是故ニ牛宿ノ位ニ當ル日ハ越テ女宿ニ合スベシ是レ一ノ習ヒ也",
+        "accepted_full_literal": null
+      },
+      {
+        "role": "月大小、其下曜及正月室宿对位",
+        "reader1_transcription": "曜ハ國曆ノ其ノ月ノ大小ヲ記ス下ノ曜ヨリ取テ正月ナレバ室宿ト合シ",
+        "accepted_full_literal": null
+      },
+      {
+        "role": "第三轮朔字对位及推日",
+        "reader1_transcription": "又第三ノ輪ノ朔ノ字ト合シテ次第二日ヲ押テ吉凶ヲ知ルベシ",
+        "accepted_full_literal": null
+      },
+      {
+        "literal": "其ノ月ノ朔日二日兩日ノ宿ハ兩度値ト知ルベシ",
+        "role": "朔日二日及兩度値原句；未改为半日或限定月大小"
+      }
+    ],
+    "leap_clause_scope": "本句只明说朔宿；未独立证明整月每一日及半日分配",
+    "uncertain_readings": [
+      {
+        "location": "三角图例分字之前",
+        "accepted_diplomatic_glyph": null,
+        "candidates": [
+          "晝",
+          "畫形字"
+        ]
+      },
+      {
+        "location": "末句兩度之后",
+        "reader_literal": "値",
+        "other_normalizations_not_applied": [
+          "直"
+        ]
+      }
+    ],
+    "instruction_variants": [
+      {
+        "location": "天竺及國后历字",
+        "reader1": "曆",
+        "reader2_candidates": [
+          "曆",
+          "暦"
+        ],
+        "accepted_literal": null
+      },
+      {
+        "location": "牛宿说明末习之前编号",
+        "reader1": "一",
+        "reader2_candidates": [
+          "一",
+          "二"
+        ],
+        "accepted_literal": null
+      },
+      {
+        "location": "下ノ曜之后",
+        "reader1": "ヨリ取テ",
+        "reader2": "ヲ取テ",
+        "accepted_literal": null
+      },
+      {
+        "location": "第三轮朔字之后推日句",
+        "reader1": "次第二日ヲ押テ",
+        "reader2": "次第ニ日ヲ押テ",
+        "accepted_literal": null,
+        "scope": "不把二日候选作为查表算法或补配顺序"
+      }
+    ]
+  },
+  "commentary_selected": {
+    "title": "大日經疏演奧鈔",
+    "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/T2216_,59,0058a01:2216_,59,0059a01.html",
+    "html_sha256": "c178d2016d427b7497e576da83f3ab9a8286add83d30294c5255750484898f6e",
+    "html_bytes": 34663,
+    "passages": [
+      {
+        "locator": "T2216_.59.0058a23-26",
+        "literal": "毎日分爲八時。平明即是所直之曜。乃至酉戌則八時而周。夜亦分爲八時。轉到明日曉時。即次後曜當直。如是細解用之萬不失一"
+      },
+      {
+        "locator": "T2216_.59.0058a26-27",
+        "literal": "些些疑文云。晝夜八時名目。如何委垂示決"
+      },
+      {
+        "locator": "T2216_.59.0058b07-09",
+        "literal": "正著時者。是當毎日平明也。從此以後。日月五星。各主一日一夜。而七箇日次第輪轉也"
+      }
+    ],
+    "quoted_question_source_identity_established": false,
+    "intraday_question_answered_by_seven_day_sequence": false,
+    "facsimile_collation_complete": false
+  },
+  "physical_clock_mapping_established": false,
+  "t1299_unique_intraday_interpretation_established": false,
+  "hinoo_half_mapping_established": false,
+  "leap_short_month_priority_established": false,
+  "source_claim_is_empirical_validation": false,
+  "scope": "具名后出印本的条件性支时查表；不从民用钟时选择支、上下刻或古代直日。保留T1299本层未定和其他见证，不覆盖宿主历法、补配候选、事项或现实结局。",
+  "frame18_closing_variants": {
+    "accepted_full_literal": null,
+    "reader1": "已上依一日二宿三曜四時具出吉凶用不之釋畢",
+    "reader2": "已上依一日二宿三曜四時其出吉凶用否之釋畢",
+    "scope": "收束后转追加急務事，不将一二三四改为数量或下页十识图当时曜续表"
+  },
+  "model_reading_receipts": [
+    {
+      "role": "generator",
+      "file": "generator-primary-reading-1.json",
+      "sha256": "cc1dc6341f665c2e42bcd896ffeb1bcdf6cccd6b77e4f26d6687476bc0aa1623",
+      "table_cells_agree": 56,
+      "human_or_provider_independence": false
+    },
+    {
+      "role": "reviewer",
+      "file": "reviewer-primary-reading-1.json",
+      "sha256": "ed5f48bbf963da528822096116baa48fdba6a04f52d53b8133b17c43e3317eeb",
+      "table_cells_agree": 56,
+      "human_or_provider_independence": false
+    },
+    {
+      "role": "generator",
+      "file": "generator-primary-reading-2.json",
+      "sha256": "39b76ff807f3bebf8cd01a5d60d31e111096b9f6455c4854dc60c6347b8c32d6",
+      "selected_frame": 8,
+      "human_or_provider_independence": false
+    },
+    {
+      "role": "reviewer",
+      "file": "reviewer-primary-reading-2.json",
+      "sha256": "a7c16e7dfc21b59690e5df3d4cb13de0f1d364ef9bd7fac21b8d8f8a91332376",
+      "selected_frame": 8,
+      "human_or_provider_independence": false
+    }
+  ],
+  "review_scope": "两现有角色分别直读新影像，56曜字一致；同提供方、共享文件系统与已有上下文。不是独立人类、严格盲法或全本校勘。"
+}

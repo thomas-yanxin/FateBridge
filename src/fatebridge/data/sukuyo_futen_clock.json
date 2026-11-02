@@ -1,0 +1,67 @@
+{
+  "id": "takesako2015_selected_futen_clock_v1",
+  "source_title": "符天暦法の復元",
+  "source_author": "竹迫忍",
+  "source_publication": "数学史研究223号 pp.1–33; author's list gives 2015",
+  "source_url": "https://www.kotenmon.com/dld/papers/223.pdf",
+  "source_sha256": "4ebd396bd1e32d16b68a6acff56c0b18039430c4889feda38ad3f57b7beaac2c",
+  "source_bytes": 8341940,
+  "bibliography_url": "https://www.kotenmon.com/ronbun.html",
+  "source_kind": "Named research interpretation of quoted historical material; original 1240 document not independently read or collated.",
+  "date_evidence": {
+    "printed_received": "2015-04-16",
+    "printed_revised_received": "2015-09-27",
+    "pdf_metadata_creation": "2022-12-26",
+    "search_index_reported_age_used_as_publication_date": false
+  },
+  "selected_locations": {
+    "995_day_unit": "printed pp.6–7 / PDF pp.7–8",
+    "1240_quote": "printed p.11 / PDF p.12",
+    "1240_clock_calculation": "printed p.12 / PDF p.13",
+    "multiple_reconstructions": "printed p.23 / PDF p.24",
+    "alternative_clock_calculation": "printed p.31 note12 / PDF p.32"
+  },
+  "models": [
+    {
+      "id": "takesako2015_1240_futen_10000",
+      "day_units": 10000,
+      "koku_units": 100,
+      "double_hours_per_day": 12,
+      "day_origin_literal": "子半",
+      "model_status": "author's selected Futen interpretation, not externally certified historical clock",
+      "printed_units_per_double_hour_decimal": "833.3"
+    },
+    {
+      "id": "takesako2015_1240_senmyo_8400",
+      "day_units": 8400,
+      "koku_units": 84,
+      "double_hours_per_day": 12,
+      "day_origin_literal": "子半",
+      "model_status": "author's alternative Senmyo interpretation of the same three readings",
+      "printed_units_per_double_hour_decimal": "700"
+    }
+  ],
+  "selected_1240_readings": [
+    {"id": "start", "literal": "未6刻31分", "printed_futen_units": 6047, "printed_alternative_senmyo_units": 5085, "printed_alternative_in_10000_units": 6054},
+    {"id": "middle", "literal": "酉初刻6分", "printed_futen_units": 7089, "printed_alternative_senmyo_units": 5956, "printed_alternative_in_10000_units": 7090},
+    {"id": "end", "literal": "戌2刻26分", "printed_futen_units": 8142, "printed_alternative_senmyo_units": 6844, "printed_alternative_in_10000_units": 8148}
+  ],
+  "printed_futen_intervals": {"start_to_middle": 1042, "middle_to_end": 1053, "total": 2095},
+  "author_asymmetry_interpretation": "The author suspects an incorrect time value because the two intervals differ; this is a research inference, not independently established manuscript error.",
+  "unit_distinctions": {
+    "1164_calculation": {"parts_per_day": 100, "subparts_per_part": 100},
+    "995_explanation_printed_parts_per_double_hour": "8分33",
+    "995_explanation_parts_per_day": 100,
+    "995_expression_certified_exact_ratio": false,
+    "same_named_part_implies_same_denominator": false
+  },
+  "source_literal_points_are_for_current_input": false,
+  "printed_integer_values_overwritten_by_exact_recalculation": false,
+  "applied_to_runtime_day_boundary": false,
+  "applied_to_hinoo_half": false,
+  "T1299_pingming_equals_ziban_established": false,
+  "leap_short_month_priority_established": false,
+  "full_futen_calendar_reconstructed": false,
+  "independent_historical_observations_added": 0,
+  "scope": "Exact arithmetic for the study's two explicit 1240 clock interpretations. Retains printed values and residuals. Does not choose a historical calendar, modern timezone, T1299 dawn, Hinoo half, leap/short-month precedence or real-world forecast."
+}

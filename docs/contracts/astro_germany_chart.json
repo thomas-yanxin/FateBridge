@@ -1,0 +1,543 @@
+{
+  "call_guidance": {
+    "birth_seconds": "Pass birth_second only from an actually recorded clock or an explicitly identified historical clock conversion. Omission represents the start of the supplied minute, not evidence of exact seconds. Seconds propagate to UTC/TT/UT1, birth-time samples and optional directions; no outcome-driven rectification. Generic astro_chart admits recorded seconds for germany/chart13/india_chart; use the current published variant schema for its other clock options.",
+    "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction. Do not use event outcomes to choose a birth time, or report sample frequencies as confidence probabilities.",
+    "clock_basis": "Use birth_clock_basis=civil for a recorded civil zone clock. Only an explicitly identified historical LMT/LAT record may select local_mean_solar/local_apparent_solar, with birth_timezone omitted and use_true_solar_time=false. These are input labels, not extra accuracy switches. Read actual person_info.clock_conversion (Germany under base_chart): input label, modeled physical UTC/UT1/TT, longitude, Sun/EOT where used, source/model and numerical residual. The UTC-named carrier before1960 is historical UT1, not atomic UTC. Never infer an ambiguous OZ basis or choose one by fitting positions/outcomes; a small numerical residual does not certify record precision or measured Earth rotation.",
+    "comparative_geometry": "Witte1924 comparative_geometry reconstructs five stated anchor rotations and the four-point mirror system from the same native factors. Coordinates are symbolic; use the actual Aries Point for tropical axes in a sidereal display. An anchor coordinate fixed by definition does not resolve its physical reference or frame orientation. Unknown inputs stay null with backend conventions separate. Confirmed birth-time samples retain every native input; sampled signed offsets are not continuous bounds or probabilities. Four printed numeric rows remain uncoordinated, and the source Earth-house labels and event claims are not applied. This is not acceptance of the separate Rulesbook mirror chapter. When exact sample coordinates are needed, select the whole midpoint_analysis.comparative_geometry.birth_time_sensitivity.samples array in the first call, then read each item's point_systems; field projection cannot descend through an array; use the actual returned coordinates and qualifiers. Full JSON requires fields=null initially, then read that same run rather than rebuilding a full result from a summary.",
+    "daily_meridian": "The selected Witte 1924 p.15 equation is solar_arc_analysis.daily_meridian: IC.day=IC.natal+solar_arc-Sun.natal.tropical+Sun.target.tropical, MC.day=IC.day+180. The actual target Sun is calculated separately in TT; symbolic meridians are not physical target angles or plain solar-arc MC. Read source_comparison: the printed 1923/1924 difference is explained by the natal VIII cusp offset in that historical example, not a universal 184 arcminute correction. A separate 4 arcminute printed sensitive-point residual remains. Full original time keys and real-world efficacy remain unaccepted; birth-time coordinate spans do not prove contact-set stability. For daily_meridian, preserve its own native MC reference qualification: unresolved dependent coordinates are null, backend_convention retains formal values, and actual Sun/arc data remain when computable. Read input_coherence for exact same-run native/grid/UTC/TT/observation-role binding, not independent astronomy. Separate unresolved_reference_sample_count from unavailable_sample_count; do not bridge unknown/unavailable adjacency or infer offsets from an unknown nominal reference. An unresolved ASC intersection alone does not restrict a resolved MC. A day_meridian_inputs503 is an internal source failure, not invalid birth data.",
+    "fictitious_elements": "Read profile.hypothetical_element_source: library_builtin or first readable external seorbel.txt with SHA-256 and search-path index. Nonempty SE_EPHE_PATH takes precedence in Swiss. An external orbit file does not make fictitious bodies observed planets; factor element_name must match the Hamburg catalogue (Vulcanus/Vulkanus accepted). Changed files inside a factor/sample cohort are rejected; data should remain immutable during service runs.",
+    "house_roles": "Keep the selected base-chart12-house system separate from native reference-angle extraction, Meridian cusps and the custom13-sector partition. In the current numeric policy hsys1 is Alcabitus (SwissB), never Equal. Read actual chart_profile.house_system/house_system_code/house_system_label_zh; do not label a whole chart from a backend reference-angle call. reference_angle_model.house_code=E with cusp_output_used=false records only ASC/MC/ARMC extraction; samples carry their own model, and Germany solar-arc profile reuses the natal model. meridian_houses.profile.house_code=X identifies the separate RA cusp construction. fatebridge_equal13_v1 is the custom partition, independent of the selected12-house system. Unrecorded roles remain unknown; these labels do not establish original-text or predictive validity.",
+    "meridian_houses": "meridian_houses is the selected Witte 1923 p.34 natal RA-divided cusp construction (Swiss X), not an equal-ecliptic house system. Cusp1 is the equatorial ascendant; physical Ascendant/Midheaven factors and base_chart houses are retained. Read the actual native angle TT, true obliquity, apparent Lahiri offset and same-run cusp samples. Native angle TT follows houses_ex UT1+deltat_ex and is recorded separately from shared TT; their difference is not a measured birth-clock error. The child factor_placement applies full ecliptic longitude/latitude to RA sectors; read its own source scope, factor counts and sample summary. Full progression time key, complete original interpretation and predictive efficacy remain unaccepted.",
+    "meridian_placement": {
+      "coordinates": "使用同run原生黄经与黄纬；恒星显示先按天体同历元的实际视偏移还原回归黄经，投影交角与其原生角度历元另列。10物理天体、1解析平均月交点和8数学假设点分开计数，3个角点参考未纳入。",
+      "limits": "生时误差未知不补0；极点数值退化保留未定。原刊p59第11、12、2宫与两个预定交角模型尚未协调，不拟合勘误；几何关系不是整部原书、宫内关键词、寿命或现实事件预测的验收。",
+      "purpose": "读取Witte1924具名子午宫赤经落宫，不按黄经区间代替三维投影。",
+      "reading": "按factor_placement.factors的id、kind、model、input_ecliptic_latitude、right_ascension、house/house_position和latitude_changes_house解读；longitude_only_control只是反事实诊断。样点读取birth_time_sensitivity.factor_placement_summary，变化时再读取同run time_sensitivity.samples.meridian_factor_positions。"
+    },
+    "mixed_pairs": "For a user-confirmed analysis_datetime, mixed_pair_geometry enumerates four-distinct-name natal/solar-arc mixed pairs under the same uniform arc. Read profile and contact_counts first. Each residual group retains four equivalent factor_layer_assignments; they are not four independent hits. midpoint_arc_coefficient=0 means arc_invariant: the uniform arc cancels, so do not interpret it as a new timing trigger. Coefficients +/-0.5 identify the additional mixed-pair relations; original homogeneous-pair contacts remain in the existing dials. Source motivation is Witte1925 pp53-54; this is a named algebraic reconstruction, not his full progression/transit method. Preserve reference_angle_basis and unresolved physical references. For a confirmed birth-time interval, read mixed_pair_geometry.birth_time_sensitivity. It evaluates the entire declared mixed-pair domain on the same-run finite grid, including nominally absent relations first appearing at samples. Read present/known-absent/unknown states, the separate backend matches, and unlisted-no-observed-hit counts; an unlisted group with unknown samples is not a proven absence. Both known true and false samples prove variation even if another sample is unknown. A missing arc affects only nonzero coefficients; coefficient0 may evaluate its natal relative geometry without substituting an arc or claiming directed coordinates outside the arc domain. Arc invariance does not imply birth-time invariance. Preserve unresolved physical reference names, every sample, actual input-clock endpoints, and partial status. The grid is neither a continuous proof nor a probability distribution. There are no new source-event keywords or validated event probabilities.",
+    "native_layer": "midpoint_analysis uses unrounded 22-factor geometry and a shared UTC/TT/UT1 policy. Sensitive-point equations double the midpoint period and orb; folded-only occupancy does not activate the direct source example. interpretations contains deduplicated, source-attributed symbolic claims only. Seven-planet top-level values also use raw coordinates.",
+    "physical_ephemeris": "Read midpoint_analysis.profile.physical_ephemeris_source for actual per-factor models and observed se1 context hashes/ranges/DE headers. Files, hypothetical orbit elements and Earth rotation are distinct. Birth-time samples reject changing per-factor models, same-name file contents or DE editions; acquire complete verified segments instead of dropping samples or silently downgrading. File identity is not accuracy certification, and NASA/Swiss may share DE441 dynamics. Source failures expose error_code=ephemeris_source_inconsistent, a named code in issues entries whose path is runtime.ephemeris_data, and retryable=false. This is runtime data, not changed birth information or an automatically retryable missing-package error. Complete the same interval data and reload before retrying. The base chart separately reports base_chart.chart_profile.physical_ephemeris_source. Its explicit orbital fallback may differ from the valid native midpoint layer; explain each layer from its own actual source and retain partial valid results. Ecliptic/equatorial states share one managed configuration; coordinate-source mismatches are errors, not reasons to silently use approximate orbits. ephemeris_model_scope=physical_bodies excludes the analytical mean node from physical model summaries; read nonphysical_factor_models and the node model swisseph_analytical_mean_node separately. Midpoint native_return_flags can echo the requested model and do not prove a vector-file source. A failed node still affects engine precision. Explicit strict JPL selection also governs the native Hamburg loop and fixed-star Earth observer; a limited kernel subset test does not certify full epoch coverage.",
+    "progression_key": {
+      "limits": "精确算术与真实接口一致性不证明原典整体、真实模型解释或现实预测已验收。",
+      "purpose": "核对实际太阳弧年长钥匙及其与Witte1923推运常数原刊的关系。只在给定analysis_datetime时读取该层。",
+      "reading": "读取profile.key_policy/year_days/key_years/progressed_julian_day_tt与key_source_comparison。原刊八项时角运算有两项不一致，残差单位为时角时间秒；它们不属于当前命盘，不能加到用户钟时或黄经。民用夜间日期与正午起算天文日标签尚未独立裁定，不从事件反推。",
+      "source_boundary": "实际使用1个TT星历日/365.25个UTC日历日的FateBridge符号约定；不是该原刊常数法的完整实现。"
+    },
+    "reference_angle_qualification": "Read midpoint_analysis.profile.angle_definition and the affected factor/row reference_angle_basis. A numerically unresolved ASC remains a backend convention: retained coordinates and exact formal contacts do not establish resolved physical reference geometry. The same qualification follows directed factors and solar-arc contacts. Read each same-run time_sensitivity.samples angle_definition; an ASC factor span with status=underdetermined_ascendant has no physical interval bounds. MC, orbital factors and meridian houses are not restricted by this horizon degeneracy. Geographic-pole meridian conventions have their own scope; do not conflate them with unresolved intersections. For Germany source conditions, an exact geographic-pole MC is a supplied-meridian convention: read source_pattern.unresolved_reference_sample_count and source_pattern.unresolved_reference_sample_indices, resolved_condition_sample_count and condition_by_sample. Known present/absent counts exclude unknowns; backend_convention is formal evidence only. Unresolved source samples have null actual conditions/orbs/MC while computed solar arcs remain available. A source_application_status=underdetermined_reference_geometry reading states unknown applicability; backend_reading_zh is the former formal wording. Empty interpretations do not establish known absence. This differs from an unresolved ASC intersection with an independently resolved MC.",
+    "solar_arc": "Only pass analysis_datetime when the user specifies a target instant with explicit timezone offset. The true solar arc uses actual tropical Sun displacement, including in the fixed natal Lahiri display. Directed coordinates are symbolic, not future observations; one source pattern only, no event guarantee. Read birth_time_sensitivity and preserve factor_layers. Read profile.sun_ephemeris_source for per-TT-epoch observations and file identities; natal/progressed sun_observation_indices and the daily target_sun_observation_index reference that shared batch. Equal TT epochs reuse one observation, not independent evidence. Different physical epochs may use different models, but each birth-time role must retain comparable sources. A source mismatch is a runtime-data error, not a birth-time effect; preserve the requested interval and repair its data coverage. At a supported nominal target, birth_time_sensitivity.status=partial can mean unavailable arcs or unresolved physical source references. Preserve all confirmed samples. For samples outside the declared0..150 Julian key-year domain, read computed_sample_count/unavailable_sample_count and sample.status/reason_code; do not substitute zero arc or infer absence. For computed arcs with unresolved MC, read source_pattern.resolved_condition_sample_count and unresolved_reference_sample_count and unresolved_reference_sample_indices; actual source_condition_met, source_direct_orb_degrees and directed_midheaven_longitude are null while backend_convention preserves formal values. Computed arc count is not resolved source-condition count. source_pattern.sampled_status=underdetermined is neither a known absence nor full-interval stability. Frequencies are not probabilities, and the key range is an implementation domain. The symbolic daily-meridian layer retains its own qualifications and unavailable samples.",
+    "two_factor": "Native v3 dials include two_factor_contacts over 22 factors. A=B is a folded relation: read aspect_degrees, full-circle separation_degrees and signed_orb; factor_offset_degrees is the oriented A-B offset modulo 360, not a midpoint-axis offset. Never call every folded hit a conjunction. unique_two_factor_pair_count deduplicates unordered pairs across dials and is not independent prediction evidence. No source keywords are invented for these contacts.",
+    "witte1925_table": {
+      "purpose": "核对Witte1925原刊完整太阳弧表、数值插值和原载分步算例，不将其冒充当前盘的太阳弧。",
+      "reading": "读取original_table_1925的source/coverage/worked_example/limitations。完整保留38行、342个年数格与38个末列值；20年列的一个不清楚度数标记会影响24个格的规范化，保持未知而不拿现代星历补值。",
+      "rounding": "原文56分+54度17分+34分=55度47分的分步算术成立。未逐步舍入的数值扩展不是原典已确认算法，保留差值，不改原表和当前太阳弧。",
+      "scope": "该字段computed_for_current_chart=false，只属于原表与历史例。已有真实出生与目标资料才调用德国盘读取此视图；纯原文问题据原刊解释，不编造出生或目标时刻。完整原典、闰日/亚日与跨年末列规则仍未验收。"
+    }
+  },
+  "evidence_views": {
+    "aspect_motion": {
+      "fields": [
+        "base_chart.person_info",
+        "base_chart.planets",
+        "base_chart.aspects",
+        "base_chart.classical_patterns"
+      ],
+      "purpose": "Instantaneous longitude motion only; inspect application_policy and aspect_motion before interpreting light configurations. No future perfection or complete source-method acceptance; not an event probability. Bodily latitude status is a separate bounded Western I.24 condition, possibly missing; it does not establish full bodily application.",
+      "when": "用户询问入相／出相、精确成相或光的传递／聚集；核对当前黄经与相对速度，精确、同速和速度未知分别保留。"
+    },
+    "clock_basis": {
+      "fields": [
+        "base_chart.person_info"
+      ],
+      "purpose": "Explicit input civil/LMT/LAT basis and physical-time conversion only. Never infer a historical basis; numerical resolution is not record accuracy or measured EOP."
+    },
+    "comparative_geometry": {
+      "fields": [
+        "midpoint_analysis.comparative_geometry.status",
+        "midpoint_analysis.comparative_geometry.ruleset_id",
+        "midpoint_analysis.comparative_geometry.profile",
+        "midpoint_analysis.comparative_geometry.frame_summary",
+        "midpoint_analysis.comparative_geometry.birth_time_sensitivity.status",
+        "midpoint_analysis.comparative_geometry.birth_time_sensitivity.sample_count",
+        "midpoint_analysis.comparative_geometry.birth_time_sensitivity.summary",
+        "midpoint_analysis.comparative_geometry.sources",
+        "midpoint_analysis.comparative_geometry.limitations"
+      ],
+      "purpose": "Selected symbolic ecliptic rotations and four-point reflection systems. Use actual native Aries Point for tropical cardinal references in either display zodiac. Assigned anchor identity does not resolve a physical ASC/MC. Append required frame paths or the whole midpoint_analysis.comparative_geometry.birth_time_sensitivity.samples array in the first call; field projection cannot descend through an array when exact coordinates are needed; full JSON requires fields=null initially and same-run result delivery. Preserve unknown references and original source discrepancies; no Earth-house or event interpretation.",
+      "when": "用户点名Witte1924比较盘、太阳／子午线／上升等换基或四点镜像几何；仅用已确认的本命资料，不要求新增目标日期。"
+    },
+    "contact_evidence": {
+      "fields": [
+        "midpoint_analysis.profile.hypothetical_element_source",
+        "midpoint_analysis.factors",
+        "midpoint_analysis.dials",
+        "midpoint_analysis.limitations",
+        "midpoint_analysis.unique_two_factor_pair_count",
+        "base_chart.person_info"
+      ],
+      "purpose": "Inspect factor kinds and contains_hypothetical for the same-run contact evidence"
+    },
+    "daily_meridian": {
+      "fields": [
+        "midpoint_analysis.solar_arc_analysis.daily_meridian",
+        "base_chart.person_info"
+      ],
+      "purpose": "Named 1924 ecliptic equation only. Inspect the actual tropical Sun, time policy, birth-time samples and primary formula. source_comparison distinguishes the historical 1923 phase/cusp arithmetic: its 184 arcminute difference is explained, its separate 4 arcminute residual retained, and computed_for_current_chart=false. Do not add the historical difference to current coordinates; no full-original or event-probability claim. For daily_meridian, preserve its own native MC reference qualification: unresolved dependent coordinates are null, backend_convention retains formal values, and actual Sun/arc data remain when computable. Read input_coherence for exact same-run native/grid/UTC/TT/observation-role binding, not independent astronomy. Separate unresolved_reference_sample_count from unavailable_sample_count; do not bridge unknown/unavailable adjacency or infer offsets from an unknown nominal reference. An unresolved ASC intersection alone does not restrict a resolved MC. A day_meridian_inputs503 is an internal source failure, not invalid birth data.",
+      "when": "用户明确指定带时区目标时刻并要求Witte日推运天顶；analysis_datetime为空时不计算该层"
+    },
+    "data_files": {
+      "fields": [
+        "ephemeris_data_policy"
+      ],
+      "scope": "Available when ephemeris_policy=require_data_files. Read the actual observed physical models, file hashes, reference zeros and private-worker reports. Native event-internal reads, fixed-star catalogue formulae and absolute accuracy are not certified. This card does not set the input policy."
+    },
+    "geometry": {
+      "fields": [
+        "midpoint_analysis.profile",
+        "midpoint_analysis.factors",
+        "midpoint_analysis.midpoint_axes",
+        "midpoint_analysis.dials",
+        "midpoint_analysis.reading_guide",
+        "midpoint_analysis.rulesets",
+        "midpoint_analysis.sources",
+        "midpoint_analysis.rule_trace",
+        "midpoint_analysis.unique_two_factor_pair_count",
+        "base_chart.person_info"
+      ],
+      "purpose": "Native unrounded factors and complete same-run geometry"
+    },
+    "meridian_houses": {
+      "fields": [
+        "midpoint_analysis.meridian_houses",
+        "midpoint_analysis.time_sensitivity",
+        "base_chart.chart_profile",
+        "base_chart.person_info"
+      ],
+      "purpose": "Selected natal RA-divided Meridian cusps only; distinguish equatorial first cusp from physical Ascendant and base-chart house system. Check actual native angle epoch/frame and all user-confirmed birth-time samples. Missing backend stays unavailable; no full-original or event prediction claim.",
+      "when": "用户指定汉堡／Witte 1923 本命子午宫表，或追问赤经等分与实际ASC的区别"
+    },
+    "meridian_placement": {
+      "fields": [
+        "midpoint_analysis.meridian_houses"
+      ],
+      "purpose": "子午宫完整方向投影、天体归属与实际生时样点摘要"
+    },
+    "mixed_pair_sensitivity": {
+      "fields": [
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.birth_time_sensitivity.status",
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.birth_time_sensitivity.uncertainty_minutes",
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.birth_time_sensitivity.sample_count",
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.birth_time_sensitivity.computed_arc_sample_count",
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.birth_time_sensitivity.unavailable_arc_sample_count",
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.birth_time_sensitivity.summary",
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.birth_time_sensitivity.continuous_interval_proven",
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.birth_time_sensitivity.sample_frequency_is_probability"
+      ],
+      "purpose": "Complete declared mixed-pair domain evaluated only on the confirmed same-run finite grid. A sparse ledger lists every nominal or backend-hit group, including new-only hits; unlisted unknown groups are counted separately from established sampled absences. Counts are not probabilities. Retrieve the same-run sensitivity dials and samples only when actual relations are needed.",
+      "when": "用户明确提供德国盘太阳弧目标时刻及生时误差范围；缺少范围保持not_assessed，不补0。"
+    },
+    "mixed_pairs": {
+      "fields": [
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.status",
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.profile",
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.contact_counts",
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.sources",
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.limitations",
+        "midpoint_analysis.solar_arc_analysis.mixed_pair_geometry.real_world_efficacy"
+      ],
+      "purpose": "Mixed-pair method, grouped relation counts and invariant-vs-dependent scope; counts are not timing accuracy. Request the same-run dials separately only when the actual equations are needed.",
+      "when": "用户明确指定德国盘太阳弧目标时刻；通用入口须chart_variant=germany。analysis_datetime未给出时不计算。"
+    },
+    "overview": {
+      "fields": [
+        "summary",
+        "midpoint_analysis.status",
+        "midpoint_analysis.profile",
+        "midpoint_analysis.contact_counts",
+        "midpoint_analysis.reading_guide",
+        "midpoint_analysis.limitations",
+        "midpoint_analysis.original_text_conformance",
+        "midpoint_analysis.real_world_efficacy",
+        "midpoint_analysis.interpretations",
+        "midpoint_analysis.time_sensitivity.status",
+        "midpoint_analysis.time_sensitivity.uncertainty_minutes",
+        "midpoint_analysis.unique_two_factor_pair_count",
+        "base_chart.person_info"
+      ],
+      "purpose": "Method, counts and limitations; counts are not predictions"
+    },
+    "progression_key": {
+      "fields": [
+        "midpoint_analysis.solar_arc_analysis.profile",
+        "midpoint_analysis.solar_arc_analysis.sources",
+        "midpoint_analysis.solar_arc_analysis.rule_trace",
+        "midpoint_analysis.solar_arc_analysis.original_text_conformance",
+        "midpoint_analysis.solar_arc_analysis.real_world_efficacy"
+      ],
+      "purpose": "实际年长钥匙、原刊时角算术及未采纳状态"
+    },
+    "solar_arc": {
+      "fields": [
+        "midpoint_analysis.profile.hypothetical_element_source",
+        "midpoint_analysis.solar_arc_analysis.status",
+        "midpoint_analysis.solar_arc_analysis.profile",
+        "midpoint_analysis.solar_arc_analysis.contact_counts",
+        "midpoint_analysis.solar_arc_analysis.interpretations",
+        "midpoint_analysis.solar_arc_analysis.birth_time_sensitivity",
+        "midpoint_analysis.solar_arc_analysis.rule_trace",
+        "midpoint_analysis.solar_arc_analysis.sources",
+        "midpoint_analysis.solar_arc_analysis.limitations",
+        "base_chart.person_info"
+      ],
+      "purpose": "True solar arc with 365.25-day Julian symbolic key; natal/directed references stay distinct. Source interpretation requires actual directed-MC occupancy and carries sampled birth-time conditions. Counts are not probabilities or observed future events. Distinguish unresolved physical MC from formal backend conditions and unavailable arcs. Read resolved/unresolved condition counts; unknown applicability is not absence. Only ASC degeneracy does not restrict a resolved MC.",
+      "when": "用户明确给出带时区目标时刻，要求德国盘太阳弧推运；analysis_datetime 为空时不计算该层"
+    },
+    "solar_conditions": {
+      "fields": [
+        "base_chart.person_info",
+        "base_chart.chart_profile",
+        "base_chart.planets",
+        "base_chart.classical.solar_condition_policy",
+        "base_chart.classical.planets"
+      ],
+      "purpose": "Named Lilly solar definitions only: 17 arcminutes, same-sign 8.5-degree combustion, 17-degree beams. Keep the contradictory printed ten-degree example and explicit boundary convention unresolved; no whole-page or event-validity certification.",
+      "when": "询问日心、焦伤或日下；先核对Lilly 1647第113页的明文定义、同星座条件、实际状态及未解决的原文示例冲突。"
+    },
+    "source_meaning": {
+      "fields": [
+        "midpoint_analysis.profile",
+        "midpoint_analysis.factors",
+        "midpoint_analysis.interpretations",
+        "midpoint_analysis.rule_trace",
+        "midpoint_analysis.sources",
+        "midpoint_analysis.limitations",
+        "midpoint_analysis.time_sensitivity",
+        "base_chart.person_info"
+      ],
+      "purpose": "Only matched source-attributed symbolic readings; claim_id deduplicates the same reading across dials. An empty list does not mean all traditional interpretations were tested. Distinguish unresolved physical MC from formal backend conditions and unavailable arcs. Read resolved/unresolved condition counts; unknown applicability is not absence. Only ASC degeneracy does not restrict a resolved MC."
+    },
+    "time_sensitivity": {
+      "fields": [
+        "midpoint_analysis.time_sensitivity",
+        "base_chart.person_info"
+      ],
+      "purpose": "Recomputed user-confirmed birth-time interval on a UTC grid <=30 seconds. Missing interval is unknown. Sampled stability is neither a continuous interval proof nor a probability; inspect nominal interpretations/partitions separately. Distinguish unresolved physical MC from formal backend conditions and unavailable arcs. Read resolved/unresolved condition counts; unknown applicability is not absence. Only ASC degeneracy does not restrict a resolved MC."
+    },
+    "witte1925_table": {
+      "fields": [
+        "midpoint_analysis.solar_arc_analysis.original_table_1925.status",
+        "midpoint_analysis.solar_arc_analysis.original_table_1925.computed_for_current_chart",
+        "midpoint_analysis.solar_arc_analysis.original_table_1925.source",
+        "midpoint_analysis.solar_arc_analysis.original_table_1925.coverage",
+        "midpoint_analysis.solar_arc_analysis.original_table_1925.worked_example",
+        "midpoint_analysis.solar_arc_analysis.original_table_1925.limitations",
+        "midpoint_analysis.solar_arc_analysis.original_table_1925.full_original_method_accepted",
+        "midpoint_analysis.solar_arc_analysis.original_table_1925.real_world_efficacy",
+        "midpoint_analysis.solar_arc_analysis.profile.key_policy"
+      ],
+      "purpose": "Witte1925原表、未定格与分步插值算例"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "summary",
+      "midpoint_analysis.status",
+      "midpoint_analysis.profile",
+      "midpoint_analysis.contact_counts",
+      "midpoint_analysis.reading_guide",
+      "midpoint_analysis.limitations",
+      "midpoint_analysis.original_text_conformance",
+      "midpoint_analysis.real_world_efficacy",
+      "midpoint_analysis.interpretations",
+      "midpoint_analysis.time_sensitivity.status",
+      "midpoint_analysis.time_sensitivity.uncertainty_minutes",
+      "midpoint_analysis.unique_two_factor_pair_count",
+      "base_chart.person_info"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "analysis_datetime": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional ISO target instant with timezone offset for true-solar-arc biwheel geometry and the explicitly named Witte-1924 ecliptic day-meridian equation. Uses a 365.25-day Julian symbolic year key, within 0..150 key years after effective birth. Omit for natal only. Symbolic directions/meridians are not physical target positions or event-success probabilities."
+      },
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "birth_clock_basis": {
+        "default": "civil",
+        "description": "Basis of the supplied birth clock, not a display preference. civil uses birth_timezone. Explicit local_mean_solar/LMT or local_apparent_solar/LAT uses longitude and modeled UT1/TT; omit birth_timezone and keep use_true_solar_time=false to avoid applying another correction. Never infer the basis of an ambiguous historical record by fitting a chart.",
+        "enum": [
+          "civil",
+          "local_mean_solar",
+          "local_apparent_solar"
+        ],
+        "type": "string"
+      },
+      "birth_day": {
+        "description": "Birth day (1-31)",
+        "maximum": 31,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "birth_hour": {
+        "description": "Birth hour (0-23)",
+        "maximum": 23,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_latitude": {
+        "anyOf": [
+          {
+            "maximum": 90,
+            "minimum": -90,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth latitude. Optional for core chart endpoints when FateBridge can infer it from a supported birth_place."
+      },
+      "birth_longitude": {
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth longitude. Optional for core chart endpoints when FateBridge can infer it from a supported birth_place."
+      },
+      "birth_minute": {
+        "default": 0,
+        "description": "Birth minute (0-59)",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_month": {
+        "description": "Birth month (1-12)",
+        "maximum": 12,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "birth_place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "Birth place"
+      },
+      "birth_second": {
+        "default": 0,
+        "description": "Recorded birth second (0..59), for Germany/equal13 charts. Omission represents the start of the supplied minute, not proof of second-level birth-time accuracy. Preserve the user's stated precision and uncertainty; do not infer missing seconds from outcomes.",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_time_uncertainty_minutes": {
+        "anyOf": [
+          {
+            "maximum": 120,
+            "minimum": 0,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "User-confirmed +/- minutes around the recorded birth instant. None means unknown, not exact. Recalculates factors and the published source pattern / equal13 assignments on a UTC grid no wider than 30 seconds; samples are not a continuous-interval proof or probabilities."
+      },
+      "birth_timezone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth timezone (IANA name or UTC offset). May be resolved from a supported birth_place; Western charts reject an unresolved civil timezone. Coordinates cannot establish the recorded zone. Explicit UTC is valid; never infer a historical basis by fitting a chart. Indian charts also require a resolved civil timezone."
+      },
+      "birth_year": {
+        "description": "Birth year, e.g., 1990",
+        "type": "integer"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "ephemeris_policy": {
+        "default": "auto",
+        "description": "auto retains and reports actual available models. require_data_files rejects analytical/orbital fallback for observed physical coordinates throughout the request, including clocks and samples; checks data contexts and endpoint hashes. Native rise/set query/result epochs are probed, but internal solver reads are not fully observable. Analytical points, fictitious elements, reference zeros and Earth rotation are separate; this is not an astronomical-accuracy or prediction certificate.",
+        "enum": [
+          "auto",
+          "require_data_files"
+        ],
+        "type": "string",
+        "x-fatebridge-western-data-policy": true
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "gender": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未知",
+        "description": "性别（可选，仅用于结果标识；西方星盘计算不使用性别）。接受此字段是为了让同一套出生信息可以原样喂给八字/紫微/星盘等工具，避免批量调用时'有的工具收、有的不收'造成的反复试错。"
+      },
+      "hsys": {
+        "anyOf": [
+          {
+            "maximum": 8,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional offline house system override; if omitted, FateBridge keeps each chart variant's historical default. Explicit values currently support 0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, 4=Koch, 5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc Explicit values must be integer codes0..8; boolean, floating-point, blank and out-of-range values are rejected."
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "Name (optional)"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "use_true_solar_time": {
+        "default": false,
+        "description": "Rebase the birth clock onto true solar time (longitude + equation of time). Default OFF: western astrology conventionally casts on the recorded civil (zone) clock time. Set true to align the western chart with the BaZi engine's apparent-solar instant. Guolao and Indian charts preserve the recorded civil instant and report the solar clock separately.",
+        "type": "boolean"
+      },
+      "zodiacal": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional offline zodiac override; if omitted, FateBridge keeps each chart variant's historical default. Explicit values currently support 0=tropical and 1=sidereal(Lahiri-like)"
+      }
+    },
+    "required": [
+      "birth_year",
+      "birth_month",
+      "birth_day",
+      "birth_hour"
+    ],
+    "type": "object"
+  },
+  "tool": "astro_germany_chart"
+}

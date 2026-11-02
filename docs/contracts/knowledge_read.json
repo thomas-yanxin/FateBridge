@@ -1,0 +1,259 @@
+{
+  "call_guidance": {
+    "astro_aspect_query": {
+      "aspect_degree": 90,
+      "category": "aspect",
+      "domain": "astro",
+      "object_a": "Sun",
+      "object_b": "Moon"
+    },
+    "astro_aspect_scope": "星体对仅标注所查询相位的对象，必须同时指定category=aspect和aspect_degree（或可定位的key）；返回是通用相位释义，不是两颗星专属规则或新增个案计算。",
+    "health_scope": "传统健康原文可以作为文化出处，不把其中病名、脏腑薄弱或调理语言应用为个人医学结论。",
+    "human_design_line_reference": "domain=human_design, category=lines, key=gate.line (e.g.1.1). All384 source locators remain; consult actual registry coverage for local paraphrases pending independent review, uncurated meanings and independent semantic acceptance. Null meanings are never replaced by profile-line themes. Preserve reference_details, citation and provenance. Select any personal polarity only from the same-run actual fixing_state and donor paths; the lookup never applies a line or predicts an outcome. Preserve1.4source ambiguity,2.3permanent2–14connection condition with unknown applicability, and2.6narrow receptivity in exaltation. Conditions not recorded are not thereby absent.",
+    "lookup": "不确定category/key时先读knowledge_registry的domains[].categories[]；目录根是domains/source/provenance，不是domain/categories。",
+    "missing_and_uncertain": "Do not fill a locally missing or unselected cell, an editorial unknown glyph or a provisional number from another column, number or edition.",
+    "scope": "Select fields for the requested domain. Legacy astro/bazi/liureng/qimen cards retain their existing semantics. Heluo/canping references use catalogue category/key and preserve source-specific partial records, without birth inputs or personal applicability evaluation.",
+    "source_fidelity": "Keep citation and provenance; for Heluo/canping also read reference_only and reference_details. A reference profile role is not the actual applied role of a person: bind personal interpretation to the same-run calculation result."
+  },
+  "evidence_views": {
+    "human_design_line_reference": {
+      "fields": [
+        "domain",
+        "category",
+        "key",
+        "title",
+        "lines",
+        "citation",
+        "source",
+        "provenance",
+        "reference_only",
+        "reference_details"
+      ],
+      "scope": "Only domain=human_design: complete384line locator/polarity index; actual registry coverage separates pending local paraphrases, uncurated meanings and independent semantic acceptance. Preserve source conditions and unknown personal applicability. Source facts are not personal fixing states. Keep same-run calculation evidence separate; no complete original-source, publisher-master or real-world efficacy certificate."
+    },
+    "numerology_reference": {
+      "fields": [
+        "domain",
+        "category",
+        "key",
+        "title",
+        "lines",
+        "citation",
+        "source",
+        "provenance",
+        "reference_only",
+        "reference_details"
+      ],
+      "scope": "For domain=heluo/canping only. Preserve original source identity, actual column and part-specific review status. Reference roles do not select personal applicability or dated periods. Full source objects remain in reference_details.record; use fields=null for a complete export and read the same retained delivery."
+    }
+  },
+  "first_view": {
+    "fields": [
+      "title",
+      "lines",
+      "source",
+      "citation"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "aspect_degree": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "[domain=astro, category=aspect] 相位角度；无 key 时须显式提供 category=aspect"
+      },
+      "category": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Category within the domain. Optional: if omitted, it is auto-resolved from `key` (astro/bazi/qimen/heluo/canping/human_design). For an astro aspect_degree query without key, explicitly pass category='aspect'."
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "di_branch": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "[domain=liureng] 地盘地支"
+      },
+      "domain": {
+        "description": "知识域：astro / bazi / liureng / qimen / heluo / canping / human_design。各域适用字段不同——astro：key，或 category=aspect 配合 aspect_degree；星体对 object_a/object_b 只给相位条目标注对象，不能单独定位词条；bazi / qimen：key（category 可省略，自动解析）；liureng：(jiang_name, tian_branch, di_branch)。heluo/canping：按knowledge_registry的category和key读取具名来源；可自动解析唯一key。这些是参考原文及政策角色，不替代同run排盘适用性回执。human_design：category=lines，key=门.线，例如1.1；384线定位，整理与独立复核数见目录coverage，未整理爻义为null。保留来源条件及未知适用性，不得仅凭参考选定个人固定极性。",
+        "type": "string"
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "jiang_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "[domain=liureng] 贵神名"
+      },
+      "key": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Primary lookup key"
+      },
+      "object_a": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "[domain=astro] 第一星体（相位查询）"
+      },
+      "object_b": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "[domain=astro] 第二星体（相位查询）"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "selected_sections": {
+        "default": [],
+        "description": "Optional snapshot section titles for filtered export payload",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "tian_branch": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "[domain=liureng] 天盘地支"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      }
+    },
+    "required": [
+      "domain"
+    ],
+    "type": "object"
+  },
+  "tool": "knowledge_read"
+}

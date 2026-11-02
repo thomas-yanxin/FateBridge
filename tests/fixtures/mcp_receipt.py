@@ -1,0 +1,78 @@
+"""Verify inline business facts when a large runtime receipt is referenced."""
+
+import hashlib
+import json
+
+
+def assert_same_run_receipt(inline, full, *, deferred_fields=()):
+    # The caller first verifies the complete artifact against the original
+    # delivery hash. Only explicitly declared supplementary receipt fields
+    # may be restored; identity/hashes or undeclared omissions never pass.
+    restored = dict(inline)
+    for path in deferred_fields:
+        if not path.startswith("run_metadata."):
+            continue  # whole-result paging is separate from this receipt check
+        assert path in {
+            "run_metadata.runtime",
+            "run_metadata.provenance",
+            "run_metadata.determinism",
+        }, path
+        key = path.removeprefix("run_metadata.")
+        if key != "runtime":
+            assert key not in inline and key in full, key
+            restored[key] = full[key]
+    summary = inline.get("runtime", {})
+    if summary.get("delivery_path") != "run_metadata.runtime":
+        assert restored == full
+        return
+    assert {k: v for k, v in restored.items() if k != "runtime"} == {
+        k: v for k, v in full.items() if k != "runtime"
+    }
+    runtime = full["runtime"]
+    assert summary["environment_sha256"] == runtime["environment_sha256"]
+    assert summary["ephemeris_inventory_sha256"] == runtime["ephemeris"]["sha256"]
+    files = runtime["ephemeris"]["files"]
+    digest = hashlib.sha256(
+        json.dumps(
+            files, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode()
+    ).hexdigest()
+    assert summary["ephemeris_inventory_sha256"] == digest
+    assert summary["ephemeris_files_count"] == len(files)
+
+
+async def verified_inline_business(client, payload):
+    assert len(json.dumps(payload, ensure_ascii=False, separators=(",", ":"))) <= 8192
+    delivery = payload.get("result_delivery")
+    if delivery is None:
+        return payload
+    # This is never permission to hide a star, position, source row or other
+    # business result behind pagination in a first-view budget assertion.
+    deferred = delivery["deferred_fields"]
+    assert deferred and len(deferred) == len(set(deferred)), delivery
+    assert "run_metadata.runtime" in deferred, delivery
+    assert set(deferred) <= {
+        "run_metadata.runtime",
+        "run_metadata.provenance",
+        "run_metadata.determinism",
+    }, delivery
+    # The compact manifest may omit the redundant first-page URI.
+    text = ""
+    uri = delivery.get("first_page_uri")
+    if uri is None:
+        uri = f"fatebridge://results/{delivery['result_id']}/pages/0"
+    while uri:
+        page = json.loads((await client.read_resource(uri))[0].text)
+        text += page["text"]
+        uri = page["next_uri"]
+    assert hashlib.sha256(text.encode()).hexdigest() == delivery["sha256"]
+    full = json.loads(text)
+    assert_same_run_receipt(
+        payload["run_metadata"], full["run_metadata"], deferred_fields=deferred
+    )
+    inline = {
+        k: v for k, v in payload.items() if k not in ("run_metadata", "result_delivery")
+    }
+    stored = {k: v for k, v in full.items() if k != "run_metadata"}
+    assert inline == stored
+    return {**inline, "run_metadata": full["run_metadata"]}

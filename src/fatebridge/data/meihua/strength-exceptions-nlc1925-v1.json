@@ -1,0 +1,88 @@
+{
+  "id": "meihua_strength_exceptions_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局卷三体用衰旺所选条件与乘旺例外",
+  "selected_source": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_indices": [
+      109,
+      110
+    ],
+    "section": "體用衰旺之訣",
+    "reader": "assistant selected-span visual reading; no independent human expert review"
+  },
+  "rules": [
+    {
+      "id": "wang_body_receives_control",
+      "quote": "此得令之卦乘旺之氣雖有他卦尅之亦無大害",
+      "pdf_indices": [
+        109
+      ],
+      "body_strength": "旺",
+      "relation": "用克体",
+      "source_symbol": "limited_source_adversity_not_real_safety"
+    },
+    {
+      "id": "wang_auxiliary_except_attacker",
+      "quote": "用互變卦乘旺皆吉但不要尅體之卦氣旺",
+      "pdf_indices": [
+        109
+      ],
+      "exception_relation": "用克体",
+      "source_symbol": "favorable_role_strength_with_explicit_exception_not_net_verdict"
+    },
+    {
+      "id": "shuai_body",
+      "quote": "體之卦氣衰是不吉之占",
+      "pdf_indices": [
+        109
+      ],
+      "body_strength": "衰",
+      "relation": null,
+      "source_symbol": "adverse_source_strength_not_real_outcome"
+    },
+    {
+      "id": "wang_body_receives_generation",
+      "quote": "若卦體旺而復有生體之卦吉事之來可刻期而至矣",
+      "pdf_indices": [
+        110
+      ],
+      "body_strength": "旺",
+      "relation": "用生体",
+      "source_symbol": "favorable_source_symbol_not_computed_event_time"
+    }
+  ],
+  "unresolved_source_clauses": [
+    {
+      "id": "weak_body_inner_outer_support",
+      "quote_spans": [
+        "若內卦外卦有生體者",
+        "體卦雖衰亦無大害也"
+      ],
+      "pdf_indices": [
+        110
+      ],
+      "span_policy": "selected spans, not a claim that every intervening glyph has been adjudicated",
+      "reason": "内卦外卦的组合范围与受制后的作用未裁定；未采集外应不能当外卦无生体。"
+    },
+    {
+      "id": "no_support_weak_body_party",
+      "quote": "內外並無生體雖體之卦黨多皆是衰卦終不吉也",
+      "pdf_indices": [
+        110
+      ],
+      "reason": "外应缺失不证明外无生；党多的计数阈值、角色范围与合参未裁定。",
+      "comparison_transcription_variant": "fixed volume3 has內外並也生體; selected facsimile並無 retained"
+    }
+  ],
+  "scope": [
+    "Existing declared solar-month table only; not complete net seasonal strength or month/day/year synthesis",
+    "Known raw support/control does not establish an effective role after countercontrol",
+    "No automatic priority between volume2 and volume3 clauses",
+    "No actual safety, clinical, mortality, litigation or event-date judgement",
+    "No absence of external support inferred from missing reported observations"
+  ],
+  "independent_human_expert_review": false,
+  "predictive_efficacy_established": false
+}

@@ -1,0 +1,132 @@
+{
+  "id": "naj_ming_cycles_v1",
+  "version": "1.0.0",
+  "source_url": "https://www.digital.archives.go.jp/item/4468520",
+  "printed_volume": "三",
+  "manual_reader_count": 1,
+  "changsheng": {
+    "frame": 78,
+    "section": "安長生沐浴冠帶臨官帝旺衰病死墓絶胎養",
+    "quote": "火局命寅起長生 木局命亥起長生 水局命申起長生 土局命申起長生 金局命巳起長生 男命順女命逆",
+    "starts_by_element": {
+      "火": "寅",
+      "木": "亥",
+      "水": "申",
+      "土": "申",
+      "金": "巳"
+    },
+    "sequence_as_read": [
+      "長生",
+      "沐浴",
+      "冠帶",
+      "臨官",
+      "帝旺",
+      "衰",
+      "病",
+      "死",
+      "墓",
+      "絶",
+      "胎",
+      "養"
+    ],
+    "sequence_modern": [
+      "长生",
+      "沐浴",
+      "冠带",
+      "临官",
+      "帝旺",
+      "衰",
+      "病",
+      "死",
+      "墓",
+      "绝",
+      "胎",
+      "养"
+    ],
+    "direction_by_gender": {
+      "男": "forward",
+      "女": "reverse"
+    },
+    "glyph_note": "繁简和絶/絕、飬/養作明示规范化，不以本批证明每个历史字形的唯一性。"
+  },
+  "boshi": {
+    "frame": 77,
+    "section_as_read": "安十二宮大歲殺祿神歌訣",
+    "modern_system_name": "博士十二神",
+    "quote": "博士力士青龍續 小耗將軍及奏書 蜚廉喜神病符錄 大耗伏兵至官府 要知不拘男女命尋祿存星起 陽男陰女順推輪陰男陽女逆流行",
+    "sequence_as_read": [
+      "博士",
+      "力士",
+      "青龍",
+      "小耗",
+      "將軍",
+      "奏書",
+      "蜚廉",
+      "喜神",
+      "病符",
+      "大耗",
+      "伏兵",
+      "官府"
+    ],
+    "sequence_modern": [
+      "博士",
+      "力士",
+      "青龙",
+      "小耗",
+      "将军",
+      "奏书",
+      "飞廉",
+      "喜神",
+      "病符",
+      "大耗",
+      "伏兵",
+      "官府"
+    ],
+    "direction_by_polarity_and_gender": {
+      "yang_male": "forward",
+      "yin_female": "forward",
+      "yin_male": "reverse",
+      "yang_female": "reverse"
+    },
+    "source_name_mapping": {
+      "蜚廉": "飞廉"
+    },
+    "layer_note": "本节蜚廉对应博士层飞廉，与另一年支星蜚廉分层，不另造岁前十二神。"
+  },
+  "lucun": {
+    "frame": 76,
+    "section": "安祿存星訣",
+    "quote": "甲生祿存在寅宮 乙生在卯丙戊巳 丁己祿存在午方 庚祿居申辛祿酉 壬祿在亥癸祿子",
+    "starts_by_stem": {
+      "甲": "寅",
+      "乙": "卯",
+      "丙": "巳",
+      "丁": "午",
+      "戊": "巳",
+      "己": "午",
+      "庚": "申",
+      "辛": "酉",
+      "壬": "亥",
+      "癸": "子"
+    }
+  },
+  "older_transcription_differences": [
+    {
+      "field": "boshi_sequence[9]",
+      "older_reading": "天耗",
+      "ming_reading": "大耗"
+    },
+    {
+      "field": "boshi_sequence[11]",
+      "older_reading": "宮府",
+      "ming_reading": "官府"
+    }
+  ],
+  "unknown_gender_derivation": "Evaluate both source-allowed directions and retain a label only if both agree. The start and opposite labels are invariant for the twelve distinct-name cycles; this is a derivation, not a claim that the text discusses unknown gender.",
+  "limits": [
+    "One manual reader of a Ming edition, no expert double adjudication or whole-book certificate.",
+    "The software baseline uses year polarity for changsheng, which differs from this Ming male/female rule for yin-year births; preserve that difference.",
+    "Bureau element and natal year stem are supplied inputs; this comparison does not certify their calendar/prerequisite derivation.",
+    "Cycle labels are historical symbolic names, not clinical conditions, lifespan or empirical predictions."
+  ]
+}

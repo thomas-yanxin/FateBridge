@@ -1,0 +1,1202 @@
+{
+  "id": "t1299_calendar_day_evidence_v5",
+  "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
+  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+  "edition": "大正藏T21 No.1299; CBETA TEI P5 header 2025-01-30",
+  "authors": "不空译；上卷杨景风修注",
+  "annotation_method": "Printed month table retained as literal source rows; day names and bounded activity mappings manually transcribed from named passages, independently of production results.",
+  "printed_month_table_28": [
+    {
+      "lunar_day": 1,
+      "mansions_by_month": "虛室奎胃畢參鬼星翼角氐心",
+      "locator": "T21n1299_p0388a22"
+    },
+    {
+      "lunar_day": 2,
+      "mansions_by_month": "危壁婁昴觜井柳張軫亢房尾",
+      "locator": "T21n1299_p0388a23"
+    },
+    {
+      "lunar_day": 3,
+      "mansions_by_month": "室奎胃畢參鬼星翼角氐心箕",
+      "locator": "T21n1299_p0388a24"
+    },
+    {
+      "lunar_day": 4,
+      "mansions_by_month": "壁婁昴觜井柳張軫亢房尾斗",
+      "locator": "T21n1299_p0388a25"
+    },
+    {
+      "lunar_day": 5,
+      "mansions_by_month": "奎胃畢參鬼星翼角氐心箕牛",
+      "locator": "T21n1299_p0388a26"
+    },
+    {
+      "lunar_day": 6,
+      "mansions_by_month": "婁昴觜井柳張軫亢房尾斗女",
+      "locator": "T21n1299_p0388a27"
+    },
+    {
+      "lunar_day": 7,
+      "mansions_by_month": "胃畢參鬼星翼角氐心箕牛虛",
+      "locator": "T21n1299_p0388a28"
+    },
+    {
+      "lunar_day": 8,
+      "mansions_by_month": "昴觜井柳張軫亢房尾斗女危",
+      "locator": "T21n1299_p0388b01"
+    },
+    {
+      "lunar_day": 9,
+      "mansions_by_month": "畢參鬼星翼角氐心箕牛虛室",
+      "locator": "T21n1299_p0388b02"
+    },
+    {
+      "lunar_day": 10,
+      "mansions_by_month": "觜井柳張軫亢房尾斗女危壁",
+      "locator": "T21n1299_p0388b03"
+    },
+    {
+      "lunar_day": 11,
+      "mansions_by_month": "參鬼星翼角氐心箕牛虛室奎",
+      "locator": "T21n1299_p0388b04"
+    },
+    {
+      "lunar_day": 12,
+      "mansions_by_month": "井柳張軫亢房尾斗女危壁婁",
+      "locator": "T21n1299_p0388b05"
+    },
+    {
+      "lunar_day": 13,
+      "mansions_by_month": "鬼星翼角氐心箕牛虛室奎胃",
+      "locator": "T21n1299_p0388b06"
+    },
+    {
+      "lunar_day": 14,
+      "mansions_by_month": "柳張軫亢房尾斗女危壁婁昴",
+      "locator": "T21n1299_p0388b07"
+    },
+    {
+      "lunar_day": 15,
+      "mansions_by_month": "星翼角氐心箕牛虛室奎胃畢",
+      "locator": "T21n1299_p0388b08"
+    },
+    {
+      "lunar_day": 16,
+      "mansions_by_month": "張軫亢房尾斗女危壁婁昴觜",
+      "locator": "T21n1299_p0388b09"
+    },
+    {
+      "lunar_day": 17,
+      "mansions_by_month": "翼角氐心箕牛虛室奎胃畢參",
+      "locator": "T21n1299_p0388b10"
+    },
+    {
+      "lunar_day": 18,
+      "mansions_by_month": "軫亢房尾斗女危壁婁昴觜井",
+      "locator": "T21n1299_p0388b11"
+    },
+    {
+      "lunar_day": 19,
+      "mansions_by_month": "角氐心箕牛虛室奎胃畢參鬼",
+      "locator": "T21n1299_p0388b12"
+    },
+    {
+      "lunar_day": 20,
+      "mansions_by_month": "亢房尾斗女危壁婁昴觜井柳",
+      "locator": "T21n1299_p0388b13"
+    },
+    {
+      "lunar_day": 21,
+      "mansions_by_month": "氐心箕牛虛室奎胃畢參鬼星",
+      "locator": "T21n1299_p0388b14"
+    },
+    {
+      "lunar_day": 22,
+      "mansions_by_month": "房尾斗女危壁婁昴觜井柳張",
+      "locator": "T21n1299_p0388b15"
+    },
+    {
+      "lunar_day": 23,
+      "mansions_by_month": "心箕牛虛室奎胃畢參鬼星翼",
+      "locator": "T21n1299_p0388b16"
+    },
+    {
+      "lunar_day": 24,
+      "mansions_by_month": "尾斗女危壁婁昴觜井柳張軫",
+      "locator": "T21n1299_p0388b17"
+    },
+    {
+      "lunar_day": 25,
+      "mansions_by_month": "箕牛虛室奎胃畢參鬼星翼角",
+      "locator": "T21n1299_p0388b18"
+    },
+    {
+      "lunar_day": 26,
+      "mansions_by_month": "斗女危壁婁昴觜井柳張軫亢",
+      "locator": "T21n1299_p0388b19"
+    },
+    {
+      "lunar_day": 27,
+      "mansions_by_month": "牛虛室奎胃畢參鬼星翼角氐",
+      "locator": "T21n1299_p0388b20"
+    },
+    {
+      "lunar_day": 28,
+      "mansions_by_month": "女危壁婁昴觜井柳張軫亢房",
+      "locator": "T21n1299_p0388b21"
+    },
+    {
+      "lunar_day": 29,
+      "mansions_by_month": "虛室奎胃畢參鬼星翼角氐心",
+      "locator": "T21n1299_p0388b22"
+    },
+    {
+      "lunar_day": 30,
+      "mansions_by_month": "危壁婁昴觜井柳張軫亢房尾",
+      "locator": "T21n1299_p0388b23"
+    }
+  ],
+  "named_days": [
+    {
+      "half_day": 1,
+      "civil_lunar_days": [
+        1,
+        16
+      ],
+      "upper_name": "建名",
+      "lower_name": "建名",
+      "upper_locator": "T21n1299_p0393a24-27",
+      "lower_locator": "T21n1299_p0394a18-20"
+    },
+    {
+      "half_day": 2,
+      "civil_lunar_days": [
+        2,
+        17
+      ],
+      "upper_name": "得财",
+      "lower_name": "得财",
+      "upper_locator": "T21n1299_p0393a28-29",
+      "lower_locator": "T21n1299_p0394a21-23"
+    },
+    {
+      "half_day": 3,
+      "civil_lunar_days": [
+        3,
+        18
+      ],
+      "upper_name": "威力",
+      "lower_name": "威力",
+      "upper_locator": "T21n1299_p0393b01-03",
+      "lower_locator": "T21n1299_p0394a24-27"
+    },
+    {
+      "half_day": 4,
+      "civil_lunar_days": [
+        4,
+        19
+      ],
+      "upper_name": "猛武",
+      "lower_name": "猛武",
+      "upper_locator": "T21n1299_p0393b04-05",
+      "lower_locator": "T21n1299_p0394a28-0394b02"
+    },
+    {
+      "half_day": 5,
+      "civil_lunar_days": [
+        5,
+        20
+      ],
+      "upper_name": "圆满",
+      "lower_name": "圆满",
+      "upper_locator": "T21n1299_p0393b06-07",
+      "lower_locator": "T21n1299_p0394b03-05"
+    },
+    {
+      "half_day": 6,
+      "civil_lunar_days": [
+        6,
+        21
+      ],
+      "upper_name": "求名",
+      "lower_name": "求名",
+      "upper_locator": "T21n1299_p0393b08-10",
+      "lower_locator": "T21n1299_p0394b06-09"
+    },
+    {
+      "half_day": 7,
+      "civil_lunar_days": [
+        7,
+        22
+      ],
+      "upper_name": "友朋",
+      "lower_name": "朋友",
+      "upper_locator": "T21n1299_p0393b11-13",
+      "lower_locator": "T21n1299_p0394b10-13"
+    },
+    {
+      "half_day": 8,
+      "civil_lunar_days": [
+        8,
+        23
+      ],
+      "upper_name": "大战",
+      "lower_name": "力战",
+      "upper_locator": "T21n1299_p0393b14-15",
+      "lower_locator": "T21n1299_p0394b14-17"
+    },
+    {
+      "half_day": 9,
+      "civil_lunar_days": [
+        9,
+        24
+      ],
+      "upper_name": "凶猛",
+      "lower_name": "凶猛",
+      "upper_locator": "T21n1299_p0393b16-18",
+      "lower_locator": "T21n1299_p0394b18-20"
+    },
+    {
+      "half_day": 10,
+      "civil_lunar_days": [
+        10,
+        25
+      ],
+      "upper_name": "善法",
+      "lower_name": "善法",
+      "upper_locator": "T21n1299_p0393b19-21",
+      "lower_locator": "T21n1299_p0394b21-25"
+    },
+    {
+      "half_day": 11,
+      "civil_lunar_days": [
+        11,
+        26
+      ],
+      "upper_name": "慈猛",
+      "lower_name": "慈猛",
+      "upper_locator": "T21n1299_p0393b22-24",
+      "lower_locator": "T21n1299_p0394b26-29"
+    },
+    {
+      "half_day": 12,
+      "civil_lunar_days": [
+        12,
+        27
+      ],
+      "upper_name": "名闻",
+      "lower_name": "名闻",
+      "upper_locator": "T21n1299_p0393b25-27",
+      "lower_locator": "T21n1299_p0394c01-03"
+    },
+    {
+      "half_day": 13,
+      "civil_lunar_days": [
+        13,
+        28
+      ],
+      "upper_name": "最胜",
+      "lower_name": "最胜",
+      "upper_locator": "T21n1299_p0393b28-0393c01",
+      "lower_locator": "T21n1299_p0394c04-06"
+    },
+    {
+      "half_day": 14,
+      "civil_lunar_days": [
+        14,
+        29
+      ],
+      "upper_name": "勇猛",
+      "lower_name": "勇猛",
+      "upper_locator": "T21n1299_p0393c02-03",
+      "lower_locator": "T21n1299_p0394c07-10"
+    },
+    {
+      "half_day": 15,
+      "civil_lunar_days": [
+        15,
+        30
+      ],
+      "upper_name": "吉祥",
+      "lower_name": "吉相",
+      "upper_locator": "T21n1299_p0393c04-06",
+      "lower_locator": "T21n1299_p0394c11-14"
+    }
+  ],
+  "activity_rules": [
+    {
+      "rule_id": "t1299_named_day_02",
+      "layer": "named_day",
+      "selectors": [
+        1,
+        16
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0393a24-27",
+      "volume": "upper",
+      "meaning": "上卷不宜远行。",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "long_distance_journey"
+          ],
+          "condition": "原文远行或远行进路，不泛化所有短程活动"
+        }
+      },
+      "source_excerpts": [
+        "唯不宜遠出行"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_03",
+      "layer": "named_day",
+      "selectors": [
+        2,
+        17
+      ],
+      "activities": [
+        "travel",
+        "social",
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0393a28-29",
+      "volume": "upper",
+      "meaning": "上卷宜出行、结交及婚姻；得财日名本身不扩大成所有交易。",
+      "source_excerpts": [
+        "出行、結交、婚親"
+      ],
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "forming_friendship"
+          ],
+          "condition": "结交／交友行为须明确，不限首次相识；不能由一般聚会代填本次结交行为。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_named_day_04",
+      "layer": "named_day",
+      "selectors": [
+        5,
+        20
+      ],
+      "activities": [
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0393b06-07",
+      "volume": "upper",
+      "meaning": "上卷宜结婚姻。",
+      "source_excerpts": [
+        "結婚並吉"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_05",
+      "layer": "named_day",
+      "selectors": [
+        6,
+        21
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0393b08-10",
+      "volume": "upper",
+      "meaning": "上卷求名日不宜出行，原文未限远行；不能收窄为仅长途。",
+      "source_excerpts": [
+        "不宜出行"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_06",
+      "layer": "named_day",
+      "selectors": [
+        7,
+        22
+      ],
+      "activities": [
+        "social"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0393b11-13",
+      "volume": "upper",
+      "meaning": "上卷宜结交朋友。",
+      "source_excerpts": [
+        "宜結交"
+      ],
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "forming_friendship"
+          ],
+          "condition": "结交／交友行为须明确，不限首次相识；不能由一般聚会代填本次结交行为。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_named_day_07",
+      "layer": "named_day",
+      "selectors": [
+        7,
+        22
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0393b11-13",
+      "volume": "upper",
+      "meaning": "上卷不宜远行。",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "long_distance_journey"
+          ],
+          "condition": "原文远行或远行进路，不泛化所有短程活动"
+        }
+      },
+      "source_excerpts": [
+        "唯不宜遠行"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_08",
+      "layer": "named_day",
+      "selectors": [
+        9,
+        24
+      ],
+      "activities": [
+        "relocation"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0393b16-18",
+      "volume": "upper",
+      "meaning": "上卷不宜入宅。",
+      "source_excerpts": [
+        "不宜入宅"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_09",
+      "layer": "named_day",
+      "selectors": [
+        13,
+        28
+      ],
+      "activities": [
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0393b28-0393c01",
+      "volume": "upper",
+      "meaning": "上卷宜嫁娶；不将入坛学法泛化为一切学习。",
+      "source_excerpts": [
+        "又宜嫁娶"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_10",
+      "layer": "named_day",
+      "selectors": [
+        14,
+        29
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0393c02-03",
+      "volume": "upper",
+      "meaning": "上卷勇猛日唯不宜远行。",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "long_distance_journey"
+          ],
+          "condition": "原文远行或远行进路，不泛化所有短程活动"
+        }
+      },
+      "source_excerpts": [
+        "唯不宜遠行"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_11",
+      "layer": "named_day",
+      "selectors": [
+        1,
+        16
+      ],
+      "activities": [
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0394a18-20",
+      "volume": "lower",
+      "meaning": "下卷宜学伎艺；不将宗教专属修法泛化为一切学习。",
+      "activity_conditions": {
+        "study": {
+          "any_of": [
+            "skill_learning"
+          ],
+          "condition": "原文学伎艺，不泛化一切学习或考试"
+        }
+      },
+      "source_excerpts": [
+        "學伎藝"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_12",
+      "layer": "named_day",
+      "selectors": [
+        1,
+        16
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0394a18-20",
+      "volume": "lower",
+      "meaning": "下卷不宜远行。",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "long_distance_journey"
+          ],
+          "condition": "原文远行或远行进路，不泛化所有短程活动"
+        }
+      },
+      "source_excerpts": [
+        "不宜遠行"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_13",
+      "layer": "named_day",
+      "selectors": [
+        2,
+        17
+      ],
+      "activities": [
+        "travel",
+        "social",
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0394a21-23",
+      "volume": "lower",
+      "meaning": "下卷得财日列远行进路、结交婚姻；远行条件须明确，不把日名推成所有交易适宜。",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "long_distance_journey"
+          ],
+          "condition": "下卷原文远行进路；与上卷普通出行的范围不同"
+        },
+        "social": {
+          "any_of": [
+            "forming_friendship"
+          ],
+          "condition": "结交／交友行为须明确，不限首次相识；不能由一般聚会代填本次结交行为。"
+        }
+      },
+      "source_excerpts": [
+        "遠行進路、結交婚姻"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_14",
+      "layer": "named_day",
+      "selectors": [
+        5,
+        20
+      ],
+      "activities": [
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0394b03-05",
+      "volume": "lower",
+      "meaning": "下卷宜结婚姻。",
+      "source_excerpts": [
+        "結婚姻"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_15",
+      "layer": "named_day",
+      "selectors": [
+        6,
+        21
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0394b06-09",
+      "volume": "lower",
+      "meaning": "下卷不宜远行进路。",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "long_distance_journey"
+          ],
+          "condition": "原文远行或远行进路，不泛化所有短程活动"
+        }
+      },
+      "source_excerpts": [
+        "不宜遠行進路"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_16",
+      "layer": "named_day",
+      "selectors": [
+        7,
+        22
+      ],
+      "activities": [
+        "social"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0394b10-13",
+      "volume": "lower",
+      "meaning": "下卷宜结交朋友。",
+      "source_excerpts": [
+        "宜結朋友"
+      ],
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "forming_friendship"
+          ],
+          "condition": "结交／交友行为须明确，不限首次相识；不能由一般聚会代填本次结交行为。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_named_day_17",
+      "layer": "named_day",
+      "selectors": [
+        9,
+        24
+      ],
+      "activities": [
+        "relocation"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0394b18-20",
+      "volume": "lower",
+      "meaning": "下卷不宜入宅。",
+      "source_excerpts": [
+        "不宜入宅"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_18",
+      "layer": "named_day",
+      "selectors": [
+        13,
+        28
+      ],
+      "activities": [
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0394c04-06",
+      "volume": "lower",
+      "meaning": "下卷宜嫁娶；不将入坛学法泛化为一切学习。",
+      "source_excerpts": [
+        "取婦人"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_19",
+      "layer": "named_day",
+      "selectors": [
+        14,
+        29
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0394c07-10",
+      "volume": "lower",
+      "meaning": "下卷不宜远行进路。",
+      "activity_conditions": {
+        "travel": {
+          "any_of": [
+            "long_distance_journey"
+          ],
+          "condition": "原文远行或远行进路，不泛化所有短程活动"
+        }
+      },
+      "source_excerpts": [
+        "不宜遠行進路"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_20",
+      "layer": "named_day",
+      "selectors": [
+        12,
+        27
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "caution",
+      "volume": "upper",
+      "locator": "T21n1299_p0393b25-27",
+      "meaning": "上卷名闻日不宜放债，只对应出借。",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "lending"
+          ],
+          "condition": "唯不宜放債"
+        }
+      },
+      "source_excerpts": [
+        "唯不宜放債"
+      ]
+    },
+    {
+      "rule_id": "t1299_named_day_21",
+      "layer": "named_day",
+      "selectors": [
+        12,
+        27
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "caution",
+      "volume": "lower",
+      "locator": "T21n1299_p0394c01-03",
+      "meaning": "下卷名闻日不宜放债取债，分别保留出借与借入。",
+      "activity_conditions": {
+        "commerce": {
+          "any_of": [
+            "lending",
+            "borrowing"
+          ],
+          "condition": "不宜放債取債"
+        }
+      },
+      "source_excerpts": [
+        "不宜放債取債"
+      ]
+    }
+  ],
+  "selection_policy": "Preserve upper/lower names and literal verse abbreviations; interpret 一夜 as 十一夜 using the explicit lower inline note and parallel prose. Building is not relocation, a 得财 day is not all commerce; no harmful or medical actions are published.",
+  "individual_time_witnesses": [
+    {
+      "lunar_day": 4,
+      "witness": "lower_named_day",
+      "phase": "night",
+      "assessment_before_release": "caution",
+      "release_after": "midnight",
+      "locator": "T21n1299_p0394b01-02",
+      "source_excerpt": "四日夜不吉，中夜已後吉"
+    },
+    {
+      "lunar_day": 8,
+      "witness": "lower_named_day",
+      "phase": "daylight",
+      "assessment_before_release": "caution",
+      "release_after": "midday",
+      "locator": "T21n1299_p0394b16-17",
+      "source_excerpt": "八日晝惡，午後吉"
+    },
+    {
+      "lunar_day": 11,
+      "witness": "lower_named_day",
+      "phase": "night",
+      "assessment_before_release": "caution",
+      "release_after": "midnight",
+      "locator": "T21n1299_p0394b28-29",
+      "source_excerpt": "十一日夜惡，中夜後還吉"
+    },
+    {
+      "lunar_day": 15,
+      "witness": "lower_named_day",
+      "phase": "daylight",
+      "assessment_before_release": "caution",
+      "release_after": "midday",
+      "locator": "T21n1299_p0394c14",
+      "source_excerpt": "十五日晝惡，午後吉"
+    },
+    {
+      "lunar_day": 18,
+      "witness": "lower_named_day",
+      "phase": "night",
+      "assessment_before_release": "caution",
+      "release_after": "midnight",
+      "locator": "T21n1299_p0394a27",
+      "source_excerpt": "十八日夜惡，中夜已後還吉"
+    },
+    {
+      "lunar_day": 22,
+      "witness": "lower_named_day",
+      "phase": "daylight",
+      "assessment_before_release": "caution",
+      "release_after": "midday",
+      "locator": "T21n1299_p0394b12-13",
+      "source_excerpt": "二十二晝惡，午後吉"
+    },
+    {
+      "lunar_day": 25,
+      "witness": "lower_named_day",
+      "phase": "night",
+      "assessment_before_release": "caution",
+      "release_after": "midnight",
+      "locator": "T21n1299_p0394b24-25",
+      "source_excerpt": "二十五日夜不吉，半夜已後通吉"
+    },
+    {
+      "lunar_day": 29,
+      "witness": "lower_named_day",
+      "phase": "daylight",
+      "assessment_before_release": "caution",
+      "release_after": "midday",
+      "locator": "T21n1299_p0394c10",
+      "source_excerpt": "二十九日晝惡，午後吉"
+    }
+  ],
+  "clock_doctrine": {
+    "id": "t1299_daybreak_eight_times_reference_v1",
+    "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
+    "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+    "locator": "T21n1299_p0399b25-28",
+    "source_excerpt": "國，未審知委。其曜亦每日分為八時，平明即是所直之曜，乃至酉戌，則八時而周。夜亦分為八時，轉到明日曉時，即次後曜當直。如是細解，用之萬不失一。",
+    "day_parts": 8,
+    "night_parts": 8,
+    "starting_boundary_literal": "平明",
+    "next_boundary_literal": "明日曉時",
+    "intradaily_luminary_order": null,
+    "physical_clock_mapping_status": "not_established",
+    "western_24_hora_applied": false,
+    "scope": "仅交付所选原段的日夜各八时及平明起曜。段内未逐时列曜神顺序，不以日曜序列或西方24行星时补写；酉戌保留原字，未映射为现代固定钟时。",
+    "source_claim_is_empirical_validation": false
+  },
+  "verse_abbreviation_resolution": {
+    "id": "t1299_white_one_night_abbreviation_v1",
+    "locator": "T21n1299_p0393c26",
+    "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
+    "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+    "source_excerpt": "所謂一夜者，十一夜也。勒頌者貴省文也",
+    "xml_kind": "note[@place=inline]",
+    "literal_expression": "一夜",
+    "literal_lunar_day": 1,
+    "interpreted_lunar_day": 11,
+    "resolution_status": "resolved_by_source_inline_gloss",
+    "scope": "下卷夹注明说一夜指十一夜；上卷同偈按其平行散文及该注释义。保留字面，不再把一字误算成初一夜限制；未判定现代钟时。"
+  },
+  "timing_witnesses": [
+    {
+      "witness": "upper_prose",
+      "locator": "T21n1299_p0393a06-16",
+      "source_excerpt": "又白月四日夜、八日晝、十一日夜、十五日晝，黑月三日夜、七日晝、十日夜、十四日晝",
+      "release_locator": "T21n1299_p0393a15-16",
+      "release_excerpt": "凡凶惡之日，日中已後却成吉時；凶惡之夜，夜半已後却成吉時。乃為頌曰：",
+      "entries": [
+        {
+          "literal_lunar_day": 4,
+          "interpreted_lunar_day": 4,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 8,
+          "interpreted_lunar_day": 8,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 11,
+          "interpreted_lunar_day": 11,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 15,
+          "interpreted_lunar_day": 15,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 18,
+          "interpreted_lunar_day": 18,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 22,
+          "interpreted_lunar_day": 22,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 25,
+          "interpreted_lunar_day": 25,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 29,
+          "interpreted_lunar_day": 29,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        }
+      ]
+    },
+    {
+      "witness": "upper_verse",
+      "locator": "T21n1299_p0393a17-22",
+      "source_excerpt": "黑三夜七晝，十夜十四晝，白四夜八晝，一夜十五晝，",
+      "release_locator": "T21n1299_p0393a15-16",
+      "release_excerpt": "凡凶惡之日，日中已後却成吉時；凶惡之夜，夜半已後却成吉時。乃為頌曰：",
+      "entries": [
+        {
+          "literal_lunar_day": 4,
+          "interpreted_lunar_day": 4,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 8,
+          "interpreted_lunar_day": 8,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 1,
+          "interpreted_lunar_day": 11,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "parallel_prose_and_lower_inline_gloss",
+          "annotation_locator": "T21n1299_p0393c26"
+        },
+        {
+          "literal_lunar_day": 15,
+          "interpreted_lunar_day": 15,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 18,
+          "interpreted_lunar_day": 18,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 22,
+          "interpreted_lunar_day": 22,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 25,
+          "interpreted_lunar_day": 25,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 29,
+          "interpreted_lunar_day": 29,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        }
+      ]
+    },
+    {
+      "witness": "lower_prose",
+      "locator": "T21n1299_p0394a06-16",
+      "source_excerpt": "入月，四日夜八日晝、十一日夜十五日晝、十八日夜二十二日晝、二十五日夜二十九日晝。",
+      "release_locator": "T21n1299_p0394a15-16",
+      "release_excerpt": "惡宿惡曜并者即凶。夫凶惡晝日中已後通吉用，凶惡夜半已後亦通吉用。",
+      "entries": [
+        {
+          "literal_lunar_day": 4,
+          "interpreted_lunar_day": 4,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 8,
+          "interpreted_lunar_day": 8,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 11,
+          "interpreted_lunar_day": 11,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 15,
+          "interpreted_lunar_day": 15,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 18,
+          "interpreted_lunar_day": 18,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 22,
+          "interpreted_lunar_day": 22,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 25,
+          "interpreted_lunar_day": 25,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 29,
+          "interpreted_lunar_day": 29,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        }
+      ]
+    },
+    {
+      "witness": "lower_verse",
+      "locator": "T21n1299_p0393c22-28",
+      "source_excerpt": "黑三夜七晝，十夜十四晝，白四夜八晝，一夜十五晝。",
+      "release_locator": "T21n1299_p0393c27-28",
+      "release_excerpt": "於此黑白月，晝夜不成就，日中及中夜，已後皆通吉。",
+      "entries": [
+        {
+          "literal_lunar_day": 4,
+          "interpreted_lunar_day": 4,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 8,
+          "interpreted_lunar_day": 8,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 1,
+          "interpreted_lunar_day": 11,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "direct_lower_inline_gloss",
+          "annotation_locator": "T21n1299_p0393c26"
+        },
+        {
+          "literal_lunar_day": 15,
+          "interpreted_lunar_day": 15,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 18,
+          "interpreted_lunar_day": 18,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 22,
+          "interpreted_lunar_day": 22,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 25,
+          "interpreted_lunar_day": 25,
+          "phase": "night",
+          "release_after": "midnight",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        },
+        {
+          "literal_lunar_day": 29,
+          "interpreted_lunar_day": 29,
+          "phase": "daylight",
+          "release_after": "midday",
+          "interpretation_status": "literal_enumeration",
+          "annotation_locator": null
+        }
+      ]
+    }
+  ]
+}

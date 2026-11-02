@@ -1,13 +1,22 @@
 """Sitting-trigram house chart and separately scoped personal charts."""
 
 from datetime import date
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
 
+from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_SOLAR_MODEL
 from fatebridge.core.divination import BAGUA_BY_NAME
+from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
 
-from .calendar import lichun_resolution, year_context
+from .bazhai_interpretation import palace_star_relationship, you_nian_trace
+from .bearing_support import sitting_support
+from .calendar import (
+    boundary_candidate_dates,
+    boundary_model_policy,
+    lichun_resolution,
+    year_context,
+)
 from .directions import rule_data, sitting_from_facing, wrap9
-from .models import BazhaiRequest, MingguaRequest
+from .models import BazhaiRequest, House, MingguaRequest
 
 
 def placement_polarity(purpose: str, aspect: str) -> str:
@@ -15,6 +24,28 @@ def placement_polarity(purpose: str, aspect: str) -> str:
     return (
         "inauspicious" if purpose == "stove" and aspect == "location" else "auspicious"
     )
+
+
+def placement_application(
+    palace: Dict[str, Any], purpose: str, aspect: str
+) -> Dict[str, Any]:
+    """The same scoped evidence for a current or proposed direction."""
+    expected = placement_polarity(purpose, aspect)
+    return {
+        "star": palace["star"],
+        "expected_polarity": expected,
+        "matches_convention": palace["star"]["polarity"] == expected,
+        "matches_convention_scope": "basic_star_polarity_only_not_element_or_whole_house_verdict",
+        "you_nian_trace": palace["you_nian_trace"],
+        "palace_star_relationship": palace["palace_star_relationship"],
+        "rule_id": (
+            "bazhai_sitting_v1.stove_seat_fire_mouth"
+            if purpose == "stove"
+            else "bazhai_sitting_v1.placement_application"
+        ),
+        "source_ids": ["S3"],
+        "application_scope": "selected_ruleset_convention",
+    }
 
 
 def sectors(base: str, subject_id: str, basis: str) -> Dict[str, Any]:
@@ -28,6 +59,12 @@ def sectors(base: str, subject_id: str, basis: str) -> Dict[str, Any]:
             **info,
             "star": stars[str(bits[base] ^ bits[info["trigram"]])],
             "changed_line_mask": bits[base] ^ bits[info["trigram"]],
+            "you_nian_trace": you_nian_trace(bits[base], bits[info["trigram"]]),
+            "palace_star_relationship": palace_star_relationship(
+                info["element"],
+                stars[str(bits[base] ^ bits[info["trigram"]])]["name"],
+                stars[str(bits[base] ^ bits[info["trigram"]])]["element"],
+            ),
             "base_trigram": base,
             "subject_id": subject_id,
             "basis": basis,
@@ -50,7 +87,6 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> Dict[str, Any]
     year = time["effective_year"]
     missing = []
     if time.get("effective_year_status") == "requires_confirmation":
-        time = {**time, "effective_year": None, "provisional_effective_year": year}
         year = None
         missing.append(
             f"occupants.{subject_id}.confirmed_effective_birth_year_due_to_boundary_precision"
@@ -69,9 +105,9 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> Dict[str, Any]
         # days are conservatively held for a confirmed effective birth year.
         uncertain_boundary = bool(
             resolution
-            and resolution["approximate"]
             and boundary_day is not None
-            and abs((day - boundary_day).days) <= 1
+            and day in boundary_candidate_dates(resolution, req.timezone_name)
+            and (resolution["approximate"] or day != boundary_day)
         )
         year = (
             None
@@ -87,6 +123,30 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> Dict[str, Any]
         }
         if resolution is not None:
             time["boundary_resolution"] = resolution
+            policy = boundary_model_policy(resolution)
+            if uncertain_boundary and policy is not None:
+                model_name = (
+                    "moshier"
+                    if policy["ephemeris_model"] == "moshier"
+                    else (
+                        "vsop2013_solar"
+                        if policy["ephemeris_model"] == VSOP2013_SOLAR_MODEL
+                        else (
+                            "aa1996_solar"
+                            if policy["ephemeris_model"] == AA1996_SOLAR_MODEL
+                            else "analytic_solar"
+                        )
+                    )
+                )
+                time["boundary_precision_policy"] = {
+                    **policy,
+                    "reason": model_name
+                    + "_guard_crosses_civil_date_not_fabricated_birth_hour",
+                    "boundary_possible_civil_dates": sorted(
+                        d.isoformat()
+                        for d in boundary_candidate_dates(resolution, req.timezone_name)
+                    ),
+                }
         if year is None:
             missing.append(
                 f"occupants.{subject_id}.confirmed_effective_birth_year_due_to_boundary_precision"
@@ -139,28 +199,110 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> Dict[str, Any]
     }
 
 
+def _house_inputs(req: BazhaiRequest) -> Tuple[Optional[House], float, str, str]:
+    # Assess is a BazhaiRequest subclass. Its optional natal branch describes
+    # the same physical house, as enforced by the assessment input contract.
+    natal = getattr(req, "xuankong", None)
+    house = req.house or (natal.house if natal is not None else None)
+    origin = "house" if req.house is not None else "xuankong.house"
+    if house is not None and house.bearing_uncertainty_degrees is not None:
+        return (
+            house,
+            house.bearing_uncertainty_degrees,
+            origin,
+            origin + ".bearing_uncertainty_degrees",
+        )
+    if natal is not None and natal.bearing_uncertainty_degrees is not None:
+        return (
+            house,
+            natal.bearing_uncertainty_degrees,
+            origin,
+            "xuankong.bearing_uncertainty_degrees",
+        )
+    return house, 0, origin, "not_provided_point_input_convention"
+
+
 def bazhai(req: BazhaiRequest) -> Dict[str, Any]:
     house = None
+    house_candidates: List[Dict[str, Any]] = []
+    orientation = None
     missing: List[str] = []
-    if req.house is not None:
-        data = req.house.model_dump()
+    declared_house, radius, origin, radius_source = _house_inputs(req)
+    if declared_house is not None:
+        data = declared_house.model_dump(exclude={"bearing_uncertainty_degrees"})
         sitting = data["sitting_trigram"]
         if data["facing_degrees"] is not None:
             bearing = sitting_from_facing(
                 data["facing_degrees"], data["north_reference"]
             )
-            if sitting is not None and sitting != bearing["trigram"]:
-                raise ValueError("宅向推导的坐山与 sitting_trigram 不一致")
-            sitting = bearing["trigram"]
-            data["sitting_bearing"] = bearing
             data["facing_degrees"] %= 360
-        if sitting is not None:
+            if radius > 0:
+                supported = sitting_support(
+                    data["facing_degrees"], radius, data["north_reference"]
+                )
+                if sitting is not None:
+                    supported = [
+                        s for s in supported if s["sitting_trigram"] == sitting
+                    ]
+                if not supported:
+                    raise ValueError("宅向误差区间与已确认 sitting_trigram 不一致")
+                ambiguous = len(supported) > 1
+                for support in supported:
+                    trigram = support["sitting_trigram"]
+                    house_candidates.append(
+                        {
+                            **data,
+                            "sitting_trigram": trigram,
+                            "candidate_id": "house-sitting:" + trigram,
+                            "candidate_only": ambiguous,
+                            "bearing_support": {
+                                **support,
+                                "policy_id": "house_bearing_closed_interval_v1",
+                                "policy_version": "1.0.0",
+                                "author": "FateBridge",
+                                "source_ids": ["S4"],
+                                "source_scope": "direction_mapping_only; interval_policy_is_engineering",
+                                "arithmetic": "exact_rational_values_of_supplied_binary_floats",
+                                "coordinate_system": "unwrapped_about_normalized_reported_facing",
+                                "scope": "input_interval_support_not_probability_or_site_measurement_certification",
+                            },
+                            "sectors": sectors(
+                                trigram, data["object_id"], "house_sitting_trigram"
+                            ),
+                        }
+                    )
+                orientation = {
+                    "status": (
+                        "candidate_only" if ambiguous else "resolved_sitting_trigram"
+                    ),
+                    "house_input_path": origin,
+                    "nominal_facing_degrees": data["facing_degrees"],
+                    "nominal_sitting_bearing": bearing,
+                    "bearing_uncertainty_degrees": radius,
+                    "uncertainty_input_path": radius_source,
+                    "north_reference": data["north_reference"],
+                    "confirmed_sitting_trigram": sitting,
+                    "policy_id": "house_bearing_closed_interval_v1",
+                    "policy_version": "1.0.0",
+                    "author": "FateBridge",
+                    "zero_radius_policy": "existing_left_closed_right_open_point_convention",
+                    "positive_radius_policy": "closed_interval_all_intersecting_sectors",
+                    "scope": "bounded_input_not_certified_site_error_or_WMM_sigma_interval",
+                }
+                if ambiguous:
+                    missing.append("house.unambiguous_sitting_trigram")
+                else:
+                    house = house_candidates[0]
+            else:
+                sitting = bearing["trigram"]
+                data["sitting_bearing"] = bearing
+        if sitting is not None and not house_candidates:
             house = {
                 **data,
                 "sitting_trigram": sitting,
                 "sectors": sectors(sitting, data["object_id"], "house_sitting_trigram"),
             }
-    if house is None:
+    if house is None and not house_candidates:
         missing.append("house.sitting_trigram_or_confirmed_facing")
     occupants = [minggua(o, o.subject_id) for o in req.occupants]
     for o in occupants:
@@ -172,8 +314,25 @@ def bazhai(req: BazhaiRequest) -> Dict[str, Any]:
         if placement.location_direction is None:
             missing.append(f"placements.{placement.object_id}.location_direction")
         bases = []
-        if house is not None:
-            bases.append((house["object_id"], "house", house["sectors"], None))
+        if house_candidates:
+            for candidate in house_candidates:
+                bases.append(
+                    (
+                        candidate["object_id"],
+                        "house",
+                        candidate["sectors"],
+                        None,
+                        {
+                            "house_candidate_id": candidate["candidate_id"],
+                            "house_sitting_trigram": candidate["sitting_trigram"],
+                        },
+                        candidate["candidate_only"],
+                    )
+                )
+        elif house is not None:
+            bases.append(
+                (house["object_id"], "house", house["sectors"], None, {}, False)
+            )
         for o in occupants:
             if placement.applies_to_occupant(o["subject_id"]):
                 for c in o["candidates"]:
@@ -183,16 +342,24 @@ def bazhai(req: BazhaiRequest) -> Dict[str, Any]:
                             "occupant",
                             c["sectors"],
                             c["gender_convention"],
+                            {},
+                            o["status"] == "partial",
                         )
                     )
-        for subject_id, basis, chart, convention in bases:
+        for (
+            subject_id,
+            basis,
+            chart,
+            convention,
+            candidate_context,
+            candidate_only,
+        ) in bases:
             for aspect, direction in [
                 ("location", placement.location_direction),
                 ("facing", placement.facing_direction),
             ]:
                 if direction is None:
                     continue
-                expects = placement_polarity(placement.purpose, aspect)
                 entry = chart[direction]
                 findings.append(
                     {
@@ -200,6 +367,7 @@ def bazhai(req: BazhaiRequest) -> Dict[str, Any]:
                         "subject_id": subject_id,
                         "subject_kind": basis,
                         "gender_convention": convention,
+                        **candidate_context,
                         "object_id": placement.object_id,
                         "purpose": placement.purpose,
                         "aspect": aspect,
@@ -207,33 +375,29 @@ def bazhai(req: BazhaiRequest) -> Dict[str, Any]:
                             placement.facing_role if aspect == "facing" else None
                         ),
                         "direction": direction,
-                        "star": entry["star"],
-                        "expected_polarity": expects,
-                        "matches_convention": entry["star"]["polarity"] == expects,
+                        **placement_application(entry, placement.purpose, aspect),
                         "observation_basis": placement.observation_basis,
-                        "rule_id": (
-                            "bazhai_sitting_v1.stove_seat_fire_mouth"
-                            if placement.purpose == "stove"
-                            else "bazhai_sitting_v1.placement_application"
-                        ),
-                        "source_ids": ["S3"],
-                        "application_scope": "selected_ruleset_convention",
-                        "candidate_only": (
-                            any(
-                                o["subject_id"] == subject_id
-                                and o["status"] == "partial"
-                                for o in occupants
-                            )
-                            if basis == "occupant"
-                            else False
-                        ),
+                        "candidate_only": candidate_only,
                     }
                 )
-    if req.placements and house is None and not any(o["candidates"] for o in occupants):
+    if (
+        req.placements
+        and house is None
+        and not house_candidates
+        and not any(o["candidates"] for o in occupants)
+    ):
         missing.append("placements.usable_house_or_personal_chart")
     return {
         "status": "partial" if missing else "complete",
         "house": house,
+        **(
+            {
+                "house_candidates": house_candidates,
+                "house_orientation_context": orientation,
+            }
+            if house_candidates
+            else {}
+        ),
         "occupants": occupants,
         "placement_findings": findings,
         "missing_inputs": missing,

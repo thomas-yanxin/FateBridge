@@ -37,7 +37,10 @@ class ExportParseRequest(_DeferredModel):
 class KnowledgeRegistryRequest(_DeferredModel):
     """Request model for bundled knowledge registry."""
 
-    domain: Optional[str] = Field(default=None, description="Optional domain filter")
+    domain: Optional[str] = Field(
+        default=None,
+        description="Optional domain filter: astro/bazi/liureng/qimen/heluo/canping/human_design. Heluo/Canping/Human Design expose source-bound partial references; catalogues do not select rules applicable to a person. Human Design retains384line locators; actual coverage reports pending local paraphrases, uncurated meanings and independent acceptance separately. Omit for all domains with separate source provenance.",
+    )
     selected_sections: List[str] = Field(
         default_factory=list,
         description="Optional snapshot section titles for filtered export payload",
@@ -49,18 +52,21 @@ class KnowledgeReadRequest(_DeferredModel):
 
     domain: str = Field(
         description=(
-            "知识域：astro / bazi / liureng / qimen。各域适用字段不同——"
+            "知识域：astro / bazi / liureng / qimen / heluo / canping / human_design。各域适用字段不同——"
             "astro：key，或 category=aspect 配合 aspect_degree；"
             "星体对 object_a/object_b 只给相位条目标注对象，不能单独定位词条；"
             "bazi / qimen：key（category 可省略，自动解析）；"
             "liureng：(jiang_name, tian_branch, di_branch)。"
+            "heluo/canping：按knowledge_registry的category和key读取具名来源；可自动解析唯一key。"
+            "这些是参考原文及政策角色，不替代同run排盘适用性回执。"
+            "human_design：category=lines，key=门.线，例如1.1；384线定位，整理与独立复核数见目录coverage，未整理爻义为null。保留来源条件及未知适用性，不得仅凭参考选定个人固定极性。"
         )
     )
     category: Optional[str] = Field(
         default=None,
         description=(
             "Category within the domain. Optional: if omitted, it is auto-resolved "
-            "from `key` (astro/bazi/qimen only). For an astro aspect_degree "
+            "from `key` (astro/bazi/qimen/heluo/canping/human_design). For an astro aspect_degree "
             "query without key, explicitly pass category='aspect'."
         ),
     )

@@ -1,0 +1,315 @@
+{
+  "id": "t1299_upper_palace_pada_v1",
+  "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
+  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+  "edition": "大正藏T21 No.1299; CBETA TEI P5 header 2025-01-30",
+  "author": "不空译；上卷杨景风修注",
+  "locator": "T21n1299_p0387b02; p0387b14-0388a02",
+  "palaces": [
+    {
+      "ordinal": 1,
+      "name": "师子宫",
+      "literal_name": "師子宮",
+      "ruler_literal": "大陽",
+      "ruler_luminary": "Sun",
+      "division": "太阳分",
+      "segments": [
+        {
+          "mansion": "星",
+          "count": 4
+        },
+        {
+          "mansion": "张",
+          "count": 4
+        },
+        {
+          "mansion": "翼",
+          "count": 1
+        }
+      ],
+      "locator": "T21n1299_p0387b14-0387b15",
+      "textual_variants": [
+        {
+          "literal": "大陽",
+          "variant": "太陽",
+          "locator": "CBETA app 0387023",
+          "witnesses": "大【大】，太【明】"
+        }
+      ]
+    },
+    {
+      "ordinal": 2,
+      "name": "女宫",
+      "literal_name": "女宮",
+      "ruler_literal": "辰星",
+      "ruler_luminary": "Mercury",
+      "division": "太阳分",
+      "segments": [
+        {
+          "mansion": "翼",
+          "count": 3
+        },
+        {
+          "mansion": "轸",
+          "count": 4
+        },
+        {
+          "mansion": "角",
+          "count": 2
+        }
+      ],
+      "locator": "T21n1299_p0387b18-0387b19",
+      "textual_variants": []
+    },
+    {
+      "ordinal": 3,
+      "name": "秤宫",
+      "literal_name": "秤宮",
+      "ruler_literal": "太白",
+      "ruler_luminary": "Venus",
+      "division": "太阳分",
+      "segments": [
+        {
+          "mansion": "角",
+          "count": 2
+        },
+        {
+          "mansion": "亢",
+          "count": 4
+        },
+        {
+          "mansion": "氐",
+          "count": 3
+        }
+      ],
+      "locator": "T21n1299_p0387b22-0387b23",
+      "textual_variants": []
+    },
+    {
+      "ordinal": 4,
+      "name": "蝎宫",
+      "literal_name": "蝎宮",
+      "ruler_literal": "熒惑",
+      "ruler_luminary": "Mars",
+      "division": "太阳分",
+      "segments": [
+        {
+          "mansion": "氐",
+          "count": 1
+        },
+        {
+          "mansion": "房",
+          "count": 4
+        },
+        {
+          "mansion": "心",
+          "count": 4
+        }
+      ],
+      "locator": "T21n1299_p0387b25-0387b26",
+      "textual_variants": []
+    },
+    {
+      "ordinal": 5,
+      "name": "弓宫",
+      "literal_name": "弓宮",
+      "ruler_literal": "歲星",
+      "ruler_luminary": "Jupiter",
+      "division": "太阳分",
+      "segments": [
+        {
+          "mansion": "尾",
+          "count": 4
+        },
+        {
+          "mansion": "箕",
+          "count": 4
+        },
+        {
+          "mansion": "斗",
+          "count": 1
+        }
+      ],
+      "locator": "T21n1299_p0387b29-0387c01",
+      "textual_variants": []
+    },
+    {
+      "ordinal": 6,
+      "name": "磨竭宫",
+      "literal_name": "磨竭宮",
+      "ruler_literal": "鎮星",
+      "ruler_luminary": "Saturn",
+      "division": "太阳分",
+      "segments": [
+        {
+          "mansion": "斗",
+          "count": 3
+        },
+        {
+          "mansion": "女",
+          "count": 4
+        },
+        {
+          "mansion": "虚",
+          "count": 2
+        }
+      ],
+      "locator": "T21n1299_p0387c04-0387c05",
+      "textual_variants": [
+        {
+          "literal": "磨竭",
+          "variant": "摩竭",
+          "locator": "CBETA app 0387030",
+          "witnesses": "磨【大】，摩【明】"
+        }
+      ]
+    },
+    {
+      "ordinal": 7,
+      "name": "瓶宫",
+      "literal_name": "瓶宮",
+      "ruler_literal": "鎮星",
+      "ruler_luminary": "Saturn",
+      "division": "太阴分",
+      "segments": [
+        {
+          "mansion": "虚",
+          "count": 2
+        },
+        {
+          "mansion": "危",
+          "count": 4
+        },
+        {
+          "mansion": "室",
+          "count": 3
+        }
+      ],
+      "locator": "T21n1299_p0387c10-0387c11",
+      "textual_variants": []
+    },
+    {
+      "ordinal": 8,
+      "name": "鱼宫",
+      "literal_name": "魚宮",
+      "ruler_literal": "歲星",
+      "ruler_luminary": "Jupiter",
+      "division": "太阴分",
+      "segments": [
+        {
+          "mansion": "室",
+          "count": 1
+        },
+        {
+          "mansion": "壁",
+          "count": 4
+        },
+        {
+          "mansion": "奎",
+          "count": 4
+        }
+      ],
+      "locator": "T21n1299_p0387c14-0387c15",
+      "textual_variants": []
+    },
+    {
+      "ordinal": 9,
+      "name": "羊宫",
+      "literal_name": "羊宮",
+      "ruler_literal": "熒惑",
+      "ruler_luminary": "Mars",
+      "division": "太阴分",
+      "segments": [
+        {
+          "mansion": "娄",
+          "count": 4
+        },
+        {
+          "mansion": "胃",
+          "count": 4
+        },
+        {
+          "mansion": "昴",
+          "count": 1
+        }
+      ],
+      "locator": "T21n1299_p0387c18-0387c19",
+      "textual_variants": []
+    },
+    {
+      "ordinal": 10,
+      "name": "牛宫",
+      "literal_name": "牛宮",
+      "ruler_literal": "太白",
+      "ruler_luminary": "Venus",
+      "division": "太阴分",
+      "segments": [
+        {
+          "mansion": "昴",
+          "count": 3
+        },
+        {
+          "mansion": "毕",
+          "count": 4
+        },
+        {
+          "mansion": "觜",
+          "count": 2
+        }
+      ],
+      "locator": "T21n1299_p0387c22-0387c23",
+      "textual_variants": []
+    },
+    {
+      "ordinal": 11,
+      "name": "婬宫",
+      "literal_name": "婬宮",
+      "ruler_literal": "辰星",
+      "ruler_luminary": "Mercury",
+      "division": "太阴分",
+      "segments": [
+        {
+          "mansion": "觜",
+          "count": 2
+        },
+        {
+          "mansion": "参",
+          "count": 4
+        },
+        {
+          "mansion": "井",
+          "count": 3
+        }
+      ],
+      "locator": "T21n1299_p0387c26-0387c27",
+      "textual_variants": []
+    },
+    {
+      "ordinal": 12,
+      "name": "蟹宫",
+      "literal_name": "蟹宮",
+      "ruler_literal": "太陰",
+      "ruler_luminary": "Moon",
+      "division": "太阴分",
+      "segments": [
+        {
+          "mansion": "井",
+          "count": 1
+        },
+        {
+          "mansion": "鬼",
+          "count": 4
+        },
+        {
+          "mansion": "柳",
+          "count": 4
+        }
+      ],
+      "locator": "T21n1299_p0388a01-0388a02",
+      "textual_variants": []
+    }
+  ],
+  "pada_numbering_basis": "在原典宫序中依次展开每宿足数，按同一宿出现的先后编号1..4；分宫足数为原文，第一/第二等足序是显式展开约定。",
+  "pada_ordinals_explicit_in_source": false,
+  "scope": "27宿每宿四足、十二宫每宫九足的文献查表；不把历日宿变成实际月亮足位、本命宫、现代黄道星座或星图House。未据此评判人格、疾病、寿命或现实必然结果。"
+}

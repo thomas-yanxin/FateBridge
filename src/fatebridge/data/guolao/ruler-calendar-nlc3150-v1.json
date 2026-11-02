@@ -1,0 +1,113 @@
+{
+  "source_id": "nlc892_411999021002_92845_3150",
+  "method_id": "nlc3150_printed_month_day_span_v1",
+  "source": {
+    "id": "nlc892_411999021002_92845_3150",
+    "title": "欽定古今圖書集成 第3150冊 博物彙編藝術典 星命部彙考五",
+    "compilers": "蔣廷錫、陳夢雷等輯",
+    "edition": "內府清雍正四年（1726）銅活字印本",
+    "holding": "中國國家圖書館，善本書號12072",
+    "access_url": "https://commons.wikimedia.org/wiki/File:NLC892-411999021002-92845_欽定古今圖書集成_第3150冊.pdf",
+    "commons_revision": 979686527,
+    "pdf_sha256": "2766952041ab8a829dedcc0404a24dd7c22d0b31d3f549cb66752d42d58c315c",
+    "locator": "PDF第35頁左葉 定行限度法（版心三十三）；第36頁 逐年行限度法（版心三十四）；第37頁 欽天監校正授時過宮度（版心三十五）",
+    "credit": "中國國家圖書館藏；Wikimedia Commons所載原掃描，保留可見水印；PD-scan / Public Domain Mark 1.0"
+  },
+  "nominal_calendar": {
+    "months_per_year": 12,
+    "days_per_month": 30,
+    "days_per_year": 360,
+    "ordinal_origin": [
+      1,
+      1,
+      1
+    ],
+    "origin_meaning": "local_palace_limit_entry_not_birth_age_or_civil_year",
+    "status": "explicit_nominal_ruler_convention_supported_by_selected_table_cells_not_physical_calendar"
+  },
+  "scales": [
+    {
+      "palaces": [
+        "相貌"
+      ],
+      "source_duration_years_exact": "10",
+      "printed_annual_rate_exact": "3",
+      "printed_annual_rate_text": "一年行三度",
+      "printed_month_day_text": "四個月行一度",
+      "months_per_degree": 4,
+      "days_per_degree_remainder": 0
+    },
+    {
+      "palaces": [
+        "官禄"
+      ],
+      "source_duration_years_exact": "15",
+      "printed_annual_rate_exact": "2",
+      "printed_annual_rate_text": "一年行二度",
+      "printed_month_day_text": "六個月行一度",
+      "months_per_degree": 6,
+      "days_per_degree_remainder": 0
+    },
+    {
+      "palaces": [
+        "福德",
+        "妻妾"
+      ],
+      "source_duration_years_exact": "11",
+      "printed_annual_rate_exact": "27207/10000",
+      "printed_annual_rate_text": "一年行二度七十二分七秒",
+      "printed_month_day_text": "四個月十二日行一度",
+      "months_per_degree": 4,
+      "days_per_degree_remainder": 12
+    },
+    {
+      "palaces": [
+        "迁移"
+      ],
+      "source_duration_years_exact": "8",
+      "printed_annual_rate_exact": "15/4",
+      "printed_annual_rate_text": "一年行三度七十五分",
+      "printed_month_day_text": "三個月零六日行一度",
+      "months_per_degree": 3,
+      "days_per_degree_remainder": 6
+    },
+    {
+      "palaces": [
+        "疾厄"
+      ],
+      "source_duration_years_exact": "7",
+      "printed_annual_rate_exact": "857/200",
+      "printed_annual_rate_text": "一年行四度二十八分五十秒",
+      "printed_month_day_text": "二個月二十四日行一度",
+      "months_per_degree": 2,
+      "days_per_degree_remainder": 24
+    },
+    {
+      "palaces": [
+        "奴仆",
+        "男女",
+        "田宅"
+      ],
+      "source_duration_years_exact": "9/2",
+      "printed_annual_rate_exact": "33003/5000",
+      "printed_annual_rate_text": "一年行六度六十分六秒",
+      "printed_month_day_text": "一個月二十四日行一度",
+      "months_per_degree": 1,
+      "days_per_degree_remainder": 24
+    },
+    {
+      "palaces": [
+        "兄弟",
+        "财帛"
+      ],
+      "source_duration_years_exact": "5",
+      "printed_annual_rate_exact": "6",
+      "printed_annual_rate_text": "一年行六度",
+      "printed_month_day_text": "兩個月行一度",
+      "months_per_degree": 2,
+      "days_per_degree_remainder": 0
+    }
+  ],
+  "full_210_printed_cells_collated": false,
+  "modern_calendar_mapping_accepted": false
+}

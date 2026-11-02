@@ -1,0 +1,12 @@
+{
+  "bearing_degrees": 0,
+  "north_reference": "true",
+  "geomagnetic_reference": {
+    "model_id": "wmm2025_v1",
+    "latitude": 80,
+    "longitude": 0,
+    "height_km_wgs84": 0,
+    "decimal_year": 2025.0,
+    "evidence": "NOAA官方数值测试例；非真实房屋或实测方向"
+  }
+}

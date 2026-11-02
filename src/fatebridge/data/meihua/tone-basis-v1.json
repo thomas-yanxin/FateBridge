@@ -1,0 +1,78 @@
+{
+  "id": "meihua_tone_input_v1",
+  "version": "1.0.0",
+  "title": "字占四声输入的音系与原例依据",
+  "scope": "计算依调用方所报平上去入类别；来源声明和与所选原例的类别比较，均不是自动音韵鉴定。不得凭字形、现代拼音调号、一个反切或原例匹配推断全部历史音系。",
+  "selected_worked_example": {
+    "id": "today-activity-nlc1925",
+    "source_id": "nlc_1925_today_tones",
+    "text": "今日動靜如何",
+    "tones": [
+      1,
+      4,
+      3,
+      3,
+      1,
+      1
+    ],
+    "original_pdf_index": 24,
+    "reading_scope": "selected source example explicitly records each tone category; not a universal historical pronunciation lexicon"
+  },
+  "sources": [
+    {
+      "id": "nlc_1925_today_tones",
+      "title": "文明書局《梅花易數》今日動靜如何选段",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+      "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+      "original_pdf_index": 24,
+      "reading_method": "assistant visual selected span, not independent expert or full-book authentication"
+    },
+    {
+      "id": "moe_guangyun_dong",
+      "title": "教育部異體字字典所列廣韻動字片段",
+      "url": "https://dict.variants.moe.edu.tw/book_piece/025/24340.png",
+      "raw_sha256": "6cc1c8ef472e221445235305ce49c69666ce00989bac9855d299a2d5e8e43923",
+      "selected_reading": {
+        "character": "動",
+        "category": "上",
+        "rhyme": "一董",
+        "fanqie": "徒總切"
+      },
+      "used_to_override_meihua_example": false
+    },
+    {
+      "id": "moe_guangyun_jing",
+      "title": "教育部異體字字典所列廣韻靜字片段",
+      "url": "https://dict.variants.moe.edu.tw/book_piece/025/189956.png",
+      "raw_sha256": "85630ed3c6493a95fbf42435b9568bedcc1685c52915b51b368c0e21f4a94075",
+      "selected_reading": {
+        "character": "靜",
+        "category": "上",
+        "rhyme": "四十靜",
+        "fanqie": "疾郢切"
+      },
+      "used_to_override_meihua_example": false
+    },
+    {
+      "id": "sinica_phonological_systems",
+      "title": "小學堂中古音資料庫使用簡介2013",
+      "url": "https://xiaoxue.iis.sinica.edu.tw/zhongguyin/Content/Files/zhongguyin-Get_Started.pdf",
+      "scope": "Primary database documentation distinguishes historical sound systems; not a selected whole-phrase pronunciation lookup"
+    }
+  ],
+  "rules": [
+    {
+      "id": "tone_encoding",
+      "kind": "text_rule",
+      "statement": "平上去入按1/2/3/4计数。不同历史阶段或音系的类别不能由数字相同而视为同一来源。"
+    },
+    {
+      "id": "tone_reference_evidence",
+      "kind": "software_evidence_policy",
+      "statement": "记录调用方声明的音系、来源及读音层次；缺项保持未知，提供声明仍不作独立核验。仅核对所报六字类别是否与已固定原例一致，不自动替换或生成另一卦。"
+    }
+  ],
+  "original_sound_system_identified": false,
+  "whole_dictionary_authenticated": false,
+  "real_world_predictive_efficacy_established": false
+}

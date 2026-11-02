@@ -1,0 +1,82 @@
+{
+  "id": "meihua_seasonal_reading_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局卷二衰旺论所选体气与生克条件",
+  "selected_source": {
+    "id": "nlc_1925",
+    "title": "文明書局《梅花易數》卷二衰旺論选段",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_index": 89,
+    "attribution_scope": "Hosting catalog metadata; no independent authorship authentication"
+  },
+  "section": "衰旺論",
+  "source_character_reading": "assistant visual selected-span reading; not independent human expert review",
+  "rules": [
+    {
+      "id": "body_prefers_wang",
+      "kind": "preference",
+      "quote": "體卦宜盛旺",
+      "target": "body",
+      "preferred_strength": "旺"
+    },
+    {
+      "id": "wang_body_receives_generation",
+      "kind": "joint_condition",
+      "quote": "氣旺而又逢生則吉",
+      "body_strength": "旺",
+      "auxiliary_relation": "用生体",
+      "signal": "favorable_source_symbol"
+    },
+    {
+      "id": "shuai_body_receives_control",
+      "kind": "joint_condition",
+      "quote": "若體衰而逢尅則其凶甚矣",
+      "body_strength": "衰",
+      "auxiliary_relation": "用克体",
+      "signal": "increased_source_constraint"
+    },
+    {
+      "id": "shuai_body_receives_generation",
+      "kind": "joint_condition",
+      "quote": "體衰而有生體之卦則衰稍解",
+      "body_strength": "衰",
+      "auxiliary_relation": "用生体",
+      "signal": "partial_source_relief"
+    },
+    {
+      "id": "supporter_prefers_wang",
+      "kind": "preference",
+      "quote": "生體之卦氣亦宜旺",
+      "target_relation": "用生体",
+      "preferred_strength": "旺"
+    },
+    {
+      "id": "attacker_prefers_shuai",
+      "kind": "preference",
+      "quote": "尅體之卦氣宜衰",
+      "target_relation": "用克体",
+      "preferred_strength": "衰"
+    }
+  ],
+  "unresolved_clause": {
+    "quote": "重遇尅則凶",
+    "scope": "重 has no adjudicated count threshold or role-occurrence denominator. Not implemented as count>=2 or vote."
+  },
+  "same_book_comparison": {
+    "volume": 3,
+    "section": "體用衰旺之訣",
+    "fixed_transcription_revision": 1441927,
+    "quote": "此得令之卦，乘旺之氣，雖有他卦克之，亦無大害。",
+    "adjudication": "No automatic priority or cancellation between chapters; selected volume2 rules only, no net verdict."
+  },
+  "scope": [
+    "Use existing month-branch strength labels only; source month/day joint synthesis not implemented",
+    "原文未定 and missing month are unknown, not neutral or weak",
+    "Body and supporter strength preferences are independent desiderata, not a requirement that both elements be 旺 simultaneously",
+    "Internal controls may constrain support or attack; retain them, no recursive cancellation",
+    "No all-chapter, actual model or real-world prediction acceptance"
+  ],
+  "independent_human_expert_review": false,
+  "predictive_efficacy_established": false
+}

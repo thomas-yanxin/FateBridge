@@ -105,3 +105,30 @@ def test_extrareturns_reports_recent_and_next_for_each_body():
             item["most_recent_return"]["datetime_utc"]
             < item["next_return"]["datetime_utc"]
         )
+
+
+def test_cardinal_ingress_cast_is_on_the_entered_side_of_each_sign_boundary():
+    expected = {
+        "春分": (0.0, "Aries"),
+        "夏至": (90.0, "Cancer"),
+        "秋分": (180.0, "Libra"),
+        "冬至": (270.0, "Capricorn"),
+    }
+    for term, (target, sign) in expected.items():
+        result = calculate_mundane(
+            year=2026,
+            ingress_term=term,
+            longitude=116.4,
+            latitude=39.9,
+            timezone_name="Asia/Shanghai",
+        )
+        assert "error" not in result
+        sun = result["mundane"]["points"]["sun"]
+        assert sun["sign"] == sign
+        assert 0 <= (sun["longitude"] - target) % 360 < 1e-6
+        assert 0 <= sun["absolute_degree"] < 360
+        assert 0 <= sun["degree"] < 30
+        assert (
+            result["mundane"]["calculation_basis"]["julian_day_tt"]
+            > result["mundane"]["calculation_basis"]["julian_day_ut1"]
+        )

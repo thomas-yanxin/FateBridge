@@ -371,10 +371,10 @@ def test_metadata_failures_are_internal_and_correlated_in_all_transports(
     else:
         original = execution.validate_output
 
-        def validate(spec, result):
+        def validate(spec, result, **kwargs):
             if "run_metadata" in result:
                 raise execution.OutputContractError("private-server-error")
-            return original(spec, result)
+            return original(spec, result, **kwargs)
 
         monkeypatch.setattr(execution, "validate_output", validate)
 

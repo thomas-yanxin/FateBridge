@@ -50,11 +50,13 @@ def test_normalize_accepts_canonical_keys():
     assert normalize_house_system("whole_sign") == "W"
 
 
-def test_unknown_still_falls_back_to_default():
-    # Out-of-range integers and gibberish keep the documented fallback so a
-    # typo can't masquerade as a valid system.
-    assert normalize_house_system(99) == "P"
-    assert normalize_house_system("not-a-system") == "P"
+def test_unknown_never_substitutes_a_default_chart():
+    # Explicit invalid selectors fail; only a missing override uses a default.
+    with pytest.raises(ValueError):
+        normalize_house_system(99)
+    with pytest.raises(ValueError):
+        normalize_house_system("not-a-system")
+    assert normalize_house_system(None, default="R") == "R"
     assert normalize_house_system(0, default="R") == "W"  # valid code wins over default
 
 
@@ -132,7 +134,7 @@ def test_house_system_fields_descriptor():
         "house_system_code": 3,
         "house_system_label_zh": "Placidus",
     }
-    assert house_system_fields(8)["house_system_label_zh"] == "天顶为10宫中点等宫制"
+    assert house_system_fields(8)["house_system_label_zh"] == "天顶为第10宫宫头的等宫制"
     # A letter outside the 0..8 set still gets a readable label, code=None.
     assert house_system_fields("C") == {
         "house_system": "C",

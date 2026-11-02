@@ -1,0 +1,140 @@
+{
+  "id": "t1796_t2216_phase_clock_selected_v1",
+  "sources": [
+    {
+      "id": "T1796",
+      "title": "大毘盧遮那成佛經疏 卷4",
+      "source_header_author_literal": "沙門一行阿闍梨記",
+      "publisher": "CBETA",
+      "format": "CBETA_TEI",
+      "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T39/T39n1796.xml",
+      "publisher_commit": "dbdea41071e1e260ad84b72faefd4587333cf76d",
+      "capture_sha256": "716a298b26545627baf773ac481933f7792df944a4693f106a97435cd6f11a92",
+      "capture_bytes": 2990454,
+      "selected_quotations": [
+        {
+          "id": "phase_condition",
+          "first_line": "0617c22",
+          "last_line": "0618a05",
+          "locator": "T39n1796_p0617c22-0618a05",
+          "literal": "吉日警發地神。餘法事例可知耳。良日晨者，謂作法當用白分月，就中一日三日五日七日十三日皆為吉祥，堪作漫荼羅。又月八日十四日十五日最勝，至此日常念誦，亦應加功也。定日者，西方曆法通計小月合當何日，若小月在白分內者，其月十五日即屬黑分，不堪用也。又曆法通計日月平行度作平朔，皆合一小一大，緣日月於平行中又更有遲疾，或時過於平行、或時不及平行，所以定朔或進退一日、定望或在十四日或在十六日。大抵月望正圓滿時名為白分十五日，月正半如弦時亦為八日。但以此准約之即得定日也。時分者，西方曆法晝夜各有三十時，一一",
+          "reading_scope": "Selected CBETA Taisho main text; not whole apparatus or manuscript collation."
+        },
+        {
+          "id": "time_wording",
+          "first_line": "0618a05",
+          "last_line": "0618a08",
+          "locator": "T39n1796_p0618a05-08",
+          "literal": "日也。時分者，西方曆法晝夜各有三十時，一一時別有名號，如晝日即量影長短計之，某時作事則吉、某時則凶、某時中平，各各皆有像類。言宿直者，謂二十七宿也。分周天作十二房，",
+          "reading_scope": "Selected time wording; does not independently resolve the meaning of each."
+        }
+      ]
+    },
+    {
+      "id": "T2216",
+      "title": "大日經疏演奧鈔 卷5",
+      "publisher": "SAT electronic Taisho",
+      "format": "SAT_HTML",
+      "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?mode=detail&nonum=&kaeri=&mode2=2&useid=2216_,59,0049a01&cpos=",
+      "capture_sha256": "47dfbdebff129cf2abda059bf0e4ebe30e5cbcf1fdd9c972cb9cf07d37f460ba",
+      "capture_bytes": 183568,
+      "capture_line_extent": [
+        "0042a01",
+        "0052c29"
+      ],
+      "selected_quotations": [
+        {
+          "id": "morning_character",
+          "first_line": "0049b23",
+          "last_line": "0049c09",
+          "locator": "T2216_.59.0049b23-0049c09",
+          "literal": "白月一三五七等日皆爲良日。於此等日。以晨朝時可起首作法也。蘇悉地經中云。晨朝澡浴著白淨衣。以稻穀花及青倶蔞草香美白花。供養所作曼荼羅地明本四之六依之當段經疏共用晨字。是即平明時也。下祕釋意良晨者。謂表行者初發菩提心也。背暗向明其義相應。然諸部經軌多作良辰。辰字總通日月星三曜也。或通子丑等十二支也。若依晨字。良日乃晨可訓之。若就辰字。良日晨可訓之。但考字書晨辰大異。不可通用晨丞眞切。説文晨早昧爽也。又慈隣切旦也小補平眞辰丞眞切。魯語天之三辰帝嚳能序之。三辰日月星也。又禮記月令。乃擇元辰天子親載耒耜。註疏云。子丑寅卯等謂之辰同上五行大義第一云。有事於天則用日。有事於地則用辰。陰陽之別。故有支",
+          "reading_scope": "Commentarial explanation of ritual morning and 晨/辰, with embedded quotations retained. Not a universal civil day-start rule."
+        },
+        {
+          "id": "phase_commentary",
+          "first_line": "0050b15",
+          "last_line": "0050c05",
+          "locator": "T2216_.59.0050b15-0050c05",
+          "literal": "若小月在白分等者。十卷本云。若小月合在白分内者等。宿曜經上云。天竺毎一月分爲兩分從朔至望爲白月分。從望至晦爲黒月分同下云。西國毎一月分爲白黒兩分。入月一日至十五日爲白月分以其光生漸明白之謂也入月十六日至三十日爲黒月分以其光漸減損暗黒之謂也西域記第二云。月盈至滿。謂之白分。月虧至晦。謂之黒分。黒分或十四日十五日。月有大小故也。黒前白後。合爲一月。六月合爲一行也。日遊在内北行也。日遊在外南行也。總此二行合爲一歳二左般若寺疏鈔第一云。私云。天竺暦法。以十五日爲一月。又以黒月爲始。以白月爲後。龍樹云。後月漸増。至十五日圓滿無礙云云餘例甚多也可悉上之五十一私云。月望正圓滿位在十四日。則小月在白分故。其月十五日以屬黒分也又暦法通計等者。義釋雜鈔智證第一云。又暦法通計日月○一小一大。此一行如何。縁日月於平府中○或在十六日。此一段句句未會云云些些疑文同之平朔者。光云謂大小平均之朔也。",
+          "reading_scope": "Nested quotations and private comments kept as this commentary; quoted original exemplars not independently acquired."
+        },
+        {
+          "id": "thirty_time_debate",
+          "first_line": "0051c24",
+          "last_line": "0052b14",
+          "locator": "T2216_.59.0051c24-0052b14",
+          "literal": "準約者。或本作準的。二本義釋作準約。光云。準謂準度。約謂約計。即測月弦望而以定日也晝夜各有三十時等者。第一云。一周晝夜。各有初中後分。乃至三十時本之十六翻譯名義集云。日藏云。我今復説刹那之數。一千六百刹那名一迦羅。六十迦羅名模呼律多。三十模呼律多爲一日夜二之五十六右智論第四十八云。日名從旦至旦。初分中分後分。夜亦三分。一日一夜有三十時。春秋分時十五時屬晝。十五時屬夜。餘時増減五月至晝十八時。夜十二時。十一月至夜十八時。晝十二時。二十九右些些疑文云。西方歴法。晝夜各有三十時。或有經中。日夜通計合有三十時。未審晝夜各有三十時云云疏鈔智證云。又第四卷云。西方暦法。晝夜各有三十時。一一時別有名號云云今撿西域記云。時極短者謂刹那也。百二十刹那爲一怛刹那。六十怛刹那爲一臘縛。三十臘縛爲一牟呼栗多。五牟呼栗多爲一時。六時合成一日一夜晝三夜三居俗日夜分爲八時晝四夜四。於一一時各有四分又倶舍頌云。百二十刹那爲怛刹那量。臘縛此六十。此三十須臾。此三十晝夜。三十晝夜月。十二月爲年。於中半減夜文今案倶舍須臾西域牟呼栗多。彼此量同。以此牟呼栗多五箇經於日夜。合六時即成五六十也。若日夜各有三十時者。日夜三時。各各具二合十二時。此日之六時。各加五牟呼栗多。即五六三十也。夜亦如是。故言日夜各有時。又疏文云各有初中後分乃至三十時等。今亦案之。初中後三分。各通於晝夜。合成六時。各各具十。故歴日夜即成六十。即以此數。一一各計至於三十也。今案各字勢。可通冠三十字也。第四卷中。云日夜各有三十時故。又初中後時各可有二分。合成六時。六時各五成五六三十也。即與前案不相異也。其意爲一已上疏鈔上一件尚未詳私云。疏鈔兩釋中初釋。依西域記倶舍等説。後釋本據尚未分明。如彼釋者。以五箇牟呼栗多爲半時。而不可爲一時也。然乃乖角此疏釋例。次下文云。合爲三十心。於此三十牟呼栗多中等八左可知之。問。初義難思。晝夜各有三十時釋。各之字勢分明。何晝夜通計可成三十時乎。答。或料簡云。次下釋云。食前時者。晝夜各有三時等七右此是三時。晝夜通計論之。晝夜總各故云各也。但彼釋相。亦約晝夜六時歟。其義至彼文處而可悉之。或鈔云。依舍頭諫經説。即晝夜合三十時也。此經摩㔁迦女經異本。一一時有其名。隨名字有吉凶。皆有像類。如",
+          "reading_scope": "Retain debate over 各 and whole-cycle counts, quoted glosses and explicit unresolved phrases; do not collapse to one accepted clock."
+        }
+      ],
+      "transcription_note": "Remove publisher footnote-button numerals before extracting visible lines; preserve selected inline material. No facsimile glyph acceptance."
+    }
+  ],
+  "phase_day_distinction": {
+    "civil_numbering_is_the_current_T1299_name_basis": true,
+    "conditional_source_case": {
+      "condition_literal": "若小月在白分內者",
+      "consequence_literal": "其月十五日即屬黑分",
+      "source_id": "T1796",
+      "quote_id": "phase_condition",
+      "assumed_civil_day_number": 15,
+      "ritual_half_under_stated_condition": "黑",
+      "condition_established_by_civil_month_length_alone": false
+    },
+    "phase_reference": {
+      "full_moon_civil_day_examples": [
+        14,
+        16
+      ],
+      "full_moon_source_name": "白分十五日",
+      "quarter_source_name": "八日",
+      "source_id": "T1796",
+      "quote_id": "phase_condition",
+      "modern_12_degree_tithi_model_defined_by_selected_text": false
+    },
+    "commentarial_case": {
+      "full_moon_at_civil_day": 14,
+      "next_civil_day": 15,
+      "next_day_half_under_stated_condition": "黑",
+      "source_id": "T2216",
+      "quote_id": "phase_commentary"
+    },
+    "actual_phase_or_tithi_computed": false,
+    "birth_day_or_mansion_overridden": false
+  },
+  "morning_reference": {
+    "source_id": "T2216",
+    "quote_id": "morning_character",
+    "selected_character_pair": [
+      "晨",
+      "辰"
+    ],
+    "morning_gloss_literal": "是即平明時也",
+    "character_distinction_literal": "但考字書晨辰大異。不可通用",
+    "scope": "Ritual morning wording versus broad 辰 usage; not the clock at which all dates or weekdays change.",
+    "universal_day_boundary_established": false,
+    "fixed_modern_clock_or_solar_altitude_established": false
+  },
+  "time_wording_reference": {
+    "T1796_literal": "西方曆法晝夜各有三十時",
+    "T2216_question_literal": "日夜通計合有三十時",
+    "T2216_unresolved_literals": [
+      "上一件尚未詳",
+      "後釋本據尚未分明"
+    ],
+    "selected_debate_resolved": false,
+    "accepted_modern_minutes_per_time_unit": null,
+    "T1299_day_eight_night_eight_replaced": false,
+    "hinoo_half_mapping_established": false
+  },
+  "scope": {
+    "only_selected_publisher_text": true,
+    "whole_work_or_independent_manuscript_collation": false,
+    "nested_quoted_originals_independently_acquired": false,
+    "new_independent_historical_observations": 0,
+    "historical_clock_mapping_established": false,
+    "leap_short_month_priority_established": false,
+    "real_world_efficacy_established": false
+  }
+}

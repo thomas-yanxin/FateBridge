@@ -1,0 +1,201 @@
+{
+  "id": "naj_ming_auxiliaries_v1",
+  "version": "1.0.0",
+  "title": "新鋟希夷陳先生紫微斗数全書",
+  "source_url": "https://www.digital.archives.go.jp/item/4468520",
+  "printed_volume": "三",
+  "manual_reader_count": 1,
+  "methods": [
+    {
+      "id": "chang_qu",
+      "frame": 75,
+      "section": "安文昌文曲星訣",
+      "quote": "子時戌上起文昌 逆到生時是貴鄉 文曲數從辰上起 文曲星從辰上起子時若人生子時就在辰宮安若丑時順去巳宮安之",
+      "input_axis": "hour",
+      "rows": [
+        {
+          "star": "文昌",
+          "anchor": "戌",
+          "direction": "reverse"
+        },
+        {
+          "star": "文曲",
+          "anchor": "辰",
+          "direction": "forward"
+        }
+      ]
+    },
+    {
+      "id": "fu_bi",
+      "frame": 75,
+      "section": "安左輔右弼星訣",
+      "quote": "左輔從辰上起正月順行如正月生者就辰宮安之二月在巳宮右弼從戌宮逆轉如正月就戌宮安之二月在酉宮餘倣此",
+      "input_axis": "month",
+      "rows": [
+        {
+          "star": "左辅",
+          "anchor": "辰",
+          "direction": "forward"
+        },
+        {
+          "star": "右弼",
+          "anchor": "戌",
+          "direction": "reverse"
+        }
+      ]
+    },
+    {
+      "id": "kong_jie",
+      "frame": 77,
+      "section": "天空地劫訣",
+      "quote": "亥上起子順安劫 逆面便是天空鄉 如子時生者劫空俱在亥宮若丑時生者劫順在子宮空逆在戌宮",
+      "input_axis": "hour",
+      "rows": [
+        {
+          "star": "地劫",
+          "anchor": "亥",
+          "direction": "forward"
+        },
+        {
+          "star": "地空",
+          "anchor": "亥",
+          "direction": "reverse"
+        }
+      ]
+    },
+    {
+      "id": "xing_yao",
+      "frame": 78,
+      "section": "安天刑天姚星訣",
+      "quote": "天刑星從酉上起正月順至本生月安之天姚從丑上起正月順至本生月安之",
+      "input_axis": "month",
+      "rows": [
+        {
+          "star": "天刑",
+          "anchor": "酉",
+          "direction": "forward"
+        },
+        {
+          "star": "天姚",
+          "anchor": "丑",
+          "direction": "forward"
+        }
+      ]
+    },
+    {
+      "id": "tai_zuo",
+      "frame": 78,
+      "section": "安三台八座二星訣",
+      "quote": "三台尋左輔將初一日加在左輔宮順數至本生日安之八座尋右弼將初一加在右弼宮逆數至本生日安之是也",
+      "input_axis": "day_from_month_star",
+      "rows": [
+        {
+          "star": "三台",
+          "anchor": "辰",
+          "direction": "forward",
+          "via_star": "左辅"
+        },
+        {
+          "star": "八座",
+          "anchor": "戌",
+          "direction": "reverse",
+          "via_star": "右弼"
+        }
+      ]
+    },
+    {
+      "id": "taifu_fenggao",
+      "frame": 78,
+      "section": "安台輔訣與安封誥訣",
+      "quote": "從午宮起子順數至本生時安之 從寅宮起子順數至本生時安之",
+      "input_axis": "hour",
+      "rows": [
+        {
+          "star": "台辅",
+          "anchor": "午",
+          "direction": "forward"
+        },
+        {
+          "star": "封诰",
+          "anchor": "寅",
+          "direction": "forward"
+        }
+      ]
+    },
+    {
+      "id": "ku_xu",
+      "frame": 78,
+      "section": "安天哭天虛星訣",
+      "quote": "天哭天虛起午宮 午宮起子兩分踪 哭逆巳兮虛順未 數到生年便居中",
+      "input_axis": "year_branch",
+      "rows": [
+        {
+          "star": "天哭",
+          "anchor": "午",
+          "direction": "reverse"
+        },
+        {
+          "star": "天虚",
+          "anchor": "午",
+          "direction": "forward"
+        }
+      ]
+    },
+    {
+      "id": "long_feng",
+      "frame": 78,
+      "section": "安龍池鳳閣訣",
+      "quote": "龍池子順辰 鳳閣子戌逆",
+      "input_axis": "year_branch",
+      "rows": [
+        {
+          "star": "龙池",
+          "anchor": "辰",
+          "direction": "forward"
+        },
+        {
+          "star": "凤阁",
+          "anchor": "戌",
+          "direction": "reverse"
+        }
+      ]
+    }
+  ],
+  "fire_bell": {
+    "frame": 76,
+    "section": "安火鈴二星訣",
+    "quote": "寅午戌人丑卯方 申子辰人寅戌揚 巳酉丑人卯戌位 亥卯未人酉戌房",
+    "pairs": [
+      {
+        "branches": "寅午戌",
+        "pair_as_written": "丑卯"
+      },
+      {
+        "branches": "申子辰",
+        "pair_as_written": "寅戌"
+      },
+      {
+        "branches": "巳酉丑",
+        "pair_as_written": "卯戌"
+      },
+      {
+        "branches": "亥卯未",
+        "pair_as_written": "酉戌"
+      }
+    ],
+    "hour_instruction_status": "not_stated_in_this_passage",
+    "pair_assignment_note": "Pair order follows 火/鈴 in the title; this is an explicit reading convention. No 子時 anchor or hour progression is certified by the verse alone."
+  },
+  "name_mapping": {
+    "source_天空": "runtime_地空",
+    "software_天空": "separate_unchecked_star"
+  },
+  "leap_month_status": "No explicit leap-month policy for these monthly auxiliaries in the selected passages. Monthly and month-day expectations remain unresolved for leap inputs; do not import the Ming/Shen leap rule.",
+  "limits": [
+    "One edition and one manual reader, no independent expert double adjudication.",
+    "Eight full directional rules covering sixteen stars; fire/bell verse provides four pairs only, not complete hour-dependent placements.",
+    "Supplied lunar month/day, year branch and hour branch are conditional inputs; no calendar/timezone/hour conversion certification.",
+    "Leap input expectations for six monthly/month-day stars are unknown. Their actual stars are still computed by the selected software/excerpt conventions.",
+    "No complete auxiliary catalogue, whole-book profile, interpretation or empirical efficacy acceptance."
+  ]
+}

@@ -44,10 +44,12 @@ def test_rest_case_map_covers_all_business_routes():
         and not route.path.startswith("/redoc")
     }
     # Result readers take opaque IDs from a prior calculation, so their live
-    # success/auth/error cases are in test_result_delivery, not static GETs.
+    # success/auth/error cases are in test_result_delivery and
+    # test_ziwei_twenty_third_iteration (verified reads), not static GETs.
     result_reader_paths = {
         "/api/results/{result_id}",
         "/api/results/{result_id}/pages",
+        "/api/results/{result_id}/verified",
     }
     expected_paths = set(REST_GET_CASES) | set(REST_POST_CASES) | result_reader_paths
 

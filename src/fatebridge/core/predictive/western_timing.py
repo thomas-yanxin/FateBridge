@@ -54,6 +54,7 @@ def _resolve_western_timing_return_location(
 
 def _build_western_timing_natal_reference(natal_subject: Any) -> Dict[str, Any]:
     natal_reference = extract_reference_points(natal_subject)
+    natal_reference["calculation_basis"] = natal_subject.calculation_basis
     sect = determine_sect(natal_subject)
     natal_reference["sect"] = {"key": sect, "label": sect_label(sect)}
     natal_reference["lots"] = build_lot_payloads(natal_subject)
@@ -440,6 +441,7 @@ def build_western_timing_payload(
         zodiac_type=zodiac_type,
     )
     natal_reference = extract_reference_points(natal_subject)
+    natal_reference["calculation_basis"] = natal_subject.calculation_basis
     sect = determine_sect(natal_subject)
     natal_reference["sect"] = {"key": sect, "label": sect_label(sect)}
     natal_reference["lots"] = build_lot_payloads(natal_subject)

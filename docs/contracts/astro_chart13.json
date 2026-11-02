@@ -1,0 +1,351 @@
+{
+  "call_guidance": {
+    "birth_seconds": "Pass birth_second only from an actually recorded clock or an explicitly identified historical clock conversion. Omission represents the start of the supplied minute, not evidence of exact seconds. Seconds propagate to UTC/TT/UT1, birth-time samples and optional directions; no outcome-driven rectification. Generic astro_chart admits recorded seconds for germany/chart13/india_chart; use the current published variant schema for its other clock options.",
+    "birth_time_uncertainty": "Pass user-confirmed birth_time_uncertainty_minutes (0..120), then read time_sensitivity. None is unknown, not exact. Samples vary recorded UTC before optional solar correction. Do not use event outcomes to choose a birth time, or report sample frequencies as confidence probabilities.",
+    "clock_basis": "Use birth_clock_basis=civil for a recorded civil zone clock. Only an explicitly identified historical LMT/LAT record may select local_mean_solar/local_apparent_solar, with birth_timezone omitted and use_true_solar_time=false. These are input labels, not extra accuracy switches. Read actual person_info.clock_conversion (Germany under base_chart): input label, modeled physical UTC/UT1/TT, longitude, Sun/EOT where used, source/model and numerical residual. The UTC-named carrier before1960 is historical UT1, not atomic UTC. Never infer an ambiguous OZ basis or choose one by fitting positions/outcomes; a small numerical residual does not certify record precision or measured Earth rotation.",
+    "geometry": "sector13 is an ascendant-relative equal partition, independent of the twelve-house selection; IAU constellations have different boundaries.",
+    "house_roles": "Keep the selected base-chart12-house system separate from native reference-angle extraction, Meridian cusps and the custom13-sector partition. In the current numeric policy hsys1 is Alcabitus (SwissB), never Equal. Read actual chart_profile.house_system/house_system_code/house_system_label_zh; do not label a whole chart from a backend reference-angle call. reference_angle_model.house_code=E with cusp_output_used=false records only ASC/MC/ARMC extraction; samples carry their own model, and Germany solar-arc profile reuses the natal model. meridian_houses.profile.house_code=X identifies the separate RA cusp construction. fatebridge_equal13_v1 is the custom partition, independent of the selected12-house system. Unrecorded roles remain unknown; these labels do not establish original-text or predictive validity.",
+    "physical_ephemeris": "Read chart_profile.physical_ephemeris_source for the actual nominal physical-body models, observed file hashes, ranges and DE headers; the analytical node is separate. Read time_sensitivity.physical_ephemeris_sources and each sample index for the grid. Nominal and sampled source cohorts are checked together, so a changing model or data edition cannot be interpreted as pure birth-time sensitivity. Source failures are error_code=ephemeris_source_inconsistent with named issues at runtime.ephemeris_data and retryable=false. Repair the runtime data, retain the original interval and repeat; source hashes are not accuracy certification or proof of atomic reads. ephemeris_model_scope=physical_bodies excludes the analytical mean node from physical model summaries; read nonphysical_factor_models and the node model swisseph_analytical_mean_node separately. Midpoint native_return_flags can echo the requested model and do not prove a vector-file source. A failed node still affects engine precision. Explicit strict JPL selection also governs the native Hamburg loop and fixed-star Earth observer; a limited kernel subset test does not certify full epoch coverage.",
+    "reference_angle_qualification": "When sector_profile.status=underdetermined_ascendant, no unique ASC-relative13-sector assignment exists: planets.sector13 and profile.anchor_longitude are null, thirteen_sectors is empty. backend_convention_* fields preserve replay values only. A null sector_by_sample is unknown, not a sector or absent condition; preserve every sample and computed_sample_count/unresolved_sample_count. Do not summarize known samples as full-interval stability or a probability. Ill-conditioned but resolved intersections and geographic-pole conventions retain their explicit angle_definition."
+  },
+  "evidence_views": {
+    "aspect_motion": {
+      "fields": [
+        "person_info",
+        "planets",
+        "aspects",
+        "classical_patterns"
+      ],
+      "purpose": "Instantaneous longitude motion only; inspect application_policy and aspect_motion before interpreting light configurations. No future perfection or complete source-method acceptance; not an event probability. Bodily latitude status is a separate bounded Western I.24 condition, possibly missing; it does not establish full bodily application.",
+      "when": "用户询问入相／出相、精确成相或光的传递／聚集；核对当前黄经与相对速度，精确、同速和速度未知分别保留。"
+    },
+    "clock_basis": {
+      "fields": [
+        "person_info"
+      ],
+      "purpose": "Explicit input civil/LMT/LAT basis and physical-time conversion only. Never infer a historical basis; numerical resolution is not record accuracy or measured EOP."
+    },
+    "data_files": {
+      "fields": [
+        "ephemeris_data_policy"
+      ],
+      "scope": "Available when ephemeris_policy=require_data_files. Read the actual observed physical models, file hashes, reference zeros and private-worker reports. Native event-internal reads, fixed-star catalogue formulae and absolute accuracy are not certified. This card does not set the input policy."
+    },
+    "geometry": {
+      "fields": [
+        "chart_profile",
+        "sector_profile",
+        "planets",
+        "thirteen_sectors",
+        "interpretation.variant_note",
+        "time_sensitivity.status",
+        "time_sensitivity.uncertainty_minutes",
+        "person_info"
+      ],
+      "purpose": "Custom 13 equal sectors; not astronomical constellation membership"
+    },
+    "solar_conditions": {
+      "fields": [
+        "person_info",
+        "chart_profile",
+        "planets",
+        "classical.solar_condition_policy",
+        "classical.planets"
+      ],
+      "purpose": "Named Lilly solar definitions only: 17 arcminutes, same-sign 8.5-degree combustion, 17-degree beams. Keep the contradictory printed ten-degree example and explicit boundary convention unresolved; no whole-page or event-validity certification.",
+      "when": "询问日心、焦伤或日下；先核对Lilly 1647第113页的明文定义、同星座条件、实际状态及未解决的原文示例冲突。"
+    },
+    "time_sensitivity": {
+      "fields": [
+        "time_sensitivity",
+        "person_info"
+      ],
+      "purpose": "Recomputed user-confirmed birth-time interval on a UTC grid <=30 seconds. Missing interval is unknown. Sampled stability is neither a continuous interval proof nor a probability; inspect nominal interpretations/partitions separately."
+    }
+  },
+  "first_view": {
+    "fields": [
+      "chart_profile",
+      "sector_profile",
+      "planets",
+      "thirteen_sectors",
+      "interpretation.variant_note",
+      "time_sensitivity.status",
+      "time_sensitivity.uncertainty_minutes",
+      "person_info"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "birth_clock_basis": {
+        "default": "civil",
+        "description": "Basis of the supplied birth clock, not a display preference. civil uses birth_timezone. Explicit local_mean_solar/LMT or local_apparent_solar/LAT uses longitude and modeled UT1/TT; omit birth_timezone and keep use_true_solar_time=false to avoid applying another correction. Never infer the basis of an ambiguous historical record by fitting a chart.",
+        "enum": [
+          "civil",
+          "local_mean_solar",
+          "local_apparent_solar"
+        ],
+        "type": "string"
+      },
+      "birth_day": {
+        "description": "Birth day (1-31)",
+        "maximum": 31,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "birth_hour": {
+        "description": "Birth hour (0-23)",
+        "maximum": 23,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_latitude": {
+        "anyOf": [
+          {
+            "maximum": 90,
+            "minimum": -90,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth latitude. Optional for core chart endpoints when FateBridge can infer it from a supported birth_place."
+      },
+      "birth_longitude": {
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth longitude. Optional for core chart endpoints when FateBridge can infer it from a supported birth_place."
+      },
+      "birth_minute": {
+        "default": 0,
+        "description": "Birth minute (0-59)",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_month": {
+        "description": "Birth month (1-12)",
+        "maximum": 12,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "birth_place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "Birth place"
+      },
+      "birth_second": {
+        "default": 0,
+        "description": "Recorded birth second (0..59), for Germany/equal13 charts. Omission represents the start of the supplied minute, not proof of second-level birth-time accuracy. Preserve the user's stated precision and uncertainty; do not infer missing seconds from outcomes.",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_time_uncertainty_minutes": {
+        "anyOf": [
+          {
+            "maximum": 120,
+            "minimum": 0,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "User-confirmed +/- minutes around the recorded birth instant. None means unknown, not exact. Recalculates factors and the published source pattern / equal13 assignments on a UTC grid no wider than 30 seconds; samples are not a continuous-interval proof or probabilities."
+      },
+      "birth_timezone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth timezone (IANA name or UTC offset). May be resolved from a supported birth_place; Western charts reject an unresolved civil timezone. Coordinates cannot establish the recorded zone. Explicit UTC is valid; never infer a historical basis by fitting a chart. Indian charts also require a resolved civil timezone."
+      },
+      "birth_year": {
+        "description": "Birth year, e.g., 1990",
+        "type": "integer"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "ephemeris_policy": {
+        "default": "auto",
+        "description": "auto retains and reports actual available models. require_data_files rejects analytical/orbital fallback for observed physical coordinates throughout the request, including clocks and samples; checks data contexts and endpoint hashes. Native rise/set query/result epochs are probed, but internal solver reads are not fully observable. Analytical points, fictitious elements, reference zeros and Earth rotation are separate; this is not an astronomical-accuracy or prediction certificate.",
+        "enum": [
+          "auto",
+          "require_data_files"
+        ],
+        "type": "string",
+        "x-fatebridge-western-data-policy": true
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "gender": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未知",
+        "description": "性别（可选，仅用于结果标识；西方星盘计算不使用性别）。接受此字段是为了让同一套出生信息可以原样喂给八字/紫微/星盘等工具，避免批量调用时'有的工具收、有的不收'造成的反复试错。"
+      },
+      "hsys": {
+        "anyOf": [
+          {
+            "maximum": 8,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional offline house system override; if omitted, FateBridge keeps each chart variant's historical default. Explicit values currently support 0=whole_sign, 1=Alcabitus, 2=Regiomontanus, 3=Placidus, 4=Koch, 5=Vehlow Equal, 6=Polich Page, 7=Sripati, 8=equal_mc Explicit values must be integer codes0..8; boolean, floating-point, blank and out-of-range values are rejected."
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "Name (optional)"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "use_true_solar_time": {
+        "default": false,
+        "description": "Rebase the birth clock onto true solar time (longitude + equation of time). Default OFF: western astrology conventionally casts on the recorded civil (zone) clock time. Set true to align the western chart with the BaZi engine's apparent-solar instant. Guolao and Indian charts preserve the recorded civil instant and report the solar clock separately.",
+        "type": "boolean"
+      },
+      "zodiacal": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional offline zodiac override; if omitted, FateBridge keeps each chart variant's historical default. Explicit values currently support 0=tropical and 1=sidereal(Lahiri-like)"
+      }
+    },
+    "required": [
+      "birth_year",
+      "birth_month",
+      "birth_day",
+      "birth_hour"
+    ],
+    "type": "object"
+  },
+  "tool": "astro_chart13"
+}

@@ -1,0 +1,162 @@
+{
+  "id": "sukuyo_source_specific_waterclock_v1",
+  "sources": [
+    {
+      "capture_file": "T2125.xml",
+      "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T54/T54n2125.xml",
+      "sha256": "2d555d871e45388785f2e07e6a86d0d5657ce40df09295efda4212e67fec8ea9",
+      "bytes": 668411,
+      "format": "CBETA_TEI"
+    },
+    {
+      "capture_file": "T1299.xml",
+      "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T21/T21n1299.xml",
+      "sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+      "bytes": 387099,
+      "format": "CBETA_TEI"
+    },
+    {
+      "capture_file": "T2216-0058.html",
+      "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/T2216_,59,0058a01:2216_,59,0059a01.html",
+      "sha256": "c178d2016d427b7497e576da83f3ab9a8286add83d30294c5255750484898f6e",
+      "bytes": 34663,
+      "format": "SAT_HTML"
+    },
+    {
+      "capture_file": "T2216-0233.html",
+      "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/T2216_,59,0233a01:2216_,59,0234a01.html",
+      "sha256": "df54d7049fff76809117e6785eba47995f81af63e9fe884a0f52d49c9c43ca66",
+      "bytes": 34938,
+      "format": "SAT_HTML"
+    }
+  ],
+  "T2125": {
+    "title": "南海寄歸內法傳 卷三",
+    "author_literal": "翻經三藏沙門義淨撰",
+    "edition": "Named CBETA adopted Taisho electronic text at pinned commit, not independent print/manuscript collation.",
+    "selected_complete_context_locator": "T54n2125_p0225c11-0226a28",
+    "selected_quotations": {
+      "local_context": {
+        "literal": "然贍部洲中影多不定，隨其方處量有參差。即如洛州無影，與餘不同。又如室利佛逝國，至八月中以圭測影不縮不盈，日中人立並皆無影，春中亦爾，一年再度日過頭上。若日南行，則北畔影長二尺三尺；日向北邊，南影同爾。神州則南溟北朔更復不同，北戶向日是其恒矣。又海東日午、關西未中，准理既然事難執一，是故律云「遣取當處日中」以為定矣。",
+        "locator": "0225c11-19"
+      },
+      "nalanda": {
+        "literal": "是曰律師矣。又復西國大寺皆有漏水，並是積代君王之所奉施，并給漏子為眾警時。下以銅盆盛水，上乃銅椀浮內。其椀薄妙可受二升，孔在下穿水便上涌，細若針許量時准宜。椀水既盡，沈即打鼓。始從平旦，一椀沈打鼓一下，兩椀兩下，三椀三下，四椀四下，然後吹螺兩聲更別打一下，名為一時也，即日東隅矣。更過四椀同前打四，更復鳴螺，別打兩下，名兩時，即正午矣。若聞兩打則僧徒不食；若見食者，寺法即便驅擯。過午後兩時，法亦同爾。夜有四時與晝相似，總論一日一夜成八時也。若初夜盡時，其知事人則於寺上閣鳴鼓以警眾，此是那爛陀寺漏法。又日將沒時及天曉時，",
+        "locator": "0225c24-0226a08"
+      },
+      "other_places": {
+        "literal": "打健稚。有四五之別，廣如餘處。其莫訶菩提及俱尸那寺，漏乃稍別，從旦至中椀沈十六。若南海骨崙國，則銅釜盛水穿孔下流，水盡之時即便打鼓，一盡一打，四椎至中，齊暮還然。夜同斯八，總成十六。亦是國王所施。由斯漏故，縱使重雲暗晝，長無惑午之辰；密雨連宵，終罕疑更之夜。若能奏請",
+        "locator": "0226a12-18"
+      },
+      "calibration": {
+        "literal": "置之，深是僧家要事。其漏器法，然須先取晝夜停時，旦至午時八椀沈沒，如其減八鑽孔令大，調停節數還須巧匠。若日夜漸短，即可增其半抄；若日夜漸長，復減其半酌，然以消息為度。維那若房設小盃，准理亦",
+        "locator": "0226a19-23"
+      },
+      "night_three": {
+        "literal": "應無過。然而東夏五更、西方四節，調御之教但列三時，謂分一夜為三分也。初分、後分念誦思惟，處中一時繫心而睡。無病乖此，便招違教之愆；敬而奉行，卒有自他之利矣。",
+        "locator": "0226a24-28"
+      }
+    },
+    "nalanda": {
+      "sinkings_per_named_part": 4,
+      "named_parts_per_day_and_night": 8,
+      "named_parts_to_noon": 2,
+      "calibration_sinkings_dawn_to_noon": 8,
+      "starting_literal": "平旦",
+      "unit": "bowl_sinkings_not_modern_minutes",
+      "ordinary_sinking_drums": "一椀沈打鼓一下，兩椀兩下，三椀三下，四椀四下",
+      "first_special_signal": "吹螺兩聲更別打一下",
+      "second_special_signal": "更復鳴螺，別打兩下",
+      "special_signal_hits_are_bowl_sinkings": false
+    },
+    "mahbodhi_kusinagara": {
+      "names_literal": "莫訶菩提及俱尸那寺",
+      "sinkings_dawn_to_noon": 16,
+      "whole_day_night_sinkings_established": false,
+      "whole_day_night_sinkings": null
+    },
+    "kulun": {
+      "place_literal": "南海骨崙國",
+      "noon_drum_strikes": 4,
+      "night_drum_strikes": 8,
+      "day_night_drum_strikes": 16,
+      "unit": "drum_strikes_for_emptyings_of_perforated_cauldron",
+      "count_is_bowl_sinkings": false
+    },
+    "calibration": {
+      "condition_literal": "晝夜停時",
+      "dawn_to_noon_sinkings": 8,
+      "shortening_literal": "若日夜漸短，即可增其半抄",
+      "lengthening_literal": "若日夜漸長，復減其半酌",
+      "half_scoop_is_half_bowl": false,
+      "adjustment_seconds_established": false,
+      "fixed_modern_seconds_per_sinking": null
+    },
+    "local_noon": {
+      "literal": "海東日午、關西未中",
+      "quoted_rule_literal": "遣取當處日中",
+      "single_global_clock_noon_established": false,
+      "birthplace_or_solar_altitude_from_text_established": false
+    },
+    "retained_unadjudicated_literals": [
+      {
+        "literal": "洛州無影",
+        "locator": "0225c12",
+        "physical_or_geographical_explanation_accepted": false
+      },
+      {
+        "literal": "椀水既盡",
+        "locator": "0225c28",
+        "emended_to_match_vessel_model": false
+      }
+    ],
+    "clock_word_mapping_to_T1299_pingming_or_T2465_half_established": false
+  },
+  "T2216_internal_comparison": {
+    "edition": "Same SAT Taisho electronic work, two locators; not two independent witnesses.",
+    "early": {
+      "locator": "T2216_.59.0058a23-26",
+      "main_literal": "毎日分爲八時。平明即是所直之曜。乃至酉戌則八時而周。夜亦分爲八時。轉到明日曉時。即次後曜當直。如是細解用之萬不失一些些疑文云。晝夜八時名目。如何",
+      "day_parts": 8,
+      "night_parts": 8
+    },
+    "early_daily_ruler": {
+      "locator": "T2216_.59.0058b07-09",
+      "main_literal": "竺暦名正著時。此執持義正著時者。是當毎日平明也。從此以後。日月五星。各主一日一夜。而七箇日次第輪轉也"
+    },
+    "later": {
+      "locator": "T2216_.59.0233b14-16",
+      "main_literal": "依宿曜經晝夜八時之中。平明爲曜直時。謂曉旦時直日執曜與宿相合。故云正著時歟此執持義等者。第四云。九執者。",
+      "inline_small_type": {
+        "0233b14": [
+          "下之十五",
+          "晝四時夜四時"
+        ]
+      },
+      "total_day_night_parts": 8,
+      "day_parts_in_small_type": 4,
+      "night_parts_in_small_type": 4,
+      "conjectural_marker": "歟",
+      "small_type_author_or_date_established": false
+    },
+    "counts_equal": false,
+    "editorial_or_witness_cause_resolved": false,
+    "eight_part_luminary_order_established": false
+  },
+  "T1299_control": {
+    "locator": "T21n1299_p0399b25-28",
+    "literal": "國，未審知委。其曜亦每日分為八時，平明即是所直之曜，乃至酉戌，則八時而周。夜亦分為八時，轉到明日曉時，即次後曜當直。如是細解，用之萬不失一。",
+    "day_parts": 8,
+    "night_parts": 8
+  },
+  "scope": {
+    "new_dated_instrument_measurements": 0,
+    "full_source_collation_accepted": false,
+    "source_report_equated_to_empirically_verified_time_standard": false,
+    "modern_clock_boundary_applied": false,
+    "hinoo_half_mapping_established": false,
+    "leap_short_month_priority_established": false,
+    "runtime_host_or_mansion_override": false,
+    "real_world_efficacy_established": false
+  }
+}

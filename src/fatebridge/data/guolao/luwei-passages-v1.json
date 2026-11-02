@@ -1,0 +1,850 @@
+{
+  "source_id": "tohoku_luwei_1141_image27_four_calendar_entries_v1",
+  "title": "新編評註通玄先生張果星宗大全·過宮分秒表",
+  "source_url": "https://touda.tohoku.ac.jp/collection/en/database/library/10020000001141",
+  "source_image_sha256": "7d9b12c438472ee2d4fa1a387cb23ae1af9131839248e61c1dbc891bd638df09",
+  "credit": "新編評註通玄先生張果星宗大全（東北大学附属図書館所蔵），陸位輯校",
+  "locator": "館藏卷1–2第27幅；十二列頭及統天、開禧、會天、授時四行；第86幅另有校注",
+  "unit_policy": "Literal numeric terms:100抄 per分 and100分 per古度. An unprinted fractional unit contributes no term to the literal sum, with this convention disclosed; a printed unit with unresolved/missing numeral blocks a sum. Not a modern coordinate or accepted source epoch.",
+  "transcription_policy": "Manual normalized Chinese text; simplified mansion labels, canonical Chinese numerals, physical line breaks not reproduced. Integers not repeated in a cell are not zero; header inheritance is an explicit optional interpretation.",
+  "headers": [
+    {
+      "branch": "丑",
+      "mansion": "斗",
+      "degree": 4,
+      "normalized_text": "斗四度"
+    },
+    {
+      "branch": "子",
+      "mansion": "女",
+      "degree": 2,
+      "normalized_text": "女二度"
+    },
+    {
+      "branch": "亥",
+      "mansion": "危",
+      "degree": 13,
+      "normalized_text": "危十三度"
+    },
+    {
+      "branch": "戌",
+      "mansion": "奎",
+      "degree": 2,
+      "normalized_text": "奎二度"
+    },
+    {
+      "branch": "酉",
+      "mansion": "胃",
+      "degree": 4,
+      "normalized_text": "胃四度"
+    },
+    {
+      "branch": "申",
+      "mansion": "毕",
+      "degree": 7,
+      "normalized_text": "毕七度"
+    },
+    {
+      "branch": "未",
+      "mansion": "井",
+      "degree": 9,
+      "normalized_text": "井九度"
+    },
+    {
+      "branch": "午",
+      "mansion": "柳",
+      "degree": 4,
+      "normalized_text": "柳四度"
+    },
+    {
+      "branch": "巳",
+      "mansion": "张",
+      "degree": 15,
+      "normalized_text": "张十五度"
+    },
+    {
+      "branch": "辰",
+      "mansion": "轸",
+      "degree": 10,
+      "normalized_text": "轸十度"
+    },
+    {
+      "branch": "卯",
+      "mansion": "氐",
+      "degree": 2,
+      "normalized_text": "氐二度"
+    },
+    {
+      "branch": "寅",
+      "mansion": "尾",
+      "degree": 3,
+      "normalized_text": "尾三度"
+    }
+  ],
+  "calendars": [
+    {
+      "key": "tongtian",
+      "printed_label": "統天",
+      "cells": [
+        {
+          "branch": "丑",
+          "printed_degree": null,
+          "minute": {
+            "value": 35,
+            "status": "literal",
+            "text": "三十五"
+          },
+          "second": {
+            "value": 92,
+            "status": "literal",
+            "text": "九十二"
+          },
+          "normalized_cell_text": "三十五分九十二抄"
+        },
+        {
+          "branch": "子",
+          "printed_degree": null,
+          "minute": {
+            "value": 95,
+            "status": "literal",
+            "text": "九十五"
+          },
+          "second": {
+            "value": 9,
+            "status": "literal",
+            "text": "九"
+          },
+          "normalized_cell_text": "九十五分九抄"
+        },
+        {
+          "branch": "亥",
+          "printed_degree": null,
+          "minute": {
+            "value": 47,
+            "status": "literal",
+            "text": "四十七"
+          },
+          "second": {
+            "value": 17,
+            "status": "literal",
+            "text": "十七"
+          },
+          "normalized_cell_text": "四十七分十七抄"
+        },
+        {
+          "branch": "戌",
+          "printed_degree": null,
+          "minute": {
+            "value": 37,
+            "status": "literal",
+            "text": "三十七"
+          },
+          "second": {
+            "value": 25,
+            "status": "literal",
+            "text": "二十五"
+          },
+          "normalized_cell_text": "三十七分二十五抄"
+        },
+        {
+          "branch": "酉",
+          "printed_degree": null,
+          "minute": {
+            "value": 19,
+            "status": "literal",
+            "text": "十九"
+          },
+          "second": {
+            "value": 15,
+            "status": "literal",
+            "text": "十五"
+          },
+          "normalized_cell_text": "十九分十五抄"
+        },
+        {
+          "branch": "申",
+          "printed_degree": null,
+          "minute": {
+            "value": 82,
+            "status": "literal",
+            "text": "八十二"
+          },
+          "second": {
+            "value": 4,
+            "status": "literal",
+            "text": "四"
+          },
+          "normalized_cell_text": "八十二分四抄"
+        },
+        {
+          "branch": "未",
+          "printed_degree": null,
+          "minute": {
+            "value": 42,
+            "status": "literal",
+            "text": "四十二"
+          },
+          "second": {
+            "value": 89,
+            "status": "literal",
+            "text": "八十九"
+          },
+          "normalized_cell_text": "四十二分八十九抄"
+        },
+        {
+          "branch": "午",
+          "printed_degree": 5,
+          "minute": {
+            "value": 27,
+            "status": "literal",
+            "text": "二十七"
+          },
+          "second": {
+            "value": null,
+            "status": "not_printed",
+            "text": null
+          },
+          "normalized_cell_text": "柳五度二十七分"
+        },
+        {
+          "branch": "巳",
+          "printed_degree": null,
+          "minute": {
+            "value": 62,
+            "status": "literal",
+            "text": "六十二"
+          },
+          "second": {
+            "value": 44,
+            "status": "literal",
+            "text": "四十四"
+          },
+          "normalized_cell_text": "六十二分四十四抄"
+        },
+        {
+          "branch": "辰",
+          "printed_degree": null,
+          "minute": {
+            "value": 65,
+            "status": "literal",
+            "text": "六十五"
+          },
+          "second": {
+            "value": null,
+            "status": "unresolved",
+            "text": null
+          },
+          "normalized_cell_text": "六十五分抄"
+        },
+        {
+          "branch": "卯",
+          "printed_degree": null,
+          "minute": {
+            "value": 74,
+            "status": "literal",
+            "text": "七十四"
+          },
+          "second": {
+            "value": 51,
+            "status": "literal",
+            "text": "五十一"
+          },
+          "normalized_cell_text": "七十四分五十一抄"
+        },
+        {
+          "branch": "寅",
+          "printed_degree": null,
+          "minute": {
+            "value": 86,
+            "status": "literal",
+            "text": "八十六"
+          },
+          "second": {
+            "value": 61,
+            "status": "literal",
+            "text": "六十一"
+          },
+          "normalized_cell_text": "八十六分六十一抄"
+        }
+      ]
+    },
+    {
+      "key": "kaixi",
+      "printed_label": "開禧",
+      "cells": [
+        {
+          "branch": "丑",
+          "printed_degree": null,
+          "minute": {
+            "value": 30,
+            "status": "literal",
+            "text": "三十"
+          },
+          "second": {
+            "value": 39,
+            "status": "literal",
+            "text": "三十九"
+          },
+          "normalized_cell_text": "三十分三十九抄"
+        },
+        {
+          "branch": "子",
+          "printed_degree": null,
+          "minute": {
+            "value": 92,
+            "status": "literal",
+            "text": "九十二"
+          },
+          "second": {
+            "value": 93,
+            "status": "literal",
+            "text": "九十三"
+          },
+          "normalized_cell_text": "九十二分九十三抄"
+        },
+        {
+          "branch": "亥",
+          "printed_degree": null,
+          "minute": {
+            "value": 36,
+            "status": "literal",
+            "text": "三十六"
+          },
+          "second": {
+            "value": 82,
+            "status": "literal",
+            "text": "八十二"
+          },
+          "normalized_cell_text": "三十六分八十二抄"
+        },
+        {
+          "branch": "戌",
+          "printed_degree": null,
+          "minute": {
+            "value": 38,
+            "status": "literal",
+            "text": "三十八"
+          },
+          "second": {
+            "value": 36,
+            "status": "literal",
+            "text": "三十六"
+          },
+          "normalized_cell_text": "三十八分三十六抄"
+        },
+        {
+          "branch": "酉",
+          "printed_degree": null,
+          "minute": {
+            "value": 23,
+            "status": "literal",
+            "text": "二十三"
+          },
+          "second": {
+            "value": 20,
+            "status": "literal",
+            "text": "二十"
+          },
+          "normalized_cell_text": "二十三分二十抄"
+        },
+        {
+          "branch": "申",
+          "printed_degree": null,
+          "minute": {
+            "value": 96,
+            "status": "literal",
+            "text": "九十六"
+          },
+          "second": {
+            "value": 73,
+            "status": "literal",
+            "text": "七十三"
+          },
+          "normalized_cell_text": "九十六分七十三抄"
+        },
+        {
+          "branch": "未",
+          "printed_degree": null,
+          "minute": {
+            "value": 33,
+            "status": "literal",
+            "text": "三十三"
+          },
+          "second": {
+            "value": 68,
+            "status": "literal",
+            "text": "六十八"
+          },
+          "normalized_cell_text": "三十三分六十八抄"
+        },
+        {
+          "branch": "午",
+          "printed_degree": null,
+          "minute": {
+            "value": 96,
+            "status": "literal",
+            "text": "九十六"
+          },
+          "second": {
+            "value": 34,
+            "status": "literal",
+            "text": "三十四"
+          },
+          "normalized_cell_text": "九十六分三十四抄"
+        },
+        {
+          "branch": "巳",
+          "printed_degree": null,
+          "minute": {
+            "value": 52,
+            "status": "literal",
+            "text": "五十二"
+          },
+          "second": {
+            "value": 44,
+            "status": "literal",
+            "text": "四十四"
+          },
+          "normalized_cell_text": "五十二分四十四抄"
+        },
+        {
+          "branch": "辰",
+          "printed_degree": null,
+          "minute": {
+            "value": 56,
+            "status": "literal",
+            "text": "五十六"
+          },
+          "second": {
+            "value": 24,
+            "status": "literal",
+            "text": "二十四"
+          },
+          "normalized_cell_text": "五十六分二十四抄"
+        },
+        {
+          "branch": "卯",
+          "printed_degree": null,
+          "minute": {
+            "value": 77,
+            "status": "literal",
+            "text": "七十七"
+          },
+          "second": {
+            "value": 22,
+            "status": "literal",
+            "text": "二十二"
+          },
+          "normalized_cell_text": "七十七分二十二抄"
+        },
+        {
+          "branch": "寅",
+          "printed_degree": null,
+          "minute": {
+            "value": 97,
+            "status": "literal",
+            "text": "九十七"
+          },
+          "second": {
+            "value": 87,
+            "status": "literal",
+            "text": "八十七"
+          },
+          "normalized_cell_text": "九十七分八十七抄"
+        }
+      ]
+    },
+    {
+      "key": "huitian",
+      "printed_label": "會天",
+      "cells": [
+        {
+          "branch": "丑",
+          "printed_degree": null,
+          "minute": {
+            "value": 24,
+            "status": "literal",
+            "text": "二十四"
+          },
+          "second": {
+            "value": 97,
+            "status": "literal",
+            "text": "九十七"
+          },
+          "normalized_cell_text": "二十四分九十七抄"
+        },
+        {
+          "branch": "子",
+          "printed_degree": null,
+          "minute": {
+            "value": 92,
+            "status": "literal",
+            "text": "九十二"
+          },
+          "second": {
+            "value": 8,
+            "status": "literal",
+            "text": "八"
+          },
+          "normalized_cell_text": "九十二分八抄"
+        },
+        {
+          "branch": "亥",
+          "printed_degree": null,
+          "minute": {
+            "value": 40,
+            "status": "literal",
+            "text": "四十"
+          },
+          "second": {
+            "value": 87,
+            "status": "literal",
+            "text": "八十七"
+          },
+          "normalized_cell_text": "四十分八十七抄"
+        },
+        {
+          "branch": "戌",
+          "printed_degree": null,
+          "minute": {
+            "value": 36,
+            "status": "literal",
+            "text": "三十六"
+          },
+          "second": {
+            "value": 29,
+            "status": "literal",
+            "text": "二十九"
+          },
+          "normalized_cell_text": "三十六分二十九抄"
+        },
+        {
+          "branch": "酉",
+          "printed_degree": null,
+          "minute": {
+            "value": 33,
+            "status": "literal",
+            "text": "三十三"
+          },
+          "second": {
+            "value": 79,
+            "status": "literal",
+            "text": "七十九"
+          },
+          "normalized_cell_text": "三十三分七十九抄"
+        },
+        {
+          "branch": "申",
+          "printed_degree": null,
+          "minute": {
+            "value": 94,
+            "status": "literal",
+            "text": "九十四"
+          },
+          "second": {
+            "value": 83,
+            "status": "literal",
+            "text": "八十三"
+          },
+          "normalized_cell_text": "九十四分八十三抄"
+        },
+        {
+          "branch": "未",
+          "printed_degree": null,
+          "minute": {
+            "value": 40,
+            "status": "literal",
+            "text": "四十"
+          },
+          "second": {
+            "value": 1,
+            "status": "literal",
+            "text": "一"
+          },
+          "normalized_cell_text": "四十分一抄"
+        },
+        {
+          "branch": "午",
+          "printed_degree": null,
+          "minute": {
+            "value": 96,
+            "status": "literal",
+            "text": "九十六"
+          },
+          "second": {
+            "value": 18,
+            "status": "literal",
+            "text": "十八"
+          },
+          "normalized_cell_text": "九十六分十八抄"
+        },
+        {
+          "branch": "巳",
+          "printed_degree": null,
+          "minute": {
+            "value": 57,
+            "status": "literal",
+            "text": "五十七"
+          },
+          "second": {
+            "value": 79,
+            "status": "literal",
+            "text": "七十九"
+          },
+          "normalized_cell_text": "五十七分七十九抄"
+        },
+        {
+          "branch": "辰",
+          "printed_degree": null,
+          "minute": {
+            "value": 50,
+            "status": "literal",
+            "text": "五十"
+          },
+          "second": {
+            "value": 26,
+            "status": "literal",
+            "text": "二十六"
+          },
+          "normalized_cell_text": "五十分二十六抄"
+        },
+        {
+          "branch": "卯",
+          "printed_degree": null,
+          "minute": {
+            "value": 77,
+            "status": "literal",
+            "text": "七十七"
+          },
+          "second": {
+            "value": 69,
+            "status": "literal",
+            "text": "六十九"
+          },
+          "normalized_cell_text": "七十七分六十九抄"
+        },
+        {
+          "branch": "寅",
+          "printed_degree": null,
+          "minute": {
+            "value": 97,
+            "status": "literal",
+            "text": "九十七"
+          },
+          "second": {
+            "value": 67,
+            "status": "literal",
+            "text": "六十七"
+          },
+          "normalized_cell_text": "九十七分六十七抄"
+        }
+      ]
+    },
+    {
+      "key": "shoushi",
+      "printed_label": "授時",
+      "cells": [
+        {
+          "branch": "丑",
+          "printed_degree": 3,
+          "minute": {
+            "value": 76,
+            "status": "literal",
+            "text": "七十六"
+          },
+          "second": {
+            "value": 85,
+            "status": "literal",
+            "text": "八十五"
+          },
+          "normalized_cell_text": "斗三度七十六分八十五抄"
+        },
+        {
+          "branch": "子",
+          "printed_degree": null,
+          "minute": {
+            "value": null,
+            "status": "unresolved",
+            "text": "六一"
+          },
+          "second": {
+            "value": 38,
+            "status": "literal",
+            "text": "三十八"
+          },
+          "normalized_cell_text": "六一分三十八抄"
+        },
+        {
+          "branch": "亥",
+          "printed_degree": 12,
+          "minute": {
+            "value": null,
+            "status": "not_printed",
+            "text": null
+          },
+          "second": {
+            "value": 38,
+            "status": "literal",
+            "text": "三十八"
+          },
+          "normalized_cell_text": "危十二度三十八抄"
+        },
+        {
+          "branch": "戌",
+          "printed_degree": 1,
+          "minute": {
+            "value": 73,
+            "status": "literal",
+            "text": "七十三"
+          },
+          "second": {
+            "value": 63,
+            "status": "literal",
+            "text": "六十三"
+          },
+          "normalized_cell_text": "奎一度七十三分六十三抄"
+        },
+        {
+          "branch": "酉",
+          "printed_degree": 3,
+          "minute": {
+            "value": 74,
+            "status": "literal",
+            "text": "七十四"
+          },
+          "second": {
+            "value": 56,
+            "status": "literal",
+            "text": "五十六"
+          },
+          "normalized_cell_text": "胃三度七十四分五十六抄"
+        },
+        {
+          "branch": "申",
+          "printed_degree": 6,
+          "minute": {
+            "value": 86,
+            "status": "literal",
+            "text": "八十六"
+          },
+          "second": {
+            "value": 5,
+            "status": "literal",
+            "text": "五"
+          },
+          "normalized_cell_text": "毕六度八十六分五抄"
+        },
+        {
+          "branch": "未",
+          "printed_degree": 8,
+          "minute": {
+            "value": 24,
+            "status": "literal",
+            "text": "二十四"
+          },
+          "second": {
+            "value": 94,
+            "status": "literal",
+            "text": "九十四"
+          },
+          "normalized_cell_text": "井八度二十四分九十四抄"
+        },
+        {
+          "branch": "午",
+          "printed_degree": 3,
+          "minute": {
+            "value": 86,
+            "status": "literal",
+            "text": "八十六"
+          },
+          "second": {
+            "value": 80,
+            "status": "literal",
+            "text": "八十"
+          },
+          "normalized_cell_text": "柳三度八十六分八十抄"
+        },
+        {
+          "branch": "巳",
+          "printed_degree": null,
+          "minute": {
+            "value": 66,
+            "status": "literal",
+            "text": "六十六"
+          },
+          "second": {
+            "value": 6,
+            "status": "literal",
+            "text": "六"
+          },
+          "normalized_cell_text": "六十六分六抄"
+        },
+        {
+          "branch": "辰",
+          "printed_degree": null,
+          "minute": {
+            "value": 7,
+            "status": "literal",
+            "text": "七"
+          },
+          "second": {
+            "value": 97,
+            "status": "literal",
+            "text": "九十七"
+          },
+          "normalized_cell_text": "七分九十七抄"
+        },
+        {
+          "branch": "卯",
+          "printed_degree": null,
+          "minute": {
+            "value": 14,
+            "status": "literal",
+            "text": "十四"
+          },
+          "second": {
+            "value": 52,
+            "status": "literal",
+            "text": "五十二"
+          },
+          "normalized_cell_text": "十四分五十二抄"
+        },
+        {
+          "branch": "寅",
+          "printed_degree": null,
+          "minute": {
+            "value": 1,
+            "status": "literal",
+            "text": "一"
+          },
+          "second": {
+            "value": 15,
+            "status": "literal",
+            "text": "十五"
+          },
+          "normalized_cell_text": "一分十五抄"
+        }
+      ]
+    }
+  ],
+  "later_correction_note": {
+    "image": 86,
+    "source_image_sha256": "d53c9fdb1f1ff9825f2bd6b431cf01d724c1765e0b40d1c0c03ed8da3fd243f1",
+    "short_palaces": "亥戌酉申未卯",
+    "rejected_old_examples": [
+      {
+        "branch": "卯",
+        "mansion": "氐",
+        "degree": 2
+      },
+      {
+        "branch": "申",
+        "mansion": "毕",
+        "degree": 7
+      }
+    ],
+    "scope": "Later note criticizes old ruler examples and refers to Shoushi; applicability and emendations of image27 not adjudicated.",
+    "automatically_applied": false
+  },
+  "independent_second_collator": false
+}

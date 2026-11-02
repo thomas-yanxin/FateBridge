@@ -1,0 +1,55 @@
+{
+  "id": "meihua_internal_control_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本内卦生助受制与克体受制条款",
+  "selected_edition_id": "nlc_1925",
+  "source": {
+    "id": "nlc_1925",
+    "title": "文明書局《梅花易數》卷二选段",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_indices": [
+      88,
+      94,
+      95
+    ]
+  },
+  "rules": [
+    {
+      "id": "support_controlled",
+      "section": "體用",
+      "original_pdf_index": 88,
+      "quote": "此卦生體諸卦有尅此卦者頗滅其吉",
+      "relation": "用生体",
+      "qualification": "support_constrained"
+    },
+    {
+      "id": "attacker_controlled",
+      "section": "體用",
+      "original_pdf_index": 88,
+      "quote": "此卦尅體諸卦又有尅此卦者稍解其凶",
+      "relation": "用克体",
+      "qualification": "partial_relief"
+    }
+  ],
+  "worked_snippets": [
+    {
+      "original_pdf_index": 95,
+      "quote": "雖兌金尅木得有離火火雖無氣終是制金"
+    },
+    {
+      "original_pdf_index": 95,
+      "quote": "雖得離火制兌金亦不純美用火洩體之氣"
+    }
+  ],
+  "evidence_scope": [
+    "No whole-book or authorship authentication",
+    "Five selected internal role occurrences are not independent observations",
+    "No recursive cancellation, vote, score, quantified weakening, net verdict, numeric time or actual outcome",
+    "No house lifespan, disaster or clinical inference is implemented",
+    "External omens and uncollected trigrams remain outside scope"
+  ],
+  "source_character_reading": "assistant selected-span visual reading; not independent human expert review",
+  "independent_human_expert_review": false,
+  "predictive_efficacy_established": false
+}

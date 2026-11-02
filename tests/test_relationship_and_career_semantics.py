@@ -19,7 +19,7 @@ from fatebridge.cli import run
 from fatebridge.core.requests.compatibility import TwoPersonCompatibilityRequest
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fixtures.compatibility import assert_score_reference
+from tests.compatibility_reference import assert_score_reference
 
 SPECS = {
     spec.key: spec
@@ -142,12 +142,12 @@ def test_food_god_controls_killer_changes_tendency_not_success_probability():
     }
     result = CareerAnalysis._analyze_entrepreneurship(pillars, "甲")
     # Original weighted-rule result preserved; wording no longer claims success.
-    assert result["score"] == 75 and result["tendency"] == "强烈创业倾向"
+    assert result["score"] == 75 and result["tendency"].startswith("未校准规则索引75")
     assert any("食神制杀" in note for note in result["notes"])
     assert all("创业成功率高" not in note for note in result["notes"])
-    assert result["score_kind"] == "traditional_rule_index"
+    assert result["score_kind"] == "uncalibrated_rule_index"
     assert result["scope"] == "individual_natal_entrepreneurship_tendency"
-    assert "不是成功率" in result["score_basis"]
+    assert "未校准为创业适合度或成功率" in result["score_basis"]
 
 
 def test_career_structure_score_does_not_measure_real_ability():
@@ -158,7 +158,9 @@ def test_career_structure_score_does_not_measure_real_ability():
         "hour": ("辛", "巳"),
     }
     result = CareerAnalysis._analyze_career_structure(pillars, "庚")
-    assert result["score"] == 75 and result["level"] == "中等格局"
+    # 官印15、食伤财10、财官8，基础60；v4两处庚巳根使旺衰判强
+    # 再加5，原有95上限保持不变：min(95, 60+15+10+8+5)=95。
+    assert result["score"] == 95 and result["level"].startswith("规则索引95")
     assert result["scope"] == "individual_natal_career_structure"
     assert "不是事业成就或收入概率" in result["score_basis"]
 
@@ -179,8 +181,8 @@ def test_career_semantics_match_rest_mcp_cli(monkeypatch, tmp_path, capsys):
         for body in [rest.json(), protocol.structured_content, cli]
     ]
     assert career[0] == career[1] == career[2]
-    assert career[0]["career_structure"]["score"] == 75
+    assert career[0]["career_structure"]["score"] == 95
     assert career[0]["entrepreneurship"]["score"] == 73
     assert "不能据此决定辞职" in career[0]["interpretation_scope"]
     assert "创业成功率高" not in json.dumps(rest.json(), ensure_ascii=False)
-    assert any("验证需求、现金流与执行能力" in s for s in career[0]["suggestions"])
+    assert any("核对需求、资金、职责和执行记录" in s for s in career[0]["suggestions"])

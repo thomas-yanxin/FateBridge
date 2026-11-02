@@ -1,0 +1,45 @@
+{
+  "ruleset_id": "heluo_wenming_jian_structure_v1",
+  "version": "1.0.0",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "source_pdf_sha256": "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c",
+  "source_pdf_pages": [
+    75,
+    76,
+    77,
+    78
+  ],
+  "calculation_source_pdf_pages": [
+    77,
+    78
+  ],
+  "counterpart_image_index": 76,
+  "review_status": "single_reviewer_two_edition_visual_comparison; independent_second_review_pending",
+  "source_case_gua": "風山漸",
+  "source_case_names": [
+    "艮",
+    "巽",
+    "震",
+    "兌",
+    "離",
+    "坎",
+    "天地否",
+    "地天泰"
+  ],
+  "source_case_reversed_name": "雷澤歸妹",
+  "five_ming_symbol_readings": {
+    "金": "庚辛申酉",
+    "木": "甲乙寅卯",
+    "水": "壬癸亥子",
+    "火": "丙丁巳午",
+    "土": "戊己辰戌丑未"
+  },
+  "scope": "Named Jian paragraph: eight mixed-arity structural records and whole reversal. Application to other hexagrams is an explicit permutation derivation, not additional literal examples or a complete definition of futi. Five-ming symbol lists do not select a natal pillar or Nayin convention.",
+  "wording_variants": [
+    {
+      "primary_reading": "以八體言之",
+      "counterpart_reading": "以八卦言之",
+      "scope": "NLC PDF77 / NAJDA image76; names and operations agree, terminology wording differs; not a full definition of futi"
+    }
+  ]
+}

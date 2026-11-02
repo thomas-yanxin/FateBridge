@@ -1,8 +1,9 @@
 """Residential inputs: location, facing and observed form stay distinct."""
 
 from datetime import date, datetime
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, cast
 
+from dateutil.tz import datetime_exists
 from pydantic import (
     ConfigDict,
     Field,
@@ -12,11 +13,14 @@ from pydantic import (
     model_validator,
 )
 
-from fatebridge.core.requests.base import _DeferredModel
 from fatebridge.utils.timezones import parse_timezone_name
 
+from .city_gate_inputs import CityGateRequest
 from .context_inputs import EnvironmentalContext
+from .geomagnetic_inputs import GeomagneticReference
 from .layout_inputs import ElementAdjustment, FormObservation
+from .lingzheng_inputs import FixedLingzhengRequest
+from .numeric_inputs import FengshuiInput as _DeferredModel
 from .surface_inputs import SurfaceConstraints, SurfaceLayout
 from .workstation_inputs import validate_review
 
@@ -27,19 +31,38 @@ Basis = Literal["measured", "user_confirmed"]
 BazhaiRuleset = Literal["bazhai_sitting_v1"]
 JinsuoRuleset = Literal["jinsuo_basic_fixed_v1"]
 AnnualRuleset = Literal["annual_zibai_lichun_v1"]
-Method = Literal["bazhai", "jinsuo", "annual_stars", "xuankong_natal"]
+Method = Literal["bazhai", "jinsuo", "annual_stars", "monthly_stars", "xuankong_natal"]
 Year = int
 
 
 class TimeInput(_DeferredModel):
     timezone_name: str = Field(
-        default="Asia/Shanghai", description="IANA 时区或 UTC 偏移；用于年度边界"
+        default="Asia/Shanghai", description="IANA 时区或 UTC 偏移；用于对应历法边界"
     )
 
     @field_validator("timezone_name")
     @classmethod
     def timezone_exists(cls, value: str) -> str:
         parse_timezone_name(value)
+        return value
+
+    @field_validator("birth_at", "query_at", "event_at", check_fields=False)
+    @classmethod
+    def existing_aware_clock(cls, value: Optional[datetime]) -> Optional[datetime]:
+        # Python callers can supply a cached dateutil/ZoneInfo tzinfo object.
+        # astimezone(same_tzinfo) then preserves even an impossible local clock.
+        # Fixed-offset ISO instants remain valid and convert normally.
+        if (
+            value is not None
+            and value.utcoffset() is not None
+            and not datetime_exists(value)
+        ):
+            raise ValueError(
+                "nonexistent local time：该地区时区不存在此钟时；请提供有效当地钟时或明确UTC偏移。"
+            )
+        # A valid aware datetime already identifies a fold through its UTC
+        # offset/fold flag. Preserve that explicit instant instead of rejecting
+        # an otherwise valid repeated wall clock.
         return value
 
 
@@ -80,7 +103,9 @@ class MingguaRequest(TimeInput):
     year_boundary: Literal["lichun", "january_1"] = Field(
         default="lichun", description="选定命卦换年约定；非所有古本统一规则"
     )
-    ruleset_id: BazhaiRuleset = "bazhai_sitting_v1"
+    ruleset_id: BazhaiRuleset = Field(
+        default="bazhai_sitting_v1", description="八宅坐山与命卦规则版本；不是八字喜用"
+    )
 
     @model_validator(mode="after")
     def validate_birth(self) -> "MingguaRequest":
@@ -103,12 +128,41 @@ class MingguaRequest(TimeInput):
 
 
 class Occupant(MingguaRequest):
-    subject_id: str = Field(min_length=1, max_length=100)
+    subject_id: str = Field(
+        min_length=1,
+        max_length=100,
+        description="已确认住户的稳定标识，用于关联实际使用对象",
+    )
 
 
 class House(_DeferredModel):
-    object_id: str = Field(default="house", min_length=1, max_length=100)
-    sitting_trigram: Optional[Trigram] = None
+    model_config = ConfigDict(
+        json_schema_extra={
+            "allOf": [
+                {
+                    "if": {
+                        "required": ["bearing_uncertainty_degrees"],
+                        "properties": {
+                            "bearing_uncertainty_degrees": {"type": "number"}
+                        },
+                    },
+                    "then": {
+                        "required": ["facing_degrees"],
+                        "properties": {"facing_degrees": {"type": "number"}},
+                    },
+                }
+            ]
+        }
+    )
+    object_id: str = Field(
+        default="house",
+        min_length=1,
+        max_length=100,
+        description="住宅标识，不与住户或家具标识混用",
+    )
+    sitting_trigram: Optional[Trigram] = Field(
+        default=None, description="已确认的住宅坐山卦；不是家具朝向或个人命卦"
+    )
     facing_degrees: Optional[float] = Field(
         default=None,
         ge=0,
@@ -116,26 +170,52 @@ class House(_DeferredModel):
         allow_inf_nan=False,
         description="宅向角度，0°北、顺时针；360°归一为0°",
     )
-    north_reference: Optional[NorthReference] = None
-    orientation_basis: Basis = "user_confirmed"
-    division_method: Literal["confirmed_angular_sectors"] = "confirmed_angular_sectors"
+    bearing_uncertainty_degrees: Optional[float] = Field(
+        default=None,
+        ge=0,
+        le=180,
+        strict=True,
+        allow_inf_nan=False,
+        description="同一宅向已知的测量误差半径，供八宅及玄空共同读取；须有facing_degrees。只接受调用方独立提供的有界区间，不把WMM标准差当误差上界。省略沿用点方位约定，不证明现场误差为零；玄空最多支持7.5度。",
+    )
+    north_reference: Optional[NorthReference] = Field(
+        default=None,
+        description="角度的参考北：magnetic 磁北或 true 真北；有角度时必填，不猜参考系",
+    )
+    orientation_basis: Basis = Field(
+        default="user_confirmed",
+        description="宅向事实来源：实测或用户明确确认；照片不自动定向",
+    )
+    division_method: Literal["confirmed_angular_sectors"] = Field(
+        default="confirmed_angular_sectors",
+        description="已确认的八宫角区分法，不自动识别户型立极",
+    )
 
     @model_validator(mode="after")
     def bearing_reference(self) -> "House":
+        if self.bearing_uncertainty_degrees is not None and self.facing_degrees is None:
+            raise ValueError("宅向误差半径须同时提供 facing_degrees")
         if self.facing_degrees is not None and self.north_reference is None:
             raise ValueError("角度输入必须明确 north_reference")
+        # A legacy XuankongRequest can supply this same measurement's radius
+        # outside House. Public calculation requests perform the complete check
+        # after that surrounding context is available.
+        if self.bearing_uncertainty_degrees is not None:
+            self.check_sitting_trigram(self.bearing_uncertainty_degrees)
+        return self
+
+    def check_sitting_trigram(self, radius: float) -> None:
         if self.facing_degrees is not None and self.sitting_trigram is not None:
             assert self.north_reference is not None
-            from .directions import sitting_from_facing
+            from .bearing_support import sitting_support
 
-            if (
-                sitting_from_facing(self.facing_degrees, self.north_reference)[
-                    "trigram"
-                ]
-                != self.sitting_trigram
-            ):
+            supported = sitting_support(
+                self.facing_degrees,
+                radius,
+                self.north_reference,
+            )
+            if self.sitting_trigram not in {c["sitting_trigram"] for c in supported}:
                 raise ValueError("宅向推导的坐山与 sitting_trigram 不一致")
-        return self
 
 
 _PLACEMENT_FACING_ROLES = {
@@ -256,13 +336,34 @@ class Placement(_DeferredModel):
 
 
 class BazhaiRequest(_DeferredModel):
-    house: Optional[House] = None
-    occupants: List[Occupant] = Field(default_factory=list, max_length=50)
-    placements: List[Placement] = Field(default_factory=list, max_length=200)
-    ruleset_id: BazhaiRuleset = "bazhai_sitting_v1"
+    house: Optional[House] = Field(
+        default=None,
+        description="已确认的住宅坐向；未知可省略保留其他可算层，不用桌朝向补宅向",
+    )
+    occupants: List[Occupant] = Field(
+        default_factory=list,
+        max_length=50,
+        description="独立命卦住户资料；同住不代表共用家具，不由八字喜忌补出",
+    )
+    placements: List[Placement] = Field(
+        default_factory=list,
+        max_length=200,
+        description="门床桌灶已确认的位置、朝向和使用人；位置与朝向分别核对，未知不补宫",
+    )
+    ruleset_id: BazhaiRuleset = Field(
+        default="bazhai_sitting_v1",
+        description="八宅坐山规则版本；不表示其他流派均已覆盖",
+    )
 
     @model_validator(mode="after")
     def unique_ids(self) -> "BazhaiRequest":
+        if self.house is not None:
+            natal = getattr(self, "xuankong", None)
+            legacy = natal.bearing_uncertainty_degrees if natal is not None else None
+            radius = self.house.bearing_uncertainty_degrees
+            self.house.check_sitting_trigram(
+                radius if radius is not None else legacy or 0
+            )
         ids = [o.subject_id for o in self.occupants]
         context = getattr(self, "environmental_context", None)
         known_subjects = set(ids) | (
@@ -304,8 +405,14 @@ class EnvironmentFeature(_DeferredModel):
 
 
 class JinsuoRequest(_DeferredModel):
-    features: List[EnvironmentFeature] = Field(default_factory=list, max_length=500)
-    ruleset_id: JinsuoRuleset = "jinsuo_basic_fixed_v1"
+    features: List[EnvironmentFeature] = Field(
+        default_factory=list,
+        max_length=500,
+        description="已确认方位、砂水分类及来源的环境特征，不按物件名称猜分类",
+    )
+    ruleset_id: JinsuoRuleset = Field(
+        default="jinsuo_basic_fixed_v1", description="金锁八宫固定砂水偏好规则版本"
+    )
 
     @model_validator(mode="after")
     def unique_features(self) -> "JinsuoRequest":
@@ -325,7 +432,10 @@ class AnnualRequest(TimeInput):
     query_at: Optional[datetime] = Field(
         default=None, description="含时区的查询时刻，以立春交节换年"
     )
-    ruleset_id: AnnualRuleset = "annual_zibai_lichun_v1"
+    ruleset_id: AnnualRuleset = Field(
+        default="annual_zibai_lichun_v1",
+        description="立春换年九宫紫白规则版本；非历史山向宅盘",
+    )
 
     @model_validator(mode="after")
     def validate_query(self) -> "AnnualRequest":
@@ -336,6 +446,77 @@ class AnnualRequest(TimeInput):
                 raise ValueError("query_at 必须包含时区")
             if not 1801 <= self.query_at.year <= 2199:
                 raise ValueError("query_at 支持 1801–2199 年")
+        return self
+
+
+class MonthlyRequest(TimeInput):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "allOf": [
+                {
+                    "anyOf": [
+                        {
+                            "properties": {
+                                "effective_solar_year": {"type": "null"},
+                                "solar_month_number": {"type": "null"},
+                            }
+                        },
+                        {
+                            "required": ["effective_solar_year", "solar_month_number"],
+                            "properties": {
+                                "effective_solar_year": {"type": "integer"},
+                                "solar_month_number": {"type": "integer"},
+                            },
+                        },
+                    ]
+                },
+                {
+                    "anyOf": [
+                        {"properties": {"query_at": {"type": "null"}}},
+                        {
+                            "properties": {
+                                "effective_solar_year": {"type": "null"},
+                                "solar_month_number": {"type": "null"},
+                            }
+                        },
+                    ]
+                },
+            ],
+        }
+    )
+    query_at: Optional[datetime] = Field(
+        default=None,
+        json_schema_extra={"pattern": r"(?:[zZ]|[+-]\d{2}:?\d{2})$"},
+        description="含时区的实际查询时刻；以十二个节的交节瞬间换月，以立春换有效年，不是农历初一或公历月首",
+    )
+    effective_solar_year: Optional[StrictInt] = Field(
+        default=None,
+        ge=1800,
+        le=2199,
+        description="已独立确认的立春后有效年；与solar_month_number成对，与query_at互斥。一月公历日期不能直接当作本年",
+    )
+    solar_month_number: Optional[StrictInt] = Field(
+        default=None,
+        ge=1,
+        le=12,
+        description="已确认节月：1=立春寅月，11=大雪子月，12=下一公历年的小寒丑月；不是农历月、闰月或公历月",
+    )
+    ruleset_id: Literal["monthly_zibai_jie_v1"] = Field(
+        default="monthly_zibai_jie_v1",
+        description="Monthly Zi Bai rule profile using the declared solar year and solar-term month boundaries.",
+    )
+
+    @model_validator(mode="after")
+    def selected_month_clock(self) -> "MonthlyRequest":
+        if (self.effective_solar_year is None) != (self.solar_month_number is None):
+            raise ValueError("effective_solar_year与solar_month_number必须成对")
+        if self.query_at is not None:
+            if self.effective_solar_year is not None:
+                raise ValueError("query_at与已确认有效年/节月不能同时提供")
+            if self.query_at.tzinfo is None or self.query_at.utcoffset() is None:
+                raise ValueError("query_at必须包含时区")
+            if not 1801 <= self.query_at.year <= 2199:
+                raise ValueError("query_at支持1801–2199年")
         return self
 
 
@@ -412,25 +593,106 @@ class XuankongInterpretationRequest(_DeferredModel):
     """An opt-in, limited rule layer; current period never resets natal age."""
 
     model_config = ConfigDict(
-        json_schema_extra={
-            "anyOf": [
-                {
-                    "properties": {
-                        "current_period_number": {"type": "null"},
-                        "period_evidence": {"type": "null"},
-                    }
-                },
-                {
-                    "properties": {
-                        "current_period_number": {"type": "integer"},
-                        "period_evidence": {"type": "string"},
+        json_schema_extra=cast(
+            Dict[str, Any],
+            {
+                "allOf": [
+                    {
+                        "if": {
+                            "required": ["fixed_lingzheng"],
+                            "properties": {
+                                "fixed_lingzheng": {
+                                    "type": "object",
+                                    "required": ["five_period_half"],
+                                    "properties": {
+                                        "five_period_half": {"type": "string"}
+                                    },
+                                }
+                            },
+                        },
+                        "then": {
+                            "required": ["current_period_number"],
+                            "properties": {"current_period_number": {"const": 5}},
+                        },
                     },
-                    "required": ["current_period_number", "period_evidence"],
-                },
-            ]
-        }
+                    *[
+                        {
+                            "not": {
+                                "required": ["external_forms", "fixed_lingzheng"],
+                                "properties": {
+                                    "external_forms": {
+                                        "contains": {
+                                            "required": ["direction", "water_present"],
+                                            "properties": {
+                                                "direction": {"const": direction},
+                                                "water_present": {"const": water},
+                                            },
+                                        }
+                                    },
+                                    "fixed_lingzheng": {
+                                        "type": "object",
+                                        "required": ["observations"],
+                                        "properties": {
+                                            "observations": {
+                                                "contains": {
+                                                    "required": [
+                                                        "direction",
+                                                        "river_water_present",
+                                                    ],
+                                                    "properties": {
+                                                        "direction": {
+                                                            "const": direction
+                                                        },
+                                                        "river_water_present": {
+                                                            "const": True
+                                                        },
+                                                    },
+                                                }
+                                            },
+                                        },
+                                    },
+                                },
+                            }
+                        }
+                        for direction in ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
+                        for water in (False,)
+                    ],
+                ],
+                "anyOf": [
+                    {
+                        "properties": {
+                            "current_period_number": {"type": "null"},
+                            "period_evidence": {"type": "null"},
+                        }
+                    },
+                    {
+                        "properties": {
+                            "current_period_number": {"type": "integer"},
+                            "period_evidence": {"type": "string"},
+                        },
+                        "required": ["current_period_number", "period_evidence"],
+                    },
+                ],
+            },
+        )
     )
     ruleset_id: Literal["xuankong_conditioned_v1"] = "xuankong_conditioned_v1"
+    include_calculation_reading: StrictBool = Field(
+        default=True,
+        description="已请求解释时默认返回带完整上下文引用的玄空固定中文释义；可显式关闭，不验证任意模型正文或现实预测",
+    )
+    timeliness_ruleset_id: Optional[Literal["wang_zhongzhou_timeliness_v1"]] = Field(
+        default=None,
+        description="显式选择王亭之上卷基本旺生衰死与互用数字参考；不扩充当令外局条件或产生综合吉凶",
+    )
+    host_guest_ruleset_id: Optional[Literal["shen_2011_host_guest_v1"]] = Field(
+        default=None,
+        description="显式选择沈氏2011整理本所收主客定义：坐山宫山主、向首宫向主及地运山向盘层比较；保留216条下卦关系词差异，不合并原书异说或推导吉凶、81对专属断语",
+    )
+    fixed_lingzheng: Optional[FixedLingzhengRequest] = Field(
+        default=None,
+        description="显式选择沈氏固定零正与五运分段；不替代山向飞星或自动合成现场吉凶",
+    )
     current_period_number: Optional[StrictInt] = Field(
         default=None,
         ge=1,
@@ -462,6 +724,19 @@ class XuankongInterpretationRequest(_DeferredModel):
 
     @model_validator(mode="after")
     def distinct_confirmed_facts(self) -> "XuankongInterpretationRequest":
+        if self.fixed_lingzheng is not None:
+            if (
+                self.fixed_lingzheng.five_period_half is not None
+                and self.current_period_number != 5
+            ):
+                raise ValueError("零正五运分段仅可用于明确评价五运")
+            old_water = {o.direction: o.water_present for o in self.external_forms}
+            for observation in self.fixed_lingzheng.observations:
+                old = old_water.get(observation.direction)
+                if observation.river_water_present is True and old is False:
+                    raise ValueError(
+                        "同一全宅方向的有水事实不能在飞星与固定零正观察中冲突"
+                    )
         if (self.current_period_number is None) != (self.period_evidence is None):
             raise ValueError("current_period_number 与 period_evidence 必须一起提供")
         if self.period_evidence is not None and not self.period_evidence.strip():
@@ -473,23 +748,69 @@ class XuankongInterpretationRequest(_DeferredModel):
 
 
 class XuankongRequest(_DeferredModel):
-    house: Optional[House] = None
-    period: Optional[HousePeriod] = None
-    bearing_uncertainty_degrees: float = Field(
-        default=0,
+    model_config = ConfigDict(
+        json_schema_extra={
+            "allOf": [
+                {
+                    "properties": {
+                        "house": {
+                            "properties": {
+                                "bearing_uncertainty_degrees": {
+                                    "anyOf": [
+                                        {"type": "number", "maximum": 7.5},
+                                        {"type": "null"},
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    )
+    house: Optional[House] = Field(
+        default=None, description="已确认的住宅磁北宅向；不是家具朝向，不由年盘补出"
+    )
+    period: Optional[HousePeriod] = Field(
+        default=None,
+        description="历史建成、入住或合资格大修定运的独立依据；查询日期不能代替",
+    )
+    bearing_uncertainty_degrees: Optional[float] = Field(
+        default=None,
         ge=0,
         le=7.5,
         allow_inf_nan=False,
-        description="宅向测量误差半径；跨山界或下/替卦阈值返回候选而非唯一宅盘",
+        description="兼容原玄空输入的宅向测量误差半径；优先在house.bearing_uncertainty_degrees声明共享事实，两处显式值须相等。合参同一宅向的此项误差也传递给八宅，不只限制玄空。跨山界或下/替卦阈值保留候选。",
     )
-    ruleset_id: Literal["xuankong_zhongzhou_v1"] = "xuankong_zhongzhou_v1"
+    ruleset_id: Literal["xuankong_zhongzhou_v1"] = Field(
+        default="xuankong_zhongzhou_v1",
+        description="中州派玄空规则版本，误差跨边界保留候选",
+    )
     interpretation: Optional[XuankongInterpretationRequest] = Field(
         default=None,
         description="显式启用有限星组合五行、当令外局与床/门取用条件；不等于完整81组合断法或全宅勘察",
     )
+    city_gate: Optional[CityGateRequest] = Field(
+        default=None,
+        description="独立选择沈氏城门运盘与同元龙水形条件；参考运显式提供，不重置历史宅盘。仅算门位时无需历史定运或现场水形。",
+    )
 
     @model_validator(mode="after")
     def magnetic_reference(self) -> "XuankongRequest":
+        if (
+            self.house is not None
+            and self.house.bearing_uncertainty_degrees is not None
+        ):
+            if (
+                self.bearing_uncertainty_degrees is not None
+                and self.bearing_uncertainty_degrees
+                != self.house.bearing_uncertainty_degrees
+            ):
+                raise ValueError("同一宅向的两处 bearing_uncertainty_degrees 必须一致")
+            if self.house.bearing_uncertainty_degrees > 7.5:
+                raise ValueError("本玄空版本的宅向误差半径最多支持7.5度")
+        if self.house is not None:
+            self.house.check_sitting_trigram(self.effective_bearing_uncertainty)
         if (
             self.house is not None
             and self.house.facing_degrees is not None
@@ -497,6 +818,15 @@ class XuankongRequest(_DeferredModel):
         ):
             raise ValueError("本玄空版本使用磁北宅向；真北需先由用户完成磁偏角校正")
         return self
+
+    @property
+    def effective_bearing_uncertainty(self) -> float:
+        if (
+            self.house is not None
+            and self.house.bearing_uncertainty_degrees is not None
+        ):
+            return self.house.bearing_uncertainty_degrees
+        return self.bearing_uncertainty_degrees or 0.0
 
 
 class LayoutConstraint(_DeferredModel):
@@ -719,25 +1049,43 @@ class AssessRequest(BazhaiRequest):
         description="专家口径的方向与户型确认、家庭辈分/排行、多楼层/院落、无方位环境事实；独立于八字紫微与八宅命卦，不按身份或命盘补方向。",
     )
     layout_constraints: List[LayoutConstraint] = Field(
-        default_factory=list, max_length=200
+        default_factory=list,
+        max_length=200,
+        description="已确认对象的搬动、转向或新增许可；不证明位置、容纳和通行可行，不阻塞普通解释",
     )
     layout_alternatives: List[LayoutAlternative] = Field(
-        default_factory=list, max_length=50
+        default_factory=list,
+        max_length=50,
+        description="用户实际提出的候选变化；新位置、现场关系与物理可行性独立确认，原关系任一端移动需重核",
     )
-    surface_layouts: List[SurfaceLayout] = Field(default_factory=list, max_length=100)
+    surface_layouts: List[SurfaceLayout] = Field(
+        default_factory=list,
+        max_length=100,
+        description="显式选择作者规则的矩形桌面物件；near 靠坐者、far 远离坐者，不等于罗盘方位",
+    )
     surface_constraints: List[SurfaceConstraints] = Field(
-        default_factory=list, max_length=100
+        default_factory=list,
+        max_length=100,
+        description="已提交桌面的物件许可、固定项和逐区确认的可容纳范围；不从照片空白推可行区",
     )
     form_observations: List[FormObservation] = Field(
-        default_factory=list, max_length=200
+        default_factory=list,
+        max_length=200,
+        description="入口可见、直冲、实体背靠等独立形态观察；照片保留候选，无方位或生辰也可独立分析",
     )
-    form_ruleset_id: Literal["indoor_command_authored_v1"] = (
-        "indoor_command_authored_v1"
+    form_ruleset_id: Literal["indoor_command_authored_v1"] = Field(
+        default="indoor_command_authored_v1",
+        description="室内形态作者规则版本，保留实际来源与覆盖范围",
     )
     element_adjustments: List[ElementAdjustment] = Field(
-        default_factory=list, max_length=100
+        default_factory=list,
+        max_length=100,
+        description="对已算星角色的有限五行调节请求；不是个人喜用、材料资格、剂量或现实效力保证",
     )
-    element_ruleset_id: Literal["afsi_element_balance_v1"] = "afsi_element_balance_v1"
+    element_ruleset_id: Literal["afsi_element_balance_v1"] = Field(
+        default="afsi_element_balance_v1",
+        description="有限五行关系作者版本；各方法不能相互抵消",
+    )
     annual_remedy_ruleset_id: Optional[Literal["pang_2026_annual_v1"]] = Field(
         default=None,
         description="显式选择作者2026年盘的有限调节规则；不外推年份或全宅结论",
@@ -746,19 +1094,43 @@ class AssessRequest(BazhaiRequest):
         default=False,
         description="对布局对象计算跨层落宫、位置/朝向调整方位及五行关系；通用于门床桌灶。原始盘与本分析的完成状态分别保留。",
     )
-    features: List[EnvironmentFeature] = Field(default_factory=list, max_length=500)
-    effective_year: Optional[Year] = Field(default=None, ge=1800, le=2199)
-    query_at: Optional[datetime] = None
-    timezone_name: str = "Asia/Shanghai"
+    features: List[EnvironmentFeature] = Field(
+        default_factory=list,
+        max_length=500,
+        description="实际确认方位和砂水分类的金锁环境特征；物件名称不自动推分类，候选新位置须重核",
+    )
+    effective_year: Optional[Year] = Field(
+        default=None,
+        ge=1800,
+        le=2199,
+        description="已确认的年星有效年；不代替玄空历史宅运",
+    )
+    query_at: Optional[datetime] = Field(
+        default=None,
+        description="含时区的实际年度查询时刻；按立春边界推有效年，不用于补宅运",
+    )
+    timezone_name: str = Field(
+        default="Asia/Shanghai",
+        description="年度查询的 IANA 时区或 UTC 偏移；与参考北分别核对",
+    )
     methods: Optional[List[Method]] = Field(
         default=None,
         description="null/省略表示自动选法；场景/作者输入按事实选择，旧无场景无作者请求使用三法。显式列表（含空列表）优先。",
     )
-    jinsuo_ruleset_id: JinsuoRuleset = "jinsuo_basic_fixed_v1"
-    annual_ruleset_id: AnnualRuleset = "annual_zibai_lichun_v1"
+    jinsuo_ruleset_id: JinsuoRuleset = Field(
+        default="jinsuo_basic_fixed_v1", description="金锁八宫固定砂水规则版本"
+    )
+    annual_ruleset_id: AnnualRuleset = Field(
+        default="annual_zibai_lichun_v1",
+        description="立春换年九宫紫白版本；年盘不是历史宅盘",
+    )
     xuankong: Optional[XuankongRequest] = Field(
         default=None,
         description="显式启用宅盘时的历史定运和宅向；可继承顶层 house，年星不继承宅运",
+    )
+    monthly: Optional[MonthlyRequest] = Field(
+        default=None,
+        description="独立月紫白输入；提供时自动选月层，显式methods仍优先。显式选择monthly_stars而省略本项时只继承顶层query_at/timezone_name，不以effective_year猜节月。月星不替代年星或宅盘，不生成布局处方。",
     )
 
     @property
@@ -881,8 +1253,16 @@ class AssessRequest(BazhaiRequest):
                 ]
                 external_forms = bool(
                     self.xuankong
-                    and self.xuankong.interpretation
-                    and self.xuankong.interpretation.external_forms
+                    and (
+                        (
+                            self.xuankong.interpretation
+                            and self.xuankong.interpretation.external_forms
+                        )
+                        or (
+                            self.xuankong.city_gate
+                            and self.xuankong.city_gate.observations
+                        )
+                    )
                 )
                 if not orientation.ready_for_sectors() and (
                     any(p.location_direction is not None for p in placements)
@@ -1248,11 +1628,25 @@ class AssessRequest(BazhaiRequest):
 
 
 class DirectionsRequest(_DeferredModel):
-    bearing_degrees: Optional[float] = Field(
-        default=None, ge=0, le=360, allow_inf_nan=False
+    geomagnetic_reference: Optional[GeomagneticReference] = Field(
+        default=None,
+        description="可选WMM2025地磁参考；明确地点、WGS84椭球高及日期，仅给换算候选，不自动确认或修改宅盘朝向",
     )
-    north_reference: Optional[NorthReference] = None
-    ruleset_id: Literal["houtian_directions_v1"] = "houtian_directions_v1"
+    bearing_degrees: Optional[float] = Field(
+        default=None,
+        ge=0,
+        le=360,
+        allow_inf_nan=False,
+        description="实际方位角，0°北、顺时针，360°归一为0°；省略时仅返回通用方向表",
+    )
+    north_reference: Optional[NorthReference] = Field(
+        default=None,
+        description="角度参考北：magnetic 磁北或 true 真北；提供角度时必须确认",
+    )
+    ruleset_id: Literal["houtian_directions_v1"] = Field(
+        default="houtian_directions_v1",
+        description="后天八卦通用方向索引版本，不代表实际空间已定宫",
+    )
 
     @model_validator(mode="after")
     def validate_reference(self) -> "DirectionsRequest":

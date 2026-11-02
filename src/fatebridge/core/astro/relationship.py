@@ -8,11 +8,10 @@ from fatebridge.core.astro.aspects import (
     _build_directional_relative_antiscia,
     _build_directional_relative_aspects,
     _build_directional_relative_midpoints,
-    _compatibility_score,
     _count_directional_relative_midpoint_hits,
     _flatten_directional_relative_aspects,
 )
-from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astro.birth import AstroBirthInfo, require_resolved_birth_timezone
 from fatebridge.core.astro.profiles import (
     _derive_engine_profile,
     _precision_label_from_profiles,
@@ -34,6 +33,11 @@ from fatebridge.core.astro.relationship_charts import (
     _build_relative_influence_pair,
     _build_timespace_chart,
     _composite_chart,
+)
+from fatebridge.core.astro.relationship_geometry import davison_birth
+from fatebridge.core.astro.relationship_scoring import (
+    compatibility_with_evidence,
+    relationship_scoring_policy,
 )
 
 
@@ -216,6 +220,9 @@ def _assemble_relative_payload(
         "in_to_out_contra_antiscia": in_to_out_contra_antiscia,
         "out_to_in_contra_antiscia": out_to_in_contra_antiscia,
         "chart": chart_value,
+        # Keep the safe union view valid for every selected mode. Only Marks
+        # populates this pair; the other modes perform no extra calculation.
+        "marks_charts": {},
         "inner": inner_influence,
         "outer": outer_influence,
         "summary": summary,
@@ -229,7 +236,10 @@ def build_relative_payload(
     hsys: int = 3,
     zodiacal: int = 0,
     relationship_focus: Any = None,
+    davison_variant: str = "uncorrected",
 ) -> Dict[str, Any]:
+    require_resolved_birth_timezone(inner_birth.timezone_source)
+    require_resolved_birth_timezone(outer_birth.timezone_source)
     relative_mode_info = _normalize_relative_mode(relative_mode)
     relative_house_system = _resolve_relative_house_system(hsys)
     zodiacal_info = _resolve_relative_zodiacal_mode(zodiacal)
@@ -257,10 +267,17 @@ def build_relative_payload(
         key=lambda item: (item["orb"], item["inner"], item["outer"]),
     )
     normalized_mode = relative_mode_info["normalized"]
+    if davison_variant not in {"uncorrected", "corrected", "spherical"}:
+        raise ValueError("davison_variant必须为uncorrected、corrected或spherical")
+    if (
+        normalized_mode not in {"timespace", "marks"}
+        and davison_variant != "uncorrected"
+    ):
+        raise ValueError("davison_variant仅适用于TimeSpace和Marks，不能静默忽略")
     composite_chart = {}
     timespace_chart = {}
     marks_chart = {}
-    if normalized_mode in {"composite", "marks"}:
+    if normalized_mode == "composite":
         composite_chart = _composite_chart(
             inner_chart,
             outer_chart,
@@ -273,21 +290,30 @@ def build_relative_payload(
             outer_birth,
             house_system_info=relative_house_system,
             zodiacal_info=zodiacal_info,
+            davison_variant=davison_variant,
         )
     if normalized_mode == "marks":
-        marks_chart = _build_marks_chart(
-            composite_chart,
-            timespace_chart,
-            house_system=relative_house_system["key"],
-            zodiacal_info=zodiacal_info,
+        relationship_birth, _ = davison_birth(
+            inner_birth, outer_birth, variant=davison_variant
         )
+        marks_charts = {
+            role: _build_marks_chart(
+                person,
+                relationship_birth,
+                house_system_info=relative_house_system,
+                zodiacal_info=zodiacal_info,
+                davison_variant=davison_variant,
+            )
+            for role, person in (("inner", inner_birth), ("outer", outer_birth))
+        }
+        marks_chart = marks_charts["inner"]
     inner_influence, outer_influence = _build_relative_influence_pair(
         inner_chart,
         outer_chart,
         house_system=relative_house_system["key"],
         zodiacal_info=zodiacal_info,
     )
-    compatibility = _compatibility_score(
+    compatibility, compatibility_evidence = compatibility_with_evidence(
         inner_chart["planets"], outer_chart["planets"], synastry_aspects
     )
     in_to_out_midpoint = _build_directional_relative_midpoints(
@@ -391,7 +417,7 @@ def build_relative_payload(
                 f"A对B相位主体数：{len(in_to_out_aspects)}。",
                 f"综合分：{compatibility['overall_score']}。",
                 (
-                    "主 chart 层采用双方出生时间与地理位置中点生成的"
+                    "主盘采用双方出生时间与地理位置中点生成的"
                     f"{_precision_label_zh(timespace_chart.get('chart_profile', {}).get('engine_precision', 'approximate_orbital_model'))}盘。"
                 ),
             ],
@@ -399,24 +425,45 @@ def build_relative_payload(
     elif normalized_mode == "marks":
         payload = _assemble_relative_payload(
             **shared_kwargs,
-            primary_layer="marks_chart",
+            primary_layer="marks_chart_pair",
             third_chart=marks_chart,
             chart_value=marks_chart,
             summary=[
-                "已生成 FateBridge 马克斯盘分析。",
-                f"马克斯盘行星数量：{len(marks_chart.get('planets', []))}。",
+                f"已生成{inner_birth.name}、{outer_birth.name}各自的马克斯盘；摘要主盘对应{inner_birth.name}。",
+                f"内方／外方星体数：{len(marks_charts['inner']['planets'])}／{len(marks_charts['outer']['planets'])}。",
                 f"A对B相位主体数：{len(in_to_out_aspects)}。",
                 f"综合分：{compatibility['overall_score']}。",
                 (
-                    "主 chart 层采用组合盘与时空中点盘之间的"
-                    f"{_precision_label_zh(marks_chart.get('chart_profile', {}).get('engine_precision', 'approximate_orbital_model'))}派生结果。"
+                    "各个人盘由本人与双方Davison时空数据再次计算Davison得到。"
+                    "这是现代关系占星的派生方法，其数值可复现性不代表现实关系结论。"
                 ),
             ],
         )
     else:  # pragma: no cover - _normalize_relative_mode only yields the 5 modes above
         raise ValueError(f"未支持的关系盘模式: {normalized_mode!r}")
 
+    if normalized_mode == "marks":
+        payload["marks_charts"] = marks_charts
+        payload["relationship_profile"]["primary_chart_role"] = "inner"
+    if normalized_mode in {"timespace", "marks"}:
+        payload["relationship_profile"]["davison_variant"] = davison_variant
+    if payload.get("chart"):
+        payload["relationship_profile"]["derivation_policy"] = payload["chart"][
+            "chart_profile"
+        ].get("derivation_policy")
+
     # 关系取向解读侧重对所有盘式通用，在分发后统一附加一次。
+    payload["relationship_profile"][
+        "compatibility_policy"
+    ] = relationship_scoring_policy()
+    payload["compatibility_evidence"] = compatibility_evidence
+    payload["summary"] = [
+        line.replace("综合分：", "自定义关系规则综合分：")
+        for line in payload["summary"]
+    ]
+    payload["relationship_profile"][
+        "relative_midpoint_policy"
+    ] = "unrounded shorter-arc points; exact diametric pairs retain both undecided candidates"
     payload.setdefault("relationship_profile", {})["focus"] = relationship_focus_block(
         relationship_focus, synastry_aspects
     )

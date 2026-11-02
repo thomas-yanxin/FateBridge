@@ -1,0 +1,503 @@
+{
+  "call_guidance": {
+    "calendar_sources": "calendar核时钟与日期，calendar_sources核date_conversion_provenance：lookups逐个连接实际日期、实施provider与印刷参照，implementation_sources保存所用补表原出处。1900参照TAM全年表，最初30日用PMO补表；1901—2100参照HKO，2100年2月9日后使用HKO补表。实施数据不是独立验证，既有历法数值及混合时钟岁序未借来源标记改写。长结果按首次所选fields沿同run分页取齐。 普通日期的实施者是fatebridge_lunardate_adapter_v1，包含上游库表与本系统已登记修正；逐时钟核applied_year_info_correction，按实际农历年取1933/1954/1978等登记，不按公历年份代选。编码是实施证据，不是新的独立历法观测或置信分。",
+    "childhood": "childhood视图单列明文一至六岁童限及实际本命星曜。岁序仍按已披露软件规则；后续岁序未唯一解释时留空，不把本命mutagen当童限四化，也不拿童限证明起大限前替代关系。",
+    "civil_offset": "birth_utc_offset与target_utc_offset分别核对出生和目标命名时区，并选择重复钟时；先后按UTC瞬间比较。偏移选择与nominal_age_basis分别记录，不能把太阳标签当成另一实际瞬间。",
+    "flowing_stars": "流年软件配置返回禄羊陀三项；摘录配置再返回天德、月德、丧门、吊客、白虎、官府，共九项，保留system_id与两种宫位身份。annual_three_sha只给原文明示三支集合，individual_name_positions=null时不自行给奏书/将军/直符逐一配宫，也不借博士同名星填补。",
+    "identity": "analysis_context是目标时刻，birth_context是出生回执；scopes.palace_name/natal_palace_name表示运限命宫所临本命宫。其他本层功能宫读取palace_map.scope_palace_name；mutagen_natal_links分别标记natal_palace_name与scope_palace_name，不混淆为同一功能宫。仅功能名旋宫，未包含全部流曜、飞宫体系或事件结论。",
+    "limit_subperiods": "明刊运限分段首次按需展开limit_subperiods或limit_subperiod_details的fields；视图名不是参数。大限上/下五年依既有虚岁与实际所临十岁区间，不能用年龄末位取余。它不认证原典岁首或星曜应验几何；natal_star_groups只给原文分类与实际本命星对象，南北斗双属仍无唯一分段，小限半年起止未定，不补公历7月1日或农历七月。原文为福邻句未计算，不能只筛吉星；不变更四化、星位或给出事件断言。详尽首调选完整字段，再沿该run分页；索引run不能读回未请求的明细。",
+    "natal_prerequisites": "问起岁、五行局或本命前置推导时，按natal_prerequisites视图首次请求相应fields；完整JSON仍fields=null。natal_prerequisites直接携带本次运限内部已算本命的lunar_date/year_stem/hour_branch/ming_gong/shen_gong/wuxing_ju及三个原rule_trace，separate_birth_run=false，不是另一次ziwei_birth回执。按实际月时→命身→年干和命宫干支→纳音元素/局数说明连接；源文比较仍以给定农历条件为前提，不认证日期转换、甲人语义或古典岁首。出生排盘钟与nominal_age_calendar参考钟、目标流曜钟可不同，不能用计岁或目标年干覆盖此处本命年干；nayin字符串是实算纳音，原文名目比较未做时不能说该名字已校勘。",
+    "nominal_age_basis": "岁序默认birth_civil_timezone：两端实际瞬间均换算到出生民用时区，以该区民用日期查农历年，正月初一00:00换岁。先读nominal_age_calendar核对两端年份、方法、参考区及与legacy_mixed_clock的差值；出生安星仍用原排盘钟，流年/月/日/时仍用目标钟，不混称同一历日。legacy_mixed_clock仅显式回放旧算法，旧春节边界仍可能报错。该修复解决混合时钟岁序的一致性，不认证原典岁首或现实预测。 旧公式比较值不是另一份旧口径成功回执。读取legacy_mixed_clock_age时同时核对legacy_comparison_applied、legacy_comparison_is_separate_run和legacy_ordinal_status：默认比较未应用、未另运行；0值标为would_reject_below_one，显式旧口径会拒算。ordinal_at_least_one只核公式下限，不保证完整旧运行成功，不能把比较值0说成旧回执返回0岁。",
+    "pre_decade": "大限status=not_started表示按所选五行局起岁尚未开始；宫位、宫干、四化为null，palace_map及mutagen_natal_links为空。六层索引保留但该层未计算，不把童限或其本命星曜当大限／童限四化。其他五层照实际结果解释；岁首仍未获原典认证。",
+    "projection": "普通摘要显式使用 suggested_fields；strict_fields=true 配合 fields=null 仍是全量，不会自动精简。",
+    "rules": "本命和运限使用同一rule_profile/version。iztro_2_5_8 1.1.2保留已起限的软件规则；quanshu_v2_excerpt 1.3.2选择闰月、四化、亮度、长生、旬空双支、部分流年星，并采用邻宫起大限和火铃年支定点读法。source_rules视图核对实际差异，岁首、小限年龄基准、闰月斗君和后续流月日时未据此认证；动态四化复用选表仍是软件约定。",
+    "scopes": "scopes数组只能整体投影；按本轮粒度解释所需层，不编造scopes.流年或数字索引路径，不默认读取snapshot_export。",
+    "sihua_source": "sihua_source=rule_profile沿用基础配置；仅在明确指定明刊四化时选naj_ming_v1。三工具同选项，组合版本含+sihua.naj-ming-v1，sihua_source_url专指四化，classical_source仍是基础配置来源。庚日武同相会实际改本命标记及各层按干查表；不因此更改安星、亮度、岁序，也不认证古典运限复用或整书。",
+    "target_clock": "target_minute默认0，target_timezone默认Asia/Shanghai，与出生时区独立；目标时刻采用钟表时间。分钟输入不证明分钟级预测。",
+    "time_input": "首轮回执time_input_status标记实际校时状态；time_input视图给出原校时过程、时区来源和地点精度。默认缺经度降级、省级代表点或仅按经度假设时区均按实际条件说明；不能把没有计算的均时差当0，也不把派生秒数当出生资料秒精度。 minute_sensitivity只比较给定钟表分钟内秒0和59.999999的假设端点；跨时辰或排盘日期时首轮上下文有time_input_minute_sensitive=true。不得替换原命盘、猜实际出生秒数、将端点当两份出生事实，或把样本误差当全局精度界。"
+  },
+  "evidence_views": {
+    "age_calendar": {
+      "fields": [
+        "ziwei_horoscope.nominal_age",
+        "ziwei_horoscope.nominal_age_calendar",
+        "ziwei_horoscope.calendar_basis.nominal_age_rule",
+        "ziwei_horoscope.calendar_basis.age_boundary_classically_verified"
+      ],
+      "purpose": "核对同区岁序与旧混合时钟差异；出生安星及目标流曜仍各用已声明时钟，未认证原典岁首。"
+    },
+    "calendar": {
+      "fields": [
+        "analysis_context",
+        "birth_context",
+        "ziwei_horoscope.ruleset.id",
+        "ziwei_horoscope.ruleset.version",
+        "ziwei_horoscope.calendar_basis.birth.method_id",
+        "ziwei_horoscope.calendar_basis.birth.placement_clock",
+        "ziwei_horoscope.calendar_basis.birth.placement_datetime",
+        "ziwei_horoscope.calendar_basis.birth.civil_datetime",
+        "ziwei_horoscope.calendar_basis.birth.timezone",
+        "ziwei_horoscope.calendar_basis.birth.date_shift_days",
+        "ziwei_horoscope.calendar_basis.birth.placement_lunar_date",
+        "ziwei_horoscope.calendar_basis.birth.civil_date_lunar_date",
+        "ziwei_horoscope.calendar_basis.birth.reference_datetime_utc_plus_08",
+        "ziwei_horoscope.calendar_basis.birth.reference_lunar_date",
+        "ziwei_horoscope.calendar_basis.birth.date_lookup_convention",
+        "ziwei_horoscope.calendar_basis.birth.day_boundary",
+        "ziwei_horoscope.calendar_basis.birth.solar_terms_basis",
+        "ziwei_horoscope.calendar_basis.birth.classical_clock_rule_verified",
+        "ziwei_horoscope.calendar_basis.birth.source_scope",
+        "ziwei_horoscope.calendar_basis.birth.reference_source",
+        "ziwei_horoscope.calendar_basis.birth.time_input",
+        "ziwei_horoscope.calendar_basis.birth.civil_clock",
+        "ziwei_horoscope.calendar_basis.target.method_id",
+        "ziwei_horoscope.calendar_basis.target.placement_clock",
+        "ziwei_horoscope.calendar_basis.target.placement_datetime",
+        "ziwei_horoscope.calendar_basis.target.civil_datetime",
+        "ziwei_horoscope.calendar_basis.target.timezone",
+        "ziwei_horoscope.calendar_basis.target.date_shift_days",
+        "ziwei_horoscope.calendar_basis.target.placement_lunar_date",
+        "ziwei_horoscope.calendar_basis.target.civil_date_lunar_date",
+        "ziwei_horoscope.calendar_basis.target.reference_datetime_utc_plus_08",
+        "ziwei_horoscope.calendar_basis.target.reference_lunar_date",
+        "ziwei_horoscope.calendar_basis.target.date_lookup_convention",
+        "ziwei_horoscope.calendar_basis.target.day_boundary",
+        "ziwei_horoscope.calendar_basis.target.solar_terms_basis",
+        "ziwei_horoscope.calendar_basis.target.classical_clock_rule_verified",
+        "ziwei_horoscope.calendar_basis.target.source_scope",
+        "ziwei_horoscope.calendar_basis.target.reference_source",
+        "ziwei_horoscope.calendar_basis.target.time_input",
+        "ziwei_horoscope.calendar_basis.target.civil_clock",
+        "ziwei_horoscope.calendar_basis.nominal_age_rule",
+        "ziwei_horoscope.calendar_basis.age_boundary_classically_verified",
+        "ziwei_horoscope.calendar_rules",
+        "ziwei_horoscope.nominal_age"
+      ],
+      "purpose": "核对原有出生安星、目标流曜、UTC+08参考时钟及岁序公式；同区岁序两端和旧规则差值另读age_calendar，实施来源另读calendar_sources，原典校时未认证。"
+    },
+    "calendar_sources": {
+      "fields": [
+        "analysis_context",
+        "birth_context",
+        "ziwei_horoscope.ruleset.id",
+        "ziwei_horoscope.ruleset.version",
+        "ziwei_horoscope.calendar_basis.birth.placement_clock",
+        "ziwei_horoscope.calendar_basis.birth.placement_lunar_date",
+        "ziwei_horoscope.calendar_basis.birth.civil_date_lunar_date",
+        "ziwei_horoscope.calendar_basis.birth.reference_lunar_date",
+        "ziwei_horoscope.calendar_basis.birth.date_conversion_provenance",
+        "ziwei_horoscope.calendar_basis.target.placement_clock",
+        "ziwei_horoscope.calendar_basis.target.placement_lunar_date",
+        "ziwei_horoscope.calendar_basis.target.civil_date_lunar_date",
+        "ziwei_horoscope.calendar_basis.target.reference_lunar_date",
+        "ziwei_horoscope.calendar_basis.target.date_conversion_provenance"
+      ],
+      "purpose": "逐个排盘、钟表和UTC+08参考日期核实际库表／补表来源及分别发布的印刷见证；1900年参照TAM，紫台仅是所用一月补表，不把实现输入冒充独立验证或古典校时认证。"
+    },
+    "childhood": {
+      "fields": [
+        "analysis_context",
+        "birth_context",
+        "ziwei_horoscope.ruleset.id",
+        "ziwei_horoscope.ruleset.version",
+        "ziwei_horoscope.nominal_age",
+        "ziwei_horoscope.childhood_limit",
+        "ziwei_horoscope.source_comparison.daxian"
+      ],
+      "purpose": "独立读取安童限诀明文一至六岁宫位及其真实本命星曜；后续岁序未决，未证明岁首或起大限前替代关系，不生成童限四化。"
+    },
+    "decade_activation": {
+      "fields": [
+        "analysis_context",
+        "birth_context",
+        "ziwei_horoscope.ruleset.id",
+        "ziwei_horoscope.ruleset.version",
+        "ziwei_horoscope.nominal_age",
+        "ziwei_horoscope.source_comparison.daxian"
+      ],
+      "purpose": "核对给定岁序是否进入所选五行局首大限；未起时明确为空，与独立童限及其他五层分开。"
+    },
+    "limit_subperiod_details": {
+      "fields": [
+        "analysis_context",
+        "birth_context",
+        "ziwei_horoscope.ruleset.id",
+        "ziwei_horoscope.ruleset.version",
+        "ziwei_horoscope.ming_limit_subperiods"
+      ],
+      "purpose": "首次请求本轮完整分段证据、南北斗定义与实际本命星位路径；双属与未分类星保留。若分页则沿同run取齐，不能将原句解释为已验证应验。"
+    },
+    "limit_subperiods": {
+      "fields": [
+        "analysis_context",
+        "birth_context",
+        "ziwei_horoscope.ruleset.id",
+        "ziwei_horoscope.ruleset.version",
+        "ziwei_horoscope.ming_limit_subperiods.method_id",
+        "ziwei_horoscope.ming_limit_subperiods.version",
+        "ziwei_horoscope.ming_limit_subperiods.source",
+        "ziwei_horoscope.ming_limit_subperiods.frame",
+        "ziwei_horoscope.ming_limit_subperiods.source_section",
+        "ziwei_horoscope.ming_limit_subperiods.source_reading",
+        "ziwei_horoscope.ming_limit_subperiods.daxian",
+        "ziwei_horoscope.ming_limit_subperiods.xiaoxian",
+        "ziwei_horoscope.ming_limit_subperiods.relevant_star_geometry_defined",
+        "ziwei_horoscope.ming_limit_subperiods.full_traditional_judgment",
+        "ziwei_horoscope.ming_limit_subperiods.source_outcome_claim_adopted",
+        "ziwei_horoscope.ming_limit_subperiods.transcription_method",
+        "ziwei_horoscope.ming_limit_subperiods.independent_human_reviewers",
+        "ziwei_horoscope.ming_limit_subperiods.independent_model_reviewers"
+      ],
+      "purpose": "依当前已选虚岁及真实大限区间核上/下五年，保留未起限、南北斗原句及小限半年未定；分类不等于选出应验星曜或最终吉凶。"
+    },
+    "natal_prerequisites": {
+      "fields": [
+        "analysis_context",
+        "birth_context",
+        "ziwei_horoscope.ruleset.id",
+        "ziwei_horoscope.ruleset.version",
+        "ziwei_horoscope.natal_prerequisites"
+      ],
+      "purpose": "核对本次运限同次计算中已生成的本命前置链：出生排盘农历与时支、命身、年干、命宫干支、纳音与局数；保留条件原文比较，不拿目标年或岁序参考年替换出生年干。未另起本命run或认证原典岁首。"
+    },
+    "sihua_source": {
+      "fields": [
+        "analysis_context",
+        "birth_context",
+        "ziwei_horoscope.ruleset",
+        "ziwei_horoscope.sihua_source_comparison"
+      ],
+      "purpose": "核对实际四化表身份、原页比较与是否显式应用；运限的各层实际四化另读同run scopes，运限复用未获原典认证。"
+    },
+    "source_rules": {
+      "fields": [
+        "analysis_context",
+        "birth_context",
+        "ziwei_horoscope.ruleset.id",
+        "ziwei_horoscope.ruleset.version",
+        "ziwei_horoscope.nominal_age",
+        "ziwei_horoscope.source_comparison"
+      ],
+      "purpose": "核对所选大限首宫、给定岁序的小限及正常生月斗君，并区分火铃年支定点读法与软件生时推进；不认证整书、年龄岁首或全部流月日时规则。"
+    },
+    "time_input": {
+      "fields": [
+        "analysis_context",
+        "birth_context",
+        "ziwei_horoscope.ruleset.id",
+        "ziwei_horoscope.ruleset.version",
+        "ziwei_horoscope.calendar_basis.birth.time_input",
+        "ziwei_horoscope.nominal_age"
+      ],
+      "purpose": "核对真太阳时是否实际应用、经纬地点精度与时区假设；未计算分量为空，不把0修正或秒数显示解释为已知天文量或出生精度。"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "analysis_context",
+      "birth_context",
+      "ziwei_horoscope.ruleset",
+      "ziwei_horoscope.interpretation_scope",
+      "ziwei_horoscope.nominal_age",
+      "ziwei_horoscope.calendar_rules",
+      "ziwei_horoscope.scopes",
+      "ziwei_horoscope.nominal_age_calendar.method_id",
+      "ziwei_horoscope.nominal_age_calendar.basis",
+      "ziwei_horoscope.nominal_age_calendar.timezone",
+      "ziwei_horoscope.nominal_age_calendar.birth_lunar_year",
+      "ziwei_horoscope.nominal_age_calendar.target_lunar_year",
+      "ziwei_horoscope.nominal_age_calendar.difference_from_legacy"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "birth_day": {
+        "description": "Birth day (1-31)",
+        "maximum": 31,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "birth_hour": {
+        "description": "Birth hour (0-23)",
+        "maximum": 23,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_longitude": {
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth longitude (optional)"
+      },
+      "birth_minute": {
+        "default": 0,
+        "description": "Birth minute (0-59)",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_month": {
+        "description": "Birth month (1-12)",
+        "maximum": 12,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "birth_place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "Birth place (optional)"
+      },
+      "birth_timezone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth timezone (IANA name or UTC offset)"
+      },
+      "birth_utc_offset": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "出生钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与出生时区核对并选择重复钟时，不替换命名时区。"
+      },
+      "birth_year": {
+        "description": "Birth year (1900–2100, the existing individual-birth service range)",
+        "maximum": 2100,
+        "minimum": 1900,
+        "type": "integer"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "gender": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未知",
+        "description": "性别（可选但建议提供：影响大运顺逆排布与部分六亲判断）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法。"
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "姓名（可选，仅用于结果快照中的标识，不参与计算）"
+      },
+      "nominal_age_basis": {
+        "default": "birth_civil_timezone",
+        "description": "岁序默认birth_civil_timezone：出生与目标实际瞬间都按出生民用时区查农历年，正月初一00:00换岁，独立于真太阳安星及目标流曜钟。legacy_mixed_clock显式回放旧的目标钟表年减出生排盘年，可能拒绝春节边界；两者均非原典岁首认证。",
+        "enum": [
+          "birth_civil_timezone",
+          "legacy_mixed_clock"
+        ],
+        "type": "string"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "rule_profile": {
+        "default": "iztro_2_5_8",
+        "description": "与本命盘共用的版本化紫微规则；quanshu_v2_excerpt 1.3.2 首大限从父母或兄弟起，火铃按年支定点读法；仍是部分摘录配置。",
+        "enum": [
+          "iztro_2_5_8",
+          "quanshu_v2_excerpt"
+        ],
+        "type": "string"
+      },
+      "selected_sections": {
+        "default": [],
+        "description": "Optional snapshot section titles for filtered export payload",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "sihua_source": {
+        "default": "rule_profile",
+        "description": "本命与可用运限层共用所选四化表；naj_ming_v1取明刊原页。运限按宫干／时间干复用仍为软件约定，不据此认证古典运限法。",
+        "enum": [
+          "rule_profile",
+          "naj_ming_v1"
+        ],
+        "type": "string"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "target_day": {
+        "description": "Target day (1-31)",
+        "maximum": 31,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "target_hour": {
+        "description": "Target hour (0-23)",
+        "maximum": 23,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "target_minute": {
+        "default": 0,
+        "description": "Target minute (0-59); does not imply minute-level predictive accuracy",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "target_month": {
+        "description": "Target month (1-12)",
+        "maximum": 12,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "target_timezone": {
+        "default": "Asia/Shanghai",
+        "description": "目标钟表时间的时区，与出生时区独立；默认 Asia/Shanghai，不对目标时刻做真太阳时修正。",
+        "type": "string"
+      },
+      "target_utc_offset": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "目标钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与target_timezone核对并选择重复钟时。省略仍拒绝歧义或不存在的目标钟时；实际先后按UTC瞬间比较。"
+      },
+      "target_year": {
+        "description": "Target year, e.g., 2026",
+        "type": "integer"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "use_true_solar_time": {
+        "default": true,
+        "description": "Rebase the birth clock onto true solar time (longitude + equation of time). Default on in the current software policy; this option does not certify a classical text's clock rule. Set false for the raw civil clock.",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "birth_year",
+      "birth_month",
+      "birth_day",
+      "birth_hour",
+      "target_year",
+      "target_month",
+      "target_day",
+      "target_hour"
+    ],
+    "type": "object"
+  },
+  "tool": "ziwei_horoscope"
+}

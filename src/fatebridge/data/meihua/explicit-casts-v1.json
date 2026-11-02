@@ -1,0 +1,202 @@
+{
+  "id": "meihua_explicit_casts_v1",
+  "version": "1.5.0",
+  "title": "《梅花易數》显式原始资料起卦与既有卦解读",
+  "scope": "所列显式原始资料取数法，含年月日時加已报数；不自动猜音、数画、取象或补起卦时刻。既有卦模式只解释实际给定的单动爻。",
+  "rules": [
+    {
+      "id": "candidate_reading_policy",
+      "kind": "software_evidence_policy",
+      "statement": "分别按所保留取爻候选的实际本互变、固定原体及同一已报月支解释生克、季令与实际动爻经文；不套用另一口径的互卦、体气或爻辞，不从候选投票认定唯一古法或现实结局。"
+    },
+    {
+      "id": "lunar_time_added_count",
+      "source_id": "meihua-volume-2",
+      "section": "起卦加數例",
+      "kind": "selected_facsimile_worked_arithmetic",
+      "quote": "先生以各姓而加數",
+      "statement": "以上卦原数=农历年支数+农历月数+日数+已报加数，下卦及取爻原数=上卦原数+原时支数；余零分别取8及6。不补绝对年份、闰标志、日期或实际月长；不把农历月数当节月，不自动查姓氏现代笔画。",
+      "selected_facsimile": {
+        "section": "起卦加數例",
+        "original_pdf_index": 94,
+        "arithmetic_quote": "又加午時七數總二十七數除三八二十四數得三離為下卦二十七中除四六二十四零三為爻得豐變震",
+        "counts_in_this_example_only": {
+          "王": 4,
+          "田": 6,
+          "韓": 21
+        },
+        "fixed_transcription_variant": "余三為初爻",
+        "variant_resolution": "Selected facsimile reads 零三為爻; total 27 modulo 6 is 3 and supplied 豐變震 also moves line 3. Fixed revision remains unchanged. Counts are supplied historical-example facts, not universal glyph stroke counts."
+      },
+      "selected_source_id": "nlc_1925",
+      "historical_examples_are_observed_validation": false
+    },
+    {
+      "id": "object_count",
+      "source_id": "meihua-volume-1",
+      "section": "物數占例",
+      "kind": "text_rule",
+      "quote": "以此數起作上卦，以時數配作下卦。即以卦數並時數總除六取動爻。",
+      "statement": "实际可数物件数量取上卦，所报时支数取下卦。动爻按所声明的原物数或上卦卦序数，加原时支数一次；不把酉戌亥的10、11、12先改成下卦的2、3、4再取爻。超八边界保留两套完整卦变与体用。",
+      "facsimile_collation": {
+        "status": "selected_span_manually_collated",
+        "references": [
+          {
+            "edition": "德聚堂刊本，故宮珍本叢刊415",
+            "original_pdf_index": 6,
+            "position": "lower half, leftmost columns",
+            "url": "https://commons.wikimedia.org/w/index.php?title=File:GGZBCK415_梅花易數_増補詳注六爻一撮金易數_官板大六壬神課金口訣_邵子易數_大六壬課經集.pdf&oldid=1155031066"
+          },
+          {
+            "edition": "文明書局本，NLC416-12jh005426-44577",
+            "original_pdf_index": 15,
+            "position": "rightmost column",
+            "url": "https://commons.wikimedia.org/w/index.php?title=File:NLC416-12jh005426-44577_梅花易數.pdf&oldid=808894944"
+          }
+        ],
+        "full_text_conformance_established": false
+      }
+    },
+    {
+      "id": "sound_groups",
+      "source_id": "meihua-volume-1",
+      "section": "鄰夜扣門借物占",
+      "kind": "text_rule",
+      "quote": "以一聲屬乾為上卦，以五聲屬巽為下卦",
+      "statement": "两组实际声音顺序分别取上下卦，加所报时支取动爻；超过八的取爻计数边界另列软件约定与替代结果。"
+    },
+    {
+      "id": "observed_trigrams",
+      "source_id": "meihua-volume-1",
+      "section": "物卦起例（端法後天起卦）",
+      "kind": "text_rule",
+      "quote": "後天端法：以物為上卦，方位為下卦，合物卦之數與方卦之數加時數以取動爻。"
+    },
+    {
+      "id": "length_zhang_chi",
+      "source_id": "meihua-volume-1",
+      "section": "丈尺占",
+      "kind": "text_rule",
+      "quote": "丈尺之物，以丈數為上卦，尺數為下卦。合丈尺之數取爻。寸數不用。"
+    },
+    {
+      "id": "length_chi_cun",
+      "source_id": "meihua-volume-1",
+      "section": "尺寸占",
+      "kind": "text_rule",
+      "quote": "以尺數為上卦，寸數為下卦。合尺寸之數加時取爻。分數不用。"
+    },
+    {
+      "id": "text_tones",
+      "source_id": "meihua-volume-1",
+      "section": "一字占至十一字占、今日動靜如何",
+      "kind": "text_rule",
+      "quote": "平聲為一數，上聲為二數，去聲為三數，入聲為四數。",
+      "statement": "四至十字按所报平上去入1/2/3/4分组，奇数少字为上，以原总数取爻且不加时。原例动静取去声，与所列广韵片段归上声不同；不能把四声一概认作唯一中古音，或用拼音调号代替。tone_reference只记录调用方音系和来源声明，未独立鉴定；原例类别比较不改输入，也不认定哪个音系为唯一古法。",
+      "tone_evidence_profile": "meihua_tone_input_v1@1.0.0"
+    },
+    {
+      "id": "text_strokes",
+      "source_id": "meihua-volume-1",
+      "section": "一字占至十一字占、西林寺牌額占",
+      "kind": "text_rule",
+      "quote": "二字為兩儀平分。以一字為上卦，一字為下卦。",
+      "statement": "二三字按实际字形所报笔画取数；少字为上，以原总画数取爻，不用现代规范字形替换原字。"
+    },
+    {
+      "id": "single_character_strokes",
+      "source_id": "meihua-volume-1",
+      "section": "一字占至十一字占",
+      "kind": "text_rule",
+      "quote": "又以一字之陰陽，全畫取爻。",
+      "statement": "只接收已核定楷书左右阴阳画和全画；草书、不明笔画或重复计画不猜。"
+    },
+    {
+      "id": "text_count",
+      "source_id": "meihua-volume-1",
+      "section": "一字占至十一字占",
+      "kind": "text_rule",
+      "quote": "止用字數。如字數均平，則以半為上卦，以半為下卦。又合二卦總數取爻。",
+      "statement": "默认固定转录2690596保留十一至百字的工作范围；所选文明书局和德聚堂影印作百餘字，精确上限未裁定。须显式text_basis选择文明书局选段才可超过100，且仅标为软件算术扩展，不以1百万的软件保护上限宣称原书数量范围已验证。合二卦总数按明示原字数或两卦卦序数取爻，不加时数；有分歧时两套实际卦变和解释均保留，原字数默认数值不改，不裁定唯一古法。",
+      "source_witnesses": [
+        {
+          "source_id": "meihua-volume-1",
+          "revision": 2690596,
+          "wording": "百字",
+          "role": "default_fixed_transcription_working_range"
+        },
+        {
+          "source_id": "nlc_1925",
+          "original_pdf_index": 17,
+          "wording": "百餘字",
+          "line_sum_span_reading": "又合二卦總取爻",
+          "status": "assistant_selected_span_visual_reading_exact_upper_extent_unadjudicated"
+        },
+        {
+          "source_id": "dejutang_text_count",
+          "selected_pdf_index": 1,
+          "original_pdf_index": 7,
+          "wording": "百餘字",
+          "line_sum_span_reading": "又合二卦總數取爻",
+          "status": "assistant_selected_span_visual_reading_exact_upper_extent_unadjudicated"
+        }
+      ]
+    },
+    {
+      "id": "existing",
+      "kind": "user_supplied_facts",
+      "statement": "直接沿用实际给定的六位卦码和唯一动爻；不换当前时刻重新起卦。"
+    },
+    {
+      "id": "explicit_count_policy",
+      "kind": "software_convention",
+      "statement": "两段声音超八时可选原声数或余数卦序相加取爻，默认原声数，并保留另法动爻；原例1和5未唯一裁定该边界。物数占另按原物数或上卦卦序数加原时支数，不能将下卦卦序代替原时数。长度某单位为零取8为坤，是明示的余数扩展约定。 字数法另保留原字数或两卦卦序数合计的取爻候选，不加时；这些是未唯一裁定的计数解释，不因与已知结果符合而换口径。"
+    },
+    {
+      "id": "specific_over_general",
+      "kind": "software_convention",
+      "statement": "丈尺及字占遵对应章节和具体演算例，不将一般取爻加时句机械套到全部方法；不足以认定全书无分歧。"
+    },
+    {
+      "id": "context_overrides",
+      "source_id": "meihua-volume-2",
+      "section": "卦斷遺論",
+      "kind": "text_rule",
+      "quote": "凡占卜決斷，固以體用為主，然有不拘體用者。",
+      "statement": "比和或生助不自动等于现实成败；西林寺是原文反例，不把四段关系投票或累加成通用吉分。"
+    }
+  ],
+  "sources": [
+    {
+      "id": "nlc_1925",
+      "title": "文明書局《梅花易數》所选计数字句",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+      "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+      "original_pdf_indices": [
+        17,
+        88,
+        94,
+        95
+      ]
+    },
+    {
+      "id": "dejutang_text_count",
+      "title": "德聚堂《梅花易數》字占所选字句",
+      "url": "https://commons.wikimedia.org/w/index.php?title=File:GGZBCK415_梅花易數_増補詳注六爻一撮金易數_官板大六壬神課金口訣_邵子易數_大六壬課經集.pdf&oldid=1155031066",
+      "original_pdf_index": 7,
+      "selected_pdf_index": 1,
+      "selected_file_sha256": "0788b4a4b3efb97558517e5f2090caac9670f14f6fa57e8f2d44372a3975b139",
+      "scope": "Only selected十一字以上至於百餘字and合二卦總數span; assistant visual reading, not full-book or independent expert authentication."
+    },
+    {
+      "id": "nlc_1925_today_tones",
+      "title": "文明書局《梅花易數》今日動靜如何所选四声",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+      "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+      "original_pdf_indices": [
+        24
+      ]
+    }
+  ],
+  "edition": "基础规则沿用维基文库固定修订转录；加数例据文明书局本所选影印段，非全书校勘或作者认证"
+}

@@ -1,0 +1,58 @@
+{
+  "ruleset_id": "zengshan_earth_cessation_v17",
+  "ruleset_version": "17.0.1",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "method": "Visual collation of same-edition PDF97-100 and127 before implementation; no borrowed fire completion."
+  },
+  "clauses": [
+    {
+      "id": "earth-cessation-exception",
+      "pdf_pages": [
+        98
+      ],
+      "quote": "土爻雖絕於巳必須休囚無氣又逢巳者謂之絕也若土爻旺相或得日月動爻生扶再遇巳爻者巳火反能生土論生不論絕也",
+      "quotation_revision": "43.0.0"
+    },
+    {
+      "id": "role-transformed-adverse",
+      "pdf_pages": [
+        53
+      ],
+      "quote": "忌神動化絕化剋化破化散六也"
+    },
+    {
+      "id": "transform-stage-location",
+      "pdf_pages": [
+        97
+      ],
+      "quote": "動而變出申金者謂之化絕"
+    }
+  ],
+  "interpretation": {
+    "independence": "A queried Si cannot prove its own earth-generation exception. For an earth day-Si or actual changed-Si position, require independently qualified month/day generation or same-element support, qualified other-line generation, or a separately qualified back-generation not itself Si. Preserve source paths and unreviewed candidates.",
+    "bounded_verdict": "Verified independent support with no listed opposition excludes this earth-cessation clause; opposing or incomplete support stays unknown. Absence of this finite support inventory is not a proof of globally rootless earth and never certifies true cessation.",
+    "role_integration": "Retain all old23 formulas, atom_values and progress_atom_values. conditional_atom_values use the stage exception. Known transformed back-control/month-break stays true; unreviewed HuaSan means an otherwise nonmatched overall changed_adverse remains unknown rather than forced false.",
+    "other_elements": "Known non-earth cessation positions retain the legacy role position predicate and its separate strength prerequisites. No new complete actual-cessation verdict or fire phase is inferred."
+  },
+  "scope": "Same-edition bounded earth-Si exception and role-clause fidelity; not a complete growth/tomb/cessation adjudicator or global outcome prediction.",
+  "quotation_errata": [
+    {
+      "artifact": "liuyao-cessation-v17.json",
+      "clause_id": "earth-cessation-exception",
+      "original_profile_sha256": "d1025a918ffd1a7e44555a2c25dc1bc09fd838ca6364fdc28c5ba58e3d99b03e",
+      "published_before_sha256": "d1025a918ffd1a7e44555a2c25dc1bc09fd838ca6364fdc28c5ba58e3d99b03e",
+      "old_quote": "土爻雖絕於巳必須休囚無氣又逢巳者謂之絕也若土爻旺相或得日月動爻生扶再遇巳者巳火反能生土論生不論絕也",
+      "new_quote": "土爻雖絕於巳必須休囚無氣又逢巳者謂之絕也若土爻旺相或得日月動爻生扶再遇巳爻者巳火反能生土論生不論絕也",
+      "new_ruleset_version": "17.0.1",
+      "source_sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+      "pdf_page": 98,
+      "passage_id": "earth-si",
+      "source_image_sha256": "f995df987f4352717a4585318055f9c9bc20c928911dbfdbde6fa8a5652fe347",
+      "revision": "43.0.0",
+      "reason": "Verbatim quotation corrected against the same frozen edition; computations and stage tables unchanged"
+    }
+  ]
+}

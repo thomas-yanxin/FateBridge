@@ -1,0 +1,208 @@
+{
+  "reference_id": "official_calendar_facsimiles_v1",
+  "single_collator": true,
+  "independent_second_collator": false,
+  "transcribed_before_first_numerical_comparison_this_turn": true,
+  "cases": [
+    {
+      "reference_id": "jiajing3_1524_wdl108",
+      "title": "大明嘉靖三年歲次甲申大統曆",
+      "source_year": 1524,
+      "edition": "明嘉靖三年刻本",
+      "original_author": "李鑑等修、欽天監頒行",
+      "collection": "Library of Congress Chinese Rare Book Collection",
+      "bibliographic_url": "https://www.loc.gov/item/2014514059/",
+      "facsimile_url": "https://commons.wikimedia.org/w/index.php?title=File:Imperial_Calendar_in_the_Third_Year_of_Emperor_Jia_Jing’s_Reign_in_the_Ming_Dynasty_WDL108.pdf&oldid=562700675",
+      "reference_pdf": "wdl108.pdf",
+      "pdf_pages": 36,
+      "reference_kind": "complete_year_summary_facsimile",
+      "calendar_month_count": 12,
+      "calendar_total_days": 354,
+      "months": [
+        {
+          "month_number": 1,
+          "is_leap_month": false,
+          "length_days": 30,
+          "sexagenary_start_day": "丙寅",
+          "locator": {
+            "pdf_page": 5,
+            "column_from_right": 2
+          }
+        },
+        {
+          "month_number": 2,
+          "is_leap_month": false,
+          "length_days": 30,
+          "sexagenary_start_day": "丙申",
+          "locator": {
+            "pdf_page": 5,
+            "column_from_right": 3
+          }
+        },
+        {
+          "month_number": 3,
+          "is_leap_month": false,
+          "length_days": 29,
+          "sexagenary_start_day": "丙寅",
+          "locator": {
+            "pdf_page": 5,
+            "column_from_right": 4
+          }
+        },
+        {
+          "month_number": 4,
+          "is_leap_month": false,
+          "length_days": 30,
+          "sexagenary_start_day": "乙未",
+          "locator": {
+            "pdf_page": 5,
+            "column_from_right": 5
+          }
+        },
+        {
+          "month_number": 5,
+          "is_leap_month": false,
+          "length_days": 29,
+          "sexagenary_start_day": "乙丑",
+          "locator": {
+            "pdf_page": 5,
+            "column_from_right": 6
+          }
+        },
+        {
+          "month_number": 6,
+          "is_leap_month": false,
+          "length_days": 30,
+          "sexagenary_start_day": "甲午",
+          "locator": {
+            "pdf_page": 5,
+            "column_from_right": 7
+          }
+        },
+        {
+          "month_number": 7,
+          "is_leap_month": false,
+          "length_days": 29,
+          "sexagenary_start_day": "甲子",
+          "locator": {
+            "pdf_page": 6,
+            "column_from_right": 1
+          }
+        },
+        {
+          "month_number": 8,
+          "is_leap_month": false,
+          "length_days": 29,
+          "sexagenary_start_day": "癸巳",
+          "locator": {
+            "pdf_page": 6,
+            "column_from_right": 2
+          }
+        },
+        {
+          "month_number": 9,
+          "is_leap_month": false,
+          "length_days": 30,
+          "sexagenary_start_day": "壬戌",
+          "locator": {
+            "pdf_page": 6,
+            "column_from_right": 3
+          }
+        },
+        {
+          "month_number": 10,
+          "is_leap_month": false,
+          "length_days": 29,
+          "sexagenary_start_day": "壬辰",
+          "locator": {
+            "pdf_page": 6,
+            "column_from_right": 4
+          }
+        },
+        {
+          "month_number": 11,
+          "is_leap_month": false,
+          "length_days": 30,
+          "sexagenary_start_day": "辛酉",
+          "locator": {
+            "pdf_page": 6,
+            "column_from_right": 5
+          }
+        },
+        {
+          "month_number": 12,
+          "is_leap_month": false,
+          "length_days": 29,
+          "sexagenary_start_day": "辛卯",
+          "locator": {
+            "pdf_page": 6,
+            "column_from_right": 6
+          }
+        }
+      ],
+      "note": "全部月大小与月首逐栏读原页；朱印覆盖另按可见字记录。未据连贯性回填。"
+    },
+    {
+      "reference_id": "wanli27_1599_nlc_preview",
+      "title": "大明萬曆二十七年歲次己亥大統曆",
+      "source_year": 1599,
+      "edition": "明萬曆刻本",
+      "collection": "國家圖書館；識典古籍公開原圖",
+      "bibliographic_url": "https://www.shidianguji.com/zh/book/NGJ892411999031452149483/chapter/1lq8cijmqrwnj",
+      "reference_kind": "partial_month_pages_facsimile",
+      "calendar_month_count": null,
+      "calendar_total_days": null,
+      "months": [
+        {
+          "month_number": 1,
+          "is_leap_month": false,
+          "length_days": 29,
+          "sexagenary_start_day": null,
+          "locator": {
+            "page_number": 6,
+            "file": "shidian1599-preview-6.png"
+          },
+          "unreadable_fields": [
+            "sexagenary_start_day"
+          ]
+        },
+        {
+          "month_number": 2,
+          "is_leap_month": false,
+          "length_days": 29,
+          "sexagenary_start_day": null,
+          "locator": {
+            "page_number": 8,
+            "file": "shidian1599-preview-8.png"
+          },
+          "unreadable_fields": [
+            "sexagenary_start_day"
+          ]
+        },
+        {
+          "month_number": 3,
+          "is_leap_month": false,
+          "length_days": 30,
+          "sexagenary_start_day": "庚辰",
+          "locator": {
+            "page_number": 10,
+            "file": "shidian1599-preview-10.png"
+          },
+          "unreadable_fields": []
+        },
+        {
+          "month_number": 4,
+          "is_leap_month": false,
+          "length_days": 29,
+          "sexagenary_start_day": "庚戌",
+          "locator": {
+            "page_number": 12,
+            "file": "shidian1599-preview-12.png"
+          },
+          "unreadable_fields": []
+        }
+      ],
+      "note": "仅公开预览6至13页；一、二月月首字迹不清，明确留空；不按软件反填，也未把闰四月文字转录升级为原图核验。"
+    }
+  ]
+}

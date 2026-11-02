@@ -1,0 +1,136 @@
+{
+  "id": "t2465_zentsuji_109_4_selected_reference_v1",
+  "title": "檜尾口訣",
+  "holding_institution": "総本山善通寺",
+  "source_attribution": "善通寺宝物館 国文学研究資料館",
+  "call_number": "109-4",
+  "film_call_number": "セ01-0259-003",
+  "catalogue_url": "https://kokusho.nijl.ac.jp/biblio/100223663",
+  "holder_list_url": "https://kokusho.nijl.ac.jp/page/list-zentsuji.html",
+  "doi": "10.20730/100223663",
+  "manifest_url": "https://kokusho.nijl.ac.jp/biblio/100223663/manifest",
+  "manifest_sha256": "dc41c230e83b2d4dcaf094b21e1d93df3d5a4c6a86763d35f062e0934c9b3f59",
+  "manifest_version": 2,
+  "canvas_count": 34,
+  "selected_canvas_id": "https://kokusho.nijl.ac.jp/biblio/100223663/canvas/29",
+  "canvas_one_based": 29,
+  "visible_left_leaf": "廿五",
+  "image_url": "https://kokusho.nijl.ac.jp/api/iiif/100223663/v4/XSE1/XSE1-25903/XSE1-25903-0028.tif/full/full/0/default.jpg",
+  "image_sha256": "55cd7cea03bb02435d0e805e5fc256b4f02032a24f7dd3bc954015178622e602",
+  "image_bytes": 1471968,
+  "image_dimensions": [
+    6153,
+    4677
+  ],
+  "image_use_terms_url": "https://kokusho.nijl.ac.jp/page/usage.html",
+  "transcription_receipt_sha256": "ca4b5f9216e71aa45a0652625ffc7e5a9a085a586949c7324b38004dbab81635",
+  "transcription_method": "Root visual inspection of the complete original JPEG and exact plain crops; no model completion of uncertain glyphs. Whitespace, reading marks and layout omitted, virtual mansion name 虛 normalized to 虚 in mansion fields only. Literal strings retain 虛.",
+  "observations": [
+    {
+      "id": "oral_heading",
+      "location": "canvas29 right page, calendar heading",
+      "normalized_transcription": "勘宿曜經取閏月之宿及小月之闕日分宿法依口説"
+    },
+    {
+      "id": "ordinary_month_repeats",
+      "location": "canvas29 right page, next calendar column",
+      "normalized_transcription": "其正月直宿即亦重直閏月"
+    },
+    {
+      "id": "twelfth_day_1",
+      "location": "canvas29 right page, last calendar column",
+      "month": 12,
+      "day": 1,
+      "mansion": "虚",
+      "normalized_transcription": "其十二月一日直宿是虛宿"
+    },
+    {
+      "id": "twelfth_day_15",
+      "location": "canvas29 right final calendar column to left first column",
+      "month": 12,
+      "day": 15,
+      "mansion": "星",
+      "normalized_transcription": "十五日直宿是星宿"
+    },
+    {
+      "id": "twelfth_day_30",
+      "location": "canvas29 left page, first body column from right",
+      "month": 12,
+      "day": 30,
+      "mansion": "室",
+      "normalized_transcription": "乃至三十日直宿是室宿"
+    },
+    {
+      "id": "base_month_explanation",
+      "location": "canvas29 left page, second and third body columns from right",
+      "normalized_transcription": "先月是正十二月閏月是傍十二月也故傍月"
+    },
+    {
+      "id": "omitted_day_exists",
+      "location": "canvas29 left page, fourth and fifth body columns from right",
+      "normalized_transcription": "假令正月小闕第三十日雖無其第三十日而彼日分直宿猶有故"
+    },
+    {
+      "id": "upper_half_assignment_fragment",
+      "location": "canvas29 left page, sixth body column from right",
+      "normalized_transcription": "上者正月闕日之分宿直也",
+      "scope": "Only the clear continuation; no supplied character between 半 and 上."
+    },
+    {
+      "id": "current_day_assignment_fragment",
+      "location": "canvas29 left page, sixth and seventh body columns from right",
+      "normalized_transcription": "下者即彼當日宿直",
+      "scope": "Only the clear continuation; no normalization of the preceding 己/已 form."
+    },
+    {
+      "id": "closing_clause",
+      "location": "canvas29 left page, eighth body column from right",
+      "normalized_transcription": "次月初一日直宿無改代也"
+    }
+  ],
+  "unaccepted_glyphs": [
+    {
+      "location": "canvas29 left page, between 次二月初一日半 and 上者",
+      "candidate_root_reading": "也",
+      "accepted_literal": null,
+      "scope": "Retain visible form as provisional; do not merge into Taisho 半已上 or treat as proof of its 甲 apparatus."
+    },
+    {
+      "location": "canvas29 left page, between 半 and 下者",
+      "candidate_root_readings": [
+        "己",
+        "已"
+      ],
+      "accepted_literal": null,
+      "scope": "No silent normalized character supplied in the selected fragment."
+    }
+  ],
+  "colophon_reference": {
+    "canvas_one_based": 33,
+    "inspection_capture": "1800 pixel derivative only",
+    "selected_date_literal": "明和七年十月",
+    "name_transcription_accepted": false,
+    "identity_as_current_object_date_established": false,
+    "scope": "Selected colophon date formula only, not an independently dated physical object; full canvas33 download timed out."
+  },
+  "identified_as_taisho_base_or_ko": false,
+  "independent_textual_lineage_established": false,
+  "independent_human_transcription_accepted": false,
+  "complete_manuscript_collation": false,
+  "leap_short_month_priority_established": false,
+  "modern_clock_mapping_established": false,
+  "algorithm_override_applied": false,
+  "scope": "Distinct catalogue object from Kyoto RB00017868 and Zentsuji109-5; selected testimony alongside existing readings, not a new operative calendar. Does not resolve Kyoto uncertain glyphs, Taisho witness identity, historical dawn or half-clock mapping, or intercalary/short-month precedence.",
+  "prior_history_contains_host_mansion_calculations": true,
+  "blinded_to_expected_mansions": false,
+  "catalogue_card_reference": {
+    "canvas_one_based": 1,
+    "inspection_capture": "1800 pixel derivative",
+    "title_literal": "檜尾口訣",
+    "form_literal": "写 1冊",
+    "holding_literal": "総本山善通寺",
+    "call_number_literal": "109-4",
+    "photography_date_literal": "平成16年7月",
+    "photography_date_is_copy_date": false
+  }
+}

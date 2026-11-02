@@ -100,7 +100,42 @@ class MarriageAnalysis:
         """
         day_stem = pillars["day"][0]
         day_branch = pillars["day"][1]
-        is_male = normalize_gender(gender) == "male"
+        normalized_gender = normalize_gender(gender)
+        if normalized_gender not in ("male", "female"):
+            return {
+                "gender_basis": "unselected_gender_alternatives",
+                "spouse_star": {
+                    "spouse_star_type": "未选定传统配偶星口径",
+                    "spouse_star_strength": "未评定",
+                    "alternatives": {
+                        "male": MarriageAnalysis._analyze_spouse_star(
+                            pillars, day_stem, True
+                        ),
+                        "female": MarriageAnalysis._analyze_spouse_star(
+                            pillars, day_stem, False
+                        ),
+                    },
+                },
+                "spouse_palace": MarriageAnalysis._analyze_spouse_palace(
+                    pillars, day_branch, day_stem
+                ),
+                "marriage_quality": {
+                    "score": None,
+                    "quality_level": "未评定",
+                    "notes": ["性别未选定，不默认套用女命规则或合并两套分数。"],
+                },
+                "marriage_shensha": MarriageAnalysis._check_marriage_shensha(pillars),
+                "marriage_timing": {
+                    "timing_signals": [],
+                    "marriage_tendency": "未评定",
+                    "tendency_notes": ["保留独立日支关系；性别相关婚期口径不作选择。"],
+                },
+                "risk_factors": [],
+                "suggestions": [
+                    "先对照实际相处、沟通与双方安排；个人单盘不能判断关系成败。"
+                ],
+            }
+        is_male = normalized_gender == "male"
 
         # 1. 配偶星分析
         spouse_star = MarriageAnalysis._analyze_spouse_star(pillars, day_stem, is_male)
@@ -139,6 +174,8 @@ class MarriageAnalysis:
         )
 
         return {
+            "gender_basis": normalized_gender,
+            "interpretation_scope": "命主单盘的传统对应；分数为固定规则指数，不是婚姻质量测量或成败概率。",
             "spouse_star": spouse_star,
             "spouse_palace": spouse_palace,
             "marriage_quality": marriage_quality,
@@ -170,9 +207,9 @@ class MarriageAnalysis:
             spouse_label = "官星"
             spouse_label_alt = "七杀"
 
-        # 在四柱中查找配偶星（婚姻同 career，跳过整个日柱）
+        # 日干自身不计，但配偶宫中的藏干也是配偶星的真实位置。
         spouse_star_positions: List[Dict[str, Any]] = []
-        for e in iter_pillar_gods(pillars, day_stem, skip_day_pillar=True):
+        for e in iter_pillar_gods(pillars, day_stem):
             if e.ten_god != spouse_god and e.ten_god != spouse_god_alt:
                 continue
             is_stem = e.location == "天干"
@@ -218,6 +255,7 @@ class MarriageAnalysis:
             "spouse_star_alt": spouse_label_alt,
             "spouse_star_positions": spouse_star_positions,
             "spouse_star_strength": spouse_star_strength,
+            "counting_scope": "含日支藏干；此字段为出现次数分类，不是根气、得令及制化后的旺衰。",
             "spouse_element": spouse_element.value if spouse_element else None,
             "predicted_appearance": appearance,
         }
@@ -302,13 +340,13 @@ class MarriageAnalysis:
 
         if branch_element == day_element:
             score += 5
-            notes.append("日支与日干同气，夫妻同心")
+            notes.append("日支与日干同五行，按本规则加5分；不由此判断夫妻同心")
         elif GENERATION_CYCLE.get(branch_element) == day_element:
             score += 8
-            notes.append("日支生日干，配偶助力")
+            notes.append("日支五行生日干，按本规则加8分；不等同配偶实际助力")
         elif DESTRUCTION_CYCLE.get(branch_element) == day_element:
             score -= 5
-            notes.append("日支克日干，婚姻中偶有压力")
+            notes.append("日支五行克日干，按本规则减5分；仅是盘内生克关系")
 
         # 2. 检查天干合
         stems = [pillars[p][0] for p in ["year", "month", "day", "hour"]]
@@ -325,10 +363,14 @@ class MarriageAnalysis:
                 if any(pair == frozenset(c) for c in stem_combinations):
                     if i == 1 and j == 2:  # 月干与日干合
                         score += 5
-                        notes.append("月干与日干相合，感情基础好")
+                        notes.append(
+                            "月干与日干符合五合配对，按本规则加5分；未认证合化或感情基础"
+                        )
                     elif i == 2 and j == 3:  # 日干与时干合
                         score += 3
-                        notes.append("日干与时干相合，晚年感情佳")
+                        notes.append(
+                            "日干与时干符合五合配对，按本规则加3分；不预测晚年感情"
+                        )
 
         # 3. 检查地支六合（日支参与）
         all_branches = [pillars[p][1] for p in ["year", "month", "day", "hour"]]
@@ -337,7 +379,9 @@ class MarriageAnalysis:
                 p_name = ["year", "month", "day", "hour"][i]
                 if p_name in ["month", "hour"]:
                     score += 6
-                    notes.append(f"日支与{p_name}支六合，婚姻和谐")
+                    notes.append(
+                        f"日支与{p_name}支六合，按本规则加6分；不直接判断现实关系和谐"
+                    )
 
         # 4. 伤官见官扣分（女命尤忌）
         if not is_male:
@@ -350,7 +394,9 @@ class MarriageAnalysis:
                     has_zhengguan = True
             if has_shangguan and has_zhengguan:
                 score -= 10
-                notes.append("女命伤官见官，婚姻易生波折")
+                notes.append(
+                    "女命口径检测到伤官与正官共现，按本规则减10分；未审制化救应"
+                )
 
         # 5. 比劫重重扣分
         bijie_count = sum(
@@ -360,7 +406,7 @@ class MarriageAnalysis:
         )
         if bijie_count >= 3:
             score -= 8
-            notes.append("比劫重重，婚姻中竞争或第三者风险增加")
+            notes.append("非日柱比劫计数达到本规则阈值，减8分；不能推断第三者或忠诚")
 
         # 限制分数范围
         score = max(30, min(95, score))
@@ -377,6 +423,9 @@ class MarriageAnalysis:
 
         return {
             "score": score,
+            "score_kind": "traditional_rule_index",
+            "score_basis": "70为基准，按声明的生克与配对固定加减并限制30–95；不是实际婚姻质量或成败概率。",
+            "counting_scope": "历史评分的十神计数不含日柱；完整配偶星位置另含日支藏干，两者不可互作旺衰。",
             "quality_level": quality_level,
             "notes": notes,
         }
@@ -422,7 +471,7 @@ class MarriageAnalysis:
 
         hl = hong_luan_map.get(year_branch)
         tx = tian_xi_map.get(year_branch)
-        if hl:
+        if hl and hl in {b for _, b in pillars.values()}:
             entries.append(
                 {
                     "name": "红鸾",
@@ -430,7 +479,7 @@ class MarriageAnalysis:
                     "meaning": f"红鸾在{hl}，主婚恋喜事",
                 }
             )
-        if tx:
+        if tx and tx in {b for _, b in pillars.values()}:
             entries.append(
                 {
                     "name": "天喜",
@@ -455,7 +504,7 @@ class MarriageAnalysis:
             "丑": "午",
         }
         peach = peach_map.get(day_branch)
-        if peach:
+        if peach and peach in {b for _, b in pillars.values()}:
             entries.append(
                 {
                     "name": "咸池（桃花）",
@@ -495,7 +544,7 @@ class MarriageAnalysis:
         }
         gc = gu_chen_map.get(day_branch)
         gs = gua_su_map.get(day_branch)
-        if gc:
+        if gc and gc in {b for _, b in pillars.values()}:
             entries.append(
                 {
                     "name": "孤辰",
@@ -503,7 +552,7 @@ class MarriageAnalysis:
                     "meaning": f"孤辰在{gc}，主性格独立，婚姻较晚",
                 }
             )
-        if gs:
+        if gs and gs in {b for _, b in pillars.values()}:
             entries.append(
                 {
                     "name": "寡宿",
@@ -683,7 +732,7 @@ class MarriageAnalysis:
                     {
                         "type": "伤官见官",
                         "severity": "高",
-                        "description": "女命伤官见官，婚姻易生口舌是非，需注意沟通方式",
+                        "description": "女命口径见伤官与正官共现；制化与救应未裁定，不由此断感情结果",
                     }
                 )
 
@@ -701,7 +750,7 @@ class MarriageAnalysis:
                     {
                         "type": "比劫争财",
                         "severity": "中",
-                        "description": "男命比劫重重，婚姻中易有竞争或第三者干扰",
+                        "description": "男命非日干三处比劫的盘内计数信号；不推断第三者或伴侣忠诚",
                     }
                 )
 
@@ -710,11 +759,10 @@ class MarriageAnalysis:
         day_element = STEM_ELEMENTS[day_stem][0]
         if is_male:
             # 男命财星为配偶星
-            for elem, destroyed in DESTRUCTION_CYCLE.items():
-                if destroyed == day_element:
-                    for s, (e, _) in STEM_ELEMENTS.items():
-                        if e == elem:
-                            spouse_stem_set.add(s)
+            wealth_element = DESTRUCTION_CYCLE[day_element]
+            spouse_stem_set = {
+                s for s, (e, _) in STEM_ELEMENTS.items() if e == wealth_element
+            }
         else:
             # 女命官杀为配偶星：克日主（即天干五行能克制日主元素）的天干。
             for s, (e, _) in STEM_ELEMENTS.items():
@@ -733,7 +781,7 @@ class MarriageAnalysis:
                         {
                             "type": "配偶星入墓",
                             "severity": "中",
-                            "description": f"配偶星{stem}在{p_name}支{branch}入墓，配偶健康或运势需关注",
+                            "description": f"配偶星{stem}在{p_name}支{branch}符合本表墓库对应；不据此判断配偶健康或现实处境",
                         }
                     )
 
@@ -751,14 +799,9 @@ class MarriageAnalysis:
         """生成婚姻建议。"""
         suggestions: List[str] = []
 
-        # 基于质量分数
-        score = marriage_quality.get("score", 70)
-        if score >= 80:
-            suggestions.append("婚姻基础良好，宜珍惜眼前人，用心经营感情")
-        elif score >= 65:
-            suggestions.append("婚姻运势中等，需多沟通理解，避免因小事生嫌隙")
-        else:
-            suggestions.append("婚姻运势需关注，建议晚婚为宜，择偶时多考察对方品性")
+        suggestions.append(
+            "本次分数是盘内固定规则指数；结婚时间与相处安排需依据双方意愿、实际沟通及生活条件。"
+        )
 
         # 基于配偶宫稳定性
         if "不稳" in spouse_palace.get("stability", ""):
@@ -768,14 +811,14 @@ class MarriageAnalysis:
         high_risks = [r for r in risk_factors if r.get("severity") == "高"]
         if high_risks:
             suggestions.append(
-                "存在高风险因素，建议婚姻中保持坦诚沟通，必要时寻求专业婚姻咨询"
+                "盘内存在待复核的关系信号；先核对是否与实际互动相符，再讨论沟通和边界。"
             )
 
         # 基于神煞
         shensha_names = {s["name"] for s in marriage_shensha}
         if "孤辰" in shensha_names or "寡宿" in shensha_names:
             suggestions.append(
-                "命带孤辰/寡宿，内心世界丰富但不善表达，建议主动表达感情"
+                "孤辰／寡宿仅是已命中的传统神煞标签；不据此给性格或婚姻结局定性。"
             )
 
         if not suggestions:

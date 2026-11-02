@@ -24,6 +24,30 @@ class DiscoveryQuery(BaseModel):
     detail: Literal["summary", "full"] = "full"
 
 
+def select_mcp_specs(
+    specs: List[ToolSpec],
+    *,
+    family: Optional[str] = None,
+    scenario: Optional[str] = None,
+    tool_scope: str = "complete",
+) -> List[ToolSpec]:
+    """Select an explicit MCP loading profile without changing domain contracts."""
+    if tool_scope not in {"complete", "topic"} or (
+        tool_scope == "topic" and not scenario
+    ):
+        raise ParameterError(
+            "tool_scope 使用 complete 或 topic；topic 必须指定 scenario",
+            [{"path": "tool_scope", "code": "invalid_tool_scope"}],
+        )
+    selected = select_specs(specs, family=family, scenario=scenario, surface="mcp")
+    if tool_scope == "topic":
+        from fatebridge.application.scenarios import scenario_keys
+
+        keys = scenario_keys(specs, scenario or "", scope="topic")
+        selected = [spec for spec in selected if spec.key in keys]
+    return selected
+
+
 def select_specs(
     specs: List[ToolSpec],
     *,

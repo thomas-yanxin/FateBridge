@@ -1,0 +1,359 @@
+{
+  "id": "meihua_journey_clauses_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本出行与谒见条款及出行条件",
+  "selected_edition_id": "nlc_1925",
+  "source": {
+    "id": "nlc_1925",
+    "title": "文明書局《梅花易數》卷二出行與謁見選段",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_indices": [
+      68,
+      69
+    ],
+    "attribution_scope": "Hosting catalogue metadata; no independent authorship certification"
+  },
+  "comparison_source": {
+    "id": "wikisource_1441921",
+    "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二",
+    "revision": 1441921,
+    "saved_fixed_transcription_text_sha256": "903b109b37071584ccbf54e15ee10813d32c702bb3d7e690e15d5b77cd0ff7cb"
+  },
+  "topics": {
+    "travel": {
+      "label": "出行",
+      "section": "出行占第十二",
+      "use_role": "所行之應",
+      "header": "占出行以體為主用為所行之應",
+      "pdf_index": 68
+    },
+    "meeting": {
+      "label": "谒见",
+      "section": "謁見占第十四",
+      "use_role": "所見之人",
+      "header": "占謁見以體為主用為所見之人",
+      "pdf_index": 69
+    }
+  },
+  "rules": [
+    {
+      "id": "travel_body_controls_use",
+      "topic": "travel",
+      "relation": "体克用",
+      "source_id": "nlc_1925",
+      "section": "出行占第十二",
+      "quote": "體尅用可行所至多得意",
+      "reading": "所选本取可行及所至多得意的传统象义，未核定行程结果",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          68
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體克用，可行，所至多得意",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "travel_use_controls_body",
+      "topic": "travel",
+      "relation": "用克体",
+      "source_id": "nlc_1925",
+      "section": "出行占第十二",
+      "quote": "用尅體出則有禍",
+      "reading": "所选本取不利的传统象义；原文禍字仅为历史用语记录，不是现实灾祸断言",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          68
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用克體，出則有禍",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "travel_body_generates_use",
+      "topic": "travel",
+      "relation": "体生用",
+      "source_id": "nlc_1925",
+      "section": "出行占第十二",
+      "quote": "體生用出行有破耗之失",
+      "reading": "所选本取耗损的传统象义，未核定实际开支或损失",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          68,
+          69
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體生用，出行有破耗之失",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "travel_use_generates_body",
+      "topic": "travel",
+      "relation": "用生体",
+      "source_id": "nlc_1925",
+      "section": "出行占第十二",
+      "quote": "用生體有意外之財",
+      "reading": "所选本取意外之财的传统象义，未核定收益或概率",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          69
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用生體，有意外之財",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "travel_same_element",
+      "topic": "travel",
+      "relation": "体用比和",
+      "source_id": "nlc_1925",
+      "section": "出行占第十二",
+      "quote": "體用比和出行順快",
+      "reading": "所选本取出行顺快的传统象义，未核定交通或行程结果",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          69
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體用比和，出行順快",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "meeting_body_controls_use",
+      "topic": "meeting",
+      "relation": "体克用",
+      "source_id": "nlc_1925",
+      "section": "謁見占第十四",
+      "quote": "體尅用可見",
+      "reading": "所选本取可见的传统象义，未核定约见事实",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          69
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體克用，可見",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "meeting_use_controls_body",
+      "topic": "meeting",
+      "relation": "用克体",
+      "source_id": "nlc_1925",
+      "section": "謁見占第十四",
+      "quote": "用尅體不見",
+      "reading": "所选本取不见的传统象义，未核定约见事实",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          69
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用克體，不見",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "meeting_body_generates_use",
+      "topic": "meeting",
+      "relation": "体生用",
+      "source_id": "nlc_1925",
+      "section": "謁見占第十四",
+      "quote": "體生用難見見之而無益",
+      "reading": "所选本取难见及见而无益的传统象义，未核定实际会面效果",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          69
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體生用，難見，見之而無益",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "meeting_use_generates_body",
+      "topic": "meeting",
+      "relation": "用生体",
+      "source_id": "nlc_1925",
+      "section": "謁見占第十四",
+      "quote": "用生體可見見之且有得",
+      "reading": "所选本取可见且有得的传统象义，未核定实际会面效果",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          69
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用生體，可見，見之且有得",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "meeting_same_element",
+      "topic": "meeting",
+      "relation": "体用比和",
+      "source_id": "nlc_1925",
+      "section": "謁見占第十四",
+      "quote": "體用比和歡然相見",
+      "reading": "所选本取欢然相见的传统象义，未核定实际会面或关系结果",
+      "semantic_tags": [
+        "source_conditional_symbol_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          69
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體用比和，歡然相見",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    }
+  ],
+  "complete_travel_supplement": "又凡出行體宜乘旺諸卦宜生體體卦乾震多主動坤艮多主不動巽宜舟行離宜陸行坎防失脫主紛爭之應也",
+  "travel_pending_clauses": [
+    {
+      "id": "qian_zhen_many",
+      "quote": "體卦乾震多主動",
+      "trigrams": [
+        "乾",
+        "震"
+      ],
+      "reason": "多 threshold and role denominator not adjudicated",
+      "original_pdf_index": 69
+    },
+    {
+      "id": "kun_gen_many",
+      "quote": "坤艮多主不動",
+      "trigrams": [
+        "坤",
+        "艮"
+      ],
+      "reason": "多 threshold and role denominator not adjudicated",
+      "original_pdf_index": 69
+    },
+    {
+      "id": "xun_boat",
+      "quote": "巽宜舟行",
+      "trigrams": [
+        "巽"
+      ],
+      "reason": "Role scope not adjudicated; a travel-mode symbol, not geographic bearing or instruction",
+      "original_pdf_index": 69
+    },
+    {
+      "id": "li_land",
+      "quote": "離宜陸行",
+      "trigrams": [
+        "离"
+      ],
+      "reason": "Role scope not adjudicated; a travel-mode symbol, not geographic bearing or instruction",
+      "original_pdf_index": 69
+    },
+    {
+      "id": "kan_loss",
+      "quote": "坎防失脫",
+      "trigrams": [
+        "坎"
+      ],
+      "reason": "Role scope not adjudicated; no actual loss verdict",
+      "original_pdf_index": 69
+    },
+    {
+      "id": "unassigned_dispute",
+      "quote": "主紛爭之應也",
+      "trigrams": [],
+      "reason": "No兌 character seen in selected NLC span; subject not restored from different transcription",
+      "original_pdf_index": 69
+    }
+  ],
+  "source_decisions": [
+    "Keep NLC坎防失脫主紛爭之應也 as read; no兌 glyph in selected facsimile span. Fixed transcription has坎妨失脫兌主紛爭. Do not restore a subject to the NLC sentence or attribute the orphan clause automatically.",
+    "NLC坤艮多主不動 versus transcription坤艮多不動 retained",
+    "No geographic-bearing clause in this selected出行chapter;舟/陸 are travel-mode symbols, not directions",
+    "多 threshold/denominator and which role scopes巽/離/坎 apply to remain unadjudicated. Keep their complete source text and actual role occurrences; no automatic outcome labels.",
+    "體宜乘旺 and諸卦宜生體 are preferences, not conditions that cancel all other clauses or require all4roles to generate the body",
+    "Source quote about禍 is historical wording only, never an actual hazard verdict; no probability, event date or route instruction"
+  ],
+  "independent_human_expert_review": false,
+  "predictive_efficacy_established": false
+}

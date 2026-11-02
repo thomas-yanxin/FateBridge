@@ -1,0 +1,261 @@
+{
+  "id": "aitani2013_naritasan_koya_preface_selected_v1",
+  "source_url": "https://www.nishogakusha-u.ac.jp/eastasia/pdf/book-naritasan.pdf",
+  "publication": "和刻本佛典邦人序跋集成 成田山佛教圖書館之部",
+  "modern_editor": "會谷佳光",
+  "modern_publication_date": "2013-03",
+  "publisher": "二松学舎大学 日本漢文教育研究推進室",
+  "isbn": "4-903353-33-8",
+  "pdf_sha256": "8d426364ae8198c8d992a90086d10d90bb9379c1d255c4b722e6a567e6b0b6f6",
+  "pdf_bytes": 7852267,
+  "entry_number": "095",
+  "printed_pages": [
+    77,
+    78
+  ],
+  "pdf_pages_one_based": [
+    83,
+    84
+  ],
+  "selected_page_images": [
+    {
+      "pdf_page": 83,
+      "sha256": "789e4500254ca609cbeb6d63b2e553da7ce5307b86ea6ae3bad5340c03585890"
+    },
+    {
+      "pdf_page": 84,
+      "sha256": "c3d97ff037615b38553dc1c00c4711a1bad4c1b139c02ebdc51138bcca881b93"
+    }
+  ],
+  "catalogue_witness": {
+    "holding": "成田山佛教圖書館",
+    "call_number_literal": null,
+    "imprint_literal": "高野山經師八左衛門刊本",
+    "preface_date_literal": "享保二十一年序",
+    "physical_identity_with_arc_established": false,
+    "call_number_model_readings": [
+      "四六―一三四（イ）",
+      "四六―一二三四（イ）"
+    ],
+    "call_number_accepted": false
+  },
+  "arc_companion_identity": {
+    "record": "arcBK01-0086-01",
+    "preface_images_sha256": {
+      "5": "2b469c1eedae354ddd5c2322848e08bb25c700d3b32106de65dcf3640450ebd9",
+      "6": "c5a57cbed3698b126fc74a20fc89add358e392e16be0ce04b0d9c9428124f65a",
+      "7": "23926dfc8e03ec4e833bf832da7b7b205289027841efb174bd6ccfd234d80cea"
+    },
+    "signature": "享保二十一年仲春日沙門覺勝"
+  },
+  "preface_selected": {
+    "literal": "正月朔本是室今以虛配朔每月三十日遇小盡之時次第而直若大盡則一宿重直兩日今皆一齊以次配屬其差不止一二宿",
+    "printed_page": 77,
+    "columns_from_right": [
+      11,
+      12
+    ],
+    "column_counting": "古序正文从宿曜經者起，不计题录和标题",
+    "status": "modern_scholarly_transcription_selected_text_with_retained_graphic_readings_not_arc_autograph_collation",
+    "literal_only_not_complete_executable_rule": true,
+    "graphic_readings": {
+      "span": "今以虛／虚配朔",
+      "reviewer_form": "虛",
+      "generator_form": "虚",
+      "normalized_name": "虚",
+      "physical_arc_glyph_adopted": false
+    }
+  },
+  "supplement": {
+    "title_literal": "補入記",
+    "printed_page": 78,
+    "calendar_month_note": {
+      "main_literal": "又大唐元和元年十二月月小盡也",
+      "inline_literal": "本國曆為大月",
+      "layers_not_merged": true
+    },
+    "attribution_note_literal": "高野山無量壽院藏中別有宿曜經發光院亦有一本兩古本末皆附載此記",
+    "authorship_and_insertion_date_established": false,
+    "personal_record_attribution_is_source_claim": true,
+    "note_after_dates_not_part_of_date_records": true,
+    "unresolved_note_glyph": {
+      "location": "案语中彼与曜之间",
+      "accepted_literal": null,
+      "candidates": [
+        "算",
+        "筭",
+        "等"
+      ]
+    },
+    "physical_arc_copy_supplement_independently_located": true,
+    "arc_location_scope": "另据ARC下卷帧28实际图像定位同组记日，非现代整理本与ARC馆藏实物同一性或独立人类验收。"
+  },
+  "weekday_name_evidence": {
+    "source_url": "https://21dzk.l.u-tokyo.ac.jp/SAT/T1299_%2C21%2C0398a27%3A1299_%2C21%2C0398c07.html",
+    "html_sha256": "d80df072ab0918002624863b40b298514ace0ed416085b0bafa920a61524a108",
+    "locator": "T1299_.21.0398b03-05",
+    "main_literals": [
+      "密日持齋",
+      "日曜太陽胡名蜜"
+    ],
+    "apparatus_literal": "密＝蜜＜明＞",
+    "normalized_luminary": "日",
+    "inference_scope": "密／蜜按该具名词项对照为日曜；不统一原字，也不据此认证每一历史日期。"
+  },
+  "dated_records": [
+    {
+      "id": "yuanhe1_first_month_day2",
+      "lunar_year": 806,
+      "lunar_month": 1,
+      "lunar_day": 2,
+      "literal": "太唐元和元年歲次丙戌正月二日丁卯是密日也",
+      "era_equivalence_literal": "此則日本國延曆廿五年也是年五月改元為大同元年也",
+      "weekday_literal": "密日",
+      "claimed_luminary": "日",
+      "printed_day_ganzhi": "丁卯",
+      "calendar_label_scope": "唐纪年兼明列日本纪年；月日来自哪一具体颁历尚未独立核定。",
+      "columns_from_right": [
+        1
+      ]
+    },
+    {
+      "id": "daido2_first_month_day3",
+      "lunar_year": 807,
+      "lunar_month": 1,
+      "lunar_day": 3,
+      "literal": "又大同二年正月三日壬辰又蜜日",
+      "weekday_literal": "蜜日",
+      "claimed_luminary": "日",
+      "printed_day_ganzhi": "壬辰",
+      "calendar_label_scope": "本国日期与准拟唐历日期分列；不将唐正月四日当日本同名日期。",
+      "tang_alternative": {
+        "lunar_month": 1,
+        "lunar_day": 4,
+        "literal": "准擬大唐曆正月四日應當是蜜日也",
+        "epistemic_status": "source_conjecture_should_be_not_independently_verified_conversion",
+        "tang_calendar_backend_computed": false
+      },
+      "columns_from_right": [
+        2
+      ]
+    },
+    {
+      "id": "daido3_second_month_day7",
+      "lunar_year": 808,
+      "lunar_month": 2,
+      "lunar_day": 7,
+      "literal": "又大同三年二月七日又是蜜日也",
+      "weekday_literal": "蜜日",
+      "claimed_luminary": "日",
+      "printed_day_ganzhi": null,
+      "calendar_label_scope": "纪年为大同三年，具体月日来源与历法身份尚未独立校定；只与同名NAOJ日本参考月日作条件比较。",
+      "columns_from_right": [
+        2,
+        3
+      ]
+    }
+  ],
+  "complete_arc_glyph_collation_accepted": false,
+  "complete_critical_edition_accepted": false,
+  "modern_clock_mapping_established": false,
+  "leap_short_month_priority_established": false,
+  "algorithm_override_applied": false,
+  "independent_reality_samples_added": 0,
+  "scope": "现代整理本所据成田山刊本的选段；古序与補入記、其按语、现代整理说明分别保留。原ARC草体疑读与360格两处疑字不被此翻刻覆盖，藏本同一性、实际印刷年、记录者归属及唐历身份未认证。普通月表、大小月议论及三条记日不能确定现代日界、逐时曜序、桧尾半日或闰小月优先。 ARC下卷帧28正文与上栏校按已另定位；其具名校正意见不自动成为原始记日事实，三条正文分母及二月七日不合继续保留。",
+  "arc_supplement_selected_reference": {
+    "record": "arcBK01-0086-02",
+    "parent_record": "arcBK01-0086",
+    "frame_one_based": 28,
+    "printed_leaf": "二十七",
+    "permalink": "https://www.dh-jac.net/db1/books/arcBK01-0086-02/portal/27/",
+    "image_sha256": "e0c54a9bfe4cf9eb888215bb9ba2403e9c87c800287ab6d6ba70bcc1b609a8c6",
+    "body_third_date_literal": "又大同三年二月七日又是蜜日也",
+    "body_day_ganzhi": null,
+    "marginal_selected_literal": "二月當作正月……大同三年正月七日己丑……二月七日己未火曜直而非蜜日也",
+    "selected_literal_has_explicit_omissions": true,
+    "complete_marginal_literal_accepted": false,
+    "uncertain_marginal_spans": [
+      {
+        "location": "今之后至推考之之前",
+        "accepted_literal": null,
+        "scope": "读录异体及词读分开保留，不补作有曆；见原始读录与根代理撤回记录。"
+      },
+      {
+        "location": "己丑是之后日也之前",
+        "accepted_literal": null,
+        "candidate_literals": [
+          "密",
+          "蜜"
+        ],
+        "normalized_term_under_named_T1299_mapping": "日"
+      },
+      {
+        "location": "末尾餘與暦法相合之前",
+        "accepted_literal": null,
+        "candidate_literals": [
+          "且",
+          "自"
+        ]
+      },
+      {
+        "location": "末栏法与合之间",
+        "accepted_literal": null,
+        "provisional_reading": "相",
+        "generator_status": "provisional",
+        "reviewer_status": "相合读录"
+      }
+    ],
+    "marginal_author_and_original_date_certified": false,
+    "body_commentary_glyph_readings_separate_from_2013_uncertainty": true,
+    "body_and_margin_not_merged": true,
+    "same_physical_witness_newly_selected_not_new_independent_observation": true,
+    "independent_human_collation_accepted": false,
+    "model_readings_sha256": {
+      "generator-arc-supplement-reading.json": "7159f326f59b5fcd5b4cc259414cf5c8e417988cef7c42a375415b3b58454101",
+      "reviewer-arc-supplement-reading.json": "165d59552470424492ab0fc2c7f59d14187dc136207d816e3c081dd861c56952"
+    },
+    "dated_claims": [
+      {
+        "claim_role": "校按拟正月七日",
+        "lunar_fields": [
+          808,
+          1,
+          7,
+          false
+        ],
+        "literal": "大同三年正月七日己丑是〔密／蜜未定〕日也",
+        "printed_day_ganzhi": "己丑",
+        "weekday_literal_candidates": [
+          "密",
+          "蜜"
+        ],
+        "accepted_weekday_glyph": null,
+        "claimed_luminary": "日",
+        "calendar_identity_certified": false
+      },
+      {
+        "claim_role": "校按对正文二月七日的判断",
+        "lunar_fields": [
+          808,
+          2,
+          7,
+          false
+        ],
+        "literal": "二月七日己未火曜直而非蜜日也",
+        "printed_day_ganzhi": "己未",
+        "weekday_literal": "火曜",
+        "claimed_luminary": "火",
+        "calendar_identity_certified": false
+      }
+    ],
+    "primary_date_or_input_override_applied": false,
+    "scope": "正文二月七日蜜日、上栏拟正月七日及二月七日火曜的校按、现代NAOJ同名参考均分层；不回写正文，不补原正文干支，不把边按当独立史实、校准日界或缩减候选。",
+    "body_commentary_selected_glyph": {
+      "location": "彼与曜之间",
+      "accepted_literal": null,
+      "generator_reading": "筭（暂读，另候选算）",
+      "reviewer_reading": "筭",
+      "independent_human_acceptance": false
+    }
+  }
+}

@@ -1,0 +1,237 @@
+{
+  "id": "meihua_trigram_relation_symbols_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本体用总诀八卦生体克体象义",
+  "selected_edition_id": "nlc_1925",
+  "source": {
+    "title": "文明書局《梅花易數》體用總訣选段",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_indices": [
+      60,
+      61,
+      62
+    ],
+    "attribution_scope": "hosting catalogue publication metadata; authorship/date authenticity not independently authenticated"
+  },
+  "premises": [
+    {
+      "quote": "又看全卦中有生體之卦看是何卦",
+      "pdf_index": 60
+    },
+    {
+      "quote": "又看卦中有尅體之卦者看是何卦",
+      "pdf_index": 61
+    }
+  ],
+  "closing_clause": {
+    "quote": "生尅不逢止隨本卦而論之",
+    "pdf_index": 62,
+    "automatic_application": "not_adjudicated; do not equate no matched support/attack with absence of all generating/controlling relationships"
+  },
+  "comparison_source": {
+    "id": "wikisource_1441921",
+    "raw_sha256": "903b109b37071584ccbf54e15ee10813d32c702bb3d7e690e15d5b77cd0ff7cb",
+    "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二"
+  },
+  "selected_variants": [
+    {
+      "rule_id": "xun_controls_body",
+      "selected": "謀事乃南方之人",
+      "comparison": "謀事乃東南方之人",
+      "used_to_override_selected_edition": false
+    },
+    {
+      "rule_id": "kan_generates_body",
+      "selected": "或水邊人進入",
+      "comparison": "或水邊人進利",
+      "used_to_override_selected_edition": false
+    },
+    {
+      "rule_id": "dui_generates_body",
+      "selected": "或市口之人欣逢",
+      "comparison": "或帶口之人欣逢",
+      "used_to_override_selected_edition": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "qian_generates_body",
+      "trigram": "乾",
+      "relation": "用生体",
+      "quote": "乾卦生體則主公門中有喜益或功名上有喜或因官有財或問訟得理或有金寶之利或老人上進財或尊長惠送或有官貴之喜",
+      "pdf_indices": [
+        60
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "kun_generates_body",
+      "trigram": "坤",
+      "relation": "用生体",
+      "quote": "坤卦生體主有田土之喜或於田土進財或得鄉人之益或得陰人之利或有果穀之進或有布帛之喜",
+      "pdf_indices": [
+        60
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "zhen_generates_body",
+      "trigram": "震",
+      "relation": "用生体",
+      "quote": "震卦生體則主山林之益或因山林得財或進東方之財或因動中有喜或木貨交易之利或因草木姓氏人稱心",
+      "pdf_indices": [
+        60
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "xun_generates_body",
+      "trigram": "巽",
+      "relation": "用生体",
+      "quote": "巽卦生體亦主山林之益或因山林得財或於東南得財或因草木人而進利或以茶果得利或茶果菜蔬饋送之喜",
+      "pdf_indices": [
+        60
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "kan_generates_body",
+      "trigram": "坎",
+      "relation": "用生体",
+      "quote": "坎卦生體有北方之喜或受北方之財或水邊人進入或因點水人稱心或因魚鹽酒貨文書交易之利或有饋送魚鹽酒之喜",
+      "pdf_indices": [
+        60
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "li_generates_body",
+      "trigram": "离",
+      "relation": "用生体",
+      "quote": "離卦生體主有南方之財或有文書之喜或有爐冶場之利或因火姓人而得財",
+      "pdf_indices": [
+        60
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "gen_generates_body",
+      "trigram": "艮",
+      "relation": "用生体",
+      "quote": "艮卦生體有東北方之財或山田之喜或因山林田土獲財或宮音帶土人之財物當安穩事有終始",
+      "pdf_indices": [
+        61
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "dui_generates_body",
+      "trigram": "兑",
+      "relation": "用生体",
+      "quote": "兌卦生體有西方之財或喜悅事或食物金玉貨利之源或商音之人或市口之人欣逢或主賓之樂或朋友講習之喜",
+      "pdf_indices": [
+        61
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "qian_controls_body",
+      "trigram": "乾",
+      "relation": "用克体",
+      "quote": "乾卦尅體主有公事之憂或門戶之憂或有財寶之失或於金穀有損或有怒於尊長或得罪於貴人",
+      "pdf_indices": [
+        61
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "kun_controls_body",
+      "trigram": "坤",
+      "relation": "用克体",
+      "quote": "坤卦尅體主有田土之憂或於田土有損或有小人之害或有陰人之侵或失布帛之財或喪穀粟之利",
+      "pdf_indices": [
+        61
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "zhen_controls_body",
+      "trigram": "震",
+      "relation": "用克体",
+      "quote": "震卦尅體主有虛驚常多恐懼或身心不能安靜或家宅見妖災或草木姓氏之人相侵或於山林有所失",
+      "pdf_indices": [
+        61
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "xun_controls_body",
+      "trigram": "巽",
+      "relation": "用克体",
+      "quote": "巽卦尅體亦有草木姓人相害或於山林上生憂謀事乃南方之人處家忌陰人小口之厄",
+      "pdf_indices": [
+        61,
+        62
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "kan_controls_body",
+      "trigram": "坎",
+      "relation": "用克体",
+      "quote": "坎卦尅體主有險陷之事或寇盜之憂或失意於水邊人或生災於酒後或點水人相害或北方人見殃",
+      "pdf_indices": [
+        62
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "li_controls_body",
+      "trigram": "离",
+      "relation": "用克体",
+      "quote": "離卦尅體主文書之憂或失火之驚或有南方之憂或火人相害",
+      "pdf_indices": [
+        62
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "gen_controls_body",
+      "trigram": "艮",
+      "relation": "用克体",
+      "quote": "艮卦尅體諸事多逆百謀中阻或有山林田土之失或帶土人相侵防東北方之禍害或憂墳墓不甚安穩",
+      "pdf_indices": [
+        62
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    },
+    {
+      "id": "dui_controls_body",
+      "trigram": "兑",
+      "relation": "用克体",
+      "quote": "兌卦尅體不利西方主口舌事之紛爭或帶口人侵欺或有毀折之患或因飲食而生憂",
+      "pdf_indices": [
+        62
+      ],
+      "source_reading": "assistant visual transcription; punctuation omitted, no semantic rewriting",
+      "independent_human_expert_review": false
+    }
+  ],
+  "interpretation_scope": "historical alternative imagery for actually computed support/control role occurrences; no person identification, observed event, risk/hazard/clinical verdict, success probability, timing or recursive net effect"
+}

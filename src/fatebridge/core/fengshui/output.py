@@ -46,6 +46,8 @@ class Palace(PartialOutput):
     annual_star_number: Optional[int] = None
     annual_star: Optional[Star] = None
     star: Optional[Star] = None
+    you_nian_trace: Optional[Object] = None
+    palace_star_relationship: Optional[Object] = None
     subject_id: Optional[str] = None
     rule_id: Optional[str] = None
     source_ids: Optional[List[str]] = None
@@ -72,13 +74,19 @@ class PersonalChart(PartialOutput):
 class HouseChart(PartialOutput):
     object_id: Optional[str] = None
     sitting_trigram: Optional[str] = None
-    north_reference: Optional[Literal["true", "magnetic"]] = None
+    north_reference: Optional[Literal["magnetic", "true"]] = None
     sectors: Optional[Dict[str, Palace]] = None
+    candidate_id: Optional[str] = None
+    candidate_only: Optional[bool] = None
+    bearing_support: Optional[Object] = None
 
 
 class Layer(PersonalChart):
+    geomagnetic_reference: Optional[Object] = None
     ruleset: Optional[Ruleset] = None
     house: Optional[HouseChart] = None
+    house_candidates: Optional[List[HouseChart]] = None
+    house_orientation_context: Optional[Object] = None
     occupants: Optional[List[PersonalChart]] = None
     placement_findings: Optional[List[Object]] = None
     feature_findings: Optional[List[Object]] = None
@@ -106,15 +114,19 @@ class NatalCandidate(PartialOutput):
     sitting: Optional[Object] = None
     chart_mode: Optional[Literal["lower", "replacement"]] = None
     mode_reason: Optional[str] = None
+    bearing_support: Optional[Object] = None
     palaces: Optional[Dict[str, NatalPalace]] = None
     period_chart: Optional[Dict[str, int]] = None
     mountain_chart: Optional[Dict[str, int]] = None
     facing_chart: Optional[Dict[str, int]] = None
     trace: Optional[Dict[str, Object]] = None
     flight_path: Optional[List[str]] = None
+    structure: Optional[Object] = None
 
 
 class NatalLayer(PartialOutput):
+    source_comparison: Optional[Object] = None
+    city_gate_analysis: Optional[Object] = None
     interpretation: Optional["NatalInterpretation"] = None
     status: Optional[Literal["complete", "partial"]] = None
     subject_id: Optional[str] = None
@@ -128,18 +140,50 @@ class NatalLayer(PartialOutput):
     mountain_registry: Optional[List[Object]] = None
 
 
+class MonthlyPalace(PartialOutput):
+    direction: Optional[str] = None
+    label: Optional[str] = None
+    palace_number: Optional[int] = None
+    trigram: Optional[str] = None
+    element: Optional[str] = None
+    monthly_star_number: Optional[int] = None
+    monthly_star: Optional[Object] = None
+    method: Optional[str] = None
+    rule_id: Optional[str] = None
+    source_ids: Optional[List[str]] = None
+
+
+class MonthlyLayer(PartialOutput):
+    status: Optional[Literal["complete", "partial"]] = None
+    ruleset: Optional[Ruleset] = None
+    time_context: Optional[Object] = None
+    year_branch: Optional[str] = None
+    year_group: Optional[Object] = None
+    center_star_number: Optional[int] = None
+    palaces: Optional[Dict[str, MonthlyPalace]] = None
+    flight_path: Optional[List[str]] = None
+    trace: Optional[Object] = None
+    position_reading: Optional[Object] = None
+    missing_inputs: Optional[List[str]] = None
+    interpretation_scope: Optional[str] = None
+    limitations: Optional[List[str]] = None
+
+
 class Layers(PartialOutput):
     directions: Optional[Layer] = None
     minggua: Optional[Layer] = None
     bazhai: Optional[Layer] = None
     jinsuo: Optional[Layer] = None
     annual_stars: Optional[Layer] = None
+    monthly_stars: Optional[MonthlyLayer] = None
     xuankong_natal: Optional[NatalLayer] = None
 
 
 class NatalInterpretation(PartialOutput):
     status: Optional[Literal["complete", "partial"]] = None
     ruleset_id: Optional[str] = None
+    timeliness_ruleset: Optional[Ruleset] = None
+    fixed_lingzheng_analysis: Optional[Object] = None
     current_period_context: Optional[Object] = None
     candidates: Optional[List[Object]] = None
     missing_inputs: Optional[List[str]] = None
@@ -256,6 +300,9 @@ class SurfaceAnalysis(PartialOutput):
 
 
 class Coverage(PartialOutput):
+    city_gate_status: Optional[Literal["complete", "partial"]] = None
+    city_gate_calculation_status: Optional[Literal["complete", "partial"]] = None
+    city_gate_missing_inputs: Optional[List[str]] = None
     method_priority_review: Optional[Object] = None
     environmental_context_status: Optional[Literal["complete", "partial"]] = None
     environmental_context_missing_inputs: Optional[List[str]] = None
@@ -274,6 +321,7 @@ class Coverage(PartialOutput):
 
 
 class FengshuiOutput(ProjectedOutput):
+    calculation_reading: Optional[Object] = None
     method_policy: Optional[Object] = None
     method_details: Optional[Object] = None
     analysis_type: Optional[str] = None

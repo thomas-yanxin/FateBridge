@@ -1,0 +1,176 @@
+{
+  "id": "meihua_weather_attributions_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "所选文明书局本天时类象与明示季令核对",
+  "source": {
+    "id": "nlc1925_selected_weather",
+    "title": "梅花易數，文明書局本，所选天時占页",
+    "attributed_author": "目录署名邵雍；作者及文本传承未独立鉴定",
+    "url": "https://commons.wikimedia.org/wiki/File:NLC416-12jh005426-44577_梅花易數.pdf",
+    "original_pdf_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "selected_pdf_sha256": "b0db66c6b2c546d0cf3a3aa9cc1b7fc701be054add672fded7f92e3318e2300a",
+    "reader": "assistant visual reading; not independent human expert collation"
+  },
+  "clauses": {
+    "metal_attributions": {
+      "id": "metal_attributions",
+      "original_pdf_index": 63,
+      "selected_pdf_index": 1,
+      "quote": "乾兌為霜雪霰雹",
+      "literal_members": [
+        "霜",
+        "雪",
+        "霰",
+        "雹"
+      ],
+      "trigrams": [
+        "乾",
+        "兑"
+      ],
+      "comparison_fixed_revision1441921": "乾、兌為霜雪雹霰",
+      "variant": "Selected facsimile reads霰雹; fixed transcription has雹霰. Preserve order separately; no word substitution."
+    },
+    "li_attributions": {
+      "id": "li_attributions",
+      "original_pdf_index": 63,
+      "selected_pdf_index": 1,
+      "quote": "離火為日電虹霓",
+      "literal_members": [
+        "日",
+        "電",
+        "虹",
+        "霓"
+      ],
+      "trigrams": [
+        "离"
+      ]
+    },
+    "summer_check": {
+      "id": "summer_check",
+      "original_pdf_index": 64,
+      "selected_pdf_index": 2,
+      "quote": "震離為電為雷應在夏天",
+      "literal_members": [
+        "電",
+        "雷"
+      ],
+      "required_season": "summer",
+      "scope": "Seasonal qualifier, not a requirement that both trigrams be present or a measured thunder/lightning prediction."
+    },
+    "winter_check": {
+      "id": "winter_check",
+      "original_pdf_index": 64,
+      "selected_pdf_index": 2,
+      "quote": "乾兌為霜為雪驗於冬月",
+      "literal_members": [
+        "霜",
+        "雪"
+      ],
+      "required_season": "winter",
+      "scope": "Does not silently extend winter qualification to霰雹, nor infer these events from the symbols."
+    },
+    "zhen_thunder": {
+      "id": "zhen_thunder",
+      "original_pdf_index": 63,
+      "selected_pdf_index": 1,
+      "quote": "震為雷",
+      "trigrams": [
+        "震"
+      ],
+      "literal_members": [
+        "雷"
+      ],
+      "coverage": "Existing primary symbol reused for its explicit summer qualifier; not a newly discovered ninth weather symbol."
+    }
+  },
+  "terms": [
+    {
+      "term": "霜",
+      "trigrams": [
+        "乾",
+        "兑"
+      ],
+      "source_clause": "metal_attributions",
+      "seasonal_clause": "winter_check"
+    },
+    {
+      "term": "雪",
+      "trigrams": [
+        "乾",
+        "兑"
+      ],
+      "source_clause": "metal_attributions",
+      "seasonal_clause": "winter_check"
+    },
+    {
+      "term": "霰",
+      "trigrams": [
+        "乾",
+        "兑"
+      ],
+      "source_clause": "metal_attributions",
+      "seasonal_clause": null
+    },
+    {
+      "term": "雹",
+      "trigrams": [
+        "乾",
+        "兑"
+      ],
+      "source_clause": "metal_attributions",
+      "seasonal_clause": null
+    },
+    {
+      "term": "日",
+      "trigrams": [
+        "离"
+      ],
+      "source_clause": "li_attributions",
+      "seasonal_clause": null
+    },
+    {
+      "term": "電",
+      "trigrams": [
+        "离"
+      ],
+      "source_clause": "li_attributions",
+      "seasonal_clause": "summer_check"
+    },
+    {
+      "term": "虹",
+      "trigrams": [
+        "离"
+      ],
+      "source_clause": "li_attributions",
+      "seasonal_clause": null
+    },
+    {
+      "term": "霓",
+      "trigrams": [
+        "离"
+      ],
+      "source_clause": "li_attributions",
+      "seasonal_clause": null
+    },
+    {
+      "term": "雷",
+      "trigrams": [
+        "震"
+      ],
+      "source_clause": "zhen_thunder",
+      "seasonal_clause": "summer_check"
+    }
+  ],
+  "scope": {
+    "presence": "本互变上下六位置的实际卦名是否出现，不增加多字阈值。",
+    "season": "仅核对调用者已确认季节；霜雪限所列冬月句，电雷限所列夏天句，不把这些季令推广到霰雹、日或虹霓。",
+    "observations": "类象不等于实际现象出现；日电虹霓不推出四者同时发生，日不自动映射为晴或无雨。",
+    "terminology": "霰及虹霓保留原词，未定义为现代可评分观测量。",
+    "controls": "本层不裁定制化、全章优先级或秋冬无制例外；不能把季令相符当作未受制天气结论。",
+    "frozen_research": "不加入旧1.0.0、1.5.0、1.7.0研究政策的雨晴映射，不提高或重算其成绩。"
+  },
+  "single_forecast": null,
+  "event_datetime": null,
+  "success_probability": null,
+  "predictive_efficacy_established": false
+}

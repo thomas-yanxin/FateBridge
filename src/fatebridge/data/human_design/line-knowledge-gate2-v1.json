@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "supplement_id": "human_design_gate2_editorial_v1",
+  "base_catalogue_sha256": "e0be8121e433f1513fdd45ac560acd4c7519f67cf12d11bd86b966b0e011430e",
+  "source_pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495",
+  "curated_by": "FateBridge root-agent local editorial review of fixed public copy",
+  "curated_on": "2026-10-27",
+  "independently_accepted_line_count": 0,
+  "publisher_master_authenticated": false,
+  "complete384_line_meanings_accepted": false,
+  "rows": [
+    {
+      "key": "2.1",
+      "source_pdf_page_one_based": 9,
+      "source_layout_block_sha256": "e0d795d03cf3fc2e3eadbd98efeceee9507f7e1618f0df687f65f54284fdefb4",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "审美与直觉",
+        "exaltation": "以美感感知和谐方向。",
+        "detriment": "自我主张可能压过内在判断。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "source_reading_notes": []
+    },
+    {
+      "key": "2.2",
+      "source_pdf_page_one_based": 9,
+      "source_layout_block_sha256": "ae7bb3a1c9d23e9aee417b2a64ed3a470117af81b70dd30973812afceb703610",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "自发领会",
+        "exaltation": "自发领会与内在专注。",
+        "detriment": "把知识当作强化自我的权力。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "source_reading_notes": []
+    },
+    {
+      "key": "2.3",
+      "source_pdf_page_one_based": 9,
+      "source_layout_block_sha256": "ae92216a9d646c6c8c70880fd5605be5eeea4e044fb17dd912dad439542b6e6f",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "接纳与耐心",
+        "exaltation": "持续接纳学习，承认过程不终结。",
+        "detriment": "急于表达，不愿等待。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "source_reading_notes": [],
+      "source_conditions": [
+        {
+          "id": "rave2001_2_3_exaltation_permanent_2_14",
+          "polarity": "exaltation",
+          "source_clause_sha256": "8e412f58a60749b2a85a3a77720181610af084d0038564de3afa7d0776823d3a",
+          "source_condition": {
+            "relation": "permanent_channel_connection",
+            "channel_gates": [
+              2,
+              14
+            ]
+          },
+          "local_clause_paraphrase_zh": "原文在永久连接14门、形成2–14通道的条件下谈服务回报；不是无条件事件预告，也未据此断定逆命题。",
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evidence_required": [
+            "same_run_actual_2_3_activation_and_fixing_state",
+            "same_run_permanent_2_14_channel_evidence"
+          ],
+          "review_status": "local_clause_review_pending_independent_review"
+        }
+      ],
+      "condition_review_status": "one_explicit_clause_locally_recorded_not_exhaustive"
+    },
+    {
+      "key": "2.4",
+      "source_pdf_page_one_based": 9,
+      "source_layout_block_sha256": "971b5c7c189c6a9dc5a1b869d3e10b41f01bc12fe67eb0953274975da499d7de",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "审慎表达",
+        "exaltation": "不求个人声望，以分寸维持和谐。",
+        "detriment": "急于张扬可能引来对立。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "source_reading_notes": []
+    },
+    {
+      "key": "2.5",
+      "source_pdf_page_one_based": 9,
+      "source_layout_block_sha256": "047deed44334e203aabb68ab5cfc8fb9e52e4707b8b94cdfc1e6d2e74c064814",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "资源与策略",
+        "exaltation": "理性配置资源，运用策略。",
+        "detriment": "独揽责任，忽略他人能力。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "source_reading_notes": []
+    },
+    {
+      "key": "2.6",
+      "source_pdf_page_one_based": 9,
+      "source_layout_block_sha256": "fd20a9c753946edca555632ab0e0324765d436c2dc1181c31e6980cfcc191cf0",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "视野与安全",
+        "exaltation": "理性解释也可能使接纳视野狭窄。",
+        "detriment": "过度求安全可能扭曲觉察。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "source_reading_notes": [
+        "本条上升段也描述接纳视野狭窄，不把上升一概改写为正面能力。"
+      ]
+    }
+  ]
+}

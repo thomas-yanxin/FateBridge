@@ -78,6 +78,7 @@ def calculate_mundane(
             zodiac_type=zodiac_type,
         )
         points = extract_reference_points(subject)
+        calculation_basis = subject.calculation_basis
 
         context = {
             "tool": label,
@@ -94,9 +95,10 @@ def calculate_mundane(
             },
             **house_system_fields(house_system),
             "zodiac_type": zodiac_type,
-            "engine": "fatebridge-offline",
+            "engine": calculation_basis["engine_backend"],
         }
         payload = {
+            "calculation_basis": calculation_basis,
             "system": "mundane_ingress",
             "system_label": "世俗入宫盘",
             "ingress_term": ingress_term,
@@ -117,7 +119,7 @@ def calculate_mundane(
         ]
         return {
             "analysis_type": "西占世俗入宫盘",
-            "engine": "fatebridge-offline",
+            "engine": calculation_basis["engine_backend"],
             "analysis_context": context,
             "mundane": payload,
             "summary": summary,
@@ -175,7 +177,7 @@ def calculate_extrareturns(
         for body_name, spec in RETURN_BODIES.items():
             planet_id = int(spec["planet_id"])  # type: ignore[call-overload]
             natal_longitude = planet_longitude_at_utc(
-                planet_id, birth_info.utc_datetime
+                planet_id, birth_info.require_utc_datetime
             )
             moments = find_planet_returns(
                 planet_id,

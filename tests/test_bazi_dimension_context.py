@@ -41,11 +41,15 @@ def test_dayun_analysis_exposes_precise_start_age_and_direction() -> None:
     assert info["direction"] == "顺行"
 
 
-def test_unknown_gender_errors_on_dayun_dimension():
+def test_unknown_gender_limits_dayun_without_losing_natal_or_liunian():
     person = create_person_info(1990, 5, 20, 10, "t", birth_place="北京")  # gender 未知
     result = bazi.calculate_bazi_career(person, analysis_year=2026)
-    assert "error" in result
-    assert "性别" in result["error"]
+    assert "error" not in result
+    timing = result["career_analysis"]["timing_context"]
+    assert timing["dayun_pillar"] is None
+    assert timing["dayun_status"] == "unavailable_gender_direction"
+    assert timing["liunian_pillar"]
+    assert result["career_analysis"]["evidence_chain"]["ten_gods"]
 
 
 def test_known_gender_produces_forward_dayun_for_yang_year_male():

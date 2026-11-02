@@ -1,0 +1,1206 @@
+{
+  "model_id": "gujin45_printed_lunar_velocity_v1",
+  "profile_id": "gujin36_37_45_floor_table_research",
+  "title": "古今律历考卷45授时立成：太阴限行度两栏",
+  "author": "邢云路",
+  "source_url": "https://commons.wikimedia.org/w/index.php?curid=71219540",
+  "anomalistic_month_days": "27.5546",
+  "half_anomalistic_month_days": "13.7773",
+  "limits_per_day": "12.2",
+  "limit_duration_in_correction_days": "0.0820",
+  "printed_decimal_places": 4,
+  "rows": [
+    {
+      "limit_index": 0,
+      "fast_ancient_du_per_limit": "1.2071",
+      "slow_ancient_du_per_limit": "0.9855",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 1,
+      "fast_ancient_du_per_limit": "1.2065",
+      "slow_ancient_du_per_limit": "0.9861",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 2,
+      "fast_ancient_du_per_limit": "1.2059",
+      "slow_ancient_du_per_limit": "0.9867",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 3,
+      "fast_ancient_du_per_limit": "1.2053",
+      "slow_ancient_du_per_limit": "0.9873",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 4,
+      "fast_ancient_du_per_limit": "1.2047",
+      "slow_ancient_du_per_limit": "0.9879",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 5,
+      "fast_ancient_du_per_limit": "1.2040",
+      "slow_ancient_du_per_limit": "0.9886",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 6,
+      "fast_ancient_du_per_limit": "1.2033",
+      "slow_ancient_du_per_limit": "0.9893",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 7,
+      "fast_ancient_du_per_limit": "1.2026",
+      "slow_ancient_du_per_limit": "0.9900",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 8,
+      "fast_ancient_du_per_limit": "1.2019",
+      "slow_ancient_du_per_limit": "0.9907",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 9,
+      "fast_ancient_du_per_limit": "1.2012",
+      "slow_ancient_du_per_limit": "0.9914",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 10,
+      "fast_ancient_du_per_limit": "1.2004",
+      "slow_ancient_du_per_limit": "0.9922",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 11,
+      "fast_ancient_du_per_limit": "1.1996",
+      "slow_ancient_du_per_limit": "0.9929",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 12,
+      "fast_ancient_du_per_limit": "1.1988",
+      "slow_ancient_du_per_limit": "0.9937",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 13,
+      "fast_ancient_du_per_limit": "1.1980",
+      "slow_ancient_du_per_limit": "0.9946",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 14,
+      "fast_ancient_du_per_limit": "1.1972",
+      "slow_ancient_du_per_limit": "0.9954",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 15,
+      "fast_ancient_du_per_limit": "1.1963",
+      "slow_ancient_du_per_limit": "0.9962",
+      "djvu_page": 523,
+      "half": "lower"
+    },
+    {
+      "limit_index": 16,
+      "fast_ancient_du_per_limit": "1.1955",
+      "slow_ancient_du_per_limit": "0.9971",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 17,
+      "fast_ancient_du_per_limit": "1.1946",
+      "slow_ancient_du_per_limit": "0.9980",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 18,
+      "fast_ancient_du_per_limit": "1.1937",
+      "slow_ancient_du_per_limit": "0.9989",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 19,
+      "fast_ancient_du_per_limit": "1.1927",
+      "slow_ancient_du_per_limit": "0.9999",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 20,
+      "fast_ancient_du_per_limit": "1.1918",
+      "slow_ancient_du_per_limit": "1.0008",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 21,
+      "fast_ancient_du_per_limit": "1.1908",
+      "slow_ancient_du_per_limit": "1.0018",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 22,
+      "fast_ancient_du_per_limit": "1.1898",
+      "slow_ancient_du_per_limit": "1.0028",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 23,
+      "fast_ancient_du_per_limit": "1.1888",
+      "slow_ancient_du_per_limit": "1.0038",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 24,
+      "fast_ancient_du_per_limit": "1.1878",
+      "slow_ancient_du_per_limit": "1.0048",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 25,
+      "fast_ancient_du_per_limit": "1.1867",
+      "slow_ancient_du_per_limit": "1.0059",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 26,
+      "fast_ancient_du_per_limit": "1.1856",
+      "slow_ancient_du_per_limit": "1.0069",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 27,
+      "fast_ancient_du_per_limit": "1.1846",
+      "slow_ancient_du_per_limit": "1.0080",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 28,
+      "fast_ancient_du_per_limit": "1.1835",
+      "slow_ancient_du_per_limit": "1.0091",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 29,
+      "fast_ancient_du_per_limit": "1.1823",
+      "slow_ancient_du_per_limit": "1.0103",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 30,
+      "fast_ancient_du_per_limit": "1.1812",
+      "slow_ancient_du_per_limit": "1.0114",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 31,
+      "fast_ancient_du_per_limit": "1.1800",
+      "slow_ancient_du_per_limit": "1.0126",
+      "djvu_page": 524,
+      "half": "upper"
+    },
+    {
+      "limit_index": 32,
+      "fast_ancient_du_per_limit": "1.1788",
+      "slow_ancient_du_per_limit": "1.0138",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 33,
+      "fast_ancient_du_per_limit": "1.1776",
+      "slow_ancient_du_per_limit": "1.0150",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 34,
+      "fast_ancient_du_per_limit": "1.1764",
+      "slow_ancient_du_per_limit": "1.0162",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 35,
+      "fast_ancient_du_per_limit": "1.1752",
+      "slow_ancient_du_per_limit": "1.0174",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 36,
+      "fast_ancient_du_per_limit": "1.1739",
+      "slow_ancient_du_per_limit": "1.0187",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 37,
+      "fast_ancient_du_per_limit": "1.1726",
+      "slow_ancient_du_per_limit": "1.0200",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 38,
+      "fast_ancient_du_per_limit": "1.1713",
+      "slow_ancient_du_per_limit": "1.0213",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 39,
+      "fast_ancient_du_per_limit": "1.1700",
+      "slow_ancient_du_per_limit": "1.0226",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 40,
+      "fast_ancient_du_per_limit": "1.1686",
+      "slow_ancient_du_per_limit": "1.0239",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 41,
+      "fast_ancient_du_per_limit": "1.1673",
+      "slow_ancient_du_per_limit": "1.0253",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 42,
+      "fast_ancient_du_per_limit": "1.1659",
+      "slow_ancient_du_per_limit": "1.0267",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 43,
+      "fast_ancient_du_per_limit": "1.1645",
+      "slow_ancient_du_per_limit": "1.0281",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 44,
+      "fast_ancient_du_per_limit": "1.1631",
+      "slow_ancient_du_per_limit": "1.0295",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 45,
+      "fast_ancient_du_per_limit": "1.1616",
+      "slow_ancient_du_per_limit": "1.0309",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 46,
+      "fast_ancient_du_per_limit": "1.1602",
+      "slow_ancient_du_per_limit": "1.0324",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 47,
+      "fast_ancient_du_per_limit": "1.1587",
+      "slow_ancient_du_per_limit": "1.0339",
+      "djvu_page": 524,
+      "half": "lower"
+    },
+    {
+      "limit_index": 48,
+      "fast_ancient_du_per_limit": "1.1573",
+      "slow_ancient_du_per_limit": "1.0354",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 49,
+      "fast_ancient_du_per_limit": "1.1557",
+      "slow_ancient_du_per_limit": "1.0369",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 50,
+      "fast_ancient_du_per_limit": "1.1541",
+      "slow_ancient_du_per_limit": "1.0384",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 51,
+      "fast_ancient_du_per_limit": "1.1526",
+      "slow_ancient_du_per_limit": "1.0400",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 52,
+      "fast_ancient_du_per_limit": "1.1510",
+      "slow_ancient_du_per_limit": "1.0416",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 53,
+      "fast_ancient_du_per_limit": "1.1494",
+      "slow_ancient_du_per_limit": "1.0432",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 54,
+      "fast_ancient_du_per_limit": "1.1478",
+      "slow_ancient_du_per_limit": "1.0448",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 55,
+      "fast_ancient_du_per_limit": "1.1462",
+      "slow_ancient_du_per_limit": "1.0464",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 56,
+      "fast_ancient_du_per_limit": "1.1445",
+      "slow_ancient_du_per_limit": "1.0481",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 57,
+      "fast_ancient_du_per_limit": "1.1428",
+      "slow_ancient_du_per_limit": "1.0497",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 58,
+      "fast_ancient_du_per_limit": "1.1412",
+      "slow_ancient_du_per_limit": "1.0547",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 59,
+      "fast_ancient_du_per_limit": "1.1394",
+      "slow_ancient_du_per_limit": "1.0531",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 60,
+      "fast_ancient_du_per_limit": "1.1377",
+      "slow_ancient_du_per_limit": "1.0549",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 61,
+      "fast_ancient_du_per_limit": "1.1359",
+      "slow_ancient_du_per_limit": "1.0567",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 62,
+      "fast_ancient_du_per_limit": "1.1342",
+      "slow_ancient_du_per_limit": "1.0584",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 63,
+      "fast_ancient_du_per_limit": "1.1324",
+      "slow_ancient_du_per_limit": "1.0602",
+      "djvu_page": 525,
+      "half": "upper"
+    },
+    {
+      "limit_index": 64,
+      "fast_ancient_du_per_limit": "1.1306",
+      "slow_ancient_du_per_limit": "1.0620",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 65,
+      "fast_ancient_du_per_limit": "1.1287",
+      "slow_ancient_du_per_limit": "1.0638",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 66,
+      "fast_ancient_du_per_limit": "1.1269",
+      "slow_ancient_du_per_limit": "1.0657",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 67,
+      "fast_ancient_du_per_limit": "1.1250",
+      "slow_ancient_du_per_limit": "1.0675",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 68,
+      "fast_ancient_du_per_limit": "1.1232",
+      "slow_ancient_du_per_limit": "1.0694",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 69,
+      "fast_ancient_du_per_limit": "1.1213",
+      "slow_ancient_du_per_limit": "1.0713",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 70,
+      "fast_ancient_du_per_limit": "1.1193",
+      "slow_ancient_du_per_limit": "1.0733",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 71,
+      "fast_ancient_du_per_limit": "1.1174",
+      "slow_ancient_du_per_limit": "1.0752",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 72,
+      "fast_ancient_du_per_limit": "1.1154",
+      "slow_ancient_du_per_limit": "1.0772",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 73,
+      "fast_ancient_du_per_limit": "1.1134",
+      "slow_ancient_du_per_limit": "1.0792",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 74,
+      "fast_ancient_du_per_limit": "1.1114",
+      "slow_ancient_du_per_limit": "1.0812",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 75,
+      "fast_ancient_du_per_limit": "1.1094",
+      "slow_ancient_du_per_limit": "1.0832",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 76,
+      "fast_ancient_du_per_limit": "1.1073",
+      "slow_ancient_du_per_limit": "1.0852",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 77,
+      "fast_ancient_du_per_limit": "1.1053",
+      "slow_ancient_du_per_limit": "1.0873",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 78,
+      "fast_ancient_du_per_limit": "1.1032",
+      "slow_ancient_du_per_limit": "1.0894",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 79,
+      "fast_ancient_du_per_limit": "1.1011",
+      "slow_ancient_du_per_limit": "1.0915",
+      "djvu_page": 525,
+      "half": "lower"
+    },
+    {
+      "limit_index": 80,
+      "fast_ancient_du_per_limit": "1.0990",
+      "slow_ancient_du_per_limit": "1.0936",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 81,
+      "fast_ancient_du_per_limit": "1.0968",
+      "slow_ancient_du_per_limit": "1.0958",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 82,
+      "fast_ancient_du_per_limit": "1.0966",
+      "slow_ancient_du_per_limit": "1.0960",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 83,
+      "fast_ancient_du_per_limit": "1.0965",
+      "slow_ancient_du_per_limit": "1.0962",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 84,
+      "fast_ancient_du_per_limit": "1.0962",
+      "slow_ancient_du_per_limit": "1.0965",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 85,
+      "fast_ancient_du_per_limit": "1.0960",
+      "slow_ancient_du_per_limit": "1.0966",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 86,
+      "fast_ancient_du_per_limit": "1.0958",
+      "slow_ancient_du_per_limit": "1.0968",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 87,
+      "fast_ancient_du_per_limit": "1.0936",
+      "slow_ancient_du_per_limit": "1.0990",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 88,
+      "fast_ancient_du_per_limit": "1.0915",
+      "slow_ancient_du_per_limit": "1.1011",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 89,
+      "fast_ancient_du_per_limit": "1.0894",
+      "slow_ancient_du_per_limit": "1.1032",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 90,
+      "fast_ancient_du_per_limit": "1.0873",
+      "slow_ancient_du_per_limit": "1.1053",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 91,
+      "fast_ancient_du_per_limit": "1.0852",
+      "slow_ancient_du_per_limit": "1.1073",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 92,
+      "fast_ancient_du_per_limit": "1.0832",
+      "slow_ancient_du_per_limit": "1.1094",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 93,
+      "fast_ancient_du_per_limit": "1.0812",
+      "slow_ancient_du_per_limit": "1.1114",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 94,
+      "fast_ancient_du_per_limit": "1.0792",
+      "slow_ancient_du_per_limit": "1.1134",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 95,
+      "fast_ancient_du_per_limit": "1.0772",
+      "slow_ancient_du_per_limit": "1.1154",
+      "djvu_page": 526,
+      "half": "upper"
+    },
+    {
+      "limit_index": 96,
+      "fast_ancient_du_per_limit": "1.0752",
+      "slow_ancient_du_per_limit": "1.1174",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 97,
+      "fast_ancient_du_per_limit": "1.0733",
+      "slow_ancient_du_per_limit": "1.1193",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 98,
+      "fast_ancient_du_per_limit": "1.0713",
+      "slow_ancient_du_per_limit": "1.1213",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 99,
+      "fast_ancient_du_per_limit": "1.0694",
+      "slow_ancient_du_per_limit": "1.1232",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 100,
+      "fast_ancient_du_per_limit": "1.0675",
+      "slow_ancient_du_per_limit": "1.1250",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 101,
+      "fast_ancient_du_per_limit": "1.0657",
+      "slow_ancient_du_per_limit": "1.1269",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 102,
+      "fast_ancient_du_per_limit": "1.0638",
+      "slow_ancient_du_per_limit": "1.1287",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 103,
+      "fast_ancient_du_per_limit": "1.0620",
+      "slow_ancient_du_per_limit": "1.1306",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 104,
+      "fast_ancient_du_per_limit": "1.0602",
+      "slow_ancient_du_per_limit": "1.1324",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 105,
+      "fast_ancient_du_per_limit": "1.0584",
+      "slow_ancient_du_per_limit": "1.1342",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 106,
+      "fast_ancient_du_per_limit": "1.0567",
+      "slow_ancient_du_per_limit": "1.1359",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 107,
+      "fast_ancient_du_per_limit": "1.0549",
+      "slow_ancient_du_per_limit": "1.1377",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 108,
+      "fast_ancient_du_per_limit": "1.0531",
+      "slow_ancient_du_per_limit": "1.1394",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 109,
+      "fast_ancient_du_per_limit": "1.0514",
+      "slow_ancient_du_per_limit": "1.1412",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 110,
+      "fast_ancient_du_per_limit": "1.0497",
+      "slow_ancient_du_per_limit": "1.1428",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 111,
+      "fast_ancient_du_per_limit": "1.0481",
+      "slow_ancient_du_per_limit": "1.1445",
+      "djvu_page": 526,
+      "half": "lower"
+    },
+    {
+      "limit_index": 112,
+      "fast_ancient_du_per_limit": "1.0464",
+      "slow_ancient_du_per_limit": "1.1462",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 113,
+      "fast_ancient_du_per_limit": "1.0448",
+      "slow_ancient_du_per_limit": "1.1478",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 114,
+      "fast_ancient_du_per_limit": "1.0432",
+      "slow_ancient_du_per_limit": "1.1494",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 115,
+      "fast_ancient_du_per_limit": "1.0416",
+      "slow_ancient_du_per_limit": "1.1510",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 116,
+      "fast_ancient_du_per_limit": "1.0400",
+      "slow_ancient_du_per_limit": "1.1526",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 117,
+      "fast_ancient_du_per_limit": "1.0384",
+      "slow_ancient_du_per_limit": "1.1541",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 118,
+      "fast_ancient_du_per_limit": "1.0369",
+      "slow_ancient_du_per_limit": "1.1557",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 119,
+      "fast_ancient_du_per_limit": "1.0354",
+      "slow_ancient_du_per_limit": "1.1573",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 120,
+      "fast_ancient_du_per_limit": "1.0339",
+      "slow_ancient_du_per_limit": "1.1587",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 121,
+      "fast_ancient_du_per_limit": "1.0324",
+      "slow_ancient_du_per_limit": "1.1602",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 122,
+      "fast_ancient_du_per_limit": "1.0309",
+      "slow_ancient_du_per_limit": "1.1616",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 123,
+      "fast_ancient_du_per_limit": "1.0295",
+      "slow_ancient_du_per_limit": "1.1631",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 124,
+      "fast_ancient_du_per_limit": "1.0281",
+      "slow_ancient_du_per_limit": "1.1645",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 125,
+      "fast_ancient_du_per_limit": "1.0267",
+      "slow_ancient_du_per_limit": "1.1659",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 126,
+      "fast_ancient_du_per_limit": "1.0253",
+      "slow_ancient_du_per_limit": "1.1673",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 127,
+      "fast_ancient_du_per_limit": "1.0239",
+      "slow_ancient_du_per_limit": "1.1686",
+      "djvu_page": 527,
+      "half": "upper"
+    },
+    {
+      "limit_index": 128,
+      "fast_ancient_du_per_limit": "1.0226",
+      "slow_ancient_du_per_limit": "1.1700",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 129,
+      "fast_ancient_du_per_limit": "1.0213",
+      "slow_ancient_du_per_limit": "1.1713",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 130,
+      "fast_ancient_du_per_limit": "1.0200",
+      "slow_ancient_du_per_limit": "1.1726",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 131,
+      "fast_ancient_du_per_limit": "1.0187",
+      "slow_ancient_du_per_limit": "1.1739",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 132,
+      "fast_ancient_du_per_limit": "1.0174",
+      "slow_ancient_du_per_limit": "1.1752",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 133,
+      "fast_ancient_du_per_limit": "1.0162",
+      "slow_ancient_du_per_limit": "1.1764",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 134,
+      "fast_ancient_du_per_limit": "1.0150",
+      "slow_ancient_du_per_limit": "1.1776",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 135,
+      "fast_ancient_du_per_limit": "1.0138",
+      "slow_ancient_du_per_limit": "1.1788",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 136,
+      "fast_ancient_du_per_limit": "1.0126",
+      "slow_ancient_du_per_limit": "1.1800",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 137,
+      "fast_ancient_du_per_limit": "1.0114",
+      "slow_ancient_du_per_limit": "1.1812",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 138,
+      "fast_ancient_du_per_limit": "1.0103",
+      "slow_ancient_du_per_limit": "1.1823",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 139,
+      "fast_ancient_du_per_limit": "1.0091",
+      "slow_ancient_du_per_limit": "1.1835",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 140,
+      "fast_ancient_du_per_limit": "1.0080",
+      "slow_ancient_du_per_limit": "1.1846",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 141,
+      "fast_ancient_du_per_limit": "1.0069",
+      "slow_ancient_du_per_limit": "1.1856",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 142,
+      "fast_ancient_du_per_limit": "1.0059",
+      "slow_ancient_du_per_limit": "1.1867",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 143,
+      "fast_ancient_du_per_limit": "1.0048",
+      "slow_ancient_du_per_limit": "1.1878",
+      "djvu_page": 527,
+      "half": "lower"
+    },
+    {
+      "limit_index": 144,
+      "fast_ancient_du_per_limit": "1.0036",
+      "slow_ancient_du_per_limit": "1.1888",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 145,
+      "fast_ancient_du_per_limit": "1.0018",
+      "slow_ancient_du_per_limit": "1.1898",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 146,
+      "fast_ancient_du_per_limit": "1.0018",
+      "slow_ancient_du_per_limit": "1.1908",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 147,
+      "fast_ancient_du_per_limit": "1.0008",
+      "slow_ancient_du_per_limit": "1.1918",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 148,
+      "fast_ancient_du_per_limit": "0.9999",
+      "slow_ancient_du_per_limit": "1.1927",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 149,
+      "fast_ancient_du_per_limit": "0.9989",
+      "slow_ancient_du_per_limit": "1.1946",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 150,
+      "fast_ancient_du_per_limit": "0.9980",
+      "slow_ancient_du_per_limit": "1.1937",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 151,
+      "fast_ancient_du_per_limit": "0.9971",
+      "slow_ancient_du_per_limit": "1.1955",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 152,
+      "fast_ancient_du_per_limit": "0.9962",
+      "slow_ancient_du_per_limit": "1.1963",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 153,
+      "fast_ancient_du_per_limit": "0.9954",
+      "slow_ancient_du_per_limit": "1.1972",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 154,
+      "fast_ancient_du_per_limit": "0.9946",
+      "slow_ancient_du_per_limit": "1.1980",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 155,
+      "fast_ancient_du_per_limit": "0.9937",
+      "slow_ancient_du_per_limit": "1.1988",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 156,
+      "fast_ancient_du_per_limit": "0.9929",
+      "slow_ancient_du_per_limit": "1.1996",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 157,
+      "fast_ancient_du_per_limit": "0.9922",
+      "slow_ancient_du_per_limit": "1.2004",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 158,
+      "fast_ancient_du_per_limit": "0.9914",
+      "slow_ancient_du_per_limit": "1.2012",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 159,
+      "fast_ancient_du_per_limit": "0.9907",
+      "slow_ancient_du_per_limit": "1.2019",
+      "djvu_page": 528,
+      "half": "upper"
+    },
+    {
+      "limit_index": 160,
+      "fast_ancient_du_per_limit": "0.9900",
+      "slow_ancient_du_per_limit": "1.2026",
+      "djvu_page": 528,
+      "half": "lower"
+    },
+    {
+      "limit_index": 161,
+      "fast_ancient_du_per_limit": "0.9893",
+      "slow_ancient_du_per_limit": "1.2033",
+      "djvu_page": 528,
+      "half": "lower"
+    },
+    {
+      "limit_index": 162,
+      "fast_ancient_du_per_limit": "0.9886",
+      "slow_ancient_du_per_limit": "1.2040",
+      "djvu_page": 528,
+      "half": "lower"
+    },
+    {
+      "limit_index": 163,
+      "fast_ancient_du_per_limit": "0.9879",
+      "slow_ancient_du_per_limit": "1.2047",
+      "djvu_page": 528,
+      "half": "lower"
+    },
+    {
+      "limit_index": 164,
+      "fast_ancient_du_per_limit": "0.9873",
+      "slow_ancient_du_per_limit": "1.2053",
+      "djvu_page": 528,
+      "half": "lower"
+    },
+    {
+      "limit_index": 165,
+      "fast_ancient_du_per_limit": "0.9867",
+      "slow_ancient_du_per_limit": "1.2059",
+      "djvu_page": 528,
+      "half": "lower"
+    },
+    {
+      "limit_index": 166,
+      "fast_ancient_du_per_limit": "0.9861",
+      "slow_ancient_du_per_limit": "1.2065",
+      "djvu_page": 528,
+      "half": "lower"
+    },
+    {
+      "limit_index": 167,
+      "fast_ancient_du_per_limit": "0.9855",
+      "slow_ancient_du_per_limit": "1.2071",
+      "djvu_page": 528,
+      "half": "lower"
+    },
+    {
+      "limit_index": 168,
+      "fast_ancient_du_per_limit": null,
+      "slow_ancient_du_per_limit": null,
+      "djvu_page": 528,
+      "half": "lower"
+    }
+  ],
+  "index_policy": "floor_the_unreflected_half_anomaly_times_12_point_2; retain empty index168",
+  "policy_evidence": "卷49、DjVu560/印页787-555：118限有余不用；116迟行度1.1526、118迟行度1.1557",
+  "angular_profile_id": "gujin36_37_printed_components",
+  "source_profile_policy": "Use original36/37 angular operands and45 printed four-decimal velocities, with explicit floor research policy. Do not substitute revised13.0205 or paper continuous velocities.",
+  "empty_endpoint_is_filled": false,
+  "reflection_is_enforced": false,
+  "internal_unrounded_velocity_reconstructed": false,
+  "modern_epoch_calibrated": false,
+  "used_in_native_birth_chart": false
+}

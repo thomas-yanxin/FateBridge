@@ -2,7 +2,7 @@
   "bundle_version": "1.0.1",
   "ruleset": {
     "ruleset_id": "xuankong_zhongzhou_v1",
-    "version": "1.0.1",
+    "version": "1.4.0",
     "method": "xuankong_natal",
     "source_ids": [
       "X1",
@@ -12,7 +12,14 @@
       "X5",
       "S7",
       "S8",
-      "X6"
+      "X6",
+      "S9",
+      "X7",
+      "X8",
+      "X9",
+      "X10",
+      "X11",
+      "X12"
     ],
     "scope": "中州派运山向宅盘，下卦与兼向替星；不含玄空大卦、城门、七星打劫、月日时盘或峦头裁决",
     "conventions": [
@@ -24,7 +31,12 @@
       "磁北角度不自动由真北转换；恰在分界取双侧候选，误差范围内所有角区均枚举",
       "X2页面“阳阳互兼用替”和十一山清单有笔误；依其上下文例子及13项口诀的24山补集校订；非声称原本统一规则",
       "1.0.1修复角区浮点容差越界，按闭区间实际相交枚举候选；已确认坐卦约束候选宫位",
-      "实际逐项报告节气求解器；跨运年份事件时刻遇近似回退须另确认有效年或宅运，不输出确定宅盘"
+      "实际逐项报告节气求解器；跨运年份事件时刻遇近似回退须另确认有效年或宅运，不输出确定宅盘",
+      "1.1.0增加历史宅运星位分布及九宫逐对合十结构；逐项返回原始星位与宫和，不代表当前旺衰、峦头配合或现实结果。近似历法仅在交节邻近日保留跨运候选，远离边界的已确认时刻仍可定运。",
+      "1.1.1按输入浮点数的精确有理数值比较误差端点，避免加减舍入制造分界候选；每盘保留全部支持角区及理由，闭端点和有理数计算属工程约定，不代表测量认证或概率。",
+      "1.2.0以影印原文五组口诀显式登记完整24山替星表；13改数、11同数分别留证，缺项或不一致拒绝计算，不再默认退回原星。逐侧区分下卦未用替、五黄不替、同数保留及实际替换。",
+      "1.3.0区分固定地盘全盘反伏数式、逐宫/历史运盘比较、卷二列举下卦局名及全局父母三般卦；源句与署名按语独立，数字匹配不推出现实吉凶。兼向仍返回数式，不自动套用所列下卦局名。",
+      "1.4.0按王氏印刷例新增山星与对宫向星的八个有向比较，中宫数和独立，不混同同宫合十或全部反吟定义；替卦只显示数字关系，不继承所引下卦例的吉凶或应期。"
     ]
   },
   "sources": {
@@ -95,6 +107,65 @@
       "scope": "仅交叉核对2024立春日期与分钟，不认证秒精度，也不证明住宅定运事件选择",
       "source_version": "2024-02-04 published page; retrieved 2026-10-12",
       "retrieved_format": "firecrawl_markdown"
+    },
+    "S9": {
+      "title": "香港天文台二十四节气时刻表（官方XML）",
+      "url": "https://www.hko.gov.hk/en/gts/astronomy/Solar_Term.htm",
+      "kind": "official_astronomical_reference",
+      "scope": "以2024、2026–2028冻结官方XML独立核对立春时刻及跨时区换年；公布到分钟，不认证秒精度，也不证明风水预测"
+    },
+    "X7": {
+      "url": "https://vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4/%E6%B2%89%E6%B0%8F%E7%8E%84%E7%A9%BA_%E4%B8%8B.pdf",
+      "title": "沈氏玄空学下册历史影印件：PDF第45、46、50页",
+      "kind": "primary_text_facsimile",
+      "scope": "仅逐像核对四运卯酉、一运酉卯、六运巽乾三处顺逆转录差异；影印正文与本实现一致，不代表整册或出版底本认证",
+      "retrieved_at": "2026-10-22",
+      "retrieved_sha256": "539308519005e1b7e95939c9cfee0da7582aae729b3488bb61c434cbbff7bff0",
+      "source_version": "76-page lower PDF; imprint and exact print edition not authenticated"
+    },
+    "X8": {
+      "url": "https://vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4/%E6%B2%89%E6%B0%8F%E7%8E%84%E7%A9%BA_%E4%B8%8A.pdf",
+      "retrieved_at": "2026-10-22",
+      "retrieved_sha256": "30d653cd53a768a957d2416d2c1586b65310f3aad3b103c90cf8af4347e4a490",
+      "title": "沈氏玄空学卷一论起星历史影印",
+      "kind": "historical_facsimile",
+      "scope": "PDF45-52/印刷90-105；24山替星口诀、同元龙映射和原文/按语语境；底本印记未独立认证",
+      "source_version": "Frozen historical facsimile and separately attributed annotations; not whole-book critical edition"
+    },
+    "X9": {
+      "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4/%E4%B8%AD%E5%B7%9E%E6%B4%BE%E7%8E%84%E7%A9%BA%E5%AD%A6_%E4%B8%8A%E5%86%8C_%E7%8E%8B%E4%BA%AD%E4%B9%8B.pdf",
+      "retrieved_at": "2026-10-22",
+      "retrieved_sha256": "8fed6915f2deeaa60eaddcc2376abe0867b358f59d1d64f29f02580a4b98c7c5",
+      "title": "王亭之编著中州派玄空学上卷",
+      "kind": "authored_primary_scan",
+      "scope": "PDF23-27/印刷21-25；起星序与5幅九宫数字图，出版年月未认证，不采用应验断语",
+      "source_version": "119-page scanned upper volume; author visible in title and contents; exact imprint not authenticated"
+    },
+    "X10": {
+      "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%89%E6%B0%8F%E7%8E%84%E7%A9%BA_%E4%B8%AD.pdf",
+      "title": "沈氏玄空学历史影印卷二论反吟伏吟",
+      "kind": "historical_facsimile",
+      "scope": "中册PDF7–8/印刷156–159；原文全盘/局部比较及28个列举下卦局，祖绵异说分列；底本印记未认证",
+      "retrieved_sha256": "f5259d7602c95cefc0d6fd00d970b8461dd43463a3989c27cb01e0953aa6622d",
+      "retrieved_at": "2026-10-22"
+    },
+    "X11": {
+      "url": "https://vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4/%E6%B2%89%E6%B0%8F%E7%8E%84%E7%A9%BA_%E4%B8%8A.pdf",
+      "title": "沈氏玄空学历史影印卷一父母三般卦",
+      "kind": "historical_facsimile",
+      "scope": "上册PDF66/印刷132–133的父母组定义、PDF71/印刷143所署按语16局；不等同普通三般卦或打劫全法",
+      "retrieved_sha256": "30d653cd53a768a957d2416d2c1586b65310f3aad3b103c90cf8af4347e4a490",
+      "retrieved_at": "2026-10-22"
+    },
+    "X12": {
+      "url": "https://vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E4%B8%AD%E5%B7%9E%E6%B4%BE%E7%8E%84%E7%A9%BA%E5%AD%A6_%E4%B8%8A%E5%86%8C_%E7%8E%8B%E4%BA%AD%E4%B9%8B.pdf",
+      "retrieved_at": "2026-10-22",
+      "retrieved_sha256": "8fed6915f2deeaa60eaddcc2376abe0867b358f59d1d64f29f02580a4b98c7c5",
+      "title": "王亭之上卷正向星局举例的山向对角数式",
+      "kind": "authored_primary_scan",
+      "scope": "PDF43/印刷41五运申山寅向例的山向对角合十及七运乙山辛向的不同反吟语境；仅数字关系，不采用吉凶与未来运断语，精确版次未认证",
+      "author": "王亭之",
+      "source_version": "119-page scanned upper volume, hash-frozen; exact imprint not authenticated"
     }
   },
   "mountains": [
@@ -324,5 +395,127 @@
     "庚": 9,
     "寅": 9
   },
-  "central_half_width_degrees": 4.5
+  "central_half_width_degrees": 4.5,
+  "replacement_catalog": {
+    "子": {
+      "native_star_number": 1,
+      "replacement_star_number": 1,
+      "changes_number": false
+    },
+    "癸": {
+      "native_star_number": 1,
+      "replacement_star_number": 1,
+      "changes_number": false
+    },
+    "甲": {
+      "native_star_number": 3,
+      "replacement_star_number": 1,
+      "changes_number": true
+    },
+    "申": {
+      "native_star_number": 2,
+      "replacement_star_number": 1,
+      "changes_number": true
+    },
+    "壬": {
+      "native_star_number": 1,
+      "replacement_star_number": 2,
+      "changes_number": true
+    },
+    "卯": {
+      "native_star_number": 3,
+      "replacement_star_number": 2,
+      "changes_number": true
+    },
+    "乙": {
+      "native_star_number": 3,
+      "replacement_star_number": 2,
+      "changes_number": true
+    },
+    "未": {
+      "native_star_number": 2,
+      "replacement_star_number": 2,
+      "changes_number": false
+    },
+    "坤": {
+      "native_star_number": 2,
+      "replacement_star_number": 2,
+      "changes_number": false
+    },
+    "乾": {
+      "native_star_number": 6,
+      "replacement_star_number": 6,
+      "changes_number": false
+    },
+    "亥": {
+      "native_star_number": 6,
+      "replacement_star_number": 6,
+      "changes_number": false
+    },
+    "辰": {
+      "native_star_number": 4,
+      "replacement_star_number": 6,
+      "changes_number": true
+    },
+    "巽": {
+      "native_star_number": 4,
+      "replacement_star_number": 6,
+      "changes_number": true
+    },
+    "巳": {
+      "native_star_number": 4,
+      "replacement_star_number": 6,
+      "changes_number": true
+    },
+    "戌": {
+      "native_star_number": 6,
+      "replacement_star_number": 6,
+      "changes_number": false
+    },
+    "酉": {
+      "native_star_number": 7,
+      "replacement_star_number": 7,
+      "changes_number": false
+    },
+    "辛": {
+      "native_star_number": 7,
+      "replacement_star_number": 7,
+      "changes_number": false
+    },
+    "丑": {
+      "native_star_number": 8,
+      "replacement_star_number": 7,
+      "changes_number": true
+    },
+    "艮": {
+      "native_star_number": 8,
+      "replacement_star_number": 7,
+      "changes_number": true
+    },
+    "丙": {
+      "native_star_number": 9,
+      "replacement_star_number": 7,
+      "changes_number": true
+    },
+    "寅": {
+      "native_star_number": 8,
+      "replacement_star_number": 9,
+      "changes_number": true
+    },
+    "午": {
+      "native_star_number": 9,
+      "replacement_star_number": 9,
+      "changes_number": false
+    },
+    "庚": {
+      "native_star_number": 7,
+      "replacement_star_number": 9,
+      "changes_number": true
+    },
+    "丁": {
+      "native_star_number": 9,
+      "replacement_star_number": 9,
+      "changes_number": false
+    }
+  }
 }

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
+from copy import deepcopy
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, cast
@@ -101,12 +103,69 @@ def _load_json(name: str) -> dict[str, Any]:
 
 @lru_cache(maxsize=1)
 def load_knowledge_bundles() -> dict[str, dict[str, Any]]:
-    return {
+    bundles = {
         "astro": _load_json("astro.json"),
         "liureng": _load_json("liureng.json"),
         "qimen": _load_json("qimen.json"),
         "bazi": _load_json("bazi.json"),
     }
+    # Add new concepts without rewriting the historically sealed base bundle.
+    base = bundles["bazi"]["categories"]
+    old_keys = {key for entries in base.values() for key in entries}
+    supplements = []
+    supplement_ids = set()
+    for filename in (
+        "bazi-foundations.json",
+        "bazi-source-contrasts.json",
+        "bazi-frontmatter.json",
+    ):
+        raw = _data_path(filename).read_bytes()
+        supplement = json.loads(raw)
+        if not isinstance(supplement, dict):
+            raise ValueError("Invalid BaZi knowledge supplement")
+        categories = supplement.get("categories")
+        if (
+            supplement.get("schema_version") != 1
+            or supplement.get("domain") != "bazi"
+            or not isinstance(supplement.get("id"), str)
+            or not supplement["id"]
+            or type(supplement.get("version")) is not int
+            or not isinstance(categories, dict)
+            or not categories
+        ):
+            raise ValueError("Invalid BaZi knowledge supplement")
+        if supplement["id"] in supplement_ids:
+            raise ValueError("Knowledge supplements cannot repeat component IDs")
+        supplement_ids.add(supplement["id"])
+        for category, entries in categories.items():
+            if not isinstance(category, str) or not category:
+                raise ValueError("Knowledge supplement needs named categories")
+            if category in base:
+                raise ValueError("Knowledge supplement cannot replace a base category")
+            if not isinstance(entries, dict) or not entries:
+                raise ValueError("Knowledge supplement needs nonempty entry mappings")
+            if old_keys.intersection(entries):
+                raise ValueError("Knowledge supplement cannot shadow existing keys")
+            base[category] = entries
+            old_keys.update(entries)
+        supplements.append(
+            {
+                "id": supplement["id"],
+                "version": supplement["version"],
+                "source_file": "data/knowledge/" + filename,
+                "sha256": hashlib.sha256(raw).hexdigest(),
+                "categories": [
+                    {
+                        "name": name,
+                        "count": len(entries),
+                        "keys_sample": sorted(entries),
+                    }
+                    for name, entries in categories.items()
+                ],
+            }
+        )
+    bundles["bazi"]["supplements"] = supplements
+    return bundles
 
 
 @lru_cache(maxsize=1)
@@ -176,7 +235,7 @@ def load_knowledge_index() -> dict[str, Any]:
 def _domain_index(domain: str) -> dict[str, Any]:
     for item in load_knowledge_index().get("domains", []):
         if item.get("domain") == domain:
-            return cast("dict[str, Any]", item)
+            return deepcopy(cast("dict[str, Any]", item))
     return {}
 
 
@@ -184,7 +243,7 @@ def _knowledge_provenance(
     *, domain: str, category: str | None = None, key: str | None = None
 ) -> dict[str, Any]:
     index = load_knowledge_index()
-    return {
+    provenance = {
         "source_domain": "xingque_hover_docs",
         "domain": domain,
         "category": category,
@@ -196,6 +255,16 @@ def _knowledge_provenance(
         ),
         "coverage": _domain_index(domain),
     }
+    supplements = [
+        item
+        for item in load_knowledge_bundles().get(domain, {}).get("supplements", [])
+        if category is None
+        or any(entry["name"] == category for entry in item["categories"])
+    ]
+    if supplements:
+        provenance["supplements"] = deepcopy(supplements)
+        provenance["coverage_scope"] = "original_index_plus_declared_supplements"
+    return provenance
 
 
 def _normalize_house_key(key: str) -> str:
@@ -648,6 +717,26 @@ def read_knowledge_entry(payload: dict[str, Any]) -> dict[str, Any]:
                 details={"category": category, "key": key},
             )
         tips = list(entry.get("tips", []))
+        provenance = _knowledge_provenance(domain=domain, category=category, key=key)
+        curation = entry.get("curation")
+        if isinstance(curation, dict):
+            from fatebridge.core.knowledge_revalidation import (
+                revalidate_structure_curation,
+            )
+
+            curation = revalidate_structure_curation(category, key, curation)
+            # Copy nested sources so callers cannot mutate the cached bundle.
+            provenance = {
+                **provenance,
+                "source_domain": "fatebridge_curated_bazi",
+                "review_status": curation.get(
+                    "review_status", "source_scoped_curation_not_full_acceptance"
+                ),
+                "build_timestamp_scope": "original_upstream_bundle_stamp_not_current_curation",
+                "entry_curation": deepcopy(curation),
+            }
+        else:
+            provenance = {**provenance, "review_status": "legacy_unreviewed"}
         return {
             "domain": domain,
             "category": category,
@@ -659,10 +748,14 @@ def read_knowledge_entry(payload: dict[str, Any]) -> dict[str, Any]:
             "rendered_text": _tips_to_rendered_text(entry.get("title", key), tips),
             "source": "fatebridge_knowledge",
             "bundle_version": load_knowledge_index().get("bundle_version"),
-            "provenance": _knowledge_provenance(
-                domain=domain, category=category, key=key
+            "provenance": provenance,
+            "citation": (
+                curation.get(
+                    "citation", f"FateBridge knowledge · {domain}/{category}/{key}"
+                )
+                if isinstance(curation, dict)
+                else f"FateBridge旧资料待逐条核对 · {domain}/{category}/{key}；未据此认证指定原典或现实效力。"
             ),
-            "citation": f"FateBridge knowledge · {domain}/{category}/{key}",
         }
 
     bundle = bundles["qimen"]

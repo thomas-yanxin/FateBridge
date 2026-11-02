@@ -7,7 +7,7 @@ Element cycles are calculated relationships, not an invented object cure rule.
 
 from typing import Any, Dict, List
 
-from fatebridge.core.divination import ELEMENT_CONTROLS, ELEMENT_GENERATES
+from fatebridge.core.hexagram_relations import ELEMENT_CONTROLS, ELEMENT_GENERATES
 
 from .actions import (
     FORM_ACTION_ROUTES,
@@ -15,7 +15,7 @@ from .actions import (
     permission_state,
     sharp_corner_target_actions,
 )
-from .bazhai import placement_polarity
+from .bazhai import placement_application
 from .context import analyze_environmental_context
 from .directions import rule_data
 from .interior_rules import analyze_interior_relations
@@ -239,10 +239,12 @@ def _summarize_layout_progress(
             for p in action["pending_confirmations"]
         )
     for finding in findings:
-        if finding.get("method") in {"annual_stars", "xuankong_natal"}:
+        if finding.get("method") in {"annual_stars", "monthly_stars", "xuankong_natal"}:
             progress_counts[
                 "unknown" if finding.get("candidate_only") else "supported"
             ] += 1
+            if finding.get("method") == "monthly_stars":
+                limited = True
     for adjustment in environment:
         state = adjustment["adjustment"]
         progress_counts[
@@ -445,10 +447,12 @@ def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]
     ):
         missing.append("form_observations_or_surface_layouts_or_selected_methods")
     if not req.placements and any(
-        m in req.selected_methods for m in ("bazhai", "annual_stars", "xuankong_natal")
+        m in req.selected_methods
+        for m in ("bazhai", "annual_stars", "monthly_stars", "xuankong_natal")
     ):
         missing.append("placements")
     annual = layers.get("annual_stars", {})
+    monthly = layers.get("monthly_stars", {})
     natal = layers.get("xuankong_natal", {})
     natal_interpretation = None
     if natal and req.xuankong is not None and req.xuankong.interpretation is not None:
@@ -459,13 +463,34 @@ def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]
         )
         missing.extend(natal_interpretation["missing_inputs"])
     bazhai = layers.get("bazhai", {})
+    if bazhai.get("house_orientation_context", {}).get("status") == "candidate_only":
+        missing.append("house.unambiguous_sitting_trigram")
     findings_by_object: Dict[str, List[Dict[str, Any]]] = {}
     for finding in bazhai.get("placement_findings", []):
         findings_by_object.setdefault(finding["object_id"], []).append(finding)
     charts = []
-    if bazhai.get("house"):
-        h = bazhai["house"]
-        charts.append((h["object_id"], "house", None, False, h["sectors"]))
+    houses = bazhai.get("house_candidates") or (
+        [bazhai["house"]] if bazhai.get("house") else []
+    )
+    for h in houses:
+        house_candidate_context = (
+            {
+                "house_candidate_id": h["candidate_id"],
+                "house_sitting_trigram": h["sitting_trigram"],
+            }
+            if "candidate_id" in h
+            else {}
+        )
+        charts.append(
+            (
+                h["object_id"],
+                "house",
+                None,
+                h.get("candidate_only", False),
+                h["sectors"],
+                house_candidate_context,
+            )
+        )
     for person in bazhai.get("occupants", []):
         for candidate in person["candidates"]:
             charts.append(
@@ -475,6 +500,7 @@ def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]
                     candidate["gender_convention"],
                     person["status"] != "complete",
                     candidate["sectors"],
+                    {},
                 )
             )
     annual_table = rule_data("annual_stars")
@@ -500,7 +526,8 @@ def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]
         # centre. Annual/natal stars apply to location, never the facing direction.
         location = placement.location_direction
         if location is None and any(
-            m in layers for m in ("bazhai", "annual_stars", "xuankong_natal")
+            m in layers
+            for m in ("bazhai", "annual_stars", "monthly_stars", "xuankong_natal")
         ):
             missing.append(f"placements.{placement.object_id}.location_direction")
         findings.extend(findings_by_object.get(placement.object_id, []))
@@ -510,14 +537,26 @@ def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]
         ):
             if direction is None or "bazhai" not in layers:
                 continue
-            expected = placement_polarity(placement.purpose, aspect)
             scope_options = []
             confirmed_sets = []
-            for subject, kind, convention, candidate_only, chart in charts:
+            for (
+                subject,
+                kind,
+                convention,
+                candidate_only,
+                chart,
+                candidate_context,
+            ) in charts:
                 if kind == "occupant" and not placement.applies_to_occupant(subject):
                     continue
+                direction_evidence = {
+                    d: placement_application(p, placement.purpose, aspect)
+                    for d, p in chart.items()
+                }
                 directions = [
-                    d for d, p in chart.items() if p["star"]["polarity"] == expected
+                    d
+                    for d, evidence in direction_evidence.items()
+                    if evidence["matches_convention"]
                 ]
                 entry = {
                     **common,
@@ -525,26 +564,63 @@ def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]
                     "subject_id": subject,
                     "subject_kind": kind,
                     "gender_convention": convention,
+                    **candidate_context,
                     "candidate_only": candidate_only,
                     "aspect": aspect,
-                    "direction": direction,
-                    "star": chart[direction]["star"],
-                    "rule_id": (
-                        "bazhai_sitting_v1.stove_seat_fire_mouth"
-                        if placement.purpose == "stove"
-                        else "bazhai_sitting_v1.placement_application"
+                    "facing_role": (
+                        placement.facing_role if aspect == "facing" else None
                     ),
-                    "source_ids": ["S3"],
+                    "direction": direction,
+                    **direction_evidence[direction],
                 }
                 add_element(entry, chart[direction]["star"])
+                # Keep shared rule metadata once, and each proposed palace's
+                # facts separately. Repeating every scope string for all four
+                # directions would push even a one-person projection over the
+                # default MCP delivery budget.
+                shared_fields = {
+                    "you_nian_trace": (
+                        "rule_id",
+                        "source_ids",
+                        "line_numbering",
+                        "scope",
+                    ),
+                    "palace_star_relationship": (
+                        "rule_id",
+                        "source_ids",
+                        "element_policy",
+                        "scope",
+                    ),
+                }
+                evidence_basis = {
+                    key: {field: entry[key][field] for field in fields}
+                    for key, fields in shared_fields.items()
+                }
                 scope_options.append(
                     {
                         **entry,
-                        "expected_polarity": expected,
-                        "matches_convention": chart[direction]["star"]["polarity"]
-                        == expected,
                         "matching_directions": directions,
                         "matching_stars": {d: chart[d]["star"] for d in directions},
+                        "matching_evidence_basis": evidence_basis,
+                        "matching_direction_evidence": {
+                            d: {
+                                "star": direction_evidence[d]["star"],
+                                "matches_convention": direction_evidence[d][
+                                    "matches_convention"
+                                ],
+                                **{
+                                    key: {
+                                        field: value
+                                        for field, value in direction_evidence[d][
+                                            key
+                                        ].items()
+                                        if field not in fields
+                                    }
+                                    for key, fields in shared_fields.items()
+                                },
+                            }
+                            for d in directions
+                        },
                     }
                 )
                 if not candidate_only:
@@ -586,6 +662,7 @@ def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]
                         )
                     ),
                     "decision_scope": "direction_relation_not_verified_relocation_feasibility",
+                    "current_result_scope": "basic_star_polarity_only_not_element_or_whole_house_verdict",
                 }
             )
         if location is None:
@@ -610,6 +687,26 @@ def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]
                 add_element(entry, palace["annual_star"])
             else:
                 missing.extend(annual["missing_inputs"])
+        if "monthly_stars" in layers:
+            if monthly.get("palaces"):
+                palace = monthly["palaces"][location]
+                findings.append(
+                    {
+                        **common,
+                        "method": "monthly_stars",
+                        "aspect": "location",
+                        "direction": location,
+                        "monthly_star_number": palace["monthly_star_number"],
+                        "monthly_star": palace["monthly_star"],
+                        "time_context": monthly["time_context"],
+                        "rule_id": palace["rule_id"],
+                        "source_ids": palace["source_ids"],
+                        "application_scope": "monthly_position_only_no_usage_or_action_rule",
+                        "usage_interpretation": "not_covered_not_inauspicious",
+                    }
+                )
+            else:
+                missing.extend(monthly["missing_inputs"])
         if "xuankong_natal" in layers:
             if not natal.get("candidates"):
                 missing.extend(natal["missing_inputs"])
@@ -771,6 +868,7 @@ def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]
         "method_disagreements": supplements["method_disagreements"],
         "missing_inputs": list(dict.fromkeys(missing)),
         "unsupported_queries": [
+            *(["monthly_usage_fortune_or_action_rules"] if monthly else []),
             "quantitative_form_distance_cutoffs",
             "complete_classical_landform_and_sha_rules",
             "specific_object_effect_magnitude_or_guarantee",

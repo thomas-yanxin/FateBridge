@@ -2,16 +2,56 @@
 Zi Wei Dou Shu (紫微斗数) chart, horoscope, and rules for the FateBridge
 metaphysics package.
 
-Pure relocation from the package facade: the ZIWEI_* tables, sihua ordering,
-五行局 resolution, and the public ``build_ziwei_chart`` / ``build_ziwei_horoscope``
-/ ``build_ziwei_rules``. Shared primitives come from ``.common``; star
-brightness/mutagen tables from ``..ziwei_tables``.
+Deterministic placement, versioned source conventions, natal cycles and scope
+identity. Geometry and evidence links stay separate from event interpretations.
 """
 
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple, cast
 
+from fatebridge.core.ziwei_age import nominal_age_calendar
+from fatebridge.core.ziwei_aux_sources import auxiliary_placement_source_evidence
+from fatebridge.core.ziwei_auxiliary import (
+    ZIWEI_LUCUN_BY_STEM,
+    attach_natal_cycles,
+    chart_masters,
+    flowing_lucun_stars,
+)
+from fatebridge.core.ziwei_childhood import childhood_limit
+from fatebridge.core.ziwei_classical import (
+    annual_text_stars,
+    annual_three_sha,
+    symbolic_properties,
+)
+from fatebridge.core.ziwei_conditions import structural_condition_evidence
+from fatebridge.core.ziwei_cycle_sources import cycle_source_evidence
+from fatebridge.core.ziwei_evidence import (
+    horoscope_natal_prerequisites,
+    natal_reading_view,
+    palace_structural_evidence,
+    scope_palace_map,
+)
+from fatebridge.core.ziwei_limit_sources import limit_source_evidence
+from fatebridge.core.ziwei_ming_properties import ming_property_evidence
+from fatebridge.core.ziwei_rulesets import (
+    DEFAULT_ZIWEI_PROFILE,
+)
+from fatebridge.core.ziwei_rulesets import ZIWEI_SIHUA_RULES as ZIWEI_SIHUA_RULES
+from fatebridge.core.ziwei_rulesets import (
+    effective_lunar_month,
+    sihua_rules_for,
+    validate_rule_profile,
+    validate_sihua_source,
+    ziwei_ruleset_metadata,
+)
+from fatebridge.core.ziwei_sources import (
+    natal_sihua_source_comparison,
+    sihua_source_comparison,
+    ziwei_day_source_evidence,
+    ziwei_prerequisite_source_evidence,
+)
+from fatebridge.core.ziwei_subperiods import limit_subperiod_evidence
 from fatebridge.utils.birth_input import normalize_gender
 
 from ...utils.data import (
@@ -44,9 +84,9 @@ _WUXING_JU_LABEL_BY_NUMBER: Dict[int, str] = {
 def _resolve_wuxing_ju(ming_stem: str, ming_branch: str) -> Dict[str, Any]:
     """由命宫干支的纳音推出五行局 (起大限岁数)。"""
     nayin = get_nayin(ming_stem, ming_branch)
-    element = nayin[-1] if nayin and nayin != "未知纳音" else "木"
+    element = nayin[-1] if nayin and nayin != "未知纳音" else ""
     if element not in _WUXING_JU_NUMBER_BY_ELEMENT:
-        element = "木"  # 无法识别时退回 木三局 保守默认
+        raise ValueError(f"命宫干支无法确定五行局：{ming_stem}{ming_branch}")
     number = _WUXING_JU_NUMBER_BY_ELEMENT[element]
     return {
         "number": number,
@@ -70,20 +110,6 @@ ZIWEI_PALACE_SEQUENCE = [
     "夫妻宫",
     "兄弟宫",
 ]
-
-
-ZIWEI_SIHUA_RULES = {
-    "甲": {"化禄": "廉贞", "化权": "破军", "化科": "武曲", "化忌": "太阳"},
-    "乙": {"化禄": "天机", "化权": "天梁", "化科": "紫微", "化忌": "太阴"},
-    "丙": {"化禄": "天同", "化权": "天机", "化科": "文昌", "化忌": "廉贞"},
-    "丁": {"化禄": "太阴", "化权": "天同", "化科": "天机", "化忌": "巨门"},
-    "戊": {"化禄": "贪狼", "化权": "太阴", "化科": "右弼", "化忌": "天机"},
-    "己": {"化禄": "武曲", "化权": "贪狼", "化科": "天梁", "化忌": "文曲"},
-    "庚": {"化禄": "太阳", "化权": "武曲", "化科": "太阴", "化忌": "天同"},
-    "辛": {"化禄": "巨门", "化权": "太阳", "化科": "文曲", "化忌": "文昌"},
-    "壬": {"化禄": "天梁", "化权": "紫微", "化科": "左辅", "化忌": "武曲"},
-    "癸": {"化禄": "破军", "化权": "巨门", "化科": "太阴", "化忌": "贪狼"},
-}
 
 
 SIHUA_DISPLAY_ORDER = {
@@ -133,8 +159,13 @@ def _lunar_year_ganzhi(lunar_year: int) -> Tuple[str, str]:
 def _apply_sihua_to_palaces(
     palaces: List[Dict[str, Any]],
     year_stem: str,
+    rule_profile: str = DEFAULT_ZIWEI_PROFILE,
+    *,
+    sihua_source: str = "rule_profile",
 ) -> Dict[str, str]:
-    sihua = ZIWEI_SIHUA_RULES[year_stem]
+    sihua = sihua_rules_for(ZIWEI_SIHUA_RULES, rule_profile, sihua_source=sihua_source)[
+        year_stem
+    ]
     transformed = {}
     for change_name, star_name in sihua.items():
         for palace in palaces:
@@ -152,13 +183,20 @@ def _apply_sihua_to_palaces(
     return cast(Dict[str, str], ordered_sihua_mapping(sihua))
 
 
-def build_ziwei_chart(seed: MetaphysicsSeed, gender: str) -> Dict[str, Any]:
+def build_ziwei_chart(
+    seed: MetaphysicsSeed,
+    gender: str,
+    *,
+    rule_profile: str = DEFAULT_ZIWEI_PROFILE,
+    sihua_source: str = "rule_profile",
+) -> Dict[str, Any]:
+    validate_rule_profile(rule_profile)
+    validate_sihua_source(sihua_source)
     lunar, lunar_month, lunar_day = require_lunar_month_day(seed, "紫微斗数")
 
-    # 紫微斗数闰月处理：以十五日为界，十五日及以前作当月算，十六日及以后作下月算
-    if lunar.get("is_leap_month"):
-        if lunar_day >= 16:
-            lunar_month = (lunar_month % 12) + 1
+    lunar_month = effective_lunar_month(
+        lunar_month, lunar_day, bool(lunar.get("is_leap_month")), rule_profile
+    )
     hour_branch = seed.pillars["hour"][1]
     hour_index = _branch_from_hour(hour_branch)
     # 年干支按农历年（正月初一为界）取，而非八字立春年柱——见 _lunar_year_ganzhi。
@@ -196,11 +234,14 @@ def build_ziwei_chart(seed: MetaphysicsSeed, gender: str) -> Dict[str, Any]:
     # 大限方向: 阳男阴女顺行 / 阴男阳女逆行
     is_yang_year = HEAVENLY_STEMS.index(year_stem) % 2 == 0
     canonical_gender = normalize_gender(gender)
+    gender_known = canonical_gender in {"男", "女"}
     daxian_forward = (canonical_gender == "男" and is_yang_year) or (
         canonical_gender == "女" and not is_yang_year
     )
 
-    daxian_direction_label = "顺行" if daxian_forward else "逆行"
+    daxian_direction_label = (
+        ("顺行" if daxian_forward else "逆行") if gender_known else "未定（缺少性别）"
+    )
 
     # --- Standard Zi Wei Star Placement ---
     # 1. Resolve Zi Wei star position based on Wu Xing Ju and Lunar Day
@@ -240,18 +281,22 @@ def build_ziwei_chart(seed: MetaphysicsSeed, gender: str) -> Dict[str, Any]:
 
     palaces: List[Dict[str, Any]] = []
     for index, palace_name in enumerate(palace_names):
-        # 命宫永远是第一个大限，其余按顺/逆方向沿宫位排列；
+        # 软件首限命宫，摘录首限邻宫，其余按顺/逆方向排列；
         # 宫名序列已按地支递增方向排布（命→父母→福德→...→兄弟）。
         if daxian_forward:
-            period_index = index  # 阳男/阴女：命→父母→福德→...
+            period_index = index  # 软件：命→父母→福德→...
         else:
             period_index = (-index) % 12  # 阴男/阳女：命→兄弟→夫妻→...
+        if rule_profile == "quanshu_v2_excerpt":
+            # 所选安大限诀从命前/后一宫起，首限为父母/兄弟。
+            # 命宫仍为本命宫，不能因运限起点改变而搬移星曜。
+            period_index = (period_index - 1) % 12
         period_start = start_age + period_index * 10
         palace: Dict[str, Any] = {
             "name": palace_name,
             "ganzhi": f"{palace_stems[index]}{palace_branches[index]}",
-            "daxian": f"{period_start}~{period_start + 9}",
-            "daxian_period": period_index + 1,
+            "daxian": f"{period_start}~{period_start + 9}" if gender_known else None,
+            "daxian_period": period_index + 1 if gender_known else None,
             "stars": [],
         }
         palaces.append(palace)
@@ -297,18 +342,6 @@ def build_ziwei_chart(seed: MetaphysicsSeed, gender: str) -> Dict[str, Any]:
     year_branch_earth_index = EARTHLY_BRANCHES.index(year_branch)
     hour_earth_index = EARTHLY_BRANCHES.index(hour_branch)
 
-    lucun_by_year_stem = {
-        "甲": "寅",
-        "乙": "卯",
-        "丙": "巳",
-        "丁": "午",
-        "戊": "巳",
-        "己": "午",
-        "庚": "申",
-        "辛": "酉",
-        "壬": "亥",
-        "癸": "子",
-    }
     tiankui_by_year_stem = {
         "甲": "丑",
         "戊": "丑",
@@ -380,7 +413,7 @@ def build_ziwei_chart(seed: MetaphysicsSeed, gender: str) -> Dict[str, Any]:
     def _branch_by_offset(start_branch: str, offset: int) -> str:
         return EARTHLY_BRANCHES[(EARTHLY_BRANCHES.index(start_branch) + offset) % 12]
 
-    lucun_branch = lucun_by_year_stem[year_stem]
+    lucun_branch = ZIWEI_LUCUN_BY_STEM[year_stem]
     minor_star_branches: Dict[str, str] = {
         "禄存": lucun_branch,
         "擎羊": _branch_by_offset(lucun_branch, 1),  # 禄存前一位
@@ -401,6 +434,11 @@ def build_ziwei_chart(seed: MetaphysicsSeed, gender: str) -> Dict[str, Any]:
         "红鸾": EARTHLY_BRANCHES[(3 - year_branch_earth_index) % 12],
         "天喜": EARTHLY_BRANCHES[(9 - year_branch_earth_index) % 12],
     }
+    if rule_profile == "quanshu_v2_excerpt":
+        # 1.3.0 adopts the explicit year-only reading of the selected verse;
+        # the software profile retains its independent birth-hour walk.
+        minor_star_branches["火星"] = huoxing_start_by_year_branch[year_branch]
+        minor_star_branches["铃星"] = lingxing_start_by_year_branch[year_branch]
     for star, target_branch in minor_star_branches.items():
         for p in palaces:
             if p["ganzhi"][1] == target_branch:
@@ -609,6 +647,11 @@ def build_ziwei_chart(seed: MetaphysicsSeed, gender: str) -> Dict[str, Any]:
         "天虚": EARTHLY_BRANCHES[(6 + year_branch_earth_index) % 12],
         "天德": EARTHLY_BRANCHES[(9 + year_branch_earth_index) % 12],
         "月德": EARTHLY_BRANCHES[(5 + year_branch_earth_index) % 12],
+        # The software baseline has a separate 天空, not an alias for 地空.
+        # 截路 / 空亡 are the two 截路空亡 branches, separate from 旬空.
+        "天空": EARTHLY_BRANCHES[(year_branch_earth_index + 1) % 12],
+        "截路": ("申", "午", "辰", "寅", "子")[year_stem_index % 5],
+        "空亡": ("酉", "未", "巳", "卯", "丑")[year_stem_index % 5],
         # 年干查表派
         "天官": tianguan_by_year_stem[year_stem],
         "天福": tianfu_by_year_stem[year_stem],
@@ -637,7 +680,18 @@ def build_ziwei_chart(seed: MetaphysicsSeed, gender: str) -> Dict[str, Any]:
                 p["stars"].append(star)
                 break
 
-    sihua = _apply_sihua_to_palaces(palaces, year_stem)
+    # The pinned text gives both branches; the software's polarity-based
+    # single-branch display is a different convention.
+    displayed_xunkong = [xunkong_branch]
+    if rule_profile == "quanshu_v2_excerpt":
+        displayed_xunkong = [xunkong_yang, xunkong_yin]
+        for p in palaces:
+            if p["ganzhi"][1] in displayed_xunkong and "旬空" not in p["stars"]:
+                p["stars"].append("旬空")
+
+    sihua = _apply_sihua_to_palaces(
+        palaces, year_stem, rule_profile, sihua_source=sihua_source
+    )
     for palace in palaces:
         palace["stars"] = sorted(dict.fromkeys(palace["stars"]))
 
@@ -653,11 +707,23 @@ def build_ziwei_chart(seed: MetaphysicsSeed, gender: str) -> Dict[str, Any]:
                 {
                     "name": base_name,
                     "label": label,
-                    "brightness": lookup_star_brightness(base_name, palace_branch),
+                    "brightness": lookup_star_brightness(
+                        base_name, palace_branch, rule_profile=rule_profile
+                    ),
                     "mutagen": mutagen,
                 }
             )
         palace["stars_detail"] = detail
+
+    cycle_rules = attach_natal_cycles(
+        palaces,
+        element=wuxing_ju["element"],
+        year_stem=year_stem,
+        gender=gender,
+        rule_profile=rule_profile,
+    )
+    for palace in palaces:
+        palace["structural_evidence"] = palace_structural_evidence(palace, palaces)
 
     ming_palace = next(palace for palace in palaces if palace["name"] == "命宫")
     shen_palace = next(
@@ -666,6 +732,146 @@ def build_ziwei_chart(seed: MetaphysicsSeed, gender: str) -> Dict[str, Any]:
     )
     return {
         "time_algorithm": "真太阳时" if seed.applied_true_solar else "直接时间",
+        "reading_view": natal_reading_view(palaces),
+        "symbolic_properties": symbolic_properties(palaces),
+        "ming_textual_properties": ming_property_evidence(
+            palaces, ming_branch=ming_branch, shen_branch=shen_branch
+        ),
+        "ming_structural_conditions": structural_condition_evidence(
+            palaces, ming_branch=ming_branch, year_stem=year_stem
+        ),
+        "auxiliary_placement_sources": auxiliary_placement_source_evidence(
+            palaces,
+            lunar_month=int(lunar["month"]),
+            lunar_day=lunar_day,
+            is_leap=bool(lunar.get("is_leap_month")),
+            hour_branch=hour_branch,
+            year_branch=year_branch,
+            rule_profile=rule_profile,
+        ),
+        "sihua_source_comparison": natal_sihua_source_comparison(
+            palaces,
+            year_stem=year_stem,
+            selected_sihua=sihua,
+            compared_assignments_applied=sihua_source == "naj_ming_v1",
+        ),
+        "void_systems": {
+            "xun": {
+                "source_branches": [xunkong_yang, xunkong_yin],
+                "displayed_star_branches": displayed_xunkong,
+                "display_rule": (
+                    "both_branches_as_written"
+                    if rule_profile == "quanshu_v2_excerpt"
+                    else "software_primary_branch_by_year_polarity"
+                ),
+                "source": ziwei_ruleset_metadata(
+                    rule_profile, sihua_source=sihua_source
+                )["classical_source"],
+            },
+            "source_name_mapping": {
+                "天空地劫诀中的天空": "地空",
+                "软件另列的天空": "年支顺一位的软件扩展，不是前述古名天空",
+                "安天德月德解神诀中的本生年解神": "年解",
+                "软件另列的解神": "月系解神，与原文的本生年解神分开",
+            },
+        },
+        "calendar_cycles": cycle_rules,
+        "cycle_source_comparison": cycle_source_evidence(
+            palaces,
+            cycle_rules,
+            element=wuxing_ju["element"],
+            year_stem=year_stem,
+            gender=gender,
+            rule_profile=rule_profile,
+        ),
+        "chart_masters": chart_masters(
+            palaces,
+            ming_branch=ming_branch,
+            year_branch=year_branch,
+            rule_profile=rule_profile,
+        ),
+        "rule_trace": [
+            {
+                "rule_id": "lunar_month_for_placement",
+                "source": (
+                    ziwei_ruleset_metadata(rule_profile, sihua_source=sihua_source)[
+                        "classical_source"
+                    ]
+                    if rule_profile == "quanshu_v2_excerpt"
+                    else ziwei_ruleset_metadata(
+                        rule_profile, sihua_source=sihua_source
+                    )["baseline_source"]
+                ),
+                "inputs": {
+                    "month": int(lunar["month"]),
+                    "day": lunar_day,
+                    "is_leap_month": bool(lunar.get("is_leap_month")),
+                },
+                "outputs": {"effective_month": lunar_month},
+            },
+            {
+                "rule_id": "ming_shen_month_hour",
+                "source": "安身命例；寅起正月、命逆身顺",
+                "inputs": {"effective_month": lunar_month, "hour_branch": hour_branch},
+                "outputs": {"ming_branch": ming_branch, "shen_branch": shen_branch},
+            },
+            {
+                "rule_id": "wuhu_dun_nayin_ju",
+                "source": "起五行寅例与命宫干支纳音",
+                "inputs": {
+                    "lunar_year": int(lunar["year"]),
+                    "year_stem": year_stem,
+                    "ming_ganzhi": ming_palace["ganzhi"],
+                },
+                "outputs": {
+                    "nayin": wuxing_ju["nayin"],
+                    "ju_number": wuxing_ju["number"],
+                    "source_comparison": ziwei_prerequisite_source_evidence(
+                        lunar_month=int(lunar["month"]),
+                        is_leap=bool(lunar.get("is_leap_month")),
+                        effective_month=lunar_month,
+                        hour_branch=hour_branch,
+                        year_stem=year_stem,
+                        shen_branch=shen_branch,
+                        palaces=palaces,
+                        nayin=wuxing_ju["nayin"],
+                        bureau=wuxing_ju["number"],
+                    ),
+                },
+            },
+            {
+                "rule_id": "ziwei_tianfu_placement",
+                "source": "五行局生日安紫微；寅申轴对映安天府",
+                "inputs": {"lunar_day": lunar_day, "ju_number": ju_num},
+                "outputs": {
+                    "ziwei_branch": ZIWEI_BRANCH_SEQUENCE[ziwei_index],
+                    "tianfu_branch": ZIWEI_BRANCH_SEQUENCE[tianfu_index],
+                    "source_comparison": ziwei_day_source_evidence(
+                        bureau=ju_num,
+                        lunar_day=lunar_day,
+                        actual_branch=ZIWEI_BRANCH_SEQUENCE[ziwei_index],
+                    ),
+                },
+            },
+            {
+                "rule_id": "daxian_direction",
+                "source": (
+                    "明刊卷三安大限诀：阳男阴女从父母、阴男阳女从兄弟起"
+                    if rule_profile == "quanshu_v2_excerpt"
+                    else "软件首限命宫，阳男阴女顺、阴男阳女逆；未知性别不排运"
+                ),
+                "inputs": {"year_stem": year_stem, "gender": canonical_gender},
+                "outputs": {
+                    "direction": daxian_direction_label,
+                    "initial_palace_name": (
+                        next(p["name"] for p in palaces if p["daxian_period"] == 1)
+                        if gender_known
+                        else None
+                    ),
+                    "first_age_given_bureau": start_age,
+                },
+            },
+        ],
         "year_stem": year_stem,
         "lunar_date": {
             "year": int(lunar["year"]),
@@ -677,8 +883,14 @@ def build_ziwei_chart(seed: MetaphysicsSeed, gender: str) -> Dict[str, Any]:
         "calendar_rules": {
             "year_boundary": "农历正月初一",
             "late_zi": "晚子时本命农历日期算当天",
-            "leap_month": "闰月十五日及以前算当月，之后算下月",
+            "leap_month": (
+                "闰月全月作下月（全书卷二转录摘录）"
+                if rule_profile == "quanshu_v2_excerpt"
+                else "闰月十五日及以前算当月，之后算下月"
+            ),
+            "effective_birth_month": lunar_month,
         },
+        "ruleset": ziwei_ruleset_metadata(rule_profile, sihua_source=sihua_source),
         "ming_gong": {
             "name": "命宫",
             "branch": ming_branch,
@@ -726,16 +938,15 @@ def _palace_for_nominal_age(
         lo, hi = (int(x) for x in palace["daxian"].split("~"))
         if lo <= nominal_age <= hi:
             return palace
-    # Before the first decade, use the six childhood palaces rather than
-    # accidentally returning the last (oldest) decade.
-    childhood = ("命宫", "财帛宫", "疾厄宫", "夫妻宫", "福德宫", "官禄宫")
     first_age = min(int(p["daxian"].split("~")[0]) for p in palaces)
     if 1 <= nominal_age < first_age:
-        return next(p for p in palaces if p["name"] == childhood[nominal_age - 1])
+        raise ValueError("按所选五行局起岁，尚未起正式大限；童限不能替代大限取宫")
     raise ValueError("目标虚岁超出紫微大限支持范围")
 
 
 def _xiaoxian_branch(year_branch: str, nominal_age: int, gender: str) -> str:
+    if normalize_gender(gender) not in {"男", "女"}:
+        raise ValueError("紫微小限顺逆需要明确性别，不能用未知性别代替女命")
     start = _XIAOXIAN_START_BY_YEAR_BRANCH[year_branch]
     start_idx = ZIWEI_BRANCH_SEQUENCE.index(start)
     offset = (nominal_age - 1) % 12
@@ -744,7 +955,14 @@ def _xiaoxian_branch(year_branch: str, nominal_age: int, gender: str) -> str:
     return ZIWEI_BRANCH_SEQUENCE[idx]
 
 
-def _horoscope_scope(scope: str, palace: Dict[str, Any], stem: str) -> Dict[str, Any]:
+def _horoscope_scope(
+    scope: str,
+    palace: Dict[str, Any],
+    stem: str,
+    rule_profile: str,
+    *,
+    sihua_source: str = "rule_profile",
+) -> Dict[str, Any]:
     branch = palace["ganzhi"][1]
     return {
         "scope": scope,
@@ -757,7 +975,9 @@ def _horoscope_scope(scope: str, palace: Dict[str, Any], stem: str) -> Dict[str,
         "branch_index": ZIWEI_BRANCH_SEQUENCE.index(branch),
         "palace_ganzhi": palace["ganzhi"],
         "stem": stem,
-        "mutagen": dict(ZIWEI_SIHUA_RULES[stem]),
+        "mutagen": sihua_rules_for(
+            ZIWEI_SIHUA_RULES, rule_profile, sihua_source=sihua_source
+        )[stem],
     }
 
 
@@ -808,46 +1028,124 @@ def build_ziwei_horoscope(
     chart: Dict[str, Any],
     gender: str,
     target_seed: MetaphysicsSeed,
+    birth_seed: Optional[MetaphysicsSeed] = None,
+    nominal_age_basis: str = "birth_civil_timezone",
 ) -> Dict[str, Any]:
     """Six scopes using lunar-year ages and the natal-month/hour Dou Jun.
 
     Scope ``branch`` is the actual natal palace, not the calendar branch of
     the target date. Month/day/hour stems still determine their own 四化.
-    This follows iztro 2.5.8 normal year/age/horoscope boundaries; late-zi
-    natal dates keep FateBridge's existing current-day convention.
+    Flowing scopes retain the target clock. Age ordinals use one civil clock
+    for both physical endpoints by default. Explicit legacy mode replays the
+    former mixed-clock rule, including its unsupported boundary.
     """
     palaces = chart["palaces"]
+    rule_profile = chart.get("ruleset", {}).get("id", DEFAULT_ZIWEI_PROFILE)
+    validate_rule_profile(rule_profile)
+    sihua_source = chart.get("ruleset", {}).get("sihua_source", "rule_profile")
+    validate_sihua_source(sihua_source)
+    named_rule = chart.get("ruleset", {}).get("sihua_rule") == "naj_ming_v1"
+    named_version = str(chart.get("ruleset", {}).get("version", "")).endswith(
+        "+sihua.naj-ming-v1"
+    )
+    if named_rule != named_version or named_rule != (sihua_source == "naj_ming_v1"):
+        raise ValueError("本命四化来源身份不一致，须保留实际所选表的完整规则信息")
+    if (
+        named_rule
+        and dict(chart["sihua"])
+        != sihua_rules_for(ZIWEI_SIHUA_RULES, rule_profile, sihua_source=sihua_source)[
+            chart["year_stem"]
+        ]
+    ):
+        raise ValueError("本命四化与所选明刊来源不一致，须按实际来源重建命盘")
+    if normalize_gender(gender) not in {"男", "女"}:
+        raise ValueError("紫微运限的大限、小限顺逆需要明确性别；本命非运限部分仍可计算")
     target_lunar, target_month, target_day = require_lunar_month_day(
         target_seed, "紫微斗数运限"
     )
+    if target_lunar.get("year") is None:
+        raise ValueError("紫微运限目标农历年缺失")
     natal_lunar = chart["lunar_date"]
-    nominal_age = int(target_lunar["year"]) - int(natal_lunar["year"]) + 1
-    if nominal_age < 1:
-        raise ValueError("目标农历年早于出生农历年")
+    age_calendar = nominal_age_calendar(
+        birth_seed=birth_seed,
+        target_seed=target_seed,
+        birth_placement_year=int(natal_lunar["year"]),
+        target_civil_year=int(target_lunar["year"]),
+        basis=nominal_age_basis,
+    )
+    nominal_age = age_calendar["nominal_age"]
     natal_year_branch = _lunar_year_ganzhi(int(natal_lunar["year"]))[1]
     target_year_stem, target_year_branch = _lunar_year_ganzhi(int(target_lunar["year"]))
 
-    daxian_palace = _palace_for_nominal_age(palaces, nominal_age)
-    daxian = _horoscope_scope("大限", daxian_palace, daxian_palace["ganzhi"][0])
+    first_daxian_age = int(chart["wuxing_ju"]["number"])
+    daxian: Dict[str, Any]
+    if nominal_age < first_daxian_age:
+        # The six literal childhood labels do not establish a substitute
+        # formal decade, a decade palace stem, or decade transformations.
+        # Retain the scope slot with explicit nulls so absence is observable.
+        daxian = {
+            "scope": "大限",
+            "palace_name": None,
+            "scope_palace_role": None,
+            "natal_palace_name": None,
+            "branch": None,
+            "branch_index": None,
+            "palace_ganzhi": None,
+            "stem": None,
+            "mutagen": None,
+            "palace_map": [],
+            "mutagen_natal_links": [],
+            "stem_origin": None,
+            "status": "not_started",
+            "unavailable_reason": "before_selected_bureau_start_no_childhood_substitution",
+        }
+    else:
+        daxian_palace = _palace_for_nominal_age(palaces, nominal_age)
+        daxian = _horoscope_scope(
+            "大限",
+            daxian_palace,
+            daxian_palace["ganzhi"][0],
+            rule_profile,
+            sihua_source=sihua_source,
+        )
+        daxian["status"] = "computed"
+    daxian["first_age"] = first_daxian_age
+    daxian["is_childhood_limit"] = False
 
     xiao_palace = _palace_by_branch(
         palaces, _xiaoxian_branch(natal_year_branch, nominal_age, gender)
     )
     # 小限 四化 follows the 宫干 of the 小限 palace (iztro convention), not the 流年 stem.
-    xiaoxian = _horoscope_scope("小限", xiao_palace, xiao_palace["ganzhi"][0])
-
-    natal_month = int(natal_lunar["month"]) + int(
-        natal_lunar["is_leap_month"] and int(natal_lunar["day"]) > 15
+    xiaoxian = _horoscope_scope(
+        "小限",
+        xiao_palace,
+        xiao_palace["ganzhi"][0],
+        rule_profile,
+        sihua_source=sihua_source,
     )
-    target_month += int(target_lunar.get("is_leap_month", False) and target_day > 15)
+
+    natal_month = effective_lunar_month(
+        int(natal_lunar["month"]),
+        int(natal_lunar["day"]),
+        bool(natal_lunar["is_leap_month"]),
+        rule_profile,
+    )
+    target_month = effective_lunar_month(
+        target_month,
+        target_day,
+        bool(target_lunar.get("is_leap_month")),
+        # The excerpt concerns natal 身命, not flowing leap months.
+        DEFAULT_ZIWEI_PROFILE,
+    )
     # Reverse from the year's palace to birth month, then forward to birth
     # hour; the result is 正月斗君. Count the target month/day/hour from it.
-    month_index = (
+    doujun_index = (
         ZIWEI_BRANCH_SEQUENCE.index(target_year_branch)
         - natal_month
         + EARTHLY_BRANCHES.index(chart["hour_branch"])
-        + target_month
+        + 1
     ) % 12
+    month_index = (doujun_index + target_month - 1) % 12
     day_index = (month_index + target_day - 1) % 12
     hour_index = (
         day_index + EARTHLY_BRANCHES.index(target_seed.pillars["hour"][1])
@@ -857,7 +1155,11 @@ def build_ziwei_horoscope(
     ]
     flowing = [
         _horoscope_scope(
-            "流年", _palace_by_branch(palaces, target_year_branch), target_year_stem
+            "流年",
+            _palace_by_branch(palaces, target_year_branch),
+            target_year_stem,
+            rule_profile,
+            sihua_source=sihua_source,
         )
     ]
     for scope, index, stem in (
@@ -867,43 +1169,141 @@ def build_ziwei_horoscope(
     ):
         flowing.append(
             _horoscope_scope(
-                scope, _palace_by_branch(palaces, ZIWEI_BRANCH_SEQUENCE[index]), stem
+                scope,
+                _palace_by_branch(palaces, ZIWEI_BRANCH_SEQUENCE[index]),
+                stem,
+                rule_profile,
+                sihua_source=sihua_source,
             )
         )
 
     scopes = [daxian, xiaoxian, *flowing]
-    for scope_record in scopes:
+    stem_origins = (
+        "本命所临宫干",
+        "本命所临宫干",
+        "目标农历年干",
+        "目标农历月序五虎遁月干",
+        "目标日柱天干",
+        "目标时柱天干",
+    )
+    for scope_record, stem_origin in zip(scopes, stem_origins):
+        if scope_record.get("status") == "not_started":
+            continue
+        scope_record["stem_origin"] = stem_origin
+        scope_record["palace_map"] = scope_palace_map(
+            scope_record["branch"], palaces, ZIWEI_PALACE_SEQUENCE
+        )
+        if scope_record["scope"] == "流年":
+            scope_record["flowing_stars"] = flowing_lucun_stars(
+                scope_record["palace_map"], stem=scope_record["stem"]
+            )
+            if rule_profile == "quanshu_v2_excerpt":
+                scope_record["flowing_stars"].extend(
+                    annual_text_stars(
+                        scope_record["palace_map"], year_branch=target_year_branch
+                    )
+                )
+                scope_record["annual_three_sha"] = annual_three_sha(target_year_branch)
         scope_record["mutagen_natal_links"] = _link_mutagen_to_natal_stars(
             scope_record, palaces
         )
+        roles = {
+            p["branch"]: p["scope_palace_name"] for p in scope_record["palace_map"]
+        }
+        for link in scope_record["mutagen_natal_links"]:
+            if link["status"] == "matched":
+                link["scope_palace_name"] = roles[link["natal_branch"]]
 
+    table_evidence = sihua_source_comparison(
+        sihua_rules_for(ZIWEI_SIHUA_RULES, rule_profile, sihua_source=sihua_source),
+        compared_assignments_applied=sihua_source == "naj_ming_v1",
+    )
+    table_evidence.update(
+        scope="natal_table_reused_for_scopes_by_software_convention",
+        dynamic_reuse_classically_verified=False,
+    )
     return {
         "engine": "fatebridge-offline",
+        "natal_prerequisites": horoscope_natal_prerequisites(chart),
         "nominal_age": nominal_age,
+        "nominal_age_calendar": age_calendar,
+        "sihua_source_comparison": table_evidence,
+        "childhood_limit": childhood_limit(chart, nominal_age),
+        "ming_limit_subperiods": limit_subperiod_evidence(
+            palaces, scopes, nominal_age=nominal_age
+        ),
         "calendar_rules": chart["calendar_rules"],
+        "ruleset": ziwei_ruleset_metadata(rule_profile, sihua_source=sihua_source),
+        "source_comparison": limit_source_evidence(
+            chart,
+            scopes,
+            nominal_age=nominal_age,
+            gender=normalize_gender(gender),
+            natal_year_branch=natal_year_branch,
+            target_year_branch=target_year_branch,
+            actual_doujun_branch=ZIWEI_BRANCH_SEQUENCE[doujun_index],
+        ),
         "interpretation_scope": {
-            "contract_version": "natal_scope_linkage_v1",
+            "contract_version": "scope_palace_mapping_v3",
             "scope_palace_meaning": "运限命宫活动索引所临的本命宫",
-            "transformation_meaning": "本层四化标记连接本命星所在宫，不是本层旋宫的功能宫",
+            "transformation_meaning": "本层四化连接本命星位；scope_palace_name 单独标记本层功能宫",
+            "scope_palace_map_supported": True,
             "full_scope_palaces_supported": False,
-            "limitations": ["未提供完整运限十二宫旋宫表", "未据此判定职业事件或吉凶"],
+            "limitations": [
+                "已提供十二宫功能名映射与部分流曜，范围由所选规则配置与实际字段确定；未提供全部流曜及飞宫体系",
+                "本命星位未随旋宫搬移",
+                "未起正式大限时该层标记not_started，不取童限宫、不生成大限四化；其他层分别计算",
+                "未据此判定职业事件或吉凶",
+            ],
         },
         "scopes": scopes,
     }
 
 
-def build_ziwei_rules(year_stem: Optional[str] = None) -> Dict[str, Any]:
+def build_ziwei_rules(
+    year_stem: Optional[str] = None,
+    *,
+    rule_profile: str = DEFAULT_ZIWEI_PROFILE,
+    sihua_source: str = "rule_profile",
+) -> Dict[str, Any]:
+    rules = sihua_rules_for(ZIWEI_SIHUA_RULES, rule_profile, sihua_source=sihua_source)
     catalogue = {
         "palace_sequence": ZIWEI_PALACE_SEQUENCE,
         "ming_gong_method": "寅宫起正月，顺数生月，逆数生时。",
         "shen_gong_method": "寅宫起正月，顺数生月，再顺数生时。",
-        "sihua_by_year_stem": ZIWEI_SIHUA_RULES,
+        "sihua_by_year_stem": rules,
+        "sihua_source_comparison": sihua_source_comparison(
+            rules, compared_assignments_applied=sihua_source == "naj_ming_v1"
+        ),
+        "ruleset": ziwei_ruleset_metadata(rule_profile, sihua_source=sihua_source),
+        "cycle_methods": {
+            "pre_decade": "所选局数起岁前不取大限宫、不生成大限四化；童限独立",
+            "daxian_start": (
+                "阳男阴女首限父母、阴男阳女首限兄弟；局数起岁，十年一宫"
+                if rule_profile == "quanshu_v2_excerpt"
+                else "首限命宫；阳男阴女顺、阴男阳女逆，局数起岁"
+            ),
+            "fire_bell": (
+                "按所列年支二支安星，不推进生时；这是明确选择的年支定点读法"
+                if rule_profile == "quanshu_v2_excerpt"
+                else "年支起点起子时，火铃双顺至生时；软件约定"
+            ),
+            "changsheng": (
+                "男顺女逆"
+                if rule_profile == "quanshu_v2_excerpt"
+                else "阳男阴女顺、阴男阳女逆"
+            ),
+            "boshi": "禄存起博士，阳男阴女顺、阴男阳女逆",
+            "annual_lucun_yang_tuo": "目标年干定流禄，前一位流羊、后一位流陀；不搬移本命星",
+        },
     }
     focused = None
     if year_stem:
+        if year_stem not in rules:
+            raise ValueError("紫微四化年干必须为甲乙丙丁戊己庚辛壬癸之一")
         focused = {
             "year_stem": year_stem,
-            "sihua": ordered_sihua_mapping(ZIWEI_SIHUA_RULES[year_stem]),
+            "sihua": ordered_sihua_mapping(rules[year_stem]),
         }
     return {
         "requested_year_stem": year_stem,

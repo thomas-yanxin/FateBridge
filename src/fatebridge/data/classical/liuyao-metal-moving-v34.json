@@ -1,0 +1,25 @@
+{
+  "ruleset_id": "zengshan_metal_si_moving_support_v34",
+  "ruleset_version": "34.0.0",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf"
+  },
+  "clauses": [
+    {
+      "id": "metal-si-qualified-support",
+      "pdf_pages": [
+        97,
+        98
+      ],
+      "quote": "金雖長生在巳須宜金爻旺相或日月動爻生扶再遇巳日占卦或是卦中動出巳爻或是金爻動而化出巳火皆謂之遇長生"
+    }
+  ],
+  "interpretation": {
+    "admission": "An actual moving earth source whose outgoing qualification is true and whose root can be proven without the queried metal supplies the stated support premise. The target metal need not already be credited with Si growth to establish that source premise.",
+    "dependencies": "Trace existing qualified actors to calendar or actual qualified own-back roots. Exclude the queried metal, all metal Si-day growth credits, and earth Si-day/own-Si roots needing independent support. A cycle without an external root is not evidence.",
+    "retained": "This local growth credit does not erase month control/break, target void, own-back control, source binding/void or uncertain source qualification. Unknown is never false.",
+    "scope": "Actual visible moving-earth support of a visible metal target at Si day; do not infer a complete source/target strength adjudication or complete fire table. Other subject-location combinations must remain explicit about their existing scope."
+  }
+}

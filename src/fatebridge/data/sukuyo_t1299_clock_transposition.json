@@ -1,0 +1,142 @@
+{
+  "id": "t1299_lower_clock_special_transposition_v1",
+  "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T21/T21n1299.xml",
+  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+  "publisher_commit": "dbdea41071e1e260ad84b72faefd4587333cf76d",
+  "selected_base": "Taisho publisher main text with its own apparatus retained",
+  "symbol_reference": {
+    "url": "https://cbeta.org/variant-symbols",
+    "selected_capture_sha256": "0a47ac0ae556066200312bef01fbe1b4dbf70c2959889c27a2a82ff0cd5bffbf",
+    "capture_kind": "selected_web_tool_text_not_full_HTML",
+    "selected_explanation": "位置ノ轉換 (‘Interchange of position’)",
+    "symbol": "∞",
+    "meaning": "interchange_of_position"
+  },
+  "blocks": [
+    {
+      "id": "lower_special_days_248",
+      "paragraph_xml_ids": [
+        "pT21p0398b1901",
+        "pT21p0398b2701",
+        "pT21p0398c0301"
+      ],
+      "start_anchor_xml_id": "nkr_note_orig_0398015",
+      "locator": "T21n1299_p0398b21-0398c07",
+      "normalized_base_text": "太陽直日，月與軫合。大陰直日，月與畢合。火曜直日，月與尾合。水曜直日，月與柳合。木曜直日，月與鬼合。金曜直日，月與房合。土曜直日，月與星合。已上名甘露日，是大吉祥，宜冊立、受灌頂法、造作寺宇及受戒、習學經法、出家修道，一切並吉。大陽直日，月與尾合。太陰直日，月與心合。火曜直日，月與壁合。水曜直日，月與昴合。木曜直日，月與井合。金曜直日，月與張合。土曜直日，月與亢合。已上名金剛峯日，宜作一切降伏法，誦日天子呪及作護摩，并諸猛利等事。大陽直日，月與冒合。太陰直日，月與鬼合。火曜直日，月與翼合。水曜直日，月與參合。木曜直日，月與底合。金曜直日，月與奎合。土曜直日，月與柳合。已上名羅剎日，不宜舉百事，必有殃禍。",
+      "count_policy": "Count only CJK Unified Ideographs U+3400..U+9FFF; printed punctuation and line wrapping excluded.",
+      "cjk_character_count": 248
+    },
+    {
+      "id": "daybreak_eight_parts_93",
+      "paragraph_xml_ids": [
+        "pT21p0399b2301"
+      ],
+      "locator": "T21n1299_p0399b23-28",
+      "normalized_base_text": "一切皆悉用之。出入行來、用兵出陣、學藝及一切舉動，無不用其宿曜時日。唯東大唐一國，未審知委。其曜亦每日分為八時，平明即是所直之曜，乃至酉戌，則八時而周。夜亦分為八時，轉到明日曉時，即次後曜當直。如是細解，用之萬不失一。",
+      "count_policy": "Count only CJK Unified Ideographs U+3400..U+9FFF; printed punctuation and line wrapping excluded.",
+      "cjk_character_count": 93
+    }
+  ],
+  "paired_apparatus": {
+    "first_note_number": "0398015",
+    "reciprocal_note_number": "0399016",
+    "note_records": {
+      "0398015": [
+        {
+          "attributes": {
+            "n": "0398015",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0398015"
+          },
+          "text": "次頁[16]（太陽…禍）二百四十八字【大】∞（一切…一）九十三字【明】"
+        },
+        {
+          "attributes": {
+            "n": "0398015",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0398015"
+          },
+          "text": "次頁[16]（（太陽…禍））二百四十八字∞（（一切…一））九十三字【明】"
+        }
+      ],
+      "0399016": [
+        {
+          "attributes": {
+            "n": "0399016",
+            "resp": "#resp1",
+            "type": "mod",
+            "target": "#nkr_note_mod_0399016"
+          },
+          "text": "前頁[15]（太陽…禍）二百四十八字【大】∞（一切…一）九十三字【明】"
+        },
+        {
+          "attributes": {
+            "n": "0399016",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_0399016"
+          },
+          "text": "前頁[15]（（太陽…禍））二百四十八字∞（（一切…一））九十三字【明】"
+        }
+      ]
+    },
+    "paired_reference_count": 2,
+    "independent_transposition_observations": 1,
+    "publisher_mod_note_contains_todo_comment": true
+  },
+  "adjacent_variant": {
+    "note_number": "0398014",
+    "note_records": [
+      {
+        "attributes": {
+          "n": "0398014",
+          "resp": "#resp1",
+          "type": "mod",
+          "target": "#nkr_note_mod_0398014"
+        },
+        "text": "一【大】，〔－〕【明】"
+      },
+      {
+        "attributes": {
+          "n": "0398014",
+          "resp": "#resp2",
+          "type": "orig",
+          "place": "foot text",
+          "target": "#nkr_note_orig_0398014"
+        },
+        "text": "〔一〕－【明】"
+      }
+    ],
+    "base_literal": "一",
+    "ming_apparatus_operation": "delete",
+    "context_before_first_block_base": "右件七曜，上運行於天、下直於人間，其精靈神驗，內外典籍具備。自南西北三方諸國一，",
+    "applied_to_runtime": false
+  },
+  "position_only_reconstruction": {
+    "base_block_order": [
+      "lower_special_days_248",
+      "intervening_text",
+      "daybreak_eight_parts_93"
+    ],
+    "apparatus_indicated_block_order": [
+      "daybreak_eight_parts_93",
+      "intervening_text",
+      "lower_special_days_248"
+    ],
+    "applies_all_other_ming_character_variants": false,
+    "independent_ming_print_acquired": false,
+    "full_ming_text_reconstructed": false,
+    "selected_pair_encodes_numeral_substitution": false,
+    "selected_pair_encodes_deletion_of_clock_block": false
+  },
+  "applied_to_primary_table": false,
+  "applied_to_activity_assessment": false,
+  "applied_to_clock_mapping": false,
+  "hinoo_half_mapping_established": false,
+  "leap_short_month_priority_established": false,
+  "scope": "下卷同底本两端互指的段落位置校记与相邻一字删除，非新增两份独立见证；仅交代248字特殊日段与93字平明八时段的相对位置。没有由位置交换改写本曜宿字、时分计数、现用事项、古代日界、桧尾半日或闰月补配次序。未取得独立明刻本，也未把位置示意称作完整明本重建。"
+}

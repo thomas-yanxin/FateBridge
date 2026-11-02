@@ -104,7 +104,9 @@ def test_birth_year_boundary_is_explicit(boundary, expected):
     assert result["layers"]["minggua"]["time_context"]["effective_year"] == expected
 
 
-def test_lichun_before_at_after_and_timezone_equivalence():
+def test_lichun_before_at_after_and_timezone_equivalence(monkeypatch):
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "de440")
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     boundary = lichun(2026, "Asia/Shanghai")
     moments = [
         (boundary - timedelta(seconds=1), 2025),
@@ -117,6 +119,22 @@ def test_lichun_before_at_after_and_timezone_equivalence():
         personal = calculate_minggua(birth_at=moment, gender_convention="male")[
             "layers"
         ]["minggua"]
+        # Keep every original one-second/exact/UTC case. The packaged model's
+        # five-second candidate policy requires uncertainty here; this is not
+        # the separate one-second TT implementation acceptance threshold.
+        for context in (annual["time_context"], personal["time_context"]):
+            assert context["effective_year"] is None
+            assert context["effective_year_status"] == "requires_confirmation"
+            assert context["candidate_effective_years"] == [2025, 2026]
+            assert context["provisional_effective_year"] == expected
+            assert context["boundary_resolution"]["operational_guard_seconds"] == 5
+        assert annual["palaces"] == {}
+    for seconds, expected in ((-6, 2025), (6, 2026)):
+        moment = boundary + timedelta(seconds=seconds)
+        annual = calculate_annual_stars(query_at=moment)["layers"]["annual_stars"]
+        personal = calculate_minggua(birth_at=moment, gender_convention="male")[
+            "layers"
+        ]["minggua"]
         assert (
             annual["effective_year"]
             == personal["time_context"]["effective_year"]
@@ -125,8 +143,12 @@ def test_lichun_before_at_after_and_timezone_equivalence():
     same = calculate_annual_stars(
         query_at=boundary.astimezone(timezone.utc), timezone_name="UTC"
     )
-    assert same["layers"]["annual_stars"]["effective_year"] == 2026
-    assert same["layers"]["annual_stars"]["time_context"]["valid_from"].endswith(
+    assert same["layers"]["annual_stars"]["time_context"]["effective_year"] is None
+    outside = calculate_annual_stars(
+        query_at=(boundary + timedelta(seconds=6)).astimezone(timezone.utc),
+        timezone_name="UTC",
+    )
+    assert outside["layers"]["annual_stars"]["time_context"]["valid_from"].endswith(
         "+00:00"
     )
 
@@ -287,9 +309,12 @@ def test_three_method_output_preserves_scopes_sources_and_differences():
         for c in result["conflicts"]
     )
     assert "xuankong_natal" in result["coverage"]["not_requested_layers"]
-    for layer in result["layers"].values():
+    for name, layer in result["layers"].items():
         ruleset = layer["ruleset"]
-        assert ruleset["version"] == "1.0.0"
+        assert (
+            ruleset["version"]
+            == {"bazhai": "1.1.0", "jinsuo": "1.0.0", "annual_stars": "1.0.0"}[name]
+        )
         assert ruleset["source_ids"] == [s["source_id"] for s in ruleset["sources"]]
         assert all(
             s["url"].startswith("https://") and s["scope"] for s in ruleset["sources"]
@@ -307,6 +332,7 @@ def test_missing_inputs_are_layer_specific_and_unselected_layers_not_computed():
     assert selected["coverage"]["not_requested_layers"] == [
         "bazhai",
         "jinsuo",
+        "monthly_stars",
         "xuankong_natal",
     ]
     unknown = payload("bazhai")

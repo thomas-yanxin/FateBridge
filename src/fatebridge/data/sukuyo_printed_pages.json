@@ -1,0 +1,295 @@
+{
+  "id": "sukuyo_selected_printed_pages_v71",
+  "before_production_R1_sha256": "14e255e15255f3f9a5db3a444019aba8436bc972ddaea7d2a2cb4e3a112ef355",
+  "normalization_note_sha256": "30f743072b719d37cd04fdfb39caa38faa763f3bbdb647614930926075bb240d",
+  "inspection_plan_sha256": "1815d130a7eefeb4fc6cf19d240ab1a790acc222a2df812a3ed8b787a14dc410",
+  "pixel_read_protocol_sha256": "c9cd5d4746da320f3c996fc935f89df70dfd2674e08a0dc21879f41565ed14ad",
+  "parent_witness_data_sha256": "903ce6626619d66ef5ea64f8ecb8884110f25ef0ef5a33946dfe659f91cc6e76",
+  "printed_frames": [
+    {
+      "id": "T1644-0196",
+      "viewer_url": "https://21dzk.l.u-tokyo.ac.jp/imgs/limg.php?useid=1644_.32.0196b28",
+      "DZI_url": "https://21dzk.l.u-tokyo.ac.jp/taisho_pub/32/32_0196.dzi",
+      "DZI_sha256": "4fc30c902f1e9206f4c40495312504cd83d67f8f4045019777972ff583b1cf51",
+      "tile_manifest_sha256": "79f7c711a2fe24b783d8b2d1457df9c6d017a1aaccb3dff730c203660c58c7f2",
+      "selected_DZI_level": 12,
+      "selected_level_size": [
+        2000,
+        2886
+      ],
+      "source_DZI_max_level": 13,
+      "source_full_size": [
+        4000,
+        5771
+      ],
+      "all_selected_level_tiles": 96,
+      "assembled_png_sha256": "a8e557161ef45b5a0c8972947116e7b5484b27bf87a37627924b09578edfcb70",
+      "RGB_pixel_sha256": "303a2a1c60abca8caadf40f6cbbd65af858b3868d3e7ed73b6f52d3c9a98e140",
+      "source_kind": "publisher_digitized_named_Taisho_page_not_original_manuscript",
+      "maximum_resolution_whole_page_obtained": false
+    },
+    {
+      "id": "T2465-0030",
+      "viewer_url": "https://21dzk.l.u-tokyo.ac.jp/imgs/limg.php?useid=2465_.78.0030c21",
+      "DZI_url": "https://21dzk.l.u-tokyo.ac.jp/taisho_pub/78/78_0030.dzi",
+      "DZI_sha256": "1b98c16d50eca76970707929524d6f1673aa94ef43cdfbba2703ea536b5b1df5",
+      "tile_manifest_sha256": "7117a9e8082fdf70c01b688a1e4452c87c9d1cffe99b8882a133527d88051bd9",
+      "selected_DZI_level": 12,
+      "selected_level_size": [
+        2000,
+        2853
+      ],
+      "source_DZI_max_level": 13,
+      "source_full_size": [
+        4000,
+        5706
+      ],
+      "all_selected_level_tiles": 96,
+      "assembled_png_sha256": "ab2ce9b6b864252ec5b5ce3b080af50090edac3f59bb8a2f1a6b45574cf85397",
+      "RGB_pixel_sha256": "cb1840e33575bbeceb479fdf1a698c10b03e8b4152912e7346b7ae29c44ed23c",
+      "source_kind": "publisher_digitized_named_Taisho_page_not_original_manuscript",
+      "maximum_resolution_whole_page_obtained": false
+    },
+    {
+      "id": "T1299-0399",
+      "viewer_url": "https://21dzk.l.u-tokyo.ac.jp/imgs/limg.php?useid=1299_.21.0399b25",
+      "DZI_url": "https://21dzk.l.u-tokyo.ac.jp/taisho_pub/21/21_0399.dzi",
+      "DZI_sha256": "a593e4690f039734b2aed7be9469cc29bd1fa92e0380f6b380c3b66e8cc0250b",
+      "tile_manifest_sha256": "b49328ee78fadd4d30a38717721ef0131fadc0a8907ab54e83dfb3900db801d3",
+      "selected_DZI_level": 12,
+      "selected_level_size": [
+        2000,
+        2807
+      ],
+      "source_DZI_max_level": 13,
+      "source_full_size": [
+        4000,
+        5613
+      ],
+      "all_selected_level_tiles": 88,
+      "assembled_png_sha256": "07cadbe99b6cbe641ce44917c53ff2e30d7858575806e8bc4ae434237a2f849d",
+      "RGB_pixel_sha256": "842b78f320142cea380a66b980be2ef21ab0afcb27fa8289c909eafa2eecee01",
+      "source_kind": "publisher_digitized_named_Taisho_page_not_original_manuscript",
+      "maximum_resolution_whole_page_obtained": false
+    }
+  ],
+  "native_a12_ROI": {
+    "source_DZI_max_level": 13,
+    "source_full_size": [
+      4000,
+      5772
+    ],
+    "source_roi_xywh": [
+      2050,
+      450,
+      430,
+      780
+    ],
+    "all_tiles_read_and_hash_verified": 8,
+    "png_sha256": "070e79a24033a81a92db1c14a04a1f1d9d68e79d0ff46a284e4907206ebd6686",
+    "RGB_pixel_sha256": "00145570663103520f9537b131aa3d47a8466d9ba52934dc8edffef75f044a42",
+    "operation": "Exact native-level ROI from decoded tile cores. No scaling, enhancement or generated pixels. Not entire maximum-resolution page.",
+    "transcription_accepted": false
+  },
+  "raw_tiles_total": 330,
+  "root_selected_observations": [
+    {
+      "id": "T1644_a12",
+      "frame": "T1644-0196",
+      "locator": "T32n1644_p0196a12",
+      "root_selected_image_literal": "矣休多",
+      "reported_XML_orig_literal": "矣",
+      "CBETA_adopted_literal": "牟",
+      "SAT_electronic_literal": "牟",
+      "native_ROI_png_sha256": "070e79a24033a81a92db1c14a04a1f1d9d68e79d0ff46a284e4907206ebd6686",
+      "native_ROI_xywh": [
+        2050,
+        450,
+        430,
+        780
+      ],
+      "scope": "This selected print image supports the XML-reported orig reading矣 at this location; actualSAT typed牟 and adoptedCBETA牟 remain separate. Does not establish every printing, source priority, original manuscript or general wrongness of an electronic platform."
+    },
+    {
+      "id": "T1644_b16",
+      "frame": "T1644-0196",
+      "locator": "T32n1644_p0196b16",
+      "root_selected_image_literal": "月減一牟休多第三月又減一牟休多",
+      "reported_XML_orig_literal": "月",
+      "CBETA_adopted_literal": "月又",
+      "scope": "Record the start-of-line月 without inserting an又 after it; the later第三月又 is another position. Printed footnote3 month-plus又 is a reported alternate, not main text."
+    },
+    {
+      "id": "T1644_b23",
+      "frame": "T1644-0196",
+      "locator": "T32n1644_p0196b23",
+      "root_selected_image_literal": "三月復減一牟林多至五月十五日其日最",
+      "reported_XML_orig_literal": "林",
+      "CBETA_adopted_literal": "休",
+      "scope": "Retain the selected printed林, not silently normalize the unit to休."
+    },
+    {
+      "id": "T1644_b28",
+      "frame": "T1644-0196",
+      "locator": "T32n1644_p0196b28",
+      "root_selected_image_literal": "各十五牟休多十一月九日是夜最長十",
+      "reported_XML_orig_literal": "十一月九日",
+      "T2251_quoted_explicit_emendation": "十二月九日",
+      "scope": "The selected image reads十一; later quotation十二 with傍本作一誤也 remains. No universal witness agreement or calendar correction inferred."
+    },
+    {
+      "id": "T1644_c20",
+      "frame": "T1644-0196",
+      "locator": "T32n1644_p0196c20",
+      "root_selected_image_literal": "提中更三月日至瞿耶尼若北欝單越則",
+      "reported_XML_orig_literal": "至",
+      "CBETA_adopted_literal": "至西",
+      "scope": "Main printed至瞿 and footnote5 plus西 are distinct; do not insert the note into main text."
+    },
+    {
+      "id": "T2465_calendar_examples",
+      "frame": "T2465-0030",
+      "locator": "T2465_.78.0030c13-21",
+      "root_selected_image_examples": [
+        {
+          "month": 12,
+          "day": 1,
+          "mansion": "虚"
+        },
+        {
+          "month": 12,
+          "day": 15,
+          "mansion": "星"
+        },
+        {
+          "month": 12,
+          "day": 30,
+          "mansion": "星"
+        }
+      ],
+      "scope": "Selected Taisho print image and its electronic example agree on三十日星. Kyoto/Zentsuji室 and currentT1299calculation室 remain distinct. No manuscript priority or algorithm override."
+    },
+    {
+      "id": "T2465_halves",
+      "frame": "T2465-0030",
+      "locator": "T2465_.78.0030c21-26",
+      "root_selected_image_literal": "次二月初一日半已上者正月闕日之分宿直也半已下者即彼當日宿直",
+      "scope": "Selected printed wording; no modern noon, dawn altitude, astronomicaltithi or leap-short rule priority supplied by these words alone."
+    },
+    {
+      "id": "T2465_apparatus16",
+      "frame": "T2465-0030",
+      "locator": "T2465_.78.0030_footnote32",
+      "root_selected_image_literal": "〔是正…月〕十六字",
+      "visible_marker_description": "イ and horizontal deletion-type stroke before 甲 retained as printed; this image alone is not acquisition or identification of the甲manuscript.",
+      "scope": "Keep the same sixteen-character span issue andイnotation, not an unconditional reconstruction of甲text or a new independent witness."
+    },
+    {
+      "id": "T1299_daybreak",
+      "frame": "T1299-0399",
+      "locator": "T21n1299_p0399b25-28",
+      "root_selected_image_literal": "其曜亦每日分爲八時平明即是所直之曜乃至酉戌則八時而周夜亦分爲八時轉到明日曉時即次後曜當直",
+      "scope": "Confirms this selected named-print paragraph wording only, not a modern clock boundary, sunrise altitude, unique hourly sequence or Hinoohalf mapping."
+    }
+  ],
+  "normalization": "Selected CJK transcription strips punctuation/line wrapping and printed footnote numbers; retain substantive glyphs. Source traditional爲/為 not used as a calendar conversion. Footnote typography kept separately; no text replacement inside image pixels.",
+  "acceptance_scope": {
+    "root_has_seen_prior_candidates": true,
+    "strict_blind": false,
+    "independent_human_paleography_accepted": false,
+    "full_book_critical_edition_accepted": false,
+    "actual_first_printing_or_original_manuscript_identified": false,
+    "calendar_day_boundary_half_or_precedence_changed": false,
+    "source_match_chosen_to_improve_algorithm_score": false,
+    "real_samples": 0
+  },
+  "all_old141_questions_and_original_gates_retained": true,
+  "source_arithmetic_changes": false,
+  "explicit_example_mansion_normalization": {
+    "虛": "虚"
+  },
+  "initial_raw_tiles_total": 288,
+  "followup_native_reference": {
+    "stage": "after A source freeze and both pixel firsts, before B production supplement",
+    "R1_sha256": "14e255e15255f3f9a5db3a444019aba8436bc972ddaea7d2a2cb4e3a112ef355",
+    "source_A_manifest_sha256": "8281b06582dba6b9ab09358335079e92a3948aa6781783dd609bca41440312e5",
+    "pixel_firsts": {
+      "generator": "5b243136d1e1201b1f0db0d12602183d53d4b3d7cb5899608fa8fc0af707b172",
+      "reviewer": "12fdb43f01b01f82d1e2683d3b3009f8a4bb822e31c700c92321c6385960eed0"
+    },
+    "additional_native_ROIs": [
+      {
+        "source_DZI_max_level": 13,
+        "source_full_size": [
+          4000,
+          5613
+        ],
+        "source_roi_xywh": [
+          740,
+          1900,
+          360,
+          1450
+        ],
+        "all_tiles_read_and_hash_verified": 21,
+        "png_file": "/Users/thomas/.codex/artifacts/fatebridge/sukuyo-printed-source-v71/T1299-0399-clock-native.png",
+        "png_sha256": "1a9106e54458ee2b01f49b44525676847a53a1c41ba64a67cfb443363b5c7c91",
+        "RGB_pixel_sha256": "9da34af40d27c6264397a6a00a3b44aba1af93d3dd353bba0db49ac36e7b602a",
+        "operation": "Exact decoded tile cores at native level, no resampling/enhancement/generated pixels; not entire max-resolution page.",
+        "independent_human_paleography_accepted": false
+      },
+      {
+        "source_DZI_max_level": 13,
+        "source_full_size": [
+          4000,
+          5706
+        ],
+        "source_roi_xywh": [
+          520,
+          3480,
+          600,
+          1420
+        ],
+        "all_tiles_read_and_hash_verified": 21,
+        "png_file": "/Users/thomas/.codex/artifacts/fatebridge/sukuyo-printed-source-v71/T2465-0030-half-native.png",
+        "png_sha256": "6a1dde54b46d7ef5d8b3a0e5a10293c650450091955fb853e1cb1c7e0bba358a",
+        "RGB_pixel_sha256": "c94e10c395157aca149e0017a3950d72fe411388162a636a04962963cc19980b",
+        "operation": "Exact decoded tile cores at native level, no resampling/enhancement/generated pixels; not entire max-resolution page.",
+        "independent_human_paleography_accepted": false
+      }
+    ],
+    "root_reinspection": {
+      "T1299_then_hour": {
+        "literal": "乃至酉戌則八時而周",
+        "basis": "visible two separated strokes under則; no下刀 in the selected native ROI",
+        "first_read_disagreement_retained": "reviewer first wrote分; generator/root first八, not decided by majority"
+      },
+      "T2465_half_glyph": {
+        "root_R1_recorded": "已",
+        "current_uncertain_candidates": [
+          "己",
+          "已"
+        ],
+        "accepted_new_literal": null,
+        "scope": "Preserve first root/gen已 and reviewer己/已 uncertainty; no independent human acceptance and no clock calibration."
+      },
+      "T2465_closing": {
+        "root_native_selected": "次月初一日眞宿無改代也",
+        "reviewer_first_unrequested_reading": "直宿",
+        "accepted_as_calendar_rule": false,
+        "scope": "New selected root reading only; first conflict retained, no silent replacement of source history."
+      }
+    },
+    "metadata_erratum": {
+      "record": "native_a12_ROI.source_full_size[1]",
+      "original_recorded": 5772,
+      "actual_DZI_height": 5771,
+      "evidence": "T1644-0196.dzi and complete-frame metadata",
+      "raw_ROI_receipt_rewritten": false,
+      "pixel_effect": "ROI y450..1229 is interior, grid coordinates/overlap and copied bytes unchanged; no resampling or inferred boundary pixels."
+    },
+    "original_R1_and_A_unchanged": true,
+    "no_calendar_math_or_rule_priority_changed": true,
+    "real_samples": 0
+  },
+  "followup_R2_sha256": "a39ff683e9f0abce7bacc15e5b6ba85076c489f75ca5f1ca791ca359ac7b8bbb"
+}

@@ -1,0 +1,57 @@
+{
+  "id": "ziwei_age_source_scope_v1",
+  "version": "1.0.1",
+  "title": "新鋟希夷陳先生紫微斗数全書",
+  "review_scope": "Three previously frozen image pages; implementer reread and one fresh-context agent transcription. Same model family, not an external human expert or whole-book collation.",
+  "manual_readers": 2,
+  "independent_reviewers": 1,
+  "citations": [
+    {
+      "source_url": "https://www.digital.archives.go.jp/item/4468520",
+      "frame": 80,
+      "section": "安大限訣",
+      "quote": "陽男陰女從命前一宮起是父母宮 陰男陽女從命後一宮起是兄弟宮",
+      "establishes": "Selected direction and first palace given gender and natal year polarity",
+      "does_not_establish_in_this_passage": "Which clock defines the natal year or the physical instant of changing nominal age"
+    },
+    {
+      "source_url": "https://www.digital.archives.go.jp/item/4468520",
+      "frame": 80,
+      "section": "安童限訣",
+      "quote": "一命二財三疾厄 四妻五福六官祿",
+      "establishes": "Six named palace assignments given age ordinals one through six",
+      "does_not_establish_in_this_passage": "Conversion from a physical date-time to the age ordinal; the remaining sentence is not adjudicated here"
+    },
+    {
+      "source_url": "https://www.digital.archives.go.jp/item/4468520",
+      "frame": 79,
+      "section": "安斗君訣",
+      "quote": "於流年太歲宮起正月逆至本生月又從本生月起子順數至本生時安斗君",
+      "establishes": "Month and hour counting conditioned on a selected annual Tai Sui palace",
+      "does_not_establish_in_this_passage": "A timezone for the start of the flowing year or a nominal-age boundary"
+    },
+    {
+      "source_url": "https://www.digital.archives.go.jp/item/4469314",
+      "frame": 35,
+      "section": "論行限分南北斗",
+      "quote": "北斗諸星吉凶大限斷上五年應小限斷上半年應 南斗諸星吉凶大限斷下五年應小限斷下半年應",
+      "establishes": "Upper and lower halves conditioned on an already selected limit interval",
+      "does_not_establish_in_this_passage": "A civil or apparent-solar instant for the first or sixth year, or half-year dates"
+    }
+  ],
+  "software_age_convention": "Both physical endpoints are converted to the birth civil timezone before the existing East Asian civil-date table is queried",
+  "source_does_not_certify_software_age_convention": true,
+  "age_boundary_classically_verified": false,
+  "whole_book_acceptance_passed": false,
+  "correction_history": [
+    {
+      "previous_version": "1.0.0",
+      "kind": "extra_character_in_quotation",
+      "incorrect_quote": "於流年太歲宮起正月逆至本生月又從本生月起子順數至本生時宮安斗君",
+      "corrected_quote": "於流年太歲宮起正月逆至本生月又從本生月起子順數至本生時安斗君",
+      "discovered_by": "fresh_context_source_blind_agent",
+      "retained_previous_manifest": "age_calendar_scope_v1/manifest.json",
+      "scope": "One extra 宮 after 本生時; no change to calculation or any frozen V1 source bytes"
+    }
+  ]
+}

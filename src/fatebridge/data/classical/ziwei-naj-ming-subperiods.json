@@ -1,0 +1,223 @@
+{
+  "id": "naj_ming_limit_subperiods_v1",
+  "version": "1.0.0",
+  "title": "新鋟希夷陳先生紫微斗数全書",
+  "source_url": "https://www.digital.archives.go.jp/item/4469314",
+  "frame": 35,
+  "section": "論行限分南北斗",
+  "north_quote": "北斗諸星吉凶大限斷上五年應小限斷上半年應",
+  "south_quote": "南斗諸星吉凶大限斷下五年應小限斷下半年應",
+  "adjacent_context_quote": "陽男陰女南斗為福 陰男陽女北斗為福",
+  "transcription_method": "single_assistant_visual_reading",
+  "group_source_url": "https://www.digital.archives.go.jp/item/4468520",
+  "group_section": "論諸星分屬南北斗化吉凶并分屬五行",
+  "group_rows": [
+    {
+      "definition_id": "lucun",
+      "group": "north",
+      "frame": 82,
+      "quote": "祿存屬土北斗司爵貴壽星",
+      "stars": [
+        "禄存"
+      ]
+    },
+    {
+      "definition_id": "lianzhen",
+      "group": "north",
+      "frame": 82,
+      "quote": "廉貞屬火北斗化殺囚在官祿為官祿主在身命為次桃花",
+      "stars": [
+        "廉贞"
+      ]
+    },
+    {
+      "definition_id": "wuqu",
+      "group": "north",
+      "frame": 83,
+      "quote": "武曲為金北斗化財為財帛主",
+      "stars": [
+        "武曲"
+      ]
+    },
+    {
+      "definition_id": "tanlang",
+      "group": "north",
+      "frame": 83,
+      "quote": "貪狼屬水木北斗化桃花殺主禍福",
+      "stars": [
+        "贪狼"
+      ]
+    },
+    {
+      "definition_id": "jumen",
+      "group": "north",
+      "frame": 83,
+      "quote": "巨門屬水北斗化暗主是非",
+      "stars": [
+        "巨门"
+      ]
+    },
+    {
+      "definition_id": "pojun",
+      "group": "north",
+      "frame": 83,
+      "quote": "破軍屬水北斗化耗司夫妻子女奴僕",
+      "stars": [
+        "破军"
+      ]
+    },
+    {
+      "definition_id": "wenqu",
+      "group": "north",
+      "frame": 83,
+      "quote": "文曲屬水北斗主科甲星",
+      "stars": [
+        "文曲"
+      ]
+    },
+    {
+      "definition_id": "qingyang",
+      "group": "north",
+      "frame": 83,
+      "quote": "擎羊屬金北斗浮星化刑",
+      "stars": [
+        "擎羊"
+      ]
+    },
+    {
+      "definition_id": "tuoluo",
+      "group": "north",
+      "frame": 83,
+      "quote": "陀羅屬金北斗助星化忌",
+      "stars": [
+        "陀罗"
+      ]
+    },
+    {
+      "definition_id": "tianji",
+      "group": "south",
+      "frame": 82,
+      "quote": "天機屬木南斗化善為兄弟主",
+      "stars": [
+        "天机"
+      ]
+    },
+    {
+      "definition_id": "tiantong",
+      "group": "south",
+      "frame": 82,
+      "quote": "天同屬水金南斗化福為福德主",
+      "stars": [
+        "天同"
+      ]
+    },
+    {
+      "definition_id": "tianfu",
+      "group": "south",
+      "frame": 83,
+      "quote": "天府屬土南斗化令星為財帛田宅主",
+      "stars": [
+        "天府"
+      ]
+    },
+    {
+      "definition_id": "tianxiang",
+      "group": "south",
+      "frame": 83,
+      "quote": "天相屬水南斗化印為官祿主",
+      "stars": [
+        "天相"
+      ]
+    },
+    {
+      "definition_id": "tianliang",
+      "group": "south",
+      "frame": 83,
+      "quote": "天梁屬土南斗化陰主壽星",
+      "stars": [
+        "天梁"
+      ]
+    },
+    {
+      "definition_id": "qisha",
+      "group": "south",
+      "frame": 83,
+      "quote": "七殺屬火金南斗將星遇帝為權",
+      "stars": [
+        "七杀"
+      ]
+    },
+    {
+      "definition_id": "huoxing",
+      "group": "south",
+      "frame": 83,
+      "quote": "火星屬火南斗助星",
+      "stars": [
+        "火星"
+      ]
+    },
+    {
+      "definition_id": "lingxing",
+      "group": "south",
+      "frame": 83,
+      "quote": "鈴星屬火南斗助星",
+      "stars": [
+        "铃星"
+      ]
+    },
+    {
+      "definition_id": "ziwei",
+      "group": "both",
+      "frame": 82,
+      "quote": "紫微為土中天星南北斗化帝座為官祿主",
+      "stars": [
+        "紫微"
+      ]
+    },
+    {
+      "definition_id": "taiyang",
+      "group": "both",
+      "frame": 82,
+      "quote": "太陽屬火南北斗化貴為官祿主",
+      "stars": [
+        "太阳"
+      ]
+    },
+    {
+      "definition_id": "taiyin",
+      "group": "both",
+      "frame": 83,
+      "quote": "太陰屬水南北斗化富為財帛田宅主",
+      "stars": [
+        "太阴"
+      ]
+    },
+    {
+      "definition_id": "wenchang",
+      "group": "both",
+      "frame": 83,
+      "quote": "文昌屬金南北斗司科甲乃文魁之宿",
+      "stars": [
+        "文昌"
+      ]
+    },
+    {
+      "definition_id": "fubi",
+      "group": "both",
+      "frame": 83,
+      "quote": "輔弼二星屬土南北斗善佐帝令星",
+      "stars": [
+        "左辅",
+        "右弼"
+      ]
+    }
+  ],
+  "limits": [
+    "The age ordinals and upper/lower split are conditional software mappings, not independently established historical calendar boundaries.",
+    "The passage supplies no unique civil or lunar start for a xiaoxian half-year; no date is selected.",
+    "Stars called 南北斗 have no unique half selected. Unlabelled stars are not silently classified.",
+    "The passage does not specify the geometry selecting relevant stars or a complete auspicious/inauspicious judgement.",
+    "The adjacent gender/polarity welfare clause is retained as text and not evaluated or used to suppress unfavourable stars.",
+    "No new independent edition, historical example, human adjudication, blind model evaluation, or outcome validation is claimed."
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "source_url": "https://www.iausofa.org/2023-10-11c",
+  "source_title": "IAU SOFA 2023-10-11 iauDat and UTC/TAI/TT routines",
+  "source_sha256": "c269b897cba4f204af65fb874ec7769fcf38b284735d9a6b76c03c51a462fab8",
+  "archive_url": "https://www.iausofa.org/s/sofa_c-20231011tar.gz",
+  "archive_sha256": "d9c10833cae8b4d9361a0ffda31ec361fd1262362025bec4d4e51a880150ace2",
+  "source_file_sha256": {
+    "cal2jd.c": "996773197e46c7dd7d7559a05281542b14694d781828fc8fa019829e059730b5",
+    "jd2cal.c": "1c117cd6fc2106a94e85b8ccaca2a84dad264752841300cb05c63eb5b0c0616c",
+    "dat.c": "c269b897cba4f204af65fb874ec7769fcf38b284735d9a6b76c03c51a462fab8",
+    "dtf2d.c": "c6ac29b8c2934be0f18ab72a691c3cfde76da1ee5c4f5344d25cbf2f5d12028b",
+    "utctai.c": "dc98532a2a6fa8361efec3593e9aaa0055de80d00f093b49000a97d79176dd31",
+    "taitt.c": "bddf4ff4f702d28569d455c840d077af21edbdf7069018bd5f303b626ea0845b",
+    "sofa.h": "e67c48b17565a060b4b2505a352e5c5eaf4e17aa4c2666d04525716f2ed8249b",
+    "sofam.h": "21d8617d5eddaf8e9ed4fa3fc92bff54acebd633e93ad257c01311687ce69f71"
+  },
+  "scope": "1960 UTC rate/offset convention from SOFA; does not authenticate a local birth clock or national time-signal realization. Pre-1960 civil labels remain an explicit UT1 assumption. The 1961-1971 IERS source is preserved separately.",
+  "formula": "TAI-UTC seconds = offset_seconds + (MJD_UTC - reference_mjd) * rate_seconds_per_day",
+  "valid_until": "1961-01-01",
+  "entries": [
+    {
+      "effective_date": "1960-01-01",
+      "offset_seconds": 1.417818,
+      "reference_mjd": 37300,
+      "rate_seconds_per_day": 0.001296
+    }
+  ]
+}

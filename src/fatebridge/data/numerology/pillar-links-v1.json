@@ -1,0 +1,64 @@
+{
+  "ruleset_id": "heluo_volume7_pillar_links_v1",
+  "version": "1.0.0",
+  "source_title": "河洛理數卷七附法·年上起月与日上起时",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/2/27/NLC416-13jh000628-43061_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "source_pdf_sha256": "9e979579139d2be3d94229a082af1eca6fa8421216333c407aa2710b91c22684",
+  "source_pdf_pages": [
+    108
+  ],
+  "counterpart_url": "https://www.digital.archives.go.jp/DAS/contents/pdf/lossy/03050271000050/0001.pdf",
+  "counterpart_pdf_pages": [
+    105,
+    106
+  ],
+  "review_status": "two_printings_single_visual_reviewer; independent_second_review_pending",
+  "authorship_status": "volume7_preface_explicitly_says_not_Chen_Tuan_authorship",
+  "month_heads": [
+    {
+      "basis_stems": "甲己",
+      "head": "丙寅"
+    },
+    {
+      "basis_stems": "乙庚",
+      "head": "戊寅"
+    },
+    {
+      "basis_stems": "丙辛",
+      "head": "庚寅"
+    },
+    {
+      "basis_stems": "丁壬",
+      "head": "壬寅"
+    },
+    {
+      "basis_stems": "戊癸",
+      "head": "甲寅"
+    }
+  ],
+  "hour_heads": [
+    {
+      "basis_stems": "甲己",
+      "head": "甲子"
+    },
+    {
+      "basis_stems": "乙庚",
+      "head": "丙子"
+    },
+    {
+      "basis_stems": "丙辛",
+      "head": "戊子"
+    },
+    {
+      "basis_stems": "丁壬",
+      "head": "庚子"
+    },
+    {
+      "basis_stems": "戊癸",
+      "head": "壬子"
+    }
+  ],
+  "month_branch_order": "寅卯辰巳午未申酉戌亥子丑",
+  "hour_branch_order": "子丑寅卯辰巳午未申酉戌亥",
+  "scope": "Stem linkage conditional on the already selected year/day pillars and month/hour branches. Does not establish original year, month, day or hour boundaries, historical clocks, or whole-calendar accuracy."
+}

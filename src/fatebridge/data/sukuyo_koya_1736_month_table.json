@@ -1,0 +1,342 @@
+{
+  "id": "arcBK01_0086_01_printed_month_table_v1",
+  "title": "新刊古本宿曜經・上卷月宿傍通暦",
+  "record": "arcBK01-0086-01",
+  "parent_record": "arcBK01-0086",
+  "catalogue_url": "https://www.dh-jac.net/db1/books/arcBK01-0086/portal/",
+  "holding_and_image_owner": "立命館大学アート・リサーチセンター (ARC)",
+  "catalogue_preface_date": "享保二十一年／1736",
+  "impression_date_established": false,
+  "preface_author_catalogue_attribution": "覺勝",
+  "visible_imprint": "無量壽院藏版",
+  "raw_images_redistributed": false,
+  "image_rights_scope": "ARC页面标示All Rights Reserved；原图只在本地研究归档，公开包只含原文选录、逐格读录、定位与指纹。",
+  "month_order": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    1
+  ],
+  "day_columns": [
+    {
+      "day": 1,
+      "text": "奎胃畢參鬼張角氐心斗虛室",
+      "frame": 14,
+      "side": "left",
+      "column_from_right": 1
+    },
+    {
+      "day": 2,
+      "text": "婁昴觜井柳翼亢房尾女危壁",
+      "frame": 14,
+      "side": "left",
+      "column_from_right": 2
+    },
+    {
+      "day": 3,
+      "text": "胃畢參鬼星軫亢心箕虛室奎",
+      "frame": 15,
+      "side": "right",
+      "column_from_right": 1
+    },
+    {
+      "day": 4,
+      "text": "昴觜井柳張角房尾斗危壁婁",
+      "frame": 15,
+      "side": "right",
+      "column_from_right": 2
+    },
+    {
+      "day": 5,
+      "text": "畢參鬼星翼亢心箕女室奎胃",
+      "frame": 15,
+      "side": "right",
+      "column_from_right": 3
+    },
+    {
+      "day": 6,
+      "text": "觜井柳張軫氐尾斗虛壁婁昴",
+      "frame": 15,
+      "side": "right",
+      "column_from_right": 4
+    },
+    {
+      "day": 7,
+      "text": "參鬼星翼角房箕女危奎胃畢",
+      "frame": 15,
+      "side": "right",
+      "column_from_right": 5
+    },
+    {
+      "day": 8,
+      "text": "井柳張軫亢心斗虛室婁昴觜",
+      "frame": 15,
+      "side": "right",
+      "column_from_right": 6
+    },
+    {
+      "day": 9,
+      "text": "鬼星翼角氐尾女危壁胃畢參",
+      "frame": 15,
+      "side": "right",
+      "column_from_right": 7
+    },
+    {
+      "day": 10,
+      "text": "柳張軫亢房箕虛室奎昴觜井",
+      "frame": 15,
+      "side": "right",
+      "column_from_right": 8
+    },
+    {
+      "day": 11,
+      "text": "星翼角氐心斗危壁婁畢參鬼",
+      "frame": 15,
+      "side": "right",
+      "column_from_right": 9
+    },
+    {
+      "day": 12,
+      "text": "張軫亢房尾女室奎胃觜井柳",
+      "frame": 15,
+      "side": "right",
+      "column_from_right": 10
+    },
+    {
+      "day": 13,
+      "text": "翼角氐心箕虛壁婁昴參鬼星",
+      "frame": 15,
+      "side": "left",
+      "column_from_right": 1
+    },
+    {
+      "day": 14,
+      "text": "軫亢房尾斗危奎胃畢井柳張",
+      "frame": 15,
+      "side": "left",
+      "column_from_right": 2
+    },
+    {
+      "day": 15,
+      "text": "角氐心箕女室婁昴觜鬼星翼",
+      "frame": 15,
+      "side": "left",
+      "column_from_right": 3
+    },
+    {
+      "day": 16,
+      "text": "亢房尾斗虛壁胃畢參柳張軫",
+      "frame": 15,
+      "side": "left",
+      "column_from_right": 4
+    },
+    {
+      "day": 17,
+      "text": "氐心箕女危奎昴觜井星翼角",
+      "frame": 15,
+      "side": "left",
+      "column_from_right": 5
+    },
+    {
+      "day": 18,
+      "text": "房尾斗虛室婁畢參鬼張軫亢",
+      "frame": 15,
+      "side": "left",
+      "column_from_right": 6
+    },
+    {
+      "day": 19,
+      "text": "心箕女危壁胃觜井柳翼角氐",
+      "frame": 15,
+      "side": "left",
+      "column_from_right": 7
+    },
+    {
+      "day": 20,
+      "text": "尾斗虛室奎昴參鬼星軫亢房",
+      "frame": 15,
+      "side": "left",
+      "column_from_right": 8
+    },
+    {
+      "day": 21,
+      "text": "箕女危壁婁畢井柳張角氐心",
+      "frame": 15,
+      "side": "left",
+      "column_from_right": 9
+    },
+    {
+      "day": 22,
+      "text": "斗虛室奎胃觜鬼星翼亢房尾",
+      "frame": 15,
+      "side": "left",
+      "column_from_right": 10
+    },
+    {
+      "day": 23,
+      "text": "女危壁婁昴參柳張軫氐心箕",
+      "frame": 16,
+      "side": "right",
+      "column_from_right": 1
+    },
+    {
+      "day": 24,
+      "text": "虛室奎胃畢井星翼角房尾斗",
+      "frame": 16,
+      "side": "right",
+      "column_from_right": 2
+    },
+    {
+      "day": 25,
+      "text": "危壁婁昴觜鬼張軫亢心箕女",
+      "frame": 16,
+      "side": "right",
+      "column_from_right": 3
+    },
+    {
+      "day": 26,
+      "text": "室奎胃畢參柳翼角氐尾斗虛",
+      "frame": 16,
+      "side": "right",
+      "column_from_right": 4
+    },
+    {
+      "day": 27,
+      "text": "壁婁昴觜井星軫亢房箕女危",
+      "frame": 16,
+      "side": "right",
+      "column_from_right": 5
+    },
+    {
+      "day": 28,
+      "text": "奎胃畢參鬼張角氐心斗虛室",
+      "frame": 16,
+      "side": "right",
+      "column_from_right": 6
+    },
+    {
+      "day": 29,
+      "text": "婁昴觜井柳翼亢房尾女危壁",
+      "frame": 16,
+      "side": "right",
+      "column_from_right": 7
+    },
+    {
+      "day": 30,
+      "text": "胃畢參鬼星軫亢心箕虛室奎",
+      "frame": 16,
+      "side": "right",
+      "column_from_right": 8
+    }
+  ],
+  "transcription_method": "Root visual transcription of all 360 printed body cells in frames 14–16, frozen before runtime comparison; physical order February through January. Handwriting, red annotations, editorial correction and computed replacement excluded. 虛/虚 normalized only for comparison.",
+  "root_transcription_sha256": "69b73bbb4eb4b396c00217e9147bea0416b0b747b9664faece8598db8766ca65",
+  "independent_human_transcription_accepted": false,
+  "full_book_collation_accepted": false,
+  "source_images": [
+    {
+      "frame": 14,
+      "image_sha256": "727e23b9594631a6814c933ce6f3702e5c87dc7ac5fded8dc2bbc741a0dc6c89",
+      "image_url": "https://www.arc.ritsumei.ac.jp/archive01/theater/image/PB/arc/Books/arcBK/arcBK01-0086/arcBK01-0086-01/arcBK01-0086-01_14.jpg",
+      "permalink": "https://www.dh-jac.net/db1/books/arcBK01-0086-01/portal/13/"
+    },
+    {
+      "frame": 15,
+      "image_sha256": "3360a970c9e7872567c2f2a441fbd33fdb11ddf5282f8e9a53b6081d263d0727",
+      "image_url": "https://www.arc.ritsumei.ac.jp/archive01/theater/image/PB/arc/Books/arcBK/arcBK01-0086/arcBK01-0086-01/arcBK01-0086-01_15.jpg",
+      "permalink": "https://www.dh-jac.net/db1/books/arcBK01-0086-01/portal/14/"
+    },
+    {
+      "frame": 16,
+      "image_sha256": "10cbae5563c1f504b2dfe5bf4ae43ca93a6bb9c838f81274eeb3cb8ea54b615c",
+      "image_url": "https://www.arc.ritsumei.ac.jp/archive01/theater/image/PB/arc/Books/arcBK/arcBK01-0086/arcBK01-0086-01/arcBK01-0086-01_16.jpg",
+      "permalink": "https://www.dh-jac.net/db1/books/arcBK01-0086-01/portal/15/"
+    }
+  ],
+  "preface_selected_reference": {
+    "frames": [
+      5,
+      6
+    ],
+    "clear_shared_fragment": "本是室",
+    "root_reading_status": "provisional_with_uncertain_cursive_glyphs",
+    "separate_model_reading_status": "retained_unresolved_glyphs_and_different_readings",
+    "readings_agreed_completely": false,
+    "operational_rule_accepted": false,
+    "scope": "序文有正月朔、大小月与配宿的议论；两次模型释读的关键草体字不同且有疑字，完整规则不得由语意、旧转写或算法预期补成。序者关于古本年代和传承的主张不等于外部认证。 新增第07图单独核读可见署年署名，不溯及声称原两图已见，不把序者当全书作者或序年当印刷年。",
+    "images": [
+      {
+        "frame": 5,
+        "image_sha256": "2b469c1eedae354ddd5c2322848e08bb25c700d3b32106de65dcf3640450ebd9",
+        "permalink": "https://www.dh-jac.net/db1/books/arcBK01-0086-01/portal/4/"
+      },
+      {
+        "frame": 6,
+        "image_sha256": "c5a57cbed3698b126fc74a20fc89add358e392e16be0ce04b0d9c9428124f65a",
+        "permalink": "https://www.dh-jac.net/db1/books/arcBK01-0086-01/portal/5/"
+      },
+      {
+        "frame": 7,
+        "image_sha256": "23926dfc8e03ec4e833bf832da7b7b205289027841efb174bd6ccfd234d80cea",
+        "permalink": "https://www.dh-jac.net/db1/books/arcBK01-0086-01/portal/6/"
+      }
+    ],
+    "visible_signature": "享保二十一年仲春日沙門覺勝",
+    "separate_date_reading_sha256": "8a520d0b651b8c194ff0dcea8c5f39048912fc41ef9550d6565714cfa114f568",
+    "separate_prose_reading_sha256": "a32b200d20628dc7bf98dcf150f621e1ffa8f8bd47566fc17903e76286ef13de"
+  },
+  "calendar_policy_evidence": {
+    "modern_clock_boundary_established": false,
+    "solar_altitude_established": false,
+    "hinoo_half_clock_mapping_established": false,
+    "leap_short_month_priority_established": false,
+    "applied_to_primary": false,
+    "scope": "普通月表格及序文不解决古代平明钟时或闰月／小月补配优先。保留所有既有日界与优先次序候选，不新增默认算法。"
+  },
+  "disputed_cells": [
+    {
+      "month": 8,
+      "day": 3,
+      "root_literal": "亢",
+      "separate_reader_literal": "氐",
+      "candidate_literals": [
+        "亢",
+        "氐"
+      ],
+      "accepted_literal": null,
+      "reason": "two model visual readings disagree; neither silently corrected from cyclic expectation"
+    },
+    {
+      "month": 8,
+      "day": 30,
+      "root_literal": "亢",
+      "separate_reader_literal": "氐",
+      "candidate_literals": [
+        "亢",
+        "氐"
+      ],
+      "accepted_literal": null,
+      "reason": "two model visual readings disagree; neither silently corrected from cyclic expectation"
+    }
+  ],
+  "model_reading_collation": {
+    "root_reading_sha256": "69b73bbb4eb4b396c00217e9147bea0416b0b747b9664faece8598db8766ca65",
+    "separate_reader_reading_sha256": "5289d41f8e89924e03f2a2bec4528de2060e3af4642764b2cb5da83d942550e4",
+    "all_cells_compared": 360,
+    "agreed_cells": 358,
+    "no_prior_reading_overwritten": true,
+    "reading_changed_from_first_root_comparison": true,
+    "not_new_historical_observations": true,
+    "not_blind_human_or_provider_independent": true,
+    "complete_acceptance": false,
+    "scope": "358格为两份模型视觉读数相同，2格仍未定；相同不等于独立人工验收。根代理首次亢读数及按该读数所得两处不同结果完整保留，不改写为首次已相合。"
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "schema": "guolao_postcomparison_solar_frame_diagnostic_v1",
+  "profile_id": "guolao_postcomparison_solar_frame_diagnostic_v1",
+  "base_reference_data_sha256": "13e114e329a1e3630a9c8b9638a85ce50bb1abf21a92b7ef2c47a11ededac230",
+  "reference_rows": [
+    {
+      "Date_________JDTT": "2187829.534542083",
+      "ObsEcLon": "269.9999965",
+      "ObsEcLat": "0.0001609",
+      "RA_(ICRF-a-app)": "280.966313223",
+      "DEC_(ICRF-a-app)": "-23.148577831",
+      "tt_jd_printed": "2187829534542083/1000000000",
+      "tt_jd_requested_exact": "573526385503/262144"
+    },
+    {
+      "Date_________JDTT": "2188012.113697052",
+      "ObsEcLon": "90.0000006",
+      "ObsEcLat": "-0.0000331",
+      "RA_(ICRF-a-app)": "100.958185900",
+      "DEC_(ICRF-a-app)": "23.149211079",
+      "tt_jd_printed": "547003028424263/250000000",
+      "tt_jd_requested_exact": "573574247533/262144"
+    },
+    {
+      "Date_________JDTT": "2188194.772884369",
+      "ObsEcLon": "270.0000000",
+      "ObsEcLat": "-0.0000724",
+      "RA_(ICRF-a-app)": "280.950018515",
+      "DEC_(ICRF-a-app)": "-23.149824250",
+      "tt_jd_printed": "2188194772884369/1000000000",
+      "tt_jd_requested_exact": "573622130543/262144"
+    },
+    {
+      "Date_________JDTT": "2188377.353839874",
+      "ObsEcLon": "90.0000006",
+      "ObsEcLat": "0.0001773",
+      "RA_(ICRF-a-app)": "100.941575990",
+      "DEC_(ICRF-a-app)": "23.150455736",
+      "tt_jd_printed": "1094188676919937/500000000",
+      "tt_jd_requested_exact": "573669993045/262144"
+    },
+    {
+      "Date_________JDTT": "2188560.012248993",
+      "ObsEcLon": "270.0000000",
+      "ObsEcLat": "-0.0000217",
+      "RA_(ICRF-a-app)": "280.933290700",
+      "DEC_(ICRF-a-app)": "-23.150814477",
+      "tt_jd_printed": "2188560012248993/1000000000",
+      "tt_jd_requested_exact": "573717875851/262144"
+    },
+    {
+      "Date_________JDTT": "2188925.254489899",
+      "ObsEcLon": "270.0000015",
+      "ObsEcLat": "0.0000716",
+      "RA_(ICRF-a-app)": "280.916390847",
+      "DEC_(ICRF-a-app)": "-23.151772094",
+      "tt_jd_printed": "2188925254489899/1000000000",
+      "tt_jd_requested_exact": "573813621913/262144"
+    },
+    {
+      "Date_________JDTT": "2305072.465709686",
+      "ObsEcLon": "270.0000003",
+      "ObsEcLat": "-0.0000908",
+      "RA_(ICRF-a-app)": "276.096204322",
+      "DEC_(ICRF-a-app)": "-23.372812100",
+      "tt_jd_printed": "1152536232854843/500000000",
+      "tt_jd_requested_exact": "604260916451/262144"
+    },
+    {
+      "Date_________JDTT": "2305161.628192902",
+      "ObsEcLon": "359.9999966",
+      "ObsEcLat": "-0.0000053",
+      "RA_(ICRF-a-app)": "5.128195158",
+      "DEC_(ICRF-a-app)": "2.228939986",
+      "tt_jd_printed": "1152580814096451/500000000",
+      "tt_jd_requested_exact": "604284289861/262144"
+    },
+    {
+      "Date_________JDTT": "2305254.677463531",
+      "ObsEcLon": "89.9999976",
+      "ObsEcLat": "0.0001164",
+      "RA_(ICRF-a-app)": "96.087919326",
+      "DEC_(ICRF-a-app)": "23.373095509",
+      "tt_jd_printed": "2305254677463531/1000000000",
+      "tt_jd_requested_exact": "604308682169/262144"
+    },
+    {
+      "Date_________JDTT": "2305348.142658234",
+      "ObsEcLon": "179.9999985",
+      "ObsEcLat": "-0.0002247",
+      "RA_(ICRF-a-app)": "185.121248343",
+      "DEC_(ICRF-a-app)": "-2.226176737",
+      "tt_jd_printed": "1152674071329117/500000000",
+      "tt_jd_requested_exact": "604333183509/262144"
+    },
+    {
+      "Date_________JDTT": "2305437.705951691",
+      "ObsEcLon": "269.9999986",
+      "ObsEcLat": "0.0000426",
+      "RA_(ICRF-a-app)": "276.079731549",
+      "DEC_(ICRF-a-app)": "-23.373189547",
+      "tt_jd_printed": "2305437705951691/1000000000",
+      "tt_jd_requested_exact": "604356661989/262144"
+    },
+    {
+      "Date_________JDTT": "2308359.657047272",
+      "ObsEcLon": "269.9999985",
+      "ObsEcLat": "0.0000516",
+      "RA_(ICRF-a-app)": "275.965439896",
+      "DEC_(ICRF-a-app)": "-23.376539997",
+      "tt_jd_printed": "288544957130909/125000000",
+      "tt_jd_requested_exact": "605122633937/262144"
+    },
+    {
+      "Date_________JDTT": "2451900.068408966",
+      "ObsEcLon": "269.9999969",
+      "ObsEcLat": "0.0001704",
+      "RA_(ICRF-a-app)": "269.990293338",
+      "DEC_(ICRF-a-app)": "-23.438993945",
+      "tt_jd_printed": "1225950034204483/500000000",
+      "tt_jd_requested_exact": "642750891533/262144"
+    },
+    {
+      "Date_________JDTT": "2461396.369029999",
+      "ObsEcLon": "269.9999968",
+      "ObsEcLat": "0.0002314",
+      "RA_(ICRF-a-app)": "269.586400971",
+      "DEC_(ICRF-a-app)": "-23.435006431",
+      "tt_jd_printed": "2461396369029999/1000000000",
+      "tt_jd_requested_exact": "645240289763/262144"
+    }
+  ],
+  "expected_swieph_DE441_files": {
+    "sepl_12.se1": {
+      "native_file_id": 0,
+      "start_jd": 2159357.5,
+      "end_jd": 2378575.6964800134,
+      "jpl_denum": 441,
+      "bytes": 483743,
+      "sha256": "8dccace2557601a223d5f8a7cf64de4e6bbb8a82b9b130b95a54d49adfbe546d"
+    },
+    "semo_12.se1": {
+      "native_file_id": 1,
+      "start_jd": 2159346.1794251623,
+      "end_jd": 2378515.1300229887,
+      "jpl_denum": 441,
+      "bytes": 1305932,
+      "sha256": "1c65fdbb854f350d3de36afc3e4ac126a53f360ae4f6dcb57beed7c690e7eb61"
+    },
+    "sepl_18.se1": {
+      "native_file_id": 0,
+      "start_jd": 2378496.5,
+      "end_jd": 2597651.3591467496,
+      "jpl_denum": 441,
+      "bytes": 484061,
+      "sha256": "ca1393ceab3a44fbc895887cf789c68819ae6a1cbc9b22225872dbe4ccd99a66"
+    },
+    "semo_18.se1": {
+      "native_file_id": 1,
+      "start_jd": 2378487.555370702,
+      "end_jd": 2597656.4574524714,
+      "jpl_denum": 441,
+      "bytes": 1304771,
+      "sha256": "1ca07bd67c24374d77226180c20a4f9996cba013697894810518e7eb582ca4f7"
+    }
+  },
+  "postcomparison_diagnostic": true,
+  "same14_independent_reference_midpoints": true,
+  "apparent_inertial_coordinate": "equatorial_ICRF_geocentric",
+  "raw_default_tropical_residuals_to_be_retained": true,
+  "date_frame_conversion_derived_from_error_fitting": false,
+  "original_modern_reference_or_native_root_results_overwritten": false,
+  "native_production_model_policy_changed": false
+}

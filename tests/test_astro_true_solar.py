@@ -12,11 +12,16 @@ from __future__ import annotations
 
 from datetime import datetime
 
+import pytest
+
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.utils.solar_time import (
     SOLAR_TIME_STRATEGY_APPARENT,
     calculate_solar_time_adjustment,
 )
+from tests.ephemeris_case_runtime import native_ephemeris_files_module
+
+pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
 _BIRTH = dict(
     name="左右",

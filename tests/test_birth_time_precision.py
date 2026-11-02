@@ -27,6 +27,7 @@ from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.places import resolve_birth_place_context
 from fatebridge.utils.solar_time import normalize_birth_time
 from fatebridge.utils.timezones import parse_timezone_name
+from tests.fixtures.solar_reference import expected_solar_clock
 from tests.fixtures.transports import mcp_parameters
 
 
@@ -228,8 +229,8 @@ def test_normalize_birth_time_resolves_full_form_chinese_city_address():
     assert normalized.timezone == "Asia/Shanghai"
     assert normalized.longitude == pytest.approx(121.5503, abs=0.01)
     assert normalized.longitude_source == "birth_place"
-    assert normalized.resolved_place == "宁波"
-    assert normalized.resolution_level == "city"
+    assert normalized.resolved_place == "海曙区"
+    assert normalized.resolution_level == "county"
     assert normalized.applied is True
 
 
@@ -248,8 +249,8 @@ def test_normalize_birth_time_supports_english_city_address():
 
     assert normalized.longitude == pytest.approx(121.5503, abs=0.01)
     assert normalized.longitude_source == "birth_place"
-    assert normalized.resolved_place == "宁波"
-    assert normalized.resolution_level == "city"
+    assert normalized.resolved_place == "海曙区"
+    assert normalized.resolution_level == "county"
 
 
 def test_normalize_birth_time_supports_pinyin_city_address():
@@ -265,10 +266,10 @@ def test_normalize_birth_time_supports_pinyin_city_address():
 
     normalized = normalize_birth_time(person)
 
-    assert normalized.longitude == pytest.approx(120.1551, abs=0.01)
+    assert normalized.longitude == pytest.approx(120.126, abs=0.01)
     assert normalized.longitude_source == "birth_place"
-    assert normalized.resolved_place == "杭州"
-    assert normalized.resolution_level == "city"
+    assert normalized.resolved_place == "西湖区"
+    assert normalized.resolution_level == "county"
 
 
 def test_normalize_birth_time_prefers_more_specific_city_match_over_province():
@@ -284,10 +285,10 @@ def test_normalize_birth_time_prefers_more_specific_city_match_over_province():
 
     normalized = normalize_birth_time(person)
 
-    assert normalized.longitude == pytest.approx(120.1551, abs=0.01)
+    assert normalized.longitude == pytest.approx(120.126, abs=0.01)
     assert normalized.longitude_source == "birth_place"
-    assert normalized.resolved_place == "杭州"
-    assert normalized.resolution_level == "city"
+    assert normalized.resolved_place == "西湖区"
+    assert normalized.resolution_level == "county"
 
 
 def test_normalize_birth_time_falls_back_to_province_when_city_is_unknown():
@@ -297,9 +298,8 @@ def test_normalize_birth_time_falls_back_to_province_when_city_is_unknown():
         birth_day=15,
         birth_hour=10,
         birth_minute=30,
-        # 衡水 is intentionally NOT in the city catalog, so resolution must
-        # fall back to 河北 province-level coordinates.
-        birth_place="河北省衡水市桃城区东风东路",
+        # A synthetic unknown place keeps the province fallback observable.
+        birth_place="河北省未收录地点",
         use_true_solar_time=True,
     )
 
@@ -311,7 +311,7 @@ def test_normalize_birth_time_falls_back_to_province_when_city_is_unknown():
     assert normalized.resolution_level == "province"
 
 
-def test_normalize_birth_time_supports_english_province_fallback():
+def test_normalize_birth_time_supports_english_district_address():
     person = create_person_info(
         birth_year=1990,
         birth_month=5,
@@ -324,10 +324,10 @@ def test_normalize_birth_time_supports_english_province_fallback():
 
     normalized = normalize_birth_time(person)
 
-    assert normalized.longitude == pytest.approx(114.5149, abs=0.01)
+    assert normalized.longitude == pytest.approx(115.491, abs=0.01)
     assert normalized.longitude_source == "birth_place"
-    assert normalized.resolved_place == "河北"
-    assert normalized.resolution_level == "province"
+    assert normalized.resolved_place == "莲池区"
+    assert normalized.resolution_level == "county"
 
 
 def test_calculate_destiny_analysis_uses_corrected_solar_time_for_hour_pillar():
@@ -345,9 +345,9 @@ def test_calculate_destiny_analysis_uses_corrected_solar_time_for_hour_pillar():
     result = calculate_destiny_analysis(person)
 
     assert result["person_info"]["birth_datetime"] == "2020年01月01日 00时30分"
-    assert (
-        result["person_info"]["normalized_birth_datetime"] == "2019年12月31日 22时16分"
-    )
+    assert result["person_info"]["normalized_birth_datetime"] == expected_solar_clock(
+        datetime(2020, 1, 1, 0, 30), "Asia/Shanghai", 87.6168
+    ).strftime("%Y年%m月%d日 %H时%M分")
     assert result["person_info"]["time_adjustment"]["applied"] is True
     assert result["person_info"]["time_adjustment"]["timezone"] == "Asia/Shanghai"
     assert result["person_info"]["time_adjustment"]["longitude_source"] == "birth_place"
@@ -374,7 +374,9 @@ def test_calculate_comprehensive_timing_uses_corrected_birth_time():
     )
 
     assert result["personal_info"]["birth_datetime"] == "2020-01-01 00:30"
-    assert result["personal_info"]["normalized_birth_datetime"] == "2019-12-31 22:16"
+    assert result["personal_info"]["normalized_birth_datetime"] == expected_solar_clock(
+        datetime(2020, 1, 1, 0, 30), "Asia/Shanghai", 87.6168
+    ).strftime("%Y-%m-%d %H:%M")
     assert result["personal_info"]["time_adjustment"]["applied"] is True
     assert result["personal_info"]["time_adjustment"]["resolved_place"] == "乌鲁木齐"
     assert result["personal_info"]["time_adjustment"]["resolution_level"] == "city"
@@ -951,9 +953,7 @@ def test_liuyue_timeline_anchor_is_minute_safe_and_replayable():
 
     for item in timeline:
         anchor = datetime.strptime(item["analysis_anchor"], "%Y-%m-%d %H:%M:%S")
-        start_term = datetime.strptime(
-            item["start_term"]["datetime"], "%Y-%m-%d %H:%M:%S"
-        )
+        start_term = datetime.fromisoformat(item["start_term"]["datetime"])
         assert anchor.second == 0
         assert timedelta(0) < anchor - start_term <= timedelta(minutes=1)
 
@@ -997,7 +997,7 @@ def test_jieqi_timeline_anchor_is_minute_safe_and_replayable():
 
     for item in timeline:
         anchor = datetime.strptime(item["analysis_anchor"], "%Y-%m-%d %H:%M:%S")
-        term = datetime.strptime(item["jieqi"]["datetime"], "%Y-%m-%d %H:%M:%S")
+        term = datetime.fromisoformat(item["jieqi"]["datetime"])
         assert anchor.second == 0
         assert timedelta(0) < anchor - term <= timedelta(minutes=1)
 
@@ -1215,11 +1215,11 @@ def test_normalize_birth_time_accepts_bare_integer_timezone():
 
 
 def test_resolve_birth_place_resolves_prefecture_city_district_form():
-    # "<city>市<district>区" must resolve via the prefecture city substring.
+    # A catalogued district now resolves beyond its parent city.
     resolution = resolve_birth_place_context("咸阳市秦都区")
-    assert resolution.canonical_name == "咸阳"
+    assert resolution.canonical_name == "秦都区"
     assert resolution.longitude == pytest.approx(108.705, abs=0.01)
-    assert resolution.level == "city"
+    assert resolution.level == "county"
 
 
 def test_normalize_birth_time_resolves_newly_catalogued_prefecture_city():
@@ -1235,7 +1235,7 @@ def test_normalize_birth_time_resolves_newly_catalogued_prefecture_city():
     normalized = normalize_birth_time(person)
     assert normalized.applied is True
     assert normalized.longitude_source == "birth_place"
-    assert normalized.resolved_place == "咸阳"
+    assert normalized.resolved_place == "秦都区"
     assert normalized.longitude == pytest.approx(108.705, abs=0.01)
 
 

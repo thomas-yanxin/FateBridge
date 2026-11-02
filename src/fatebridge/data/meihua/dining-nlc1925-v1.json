@@ -1,0 +1,235 @@
+{
+  "id": "meihua_dining_clauses_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本饮食初始条款、内卦酒食象与直接制约",
+  "selected_edition_id": "nlc_1925",
+  "source": {
+    "id": "nlc_1925",
+    "title": "文明書局《梅花易數》卷二飲食占第七與體用類選段",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_indices": [
+      66,
+      67,
+      88,
+      89
+    ],
+    "attribution_scope": "Hosting catalogue metadata; not independent authorship or edition authentication"
+  },
+  "comparison_source": {
+    "id": "wikisource_1441921",
+    "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二",
+    "revision": 1441921,
+    "saved_fixed_transcription_wikitext_sha256": "239523c6bb8b59d7ed3fe229c681cd1a1124a5216617e198f05dbf19cc6d2939"
+  },
+  "topics": {
+    "dining": {
+      "label": "飲食",
+      "section": "飲食占第七",
+      "use_role": "飲食",
+      "header": "凡占飲食以體爲主用爲飲食"
+    }
+  },
+  "rules": [
+    {
+      "id": "dining_body_controls_use",
+      "topic": "dining",
+      "relation": "体克用",
+      "quote": "體尅用則飲食有阻",
+      "reading": "所选章句取饮食有阻的传统象义，未核实实际餐食安排或测得延误时长",
+      "semantic_tags": [
+        "selected_initial_relation_clause",
+        "historical_conditional_not_verified_meal"
+      ],
+      "delay_scope": "not_numeric_event_time",
+      "source_witness": {
+        "original_pdf_indices": [
+          66,
+          67
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體克用，則飲食有阻",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "dining_use_controls_body",
+      "topic": "dining",
+      "relation": "用克体",
+      "quote": "用尅體飲食必無",
+      "reading": "所选章句取饮食必无的历史断语，未将其认定为现实无餐食或饮食安全结论",
+      "semantic_tags": [
+        "selected_initial_relation_clause",
+        "historical_conditional_not_verified_meal"
+      ],
+      "delay_scope": "not_numeric_event_time",
+      "source_witness": {
+        "original_pdf_indices": [
+          67
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用克體，飲食必無",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "dining_body_generates_use",
+      "topic": "dining",
+      "relation": "体生用",
+      "quote": "體生用飲食難就",
+      "reading": "所选章句取饮食难就的传统象义，未核实餐食是否提供",
+      "semantic_tags": [
+        "selected_initial_relation_clause",
+        "historical_conditional_not_verified_meal"
+      ],
+      "delay_scope": "not_numeric_event_time",
+      "source_witness": {
+        "original_pdf_indices": [
+          66
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體生用，飲食難就",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "dining_use_generates_body",
+      "topic": "dining",
+      "relation": "用生体",
+      "quote": "用生體飲食必豐",
+      "reading": "所选章句取饮食必丰的传统象义，未保证实际菜品、份量或供应",
+      "semantic_tags": [
+        "selected_initial_relation_clause",
+        "historical_conditional_not_verified_meal"
+      ],
+      "delay_scope": "not_numeric_event_time",
+      "source_witness": {
+        "original_pdf_indices": [
+          66
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用生體，飲食必豐",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "dining_same_element",
+      "topic": "dining",
+      "relation": "体用比和",
+      "quote": "體用比和飲食豐足",
+      "reading": "所选章句取饮食丰足的传统象义，未核实实际餐食结果",
+      "semantic_tags": [
+        "selected_initial_relation_clause",
+        "historical_conditional_not_verified_meal"
+      ],
+      "delay_scope": "not_numeric_event_time",
+      "source_witness": {
+        "original_pdf_indices": [
+          67
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體用比和，飲食豐足",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    }
+  ],
+  "symbol_clauses": [
+    {
+      "id": "dining_kan_wine",
+      "symbol": "wine",
+      "trigram": "坎",
+      "quote": "又卦中有坎則有酒",
+      "control_quote": "如遇坤艮則坎亦無酒",
+      "controller_trigrams": [
+        "坤",
+        "艮"
+      ],
+      "control_section": "體用類",
+      "control_pdf_index": 89
+    },
+    {
+      "id": "dining_dui_food",
+      "symbol": "food",
+      "trigram": "兑",
+      "quote": "有兌則有食",
+      "control_quote": "離值則兌亦無食",
+      "controller_trigrams": [
+        "离"
+      ],
+      "control_section": "體用類",
+      "control_pdf_index": 89
+    }
+  ],
+  "inner_scope_reference": {
+    "quote": "全卦爲內卦內亦不知一用而互變皆用也",
+    "original_pdf_index": 88,
+    "working_scope": "original_body_and_four_auxiliary_roles; six base/mutual/changed positions crosschecked for presence only",
+    "complete_source_internal_external_scope_adjudicated": false
+  },
+  "absence_clause": {
+    "quote": "無坎無兌則皆無",
+    "original_pdf_index": 67,
+    "conjunction": "both_kan_and_dui_absent_in_selected_scope",
+    "physical_absence_inferred": false
+  },
+  "generation_reference": {
+    "quote": "兌坎生身酒肉醉飽",
+    "comparison_quote": "兌、坎生體，酒肉醉飽",
+    "source_target_term": "身",
+    "comparison_target_term": "體",
+    "source_target_as_original_body_adjudicated": false,
+    "junction_semantics": "not_adjudicated",
+    "quote_pdf_index": 67,
+    "named_trigrams": [
+      "兑",
+      "坎"
+    ],
+    "diagnostic_reference_frame": "original_static_body; not a resolution of source 身",
+    "both_named_elements_generate_one_same_body_element": false
+  },
+  "food_and_people_references": {
+    "food_quote": "欲知所食何物以飲食推之",
+    "people_quote": "欲知席上何人以互卦人事推之",
+    "source_note": "飲食八事類者即前八卦內萬物屬類是也",
+    "source_note_term": "八事類",
+    "source_note_term_emended": false,
+    "comparison_note": null,
+    "original_pdf_index": 67,
+    "food_selector_and_mutual_side_adjudicated": false
+  },
+  "source_heading_variant": {
+    "selected_heading": "體用類",
+    "comparison_heading": "體用",
+    "original_pdf_index": 88,
+    "semantic_adjudication": "not_adjudicated"
+  },
+  "unresolved": [
+    "source_身_target_vs_體_transcription",
+    "兌坎_generation_junction",
+    "full_internal_external_control_scope",
+    "recursive_control_cancellation_and_strength_synthesis",
+    "food_selector_and_attendee_mutual_side",
+    "八事類_term",
+    "real_world_predictive_effectiveness"
+  ]
+}

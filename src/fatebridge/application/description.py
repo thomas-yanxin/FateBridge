@@ -14,7 +14,7 @@ def resolve_spec(specs: List[ToolSpec], name: str) -> ToolSpec | None:
     return next((s for s in specs if name in {s.key, s.tool_name}), None)
 
 
-def unwrap_optional(annotation: Any) -> Any:
+def unwrap_optional(annotation: object) -> object:
     """Strip a single ``Optional[...]`` / ``Union[..., None]`` wrapper."""
     if get_origin(annotation) is Union:
         non_none = [a for a in get_args(annotation) if a is not type(None)]
@@ -23,13 +23,13 @@ def unwrap_optional(annotation: Any) -> Any:
     return annotation
 
 
-def is_model_field(annotation: Any) -> bool:
+def is_model_field(annotation: object) -> bool:
     """True if the (unwrapped) annotation is a nested pydantic model."""
     base = unwrap_optional(annotation)
     return isinstance(base, type) and issubclass(base, BaseModel)
 
 
-def field_type_name(annotation: Any) -> str:
+def field_type_name(annotation: object) -> str:
     """Render a field annotation as a short, agent-readable type string."""
     # Multi-member Unions (e.g. ``house_system: Union[int, str]``) must surface
     # every accepted type, not just the first — otherwise an agent reading the
@@ -90,13 +90,25 @@ def _describe_contract(
         }
         for name, field in spec.request_model.model_fields.items()
     ]
-    from fatebridge.application.examples import evidence_views, example_input
+    from fatebridge.application.examples import (
+        call_guidance,
+        evidence_views,
+        example_context,
+        example_input,
+    )
 
     example = example_input(spec)
     views = evidence_views(spec)
+    guidance = call_guidance(spec)
+    cli_safe = spec_is_cli_safe(spec)
     return {
-        **({"example_input": example} if example is not None else {}),
+        **(
+            {"example_input": example, "example_context": example_context()}
+            if example is not None
+            else {}
+        ),
         **({"evidence_views": views} if views is not None else {}),
+        **({"call_guidance": guidance} if guidance is not None else {}),
         "tool": spec.tool_name,
         "key": spec.key,
         "summary": spec.summary,
@@ -106,8 +118,8 @@ def _describe_contract(
         "reproducibility": spec.reproducibility.as_manifest(),
         "full_result_required_fields": list(spec.required_output_fields),
         "surfaces": {
-            "cli": spec_is_cli_safe(spec),
-            "cli_name": spec.tool_name if spec_is_cli_safe(spec) else None,
+            "cli": cli_safe,
+            "cli_name": spec.tool_name if cli_safe else None,
             "rest_path": spec.rest_path,
             "mcp_name": spec.mcp_name,
         },
@@ -127,6 +139,7 @@ def _describe_contract(
 
 
 def summarize_spec(spec: ToolSpec) -> Dict[str, Any]:
+    cli_safe = spec_is_cli_safe(spec)
     return {
         "tool": spec.tool_name,
         "key": spec.key,
@@ -134,8 +147,8 @@ def summarize_spec(spec: ToolSpec) -> Dict[str, Any]:
         "operation_label_zh": spec.operation_label_zh,
         "family": spec.family,
         "surfaces": {
-            "cli": spec_is_cli_safe(spec),
-            "cli_name": spec.tool_name if spec_is_cli_safe(spec) else None,
+            "cli": cli_safe,
+            "cli_name": spec.tool_name if cli_safe else None,
             "rest_path": spec.rest_path,
             "mcp_name": spec.mcp_name,
         },
@@ -156,6 +169,16 @@ def mcp_description(spec: ToolSpec) -> str:
     fields = suggested_fields(spec)
     guidance = call_guidance(spec)
     views = evidence_views(spec)
+    if spec.key == "fengshui_assess" and guidance:
+        # Detailed branches remain in the input resource / on-demand contract.
+        # Parameters describe their own semantics, avoiding a second manual in
+        # every loaded tool description.
+        guidance = {k: guidance[k] for k in ("scene_selection", "interpretation")}
+        guidance["conditional_fields"] = (
+            "只有提供environmental_context时才追加layout_analysis.environmental_context；"
+            "只有提交对应关系或材质事实时才追加interior_analysis/material_analysis，"
+            "避免严格投影读取未生成的分支。"
+        )
     summary = spec.summary + (
         " 调用参考系：" + json.dumps(guidance, ensure_ascii=False) if guidance else ""
     )

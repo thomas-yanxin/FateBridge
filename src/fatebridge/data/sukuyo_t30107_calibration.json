@@ -1,0 +1,20 @@
+{
+  "id": "utokyo_t30107_selected_calibration_precision_v1",
+  "holding": "東京大学総合図書館 T30107",
+  "catalogue_url": "https://da.dl.itc.u-tokyo.ac.jp/portal/assets/1cf6a35f-73cd-8598-57ce-f0706cd68972",
+  "locator": "canvas20 right through left; canvas21 left; canvas22 right",
+  "elapsed_cycles": 137,
+  "elapsed_years": 2603,
+  "nominal_days": 965850,
+  "printed_drift_days": "6.1042671395",
+  "printed_per_nominal_day_correction": "0.0000063200985033908",
+  "printed_scaled_omission_coefficient": "156.53546272045398",
+  "printed_corrected_mean_days": "950731.022333144959",
+  "printed_recalibrated_scaled_year": "3652443.42041162105",
+  "day_scale": 10000,
+  "precision_policy": "Conservative +/- one unit of the final selected decimal place, applied uniformly; covers rounding or truncation, not scribal error or unknown extra digits. Relations use each stated intermediate precision independently.",
+  "manual_transcription": true,
+  "independent_transcription_accepted": false,
+  "complete_lunar_secular_derivation_accepted": false,
+  "scope": "Selected 1816 calibration arithmetic and decimal-precision audit only; not the complete recalculation, civil-date epoch, historical clock or observed tropical year."
+}

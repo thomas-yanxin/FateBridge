@@ -22,6 +22,7 @@ def _horoscope_for(birth, target):
         analysis_hour=target["hour"],
     )
     return build_ziwei_horoscope(
+        nominal_age_basis="legacy_mixed_clock",
         chart=chart,
         gender=person.gender or "未知",
         target_seed=target_seed,
@@ -46,7 +47,15 @@ def test_horoscope_has_six_scopes_with_expected_shape():
             "palace_ganzhi",
             "stem",
             "mutagen",
-        }
+            "palace_map",
+            "stem_origin",
+        } | (
+            {"is_childhood_limit", "status", "first_age"}
+            if s["scope"] == "大限"
+            else set()
+        ) | (
+            {"flowing_stars"} if s["scope"] == "流年" else set()
+        )
         assert 0 <= s["branch_index"] <= 11
         assert set(s["mutagen"].keys()) == {"化禄", "化权", "化科", "化忌"}
 

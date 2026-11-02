@@ -1,0 +1,737 @@
+{
+  "method_id": "month_duty_source_layers_v1",
+  "sources": {
+    "ditian_1947": {
+      "id": "ditian_month_command_1947",
+      "title": "任注滴天髓闡微·月令",
+      "author": "任鐵樵增注，李雨田校訂",
+      "edition": "上海大東書局經售，1947年4月初版",
+      "url": "https://commons.wikimedia.org/wiki/File:SSID-11335994_滴天髓闡微.pdf",
+      "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+      "pdf_pages": [
+        170,
+        171,
+        172,
+        173
+      ],
+      "review_status": "selected_scanned_passages_developer_collation_not_independent_review"
+    },
+    "sanming_digital": {
+      "id": "sanming_renyuan_sk1610_v37",
+      "title": "三命通會·卷二·論人元司事",
+      "author": "明·萬民英",
+      "url": "https://www.shidianguji.com/book/SK1610/chapter/1kf5v6o9by5o3",
+      "edition_as_platform_metadata": "四庫全書本，清",
+      "publication_as_platform_metadata": "北京大學-字節跳動古籍開放文本庫",
+      "platform_book_version": 37,
+      "platform_volume_version": 36,
+      "digital_paragraphs_sha256": "fafc44e15f0591c81ed2a2cf4e90741834573f37aff6f968be72fc294daf5e93",
+      "review_status": "digital_primary_text_transcribed_not_scan_collated",
+      "scope": "完整13段数字原文；平台版本和底本自述不是已逐页核对书影。保留字形与算术不一致，不据此断定原刊错字。"
+    }
+  },
+  "profiles": [
+    {
+      "id": "sanming_opening_prose",
+      "source": "sanming_digital",
+      "layer": "本章开头十二支逐月列举",
+      "claim_kind": "nominal_durations_not_adopted_schedule",
+      "source_text": "夫一氣渾淪，形質未離，孰為隂陽？太始既肇，裂一為三，倐忽乃分。天得之而輕清為陽，地得之而重濁為隂。人位乎天地之中，禀陽隂沖和之氣，故此輕清者為十干，主祿，謂之天元；重濁者為十二支，主身，謂之地元。天地各正其位，成才於兩間者，乃所謂人也。故支中所藏者主命，謂之人元，名為司事之神。以命術言之，為月令用神。經云用神不可損傷，日主最宜健旺是也。如正月建寅，寅中有艮土用事五日。丙火長生五日，甲木二十日。二月建卯，卯中有甲木，用事七日。乙木二十三日。三月建辰，辰中有乙木用事七日。壬水墓庫五日。戊土一十八日。四月建已，已中有戊土七日。庚金長生五日，丙火一十八日。五月建午，午中丙火用事七日。丁火二十三日。六月建未，未中有丁火，用事七日。甲木墓庫五日。已土一十八日。七月建申，申中有坤土，用事五日，壬水長生五日。庚金，二十日。八月，建酉，酉中有庚金，用事七日，辛金，二十三日。九月，建戌，戌中有辛金，用事七日，丙火墓庫五日。戊土，一十八日。十月，建亥，亥中有戊土，五日，甲木長生五日，壬水用事二十日。十一月，建子，子中有壬水，用事七日。癸水，二十三日。十二月，建丑，丑中有癸水，用事七日，庚金墓庫五日。已土，一十八日。此十二支，按十二月各藏五行為人元，以配四時，則春煖、秋凉，冬寒、夏熱，如𤨔無端，終而復始，嵗功畢而成一年。再考玉井，則以甲、丙、庚、壬各三十五日，乙、丁、辛、癸各三十五日，戊、已各五十日，共計三百六十日。",
+      "months": {
+        "寅": {
+          "literal_branch_glyph": "寅",
+          "normalized_month_branch": "寅",
+          "claims": [
+            {
+              "source_name": "艮土",
+              "canonical_stem": null,
+              "days": 5,
+              "identity_status": "unresolved_literal_soil_identity"
+            },
+            {
+              "source_name": "丙火",
+              "canonical_stem": "丙",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "甲木",
+              "canonical_stem": "甲",
+              "days": 20,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "卯": {
+          "literal_branch_glyph": "卯",
+          "normalized_month_branch": "卯",
+          "claims": [
+            {
+              "source_name": "甲木",
+              "canonical_stem": "甲",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "乙木",
+              "canonical_stem": "乙",
+              "days": 23,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "辰": {
+          "literal_branch_glyph": "辰",
+          "normalized_month_branch": "辰",
+          "claims": [
+            {
+              "source_name": "乙木",
+              "canonical_stem": "乙",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "壬水",
+              "canonical_stem": "壬",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "戊土",
+              "canonical_stem": "戊",
+              "days": 18,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "巳": {
+          "literal_branch_glyph": "已",
+          "normalized_month_branch": "巳",
+          "claims": [
+            {
+              "source_name": "戊土",
+              "canonical_stem": "戊",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "庚金",
+              "canonical_stem": "庚",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "丙火",
+              "canonical_stem": "丙",
+              "days": 18,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "午": {
+          "literal_branch_glyph": "午",
+          "normalized_month_branch": "午",
+          "claims": [
+            {
+              "source_name": "丙火",
+              "canonical_stem": "丙",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "丁火",
+              "canonical_stem": "丁",
+              "days": 23,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "未": {
+          "literal_branch_glyph": "未",
+          "normalized_month_branch": "未",
+          "claims": [
+            {
+              "source_name": "丁火",
+              "canonical_stem": "丁",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "甲木",
+              "canonical_stem": "甲",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "已土",
+              "canonical_stem": null,
+              "days": 18,
+              "identity_status": "unresolved_literal_soil_identity"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "申": {
+          "literal_branch_glyph": "申",
+          "normalized_month_branch": "申",
+          "claims": [
+            {
+              "source_name": "坤土",
+              "canonical_stem": null,
+              "days": 5,
+              "identity_status": "unresolved_literal_soil_identity"
+            },
+            {
+              "source_name": "壬水",
+              "canonical_stem": "壬",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "庚金",
+              "canonical_stem": "庚",
+              "days": 20,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "酉": {
+          "literal_branch_glyph": "酉",
+          "normalized_month_branch": "酉",
+          "claims": [
+            {
+              "source_name": "庚金",
+              "canonical_stem": "庚",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "辛金",
+              "canonical_stem": "辛",
+              "days": 23,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "戌": {
+          "literal_branch_glyph": "戌",
+          "normalized_month_branch": "戌",
+          "claims": [
+            {
+              "source_name": "辛金",
+              "canonical_stem": "辛",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "丙火",
+              "canonical_stem": "丙",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "戊土",
+              "canonical_stem": "戊",
+              "days": 18,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "亥": {
+          "literal_branch_glyph": "亥",
+          "normalized_month_branch": "亥",
+          "claims": [
+            {
+              "source_name": "戊土",
+              "canonical_stem": "戊",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "甲木",
+              "canonical_stem": "甲",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "壬水",
+              "canonical_stem": "壬",
+              "days": 20,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "子": {
+          "literal_branch_glyph": "子",
+          "normalized_month_branch": "子",
+          "claims": [
+            {
+              "source_name": "壬水",
+              "canonical_stem": "壬",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "癸水",
+              "canonical_stem": "癸",
+              "days": 23,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "丑": {
+          "literal_branch_glyph": "丑",
+          "normalized_month_branch": "丑",
+          "claims": [
+            {
+              "source_name": "癸水",
+              "canonical_stem": "癸",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "庚金",
+              "canonical_stem": "庚",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "已土",
+              "canonical_stem": null,
+              "days": 18,
+              "identity_status": "unresolved_literal_soil_identity"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        }
+      }
+    },
+    {
+      "id": "sanming_following_table",
+      "source": "sanming_digital",
+      "layer": "再考玉井后所列十二月数字",
+      "claim_kind": "duration_table_order_not_adjudicated",
+      "source_text": "正月：寅，立春、雨水，已土，七日；丙火，五日；甲木，十八日。二月卯，驚蟄、春分，乙，十八日，甲，九日，癸，三日。\n三月辰，清明、穀雨，戊，十八日，乙，九日，癸，三日。\n四月已，立夏、小滿，丙，十八日，戊，七日，庚，五日。\n五月午，芒種夏至，丁十八日，丙九日，乙三日。\n六月未，小暑、大暑，已十八日，乙五日，丁七日。\n七月申，立秋、處暑，庚十七日，已七日，戊三日，壬三日。八月酉，白露、秋分，辛二十日，庚七日，丁五日。\n九月戌，寒露霜降，戊十八日，辛七日，丁五日。\n十月亥，立冬、小雪，壬十八日，甲五日，戊七日。\n十一月子，大雪、冬至，癸十八日，壬五日，辛三日。\n十二月丑，小寒、大寒，已十八日，癸七日，辛五日。",
+      "months": {
+        "寅": {
+          "literal_branch_glyph": "寅",
+          "normalized_month_branch": "寅",
+          "claims": [
+            {
+              "source_name": "已土",
+              "canonical_stem": null,
+              "days": 7,
+              "identity_status": "unresolved_literal_soil_identity"
+            },
+            {
+              "source_name": "丙火",
+              "canonical_stem": "丙",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "甲木",
+              "canonical_stem": "甲",
+              "days": 18,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "卯": {
+          "literal_branch_glyph": "卯",
+          "normalized_month_branch": "卯",
+          "claims": [
+            {
+              "source_name": "乙",
+              "canonical_stem": "乙",
+              "days": 18,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "甲",
+              "canonical_stem": "甲",
+              "days": 9,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "癸",
+              "canonical_stem": "癸",
+              "days": 3,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "辰": {
+          "literal_branch_glyph": "辰",
+          "normalized_month_branch": "辰",
+          "claims": [
+            {
+              "source_name": "戊",
+              "canonical_stem": "戊",
+              "days": 18,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "乙",
+              "canonical_stem": "乙",
+              "days": 9,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "癸",
+              "canonical_stem": "癸",
+              "days": 3,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "巳": {
+          "literal_branch_glyph": "已",
+          "normalized_month_branch": "巳",
+          "claims": [
+            {
+              "source_name": "丙",
+              "canonical_stem": "丙",
+              "days": 18,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "戊",
+              "canonical_stem": "戊",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "庚",
+              "canonical_stem": "庚",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "午": {
+          "literal_branch_glyph": "午",
+          "normalized_month_branch": "午",
+          "claims": [
+            {
+              "source_name": "丁",
+              "canonical_stem": "丁",
+              "days": 18,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "丙",
+              "canonical_stem": "丙",
+              "days": 9,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "乙",
+              "canonical_stem": "乙",
+              "days": 3,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "未": {
+          "literal_branch_glyph": "未",
+          "normalized_month_branch": "未",
+          "claims": [
+            {
+              "source_name": "已",
+              "canonical_stem": null,
+              "days": 18,
+              "identity_status": "unresolved_literal_soil_identity"
+            },
+            {
+              "source_name": "乙",
+              "canonical_stem": "乙",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "丁",
+              "canonical_stem": "丁",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "申": {
+          "literal_branch_glyph": "申",
+          "normalized_month_branch": "申",
+          "claims": [
+            {
+              "source_name": "庚",
+              "canonical_stem": "庚",
+              "days": 17,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "已",
+              "canonical_stem": null,
+              "days": 7,
+              "identity_status": "unresolved_literal_soil_identity"
+            },
+            {
+              "source_name": "戊",
+              "canonical_stem": "戊",
+              "days": 3,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "壬",
+              "canonical_stem": "壬",
+              "days": 3,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "酉": {
+          "literal_branch_glyph": "酉",
+          "normalized_month_branch": "酉",
+          "claims": [
+            {
+              "source_name": "辛",
+              "canonical_stem": "辛",
+              "days": 20,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "庚",
+              "canonical_stem": "庚",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "丁",
+              "canonical_stem": "丁",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "戌": {
+          "literal_branch_glyph": "戌",
+          "normalized_month_branch": "戌",
+          "claims": [
+            {
+              "source_name": "戊",
+              "canonical_stem": "戊",
+              "days": 18,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "辛",
+              "canonical_stem": "辛",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "丁",
+              "canonical_stem": "丁",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "亥": {
+          "literal_branch_glyph": "亥",
+          "normalized_month_branch": "亥",
+          "claims": [
+            {
+              "source_name": "壬",
+              "canonical_stem": "壬",
+              "days": 18,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "甲",
+              "canonical_stem": "甲",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "戊",
+              "canonical_stem": "戊",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "子": {
+          "literal_branch_glyph": "子",
+          "normalized_month_branch": "子",
+          "claims": [
+            {
+              "source_name": "癸",
+              "canonical_stem": "癸",
+              "days": 18,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "壬",
+              "canonical_stem": "壬",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "辛",
+              "canonical_stem": "辛",
+              "days": 3,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        },
+        "丑": {
+          "literal_branch_glyph": "丑",
+          "normalized_month_branch": "丑",
+          "claims": [
+            {
+              "source_name": "已",
+              "canonical_stem": null,
+              "days": 18,
+              "identity_status": "unresolved_literal_soil_identity"
+            },
+            {
+              "source_name": "癸",
+              "canonical_stem": "癸",
+              "days": 7,
+              "identity_status": "explicit_stem"
+            },
+            {
+              "source_name": "辛",
+              "canonical_stem": "辛",
+              "days": 5,
+              "identity_status": "explicit_stem"
+            }
+          ],
+          "stated_month_total": null,
+          "chronological_order_adjudicated": false
+        }
+      }
+    }
+  ],
+  "ditian_original_note": {
+    "source": "ditian_1947",
+    "source_layer": "原注，非任注最终有效取用裁定",
+    "months": {
+      "寅": [
+        {
+          "stem": "戊",
+          "literal_day_range": "立春後七日前"
+        },
+        {
+          "stem": "丙",
+          "literal_day_range": "八日後十四日前"
+        },
+        {
+          "stem": "甲",
+          "literal_day_range": "十五日後"
+        }
+      ]
+    },
+    "interval_boundary_convention": "not_adjudicated",
+    "modern_elapsed_seconds_mapping": "not_adopted"
+  },
+  "ditian_ren_commentary": {
+    "source": "ditian_1947",
+    "source_layer": "任氏增注",
+    "conditions": [
+      "地支人元与天干引助须合参，司令出现也未必可用。",
+      "寅月戊土虽司令出见仍可能置而弗论，不能把透出当充分条件。",
+      "丙火司令、无水而透火土与反透水木等情形，须结合寒暖、损益判断。"
+    ],
+    "anchors": [
+      "司令出見可置弗論",
+      "如丙火司令四柱無水寒木得火而繁華"
+    ]
+  },
+  "sanming_critique": {
+    "source": "sanming_digital",
+    "source_layer": "本章醉醒子曰及评议的完整末段",
+    "source_text": "醉醒子曰：時行物生，天道之常。一歳之中，雖有進退，四時之內，本無輕重。故以金、木、水、火分旺四時，各得七十二日；土旺四季，各有十八日，共三百六十日乃成嵗焉。立春之後，則用陽木三十六日，艮土分野，丙戊長生；驚蟄後六日，則用隂木三十六日，癸水寄生；清明後十二日，則用戊土十八日，陽水歸庫，隂水返魂。夏、秋、冬亦如此。淵源淵海則以立春之後，已土餘氣幾日，艮土分野幾日，丙戊長生先後各得幾日；卯月癸水寄生幾日，辰月陽水歸庫，隂水返魂亦各幾日。殊不思丑月之用既足，春後又何餘哉？分野者，聚一方之旺氣；長生者，歸母成孕；先後者，盖有寅而後生丙，有丙而後戊生；寄生者，徒有虚名，乃無實位；歸庫者，絶其生氣而收藏；返魂者，續其死氣而變化。此五行生死進退之𤣥機，豈可以幾日為限哉？且春之用木，秋之用金，固一定之理也。若雜揉寓處之神，占用幾日，則本宫主氣之數，未嘗不缺而虧矣，則何以見春木夏火一氣流行，各旺七十二日之數耶？以四季配五行之用，乃主有納客之數，客無勝主之理，但主氣之司權，自有初中末三氣之淺深，用之者特宜較量輕重言耳，又豈可以三五七日為限哉？其説足以破淵源之誤。又支中所藏，止以月論年日時，不論人命，重提綱，厥有㫖哉。",
+    "anchor": "又豈可以三五七日為限哉",
+    "scope": "段中反对机械分日，并论主客、初中末气浅深。不能只抄数字而删除这段限制。"
+  },
+  "annual_literal_claim": {
+    "source": "sanming_digital",
+    "layer": "再考玉井一句",
+    "stated_total_days": 360,
+    "scope": "按平台数字逐字保留；计算合计380与所述360不合，未核原页，不擅改三十五为其他数字。",
+    "groups": [
+      {
+        "source_names": [
+          "甲",
+          "丙",
+          "庚",
+          "壬"
+        ],
+        "each_days": 35
+      },
+      {
+        "source_names": [
+          "乙",
+          "丁",
+          "辛",
+          "癸"
+        ],
+        "each_days": 35
+      },
+      {
+        "source_names": [
+          "戊",
+          "已"
+        ],
+        "each_days": 50
+      }
+    ]
+  },
+  "interpretation_scope": "司事条目不等于当前藏干目录；艮土、坤土、已土等不擅定阴阳干。时长、排序、日界与有效取用分别保留未知，不加入藏干、根量、旺衰或全局喜忌。",
+  "independent_expert_review": "pending",
+  "calculation_effect": "none"
+}

@@ -11,7 +11,8 @@
       "title": "八宅明镜卷上转录",
       "url": "https://www.shicihui.com/zh-tw/book/bazhaimingjing/212094",
       "kind": "primary_text_transcription",
-      "scope": "三元命卦起点；转录可能有讹误，现代1864纪元另按S4登记"
+      "scope": "三元命卦起点；转录可能有讹误，现代1864纪元另按S4登记",
+      "retrieval_status_2026_10_22": "title_only_no_formula_text_returned; retained_as_historical_citation_not_new_verification"
     },
     "S3": {
       "title": "八宅明镜卷下转录",
@@ -48,6 +49,52 @@
       "url": "https://www.hko.gov.hk/tc/gts/time/calendar/pdf/files/2026.pdf",
       "kind": "official_calendar",
       "scope": "立春公历日期；不证明风水解释"
+    },
+    "S9": {
+      "title": "香港天文台二十四节气时刻表（官方XML）",
+      "url": "https://www.hko.gov.hk/en/gts/astronomy/Solar_Term.htm",
+      "kind": "official_astronomical_reference",
+      "scope": "以2024、2026–2028冻结官方XML独立核对立春时刻及跨时区换年；公布到分钟，不认证秒精度，也不证明风水预测"
+    },
+    "S10": {
+      "title": "八宅明镜卷上星煞吉凶：现代排印本所引原文",
+      "url": "https://vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4/%E5%85%AB%E5%AE%85%E6%98%8E%E9%95%9C_%E5%94%90_%E6%9D%A8%E7%AD%A0%E6%9D%BE%E8%91%97.pdf",
+      "kind": "primary_text_in_modern_edition",
+      "scope": "仅核对原文八星五行及伏位属木；不采用今译、原文事件断言或据此认证整本",
+      "locator": "印刷第022页，PDF第45页，原文星表",
+      "retrieved_at": "2026-10-22",
+      "retrieved_sha256": "69d35cecd8373b59ce36d6c1e18f95887206d92fd55a3ae982dc15366202cb55",
+      "source_version": "353-page modern typeset PDF; ancient quotation block inspected, exact publication imprint not authenticated"
+    },
+    "S11": {
+      "title": "八宅明镜八卦九星吉凶之源：累计七变段落",
+      "url": "https://bazhaimingjing.5000yan.com/23/",
+      "kind": "primary_text_transcription",
+      "scope": "画卦自下而上、变卦自上而下的56组非同卦关系；累计操作数不等于净变化爻数，不代表流年",
+      "retrieved_at": "2026-10-22",
+      "retrieved_html_sha256": "19db40c0e8f5e0ec72e4ab1507e9cf1b2c58c26ca4ef45f12ffbdb9101cc8da6",
+      "source_version": "2026-10-22 retrieved web transcription; not a collated print edition",
+      "locator": "八宅生气等星吉凶之源 > 八卦九星吉凶之源，画卦自下而上至七变段"
+    },
+    "S12": {
+      "title": "八宅明镜九星五行：辅弼随门而化语境",
+      "url": "https://bazhaimingjing.5000yan.com/64996.html",
+      "kind": "primary_text_transcription",
+      "scope": "保留左辅右弼随门而化的原文段，与星煞吉凶的伏位木并列；本版本未据门自动改五行",
+      "retrieved_at": "2026-10-22",
+      "retrieved_html_sha256": "b1ef0339bda46bb1534599eec2fc2aa3acf5ec70345c512b4f95fc3a21cbd32a",
+      "source_version": "2026-10-22 retrieved web transcription; not a collated print edition",
+      "locator": "九星五行，白话解读之前原文段最后一句"
+    },
+    "S13": {
+      "title": "Larry Sang / AFSI: The Principles of Feng Shui, Chapter 3",
+      "url": "https://www.amfengshui.com/wp-content/uploads/woocommerce_uploads/2013/12/tpofs.pdf",
+      "kind": "author_published_book",
+      "scope": "仅采用五行相生相克有向循环；不采用摆件功效、颜色处方或结果保证",
+      "locator": "印刷第19、20页，PDF第36、37页；本次逐像核对",
+      "retrieved_at": "2026-10-22",
+      "retrieved_sha256": "6ab5135060df281fd6a6e376e0516e660c185dd2af2f146a5f850df64cc3b024",
+      "source_version": "Author-published PDF, SHA-256 verified unchanged on 2026-10-22"
     }
   },
   "rulesets": {
@@ -65,19 +112,25 @@
       ]
     },
     "bazhai_sitting_v1": {
-      "version": "1.0.0",
+      "version": "1.1.0",
       "method": "bazhai",
       "source_ids": [
         "S1",
         "S2",
         "S3",
-        "S4"
+        "S4",
+        "S10",
+        "S11",
+        "S12",
+        "S13"
       ],
       "scope": "坐山起伏位；1864现代三元命卦锚点；8x8大游年；男女原始五数分别寄坤/艮",
       "conventions": [
         "出生时刻默认立春换年，可明确选择公历元旦；有效生年可显式覆盖",
         "命卦与宅卦独立；未知起算法返回男女候选",
-        "普通位置偏吉；灶座偏凶、确认火门偏吉；床头/书桌朝向属本版本明确的应用约定，不声称原典统一标准"
+        "普通位置偏吉；灶座偏凶、确认火门偏吉；床头/书桌朝向属本版本明确的应用约定，不声称原典统一标准",
+        "1.1.0保留累计七变操作与净变爻的区别；新增宫星有向五行关系但不覆盖原基础用途匹配布尔值，也不据此输出全宅吉凶。",
+        "伏位五行依所选星煞吉凶表采用木；并列登记辅弼随门而化的文本语境，不将任何一段冒称全本唯一规则。"
       ]
     },
     "jinsuo_basic_fixed_v1": {
@@ -100,7 +153,8 @@
         "S4",
         "S6",
         "S7",
-        "S8"
+        "S8",
+        "S9"
       ],
       "scope": "年度紫白入中与顺飞九宫；立春到下个立春；当前20年元运单独列示",
       "conventions": [
@@ -295,7 +349,6 @@
   ],
   "unavailable_layers": [
     "xuankong_natal",
-    "monthly_stars",
     "jinsuo_24_mountains",
     "jinsuo_forms_and_periods",
     "automatic_floorplan_geometry"

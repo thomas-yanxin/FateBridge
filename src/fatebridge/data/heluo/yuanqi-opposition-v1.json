@@ -1,0 +1,60 @@
+{
+  "ruleset_id": "heluo_wenming_yuanqi_opposition_v1",
+  "version": "1.0.0",
+  "source_title": "河洛理數·論元氣、元氣相反與反中有救說（文明書局本）",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "source_pdf_sha256": "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c",
+  "source_pdf_pages": [
+    32,
+    33,
+    34,
+    35
+  ],
+  "review_status": "single_reader_selected_sections; independent_second_review_pending",
+  "year_context_literal": "凡元氣自人當生之年干支上取與日月時不相涉",
+  "absence_literal": "如天地元氣屬乾卦中無乾而有坤則是相反矣",
+  "rescue_literal": "元氣雖衝莫作凶。要分節氣淺深中。反處氣虛無尅制。應知財壽亦豐隆。",
+  "mappings": [
+    {
+      "symbols": "甲壬戌亥",
+      "yuan": "乾",
+      "fan": "坤"
+    },
+    {
+      "symbols": "乙癸未申",
+      "yuan": "坤",
+      "fan": "乾"
+    },
+    {
+      "symbols": "丙丑寅",
+      "yuan": "艮",
+      "fan": "兌"
+    },
+    {
+      "symbols": "己午",
+      "yuan": "離",
+      "fan": "坎"
+    },
+    {
+      "symbols": "丁酉",
+      "yuan": "兌",
+      "fan": "艮"
+    },
+    {
+      "symbols": "戊子",
+      "yuan": "坎",
+      "fan": "離"
+    },
+    {
+      "symbols": "辛辰巳",
+      "yuan": "巽",
+      "fan": "震"
+    },
+    {
+      "symbols": "庚卯",
+      "yuan": "震",
+      "fan": "巽"
+    }
+  ],
+  "scope": "Born-year stem/branch targets and per-phase absence-plus-opposite facts under the explicitly named lower/upper/two-nuclear body scope. Not a complete rescue or Xie judgment. The Qian absence example is extended to the eight printed target groups; this scope is an implementation interpretation, not eight separately printed absence examples."
+}

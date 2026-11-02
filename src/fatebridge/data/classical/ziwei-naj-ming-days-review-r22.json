@@ -1,0 +1,1960 @@
+{
+  "id": "naj_ming_day_independent_review_r22_corrected_v1",
+  "source_report_sha256": "6236724d3bdce427d97d5ea1a015653ab5cb5c76ff5335b6361355cda4e4acd7",
+  "erratum_sha256": "b0c2d0cd89c923e5abc578bdfce46001410b8a79d4054e73e21d19a687c021de",
+  "frozen_manifest_sha256": "604af6bf5013770a5d2b4c040750f47a1f88c4b51df9dce5ab37a6cc892db828",
+  "source_report": "docs/validation/ziwei-r22-day-tables-review-raw.json",
+  "separate_erratum": "docs/validation/ziwei-r22-day-tables-review-raw.errata-01.json",
+  "new_edition": false,
+  "external_human_experts": 0,
+  "records": [
+    {
+      "bureau": 2,
+      "day": 1,
+      "branches_from_direct_labels": [
+        "丑"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_丑_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 2,
+      "branches_from_direct_labels": [
+        "寅"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_寅_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 3,
+      "branches_from_direct_labels": [
+        "寅"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_寅_right_2"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 4,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_卯_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 5,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_卯_right_2"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 6,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_辰_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 7,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_辰_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 8,
+      "branches_from_direct_labels": [
+        "巳"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_巳_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 9,
+      "branches_from_direct_labels": [
+        "巳"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_巳_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 10,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_午_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 11,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_午_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 12,
+      "branches_from_direct_labels": [
+        "未"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_未_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 13,
+      "branches_from_direct_labels": [
+        "未"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_未_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 14,
+      "branches_from_direct_labels": [
+        "申"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_申_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 15,
+      "branches_from_direct_labels": [
+        "申"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_申_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 16,
+      "branches_from_direct_labels": [
+        "酉"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_酉_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 17,
+      "branches_from_direct_labels": [
+        "酉"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_酉_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 18,
+      "branches_from_direct_labels": [
+        "戌"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_戌_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 19,
+      "branches_from_direct_labels": [
+        "戌"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_戌_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 20,
+      "branches_from_direct_labels": [
+        "亥"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_亥_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 21,
+      "branches_from_direct_labels": [],
+      "status": "unknown_no_directly_read_label",
+      "candidate_branches_from_this_rereading": [],
+      "withdrawn_branch": "亥",
+      "note": "本次原图复核仅能撤回旧21→亥断言，不能凭未定后缀给21日另定宫位。"
+    },
+    {
+      "bureau": 2,
+      "day": 22,
+      "branches_from_direct_labels": [
+        "子"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_子_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 23,
+      "branches_from_direct_labels": [
+        "子"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_子_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 24,
+      "branches_from_direct_labels": [
+        "丑"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_丑_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 25,
+      "branches_from_direct_labels": [
+        "丑"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_丑_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 26,
+      "branches_from_direct_labels": [
+        "寅"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_寅_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 27,
+      "branches_from_direct_labels": [
+        "寅"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_寅_left_2"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 28,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_卯_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 29,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_卯_left_2"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 2,
+      "day": 30,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_2_辰_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 1,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_辰_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 2,
+      "branches_from_direct_labels": [
+        "丑"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_丑_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 3,
+      "branches_from_direct_labels": [
+        "寅"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_寅_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 4,
+      "branches_from_direct_labels": [
+        "巳"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_巳_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 5,
+      "branches_from_direct_labels": [
+        "寅"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_寅_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 6,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_卯_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 7,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_午_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 8,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_卯_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 9,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_辰_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 10,
+      "branches_from_direct_labels": [
+        "未"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_未_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 11,
+      "branches_from_direct_labels": [],
+      "status": "unknown_no_directly_read_label",
+      "source_inscription_ids": [],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 12,
+      "branches_from_direct_labels": [
+        "巳",
+        "辰"
+      ],
+      "status": "conflicting_direct_labels",
+      "source_inscription_ids": [
+        "bureau_3_巳_middle_1",
+        "bureau_3_辰_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 13,
+      "branches_from_direct_labels": [
+        "申"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_申_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 14,
+      "branches_from_direct_labels": [
+        "巳"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_巳_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 15,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_午_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 16,
+      "branches_from_direct_labels": [
+        "酉"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_酉_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 17,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_午_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 18,
+      "branches_from_direct_labels": [
+        "未"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_未_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 19,
+      "branches_from_direct_labels": [
+        "戌"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_戌_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 20,
+      "branches_from_direct_labels": [
+        "未"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_未_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 21,
+      "branches_from_direct_labels": [
+        "申"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_申_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 22,
+      "branches_from_direct_labels": [
+        "亥"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_亥_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 23,
+      "branches_from_direct_labels": [
+        "申"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_申_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 24,
+      "branches_from_direct_labels": [
+        "酉"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_酉_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 25,
+      "branches_from_direct_labels": [
+        "子"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_子_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 26,
+      "branches_from_direct_labels": [
+        "酉"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_酉_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 27,
+      "branches_from_direct_labels": [
+        "戌"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_戌_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 28,
+      "branches_from_direct_labels": [
+        "丑"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_丑_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 29,
+      "branches_from_direct_labels": [
+        "戌"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_戌_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 3,
+      "day": 30,
+      "branches_from_direct_labels": [
+        "亥"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_3_亥_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 1,
+      "branches_from_direct_labels": [
+        "亥"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_亥_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 2,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_辰_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 3,
+      "branches_from_direct_labels": [
+        "丑"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_丑_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 4,
+      "branches_from_direct_labels": [
+        "寅"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_寅_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 5,
+      "branches_from_direct_labels": [
+        "子"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_子_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 6,
+      "branches_from_direct_labels": [
+        "巳"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_巳_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 7,
+      "branches_from_direct_labels": [
+        "寅"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_寅_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 8,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_卯_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 9,
+      "branches_from_direct_labels": [
+        "丑"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_丑_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 10,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_午_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 11,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_卯_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 12,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_辰_right_2"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 13,
+      "branches_from_direct_labels": [
+        "寅"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_寅_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 14,
+      "branches_from_direct_labels": [
+        "未"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_未_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 15,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_辰_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 16,
+      "branches_from_direct_labels": [
+        "巳"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_巳_right_2"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 17,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_卯_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 18,
+      "branches_from_direct_labels": [
+        "申"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_申_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 19,
+      "branches_from_direct_labels": [
+        "巳"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_巳_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 20,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_午_right_2"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 21,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_辰_left_2"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 22,
+      "branches_from_direct_labels": [
+        "酉"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_酉_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 23,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_午_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 24,
+      "branches_from_direct_labels": [
+        "未"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_未_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 25,
+      "branches_from_direct_labels": [
+        "巳"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_巳_left_2"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 26,
+      "branches_from_direct_labels": [
+        "戌"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_戌_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 27,
+      "branches_from_direct_labels": [
+        "未"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_未_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 28,
+      "branches_from_direct_labels": [
+        "申"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_申_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 29,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_午_left_2"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 4,
+      "day": 30,
+      "branches_from_direct_labels": [
+        "亥"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_4_亥_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 1,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_午_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 2,
+      "branches_from_direct_labels": [
+        "亥"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_亥_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 3,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_辰_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 4,
+      "branches_from_direct_labels": [
+        "丑"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_丑_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 5,
+      "branches_from_direct_labels": [
+        "寅"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_寅_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 6,
+      "branches_from_direct_labels": [
+        "未"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_未_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 7,
+      "branches_from_direct_labels": [
+        "子"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_子_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 8,
+      "branches_from_direct_labels": [
+        "巳"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_巳_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 9,
+      "branches_from_direct_labels": [
+        "寅"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_寅_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 10,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_卯_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 11,
+      "branches_from_direct_labels": [
+        "申"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_申_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 12,
+      "branches_from_direct_labels": [
+        "丑"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_丑_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 13,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_午_right_2"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 14,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_卯_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 15,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_辰_right_2"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 16,
+      "branches_from_direct_labels": [
+        "酉"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_酉_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 17,
+      "branches_from_direct_labels": [
+        "寅"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_寅_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 18,
+      "branches_from_direct_labels": [
+        "未"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_未_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 19,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_辰_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 20,
+      "branches_from_direct_labels": [
+        "巳"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_巳_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 21,
+      "branches_from_direct_labels": [
+        "戌"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_戌_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 22,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_卯_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 23,
+      "branches_from_direct_labels": [
+        "申"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_申_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 24,
+      "branches_from_direct_labels": [
+        "巳"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_巳_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 25,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_午_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 26,
+      "branches_from_direct_labels": [
+        "亥"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_亥_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 27,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_辰_left_2"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 28,
+      "branches_from_direct_labels": [
+        "酉"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_酉_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 29,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_午_left_2"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 5,
+      "day": 30,
+      "branches_from_direct_labels": [
+        "未"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_5_未_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 1,
+      "branches_from_direct_labels": [
+        "酉"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_酉_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 2,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_午_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 3,
+      "branches_from_direct_labels": [
+        "亥"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_亥_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 4,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_辰_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 5,
+      "branches_from_direct_labels": [
+        "丑"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_丑_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 6,
+      "branches_from_direct_labels": [],
+      "status": "unknown_no_directly_read_label",
+      "source_inscription_ids": [],
+      "candidate_branches_from_unresolved_labels": [
+        "寅"
+      ],
+      "candidate_source_inscription_ids": [
+        "bureau_6_寅_right_1"
+      ]
+    },
+    {
+      "bureau": 6,
+      "day": 7,
+      "branches_from_direct_labels": [
+        "戌"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_戌_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 8,
+      "branches_from_direct_labels": [
+        "未"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_未_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [
+        "寅"
+      ],
+      "candidate_source_inscription_ids": [
+        "bureau_6_寅_right_1"
+      ]
+    },
+    {
+      "bureau": 6,
+      "day": 9,
+      "branches_from_direct_labels": [
+        "子"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_子_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 10,
+      "branches_from_direct_labels": [
+        "巳"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_巳_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 11,
+      "branches_from_direct_labels": [
+        "寅"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_寅_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 12,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_卯_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 13,
+      "branches_from_direct_labels": [
+        "亥"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_亥_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 14,
+      "branches_from_direct_labels": [
+        "申"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_申_right_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 15,
+      "branches_from_direct_labels": [
+        "丑"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_丑_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 16,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_午_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 17,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_卯_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 18,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_辰_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 19,
+      "branches_from_direct_labels": [
+        "子"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_子_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 20,
+      "branches_from_direct_labels": [
+        "酉"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_酉_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 21,
+      "branches_from_direct_labels": [
+        "寅"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_寅_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 22,
+      "branches_from_direct_labels": [
+        "未"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_未_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 23,
+      "branches_from_direct_labels": [
+        "辰"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_辰_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 24,
+      "branches_from_direct_labels": [
+        "巳"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_巳_middle_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 25,
+      "branches_from_direct_labels": [
+        "丑"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_丑_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 26,
+      "branches_from_direct_labels": [
+        "戌"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_戌_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 27,
+      "branches_from_direct_labels": [
+        "卯"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_卯_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 28,
+      "branches_from_direct_labels": [
+        "申"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_申_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 29,
+      "branches_from_direct_labels": [
+        "巳"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_巳_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    },
+    {
+      "bureau": 6,
+      "day": 30,
+      "branches_from_direct_labels": [
+        "午"
+      ],
+      "status": "directly_read_single_branch",
+      "source_inscription_ids": [
+        "bureau_6_午_left_1"
+      ],
+      "candidate_branches_from_unresolved_labels": [],
+      "candidate_source_inscription_ids": []
+    }
+  ]
+}

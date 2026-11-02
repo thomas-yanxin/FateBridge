@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Callable, Dict, Tuple
 
 from fatebridge.application.bindings import lazy_service, resolve_service
+from fatebridge.core.requests.western_policy import service_inputs
 
 # ---------------------------------------------------------------------------
 # Service callables are bound LAZILY: each name below is a proxy that imports
@@ -32,9 +33,21 @@ calculate_relative_chart_analysis = lazy_service(
 def _astro_chart_bind(
     req: Any,
 ) -> Tuple[Callable[..., Any], Tuple[Any, ...], Dict[str, Any]]:
-    data = req.model_dump()
+    data = service_inputs(req)
     variant = data.pop("chart_variant", "chart")
     if variant == "germany":
+        for key in (
+            "guolao_month_basis",
+            "guolao_seasonal_anchor_policy",
+            "node_mode",
+            "divisions",
+            "ephemeris_policy",
+            "saptavargaja_profile",
+            "drekkana_profile",
+            "cheshta_model",
+            "birth_microsecond",
+        ):
+            data.pop(key, None)
         return resolve_service(calculate_germany_chart_analysis), (), data
     return (
         resolve_service(calculate_core_chart_analysis),
@@ -56,6 +69,7 @@ def _astro_relative_rest_bind(
             "hsys": req.hsys,
             "zodiacal": req.zodiacal,
             "relationship_focus": req.relationship_focus,
+            "davison_variant": req.davison_variant,
         },
     )
 
@@ -90,5 +104,6 @@ def _astro_relative_flat_bind(
             "hsys": d["hsys"],
             "zodiacal": d["zodiacal"],
             "relationship_focus": d.get("relationship_focus"),
+            "davison_variant": d["davison_variant"],
         },
     )

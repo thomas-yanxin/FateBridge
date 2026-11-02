@@ -37,7 +37,7 @@ _REST_RESERVED_FIELDS = {
 }
 
 
-def _query_response_budget(value: Any) -> Any:
+def _query_response_budget(value: object) -> object:
     # HTTP query values are strings. Coerce once before evaluating the union;
     # otherwise Literal[0] rejects "0" and the bounded integer branch rejects 0.
     return int(value) if isinstance(value, str) else value

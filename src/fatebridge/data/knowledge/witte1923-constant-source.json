@@ -1,0 +1,314 @@
+{
+  "schema_version": 1,
+  "source": {
+    "id": "witte1923_progressive_constant",
+    "author": "Alfred Witte",
+    "title": "Berechnung einer Konstante fuer Tage des progressiven Horoskops",
+    "publication": "Astrologische Blaetter V/8, November1923, pp183-184",
+    "url": "https://www.astrax.de/pdf/24_Berechnung%20e%20Konstanten%20f%20Tage%20d%20progr%20Horoskops.pdf",
+    "source_pdf_sha256": "b528a8fe29af0914a9124a60525146a821bd21be597e04d17432637b6541815e",
+    "transcription": "Read from hash-pinned scanned original pp183-184 before implementing the replayer or comparing a modern ephemeris. h/m/s are time-angle units, not zodiac longitude. The first RA sum includes an explicitly annotated implicit 24h reduction; all other terms are printed values.",
+    "sections": [
+      "printed p183: birth clock and sidereal correction",
+      "printed p184: constant, event subtraction and progressed meridian sum"
+    ]
+  },
+  "clock_labels": {
+    "civil_night_date": [
+      1870,
+      1,
+      13
+    ],
+    "civil_local_clock": [
+      3,
+      14,
+      0
+    ],
+    "printed_astronomical_date": [
+      1870,
+      1,
+      13
+    ],
+    "printed_astronomical_local_hours": [
+      15,
+      14,
+      0
+    ],
+    "east_longitude_time": [
+      0,
+      40,
+      0
+    ],
+    "clock_standard_independently_verified": false,
+    "calendar_independently_verified": false,
+    "noon_date_label_convention_adopted": false
+  },
+  "operations": [
+    {
+      "id": "greenwich_clock",
+      "section": "p183 table",
+      "terms": [
+        {
+          "sign": 1,
+          "hms": [
+            15,
+            14,
+            0
+          ]
+        },
+        {
+          "sign": -1,
+          "hms": [
+            0,
+            40,
+            0
+          ]
+        }
+      ],
+      "printed_result_hms": [
+        14,
+        34,
+        0
+      ]
+    },
+    {
+      "id": "birth_sidereal_time_arc",
+      "section": "p183 table",
+      "terms": [
+        {
+          "sign": 1,
+          "hms": [
+            14,
+            34,
+            0
+          ]
+        },
+        {
+          "sign": 1,
+          "hms": [
+            0,
+            2,
+            26
+          ]
+        }
+      ],
+      "printed_result_hms": [
+        14,
+        36,
+        26
+      ]
+    },
+    {
+      "id": "local_birth_time_arc",
+      "section": "p184 first table",
+      "terms": [
+        {
+          "sign": 1,
+          "hms": [
+            14,
+            36,
+            26
+          ]
+        },
+        {
+          "sign": 1,
+          "hms": [
+            0,
+            40,
+            0
+          ]
+        }
+      ],
+      "printed_result_hms": [
+        15,
+        16,
+        26
+      ]
+    },
+    {
+      "id": "birth_meridian_ra",
+      "section": "p184 first table",
+      "terms": [
+        {
+          "sign": 1,
+          "hms": [
+            15,
+            16,
+            26
+          ]
+        },
+        {
+          "sign": 1,
+          "hms": [
+            19,
+            31,
+            3
+          ]
+        },
+        {
+          "sign": -1,
+          "hms": [
+            24,
+            0,
+            0
+          ],
+          "provenance": "Implicit 24-hour cycle reduction to compare the printed 10h47m29s; the 24h subtraction is not printed as its own row here."
+        }
+      ],
+      "printed_result_hms": [
+        10,
+        47,
+        29
+      ]
+    },
+    {
+      "id": "constant_sidereal_time",
+      "section": "p184 table 1870 Jan14",
+      "terms": [
+        {
+          "sign": 1,
+          "hms": [
+            19,
+            35,
+            0
+          ]
+        },
+        {
+          "sign": -1,
+          "hms": [
+            14,
+            36,
+            26
+          ]
+        }
+      ],
+      "printed_result_hms": [
+        4,
+        58,
+        34
+      ]
+    },
+    {
+      "id": "event_time_arc",
+      "section": "p184 table 1895 Dec18",
+      "terms": [
+        {
+          "sign": 1,
+          "hms": [
+            17,
+            48,
+            35
+          ]
+        },
+        {
+          "sign": -1,
+          "hms": [
+            4,
+            58,
+            34
+          ]
+        }
+      ],
+      "printed_result_hms": [
+        12,
+        49,
+        1
+      ]
+    },
+    {
+      "id": "progressed_meridian_sum",
+      "section": "p184 final table",
+      "terms": [
+        {
+          "sign": 1,
+          "hms": [
+            12,
+            49,
+            1
+          ]
+        },
+        {
+          "sign": 1,
+          "hms": [
+            0,
+            2,
+            8
+          ]
+        },
+        {
+          "sign": 1,
+          "hms": [
+            21,
+            9,
+            35
+          ]
+        },
+        {
+          "sign": 1,
+          "hms": [
+            0,
+            40,
+            0
+          ]
+        }
+      ],
+      "printed_result_hms": [
+        35,
+        40,
+        44
+      ]
+    },
+    {
+      "id": "progressed_meridian_reduction",
+      "section": "p184 final table",
+      "terms": [
+        {
+          "sign": 1,
+          "hms": [
+            35,
+            40,
+            44
+          ]
+        },
+        {
+          "sign": -1,
+          "hms": [
+            24,
+            0,
+            0
+          ]
+        }
+      ],
+      "printed_result_hms": [
+        11,
+        40,
+        44
+      ]
+    }
+  ],
+  "printed_event_arc_used_in_next_sum": [
+    12,
+    49,
+    1
+  ],
+  "printed_event_arc_after_subtraction": [
+    12,
+    49,
+    1
+  ],
+  "event_date_label": [
+    1895,
+    12,
+    18
+  ],
+  "secondary_day_label": [
+    1870,
+    2,
+    7
+  ],
+  "original_progression_time_key_accepted": false,
+  "full_original_rulebook_accepted": false,
+  "empirical_outcomes": 0,
+  "scope": "Eight printed time-angle operations from one worked example. Exact arithmetic only; no birth-clock, ephemeris, original time-key or real-event acceptance.",
+  "draft_crosscheck": "The draft event subtraction result was corrected to the image-read printed 12h49m01s before freezing this canonical record. The draft remains in the research cache; it is not the source of expected arithmetic."
+}

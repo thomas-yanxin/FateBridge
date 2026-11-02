@@ -1,0 +1,670 @@
+{
+  "schema_version": 1,
+  "id": "fatebridge_bazi_frontmatter_v1",
+  "version": 1,
+  "domain": "bazi",
+  "description": "李雨田初学捷径的来源术语及正常五行取用条件；保留作者差异、未知阈值和从化变格例外。",
+  "categories": {
+    "source_vocabulary": {
+      "旺衰与强弱的编者分层": {
+        "title": "旺衰与强弱的编者分层",
+        "tips": [
+          "旺、衰、强、弱需要连同作者、段落和所论对象读取。月令得时与四柱生扶克泄是不同证据项，单见一个旺字不足以认定程序三档中的强。",
+          "李雨田增补《初学捷径》的衰旺强弱之别续文以雨田按开头，批评本文用字混查，尝试以得时作旺、失令作衰，以四柱劫印及克泄讨论强弱；这是编者按语的局部解释。",
+          "同页举出当令兼劫印、失令而劫印多、当令却克泄重等组合，说明当令不能单独代替全局判断。编者又指出部分旺强用法难分，诸家著述未画明界限，末劝活看、不要拘泥；这些不完全一致之处继续保留。",
+          "本页列旺宜克、强宜泄、衰宜扶、弱宜抑，称为常理；又列旺极宜生、衰极宜泄，称为变法。词义和组合前提未判明时，不能把其中一句抽出作为普遍喜忌口令。",
+          "这段属于李雨田的初学编者层，不归给任铁樵的任氏曰或原韵文。它也不能替代任氏在另一段对太旺、旺极、太衰、衰极的条件性讨论。",
+          "FateBridge当前强弱模型以工程政策给出强、中和、弱三档；本页没有相应数值界限。该词条没有新增四态分类器、改动数值结果或解决原典命例分歧。"
+        ],
+        "curation": {
+          "method_id": "dtcw1947_li_frontmatter_source_scope_v1",
+          "entry_revision": 1,
+          "classification": "source_local_editorial_vocabulary_and_table_conditions_not_classifier",
+          "review_status": "single_reader_source_scoped_not_full_classical_acceptance",
+          "source_tip_indices": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "implementation_tip_indices": [
+            5
+          ],
+          "editorial_tip_indices": [
+            0
+          ],
+          "source_refs": [
+            {
+              "author": "李雨田增补（初学捷径；雨田按）",
+              "title": "初學捷徑·衰旺強弱之別／看命三法／五行衰旺取用法",
+              "container": "任注滴天髓闡微，李雨田校訂，上海大東書局1947年4月初版影印资料",
+              "source_url": "https://commons.wikimedia.org/wiki/File:CADAL07005210_滴天髓闡微.djvu",
+              "catalog_url": "https://cadal.edu.cn/cardpage/bookCardPage?ssno=07005210",
+              "source_kind": "additional_digital_witness_single_reader_not_independent_edition",
+              "source_sha256": "1d0a16f528ed3074cdefad33b2d2f9233a47199cf88a8b02001c897e16996e60",
+              "source_djvu_leaves": [
+                51
+              ],
+              "printed_pages": [
+                "四十"
+              ],
+              "tip_indices": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "support_scope": "本节编者层的概念、组合前提和适用限制；不是任氏正文、原韵文、数值常数或现实效度证明。"
+            }
+          ],
+          "source_binding": {
+            "protocol_sha256": "3cd171eef27321afb8af3702efe02ac32b65d003239fdc24b9cfcc5538d13268",
+            "reviewed_binding_sha256": "5dadfdc20f19f5d060beda21b3bdda7ef82a8cecb18b7b0003a487b3469c4eca",
+            "source_supplement_sha256": "8e103a5435c1ba81be4f3a0562337aaa3fd9ed271c05a870620a346e4d025725",
+            "gap_review_sha256": "c296fc6035f25cf7cdaa0d99165e7af2f26ef2f5fd13e377070ba0b53860676d",
+            "source_leaf_images_sha256": {
+              "docs/validation/bazi-source-leaf-alignment-v1/candidate-detail-first/leaf-0051.png": "a4817814f5f961b1c80bbd73c9b2a4caaa19fb57a029b6c6ece9af93750c796f"
+            },
+            "original516_source_not_replaced": true
+          },
+          "numerical_strength_rules_adopted": false,
+          "independent_expert_review": "not_completed",
+          "reality_prediction_efficacy": "not_tested",
+          "original26_disagreement_gate_closed": false,
+          "citation": "FateBridge限域编释及源表编录，非逐字引文；李雨田增补《初学捷径》，收入《任注滴天髓阐微》；CADAL07005210数字扫描叶51；单读者校读，未完成独立专家审定；https://commons.wikimedia.org/wiki/File:CADAL07005210_滴天髓闡微.djvu",
+          "implementation_refs": [
+            {
+              "source_path": "src/fatebridge/core/strength.py",
+              "source_sha256": "a6a52ba57159825b8f71ebf867e64442148c37f124982a4a9709e221f1b36c16",
+              "support_scope": "只支持工程模型强、中和、弱三档及系数为工程政策；不为原典四字设立数值定义。"
+            }
+          ],
+          "separate_Ren_passage": {
+            "existing_key": "日元强弱与性情措辞",
+            "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+            "source_pdf_pages": [
+              177,
+              178
+            ],
+            "source_claim_id": "CENSUS-R539",
+            "source_rows_sha256": "ab91152988059b5cf32f67d20f4f10a93ec6ee951412024db17687b80eff83d9",
+            "no_cross_author_table_merging": true
+          }
+        }
+      },
+      "得时得势得地的判读对象": {
+        "title": "得时得势得地的判读对象",
+        "tips": [
+          "得时、得势、得地分别列出季节、同党援助和根地证据。解释前先明确正在说日主、用神还是忌神，并保留本命或行运的具体语境。",
+          "李雨田增补《初学捷径》的看命三法并列得时、得势、得地，明说日主、用神、忌神都要如此观察，还讨论日主与用神、忌神之间的配合；并非只检查日主是否当令。",
+          "该段以生于禄旺之月、当令气盛说明得时；以生于休囚之月而党多援众说明得势；以生于非旺之月而坐下通根、支乘生旺说明得地。三个条件应各自保留，不把失时直接写成无势、无根。",
+          "日主失时不能代替其他对象的状态判断，某一藏干出现也不能自动证明它在相应关系中有效。若计算只返回部分证据，解释应说到实际返回的层次，不补造未裁定的得势、得地结论。",
+          "本段没有给党多、援众或根地有效性制定数值阈值。这些来源条件不等于已经校准的概率或现实结果保证，也不据此倒填未知出生资料。"
+        ],
+        "curation": {
+          "method_id": "dtcw1947_li_frontmatter_source_scope_v1",
+          "entry_revision": 1,
+          "classification": "source_local_editorial_vocabulary_and_table_conditions_not_classifier",
+          "review_status": "single_reader_source_scoped_not_full_classical_acceptance",
+          "source_tip_indices": [
+            1,
+            2
+          ],
+          "implementation_tip_indices": [],
+          "editorial_tip_indices": [
+            0,
+            3,
+            4
+          ],
+          "source_refs": [
+            {
+              "author": "李雨田增补（初学捷径；雨田按）",
+              "title": "初學捷徑·衰旺強弱之別／看命三法／五行衰旺取用法",
+              "container": "任注滴天髓闡微，李雨田校訂，上海大東書局1947年4月初版影印资料",
+              "source_url": "https://commons.wikimedia.org/wiki/File:CADAL07005210_滴天髓闡微.djvu",
+              "catalog_url": "https://cadal.edu.cn/cardpage/bookCardPage?ssno=07005210",
+              "source_kind": "additional_digital_witness_single_reader_not_independent_edition",
+              "source_sha256": "1d0a16f528ed3074cdefad33b2d2f9233a47199cf88a8b02001c897e16996e60",
+              "source_djvu_leaves": [
+                52
+              ],
+              "printed_pages": [
+                "四一"
+              ],
+              "tip_indices": [
+                1,
+                2
+              ],
+              "support_scope": "本节编者层的概念、组合前提和适用限制；不是任氏正文、原韵文、数值常数或现实效度证明。"
+            }
+          ],
+          "source_binding": {
+            "protocol_sha256": "3cd171eef27321afb8af3702efe02ac32b65d003239fdc24b9cfcc5538d13268",
+            "reviewed_binding_sha256": "5dadfdc20f19f5d060beda21b3bdda7ef82a8cecb18b7b0003a487b3469c4eca",
+            "source_supplement_sha256": "8e103a5435c1ba81be4f3a0562337aaa3fd9ed271c05a870620a346e4d025725",
+            "gap_review_sha256": "c296fc6035f25cf7cdaa0d99165e7af2f26ef2f5fd13e377070ba0b53860676d",
+            "source_leaf_images_sha256": {
+              "docs/validation/bazi-source-leaf-alignment-v1/candidate-detail-first/leaf-0052.png": "8566e9f31bcd0cc0b3c578c98355921ca006cca8b714322530bd8f753f5285f2"
+            },
+            "original516_source_not_replaced": true
+          },
+          "numerical_strength_rules_adopted": false,
+          "independent_expert_review": "not_completed",
+          "reality_prediction_efficacy": "not_tested",
+          "original26_disagreement_gate_closed": false,
+          "citation": "FateBridge限域编释及源表编录，非逐字引文；李雨田增补《初学捷径》，收入《任注滴天髓阐微》；CADAL07005210数字扫描叶52；单读者校读，未完成独立专家审定；https://commons.wikimedia.org/wiki/File:CADAL07005210_滴天髓闡微.djvu"
+        }
+      },
+      "五行取用表的适用范围": {
+        "title": "五行取用表的适用范围",
+        "tips": [
+          "《初学捷径》的五行衰旺取用法先列旺、衰和某元素多寡的前提，再区分为上、次之及不足时的候选。以下保留全部五行各六行，标点与繁简作编录整理。",
+          "同节末页明确说以上只就五行正常之理论，其它从、化、变格不在此例；这项范围限制适用于下列全部30行。",
+          "木：木旺者取金为上火次之金少者取土；木衰者取水为上木次之；木衰金多者取火火少者取木；木衰火多者取水水少者取金；木衰水多者取土土少者取火；木衰土多者取木木少者取水。",
+          "火：火旺者取水为上土次之水少者取金；火衰者取木为上火次之；火衰水多者取土土少者取火；火衰土多者取木木少者取水；火衰木多者取金金少者取土；火衰金多者取火火少者取木。",
+          "土：土旺者取木为上金次之木少者取水；土衰者取火为上土次之；土衰木多者取金金少者取土；土衰金多者取火火少者取木；土衰火多者取水水少者取金；土衰水多者取土土少者取火。",
+          "金：金旺者取火为上水次之火少者取木；金衰者取土为上金次之；金衰火多者取水水少者取金；金衰水多者取土土少者取火；金衰土多者取木木少者取水；金衰木多者取金金少者取土。",
+          "水：水旺者取土为上木次之土少者取火；水衰者取金为上水次之；水衰土多者取木木少者取水；水衰木多者取金金少者取土；水衰金多者取火火少者取木；水衰火多者取水水少者取金。",
+          "同页注释把生对应印绶、财对应我克、克对应官杀、泄对应食伤、助对应比劫。这是本节用语说明，解释时仍须保留所论对象及原有组合条件。",
+          "本表没有把旺、衰、多、少量化，不能用表中取用结果倒推这些前提已经成立，也不能只按元素缺少就自动选取用神。",
+          "这是李雨田初学编者层的限域资料。任氏四态关系另见已收录的日元强弱与性情措辞词条；两段不混作同一张表，本条也不把历史运事表转为个人预测保证。"
+        ],
+        "curation": {
+          "method_id": "dtcw1947_li_frontmatter_source_scope_v1",
+          "entry_revision": 1,
+          "classification": "source_local_editorial_vocabulary_and_table_conditions_not_classifier",
+          "review_status": "single_reader_source_scoped_not_full_classical_acceptance",
+          "source_tip_indices": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "implementation_tip_indices": [],
+          "editorial_tip_indices": [
+            0,
+            8,
+            9
+          ],
+          "source_refs": [
+            {
+              "author": "李雨田增补（初学捷径；雨田按）",
+              "title": "初學捷徑·衰旺強弱之別／看命三法／五行衰旺取用法",
+              "container": "任注滴天髓闡微，李雨田校訂，上海大東書局1947年4月初版影印资料",
+              "source_url": "https://commons.wikimedia.org/wiki/File:CADAL07005210_滴天髓闡微.djvu",
+              "catalog_url": "https://cadal.edu.cn/cardpage/bookCardPage?ssno=07005210",
+              "source_kind": "additional_digital_witness_single_reader_not_independent_edition",
+              "source_sha256": "1d0a16f528ed3074cdefad33b2d2f9233a47199cf88a8b02001c897e16996e60",
+              "source_djvu_leaves": [
+                52,
+                53,
+                54,
+                56
+              ],
+              "printed_pages": [
+                "四一",
+                "四二",
+                "四三",
+                "四五"
+              ],
+              "tip_indices": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "support_scope": "本节编者层的概念、组合前提和适用限制；不是任氏正文、原韵文、数值常数或现实效度证明。"
+            }
+          ],
+          "source_binding": {
+            "protocol_sha256": "3cd171eef27321afb8af3702efe02ac32b65d003239fdc24b9cfcc5538d13268",
+            "reviewed_binding_sha256": "5dadfdc20f19f5d060beda21b3bdda7ef82a8cecb18b7b0003a487b3469c4eca",
+            "source_supplement_sha256": "8e103a5435c1ba81be4f3a0562337aaa3fd9ed271c05a870620a346e4d025725",
+            "gap_review_sha256": "c296fc6035f25cf7cdaa0d99165e7af2f26ef2f5fd13e377070ba0b53860676d",
+            "source_leaf_images_sha256": {
+              "docs/validation/bazi-source-leaf-alignment-v1/candidate-detail-first/leaf-0052.png": "8566e9f31bcd0cc0b3c578c98355921ca006cca8b714322530bd8f753f5285f2",
+              "docs/validation/bazi-source-leaf-alignment-v1/candidate-detail-first/leaf-0053.png": "e9cb28e7c5db1b61cdb262ebb38c30cf0ea4c3684517fc0a11e1a7b05dd9ef73",
+              "docs/validation/bazi-source-leaf-alignment-v1/candidate-detail-first/leaf-0054.png": "27de8c9827f0c0ef829ec1b947839711ae99c7341b3bd9c85ec8be02a8c2cdcf",
+              "docs/validation/bazi-source-leaf-alignment-v1/candidate-detail-first/leaf-0056.png": "e23f8200e04e60e42b42a8f581a455d3ea1b232bd9a1b5808d9a9699cc4c12cf"
+            },
+            "original516_source_not_replaced": true
+          },
+          "numerical_strength_rules_adopted": false,
+          "independent_expert_review": "not_completed",
+          "reality_prediction_efficacy": "not_tested",
+          "original26_disagreement_gate_closed": false,
+          "citation": "FateBridge限域编释及源表编录，非逐字引文；李雨田增补《初学捷径》，收入《任注滴天髓阐微》；CADAL07005210数字扫描叶52、53、54、56；单读者校读，未完成独立专家审定；https://commons.wikimedia.org/wiki/File:CADAL07005210_滴天髓闡微.djvu",
+          "separate_Ren_passage": {
+            "existing_key": "日元强弱与性情措辞",
+            "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+            "source_pdf_pages": [
+              177,
+              178
+            ],
+            "source_claim_id": "CENSUS-R539",
+            "source_rows_sha256": "ab91152988059b5cf32f67d20f4f10a93ec6ee951412024db17687b80eff83d9",
+            "no_cross_author_table_merging": true
+          },
+          "source_table_binding": {
+            "rows": [
+              {
+                "id": "CADAL-LI-ELEMENT-木-1",
+                "element": "木",
+                "candidate_leaf": 52,
+                "normalized_source_text": "木旺者取金为上火次之金少者取土",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-木-2",
+                "element": "木",
+                "candidate_leaf": 52,
+                "normalized_source_text": "木衰者取水为上木次之",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-木-3",
+                "element": "木",
+                "candidate_leaf": 52,
+                "normalized_source_text": "木衰金多者取火火少者取木",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-木-4",
+                "element": "木",
+                "candidate_leaf": 52,
+                "normalized_source_text": "木衰火多者取水水少者取金",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-木-5",
+                "element": "木",
+                "candidate_leaf": 53,
+                "normalized_source_text": "木衰水多者取土土少者取火",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-木-6",
+                "element": "木",
+                "candidate_leaf": 53,
+                "normalized_source_text": "木衰土多者取木木少者取水",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-火-1",
+                "element": "火",
+                "candidate_leaf": 53,
+                "normalized_source_text": "火旺者取水为上土次之水少者取金",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-火-2",
+                "element": "火",
+                "candidate_leaf": 53,
+                "normalized_source_text": "火衰者取木为上火次之",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-火-3",
+                "element": "火",
+                "candidate_leaf": 53,
+                "normalized_source_text": "火衰水多者取土土少者取火",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-火-4",
+                "element": "火",
+                "candidate_leaf": 53,
+                "normalized_source_text": "火衰土多者取木木少者取水",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-火-5",
+                "element": "火",
+                "candidate_leaf": 53,
+                "normalized_source_text": "火衰木多者取金金少者取土",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-火-6",
+                "element": "火",
+                "candidate_leaf": 53,
+                "normalized_source_text": "火衰金多者取火火少者取木",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-土-1",
+                "element": "土",
+                "candidate_leaf": 53,
+                "normalized_source_text": "土旺者取木为上金次之木少者取水",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-土-2",
+                "element": "土",
+                "candidate_leaf": 53,
+                "normalized_source_text": "土衰者取火为上土次之",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-土-3",
+                "element": "土",
+                "candidate_leaf": 53,
+                "normalized_source_text": "土衰木多者取金金少者取土",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-土-4",
+                "element": "土",
+                "candidate_leaf": 53,
+                "normalized_source_text": "土衰金多者取火火少者取木",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-土-5",
+                "element": "土",
+                "candidate_leaf": 53,
+                "normalized_source_text": "土衰火多者取水水少者取金",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-土-6",
+                "element": "土",
+                "candidate_leaf": 53,
+                "normalized_source_text": "土衰水多者取土土少者取火",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-金-1",
+                "element": "金",
+                "candidate_leaf": 53,
+                "normalized_source_text": "金旺者取火为上水次之火少者取木",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-金-2",
+                "element": "金",
+                "candidate_leaf": 53,
+                "normalized_source_text": "金衰者取土为上金次之",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-金-3",
+                "element": "金",
+                "candidate_leaf": 53,
+                "normalized_source_text": "金衰火多者取水水少者取金",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-金-4",
+                "element": "金",
+                "candidate_leaf": 54,
+                "normalized_source_text": "金衰水多者取土土少者取火",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-金-5",
+                "element": "金",
+                "candidate_leaf": 54,
+                "normalized_source_text": "金衰土多者取木木少者取水",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-金-6",
+                "element": "金",
+                "candidate_leaf": 54,
+                "normalized_source_text": "金衰木多者取金金少者取土",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-水-1",
+                "element": "水",
+                "candidate_leaf": 54,
+                "normalized_source_text": "水旺者取土为上木次之土少者取火",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-水-2",
+                "element": "水",
+                "candidate_leaf": 54,
+                "normalized_source_text": "水衰者取金为上水次之",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-水-3",
+                "element": "水",
+                "candidate_leaf": 54,
+                "normalized_source_text": "水衰土多者取木木少者取水",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-水-4",
+                "element": "水",
+                "candidate_leaf": 54,
+                "normalized_source_text": "水衰木多者取金金少者取土",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-水-5",
+                "element": "水",
+                "candidate_leaf": 54,
+                "normalized_source_text": "水衰金多者取火火少者取木",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              },
+              {
+                "id": "CADAL-LI-ELEMENT-水-6",
+                "element": "水",
+                "candidate_leaf": 54,
+                "normalized_source_text": "水衰火多者取水水少者取金",
+                "source_text_layer": "Li_introductory_supplement",
+                "judgment_context": "editorial_rule_not_natal_case",
+                "literal_pillars": null,
+                "expected_daymaster_strength": null,
+                "implemented_or_evaluated": false,
+                "numeric_thresholds_not_defined": true,
+                "limited_by_candidate_leaf56": true
+              }
+            ],
+            "rendered_tip_indices": [
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "exclusion_tip_index": 1,
+            "applies_to_all_rows": [
+              "五行正常之理"
+            ],
+            "excluded_contexts": [
+              "从",
+              "化",
+              "变格"
+            ],
+            "numeric_thresholds_defined": false,
+            "individual_outcome_rules_adopted": false
+          }
+        }
+      }
+    }
+  }
+}

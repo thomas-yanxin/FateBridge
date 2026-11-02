@@ -69,7 +69,11 @@ The calculation service runs locally and requires no LLM API key. Natural-langua
 | Western astrology | Natal and tradition-specific charts, relationship charts, returns, transits, primary directions, and time-lord techniques | Explore personal configurations, relationship dynamics, and changes over time through astrology |
 | Feng Shui | Eight Mansions, basic Jin Suo sand/water, annual stars, historical Xuan Kong natal charts, layered layout and object review | Review homes, workstations, and layout options against actual spatial facts and the selected authors' rules |
 
-Current source exposes **86 business REST routes** and **87 FastMCP tools** across **13 families / 87 tools**. The central catalog contains 88 records; the CLI can execute 87. Names and exposed surfaces differ: see [interface boundaries](docs/api-reference.md#24-三端能力边界) and the per-tool [algorithm coverage matrix](docs/algorithm-coverage.md).
+Current source exposes **91 business REST routes** and **92 FastMCP tools** across **13 families / 92 tools**. The central catalog contains 93 records; the CLI can execute 92. Names and exposed surfaces differ: see [interface boundaries](docs/api-reference.md#24-三端能力边界) and the per-tool [algorithm coverage matrix](docs/algorithm-coverage.md).
+
+[Human Design](docs/human-design.md) adds the 88-degree Design epoch, gate subdivisions, channels, Type and Authority, with explicit source discrepancies and separate validation axes.
+
+Indian astrology includes Lahiri nine-graha charts, nakshatra/pada, D1/D9/D10, separate rulership/dignity/aspect rules, and Moon-based Vimshottari major/subperiods. See [scope, runnable examples and verification](docs/jyotish.md).
 
 ## Technology and prerequisites
 
@@ -285,6 +289,8 @@ A successful actual tool call completes client setup. A saved configuration or p
 
 All tools are exposed by default. To narrow the tool scope, set `FATEBRIDGE_MCP_SCENARIOS=onda-shiye` for career consultations, or `FATEBRIDGE_MCP_FAMILIES=fengshui` for the Feng Shui family. Filters intersect; empty values impose no restriction. Restart MCP after changes. Run `fatebridge scenarios` to list scenarios.
 
+The topic switch is part of the current source changes; use the source environment before its release. For a host without deferred tool loading, combine a scenario with `FATEBRIDGE_MCP_TOOL_SCOPE=topic` to expose its direct tools and knowledge support. `complete` (the default) also exposes conditional dependencies. Topic mode reports unavailable branches in scenario `availability`; switch to complete when those methods are needed. Validate with `uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye --tool-scope topic`. Hosts with tool search can keep complete and load definitions on demand; the OpenAI recommendation for a small initial tool set is not a server-wide tool-count limit.
+
 ### HTTP MCP
 
 URL-capable clients can connect to the same `app` through the FastMCP runner. **This example uses the source installation.** Run from the repository root and keep the process running:
@@ -300,7 +306,7 @@ A remote machine can keep its loopback binding and accept connections through an
 
 ### Onda consultation skills
 
-MCP supplies calculation tools; Onda supplies consultation workflows. When you use the source repository as a Codex project, `AGENTS.md` and `.agents/skills/` provide project guidance and skill entry points. Confirm discovery in a new chat. Other clients must load `skills/` through their own skill mechanisms; MCP does not transfer these files. See the [Onda skill index](skills/README.md).
+MCP supplies calculation tools; Onda supplies consultation workflows. When you use the source repository as a Codex project, `AGENTS.md` and `.agents/skills/` provide project guidance and skill entry points. Confirm discovery in a new chat. Other clients must load `skills/` through their own skill mechanisms; MCP does not transfer these files. See the [Onda skill index](skills/README.md). The [plugin build guide](docs/onda-plugin.md) packages shared references, the current backend source, locked runtime requirements, and source hashes. The first launch downloads dependencies for the target platform; host installation remains a separate check.
 
 ModelScope entries: [FateBridge MCP Server](https://www.modelscope.cn/mcp/servers/thomas/FateBridge) · [Onda Skills collection](https://www.modelscope.cn/collections/thomas/Onda-Skills). Follow those pages for platform-specific setup, or this README for local installation and configuration.
 
@@ -355,6 +361,7 @@ cp -n .env.example .env
 | `API_KEY_HEADER_NAME` | `X-API-Key` | REST key header; send only `secret`, without `client:` |
 | `ALLOWED_ORIGINS` | `http://localhost:3000` | Comma-separated browser CORS origins |
 | `FATEBRIDGE_MCP_FAMILIES` / `FATEBRIDGE_MCP_SCENARIOS` | Empty; no filtering | MCP family / scenario intersection; does not change REST / CLI |
+| `FATEBRIDGE_MCP_TOOL_SCOPE` | `complete` | `topic` requires a scenario; exposes direct topic tools and knowledge support, marking conditional gaps |
 | `SE_EPHE_PATH` | Unset; tries local `ephe/` | Custom ephemeris directory; not included in `.env.example` |
 | `FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY` | `min(4, max(1, CPU count))` | Heavy-calculation concurrency per REST process, at least 1; not a request rate limit |
 | `LOG_LEVEL` | `INFO` | Logging level |
@@ -374,6 +381,7 @@ By default, this downloads three `.se1` files into the repository's `ephe/` dire
 ### Inputs, results, and precision
 
 - **Inputs**: Birth interfaces use Gregorian dates. Supply hours, timezone, and location according to each tool's schema; do not replace an unknown birth time with midnight. Chinese birth calculations default to true solar time; core Western charts default to civil time. Retain resolution and precision warnings.
+- **Places**: The pinned offline catalog covers 397 mainland county-level cities and 333 prefecture-level units, plus counties/districts, Taiwan administrative units and 6,333 overseas cities across five continents. Province/city and country/state qualifiers disambiguate namesakes. Coordinates are representative points; supply actual birth coordinates for precise locations. See [sources, coordinate conversion and known gaps](docs/place-catalog.md).
 - **Results**: Check MCP `isError`, REST status codes, or CLI exit codes before reading business data. `fields` accepts dotted paths; `strict_fields=true` rejects invalid paths. REST projection options belong in query parameters, not the JSON body.
 - **Complete exports**: Set `fields=null` on the first call for complete JSON. MCP's default budget is 8192 characters; follow `result_delivery` to read the same run. Fields omitted by the initial projection cannot be recovered later. See [same-run exports](docs/agent-guide.md#完整结果交付与同次导出).
 - **Precision and reproduction**: Keep original inputs and `run_metadata`. External `.se1` ephemeris files are not bundled in the wheel. Inspect `chart_profile.ephemeris_model` and `run_metadata.engine_is_approximate`; an importable dependency alone does not establish that data files were loaded. Reproduction also requires matching implementation, data, and environment; see [ephemeris guidance](docs/getting-started.md#星历数据与精度).

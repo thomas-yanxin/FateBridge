@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "catalogue_id": "human_design_line_knowledge_v3",
+  "version": 3,
+  "parent_version": 2,
+  "parent_manifest_sha256": "c33d3b6099e96b66c0e2dbe898dc97e5a5a8ab125a1c64596863c63f31440d79",
+  "supplements": [
+    {
+      "file": "line-knowledge-gate3-v1.json",
+      "sha256": "5881993645965530313ef8455bfb95b2774cb9f4d440b2bb826727aefab2b9ba",
+      "keys": [
+        "3.1",
+        "3.2",
+        "3.3",
+        "3.4",
+        "3.5",
+        "3.6"
+      ]
+    }
+  ],
+  "required_line_count": 384,
+  "expected_local_paraphrase_count": 18,
+  "independently_accepted_line_count": 0,
+  "publisher_master_authenticated": false,
+  "complete384_line_meanings_accepted": false,
+  "publisher_sample_sha256": "bbdb7bfa006bd0e8245c419bd607ee7b0c6919ec00c25faaecc15290cd1f0568",
+  "corroborated_headings_only": [
+    "Synthesis",
+    "Immaturity",
+    "Survival",
+    "Charisma",
+    "Victimization",
+    "Surrender"
+  ]
+}

@@ -1,0 +1,1046 @@
+{
+  "call_guidance": {
+    "calendar_precision": "读取meihua.calendar_policy.label_precision：官方列出2057-09-28、2089-09-04、2097-08-07朔日可能相差一日。matched_events是明示软件复核窗口，不是官方物理置信区间；保留已公布标签，不猜偏移方向、概率或替代卦。历表月日如修订须复算；未列事件不等于全时区或天文精度认证。不能删除这些日期使验收满分。",
+    "casting": "只支持年月日時取数；输入公历钟时，按指定时区查中国农历。不得把八字立春年柱代替农历年支。",
+    "civil_clock": "analysis_utc_offset可与analysis_timezone联合核对，格式±HH:MM或±HH:MM:SS；保留命名地区时区，不换成固定偏移。未给偏移仍拒绝重复钟时，不存在的钟时、整日跳过和错误偏移不能救回。读analysis_context.civil_utc_offset/civil_instant_utc及meihua.calendar_policy.civil_clock_resolution，核对fold、UTC和实际pytz/IANA版本。纽约两次01:30可相差3600秒，LordHowe可相差1800秒，所选上海1900年末记录可相差343秒，不能一律按一小时；当地日期时支相同也可得到同卦，不强造差异或多算独立占验。交节比较必须沿用实际UTC，不能去掉时区再绑定fold0。历史偏移秒数仅按所选tzdb记录，未验证现场钟表或秒级天文精度；未来规则不保证未来立法。UTC普通钟时规范fold0。现代消歧软件约定不是原典唯一时制，也不是预测通过。",
+    "conventions": "春节换年、民用午夜换日、闰月沿用本月数、节月季令是明示约定；不是原文唯一裁定。",
+    "current_weather_study": "1.7.0实际范围检验另读weather.research_validation.current_profile_study。固定2026年1—9月主队列273日，明示起卦节月季节时49个无雨标签、29正确、224弃权；全队列正确贡献29，对比恒无雨158，未通过。2024/2025和季节未知敏感性情形分别保留，不能挑较好比例拼接或代替主队列；2008份情形记录对应1004个目标日期，不是2008独立观测。源时段配次日及未定晴象转无雨是研究假设，朝晴不等于全天无雨；午时队列未命中明确朝暮，不能验证朝暮预测。是公开资料下的追加回顾，前瞻观测与实际模型仍0，不能据工程执行成功或来源符合宣称现实预测通过。",
+    "day_qi": "Read interpretation.day_qi for selected NLC1925 day-branch element and month/day strength. Keep each counting candidate own original body; no unique day trigram, inferred missing branch, five-state weights, month/day cancellation or year-month-day net verdict. At23h time entry follows declared Meihua midnight convention and retains zi-start alternative rather than borrowing Bazi day; not event timing, validated outcome or a retrospective study exclusion.",
+    "external_manifestations": "external_observations只接收已报manifestation类别及label描述，未知不猜，不按问题文字或未查看场景自动分类。仅用于general/planning/reputation/wealth/transaction/travel/meeting/lost_property。读interpretation.external_omens：raw_relation_to_body是符号关系，qualification才是文明书局卷三所选实物／形色条款资格；炉火、烛火、红紫色，锐器、饰物器皿，土、瓦器，柴薪、未伐树不可互套。未覆盖配对保持not_addressed_in_selected_pairs，不由五行归属补作用。不把真生真克术语当实测物理、临床或灾祸判断，不转成概率、数值强度或日期。每个取数候选使用自身原体，来源及两处用字差异随配置保留；不将外应与内卦投票或抵消成结局。没有资料时null仍表示未采集，非确认没有外应；12条上限仅软件保护。",
+    "household_chapters": "显式household为家宅章、dwelling为屋舍章，均读topic/topic_audit已发布父字段。以本候选原体为主、初用为家宅或屋舍；不是风水空间评估、房屋检查或选房迁居许可。家宅影印比利与固定转录比和未裁定，source_relation_condition=null，五行相同不能自动套家宅安稳；屋舍體生用保留冷退/转录衰退，不改原字。家宅生体转引人事章按所列四内卦实际生体角色留路径；未见仅限该范围，不当完整内外无生。full_source_generation_condition和完整跨章净结论保持null；原体、互变、受制及旺衰分别保留，不输出住宅安全、实际失盗、资产结果、日期或概率。",
+    "internal_control": "人事分支读取interpretation.internal_countercontrol：原体加初用、体互、用互、变用共五个分析角色，不是五次独立观测。用生体之卦受其他卦克则生助受限，用克体之卦受制仅取稍解其凶；原关系保留。control_edges给直接制约及制约者自身所受克，qualifications保留其对原体的关系；离火制兑金也可能同时泄木体，不能递归抵消、计票、加权、合成成败。季令弱或未知不自动关掉制约。每个计数候选自带本卦事实路径；weather分支为null。新internal_control字段卡可核对完整证据；所选影印字句目读不是独立专家、全书或现实预测认证。",
+    "limits": "季令只列所选规则的旺衰，不据此生造现实概率、外应或精确应期；现实效力未验证。",
+    "motion_context": "observer_activity只接已确认占者当时seated坐/walking行/standing立，未知不补；external_observations逐条motion可为moving/stationary，未知省略，不从水土类别、label、问句、车辆运动或内卦角色推断。读interpretation.motion_context或motion字段卡。内卦体互静、用变动是符号角色；与外物运动、占者活动分列，各候选保留自身原体及外应资格路径。占者坐行立只保留所选原文迟/速/半迟半速，无天数日期。外应动而吉/凶句缺综合吉凶判断，omen_valence仍null；matter_scenario为问事情境，不能充当已判吉应或凶应，勿向调用者索取所希望预测的吉凶来补足前提。静止句按影印未见保留，旧转录末见另列；不据静止取消已有起卦或断不发生。不动不占及心境之静未自动裁定。三项不投票或综合成现实结局，weather不接此人事层。 端法名义应期数见motion_context.postheaven_count_reference：仅observed_trigrams/observed_categories且占者observer_activity明确时，原上下卦先天序数加原时支数一次，以除六前总数按行1/2、坐2、立1作精确比例。奇数取半保留分数，不取动爻余数，不推定主体活动、时间单位、起算时刻、天数、日期或现实观测窗口。已有卦的起法未知，数起卦和年月日时起卦不借用此式。影印二花皆朝夕与转录二日花皆朝夕、待/特及坐句於字差异保留；二日花不能生成通用两日期限。变通规则未自动裁定，完整先天卦气应期与远期合参未实现；天气旧研究、分母、失败和原365日试验不变。",
+    "obstruction_days": "interpretation.stage_emphasis.obstruction_timing按本候选原体列克体阻节日数。须调用方明确matter_scenario=favorable_matter且实际内卦同时有生体、克体才激活；乾1兑2为原句明例，其余六卦为类推。重复角色不累加，多卦日数不选总和/最大/最小；未给起算日及计日边界，不生成完成日期，不把日数当成功概率。",
+    "omen_reversal": "Explicitly reported external_observations manifestation gold_silver_treasure/weapon uses NLC1925內外論 original-body symbol qualifications. Never infer treasure from generic metal or weapon from every sharp tool, labels, settings or desired valence. Read external_symbol card and external_omens.body_relative_symbols. Gold/silver with震/巽body is反為不吉; weapon with坎body is反為不凶, never upgraded to吉or physical safety. Other bodies keep qualified symbol null, not the common omen as current outcome. Each count candidate keeps its own actual original body. Preserve old material qualifications; no net synthesis, vote, probability, event time or changed study eligibility.",
+    "postheaven_timing": "端法名义应期数见motion_context.postheaven_count_reference：仅observed_trigrams/observed_categories且占者observer_activity明确时，原上下卦先天序数加原时支数一次，以除六前总数按行1/2、坐2、立1作精确比例。奇数取半保留分数，不取动爻余数，不推定主体活动、时间单位、起算时刻、天数、日期或现实观测窗口。已有卦的起法未知，数起卦和年月日时起卦不借用此式。影印二花皆朝夕与转录二日花皆朝夕、待/特及坐句於字差异保留；二日花不能生成通用两日期限。变通规则未自动裁定，完整先天卦气应期与远期合参未实现；天气旧研究、分母、失败和原365日试验不变。",
+    "qi_branch_timing": "求名/求财的topic_reading.qi_branch_timing_reference按原章句实际生体/克体角色分列年、月、日、时的明列支标签；各取数候选读自身topic_clause同名子层。年/时只用原seed，年支不以立春年或子初翌日重算。节月支与名义农历月序对应支分列，后者只是固定月序映射，闰月及完整时序含义未唯一裁定；23时日界备选不改原年支。坤辰戌丑未只另属月，未申见于四单位，月的明列支为辰戌丑未申，其他单位为未申。未知标签不补，分歧不挑相符者、不合并计票；数字、五金、土、季节与完整应期另待核，不推天干谓词，不生成最近日期、现实窗口或成败。topic/topic_audit已带原seed、历法口径、季令、日气及候选；原单独日支层仍保留。",
+    "qi_day_timing": "求名/求财且day_qi已知时，topic_reading.qi_day_timing_reference按原章句实际生体/克体角色核时序明列日支，求名另保留无克体条件未全核时的原体参照；不得用原体或变用替代指定角色。坤辰戌丑未月是月限定，日支原子只取未申年月日時中的未/申；这是明列标签相符，不是五行旺衰或全时序条件。其他数字、季节、五行干支条文未解析，原子不符不等于全条件否定；在任及完整内外无克体前提另列。每个取数候选使用自己的角色与日气，23时保留午夜和子初两个输入日界标签，不挑相符者充作预测。topic/topic_audit同时包含day_qi；不搜索最近日期，不生成实际应期、收支、名成、处分或现实窗口；原天气研究失败与未来365日试验不变。",
+    "quiet_context": "observation_context只接同次起卦与占者已报label及quiet_room/nothing_heard/nothing_seen三项严格布尔，未知省略或null；未采集不等于确认无所闻见。读quiet字段卡。全真仅核对所选文明书局《静占》的不论外卦条件，不代表完整年月日衰旺合参、心境、起占资格或现实预测有效。静室不推占者坐/行/立；问题文字和本卦动爻不补闻见事实。明确声音法与无所闻冲突，观物法与完整静室无所闻见组合冲突；全真也不能同时附外应记录，不按未实现类别判无外应。不改旧研究标签、有效样本或分母。",
+    "reading": "用、体互、用互、变用均相对原体分析；经文按实际卦码与动爻引用。is_active=false为其他爻单动的假设参考。",
+    "reputation_supplement": "reputation另读chapter_qualifications的5条补充句、八卦時序及方道原文；reputation_context只接收已确认的原文在任与職任之處条件，不从已就业、考试、问句或label推定。未知省略/null，布尔须明确。初始五条不变，各候选沿用自身原体及四个辅助角色，生体和克体分别列自身时序、受制与旺衰；内卦无克体不等于已确认完整内外无克体。在任条件满足也不输出处分、灾祸或现实结局。所选方道为变用经卦的明示读法，未唯一裁定；巽方道東与同本地理及转录東南并列，震時序春二月与转录春三月、乾五金与转录一四九等异文保留，年月日時及数字未换算日期、天数、任所或概率。",
+    "situational_responses": "Only when caller reports response_context for the same casting episode, use situational field card. Map querent occupied compass side, present weather, setting and human source categories against each candidate own original body. Unknown omit, never infer from seed/question/address. Keep multiple named trigrams; laughter/weeping are source symbols without a trigram. NLC體見雷 subject unresolved, fixed transcription火見雷 kept separately; neither overrides five-element calculation. No net ten-response synthesis, real outcome, probability or event time. Weather topic rejects this human-matter layer. Rain and snow both map to坎. Only rain is explicitly preferred by坎體宜雨: snow has no exact preference claim, and rain_or_snow keeps the rain predicate pending. matches_actual_body alone is not the whole clause; read clause_applies_to_reported_conditions.",
+    "solar_date_reference": "读取meihua.calendar_policy.solar_term_date_reference：四条selected_record_paths分别指当前／下一节气和月令起终锚点；按固定UTC+08比较官方日标签，保留实际时刻、模型、source和fact_path。date_disagreement_count按同年同名事件去重，不能把重复记录当独立验证；publisher_named_event_count是固定说明点名，日期相同不认证精度。偏移天数不是时刻误差区间，不据年表日期改月令、农历或卦象。same_reference_event_has_multiple_instants为true须说明本次时刻依据冲突，不选一项冒充已算对；unknown／outside仅限制对照层。weather分支仍只用已确认weather_context，不从日标签推晴雨。",
+    "stage_emphasis": "读取interpretation.stage_emphasis或stage_emphasis字段卡。matter_scenario只接调用方已确认的原文所问事项类别：favorable_matter问吉事、unfavorable_matter问不吉之事，不是愿望、情绪、系统预测或已发生结果；未知不补，不由题篇、关键词或关系推断，天气拒绝此参数。scenario_declaration保留原值、caller_declared_unverified及原输入路径。未给时scenario_condition_met保持null；已确定缺少必要卦内结构时full_clause_applies为false，结构满足但情境未给时才为null，不由不适用反推情境。已给时scenario_condition_met匹配原文前提，full_clause_applies仅核对所选条件，不是净作用或现实结果。用互变紧次及体互先于用互不换成权重。吉事情境的生体用／互／变迟速句分别核对；互字范围未裁定时整句仍null，不能因情境已给就默认唯一互范围。生克并见另读阻节句；scenario_clauses区分吉事无生且有克、不吉事有生及无生的原句。原文有救无害和事必不吉均非现实、临床或灾祸保证。已有体气、生助受制、每支候选关系与路径保留，不择有利句、最早最迟或投票成结局。event_time／real_outcome／net_effect_weight仍null。",
+    "strength_reading": "人事分支的interpretation.seasonal_qualification按文明书局卷二衰旺论分列三条联合条件：体旺逢生、体衰逢克、体衰有生。preferences分列体宜旺、生体宜旺、克体宜衰，不要求体和生体之卦同时旺，不累加成分数或必要门槛。原文未定及缺节月保持pending_strength/unknown_strength，不写中性或衰。体衰受克与有生可同时matched，加重与稍解并存；countercontrol_qualifications还保留生助受制或克体被制，未综合成最终好坏。roles的strength_fact_path连回本次实际旺衰，候选连到自己的casting_readings季令字段，不能借主候选。strength卡核对本卦，strength_audit含候选及直接制约。重遇克的重无既定阈值，不补次数；未作月日合参、全书优先级或现实效力验收，weather分支为null。另读volume3_qualification：按所选卷三逐角色核对体旺受克的限定、体衰、体旺有生及用互变乘旺句；克体且旺属于明示例外，不能引用乘旺皆吉。matched_selected_month_conditions只核所选节月标签及原始关系，不是受制后的净作用；auxiliary_checks保留实际受制资格。两段内外生体、无生体与党多句仍not_adjudicated，未评估外应不等于外无生体。原卷二文字保留在volume2_summary，seasonal_qualification.summary已将两卷所选条件带来源标签并列，并进入主结果及各候选摘要，不替换原文或裁定两卷优先级，不作现实安全、诉讼、临床、生死或日期保证。favorable_clause_applies与attacker_wang_exception_applies分别给合取结果：克体已知时前者恒false，即使旺衰未知；后者在旺衰未知时仍null，status的pending_strength不表示吉句可适用。",
+    "topic_chapters": "显式选planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling并使用topic字段卡。原四章20条与新增出行/谒见10条分别保留规则集；travel另列原体旺气及各辅助生体偏好，多字阈值及舟陆等句的角色范围未裁定，不补方位或出行指令。依据文明书局本卷二四章的初始五种体用关系，保留固定转录1441921异文；交易体克用在所选本作交易成迟，转录作有财，不能混用或按所求结果选版本。每个取数候选匹配自身原体/用，互变与旺衰另列，不把初始条款自动套到四阶段，不换算应期或收益概率。原四章仍为初始20条，非全章、独立模型或现实预测认证。 lost_property另用失物章独立5条初始关系及8条方位类象，方位明确采用变用经卦读法（未唯一裁定），核对每个候选实际changed_use与动爻路径。体用比和原文物不失不得否认已报遗失或断定已寻回。舟車/舟居、倉廩/倉稟等异文保留；没有现场参照原点、实际位置、搜寻许可、寻获日或概率。 reputation另读chapter_qualifications的5条补充句、八卦時序及方道原文；reputation_context只接收已确认的原文在任与職任之處条件，不从已就业、考试、问句或label推定。未知省略/null，布尔须明确。初始五条不变，各候选沿用自身原体及四个辅助角色，生体和克体分别列自身时序、受制与旺衰；内卦无克体不等于已确认完整内外无克体。在任条件满足也不输出处分、灾祸或现实结局。所选方道为变用经卦的明示读法，未唯一裁定；巽方道東与同本地理及转录東南并列，震時序春二月与转录春三月、乾五金与转录一四九等异文保留，年月日時及数字未换算日期、天数、任所或概率。 traveler按行人章初始五条及补充六句，返归仍以原体为参照，在外另以初用为受作用者。chapter_qualifications.initial_use_frame逐列原体、体互、用互、变用对初用的实际有向关系；体生用可为初用受生，用生体不能改写成用受生。初用月令衰且实际受克须同成立，原文未定与缺月令保持未知，内卦未见不证明完整内外没有。震多艮多门槛与范围未裁定；坎兑句只标明初用经卦读法。保留影印盈旺/转录在外之情況、紛爭之應/紛爭差异。各取数候选使用自己的原体、初用、旺衰及事实路径，不合并为吉凶、归期、行踪、安全或现实结局。 求名/求财且day_qi已知时，topic_reading.qi_day_timing_reference按原章句实际生体/克体角色核时序明列日支，求名另保留无克体条件未全核时的原体参照；不得用原体或变用替代指定角色。坤辰戌丑未月是月限定，日支原子只取未申年月日時中的未/申；这是明列标签相符，不是五行旺衰或全时序条件。其他数字、季节、五行干支条文未解析，原子不符不等于全条件否定；在任及完整内外无克体前提另列。每个取数候选使用自己的角色与日气，23时保留午夜和子初两个输入日界标签，不挑相符者充作预测。topic/topic_audit同时包含day_qi；不搜索最近日期，不生成实际应期、收支、名成、处分或现实窗口；原天气研究失败与未来365日试验不变。 求名/求财的topic_reading.qi_branch_timing_reference按原章句实际生体/克体角色分列年、月、日、时的明列支标签；各取数候选读自身topic_clause同名子层。年/时只用原seed，年支不以立春年或子初翌日重算。节月支与名义农历月序对应支分列，后者只是固定月序映射，闰月及完整时序含义未唯一裁定；23时日界备选不改原年支。坤辰戌丑未只另属月，未申见于四单位，月的明列支为辰戌丑未申，其他单位为未申。未知标签不补，分歧不挑相符者、不合并计票；数字、五金、土、季节与完整应期另待核，不推天干谓词，不生成最近日期、现实窗口或成败。topic/topic_audit已带原seed、历法口径、季令、日气及候选；原单独日支层仍保留。 人事题篇每个casting_readings的traditional_judgement须沿用自身topic_clause的题篇、引句和限定，再保留各自受制/旺衰/求财补充及后续附层；一般阶段解释另列traditional_stage_readings，不把它代作题篇初始摘要。",
+    "traveler_frame": "traveler按行人章初始五条及补充六句，返归仍以原体为参照，在外另以初用为受作用者。chapter_qualifications.initial_use_frame逐列原体、体互、用互、变用对初用的实际有向关系；体生用可为初用受生，用生体不能改写成用受生。初用月令衰且实际受克须同成立，原文未定与缺月令保持未知，内卦未见不证明完整内外没有。震多艮多门槛与范围未裁定；坎兑句只标明初用经卦读法。保留影印盈旺/转录在外之情況、紛爭之應/紛爭差异。各取数候选使用自己的原体、初用、旺衰及事实路径，不合并为吉凶、归期、行踪、安全或现实结局。",
+    "trigram_relation_symbols": "按trigram_symbols字段卡核对所选16条史料象义：仅实际用生体或用克体的角色匹配对应卦名，不能以同五行替代卦名。所有或字为备选，不自动识别姓名、性别、身份、实际方位或事件；受制与未知旺衰保留，各取爻候选用自己的原体。所选巽克体作南方，固定转录作东南，不据八卦常识换字；不是现实灾祸、临床、应期或预测效力判断。",
+    "wealth_supplement": "interpretation_topic=wealth时另读interpretation.wealth_components：文明书局卷二求財占补充句逐项核对初用、体互、用互、变用对同一原体的体克用／用生体与用克体／体生用。每个取数候选沿用自身路径、体气及直接制约，不能借主候选。source_groups给原句和关系成分；all_named_components_present仅为所列成分全有的事实，不是及的组合含义已裁定或有财／破财整句适用。两侧成分可并存，不计票、不抵消、不覆盖初始条款。timing_reference只是源文，event_time／real_financial_change／success_probability均未计算；不据此作投资、收入保证或具体日期。",
+    "weather": "天时占显式选interpretation_topic=weather并复制weather字段卡到fields。按selected_readings的effective_status/controlled_tags/conditional_tags解释，不能只读raw status=matched。controls保留阈值和五/六位置及合计/单卦范围分歧，不投票。旧1.0.0研究组合128/209未胜过同日始终无雨134/209；不冒称当前组件已做现实预测验收。",
+    "weather_dayparts": "1.7.0离在艮上暮雨朝晴仅匹配同一本/互/变重卦上离下艮；两项原文时段保留time_scope=morning/evening，不能当成同窗自相矛盾。读取time_scope_comparison：未定时段不等于全天，与朝暮的关系仍待核定；不自动交集、排序或合为唯一预报。朝暮不补日期、钟时或日出日落，已知analysis_datetime也不自动定位应验日。离互艮宫仍未裁定。每个取爻候选都有自己的时段比较；旧1.5.0现实检验及1.6.0语义准备不能认证本轮。",
+    "weather_prior_context": "prior_condition可用neither_prolonged表达久雨与久晴两个前期条件均已确认不成立；null或省略仍未知，不为消除pending_context而填neither。它只使四项前期条件条款not_met，不补季节、多字阈值或唯一预报。一天无雨不证明久晴，缺测或间歇天气也不自动证明两者均不成立；公开月度回顾资料不证明起卦当时已可得。旧1.7.0负面现实检验保持不变，新增事实状态不是预测提升或原文久字阈值已裁定的证明。",
+    "weather_reference_baselines": "weather.research_validation.reference_baseline_supplement单列现代参考方法，不是梅花预测或卦象概率。起卦前一日中午不能使用尚未结束的当日总雨量，持续性改用最近完整民用日即目标日前2日；月度基线固定1991—2020，10958日并与官方12个月常年雨日数按公布精度核对相符。全273日条件性历史参考持续性183、月度190，旧梅花正确贡献29；同49日参考各31、旧标签29。发布时间未证，两个参考当时可用的历史天数均0，operational_superiority_gate=null；不能把这些数当成实盘基线已验证，不能选较好年份或情形代替主检验。原29对恒无雨158未通过的主终点、旧版本结果与未来账本保持。",
+    "weather_research": "research_validation的旧1.0.0/2025结果与additional_profile_audits的1.5.0/2024结果分别读取，不能跨政策和年份合并。后者16/29、337弃权，与同日恒无雨16/29相同；主终点按全366日正确贡献16计，对比恒无雨214，未通过。全队列正确贡献不是命中率；实际前瞻观测仍0。",
+    "weather_seasonal": "1.6.0新增秋金晴、冬坎雪、春土雨按固定卷二转录1441921；乾兑或坤艮任一见于实际本互变即可，不要求两者同现或多字阈值。仅用已确认weather_context.season，未知不从公历月份猜。所选文明书局冬句未见坎之水，春句坤兌与转录坤艮不同；逐条保留textual_status/source_witnesses，不默改底本，也不将土雨象随坎雨一并取消。旧现实检验不认证1.6.0。",
+    "weather_text": "selected_readings.source_witnesses保留影印选段与所引固定转录的文字差异。四时多雨不改成保证有雨；未辨清的字形或主语不凭熟悉文本补齐。震多春夏须核实际季节，巽多四时与兑多亦阴均须明示阈值和五/六位置资格；兑阴不是无雨标签。目读由助手完成，非独立专家或全章认证。"
+  },
+  "evidence_views": {
+    "audit": {
+      "fields": [
+        "analysis_context",
+        "calendar_context.lunar_calendar",
+        "meihua.ruleset",
+        "meihua.calendar_policy",
+        "meihua.rule_trace",
+        "meihua.stage_relations",
+        "meihua.seasonal_strength",
+        "meihua.evidence_scope",
+        "interpretation.topic_reading",
+        "interpretation.classical_text_reference",
+        "interpretation.traditional_stage_readings",
+        "interpretation.evidence_scope",
+        "interpretation.internal_countercontrol",
+        "interpretation.seasonal_qualification",
+        "interpretation.wealth_components",
+        "interpretation.external_omens",
+        "interpretation.trigram_relation_symbols"
+      ],
+      "purpose": "核对原文修订、历法约定与实际取数过程；不另起卦"
+    },
+    "chapter_qualitative_motion": {
+      "fields": [
+        "meihua.body_trigram",
+        "meihua.use_trigram",
+        "interpretation.topic_reading.chapter_qualifications.qualitative_motion",
+        "summary"
+      ],
+      "scope": "Requires interpretation_topic=travel or traveler. A declared NLC1925 grammatical reading selects the candidate's initial body for travel and initial use for traveler. Preserve 多 as an unquantified qualifier; distinguish it from inner-role motion and field observations. Existing occurrence-count readings remain unresolved. No probability, route, location, safety or return-time certificate."
+    },
+    "civil_clock": {
+      "fields": [
+        "analysis_context",
+        "meihua.seed",
+        "meihua.calendar_policy",
+        "meihua.rule_trace",
+        "calendar_context.bazi_month_boundary",
+        "meihua.seasonal_strength",
+        "summary"
+      ],
+      "purpose": "核对地区时区、明确偏移、实际UTC和交节比较同一时刻",
+      "when": "重复钟时、历史或非整小时偏移，或需要追溯时区数据；不据此断应期"
+    },
+    "day_qi": {
+      "fields": [
+        "analysis_context",
+        "meihua.seed",
+        "meihua.body_trigram",
+        "meihua.use_trigram",
+        "meihua.seasonal_strength",
+        "interpretation.day_qi",
+        "summary"
+      ],
+      "purpose": "Selected day-qi, own-body and month/day qualifications; no full synthesis or reality claim",
+      "when": "Selected day-qi, own-body and month/day qualifications; no full synthesis or reality claim"
+    },
+    "external": {
+      "fields": [
+        "meihua.seed",
+        "meihua.body_trigram",
+        "meihua.stage_relations",
+        "meihua.evidence_scope",
+        "interpretation.external_omens",
+        "interpretation.evidence_scope",
+        "summary"
+      ],
+      "include_snapshot_text": false,
+      "purpose": "核对已报外应的形色／实物资格、原体及各取数候选；保留符号关系和所选原文的不同作用类别",
+      "strict_fields": true,
+      "when": "已确认外应类别及描述且选择人事分支；未知不补，weather不支持"
+    },
+    "external_symbol": {
+      "fields": [
+        "analysis_context",
+        "meihua",
+        "interpretation.external_omens",
+        "summary"
+      ],
+      "include_snapshot_text": false,
+      "purpose": "所报金银世宝、兵刃的原体限定与实物资格分列；不把不凶改成吉或安全",
+      "strict_fields": true,
+      "when": "只有已报明确类别才选新manifestation，未知省略；旧金属或锐器不自动升级为新类别"
+    },
+    "internal_control": {
+      "fields": [
+        "meihua.seed",
+        "meihua.base_hexagram",
+        "meihua.changed_hexagram",
+        "meihua.mutual_hexagram",
+        "meihua.stage_relations",
+        "meihua.seasonal_strength",
+        "interpretation.internal_countercontrol",
+        "summary"
+      ],
+      "include_snapshot_text": false,
+      "strict_fields": true
+    },
+    "motion": {
+      "description": "占者坐行立、实际外应动静与内卦符号角色分列；缺吉凶判断的条件保持待定，无日期或结局；端法且占者活动明确时另核除六前名义比例数及未知时间单位",
+      "fields": [
+        "analysis_context",
+        "meihua.body_trigram",
+        "interpretation.motion_context",
+        "interpretation.external_omens",
+        "summary"
+      ],
+      "include_snapshot_text": false,
+      "strict_fields": true
+    },
+    "obstruction_days": {
+      "description": "生克并见时的条件化原文计日；明例与类推、实际角色、制约与候选分别保留，非净延迟或现实日期",
+      "fields": [
+        "analysis_context",
+        "meihua.body_trigram",
+        "meihua.stage_relations",
+        "interpretation.stage_emphasis",
+        "meihua.seasonal_strength",
+        "interpretation.internal_countercontrol",
+        "interpretation.day_qi",
+        "meihua.use_trigram",
+        "meihua.mutual_hexagram.upper",
+        "meihua.mutual_hexagram.lower",
+        "meihua.changed_hexagram.upper",
+        "meihua.changed_hexagram.lower",
+        "summary"
+      ]
+    },
+    "quiet": {
+      "fields": [
+        "analysis_context",
+        "meihua.seed",
+        "meihua.body_trigram",
+        "meihua.use_trigram",
+        "meihua.seasonal_strength",
+        "interpretation.observation_context",
+        "interpretation.external_omens",
+        "interpretation.motion_context",
+        "summary",
+        "interpretation.day_qi"
+      ],
+      "purpose": "静占已报条件与未知状态、内卦资料范围；不把未采集解释为无外应",
+      "when": "人事分支需要区别未采集与当次静室无所闻见声明时；不套天时占"
+    },
+    "reading": {
+      "fields": [
+        "analysis_context",
+        "meihua.base_hexagram",
+        "meihua.changed_hexagram",
+        "meihua.seed",
+        "meihua.body_trigram.name",
+        "meihua.use_trigram.name",
+        "meihua.body_use_relation",
+        "meihua.ruleset.id",
+        "meihua.ruleset.sources",
+        "meihua.ruleset.version",
+        "meihua.calendar_policy",
+        "meihua.stage_relations",
+        "meihua.seasonal_strength",
+        "meihua.evidence_scope",
+        "interpretation.topic_reading",
+        "interpretation.classical_text_reference",
+        "interpretation.evidence_scope",
+        "interpretation.action_hint",
+        "interpretation.risk_hint",
+        "summary",
+        "interpretation.internal_countercontrol",
+        "interpretation.external_omens",
+        "interpretation.trigram_relation_symbols",
+        "interpretation.seasonal_qualification"
+      ],
+      "purpose": "读同一次时间梅花的卦变、原体下初中终生克与季令，区分原文和现代建议"
+    },
+    "situational": {
+      "fields": [
+        "analysis_context.response_context",
+        "meihua",
+        "interpretation.situational_responses",
+        "summary"
+      ],
+      "include_snapshot_text": false,
+      "purpose": "已报同次方应、天时应、地理应、人事应与原体符号关系；多候选及异文分列",
+      "strict_fields": true,
+      "when": "仅在已提供response_context时读取；未知现场资料省略，常规reading保留原输出；不用于天时预测分支"
+    },
+    "solar_date_reference": {
+      "fields": [
+        "analysis_context",
+        "meihua.seed",
+        "meihua.calendar_policy.solar_term_date_reference",
+        "calendar_context.bazi_month_boundary",
+        "interpretation.evidence_scope",
+        "summary"
+      ],
+      "include_snapshot_text": false,
+      "purpose": "核对实际交节时刻与固定UTC+08公布日期，包含月令起终锚点；保留差异与未比较项",
+      "strict_fields": true,
+      "when": "历表与计算日期不一致、官方点名近午夜或需追溯月令依据；不另起卦"
+    },
+    "stage_emphasis": {
+      "description": "所报原文问事情境、内卦紧次及迟速／生克条件；整句条件适用不等于净作用或现实结局",
+      "fields": [
+        "analysis_context",
+        "meihua.seed",
+        "meihua.body_trigram",
+        "interpretation.stage_emphasis",
+        "summary"
+      ]
+    },
+    "stage_emphasis_audit": {
+      "description": "所报原文问事情境、内卦紧次及迟速／生克条件；整句条件适用不等于净作用或现实结局",
+      "fields": [
+        "analysis_context",
+        "meihua",
+        "interpretation.stage_emphasis",
+        "interpretation.internal_countercontrol",
+        "interpretation.seasonal_qualification",
+        "summary"
+      ]
+    },
+    "strength": {
+      "fields": [
+        "meihua.stage_relations",
+        "meihua.seasonal_strength",
+        "interpretation.seasonal_qualification",
+        "summary"
+      ],
+      "include_snapshot_text": false,
+      "strict_fields": true
+    },
+    "strength_audit": {
+      "fields": [
+        "meihua",
+        "interpretation.seasonal_qualification",
+        "interpretation.internal_countercontrol",
+        "interpretation.topic_reading",
+        "summary",
+        "interpretation.external_omens"
+      ],
+      "include_snapshot_text": false,
+      "strict_fields": true
+    },
+    "topic": {
+      "fields": [
+        "analysis_context",
+        "interpretation.topic_reading",
+        "meihua.seed",
+        "meihua.base_hexagram.name",
+        "meihua.calendar_policy",
+        "meihua.stage_relations",
+        "meihua.seasonal_strength",
+        "meihua.evidence_scope",
+        "interpretation.casting_readings",
+        "interpretation.casting_comparison",
+        "interpretation.evidence_scope",
+        "summary",
+        "interpretation.internal_countercontrol",
+        "interpretation.wealth_components",
+        "interpretation.external_omens",
+        "interpretation.day_qi"
+      ],
+      "purpose": "核对所选文明书局本八章的初始体用条款及出行偏好、失物方位类象、行人初用参照、异文与各实际取数候选；不以通用吉凶取代章句",
+      "when": "interpretation_topic为planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler之一"
+    },
+    "topic_audit": {
+      "fields": [
+        "analysis_context",
+        "meihua",
+        "interpretation.topic_ruleset",
+        "interpretation.topic_reading",
+        "interpretation.casting_readings",
+        "interpretation.casting_comparison",
+        "interpretation.evidence_scope",
+        "summary",
+        "interpretation.internal_countercontrol",
+        "interpretation.seasonal_qualification",
+        "interpretation.wealth_components",
+        "interpretation.external_omens",
+        "interpretation.day_qi"
+      ],
+      "purpose": "完整所选题篇条款、异文及实际候选的原体用/互变/季令与爻辞参照",
+      "when": "八个显式题篇分支需要完整审计；沿用同run结果"
+    },
+    "trigram_symbols": {
+      "fields": [
+        "interpretation.trigram_relation_symbols",
+        "meihua.stage_relations",
+        "meihua.seasonal_strength",
+        "interpretation.internal_countercontrol",
+        "interpretation.seasonal_qualification",
+        "interpretation.casting_readings"
+      ],
+      "purpose": "按本次原体与初用、体互、用互、变用的实际生体或克体关系，读取文明书局本16组八卦专属象义。各计数候选分列，保留受制和旺衰；或字为史料备选，不能推定现实人物、姓氏、方位、灾祸、诊疗、应期或已验证结果。所选巽克体南方等异文不以常识改字。",
+      "when": "比较相同五行却不同卦名的具体传统象义，或核对体用总诀原句与本次角色；天时分支为null"
+    },
+    "wealth": {
+      "fields": [
+        "meihua.seed",
+        "meihua.stage_relations",
+        "meihua.seasonal_strength",
+        "interpretation.topic_reading",
+        "interpretation.wealth_components",
+        "interpretation.casting_readings",
+        "interpretation.casting_comparison",
+        "summary",
+        "interpretation.external_omens"
+      ],
+      "include_snapshot_text": false,
+      "purpose": "核对所选求财初始条款与补充句关系成分、各候选及制约，保留并存关系",
+      "strict_fields": true,
+      "when": "interpretation_topic=wealth；不按问题文字自动切换"
+    },
+    "weather": {
+      "fields": [
+        "analysis_context",
+        "meihua.seed",
+        "meihua.calendar_policy.label_precision",
+        "meihua.calendar_policy.solar_term_date_reference",
+        "meihua.evidence_scope",
+        "interpretation.weather.ruleset_id",
+        "interpretation.weather.version",
+        "interpretation.weather.ruleset.sources",
+        "interpretation.weather.control_profile.id",
+        "interpretation.weather.control_profile.version",
+        "interpretation.weather.control_profile.sources",
+        "interpretation.weather.context",
+        "interpretation.weather.trigram_counts",
+        "interpretation.weather.frequency_views",
+        "interpretation.weather.selected_readings",
+        "interpretation.weather.symbolic_attributions",
+        "interpretation.weather.time_scope_comparison",
+        "interpretation.weather.casting_comparison",
+        "interpretation.weather.casting_variants",
+        "interpretation.weather.controls",
+        "interpretation.weather.pending_rule_ids",
+        "interpretation.weather.research_validation",
+        "interpretation.evidence_scope",
+        "summary"
+      ],
+      "purpose": "先读实际命中条文、制约资格、五/六位置计数差异及旧研究负结果；不以体用判晴雨，不把raw matched当成未受制天气断言",
+      "when": "interpretation_topic=weather时选择；需要的weather_context由已确认事实提供"
+    },
+    "weather_audit": {
+      "fields": [
+        "analysis_context",
+        "meihua",
+        "interpretation.weather",
+        "interpretation.evidence_scope"
+      ],
+      "purpose": "完整天气规则、计数、条件轨迹与来源；用于核对缺项和跨章制化候选",
+      "when": "interpretation_topic=weather且需要审计细节时；沿用同run结果"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "analysis_context",
+      "meihua.base_hexagram.name",
+      "meihua.base_hexagram.binary_code",
+      "meihua.base_hexagram.symbol",
+      "meihua.changed_hexagram.name",
+      "meihua.changed_hexagram.binary_code",
+      "meihua.changed_hexagram.symbol",
+      "meihua.seed",
+      "meihua.body_trigram.name",
+      "meihua.use_trigram.name",
+      "meihua.body_use_relation",
+      "meihua.stage_relations",
+      "meihua.ruleset.id",
+      "meihua.ruleset.sources",
+      "meihua.ruleset.version",
+      "meihua.calendar_policy.lunar_year",
+      "meihua.calendar_policy.year_boundary",
+      "meihua.calendar_policy.day_boundary",
+      "meihua.calendar_policy.is_leap_month",
+      "meihua.calendar_policy.leap_month_rule",
+      "meihua.calendar_policy.timezone",
+      "meihua.calendar_policy.date_basis",
+      "meihua.calendar_policy.hour_basis",
+      "meihua.calendar_policy.true_solar_time_applied",
+      "meihua.calendar_policy.minute_role",
+      "meihua.calendar_policy.rule_kind",
+      "meihua.calendar_policy.label_precision.status",
+      "meihua.calendar_policy.label_precision.source_scope",
+      "meihua.calendar_policy.label_precision.exact_astronomical_accuracy_established",
+      "meihua.evidence_scope",
+      "interpretation.topic_reading",
+      "interpretation.classical_text_reference",
+      "interpretation.evidence_scope",
+      "interpretation.action_hint",
+      "interpretation.risk_hint",
+      "summary"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "analysis_day": {
+        "description": "Analysis day (1-31)",
+        "maximum": 31,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "analysis_hour": {
+        "description": "Analysis hour (0-23)",
+        "maximum": 23,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "analysis_minute": {
+        "anyOf": [
+          {
+            "maximum": 59,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Confirmed civil minute (strict integer 0-59), when known. Omitted/null means unavailable; numerical00 is only the nominal calculation reference, not a claim that the event occurred on the hour. No rounding or measurement-error interval is inferred. Minute and second never add to the cast seed."
+      },
+      "analysis_month": {
+        "description": "Analysis month (1-12)",
+        "maximum": 12,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "analysis_second": {
+        "anyOf": [
+          {
+            "maximum": 59,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional civil second (0-59), only when known; preserves the instant for solar-term boundaries, never an additional cast seed. Omitted/null keeps the existing minute anchored at second 00. Input precision does not certify clock or ephemeris accuracy; leap-second label 60 is unsupported."
+      },
+      "analysis_timezone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Civil-clock timezone (IANA or UTC offset; defaults to Asia/Shanghai). Keep the named zone when using analysis_utc_offset to select a repeated clock. Nonexistent clocks remain invalid. A regional rule whose selected local time is unspecified cannot be treated as UTC; use a confirmed fixed offset as analysis_timezone when available."
+      },
+      "analysis_utc_offset": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional explicit UTC offset, ±HH:MM or ±HH:MM:SS. Verified jointly with analysis_timezone at the supplied local clock; selects a fold without replacing the named calendar zone. Cannot rescue a DST gap or skipped date. Omit to keep rejecting ambiguous clocks. An offset cannot certify an unspecified regional time type; a confirmed fixed offset belongs in analysis_timezone."
+      },
+      "analysis_year": {
+        "description": "Gregorian analysis year; supported civil dates: 1900-01-01 to 2100-12-31",
+        "type": "integer"
+      },
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "external_observations": {
+        "anyOf": [
+          {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "label": {
+                  "description": "Caller description/reference for this reported observation; presence and classification are not independently verified",
+                  "maxLength": 240,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "manifestation": {
+                  "description": "Caller-reported selected source category; gold_silver_treasure and weapon are explicit NLC1925內外論 classifications, never inferred from every metallic ornament or sharp tool, free text, favorable/unfavorable wishes or an unseen scene. Symbolic body qualification is separate from material effect, real-world safety and outcomes. Unknown manifestations cannot be guessed",
+                  "enum": [
+                    "furnace_flame",
+                    "candle_flame",
+                    "red_purple_color",
+                    "sharp_metal_tool",
+                    "metal_ornament_or_utensil",
+                    "actual_water",
+                    "black_or_damp_appearance",
+                    "soil",
+                    "fired_pottery",
+                    "cut_firewood",
+                    "living_tree",
+                    "gold_silver_treasure",
+                    "weapon"
+                  ],
+                  "type": "string"
+                },
+                "motion": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "moving",
+                        "stationary"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Optional caller-reported actual motion of this external observation. Omit if unknown; never inferred from material, description, observer activity or inner symbolic roles. Moving water/carried soil and still wells/ground remain distinct. Does not determine omen valence or an event date"
+                }
+              },
+              "required": [
+                "manifestation",
+                "label"
+              ],
+              "type": "object"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional caller-reported manifestations for general/planning/reputation/wealth/transaction/travel/meeting/lost_property/traveler/household/dwelling/marriage/dining; NLC1925 selected material-versus-appearance qualifications plus explicit gold_silver_treasure/weapon original-body symbolic cases. Traveler observations keep the original-body reference and are not automatically rebased to initial use. Not every metal object is treasure or every sharp tool a weapon. Omit if unknown; no default observations, unique trigram assignment, physical/hazard/clinical verdict or event date.12 is a software guard, not a classical limit"
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "interpretation_topic": {
+        "default": "general",
+        "description": "Explicit branch: general; weather (no body/use); planning/reputation/wealth/transaction (文明书局本原四章初始体用条款，wealth另列求财成分)；travel/meeting为同本出行/谒见章，travel另核旺气及辅助生体偏好，多字及舟陆角色范围未裁定；lost_property为失物章五种初始关系及明示变用经卦读法的方位类象，物不失不否认已报遗失，位置与寻获未核实。traveler为行人章，返归句保留原体参照，在外补充明示以初用为受生受克对象，四个其他内卦角色逐一列出；初用月令衰与受克须同时成立，未知不猜，多字门槛及完整角色范围未裁定，不生成行踪、灾祸、返归核实或日期。reputation另列求名补充句及原文時序/方道，reputation_context声明原文在任与求职任条件，未知不猜，巽方道東/同本地理及转录東南等差异未裁定。household/dwelling分别为家宅/屋舍章，沿用实际原体与初用。家宅比利/转录比和未裁定，五行相同不自动套家宅安稳句；屋舍保留冷退/衰退异文。家宅生体转引人事章只核所列四内卦实际角色，未作完整跨章合参、住宅安全鉴定、选房或迁居许可。marriage为婚姻章五种初始关系，并分别核原体所占之家、初用所婚之家的已报节月旺气条件；原文未定与缺月令保持未知。补充生体/体生只列实际关系成分，或字不合并成必然同现；后段比利/转录比和未裁定，不自动套彼此相就句。八卦相貌品行仅作历史文本记录，不指派现实人物特征、两家财富、意愿或婚姻成败。dining为飲食章五种初始关系，并另列内卦坎酒、兑食及體用類的坤艮制坎、离制兑；这些句不要求多字门槛，不因制约者受制或季令衰自动抵消，完整内外合参未裁定。影印生身/转录生体及兑坎组合未裁定，不把酒食象当实际供应、菜单、席上人物、饮酒或饮食医疗建议。版本异文另列。Question keywords never switch branches; historical clauses are not hazard verdicts, travel instructions, validated outcomes or event dates",
+        "enum": [
+          "general",
+          "weather",
+          "planning",
+          "reputation",
+          "wealth",
+          "transaction",
+          "travel",
+          "meeting",
+          "lost_property",
+          "traveler",
+          "household",
+          "dwelling",
+          "marriage",
+          "dining"
+        ],
+        "type": "string"
+      },
+      "matter_scenario": {
+        "anyOf": [
+          {
+            "enum": [
+              "favorable_matter",
+              "unfavorable_matter"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller-confirmed subject category for the selected 占卦訣: 原文问吉事 or 原文问不吉之事. Not a desired answer, question sentiment, topic classification or prediction of an actual outcome. Omit when unknown. Human-matter branches only; declaration is not independently verified"
+      },
+      "observation_context": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "description": "Caller reference for the same casting episode and observer. Not parsed to infer any condition; presence or perception is not independently verified",
+                "maxLength": 240,
+                "minLength": 1,
+                "type": "string"
+              },
+              "nothing_heard": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Caller declaration of no external 所闻 in the selected 静占 sense at this cast; omit/null if unknown. No inference from absent records or unimplemented categories"
+              },
+              "nothing_seen": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Caller declaration of no external 所见 in the selected 静占 sense at this cast; omit/null if unknown. No inference from an unseen scene, empty records or unimplemented categories"
+              },
+              "quiet_room": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Caller declaration of 在静室 for this cast; omit/null if unknown. Physical setting is not mental stillness or a decibel measurement"
+              }
+            },
+            "required": [
+              "label"
+            ],
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional same-cast/observer quiet-room and hearing/vision declarations for human branches. Missing is uncollected, not confirmed absent. Selected NLC1925静占 conditions only; no full year-month-day strength synthesis, mental-state inference, casting eligibility or validated forecast. Never changes old study denominators"
+      },
+      "observer_activity": {
+        "anyOf": [
+          {
+            "enum": [
+              "seated",
+              "walking",
+              "standing"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional caller-confirmed observer activity corresponding to selected NLC1925 我坐/我行/我立. Omit if unknown; no inference from question, vehicle motion, external movement or mental stillness. Selected relative wording only, no measured delay, omen valence, or date. Human-matter branches only"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "question": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Question or topic for the divination context"
+      },
+      "reputation_context": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "currently_in_office": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Caller-confirmed 在任 in the selected historical official-office clause, not generic modern employment, seniority or a desired promotion. Omit/null if unknown; no real personnel or hazard verdict follows"
+              },
+              "label": {
+                "description": "Caller reference for the declared source context; never parsed to infer office status, desired result or an appointment",
+                "maxLength": 240,
+                "minLength": 1,
+                "type": "string"
+              },
+              "seeking_official_appointment": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Caller confirms the question concerns the source's 職任之處. Not inferred from reputation, an exam, already being employed, question keywords or wishes. Omit/null if unknown; selected 方道 witnesses are not an actual location"
+              }
+            },
+            "required": [
+              "label"
+            ],
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional caller-confirmed 在任 and 職任之處 declarations, only with interpretation_topic=reputation. Unknown omit/null; no keyword inference, permission, event date, validated outcome or probability"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "response_context": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "human": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "enum": [
+                        "elderly_man",
+                        "elderly_woman",
+                        "young_boy",
+                        "young_girl",
+                        "heard_laughter",
+                        "weeping_encountered"
+                      ],
+                      "type": "string"
+                    },
+                    "maxItems": 6,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Caller-reported source classes 老人/老婦/少男/少女 or actually heard笑語/encountered哭泣. No numerical age cutoffs, automatic person classification or outcomes. Laughter/weeping do not manufacture a trigram"
+              },
+              "label": {
+                "maxLength": 240,
+                "minLength": 1,
+                "type": "string"
+              },
+              "querent_position": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "direction": {
+                        "description": "Reported compass side occupied by the person asking at this cast; not movement heading, facing, address or the casting object's direction. No compass bearing or north-reference conversion inferred",
+                        "enum": [
+                          "north",
+                          "northeast",
+                          "east",
+                          "southeast",
+                          "south",
+                          "southwest",
+                          "west",
+                          "northwest"
+                        ],
+                        "type": "string"
+                      },
+                      "reference_label": {
+                        "description": "Caller-reported reference/origin for this occupied side; not parsed or independently located",
+                        "maxLength": 240,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "direction",
+                      "reference_label"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "same_casting_episode_confirmed": {
+                "const": true,
+                "description": "Caller explicitly confirms these are reported actual conditions at this casting episode, not desired/future outcomes. Presence/classification is not independently verified",
+                "type": "boolean"
+              },
+              "setting": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "enum": [
+                        "bamboo_woodland",
+                        "rivers_streams_or_pools",
+                        "metal_place",
+                        "kiln_stove_or_fire",
+                        "earth_or_tiles"
+                      ],
+                      "type": "string"
+                    },
+                    "maxItems": 5,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Reported place at the cast: 竹林/江河溪澗池沼/五金/窰竈爐火/土瓦. Keep all source trigram candidates; never infer setting from address, objects, question or unseen scene"
+              },
+              "weather": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "enum": [
+                        "clear",
+                        "rain",
+                        "snow",
+                        "rain_or_snow",
+                        "wind",
+                        "thunder"
+                      ],
+                      "type": "string"
+                    },
+                    "maxItems": 6,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Reported present conditions corresponding to 晴明/雨/雪/雨雪未分/風/雷. 雨雪皆配坎, but坎體宜雨does not uniquely establish a preference for snow; rain_or_snow keeps that condition pending. Human-matter 天時應 only; not a future weather prediction or daily rain label. Unknown omit/null; multiple observations retained without voting"
+              }
+            },
+            "required": [
+              "label",
+              "same_casting_episode_confirmed"
+            ],
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional caller-reported same-cast 方應/天時應/地理應/人事應 for human matters. No scene, direction or weather inferred; retain multiple trigram candidates and source variants. Not a casting method, future weather forecast, combined ten-response verdict, probability or event date"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "weather_context": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "many_min_count": {
+                "anyOf": [
+                  {
+                    "maximum": 6,
+                    "minimum": 2,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Declared software threshold for 多, with both six-position and five-role static-once scope probes retained. The raw six-position status is qualified when scopes disagree; neither scope is claimed as uniquely classical. If absent, potentially applicable 多 conditions remain pending"
+              },
+              "prior_condition": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "prolonged_rain",
+                      "prolonged_clear",
+                      "neither_prolonged"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Caller-confirmed prior weather: prolonged_rain, prolonged_clear, or neither_prolonged only when both prolonged conditions are confirmed false. None means unknown, never confirmed neither. The original gives no number of days for 久. No rainfall alone does not establish clear sky; a completed dry day, a missing observation or a cast cannot supply this fact"
+              },
+              "season": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "spring",
+                      "summer",
+                      "autumn",
+                      "winter"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Confirmed season in the source's weather context; not inferred from a timezone or Gregorian month"
+              }
+            },
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional caller-confirmed season and weather declarations, only with interpretation_topic=weather. Omit unknown facts; these conditions qualify the selected classical weather clauses."
+      }
+    },
+    "required": [
+      "analysis_year",
+      "analysis_month",
+      "analysis_day",
+      "analysis_hour"
+    ],
+    "type": "object"
+  },
+  "tool": "meihua_analysis"
+}

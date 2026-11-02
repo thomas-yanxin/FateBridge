@@ -14,12 +14,6 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_ENV_PATH = PROJECT_ROOT / ".env"
 
 
-def _strip_wrapping_quotes(value: str) -> str:
-    if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
-        return value[1:-1]
-    return value
-
-
 def load_runtime_env(
     path: Optional[str | Path] = None,
     *,
@@ -44,7 +38,9 @@ def load_runtime_env(
 
         key, raw_value = line.split("=", 1)
         key = key.strip()
-        value = _strip_wrapping_quotes(raw_value.strip())
+        value = raw_value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+            value = value[1:-1]
         if not key:
             continue
 

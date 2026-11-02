@@ -16,6 +16,7 @@ from fatebridge.cli import run
 from fatebridge.core import almanac
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.fengshui import PAYLOADS, payload
+from tests.mcp_result_assertions import same_run_projected_response, without_transport
 
 SPECS = {s.key.removeprefix("fengshui_"): s for s in CATALOG if s.family == "fengshui"}
 
@@ -37,10 +38,6 @@ async def mcp_call(name, inputs):
             {"response_char_limit": 0, **inputs},
             raise_on_error=False,
         )
-
-
-def without_transport(result):
-    return {k: v for k, v in result.items() if k != "run_metadata"}
 
 
 @pytest.mark.parametrize("name", list(PAYLOADS))
@@ -220,6 +217,8 @@ def test_precise_near_boundaries_have_one_chart_on_all_surfaces(
 def test_period_fallback_is_partial_success_on_all_surfaces(
     monkeypatch, tmp_path, capsys
 ):
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     almanac.get_solar_terms_for_year.cache_clear()
     monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", lambda *a: None)
     try:

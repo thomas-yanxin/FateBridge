@@ -1,0 +1,38 @@
+{
+  "ruleset_id": "zengshan_current_void_fill_control_v31",
+  "ruleset_version": "1.0.0",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf"
+  },
+  "clauses": [
+    {
+      "id": "author_yin_controls_chen",
+      "pdf_page": 51,
+      "speaker": "予曰之后作者答语",
+      "quote": "所以此辰土單受寅木之尅不得午火之生",
+      "qualification": "Normalized visual reading, not certified diplomatic collation. The questioner Yin→Wu statement is not used as the author oracle."
+    },
+    {
+      "id": "active_controls_static_without_own_strength",
+      "pdf_page": 58,
+      "speaker": "本章论述",
+      "quote": "酉金發動雖則休囚動而能尅旺相之卯木"
+    },
+    {
+      "id": "current_void_fill_available",
+      "pdf_page": 67,
+      "speaker": "本章论述",
+      "quote": "爻遇旬空日辰沖起而爲用謂之沖空則實"
+    },
+    {
+      "id": "dark_motion_can_control_focus",
+      "pdf_page": 84,
+      "speaker": "本章论述",
+      "quote": "用神休囚無助若遇忌神暗動尅害用神者此皆謂之忌也"
+    }
+  ],
+  "precedence": "Original static current-void/day-clash activity qualifies active-to-static control against the SAME day controlling opposition only. No erasure of raw day-control, no source strength certification, no generation license. Original month break, own back-control, binding, independent/unknown pattern opposition, other active controllers and active target arbitration remain separate.",
+  "scope": "冲空静爻的同日日克只在所列动克静资格层解除未知。仍保留日克事实、原旬空身份及其他独立反制；不能据此断最终受伤、全局解救、接续相生或现实成败。明动普遍受日克尚未在本裁决中放行。"
+}

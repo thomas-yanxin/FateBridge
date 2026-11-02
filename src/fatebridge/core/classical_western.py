@@ -13,8 +13,17 @@ table-parity + classical invariants (see tests).
 
 from __future__ import annotations
 
+import math
+from fractions import Fraction
 from typing import Any, Dict, List, Optional
 
+from fatebridge.core.astro.geometry import (
+    Angle,
+    angle_fraction,
+    angular_separation_fraction,
+    combine_longitudes,
+    normalize_angle,
+)
 from fatebridge.core.astrology_tables import (
     DOMICILE_RULERS,
     EGYPTIAN_BOUNDS_BY_SIGN,
@@ -69,7 +78,7 @@ DIGNITY_LABELS_ZH: Dict[str, str] = {
     "face": "面",
     "detriment": "陷",
     "fall": "弱",
-    "peregrine": "平",
+    "peregrine": "游离",
 }
 
 # Planetary joys by house (Hellenistic): Mercury 1, Moon 3, Venus 5, Mars 6,
@@ -93,12 +102,16 @@ TRADITIONAL_PLANETS = frozenset(
     {"Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"}
 )
 
-# Combustion thresholds (degrees) — cazimi 17′, combust 8.5°, under-beams 15°.
-# Under-the-sunbeams uses the Sun's moiety of 15° (Lilly, CA p.113); this matches
-# the solar moiety in ``astrology_horary.PLANET_MOIETIES``.
-_COMBUST_CAZIMI = 17.0 / 60.0
+# Traditional ponderosity, not instantaneous angular-speed ranking. Lilly's
+# p.111 translator is lighter than both endpoints; p.126 collector is heavier.
+LIGHT_WEIGHT_ORDER = ("Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon")
+
+# Lilly 1647 p.113 definitions: cazimi 17', same-sign combustion 8.5°, beams 17°.
+# The page's Sun18/planet28 example contradicts its 8.5° definition and remains
+# an explicit textual discrepancy; we do not change the radius to fit it.
+_COMBUST_CAZIMI = Fraction(17, 60)
 _COMBUST_LIMIT = 8.5
-_UNDER_BEAMS_LIMIT = 15.0
+_UNDER_BEAMS_LIMIT = 17.0
 # Max separation for enclosure/besiegement by body — flanking bodies must be
 # within this orb on each side, else nearest-neighbour over-reports.
 _ENCLOSURE_ORB = 15.0
@@ -106,15 +119,9 @@ _ENCLOSURE_ORB = 15.0
 OUT_OF_BOUNDS_LIMIT = 23.4367
 
 
-def _angular_distance(first: float, second: float) -> float:
+def _angular_distance(first: Angle, second: Angle) -> Fraction:
     """Unsigned 0–180° separation."""
-    diff = abs((first - second) % 360.0)
-    return min(diff, 360.0 - diff)
-
-
-def _signed_delta(reference: float, target: float) -> float:
-    """``target − reference`` folded into (−180, 180]."""
-    return (target - reference + 540.0) % 360.0 - 180.0
+    return angular_separation_fraction(first, second)
 
 
 def bound_lord(sign: str, degree_in_sign: float) -> Optional[str]:
@@ -144,10 +151,10 @@ def triplicity_members(sign: str) -> List[str]:
     return [rulers["day"], rulers["night"], rulers["participating"]]
 
 
-def triplicity_ruler(sign: str, is_day: bool) -> Optional[str]:
+def triplicity_ruler(sign: str, is_day: Optional[bool]) -> Optional[str]:
     """The sect triplicity ruler (Lilly scores the in-sect ruler +3)."""
     rulers = DOROTHEAN_TRIPLICITY.get(ELEMENT_BY_SIGN.get(sign, ""))
-    if not rulers:
+    if not rulers or is_day is None:
         return None
     return rulers["day"] if is_day else rulers["night"]
 
@@ -157,7 +164,7 @@ def _detriment_signs(planet: str) -> set:
 
 
 def essential_dignities(
-    planet: str, sign: str, degree_in_sign: float, is_day: bool
+    planet: str, sign: str, degree_in_sign: float, is_day: Optional[bool]
 ) -> Optional[Dict[str, Any]]:
     """Full classical essential-dignity picture for a traditional planet.
 
@@ -189,19 +196,32 @@ def essential_dignities(
     score = sum(DIGNITY_SCORE[d] for d in held) + sum(
         DIGNITY_SCORE[d] for d in debilities
     )
-    peregrine = not held and not debilities
+    # Lilly1647 p112 explicitly calls Saturn in Aries10 peregrine even though
+    # it is also fallen. Debility does not confer a positive dignity.
+    rulers = DOROTHEAN_TRIPLICITY.get(ELEMENT_BY_SIGN.get(sign, ""), {})
+    unknown_triplicity = is_day is None and planet in {
+        rulers.get("day"),
+        rulers.get("night"),
+    }
+    peregrine = False if held else None if unknown_triplicity else True
 
     return {
         "dignities": held,
         "debilities": debilities,
         "peregrine": peregrine,
-        "score": score,
+        "score": None if unknown_triplicity else score,
+        **(
+            {"unknown_dignities": ["triplicity"], "known_score": score}
+            if unknown_triplicity
+            else {}
+        ),
         "bound_lord": bound_lord(sign, degree_in_sign),
         "triplicity_ruler": triplicity_ruler(sign, is_day),
         "face_lord": face_lord(sign, degree_in_sign),
         "labels_zh": [DIGNITY_LABELS_ZH[d] for d in held]
         + [DIGNITY_LABELS_ZH[d] for d in debilities]
-        + (["平"] if peregrine else []),
+        + ([DIGNITY_LABELS_ZH["peregrine"]] if peregrine else [])
+        + (["三分待定"] if unknown_triplicity else []),
     }
 
 
@@ -223,28 +243,67 @@ def angularity(house: Optional[int]) -> Optional[str]:
     return "cadent"
 
 
-def combustion_state(planet_lon: float, sun_lon: Optional[float]) -> Optional[str]:
-    """cazimi (≤17′) · combust (<8.5°) · under_beams (<15°), else None."""
+def combustion_state(planet_lon: Angle, sun_lon: Optional[Angle]) -> Optional[str]:
+    """Lilly p.113 definitions with explicit interval/zero-sign policies."""
     if sun_lon is None:
         return None
     distance = _angular_distance(planet_lon, sun_lon)
     if distance <= _COMBUST_CAZIMI:
         return "cazimi"
-    if distance < _COMBUST_LIMIT:
+    same_sign = (angle_fraction(planet_lon) % 360) // 30 == (
+        angle_fraction(sun_lon) % 360
+    ) // 30
+    if distance < _COMBUST_LIMIT and same_sign:
         return "combust"
     if distance < _UNDER_BEAMS_LIMIT:
         return "under_beams"
     return None
 
 
-def orientality(planet_lon: float, sun_lon: Optional[float]) -> Optional[str]:
-    """oriental (rises before the Sun) / occidental (sets after)."""
+def solar_condition_policy() -> Dict[str, Any]:
+    return {
+        "rule_id": "lilly1647_p113_solar_definitions_v1",
+        "source_edition": "William Lilly, Christian Astrology, London 1647",
+        "source_url": "https://wellcomecollection.org/works/s7z7c46y",
+        "printed_page": 113,
+        "cazimi_limit_exact_degrees": "17/60",
+        "combust_limit_degrees": 8.5,
+        "under_beams_limit_degrees": 17.0,
+        "combust_requires_same_sign": True,
+        "interval_policy": "cazimi <=17/60; combust <8.5 in same sign; beams <17",
+        "zodiac_policy": "Same sign in declared chart zodiac; sidereal use is a modern extension",
+        "printed_example_discrepancy": "Sun 18 Aries, planet 28 Aries is called combust despite the 8.5-degree definition; unresolved, not emended",
+        "full_page_acceptance": False,
+    }
+
+
+def orientality(planet_lon: Angle, sun_lon: Optional[Angle]) -> Optional[str]:
+    """Longitude phase at the exact supplied values, without a dead band.
+
+    This does not solve physical rising or visibility. Exact coincidence is
+    unknown; the existing oriental half-turn tie is retained, rather than
+    adjudicating different authors' or planets' transition endpoints here.
+    """
     if sun_lon is None:
         return None
-    delta = _signed_delta(sun_lon, planet_lon)  # planet − sun ∈ (−180, 180]
-    if abs(delta) < 1e-4:
+    phase = (angle_fraction(planet_lon) - angle_fraction(sun_lon)) % 360
+    if phase == 0:
         return None
-    return "oriental" if delta < 0 else "occidental"
+    return "oriental" if phase >= 180 else "occidental"
+
+
+def orientality_policy() -> Dict[str, Any]:
+    """Expose what the shared geometric classification actually establishes."""
+    return {
+        "model": "ecliptic_longitude_phase",
+        "arithmetic": "exact_supplied_finite_angles",
+        "conjunction": "unknown_at_exact_coincidence",
+        "opposition": "oriental_legacy_half_open_tie",
+        "nonzero_deadband": "none",
+        "physical_rise_set_verified": False,
+        "heliacal_visibility_verified": False,
+        "author_transition_endpoints_certified": False,
+    }
 
 
 def planet_sect(planet: str, orientality_value: Optional[str]) -> Optional[str]:
@@ -305,16 +364,18 @@ def is_retrograde(longitude_speed: Optional[float]) -> Optional[bool]:
     return longitude_speed < 0.0
 
 
-def out_of_bounds(declination: Optional[float]) -> Optional[bool]:
+def out_of_bounds(
+    declination: Optional[float], obliquity: Optional[float] = OUT_OF_BOUNDS_LIMIT
+) -> Optional[bool]:
     """A body is *out of bounds* when its declination exceeds the Sun's maximum.
 
-    Beyond ±23.44° a planet stands outside the band the Sun ever reaches, a
-    classical mark of unruly / extra-potent expression. ``None`` when declination
-    is unknown (offline engine — declination needs the equatorial ephemeris).
+    Compare with the epoch's obliquity in the same true-equator frame as the
+    declination. The default retains the legacy modern-epoch approximation for
+    standalone callers; chart assembly supplies the actual epoch value.
     """
-    if declination is None:
+    if declination is None or obliquity is None:
         return None
-    return abs(declination) > OUT_OF_BOUNDS_LIMIT
+    return abs(declination) > abs(obliquity)
 
 
 # ── almuten (essential-dignity rulership of a degree) + dispositors ──
@@ -432,7 +493,7 @@ def build_almuten_figuris(
         result = almuten_of(sign, float(degree), is_day)
         per_point[point_id] = {
             "sign": sign,
-            "degree_in_sign": round(float(degree), 4),
+            "degree_in_sign": float(degree),
             "winner": result["winner"],
             "totals": result["totals"],
         }
@@ -544,7 +605,7 @@ LOTS: Dict[str, Dict[str, Any]] = {
 
 
 def _sign_of_longitude(longitude: float) -> str:
-    return SIGNS[int((longitude % 360.0) // 30.0)]
+    return SIGNS[int(normalize_angle(longitude) // 30.0)]
 
 
 def compute_lot(formula: List[str], lons: Dict[str, float]) -> Optional[float]:
@@ -554,7 +615,10 @@ def compute_lot(formula: List[str], lons: Dict[str, float]) -> Optional[float]:
     c = lons.get(formula[2])
     if a is None or b is None or c is None:
         return None
-    return ((a + b - c) % 360.0 + 360.0) % 360.0
+    # Share the chart path's half-open angular normalization. Adding 360 after
+    # an already-positive modulo loses low bits and can wrap a tiny negative
+    # input to zero, changing which side of the zodiac boundary it occupies.
+    return combine_longitudes(a, b, -c)
 
 
 def lot_dispositor(lot_longitude: float) -> Optional[str]:
@@ -574,9 +638,9 @@ def build_lots_layer(lons: Dict[str, float], is_day: bool) -> Dict[str, Any]:
         degree = lon % 30.0
         out[lot_id] = {
             "cn": definition["cn"],
-            "longitude": round(lon, 4),
+            "longitude": lon,
             "sign": sign,
-            "degree_in_sign": round(degree, 4),
+            "degree_in_sign": degree,
             "dispositor": RULER_BY_SIGN.get(sign),
             "almuten": almuten_of(sign, degree, is_day)["winner"],
         }
@@ -632,8 +696,42 @@ _ASPECT_ANGLES = {
 }
 # A planet within this orb of a square to the nodal axis sits "at the bending".
 NODE_BENDING_ORB = 3.0
-# Small forward step (days) for the applying/separating test.
-_APPLY_PROBE_DAYS = 0.05
+
+
+def _aspect_phase(
+    lon_a: float,
+    speed_a: Optional[float],
+    lon_b: float,
+    speed_b: Optional[float],
+    exact_angle: float,
+) -> str:
+    """One-sided instantaneous motion of longitude distance to an aspect.
+
+    Uses supplied signed longitude speeds without stepping past perfection.
+    It does not predict future perfection, stations or bodily latitude contact.
+    """
+    if speed_a is None or speed_b is None:
+        return "unavailable"
+    if not all(math.isfinite(value) for value in (speed_a, speed_b, exact_angle)):
+        raise ValueError("Aspect speeds and angle must be finite")
+    if not 0 <= exact_angle <= 180:
+        raise ValueError("Aspect angle must be within 0..180 degrees")
+    delta = (angle_fraction(lon_b) - angle_fraction(lon_a)) % 360
+    angle = Fraction(exact_angle)
+    residuals: List[Fraction] = []
+    for target in {angle % 360, (-angle) % 360}:
+        forward = (delta - target) % 360
+        residuals.extend((forward, forward - 360))
+    gap = min(abs(value) for value in residuals)
+    if gap == 0:
+        return "exact"
+    relative_speed = Fraction(speed_b) - Fraction(speed_a)
+    if relative_speed == 0:
+        return "stationary"
+    approaching = any(
+        residual * relative_speed < 0 for residual in residuals if abs(residual) == gap
+    )
+    return "applying" if approaching else "separating"
 
 
 def _aspect_is_applying(
@@ -643,22 +741,40 @@ def _aspect_is_applying(
     speed_b: Optional[float],
     exact_angle: float,
 ) -> Optional[bool]:
-    """Whether an aspect is applying (separation nearing exact) vs separating.
+    """Compatibility predicate; exact/equal-speed/unknown are not separating."""
+    phase = _aspect_phase(lon_a, speed_a, lon_b, speed_b, exact_angle)
+    return {"applying": True, "separating": False}.get(phase)
 
-    Steps both bodies forward a fraction of a day at their true (signed) speeds
-    and asks whether the gap to the exact aspect angle shrank. ``None`` when a
-    speed is unknown (offline engine) — applying/separating is then undefined.
+
+def ptolemy_latitude_condition(
+    angle: float, first: Optional[float], second: Optional[float]
+) -> Dict[str, Any]:
+    """Robbins I.24 latitude gate, separate from modern longitude aspects.
+
+    Closed hemispheres admit a body on the ecliptic. That zero convention is
+    explicit; this condition alone does not establish the whole application.
     """
-    if speed_a is None or speed_b is None:
-        return None
-    now = abs(_angular_distance(lon_a, lon_b) - exact_angle)
-    later = abs(
-        _angular_distance(
-            lon_a + speed_a * _APPLY_PROBE_DAYS, lon_b + speed_b * _APPLY_PROBE_DAYS
+    if any(
+        v is not None and (not math.isfinite(v) or not -90 <= v <= 90)
+        for v in (first, second)
+    ):
+        raise ValueError(
+            "Physical ecliptic latitudes must be finite and within -90..90"
         )
-        - exact_angle
-    )
-    return later < now
+    if angle != 0:
+        status = "not_required_for_aspect_ray"
+    elif first is None or second is None:
+        status = "missing_latitude"
+    else:
+        same_side = (first >= 0 and second >= 0) or (first <= 0 and second <= 0)
+        status = "same_hemisphere" if same_side else "opposite_hemispheres"
+    return {
+        "status": status,
+        "latitude_a": first,
+        "latitude_b": second,
+        "source_url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/1B%2A.html#24",
+        "policy": "closed_ecliptic_hemispheres; separate_from_longitude_motion_and_full_application",
+    }
 
 
 def build_classical_patterns(
@@ -667,6 +783,7 @@ def build_classical_patterns(
     chart_sect: Optional[str],
     *,
     speeds: Optional[Dict[str, float]] = None,
+    latitudes: Optional[Dict[str, float]] = None,
     node_longitude: Optional[float] = None,
 ) -> Dict[str, Any]:
     """``[古典格局]`` relational layer over the seven traditional planets.
@@ -682,6 +799,7 @@ def build_classical_patterns(
     trad = [p for p in planet_positions if p["id"] in TRADITIONAL_PLANETS]
     by_id = {p["id"]: p for p in trad}
     speeds = speeds or {}
+    latitudes = latitudes or {}
 
     # --- aversion: pairs sharing no whole-sign aspect ---
     aversions: List[List[str]] = []
@@ -738,15 +856,53 @@ def build_classical_patterns(
     # --- translation & collection of light (need applying/separating) ---
     # Aspect angle between two traditional planets, keyed by the unordered pair.
     pair_angle: Dict[frozenset, float] = {}
+    aspect_motion: List[Dict[str, Any]] = []
     for aspect in aspects:
         a, b = aspect.get("planet_a"), aspect.get("planet_b")
         angle = _ASPECT_ANGLES.get(str(aspect.get("aspect") or ""))
-        if a in by_id and b in by_id and angle is not None:
+        if (
+            isinstance(a, str)
+            and isinstance(b, str)
+            and a in by_id
+            and b in by_id
+            and angle is not None
+        ):
             pair_angle[frozenset((a, b))] = angle
+            separation = _angular_distance(by_id[a]["longitude"], by_id[b]["longitude"])
+            speed_a, speed_b = speeds.get(a), speeds.get(b)
+            aspect_motion.append(
+                {
+                    "planet_a": a,
+                    "planet_b": b,
+                    "aspect": aspect["aspect"],
+                    "exact_angle": angle,
+                    "separation": float(separation),
+                    "orb": float(abs(separation - Fraction(angle))),
+                    "relative_longitude_speed": (
+                        None
+                        if speed_a is None or speed_b is None
+                        else float(Fraction(speed_b) - Fraction(speed_a))
+                    ),
+                    "phase": _aspect_phase(
+                        by_id[a]["longitude"],
+                        speed_a,
+                        by_id[b]["longitude"],
+                        speed_b,
+                        angle,
+                    ),
+                    "ptolemy_latitude_condition": ptolemy_latitude_condition(
+                        angle, latitudes.get(a), latitudes.get(b)
+                    ),
+                }
+            )
 
     def faster(p: str, q: str) -> bool:
         """``p`` outpaces ``q`` in longitude (by absolute speed)."""
-        return abs(speeds.get(p, 0.0)) > abs(speeds.get(q, 0.0))
+        vp, vq = speeds.get(p), speeds.get(q)
+        return vp is not None and vq is not None and abs(vp) > abs(vq)
+
+    def lighter(p: str, q: str) -> bool:
+        return LIGHT_WEIGHT_ORDER.index(p) > LIGHT_WEIGHT_ORDER.index(q)
 
     def applying(source: str, target: str) -> Optional[bool]:
         angle = pair_angle.get(frozenset((source, target)))
@@ -762,21 +918,25 @@ def build_classical_patterns(
 
     translation: List[Dict[str, str]] = []
     collection: List[Dict[str, Any]] = []
-    if all(speeds.get(pid) is not None for pid in ids):
-        # Translation: a faster Z separates from X and applies to Y, where X and
-        # Y are in aversion (no mutual aspect) — Z carries light from X to Y.
+    if ids:
+        # Lilly p.111 definition candidate: a lighter, faster Z separates from
+        # X and applies to Y. His example has aspected endpoints. The separate
+        # p.126 judgement/reception conditions remain explicitly unverified.
         for translator in ids:
             for source in ids:
                 for sink in ids:
                     if len({translator, source, sink}) < 3:
                         continue
-                    if frozenset((source, sink)) in pair_angle:
-                        continue
                     if frozenset((translator, source)) not in pair_angle:
                         continue
                     if frozenset((translator, sink)) not in pair_angle:
                         continue
-                    if not (faster(translator, source) and faster(translator, sink)):
+                    if not (
+                        lighter(translator, source)
+                        and lighter(translator, sink)
+                        and faster(translator, source)
+                        and faster(translator, sink)
+                    ):
                         continue
                     if applying(translator, source) is False and applying(
                         translator, sink
@@ -793,6 +953,7 @@ def build_classical_patterns(
                 if other != collector
                 and frozenset((collector, other)) in pair_angle
                 and faster(other, collector)
+                and lighter(other, collector)
                 and applying(other, collector)
             ]
             for i, first in enumerate(contributors):
@@ -807,8 +968,8 @@ def build_classical_patterns(
     nodal_bending: List[Dict[str, Any]] = []
     if node_longitude is not None:
         bending_points = {
-            "north": (node_longitude + 90.0) % 360.0,
-            "south": (node_longitude - 90.0) % 360.0,
+            "north": (angle_fraction(node_longitude) + 90) % 360,
+            "south": (angle_fraction(node_longitude) - 90) % 360,
         }
         for planet in trad:
             for side, point in bending_points.items():
@@ -818,7 +979,7 @@ def build_classical_patterns(
                         {
                             "planet": planet["id"],
                             "bending": side,
-                            "orb": round(separation, 4),
+                            "orb": float(separation),
                         }
                     )
 
@@ -830,7 +991,31 @@ def build_classical_patterns(
         "besiegement": besiegement,
         "translation_of_light": translation,
         "collection_of_light": collection,
+        "light_configuration_policy": {
+            "rule_id": "lilly1647_ponderosity_structural_candidates_v1",
+            "source_edition": "William Lilly, Christian Astrology, London 1647",
+            "source_url": "https://wellcomecollection.org/works/s7z7c46y",
+            "translation_definition_page": 111,
+            "collection_judgement_page": 126,
+            "weight_order": list(LIGHT_WEIGHT_ORDER),
+            "status": "instantaneous_structural_candidates",
+            "full_original_text_acceptance": False,
+            "unverified_conditions": [
+                "future_event_order_and_presently",
+                "source_specific_reception",
+                "prohibition_refranation_frustration",
+                "historical_orbs_and_full_judgement",
+            ],
+        },
         "nodal_bending": nodal_bending,
+        "aspect_motion": aspect_motion,
+        "application_policy": {
+            "rule_id": "instantaneous_longitude_phase_v1",
+            "method": "one_sided_derivative_of_longitude_aspect_gap",
+            "speed_unit": "degrees_per_day",
+            "scope": "longitude_only_not_future_perfection_or_complete_original_text_conditions",
+            "source_url": "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/1B%2A.html#24",
+        },
         "bonification": {
             k: v
             for k, v in bonification.items()
@@ -842,10 +1027,9 @@ def build_classical_patterns(
 # ── fixed stars (恒星) ──────────────────────────────────────────────
 
 # Curated classical catalogue: the 15 Behenian stars + 5 notable bright stars.
-# ``lon2000`` / ``lat`` are the J2000.0 tropical ecliptic coordinates extracted
-# from the Swiss Ephemeris star catalogue — a star's position is a public
-# astronomical fact, so the numbers are vendored here even though the AGPL data
-# file itself is never shipped (same stance as the .se1 ephemeris). ``nature`` is
+# ``lon2000`` / ``lat`` retain legacy rounded coordinates for callers of the
+# explicitly approximate fixed_star_longitude helper. Production positions use
+# the separate SIMBAD ICRS catalogue and native apparent-position model. ``nature`` is
 # the Ptolemaic planetary nature (a cited traditional attribution, the raw
 # material for a reading); ``cn`` the traditional Chinese name. Interpretation of
 # what a conjunction *means* is the skills layer's job, not the engine's.
@@ -859,7 +1043,7 @@ FIXED_STARS: Dict[str, Dict[str, Any]] = {
     "Alcyone": {
         "lon2000": 59.9929,
         "lat": 4.051,
-        "nature": ["Moon", "Mars"],
+        "nature": ["Moon", "Jupiter"],
         "cn": "昴宿六",
     },
     "Aldebaran": {
@@ -972,10 +1156,8 @@ FIXED_STARS: Dict[str, Dict[str, Any]] = {
     },
 }
 
-# General precession in tropical longitude (IAU): ~50.2877″/yr. Fixed-star
-# longitudes advance by this much; over modern births it dominates the much
-# smaller proper motion, keeping vendored J2000 values accurate within a few
-# arc-seconds (well inside the 1° conjunction orb).
+# Legacy linear approximation only. It omits space motion, non-linear
+# precession and apparent-place effects and has no precision certification.
 PRECESSION_DEG_PER_YEAR = 50.2877 / 3600.0
 _J2000_JD = 2451545.0
 # Classical fixed-star conjunctions use a tight orb; 1° is the common default.
@@ -983,39 +1165,47 @@ FIXED_STAR_ORB = 1.0
 
 
 def fixed_star_longitude(lon2000: float, julian_day: float) -> float:
-    """Precess a J2000 ecliptic longitude to ``julian_day`` (tropical, mod 360)."""
+    """Legacy approximate tropical longitude; not used by chart calculations."""
     years = (julian_day - _J2000_JD) / 365.25
     return (lon2000 + PRECESSION_DEG_PER_YEAR * years) % 360.0
 
 
 def build_fixed_star_hits(
-    points: Dict[str, float], julian_day: float, orb: float = FIXED_STAR_ORB
+    points: Dict[str, float],
+    julian_day: float,
+    orb: float = FIXED_STAR_ORB,
+    *,
+    julian_day_tt: Optional[float] = None,
+    sidereal: bool = False,
 ) -> List[Dict[str, Any]]:
-    """Conjunctions of catalogue stars to chart points, within ``orb`` degrees.
+    """Native apparent conjunctions; ``julian_day`` is UT1, TT may be supplied.
 
-    ``points`` maps a point id (planet / Ascendant / Midheaven) to its longitude.
-    Pure computation — the star longitudes come from the vendored J2000 table
-    precessed to date, so this needs no ephemeris data file and runs everywhere.
-    Sorted by orb (tightest first), then star then point for determinism.
+    Call build_fixed_star_layer to distinguish unavailable positions from no
+    hits. The old linear approximation is not used as a silent fallback.
     """
-    hits: List[Dict[str, Any]] = []
-    for star, data in FIXED_STARS.items():
-        star_lon = fixed_star_longitude(data["lon2000"], julian_day)
-        for point_id, point_lon in points.items():
-            separation = _angular_distance(star_lon, point_lon)
-            if separation <= orb:
-                hits.append(
-                    {
-                        "star": star,
-                        "cn": data["cn"],
-                        "point": point_id,
-                        "orb": round(separation, 4),
-                        "star_longitude": round(star_lon, 4),
-                        "nature": data["nature"],
-                    }
-                )
-    hits.sort(key=lambda hit: (hit["orb"], hit["star"], hit["point"]))
-    return hits
+    return build_fixed_star_layer(
+        points, julian_day, orb=orb, julian_day_tt=julian_day_tt, sidereal=sidereal
+    )[0]
+
+
+def build_fixed_star_layer(
+    points: Dict[str, float],
+    julian_day: float,
+    orb: float = FIXED_STAR_ORB,
+    *,
+    julian_day_tt: Optional[float] = None,
+    sidereal: bool = False,
+) -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
+    from fatebridge.core.fixed_stars import build_layer
+
+    return build_layer(
+        points,
+        julian_day,
+        FIXED_STARS,
+        julian_day_tt=julian_day_tt,
+        sidereal=sidereal,
+        orb=orb,
+    )
 
 
 # ── dodekatemoria (12分度) + melothesia (身体部位) + temperament (气质) ──
@@ -1163,6 +1353,8 @@ def build_planet_classical(
     chart_sect: Optional[str],
     longitude_speed: Optional[float] = None,
     declination: Optional[float] = None,
+    altitude: Optional[float] = None,
+    obliquity: Optional[float] = OUT_OF_BOUNDS_LIMIT,
 ) -> Dict[str, Any]:
     """The per-planet ``classical`` entry surfaced on the chart payload.
 
@@ -1171,11 +1363,16 @@ def build_planet_classical(
     ``None`` on the offline approximate engine, where direction and declination
     are unknowable rather than zero.
     """
-    above = is_above_horizon(house)
+    # Whole-sign, Vehlow and MC-anchored house numbers do not encode which
+    # side of the physical horizon the planet occupies. Unknown stays unknown.
+    above = altitude >= 0.0 if altitude is not None else None
     orient = None if planet == "Sun" else orientality(longitude, sun_longitude)
     return {
         "essential": essential_dignities(
-            planet, sign, degree_in_sign, chart_sect == "day"
+            planet,
+            sign,
+            degree_in_sign,
+            True if chart_sect == "day" else False if chart_sect == "night" else None,
         ),
         "angularity": angularity(house),
         "above_horizon": above,
@@ -1187,7 +1384,7 @@ def build_planet_classical(
         "in_halb": in_halb(planet, chart_sect, above, orient),
         "joy": planetary_joy(planet, house),
         "retrograde": is_retrograde(longitude_speed),
-        "out_of_bounds": out_of_bounds(declination),
+        "out_of_bounds": out_of_bounds(declination, obliquity),
         "dodekatemorion": dodekatemorion(sign, degree_in_sign),
         "ninth_part": ninth_part(sign, degree_in_sign),
         "melothesia": melothesia(sign, degree_in_sign),

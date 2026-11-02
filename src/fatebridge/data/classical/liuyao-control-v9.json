@@ -1,0 +1,47 @@
+{
+  "ruleset_id": "zengshan_activity_control_v9",
+  "ruleset_version": "9.0.0",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "method": "Original PDF57-58 visually read; same-edition chapter14. Calendar days absent from its examples remain explicitly synthetic."
+  },
+  "clauses": [
+    {
+      "id": "static-supported-to-weak",
+      "pdf_page": 57,
+      "quote": "六爻安靜旺相之爻可以生得休囚之爻亦可以尅得休囚之爻蓋旺相者如有力之人也"
+    },
+    {
+      "id": "static-cannot-control-active",
+      "pdf_page": 58,
+      "quote": "卦有動爻卽使靜爻能尅靜爻旺相亦不能尅動爻"
+    },
+    {
+      "id": "weak-active-controls-static",
+      "pdf_page": 58,
+      "quote": "酉金發動雖則休囚動而能尅旺相之卯木"
+    },
+    {
+      "id": "injured-static-control",
+      "pdf_page": 58,
+      "quote": "卯木當令能尅丑未二土今旣木被金傷亦難尅土餘倣此"
+    }
+  ],
+  "secondary_source": {
+    "title": "增刪卜易/22",
+    "url": "https://zh.wikisource.org/wiki/增刪卜易/22",
+    "basis": "Reuse existing frozen same-run dark-activity conditions; no new calendar day or outcome reconstruction."
+  },
+  "textual_issues": [
+    {
+      "id": "static-to-moving-sentence-omission",
+      "pdf_page": 58,
+      "scan": "卦有動爻卽使靜爻能尅靜爻旺相亦不能尅動爻",
+      "frozen_wikisource": "Sentence omitted between the first and second examples in chapter14. Raw v2 bytes kept unchanged.",
+      "action": "Use the explicitly named 1925 edition reading; do not suppress all static control merely because an unrelated line moves."
+    }
+  ],
+  "scope": "Directed control-condition prerequisites, not universal strength or final effect. Moving versus moving, competing or blocked calendars, bindings and rescue remain unresolved. Known injury obstructs static outward control only; do not generalize to every kind of generation or permanent incapacity. No outcome vote."
+}

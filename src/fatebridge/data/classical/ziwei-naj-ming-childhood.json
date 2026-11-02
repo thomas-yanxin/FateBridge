@@ -1,0 +1,65 @@
+{
+  "id": "naj_ming_childhood_v1",
+  "version": "1.0.0",
+  "source_url": "https://www.digital.archives.go.jp/item/4468520",
+  "printed_volume": "三",
+  "frame": 80,
+  "section": "安童限訣",
+  "quote": "一命二財三疾厄 四妻五福六官祿 餘年一泒順流行 十五命宮看端的",
+  "manual_reader_count": 1,
+  "ordinal_rows": [
+    {
+      "age": 1,
+      "source_palace": "命",
+      "modern_palace_name": "命宫"
+    },
+    {
+      "age": 2,
+      "source_palace": "財",
+      "modern_palace_name": "财帛宫"
+    },
+    {
+      "age": 3,
+      "source_palace": "疾厄",
+      "modern_palace_name": "疾厄宫"
+    },
+    {
+      "age": 4,
+      "source_palace": "妻",
+      "modern_palace_name": "夫妻宫"
+    },
+    {
+      "age": 5,
+      "source_palace": "福",
+      "modern_palace_name": "福德宫"
+    },
+    {
+      "age": 6,
+      "source_palace": "官祿",
+      "modern_palace_name": "官禄宫"
+    }
+  ],
+  "name_mapping_scope": "Modern names follow the explicit palace-order mapping already frozen; 妻 is mapped to 夫妻 without inventing different gendered positions.",
+  "unresolved_tail": {
+    "quote": "餘年一泒順流行 十五命宮看端的",
+    "ages_not_uniquely_placed": [
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "reason": "Do not extrapolate palace order or treat 看端的 as an independently established fifteenth-age placement without resolving the full rule."
+  },
+  "limits": [
+    "Six palace labels conditional on supplied age ordinal only.",
+    "The relation to formal ten-year limits and the modern lunar-new-year age boundary is not certified.",
+    "Natal stars are linked as natal facts; no childhood-specific transformations or empirical outcomes are inferred.",
+    "One manual reader; no expert double adjudication or whole-book claim."
+  ],
+  "tail_glyph_note": "末句泒/派作异体或转录差异保留，不据此宣布该字唯一字形；前六项岁序和宫位标签不依赖此字。"
+}

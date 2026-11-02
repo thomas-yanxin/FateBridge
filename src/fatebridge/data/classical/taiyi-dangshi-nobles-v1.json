@@ -1,0 +1,127 @@
+{
+  "id": "jinjing_dangshi_noble_sources_v1",
+  "version": "1.0.0",
+  "author": "FateBridge contributors; Codex image reading, no independent human review",
+  "source_freeze_sha256": "2ad83f1a72c0c941dd83f2ff5f4247871ae18227be9a8bdcb06baaa08b0de47c",
+  "tables": [
+    {
+      "id": "jinjing_siku_dangshi_noble_v1",
+      "edition": "CADAL06056494四库本",
+      "url": "https://commons.wikimedia.org/wiki/File:CADAL06056494_太乙金鏡式經·卷一~卷四.djvu",
+      "page": 53,
+      "rows": [
+        {
+          "stem": "甲",
+          "morning_branch": "未",
+          "evening_branch": "丑"
+        },
+        {
+          "stem": "乙",
+          "morning_branch": "申",
+          "evening_branch": "子"
+        },
+        {
+          "stem": "丙",
+          "morning_branch": "酉",
+          "evening_branch": "亥"
+        },
+        {
+          "stem": "丁",
+          "morning_branch": "亥",
+          "evening_branch": "酉"
+        },
+        {
+          "stem": "戊",
+          "morning_branch": "丑",
+          "evening_branch": "未"
+        },
+        {
+          "stem": "己",
+          "morning_branch": "子",
+          "evening_branch": "申"
+        },
+        {
+          "stem": "庚",
+          "morning_branch": "丑",
+          "evening_branch": "未"
+        },
+        {
+          "stem": "辛",
+          "morning_branch": "寅",
+          "evening_branch": "午"
+        },
+        {
+          "stem": "壬",
+          "morning_branch": "卯",
+          "evening_branch": "巳"
+        },
+        {
+          "stem": "癸",
+          "morning_branch": "巳",
+          "evening_branch": "卯"
+        }
+      ],
+      "facsimile_sha256": "fcdc3c566b18922c8ee5eb44e44c6cd29bf73a91bbe393fe18b26cc49b0edddf"
+    },
+    {
+      "id": "jinjing_ming_dangshi_noble_v1",
+      "edition": "NCL-06604明钞本",
+      "url": "https://commons.wikimedia.org/wiki/File:NCL-06604_太乙金鏡式經.pdf",
+      "page": 23,
+      "rows": [
+        {
+          "stem": "甲",
+          "morning_branch": "丑",
+          "evening_branch": "未"
+        },
+        {
+          "stem": "乙",
+          "morning_branch": "子",
+          "evening_branch": "申"
+        },
+        {
+          "stem": "丙",
+          "morning_branch": "亥",
+          "evening_branch": "酉"
+        },
+        {
+          "stem": "丁",
+          "morning_branch": "亥",
+          "evening_branch": "酉"
+        },
+        {
+          "stem": "戊",
+          "morning_branch": "丑",
+          "evening_branch": "未"
+        },
+        {
+          "stem": "己",
+          "morning_branch": "子",
+          "evening_branch": "申"
+        },
+        {
+          "stem": "庚",
+          "morning_branch": "丑",
+          "evening_branch": "未"
+        },
+        {
+          "stem": "辛",
+          "morning_branch": "午",
+          "evening_branch": "寅"
+        },
+        {
+          "stem": "壬",
+          "morning_branch": "巳",
+          "evening_branch": "卯"
+        },
+        {
+          "stem": "癸",
+          "morning_branch": "巳",
+          "evening_branch": "卯"
+        }
+      ],
+      "facsimile_sha256": "4352497791eacd6b02df9694b0a58dd87b45e76a36134f632cff11c714493ac6"
+    }
+  ],
+  "scope": "朝暮贵人本位二十项逐版本对照；朝暮边界、顺逆布将、四维寄支与完整合参断法未由此裁定。"
+}

@@ -1,0 +1,31 @@
+{
+  "method_id": "human_design_publisher_preview_natal_facts_v1",
+  "source": {
+    "author": "Ra Uru Hu",
+    "title": "Life Cycles Analysis",
+    "course_year": 2005,
+    "publisher_page": "https://jovianarchive.com/products/life-cycles-analysis",
+    "pdf_url": "https://cdn.shopify.com/s/files/1/0872/4984/6576/files/Life-Cycles-Analysis-preview.pdf?v=1757008879",
+    "pdf_sha256": "5bbc572b33609ee1f23e33ee7a36645ddc565da9f256635a95043295369a33e6",
+    "pdf_page_one_based": 10,
+    "printed_page": "2",
+    "publisher_preview_only": true
+  },
+  "example": {
+    "id": "krishnamurti-course-2005-published-note",
+    "subject": "Krishnamurti",
+    "date": "1895-05-12",
+    "clock": "12:25 PM",
+    "hour_24": 12,
+    "minute": 25,
+    "place": "Madanapalle, India",
+    "timezone_printed_in_birth_note": false,
+    "expected_structural_fields": {
+      "bodygraph.type": "manifestor",
+      "bodygraph.definition.kind": "single"
+    },
+    "independent_structural_fact_count": 2,
+    "activation_glyphs_available_in_preview": false
+  },
+  "scope": "One publisher example with two structural assertions. The printed birth note supplies no time zone. Hypotheses must remain explicit; matching type/definition cannot authenticate an epoch, all26activations, the whole book or real-world prediction. No unprinted AM input may count as literal conformance."
+}

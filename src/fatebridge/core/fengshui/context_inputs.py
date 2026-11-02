@@ -16,14 +16,13 @@ from pydantic import (
     model_validator,
 )
 
-from fatebridge.core.requests.base import _DeferredModel
-
 from .interior_inputs import (
     InteriorRelation,
     InteriorRole,
     validate_relation_references,
 )
 from .material_inputs import MaterialShapeFact
+from .numeric_inputs import FengshuiInput as _DeferredModel
 from .workstation_inputs import WorkstationReview
 
 ContextBasis = Literal["measured", "user_confirmed"]

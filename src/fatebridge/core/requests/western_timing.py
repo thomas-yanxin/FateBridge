@@ -7,9 +7,11 @@ from typing import List, Literal, Optional, Union
 from pydantic import Field
 
 from fatebridge.core.requests.birth import AstroBirthRequest
+from fatebridge.core.requests.western_policy import WesternEphemerisRequest
+from fatebridge.utils.house_systems import TWELVE_HOUSE_SYSTEM_NOTE
 
 
-class WesternTimingRequest(AstroBirthRequest):
+class WesternTimingRequest(AstroBirthRequest, WesternEphemerisRequest):
     """Request model for western predictive timing analysis."""
 
     analysis_year: Optional[int] = Field(default=None, description="Analysis year")
@@ -66,7 +68,8 @@ class WesternTimingRequest(AstroBirthRequest):
         default="P",
         description="House system, any convention: SE letter ('P'=Placidus, "
         "'R'=Regiomontanus, 'W'=whole sign, 'D'=equal_mc), key ('placidus', "
-        "'equal_mc'), or integer code 0..8 (3=Placidus, 8=equal_mc).",
+        "'equal_mc'), or integer code 0..8 (3=Placidus, 8=equal_mc)."
+        + TWELVE_HOUSE_SYSTEM_NOTE,
     )
     zodiac_type: str = Field(
         default="Tropic", description="Zodiac type, e.g. Tropic or Sidereal"

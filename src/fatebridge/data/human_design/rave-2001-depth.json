@@ -1,0 +1,3910 @@
+{
+  "source": {
+    "title": "The Complete Rave I'Ching",
+    "author": "Ra Uru Hu",
+    "publisher": "Jovian Archive Corporation",
+    "edition_year": 2001,
+    "url": "https://www.myhumandesign.be/downloads/Rave-I%27Ching.pdf",
+    "pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495",
+    "scope": "64 gate identifiers, 192 angle-specific cross identifiers, 36 channel identifiers, 384 numeric line/planet-polarity assignments. No line readings or commentary bundled.",
+    "extraction": "pdftotext -raw; source font glyphs mapped explicitly; ordered 6-to-1 line headings associated with printed p/s glyphs; 375 dual lines cross-checked against Ra's 1997 newsletter."
+  },
+  "gates": [
+    {
+      "gate": 1,
+      "name": "SELF-EXPRESSION",
+      "channel_identifiers": [
+        {
+          "gates": [
+            1,
+            8
+          ],
+          "name": "Inspiration"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE SPHINX (4)",
+        "juxtaposition": "SELF-EXPRESSION",
+        "left": "DEFIANCE (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Uranus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Uranus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        6,
+        7
+      ]
+    },
+    {
+      "gate": 2,
+      "name": "HIGHER KNOWING",
+      "channel_identifiers": [
+        {
+          "gates": [
+            2,
+            14
+          ],
+          "name": "The Beat"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE SPHINX (2)",
+        "juxtaposition": "THE DRIVER",
+        "left": "DEFIANCE"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Uranus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Mercury",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Mercury",
+          "detriment_planet": "Saturn",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        8,
+        9
+      ]
+    },
+    {
+      "gate": 3,
+      "name": "ORDERING",
+      "channel_identifiers": [
+        {
+          "gates": [
+            3,
+            60
+          ],
+          "name": "Mutation"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "LAWS",
+        "juxtaposition": "MUTATION",
+        "left": "WISHES"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Uranus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        10,
+        11
+      ]
+    },
+    {
+      "gate": 4,
+      "name": "FORMULIZATION",
+      "channel_identifiers": [
+        {
+          "gates": [
+            4,
+            63
+          ],
+          "name": "Logic"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "EXPLANATION (3)",
+        "juxtaposition": "FORMULIZATION",
+        "left": "REVOLUTION (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Saturn",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Mercury",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        12,
+        13
+      ]
+    },
+    {
+      "gate": 5,
+      "name": "FIXED RHYTHMS",
+      "channel_identifiers": [
+        {
+          "gates": [
+            5,
+            15
+          ],
+          "name": "Rhythm"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "CONSCIOUSNESS (4)",
+        "juxtaposition": "HABITS",
+        "left": "SEPARATION (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Sun",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": null,
+          "polarity_kind": "unitary"
+        }
+      ],
+      "pdf_pages_one_based": [
+        14,
+        15
+      ]
+    },
+    {
+      "gate": 6,
+      "name": "FRICTION",
+      "channel_identifiers": [
+        {
+          "gates": [
+            6,
+            59
+          ],
+          "name": "Mating"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "EDEN (3)",
+        "juxtaposition": "CONFLICT",
+        "left": "THE PLANE (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Mercury",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        16,
+        17
+      ]
+    },
+    {
+      "gate": 7,
+      "name": "THE ROLE OF THE SELF",
+      "channel_identifiers": [
+        {
+          "gates": [
+            7,
+            31
+          ],
+          "name": "The Alpha"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE SPHINX (3)",
+        "juxtaposition": "INTERACTION",
+        "left": "MASKS (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Uranus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Mercury",
+          "detriment_planet": "Uranus",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        18,
+        19
+      ]
+    },
+    {
+      "gate": 8,
+      "name": "CONTRIBUTION",
+      "channel_identifiers": [
+        {
+          "gates": [
+            1,
+            8
+          ],
+          "name": "Inspiration"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "CONTAGEN (2)",
+        "juxtaposition": "CONTRIBUTION",
+        "left": "UNCERTAINTY"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Saturn",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Sun",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        20,
+        21
+      ]
+    },
+    {
+      "gate": 9,
+      "name": "FOCUS",
+      "channel_identifiers": [
+        {
+          "gates": [
+            9,
+            52
+          ],
+          "name": "Concentration"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "PLANNING (4)",
+        "juxtaposition": "FOCUS",
+        "left": "IDENTIFICATION (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Sun",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        22,
+        23
+      ]
+    },
+    {
+      "gate": 10,
+      "name": "THE BEHAVIOUR OF THE SELF",
+      "channel_identifiers": [
+        {
+          "gates": [
+            10,
+            34
+          ],
+          "name": "Exploration"
+        },
+        {
+          "gates": [
+            10,
+            57
+          ],
+          "name": "Perfected Form"
+        },
+        {
+          "gates": [
+            10,
+            20
+          ],
+          "name": "Awakening"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE VESSEL OF LOVE (4)",
+        "juxtaposition": "BEHAVIOUR",
+        "left": "PREVENTION (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Mercury",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Saturn",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        24,
+        25
+      ]
+    },
+    {
+      "gate": 11,
+      "name": "IDEAS",
+      "channel_identifiers": [
+        {
+          "gates": [
+            11,
+            56
+          ],
+          "name": "Curiosity"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "EDEN (4)",
+        "juxtaposition": "IDEAS",
+        "left": "EDUCATION (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Sun",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        26,
+        27
+      ]
+    },
+    {
+      "gate": 12,
+      "name": "CAUTION",
+      "channel_identifiers": [
+        {
+          "gates": [
+            12,
+            22
+          ],
+          "name": "Openness"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "EDEN (2)",
+        "juxtaposition": "ARTICULATION",
+        "left": "EDUCATION"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        28,
+        29
+      ]
+    },
+    {
+      "gate": 13,
+      "name": "THE LISTENER",
+      "channel_identifiers": [
+        {
+          "gates": [
+            13,
+            33
+          ],
+          "name": "The Prodigal"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE SPHINX",
+        "juxtaposition": "LISTENING",
+        "left": "MASKS"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Sun",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        30,
+        31
+      ]
+    },
+    {
+      "gate": 14,
+      "name": "POWER SKILLS",
+      "channel_identifiers": [
+        {
+          "gates": [
+            2,
+            14
+          ],
+          "name": "The Beat"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "CONTAGEN (4)",
+        "juxtaposition": "EMPOWERING",
+        "left": "UNCERTAINTY (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        32,
+        33
+      ]
+    },
+    {
+      "gate": 15,
+      "name": "EXTREMES",
+      "channel_identifiers": [
+        {
+          "gates": [
+            5,
+            15
+          ],
+          "name": "Rhythm"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE VESSEL OF LOVE (2)",
+        "juxtaposition": "EXTREMES",
+        "left": "PREVENTION"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Saturn",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        34,
+        35
+      ]
+    },
+    {
+      "gate": 16,
+      "name": "SKILLS",
+      "channel_identifiers": [
+        {
+          "gates": [
+            16,
+            48
+          ],
+          "name": "The Wave Length"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "PLANNING (2)",
+        "juxtaposition": "EXPERIMENTATION",
+        "left": "IDENTIFICATION"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        36,
+        37
+      ]
+    },
+    {
+      "gate": 17,
+      "name": "OPINIONS",
+      "channel_identifiers": [
+        {
+          "gates": [
+            17,
+            62
+          ],
+          "name": "Acceptance"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "SERVICE",
+        "juxtaposition": "OPINIONS",
+        "left": "UPHEAVEL"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        38,
+        39
+      ]
+    },
+    {
+      "gate": 18,
+      "name": "CORRECTION",
+      "channel_identifiers": [
+        {
+          "gates": [
+            18,
+            58
+          ],
+          "name": "Judgment"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "SERVICE (3)",
+        "juxtaposition": "CORRECTION",
+        "left": "UPHEAVEL (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Uranus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        40,
+        41
+      ]
+    },
+    {
+      "gate": 19,
+      "name": "WANTING",
+      "channel_identifiers": [
+        {
+          "gates": [
+            19,
+            49
+          ],
+          "name": "Synthesis"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE FOUR WAYS (4)",
+        "juxtaposition": "NEED",
+        "left": "REFINEMENT (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        42,
+        43
+      ]
+    },
+    {
+      "gate": 20,
+      "name": "THE NOW",
+      "channel_identifiers": [
+        {
+          "gates": [
+            10,
+            20
+          ],
+          "name": "Awakening"
+        },
+        {
+          "gates": [
+            20,
+            57
+          ],
+          "name": "The Brain Wave"
+        },
+        {
+          "gates": [
+            20,
+            34
+          ],
+          "name": "Charisma"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE SLEEPING PHOENIX (2)",
+        "juxtaposition": "THE NOW",
+        "left": "DUALITY"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Uranus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        44,
+        45
+      ]
+    },
+    {
+      "gate": 21,
+      "name": "THE HUNTER/HUNTRESS",
+      "channel_identifiers": [
+        {
+          "gates": [
+            21,
+            45
+          ],
+          "name": "The Money Line"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "TENSION",
+        "juxtaposition": "CONTROL",
+        "left": "ENDEVOUR"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        46,
+        47
+      ]
+    },
+    {
+      "gate": 22,
+      "name": "OPENNESS",
+      "channel_identifiers": [
+        {
+          "gates": [
+            12,
+            22
+          ],
+          "name": "Openness"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "RULERSHIP",
+        "juxtaposition": "GRACE",
+        "left": "INFORMING"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        48,
+        49
+      ]
+    },
+    {
+      "gate": 23,
+      "name": "ASSIMILATION",
+      "channel_identifiers": [
+        {
+          "gates": [
+            23,
+            43
+          ],
+          "name": "Structuring"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "EXPLANATION (2)",
+        "juxtaposition": "ASSIMILATION",
+        "left": "DEDICATION"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        50,
+        51
+      ]
+    },
+    {
+      "gate": 24,
+      "name": "RATIONALIZING",
+      "channel_identifiers": [
+        {
+          "gates": [
+            24,
+            61
+          ],
+          "name": "Awareness"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE FOUR WAYS",
+        "juxtaposition": "RATIONALIZATION",
+        "left": "INCARNATION"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        52,
+        53
+      ]
+    },
+    {
+      "gate": 25,
+      "name": "THE SPIRIT OF THE SELF",
+      "channel_identifiers": [
+        {
+          "gates": [
+            25,
+            51
+          ],
+          "name": "Initiation"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE VESSEL OF LOVE",
+        "juxtaposition": "INNOCENCE",
+        "left": "HEALING"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Mercury",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Venus",
+          "detriment_planet": null,
+          "polarity_kind": "unitary"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Uranus",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        54,
+        55
+      ]
+    },
+    {
+      "gate": 26,
+      "name": "THE EGOIST",
+      "channel_identifiers": [
+        {
+          "gates": [
+            26,
+            44
+          ],
+          "name": "Surrender"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "RULERSHIP (4)",
+        "juxtaposition": "THE TRICKSTER",
+        "left": "CONFRONTATION (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Saturn",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Saturn",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        56,
+        57
+      ]
+    },
+    {
+      "gate": 27,
+      "name": "CARING",
+      "channel_identifiers": [
+        {
+          "gates": [
+            27,
+            50
+          ],
+          "name": "Preservation"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE UNEXPECTED",
+        "juxtaposition": "CARING",
+        "left": "ALIGNMENT"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Saturn",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        58,
+        59
+      ]
+    },
+    {
+      "gate": 28,
+      "name": "THE GAME PLAYER",
+      "channel_identifiers": [
+        {
+          "gates": [
+            28,
+            38
+          ],
+          "name": "Struggle"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE UNEXPECTED (3)",
+        "juxtaposition": "RISKS",
+        "left": "ALIGNMENT (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Sun",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        60,
+        61
+      ]
+    },
+    {
+      "gate": 29,
+      "name": "SAYING YES",
+      "channel_identifiers": [
+        {
+          "gates": [
+            29,
+            46
+          ],
+          "name": "Discovery"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "CONTAGEN (3)",
+        "juxtaposition": "COMMITMENT",
+        "left": "INDUSTRY (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        62,
+        63
+      ]
+    },
+    {
+      "gate": 30,
+      "name": "RECOGNITION OF FEELINGS",
+      "channel_identifiers": [
+        {
+          "gates": [
+            30,
+            41
+          ],
+          "name": "Recognition"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "CONTAGEN",
+        "juxtaposition": "FATES",
+        "left": "INDUSTRY"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        64,
+        65
+      ]
+    },
+    {
+      "gate": 31,
+      "name": "LEADING",
+      "channel_identifiers": [
+        {
+          "gates": [
+            7,
+            31
+          ],
+          "name": "The Alpha"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE UNEXPECTED (2)",
+        "juxtaposition": "INFLUENCE",
+        "left": "THE ALPHA"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        66,
+        67
+      ]
+    },
+    {
+      "gate": 32,
+      "name": "CONTINUITY",
+      "channel_identifiers": [
+        {
+          "gates": [
+            32,
+            54
+          ],
+          "name": "Transformation"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "MAIA (3)",
+        "juxtaposition": "CONSERVATION",
+        "left": "LIMITATION (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Mercury",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Saturn",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        68,
+        69
+      ]
+    },
+    {
+      "gate": 33,
+      "name": "PRIVACY",
+      "channel_identifiers": [
+        {
+          "gates": [
+            13,
+            33
+          ],
+          "name": "The Prodigal"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE FOUR WAYS (2)",
+        "juxtaposition": "RETREAT",
+        "left": "REFINEMENT"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        70,
+        71
+      ]
+    },
+    {
+      "gate": 34,
+      "name": "POWER",
+      "channel_identifiers": [
+        {
+          "gates": [
+            34,
+            57
+          ],
+          "name": "Power"
+        },
+        {
+          "gates": [
+            20,
+            34
+          ],
+          "name": "Charisma"
+        },
+        {
+          "gates": [
+            10,
+            34
+          ],
+          "name": "Exploration"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE SLEEPING PHOENIX (4)",
+        "juxtaposition": "POWER",
+        "left": "DUALITY (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        72,
+        73
+      ]
+    },
+    {
+      "gate": 35,
+      "name": "CHANGE",
+      "channel_identifiers": [
+        {
+          "gates": [
+            35,
+            36
+          ],
+          "name": "Transitoriness"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "CONSCIOUSNESS (2)",
+        "juxtaposition": "EXPERIENCE",
+        "left": "SEPARATION"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Sun",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Mercury",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        74,
+        75
+      ]
+    },
+    {
+      "gate": 36,
+      "name": "CRISIS",
+      "channel_identifiers": [
+        {
+          "gates": [
+            35,
+            36
+          ],
+          "name": "Transitoriness"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "EDEN",
+        "juxtaposition": "CRISIS",
+        "left": "THE PLANE"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Saturn",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        76,
+        77
+      ]
+    },
+    {
+      "gate": 37,
+      "name": "FRIENDSHIP",
+      "channel_identifiers": [
+        {
+          "gates": [
+            37,
+            40
+          ],
+          "name": "Community"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "PLANNING",
+        "juxtaposition": "BARGAINS",
+        "left": "MIGRATION"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Venus",
+          "detriment_planet": null,
+          "polarity_kind": "unitary"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Saturn",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        78,
+        79
+      ]
+    },
+    {
+      "gate": 38,
+      "name": "THE FIGHTER",
+      "channel_identifiers": [
+        {
+          "gates": [
+            28,
+            38
+          ],
+          "name": "Struggle"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "TENSION (4)",
+        "juxtaposition": "OPPOSITION",
+        "left": "INDIVIDUALISM (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        80,
+        81
+      ]
+    },
+    {
+      "gate": 39,
+      "name": "THE PROVOCATEUR",
+      "channel_identifiers": [
+        {
+          "gates": [
+            39,
+            55
+          ],
+          "name": "Emoting"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "TENSION (2)",
+        "juxtaposition": "PROVOCATION",
+        "left": "INDIVIDUALISM"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Sun",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        82,
+        83
+      ]
+    },
+    {
+      "gate": 40,
+      "name": "ALONENESS",
+      "channel_identifiers": [
+        {
+          "gates": [
+            37,
+            40
+          ],
+          "name": "Community"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "PLANNING (3)",
+        "juxtaposition": "DENIAL",
+        "left": "MIGRATION (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        84,
+        85
+      ]
+    },
+    {
+      "gate": 41,
+      "name": "CONTRACTION",
+      "channel_identifiers": [
+        {
+          "gates": [
+            30,
+            41
+          ],
+          "name": "Recognition"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE UNEXPECTED (4)",
+        "juxtaposition": "FANTASY",
+        "left": "THE ALPHA (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        86,
+        87
+      ]
+    },
+    {
+      "gate": 42,
+      "name": "GROWTH",
+      "channel_identifiers": [
+        {
+          "gates": [
+            42,
+            53
+          ],
+          "name": "Maturation"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "MAIA",
+        "juxtaposition": "COMPLETION",
+        "left": "LIMITATION"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Saturn",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        88,
+        89
+      ]
+    },
+    {
+      "gate": 43,
+      "name": "INSIGHT",
+      "channel_identifiers": [
+        {
+          "gates": [
+            23,
+            43
+          ],
+          "name": "Structuring"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "EXPLANATION (4)",
+        "juxtaposition": "INSIGHT",
+        "left": "DEDICATION (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Mercury",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        90,
+        91
+      ]
+    },
+    {
+      "gate": 44,
+      "name": "ALERTNESS",
+      "channel_identifiers": [
+        {
+          "gates": [
+            26,
+            44
+          ],
+          "name": "Surrender"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE FOUR WAYS (3)",
+        "juxtaposition": "ALERTNESS",
+        "left": "INCARNATION (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Sun",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        92,
+        93
+      ]
+    },
+    {
+      "gate": 45,
+      "name": "THE GATHERER",
+      "channel_identifiers": [
+        {
+          "gates": [
+            21,
+            45
+          ],
+          "name": "The Money Line"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "RULERSHIP (2)",
+        "juxtaposition": "POSSESSION",
+        "left": "CONFRONTATION"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        94,
+        95
+      ]
+    },
+    {
+      "gate": 46,
+      "name": "THE DETERMINATION OF THE SELF",
+      "channel_identifiers": [
+        {
+          "gates": [
+            29,
+            46
+          ],
+          "name": "Discovery"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE VESSEL OF LOVE (3)",
+        "juxtaposition": "SERENDIPITY",
+        "left": "HEALING (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        96,
+        97
+      ]
+    },
+    {
+      "gate": 47,
+      "name": "REALIZING",
+      "channel_identifiers": [
+        {
+          "gates": [
+            47,
+            64
+          ],
+          "name": "Abstraction"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "RULERSHIP (3)",
+        "juxtaposition": "OPPRESSION",
+        "left": "INFORMING (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Venus",
+          "detriment_planet": null,
+          "polarity_kind": "unitary"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": null,
+          "detriment_planet": "Sun",
+          "polarity_kind": "unitary"
+        }
+      ],
+      "pdf_pages_one_based": [
+        98,
+        99
+      ]
+    },
+    {
+      "gate": 48,
+      "name": "DEPTH",
+      "channel_identifiers": [
+        {
+          "gates": [
+            16,
+            48
+          ],
+          "name": "The Wave Length"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "TENSION (3)",
+        "juxtaposition": "DEPTH",
+        "left": "ENDEVOUR (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        100,
+        101
+      ]
+    },
+    {
+      "gate": 49,
+      "name": "PRINCIPLES",
+      "channel_identifiers": [
+        {
+          "gates": [
+            19,
+            49
+          ],
+          "name": "Synthesis"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "EXPLANATION",
+        "juxtaposition": "PRINCIPLES",
+        "left": "REVOLUTION"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Sun",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Saturn",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        102,
+        103
+      ]
+    },
+    {
+      "gate": 50,
+      "name": "VALUES",
+      "channel_identifiers": [
+        {
+          "gates": [
+            27,
+            50
+          ],
+          "name": "Preservation"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "LAWS (3)",
+        "juxtaposition": "VALUES",
+        "left": "WISHES (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        104,
+        105
+      ]
+    },
+    {
+      "gate": 51,
+      "name": "SHOCK",
+      "channel_identifiers": [
+        {
+          "gates": [
+            25,
+            51
+          ],
+          "name": "Initiation"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "PENETRATION",
+        "juxtaposition": "SHOCK",
+        "left": "THE CLARION"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Mars",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        106,
+        107
+      ]
+    },
+    {
+      "gate": 52,
+      "name": "INACTION",
+      "channel_identifiers": [
+        {
+          "gates": [
+            9,
+            52
+          ],
+          "name": "Concentration"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "SERVICE (2)",
+        "juxtaposition": "STILLNESS",
+        "left": "DEMANDS"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Earth",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        108,
+        109
+      ]
+    },
+    {
+      "gate": 53,
+      "name": "BEGINNINGS",
+      "channel_identifiers": [
+        {
+          "gates": [
+            42,
+            53
+          ],
+          "name": "Maturation"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "PENETRATION (2)",
+        "juxtaposition": "BEGINNINGS",
+        "left": "CYCLES"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        110,
+        111
+      ]
+    },
+    {
+      "gate": 54,
+      "name": "AMBITION",
+      "channel_identifiers": [
+        {
+          "gates": [
+            32,
+            54
+          ],
+          "name": "Transformation"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "PENETRATION (4)",
+        "juxtaposition": "AMBITION",
+        "left": "CYCLES (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": null,
+          "detriment_planet": null,
+          "polarity_kind": "no_planet_polarity"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Sun",
+          "detriment_planet": null,
+          "polarity_kind": "unitary"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        112,
+        113
+      ]
+    },
+    {
+      "gate": 55,
+      "name": "SPIRIT",
+      "channel_identifiers": [
+        {
+          "gates": [
+            39,
+            55
+          ],
+          "name": "Emoting"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE SLEEPING PHOENIX",
+        "juxtaposition": "MOODS",
+        "left": "SPIRIT"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Sun",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        114,
+        115
+      ]
+    },
+    {
+      "gate": 56,
+      "name": "STIMULATION",
+      "channel_identifiers": [
+        {
+          "gates": [
+            11,
+            56
+          ],
+          "name": "Curiosity"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "LAWS (2)",
+        "juxtaposition": "STIMULATION",
+        "left": "DISTRACTION"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        116,
+        117
+      ]
+    },
+    {
+      "gate": 57,
+      "name": "INTUITIVE INSIGHT",
+      "channel_identifiers": [
+        {
+          "gates": [
+            20,
+            57
+          ],
+          "name": "The Brain Wave"
+        },
+        {
+          "gates": [
+            34,
+            57
+          ],
+          "name": "Power"
+        },
+        {
+          "gates": [
+            10,
+            57
+          ],
+          "name": "Perfected Form"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "PENETRATION (3)",
+        "juxtaposition": "INTUITION",
+        "left": "THE CLARION (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Mercury",
+          "detriment_planet": null,
+          "polarity_kind": "unitary"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        118,
+        119
+      ]
+    },
+    {
+      "gate": 58,
+      "name": "ALIVENESS",
+      "channel_identifiers": [
+        {
+          "gates": [
+            18,
+            58
+          ],
+          "name": "Judgment"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "SERVICE (4)",
+        "juxtaposition": "VITALITY",
+        "left": "DEMANDS (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": null,
+          "detriment_planet": "Uranus",
+          "polarity_kind": "unitary"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Sun",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        120,
+        121
+      ]
+    },
+    {
+      "gate": 59,
+      "name": "SEXUALITY",
+      "channel_identifiers": [
+        {
+          "gates": [
+            6,
+            59
+          ],
+          "name": "Mating"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "THE SLEEPING PHOENIX (3)",
+        "juxtaposition": "STRATEGY",
+        "left": "SPIRIT (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Uranus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        122,
+        123
+      ]
+    },
+    {
+      "gate": 60,
+      "name": "ACCEPTANCE",
+      "channel_identifiers": [
+        {
+          "gates": [
+            3,
+            60
+          ],
+          "name": "Mutation"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "LAWS (4)",
+        "juxtaposition": "LIMITATION",
+        "left": "DISTRACTION (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Earth",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Mercury",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        124,
+        125
+      ]
+    },
+    {
+      "gate": 61,
+      "name": "MYSTERY",
+      "channel_identifiers": [
+        {
+          "gates": [
+            24,
+            61
+          ],
+          "name": "Awareness"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "MAIA (4)",
+        "juxtaposition": "THINKING",
+        "left": "OBSCURATION (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Pluto",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        126,
+        127
+      ]
+    },
+    {
+      "gate": 62,
+      "name": "DETAIL",
+      "channel_identifiers": [
+        {
+          "gates": [
+            17,
+            62
+          ],
+          "name": "Acceptance"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "MAIA (2)",
+        "juxtaposition": "DETAIL",
+        "left": "OBSCURATION"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Neptune",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Uranus",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Neptune",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Mercury",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        128,
+        129
+      ]
+    },
+    {
+      "gate": 63,
+      "name": "DOUBT",
+      "channel_identifiers": [
+        {
+          "gates": [
+            4,
+            63
+          ],
+          "name": "Logic"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "CONSCIOUSNESS",
+        "juxtaposition": "DOUBTS",
+        "left": "DOMINION"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Uranus",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Saturn",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Mercury",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Sun",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Jupiter",
+          "detriment_planet": "Pluto",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        130,
+        131
+      ]
+    },
+    {
+      "gate": 64,
+      "name": "CONFUSION",
+      "channel_identifiers": [
+        {
+          "gates": [
+            47,
+            64
+          ],
+          "name": "Abstraction"
+        }
+      ],
+      "cross_identifiers": {
+        "right": "CONSCIOUSNESS (3)",
+        "juxtaposition": "CONFUSION",
+        "left": "DOMINION (2)"
+      },
+      "line_polarities": [
+        {
+          "line": 1,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 2,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 3,
+          "exaltation_planet": "Saturn",
+          "detriment_planet": "Moon",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 4,
+          "exaltation_planet": "Moon",
+          "detriment_planet": "Mars",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 5,
+          "exaltation_planet": "Venus",
+          "detriment_planet": "Jupiter",
+          "polarity_kind": "dual"
+        },
+        {
+          "line": 6,
+          "exaltation_planet": "Mercury",
+          "detriment_planet": "Venus",
+          "polarity_kind": "dual"
+        }
+      ],
+      "pdf_pages_one_based": [
+        132,
+        133
+      ]
+    }
+  ]
+}

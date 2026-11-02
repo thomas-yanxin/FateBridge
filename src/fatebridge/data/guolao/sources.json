@@ -1,0 +1,539 @@
+{
+  "source": "CDS SIMBAD, ICRS positions at J2000, proper motions in mas/yr (RA*cos(dec)); parallax mas, radial velocity km/s",
+  "mapping_scope": "Explicit research anchor set; not a reconstruction of the Tohoku classical edition. Epoch crossings are sorted by actual right ascension.",
+  "stars": [
+    {
+      "mansion": "角宿",
+      "star": "alpha Vir",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=alpha+Vir&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:07\n\nalpha Vir\n---------\n\nObject * alf Vir  ---  bC*  ---  OID=@2140887   (@@143525,0)  ---  coobox=15573\n\nCoordinates(ICRS,ep=J2000,eq=2000): 13 25 11.57937  -11 09 40.7501 (Opt ) A [5.46 3.26 82] 2007A&A...474..653V\nCoordinates(FK4,ep=B1950,eq=1950): 13 22 33.29940  -10 54 03.2955\nCoordinates(Gal,ep=J2000,eq=2000): 316.11234750  +50.84455481 \nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: -42.35 -30.67 [0.62 0.37 0] A 2007A&A...474..653V\nParallax: 13.06 [0.70] A 2007A&A...474..653V\nRadial Velocity: -3.310 [0.780] A 2023ApJS..266...11B\nRedshift: -0.000011 [0.000003] A 2023ApJS..266...11B\ncz: -3.31 [0.78] A 2023ApJS..266...11B\nFlux U : -0.20 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "c88a3ce43285a4937580f60a5d5b534e76bdfb6b1da2909b159179ab8a0ff92f",
+      "record": [
+        13.0,
+        25.0,
+        11.57937,
+        -11.0,
+        9.0,
+        40.7501,
+        -42.35,
+        -30.67,
+        -3.31,
+        13.06
+      ]
+    },
+    {
+      "mansion": "亢宿",
+      "star": "kappa Vir",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=kappa+Vir&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:07\n\nkappa Vir\n---------\n\nObject * kap Vir  ---  PM*  ---  OID=@2243194   (@@47165,1)  ---  coobox=15765\n\nCoordinates(ICRS,ep=J2000,eq=2000): 14 12 53.7448526298  -10 16 25.332461336 (Opt ) A [0.1500 0.1765 90] 2020yCat.1350....0G\nCoordinates(FK4,ep=B1950,eq=1950): 14 10 13.4535123467  -10 02 30.637513366\nCoordinates(Gal,ep=J2000,eq=2000): 333.5157072597069  +47.7024379946285\nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: 6.674 138.987 [0.344 0.447 90] A 2020yCat.1350....0G\nParallax: 11.5878 [0.1625] A 2020yCat.1350....0G\nRadial Velocity: -4.38 [0.21] A 2008AJ....135..209M\nRedshift: -0.000015 [0.000001] A 2008AJ....135..209M\ncz: -4.38 [0.21] A 2008AJ....135..209M\nFlux U : 7.00 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "3815c0a07bd0a710989c52f1d70ea17a476dc3b9d7c3c8e72a380ae91e790271",
+      "record": [
+        14.0,
+        12.0,
+        53.7448526298,
+        -10.0,
+        16.0,
+        25.332461336,
+        6.674,
+        138.987,
+        -4.38,
+        11.5878
+      ]
+    },
+    {
+      "mansion": "氐宿",
+      "star": "alpha2 Lib",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=alpha2+Lib&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:07\n\nalpha2 Lib\n----------\n\nObject * alf02 Lib  ---  SB*  ---  OID=@2309078   (@@48134,0)  ---  coobox=15870\n\nCoordinates(ICRS,ep=J2000,eq=2000): 14 50 52.71309  -16 02 30.3955 (Opt ) A [1.76 1.06 90] 2007A&A...474..653V\nCoordinates(FK4,ep=B1950,eq=1950): 14 48 06.44859  -15 50 06.4849\nCoordinates(Gal,ep=J2000,eq=2000): 340.32577406  +38.00828303 \nhierarchy counts: #parents=1, #children=0, #siblings=0\nProper motions: -105.68 -68.40 [0.20 0.12 0] A 2007A&A...474..653V\nParallax: 43.03 [0.19] A 2007A&A...474..653V\nRadial Velocity: -10.0 [5] E 1953GCRV..C......0W\nRedshift: -0.000033 [0.000017] E 1953GCRV..C......0W\ncz: -10.00 [5.00] E 1953GCRV..C......0W\nFlux U : 2.99 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "6a8d2e30e6d4d8adb53772d1f8ca06da3d45a1103a4a273be3fc0a8684872fef",
+      "record": [
+        14.0,
+        50.0,
+        52.71309,
+        -16.0,
+        2.0,
+        30.3955,
+        -105.68,
+        -68.4,
+        -10.0,
+        43.03
+      ]
+    },
+    {
+      "mansion": "房宿",
+      "star": "pi Sco",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=pi+Sco&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:07\n\npi Sco\n------\n\nObject * pi. Sco  ---  SB*  ---  OID=@2400278   (@@50006,3)  ---  coobox=16588\n\nCoordinates(ICRS,ep=J2000,eq=2000): 15 58 51.1132378  -26 06 50.788602 (Opt ) A [0.56 0.27 90] 2007A&A...474..653V\nCoordinates(FK4,ep=B1950,eq=1950): 15 55 49.2935507  -25 58 18.178314\nCoordinates(Gal,ep=J2000,eq=2000): 347.2147761582  +20.2304612097\nhierarchy counts: #parents=1, #children=0, #siblings=0\nProper motions: -11.42 -26.83 [0.78 0.74 90] A 2007A&A...474..653V\nParallax: 5.57 [0.64] A 2007A&A...474..653V\nRadial Velocity: -7.40 [1.3] B 2004A&A...424..727P\nRedshift: -0.000025 [0.000004] B 2004A&A...424..727P\ncz: -7.40 [1.30] B 2004A&A...424..727P\nFlux U : 1.82 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "7d68d7d3147506a46d5409da999fe4a4b0d7283da95ef4d8d8cd843de078074a",
+      "record": [
+        15.0,
+        58.0,
+        51.1132378,
+        -26.0,
+        6.0,
+        50.788602,
+        -11.42,
+        -26.83,
+        -7.4,
+        5.57
+      ]
+    },
+    {
+      "mansion": "心宿",
+      "star": "sigma Sco",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=sigma+Sco&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:08\n\nsigma Sco\n---------\n\nObject * sig Sco  ---  bC*  ---  OID=@2482758   (@@50687,0)  ---  coobox=16632\n\nCoordinates(ICRS,ep=J2000,eq=2000): 16 21 11.3157134  -25 35 34.051476 (Opt ) A [0.58 0.35 90] 2007A&A...474..653V\nCoordinates(FK4,ep=B1950,eq=1950): 16 18 08.6678835  -25 28 28.268148\nCoordinates(Gal,ep=J2000,eq=2000): 351.3130051710  +16.9989235145\nhierarchy counts: #parents=2, #children=0, #siblings=0\nProper motions: -10.60 -16.28 [0.78 0.43 90] A 2007A&A...474..653V\nParallax: 4.68 [0.60] A 2007A&A...474..653V\nRadial Velocity: -0.4 [0.9] E 1953GCRV..C......0W\nRedshift: -0.000001 [0.000003] E 1953GCRV..C......0W\ncz: -0.40 [0.90] E 1953GCRV..C......0W\nFlux U : 2.32 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "15db89165509b4c613ed032334ebb3a31c09f50bf48376e1d94fb29607b52d15",
+      "record": [
+        16.0,
+        21.0,
+        11.3157134,
+        -25.0,
+        35.0,
+        34.051476,
+        -10.6,
+        -16.28,
+        -0.4,
+        4.68
+      ]
+    },
+    {
+      "mansion": "尾宿",
+      "star": "mu1 Sco",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=mu1+Sco&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:08\n\nmu1 Sco\n-------\n\nObject * mu.01 Sco  ---  Be*  ---  OID=@2343679   (@@52108,0)  ---  coobox=16922\n\nCoordinates(ICRS,ep=J2000,eq=2000): 16 51 52.2283548696  -38 02 50.638070400 (Opt ) A [0.4832 0.3257 90] 2020yCat.1350....0G\nCoordinates(FK4,ep=B1950,eq=1950): 16 48 28.6799742628  -37 57 48.969880292\nCoordinates(Gal,ep=J2000,eq=2000): 346.1151813446325  +03.9139542734155\nhierarchy counts: #parents=2, #children=0, #siblings=0\nProper motions: -10.451 -18.315 [0.663 0.442 90] A 2020yCat.1350....0G\nParallax: 1.8732 [0.7355] A 2020yCat.1350....0G\nRadial Velocity: -7.60 [3.9] C 2004A&A...424..727P\nRedshift: -0.000025 [0.000013] C 2004A&A...424..727P\ncz: -7.60 [3.90] C 2004A&A...424..727P\nFlux U : 1.98 [~] D 2003AJ....125.2531R\n",
+      "excerpt_sha256": "ebeb7ed46a07f5e8acce7845152c25dcca90e65a1fb7a1fbba6522de8ce246ed",
+      "record": [
+        16.0,
+        51.0,
+        52.2283548696,
+        -38.0,
+        2.0,
+        50.6380704,
+        -10.451,
+        -18.315,
+        -7.6,
+        1.8732
+      ]
+    },
+    {
+      "mansion": "箕宿",
+      "star": "gamma Sgr",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=gamma+Sgr&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:08\n\ngamma Sgr\n---------\n\nObject * gam02 Sgr  ---  PM*  ---  OID=@2432279   (@@55560,5)  ---  coobox=18502\n\nCoordinates(ICRS,ep=J2000,eq=2000): 18 05 48.4880988  -30 25 26.723458 (Opt ) A [0.17 0.11 90] 2007A&A...474..653V\nCoordinates(FK4,ep=B1950,eq=1950): 18 02 35.6598988  -30 25 34.833614\nCoordinates(Gal,ep=J2000,eq=2000): 000.9185898703  -04.5380516295\nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: -48.839 -204.860 [0.966 0.610 90] A 2020yCat.1350....0G\nParallax: 32.2697 [0.7754] A 2020yCat.1350....0G\nRadial Velocity: 22.00 [2.9] C 2006AstL...32..759G\nRedshift: 0.000073 [0.000010] C 2006AstL...32..759G\ncz: 22.00 [2.90] C 2006AstL...32..759G\nFlux U : 4.77 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "d94a58d023beb1b60791d59e000e91b390c6764ad3036bd72601fedf602918b5",
+      "record": [
+        18.0,
+        5.0,
+        48.4880988,
+        -30.0,
+        25.0,
+        26.723458,
+        -48.839,
+        -204.86,
+        22.0,
+        32.2697
+      ]
+    },
+    {
+      "mansion": "斗宿",
+      "star": "phi Sgr",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=phi+Sgr&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:08\n\nphi Sgr\n-------\n\nObject * phi Sgr  ---  PM*  ---  OID=@2503301   (@@57340,0)  ---  coobox=18640\n\nCoordinates(ICRS,ep=J2000,eq=2000): 18 45 39.3895425891  -26 59 26.817522401 (Opt ) A [0.5682 0.5278 90] 2018yCat.1345....0G\nCoordinates(FK4,ep=B1950,eq=1950): 18 42 31.9762164291  -27 02 38.458437813\nCoordinates(Gal,ep=J2000,eq=2000): 007.9962919301102  -10.7744600906638\nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: 49.919 -0.090 [1.060 0.992 90] A 2018yCat.1345....0G\nParallax: 12.1552 [0.5888] A 2018yCat.1345....0G\nRadial Velocity: 21.5 [2] E 1953GCRV..C......0W\nRedshift: 0.000072 [0.000007] E 1953GCRV..C......0W\ncz: 21.50 [2.00] E 1953GCRV..C......0W\nFlux U : 2.69 [~] D 2003AJ....125.2531R\n",
+      "excerpt_sha256": "94ee581d2d6431556987ac220e68e46a90a1089cb573c96379d6bfd037270ffe",
+      "record": [
+        18.0,
+        45.0,
+        39.3895425891,
+        -26.0,
+        59.0,
+        26.817522401,
+        49.919,
+        -0.09,
+        21.5,
+        12.1552
+      ]
+    },
+    {
+      "mansion": "牛宿",
+      "star": "beta Cap",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=beta+Cap&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:09\n\nbeta Cap\n--------\n\nObject * bet01 Cap  ---  SB*  ---  OID=@2556894   (@@61897,7)  ---  coobox=19335\n\nCoordinates(ICRS,ep=J2000,eq=2000): 20 21 00.6665981712  -14 46 53.067367488 (Opt ) A [0.5758 0.3590 90] 2020yCat.1350....0G\nCoordinates(FK4,ep=B1950,eq=1950): 20 18 12.1925974422  -14 56 26.589353113\nCoordinates(Gal,ep=J2000,eq=2000): 029.1496821413666  -26.3700830508416\nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: 44.133 0.360 [0.609 0.407 90] A 2020yCat.1350....0G\nParallax: 8.3966 [0.6348] A 2020yCat.1350....0G\nRadial Velocity: -19.00 [0.6] A 2006AstL...32..759G\nRedshift: -0.000063 [0.000002] A 2006AstL...32..759G\ncz: -19.00 [0.60] A 2006AstL...32..759G\nFlux U : 4.14 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "828e74c021b770b03ba154116412b7b637546ab4bbcecf9116d993440d080094",
+      "record": [
+        20.0,
+        21.0,
+        0.6665981712,
+        -14.0,
+        46.0,
+        53.067367488,
+        44.133,
+        0.36,
+        -19.0,
+        8.3966
+      ]
+    },
+    {
+      "mansion": "女宿",
+      "star": "epsilon Aqr",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=epsilon+Aqr&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:09\n\nepsilon Aqr\n-----------\n\nObject * eps Aqr  ---  *  ---  OID=@2592902   (@@62517,0)  ---  coobox=19382\n\nCoordinates(ICRS,ep=J2000,eq=2000): 20 47 40.5495728200  -09 29 44.796936843 (Opt ) A [0.2715 0.1373 90] 2020yCat.1350....0G\nCoordinates(FK4,ep=B1950,eq=1950): 20 44 58.2132527025  -09 40 48.260707880\nCoordinates(Gal,ep=J2000,eq=2000): 037.6806428807293  -30.1049349636779\nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: 33.923 -34.936 [0.429 0.286 90] A 2020yCat.1350....0G\nParallax: 13.3619 [0.3737] A 2020yCat.1350....0G\nRadial Velocity: -19.82 [0.58] A 2022yCat.1355....0G\nRedshift: -0.000066 [0.000002] A 2022yCat.1355....0G\ncz: -19.82 [0.58] A 2022yCat.1355....0G\nFlux U : 3.79 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "606596f0f6855c006f93c040dcfb340fe63fd45f18598849012c1f9fe5377d9b",
+      "record": [
+        20.0,
+        47.0,
+        40.54957282,
+        -9.0,
+        29.0,
+        44.796936843,
+        33.923,
+        -34.936,
+        -19.82,
+        13.3619
+      ]
+    },
+    {
+      "mansion": "虚宿",
+      "star": "beta Aqr",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=beta+Aqr&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:09\n\nbeta Aqr\n--------\n\nObject * bet Aqr  ---  *  ---  OID=@1340905   (@@27606,0)  ---  coobox=8551\n\nCoordinates(ICRS,ep=J2000,eq=2000): 21 31 33.5320760349  -05 34 16.229381029 (Opt ) A [0.2080 0.1382 90] 2020yCat.1350....0G\nCoordinates(FK4,ep=B1950,eq=1950): 21 28 55.6501922138  -05 47 31.647257539\nCoordinates(Gal,ep=J2000,eq=2000): 048.0228508000101  -37.8790757753861\nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: 19.214 -8.163 [0.250 0.151 90] A 2020yCat.1350....0G\nParallax: 5.9728 [0.2147] A 2020yCat.1350....0G\nRadial Velocity: 6.451 [0.0014] A 2018A&A...616A...7S\nRedshift: 0.000022 [0.000000] A 2018A&A...616A...7S\ncz: 6.45 [0.00] A 2018A&A...616A...7S\nFlux U : 4.27 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "57024cf21186a923a134ababe8f1576fe9f42939c067f56f533652e816934ae4",
+      "record": [
+        21.0,
+        31.0,
+        33.5320760349,
+        -5.0,
+        34.0,
+        16.229381029,
+        19.214,
+        -8.163,
+        6.451,
+        5.9728
+      ]
+    },
+    {
+      "mansion": "危宿",
+      "star": "alpha Aqr",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=alpha+Aqr&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:09\n\nalpha Aqr\n---------\n\nObject * alf Aqr  ---  *  ---  OID=@1362859   (@@28184,0)  ---  coobox=8671\n\nCoordinates(ICRS,ep=J2000,eq=2000): 22 05 47.0355458275  -00 19 11.463439527 (Opt ) A [0.3007 0.3474 90] 2020yCat.1350....0G\nCoordinates(FK4,ep=B1950,eq=1950): 22 03 12.9511281131  -00 33 48.609584237\nCoordinates(Gal,ep=J2000,eq=2000): 059.9287517729356  -42.0660103858579\nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: 18.590 -10.450 [0.361 0.322 90] A 2020yCat.1350....0G\nParallax: 4.9451 [0.4296] A 2020yCat.1350....0G\nRadial Velocity: 6.829 [0.0026] A 2018A&A...616A...7S\nRedshift: 0.000023 [0.000000] A 2018A&A...616A...7S\ncz: 6.83 [0.00] A 2018A&A...616A...7S\nFlux U : 4.65 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "41236d944af9fc8a5c0fc7bab316a2af6ba848dd96f5621f3102f29b7f172569",
+      "record": [
+        22.0,
+        5.0,
+        47.0355458275,
+        -0.0,
+        19.0,
+        11.463439527,
+        18.59,
+        -10.45,
+        6.829,
+        4.9451
+      ]
+    },
+    {
+      "mansion": "室宿",
+      "star": "alpha Peg",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=alpha+Peg&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:10\n\nalpha Peg\n---------\n\nObject * alf Peg  ---  PM*  ---  OID=@1447433   (@@30153,1)  ---  coobox=9837\n\nCoordinates(ICRS,ep=J2000,eq=2000): 23 04 45.65345  +15 12 18.9617 (Opt ) A [1.50 1.40 90] 2007A&A...474..653V\nCoordinates(FK4,ep=B1950,eq=1950): 23 02 16.06576  +14 56 09.1200\nCoordinates(Gal,ep=J2000,eq=2000): 088.27979025  -40.38106260 \nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: 60.40 -41.30 [0.17 0.16 0] A 2007A&A...474..653V\nParallax: 24.46 [0.19] A 2007A&A...474..653V\nRadial Velocity: -2.70 [0.8] A 2006AstL...32..759G\nRedshift: -0.000009 [0.000003] A 2006AstL...32..759G\ncz: -2.70 [0.80] A 2006AstL...32..759G\nFlux U : 2.38 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "b4e82bf526fa766ae9b26b548b3bfa334a2d4992dd2e2a8a3f701e4b91c25861",
+      "record": [
+        23.0,
+        4.0,
+        45.65345,
+        15.0,
+        12.0,
+        18.9617,
+        60.4,
+        -41.3,
+        -2.7,
+        24.46
+      ]
+    },
+    {
+      "mansion": "壁宿",
+      "star": "gamma Peg",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=gamma+Peg&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:10\n\ngamma Peg\n---------\n\nObject * gam Peg  ---  bC*  ---  OID=@1450034   (@@30219,0)  ---  coobox=11340\n\nCoordinates(ICRS,ep=J2000,eq=2000): 00 13 14.1523490172  +15 11 00.954346538 (Opt ) A [0.3730 0.2780 90] 2020yCat.1350....0G\nCoordinates(FK4,ep=B1950,eq=1950): 00 10 39.4527594380  +14 54 20.658488930\nCoordinates(Gal,ep=J2000,eq=2000): 109.4338164050655  -46.6844836786257\nhierarchy counts: #parents=1, #children=0, #siblings=0\nProper motions: 0.492 -10.730 [0.488 0.409 90] A 2020yCat.1350....0G\nParallax: 6.9474 [0.4293] A 2020yCat.1350....0G\nRadial Velocity: -0.66 [0.14] A 2023A&A...676A.129H\nRedshift: -0.000002 [0.000000] A 2023A&A...676A.129H\ncz: -0.66 [0.14] A 2023A&A...676A.129H\nFlux U : 1.75 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "c4cc09ca7dc2da35e3f19933bf333fd53c376d7e0712a8c3ad817908a368da33",
+      "record": [
+        0.0,
+        13.0,
+        14.1523490172,
+        15.0,
+        11.0,
+        0.954346538,
+        0.492,
+        -10.73,
+        -0.66,
+        6.9474
+      ]
+    },
+    {
+      "mansion": "奎宿",
+      "star": "zeta And",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=zeta+And&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:10\n\nzeta And\n--------\n\nObject * zet And  ---  El*  ---  OID=@1484053   (@@30992,0)  ---  coobox=11649\n\nCoordinates(ICRS,ep=J2000,eq=2000): 00 47 20.3257188471  +24 16 01.842781713 (Opt ) A [0.1346 0.0673 90] 2020yCat.1350....0G\nCoordinates(FK4,ep=B1950,eq=1950): 00 44 40.9673215623  +23 59 43.845938246\nCoordinates(Gal,ep=J2000,eq=2000): 121.7365763812667  -38.5950549090425\nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: -101.068 -80.276 [0.222 0.097 90] A 2020yCat.1350....0G\nParallax: 18.0083 [0.1604] A 2020yCat.1350....0G\nRadial Velocity: -24.43 [0.1] A 2004MNRAS.349.1069K\nRedshift: -0.000081 [0.000000] A 2004MNRAS.349.1069K\ncz: -24.43 [0.10] A 2004MNRAS.349.1069K\nFlux U : 6.05 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "10d4f7357f58911cda4ed73c699873bda0902294bb70fa26abc6de20a886aad9",
+      "record": [
+        0.0,
+        47.0,
+        20.3257188471,
+        24.0,
+        16.0,
+        1.842781713,
+        -101.068,
+        -80.276,
+        -24.43,
+        18.0083
+      ]
+    },
+    {
+      "mansion": "娄宿",
+      "star": "beta Ari",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=beta+Ari&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:10\n\nbeta Ari\n--------\n\nObject * bet Ari  ---  SB*  ---  OID=@1485518   (@@31033,0)  ---  coobox=12064\n\nCoordinates(ICRS,ep=J2000,eq=2000): 01 54 38.41099  +20 48 28.9133 (Opt ) A [6.24 4.13 90] 2007A&A...474..653V\nCoordinates(FK4,ep=B1950,eq=1950): 01 51 52.34061  +20 33 52.1625\nCoordinates(Gal,ep=J2000,eq=2000): 142.24493143  -39.68169882 \nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: 98.74 -110.41 [0.71 0.47 0] A 2007A&A...474..653V\nParallax: 55.60 [0.58] A 2007A&A...474..653V\nRadial Velocity: -3.10 [0.15] A 2004A&A...424..727P\nRedshift: -0.000010 [0.000001] A 2004A&A...424..727P\ncz: -3.10 [0.15] A 2004A&A...424..727P\nFlux U : 2.88 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "acc2f5878a15c1e7b30a0eac7c78136fd4ae321f984e3a110dd49bec165b921b",
+      "record": [
+        1.0,
+        54.0,
+        38.41099,
+        20.0,
+        48.0,
+        28.9133,
+        98.74,
+        -110.41,
+        -3.1,
+        55.6
+      ]
+    },
+    {
+      "mansion": "胃宿",
+      "star": "35 Ari",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=35+Ari&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:11\n\n35 Ari\n------\n\nObject * 35 Ari  ---  SB*  ---  OID=@1538029   (@@32197,0)  ---  coobox=12258\n\nCoordinates(ICRS,ep=J2000,eq=2000): 02 43 27.1142794560  +27 42 25.737873444 (Opt ) A [0.4191 0.3316 90] 2020yCat.1350....0G\nCoordinates(FK4,ep=B1950,eq=1950): 02 40 30.6511180188  +27 29 44.236448402\nCoordinates(Gal,ep=J2000,eq=2000): 151.2871756391925  -28.9256766872832\nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: 8.502 -11.433 [0.665 0.483 90] A 2020yCat.1350....0G\nParallax: 5.2876 [0.491] A 2020yCat.1350....0G\nRadial Velocity: 13 [5] C 1979IAUS...30...57E\nRedshift: 0.000043 [0.000017] C 1979IAUS...30...57E\ncz: 13.00 [5.00] C 1979IAUS...30...57E\nFlux U : 3.91 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "8ac301949d503322f31660068687ebe21f88bc52fcba960e58f5cc0f39d91b10",
+      "record": [
+        2.0,
+        43.0,
+        27.114279456,
+        27.0,
+        42.0,
+        25.737873444,
+        8.502,
+        -11.433,
+        13.0,
+        5.2876
+      ]
+    },
+    {
+      "mansion": "昴宿",
+      "star": "17 Tau",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=17+Tau&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:11\n\n17 Tau\n------\n\nObject * 17 Tau  ---  Be*  ---  OID=@661210   (@@21111,0)  ---  coobox=4255\n\nCoordinates(ICRS,ep=J2000,eq=2000): 03 44 52.5370897890  +24 06 48.016260072 (Opt ) A [0.3875 0.3188 90] 2020yCat.1350....0G\nCoordinates(FK4,ep=B1950,eq=1950): 03 41 54.0610178169  +23 57 27.705927721\nCoordinates(Gal,ep=J2000,eq=2000): 166.1803885250657  -23.8486644156982\nhierarchy counts: #parents=1, #children=0, #siblings=0\nProper motions: 20.542 -46.081 [0.441 0.308 90] A 2020yCat.1350....0G\nParallax: 8.3457 [0.4386] A 2020yCat.1350....0G\nRadial Velocity: 6.87 [0.72] A 2021ApJ...921..117T\nRedshift: 0.000023 [0.000002] A 2021ApJ...921..117T\ncz: 6.87 [0.72] A 2021ApJ...921..117T\nFlux U : 3.19 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "e532c99c3297cfa32060c003f463447eca6fe50d2e96a9b7a1bc8e75749de470",
+      "record": [
+        3.0,
+        44.0,
+        52.537089789,
+        24.0,
+        6.0,
+        48.016260072,
+        20.542,
+        -46.081,
+        6.87,
+        8.3457
+      ]
+    },
+    {
+      "mansion": "毕宿",
+      "star": "epsilon Tau",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=epsilon+Tau&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:11\n\nepsilon Tau\n-----------\n\nObject * eps Tau  ---  **  ---  OID=@708367   (@@19950,0)  ---  coobox=4695\n\nCoordinates(ICRS,ep=J2000,eq=2000): 04 28 37.0002551195  +19 10 49.563140930 (Opt ) A [0.1385 0.0762 90] 2020yCat.1350....0G\nCoordinates(FK4,ep=B1950,eq=1950): 04 25 41.5859208770  +19 04 16.367612913\nCoordinates(Gal,ep=J2000,eq=2000): 177.5963789037864  -19.9236490649279\nhierarchy counts: #parents=2, #children=1, #siblings=0\nProper motions: 107.526 -36.200 [0.193 0.126 90] A 2020yCat.1350....0G\nParallax: 22.3654 [0.1721] A 2020yCat.1350....0G\nRadial Velocity: 38.420 [0.0004] A 2018A&A...616A...7S\nRedshift: 0.000128 [0.000000] A 2018A&A...616A...7S\ncz: 38.42 [0.00] A 2018A&A...616A...7S\nFlux U : 5.42 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "2ea30a7869c1af1eb58f75bdb0eba233d790e2b991be981556ee605ff0e90c16",
+      "record": [
+        4.0,
+        28.0,
+        37.0002551195,
+        19.0,
+        10.0,
+        49.56314093,
+        107.526,
+        -36.2,
+        38.42,
+        22.3654
+      ]
+    },
+    {
+      "mansion": "觜宿",
+      "star": "lambda Ori",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=lambda+Ori&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:11\n\nlambda Ori\n----------\n\nObject * lam Ori  ---  **  ---  OID=@797122   (@@18557,0)  ---  coobox=5061\n\nCoordinates(ICRS,ep=J2000,eq=2000): 05 35 08.27761  +09 56 02.9611 (Opt ) A [5.27 2.91 90] 2007A&A...474..653V\nCoordinates(FK4,ep=B1950,eq=1950): 05 32 22.93485  +09 54 08.5778\nCoordinates(Gal,ep=J2000,eq=2000): 195.05189849  -11.99506026 \nhierarchy counts: #parents=0, #children=2, #siblings=0\nProper motions: -0.34 -2.94 [0.60 0.33 0] A 2007A&A...474..653V\nParallax: 2.97 [0.55] A 2007A&A...474..653V\nRadial Velocity: 30.10 [1.4] B 2006AstL...32..759G\nRedshift: 0.000100 [0.000005] B 2006AstL...32..759G\ncz: 30.10 [1.40] B 2006AstL...32..759G\nFlux U : 2.45 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "81641caa228f615c83eaffa7a9f8ee660a3a02fccf67c0b8b9e1adcd7ade9971",
+      "record": [
+        5.0,
+        35.0,
+        8.27761,
+        9.0,
+        56.0,
+        2.9611,
+        -0.34,
+        -2.94,
+        30.1,
+        2.97
+      ]
+    },
+    {
+      "mansion": "参宿",
+      "star": "delta Ori",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=delta+Ori&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:12\n\ndelta Ori\n---------\n\nObject * del Ori  ---  **  ---  OID=@799898   (@@17013,0)  ---  coobox=6469\n\nCoordinates(ICRS,ep=J2000,eq=2000): 05 32 00.40009  -00 17 56.7424 (Opt ) A [4.92 2.38 90] 2007A&A...474..653V\nCoordinates(FK4,ep=B1950,eq=1950): 05 29 27.02698  -00 20 04.4178\nCoordinates(Gal,ep=J2000,eq=2000): 203.85592217  -17.73973400 \nhierarchy counts: #parents=2, #children=2, #siblings=0\nProper motions: 0.64 -0.69 [0.56 0.27 0] A 2007A&A...474..653V\nParallax: 4.71 [0.58] A 2007A&A...474..653V\nRadial Velocity: 18.50 [0.5] A 2004A&A...424..727P\nRedshift: 0.000062 [0.000002] A 2004A&A...424..727P\ncz: 18.50 [0.50] A 2004A&A...424..727P\nFlux U : 0.96 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "3fe2f4d0cd599c5ab1c6ace37c6e18aa9fd6466bb8c46d6df9e8da6c0dc3210d",
+      "record": [
+        5.0,
+        32.0,
+        0.40009,
+        -0.0,
+        17.0,
+        56.7424,
+        0.64,
+        -0.69,
+        18.5,
+        4.71
+      ]
+    },
+    {
+      "mansion": "井宿",
+      "star": "mu Gem",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=mu+Gem&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:12\n\nmu Gem\n------\n\nObject * mu. Gem  ---  LP*  ---  OID=@885951   (@@20464,0)  ---  coobox=5306\n\nCoordinates(ICRS,ep=J2000,eq=2000): 06 22 57.62686  +22 30 48.8979 (Opt ) A [7.46 4.49 90] 2007A&A...474..653V\nCoordinates(FK4,ep=B1950,eq=1950): 06 19 56.09518  +22 32 28.0172\nCoordinates(Gal,ep=J2000,eq=2000): 189.72658581  +04.16915283 \nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: 56.39 -110.03 [0.85 0.51 0] A 2007A&A...474..653V\nParallax: 14.08 [0.71] A 2007A&A...474..653V\nRadial Velocity: 54.38 [0.24] A 2005A&A...430..165F\nRedshift: 0.000181 [0.000001] A 2005A&A...430..165F\ncz: 54.38 [0.24] A 2005A&A...430..165F\nFlux U : 6.37 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "bb85f9ede5dca60ac47a3ca63af406a1df2625389e392ac9f394c92553c89ceb",
+      "record": [
+        6.0,
+        22.0,
+        57.62686,
+        22.0,
+        30.0,
+        48.8979,
+        56.39,
+        -110.03,
+        54.38,
+        14.08
+      ]
+    },
+    {
+      "mansion": "鬼宿",
+      "star": "theta Cnc",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=theta+Cnc&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:12\n\ntheta Cnc\n---------\n\nObject * tet Cnc  ---  PM*  ---  OID=@1091867   (@@20178,13)  ---  coobox=5956\n\nCoordinates(ICRS,ep=J2000,eq=2000): 08 31 35.7299602200  +18 05 39.905422656 (Opt ) A [0.0860 0.0592 90] 2020yCat.1350....0G\nCoordinates(FK4,ep=B1950,eq=1950): 08 28 44.8033092103  +18 15 53.379095779\nCoordinates(Gal,ep=J2000,eq=2000): 206.7706270017058  +29.9783432371668\nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: -59.639 -56.615 [0.104 0.077 90] A 2020yCat.1350....0G\nParallax: 7.5577 [0.1008] A 2020yCat.1350....0G\nRadial Velocity: 44.60 [0.16] A 2018yCat.1345....0G\nRedshift: 0.000149 [0.000001] A 2018yCat.1345....0G\ncz: 44.60 [0.16] A 2018yCat.1345....0G\nFlux B : 6.908 [0.015] D 2000A&A...355L..27H\n",
+      "excerpt_sha256": "23f2e69a4e50cc02894a50aac322771f4e9101d7211c81e7bf6b73bfc962597c",
+      "record": [
+        8.0,
+        31.0,
+        35.72996022,
+        18.0,
+        5.0,
+        39.905422656,
+        -59.639,
+        -56.615,
+        44.6,
+        7.5577
+      ]
+    },
+    {
+      "mansion": "柳宿",
+      "star": "delta Hya",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=delta+Hya&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:12\n\ndelta Hya\n---------\n\nObject * del Hya  ---  **  ---  OID=@1113830   (@@18433,4)  ---  coobox=6104\n\nCoordinates(ICRS,ep=J2000,eq=2000): 08 37 39.3674727912  +05 42 13.635944028 (Opt ) A [0.2548 0.1636 90] 2020yCat.1350....0G\nCoordinates(FK4,ep=B1950,eq=1950): 08 35 00.5987459248  +05 52 45.829657813\nCoordinates(Gal,ep=J2000,eq=2000): 220.2549969748774  +26.1815723853435\nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: -68.867 -7.551 [0.345 0.327 90] A 2020yCat.1350....0G\nParallax: 18.4301 [0.3241] A 2020yCat.1350....0G\nRadial Velocity: 15.47 [0.83] A 2022yCat.1355....0G\nRedshift: 0.000052 [0.000003] A 2022yCat.1355....0G\ncz: 15.47 [0.83] A 2022yCat.1355....0G\nFlux B : 4.144 [0.014] D 2000A&A...355L..27H\n",
+      "excerpt_sha256": "d32f3e190db75162568375026287831f9b91f92d9233279fc94bd1b98791e83a",
+      "record": [
+        8.0,
+        37.0,
+        39.3674727912,
+        5.0,
+        42.0,
+        13.635944028,
+        -68.867,
+        -7.551,
+        15.47,
+        18.4301
+      ]
+    },
+    {
+      "mansion": "星宿",
+      "star": "alpha Hya",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=alpha+Hya&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:13\n\nalpha Hya\n---------\n\nObject * alf Hya  ---  *  ---  OID=@1634852   (@@134482,0)  ---  coobox=14394\n\nCoordinates(ICRS,ep=J2000,eq=2000): 09 27 35.24270  -08 39 30.9583 (Opt ) A [1.67 1.14 90] 2007A&A...474..653V\nCoordinates(FK4,ep=B1950,eq=1950): 09 25 07.79393  -08 26 27.3371\nCoordinates(Gal,ep=J2000,eq=2000): 241.48814210  +29.04545375 \nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: -15.23 34.37 [0.19 0.13 0] A 2007A&A...474..653V\nParallax: 18.09 [0.18] A 2007A&A...474..653V\nRadial Velocity: -4.561 [0.0001] A 2018A&A...616A...7S\nRedshift: -0.000015 [0.000000] A 2018A&A...616A...7S\ncz: -4.56 [0.00] A 2018A&A...616A...7S\nFlux U : 5.14 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "d1243a88b2dcb1d377658455ee93c553056cb8b02d30521907baa31e22832b08",
+      "record": [
+        9.0,
+        27.0,
+        35.2427,
+        -8.0,
+        39.0,
+        30.9583,
+        -15.23,
+        34.37,
+        -4.561,
+        18.09
+      ]
+    },
+    {
+      "mansion": "张宿",
+      "star": "upsilon1 Hya",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=upsilon1+Hya&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:13\n\nupsilon1 Hya\n------------\n\nObject * ups01 Hya  ---  *  ---  OID=@1662457   (@@34730,0)  ---  coobox=14561\n\nCoordinates(ICRS,ep=J2000,eq=2000): 09 51 28.6749789221  -14 50 47.863368049 (Opt ) A [0.3049 0.2777 90] 2018yCat.1345....0G\nCoordinates(FK4,ep=B1950,eq=1950): 09 49 04.2454965427  -14 36 40.563010917\nCoordinates(Gal,ep=J2000,eq=2000): 251.2351062983478  +29.4441727421621\nhierarchy counts: #parents=1, #children=0, #siblings=0\nProper motions: 31.037 -26.862 [0.591 0.528 90] A 2018yCat.1345....0G\nParallax: 13.1263 [0.3364] A 2018yCat.1345....0G\nRadial Velocity: -14.34 [0.04] A 2015A&A...574A..50J\nRedshift: -0.000048 [0.000000] A 2015A&A...574A..50J\ncz: -14.34 [0.04] A 2015A&A...574A..50J\nFlux U : 5.68 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "b6a70b72f13dd59c7f72ee48d09e364e6e8da94950146073b788dc39786cf744",
+      "record": [
+        9.0,
+        51.0,
+        28.6749789221,
+        -14.0,
+        50.0,
+        47.863368049,
+        31.037,
+        -26.862,
+        -14.34,
+        13.1263
+      ]
+    },
+    {
+      "mansion": "翼宿",
+      "star": "alpha Crt",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=alpha+Crt&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:13\n\nalpha Crt\n---------\n\nObject * alf Crt  ---  PM*  ---  OID=@1776854   (@@91344,7)  ---  coobox=14771\n\nCoordinates(ICRS,ep=J2000,eq=2000): 10 59 46.4651557828  -18 17 55.630394216 (Opt ) A [0.1223 0.1317 90] 2020yCat.1350....0G\nCoordinates(FK4,ep=B1950,eq=1950): 10 57 20.1472481303  -18 01 55.536524944\nCoordinates(Gal,ep=J2000,eq=2000): 269.0517435137799  +37.1203546179992\nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: -462.303 128.614 [0.184 0.149 90] A 2020yCat.1350....0G\nParallax: 20.3693 [0.1704] A 2020yCat.1350....0G\nRadial Velocity: 47.54 [0.16] A 2008AJ....135..209M\nRedshift: 0.000159 [0.000001] A 2008AJ....135..209M\ncz: 47.54 [0.16] A 2008AJ....135..209M\nFlux U : 6.14 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "fc9a02595adf5909734535bd66a8ffe157e99f23136936e42b0499ecf4831ffb",
+      "record": [
+        10.0,
+        59.0,
+        46.4651557828,
+        -18.0,
+        17.0,
+        55.630394216,
+        -462.303,
+        128.614,
+        47.54,
+        20.3693
+      ]
+    },
+    {
+      "mansion": "轸宿",
+      "star": "gamma Crv",
+      "source_url": "https://simbad.cds.unistra.fr/simbad/sim-id?Ident=gamma+Crv&output.format=ASCII",
+      "source_excerpt": "C.D.S.  -  SIMBAD4 rel 1.8  -  2026.10.21CEST20:55:13\n\ngamma Crv\n---------\n\nObject * gam Crv  ---  PM*  ---  OID=@1920557   (@@39754,10)  ---  coobox=15524\n\nCoordinates(ICRS,ep=J2000,eq=2000): 12 15 48.37081  -17 32 30.9496 (Opt ) A [1.32 0.88 90] 2007A&A...474..653V\nCoordinates(FK4,ep=B1950,eq=1950): 12 13 13.84365  -17 15 51.7277\nCoordinates(Gal,ep=J2000,eq=2000): 290.98469665  +44.50166400 \nhierarchy counts: #parents=0, #children=0, #siblings=0\nProper motions: -158.61 21.86 [0.15 0.10 0] A 2007A&A...474..653V\nParallax: 21.23 [0.20] A 2007A&A...474..653V\nRadial Velocity: -4.2 [2] E 1953GCRV..C......0W\nRedshift: -0.000014 [0.000007] E 1953GCRV..C......0W\ncz: -4.20 [2.00] E 1953GCRV..C......0W\nFlux U : 2.12 [~] C 2002yCat.2237....0D\n",
+      "excerpt_sha256": "6a5bfded228b2782c6df3c2210f05743d3aa705c270cee983bb293db72d88bb4",
+      "record": [
+        12.0,
+        15.0,
+        48.37081,
+        -17.0,
+        32.0,
+        30.9496,
+        -158.61,
+        21.86,
+        -4.2,
+        21.23
+      ]
+    }
+  ],
+  "catalogue_sha256": "83da2ca046e00c08639dd8d5ea865e83b8f46f5c73b31f4559e73ce2e603bf24"
+}

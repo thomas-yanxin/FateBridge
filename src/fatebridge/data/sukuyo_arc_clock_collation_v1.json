@@ -1,0 +1,95 @@
+{
+  "id": "arc_selected_clock_collation_v1",
+  "scope": "Selected working readings of one known ARC printed page; not a complete critical edition or an independently identified ancient manuscript.",
+  "image": {
+    "catalogue_id": "arcBK01-0086-02",
+    "requested_viewer_url": "https://www.dh-jac.net/db1/books/arcBK01-0086-02/portal/21/",
+    "direct_image_url": "https://www.arc.ritsumei.ac.jp/archive01/theater/image/PB/arc/Books/arcBK/arcBK01-0086/arcBK01-0086-02/arcBK01-0086-02_22.jpg",
+    "actual_image_frame": 22,
+    "format": "JPEG",
+    "bytes": 433167,
+    "width": 2700,
+    "height": 1999,
+    "sha256": "d4b273b59e954d52e0d63c7ff378446716ab390086ed2cc789d9beb7fa8f6329",
+    "image_redistributed_in_this_bundle": false,
+    "image_metadata_is_physical_print_date": false
+  },
+  "selected_readings": [
+    {
+      "id": "dawn_apparatus",
+      "layer": "upper_printed_apparatus",
+      "working_literal": "平明一作平旦",
+      "reading_status": "model_working_reading_not_human_certified",
+      "root_first_working_literal": "平明一作平日",
+      "reviewer_first_working_literal": "平明一作平旦",
+      "root_after_feedback_working_literal": "平明一作平旦",
+      "root_first_was_misread": true,
+      "reported_other_exemplar_obtained": false
+    },
+    {
+      "id": "body_before_day_division",
+      "layer": "main_text",
+      "left_context": "其曜亦",
+      "right_context": "日分爲八時",
+      "root_first_working_glyph": "每",
+      "reviewer_first_working_glyph": "審",
+      "root_after_feedback_candidates": ["審", "晝"],
+      "candidate_list_is_exhaustive": false,
+      "accepted_unique_glyph": null,
+      "full_sentence_exact_transcription_accepted": false
+    },
+    {
+      "id": "weekday_handover_body",
+      "layer": "main_text",
+      "working_literal": "轉到明日曉時卽次後曜當",
+      "reading_status": "selected_model_working_reading",
+      "reported_following_zhi_inserted_into_main_text": false
+    },
+    {
+      "id": "following_zhi_apparatus",
+      "layer": "upper_printed_apparatus",
+      "working_literal": "當下明高有直字",
+      "reading_status": "selected_model_working_reading",
+      "reported_addition": "直",
+      "reported_position": "after當",
+      "sigla_literals": ["明", "高"],
+      "specific_sigla_exemplars_identified": false,
+      "reported_exemplars_obtained": false
+    }
+  ],
+  "selected_working_fragments": [
+    "平明卽是所直之曜",
+    "乃至酉戌",
+    "夜亦分爲八時",
+    "轉到明日曉時卽次後曜當"
+  ],
+  "source_records": [
+    {
+      "role": "reviewer_pixel_first",
+      "public_record": "docs/validation/sukuyo-semantic-continuation-v110-ARC-image-reviewer-first.json",
+      "sha256": "41ac11361196d66dae57b1296b30ea9d528f3d500955d7f8dc5a3c76508e0a6e",
+      "scope": "First selected pixel reading by the existing readonly role; shared provider and history, not external blind validation."
+    },
+    {
+      "role": "root_feedback_exposed_correction",
+      "public_record": "docs/validation/sukuyo-semantic-continuation-v110-ARC-root-correction-first.json",
+      "sha256": "85eeafdb4ed422e83aa69a975e36a19284ca2ea391685b8726718e832622700e",
+      "scope": "Correction after reading reviewer feedback; the old root first and uncertain glyph remain preserved."
+    }
+  ],
+  "acceptance_scope": {
+    "complete_page_collation_accepted": false,
+    "independent_human_paleography_accepted": false,
+    "external_blind_review": false,
+    "specific_print_impression_date_established": false,
+    "independent_manuscript_lineage_established": false,
+    "modern_clock_mapping_established": false,
+    "ancient_civil_day_boundary_established": false,
+    "hinoo_half_clock_established": false,
+    "leap_short_month_priority_established": false,
+    "calendar_or_mansion_override_applied": false,
+    "new_independent_ancient_witnesses": 0,
+    "new_historical_observations": 0,
+    "real_prediction_samples": 0
+  }
+}

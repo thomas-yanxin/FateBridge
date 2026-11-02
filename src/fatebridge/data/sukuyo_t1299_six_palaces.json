@@ -1,0 +1,47 @@
+{
+  "id": "t1299_upper_six_palace_positions_v1",
+  "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
+  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+  "locator": "T21n1299_p0392b04-20",
+  "mansion_order": "角亢氐房心尾箕斗女虚危室壁奎娄胃昴毕觜参井鬼柳星张翼轸",
+  "counting_basis": "从本命宿本身计一，沿二十七宿次序顺数；六宫宿是本段的六个本命相对位置。",
+  "counting_excerpt": "一者命宿、二者事宿、三者意宿、四者聚宿、五者同宿、六者克宿。從命數第十為事宿，第四為意宿，第十六為聚宿，第二十為同宿，第十三為克宿",
+  "positions": [
+    {
+      "name": "命",
+      "inclusive_ordinal": 1,
+      "locator": "T21n1299_p0392b05-06"
+    },
+    {
+      "name": "事",
+      "inclusive_ordinal": 10,
+      "locator": "T21n1299_p0392b06-07"
+    },
+    {
+      "name": "意",
+      "inclusive_ordinal": 4,
+      "locator": "T21n1299_p0392b07"
+    },
+    {
+      "name": "聚",
+      "inclusive_ordinal": 16,
+      "locator": "T21n1299_p0392b07"
+    },
+    {
+      "name": "同",
+      "inclusive_ordinal": 20,
+      "locator": "T21n1299_p0392b07-08"
+    },
+    {
+      "name": "克",
+      "inclusive_ordinal": 13,
+      "locator": "T21n1299_p0392b08-09"
+    }
+  ],
+  "joint_reading_requirement": {
+    "source_excerpt": "皆須共三九祕宿相參，然後定災厄也。",
+    "locator": "T21n1299_p0392b14-15",
+    "evaluated": false
+  },
+  "scope": "仅计算已给定本命宿的六宫宿位置；未判定七曜运天犯宿，未把历日宿或星期当实际运行七曜，也不据此生成六害期间、现实灾祸、得失或全天宜忌。此六位置与十二宫分足另属不同章法。"
+}

@@ -89,7 +89,7 @@ def validate_calendar_firdaria_inputs(
     """Reject ambiguous clocks before the natal backend can silently resolve them."""
     _validate_calendar_clock(birth_info.local_datetime, "出生钟时")
     _validate_calendar_clock(analysis_datetime, "分析钟时")
-    if analysis_datetime.astimezone(timezone.utc) < birth_info.utc_datetime:
+    if analysis_datetime.astimezone(timezone.utc) < birth_info.require_utc_datetime:
         raise ValueError("法达公历周年模式的分析时刻不能早于出生时刻")
 
 
@@ -187,11 +187,30 @@ def build_firdaria_payload(
     firdaria_night_order: str = "nodes_at_end",
     firdaria_year_basis: str = "fixed_365_2425",
 ) -> Dict[str, Any]:
+    return build_firdaria_for_sect(
+        birth_info,
+        determine_sect(natal_subject),
+        analysis_datetime=analysis_datetime,
+        firdaria_night_order=firdaria_night_order,
+        firdaria_year_basis=firdaria_year_basis,
+    )
+
+
+def build_firdaria_for_sect(
+    birth_info: AstroBirthInfo,
+    sect: str,
+    *,
+    analysis_datetime: datetime,
+    firdaria_night_order: str = "nodes_at_end",
+    firdaria_year_basis: str = "fixed_365_2425",
+) -> Dict[str, Any]:
+    """Calendar arithmetic with an explicit sect; no surrogate natal houses."""
+    if sect not in {"day", "night"}:
+        raise ValueError("法达计算需要明确的 day／night 宗派")
     if firdaria_night_order not in {"nodes_at_end", "nodes_after_mars"}:
         raise ValueError("无效的 firdaria_night_order")
     if firdaria_year_basis not in {"fixed_365_2425", "calendar_anniversary"}:
         raise ValueError("无效的 firdaria_year_basis")
-    sect = determine_sect(natal_subject)
     sequence = (
         FIRDARIA_DAY_SEQUENCE
         if sect == "day"

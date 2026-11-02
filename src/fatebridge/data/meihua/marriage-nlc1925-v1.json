@@ -1,0 +1,263 @@
+{
+  "id": "meihua_marriage_clauses_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本婚姻初始条款、两家旺气与补充句关系成分",
+  "selected_edition_id": "nlc_1925",
+  "source": {
+    "id": "nlc_1925",
+    "title": "文明書局《梅花易數》卷二婚姻占第五選段",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_indices": [
+      65,
+      66
+    ],
+    "paper_page_labels": [
+      "一二",
+      "一三"
+    ],
+    "attribution_scope": "Hosting catalogue metadata; no independent authorship or edition authentication"
+  },
+  "comparison_source": {
+    "id": "wikisource_1441921",
+    "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二",
+    "revision": 1441921,
+    "saved_fixed_transcription_wikitext_sha256": "239523c6bb8b59d7ed3fe229c681cd1a1124a5216617e198f05dbf19cc6d2939"
+  },
+  "topics": {
+    "marriage": {
+      "label": "婚姻",
+      "section": "婚姻占第五",
+      "use_role": "婚姻",
+      "header": "占婚姻以體為主用為婚姻",
+      "pdf_index": 65
+    }
+  },
+  "rules": [
+    {
+      "id": "marriage_body_controls_use",
+      "topic": "marriage",
+      "relation": "体克用",
+      "quote": "體尅用可成但成之遲",
+      "reading": "所选章句取可成而成迟的传统象义，迟未换算成日期，也未核定现实婚姻结果",
+      "semantic_tags": [
+        "selected_initial_relation_clause",
+        "historical_conditional_not_verified_outcome"
+      ],
+      "delay_scope": "relative_only_not_numeric",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體克用，可成但成之遲",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "marriage_use_controls_body",
+      "topic": "marriage",
+      "relation": "用克体",
+      "quote": "用尅體不可成成亦有害",
+      "reading": "所选章句取不可成及成亦有害的历史象义，未据此作现实婚姻裁决或灾祸断言",
+      "semantic_tags": [
+        "selected_initial_relation_clause",
+        "historical_conditional_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用克體，不可成，成亦有害",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "marriage_body_generates_use",
+      "topic": "marriage",
+      "relation": "体生用",
+      "quote": "體生用婚難成或因婚有失",
+      "reading": "所选章句并记婚难成与或因婚有失，保留或字，不将两句改为必然同现的现实损失",
+      "semantic_tags": [
+        "selected_initial_relation_clause",
+        "historical_conditional_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體生用，婚難成，或因婚有失",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "marriage_use_generates_body",
+      "topic": "marriage",
+      "relation": "用生体",
+      "quote": "用生體婚易成或因婚有得",
+      "reading": "所选章句并记婚易成与或因婚有得，保留或字，不将两句改为必然同现的现实收益",
+      "semantic_tags": [
+        "selected_initial_relation_clause",
+        "historical_conditional_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "用生體，婚易成，或因婚有得",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    },
+    {
+      "id": "marriage_same_element",
+      "topic": "marriage",
+      "relation": "体用比和",
+      "quote": "體用比和婚姻吉利",
+      "reading": "所选初始句明写比和及婚姻吉利，后段比利异文另列，未核实伴侣适配或实际婚姻结果",
+      "semantic_tags": [
+        "selected_initial_relation_clause",
+        "historical_conditional_not_verified_outcome"
+      ],
+      "delay_scope": "not_stated_in_selected_clause",
+      "source_witness": {
+        "original_pdf_indices": [
+          65
+        ],
+        "reader": "assistant selected-span visual reading",
+        "independent_human_expert_review": false
+      },
+      "comparison_reading": {
+        "source_id": "wikisource_1441921",
+        "quote": "體用比和，婚姻吉利",
+        "semantic_status": "separate_witness_not_used_to_override_selected_edition"
+      }
+    }
+  ],
+  "family_frame": {
+    "quote": "占婚體爲所占之家用爲所婚之家",
+    "body_source_role": "所占之家",
+    "use_source_role": "所婚之家",
+    "gender_or_modern_partner_assignment": "not_specified_by_software"
+  },
+  "strength_clauses": [
+    {
+      "id": "marriage_body_wang",
+      "role": "body",
+      "quote": "體卦旺則此家門戶勝",
+      "source_family_role": "所占之家",
+      "source_result_wording": "此家門戶勝"
+    },
+    {
+      "id": "marriage_use_wang",
+      "role": "use",
+      "quote": "用卦旺則彼家資盛",
+      "source_family_role": "所婚之家",
+      "source_result_wording": "彼家資盛"
+    }
+  ],
+  "generation_clauses": [
+    {
+      "id": "marriage_receives_generation",
+      "relation_atom": "用生体",
+      "quote": "生體則得婚姻之財或彼有相就之意",
+      "comparison_quote": "生體，則得婚姻之財；或彼有相就之意",
+      "source_explicitly_names_use_in_this_supplement": false,
+      "junction": "或",
+      "full_actor_scope": "not_adjudicated"
+    },
+    {
+      "id": "marriage_generates_auxiliary",
+      "relation_atom": "体生用",
+      "quote": "體生則無嫁奩之資或此去求婚方諧",
+      "comparison_quote": "體生，則無嫁奩之資，或此去求婚方諧",
+      "source_explicitly_names_use_in_this_supplement": false,
+      "junction": "或",
+      "full_actor_scope": "not_adjudicated"
+    }
+  ],
+  "bili_supplement": {
+    "id": "marriage_supplement_bili",
+    "quote": "若體用比利則彼此相就良配無疑",
+    "comparison_quote": "若體用比和，則彼此相就，良配無疑",
+    "original_pdf_indices": [
+      65,
+      66
+    ],
+    "source_relation_term": "比利",
+    "comparison_relation_term": "比和",
+    "semantic_adjudication": "not_adjudicated",
+    "automatic_same_element_supplement": false
+  },
+  "unapplied_historical_person_descriptions": {
+    "source_heading_or_explicit_target_role": null,
+    "original_pdf_indices": [
+      66
+    ],
+    "entries": [
+      {
+        "trigram": "乾",
+        "quote": "端正而長"
+      },
+      {
+        "trigram": "坎",
+        "quote": "邪淫黑色嫉妒奢侈"
+      },
+      {
+        "trigram": "艮",
+        "quote": "色黃多巧"
+      },
+      {
+        "trigram": "震",
+        "quote": "美貌難犯"
+      },
+      {
+        "trigram": "巽",
+        "quote": "髮少稀疏醜陋心貪"
+      },
+      {
+        "trigram": "離",
+        "quote": "短赤色性不常"
+      },
+      {
+        "trigram": "坤",
+        "quote": "貌醜大腹而黃"
+      },
+      {
+        "trigram": "兌",
+        "quote": "高長語話喜悅白色"
+      }
+    ],
+    "selection_scope": "unadjudicated_original_target_role",
+    "automatic_appearance_character_or_ethnicity_inference": false,
+    "scope": "Documentary historical wording, not facts or a classifier of any person"
+  },
+  "unresolved": [
+    "supplement_generation_actor_scope",
+    "supplement_bili_term",
+    "historical_description_target_role",
+    "full_year_month_day_strength_and_internal_external_synthesis",
+    "real_world_prediction_effectiveness"
+  ]
+}

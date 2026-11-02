@@ -1,0 +1,262 @@
+{
+  "id": "sukuyo_named_seasonal_context_v68",
+  "edition": "CBETA fixed electronic Taisho selected main text; source-specific inline annotation kept separate. Not full manuscript collation.",
+  "source_files": {
+    "T13n0397.xml": {
+      "sha256": "64d0dbf21d28e11d76488a2bf7ff0f651883f1f7d5d76392616b97da5d38ce17",
+      "bytes": 6969939,
+      "reused_exact_prior_capture": "/Users/thomas/.codex/artifacts/fatebridge/sukuyo-month-names-v67/T13n0397.xml",
+      "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T13/T13n0397.xml"
+    },
+    "T21n1299.xml": {
+      "sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+      "bytes": 387099,
+      "reused_exact_prior_capture": "/Users/thomas/.codex/artifacts/fatebridge/sukuyo-month-names-v67/T21n1299.xml",
+      "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T21/T21n1299.xml"
+    },
+    "T25n1509.xml": {
+      "sha256": "f1f8be755336c8745f6a92d8a8a749998fc331d1f50d631ca1e88f5c0e153619",
+      "bytes": 17164919,
+      "reused_exact_prior_capture": "/Users/thomas/.codex/artifacts/fatebridge/sukuyo-weekday-origin-v30/T25n1509.xml",
+      "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T25/T25n1509.xml"
+    }
+  },
+  "all12_season_rows": [
+    {
+      "textual_month": 1,
+      "paragraph_id": "pT13p0281a1301",
+      "literal": "「『正月合角宿滿，晝行十四時、夜行十六時，日轉近北，日午之影長八脚跡，張宿夜行、婁在日前，日子熒惑嚴惡速疾此時用事，是正月時，特羊之神主當其月。",
+      "day_count_literal": "十四",
+      "night_count_literal": "十六",
+      "day_count": 14,
+      "night_count": 16,
+      "sum_derived": 30,
+      "time_unit_literal": "時",
+      "noon_shadow_literal": "八脚跡",
+      "explicit_fortnight_table_for_this_month": true,
+      "explicit_equinox_term_in_selected_paragraph": false
+    },
+    {
+      "textual_month": 2,
+      "paragraph_id": "pT13p0281a2701",
+      "literal": "「『二月合氐宿滿，晝行十五時、夜行十五時，日近北行，日午之影長六脚跡，角宿夜行、昴在日前，阿修羅師名曰太白此時用事，是二月時，特牛之神主當其月。",
+      "day_count_literal": "十五",
+      "night_count_literal": "十五",
+      "day_count": 15,
+      "night_count": 15,
+      "sum_derived": 30,
+      "time_unit_literal": "時",
+      "noon_shadow_literal": "六脚跡",
+      "explicit_fortnight_table_for_this_month": true,
+      "explicit_equinox_term_in_selected_paragraph": false
+    },
+    {
+      "textual_month": 3,
+      "paragraph_id": "pT13p0281b1201",
+      "literal": "「『三月合心宿滿，晝行十六時、夜行十四時，日行近北，日午之影長四脚跡，氐宿夜行、觜在日前，日子名曰佛陀懸多此時用事作柔軟業，是三月時，雙鳥之神主當其月。",
+      "day_count_literal": "十六",
+      "night_count_literal": "十四",
+      "day_count": 16,
+      "night_count": 14,
+      "sum_derived": 30,
+      "time_unit_literal": "時",
+      "noon_shadow_literal": "四脚跡",
+      "explicit_fortnight_table_for_this_month": true,
+      "explicit_equinox_term_in_selected_paragraph": false
+    },
+    {
+      "textual_month": 4,
+      "paragraph_id": "pT13p0281b2601",
+      "literal": "「『四月合箕宿滿，晝行十七時、夜行十三時，日近北行，日午之影長兩脚跡，房宿夜行、日隨井星，是四月時，蟹神主當其月。",
+      "day_count_literal": "十七",
+      "night_count_literal": "十三",
+      "day_count": 17,
+      "night_count": 13,
+      "sum_derived": 30,
+      "time_unit_literal": "時",
+      "noon_shadow_literal": "兩脚跡",
+      "explicit_fortnight_table_for_this_month": true,
+      "explicit_equinox_term_in_selected_paragraph": false
+    },
+    {
+      "textual_month": 5,
+      "paragraph_id": "pT13p0281c1001",
+      "literal": "「『五月合女宿滿，晝行十八時、夜行十二時，日極行北，日午之影長半脚跡，箕宿夜行、心在日前，是時日光焰熾大盛。此五月時，師子之神主當其月。",
+      "day_count_literal": "十八",
+      "night_count_literal": "十二",
+      "day_count": 18,
+      "night_count": 12,
+      "sum_derived": 30,
+      "time_unit_literal": "時",
+      "noon_shadow_literal": "半脚跡",
+      "explicit_fortnight_table_for_this_month": true,
+      "explicit_equinox_term_in_selected_paragraph": false
+    },
+    {
+      "textual_month": 6,
+      "paragraph_id": "pT13p0281c2401",
+      "literal": "「『六月合室宿滿，晝行十七時、夜行十三時，強日近南行，日午之影長二脚跡，女宿夜行、張在日前，月子名覺此時用事。此六月時，天女之神主當其月。",
+      "day_count_literal": "十七",
+      "night_count_literal": "十三",
+      "day_count": 17,
+      "night_count": 13,
+      "sum_derived": 30,
+      "time_unit_literal": "時",
+      "noon_shadow_literal": "二脚跡",
+      "explicit_fortnight_table_for_this_month": true,
+      "explicit_equinox_term_in_selected_paragraph": false
+    },
+    {
+      "textual_month": 7,
+      "paragraph_id": "pT13p0282a0901",
+      "literal": "「『七月合婁宿滿，晝行十六時、夜行十四時，日轉近南，日午之影長四脚跡，室宿夜行、角在日前，阿修羅師名曰太白此時用事。是七月時，秤量之神主當其月。』",
+      "day_count_literal": "十六",
+      "night_count_literal": "十四",
+      "day_count": 16,
+      "night_count": 14,
+      "sum_derived": 30,
+      "time_unit_literal": "時",
+      "noon_shadow_literal": "四脚跡",
+      "explicit_fortnight_table_for_this_month": true,
+      "explicit_equinox_term_in_selected_paragraph": false
+    },
+    {
+      "textual_month": 8,
+      "paragraph_id": "pT13p0280a2701",
+      "literal": "「『胃宿十四日用事，人生吉凶造作善惡疾病等事如上說了。月行虛空周匝宿訖還更起昴，是故言日。虛空月滿三十晝夜，亦名月滿。八月滿者起胃終昴，其月如是。夜十五時晝十五時，日午之影長六脚跡。婁宿夜行、房在日前，熒惑日子是時隨日。是八月時蝎神主當，昴宿為業，前已說竟。是白月內，次十五日昴又用事，月合昴星是八月滿，昴與月合一日夜訖；其次復轉合於畢宿，九月初日畢用事也。",
+      "day_count_literal": "十五",
+      "night_count_literal": "十五",
+      "day_count": 15,
+      "night_count": 15,
+      "sum_derived": 30,
+      "time_unit_literal": "時",
+      "noon_shadow_literal": "六脚跡",
+      "explicit_fortnight_table_for_this_month": false,
+      "explicit_equinox_term_in_selected_paragraph": false
+    },
+    {
+      "textual_month": 9,
+      "paragraph_id": "pT13p0280b1301",
+      "literal": "「『白月，一日合尾、二日合箕、三日合斗、四日合牛、五日合女、六日合虛、七日合危、八日合室、九日合辟、十日合奎、十一日合婁、十二日合胃、十三日合昴、十四日合畢、十五日合觜是白月滿。九月合觜宿滿，晝十四時、夜十六時，日午之影長八脚跡，日行南陸，昴宿夜行、尾在日前。其九月時歲星用事，為一切天之所尊敬，得失諸事皆悉由之。是九月時，射神主當。",
+      "day_count_literal": "十四",
+      "night_count_literal": "十六",
+      "day_count": 14,
+      "night_count": 16,
+      "sum_derived": 30,
+      "time_unit_literal": "時",
+      "noon_shadow_literal": "八脚跡",
+      "explicit_fortnight_table_for_this_month": true,
+      "explicit_equinox_term_in_selected_paragraph": false
+    },
+    {
+      "textual_month": 10,
+      "paragraph_id": "pT13p0280c0301",
+      "literal": "「『十月合鬼宿滿，晝十三時、夜十七時，日午之影長十脚跡，觜宿夜行、女在日前。當此之時辰星用事。是十月時，摩竭之神主當其月。",
+      "day_count_literal": "十三",
+      "night_count_literal": "十七",
+      "day_count": 13,
+      "night_count": 17,
+      "sum_derived": 30,
+      "time_unit_literal": "時",
+      "noon_shadow_literal": "十脚跡",
+      "explicit_fortnight_table_for_this_month": true,
+      "explicit_equinox_term_in_selected_paragraph": false
+    },
+    {
+      "textual_month": 11,
+      "paragraph_id": "pT13p0280c1501",
+      "literal": "「『十一月合七星滿，晝十二時、夜十八時，日午之影十二脚跡，鬼宿夜行、危在日前，近南轉，辰星用事。是十一月，水器之神主當其月。",
+      "day_count_literal": "十二",
+      "night_count_literal": "十八",
+      "day_count": 12,
+      "night_count": 18,
+      "sum_derived": 30,
+      "time_unit_literal": "時",
+      "noon_shadow_literal": "十二脚跡",
+      "explicit_fortnight_table_for_this_month": true,
+      "explicit_equinox_term_in_selected_paragraph": false
+    },
+    {
+      "textual_month": 12,
+      "paragraph_id": "pT13p0280c2801",
+      "literal": "「『十二月合翼宿滿，晝行十三時、夜行十七時，日轉近北，日午之影十二脚跡，七星夜行天師歲星用事之時，是十二月，天魚之神主當其月。",
+      "day_count_literal": "十三",
+      "night_count_literal": "十七",
+      "day_count": 13,
+      "night_count": 17,
+      "sum_derived": 30,
+      "time_unit_literal": "時",
+      "noon_shadow_literal": "十二脚跡",
+      "explicit_fortnight_table_for_this_month": true,
+      "explicit_equinox_term_in_selected_paragraph": false
+    }
+  ],
+  "rizang_unit_context": {
+    "paragraph_id": "pT13p0276a2303",
+    "literal": "「佉盧虱吒仙人言：『月合諸星起昴終胃，月行宿訖一月將滿，八月黑初月合在胃，如是次第輪轉不息。我今復說剎那之數，一千六百剎那名一迦羅，六十迦羅名摸呼律多，三十摸呼律多為一日夜。"
+  },
+  "T1299_spring_context": {
+    "paragraph_id": "pT21p0388a0501",
+    "main_literal": "上古白博叉二月春分朔，于時曜躔婁宿，道齊景正，日中氣和，庶物漸榮，一切增長。梵天歡喜，命為歲元。",
+    "inline_notes": [
+      "景風曰：大唐以建寅為歲初，天竺以建卯為歲首。然則大唐令月皆以正月二三四至于十二，則天竺皆據白月十五日夜太陰所在宿為月名，故呼建卯為角月、建辰為氐月，則但呼角氐心箕之月，亦不論建卯建辰及正二三月也。此東西二之異義，學者先宜曉之，今又二詳釋如左也"
+    ]
+  },
+  "T1509_season_context": {
+    "locator": "T25n1509_p0409b25-29",
+    "main_literal": "說。「日月歲節」者，日名從旦至旦，初分、中分、後分；夜亦三分。一日一夜有三十時：春、秋分時，十五時屬晝，十五時屬夜；餘時增減——五月至，晝十八時，夜十二時；十一月至，夜十八時，晝十二時。一月，或三十日、或三十日半、或",
+    "comparison_type": "Same literal fifth/eleventh label and count only; no certified same calendar date, uniform whole-calendar shift or physical observation."
+  },
+  "derived_diagnostics": {
+    "all12_sums_equal30": true,
+    "equal_day_night_textual_months": [
+      2,
+      8
+    ],
+    "max_day_count_textual_months": [
+      5
+    ],
+    "max_night_count_textual_months": [
+      11
+    ],
+    "eleventh_and_twelfth_noon_shadows_both_literal_twelve": true,
+    "monthly_time_label_automatically_equals_muhurta": false,
+    "48minute_modern_unit_accepted": false,
+    "seasonal_mapping_to_current_calendar_accepted": false,
+    "equinox_event_dates_established": false,
+    "latitude_or_gnomon_geometry_inferred": false,
+    "clock_or_hinoo_half_or_leap_precedence_resolved": false,
+    "new_independent_historical_observations": 0
+  },
+  "named_month_comparison_scope": {
+    "Rizang_month5_fullmoon_literal": "女",
+    "T1299_named_month_literal": "女月",
+    "T1299_named_Tang_month": 6,
+    "literal_Rizang_month5_season_counts": [
+      18,
+      12
+    ],
+    "literal_T1509_fifth_solstice_counts": [
+      18,
+      12
+    ],
+    "same_literal_labels_and_counts_are_not_same_physical_dates": true,
+    "month8_narrative_has_day_night_counts_but_not30_explicit_daily_cells": true,
+    "seven_stars_star_alias_accepted": false
+  },
+  "interpretation_scope": {
+    "applied_to_current_calendar": false,
+    "uniform_month_or_year_conversion_established": false,
+    "new_intercalation_or_precedence_rule_adopted": false,
+    "equinox_event_dates_established": false,
+    "all30_counts_mean30_modern_hours": false,
+    "muhurta_equals48_modern_minutes_accepted": false,
+    "fixed_solar_altitude_or_gnomon_geometry_established": false,
+    "hinoo_half_mapping_established": false,
+    "physical_day_boundary_established": false,
+    "new_independent_historical_observations": 0,
+    "real_sample_count": 0
+  },
+  "before_production_reference_sha256": "738f421ed51dd8957063342189ae536563e340ec683a0d4f3eebf82fded8760f",
+  "reference_plan_sha256": "0ee30ca88bc29566d5cde234311e7fc6647e12840a19e91d836fa227b80a38af"
+}

@@ -1,0 +1,54 @@
+{
+  "id": "wakita_1897_selected_weekday_chapter_v1",
+  "title": "宿曜經：縮刷 二冊合卷；宿曜經算曜直章第七",
+  "publisher": "脇田文紹",
+  "publication_year": 1897,
+  "holding": "国立国会図書館 特46-672",
+  "catalogue_url": "https://ndlsearch.ndl.go.jp/books/R100000039-I817827",
+  "doi": "10.11501/817827",
+  "manifest_url": "https://dl.ndl.go.jp/api/iiif/817827/manifest.json",
+  "manifest_sha256": "7b2b111e19ca158f92b2d82ab22645cb9d6185dc3bd218c218b63b67c6ae9834",
+  "locator": "upper printed pp40-41; IIIF canvas23 right bottom through left",
+  "selected_main_clauses": [
+    "大唐開元二年",
+    "一千五百一算外",
+    "若推已後每年加一算若推已前年用減一算",
+    "以十二乘入元距所求年積算又加自入年已來月數",
+    "起二月加之假令推五月五日更加四箇是也",
+    "下位以七乘之以二百廿八除之為積閏不盡為閏餘",
+    "以積閏加上位加訖置為積月",
+    "以三十乘積月又加入月已來日數",
+    "以十一乘下位加差五百以七百三除之所得為小月日不盡為小餘",
+    "以小月日減上位",
+    "以六十去積日不盡者命起甲辰等上則所求年月日之甲子乙丑也",
+    "又以七去積日不盡者命起太陰以次火水木金土日等盡之上則是其日所得曜直也"
+  ],
+  "transcription_scope": "Selected main text only; printed variant apparatus, all neighbouring sections and whole book not collated. Manual reading, no independent transcription acceptance. The glyph between 積歲 and 一千 is excluded from the selected fragments and remains untranscribed.",
+  "year_count_rule": {
+    "anchor_named_year": "大唐開元二年",
+    "anchor_year_number": 714,
+    "anchor_elapsed_years": 1501,
+    "later_year_increment": 1,
+    "earlier_year_decrement": 1,
+    "epoch_year_name": "癸丑",
+    "literal_epoch_year_conversion_not_printed": true
+  },
+  "formula_constants": {
+    "months_per_year": 12,
+    "intercalation_numerator": 7,
+    "intercalation_denominator": 228,
+    "nominal_days_per_month": 30,
+    "omission_numerator": 11,
+    "omission_bias": 500,
+    "omission_denominator": 703,
+    "sexagenary_first_count": "甲辰",
+    "weekday_first_count": "月"
+  },
+  "entered_month_example": {
+    "named_month": 5,
+    "entered_months": 4,
+    "named_day": 5,
+    "elapsed_days": 5
+  },
+  "scope": "A separate later printed witness of the selected year-count and integer formula. The named-year arithmetic is not admission of a civil epoch, historical month sequence, modern host calendar, sunrise or hourly order."
+}

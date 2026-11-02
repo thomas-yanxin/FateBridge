@@ -1,0 +1,262 @@
+{
+  "schema_version": "gujin45-targeted-witness-variants-v1",
+  "scope": "six_preselected_cells_only",
+  "target_selection": "Three Siku day-rate diagnostic outliers and three Siku increment/adjacent-cumulative conflicts found before acquiring these witnesses.",
+  "targets": [
+    {
+      "field": "day_rate_days",
+      "limit_index": 90
+    },
+    {
+      "field": "day_rate_days",
+      "limit_index": 154
+    },
+    {
+      "field": "day_rate_days",
+      "limit_index": 166
+    },
+    {
+      "field": "signed_increment_ancient_du",
+      "limit_index": 12
+    },
+    {
+      "field": "signed_increment_ancient_du",
+      "limit_index": 155
+    },
+    {
+      "field": "signed_increment_ancient_du",
+      "limit_index": 163
+    }
+  ],
+  "baseline_witness_id": "siku787_existing_single_collation",
+  "baseline_source_url": "https://commons.wikimedia.org/w/index.php?curid=71219540",
+  "baseline_files_sha256": {
+    "src/fatebridge/data/guolao/gujin45-day-rate-v1.json": "9c471d97f51c0ba2b6e311bd04fda1907d7f076e4cbad1267883692787bfe2ee",
+    "src/fatebridge/data/guolao/gujin45-cumulative-table-v1.json": "e59afd87fc71c4202a29a8f76227b02d949155a2409287a9f38a0a9b87da857e"
+  },
+  "fixture_reference_sha256": "7b5520f910119f27a184b0d737fda18ffa3896c47542f1e75e14596ae4ca7f06",
+  "single_collator": true,
+  "independent_second_collator": false,
+  "prior_formula_and_witness_values_known": true,
+  "full_additional_table_transcription": false,
+  "textual_ancestry_adjudicated": false,
+  "computational_overrides_authorized": false,
+  "witnesses": [
+    {
+      "witness_id": "nlc_cbm1408_volume14",
+      "label": "中国国家图书馆 CBM1408，第14册",
+      "source_url": "https://commons.wikimedia.org/w/index.php?title=File:NLC892-CBM1408-371933_古今律曆考_七十二卷_第14冊.pdf&oldid=1269757833",
+      "official_catalog_url": "https://read.nlc.cn/allSearch/searchDetail?fid=CBM1408&indexName=data_892&searchType=10024&showType=1",
+      "edition_statement": "明萬曆[1573–1620]刻本；具体刊年未核定",
+      "exact_edition_year": null,
+      "downloaded_pdf_bytes": 18807026,
+      "downloaded_pdf_sha256": "95b264e0447fb612a4b389b4b44e8f9871f9d0417b6893699fd37fe589cb23f3",
+      "observations": [
+        {
+          "field": "day_rate_days",
+          "limit_index": 90,
+          "value": "7.3607",
+          "observed_glyphs": "七日三六〇七",
+          "pdf_page_one_based": 59,
+          "status": "legible_single_collator",
+          "inspection_crop": "nlc-cbm1408-R90.png",
+          "complete_page_image": "nlc-cbm1408-p59.png"
+        },
+        {
+          "field": "day_rate_days",
+          "limit_index": 154,
+          "value": "12.6292",
+          "observed_glyphs": "十二日六二九二",
+          "pdf_page_one_based": 63,
+          "status": "legible_single_collator",
+          "inspection_crop": "nlc-cbm1408-R154.png",
+          "complete_page_image": "nlc-cbm1408-p63.png"
+        },
+        {
+          "field": "day_rate_days",
+          "limit_index": 166,
+          "value": "13.6333",
+          "observed_glyphs": "十三日六三三三",
+          "pdf_page_one_based": 64,
+          "status": "legible_single_collator",
+          "inspection_crop": "nlc-cbm1408-R166.png",
+          "complete_page_image": "nlc-cbm1408-p64.png"
+        },
+        {
+          "field": "signed_increment_ancient_du",
+          "limit_index": 12,
+          "value": "0.10255075",
+          "observed_glyphs": "益十分二五五〇七五",
+          "pdf_page_one_based": 55,
+          "status": "legible_single_collator",
+          "inspection_crop": "nlc-cbm1408-S12.png",
+          "complete_page_image": "nlc-cbm1408-p55.png"
+        },
+        {
+          "field": "signed_increment_ancient_du",
+          "limit_index": 155,
+          "value": "-0.10225075",
+          "observed_glyphs": "損十〇分二二五〇七五",
+          "pdf_page_one_based": 63,
+          "status": "legible_single_collator",
+          "inspection_crop": "nlc-cbm1408-S155.png",
+          "complete_page_image": "nlc-cbm1408-p63.png"
+        },
+        {
+          "field": "signed_increment_ancient_du",
+          "limit_index": 163,
+          "value": "-0.10817275",
+          "observed_glyphs": "損十〇分八一七二七五",
+          "pdf_page_one_based": 63,
+          "status": "legible_single_collator",
+          "inspection_crop": "nlc-cbm1408-S163.png",
+          "complete_page_image": "nlc-cbm1408-p63.png"
+        }
+      ]
+    },
+    {
+      "witness_id": "ncl_06273_part2",
+      "label": "台湾国家图书馆 06273，第2个PDF",
+      "source_url": "https://commons.wikimedia.org/w/index.php?curid=138010754",
+      "official_catalog_url": "https://rbook.ncl.edu.tw/NCLSearch/Search/SearchDetail?HasImage=&SourceID=1&item=56e6ed5cbce14fc3a10a312cb8057d23fDcyNTA00.dLZGHJOE0XLZf5cTCQKNqbNDaqqjmxH0Dp0meHcb2Ss_&page=",
+      "edition_statement": "馆藏目录著录：明萬曆戊申(1608)孫瑋保定刊本",
+      "exact_edition_year": 1608,
+      "downloaded_pdf_bytes": 48561584,
+      "downloaded_pdf_sha256": "4c6ec588e2fa7a13db0187b7ce8630fbfa7ec86ac47f2c8120e0f9a6b3dcce78",
+      "observations": [
+        {
+          "field": "day_rate_days",
+          "limit_index": 90,
+          "value": "7.3607",
+          "observed_glyphs": "七日三六〇七",
+          "pdf_page_one_based": 81,
+          "status": "legible_single_collator",
+          "inspection_crop": "ncl-06273-R90.png",
+          "complete_page_image": "ncl-06273-p81.jpg"
+        },
+        {
+          "field": "day_rate_days",
+          "limit_index": 154,
+          "value": "12.6292",
+          "observed_glyphs": "十二日六二九二",
+          "pdf_page_one_based": 85,
+          "status": "legible_single_collator",
+          "inspection_crop": "ncl-06273-R154.png",
+          "complete_page_image": "ncl-06273-p85.jpg"
+        },
+        {
+          "field": "day_rate_days",
+          "limit_index": 166,
+          "value": "13.6333",
+          "observed_glyphs": "十三日六三三三",
+          "pdf_page_one_based": 86,
+          "status": "legible_single_collator",
+          "inspection_crop": "ncl-06273-R166.png",
+          "complete_page_image": "ncl-06273-p86.jpg"
+        },
+        {
+          "field": "signed_increment_ancient_du",
+          "limit_index": 12,
+          "value": "0.10255075",
+          "observed_glyphs": "益十分二五五〇七五",
+          "pdf_page_one_based": 77,
+          "status": "legible_single_collator",
+          "inspection_crop": "ncl-06273-S12.png",
+          "complete_page_image": "ncl-06273-p77.jpg"
+        },
+        {
+          "field": "signed_increment_ancient_du",
+          "limit_index": 155,
+          "value": "-0.10225075",
+          "observed_glyphs": "損十〇分二二五〇七五",
+          "pdf_page_one_based": 85,
+          "status": "legible_single_collator",
+          "inspection_crop": "ncl-06273-S155.png",
+          "complete_page_image": "ncl-06273-p85.jpg"
+        },
+        {
+          "field": "signed_increment_ancient_du",
+          "limit_index": 163,
+          "value": "-0.10817275",
+          "observed_glyphs": "損十〇分八一七二七五",
+          "pdf_page_one_based": 85,
+          "status": "legible_single_collator",
+          "inspection_crop": "ncl-06273-S163.png",
+          "complete_page_image": "ncl-06273-p85.jpg"
+        }
+      ]
+    },
+    {
+      "witness_id": "ncl_06272_part2",
+      "label": "台湾国家图书馆 06272，第2个PDF",
+      "source_url": "https://commons.wikimedia.org/w/index.php?curid=138088963",
+      "official_catalog_url": "https://catalog.digitalarchives.tw/Organization/List.jsp?CID=6560",
+      "edition_statement": "馆藏目录著录：明萬曆戊申(1608)孫瑋保定刊本",
+      "exact_edition_year": 1608,
+      "downloaded_pdf_bytes": 137534391,
+      "downloaded_pdf_sha256": "6fa54ca272ad7bceb7bb7301680df32565b1dae3930a293693df4465c1b18d30",
+      "observations": [
+        {
+          "field": "day_rate_days",
+          "limit_index": 90,
+          "value": "7.3607",
+          "observed_glyphs": "七日三六〇七",
+          "pdf_page_one_based": 46,
+          "status": "legible_single_collator",
+          "inspection_crop": "ncl-06272-R90.png",
+          "complete_page_image": "ncl-06272-p46.jpg"
+        },
+        {
+          "field": "day_rate_days",
+          "limit_index": 154,
+          "value": "12.6292",
+          "observed_glyphs": "十二日六二九二",
+          "pdf_page_one_based": 50,
+          "status": "legible_single_collator",
+          "inspection_crop": "ncl-06272-R154.png",
+          "complete_page_image": "ncl-06272-p50.jpg"
+        },
+        {
+          "field": "day_rate_days",
+          "limit_index": 166,
+          "value": "13.6333",
+          "observed_glyphs": "十三日六三三三",
+          "pdf_page_one_based": 51,
+          "status": "legible_single_collator",
+          "inspection_crop": "ncl-06272-R166.png",
+          "complete_page_image": "ncl-06272-p51.jpg"
+        },
+        {
+          "field": "signed_increment_ancient_du",
+          "limit_index": 12,
+          "value": "0.10255075",
+          "observed_glyphs": "益十分二五五〇七五",
+          "pdf_page_one_based": 42,
+          "status": "legible_single_collator",
+          "inspection_crop": "ncl-06272-S12.png",
+          "complete_page_image": "ncl-06272-p42.jpg"
+        },
+        {
+          "field": "signed_increment_ancient_du",
+          "limit_index": 155,
+          "value": "-0.10225075",
+          "observed_glyphs": "損十〇分二二五〇七五",
+          "pdf_page_one_based": 50,
+          "status": "legible_single_collator",
+          "inspection_crop": "ncl-06272-S155.png",
+          "complete_page_image": "ncl-06272-p50.jpg"
+        },
+        {
+          "field": "signed_increment_ancient_du",
+          "limit_index": 163,
+          "value": "-0.10817275",
+          "observed_glyphs": "損十〇分八一七二七五",
+          "pdf_page_one_based": 50,
+          "status": "legible_single_collator",
+          "inspection_crop": "ncl-06272-S163.png",
+          "complete_page_image": "ncl-06272-p50.jpg"
+        }
+      ]
+    }
+  ]
+}

@@ -105,3 +105,6 @@ def test_uncertain_boundary_has_the_same_partial_contract_on_every_transport(
         == without_transport(cli)
     )
     assert http.json()["status"] == "partial"
+    for body in (http.json(), protocol.structured_content, cli):
+        assert body["run_metadata"]["engine_is_approximate"] is True
+        assert "approximate_engine" in body["run_metadata"]["warnings"]

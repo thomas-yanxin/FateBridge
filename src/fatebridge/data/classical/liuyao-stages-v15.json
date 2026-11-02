@@ -1,0 +1,101 @@
+{
+  "ruleset_id": "zengshan_partial_stage_queries_v15",
+  "ruleset_version": "15.0.1",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "method": "PDF97,99-101 visually read before implementation; same-edition hidden clauses PDF110-112 retained from v14. No replacement edition or completed fire row."
+  },
+  "known_stages": {
+    "金": {
+      "巳": "长生",
+      "酉": "帝旺",
+      "丑": "墓",
+      "寅": "绝"
+    },
+    "木": {
+      "亥": "长生",
+      "卯": "帝旺",
+      "未": "墓",
+      "申": "绝"
+    },
+    "水": {
+      "申": "长生",
+      "子": "帝旺",
+      "辰": "墓",
+      "巳": "绝"
+    },
+    "土": {
+      "申": "长生",
+      "子": "帝旺",
+      "辰": "墓",
+      "巳": "绝"
+    },
+    "火": {
+      "寅": "长生",
+      "戌": "墓"
+    }
+  },
+  "clauses": [
+    {
+      "id": "four-stage-scope",
+      "pdf_pages": [
+        97
+      ],
+      "quote": "余得驗者止驗生旺墓絕其餘不驗不必用之"
+    },
+    {
+      "id": "fire-known-growth",
+      "pdf_pages": [
+        99
+      ],
+      "quote": "火生在寅四大生理之正也"
+    },
+    {
+      "id": "fire-known-tomb",
+      "pdf_pages": [
+        101
+      ],
+      "quote": "且如主象臨午火火墓於戌後逢辰日則應之餘倣此",
+      "quotation_revision": "43.0.0"
+    },
+    {
+      "id": "flying-hidden-six",
+      "pdf_pages": [
+        110
+      ],
+      "quote": "伏神得日月生者一也"
+    },
+    {
+      "id": "strong-flying-pressure",
+      "pdf_pages": [
+        111
+      ],
+      "quote": "伏神被旺相之飛神尅害者三也"
+    }
+  ],
+  "interpretation": {
+    "query_model": "Each listed phase has its stated branch and a branch has one phase for a given element. A known different phase excludes the requested phase; an unknown branch excludes a requested phase only if that phase mapping is present. Unlisted requested phases remain unknown. This is a deterministic evaluation model, not a newly discovered fire table.",
+    "aggregation": "Kleene OR for alternative queried positions. A verified position cannot be erased by another unknown position. A position relation does not certify actual tomb/cessation.",
+    "applicability": "The hidden target queries its own month/day/flying positions. Missing flying-stage data remains blocking where flying pressure is in dispute; it is not a new adverse condition when the flying element cannot control the independently supported hidden target."
+  },
+  "scope": "仅核已列阶段位置及本次查询完整性；不填补火帝旺与绝位，不把位置关系当成真墓真绝或现实成败。",
+  "quotation_errata": [
+    {
+      "artifact": "liuyao-stages-v15.json",
+      "clause_id": "fire-known-tomb",
+      "original_profile_sha256": "7e2936e5855abee97fea86fc829b7454f6b90bdd6e29dfccc1097d22ebfeb9f5",
+      "published_before_sha256": "7e2936e5855abee97fea86fc829b7454f6b90bdd6e29dfccc1097d22ebfeb9f5",
+      "old_quote": "主事爻臨午火火墓於戌後逢辰日則應之",
+      "new_quote": "且如主象臨午火火墓於戌後逢辰日則應之餘倣此",
+      "new_ruleset_version": "15.0.1",
+      "source_sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+      "pdf_page": 101,
+      "passage_id": "fire-tomb",
+      "source_image_sha256": "0a560201476f4839df1da340a7498bd6368d6c615b40c782cf4417e15e07a48c",
+      "revision": "43.0.0",
+      "reason": "Verbatim quotation corrected against the same frozen edition; computations and stage tables unchanged"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "ruleset_id": "zengshan_hidden_reception_v14",
+  "ruleset_version": "14.0.0",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "method": "PDF110-112 visually read before implementation. Cases frozen before engine edits; source examples are structural and do not recover civil years or establish event accuracy."
+  },
+  "clauses": [
+    {
+      "id": "flying-generates",
+      "pdf_pages": [
+        110
+      ],
+      "quote": "伏神得飛神生者三也"
+    },
+    {
+      "id": "six-positive-conditions",
+      "pdf_pages": [
+        110
+      ],
+      "quote": "伏神得日月生者一也"
+    },
+    {
+      "id": "flying-release",
+      "pdf_pages": [
+        110
+      ],
+      "quote": "但得飛神臨破臨絕休囚入墓而伏神皆易出也"
+    },
+    {
+      "id": "hidden-obstructions",
+      "pdf_pages": [
+        111
+      ],
+      "quote": "伏神被日月沖尅者二也"
+    },
+    {
+      "id": "strong-flying-control",
+      "pdf_pages": [
+        111
+      ],
+      "quote": "伏神被旺相之飛神尅害者三也"
+    },
+    {
+      "id": "supported-void-waits",
+      "pdf_pages": [
+        111
+      ],
+      "quote": "凡用神旺相而遇旬空出空之日則出矣"
+    },
+    {
+      "id": "bi-current-void",
+      "pdf_pages": [
+        111
+      ],
+      "quote": "午火父母爲用神空而伏於二爻丑土之下壓之難出"
+    },
+    {
+      "id": "sheng-flying-void",
+      "pdf_pages": [
+        112
+      ],
+      "quote": "丑土旬空伏神易出"
+    }
+  ],
+  "textual_issues": [
+    {
+      "id": "page110-linjue",
+      "scan_reading": "臨破臨絕休囚入墓",
+      "scope": "原页含臨絕；旧转录及关系层不重写。绝位关系不等于已裁真绝。"
+    }
+  ],
+  "scope": "列出的当前受生与引拔门槛，不是完整出伏、吉凶或现实预测裁定。日月冲克与生扶并存、飞伏强弱竞争、动爻克伏及墓绝位冲突保留未知。火表缺项保留未知。飞生使用飞神本身来源资格，不能借用伏神或同位其他对象。"
+}

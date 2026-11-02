@@ -1,0 +1,370 @@
+{
+  "ruleset_id": "zengshan_role_conditions_v4",
+  "ruleset_version": "4.0.0",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "pages": [
+      51,
+      52,
+      53,
+      54
+    ],
+    "method": "Visually read rendered primary scan; selected clauses only."
+  },
+  "scope": "23 enumerated predicates are condition evidence. Total strength, entering a tomb, scattering, focus robustness and final effectiveness still require adjudication; no condition-count vote.",
+  "rules": [
+    {
+      "rule_id": "yuan_support_1",
+      "role": "yuan",
+      "kind": "support",
+      "quote": "元神旺相或臨日月或日月動爻生扶者一也",
+      "formula": [
+        "any",
+        "strength_wang",
+        "near_calendar",
+        "calendar_support",
+        "moving_support"
+      ],
+      "pdf_pages": [
+        52
+      ]
+    },
+    {
+      "rule_id": "yuan_support_2",
+      "role": "yuan",
+      "kind": "support",
+      "quote": "元神動化回頭生及化進神者二也",
+      "formula": [
+        "all",
+        "active",
+        [
+          "any",
+          "back_generate",
+          "advance"
+        ]
+      ],
+      "pdf_pages": [
+        52
+      ]
+    },
+    {
+      "rule_id": "yuan_support_3",
+      "role": "yuan",
+      "kind": "support",
+      "quote": "元神長生帝旺於日辰三也",
+      "formula": "day_growth_peak",
+      "pdf_pages": [
+        52
+      ]
+    },
+    {
+      "rule_id": "yuan_support_4",
+      "role": "yuan",
+      "kind": "support",
+      "quote": "元神與忌神同動四也",
+      "formula": "paired_active",
+      "pdf_pages": [
+        52
+      ]
+    },
+    {
+      "rule_id": "yuan_support_5",
+      "role": "yuan",
+      "kind": "support",
+      "quote": "元神旺動臨空化空五也",
+      "formula": [
+        "all",
+        "strength_wang",
+        "active",
+        "original_or_changed_void"
+      ],
+      "pdf_pages": [
+        52
+      ]
+    },
+    {
+      "rule_id": "yuan_obstruction_1",
+      "role": "yuan",
+      "kind": "obstruction",
+      "quote": "元神休囚不動或動而休囚又被傷克者一也",
+      "formula": [
+        "all",
+        "strength_weak",
+        [
+          "any",
+          "static",
+          [
+            "all",
+            "active",
+            "injured_relation"
+          ]
+        ]
+      ],
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "yuan_obstruction_2",
+      "role": "yuan",
+      "kind": "obstruction",
+      "quote": "元神休囚又逢旬空月破二也",
+      "formula": [
+        "all",
+        "strength_weak",
+        "void_or_break"
+      ],
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "yuan_obstruction_3",
+      "role": "yuan",
+      "kind": "obstruction",
+      "quote": "元神休囚動化退神三也",
+      "formula": [
+        "all",
+        "strength_weak",
+        "active",
+        "retreat"
+      ],
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "yuan_obstruction_4",
+      "role": "yuan",
+      "kind": "obstruction",
+      "quote": "元神衰而又絕四也",
+      "formula": [
+        "all",
+        "strength_failing",
+        "day_cessation"
+      ],
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "yuan_obstruction_5",
+      "role": "yuan",
+      "kind": "obstruction",
+      "quote": "元神入五墓五也",
+      "formula": "entered_tomb",
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "yuan_obstruction_6",
+      "role": "yuan",
+      "kind": "obstruction",
+      "quote": "元神休囚動而化絕化剋化破化散六也",
+      "formula": [
+        "all",
+        "strength_weak",
+        "active",
+        "changed_adverse"
+      ],
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "ji_support_1",
+      "role": "ji",
+      "kind": "support",
+      "quote": "忌神旺相或遇日月動爻生扶或臨日月者一也",
+      "formula": [
+        "any",
+        "strength_wang",
+        "near_calendar",
+        "calendar_support",
+        "moving_support"
+      ],
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "ji_support_2",
+      "role": "ji",
+      "kind": "support",
+      "quote": "忌神動化回頭生化進神者二也",
+      "formula": [
+        "all",
+        "active",
+        [
+          "any",
+          "back_generate",
+          "advance"
+        ]
+      ],
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "ji_support_3",
+      "role": "ji",
+      "kind": "support",
+      "quote": "忌神旺動臨空化空三也",
+      "formula": [
+        "all",
+        "strength_wang",
+        "active",
+        "original_or_changed_void"
+      ],
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "ji_support_4",
+      "role": "ji",
+      "kind": "support",
+      "quote": "忌神長生帝旺于日辰四也",
+      "formula": "day_growth_peak",
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "ji_support_5",
+      "role": "ji",
+      "kind": "support",
+      "quote": "忌神與仇神同動五也",
+      "formula": "chou_active",
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "ji_obstruction_1",
+      "role": "ji",
+      "kind": "obstruction",
+      "quote": "忌神休囚不動動而休囚被日月動爻剋者一也",
+      "formula": [
+        "all",
+        "strength_weak",
+        [
+          "any",
+          "static",
+          [
+            "all",
+            "active",
+            "calendar_moving_controls"
+          ]
+        ]
+      ],
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "ji_obstruction_2",
+      "role": "ji",
+      "kind": "obstruction",
+      "quote": "忌神靜臨空破二也",
+      "formula": [
+        "all",
+        "static",
+        "void_or_break"
+      ],
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "ji_obstruction_3",
+      "role": "ji",
+      "kind": "obstruction",
+      "quote": "忌神入五墓三也",
+      "formula": "entered_tomb",
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "ji_obstruction_4",
+      "role": "ji",
+      "kind": "obstruction",
+      "quote": "忌神衰動化退神四也",
+      "formula": [
+        "all",
+        "strength_failing",
+        "active",
+        "retreat"
+      ],
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "ji_obstruction_5",
+      "role": "ji",
+      "kind": "obstruction",
+      "quote": "忌神衰而又絕五也",
+      "formula": [
+        "all",
+        "strength_failing",
+        "day_cessation"
+      ],
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "ji_obstruction_6",
+      "role": "ji",
+      "kind": "obstruction",
+      "quote": "忌神動化絕化剋化破化散六也",
+      "formula": [
+        "all",
+        "active",
+        "changed_adverse"
+      ],
+      "pdf_pages": [
+        53
+      ]
+    },
+    {
+      "rule_id": "ji_obstruction_7",
+      "role": "ji",
+      "kind": "obstruction",
+      "quote": "忌神與元神同動七也",
+      "formula": "paired_active",
+      "pdf_pages": [
+        53
+      ]
+    }
+  ],
+  "co_motion_quotes": [
+    {
+      "pdf_page": 51,
+      "quote": "忌神與元神同動則兩生也"
+    },
+    {
+      "pdf_page": 54,
+      "quote": "忌神未土反生元神之酉金金生亥水接續相生"
+    },
+    {
+      "pdf_page": 54,
+      "quote": "用神無根元神有力亦難生"
+    }
+  ],
+  "textual_issues": [
+    {
+      "id": "five-versus-three-tombs",
+      "scan_page": 53,
+      "scan_reading": "元神入五墓；忌神入五墓",
+      "transcription_reading": "元神入三墓；忌神入三墓",
+      "resolution": "Unresolved numerical variant. Do not infer tomb mechanics from the numeral; entered_tomb remains unadjudicated."
+    }
+  ],
+  "formula_policy": "Literal clauses grouped into explicit all/any predicates, not a universal strength resolver. Static and active use the published conditional activity layer. Relation matches preserve blockers; missing total-strength facts are null."
+}

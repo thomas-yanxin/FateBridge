@@ -1,0 +1,262 @@
+{
+  "id": "meihua_external_manifestations_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本外应实物形色的所选资格",
+  "source": {
+    "selected_edition": "nlc_1925",
+    "section": "體用生尅之訣",
+    "original_pdf_indices": [
+      108,
+      109
+    ],
+    "printed_leaves": [
+      "卷三七",
+      "卷三八"
+    ],
+    "raw_pdf_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "raw_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "reader": "assistant selected-span direct visual reading; punctuation editorial",
+    "independent_human_expert_review": false,
+    "selected_variants": [
+      {
+        "scope": "sharp metal tool, wood body",
+        "selected": "值之始有不吉",
+        "transcription": "值之必有不吉",
+        "adjudication": "Keep selected始; no probability or actual harm verdict"
+      },
+      {
+        "scope": "living tree generation of fire",
+        "selected": "生火之遲也",
+        "transcription": "生炎之遲也",
+        "adjudication": "Preserve selected火, do not infer event dates"
+      }
+    ]
+  },
+  "manifestations": {
+    "furnace_flame": {
+      "element": "火",
+      "description": "原文炉中、窑灶或烈焰真火"
+    },
+    "candle_flame": {
+      "element": "火",
+      "description": "原文一盏灯、一炬烛之微细真火"
+    },
+    "red_purple_color": {
+      "element": "火",
+      "description": "仅确认红紫颜色，未据颜色确认实火"
+    },
+    "sharp_metal_tool": {
+      "element": "金",
+      "description": "原文快刀锐刃、巨斧大锯"
+    },
+    "metal_ornament_or_utensil": {
+      "element": "金",
+      "description": "原文所列金属饰物、银杯盘、锡器或琐屑铜铁；不借此分类锐器"
+    },
+    "actual_water": {
+      "element": "水",
+      "description": "所报实际水，区别于颜色或湿象"
+    },
+    "black_or_damp_appearance": {
+      "element": "水",
+      "description": "仅所见黑色或湿象，不自动当真水"
+    },
+    "soil": {
+      "element": "土",
+      "description": "原文土，区别于已烧成瓦器"
+    },
+    "fired_pottery": {
+      "element": "土",
+      "description": "原文已烧成瓦器，区别于土"
+    },
+    "cut_firewood": {
+      "element": "木",
+      "description": "已伐柴薪，区别于未伐树木"
+    },
+    "living_tree": {
+      "element": "木",
+      "description": "尚未伐的树木，未自动当即用柴薪"
+    }
+  },
+  "rules": [
+    {
+      "manifestation": "furnace_flame",
+      "external_element": "火",
+      "body_element": "金",
+      "raw_relation": "用克体",
+      "qualification": "substantive_control",
+      "quote": "真火能尅金形色則不能尅",
+      "pdf_index": 108,
+      "id": "external_pair_1",
+      "reading": "所选原文按该实物条件列为真克；此为传统分类，不是现场作用或现实事件已验证",
+      "quote_original_pdf_indices": [
+        108
+      ]
+    },
+    {
+      "manifestation": "candle_flame",
+      "external_element": "火",
+      "body_element": "金",
+      "raw_relation": "用克体",
+      "qualification": "light_control",
+      "quote": "雖曰真火微細而輕小不利耳",
+      "pdf_index": 109,
+      "id": "external_pair_2",
+      "reading": "所选原文称微细而轻、小不利；不量化为强度或损失",
+      "quote_original_pdf_indices": [
+        109
+      ]
+    },
+    {
+      "manifestation": "red_purple_color",
+      "external_element": "火",
+      "body_element": "金",
+      "raw_relation": "用克体",
+      "qualification": "form_color_no_substantive_control",
+      "quote": "乾兌之體不為深忌",
+      "pdf_index": 109,
+      "id": "external_pair_3",
+      "reading": "所选原文区分形色与真火，不以红紫颜色等同实火克金",
+      "quote_original_pdf_indices": [
+        108,
+        109
+      ]
+    },
+    {
+      "manifestation": "sharp_metal_tool",
+      "external_element": "金",
+      "body_element": "木",
+      "raw_relation": "用克体",
+      "qualification": "substantive_control",
+      "quote": "木之所忌者快刀銳刃巨斧大鋸",
+      "pdf_index": 109,
+      "id": "external_pair_4",
+      "reading": "所选原文按该实物条件列为真克；此为传统分类，不是现场作用或现实事件已验证",
+      "quote_original_pdf_indices": [
+        109
+      ]
+    },
+    {
+      "manifestation": "metal_ornament_or_utensil",
+      "external_element": "金",
+      "body_element": "木",
+      "raw_relation": "用克体",
+      "qualification": "no_substantive_control",
+      "quote": "此等之金豈能尅木",
+      "pdf_index": 109,
+      "id": "external_pair_5",
+      "reading": "所选原文不把所列饰物器皿等金属直接视为克木的锐器",
+      "quote_original_pdf_indices": [
+        109
+      ]
+    },
+    {
+      "manifestation": "actual_water",
+      "external_element": "水",
+      "body_element": "火",
+      "raw_relation": "用克体",
+      "qualification": "substantive_control",
+      "quote": "又若離火為體見真水能尅",
+      "pdf_index": 109,
+      "id": "external_pair_6",
+      "reading": "所选原文按该实物条件列为真克；此为传统分类，不是现场作用或现实事件已验证",
+      "quote_original_pdf_indices": [
+        109
+      ]
+    },
+    {
+      "manifestation": "black_or_damp_appearance",
+      "external_element": "水",
+      "body_element": "火",
+      "raw_relation": "用克体",
+      "qualification": "limited_symbolic_control",
+      "quote": "不深害也",
+      "pdf_index": 109,
+      "id": "external_pair_7",
+      "reading": "所选原文只取较轻的形色关系，不补成实水作用",
+      "quote_original_pdf_indices": [
+        109
+      ]
+    },
+    {
+      "manifestation": "soil",
+      "external_element": "土",
+      "body_element": "金",
+      "raw_relation": "用生体",
+      "qualification": "substantive_generation",
+      "quote": "金遇之土能生金瓦不能生也",
+      "pdf_index": 109,
+      "id": "external_pair_8",
+      "reading": "所选原文区分土与瓦器，对土列生金之义",
+      "quote_original_pdf_indices": [
+        109
+      ]
+    },
+    {
+      "manifestation": "fired_pottery",
+      "external_element": "土",
+      "body_element": "金",
+      "raw_relation": "用生体",
+      "qualification": "no_substantive_generation",
+      "quote": "金遇之土能生金瓦不能生也",
+      "pdf_index": 109,
+      "id": "external_pair_9",
+      "reading": "所选原文明确瓦不能生，不以土类归属直接补成已能生金",
+      "quote_original_pdf_indices": [
+        109
+      ]
+    },
+    {
+      "manifestation": "cut_firewood",
+      "external_element": "木",
+      "body_element": "火",
+      "raw_relation": "用生体",
+      "qualification": "faster_generation",
+      "quote": "柴薪生火之捷",
+      "pdf_index": 109,
+      "id": "external_pair_10",
+      "reading": "所选原文相对取柴薪生火之捷，不是实际钟时或数值速度",
+      "quote_original_pdf_indices": [
+        109
+      ]
+    },
+    {
+      "manifestation": "living_tree",
+      "external_element": "木",
+      "body_element": "火",
+      "raw_relation": "用生体",
+      "qualification": "slower_generation",
+      "quote": "樹木之未伐者生火之遲也",
+      "pdf_index": 109,
+      "id": "external_pair_11",
+      "reading": "所选原文相对取未伐树木生火之迟，不是实际钟时或数值速度",
+      "quote_original_pdf_indices": [
+        109
+      ]
+    },
+    {
+      "manifestation": "actual_water",
+      "external_element": "水",
+      "body_element": "木",
+      "raw_relation": "用生体",
+      "qualification": "stronger_generation",
+      "quote": "木為體真水生木之福重",
+      "pdf_index": 109,
+      "id": "external_pair_12",
+      "reading": "所选原文相对取真水生木之福重，不换成现实结果或概率",
+      "quote_original_pdf_indices": [
+        109
+      ]
+    }
+  ],
+  "policies": {
+    "input": "Caller-reported classifications only; no scene inference or independent presence verification",
+    "reference_body": "Original static body, each casting candidate separately",
+    "uncovered_pair": "Raw five-element relation retained; detailed effect not addressed, never filled by analogy",
+    "real_outcome": "not_computed",
+    "event_timing": "not_computed",
+    "internal_external_net_synthesis": "not_computed",
+    "independent_verified_observations": 0
+  },
+  "scope": "11reportedmanifestationkinds and12selectedpairclauses, not all external omens, measured physical causation, clinical advice, disaster prediction or predictive certification"
+}

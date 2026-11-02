@@ -1,0 +1,1546 @@
+{
+  "model_id": "gujin45_literal_cumulative_and_increment_v1",
+  "profile_id": "gujin36_37_45_literal_cumulative_day_rate_research",
+  "source_url": "https://commons.wikimedia.org/w/index.php?curid=71219540",
+  "day_rate_data_sha256": "9c471d97f51c0ba2b6e311bd04fda1907d7f076e4cbad1267883692787bfe2ee",
+  "interpolation_divisor_days": "0.0820",
+  "origin_policy": "empty_cumulative_at_index0_interpreted_as_origin_zero_only",
+  "empty_endpoint_policy": "index168_cumulative_and_increment_missing_not_periodically_filled",
+  "full_single_collator_field_transcription": true,
+  "independent_second_collator": false,
+  "rows": [
+    {
+      "limit_index": 0,
+      "cumulative_ancient_du": null,
+      "signed_increment_ancient_du": "0.11081575",
+      "increment_label": "益",
+      "cumulative_mark": "空",
+      "djvu_page": 518,
+      "half": "upper"
+    },
+    {
+      "limit_index": 1,
+      "cumulative_ancient_du": "0.11081575",
+      "signed_increment_ancient_du": "0.11023425",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "upper"
+    },
+    {
+      "limit_index": 2,
+      "cumulative_ancient_du": "0.22105000",
+      "signed_increment_ancient_du": "0.10963325",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "upper"
+    },
+    {
+      "limit_index": 3,
+      "cumulative_ancient_du": "0.33068325",
+      "signed_increment_ancient_du": "0.10901275",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "upper"
+    },
+    {
+      "limit_index": 4,
+      "cumulative_ancient_du": "0.43969600",
+      "signed_increment_ancient_du": "0.10837275",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "upper"
+    },
+    {
+      "limit_index": 5,
+      "cumulative_ancient_du": "0.54806875",
+      "signed_increment_ancient_du": "0.10771325",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "upper"
+    },
+    {
+      "limit_index": 6,
+      "cumulative_ancient_du": "0.65578200",
+      "signed_increment_ancient_du": "0.10703425",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "upper"
+    },
+    {
+      "limit_index": 7,
+      "cumulative_ancient_du": "0.76281625",
+      "signed_increment_ancient_du": "0.10633575",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "upper"
+    },
+    {
+      "limit_index": 8,
+      "cumulative_ancient_du": "0.86915200",
+      "signed_increment_ancient_du": "0.10561775",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "upper"
+    },
+    {
+      "limit_index": 9,
+      "cumulative_ancient_du": "0.97476975",
+      "signed_increment_ancient_du": "0.10488025",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "upper"
+    },
+    {
+      "limit_index": 10,
+      "cumulative_ancient_du": "1.07965000",
+      "signed_increment_ancient_du": "0.10412325",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "upper"
+    },
+    {
+      "limit_index": 11,
+      "cumulative_ancient_du": "1.18377325",
+      "signed_increment_ancient_du": "0.10334675",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 12,
+      "cumulative_ancient_du": "1.28712000",
+      "signed_increment_ancient_du": "0.10225075",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 13,
+      "cumulative_ancient_du": "1.38967075",
+      "signed_increment_ancient_du": "0.10173525",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 14,
+      "cumulative_ancient_du": "1.49140600",
+      "signed_increment_ancient_du": "0.10090025",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 15,
+      "cumulative_ancient_du": "1.59230625",
+      "signed_increment_ancient_du": "0.10004575",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 16,
+      "cumulative_ancient_du": "1.69235200",
+      "signed_increment_ancient_du": "0.09917175",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 17,
+      "cumulative_ancient_du": "1.79152375",
+      "signed_increment_ancient_du": "0.09827825",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 18,
+      "cumulative_ancient_du": "1.88980200",
+      "signed_increment_ancient_du": "0.09736525",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 19,
+      "cumulative_ancient_du": "1.98716725",
+      "signed_increment_ancient_du": "0.09643275",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 20,
+      "cumulative_ancient_du": "2.08360000",
+      "signed_increment_ancient_du": "0.09548075",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 21,
+      "cumulative_ancient_du": "2.17908075",
+      "signed_increment_ancient_du": "0.09450925",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 22,
+      "cumulative_ancient_du": "2.27359000",
+      "signed_increment_ancient_du": "0.09351825",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 23,
+      "cumulative_ancient_du": "2.36710825",
+      "signed_increment_ancient_du": "0.09250775",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 24,
+      "cumulative_ancient_du": "2.45961600",
+      "signed_increment_ancient_du": "0.09147775",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 25,
+      "cumulative_ancient_du": "2.55109375",
+      "signed_increment_ancient_du": "0.09042825",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 26,
+      "cumulative_ancient_du": "2.64152200",
+      "signed_increment_ancient_du": "0.08935925",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 518,
+      "half": "lower"
+    },
+    {
+      "limit_index": 27,
+      "cumulative_ancient_du": "2.73088125",
+      "signed_increment_ancient_du": "0.08827075",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 28,
+      "cumulative_ancient_du": "2.81915200",
+      "signed_increment_ancient_du": "0.08716275",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 29,
+      "cumulative_ancient_du": "2.90631475",
+      "signed_increment_ancient_du": "0.08603525",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 30,
+      "cumulative_ancient_du": "2.99235000",
+      "signed_increment_ancient_du": "0.08488825",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 31,
+      "cumulative_ancient_du": "3.07723825",
+      "signed_increment_ancient_du": "0.08372175",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 32,
+      "cumulative_ancient_du": "3.16096000",
+      "signed_increment_ancient_du": "0.08253575",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 33,
+      "cumulative_ancient_du": "3.24349575",
+      "signed_increment_ancient_du": "0.08133025",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 34,
+      "cumulative_ancient_du": "3.32482600",
+      "signed_increment_ancient_du": "0.08010525",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 35,
+      "cumulative_ancient_du": "3.40493125",
+      "signed_increment_ancient_du": "0.07886075",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 36,
+      "cumulative_ancient_du": "3.48379200",
+      "signed_increment_ancient_du": "0.07759675",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 37,
+      "cumulative_ancient_du": "3.56138875",
+      "signed_increment_ancient_du": "0.07631325",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 38,
+      "cumulative_ancient_du": "3.63770200",
+      "signed_increment_ancient_du": "0.07501025",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 39,
+      "cumulative_ancient_du": "3.71271225",
+      "signed_increment_ancient_du": "0.07368775",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 40,
+      "cumulative_ancient_du": "3.78640000",
+      "signed_increment_ancient_du": "0.07234575",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 41,
+      "cumulative_ancient_du": "3.85874575",
+      "signed_increment_ancient_du": "0.07098425",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 42,
+      "cumulative_ancient_du": "3.92973000",
+      "signed_increment_ancient_du": "0.06960325",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "upper"
+    },
+    {
+      "limit_index": 43,
+      "cumulative_ancient_du": "3.99933325",
+      "signed_increment_ancient_du": "0.06820275",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 44,
+      "cumulative_ancient_du": "4.06753600",
+      "signed_increment_ancient_du": "0.06678275",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 45,
+      "cumulative_ancient_du": "4.13431875",
+      "signed_increment_ancient_du": "0.06534325",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 46,
+      "cumulative_ancient_du": "4.19966200",
+      "signed_increment_ancient_du": "0.06388425",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 47,
+      "cumulative_ancient_du": "4.26354625",
+      "signed_increment_ancient_du": "0.06240575",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 48,
+      "cumulative_ancient_du": "4.32595200",
+      "signed_increment_ancient_du": "0.06090775",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 49,
+      "cumulative_ancient_du": "4.38685975",
+      "signed_increment_ancient_du": "0.05939025",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 50,
+      "cumulative_ancient_du": "4.44625000",
+      "signed_increment_ancient_du": "0.05785325",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 51,
+      "cumulative_ancient_du": "4.50410325",
+      "signed_increment_ancient_du": "0.05629675",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 52,
+      "cumulative_ancient_du": "4.56040000",
+      "signed_increment_ancient_du": "0.05472075",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 53,
+      "cumulative_ancient_du": "4.61512075",
+      "signed_increment_ancient_du": "0.05312525",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 54,
+      "cumulative_ancient_du": "4.66824600",
+      "signed_increment_ancient_du": "0.05151025",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 55,
+      "cumulative_ancient_du": "4.71975625",
+      "signed_increment_ancient_du": "0.04987575",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 56,
+      "cumulative_ancient_du": "4.76963200",
+      "signed_increment_ancient_du": "0.04822175",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 57,
+      "cumulative_ancient_du": "4.81785375",
+      "signed_increment_ancient_du": "0.04654825",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 58,
+      "cumulative_ancient_du": "4.86440200",
+      "signed_increment_ancient_du": "0.04485525",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 519,
+      "half": "lower"
+    },
+    {
+      "limit_index": 59,
+      "cumulative_ancient_du": "4.90925725",
+      "signed_increment_ancient_du": "0.04314275",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 60,
+      "cumulative_ancient_du": "4.95240000",
+      "signed_increment_ancient_du": "0.04141075",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 61,
+      "cumulative_ancient_du": "4.99381075",
+      "signed_increment_ancient_du": "0.03965925",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 62,
+      "cumulative_ancient_du": "5.03347000",
+      "signed_increment_ancient_du": "0.03788825",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 63,
+      "cumulative_ancient_du": "5.07135825",
+      "signed_increment_ancient_du": "0.03609775",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 64,
+      "cumulative_ancient_du": "5.10745600",
+      "signed_increment_ancient_du": "0.03428775",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 65,
+      "cumulative_ancient_du": "5.14174375",
+      "signed_increment_ancient_du": "0.03245825",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 66,
+      "cumulative_ancient_du": "5.17420200",
+      "signed_increment_ancient_du": "0.03060925",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 67,
+      "cumulative_ancient_du": "5.20481125",
+      "signed_increment_ancient_du": "0.02874075",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 68,
+      "cumulative_ancient_du": "5.23355200",
+      "signed_increment_ancient_du": "0.02685275",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 69,
+      "cumulative_ancient_du": "5.26040475",
+      "signed_increment_ancient_du": "0.02494525",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 70,
+      "cumulative_ancient_du": "5.28535000",
+      "signed_increment_ancient_du": "0.02301825",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 71,
+      "cumulative_ancient_du": "5.30836825",
+      "signed_increment_ancient_du": "0.02107175",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 72,
+      "cumulative_ancient_du": "5.32944000",
+      "signed_increment_ancient_du": "0.01910575",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 73,
+      "cumulative_ancient_du": "5.34854575",
+      "signed_increment_ancient_du": "0.01712025",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 74,
+      "cumulative_ancient_du": "5.36566600",
+      "signed_increment_ancient_du": "0.01511525",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "upper"
+    },
+    {
+      "limit_index": 75,
+      "cumulative_ancient_du": "5.38078125",
+      "signed_increment_ancient_du": "0.01309075",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 76,
+      "cumulative_ancient_du": "5.39387200",
+      "signed_increment_ancient_du": "0.01104675",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 77,
+      "cumulative_ancient_du": "5.40491875",
+      "signed_increment_ancient_du": "0.00898325",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 78,
+      "cumulative_ancient_du": "5.41390200",
+      "signed_increment_ancient_du": "0.00690025",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 79,
+      "cumulative_ancient_du": "5.42080225",
+      "signed_increment_ancient_du": "0.00479775",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 80,
+      "cumulative_ancient_du": "5.42560000",
+      "signed_increment_ancient_du": "0.00267575",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 81,
+      "cumulative_ancient_du": "5.42827575",
+      "signed_increment_ancient_du": "0.00053425",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 82,
+      "cumulative_ancient_du": "5.42881000",
+      "signed_increment_ancient_du": "0.00035616",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 83,
+      "cumulative_ancient_du": "5.42916616",
+      "signed_increment_ancient_du": "0.00017808",
+      "increment_label": "益",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 84,
+      "cumulative_ancient_du": "5.42934424",
+      "signed_increment_ancient_du": "-0.00017808",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 85,
+      "cumulative_ancient_du": "5.42916616",
+      "signed_increment_ancient_du": "-0.00035616",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 86,
+      "cumulative_ancient_du": "5.42881000",
+      "signed_increment_ancient_du": "-0.00053425",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 87,
+      "cumulative_ancient_du": "5.42827575",
+      "signed_increment_ancient_du": "-0.00267575",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 88,
+      "cumulative_ancient_du": "5.42560000",
+      "signed_increment_ancient_du": "-0.00479775",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 89,
+      "cumulative_ancient_du": "5.42080225",
+      "signed_increment_ancient_du": "-0.00690025",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 90,
+      "cumulative_ancient_du": "5.41390200",
+      "signed_increment_ancient_du": "-0.00898325",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 520,
+      "half": "lower"
+    },
+    {
+      "limit_index": 91,
+      "cumulative_ancient_du": "5.40491875",
+      "signed_increment_ancient_du": "-0.01104675",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 92,
+      "cumulative_ancient_du": "5.39387200",
+      "signed_increment_ancient_du": "-0.01309075",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 93,
+      "cumulative_ancient_du": "5.38078125",
+      "signed_increment_ancient_du": "-0.01511525",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 94,
+      "cumulative_ancient_du": "5.36566600",
+      "signed_increment_ancient_du": "-0.01712025",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 95,
+      "cumulative_ancient_du": "5.34854575",
+      "signed_increment_ancient_du": "-0.01910575",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 96,
+      "cumulative_ancient_du": "5.32944000",
+      "signed_increment_ancient_du": "-0.02107175",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 97,
+      "cumulative_ancient_du": "5.30836825",
+      "signed_increment_ancient_du": "-0.02301825",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 98,
+      "cumulative_ancient_du": "5.28535000",
+      "signed_increment_ancient_du": "-0.02494525",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 99,
+      "cumulative_ancient_du": "5.26040475",
+      "signed_increment_ancient_du": "-0.02685275",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 100,
+      "cumulative_ancient_du": "5.23355200",
+      "signed_increment_ancient_du": "-0.02874075",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 101,
+      "cumulative_ancient_du": "5.20481125",
+      "signed_increment_ancient_du": "-0.03060925",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 102,
+      "cumulative_ancient_du": "5.17420200",
+      "signed_increment_ancient_du": "-0.03245825",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 103,
+      "cumulative_ancient_du": "5.14174375",
+      "signed_increment_ancient_du": "-0.03428775",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 104,
+      "cumulative_ancient_du": "5.10745600",
+      "signed_increment_ancient_du": "-0.03609775",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 105,
+      "cumulative_ancient_du": "5.07135825",
+      "signed_increment_ancient_du": "-0.03788825",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 106,
+      "cumulative_ancient_du": "5.03347000",
+      "signed_increment_ancient_du": "-0.03965925",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "upper"
+    },
+    {
+      "limit_index": 107,
+      "cumulative_ancient_du": "4.99381075",
+      "signed_increment_ancient_du": "-0.04141075",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 108,
+      "cumulative_ancient_du": "4.95240000",
+      "signed_increment_ancient_du": "-0.04314275",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 109,
+      "cumulative_ancient_du": "4.90925725",
+      "signed_increment_ancient_du": "-0.04485525",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 110,
+      "cumulative_ancient_du": "4.86440200",
+      "signed_increment_ancient_du": "-0.04654825",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 111,
+      "cumulative_ancient_du": "4.81785375",
+      "signed_increment_ancient_du": "-0.04822175",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 112,
+      "cumulative_ancient_du": "4.76963200",
+      "signed_increment_ancient_du": "-0.04987575",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 113,
+      "cumulative_ancient_du": "4.71975625",
+      "signed_increment_ancient_du": "-0.05151025",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 114,
+      "cumulative_ancient_du": "4.66824600",
+      "signed_increment_ancient_du": "-0.05312525",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 115,
+      "cumulative_ancient_du": "4.61512075",
+      "signed_increment_ancient_du": "-0.05472075",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 116,
+      "cumulative_ancient_du": "4.56040000",
+      "signed_increment_ancient_du": "-0.05629675",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 117,
+      "cumulative_ancient_du": "4.50410325",
+      "signed_increment_ancient_du": "-0.05785325",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 118,
+      "cumulative_ancient_du": "4.44625000",
+      "signed_increment_ancient_du": "-0.05939025",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 119,
+      "cumulative_ancient_du": "4.38685975",
+      "signed_increment_ancient_du": "-0.06090775",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 120,
+      "cumulative_ancient_du": "4.32595200",
+      "signed_increment_ancient_du": "-0.06240575",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 121,
+      "cumulative_ancient_du": "4.26354625",
+      "signed_increment_ancient_du": "-0.06388425",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 122,
+      "cumulative_ancient_du": "4.19966200",
+      "signed_increment_ancient_du": "-0.06534325",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 521,
+      "half": "lower"
+    },
+    {
+      "limit_index": 123,
+      "cumulative_ancient_du": "4.13431875",
+      "signed_increment_ancient_du": "-0.06678275",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 124,
+      "cumulative_ancient_du": "4.06753600",
+      "signed_increment_ancient_du": "-0.06820275",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 125,
+      "cumulative_ancient_du": "3.99933325",
+      "signed_increment_ancient_du": "-0.06960325",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 126,
+      "cumulative_ancient_du": "3.92973000",
+      "signed_increment_ancient_du": "-0.07098425",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 127,
+      "cumulative_ancient_du": "3.85874575",
+      "signed_increment_ancient_du": "-0.07234575",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 128,
+      "cumulative_ancient_du": "3.78640000",
+      "signed_increment_ancient_du": "-0.07368775",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 129,
+      "cumulative_ancient_du": "3.71271225",
+      "signed_increment_ancient_du": "-0.07501025",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 130,
+      "cumulative_ancient_du": "3.63770200",
+      "signed_increment_ancient_du": "-0.07631325",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 131,
+      "cumulative_ancient_du": "3.56138875",
+      "signed_increment_ancient_du": "-0.07759675",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 132,
+      "cumulative_ancient_du": "3.48379200",
+      "signed_increment_ancient_du": "-0.07886075",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 133,
+      "cumulative_ancient_du": "3.40493125",
+      "signed_increment_ancient_du": "-0.08010525",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 134,
+      "cumulative_ancient_du": "3.32482600",
+      "signed_increment_ancient_du": "-0.08133025",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 135,
+      "cumulative_ancient_du": "3.24349575",
+      "signed_increment_ancient_du": "-0.08253575",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 136,
+      "cumulative_ancient_du": "3.16096000",
+      "signed_increment_ancient_du": "-0.08372175",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 137,
+      "cumulative_ancient_du": "3.07723825",
+      "signed_increment_ancient_du": "-0.08488825",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 138,
+      "cumulative_ancient_du": "2.99235000",
+      "signed_increment_ancient_du": "-0.08603525",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "upper"
+    },
+    {
+      "limit_index": 139,
+      "cumulative_ancient_du": "2.90631475",
+      "signed_increment_ancient_du": "-0.08716275",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 140,
+      "cumulative_ancient_du": "2.81915200",
+      "signed_increment_ancient_du": "-0.08827075",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 141,
+      "cumulative_ancient_du": "2.73088125",
+      "signed_increment_ancient_du": "-0.08935925",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 142,
+      "cumulative_ancient_du": "2.64152200",
+      "signed_increment_ancient_du": "-0.09042825",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 143,
+      "cumulative_ancient_du": "2.55109375",
+      "signed_increment_ancient_du": "-0.09147775",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 144,
+      "cumulative_ancient_du": "2.45961600",
+      "signed_increment_ancient_du": "-0.09250775",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 145,
+      "cumulative_ancient_du": "2.36710825",
+      "signed_increment_ancient_du": "-0.09351825",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 146,
+      "cumulative_ancient_du": "2.27359000",
+      "signed_increment_ancient_du": "-0.09450925",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 147,
+      "cumulative_ancient_du": "2.17908075",
+      "signed_increment_ancient_du": "-0.09548075",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 148,
+      "cumulative_ancient_du": "2.08360000",
+      "signed_increment_ancient_du": "-0.09643275",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 149,
+      "cumulative_ancient_du": "1.98716725",
+      "signed_increment_ancient_du": "-0.09736525",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 150,
+      "cumulative_ancient_du": "1.88980200",
+      "signed_increment_ancient_du": "-0.09827825",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 151,
+      "cumulative_ancient_du": "1.79152375",
+      "signed_increment_ancient_du": "-0.09917175",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 152,
+      "cumulative_ancient_du": "1.69235200",
+      "signed_increment_ancient_du": "-0.10004575",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 153,
+      "cumulative_ancient_du": "1.59230625",
+      "signed_increment_ancient_du": "-0.10090025",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 154,
+      "cumulative_ancient_du": "1.49140600",
+      "signed_increment_ancient_du": "-0.10173525",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 522,
+      "half": "lower"
+    },
+    {
+      "limit_index": 155,
+      "cumulative_ancient_du": "1.38967075",
+      "signed_increment_ancient_du": "-0.10225075",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 523,
+      "half": "upper"
+    },
+    {
+      "limit_index": 156,
+      "cumulative_ancient_du": "1.28712000",
+      "signed_increment_ancient_du": "-0.10334675",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 523,
+      "half": "upper"
+    },
+    {
+      "limit_index": 157,
+      "cumulative_ancient_du": "1.18377325",
+      "signed_increment_ancient_du": "-0.10412325",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 523,
+      "half": "upper"
+    },
+    {
+      "limit_index": 158,
+      "cumulative_ancient_du": "1.07965000",
+      "signed_increment_ancient_du": "-0.10488025",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 523,
+      "half": "upper"
+    },
+    {
+      "limit_index": 159,
+      "cumulative_ancient_du": "0.97476975",
+      "signed_increment_ancient_du": "-0.10561775",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 523,
+      "half": "upper"
+    },
+    {
+      "limit_index": 160,
+      "cumulative_ancient_du": "0.86915200",
+      "signed_increment_ancient_du": "-0.10633575",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 523,
+      "half": "upper"
+    },
+    {
+      "limit_index": 161,
+      "cumulative_ancient_du": "0.76281625",
+      "signed_increment_ancient_du": "-0.10703425",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 523,
+      "half": "upper"
+    },
+    {
+      "limit_index": 162,
+      "cumulative_ancient_du": "0.65578200",
+      "signed_increment_ancient_du": "-0.10771325",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 523,
+      "half": "upper"
+    },
+    {
+      "limit_index": 163,
+      "cumulative_ancient_du": "0.54806875",
+      "signed_increment_ancient_du": "-0.10817275",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 523,
+      "half": "upper"
+    },
+    {
+      "limit_index": 164,
+      "cumulative_ancient_du": "0.43969600",
+      "signed_increment_ancient_du": "-0.10901275",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 523,
+      "half": "upper"
+    },
+    {
+      "limit_index": 165,
+      "cumulative_ancient_du": "0.33068325",
+      "signed_increment_ancient_du": "-0.10963325",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 523,
+      "half": "upper"
+    },
+    {
+      "limit_index": 166,
+      "cumulative_ancient_du": "0.22105000",
+      "signed_increment_ancient_du": "-0.11023425",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 523,
+      "half": "upper"
+    },
+    {
+      "limit_index": 167,
+      "cumulative_ancient_du": "0.11081575",
+      "signed_increment_ancient_du": "-0.11081575",
+      "increment_label": "損",
+      "cumulative_mark": "numeric",
+      "djvu_page": 523,
+      "half": "upper"
+    },
+    {
+      "limit_index": 168,
+      "cumulative_ancient_du": null,
+      "signed_increment_ancient_du": null,
+      "increment_label": "空",
+      "cumulative_mark": "空",
+      "djvu_page": 523,
+      "half": "upper"
+    }
+  ],
+  "known_increment_vs_adjacent_cumulative_conflict_indices": [
+    12,
+    155,
+    163
+  ],
+  "limitations": [
+    "原刊完整字段的单人影像转录，尚无第二位独立校读者",
+    "取限仍有原刊日率倒序歧义，不能排序或按吻合度校值",
+    "原刊损益与相邻积度差三处不一致，保留刊值而不作无异议正确的断言",
+    "零限累计空格作起点零值的政策明示，168限积度及损益空格不补",
+    "具名研究方法，未认证完整古历、现代历元或现实预测"
+  ]
+}

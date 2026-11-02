@@ -1,0 +1,271 @@
+{
+  "source_id": "nijl_100238879_shoushi_passages_image26_v1",
+  "source_url": "https://kokusho.nijl.ac.jp/biblio/100238879",
+  "manifest_url": "https://kokusho.nijl.ac.jp/biblio/100238879/manifest",
+  "image_url": "https://kokusho.nijl.ac.jp/api/iiif/100238879/v4/THKW/THKW-04306/THKW-04306-00026.tif/full/full/0/default.jpg",
+  "image_sha256": "a11fb7b1e4955c5ec4c0ec6294d2489fda8a64ab17dd9e36cbcbc67a8a5ddd70",
+  "credit": "新編評註通玄先生張果星宗大全（東北大学附属図書館所蔵），国文学研究資料館提供",
+  "locator": "NIJL canvas label26（canvas ID尾部25）·分野黄道宿度·授时行",
+  "witness_relation": "Official holding identifiers differ: earlier Tohoku resource is Hirayama MA/591; NIJL100238879 is Fujiwara4232, DIG-THKW-04306. Distinct holding records are established; textual edition independence, printing lineage and authority remain unadjudicated. Never overwrite the earlier witness.",
+  "small_unit_arithmetic_policy": "Explicit literal-unit arithmetic treats100秒=1分 and100分=1古度; this is not independent acceptance of the source coordinate system",
+  "calendar": "shoushi",
+  "printed_calendar_label": "授時",
+  "headers": [
+    {
+      "branch": "丑",
+      "mansion": "斗",
+      "degree": 4
+    },
+    {
+      "branch": "子",
+      "mansion": "女",
+      "degree": 2
+    },
+    {
+      "branch": "亥",
+      "mansion": "危",
+      "degree": 13
+    },
+    {
+      "branch": "戌",
+      "mansion": "奎",
+      "degree": 2
+    },
+    {
+      "branch": "酉",
+      "mansion": "胃",
+      "degree": 4
+    },
+    {
+      "branch": "申",
+      "mansion": "毕",
+      "degree": 7
+    },
+    {
+      "branch": "未",
+      "mansion": "井",
+      "degree": 9
+    },
+    {
+      "branch": "午",
+      "mansion": "柳",
+      "degree": 4
+    },
+    {
+      "branch": "巳",
+      "mansion": "张",
+      "degree": 15
+    },
+    {
+      "branch": "辰",
+      "mansion": "轸",
+      "degree": 10
+    },
+    {
+      "branch": "卯",
+      "mansion": "氐",
+      "degree": 2
+    },
+    {
+      "branch": "寅",
+      "mansion": "尾",
+      "degree": 3
+    }
+  ],
+  "cells": [
+    {
+      "branch": "丑",
+      "printed_degree": 3,
+      "minute": {
+        "value": 76,
+        "status": "literal",
+        "text": "七十六"
+      },
+      "second": {
+        "value": 85,
+        "status": "literal",
+        "text": "八十五"
+      },
+      "second_unit": "秒",
+      "normalized_cell_text": "斗三度七十六分八十五秒"
+    },
+    {
+      "branch": "子",
+      "printed_degree": null,
+      "minute": {
+        "value": 6,
+        "status": "literal",
+        "text": "六"
+      },
+      "second": {
+        "value": 38,
+        "status": "literal",
+        "text": "三十八"
+      },
+      "second_unit": "秒",
+      "normalized_cell_text": "六分三十八秒"
+    },
+    {
+      "branch": "亥",
+      "printed_degree": 12,
+      "minute": {
+        "value": null,
+        "status": "not_printed",
+        "text": null
+      },
+      "second": {
+        "value": 38,
+        "status": "literal",
+        "text": "三十八"
+      },
+      "second_unit": "秒",
+      "normalized_cell_text": "危十二度三十八秒"
+    },
+    {
+      "branch": "戌",
+      "printed_degree": 1,
+      "minute": {
+        "value": 73,
+        "status": "literal",
+        "text": "七十三"
+      },
+      "second": {
+        "value": 63,
+        "status": "literal",
+        "text": "六十三"
+      },
+      "second_unit": "秒",
+      "normalized_cell_text": "奎一度七十三分六十三秒"
+    },
+    {
+      "branch": "酉",
+      "printed_degree": 3,
+      "minute": {
+        "value": 74,
+        "status": "literal",
+        "text": "七十四"
+      },
+      "second": {
+        "value": 56,
+        "status": "literal",
+        "text": "五十六"
+      },
+      "second_unit": "秒",
+      "normalized_cell_text": "胃三度七十四分五十六秒"
+    },
+    {
+      "branch": "申",
+      "printed_degree": 6,
+      "minute": {
+        "value": 88,
+        "status": "literal",
+        "text": "八十八"
+      },
+      "second": {
+        "value": 5,
+        "status": "literal",
+        "text": "五"
+      },
+      "second_unit": "秒",
+      "normalized_cell_text": "毕六度八十八分五秒"
+    },
+    {
+      "branch": "未",
+      "printed_degree": null,
+      "minute": {
+        "value": 34,
+        "status": "literal",
+        "text": "三十四"
+      },
+      "second": {
+        "value": 94,
+        "status": "literal",
+        "text": "九十四"
+      },
+      "second_unit": "秒",
+      "normalized_cell_text": "三十四分九十四秒"
+    },
+    {
+      "branch": "午",
+      "printed_degree": 3,
+      "minute": {
+        "value": null,
+        "status": "unresolved",
+        "text": "八十〔末字未裁〕"
+      },
+      "second": {
+        "value": 80,
+        "status": "literal",
+        "text": "八十"
+      },
+      "second_unit": "秒",
+      "normalized_cell_text": "柳三度八十〔末字未裁〕分八十秒"
+    },
+    {
+      "branch": "巳",
+      "printed_degree": null,
+      "minute": {
+        "value": 66,
+        "status": "literal",
+        "text": "六十六"
+      },
+      "second": {
+        "value": 6,
+        "status": "literal",
+        "text": "六"
+      },
+      "second_unit": "秒",
+      "normalized_cell_text": "六十六分六秒"
+    },
+    {
+      "branch": "辰",
+      "printed_degree": null,
+      "minute": {
+        "value": 7,
+        "status": "literal",
+        "text": "七"
+      },
+      "second": {
+        "value": 97,
+        "status": "literal",
+        "text": "九十七"
+      },
+      "second_unit": "秒",
+      "normalized_cell_text": "七分九十七秒"
+    },
+    {
+      "branch": "卯",
+      "printed_degree": null,
+      "minute": {
+        "value": 14,
+        "status": "literal",
+        "text": "十四"
+      },
+      "second": {
+        "value": 52,
+        "status": "literal",
+        "text": "五十二"
+      },
+      "second_unit": "秒",
+      "normalized_cell_text": "十四分五十二秒"
+    },
+    {
+      "branch": "寅",
+      "printed_degree": null,
+      "minute": {
+        "value": 1,
+        "status": "literal",
+        "text": "一"
+      },
+      "second": {
+        "value": 25,
+        "status": "literal",
+        "text": "二十五"
+      },
+      "second_unit": "秒",
+      "normalized_cell_text": "一分二十五秒"
+    }
+  ],
+  "transcription_policy": "Manual component readings from native pixel crops. Simplified mansion names; bracketed words are editorial unresolved-status notation, not printed glyphs; no second independent collator",
+  "distinct_holding_records_established": true
+}

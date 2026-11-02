@@ -1,0 +1,204 @@
+{
+  "id": "edo_calendar_methods_and_horeki_intercalation_v101",
+  "sources": {
+    "naoj_reforms": {
+      "source_url": "https://eco2.mtk.nao.ac.jp/koyomi/exhibition/030/",
+      "raw_sha256": "0ec5e04ecafd857899a765c687a964817a438a865c66e089d486f68b59f9adb3"
+    },
+    "uchida1973": {
+      "source_url": "https://www.asj.or.jp/geppou/archive_open/1973/pdf/19730306.pdf",
+      "raw_sha256": "439cf27a554697181dc20933e287aa229e5d379eb910bd192df291f8a1e97e42",
+      "title": "宝暦暦法置閏の疑問",
+      "author": "内田正男",
+      "printed_pages": [
+        67,
+        68
+      ],
+      "table": "第3表全10行；第2表三例分别保留"
+    },
+    "ndl_sizes": {
+      "source_url": "https://www.ndl.go.jp/koyomi/chapter2/s1.html",
+      "raw_sha256": "eca9199f17efdab59428d822c5001bddd61a53bcc19e529b88a18ed3ef1a6f40"
+    }
+  },
+  "calendar_periods": [
+    {
+      "id": "jokyo",
+      "name": "貞享暦",
+      "first_printed_lunar_year": 1685,
+      "last_printed_lunar_year": 1754
+    },
+    {
+      "id": "horeki",
+      "name": "宝暦暦",
+      "first_printed_lunar_year": 1755,
+      "last_printed_lunar_year": 1770
+    },
+    {
+      "id": "corrected_horeki",
+      "name": "修正宝暦暦",
+      "first_printed_lunar_year": 1771,
+      "last_printed_lunar_year": 1797
+    },
+    {
+      "id": "kansei",
+      "name": "寛政暦",
+      "first_printed_lunar_year": 1798,
+      "last_printed_lunar_year": 1843
+    },
+    {
+      "id": "tenpo",
+      "name": "天保暦",
+      "first_printed_lunar_year": 1844,
+      "last_printed_lunar_year": 1872
+    }
+  ],
+  "midnight_notation_source": {
+    "source_id": "naoj_reforms",
+    "source_object": "宝暦暦1755年颁历的馆方选录",
+    "before_midnight_label": "今夜",
+    "after_midnight_label": "今暁",
+    "applied_to_sukuyo_daybreak": false,
+    "ancient_clock_mapping_established": false
+  },
+  "all_ten_selected_published_leap_rows": [
+    {
+      "year": 1773,
+      "era_working": "安永2",
+      "published_leap_month_literal": "3月",
+      "month_after_conventional_leap_literal": "3月",
+      "computed_new_moon_literal": "56.299",
+      "computed_principal_term_literal": "56.018",
+      "principal_term_day_literal": "1日",
+      "published_leap_month_number": 3,
+      "source_describes_irregular_placement": true,
+      "conventional_leap_month_in_table2": 2
+    },
+    {
+      "year": 1775,
+      "era_working": "安永4",
+      "published_leap_month_literal": "12月",
+      "month_after_conventional_leap_literal": "12月",
+      "computed_new_moon_literal": "40.520",
+      "computed_principal_term_literal": "40.435",
+      "principal_term_day_literal": "1日",
+      "published_leap_month_number": 12,
+      "source_describes_irregular_placement": true,
+      "conventional_leap_month_in_table2": 11
+    },
+    {
+      "year": 1778,
+      "era_working": "安永7",
+      "published_leap_month_literal": "7月",
+      "month_after_conventional_leap_literal": "8月",
+      "computed_new_moon_literal": "54.178",
+      "computed_principal_term_literal": "54.411",
+      "principal_term_day_literal": "1日",
+      "published_leap_month_number": 7,
+      "source_describes_irregular_placement": false,
+      "conventional_leap_month_in_table2": null
+    },
+    {
+      "year": 1781,
+      "era_working": "天明元",
+      "published_leap_month_literal": "5月",
+      "month_after_conventional_leap_literal": "6月",
+      "computed_new_moon_literal": "8.652",
+      "computed_principal_term_literal": "9.263",
+      "principal_term_day_literal": "2日",
+      "published_leap_month_number": 5,
+      "source_describes_irregular_placement": false,
+      "conventional_leap_month_in_table2": null
+    },
+    {
+      "year": 1784,
+      "era_working": "天明4",
+      "published_leap_month_literal": "正月",
+      "month_after_conventional_leap_literal": "2月",
+      "computed_new_moon_literal": "22.653",
+      "computed_principal_term_literal": "23.240",
+      "principal_term_day_literal": "2日",
+      "published_leap_month_number": 1,
+      "source_describes_irregular_placement": false,
+      "conventional_leap_month_in_table2": null
+    },
+    {
+      "year": 1786,
+      "era_working": "天明6",
+      "published_leap_month_literal": "10月",
+      "month_after_conventional_leap_literal": "10月",
+      "computed_new_moon_literal": "37.283",
+      "computed_principal_term_literal": "37.218",
+      "principal_term_day_literal": "1日",
+      "published_leap_month_number": 10,
+      "source_describes_irregular_placement": true,
+      "conventional_leap_month_in_table2": 9
+    },
+    {
+      "year": 1789,
+      "era_working": "寛政元",
+      "published_leap_month_literal": "6月",
+      "month_after_conventional_leap_literal": "7月",
+      "computed_new_moon_literal": "21.363",
+      "computed_principal_term_literal": "21.632",
+      "principal_term_day_literal": "1日",
+      "published_leap_month_number": 6,
+      "source_describes_irregular_placement": false,
+      "conventional_leap_month_in_table2": null
+    },
+    {
+      "year": 1792,
+      "era_working": "寛政4",
+      "published_leap_month_literal": "2月",
+      "month_after_conventional_leap_literal": "3月",
+      "computed_new_moon_literal": "35.686",
+      "computed_principal_term_literal": "35.610",
+      "principal_term_day_literal": "1日",
+      "published_leap_month_number": 2,
+      "source_describes_irregular_placement": false,
+      "conventional_leap_month_in_table2": null
+    },
+    {
+      "year": 1794,
+      "era_working": "寛政6",
+      "published_leap_month_literal": "11月",
+      "month_after_conventional_leap_literal": "12月",
+      "computed_new_moon_literal": "20.410",
+      "computed_principal_term_literal": "20.024",
+      "principal_term_day_literal": "1日",
+      "published_leap_month_number": 11,
+      "source_describes_irregular_placement": false,
+      "conventional_leap_month_in_table2": null
+    },
+    {
+      "year": 1797,
+      "era_working": "寛政9",
+      "published_leap_month_literal": "7月",
+      "month_after_conventional_leap_literal": "8月",
+      "computed_new_moon_literal": "33.990",
+      "computed_principal_term_literal": "34.002",
+      "principal_term_day_literal": "2日",
+      "published_leap_month_number": 7,
+      "source_describes_irregular_placement": false,
+      "conventional_leap_month_in_table2": null
+    }
+  ],
+  "raw_NDL_comparison": {
+    "years_inclusive": [
+      1684,
+      1872
+    ],
+    "month_rows": 2337,
+    "raw_matches": 2336,
+    "raw_differences": 1,
+    "difference": {
+      "year": 1872,
+      "month": 12,
+      "NDL_nominal_days_from_大": 30,
+      "covered_reference_days": 2,
+      "raw_difference_retained": true
+    },
+    "same_source_bibliographic_independence_established": false
+  },
+  "scope": "具名近世历法期别和文献比较。表3右侧是规则闰月的翌月，非替换后的闰月；小数为作者原串而非现代钟时。三例异常为作者主张，未独立校原颁历或重算天象。保留全部10行和未修閏的后例；不按时刻先后改月，不认证宿曜平明、桧尾半日、闰小月补配先后或现实效力。"
+}

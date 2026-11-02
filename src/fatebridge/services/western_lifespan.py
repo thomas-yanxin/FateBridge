@@ -17,7 +17,8 @@ from datetime import timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
 from fatebridge.core.astro.ephemeris import _swisseph_planet_state
-from fatebridge.core.astro.geometry import _ayanamsha, _julian_day
+from fatebridge.core.astro.geometry import _ayanamsha
+from fatebridge.core.astro.julian_day import _julian_day
 from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
 from fatebridge.core.astrology_lifespan import (
     build_age_point_payload,
@@ -960,9 +961,9 @@ def calculate_vedicprog(
         )
         # Secondary progression advances the chart one day per year of life.
         progressed_ayanamsha = _ayanamsha(
-            _julian_day(birth_info.utc_datetime + timedelta(days=age_years))
+            _julian_day(birth_info.require_utc_datetime + timedelta(days=age_years))
         )
-        natal_ayanamsha = _ayanamsha(_julian_day(birth_info.utc_datetime))
+        natal_ayanamsha = _ayanamsha(_julian_day(birth_info.require_utc_datetime))
         progressed_sidereal = {
             body: (lon - progressed_ayanamsha) % 360.0
             for body, lon in extract_reference_longitudes(
@@ -1045,10 +1046,10 @@ def calculate_jaynesprog(
         )
         age_years = calculate_age_years(birth_info, analysis_datetime)
         # Secondary progression: a day after birth per year of life ("day for a year").
-        progressed_utc = birth_info.utc_datetime + timedelta(days=age_years)
+        progressed_utc = birth_info.require_utc_datetime + timedelta(days=age_years)
         payload = build_jaynes_declination_payload(
             _body_declinations(progressed_utc),
-            _body_declinations(birth_info.utc_datetime),
+            _body_declinations(birth_info.require_utc_datetime),
             orb=orb,
         )
         summary = (

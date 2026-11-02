@@ -1,0 +1,1874 @@
+{
+  "source_id": "tohoku_luwei_1141_image78_grid_v1",
+  "source_url": "https://touda.tohoku.ac.jp/collection/en/database/library/10020000001141",
+  "image_url": "https://touda.tohoku.ac.jp/iiif/2/public%2Flibrary%2Fwasan%2Fportal%2Fq%2Fq065%2F02%2Fq065020078l.tif/full/max/0/default.jpg",
+  "source_image_sha256": "36d3768ce39dbecb8c07d7669cfd57628ffab0ea09ca536dd4f18b8a669da408",
+  "credit": "新編評註通玄先生張果星宗大全（東北大学附属図書館所蔵），陸位輯校",
+  "locator": "館藏卷1–2第78幅·欽天監校正授時過宮度·橫看；右葉1–14列、左葉15–30列",
+  "transcription_policy": "Regular numeral semantic readings use modern Arabic integers; 初 is a distinct printed marker; mansion-name markers use modern canonical characters, with attached small numerals deliberately not transcribed or inferred. Markers are not all framed by circles (e.g. 辰 column2亢). This is not a full diplomatic transcription.",
+  "fractional_tail_cells_collated": false,
+  "independent_second_collator": false,
+  "rows": [
+    {
+      "palace": "子",
+      "cells": [
+        {
+          "mansion_marker": "危",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "虚",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "女",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        }
+      ]
+    },
+    {
+      "palace": "丑",
+      "cells": [
+        {
+          "mansion_marker": "女",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": null,
+          "initial_marker": true
+        },
+        {
+          "mansion_marker": "牛",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": null,
+          "initial_marker": true
+        },
+        {
+          "mansion_marker": "斗",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 22,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 21,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 20,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 19,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 18,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 17,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 16,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 15,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 14,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 13,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 12,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 11,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        }
+      ]
+    },
+    {
+      "palace": "寅",
+      "cells": [
+        {
+          "mansion_marker": "斗",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": null,
+          "initial_marker": true
+        },
+        {
+          "mansion_marker": "箕",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": null,
+          "initial_marker": true
+        },
+        {
+          "mansion_marker": "尾",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 17,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 16,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 15,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 14,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 13,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 12,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 11,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        }
+      ]
+    },
+    {
+      "palace": "卯",
+      "cells": [
+        {
+          "mansion_marker": "尾",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "心",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "房",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": null,
+          "initial_marker": true
+        },
+        {
+          "mansion_marker": "氐",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 15,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 14,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 13,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 12,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 11,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        }
+      ]
+    },
+    {
+      "palace": "辰",
+      "cells": [
+        {
+          "mansion_marker": "氐",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "亢",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "角",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 11,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "轸",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 16,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 15,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 14,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 13,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 12,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 11,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        }
+      ]
+    },
+    {
+      "palace": "巳",
+      "cells": [
+        {
+          "mansion_marker": "轸",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "翼",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 18,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 17,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 16,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 15,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 14,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 13,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 12,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 11,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "张",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 15,
+          "initial_marker": false
+        }
+      ]
+    },
+    {
+      "palace": "午",
+      "cells": [
+        {
+          "mansion_marker": "张",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 13,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 12,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 11,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "柳",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 12,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 11,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        }
+      ]
+    },
+    {
+      "palace": "未",
+      "cells": [
+        {
+          "mansion_marker": "柳",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": null,
+          "initial_marker": true
+        },
+        {
+          "mansion_marker": "鬼",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": null,
+          "initial_marker": true
+        },
+        {
+          "mansion_marker": "井",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 29,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 28,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 27,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 26,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 25,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 24,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 23,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 22,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 21,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 20,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 19,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 18,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 17,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 16,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 15,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 14,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 13,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 12,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 11,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        }
+      ]
+    },
+    {
+      "palace": "申",
+      "cells": [
+        {
+          "mansion_marker": "井",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": null,
+          "initial_marker": true
+        },
+        {
+          "mansion_marker": "参",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "觜",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "毕",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 15,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 14,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 13,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 12,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 11,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        }
+      ]
+    },
+    {
+      "palace": "酉",
+      "cells": [
+        {
+          "mansion_marker": "毕",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": null,
+          "initial_marker": true
+        },
+        {
+          "mansion_marker": "昴",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": null,
+          "initial_marker": true
+        },
+        {
+          "mansion_marker": "胃",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 14,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 13,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 12,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 11,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        }
+      ]
+    },
+    {
+      "palace": "戌",
+      "cells": [
+        {
+          "mansion_marker": "胃",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "娄",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 11,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "奎",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 15,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 14,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 13,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 12,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 11,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        }
+      ]
+    },
+    {
+      "palace": "亥",
+      "cells": [
+        {
+          "mansion_marker": "奎",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "壁",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "室",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 16,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 15,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 14,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 13,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 12,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 11,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 10,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 9,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 8,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 7,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 6,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 5,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 4,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 3,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 2,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 1,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": "危",
+          "numeral_value": null,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 14,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 13,
+          "initial_marker": false
+        },
+        {
+          "mansion_marker": null,
+          "numeral_value": 12,
+          "initial_marker": false
+        }
+      ]
+    }
+  ],
+  "marker_attached_numerals_collated": false
+}

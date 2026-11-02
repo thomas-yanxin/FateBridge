@@ -1,0 +1,29 @@
+# 河洛技法取证
+
+只展开用户所问的技法；各段给出的视图字段均按实际公开合同取用。先连起输入、算子、返回事实和传统含义，再说明该关系仍未证明的部分。
+
+问四体八体、伏体或移爻时读取`body_structure`视图。逐阶段核`input_lines`、八条`records.original_positions/arity/lines/name`与`whole_reversal`；六个三爻体和两个六爻卦不能当八个互体合并纳音。`literal_case_match=true`仅当前为所核渐卦原例；其他卦是明确算子推演，不说成该卦源例已核或全书伏体已定。移第三爻到最上位不是翻转阴阳或后天换卦；五命干支字表不自动选用某柱或替代纳音口径，见结构核对（本地数据：`../../../docs/validation/heluo-structure-audit.md`）。
+
+问有援或相应时读`line_conditions`的各阶段`source_youyuan`，按实际元堂及应爻解释所选主本阴元堂、阳应爻式；阳元堂、阴应爻虽通用阴阳相异，也不命中该原句。主本“陰爻位”与别本“陰位”字面分别保留，采用具名主本阴爻读法，不改成偶数位。旧`yuanTang.youYing`仅先天通用相异事实，不代替两阶段或十体总判；未匹配不推无援／现实孤立，见有援原句核对（本地数据：`../../../docs/validation/heluo-support-clause-audit.md`）。
+
+问河洛爻位或众宗时读公开`line_conditions`视图，逐先后天核实际`pos/lines`。众宗须五同一异且元堂选中唯一异爻；只有卦形符合还不够。`position_preference_order`只是五、二、三四、初上的位序，不是强弱评分。`yuanTang.dangWei`仅旧位序阴阳比较别名，原典阴月当位仍未定义；不以偶数月或至点半年代填。未中正面式不推出众疾等反面断语，也不合成十体总分，见爻位核对（本地数据：`../../../docs/validation/heluo-line-conditions-audit.md`）。
+
+核对节卦／候卦可用`jiehou`视图。按本次已算节气查四正卦爻，保留原印候卦组与卦形爻名的差异；两种名义日序模型分别对照原例及表头，没有选定模型。`selected_hou`、`selected_reconstruction_model`与`huagong_assessment`为null，不能把三项原列补成五日区间或将节卦当作本命／岁卦，见节候核对（本地数据：`../../../docs/validation/heluo-jiehou-audit.md`）。
+
+核对岁运年标签及源钟式可用公开`clock_basis`视图：`year_context`用本次实际年柱的`cycleYear`，不是公历出生年或选查年份。卷一寅申巳亥九刻、其余八刻；六日进一支的全年365源日为支初相对推演，不解决日内添分或节月实日。18分一刻只在另一组等时假设中数式闭合，不能当原典默认分制。实际原点及分制null、物理应用及完整映射false，不能据此推出实际日卦应期。见百刻与年上下文核对（本地数据：`../../../docs/validation/heluo-clock-year-context-audit.md`）。
+
+`time`须为已知当地钟时，空白／未知不可补零点；显式零点有效，时区单独放`zone`。问卦月或得时读取`judge.month_affinity`，可用公开同名视图字段；所属月与另述月份条件分开，不能只用`deTime`判全部得时。区分离散、连续、跨年和季节，以及及时／失时语义；`month_label_match`仅月号，附加条件未决时即使月号未中，整条仍为`match=null`。十三条月份／纳甲原句的`natal_najia_clause`另列同一先天或后天阶段的出生年干支、正纳／借用命中位置；不能取另一阶段或合并`deSheng`替代。分别解释月号真假、纳甲真假和原句连接范围未决，不把单项true／false升级为整条吉凶；未求值与实际未命中不同，见月份与纳甲核对（本地数据：`../../../docs/validation/heluo-najia-qualifiers-audit.md`）。乾八月、颐九月边界为空；随正月相反条件保留，不选其中一条覆盖。64卦总论单次目校中63项明确所属月，无妄仍待核。月号暂按四柱月支解释，不转述为已核农历月界或精确应期。日干映射不代替命与卦体相生等完整得体条件。
+
+问元堂如何起、乾坤为何顺逆或后天如何变，读取公开`yuantang`视图的字段。核对实际性别、时组、配时六位序列、所用位置、`half_year.value/basis`及换卦。`counterfactuals`是半年敏感性比较，不能说成两个实际出生盘；实际选择以已定半年为准。固定四柱结果半年／`heLi=null`时不推为阴令或异类；日期工具自身会按出生瞬间确定半年，见元堂核对（本地数据：`../../../docs/validation/heluo-yuantang-audit.md`）。
+
+问卦体、纳音或得体读取公开`body_relations`视图。`judge.deTi`分列年柱纳音与先后天实际上下／互体的五行关系；完整`present=null`，不据同五行或相生条目自动断得体。第51页`generating_qi`须核无元气前提及“卦体生纳音”方向；第87页双向关系另列`mutual_generation`，不能反向套入前段。旧日干查卦已迁至`judge.day_stem_mapping`，仅按其明确名称解释。
+
+问先后天元气、化工得失时读取公开`qi_phases`视图。旧`yuan/fanYuan/huagong/fanhua`是先后天并集，不能据此说两阶段都有；`judge.qi_phases`把上下体、互体及取得／失去分别给出。春分至夏至按所核反例段同时保留离、巽；空候选`present=null`与已评估的false分开。反化工存在不能直接断现实凶事，乙亥例乾化工与定义离的差异仍待核。 `yuanqi_opposition`分别给出同阶段无正而有反前提；正反并存不能说该式成立。`direct_only_condition_match`只作上下体范围比较，不替换包含两互体的具名取法；不借另一阶段补位。`fanYuan`为反候选命中并集，`rescue_match=null`，节气浅深、气虚、尅制未定不能断反中有救。见相反前提核对（本地数据：`../../../docs/validation/heluo-yuanqi-opposition-audit.md`）。 `solar_term.boundary_context`列实际所用当前节气、最近至点和下一四立，并按原民用年与共享历法核对；二数时令另列实际起止来源。不能据相邻年边界扩充显式模型公开年份，或把TT数值比对解释为历史UTC已认证。河洛来源见端点上下文核对（本地数据：`../../../docs/validation/heluo-solar-context-audit.md`）。参平`calendar_boundaries`视图保留完整121个立春和实际所选源；查询年份及条文须读同次`selected`及`year_start_boundary/year_end_boundary`，不能另查当前年或任取首运。派生许可仅补既有120年序依赖，未来UTC／时区仍有条件，范围不是寿命估计，见完整年序核对（本地数据：`../../../docs/validation/canping-projection-audit.md`）。
+
+问年命纳甲、正纳借用或实际爻位时读公开`najia`视图。按`judge.najia`逐阶段核年干支和命中，`lines[].source.basis`区分该卦条目已核与纯卦内外位推演；后者不能转述成该复卦已经逐爻原页核定。`najia_collation`的8个基础表48／12位置与13条卦解78／18观察分别计数，其余51卦未逐卦目校；64卦384位置的软件核对不是384个原典命例。解卦两印本列举末两支次序不同于计算爻序，`source_issues`未解决，不据此换位或引为直接原页爻位。坎只写及時與納甲，不能据属月表填固定月号，见纳甲基础表核对（本地数据：`../../../docs/validation/heluo-najia-foundations-audit.md`）。
+
+河洛首轮按 `numerology_evidence`、实际先后天卦、元堂及问题所需字段解释。`deSheng` 仅是逐爻年命纳甲命中；月表匹配、日干映射、元堂阴阳与令的比较不能代替完整得时得位或综合葉否。选文可能同时保留不同条件分支，未有综合裁定时不挑有利断语充当唯一结论。
+
+问二数强弱或季节条件时读取 `judge.seasonal_numbers`，可用公开 `number_conditions` 视图的字段。原始数的25／30相等称正数，未自动等于时令得中；至弱、太过是绝对数段。`seasonal_windows[].active` 与 `numeric_band_match` 分开核对，后者为 `null` 时再读 `numeric_band_status`，区分得中未量化与超出所核数段。原文两组时窗和部分数式会重叠，保留全部成立条件，不选有利名称覆盖其他项；不在六窗内也不能推成失时。原数式名不能转写成对人的亲属、性格、生死或现实结果断言。
+
+指定河洛岁运时先核对 `heluo_timing.selected_annual/selected_month/selected_day` 与 `selected_texts`。`analysis_year` 是干支年标签，`month_index/day_index` 是原典序号，尚非完整公历日期映射；不得把月序3／日序10解释成公历3月10日。`pos` 是选文所用爻位，`changed_pos` 是变爻。

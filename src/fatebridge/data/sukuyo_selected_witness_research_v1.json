@@ -1,0 +1,441 @@
+{
+  "id": "nijl_selected_calendar_witnesses_2026_10_25_v1",
+  "capture_snapshot_as_of_utc": "2026-10-25T15:18:45.120925+00:00",
+  "status_is_frozen_capture_record_not_live_network": true,
+  "scope": "Selected source availability, holder metadata and attributed model readings; separate from accepted Taisho/Kyoto/Zentsuji selected controls. Does not supply a new calendar policy or a complete critical edition.",
+  "taisho_binding": {
+    "publisher_html_response_sha256": "74c63f5151c2b8c3ac554f7a0acae0776e5247e740a712834e1b600a065050e6",
+    "downloaded_calendar_windows": [
+      {
+        "locator": "T2465_.78.0030c13-21",
+        "text": "若有閏月時。其正月直宿即亦重直閏月。謂假令十二月有閏月。而其十二月一日直宿是虚宿。十五日直宿是星宿。乃至三十日直宿是星宿。如是閏十二月直宿亦同之。更無異也。先月是正十二月。閏月是傍十二月也。故傍月･直宿三十日皆用正十二月直宿更不異宿也。餘月聞月准之知耳。"
+      },
+      {
+        "locator": "T2465_.78.0030c21-26",
+        "text": "取小月闕第三十日直宿之法。假令正月小闕第三十日。雖無其第三十日。而彼日分直宿猶有故。次二月初一日半已上者。正月闕日之分宿直也。半已下者即彼當日宿直。故雖大小異日有増減。而小月闕日直宿無日不得。次月初一日眞宿無改代也｣"
+      }
+    ]
+  },
+  "source_evidence_sha256": {
+    "capture-accounting-first.json": "c9c2da2bae8f227fe56df6cbfb8557a80fe729370714360e0e9145665ddcbb8b",
+    "holder-catalogue-before-adoption-reference.json": "cd8b989774fd402eb192d2bf2e16d5579f171759d89ac7e813cec688ac75d792",
+    "reviewer-holder-source-scope-first.json": "b20fd962a0086439c95144187c2d93e2295e7b9d72f704b28f68e8eeb93d14d1",
+    "reviewer-alternate-naoj-source-first.json": "2e405d5a1ea9d87387f299df3c23f540970532151cd785bd739c4427244f6feb",
+    "alternate-reading-differences-R3.json": "a624770914e3c3debd56395054a750cca898dba889926b3f24bb8ddb6a74cff8",
+    "generator-shinpukuji-discovery-first.json": "93a6d306e83384d7b8e27bfa17e536f13feaa3c331e00f6f7a4604cc7fdf04c5",
+    "reviewer-shinpukuji-cross-first.json": "2fc8de3aa5e9b3e3b9e747c0cb7d41b1fb77ea8cac3b0df780f52f27a65f3355",
+    "before-source-adoption-reference-R2.json": "dcf8602487f658bc7453dfe9de9607fdabe1d1613853e240002ea2dbc125a39b",
+    "source-scope-addendum-R3.json": "0a1ada19b4c19613e5866d03d7ec31d8bf1bec1d5528f7e9104e0c00a3249e4f",
+    "alternate-capture-accounting-first.json": "49f62d5bf1dae7173306fe6c65f4f31ce5e1471514502b577a8fea984d2e9164",
+    "conjunction-layer-scope-audit.json": "f534e33cf0594c810933301daa5c7c281a4131722a22ba983cfb39380fd9294d",
+    "nagoya-holder-catalogue.html": "ca870475b0e8a54d56bb8b6c0106952b4f0a11597856a6edb178544c187ce6c6",
+    "100183249-manifest.json": "4e03baf4838b4a7484e9c4e92215059298a60f90f74522fd0cb121e6a48a8093",
+    "100436698-manifest.json": "8cc76ad935d419d307acb52c44e54588400b0a3a26ea74d1bc2f7fafc057d460",
+    "100265591-manifest.json": "adbbdbdc51e7510c9916eb5ab9636663972a0d9c389b28c4fcd7e25af3fe22ce",
+    "reviewer-composite-discovery-first.json": "477fefc1b9e2b6dc8c437d384488ef5ff73630bcefbb5094cff7ff99e27e112f",
+    "generator-composite-cross-first.json": "55c48d9bf8d0fdfdc53eb5e82ec448b4178539983698fb2a82fdcfbd5230c5d0"
+  },
+  "capture_summary": {
+    "manifest_canvases": {
+      "100183249": 41,
+      "100436698": 76,
+      "100265591": 80
+    },
+    "NIJL_previews_planned": 197,
+    "NIJL_previews_saved": 196,
+    "NIJL_failed_previews": [
+      {
+        "catalogue_id": "100265591",
+        "frame_one_based": 69
+      }
+    ],
+    "original_resolution_requirements": 17,
+    "original_resolution_acquired": 0,
+    "original_resolution_gate_met": false,
+    "NAOJ_legacy_selected_images_saved": 11,
+    "NAOJ_legacy_pixels": [
+      2500,
+      1872
+    ]
+  },
+  "shinpukuji": {
+    "title": "檜尾鈔",
+    "catalogue_title_alias": "檜尾抄",
+    "institution": "北野山真福寺宝生院（真福寺大須文庫）",
+    "catalogue_id": "100183249",
+    "call_number": "72-25",
+    "film_identifier": "0278-007402",
+    "catalogue_author_literal": "実慧",
+    "manifest_url": "https://kokusho.nijl.ac.jp/biblio/100183249/manifest",
+    "selected_previews": [
+      {
+        "frame_one_based": 34,
+        "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100183249/canvas/34",
+        "image_service_url": "https://kokusho.nijl.ac.jp/api/iiif/100183249/v4/0278/0278-007402/0278-007402-0033.tif",
+        "preview_sha256": "ef745a24835af8f00411bff50fc329ef8e966513cb675dc2f540cf23bff40591",
+        "preview_pixels": [
+          1400,
+          1070
+        ],
+        "declared_original_pixels": [
+          6112,
+          4672
+        ]
+      },
+      {
+        "frame_one_based": 35,
+        "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100183249/canvas/35",
+        "image_service_url": "https://kokusho.nijl.ac.jp/api/iiif/100183249/v4/0278/0278-007402/0278-007402-0034.tif",
+        "preview_sha256": "717c71511582825d36620414d7db6fa4bbd1b60bd2b8a747e0f34c68a73043a6",
+        "preview_pixels": [
+          1400,
+          1070
+        ],
+        "declared_original_pixels": [
+          6112,
+          4672
+        ]
+      }
+    ],
+    "calendar_passages_located": true,
+    "passage_locations": {
+      "intercalary_month_reuse": "034左頁から035右頁",
+      "short_month_missing30_and_next_day_parts": "035右頁"
+    },
+    "day30_readings": [
+      {
+        "role": "generator",
+        "literal_candidate": "室",
+        "certainty": "candidate_from_1400px_preview"
+      },
+      {
+        "role": "reviewer",
+        "literal_candidate": "室",
+        "certainty": "selected_preview_reading"
+      }
+    ],
+    "day30_accepted_glyph": null,
+    "half_phrase_readings": [
+      {
+        "role": "generator",
+        "literal_fragments": [
+          "次二月初一日半…上者",
+          "半…下者即彼當日宿直"
+        ],
+        "middle_glyph_accepted": null
+      },
+      {
+        "role": "reviewer",
+        "literal_fragments": [
+          "二月初一日半晝上者正月卅日之分宿直也",
+          "其□下者即彼當日應直"
+        ],
+        "square_candidates": [
+          "已",
+          "巳"
+        ],
+        "square_accepted": null
+      }
+    ],
+    "overlap_priority_established": false,
+    "modern_half_clock": null,
+    "identified_as_T2465_base_or_ko": false,
+    "whole_manuscript_collated": false
+  },
+  "nagoya_composite": {
+    "catalogue_id": "100436698",
+    "institution": "名古屋大学附属図書館",
+    "holder_catalogue_url": "https://da.adm.thers.ac.jp/item/n004-20230901-00308",
+    "holder_html_sha256": "ca870475b0e8a54d56bb8b6c0106952b4f0a11597856a6edb178544c187ce6c6",
+    "holder_metadata_license": "CC0",
+    "metadata_license_is_image_license": false,
+    "holder_catalogue_fields": {
+      "書名": "宿曜経",
+      "数量": "2冊",
+      "出版年(西暦)": "1681",
+      "成立": "享保２１年仲春日、沙門覚勝（寓於和州柴水山吉祥寺書）序。序の版心下部に「無量寿院蔵版」。上巻巻首「特進試鴻臚卿大興善寺三蔵沙門大広智不空奉詔訳本」。下巻巻首「唐内供奉三蔵沙門不空奉詔訳／弟子上都艸沢楊景風修註」。尾題の前に刊語あり、末に「順治十八年五月日径山比丘徹微印開識」。延宝９年季春、神京書肆村上勘兵衛刊。",
+      "内容注記": "上下巻は別版の取り合わせ本。上巻は四周単辺１０行。享保序刊、無量寿院蔵版本。序によれば、南山（高野山）無量寿院経蔵所蔵の古写本に基づき梓行したもので、原本は５００年以上前の写本とし、弘法大師将来本の伝写かと推定する。頭書に別本との校異を注記する。下巻は四周単辺８行。清初順治１８年刊本に基づく延宝の和刻本。下巻のみ朱書校合書入あり。",
+      "書誌ID": "WB03054425",
+      "NCID": "BB04263873",
+      "資料ID": "10050941, 10050942",
+      "請求記号": "148.8-Su",
+      "メタデータ提供者": "名古屋大学附属図書館",
+      "備考": "上巻は原装縹色表紙、雷文繋地に菊花唐草文（型押）。下巻は原装朽葉色表紙。"
+    },
+    "different_editions_composite_as_holder_statement": true,
+    "upper_lines_as_holder_statement": 10,
+    "lower_lines_as_holder_statement": 8,
+    "ancient_copy_claim_attribution": "館方内容注記が序の主張を転述。五百年以上の写本及び弘法大師将来本の伝写かという推定であり、現物を本研究で鑑定した事実ではない。",
+    "selected_preview": {
+      "frame_one_based": 75,
+      "canvas_id": "https://kokusho.nijl.ac.jp/biblio/100436698/canvas/75",
+      "image_service_url": "https://kokusho.nijl.ac.jp/api/iiif/100436698/v4/NAGO/NAGO-70159/NAGO-70159-0074.tif",
+      "preview_sha256": "01b0c6883634c79ba786850c58bee6a88457d066be6877bde7a9688f05df8143",
+      "preview_pixels": [
+        1400,
+        1012
+      ],
+      "declared_original_pixels": [
+        6464,
+        4672
+      ]
+    },
+    "colophon_first_readings": [
+      {
+        "role": "reviewer",
+        "volume_literal": "下卷",
+        "cost_literal": "四兩九錢三分"
+      },
+      {
+        "role": "generator",
+        "volume_literal": "上下卷",
+        "cost_literal": "四兩九錢二分"
+      }
+    ],
+    "volume_accepted_glyph": null,
+    "cost_accepted_glyph": null,
+    "all_leaves_dated_by_catalogue1681": false,
+    "independent_lineage_accepted": false
+  },
+  "naoj_legacy": {
+    "institution": "国立天文台図書室",
+    "holder_catalogue_url": "https://library.nao.ac.jp/cgi-bin/db/library.cgi",
+    "holder_catalogue_row": 143,
+    "viewer_url": "https://library.nao.ac.jp/kichou/archive/0143/kmview.html",
+    "NIJL_catalogue_id": "100265591",
+    "NIJL_photo_identifier": "NAOJ-00315",
+    "holder_row315_title": "談天",
+    "same_digits_are_item_identity": false,
+    "selected_images": [
+      {
+        "viewer_page_one_based": 1,
+        "image_url": "https://library.nao.ac.jp/kichou/archive/0143/images/00001.jpg",
+        "image_sha256": "eb93a4e3bf81e376f027660d5388b3fcab4942461320c6429d77086975696475",
+        "pixels": [
+          2500,
+          1872
+        ]
+      },
+      {
+        "viewer_page_one_based": 13,
+        "image_url": "https://library.nao.ac.jp/kichou/archive/0143/images/00013.jpg",
+        "image_sha256": "a73b19b36e3bbc0c098f4b07d562f95ecbd953cc60027cb0ec1d9db696696682",
+        "pixels": [
+          2500,
+          1872
+        ]
+      },
+      {
+        "viewer_page_one_based": 14,
+        "image_url": "https://library.nao.ac.jp/kichou/archive/0143/images/00014.jpg",
+        "image_sha256": "14fe629d7a9ac1df365b8a4fc0318908daeb8833e48538da25f77d162f47199b",
+        "pixels": [
+          2500,
+          1872
+        ]
+      },
+      {
+        "viewer_page_one_based": 15,
+        "image_url": "https://library.nao.ac.jp/kichou/archive/0143/images/00015.jpg",
+        "image_sha256": "dcad19740d632a8f4c15273f014dafda9a348379e3d41159492c7f88c12af8b3",
+        "pixels": [
+          2500,
+          1872
+        ]
+      },
+      {
+        "viewer_page_one_based": 16,
+        "image_url": "https://library.nao.ac.jp/kichou/archive/0143/images/00016.jpg",
+        "image_sha256": "02d0878d2632686b2b8db34613f32acbaaf3a31b0c71c5b651a01fd9ff4a2095",
+        "pixels": [
+          2500,
+          1872
+        ]
+      },
+      {
+        "viewer_page_one_based": 69,
+        "image_url": "https://library.nao.ac.jp/kichou/archive/0143/images/00069.jpg",
+        "image_sha256": "104d31dc6d00130084ac48fccadfc174f367a2a55a9c49bc67dd6598f38fb348",
+        "pixels": [
+          2500,
+          1872
+        ]
+      },
+      {
+        "viewer_page_one_based": 70,
+        "image_url": "https://library.nao.ac.jp/kichou/archive/0143/images/00070.jpg",
+        "image_sha256": "6b9a65c0a6d353007a1da35aacad3c26934d292a80fd7e63c531950b20beb3e6",
+        "pixels": [
+          2500,
+          1872
+        ]
+      },
+      {
+        "viewer_page_one_based": 71,
+        "image_url": "https://library.nao.ac.jp/kichou/archive/0143/images/00071.jpg",
+        "image_sha256": "9294aecaf2e8d3d9c15c937b1fbb169e5c0f839da864989fe2402a51f46839d6",
+        "pixels": [
+          2500,
+          1872
+        ]
+      },
+      {
+        "viewer_page_one_based": 77,
+        "image_url": "https://library.nao.ac.jp/kichou/archive/0143/images/00077.jpg",
+        "image_sha256": "55b0a9a139960a4b4fc1aa13562b86b90f7afed24aac143ddf27ce228504eadf",
+        "pixels": [
+          2500,
+          1872
+        ]
+      },
+      {
+        "viewer_page_one_based": 78,
+        "image_url": "https://library.nao.ac.jp/kichou/archive/0143/images/00078.jpg",
+        "image_sha256": "6dda2ec34d69454032a60ff3e4add80eba318dd544677ae4f0e5ad73f75261b6",
+        "pixels": [
+          2500,
+          1872
+        ]
+      },
+      {
+        "viewer_page_one_based": 79,
+        "image_url": "https://library.nao.ac.jp/kichou/archive/0143/images/00079.jpg",
+        "image_sha256": "aa002ac20f149e72b7fd368ce818696c16027881feff6bc34df15f87ea846a80",
+        "pixels": [
+          2500,
+          1872
+        ]
+      }
+    ],
+    "visually_supported_content_pairs": [
+      {
+        "alternate": "00013",
+        "preview": "012",
+        "basis": "月名排列、正文及小注版面"
+      },
+      {
+        "alternate": "00014",
+        "preview": "013",
+        "basis": "唐月建之圖及一日至十三日表"
+      },
+      {
+        "alternate": "00015",
+        "preview": "014",
+        "basis": "十四日至二十九日表"
+      },
+      {
+        "alternate": "00016",
+        "preview": "015",
+        "basis": "三十日列、三种合法及歌诀"
+      },
+      {
+        "alternate": "00069",
+        "preview": "068",
+        "basis": "七曜直日曆品第八及前后连续文字"
+      },
+      {
+        "alternate": "00071",
+        "preview": "070",
+        "basis": "平明八时段、七曜占及太陽直日页"
+      },
+      {
+        "alternate": "00077",
+        "preview": "076",
+        "basis": "羅刹结语、太白方向表及框内小字位置"
+      },
+      {
+        "alternate": "00078",
+        "preview": "077",
+        "basis": "音释、卷终、顺治刊语及延宝独立刊行框"
+      },
+      {
+        "alternate": "00079",
+        "preview": "078",
+        "basis": "空白页及售书附页版面"
+      }
+    ],
+    "constant_all80_page_offset_accepted": false,
+    "missing_NIJL069_replaced_by_legacy070": false,
+    "same_physical_copy_accepted": false,
+    "independent_lineage_accepted": false,
+    "timing_passage": {
+      "legacy_page": 71,
+      "NIJL_frame": 70,
+      "start_literal": "平明",
+      "day_parts_literal": 8,
+      "night_parts_literal": 8,
+      "evening_glyph_readings": {
+        "parent": "酉",
+        "reviewer_candidates": [
+          "西",
+          "酉"
+        ],
+        "accepted": null
+      },
+      "next_day_glyph_readings": {
+        "parent": "曉",
+        "reviewer": "曜",
+        "accepted": null
+      },
+      "modern_civil_clock": null,
+      "solar_altitude": null,
+      "complete_intradaily_luminary_order": null,
+      "Hinoo_half_equated_to_day_night": false
+    },
+    "legacy78_character_count_readings": {
+      "parent_first": "八千四百二十字",
+      "reviewer_first": "八千四百一十字",
+      "parent_after_exact_crop": "八千四百一十字",
+      "working_selected_image_reading": "八千四百一十字",
+      "parent_first_error_preserved": true,
+      "applies_to_NAGO075": false
+    },
+    "upper_conjunction_layers": {
+      "legacy_page": 16,
+      "prose_literal": "心尾箕斗牛女虛危室壁十宿爲隨合",
+      "verse_literal": "九宿如犢隨從母",
+      "merged_with_selected_lower27_rule": false
+    },
+    "publisher_leaf": {
+      "legacy_page": 79,
+      "NIJL_frame": 78,
+      "heading_literal": "各宗書籍製本發賣所",
+      "date_accepted": null
+    },
+    "whole_table360_collated": false
+  },
+  "acceptance": {
+    "applied_to_calendar": false,
+    "applied_to_physical_moon": false,
+    "emends_other_witness_glyphs": false,
+    "Taisho_star_emended": false,
+    "modern_daybreak_clock_established": false,
+    "modern_Hinoo_half_clock_established": false,
+    "intercalary_short_month_priority_established": false,
+    "complete_critical_edition_accepted": false,
+    "independent_human_collation_accepted": false,
+    "strict_blind_transcription_accepted": false,
+    "independent_historical_observations_added": 0,
+    "real_prediction_samples_added": 0
+  },
+  "source_evidence_artifact_namespace": {
+    "capture-accounting-first.json": "sukuyo-composite-witness-v82",
+    "holder-catalogue-before-adoption-reference.json": "sukuyo-native-and-audit-v83",
+    "reviewer-holder-source-scope-first.json": "sukuyo-native-and-audit-v83",
+    "reviewer-alternate-naoj-source-first.json": "sukuyo-native-and-audit-v83",
+    "alternate-reading-differences-R3.json": "sukuyo-native-and-audit-v83",
+    "generator-shinpukuji-discovery-first.json": "sukuyo-composite-witness-v82",
+    "reviewer-shinpukuji-cross-first.json": "sukuyo-composite-witness-v82",
+    "before-source-adoption-reference-R2.json": "sukuyo-composite-witness-v82",
+    "source-scope-addendum-R3.json": "sukuyo-composite-witness-v82",
+    "alternate-capture-accounting-first.json": "sukuyo-native-and-audit-v83",
+    "conjunction-layer-scope-audit.json": "sukuyo-native-and-audit-v83",
+    "nagoya-holder-catalogue.html": "sukuyo-native-and-audit-v83",
+    "100183249-manifest.json": "sukuyo-composite-witness-v82",
+    "100436698-manifest.json": "sukuyo-composite-witness-v82",
+    "100265591-manifest.json": "sukuyo-composite-witness-v82",
+    "reviewer-composite-discovery-first.json": "sukuyo-composite-witness-v82",
+    "generator-composite-cross-first.json": "sukuyo-composite-witness-v82"
+  },
+  "source_evidence_scope": "Each evidence filename is bound to an explicit frozen research-artifact namespace and SHA256; raw private image/HTML packages remain separate. Seventeen evidence files are not seventeen independent witnesses or new observations."
+}

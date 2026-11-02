@@ -1,89 +1,89 @@
-"""太阳/月亮回归推运法。"""
+"""Bracketed solar/lunar returns in TT; governing event never lies in future."""
 
 from __future__ import annotations
 
-from datetime import timezone
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
-from ._common import (
-    Any,
-    Dict,
-    List,
-    Optional,
-    PlanetaryReturnFactory,
-    datetime,
-    point_to_dict,
+from fatebridge.core.astro.geometry import _ayanamsha
+from fatebridge.core.astro.time_scales import datetime_from_tt, ephemeris_time
+from fatebridge.core.ephemeris_runtime import (
+    ephemeris_call,
     preserve_ephemeris_path,
-    resolve_kerykeion_timezone_name,
     swe,
-    timedelta,
 )
 
-# Search-seed lookback per return type. The governing return is the latest one
-# at or before the analysis instant, so we seed the search at least one full
-# period earlier and scan forward. Solar returns recur ~yearly, lunar ~27.3d.
-_RETURN_SEED_LOOKBACK_DAYS = {"Solar": 367, "Lunar": 31}
+from ._common import build_subject, point_to_dict
 
 
-def _analysis_julian_day(analysis_datetime: datetime) -> float:
-    moment = analysis_datetime.astimezone(timezone.utc)
-    return float(
-        swe.julday(
-            moment.year,
-            moment.month,
-            moment.day,
-            moment.hour + moment.minute / 60.0 + moment.second / 3600.0,
-        )
-    )
+def _longitude_tt(
+    body_id: int, julian_day_tt: float, *, sidereal: bool = False
+) -> float:
+    coordinates, flag = ephemeris_call("calc", julian_day_tt, body_id, swe.FLG_SWIEPH)
+    if flag < 0:
+        raise ValueError("Return search ephemeris failed")
+    longitude = float(coordinates[0])
+    if sidereal:
+        ut1 = julian_day_tt
+        for _ in range(4):
+            ut1 = julian_day_tt - ephemeris_call("deltat_ex", ut1, swe.FLG_SWIEPH)
+        longitude -= _ayanamsha(ut1)
+    return longitude % 360
 
 
-def _governing_return(
-    factory: Any,
-    analysis_datetime: datetime,
-    return_type: str,
-) -> Any:
-    """Return the planetary return that is in effect on ``analysis_datetime``.
+def _signed_offset(longitude: float, target: float) -> float:
+    return (longitude - target + 180) % 360 - 180
 
-    A return chart governs the span from its own moment until the next return,
-    so the active chart for a given instant is the *latest return at or before*
-    it — not the next upcoming one. ``next_return_from_date`` only finds the
-    first return on/after a seed date, so we seed one period early and step
-    forward, keeping the last return whose moment does not exceed the analysis
-    instant.
+
+def governing_return_tt(
+    body_id: int, target_longitude: float, analysis_tt: float, *, sidereal: bool = False
+) -> float:
+    """Latest positive-motion zero crossing at or before analysis_tt.
+
+    Solar 10-day / lunar 1-day steps remain below half a revolution; reject the
+    antipodal discontinuity. Bisection keeps the final root inside its bracket.
+    The wider windows include at least one complete solar or lunar revolution.
     """
-    analysis_jd = _analysis_julian_day(analysis_datetime)
-    lookback = _RETURN_SEED_LOOKBACK_DAYS[return_type]
-    seed = analysis_datetime - timedelta(days=lookback)
-
-    governing = None
-    candidate = factory.next_return_from_date(
-        seed.year, seed.month, seed.day, return_type=return_type
+    if body_id not in {swe.SUN, swe.MOON}:
+        raise ValueError("This return solver supports Sun and Moon only")
+    lookback, step = (370.0, 10.0) if body_id == swe.SUN else (32.0, 1.0)
+    left = analysis_tt - lookback
+    previous = _signed_offset(
+        _longitude_tt(body_id, left, sidereal=sidereal), target_longitude
     )
-    # Bounded scan: at most a handful of periods fit in the lookback window.
-    for _ in range(40):
-        if candidate.julian_day > analysis_jd:
-            break
-        governing = candidate
-        year, month, day, _hour = swe.revjul(candidate.julian_day)
-        next_seed = datetime(
-            int(year), int(month), int(day), tzinfo=timezone.utc
-        ) + timedelta(days=1)
-        candidate = factory.next_return_from_date(
-            next_seed.year, next_seed.month, next_seed.day, return_type=return_type
+    bracket = None
+    while left < analysis_tt:
+        right = min(left + step, analysis_tt)
+        current = _signed_offset(
+            _longitude_tt(body_id, right, sidereal=sidereal), target_longitude
         )
-
-    # Fall back to the earliest located return if none precedes the analysis
-    # instant (only possible if the chart predates the lookback window).
-    return governing if governing is not None else candidate
-
-
-def _return_section(planet_return: Any) -> Dict[str, Any]:
-    return {
-        "return_datetime": planet_return.iso_formatted_local_datetime,
-        "sun": point_to_dict("Sun", planet_return.sun),
-        "moon": point_to_dict("Moon", planet_return.moon),
-        "ascendant": point_to_dict("Ascendant", planet_return.ascendant),
-        "medium_coeli": point_to_dict("Medium_Coeli", planet_return.medium_coeli),
-    }
+        if previous <= 0 <= current and current - previous < 180:
+            bracket = (left, right)
+        left, previous = right, current
+    if bracket is None:
+        raise ValueError(
+            "No governing return was bracketed before the analysis instant"
+        )
+    low, high = bracket
+    for _ in range(64):
+        middle = (low + high) / 2
+        if middle in {low, high} or high - low <= 1e-9:
+            break
+        value = _signed_offset(
+            _longitude_tt(body_id, middle, sidereal=sidereal), target_longitude
+        )
+        if value < 0:
+            low = middle
+        else:
+            high = middle
+    return min(
+        (low, high),
+        key=lambda jd: abs(
+            _signed_offset(
+                _longitude_tt(body_id, jd, sidereal=sidereal), target_longitude
+            )
+        ),
+    )
 
 
 @preserve_ephemeris_path()
@@ -96,23 +96,45 @@ def build_return_payload(
     return_timezone: str,
     include: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
-    backend_return_timezone = resolve_kerykeion_timezone_name(return_timezone) or "UTC"
-    factory = PlanetaryReturnFactory(
-        natal_subject,
-        lng=return_longitude,
-        lat=return_latitude,
-        tz_str=backend_return_timezone,
-        online=False,
-    )
-    included = set(include or ["solar_return", "lunar_return"])
+    times = ephemeris_time(analysis_datetime)
+    if times.jd_tt is None:
+        raise ImportError("Swiss Ephemeris is required for planetary returns")
     payload: Dict[str, Any] = {}
-
-    if "solar_return" in included:
-        solar_return = _governing_return(factory, analysis_datetime, "Solar")
-        payload["solar_return"] = _return_section(solar_return)
-
-    if "lunar_return" in included:
-        lunar_return = _governing_return(factory, analysis_datetime, "Lunar")
-        payload["lunar_return"] = _return_section(lunar_return)
-
+    for key, planet, body_id in [
+        ("solar_return", "sun", swe.SUN),
+        ("lunar_return", "moon", swe.MOON),
+    ]:
+        if key not in (include or ["solar_return", "lunar_return"]):
+            continue
+        target = float(getattr(natal_subject, planet).abs_pos)
+        sidereal = natal_subject.zodiac_type == "Sidereal"
+        solved = governing_return_tt(body_id, target, times.jd_tt, sidereal=sidereal)
+        moment = datetime_from_tt(solved)
+        chart = build_subject(
+            name=f"{natal_subject.name}-{key}",
+            local_datetime=moment,
+            longitude=return_longitude,
+            latitude=return_latitude,
+            timezone_name=return_timezone,
+            house_system=natal_subject.houses_system_identifier,
+            zodiac_type=natal_subject.zodiac_type,
+        )
+        actual = float(getattr(chart, planet).abs_pos)
+        payload[key] = {
+            "return_datetime": chart.iso_formatted_local_datetime,
+            "return_datetime_utc": moment.isoformat(),
+            "sun": point_to_dict("Sun", chart.sun),
+            "moon": point_to_dict("Moon", chart.moon),
+            "ascendant": point_to_dict("Ascendant", chart.ascendant),
+            "medium_coeli": point_to_dict("Medium_Coeli", chart.medium_coeli),
+            "solver": {
+                "method_id": "bracketed_tt_longitude_return_v1",
+                "julian_day_tt": solved,
+                "target_longitude": target,
+                "solved_longitude": actual,
+                "residual_arcseconds": abs(_signed_offset(actual, target)) * 3600,
+                "event_not_after_analysis": solved <= times.jd_tt,
+            },
+            "calculation_basis": chart.calculation_basis,
+        }
     return payload

@@ -22,10 +22,23 @@ def example_input(spec: ToolSpec) -> Optional[Dict[str, Any]]:
         return None
     if isinstance(source, str):
         source = bundle["subjects"][source]
-    inputs = {k: v for k, v in source.items() if k in spec.request_model.model_fields}
+    inputs = {
+        k: deepcopy(v)
+        for k, v in source.items()
+        if k in spec.request_model.model_fields
+    }
     # Fail loudly on stale published examples; never substitute fabricated input.
     spec.request_model.model_validate(inputs)
     return inputs
+
+
+def example_context() -> Dict[str, Any]:
+    """Example facts are transport fixtures, never missing user information."""
+    return {
+        "fictional": True,
+        "purpose": "schema_and_transport_demo",
+        "use_as_user_default": False,
+    }
 
 
 def suggested_fields(
@@ -50,6 +63,28 @@ def evidence_views(spec: ToolSpec) -> Optional[Dict[str, Any]]:
     """
     key = "astro_relative_chart" if spec.key == "astro_relative" else spec.key
     views = deepcopy(_examples().get("evidence_views", {}).get(key))
+    from fatebridge.core.requests.western_policy import supports_western_policy_model
+
+    if supports_western_policy_model(spec.request_model):
+        views = views or {}
+        views["data_files"] = {
+            "fields": ["ephemeris_data_policy"],
+            "scope": "Available when ephemeris_policy=require_data_files. Read the actual observed physical models, file hashes, reference zeros and private-worker reports. Native event-internal reads, fixed-star catalogue formulae and absolute accuracy are not certified. This card does not set the input policy.",
+        }
+    if key in {"meihua_cast", "meihua_analysis"}:
+        views = views or {}
+        fields = [
+            "meihua.body_trigram",
+            "meihua.use_trigram",
+            "interpretation.topic_reading.chapter_qualifications.qualitative_motion",
+            "summary",
+        ]
+        if key == "meihua_cast":
+            fields.append("interpretation.casting_readings")
+        views["chapter_qualitative_motion"] = {
+            "fields": fields,
+            "scope": "Requires interpretation_topic=travel or traveler. A declared NLC1925 grammatical reading selects the candidate's initial body for travel and initial use for traveler. Preserve 多 as an unquantified qualifier; distinguish it from inner-role motion and field observations. Existing occurrence-count readings remain unresolved. No probability, route, location, safety or return-time certificate.",
+        }
     if views is not None and key == "astro_relative_chart":
         from fatebridge.core.astro.reference import (
             RELATIVE_MODE_EXACT_ALIASES,

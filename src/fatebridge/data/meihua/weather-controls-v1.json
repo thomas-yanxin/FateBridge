@@ -1,0 +1,105 @@
+{
+  "id": "meihua_weather_controls_v1",
+  "version": "1.0.0",
+  "title": "《梅花易數》跨章天气制约与频数候选",
+  "sources": [
+    {
+      "id": "meihua-volume-1",
+      "revision": 2690596,
+      "url": "https://zh.wikisource.org/w/index.php?oldid=2690596&title=梅花易數/卷一"
+    },
+    {
+      "id": "meihua-volume-2",
+      "revision": 1441921,
+      "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二"
+    }
+  ],
+  "rules": [
+    {
+      "id": "metal_controls_wood_weather",
+      "source_id": "meihua-volume-2",
+      "section": "體用",
+      "quote": "如論卦中乾、兌多，則震無雷，巽亦無風",
+      "controllers": [
+        "乾",
+        "兑"
+      ],
+      "targets": {
+        "震": [
+          "thunder"
+        ],
+        "巽": [
+          "wind"
+        ]
+      },
+      "reading": "乾兑金多制震雷、巽风"
+    },
+    {
+      "id": "earth_controls_water_weather",
+      "source_id": "meihua-volume-2",
+      "section": "體用論",
+      "quote": "坤、艮多則坎無雨",
+      "controllers": [
+        "坤",
+        "艮"
+      ],
+      "targets": {
+        "坎": [
+          "rain"
+        ]
+      },
+      "reading": "坤艮土多制坎雨"
+    },
+    {
+      "id": "water_controls_fire_weather",
+      "source_id": "meihua-volume-2",
+      "section": "體用論",
+      "quote": "坎多，則離亦不晴",
+      "controllers": [
+        "坎"
+      ],
+      "targets": {
+        "离": [
+          "clear"
+        ]
+      },
+      "reading": "坎水多制离晴"
+    }
+  ],
+  "frequency_reference": {
+    "source_id": "meihua-volume-1",
+    "section": "鄰夜扣門借物占",
+    "quote": "卦中三乾金，二巽木，為金木之物也",
+    "statement": "此原例按本卦二位、互卦二位、变用一位可复得三乾二巽；六位置则三乾三巽。五位置只是该例支持的频数候选，不据此宣布天时章全部必须改用五位置。"
+  },
+  "policies": [
+    {
+      "id": "frequency_candidates",
+      "kind": "software_scope_probes",
+      "statement": "保留本互变六位置与只计一次静卦的五位置；五位置只用于计数敏感性诊断，不作为体用吉凶判断。两范围都列出，不按实际天气选有利一方。"
+    },
+    {
+      "id": "controller_grouping",
+      "kind": "software_scope_probes",
+      "statement": "乾兑或坤艮多分别检验合计数与任一单卦数两种候选；单一坎只须一种。候选并非穷尽古义或完成校勘。"
+    },
+    {
+      "id": "threshold",
+      "kind": "unadjudicated_quantifier",
+      "statement": "沿用调用者事前明示的many_min_count。未给阈值时不暗设多数；控制卦少于二的候选不满足本接口允许的任何阈值。"
+    },
+    {
+      "id": "direct_controls_only",
+      "kind": "partial_text_implementation",
+      "statement": "直接条款只修饰依赖对应受制卦的已命中象义，不把坎雨受制扩展成所有雨象都无效。未递归裁定制约者再受制、季节权重或全局胜负。"
+    }
+  ],
+  "unresolved": [
+    "多的数值及计数分母不是原文唯一裁定",
+    "合计与单卦计数只是明示候选，未穷尽解释",
+    "五位置频数从借物例得到，不等于已证明天时全章采用同一口径",
+    "制约者再受制与复合制化优先级未实现",
+    "不从控制状态自动选择唯一现实天气预测"
+  ],
+  "ruleset_id": "meihua_weather_controls_v1"
+}

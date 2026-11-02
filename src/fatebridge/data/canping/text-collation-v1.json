@@ -1,0 +1,6809 @@
+{
+  "corpus_id": "canping_najda_selected_cells_v1",
+  "version": "1.11.0",
+  "source_title": "河洛理數 卷六 國立公文書館305-0271明刊清印本",
+  "source_url": "https://www.digital.archives.go.jp/DAS/contents/pdf/lossy/03050271000050/0001.pdf",
+  "source_pdf_sha256": "199c7c1100a86857bc6973da4f0cfb27be473fdd5ede7b0241fc8cdb101877ea",
+  "review_status": "single_visual_collation_with_same_reviewer_native_image_rereading; independent_second_review_pending",
+  "transcription_policy": "Literal cells manually read against whole-page witnesses. Modern punctuation supplied. ○ is a printed circle; □ marks editorial uncertainty and is not a source glyph. Existing inherited readings were consulted for comparison, not treated as the source. No normalization to familiar allusions.",
+  "scope": "All five numbered parts examined once, 78 rows / 234 cells each. Forty previously uncertain water cells re-examined from native-coordinate IIIF regions of the same catalogue copy: 30 now have clear readings, ten remain uncertain. This adds zero examined numbered cells and zero independent reviews. Current unresolved water/fire/wood/gold/earth cells: 10/11/13/11/2 (47 total). Two fire and four wood obscured headers retain provisional inherited-key attribution; all eighteen cells remain unresolved. Gold final eleven primary-edition number/body pairings differ from inherited same-number rows, attribution unresolved. Corrected earth 3373 and fire 2838 retain inherited-key provenance. The standalone 2869 note remains unassigned and unapplied. Zero unexamined numbered cells does not establish complete clear readings, independent review or complete-book rule conformity. Native-coordinate rereading of all six obscured headers confirms five seal-overprint cases and one faded-digit case; all six remain unresolved, adding zero confirmed or examined numbered cells. Body-reading state and unresolved number attribution are returned separately for these eighteen cells, without promoting their whole-cell status. Fire native-coordinate body rereading: eleven prior uncertain cells, six resolved and five retained. Prior water and header witnesses retained separately. Zero new numbered cells or independent reviews. Wood native-coordinate body rereading: four prior uncertain cells, three resolved and one retained.  Water, fire and number-header witnesses retained separately; zero new numbered cells or independent reviews. Gold native-coordinate body rereading: fifteen prior uncertain cells, four resolved and eleven retained; 3314 luck gains only 花, not female-column completion.  Water, fire, wood and number-header witnesses retained separately; zero new numbered cells or independent reviews. Earth native-coordinate rereading: three prior uncertain cells reviewed, one resolved and two retained; one previously clear comparison cell retained unchanged after an erroneous draft was withdrawn. Current clear readings: 1123 of 1170. All prior witnesses retained; zero new numbered cells or independent reviews. Glyph identification does not settle intended word sense.",
+  "total_cells": 1170,
+  "column_rule_pdf_pages": [
+    49,
+    50,
+    65
+  ],
+  "direction_rule_pdf_page": 54,
+  "entries": [
+    {
+      "element": "水",
+      "number": 3330,
+      "pdf_page": 65,
+      "cells": {
+        "male": "洞門無鎖鑰，便是一閒人。",
+        "female": "閨門深似海，應不染紅塵。",
+        "luck": "半空明月稀，一枕清風靜。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2231,
+      "pdf_page": 65,
+      "cells": {
+        "male": "月在清波底，維舟向柳邊。",
+        "female": "年來十二月，月長日西沈。",
+        "luck": "酒醒何處去，柳岸臨風輕。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2332,
+      "pdf_page": 65,
+      "cells": {
+        "male": "南山秦嶺花，開向三冬雪。",
+        "female": "花果一時新，回首四面隔。",
+        "luck": "商山採藥去，意望作神仙。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2433,
+      "pdf_page": 65,
+      "cells": {
+        "male": "元霄好燈爛，卻向五更明。",
+        "female": "紫燕語離情，新巢重引子。",
+        "luck": "將軍欲斷橋，謀為何計策。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2534,
+      "pdf_page": 66,
+      "cells": {
+        "male": "三年不言道，夢傳說旁求。",
+        "female": "牛女星方度，誰家波浪生。",
+        "luck": "梅花開雪下，已自壓群芳。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2635,
+      "pdf_page": 66,
+      "cells": {
+        "male": "觀鼎取其象，稼穡下艱難。",
+        "female": "花上鶯聲急，東風歎短長。",
+        "luck": "蒼鷹與良丈，須自漸從遊。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2736,
+      "pdf_page": 66,
+      "cells": {
+        "male": "結繩代書契，八卦未會成。",
+        "female": "革故取鼎新，姻緣事非偶。",
+        "luck": "駿馬已登途，阻防蹄暫住。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2837,
+      "pdf_page": 66,
+      "cells": {
+        "male": "華渚星虹動，海棠雲雨飛。",
+        "female": "羅帳怕霜侵，雲外衣裳冷。",
+        "luck": "鳳鳴在高岡，百鳥皆集視。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2938,
+      "pdf_page": 66,
+      "cells": {
+        "male": "鴻毛飛白雪，羊角上清霄。",
+        "female": "惟願日長好，□西還自東。",
+        "luck": "用扇作飛簾，糞塵如風捲。"
+      },
+      "reading_uncertainties": {
+        "female": [
+          "原圖首字向／旬形近，本輪仍未穩定辨定，保留編輯□。",
+          "□為編輯未定，可代表未定字串；未按典故、繼承文或另一印本補字。"
+        ]
+      },
+      "reading_revisions": {
+        "female": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "惟願日長好，□西還自東。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 66,
+          "note": "原圖首字向／旬形近，本輪仍未穩定辨定，保留編輯□。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 3039,
+      "pdf_page": 66,
+      "cells": {
+        "male": "魚蝦北海過，海水變桑田。",
+        "female": "葛藟絏樛木，前程自有期。",
+        "luck": "鑿井得邊泉，先勞而後暢。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 3140,
+      "pdf_page": 66,
+      "cells": {
+        "male": "惟魚與熊掌，二者豈能兼。",
+        "female": "清淯自澄徹，莫使決汚泥。",
+        "luck": "生義人所欲，二者豈能兼。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 3241,
+      "pdf_page": 66,
+      "cells": {
+        "male": "虎皮包干戈，華山未歸馬。",
+        "female": "江天欲暮時，惆悵神仙侶。",
+        "luck": "蝴蝶上天飛，尋花去上苑。"
+      },
+      "reading_revisions": {
+        "female": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "江天□暮時，惆悵神仙侶。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 66,
+          "note": "原圖欲字可辨，不依文義補字。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 3332,
+      "pdf_page": 66,
+      "cells": {
+        "male": "自牖看天心，咫尺天顏近。",
+        "female": "春風酒一壺，明月人千里。",
+        "luck": "雪滿芳郊外，此心惟是憂。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2233,
+      "pdf_page": 66,
+      "cells": {
+        "male": "月出四更靜，長天惟字橫。",
+        "female": "要知天不曉，月色轉三更。",
+        "luck": "定前須向月，何在更登樓。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2334,
+      "pdf_page": 67,
+      "cells": {
+        "male": "海棠三月開，雨洗胭脂臉。",
+        "female": "梅子墜金風，不見釵頭鳳。",
+        "luck": "馬過危橋上，隄防足下空。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2435,
+      "pdf_page": 67,
+      "cells": {
+        "male": "白露結珠花，東邊太陽上。",
+        "female": "明珠生老蚌，莫戲綠楊津。",
+        "luck": "○○○○○，○○○○○。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2536,
+      "pdf_page": 67,
+      "cells": {
+        "male": "繡針為鐵杵，江海暗中瀛。",
+        "female": "鐵磬與銅盆，相剛方穩當。",
+        "luck": "得薪又無米，恍忽又憂惶。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "得薪又無米，□忽又憂惶。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 67,
+          "note": "恍字可辨，保留底本忽字，不改為惚。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2637,
+      "pdf_page": 67,
+      "cells": {
+        "male": "二氣包鰲極，五行猶未分。",
+        "female": "天邊問明月，已度又還員。",
+        "luck": "夜深聞雷聲，疑有所思時。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2738,
+      "pdf_page": 67,
+      "cells": {
+        "male": "花箋黑水染，空有五雲飛。",
+        "female": "仙曲何人和，玉簫吹夜寒。",
+        "luck": "扁舟兼得舫，向後飛出常。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2839,
+      "pdf_page": 67,
+      "cells": {
+        "male": "赤電閃紅旗，黑雲拖鐵騎。",
+        "female": "月中丹桂子，開處待秋風。",
+        "luck": "蛇蟠當道上，進退自為憂。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2940,
+      "pdf_page": 67,
+      "cells": {
+        "male": "巫山千里遠，欲聽鳥聲音。",
+        "female": "鄭北春風生，霜雪摧蒲柳。",
+        "luck": "螃蟹脫二谷，振羽欲飛時。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "螃蟹□□谷，振羽欲飛時。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 67,
+          "note": "保留原圖脫二谷讀法，不按文義改窠穴。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 3041,
+      "pdf_page": 67,
+      "cells": {
+        "male": "龍舟爭勝負，欲定一時名。",
+        "female": "東風滿柳花，西風何太急。",
+        "luck": "畫舫過洪波，棹○難得太。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "畫舫過洪波，棹○難得□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 67,
+          "note": "末字太的下點可辨，原頁○仍保留。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 3142,
+      "pdf_page": 67,
+      "cells": {
+        "male": "樲棘共梧檟，取養在場師。",
+        "female": "鮑魚混芝蘭，馨香依舊在。",
+        "luck": "桂林無雨露，山澤有風雲。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 3334,
+      "pdf_page": 67,
+      "cells": {
+        "male": "物均衡斗正，益寡以裒多。",
+        "female": "楊朱惡修身，難遇天仙子。",
+        "luck": "閑更井駐笛，躁進恐無由。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2235,
+      "pdf_page": 68,
+      "cells": {
+        "male": "龍蛇爭一室，飛向百花叢。",
+        "female": "雲開月色新，陰晴猶未保。",
+        "luck": "猛虎居林叢，笑吼自生風。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2336,
+      "pdf_page": 68,
+      "cells": {
+        "male": "高下花飛處，鶯聲春晝閑。",
+        "female": "水二府蓮花，塵中留不住。",
+        "luck": "三月艷陽天，融和生宇宙。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2437,
+      "pdf_page": 68,
+      "cells": {
+        "male": "水入犀牛角，龍蛇出海來。",
+        "female": "極目高樓上，太陽天上天。",
+        "luck": "野火自燒山，禽飛并獸走。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "野火自燒山，禽飛□□走。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 68,
+          "note": "并獸二字可辨，保留原頁并字形。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2538,
+      "pdf_page": 68,
+      "cells": {
+        "male": "坐井觀天象，明知八陣圖。",
+        "female": "荷葉疊青錢，□鴦永向風。",
+        "luck": "飛鷹思得兔，反獲□□□。"
+      },
+      "reading_uncertainties": {
+        "female": [
+          "首字形仍未定；鴦永向可辨，不依熟語補鴛或改永為泳。",
+          "□為編輯未定，可代表未定字串；未按典故、繼承文或另一印本補字。"
+        ],
+        "luck": [
+          "反獲後三字墨損，本輪仍未定。",
+          "□為編輯未定，可代表未定字串；未按典故、繼承文或另一印本補字。"
+        ]
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "坐井觀天象，明知□陣圖。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 68,
+          "note": "八字可辨。"
+        },
+        "female": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "荷葉疊青錢，□□□□風。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 68,
+          "note": "首字形仍未定；鴦永向可辨，不依熟語補鴛或改永為泳。"
+        },
+        "luck": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "飛鷹思得兔，反獲□□□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 68,
+          "note": "反獲後三字墨損，本輪仍未定。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2639,
+      "pdf_page": 68,
+      "cells": {
+        "male": "荊棘凱風吹，枝頭烟一抹。",
+        "female": "春光重首○，何人落少年。",
+        "luck": "立地待行人，長江空渺渺。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2740,
+      "pdf_page": 68,
+      "cells": {
+        "male": "玉兔與金烏，東西任來往。",
+        "female": "芙蓉在秋江，風露已高聲。",
+        "luck": "江山千□，遇虎可為□。"
+      },
+      "reading_uncertainties": {
+        "luck": [
+          "首句千後殘字未定，不延用舊目讀里外；次句虎可辨，末字仍未定，□可表示未定字串。",
+          "□為編輯未定，可代表未定字串；未按典故、繼承文或另一印本補字。"
+        ]
+      },
+      "reading_revisions": {
+        "luck": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "江山千里外，遇□可為□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 68,
+          "note": "首句千後殘字未定，不延用舊目讀里外；次句虎可辨，末字仍未定，□可表示未定字串。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2841,
+      "pdf_page": 68,
+      "cells": {
+        "male": "剝果見花開，時人逞爛熳。",
+        "female": "雨餘雲半飛，○濟自東出。",
+        "luck": "腐草化為螢，難於分明白。"
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "剝果見花開，時人逞爛□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 68,
+          "note": "熳字可辨，保留底本火旁字形。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2942,
+      "pdf_page": 68,
+      "cells": {
+        "male": "玉壺無別物，赤蟻聚蜂屯。",
+        "female": "氣情貞玉德，豐薄帝佳人。",
+        "luck": "暗室偶逢燈，自然分明白。"
+      },
+      "reading_revisions": {
+        "female": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "氣情貞玉德，豐薄□佳人。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 68,
+          "note": "帝字可辨，少見措辭原樣保留。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 3043,
+      "pdf_page": 68,
+      "cells": {
+        "male": "江梅開雪下，先報一枝春。",
+        "female": "對鏡看青鸞，光陰來不再。",
+        "luck": "折梅逢驛使，寄與隴頭人。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 3336,
+      "pdf_page": 68,
+      "cells": {
+        "male": "紅蓮依綠水，搖影動龍魚。",
+        "female": "○○○○○，○○○○○。",
+        "luck": "枯魚時得水，喜躍自無虞。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2237,
+      "pdf_page": 69,
+      "cells": {
+        "male": "龍行蛇穴去，飛雁遇風吹。",
+        "female": "一枝林下竹，難脫錦棚兒。",
+        "luck": "春雷自收聲，蟄虫從此振。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2338,
+      "pdf_page": 69,
+      "cells": {
+        "male": "點火茂林頭，猛風吹蔓草。",
+        "female": "日月兩團圓，天地應難曉。",
+        "luck": "得弓無箭用，欲射不能為。"
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "點火茂林頭，□風吹蔓草。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 69,
+          "note": "猛字可辨。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2439,
+      "pdf_page": 69,
+      "cells": {
+        "male": "燭心作梁棟，不假斧斤虞。",
+        "female": "日月願長明，天地先來禱。",
+        "luck": "朝霜逢暖日，立便滅寒墟。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "朝霜逢暖日，立便減寒□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 69,
+          "note": "滅及墟原圖可辨，原先減字亦更正；少見措辭不依熟語改氣。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2540,
+      "pdf_page": 69,
+      "cells": {
+        "male": "射隼於高墉，飛鳥已先散。",
+        "female": "寶釵金鏡裏，重整舊家風。",
+        "luck": "淺水內藏魚，莫遂優悠性。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2641,
+      "pdf_page": 69,
+      "cells": {
+        "male": "九州四海凶，舉目是我家。",
+        "female": "若問好姻緣，紅絲牽傀儡。",
+        "luck": "鴉與人同群，吉凶還自異。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2742,
+      "pdf_page": 69,
+      "cells": {
+        "male": "草際飛螢出，火星流入酉。",
+        "female": "春山與秋水，幾度愁東風。",
+        "luck": "中秋月夜明，何方不照耀。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2843,
+      "pdf_page": 69,
+      "cells": {
+        "male": "方寸木不揣，可使高岑樓。",
+        "female": "○○○○○，○○○○○。",
+        "luck": "片片○雲壑，難分始與終。"
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "方寸□不揣，可使高□樓。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 69,
+          "note": "木及岑可辨，不按典故加之或於。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2944,
+      "pdf_page": 69,
+      "cells": {
+        "male": "江山千里外，草木放精神。",
+        "female": "風損花枝折，醫治待神仙。",
+        "luck": "清秋天宇闊，雁字寫長空。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 3338,
+      "pdf_page": 69,
+      "cells": {
+        "male": "三月艷陽景，一襟風月閑。",
+        "female": "朱顏枝上花，萬里雲空碧。",
+        "luck": "二龍爭一珠，一得還一失。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2239,
+      "pdf_page": 69,
+      "cells": {
+        "male": "周流天地間，還波水常性。",
+        "female": "○○○○○，○○○○○。",
+        "luck": "鷺鷥覺魚鉤，昂頭須觀步。"
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "周流天地間，□波水常性。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 69,
+          "note": "還字可辨，不依文義改成旋。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2340,
+      "pdf_page": 70,
+      "cells": {
+        "male": "蒼湘湖水上，應有洞庭人。",
+        "female": "可惜花開處，天公歎不常。",
+        "luck": "風雲相會處，平步上青天。"
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "□湘湖水上，應有洞庭人。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 70,
+          "note": "首字蒼的艹與倉可辨，不依瀟湘熟語改瀟。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2441,
+      "pdf_page": 70,
+      "cells": {
+        "male": "雪浪震天鼓，扁舟在下行。",
+        "female": "雪浪震天鼓，扁舟水上行。",
+        "luck": "寒花紅日近，迤運有疏通。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "□花□日近，□□有疏通。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 70,
+          "note": "寒紅迤運四字可辨，保留原圖讀法。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2542,
+      "pdf_page": 70,
+      "cells": {
+        "male": "掌中秋月扇，舉動好風生。",
+        "female": "春風玉鏡臺，莫落他人手。",
+        "luck": "大鵬生六畜，其羽可為儀。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2643,
+      "pdf_page": 70,
+      "cells": {
+        "male": "流轉運元氣，陰陽有準繩。",
+        "female": "水上種仙花，花開根未穩。",
+        "luck": "秋露既成珠，團圓多不久。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2744,
+      "pdf_page": 70,
+      "cells": {
+        "male": "兩羊排山岸，沙烟看□槎。",
+        "female": "庭竹長尤孫，歲寒風雪裏。",
+        "luck": "燕雀出巢來，自有飛騰志。"
+      },
+      "reading_uncertainties": {
+        "male": [
+          "兩岸及次句多字可辨，看後字墨損仍未定，不補釣。",
+          "□為編輯未定，可代表未定字串；未按典故、繼承文或另一印本補字。"
+        ]
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "□羊排山□，□□□□□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 70,
+          "note": "兩岸及次句多字可辨，看後字墨損仍未定，不補釣。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2845,
+      "pdf_page": 70,
+      "cells": {
+        "male": "登山延木設，桃叶落陽花。",
+        "female": "嫣婉○宜求，難教霜點鬢。",
+        "luck": "蛇鼠正相觸，難道無兩活。"
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "登山延□設，桃吐□陽花。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 70,
+          "note": "木與落可辨，原先吐改為原圖叶，不按文義改寫。"
+        },
+        "female": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "□婉○宜求，難教霜點鬢。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 70,
+          "note": "嫣字可辨，原頁○保留。"
+        },
+        "luck": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "□□正□觸，難道無兩活。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 70,
+          "note": "蛇鼠相三字可辨。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 3340,
+      "pdf_page": 70,
+      "cells": {
+        "male": "一點浮雲翳，鴻羽逐風飛。",
+        "female": "畫堂人散後，燭影怕當風。",
+        "luck": "夜月望青天，悠悠生意緒。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2241,
+      "pdf_page": 70,
+      "cells": {
+        "male": "舟放浪波□，洞庭風送雁。",
+        "female": "梅花迥出群，清香自瀟洒。",
+        "luck": "好禮富人家，未若貧而樂。"
+      },
+      "reading_uncertainties": {
+        "male": [
+          "波可辨，末字仍未穩定辨定，保留□。",
+          "□為編輯未定，可代表未定字串；未按典故、繼承文或另一印本補字。"
+        ]
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "舟放浪□□，洞庭風送雁。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 70,
+          "note": "波可辨，末字仍未穩定辨定，保留□。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2342,
+      "pdf_page": 70,
+      "cells": {
+        "male": "翠亭鳴雀喚，雲月出西山。",
+        "female": "井畔聽瑤琴，知音正如此。",
+        "luck": "冬霖忽晴霽，有次盡忻顏。"
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "□亭鳴□□，雲月出西山。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 70,
+          "note": "翠雀喚可辨，不按常用句改寫。"
+        },
+        "luck": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "冬霖忽晴霽，有□盡忻顏。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 70,
+          "note": "次字可辨，保留原圖少見措辭。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2443,
+      "pdf_page": 70,
+      "cells": {
+        "male": "琴上掛田租，移人于河東。",
+        "female": "□女乘龍去，猶疑結子。",
+        "luck": "池畔撫琴聲，遊魚已出聽。"
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "琴上掛田□，移人□河東。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 70,
+          "note": "租與于可辨，不按文義更改。"
+        },
+        "female": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "□女乘龍去，□□結子□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 70,
+          "note": "首字女旁的右部仍有歧讀，撤回初稿嫦字並保留□；次句原圖可辨四字，不為湊五字補未定字。"
+        }
+      },
+      "reading_uncertainties": {
+        "female": [
+          "首字女旁的右部仍有歧讀，撤回初稿嫦字並保留□；次句原圖可辨四字，不為湊五字補未定字。",
+          "□為編輯未定，可表示未定字串，不依典故補字。"
+        ]
+      }
+    },
+    {
+      "element": "水",
+      "number": 2544,
+      "pdf_page": 71,
+      "cells": {
+        "male": "虎兕出於押，征夫不能行。",
+        "female": "好生橫翠黛，曉露滴芳環。",
+        "luck": "戰勝頭歌回，論功先後處。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2645,
+      "pdf_page": 71,
+      "cells": {
+        "male": "軒輅颺清風，虛心皆自貫。",
+        "female": "烟柳弄輕風，垂絲繫白日。",
+        "luck": "廟廊重百器，寶鼎玉居先。"
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "□輅颺清風，虛心皆自貫。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 71,
+          "note": "軒字可辨。"
+        },
+        "female": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "□□弄□風，垂絲繫白日。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 71,
+          "note": "烟柳輕可辨，保留底本烟字形。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2746,
+      "pdf_page": 71,
+      "cells": {
+        "male": "乘舟渡日月，天表厭烟波。",
+        "female": "鸚鵡在金籠，聲嬌得自由。",
+        "luck": "野渡自逢舟，先勞而居豫。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 3342,
+      "pdf_page": 71,
+      "cells": {
+        "male": "岩畔青松樹，根盤石上生。",
+        "female": "井上種仙花，子結玲瓏蕊。",
+        "luck": "鳳簫無孔竅，何用秦韶音。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2243,
+      "pdf_page": 71,
+      "cells": {
+        "male": "金波浸明月，雷□捧天香。",
+        "female": "芝蘭誰種得，還羡滿庭芳。",
+        "luck": "□升被雲大，時下暗光輝。"
+      },
+      "reading_uncertainties": {
+        "male": [
+          "雷可辨，後一雨頭字底部墨損仍未穩定辨定。",
+          "□為編輯未定，可代表未定字串；未按典故、繼承文或另一印本補字。"
+        ],
+        "luck": [
+          "首字仍淡損；大及時可辨，不依文義改大為天。",
+          "□為編輯未定，可代表未定字串；未按典故、繼承文或另一印本補字。"
+        ]
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "金波浸明月，□□捧天香。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 71,
+          "note": "雷可辨，後一雨頭字底部墨損仍未穩定辨定。"
+        },
+        "luck": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "□升被雲□，□下暗光輝。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 71,
+          "note": "首字仍淡損；大及時可辨，不依文義改大為天。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2344,
+      "pdf_page": 71,
+      "cells": {
+        "male": "蜂釀百花酒，其甘與世殊。",
+        "female": "春歸當斷○，梅子釀酸時。",
+        "luck": "下和獻璞玉，先辱後榮恩。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "□□□□玉，先辱後榮□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 71,
+          "note": "保留原圖下和及榮恩，不依典故改卞和或刪恩。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2445,
+      "pdf_page": 71,
+      "cells": {
+        "male": "竹花開石上，結果不生笋。",
+        "female": "琵琶江上曲，回首重堪悲。",
+        "luck": "大風多拔木，根本難兩隔。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "大風多拔木，根本難兩□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 71,
+          "note": "隔字可辨。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2546,
+      "pdf_page": 71,
+      "cells": {
+        "male": "點火入九淵，匱中有龜玉。",
+        "female": "花開桃岸南，子結桂林霜。",
+        "luck": "良田種松竹，節操自靈根。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2647,
+      "pdf_page": 71,
+      "cells": {
+        "male": "寸陰惟我惜，稼穡為君憂。",
+        "female": "春園恣竹閑，士女競光陰。",
+        "luck": "風浩浪自靜，過渡不為憂。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "風□浪自靜，過渡不為憂。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 71,
+          "note": "浩字可辨。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 3344,
+      "pdf_page": 71,
+      "cells": {
+        "male": "泰宇清明地，無言獨履霜。",
+        "female": "繩繩○在堂，要接連天宇。",
+        "luck": "夜雨正逢春，宇宙生和氣。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2245,
+      "pdf_page": 72,
+      "cells": {
+        "male": "雲電斗星見，石路馬蹄輕。",
+        "female": "齊大非吾偶，姻嫁自己排。",
+        "luck": "登樓眺望間，乘興立千里。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2346,
+      "pdf_page": 72,
+      "cells": {
+        "male": "北斗日中見，斯言傳古今。",
+        "female": "白璧一雙好，留心手內擎。",
+        "luck": "○○○○○，○○○○○。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2447,
+      "pdf_page": 72,
+      "cells": {
+        "male": "初生嫩松柏，栽向雪霜中。",
+        "female": "○○○○○，○○○○○。",
+        "luck": "○○○○○，○○○○○。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2548,
+      "pdf_page": 72,
+      "cells": {
+        "male": "惟我有用禾，一井供萬竈。",
+        "female": "秋月當空滿，雞鳴又向西。",
+        "luck": "決水東西流，難定從彼勢。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 3346,
+      "pdf_page": 72,
+      "cells": {
+        "male": "茆屋芒供祭，百神皆享之。",
+        "female": "黃帳共蘭房，春風與明月。",
+        "luck": "笋生于林下，長養自萌芽。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2247,
+      "pdf_page": 72,
+      "cells": {
+        "male": "煙霞朝日食，吾道不雷同。",
+        "female": "綠衣緣自剖，何用假黃裳。",
+        "luck": "惟魚與熊掌，二者豈能兼。"
+      },
+      "reading_revisions": {
+        "female": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "綠衣□自剖，何用假黃裳。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 72,
+          "note": "緣字可辨。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2348,
+      "pdf_page": 72,
+      "cells": {
+        "male": "去敲天上坡，跣足履冰霜。",
+        "female": "晚風雷芍藥，須避巽風臺。",
+        "luck": "清月登樓望，風生星斗移。"
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "□□天上坡，跣足履冰霜。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 72,
+          "note": "去敲可辨，不按文義改坡。"
+        },
+        "female": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "□□雷方變，須避巽風臺。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 72,
+          "note": "晚風可辨，原先方變亦更正為原圖芍藥；保留少見措辭。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2449,
+      "pdf_page": 72,
+      "cells": {
+        "male": "紅添綠減處，鳥啼三月天。",
+        "female": "月娥雷桂子，圓缺又同情。",
+        "luck": "雞兒方出殼，各自奔生成。"
+      },
+      "reading_revisions": {
+        "female": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "月□雷□子，圓缺又同情。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 72,
+          "note": "娥與桂可辨，保留本版雷，不用對讀版替換。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 3348,
+      "pdf_page": 72,
+      "cells": {
+        "male": "丘陵勢自殊，井地分經界。",
+        "female": "為問女佳人，春光能有幾。",
+        "luck": "機事不密成，反遭其悔吝。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2249,
+      "pdf_page": 72,
+      "cells": {
+        "male": "太歲屬木人，厥德從風掩。",
+        "female": "□□螽斯好，青天露不空。",
+        "luck": "○○○○○，○○○○○。"
+      },
+      "reading_uncertainties": {
+        "female": [
+          "首二字形近仍未定；螽斯好及露不空可辨，初稿誤讀的羽改為原圖好，不按典故補首二字。",
+          "□為編輯未定，可表示未定字串，不依典故補字。"
+        ]
+      },
+      "reading_revisions": {
+        "male": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "太歲屬木人，厥德從風□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 72,
+          "note": "掩字可辨。"
+        },
+        "female": {
+          "rereading_id": "canping_water_native_rereading_v1",
+          "previous_collation_version": "1.5.0",
+          "previous_text": "□□□□□，青天□□□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "source_pdf_page": 72,
+          "note": "首二字形近仍未定；螽斯好及露不空可辨，初稿誤讀的羽改為原圖好，不按典故補首二字。"
+        }
+      }
+    },
+    {
+      "element": "水",
+      "number": 2350,
+      "pdf_page": 73,
+      "cells": {
+        "male": "天為蓬島屋，風雲作錦屏。",
+        "female": "迷失從前路，桃源尚可尋。",
+        "luck": "遙望海漫漫，不見蓬萊島。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 3350,
+      "pdf_page": 73,
+      "cells": {
+        "male": "邃屋密房間，鳳凰在鼠穴。",
+        "female": "好脩清淨緣，莫入風塵隊。",
+        "luck": "園林過風處，草木自脩然。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 2251,
+      "pdf_page": 73,
+      "cells": {
+        "male": "提劍北方起，飛金雪嶺塵。",
+        "female": "百花蜂戀採，勤苦為誰忙。",
+        "luck": "蓬萊須可見，遙望水漫漫。"
+      }
+    },
+    {
+      "element": "水",
+      "number": 3352,
+      "pdf_page": 73,
+      "cells": {
+        "male": "雨漲長江急，煙波萬頃潮。",
+        "female": "天邊有明月，何處照人間。",
+        "luck": "古鏡復重磨，白金須有喜。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2838,
+      "inherited_wrong_number": 3838,
+      "pdf_page": 74,
+      "cells": {
+        "male": "清波泛百川，引出蓼浦澤。",
+        "female": "出海珊瑚樹，枝柯只自垂。",
+        "luck": "呂公遇鍾離，得舟須變觀。"
+      },
+      "reading_notes": [
+        "得舟按所見保留，不以文義推改。"
+      ]
+    },
+    {
+      "element": "火",
+      "number": 2335,
+      "pdf_page": 74,
+      "cells": {
+        "male": "金錢買松竹，白雲深處栽。",
+        "female": "○○○○○，○○○○○。",
+        "luck": "道途皆平坦，涉履更何憂。"
+      },
+      "reading_notes": [
+        "只核中層圈空，不將本行上、下欄一併標為已校。"
+      ]
+    },
+    {
+      "element": "金",
+      "number": 3306,
+      "pdf_page": 89,
+      "cells": {
+        "male": "鶴在白雲樓，鴟鴞不翔舉。",
+        "female": "花開花上花，風起風中絮。",
+        "luck": "鴻鵠丈夫志，豈能知歲雀。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2207,
+      "pdf_page": 89,
+      "cells": {
+        "male": "白雲隨月出，引領拜丹墀。",
+        "female": "李桃貪結子，莫恨五更風。",
+        "luck": "日出自扶桑，眾人皆仰視。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2308,
+      "pdf_page": 89,
+      "cells": {
+        "male": "大樹蜉蝣撼，精神百怪通。",
+        "female": "銀燭照紅粧，莫遣佳人睡。",
+        "luck": "燕雀兩間飛，一生遇一死。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2409,
+      "pdf_page": 89,
+      "cells": {
+        "male": "花鈿委地戶，沙暖見春雲。",
+        "female": "水面群鷗浴，風來浪拍天。",
+        "luck": "枯木經春發，憂老遇孤霜。"
+      },
+      "reading_notes": [
+        "保留底本地戶讀法，不依熟句改為地中。"
+      ]
+    },
+    {
+      "element": "金",
+      "number": 2510,
+      "pdf_page": 89,
+      "cells": {
+        "male": "梧桐金井上，枝葉接松筠。",
+        "female": "生來在塵中，不作塵中人。",
+        "luck": "洞門無鎖鑰，便是一閒人。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2611,
+      "pdf_page": 89,
+      "cells": {
+        "male": "鐘聲徹萬里，食後上樓敲。",
+        "female": "人間喜夢覺，孤月又當空。",
+        "luck": "琴瑟絃忽斷，難便正音傳。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2712,
+      "pdf_page": 89,
+      "cells": {
+        "male": "下漏在軍門，日中留客飲。",
+        "female": "玉簫聲未斷，重結好姻嫁。",
+        "luck": "籠鸚雖巧語，猶自被羈縻。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2813,
+      "pdf_page": 90,
+      "cells": {
+        "male": "井井浮陽氣，新田禾黍繁。",
+        "female": "夜雨滴梧桐，春風損桃李。",
+        "luck": "當逢千尋木，折令遇其時。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2914,
+      "pdf_page": 90,
+      "cells": {
+        "male": "御苑溝渠裏，翩翩一點紅。",
+        "female": "紅葉有前緣，水流何太急。",
+        "luck": "寒犬吠明月，空自費情懷。"
+      },
+      "reading_revisions": {
+        "male": {
+          "previous_text": "□苑溝渠裏，翩翩一點紅。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "原圖首字彳及右部卸構形可辨御，保留其餘字面；不按苑字聯想補讀。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 90
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 3015,
+      "pdf_page": 90,
+      "cells": {
+        "male": "兩曜循天地，五星惟順纏。",
+        "female": "黃菊有佳色，秋光何太遲。",
+        "luck": "雷是震天鼓，青天無片雲。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 3116,
+      "pdf_page": 90,
+      "cells": {
+        "male": "千駟馬弗視，甘心惟步行。",
+        "female": "管絃醉春風，何如枯冷淡。",
+        "luck": "舟行帆自捲，欲進路無由。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 3217,
+      "pdf_page": 90,
+      "cells": {
+        "male": "桑麻天地產，不必問耕桑。",
+        "female": "奈有仙風骨，壺中日月閒。",
+        "luck": "一箭射胸中，萬事能假從。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 3308,
+      "pdf_page": 90,
+      "cells": {
+        "male": "草木年年改，山河竟自如。",
+        "female": "枯楊生綠柳，雪裏自陽春。",
+        "luck": "銅鏡未曾入，暫時生塵垢。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2209,
+      "pdf_page": 90,
+      "cells": {
+        "male": "金命既如此，天花桂影風。",
+        "female": "欲指神仙路，雲山幾萬重。",
+        "luck": "冒暑去投林，當途風少息。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "冒暑去投林，□途風少息。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "原圖尚與田構形可辨當，依圖錄為當途，非依句意換成暫途或別字。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 90
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 2310,
+      "pdf_page": 90,
+      "cells": {
+        "male": "舉箭射青天，月淡星稀候。",
+        "female": "春日種梅花，秋風生桂枝。",
+        "luck": "月明與星稀，烏鵲南飛起。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2411,
+      "pdf_page": 90,
+      "cells": {
+        "male": "酒罷醉和風，蛾眉山上色。",
+        "female": "福祿從天降，□求保自生。",
+        "luck": "遨遊成秀地，不覺日平西。"
+      },
+      "reading_uncertainties": {
+        "female": [
+          "求前一字磨損，不能穩定辨定；不以無求等句式補讀，保留□。"
+        ]
+      },
+      "reading_revisions": {
+        "female": {
+          "previous_text": "福祿從天降，□求保自生。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "求前一字磨損，不能穩定辨定；不以無求等句式補讀，保留□。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 90
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 2512,
+      "pdf_page": 90,
+      "cells": {
+        "male": "丹崖萬仞高，中有蜉蝣上。",
+        "female": "秋風動桂枝，桂子應難有。",
+        "luck": "停帆遇順風，千里終須到。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2613,
+      "pdf_page": 91,
+      "cells": {
+        "male": "麾蓋漾虛空，白雲深處曲。",
+        "female": "兔絲負女蘿，纏錦成一家。",
+        "luck": "虎落在阱中，地偶難迴避。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2714,
+      "pdf_page": 91,
+      "cells": {
+        "male": "九河循故道，虹蜺遶山行。",
+        "female": "桑麻深雨露，桃李正芳菲。",
+        "luck": "渴時須飲水，臨井又無泉。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2815,
+      "pdf_page": 91,
+      "cells": {
+        "male": "高枝投宿鳥，廣廈上林燕。",
+        "female": "風月宴年年，更闌人散後。",
+        "luck": "曉日離雲陣，寒威漸漸分。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2916,
+      "pdf_page": 91,
+      "cells": {
+        "male": "扁舟過夏口，赤壁火燒天。",
+        "female": "君子期偕老，江山逝若川。",
+        "luck": "子期逢伯牙，正是好知音。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 3017,
+      "pdf_page": 91,
+      "cells": {
+        "male": "桂林無雨露，山澤有雷風。",
+        "female": "雙燕春風暖，孤鴻落日斜。",
+        "luck": "月被烏雲掩，光明暫一時。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 3118,
+      "pdf_page": 91,
+      "cells": {
+        "male": "寶鏡當空照，光明人自知。",
+        "female": "庭前有丹桂，肌膚帶天□。",
+        "luck": "匈奴降蘇武，漢節不能屈。"
+      },
+      "reading_uncertainties": {
+        "female": [
+          "天後字極淡，不能僅憑丹桂及天香熟語認定為香，保留□。"
+        ]
+      },
+      "reading_revisions": {
+        "female": {
+          "previous_text": "庭前有丹桂，肌膚帶天□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "天後字極淡，不能僅憑丹桂及天香熟語認定為香，保留□。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 91
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 3310,
+      "pdf_page": 91,
+      "cells": {
+        "male": "貓鼠崇墉上，安居備不虞。",
+        "female": "青春花不□，冬嶺伴蒼松。",
+        "luck": "憂辱無所怨，安居且慮危。"
+      },
+      "reading_uncertainties": {
+        "female": [
+          "不後字磨損嚴重，餘文照錄，保留□，不按花不老等熟語補字。"
+        ]
+      },
+      "reading_revisions": {
+        "female": {
+          "previous_text": "青春花不□，冬嶺伴蒼松。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "不後字磨損嚴重，餘文照錄，保留□，不按花不老等熟語補字。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 91
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 2211,
+      "pdf_page": 91,
+      "cells": {
+        "male": "重重又重重，好彈無絃琴。",
+        "female": "鴛鴦飛水面，花落又花新。",
+        "luck": "琴瑟忽斷絃，便不同音韻。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2312,
+      "pdf_page": 91,
+      "cells": {
+        "male": "將火照明月，浮雲一點無。",
+        "female": "自有好姻緣，□識今日鏡。",
+        "luck": "風吹水上萍，東西任來去。"
+      },
+      "reading_uncertainties": {
+        "female": [
+          "識前字極淡，今日鏡字面保留，不按姻緣句意改成其他熟語。"
+        ]
+      },
+      "reading_revisions": {
+        "female": {
+          "previous_text": "自有好姻緣，□識今日鏡。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "識前字極淡，今日鏡字面保留，不按姻緣句意改成其他熟語。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 91
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 2413,
+      "pdf_page": 91,
+      "cells": {
+        "male": "都門千餘里，城闕煙生塵。",
+        "female": "東園花易開，西園果先熟。",
+        "luck": "投身向弱水，剖蚌取明珠。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2514,
+      "pdf_page": 92,
+      "cells": {
+        "male": "蝴蝶在林中，採花爲麴蘖。",
+        "female": "吹簫人去後，仙境又重登。",
+        "luck": "上陣長鎗遇，前途須我約。"
+      },
+      "reading_revisions": {
+        "male": {
+          "previous_text": "蝴蝶在林中，採花爲麴□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "原圖末字下部可辨木，錄為蘖；不因麴糵常見寫法改成米部糵，也不改寫採花爲麴字面。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 92
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 2615,
+      "pdf_page": 92,
+      "cells": {
+        "male": "嵬嵬數仞牆，不得其門入。",
+        "female": "當生金不多，誰知□路難。",
+        "luck": "木生毫末間，從微須著至。"
+      },
+      "reading_uncertainties": {
+        "female": [
+          "知與路間字被磨損，殘筆不足以唯一辨定，保留□，不以行路或道路等句式補字。"
+        ]
+      },
+      "reading_notes": [
+        "保留原頁從微須著至字序，不按熟句改倒。"
+      ],
+      "reading_revisions": {
+        "female": {
+          "previous_text": "當生金不多，誰知□路難。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "知與路間字被磨損，殘筆不足以唯一辨定，保留□，不以行路或道路等句式補字。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 92
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 2716,
+      "pdf_page": 92,
+      "cells": {
+        "male": "芝草穿珍珠，玉堂高掛地。",
+        "female": "並蒂雙蓮出，風光共一家。",
+        "luck": "織女未乘機，精神自頻縮。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2817,
+      "pdf_page": 92,
+      "cells": {
+        "male": "藻芹離泮水，爐火熱明香。",
+        "female": "著意栽桃李，須防困蒺藜。",
+        "luck": "和風吹折柳，光景與天同。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2918,
+      "pdf_page": 92,
+      "cells": {
+        "male": "日照雪中山，銀河波自起。",
+        "female": "春花方競秀，夏日又成陰。",
+        "luck": "寒鴉終夜噪，恍惚有驚疑。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 3019,
+      "pdf_page": 92,
+      "cells": {
+        "male": "綺羅裁剪下，一線逐針行。",
+        "female": "更深玉漏殘，月裏嫦娥去。",
+        "luck": "大匠欲斲輪，勞費繩與尺。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 3312,
+      "pdf_page": 92,
+      "cells": {
+        "male": "孤軍臨大敵，剖竹可分符。",
+        "female": "寒梅空自白，芳□爲誰青。",
+        "luck": "和羹用鹽梅，苦旱用霖雨。"
+      },
+      "reading_uncertainties": {
+        "female": [
+          "芳後字殘存草形筆畫，但艸與其他寫法仍有歧讀；不按芳草熟語確定，保留□。"
+        ]
+      },
+      "reading_revisions": {
+        "female": {
+          "previous_text": "寒梅空自白，芳□爲誰青。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "芳後字殘存草形筆畫，但艸與其他寫法仍有歧讀；不按芳草熟語確定，保留□。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 92
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 2213,
+      "pdf_page": 92,
+      "cells": {
+        "male": "辰卯從革人，玉殿生芳□。",
+        "female": "短長由自己，苦樂在他人。",
+        "luck": "水映千江月，山含萬木春。"
+      },
+      "reading_uncertainties": {
+        "male": [
+          "末字卉與艸等字形仍有歧讀；不按芳卉熟語確定，保留□，辰卯原字序不改。"
+        ]
+      },
+      "reading_revisions": {
+        "male": {
+          "previous_text": "辰卯從革人，玉殿生芳□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "末字卉與艸等字形仍有歧讀；不按芳卉熟語確定，保留□，辰卯原字序不改。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 92
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 2314,
+      "pdf_page": 92,
+      "cells": {
+        "male": "山上水仙花，非是江河養。",
+        "female": "蓮花綠木香，莫怨秋風早。",
+        "luck": "丹崖萬仞高，中有蜉蝣上。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2415,
+      "pdf_page": 92,
+      "cells": {
+        "male": "楓葉蘆花岸，滿江秋月明。",
+        "female": "嬌鶯細柳中，春暮多風雨。",
+        "luck": "急浪自呼舟，求濟何時脫。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2516,
+      "pdf_page": 93,
+      "cells": {
+        "male": "四方風一動，古木自縱橫。",
+        "female": "綠柳正搖風，雪花飛天上。",
+        "luck": "東鄰殺牛時，不如西禴祭。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2617,
+      "pdf_page": 93,
+      "cells": {
+        "male": "衣裳藏在笥，鎖鑰不相投。",
+        "female": "紅葉手中持，春殘花未開。",
+        "luck": "月內一蟾蜍，影收光又散。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2718,
+      "pdf_page": 93,
+      "cells": {
+        "male": "雨經風作緯，欲織一機羅。",
+        "female": "鳳飛鸞亦飛，雞鳴子正和。",
+        "luck": "急浪回晚棹，進退自徘徊。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2819,
+      "pdf_page": 93,
+      "cells": {
+        "male": "糞土築城牆，使人高數仞。",
+        "female": "明月逐人來，風塵隨馬去。",
+        "luck": "黃蜂作蜜後，己苦別人甜。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2920,
+      "pdf_page": 93,
+      "cells": {
+        "male": "井給莫西井，舟行載日光。",
+        "female": "青繩曾係足，何事○伐柯。",
+        "luck": "門其造處士，取舍在人間。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 3314,
+      "pdf_page": 93,
+      "cells": {
+        "male": "棹舟過滄海，風雲生八荒。",
+        "female": "蕙蘭花一處，各自逞馨香。",
+        "luck": "蕙蘭花□，各自逞馨香。"
+      },
+      "reading_uncertainties": {
+        "luck": [
+          "花可辨，其後殘損範圍仍以□表示；□不表示已確定缺字個數。不得抄同號女文花一處補齊時運格，整格仍未定。"
+        ]
+      },
+      "reading_notes": [
+        "原行末數字磨損；蕙蘭後的□為未定字串，不主張只有一個缺字；保留明確第二句，不複製女命首句。"
+      ],
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "蕙蘭□，各自逞馨香。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "花可辨，其後殘損範圍仍以□表示；□不表示已確定缺字個數。不得抄同號女文花一處補齊時運格，整格仍未定。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 93
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 2215,
+      "pdf_page": 93,
+      "cells": {
+        "male": "青天江海流，前定事如是。",
+        "female": "斷雲殘雨後，缺月又重輝。",
+        "luck": "無根三月柳，花絮滿天飛。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2316,
+      "pdf_page": 93,
+      "cells": {
+        "male": "昆明春水清，四面八方流。",
+        "female": "飲泉風吹美，不覺浪花卷。",
+        "luck": "玄豹變成虎，喜意自非常。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2417,
+      "pdf_page": 93,
+      "cells": {
+        "male": "金風疏落葉，趙璧保珊瑚。",
+        "female": "萬木怕秋風，桂獨一枝花。",
+        "luck": "○○○○○，○○○○○。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2518,
+      "pdf_page": 93,
+      "cells": {
+        "male": "因赴武陵約，桃花逐水流。",
+        "female": "繡帶綰春羅，塵滿菱花鏡。",
+        "luck": "吞釣魚上鉤，沈機大小○。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2619,
+      "pdf_page": 94,
+      "cells": {
+        "male": "壺口孟津間，冀州先載水。",
+        "female": "鏡裏花顏改，枝頭果未圓。",
+        "luck": "祥日頻曉日，輪轉有祥光。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2720,
+      "pdf_page": 94,
+      "cells": {
+        "male": "夜寢遊仙夢，通靈各有神。",
+        "female": "莫訝今朝景，修緣好閒空。",
+        "luck": "有舟無棹處，過渡有憂疑。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2821,
+      "pdf_page": 94,
+      "cells": {
+        "male": "挾山超北海，緣木以求魚。",
+        "female": "昔日青天上，風光再主持。",
+        "luck": "電光爍秋月，方寸自生疑。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 3316,
+      "pdf_page": 94,
+      "cells": {
+        "male": "斗柄橫雲漢，西山曉月浸。",
+        "female": "東風纔得意，夜月改梨花。",
+        "luck": "竹筍已抽簪，成林自有日。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2217,
+      "pdf_page": 94,
+      "cells": {
+        "male": "細柳新蒲綠，夕陽流彩紅。",
+        "female": "兼織迴紋錦，重圓月影光。",
+        "luck": "蜂蝶競爭雄，可存芳樹上。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2318,
+      "pdf_page": 94,
+      "cells": {
+        "male": "斗牛星會處，蘭麝自馨香。",
+        "female": "紫穗吐奇芳，光陰逐流水。",
+        "luck": "魚潛水上□，思躍有其時。"
+      },
+      "reading_uncertainties": {
+        "luck": [
+          "上後字下部嚴重漫漶，不能穩定辨為燕或其他字，保留□，不按魚躍情景補寫。"
+        ]
+      },
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "魚潛水上□，思躍有其時。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "上後字下部嚴重漫漶，不能穩定辨為燕或其他字，保留□，不按魚躍情景補寫。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 94
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 2419,
+      "pdf_page": 94,
+      "cells": {
+        "male": "魚鳧在虎穴，鸞鳳宿花叢。",
+        "female": "嫩筍出階前，櫻花飛滿院。",
+        "luck": "鎔金欲鑄印，成用有其時。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2520,
+      "pdf_page": 94,
+      "cells": {
+        "male": "輟耒不耕莘，行車遇霖雨。",
+        "female": "前定四時春，只怕東風惡。",
+        "luck": "旅食在他鄉，何時歸本地。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2621,
+      "pdf_page": 94,
+      "cells": {
+        "male": "明堂空谷中，不納三伏暑。",
+        "female": "斷橋流水急，準擬上扁舟。",
+        "luck": "苦求藥用之，於人又何咎。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2722,
+      "pdf_page": 94,
+      "cells": {
+        "male": "舟下急流中，山陰不可去。",
+        "female": "屏間金孔雀，那個是前緣。",
+        "luck": "刀箭既相怨，此心懷一快。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 3318,
+      "pdf_page": 95,
+      "cells": {
+        "male": "織女機上梭，往來同日月。",
+        "female": "雖不是汀蘭，刻木也成形。",
+        "luck": "高堂懷棟梁，架椽無所靳。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2219,
+      "pdf_page": 95,
+      "cells": {
+        "male": "神仙居洞府，欲活爛柯棋。",
+        "female": "玄霜誰搗就，只恐又姻緣。",
+        "luck": "斗牛星會處，蘭麝自馨香。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2320,
+      "pdf_page": 95,
+      "cells": {
+        "male": "竹影連山影，松聲間水聲。",
+        "female": "芙蓉秋夜花，莫怨東風錯。",
+        "luck": "明月三盃酒，清風一曲琴。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2421,
+      "pdf_page": 95,
+      "cells": {
+        "male": "青天蜀道難，背劍跳雲棧。",
+        "female": "祿馬度前橋，須還跳井口。",
+        "luck": "劍斬長橋蛟，箭射白額虎。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2522,
+      "pdf_page": 95,
+      "cells": {
+        "male": "青天如水淨，旱魃化雲霓。",
+        "female": "水面宿鴛鴦，鳳凰那時出。",
+        "luck": "大旱望雲霓，沛然天下雨。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2623,
+      "pdf_page": 95,
+      "cells": {
+        "male": "心是無星秤，均同一氣形。",
+        "female": "箕帚自相當，瓦璋猶未定。",
+        "luck": "多禽見鷹□，不測自刑傷。"
+      },
+      "reading_uncertainties": {
+        "luck": [
+          "鷹後一字受污損遮蔽，不能依多禽見鷹情景補寫，保留□，不將傳統刑傷句變成現實災禍斷言。"
+        ]
+      },
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "多禽見鷹□，不測自刑傷。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "鷹後一字受污損遮蔽，不能依多禽見鷹情景補寫，保留□，不將傳統刑傷句變成現實災禍斷言。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 95
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 3320,
+      "pdf_page": 95,
+      "cells": {
+        "male": "松柯悉茲茂，丹青石上生。",
+        "female": "綠顏流水急，誰念百花新。",
+        "luck": "大冶可陶金，必定成金器。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2221,
+      "pdf_page": 95,
+      "cells": {
+        "male": "積雪遇和日，池塘春草生。",
+        "female": "可惜花開處，風光歎不常。",
+        "luck": "臨春花柳香，好遂追遊世。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "臨春花柳香，好遂□遊世。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "原圖辶與上部構形可辨追，保留好遂追遊世字面，不因語序生硬改作好遂遨遊等熟語。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 95
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 2322,
+      "pdf_page": 95,
+      "cells": {
+        "male": "楊竿釣渭水，忍恥向淮陰。",
+        "female": "種樹於途邊，行人受綠陰。",
+        "luck": "白頭爲釣叟，晚節遇文王。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2423,
+      "pdf_page": 95,
+      "cells": {
+        "male": "金風西嶺月，光燄射楊花。",
+        "female": "天地無憑準，空餘燕子樓。",
+        "luck": "烏江不可渡，患害豈非常。"
+      }
+    },
+    {
+      "element": "金",
+      "number": 2524,
+      "pdf_page": 96,
+      "cells": {
+        "male": "□作擎天柱，難當盛暑風。",
+        "female": "望月伴嫦娥，只空浮雲翳。",
+        "luck": "淡雲來掩日，殘雲暫收光。"
+      },
+      "reading_uncertainties": {
+        "male": [
+          "首字山形與卩形等筆畫仍有歧讀，不能穩定辨定；保留□，不以擎天柱句意補字。此格處於原頁編號與傳承底本對應有差異的末十一條，讀字與號文歸屬分開處理。"
+        ]
+      },
+      "inherited_content_number": 3328,
+      "reading_notes": [
+        "本頁原號2524的三欄正文與繼承3328一組對應；本次按底本號文歸屬選取。未判定其他版本或原版排誤原因，並非計算編號重映射。"
+      ],
+      "reading_revisions": {
+        "male": {
+          "previous_text": "□作擎天柱，難當盛暑風。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.9.0",
+          "note": "首字山形與卩形等筆畫仍有歧讀，不能穩定辨定；保留□，不以擎天柱句意補字。此格處於原頁編號與傳承底本對應有差異的末十一條，讀字與號文歸屬分開處理。",
+          "rereading_id": "canping_gold_native_rereading_v1",
+          "source_pdf_page": 96
+        }
+      }
+    },
+    {
+      "element": "金",
+      "number": 3322,
+      "pdf_page": 96,
+      "cells": {
+        "male": "圭田如玉潔，一點不生塵。",
+        "female": "自得操持手，何須男子爲。",
+        "luck": "於斯有美玉，求善價沽諸。"
+      },
+      "inherited_content_number": 2524,
+      "reading_notes": [
+        "本頁原號3322的三欄正文與繼承2524一組對應；本次按底本號文歸屬選取。未判定其他版本或原版排誤原因，並非計算編號重映射。"
+      ]
+    },
+    {
+      "element": "金",
+      "number": 2223,
+      "pdf_page": 96,
+      "cells": {
+        "male": "天河玉浪起，爭奮鴻雁飛。",
+        "female": "天台劉阮遇，時景又雲飛。",
+        "luck": "莫望紅塵遠，出門天地寬。"
+      },
+      "inherited_content_number": 3322,
+      "reading_notes": [
+        "本頁原號2223的三欄正文與繼承3322一組對應；本次按底本號文歸屬選取。未判定其他版本或原版排誤原因，並非計算編號重映射。"
+      ]
+    },
+    {
+      "element": "金",
+      "number": 2324,
+      "pdf_page": 96,
+      "cells": {
+        "male": "擊柝重門外，機邊看錦花。",
+        "female": "佳人天上月，圓缺照誰家。",
+        "luck": "錦機梭過處，隨即起波紋。"
+      },
+      "inherited_content_number": 2223,
+      "reading_notes": [
+        "本頁原號2324的三欄正文與繼承2223一組對應；本次按底本號文歸屬選取。未判定其他版本或原版排誤原因，並非計算編號重映射。"
+      ]
+    },
+    {
+      "element": "金",
+      "number": 2425,
+      "pdf_page": 96,
+      "cells": {
+        "male": "假山中草木，鳥獸豈容藏。",
+        "female": "天邊有明月，何處照人間。",
+        "luck": "春水初泮處，任便戲新魚。"
+      },
+      "inherited_content_number": 2324,
+      "reading_notes": [
+        "本頁原號2425的三欄正文與繼承2324一組對應；本次按底本號文歸屬選取。未判定其他版本或原版排誤原因，並非計算編號重映射。"
+      ]
+    },
+    {
+      "element": "金",
+      "number": 3324,
+      "pdf_page": 96,
+      "cells": {
+        "male": "大道藏無極，鴻濛隱八維。",
+        "female": "金多必有傷，及早修緣事。",
+        "luck": "殺雞煩鼠約，忠信自無疑。"
+      },
+      "inherited_content_number": 2425,
+      "reading_notes": [
+        "本頁原號3324的三欄正文與繼承2425一組對應；本次按底本號文歸屬選取。未判定其他版本或原版排誤原因，並非計算編號重映射。"
+      ]
+    },
+    {
+      "element": "金",
+      "number": 2225,
+      "pdf_page": 96,
+      "cells": {
+        "male": "月華透梅雪，水淨見山陰。",
+        "female": "殘燈半空月，爭奈五更長。",
+        "luck": "花渠暗水流，出沒世難測。"
+      },
+      "inherited_content_number": 3324,
+      "reading_notes": [
+        "本頁原號2225的三欄正文與繼承3324一組對應；本次按底本號文歸屬選取。未判定其他版本或原版排誤原因，並非計算編號重映射。"
+      ]
+    },
+    {
+      "element": "金",
+      "number": 2326,
+      "pdf_page": 96,
+      "cells": {
+        "male": "形畫麒麟閣，毫端爭一莖。",
+        "female": "孤猿枝上啼，明月空中落。",
+        "luck": "陽氣喜初生，萌芽將復展。"
+      },
+      "inherited_content_number": 2225,
+      "reading_notes": [
+        "本頁原號2326的三欄正文與繼承2225一組對應；本次按底本號文歸屬選取。未判定其他版本或原版排誤原因，並非計算編號重映射。"
+      ]
+    },
+    {
+      "element": "金",
+      "number": 3326,
+      "pdf_page": 96,
+      "cells": {
+        "male": "牽牛過堂下，問是梁惠王。",
+        "female": "仙壇與佛塔，功果好修爲。",
+        "luck": "大旱望雲霓，青天空霹靂。"
+      },
+      "inherited_content_number": 2326,
+      "reading_notes": [
+        "本頁原號3326的三欄正文與繼承2326一組對應；本次按底本號文歸屬選取。未判定其他版本或原版排誤原因，並非計算編號重映射。"
+      ]
+    },
+    {
+      "element": "金",
+      "number": 2227,
+      "pdf_page": 96,
+      "cells": {
+        "male": "風行江上去，松竹竟爭春。",
+        "female": "古稱朱陳村，只恐花難老。",
+        "luck": "○○○○○，○○○○○。"
+      },
+      "inherited_content_number": 3326,
+      "reading_notes": [
+        "本頁原號2227的三欄正文與繼承3326一組對應；本次按底本號文歸屬選取。未判定其他版本或原版排誤原因，並非計算編號重映射。"
+      ]
+    },
+    {
+      "element": "金",
+      "number": 3328,
+      "pdf_page": 97,
+      "cells": {
+        "male": "吾身何踐履，天外有煙霞。",
+        "female": "畫堂春正濃，楊柳輕飄絮。",
+        "luck": "社燕自營巢，不安期得便。"
+      },
+      "inherited_content_number": 2227,
+      "reading_notes": [
+        "本頁原號3328的三欄正文與繼承2227一組對應；本次按底本號文歸屬選取。未判定其他版本或原版排誤原因，並非計算編號重映射。"
+      ]
+    },
+    {
+      "element": "火",
+      "number": 3331,
+      "pdf_page": 73,
+      "cells": {
+        "male": "宇宙世三才，乾坤猶未足。",
+        "female": "空中光焰出，調鼎事重新。",
+        "luck": "食鼠有餱糧，大數皆前定。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2232,
+      "pdf_page": 73,
+      "cells": {
+        "male": "卻將三尺竿，來作中流柱。",
+        "female": "喜鵲營巢久，鳩居忽變遷。",
+        "luck": "急水補漏舟，狂波難砥柱。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2333,
+      "pdf_page": 73,
+      "cells": {
+        "male": "天表霓虹見，風吹向洌泉。",
+        "female": "莫報東風急，好花春日開。",
+        "luck": "倉庫鼠損處，小虧有大盈。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2434,
+      "pdf_page": 73,
+      "cells": {
+        "male": "鳳簫無一竅，不用奏韶音。",
+        "female": "雖無金判刀，解使琴弦斷。",
+        "luck": "孤雲纔出嶺，○去便無回。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2535,
+      "pdf_page": 73,
+      "cells": {
+        "male": "盃水成海河，乾坤自我持。",
+        "female": "青天雷一聲，驚散梁間燕。",
+        "luck": "紅塵百花處，蜂蝶兩交加。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2636,
+      "pdf_page": 74,
+      "cells": {
+        "male": "田既授以井，心寧安厥常。",
+        "female": "龜鶴期高壽，風光恐暗移。",
+        "luck": "三足鼎分時，缺一尚不可。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2737,
+      "pdf_page": 74,
+      "cells": {
+        "male": "穴居而野處，棟宇自清涼。",
+        "female": "魚水百年間，錦鱗三十六。",
+        "luck": "扶梁憑短棹，得渡過江東。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2939,
+      "pdf_page": 74,
+      "cells": {
+        "male": "閒鎖芳亭月，門扃細柳春。",
+        "female": "身在寶瓶中，莫行金井畔。",
+        "luck": "燕期秋社歸，遙遙看初路。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3040,
+      "pdf_page": 74,
+      "cells": {
+        "male": "一蟲生兩翅，飛入百花叢。",
+        "female": "麗日正芬芳，春風吹綠柳。",
+        "luck": "黃蜂與粉蝶，撩亮百花叢。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3141,
+      "pdf_page": 74,
+      "cells": {
+        "male": "拱□之桐梓，斫為棟梁材。",
+        "female": "孤舟流水急，○向溪灘○。",
+        "luck": "工師得大木，必去勝其任。"
+      },
+      "reading_uncertainties": {
+        "male": [
+          "原圖首句第二字磨損，仍不能穩定辨定，不按拱把等熟語補字。"
+        ]
+      },
+      "reading_revisions": {
+        "male": {
+          "previous_text": "拱□之桐梓，斫為棟梁材。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.7.0",
+          "note": "原圖首句第二字磨損，仍不能穩定辨定，不按拱把等熟語補字。",
+          "rereading_id": "canping_fire_native_rereading_v1",
+          "source_pdf_page": 74
+        }
+      }
+    },
+    {
+      "element": "火",
+      "number": 3242,
+      "pdf_page": 74,
+      "cells": {
+        "male": "田獵在高山，邇麟棄麋鹿。",
+        "female": "春風花始開，枝頭慳結子。",
+        "luck": "良馬羈其足，百鞭亦難進。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3333,
+      "pdf_page": 74,
+      "cells": {
+        "male": "秋天霖雨集，平地水中行。",
+        "female": "玉樹好移根，東風終結子。",
+        "luck": "輕舟將過浪，一喜一憂驚。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2234,
+      "pdf_page": 74,
+      "cells": {
+        "male": "獨將一葉舟，去向桃花浪。",
+        "female": "丁香連豆蔻，結果玉稍頭。",
+        "luck": "燈光夜結花，吉兆先期報。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2436,
+      "pdf_page": 75,
+      "cells": {
+        "male": "燭與月爭光，飛空天上絮。",
+        "female": "寶瑟十三弦，更張韻更清。",
+        "luck": "舟行得水脈，波浪不為憂。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2537,
+      "pdf_page": 75,
+      "cells": {
+        "male": "壁上畫山水，四時維如一。",
+        "female": "春風應轉蕙，秋水有明珠。",
+        "luck": "過江反思飲，臨渡卻思回。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2638,
+      "pdf_page": 75,
+      "cells": {
+        "male": "鐵船再江水，船內有魚遊。",
+        "female": "秋月來天上，清光照世間。",
+        "luck": "老驥強伏櫪，志在遠方遊。"
+      },
+      "reading_notes": [
+        "保留底本再江水，不按文義改在。"
+      ]
+    },
+    {
+      "element": "火",
+      "number": 2739,
+      "pdf_page": 75,
+      "cells": {
+        "male": "冬生秦嶺上，蘭蕙出蓬蒿。",
+        "female": "金石兼盟好，光陰自短長。",
+        "luck": "捕禽與得兔，凡事無心出。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2840,
+      "pdf_page": 75,
+      "cells": {
+        "male": "律己非繩尺，修身無斧斤。",
+        "female": "寢寐將何倚，雌雄在河洲。",
+        "luck": "百花開爛熳，蜂蝶戲春園。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2941,
+      "pdf_page": 75,
+      "cells": {
+        "male": "九年禹洪水，七載湯亢陽。",
+        "female": "親親人未久，重整舊家風。",
+        "luck": "銅壺並滴漏，一定不由人。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3042,
+      "pdf_page": 75,
+      "cells": {
+        "male": "舟停綠水上，雁字寫長空。",
+        "female": "寒梅空自白，芳草為誰新。",
+        "luck": "秋天淨如洗，雁字寫長空。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3143,
+      "pdf_page": 75,
+      "cells": {
+        "male": "飯糗猶茹草，被袗衣鼓琴。",
+        "female": "前生緣分定，虛度幾重山。",
+        "luck": "深潭尤自躍，變化得其時。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3335,
+      "pdf_page": 75,
+      "cells": {
+        "male": "廣寒深邃處，凜凜扇寒風。",
+        "female": "東君休嘆老，花謝又還生。",
+        "luck": "神仙居洞府，欲掃世榮枯。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2236,
+      "pdf_page": 75,
+      "cells": {
+        "male": "晝間人秉燭，直入洞房中。",
+        "female": "夫人神氣定，綽有林下風。",
+        "luck": "入山去採木，自可求良匠。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2337,
+      "pdf_page": 76,
+      "cells": {
+        "male": "蓬萊隔弱水，子女生舟中。",
+        "female": "○○○○○，○○○○○。",
+        "luck": "風急水漫漫，不見蓬萊島。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2438,
+      "pdf_page": 76,
+      "cells": {
+        "male": "麥秋天氣到，燕語畫梁頭。",
+        "female": "烏鵲駕天橋，佳賓莫空負。",
+        "luck": "鼎中兼有物，濟事自無虧。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2539,
+      "pdf_page": 76,
+      "cells": {
+        "male": "鳩影渡秋塘，月中星斗見。",
+        "female": "有鹿自銜花，無猿難獻果。",
+        "luck": "寶劍試重磨，光芒須復現。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2640,
+      "pdf_page": 76,
+      "cells": {
+        "male": "椒花守歲除，剝棗已先爛。",
+        "female": "滌器有長才，玉容何惜整。",
+        "luck": "塞雁偶失群，難期排陣序。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2741,
+      "pdf_page": 76,
+      "cells": {
+        "male": "天地我屋宇，坎離為戶庭。",
+        "female": "莫誇魚水樂，提防泛柏舟。",
+        "luck": "李下去彈冠，目可生疑□。"
+      },
+      "reading_uncertainties": {
+        "luck": [
+          "末字墨團與磨損並存，仍未定，不依句意補字。"
+        ]
+      },
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "李下去彈冠，目可生疑□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.7.0",
+          "note": "末字墨團與磨損並存，仍未定，不依句意補字。",
+          "rereading_id": "canping_fire_native_rereading_v1",
+          "source_pdf_page": 76
+        }
+      }
+    },
+    {
+      "element": "火",
+      "number": 2842,
+      "pdf_page": 76,
+      "cells": {
+        "male": "影浸秋波下，聲傳空谷中。",
+        "female": "花開春正好，人不在長安。",
+        "luck": "呢喃雙紫燕，春日自融和。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2943,
+      "pdf_page": 76,
+      "cells": {
+        "male": "霓裳羽衣曲，不鼓缶而歌。",
+        "female": "紅蓮開水面，青草怕飛霜。",
+        "luck": "春燕日爭巢，須分前後至。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3044,
+      "pdf_page": 76,
+      "cells": {
+        "male": "青天一輪月，卻向五更出。",
+        "female": "長空月一鉤，卻向五更出。",
+        "luck": "旱苗逢時雨，秀實得其宜。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3337,
+      "pdf_page": 76,
+      "cells": {
+        "male": "鯤浪上扁舟，縱橫隨波動。",
+        "female": "瓜葛本相連，荊棘何勞爾。",
+        "luck": "雞雖將出聲，五德有鳴期。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2238,
+      "pdf_page": 76,
+      "cells": {
+        "male": "泥橋逢雨雪，淺水釣金鱗。",
+        "female": "玉容那改移，只恐花驚鏡。",
+        "luck": "旱枯井水竭，魚鱉豈容身。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2339,
+      "pdf_page": 77,
+      "cells": {
+        "male": "連峰接雲漢，秋月照空山。",
+        "female": "秋風麗日中，蜂恨花鬚落。",
+        "luck": "負鼎去三場，遂成湯天下。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2440,
+      "pdf_page": 77,
+      "cells": {
+        "male": "飲泉流脈乾，將見水中月。",
+        "female": "江梅花正開，春色風中度。",
+        "luck": "青天闊萬里，月皎鵲驚飛。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2541,
+      "pdf_page": 77,
+      "cells": {
+        "male": "月宮吾欲往，摘柳作天梯。",
+        "female": "無根卻有根，結果難為果。",
+        "luck": "○掛在高山，大用須成器。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2642,
+      "pdf_page": 77,
+      "cells": {
+        "male": "鳳德幽深遠，駒陰過玉臺。",
+        "female": "薺甘與苦茶，卻在下場頭。",
+        "luck": "曲直自從繩，正直元須取。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2743,
+      "pdf_page": 77,
+      "cells": {
+        "male": "巫山十二峰，不與凡人上。",
+        "female": "天上神仙女，人間富貴家。",
+        "luck": "意欲搆舟子，得乘□。"
+      },
+      "reading_uncertainties": {
+        "male": [
+          "原頁編號有遮損；本行暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ],
+        "female": [
+          "原頁編號有遮損；本行暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ],
+        "luck": [
+          "正文的字形或磨損未能確定；□為編者疑讀，可代表未定字串，不是原頁圈空。",
+          "原頁編號有遮損；本行暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ]
+      },
+      "number_reading_uncertainties": [
+        "Printed header partially obscured; inherited key is retained provisionally, not claimed as a secure literal header reading."
+      ],
+      "reading_notes": [
+        "得乘後的□表示磨損未定字串，不主張一字，也不沿繼承圈缺補濟。",
+        "本行號碼暫沿繼承鍵，原頁號文歸屬未定；正文可辨不代表編號已核。"
+      ]
+    },
+    {
+      "element": "火",
+      "number": 2844,
+      "pdf_page": 77,
+      "cells": {
+        "male": "海棠花爛熳，獨立雨中看。",
+        "female": "父子聚嘻嘻，風光保無恙。",
+        "luck": "將薪去傳火，立便見煙成。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2945,
+      "pdf_page": 77,
+      "cells": {
+        "male": "流水下高山，孰能相止遏。",
+        "female": "日月有陰晦，求賢難獨難。",
+        "luck": "運籌帷幄中，決勝千里外。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3339,
+      "pdf_page": 77,
+      "cells": {
+        "male": "燕下鳳凰臺，江山活計中。",
+        "female": "居柔卻用剛，剛柔能既濟。",
+        "luck": "一蟲生兩翅，飛入百花叢。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2240,
+      "pdf_page": 77,
+      "cells": {
+        "male": "煙焰逐浮雲，月明金井地。",
+        "female": "鳳凰飛去後，明月見光輝。",
+        "luck": "燥火助太陽，青天雲歛盡。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2341,
+      "pdf_page": 77,
+      "cells": {
+        "male": "開樽乘月夜，曲水暗中流。",
+        "female": "綺羅媚春風，好花容易過。",
+        "luck": "對景邀明月，盃中酒不空。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "對□邀明月，盃中酒不空。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.7.0",
+          "note": "原坐標圖可辨景字，盃字按本頁保留，不因常見詩句改文。",
+          "rereading_id": "canping_fire_native_rereading_v1",
+          "source_pdf_page": 77
+        }
+      }
+    },
+    {
+      "element": "火",
+      "number": 2442,
+      "pdf_page": 78,
+      "cells": {
+        "male": "太白騎龍馬，禹門波浪乾。",
+        "female": "天邊瑞氣凝，牡丹花露溼。",
+        "luck": "狂風吹殘燭，光陰誠難住。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2543,
+      "pdf_page": 78,
+      "cells": {
+        "male": "日本從陽主，三更避斗牛。",
+        "female": "曉風殘月影，別為一枝香。",
+        "luck": "田獵無一禽，徒勞費蒼鷹。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "田獵無一禽，徒勞費鴛□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.7.0",
+          "note": "原圖末二字可辨蒼鷹；舊讀鴛□一併修訂，並非只填方框。",
+          "rereading_id": "canping_fire_native_rereading_v1",
+          "source_pdf_page": 78
+        }
+      }
+    },
+    {
+      "element": "火",
+      "number": 2644,
+      "pdf_page": 78,
+      "cells": {
+        "male": "萬里迢迢路，旁溪曲徑通。",
+        "female": "斜陽人喚渡，流水泛天涯。",
+        "luck": "九月去登高，福中還發福。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2745,
+      "pdf_page": 78,
+      "cells": {
+        "male": "花發向波心，天香施水面。",
+        "female": "菡萏波中出，鴛鴦水面遊。",
+        "luck": "能任成大器，負鼎去干湯。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2846,
+      "pdf_page": 78,
+      "cells": {
+        "male": "秋色來天上，寒光到世間。",
+        "female": "香蘭終月滿，桂子落秋風。",
+        "luck": "風雲三吐哺，盡禮詩○賢。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3341,
+      "pdf_page": 78,
+      "cells": {
+        "male": "牡丹花樹下，蜂蝶結雲屯。",
+        "female": "蜂蝶怕春寒，好花風裡過。",
+        "luck": "狂蛟來□□，節操自然端。"
+      },
+      "reading_uncertainties": {
+        "luck": [
+          "首句末字串仍不能穩定辨定，不補地名或按文義解字。"
+        ]
+      },
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "狂蛟來□□，節操自然端。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.7.0",
+          "note": "首句末字串仍不能穩定辨定，不補地名或按文義解字。",
+          "rereading_id": "canping_fire_native_rereading_v1",
+          "source_pdf_page": 78
+        }
+      }
+    },
+    {
+      "element": "火",
+      "number": 2242,
+      "pdf_page": 78,
+      "cells": {
+        "male": "春晝玉壺閒，桃花芳洲陌。",
+        "female": "海棠花正發，惆悵五更風。",
+        "luck": "百花開似錦，春日自融和。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2343,
+      "pdf_page": 78,
+      "cells": {
+        "male": "蚍蜉生兩翅，飛向九重天。",
+        "female": "海棠春正發，夜雨濕胭脂。",
+        "luck": "遺刀還得劍，見喜有其年。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2444,
+      "pdf_page": 78,
+      "cells": {
+        "male": "避害以趨利，虹霓作渡橋。",
+        "female": "山水珊瑚樹，春風費力栽。",
+        "luck": "一雨過三千，青山峰色好。"
+      },
+      "reading_notes": [
+        "保留底本山水珊瑚樹，不按熟句改出水。"
+      ]
+    },
+    {
+      "element": "火",
+      "number": 2545,
+      "pdf_page": 78,
+      "cells": {
+        "male": "太虛中大廈，鴛瓦接青霄。",
+        "female": "花菓修緣好，葫蘆水上浮。",
+        "luck": "海水自生采，優悠星火曜。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2646,
+      "pdf_page": 79,
+      "cells": {
+        "male": "躬行於萬境，聲色在吾為。",
+        "female": "夫唱婦相隨，永終在謀始。",
+        "luck": "如人初食蔗，自尾及其頭。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2747,
+      "pdf_page": 79,
+      "cells": {
+        "male": "螟蛉入蜂巢，得見蜂王面。",
+        "female": "失葉怕春風，吹破桃李萼。",
+        "luck": "鶯雛初出谷，飛羽自欹斜。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3343,
+      "pdf_page": 79,
+      "cells": {
+        "male": "春深花卉發，細柳為誰青。",
+        "female": "玉樓防失足，金菊暗傷情。",
+        "luck": "巨魚跳龍門，須憑三尺浪。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2244,
+      "pdf_page": 79,
+      "cells": {
+        "male": "榴花枝上火，風動擬空燒。",
+        "female": "風雨雞鳴夜，春風欲暮時。",
+        "luck": "百煉忘真金，自然添火力。"
+      },
+      "reading_notes": [
+        "保留底本忘真金，不按熟語改成其他字。"
+      ]
+    },
+    {
+      "element": "火",
+      "number": 2345,
+      "pdf_page": 79,
+      "cells": {
+        "male": "南柯鸞鳳立，天表景星行。",
+        "female": "蜂釀百花酒，其甘與世殊。",
+        "luck": "青山纔雨過，清興逸無窮。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2446,
+      "pdf_page": 79,
+      "cells": {
+        "male": "御溝一紅葉，流水出深宮。",
+        "female": "二六巫山遠，朝雲何處飛。",
+        "luck": "深山藏日久，威勢自英雄。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2547,
+      "pdf_page": 79,
+      "cells": {
+        "male": "浮舟上急水，飛躍多鳶魚。",
+        "female": "河東獅子吼，好事嘆難完。",
+        "luck": "雲收兼霧散，萬里見晴光。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "雲□兼霧散，萬里見晴光。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.7.0",
+          "note": "原圖可辨收字，完整兩句按所選底本記錄。",
+          "rereading_id": "canping_fire_native_rereading_v1",
+          "source_pdf_page": 79
+        }
+      }
+    },
+    {
+      "element": "火",
+      "number": 2648,
+      "pdf_page": 79,
+      "cells": {
+        "male": "八維內寒暑，其端自我持。",
+        "female": "一家人盡喜，提防井上安。",
+        "luck": "草廬三顧問，明良相濟遇。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3345,
+      "pdf_page": 79,
+      "cells": {
+        "male": "道是無形器，四時萬物生。",
+        "female": "參昴正當天，江月半分破。",
+        "luck": "鬼佛兩同途，善惡皆相□。"
+      },
+      "reading_uncertainties": {
+        "luck": [
+          "末字構形仍有懼與權的歧讀，保留方框，不按語義選字。"
+        ]
+      },
+      "reading_revisions": {
+        "female": {
+          "previous_text": "參□正當天，江月半分破。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.7.0",
+          "note": "原圖日與卯構形可辨昴，保留參昴字面，未據星名改動其他字。",
+          "rereading_id": "canping_fire_native_rereading_v1",
+          "source_pdf_page": 79
+        },
+        "luck": {
+          "previous_text": "鬼佛兩同途，善惡皆相□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.7.0",
+          "note": "末字構形仍有懼與權的歧讀，保留方框，不按語義選字。",
+          "rereading_id": "canping_fire_native_rereading_v1",
+          "source_pdf_page": 79
+        }
+      }
+    },
+    {
+      "element": "火",
+      "number": 2246,
+      "pdf_page": 79,
+      "cells": {
+        "male": "背水相傳信，行看花影頗。",
+        "female": "黃花晚節香，老圃見秋光。",
+        "luck": "有雷無雨下，旱處可憂煎。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2347,
+      "pdf_page": 80,
+      "cells": {
+        "male": "大海變桑田，宏開日月落。",
+        "female": "四月正東上，皎潔又西墜。",
+        "luck": "美玉未分明，逞光挑暗□。"
+      },
+      "reading_uncertainties": {
+        "luck": [
+          "倒數第二字暗可辨；末字疑似薩但仍有歧讀，未按語義改成其他字，整格仍未定。"
+        ]
+      },
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "美玉未分明，逞光挑□□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.7.0",
+          "note": "倒數第二字暗可辨；末字疑似薩但仍有歧讀，未按語義改成其他字，整格仍未定。",
+          "rereading_id": "canping_fire_native_rereading_v1",
+          "source_pdf_page": 80
+        }
+      }
+    },
+    {
+      "element": "火",
+      "number": 2448,
+      "pdf_page": 80,
+      "cells": {
+        "male": "積雪待來年，雲開逢暖日。",
+        "female": "飛雪上梅花，浩雲開暖日。",
+        "luck": "古鏡又重磨，終是顏先在。"
+      },
+      "reading_revisions": {
+        "female": {
+          "previous_text": "飛雪上梅花，□雲開暖日。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.7.0",
+          "note": "原圖氵與告構形可辨浩；保留少見浩雲，不改成浮雲或陰雲。",
+          "rereading_id": "canping_fire_native_rereading_v1",
+          "source_pdf_page": 80
+        }
+      }
+    },
+    {
+      "element": "火",
+      "number": 2549,
+      "pdf_page": 80,
+      "cells": {
+        "male": "持刀破魚腹，珍異在其中。",
+        "female": "雙飛鸞鳳曲，莫追怨知音。",
+        "luck": "伯夷君子節，自不改初終。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3347,
+      "pdf_page": 80,
+      "cells": {
+        "male": "鴻毛岫上風，陰陽互寒暑。",
+        "female": "天寒雁影孤，月落銷金帳。",
+        "luck": "萬里迢迢路，旁溪曲徑通。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2248,
+      "pdf_page": 80,
+      "cells": {
+        "male": "足踏雲霄上，蓬人弱水流。",
+        "female": "○○○○○，○○○○○。",
+        "luck": "雀羽喜當生，摩空須有漸。"
+      },
+      "reading_uncertainties": {
+        "male": [
+          "原頁編號有遮損；本行暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ],
+        "female": [
+          "原頁編號有遮損；本行暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ],
+        "luck": [
+          "原頁編號有遮損；本行暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ]
+      },
+      "number_reading_uncertainties": [
+        "Printed header partially obscured; inherited key is retained provisionally, not claimed as a secure literal header reading."
+      ],
+      "reading_notes": [
+        "本行號碼暫沿繼承鍵，原頁號文歸屬未定；正文可辨不代表編號已核。"
+      ]
+    },
+    {
+      "element": "火",
+      "number": 2349,
+      "pdf_page": 80,
+      "cells": {
+        "male": "暴虎以馮河，矻然為砥柱。",
+        "female": "瑤池人宴後，明月夜空寒。",
+        "luck": "太公未遇時，日釣渭江邊。"
+      },
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "太公未遇時，日釣渭江□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.7.0",
+          "note": "原圖末字可辨邊；保留本頁完整兩句，不據典故改寫。",
+          "rereading_id": "canping_fire_native_rereading_v1",
+          "source_pdf_page": 80
+        }
+      }
+    },
+    {
+      "element": "火",
+      "number": 2450,
+      "pdf_page": 80,
+      "cells": {
+        "male": "渭水有肥魚，竿頭無釣餌。",
+        "female": "花開難結實，策杖且扶身。",
+        "luck": "停帆順風後，躁進恐成憂。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3349,
+      "pdf_page": 80,
+      "cells": {
+        "male": "紀綱吾掌上，網漏吞舟魚。",
+        "female": "夫征與婦育，天際一浮雲。",
+        "luck": "孤舟如遇浪，險阻謹提防。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2250,
+      "pdf_page": 80,
+      "cells": {
+        "male": "舉足達紫薇，梅花隨雲墮。",
+        "female": "蟠桃花未實，不用怨東風。",
+        "luck": "為祥不為災，得名兼得利。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 2351,
+      "pdf_page": 80,
+      "cells": {
+        "male": "西風送行色，斜日照丹墀。",
+        "female": "琴彈廣陵散，無語怨黃昏。",
+        "luck": "長蛇自退皮，勞神並改性。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3351,
+      "pdf_page": 81,
+      "cells": {
+        "male": "彤弓架朱箭，用卵石麒麟。",
+        "female": "福星雖燦爛，孤星也照臨。",
+        "luck": "花間逢○○，多不減芸香。"
+      },
+      "reading_notes": [
+        "保留底本用卵石麒麟讀法，不依熟句改射。"
+      ]
+    },
+    {
+      "element": "火",
+      "number": 2252,
+      "pdf_page": 81,
+      "cells": {
+        "male": "梁園花木綻，東苑徹金風。",
+        "female": "積木起高樓，風月事分破。",
+        "luck": "藥變損丹鑪，神空已度設。"
+      }
+    },
+    {
+      "element": "火",
+      "number": 3353,
+      "pdf_page": 81,
+      "cells": {
+        "male": "御溝流不盡，水脈到甘泉。",
+        "female": "琴彈山水曲，曲曲自知音。",
+        "luck": "斜日欲流西，光輝已先散。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3305,
+      "pdf_page": 81,
+      "cells": {
+        "male": "雲霞文發散，舞動錦飛鸞。",
+        "female": "魚向水中游，須防天降旱。",
+        "luck": "飛花自騰遠，不須風雨翻。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2206,
+      "pdf_page": 81,
+      "cells": {
+        "male": "洞庭風葉舞，撫手上南山。",
+        "female": "鷗鷺泛江天，不與蛟龍並。",
+        "luck": "求之於規矩，自可取方圓。"
+      },
+      "reading_revisions": {
+        "male": {
+          "previous_text": "洞庭風葉舞，□手上南山。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.8.0",
+          "note": "原圖扌與無構形可辨撫，保留撫手字面，不據熟語改為攜手或拱手。",
+          "rereading_id": "canping_wood_native_rereading_v1",
+          "source_pdf_page": 81
+        }
+      }
+    },
+    {
+      "element": "木",
+      "number": 2307,
+      "pdf_page": 81,
+      "cells": {
+        "male": "身坐乾坤甑，自知炎暑威。",
+        "female": "休彈陌上箏，莫娶桑間女。",
+        "luck": "佯狂並設詐，苟有見災危。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2408,
+      "pdf_page": 81,
+      "cells": {
+        "male": "水銀鎛鑄鼎，日月煮黃粱。",
+        "female": "鸚鵡尚聲嬌，佳人空自老。",
+        "luck": "織錦停機杼，機邊看錦花。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2509,
+      "pdf_page": 81,
+      "cells": {
+        "male": "微漲天河流，冬江雪浪起。",
+        "female": "夕陽無限好，爭奈易黃昏。",
+        "luck": "汲井遇泉枯，何由得濟渴。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2610,
+      "pdf_page": 81,
+      "cells": {
+        "male": "金城千里地，舉目望征人。",
+        "female": "春暮飛花急，暗隨流水邊。",
+        "luck": "夢魂千里遠，空怨離恨多。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2711,
+      "pdf_page": 82,
+      "cells": {
+        "male": "木牛出祁山，流馬入斜谷。",
+        "female": "冬天暖似春，江梅花正吐。",
+        "luck": "春蘭與秋蕙，各自及時香。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2812,
+      "pdf_page": 82,
+      "cells": {
+        "male": "強瀾既四倒，地道有常經。",
+        "female": "姻緣同比翼，風送上天去。",
+        "luck": "雷聲才出地，遠近自然驚。"
+      },
+      "reading_notes": [
+        "保留底本強瀾既四倒，不按熟語更改。"
+      ]
+    },
+    {
+      "element": "木",
+      "number": 2913,
+      "pdf_page": 82,
+      "cells": {
+        "male": "秋月照寒冰，飛雁落沙汀。",
+        "female": "風吹香夢醒，天暝子規啼。",
+        "luck": "蕭何定律法，輕重自分明。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3014,
+      "pdf_page": 82,
+      "cells": {
+        "male": "鵲巢高樹上，風雨絕塵埃。",
+        "female": "冷淡是生涯，何須花簇簇。",
+        "luck": "桃花三月景，百卉一齊新。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3115,
+      "pdf_page": 82,
+      "cells": {
+        "male": "趙人兼晉璧，歡時起利心。",
+        "female": "活計水中萍，姻緣風裡絮。",
+        "luck": "登高○○○，傳命探梅花。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3216,
+      "pdf_page": 82,
+      "cells": {
+        "male": "梭擲錦機中，花紋隨後起。",
+        "female": "天長地久時，只怕多風雨。",
+        "luck": "浮雲將蔽日，先暗後光明。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3307,
+      "pdf_page": 82,
+      "cells": {
+        "male": "椿松在槐棘，月色染雲霓。",
+        "female": "春閨人夢斷，明月又當前。",
+        "luck": "明鏡自當臺，何憂不昭燭。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2208,
+      "pdf_page": 82,
+      "cells": {
+        "male": "木人逢此地，平步上青雲。",
+        "female": "雨餘天欲霽，江上好峰青。",
+        "luck": "藍橋玉壺○，鴛鴦解鳴雨。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2309,
+      "pdf_page": 82,
+      "cells": {
+        "male": "漏水自天漿，八方皆可去。",
+        "female": "玉盃出清淡，龍蛇多爭室。",
+        "luck": "鑿井得甘泉，源源自流出。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2410,
+      "pdf_page": 82,
+      "cells": {
+        "male": "牡丹花影中，走馬弓弦上。",
+        "female": "池中多污泥，忽出蓮花新。",
+        "luck": "走馬過危橋，不道成惆悵。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2511,
+      "pdf_page": 83,
+      "cells": {
+        "male": "東山有八麥，生向雪霜中。",
+        "female": "高木蟬聲噪，安知紅樹秋。",
+        "luck": "舉足蹈紫微，青雲生平地。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2612,
+      "pdf_page": 83,
+      "cells": {
+        "male": "蠶營簇上繭，宛轉吐絲綸。",
+        "female": "神仙不用求，自有桃源路。",
+        "luck": "抱薪就火然，謹當慎自主。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2713,
+      "pdf_page": 83,
+      "cells": {
+        "male": "掌火焚山澤，連天草木除。",
+        "female": "白髮喜相逢，齊眉并舉案。",
+        "luck": "鶯籠纔得出，飛動有其時。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2814,
+      "pdf_page": 83,
+      "cells": {
+        "male": "萬籟清風裡，吹簫秋月明。",
+        "female": "一聲秋夜雷，明月落誰家。",
+        "luck": "雙燕巢梁間，呢喃自相語。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2915,
+      "pdf_page": 83,
+      "cells": {
+        "male": "舉目仰天人，用除三伏暑。",
+        "female": "紅蓮初出水，春草怕飛霜。",
+        "luck": "驪珠將照水，光耀自如然。"
+      },
+      "reading_notes": [
+        "保留底本光耀自如然，不按熟語改字序。"
+      ]
+    },
+    {
+      "element": "木",
+      "number": 3016,
+      "pdf_page": 83,
+      "cells": {
+        "male": "水影照天文，森羅成萬象。",
+        "female": "片雲天外飛，方見雲中月。",
+        "luck": "自牖看天心，咫尺天顏近。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3117,
+      "pdf_page": 83,
+      "cells": {
+        "male": "子產畜生魚，校人得烹食。",
+        "female": "萬里白雲遶，江南日暮春。",
+        "luck": "守株而待兔，空滯好光陰。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3309,
+      "pdf_page": 83,
+      "cells": {
+        "male": "牛溲馬渤功，不假金丹術。",
+        "female": "此木非尋常，堪作高堂室。",
+        "luck": "喜生不測處，枯木再逢春。"
+      },
+      "reading_notes": [
+        "保留底本牛溲馬渤功讀法，不依典故改勃。"
+      ]
+    },
+    {
+      "element": "木",
+      "number": 2210,
+      "pdf_page": 83,
+      "cells": {
+        "male": "芳枝開月下，秋葉舞春風。",
+        "female": "深園空夜月，琴調幾知音。",
+        "luck": "流水遇高山，自有真佳趣。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2311,
+      "pdf_page": 83,
+      "cells": {
+        "male": "當道雪中卉，青蛇用蔽身。",
+        "female": "利器手中持，消息長無苦。",
+        "luck": "車無輗與軏，其何以行路。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2412,
+      "pdf_page": 84,
+      "cells": {
+        "male": "玉藍凝絲竹，蟾宮火上山。",
+        "female": "還解○香祝，清虛度化生。",
+        "luck": "玉兔東方出，夕陽留彩紅。"
+      },
+      "reading_revisions": {
+        "male": {
+          "previous_text": "玉□凝絲竹，蟾宮火上山。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.8.0",
+          "note": "原圖艹與監構形可辨藍，保留玉藍，不因句意換作其他樂器或籃字。",
+          "rereading_id": "canping_wood_native_rereading_v1",
+          "source_pdf_page": 84
+        }
+      }
+    },
+    {
+      "element": "木",
+      "number": 2513,
+      "pdf_page": 84,
+      "cells": {
+        "male": "花渠暗水流，出沒世難識。",
+        "female": "風蒲美轉定，能化青蛇銅。",
+        "luck": "海岸繫孤舟，何須憂浪竭。"
+      },
+      "reading_notes": [
+        "保留底本青蛇銅讀法，不依典故改劍。"
+      ]
+    },
+    {
+      "element": "木",
+      "number": 2614,
+      "pdf_page": 84,
+      "cells": {
+        "male": "攘臂取珊瑚，擊破生鐵柱。",
+        "female": "鸞鳳引雛飛，只緣多兒戲。",
+        "luck": "涇渭分流處，一濁一清源。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2715,
+      "pdf_page": 84,
+      "cells": {
+        "male": "假山生柳桂，秋月散金花。",
+        "female": "種出無方藥，方知造化神。",
+        "luck": "風雨栽培處，可待長萌葉。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2816,
+      "pdf_page": 84,
+      "cells": {
+        "male": "冰霜持令節，以候判陰陽。",
+        "female": "芳草正連天，那看黃梅雨。",
+        "luck": "倒把龍泉劍，叉手空相傷。"
+      },
+      "reading_uncertainties": {
+        "male": [
+          "原頁編號有磨損、遮墨或淡字；暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ],
+        "female": [
+          "原頁編號有磨損、遮墨或淡字；暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ],
+        "luck": [
+          "原頁編號有磨損、遮墨或淡字；暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ]
+      },
+      "number_reading_uncertainties": [
+        "原頁編號有遮損或淡字，無法本輪完整確認；暫保留繼承鍵，不依公式或鄰行序次補定。"
+      ],
+      "reading_notes": [
+        "本行號碼暫沿繼承鍵；正文或圈空可辨不代表編號歸屬已核。"
+      ]
+    },
+    {
+      "element": "木",
+      "number": 2917,
+      "pdf_page": 84,
+      "cells": {
+        "male": "江上一犁雨，芳菲起淡煙。",
+        "female": "月兔夜光圓，向晚金烏出。",
+        "luck": "風生浪不靜，未可息憂□。"
+      },
+      "reading_uncertainties": {
+        "male": [
+          "原頁編號有磨損、遮墨或淡字；暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ],
+        "female": [
+          "原頁編號有磨損、遮墨或淡字；暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ],
+        "luck": [
+          "正文的字形或磨損未能確定；□為編者疑讀，可代表未定字串，不是原頁圈空。",
+          "原頁編號有磨損、遮墨或淡字；暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ]
+      },
+      "number_reading_uncertainties": [
+        "原頁編號有遮損或淡字，無法本輪完整確認；暫保留繼承鍵，不依公式或鄰行序次補定。"
+      ],
+      "reading_notes": [
+        "本行號碼暫沿繼承鍵；正文或圈空可辨不代表編號歸屬已核。"
+      ]
+    },
+    {
+      "element": "木",
+      "number": 3018,
+      "pdf_page": 84,
+      "cells": {
+        "male": "溪漾浮萍草，流芳自吐奇。",
+        "female": "雞棲生鳳子，回首隔塵埃。",
+        "luck": "欲求魚與兔，須用得筌蹄。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3311,
+      "pdf_page": 84,
+      "cells": {
+        "male": "朔風從北起，冰鑒照青天。",
+        "female": "芝蘭出蓬島，莫染花間塵。",
+        "luck": "金堂步紫微，玉殿生芳草。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2212,
+      "pdf_page": 84,
+      "cells": {
+        "male": "分慶誕辰中，花下人相顧。",
+        "female": "水邊多綠草，翠竹喜相逢。",
+        "luck": "舉盃邀明月，花下人相覬。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2313,
+      "pdf_page": 84,
+      "cells": {
+        "male": "禹門波浪急，冬月井中魚。",
+        "female": "日口任東風，女子貞不字。",
+        "luck": "○○○○○，○○○○○。"
+      },
+      "reading_notes": [
+        "保留底本日口任東風讀法，不按文義補改。"
+      ]
+    },
+    {
+      "element": "木",
+      "number": 2414,
+      "pdf_page": 85,
+      "cells": {
+        "male": "瓦冷霜華重，飛灰葭管中。",
+        "female": "豈料狂風惡，花開落嫩紅。",
+        "luck": "準定用權衡，輕重當自取。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2515,
+      "pdf_page": 85,
+      "cells": {
+        "male": "騎牛逐麋鹿，前程路不迷。",
+        "female": "木非凡木比，可用作門楣。",
+        "luck": "龍蛇爭一室，飛向百花叢。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2616,
+      "pdf_page": 85,
+      "cells": {
+        "male": "斗秤皆均物，權衡有萬殊。",
+        "female": "流鶯語燕嬌，日暮花飛雨。",
+        "luck": "風過大林中，草木皆迴偃。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2717,
+      "pdf_page": 85,
+      "cells": {
+        "male": "柳線繫春光，暮天色已定。",
+        "female": "傳言桃李春，為惜桑樹是。",
+        "luck": "鵲噪喜白日，信通心更切。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2818,
+      "pdf_page": 85,
+      "cells": {
+        "male": "掌上握風雲，前生已先定。",
+        "female": "蘭房花正開，門帳人如玉。",
+        "luck": "閒人風送遠，正醒心自樂。"
+      },
+      "reading_revisions": {
+        "female": {
+          "previous_text": "蘭房花正開，門□人如玉。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.8.0",
+          "note": "原圖巾與長構形可辨帳，保留門帳，不依常見句改羅帳。",
+          "rereading_id": "canping_wood_native_rereading_v1",
+          "source_pdf_page": 85
+        }
+      }
+    },
+    {
+      "element": "木",
+      "number": 2919,
+      "pdf_page": 85,
+      "cells": {
+        "male": "架屋橋梁上，依山又帶河。",
+        "female": "寒人下秋天，連芳溼五彩。",
+        "luck": "月白與風清，因斯知有待。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3313,
+      "pdf_page": 85,
+      "cells": {
+        "male": "景星依北陸，熒惑出南宮。",
+        "female": "雲雨歸何處，巫山十二峰。",
+        "luck": "晝行人秉燭，直入洞房中。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2214,
+      "pdf_page": 85,
+      "cells": {
+        "male": "牡丹花影中，靈清海棠溼。",
+        "female": "月之長大照，片人天外遮。",
+        "luck": "桂枝花下影，秋月弄金風。"
+      },
+      "reading_notes": [
+        "保留底本片人天外遮，不按文義改人。"
+      ]
+    },
+    {
+      "element": "木",
+      "number": 2315,
+      "pdf_page": 85,
+      "cells": {
+        "male": "多少魚蝦出，波流天日紅。",
+        "female": "紅梅映蒼竹，惟有歲寒情。",
+        "luck": "久晦遇晴明，已慰眾人望。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2416,
+      "pdf_page": 85,
+      "cells": {
+        "male": "金烏未出海，玉兔已先沈。",
+        "female": "莫恨花飛急，枝頭子漸垂。",
+        "luck": "金烏拜玉兔，各自列東西。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2517,
+      "pdf_page": 86,
+      "cells": {
+        "male": "金魚溝內躍，風動紙鳶飛。",
+        "female": "玉雲荷盤裡，瓊珠碎碎圓。",
+        "luck": "舟行望峰移，自生疑惑處。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2618,
+      "pdf_page": 86,
+      "cells": {
+        "male": "身自攜筐去，憂勤等採薇。",
+        "female": "○○○○○，○○○○○。",
+        "luck": "燈光夜結花，喜信必須得。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2719,
+      "pdf_page": 86,
+      "cells": {
+        "male": "夜寢遊仙夢，通靈各有神。",
+        "female": "江水映秋風，水落花去速。",
+        "luck": "穴居而野處，棟宇自接涼。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2820,
+      "pdf_page": 86,
+      "cells": {
+        "male": "清淡梧桐樹，風搖金井間。",
+        "female": "鶯花三月景，天氣又重新。",
+        "luck": "陸行如推車，是以常自苦。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3315,
+      "pdf_page": 86,
+      "cells": {
+        "male": "荏苒風霜至，竹梅花自開。",
+        "female": "上林花正發，只恐起東風。",
+        "luck": "自我來西郊，密雲空不雨。"
+      },
+      "reading_uncertainties": {
+        "male": [
+          "原頁編號有磨損、遮墨或淡字；暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ],
+        "female": [
+          "原頁編號有磨損、遮墨或淡字；暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ],
+        "luck": [
+          "原頁編號有磨損、遮墨或淡字；暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ]
+      },
+      "number_reading_uncertainties": [
+        "原頁編號有遮損或淡字，無法本輪完整確認；暫保留繼承鍵，不依公式或鄰行序次補定。"
+      ],
+      "reading_notes": [
+        "本行號碼暫沿繼承鍵；正文或圈空可辨不代表編號歸屬已核。"
+      ]
+    },
+    {
+      "element": "木",
+      "number": 2216,
+      "pdf_page": 86,
+      "cells": {
+        "male": "萬里桑麻地，魚龍相約侵。",
+        "female": "春花太逼人，蝶向誰家宿。",
+        "luck": "幸結殘花實，喜生枯樹枝。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2317,
+      "pdf_page": 86,
+      "cells": {
+        "male": "江漾南山影，雁從雲外飛。",
+        "female": "姚黃并魏紫，相遇五更風。",
+        "luck": "鴛鴦宿池塘，姻緣自相守。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2418,
+      "pdf_page": 86,
+      "cells": {
+        "male": "地軸天輪轉，壺中日月長。",
+        "female": "採蓮曲未終，扁舟空蕩漾。",
+        "luck": "紅芳看滿地，蜂蝶遶花叢。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2519,
+      "pdf_page": 86,
+      "cells": {
+        "male": "能開頃刻花，結果不能食。",
+        "female": "要祝花宜壽，須求菊蕊仙。",
+        "luck": "遇水得逢橋，憂心傾□然。"
+      },
+      "reading_uncertainties": {
+        "luck": [
+          "傾可辨，次字疑似什仍有歧讀，保留□；不按句意改作頓釋然，整格不升為確定。"
+        ]
+      },
+      "reading_notes": [
+        "憂心後的□□為未定字串，不按熟語猜補。"
+      ],
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "遇水得逢橋，憂心□□然。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.8.0",
+          "note": "傾可辨，次字疑似什仍有歧讀，保留□；不按句意改作頓釋然，整格不升為確定。",
+          "rereading_id": "canping_wood_native_rereading_v1",
+          "source_pdf_page": 86
+        }
+      }
+    },
+    {
+      "element": "木",
+      "number": 2620,
+      "pdf_page": 86,
+      "cells": {
+        "male": "碧落出烏輪，眾星拱北斗。",
+        "female": "難許自由身，是心難飛走。",
+        "luck": "○○○○○，○○○○○。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2721,
+      "pdf_page": 87,
+      "cells": {
+        "male": "雷是震天鼓，青天無片雲。",
+        "female": "金盃休覆水，琴瑟再調弦。",
+        "luck": "行人立渡頭，待船空已久。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3317,
+      "pdf_page": 87,
+      "cells": {
+        "male": "泉源并土脈，雨露作根基。",
+        "female": "桂子落重川，菱花空谷響。",
+        "luck": "視形頻把鏡，內外不相同。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2218,
+      "pdf_page": 87,
+      "cells": {
+        "male": "採山堪茹美，釣水鱷魚藏。",
+        "female": "斑扇重狂風，安知炎暑退。",
+        "luck": "有矢恨無弓，先階後須放。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2319,
+      "pdf_page": 87,
+      "cells": {
+        "male": "木筆寫青天，硯內龍蛇動。",
+        "female": "杏花須自紅，葑菲定不美。",
+        "luck": "黃蜂採蜜成，久後誰甘苦。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2420,
+      "pdf_page": 87,
+      "cells": {
+        "male": "仗劍斷鰲足，鴻飛荒野山。",
+        "female": "枝頭春玉李，一朵綻先紅。",
+        "luck": "箭射南山虎，仗劍斬龍蛇。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2521,
+      "pdf_page": 87,
+      "cells": {
+        "male": "把扇作飛簾，糞塵咸席捲。",
+        "female": "○○○○○，○○○○○。",
+        "luck": "寶劍藏深匣，光芒不等閒。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2622,
+      "pdf_page": 87,
+      "cells": {
+        "male": "八荒惟我室，變動體無常。",
+        "female": "娥眉月圓缺，桂子漫傳香。",
+        "luck": "遊魚戲新荷，在沼樂其樂。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3319,
+      "pdf_page": 87,
+      "cells": {
+        "male": "萬里有循環，陰陽無久駐。",
+        "female": "錦繡藹春閨，梧桐在金井。",
+        "luck": "紅芳成艷色，俱起動花心。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2220,
+      "pdf_page": 87,
+      "cells": {
+        "male": "惟斯屬木人，水清在陰地。",
+        "female": "雪裡出梅花，猶待春風至。",
+        "luck": "錯節與盤根，自然別利器。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2321,
+      "pdf_page": 87,
+      "cells": {
+        "male": "尋釣夢春澤，投身北海間。",
+        "female": "暮去更朝來，春花幾芳馥。",
+        "luck": "花開向波心，天香施紅味。"
+      },
+      "reading_notes": [
+        "保留底本天香施紅味讀法，不按文義改面。"
+      ]
+    },
+    {
+      "element": "木",
+      "number": 2422,
+      "pdf_page": 88,
+      "cells": {
+        "male": "東海植扶桑，西海載弱水。",
+        "female": "天外雁聲孤，喚醒佳人夢。",
+        "luck": "萬里迢迢路，徑行不見蹤。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2523,
+      "pdf_page": 88,
+      "cells": {
+        "male": "蛇鬥鄭門中，廣陵盟亦載。",
+        "female": "把鏡稱月影，朱顏渾未改。",
+        "luck": "升水用藏龍，淹回其雲氣。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3321,
+      "pdf_page": 88,
+      "cells": {
+        "male": "井上有綠李，鹽梅氣味同。",
+        "female": "花開向春晚，花謝果還稀。",
+        "luck": "野猴啼夜月，衰草更逢春。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2222,
+      "pdf_page": 88,
+      "cells": {
+        "male": "紅波推畫舫，綠棹逐蛟龍。",
+        "female": "江上月清明，金鞭何處去。",
+        "luck": "大廈與高堂，燕雀生成就。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2323,
+      "pdf_page": 88,
+      "cells": {
+        "male": "三月無根柳，空中舞柳花。",
+        "female": "梨花滿院香，莫收春帶雨。",
+        "luck": "陽春三月景，柳絮滿天飛。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2424,
+      "pdf_page": 88,
+      "cells": {
+        "male": "波中生日月，鏡底見乾坤。",
+        "female": "蜾蠃負螟蛉，新枝發舊花。",
+        "luck": "杏花雨濛濛，喜蘇人○犁。"
+      },
+      "reading_uncertainties": {
+        "male": [
+          "原頁編號有磨損、遮墨或淡字；暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ],
+        "female": [
+          "原頁編號有磨損、遮墨或淡字；暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ],
+        "luck": [
+          "原頁編號有磨損、遮墨或淡字；暫沿繼承鍵定位，號文歸屬未定，三欄均不計入已確定數。"
+        ]
+      },
+      "number_reading_uncertainties": [
+        "原頁編號有遮損或淡字，無法本輪完整確認；暫保留繼承鍵，不依公式或鄰行序次補定。"
+      ],
+      "reading_notes": [
+        "本行號碼暫沿繼承鍵；正文或圈空可辨不代表編號歸屬已核。"
+      ]
+    },
+    {
+      "element": "木",
+      "number": 3323,
+      "pdf_page": 88,
+      "cells": {
+        "male": "將燈入洞坐，洞裡有輕風。",
+        "female": "水畔插垂楊，孫陽黃金屋。",
+        "luck": "線斷釣沈底，深嗟不已情。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2224,
+      "pdf_page": 88,
+      "cells": {
+        "male": "滹沱冰雪飛，足蹤履冰跡。",
+        "female": "鑿池通流水，開闢天外風。",
+        "luck": "藍關逢雪擁，駿馬不能行。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2325,
+      "pdf_page": 88,
+      "cells": {
+        "male": "蓮花隨步起，風雨過池塘。",
+        "female": "芳草碧連天，塵○臨絃索。",
+        "luck": "羝羊觸其角，何苦自傷殘。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3325,
+      "pdf_page": 88,
+      "cells": {
+        "male": "斧柯在我手，山行隨意行。",
+        "female": "水邊佳會處，休唱阿奴嬌。",
+        "luck": "駕箭與彎弓，偶射須百中。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 2226,
+      "pdf_page": 89,
+      "cells": {
+        "male": "四境風雲起，金烏照太空。",
+        "female": "四野風煙暝，飛花落野泥。",
+        "luck": "斲輪將有就，乘鸞在當時。"
+      }
+    },
+    {
+      "element": "木",
+      "number": 3327,
+      "pdf_page": 89,
+      "cells": {
+        "male": "地形接霄壤，在下有星辰。",
+        "female": "風煙欲暝天，日暮江南樹。",
+        "luck": "○○○○○，○○○○○。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3357,
+      "pdf_page": 97,
+      "cells": {
+        "male": "蜘蛛結網羅，箭射空中雨。",
+        "female": "天邊有彩鸞，風舉乘雲路。",
+        "luck": "臨淵空羨魚，取舍難為事。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2258,
+      "pdf_page": 97,
+      "cells": {
+        "male": "蓬蒿棲鳳凰，瞻望隨堤柳。",
+        "female": "臘日消殘雪，紅杏又看花。",
+        "luck": "涼風并水閣，散髮又披襟。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2359,
+      "pdf_page": 97,
+      "cells": {
+        "male": "龍門舟未出，蚯蚓載坤輿。",
+        "female": "紫燕營新巢，呢喃又無水。",
+        "luck": "梨園遇猴宿，果熟不能存。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2460,
+      "pdf_page": 97,
+      "cells": {
+        "male": "沈李浮瓜景，廣寒宮似水。",
+        "female": "孤帆太湖遠，休上望夫山。",
+        "luck": "再磨龍劍用，銳氣徹青□。"
+      },
+      "reading_uncertainties": {
+        "luck": [
+          "青後字淡損，原圖仍不足以辨定；保留□，不按青空或青霄等熟語補字。"
+        ]
+      },
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "再磨龍劍用，銳氣徹青□。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.10.0",
+          "note": "青後字淡損，原圖仍不足以辨定；保留□，不按青空或青霄等熟語補字。",
+          "rereading_id": "canping_earth_native_rereading_v1",
+          "source_pdf_page": 97
+        }
+      }
+    },
+    {
+      "element": "土",
+      "number": 2561,
+      "pdf_page": 97,
+      "cells": {
+        "male": "投身向弱水，剖蚌取明珠。",
+        "female": "柳絮舞春風，晴雲翻暮雨。",
+        "luck": "春柳發萌芽，濃陰堪待暑。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2662,
+      "pdf_page": 97,
+      "cells": {
+        "male": "置郵符馹使，傳命折梅花。",
+        "female": "莫待塵緣結，皈依好向空。",
+        "luck": "旅懷千里遠，日暮急奔程。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2763,
+      "pdf_page": 97,
+      "cells": {
+        "male": "廣寒宮枕簟，內有風雪生。",
+        "female": "藤蘿引高松，陰陽調呂律。",
+        "luck": "彎弓兼得箭，際遇莫踟躕。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2864,
+      "pdf_page": 97,
+      "cells": {
+        "male": "蝴蝶夢方回，尋花天上去。",
+        "female": "玉女逢佳偶，天風吹珮環。",
+        "luck": "築壇來拜將，萬世好名揚。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2965,
+      "pdf_page": 98,
+      "cells": {
+        "male": "牆外生斑竹，莖長接上蒼。",
+        "female": "換葉移根樹，花開子未圓。",
+        "luck": "陽春三月景，桃李自芬芳。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3066,
+      "pdf_page": 98,
+      "cells": {
+        "male": "魚鹽版築人，心志自先苦。",
+        "female": "一疋紅綾好，春風幾度求。",
+        "luck": "曲木轉形影，運動影隨身。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3167,
+      "pdf_page": 98,
+      "cells": {
+        "male": "山徑之蹊間，介然用成路。",
+        "female": "香草出河邊，寂寞春歸晚。",
+        "luck": "鵲巢鳩打破，有始卻無終。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3268,
+      "pdf_page": 98,
+      "cells": {
+        "male": "河洛出圖書，伏羲不再畫。",
+        "female": "春光沸管弦，秋風換羅綺。",
+        "luck": "笙歌頻聒聒，自可樂歡顏。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3359,
+      "pdf_page": 98,
+      "cells": {
+        "male": "萬里長城去，黃河猶舊流。",
+        "female": "香盟於山嶽，未信晴雲輕。",
+        "luck": "梨園遇猴宿，果熟不能存。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2260,
+      "pdf_page": 98,
+      "cells": {
+        "male": "大旱望雲霓，青霽隔風阻。",
+        "female": "風煙隔明鏡，膏沐為誰容。",
+        "luck": "萬物原於天，密雲渾不雨。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2361,
+      "pdf_page": 98,
+      "cells": {
+        "male": "風吹海水動，巨蟹四方遊。",
+        "female": "桃花人面去，黃菊又三秋。",
+        "luck": "寒光有重焰，從此再回生。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2462,
+      "pdf_page": 98,
+      "cells": {
+        "male": "四海塵埃起，隨風蔽九天。",
+        "female": "花落東流水，高堂望杏紅。",
+        "luck": "○○○○○，○○○○○。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2563,
+      "pdf_page": 98,
+      "cells": {
+        "male": "對月登樓望，風生星斗移。",
+        "female": "妙手連環解，姻緣事不由。",
+        "luck": "日暮強奔程，狂走途還失。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2664,
+      "pdf_page": 98,
+      "cells": {
+        "male": "壺頭山上鼓，終日伏波聞。",
+        "female": "氣味芝蘭美，光陰日月行。",
+        "luck": "龍吟深大澤，逸樂有其之。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2765,
+      "pdf_page": 99,
+      "cells": {
+        "male": "獨舞菖蒲劍，三軍不可當。",
+        "female": "風山花零落，春風趁馬蹄。",
+        "luck": "雄雞齊唱曉，曙色未分明。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2866,
+      "pdf_page": 99,
+      "cells": {
+        "male": "燕期秋社中，遙指神仙路。",
+        "female": "月中丹桂子，開時待秋風。",
+        "luck": "大寒將索裘，已失先期備。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2967,
+      "pdf_page": 99,
+      "cells": {
+        "male": "身在青雲裡，天街我獨行。",
+        "female": "天地春風裡，江山夕照中。",
+        "luck": "春遊時得喜，駿馬自馳驅。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3068,
+      "pdf_page": 99,
+      "cells": {
+        "male": "旱天逢雨集，溝澮自皆盈。",
+        "female": "○○○○○，○○○○○。",
+        "luck": "虎鹿圖一雀，一悲還一喜。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3169,
+      "pdf_page": 99,
+      "cells": {
+        "male": "眾逐虎負嵎，攘臂下車搏。",
+        "female": "重重天色晚，何處彩雲飛。",
+        "luck": "猛虎依平林，收威并失勢。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3361,
+      "pdf_page": 99,
+      "cells": {
+        "male": "江心秋月色，魚隱在心中。",
+        "female": "竊香人去後，月色又黃昏。",
+        "luck": "猛虎居山巖，前凶而後吉。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2262,
+      "pdf_page": 99,
+      "cells": {
+        "male": "竹叢蜂蝶聚，落葉露珠傾。",
+        "female": "暴虎馮河婦，如何柔濟剛。",
+        "luck": "正當駿馬時，情懷難自捲。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2363,
+      "pdf_page": 99,
+      "cells": {
+        "male": "白日片雲收，青天一點雪。",
+        "female": "薰風吹石榴，秋風破酸子。",
+        "luck": "田獵而獲禽，自知得如願。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2464,
+      "pdf_page": 99,
+      "cells": {
+        "male": "蔓草與長松，遠看同一色。",
+        "female": "姻緣竟若無，浮雲落流水。",
+        "luck": "瑞雲飛出洞，聚散不為常。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2565,
+      "pdf_page": 99,
+      "cells": {
+        "male": "正當三伏暑，晝寢覆青氈。",
+        "female": "目斷楚天空，星河何處覓。",
+        "luck": "杏花紅千里，歸去馬如飛。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2666,
+      "pdf_page": 100,
+      "cells": {
+        "male": "豫州城似鐵，強弩不能穿。",
+        "female": "汀蘭井岸芷，泛○奉浮家。",
+        "luck": "大廈要扶持，誠然非一木。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2767,
+      "pdf_page": 100,
+      "cells": {
+        "male": "天漢彩雲橫，斗牛星不動。",
+        "female": "花開幾度春，日月應難光。",
+        "luck": "眾棹若扶持，一時須得渡。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2868,
+      "pdf_page": 100,
+      "cells": {
+        "male": "南畝金城外，一鞭風月清。",
+        "female": "龍鳳喜同巢，乾坤風景異。",
+        "luck": "蜂蝶戲春深，先益而後損。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2969,
+      "pdf_page": 100,
+      "cells": {
+        "male": "三月清明節，桃源不老春。",
+        "female": "黃鶯出空谷，燕采落花泥。",
+        "luck": "舉足傾天河，用除三伏暑。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3070,
+      "pdf_page": 100,
+      "cells": {
+        "male": "王事不敢廢，抽矢扣車輪。",
+        "female": "桃花逐水流，空鎖武陵春。",
+        "luck": "春天喜勝遊，冬日真可愛。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3363,
+      "pdf_page": 100,
+      "cells": {
+        "male": "九穗嘉禾起，吳江風月清。",
+        "female": "南國有佳人，花影空中霧。",
+        "luck": "魚龍在釣□，志樂在其中。"
+      },
+      "reading_uncertainties": {
+        "luck": [
+          "釣後字被墨污遮損，殘筆不足以唯一辨定；保留□，不按垂釣語境補餌或其他字。"
+        ]
+      },
+      "reading_revisions": {
+        "luck": {
+          "previous_text": "魚龍在釣□，志樂在其中。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.10.0",
+          "note": "釣後字被墨污遮損，殘筆不足以唯一辨定；保留□，不按垂釣語境補餌或其他字。",
+          "rereading_id": "canping_earth_native_rereading_v1",
+          "source_pdf_page": 100
+        }
+      }
+    },
+    {
+      "element": "土",
+      "number": 2264,
+      "pdf_page": 100,
+      "cells": {
+        "male": "古道多芳草，武陵花自紅。",
+        "female": "芙蓉不怕霜，霜裡好開花。",
+        "luck": "夜光流星落，中心亦可憂。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2365,
+      "pdf_page": 100,
+      "cells": {
+        "male": "虹霓射日光，五彩空中散。",
+        "female": "一曲神仙○，風吹別調聞。",
+        "luck": "青天當午日，迤運有藏雲。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2466,
+      "pdf_page": 100,
+      "cells": {
+        "male": "身登竹葉舟，更不假篙楫。",
+        "female": "機錦織成花，未許金刀剪。",
+        "luck": "子房遇黃石，受履顯光榮。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2567,
+      "pdf_page": 100,
+      "cells": {
+        "male": "高山雨露深，一人騎虎至。",
+        "female": "賞花人散後，金勒馬嘶風。",
+        "luck": "春遊知得意，信步自忘勞。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2668,
+      "pdf_page": 101,
+      "cells": {
+        "male": "白日青天裡，東方出五星。",
+        "female": "春光媚華堂，秋月照穹空。",
+        "luck": "未雨時先雷，陰雲空密佈。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2769,
+      "pdf_page": 101,
+      "cells": {
+        "male": "桃浪江深處，蛇從螃蟹行。",
+        "female": "霜風似刀劍，砍斷飛鴛侶。",
+        "luck": "田獵出無心，捕禽而得兔。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2870,
+      "pdf_page": 101,
+      "cells": {
+        "male": "歲寒知松柏，猶自藹柔芽。",
+        "female": "○○○○○，○○○○○。",
+        "luck": "初生新出月，皎白有明時。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2971,
+      "pdf_page": 101,
+      "cells": {
+        "male": "嫦娥會月宮，鏡照紅顏改。",
+        "female": "○○有佳人，青鏡朱顏改。",
+        "luck": "琴瑟不調和，其弦急可整。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3365,
+      "pdf_page": 101,
+      "cells": {
+        "male": "泰山添土壤，春草自鋪煙。",
+        "female": "一曲醉金卮，野煙生碧樹。",
+        "luck": "方澤水溶溶，魚龍俱得勢。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2266,
+      "pdf_page": 101,
+      "cells": {
+        "male": "嫦娥伴玉兔，醉倒桂花叢。",
+        "female": "嫦娥在月窟，三五圓又缺。",
+        "luck": "彎弓弦忽改，悵望獨咨嗟。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2367,
+      "pdf_page": 101,
+      "cells": {
+        "male": "龍脫初生骨，飛潛花苑中。",
+        "female": "籬菊綻金錢，玉露生秋草。",
+        "luck": "浮雲迷皎月，暫時處朦朧。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2468,
+      "pdf_page": 101,
+      "cells": {
+        "male": "山中有一道，不露神仙跡。",
+        "female": "綠蟻共佳人，巫山連楚夢。",
+        "luck": "病人遇良醫，貴人相提挈。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2569,
+      "pdf_page": 101,
+      "cells": {
+        "male": "珠履騰空去，一雙鳧上天。",
+        "female": "要看枝上花，卻看花梢月。",
+        "luck": "流水下高山，誰能相止遏。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2670,
+      "pdf_page": 101,
+      "cells": {
+        "male": "英雄一上將，來作負荊人。",
+        "female": "春草暗連山，王孫應恨別。",
+        "luck": "珍珠俱已成，何須多草艾。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2771,
+      "pdf_page": 102,
+      "cells": {
+        "male": "畫屏堂半開，上有丹青筆。",
+        "female": "○○○○○，○○○○○。",
+        "luck": "舜日得升空，堅冰須盡什。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2872,
+      "pdf_page": 102,
+      "cells": {
+        "male": "江漢源流水，同來井路中。",
+        "female": "月兔夜光圓，向曉金烏出。",
+        "luck": "黃鶯聲百囀，其可樂春遲。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3367,
+      "pdf_page": 102,
+      "cells": {
+        "male": "廟堂知重器，寶鼎玉居先。",
+        "female": "春樹發新條，風光喜戀新。",
+        "luck": "旅況在窮途，得薪又無火。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2268,
+      "pdf_page": 102,
+      "cells": {
+        "male": "採薇除蔓草，蜂蝶在紅塵。",
+        "female": "鸞鳳乘何遠，熊羆夢已回。",
+        "luck": "荒田多野草，空自負耕犁。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2369,
+      "pdf_page": 102,
+      "cells": {
+        "male": "當塗白日虎，草下現其身。",
+        "female": "好花臨水畔，風雨隔前林。",
+        "luck": "葉落為辭樹，正不為幹枝。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2470,
+      "pdf_page": 102,
+      "cells": {
+        "male": "聚沙為五嶽，一簣豈容虧。",
+        "female": "自是閨門好，須防半疾殃。",
+        "luck": "柏樹長高崗，喬枝須出群。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2571,
+      "pdf_page": 102,
+      "cells": {
+        "male": "陽春三月景，杜鵑花正開。",
+        "female": "名園花果香，春風皆吹暝。",
+        "luck": "良晝惟歸去，志存楊柳間。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2672,
+      "pdf_page": 102,
+      "cells": {
+        "male": "即墨得神仙，飛鳥悉翔舞。",
+        "female": "嫦娥在月宮，秋光共誰處。",
+        "luck": "二將競爭功，一得須一失。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2773,
+      "pdf_page": 102,
+      "cells": {
+        "male": "松筠侵日月，星斗見長天。",
+        "female": "芍藥花開遍，清和轉夏天。",
+        "luck": "水由地中行，江淮朝宗漢。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3369,
+      "pdf_page": 102,
+      "cells": {
+        "male": "飛雲隨水起，燕雀語花陰。",
+        "female": "浮雲蔽白日，彷彿見參商。",
+        "luck": "風動水中萍，往來無定處。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2270,
+      "pdf_page": 103,
+      "cells": {
+        "male": "修行下螻蟻，衘泥疊太山。",
+        "female": "牡丹花半開，春色無留意。",
+        "luck": "兩兩忽交鋒，自當宜謹慎。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2371,
+      "pdf_page": 103,
+      "cells": {
+        "male": "橫池龜曳尾，入水散清波。",
+        "female": "姻緣此日兼，只恐姻緣阻。",
+        "luck": "痴心問人影，否泰出何心。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2472,
+      "pdf_page": 103,
+      "cells": {
+        "male": "白水對青山，玉衡齊七政。",
+        "female": "春色天涯遠，燕歸人亦歸。",
+        "luck": "田欲成秀苗，必先除草芥。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2573,
+      "pdf_page": 103,
+      "cells": {
+        "male": "柳岸春風處，波紋漾碧天。",
+        "female": "寶鏡畫堂前，莫遣青鸞舞。",
+        "luck": "路遙頻馬往，心困與神疲。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2674,
+      "pdf_page": 103,
+      "cells": {
+        "male": "義兵不用詐，背水戰何因。",
+        "female": "灼灼枝上花，春時天又雨。",
+        "luck": "喬松方出土，難得生嫩枝。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3371,
+      "pdf_page": 103,
+      "cells": {
+        "male": "博浪沙中立，海濱車駕行。",
+        "female": "天生連理枝，莫遣風霜苦。",
+        "luck": "有金無火鍊，作器恐無期。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2272,
+      "pdf_page": 103,
+      "cells": {
+        "male": "隨山刊古木，鮮食奠山川。",
+        "female": "緣分宜嬌客，難教桂丁香。",
+        "luck": "明珠生蚌內，方寸自然光。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2373,
+      "pdf_page": 103,
+      "cells": {
+        "male": "上陽宮裡人，相伴白雲宿。",
+        "female": "天外彩雲飛，化作白雲去。",
+        "luck": "工師得大木，以勝棟梁材。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2474,
+      "pdf_page": 103,
+      "cells": {
+        "male": "庭月射花影，散作五更怨。",
+        "female": "雖是好羅裙，猶同紗○裡。",
+        "luck": "廣大置車輪，行雖由正路。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2575,
+      "pdf_page": 103,
+      "cells": {
+        "male": "馬陵書大字，鬥志有孫龐。",
+        "female": "鶯花春世界，咫尺近春逢。",
+        "luck": "春魚方跳躍，得勢漫東流。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3373,
+      "inherited_wrong_number": 3372,
+      "pdf_page": 104,
+      "cells": {
+        "male": "象取斗中氣，天邊柳絮飛。",
+        "female": "樓上有神仙，人間無去客。",
+        "luck": "鞭生庭下長，養竹自萌芽。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2274,
+      "pdf_page": 104,
+      "cells": {
+        "male": "用缶納自牖，泥途中得興。",
+        "female": "冰骨玉肌膚，夏日當炎暑。",
+        "luck": "一刀還兩段，過意即分明。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2375,
+      "pdf_page": 104,
+      "cells": {
+        "male": "金燈對月華，燕疊畫梁巢。",
+        "female": "紅顏對明鏡，幾度插花新。",
+        "luck": "男兒衣祿好，女子命還危。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2476,
+      "pdf_page": 104,
+      "cells": {
+        "male": "水由地中行，江漢朝宗海。",
+        "female": "結髮望齊眉，莫負恩與愛。",
+        "luck": "酩酊見衝盃，性真正自在。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3375,
+      "pdf_page": 104,
+      "cells": {
+        "male": "東山煙霞佈，木棹入扁舟。",
+        "female": "風動玉欄杆，驚醒花間夢。",
+        "luck": "戰馬得金聲，雄心期便振。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2276,
+      "pdf_page": 104,
+      "cells": {
+        "male": "鴻鵠竟飛鳴，深居而簡出。",
+        "female": "夏木黃鸝語，梧桐葉早秋。",
+        "luck": "聲傳空谷處，影浸清波下。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 2377,
+      "pdf_page": 104,
+      "cells": {
+        "male": "天涯一望中，燕雀任來往。",
+        "female": "一花雙結子，惟恐到頭難。",
+        "luck": "石上磨玉簪，不測中有折。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3377,
+      "pdf_page": 104,
+      "cells": {
+        "male": "雷聲震天地，草木絕其根。",
+        "female": "晝夕掩重門，虛空久寂寞。",
+        "luck": "固壘○○處，隄防有不虞。"
+      },
+      "reading_revisions": {
+        "female": {
+          "previous_text": "□夕掩重門，虛空久寂寞。",
+          "previous_cell_status": "source_reading_uncertain",
+          "previous_collation_version": "1.10.0",
+          "note": "原圖首字下部日及底一可辨，錄晝字形；與同頁畫梁的田部字形分開，不據晝夕熟語補讀。晝亦可作畫的異體，此處字形確認不自動裁定詞義。",
+          "rereading_id": "canping_earth_native_rereading_v1",
+          "source_pdf_page": 104
+        }
+      }
+    },
+    {
+      "element": "土",
+      "number": 2278,
+      "pdf_page": 104,
+      "cells": {
+        "male": "乘槎浮海上，四面任風吹。",
+        "female": "骨肉前緣定，修持好閒空。",
+        "luck": "遊舟入水中，進退不由己。"
+      }
+    },
+    {
+      "element": "土",
+      "number": 3379,
+      "pdf_page": 104,
+      "cells": {
+        "male": "八尺長燈檠，清光射白晝。",
+        "female": "長檠照珠翠，燭影怕風吹。",
+        "luck": "塞翁須失馬，反禍又成福。"
+      }
+    }
+  ],
+  "unapplied_notes": [
+    {
+      "printed_number": 2869,
+      "pdf_page": 105,
+      "text": "陰陽皆失位，無極自失宜。流年如遇火，一死復何疑。",
+      "status": "printed_number_unreachable_by_examined_formula; column_and_scope_unresolved",
+      "applied_to_lookup": false
+    }
+  ],
+  "rereading_witness": {
+    "fixture_id": "canping_water_native_rereading_v1",
+    "source_catalog_url": "https://www.digital.archives.go.jp/file/3611497",
+    "source_item_url": "https://www.digital.archives.go.jp/item/3671442",
+    "source_manifest_url": "https://www.digital.archives.go.jp/api/iiif/3671442/manifest.json",
+    "source_manifest_sha256": "726d756f5322fe9fd9fd07f3beb5e75fcf63a182b1942dfb4ec777ceeb9cc9c2",
+    "same_copy_pdf_sha256": "199c7c1100a86857bc6973da4f0cfb27be473fdd5ede7b0241fc8cdb101877ea",
+    "review_status": "same_reviewer_higher_resolution_rereading; independent_second_review_pending",
+    "policy": "All forty previously uncertain water cells re-examined. Original-coordinate IIIF regions each return 2950x2200 pixels; four regions cover the declared 5900x4400 canvas without interpolation. Whole max requests return only 3000x2237. Regions are the same catalogue copy, not a new edition, independent reviewer, new numbered cell, calendar instant or worked horoscope. Prior uncertain readings remain in revision metadata; no completion target used to infer glyphs. Punctuation and conventional forms are editorial.",
+    "reviewed_previous_uncertain_cells": 40,
+    "resolved_cells": 30,
+    "still_uncertain_cells": 10,
+    "new_numbered_cells_examined": 0,
+    "new_independent_reviews": 0,
+    "pages": [
+      {
+        "pdf_page": 66,
+        "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098368900/iiif/M2014071420263467326_0066.jp2",
+        "canvas_dimensions": [
+          5900,
+          4400
+        ],
+        "full_request_actual_dimensions": [
+          3000,
+          2237
+        ],
+        "regions": [
+          {
+            "region": [
+              0,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098368900/iiif/M2014071420263467326_0066.jp2/0,0,2950,2200/full/0/native.jpg",
+            "sha256": "a42ed8fce49c4f090c9564a7dbaa1ba57c798ee53abf10173083ae411689a5b0"
+          },
+          {
+            "region": [
+              2950,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098368900/iiif/M2014071420263467326_0066.jp2/2950,0,2950,2200/full/0/native.jpg",
+            "sha256": "51d2d03e5ac7e785ca7d431861f7e2b1ed660495a8d3fe30a810e3d5900ce566"
+          },
+          {
+            "region": [
+              0,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098368900/iiif/M2014071420263467326_0066.jp2/0,2200,2950,2200/full/0/native.jpg",
+            "sha256": "425572e5c043b2111653ee5406402427f4381b2102b37f38d6369b3e70f484e1"
+          },
+          {
+            "region": [
+              2950,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098368900/iiif/M2014071420263467326_0066.jp2/2950,2200,2950,2200/full/0/native.jpg",
+            "sha256": "857a384fe0844dd5a72ab7aa3f4a007f699e76333fb69f16331027a9edea0039"
+          }
+        ]
+      },
+      {
+        "pdf_page": 67,
+        "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369000/iiif/M2014071420263467326_0067.jp2",
+        "canvas_dimensions": [
+          5900,
+          4400
+        ],
+        "full_request_actual_dimensions": [
+          3000,
+          2237
+        ],
+        "regions": [
+          {
+            "region": [
+              0,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369000/iiif/M2014071420263467326_0067.jp2/0,0,2950,2200/full/0/native.jpg",
+            "sha256": "eb8c1c4c508580f3c8d3aeb00b1bd32da35ba171927f2eaa4a2a243fb7a1440e"
+          },
+          {
+            "region": [
+              2950,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369000/iiif/M2014071420263467326_0067.jp2/2950,0,2950,2200/full/0/native.jpg",
+            "sha256": "d951b4bf1e261c6cb69ae566a9f9814f6ca5d9058ba0dbd258b36115ab7a09db"
+          },
+          {
+            "region": [
+              0,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369000/iiif/M2014071420263467326_0067.jp2/0,2200,2950,2200/full/0/native.jpg",
+            "sha256": "b15424735e89ae31260e5e66bcbd1dd84fa354765cc6b241718880e24ac7a51a"
+          },
+          {
+            "region": [
+              2950,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369000/iiif/M2014071420263467326_0067.jp2/2950,2200,2950,2200/full/0/native.jpg",
+            "sha256": "ba440a01853c5acd29f9c798a00421fb26a75c037623e192d11c1585580e6077"
+          }
+        ]
+      },
+      {
+        "pdf_page": 68,
+        "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369100/iiif/M2014071420263467326_0068.jp2",
+        "canvas_dimensions": [
+          5900,
+          4400
+        ],
+        "full_request_actual_dimensions": [
+          3000,
+          2237
+        ],
+        "regions": [
+          {
+            "region": [
+              0,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369100/iiif/M2014071420263467326_0068.jp2/0,0,2950,2200/full/0/native.jpg",
+            "sha256": "ec1db0702066f80836ad22c0232349f789877b167cdbf8852c8a6293236ecfa6"
+          },
+          {
+            "region": [
+              2950,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369100/iiif/M2014071420263467326_0068.jp2/2950,0,2950,2200/full/0/native.jpg",
+            "sha256": "c635c9a4ed677dad55ce79179bc669770b75b8c0f1b62f22328ac5612a674668"
+          },
+          {
+            "region": [
+              0,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369100/iiif/M2014071420263467326_0068.jp2/0,2200,2950,2200/full/0/native.jpg",
+            "sha256": "5284e2e8d9f13b8813e1c965c3949045ba00a34de5c6be7a7033aa4833fd6066"
+          },
+          {
+            "region": [
+              2950,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369100/iiif/M2014071420263467326_0068.jp2/2950,2200,2950,2200/full/0/native.jpg",
+            "sha256": "01cddbe030f51e789ab684ae3b2405c31e2321d5cf2dc5e0797f015aebeee264"
+          }
+        ]
+      },
+      {
+        "pdf_page": 69,
+        "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369200/iiif/M2014071420263467326_0069.jp2",
+        "canvas_dimensions": [
+          5900,
+          4400
+        ],
+        "full_request_actual_dimensions": [
+          3000,
+          2237
+        ],
+        "regions": [
+          {
+            "region": [
+              0,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369200/iiif/M2014071420263467326_0069.jp2/0,0,2950,2200/full/0/native.jpg",
+            "sha256": "4757dd5f70bde6185ae196626f5c49aaf079cb9ea3ae24125c1e7b26c255ac3a"
+          },
+          {
+            "region": [
+              2950,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369200/iiif/M2014071420263467326_0069.jp2/2950,0,2950,2200/full/0/native.jpg",
+            "sha256": "335a810481a212f7d8d3a4bcd2c393fffb766fd53c2596b42aded31b4f5d4a0f"
+          },
+          {
+            "region": [
+              0,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369200/iiif/M2014071420263467326_0069.jp2/0,2200,2950,2200/full/0/native.jpg",
+            "sha256": "fe54d064a61397d489f75ab44d0ff3a5d1b662f9275f5ad3baea1566cf567c07"
+          },
+          {
+            "region": [
+              2950,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369200/iiif/M2014071420263467326_0069.jp2/2950,2200,2950,2200/full/0/native.jpg",
+            "sha256": "3039ec363126e927f54643b413e27a66fe11c527e93bf21672af25c362bdc745"
+          }
+        ]
+      },
+      {
+        "pdf_page": 70,
+        "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369300/iiif/M2014071420263467326_0070.jp2",
+        "canvas_dimensions": [
+          5900,
+          4400
+        ],
+        "full_request_actual_dimensions": [
+          3000,
+          2237
+        ],
+        "regions": [
+          {
+            "region": [
+              0,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369300/iiif/M2014071420263467326_0070.jp2/0,0,2950,2200/full/0/native.jpg",
+            "sha256": "09300a90f8beb21027223e28759a0cb7fc121d16960795afd62fb7249c3acd42"
+          },
+          {
+            "region": [
+              2950,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369300/iiif/M2014071420263467326_0070.jp2/2950,0,2950,2200/full/0/native.jpg",
+            "sha256": "6635639a95cb592a388b5e0dcea6739adc3f73e81f8ed638a0bc1810d5f308c0"
+          },
+          {
+            "region": [
+              0,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369300/iiif/M2014071420263467326_0070.jp2/0,2200,2950,2200/full/0/native.jpg",
+            "sha256": "e8e652a871e328ae75ca2f2b0a27e1f9bab826a3c461df49160404cbefd97440"
+          },
+          {
+            "region": [
+              2950,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369300/iiif/M2014071420263467326_0070.jp2/2950,2200,2950,2200/full/0/native.jpg",
+            "sha256": "4442467a8b62e43b76166df8aafca53abe6b7967e57ce53fbd9794453f25e2ab"
+          }
+        ]
+      },
+      {
+        "pdf_page": 71,
+        "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369400/iiif/M2014071420263467326_0071.jp2",
+        "canvas_dimensions": [
+          5900,
+          4400
+        ],
+        "full_request_actual_dimensions": [
+          3000,
+          2237
+        ],
+        "regions": [
+          {
+            "region": [
+              0,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369400/iiif/M2014071420263467326_0071.jp2/0,0,2950,2200/full/0/native.jpg",
+            "sha256": "07cf150566cc1bc9f94587200a41a6ce4562bec7ae50c506dbf4827a48d79b42"
+          },
+          {
+            "region": [
+              2950,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369400/iiif/M2014071420263467326_0071.jp2/2950,0,2950,2200/full/0/native.jpg",
+            "sha256": "a9c1992d9ec45c5b055820b203fa5c7383884bb95b83eca0b998b14bb49c7be0"
+          },
+          {
+            "region": [
+              0,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369400/iiif/M2014071420263467326_0071.jp2/0,2200,2950,2200/full/0/native.jpg",
+            "sha256": "72b7a639aae01a55d80539feed80fb8a5e4fcfd0a559dc1260f5d33c50997ce6"
+          },
+          {
+            "region": [
+              2950,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369400/iiif/M2014071420263467326_0071.jp2/2950,2200,2950,2200/full/0/native.jpg",
+            "sha256": "42d8027a3f07b490721436333710e38dcd77797f0f3e569b313b14737652b8c2"
+          }
+        ]
+      },
+      {
+        "pdf_page": 72,
+        "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369500/iiif/M2014071420263467326_0072.jp2",
+        "canvas_dimensions": [
+          5900,
+          4400
+        ],
+        "full_request_actual_dimensions": [
+          3000,
+          2237
+        ],
+        "regions": [
+          {
+            "region": [
+              0,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369500/iiif/M2014071420263467326_0072.jp2/0,0,2950,2200/full/0/native.jpg",
+            "sha256": "f52d5c35ccbc39f1b3b4f24eba79f7a199f3e7b9180ca075c4078402f5c5edf6"
+          },
+          {
+            "region": [
+              2950,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369500/iiif/M2014071420263467326_0072.jp2/2950,0,2950,2200/full/0/native.jpg",
+            "sha256": "a4113b4909c3bfccffd4f75397103233f071732adb95083ccbbf88fa3f9f0ff4"
+          },
+          {
+            "region": [
+              0,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369500/iiif/M2014071420263467326_0072.jp2/0,2200,2950,2200/full/0/native.jpg",
+            "sha256": "e1e19b2dfc57a461bb6f2f1c8a2de1c3a888fe40b5dddf0201d4b2f15219e739"
+          },
+          {
+            "region": [
+              2950,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369500/iiif/M2014071420263467326_0072.jp2/2950,2200,2950,2200/full/0/native.jpg",
+            "sha256": "7237714443c0f86cdf75e70aaac4a1bea9c014364d148602280e93ee9c482987"
+          }
+        ]
+      }
+    ]
+  },
+  "number_reading_witness": {
+    "fixture_id": "canping_native_header_observation_v1",
+    "source_item_url": "https://www.digital.archives.go.jp/item/3671442",
+    "source_manifest_url": "https://www.digital.archives.go.jp/api/iiif/3671442/manifest.json",
+    "source_manifest_sha256": "726d756f5322fe9fd9fd07f3beb5e75fcf63a182b1942dfb4ec777ceeb9cc9c2",
+    "same_copy_pdf_sha256": "199c7c1100a86857bc6973da4f0cfb27be473fdd5ede7b0241fc8cdb101877ea",
+    "review_status": "same_reviewer_native_header_rereading; all_six_headers_unresolved; independent_second_review_pending",
+    "scope": "Six previously obscured number headers only, not new body collation. Twenty original-coordinate regions cover five native canvases. Body states are separated using the retained prior literal body transcriptions and markers; they do not establish source-number attribution or semantic interpretation. Five headers have seal overprint, one has a faded digit. All six remain unresolved; no number is filled from inherited keys, adjacent sequence, formulas or another edition.",
+    "headers": [
+      {
+        "element": "火",
+        "provisional_number": 2743,
+        "pdf_page": 77,
+        "observed_header": "□□□□",
+        "obstruction_kind": "seal_overprint",
+        "note": "印章直接覆蓋號碼，原圖仍不能完整辨定；不按繼承鍵或相鄰行序補號。",
+        "resolution_status": "unresolved"
+      },
+      {
+        "element": "火",
+        "provisional_number": 2248,
+        "pdf_page": 80,
+        "observed_header": "□□四八",
+        "obstruction_kind": "seal_overprint",
+        "note": "首兩位被印章覆蓋，四八殘字可見，完整號碼仍未定。",
+        "resolution_status": "unresolved"
+      },
+      {
+        "element": "木",
+        "provisional_number": 2816,
+        "pdf_page": 84,
+        "observed_header": "□八一六",
+        "obstruction_kind": "faded_digit",
+        "note": "八一六可見，首位橫畫淡損，本輪仍不將首位補作二或三。",
+        "resolution_status": "unresolved"
+      },
+      {
+        "element": "木",
+        "provisional_number": 2917,
+        "pdf_page": 84,
+        "observed_header": "□□□□",
+        "obstruction_kind": "seal_overprint",
+        "note": "號碼被印章覆蓋，殘畫不足以完整判讀，不依鄰行與公式補定。",
+        "resolution_status": "unresolved"
+      },
+      {
+        "element": "木",
+        "provisional_number": 3315,
+        "pdf_page": 86,
+        "observed_header": "□□□□",
+        "obstruction_kind": "seal_overprint",
+        "note": "印章壓住編號，未能穩定分離字形，不把印章殘筆當作完整號碼。",
+        "resolution_status": "unresolved"
+      },
+      {
+        "element": "木",
+        "provisional_number": 2424,
+        "pdf_page": 88,
+        "observed_header": "□□□□",
+        "obstruction_kind": "seal_overprint",
+        "note": "印章與淡損並存；可見四形殘字但位次及完整號碼未定，不按繼承鍵補定。",
+        "resolution_status": "unresolved"
+      }
+    ],
+    "header_count": 6,
+    "headers_resolved": 0,
+    "headers_still_uncertain": 6,
+    "affected_cells": 18,
+    "new_confirmed_cells": 0,
+    "new_numbered_cells_examined": 0,
+    "new_independent_reviews": 0,
+    "pages": [
+      {
+        "pdf_page": 77,
+        "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370000/iiif/M2014071420263467326_0077.jp2",
+        "canvas_dimensions": [
+          5900,
+          4400
+        ],
+        "regions": [
+          {
+            "region": [
+              0,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370000/iiif/M2014071420263467326_0077.jp2/0,0,2950,2200/full/0/native.jpg",
+            "sha256": "1f0682710bbffeb2dbf44b87da29cfe537ebd51a4ee2cd281419536a83a827e6"
+          },
+          {
+            "region": [
+              2950,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370000/iiif/M2014071420263467326_0077.jp2/2950,0,2950,2200/full/0/native.jpg",
+            "sha256": "c337e52b0be78fc824f2abd6ef5be60d1dd2582263553301cbb1b6943ddee650"
+          },
+          {
+            "region": [
+              0,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370000/iiif/M2014071420263467326_0077.jp2/0,2200,2950,2200/full/0/native.jpg",
+            "sha256": "2551b53fa40f1fa871fccf4d46504b6bd4cb5f68d630e36ed38c08e1786d946d"
+          },
+          {
+            "region": [
+              2950,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370000/iiif/M2014071420263467326_0077.jp2/2950,2200,2950,2200/full/0/native.jpg",
+            "sha256": "8fe698f2e1d6222153ad7646931f66da9efacf021a53eaa80787e2f3774a5f59"
+          }
+        ]
+      },
+      {
+        "pdf_page": 80,
+        "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370300/iiif/M2014071420263467326_0080.jp2",
+        "canvas_dimensions": [
+          5900,
+          4400
+        ],
+        "regions": [
+          {
+            "region": [
+              0,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370300/iiif/M2014071420263467326_0080.jp2/0,0,2950,2200/full/0/native.jpg",
+            "sha256": "0d705cafbdce5ea48998e1a4e6037d0ceb74f6d5c05abb7f1bf029b8b599529e"
+          },
+          {
+            "region": [
+              2950,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370300/iiif/M2014071420263467326_0080.jp2/2950,0,2950,2200/full/0/native.jpg",
+            "sha256": "df3596a0d4f57d609695bd9bc22a868a6a6b1a08b5a4147a0e06b9299f0b1219"
+          },
+          {
+            "region": [
+              0,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370300/iiif/M2014071420263467326_0080.jp2/0,2200,2950,2200/full/0/native.jpg",
+            "sha256": "925894b16bd1e17b92042ceae93aeb34427849a0b00d7ac7cc6dc01b8fd5b210"
+          },
+          {
+            "region": [
+              2950,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370300/iiif/M2014071420263467326_0080.jp2/2950,2200,2950,2200/full/0/native.jpg",
+            "sha256": "280c54a2674519615c9fe79265b5c13d365d3be01af8c7f181035c957bee57c2"
+          }
+        ]
+      },
+      {
+        "pdf_page": 84,
+        "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370700/iiif/M2014071420263467326_0084.jp2",
+        "canvas_dimensions": [
+          5900,
+          4400
+        ],
+        "regions": [
+          {
+            "region": [
+              0,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370700/iiif/M2014071420263467326_0084.jp2/0,0,2950,2200/full/0/native.jpg",
+            "sha256": "7ae212437ac2c44fdb8268045d8e6cf9bb112452173e9529a6064b1819df76ab"
+          },
+          {
+            "region": [
+              2950,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370700/iiif/M2014071420263467326_0084.jp2/2950,0,2950,2200/full/0/native.jpg",
+            "sha256": "cad2e3d92af495adec029134565c9db6cf4d13ae16c58ca108649c4ddd5c6da4"
+          },
+          {
+            "region": [
+              0,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370700/iiif/M2014071420263467326_0084.jp2/0,2200,2950,2200/full/0/native.jpg",
+            "sha256": "8d97ec9c669967a7a2887b1200e3f1501d40080f06f3fe17b7b6b67d5fc2229d"
+          },
+          {
+            "region": [
+              2950,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370700/iiif/M2014071420263467326_0084.jp2/2950,2200,2950,2200/full/0/native.jpg",
+            "sha256": "2492289ed858393cb45b0535d5ebed184f97b3899f43f30704dd8fe9df561579"
+          }
+        ]
+      },
+      {
+        "pdf_page": 86,
+        "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370900/iiif/M2014071420263467326_0086.jp2",
+        "canvas_dimensions": [
+          5900,
+          4400
+        ],
+        "regions": [
+          {
+            "region": [
+              0,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370900/iiif/M2014071420263467326_0086.jp2/0,0,2950,2200/full/0/native.jpg",
+            "sha256": "4060dac29b65cfc8706dc78fd6aabce27761e440b5601c323d04ffc203d0091b"
+          },
+          {
+            "region": [
+              2950,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370900/iiif/M2014071420263467326_0086.jp2/2950,0,2950,2200/full/0/native.jpg",
+            "sha256": "835dc925cd02c9b46c77438336cadd1e4d7c5eab16a742047beb95d83e9d6304"
+          },
+          {
+            "region": [
+              0,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370900/iiif/M2014071420263467326_0086.jp2/0,2200,2950,2200/full/0/native.jpg",
+            "sha256": "544ef7ce042b129416e1af0da80181cb554b507b1ff8412620e8cc795484f684"
+          },
+          {
+            "region": [
+              2950,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370900/iiif/M2014071420263467326_0086.jp2/2950,2200,2950,2200/full/0/native.jpg",
+            "sha256": "9966262bfafe4725d785ea86b4db36e030bb68ff2e55db7467e13d417e6e0e5b"
+          }
+        ]
+      },
+      {
+        "pdf_page": 88,
+        "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371100/iiif/M2014071420263467326_0088.jp2",
+        "canvas_dimensions": [
+          5900,
+          4400
+        ],
+        "regions": [
+          {
+            "region": [
+              0,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371100/iiif/M2014071420263467326_0088.jp2/0,0,2950,2200/full/0/native.jpg",
+            "sha256": "63341759e4da76f42104882919f4f3bee5691a4d62a4794b6f58e371865f4004"
+          },
+          {
+            "region": [
+              2950,
+              0,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371100/iiif/M2014071420263467326_0088.jp2/2950,0,2950,2200/full/0/native.jpg",
+            "sha256": "a4e2b7617975c490a5dac897cae3b1a953d3b5db42e3b67767d4a866b061451c"
+          },
+          {
+            "region": [
+              0,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371100/iiif/M2014071420263467326_0088.jp2/0,2200,2950,2200/full/0/native.jpg",
+            "sha256": "1f3451010914e0df8d3b8cd0f12565ef3e9c3fc345f4d75cfb91bf4561919e79"
+          },
+          {
+            "region": [
+              2950,
+              2200,
+              2950,
+              2200
+            ],
+            "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371100/iiif/M2014071420263467326_0088.jp2/2950,2200,2950,2200/full/0/native.jpg",
+            "sha256": "fd5aac34274b92838c41df3c38d2326e49ad17cca5d76217cc7a0018a01f96c8"
+          }
+        ]
+      }
+    ]
+  },
+  "additional_rereading_witnesses": [
+    {
+      "fixture_id": "canping_fire_native_rereading_v1",
+      "element": "火",
+      "source_catalog_url": "https://www.digital.archives.go.jp/file/3611497",
+      "source_item_url": "https://www.digital.archives.go.jp/item/3671442",
+      "source_manifest_url": "https://www.digital.archives.go.jp/api/iiif/3671442/manifest.json",
+      "source_manifest_sha256": "726d756f5322fe9fd9fd07f3beb5e75fcf63a182b1942dfb4ec777ceeb9cc9c2",
+      "same_copy_pdf_sha256": "199c7c1100a86857bc6973da4f0cfb27be473fdd5ede7b0241fc8cdb101877ea",
+      "review_status": "same_reviewer_native_body_rereading; independent_second_review_pending",
+      "policy": "Reexamine eleven previously uncertain fire bodies whose number headers were already read. Six cells have clear literal readings, five retain uncertainty; one retained cell gains a readable 暗 but its final glyph remains unresolved. No completion target, inherited string or familiar phrase resolves ambiguous glyphs. Twenty-four native-coordinate regions cover six same-copy canvases, eight regions reused from the header fixture and sixteen newly stored; an overlapping small-glyph request is only a temporary reading aid. Same reviewer, no independent second review or edition. No new numbered cells, classical horoscopes, calendar instants or real-world outcomes.",
+      "reviewed_previous_uncertain_cells": 11,
+      "resolved_cells": 6,
+      "still_uncertain_cells": 5,
+      "new_numbered_cells_examined": 0,
+      "new_independent_reviews": 0,
+      "new_classical_birth_examples": 0,
+      "new_independent_calendar_instants": 0,
+      "new_real_world_outcomes": 0,
+      "native_region_count": 24,
+      "reused_region_count": 8,
+      "new_stored_region_count": 16,
+      "pages": [
+        {
+          "pdf_page": 74,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369700/iiif/M2014071420263467326_0074.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369700/iiif/M2014071420263467326_0074.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "85db69f2691caea42b1b2819a61d6669905bab39e6c92dc2988e088ff712335e"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369700/iiif/M2014071420263467326_0074.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "816538acc24fc57ba98e5cf88b0b0e6db682f6a9d23be9f9f6a216da861ec2c5"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369700/iiif/M2014071420263467326_0074.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "600a080f8a780d4e717773c1631572f5cad4bdddbc64d659a34b38e46a0548ae"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369700/iiif/M2014071420263467326_0074.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "9e7f584331e05057942c4b5646c63911a2afcb3cbd16720244084711077e5d75"
+            }
+          ]
+        },
+        {
+          "pdf_page": 76,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369900/iiif/M2014071420263467326_0076.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369900/iiif/M2014071420263467326_0076.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "25651d90946f91f570804412fa5fea45bd4fb5ae1bb8243940d6de640ae0e821"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369900/iiif/M2014071420263467326_0076.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "743d730901248fbfc26ab8a60a161db347aaa56e4739a8c374da5a902962836b"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369900/iiif/M2014071420263467326_0076.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "ab209ad30b9327bc69ba6db6dff2a98d66d8ae02463e6c2c2a616c6a3d916aa0"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098369900/iiif/M2014071420263467326_0076.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "1043397fa5537588ff73ebb1304194b307ff881334f4896c23c34fcd106c24d0"
+            }
+          ]
+        },
+        {
+          "pdf_page": 77,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370000/iiif/M2014071420263467326_0077.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370000/iiif/M2014071420263467326_0077.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "1f0682710bbffeb2dbf44b87da29cfe537ebd51a4ee2cd281419536a83a827e6"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370000/iiif/M2014071420263467326_0077.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "c337e52b0be78fc824f2abd6ef5be60d1dd2582263553301cbb1b6943ddee650"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370000/iiif/M2014071420263467326_0077.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "2551b53fa40f1fa871fccf4d46504b6bd4cb5f68d630e36ed38c08e1786d946d"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370000/iiif/M2014071420263467326_0077.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "8fe698f2e1d6222153ad7646931f66da9efacf021a53eaa80787e2f3774a5f59"
+            }
+          ]
+        },
+        {
+          "pdf_page": 78,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370100/iiif/M2014071420263467326_0078.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370100/iiif/M2014071420263467326_0078.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "9c821457b671026f75d7263d92ea44d6f6e3bed304c4612aaa2aa60849dd82fa"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370100/iiif/M2014071420263467326_0078.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "cc668ab412c8ab6390820a0d709527de883767dd6e44194fe5fe648119100c3e"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370100/iiif/M2014071420263467326_0078.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "a992f2580401a41c853a89bfddfd5ba2946d1edc7a619c927af3889be93eba3a"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370100/iiif/M2014071420263467326_0078.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "e9ce86b481d89265d7cdfd9810d94ad3f119ecff93d29dfef231cce208b0d707"
+            }
+          ]
+        },
+        {
+          "pdf_page": 79,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370200/iiif/M2014071420263467326_0079.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370200/iiif/M2014071420263467326_0079.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "eabd5f66df18cb453f20c9bc84713108a2fb0f15ad9ac5cc51273cda806247e5"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370200/iiif/M2014071420263467326_0079.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "8f5fedc74b408f595be4471d10f1dd20d5493309390f67be4db03ea91e997290"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370200/iiif/M2014071420263467326_0079.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "19449e750b0f04c851c322b45ff2ed548b591dac7a009458f5d24ff96c05e8ec"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370200/iiif/M2014071420263467326_0079.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "35b6fca41d90ce7a744ffbd5b331429039ddca30495da8f224c6c90ae6bc4381"
+            }
+          ]
+        },
+        {
+          "pdf_page": 80,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370300/iiif/M2014071420263467326_0080.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370300/iiif/M2014071420263467326_0080.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "0d705cafbdce5ea48998e1a4e6037d0ceb74f6d5c05abb7f1bf029b8b599529e"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370300/iiif/M2014071420263467326_0080.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "df3596a0d4f57d609695bd9bc22a868a6a6b1a08b5a4147a0e06b9299f0b1219"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370300/iiif/M2014071420263467326_0080.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "925894b16bd1e17b92042ceae93aeb34427849a0b00d7ac7cc6dc01b8fd5b210"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370300/iiif/M2014071420263467326_0080.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "280c54a2674519615c9fe79265b5c13d365d3be01af8c7f181035c957bee57c2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fixture_id": "canping_wood_native_rereading_v1",
+      "element": "木",
+      "source_catalog_url": "https://www.digital.archives.go.jp/file/3611497",
+      "source_item_url": "https://www.digital.archives.go.jp/item/3671442",
+      "source_manifest_url": "https://www.digital.archives.go.jp/api/iiif/3671442/manifest.json",
+      "source_manifest_sha256": "726d756f5322fe9fd9fd07f3beb5e75fcf63a182b1942dfb4ec777ceeb9cc9c2",
+      "same_copy_pdf_sha256": "199c7c1100a86857bc6973da4f0cfb27be473fdd5ede7b0241fc8cdb101877ea",
+      "review_status": "same_reviewer_native_body_rereading; independent_second_review_pending",
+      "policy": "Reexamine four previously uncertain wood bodies whose number headers were read. Three literal readings resolved; one cell gains 傾 while the next glyph remains ambiguous and is not promoted. Unusual 撫手, 玉藍 and 門帳 readings retained without rewriting to familiar phrases. Sixteen native-coordinate regions cover four same-copy canvases: eight reused header-fixture regions, eight newly stored. No new numbered cells, independent reviewer or edition, classical horoscope, calendar instant or real-world outcome. Prior water, fire and number-header witnesses remain intact.",
+      "reviewed_previous_uncertain_cells": 4,
+      "resolved_cells": 3,
+      "still_uncertain_cells": 1,
+      "new_numbered_cells_examined": 0,
+      "new_independent_reviews": 0,
+      "new_classical_birth_examples": 0,
+      "new_independent_calendar_instants": 0,
+      "new_real_world_outcomes": 0,
+      "native_region_count": 16,
+      "reused_region_count": 8,
+      "new_stored_region_count": 8,
+      "pages": [
+        {
+          "pdf_page": 81,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370400/iiif/M2014071420263467326_0081.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370400/iiif/M2014071420263467326_0081.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "e492baf5b694c45d7d7b94db2cca48c8905a54d69ddc1794a7288f380f4695ea"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370400/iiif/M2014071420263467326_0081.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "b18d841fd02cfc375d3db2b06809fb89c088d94a071edefe7873bc459a3acded"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370400/iiif/M2014071420263467326_0081.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "0aa74ac4835d99b65366228c737825f22a33b0d3f85e1b143eae357b52778cf6"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370400/iiif/M2014071420263467326_0081.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "a6ed53f491a9a2c8e927e33fff3da4817fad944954947286c74f36f40eaca5ed"
+            }
+          ]
+        },
+        {
+          "pdf_page": 84,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370700/iiif/M2014071420263467326_0084.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370700/iiif/M2014071420263467326_0084.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "7ae212437ac2c44fdb8268045d8e6cf9bb112452173e9529a6064b1819df76ab"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370700/iiif/M2014071420263467326_0084.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "cad2e3d92af495adec029134565c9db6cf4d13ae16c58ca108649c4ddd5c6da4"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370700/iiif/M2014071420263467326_0084.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "8d97ec9c669967a7a2887b1200e3f1501d40080f06f3fe17b7b6b67d5fc2229d"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370700/iiif/M2014071420263467326_0084.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "2492289ed858393cb45b0535d5ebed184f97b3899f43f30704dd8fe9df561579"
+            }
+          ]
+        },
+        {
+          "pdf_page": 85,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370800/iiif/M2014071420263467326_0085.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370800/iiif/M2014071420263467326_0085.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "5978860ae7dafb36f5cb3b4cb8f6068036c9e7f9df82a576197ccee9a092ece9"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370800/iiif/M2014071420263467326_0085.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "42e54d12b2c637b214b11f9ecab75115c36eb3365fbe68c4e70c44301adee2ea"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370800/iiif/M2014071420263467326_0085.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "1e5a7f419b408cea1c1088d09f5eb601b243917b63ab54d8a65ad1886b74b956"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370800/iiif/M2014071420263467326_0085.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "04acd917de72583ca98fc6bbe20040dd510f66585429a7a0b8b2cb8dc5693394"
+            }
+          ]
+        },
+        {
+          "pdf_page": 86,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370900/iiif/M2014071420263467326_0086.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370900/iiif/M2014071420263467326_0086.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "4060dac29b65cfc8706dc78fd6aabce27761e440b5601c323d04ffc203d0091b"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370900/iiif/M2014071420263467326_0086.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "835dc925cd02c9b46c77438336cadd1e4d7c5eab16a742047beb95d83e9d6304"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370900/iiif/M2014071420263467326_0086.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "544ef7ce042b129416e1af0da80181cb554b507b1ff8412620e8cc795484f684"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098370900/iiif/M2014071420263467326_0086.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "9966262bfafe4725d785ea86b4db36e030bb68ff2e55db7467e13d417e6e0e5b"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fixture_id": "canping_gold_native_rereading_v1",
+      "element": "金",
+      "source_catalog_url": "https://www.digital.archives.go.jp/file/3611497",
+      "source_item_url": "https://www.digital.archives.go.jp/item/3671442",
+      "source_manifest_url": "https://www.digital.archives.go.jp/api/iiif/3671442/manifest.json",
+      "source_manifest_sha256": "726d756f5322fe9fd9fd07f3beb5e75fcf63a182b1942dfb4ec777ceeb9cc9c2",
+      "same_copy_pdf_sha256": "199c7c1100a86857bc6973da4f0cfb27be473fdd5ede7b0241fc8cdb101877ea",
+      "review_status": "same_reviewer_native_body_rereading; independent_second_review_pending",
+      "policy": "Reexamine all fifteen previously uncertain gold bodies. Four whole-cell readings resolved; eleven remain uncertain, including the partial 花 recovery in 3314 luck. Preserve literal 麴蘖 and 追遊世; do not rewrite to familiar phrases or borrow 3314 female text. Twenty-eight native-coordinate regions cover seven same-copy canvases, all newly stored. No new numbered cells, independent reviewer or edition, classical horoscope, calendar instant or real-world outcome. Gold last-eleven source/inherited numbered-content differences remain separately unresolved; no numerical remapping. Prior water, fire, wood and number-header witnesses remain intact.",
+      "reviewed_previous_uncertain_cells": 15,
+      "resolved_cells": 4,
+      "still_uncertain_cells": 11,
+      "new_numbered_cells_examined": 0,
+      "new_independent_reviews": 0,
+      "new_classical_birth_examples": 0,
+      "new_independent_calendar_instants": 0,
+      "new_real_world_outcomes": 0,
+      "native_region_count": 28,
+      "reused_region_count": 0,
+      "new_stored_region_count": 28,
+      "pages": [
+        {
+          "pdf_page": 90,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371300/iiif/M2014071420263467326_0090.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371300/iiif/M2014071420263467326_0090.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "9f463fd7eaa7b510491a86de273cfe68b201df8a41f2d6afbebac715bca3b7b4"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371300/iiif/M2014071420263467326_0090.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "b13f02d09502f20def1e9eee1c555e467d83f0472aba806128ef15d53d5365c8"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371300/iiif/M2014071420263467326_0090.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "df1c079c96424b0104b3ba28b7386fe570ff80a060467236d1274a9a4e8af9ea"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371300/iiif/M2014071420263467326_0090.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "27d19424088a2accd07d4f283166af539b9bcc27272e2d0a08b169088b843380"
+            }
+          ]
+        },
+        {
+          "pdf_page": 91,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371400/iiif/M2014071420263467326_0091.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371400/iiif/M2014071420263467326_0091.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "57c2cdd0cc787cfc5be404a02b4a6a86ffdbc87a8d9d79cfe64e6cc4d3c13c3b"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371400/iiif/M2014071420263467326_0091.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "ecb7ad561fd1d117d6e541feead17af4c0aa3e242fc83b643aff1fc7a7c81472"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371400/iiif/M2014071420263467326_0091.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "37107b99f4cc97433176f079ef471b278c20dfdcf7128696930f61ac8c02b6b7"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371400/iiif/M2014071420263467326_0091.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "80063030c2d2827d9646726e37a6364bfa992e745db258864df545e9c4cdf732"
+            }
+          ]
+        },
+        {
+          "pdf_page": 92,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371500/iiif/M2014071420263467326_0092.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371500/iiif/M2014071420263467326_0092.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "68316bbe5bb16eca7f9e2590112339bd04e47ec0e0d74e5c9f0594d193fc98dc"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371500/iiif/M2014071420263467326_0092.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "bb0d3630be4f0fe5d6cfa227c4ee4280428974c87d554a9a7b3ee3c71c5b7e2c"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371500/iiif/M2014071420263467326_0092.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "8a9c362b3ac7860c330f38f8db8187ddc3d0272b301eaa6dc3fb22443cfaf932"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371500/iiif/M2014071420263467326_0092.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "69ced154a51de0f8bda8913aea850e48d1e0bc1b0c78a5123b15a641971ea0dc"
+            }
+          ]
+        },
+        {
+          "pdf_page": 93,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371600/iiif/M2014071420263467326_0093.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371600/iiif/M2014071420263467326_0093.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "f52b54001c0371f68f6fa6a66fbf40672e6206c18ce4a17457c73cafb3735652"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371600/iiif/M2014071420263467326_0093.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "4406412c8229d580637b9f0d2ec7c87674237a42c903886d49372c0fa1fc77ad"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371600/iiif/M2014071420263467326_0093.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "c708fd997542a10af6f926265c99645db6dc8d7cb3ae3d1d8b8a9a41fe0f75ee"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371600/iiif/M2014071420263467326_0093.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "2dec0a6029cd29c5101d387babaaac9df467f8482e96aa9842c2384b720e8b29"
+            }
+          ]
+        },
+        {
+          "pdf_page": 94,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371700/iiif/M2014071420263467326_0094.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371700/iiif/M2014071420263467326_0094.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "9f996d0ac2d640924b896d4d820a27d3549f6ae279d5abc5a0ad0d2dcaaee6de"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371700/iiif/M2014071420263467326_0094.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "53c2d51f978154c18301318a7ada11ae0d144b1359ebd8860b37d506d5cda3d6"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371700/iiif/M2014071420263467326_0094.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "26f2c922225149b6d61b0d534a63c04bfd6ac942117172e9394dd29a008758cf"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371700/iiif/M2014071420263467326_0094.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "c063fda005a54e35dc8d98b26a6fbe76b3fe0d21f46fce59df32a2c7d78f6051"
+            }
+          ]
+        },
+        {
+          "pdf_page": 95,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371800/iiif/M2014071420263467326_0095.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371800/iiif/M2014071420263467326_0095.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "ea824a568aa5c131b28f2313d1da058d9eb074f22a84025e39c860857cc940f1"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371800/iiif/M2014071420263467326_0095.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "1d65f5a46f4ad536e85e4cc51aec50b139d041529c025763b842c7c61c09edc5"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371800/iiif/M2014071420263467326_0095.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "95237ec4005ed28589d509408aab3363ef796b09e12a552a6d969f823114bd89"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371800/iiif/M2014071420263467326_0095.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "5c8e1038c644e615ccb5f049b7544c1f14785545794e5d45a63425890883421f"
+            }
+          ]
+        },
+        {
+          "pdf_page": 96,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371900/iiif/M2014071420263467326_0096.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371900/iiif/M2014071420263467326_0096.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "39f217472e16267a671c49f67db2037f8b25616148be8379de07abd3eca2c3af"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371900/iiif/M2014071420263467326_0096.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "a6e8ce98c97e5a5f57b78a352ee015d2b5fedf8e91c09a474215cfa16d76f735"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371900/iiif/M2014071420263467326_0096.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "5d73a1d07ea4fa5a4a5ecfae7e75fe390a13ad89b3e0e1172fcd45d84c65a14a"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098371900/iiif/M2014071420263467326_0096.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "b236286ebed456ffe2b9009bf51a0768b57d4a1696118992455795ee7f9f7d9b"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fixture_id": "canping_earth_native_rereading_v1",
+      "element": "土",
+      "source_catalog_url": "https://www.digital.archives.go.jp/file/3611497",
+      "source_item_url": "https://www.digital.archives.go.jp/item/3671442",
+      "source_manifest_url": "https://www.digital.archives.go.jp/api/iiif/3671442/manifest.json",
+      "source_manifest_sha256": "726d756f5322fe9fd9fd07f3beb5e75fcf63a182b1942dfb4ec777ceeb9cc9c2",
+      "same_copy_pdf_sha256": "199c7c1100a86857bc6973da4f0cfb27be473fdd5ede7b0241fc8cdb101877ea",
+      "review_status": "same_reviewer_native_body_rereading; independent_second_review_pending",
+      "policy": "Reexamine all three previously uncertain earth bodies. One resolved to the visible 晝 form; two remain uncertain. The same-page 3379 male cell was also compared and its existing 檠 and 晝 transcription is retained unchanged; an erroneous draft 擎/畫 correction was withdrawn after checking the actual prior JSON and source pixels. Official glyph dictionaries are ancillary character-form aids, not independent edition or reviewer evidence or proof of intended word sense. Twelve native regions cover three same-copy canvases. Prior water/fire/wood/gold and number-header witnesses remain intact. No new numbered cells, independent review, classical horoscope, calendar instant or outcome.",
+      "reviewed_cells": 3,
+      "reviewed_previous_uncertain_cells": 3,
+      "corrected_previously_clear_cells": 0,
+      "resolved_cells": 1,
+      "still_uncertain_cells": 2,
+      "new_numbered_cells_examined": 0,
+      "new_independent_reviews": 0,
+      "new_classical_birth_examples": 0,
+      "new_independent_calendar_instants": 0,
+      "new_real_world_outcomes": 0,
+      "native_region_count": 12,
+      "reused_region_count": 0,
+      "new_stored_region_count": 12,
+      "pages": [
+        {
+          "pdf_page": 97,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372000/iiif/M2014071420263467326_0097.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372000/iiif/M2014071420263467326_0097.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "df867a2b6ce7e2a6dbf2b9e8f3c9f91b385b29acb89ac8b1461180c453449b8f"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372000/iiif/M2014071420263467326_0097.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "0169cf8f5b23a3cbf41c7d5ac9afb1ff47573fa7dd0887fd080bcc5bdbc1ec6b"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372000/iiif/M2014071420263467326_0097.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "e6aee410596ca64fa052df99178753f24dea41bbd2915ed83451ad6aff051fd2"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372000/iiif/M2014071420263467326_0097.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "c86633fb3d4955e0ed4e062732d3bb2075cd0f7174cd016a066fa93f54b86e06"
+            }
+          ]
+        },
+        {
+          "pdf_page": 100,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372300/iiif/M2014071420263467326_0100.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372300/iiif/M2014071420263467326_0100.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "5685494762bad6c54fc58c15efef94c609af0e73f888c254cef27c47b8ea79ca"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372300/iiif/M2014071420263467326_0100.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "b25c7f625537c64475418017167a1090cc6c31113aa45135bdfb94e725c5a9db"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372300/iiif/M2014071420263467326_0100.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "e4e1835f9403cb063c4c57bb83653ff209bf49e6081746edf3ad96346a2ae7ba"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372300/iiif/M2014071420263467326_0100.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "d71b3a9ab555e3ff3b98b289e2cdca0b0b935f080cadf59be007c963baefb535"
+            }
+          ]
+        },
+        {
+          "pdf_page": 104,
+          "image_service_url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372700/iiif/M2014071420263467326_0104.jp2",
+          "canvas_dimensions": [
+            5900,
+            4400
+          ],
+          "regions": [
+            {
+              "region": [
+                0,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372700/iiif/M2014071420263467326_0104.jp2/0,0,2950,2200/full/0/native.jpg",
+              "sha256": "7dc8a9d3bb7df1f818c78b6405922c3fed9d31c9e239b27befaea9931410e3f5"
+            },
+            {
+              "region": [
+                2950,
+                0,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372700/iiif/M2014071420263467326_0104.jp2/2950,0,2950,2200/full/0/native.jpg",
+              "sha256": "9ca10f449e0ed50e16c19ce25aff9235bad9396c3a3bea3cd05c2af56b8d32cc"
+            },
+            {
+              "region": [
+                0,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372700/iiif/M2014071420263467326_0104.jp2/0,2200,2950,2200/full/0/native.jpg",
+              "sha256": "a60260b7638e089065944a51e82fe3eda31db49807ca2d5ebdfa39529e4d6f2b"
+            },
+            {
+              "region": [
+                2950,
+                2200,
+                2950,
+                2200
+              ],
+              "url": "https://www.digital.archives.go.jp/api/content/pub/da12/C101098372700/iiif/M2014071420263467326_0104.jp2/2950,2200,2950,2200/full/0/native.jpg",
+              "sha256": "861967f941aedda4bc2f5509605d1d83692d7801666285e8cd51eb699fc13958"
+            }
+          ]
+        }
+      ],
+      "reviewed_previous_clear_cells": 1
+    }
+  ]
+}

@@ -60,7 +60,12 @@ def command(name, inputs, flags):
 def protocol_call(inputs):
     async def call():
         async with Client(mcp.app) as client:
-            result = await client.call_tool("bazi_birth", inputs, raise_on_error=False)
+            # These assertions compare projection semantics against REST/CLI,
+            # both unlimited here. Actual 4096/8192 delivery envelopes and
+            # restoration are exercised by test_ephemeris_inventory_delivery.
+            result = await client.call_tool(
+                "bazi_birth", {"response_char_limit": 0, **inputs}, raise_on_error=False
+            )
             assert json.loads(result.content[0].text) == result.structured_content
             return result
 

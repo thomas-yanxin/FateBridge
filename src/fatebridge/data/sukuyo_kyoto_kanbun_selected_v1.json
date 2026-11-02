@@ -1,0 +1,346 @@
+{
+  "id": "kyoto_RB00018489_selected_kanbun_witness_v1",
+  "reference_frozen_at": "2026-10-25T21:20:03.778252+00:00",
+  "catalogue_and_manifest": {
+    "catalogue": {
+      "url": "https://rmda.kulib.kyoto-u.ac.jp/item/rb00018489",
+      "citation": "[京都大学官方目录](https://rmda.kulib.kyoto-u.ac.jp/item/rb00018489)",
+      "status": 200,
+      "bytes": 20375,
+      "sha256": "068e7b8607f1b667de3ae8a5522b4f7912b9c1e5f5d77c5f126f8f9c950b4f56",
+      "reported_title": "大日經疏指心鈔 十六巻",
+      "reported_author": "(僧)頼瑜著",
+      "reported_publication_year": "寛文1",
+      "reported_material_type": "刊",
+      "reported_volumes": 8,
+      "holder": "京都大学附属図書館",
+      "collection": "蔵経書院文庫",
+      "shelfmark": "日藏/未刊/60",
+      "registration_number": "291819",
+      "qualification": "刊年、著者及收藏身份在此归属官方目录；本次没有核读刊记来独立确认刊年。目录另明确记有墨书、朱书。"
+    },
+    "manifest": {
+      "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/metadata_manifest/RB00018489/manifest.json",
+      "citation": "[京都大学官方IIIF清单](https://rmda.kulib.kyoto-u.ac.jp/iiif/metadata_manifest/RB00018489/manifest.json)",
+      "status": 200,
+      "bytes": 986016,
+      "sha256": "62b773da058e22bc7c4d96382cb4e895d5c12b5ea3cc5e503d1998d795dd50bd",
+      "presentation_version": 3,
+      "canvas_count": 643,
+      "selected_volume_group": "03&04",
+      "selected_group_global_canvases": {
+        "first": 93,
+        "last": 176,
+        "count": 84
+      },
+      "qualification": "已解析完整清单结构；643帧或候选84帧不等于已逐页看完。"
+    }
+  },
+  "target_image": {
+    "canvas": 147,
+    "canvas_uri": "https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00018489/canvas/p147",
+    "native_image_uri": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00018489%2F03%2604%2FRB00018489_00147_0.ptif/full/max/0/default.jpg",
+    "status": 200,
+    "bytes": 3398280,
+    "sha256": "66daf7b7ca267dbdbfb6a325644e17c96b89eca15a60fdf1c028f474e5dfccc8",
+    "actual_decoded_dimensions": {
+      "width": 6016,
+      "height": 4016,
+      "format": "JPEG"
+    },
+    "location": {
+      "bound_volume_group": "卷第03&04合册",
+      "work_volume": "卷第四",
+      "page_side_in_image": "右页",
+      "visible_leaf_number": "十九",
+      "following_left_page_leaf_number": "二十",
+      "target_position": "右页下半“日行四天下”题头，其左接自上起“三十時等者”的连续正文栏。",
+      "qualification": "卷四由实际卷首及目标开面的版心核定；十九、二十为实际所见叶号，没有把D18电子0131a直接换算成京都叶号。"
+    },
+    "native_pixel_views": [
+      {
+        "box_xyxy": [
+          3150,
+          550,
+          5350,
+          3450
+        ],
+        "dimensions": [
+          2200,
+          2900
+        ],
+        "png_sha256": "561000eb7f80981755930836551870ce29da29674aa97803b5056390d69f3e98",
+        "purpose": "目标右页正文与上下文"
+      },
+      {
+        "box_xyxy": [
+          3300,
+          550,
+          4050,
+          3650
+        ],
+        "dimensions": [
+          750,
+          3100
+        ],
+        "png_sha256": "d8b9ddb7dec4348f0828ba38d491c24a054e502b829cf1aab0843d56f2a6aa5b",
+        "purpose": "连续目标栏及栏末"
+      },
+      {
+        "box_xyxy": [
+          3740,
+          650,
+          3970,
+          3650
+        ],
+        "dimensions": [
+          230,
+          3000
+        ],
+        "png_sha256": "038bd063300844086d34da99650c1d45859ec54ebd5b3d39ee043090307e895d",
+        "purpose": "复核鈔、日名從旦至夕及该栏完整字形"
+      },
+      {
+        "box_xyxy": [
+          5030,
+          850,
+          5370,
+          3000
+        ],
+        "dimensions": [
+          340,
+          2150
+        ],
+        "png_sha256": "5518e38b7b17bc2d8047cdcdef86ddc2946f2a4d8f2736d3c51f485fe9f3170c",
+        "purpose": "目标右页版心卷号与十九叶号"
+      },
+      {
+        "box_xyxy": [
+          650,
+          550,
+          2850,
+          3450
+        ],
+        "dimensions": [
+          2200,
+          2900
+        ],
+        "png_sha256": "585e3a3e7ec12ead293da7707083f44dca316b2c8a2d9e4c29d02098aae98131",
+        "purpose": "左页续文及二十叶号"
+      }
+    ],
+    "pixel_method": "以上均从已取得JPEG在内存按原坐标裁出，未缩放、增强、锐化或OCR，未保存文件。原生JPEG实际尺寸与manifest所列6016×4016相符；不据此认证馆方扫描主档的更高层级。"
+  },
+  "actual_volume_verification": [
+    {
+      "canvas": 94,
+      "side": "左页卷首",
+      "reading": "大日經疏指心鈔卷第三／疏卷第一之三",
+      "image_sha256": "e6cfeb675c1a8afca1fad8fd835e8b93db41a74e670860b637ff20e9734d3ed5",
+      "qualification": "完整图的首次显示被平台缩小，随后另看原像素题名裁片；卷首读数以该原像素裁片为据。"
+    },
+    {
+      "canvas": 128,
+      "side": "左页卷首",
+      "reading": "大日經疏指心鈔卷第四／疏卷第一之四",
+      "image_sha256": "40af755ad90faea7e5b390091a5994183451f689f4fa7ae3cf403582d9966975",
+      "native_crop_xyxy": [
+        650,
+        550,
+        2850,
+        3450
+      ],
+      "qualification": "实际题名及卷次已看；疏字的异体编码不在此次作字体学裁定。"
+    }
+  ],
+  "accepted_readings": {
+    "glyph_after_至": "夕",
+    "glyph_after_從": null,
+    "glyph_after_從_candidates": [
+      "旦",
+      "且"
+    ],
+    "some_晝_畫_forms": null,
+    "complete_literal_uniquely_accepted": null,
+    "volume_working_reading": 4,
+    "right_leaf_working_reading": "十九",
+    "left_leaf_working_reading": "二十",
+    "no_majority_vote_or_silent_electronic_normalization": true
+  },
+  "first_readings": {
+    "generator_selected": [
+      {
+        "id": "preceding_context",
+        "locator": "canvas147右页，目标题头前一连续栏下段",
+        "layer": "黑色印刷正文",
+        "literal": "法華經云五十小劫佛神力故令諸眾生謂如半日",
+        "small_print": "句末另有小字文。",
+        "qualification": "此处为所引法华叙述中的半日，不把它改解释为桧尾日内前后半规则。"
+      },
+      {
+        "id": "target_heading",
+        "locator": "canvas147右页下半，接在法华半日句后",
+        "layer": "黑色印刷题头及小字",
+        "large_print": "日行四天下",
+        "small_print": "乃至",
+        "qualification": "“乃至”字号较小，与后接正文层次分开记录。"
+      },
+      {
+        "id": "target_continuous_quote",
+        "locator": "canvas147右页，题头左接“三十時等者”起的连续四栏",
+        "layer": "黑色印刷正文",
+        "literal_without_added_punctuation": "三十時等者鈔第二云智論云日名從旦至夕初分中分後分夜亦三分一日一夜有三十時春秋分時十五時屬晝十五時屬夜餘時增減五月晝十八時夜十二時十一月翻此言十五時屬晝三分中各五時也",
+        "small_print": "也后另有小字文。",
+        "key_glyph_observation": {
+          "literal": "夕",
+          "position": "日名從旦至之后、初分之前",
+          "visible_basis": "可见夕字的斜向主体及内部点笔；不是日形加下横的旦，也不是且字框形。该处没有看到朱笔将黑字改成旦。",
+          "uncertain_candidates": []
+        },
+        "qualification": "为便于逐字复核未添加现代句读；原图另有训读点、返读标记和朱笔，不能将这些标记全部当作正文标点。"
+      },
+      {
+        "id": "following_quote_chain",
+        "locator": "canvas147右页末栏，跨接同帧左页首栏",
+        "layer": "黑色印刷正文",
+        "literal_without_added_punctuation": "又智證大師鈔云疏云日行四天下一周晝夜各有初中後分乃至三十時等",
+        "qualification": "此段与前面的“鈔第二云智論云”分别保留，不把两处鈔自行并成同一具体引本。后续还有“又第四云”及其他计时讨论，本次不扩成完整校勘。"
+      }
+    ],
+    "reviewer_selected": [
+      {
+        "location": "右页日名段，引书语及其下方连续大字",
+        "working_literal": "三十時等者鈔第二云智論云日名從且至夕初分中分",
+        "layer": "黑色大字正文；此串不补现代标点，不并入旁侧训点。"
+      },
+      {
+        "location": "相邻左栏",
+        "working_literal": "後分夜亦三分一日一夜有三十時春秋分時十五時屬〔晝／畫形待定〕",
+        "layer": "黑色大字正文；末字字形单列未定。"
+      },
+      {
+        "location": "再左侧连续栏",
+        "working_literal": "月翻此言十五時屬〔晝／畫形待定〕三分中各五時也文又智證大師",
+        "layer": "黑色大字及引文结束标识。此为短选录，不冒称全页逐字转录。"
+      }
+    ],
+    "reviewer_glyphs": [
+      {
+        "position": "“從”后、“至”前",
+        "working_reading": "且",
+        "status": "本轮像素工作读法",
+        "visible_strokes": "可见长方框形、内部横笔及底横；两侧竖笔呈延至底横的形态，支持读且。",
+        "qualification": "不是据电子文本补出的旦；没有将此工作读法升格为独立人工定字。"
+      },
+      {
+        "position": "“至”后、“初分”前",
+        "working_reading": "夕",
+        "status": "本轮像素工作读法",
+        "visible_strokes": "主体为斜折、撇及内点形，不是日框加底横形。",
+        "qualification": "其上左侧另有较小黑色レ形符号，应与大字主体分开。"
+      }
+    ],
+    "reviewer_volume_leaf": {
+      "location": "右页外侧版心窄栏",
+      "abbreviated_title_literal": "〔疏／䟽〕指抄四",
+      "leaf_literal": "十九",
+      "working_interpretation": "卷四、叶十九的工作读法。",
+      "uncertainty": "首字及部分笔画受折曲、墨迹影响；不由此补出完整书名，也不凭文件名认证馆藏实物身份。"
+    },
+    "root_short_literal": "智論云日名從旦至夕初分中分",
+    "root_initial_from_glyph": "旦",
+    "firsts_disagree_after_從": true,
+    "firsts_agree_after_至": "夕"
+  },
+  "annotation_layers": {
+    "black_large_print": "目标段及其引文框架属于黑色大字印刷正文；“日名從旦至夕”的夕在这一层。",
+    "black_small_print": "已辨题头中的乃至、引句后的文，以及若干训读／返读小记号。未将小字混入主文同字号。",
+    "red_marks": "可见红点、圈线、对若干词的竖线强调，以及“第二”旁的小字注记。这些与黑色印文分层，未凭目录传承记载认定本页朱笔作者。",
+    "unresolved_red_annotation": {
+      "locator": "目标栏“第／二”附近右侧红色小字",
+      "literal": null,
+      "reason": "可见类似数目与丁字的页次注形，但顺序及完整字串本次不强定；不据电子定位或其他读录补写。"
+    },
+    "not_seen_in_target_window": "所选京都目标窗口未见大正式“夕＝且〔甲〕”校注；这不证明京都全书无其他校语，也不否定大正编者另报的甲本读数。"
+  },
+  "reviewer_unresolved": [
+    "版心首字的具体异体写法及受折曲处笔画。",
+    "所列晝／畫形位置的唯一字形。",
+    "全部黑色小字、返读符号和朱点的逐项训读与添加年代。",
+    "本轮工作读法能否经独立人工古籍审读接受。"
+  ],
+  "root_reacquisition": {
+    "target": [
+      {
+        "name": "Kyoto-c147-info.json",
+        "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00018489%2F03%2604%2FRB00018489_00147_0.ptif/info.json",
+        "at": "2026-10-25T21:04:41.721913+00:00",
+        "status": 200,
+        "final_url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00018489%2F03%2604%2FRB00018489_00147_0.ptif/info.json",
+        "bytes": 850,
+        "sha256": "2ddc41c7347b902cd849817ea2875557804d10927c50c3a4cadbb938dc27cfbb"
+      },
+      {
+        "name": "Kyoto-c147-native.jpg",
+        "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00018489%2F03%2604%2FRB00018489_00147_0.ptif/full/max/0/default.jpg",
+        "at": "2026-10-25T21:04:42.649327+00:00",
+        "status": 200,
+        "final_url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00018489%2F03%2604%2FRB00018489_00147_0.ptif/full/max/0/default.jpg",
+        "bytes": 3398280,
+        "sha256": "66daf7b7ca267dbdbfb6a325644e17c96b89eca15a60fdf1c028f474e5dfccc8"
+      }
+    ],
+    "volume_headings": [
+      {
+        "canvas": 94,
+        "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00018489%2F03%2604%2FRB00018489_00094_0.ptif/full/max/0/default.jpg",
+        "file": "Kyoto-c94-native.jpg",
+        "at": "2026-10-25T21:18:50.575486+00:00",
+        "status": 200,
+        "bytes": 2884207,
+        "sha256": "e6cfeb675c1a8afca1fad8fd835e8b93db41a74e670860b637ff20e9734d3ed5"
+      },
+      {
+        "canvas": 128,
+        "url": "https://rmda.kulib.kyoto-u.ac.jp/iiif/3/RB00018489%2F03%2604%2FRB00018489_00128_0.ptif/full/max/0/default.jpg",
+        "file": "Kyoto-c128-native.jpg",
+        "at": "2026-10-25T21:18:52.141105+00:00",
+        "status": 200,
+        "bytes": 3230253,
+        "sha256": "40af755ad90faea7e5b390091a5994183451f689f4fa7ae3cf403582d9966975"
+      }
+    ],
+    "all_root_bytes_match_role_first": true,
+    "root_and_role_persistent_crop_methods": "root saved native crops; two roles used in-memory regions; overview reductions are not native glyph proof"
+  },
+  "first_record_identities": {
+    "kyoto-target-generator-first.json": "535776b517fcd393fb82aa1f5c6644331c7c274aa710397005c16f6b216520ef",
+    "kyoto-pixel-reviewer-first.json": "f0875a40d558158830e77e3ca371fc79107431eec26ecfc74cdca9ed1b978106",
+    "kyoto-parent-reading-first.json": "e19c4e6f11ddb2c4bc50f5f3f0516715e666c6bc9d617b60b535deb537b78de4",
+    "kyoto-parent-crops-first.json": "251ae063702bf97b8f581d162035be278f7f5d79f04bbf4570e39eb6c624fdb9"
+  },
+  "scope": {
+    "catalogue_year_independently_verified_from_colophon": false,
+    "Taisho_base_physical_copy_identified": false,
+    "reported_甲_target_image_seen": false,
+    "complete_target_transcription_agreed": false,
+    "highest_scan_master_resolution_certified": false,
+    "independent_ancient_witness_count": null,
+    "all643frames_collated": false,
+    "old17_image_queue_completed": 0,
+    "T1299_pingming_mapping_established": false,
+    "hinoo_half_mapping_established": false,
+    "leap_short_priority_established": false,
+    "birth_calendar_override_applied": false,
+    "real_samples": 0
+  },
+  "limits": [
+    "这是官方馆藏具名寛文刊本目标页的直接数字图像读数；寛文元年身份目前仍按官方目录归属，本次未核刊记。",
+    "本次实际看到了京都本此处的夕，但没有证明京都RB00018489就是大正编者使用的同一件原刊底本，也没有证明它是大正甲本。",
+    "大正甲本的室町时代写高野山宝龟院藏本描述与京都寛文刊本须分开；同书、同刊年、相同读数均不足以完成实物或谱系认证。",
+    "“鈔第二云智論云”是本页实际可见的称引层。选段本身没有直接题出其具体中间书名；本次未借另一角色的作品层识别结论补定引本。",
+    "这一夕字读数不裁定T1299平明的现代钟点、桧尾前后半端点、古代通用日界或闰月复用与小月补配优先。",
+    "Root and generator initially read glyph after從 as旦; reviewer read且. From-glyph and晝/畫 uncertainties are retained despite agreement on target夕. No whole-literal consensus or majority adjudication."
+  ],
+  "target_image_observer": "generator source-role first; its pixel_method and in-memory-only statements describe that role, not the root retained files"
+}

@@ -63,7 +63,9 @@ def dependency_closure(
     return resolved
 
 
-def scenario_keys(specs: List[ToolSpec], scenario: str) -> Set[str]:
+def scenario_keys(
+    specs: List[ToolSpec], scenario: str, *, scope: str = "complete"
+) -> Set[str]:
     records = {record["id"]: record for record in definitions()["scenarios"]}
     names = [part.strip() for part in scenario.split(",")]
     if any(name not in records for name in names):
@@ -79,7 +81,26 @@ def scenario_keys(specs: List[ToolSpec], scenario: str) -> Set[str]:
         )
     by_key = {spec.key: spec for spec in specs}
     closure = dependency_closure(records, set(by_key))
-    requested = {key for name in names for key in closure[name]}
+    if scope not in {"complete", "topic"}:
+        raise ParameterError(
+            "MCP 工具范围无效",
+            [{"path": "tool_scope", "code": "invalid_tool_scope"}],
+        )
+    if scope == "complete":
+        requested = {key for name in names for key in closure[name]}
+    else:
+        # Publish direct topic evidence and knowledge support. Conditional and
+        # composite branches remain visible as unavailable in scenario discovery;
+        # this is an explicit smaller surface, never a generic dispatcher bypass.
+        requested = {key for name in names for key in records[name]["engine_tools"]}
+        for name in names:
+            for dependency in records[name].get("dependencies", []):
+                if dependency["kind"] == "shared_support":
+                    requested.update(
+                        closure[dependency["scenario"]]
+                        if dependency.get("scenario")
+                        else dependency["tools"]
+                    )
     # Nested REST and flat MCP/CLI siblings declare the same operation label.
     labels = {by_key[key].operation_label_zh for key in requested}
     return {

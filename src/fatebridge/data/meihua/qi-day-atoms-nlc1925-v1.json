@@ -1,0 +1,189 @@
+{
+  "id": "meihua_qi_day_atoms_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "章句实际卦气角色与时序明列日支原子",
+  "source": {
+    "id": "nlc_1925",
+    "title": "文明書局《梅花易數》卷一八卦萬物屬類時序、卷二求名與求財",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "raw_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_indices": [
+      33,
+      35,
+      38,
+      41,
+      43,
+      46,
+      48,
+      51,
+      67,
+      68
+    ],
+    "reader": "assistant selected clear day-branch spans only; not independent human expert authentication or full text re-collation"
+  },
+  "comparison_source_hashes": {
+    "volume1.wikitext": "f5245837e94bf82420e619fa61644cac1a1242cc59e1c5da5f776dcfd985ac99",
+    "volume2.wikitext": "239523c6bb8b59d7ed3fe229c681cd1a1124a5216617e198f05dbf19cc6d2939"
+  },
+  "literal_day_branch_atoms": {
+    "乾": {
+      "trigram": "乾",
+      "selected_span": "戌亥年月日時",
+      "day_branches": [
+        "戌",
+        "亥"
+      ],
+      "original_pdf_index": 33,
+      "explicit_month_only_spans_excluded_from_day_match": [],
+      "scope": "literal_named_branch_membership_only; source lists year/month/day/hour but this query tests day only",
+      "all_other_numeric_element_season_components_parsed": false
+    },
+    "坤": {
+      "trigram": "坤",
+      "selected_span": "未申年月日時",
+      "day_branches": [
+        "未",
+        "申"
+      ],
+      "original_pdf_index": 35,
+      "explicit_month_only_spans_excluded_from_day_match": [
+        "辰戌丑未月"
+      ],
+      "scope": "literal_named_branch_membership_only; source lists year/month/day/hour but this query tests day only",
+      "all_other_numeric_element_season_components_parsed": false
+    },
+    "震": {
+      "trigram": "震",
+      "selected_span": "卯年月日時",
+      "day_branches": [
+        "卯"
+      ],
+      "original_pdf_index": 38,
+      "explicit_month_only_spans_excluded_from_day_match": [
+        "春二月"
+      ],
+      "scope": "literal_named_branch_membership_only; source lists year/month/day/hour but this query tests day only",
+      "all_other_numeric_element_season_components_parsed": false
+    },
+    "巽": {
+      "trigram": "巽",
+      "selected_span": "辰巳年月日時",
+      "day_branches": [
+        "辰",
+        "巳"
+      ],
+      "original_pdf_index": 41,
+      "explicit_month_only_spans_excluded_from_day_match": [
+        "三月",
+        "四月"
+      ],
+      "scope": "literal_named_branch_membership_only; source lists year/month/day/hour but this query tests day only",
+      "all_other_numeric_element_season_components_parsed": false
+    },
+    "坎": {
+      "trigram": "坎",
+      "selected_span": "子年月日時",
+      "day_branches": [
+        "子"
+      ],
+      "original_pdf_index": 43,
+      "explicit_month_only_spans_excluded_from_day_match": [
+        "冬十一月"
+      ],
+      "scope": "literal_named_branch_membership_only; source lists year/month/day/hour but this query tests day only",
+      "all_other_numeric_element_season_components_parsed": false
+    },
+    "离": {
+      "trigram": "离",
+      "selected_span": "午火年月日時",
+      "day_branches": [
+        "午"
+      ],
+      "original_pdf_index": 46,
+      "explicit_month_only_spans_excluded_from_day_match": [
+        "夏五月"
+      ],
+      "scope": "literal_named_branch_membership_only; source lists year/month/day/hour but this query tests day only",
+      "all_other_numeric_element_season_components_parsed": false
+    },
+    "艮": {
+      "trigram": "艮",
+      "selected_span": "丑寅年月日時",
+      "day_branches": [
+        "丑",
+        "寅"
+      ],
+      "original_pdf_index": 48,
+      "explicit_month_only_spans_excluded_from_day_match": [
+        "冬春之月",
+        "十二月"
+      ],
+      "scope": "literal_named_branch_membership_only; source lists year/month/day/hour but this query tests day only",
+      "all_other_numeric_element_season_components_parsed": false
+    },
+    "兑": {
+      "trigram": "兑",
+      "selected_span": "酉年月日時",
+      "day_branches": [
+        "酉"
+      ],
+      "original_pdf_index": 51,
+      "explicit_month_only_spans_excluded_from_day_match": [
+        "秋八月"
+      ],
+      "scope": "literal_named_branch_membership_only; source lists year/month/day/hour but this query tests day only",
+      "all_other_numeric_element_season_components_parsed": false
+    }
+  },
+  "chapter_selectors": {
+    "wealth_gain": {
+      "topic": "wealth",
+      "relation": "用生体",
+      "quote": "欲知得財之日生體之卦氣定之",
+      "section": "求財占第十",
+      "original_pdf_index": 68
+    },
+    "wealth_loss": {
+      "topic": "wealth",
+      "relation": "用克体",
+      "quote": "欲知破財之日尅體之卦氣定之",
+      "section": "求財占第十",
+      "original_pdf_index": 68
+    },
+    "reputation_completion": {
+      "topic": "reputation",
+      "relation": "用生体",
+      "quote": "欲知名成之日生體之卦氣詳之",
+      "section": "求名占第九",
+      "original_pdf_index": 67
+    },
+    "reputation_office": {
+      "topic": "reputation",
+      "relation": "用克体",
+      "quote": "其日期尅體之卦氣者於八卦萬物所屬時序類中斷之",
+      "section": "求名占第九",
+      "original_pdf_index": 68,
+      "requires_declared_historical_in_office_context": true
+    },
+    "reputation_body_without_attacker": {
+      "topic": "reputation",
+      "role": "body",
+      "quote": "若無尅體之卦則名易就止看卦體時序之類以定日期",
+      "section": "求名占第九",
+      "original_pdf_index": 67,
+      "full_inner_outer_no_attacker_not_assumed": true
+    }
+  },
+  "scope_limits": [
+    "No automatic original body/changed-use substitution for supporting or attacking role",
+    "Do not treat 四土月 as 坤 day labels or treat element strength as timing-class membership",
+    "Literal branch nonmembership does not negate other source atoms or full timing",
+    "Other numeric/element/season wording, stem day predicates and full source synthesis remain unadjudicated",
+    "Input civil-midnight/zi-start candidates are two labels of the input clock, not two future forecast dates",
+    "No next/nearest-day search, dates, scores, horizon tuning, future observation window or real outcome"
+  ],
+  "legacy_full_time_profile_sha256": "b73ec8c22c261c47673a0b89bfc3bc714da30806962a9883bf0c0c10ec03b26c",
+  "legacy_numeric_and_other_full_spans_recollated_this_round": false,
+  "full_original_conformance": false,
+  "predictive_efficacy": false
+}

@@ -2,7 +2,7 @@
 
 import math
 import re
-from typing import Any, Literal, Optional
+from typing import Literal, Optional
 
 _COORDINATE = re.compile(
     r"\s*(?P<degrees>[+-]?\d+(?:\.\d+)?)(?:(?P<direction>[NSEW])(?P<minutes>\d+(?:\.\d+)?))?\s*",
@@ -11,7 +11,7 @@ _COORDINATE = re.compile(
 
 
 def parse_geo_coordinate(
-    value: Any, *, axis: Literal["latitude", "longitude"]
+    value: object, *, axis: Literal["latitude", "longitude"]
 ) -> Optional[float]:
     """Return None only for absent values; reject malformed or out-of-range input."""
     if value is None or value == "":

@@ -69,7 +69,7 @@ def test_cn_analysis_request_models_accept_fields():
         analysis_minute=18,
         analysis_timezone="Asia/Shanghai",
         analysis_longitude=121.4737,
-        qimen_options={"layout": "fly"},
+        qimen_options={"layout": "direct"},
         selected_sections=["起盘信息", "九宫方盘"],
     )
     taiyi_request = TaiyiAnalysisRequest(
@@ -119,7 +119,7 @@ def test_cn_analysis_request_models_accept_fields():
     assert liureng_request.model_dump()["analysis_longitude"] == 121.4737
     assert liureng_request.model_dump()["selected_sections"] == ["起盘信息", "三传"]
     assert qimen_request.model_dump()["analysis_hour"] == 21
-    assert qimen_request.model_dump()["qimen_options"]["layout"] == "fly"
+    assert qimen_request.model_dump()["qimen_options"]["layout"] == "direct"
     assert qimen_request.model_dump()["selected_sections"] == ["起盘信息", "九宫方盘"]
     assert taiyi_request.model_dump()["gender"] == "男"
     assert taiyi_request.model_dump()["selected_sections"] == ["起盘信息", "十六宫标记"]
@@ -611,14 +611,17 @@ def test_metaphysics_true_solar_time_includes_equation_of_time():
         use_true_solar_time=True,
     )
 
-    # Longitude contributes +5.895 minutes; the equation of time contributes
-    # about -3.38 minutes on this date. Both belong in apparent solar time.
+    # Direct Swiss Ephemeris 2.10.03 reference, outside FateBridge's helpers:
+    # jd_ut=2461135.0541666667 (13:18 UTC), time_equ=-2.935413924 min,
+    # longitude=+5.8948 min, total=+2.959386076 min. The old 2.51 value came
+    # from a date-only sinusoidal approximation. This is a library integration
+    # reference, not an independent astronomical accuracy certificate.
     assert result["analysis_context"]["time_algorithm"] == "真太阳时"
     assert result["analysis_context"]["corrected_datetime"].startswith(
         "2026-04-04 21:20:"
     )
     assert result["analysis_context"]["total_correction_minutes"] == pytest.approx(
-        2.51, abs=0.05
+        2.959386076, abs=0.05
     )
     assert result["four_pillars"] == {
         "year": {"stem": "丙", "branch": "午"},
@@ -629,8 +632,10 @@ def test_metaphysics_true_solar_time_includes_equation_of_time():
     assert result["qimen"]["ju_text"] == "阳遁六局下元"
     assert result["qimen"]["yuan"] == "下元"
     assert result["qimen"]["fu_tou"] == "甲辰"
-    assert result["qimen"]["xun_head"] == "甲辰"
-    assert result["qimen"]["kongwang"] == "寅卯空"
+    assert result["qimen"]["day_xun_head"] == "甲辰"
+    assert result["qimen"]["xun_head"] == "甲寅"
+    assert result["qimen"]["day_kongwang"] == "寅卯空"
+    assert result["qimen"]["kongwang"] == "子丑空"
     assert result["qimen"]["zhifu"] == {
         "star": "天芮",
         "palace": "坤二宫",
@@ -680,40 +685,16 @@ def test_calculate_qimen_analysis_applies_qimen_options_and_snapshot_text():
         analysis_minute=33,
         analysis_timezone="Asia/Shanghai",
         analysis_longitude=121.4737,
-        qimen_options={"layout": "fly"},
+        qimen_options={"ju_method": "chaibu"},
     )
 
-    assert optioned_result["qimen"] != default_result["qimen"]
-    assert optioned_result["qimen"]["layout"] == "fly"
+    assert optioned_result["qimen"]["ju_method"] == "chaibu"
+    assert optioned_result["qimen"]["ju_term"] == "清明"
+    assert optioned_result["qimen"]["ju_number"] == 7
+    assert default_result["qimen"]["ju_number"] == 6
     assert optioned_result["snapshot_text"] != default_result["snapshot_text"]
     assert "[九宫方盘]" in optioned_result["snapshot_text"]
-    assert "内容来源：" in optioned_result["snapshot_text"]
-    optioned_zhifu_palace = next(
-        palace
-        for palace in optioned_result["qimen"]["palaces"]
-        if palace["name"] == optioned_result["qimen"]["zhifu"]["palace"]
-    )
-    optioned_zhishi_palace = next(
-        palace
-        for palace in optioned_result["qimen"]["palaces"]
-        if palace["name"] == optioned_result["qimen"]["zhishi"]["palace"]
-    )
-    assert (
-        optioned_result["qimen"]["zhifu"]["content_palace"]
-        == optioned_zhifu_palace["content_palace"]
-    )
-    assert (
-        optioned_result["qimen"]["zhifu"]["content_trigram"]
-        == optioned_zhifu_palace["content_trigram"]
-    )
-    assert (
-        optioned_result["qimen"]["zhishi"]["content_palace"]
-        == optioned_zhishi_palace["content_palace"]
-    )
-    assert (
-        optioned_result["qimen"]["zhishi"]["content_trigram"]
-        == optioned_zhishi_palace["content_trigram"]
-    )
+    assert "定局所用节气：清明" in optioned_result["snapshot_text"]
 
 
 def test_calculate_qimen_analysis_supports_selected_export_sections():
@@ -755,9 +736,8 @@ def test_calculate_taiyi_analysis_returns_sixteen_palaces():
 
     assert result["analysis_type"] == "太乙神数"
     assert result["taiyi"]["style_label"]
-    # 太乙統宗 人道命法 (ji_style=0)，对齐参考实现 kintaiyi。2026-04-04 21:18
-    # 真太阳 → 四柱 丙午/辛卯/戊申/癸亥，农历年 2026 → 积年数 10155943，
-    # 局数 = 10155943 % 72 = 55 → 陽遁五十五局；太乙落宫 艮、文昌(天目) 申。
+    # 金镜年计核心：724年的积年1937281逐年加一，2026年为1938583，55局。
+    # 完整主客算独立验收见 test_taiyi_accuracy.py；软件同源一致不认证原典。
     assert result["taiyi"]["taiyi_palace"] == "艮"
     assert result["taiyi"]["wenchang_palace"] == "申"
     assert len(result["taiyi"]["palace_marks"]) == 16
@@ -832,13 +812,10 @@ def test_calculate_jinkou_analysis_returns_four_positions():
     assert result["liureng"]["month_general"]["branch"] == "戌"
     assert result["jinkou"]["overview"]["di_fen"] == "酉"
     assert result["jinkou"]["overview"]["yuejiang"]["branch"] == "申"
-    # 贵人乘未、落地盘申逆布，地盘亥上为戌，天将为玄武。
-    assert result["jinkou"]["overview"]["guishen"]["name"] == "玄武"
-    assert (
-        result["jinkou"]["overview"]["board_style"] == result["liureng"]["board_style"]
-    )
-    # 当前为元首课，四位同旺时 JINKOU_USE_POSITION_PREFERENCE["元首"]="贵神"，但依具体旺衰
-    # 规则最终落实在哪一位上取决于四位力量排序。此用例用 `in` 断言保证返回 of the 标准集合。
+    # 金口诀戊日夜贵未：未贵、午蛇……酉太阴，不能借用大六壬天盘。
+    assert result["jinkou"]["overview"]["guishen"]["name"] == "太阴"
+    assert result["jinkou"]["overview"]["guishen"]["branch"] == "酉"
+    assert result["jinkou"]["overview"]["board_style"] == "金口诀四位"
     assert result["jinkou"]["overview"]["use_position"] in {
         "人元",
         "贵神",
@@ -855,8 +832,7 @@ def test_calculate_jinkou_analysis_returns_four_positions():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
 
-def test_calculate_jinkou_analysis_propagates_corrected_liureng_detail():
-    # Corrected remote-clash details must propagate into the combined output.
+def test_calculate_jinkou_analysis_does_not_borrow_liureng_transmission_rule():
     result = calculate_jinkou_analysis(
         analysis_year=2026,
         analysis_month=1,
@@ -870,16 +846,11 @@ def test_calculate_jinkou_analysis_propagates_corrected_liureng_detail():
     )
 
     assert result["liureng"]["board_style_detail"] == "弹射"
-    assert result["jinkou"]["overview"]["board_style_detail"] == "弹射"
+    assert result["jinkou"]["overview"]["board_style_detail"] == "三阴一阳"
+    # 丙子日巳时巳位：癸 / 天空戌 / 大吉丑 / 巳，唯一阳位是贵神。
     assert result["jinkou"]["overview"]["use_position"] == "贵神"
-    assert any(
-        item["label"] == "课体" and item["value"] == "弹射课"
-        for item in result["jinkou"]["shensha"]
-    )
-    assert any(
-        item["label"] == "取传"
-        and item["value"] == result["liureng"]["three_transmissions"]["method"]
-        for item in result["jinkou"]["shensha"]
+    assert all(
+        item["label"] not in {"课体", "取传"} for item in result["jinkou"]["shensha"]
     )
 
 

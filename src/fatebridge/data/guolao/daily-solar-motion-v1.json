@@ -1,0 +1,2361 @@
+{
+  "schema": "gujin43_daily_solar_literal_motion_v1",
+  "profile_id": "gujin43_siku318_literal_motion",
+  "author": "邢云路",
+  "edition": "文渊阁四库全书787册，卷41、42行度列及卷43授时318算例；同位非盲校读",
+  "source_url": "https://commons.wikimedia.org/w/index.php?curid=71219540",
+  "source_day_unit": "source_day_not_UTC_TT_or_modern_JD",
+  "coordinate_unit": "historical_du_not_modern_degrees",
+  "circle_du": "365.2578",
+  "source_first_midnight_day": "42",
+  "elapsed_source_years": 318,
+  "midnight_anchor_policy": "Gujin43推相距度段的完整夜半刊数；保留前段秋正短数为异值，不拼大统算例",
+  "cardinals": [
+    "winter",
+    "spring",
+    "summer",
+    "autumn",
+    "next_winter"
+  ],
+  "integer_day_offsets": [
+    0,
+    88,
+    182,
+    276,
+    365
+  ],
+  "midnight_unwrapped_du": [
+    "4.554334",
+    "94.960394",
+    "186.592973",
+    "278.157692",
+    "369.543161"
+  ],
+  "printed_earlier_autumn_midnight_du": "278.1576",
+  "source_subtraction_components": {
+    "event_unwrapped_du": [
+      "4.6380",
+      "95.94885",
+      "187.2597",
+      "278.57055",
+      "369.8814"
+    ],
+    "event_fraction_of_source_day": [
+      "0.0796",
+      "0.98875",
+      "0.7007",
+      "0.41265",
+      "0.3218"
+    ],
+    "printed_event_rate_du": [
+      "1.051085",
+      "0.999103",
+      "0.951516",
+      "1.000505",
+      "1.051085"
+    ],
+    "separately_printed_subtraction_du": [
+      "0.083666",
+      "0.988456",
+      "0.666727",
+      "0.412858",
+      "0.338239"
+    ],
+    "summer_earlier_subtraction_du": "0.666737"
+  },
+  "segments": {
+    "winter": {
+      "rows": [
+        {
+          "index": 0,
+          "rate_du": "1.051085",
+          "djvu_page": 464,
+          "physical_half": 0
+        },
+        {
+          "index": 1,
+          "rate_du": "1.050591",
+          "djvu_page": 464,
+          "physical_half": 0
+        },
+        {
+          "index": 2,
+          "rate_du": "1.050096",
+          "djvu_page": 464,
+          "physical_half": 0
+        },
+        {
+          "index": 3,
+          "rate_du": "1.049598",
+          "djvu_page": 464,
+          "physical_half": 0
+        },
+        {
+          "index": 4,
+          "rate_du": "1.049099",
+          "djvu_page": 464,
+          "physical_half": 0
+        },
+        {
+          "index": 5,
+          "rate_du": "1.048597",
+          "djvu_page": 464,
+          "physical_half": 0
+        },
+        {
+          "index": 6,
+          "rate_du": "1.048094",
+          "djvu_page": 464,
+          "physical_half": 0
+        },
+        {
+          "index": 7,
+          "rate_du": "1.047589",
+          "djvu_page": 464,
+          "physical_half": 0
+        },
+        {
+          "index": 8,
+          "rate_du": "1.047082",
+          "djvu_page": 464,
+          "physical_half": 0
+        },
+        {
+          "index": 9,
+          "rate_du": "1.046573",
+          "djvu_page": 464,
+          "physical_half": 0
+        },
+        {
+          "index": 10,
+          "rate_du": "1.046063",
+          "djvu_page": 464,
+          "physical_half": 0
+        },
+        {
+          "index": 11,
+          "rate_du": "1.045550",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 12,
+          "rate_du": "1.045036",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 13,
+          "rate_du": "1.044510",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 14,
+          "rate_du": "1.044001",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 15,
+          "rate_du": "1.043482",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 16,
+          "rate_du": "1.042960",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 17,
+          "rate_du": "1.042437",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 18,
+          "rate_du": "1.041912",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 19,
+          "rate_du": "1.041384",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 20,
+          "rate_du": "1.040855",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 21,
+          "rate_du": "1.040324",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 22,
+          "rate_du": "1.039791",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 23,
+          "rate_du": "1.039256",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 24,
+          "rate_du": "1.038719",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 25,
+          "rate_du": "1.038181",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 26,
+          "rate_du": "1.037640",
+          "djvu_page": 464,
+          "physical_half": 1
+        },
+        {
+          "index": 27,
+          "rate_du": "1.037098",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 28,
+          "rate_du": "1.036554",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 29,
+          "rate_du": "1.036008",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 30,
+          "rate_du": "1.035460",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 31,
+          "rate_du": "1.034911",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 32,
+          "rate_du": "1.034359",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 33,
+          "rate_du": "1.033806",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 34,
+          "rate_du": "1.033250",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 35,
+          "rate_du": "1.032693",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 36,
+          "rate_du": "1.032134",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 37,
+          "rate_du": "1.031574",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 38,
+          "rate_du": "1.031411",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 39,
+          "rate_du": "1.030446",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 40,
+          "rate_du": "1.029880",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 41,
+          "rate_du": "1.029312",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 42,
+          "rate_du": "1.028742",
+          "djvu_page": 465,
+          "physical_half": 0
+        },
+        {
+          "index": 43,
+          "rate_du": "1.028170",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 44,
+          "rate_du": "1.027596",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 45,
+          "rate_du": "1.027020",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 46,
+          "rate_du": "1.026443",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 47,
+          "rate_du": "1.025863",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 48,
+          "rate_du": "1.025282",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 49,
+          "rate_du": "1.024699",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 50,
+          "rate_du": "1.024114",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 51,
+          "rate_du": "1.023527",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 52,
+          "rate_du": "1.022938",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 53,
+          "rate_du": "1.022348",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 54,
+          "rate_du": "1.021755",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 55,
+          "rate_du": "1.021161",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 56,
+          "rate_du": "1.020565",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 57,
+          "rate_du": "1.019967",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 58,
+          "rate_du": "1.019367",
+          "djvu_page": 465,
+          "physical_half": 1
+        },
+        {
+          "index": 59,
+          "rate_du": "1.018765",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 60,
+          "rate_du": "1.018161",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 61,
+          "rate_du": "1.017556",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 62,
+          "rate_du": "1.016949",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 63,
+          "rate_du": "1.016339",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 64,
+          "rate_du": "1.015728",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 65,
+          "rate_du": "1.015115",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 66,
+          "rate_du": "1.014501",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 67,
+          "rate_du": "1.013884",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 68,
+          "rate_du": "1.013266",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 69,
+          "rate_du": "1.012645",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 70,
+          "rate_du": "1.012023",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 71,
+          "rate_du": "1.011399",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 72,
+          "rate_du": "1.010773",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 73,
+          "rate_du": "1.010145",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 74,
+          "rate_du": "1.009516",
+          "djvu_page": 466,
+          "physical_half": 0
+        },
+        {
+          "index": 75,
+          "rate_du": "1.008884",
+          "djvu_page": 466,
+          "physical_half": 1
+        },
+        {
+          "index": 76,
+          "rate_du": "1.008251",
+          "djvu_page": 466,
+          "physical_half": 1
+        },
+        {
+          "index": 77,
+          "rate_du": "1.007616",
+          "djvu_page": 466,
+          "physical_half": 1
+        },
+        {
+          "index": 78,
+          "rate_du": "1.006979",
+          "djvu_page": 466,
+          "physical_half": 1
+        },
+        {
+          "index": 79,
+          "rate_du": "1.006340",
+          "djvu_page": 466,
+          "physical_half": 1
+        },
+        {
+          "index": 80,
+          "rate_du": "1.005699",
+          "djvu_page": 466,
+          "physical_half": 1
+        },
+        {
+          "index": 81,
+          "rate_du": "1.005056",
+          "djvu_page": 466,
+          "physical_half": 1
+        },
+        {
+          "index": 82,
+          "rate_du": "1.004412",
+          "djvu_page": 466,
+          "physical_half": 1
+        },
+        {
+          "index": 83,
+          "rate_du": "1.003765",
+          "djvu_page": 466,
+          "physical_half": 1
+        },
+        {
+          "index": 84,
+          "rate_du": "1.003117",
+          "djvu_page": 466,
+          "physical_half": 1
+        },
+        {
+          "index": 85,
+          "rate_du": "1.002467",
+          "djvu_page": 466,
+          "physical_half": 1
+        },
+        {
+          "index": 86,
+          "rate_du": "1.001815",
+          "djvu_page": 466,
+          "physical_half": 1
+        },
+        {
+          "index": 87,
+          "rate_du": "1.001161",
+          "djvu_page": 466,
+          "physical_half": 1
+        },
+        {
+          "index": 88,
+          "rate_du": "1.000505",
+          "djvu_page": 466,
+          "physical_half": 1
+        },
+        {
+          "index": 89,
+          "rate_du": null,
+          "djvu_page": 466,
+          "physical_half": 1
+        }
+      ],
+      "distance_source_days": 88,
+      "printed_worked_cumulative_du": "90.400935",
+      "printed_daily_difference_du": "0.00005821"
+    },
+    "spring": {
+      "rows": [
+        {
+          "index": 0,
+          "rate_du": "0.999703",
+          "djvu_page": 479,
+          "physical_half": 0
+        },
+        {
+          "index": 1,
+          "rate_du": "0.999110",
+          "djvu_page": 479,
+          "physical_half": 0
+        },
+        {
+          "index": 2,
+          "rate_du": "0.498519",
+          "djvu_page": 479,
+          "physical_half": 0
+        },
+        {
+          "index": 3,
+          "rate_du": "0.997930",
+          "djvu_page": 479,
+          "physical_half": 0
+        },
+        {
+          "index": 4,
+          "rate_du": "0.997342",
+          "djvu_page": 479,
+          "physical_half": 0
+        },
+        {
+          "index": 5,
+          "rate_du": "0.996756",
+          "djvu_page": 479,
+          "physical_half": 0
+        },
+        {
+          "index": 6,
+          "rate_du": "0.996171",
+          "djvu_page": 479,
+          "physical_half": 0
+        },
+        {
+          "index": 7,
+          "rate_du": "0.995588",
+          "djvu_page": 479,
+          "physical_half": 0
+        },
+        {
+          "index": 8,
+          "rate_du": "0.995007",
+          "djvu_page": 479,
+          "physical_half": 0
+        },
+        {
+          "index": 9,
+          "rate_du": "0.994427",
+          "djvu_page": 479,
+          "physical_half": 0
+        },
+        {
+          "index": 10,
+          "rate_du": "0.993849",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 11,
+          "rate_du": "0.993273",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 12,
+          "rate_du": "0.992698",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 13,
+          "rate_du": "0.992125",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 14,
+          "rate_du": "0.991553",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 15,
+          "rate_du": "0.990983",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 16,
+          "rate_du": "0.990415",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 17,
+          "rate_du": "0.989848",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 18,
+          "rate_du": "0.989283",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 19,
+          "rate_du": "0.988719",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 20,
+          "rate_du": "0.988158",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 21,
+          "rate_du": "0.987597",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 22,
+          "rate_du": "0.987038",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 23,
+          "rate_du": "0.986481",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 24,
+          "rate_du": "0.985926",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 25,
+          "rate_du": "0.985372",
+          "djvu_page": 479,
+          "physical_half": 1
+        },
+        {
+          "index": 26,
+          "rate_du": "0.984820",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 27,
+          "rate_du": "0.984270",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 28,
+          "rate_du": "0.983721",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 29,
+          "rate_du": "0.983173",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 30,
+          "rate_du": "0.982628",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 31,
+          "rate_du": "0.982084",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 32,
+          "rate_du": "0.981541",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 33,
+          "rate_du": "0.981000",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 34,
+          "rate_du": "0.980461",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 35,
+          "rate_du": "0.979924",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 36,
+          "rate_du": "0.979388",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 37,
+          "rate_du": "0.978853",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 38,
+          "rate_du": "0.978321",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 39,
+          "rate_du": "0.977789",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 40,
+          "rate_du": "0.977260",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 41,
+          "rate_du": "0.976732",
+          "djvu_page": 480,
+          "physical_half": 0
+        },
+        {
+          "index": 42,
+          "rate_du": "0.976206",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 43,
+          "rate_du": "0.975681",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 44,
+          "rate_du": "0.975158",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 45,
+          "rate_du": "0.974637",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 46,
+          "rate_du": "0.974117",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 47,
+          "rate_du": "0.973599",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 48,
+          "rate_du": "0.973082",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 49,
+          "rate_du": "0.972568",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 50,
+          "rate_du": "0.972054",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 51,
+          "rate_du": "0.971543",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 52,
+          "rate_du": "0.971033",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 53,
+          "rate_du": "0.970524",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 54,
+          "rate_du": "0.970017",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 55,
+          "rate_du": "0.969512",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 56,
+          "rate_du": "0.969009",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 57,
+          "rate_du": "0.968507",
+          "djvu_page": 480,
+          "physical_half": 1
+        },
+        {
+          "index": 58,
+          "rate_du": "0.968006",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 59,
+          "rate_du": "0.967508",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 60,
+          "rate_du": "0.967011",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 61,
+          "rate_du": "0.966515",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 62,
+          "rate_du": "0.966021",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 63,
+          "rate_du": "0.965529",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 64,
+          "rate_du": "0.965038",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 65,
+          "rate_du": "0.964549",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 66,
+          "rate_du": "0.964062",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 67,
+          "rate_du": "0.963576",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 68,
+          "rate_du": "0.963092",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 69,
+          "rate_du": "0.962610",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 70,
+          "rate_du": "0.962129",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 71,
+          "rate_du": "0.961650",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 72,
+          "rate_du": "0.961172",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 73,
+          "rate_du": "0.960696",
+          "djvu_page": 481,
+          "physical_half": 0
+        },
+        {
+          "index": 74,
+          "rate_du": "0.960222",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 75,
+          "rate_du": "0.959749",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 76,
+          "rate_du": "0.959278",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 77,
+          "rate_du": "0.958808",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 78,
+          "rate_du": "0.958340",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 79,
+          "rate_du": "0.957874",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 80,
+          "rate_du": "0.957409",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 81,
+          "rate_du": "0.956946",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 82,
+          "rate_du": "0.956485",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 83,
+          "rate_du": "0.956025",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 84,
+          "rate_du": "0.955567",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 85,
+          "rate_du": "0.955110",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 86,
+          "rate_du": "0.954655",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 87,
+          "rate_du": "0.954201",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 88,
+          "rate_du": "0.953750",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 89,
+          "rate_du": "0.953300",
+          "djvu_page": 481,
+          "physical_half": 1
+        },
+        {
+          "index": 90,
+          "rate_du": "0.952851",
+          "djvu_page": 482,
+          "physical_half": 0
+        },
+        {
+          "index": 91,
+          "rate_du": "0.952425",
+          "djvu_page": 482,
+          "physical_half": 0
+        },
+        {
+          "index": 92,
+          "rate_du": "0.951959",
+          "djvu_page": 482,
+          "physical_half": 0
+        },
+        {
+          "index": 93,
+          "rate_du": "0.951516",
+          "djvu_page": 482,
+          "physical_half": 0
+        },
+        {
+          "index": 94,
+          "rate_du": null,
+          "djvu_page": 482,
+          "physical_half": 0
+        }
+      ],
+      "distance_source_days": 94,
+      "printed_worked_cumulative_du": "91.598759",
+      "printed_daily_difference_du": "0.00035978"
+    },
+    "summer": {
+      "rows": [
+        {
+          "index": 0,
+          "rate_du": "0.951516",
+          "djvu_page": 473,
+          "physical_half": 0
+        },
+        {
+          "index": 1,
+          "rate_du": "0.951959",
+          "djvu_page": 473,
+          "physical_half": 0
+        },
+        {
+          "index": 2,
+          "rate_du": "0.952415",
+          "djvu_page": 473,
+          "physical_half": 0
+        },
+        {
+          "index": 3,
+          "rate_du": "0.952851",
+          "djvu_page": 473,
+          "physical_half": 0
+        },
+        {
+          "index": 4,
+          "rate_du": "0.953300",
+          "djvu_page": 473,
+          "physical_half": 0
+        },
+        {
+          "index": 5,
+          "rate_du": "0.953750",
+          "djvu_page": 473,
+          "physical_half": 0
+        },
+        {
+          "index": 6,
+          "rate_du": "0.954201",
+          "djvu_page": 473,
+          "physical_half": 0
+        },
+        {
+          "index": 7,
+          "rate_du": "0.954655",
+          "djvu_page": 473,
+          "physical_half": 0
+        },
+        {
+          "index": 8,
+          "rate_du": "0.955110",
+          "djvu_page": 473,
+          "physical_half": 0
+        },
+        {
+          "index": 9,
+          "rate_du": "0.955567",
+          "djvu_page": 473,
+          "physical_half": 0
+        },
+        {
+          "index": 10,
+          "rate_du": "0.956025",
+          "djvu_page": 473,
+          "physical_half": 0
+        },
+        {
+          "index": 11,
+          "rate_du": "0.956485",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 12,
+          "rate_du": "0.956946",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 13,
+          "rate_du": "0.957409",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 14,
+          "rate_du": "0.957874",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 15,
+          "rate_du": "0.958340",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 16,
+          "rate_du": "0.958808",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 17,
+          "rate_du": "0.959278",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 18,
+          "rate_du": "0.959749",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 19,
+          "rate_du": "0.960222",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 20,
+          "rate_du": "0.960696",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 21,
+          "rate_du": "0.961172",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 22,
+          "rate_du": "0.961650",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 23,
+          "rate_du": "0.962129",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 24,
+          "rate_du": "0.962610",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 25,
+          "rate_du": "0.963092",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 26,
+          "rate_du": "0.963576",
+          "djvu_page": 473,
+          "physical_half": 1
+        },
+        {
+          "index": 27,
+          "rate_du": "0.964062",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 28,
+          "rate_du": "0.964549",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 29,
+          "rate_du": "0.965038",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 30,
+          "rate_du": "0.965539",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 31,
+          "rate_du": "0.966021",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 32,
+          "rate_du": "0.966515",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 33,
+          "rate_du": "0.967011",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 34,
+          "rate_du": "0.967508",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 35,
+          "rate_du": "0.968006",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 36,
+          "rate_du": "0.968507",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 37,
+          "rate_du": "0.969009",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 38,
+          "rate_du": "0.969512",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 39,
+          "rate_du": "0.970017",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 40,
+          "rate_du": "0.970524",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 41,
+          "rate_du": "0.971033",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 42,
+          "rate_du": "0.971543",
+          "djvu_page": 474,
+          "physical_half": 0
+        },
+        {
+          "index": 43,
+          "rate_du": "0.972054",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 44,
+          "rate_du": "0.972568",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 45,
+          "rate_du": "0.973082",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 46,
+          "rate_du": "0.973599",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 47,
+          "rate_du": "0.974117",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 48,
+          "rate_du": "0.974637",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 49,
+          "rate_du": "0.975158",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 50,
+          "rate_du": "0.975681",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 51,
+          "rate_du": "0.976026",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 52,
+          "rate_du": "0.976732",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 53,
+          "rate_du": "0.977260",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 54,
+          "rate_du": "0.977789",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 55,
+          "rate_du": "0.978321",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 56,
+          "rate_du": "0.978853",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 57,
+          "rate_du": "0.979388",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 58,
+          "rate_du": "0.979924",
+          "djvu_page": 474,
+          "physical_half": 1
+        },
+        {
+          "index": 59,
+          "rate_du": "0.980461",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 60,
+          "rate_du": "0.981000",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 61,
+          "rate_du": "0.981541",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 62,
+          "rate_du": "0.982084",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 63,
+          "rate_du": "0.982628",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 64,
+          "rate_du": "0.983173",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 65,
+          "rate_du": "0.983721",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 66,
+          "rate_du": "0.984270",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 67,
+          "rate_du": "0.984820",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 68,
+          "rate_du": "0.985372",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 69,
+          "rate_du": "0.985926",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 70,
+          "rate_du": "0.986481",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 71,
+          "rate_du": "0.987038",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 72,
+          "rate_du": "0.987597",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 73,
+          "rate_du": "0.988158",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 74,
+          "rate_du": "0.988719",
+          "djvu_page": 475,
+          "physical_half": 0
+        },
+        {
+          "index": 75,
+          "rate_du": "0.989283",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 76,
+          "rate_du": "0.989848",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 77,
+          "rate_du": "0.990415",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 78,
+          "rate_du": "0.990983",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 79,
+          "rate_du": "0.991553",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 80,
+          "rate_du": "0.992125",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 81,
+          "rate_du": "0.992698",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 82,
+          "rate_du": "0.993273",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 83,
+          "rate_du": "0.993849",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 84,
+          "rate_du": "0.994427",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 85,
+          "rate_du": "0.995007",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 86,
+          "rate_du": "0.995588",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 87,
+          "rate_du": "0.996171",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 88,
+          "rate_du": "0.996756",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 89,
+          "rate_du": "0.997342",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 90,
+          "rate_du": "0.997930",
+          "djvu_page": 475,
+          "physical_half": 1
+        },
+        {
+          "index": 91,
+          "rate_du": "0.998519",
+          "djvu_page": 476,
+          "physical_half": 0
+        },
+        {
+          "index": 92,
+          "rate_du": "0.999110",
+          "djvu_page": 476,
+          "physical_half": 0
+        },
+        {
+          "index": 93,
+          "rate_du": "0.999702",
+          "djvu_page": 476,
+          "physical_half": 0
+        },
+        {
+          "index": 94,
+          "rate_du": null,
+          "djvu_page": 476,
+          "physical_half": 0
+        }
+      ],
+      "distance_source_days": 94,
+      "printed_worked_cumulative_du": "91.598759",
+      "printed_daily_difference_du": "-0.00035574"
+    },
+    "autumn": {
+      "rows": [
+        {
+          "index": 0,
+          "rate_du": "1.000505",
+          "djvu_page": 469,
+          "physical_half": 1
+        },
+        {
+          "index": 1,
+          "rate_du": "1.001161",
+          "djvu_page": 469,
+          "physical_half": 1
+        },
+        {
+          "index": 2,
+          "rate_du": "1.001815",
+          "djvu_page": 469,
+          "physical_half": 1
+        },
+        {
+          "index": 3,
+          "rate_du": "1.002467",
+          "djvu_page": 469,
+          "physical_half": 1
+        },
+        {
+          "index": 4,
+          "rate_du": "1.003117",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 5,
+          "rate_du": "1.003765",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 6,
+          "rate_du": "1.004412",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 7,
+          "rate_du": "1.005056",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 8,
+          "rate_du": "1.005699",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 9,
+          "rate_du": "1.006340",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 10,
+          "rate_du": "1.006979",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 11,
+          "rate_du": "1.007616",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 12,
+          "rate_du": "1.008251",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 13,
+          "rate_du": "1.008884",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 14,
+          "rate_du": "1.009516",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 15,
+          "rate_du": "1.010145",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 16,
+          "rate_du": "1.010773",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 17,
+          "rate_du": "1.011399",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 18,
+          "rate_du": "1.012023",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 19,
+          "rate_du": "1.012645",
+          "djvu_page": 470,
+          "physical_half": 0
+        },
+        {
+          "index": 20,
+          "rate_du": "1.013266",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 21,
+          "rate_du": "1.012884",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 22,
+          "rate_du": "1.014501",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 23,
+          "rate_du": "1.015115",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 24,
+          "rate_du": "1.015728",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 25,
+          "rate_du": "1.016339",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 26,
+          "rate_du": "1.016949",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 27,
+          "rate_du": "1.017556",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 28,
+          "rate_du": "1.018161",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 29,
+          "rate_du": "1.018765",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 30,
+          "rate_du": "1.019367",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 31,
+          "rate_du": "1.019967",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 32,
+          "rate_du": "1.020565",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 33,
+          "rate_du": "1.021161",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 34,
+          "rate_du": "1.021755",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 35,
+          "rate_du": "1.022348",
+          "djvu_page": 470,
+          "physical_half": 1
+        },
+        {
+          "index": 36,
+          "rate_du": "1.022938",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 37,
+          "rate_du": "1.023527",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 38,
+          "rate_du": "1.024114",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 39,
+          "rate_du": "1.024699",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 40,
+          "rate_du": "1.025282",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 41,
+          "rate_du": "1.025863",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 42,
+          "rate_du": "1.026443",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 43,
+          "rate_du": "1.027020",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 44,
+          "rate_du": "1.027596",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 45,
+          "rate_du": "1.028170",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 46,
+          "rate_du": "1.028742",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 47,
+          "rate_du": "1.029312",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 48,
+          "rate_du": "1.029880",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 49,
+          "rate_du": "1.030446",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 50,
+          "rate_du": "1.031011",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 51,
+          "rate_du": "1.031574",
+          "djvu_page": 471,
+          "physical_half": 0
+        },
+        {
+          "index": 52,
+          "rate_du": "1.032134",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 53,
+          "rate_du": "1.032693",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 54,
+          "rate_du": "1.033250",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 55,
+          "rate_du": "1.033806",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 56,
+          "rate_du": "1.034359",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 57,
+          "rate_du": "1.034911",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 58,
+          "rate_du": "1.035460",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 59,
+          "rate_du": "1.036008",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 60,
+          "rate_du": "1.036554",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 61,
+          "rate_du": "1.037098",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 62,
+          "rate_du": "1.037640",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 63,
+          "rate_du": "1.038181",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 64,
+          "rate_du": "1.038719",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 65,
+          "rate_du": "1.039256",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 66,
+          "rate_du": "1.039791",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 67,
+          "rate_du": "1.040324",
+          "djvu_page": 471,
+          "physical_half": 1
+        },
+        {
+          "index": 68,
+          "rate_du": "1.040855",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 69,
+          "rate_du": "1.041384",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 70,
+          "rate_du": "1.041911",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 71,
+          "rate_du": "1.042437",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 72,
+          "rate_du": "1.042960",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 73,
+          "rate_du": "1.043482",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 74,
+          "rate_du": "1.044002",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 75,
+          "rate_du": "1.044510",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 76,
+          "rate_du": "1.045036",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 77,
+          "rate_du": "1.045550",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 78,
+          "rate_du": "1.046063",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 79,
+          "rate_du": "1.046573",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 80,
+          "rate_du": "1.047082",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 81,
+          "rate_du": "1.047589",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 82,
+          "rate_du": "1.048094",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 83,
+          "rate_du": "1.048597",
+          "djvu_page": 472,
+          "physical_half": 0
+        },
+        {
+          "index": 84,
+          "rate_du": "1.049099",
+          "djvu_page": 472,
+          "physical_half": 1
+        },
+        {
+          "index": 85,
+          "rate_du": "1.049598",
+          "djvu_page": 472,
+          "physical_half": 1
+        },
+        {
+          "index": 86,
+          "rate_du": "1.050096",
+          "djvu_page": 472,
+          "physical_half": 1
+        },
+        {
+          "index": 87,
+          "rate_du": "1.050591",
+          "djvu_page": 472,
+          "physical_half": 1
+        },
+        {
+          "index": 88,
+          "rate_du": "1.051085",
+          "djvu_page": 472,
+          "physical_half": 1
+        },
+        {
+          "index": 89,
+          "rate_du": null,
+          "djvu_page": 472,
+          "physical_half": 1
+        }
+      ],
+      "distance_source_days": 89,
+      "printed_worked_cumulative_du": "91.401441",
+      "printed_daily_difference_du": "-0.000177921"
+    }
+  },
+  "source_witness_differences": [
+    {
+      "locator": "卷43推日差·春正距夏正相距度；DjVu492下半页",
+      "siku_literal_du": "91.632579",
+      "digital_revision_620325_du": "91.622579",
+      "arithmetic_was_not_used_to_choose_the_glyph": true
+    }
+  ],
+  "worked_cumulative_comparison_witness": {
+    "source_url": "https://zh.wikisource.org/w/index.php?title=古今律厯考_(四庫全書本)/卷43&oldid=620325",
+    "new_independent_facsimile_collation_of_all12_worked_cumulative_values": false,
+    "nodes": {
+      "winter": {
+        "8": "8.394749",
+        "36": "37.514672",
+        "66": "68.227212"
+      },
+      "spring": {
+        "11": "10.964420",
+        "43": "42.472041",
+        "74": "72.482246"
+      },
+      "summer": {
+        "9": "8.579758",
+        "39": "37.452653",
+        "71": "68.752616"
+      },
+      "autumn": {
+        "10": "10.034337",
+        "42": "42.564418",
+        "70": "71.517035"
+      }
+    }
+  },
+  "scope": {
+    "complete_four_selected_motion_columns": true,
+    "complete_cumulative_columns_transcribed": false,
+    "other88_day_autumn_or93_day_spring_tables_transcribed": false,
+    "rates_generated_by_reversing_other_columns": false,
+    "missing_terminal_rates_filled": false,
+    "single_unblinded_collator": true,
+    "independent_second_expert": false,
+    "source_internal_arithmetic_is_physical_accuracy": false,
+    "used_in_native_birth_chart": false
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "id": "numerology_knowledge_source_catalogue_v15",
+  "version": 15,
+  "reference_only": true,
+  "scope": "Revision15 binds Daxu26 six headers/24complete parent sections;156/384each,228pending. Other15sources exact. Two new glyph locations qualified. Dictionary context is editorial, not glyph proof or personal applicability. No independent certification or outcome evidence.",
+  "sources": [
+    {
+      "domain": "heluo",
+      "key": "body_structure",
+      "source_path": "heluo/body-structure-v1.json",
+      "canonical_content_sha256": "e50e6366d3835f918fb3febad41ce2f77d37a2789680476d9242b2b0e31e720d",
+      "source_kind": "existing_partial_source_record"
+    },
+    {
+      "domain": "heluo",
+      "key": "clock",
+      "source_path": "heluo/clock-v1.json",
+      "canonical_content_sha256": "d1e449c3e2dee87e3f1571cbab57cde0add9d72abe7daff9ff517c26d2607b71",
+      "source_kind": "existing_partial_source_record"
+    },
+    {
+      "domain": "heluo",
+      "key": "commentary_collation",
+      "source_path": "heluo/commentary-collation-v1.json",
+      "canonical_content_sha256": "0b0bca66080f6e3c8822bc8269d2241b433197b92e1348764057ae1744b765ed",
+      "source_kind": "existing_partial_source_record"
+    },
+    {
+      "domain": "heluo",
+      "key": "heluoTiaowen",
+      "source_path": "heluo/heluoTiaowen.json",
+      "canonical_content_sha256": "f4973e57935dfff32428fea8d8a875ff5eb603ae26b7eab117a54eb239e5e13d",
+      "source_kind": "inherited_unreviewed"
+    },
+    {
+      "domain": "heluo",
+      "key": "jiehou",
+      "source_path": "heluo/jiehou-v1.json",
+      "canonical_content_sha256": "c8fd28df0f479afd0f55e3c2ae68fab75dde6a70d4b23f8e12663fc993daa558",
+      "source_kind": "existing_partial_source_record"
+    },
+    {
+      "domain": "heluo",
+      "key": "line_rules",
+      "source_path": "heluo/line-rules-v1.json",
+      "canonical_content_sha256": "1bd2a2d16028e00d1eef3828784e0623aa45d46052f9aa13c6589741a2305359",
+      "source_kind": "existing_partial_source_record"
+    },
+    {
+      "domain": "heluo",
+      "key": "month_collation",
+      "source_path": "heluo/month-collation-v1.json",
+      "canonical_content_sha256": "b6cf9fa823c929269320e70af0ca98a77d94cba01c1951eb2a393738bff30ed0",
+      "source_kind": "existing_partial_source_record"
+    },
+    {
+      "domain": "heluo",
+      "key": "najia_collation",
+      "source_path": "heluo/najia-collation-v1.json",
+      "canonical_content_sha256": "dd57e79dbe2b9d27c3a336d879d24a24a9b8e38a35b87b3e470cdad39c4f54e2",
+      "source_kind": "existing_partial_source_record"
+    },
+    {
+      "domain": "heluo",
+      "key": "poem_collation",
+      "source_path": "heluo/poem-collation-v1.json",
+      "canonical_content_sha256": "5e956c49d71db1879743ad9e4ac4511f58a0cae036ebd5d30abc9e595020703d",
+      "source_kind": "existing_partial_source_record"
+    },
+    {
+      "domain": "heluo",
+      "key": "volume_one_month_table",
+      "source_path": "heluo/volume-one-month-table-v1.json",
+      "canonical_content_sha256": "fc14a2e630688b9f9492a120b748477cae7799befc532033a4c1b94fce8d718f",
+      "source_kind": "existing_partial_source_record"
+    },
+    {
+      "domain": "heluo",
+      "key": "yaoci_collation",
+      "source_path": "heluo/yaoci-collation-v1.json",
+      "canonical_content_sha256": "61e5f891792122d73c84faef09b46bbc40864ac122a79100f9bdf0decfe0c5e3",
+      "source_kind": "existing_partial_source_record"
+    },
+    {
+      "domain": "heluo",
+      "key": "yuanqi_opposition",
+      "source_path": "heluo/yuanqi-opposition-v1.json",
+      "canonical_content_sha256": "b2e3fb847000313ea44615fbca38117cfce093964cb09156741f06cf3fc640c5",
+      "source_kind": "existing_partial_source_record"
+    },
+    {
+      "domain": "canping",
+      "key": "canpingTiaowen",
+      "source_path": "canping/canpingTiaowen.json",
+      "canonical_content_sha256": "0937239dc138f47ae4edc4b6a8ebbbeb23151e3d7d6ee867eef0d48219e00712",
+      "source_kind": "inherited_unreviewed"
+    },
+    {
+      "domain": "canping",
+      "key": "schedule_basis",
+      "source_path": "canping/schedule-basis-v1.json",
+      "canonical_content_sha256": "c8da433b4ab29c86f044f05e06593ead40992b76612147b6f1d11b5a37ccccc4",
+      "source_kind": "existing_partial_source_record"
+    },
+    {
+      "domain": "canping",
+      "key": "text_collation",
+      "source_path": "canping/text-collation-v1.json",
+      "canonical_content_sha256": "ca8fc561e948fc1c9e2db219cadf82fbd655c5471984839c4de0c5606301b45b",
+      "source_kind": "existing_partial_source_record"
+    },
+    {
+      "domain": "canping",
+      "key": "text_witnesses",
+      "source_path": "canping/text-witnesses-v1.json",
+      "canonical_content_sha256": "a42cde9985fbdeb6b3142e4b7e0ba50717a23b5caeffc21215bb3f5ec440e9e4",
+      "source_kind": "existing_partial_source_record"
+    },
+    {
+      "domain": "heluo",
+      "key": "pillar_links",
+      "source_path": "numerology/pillar-links-v1.json",
+      "canonical_content_sha256": "874bbc303f4bdb5c61a7c16f7196badcfda8f90d63b81aa73af363a211ee2ac8",
+      "source_kind": "existing_partial_source_record"
+    }
+  ]
+}

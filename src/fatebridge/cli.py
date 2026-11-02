@@ -17,9 +17,22 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shlex
 from pathlib import Path
-from typing import Any, Dict, List, NoReturn, Optional, get_origin
+from types import UnionType
+from typing import (
+    Annotated,
+    Any,
+    Dict,
+    List,
+    Literal,
+    NoReturn,
+    Optional,
+    Union,
+    get_args,
+    get_origin,
+)
 
 from pydantic import ValidationError
 
@@ -27,7 +40,6 @@ from fatebridge.application.description import describe_input_spec, describe_spe
 from fatebridge.application.description import field_type_name as _type_name
 from fatebridge.application.description import is_model_field, resolve_spec
 from fatebridge.application.description import spec_is_cli_safe as _cli_safe
-from fatebridge.application.description import unwrap_optional as _unwrap_optional
 from fatebridge.application.discovery import discover_specs
 from fatebridge.application.execution import (
     execute_tool,
@@ -69,6 +81,16 @@ class _JsonErrorParser(argparse.ArgumentParser):
     (argparse defaults ``parser_class`` to ``type(self)``), so per-tool flag
     errors are routed too.
     """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        # Argparse's default numeric matcher omits exponents. A valid
+        # negative coordinate such as -5.63e-05 would otherwise look like
+        # another option when passed after --birth-longitude. Keep its
+        # standard registered-option precedence and JSON error handling.
+        self._negative_number_matcher = re.compile(
+            r"^-(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$"
+        )
 
     def error(self, message: str) -> "NoReturn":  # type: ignore[override]
         print(
@@ -224,6 +246,33 @@ def _cli_example(spec: ToolSpec, inputs: Dict[str, Any]) -> str:
     return shlex.join(parts)
 
 
+def _argument_type(annotation: Any) -> Any:
+    """Choose the lexical CLI parser while retaining Pydantic constraints.
+
+    Optional StrictInt and list[Annotated[int, ...]] retain Annotated wrappers
+    inside their outer type. They still need argparse's integer conversion;
+    model validation subsequently enforces strictness and value bounds.
+    """
+    if get_origin(annotation) is Annotated:
+        return _argument_type(get_args(annotation)[0])
+    # A multi-type union is not an Optional wrapper. In particular, choosing
+    # the first member of Union[int,str] loses every named house system before
+    # the shared request model sees it. Keep a declared string branch lexical;
+    # the request model remains responsible for validating its meaning.
+    if get_origin(annotation) in (Union, UnionType):
+        members = [a for a in get_args(annotation) if a is not type(None)]
+        resolved = [_argument_type(a) for a in members]
+        if str in resolved:
+            return str
+        if len(resolved) == 1:
+            return resolved[0]
+        # Retain the existing first-branch numeric policy outside unions with
+        # a textual branch; this change does not select new numeric semantics.
+        if get_origin(annotation) is Union and resolved:
+            return resolved[0]
+    return annotation
+
+
 def _add_field_argument(
     parser: argparse.ArgumentParser,
     name: str,
@@ -232,7 +281,7 @@ def _add_field_argument(
     relax_required: bool = False,
     json_structures: bool = False,
 ) -> None:
-    annotation = _unwrap_optional(field.annotation)
+    annotation = _argument_type(field.annotation)
     origin = get_origin(annotation)
     is_required = field.is_required()
     # When a --subject-file supplies this field, drop the argparse-level
@@ -248,8 +297,8 @@ def _add_field_argument(
     flag = "--" + name.replace("_", "-")
     help_text = field.description or ""
 
-    if json_structures and (
-        is_model_field(field.annotation) or origin in (list, List, dict, Dict)
+    if origin in (dict, Dict) or (
+        json_structures and (is_model_field(field.annotation) or origin in (list, List))
     ):
         parser.add_argument(
             flag,
@@ -274,7 +323,24 @@ def _add_field_argument(
             help=bool_help,
         )
     elif origin in (list, List):
-        parser.add_argument(flag, dest=name, nargs="*", default=default, help=help_text)
+        item_type = (
+            _argument_type(get_args(annotation)[0]) if get_args(annotation) else str
+        )
+        if get_origin(item_type) is Literal:
+            choices = get_args(item_type)
+            item_type = (
+                type(choices[0])
+                if choices and all(type(v) is type(choices[0]) for v in choices)
+                else str
+            )
+        parser.add_argument(
+            flag,
+            dest=name,
+            nargs="*",
+            type=item_type if item_type in (int, float, str) else str,
+            default=default,
+            help=help_text,
+        )
     elif annotation is int:
         parser.add_argument(
             flag,
@@ -346,10 +412,31 @@ def build_parser(
         help="input 只取输入契约及示例；full 还含输出契约",
     )
 
+    result_reader = sub.add_parser(
+        "result-read", help="核对原 run 的完整 payload 散列，再读取一页或点路径；不重算"
+    )
+    result_reader.add_argument("result_id")
+    result_reader.add_argument(
+        "--sha256", required=True, help="原 result_delivery.sha256"
+    )
+    result_reader.add_argument("--run-id", required=True, help="原 run_metadata.run_id")
+    result_reader.add_argument(
+        "--path", help="对象或数组数字索引点路径；省略读取全文分页"
+    )
+    result_reader.add_argument("--offset", type=int, default=0)
+    result_reader.add_argument(
+        "--directory", type=Path, help="可选：原交付文件所在的私有目录；不创建目录"
+    )
+
     doctor = sub.add_parser("doctor", help="检查安装；--mcp 验证独立 stdio 进程")
     doctor.add_argument("--mcp", action="store_true")
     doctor.add_argument("--family", help="检查这些 MCP 分类（CSV）")
     doctor.add_argument("--scenario", help="检查这些 MCP 场景（CSV）")
+    doctor.add_argument(
+        "--tool-scope",
+        choices=("complete", "topic"),
+        help="complete 包含条件依赖；topic 仅主题直接工具与知识支撑，需 --scenario",
+    )
 
     _add_profile_parser(sub)
 
@@ -766,7 +853,7 @@ def _run_profile(
     # Shared person inputs: subject-file defaults, then explicit CLI flags win.
     inputs: Dict[str, Any] = {}
     if subject_data:
-        inputs.update({k: v for k, v in subject_data.items() if v is not None})
+        inputs.update(subject_data)
     for fname in _PROFILE_PERSON_FIELDS:
         if fname in vars(args):  # SUPPRESS -> present only if user passed it
             inputs[fname] = getattr(args, fname)
@@ -805,9 +892,7 @@ def _run_profile(
     any_error = False
     for token, spec in resolved:
         field_names = set(spec.request_model.model_fields)
-        provided = {
-            k: v for k, v in inputs.items() if k in field_names and v is not None
-        }
+        provided = {k: v for k, v in inputs.items() if k in field_names}
         try:
             result = execute_tool(
                 spec,
@@ -958,6 +1043,23 @@ def run(argv: Optional[List[str]] = None) -> int:
         _print_tools()
         return 0
 
+    if args.command == "result-read":
+        from fatebridge.application.result_delivery import RESULT_STORE, ResultStore
+
+        try:
+            store = (
+                ResultStore(args.directory)
+                if args.directory is not None
+                else RESULT_STORE
+            )
+            page = store.verified_page(
+                args.result_id, args.sha256, args.run_id, args.offset, args.path
+            )
+        except ParameterError as exc:
+            return _emit_error(exc.as_result(), 1)
+        print(json.dumps(page, ensure_ascii=False, separators=(",", ":")))
+        return 0
+
     if args.command in {"list", "discover"}:
         try:
             catalog = discover_specs(
@@ -996,7 +1098,12 @@ def run(argv: Optional[List[str]] = None) -> int:
     if args.command == "doctor":
         from fatebridge.diagnostics import diagnose
 
-        result = diagnose(mcp=args.mcp, family=args.family, scenario=args.scenario)
+        result = diagnose(
+            mcp=args.mcp,
+            family=args.family,
+            scenario=args.scenario,
+            tool_scope=args.tool_scope,
+        )
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0 if result["ok"] else 1
 
@@ -1032,7 +1139,7 @@ def run(argv: Optional[List[str]] = None) -> int:
         defaults = {
             k: v
             for k, v in subject_data.items()
-            if k in field_names and v is not None and k not in provided
+            if k in field_names and k not in provided
         }
         provided = {**defaults, **provided}
 

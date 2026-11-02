@@ -1,0 +1,45 @@
+{
+  "model_id": "shoushi_named_year_labels_v1",
+  "reference_nominal_year_ce": 1281,
+  "reference_winter_year_ce": 1280,
+  "reference_label": "至元十八年辛巳历书，岁前至元十七年庚辰冬至",
+  "elapsed_years_formula": "source_year - 1281 = winter_year - 1280; inclusive count minus one",
+  "year_boundary_policy": "named_book_year_label_only_no_modern_calendar_boundary",
+  "sources": [
+    {
+      "source_id": "yuanshi_52_nlc166_winter_1280",
+      "title": "元史卷52，国图藏二十四史第166册",
+      "source_url": "https://commons.wikimedia.org/w/index.php?title=File:NLC892-312002017339-363669_二十四史_第166冊.pdf&oldid=1270279566",
+      "original_sha256": "c9f5560e0b14b1f85d27f81bb1e28fbc97ef739df4fef6979e0a85cdf6aac8e4",
+      "artifact": "yuanshi-nlc166-page40.pdf",
+      "artifact_sha256": "c02efad568bcd8086f8df599903e5e90b0794dfab5745aba284149b456a203c9",
+      "role": "至元十七年庚辰的冬至记录；与1281历书标年分列"
+    },
+    {
+      "source_id": "gjtj29_shoushi_source_year_1608",
+      "title": "古今圖書集成，Volume029，推天正冬至及推今時所測歲實",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Gujin_Tushu_Jicheng,_Volume_029_(1700-1725).djvu",
+      "original_sha256": "22e1c5d03d4204df721814a41d9f1de0d07b09e377c82120883e317f9859c88c",
+      "artifact": "gjtj29-page83.jpg",
+      "artifact_sha256": "1ff01a5d1c60104776f9ac84bf3910af13cc7717f2ad095ffa31308a6e80a5b5",
+      "role": "原书标年1608距1281含首尾328，减一327；所推冬至为岁前1607，原历计算与另列晷景观测分别保存"
+    }
+  ],
+  "worked_example_1608": {
+    "source_year": 1608,
+    "winter_year": 1607,
+    "elapsed_years": 327,
+    "inclusive_count": 328,
+    "year_days": "365.2422",
+    "zhongji_days": "119434.1994",
+    "winter_cycle_days": "29.2594",
+    "winter_sexagenary_day": "癸巳",
+    "winter_fraction_of_day": "0.2594",
+    "evidence": "GJTJ29 physical page83 upper block original worked calculation"
+  },
+  "independent_second_collator": false,
+  "modern_calendar_date_assigned": false,
+  "modern_epoch_calibrated": false,
+  "used_in_native_birth_chart": false,
+  "gujin58_header_variants_resolved": false
+}

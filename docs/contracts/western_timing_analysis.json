@@ -1,0 +1,484 @@
+{
+  "call_guidance": {
+    "complete_export": "用户要求完整JSON、全部时间线或完整文件时，首次fields=null，保留默认响应预算，再读取result_delivery；first_view仅用于摘要咨询，不能先投影摘要再补算全文。",
+    "delivery": "MCP默认8192字符，完整结果超限返回result_delivery。用其manifest_uri按所需字段或分页读取同一run；完整JSON重组核对sha256，不重新计算，不解析截断片段。",
+    "evidence": "首次按问题选择evidence_views.stage/annual/short_term/career的fields；事业兼阶段与目标时段用career，结合本命职业配置筛选相关hits。默认与其他视图不强制展开全部方法；fields=null仍表示全量。",
+    "target_clock": "analysis_hour/minute 是目标钟时，按 birth_timezone；显式0有效。省略分别沿用出生小时/分钟，仅兼容日期级调用。return_timezone转换同一时刻。"
+  },
+  "evidence_views": {
+    "annual": {
+      "fields": [
+        "analysis_context",
+        "summary",
+        "time_lords.annual_profection",
+        "time_lords.firdaria.current_major",
+        "time_lords.firdaria.current_sub",
+        "directions.given_year.year_start",
+        "directions.given_year.year_end",
+        "returns.solar_return.return_datetime",
+        "returns.solar_return.return_datetime_utc",
+        "returns.solar_return.sun",
+        "returns.solar_return.moon",
+        "returns.solar_return.ascendant",
+        "returns.solar_return.medium_coeli",
+        "returns.solar_return.solver",
+        "returns.solar_return.calculation_basis.engine_backend",
+        "returns.solar_return.calculation_basis.ephemeris_model",
+        "returns.solar_return.calculation_basis.time_scale",
+        "returns.solar_return.calculation_basis.future_leap_seconds_assumed_unchanged"
+      ],
+      "when": "年度主题，按生日年起止读小限与太阳返照位置；不是全年逐日时间线"
+    },
+    "career": {
+      "fields": [
+        "analysis_context",
+        "summary",
+        "time_lords.firdaria.sect",
+        "time_lords.firdaria.current_major",
+        "time_lords.firdaria.current_sub",
+        "time_lords.annual_profection",
+        "directions.given_year.year_start",
+        "directions.given_year.year_end",
+        "returns.solar_return.return_datetime",
+        "returns.solar_return.return_datetime_utc",
+        "returns.solar_return.sun",
+        "returns.solar_return.moon",
+        "returns.solar_return.ascendant",
+        "returns.solar_return.medium_coeli",
+        "returns.solar_return.solver",
+        "returns.solar_return.calculation_basis.engine_backend",
+        "returns.solar_return.calculation_basis.ephemeris_model",
+        "returns.solar_return.calculation_basis.time_scale",
+        "returns.solar_return.calculation_basis.future_leap_seconds_assumed_unchanged",
+        "transits.current_transit.analysis_datetime",
+        "transits.current_transit.orb_limit",
+        "transits.current_transit.house_emphasis",
+        "transits.current_transit.hits",
+        "transits.current_transit.exact_hits"
+      ],
+      "when": "事业问题同时涉及阶段和目标时段，首次保留主运/分运、生日年界及目标时刻行运命中；结合本命职业配置筛选相关hits，空值不补造，也不称全年逐日扫描。"
+    },
+    "data_files": {
+      "fields": [
+        "ephemeris_data_policy"
+      ],
+      "scope": "Available when ephemeris_policy=require_data_files. Read the actual observed physical models, file hashes, reference zeros and private-worker reports. Native event-internal reads, fixed-star catalogue formulae and absolute accuracy are not certified. This card does not set the input policy."
+    },
+    "short_term": {
+      "fields": [
+        "analysis_context",
+        "summary",
+        "transits.current_transit.analysis_datetime",
+        "transits.current_transit.orb_limit",
+        "transits.current_transit.house_emphasis",
+        "transits.current_transit.hits",
+        "transits.current_transit.exact_hits",
+        "returns.lunar_return"
+      ],
+      "when": "指定短期或钟时，读实际行运命中与月返；空 hits 也是有效结果，不编造命中"
+    },
+    "stage": {
+      "fields": [
+        "analysis_context",
+        "summary",
+        "time_lords.firdaria.sect",
+        "time_lords.firdaria.current_major",
+        "time_lords.firdaria.current_sub"
+      ],
+      "when": "人生阶段，读法达主运／分运及真实起止；窄查法达可直接用 firdaria"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "analysis_context",
+      "summary",
+      "time_lords.firdaria.sect",
+      "time_lords.firdaria.current_major",
+      "time_lords.firdaria.current_sub",
+      "time_lords.annual_profection",
+      "returns.solar_return.return_datetime",
+      "returns.solar_return.return_datetime_utc",
+      "returns.solar_return.sun",
+      "returns.solar_return.moon",
+      "returns.solar_return.ascendant",
+      "returns.solar_return.medium_coeli",
+      "returns.solar_return.solver",
+      "returns.solar_return.calculation_basis.engine_backend",
+      "returns.solar_return.calculation_basis.ephemeris_model",
+      "returns.solar_return.calculation_basis.time_scale",
+      "returns.solar_return.calculation_basis.future_leap_seconds_assumed_unchanged",
+      "transits.current_transit.analysis_datetime",
+      "transits.current_transit.orb_limit",
+      "transits.current_transit.hits"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "analysis_day": {
+        "anyOf": [
+          {
+            "maximum": 31,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis day (1-31)"
+      },
+      "analysis_hour": {
+        "anyOf": [
+          {
+            "maximum": 23,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis hour (0-23), in birth_timezone. If omitted, keeps the birth hour for date-only compatibility."
+      },
+      "analysis_minute": {
+        "anyOf": [
+          {
+            "maximum": 59,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis minute (0-59), in birth_timezone. If omitted, keeps the birth minute for date-only compatibility."
+      },
+      "analysis_month": {
+        "anyOf": [
+          {
+            "maximum": 12,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis month (1-12)"
+      },
+      "analysis_year": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis year"
+      },
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "birth_day": {
+        "description": "Birth day (1-31)",
+        "maximum": 31,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "birth_hour": {
+        "description": "Birth hour (0-23)",
+        "maximum": 23,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_latitude": {
+        "description": "Birth latitude",
+        "maximum": 90,
+        "minimum": -90,
+        "type": "number"
+      },
+      "birth_longitude": {
+        "description": "Birth longitude",
+        "maximum": 180,
+        "minimum": -180,
+        "type": "number"
+      },
+      "birth_minute": {
+        "default": 0,
+        "description": "Birth minute (0-59)",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_month": {
+        "description": "Birth month (1-12)",
+        "maximum": 12,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "birth_place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "Birth place"
+      },
+      "birth_timezone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth timezone (IANA name or UTC offset). Optional: when omitted, FateBridge may resolve it from a supported birth_place. Western charts and timing reject an unresolved civil timezone; coordinates alone do not establish a zone. Supply UTC explicitly when that is the confirmed recorded basis. Place inference does not certify historical clock accuracy."
+      },
+      "birth_year": {
+        "description": "Birth year, e.g., 1990",
+        "type": "integer"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "ephemeris_policy": {
+        "default": "auto",
+        "description": "auto retains and reports actual available models. require_data_files rejects analytical/orbital fallback for observed physical coordinates throughout the request, including clocks and samples; checks data contexts and endpoint hashes. Native rise/set query/result epochs are probed, but internal solver reads are not fully observable. Analytical points, fictitious elements, reference zeros and Earth rotation are separate; this is not an astronomical-accuracy or prediction certificate.",
+        "enum": [
+          "auto",
+          "require_data_files"
+        ],
+        "type": "string",
+        "x-fatebridge-western-data-policy": true
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "firdaria_night_order": {
+        "default": "nodes_at_end",
+        "description": "Firdaria night order: nodes_at_end (existing default, after Mercury) or nodes_after_mars (Bonatti-labelled variant). Day order is unchanged.",
+        "enum": [
+          "nodes_at_end",
+          "nodes_after_mars"
+        ],
+        "type": "string"
+      },
+      "firdaria_year_basis": {
+        "default": "fixed_365_2425",
+        "description": "Firdaria year basis: fixed_365_2425 (existing local-wall arithmetic) or calendar_anniversary (original-birth anniversaries, Feb 29 clamps to Feb 28 then restores; UTC elapsed subperiods). Calendar mode rejects ambiguous/nonexistent birth, analysis and generated anniversary clocks.",
+        "enum": [
+          "fixed_365_2425",
+          "calendar_anniversary"
+        ],
+        "type": "string"
+      },
+      "house_system": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string"
+          }
+        ],
+        "default": "P",
+        "description": "House system, any convention: SE letter ('P'=Placidus, 'R'=Regiomontanus, 'W'=whole sign, 'D'=equal_mc), key ('placidus', 'equal_mc'), or integer code 0..8 (3=Placidus, 8=equal_mc). Explicit values must be supported letters/names or integer codes0..8; unknown, blank, boolean and floating-point selections are rejected without substitution. Gauquelin (G) has36 clockwise sectors and is unavailable here."
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "Name (optional)"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "pd_aspects": {
+        "default": [
+          0,
+          60,
+          90,
+          120,
+          180
+        ],
+        "description": "Primary direction aspects in degrees",
+        "items": {
+          "type": "integer"
+        },
+        "type": "array"
+      },
+      "pd_method": {
+        "default": "astroapp_alchabitius",
+        "description": "Primary direction method identifier, e.g. astroapp_alchabitius, equatorial, or fatebridge_mundane_semiarc",
+        "enum": [
+          "astroapp_alchabitius",
+          "equatorial",
+          "fatebridge_mundane_semiarc"
+        ],
+        "type": "string"
+      },
+      "pd_time_key": {
+        "default": "Ptolemy",
+        "description": "Primary direction time key, e.g. Ptolemy or Naibod",
+        "type": "string"
+      },
+      "pd_type": {
+        "default": 0,
+        "description": "Primary direction mode: 0 for direct, 1 for converse",
+        "maximum": 1,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "return_latitude": {
+        "anyOf": [
+          {
+            "maximum": 90,
+            "minimum": -90,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Return chart latitude"
+      },
+      "return_longitude": {
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Return chart longitude"
+      },
+      "return_timezone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Return chart timezone (IANA name or UTC offset)"
+      },
+      "show_pd_bounds": {
+        "default": true,
+        "description": "Whether to expose the bounds overlay preference for the primary direction chart",
+        "type": "boolean"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "zodiac_type": {
+        "default": "Tropic",
+        "description": "Zodiac type, e.g. Tropic or Sidereal",
+        "type": "string"
+      }
+    },
+    "required": [
+      "birth_year",
+      "birth_month",
+      "birth_day",
+      "birth_hour",
+      "birth_longitude",
+      "birth_latitude"
+    ],
+    "type": "object"
+  },
+  "tool": "western_timing_analysis"
+}

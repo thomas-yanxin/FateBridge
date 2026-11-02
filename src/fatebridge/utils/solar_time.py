@@ -1,11 +1,12 @@
 """Solar-time strategies and birth-clock normalization with place and timezone provenance."""
 
 import math
-from dataclasses import dataclass
-from datetime import datetime, timedelta
+from dataclasses import dataclass, replace
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 
 from fatebridge.utils.birth_input import PersonInfo, create_birth_datetime
+from fatebridge.utils.civil_clock import resolve_civil_clock, utc_instant
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE, resolve_birth_place_context
 from fatebridge.utils.timezones import (
     invalid_timezone_message as _invalid_timezone_message,
@@ -13,11 +14,13 @@ from fatebridge.utils.timezones import (
 from fatebridge.utils.timezones import (
     parse_timezone_name,  # Shared parsing for civil and astronomical calculations.
 )
+from fatebridge.utils.timezones import validate_local_clock
 
 SOLAR_TIME_STRATEGY_APPARENT = "apparent"
 
 
 SOLAR_TIME_STRATEGY_LONGITUDE_ONLY = "longitude_only"
+EQUATION_OF_TIME_METHOD = "swiss_time_equ_utc_instant_v1"
 
 
 # the astrology engine would reject an address the BaZi engine happily accepts.
@@ -40,10 +43,14 @@ class NormalizedBirthTime:
     total_correction_minutes: float
     applied: bool
     # 仅当经度是从 birth_place 推断、且只匹配到省级中心点（而非具体市县）时填充：
-    # 告知调用方此次校正用的是省级近似经度，可能与实际地点相差数分钟。
+    # 告知调用方此次校正用的是省级代表经度，未量化实际出生点的误差界。
     resolution_advisory: Optional[str] = None
+    equation_of_time_method: Optional[str] = None
+    solar_time_strategy: Optional[str] = None
+    timezone_source: Optional[str] = None
+    timezone_resolved_place: Optional[str] = None
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self, *, include_timezone_resolution: bool = False) -> Dict[str, Any]:
         """Return a JSON-safe summary for API responses."""
         summary: Dict[str, Any] = {
             "applied": self.applied,
@@ -61,14 +68,53 @@ class NormalizedBirthTime:
         # 的输出结构不变，避免给既有消费者凭空多一个 null 字段。
         if self.resolution_advisory is not None:
             summary["resolution_advisory"] = self.resolution_advisory
+        if self.equation_of_time_method is not None:
+            summary["equation_of_time_method"] = self.equation_of_time_method
+            summary["equation_of_time_time_scale"] = "UTC_as_UT1"
+        if self.solar_time_strategy is not None:
+            summary["solar_time_strategy"] = self.solar_time_strategy
+        if include_timezone_resolution:
+            summary["timezone_source"] = self.timezone_source
+            summary["timezone_resolved_place"] = self.timezone_resolved_place
         return summary
 
 
-def calculate_equation_of_time_minutes(target_datetime: datetime) -> float:
-    """Approximate equation of time in minutes for a given date."""
-    day_of_year = target_datetime.timetuple().tm_yday
-    b = 2 * math.pi * (day_of_year - 81) / 364
-    return 9.87 * math.sin(2 * b) - 7.53 * math.cos(b) - 1.5 * math.sin(b)
+def calculate_equation_of_time_minutes(
+    target_datetime: datetime, *, julian_day_ut1: Optional[float] = None
+) -> float:
+    """Apparent minus mean solar time at an explicit civil instant.
+
+    Swiss Ephemeris expects UT and returns days. UTC is used as an
+    approximation to UT1 by default. A domain with a resolved physical clock
+    may supply that instant's explicit UT1 instead. Neither mode certifies
+    measured DUT1. Never substitute a seasonal sinusoid silently.
+    """
+    from fatebridge.core import ephemeris_runtime as runtime
+
+    if target_datetime.utcoffset() is None:
+        raise ValueError("均时差计算需要带时区的真实时刻")
+    if runtime.swe is None:
+        raise ImportError("真太阳时均时差计算需要 Swiss Ephemeris")
+    if julian_day_ut1 is None:
+        instant = target_datetime.astimezone(timezone.utc)
+        hour = (
+            instant.hour
+            + instant.minute / 60
+            + (instant.second + instant.microsecond / 1e6) / 3600
+        )
+        julian_day = runtime.ephemeris_call(
+            "julday",
+            instant.year,
+            instant.month,
+            instant.day,
+            hour,
+            runtime.swe.GREG_CAL,
+        )
+    else:
+        if not math.isfinite(julian_day_ut1):
+            raise ValueError("Equation-of-time UT1 Julian day must be finite")
+        julian_day = julian_day_ut1
+    return float(runtime.ephemeris_call("time_equ", julian_day)) * 1440
 
 
 def calculate_solar_time_adjustment(
@@ -77,10 +123,15 @@ def calculate_solar_time_adjustment(
     longitude: float,
     *,
     strategy: str = SOLAR_TIME_STRATEGY_APPARENT,
+    equation_of_time_jd_ut1: Optional[float] = None,
 ) -> Dict[str, float]:
     """Calculate solar-time correction details for a local civil datetime."""
     timezone_info = parse_timezone_name(timezone_name)
-    aware_datetime = input_datetime.replace(tzinfo=timezone_info)
+    if input_datetime.utcoffset() is None:
+        aware_datetime = input_datetime.replace(tzinfo=timezone_info)
+        validate_local_clock(aware_datetime)
+    else:
+        aware_datetime = input_datetime.astimezone(timezone_info)
     utc_offset = aware_datetime.utcoffset()
     if utc_offset is None:
         raise ValueError(_invalid_timezone_message(timezone_name))
@@ -100,7 +151,13 @@ def calculate_solar_time_adjustment(
     dst_offset_minutes = daylight_saving.total_seconds() / 60
 
     if strategy == SOLAR_TIME_STRATEGY_APPARENT:
-        equation_of_time_minutes = calculate_equation_of_time_minutes(input_datetime)
+        equation_of_time_minutes = (
+            calculate_equation_of_time_minutes(aware_datetime)
+            if equation_of_time_jd_ut1 is None
+            else calculate_equation_of_time_minutes(
+                aware_datetime, julian_day_ut1=equation_of_time_jd_ut1
+            )
+        )
         total_correction_minutes = (
             longitude_correction_minutes + equation_of_time_minutes - dst_offset_minutes
         )
@@ -126,10 +183,45 @@ def calculate_solar_time_adjustment(
     }
 
 
+def rebase_birth_clock(
+    template: NormalizedBirthTime, civil_instant: datetime
+) -> NormalizedBirthTime:
+    """Evaluate a derived uncertainty instant in the confirmed clock policy.
+
+    This does not replace a confirmed birth record. The caller supplies an
+    aware actual instant inside its separately declared assessment range.
+    Fractional probes remain derived calculation points, not record precision.
+    """
+    civil = utc_instant(civil_instant).astimezone(
+        parse_timezone_name(template.timezone)
+    )
+    if not template.applied:
+        return replace(template, input_datetime=civil, corrected_datetime=civil)
+    if template.longitude is None or template.solar_time_strategy is None:
+        raise ValueError("已生效的出生钟校正缺少经度或策略，不能推定派生时刻口径")
+    adjustment = calculate_solar_time_adjustment(
+        civil,
+        template.timezone,
+        template.longitude,
+        strategy=template.solar_time_strategy,
+    )
+    return replace(
+        template,
+        input_datetime=civil,
+        corrected_datetime=civil.replace(tzinfo=None)
+        + timedelta(minutes=adjustment["total_correction_minutes"]),
+        longitude_correction_minutes=adjustment["longitude_correction_minutes"],
+        equation_of_time_minutes=adjustment["equation_of_time_minutes"],
+        daylight_saving_minutes=adjustment["daylight_saving_minutes"],
+        total_correction_minutes=adjustment["total_correction_minutes"],
+    )
+
+
 def normalize_birth_time(
     person: PersonInfo,
     *,
     solar_time_strategy: str = SOLAR_TIME_STRATEGY_APPARENT,
+    birth_utc_offset: Optional[str] = None,
 ) -> NormalizedBirthTime:
     """Normalize birth time and optionally apply true solar time correction."""
     input_datetime = create_birth_datetime(
@@ -138,12 +230,21 @@ def normalize_birth_time(
         person.birth_day,
         person.birth_hour,
         person.birth_minute,
+        person.birth_second if person.birth_second is not None else 0,
     )
 
     inferred_place = resolve_birth_place_context(person.birth_place)
 
     explicit_timezone = person.birth_timezone or inferred_place.timezone
     timezone_name = explicit_timezone or DEFAULT_BIRTH_TIMEZONE
+    timezone_source = (
+        "birth_timezone"
+        if person.birth_timezone
+        else "birth_place" if inferred_place.timezone else "default_timezone"
+    )
+    timezone_resolved_place = (
+        inferred_place.canonical_name if timezone_source == "birth_place" else None
+    )
 
     longitude = person.birth_longitude
     longitude_source = "birth_longitude" if longitude is not None else None
@@ -160,8 +261,17 @@ def normalize_birth_time(
     if explicit_timezone is None and longitude is not None:
         zone_hours = max(-12, min(14, int(round(longitude / 15.0))))
         timezone_name = f"{'+' if zone_hours >= 0 else '-'}{abs(zone_hours):02d}:00"
+        timezone_source = "longitude_standard_meridian_assumption"
 
-    parse_timezone_name(timezone_name)
+    resolved_clock = resolve_civil_clock(
+        input_datetime,
+        timezone_name,
+        birth_utc_offset,
+        offset_field="birth_utc_offset",
+        recorded_offset=person.birth_utc_offset,
+    )
+    if birth_utc_offset is not None or person.birth_utc_offset is not None:
+        input_datetime = resolved_clock
 
     if not person.use_true_solar_time:
         return NormalizedBirthTime(
@@ -177,6 +287,8 @@ def normalize_birth_time(
             daylight_saving_minutes=0.0,
             total_correction_minutes=0.0,
             applied=False,
+            timezone_source=timezone_source,
+            timezone_resolved_place=timezone_resolved_place,
         )
 
     if longitude is None:
@@ -211,6 +323,8 @@ def normalize_birth_time(
             daylight_saving_minutes=0.0,
             total_correction_minutes=0.0,
             applied=False,
+            timezone_source=timezone_source,
+            timezone_resolved_place=timezone_resolved_place,
             resolution_advisory=(
                 "未提供可解析的出生地或 birth_longitude，真太阳时校正未生效，结果按"
                 "钟表（标准时区）时间计算；补出生地或经度即可启用真太阳时（经度东正）。"
@@ -227,7 +341,10 @@ def normalize_birth_time(
     equation_of_time_minutes = adjustment["equation_of_time_minutes"]
     daylight_saving_minutes = adjustment.get("daylight_saving_minutes", 0.0)
     total_correction_minutes = adjustment["total_correction_minutes"]
-    corrected_datetime = input_datetime + timedelta(minutes=total_correction_minutes)
+    # Apparent-solar output is a clock label, not another civil instant.
+    corrected_datetime = input_datetime.replace(tzinfo=None) + timedelta(
+        minutes=total_correction_minutes
+    )
 
     # 经度来自 birth_place 且只匹配到省级中心点时，校正用的是省级近似经度（如
     # 「江苏省南通市海安市」只识别出省份「江苏」119.42°，与海安实际 ~120.47° 相差
@@ -238,7 +355,7 @@ def normalize_birth_time(
         resolution_advisory = (
             f"出生地『{person.birth_place}』未匹配到具体市县，仅按省级"
             f"（{resolved_place}）经度 {longitude:.2f}° 做真太阳时校正，"
-            "可能与实际地点相差数分钟；如需精确请改传 birth_longitude。"
+            "未确认实际出生点经度，误差界未量化；如需细分时辰请改传 birth_longitude。"
         )
 
     return NormalizedBirthTime(
@@ -254,5 +371,13 @@ def normalize_birth_time(
         daylight_saving_minutes=daylight_saving_minutes,
         total_correction_minutes=total_correction_minutes,
         applied=True,
+        timezone_source=timezone_source,
+        timezone_resolved_place=timezone_resolved_place,
         resolution_advisory=resolution_advisory,
+        equation_of_time_method=(
+            EQUATION_OF_TIME_METHOD
+            if solar_time_strategy == SOLAR_TIME_STRATEGY_APPARENT
+            else None
+        ),
+        solar_time_strategy=solar_time_strategy,
     )

@@ -9,7 +9,7 @@ from typing import Any, Iterable, Literal, Mapping, Optional, Set, Tuple, get_ar
 
 from pydantic import Field, StrictBool, field_validator, model_validator
 
-from fatebridge.core.requests.base import _DeferredModel
+from .numeric_inputs import FengshuiInput as _DeferredModel
 
 InteriorRole = Literal[
     "main_entry_door",

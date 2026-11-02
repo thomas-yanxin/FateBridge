@@ -4,7 +4,7 @@ from typing import List, Literal, Optional
 
 from pydantic import ConfigDict, Field, StrictBool, model_validator
 
-from fatebridge.core.requests.base import _DeferredModel
+from .numeric_inputs import FengshuiInput as _DeferredModel
 
 SurfaceZone = Literal[
     "near_left",

@@ -2,16 +2,40 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Mapping, Optional
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.reference import (
     CORE_CHART_DEFAULT_HOUSE_LABELS_ZH,
     CORE_CHART_DEFAULT_HOUSE_SYSTEMS,
     CORE_CHART_DEFAULT_ZODIACAL,
+    NODE_BODIES,
     RELATIVE_HOUSE_SYSTEM_SPECS,
     RELATIVE_ZODIACAL_LABELS_ZH,
 )
+from fatebridge.utils.house_systems import InvalidHouseSystemError, house_system_fields
+
+ANALYTICAL_MEAN_NODE_MODEL = "swisseph_analytical_mean_node"
+APPROXIMATE_ORBIT_MODEL = "fatebridge_approximate_orbital_model"
+
+
+def native_factor_model(body_id: int, returned_flags: int) -> str:
+    """Mean-node flags echo the request, not a loaded vector ephemeris.
+
+    Swiss 2.10.03 sweph.c delegates this point to swi_mean_node() in
+    swemmoon.c. Frame/nutation handling is separate from its mean elements.
+    """
+    if runtime.swe is not None and body_id == runtime.swe.MEAN_NODE:
+        return ANALYTICAL_MEAN_NODE_MODEL
+    return runtime.ephemeris_model_from_retflag(returned_flags)
+
+
+def physical_ephemeris_summary(models: Mapping[str, str]) -> str:
+    """Summarize physical bodies, keeping reference points and quality apart."""
+    physical = {model for name, model in models.items() if name not in NODE_BODIES}
+    if not physical or physical == {APPROXIMATE_ORBIT_MODEL}:
+        return "none"
+    return _consolidate_ephemeris_model(physical)
 
 
 def _consolidate_ephemeris_model(models: set[str]) -> str:
@@ -34,12 +58,12 @@ def _derive_engine_profile(
     precisions = {
         str(profile["engine_precision"])
         for profile in profiles
-        if isinstance(profile, dict) and profile.get("engine_precision")
+        if profile is not None and profile.get("engine_precision")
     }
     backends = {
         str(profile["engine_backend"])
         for profile in profiles
-        if isinstance(profile, dict) and profile.get("engine_backend")
+        if profile is not None and profile.get("engine_backend")
     }
 
     if not precisions:
@@ -81,7 +105,7 @@ def _precision_label_from_profiles(
     return _precision_label_zh(_derive_engine_profile(*profiles)["engine_precision"])
 
 
-def _coerce_house_system_code(hsys: Any) -> Optional[int]:
+def _coerce_house_system_code(hsys: object) -> Optional[int]:
     """Translate a user-facing house-system identifier into the internal 0-8 code.
 
     Accepts:
@@ -98,41 +122,16 @@ def _coerce_house_system_code(hsys: Any) -> Optional[int]:
     if hsys is None:
         return None
     try:
-        resolved_int = int(hsys)
-    except (TypeError, ValueError):
-        resolved_int = None
-    else:
-        if resolved_int in RELATIVE_HOUSE_SYSTEM_SPECS:
-            return resolved_int
-
-    if not isinstance(hsys, str):
+        return house_system_fields(hsys)["house_system_code"]
+    except InvalidHouseSystemError:
         return None
-
-    normalized = hsys.strip()
-    if not normalized:
-        return None
-
-    if len(normalized) == 1:
-        letter = normalized.upper().encode("ascii", errors="ignore")
-        for code, spec in RELATIVE_HOUSE_SYSTEM_SPECS.items():
-            if spec["swisseph_code"] == letter:
-                return code
-
-    folded = normalized.casefold()
-    for code, spec in RELATIVE_HOUSE_SYSTEM_SPECS.items():
-        if spec["key"].casefold() == folded:
-            return code
-        if spec["label_zh"].casefold() == folded:
-            return code
-
-    return None
 
 
 def _resolve_offline_house_system(hsys: Any, *, context_label: str) -> Dict[str, Any]:
     resolved = _coerce_house_system_code(hsys)
     if resolved is None or resolved not in RELATIVE_HOUSE_SYSTEM_SPECS:
         raise ValueError(
-            f"{context_label}离线模式暂仅支持 hsys=0..8（整宫制、Alcabitus、Regiomontanus、Placidus、Koch、Vehlow Equal、Polich Page、Sripati、天顶为10宫中点等宫制）。"
+            f"{context_label}离线模式暂仅支持 hsys=0..8（整宫制、Alcabitus、Regiomontanus、Placidus、Koch、Vehlow Equal、Polich Page、Sripati、天顶为第10宫宫头的等宫制）。"
         )
     if runtime.swe is None and resolved != 0:
         raise ValueError(
@@ -250,13 +249,3 @@ def _relative_zodiac_profile_overrides(
     if ayanamsha is not None:
         overrides["ayanamsha"] = round(ayanamsha, 4)
     return overrides
-
-
-def _relative_house_profile_overrides(
-    house_system_info: Dict[str, Any],
-) -> Dict[str, Any]:
-    return {
-        "house_system": house_system_info["key"],
-        "house_system_code": house_system_info["value"],
-        "house_system_label_zh": house_system_info["label_zh"],
-    }

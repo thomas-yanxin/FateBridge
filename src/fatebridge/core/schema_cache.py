@@ -1,13 +1,14 @@
 """Bounded caches for immutable model contracts, never requests or results."""
 
-import hashlib
-import json
 from copy import deepcopy
 from functools import lru_cache
 from threading import RLock
-from typing import Any, Dict, Optional, Tuple, Type
+from typing import Optional, Tuple, Type
 
 from pydantic import BaseModel
+from pydantic.json_schema import JsonSchemaValue
+
+from fatebridge.utils.json_digest import digest
 
 _LOCK = RLock()
 
@@ -15,7 +16,7 @@ _LOCK = RLock()
 class _SchemaRevision:
     """Keep the schema alive so a recycled object id cannot hit an old entry."""
 
-    def __init__(self, schema: Any) -> None:
+    def __init__(self, schema: object) -> None:
         self.schema = schema
 
     def __hash__(self) -> int:
@@ -34,12 +35,12 @@ def _revision(model: Type[BaseModel]) -> _SchemaRevision:
 
 
 @lru_cache(maxsize=256)
-def _schema(model: Type[BaseModel], revision: _SchemaRevision) -> Dict[str, Any]:
+def _schema(model: Type[BaseModel], revision: _SchemaRevision) -> JsonSchemaValue:
     """Private snapshot; revision is part of the cache key, not wire data."""
     return model.model_json_schema()
 
 
-def model_schema(model: Type[BaseModel]) -> Dict[str, Any]:
+def model_schema(model: Type[BaseModel]) -> JsonSchemaValue:
     """Return an independent public copy of the default validation schema.
 
     The lock prevents concurrent cold calls from generating the same schema
@@ -61,20 +62,13 @@ def _fingerprint(
     if output_model is not None:
         assert output_revision is not None
         output_schema = _schema(output_model, output_revision)
-    contract: Dict[str, Any] = {
+    contract: dict[str, object] = {
         "input": _schema(request_model, request_revision),
         "output": output_schema,
     }
     if required_output_fields:
         contract["full_result_required_fields"] = list(required_output_fields)
-    encoded = json.dumps(
-        contract,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-        allow_nan=False,
-    ).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
+    return digest(contract)
 
 
 def contract_fingerprint(

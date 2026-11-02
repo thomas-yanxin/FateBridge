@@ -1,0 +1,19 @@
+{
+  "schema": "gujin318_source_solar_day_reconstruction_v1",
+  "profile_id": "gujin318_source_solar_day_reconstruction_v1",
+  "input_data_sha256": {
+    "daily-solar-motion-v1.json": "a6f05cda796da34b69eb3e6b37bf8d035bb4e6644fddca5726b489ccbc3a94c8",
+    "solar-generation-v1.json": "835e4a8e3ddff56cb1781e5dde584787c15ee1a57fe6cd3cae404e8b5f13ebae",
+    "midnight-anchors-v1.json": "2c60e0fd9703041dbb2458f9f03550ea714014f5d56ed293adc358c0acfa86fe",
+    "half-night-tables-v1.json": "6ded40b721454db8b7bc0e19ec9382139506dfcffa26df48096134ff0463f548",
+    "solar-fold-v1.json": "3eb14054f608b1d76ff6a0828c52f629de094a8abbeed93794c95ea0ff82f6f9"
+  },
+  "origin_policy": "subtract_same_named_winter_event_unwrapped_coordinate",
+  "origin_definition_url": "https://zh.wikisource.org/w/index.php?title=古今律厯考_(四庫全書本)/卷36&oldid=771682",
+  "origin_definition_applies_explicitly_to_noon": true,
+  "transfer_to_midnight_is_declared_reconstruction": true,
+  "side_policy": "gujin43_time_and_position_intervals_reconstruction",
+  "side_disagreement_or_exact_equinox_is_unassigned": true,
+  "pre_winter_midnight_not_wrapped_into_previous_year": true,
+  "native_birth_chart_integration": false
+}

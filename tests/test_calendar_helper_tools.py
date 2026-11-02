@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from fatebridge.core.requests.calendar import JieqiYearRequest, NongliTimeRequest
 from fatebridge.core.requests.divination import GuaMeiyiRequest
@@ -7,6 +8,7 @@ from fatebridge.services.calendar_tools import (
     calculate_nongli_time,
 )
 from fatebridge.services.divination import calculate_gua_meiyi
+from tests.fixtures.solar_reference import expected_solar_clock
 from tests.fixtures.transports import mcp_parameters, mcp_text
 
 
@@ -101,12 +103,19 @@ def test_calculate_nongli_time_returns_lunar_and_ganzhi_context():
     assert result["input_context"]["date"] == "2028-04-01"
     assert result["input_context"]["time"] == "09:00:00"
     assert result["input_context"]["timezone"] == "Asia/Shanghai"
-    assert result["birth"] == "2028-04-01 09:01:50"
+    expected = expected_solar_clock(
+        datetime(2028, 4, 1, 9), "Asia/Shanghai", 121 + 28 / 60
+    )
+    actual = datetime.fromisoformat(result["birth"])
+    assert abs((actual - expected).total_seconds()) <= 5
     assert result["analysis_context"]["input_datetime"] == "2028-04-01 09:00:00"
-    assert result["analysis_context"]["corrected_datetime"] == "2028-04-01 09:01:50"
-    assert result["analysis_context"]["effective_datetime"] == "2028-04-01 09:01:50"
+    assert result["analysis_context"]["corrected_datetime"] == result["birth"]
+    assert result["analysis_context"]["effective_datetime"] == result["birth"]
     assert result["analysis_context"]["time_algorithm"] == "真太阳时"
-    assert result["analysis_context"]["total_correction_minutes"] == 1.85
+    correction = (actual - datetime(2028, 4, 1, 9)).total_seconds() / 60
+    assert (
+        abs(result["analysis_context"]["total_correction_minutes"] - correction) <= 0.02
+    )
     assert result["yearJieqi"] == "戊申"
     assert result["monthGanZi"] == "乙卯"
     assert result["dayGanZi"] == "丙辰"
@@ -121,7 +130,7 @@ def test_calculate_nongli_time_returns_lunar_and_ganzhi_context():
     assert result["lunar_calendar"]["jieqi"] == "春分"
     assert set(result["four_pillars"]) == {"year", "month", "day", "hour"}
     assert result["calendar_context"]["current_solar_term"]["name"] == "春分"
-    assert "2028-04-01 09:01:50" in result["summary"]
+    assert result["birth"] in result["summary"]
     assert "三月初七" in result["summary"]
     assert "春分" in result["summary"]
     assert "[查询信息]" in result["snapshot_text"]
@@ -169,7 +178,17 @@ def test_calculate_nongli_time_time_alg_zero_applies_true_solar_correction():
     assert direct_result["birth"] == "2020-01-01 00:30:00"
     assert direct_result["dayGanZi"] == "癸卯"
     assert direct_result["timeGanZi"] == "壬子"
-    assert true_solar_result["birth"].startswith("2019-12-31 22:16:")
+    expected = expected_solar_clock(
+        datetime(2020, 1, 1, 0, 30), "Asia/Shanghai", 87.6168
+    )
+    assert (
+        abs(
+            (
+                datetime.fromisoformat(true_solar_result["birth"]) - expected
+            ).total_seconds()
+        )
+        <= 5
+    )
     assert true_solar_result["dayGanZi"] == "壬寅"
     assert true_solar_result["timeGanZi"] == "辛亥"
     assert true_solar_result["birth"] != direct_result["birth"]
@@ -193,7 +212,7 @@ def test_calculate_nongli_time_time_alg_zero_warns_without_longitude():
     ]
 
 
-def test_calculate_nongli_time_supports_last_valid_offline_lunar_date():
+def test_calculate_nongli_time_retains_last_legacy_lunar_date():
     result = calculate_nongli_time(
         date="2100-02-08",
         time="12:00:00",
@@ -211,14 +230,14 @@ def test_calculate_nongli_time_supports_last_valid_offline_lunar_date():
 
 def test_calculate_nongli_time_rejects_dates_after_offline_lunar_range():
     result = calculate_nongli_time(
-        date="2100-02-09",
+        date="2101-01-01",
         time="12:00:00",
         zone="Asia/Shanghai",
         time_alg=1,
     )
 
     assert result == {
-        "error": "离线农历换算仅支持公历 1900-01-31 至 2100-02-08。",
+        "error": "离线农历换算仅支持公历 1900-01-01 至 2100-12-31。",
         "error_code": "validation_error",
         "status_code": 400,
         "retryable": False,

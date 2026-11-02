@@ -1,0 +1,131 @@
+{
+  "id": "naj_ming_sihua_collation_v1",
+  "version": "1.0.0",
+  "title": "新鋟希夷陳先生紫微斗数全書",
+  "edition": "明刊本，七卷二册；本批第一册卷三部分规则",
+  "source_url": "https://www.digital.archives.go.jp/item/4468520",
+  "viewer_url": "https://www.digital.archives.go.jp/img/4468520",
+  "reference_code": "子０６０－０００１-0001",
+  "printed_volume": "三",
+  "section": "安祿權科忌四星變化訣",
+  "manual_reader_count": 1,
+  "scope": "Literal Si Hua table only; not a new chart profile or whole-book certification",
+  "rows": [
+    {
+      "stem": "甲",
+      "frame": 76,
+      "reading": "甲廉破武陽為伴",
+      "assignments": {
+        "化禄": "廉贞",
+        "化权": "破军",
+        "化科": "武曲",
+        "化忌": "太阳"
+      }
+    },
+    {
+      "stem": "乙",
+      "frame": 76,
+      "reading": "乙機梁紫月交侵",
+      "assignments": {
+        "化禄": "天机",
+        "化权": "天梁",
+        "化科": "紫微",
+        "化忌": "太阴"
+      }
+    },
+    {
+      "stem": "丙",
+      "frame": 76,
+      "reading": "丙同機昌廉貞位",
+      "assignments": {
+        "化禄": "天同",
+        "化权": "天机",
+        "化科": "文昌",
+        "化忌": "廉贞"
+      }
+    },
+    {
+      "stem": "丁",
+      "frame": 76,
+      "reading": "丁月同機巨門尋",
+      "assignments": {
+        "化禄": "太阴",
+        "化权": "天同",
+        "化科": "天机",
+        "化忌": "巨门"
+      }
+    },
+    {
+      "stem": "戊",
+      "frame": 76,
+      "reading": "戊貪月弼機為主",
+      "assignments": {
+        "化禄": "贪狼",
+        "化权": "太阴",
+        "化科": "右弼",
+        "化忌": "天机"
+      }
+    },
+    {
+      "stem": "己",
+      "frame": 76,
+      "reading": "己武貪梁曲最平",
+      "assignments": {
+        "化禄": "武曲",
+        "化权": "贪狼",
+        "化科": "天梁",
+        "化忌": "文曲"
+      }
+    },
+    {
+      "stem": "庚",
+      "frame": 76,
+      "reading": "庚日武同相為首",
+      "assignments": {
+        "化禄": "太阳",
+        "化权": "武曲",
+        "化科": "天同",
+        "化忌": "天相"
+      }
+    },
+    {
+      "stem": "辛",
+      "frame": 76,
+      "reading": "辛巨陽曲昌星臨",
+      "assignments": {
+        "化禄": "巨门",
+        "化权": "太阳",
+        "化科": "文曲",
+        "化忌": "文昌"
+      }
+    },
+    {
+      "stem": "壬",
+      "frame": 76,
+      "reading": "壬梁紫府武宿是",
+      "assignments": {
+        "化禄": "天梁",
+        "化权": "紫微",
+        "化科": "天府",
+        "化忌": "武曲"
+      }
+    },
+    {
+      "stem": "癸",
+      "frame": 77,
+      "reading": "癸破巨陰貪狼停",
+      "assignments": {
+        "化禄": "破军",
+        "化权": "巨门",
+        "化科": "太阴",
+        "化忌": "贪狼"
+      }
+    }
+  ],
+  "limits": [
+    "One print, one reader; no independent expert double adjudication",
+    "庚日武同相 is retained literally; no emendation to a familiar modern table",
+    "Compared assignments are not silently applied to the selected rule profile",
+    "Matching one stem does not establish other rules or whole-book conformity"
+  ]
+}

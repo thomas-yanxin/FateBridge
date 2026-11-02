@@ -1,0 +1,344 @@
+{
+  "id": "kenyu_nijl100159236_selected_lingbi_v1",
+  "title": "宿曜經撮要追加七曜暦",
+  "source_url": "https://doi.org/10.20730/100159236",
+  "holder": "名古屋大学附属図書館148.8-Ke",
+  "credit": "名古屋大学附属図書館 国文学研究資料館",
+  "manifest_sha256": "fbd4602119d733ed58b01e6206abba8fc271bd01262da6dfe672a3d9c19aca65",
+  "source_image": {
+    "frame": 8,
+    "canvas": "https://kokusho.nijl.ac.jp/biblio/100159236/canvas/8",
+    "url": "https://kokusho.nijl.ac.jp/api/iiif/100159236/v4/0007/0007-004002/0007-004002-0007.tif/full/full/0/default.jpg",
+    "sha256": "4b775fce10cd378f6b880a68aa2dc611c426bc428565b33a36aea2327c1cf544"
+  },
+  "printed_rows": [
+    {
+      "month": 1,
+      "month_start_luminary": "日",
+      "start_literal": "十七日",
+      "end_literal": "三十日",
+      "start_day": 17,
+      "end_day": 30,
+      "literal": "日曜ナレハ十七日ヨリ三十日マテ陵逼",
+      "image_location": "正月格，右小栏"
+    },
+    {
+      "month": 1,
+      "month_start_luminary": "土",
+      "start_literal": "朔日",
+      "end_literal": "十六日",
+      "start_day": 1,
+      "end_day": 16,
+      "literal": "土曜ナレハ朔日ヨリ十六日マテ陵逼",
+      "image_location": "正月格，左小栏"
+    },
+    {
+      "month": 2,
+      "month_start_luminary": "月",
+      "start_literal": "朔日",
+      "end_literal": "十四日",
+      "start_day": 1,
+      "end_day": 14,
+      "literal": "月曜ナレハ朔日ヨリ十四日マテ陵逼",
+      "image_location": "二月格，右小栏"
+    },
+    {
+      "month": 2,
+      "month_start_luminary": "火",
+      "start_literal": "十五日",
+      "end_literal": "三十日",
+      "start_day": 15,
+      "end_day": 30,
+      "literal": "火曜ナレハ十五日ヨリ三十日マテ陵逼",
+      "image_location": "二月格，左小栏"
+    },
+    {
+      "month": 3,
+      "month_start_luminary": "水",
+      "start_literal": "朔日",
+      "end_literal": "十二日",
+      "start_day": 1,
+      "end_day": 12,
+      "literal": "水曜ナレハ朔日ヨリ十二日マテ陵逼",
+      "image_location": "三月格，右小栏"
+    },
+    {
+      "month": 3,
+      "month_start_luminary": "木",
+      "start_literal": "十三日",
+      "end_literal": "三十日",
+      "start_day": 13,
+      "end_day": 30,
+      "literal": "木曜ナレハ十三日ヨリ三十日マテ陵逼",
+      "image_location": "三月格，左小栏"
+    },
+    {
+      "month": 4,
+      "month_start_luminary": "金",
+      "start_literal": "朔日",
+      "end_literal": "十日",
+      "start_day": 1,
+      "end_day": 10,
+      "literal": "金曜ナレハ朔日ヨリ十日マテ陵逼",
+      "image_location": "四月格，右小栏"
+    },
+    {
+      "month": 4,
+      "month_start_luminary": "土",
+      "start_literal": "十一日",
+      "end_literal": "三十日",
+      "start_day": 11,
+      "end_day": 30,
+      "literal": "土曜ナレハ十一日ヨリ三十日マテ陵逼",
+      "image_location": "四月格，左小栏"
+    },
+    {
+      "month": 5,
+      "month_start_luminary": "日",
+      "start_literal": "朔日",
+      "end_literal": "八日",
+      "start_day": 1,
+      "end_day": 8,
+      "literal": "日曜ナレハ朔日ヨリ八日マテ陵逼",
+      "image_location": "五月格，右小栏"
+    },
+    {
+      "month": 5,
+      "month_start_luminary": "月",
+      "start_literal": "九日",
+      "end_literal": "三十日",
+      "start_day": 9,
+      "end_day": 30,
+      "literal": "月曜ナレハ九日ヨリ三十日マテ陵逼",
+      "image_location": "五月格，左小栏"
+    },
+    {
+      "month": 6,
+      "month_start_luminary": "火",
+      "start_literal": "朔日",
+      "end_literal": "六日",
+      "start_day": 1,
+      "end_day": 6,
+      "literal": "火曜ナレハ朔日ヨリ六日マテ陵逼",
+      "image_location": "六月格，右小栏"
+    },
+    {
+      "month": 6,
+      "month_start_luminary": "水",
+      "start_literal": "七日",
+      "end_literal": "三十日",
+      "start_day": 7,
+      "end_day": 30,
+      "literal": "水曜ナレハ七日ヨリ三十日マテ陵逼",
+      "image_location": "六月格，左小栏"
+    },
+    {
+      "month": 7,
+      "month_start_luminary": "金",
+      "start_literal": "朔日",
+      "end_literal": "三日",
+      "start_day": 1,
+      "end_day": 3,
+      "literal": "金曜ナレハ朔日ヨリ三日マテ陵逼",
+      "image_location": "七月格，右小栏"
+    },
+    {
+      "month": 7,
+      "month_start_luminary": "土",
+      "start_literal": "四日",
+      "end_literal": "三十日",
+      "start_day": 4,
+      "end_day": 30,
+      "literal": "土曜ナレハ四日ヨリ三十日マテ陵逼",
+      "image_location": "七月格，左小栏"
+    },
+    {
+      "month": 8,
+      "month_start_luminary": "火",
+      "start_literal": "朔日",
+      "end_literal": "二十七日",
+      "start_day": 1,
+      "end_day": 27,
+      "literal": "火曜ナレハ朔日ヨリ二十七日マテ陵逼",
+      "image_location": "八月格，单栏"
+    },
+    {
+      "month": 9,
+      "month_start_luminary": "木",
+      "start_literal": "朔日",
+      "end_literal": "二十五日",
+      "start_day": 1,
+      "end_day": 25,
+      "literal": "木曜ナレハ朔日ヨリ二十五日マテ陵逼",
+      "image_location": "九月格，右小栏"
+    },
+    {
+      "month": 9,
+      "month_start_luminary": "金",
+      "start_literal": "二十六日",
+      "end_literal": "三十日",
+      "start_day": 26,
+      "end_day": 30,
+      "literal": "金曜ナレハ二十六日ヨリ三十日マテ陵逼",
+      "image_location": "九月格，左小栏"
+    },
+    {
+      "month": 10,
+      "month_start_luminary": "日",
+      "start_literal": "二十四日",
+      "end_literal": "三十日",
+      "start_day": 24,
+      "end_day": 30,
+      "literal": "日曜ナレハ二十四日ヨリ三十日マテ陵逼",
+      "image_location": "十月格，右小栏"
+    },
+    {
+      "month": 10,
+      "month_start_luminary": "土",
+      "start_literal": "朔日",
+      "end_literal": "二十三日",
+      "start_day": 1,
+      "end_day": 23,
+      "literal": "土曜ナレハ朔日ヨリ二十三日マテ陵逼",
+      "image_location": "十月格，左小栏"
+    },
+    {
+      "month": 11,
+      "month_start_luminary": "火",
+      "start_literal": "朔日",
+      "end_literal": "二十日",
+      "start_day": 1,
+      "end_day": 20,
+      "literal": "火曜ナレハ朔日ヨリ二十日マテ陵逼",
+      "image_location": "十一月格，右小栏"
+    },
+    {
+      "month": 11,
+      "month_start_luminary": "水",
+      "start_literal": "二十一日",
+      "end_literal": "三十日",
+      "start_day": 21,
+      "end_day": 30,
+      "literal": "水曜ナレハ二十一日ヨリ三十日マテ陵逼",
+      "image_location": "十一月格，左小栏"
+    },
+    {
+      "month": 12,
+      "month_start_luminary": "木",
+      "start_literal": "朔日",
+      "end_literal": "十八日",
+      "start_day": 1,
+      "end_day": 18,
+      "literal": "木曜ナレハ朔日ヨリ十八日マテ陵逼",
+      "image_location": "十二月格，右小栏"
+    },
+    {
+      "month": 12,
+      "month_start_luminary": "金",
+      "start_literal": "十九日",
+      "end_literal": "三十日",
+      "start_day": 19,
+      "end_day": 30,
+      "literal": "金曜ナレハ十九日ヨリ三十日マテ陵逼",
+      "image_location": "十二月格，左小栏"
+    }
+  ],
+  "leap_month_reference": {
+    "literal": "潤月全如本月",
+    "location": "帧8右页表末说明区",
+    "scope": "本陵逼表的字面说明；不同于左页潤月朔宿全如本月，不据此裁定T2465分宿或小月补配优先。",
+    "month_start_ruler_inheritance_established": false,
+    "leap_short_month_priority_established": false
+  },
+  "appendix": {
+    "frame": 7,
+    "sha256": "7e58b815da4ed405ca1a89eea7c60c44af5d84db315efc2aa20b13a84476a8f2",
+    "layer_marker_literal": "宿曜經撮要序文之次入紙",
+    "context_literal": "陵逼之間",
+    "urgent_condition_literal": "若有急事欲作之者",
+    "nonuse_literal": "當榮成友親安五宿者不可取用",
+    "source_claim_layer": "入纸自述御傳、末有取意；不把整页当T1299逐字正文或认证传承",
+    "unresolved_transcriptions": [
+      "序文寺名、署记及相关字",
+      "序文僅后、齒部字等",
+      "入纸逢／達及断句",
+      "万、內、壞等具体字形与规范化分别保留"
+    ],
+    "full_accepted_transcription": null,
+    "urgent_use_normalized_reference": "於三九之中可用衰危壞此三宿之内可百事通達",
+    "normalization_note": "此字段仅为整理层语义参考，壞／壊及內／内字形读录在原始角色输出保留；不是整段逐字定本。"
+  },
+  "personal_conditions": [
+    {
+      "relations": [
+        "命",
+        "胎"
+      ],
+      "assessment": "caution",
+      "meaning": "具名补纸在陵逼期间对命、胎所作列不利传统条文；不作个体生命或灾祸断言。",
+      "urgent_action_required": false
+    },
+    {
+      "relations": [
+        "業"
+      ],
+      "assessment": "caution",
+      "meaning": "具名补纸在陵逼期间列业宿作事不成就，作为传统条件主张保留。",
+      "urgent_action_required": false
+    },
+    {
+      "relations": [
+        "衰",
+        "危",
+        "壊"
+      ],
+      "assessment": "favorable",
+      "meaning": "具名补纸在陵逼期间且若有急事欲作的条件下，才称可用衰、危、坏；不能扩大为所有日期或无条件百事皆宜。",
+      "urgent_action_required": true
+    },
+    {
+      "relations": [
+        "栄",
+        "成",
+        "友",
+        "親",
+        "安"
+      ],
+      "assessment": "caution",
+      "meaning": "具名补纸的陵逼说明在急事段落后列荣、成、友、亲、安五宿不可取用；保留原次序，不移作平日的一般禁忌。",
+      "urgent_action_required": null
+    }
+  ],
+  "statistical_claim": {
+    "literal": "八十六年之間全無陵逼年者唯六年而已",
+    "preceding_year_labels": [
+      "明和元年",
+      "嘉永二年"
+    ],
+    "verified": false,
+    "independent_real_world_samples_added": 0
+  },
+  "comparison_t1299": {
+    "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/master/T/T21/T21n1299.xml",
+    "captured_tei_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+    "locator": "T21n1299_p0398a18-26",
+    "requirement_literal": "如此當須問知司天者，乃知此年此月熒惑、鎮歲、辰星、太白及日月等在何宿。",
+    "meaning": "T1299此段要求知实际天体所在宿；后出月朔曜表不是相同计算，未用现代宿名或任意角距判定陵犯守逼。"
+  },
+  "model_reading_receipts": [
+    {
+      "file": "generator-primary-current-1.json",
+      "sha256": "88ac28e944386e6b3a9e6d820eca114ea95e7519c2d0ac6ec07ce2e97d28edb4"
+    },
+    {
+      "file": "reviewer-primary-current-1.json",
+      "sha256": "28257df33918aeddc8a29fe36f90ed18248d25d9630b6a9686273b488c3887b6"
+    },
+    {
+      "file": "reviewer-primary-current-2.json",
+      "sha256": "87bc63bb554dde7d18ed48eea87eb27201a64fa0149f25b79843f41f4d023974"
+    }
+  ],
+  "reading_status": "two_existing_model_roles_agree_on_23_literal_table_rows_not_human_independent_collation",
+  "scope": "具名印本23行月朔曜条件表与入纸条件说明；普通宿主民用月首仅作明示条件查表，未列条件不等于确定无陵逼；古代日界、闰月继承的朔曜、整套轮图、传承及现实效力尚未建立。"
+}

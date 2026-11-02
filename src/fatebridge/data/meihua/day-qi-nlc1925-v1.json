@@ -1,0 +1,86 @@
+{
+  "id": "meihua_day_qi_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本日应与月日衰旺所选条款",
+  "source": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "selected_edition": "NLC1925",
+    "author_authentication": false
+  },
+  "day_clause": {
+    "original_pdf_index": 129,
+    "paper_page": "卷三二八",
+    "section": "日應",
+    "quote": "日應者以體卦為主看所占卦日屬何卦及體卦與本日衰旺如何蓋卦宜生體宜比和不宜尅體亦不宜體卦生之也本日所屬卦氣如寅卯木巳午火申酉金亥子水辰戌丑未土也",
+    "selected_variant": "NLC看所占卦日屬何卦; fixed volume3 transcription看所占屬何卦. Keep rather than silently normalize"
+  },
+  "month_day_strength": {
+    "original_pdf_indices": [
+      83,
+      84
+    ],
+    "paper_pages": [
+      "卷二三〇",
+      "卷二三一"
+    ],
+    "section": "復明時令之應",
+    "weak_quote": "衰者如木旺則土衰土旺則水衰水旺則火衰火旺則金衰金旺則木衰",
+    "preferences_quote": "是故生體之卦氣宜值時之旺氣不宜衰氣如尅體卦氣則宜乘衰此時令之應也",
+    "selected_variants": "NLC水旺則火衰 and生體之卦氣; fixed transcription lacks those則/之 characters"
+  },
+  "day_branch_elements": {
+    "子": "水",
+    "丑": "土",
+    "寅": "木",
+    "卯": "木",
+    "辰": "土",
+    "巳": "火",
+    "午": "火",
+    "未": "土",
+    "申": "金",
+    "酉": "金",
+    "戌": "土",
+    "亥": "水"
+  },
+  "weak_element_when_wang": {
+    "木": "土",
+    "火": "金",
+    "土": "水",
+    "金": "木",
+    "水": "火"
+  },
+  "day_relation_preferences": {
+    "用生体": "preferred_in_selected_day_clause",
+    "体用比和": "preferred_in_selected_day_clause",
+    "用克体": "not_preferred_in_selected_day_clause",
+    "体生用": "not_preferred_in_selected_day_clause"
+  },
+  "source_decisions": [
+    "Day branch maps to an element, never uniquely to坤/艮/乾/兌; no invented day trigram",
+    "Only selected旺/衰 are labels; other elements remain原文未定",
+    "Apply explicit supporter-wang and attacker-shuai preferences to each own actual role; other relations have no invented preferred strength",
+    "Relation of day element to original body is symbolic. The day-clause卦 subject is a selected reading, not unique full adjudication",
+    "Do not extrapolate body-controls-day into favorable; selected day paragraph does not state that case",
+    "Time-selected day follows the already declared local-midnight Meihua calendar convention; 23h alternative zi-start retained separately, never read Bazi day as midnight day",
+    "No datetime in explicit cast: only caller-reported day branch, no date/hour/question inference",
+    "Month/day strength disagreement stays visible and unaggregated; year-qi and full quiet synthesis not implemented",
+    "Weather does not use body/use day-qi layer and all original study policies, denominators and failed outcomes remain unchanged"
+  ],
+  "independent_human_expert_review": false,
+  "predictive_efficacy_established": false,
+  "comparison_sources": [
+    {
+      "url": "https://zh.wikisource.org/w/index.php?oldid=1441927&title=梅花易數/卷三",
+      "revision": 1441927,
+      "saved_text_sha256": "40dc414defbc2cf93f5a3c398e16a1cb3d0b62f7ad5db14603be7dba2e37e7f6",
+      "role": "comparison transcription; does not override selected NLC words"
+    },
+    {
+      "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二",
+      "revision": 1441921,
+      "saved_text_sha256": "903b109b37071584ccbf54e15ee10813d32c702bb3d7e690e15d5b77cd0ff7cb",
+      "role": "comparison transcription; does not override selected NLC words"
+    }
+  ]
+}

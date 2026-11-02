@@ -31,6 +31,7 @@ venv/
 ENV/
 env/
 .venv
+.venv*/
 
 # Swiss Ephemeris data files (.se1) are Astrodienst's, dual-licensed
 # AGPL-3.0 / commercial. FateBridge is Apache-2.0; acquire the data separately;
@@ -47,6 +48,8 @@ ephe/
 
 # Testing
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .coverage
 htmlcov/
 
@@ -79,3 +82,20 @@ docs/plans/
 
 # One-off review transcripts, snapshots, and collection scripts
 docs/reviews/
+
+# Local scratch output
+/tmp/
+
+# Historical validation data and regression inputs are supplied separately.
+/docs/validation/
+/tests/golden/snapshots/
+/tests/fixtures/**
+!/tests/fixtures/**/
+!/tests/fixtures/*.py
+!/tests/fixtures/bazi_branch_inventory_v1/literal_geometry.py
+!/tests/fixtures/bazi_month_command_integrity_v1/capture_counterexamples.py
+!/tests/fixtures/bazi_punishment_resolution_v1/literal_reference_corrected.py
+!/tests/fixtures/bazi_root_predicate_v1/transport_reader.py
+!/tests/fixtures/bazi_same_target_bureau_v1/reference_geometry.py
+!/tests/fixtures/bazi_seasonal_bing_v1/transport_reader.py
+!/tests/fixtures/bazi_strength_threshold_v1/independent_reference_v2.py

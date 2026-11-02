@@ -1,0 +1,282 @@
+{
+  "id": "t1299_selected_text_layers_v1",
+  "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T21/T21n1299.xml",
+  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+  "publisher_commit": "dbdea41071e1e260ad84b72faefd4587333cf76d",
+  "passages": {
+    "pT21p0397a2701": {
+      "paragraph_xml_id": "pT21p0397a2701",
+      "locator": "T21n1299_p0397a27",
+      "main_text": "日屬軫宿，不得向北路行。",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "縱吉時亦不可行"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397a2801": {
+      "paragraph_xml_id": "pT21p0397a2801",
+      "locator": "T21n1299_p0397a28",
+      "main_text": "日屬女宿，不得向東行。",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "縱吉時亦不可行"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397a2901": {
+      "paragraph_xml_id": "pT21p0397a2901",
+      "locator": "T21n1299_p0397a29",
+      "main_text": "日屬鬼宿，不得向西行。",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "縱吉時亦不可行"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397b0101": {
+      "paragraph_xml_id": "pT21p0397b0101",
+      "locator": "T21n1299_p0397b01",
+      "main_text": "日屬婁宿，不得向南行。",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "縱吉時亦不可行"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397b0201": {
+      "paragraph_xml_id": "pT21p0397b0201",
+      "locator": "T21n1299_p0397b02",
+      "main_text": "第七秤宮",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "取角、亢日"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397b0301": {
+      "paragraph_xml_id": "pT21p0397b0301",
+      "locator": "T21n1299_p0397b03",
+      "main_text": "第十一瓶宮",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "取危、室日，已上東行大吉"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397b0401": {
+      "paragraph_xml_id": "pT21p0397b0401",
+      "locator": "T21n1299_p0397b04",
+      "main_text": "第五獅子宮",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "取星、張日"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397b0501": {
+      "paragraph_xml_id": "pT21p0397b0501",
+      "locator": "T21n1299_p0397b05",
+      "main_text": "第九弓宮",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "取尾、箕、斗日，已上西行大吉"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397b0601": {
+      "paragraph_xml_id": "pT21p0397b0601",
+      "locator": "T21n1299_p0397b06",
+      "main_text": "第八蝎宮",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "取互、房、心日"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397b0701": {
+      "paragraph_xml_id": "pT21p0397b0701",
+      "locator": "T21n1299_p0397b07",
+      "main_text": "第十二魚宮",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "取壁、奎日，已上向南行大吉"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397b0801": {
+      "paragraph_xml_id": "pT21p0397b0801",
+      "locator": "T21n1299_p0397b08",
+      "main_text": "第六女宮",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "取翼、軫日"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397b0901": {
+      "paragraph_xml_id": "pT21p0397b0901",
+      "locator": "T21n1299_p0397b09",
+      "main_text": "第四蟹宮",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "取鬼、柳，日已上向南行大吉"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397b1001": {
+      "paragraph_xml_id": "pT21p0397b1001",
+      "locator": "T21n1299_p0397b10",
+      "main_text": "第三男女宮",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "至參、井日，東行大吉"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397b1101": {
+      "paragraph_xml_id": "pT21p0397b1101",
+      "locator": "T21n1299_p0397b11",
+      "main_text": "第十摩竭宮",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "至女、虛日，南行大凶"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397b1201": {
+      "paragraph_xml_id": "pT21p0397b1201",
+      "locator": "T21n1299_p0397b12",
+      "main_text": "第一羊宮",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "至婁、胃、昴日，西行大凶"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0397b1301": {
+      "paragraph_xml_id": "pT21p0397b1301",
+      "locator": "T21n1299_p0397b13",
+      "main_text": "第二牛宮",
+      "inline_notes": [
+        {
+          "place": "inline",
+          "text": "至畢、觜日，北行大凶"
+        }
+      ],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    },
+    "pT21p0396b2101": {
+      "paragraph_xml_id": "pT21p0396b2101",
+      "locator": "T21n1299_p0396b21",
+      "main_text": "壁宿，宜作求長壽增益法，不宜南行。宜造城邑、取衣取財、嫁娶婚姻等喜善事皆吉。",
+      "inline_notes": [],
+      "text_placement_basis": "explicit_publisher_TEI_note_place_inline",
+      "inline_author_identity_independently_established": false
+    }
+  },
+  "rule_passages": {
+    "t1299_direction_01": [
+      "pT21p0397a2701"
+    ],
+    "t1299_direction_02": [
+      "pT21p0397a2801"
+    ],
+    "t1299_direction_03": [
+      "pT21p0397a2901"
+    ],
+    "t1299_direction_04": [
+      "pT21p0397b0101"
+    ],
+    "t1299_direction_05": [
+      "pT21p0397b0201",
+      "pT21p0397b0301"
+    ],
+    "t1299_direction_06": [
+      "pT21p0397b0301"
+    ],
+    "t1299_direction_07": [
+      "pT21p0397b0401",
+      "pT21p0397b0501"
+    ],
+    "t1299_direction_08": [
+      "pT21p0397b0501"
+    ],
+    "t1299_direction_09": [
+      "pT21p0397b0601",
+      "pT21p0397b0701"
+    ],
+    "t1299_direction_10": [
+      "pT21p0397b0701"
+    ],
+    "t1299_direction_11": [
+      "pT21p0397b0801",
+      "pT21p0397b0901"
+    ],
+    "t1299_direction_12": [
+      "pT21p0397b0901"
+    ],
+    "t1299_direction_13": [
+      "pT21p0397b1001"
+    ],
+    "t1299_direction_14": [
+      "pT21p0397b1101"
+    ],
+    "t1299_direction_15": [
+      "pT21p0397b1201"
+    ],
+    "t1299_direction_16": [
+      "pT21p0397b1301"
+    ],
+    "t1299_lower_mansion_37": [
+      "pT21p0396b2101"
+    ]
+  },
+  "scope": "所选17个原段的正文与明确place=inline注分层；不把行内注认定为独立传本、证明注者身份或裁定正文与注的规则优先权。明本校记仍另存。"
+}

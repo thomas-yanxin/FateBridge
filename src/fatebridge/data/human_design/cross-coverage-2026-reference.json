@@ -1,0 +1,2855 @@
+{
+  "method_id": "human_design_expanded_official_cross_observation_v1",
+  "source": {
+    "publisher": "Jovian Archive / Maia Mechanics",
+    "url": "https://jovianarchive.com/pages/get-your-human-design-chart",
+    "collection": "193 frozen synthetic inputs through the normal official public calculator UI, no email/account/direct calculation API. All13 visible properties independently extracted from downloaded PDF text and normalized for whitespace only. 26 gate.lines plus defined channels/centers directly observed from rendered SVG, not inferred from PDF text or engine values. PDF diagram is an image; no second independent diagram transcription claimed. Not a blind population or real birth dataset.",
+    "collected_at": "2026-10-22T12:47:33.771736+00:00",
+    "observation_fixture_sha256": "46d801f0c468f1b87096ac6951cd2352cddf440af25cc57875f70a631f5da22c",
+    "plan_sha256": "0d2e31c0f750a30149c6d5ecbcf015d2adf0c447e8c7c70ca55ab9f94e0badd4",
+    "transcription_crosscheck": {
+      "normalized_properties_fnv1a32": "2397b0ad",
+      "normalized_facts_fnv1a32": "f101b8ca",
+      "raw_properties_fnv1a32": "c5b3d3dd",
+      "raw_facts_fnv1a32": "589642e0",
+      "scope": "FNV1a32 is a non-cryptographic transfer crosscheck against the separately held rendered DOM observations, not authenticity proof. Original PDFs are separately SHA256-bound.",
+      "whitespace_changes": [
+        {
+          "id": "cross-right-01",
+          "field": "Incarnation Cross",
+          "raw": "Right Angle Cross of The Sphinx  (1/2 | 7/13)",
+          "normalized": "Right Angle Cross of The Sphinx (1/2 | 7/13)"
+        },
+        {
+          "id": "cross-right-02",
+          "field": "Incarnation Cross",
+          "raw": "Right Angle Cross of The Sphinx  (2/1 | 13/7)",
+          "normalized": "Right Angle Cross of The Sphinx (2/1 | 13/7)"
+        },
+        {
+          "id": "cross-right-07",
+          "field": "Incarnation Cross",
+          "raw": "Right Angle Cross of The Sphinx  (7/13 | 2/1)",
+          "normalized": "Right Angle Cross of The Sphinx (7/13 | 2/1)"
+        },
+        {
+          "id": "cross-right-13",
+          "field": "Incarnation Cross",
+          "raw": "Right Angle Cross of The Sphinx  (13/7 | 1/2)",
+          "normalized": "Right Angle Cross of The Sphinx (13/7 | 1/2)"
+        },
+        {
+          "id": "cross-right-31",
+          "field": "Incarnation Cross",
+          "raw": "Right Angle Cross of The Unexpected  (31/41 | 27/28)",
+          "normalized": "Right Angle Cross of The Unexpected (31/41 | 27/28)"
+        },
+        {
+          "id": "cross-right-34",
+          "field": "Incarnation Cross",
+          "raw": "Right Angle Cross of The Sleeping Phoenix  (34/20 | 59/55)",
+          "normalized": "Right Angle Cross of The Sleeping Phoenix (34/20 | 59/55)"
+        },
+        {
+          "id": "cross-right-41",
+          "field": "Incarnation Cross",
+          "raw": "Right Angle Cross of The Unexpected  (41/31 | 28/27)",
+          "normalized": "Right Angle Cross of The Unexpected (41/31 | 28/27)"
+        },
+        {
+          "id": "cross-right-56",
+          "field": "Incarnation Cross",
+          "raw": "Right Angle Cross of Laws  (56/60 | 3/50)",
+          "normalized": "Right Angle Cross of Laws (56/60 | 3/50)"
+        },
+        {
+          "id": "cross-juxtaposition-46",
+          "field": "Incarnation Cross",
+          "raw": "Juxtaposition Cross of Serendipity  (46/25 | 52/58)",
+          "normalized": "Juxtaposition Cross of Serendipity (46/25 | 52/58)"
+        },
+        {
+          "id": "cross-left-08",
+          "field": "Incarnation Cross",
+          "raw": "Left Angle Cross of Uncertainty  (8/14 | 55/59)",
+          "normalized": "Left Angle Cross of Uncertainty (8/14 | 55/59)"
+        },
+        {
+          "id": "cross-left-14",
+          "field": "Incarnation Cross",
+          "raw": "Left Angle Cross of Uncertainty  (14/8 | 59/55)",
+          "normalized": "Left Angle Cross of Uncertainty (14/8 | 59/55)"
+        },
+        {
+          "id": "cross-left-15",
+          "field": "Incarnation Cross",
+          "raw": "Left Angle Cross of Prevention  (15/10 | 17/18)",
+          "normalized": "Left Angle Cross of Prevention (15/10 | 17/18)"
+        },
+        {
+          "id": "cross-left-17",
+          "field": "Incarnation Cross",
+          "raw": "Left Angle Cross of Upheaval  (17/18 | 38/39)",
+          "normalized": "Left Angle Cross of Upheaval (17/18 | 38/39)"
+        },
+        {
+          "id": "cross-left-18",
+          "field": "Incarnation Cross",
+          "raw": "Left Angle Cross of Upheaval  (18/17 | 39/38)",
+          "normalized": "Left Angle Cross of Upheaval (18/17 | 39/38)"
+        },
+        {
+          "id": "cross-left-19",
+          "field": "Incarnation Cross",
+          "raw": "Left Angle Cross of Refinement  (19/33 | 1/2)",
+          "normalized": "Left Angle Cross of Refinement (19/33 | 1/2)"
+        },
+        {
+          "id": "cross-left-33",
+          "field": "Incarnation Cross",
+          "raw": "Left Angle Cross of Refinement  (33/19 | 2/1)",
+          "normalized": "Left Angle Cross of Refinement (33/19 | 2/1)"
+        },
+        {
+          "id": "cross-left-55",
+          "field": "Incarnation Cross",
+          "raw": "Left Angle Cross of Spirit  (55/59 | 9/16)",
+          "normalized": "Left Angle Cross of Spirit (55/59 | 9/16)"
+        },
+        {
+          "id": "cross-left-59",
+          "field": "Incarnation Cross",
+          "raw": "Left Angle Cross of Spirit  (59/55 | 16/9)",
+          "normalized": "Left Angle Cross of Spirit (59/55 | 16/9)"
+        }
+      ]
+    }
+  },
+  "scope": "All64 Personality Sun gates at each of3 angles in193 synthetic, engine-selected inputs from1980; all192 gate/angle strata plus one extra quadruple definition. Inputs fixed before new official outputs. Earlier19 cases unchanged and separate. No aliases, birth-record authentication, population frequency, full calendar-range, line-prose or prediction certification.",
+  "cohort_sha256": "fb77fbc137d6ebb83a9781b0558b4b9c5d7c411f1f3fce7b0ac54cf5d0510c89",
+  "observations": [
+    {
+      "case_id": "cross-right-01",
+      "gates": [
+        1,
+        2,
+        7,
+        13
+      ],
+      "angle": "right",
+      "display_name": "The Sphinx",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "156a5f546485776adff98170efe6ceb1cbd437aa2f3d17db701eea6de49904aa"
+    },
+    {
+      "case_id": "cross-right-02",
+      "gates": [
+        2,
+        1,
+        13,
+        7
+      ],
+      "angle": "right",
+      "display_name": "The Sphinx",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "15544808ef561e4df8e861a8dcd8daa4c397ac7d7debdbbf7daa97f11a241a14"
+    },
+    {
+      "case_id": "cross-right-03",
+      "gates": [
+        3,
+        50,
+        60,
+        56
+      ],
+      "angle": "right",
+      "display_name": "Laws",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "e46d0a7a4db97dc274e397b355a8a712ad987abece57b4fc155550c2516ce7a7"
+    },
+    {
+      "case_id": "cross-right-04",
+      "gates": [
+        4,
+        49,
+        23,
+        43
+      ],
+      "angle": "right",
+      "display_name": "Explanation",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "32a144de3b35f0bdc8a2e82eb60f573a23b9b4a862d1cbacae1a8a2850839eb0"
+    },
+    {
+      "case_id": "cross-right-05",
+      "gates": [
+        5,
+        35,
+        64,
+        63
+      ],
+      "angle": "right",
+      "display_name": "Consciousness",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "50309cdffea689d4b6ed54f4eff6bbd89f885f89a5ca6b131dade8985eacc24b"
+    },
+    {
+      "case_id": "cross-right-06",
+      "gates": [
+        6,
+        36,
+        12,
+        11
+      ],
+      "angle": "right",
+      "display_name": "Eden",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "81375aceb88c23dfd0211e880eb3b3495ba738faa63e551d48a718a3a8c8a1a6"
+    },
+    {
+      "case_id": "cross-right-07",
+      "gates": [
+        7,
+        13,
+        2,
+        1
+      ],
+      "angle": "right",
+      "display_name": "The Sphinx",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "9870df08167f70194a0af0a3052abbb6de3e92a31f4c3748979dac5263a5d6c4"
+    },
+    {
+      "case_id": "cross-right-08",
+      "gates": [
+        8,
+        14,
+        30,
+        29
+      ],
+      "angle": "right",
+      "display_name": "Contagion",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "1d858065848b37b637e3db71b0233b2de594117e688f6fee68a526b463bc888e"
+    },
+    {
+      "case_id": "cross-right-09",
+      "gates": [
+        9,
+        16,
+        40,
+        37
+      ],
+      "angle": "right",
+      "display_name": "Planning",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "c736320c90e5327f28562fc907fb9cd7d5a4c076235f4e6d09d901408312f578"
+    },
+    {
+      "case_id": "cross-right-10",
+      "gates": [
+        10,
+        15,
+        46,
+        25
+      ],
+      "angle": "right",
+      "display_name": "The Vessel of Love",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "8806e66714583cc4d3e1369f261ece47366e34dd52f6dd7958b4c968539e02af"
+    },
+    {
+      "case_id": "cross-right-11",
+      "gates": [
+        11,
+        12,
+        6,
+        36
+      ],
+      "angle": "right",
+      "display_name": "Eden",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "f059aff345812651187f585689e5d585b03a71daa9649e9e482f43860ab365e2"
+    },
+    {
+      "case_id": "cross-right-12",
+      "gates": [
+        12,
+        11,
+        36,
+        6
+      ],
+      "angle": "right",
+      "display_name": "Eden",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "cd23ab554a838b72e2677692a1944a04a964b2e33661fa6267ebe5b54eed092d"
+    },
+    {
+      "case_id": "cross-right-13",
+      "gates": [
+        13,
+        7,
+        1,
+        2
+      ],
+      "angle": "right",
+      "display_name": "The Sphinx",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "2f4b7dbf57eb4970fc42894f00f3b0dbfcef88e965ed4adfde417a92041e6ffd"
+    },
+    {
+      "case_id": "cross-right-14",
+      "gates": [
+        14,
+        8,
+        29,
+        30
+      ],
+      "angle": "right",
+      "display_name": "Contagion",
+      "profile": "2/4",
+      "definition": "None",
+      "pdf_sha256": "2cb8befef7f1c97f305e719b5b79139099efac7c370fa27c624c2ba4f0093dcc"
+    },
+    {
+      "case_id": "cross-right-15",
+      "gates": [
+        15,
+        10,
+        25,
+        46
+      ],
+      "angle": "right",
+      "display_name": "The Vessel of Love",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "d35cf99043f748aa28be701d44d36364df704de020b70bbf3ec4adcaaebb94ed"
+    },
+    {
+      "case_id": "cross-right-16",
+      "gates": [
+        16,
+        9,
+        37,
+        40
+      ],
+      "angle": "right",
+      "display_name": "Planning",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "623e02820bf95ea4b49caf105538ee765b730a7bec14bd363f9ef55d15685abb"
+    },
+    {
+      "case_id": "cross-right-17",
+      "gates": [
+        17,
+        18,
+        58,
+        52
+      ],
+      "angle": "right",
+      "display_name": "Service",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "e95f61d4084ff73ccc27dc9d7f97f5d02c111a1d7607251cfe1f2f369d30c5d3"
+    },
+    {
+      "case_id": "cross-right-18",
+      "gates": [
+        18,
+        17,
+        52,
+        58
+      ],
+      "angle": "right",
+      "display_name": "Service",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "edea776d3d225be968641a440595afcd0e8528a3fae9702bf94d9911435ccc4e"
+    },
+    {
+      "case_id": "cross-right-19",
+      "gates": [
+        19,
+        33,
+        44,
+        24
+      ],
+      "angle": "right",
+      "display_name": "The Four Ways",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "0d23c792130c82dcd3863bc2f929010ae95671783ddb084084be7b5c02908906"
+    },
+    {
+      "case_id": "cross-right-20",
+      "gates": [
+        20,
+        34,
+        55,
+        59
+      ],
+      "angle": "right",
+      "display_name": "The Sleeping Phoenix",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "7215173965f757ea7ea0aa1414bc9bccac78c0de1df153f4bf89b5ad5143e1bb"
+    },
+    {
+      "case_id": "cross-right-21",
+      "gates": [
+        21,
+        48,
+        38,
+        39
+      ],
+      "angle": "right",
+      "display_name": "Tension",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "471f01a0796cc05301cca2eb4f040ad9be3ce8c23943dee7a265cbfc95a680e5"
+    },
+    {
+      "case_id": "cross-right-22",
+      "gates": [
+        22,
+        47,
+        26,
+        45
+      ],
+      "angle": "right",
+      "display_name": "Rulership",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "99101781576a8baece52d256f25153407b9824ec01d608a6dc8670869497f61f"
+    },
+    {
+      "case_id": "cross-right-23",
+      "gates": [
+        23,
+        43,
+        49,
+        4
+      ],
+      "angle": "right",
+      "display_name": "Explanation",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "6e68d96c3be7a8b4fefa31d06d4a70b011f48a4fbbb293beb0334ce954e4392b"
+    },
+    {
+      "case_id": "cross-right-24",
+      "gates": [
+        24,
+        44,
+        19,
+        33
+      ],
+      "angle": "right",
+      "display_name": "The Four Ways",
+      "profile": "2/4",
+      "definition": "Quadruple Split",
+      "pdf_sha256": "0ac9f507bfa1e5d8942f0014cd22e7983fb3e20a36b2a70d80b5165b6ae21976"
+    },
+    {
+      "case_id": "cross-right-25",
+      "gates": [
+        25,
+        46,
+        10,
+        15
+      ],
+      "angle": "right",
+      "display_name": "The Vessel of Love",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "4970cff084752fd22325f58427a4437ec4d273e1e3bd723642e4b952cec523cb"
+    },
+    {
+      "case_id": "cross-right-26",
+      "gates": [
+        26,
+        45,
+        47,
+        22
+      ],
+      "angle": "right",
+      "display_name": "Rulership",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "214b9096b3a80a9281fcc4c56ab372259717ccb45cea71440a37a1ccd5f7218f"
+    },
+    {
+      "case_id": "cross-right-27",
+      "gates": [
+        27,
+        28,
+        41,
+        31
+      ],
+      "angle": "right",
+      "display_name": "The Unexpected",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "472799c99272f8297018f506e60d3b15dd78fd8d1d3fe13c73a591ffd6414a8f"
+    },
+    {
+      "case_id": "cross-right-28",
+      "gates": [
+        28,
+        27,
+        31,
+        41
+      ],
+      "angle": "right",
+      "display_name": "The Unexpected",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "08e8d9f2a28c7637f2a43831a591c54bd24631ce2ef0f438a9607b2a70640fd9"
+    },
+    {
+      "case_id": "cross-right-29",
+      "gates": [
+        29,
+        30,
+        8,
+        14
+      ],
+      "angle": "right",
+      "display_name": "Contagion",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "b8fa2c35f62630cf0e37d41e3fb800e180a897463bdba4e1e74328dd5aa01576"
+    },
+    {
+      "case_id": "cross-right-30",
+      "gates": [
+        30,
+        29,
+        14,
+        8
+      ],
+      "angle": "right",
+      "display_name": "Contagion",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "834ec04a5be04d8717bf6f17e8346932fa4c0dad7887c69769efa5f4a1c589f4"
+    },
+    {
+      "case_id": "cross-right-31",
+      "gates": [
+        31,
+        41,
+        27,
+        28
+      ],
+      "angle": "right",
+      "display_name": "The Unexpected",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "5fc6e172d5e49664dcd73d9ca9363cb194e174d9e98d4e5849184da101b121f7"
+    },
+    {
+      "case_id": "cross-right-32",
+      "gates": [
+        32,
+        42,
+        62,
+        61
+      ],
+      "angle": "right",
+      "display_name": "Maya",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "176602b37754e17181adefad59a4e4bfda5fa3462b566dde43b66057fdce3923"
+    },
+    {
+      "case_id": "cross-right-33",
+      "gates": [
+        33,
+        19,
+        24,
+        44
+      ],
+      "angle": "right",
+      "display_name": "The Four Ways",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "146624507f79ed7187b8d27282323fa18afef54541a851fdbc8e21e277786ea5"
+    },
+    {
+      "case_id": "cross-right-34",
+      "gates": [
+        34,
+        20,
+        59,
+        55
+      ],
+      "angle": "right",
+      "display_name": "The Sleeping Phoenix",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "a9d66d3e20c0bb6cdf78d8ccbea003e3e9fdf9dec62b9823050cfbfade44a5b5"
+    },
+    {
+      "case_id": "cross-right-35",
+      "gates": [
+        35,
+        5,
+        63,
+        64
+      ],
+      "angle": "right",
+      "display_name": "Consciousness",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "5320e7387f131edeeecfcc685f2d05f4e3b73201fabcc8c8855c95ebd64aedbc"
+    },
+    {
+      "case_id": "cross-right-36",
+      "gates": [
+        36,
+        6,
+        11,
+        12
+      ],
+      "angle": "right",
+      "display_name": "Eden",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "79d1348972618c0cd747a7eb9240b19c8e1d275fe0b74ca61df9d00f2303f6b6"
+    },
+    {
+      "case_id": "cross-right-37",
+      "gates": [
+        37,
+        40,
+        9,
+        16
+      ],
+      "angle": "right",
+      "display_name": "Planning",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "a6ccc2a3497c8e6a94781953d2c57236858ff1d0f841814d6aadf50266598dd2"
+    },
+    {
+      "case_id": "cross-right-38",
+      "gates": [
+        38,
+        39,
+        48,
+        21
+      ],
+      "angle": "right",
+      "display_name": "Tension",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "8667346810f34fc736ddca7f031ece0843363a4d923174958fb2d3ae39b9920a"
+    },
+    {
+      "case_id": "cross-right-39",
+      "gates": [
+        39,
+        38,
+        21,
+        48
+      ],
+      "angle": "right",
+      "display_name": "Tension",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "270a0637a642940705057177cdc061541a984a4482886ea40f399a11d532a71a"
+    },
+    {
+      "case_id": "cross-right-40",
+      "gates": [
+        40,
+        37,
+        16,
+        9
+      ],
+      "angle": "right",
+      "display_name": "Planning",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "ef2af82ee8d930685e3afe1fe5e1cd136191957a22a3bb81547ed15df7c72e15"
+    },
+    {
+      "case_id": "cross-right-41",
+      "gates": [
+        41,
+        31,
+        28,
+        27
+      ],
+      "angle": "right",
+      "display_name": "The Unexpected",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "23373ca17fcb759e362753893360704b02cf0708801da7e77b53b2ad3e7d12e4"
+    },
+    {
+      "case_id": "cross-right-42",
+      "gates": [
+        42,
+        32,
+        61,
+        62
+      ],
+      "angle": "right",
+      "display_name": "Maya",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "e855abe059d680a3e8d48d02728c7ea6c4f246b0891e8fd5de6f12afd3c3a74b"
+    },
+    {
+      "case_id": "cross-right-43",
+      "gates": [
+        43,
+        23,
+        4,
+        49
+      ],
+      "angle": "right",
+      "display_name": "Explanation",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "0456ea4c5301ef14c1e8101cadb76b95416171010f9513bc0312b6cf3294ea77"
+    },
+    {
+      "case_id": "cross-right-44",
+      "gates": [
+        44,
+        24,
+        33,
+        19
+      ],
+      "angle": "right",
+      "display_name": "The Four Ways",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "146a2c96e1e5a237bc231655c47791a8cdc7f69fa739cc25292263076b3380f3"
+    },
+    {
+      "case_id": "cross-right-45",
+      "gates": [
+        45,
+        26,
+        22,
+        47
+      ],
+      "angle": "right",
+      "display_name": "Rulership",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "e3ea54fa3f402cf3e363f192be1f2c9009e7a8df3da3f806170ff1235b6be4cf"
+    },
+    {
+      "case_id": "cross-right-46",
+      "gates": [
+        46,
+        25,
+        15,
+        10
+      ],
+      "angle": "right",
+      "display_name": "The Vessel of Love",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "8d45c1edbc3e69515fe611a8a8d7d5e0675402f46999d49226d4ba6b91d30091"
+    },
+    {
+      "case_id": "cross-right-47",
+      "gates": [
+        47,
+        22,
+        45,
+        26
+      ],
+      "angle": "right",
+      "display_name": "Rulership",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "a3ef14c5010b5d18d46557137a628c308c7f7389cac0331823da9b465422f4cb"
+    },
+    {
+      "case_id": "cross-right-48",
+      "gates": [
+        48,
+        21,
+        39,
+        38
+      ],
+      "angle": "right",
+      "display_name": "Tension",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "e5982755673350dadd61a7bb39c7fa61e0a1b9a03172cb4cda18d2161e5db9f0"
+    },
+    {
+      "case_id": "cross-right-49",
+      "gates": [
+        49,
+        4,
+        43,
+        23
+      ],
+      "angle": "right",
+      "display_name": "Explanation",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "bd52416a4fe3d34ba3f5149b53afcc413109b0d9fb48ee75e09d467f48625fbb"
+    },
+    {
+      "case_id": "cross-right-50",
+      "gates": [
+        50,
+        3,
+        56,
+        60
+      ],
+      "angle": "right",
+      "display_name": "Laws",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "644809efd747a1f3e6cf4ede8c2cb0630bea2f1fda653d1fb2bf8b1544f1c0de"
+    },
+    {
+      "case_id": "cross-right-51",
+      "gates": [
+        51,
+        57,
+        54,
+        53
+      ],
+      "angle": "right",
+      "display_name": "Penetration",
+      "profile": "2/4",
+      "definition": "Triple Split",
+      "pdf_sha256": "a28db6fcfb12d64690ef37e9ae2d0c5715d1c5e64be5994f15976147f8661a51"
+    },
+    {
+      "case_id": "cross-right-52",
+      "gates": [
+        52,
+        58,
+        17,
+        18
+      ],
+      "angle": "right",
+      "display_name": "Service",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "a3e6265507f39dce325f179edb627845bfbf530a25d94b64eca5ba87f3f1ea77"
+    },
+    {
+      "case_id": "cross-right-53",
+      "gates": [
+        53,
+        54,
+        51,
+        57
+      ],
+      "angle": "right",
+      "display_name": "Penetration",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "ed2d5bac425e95ce8434f9c0d8705c951f0fbcaa12ff83783a59dd9618ef866d"
+    },
+    {
+      "case_id": "cross-right-54",
+      "gates": [
+        54,
+        53,
+        57,
+        51
+      ],
+      "angle": "right",
+      "display_name": "Penetration",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "cf579bb13cf608b35a862b82096da83af26f46d3a16780d4697d39c082a977ff"
+    },
+    {
+      "case_id": "cross-right-55",
+      "gates": [
+        55,
+        59,
+        34,
+        20
+      ],
+      "angle": "right",
+      "display_name": "The Sleeping Phoenix",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "5a0e933c4cc529ff0f664dc22f668d78ef7f9a002b68546a35b41cf84455f1cf"
+    },
+    {
+      "case_id": "cross-right-56",
+      "gates": [
+        56,
+        60,
+        3,
+        50
+      ],
+      "angle": "right",
+      "display_name": "Laws",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "02201f449cc45f235d5b3eecfdac924ca580b5e0e4efc3c1558b849a51af862e"
+    },
+    {
+      "case_id": "cross-right-57",
+      "gates": [
+        57,
+        51,
+        53,
+        54
+      ],
+      "angle": "right",
+      "display_name": "Penetration",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "9099dfad35a71ea6e97adf8031c4ce8a8b5f4739f8501b6134731dd7b50bd41f"
+    },
+    {
+      "case_id": "cross-right-58",
+      "gates": [
+        58,
+        52,
+        18,
+        17
+      ],
+      "angle": "right",
+      "display_name": "Service",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "c18446795fccf1ce45e40861afa7151f4d9bbbcf1416e4f92b3cb97121b0fb67"
+    },
+    {
+      "case_id": "cross-right-59",
+      "gates": [
+        59,
+        55,
+        20,
+        34
+      ],
+      "angle": "right",
+      "display_name": "The Sleeping Phoenix",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "73818c4ea3429ce6795b8956fb0a9dc1c6521d75e6d0d4773514d83ac6fcfdce"
+    },
+    {
+      "case_id": "cross-right-60",
+      "gates": [
+        60,
+        56,
+        50,
+        3
+      ],
+      "angle": "right",
+      "display_name": "Laws",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "40a6776d810b68a3e5dfbbe9529843299eb6442c78eeeaa200aac153755a825c"
+    },
+    {
+      "case_id": "cross-right-61",
+      "gates": [
+        61,
+        62,
+        32,
+        42
+      ],
+      "angle": "right",
+      "display_name": "Maya",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "aaf793552484e8270f13579c92046e7bb65a86a04e1d170a48f798c99a96dc0b"
+    },
+    {
+      "case_id": "cross-right-62",
+      "gates": [
+        62,
+        61,
+        42,
+        32
+      ],
+      "angle": "right",
+      "display_name": "Maya",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "617f7891b48e01f29d91572c41588b0cf58e1a3024ff53cd0de94156c7f19dab"
+    },
+    {
+      "case_id": "cross-right-63",
+      "gates": [
+        63,
+        64,
+        5,
+        35
+      ],
+      "angle": "right",
+      "display_name": "Consciousness",
+      "profile": "2/4",
+      "definition": "Single",
+      "pdf_sha256": "3a38701b2026c5a5f799a060c741f07e7d11ac9f769d4f0ee996a6ec42f5ab97"
+    },
+    {
+      "case_id": "cross-right-64",
+      "gates": [
+        64,
+        63,
+        35,
+        5
+      ],
+      "angle": "right",
+      "display_name": "Consciousness",
+      "profile": "2/4",
+      "definition": "Split",
+      "pdf_sha256": "7da7b67f51689351157c91d8f1562c6411969792f34394a269b13c613e02cf3c"
+    },
+    {
+      "case_id": "cross-juxtaposition-01",
+      "gates": [
+        1,
+        2,
+        4,
+        49
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Self-expression",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "c83f1de23c5e50f2a747ffcc9adb06adc6a40c5113dfe29e9a6c70d3d4343c50"
+    },
+    {
+      "case_id": "cross-juxtaposition-02",
+      "gates": [
+        2,
+        1,
+        49,
+        4
+      ],
+      "angle": "juxtaposition",
+      "display_name": "The Driver",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "6fe8adb40de8585f173988f1c75dd43a34b39a206b8c8befca13fe90a65d64c8"
+    },
+    {
+      "case_id": "cross-juxtaposition-03",
+      "gates": [
+        3,
+        50,
+        41,
+        31
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Mutation",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "b140ba910d4103175a6d859655d2b42c9cc7935574a92a8213e821446fec9c37"
+    },
+    {
+      "case_id": "cross-juxtaposition-04",
+      "gates": [
+        4,
+        49,
+        8,
+        14
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Formulization",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "3130de521a6df59473e85ce25feccb4a1f76af8d9cc356552490e935ba94c715"
+    },
+    {
+      "case_id": "cross-juxtaposition-05",
+      "gates": [
+        5,
+        35,
+        47,
+        22
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Habits",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "da17a2d48ab8fb8add541fbd7305f10848c5d36261b002961762ab409edbc633"
+    },
+    {
+      "case_id": "cross-juxtaposition-06",
+      "gates": [
+        6,
+        36,
+        15,
+        10
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Conflict",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "175f280491f47bce80b9f09577982e3b3b9ffd0e66e6988efc7d808b7ec11c63"
+    },
+    {
+      "case_id": "cross-juxtaposition-07",
+      "gates": [
+        7,
+        13,
+        23,
+        43
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Interaction",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "3c9ba2ab4e427576045fedef69ee97f6f2cd078a1988d12ad4d265cfb529d223"
+    },
+    {
+      "case_id": "cross-juxtaposition-08",
+      "gates": [
+        8,
+        14,
+        55,
+        59
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Contribution",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "5236cd6b207b171eda0c2394c10abe987a8c64932a559c3813c693a21c668398"
+    },
+    {
+      "case_id": "cross-juxtaposition-09",
+      "gates": [
+        9,
+        16,
+        64,
+        63
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Focus",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "026ed6e79e81ea21c5e1734474958fd50e8fce51fcac7f97ff5622efd2d5d9f1"
+    },
+    {
+      "case_id": "cross-juxtaposition-10",
+      "gates": [
+        10,
+        15,
+        18,
+        17
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Behavior",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "13dc6050c3a8c162cb61f531d500694214ff1492ea771f35035b26bfaa6e8320"
+    },
+    {
+      "case_id": "cross-juxtaposition-11",
+      "gates": [
+        11,
+        12,
+        46,
+        25
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Ideas",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "c5c6030e01b51ac4f7fb9d36c24efba99dbf7f0c0dbec5d3d53a30a120bd5eea"
+    },
+    {
+      "case_id": "cross-juxtaposition-12",
+      "gates": [
+        12,
+        11,
+        25,
+        46
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Articulation",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "83b0396648a48378df34109c475816d1fdf4f54451ab01088db8dbbd6b8ea5b0"
+    },
+    {
+      "case_id": "cross-juxtaposition-13",
+      "gates": [
+        13,
+        7,
+        43,
+        23
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Listening",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "4a4cb307bee799d928c837bc93daed52e07384e88bc2327e7a6ab160f3e35528"
+    },
+    {
+      "case_id": "cross-juxtaposition-14",
+      "gates": [
+        14,
+        8,
+        59,
+        55
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Empowering",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "d46b9b52e452ba381bb1972be34d7d6f167ca5c3392488106f8d0eef03ee5107"
+    },
+    {
+      "case_id": "cross-juxtaposition-15",
+      "gates": [
+        15,
+        10,
+        17,
+        18
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Extremes",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "06c1536b3ccd433ecb0c7dea99893ade2a4bdbaf480ac52b397ec891ff5a6211"
+    },
+    {
+      "case_id": "cross-juxtaposition-16",
+      "gates": [
+        16,
+        9,
+        63,
+        64
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Experimentation",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "397ce2f6996461024f3463359ec165e1326c398b96e32409ac185029ee55a921"
+    },
+    {
+      "case_id": "cross-juxtaposition-17",
+      "gates": [
+        17,
+        18,
+        38,
+        39
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Opinions",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "d5a774a2a6e452501c1f28892299c7daa4884e30c0e594b423920bfb5697fb4e"
+    },
+    {
+      "case_id": "cross-juxtaposition-18",
+      "gates": [
+        18,
+        17,
+        39,
+        38
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Correction",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "abbe875e5cd9d73f51a3518b63f04ea161ecf6fe3de0a168a90b4832fe0dace7"
+    },
+    {
+      "case_id": "cross-juxtaposition-19",
+      "gates": [
+        19,
+        33,
+        1,
+        2
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Need",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "2d4779864e8343ec83b73142249a2df348428fd44d9ec3f02e2a49a2a70b0177"
+    },
+    {
+      "case_id": "cross-juxtaposition-20",
+      "gates": [
+        20,
+        34,
+        37,
+        40
+      ],
+      "angle": "juxtaposition",
+      "display_name": "The Now",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "65f65021a96b83acf2b2b19f5a0a46e03423d0604e9feb40a707751c939561d6"
+    },
+    {
+      "case_id": "cross-juxtaposition-21",
+      "gates": [
+        21,
+        48,
+        54,
+        53
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Control",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "6007b71bcbdb412109e246d038b57dca38de6ffa9f1845cb3ac4da114e5a77dc"
+    },
+    {
+      "case_id": "cross-juxtaposition-22",
+      "gates": [
+        22,
+        47,
+        11,
+        12
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Grace",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "f515a41c2b5c3952325201d926e47a632f4cf831140e69d34f6135659d22ec77"
+    },
+    {
+      "case_id": "cross-juxtaposition-23",
+      "gates": [
+        23,
+        43,
+        30,
+        29
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Assimilation",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "268877fa4055b5f6d1b1170932466b0dcbce20b06c78dcbb62b42c47e6591f84"
+    },
+    {
+      "case_id": "cross-juxtaposition-24",
+      "gates": [
+        24,
+        44,
+        13,
+        7
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Rationalization",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "103d45fec1fa3fc26cfcb3c5a8de3a106a6e7ceb431fb7344d5b3451dd28267d"
+    },
+    {
+      "case_id": "cross-juxtaposition-25",
+      "gates": [
+        25,
+        46,
+        58,
+        52
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Innocence",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "da9e06e82dda81d325754bb9b79e18d606555df9a0db9bec02d8670df38c0521"
+    },
+    {
+      "case_id": "cross-juxtaposition-26",
+      "gates": [
+        26,
+        45,
+        6,
+        36
+      ],
+      "angle": "juxtaposition",
+      "display_name": "The Trickster",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "0317b1bad8ee50b05c7bd18c08b440ab3fcc2312fd1e9138d8a5f9ed297abf2d"
+    },
+    {
+      "case_id": "cross-juxtaposition-27",
+      "gates": [
+        27,
+        28,
+        19,
+        33
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Caring",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "d890c6d13c178df5911b35b5705e8bbd0b8e287138e01b29e5aba5682f89fbde"
+    },
+    {
+      "case_id": "cross-juxtaposition-28",
+      "gates": [
+        28,
+        27,
+        33,
+        19
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Risks",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "5b596e3761d69ded2f358267fffb987a1578003e4e43bcb665b171cf516058cf"
+    },
+    {
+      "case_id": "cross-juxtaposition-29",
+      "gates": [
+        29,
+        30,
+        20,
+        34
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Commitment",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "4409a2e07f118501d70dfacb0248524c579295b97e4fbbaa02cb48727f3c8562"
+    },
+    {
+      "case_id": "cross-juxtaposition-30",
+      "gates": [
+        30,
+        29,
+        34,
+        20
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Fates",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "c1e97204f51b8ed3135998117d4f5982e7fd92258015c47c7c66359a7c0850e9"
+    },
+    {
+      "case_id": "cross-juxtaposition-31",
+      "gates": [
+        31,
+        41,
+        24,
+        44
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Influence",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "9dad2ea4b81492f79e52a02e7e3ea73c6417072ce2eb516c6699f7535fe30d53"
+    },
+    {
+      "case_id": "cross-juxtaposition-32",
+      "gates": [
+        32,
+        42,
+        56,
+        60
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Conservation",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "e004872c7e3dedfa5c3ae57f9df2f018a6d446742dbbfd5183578df6b38db3a4"
+    },
+    {
+      "case_id": "cross-juxtaposition-33",
+      "gates": [
+        33,
+        19,
+        2,
+        1
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Retreat",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "0a15f165e89fd8ab73f3f758dcad03a9f903f0ec682733556be06618757ce4a8"
+    },
+    {
+      "case_id": "cross-juxtaposition-34",
+      "gates": [
+        34,
+        20,
+        40,
+        37
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Power",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "9a81337fa9c1218b61d3135db9f642647aa9554575d749f7b0fcb3f3aaddcb17"
+    },
+    {
+      "case_id": "cross-juxtaposition-35",
+      "gates": [
+        35,
+        5,
+        22,
+        47
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Experience",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "7eafe01633a2d9faf66d8a7f64eb146f3eb23c7220ed191cba08c0ca907b3940"
+    },
+    {
+      "case_id": "cross-juxtaposition-36",
+      "gates": [
+        36,
+        6,
+        10,
+        15
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Crisis",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "9a60c5cada449e38ef474ee005444f25b513731898a3039656ab47e89ca82bee"
+    },
+    {
+      "case_id": "cross-juxtaposition-37",
+      "gates": [
+        37,
+        40,
+        5,
+        35
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Bargains",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "96ff5e76dcd477eb8fca4d20d62c19b2bf5c648491f3e991bb45cbf8e7b17829"
+    },
+    {
+      "case_id": "cross-juxtaposition-38",
+      "gates": [
+        38,
+        39,
+        57,
+        51
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Opposition",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "66adef68d5a0265f0a85da23497dcce3a458f535756d6bed7d693a8233b2142b"
+    },
+    {
+      "case_id": "cross-juxtaposition-39",
+      "gates": [
+        39,
+        38,
+        51,
+        57
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Provocation",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "2995ce88fab566cbb7f921730d3b8d478535e0cb9d5a69f8d06cbf8fdfdc857f"
+    },
+    {
+      "case_id": "cross-juxtaposition-40",
+      "gates": [
+        40,
+        37,
+        35,
+        5
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Denial",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "ee63b1b7e02409eea28b6c6363f3ce42234f5f4310d8b83b10d38ec99736336a"
+    },
+    {
+      "case_id": "cross-juxtaposition-41",
+      "gates": [
+        41,
+        31,
+        44,
+        24
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Fantasy",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "71ff313eaadd6b1ee9cd9d84b7980aab874c0658519d6364cbc1684fbdce5f4f"
+    },
+    {
+      "case_id": "cross-juxtaposition-42",
+      "gates": [
+        42,
+        32,
+        60,
+        56
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Completion",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "037eeea95e51d298e472d2d4d9fc4bb2a63eb3bcad13784c6642dfbc1f9d67d5"
+    },
+    {
+      "case_id": "cross-juxtaposition-43",
+      "gates": [
+        43,
+        23,
+        29,
+        30
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Insight",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "d7dcd801916f5dce1b04deb3746f90ef2f576f141874ffcd8eaa30c2cc0cbb8d"
+    },
+    {
+      "case_id": "cross-juxtaposition-44",
+      "gates": [
+        44,
+        24,
+        7,
+        13
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Alertness",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "eea673d5d6383a4f36a90f355f6fb6b9d372a26b9ddf95c1b4ffff3efa7b2f20"
+    },
+    {
+      "case_id": "cross-juxtaposition-45",
+      "gates": [
+        45,
+        26,
+        36,
+        6
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Possession",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "edade6e50db4a60fc2c43b6cdf7ea004941a5e3a09447c0f4edc6db62038a73a"
+    },
+    {
+      "case_id": "cross-juxtaposition-46",
+      "gates": [
+        46,
+        25,
+        52,
+        58
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Serendipity",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "71d6b2ed71fd9248e303b2c0f0b500c893c5c81e8ec65bce7e5fb4c2e3d4fe9f"
+    },
+    {
+      "case_id": "cross-juxtaposition-47",
+      "gates": [
+        47,
+        22,
+        12,
+        11
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Oppression",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "217e39a86bdbfebc660af94b176e6b4cf0b3855f6d71dacf3be8fb01b37cef8f"
+    },
+    {
+      "case_id": "cross-juxtaposition-48",
+      "gates": [
+        48,
+        21,
+        53,
+        54
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Depth",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "45b30c0eee9b11626a6dc80064209989445090551b146da4db30419af6f5c0e0"
+    },
+    {
+      "case_id": "cross-juxtaposition-49",
+      "gates": [
+        49,
+        4,
+        14,
+        8
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Principles",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "6a20c7d2a6527669038198fce42ee98036118d2617780dee820885a261f3905a"
+    },
+    {
+      "case_id": "cross-juxtaposition-50",
+      "gates": [
+        50,
+        3,
+        31,
+        41
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Values",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "6424d616739af10c97d78af13cbf9b16da0159e936ce722835f420839ae3879f"
+    },
+    {
+      "case_id": "cross-juxtaposition-51",
+      "gates": [
+        51,
+        57,
+        61,
+        62
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Shock",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "b7c9640f5917a675d2ef678e862b79cd97f2c0ad4599b4e41827c16a44b83b64"
+    },
+    {
+      "case_id": "cross-juxtaposition-52",
+      "gates": [
+        52,
+        58,
+        21,
+        48
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Stillness",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "35503b261b489a193a7f285525e782babbed7f9d9620a8ea36784c9a85566703"
+    },
+    {
+      "case_id": "cross-juxtaposition-53",
+      "gates": [
+        53,
+        54,
+        42,
+        32
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Beginnings",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "b4f6f492a0bb0d3d1f6058e96445a3b8d3f5c75fab8b52c41af0962a23e3b37f"
+    },
+    {
+      "case_id": "cross-juxtaposition-54",
+      "gates": [
+        54,
+        53,
+        32,
+        42
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Ambition",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "0b3e473f4fa7518a04e7d95546837d7e410b320e782f9fc387e9a69f7f667bee"
+    },
+    {
+      "case_id": "cross-juxtaposition-55",
+      "gates": [
+        55,
+        59,
+        9,
+        16
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Moods",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "2fed6d4faf787350571d16b18c5d823609ce6aa027d50e4c16b9c6075999afaa"
+    },
+    {
+      "case_id": "cross-juxtaposition-56",
+      "gates": [
+        56,
+        60,
+        27,
+        28
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Stimulation",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "28c84b1b6c40dd791e249b6c895b87ab4b11167a8a812b4a356ae2a634eb9194"
+    },
+    {
+      "case_id": "cross-juxtaposition-57",
+      "gates": [
+        57,
+        51,
+        62,
+        61
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Intuition",
+      "profile": "4/1",
+      "definition": "None",
+      "pdf_sha256": "0c719302e06f1ce9dad7df3e78bf64f3201174c8b9bef28941e8c3f941cb442f"
+    },
+    {
+      "case_id": "cross-juxtaposition-58",
+      "gates": [
+        58,
+        52,
+        48,
+        21
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Vitality",
+      "profile": "4/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "62836646162621f68b6283da3a7b4b384d74238bdd75980366f768d82b9991eb"
+    },
+    {
+      "case_id": "cross-juxtaposition-59",
+      "gates": [
+        59,
+        55,
+        16,
+        9
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Strategy",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "ad41738c0ca4c6bdddae1d269387098e6ac7d2363d9c8fe46bac0a910dccc389"
+    },
+    {
+      "case_id": "cross-juxtaposition-60",
+      "gates": [
+        60,
+        56,
+        28,
+        27
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Limitation",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "e01510c9f182c400fa0ee939f3493c00de7fac81ce55776f8de63f28d2d0766c"
+    },
+    {
+      "case_id": "cross-juxtaposition-61",
+      "gates": [
+        61,
+        62,
+        50,
+        3
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Thinking",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "b9f4b74ea1313a227eb5fd4e56659fa90b75fa72b59c3c4ddfa3d2308e068d9e"
+    },
+    {
+      "case_id": "cross-juxtaposition-62",
+      "gates": [
+        62,
+        61,
+        3,
+        50
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Detail",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "b52e535c17dac1ad1d0551f3f9ee0beef4d641cde9479973e2ab732944bb8e1e"
+    },
+    {
+      "case_id": "cross-juxtaposition-63",
+      "gates": [
+        63,
+        64,
+        26,
+        45
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Doubts",
+      "profile": "4/1",
+      "definition": "Single",
+      "pdf_sha256": "c3a56727267009049da27bf0bbb7aa906fb0682809904857208f47edec093baa"
+    },
+    {
+      "case_id": "cross-juxtaposition-64",
+      "gates": [
+        64,
+        63,
+        45,
+        26
+      ],
+      "angle": "juxtaposition",
+      "display_name": "Confusion",
+      "profile": "4/1",
+      "definition": "Split",
+      "pdf_sha256": "8f99502e2d4efbe06e750a11409943a7aad8d1691bf6735d3745174da11feabd"
+    },
+    {
+      "case_id": "cross-left-01",
+      "gates": [
+        1,
+        2,
+        4,
+        49
+      ],
+      "angle": "left",
+      "display_name": "Defiance",
+      "profile": "5/1",
+      "definition": "Single",
+      "pdf_sha256": "5c0e3d4e23bb7426f17b117b3fcdb516a3edf1a3504ccd98817f46a0141e1b9a"
+    },
+    {
+      "case_id": "cross-left-02",
+      "gates": [
+        2,
+        1,
+        49,
+        4
+      ],
+      "angle": "left",
+      "display_name": "Defiance",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "53bd461530ee422b850c081a4205a3eeef52deb803286a9f7fe32c483aa3c7d1"
+    },
+    {
+      "case_id": "cross-left-03",
+      "gates": [
+        3,
+        50,
+        41,
+        31
+      ],
+      "angle": "left",
+      "display_name": "Wishes",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "5fc4a379198dc6f5d72cb1c3b97ab5a2103c5d252280ac397f92b5188e6a7151"
+    },
+    {
+      "case_id": "cross-left-04",
+      "gates": [
+        4,
+        49,
+        8,
+        14
+      ],
+      "angle": "left",
+      "display_name": "Revolution",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "9e5284f1cdfff84c16bfea67f2ba8836e693bba309176af680b410cbf2f2e442"
+    },
+    {
+      "case_id": "cross-left-05",
+      "gates": [
+        5,
+        35,
+        47,
+        22
+      ],
+      "angle": "left",
+      "display_name": "Separation",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "e29c6bedeb65bf3c13445c6c3f31d1862e02d98e40c68a3887bbd1624f7138bc"
+    },
+    {
+      "case_id": "cross-left-06",
+      "gates": [
+        6,
+        36,
+        15,
+        10
+      ],
+      "angle": "left",
+      "display_name": "The Plane",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "c0470c01d9b2691e8685b9044c700111b6f2c3af4574ef2160a5059535185280"
+    },
+    {
+      "case_id": "cross-left-07",
+      "gates": [
+        7,
+        13,
+        23,
+        43
+      ],
+      "angle": "left",
+      "display_name": "Masks",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "13c9fe6de3f798a1cacb14a961a190f3a025b6c636bd73a68f89ac1d2990a3da"
+    },
+    {
+      "case_id": "cross-left-08",
+      "gates": [
+        8,
+        14,
+        55,
+        59
+      ],
+      "angle": "left",
+      "display_name": "Uncertainty",
+      "profile": "5/1",
+      "definition": "Single",
+      "pdf_sha256": "520250b233e9dfaf47c8364b7824fb2b1fefe1fff3da608919977590867bfb06"
+    },
+    {
+      "case_id": "cross-left-09",
+      "gates": [
+        9,
+        16,
+        64,
+        63
+      ],
+      "angle": "left",
+      "display_name": "Identification",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "55e438abef8c9ce15ac22602999e09cd7dc1d938e9df2e60461f3a5cf93b725f"
+    },
+    {
+      "case_id": "cross-left-10",
+      "gates": [
+        10,
+        15,
+        18,
+        17
+      ],
+      "angle": "left",
+      "display_name": "Prevention",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "d44a2ede461e73d68df8b6a2f1c5724d27f24ef15250030d1e3ef8021c2188dd"
+    },
+    {
+      "case_id": "cross-left-11",
+      "gates": [
+        11,
+        12,
+        46,
+        25
+      ],
+      "angle": "left",
+      "display_name": "Education",
+      "profile": "5/1",
+      "definition": "Single",
+      "pdf_sha256": "a123f5a7ec7834176c20c4cb98dbdbda573cf61d041aa7e63ea4d04afeaac16e"
+    },
+    {
+      "case_id": "cross-left-12",
+      "gates": [
+        12,
+        11,
+        25,
+        46
+      ],
+      "angle": "left",
+      "display_name": "Education",
+      "profile": "5/1",
+      "definition": "Single",
+      "pdf_sha256": "9f7b5d2faa1dee20fffcd1ac3f58bc17b654fa4db0cb034c9f3862e9148f21bd"
+    },
+    {
+      "case_id": "cross-left-13",
+      "gates": [
+        13,
+        7,
+        43,
+        23
+      ],
+      "angle": "left",
+      "display_name": "Masks",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "80963a3cf432eb63cc70ed59d826f19822d88008ae7271666dc0fa60219e9584"
+    },
+    {
+      "case_id": "cross-left-14",
+      "gates": [
+        14,
+        8,
+        59,
+        55
+      ],
+      "angle": "left",
+      "display_name": "Uncertainty",
+      "profile": "5/1",
+      "definition": "Single",
+      "pdf_sha256": "72dd2c558526d9afce5697287ddef8b3b62b2cc5a6354d66b66275f8fcb5d82b"
+    },
+    {
+      "case_id": "cross-left-15",
+      "gates": [
+        15,
+        10,
+        17,
+        18
+      ],
+      "angle": "left",
+      "display_name": "Prevention",
+      "profile": "5/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "3f9c96df33cbac49be245316388959d2b43451794d41cff36cb5e2406aae4ab4"
+    },
+    {
+      "case_id": "cross-left-16",
+      "gates": [
+        16,
+        9,
+        63,
+        64
+      ],
+      "angle": "left",
+      "display_name": "Identification",
+      "profile": "5/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "cb0c417cc929bf70ee69ab812f256e8b9fdc4f3bec40a1ea6b719cf1ea78eedd"
+    },
+    {
+      "case_id": "cross-left-17",
+      "gates": [
+        17,
+        18,
+        38,
+        39
+      ],
+      "angle": "left",
+      "display_name": "Upheaval",
+      "profile": "5/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "510b3e11679b45eac31d160f86de1acd3c69e2d159d753b9b34423dada265190"
+    },
+    {
+      "case_id": "cross-left-18",
+      "gates": [
+        18,
+        17,
+        39,
+        38
+      ],
+      "angle": "left",
+      "display_name": "Upheaval",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "4e84bd881e6d09615a087ae804cc5ea7437049ca37e6bc7d1188988d853f4776"
+    },
+    {
+      "case_id": "cross-left-19",
+      "gates": [
+        19,
+        33,
+        1,
+        2
+      ],
+      "angle": "left",
+      "display_name": "Refinement",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "819cb7245e67e8b7d7c754a4f9c14ca859f7211207c83ba5f0da0f271ac48f80"
+    },
+    {
+      "case_id": "cross-left-20",
+      "gates": [
+        20,
+        34,
+        37,
+        40
+      ],
+      "angle": "left",
+      "display_name": "Duality",
+      "profile": "5/1",
+      "definition": "Single",
+      "pdf_sha256": "8408ab8f60c2b0974e9e8b4ecd37eebef62eb377fb52cffd85683162edef893a"
+    },
+    {
+      "case_id": "cross-left-21",
+      "gates": [
+        21,
+        48,
+        54,
+        53
+      ],
+      "angle": "left",
+      "display_name": "Endeavor",
+      "profile": "5/1",
+      "definition": "Quadruple Split",
+      "pdf_sha256": "107f9934584ab9a433fd8a213a61bda15ba27ffe36e314e14638a00c012d54f7"
+    },
+    {
+      "case_id": "cross-left-22",
+      "gates": [
+        22,
+        47,
+        11,
+        12
+      ],
+      "angle": "left",
+      "display_name": "Informing",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "5882197c21780b576a1fbdfa28fd3fd888bfe6666dcc6644b58708b2d2cf688e"
+    },
+    {
+      "case_id": "cross-left-23",
+      "gates": [
+        23,
+        43,
+        30,
+        29
+      ],
+      "angle": "left",
+      "display_name": "Dedication",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "a3e8290f2b647b82d4c649e2165c0620b5b20a93cd275b31bc570fbdc2f6e40b"
+    },
+    {
+      "case_id": "cross-left-24",
+      "gates": [
+        24,
+        44,
+        13,
+        7
+      ],
+      "angle": "left",
+      "display_name": "Incarnation",
+      "profile": "5/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "b63d724109b8548424dfc884187dc871bbec63ba02d1ff5d71a6d9291ea37e36"
+    },
+    {
+      "case_id": "cross-left-25",
+      "gates": [
+        25,
+        46,
+        58,
+        52
+      ],
+      "angle": "left",
+      "display_name": "Healing",
+      "profile": "5/1",
+      "definition": "Single",
+      "pdf_sha256": "a53f78a17b178df64ebf433ac5a2f0a5065408c0ad204eba2357733bfef9746c"
+    },
+    {
+      "case_id": "cross-left-26",
+      "gates": [
+        26,
+        45,
+        6,
+        36
+      ],
+      "angle": "left",
+      "display_name": "Confrontation",
+      "profile": "5/1",
+      "definition": "Single",
+      "pdf_sha256": "25b75a9a1b003b1f6cda50eb4cd7f7b99df0fc3eab220059c0f54413534f1f10"
+    },
+    {
+      "case_id": "cross-left-27",
+      "gates": [
+        27,
+        28,
+        19,
+        33
+      ],
+      "angle": "left",
+      "display_name": "Alignment",
+      "profile": "5/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "79ef923b16ef0c1749e5204d9f2585942b8ce880387af90dbd2d51e314dd0563"
+    },
+    {
+      "case_id": "cross-left-28",
+      "gates": [
+        28,
+        27,
+        33,
+        19
+      ],
+      "angle": "left",
+      "display_name": "Alignment",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "ac119a7fa0c64a0de4e02356025454b9bbbf4ea96fd1f04e8c077d219b2cf018"
+    },
+    {
+      "case_id": "cross-left-29",
+      "gates": [
+        29,
+        30,
+        20,
+        34
+      ],
+      "angle": "left",
+      "display_name": "Industry",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "0684f3e816b44c6f0993d798497fade6b5ddfa002c8d49f9c3f667da6446ebbd"
+    },
+    {
+      "case_id": "cross-left-30",
+      "gates": [
+        30,
+        29,
+        34,
+        20
+      ],
+      "angle": "left",
+      "display_name": "Industry",
+      "profile": "5/1",
+      "definition": "Single",
+      "pdf_sha256": "f8185db465757d67e65331327cbcdfafe981291fc30ebc676b06faaac59a628f"
+    },
+    {
+      "case_id": "cross-left-31",
+      "gates": [
+        31,
+        41,
+        24,
+        44
+      ],
+      "angle": "left",
+      "display_name": "The Alpha",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "969cc67d1e32932dac703b78c61096fbe08cc15d720fe1736377c0cef1c1f72b"
+    },
+    {
+      "case_id": "cross-left-32",
+      "gates": [
+        32,
+        42,
+        56,
+        60
+      ],
+      "angle": "left",
+      "display_name": "Limitation",
+      "profile": "5/1",
+      "definition": "Single",
+      "pdf_sha256": "dbe1236fa864ded5508b427710544ceca1cf61d053a2669ed4d29c0262f2861c"
+    },
+    {
+      "case_id": "cross-left-33",
+      "gates": [
+        33,
+        19,
+        2,
+        1
+      ],
+      "angle": "left",
+      "display_name": "Refinement",
+      "profile": "5/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "dfb1d14479bcc17f43cb8aa82aff582198ac7024717c45502c2fe7a634cbbaa8"
+    },
+    {
+      "case_id": "cross-left-34",
+      "gates": [
+        34,
+        20,
+        40,
+        37
+      ],
+      "angle": "left",
+      "display_name": "Duality",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "d35cff4ec16829843a653fcbf5ae1558b6416c9a4ea1776a7275b9bedc0f9aaa"
+    },
+    {
+      "case_id": "cross-left-35",
+      "gates": [
+        35,
+        5,
+        22,
+        47
+      ],
+      "angle": "left",
+      "display_name": "Separation",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "a2d53b5fdff9d57daea8bfea37487205f54efadbcf4566d54ca9e1e6aca3c79a"
+    },
+    {
+      "case_id": "cross-left-36",
+      "gates": [
+        36,
+        6,
+        10,
+        15
+      ],
+      "angle": "left",
+      "display_name": "The Plane",
+      "profile": "5/1",
+      "definition": "Single",
+      "pdf_sha256": "5c662c0f06ec5628f370396d790759a87efb96b816bb17e98de0c408fe632092"
+    },
+    {
+      "case_id": "cross-left-37",
+      "gates": [
+        37,
+        40,
+        5,
+        35
+      ],
+      "angle": "left",
+      "display_name": "Migration",
+      "profile": "5/1",
+      "definition": "Single",
+      "pdf_sha256": "b27c961d86b0f9c564bd0219afce01154e801dcf42b5ec9605f102d045321426"
+    },
+    {
+      "case_id": "cross-left-38",
+      "gates": [
+        38,
+        39,
+        57,
+        51
+      ],
+      "angle": "left",
+      "display_name": "Individualism",
+      "profile": "5/1",
+      "definition": "Quadruple Split",
+      "pdf_sha256": "cd590134f4327e42390201a494896f8ad7ed9f8a563ebd1d485484321d22b402"
+    },
+    {
+      "case_id": "cross-left-39",
+      "gates": [
+        39,
+        38,
+        51,
+        57
+      ],
+      "angle": "left",
+      "display_name": "Individualism",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "2c592fb86642b647bcf2ad235d0d4da339c8fde9d4bb505b24aa445a53bf45bd"
+    },
+    {
+      "case_id": "cross-left-40",
+      "gates": [
+        40,
+        37,
+        35,
+        5
+      ],
+      "angle": "left",
+      "display_name": "Migration",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "ab9aeb1892ff74fa44c123860215eed83c3b486ccbd01e93a5fa6661816486ae"
+    },
+    {
+      "case_id": "cross-left-41",
+      "gates": [
+        41,
+        31,
+        44,
+        24
+      ],
+      "angle": "left",
+      "display_name": "The Alpha",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "368ee8318bcb953a4f7985964ecde3b549bd78a331924b458aed25d713a15a74"
+    },
+    {
+      "case_id": "cross-left-42",
+      "gates": [
+        42,
+        32,
+        60,
+        56
+      ],
+      "angle": "left",
+      "display_name": "Limitation",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "605d6d0c9ff338b2c9fd693e73d1d816c96827768de51175ba998fbbbc9ce5ea"
+    },
+    {
+      "case_id": "cross-left-43",
+      "gates": [
+        43,
+        23,
+        29,
+        30
+      ],
+      "angle": "left",
+      "display_name": "Dedication",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "3a3dd278fa992a871b25b201608c715e729e44701f4be9977b88e6b80c05dca4"
+    },
+    {
+      "case_id": "cross-left-44",
+      "gates": [
+        44,
+        24,
+        7,
+        13
+      ],
+      "angle": "left",
+      "display_name": "Incarnation",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "32fce43bebbc22986cd69ada25740ffdf79f47d74c91c87446d234e2c98762ae"
+    },
+    {
+      "case_id": "cross-left-45",
+      "gates": [
+        45,
+        26,
+        36,
+        6
+      ],
+      "angle": "left",
+      "display_name": "Confrontation",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "57490a7eb3de83b59062c044cce542feb06a85b7fdc1429634837b04dd62d7be"
+    },
+    {
+      "case_id": "cross-left-46",
+      "gates": [
+        46,
+        25,
+        52,
+        58
+      ],
+      "angle": "left",
+      "display_name": "Healing",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "f0be737950457feaeafd6ebf51d3197fefed40931a7b3c7bb1d9fbe295f552da"
+    },
+    {
+      "case_id": "cross-left-47",
+      "gates": [
+        47,
+        22,
+        12,
+        11
+      ],
+      "angle": "left",
+      "display_name": "Informing",
+      "profile": "5/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "adf2013812b7d3fdbb977d72b8205ab80c0bb25e04de30e4a18c51634aea9fcb"
+    },
+    {
+      "case_id": "cross-left-48",
+      "gates": [
+        48,
+        21,
+        53,
+        54
+      ],
+      "angle": "left",
+      "display_name": "Endeavor",
+      "profile": "5/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "f33159bd7ea8ae4a5b1c304746c0409295da9a3eb111d48ec756266a6a8cff38"
+    },
+    {
+      "case_id": "cross-left-49",
+      "gates": [
+        49,
+        4,
+        14,
+        8
+      ],
+      "angle": "left",
+      "display_name": "Revolution",
+      "profile": "5/1",
+      "definition": "Single",
+      "pdf_sha256": "a2f8e1c0618d5a095114cdf2b0857a59908119e8c853aa0069cd76a91acb798c"
+    },
+    {
+      "case_id": "cross-left-50",
+      "gates": [
+        50,
+        3,
+        31,
+        41
+      ],
+      "angle": "left",
+      "display_name": "Wishes",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "ff467c151e51d4bfac9834b0f5b220b77fcdd475d643907a88215b49de70d3d5"
+    },
+    {
+      "case_id": "cross-left-51",
+      "gates": [
+        51,
+        57,
+        61,
+        62
+      ],
+      "angle": "left",
+      "display_name": "The Clarion",
+      "profile": "5/1",
+      "definition": "Triple Split",
+      "pdf_sha256": "6cbcc5cdf31505e1360ff592582d332959bd00e607d98f1bda0326d2fe56a5b1"
+    },
+    {
+      "case_id": "cross-left-52",
+      "gates": [
+        52,
+        58,
+        21,
+        48
+      ],
+      "angle": "left",
+      "display_name": "Demands",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "10560ef5741f15267787974cf6a9db8fe139d08ad74a2c5e6d0e016570a60f65"
+    },
+    {
+      "case_id": "cross-left-53",
+      "gates": [
+        53,
+        54,
+        42,
+        32
+      ],
+      "angle": "left",
+      "display_name": "Cycles",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "0fff4cdd4d90d89e67a065003dc1fd1aa64def4a253cd5aec707857006b45946"
+    },
+    {
+      "case_id": "cross-left-54",
+      "gates": [
+        54,
+        53,
+        32,
+        42
+      ],
+      "angle": "left",
+      "display_name": "Cycles",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "da397826ad3f8fd21cc5cb976a6561739455dc71b9263180a322b408f4b90af3"
+    },
+    {
+      "case_id": "cross-left-55",
+      "gates": [
+        55,
+        59,
+        9,
+        16
+      ],
+      "angle": "left",
+      "display_name": "Spirit",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "8c856f997c0a3d6277e8ad708ef9a4b426474d5a37e86575cbeef7a6b1ba88ad"
+    },
+    {
+      "case_id": "cross-left-56",
+      "gates": [
+        56,
+        60,
+        27,
+        28
+      ],
+      "angle": "left",
+      "display_name": "Distraction",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "52763779f3bee3e658d42b16d71e550c0207892275b2e82f5d87d518eac48d19"
+    },
+    {
+      "case_id": "cross-left-57",
+      "gates": [
+        57,
+        51,
+        62,
+        61
+      ],
+      "angle": "left",
+      "display_name": "The Clarion",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "57c454515d40b5d606cbbf10e3f2212c8b06b733fcc9efc88d001d0cec716062"
+    },
+    {
+      "case_id": "cross-left-58",
+      "gates": [
+        58,
+        52,
+        48,
+        21
+      ],
+      "angle": "left",
+      "display_name": "Demands",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "285d1539b564f1620f399cb84b71cad272bc923b28fcd21c58e503a109b8aec5"
+    },
+    {
+      "case_id": "cross-left-59",
+      "gates": [
+        59,
+        55,
+        16,
+        9
+      ],
+      "angle": "left",
+      "display_name": "Spirit",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "9bced881702bf332af13094ffd7f9c20f3e1d1eac36fbc212de402d019d7a8fa"
+    },
+    {
+      "case_id": "cross-left-60",
+      "gates": [
+        60,
+        56,
+        28,
+        27
+      ],
+      "angle": "left",
+      "display_name": "Distraction",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "16daaecb7e310e180b98ba5784a73b5376972a131e7611a72c1c46b05b0242bd"
+    },
+    {
+      "case_id": "cross-left-61",
+      "gates": [
+        61,
+        62,
+        50,
+        3
+      ],
+      "angle": "left",
+      "display_name": "Obscuration",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "fb722bca32fb9bd48a719dc3cb39f5ad5fd3876cee20b0a1098b332054325eb7"
+    },
+    {
+      "case_id": "cross-left-62",
+      "gates": [
+        62,
+        61,
+        3,
+        50
+      ],
+      "angle": "left",
+      "display_name": "Obscuration",
+      "profile": "5/1",
+      "definition": "Single",
+      "pdf_sha256": "4b3be41fe8300e5b2b38fc1966063ffde78f1f23593afbfa4cf22de8b7634870"
+    },
+    {
+      "case_id": "cross-left-63",
+      "gates": [
+        63,
+        64,
+        26,
+        45
+      ],
+      "angle": "left",
+      "display_name": "Dominion",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "51a656471bf7873fc5487a66b651439f52a2ad41c7076d75a047d30cf8067def"
+    },
+    {
+      "case_id": "cross-left-64",
+      "gates": [
+        64,
+        63,
+        45,
+        26
+      ],
+      "angle": "left",
+      "display_name": "Dominion",
+      "profile": "5/1",
+      "definition": "Split",
+      "pdf_sha256": "62ba3be34c900f71058c513fd3639ae2b5293e3e468a7bb065448a4897d1449f"
+    },
+    {
+      "case_id": "first-quadruple-1980-01-05",
+      "gates": [
+        38,
+        39,
+        57,
+        51
+      ],
+      "angle": "left",
+      "display_name": "Individualism",
+      "profile": "6/2",
+      "definition": "Quadruple Split",
+      "pdf_sha256": "b0db3f27e7170d6550ffe5a8bab9ea5b1b5639c8a918e394f7ab97d41ee94fb3"
+    }
+  ],
+  "course_list_disagreement": {
+    "source_url": "https://jovianarchive.com/products/intermediate-2-profiles-lines-and-incarnation-crosses",
+    "source_kind": "official_course_product_page_visible_list",
+    "captured_html_sha256": "a009dab6eb6ae13a7e6677712183310dad9f7c75e0d30d43a2dc6722bbb0e779",
+    "visible_list_entry": "Left Angle Cross of Identification (16/6 | 63/64)",
+    "visible_occurrences": 2,
+    "official_chart_case_id": "cross-left-16",
+    "official_chart_label": "Left Angle Cross of Identification (16/9 | 63/64)",
+    "printed_course_personality_pair": [
+      16,
+      6
+    ],
+    "official_chart_personality_pair": [
+      16,
+      9
+    ],
+    "publisher_erratum_obtained": false,
+    "resolved": false,
+    "scope": "Retain the course list separately from the frozen official chart. The course list conflicts with the actual Sun/Earth opposition; no publisher correction assumed and no natal gate is overwritten."
+  },
+  "course_disagreement_fixture_sha256": "c1ab42cc1f3db221211915be7f7d47e4b5f5f47b5a7c2e126eea1dbe71f6183b"
+}

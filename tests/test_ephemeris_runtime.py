@@ -1,5 +1,9 @@
 """Unit tests for the shared Swiss Ephemeris runtime helpers."""
 
+from concurrent.futures import ThreadPoolExecutor
+from threading import local
+from types import SimpleNamespace
+
 import pytest
 
 from fatebridge.core import ephemeris_runtime
@@ -16,6 +20,8 @@ def preserve_configured_path(monkeypatch):
     monkeypatch.setattr(
         ephemeris_runtime, "_configured_path", ephemeris_runtime._configured_path
     )
+    monkeypatch.delenv("SE_EPHE_PATH", raising=False)
+    monkeypatch.setattr(ephemeris_runtime, "verified_user_ephemeris_dir", lambda: None)
 
 
 def test_configure_ephemeris_path_uses_explicit_argument(monkeypatch):
@@ -45,7 +51,7 @@ def test_configure_ephemeris_path_reads_env(monkeypatch):
     assert captured["path"] == "/data/ephe"
 
 
-def test_configure_ephemeris_path_noop_without_path(monkeypatch):
+def test_configure_ephemeris_path_initialises_default_without_custom_path(monkeypatch):
     swe = pytest.importorskip("swisseph")
     calls = []
     monkeypatch.setattr(swe, "set_ephe_path", lambda path: calls.append(path))
@@ -53,7 +59,7 @@ def test_configure_ephemeris_path_noop_without_path(monkeypatch):
     monkeypatch.setattr(ephemeris_runtime, "default_ephe_dir", lambda: None)
 
     assert configure_ephemeris_path() is None
-    assert calls == []
+    assert calls == [""]
 
 
 def test_configure_ephemeris_path_falls_back_to_default_dir(monkeypatch):
@@ -69,7 +75,7 @@ def test_configure_ephemeris_path_falls_back_to_default_dir(monkeypatch):
     assert captured["path"] == "/proj/ephe"
 
 
-def test_configure_explicit_path_overrides_default_dir(monkeypatch):
+def test_nonempty_env_is_reported_as_the_library_override(monkeypatch):
     swe = pytest.importorskip("swisseph")
     captured = {}
     monkeypatch.setattr(
@@ -78,9 +84,10 @@ def test_configure_explicit_path_overrides_default_dir(monkeypatch):
     monkeypatch.setenv("SE_EPHE_PATH", "/env/ephe")
     monkeypatch.setattr(ephemeris_runtime, "default_ephe_dir", lambda: "/proj/ephe")
 
-    # An explicit argument wins over both the env var and the project directory.
-    assert configure_ephemeris_path("/explicit/ephe") == "/explicit/ephe"
-    assert captured["path"] == "/explicit/ephe"
+    # The real C library ignores the explicit argument when the env is nonempty.
+    # Report its actual selection rather than only what a mock setter received.
+    assert configure_ephemeris_path("/explicit/ephe") == "/env/ephe"
+    assert captured["path"] == "/env/ephe"
 
 
 def test_default_ephe_dir_detects_se1_files(tmp_path, monkeypatch):
@@ -125,3 +132,61 @@ def test_ephemeris_model_from_retflag_unavailable(monkeypatch):
 
     assert ephemeris_model_from_retflag(2) == "unavailable"
     assert configure_ephemeris_path("/whatever") is None
+
+
+def test_direct_calls_initialise_each_worker_and_changed_path_once(monkeypatch):
+    state = local()
+    applied = []
+
+    def set_path(path):
+        state.path = path
+        applied.append(path)
+
+    def delta_t(*args):
+        assert hasattr(
+            state, "path"
+        ), "worker called time conversion before initialisation"
+        return state.path
+
+    monkeypatch.setattr(
+        ephemeris_runtime,
+        "swe",
+        SimpleNamespace(set_ephe_path=set_path, deltat_ex=delta_t),
+    )
+    monkeypatch.setattr(ephemeris_runtime, "_configured_path", "/first")
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        for _ in range(3):
+            assert (
+                pool.submit(
+                    ephemeris_runtime.ephemeris_call, "deltat_ex", 2451545, 2
+                ).result()
+                == "/first"
+            )
+        assert applied == ["/first"]
+        monkeypatch.setattr(ephemeris_runtime, "_configured_path", "/second")
+        assert (
+            pool.submit(
+                ephemeris_runtime.ephemeris_call, "deltat_ex", 2451545, 2
+            ).result()
+            == "/second"
+        )
+        assert applied == ["/first", "/second"]
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        assert (
+            pool.submit(
+                ephemeris_runtime.ephemeris_call, "deltat_ex", 2451545, 2
+            ).result()
+            == "/second"
+        )
+    assert applied == ["/first", "/second", "/second"]
+
+
+def test_time_scale_conversion_succeeds_as_first_call_in_fresh_thread(monkeypatch):
+    swe = pytest.importorskip("swisseph")
+    monkeypatch.setattr(ephemeris_runtime, "_configured_path", None)
+    monkeypatch.delenv("SE_EPHE_PATH", raising=False)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        value = pool.submit(
+            ephemeris_runtime.ephemeris_call, "deltat_ex", 2451545.0, swe.FLG_SWIEPH
+        ).result()
+    assert 60 < value * 86400 < 70  # J2000 Delta-T, seconds, not a placeholder.

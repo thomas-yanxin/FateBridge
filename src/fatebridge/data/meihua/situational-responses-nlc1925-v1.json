@@ -1,0 +1,220 @@
+{
+  "id": "meihua_situational_responses_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局占卜十应诀所选四类已报现场条件",
+  "source_reading": {
+    "source_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "selected_edition": "NLC1925",
+    "original_indices": {
+      "directions": 21,
+      "intro": 128,
+      "direction_response": 129,
+      "weather_setting_human": 130
+    },
+    "paper_pages": {
+      "directions": "卷一一〇",
+      "intro": "卷三二七",
+      "direction_response": "卷三二八",
+      "weather_setting_human": "卷三二九"
+    },
+    "quotes": {
+      "intro_list": "正應互應變應方應日應刻應外應天時應地理應人事應",
+      "direction": "方應者以體爲主看來占之人在何方位上即看其所坐立之方卦宜生體卦又宜與體比和則吉如尅體卦則凶如體卦生之亦不吉矣",
+      "weather": "天時之應占卜之際晴明爲離雨雪爲坎風爲巽雷爲震如離爲體宜晴坎爲體宜雨巽爲體宜風震爲體宜雷體見雷爲比和參之生尅以定吉凶",
+      "setting": "地理之應凡占卜之時偶在竹林間爲震巽之地在江河溪澗池沼之上爲坎在五金之處爲乾兌之鄉在窰竈爐火之所爲離在土瓦之所爲坤艮並爲體卦論生尅比和之理以決之",
+      "human": "人事之應即三要中人事之尅應也蓋占卜之際偶遇人事之吉爲吉偶遇人事之凶爲凶如聞笑語主有吉慶之事遇哭泣主有悲愁之事又以人事之屬於卦者論之老人爲乾老婦爲坤少男爲艮少女爲兌並看此人事之卦與體卦生尅比和以決吉凶"
+    },
+    "comparison": {
+      "fixed_revision": 1441927,
+      "saved_text_sha256": "40dc414defbc2cf93f5a3c398e16a1cb3d0b62f7ad5db14603be7dba2e37e7f6",
+      "transcription_intro_omits": "方應",
+      "transcription_weather_sentence": "火見雷為比和",
+      "selected_weather_sentence": "體見雷爲比和",
+      "used_to_override_selected": false,
+      "selected_direction": "所坐立之方卦",
+      "transcription_direction": "所坐立之方位"
+    },
+    "decisions": [
+      "No uniquely specified year-qi or net year-month-day strength algorithm from examined spans; do not manufacture it",
+      "Querent reported occupied compass side is not travel heading, gaze, address or duanfa object direction; never inferred from another input",
+      "Map all named trigrams as candidates. Do not choose乾versus兌 or震versus巽 or坤versus艮 by invention",
+      "Same casting episode, caller reported actual conditions; weather condition is not a future weather forecast",
+      "天時preferred pair requires the exact original body trigram named in selected clause; generic relationships remain independent facts",
+      "Selected體見雷subject unresolved; no rule that fire and thunder are mathematically比和; transcription fire kept only as variant",
+      "Human laughter/weeping symbolic valence is not a trigram or observed future result; do not cancel generic relations or vote",
+      "No simultaneous or ordered omens synthesis, probability, real outcome, event date or retrospective study exclusions",
+      "雨雪爲坎 is a mapping for both, whereas坎爲體宜雨 explicitly names rain only. Separate known rain and snow; an undifferentiated rain-or-snow report leaves this weather predicate unknown. Do not infer snow unfavorable or a real outcome."
+    ],
+    "independent_human_review": false,
+    "new_real_observations": 0,
+    "source_character_reading": "Assistant visual selected-span reading; modern punctuation omitted; character/term normalization of trigram name巽does not override contextual variants. Not independent human expert review."
+  },
+  "source_heads": {
+    "querent_position": "方應",
+    "weather": "天時應",
+    "setting": "地理應",
+    "human": "人事應"
+  },
+  "tables": {
+    "querent_position": {
+      "north": [
+        "坎"
+      ],
+      "northeast": [
+        "艮"
+      ],
+      "east": [
+        "震"
+      ],
+      "southeast": [
+        "巽"
+      ],
+      "south": [
+        "离"
+      ],
+      "southwest": [
+        "坤"
+      ],
+      "west": [
+        "兑"
+      ],
+      "northwest": [
+        "乾"
+      ]
+    },
+    "weather": {
+      "clear": [
+        "离"
+      ],
+      "rain_or_snow": [
+        "坎"
+      ],
+      "wind": [
+        "巽"
+      ],
+      "thunder": [
+        "震"
+      ],
+      "rain": [
+        "坎"
+      ],
+      "snow": [
+        "坎"
+      ]
+    },
+    "setting": {
+      "bamboo_woodland": [
+        "震",
+        "巽"
+      ],
+      "rivers_streams_or_pools": [
+        "坎"
+      ],
+      "metal_place": [
+        "乾",
+        "兑"
+      ],
+      "kiln_stove_or_fire": [
+        "离"
+      ],
+      "earth_or_tiles": [
+        "坤",
+        "艮"
+      ]
+    },
+    "human": {
+      "elderly_man": [
+        "乾"
+      ],
+      "elderly_woman": [
+        "坤"
+      ],
+      "young_boy": [
+        "艮"
+      ],
+      "young_girl": [
+        "兑"
+      ],
+      "heard_laughter": [],
+      "weeping_encountered": []
+    }
+  },
+  "trigram_elements": {
+    "乾": "金",
+    "兑": "金",
+    "离": "火",
+    "震": "木",
+    "巽": "木",
+    "坎": "水",
+    "艮": "土",
+    "坤": "土"
+  },
+  "direction_preferences": {
+    "体用比和": "preferred",
+    "体生用": "not_preferred",
+    "体克用": null,
+    "用生体": "preferred",
+    "用克体": "not_preferred"
+  },
+  "weather_exact_preferred": {
+    "clear": "离",
+    "rain_or_snow": "坎",
+    "wind": "巽",
+    "thunder": "震",
+    "rain": "坎"
+  },
+  "weather_exact_quotes": {
+    "clear": "離爲體宜晴",
+    "rain_or_snow": "坎爲體宜雨",
+    "wind": "巽爲體宜風",
+    "thunder": "震爲體宜雷",
+    "rain": "坎爲體宜雨"
+  },
+  "human_symbolic_valence": {
+    "heard_laughter": "source_joy_symbol",
+    "weeping_encountered": "source_sorrow_symbol"
+  },
+  "thunder_relation_clause": {
+    "selected_quote": "體見雷爲比和",
+    "comparison_quote": "火見雷為比和",
+    "selected_subject": "unresolved",
+    "used_to_override_five_element_relation": false
+  },
+  "full_ten_response_synthesis": null,
+  "predictive_efficacy_established": false,
+  "category_labels": {
+    "north": "北侧",
+    "northeast": "东北侧",
+    "east": "东侧",
+    "southeast": "东南侧",
+    "south": "南侧",
+    "southwest": "西南侧",
+    "west": "西侧",
+    "northwest": "西北侧",
+    "clear": "晴明",
+    "rain_or_snow": "雨雪未分",
+    "wind": "风",
+    "thunder": "雷",
+    "bamboo_woodland": "竹林",
+    "rivers_streams_or_pools": "江河溪涧池沼",
+    "metal_place": "五金之处",
+    "kiln_stove_or_fire": "窑灶炉火之处",
+    "earth_or_tiles": "土瓦之处",
+    "elderly_man": "原文老人",
+    "elderly_woman": "原文老妇",
+    "young_boy": "原文少男",
+    "young_girl": "原文少女",
+    "heard_laughter": "已闻笑语",
+    "weeping_encountered": "所遇哭泣",
+    "rain": "雨",
+    "snow": "雪"
+  },
+  "precipitation_source_distinction": {
+    "supplement_scope": "after initial implementation, literal source distinction; original lookup retained",
+    "rain_and_snow_map_to": "坎",
+    "selected_exact_preference_condition": "rain",
+    "umbrella_condition": "pending",
+    "snow_exact_preference": "not_stated"
+  }
+}

@@ -1,7 +1,6 @@
 """紫微 / 太乙 在农历不可用时必须显式拒绝，而非静默按正月初一起盘。
 
-离线农历换算仅支持公历 1900-01-31 ~ 2100-02-08。落在该区间之外 (例如
-2100-02-09 之后，仍满足 PersonInfo 的 le=2100) 或缺少 lunardate 时，
+离线农历换算支持公历 1900-01-01 ~ 2100-12-31。落在该区间之外或缺少 lunardate 时，
 ``lunar_calendar`` 为空。旧实现 ``int(lunar.get("month") or 1)`` 会悄悄
 退化到正月初一，算出一张看似正常却整体错位的盘。现在应返回 400 校验错误。
 """
@@ -15,11 +14,13 @@ from fatebridge.services.metaphysics import (
 from fatebridge.utils.birth_input import create_person_info
 
 
-def test_ziwei_rejects_date_outside_lunar_range():
-    # 2100-06-01 仍通过 PersonInfo (le=2100)，但已超出农历支持上界 2100-02-08。
+def test_ziwei_rejects_missing_lunar_data_instead_of_defaulting(monkeypatch):
+    # The prefix is now supplied by PMO; missing data must still never turn
+    # into a fabricated first day of the first month.
+    monkeypatch.setattr("fatebridge.core.almanac.LunarDate", None)
     person = create_person_info(
-        birth_year=2100,
-        birth_month=6,
+        birth_year=1900,
+        birth_month=1,
         birth_day=1,
         birth_hour=14,
         name="超范围",

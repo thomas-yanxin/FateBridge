@@ -17,6 +17,7 @@ from ..utils.data import (
     TenGod,
     get_ten_god,
 )
+from .classical_candidate_selection import build_candidate_selection
 from .useful_elements import resolve_useful_elements
 
 
@@ -818,7 +819,7 @@ class BaZiRules:
                     "key": "yang_ren_jia_sha",
                     "label": "羊刃驾杀",
                     "priority": BaZiRules.STRUCTURE_PRIORITIES["yang_ren_jia_sha"],
-                    "reason": f"{day_stem}日主临羊刃{blade_branch}，命局同时见七杀，格局判断优先看驭杀之力。",
+                    "reason": f"四柱见{day_stem}的阳刃位{blade_branch}并见七杀；这是旧共现候选，不认证月刃格或制杀效力。",
                     "useful_elements": BaZiRules._ordered_unique(
                         [killer_element, seal_element]
                     ),
@@ -843,7 +844,7 @@ class BaZiRules:
                     "key": "sha_yin_xiang_sheng",
                     "label": "杀印相生",
                     "priority": BaZiRules.STRUCTURE_PRIORITIES["sha_yin_xiang_sheng"],
-                    "reason": "命局杀星与印星并见，格局更看杀印流通，而非单纯以官杀为压制。",
+                    "reason": "旧规则观察到杀星与印星并见；杀格用印、印格用杀及伤官用杀印另按月令和力量审查。",
                     "useful_elements": BaZiRules._ordered_unique(
                         [killer_element, seal_element]
                     ),
@@ -863,7 +864,7 @@ class BaZiRules:
                     "key": "shi_shen_zhi_sha",
                     "label": "食神制杀",
                     "priority": BaZiRules.STRUCTURE_PRIORITIES["shi_shen_zhi_sha"],
-                    "reason": "命局食神与七杀同见，取食神制杀之路，比单纯官杀压制更关键。",
+                    "reason": "旧规则观察到食神与七杀同见；食神格制杀与杀格用食分列，尚未裁定制杀适当。",
                     "useful_elements": BaZiRules._ordered_unique(
                         [food_element, killer_element]
                     ),
@@ -884,7 +885,7 @@ class BaZiRules:
                     "key": "shang_guan_pei_yin",
                     "label": "伤官配印",
                     "priority": BaZiRules.STRUCTURE_PRIORITIES["shang_guan_pei_yin"],
-                    "reason": "命局伤官配印，宜看印星承接才气，而不宜只把伤官视为纯负项。",
+                    "reason": "旧规则观察到伤官与印并见；伤官佩印与印格用食伤不能混为同一取用结论。",
                     "useful_elements": BaZiRules._ordered_unique(
                         [hurt_element, seal_element]
                     ),
@@ -906,7 +907,7 @@ class BaZiRules:
                     "key": "shang_guan_jian_guan",
                     "label": "伤官见官",
                     "priority": BaZiRules.STRUCTURE_PRIORITIES["shang_guan_jian_guan"],
-                    "reason": "命局伤官与正官并见，先看张力与化解条件，不能只做简单吉凶判定。",
+                    "reason": "旧规则观察到伤官与正官并见；官格遇伤与金水伤官用官的条件分别审查，不由共现认定破格。",
                     "useful_elements": BaZiRules._ordered_unique(
                         [seal_element] if seal_element else []
                     ),
@@ -992,17 +993,12 @@ class BaZiRules:
             day_stem, baseline_useful
         )
         recognized_structures = BaZiRules._build_structure_candidates(pillars, day_stem)
-
+        candidate_selection = build_candidate_selection(pillars)
+        selected_month = candidate_selection["selected_month"]
         if recognized_structures:
-            dominant_structure = recognized_structures[0]
-            secondary_structures = recognized_structures[1:]
-            decision_basis = [
-                f"识别到高影响格局：{dominant_structure['label']}。",
-                dominant_structure["reason"],
-                f"基础扶抑判断显示日主为{day_strength}，但本次以格局优先修正喜用。",
-            ]
+            legacy_dominant_structure = recognized_structures[0]
         else:
-            dominant_structure = {
+            legacy_dominant_structure = {
                 "key": "default_support",
                 "label": "扶抑参考",
                 "priority": BaZiRules.STRUCTURE_PRIORITIES["default_support"],
@@ -1011,26 +1007,48 @@ class BaZiRules:
                 "avoid_elements": [],
                 "useful_ten_gods": baseline_useful_ten_gods,
             }
-            secondary_structures = []
-            decision_basis = [
-                f"未识别高影响白名单格局，当前按日主{day_strength}做扶抑参考。",
-            ]
+        dominant_structure = {
+            "key": "selected_month_reference",
+            "label": selected_month["label"],
+            "formation_status": "not_adjudicated",
+            "reason": f"月令{selected_month['branch']}按同次{selected_month['selection_rule']}选{selected_month['ten_god']}；月令主类不等于完整成格或取用已定。",
+            "useful_elements": [],
+            "avoid_elements": [],
+            "useful_ten_gods": [],
+        }
+        secondary_structures = recognized_structures
+        decision_basis = [
+            dominant_structure["reason"],
+            f"工程扶抑模型判为{day_strength}；身、印及食财官杀的相对力量另列待判条件。",
+            "原典取用路径按月令分列，未由十神共现或固定优先级选定；旧优先候选仅供追溯。",
+        ]
+        if selected_month["basis_status"] == "original_and_selected_differ":
+            decision_basis.append(
+                f"月令本气为{selected_month['original_main_qi']['ten_god']}，当前有限规则所选为{selected_month['ten_god']}；是否变格、兼格仍待裁定，不以透干即抹去本气。"
+            )
 
         resolution = resolve_useful_elements(
             pillars, element_analysis, recognized_structures
         )
+        if resolution["from_child_reference"]["ordinary_fuyi_requires_review"]:
+            decision_basis.append(
+                "任注顺局从儿的月柱食伤、分布与财星前提已见；从儿不以身弱为必要条件。成气、藏印官杀及承接救应未判，普通扶抑喜忌列为条件参考。"
+            )
         useful_elements = resolution["useful_elements"]
         avoid_elements = resolution["avoid_elements"]
         useful_ten_gods = BaZiRules._derive_ten_gods_from_elements(
             day_stem, useful_elements
         )
         decision_basis.append(
-            "扶抑、格局候选与调候分层保留；冲突及仅旁证支持的五行列为条件项，未入喜不自动为忌。"
+            "扶抑、原典待判路径、旧共现候选与调候分层保留；未裁定的旧候选不单独授予全局喜忌，未入喜不自动为忌。"
         )
         structure_profile: Dict[str, Any] = {
             **resolution,
             "dominant_structure": dominant_structure,
+            "legacy_dominant_structure": legacy_dominant_structure,
+            "candidate_selection": candidate_selection,
             "secondary_structures": secondary_structures,
+            "secondary_structure_scope": "旧共现候选完整保留，不代表次格成立或已选定取用路径。",
             "recognized_structures": recognized_structures,
             "useful_elements": useful_elements,
             "avoid_elements": avoid_elements,

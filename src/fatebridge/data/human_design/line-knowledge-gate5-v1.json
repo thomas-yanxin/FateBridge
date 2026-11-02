@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "version": 6,
+  "catalogue_id": "human_design_gate5_editorial_v6",
+  "parent_version": 5,
+  "parent_catalogue_sha256": "2893e860a30de29b6b5438d8c60398424d916fb277e2aae8cd5be2f4b4f2b269",
+  "source_pdf_sha256": "e45ca38d7959efa2f69b512e0d6d97a59dfbc150519d4f54c08b76149e5bb495",
+  "curated_by": "FateBridge primary agent; bounded visual source reading, not independent review",
+  "required_line_count": 384,
+  "expected_local_paraphrase_count": 30,
+  "independently_accepted_line_count": 0,
+  "publisher_master_authenticated": false,
+  "complete384_line_meanings_accepted": false,
+  "source_conditions_exhaustively_reviewed": false,
+  "publisher_direct_body_corroboration_available": false,
+  "rows": [
+    {
+      "key": "5.1",
+      "source_pdf_page_one_based": 15,
+      "source_layout_block_sha256": "c31c162352c9c3a72772788c026a3a70646fa65df8a681864a9a1979bc51fb5d",
+      "source_line_heading": "Perseverance",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "节律坚持",
+        "exaltation": "困境中坚持节律。",
+        "detriment": "受挑战时急于放弃。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "职责困境的比喻。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：职责困境的比喻。",
+        "这里的等待不生成可预测的事件日期。",
+        "原比喻不作为现实危险行动指令。"
+      ],
+      "source_polarity_planets": {
+        "exaltation": [
+          "Mars"
+        ],
+        "detriment": [
+          "Earth"
+        ]
+      },
+      "source_polarity_text_note": null
+    },
+    {
+      "key": "5.2",
+      "source_pdf_page_one_based": 15,
+      "source_layout_block_sha256": "8e549b6218eb30778b6a821d2aa08bece344b83a63ef14bcb39742ad7b9dcaeb",
+      "source_line_heading": "Inner peace",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "平静与停滞感",
+        "exaltation": "安然处于自身节律。",
+        "detriment": "把平静体验为停滞。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "避免过早行动。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：避免过早行动。",
+        "这里的等待不生成可预测的事件日期。"
+      ],
+      "source_polarity_planets": {
+        "exaltation": [
+          "Venus"
+        ],
+        "detriment": [
+          "Pluto"
+        ]
+      },
+      "source_polarity_text_note": null
+    },
+    {
+      "key": "5.3",
+      "source_pdf_page_one_based": 15,
+      "source_layout_block_sha256": "be91b3423b4ee107813d63c9c17ab8dacf26bf10b2cecf5f3581754e8f15982a",
+      "source_line_heading": "Compulsiveness",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "急迫与想象",
+        "exaltation": "以想象限制急迫行动。",
+        "detriment": "难以接受自身节律。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "无助感带来急迫。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：无助感带来急迫。",
+        "这里的等待不生成可预测的事件日期。",
+        "线名不等于临床诊断。"
+      ],
+      "source_polarity_planets": {
+        "exaltation": [
+          "Neptune"
+        ],
+        "detriment": [
+          "Moon"
+        ]
+      },
+      "source_polarity_text_note": null
+    },
+    {
+      "key": "5.4",
+      "source_pdf_page_one_based": 15,
+      "source_layout_block_sha256": "2e37f96bc32051d1194fd0e25bc058eb2fe31a560483d92f2027734533ebbfb4",
+      "source_line_heading": "The hunter",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "等待中的行动",
+        "exaltation": "从被动中创造行动。",
+        "detriment": "因自负否定自身节律。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "等待的生存主题。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：等待的生存主题。",
+        "这里的等待不生成可预测的事件日期。",
+        "不据生存措辞推算生死、灾祸或实际安全。"
+      ],
+      "source_polarity_planets": {
+        "exaltation": [
+          "Uranus"
+        ],
+        "detriment": [
+          "Sun"
+        ]
+      },
+      "source_polarity_text_note": null
+    },
+    {
+      "key": "5.5",
+      "source_pdf_page_one_based": 15,
+      "source_layout_block_sha256": "13f54d6211cdd8873bed29d8850ae9decf820933a3faa2ef3f5cf6936705acc3",
+      "source_line_heading": "Joy",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "平静与失望",
+        "exaltation": "在节律中保持平静。",
+        "detriment": "把等待视为失败。"
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "等待与觉察。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：等待与觉察。",
+        "这里的等待不生成可预测的事件日期。"
+      ],
+      "source_polarity_planets": {
+        "exaltation": [
+          "Venus"
+        ],
+        "detriment": [
+          "Pluto"
+        ]
+      },
+      "source_polarity_text_note": null
+    },
+    {
+      "key": "5.6",
+      "source_pdf_page_one_based": 15,
+      "source_layout_block_sha256": "f75c20f2cb08d9e0cce0291c4d6cf829a4b41fe0c8e880507ee13b3c2a08f20a",
+      "source_line_heading": "Yielding",
+      "meaning_status": "local_editorial_paraphrase_pending_independent_review",
+      "editorial_paraphrase": {
+        "theme_zh": "顺应节律",
+        "exaltation": "压力与意外中顺应节律。",
+        "detriment": null
+      },
+      "independent_semantic_review_completed": false,
+      "complete_line_meaning_accepted": false,
+      "condition_review_status": "introductory_qualifier_locally_reviewed_not_exhaustive",
+      "source_conditions": null,
+      "source_qualifiers": [
+        {
+          "source_role": "introductory_qualifier",
+          "editorial_summary_zh": "等待仍含压力和意外。",
+          "mechanical_predicate": null,
+          "personal_condition_satisfied": null,
+          "automatic_application": false,
+          "evaluation_status": "not_automated_nonmechanical_source_qualifier"
+        }
+      ],
+      "source_reading_notes": [
+        "引导语局部转述：等待仍含压力和意外。",
+        "这里的等待不生成可预测的事件日期。",
+        "上升栏海王星图符与正文无极性、未列下降星体的表述同时保留；不据此改变原盘固定规则，图文约定未独立裁定。"
+      ],
+      "source_polarity_planets": {
+        "exaltation": [
+          "Neptune"
+        ],
+        "detriment": []
+      },
+      "source_polarity_text_note": {
+        "printed_no_polarity": true,
+        "printed_no_planet_in_detriment": true,
+        "glyph_text_convention_independently_resolved": false,
+        "mechanical_rule_changed": false
+      }
+    }
+  ]
+}

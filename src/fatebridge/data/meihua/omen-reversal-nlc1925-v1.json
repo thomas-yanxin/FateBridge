@@ -1,0 +1,69 @@
+{
+  "id": "meihua_omen_reversal_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局内外论金银兵刃的原体限定",
+  "source": {
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "source_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "original_pdf_index": 90,
+    "paper_page": "卷二三七",
+    "section": "內外論",
+    "gold_quote": "金銀爲世寶三要爲吉者若震巽爲體則金尅木反爲不吉",
+    "weapon_quote": "兵刃爲世凶三要爲凶者若坎爲體則金生水反爲不凶",
+    "material_source_indices": [
+      108,
+      109
+    ],
+    "decisions": [
+      "金銀世寶 and兵刃 are explicit caller classifications, never inferred from generic metal, sharp tools, free text, settings or desired valence",
+      "Both are symbolic金without a unique乾/兌trigram",
+      "Only震/巽body for gold/silver and坎body for weapons have the selected explicit qualified conclusion",
+      "反爲不凶 is not upgraded to吉or safety;反爲不吉 is not a verified harmful event",
+      "Retain all old material qualifications and raw relationships; new symbolic cases do not imply substantive control/generation or priority between chapters",
+      "No clinical, childbirth, mortality or hazard conclusions from the other examples",
+      "No vote, probability, net verdict, event time, retrospective exclusion or new observation"
+    ],
+    "independent_human_review": false
+  },
+  "manifestations": {
+    "gold_silver_treasure": {
+      "element": "金",
+      "description": "调用方明确已报的原文金银世宝类别，不是所有金属饰物或吉利愿望"
+    },
+    "weapon": {
+      "element": "金",
+      "description": "调用方明确已报的原文兵刃类别，不从所有锐器、刀锯或凶吉愿望推断"
+    }
+  },
+  "cases": {
+    "gold_silver_treasure": {
+      "common_symbol": "auspicious_symbol",
+      "qualified_bodies": [
+        "震",
+        "巽"
+      ],
+      "qualified_symbol": "not_auspicious_symbol",
+      "quote": "金銀爲世寶三要爲吉者若震巽爲體則金尅木反爲不吉"
+    },
+    "weapon": {
+      "common_symbol": "inauspicious_symbol",
+      "qualified_bodies": [
+        "坎"
+      ],
+      "qualified_symbol": "not_inauspicious_symbol",
+      "quote": "兵刃爲世凶三要爲凶者若坎爲體則金生水反爲不凶"
+    }
+  },
+  "independent_human_expert_review": false,
+  "predictive_efficacy_established": false,
+  "body_elements": {
+    "乾": "金",
+    "兑": "金",
+    "离": "火",
+    "震": "木",
+    "巽": "木",
+    "坎": "水",
+    "艮": "土",
+    "坤": "土"
+  }
+}

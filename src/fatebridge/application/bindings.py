@@ -2,7 +2,7 @@
 
 import importlib
 import inspect
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 from pydantic import BaseModel
 
@@ -71,14 +71,20 @@ _PERSON_POSITIONAL = (
 )
 _PERSON_KEYWORD = (
     "birth_minute",
+    "birth_second",
     "birth_timezone",
+    "birth_utc_offset",
     "birth_longitude",
     "use_true_solar_time",
 )
 
 
 def _build_person(
-    data: Dict[str, Any], prefix: str = "", *, true_solar_explicit: bool = True
+    data: Dict[str, Any],
+    prefix: str = "",
+    *,
+    true_solar_explicit: bool = True,
+    supplied_fields: Optional[Set[str]] = None,
 ) -> PersonInfo:
     def g(field: str, default: Any = None) -> Any:
         return data.get(f"{prefix}{field}", default)
@@ -91,8 +97,14 @@ def _build_person(
         g("name", "未提供"),
         g("gender", "未知"),
         g("birth_place", "未提供"),
-        birth_minute=g("birth_minute", 0),
+        birth_minute=(
+            g("birth_minute")
+            if supplied_fields is None or f"{prefix}birth_minute" in supplied_fields
+            else None
+        ),
+        birth_second=g("birth_second"),
         birth_timezone=g("birth_timezone"),
+        birth_utc_offset=g("birth_utc_offset"),
         birth_longitude=g("birth_longitude"),
         use_true_solar_time=g("use_true_solar_time", False),
         true_solar_explicit=true_solar_explicit,
@@ -119,7 +131,9 @@ def person_invoke(
         # 区分「用户显式要求真太阳时」与「吃了模型默认」：缺经度时前者 fail-loud、
         # 后者降级为钟表时间并附 advisory（见 normalize_birth_time）。
         explicit = "use_true_solar_time" in req.model_fields_set
-        person = _build_person(data, true_solar_explicit=explicit)
+        person = _build_person(
+            data, true_solar_explicit=explicit, supplied_fields=req.model_fields_set
+        )
         extras = {k: v for k, v in data.items() if k not in person_fields}
         for field in also_pass:
             if field in data:
@@ -146,11 +160,13 @@ def pair_invoke(
             data,
             prefix="person1_",
             true_solar_explicit="person1_use_true_solar_time" in fields_set,
+            supplied_fields=fields_set,
         )
         p2 = _build_person(
             data,
             prefix="person2_",
             true_solar_explicit="person2_use_true_solar_time" in fields_set,
+            supplied_fields=fields_set,
         )
         rel = data.get(relationship_field, "general")
         return get_service(), (p1, p2, rel), {}
@@ -175,7 +191,9 @@ def raw_invoke(
             explicit_solar_cache.append(
                 "true_solar_explicit" in inspect.signature(resolved).parameters
             )
-        data = req.model_dump()
+        from fatebridge.core.requests.western_policy import service_inputs
+
+        data = service_inputs(req)
         # Thread whether the user explicitly asked for true solar time so the
         # service can fail-loud on an explicit request that lacks a longitude,
         # yet gracefully fall back to civil time when the flag merely defaulted

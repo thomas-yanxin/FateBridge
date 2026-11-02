@@ -1,0 +1,3150 @@
+{
+  "schema_version": 1,
+  "id": "fatebridge_bazi_source_contrasts_v1",
+  "version": 1,
+  "domain": "bazi",
+  "description": "独立新增的原典比较与配干联动知识；原85条八字及3条基础概念保持原值。",
+  "categories": {
+    "source_contrasts": {
+      "只换一字与干支联动": {
+        "title": "只换一字与干支联动",
+        "tips": [
+          "原典中的“只换一字”要连同原图、干支位置与上下文读取。逐字差异、配干规则中的联动和现实因果证据须分别核对，不能只凭一句比较语就认定单一因素造成不同命运。",
+          "比较四柱先逐位列出实际变化；同一组字形出现在不同年、月、日、时位置，不能当成同一结构。只数五行或把八字当作无序字袋，会漏掉位置变化。",
+          "配月表中月干随年干与月支确定，配时表中时干随日干、时支及明确的换日候选规则确定。非派生符号字段不等于可以随意独立改变的真实出生参数；子时钟点未知时保留普通配时和原书夜子候选，不挑选有利候选减少差异。",
+          "任氏两例己卯、丁卯、壬午、甲辰与己卯、丁卯、壬午、癸卯，原文说只换一卯字。原图实际有时干和时支两字变化；壬日辰时配甲、卯时配癸可说明时干联动，仍须保留两字差异，不能据此认证现实因果。",
+          "乙酉、辛巳、戊午、丙辰与丁酉、乙巳、戊午、丙辰例，原文着眼辛字，而年干乙变丁、巳月配干辛变乙两处并存。配月联动可说明形式关系，不能把这个比较说成只单独改变辛金。",
+          "戊戌、丙辰、辛丑、戊戌与丙戌、戊戌、辛丑、戊戌例有年干、月干、月支三字变化；即使列出月干联动，年干和月支仍都改变，不能把所有差异消去后称为只改一个位置。",
+          "未另印完整四柱的反事实语句保持关系记录，不从模板补造新的出生盘。配干符合表格、干支属于六十甲子和真实公历出生时刻成立是不同检查，前两项不能代替后一项。",
+          "这些来源比较和符号核查不认证强弱分类器、人物经历、因果效果或预测成功率。它们是有出处的限域编释，原典疑问、缺项和未完成的独立复核仍需保留。"
+        ],
+        "curation": {
+          "method_id": "dtcw1947_source_contrast_dependencies_v1",
+          "entry_revision": 1,
+          "classification": "source_literals_plus_explicit_symbolic_dependencies_not_causal_evidence",
+          "source_tip_indices": [
+            3,
+            4,
+            5
+          ],
+          "implementation_tip_indices": [
+            1,
+            2,
+            6
+          ],
+          "editorial_tip_indices": [
+            0,
+            7
+          ],
+          "source_refs": [
+            {
+              "author": "任鐵樵增注（任氏曰）",
+              "title": "任注滴天髓闡微·命例比较",
+              "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "source_pdf_pages": [
+                100,
+                106,
+                107,
+                113,
+                114,
+                148,
+                149,
+                154,
+                155,
+                203,
+                204,
+                209,
+                210,
+                211,
+                234,
+                235,
+                262,
+                263,
+                331,
+                339,
+                340,
+                378,
+                379,
+                402,
+                403,
+                415,
+                416,
+                447
+              ],
+              "support_scope": "只支持这些原图四柱、比较语和位置；配干联动为独立列明的符号分析，不认证作者意图、人物事迹或因果效果。"
+            },
+            {
+              "author": "李雨田增補",
+              "title": "初學捷徑·遁月遁時（收入任注滴天髓闡微）",
+              "edition": "李雨田校訂，上海大東書局，1947年4月初版",
+              "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+              "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+              "source_pdf_pages": [
+                32,
+                34,
+                35,
+                36
+              ],
+              "support_scope": "只支持年干配月、日干配时及本书夜子候选，不能据干支反推出唯一现代出生日期或钟点。"
+            }
+          ],
+          "implementation_refs": [
+            {
+              "source_path": "scripts/audit_bazi_source_contrast_dependencies.py",
+              "source_sha256": "02c4544a0c579eb7609cb5f1279c4319c1ce02fd4f594885b30d3051a43a0708",
+              "support_scope": "只支持逐位差异、配月配时表联动、六十甲子和缺项候选的符号核查；没有新增强弱计算或现实预测验收。"
+            }
+          ],
+          "source_contrast_binding": {
+            "source_analysis_sha256": "5ddf81f171ea071be15ca21c394e7d61c8698039d72dd03c3aeeafbc95266a94",
+            "source_bindings_sha256": "5f695cc03340c70a7f1c4d40240bb6fe446fd73a4f54a7bad281cd75ea8dc8ce",
+            "all15_printed_pairs": [
+              {
+                "before_case_id": "MAIN-C039",
+                "after_case_id": "MAIN-C040",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R323"
+                ],
+                "source_pages": [
+                  100
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C039",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "戊子戊午戊戌戊午",
+                  "literal_pillars": {
+                    "year": "戊子",
+                    "month": "戊午",
+                    "day": "戊戌",
+                    "hour": "戊午"
+                  },
+                  "source_metadata": {},
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R322"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C040",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "戊申戊午戊子戊午",
+                  "literal_pillars": {
+                    "year": "戊申",
+                    "month": "戊午",
+                    "day": "戊子",
+                    "hour": "戊午"
+                  },
+                  "source_metadata": {
+                    "source_comparison_statement": "祇換一申字",
+                    "comparison_not_certified_as_single_position_ablation": true
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R323"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "子",
+                      "after": "申"
+                    },
+                    {
+                      "field": "day.branch",
+                      "before": "戌",
+                      "after": "子"
+                    }
+                  ],
+                  "literal_glyph_change_count": 2,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "子",
+                      "after": "申"
+                    },
+                    {
+                      "field": "day.branch",
+                      "before": "戌",
+                      "after": "子"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 2,
+                  "changed_derived_fields": [],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "戊",
+                          "observed": "戊",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "戊",
+                          "observed": "戊",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "戊",
+                          "observed": "戊",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "戊",
+                          "observed": "戊",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": []
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": false,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              },
+              {
+                "before_case_id": "MAIN-C046",
+                "after_case_id": "MAIN-C047",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R342"
+                ],
+                "source_pages": [
+                  106,
+                  107
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C046",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "丙子己亥乙酉壬午",
+                  "literal_pillars": {
+                    "year": "丙子",
+                    "month": "己亥",
+                    "day": "乙酉",
+                    "hour": "壬午"
+                  },
+                  "source_metadata": {
+                    "literal_body_vocabulary": [
+                      {
+                        "quote": "日主本衰",
+                        "subject": "daymaster",
+                        "status": "explicit_source_term_before_appraisal_of_generation"
+                      }
+                    ],
+                    "engineering_three_grade_mapping": "pending_full_book_voice_specific_mapping",
+                    "source_pages": [
+                      106,
+                      107
+                    ],
+                    "comparison_case_next_page": "MAIN-C047"
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R340"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C047",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "己亥丙子乙丑壬午",
+                  "literal_pillars": {
+                    "year": "己亥",
+                    "month": "丙子",
+                    "day": "乙丑",
+                    "hour": "壬午"
+                  },
+                  "source_metadata": {
+                    "source_pages": [
+                      106,
+                      107
+                    ],
+                    "author_comparison_phrase": "只換一酉字",
+                    "reader_layout_observation": "Compared to MAIN-C046, the literal year and month positions also exchange; author commentary itself says 前丙在年 and 此丙在月.",
+                    "not_a_single_position_ablation": true
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R342"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "year.stem",
+                      "before": "丙",
+                      "after": "己"
+                    },
+                    {
+                      "field": "year.branch",
+                      "before": "子",
+                      "after": "亥"
+                    },
+                    {
+                      "field": "month.stem",
+                      "before": "己",
+                      "after": "丙"
+                    },
+                    {
+                      "field": "month.branch",
+                      "before": "亥",
+                      "after": "子"
+                    },
+                    {
+                      "field": "day.branch",
+                      "before": "酉",
+                      "after": "丑"
+                    }
+                  ],
+                  "literal_glyph_change_count": 5,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "year.stem",
+                      "before": "丙",
+                      "after": "己"
+                    },
+                    {
+                      "field": "year.branch",
+                      "before": "子",
+                      "after": "亥"
+                    },
+                    {
+                      "field": "month.branch",
+                      "before": "亥",
+                      "after": "子"
+                    },
+                    {
+                      "field": "day.branch",
+                      "before": "酉",
+                      "after": "丑"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 4,
+                  "changed_derived_fields": [
+                    {
+                      "field": "month.stem",
+                      "before": "己",
+                      "after": "丙"
+                    }
+                  ],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "己",
+                          "observed": "己",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "壬",
+                          "observed": "壬",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "丙",
+                          "observed": "丙",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "壬",
+                          "observed": "壬",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": [
+                        {
+                          "field": "month.stem",
+                          "before": "己",
+                          "after": "丙",
+                          "before_matches": true,
+                          "after_matches": true
+                        }
+                      ]
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": false,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              },
+              {
+                "before_case_id": "MAIN-C052",
+                "after_case_id": "MAIN-C053",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R361"
+                ],
+                "source_pages": [
+                  113,
+                  114
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C052",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "壬午己酉甲申甲子",
+                  "literal_pillars": {
+                    "year": "壬午",
+                    "month": "己酉",
+                    "day": "甲申",
+                    "hour": "甲子"
+                  },
+                  "source_metadata": {},
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R359"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C053",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "壬辰己酉甲申甲子",
+                  "literal_pillars": {
+                    "year": "壬辰",
+                    "month": "己酉",
+                    "day": "甲申",
+                    "hour": "甲子"
+                  },
+                  "source_metadata": {
+                    "author_comparison_phrase": "只換一辰字",
+                    "compared_case": "MAIN-C052"
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R361"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "午",
+                      "after": "辰"
+                    }
+                  ],
+                  "literal_glyph_change_count": 1,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "午",
+                      "after": "辰"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 1,
+                  "changed_derived_fields": [],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "己",
+                          "observed": "己",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "甲",
+                          "observed": "甲",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "己",
+                          "observed": "己",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "甲",
+                          "observed": "甲",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": []
+                    },
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "li1947_late_zi",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "己",
+                          "observed": "己",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "甲",
+                          "observed": "甲",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "己",
+                          "observed": "己",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "丙",
+                          "observed": "甲",
+                          "matches": false
+                        }
+                      },
+                      "all_observed_stems_match_tables": false,
+                      "changed_derived_field_checks": []
+                    },
+                    {
+                      "before_profile": "li1947_late_zi",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "己",
+                          "observed": "己",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "丙",
+                          "observed": "甲",
+                          "matches": false
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "己",
+                          "observed": "己",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "甲",
+                          "observed": "甲",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": false,
+                      "changed_derived_field_checks": []
+                    },
+                    {
+                      "before_profile": "li1947_late_zi",
+                      "after_profile": "li1947_late_zi",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "己",
+                          "observed": "己",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "丙",
+                          "observed": "甲",
+                          "matches": false
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "己",
+                          "observed": "己",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "丙",
+                          "observed": "甲",
+                          "matches": false
+                        }
+                      },
+                      "all_observed_stems_match_tables": false,
+                      "changed_derived_field_checks": []
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": false,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              },
+              {
+                "before_case_id": "MAIN-C096",
+                "after_case_id": "MAIN-C097",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R469"
+                ],
+                "source_pages": [
+                  148,
+                  149
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C096",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "辛未辛卯乙未／丁亥跨頁",
+                  "literal_pillars": {
+                    "year": "辛未",
+                    "month": "辛卯",
+                    "day": "乙未",
+                    "hour": "丁亥"
+                  },
+                  "source_metadata": {
+                    "source_pages": [
+                      148,
+                      149
+                    ],
+                    "natal_hour_page149": "丁亥",
+                    "luck_row_separately_contains": "丁亥"
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R464"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C097",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "辛未辛卯乙未戊寅",
+                  "literal_pillars": {
+                    "year": "辛未",
+                    "month": "辛卯",
+                    "day": "乙未",
+                    "hour": "戊寅"
+                  },
+                  "source_metadata": {
+                    "comparison_with_MAIN_C096": "时柱全体不同，保留原图，不当作只换一字的受控实验"
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R469"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "hour.stem",
+                      "before": "丁",
+                      "after": "戊"
+                    },
+                    {
+                      "field": "hour.branch",
+                      "before": "亥",
+                      "after": "寅"
+                    }
+                  ],
+                  "literal_glyph_change_count": 2,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "hour.branch",
+                      "before": "亥",
+                      "after": "寅"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 1,
+                  "changed_derived_fields": [
+                    {
+                      "field": "hour.stem",
+                      "before": "丁",
+                      "after": "戊"
+                    }
+                  ],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "辛",
+                          "observed": "辛",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "丁",
+                          "observed": "丁",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "辛",
+                          "observed": "辛",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "戊",
+                          "observed": "戊",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": [
+                        {
+                          "field": "hour.stem",
+                          "before": "丁",
+                          "after": "戊",
+                          "before_matches": true,
+                          "after_matches": true
+                        }
+                      ]
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": false,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              },
+              {
+                "before_case_id": "MAIN-C102",
+                "after_case_id": "MAIN-C103",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R482"
+                ],
+                "source_pages": [
+                  154,
+                  155
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C102",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "辛卯丙申癸卯壬戌",
+                  "literal_pillars": {
+                    "year": "辛卯",
+                    "month": "丙申",
+                    "day": "癸卯",
+                    "hour": "壬戌"
+                  },
+                  "source_metadata": {},
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R481"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C103",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "辛卯丙申癸卯／甲寅跨頁",
+                  "literal_pillars": {
+                    "year": "辛卯",
+                    "month": "丙申",
+                    "day": "癸卯",
+                    "hour": "甲寅"
+                  },
+                  "source_metadata": {
+                    "source_pages": [
+                      154,
+                      155
+                    ],
+                    "natal_hour_page155": "甲寅",
+                    "source_claim_only_one_character_changed_retained": "只換一寅字",
+                    "literal_hour_pair": [
+                      "壬戌",
+                      "甲寅"
+                    ],
+                    "not_a_one_character_controlled_experiment": true
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R482"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "hour.stem",
+                      "before": "壬",
+                      "after": "甲"
+                    },
+                    {
+                      "field": "hour.branch",
+                      "before": "戌",
+                      "after": "寅"
+                    }
+                  ],
+                  "literal_glyph_change_count": 2,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "hour.branch",
+                      "before": "戌",
+                      "after": "寅"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 1,
+                  "changed_derived_fields": [
+                    {
+                      "field": "hour.stem",
+                      "before": "壬",
+                      "after": "甲"
+                    }
+                  ],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "丙",
+                          "observed": "丙",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "壬",
+                          "observed": "壬",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "丙",
+                          "observed": "丙",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "甲",
+                          "observed": "甲",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": [
+                        {
+                          "field": "hour.stem",
+                          "before": "壬",
+                          "after": "甲",
+                          "before_matches": true,
+                          "after_matches": true
+                        }
+                      ]
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": false,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              },
+              {
+                "before_case_id": "MAIN-C147",
+                "after_case_id": "MAIN-C148",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R601"
+                ],
+                "source_pages": [
+                  203,
+                  204
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C147",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "己酉丙寅庚申庚辰",
+                  "literal_pillars": {
+                    "year": "己酉",
+                    "month": "丙寅",
+                    "day": "庚申",
+                    "hour": "庚辰"
+                  },
+                  "source_metadata": {
+                    "source_pages": [
+                      203,
+                      204
+                    ],
+                    "six_class_reference_unit": 1,
+                    "literal_body_vocabulary": [
+                      {
+                        "quote": "身弱中變旺",
+                        "status": "final_旺_mapping_pending_not_initial_弱_grade"
+                      }
+                    ]
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R599"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C148",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "丙申庚寅庚申辛巳",
+                  "literal_pillars": {
+                    "year": "丙申",
+                    "month": "庚寅",
+                    "day": "庚申",
+                    "hour": "辛巳"
+                  },
+                  "source_metadata": {
+                    "six_class_reference_unit": 1,
+                    "literal_luck_comparison_with": "MAIN-C147",
+                    "better_luck_not_better_natal_grade": true
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R601"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "year.stem",
+                      "before": "己",
+                      "after": "丙"
+                    },
+                    {
+                      "field": "year.branch",
+                      "before": "酉",
+                      "after": "申"
+                    },
+                    {
+                      "field": "month.stem",
+                      "before": "丙",
+                      "after": "庚"
+                    },
+                    {
+                      "field": "hour.stem",
+                      "before": "庚",
+                      "after": "辛"
+                    },
+                    {
+                      "field": "hour.branch",
+                      "before": "辰",
+                      "after": "巳"
+                    }
+                  ],
+                  "literal_glyph_change_count": 5,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "year.stem",
+                      "before": "己",
+                      "after": "丙"
+                    },
+                    {
+                      "field": "year.branch",
+                      "before": "酉",
+                      "after": "申"
+                    },
+                    {
+                      "field": "hour.branch",
+                      "before": "辰",
+                      "after": "巳"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 3,
+                  "changed_derived_fields": [
+                    {
+                      "field": "month.stem",
+                      "before": "丙",
+                      "after": "庚"
+                    },
+                    {
+                      "field": "hour.stem",
+                      "before": "庚",
+                      "after": "辛"
+                    }
+                  ],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "丙",
+                          "observed": "丙",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "庚",
+                          "observed": "庚",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "庚",
+                          "observed": "庚",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "辛",
+                          "observed": "辛",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": [
+                        {
+                          "field": "month.stem",
+                          "before": "丙",
+                          "after": "庚",
+                          "before_matches": true,
+                          "after_matches": true
+                        },
+                        {
+                          "field": "hour.stem",
+                          "before": "庚",
+                          "after": "辛",
+                          "before_matches": true,
+                          "after_matches": true
+                        }
+                      ]
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": false,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              },
+              {
+                "before_case_id": "MAIN-C158",
+                "after_case_id": "MAIN-C159",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R614"
+                ],
+                "source_pages": [
+                  209,
+                  210,
+                  211
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C158",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "癸丑戊午丙午壬辰",
+                  "literal_pillars": {
+                    "year": "癸丑",
+                    "month": "戊午",
+                    "day": "丙午",
+                    "hour": "壬辰"
+                  },
+                  "source_metadata": {
+                    "six_class_reference_unit": 4,
+                    "source_heading": "四曰合官留殺格"
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R613"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C159",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "癸巳戊午丙午壬辰",
+                  "literal_pillars": {
+                    "year": "癸巳",
+                    "month": "戊午",
+                    "day": "丙午",
+                    "hour": "壬辰"
+                  },
+                  "source_metadata": {
+                    "source_pages": [
+                      210,
+                      211
+                    ],
+                    "six_class_reference_unit": 4,
+                    "source_person_name": "任鐵樵自造",
+                    "duplicate_literal_input_of": "PREF-C001",
+                    "source_caption_as_printed": "乾隆二十八年四月十八日辰時",
+                    "source_calendar_identity_not_resolved": true,
+                    "no_calendar_formula_used_to_repair_source_year": true
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R614"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "丑",
+                      "after": "巳"
+                    }
+                  ],
+                  "literal_glyph_change_count": 1,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "丑",
+                      "after": "巳"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 1,
+                  "changed_derived_fields": [],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "戊",
+                          "observed": "戊",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "壬",
+                          "observed": "壬",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "戊",
+                          "observed": "戊",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "壬",
+                          "observed": "壬",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": []
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": false,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              },
+              {
+                "before_case_id": "MAIN-C201",
+                "after_case_id": "MAIN-C202",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R667"
+                ],
+                "source_pages": [
+                  234,
+                  235
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C201",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "乙酉辛巳戊午丙辰",
+                  "literal_pillars": {
+                    "year": "乙酉",
+                    "month": "辛巳",
+                    "day": "戊午",
+                    "hour": "丙辰"
+                  },
+                  "source_metadata": {
+                    "injuring_officer_reference_unit": 6
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R666"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C202",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "丁酉乙巳戊午丙辰",
+                  "literal_pillars": {
+                    "year": "丁酉",
+                    "month": "乙巳",
+                    "day": "戊午",
+                    "hour": "丙辰"
+                  },
+                  "source_metadata": {
+                    "injuring_officer_reference_unit": 6,
+                    "source_pages": [
+                      234,
+                      235
+                    ],
+                    "natal_columns_on_page234": [
+                      "year"
+                    ],
+                    "remaining_natal_columns_page235": [
+                      "month",
+                      "day",
+                      "hour"
+                    ],
+                    "source_claim_only_one_character_changed_retained": "只換一辛字",
+                    "literal_pair_with_MAIN_C201": [
+                      "乙酉辛巳戊午丙辰",
+                      "丁酉乙巳戊午丙辰"
+                    ],
+                    "not_a_one_character_controlled_experiment": true
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R667"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "year.stem",
+                      "before": "乙",
+                      "after": "丁"
+                    },
+                    {
+                      "field": "month.stem",
+                      "before": "辛",
+                      "after": "乙"
+                    }
+                  ],
+                  "literal_glyph_change_count": 2,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "year.stem",
+                      "before": "乙",
+                      "after": "丁"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 1,
+                  "changed_derived_fields": [
+                    {
+                      "field": "month.stem",
+                      "before": "辛",
+                      "after": "乙"
+                    }
+                  ],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "辛",
+                          "observed": "辛",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "丙",
+                          "observed": "丙",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "乙",
+                          "observed": "乙",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "丙",
+                          "observed": "丙",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": [
+                        {
+                          "field": "month.stem",
+                          "before": "辛",
+                          "after": "乙",
+                          "before_matches": true,
+                          "after_matches": true
+                        }
+                      ]
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": false,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              },
+              {
+                "before_case_id": "MAIN-C229",
+                "after_case_id": "MAIN-C230",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R740"
+                ],
+                "source_pages": [
+                  262,
+                  263
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C229",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "癸未丁巳甲午庚午",
+                  "literal_pillars": {
+                    "year": "癸未",
+                    "month": "丁巳",
+                    "day": "甲午",
+                    "hour": "庚午"
+                  },
+                  "source_metadata": {},
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R739"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C230",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "癸丑丁巳甲辰庚午",
+                  "literal_pillars": {
+                    "year": "癸丑",
+                    "month": "丁巳",
+                    "day": "甲辰",
+                    "hour": "庚午"
+                  },
+                  "source_metadata": {
+                    "comparison_with_MAIN_C229_changed_literal_locations": [
+                      "year.branch",
+                      "day.branch"
+                    ]
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R740"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "未",
+                      "after": "丑"
+                    },
+                    {
+                      "field": "day.branch",
+                      "before": "午",
+                      "after": "辰"
+                    }
+                  ],
+                  "literal_glyph_change_count": 2,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "未",
+                      "after": "丑"
+                    },
+                    {
+                      "field": "day.branch",
+                      "before": "午",
+                      "after": "辰"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 2,
+                  "changed_derived_fields": [],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "丁",
+                          "observed": "丁",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "庚",
+                          "observed": "庚",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "丁",
+                          "observed": "丁",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "庚",
+                          "observed": "庚",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": []
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": false,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              },
+              {
+                "before_case_id": "MAIN-C301",
+                "after_case_id": "MAIN-C300",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R905"
+                ],
+                "source_pages": [
+                  331
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C301",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "丁丑癸丑庚子乙酉",
+                  "literal_pillars": {
+                    "year": "丁丑",
+                    "month": "癸丑",
+                    "day": "庚子",
+                    "hour": "乙酉"
+                  },
+                  "source_metadata": {},
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R906"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C300",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "丁未癸丑庚子丁亥",
+                  "literal_pillars": {
+                    "year": "丁未",
+                    "month": "癸丑",
+                    "day": "庚子",
+                    "hour": "丁亥"
+                  },
+                  "source_metadata": {
+                    "comparison_with_MAIN_C301": "两例图版年支未与丑、时柱丁亥与乙酉均不同，不能当只换一字的受控实验。"
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R905"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "丑",
+                      "after": "未"
+                    },
+                    {
+                      "field": "hour.stem",
+                      "before": "乙",
+                      "after": "丁"
+                    },
+                    {
+                      "field": "hour.branch",
+                      "before": "酉",
+                      "after": "亥"
+                    }
+                  ],
+                  "literal_glyph_change_count": 3,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "丑",
+                      "after": "未"
+                    },
+                    {
+                      "field": "hour.branch",
+                      "before": "酉",
+                      "after": "亥"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 2,
+                  "changed_derived_fields": [
+                    {
+                      "field": "hour.stem",
+                      "before": "乙",
+                      "after": "丁"
+                    }
+                  ],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "癸",
+                          "observed": "癸",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "乙",
+                          "observed": "乙",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "癸",
+                          "observed": "癸",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "丁",
+                          "observed": "丁",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": [
+                        {
+                          "field": "hour.stem",
+                          "before": "乙",
+                          "after": "丁",
+                          "before_matches": true,
+                          "after_matches": true
+                        }
+                      ]
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": false,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              },
+              {
+                "before_case_id": "MAIN-C315",
+                "after_case_id": "MAIN-C316",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R921"
+                ],
+                "source_pages": [
+                  339,
+                  340
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C315",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "癸丑庚申戊午己未",
+                  "literal_pillars": {
+                    "year": "癸丑",
+                    "month": "庚申",
+                    "day": "戊午",
+                    "hour": "己未"
+                  },
+                  "source_metadata": {},
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R920"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C316",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "癸未庚申戊戌己未",
+                  "literal_pillars": {
+                    "year": "癸未",
+                    "month": "庚申",
+                    "day": "戊戌",
+                    "hour": "己未"
+                  },
+                  "source_metadata": {
+                    "comparison_case": "MAIN-C315",
+                    "literal_differences": [
+                      "year_branch_丑_to_未",
+                      "day_branch_午_to_戌"
+                    ]
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R921"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "丑",
+                      "after": "未"
+                    },
+                    {
+                      "field": "day.branch",
+                      "before": "午",
+                      "after": "戌"
+                    }
+                  ],
+                  "literal_glyph_change_count": 2,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "丑",
+                      "after": "未"
+                    },
+                    {
+                      "field": "day.branch",
+                      "before": "午",
+                      "after": "戌"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 2,
+                  "changed_derived_fields": [],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "庚",
+                          "observed": "庚",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "己",
+                          "observed": "己",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "庚",
+                          "observed": "庚",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "己",
+                          "observed": "己",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": []
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": false,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              },
+              {
+                "before_case_id": "MAIN-C362",
+                "after_case_id": "MAIN-C363",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R1013"
+                ],
+                "source_pages": [
+                  378,
+                  379
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C362",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "己卯丁卯壬午甲辰",
+                  "literal_pillars": {
+                    "year": "己卯",
+                    "month": "丁卯",
+                    "day": "壬午",
+                    "hour": "甲辰"
+                  },
+                  "source_metadata": {},
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R1012"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C363",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "己卯丁卯壬午癸卯",
+                  "literal_pillars": {
+                    "year": "己卯",
+                    "month": "丁卯",
+                    "day": "壬午",
+                    "hour": "癸卯"
+                  },
+                  "source_metadata": {
+                    "comparison_case": "MAIN-C362",
+                    "literal_hour_differences": [
+                      "甲辰",
+                      "癸卯"
+                    ],
+                    "prose_comparison_first_retained": "只換一卯字"
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R1013"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "hour.stem",
+                      "before": "甲",
+                      "after": "癸"
+                    },
+                    {
+                      "field": "hour.branch",
+                      "before": "辰",
+                      "after": "卯"
+                    }
+                  ],
+                  "literal_glyph_change_count": 2,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "hour.branch",
+                      "before": "辰",
+                      "after": "卯"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 1,
+                  "changed_derived_fields": [
+                    {
+                      "field": "hour.stem",
+                      "before": "甲",
+                      "after": "癸"
+                    }
+                  ],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "丁",
+                          "observed": "丁",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "甲",
+                          "observed": "甲",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "丁",
+                          "observed": "丁",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "癸",
+                          "observed": "癸",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": [
+                        {
+                          "field": "hour.stem",
+                          "before": "甲",
+                          "after": "癸",
+                          "before_matches": true,
+                          "after_matches": true
+                        }
+                      ]
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": false,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              },
+              {
+                "before_case_id": "MAIN-C393",
+                "after_case_id": "MAIN-C394",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R1068"
+                ],
+                "source_pages": [
+                  402,
+                  403
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C393",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "戊戌丙辰辛丑戊戌",
+                  "literal_pillars": {
+                    "year": "戊戌",
+                    "month": "丙辰",
+                    "day": "辛丑",
+                    "hour": "戊戌"
+                  },
+                  "source_metadata": {},
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R1067"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C394",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "丙戌戊戌辛丑戊戌",
+                  "literal_pillars": {
+                    "year": "丙戌",
+                    "month": "戊戌",
+                    "day": "辛丑",
+                    "hour": "戊戌"
+                  },
+                  "source_metadata": {
+                    "comparison_case": "MAIN-C393",
+                    "literal_differences": [
+                      "year_stem_戊_to_丙",
+                      "month_stem_丙_to_戊",
+                      "month_branch_辰_to_戌"
+                    ],
+                    "prose_comparison_first_retained": "只換一戌字"
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R1068"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "year.stem",
+                      "before": "戊",
+                      "after": "丙"
+                    },
+                    {
+                      "field": "month.stem",
+                      "before": "丙",
+                      "after": "戊"
+                    },
+                    {
+                      "field": "month.branch",
+                      "before": "辰",
+                      "after": "戌"
+                    }
+                  ],
+                  "literal_glyph_change_count": 3,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "year.stem",
+                      "before": "戊",
+                      "after": "丙"
+                    },
+                    {
+                      "field": "month.branch",
+                      "before": "辰",
+                      "after": "戌"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 2,
+                  "changed_derived_fields": [
+                    {
+                      "field": "month.stem",
+                      "before": "丙",
+                      "after": "戊"
+                    }
+                  ],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "丙",
+                          "observed": "丙",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "戊",
+                          "observed": "戊",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "戊",
+                          "observed": "戊",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "戊",
+                          "observed": "戊",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": [
+                        {
+                          "field": "month.stem",
+                          "before": "丙",
+                          "after": "戊",
+                          "before_matches": true,
+                          "after_matches": true
+                        }
+                      ]
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": false,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              },
+              {
+                "before_case_id": "MAIN-C410",
+                "after_case_id": "MAIN-C411",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R1098"
+                ],
+                "source_pages": [
+                  415,
+                  416
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C410",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "己亥甲戌戊寅丙辰",
+                  "literal_pillars": {
+                    "year": "己亥",
+                    "month": "甲戌",
+                    "day": "戊寅",
+                    "hour": "丙辰"
+                  },
+                  "source_metadata": {},
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R1097"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C411",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "己巳甲戌戊寅丙辰",
+                  "literal_pillars": {
+                    "year": "己巳",
+                    "month": "甲戌",
+                    "day": "戊寅",
+                    "hour": "丙辰"
+                  },
+                  "source_metadata": {
+                    "comparison_case": "MAIN-C410",
+                    "only_literal_chart_difference": "year_branch_亥_to_巳"
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R1098"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "亥",
+                      "after": "巳"
+                    }
+                  ],
+                  "literal_glyph_change_count": 1,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "亥",
+                      "after": "巳"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 1,
+                  "changed_derived_fields": [],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "甲",
+                          "observed": "甲",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "丙",
+                          "observed": "丙",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "甲",
+                          "observed": "甲",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "丙",
+                          "observed": "丙",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": []
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": false,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              },
+              {
+                "before_case_id": "MAIN-C450",
+                "after_case_id": "MAIN-C451",
+                "link_status": "single_reader_source_page_confirmed_not_external_certification",
+                "source_claim_ids": [
+                  "CENSUS-R1197"
+                ],
+                "source_pages": [
+                  447
+                ],
+                "before_case": {
+                  "case_id": "MAIN-C450",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "丙寅甲午丙申壬辰",
+                  "literal_pillars": {
+                    "year": "丙寅",
+                    "month": "甲午",
+                    "day": "丙申",
+                    "hour": "壬辰"
+                  },
+                  "source_metadata": {},
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R1196"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "after_case": {
+                  "case_id": "MAIN-C451",
+                  "source_text_layer": "Ren_commentary",
+                  "speaker_chain": [
+                    "任氏曰"
+                  ],
+                  "kind": "literal_case",
+                  "anchor": "丙申甲午丙寅壬辰",
+                  "literal_pillars": {
+                    "year": "丙申",
+                    "month": "甲午",
+                    "day": "丙寅",
+                    "hour": "壬辰"
+                  },
+                  "source_metadata": {
+                    "comparison_case": "MAIN-C450",
+                    "same_glyph_multiset_different_year_and_day_positions": true,
+                    "source_claim_same_eight_characters": "八字皆同"
+                  },
+                  "expected_daymaster_strength": null,
+                  "forbidden_daymaster_strengths": [],
+                  "claim_ids": [
+                    "CENSUS-R1197"
+                  ],
+                  "calculator_evaluated": false,
+                  "source_labels_independently_certified": false,
+                  "uncertainties": [
+                    "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                  ]
+                },
+                "symbolic_contrast": {
+                  "literal_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "寅",
+                      "after": "申"
+                    },
+                    {
+                      "field": "day.branch",
+                      "before": "申",
+                      "after": "寅"
+                    }
+                  ],
+                  "literal_glyph_change_count": 2,
+                  "non_derived_coordinate_differences": [
+                    {
+                      "field": "year.branch",
+                      "before": "寅",
+                      "after": "申"
+                    },
+                    {
+                      "field": "day.branch",
+                      "before": "申",
+                      "after": "寅"
+                    }
+                  ],
+                  "non_derived_coordinate_change_count": 2,
+                  "changed_derived_fields": [],
+                  "unknown_coordinates_retained": [],
+                  "profile_candidates": [
+                    {
+                      "before_profile": "ordinary",
+                      "after_profile": "ordinary",
+                      "before_checks": {
+                        "month.stem": {
+                          "expected": "甲",
+                          "observed": "甲",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "壬",
+                          "observed": "壬",
+                          "matches": true
+                        }
+                      },
+                      "after_checks": {
+                        "month.stem": {
+                          "expected": "甲",
+                          "observed": "甲",
+                          "matches": true
+                        },
+                        "hour.stem": {
+                          "expected": "壬",
+                          "observed": "壬",
+                          "matches": true
+                        }
+                      },
+                      "all_observed_stems_match_tables": true,
+                      "changed_derived_field_checks": []
+                    }
+                  ],
+                  "sixty_cycle_mismatches": {
+                    "before": [],
+                    "after": []
+                  },
+                  "actual_zi_clock_inferred": false,
+                  "same_glyph_multiset": true,
+                  "historical_calendar_realisability_certified": false,
+                  "single_variable_causal_experiment_certified": false,
+                  "source_wording_or_pillars_repaired": false
+                }
+              }
+            ],
+            "all14_unprinted_relational_cases": [
+              {
+                "case_id": "MAIN-C066",
+                "source_text_layer": "Ren_commentary",
+                "speaker_chain": [
+                  "任氏曰"
+                ],
+                "kind": "source_counterfactual_relational_case",
+                "anchor": "如兩戌換以兩辰",
+                "literal_pillars": {
+                  "year": null,
+                  "month": null,
+                  "day": null,
+                  "hour": null
+                },
+                "source_metadata": {
+                  "template_case": "MAIN-C065",
+                  "source_counterfactual_quote": "如兩戌換以兩辰不致燥烈雖逢水運亦不至大凶也",
+                  "explicit_branch_substitution": {
+                    "from": "two 戌",
+                    "to": "two 辰"
+                  },
+                  "derived_pillars_not_promoted_to_literal": true
+                },
+                "expected_daymaster_strength": null,
+                "forbidden_daymaster_strengths": [],
+                "claim_ids": [
+                  "CENSUS-R389"
+                ],
+                "calculator_evaluated": false,
+                "source_labels_independently_certified": false,
+                "uncertainties": [
+                  "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                ]
+              },
+              {
+                "case_id": "MAIN-C071",
+                "source_text_layer": "Ren_commentary",
+                "speaker_chain": [
+                  "任氏曰"
+                ],
+                "kind": "source_counterfactual_relational_case",
+                "anchor": "若有辰而無戌",
+                "literal_pillars": {
+                  "year": null,
+                  "month": null,
+                  "day": null,
+                  "hour": null
+                },
+                "source_metadata": {
+                  "template_case": "MAIN-C070",
+                  "source_condition": "有辰而無戌",
+                  "derived_pillars_not_promoted_to_literal": true
+                },
+                "expected_daymaster_strength": null,
+                "forbidden_daymaster_strengths": [],
+                "claim_ids": [
+                  "CENSUS-R399"
+                ],
+                "calculator_evaluated": false,
+                "source_labels_independently_certified": false,
+                "uncertainties": [
+                  "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                ]
+              },
+              {
+                "case_id": "MAIN-C076",
+                "source_text_layer": "Ren_commentary",
+                "speaker_chain": [
+                  "任氏曰"
+                ],
+                "kind": "source_counterfactual_relational_case",
+                "anchor": "若天干透一庚辛地支藏一申酉",
+                "literal_pillars": {
+                  "year": null,
+                  "month": null,
+                  "day": null,
+                  "hour": null
+                },
+                "source_metadata": {
+                  "template_case": "MAIN-C075",
+                  "source_condition": "透一庚辛或支藏一申酉的反事实选项",
+                  "derived_pillars_not_promoted_to_literal": true
+                },
+                "expected_daymaster_strength": null,
+                "forbidden_daymaster_strengths": [],
+                "claim_ids": [
+                  "CENSUS-R413"
+                ],
+                "calculator_evaluated": false,
+                "source_labels_independently_certified": false,
+                "uncertainties": [
+                  "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                ]
+              },
+              {
+                "case_id": "MAIN-C091",
+                "source_text_layer": "Ren_commentary",
+                "speaker_chain": [
+                  "任氏曰"
+                ],
+                "kind": "source_counterfactual_relational_case",
+                "anchor": "設使癸水換一火土",
+                "literal_pillars": {
+                  "year": null,
+                  "month": null,
+                  "day": null,
+                  "hour": null
+                },
+                "source_metadata": {
+                  "template_case": "MAIN-C090",
+                  "source_condition": "癸换一火土，未指定完整替代时柱",
+                  "derived_pillars_not_promoted_to_literal": true
+                },
+                "expected_daymaster_strength": null,
+                "forbidden_daymaster_strengths": [],
+                "claim_ids": [
+                  "CENSUS-R453"
+                ],
+                "calculator_evaluated": false,
+                "source_labels_independently_certified": false,
+                "uncertainties": [
+                  "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                ]
+              },
+              {
+                "case_id": "MAIN-C094",
+                "source_text_layer": "Ren_commentary",
+                "speaker_chain": [
+                  "任氏曰"
+                ],
+                "kind": "source_counterfactual_relational_case",
+                "anchor": "此造如時逢丙寅",
+                "literal_pillars": {
+                  "year": null,
+                  "month": null,
+                  "day": null,
+                  "hour": null
+                },
+                "source_metadata": {
+                  "template_case": "MAIN-C093",
+                  "source_condition": "明确替换时为丙寅，完整反事实盘未另印",
+                  "derived_pillars_not_promoted_to_literal": true
+                },
+                "expected_daymaster_strength": null,
+                "forbidden_daymaster_strengths": [],
+                "claim_ids": [
+                  "CENSUS-R461"
+                ],
+                "calculator_evaluated": false,
+                "source_labels_independently_certified": false,
+                "uncertainties": [
+                  "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                ]
+              },
+              {
+                "case_id": "MAIN-C253",
+                "source_text_layer": "Ren_commentary",
+                "speaker_chain": [
+                  "任氏曰"
+                ],
+                "kind": "source_counterfactual_relational_case",
+                "anchor": "此造如戌土換之以木",
+                "literal_pillars": {
+                  "year": null,
+                  "month": null,
+                  "day": null,
+                  "hour": null
+                },
+                "source_metadata": {
+                  "template_case": "MAIN-C252",
+                  "source_condition": "日支戌土换木，未指具体木支或另印四柱",
+                  "derived_pillars_not_promoted_to_literal": true
+                },
+                "expected_daymaster_strength": null,
+                "forbidden_daymaster_strengths": [],
+                "claim_ids": [
+                  "CENSUS-R798"
+                ],
+                "calculator_evaluated": false,
+                "source_labels_independently_certified": false,
+                "uncertainties": [
+                  "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                ]
+              },
+              {
+                "case_id": "MAIN-C263",
+                "source_text_layer": "Ren_commentary",
+                "speaker_chain": [
+                  "任氏曰"
+                ],
+                "kind": "source_counterfactual_relational_case",
+                "anchor": "余造年月日皆同換一壬辰時",
+                "literal_pillars": {
+                  "year": null,
+                  "month": null,
+                  "day": null,
+                  "hour": null
+                },
+                "source_metadata": {
+                  "template_case": "MAIN-C262",
+                  "source_condition": "作者自造前三柱同，换时壬辰；本处未另列四柱",
+                  "derived_pillars_not_promoted_to_literal": true
+                },
+                "expected_daymaster_strength": null,
+                "forbidden_daymaster_strengths": [],
+                "claim_ids": [
+                  "CENSUS-R820"
+                ],
+                "calculator_evaluated": false,
+                "source_labels_independently_certified": false,
+                "uncertainties": [
+                  "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                ]
+              },
+              {
+                "case_id": "MAIN-C289",
+                "source_text_layer": "Ren_commentary",
+                "speaker_chain": [
+                  "任氏曰"
+                ],
+                "kind": "source_counterfactual_relational_case",
+                "anchor": "設使年干癸水換於丁火",
+                "literal_pillars": {
+                  "year": null,
+                  "month": null,
+                  "day": null,
+                  "hour": null
+                },
+                "source_metadata": {
+                  "template_case": "MAIN-C288",
+                  "source_condition": "作者假设年干癸换丁，其余未另印完整四柱",
+                  "derived_pillars_not_promoted_to_literal": true
+                },
+                "expected_daymaster_strength": null,
+                "forbidden_daymaster_strengths": [],
+                "claim_ids": [
+                  "CENSUS-R877"
+                ],
+                "calculator_evaluated": false,
+                "source_labels_independently_certified": false,
+                "uncertainties": [
+                  "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                ]
+              },
+              {
+                "case_id": "MAIN-C324",
+                "source_text_layer": "Ren_commentary",
+                "speaker_chain": [
+                  "任氏曰"
+                ],
+                "kind": "source_counterfactual_relational_case",
+                "anchor": "設使兩造運皆順行",
+                "literal_pillars": {
+                  "year": null,
+                  "month": null,
+                  "day": null,
+                  "hour": null
+                },
+                "source_metadata": {
+                  "template_case": "MAIN-C322",
+                  "source_condition": "对MAIN-C322及MAIN-C323的同一顺行运假设，未另印完整四柱或起运瞬间",
+                  "derived_pillars_not_promoted_to_literal": true,
+                  "also_related_case": "MAIN-C323"
+                },
+                "expected_daymaster_strength": null,
+                "forbidden_daymaster_strengths": [],
+                "claim_ids": [
+                  "CENSUS-R929"
+                ],
+                "calculator_evaluated": false,
+                "source_labels_independently_certified": false,
+                "uncertainties": [
+                  "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                ]
+              },
+              {
+                "case_id": "MAIN-C332",
+                "source_text_layer": "original_commentary",
+                "speaker_chain": [
+                  "原注"
+                ],
+                "kind": "source_counterfactual_relational_case",
+                "anchor": "丙寅戊辰月日己卯癸卯年時",
+                "literal_pillars": {
+                  "year": null,
+                  "month": null,
+                  "day": null,
+                  "hour": null
+                },
+                "source_metadata": {
+                  "template_case": "unassigned_theory_example",
+                  "source_condition": "原注月日和年时各列两词，位置未独立明确",
+                  "derived_pillars_not_promoted_to_literal": true
+                },
+                "expected_daymaster_strength": null,
+                "forbidden_daymaster_strengths": [],
+                "claim_ids": [
+                  "CENSUS-R945"
+                ],
+                "calculator_evaluated": false,
+                "source_labels_independently_certified": false,
+                "uncertainties": [
+                  "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                ]
+              },
+              {
+                "case_id": "MAIN-C333",
+                "source_text_layer": "original_commentary",
+                "speaker_chain": [
+                  "原注"
+                ],
+                "kind": "source_counterfactual_relational_case",
+                "anchor": "己卯己巳月日丙寅戊寅年時",
+                "literal_pillars": {
+                  "year": null,
+                  "month": null,
+                  "day": null,
+                  "hour": null
+                },
+                "source_metadata": {
+                  "template_case": "unassigned_theory_example",
+                  "source_condition": "原注月日和年时各列两词，位置未独立明确",
+                  "derived_pillars_not_promoted_to_literal": true
+                },
+                "expected_daymaster_strength": null,
+                "forbidden_daymaster_strengths": [],
+                "claim_ids": [
+                  "CENSUS-R946"
+                ],
+                "calculator_evaluated": false,
+                "source_labels_independently_certified": false,
+                "uncertainties": [
+                  "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                ]
+              },
+              {
+                "case_id": "MAIN-C474",
+                "source_text_layer": "Ren_commentary",
+                "speaker_chain": [
+                  "任氏曰"
+                ],
+                "kind": "source_counterfactual_relational_case",
+                "anchor": "若一見火為財多身弱",
+                "literal_pillars": {
+                  "year": null,
+                  "month": null,
+                  "day": null,
+                  "hour": null
+                },
+                "source_metadata": {
+                  "template_case": "MAIN-C473",
+                  "source_condition": "无火原盘若见一火，未指定完整替换柱",
+                  "derived_pillars_not_promoted_to_literal": true
+                },
+                "expected_daymaster_strength": null,
+                "forbidden_daymaster_strengths": [],
+                "claim_ids": [
+                  "CENSUS-R1248"
+                ],
+                "calculator_evaluated": false,
+                "source_labels_independently_certified": false,
+                "uncertainties": [
+                  "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                ]
+              },
+              {
+                "case_id": "MAIN-C497",
+                "source_text_layer": "Ren_commentary",
+                "speaker_chain": [
+                  "任氏曰"
+                ],
+                "kind": "source_counterfactual_relational_case",
+                "anchor": "其弟生卯時",
+                "literal_pillars": {
+                  "year": null,
+                  "month": null,
+                  "day": null,
+                  "hour": null
+                },
+                "source_metadata": {
+                  "template_case": "MAIN-C496",
+                  "source_condition": "同胞弟生卯时，未另印完整替代四柱",
+                  "derived_pillars_not_promoted_to_literal": true
+                },
+                "expected_daymaster_strength": null,
+                "forbidden_daymaster_strengths": [],
+                "claim_ids": [
+                  "CENSUS-R1290"
+                ],
+                "calculator_evaluated": false,
+                "source_labels_independently_certified": false,
+                "uncertainties": [
+                  "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                ]
+              },
+              {
+                "case_id": "MAIN-C504",
+                "source_text_layer": "Ren_commentary",
+                "speaker_chain": [
+                  "任氏曰"
+                ],
+                "kind": "source_counterfactual_relational_case",
+                "anchor": "若換酉年午時",
+                "literal_pillars": {
+                  "year": null,
+                  "month": null,
+                  "day": null,
+                  "hour": null
+                },
+                "source_metadata": {
+                  "template_case": "MAIN-C503",
+                  "source_condition": "设年酉时午，未印完整柱",
+                  "derived_pillars_not_promoted_to_literal": true
+                },
+                "expected_daymaster_strength": null,
+                "forbidden_daymaster_strengths": [],
+                "claim_ids": [
+                  "CENSUS-R1301"
+                ],
+                "calculator_evaluated": false,
+                "source_labels_independently_certified": false,
+                "uncertainties": [
+                  "三档映射未独立认证；未从人物运事推断标签或唯一现代出生时刻。"
+                ]
+              }
+            ],
+            "correspondence_reference_sha256": "cbe719be20aac9fd366169696cb9e5f3cb42464ef41b3e5751c97ede2836f273",
+            "all_original_questions_retained": {
+              "original22": [
+                {
+                  "source_kind": "page",
+                  "original_document": "review-batch-0001-pages0001-0004.json",
+                  "original_document_sha256": "594b82ffd176353f808b3e366ce388397b682c7f7a5796bfa8655dda4412afbd",
+                  "pdf_page": 1,
+                  "warning_index": 0,
+                  "item": "题签末字及印章不作作者身份断言；不影响本页无四柱命例的观察。",
+                  "warning_id": "a53c2a30ca0e6a60917ef1c0f97542c939bd8e73930d3b87fa09b51efa0609e5"
+                },
+                {
+                  "source_kind": "page",
+                  "original_document": "review-batch-0005-pages0041-0056.json",
+                  "original_document_sha256": "d419cde99081c6b9fe6634425b5af9088dc29b5b38678535861b10ba5f4f253b",
+                  "pdf_page": 53,
+                  "warning_index": 0,
+                  "item": "史姓例首干字形待独立核对。",
+                  "warning_id": "9150eac8b4e4419e2ed32613dcae168eb4fc563869e2db8b82379c531e877086"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": 1,
+                  "warning_index": 0,
+                  "item": "Page1signaturelastglyph",
+                  "warning_id": "04122c1b37b0c743c94c6f787337899fe74a88db25ce8d339cd6ca534b7e95bf"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": 5,
+                  "warning_index": 1,
+                  "item": "Page5twoincompletesourcecasesandquotedcomparison",
+                  "warning_id": "091c48fcf27ad3a7c58a68879007348e5e00d6063255ed835e23201d76ca3050"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": null,
+                  "warning_index": 3,
+                  "item": "Laterfullbookqualificationsofintroductoryrelations",
+                  "warning_id": "8fd7fc973fb8a0523ddffb126929c13dede05fd9ad6efbd5426dba8f14b7cbed"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": null,
+                  "warning_index": 5,
+                  "item": "Clockexampleslackuniqueyearcycleandmodernclockbasis",
+                  "warning_id": "3405a0fa64f45125d6be7187f2f72dc302bf8754833abf69b029eef12154f32a"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": null,
+                  "warning_index": 6,
+                  "item": "Nightzianddayuntextprofileshavenotbeenadoptedorcompared",
+                  "warning_id": "c04351a9cd39434e2e9bdbee7c6b971b7b2712acefb8942d538025bdb35f0f15"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": 53,
+                  "warning_index": 7,
+                  "item": "Page53Shicasefirststemglyph",
+                  "warning_id": "31a6d9d730ea7eebee824fcfb87f1831e18d577e5cbf783a952f75ad6687c742"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": null,
+                  "warning_index": 8,
+                  "item": "Sourcefourlevelvocabularyandmechanismsnotadjudicatedasengineeringthreegrades",
+                  "warning_id": "ef2cd0376d90dc981994b905444404f712306d15bf434145289ca8f36ce5a845"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": null,
+                  "warning_index": 9,
+                  "item": "VoiceSpecific旺強衰弱MappingBeforeNewCensusComparison",
+                  "warning_id": "fb9103f093d5b49f51b648d3af68214ad9e0afa7e439d78068314862b3acc246"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": 26,
+                  "warning_index": 10,
+                  "item": "Page26later_wangshuai_section_located_and_table_crossbound_but_no_new_calculation_or_independent_certification",
+                  "warning_id": "17bae66e55c5400b8ffd3cceee17212d9012227796f1cd4a3da376e7b5076b81"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": 210,
+                  "warning_index": 11,
+                  "item": "Page210printed_self_case_calendar_caption_identity_not_resolved",
+                  "warning_id": "16110dfc9b6d82e35aa7cb97a3031324070ffb308f240e9401ca085248b494d0"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": null,
+                  "warning_index": 12,
+                  "item": "Pages234-235只换辛原话与图版两干差异并存",
+                  "warning_id": "1a2e5f9bfd89b9b816653b957b386e4c66de6441e46c4cbb432ccc88aa117b1a"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": 238,
+                  "warning_index": 13,
+                  "item": "Page238财字疑印字之误保留作者与校注两层",
+                  "warning_id": "eb331449f14f33b45bc4d5b7c66f52a5acbaf7bd65a244c93de4f9c6e21fe22c"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": null,
+                  "warning_index": 14,
+                  "item": "MAIN-C210初始虚弱随后甲丙印化最终唯一档未认证",
+                  "warning_id": "fbcbe571aeff5fc9bf73bfab9f6b1917709cb7df813a9b5604de05083a75ed99"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": 280,
+                  "warning_index": 15,
+                  "item": "Page280原文癸水之财与十神名不按公式改写",
+                  "warning_id": "f71725e671dfe2ae3148f4b7f721706a562a5e644e5677f450318ed89d17bccb"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": 293,
+                  "warning_index": 16,
+                  "item": "Page293相火有焰不作旺论源词三档映射待核",
+                  "warning_id": "5134ac0e4591afbc206c3cd19fc8433064141abd181e1e7eb37e2b5f76d45768"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": 299,
+                  "warning_index": 17,
+                  "item": "Page299辛巳月图与立夏前五日原文并存，月界定位待核不静默改字",
+                  "warning_id": "09babbfb6569ab5cabe4e0db295810ec5ec5ad237d1d52e3041763978a893164"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": 372,
+                  "warning_index": 18,
+                  "item": "Page372甲丙联合强旺极与唯一日主强档映射未认证",
+                  "warning_id": "380cb984cf0384f43e48e6f4dd81542399fdd92d8dc9c598ede8e336953fcd34"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": 379,
+                  "warning_index": 19,
+                  "item": "Page379只换一卯字原话与图版时柱甲辰到癸卯两字不同并存",
+                  "warning_id": "8bb2328599315d49eae710e24ff861acb4d461408c9e2ab028f423b8029c76fd"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": 403,
+                  "warning_index": 20,
+                  "item": "Page403只换一戌字与图版年干月干月支三字差异并存",
+                  "warning_id": "e637943f25dd14acb013f3eede6799b379335cf053f3ea14b4735d3383a7dced"
+                },
+                {
+                  "source_kind": "full_page_progress",
+                  "original_document": "progress-thirtyseventh.json",
+                  "original_document_sha256": "276e061eed307287996250108d469b351ea83f08506fa0c16a71eac2f6d742f4",
+                  "pdf_page": 441,
+                  "warning_index": 21,
+                  "item": "Page441衰极从衰源词保留而未自动映射弱",
+                  "warning_id": "ace5d01546d86881ca37010af623f311da0a85f8d87b6ec534962b3be25b0f84"
+                }
+              ],
+              "input4": [
+                {
+                  "case_id": "MAIN-C219",
+                  "kind": "printed_source_conflict",
+                  "review_protocol": "docs/validation/bazi-census-input-claim-alignment-v1/protocol-first.json"
+                },
+                {
+                  "case_id": "MAIN-C368",
+                  "kind": "printed_source_conflict",
+                  "review_protocol": "docs/validation/bazi-census-input-claim-alignment-v1/protocol-first.json"
+                },
+                {
+                  "case_id": "MAIN-C488",
+                  "kind": "printed_source_conflict",
+                  "review_protocol": "docs/validation/bazi-census-input-claim-alignment-v1/protocol-first.json"
+                },
+                {
+                  "case_id": "MAIN-C457",
+                  "kind": "glyph_review_pending",
+                  "review_protocol": "docs/validation/bazi-census-input-claim-alignment-v1/protocol-first.json"
+                }
+              ]
+            },
+            "source_questions_closed": 0,
+            "force_comparison_allowed": false,
+            "causal_acceptance": false
+          },
+          "validation_status": "source_bound_symbolic_contrasts_not_causal_or_force_acceptance",
+          "review_status": "single_developer_source_reading_external_review_pending",
+          "independent_expert_review": "not_completed",
+          "reality_prediction_efficacy": "not_tested",
+          "source_attribution_rule": "原图与任氏比较语、李氏配干表、程序符号分析及编辑边界分开；保留全部字面差异与原疑问。",
+          "citation": "FateBridge限域编释，非逐字引文；任鐵樵增注、李雨田校訂《任注滴天髓闡微》，上海大東書局1947年4月初版；https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf；原图比较不认证单一现实因果、完整强弱算法或预测有效性。",
+          "curated_on": "2026-10-25"
+        }
+      }
+    }
+  }
+}

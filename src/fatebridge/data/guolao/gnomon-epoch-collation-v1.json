@@ -1,0 +1,37 @@
+{
+  "schema": "li2013_nlc38_triad71_reading_v1",
+  "profile_id": "li2013_nlc38_triad71_reading_v1",
+  "base_profile": "li2013_yuanshi_three_shadow_v1",
+  "base_data_sha256": "643a9b7ebcd5d9797cc57ce17aebf3c7df95f4dca8011851ce224b09a19b4e3b",
+  "observed_after_first_domain_comparison": true,
+  "initial_literal_audit_sha256": "5d7919a70db57e00141aa3625991ca98e4897cb12c2d9fcd02a66e95a12be299",
+  "initial_literal_matches": 74,
+  "initial_literal_total": 75,
+  "season": "winter1279",
+  "case_id": 25,
+  "printed_A": 77,
+  "declared_A": 71,
+  "B": 97,
+  "C": 98,
+  "printed_span_days": 99,
+  "printed_result_cycle_day": "49.8177",
+  "primary_witness": {
+    "name": "元史卷52乾隆四年校刊影印,NLC166",
+    "original_full_pdf_sha256": "c9f5560e0b14b1f85d27f81bb1e28fbc97ef739df4fef6979e0a85cdf6aac8e4",
+    "pages": [
+      38,
+      39
+    ],
+    "opening_literal": "九月二十日甲子景五丈六尺四寸九分二釐五毫",
+    "observation71_shadow_zhang": "5.64925",
+    "observation77_shadow_zhang": "7.19225",
+    "excerpt36to38_sha256": "bc0672edcb36bdfd12c00ad1f31568aeada7df1383f2a8a8f270ca6d9bcb4248",
+    "continuation39_sha256": "ea7ab02dd0fefccc66998a45719c9fbf1174d7461eb0cea41eee12e29b3e9a3a"
+  },
+  "paper_row_replaced_in_base_data": false,
+  "independent_holdout_or_second_collator": false,
+  "published_half_unit_changed": false,
+  "clock_interval_inconsistency_repaired": false,
+  "source_55_06_constant_replaced": false,
+  "physical_epoch_calibrated": false
+}

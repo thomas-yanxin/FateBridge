@@ -1,0 +1,168 @@
+{
+  "id": "meihua_observed_categories_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本所选端法物象与八方的已报类别起卦",
+  "scope": "五种原例物象的已报类别、单一对象及所报八方，保留来往所在关系。非全物象自动识别、罗盘测量、完整起占条件或现实预测认证。",
+  "source": {
+    "selected_edition": "nlc_1925",
+    "raw_pdf_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "raw_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "original_pdf_indices": [
+      20,
+      21,
+      26,
+      27,
+      28
+    ],
+    "reader": "Assistant selected-span direct visual reading; punctuation editorial; no independent human expert review",
+    "formula": {
+      "section": "物卦起例",
+      "quote": "後天端法以物為上卦，方位為下卦。合物卦之數與方位卦之數加時數以取動爻。",
+      "pdf_index": 20
+    },
+    "directions": {
+      "section": "八卦方位圖",
+      "pdf_index": 21,
+      "orientation": "South at top, east at left. Read named compass directions; do not mirror the diagram. Numbers are pre-heaven trigram numbers, not Luo Shu palace numbers."
+    },
+    "direction_reference_examples": [
+      {
+        "category": "elder_person",
+        "direction": "southeast",
+        "direction_role": "toward",
+        "quote": "有老人往巽方",
+        "pdf_index": 26
+      },
+      {
+        "category": "young_person",
+        "direction": "south",
+        "direction_role": "from",
+        "quote": "有少年從離方來",
+        "pdf_index": 27
+      },
+      {
+        "category": "cow",
+        "direction": "north",
+        "direction_role": "at",
+        "quote": "有牛鳴於坎方",
+        "pdf_index": 27
+      },
+      {
+        "category": "chicken",
+        "direction": "northwest",
+        "direction_role": "at",
+        "quote": "有雞鳴於乾方",
+        "pdf_index": 28
+      },
+      {
+        "category": "dry_wood",
+        "direction": "west",
+        "direction_role": "toward",
+        "quote": "枯枝自墜地於兌方",
+        "pdf_index": 28
+      }
+    ],
+    "limits": [
+      "Only five selected subject categories; not a complete classification of all scenes, sounds, forms or colors",
+      "Caller reports source category, single subject, direction label, reference relation and hour; no scene, compass, age threshold or event trigger authenticated",
+      "From direction is the reported source side; it is not automatically replaced with the opposite direction of travel",
+      "No bearing sectors, magnetic/true north conversion, place resolver or observer activity inferred",
+      "Historical example stories and their claimed outcomes are not prospective observations; original semantic disagreements remain unresolved"
+    ]
+  },
+  "subjects": {
+    "elder_person": {
+      "label": "原例老人",
+      "trigram": "乾",
+      "number": 1,
+      "quote": "以老人屬乾為上卦，巽方為下卦。",
+      "pdf_index": 26,
+      "section": "老人有憂色占",
+      "age_cutoff_inferred": false
+    },
+    "young_person": {
+      "label": "原例少年",
+      "trigram": "艮",
+      "number": 7,
+      "quote": "以少年屬艮為上卦，離為下卦。",
+      "pdf_index": 27,
+      "section": "少年有喜色占",
+      "age_cutoff_inferred": false
+    },
+    "cow": {
+      "label": "牛",
+      "trigram": "坤",
+      "number": 8,
+      "quote": "牛屬坤為上卦，坎方為下卦。",
+      "pdf_index": 27,
+      "section": "牛哀鳴占"
+    },
+    "chicken": {
+      "label": "雞",
+      "trigram": "巽",
+      "number": 5,
+      "quote": "雞屬巽為上卦，乾方為下卦。",
+      "pdf_index": 28,
+      "section": "雞悲鳴占"
+    },
+    "dry_wood": {
+      "label": "槁木",
+      "trigram": "离",
+      "number": 3,
+      "quote": "槁木為離作上卦，兌方為下卦。",
+      "pdf_index": 28,
+      "section": "枯枝墜地占",
+      "generic_wood_or_fresh_fallen_branch_equated": false
+    }
+  },
+  "directions": {
+    "north": {
+      "label": "北",
+      "trigram": "坎",
+      "number": 6,
+      "pdf_index": 21
+    },
+    "northeast": {
+      "label": "東北",
+      "trigram": "艮",
+      "number": 7,
+      "pdf_index": 21
+    },
+    "east": {
+      "label": "東",
+      "trigram": "震",
+      "number": 4,
+      "pdf_index": 21
+    },
+    "southeast": {
+      "label": "東南",
+      "trigram": "巽",
+      "number": 5,
+      "pdf_index": 21
+    },
+    "south": {
+      "label": "南",
+      "trigram": "离",
+      "number": 3,
+      "pdf_index": 21
+    },
+    "southwest": {
+      "label": "西南",
+      "trigram": "坤",
+      "number": 8,
+      "pdf_index": 21
+    },
+    "west": {
+      "label": "西",
+      "trigram": "兑",
+      "number": 2,
+      "pdf_index": 21
+    },
+    "northwest": {
+      "label": "西北",
+      "trigram": "乾",
+      "number": 1,
+      "pdf_index": 21
+    }
+  }
+}

@@ -15,7 +15,7 @@ DIGNITY_LABELS_ZH = {
     "exaltation": "旺",
     "detriment": "陷",
     "fall": "弱",
-    "peregrine": "平",
+    "no_major_dignity": "无主要庙旺落陷",
 }
 
 
@@ -222,7 +222,7 @@ RELATIVE_HOUSE_SYSTEM_SPECS: Dict[int, Dict[str, Any]] = {
     },
     8: {
         "key": "equal_mc",
-        "label_zh": "天顶为10宫中点等宫制",
+        "label_zh": "天顶为第10宫宫头的等宫制",
         "swisseph_code": b"D",
     },
 }
@@ -279,7 +279,7 @@ CORE_CHART_DEFAULT_HOUSE_SYSTEMS = {
 
 CORE_CHART_DEFAULT_HOUSE_LABELS_ZH = {
     "equal": "等宫制（上升起点）",
-    "equal_mc": "天顶为10宫中点等宫制",
+    "equal_mc": "天顶为第10宫宫头的等宫制",
     "placidus": "Placidus",
     "whole_sign": "整宫制",
 }

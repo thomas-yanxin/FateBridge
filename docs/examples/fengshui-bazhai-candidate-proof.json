@@ -1,0 +1,19 @@
+{
+  "methods": ["bazhai"],
+  "analyze_layout": true,
+  "occupants": [
+    {
+      "subject_id": "fictional-resident",
+      "effective_birth_year": 1990
+    }
+  ],
+  "placements": [
+    {
+      "object_id": "synthetic-bed",
+      "purpose": "bed",
+      "location_direction": "E",
+      "subject_id": "fictional-resident",
+      "observation_basis": "user_confirmed"
+    }
+  ]
+}

@@ -9,7 +9,7 @@ description: 解释 FateBridge 算出的五行权重、寒暖分类及传统健�
 
 ## 共用规则与资料
 
-先读[按用户问题组织咨询](../_shared/consultation-routing.md)、[硬边界](../_shared/safety-boundaries.md)、[引擎调用](../_shared/fatebridge-engine.md)和[解读层](../_shared/onda-counsel.md)。涉及日期、阶段或变化时读[共享时间选择](../_shared/timing-selection.md)；采用西占主题解释时读[西占证据参考](../_shared/western-topic-evidence.md)。发现入口可能为软链接，先以 `pwd -P` 解析真实目录，再读相对引用。
+先读短的[咨询核心](../_shared/consultation-core.md)。主题重叠或扩展时读[范围选择](../_shared/consultation-routing.md)；涉及阶段、日期或变化才读[时间选择](../_shared/timing-selection.md)。采用八字、紫微或西占解释时，分别定位[八字证据](../_shared/bazi-topic-evidence.md)、[紫微证据](../_shared/ziwei-topic-evidence.md)或[西占证据](../_shared/western-topic-evidence.md)的相关条目。参数、分页或 CLI 有缺口时再查[引擎参考](../_shared/fatebridge-engine.md#怎么调引擎)；表达细节按需查[解读参考](../_shared/onda-counsel.md)。软链接先解析真实目录，再读相对引用。
 
 资料使用当前聊天已确认内容，一次核对所选计算真正必要的缺项；不猜出生时刻，不把其他方法的缺项升级为必答。普通首轮严格字段投影、关闭快照；完整导出首次 `fields=null`，读同 run 交付。追问复用未变结果，只补所需新层。
 

@@ -1,0 +1,1212 @@
+{
+  "id": "t1299_lower_individual_mansion_v3",
+  "source_url": "https://cbetaonline.dila.edu.tw/zh-tw/T1299",
+  "source_sha256": "8a3e11e428dc8352e4ac163d839dea23df875dc74069ccd38cadd89e1878c006",
+  "edition": "大正藏T21 No.1299; CBETA TEI P5 header 2025-01-30",
+  "author": "不空译；下卷二十七宿所为吉凶历",
+  "locator": "T21n1299_p0395b23-0396c01",
+  "selection_method": "27 named source entries are indexed (XML paragraph boundaries are not assumed to equal mansion boundaries). Safe topic clauses are manually mapped; narrower sale/lending/direction/skill clauses remain conditional without activity detail. No clinical, lifespan or harmful instructions are supplied. An unattributed paragraph is preserved without silently assigning it. Existing upper-volume and named-day long-distance and education clauses are qualified per activity as well.",
+  "records": [
+    {
+      "mansion": "昴",
+      "locator": "T21n1299_p0395b23-0395b28",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "毕",
+      "locator": "T21n1299_p0395b29-0395c03",
+      "textual_issues": [],
+      "mapping_notes": [
+        "不宜生财未定义具体财务行为，未将其自动扩成全部交易。"
+      ]
+    },
+    {
+      "mansion": "觜",
+      "locator": "T21n1299_p0395c04-0395c08",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "参",
+      "locator": "T21n1299_p0395c09-0395c11",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "井",
+      "locator": "T21n1299_p0395c12-0395c15",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "鬼",
+      "locator": "T21n1299_p0395c16-0395c19",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "柳",
+      "locator": "T21n1299_p0395c20-0395c21",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "星",
+      "locator": "T21n1299_p0395c22-0395c24",
+      "textual_issues": [],
+      "mapping_notes": [
+        "修宅和粮食入宅不等于迁居，未映射为relocation。"
+      ]
+    },
+    {
+      "mansion": "张",
+      "locator": "T21n1299_p0395c25-0395c26",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "翼",
+      "locator": "T21n1299_p0395c27-0395c29",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "轸",
+      "locator": "T21n1299_p0396a01-0396a04",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "角",
+      "locator": "T21n1299_p0396a05-0396a09",
+      "textual_issues": [],
+      "mapping_notes": [
+        "歌舞及余伎艺未明确为学习，不自动映射为study。"
+      ]
+    },
+    {
+      "mansion": "亢",
+      "locator": "T21n1299_p0396a10-0396a12",
+      "textual_issues": [
+        {
+          "locator": "T21n1299_p0396a11-12; CBETA app 0396006",
+          "literal": "宜不自行動",
+          "variant": "不宜自行動",
+          "witnesses": "宜不【大】，不宜【明】",
+          "issue": "保留字序异文；只作自行动身的条件条文，不扩成所有出行。"
+        }
+      ],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "氐",
+      "locator": "T21n1299_p0396a13-0396a14",
+      "textual_issues": [
+        {
+          "locator": "T21n1299_p0396a15-16",
+          "literal": "凡諸有大為作事並不可作，宜醞酒漿、宜種虋栽樹甘蔗等並吉。",
+          "issue": "相邻段落未再次署宿，不能单凭段序断定归氐或推广全27宿。",
+          "attribution_status": "unresolved_not_applied_to_activity",
+          "applied_to_activity": false
+        }
+      ],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "房",
+      "locator": "T21n1299_p0396a17-0396a19",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "心",
+      "locator": "T21n1299_p0396a20-0396a24",
+      "textual_issues": [],
+      "mapping_notes": [
+        "唯除营功德事自余不可的限定保留，不改成个人品德或必然灾祸判断。"
+      ]
+    },
+    {
+      "mansion": "尾",
+      "locator": "T21n1299_p0396a25-0396a28",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "箕",
+      "locator": "T21n1299_p0396a29-0396b02",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "斗",
+      "locator": "T21n1299_p0396b03-0396b05",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "女",
+      "locator": "T21n1299_p0396b06-0396b10",
+      "textual_issues": [
+        {
+          "locator": "T21n1299_p0396b07-08",
+          "literal": "呈學伎藝",
+          "issue": "呈学的读法未校定；该条件文即使提供技艺学习细节也暂不计入确定宜忌。",
+          "applied_to_activity": false
+        }
+      ],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "虚",
+      "locator": "T21n1299_p0396b11-0396b14",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "危",
+      "locator": "T21n1299_p0396b15-0396b18",
+      "textual_issues": [
+        {
+          "locator": "T21n1299_p0396b18; CBETA app 0396017",
+          "literal": "估賣商皈吉",
+          "variant": "估賣商販吉",
+          "witnesses": "皈【大】，販【明】",
+          "issue": "估卖为明确交易上下文；保留皈/贩字形，不静默改底本。"
+        }
+      ],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "室",
+      "locator": "T21n1299_p0396b19-0396b20",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "壁",
+      "locator": "T21n1299_p0396b21-0396b22",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "奎",
+      "locator": "T21n1299_p0396b23-0396b25",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "娄",
+      "locator": "T21n1299_p0396b26-0396b27",
+      "textual_issues": [],
+      "mapping_notes": []
+    },
+    {
+      "mansion": "胃",
+      "locator": "T21n1299_p0396b28-0396c01",
+      "textual_issues": [],
+      "mapping_notes": []
+    }
+  ],
+  "rules": [
+    {
+      "rule_id": "t1299_lower_mansion_01",
+      "layer": "lower_mansion",
+      "selectors": [
+        "昴"
+      ],
+      "activities": [
+        "relocation"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395b25",
+      "source_excerpt": "入宅",
+      "meaning": "下卷昴宿有入宅宜文。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "入宅"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_02",
+      "layer": "lower_mansion",
+      "selectors": [
+        "昴"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395b26",
+      "source_excerpt": "賣物",
+      "meaning": "下卷昴宿宜卖物；仅对应出售。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "出售物品",
+      "activity_detail_any_of": [
+        "sale",
+        "sale_livestock",
+        "sale_lactating_livestock"
+      ],
+      "source_excerpts": [
+        "賣物"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_03",
+      "layer": "lower_mansion",
+      "selectors": [
+        "昴"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0395b27",
+      "source_excerpt": "不宜修理鬢髮及遠行道路",
+      "meaning": "下卷昴宿不宜远行道路；未推广短程活动。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "远行道路",
+      "activity_detail_any_of": [
+        "long_distance_journey"
+      ],
+      "source_excerpts": [
+        "不宜修理鬢髮及遠行道路"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_04",
+      "layer": "lower_mansion",
+      "selectors": [
+        "毕"
+      ],
+      "activities": [
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395b29",
+      "source_excerpt": "嫁娶",
+      "meaning": "下卷毕宿宜嫁娶。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "嫁娶"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_05",
+      "layer": "lower_mansion",
+      "selectors": [
+        "毕"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0395c02",
+      "source_excerpt": "不宜取債放債",
+      "meaning": "下卷毕宿不宜取债放债；不是一切交易的禁忌。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "借入或放出债款",
+      "activity_detail_any_of": [
+        "borrowing",
+        "lending"
+      ],
+      "source_excerpts": [
+        "不宜取債放債"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_06",
+      "layer": "lower_mansion",
+      "selectors": [
+        "觜"
+      ],
+      "activities": [
+        "relocation"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395c05",
+      "source_excerpt": "入新宅",
+      "meaning": "下卷觜宿宜入新宅。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "入新宅"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_07",
+      "layer": "lower_mansion",
+      "selectors": [
+        "觜"
+      ],
+      "activities": [
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395c06",
+      "source_excerpt": "嫁娶",
+      "meaning": "下卷觜宿宜嫁娶。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "嫁娶"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_08",
+      "layer": "lower_mansion",
+      "selectors": [
+        "参"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395c09",
+      "source_excerpt": "求財",
+      "meaning": "下卷参宿宜求财；没有指定所有买卖均宜。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "求财行为，仍需明确具体事项",
+      "activity_detail_any_of": [
+        "earning_money"
+      ],
+      "source_excerpts": [
+        "求財"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_09",
+      "layer": "lower_mansion",
+      "selectors": [
+        "参"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395c09-10",
+      "source_excerpt": "賣有乳畜生",
+      "meaning": "下卷参宿有卖有乳畜生的限定宜文。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "出售有乳牲畜",
+      "activity_detail_any_of": [
+        "sale_lactating_livestock"
+      ],
+      "source_excerpts": [
+        "賣有乳畜生"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_10",
+      "layer": "lower_mansion",
+      "selectors": [
+        "井"
+      ],
+      "activities": [
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395c13",
+      "source_excerpt": "宜嫁娶",
+      "meaning": "下卷井宿宜嫁娶；不引出生育结果断言。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "宜嫁娶"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_11",
+      "layer": "lower_mansion",
+      "selectors": [
+        "井"
+      ],
+      "activities": [
+        "social",
+        "marriage",
+        "travel",
+        "relocation",
+        "commerce",
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395c14-15",
+      "source_excerpt": "此宿所作事皆成吉",
+      "meaning": "下卷井宿本段泛称所作事皆成吉；此处仅作为文献泛称，医疗例外不作为服务事项。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "此宿所作事皆成吉"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_12",
+      "layer": "lower_mansion",
+      "selectors": [
+        "鬼"
+      ],
+      "activities": [
+        "social",
+        "marriage",
+        "travel",
+        "relocation",
+        "commerce",
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395c16",
+      "source_excerpt": "所作皆吉",
+      "meaning": "下卷鬼宿本段泛称所作皆吉；不是现实结果保证。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "所作皆吉"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_13",
+      "layer": "lower_mansion",
+      "selectors": [
+        "鬼"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395c18",
+      "source_excerpt": "遠行進路",
+      "meaning": "下卷鬼宿宜远行进路；未推广所有短程活动。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "远行进路",
+      "activity_detail_any_of": [
+        "long_distance_journey"
+      ],
+      "source_excerpts": [
+        "遠行進路"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_14",
+      "layer": "lower_mansion",
+      "selectors": [
+        "张"
+      ],
+      "activities": [
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395c25",
+      "source_excerpt": "求女嫁娶",
+      "meaning": "下卷张宿有嫁娶宜文。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "求女嫁娶"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_15",
+      "layer": "lower_mansion",
+      "selectors": [
+        "翼"
+      ],
+      "activities": [
+        "social",
+        "marriage",
+        "travel",
+        "relocation",
+        "commerce",
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395c27",
+      "source_excerpt": "所作皆吉",
+      "meaning": "下卷翼宿本段泛称所作皆吉；不是现实结果保证。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "所作皆吉"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_16",
+      "layer": "lower_mansion",
+      "selectors": [
+        "翼"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395c28",
+      "source_excerpt": "商業",
+      "meaning": "下卷翼宿宜商业。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "原文商业，须明确经营业务，不泛化所有借贷或收支",
+      "activity_detail_any_of": [
+        "business_operation"
+      ],
+      "source_excerpts": [
+        "商業"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_17",
+      "layer": "lower_mansion",
+      "selectors": [
+        "翼"
+      ],
+      "activities": [
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0395c28",
+      "source_excerpt": "嫁娶",
+      "meaning": "下卷翼宿宜嫁娶。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "嫁娶"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_18",
+      "layer": "lower_mansion",
+      "selectors": [
+        "轸"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396a01",
+      "source_excerpt": "遠行向外國",
+      "meaning": "下卷轸宿宜远行向外国；不推广为所有出行。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "同时明确远距离行程且目的地为外国，不能仅凭赴外或仅凭远行",
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "遠行向外國"
+      ],
+      "activity_detail_all_of": [
+        "long_distance_journey",
+        "journey_abroad"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_19",
+      "layer": "lower_mansion",
+      "selectors": [
+        "轸"
+      ],
+      "activities": [
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396a02",
+      "source_excerpt": "學伎藝",
+      "meaning": "下卷轸宿宜学伎艺；不是所有考试或专业选择的判断。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "学习技艺",
+      "activity_detail_any_of": [
+        "skill_learning"
+      ],
+      "source_excerpts": [
+        "學伎藝"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_20",
+      "layer": "lower_mansion",
+      "selectors": [
+        "轸"
+      ],
+      "activities": [
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396a02",
+      "source_excerpt": "嫁娶",
+      "meaning": "下卷轸宿宜嫁娶。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "嫁娶"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_21",
+      "layer": "lower_mansion",
+      "selectors": [
+        "角"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396a07",
+      "source_excerpt": "進路",
+      "meaning": "下卷角宿有进路宜文。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "進路"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_22",
+      "layer": "lower_mansion",
+      "selectors": [
+        "亢"
+      ],
+      "activities": [
+        "marriage",
+        "social"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396a11",
+      "source_excerpt": "嫁娶、結朋友",
+      "meaning": "下卷亢宿宜嫁娶、结朋友。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "嫁娶、結朋友"
+      ],
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "forming_friendship"
+          ],
+          "condition": "结交／交友行为须明确，不限首次相识；不能由一般聚会代填本次结交行为。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_mansion_23",
+      "layer": "lower_mansion",
+      "selectors": [
+        "亢"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0396a11-12",
+      "source_excerpt": "宜不自行動",
+      "meaning": "下卷亢宿大正字面宜不自行动，明本作不宜自行动；未扩成所有交通行为。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "本人动身，非仅派遣他人",
+      "activity_detail_any_of": [
+        "personal_departure"
+      ],
+      "source_excerpts": [
+        "宜不自行動"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_24",
+      "layer": "lower_mansion",
+      "selectors": [
+        "房"
+      ],
+      "activities": [
+        "social",
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396a17",
+      "source_excerpt": "宜結朋友、婚姻",
+      "meaning": "下卷房宿宜结朋友、婚姻。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "宜結朋友、婚姻"
+      ],
+      "activity_conditions": {
+        "social": {
+          "any_of": [
+            "forming_friendship"
+          ],
+          "condition": "结交／交友行为须明确，不限首次相识；不能由一般聚会代填本次结交行为。"
+        }
+      }
+    },
+    {
+      "rule_id": "t1299_lower_mansion_25",
+      "layer": "lower_mansion",
+      "selectors": [
+        "房"
+      ],
+      "activities": [
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396a19",
+      "source_excerpt": "學藝、工巧",
+      "meaning": "下卷房宿宜学艺、工巧，未推广全部学习事项。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "学习技艺或工巧",
+      "activity_detail_any_of": [
+        "skill_learning"
+      ],
+      "source_excerpts": [
+        "學藝、工巧"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_26",
+      "layer": "lower_mansion",
+      "selectors": [
+        "心"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0396a23-24",
+      "source_excerpt": "出財與人，及放債凶",
+      "meaning": "下卷心宿不宜出财与人及放债；不等于所有交易不宜。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "向他人交付款项或放债",
+      "activity_detail_any_of": [
+        "spending_property",
+        "lending"
+      ],
+      "source_excerpts": [
+        "出財與人，及放債凶"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_27",
+      "layer": "lower_mansion",
+      "selectors": [
+        "女"
+      ],
+      "activities": [
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396b07-08",
+      "source_excerpt": "呈學伎藝",
+      "meaning": "下卷女宿记呈学伎艺，仅列为技艺学习条件文。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "技艺学习，原文呈学语义仍需核对",
+      "activity_detail_any_of": [
+        "skill_learning"
+      ],
+      "requires_textual_review": true,
+      "source_excerpts": [
+        "呈學伎藝"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_28",
+      "layer": "lower_mansion",
+      "selectors": [
+        "女"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0396b09",
+      "source_excerpt": "競財",
+      "meaning": "下卷女宿不宜竞财；不扩大为全部交易。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "竞财，需另明确行为含义",
+      "activity_detail_any_of": [
+        "wealth_competition"
+      ],
+      "source_excerpts": [
+        "競財"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_29",
+      "layer": "lower_mansion",
+      "selectors": [
+        "虚"
+      ],
+      "activities": [
+        "study"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396b11",
+      "source_excerpt": "宜學問",
+      "meaning": "下卷虚宿宜学问；其后求子法的夜限不移用于学问。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "宜學問"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_30",
+      "layer": "lower_mansion",
+      "selectors": [
+        "虚"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396b14",
+      "source_excerpt": "作商業",
+      "meaning": "下卷虚宿宜作商业。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "原文商业，须明确经营业务，不泛化所有借贷或收支",
+      "activity_detail_any_of": [
+        "business_operation"
+      ],
+      "source_excerpts": [
+        "作商業"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_31",
+      "layer": "lower_mansion",
+      "selectors": [
+        "虚"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396b13",
+      "source_excerpt": "還人財物",
+      "meaning": "下卷虚宿宜还人财物，只对应归还行为。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "归还他人财物",
+      "activity_detail_any_of": [
+        "returning_property"
+      ],
+      "source_excerpts": [
+        "還人財物"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_32",
+      "layer": "lower_mansion",
+      "selectors": [
+        "虚"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396b13-14",
+      "source_excerpt": "賣畜生",
+      "meaning": "下卷虚宿有卖畜生宜文。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "出售牲畜",
+      "activity_detail_any_of": [
+        "sale_livestock",
+        "sale_lactating_livestock"
+      ],
+      "source_excerpts": [
+        "賣畜生"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_33",
+      "layer": "lower_mansion",
+      "selectors": [
+        "危"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396b17-18",
+      "source_excerpt": "估賣商皈吉",
+      "meaning": "下卷危宿估卖宜文只对应出售业务；保留皈/贩异字，不推广所有交易或覆盖出财限制。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "估卖或出售业务",
+      "activity_detail_any_of": [
+        "sale",
+        "sale_livestock",
+        "sale_lactating_livestock"
+      ],
+      "source_excerpts": [
+        "估賣商皈吉"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_34",
+      "layer": "lower_mansion",
+      "selectors": [
+        "危"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396b16-17",
+      "source_excerpt": "納財",
+      "meaning": "下卷危宿宜纳财，只对应收入或接收财物。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "纳财或接收财物",
+      "activity_detail_any_of": [
+        "receiving_property"
+      ],
+      "source_excerpts": [
+        "納財"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_35",
+      "layer": "lower_mansion",
+      "selectors": [
+        "危"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0396b18",
+      "source_excerpt": "不宜出財",
+      "meaning": "下卷危宿不宜出财；未改成一切交易不宜。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "支出财物",
+      "activity_detail_any_of": [
+        "spending_property",
+        "lending"
+      ],
+      "source_excerpts": [
+        "不宜出財"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_36",
+      "layer": "lower_mansion",
+      "selectors": [
+        "室"
+      ],
+      "activities": [
+        "social",
+        "marriage",
+        "travel",
+        "relocation",
+        "commerce",
+        "study"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0396b19-20",
+      "source_excerpt": "諸事並不宜作",
+      "meaning": "下卷室宿本段列端严事后，称诸事并不宜作；服务六类事项保留此限制，不输出伤害性例外。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "諸事並不宜作"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_37",
+      "layer": "lower_mansion",
+      "selectors": [
+        "壁"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "caution",
+      "locator": "T21n1299_p0396b21",
+      "source_excerpt": "不宜南行",
+      "meaning": "下卷壁宿不宜南行，仅为方向条件。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "向南出行",
+      "activity_detail_any_of": [
+        "southbound_journey"
+      ],
+      "source_excerpts": [
+        "不宜南行"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_38",
+      "layer": "lower_mansion",
+      "selectors": [
+        "壁"
+      ],
+      "activities": [
+        "marriage"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396b22",
+      "source_excerpt": "嫁娶婚姻",
+      "meaning": "下卷壁宿宜嫁娶婚姻。",
+      "volume": "lower",
+      "applicability": "topic_level",
+      "topic_condition": null,
+      "activity_detail_any_of": [],
+      "source_excerpts": [
+        "嫁娶婚姻"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_39",
+      "layer": "lower_mansion",
+      "selectors": [
+        "奎"
+      ],
+      "activities": [
+        "travel"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396b25",
+      "source_excerpt": "遠行進路",
+      "meaning": "下卷奎宿宜远行进路；不推广为一切短程活动。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "远行进路",
+      "activity_detail_any_of": [
+        "long_distance_journey"
+      ],
+      "source_excerpts": [
+        "遠行進路"
+      ]
+    },
+    {
+      "rule_id": "t1299_lower_mansion_40",
+      "layer": "lower_mansion",
+      "selectors": [
+        "娄"
+      ],
+      "activities": [
+        "commerce"
+      ],
+      "assessment": "favorable",
+      "locator": "T21n1299_p0396b26-27",
+      "source_excerpt": "出賣",
+      "meaning": "下卷娄宿有出卖宜文。",
+      "volume": "lower",
+      "applicability": "activity_detail_required",
+      "topic_condition": "出售行为",
+      "activity_detail_any_of": [
+        "sale",
+        "sale_livestock",
+        "sale_lactating_livestock"
+      ],
+      "source_excerpts": [
+        "出賣"
+      ]
+    }
+  ],
+  "conjunction_doctrine": {
+    "id": "t1299_lunar_conjunction_doctrine_v1",
+    "locator": "T21n1299_p0395b09-21",
+    "groups": [
+      {
+        "id": "before_arrival_six",
+        "label": "六宿未到",
+        "members": [
+          "奎",
+          "娄",
+          "胃",
+          "昴",
+          "毕",
+          "觜"
+        ],
+        "membership_basis": "explicit_source_enumeration",
+        "locator": "T21n1299_p0395b14-15",
+        "meaning": "原文月未至宿，仍名彼宿直；没有给出可直接套用的统一角距。"
+      },
+      {
+        "id": "around_station_twelve",
+        "label": "十二宿左右合",
+        "members": [
+          "参",
+          "井",
+          "鬼",
+          "柳",
+          "星",
+          "张",
+          "翼",
+          "轸",
+          "角",
+          "亢",
+          "氐",
+          "房"
+        ],
+        "membership_basis": "explicit_source_enumeration",
+        "locator": "T21n1299_p0395b15-18",
+        "meaning": "原文临彼宿上及前后南北并取属彼宿；没有给出统一角距或矩形边界。"
+      },
+      {
+        "id": "moon_precedes_station_nine",
+        "label": "九宿如犊随母",
+        "members": [
+          "心",
+          "尾",
+          "箕",
+          "斗",
+          "女",
+          "虚",
+          "危",
+          "室",
+          "壁"
+        ],
+        "membership_basis": "inferred_remaining_nine_in_27_order_starting_at_奎",
+        "locator": "T21n1299_p0395b12-21",
+        "meaning": "原文月居宿前、宿居月后；成员为27宿序扣除前6及中12后所余9宿，原文此段未逐一列名。"
+      }
+    ],
+    "scope": "宿名对应的文献分类，不是由历日宿反推真实月亮位置；未给统一角距或钟时，不能据此平移现代天文宿界。"
+  }
+}

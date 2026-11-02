@@ -5,8 +5,9 @@ Converts Gregorian dates to Chinese sexagenary cycle (干支).
 
 from datetime import date, datetime, timedelta
 from functools import lru_cache
-from typing import Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
+from ..utils.civil_clock import utc_instant
 from ..utils.data import (
     EARTHLY_BRANCHES,
     HEAVENLY_STEMS,
@@ -18,6 +19,7 @@ from .almanac import (
     get_bazi_month_context,
     get_bazi_year,
     get_day_ganzhi,
+    get_solar_term_environment_key,
     localize_datetime,
 )
 
@@ -226,8 +228,13 @@ class BaZiCalendar:
         civil_datetime: datetime,
         timezone_name: str,
         day_pillar_strategy: str,
+        _solar_environment: Tuple[Any, ...] = (),
     ) -> Tuple[Tuple[str, str], Tuple[str, str], Tuple[str, str], Tuple[str, str]]:
-        """Cache deterministic four-pillar derivation for repeated service calls."""
+        """Cache a day/hour wall label plus a distinct physical civil instant.
+
+        Same-zone aware datetimes ignore fold in equality and hashing. The
+        public entry therefore sends a naive day/hour clock and UTC civil key.
+        """
         year = local_birth_datetime.year
         month = local_birth_datetime.month
         day = local_birth_datetime.day
@@ -284,10 +291,17 @@ class BaZiCalendar:
         local_birth_datetime = localize_datetime(birth_datetime, timezone_name)
         year_pillar, month_pillar, day_pillar, hour_pillar = (
             cls._get_four_pillars_cached(
-                local_birth_datetime,
-                localize_datetime(civil_datetime or birth_datetime, timezone_name),
+                local_birth_datetime.replace(tzinfo=None, fold=0),
+                utc_instant(
+                    localize_datetime(civil_datetime or birth_datetime, timezone_name)
+                ),
                 timezone_name,
                 day_pillar_strategy,
+                get_solar_term_environment_key(
+                    year=localize_datetime(
+                        civil_datetime or birth_datetime, timezone_name
+                    ).year
+                ),
             )
         )
         return {

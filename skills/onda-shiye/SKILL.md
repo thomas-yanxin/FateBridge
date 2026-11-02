@@ -9,7 +9,7 @@ description: 围绕工作方向、岗位、晋升、跳槽与创业角色，按�
 
 ## 共用规则与资料
 
-先读[按用户问题组织咨询](../_shared/consultation-routing.md)、[硬边界](../_shared/safety-boundaries.md)、[引擎调用](../_shared/fatebridge-engine.md)和[解读层](../_shared/onda-counsel.md)。涉及日期、阶段或变化时读[共享时间选择](../_shared/timing-selection.md)；采用八字时读[八字专题取证](../_shared/bazi-topic-evidence.md)，采用紫微时读[紫微专题取证](../_shared/ziwei-topic-evidence.md)；采用西占主题解释时读[西占证据参考](../_shared/western-topic-evidence.md)。发现入口可能为软链接，先以 `pwd -P` 解析真实目录，再读相对引用。
+先读短的[咨询核心](../_shared/consultation-core.md)。主题重叠或扩展时读[范围选择](../_shared/consultation-routing.md)；涉及阶段、日期或变化才读[时间选择](../_shared/timing-selection.md)。采用八字、紫微或西占解释时，分别定位[八字证据](../_shared/bazi-topic-evidence.md)、[紫微证据](../_shared/ziwei-topic-evidence.md)或[西占证据](../_shared/western-topic-evidence.md)的相关条目。参数、分页或 CLI 有缺口时再查[引擎参考](../_shared/fatebridge-engine.md#怎么调引擎)；表达细节按需查[解读参考](../_shared/onda-counsel.md)。软链接先解析真实目录，再读相对引用。
 
 资料使用当前聊天已确认内容，一次核对所选计算真正必要的缺项；不猜出生时刻，不把其他方法的缺项升级为必答。首次按任务选已发布 `evidence_views` 的字段：岗位方向用 `bazi_career.direction`，目标年份安排用 `target_year`，西占补证按相关时间卡及 `career` 取字段；这些是描述内卡名，不是请求参数。普通首轮严格字段投影、关闭快照；完整导出首次 `fields=null`，读同 run 交付。追问复用未变结果，只补所需新层。
 
@@ -38,3 +38,7 @@ description: 围绕工作方向、岗位、晋升、跳槽与创业角色，按�
 若实际 `top_gods` 同时返回竞争型与管理型、权重并列，且用户在比较客户沟通岗和流程管理岗，可以解释“本工具两类映射并列；若沟通岗也承担项目推进与规则落实，两类特点都可能用上”，随后用用户已给职责比较自主权、协调量和责任边界。不能只因 primary 排在前面就排除流程岗。这是现代岗位类比及条件式应用，不把它称作原典直接指定职业。
 
 若事业专项年度信号为空，紫微另返回年度四化关联本命官禄，可以交付“原专项没有年度命中；紫微增加一项与本命工作宫有关的动态连接”，再按已核对的四化解释来源说明新增议题；没有足够来源或月份依据时，仍可依据原有工作特点讨论岗位选择，把作品准备、合同条件和交接安排列为现实建议，不编最佳月份。第二方法只新增字段而没有改变本次解释时，不宣称咨询质量或预测把握提高。
+
+## 印度占星视角
+
+用户选择印占，或综合咨询中该视角能新增事业结构依据时，先读[印占取证](../_shared/vedic-evidence.md)。`astro_india_chart` 的 `career` 卡保留 D1、第十宫主和 D10；阶段问题可用 `astro_vimshottari`，以实际主／次运及对应本命宫主联系解释，不从 D10 单独编造行业、能力或晋升日期。

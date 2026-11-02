@@ -229,7 +229,26 @@ def test_knowledge_registry_full_domain_order_matches_reference_order():
         "bazi",
         "liureng",
         "qimen",
+        "heluo",
+        "canping",
+        "human_design",
     ]
+    # Original four-domain order and identities remain an exact prefix; the
+    # added domains are source-bound references, not extra legacy hover data.
+    assert [item["domain"] for item in registry["domains"][:4]] == [
+        "astro",
+        "bazi",
+        "liureng",
+        "qimen",
+    ]
+    assert all(
+        item["source"] == "xingque_hover_docs" for item in registry["domains"][:4]
+    )
+    assert all(
+        item["source"] == "fatebridge_numerology_references"
+        for item in registry["domains"][4:6]
+    )
+    assert registry["domains"][6]["source"] == "fatebridge_human_design_line_references"
 
 
 def test_export_and_knowledge_mcp_tools_return_json_strings():

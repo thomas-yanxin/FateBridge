@@ -17,7 +17,11 @@ from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.services.fengshui import assess, calculate_bazhai, calculate_minggua
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.fengshui import payload
-from tests.test_fengshui_surfaces import rest_client, without_transport
+from tests.test_fengshui_surfaces import (
+    rest_client,
+    same_run_projected_response,
+    without_transport,
+)
 
 
 def facing_only():
@@ -360,7 +364,7 @@ def test_strict_projected_analysis_works_on_real_mcp():
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
+            response = await client.call_tool(
                 "fengshui_assess",
                 {
                     **facing_only(),
@@ -373,8 +377,9 @@ def test_strict_projected_analysis_works_on_real_mcp():
                     "include_snapshot_text": False,
                 },
             )
+            return await same_run_projected_response(client, response)
 
-    result = asyncio.run(call()).structured_content
+    result = asyncio.run(call())
     assert set(result) == {"layout_analysis", "run_metadata"}
     assert set(result["layout_analysis"]) == {
         "adjustment_options",
@@ -392,6 +397,7 @@ def test_layout_uses_existing_tools_no_special_workspace_entry():
         "fengshui_bazhai",
         "fengshui_jinsuo",
         "fengshui_annual_stars",
+        "fengshui_monthly_stars",
         "fengshui_xuankong_natal",
         "fengshui_assess",
     }

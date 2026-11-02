@@ -1,0 +1,75 @@
+{
+  "ruleset_id": "zengshan_generation_v11",
+  "ruleset_version": "11.0.0",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "method": "Original PDF52-54,61-63,66,86 visually read before implementation. Live transcriptions checked only as finding aids; same-edition original governs."
+  },
+  "clauses": [
+    {
+      "id": "own-back-generation",
+      "pdf_pages": [
+        52
+      ],
+      "quote": "元神動化回頭生及化進神者二也"
+    },
+    {
+      "id": "ji-back-generation",
+      "pdf_pages": [
+        53
+      ],
+      "quote": "忌神動化回頭生化進神者二也"
+    },
+    {
+      "id": "rootless-target",
+      "pdf_pages": [
+        53,
+        54
+      ],
+      "quote": "倘若用神無根謂之元神有力亦難生"
+    },
+    {
+      "id": "directed-huan-generation",
+      "pdf_pages": [
+        86
+      ],
+      "quote": "卯木父爻動而生世又化子水回頭生"
+    },
+    {
+      "id": "calendar-injury-not-erased",
+      "pdf_pages": [
+        62,
+        63
+      ],
+      "quote": "逢傷亦傷却有待時之用"
+    },
+    {
+      "id": "calendar-conflict-needs-context",
+      "pdf_pages": [
+        66
+      ],
+      "quote": "日生月尅兼看生扶日尅月生等查沖尅"
+    }
+  ],
+  "textual_issues": [
+    {
+      "id": "ji-advance-not-transcribed-retreat",
+      "pdf_page": 53,
+      "scan": "忌神動化回頭生化進神者二也",
+      "transcription": "忌神动化回头生扶退神者二也",
+      "action": "Preserve earlier frozen transcription/profile notes; generation rule uses the explicit back-generation phrase, not the disputed advance/retreat word."
+    },
+    {
+      "id": "support-not-total-strength",
+      "pdf_pages": [
+        52,
+        54,
+        86
+      ],
+      "action": "Source can generate despite a calendar injury without being globally unopposed. Target void/timing or rootlessness remains a separate receiving condition. No success or medical-outcome grade."
+    }
+  ],
+  "scope": "Own transformed support qualifies original outgoing generation under specified gates; no transformed cross-position actor. Explicit original/source/target void, monthly break, binding, back-control and competing controls remain visible. Groundless loops cannot create a root. Source can-generate is distinct from globally supported/unopposed strength and target current benefit. Whole causal arbitration not established."
+}

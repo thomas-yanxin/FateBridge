@@ -3,9 +3,21 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
+from fatebridge.core.timing_carriers import timing_carrier_snapshot_lines
 from fatebridge.services.snapshot_builders import (
     render_snapshot_lines as _render_snapshot_text,
 )
+from fatebridge.utils.formatting import format_clock_datetime
+
+
+def _dayun_start_age_lines(info: Dict[str, Any]) -> List[str]:
+    raw = info.get("start_age_unrounded")
+    if raw is None:
+        return [f"起运年龄：{info.get('start_age', '未知')}"]
+    return [
+        f"起运年龄：{info.get('start_age', '未知')}（未舍入值向上取整，至少1岁，仅展示）",
+        f"起运折算年龄：{raw!r}（未舍入）；{info.get('start_age_precise', '未知')}（两位展示）",
+    ]
 
 
 def _format_location_line(
@@ -173,8 +185,8 @@ def _build_liuyue_snapshot_text(
     query_lines = [
         f"姓名：{person_name or '未提供'}",
         f"分析时刻：{analysis_date.strftime('%Y-%m-%d %H:%M')}",
-        f"出生时间：{birth_datetime.strftime('%Y-%m-%d %H:%M')}",
-        f"归一时间：{normalized_birth_datetime.strftime('%Y-%m-%d %H:%M')}",
+        f"出生时间：{format_clock_datetime(birth_datetime)}",
+        f"归一时间：{format_clock_datetime(normalized_birth_datetime)}",
         f"时区：{timezone_name}",
         f"分析日节气：{current_term} -> {next_term}",
         f"摘要：{summary}",
@@ -248,6 +260,62 @@ def _build_liuyue_snapshot_text(
     )
 
 
+def _birth_range_snapshot_lines(data: Optional[Dict[str, Any]]) -> List[str]:
+    if data is None:
+        return []
+    candidates = data.get("current_dayun_candidates") or []
+    status_labels = {"before_dayun": "尚未起运", "beyond_calculation": "超出已配置期数"}
+    labels = [
+        item.get("pillar")
+        or status_labels.get(item.get("status"), item.get("status", "不可用"))
+        for item in candidates
+    ]
+    candidate_text = "、".join(labels)
+    if data.get("dayun_assessment_status") == "unavailable_missing_gender":
+        candidate_text = "未计算（顺逆所需性别未提供）"
+    lines = [
+        f"已声明出生时间范围：±{data['uncertainty_minutes']}分钟；逐分钟核对{data['sample_count']}个输入",
+        f"本命四柱候选数：{len(data.get('pillars_candidates') or [])}",
+        f"当前大运候选：{candidate_text}",
+        "下列单盘和时运摘要对应名义出生输入；范围敏感时须结合全部候选解读。",
+        "采样数量不是概率，逐分钟核对未证明采样间秒级无变化。",
+    ]
+    if data.get("event_analysis") is not None:
+        lines.append(
+            f"另核对{data.get('additional_event_probe_count', 0)}个派生事件探针；"
+            "无分钟样本的事件候选也须保留，探针频次不是概率，派生微秒不认证出生记录。"
+        )
+        lines.append(
+            "事件括区间不是物理精度；全部连续候选、交运状态与边界极值仍未认证。"
+        )
+        if data["event_analysis"].get("unresolved_event_orders"):
+            lines.append("校正钟面与节令事件存在未决顺序，不能只选其中一种解释。")
+    if data.get("dayun_event_analysis") is not None:
+        lines.append(
+            f"大运历法事件探针{data.get('dayun_event_probe_count', 0)}个；"
+            "公历月长、闰日裁剪与未来跳时或回拨可使交运边界跳变，须保留尚未起运、相邻期数等全部状态；连续极值仍未认证。计算覆盖期数不是寿命估计。"
+        )
+        kinds = {e.get("kind") for e in data["dayun_event_analysis"].get("events", [])}
+        names = [
+            label
+            for kind, label in (
+                ("dayun_analysis_moment", "分析时刻逆像"),
+                ("dayun_decade_leap_clip", "十年闰日裁剪"),
+                ("dayun_future_civil_fold_end", "未来回拨结束"),
+            )
+            if kind in kinds
+        ]
+        if names:
+            lines.append("本次实际核对的补充事件：" + "、".join(names) + "。")
+        if data["dayun_event_analysis"].get("unresolved_cells"):
+            lines.append("大运事件分区存在未决项，已核对点未证明整段候选完整。")
+    if data.get("boundary_ranges_vary"):
+        lines.append(
+            "交运边界随出生输入变化，已核对探针的起止包络见birth_time_sensitivity.dayun_boundary_ranges；未认证连续极值。"
+        )
+    return lines
+
+
 def _build_dayun_snapshot_text(
     *,
     person_name: Optional[str],
@@ -258,22 +326,28 @@ def _build_dayun_snapshot_text(
     dayun_info: Optional[Dict[str, Any]],
     element_effects: Dict[str, Any],
     summary: str,
+    birth_time_sensitivity: Optional[Dict[str, Any]] = None,
 ) -> str:
     query_lines = [
         f"姓名：{person_name or '未提供'}",
         f"分析年龄：{analysis_age}",
-        f"出生时间：{birth_datetime.strftime('%Y-%m-%d %H:%M')}",
-        f"归一时间：{normalized_birth_datetime.strftime('%Y-%m-%d %H:%M')}",
+        f"出生时间：{format_clock_datetime(birth_datetime)}",
+        f"归一时间：{format_clock_datetime(normalized_birth_datetime)}",
         f"时区：{timezone_name}",
         f"摘要：{summary}",
     ]
-    if dayun_info:
+    query_lines.extend(_birth_range_snapshot_lines(birth_time_sensitivity))
+    if dayun_info and dayun_info.get("status"):
+        dayun_lines = [f"大运状态：{dayun_info.get('message', '本次未选出大运')}"]
+    elif dayun_info:
         dayun_lines = [
             f"当前大运：{dayun_info.get('pillar', dayun_info.get('current_dayun', '未知'))}",
             f"大运干支：{dayun_info.get('stem', '未知')}{dayun_info.get('branch', '未知')}",
-            f"起运年龄：{dayun_info.get('start_age', '未知')}",
+            *_dayun_start_age_lines(dayun_info),
             f"累计行运年数(起运至今)：{dayun_info.get('dayun_age', '未知')}",
             f"本运已行年数：{dayun_info.get('years_in_period', '未知')}",
+            f"选运依据：{dayun_info.get('selection_basis', '未知')}",
+            f"本运起止（含起不含止）：{dayun_info.get('start_at', '未知')} -> {dayun_info.get('end_at', '未知')}",
         ]
     else:
         dayun_lines = ["当前大运：不可用"]
@@ -316,8 +390,8 @@ def _build_liunian_snapshot_text(
     query_lines = [
         f"姓名：{person_name or '未提供'}",
         f"目标年份：{target_year}",
-        f"出生时间：{birth_datetime.strftime('%Y-%m-%d %H:%M')}",
-        f"归一时间：{normalized_birth_datetime.strftime('%Y-%m-%d %H:%M')}",
+        f"出生时间：{format_clock_datetime(birth_datetime)}",
+        f"归一时间：{format_clock_datetime(normalized_birth_datetime)}",
         f"时区：{timezone_name}",
         f"摘要：{summary}",
     ]
@@ -370,8 +444,8 @@ def _build_liuri_snapshot_text(
     query_lines = [
         f"姓名：{person_name or '未提供'}",
         f"分析时刻：{analysis_date.strftime('%Y-%m-%d %H:%M')}",
-        f"出生时间：{birth_datetime.strftime('%Y-%m-%d %H:%M')}",
-        f"归一时间：{normalized_birth_datetime.strftime('%Y-%m-%d %H:%M')}",
+        f"出生时间：{format_clock_datetime(birth_datetime)}",
+        f"归一时间：{format_clock_datetime(normalized_birth_datetime)}",
         f"时区：{timezone_name}",
         f"分析日节气：{current_term} -> {next_term}",
         f"摘要：{summary}",
@@ -427,8 +501,8 @@ def _build_liushi_snapshot_text(
     query_lines = [
         f"姓名：{person_name or '未提供'}",
         f"分析时刻：{analysis_date.strftime('%Y-%m-%d %H:%M')}",
-        f"出生时间：{birth_datetime.strftime('%Y-%m-%d %H:%M')}",
-        f"归一时间：{normalized_birth_datetime.strftime('%Y-%m-%d %H:%M')}",
+        f"出生时间：{format_clock_datetime(birth_datetime)}",
+        f"归一时间：{format_clock_datetime(normalized_birth_datetime)}",
         f"时区：{timezone_name}",
         f"分析日节气：{current_term} -> {next_term}",
         f"摘要：{summary}",
@@ -489,8 +563,8 @@ def _build_jieqi_timeline_snapshot_text(
     query_lines = [
         f"姓名：{person_name or '未提供'}",
         f"目标年份：{target_year}",
-        f"出生时间：{birth_datetime.strftime('%Y-%m-%d %H:%M')}",
-        f"归一时间：{normalized_birth_datetime.strftime('%Y-%m-%d %H:%M')}",
+        f"出生时间：{format_clock_datetime(birth_datetime)}",
+        f"归一时间：{format_clock_datetime(normalized_birth_datetime)}",
         f"时区：{timezone_name}",
         f"节点数量：{len(jieqi_timeline)}",
         f"摘要：{summary}",
@@ -536,6 +610,8 @@ def _build_comprehensive_timing_snapshot_text(
     liushi_info: Dict[str, Any],
     combined_effects: Dict[str, Any],
     summary: str,
+    birth_time_sensitivity: Optional[Dict[str, Any]] = None,
+    interaction_analysis: Optional[Dict[str, Any]] = None,
 ) -> str:
     current_term = (analysis_calendar_context.get("current_solar_term") or {}).get(
         "name", "未知"
@@ -547,12 +623,13 @@ def _build_comprehensive_timing_snapshot_text(
         f"姓名：{person_name or '未提供'}",
         f"分析时刻：{analysis_date.strftime('%Y-%m-%d %H:%M')}",
         f"当前年龄：{current_age}",
-        f"出生时间：{birth_datetime.strftime('%Y-%m-%d %H:%M')}",
-        f"归一时间：{normalized_birth_datetime.strftime('%Y-%m-%d %H:%M')}",
+        f"出生时间：{format_clock_datetime(birth_datetime)}",
+        f"归一时间：{format_clock_datetime(normalized_birth_datetime)}",
         f"时区：{timezone_name}",
         f"分析日节气：{current_term} -> {next_term}",
         f"摘要：{summary}",
     ]
+    query_lines.extend(_birth_range_snapshot_lines(birth_time_sensitivity))
 
     if dayun_info.get("error"):
         dayun_lines = [f"当前大运：{dayun_info['error']}"]
@@ -560,9 +637,11 @@ def _build_comprehensive_timing_snapshot_text(
         dayun_lines = [
             f"当前大运：{dayun_info.get('current_dayun', '未知')}",
             f"大运干支：{dayun_info.get('stem', '未知')}{dayun_info.get('branch', '未知')}",
-            f"起运年龄：{dayun_info.get('start_age', '未知')}",
+            *_dayun_start_age_lines(dayun_info),
             f"累计行运年数(起运至今)：{dayun_info.get('dayun_age', '未知')}",
             f"本运已行年数：{dayun_info.get('years_in_period', '未知')}",
+            f"选运依据：{dayun_info.get('selection_basis', '未知')}",
+            f"本运起止（含起不含止）：{dayun_info.get('start_at', '未知')} -> {dayun_info.get('end_at', '未知')}",
             f"概览：{dayun_info.get('summary', '无')}",
         ]
 
@@ -587,6 +666,7 @@ def _build_comprehensive_timing_snapshot_text(
         "来源：FateBridge 离线综合时运分析",
         "引用：fatebridge.analysis.timing_effects / comprehensive_timing_analysis",
     ]
+    impact_lines.extend(timing_carrier_snapshot_lines(interaction_analysis or {}))
     return _render_snapshot_text(
         [
             ("查询信息", query_lines),

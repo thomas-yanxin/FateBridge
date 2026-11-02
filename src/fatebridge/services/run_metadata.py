@@ -17,10 +17,6 @@ from uuid import uuid4
 DEFAULT_ENGINE = "fatebridge-offline"
 
 
-def _utc_timestamp() -> str:
-    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-
-
 def _enqueue_children(queue: Deque[Any], values: Iterable[Any]) -> None:
     for value in values:
         if isinstance(value, (dict, list, tuple)):
@@ -63,19 +59,22 @@ def resolve_runtime_engine(payload: Dict[str, Any]) -> str:
 
 
 def engine_is_approximate(engine: str) -> bool:
-    """Whether an astro result fell back to the offline approximation engine.
+    """Whether the engine name itself declares an approximation.
 
     Lets an agent branch on degraded precision without string-matching the
     backend name or the Chinese precision label. Non-astro tools report
     ``DEFAULT_ENGINE`` and are deterministic in their own domain, so they are
     not "approximate"; only the orbital-approximation and mixed-precision astro
-    backends are flagged.
+    backends are flagged here. Actual ephemeris and Feng Shui calendar
+    resolution records are checked separately in ``attach_run_metadata``.
     """
     lowered = engine.lower()
     return "approximate" in lowered or lowered.startswith("mixed")
 
 
-_DOWNGRADED_EPHEMERIS_MODELS = frozenset({"moshier", "mixed"})
+_DOWNGRADED_EPHEMERIS_MODELS = frozenset(
+    {"moshier", "mixed", "fatebridge_analytic_solar_v1"}
+)
 
 
 def _ephemeris_is_downgraded(payload: Dict[str, Any]) -> bool:
@@ -112,6 +111,34 @@ def _ephemeris_is_downgraded(payload: Dict[str, Any]) -> bool:
     return False
 
 
+def _fengshui_calendar_is_approximate(payload: Dict[str, Any]) -> bool:
+    """Use actual solar-term resolution records, not dependency availability.
+
+    Only called for Feng Shui tools. Statistical WMM uncertainty and caller
+    evidence are not a degraded calendar provider. This also covers birth-date
+    boundaries and historical house-period endpoints, not just annual layers.
+    """
+    queue: Deque[Any] = deque([payload])
+    seen: Set[int] = set()
+    while queue:
+        current = queue.popleft()
+        if isinstance(current, dict):
+            if id(current) in seen:
+                continue
+            seen.add(id(current))
+            if (
+                current.get("approximate") is True
+                and isinstance(current.get("provider"), str)
+                and isinstance(current.get("moment"), str)
+                and "precision_scope" in current
+            ):
+                return True
+            _enqueue_children(queue, current.values())
+        elif isinstance(current, (list, tuple)):
+            _enqueue_children(queue, current)
+    return False
+
+
 def attach_run_metadata(
     payload: Dict[str, Any],
     *,
@@ -124,16 +151,20 @@ def attach_run_metadata(
     run_id = uuid4().hex
     trace_id = uuid4().hex
     engine = resolve_runtime_engine(payload)
-    # Approximate if the resolved engine name says so OR the actual ephemeris
-    # model silently downgraded to Moshier (engine_backend/precision can't show
-    # that — see _ephemeris_is_downgraded).
-    approximate = engine_is_approximate(engine) or _ephemeris_is_downgraded(payload)
+    approximate = (
+        engine_is_approximate(engine)
+        or _ephemeris_is_downgraded(payload)
+        or (
+            tool_name.startswith("fengshui_")
+            and _fengshui_calendar_is_approximate(payload)
+        )
+    )
     enriched = dict(payload)
     enriched["run_metadata"] = {
         "run_id": run_id,
         "trace_id": trace_id,
         "tool_name": tool_name,
-        "generated_at": _utc_timestamp(),
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "engine": engine,
         "engine_is_approximate": approximate,
     }

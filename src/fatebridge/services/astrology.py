@@ -5,14 +5,19 @@ FateBridge astrology services.
 from __future__ import annotations
 
 from collections import Counter
+from dataclasses import replace
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from fatebridge.core import guolao_moira
 from fatebridge.core.astro.birth import AstroBirthInfo, build_astro_birth_info
 from fatebridge.core.astro.chart import build_core_chart_payload, build_midpoint_payload
+from fatebridge.core.astro.reference import NODE_BODIES
 from fatebridge.core.astro.relationship import build_relative_payload
 from fatebridge.core.astrology_tables import SIGN_LABELS_ZH
 from fatebridge.core.export_parser import parse_export_content
+from fatebridge.core.guolao_birth_clock import coherent_guolao_solar_call
+from fatebridge.core.jyotish_sources import coherent_india_call
 from fatebridge.services.snapshot_builders import (
     render_snapshot_text as _render_snapshot_text,
 )
@@ -205,6 +210,17 @@ def _format_degree(value: Any) -> str:
         return "—"
 
 
+def _format_zodiac_degree(value: Any) -> str:
+    """A sign-relative display must never promote the coordinate to 30°."""
+    try:
+        degree = float(value) % 30.0
+        if degree < 30 and round(degree, 2) == 30:
+            return "29.99…°"
+        return _format_degree(degree)
+    except (TypeError, ValueError):
+        return "—"
+
+
 def _build_balance_line(balance: Dict[str, Any], labels: Dict[str, str]) -> str:
     ordered_keys = [key for key in labels if key in balance]
     if not ordered_keys:
@@ -215,7 +231,7 @@ def _build_balance_line(balance: Dict[str, Any], labels: Dict[str, str]) -> str:
 def _build_house_lines(houses: List[Dict[str, Any]]) -> str:
     return (
         "\n".join(
-            f"第{item['house']}宫：{item['sign_zh']} {_format_degree(item['cusp_longitude'])}"
+            f"第{item['house']}宫：{item['sign_zh']} {_format_zodiac_degree(item['cusp_longitude'])}"
             for item in houses
         ).strip()
         or "无"
@@ -227,8 +243,8 @@ def _build_angle_lines(angles: Dict[str, Any]) -> str:
     midheaven = angles.get("midheaven", {})
     return "\n".join(
         [
-            f"Asc：{ascendant.get('sign_zh', '未知')} {_format_degree(ascendant.get('longitude'))}",
-            f"MC：{midheaven.get('sign_zh', '未知')} {_format_degree(midheaven.get('longitude'))}",
+            f"Asc：{ascendant.get('sign_zh', '未知')} {_format_zodiac_degree(ascendant.get('longitude'))}",
+            f"MC：{midheaven.get('sign_zh', '未知')} {_format_zodiac_degree(midheaven.get('longitude'))}",
         ]
     ).strip()
 
@@ -238,9 +254,14 @@ def _build_planet_lines(planets: List[Dict[str, Any]]) -> str:
     for item in planets:
         extras: List[str] = []
         dignity = item.get("dignity")
-        if dignity and dignity.get("dignity") != "peregrine":
+        if dignity and dignity.get("dignity") in {
+            "rulership",
+            "exaltation",
+            "detriment",
+            "fall",
+        }:
             extras.append(f"{dignity['status_zh']}（{dignity['dignity']}）")
-        if "sector13" in item:
+        if item.get("sector13") is not None:
             extras.append(f"13扇区 {item['sector13']}")
         if item.get("nakshatra"):
             extras.append(f"宿 {item['nakshatra']}")
@@ -249,7 +270,7 @@ def _build_planet_lines(planets: List[Dict[str, Any]]) -> str:
         extras_text = f"，{'，'.join(extras)}" if extras else ""
         lines.append(
             f"{PLANET_LABELS_ZH.get(item['id'], item['id'])}："
-            f"{item.get('sign_zh', '未知')} {_format_degree(item.get('degree_in_sign'))}，"
+            f"{item.get('sign_zh', '未知')} {_format_zodiac_degree(item.get('degree_in_sign'))}，"
             f"第{item.get('house', '—')}宫，黄纬 {_format_degree(item.get('latitude'))}"
             f"{extras_text}"
         )
@@ -272,17 +293,22 @@ def _planet_by_id(planets: List[Dict[str, Any]], planet_id: str) -> Dict[str, An
     return next((item for item in planets if item.get("id") == planet_id), {})
 
 
-def _top_balance_key(balance: Dict[str, Any]) -> Optional[str]:
+def _top_balance_keys(balance: Dict[str, Any]) -> List[str]:
     if not balance:
-        return None
-    return sorted(balance.items(), key=lambda item: (-int(item[1]), item[0]))[0][0]
+        return []
+    maximum = max(int(value) for value in balance.values())
+    return (
+        sorted(key for key, value in balance.items() if int(value) == maximum)
+        if maximum > 0
+        else []
+    )
 
 
 def _house_focus(planets: List[Dict[str, Any]]) -> List[tuple[int, int]]:
     counter = Counter(
         int(item["house"])
         for item in planets
-        if item.get("house") is not None and item.get("id") != "North Node"
+        if item.get("house") is not None and item.get("id") not in NODE_BODIES
     )
     return sorted(counter.items(), key=lambda item: (-item[1], item[0]))
 
@@ -291,7 +317,7 @@ def _sign_focus(planets: List[Dict[str, Any]]) -> List[tuple[str, int]]:
     counter = Counter(
         item["sign"]
         for item in planets
-        if item.get("sign") and item.get("id") != "North Node"
+        if item.get("sign") and item.get("id") not in NODE_BODIES
     )
     return sorted(counter.items(), key=lambda item: (-item[1], item[0]))
 
@@ -321,13 +347,22 @@ def _build_signature(planets: List[Dict[str, Any]], angles: Dict[str, Any]) -> s
 def _build_dominant_energy(
     element_balance: Dict[str, Any], modality_balance: Dict[str, Any]
 ) -> str:
-    dominant_element = _top_balance_key(element_balance)
-    dominant_modality = _top_balance_key(modality_balance)
     lines: List[str] = []
-    if dominant_element:
-        lines.append(ELEMENT_THEMES.get(dominant_element, ""))
-    if dominant_modality:
-        lines.append(MODALITY_THEMES.get(dominant_modality, ""))
+    for balance, labels, themes, category in [
+        (element_balance, ELEMENT_LABELS_ZH, ELEMENT_THEMES, "元素"),
+        (modality_balance, MODALITY_LABELS_ZH, MODALITY_THEMES, "模式"),
+    ]:
+        leaders = _top_balance_keys(balance)
+        if len(leaders) == 1:
+            leader = leaders[0]
+            lines.append(
+                f"{labels.get(leader, leader)}{category}数量最多（{balance[leader]}颗）；现代象征参考：{themes.get(leader, '')}"
+            )
+        elif leaders:
+            names = "、".join(labels.get(key, key) for key in leaders)
+            lines.append(
+                f"{names}{category}数量并列最多（各{balance[leaders[0]]}颗），保留并列。"
+            )
     return (
         " ".join(item for item in lines if item).strip() or "当前盘面主导能量尚不明显。"
     )
@@ -335,25 +370,29 @@ def _build_dominant_energy(
 
 def _build_core_identity(planets: List[Dict[str, Any]]) -> str:
     sun = _planet_by_id(planets, "Sun")
+    if not sun:
+        return "本次未返回太阳落点。"
     sign = sun.get("sign")
     trait = SIGN_INTERPRETATION.get(sign or "", {})
     house_topic = HOUSE_TOPICS.get(sun.get("house"), "个人成长议题")
     return (
         f"太阳落在{sun.get('sign_zh', '未知')}第{sun.get('house', '—')}宫，"
-        f"核心驱动力偏向{trait.get('core', '通过经验确认自我方向')}。"
-        f"很多自我实现会围绕{house_topic}展开。"
+        f"现代象征模板将其核心驱动力主题写作{trait.get('core', '自我方向')}；"
+        f"该宫的象征领域是{house_topic}。"
     )
 
 
 def _build_emotional_style(planets: List[Dict[str, Any]]) -> str:
     moon = _planet_by_id(planets, "Moon")
+    if not moon:
+        return "本次未返回月亮落点。"
     sign = moon.get("sign")
     trait = SIGN_INTERPRETATION.get(sign or "", {})
     house_topic = HOUSE_TOPICS.get(moon.get("house"), "情绪与安全感议题")
     return (
         f"月亮落在{moon.get('sign_zh', '未知')}第{moon.get('house', '—')}宫，"
-        f"{trait.get('emotion', '情绪处理方式会深刻影响日常节奏')}。"
-        f"安全感通常与{house_topic}强相关。"
+        f"现代情绪与安全感象征模板为：{trait.get('emotion', '情绪处理方式')}；"
+        f"该宫的象征领域是{house_topic}。"
     )
 
 
@@ -361,12 +400,20 @@ def _build_social_style(planets: List[Dict[str, Any]], angles: Dict[str, Any]) -
     ascendant = angles.get("ascendant", {})
     midheaven = angles.get("midheaven", {})
     asc_trait = SIGN_INTERPRETATION.get(ascendant.get("sign") or "", {})
+    mc_trait = SIGN_INTERPRETATION.get(midheaven.get("sign") or "", {})
     mc_topic = HOUSE_TOPICS.get(10, "事业与公众方向")
-    return (
-        f"上升{ascendant.get('sign_zh', '未知')}让你在外界面前更容易呈现出"
-        f"{asc_trait.get('persona', '鲜明的个人风格')}。"
-        f"MC落在{midheaven.get('sign_zh', '未知')}，说明{mc_topic}里会带着这类气质被看见。"
-    )
+    lines = []
+    if ascendant:
+        lines.append(
+            f"上升{ascendant.get('sign_zh', '未知')}的现代外在呈现象征是："
+            f"{asc_trait.get('persona', '个人风格')}。"
+        )
+    if midheaven:
+        lines.append(
+            f"MC落在{midheaven.get('sign_zh', '未知')}，在{mc_topic}的象征读法中，"
+            f"对应{mc_trait.get('core', '公众方向的主题')}。"
+        )
+    return "".join(lines) or "本次未返回上升或MC落点。"
 
 
 def _build_relationship_pattern(planets: List[Dict[str, Any]]) -> str:
@@ -376,14 +423,20 @@ def _build_relationship_pattern(planets: List[Dict[str, Any]]) -> str:
     mars_trait = SIGN_INTERPRETATION.get(mars.get("sign") or "", {})
     venus_topic = HOUSE_TOPICS.get(venus.get("house"), "关系与价值议题")
     mars_topic = HOUSE_TOPICS.get(mars.get("house"), "行动与欲望议题")
-    return (
-        f"金星在{venus.get('sign_zh', '未知')}第{venus.get('house', '—')}宫，"
-        f"{venus_trait.get('relationship', '会通过关系中的价值感表达喜欢')}，"
-        f"而且往往会把心力投向{venus_topic}。"
-        f"火星在{mars.get('sign_zh', '未知')}第{mars.get('house', '—')}宫，"
-        f"行动时更容易走向{mars_trait.get('core', '直接推进目标')}，"
-        f"尤其在{mars_topic}上表现明显。"
-    )
+    lines = []
+    if venus:
+        lines.append(
+            f"金星在{venus.get('sign_zh', '未知')}第{venus.get('house', '—')}宫，"
+            f"现代关系象征参考：{venus_trait.get('relationship', '关系中的价值感')}；"
+            f"该宫领域为{venus_topic}。"
+        )
+    if mars:
+        lines.append(
+            f"火星在{mars.get('sign_zh', '未知')}第{mars.get('house', '—')}宫，"
+            f"现代行动象征参考：{mars_trait.get('core', '推进目标')}；"
+            f"该宫领域为{mars_topic}。"
+        )
+    return "".join(lines) or "本次未返回金星或火星落点。"
 
 
 def _build_life_focus(planets: List[Dict[str, Any]]) -> str:
@@ -391,37 +444,40 @@ def _build_life_focus(planets: List[Dict[str, Any]]) -> str:
     sign_focus = _sign_focus(planets)
     lines: List[str] = []
     if house_focus:
-        top_houses = house_focus[:2]
+        top_houses = [
+            (house, count) for house, count in house_focus if count == house_focus[0][1]
+        ]
         topics = _format_topic_list(
             [HOUSE_TOPICS.get(house, f"第{house}宫议题") for house, _ in top_houses]
         )
         labels = "、".join(f"第{house}宫({count})" for house, count in top_houses)
-        lines.append(f"盘面重心偏向{labels}，说明{topics}会反复成为人生主轴。")
+        lines.append(f"星体本体数量最多的宫位为{labels}；现代象征领域为{topics}。")
     if sign_focus and sign_focus[0][1] >= 3:
-        sign_name = sign_focus[0][0]
-        sign_label = SIGN_INTERPRETATION.get(sign_name, {})
+        top_signs = [name for name, count in sign_focus if count == sign_focus[0][1]]
         lines.append(
-            f"{SIGN_LABELS_ZH.get(sign_name, sign_name)}能量聚集较多，整个人会更明显地表现出"
-            f"{sign_label.get('core', '这一星座的核心气质')}。"
+            "、".join(SIGN_LABELS_ZH.get(name, name) for name in top_signs)
+            + f"的星体本体数量并列最多（各{sign_focus[0][1]}颗）。"
+            if len(top_signs) > 1
+            else f"{SIGN_LABELS_ZH.get(top_signs[0], top_signs[0])}的星体本体数量最多（{sign_focus[0][1]}颗）。"
         )
     north_node = _planet_by_id(planets, "North Node")
     if north_node:
         node_topic = HOUSE_TOPICS.get(north_node.get("house"), "长期成长课题")
         lines.append(
             f"北交点落在{north_node.get('sign_zh', '未知')}第{north_node.get('house', '—')}宫，"
-            f"长期成长往往要朝{node_topic}持续打开。"
+            f"现代成长象征参考为{node_topic}。"
         )
     return " ".join(lines).strip() or "盘面焦点较平均，需要结合现实阶段观察重心。"
 
 
 def _build_aspect_pattern(aspects: List[Dict[str, Any]]) -> str:
     if not aspects:
-        return "显著相位较少，很多主题更像通过整体配置慢慢展开。"
+        return "本次容许度政策下没有返回主相位命中。"
 
-    top_aspect = aspects[0]
+    top_aspect = min(aspects, key=lambda item: float(item["orb"]))
     aspect_name = top_aspect.get("aspect")
     top_line = (
-        f"最强主相位是{PLANET_LABELS_ZH.get(top_aspect.get('planet_a'), top_aspect.get('planet_a'))}"
+        f"偏离精确角度最小的主相位是{PLANET_LABELS_ZH.get(top_aspect.get('planet_a'), top_aspect.get('planet_a'))}"
         f"与{PLANET_LABELS_ZH.get(top_aspect.get('planet_b'), top_aspect.get('planet_b'))}"
         f"的{ASPECT_LABELS_ZH.get(aspect_name, aspect_name)}，"
         f"容许度{_format_degree(top_aspect.get('orb'))}。"
@@ -436,12 +492,88 @@ def _build_aspect_pattern(aspects: List[Dict[str, Any]]) -> str:
         1 for item in aspects if item.get("aspect") in CHALLENGING_ASPECTS
     )
     if tension_count > harmony_count:
-        tone = "整体相位张力略强，成长通常来自摩擦、决断和重新分配能量。"
+        tone = f"所列相位中张力类{tension_count}条、协调类{harmony_count}条；张力类条数较多。"
     elif harmony_count > tension_count:
-        tone = "整体相位协同感更好，很多优势在顺势发挥时会很自然地出现。"
+        tone = f"所列相位中协调类{harmony_count}条、张力类{tension_count}条；协调类条数较多。"
     else:
-        tone = "盘面中的顺流与阻力比较均衡，关键在于何时推进、何时收束。"
-    return f"{top_line}{aspect_meaning} {tone}"
+        tone = f"所列相位中协调类与张力类条数相同（各{harmony_count}条）。"
+    return f"{top_line}现代象征参考：{aspect_meaning} {tone}"
+
+
+def _build_ptolemy_sign_reading(payload: Dict[str, Any]) -> Optional[str]:
+    layer = payload.get("classical", {}).get("ptolemy", {})
+    if layer.get("status") != "computed_subset":
+        return None
+    pair = next(
+        (
+            p
+            for p in layer.get("sign_relationships", [])
+            if {p["planet_a"], p["planet_b"]} == {"Sun", "Moon"}
+        ),
+        None,
+    )
+    if pair is None:
+        return None
+    facts = []
+    if pair["same_sign"]:
+        facts.append("位于同一星座")
+    if pair["sign_aspect"]:
+        quality = {"harmonious": "和谐类", "disharmonious": "不和谐类"}[
+            pair["aspect_quality"]
+        ]
+        facts.append(f"按I.13构成{ASPECT_LABELS_ZH[pair['sign_aspect']]}（{quality}）")
+    if pair["commanding_sign"]:
+        facts.append(
+            f"按I.14，{SIGN_LABELS_ZH[pair['commanding_sign']]}为命令方、{SIGN_LABELS_ZH[pair['obeying_sign']]}为服从方"
+        )
+    if pair["beholding_equal_power"]:
+        facts.append("按I.15属于相互注视、等力关系")
+    if pair["disjunct"]:
+        facts.append("按I.16排除其他亲缘关系后属于离隔")
+    return (
+        f"Robbins 1940《四书》I.13–16：{PLANET_LABELS_ZH[pair['planet_a']]}所在的{SIGN_LABELS_ZH[pair['sign_a']]}"
+        f"与{PLANET_LABELS_ZH[pair['planet_b']]}所在的{SIGN_LABELS_ZH[pair['sign_b']]}，"
+        + "；".join(facts)
+        + "。此层按星座关系计算。"
+    )
+
+
+def _build_ptolemy_term_reading(payload: Dict[str, Any]) -> Optional[str]:
+    """Report returned term ownership; never turn it into an outcome or score."""
+    classical = payload.get("classical", {})
+    layer = classical.get("ptolemy", {})
+    if layer.get("status") != "computed_subset":
+        return None
+    lines = []
+    for name, planet in layer.get("planets", {}).items():
+        terms = planet.get("terms") or {}
+        if not terms:
+            continue
+        owners = []
+        for system, label in (
+            ("egyptian", "埃及界"),
+            ("chaldaean", "迦勒底界"),
+            ("ptolemaic", "托勒密界"),
+        ):
+            term = terms.get(system)
+            if term is not None:
+                owners.append(
+                    f"{label}主{PLANET_LABELS_ZH[term['lord']]}"
+                    f"[{term['start_degree']},{term['end_degree']})°"
+                )
+        lines.append(
+            f"{PLANET_LABELS_ZH[name]}在{SIGN_LABELS_ZH[planet['sign']]}："
+            + "、".join(owners)
+        )
+    if not lines:
+        return None
+    sect = {"day": "昼盘", "night": "夜盘"}[classical["sect"]]
+    return (
+        f"Robbins 1940《四书》I.20–21（纸本表，{sect}）："
+        + "；".join(lines)
+        + "。区间含起点、不含终点，按未舍入黄经归界；三种表分别列示，"
+        "界主表示该位置的传统归属，不据此推断整体强弱或现实事件。"
+    )
 
 
 def _build_development_advice(
@@ -449,15 +581,10 @@ def _build_development_advice(
     element_balance: Dict[str, Any],
     modality_balance: Dict[str, Any],
 ) -> str:
-    dominant_element = _top_balance_key(element_balance)
-    dominant_modality = _top_balance_key(modality_balance)
     north_node = _planet_by_id(planets, "North Node")
     sign_trait = SIGN_INTERPRETATION.get(north_node.get("sign") or "", {})
     advice_parts: List[str] = []
-    if dominant_element:
-        advice_parts.append(ELEMENT_THEMES.get(dominant_element, ""))
-    if dominant_modality:
-        advice_parts.append(MODALITY_THEMES.get(dominant_modality, ""))
+    advice_parts.append(_build_dominant_energy(element_balance, modality_balance))
     if north_node:
         advice_parts.append(
             f"成长建议可以特别参考北交点：往{sign_trait.get('growth', '更成熟地承担长期课题')}"
@@ -484,7 +611,7 @@ def _build_variant_note(payload: Dict[str, Any], chart_variant: str) -> Optional
             or "无"
         )
         return (
-            f"希腊盘补充信息显示这是{hellenistic.get('sect', '未知')}盘，"
+            f"希腊盘补充信息显示这是{ {'day': '日', 'night': '夜'}.get(hellenistic.get('sect'), '未知') }盘，"
             f"上升主星为{ascendant_ruler}，角宫星体有{angular_planets}。"
         )
     if chart_variant == "india_chart":
@@ -495,9 +622,14 @@ def _build_variant_note(payload: Dict[str, Any], chart_variant: str) -> Optional
             f"Ayanamsha约为{_format_degree(india.get('ayanamsha'))}。"
         )
     if chart_variant == "chart13":
+        if (
+            payload.get("sector_profile", {}).get("status")
+            == "underdetermined_ascendant"
+        ):
+            return "角度模型无法解析唯一上升点，13等分扇区未定；后端约定值仅保留在sector_profile及sector13_evidence中供复核，不构成实际落区。"
         return (
-            f"13扇区盘把生命经验进一步切成{len(payload.get('thirteen_sectors', []))}个细段，"
-            "适合拿来观察能量落点的细部分区。"
+            f"13等分扇区以实际上升为起点，分为{len(payload.get('thirteen_sectors', []))}个等宽区间；"
+            "sector13是几何落区，不是IAU天文星座，也未建立独立的性格或事件解释规则。"
         )
     if chart_variant == "guolao_chart":
         guolao = payload.get("guolao", {})
@@ -517,6 +649,11 @@ def _build_chart_interpretation(
     element_balance = payload.get("element_balance", {})
     modality_balance = payload.get("modality_balance", {})
     interpretation = {
+        "evidence_scope": (
+            "以下现代象征模板绑定已返回星体、宫位和相位；原典关系另列，现实建议另列。"
+            "classical 为多来源规则；classical.ptolemy 仅覆盖所列原典章节，"
+            "不代表原典全文验收或现实预测已验证。"
+        ),
         "signature": _build_signature(planets, angles),
         "dominant_energy": _build_dominant_energy(element_balance, modality_balance),
         "core_identity": _build_core_identity(planets),
@@ -532,7 +669,30 @@ def _build_chart_interpretation(
     variant_note = _build_variant_note(payload, chart_variant)
     if variant_note:
         interpretation["variant_note"] = variant_note
+    original_text = _build_ptolemy_sign_reading(payload)
+    if original_text:
+        interpretation["original_text_relations"] = original_text
+    terms = _build_ptolemy_term_reading(payload)
+    if terms:
+        interpretation["original_text_terms"] = terms
     return interpretation
+
+
+def _chart_calculation_notes(payload: Dict[str, Any]) -> List[str]:
+    notes: List[str] = []
+    for field in (
+        "ephemeris_reference_points",
+        "angle_definition",
+        "house_axis_convention",
+        "house_position_projection",
+        "orbital_fallback",
+        "fixed_stars",
+    ):
+        qualification = payload.get("chart_profile", {}).get(field) or {}
+        note = qualification.get("note_zh")
+        if note and note not in notes:
+            notes.append(note)
+    return notes
 
 
 def _build_chart_summary(
@@ -558,23 +718,111 @@ def _build_chart_summary(
     ]
     if interpretation.get("variant_note"):
         lines.append(interpretation["variant_note"])
+    if interpretation.get("original_text_relations"):
+        lines.append(interpretation["original_text_relations"])
+    if interpretation.get("original_text_terms"):
+        lines.append(interpretation["original_text_terms"])
     return lines
 
 
 def _augment_core_chart_reading(
     payload: Dict[str, Any], chart_variant: str
 ) -> Dict[str, Any]:
+    if chart_variant == "guolao_chart":
+        from fatebridge.core.guolao import reading
+
+        return reading(payload)
     interpretation = _build_chart_interpretation(payload, chart_variant)
+    planet_paths = {
+        planet["id"]: f"planets.{index}"
+        for index, planet in enumerate(payload.get("planets", []))
+    }
+
+    def refs(*names: str) -> List[str]:
+        return [planet_paths[name] for name in names if name in planet_paths]
+
+    # These paths let a host bind quotations to this run's receipt. They are
+    # dependencies of deterministic templates, not a semantic grade for prose.
+    sources = {
+        "signature": refs("Sun", "Moon") + ["angles.ascendant"],
+        "dominant_energy": ["element_balance", "modality_balance"],
+        "core_identity": refs("Sun"),
+        "emotional_style": refs("Moon"),
+        "social_style": ["angles.ascendant", "angles.midheaven"],
+        "relationship_pattern": refs("Venus", "Mars"),
+        "life_focus": ["planets"],
+        "aspect_pattern": ["aspects"],
+        "development_advice": ["element_balance", "modality_balance"]
+        + refs("North Node"),
+    }
+    if "original_text_relations" in interpretation:
+        sources["original_text_relations"] = [
+            "classical.ptolemy.sign_relationships",
+            "classical.ptolemy.sign_relationship_policy",
+        ]
+    if "original_text_terms" in interpretation:
+        sources["original_text_terms"] = [
+            "classical.ptolemy.planets",
+            "classical.ptolemy.term_policy",
+            "classical.ptolemy.term_source_url",
+            "classical.ptolemy.term_transcription_note",
+            "classical.sect",
+        ]
+    if "variant_note" in interpretation:
+        sources["variant_note"] = {
+            "hellen_chart": ["hellenistic"],
+            "india_chart": ["india"],
+            "chart13": ["thirteen_sectors", "sector_profile"],
+        }.get(chart_variant, ["chart_profile"])
+    for key in ("signature", "social_style"):
+        for qualification in (
+            "angle_definition",
+            "house_axis_convention",
+            "house_position_projection",
+        ):
+            if payload.get("chart_profile", {}).get(qualification) is not None:
+                sources[key].append(f"chart_profile.{qualification}")
+    summary = _build_chart_summary(
+        chart_variant,
+        interpretation,
+        engine_precision=payload.get("chart_profile", {}).get(
+            "engine_precision", "approximate_orbital_model"
+        ),
+    )
+    for note in _chart_calculation_notes(payload):
+        if note not in summary:
+            summary.append(note)
     return {
         "interpretation": interpretation,
-        "summary": _build_chart_summary(
-            chart_variant,
-            interpretation,
-            engine_precision=payload.get("chart_profile", {}).get(
-                "engine_precision",
-                "approximate_orbital_model",
-            ),
-        ),
+        "interpretation_evidence": {
+            key: {
+                "source_paths": paths,
+                "kind": (
+                    "practical_suggestion"
+                    if key == "development_advice"
+                    else (
+                        "primary_text_rule_interpretation"
+                        if key in {"original_text_relations", "original_text_terms"}
+                        else (
+                            "calculation_summary"
+                            if key in {"signature", "variant_note"}
+                            else "modern_symbolic_template"
+                        )
+                    )
+                ),
+                "policy_id": (
+                    "ptolemy_robbins_sign_relations_v1"
+                    if key == "original_text_relations"
+                    else (
+                        "ptolemy_robbins_printed_terms_v1"
+                        if key == "original_text_terms"
+                        else "modern_symbolic_templates_v2"
+                    )
+                ),
+            }
+            for key, paths in sources.items()
+        },
+        "summary": summary,
     }
 
 
@@ -598,16 +846,21 @@ def _build_classical_lines(payload: Dict[str, Any]) -> str:
     if not planets:
         return "无"
     lines: List[str] = []
+    if classical.get("solar_condition_policy"):
+        lines.append(
+            "太阳条件采用Lilly 1647第113页明文：日心≤17′、焦伤<8.5°且同星座、日下<17°；原页10°示例与8.5°定义的冲突尚未解决。"
+        )
     for planet in _CLASSICAL_PLANET_ORDER:
         entry = planets.get(planet)
         if not entry:
             continue
         essential = entry.get("essential") or {}
-        labels = essential.get("labels_zh") or ["平"]
-        score = essential.get("score", 0)
+        labels = essential.get("labels_zh") or ["未列本质尊贵标签"]
+        score = essential.get("score")
+        score_text = f"{score:+d}" if isinstance(score, int) else "分值待定"
         parts = [
             PLANET_LABELS_ZH.get(planet, planet),
-            f"{'·'.join(labels)}({score:+d})",
+            f"{'·'.join(labels)}({score_text})",
             _ANGULARITY_ZH.get(entry.get("angularity"), ""),
         ]
         if entry.get("sect_placement") == "of_sect":
@@ -664,7 +917,7 @@ def _build_lots_lines(payload: Dict[str, Any]) -> str:
         disp = PLANET_LABELS_ZH.get(lot.get("dispositor"), lot.get("dispositor") or "—")
         almuten = PLANET_LABELS_ZH.get(lot.get("almuten"), lot.get("almuten") or "—")
         lines.append(
-            f"{lot.get('cn', '?')} {sign_zh}{_format_degree(lot.get('degree_in_sign'))}"
+            f"{lot.get('cn', '?')} {sign_zh}{_format_zodiac_degree(lot.get('degree_in_sign'))}"
             f" 主{disp} 力主{almuten}"
         )
     return "\n".join(lines).strip()
@@ -712,11 +965,17 @@ def _build_classical_patterns_lines(payload: Dict[str, Any]) -> str:
             lines.append(f"{zh(planet)}：{'　'.join(parts)}")
     for hand in patterns.get("translation_of_light", []):
         lines.append(
-            f"光的传递：{zh(hand['translator'])} 自 {zh(hand['from'])} 递光至 {zh(hand['to'])}"
+            f"光的传递（结构候选）：{zh(hand['translator'])} 自 {zh(hand['from'])} 递光至 {zh(hand['to'])}"
         )
     for gather in patterns.get("collection_of_light", []):
         sources = "、".join(zh(p) for p in gather["from"])
-        lines.append(f"光的聚集：{zh(gather['collector'])} 聚 {sources} 之光")
+        lines.append(
+            f"光的聚集（结构候选）：{zh(gather['collector'])} 聚 {sources} 之光"
+        )
+    if patterns.get("light_configuration_policy"):
+        lines.append(
+            "传光／聚光已核对传统轻重次序与当前入出相；真实先后、接纳、阻碍／折返及完整Lilly成事条件尚未核验，不能据候选断成败。"
+        )
     bending = patterns.get("nodal_bending", [])
     if bending:
         side_zh = {"north": "北弯", "south": "南弯"}
@@ -726,6 +985,37 @@ def _build_classical_patterns_lines(payload: Dict[str, Any]) -> str:
                 f"{zh(b['planet'])}{side_zh.get(b['bending'], b['bending'])}"
                 for b in bending
             )
+        )
+    policy = patterns.get("application_policy", {})
+    if policy.get("rule_id") == "instantaneous_longitude_phase_v1":
+        phase_zh = {
+            "applying": "入相",
+            "separating": "出相",
+            "exact": "精确成相",
+            "stationary": "相对黄经同速",
+            "unavailable": "速度未知",
+        }
+        motion = patterns.get("aspect_motion", [])
+
+        def motion_line(row: Dict[str, Any]) -> str:
+            line = f"{zh(row['planet_a'])}—{zh(row['planet_b'])} {row['aspect']} {phase_zh[row['phase']]}"
+            if row["aspect"] == "conjunction":
+                condition = row.get("ptolemy_latitude_condition", {})
+                label = {
+                    "same_hemisphere": "I.24黄纬同侧条件满足",
+                    "opposite_hemispheres": "I.24黄纬异侧，不满足该条条件",
+                    "missing_latitude": "I.24黄纬条件缺项",
+                }.get(condition.get("status"))
+                if label:
+                    line += f"（{label}）"
+            return line
+
+        if motion:
+            lines.append(
+                "相位运动（瞬时黄经）：" + "；".join(motion_line(row) for row in motion)
+            )
+        lines.append(
+            "入出相仅按当前黄经与相对速度判定；精确、同速及速度未知分别列示。合相黄纬同侧条件在逐项证据中单列（可为缺项），未检验未来成相及完整原典条件。"
         )
     return "\n".join(lines).strip()
 
@@ -778,7 +1068,7 @@ _FIGURIS_POINT_ZH = {
     "Moon": "月",
     "Ascendant": "命",
     "fortune": "福",
-    "syzygy": "朔",
+    "syzygy": "朔望",
 }
 _SYZYGY_TYPE_ZH = {"new": "新月", "full": "满月"}
 
@@ -814,13 +1104,24 @@ def _build_almuten_figuris_line(payload: Dict[str, Any]) -> str:
         type_zh = _SYZYGY_TYPE_ZH.get(syzygy_type, syzygy_type)
         sign_zh = SIGN_LABELS_ZH.get(sign, sign)
         lines.append(
-            f"朔望：{type_zh} {sign_zh}{_format_degree(syzygy.get('degree_in_sign'))}"
+            f"朔望：{type_zh} {sign_zh}{_format_zodiac_degree(syzygy.get('degree_in_sign'))}"
         )
+        if (syzygy.get("ephemeris_source") or {}).get("models_stable") is False:
+            lines.append("朔望搜索发生星历模型切换；请结合来源回执读取。")
+        representation = syzygy.get("utc_representation") or {}
+        if representation.get("datetime_representable") is False:
+            lines.append(
+                "朔望采用扩展纪年或特殊UTC标签；Python日期表示受限，"
+                "已保留TT／UT1及计算星位。"
+            )
     return "\n".join(lines).strip()
 
 
 def _build_fixed_stars_lines(payload: Dict[str, Any]) -> str:
     """``[恒星]`` section: each catalogue star conjunct a chart point (orb ≤ 1°)."""
+    profile = payload.get("chart_profile", {}).get("fixed_stars") or {}
+    if profile.get("status") == "unavailable":
+        return profile.get("note_zh") or "恒星层未计算"
     hits = payload.get("fixed_stars")
     if not isinstance(hits, list) or not hits:
         return "无"
@@ -831,6 +1132,17 @@ def _build_fixed_stars_lines(payload: Dict[str, Any]) -> str:
         nature = "/".join(
             PLANET_LABELS_ZH.get(planet, planet) for planet in hit.get("nature", [])
         )
+        if hit.get("nature_components"):
+            qualifiers = {
+                "unqualified": "",
+                "lesser_degree": "（较轻程度）",
+                "some_degree": "（一定程度）",
+            }
+            nature = "/".join(
+                PLANET_LABELS_ZH.get(item["planet"], item["planet"])
+                + qualifiers[item["qualifier"]]
+                for item in hit["nature_components"]
+            )
         lines.append(
             f"{hit.get('cn', '')}({hit.get('star', '?')}) 合 {point}"
             f" {_format_degree(hit.get('orb'))}　[{nature}]"
@@ -850,6 +1162,12 @@ def _build_planetary_hours_line(payload: Dict[str, Any]) -> str:
     return (
         f"生时主星：{hour_ruler}（{period}第{hours.get('hour_number', '?')}时）"
         f"  当日主星：{day_ruler_zh}"
+        + (
+            "\n口径：以含标准折射的太阳中心日出／日落划分不等时。"
+            if hours.get("sunrise_convention")
+            == "apparent_solar_center_sea_level_1013.25hPa_0C"
+            else ""
+        )
     )
 
 
@@ -870,14 +1188,29 @@ def _build_standard_chart_snapshot_sections(
         f"宫制：{chart_profile.get('house_system_label_zh', chart_profile.get('house_system', '未知'))}",
         f"精度层：{chart_profile.get('engine_precision', '未知')}",
     ]
+    info_lines.extend(_chart_calculation_notes(payload))
+    if clock := person_info.get("clock_conversion"):
+        clock_label = (
+            "地方平太阳时"
+            if clock["input_clock_basis"] == "local_mean_solar"
+            else "地方真太阳时"
+        )
+        info_lines.append(
+            f"声明的输入钟时：{clock['input_wall_datetime']}（{clock_label}）"
+        )
 
     detail_lines = [
+        interpretation.get("evidence_scope", ""),
         f"元素分布：{_build_balance_line(payload.get('element_balance', {}), ELEMENT_LABELS_ZH)}",
         f"模式分布：{_build_balance_line(payload.get('modality_balance', {}), MODALITY_LABELS_ZH)}",
         f"人格签名：{interpretation.get('signature', '无')}",
         f"主导能量：{interpretation.get('dominant_energy', '无')}",
         f"人生重心：{interpretation.get('life_focus', '无')}",
     ]
+    if interpretation.get("original_text_relations"):
+        detail_lines.append(interpretation["original_text_relations"])
+    if interpretation.get("original_text_terms"):
+        detail_lines.append(interpretation["original_text_terms"])
 
     if chart_variant == "chart13":
         detail_lines.append(f"13扇区数量：{len(payload.get('thirteen_sectors', []))}")
@@ -894,6 +1227,9 @@ def _build_standard_chart_snapshot_sections(
 
     india = payload.get("india", {})
     if chart_variant == "india_chart":
+        info_lines.append(
+            "印占证据使用独立 Parashari 规则；通用古典、元素和西占角度相位段仅保留为历史参考。"
+        )
         detail_lines.extend(
             [
                 f"Ayanamsha：{_format_degree(india.get('ayanamsha'))}",
@@ -901,12 +1237,29 @@ def _build_standard_chart_snapshot_sections(
                 f"月宿：{india.get('moon_nakshatra', '未知')}",
             ]
         )
+        detail_lines.append(
+            f"印占状态：{india.get('status', 'legacy')}；规则：{india.get('ruleset_id', '未计算核心')}"
+        )
+        for chart_name, chart in india.get("charts", {}).items():
+            detail_lines.append(
+                f"{chart_name} 上升：{chart['ascendant']['sign_zh']}（该分盘整宫起点）"
+            )
+            for planet in chart["planets"]:
+                detail_lines.append(
+                    f"{chart_name} {planet['label_zh']}：{planet['sign_zh']} {_format_zodiac_degree(planet['degree_in_sign'])}，第{planet['house']}宫，尊贵状态 {planet['dignity']['state']}"
+                )
+        for source in india.get("rulesets", []):
+            detail_lines.append(f"印占来源：{source['title']} {source['url']}")
+        if "birth_time_sensitivity" in india:
+            detail_lines.append(
+                f"生时敏感性：{india['birth_time_sensitivity']['status']}；{india['birth_time_sensitivity']['limitation']}"
+            )
 
     greek_lines = ["无"]
     lot_of_fortune = hellenistic.get("lot_of_fortune")
     if isinstance(lot_of_fortune, dict):
         greek_lines = [
-            f"福点：{lot_of_fortune.get('sign_zh', '未知')} {_format_degree(lot_of_fortune.get('degree_in_sign'))}，第{lot_of_fortune.get('house', '—')}宫"
+            f"福点：{lot_of_fortune.get('sign_zh', '未知')} {_format_zodiac_degree(lot_of_fortune.get('degree_in_sign'))}，第{lot_of_fortune.get('house', '—')}宫"
         ]
 
     return [
@@ -960,29 +1313,99 @@ def _build_guolao_snapshot_sections(payload: Dict[str, Any]) -> List[tuple[str, 
         f"时区：{person_info.get('birth_timezone', '未提供')}",
         f"经纬度：{_format_degree(person_info.get('birth_longitude'))} / {_format_degree(person_info.get('birth_latitude'))}",
         f"黄道：{chart_profile.get('zodiac_label_zh', chart_profile.get('zodiac', '未知'))}",
-        f"宫制：{chart_profile.get('house_system_label_zh', chart_profile.get('house_system', '未知'))}",
+        f"天文参考宫制：{chart_profile.get('house_system_label_zh', chart_profile.get('house_system', '未知'))}；功能十二宫另按安命逆布",
+        interpretation.get("signature", "未返回安命解释"),
+        interpretation.get("core_identity", ""),
     ]
 
     star_lines = [
-        f"{PLANET_LABELS_ZH.get(item['id'], item['id'])}："
-        f"{item.get('sign_zh', '未知')} {_format_degree(item.get('degree_in_sign'))}，"
-        f"第{item.get('house', '—')}宫，二十八宿 {item.get('su28', '未知')}"
-        for item in payload.get("planets", [])
+        f"{item['name_zh']}：黄经 {_format_degree(item['longitude'])}，"
+        f"{item['palace_branch']}宫（宫主{item['palace_lord']}），"
+        f"研究宿位{item['mansion']['su28']} {_format_degree(item['mansion']['degree_in_mansion'])}，"
+        f"度主{item['mansion']['degree_lord']}"
+        for item in guolao.get("bodies", [])
     ]
+    if input_clock := guolao.get("profile", {}).get("input_clock"):
+        setup_lines[3] = (
+            "输入钟制："
+            + (
+                "地方平太阳时"
+                if input_clock["input_clock_basis"] == "local_mean_solar"
+                else "地方真太阳时"
+            )
+            + "；不视为民用时区"
+        )
+        setup_lines.append(interpretation["input_clock"])
+    if interpretation.get("reference_geometry"):
+        setup_lines.append(interpretation["reference_geometry"])
 
     shensha_lines = [
         f"星期主星：{PLANET_LABELS_ZH.get(guolao.get('weekday_ruler', ''), guolao.get('weekday_ruler', '未知'))}",
         f"月宿：{guolao.get('moon_mansion', '未知')}",
-        f"人格签名：{interpretation.get('signature', '无')}",
-        f"盘面重心：{interpretation.get('life_focus', '无')}",
-        f"成长建议：{interpretation.get('development_advice', '无')}",
+        f"底本贵人及岁驾宫支：{guolao.get('god_positions', {}).get('branches', {})}",
+        "天贵对应天乙昼贵，玉贵对应玉堂夜贵；年干支暂按立春换年。",
     ]
+    timing = guolao.get("timing", {})
+    timing_sections = []
+    if timing.get("status") == "research_partial":
+        timing_sections.append(
+            (
+                "目标时刻小限与十一曜研究位置",
+                "\n".join(
+                    [
+                        interpretation.get("timing", ""),
+                        *(
+                            [interpretation["month_limit"]]
+                            if "month_limit" in interpretation
+                            else []
+                        ),
+                        f"换年钟面：{timing['calendar_datetime']}（{timing['calendar_timezone']}）；天文计算保留同一目标瞬间。",
+                        *[
+                            f"{b['name_zh']}：所选黄道黄经{_format_degree(b['zodiac_longitude'])}，"
+                            f"{b['palace_branch']}宫，{b['mansion']['su28']} "
+                            f"{_format_degree(b['mansion']['degree_in_mansion'])}，"
+                            f"临本命{b['natal_functional_palace']}"
+                            for b in timing["transit_bodies"]
+                        ],
+                        *timing["limitations"],
+                    ]
+                ),
+            )
+        )
 
     return [
         ("起盘信息", "\n".join(setup_lines).strip()),
+        (
+            "安命与十二功能宫",
+            "\n".join(
+                [
+                    interpretation.get("signature", "未返回安命解释"),
+                    interpretation.get("core_identity", ""),
+                    *[
+                        f"{p['palace']}：{p['branch']}宫，宫主{p['lord']}"
+                        for p in guolao.get("palaces", [])
+                    ],
+                ]
+            ),
+        ),
         ("七政四余宫位与二十八宿星曜", "\n".join(star_lines).strip() or "无"),
         ("神煞", "\n".join(shensha_lines).strip()),
         ("政余格局", guolao_moira.build_section_text(guolao.get("moira_patterns", []))),
+        *timing_sections,
+        ("计算对应解读", "\n".join(interpretation.values())),
+        (
+            "规则与验收",
+            "\n".join(
+                [
+                    "研究口径：" + guolao.get("lunar_mansion_system", "未知"),
+                    *[
+                        r["title"] + "：" + r["source_url"]
+                        for r in guolao.get("rulesets", [])
+                    ],
+                    *guolao.get("validation", {}).get("limitations", []),
+                ]
+            ),
+        ),
     ]
 
 
@@ -1015,16 +1438,27 @@ def _build_birth_info(payload: Dict[str, Any]) -> AstroBirthInfo:
         birth_day=payload["birth_day"],
         birth_hour=payload["birth_hour"],
         birth_minute=payload.get("birth_minute", 0),
+        birth_second=payload.get("birth_second", 0),
+        birth_microsecond=payload.get("birth_microsecond", 0),
+        birth_clock_basis=payload.get("birth_clock_basis", "civil"),
         birth_timezone=payload.get("birth_timezone"),
         birth_longitude=payload.get("birth_longitude"),
         birth_latitude=payload.get("birth_latitude"),
         name=payload.get("name"),
         birth_place=payload.get("birth_place"),
         use_true_solar_time=payload.get("use_true_solar_time", False),
+        preserve_instant=payload.get("preserve_instant", False),
+        require_resolved_timezone=payload.get("require_resolved_timezone", True),
+        solar_clock_ephemeris_policy=payload.get(
+            "solar_clock_ephemeris_policy", "auto"
+        ),
+        allow_native_solar_epoch=payload.get("allow_native_solar_epoch", False),
     )
 
 
 @calculation_guard("核心星盘分析")
+@coherent_india_call
+@coherent_guolao_solar_call
 def calculate_core_chart_analysis(
     *,
     birth_year: int,
@@ -1035,6 +1469,9 @@ def calculate_core_chart_analysis(
     birth_latitude: Optional[float],
     chart_variant: str = "chart",
     birth_minute: int = 0,
+    birth_second: int = 0,
+    birth_microsecond: int = 0,
+    birth_clock_basis: str = "civil",
     birth_timezone: Optional[str] = None,
     name: Optional[str] = None,
     birth_place: Optional[str] = None,
@@ -1042,6 +1479,16 @@ def calculate_core_chart_analysis(
     hsys: Optional[int] = None,
     zodiacal: Optional[int] = None,
     use_true_solar_time: bool = False,
+    node_mode: str = "mean",
+    ephemeris_policy: str = "auto",
+    saptavargaja_profile: str = "santhanam_27",
+    drekkana_profile: str = "santhanam_27_6",
+    cheshta_model: str = "unadjudicated",
+    divisions: Optional[List[int]] = None,
+    birth_time_uncertainty_minutes: Optional[float] = None,
+    analysis_datetime: Optional[datetime] = None,
+    guolao_month_basis: Optional[str] = None,
+    guolao_seasonal_anchor_policy: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Build an offline core astrology chart family payload.
@@ -1049,6 +1496,82 @@ def calculate_core_chart_analysis(
     Core charts prefer a local Swiss Ephemeris runtime when available and fall
     back to the bundled approximate orbital model when it is not.
     """
+    if guolao_seasonal_anchor_policy is not None:
+        from fatebridge.core.guolao_anchor_days import POLICIES
+
+        if chart_variant != "guolao_chart":
+            raise ValueError(
+                "guolao_seasonal_anchor_policy requires chart_variant=guolao_chart"
+            )
+        if guolao_seasonal_anchor_policy not in POLICIES:
+            raise ValueError("Unknown guolao_seasonal_anchor_policy")
+        if guolao_seasonal_anchor_policy in POLICIES[1:] and not (
+            use_true_solar_time or birth_clock_basis == "local_apparent_solar"
+        ):
+            raise ValueError(
+                "Solar-day anchors require an apparent clock: use_true_solar_time=true or explicit LAT input"
+            )
+    if guolao_month_basis is not None and (
+        chart_variant != "guolao_chart" or analysis_datetime is None
+    ):
+        raise ValueError(
+            "guolao_month_basis requires chart_variant=guolao_chart and analysis_datetime"
+        )
+    if guolao_month_basis is not None and guolao_month_basis not in {
+        "jie_month",
+        "chinese_lunar_utc8",
+    }:
+        raise ValueError("guolao_month_basis must be jie_month or chinese_lunar_utc8")
+    if chart_variant != "india_chart" and drekkana_profile != "santhanam_27_6":
+        raise ValueError("drekkana_profile requires chart_variant=india_chart")
+    if birth_clock_basis != "civil" and chart_variant not in {
+        "germany",
+        "chart13",
+        "india_chart",
+        "guolao_chart",
+    }:
+        raise ValueError(
+            "Noncivil birth_clock_basis requires chart_variant=germany, chart13, india_chart or guolao_chart"
+        )
+    if birth_second and chart_variant not in {
+        "germany",
+        "chart13",
+        "india_chart",
+        "guolao_chart",
+    }:
+        raise ValueError(
+            "nonzero birth_second requires chart_variant=germany, chart13, india_chart or guolao_chart"
+        )
+    if birth_microsecond and chart_variant not in {"india_chart", "guolao_chart"}:
+        raise ValueError(
+            "nonzero birth_microsecond requires chart_variant=india_chart or guolao_chart"
+        )
+    if chart_variant == "germany":
+        return calculate_germany_chart_analysis(
+            birth_year=birth_year,
+            birth_month=birth_month,
+            birth_day=birth_day,
+            birth_hour=birth_hour,
+            birth_minute=birth_minute,
+            birth_second=birth_second,
+            birth_clock_basis=birth_clock_basis,
+            birth_longitude=birth_longitude,
+            birth_latitude=birth_latitude,
+            birth_timezone=birth_timezone,
+            name=name,
+            birth_place=birth_place,
+            gender=gender,
+            hsys=hsys,
+            zodiacal=zodiacal,
+            use_true_solar_time=use_true_solar_time,
+            birth_time_uncertainty_minutes=birth_time_uncertainty_minutes,
+            analysis_datetime=analysis_datetime,
+        )
+
+    if analysis_datetime is not None and chart_variant != "guolao_chart":
+        raise ValueError(
+            "analysis_datetime requires chart_variant=germany or guolao_chart"
+        )
     if chart_variant not in SUPPORTED_CHART_VARIANTS:
         raise ValueError(
             f"不支持的 chart_variant: {chart_variant}。"
@@ -1062,21 +1585,87 @@ def calculate_core_chart_analysis(
             "birth_day": birth_day,
             "birth_hour": birth_hour,
             "birth_minute": birth_minute,
+            "birth_second": birth_second,
+            "birth_clock_basis": birth_clock_basis,
             "birth_timezone": birth_timezone,
             "birth_longitude": birth_longitude,
             "birth_latitude": birth_latitude,
             "name": name,
             "birth_place": birth_place,
-            "use_true_solar_time": use_true_solar_time,
+            "use_true_solar_time": (
+                False
+                if chart_variant == "guolao_chart"
+                or (chart_variant == "india_chart" and birth_clock_basis == "civil")
+                else use_true_solar_time
+            ),
+            "preserve_instant": chart_variant in {"guolao_chart", "india_chart"},
+            "require_resolved_timezone": True,
+            "allow_native_solar_epoch": chart_variant == "guolao_chart",
+            "birth_microsecond": birth_microsecond,
+            "solar_clock_ephemeris_policy": (
+                ephemeris_policy if chart_variant == "india_chart" else "auto"
+            ),
         }
+    )
+    if chart_variant == "guolao_chart":
+        # Guolao derives its solar clock from its actual Sun/UT1 later. The
+        # legacy constructor's independent display is unused and can fail
+        # before that valid calculation. Keep only the requested clock policy.
+        birth_info = replace(birth_info, applied_true_solar=use_true_solar_time)
+    if chart_variant == "india_chart":
+        from fatebridge.core.jyotish_display import normalize_solar_display
+
+        birth_info, _ = normalize_solar_display(
+            birth_info, ephemeris_policy, requested=use_true_solar_time
+        )
+    anchor_options: Dict[str, Any] = (
+        {"guolao_seasonal_anchor_policy": guolao_seasonal_anchor_policy}
+        if guolao_seasonal_anchor_policy is not None
+        else {}
     )
     result = build_core_chart_payload(
         birth_info,
         chart_variant,
         hsys=hsys,
         zodiacal=zodiacal,
+        **anchor_options,
     )
+    if chart_variant == "guolao_chart":
+        from fatebridge.core.guolao_timing import enrich_guolao_timing
+
+        enrich_guolao_timing(
+            result,
+            birth_info,
+            analysis_datetime,
+            zodiacal=zodiacal,
+            month_basis=guolao_month_basis,
+        )
     result.update(_augment_core_chart_reading(result, chart_variant))
+    if chart_variant == "india_chart":
+        from fatebridge.core.jyotish import validate_clock
+        from fatebridge.services.jyotish import enrich_india_chart
+
+        validate_clock(birth_info.local_datetime, "解析后的出生时刻")
+        enrich_india_chart(
+            result,
+            birth_info,
+            node_mode=node_mode,
+            ephemeris_policy=ephemeris_policy,
+            saptavargaja_profile=saptavargaja_profile,
+            drekkana_profile=drekkana_profile,
+            cheshta_model=cheshta_model,
+            divisions=divisions,
+            birth_time_uncertainty_minutes=birth_time_uncertainty_minutes,
+        )
+    if chart_variant == "chart13":
+        from fatebridge.core.astro.sensitivity import enrich_specialty_sensitivity
+
+        enrich_specialty_sensitivity(
+            result,
+            birth_info,
+            kind="chart13",
+            uncertainty_minutes=birth_time_uncertainty_minutes,
+        )
     result.update(_build_chart_snapshot(result, chart_variant))
     return result
 
@@ -1088,9 +1677,11 @@ def calculate_germany_chart_analysis(
     birth_month: int,
     birth_day: int,
     birth_hour: int,
-    birth_longitude: float,
-    birth_latitude: float,
+    birth_longitude: Optional[float],
+    birth_latitude: Optional[float],
     birth_minute: int = 0,
+    birth_second: int = 0,
+    birth_clock_basis: str = "civil",
     birth_timezone: Optional[str] = None,
     name: Optional[str] = None,
     birth_place: Optional[str] = None,
@@ -1098,6 +1689,8 @@ def calculate_germany_chart_analysis(
     hsys: Optional[int] = None,
     zodiacal: Optional[int] = None,
     use_true_solar_time: bool = False,
+    birth_time_uncertainty_minutes: Optional[float] = None,
+    analysis_datetime: Optional[datetime] = None,
 ) -> Dict[str, Any]:
     """
     Build the FateBridge midpoint/germany chart payload.
@@ -1109,6 +1702,8 @@ def calculate_germany_chart_analysis(
             "birth_day": birth_day,
             "birth_hour": birth_hour,
             "birth_minute": birth_minute,
+            "birth_second": birth_second,
+            "birth_clock_basis": birth_clock_basis,
             "birth_timezone": birth_timezone,
             "birth_longitude": birth_longitude,
             "birth_latitude": birth_latitude,
@@ -1117,11 +1712,23 @@ def calculate_germany_chart_analysis(
             "use_true_solar_time": use_true_solar_time,
         }
     )
-    return build_midpoint_payload(
+    result = build_midpoint_payload(
         birth_info,
         hsys=hsys,
         zodiacal=zodiacal,
     )
+    from fatebridge.core.astro.sensitivity import enrich_specialty_sensitivity
+
+    enrich_specialty_sensitivity(
+        result,
+        birth_info,
+        kind="germany",
+        uncertainty_minutes=birth_time_uncertainty_minutes,
+    )
+    from fatebridge.core.astro.solar_arc import enrich_solar_arc
+
+    enrich_solar_arc(result, birth_info, analysis_datetime)
+    return result
 
 
 @calculation_guard("关系星盘分析")
@@ -1130,15 +1737,15 @@ def calculate_relative_chart_analysis(
     inner_payload: Dict[str, Any],
     outer_payload: Dict[str, Any],
     relative_mode: Any = None,
-    hsys: int = 8,
+    hsys: int = 3,
     zodiacal: int = 0,
     relationship_focus: Any = None,
+    davison_variant: str = "uncorrected",
 ) -> Dict[str, Any]:
     """
     Build synastry/composite payloads for two parties.
 
-    ``hsys`` defaults to equal_mc (8), matching the natal/suzhan/otherbu charts so
-    a person's natal and relative charts agree on the house system.
+    ``hsys`` defaults to Placidus (3), matching both published request forms.
     """
     inner_birth = _build_birth_info(inner_payload)
     outer_birth = _build_birth_info(outer_payload)
@@ -1149,6 +1756,7 @@ def calculate_relative_chart_analysis(
         hsys=hsys,
         zodiacal=zodiacal,
         relationship_focus=relationship_focus,
+        davison_variant=davison_variant,
     )
     if isinstance(payload, dict) and "error" not in payload:
         # Allowlist the relationship-facing summary; the raw inner/outer/
@@ -1160,6 +1768,7 @@ def calculate_relative_chart_analysis(
                 "relationship_profile",
                 "synastry_aspects",
                 "compatibility",
+                "compatibility_evidence",
                 "summary",
             )
             if key in payload

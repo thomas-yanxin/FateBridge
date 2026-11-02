@@ -1,0 +1,247 @@
+{
+  "method_id": "month_duty_cross_chapter_identity_v1",
+  "source": {
+    "id": "sanming_tiangan_cadal06066038",
+    "title": "三命通會·卷二·論天干陰陽生死",
+    "author": "明·萬民英",
+    "edition_as_holding_metadata": "欽定四庫全書本，浙江大学图书馆／CADAL06066038",
+    "url": "https://archive.org/details/06066038.cn",
+    "pdf_url": "https://archive.org/download/06066038.cn/06066038.cn.pdf",
+    "source_pdf_sha256": "af4a8ca65cc4dfdf63d6294adc7925a868214563d0d52664c7ba779b833db14a",
+    "source_pdf_pages": 232,
+    "chapter_original_pdf_pages": [
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35
+    ],
+    "retained_context_original_pdf_pages": [
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36
+    ],
+    "chapter_start": "原PDF9右起第5栏題論天干陰陽生死，接或問十干有陰陽剛柔生死之分",
+    "chapter_end": "原PDF35同耶看命者當以前說為是，後題論地支；原PDF36保留下一章開頭",
+    "review_status": "same_developer_visual_collation_not_independent_expert",
+    "coverage": "完整章及十干段、章末議論均已目讀；只轉錄所列錨句，不聲稱整章逐字轉錄或全書檢索窮盡。"
+  },
+  "chapter_coverage": {
+    "opening_pages": [
+      9,
+      10
+    ],
+    "stem_paragraph_pages": {
+      "甲": [
+        10,
+        11,
+        12
+      ],
+      "乙": [
+        12,
+        13
+      ],
+      "丙": [
+        13,
+        14,
+        15
+      ],
+      "丁": [
+        15,
+        16,
+        17
+      ],
+      "戊": [
+        17,
+        18
+      ],
+      "己": [
+        19,
+        20
+      ],
+      "庚": [
+        20,
+        21,
+        22
+      ],
+      "辛": [
+        22,
+        23,
+        24
+      ],
+      "壬": [
+        24,
+        25,
+        26
+      ],
+      "癸": [
+        26,
+        27,
+        28
+      ]
+    },
+    "closing_discussion_pages": [
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35
+    ]
+  },
+  "anchors": [
+    {
+      "id": "wu_gen_definition",
+      "original_pdf_pages": [
+        17
+      ],
+      "context": "戊土段論陽土及寅生",
+      "literal_quote": "陽火者丙火也丙生於寅寅屬艮艮為山山為剛土即戊土也賴丙火而生焉"
+    },
+    {
+      "id": "ji_qiankun_metaphor",
+      "original_pdf_pages": [
+        19
+      ],
+      "context": "己土段的乾坤媒妁比喻；沒有坤土即己的等同句",
+      "literal_quote": "天地人三才皆不可缺此土如乾坤中一媒妁陰陽失此豈能配偶故於四行無不在於四時則寄旺焉"
+    },
+    {
+      "id": "gui_shen_kun",
+      "original_pdf_pages": [
+        27
+      ],
+      "context": "癸水段的申中坤土與庚金；沒有指明坤土為戊或己",
+      "literal_quote": "至於申地三陰用事否卦司權天地不交萬物不通申中坤土庚金遂成圍堰使癸水不能流暢困於池沼無所施設"
+    },
+    {
+      "id": "soil_birth_dispute",
+      "original_pdf_pages": [
+        29
+      ],
+      "context": "章末另論土之寅生與申生等說，並非月令分日表",
+      "literal_quote": "土旺於四季火土有如母子相生所以戊隨丙臨官歸祿於巳己臨丁臨官歸祿於午戊土生於寅己土生於酉明矣若以戊生申己生卯何不以壬戊歸祿於亥癸己歸祿於子"
+    },
+    {
+      "id": "soil_body_use",
+      "original_pdf_pages": [
+        30
+      ],
+      "context": "章末區分土之體用；申坤位在這裡仍非戊己身份等式",
+      "literal_quote": "獨土一行分體用厚德載物居中不用者土之體也散於四維各旺四季土之用也體生於巳乘父之祿用生於申維母之位"
+    },
+    {
+      "id": "yin_yang_critique",
+      "original_pdf_pages": [
+        34
+      ],
+      "context": "章末以氣、質及其他引書評前說；保留不同論述層次",
+      "literal_quote": "觀此亦見甲不必主乙不必生之說矣其言足以破前說之偏而有合古人原論十干之義也"
+    },
+    {
+      "id": "closing_yin_yang_distinction",
+      "original_pdf_pages": [
+        35
+      ],
+      "context": "章末再論分陰陽，最後以看命者當以前說為是作結",
+      "literal_quote": "若不分則官煞食傷印綬梟神劫財比肩何以一物名而為二而吉凶禍福迥不同耶看命者當以前說為是"
+    }
+  ],
+  "identity_claims": [
+    {
+      "id": "gen_soil_in_wu_context",
+      "source_name": "艮土",
+      "canonical_stem": "戊",
+      "identity_status": "explicit_same_book_cross_chapter_definition",
+      "definition_anchor_ids": [
+        "wu_gen_definition"
+      ],
+      "context_anchor_ids": [
+        "soil_birth_dispute",
+        "soil_body_use",
+        "yin_yang_critique",
+        "closing_yin_yang_distinction"
+      ],
+      "application_scope": "同書戊土段明言艮山剛土即戊；作寅月艮土的跨章術語對讀。這是本輪來源解讀，並非人元章新增明文、無條件跨流派對照或有效司令判定。"
+    },
+    {
+      "id": "kun_soil_unassigned",
+      "source_name": "坤土",
+      "canonical_stem": null,
+      "identity_status": "specific_stem_not_explicit_in_reviewed_context",
+      "definition_anchor_ids": [],
+      "context_anchor_ids": [
+        "ji_qiankun_metaphor",
+        "gui_shen_kun",
+        "soil_body_use"
+      ],
+      "application_scope": "所讀兩章的坤土、乾坤媒妁及申坤位不足以唯一裁定戊或己；不從卦名陰陽推定天干。這不聲稱全書或所有原典均無明確定義。"
+    }
+  ],
+  "preserved_month_witness": {
+    "method_id": "month_duty_scanned_witness_v1",
+    "source_sha256": "d1cb39bc138af624d3dc26b9ce482dca59a22823338fbcd1d2b8157a408600f7",
+    "local_chapter_identity_values_unchanged": true
+  },
+  "interpretation_constraints": [
+    "原人元章見證中艮土、坤土的canonical_stem及透藏null保持；本層另列跨章身份及實際透藏。",
+    "同書的術語定義不使名義五日成為已採用分日曆，也不建立出生瞬間、節後日序與古日序的換算。",
+    "艮土可對讀戊仍不能使原ML02的六日戊司令符合另一章五日艮土條，不能擇源調日。",
+    "引用的土生寅／申及體用討論是來源脈絡，不採用新的長生法、藏干目錄、根力係數或免沖規則。",
+    "術語身份與原局透藏只是事實層；身印輕重、有效通關及全局旺衰仍須另有依據。"
+  ],
+  "calendar_mapping_status": "not_adopted",
+  "selected_duty_stem": null,
+  "effective_command_status": "not_adjudicated",
+  "calculation_effect": "none",
+  "independent_expert_review": "not_completed"
+}

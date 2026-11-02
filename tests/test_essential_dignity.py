@@ -1,7 +1,8 @@
 """锁定西占行星本质尊贵（庙旺落陷）判定。
 
 仅古典七曜（日月水金火木土）有本质尊贵：入庙(domicile)、入旺(exaltation)、
-落陷(detriment=庙之对宫)、失势(fall=旺之对宫)，余为平(peregrine)。天王 /
+落陷(detriment=庙之对宫)、失势(fall=旺之对宫)。此星座级摘要不计算三分、界、面，
+不能将其余情况称为peregrine。天王 /
 海王 / 冥王及交点无古典本质尊贵，记为 None。
 """
 
@@ -27,8 +28,8 @@ from fatebridge.core.astrology_tables import _opposite_sign
         ("Mars", "Cancer", "fall"),
         ("Mercury", "Sagittarius", "detriment"),  # 命主水星射手
         ("Jupiter", "Gemini", "detriment"),  # 命主木星双子
-        ("Saturn", "Taurus", "peregrine"),
-        ("Venus", "Aquarius", "peregrine"),
+        ("Saturn", "Taurus", "no_major_dignity"),
+        ("Venus", "Aquarius", "no_major_dignity"),
     ],
 )
 def test_classical_dignities(planet, sign, expected):

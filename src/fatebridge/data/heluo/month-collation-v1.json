@@ -1,0 +1,909 @@
+{
+  "corpus_id": "heluo_wenming_month_intro_collation_v1",
+  "version": "2.2.0",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "source_pdf_sha256": "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c",
+  "review_status": "single_visual_review; independent_second_review_pending",
+  "reviewed_hexagram_introductions": 64,
+  "scope": "Assigned-month labels and selected additional month clauses in hexagram introductions; not complete commentary, deTime or deTi collation. Thirteen registered natal-month/Najia phrases expose separate month-label and current-phase birth-year Najia facts. Connector scope and the Jie exception remain unresolved; a false component is not a whole-clause verdict.",
+  "assigned_months": [
+    {
+      "gua": "乾為天",
+      "month": 4,
+      "branch": "巳",
+      "page": 119
+    },
+    {
+      "gua": "坤為地",
+      "month": 10,
+      "branch": "亥",
+      "page": 122
+    },
+    {
+      "gua": "水雷屯",
+      "month": 6,
+      "branch": "未",
+      "page": 124
+    },
+    {
+      "gua": "山水蒙",
+      "month": 8,
+      "branch": "酉",
+      "page": 126
+    },
+    {
+      "gua": "水天需",
+      "month": 8,
+      "branch": "酉",
+      "page": 129
+    },
+    {
+      "gua": "天水訟",
+      "month": 2,
+      "branch": "卯",
+      "page": 131
+    },
+    {
+      "gua": "地水師",
+      "month": 7,
+      "branch": "申",
+      "page": 134
+    },
+    {
+      "gua": "水地比",
+      "month": 7,
+      "branch": "申",
+      "page": 136
+    },
+    {
+      "gua": "風天小畜",
+      "month": 11,
+      "branch": "子",
+      "page": 139
+    },
+    {
+      "gua": "火澤睽",
+      "month": 2,
+      "branch": "卯",
+      "page": 209
+    },
+    {
+      "gua": "震為雷",
+      "month": 10,
+      "branch": "亥",
+      "page": 240
+    },
+    {
+      "gua": "水澤節",
+      "month": 11,
+      "branch": "子",
+      "page": 263
+    },
+    {
+      "gua": "天澤履",
+      "month": 3,
+      "branch": "辰",
+      "page": 141
+    },
+    {
+      "gua": "地天泰",
+      "month": 1,
+      "branch": "寅",
+      "page": 144
+    },
+    {
+      "gua": "天地否",
+      "month": 7,
+      "branch": "申",
+      "page": 146
+    },
+    {
+      "gua": "天火同人",
+      "month": 1,
+      "branch": "寅",
+      "page": 149
+    },
+    {
+      "gua": "火天大有",
+      "month": 1,
+      "branch": "寅",
+      "page": 151
+    },
+    {
+      "gua": "地山謙",
+      "month": 9,
+      "branch": "戌",
+      "page": 154
+    },
+    {
+      "gua": "雷地豫",
+      "month": 5,
+      "branch": "午",
+      "page": 156
+    },
+    {
+      "gua": "澤雷隨",
+      "month": 7,
+      "branch": "申",
+      "page": 158
+    },
+    {
+      "gua": "山風蠱",
+      "month": 1,
+      "branch": "寅",
+      "page": 161
+    },
+    {
+      "gua": "地澤臨",
+      "month": 12,
+      "branch": "丑",
+      "page": 163
+    },
+    {
+      "gua": "風地觀",
+      "month": 8,
+      "branch": "酉",
+      "page": 166
+    },
+    {
+      "gua": "火雷噬嗑",
+      "month": 9,
+      "branch": "戌",
+      "page": 168
+    },
+    {
+      "gua": "山火賁",
+      "month": 11,
+      "branch": "子",
+      "page": 170
+    },
+    {
+      "gua": "山地剝",
+      "month": 9,
+      "branch": "戌",
+      "page": 173
+    },
+    {
+      "gua": "地雷復",
+      "month": 11,
+      "branch": "子",
+      "page": 175
+    },
+    {
+      "gua": "山天大畜",
+      "month": 12,
+      "branch": "丑",
+      "page": 180
+    },
+    {
+      "gua": "山雷頤",
+      "month": 8,
+      "branch": "酉",
+      "page": 182
+    },
+    {
+      "gua": "澤風大過",
+      "month": 2,
+      "branch": "卯",
+      "page": 184
+    },
+    {
+      "gua": "坎為水",
+      "month": 10,
+      "branch": "亥",
+      "page": 187
+    },
+    {
+      "gua": "離為火",
+      "month": 4,
+      "branch": "巳",
+      "page": 189
+    },
+    {
+      "gua": "澤山咸",
+      "month": 1,
+      "branch": "寅",
+      "page": 193
+    },
+    {
+      "gua": "雷風恆",
+      "month": 1,
+      "branch": "寅",
+      "page": 195
+    },
+    {
+      "gua": "天山遯",
+      "month": 6,
+      "branch": "未",
+      "page": 197
+    },
+    {
+      "gua": "雷天大壯",
+      "month": 2,
+      "branch": "卯",
+      "page": 199
+    },
+    {
+      "gua": "火地晉",
+      "month": 2,
+      "branch": "卯",
+      "page": 202
+    },
+    {
+      "gua": "地火明夷",
+      "month": 8,
+      "branch": "酉",
+      "page": 204
+    },
+    {
+      "gua": "風火家人",
+      "month": 6,
+      "branch": "未",
+      "page": 207
+    },
+    {
+      "gua": "水山蹇",
+      "month": 8,
+      "branch": "酉",
+      "page": 211
+    },
+    {
+      "gua": "雷水解",
+      "month": 12,
+      "branch": "丑",
+      "page": 214
+    },
+    {
+      "gua": "山澤損",
+      "month": 7,
+      "branch": "申",
+      "page": 216
+    },
+    {
+      "gua": "風雷益",
+      "month": 7,
+      "branch": "申",
+      "page": 219
+    },
+    {
+      "gua": "澤天夬",
+      "month": 3,
+      "branch": "辰",
+      "page": 221
+    },
+    {
+      "gua": "天風姤",
+      "month": 5,
+      "branch": "午",
+      "page": 224
+    },
+    {
+      "gua": "澤地萃",
+      "month": 6,
+      "branch": "未",
+      "page": 226
+    },
+    {
+      "gua": "地風升",
+      "month": 8,
+      "branch": "酉",
+      "page": 228
+    },
+    {
+      "gua": "澤水困",
+      "month": 5,
+      "branch": "午",
+      "page": 231
+    },
+    {
+      "gua": "水風井",
+      "month": 2,
+      "branch": "卯",
+      "page": 233
+    },
+    {
+      "gua": "澤火革",
+      "month": 2,
+      "branch": "卯",
+      "page": 235
+    },
+    {
+      "gua": "火風鼎",
+      "month": 12,
+      "branch": "丑",
+      "page": 238
+    },
+    {
+      "gua": "艮為山",
+      "month": 4,
+      "branch": "巳",
+      "page": 243
+    },
+    {
+      "gua": "風山漸",
+      "month": 1,
+      "branch": "寅",
+      "page": 245
+    },
+    {
+      "gua": "雷澤歸妹",
+      "month": 7,
+      "branch": "申",
+      "page": 248
+    },
+    {
+      "gua": "雷火豐",
+      "month": 9,
+      "branch": "戌",
+      "page": 250
+    },
+    {
+      "gua": "火山旅",
+      "month": 5,
+      "branch": "午",
+      "page": 252
+    },
+    {
+      "gua": "巽為風",
+      "month": 4,
+      "branch": "巳",
+      "page": 255
+    },
+    {
+      "gua": "兌為澤",
+      "month": 10,
+      "branch": "亥",
+      "page": 257
+    },
+    {
+      "gua": "風水渙",
+      "month": 3,
+      "branch": "辰",
+      "page": 260
+    },
+    {
+      "gua": "風澤中孚",
+      "month": 8,
+      "branch": "酉",
+      "page": 265
+    },
+    {
+      "gua": "雷山小過",
+      "month": 2,
+      "branch": "卯",
+      "page": 268
+    },
+    {
+      "gua": "水火既濟",
+      "month": 1,
+      "branch": "寅",
+      "page": 270
+    },
+    {
+      "gua": "火水未濟",
+      "month": 7,
+      "branch": "申",
+      "page": 273
+    }
+  ],
+  "unresolved_assigned_months": [
+    {
+      "gua": "天雷無妄",
+      "page": 177,
+      "literal": "巽宮五世卦",
+      "status": "assigned_month_not_explicit; palace_generation_question_retained"
+    }
+  ],
+  "windows": [
+    {
+      "id": "qian_timely",
+      "gua": "乾為天",
+      "page": 119,
+      "literal": "二月至八月以前得時",
+      "month_numbers": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "uncertain_month_numbers": [
+        8
+      ],
+      "kind": "continuous_range",
+      "meaning": "timely",
+      "first_month_number": 2,
+      "last_month_number": 8,
+      "last_month_inclusive": null
+    },
+    {
+      "id": "tun_timely",
+      "gua": "水雷屯",
+      "page": 124,
+      "literal": "二月至八月得其時",
+      "month_numbers": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "kind": "continuous_range",
+      "meaning": "timely",
+      "first_month_number": 2,
+      "last_month_number": 8,
+      "last_month_inclusive": true
+    },
+    {
+      "id": "wuwang_timely",
+      "gua": "天雷無妄",
+      "page": 177,
+      "literal": "最喜二月至八月為及時",
+      "month_numbers": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "kind": "continuous_range",
+      "meaning": "timely",
+      "first_month_number": 2,
+      "last_month_number": 8,
+      "last_month_inclusive": true
+    },
+    {
+      "id": "p156_1",
+      "gua": "雷地豫",
+      "page": 156,
+      "literal": "二月八月為及時",
+      "month_numbers": [
+        2,
+        8
+      ],
+      "kind": "discrete_months",
+      "meaning": "timely"
+    },
+    {
+      "id": "p158_2",
+      "gua": "澤雷隨",
+      "page": 158,
+      "literal": "生於一月至八月為及時",
+      "month_numbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "kind": "continuous_range",
+      "meaning": "timely",
+      "first_month_number": 1,
+      "last_month_number": 8,
+      "last_month_inclusive": true
+    },
+    {
+      "id": "p158_3",
+      "gua": "澤雷隨",
+      "page": 158,
+      "literal": "九月至正月為失時",
+      "month_numbers": [
+        9,
+        10,
+        11,
+        12,
+        1
+      ],
+      "kind": "continuous_range",
+      "meaning": "untimely",
+      "first_month_number": 9,
+      "last_month_number": 1,
+      "last_month_inclusive": true
+    },
+    {
+      "id": "p161_4",
+      "gua": "山風蠱",
+      "page": 161,
+      "literal": "如生於春夏秋者及時",
+      "month_numbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "kind": "season_set",
+      "meaning": "timely"
+    },
+    {
+      "id": "p168_5",
+      "gua": "火雷噬嗑",
+      "page": 168,
+      "literal": "二月八月及時也",
+      "month_numbers": [
+        2,
+        8
+      ],
+      "kind": "discrete_months",
+      "meaning": "timely"
+    },
+    {
+      "id": "p175_6",
+      "gua": "地雷復",
+      "page": 175,
+      "literal": "又有二月生者及時",
+      "month_numbers": [
+        2
+      ],
+      "kind": "discrete_months",
+      "meaning": "timely"
+    },
+    {
+      "id": "p182_7",
+      "gua": "山雷頤",
+      "page": 182,
+      "literal": "二月至八月為及時",
+      "month_numbers": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "kind": "continuous_range",
+      "meaning": "timely",
+      "first_month_number": 2,
+      "last_month_number": 8,
+      "last_month_inclusive": true
+    },
+    {
+      "id": "p182_8",
+      "gua": "山雷頤",
+      "page": 182,
+      "literal": "九月後則非其時",
+      "month_numbers": [
+        10,
+        11,
+        12
+      ],
+      "kind": "continuous_range",
+      "meaning": "untimely",
+      "first_month_number": 9,
+      "last_month_number": 12,
+      "last_month_inclusive": true,
+      "uncertain_month_numbers": [
+        9
+      ],
+      "first_month_inclusive": null
+    },
+    {
+      "id": "p189_9",
+      "gua": "離為火",
+      "page": 189,
+      "literal": "生於四月五月六月及納甲者",
+      "month_numbers": [
+        4,
+        5,
+        6
+      ],
+      "kind": "discrete_months",
+      "meaning": "named_months_with_najia",
+      "qualifiers": [
+        "年命納甲事实另列；及字连接范围仍待核"
+      ],
+      "natal_najia_clause_id": "li_natal_najia"
+    },
+    {
+      "id": "p195_10",
+      "gua": "雷風恆",
+      "page": 195,
+      "literal": "九月至十一月失時",
+      "month_numbers": [
+        9,
+        10,
+        11
+      ],
+      "kind": "continuous_range",
+      "meaning": "untimely",
+      "first_month_number": 9,
+      "last_month_number": 11,
+      "last_month_inclusive": true
+    },
+    {
+      "id": "p214_11",
+      "gua": "雷水解",
+      "page": 214,
+      "literal": "二月及八月雷雨及時",
+      "month_numbers": [
+        2,
+        8
+      ],
+      "kind": "discrete_months",
+      "meaning": "timely",
+      "qualifiers": [
+        "本命月卦不在此論：例外所指尚未在此层求值"
+      ]
+    },
+    {
+      "id": "p214_12",
+      "gua": "雷水解",
+      "page": 214,
+      "literal": "九月至正月失時",
+      "month_numbers": [
+        9,
+        10,
+        11,
+        12,
+        1
+      ],
+      "kind": "continuous_range",
+      "meaning": "untimely",
+      "first_month_number": 9,
+      "last_month_number": 1,
+      "last_month_inclusive": true,
+      "qualifiers": [
+        "本命月卦不在此論：例外所指尚未在此层求值"
+      ]
+    },
+    {
+      "id": "p219_13",
+      "gua": "風雷益",
+      "page": 219,
+      "literal": "又二月至八月生者福重",
+      "month_numbers": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "kind": "continuous_range",
+      "meaning": "named_favorable_months",
+      "first_month_number": 2,
+      "last_month_number": 8,
+      "last_month_inclusive": true
+    },
+    {
+      "id": "p221_14",
+      "gua": "澤天夬",
+      "page": 221,
+      "literal": "若生於秋月亦為及時也",
+      "month_numbers": [
+        7,
+        8,
+        9
+      ],
+      "kind": "season_set",
+      "meaning": "timely"
+    },
+    {
+      "id": "p233_15",
+      "gua": "水風井",
+      "page": 233,
+      "literal": "如生於三月及納甲者",
+      "month_numbers": [
+        3
+      ],
+      "kind": "discrete_months",
+      "meaning": "named_months_with_najia",
+      "qualifiers": [
+        "年命納甲事实另列；及字连接范围仍待核"
+      ],
+      "natal_najia_clause_id": "jing_natal_najia"
+    },
+    {
+      "id": "p250_16",
+      "gua": "雷火豐",
+      "page": 250,
+      "literal": "又二月至八月福重餘則福輕也",
+      "month_numbers": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "kind": "continuous_range",
+      "meaning": "named_favorable_months",
+      "first_month_number": 2,
+      "last_month_number": 8,
+      "last_month_inclusive": true
+    },
+    {
+      "id": "p255_17",
+      "gua": "巽為風",
+      "page": 255,
+      "literal": "在春夏長養為福重",
+      "month_numbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "kind": "season_set",
+      "meaning": "named_favorable_months"
+    },
+    {
+      "id": "p260_18",
+      "gua": "風水渙",
+      "page": 260,
+      "literal": "如生于五月及納甲者",
+      "month_numbers": [
+        5
+      ],
+      "kind": "discrete_months",
+      "meaning": "named_months_with_najia",
+      "qualifiers": [
+        "年命納甲事实另列；及字连接范围仍待核"
+      ],
+      "natal_najia_clause_id": "huan_natal_najia"
+    }
+  ],
+  "natal_najia_clauses": [
+    {
+      "id": "qian_natal_najia",
+      "gua": "乾為天",
+      "page": 119,
+      "month_numbers": [
+        4
+      ],
+      "literal": "若生於四月及納甲本命者",
+      "connector_status": "source_ji_scope_unresolved",
+      "scope": "month_label_and_current_phase_birth_year_najia_facts_only; no_combined_omen"
+    },
+    {
+      "id": "kun_natal_najia",
+      "gua": "坤為地",
+      "page": 122,
+      "month_numbers": [
+        10
+      ],
+      "literal": "如生於十月及納甲本命者",
+      "connector_status": "source_ji_scope_unresolved",
+      "scope": "month_label_and_current_phase_birth_year_najia_facts_only; no_combined_omen"
+    },
+    {
+      "id": "tun_natal_najia",
+      "gua": "水雷屯",
+      "page": 124,
+      "month_numbers": [
+        6
+      ],
+      "literal": "如生於六月及納甲者",
+      "connector_status": "source_ji_scope_unresolved",
+      "scope": "month_label_and_current_phase_birth_year_najia_facts_only; no_combined_omen"
+    },
+    {
+      "id": "bi_natal_najia",
+      "gua": "水地比",
+      "page": 136,
+      "month_numbers": [
+        7
+      ],
+      "literal": "如生於七月及納甲者",
+      "connector_status": "source_ji_scope_unresolved",
+      "scope": "month_label_and_current_phase_birth_year_najia_facts_only; no_combined_omen"
+    },
+    {
+      "id": "xiaoxu_natal_najia",
+      "gua": "風天小畜",
+      "page": 139,
+      "month_numbers": [
+        11
+      ],
+      "literal": "如生於十一月及納甲者",
+      "connector_status": "source_ji_scope_unresolved",
+      "scope": "month_label_and_current_phase_birth_year_najia_facts_only; no_combined_omen"
+    },
+    {
+      "id": "li_natal_najia",
+      "gua": "離為火",
+      "page": 189,
+      "month_numbers": [
+        4,
+        5,
+        6
+      ],
+      "literal": "生於四月五月六月及納甲者",
+      "connector_status": "source_ji_scope_unresolved",
+      "scope": "month_label_and_current_phase_birth_year_najia_facts_only; no_combined_omen"
+    },
+    {
+      "id": "jie_natal_najia",
+      "gua": "雷水解",
+      "page": 214,
+      "month_numbers": [
+        12
+      ],
+      "literal": "生於十二月及納甲者",
+      "connector_status": "source_ji_scope_unresolved",
+      "scope": "month_label_and_current_phase_birth_year_najia_facts_only; no_combined_omen"
+    },
+    {
+      "id": "jing_natal_najia",
+      "gua": "水風井",
+      "page": 233,
+      "month_numbers": [
+        3
+      ],
+      "literal": "如生於三月及納甲者",
+      "connector_status": "source_ji_scope_unresolved",
+      "scope": "month_label_and_current_phase_birth_year_najia_facts_only; no_combined_omen"
+    },
+    {
+      "id": "huan_natal_najia",
+      "gua": "風水渙",
+      "page": 260,
+      "month_numbers": [
+        5
+      ],
+      "literal": "如生于五月及納甲者",
+      "connector_status": "source_ji_scope_unresolved",
+      "scope": "month_label_and_current_phase_birth_year_najia_facts_only; no_combined_omen"
+    },
+    {
+      "id": "zhen_natal_najia",
+      "gua": "震為雷",
+      "page": 240,
+      "month_numbers": [
+        10
+      ],
+      "literal": "如生於十月及納甲者",
+      "connector_status": "source_ji_scope_unresolved",
+      "scope": "month_label_and_current_phase_birth_year_najia_facts_only; no_combined_omen"
+    },
+    {
+      "id": "gen_natal_najia",
+      "gua": "艮為山",
+      "page": 243,
+      "month_numbers": [
+        4
+      ],
+      "literal": "生於四月及納甲者",
+      "connector_status": "source_ji_scope_unresolved",
+      "scope": "month_label_and_current_phase_birth_year_najia_facts_only; no_combined_omen"
+    },
+    {
+      "id": "xun_natal_najia",
+      "gua": "巽為風",
+      "page": 255,
+      "month_numbers": [
+        4
+      ],
+      "literal": "如生于四月及納甲者",
+      "connector_status": "source_ji_scope_unresolved",
+      "scope": "month_label_and_current_phase_birth_year_najia_facts_only; no_combined_omen"
+    },
+    {
+      "id": "dui_natal_najia",
+      "gua": "兌為澤",
+      "page": 257,
+      "month_numbers": [
+        10
+      ],
+      "literal": "如生于十月及納甲者",
+      "connector_status": "source_ji_scope_unresolved",
+      "scope": "month_label_and_current_phase_birth_year_najia_facts_only; no_combined_omen"
+    }
+  ]
+}

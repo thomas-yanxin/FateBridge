@@ -1,0 +1,26 @@
+{
+  "method_id": "ziwei_date_reference_catalogue_v1",
+  "references": {
+    "tam_1900": {
+      "publisher": "臺北市立天文科學教育館",
+      "title": "西元1900年陰陽曆對照表",
+      "url": "https://www-ws.gov.taipei/Download.ashx?icon=..pdf&n=5ZyL6L6y5puGMTkwMC5wZGY%3D&u=LzAwMS9VcGxvYWQvNDM5L3JlbGZpbGUvNDc1NTcvNzk3MDY5OS82NWNkZGZmNC0xOTJiLTQxYTEtYjliNC0yMTU4OTQ5Zjc3NTEucGRm",
+      "raw_sha256": "e6bc3affa9264fd377e5b91d50047d2c99fa5a9f44fc6f15f9f7e956dc10f649",
+      "date_scope": [
+        "1900-01-01",
+        "1900-12-31"
+      ],
+      "role": "separately_published_printed_date_witness_not_independent_physical_observations"
+    },
+    "hko_1901_2100": {
+      "publisher": "Hong Kong Observatory",
+      "title": "公曆與農曆對照表",
+      "url": "https://www.hko.gov.hk/tc/gts/time/conversion.htm",
+      "date_scope": [
+        "1901-01-01",
+        "2100-12-31"
+      ],
+      "role": "published_utc_plus_08_civil_date_tables_not_local_lunation_recalculation"
+    }
+  }
+}

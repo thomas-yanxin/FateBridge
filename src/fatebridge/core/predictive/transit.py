@@ -65,6 +65,7 @@ def build_transit_payload(
     ]
     exact_hits = [item for item in hits if float(item.get("orb", 99.0)) <= 0.3][:12]
     return {
+        "calculation_basis": transit_subject.calculation_basis,
         "analysis_datetime": analysis_local.isoformat(),
         "location": {
             "longitude": transit_longitude,

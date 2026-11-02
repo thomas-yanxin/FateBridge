@@ -1,0 +1,73 @@
+{
+  "id": "guolao_literal_table_usage_v1",
+  "context_policy_id": "nijl_preceding_marker_segment_hypothesis_v1",
+  "source_grid_id": "nijl_100238879_image77_grid_v1",
+  "source_grid_data_sha256": "604685ee3a310ea81539d3a8425cb727be9be6af5bcba7d298e286eaf4830b60",
+  "source_grid_image_sha256": "28d84dfea60c2410c4bb40ee596f54311b65aa54b93fdc7b32e07dfe0699d3a0",
+  "sources": [
+    {
+      "id": "nijl_image8",
+      "source_file": "tests/fixtures/guolao-nijl-witness-v1/nijl-100238879-image8.jpg",
+      "source_url": "https://kokusho.nijl.ac.jp/biblio/100238879",
+      "credit": "新編評註通玄先生張果星宗大全（東北大学附属図書館所蔵），国文学研究資料館提供",
+      "excerpts": [
+        {
+          "id": "method",
+          "text": "以太陽之度對著命宮之度即是命度也"
+        },
+        {
+          "id": "example_a",
+          "text": "如太陽躔子宮虛六度對著午宮星五度即為命度"
+        },
+        {
+          "id": "example_b",
+          "text": "如日躔女三度對著午宮柳四度是也餘同此例"
+        },
+        {
+          "id": "limit_instruction",
+          "text": "以命度在某宮第幾行則知其歲行限也"
+        },
+        {
+          "id": "limit_example",
+          "text": "如命躔星五度在星盤中午宮第五行上則是十五歲行限"
+        }
+      ],
+      "source_sha256": "0f74d3df1ef39852b88fb340c7e8d86bbdfea2322bd72f2af925b7727ca90220"
+    },
+    {
+      "id": "ma591_image86",
+      "source_file": "tests/fixtures/guolao-life-degree-facsimile-v1/tohoku-1141-image86.jpg",
+      "source_url": "https://touda.tohoku.ac.jp/collection/database/library/10020000001141",
+      "credit": "新編評註通玄先生張果星宗大全（東北大学附属図書館所蔵），陸位輯校",
+      "excerpts": [
+        {
+          "id": "correction_note",
+          "text": "凡欲排命大小二盤隨便擇用考過宮度數查亥戌酉申未卯六宮咸少一度蓋遵授時曆算依此定命限度則有準矣不必看量天尺古例氐二過卯畢七過申非也"
+        }
+      ],
+      "source_sha256": "d53c9fdb1f1ff9825f2bd6b431cf01d724c1765e0b40d1c0c03ed8da3fd243f1"
+    }
+  ],
+  "ma591_note_palaces": [
+    "亥",
+    "戌",
+    "酉",
+    "申",
+    "未",
+    "卯"
+  ],
+  "source_transcription": "Normalized glyph transcription of held original crops; unblinded single collator; no independent second collation",
+  "method_status": "same-column lookup with an explicit preceding-marker context hypothesis; not adjudicated original usage",
+  "initial_is_zero": false,
+  "ordinary_cell_printed_mansion_inherited": false,
+  "native_life_degree_accepted": false,
+  "independent_token_reference_sha256": "039c00fc3a036ef94b14493c9f7283f667a0d2114934bab34c945c79ab72e746",
+  "source_prerequisites_unresolved": [
+    "meaning_and_quantization_of_printed_integer_labels",
+    "same_column_rule_as_intended_use_of_this_grid",
+    "relation_between_circular_chart_and_horizontal_grid",
+    "historical_palace_and_mansion_coordinate_model",
+    "modern_epoch_and_birth_input_mapping",
+    "complete_initial_limit_and_calendar_mapping"
+  ]
+}

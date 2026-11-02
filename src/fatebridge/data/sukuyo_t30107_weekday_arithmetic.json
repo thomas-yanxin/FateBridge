@@ -1,0 +1,45 @@
+{
+  "source_title": "宿曜經算曜直章第七",
+  "holding": "東京大学総合図書館 T30107",
+  "catalogue_url": "https://da.dl.itc.u-tokyo.ac.jp/portal/assets/1cf6a35f-73cd-8598-57ce-f0706cd68972",
+  "manifest_url": "https://da.dl.itc.u-tokyo.ac.jp/portal/repo/iiif/1cf6a35f-73cd-8598-57ce-f0706cd68972/manifest",
+  "manifest_sha256": "bf2f09b7bb5796084cd554f364ad379f501fc93c546d406f956ae35e98a1f548",
+  "source_kind": "later_copied_composite_volume_with_recalculation_not_T1299_TEI_or_Tang_autograph",
+  "general_formula": {
+    "locator": "T30107 canvas p18 left; p19 right top",
+    "transcription_kind": "manual_selected_main_columns_no_furigana_or_full_annotation",
+    "selected_literal_clauses": [
+      "以十二乘入元距所求年積算又加自入年已來月數",
+      "以七乘之以二百二十八除之為積閏",
+      "以積閏加上位",
+      "以三十乘積月又加入月已來日數",
+      "以十一乘下位加差五百",
+      "以七百三除之所得為小月日不盡為小餘",
+      "以小月日減上位",
+      "以六十去積日不盡者命起甲辰",
+      "又以七去積日不盡者命起太陰以次火水木金土日算盡之上則是其日所曜直也"
+    ],
+    "may_fifth_example": {
+      "elapsed_months": 4,
+      "elapsed_days": 5,
+      "literal": "假令推五月五日更加四箇五算是也"
+    },
+    "constants": {
+      "months_per_year": 12,
+      "intercalation_numerator": 7,
+      "intercalation_denominator": 228,
+      "nominal_days_per_month": 30,
+      "omission_numerator": 11,
+      "omission_bias": 500,
+      "omission_denominator": 703,
+      "sexagenary_first_count": "甲辰",
+      "weekday_first_count": "月"
+    },
+    "gregorian_or_host_calendar_conversion_admitted": false,
+    "historical_epoch_identity_accepted": false
+  },
+  "scope": "Selected main formula and bounded printed arithmetic controls only; no whole manuscript, original Tang calendar, civil-date mapping, sunrise/daybreak or eight-hour sequence acceptance.",
+  "id": "utokyo_t30107_selected_weekday_integer_arithmetic_v1",
+  "author": "瞿曇氏曆引文及後期抄本；未認證唐代原筆",
+  "printed_recalculation_is_separate": true
+}

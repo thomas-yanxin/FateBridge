@@ -1,0 +1,210 @@
+{
+  "source_id": "tohoku_luwei_1141_image26_shoushi_widths_v1",
+  "source_url": "https://touda.tohoku.ac.jp/collection/en/database/library/10020000001141",
+  "image_sha256": "faa5e00c3f8ea378a304c908dd314106f601588c502ad10ff9c3c3ec1e95028d",
+  "credit": "新編評註通玄先生張果星宗大全（東北大学附属図書館所蔵），陸位輯校",
+  "calendar": "shoushi",
+  "printed_calendar_label": "授時",
+  "transcription_method": "Manual readings from the existing full page and four correctly positioned enlarged crops; normalized Chinese and simplified mansion names; no independent second collator",
+  "circle_total_printed_on_this_page": null,
+  "quarter_policy_note": "少=1/4,半=1/2,太=3/4 is an explicit interpretation, not an emendation or an assertion that Lu Wei prints this definition here",
+  "quarter_notation_comparison_source": "https://zh.wikisource.org/w/index.php?title=宋史/卷079&oldid=11120213",
+  "readings": [
+    {
+      "mansion": "角",
+      "normalized_text": "十二度八十七分",
+      "whole_degree": 12,
+      "minute": 87,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "亢",
+      "normalized_text": "九度五十六分",
+      "whole_degree": 9,
+      "minute": 56,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "氐",
+      "normalized_text": "十六度四十分",
+      "whole_degree": 16,
+      "minute": 40,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "房",
+      "normalized_text": "五度四十八分",
+      "whole_degree": 5,
+      "minute": 48,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "心",
+      "normalized_text": "六度二十七分",
+      "whole_degree": 6,
+      "minute": 27,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "尾",
+      "normalized_text": "十七度九十五分",
+      "whole_degree": 17,
+      "minute": 95,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "箕",
+      "normalized_text": "九度五十九分",
+      "whole_degree": 9,
+      "minute": 59,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "斗",
+      "normalized_text": "二十三度四十七分",
+      "whole_degree": 23,
+      "minute": 47,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "牛",
+      "normalized_text": "六度九十八分",
+      "whole_degree": 6,
+      "minute": 98,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "女",
+      "normalized_text": "十一度十二分",
+      "whole_degree": 11,
+      "minute": 12,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "虚",
+      "normalized_text": "九度",
+      "whole_degree": 9,
+      "minute": null,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "危",
+      "normalized_text": "十五度九十五分",
+      "whole_degree": 15,
+      "minute": 95,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "室",
+      "normalized_text": "十八度三十二分",
+      "whole_degree": 18,
+      "minute": 32,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "壁",
+      "normalized_text": "九度三十四分",
+      "whole_degree": 9,
+      "minute": 34,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "奎",
+      "normalized_text": "十七度八十七分",
+      "whole_degree": 17,
+      "minute": 87,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "娄",
+      "normalized_text": "十二度三十六分",
+      "whole_degree": 12,
+      "minute": 36,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "胃",
+      "normalized_text": "十二度三十六分",
+      "whole_degree": 12,
+      "minute": 36,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "昴",
+      "normalized_text": "十一度",
+      "whole_degree": 11,
+      "minute": null,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "毕",
+      "normalized_text": "十六度半",
+      "whole_degree": 16,
+      "minute": null,
+      "quarter_mark": "半"
+    },
+    {
+      "mansion": "觜",
+      "normalized_text": "二十五分",
+      "whole_degree": null,
+      "minute": 25,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "参",
+      "normalized_text": "十度二十八分",
+      "whole_degree": 10,
+      "minute": 28,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "井",
+      "normalized_text": "三十一度",
+      "whole_degree": 31,
+      "minute": null,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "鬼",
+      "normalized_text": "二度二十一分",
+      "whole_degree": 2,
+      "minute": 21,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "柳",
+      "normalized_text": "十三度",
+      "whole_degree": 13,
+      "minute": null,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "星",
+      "normalized_text": "六度三十一分",
+      "whole_degree": 6,
+      "minute": 31,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "张",
+      "normalized_text": "十七度七十九分",
+      "whole_degree": 17,
+      "minute": 79,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "翼",
+      "normalized_text": "二十度",
+      "whole_degree": 20,
+      "minute": null,
+      "quarter_mark": null
+    },
+    {
+      "mansion": "轸",
+      "normalized_text": "十八度太",
+      "whole_degree": 18,
+      "minute": null,
+      "quarter_mark": "太"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "虚构：太阳弧生时区间边界",
+  "birth_year": 2000,
+  "birth_month": 1,
+  "birth_day": 1,
+  "birth_hour": 12,
+  "birth_minute": 0,
+  "birth_second": 0,
+  "birth_timezone": "UTC",
+  "birth_longitude": 0.0,
+  "birth_latitude": 0.0,
+  "birth_time_uncertainty_minutes": 1,
+  "analysis_datetime": "2000-01-01T12:00:00+00:00"
+}

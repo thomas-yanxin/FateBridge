@@ -1,0 +1,120 @@
+{
+  "id": "meihua_motion_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本人事内卦、外物与占者动静所选条件",
+  "source": {
+    "selected_edition": "nlc_1925",
+    "section": "體用動靜之訣",
+    "raw_pdf_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "raw_pdf_url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "original_pdf_indices": [
+      110,
+      111
+    ],
+    "printed_leaves": [
+      "卷三九",
+      "卷三十"
+    ],
+    "reader": "assistant direct visual reading; punctuation editorial; no independent expert review",
+    "transcription_variants": [
+      {
+        "selected": "吉凶之未見也",
+        "fixed_transcription": "吉凶之末見也",
+        "adjudication": "Selected scan read 未, not 末; fixed transcript retained unchanged"
+      },
+      {
+        "selected": "事應於遲／事應於速",
+        "fixed_transcription": "事應之遲／事應之速",
+        "adjudication": "Keep selected 於 wording; no numerical delay"
+      },
+      {
+        "selected": "我立則半遲半速",
+        "fixed_transcription": "我立而半遲半速",
+        "adjudication": "Keep selected 則"
+      }
+    ],
+    "unimplemented": [
+      "full_external_omen_valence",
+      "inner_outer_motion_synthesis",
+      "mental_stillness_and_casting_trigger_adjudication",
+      "absolute_event_time",
+      "real_predictive_validation"
+    ],
+    "reading_limits": [
+      "External category alone does not establish movement",
+      "Asked favorable matter is not a favorable omen",
+      "Observer posture does not establish omen valence",
+      "Source inner symbolic motion is not outer physical movement",
+      "Not moving is not a basis to erase an existing cast or predict no event",
+      "Observer mental stillness is a separate premise; exact implementation not adjudicated"
+    ]
+  },
+  "rules": [
+    {
+      "id": "inner_roles",
+      "quote": "夫體卦為靜，互卦為靜，用卦變卦則動也。此內卦之動靜也。",
+      "pdf_indices": [
+        110
+      ]
+    },
+    {
+      "id": "carried_object",
+      "quote": "器物本靜，人持其器物而來，則動矣。",
+      "pdf_indices": [
+        110
+      ]
+    },
+    {
+      "id": "water_soil_examples",
+      "quote": "蓋水之井沼，土之山巖石，皆靜者矣。人汲水擔水而前，水之動也。又人持石負土而前，土之動也。",
+      "pdf_indices": [
+        110
+      ]
+    },
+    {
+      "id": "moving_favorable",
+      "quote": "動而吉者，應吉之速。",
+      "pdf_indices": [
+        110
+      ]
+    },
+    {
+      "id": "moving_unfavorable",
+      "quote": "動而凶者，應凶之速。",
+      "pdf_indices": [
+        110
+      ]
+    },
+    {
+      "id": "stationary_not_yet",
+      "quote": "不動而應者，吉凶之未見也。",
+      "pdf_indices": [
+        110
+      ]
+    },
+    {
+      "id": "observer_seated",
+      "quote": "又若我坐，則事應於遲。",
+      "pdf_indices": [
+        111
+      ],
+      "relative_wording": "遲"
+    },
+    {
+      "id": "observer_walking",
+      "quote": "我行而事應於速。",
+      "pdf_indices": [
+        111
+      ],
+      "relative_wording": "速"
+    },
+    {
+      "id": "observer_standing",
+      "quote": "我立則半遲半速。",
+      "pdf_indices": [
+        111
+      ],
+      "relative_wording": "半遲半速"
+    }
+  ]
+}

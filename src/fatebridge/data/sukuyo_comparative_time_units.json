@@ -1,0 +1,82 @@
+{
+  "id": "sukuyo_comparative_time_units_v1",
+  "witnesses": [
+    {
+      "id": "T25n1509",
+      "title": "大智度論 卷48",
+      "source_header_author_literal": "龍樹菩薩造　後秦 鳩摩羅什譯",
+      "edition": "CBETA electronic Taisho main text with explicitly separate inline notes",
+      "publisher": "CBETA",
+      "publisher_commit": "dbdea41071e1e260ad84b72faefd4587333cf76d",
+      "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T25/T25n1509.xml",
+      "source_sha256": "f1f8be755336c8745f6a92d8a8a749998fc331d1f50d631ca1e88f5c0e153619",
+      "source_bytes": 17164919,
+      "locator": "T25n1509_p0409b25-29",
+      "source_excerpt": "「日月歲節」者，日名從旦至旦，初分、中分、後分；夜亦三分。一日一夜有三十時：春、秋分時，十五時屬晝，十五時屬夜；餘時增減——五月至，晝十八時，夜十二時；十一月至，夜十八時，晝十二時。",
+      "inline_notes": [],
+      "transcription_scope": "Selected main-text excerpt and declared inline notes only; not full textual-apparatus or manuscript collation.",
+      "independent_historical_observation": false,
+      "day_start_literal": "旦",
+      "structural_day_parts": 3,
+      "structural_night_parts": 3,
+      "daily_time_units": 30,
+      "seasonal_time_unit_counts": [
+        {
+          "source_label": "春、秋分",
+          "day": 15,
+          "night": 15
+        },
+        {
+          "source_label": "五月至",
+          "day": 18,
+          "night": 12
+        },
+        {
+          "source_label": "十一月至",
+          "day": 12,
+          "night": 18
+        }
+      ],
+      "units_are_modern_hours": false
+    },
+    {
+      "id": "T51n2087",
+      "title": "大唐西域記 卷2",
+      "source_header_author_literal": "唐 玄奘譯．辯機撰",
+      "edition": "CBETA electronic Taisho main text with explicitly separate inline notes",
+      "publisher": "CBETA",
+      "publisher_commit": "dbdea41071e1e260ad84b72faefd4587333cf76d",
+      "source_url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T51/T51n2087.xml",
+      "source_sha256": "ac50f33584ac90ecb9fd61a1fbfa1f8a802464103b4eb6a26d20ff6f9d578763",
+      "source_bytes": 2599669,
+      "locator": "T51n2087_p0875c16-20",
+      "source_excerpt": "時極短者，謂剎那也。百二十剎那為一呾剎那，六十呾剎那為一臘縛，三十臘縛為一牟呼栗多，五牟呼栗多為一時，六時合成一日一夜。居俗日夜分為八時。",
+      "inline_notes": [
+        {
+          "locator": "T51n2087_p0875c19",
+          "text": "晝三夜三"
+        },
+        {
+          "locator": "T51n2087_p0875c20",
+          "text": "晝四夜四，於一一時各有四分"
+        }
+      ],
+      "transcription_scope": "Selected main-text excerpt and declared inline notes only; not full textual-apparatus or manuscript collation.",
+      "independent_historical_observation": false,
+      "day_start_literal": null,
+      "muhurta_per_six_part_time": 5,
+      "structural_day_parts": 3,
+      "structural_night_parts": 3,
+      "lay_day_parts": 4,
+      "lay_night_parts": 4,
+      "subdivisions_per_lay_part": 4,
+      "units_are_modern_hours": false
+    }
+  ],
+  "applied_to_runtime_clock": false,
+  "t1299_day_eight_night_eight_replaced": false,
+  "modern_clock_conversion_established": false,
+  "solar_altitude_degrees": null,
+  "hinoo_half_mapping_established": false,
+  "scope": "两部原典的所选分时制度对照：区分一日夜三十时、昼三夜三和居俗昼四夜四。不是T1299昼八夜八的替代表，也没有证明旦与平明同义、现代固定钟时、太阳高度或桧尾前后半。未改变参考历日、配宿或事项计算。"
+}

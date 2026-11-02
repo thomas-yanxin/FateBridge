@@ -7,13 +7,14 @@ import os
 import platform
 import shlex
 import shutil
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 from fatebridge import __version__
-from fatebridge.application.discovery import select_specs
+from fatebridge.application.discovery import select_mcp_specs
 from fatebridge.application.examples import example_input
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import ParameterError
@@ -26,11 +27,46 @@ def resolve_codex_cli() -> Dict[str, str]:
     terminal = shutil.which("codex")
     if desktop and Path(desktop).is_file() and os.access(desktop, os.X_OK):
         return {"path": desktop, "source": "desktop", "path_cli": terminal or ""}
+    if (
+        not desktop
+        and os.getenv("CODEX_INTERNAL_ORIGINATOR_OVERRIDE") == "Codex Desktop"
+    ):
+        running = _running_desktop_cli()
+        if running:
+            return {
+                "path": running,
+                "source": "running_desktop",
+                "path_cli": terminal or "",
+            }
     return {
         "path": terminal or "codex",
         "source": "PATH" if terminal else "not_installed",
         "path_cli": terminal or "",
     }
+
+
+def _running_desktop_cli() -> Optional[str]:
+    """Discover a unique actual macOS app CLI; process arguments are never read."""
+    if platform.system() != "Darwin":
+        return None
+    try:
+        result = subprocess.run(
+            ["ps", "-axo", "comm"], capture_output=True, text=True, timeout=2
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if result.returncode:
+        return None
+    candidates = {
+        line.strip()
+        for line in result.stdout.splitlines()
+        if line.strip().endswith("/codex")
+        and ".app/Contents/" in line
+        and Path(line.strip()).is_file()
+        and os.access(line.strip(), os.X_OK)
+    }
+    # Multiple active app installations are ambiguous; retain the PATH fallback.
+    return next(iter(candidates)) if len(candidates) == 1 else None
 
 
 class _StdioProbeError(RuntimeError):
@@ -132,6 +168,7 @@ def diagnose(
     mcp: bool = False,
     family: Optional[str] = None,
     scenario: Optional[str] = None,
+    tool_scope: Optional[str] = None,
 ) -> Dict[str, Any]:
     if mcp:
         load_runtime_env()
@@ -139,13 +176,25 @@ def diagnose(
     scenario = (
         scenario if scenario is not None else os.getenv("FATEBRIDGE_MCP_SCENARIOS", "")
     )
+    tool_scope = (
+        tool_scope
+        if tool_scope is not None
+        else os.getenv("FATEBRIDGE_MCP_TOOL_SCOPE", "complete")
+    )
     try:
-        selected = select_specs(
-            CATALOG, family=family or None, scenario=scenario or None, surface="mcp"
+        selected = select_mcp_specs(
+            CATALOG,
+            family=family or None,
+            scenario=scenario or None,
+            tool_scope=tool_scope,
         )
     except ParameterError as exc:
         return {"ok": False, **exc.as_result()}
-    env = {"FATEBRIDGE_MCP_FAMILIES": family, "FATEBRIDGE_MCP_SCENARIOS": scenario}
+    env = {
+        "FATEBRIDGE_MCP_FAMILIES": family,
+        "FATEBRIDGE_MCP_SCENARIOS": scenario,
+        "FATEBRIDGE_MCP_TOOL_SCOPE": tool_scope,
+    }
     dependencies: Dict[str, Any] = {}
     for dependency in importlib.metadata.requires("fatebridge") or []:
         from packaging.requirements import Requirement
@@ -203,4 +252,60 @@ def diagnose(
             }
             if isinstance(exc, _StdioProbeError):
                 output["mcp"].update(exc.details)
+    if any(spec.family == "fengshui" for spec in selected):
+        from fatebridge.core.ephemeris_installation import (
+            fengshui_file_status,
+            user_ephemeris_dir,
+        )
+        from fatebridge.core.ephemeris_runtime import effective_ephemeris_search_path
+
+        active = effective_ephemeris_search_path()
+        output["fengshui_calendar"] = {
+            "active_search_path": active,
+            "active_directories": [
+                fengshui_file_status(Path(item))
+                for item in str(active).split(os.pathsep)
+                if active and item
+            ],
+            "user_cache": fengshui_file_status(user_ephemeris_dir()),
+            "setup_argv": [
+                sys.executable,
+                "-m",
+                "fatebridge.fetch_ephe",
+                "--profile",
+                "fengshui_calendar",
+            ],
+            "setup_command": f"{shlex.quote(sys.executable)} -m fatebridge.fetch_ephe --profile fengshui_calendar",
+            "astronomical_acceptance": "not_run_by_doctor; file identity does not certify one-second TT accuracy",
+            "scope": "read_only_data_readiness; doctor ok describes package/dependencies/protocol, not full Feng Shui precision",
+        }
+    if any(spec.key == "human_design" for spec in selected):
+        from fatebridge.core.ephemeris_installation import (
+            HUMAN_DESIGN_PROFILE,
+            human_design_file_status,
+            user_ephemeris_dir,
+        )
+        from fatebridge.core.ephemeris_runtime import effective_ephemeris_search_path
+
+        active = effective_ephemeris_search_path()
+        setup = [
+            sys.executable,
+            "-m",
+            "fatebridge.fetch_ephe",
+            "--profile",
+            HUMAN_DESIGN_PROFILE,
+        ]
+        output["human_design"] = {
+            "active_search_path": active,
+            "active_directories": [
+                human_design_file_status(Path(item))
+                for item in str(active).split(os.pathsep)
+                if active and item
+            ],
+            "user_cache": human_design_file_status(user_ephemeris_dir()),
+            "setup_argv": setup,
+            "setup_command": shlex.join(setup),
+            "astronomical_acceptance": "not_run_by_doctor; file identity does not certify positions, Design roots or cycle contacts",
+            "scope": "read_only_data_readiness; doctor ok describes package/dependencies/protocol, not full Human Design acceptance",
+        }
     return output

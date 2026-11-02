@@ -40,3 +40,350 @@ kintaiyi (太乙神数 / Tai Yi divination engine)
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
+
+------------------------------------------------------------------------------
+Offline place catalog
+------------------------------------------------------------------------------
+
+AreaCity-JsSpider-StatsGov
+  Source: https://github.com/xiangyuecn/AreaCity-JsSpider-StatsGov
+  Release: 2025.251231.260403 (2026-04-03)
+  Copyright (c) 2019 xiangyuecn
+  License: MIT
+
+  Chinese administrative names, hierarchy and centre points were extracted,
+  selector-only duplicate levels removed, aliases added, and GCJ-02 points
+  converted to approximate WGS84. Original point coordinates are retained in
+  the data. These are representative points, not surveyed birth addresses.
+
+  MIT License
+
+  Copyright (c) 2019 xiangyuecn
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+GeoNames geographical database
+  Source: https://www.geonames.org/
+  Extract format: https://download.geonames.org/export/dump/readme.txt
+  License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+  License URL: https://creativecommons.org/licenses/by/4.0/
+  Retrieved: 2026-10-22
+
+  Overseas populated places and Taiwan administrative representative points
+  were selected from GeoNames extracts. Names and aliases were filtered and
+  supplemented with simplified/traditional Chinese forms; records were
+  reorganized into FateBridge's offline schema. WGS84 coordinates and IANA
+  timezones are attributed to GeoNames. This adaptation does not imply
+  GeoNames endorsement. Data are supplied as is, without a representation of
+  accuracy, timeliness or completeness. Source IDs, hashes, modifications
+  and selection details are retained in data/places and docs/place-catalog.md.
+
+  These third-party data retain their respective licenses independently of
+  FateBridge's Apache-2.0 code license.
+
+------------------------------------------------------------------------------
+Classical Yi texts and frozen Wikisource transcriptions
+------------------------------------------------------------------------------
+
+Zhouyi / 周易; Zengshan Buyi / 增刪卜易 (野鶴老人, with 李我平 commentary)
+  Sources: https://zh.wikisource.org/wiki/周易
+           https://zh.wikisource.org/wiki/增刪卜易
+  The historical works are marked public domain by Wikisource. Frozen raw
+  pages also retain contributor markup and modern editorial notes; these
+  are not presented as part of the historical authors' text. Wikisource's
+  contributor text is available under CC BY-SA 4.0, subject to its terms:
+  https://creativecommons.org/licenses/by-sa/4.0/
+
+  Attribution and contributor histories are accessible through each frozen
+  page's source_url, title and revision in tests/fixtures/zhouyi-wikisource.json,
+  liuyao-zengshan-sources.json and liuyao-zengshan-depth-v2.json. Frozen wikitext
+  is preserved unchanged. Runtime extracts remove markup and separate literal
+  verses from modern descriptions; implementation corrections and textual
+  conflicts are recorded in the source manifests and docs/liuyao-depth-audit.md.
+  Contributor material retains its applicable license independently of the
+  Apache-2.0 engine. Neither Wikisource nor the historical authors endorse
+  FateBridge or certify the engine's classical or predictive accuracy.
+
+Zengshan Buyi / 增刪卜易, 文明書局 1925 edition, 秦慎安校勘
+  Holding institution: National Library of China (中國國家圖書館)
+  Catalog: NLC416-12jh005345-45344
+  Source and public-domain scan metadata:
+  https://commons.wikimedia.org/w/index.php?title=File:NLC416-12jh005345-45344_增刪卜易.pdf&oldid=808899674
+  The original scan is frozen in tests/fixtures/liuyao_scan_v3/sources.
+  Selected passages were visually collated; page references, source-byte
+  hashes, variant readings and unresolved conditions are retained in that
+  bundle and data/classical/liuyao-scan-v3.json. Further selected clauses are
+  retained in liuyao-effects-v4.json, liuyao-strength-v5.json and
+  liuyao-fanfu-v6.json, liuyao-void-v7.json, liuyao-progression-v8.json
+  liuyao-control-v9.json, liuyao-clash-v10.json, liuyao-generation-v11.json
+  liuyao-rescue-v12.json and liuyao-routing-v13.json,
+  with independently frozen
+  structural cases and reading
+  notes in the corresponding test fixtures. This is not a full critical
+  edition. The holding institution and publisher do not endorse FateBridge.
+
+Guolao selected facsimile
+  新編評註通玄先生張果星宗大全（東北大学附属図書館所蔵）, 陸位輯校
+  Catalogued bundle volumes 1-2, images 9, 26-27, 76-79 and 86-87, record 10020000001141
+  Source: https://touda.tohoku.ac.jp/collection/en/database/library/10020000001141
+  Reuse conditions: https://touda.tohoku.ac.jp/collection/database/library/use_of_materials
+  The catalogue marks secondary image use CC BY. The library requires the
+  work title and holding-library credit; no unlisted CC version is inferred.
+  The unmodified images, source URLs, hashes, attribution and selected manual
+  readings are in tests/fixtures/guolao-small-limit-v1 and
+  tests/fixtures/guolao-life-degree-facsimile-v1. Each image retains
+  its source conditions independently of FateBridge's code license. This
+  selected-page collation is not a full critical edition or library endorsement.
+  Further selected limit-rate and diagram-note readings are recorded in
+  tests/fixtures/guolao-limit-scale-v1 without modifying the original images.
+  Selected historical coordinate-table readings and the unmodified images
+  26-27 are retained in tests/fixtures/guolao-historical-coordinates-v1.
+
+Yuan Shi 54 / 元史卷五十四, selected historical coordinate evidence
+  National Library of China, 武林竹簡齋石印本, 二十四史第166冊.
+  Original scan: Commons file NLC892-312002017339-363669, revision 1270279566.
+  https://commons.wikimedia.org/w/index.php?curid=198546859
+  Commons marks the mechanical scan PD-scan / PD-old-100-expired. Original
+  PDF pages 55, 57 and 58 were extracted without altering the scan content;
+  the PDF container was regenerated. Source hashes, extraction details,
+  render equality and selected transcriptions are recorded in
+  tests/fixtures/guolao-historical-coordinates-v1.
+  A public-domain historical passage from Wikisource revision 1959444 of
+  元史/卷054 is separately retained, without modern editorial commentary.
+  The scan and digital transcription's 斗/張 variants are not silently merged.
+  Neither holding institution nor hosting service endorses FateBridge or
+  certifies its astronomical, classical or real-world predictive accuracy.
+
+World Magnetic Model 2025
+  NOAA NCEI Geomagnetic Modeling Team and British Geological Survey (2024).
+  Model DOI: https://doi.org/10.25921/aqfd-sd83
+  Coefficients and official numeric tests:
+  https://www.ncei.noaa.gov/products/world-magnetic-model/wmm-coefficients
+  Frozen WMM2025 coefficients in data/fengshui/geomagnetic-wmm2025-v1.json
+  and NOAA reference fixtures retain their source-byte hashes. NOAA WMM
+  US Government material is public domain and is not subject to copyright
+  protection. The separately installed pygeomag 1.1.0 port is MIT-licensed:
+  https://github.com/boxpet/pygeomag/blob/v1.1.0/LICENSE
+  Neither NOAA, BGS nor that port's authors endorse FateBridge. Geomagnetic
+  model reference checks do not certify on-site bearings or Feng Shui predictions.
+
+Japanese calendar candidate research fixtures
+  HuTime Calendar Calculation Web API, Tatsuki Sekino.
+  https://ap.hutime.org/cal/index_en.html
+  https://www.hutime.jp/basicdata/calendar/calendars/OldJapanese.html
+  We acknowledge use of HuTime's API in FateBridge's source-admission research.
+  Frozen factual period responses retain requests and hashes in
+  tests/fixtures/sukuyo_hutime_v1. They are quarantined research evidence,
+  not a runtime Japanese calendar or a complete Jingu almanac edition.
+  The separately derived runtime reference uses complete daily responses in
+  tests/fixtures/sukuyo_hutime_daily_v1, with its declared LOD domain and all
+  longer-range nulls retained. Runtime calendar data derive from API facts; this is
+  not a complete Jingu facsimile or historical local-time reconstruction.
+  A separate 327-day pre-reform control comes from the National Astronomical
+  Observatory of Japan's Calendar and Ephemeris Office calendar database:
+  https://eco.mtk.nao.ac.jp/cgi-bin/koyomi/caldb.cgi
+  Neither provider endorses FateBridge or certifies its predictive accuracy.
+
+SAT T2465 selected primary quotations and apparatus (2026-10-22)
+The Hinoo research addendum cites selected calendar passages and manuscript
+apparatus from the SAT Daizokyo Text Database, University of Tokyo. The
+complete publisher HTML response is kept only as a private local research
+capture; it is not redistributed in the source tree or package. Selected
+quotations, source URLs, fingerprints and a verification script document the
+research result. SAT terms: https://21dzk.l.u-tokyo.ac.jp/SAT/termsofuse.html
+This acknowledgement does not assert a grant for full database redistribution
+or a completed manuscript or facsimile collation.
+
+Japanese historical calendar reference (2026-10-22)
+  National Astronomical Observatory of Japan, Calendar and Ephemeris Office:
+  https://eco.mtk.nao.ac.jp/cgi-bin/koyomi/caldb.cgi
+  Methodology and known corrections:
+  https://eco.mtk.nao.ac.jp/koyomi/wiki/C2C0B1A2C2C0CDDBCEF12FC6FCCBDCA4CECEF1C6FCA5C7A1BCA5BFA5D9A1BCA5B9.html
+  Source acknowledgement and reuse policy: https://eco.mtk.nao.ac.jp/koyomi/site/
+  The frozen month-start reference uses explicit proleptic Gregorian labels,
+  retaining reconstructed early chronology and the two-day Meiji reform month.
+  HuTime 1001.1 (Tatsuki Sekino) provides a separately retained control:
+  https://datetime.hutime.org/calendar/1001.1?out=html
+  https://www.hutime.jp/basicdata/calendar/calendars/Japanese.html
+  All 210 differing civil dates remain disclosed. These sources partly share
+  historical literature; agreement is not independent historical truth.
+  Fixed UTC+09 is a declared date policy, not historical clock reconstruction.
+  Neither provider endorses FateBridge or its predictions.
+
+T1299 Taibai selected quotations and apparatus (2026-10-22)
+Selected lunar-day rows and variant apparatus are attributed to CBETA TEI P5
+T21n1299 (header dated 2025-01-30) and the University of Tokyo SAT database.
+CBETA source: https://raw.githubusercontent.com/cbeta-org/xml-p5/master/T/T21/T21n1299.xml
+SAT selected response: https://21dzk.l.u-tokyo.ac.jp/SAT/ddb-sat2.php?mode=detail&useid=1299_,00,0399&nonum=&kaeri=
+Only selected quotations and fingerprints are redistributed here. Complete
+responses remain private research captures. The SAT response is a selected
+text window, not the complete T1299 work. Ming readings are reconstructed
+from the apparatus and are not an independently collated Ming edition.
+SAT terms: https://21dzk.l.u-tokyo.ac.jp/SAT/termsofuse.html
+
+Analytic solar model (2026-10-22)
+  The published harmonic coefficients and selected algorithms are adapted from
+  ERFA 2.0.1, commit 9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3,
+  Copyright (C) 2013-2023, NumFOCUS Foundation, derived with permission from
+  the IAU SOFA library. The full ERFA copyright, conditions and disclaimer are
+  distributed in fatebridge/data/astronomy/erfa-license.txt. The implementation
+  has distinct names and an explicit numerical scope; it is not the unmodified
+  SOFA reference implementation. Neither ERFA, SOFA nor the IAU endorses this
+  product, its traditional interpretations or its claims.
+  Source: https://github.com/liberfa/erfa/tree/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3
+
+------------------------------------------------------------------------------
+Historical calendar test references
+------------------------------------------------------------------------------
+
+DDBC Chinese Calendar database (Simon Wiles and the Library and Information
+Center of Dharma Drum Buddhist College, assembled 2008-2010; hosted by DILA)
+  Source: https://authority.dila.edu.tw/downloads/authority_time_chinese.2012-02.zip
+  License in the downloaded README and COPYING: CC BY-SA 3.0 Unported
+  License URL: https://creativecommons.org/licenses/by-sa/3.0/
+
+  tests/fixtures/heluo_historical_calendar_v1/dila-excerpt.json selects five
+  t_month records and related name/parent records and converts SQL tuples to
+  JSON. This adapted extract remains under the archive license. Its original
+  README, schema and complete license are retained alongside it. The download
+  page says February 2012 while the archive README says October 2010; the site
+  footer separately states CC BY-SA 2.5 Taiwan. No DILA endorsement is implied.
+
+Mei Wending, Dongzhi kao (冬至攷), juan1, in CADAL01020102 combined volume
+  Source: https://commons.wikimedia.org/w/index.php?curid=83748380
+  Commons identifies the historical scanned work as public domain.
+  tests/fixtures/song_tongtian_v1 retains selected whole-page renderings and
+  literal arithmetic readings with source identity and scope in reference.json.
+  The accompanying Zhufang rigui and Wuxing jiyao works are not collated here.
+  No library, CADAL or Wikimedia endorsement is implied.
+
+Packaged DE440 solar coefficient derivative (2026-10-23)
+  Producer of the derivative: FateBridge project contributors, FateBridge project.
+  Original orbit data: DE440, Ryan S. Park, William M. Folkner,
+  James G. Williams and Dale H. Boggs, JPL/NASA (AJ 161:105, 2021).
+  Source: https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440.bsp
+  Redistribution rules: https://naif.jpl.nasa.gov/naif/rules.html
+  This separately named third-party coefficient product selects Earth, EMB
+  and Sun records over a declared interval and changes the storage format.
+  Every selected coefficient byte is retained; it is not an unmodified NASA
+  kernel or an endorsement by NASA/JPL. Original comments are archived only
+  as source provenance inside de440-solar-v1.json. Geocentric TT/TDB terms
+  are adapted from the same pinned ERFA source and distributed under the
+  complete ERFA conditions in data/astronomy/erfa-license.txt.
+
+Historical Feng Shui solar coefficient derivative (2026-10-23)
+  Producer of the derivative: FateBridge project contributors, FateBridge project.
+  de440-solar-historical-v1.json and de440-solar-historical-v1.bin.gz retain
+  original Earth, EMB and Sun record bytes from the same pinned DE440 kernel
+  identified above. Records include padding for the predeclared 1784..2204
+  historical-period protocol. This separately named product does not replace
+  the default coefficient files or contain reference event-time answers.
+  Source comments remain an archive of provenance, not attribution of this
+  derivative to NASA/JPL. The same geocentric ERFA TT/TDB terms and full ERFA
+  conditions apply. No provider endorsement or absolute accuracy is implied.
+
+Canping complete-horizon solar coefficient derivative (2026-10-23)
+  Producer of the derivative: FateBridge project contributors, FateBridge project.
+  de440-solar-canping-v1.json and de440-solar-canping-v1.bin.gz retain
+  original Earth, EMB and Sun record bytes from the same pinned DE440 kernel
+  identified above, padded over 2200..2323 for the predeclared 2201..2320
+  Lichun projection protocol. They do not extend the public model-year policy
+  or contain reference event-time answers. Source comments and the complete
+  ERFA terms retain the provenance and conditions described above. This is a
+  separately named derivative without provider endorsement or civil UTC,
+  classical conformity or real-world prediction certification.
+
+Hong Kong Observatory published solar-term dates
+  Source: https://www.hko.gov.hk/tc/gts/time/conversion.htm
+  data/astronomy/hko-term-dates-v1.json derives 4,800 published dates from
+  all 200 previously captured official annual text tables (1901–2100).
+  Source URLs and byte hashes accompany every record. These are published
+  calendar dates, not exact crossing instants or an endorsement of FateBridge.
+
+Canping additional complete-horizon coefficient derivative (2026-10-26)
+  Producer of the derivative: FateBridge project contributors, FateBridge project.
+  de440-solar-canping-extended-v1.json and its .bin.gz retain original Earth,
+  EMB and Sun record bytes from the same pinned DE440 kernel identified above,
+  padded over 2300..2423 for bounded Lichun events in 2301..2420. The existing
+  extended coefficient product supplies the separately qualified 1699 event.
+  This additional product preserves all older coefficient files, does not
+  enlarge the standalone public year-grid policy, and contains no reference
+  event-time answers. The source comments, producer attribution and complete
+  ERFA conditions described above apply. It is a separately named third-party
+  derivative without provider endorsement or civil UTC/physical certification.
+
+------------------------------------------------------------------------------
+IERS 20 C04 UT1 daily series (UT1 component only)
+------------------------------------------------------------------------------
+  Original provider: IERS Earth Orientation Product Centre, Paris Observatory
+  Source: https://hpiers.obspm.fr/iers/eop/eopc04/eopc04.1962-now
+  Redistributed from the Astropy-maintained IERS mirror, commit:
+  1dfcc5e5460f1c36e5e54f84dc567f5a1e506c05
+  Source SHA-256: 2f451f2b9faf42dc32f7368888980c92c3e773957019963c5d22df9ac20c8c82
+  The packaged subset contains published UT1-UTC values and formal errors.
+  Astropy redistribution notice: fatebridge/data/knowledge/iers-c04-LICENSE.txt
+  The complete original source and provenance are retained in validation fixtures.
+
+------------------------------------------------------------------------------
+Heluo line commentary, selected historical printing
+------------------------------------------------------------------------------
+  Source: 河洛理數, 上海文明書局印行本, NLC416-13jh000625-42999.
+  https://commons.wikimedia.org/wiki/File:NLC416-13jh000625-42999_河洛理數.pdf
+  PDF SHA-256: fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c
+  Packaged partial collation: 60 line commentaries, including Shi/Bi on PDF
+  pages134-138 and Xiao Chu/Lu on139-143, plus six new Lu headers.
+  Modern punctuation and section boundaries are editorial.
+  Historical glyphs follow the declared Unicode normalization policy.
+  Single-reader collation; independent second review and complete-book
+  conformity remain pending. Traditional authorship is not independently
+  established. This source attribution is not prediction certification.
+
+------------------------------------------------------------------------------
+MingLi-Bench public evaluation material (validation fixtures only)
+------------------------------------------------------------------------------
+  Source: https://github.com/DestinyLinker/MingLi-Bench
+  Revision: b7433280fd86d7a7c27debbc47d0303c218f0bfd
+  Copyright (c) 2026 MingLi-Bench Contributors
+  License: MIT; complete upstream text is retained with the fixture sources.
+
+  tests/fixtures/mingli_bench_v1 preserves the upstream questions and raw
+  answer sheets separately from FateBridge's derived input-quality,
+  interpretation-fidelity and consultation-boundary assessments. File hashes,
+  transformations and case-level development/holdout assignments accompany
+  the fixtures. These materials are not runtime knowledge or prediction gold.
+  The upstream repository attributes the questions to a public competition;
+  independent verification of its original subject records and the organizer's
+  source-material terms remains incomplete. Attribution does not imply
+  organizer endorsement or validation of predictive accuracy. The upstream
+  material retains its stated license independently of FateBridge's code.
+
+------------------------------------------------------------------------------
+BaZi foundations glossary source context
+------------------------------------------------------------------------------
+  Three additive FateBridge entries: 四柱, 年柱, 月柱.
+  Classical context: 萬民英, 三命通會 (四庫全書本), 卷二,
+  論年月日時 and 論遁月時. Exact Wikisource revision: 761691.
+  https://zh.wikisource.org/w/index.php?oldid=761691
+
+  The exact digital transcription and its original PD-old marker, API response,
+  quotation locations and SHA-256 digests are retained in
+  tests/fixtures/bazi_foundations_v1. Runtime entries are scoped editorial
+  paraphrases, not verbatim classical quotations. Current program conventions
+  are attributed separately to implementation files. This does not claim scan
+  collation, independent expert acceptance or real-world predictive validity.

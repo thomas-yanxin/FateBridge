@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from fatebridge.core.astro.time_scales import ephemeris_time
+
 from ._common import (
     ASPECT_DEGREE_TO_META,
     LOT_KEY_BY_POINT_NAME,
@@ -125,42 +127,31 @@ def primary_direction_coordinate_runtime_meta(pd_method: str) -> tuple[str, str]
             return "equatorial_runtime_projection", "swisseph_equatorial_projection"
         return (
             "ecliptic_runtime_reference_fallback",
-            "kerykeion_ecliptic_reference_fallback",
+            "native_ecliptic_reference_fallback",
         )
     if pd_method == "fatebridge_mundane_semiarc":
         if swe is not None:
             return "mundane_runtime_projection", "swisseph_mundane_semiarc_projection"
         return (
             "ecliptic_runtime_reference_fallback",
-            "kerykeion_ecliptic_reference_fallback",
+            "native_ecliptic_reference_fallback",
         )
-    return "ephemeris_runtime_model", "kerykeion_subject_abs_pos"
+    return "ephemeris_runtime_model", "fatebridge_native_subject_abs_pos"
 
 
 def build_primary_direction_equatorial_context(
     birth_info: AstroBirthInfo,
 ) -> Dict[str, float]:
-    utc_datetime = birth_info.utc_datetime
-    julian_day = swe.julday(
-        utc_datetime.year,
-        utc_datetime.month,
-        utc_datetime.day,
-        utc_datetime.hour
-        + (utc_datetime.minute / 60.0)
-        + (utc_datetime.second / 3600.0)
-        + (utc_datetime.microsecond / 3_600_000_000.0),
-    )
-    obliquity = ephemeris_call("calc_ut", julian_day, swe.ECL_NUT)[0][0]
-    ascmc = swe.houses_ex(
-        julian_day,
-        birth_info.latitude,
-        birth_info.longitude,
-        b"P",
-    )[1]
+    times = ephemeris_time(birth_info.require_utc_datetime)
+    if times.jd_tt is None:
+        raise ImportError("Swiss Ephemeris is required for equatorial directions")
+    obliquity = ephemeris_call("calc", times.jd_tt, swe.ECL_NUT)[0][0]
+    armc = (ephemeris_call("sidtime", times.jd_ut1) * 15 + birth_info.longitude) % 360
     return {
-        "julian_day": julian_day,
+        "julian_day": times.jd_ut1,
+        "julian_day_tt": float(times.jd_tt),
         "obliquity": float(obliquity),
-        "armc": float(ascmc[2]),
+        "armc": float(armc),
     }
 
 
@@ -183,19 +174,25 @@ def point_equatorial_position(
     julian_day: float,
     obliquity: float,
     armc: float,
+    julian_day_tt: Optional[float] = None,
 ) -> tuple[float, float]:
     if point_name in SWISSEPH_PLANET_IDS:
-        equatorial = ephemeris_call(
-            "calc_ut",
-            julian_day,
+        equatorial, retflag = ephemeris_call(
+            "calc" if julian_day_tt is not None else "calc_ut",
+            julian_day_tt if julian_day_tt is not None else julian_day,
             SWISSEPH_PLANET_IDS[point_name],
             swe.FLG_SWIEPH | swe.FLG_SPEED | swe.FLG_EQUATORIAL,
-        )[0]
+        )
+        if retflag < 0:
+            raise ValueError("Primary direction equatorial ephemeris failed")
         return float(equatorial[0]), float(equatorial[1])
-    if point_name == "Medium_Coeli":
-        return armc, 0.0
+    # MC is on the ecliptic, not on the equator: its RA is ARMC but its
+    # declination is generally nonzero. Preserve the physical chart point.
+    offset = getattr(natal_subject, "calculation_basis", {}).get(
+        "ayanamsha_degrees", 0.0
+    )
     return project_absolute_degree_to_equatorial(
-        point_absolute_position(natal_subject, point_name),
+        point_absolute_position(natal_subject, point_name) + offset,
         obliquity=obliquity,
     )
 
@@ -205,12 +202,13 @@ def project_equatorial_to_ecliptic(
     declination: float,
     *,
     obliquity: float,
+    zodiac_offset: float = 0.0,
 ) -> tuple[float, float]:
     longitude, latitude, _ = swe.cotrans(
         (normalize_angle(right_ascension), declination, 1.0),
         obliquity,
     )
-    return normalize_angle(float(longitude)), float(latitude)
+    return normalize_angle(float(longitude) - zodiac_offset), float(latitude)
 
 
 def build_reprojected_primary_direction_chart_layers(
@@ -236,6 +234,7 @@ def build_reprojected_primary_direction_chart_layers(
             point_name,
             natal_subject,
             julian_day=julian_day,
+            julian_day_tt=equatorial_context["julian_day_tt"],
             obliquity=obliquity,
             armc=armc,
         )
@@ -243,19 +242,22 @@ def build_reprojected_primary_direction_chart_layers(
             right_ascension + arc_degrees,
             declination,
             obliquity=obliquity,
+            zodiac_offset=natal_subject.calculation_basis["ayanamsha_degrees"],
         )
         directed_points[point_name] = longitude_to_point_dict(point_name, longitude)
 
     directed_lots: Dict[str, Dict[str, Any]] = {}
     for lot_key, payload in natal_lots.items():
         right_ascension, declination = project_absolute_degree_to_equatorial(
-            float(payload["absolute_degree"]),
+            float(payload.get("longitude", payload["absolute_degree"]))
+            + natal_subject.calculation_basis["ayanamsha_degrees"],
             obliquity=obliquity,
         )
         longitude, _latitude = project_equatorial_to_ecliptic(
             right_ascension + arc_degrees,
             declination,
             obliquity=obliquity,
+            zodiac_offset=natal_subject.calculation_basis["ayanamsha_degrees"],
         )
         directed_lots[lot_key] = build_lot_point_dict(
             lot_key,
@@ -286,8 +288,12 @@ def mundane_semiarc_position(
     hour_angle: float,
     semiarc_degrees: float,
 ) -> tuple[float, str]:
-    clamped_semiarc = min(max(semiarc_degrees, 1e-6), 179.999999)
-    nocturnal_semiarc = max(180.0 - clamped_semiarc, 1e-6)
+    if not math.isfinite(semiarc_degrees) or not 0 < semiarc_degrees < 180:
+        raise ValueError(
+            "Mundane semiarc projection is undefined for circumpolar points"
+        )
+    clamped_semiarc = semiarc_degrees
+    nocturnal_semiarc = 180.0 - clamped_semiarc
 
     if -clamped_semiarc <= hour_angle <= 0.0:
         position = ((hour_angle + clamped_semiarc) / clamped_semiarc) * 90.0
@@ -311,8 +317,12 @@ def hour_angle_from_mundane_coordinate(
     semiarc_degrees: float,
 ) -> float:
     normalized_coordinate = normalize_angle(coordinate_degrees)
-    clamped_semiarc = min(max(semiarc_degrees, 1e-6), 179.999999)
-    nocturnal_semiarc = max(180.0 - clamped_semiarc, 1e-6)
+    if not math.isfinite(semiarc_degrees) or not 0 < semiarc_degrees < 180:
+        raise ValueError(
+            "Mundane semiarc projection is undefined for circumpolar points"
+        )
+    clamped_semiarc = semiarc_degrees
+    nocturnal_semiarc = 180.0 - clamped_semiarc
 
     if normalized_coordinate <= 90.0:
         return ((normalized_coordinate / 90.0) * clamped_semiarc) - clamped_semiarc
@@ -348,6 +358,7 @@ def build_reprojected_mundane_primary_direction_chart_layers(
             point_name,
             natal_subject,
             julian_day=julian_day,
+            julian_day_tt=equatorial_context["julian_day_tt"],
             obliquity=obliquity,
             armc=armc,
         )
@@ -367,27 +378,39 @@ def build_reprojected_mundane_primary_direction_chart_layers(
             directed_right_ascension,
             declination,
             obliquity=obliquity,
+            zodiac_offset=natal_subject.calculation_basis["ayanamsha_degrees"],
         )
         directed_points[point_name] = longitude_to_point_dict(point_name, longitude)
 
     for point_name, base_coordinate in (("Ascendant", 0.0), ("Medium_Coeli", 90.0)):
+        _, declination = point_equatorial_position(
+            point_name,
+            natal_subject,
+            julian_day=julian_day,
+            julian_day_tt=equatorial_context["julian_day_tt"],
+            obliquity=obliquity,
+            armc=armc,
+        )
+        semiarc = semiarc_degrees_for_declination(birth_info.latitude, declination)
         target_coordinate = normalize_angle(base_coordinate + arc_degrees)
         directed_hour_angle = hour_angle_from_mundane_coordinate(
             target_coordinate,
-            semiarc_degrees=90.0,
+            semiarc_degrees=semiarc,
         )
         directed_right_ascension = normalize_angle(armc - directed_hour_angle)
         longitude, _latitude = project_equatorial_to_ecliptic(
             directed_right_ascension,
-            0.0,
+            declination,
             obliquity=obliquity,
+            zodiac_offset=natal_subject.calculation_basis["ayanamsha_degrees"],
         )
         directed_points[point_name] = longitude_to_point_dict(point_name, longitude)
 
     directed_lots: Dict[str, Dict[str, Any]] = {}
     for lot_key, payload in natal_lots.items():
         right_ascension, declination = project_absolute_degree_to_equatorial(
-            float(payload["absolute_degree"]),
+            float(payload.get("longitude", payload["absolute_degree"]))
+            + natal_subject.calculation_basis["ayanamsha_degrees"],
             obliquity=obliquity,
         )
         semiarc = semiarc_degrees_for_declination(birth_info.latitude, declination)
@@ -406,6 +429,7 @@ def build_reprojected_mundane_primary_direction_chart_layers(
             directed_right_ascension,
             declination,
             obliquity=obliquity,
+            zodiac_offset=natal_subject.calculation_basis["ayanamsha_degrees"],
         )
         directed_lots[lot_key] = build_lot_point_dict(
             lot_key,
@@ -691,7 +715,9 @@ def extract_primary_direction_coordinate_payload(
     coordinate_map = extract_reference_longitudes(natal_subject)
     lot_payloads = build_lot_payloads(natal_subject)
     for lot_key, payload in lot_payloads.items():
-        coordinate_map[LOT_POINT_NAMES[lot_key]] = float(payload["absolute_degree"])
+        coordinate_map[LOT_POINT_NAMES[lot_key]] = float(
+            payload.get("longitude", payload["absolute_degree"])
+        )
 
     approximation_method = (
         pd_method if coordinate_system == "mundane_semiarc" else "astroapp_alchabitius"
@@ -729,6 +755,7 @@ def extract_primary_direction_coordinate_payload(
                 point_name,
                 natal_subject,
                 julian_day=julian_day,
+                julian_day_tt=equatorial_context["julian_day_tt"],
                 obliquity=obliquity,
                 armc=armc,
             )
@@ -743,7 +770,8 @@ def extract_primary_direction_coordinate_payload(
         for lot_key, payload in lot_payloads.items():
             point_name = LOT_POINT_NAMES[lot_key]
             right_ascension, declination = project_absolute_degree_to_equatorial(
-                float(payload["absolute_degree"]),
+                float(payload.get("longitude", payload["absolute_degree"]))
+                + natal_subject.calculation_basis["ayanamsha_degrees"],
                 obliquity=obliquity,
             )
             coordinate_map[point_name] = right_ascension
@@ -766,8 +794,6 @@ def extract_primary_direction_coordinate_payload(
             "quadrant": "horizon_east",
             "quadrant_label": PRIMARY_DIRECTION_QUADRANT_LABELS["horizon_east"],
             "mundane_position_degrees": 0.0,
-            "semiarc_degrees": 90.0,
-            "nocturnal_semiarc_degrees": 90.0,
         },
         "Medium_Coeli": {
             "projection": "mundane_semiarc",
@@ -775,16 +801,37 @@ def extract_primary_direction_coordinate_payload(
             "quadrant": "upper_meridian",
             "quadrant_label": PRIMARY_DIRECTION_QUADRANT_LABELS["upper_meridian"],
             "mundane_position_degrees": 90.0,
-            "semiarc_degrees": 90.0,
-            "nocturnal_semiarc_degrees": 90.0,
         },
     }
+
+    for point_name in PRIMARY_DIRECTION_PROMISSORS:
+        right_ascension, declination = point_equatorial_position(
+            point_name,
+            natal_subject,
+            julian_day=julian_day,
+            julian_day_tt=equatorial_context["julian_day_tt"],
+            obliquity=obliquity,
+            armc=armc,
+        )
+        semiarc = semiarc_degrees_for_declination(birth_info.latitude, declination)
+        diagnostics[point_name].update(
+            {
+                "right_ascension": round(right_ascension, 4),
+                "declination": round(declination, 4),
+                "hour_angle_degrees": round(
+                    normalize_signed_angle(armc - right_ascension), 4
+                ),
+                "semiarc_degrees": round(semiarc, 4),
+                "nocturnal_semiarc_degrees": round(180.0 - semiarc, 4),
+            }
+        )
 
     for point_name in TRADITIONAL_PLANETS:
         right_ascension, declination = point_equatorial_position(
             point_name,
             natal_subject,
             julian_day=julian_day,
+            julian_day_tt=equatorial_context["julian_day_tt"],
             obliquity=obliquity,
             armc=armc,
         )
@@ -811,7 +858,8 @@ def extract_primary_direction_coordinate_payload(
     for lot_key, payload in lot_payloads.items():
         point_name = LOT_POINT_NAMES[lot_key]
         right_ascension, declination = project_absolute_degree_to_equatorial(
-            float(payload["absolute_degree"]),
+            float(payload.get("longitude", payload["absolute_degree"]))
+            + natal_subject.calculation_basis["ayanamsha_degrees"],
             obliquity=obliquity,
         )
         semiarc = semiarc_degrees_for_declination(birth_info.latitude, declination)
@@ -878,7 +926,7 @@ def build_shifted_lot_payloads(
     return {
         lot_key: build_lot_point_dict(
             lot_key,
-            float(payload["absolute_degree"]) + arc_degrees,
+            float(payload.get("longitude", payload["absolute_degree"])) + arc_degrees,
             asc_sign=asc_sign,
         )
         for lot_key, payload in natal_lots.items()

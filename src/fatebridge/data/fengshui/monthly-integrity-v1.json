@@ -1,0 +1,132 @@
+{
+  "reference_id": "monthly_literal_guard_v1",
+  "source_reference_sha256": "d91185d7bcf93f424517225e8d8d62e4ddbe36c46f1aeef72b33251d52a286b4",
+  "source": {
+    "title": "沈氏玄空学·玄空辑要·月紫白九星入中表",
+    "author": "沈竹礽编，王则先辑要；姚国华、柯誉整理",
+    "url": "https://www.vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4%2F%E6%B2%88%E6%B0%8F%E7%8E%84%E7%A9%BA%E5%AD%A6.pdf",
+    "kind": "published_original_text_reprint",
+    "source_version": "中央编译出版社2011.3出版、2016.2重印，ISBN978-7-5117-0801-4，以完整PDF散列固定",
+    "retrieved_sha256": "b0c2a7af0a1b94f36cf1cc9f0d2ce4b65e8ea49bd793bc128b8fdc525b5ba847",
+    "locator": "PDF731，三组年支与十二节月的36个入中数；PDF730为表题",
+    "scope": "只采用36个星数与三组年支，六月节候栏的大暑、小暑倒序另记，不采用吉凶断语或认证全书"
+  },
+  "printed_center_columns": [
+    {
+      "branches": [
+        "子",
+        "午",
+        "卯",
+        "酉"
+      ],
+      "centers": [
+        8,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        9,
+        8,
+        7,
+        6
+      ]
+    },
+    {
+      "branches": [
+        "辰",
+        "戌",
+        "丑",
+        "未"
+      ],
+      "centers": [
+        5,
+        4,
+        3,
+        2,
+        1,
+        9,
+        8,
+        7,
+        6,
+        5,
+        4,
+        3
+      ]
+    },
+    {
+      "branches": [
+        "寅",
+        "申",
+        "巳",
+        "亥"
+      ],
+      "centers": [
+        2,
+        1,
+        9,
+        8,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        9
+      ]
+    }
+  ],
+  "palace_offsets": {
+    "C": 0,
+    "NW": 1,
+    "W": 2,
+    "NE": 3,
+    "S": 4,
+    "N": 5,
+    "SW": 6,
+    "E": 7,
+    "SE": 8
+  },
+  "star_identities": {
+    "1": {
+      "name": "一白贪狼",
+      "element": "水"
+    },
+    "2": {
+      "name": "二黑巨门",
+      "element": "土"
+    },
+    "3": {
+      "name": "三碧禄存",
+      "element": "木"
+    },
+    "4": {
+      "name": "四绿文曲",
+      "element": "木"
+    },
+    "5": {
+      "name": "五黄廉贞",
+      "element": "土"
+    },
+    "6": {
+      "name": "六白武曲",
+      "element": "金"
+    },
+    "7": {
+      "name": "七赤破军",
+      "element": "金"
+    },
+    "8": {
+      "name": "八白左辅",
+      "element": "土"
+    },
+    "9": {
+      "name": "九紫右弼",
+      "element": "火"
+    }
+  },
+  "scope": "Literal month centers and fixed Lo Shu flight arithmetic; not calendrical TT accuracy, whole book or reality prediction"
+}

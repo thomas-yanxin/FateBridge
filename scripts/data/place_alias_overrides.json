@@ -1,0 +1,1136 @@
+[
+  {
+    "canonical_name": "北京",
+    "level": "municipality",
+    "aliases": [
+      "北京",
+      "beijing",
+      "peking",
+      "北京市"
+    ]
+  },
+  {
+    "canonical_name": "上海",
+    "level": "municipality",
+    "aliases": [
+      "上海",
+      "shanghai",
+      "上海市"
+    ]
+  },
+  {
+    "canonical_name": "天津",
+    "level": "municipality",
+    "aliases": [
+      "天津",
+      "tianjin",
+      "天津市"
+    ]
+  },
+  {
+    "canonical_name": "重庆",
+    "level": "municipality",
+    "aliases": [
+      "重庆",
+      "chongqing",
+      "重庆市"
+    ]
+  },
+  {
+    "canonical_name": "开州区",
+    "level": "county",
+    "aliases": [
+      "开州区",
+      "开州",
+      "开县"
+    ]
+  },
+  {
+    "canonical_name": "香港",
+    "level": "special_region",
+    "aliases": [
+      "香港",
+      "hong kong",
+      "hongkong",
+      "香港特别行政区"
+    ]
+  },
+  {
+    "canonical_name": "澳门",
+    "level": "special_region",
+    "aliases": [
+      "澳门",
+      "macau",
+      "macao",
+      "澳门特别行政区"
+    ]
+  },
+  {
+    "canonical_name": "台北",
+    "level": "special_region",
+    "aliases": [
+      "台北",
+      "taipei",
+      "臺北",
+      "台北市",
+      "臺北市"
+    ]
+  },
+  {
+    "canonical_name": "河北",
+    "level": "province",
+    "aliases": [
+      "河北",
+      "hebei",
+      "河北省"
+    ]
+  },
+  {
+    "canonical_name": "山西",
+    "level": "province",
+    "aliases": [
+      "山西",
+      "shanxi",
+      "山西省"
+    ]
+  },
+  {
+    "canonical_name": "辽宁",
+    "level": "province",
+    "aliases": [
+      "辽宁",
+      "liaoning",
+      "辽宁省"
+    ]
+  },
+  {
+    "canonical_name": "吉林",
+    "level": "province",
+    "aliases": [
+      "吉林",
+      "jilin",
+      "吉林省"
+    ]
+  },
+  {
+    "canonical_name": "黑龙江",
+    "level": "province",
+    "aliases": [
+      "黑龙江",
+      "heilongjiang",
+      "hei longjiang",
+      "黑龙江省"
+    ]
+  },
+  {
+    "canonical_name": "江苏",
+    "level": "province",
+    "aliases": [
+      "江苏",
+      "jiangsu",
+      "江苏省"
+    ]
+  },
+  {
+    "canonical_name": "浙江",
+    "level": "province",
+    "aliases": [
+      "浙江",
+      "zhejiang",
+      "浙江省"
+    ]
+  },
+  {
+    "canonical_name": "安徽",
+    "level": "province",
+    "aliases": [
+      "安徽",
+      "anhui",
+      "安徽省"
+    ]
+  },
+  {
+    "canonical_name": "福建",
+    "level": "province",
+    "aliases": [
+      "福建",
+      "fujian",
+      "福建省"
+    ]
+  },
+  {
+    "canonical_name": "江西",
+    "level": "province",
+    "aliases": [
+      "江西",
+      "jiangxi",
+      "江西省"
+    ]
+  },
+  {
+    "canonical_name": "山东",
+    "level": "province",
+    "aliases": [
+      "山东",
+      "shandong",
+      "山东省"
+    ]
+  },
+  {
+    "canonical_name": "河南",
+    "level": "province",
+    "aliases": [
+      "河南",
+      "henan",
+      "河南省"
+    ]
+  },
+  {
+    "canonical_name": "湖北",
+    "level": "province",
+    "aliases": [
+      "湖北",
+      "hubei",
+      "湖北省"
+    ]
+  },
+  {
+    "canonical_name": "湖南",
+    "level": "province",
+    "aliases": [
+      "湖南",
+      "hunan",
+      "湖南省"
+    ]
+  },
+  {
+    "canonical_name": "广东",
+    "level": "province",
+    "aliases": [
+      "广东",
+      "guangdong",
+      "广东省"
+    ]
+  },
+  {
+    "canonical_name": "海南",
+    "level": "province",
+    "aliases": [
+      "海南",
+      "hainan",
+      "海南省"
+    ]
+  },
+  {
+    "canonical_name": "四川",
+    "level": "province",
+    "aliases": [
+      "四川",
+      "sichuan",
+      "四川省"
+    ]
+  },
+  {
+    "canonical_name": "贵州",
+    "level": "province",
+    "aliases": [
+      "贵州",
+      "guizhou",
+      "贵州省"
+    ]
+  },
+  {
+    "canonical_name": "云南",
+    "level": "province",
+    "aliases": [
+      "云南",
+      "yunnan",
+      "云南省"
+    ]
+  },
+  {
+    "canonical_name": "陕西",
+    "level": "province",
+    "aliases": [
+      "陕西",
+      "shaanxi",
+      "陕西省"
+    ]
+  },
+  {
+    "canonical_name": "甘肃",
+    "level": "province",
+    "aliases": [
+      "甘肃",
+      "gansu",
+      "甘肃省"
+    ]
+  },
+  {
+    "canonical_name": "青海",
+    "level": "province",
+    "aliases": [
+      "青海",
+      "qinghai",
+      "青海省"
+    ]
+  },
+  {
+    "canonical_name": "台湾",
+    "level": "province",
+    "aliases": [
+      "台湾",
+      "taiwan",
+      "台湾省",
+      "臺灣",
+      "臺灣省"
+    ]
+  },
+  {
+    "canonical_name": "内蒙古",
+    "level": "province",
+    "aliases": [
+      "内蒙古",
+      "neimenggu",
+      "inner mongolia",
+      "内蒙古自治区"
+    ]
+  },
+  {
+    "canonical_name": "广西",
+    "level": "province",
+    "aliases": [
+      "广西",
+      "guangxi",
+      "广西壮族自治区"
+    ]
+  },
+  {
+    "canonical_name": "西藏",
+    "level": "province",
+    "aliases": [
+      "西藏",
+      "xizang",
+      "tibet",
+      "西藏自治区"
+    ]
+  },
+  {
+    "canonical_name": "宁夏",
+    "level": "province",
+    "aliases": [
+      "宁夏",
+      "ningxia",
+      "宁夏回族自治区"
+    ]
+  },
+  {
+    "canonical_name": "新疆",
+    "level": "province",
+    "aliases": [
+      "新疆",
+      "xinjiang",
+      "新疆维吾尔自治区"
+    ]
+  },
+  {
+    "canonical_name": "广州",
+    "level": "city",
+    "aliases": [
+      "广州",
+      "guangzhou",
+      "canton",
+      "广州市"
+    ]
+  },
+  {
+    "canonical_name": "深圳",
+    "level": "city",
+    "aliases": [
+      "深圳",
+      "shenzhen",
+      "深圳市"
+    ]
+  },
+  {
+    "canonical_name": "杭州",
+    "level": "city",
+    "aliases": [
+      "杭州",
+      "hangzhou",
+      "杭州市"
+    ]
+  },
+  {
+    "canonical_name": "宁波",
+    "level": "city",
+    "aliases": [
+      "宁波",
+      "ningbo",
+      "宁波市"
+    ]
+  },
+  {
+    "canonical_name": "南京",
+    "level": "city",
+    "aliases": [
+      "南京",
+      "nanjing",
+      "南京市"
+    ]
+  },
+  {
+    "canonical_name": "苏州",
+    "level": "city",
+    "aliases": [
+      "苏州",
+      "suzhou",
+      "苏州市"
+    ]
+  },
+  {
+    "canonical_name": "武汉",
+    "level": "city",
+    "aliases": [
+      "武汉",
+      "wuhan",
+      "武汉市"
+    ]
+  },
+  {
+    "canonical_name": "成都",
+    "level": "city",
+    "aliases": [
+      "成都",
+      "chengdu",
+      "成都市"
+    ]
+  },
+  {
+    "canonical_name": "西安",
+    "level": "city",
+    "aliases": [
+      "西安",
+      "xi'an",
+      "xi an",
+      "xian",
+      "西安市"
+    ]
+  },
+  {
+    "canonical_name": "乌鲁木齐",
+    "level": "city",
+    "aliases": [
+      "乌鲁木齐",
+      "urumqi",
+      "wulumuqi",
+      "urumchi",
+      "乌鲁木齐市"
+    ]
+  },
+  {
+    "canonical_name": "石家庄",
+    "level": "city",
+    "aliases": [
+      "石家庄",
+      "shijiazhuang",
+      "石家庄市"
+    ]
+  },
+  {
+    "canonical_name": "济南",
+    "level": "city",
+    "aliases": [
+      "济南",
+      "jinan",
+      "济南市"
+    ]
+  },
+  {
+    "canonical_name": "青岛",
+    "level": "city",
+    "aliases": [
+      "青岛",
+      "qingdao",
+      "tsingtao",
+      "青岛市"
+    ]
+  },
+  {
+    "canonical_name": "郑州",
+    "level": "city",
+    "aliases": [
+      "郑州",
+      "zhengzhou",
+      "郑州市"
+    ]
+  },
+  {
+    "canonical_name": "长沙",
+    "level": "city",
+    "aliases": [
+      "长沙",
+      "changsha",
+      "长沙市"
+    ]
+  },
+  {
+    "canonical_name": "福州",
+    "level": "city",
+    "aliases": [
+      "福州",
+      "fuzhou",
+      "福州市"
+    ]
+  },
+  {
+    "canonical_name": "厦门",
+    "level": "city",
+    "aliases": [
+      "厦门",
+      "xiamen",
+      "amoy",
+      "厦门市"
+    ]
+  },
+  {
+    "canonical_name": "合肥",
+    "level": "city",
+    "aliases": [
+      "合肥",
+      "hefei",
+      "合肥市"
+    ]
+  },
+  {
+    "canonical_name": "南昌",
+    "level": "city",
+    "aliases": [
+      "南昌",
+      "nanchang",
+      "南昌市"
+    ]
+  },
+  {
+    "canonical_name": "昆明",
+    "level": "city",
+    "aliases": [
+      "昆明",
+      "kunming",
+      "昆明市"
+    ]
+  },
+  {
+    "canonical_name": "贵阳",
+    "level": "city",
+    "aliases": [
+      "贵阳",
+      "guiyang",
+      "贵阳市"
+    ]
+  },
+  {
+    "canonical_name": "南宁",
+    "level": "city",
+    "aliases": [
+      "南宁",
+      "nanning",
+      "南宁市"
+    ]
+  },
+  {
+    "canonical_name": "海口",
+    "level": "city",
+    "aliases": [
+      "海口",
+      "haikou",
+      "海口市"
+    ]
+  },
+  {
+    "canonical_name": "呼和浩特",
+    "level": "city",
+    "aliases": [
+      "呼和浩特",
+      "huhehaote",
+      "hohhot",
+      "呼和浩特市"
+    ]
+  },
+  {
+    "canonical_name": "银川",
+    "level": "city",
+    "aliases": [
+      "银川",
+      "yinchuan",
+      "银川市"
+    ]
+  },
+  {
+    "canonical_name": "兰州",
+    "level": "city",
+    "aliases": [
+      "兰州",
+      "lanzhou",
+      "兰州市"
+    ]
+  },
+  {
+    "canonical_name": "西宁",
+    "level": "city",
+    "aliases": [
+      "西宁",
+      "xining",
+      "西宁市"
+    ]
+  },
+  {
+    "canonical_name": "拉萨",
+    "level": "city",
+    "aliases": [
+      "拉萨",
+      "lhasa",
+      "lasa",
+      "拉萨市"
+    ]
+  },
+  {
+    "canonical_name": "喀什",
+    "level": "city",
+    "aliases": [
+      "喀什",
+      "kashi",
+      "kashgar",
+      "喀什地区",
+      "喀什市"
+    ]
+  },
+  {
+    "canonical_name": "咸阳",
+    "level": "city",
+    "aliases": [
+      "咸阳",
+      "咸阳市"
+    ]
+  },
+  {
+    "canonical_name": "宝鸡",
+    "level": "city",
+    "aliases": [
+      "宝鸡",
+      "宝鸡市"
+    ]
+  },
+  {
+    "canonical_name": "南通",
+    "level": "city",
+    "aliases": [
+      "南通",
+      "南通市"
+    ]
+  },
+  {
+    "canonical_name": "海安",
+    "level": "county",
+    "aliases": [
+      "海安",
+      "海安市",
+      "海安县"
+    ]
+  },
+  {
+    "canonical_name": "如皋",
+    "level": "county",
+    "aliases": [
+      "如皋",
+      "如皋市"
+    ]
+  },
+  {
+    "canonical_name": "启东",
+    "level": "county",
+    "aliases": [
+      "启东",
+      "启东市"
+    ]
+  },
+  {
+    "canonical_name": "海门",
+    "level": "county",
+    "aliases": [
+      "海门",
+      "海门区",
+      "海门市"
+    ]
+  },
+  {
+    "canonical_name": "如东",
+    "level": "county",
+    "aliases": [
+      "如东",
+      "如东县"
+    ]
+  },
+  {
+    "canonical_name": "无锡",
+    "level": "city",
+    "aliases": [
+      "无锡",
+      "无锡市"
+    ]
+  },
+  {
+    "canonical_name": "常州",
+    "level": "city",
+    "aliases": [
+      "常州",
+      "常州市"
+    ]
+  },
+  {
+    "canonical_name": "徐州",
+    "level": "city",
+    "aliases": [
+      "徐州",
+      "徐州市"
+    ]
+  },
+  {
+    "canonical_name": "扬州",
+    "level": "city",
+    "aliases": [
+      "扬州",
+      "扬州市"
+    ]
+  },
+  {
+    "canonical_name": "盐城",
+    "level": "city",
+    "aliases": [
+      "盐城",
+      "盐城市"
+    ]
+  },
+  {
+    "canonical_name": "镇江",
+    "level": "city",
+    "aliases": [
+      "镇江",
+      "镇江市"
+    ]
+  },
+  {
+    "canonical_name": "泰州",
+    "level": "city",
+    "aliases": [
+      "泰州",
+      "泰州市"
+    ]
+  },
+  {
+    "canonical_name": "温州",
+    "level": "city",
+    "aliases": [
+      "温州",
+      "温州市"
+    ]
+  },
+  {
+    "canonical_name": "绍兴",
+    "level": "city",
+    "aliases": [
+      "绍兴",
+      "绍兴市"
+    ]
+  },
+  {
+    "canonical_name": "嘉兴",
+    "level": "city",
+    "aliases": [
+      "嘉兴",
+      "嘉兴市"
+    ]
+  },
+  {
+    "canonical_name": "台州",
+    "level": "city",
+    "aliases": [
+      "台州",
+      "台州市"
+    ]
+  },
+  {
+    "canonical_name": "金华",
+    "level": "city",
+    "aliases": [
+      "金华",
+      "金华市"
+    ]
+  },
+  {
+    "canonical_name": "湖州",
+    "level": "city",
+    "aliases": [
+      "湖州",
+      "湖州市"
+    ]
+  },
+  {
+    "canonical_name": "大连",
+    "level": "city",
+    "aliases": [
+      "大连",
+      "大连市"
+    ]
+  },
+  {
+    "canonical_name": "鞍山",
+    "level": "city",
+    "aliases": [
+      "鞍山",
+      "鞍山市"
+    ]
+  },
+  {
+    "canonical_name": "唐山",
+    "level": "city",
+    "aliases": [
+      "唐山",
+      "唐山市"
+    ]
+  },
+  {
+    "canonical_name": "保定",
+    "level": "city",
+    "aliases": [
+      "保定",
+      "保定市"
+    ]
+  },
+  {
+    "canonical_name": "邯郸",
+    "level": "city",
+    "aliases": [
+      "邯郸",
+      "邯郸市"
+    ]
+  },
+  {
+    "canonical_name": "沧州",
+    "level": "city",
+    "aliases": [
+      "沧州",
+      "沧州市"
+    ]
+  },
+  {
+    "canonical_name": "廊坊",
+    "level": "city",
+    "aliases": [
+      "廊坊",
+      "廊坊市"
+    ]
+  },
+  {
+    "canonical_name": "临沂",
+    "level": "city",
+    "aliases": [
+      "临沂",
+      "临沂市"
+    ]
+  },
+  {
+    "canonical_name": "潍坊",
+    "level": "city",
+    "aliases": [
+      "潍坊",
+      "潍坊市"
+    ]
+  },
+  {
+    "canonical_name": "淄博",
+    "level": "city",
+    "aliases": [
+      "淄博",
+      "淄博市"
+    ]
+  },
+  {
+    "canonical_name": "济宁",
+    "level": "city",
+    "aliases": [
+      "济宁",
+      "济宁市"
+    ]
+  },
+  {
+    "canonical_name": "泰安",
+    "level": "city",
+    "aliases": [
+      "泰安",
+      "泰安市"
+    ]
+  },
+  {
+    "canonical_name": "烟台",
+    "level": "city",
+    "aliases": [
+      "烟台",
+      "烟台市"
+    ]
+  },
+  {
+    "canonical_name": "威海",
+    "level": "city",
+    "aliases": [
+      "威海",
+      "威海市"
+    ]
+  },
+  {
+    "canonical_name": "洛阳",
+    "level": "city",
+    "aliases": [
+      "洛阳",
+      "洛阳市"
+    ]
+  },
+  {
+    "canonical_name": "南阳",
+    "level": "city",
+    "aliases": [
+      "南阳",
+      "南阳市"
+    ]
+  },
+  {
+    "canonical_name": "开封",
+    "level": "city",
+    "aliases": [
+      "开封",
+      "开封市"
+    ]
+  },
+  {
+    "canonical_name": "新乡",
+    "level": "city",
+    "aliases": [
+      "新乡",
+      "新乡市"
+    ]
+  },
+  {
+    "canonical_name": "许昌",
+    "level": "city",
+    "aliases": [
+      "许昌",
+      "许昌市"
+    ]
+  },
+  {
+    "canonical_name": "宜昌",
+    "level": "city",
+    "aliases": [
+      "宜昌",
+      "宜昌市"
+    ]
+  },
+  {
+    "canonical_name": "襄阳",
+    "level": "city",
+    "aliases": [
+      "襄阳",
+      "襄阳市",
+      "襄樊"
+    ]
+  },
+  {
+    "canonical_name": "株洲",
+    "level": "city",
+    "aliases": [
+      "株洲",
+      "株洲市"
+    ]
+  },
+  {
+    "canonical_name": "湘潭",
+    "level": "city",
+    "aliases": [
+      "湘潭",
+      "湘潭市"
+    ]
+  },
+  {
+    "canonical_name": "衡阳",
+    "level": "city",
+    "aliases": [
+      "衡阳",
+      "衡阳市"
+    ]
+  },
+  {
+    "canonical_name": "岳阳",
+    "level": "city",
+    "aliases": [
+      "岳阳",
+      "岳阳市"
+    ]
+  },
+  {
+    "canonical_name": "泉州",
+    "level": "city",
+    "aliases": [
+      "泉州",
+      "泉州市"
+    ]
+  },
+  {
+    "canonical_name": "漳州",
+    "level": "city",
+    "aliases": [
+      "漳州",
+      "漳州市"
+    ]
+  },
+  {
+    "canonical_name": "赣州",
+    "level": "city",
+    "aliases": [
+      "赣州",
+      "赣州市"
+    ]
+  },
+  {
+    "canonical_name": "九江",
+    "level": "city",
+    "aliases": [
+      "九江",
+      "九江市"
+    ]
+  },
+  {
+    "canonical_name": "芜湖",
+    "level": "city",
+    "aliases": [
+      "芜湖",
+      "芜湖市"
+    ]
+  },
+  {
+    "canonical_name": "绵阳",
+    "level": "city",
+    "aliases": [
+      "绵阳",
+      "绵阳市"
+    ]
+  },
+  {
+    "canonical_name": "宜宾",
+    "level": "city",
+    "aliases": [
+      "宜宾",
+      "宜宾市"
+    ]
+  },
+  {
+    "canonical_name": "遵义",
+    "level": "city",
+    "aliases": [
+      "遵义",
+      "遵义市"
+    ]
+  },
+  {
+    "canonical_name": "桂林",
+    "level": "city",
+    "aliases": [
+      "桂林",
+      "桂林市"
+    ]
+  },
+  {
+    "canonical_name": "柳州",
+    "level": "city",
+    "aliases": [
+      "柳州",
+      "柳州市"
+    ]
+  },
+  {
+    "canonical_name": "佛山",
+    "level": "city",
+    "aliases": [
+      "佛山",
+      "佛山市"
+    ]
+  },
+  {
+    "canonical_name": "东莞",
+    "level": "city",
+    "aliases": [
+      "东莞",
+      "东莞市"
+    ]
+  },
+  {
+    "canonical_name": "珠海",
+    "level": "city",
+    "aliases": [
+      "珠海",
+      "珠海市"
+    ]
+  },
+  {
+    "canonical_name": "汕头",
+    "level": "city",
+    "aliases": [
+      "汕头",
+      "汕头市"
+    ]
+  },
+  {
+    "canonical_name": "惠州",
+    "level": "city",
+    "aliases": [
+      "惠州",
+      "惠州市"
+    ]
+  },
+  {
+    "canonical_name": "纽约",
+    "level": "city",
+    "aliases": [
+      "纽约",
+      "new york",
+      "newyork",
+      "nyc",
+      "纽约市"
+    ]
+  },
+  {
+    "canonical_name": "伦敦",
+    "level": "city",
+    "aliases": [
+      "伦敦",
+      "london"
+    ]
+  },
+  {
+    "canonical_name": "东京",
+    "level": "city",
+    "aliases": [
+      "东京",
+      "tokyo",
+      "东京都"
+    ]
+  },
+  {
+    "canonical_name": "悉尼",
+    "level": "city",
+    "aliases": [
+      "悉尼",
+      "sydney",
+      "悉尼市"
+    ]
+  }
+]

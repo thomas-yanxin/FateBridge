@@ -41,6 +41,12 @@ _MCP_SOLAR_FIELDS = {
     "person1_use_true_solar_time",
     "person2_use_true_solar_time",
 }
+_MCP_COMPONENT_FIELDS = {
+    "birth_minute",
+    "person1_birth_minute",
+    "person2_birth_minute",
+}
+_MCP_PRESENCE_FIELDS = _MCP_SOLAR_FIELDS | _MCP_COMPONENT_FIELDS
 
 
 def _mcp_omitted_default() -> Any:
@@ -49,8 +55,10 @@ def _mcp_omitted_default() -> Any:
 
 def model_parameters(
     model: Type[BaseModel],
+    *,
+    additional_presence_fields: tuple[str, ...] = (),
 ) -> Tuple[List[inspect.Parameter], Dict[str, Any]]:
-    """Expose model constraints while preserving omitted solar-time flags."""
+    """Expose constraints while preserving omitted flags and clock components."""
     required: List[inspect.Parameter] = []
     optional: List[inspect.Parameter] = []
     annotations: Dict[str, Any] = {}
@@ -58,10 +66,12 @@ def model_parameters(
         metadata = copy(field)
         metadata.default = PydanticUndefined
         metadata.default_factory = None
-        preserve_omission = name in _MCP_SOLAR_FIELDS and not field.is_required()
+        preserve_omission = (
+            name in _MCP_PRESENCE_FIELDS or name in additional_presence_fields
+        ) and not field.is_required()
         if preserve_omission:
             # Pydantic fills signature defaults before calling impl. A factory
-            # gives omitted booleans a private sentinel without accepting null
+            # gives omitted inputs a private sentinel without accepting null
             # or changing the request model's actual default.
             metadata.default_factory = _mcp_omitted_default
         ann: Any = Annotated[
@@ -118,7 +128,10 @@ def register_mcp(
                 model_schema(spec.output_model) if spec.output_model else None
             ),
         )
-        for name in _MCP_SOLAR_FIELDS & spec.request_model.model_fields.keys():
+        presence_fields = _MCP_PRESENCE_FIELDS | (
+            {"analysis_minute"} if spec.key == "meihua_analysis" else set()
+        )
+        for name in presence_fields & spec.request_model.model_fields.keys():
             field = spec.request_model.model_fields[name]
             if not field.is_required():
                 # The factory is an adapter detail. Discovery describes the
@@ -147,7 +160,12 @@ def _make_mcp_fn(
     from fastmcp.tools import ToolResult
 
     model = spec.request_model
-    params, annotations = model_parameters(model)
+    params, annotations = model_parameters(
+        model,
+        additional_presence_fields=(
+            ("analysis_minute",) if spec.key == "meihua_analysis" else ()
+        ),
+    )
     # Transport-level flags appended after model fields; guard against a model
     # field shadowing them (would make the flag unsettable / silently swallowed).
     _reserved = {

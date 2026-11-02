@@ -1,0 +1,71 @@
+{
+  "model_id": "fatebridge_moshier_aa1996_solar_v1",
+  "version": "1.1.0",
+  "abi_version": 1,
+  "calculation_recipe_id": "swiss_2.10.03_aa1996_emb_complete_moon_v1",
+  "calculation_source_sha256": "a2aa7646b58e9b3cea5101a7efbf6a3e434dd745b6ad12795132347b5c370593",
+  "calculation_files_sha256": {
+    "swemptab.h": "dc7595b81bd49e86a6204ed1e0a041c410a9de5c068fd1d90d350a82d604fb85",
+    "swemmoon.c": "1d5f5ef9a95cf9a2f395b6334a58c63851ce0512d65bf08e49d3caf0a9fecb00",
+    "swevents.h": "82ce992f909854f7816386aaaf52f52826c315d5c926172195b57edbe32364e0",
+    "LICENSE": "b6345743292c516d07799dfad46f1a641e5270da2160cc4d6bd54594d6faa991",
+    "swehouse.h": "7a91a007a4de0900ed6d234d74da421b2372d245b09a2ba8b74d6e2e054a200c",
+    "swephexp.h": "dd8e74e2853915a316041397f31730219b7910333be6bba3934fd77130335f22",
+    "Makefile": "1f872c7fb49d45577452caea3bf09c62945e8ba67389f38556827d059e3be805",
+    "sweph.h": "8e44b9c00d23a0b583581f17fc6798ea376649d2517abbb556ee1b1aff6a138a",
+    "swedate.h": "886b001815561f2c5f5e40418ce00d62377cb8962180c38062ac83bfdab77b38",
+    "swehel.c": "7b4be28627afd22b059389abc4ef679b7259a0bcb9d0510e7ca3825901754b93",
+    "swejpl.h": "f61ae6173b150f456540afba68500989c642506822e0397cf99c2cb7f50aac0d",
+    "swephlib.h": "29a151bb0c6adcb73fa73eff805b498c26bdffbb81e82d55e1b50f79218ea82a",
+    "swedll.h": "8bfe26da8ddab988bf4980828da231f6b8608158606b679ce7f68ee44cf692ad",
+    "swehouse.c": "384c1d7b2a8bcef9f2cf16f7fbf02e7aa18f372bc11320874a5543b92aed95d9",
+    "swemplan-aa1996.c": "e1ef163a333f5767afe1f9f4c7c970b409b19d36ff5b899b64b92702173e5c3e",
+    "swecl.c": "ab46bdc303978523c69d814d236432541ff48cb410b756ef78cc1e8d2b2be303",
+    "sweephe4.h": "2cab6af5381da9bb7cb08644577b71c7dd9e3a0e69a7080a659d30817448f7b1",
+    "swenut2000a.h": "83b0a2f569174b56c8e26971b00f85f5ae52265b34c1c53436c7122e0f1faad7",
+    "sweph.c": "80761ccfae7cd7207a33559d8898b9c5386cced609cfaebbbbf050f7a80ddc4f",
+    "swedate.c": "6790e989a003cb6422080d9aecf3c6567a25030f5b5647fd749e5b16422cfac7",
+    "swemplan.c": "d13502ca7b92e3e32317b67ba7f012d92fabd1d358c3394c094d5515a3567caa",
+    "swephlib.c": "d41eb2f396163fedd574749de02a25e8547b4e1e4c66783d47ccc0c7e4885a05",
+    "swejpl.c": "44014e260ae9ab2b1e8f413bb8a35fa270e369e3fb4907cd137ae103d2a8d0c2",
+    "sweodef.h": "a2ace0fc0ea81ffbf9eb0a7f9fc1c1446d98f07d3a170a2c54b8ef4908325462",
+    "author/mlat404.c": "b6c80cfa267e8eb30e34c50e43275c413a3c768510b6d4da6d4cc7821d790196",
+    "author/mlr404.c": "42750702d4fdfa95a83002e7206aaae937eb853a4fe72bc1834e297d1d29e51c",
+    "author/wrapper.c": "af9132368753f0b7d388cee054c4a840c62eecafc3c490e4619289b673c93863",
+    "author/native_bridge.c": "595afcf2fd319dabc9344edce156870baa7c1530b4f4a7811993846b2690d45b",
+    "author/ear404.c": "9c3eb73355905f5f89d7bff6f8d22a7374ddbaa75ff59431ca19f51b1ea2f2ed",
+    "author/epsiln.c": "a21592a188808b43e9f23d0744b2eaa5a6c97c03a7da6a4e0f790685215088ce",
+    "author/plantbl.h": "9d7ebfe426fe1e40ff12428e73ae6b0b85a4aac610a0be3841591cdf3120a796",
+    "author/gplan.c": "f241e5d38ef53d82aed306cc90f2a58066ba39938320498fdae58714a5dd66be"
+  },
+  "sources": {
+    "swiss": {
+      "url": "https://files.pythonhosted.org/packages/66/a6/db70d67a00dda42ebd033538c086879328f4c17f670eafe8aca2f11abfef/pyswisseph-2.10.3.2.tar.gz",
+      "sha256": "c54c305e83dbd5d2b71e58d8a69d8ee41de24c4d3328ce09e2af860a3537624d",
+      "core_version": "2.10.03"
+    },
+    "aa56": {
+      "url": "https://www.moshier.net/aa-56.zip",
+      "sha256": "da6142ca4a0808d53ae4e21d57ab72008ecedc7b12cf73f31e0599e7acad0a0e",
+      "earth_table_version": "December1996"
+    }
+  },
+  "native_bridge_c": "#include <math.h>\nextern int aa56_emb(double, double *);\nextern double aa56_epsilon_j2000(void);\nextern double swi_epsiln(double, int);\nint fatebridge_aa96_native_emb(double tt, double *out) {\n    double p[3], x, y, z, a, b, e;\n    int code = aa56_emb(tt, p);\n    if (code != 0) return code;\n    x = p[2] * cos(p[1]) * cos(p[0]);\n    y = p[2] * cos(p[1]) * sin(p[0]);\n    z = p[2] * sin(p[1]);\n    e = aa56_epsilon_j2000();\n    a = cos(e) * y - sin(e) * z;\n    b = sin(e) * y + cos(e) * z;\n    e = swi_epsiln(2451545.0, 0);\n    y = cos(e) * a + sin(e) * b;\n    z = -sin(e) * a + cos(e) * b;\n    out[0] = atan2(y, x);\n    out[1] = atan2(z, hypot(x, y));\n    out[2] = p[2];\n    return 0;\n}\n",
+  "native_declaration_c": "\nextern int fatebridge_aa96_native_emb(double, double *);\n",
+  "lunar_replacement_c": "\n  /* Experimental AA1996/full-Moshier-Moon research only, not a stock build.\n     Use the full standalone geometric lunar series and the exact queried\n     epoch's obliquity. Do not depend on cached oec at another sample time. */\n  {\n    double moon[3];\n    double epsilon = swi_epsiln(tjd, 0);\n    int k;\n    if (swi_moshmoon2(tjd, moon) != 0) {\n      for (k = 0; k < 3; k++) xemb[k] = NAN;\n      return;\n    }\n    swi_polcart(moon, moon);\n    swi_coortrf2(moon, moon, -sin(epsilon), cos(epsilon));\n    swi_precess(moon, tjd, 0, J_TO_J2000);\n    for (k = 0; k < 3; k++) xemb[k] -= moon[k] / (EARTH_MOON_MRAT + 1.0);\n    return;\n  }\n",
+  "source_wrapper_c": "#include \"plantbl.h\"\nextern struct plantbl ear404;\nextern int g3plan(double, struct plantbl *, double *, int);\nextern int epsiln(double);\nextern double eps;\ndouble STR = 4.8481368110953599359e-6;\nint aa56_emb(double tt, double *out) { return g3plan(tt, &ear404, out, 3); }\ndouble aa56_epsilon_j2000(void) { epsiln(2451545.0); return eps; }\nint aa56_long_bytes(void) { return sizeof(long); }\n",
+  "software_input_years": [
+    1800,
+    2200
+  ],
+  "working_jd_tt": [
+    2372652.5,
+    2526419.5
+  ],
+  "reference": "https://moshier.net/",
+  "scope": "Named modified Moshier Sun model; v1.1 qualifies all24terms1784..2204 for internal period endpoints,while standalone input years remain1800..2200. Same calculation source as v1.0; not all-epoch physical/civil accuracy or stock native Moshier certification.",
+  "qualified_solar_term_years": [
+    1784,
+    2204
+  ]
+}

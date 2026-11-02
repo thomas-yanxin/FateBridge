@@ -13,7 +13,11 @@ from fatebridge.core.fengshui.models import AssessRequest
 from fatebridge.core.fengshui.output import FengshuiOutput
 from fatebridge.services.fengshui import assess
 from tests.fixtures.fengshui import payload
-from tests.test_fengshui_surfaces import rest_client, without_transport
+from tests.test_fengshui_surfaces import (
+    rest_client,
+    same_run_projected_response,
+    without_transport,
+)
 
 PURPOSE_ROLES = [
     ("door", "door_facing"),
@@ -186,16 +190,17 @@ def test_projected_readiness_is_identical_on_rest_mcp_cli(
 
     async def call():
         async with Client(create_mcp_app()) as client:
-            return await client.call_tool(
+            result = await client.call_tool(
                 "fengshui_assess", {**inputs, **controls}, raise_on_error=False
             )
+            return result, await same_run_projected_response(client, result)
 
     rest = rest_client(monkeypatch).post(
         "/api/fengshui/assess",
         params=controls,
         json=inputs,
     )
-    mcp = asyncio.run(call())
+    mcp, mcp_body = asyncio.run(call())
     path = tmp_path / "coverage.json"
     path.write_text(json.dumps(inputs))
     assert (
@@ -218,10 +223,10 @@ def test_projected_readiness_is_identical_on_rest_mcp_cli(
     assert rest.status_code == 200 and not mcp.is_error
     assert (
         without_transport(rest.json())
-        == without_transport(mcp.structured_content)
+        == without_transport(mcp_body)
         == without_transport(cli)
     )
-    for result in [rest.json(), mcp.structured_content, cli]:
+    for result in [rest.json(), mcp.structured_content, mcp_body, cli]:
         Draft202012Validator(FengshuiOutput.model_json_schema()).validate(result)
         assert result["coverage"]["requested_analysis_status"] == "partial"
         assert result["coverage"]["layout_missing_inputs"] == [

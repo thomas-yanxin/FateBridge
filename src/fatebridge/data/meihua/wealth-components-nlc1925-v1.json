@@ -1,0 +1,48 @@
+{
+  "id": "meihua_wealth_components_nlc1925_v1",
+  "version": "1.0.0",
+  "title": "文明书局本求财占补充句关系成分",
+  "selected_edition_id": "nlc_1925",
+  "source": {
+    "section": "求財占第十",
+    "original_pdf_index": 68,
+    "printed_leaf": "卷二十五",
+    "raw_pdf_sha256": "af608094ab11ae209eae91a9365565e7c9cff604aac3da5e753e04d1cc4598c0",
+    "pdf_url": "https://upload.wikimedia.org/wikipedia/commons/a/af/NLC416-12jh005426-44577_%E6%A2%85%E8%8A%B1%E6%98%93%E6%95%B8.pdf",
+    "scan_sha256": "46bdcf2c9d2f9ecd8913ad3d5e47be7fdb39643551261311d646f0628fc57b37",
+    "reader": "assistant selected-span direct visual reading; punctuation editorial",
+    "independent_human_expert_review": false
+  },
+  "rules": [
+    {
+      "id": "wealth_gain_components",
+      "side": "gain",
+      "quote": "又若卦中有體尅用之卦及生體之卦則有財此卦氣即見財之日",
+      "named_relations": [
+        "体克用",
+        "用生体"
+      ],
+      "source_result_wording": "有財"
+    },
+    {
+      "id": "wealth_loss_components",
+      "side": "loss",
+      "quote": "若卦中有尅體之卦及體生用之卦即破財此卦氣即破財之日",
+      "named_relations": [
+        "用克体",
+        "体生用"
+      ],
+      "source_result_wording": "破財"
+    }
+  ],
+  "timing_quote": "欲知得財之日生體之卦氣定之欲知破財之日尅體之卦氣定之",
+  "policies": {
+    "relations": "Keep original static body and four actual auxiliary occurrences. No recast or body replacement",
+    "junction": "及 combination not adjudicated; display each relation component and all-present fact, do not infer full-clause applicability",
+    "effect": "Keep original initial topic clause, season and direct countercontrol together. No vote, net result or guaranteed money",
+    "timing": "Quote retained as source knowledge only; no dates or periods computed",
+    "other_topics": "Only interpretation_topic=wealth. No keyword-based branch switch",
+    "role_occurrences_are_independent_observations": false
+  },
+  "scope": "Selected supplement components, not whole chapter synthesis, concrete financial advice, physical timing or predictive acceptance"
+}

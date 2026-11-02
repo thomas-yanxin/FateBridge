@@ -1,0 +1,838 @@
+{
+  "ruleset_id": "heluo_wenming_jiehou_v1",
+  "version": "1.0.0",
+  "source_title": "河洛理數 文明書局本 卷一 定節候卦說／節卦／候卦定局",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "source_pdf_sha256": "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c",
+  "source_pdf_pages": [
+    41,
+    42,
+    43,
+    44
+  ],
+  "review_status": "single_visual_reading; independent_second_review_pending",
+  "term_rows": [
+    {
+      "term": "冬至",
+      "gua": "坎為水",
+      "position": 1,
+      "source_pdf_page": 41
+    },
+    {
+      "term": "小寒",
+      "gua": "坎為水",
+      "position": 2,
+      "source_pdf_page": 41
+    },
+    {
+      "term": "大寒",
+      "gua": "坎為水",
+      "position": 3,
+      "source_pdf_page": 41
+    },
+    {
+      "term": "立春",
+      "gua": "坎為水",
+      "position": 4,
+      "source_pdf_page": 41
+    },
+    {
+      "term": "雨水",
+      "gua": "坎為水",
+      "position": 5,
+      "source_pdf_page": 41
+    },
+    {
+      "term": "驚蟄",
+      "gua": "坎為水",
+      "position": 6,
+      "source_pdf_page": 41
+    },
+    {
+      "term": "春分",
+      "gua": "震為雷",
+      "position": 1,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "清明",
+      "gua": "震為雷",
+      "position": 2,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "穀雨",
+      "gua": "震為雷",
+      "position": 3,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "立夏",
+      "gua": "震為雷",
+      "position": 4,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "小滿",
+      "gua": "震為雷",
+      "position": 5,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "芒種",
+      "gua": "震為雷",
+      "position": 6,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "夏至",
+      "gua": "離為火",
+      "position": 1,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "小暑",
+      "gua": "離為火",
+      "position": 2,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "大暑",
+      "gua": "離為火",
+      "position": 3,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "立秋",
+      "gua": "離為火",
+      "position": 4,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "處暑",
+      "gua": "離為火",
+      "position": 5,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "白露",
+      "gua": "離為火",
+      "position": 6,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "秋分",
+      "gua": "兌為澤",
+      "position": 1,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "寒露",
+      "gua": "兌為澤",
+      "position": 2,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "霜降",
+      "gua": "兌為澤",
+      "position": 3,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "立冬",
+      "gua": "兌為澤",
+      "position": 4,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "小雪",
+      "gua": "兌為澤",
+      "position": 5,
+      "source_pdf_page": 42
+    },
+    {
+      "term": "大雪",
+      "gua": "兌為澤",
+      "position": 6,
+      "source_pdf_page": 42
+    }
+  ],
+  "hou_rows": [
+    {
+      "term": "冬至",
+      "entry_in_group": 1,
+      "short_name": "頤",
+      "gua": "山雷頤",
+      "raw_yao": "六四",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "冬至",
+      "entry_in_group": 2,
+      "short_name": "中孚",
+      "gua": "風澤中孚",
+      "raw_yao": "初九",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "冬至",
+      "entry_in_group": 3,
+      "short_name": "復",
+      "gua": "地雷復",
+      "raw_yao": "初九",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "小寒",
+      "entry_in_group": 1,
+      "short_name": "屯",
+      "gua": "水雷屯",
+      "raw_yao": "初九",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "小寒",
+      "entry_in_group": 2,
+      "short_name": "謙",
+      "gua": "地山謙",
+      "raw_yao": "初六",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "小寒",
+      "entry_in_group": 3,
+      "short_name": "睽",
+      "gua": "火澤睽",
+      "raw_yao": "初六",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "大寒",
+      "entry_in_group": 1,
+      "short_name": "睽",
+      "gua": "火澤睽",
+      "raw_yao": "初九",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "大寒",
+      "entry_in_group": 2,
+      "short_name": "升",
+      "gua": "地風升",
+      "raw_yao": "初六",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "大寒",
+      "entry_in_group": 3,
+      "short_name": "臨",
+      "gua": "地澤臨",
+      "raw_yao": "初九",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "立春",
+      "entry_in_group": 1,
+      "short_name": "小過",
+      "gua": "雷山小過",
+      "raw_yao": "初六",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "立春",
+      "entry_in_group": 2,
+      "short_name": "蒙",
+      "gua": "山水蒙",
+      "raw_yao": "初六",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "立春",
+      "entry_in_group": 3,
+      "short_name": "益",
+      "gua": "風雷益",
+      "raw_yao": "初九",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "雨水",
+      "entry_in_group": 1,
+      "short_name": "益",
+      "gua": "風雷益",
+      "raw_yao": "初九",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "雨水",
+      "entry_in_group": 2,
+      "short_name": "漸",
+      "gua": "風山漸",
+      "raw_yao": "初六",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "雨水",
+      "entry_in_group": 3,
+      "short_name": "泰",
+      "gua": "地天泰",
+      "raw_yao": "初九",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "驚蟄",
+      "entry_in_group": 1,
+      "short_name": "需",
+      "gua": "水天需",
+      "raw_yao": "初九",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "驚蟄",
+      "entry_in_group": 2,
+      "short_name": "隨",
+      "gua": "澤雷隨",
+      "raw_yao": "初九",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "驚蟄",
+      "entry_in_group": 3,
+      "short_name": "晉",
+      "gua": "火地晉",
+      "raw_yao": "初六",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "春分",
+      "entry_in_group": 1,
+      "short_name": "晉",
+      "gua": "火地晉",
+      "raw_yao": "初六",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "春分",
+      "entry_in_group": 2,
+      "short_name": "解",
+      "gua": "雷水解",
+      "raw_yao": "初六",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "春分",
+      "entry_in_group": 3,
+      "short_name": "大壯",
+      "gua": "雷天大壯",
+      "raw_yao": "初九",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "清明",
+      "entry_in_group": 1,
+      "short_name": "豫",
+      "gua": "雷地豫",
+      "raw_yao": "初六",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "清明",
+      "entry_in_group": 2,
+      "short_name": "訟",
+      "gua": "天水訟",
+      "raw_yao": "初六",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "清明",
+      "entry_in_group": 3,
+      "short_name": "蠱",
+      "gua": "山風蠱",
+      "raw_yao": "初六",
+      "source_pdf_page": 42
+    },
+    {
+      "term": "穀雨",
+      "entry_in_group": 1,
+      "short_name": "蠱",
+      "gua": "山風蠱",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "穀雨",
+      "entry_in_group": 2,
+      "short_name": "革",
+      "gua": "澤火革",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "穀雨",
+      "entry_in_group": 3,
+      "short_name": "夬",
+      "gua": "澤天夬",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "立夏",
+      "entry_in_group": 1,
+      "short_name": "旅",
+      "gua": "火山旅",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "立夏",
+      "entry_in_group": 2,
+      "short_name": "師",
+      "gua": "地水師",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "立夏",
+      "entry_in_group": 3,
+      "short_name": "比",
+      "gua": "水地比",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "小滿",
+      "entry_in_group": 1,
+      "short_name": "比",
+      "gua": "水地比",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "小滿",
+      "entry_in_group": 2,
+      "short_name": "小畜",
+      "gua": "風天小畜",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "小滿",
+      "entry_in_group": 3,
+      "short_name": "乾",
+      "gua": "乾為天",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "芒種",
+      "entry_in_group": 1,
+      "short_name": "大有",
+      "gua": "火天大有",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "芒種",
+      "entry_in_group": 2,
+      "short_name": "家人",
+      "gua": "風火家人",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "芒種",
+      "entry_in_group": 3,
+      "short_name": "井",
+      "gua": "水風井",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "夏至",
+      "entry_in_group": 1,
+      "short_name": "井",
+      "gua": "水風井",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "夏至",
+      "entry_in_group": 2,
+      "short_name": "咸",
+      "gua": "澤山咸",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "夏至",
+      "entry_in_group": 3,
+      "short_name": "姤",
+      "gua": "天風姤",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "小暑",
+      "entry_in_group": 1,
+      "short_name": "鼎",
+      "gua": "火風鼎",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "小暑",
+      "entry_in_group": 2,
+      "short_name": "豐",
+      "gua": "雷火豐",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "小暑",
+      "entry_in_group": 3,
+      "short_name": "渙",
+      "gua": "風水渙",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "大暑",
+      "entry_in_group": 1,
+      "short_name": "渙",
+      "gua": "風水渙",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "大暑",
+      "entry_in_group": 2,
+      "short_name": "履",
+      "gua": "天澤履",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "大暑",
+      "entry_in_group": 3,
+      "short_name": "遯",
+      "gua": "天山遯",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "立秋",
+      "entry_in_group": 1,
+      "short_name": "恆",
+      "gua": "雷風恆",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "立秋",
+      "entry_in_group": 2,
+      "short_name": "節",
+      "gua": "水澤節",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "立秋",
+      "entry_in_group": 3,
+      "short_name": "同人",
+      "gua": "天火同人",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "處暑",
+      "entry_in_group": 1,
+      "short_name": "同人",
+      "gua": "天火同人",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "處暑",
+      "entry_in_group": 2,
+      "short_name": "損",
+      "gua": "山澤損",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "處暑",
+      "entry_in_group": 3,
+      "short_name": "否",
+      "gua": "天地否",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "白露",
+      "entry_in_group": 1,
+      "short_name": "巽",
+      "gua": "巽為風",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "白露",
+      "entry_in_group": 2,
+      "short_name": "萃",
+      "gua": "澤地萃",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "白露",
+      "entry_in_group": 3,
+      "short_name": "大畜",
+      "gua": "山天大畜",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "秋分",
+      "entry_in_group": 1,
+      "short_name": "大畜",
+      "gua": "山天大畜",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "秋分",
+      "entry_in_group": 2,
+      "short_name": "賁",
+      "gua": "山火賁",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "秋分",
+      "entry_in_group": 3,
+      "short_name": "觀",
+      "gua": "風地觀",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "寒露",
+      "entry_in_group": 1,
+      "short_name": "歸妹",
+      "gua": "雷澤歸妹",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "寒露",
+      "entry_in_group": 2,
+      "short_name": "無妄",
+      "gua": "天雷無妄",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "寒露",
+      "entry_in_group": 3,
+      "short_name": "明夷",
+      "gua": "地火明夷",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "霜降",
+      "entry_in_group": 1,
+      "short_name": "明夷",
+      "gua": "地火明夷",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "霜降",
+      "entry_in_group": 2,
+      "short_name": "困",
+      "gua": "澤水困",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "霜降",
+      "entry_in_group": 3,
+      "short_name": "剝",
+      "gua": "山地剝",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "立冬",
+      "entry_in_group": 1,
+      "short_name": "艮",
+      "gua": "艮為山",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "立冬",
+      "entry_in_group": 2,
+      "short_name": "既濟",
+      "gua": "水火既濟",
+      "raw_yao": "初六",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "立冬",
+      "entry_in_group": 3,
+      "short_name": "噬嗑",
+      "gua": "火雷噬嗑",
+      "raw_yao": "初九",
+      "source_pdf_page": 43
+    },
+    {
+      "term": "小雪",
+      "entry_in_group": 1,
+      "short_name": "噬嗑",
+      "gua": "火雷噬嗑",
+      "raw_yao": "初九",
+      "source_pdf_page": 44
+    },
+    {
+      "term": "小雪",
+      "entry_in_group": 2,
+      "short_name": "大過",
+      "gua": "澤風大過",
+      "raw_yao": "初六",
+      "source_pdf_page": 44
+    },
+    {
+      "term": "小雪",
+      "entry_in_group": 3,
+      "short_name": "坤",
+      "gua": "坤為地",
+      "raw_yao": "初六",
+      "source_pdf_page": 44
+    },
+    {
+      "term": "大雪",
+      "entry_in_group": 1,
+      "short_name": "坤",
+      "gua": "坤為地",
+      "raw_yao": "初六",
+      "source_pdf_page": 44
+    },
+    {
+      "term": "大雪",
+      "entry_in_group": 2,
+      "short_name": "未濟",
+      "gua": "火水未濟",
+      "raw_yao": "初六",
+      "source_pdf_page": 44
+    },
+    {
+      "term": "大雪",
+      "entry_in_group": 3,
+      "short_name": "蹇",
+      "gua": "水山蹇",
+      "raw_yao": "初六",
+      "source_pdf_page": 44
+    }
+  ],
+  "gua_order": [
+    "山雷頤",
+    "風澤中孚",
+    "地雷復",
+    "水雷屯",
+    "地山謙",
+    "火澤睽",
+    "地風升",
+    "地澤臨",
+    "雷山小過",
+    "山水蒙",
+    "風雷益",
+    "風山漸",
+    "地天泰",
+    "水天需",
+    "澤雷隨",
+    "火地晉",
+    "雷水解",
+    "雷天大壯",
+    "雷地豫",
+    "天水訟",
+    "山風蠱",
+    "澤火革",
+    "澤天夬",
+    "火山旅",
+    "地水師",
+    "水地比",
+    "風天小畜",
+    "乾為天",
+    "火天大有",
+    "風火家人",
+    "水風井",
+    "澤山咸",
+    "天風姤",
+    "火風鼎",
+    "雷火豐",
+    "風水渙",
+    "天澤履",
+    "天山遯",
+    "雷風恆",
+    "水澤節",
+    "天火同人",
+    "山澤損",
+    "天地否",
+    "巽為風",
+    "澤地萃",
+    "山天大畜",
+    "山火賁",
+    "風地觀",
+    "雷澤歸妹",
+    "天雷無妄",
+    "地火明夷",
+    "澤水困",
+    "山地剝",
+    "艮為山",
+    "水火既濟",
+    "火雷噬嗑",
+    "澤風大過",
+    "坤為地",
+    "火水未濟",
+    "水山蹇"
+  ],
+  "caption": {
+    "source_pdf_page": 44,
+    "winter_term_printed_day_label": 20,
+    "calendar_instant": null,
+    "rows": [
+      {
+        "day_label": 20,
+        "gua": "山雷頤",
+        "position": 4
+      },
+      {
+        "day_label": 21,
+        "gua": "山雷頤",
+        "position": 5
+      },
+      {
+        "day_label": 22,
+        "gua": "山雷頤",
+        "position": 6
+      },
+      {
+        "day_label": 23,
+        "gua": "山雷頤",
+        "position": 1
+      },
+      {
+        "day_label": 24,
+        "gua": "山雷頤",
+        "position": 2
+      },
+      {
+        "day_label": 25,
+        "gua": "山雷頤",
+        "position": 3
+      }
+    ]
+  },
+  "printed_total_yao_phrase": "一年總三百六十四爻，四爻生八節，餘三百六十爻分三百六十日"
+}

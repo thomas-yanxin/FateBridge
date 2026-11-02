@@ -9,6 +9,8 @@ from typing import Any, Dict, List, Literal, Optional
 from pydantic import ConfigDict, model_validator
 
 from fatebridge.core.output_base import PartialOutput
+from fatebridge.core.output_bazi_evidence import BaziEvidenceChain
+from fatebridge.core.output_chinese import CalendarContext, SolarTerm
 
 
 class TimingOverrides(PartialOutput):
@@ -26,24 +28,34 @@ class DimensionTimingContext(PartialOutput):
     boundary_status: Optional[Literal["year_boundary_day", "not_year_boundary_day"]] = (
         None
     )
-    boundaries_on_date: Optional[List[Dict[str, str]]] = None
+    boundaries_on_date: Optional[List[SolarTerm]] = None
     boundary_scope: Optional[str] = None
     hourly_evidence: Optional[Dict[str, Any]] = None
     dayun_pillar: Optional[str] = None
     liunian_pillar: Optional[str] = None
     source: Optional[str] = None
+    dayun_status: Optional[str] = None
+    limitations: Optional[List[str]] = None
     # The timing engine reports fractional years (for example 28.7).
     dayun_age: Optional[float] = None
     dayun_age_basis: Optional[str] = None
+    dayun_selection_basis: Optional[str] = None
+    dayun_start_at: Optional[str] = None
+    dayun_end_at: Optional[str] = None
     overridden: Optional[TimingOverrides] = None
 
 
 class DimensionOutput(PartialOutput):
+    calendar_context: Optional[CalendarContext] = None
     timing_context: Optional[DimensionTimingContext] = None
+    evidence_chain: Optional[BaziEvidenceChain] = None
+    counting_basis: Optional[str] = None
 
 
 class TimingSignals(PartialOutput):
     timing_signals: Optional[List[str]] = None
+    assessment_status: Optional[str] = None
+    storage_events: Optional[List[Dict[str, Any]]] = None
 
 
 class Notes(PartialOutput):
@@ -87,6 +99,9 @@ class SpousePalace(PartialOutput):
 
 class MarriageQuality(PartialOutput):
     score: Optional[int] = None
+    score_kind: Optional[Literal["traditional_rule_index"]] = None
+    score_basis: Optional[str] = None
+    counting_scope: Optional[str] = None
     quality_level: Optional[str] = None
     notes: Optional[List[str]] = None
 
@@ -128,6 +143,7 @@ class CareerGod(PartialOutput):
 
 
 class CareerDominant(PartialOutput):
+    mapping_scope: Optional[str] = None
     top_gods: Optional[List[CareerGod]] = None
     primary_career_type: Optional[str] = None
     weighted_counts: Optional[Dict[str, float]] = None
@@ -145,6 +161,9 @@ class IndustryRecommendation(PartialOutput):
 
 class IndustryAnalysis(PartialOutput):
     favorable_elements: Optional[List[str]] = None
+    conditional_elements: Optional[List[str]] = None
+    reference_scope: Optional[str] = None
+    mapping_status: Optional[str] = None
     recommended_industries: Optional[List[IndustryRecommendation]] = None
     avoid_industries: Optional[List[IndustryRecommendation]] = None
     element_distribution: Optional[Dict[str, float]] = None
@@ -162,6 +181,7 @@ class CareerStructure(PartialOutput):
     score_basis: Optional[str] = None
     score: Optional[int] = None
     level: Optional[str] = None
+    legacy_level: Optional[str] = None
     notes: Optional[List[str]] = None
     formation_status: Optional[Literal["heuristic_candidate_only"]] = None
     rule_signals: Optional[List[CareerRuleSignal]] = None
@@ -175,6 +195,10 @@ class Entrepreneurship(PartialOutput):
     score_basis: Optional[str] = None
     score: Optional[int] = None
     tendency: Optional[str] = None
+    legacy_tendency: Optional[str] = None
+    weighted_counts: Optional[Dict[str, float]] = None
+    partial_star_weight: Optional[float] = None
+    normal_star_weight: Optional[float] = None
     notes: Optional[List[str]] = None
     formation_status: Optional[Literal["heuristic_candidate_only"]] = None
     rule_signals: Optional[List[CareerRuleSignal]] = None
@@ -217,6 +241,11 @@ class WealthStructure(PartialOutput):
     wealth_strength: Optional[float] = None
     score: Optional[int] = None
     notes: Optional[List[str]] = None
+    legacy_pattern: Optional[str] = None
+    formation_status: Optional[str] = None
+    score_kind: Optional[str] = None
+    score_basis: Optional[str] = None
+    wealth_strength_kind: Optional[str] = None
 
 
 class StorageHit(PartialOutput):
@@ -225,12 +254,16 @@ class StorageHit(PartialOutput):
     stores: Optional[str] = None
     note: Optional[str] = None
     opened: Optional[bool] = None
+    clash_present: Optional[bool] = None
+    clashes: Optional[List[Dict[str, str]]] = None
 
 
 class WealthStorage(PartialOutput):
     has_storage: Optional[bool] = None
     storage_hits: Optional[List[StorageHit]] = None
     summary: Optional[str] = None
+    effect_status: Optional[str] = None
+    source_ref: Optional[str] = None
 
 
 class WealthStyle(PartialOutput):
@@ -247,9 +280,12 @@ class WealthDirection(PartialOutput):
 class WealthRisk(PartialOutput):
     bijie_weight: Optional[float] = None
     risks: Optional[List[str]] = None
+    relations: Optional[List[Dict[str, Any]]] = None
+    assessment_status: Optional[str] = None
 
 
 class WealthAnalysis(DimensionOutput):
+    classical_context: Optional[Dict[str, Any]] = None
     wealth_element: Optional[str] = None
     wealth_stars: Optional[WealthStars] = None
     wealth_structure: Optional[WealthStructure] = None
@@ -355,6 +391,9 @@ class StudyStars(PartialOutput):
 
 class EducationLevel(PartialOutput):
     score: Optional[int] = None
+    score_kind: Optional[str] = None
+    score_basis: Optional[str] = None
+    assessment_status: Optional[str] = None
     tier: Optional[str] = None
     notes: Optional[List[str]] = None
 
@@ -369,6 +408,7 @@ class Wenchang(PartialOutput):
 class SubjectOrientation(PartialOutput):
     inclination: Optional[str] = None
     favorable_fields: Optional[List[str]] = None
+    assessment_status: Optional[str] = None
 
 
 class EducationAnalysis(DimensionOutput):
@@ -385,6 +425,7 @@ class CoreNature(PartialOutput):
     virtue: Optional[str] = None
     traits: Optional[str] = None
     shortcoming: Optional[str] = None
+    reference_scope: Optional[str] = None
 
 
 class PersonalityGod(PartialOutput):
@@ -396,6 +437,8 @@ class PersonalityGod(PartialOutput):
 class DominantTraits(PartialOutput):
     top_gods: Optional[List[PersonalityGod]] = None
     primary: Optional[str] = None
+    tied_primary_gods: Optional[List[str]] = None
+    primary_selection: Optional[str] = None
 
 
 class Disposition(PartialOutput):
@@ -405,6 +448,7 @@ class Disposition(PartialOutput):
 
 
 class PersonalityAnalysis(DimensionOutput):
+    interpretation_scope: Optional[str] = None
     day_master: Optional[str] = None
     core_nature: Optional[CoreNature] = None
     dominant_traits: Optional[DominantTraits] = None
@@ -465,12 +509,25 @@ class OppositeSexStar(PartialOutput):
     weight: Optional[float] = None
 
 
+class PeachRelation(PartialOutput):
+    peach_pillar: Optional[str] = None
+    peach_branch: Optional[str] = None
+    other_pillar: Optional[str] = None
+    other_branch: Optional[str] = None
+    relation: Optional[str] = None
+
+
+class PeachQuality(Notes):
+    relations: Optional[List[PeachRelation]] = None
+    assessment_status: Optional[str] = None
+
+
 class RomanceAnalysis(DimensionOutput):
     gender_basis: Optional[str] = None
     peach_blossom: Optional[PeachBlossom] = None
     hongluan_tianxi: Optional[HongluanTianxi] = None
     opposite_sex_star: Optional[OppositeSexStar] = None
-    peach_quality: Optional[Notes] = None
+    peach_quality: Optional[PeachQuality] = None
     romance_timing: Optional[TimingSignals] = None
 
 

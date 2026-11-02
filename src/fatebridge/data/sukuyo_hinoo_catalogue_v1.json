@@ -1,0 +1,585 @@
+{
+  "id": "hinoo_catalogue_candidates_v1",
+  "before_code_facts_sha256": "cccfed4983475f02164adc60b9f993c0e290c71c9dc769f89d053a91c16a2b18",
+  "facts": {
+    "id": "hinoo_primary_catalogue_facts_v1",
+    "frozen_at": "2026-10-24T18:29:08.283850+00:00",
+    "raw_source_files_sha256": {
+      "sat-t2465.html": "492217fc0cf55c1cf83da65f711a1098816d119b22defe51e2d8feab488f3ab8",
+      "sat-t2465.receipt.json": "b0d2b46a5e82718f0a892591245e9eccea68a29261c4684a7c9b16f196335656",
+      "sat-selected-apparatus-first.json": "54f76584a19d6bb97de4f18f602014787a8dfe8099ef864c060b3a76249e13c3",
+      "taisho-archive.html": "ee0279bfb821cfdfaa1bd288d1b0fbe8cfb796ba189e17c411fb9a5b270fef66",
+      "kozanji-search.html": "21775778bf0ff39364010439db493ec15692e162c9753b4d3aea785c111eaf32",
+      "kozanji-hinoo.json": "5a06bb24ae875adfd10b6b46938616d801deb7c36d8511f8b27ee65dc00bfca7",
+      "kozanji-shukuyo.json": "1a8f4af3f057e27269683079a266c5fbcd23aba493fdf2b19115dff30eadefb2",
+      "taisho-hinoo.html": "f824e99aef912dc93a6c561fc69c989cd159909e94076b865fc1b8a48e746269",
+      "taisho-hinoo-variant.html": "3326226b38914daa2ce656706dfc7b22a1a6a064babbde5e41ad9433cf6c67f2",
+      "catalog-acquisition.json": "e07e1f29d7483e2e2b90171b0cf277b2c0433096c947cc12b5fc236f5c976c9d",
+      "catalog-search-acquisition.json": "21a895df71b4fbe57b57d9777fa3338cb9b60eb5b311554390aec278791e8058",
+      "taisho-hinoo-variant.receipt.json": "4396eea9b10d3b1fba688fcd400abc0597fe1fc18052cdf57e96d4f27198be2a"
+    },
+    "existing_sat_note_not_new_discovery": {
+      "literal": "＜原＞建久六年寫高山寺藏本, ＜甲＞寶暦十一年寫智山專門學校藏本",
+      "already_present_production_file": "src/fatebridge/data/sukuyo_t1299_calendar_profiles.json",
+      "already_present_field": "downloaded_primary_edition.edition_witness_note_html",
+      "already_documented_round": 18,
+      "new_raw_html_sha256": "492217fc0cf55c1cf83da65f711a1098816d119b22defe51e2d8feab488f3ab8",
+      "current_note_equals_prior_operative_note": true
+    },
+    "catalogue_authority": {
+      "title": "高山寺経蔵典籍文書目録書名検索システム",
+      "url": "https://agni.dhii.jp/kozanji/search.html",
+      "described_underlying_catalogue_volumes": [
+        "第一",
+        "第二",
+        "第三",
+        "第四"
+      ],
+      "source_description_scope": "The search front describes correspondence with volumes1 through4 and provides abbreviated catalogue data. Not the complete physical library or a newly acquired manuscript image.",
+      "manuscript_images_acquired": false,
+      "raw_texts_collated": false
+    },
+    "kozanji_hinoo_search": {
+      "actual_result_count": 8,
+      "actual_returned_record_count": 8,
+      "actual_expanded_query_keys": [
+        "檜尾",
+        "桧尾"
+      ],
+      "complete_returned_records": [
+        {
+          "id": "7131",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "079",
+          "bknum": "085",
+          "tit": "護摩口决檜尾",
+          "vol": "一帖"
+        },
+        {
+          "id": "7132",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "079",
+          "bknum": "085",
+          "bra": "〔001〕",
+          "tit": "護摩口决檜尾",
+          "vol": "一帖",
+          "cont": "包紙",
+          "vol2": "一紙",
+          "date": "江戸時代",
+          "date_st": "江戸時代"
+        },
+        {
+          "id": "7133",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "079",
+          "bknum": "085",
+          "bra": "〔002〕",
+          "tit": "護摩口决檜尾",
+          "vol": "一帖",
+          "cont": "包紙",
+          "vol2": "一紙",
+          "date": "江戸時代",
+          "date_st": "江戸時代"
+        },
+        {
+          "id": "7134",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "079",
+          "bknum": "085",
+          "bra": "〔003〕",
+          "tit": "護摩口决檜尾",
+          "vol": "一帖",
+          "cont": "護摩口决檜尾",
+          "vol2": "一帖",
+          "date": "鎌倉時代建久四年寫",
+          "date_st": "鎌倉時代建久四年寫",
+          "style": "粘葉装枡型",
+          "style_st": "粘葉装枡型",
+          "seal": "高山寺",
+          "seal_st": "高山寺",
+          "kai": "押界",
+          "kntn": "無點",
+          "kntn_st": "無點"
+        },
+        {
+          "id": "7744",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "084",
+          "bknum": "001",
+          "tit": "檜尾口決",
+          "vol": "一帖",
+          "date": "鎌倉時代建久六年寫",
+          "date_st": "鎌倉時代建久六年寫",
+          "style": "粘葉装枡型",
+          "style_st": "粘葉装枡型",
+          "seal": "高山寺",
+          "seal_st": "高山寺",
+          "kai": "押界",
+          "kntn": "無點",
+          "kntn_st": "無點"
+        },
+        {
+          "id": "7745",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "084",
+          "bknum": "002",
+          "tit": "秘密口決檜尾僧都説",
+          "vol": "一帖",
+          "date": "鎌倉中期寫",
+          "date_st": "鎌倉中期寫",
+          "style": "粘葉装枡型",
+          "style_st": "粘葉装枡型",
+          "seal": "高山寺",
+          "seal_st": "高山寺",
+          "kai": "押界",
+          "kntn": "無點",
+          "kntn_st": "無點"
+        },
+        {
+          "id": "7768",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "084",
+          "bknum": "018",
+          "tit": "（va jra dha tu）口決檜尾",
+          "vol": "一帖",
+          "date": "鎌倉時代建久四年寫",
+          "date_st": "鎌倉時代建久四年寫",
+          "style": "粘葉装枡型",
+          "style_st": "粘葉装枡型",
+          "seal": "高山寺",
+          "seal_st": "高山寺",
+          "kai": "押界",
+          "kntn": "無點",
+          "kntn_st": "無點"
+        },
+        {
+          "id": "7786",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "084",
+          "bknum": "027",
+          "tit": "檜尾口決」高雄口決",
+          "vol": "一冊",
+          "date": "江戸時代享保十六年寫",
+          "date_st": "江戸時代享保十六年寫",
+          "scribe": "覺雄筆",
+          "scribe_st": "覺雄筆",
+          "style": "袋綴装",
+          "style_st": "袋綴装",
+          "seal": "朱方印(印文未詳)",
+          "seal_st": "朱方印(印文未詳)",
+          "kntn": "墨點(假名、享保十六年)",
+          "kntn_st": "墨點(假名、享保十六年)"
+        }
+      ],
+      "catalogue_group_key": [
+        "sec",
+        "bxnum",
+        "bknum"
+      ],
+      "catalogue_groups": [
+        {
+          "key": [
+            "4",
+            "079",
+            "085"
+          ],
+          "record_ids": [
+            "7131",
+            "7132",
+            "7133",
+            "7134"
+          ]
+        },
+        {
+          "key": [
+            "4",
+            "084",
+            "001"
+          ],
+          "record_ids": [
+            "7744"
+          ]
+        },
+        {
+          "key": [
+            "4",
+            "084",
+            "002"
+          ],
+          "record_ids": [
+            "7745"
+          ]
+        },
+        {
+          "key": [
+            "4",
+            "084",
+            "018"
+          ],
+          "record_ids": [
+            "7768"
+          ]
+        },
+        {
+          "key": [
+            "4",
+            "084",
+            "027"
+          ],
+          "record_ids": [
+            "7786"
+          ]
+        }
+      ],
+      "catalogue_group_count": 5,
+      "wrapper_summary_and_body_group": {
+        "key": [
+          "4",
+          "079",
+          "085"
+        ],
+        "record_ids": [
+          "7131",
+          "7132",
+          "7133",
+          "7134"
+        ],
+        "summary_record_id": "7131",
+        "wrapper_record_ids": [
+          "7132",
+          "7133"
+        ],
+        "body_record_id": "7134",
+        "body_date_literal": "鎌倉時代建久四年寫"
+      },
+      "named_base_description_candidate": {
+        "record_id": "7744",
+        "catalogue_key": [
+          "4",
+          "084",
+          "001"
+        ],
+        "title_literal": "檜尾口決",
+        "date_literal": "鎌倉時代建久六年寫",
+        "seal_literal": "高山寺",
+        "relationship": "Title, catalogue holding context and stated copying year match the SAT base description; candidate only. No image, colophon comparison or direct item identity with the Taisho base has been established.",
+        "same_physical_item_as_taisho_original_certified": false,
+        "same_as_taisho_ko_witness_certified": false
+      },
+      "combined_title_record": {
+        "record_id": "7786",
+        "title_literal": "檜尾口決」高雄口決",
+        "date_literal": "江戸時代享保十六年寫",
+        "same_item_as_kenkyu6_or_horeki11_certified": false
+      }
+    },
+    "kozanji_shukuyo_search": {
+      "actual_result_count": 11,
+      "actual_returned_record_count": 11,
+      "complete_returned_records": [
+        {
+          "id": "10956",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "102",
+          "bknum": "012",
+          "tit": "宿曜私記",
+          "vol": "一帖",
+          "date": "院政期寫",
+          "date_st": "院政期寫",
+          "style": "粘葉裝枡型",
+          "style_st": "粘葉裝枡型",
+          "seal": "方便智院",
+          "seal_st": "方便智院",
+          "kai": "押界",
+          "kntn": "無點",
+          "kntn_st": "無點",
+          "rmks1": "圖アリ",
+          "rmks2": "（第5號ヨリ第12號マデ包紙ニテ一括セリ）"
+        },
+        {
+          "id": "1261",
+          "sec": "2",
+          "sec_st": "2",
+          "bknum": "217",
+          "tit": "（宿曜占文抄）",
+          "vol": "一卷",
+          "date": "鎌倉時代文治四年",
+          "date_st": "鎌倉時代文治四年",
+          "style": "巻子本",
+          "style_st": "巻子本"
+        },
+        {
+          "id": "12674",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "117",
+          "bknum": "021",
+          "tit": "宿曜經疑義",
+          "vol": "一帖",
+          "date": "平安時代永保四年寫",
+          "date_st": "平安時代永保四年寫",
+          "style": "粘葉裝枡型",
+          "style_st": "粘葉裝枡型",
+          "rmks2": "無點"
+        },
+        {
+          "id": "1403",
+          "sec": "2",
+          "sec_st": "2",
+          "bknum": "303",
+          "tit": "宿曜供略次第",
+          "vol": "一卷",
+          "date": "鎌倉時代承元三年",
+          "date_st": "鎌倉時代承元三年",
+          "style": "巻子本",
+          "style_st": "巻子本",
+          "seal": "高山寺",
+          "seal_st": "高山寺"
+        },
+        {
+          "id": "15814",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "149",
+          "bknum": "030",
+          "tit": "宿曜儀軌",
+          "vol": "一帖",
+          "date": "院政期",
+          "date_st": "院政期",
+          "style": "粘葉装枡型",
+          "style_st": "粘葉装枡型",
+          "seal": "高山寺",
+          "seal_st": "高山寺"
+        },
+        {
+          "id": "16021",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "153",
+          "bknum": "006",
+          "tit": "宿曜供略次第",
+          "vol": "一帖",
+          "date": "平安時代保元二年",
+          "date_st": "平安時代保元二年",
+          "style": "粘葉装枡型",
+          "style_st": "粘葉装枡型",
+          "seal": "高山寺",
+          "seal_st": "高山寺"
+        },
+        {
+          "id": "19777",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "190",
+          "bknum": "072",
+          "tit": "宿曜供略次第",
+          "vol": "一帖",
+          "pbox": "（表紙右上）「法皷廿九箱」",
+          "date": "院政期寫",
+          "date_st": "院政期寫",
+          "style": "粘葉裝枡型",
+          "style_st": "粘葉裝枡型",
+          "cpage": "（表紙）「慶幸」",
+          "seal": "高山寺朱印",
+          "seal_st": "高山寺朱印",
+          "kai": "押界",
+          "kntn": "朱點（假名、聲點、院政期）",
+          "kntn_st": "朱點（假名、聲點、院政期）",
+          "kntn2": "墨點（一）（假名、院政期、薄墨色）",
+          "kntn3": "墨點（二）（假名、院政期、濃墨色）",
+          "rmks1": "尾缺",
+          "rmks2": "寫經料紙（墨界アリ）ヲ轉用セリ"
+        },
+        {
+          "id": "3835",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "042",
+          "bknum": "005",
+          "tit": "三九秘宿　又六害宿加之",
+          "vol": "一巻",
+          "date": "鎌倉後期寫",
+          "date_st": "鎌倉後期寫",
+          "style": "巻子本",
+          "style_st": "巻子本",
+          "seal": "方便智院",
+          "seal_st": "方便智院",
+          "kntn": "無點",
+          "kntn_st": "無點",
+          "rmks1": "紙背ニ「宿曜經三九秘法」ヲ記シテ更ニソレヲ抹消セリ"
+        },
+        {
+          "id": "5057",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "053",
+          "bknum": "523",
+          "tit": "破宿曜障眞言",
+          "vol": "一通",
+          "date": "鎌倉中期寫",
+          "date_st": "鎌倉中期寫",
+          "style": "折紙",
+          "style_st": "折紙",
+          "style2": "尾缺(殘缺)",
+          "seal": "高山寺",
+          "seal_st": "高山寺",
+          "kntn": "無點",
+          "kntn_st": "無點",
+          "rmks1": "片假名交リ文ヲ含ム"
+        },
+        {
+          "id": "5690",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "062",
+          "bknum": "098",
+          "tit": "宿曜私記",
+          "vol": "一帖",
+          "cont": "北斗事附古要文",
+          "date": "院政期寫",
+          "date_st": "院政期寫",
+          "style": "粘葉裝枡型",
+          "style_st": "粘葉裝枡型",
+          "cpage": "原表紙",
+          "seal": "高山寺",
+          "seal_st": "高山寺",
+          "kai": "押界",
+          "kntn": "無點",
+          "kntn_st": "無點",
+          "rmks1": "朱書",
+          "rmks2": "宿曜符號アリ"
+        },
+        {
+          "id": "7562",
+          "sec": "4",
+          "sec_st": "4",
+          "bxnum": "082",
+          "bknum": "099",
+          "tit": "宿曜供次第",
+          "vol": "一帖",
+          "date": "院政期寫",
+          "date_st": "院政期寫",
+          "style": "粘葉装枡型",
+          "style_st": "粘葉装枡型",
+          "seal": "高山寺",
+          "seal_st": "高山寺",
+          "kai": "押界",
+          "kntn2": "無點"
+        }
+      ],
+      "contents_or_priority_read_from_titles_only": false,
+      "selected_example_of_unread_work": {
+        "record_id": "12674",
+        "catalogue_key": [
+          "4",
+          "117",
+          "021"
+        ],
+        "title_literal": "宿曜經疑義",
+        "date_literal": "平安時代永保四年寫",
+        "text_or_manuscript_image_acquired": false
+      }
+    },
+    "taisho_portal_keyword_searches": [
+      {
+        "institution": "大正大学附属図書館",
+        "portal": "大正大学デジタルアーカイブ",
+        "keyword": "檜尾",
+        "actual_result_literal": "検索条件[キーワード:檜尾]で0件ヒット",
+        "result_count": 0,
+        "actual_html_sha256": "f824e99aef912dc93a6c561fc69c989cd159909e94076b865fc1b8a48e746269",
+        "current_holdings_or_digitization_absence_proven": false,
+        "successor_identity_of_chisan_manuscript_proven": false
+      },
+      {
+        "institution": "大正大学附属図書館",
+        "portal": "大正大学デジタルアーカイブ",
+        "keyword": "桧尾",
+        "actual_result_literal": "検索条件[キーワード:桧尾]で0件ヒット",
+        "result_count": 0,
+        "actual_html_sha256": "3326226b38914daa2ce656706dfc7b22a1a6a064babbde5e41ad9433cf6c67f2",
+        "current_holdings_or_digitization_absence_proven": false,
+        "successor_identity_of_chisan_manuscript_proven": false
+      }
+    ],
+    "acceptance_status": {
+      "new_independent_historical_observations": 0,
+      "real_samples": 0,
+      "genealogical_independence_established": false,
+      "taisho_base_or_ko_physical_manuscript_acquired": false,
+      "ancient_clock_or_half_day_mapped": false,
+      "leap_short_month_priority_established": false,
+      "calendar_or_mansion_values_changed": false,
+      "original_four_axes_or_gates_changed": false
+    },
+    "retained_research_corrections": [
+      {
+        "issue": "Initial inline SAT fetch saved166587 bytes then optional bs4 import failed; no bs4 dependency added. Subsequent standard-library parsing used actual saved bytes.",
+        "raw_bytes_were_saved_before_import_failure": true
+      },
+      {
+        "issue": "Root initially described the SAT note as previously unincorporated; current-code inspection found it already present since round18. The note is revalidated, not new knowledge or an independently acquired copy.",
+        "new_discovery_claim_withdrawn": true
+      }
+    ]
+  },
+  "actual_source_access_receipts": [
+    {
+      "name": "taisho-archive.html",
+      "url": "https://jmapps.ne.jp/tais/",
+      "final_url": "https://jmapps.ne.jp/tais/",
+      "status": 200,
+      "sha256": "ee0279bfb821cfdfaa1bd288d1b0fbe8cfb796ba189e17c411fb9a5b270fef66",
+      "bytes": 46724
+    },
+    {
+      "name": "kozanji-search.html",
+      "url": "https://agni.dhii.jp/kozanji/search.html",
+      "final_url": "https://agni.dhii.jp/kozanji/search.html",
+      "status": 200,
+      "sha256": "21775778bf0ff39364010439db493ec15692e162c9753b4d3aea785c111eaf32",
+      "bytes": 24681
+    },
+    {
+      "name": "kozanji-hinoo.json",
+      "url": "https://agni.dhii.jp/kozanji/search?q=%E6%AA%9C%E5%B0%BE&mode=partial&rows=2000",
+      "final_url": "https://agni.dhii.jp/kozanji/search?q=%E6%AA%9C%E5%B0%BE&mode=partial&rows=2000",
+      "status": 200,
+      "bytes": 3023,
+      "sha256": "5a06bb24ae875adfd10b6b46938616d801deb7c36d8511f8b27ee65dc00bfca7"
+    },
+    {
+      "name": "kozanji-shukuyo.json",
+      "url": "https://agni.dhii.jp/kozanji/search?q=%E5%AE%BF%E6%9B%9C&mode=partial&rows=2000",
+      "final_url": "https://agni.dhii.jp/kozanji/search?q=%E5%AE%BF%E6%9B%9C&mode=partial&rows=2000",
+      "status": 200,
+      "bytes": 4575,
+      "sha256": "1a8f4af3f057e27269683079a266c5fbcd23aba493fdf2b19115dff30eadefb2"
+    },
+    {
+      "name": "taisho-hinoo.html",
+      "url": "https://jmapps.ne.jp/tais/list.html?keywords=%E6%AA%9C%E5%B0%BE&kwd_and_or=and",
+      "final_url": "https://jmapps.ne.jp/tais/list.html?keywords=%E6%AA%9C%E5%B0%BE&kwd_and_or=and",
+      "status": 200,
+      "bytes": 41882,
+      "sha256": "f824e99aef912dc93a6c561fc69c989cd159909e94076b865fc1b8a48e746269"
+    },
+    {
+      "url": "https://jmapps.ne.jp/tais/list.html?keywords=%E6%A1%A7%E5%B0%BE&kwd_and_or=and",
+      "final_url": "https://jmapps.ne.jp/tais/list.html?keywords=%E6%A1%A7%E5%B0%BE&kwd_and_or=and",
+      "status": 200,
+      "bytes": 41882,
+      "sha256": "3326226b38914daa2ce656706dfc7b22a1a6a064babbde5e41ad9433cf6c67f2",
+      "at": "2026-10-24T18:27:14.391793+00:00"
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "ruleset_id": "zengshan_scan_v3",
+  "ruleset_version": "3.0.0",
+  "source": {
+    "id": "nlc1925-zengshan",
+    "title": "增刪卜易",
+    "editor": "秦慎安校勘",
+    "publisher": "文明書局",
+    "publication_year": 1925,
+    "institution": "中國國家圖書館",
+    "catalog_id": "NLC416-12jh005345-45344",
+    "file": "sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "page_count": 394,
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "description_url": "https://commons.wikimedia.org/w/index.php?title=File:NLC416-12jh005345-45344_增刪卜易.pdf&oldid=808899674",
+    "license": "public_domain_scan",
+    "method": "Selected rendered pages visually read before changing rules; OCR was used only as an unsuccessful locator, never as an oracle."
+  },
+  "scope": "Only the listed passages are visually collated; not the full book or every edition. No real-world efficacy claim.",
+  "collations": [
+    {
+      "id": "ji-advance-correction",
+      "chapter": "10",
+      "pdf_pages": [
+        53
+      ],
+      "printed_pages": [
+        "卷一三三"
+      ],
+      "quote": "忌神動化回頭生化進神者二也",
+      "transcription_reading": "忌神動化回頭生扶退神者二也",
+      "finding": "scan_resolves_transcription_error",
+      "implementation": "有力忌神候选按化进，不把化退列为此条支持条件"
+    },
+    {
+      "id": "spring-residual-correction",
+      "chapter": "15又",
+      "pdf_pages": [
+        59
+      ],
+      "printed_pages": [
+        "卷一三九"
+      ],
+      "quote": "正二月木爲旺火爲相其餘金水土俱作休囚",
+      "transcription_reading": "其餘金火土作休囚",
+      "finding": "scan_confirms_previous_explicit_correction",
+      "implementation": "木旺火相，余金水土休囚；原始转录不改"
+    },
+    {
+      "id": "three-harmony-conditions",
+      "chapter": "19",
+      "pdf_pages": [
+        77,
+        78
+      ],
+      "printed_pages": [
+        "卷二七",
+        "卷二八"
+      ],
+      "quote": "申子辰合成水局巳酉丑合成金局寅午戌合成火局亥卯未合成木局",
+      "additional_quotes": [
+        "一卦之內有一爻動而合局者一也",
+        "若兩爻動一爻不動亦成合局二也",
+        "有內卦初爻三爻動動而變出之爻成三合者三也",
+        "又有外卦四爻六爻動動而變出之爻成三合者四也",
+        "三爻若有兩爻動不成其局須待後之日月補湊合成其局謂之虛一待用",
+        "一爻明動一爻暗動亦作兩爻動",
+        "三合局中有一空破者待填實之日月成之有一爻入墓者待沖開之日成之"
+      ],
+      "finding": "selected_scan_collated_with_condition_ambiguity",
+      "implementation": "区分三支齐全、两支待补及内初三外四六限定动变；首句一动成局未给其余条件，不据此自动作一动即成局；不将静三支或任意本变混搭作成局"
+    },
+    {
+      "id": "four-stages-bounded-table",
+      "chapter": "26又1",
+      "pdf_pages": [
+        97,
+        99
+      ],
+      "printed_pages": [
+        "卷二二七",
+        "卷二二九"
+      ],
+      "quote": "金長生在巳旺在酉墓在丑絕在寅木長生在亥旺在卯墓在未絕在申水土長生在申旺在子墓在辰絕在巳",
+      "finding": "scan_also_omits_full_fire_table",
+      "implementation": "保留已校核四位，不能把缺项当作不存在"
+    },
+    {
+      "id": "hidden-support-six",
+      "chapter": "28",
+      "pdf_pages": [
+        110
+      ],
+      "printed_pages": [
+        "卷二四〇"
+      ],
+      "quote": "伏神有用者六",
+      "additional_quotes": [
+        "伏神得日月生者一也",
+        "伏神旺相者二也",
+        "伏神得飛神生者三也",
+        "伏神得動爻生者四也",
+        "伏神得遇日月動爻沖克飛神者五也",
+        "伏神得遇飛神空破休囚墓絕者六也"
+      ],
+      "finding": "selected_scan_collated",
+      "implementation": "逐项列支持条件，月令层与总旺衰区别；支持条件不能覆盖相反阻碍"
+    },
+    {
+      "id": "hidden-obstruction-five",
+      "chapter": "28",
+      "pdf_pages": [
+        111
+      ],
+      "printed_pages": [
+        "卷二四一"
+      ],
+      "quote": "又伏神終不得出者有五",
+      "additional_quotes": [
+        "伏神休囚無氣者一也",
+        "伏神被日月沖克者二也",
+        "伏神被旺相之飛神克害者三也",
+        "伏神墓絕於日月飛爻者四也",
+        "伏神休囚值旬空月破者五也",
+        "凡用神旺相而遇旬空出空之日則出矣"
+      ],
+      "finding": "selected_scan_collated",
+      "implementation": "空破墓绝不得仅凭一个标记判终不得出；逐项保留支持、阻碍及总旺衰未决"
+    },
+    {
+      "id": "changed-before-hidden",
+      "chapter": "28",
+      "pdf_pages": [
+        115
+      ],
+      "printed_pages": [
+        "卷二四五"
+      ],
+      "quote": "飛爻變爻俱無用神者始尋伏神",
+      "additional_quotes": [
+        "此卦初爻寅木變出巳火官星孟春官遇長生且財爻獨發生官何故不言變出之官而言伏神"
+      ],
+      "finding": "selected_scan_collated",
+      "implementation": "明现及实际变爻先于本宫伏神；变爻与同位原爻不可混为用神"
+    }
+  ]
+}

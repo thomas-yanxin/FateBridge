@@ -1,0 +1,158 @@
+{
+  "review_id": "heluo_song_five_independent_v1",
+  "version": "1.0.0",
+  "source_pdf_sha256": "4a04e1e32a42719f001b56936e3c7561b5f68563ae54f0a23ed004af146cfcd7",
+  "source_pdf_pages": [
+    11,
+    12
+  ],
+  "first_transcription_sha256": "4b0c4579bc82ad3898dbfcf905f91c01e021d939b0b862d801f97891d196c34b",
+  "first_freeze_sha256": "6dc3b2c4db2069f58e5196fab1dcb1394aeeae420b39c92b82e80296574f86a7",
+  "comparison_sha256": "ef8108cc8e9dc50351e1df22fcc165d2960effc99e620c8e07e422c1e2e1063c",
+  "comparison_freeze_sha256": "0c1c7126b920a626c104cfbde2c83252ea9e005bf3c307f3f467eb10f3bb1710",
+  "review_stage": "post_R82_adoption_same_model_reader; first_transcription_frozen_before_candidate_exposure; comparison_completed_with_unresolved_glyphs",
+  "scope_note": "只复核五首116字及20个印刷句点；同一模型代理，非外部专家、异版本或全书认证。R82当时独立复核未完成的历史不改写。初、二全文一致仍非文字准确率分数；七处候选包括四处尚未裁决的首稿分歧。",
+  "reviewed_poems": 5,
+  "reviewed_characters": 116,
+  "first_character_differences": 5,
+  "unadjudicated_first_differences": 4,
+  "unresolved_character_positions": 7,
+  "external_expert_review": false,
+  "whole_corpus_independent_review": false,
+  "automatic_applicability_selection": false,
+  "real_world_efficacy_validated": false,
+  "entries": [
+    {
+      "hexagram": "天水訟",
+      "line": 1,
+      "poem_index": 1,
+      "current_text": "嘹喨征鴻獨出羣。高飛羽翼未離分。正宜奮起行前進。好個聲音處處聞。",
+      "first_reader_text": "嘹喨征鴻獨出羣。高飛羽翼未離分。正宜奮起行前進。好個聲音處處聞。",
+      "first_matches_current": true,
+      "first_difference_count": 0,
+      "unresolved_readings": [
+        {
+          "segment": 1,
+          "position": 1,
+          "candidates": [
+            "嘹",
+            "嘆"
+          ],
+          "reader_preferred": "嘹"
+        },
+        {
+          "segment": 1,
+          "position": 2,
+          "candidates": [
+            "喨",
+            "唬"
+          ],
+          "reader_preferred": "喨"
+        }
+      ],
+      "review_notes": [
+        "R89在候选曝光前首稿与当前全文一致，但嘹／嘆、喨／唬仍有弱疑读，未以一致性消除候选。"
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 2,
+      "poem_index": 2,
+      "current_text": "不進須當退。方無否塞憂。貴人相佑下。王事出奇留。",
+      "first_reader_text": "不進須當退。方無否塞憂。貴人相佑下。王事出奇留。",
+      "first_matches_current": true,
+      "first_difference_count": 0,
+      "unresolved_readings": [],
+      "review_notes": [
+        "R89在候选曝光前首稿与当前全文一致；王字获同页完整像素支持，不将继承王字计为新修复。"
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 4,
+      "poem_index": 2,
+      "current_text": "名懼親君位。安貞吉有餘。得人相瞻處。澤地有安居。",
+      "first_reader_text": "名懼親君位。安貞吉有餘。得人相贈處。擇地有安居。",
+      "first_matches_current": false,
+      "first_difference_count": 2,
+      "unresolved_readings": [
+        {
+          "segment": 1,
+          "position": 2,
+          "candidates": [
+            "懼",
+            "懽"
+          ],
+          "reader_preferred": "懼"
+        },
+        {
+          "segment": 3,
+          "position": 4,
+          "candidates": [
+            "贍",
+            "瞻",
+            "贈"
+          ],
+          "reader_preferred": "贍"
+        },
+        {
+          "segment": 4,
+          "position": 1,
+          "candidates": [
+            "擇",
+            "澤"
+          ],
+          "reader_preferred": "擇"
+        }
+      ],
+      "review_notes": [
+        "R89首稿相贈／擇地与当前相瞻／澤地不同；曝光后新增贍候选。瞻／贍／贈及澤／擇未决，名懼亦保留懼／懽弱疑读。当前正文仍是保留录字，不能据此选定义项。"
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 5,
+      "poem_index": 3,
+      "current_text": "簷前鵲噪喜翩翩。憂慮潛消理自然。一人進兮一人退。末稍却有好姻緣。",
+      "first_reader_text": "簷前鵲噪喜翩翩。憂慮潛消理自然。一人進今一人退。末梢却有好姻緣。",
+      "first_matches_current": false,
+      "first_difference_count": 2,
+      "unresolved_readings": [
+        {
+          "segment": 3,
+          "position": 4,
+          "candidates": [
+            "今",
+            "兮"
+          ],
+          "reader_preferred": "今"
+        },
+        {
+          "segment": 4,
+          "position": 2,
+          "candidates": [
+            "梢",
+            "稍"
+          ],
+          "reader_preferred": "梢"
+        }
+      ],
+      "review_notes": [
+        "R89首稿一人進今一人退、末梢却与当前兮、稍不同；今／兮及梢／稍未决。末字得到曝光前读稿支持，不能将整句记为完全吻合，亦不自动生成姻缘事件或时间。"
+      ]
+    },
+    {
+      "hexagram": "天水訟",
+      "line": 6,
+      "poem_index": 1,
+      "current_text": "有錫不須懽。時當隱遁安。困來宜擇避。枯木奈嚴寒。",
+      "first_reader_text": "有錫不須憚。時當隱遁安。困來宜擇避。枯木奈嚴寒。",
+      "first_matches_current": false,
+      "first_difference_count": 1,
+      "unresolved_readings": [],
+      "review_notes": [
+        "R89首稿有錫不須憚；看到候选后依像素改判懽。此为曝光后改判，不能记录为曝光前一致；困字与曝光前首稿一致。懽为当前所录字，仍不据诗自动选择个人适用或现实结果。"
+      ]
+    }
+  ]
+}

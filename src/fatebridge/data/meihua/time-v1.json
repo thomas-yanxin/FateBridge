@@ -1,0 +1,23 @@
+{
+  "id": "meihua_lunar_time_v1",
+  "version": "1.0.0",
+  "title": "《梅花易數》时间取数、体用互变有限规则集",
+  "edition": "维基文库固定修订转录；未校勘影印底本，不认证作者归属",
+  "sources": [
+    {"id": "meihua-volume-1", "title": "《梅花易數》卷一", "revision": 2690596, "url": "https://zh.wikisource.org/w/index.php?oldid=2690596&title=梅花易數/卷一"},
+    {"id": "meihua-volume-2", "title": "《梅花易數》卷二", "revision": 1441921, "url": "https://zh.wikisource.org/w/index.php?oldid=1441921&title=梅花易數/卷二"},
+    {"id": "meihua-volume-3", "title": "《梅花易數》卷三", "revision": 1441927, "url": "https://zh.wikisource.org/w/index.php?oldid=1441927&title=梅花易數/卷三"}
+  ],
+  "rules": [
+    {"id": "time_seed", "source_id": "meihua-volume-1", "section": "年月日時起例", "kind": "text_rule", "quote": "年月日為上卦。年月日加時總數為下卦。又以年月日時總數取爻。"},
+    {"id": "remainders", "source_id": "meihua-volume-1", "section": "卦以八除、爻以六除", "kind": "text_rule", "statement": "卦数除八，动爻除六；整除分别取八及六。爻画按初爻至上爻排列。"},
+    {"id": "mutual", "source_id": "meihua-volume-1", "section": "互卦起例", "kind": "text_rule", "quote": "又云：乾坤無互，互其變卦。", "statement": "下互取二三四爻，上互取三四五爻；本卦纯乾或纯坤时取变卦之互。"},
+    {"id": "body_use", "source_id": "meihua-volume-3", "section": "變卦式八則", "kind": "text_rule", "quote": "動者為用，靜者為體。"},
+    {"id": "stages", "source_id": "meihua-volume-2", "section": "體用總訣", "kind": "text_rule", "quote": "體克用，諸事吉；用克體，諸事凶。體生用，有耗失之患；用生體，有進益之喜。", "statement": "用为初应、互为中间、变为终应；始终以本卦静体为参照，不在变卦重定体用。"},
+    {"id": "mutual_roles", "source_id": "meihua-volume-3", "section": "體用互變之訣", "kind": "text_rule", "quote": "如體在上，則上互為體之互，下互為用之互，體卦在下，則下互為體之互，上互為用之互。"},
+    {"id": "season", "source_id": "meihua-volume-1", "section": "卦氣旺、卦氣衰", "kind": "text_rule", "quote": "震、巽木旺於春，離火旺于夏，乾、兌金旺於秋，坎水旺於冬，坤、艮土旺於辰戌丑未月。"},
+    {"id": "calendar_policy", "kind": "software_convention", "statement": "按所选时区的民用日期查中国农历；春节换年、午夜换日、闰月沿用本月数、钟时取时支，不作真太阳时修正。原文未唯一裁定这些现代边界。"},
+    {"id": "season_policy", "kind": "software_convention", "statement": "季令按节气月支；辰戌丑未优先按四季土月，其他月按春夏秋冬。仅列原文明确的旺、衰，其他五行记原文未定，不拟造权重或五态。"}
+  ],
+  "scope": "仅支持年月日時起例及所列体用互变规则；不代表全书占法或现实预测验收通过。"
+}

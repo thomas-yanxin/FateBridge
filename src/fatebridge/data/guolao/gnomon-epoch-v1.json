@@ -1,0 +1,1390 @@
+{
+  "schema": "li2013_yuanshi_three_shadow_v1",
+  "profile_id": "li2013_yuanshi_three_shadow_v1",
+  "paper": {
+    "url": "https://pmo.cas.cn/xscbw/twxb/xbll/2003_2018/2013_54/2013_54_6/201311/P020131124690147098590.pdf",
+    "bytes": 591888,
+    "sha256": "48e7158dac69fc47c7381ba4d04ac2494f6501a59f0c991e841aef976b5c8f8f",
+    "www_host_TLS_certificate_failed": true,
+    "TLS_verification_disabled": false
+  },
+  "source_name": "Li Yong, Acta Astronomica Sinica 54(6),569-580(2013)",
+  "source_pdf_pages": {
+    "observation_table": [
+      2,
+      3
+    ],
+    "formulae": [
+      4
+    ],
+    "all75_triads": [
+      7
+    ],
+    "means": [
+      8
+    ],
+    "clock_and_epoch": [
+      9
+    ]
+  },
+  "public_domain_original_witness": {
+    "original_pdf_sha256": "c9f5560e0b14b1f85d27f81bb1e28fbc97ef739df4fef6979e0a85cdf6aac8e4",
+    "excerpt_pdf_sha256": "bc0672edcb36bdfd12c00ad1f31568aeada7df1383f2a8a8f270ca6d9bcb4248",
+    "physical_pages": [
+      36,
+      37,
+      38
+    ],
+    "all98_measurements_recensio_complete": false
+  },
+  "observations": [
+    {
+      "observation_id": "1",
+      "printed_calendar_date": "1277-07-07",
+      "shadow_zhang": "1.30800"
+    },
+    {
+      "observation_id": "2",
+      "printed_calendar_date": "1277-11-17",
+      "shadow_zhang": "7.09710"
+    },
+    {
+      "observation_id": "3",
+      "printed_calendar_date": "1277-11-27",
+      "shadow_zhang": "7.59865"
+    },
+    {
+      "observation_id": "4",
+      "printed_calendar_date": "1277-11-28",
+      "shadow_zhang": "7.63770"
+    },
+    {
+      "observation_id": "5",
+      "printed_calendar_date": "1277-12-05",
+      "shadow_zhang": "7.86355"
+    },
+    {
+      "observation_id": "6",
+      "printed_calendar_date": "1277-12-10",
+      "shadow_zhang": "7.94855"
+    },
+    {
+      "observation_id": "7",
+      "printed_calendar_date": "1277-12-17",
+      "shadow_zhang": "7.95410"
+    },
+    {
+      "observation_id": "8",
+      "printed_calendar_date": "1277-12-18",
+      "shadow_zhang": "7.94550"
+    },
+    {
+      "observation_id": "9",
+      "printed_calendar_date": "1277-12-22",
+      "shadow_zhang": "7.87935"
+    },
+    {
+      "observation_id": "10",
+      "printed_calendar_date": "1277-12-23",
+      "shadow_zhang": "7.85500"
+    },
+    {
+      "observation_id": "11",
+      "printed_calendar_date": "1277-12-24",
+      "shadow_zhang": "7.83045"
+    },
+    {
+      "observation_id": "12",
+      "printed_calendar_date": "1277-12-31",
+      "shadow_zhang": "7.58510"
+    },
+    {
+      "observation_id": "13",
+      "printed_calendar_date": "1278-01-01",
+      "shadow_zhang": "7.54170"
+    },
+    {
+      "observation_id": "14",
+      "printed_calendar_date": "1278-01-02",
+      "shadow_zhang": "7.49595"
+    },
+    {
+      "observation_id": "15",
+      "printed_calendar_date": "1278-01-03",
+      "shadow_zhang": "7.44860"
+    },
+    {
+      "observation_id": "16",
+      "printed_calendar_date": "1278-01-06",
+      "shadow_zhang": "7.29725"
+    },
+    {
+      "observation_id": "17",
+      "printed_calendar_date": "1278-01-07",
+      "shadow_zhang": "7.24545"
+    },
+    {
+      "observation_id": "18",
+      "printed_calendar_date": "1278-01-08",
+      "shadow_zhang": "7.19090"
+    },
+    {
+      "observation_id": "19",
+      "printed_calendar_date": "1278-01-09",
+      "shadow_zhang": "7.13430"
+    },
+    {
+      "observation_id": "20",
+      "printed_calendar_date": "1278-01-10",
+      "shadow_zhang": "7.07600"
+    },
+    {
+      "observation_id": "21",
+      "printed_calendar_date": "1278-01-11",
+      "shadow_zhang": "7.01565"
+    },
+    {
+      "observation_id": "22",
+      "printed_calendar_date": "1278-05-23",
+      "shadow_zhang": "1.30385"
+    },
+    {
+      "observation_id": "23",
+      "printed_calendar_date": "1278-05-24",
+      "shadow_zhang": "1.29205"
+    },
+    {
+      "observation_id": "24",
+      "printed_calendar_date": "1278-06-10",
+      "shadow_zhang": "1.17775"
+    },
+    {
+      "observation_id": "25",
+      "printed_calendar_date": "1278-06-19",
+      "shadow_zhang": "1.17800"
+    },
+    {
+      "observation_id": "26",
+      "printed_calendar_date": "1278-06-20",
+      "shadow_zhang": "1.18055"
+    },
+    {
+      "observation_id": "27",
+      "printed_calendar_date": "1278-07-17",
+      "shadow_zhang": "1.44525"
+    },
+    {
+      "observation_id": "28",
+      "printed_calendar_date": "1278-07-18",
+      "shadow_zhang": "1.46380"
+    },
+    {
+      "observation_id": "29",
+      "printed_calendar_date": "1278-11-17",
+      "shadow_zhang": "7.07595"
+    },
+    {
+      "observation_id": "30",
+      "printed_calendar_date": "1278-11-18",
+      "shadow_zhang": "7.14060"
+    },
+    {
+      "observation_id": "31",
+      "printed_calendar_date": "1278-11-19",
+      "shadow_zhang": "7.19575"
+    },
+    {
+      "observation_id": "32",
+      "printed_calendar_date": "1278-11-20",
+      "shadow_zhang": "7.25050"
+    },
+    {
+      "observation_id": "33",
+      "printed_calendar_date": "1278-11-21",
+      "shadow_zhang": "7.30335"
+    },
+    {
+      "observation_id": "34",
+      "printed_calendar_date": "1278-11-23",
+      "shadow_zhang": "7.40375"
+    },
+    {
+      "observation_id": "35",
+      "printed_calendar_date": "1278-11-24",
+      "shadow_zhang": "7.45205"
+    },
+    {
+      "observation_id": "36",
+      "printed_calendar_date": "1278-11-25",
+      "shadow_zhang": "7.50035"
+    },
+    {
+      "observation_id": "37",
+      "printed_calendar_date": "1278-11-26",
+      "shadow_zhang": "7.54495"
+    },
+    {
+      "observation_id": "38",
+      "printed_calendar_date": "1278-11-27",
+      "shadow_zhang": "7.58815"
+    },
+    {
+      "observation_id": "39",
+      "printed_calendar_date": "1278-11-28",
+      "shadow_zhang": "7.63015"
+    },
+    {
+      "observation_id": "40",
+      "printed_calendar_date": "1278-12-04",
+      "shadow_zhang": "7.83185"
+    },
+    {
+      "observation_id": "41",
+      "printed_calendar_date": "1278-12-24",
+      "shadow_zhang": "7.83635"
+    },
+    {
+      "observation_id": "42",
+      "printed_calendar_date": "1278-12-25",
+      "shadow_zhang": "7.80825"
+    },
+    {
+      "observation_id": "43",
+      "printed_calendar_date": "1278-12-30",
+      "shadow_zhang": "7.63665"
+    },
+    {
+      "observation_id": "44",
+      "printed_calendar_date": "1278-12-31",
+      "shadow_zhang": "7.59530"
+    },
+    {
+      "observation_id": "45",
+      "printed_calendar_date": "1279-01-01",
+      "shadow_zhang": "7.55045"
+    },
+    {
+      "observation_id": "46",
+      "printed_calendar_date": "1279-01-04",
+      "shadow_zhang": "7.41200"
+    },
+    {
+      "observation_id": "47",
+      "printed_calendar_date": "1279-01-05",
+      "shadow_zhang": "7.36145"
+    },
+    {
+      "observation_id": "48",
+      "printed_calendar_date": "1279-03-03",
+      "shadow_zhang": "3.85015"
+    },
+    {
+      "observation_id": "49",
+      "printed_calendar_date": "1279-03-16",
+      "shadow_zhang": "3.21955"
+    },
+    {
+      "observation_id": "50",
+      "printed_calendar_date": "1279-03-31",
+      "shadow_zhang": "2.60345"
+    },
+    {
+      "observation_id": "51",
+      "printed_calendar_date": "1279-04-13",
+      "shadow_zhang": "2.16110"
+    },
+    {
+      "observation_id": "52",
+      "printed_calendar_date": "1279-04-14",
+      "shadow_zhang": "2.13050"
+    },
+    {
+      "observation_id": "53",
+      "printed_calendar_date": "1279-05-03",
+      "shadow_zhang": "1.63905"
+    },
+    {
+      "observation_id": "54",
+      "printed_calendar_date": "1279-05-13",
+      "shadow_zhang": "1.44810"
+    },
+    {
+      "observation_id": "55",
+      "printed_calendar_date": "1279-05-30",
+      "shadow_zhang": "1.23695"
+    },
+    {
+      "observation_id": "56",
+      "printed_calendar_date": "1279-05-31",
+      "shadow_zhang": "1.22935"
+    },
+    {
+      "observation_id": "57",
+      "printed_calendar_date": "1279-06-09",
+      "shadow_zhang": "1.18630"
+    },
+    {
+      "observation_id": "58",
+      "printed_calendar_date": "1279-06-10",
+      "shadow_zhang": "1.17830"
+    },
+    {
+      "observation_id": "59",
+      "printed_calendar_date": "1279-06-29",
+      "shadow_zhang": "1.22640"
+    },
+    {
+      "observation_id": "60",
+      "printed_calendar_date": "1279-07-26",
+      "shadow_zhang": "1.60995"
+    },
+    {
+      "observation_id": "61",
+      "printed_calendar_date": "1279-07-27",
+      "shadow_zhang": "1.63110"
+    },
+    {
+      "observation_id": "62",
+      "printed_calendar_date": "1279-08-15",
+      "shadow_zhang": "2.11955"
+    },
+    {
+      "observation_id": "63",
+      "printed_calendar_date": "1279-08-16",
+      "shadow_zhang": "2.14865"
+    },
+    {
+      "observation_id": "64",
+      "printed_calendar_date": "1279-08-17",
+      "shadow_zhang": "2.19155"
+    },
+    {
+      "observation_id": "65",
+      "printed_calendar_date": "1279-08-29",
+      "shadow_zhang": "2.58990"
+    },
+    {
+      "observation_id": "66",
+      "printed_calendar_date": "1279-08-30",
+      "shadow_zhang": "2.62590"
+    },
+    {
+      "observation_id": "67",
+      "printed_calendar_date": "1279-09-12",
+      "shadow_zhang": "3.15965"
+    },
+    {
+      "observation_id": "68",
+      "printed_calendar_date": "1279-09-13",
+      "shadow_zhang": "3.20265"
+    },
+    {
+      "observation_id": "69",
+      "printed_calendar_date": "1279-09-25",
+      "shadow_zhang": "3.78230"
+    },
+    {
+      "observation_id": "70",
+      "printed_calendar_date": "1279-09-26",
+      "shadow_zhang": "3.83105"
+    },
+    {
+      "observation_id": "71",
+      "printed_calendar_date": "1279-10-26",
+      "shadow_zhang": "5.64925"
+    },
+    {
+      "observation_id": "72",
+      "printed_calendar_date": "1279-10-28",
+      "shadow_zhang": "5.78250"
+    },
+    {
+      "observation_id": "73",
+      "printed_calendar_date": "1279-11-06",
+      "shadow_zhang": "6.38700"
+    },
+    {
+      "observation_id": "74",
+      "printed_calendar_date": "1279-11-12",
+      "shadow_zhang": "6.77450"
+    },
+    {
+      "observation_id": "75",
+      "printed_calendar_date": "1279-11-13",
+      "shadow_zhang": "6.83725"
+    },
+    {
+      "observation_id": "76",
+      "printed_calendar_date": "1279-11-14",
+      "shadow_zhang": "6.89775"
+    },
+    {
+      "observation_id": "77",
+      "printed_calendar_date": "1279-11-19",
+      "shadow_zhang": "7.19225"
+    },
+    {
+      "observation_id": "78",
+      "printed_calendar_date": "1279-11-20",
+      "shadow_zhang": "7.24690"
+    },
+    {
+      "observation_id": "79",
+      "printed_calendar_date": "1279-11-21",
+      "shadow_zhang": "7.30150"
+    },
+    {
+      "observation_id": "80",
+      "printed_calendar_date": "1279-11-23",
+      "shadow_zhang": "7.40525"
+    },
+    {
+      "observation_id": "81",
+      "printed_calendar_date": "1279-11-24",
+      "shadow_zhang": "7.45450"
+    },
+    {
+      "observation_id": "82",
+      "printed_calendar_date": "1279-11-25",
+      "shadow_zhang": "7.50250"
+    },
+    {
+      "observation_id": "83",
+      "printed_calendar_date": "1279-11-29",
+      "shadow_zhang": "7.67400"
+    },
+    {
+      "observation_id": "84",
+      "printed_calendar_date": "1279-12-30",
+      "shadow_zhang": "7.65800"
+    },
+    {
+      "observation_id": "85",
+      "printed_calendar_date": "1279-12-31",
+      "shadow_zhang": "7.61425"
+    },
+    {
+      "observation_id": "86",
+      "printed_calendar_date": "1280-01-02",
+      "shadow_zhang": "7.53200"
+    },
+    {
+      "observation_id": "87",
+      "printed_calendar_date": "1280-01-03",
+      "shadow_zhang": "7.48525"
+    },
+    {
+      "observation_id": "88",
+      "printed_calendar_date": "1280-01-04",
+      "shadow_zhang": "7.43650"
+    },
+    {
+      "observation_id": "89",
+      "printed_calendar_date": "1280-01-05",
+      "shadow_zhang": "7.38715"
+    },
+    {
+      "observation_id": "90",
+      "printed_calendar_date": "1280-01-06",
+      "shadow_zhang": "7.33200"
+    },
+    {
+      "observation_id": "91",
+      "printed_calendar_date": "1280-01-07",
+      "shadow_zhang": "7.28425"
+    },
+    {
+      "observation_id": "92",
+      "printed_calendar_date": "1280-01-08",
+      "shadow_zhang": "7.22725"
+    },
+    {
+      "observation_id": "93",
+      "printed_calendar_date": "1280-01-15",
+      "shadow_zhang": "6.81450"
+    },
+    {
+      "observation_id": "94",
+      "printed_calendar_date": "1280-01-21",
+      "shadow_zhang": "6.42975"
+    },
+    {
+      "observation_id": "95",
+      "printed_calendar_date": "1280-01-22",
+      "shadow_zhang": "6.36250"
+    },
+    {
+      "observation_id": "96",
+      "printed_calendar_date": "1280-01-31",
+      "shadow_zhang": "5.75800"
+    },
+    {
+      "observation_id": "97",
+      "printed_calendar_date": "1280-02-01",
+      "shadow_zhang": "5.69150"
+    },
+    {
+      "observation_id": "98",
+      "printed_calendar_date": "1280-02-02",
+      "shadow_zhang": "5.62500"
+    }
+  ],
+  "triads": [
+    {
+      "season": "winter1277",
+      "case_id": "1",
+      "A": "6",
+      "B": "7",
+      "C": "8",
+      "span_days": "8",
+      "mode": "before1_after2",
+      "printed_cycle_day": "39.3227"
+    },
+    {
+      "season": "winter1277",
+      "case_id": "2",
+      "A": "5",
+      "B": "9",
+      "C": "10",
+      "span_days": "18",
+      "mode": "before1_after2",
+      "printed_cycle_day": "39.3244"
+    },
+    {
+      "season": "winter1277",
+      "case_id": "3",
+      "A": "5",
+      "B": "10",
+      "C": "11",
+      "span_days": "19",
+      "mode": "before1_after2",
+      "printed_cycle_day": "39.3259"
+    },
+    {
+      "season": "winter1277",
+      "case_id": "4",
+      "A": "3",
+      "B": "4",
+      "C": "12",
+      "span_days": "34",
+      "mode": "before2_after1",
+      "printed_cycle_day": "39.3265"
+    },
+    {
+      "season": "winter1277",
+      "case_id": "5",
+      "A": "2",
+      "B": "20",
+      "C": "21",
+      "span_days": "55",
+      "mode": "before1_after2",
+      "printed_cycle_day": "39.3252"
+    },
+    {
+      "season": "winter1277",
+      "case_id": "6",
+      "A": "1",
+      "B": "22",
+      "C": "23",
+      "span_days": "321",
+      "mode": "before1_after2",
+      "printed_cycle_day": "39.3242"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "1",
+      "A": "24",
+      "B": "25",
+      "C": "26",
+      "span_days": "10",
+      "mode": "before1_after2",
+      "printed_cycle_day": "41.9510"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "2",
+      "A": "19",
+      "B": "29",
+      "C": "30",
+      "span_days": "313",
+      "mode": "before1_after2",
+      "printed_cycle_day": "41.9513"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "3",
+      "A": "16",
+      "B": "31",
+      "C": "32",
+      "span_days": "318",
+      "mode": "before1_after2",
+      "printed_cycle_day": "41.9269"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "4",
+      "A": "17",
+      "B": "32",
+      "C": "33",
+      "span_days": "318",
+      "mode": "before1_after2",
+      "printed_cycle_day": "41.9522"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "5",
+      "A": "16",
+      "B": "17",
+      "C": "31",
+      "span_days": "317",
+      "mode": "before2_after1",
+      "printed_cycle_day": "41.9797"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "6",
+      "A": "17",
+      "B": "18",
+      "C": "32",
+      "span_days": "317",
+      "mode": "before2_after1",
+      "printed_cycle_day": "41.9537"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "7",
+      "A": "16",
+      "B": "32",
+      "C": "33",
+      "span_days": "319",
+      "mode": "before1_after2",
+      "printed_cycle_day": "41.9423"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "8",
+      "A": "17",
+      "B": "31",
+      "C": "32",
+      "span_days": "317",
+      "mode": "before1_after2",
+      "printed_cycle_day": "41.9539"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "9",
+      "A": "18",
+      "B": "31",
+      "C": "32",
+      "span_days": "316",
+      "mode": "before1_after2",
+      "printed_cycle_day": "41.9557"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "10",
+      "A": "18",
+      "B": "32",
+      "C": "33",
+      "span_days": "317",
+      "mode": "before1_after2",
+      "printed_cycle_day": "41.9361"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "11",
+      "A": "16",
+      "B": "17",
+      "C": "32",
+      "span_days": "318",
+      "mode": "before2_after1",
+      "printed_cycle_day": "41.9513"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "12",
+      "A": "16",
+      "B": "17",
+      "C": "33",
+      "span_days": "319",
+      "mode": "before2_after1",
+      "printed_cycle_day": "41.9411"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "13",
+      "A": "17",
+      "B": "18",
+      "C": "31",
+      "span_days": "316",
+      "mode": "before2_after1",
+      "printed_cycle_day": "41.9555"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "14",
+      "A": "17",
+      "B": "18",
+      "C": "33",
+      "span_days": "318",
+      "mode": "before2_after1",
+      "printed_cycle_day": "41.9693"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "15",
+      "A": "13",
+      "B": "35",
+      "C": "36",
+      "span_days": "328",
+      "mode": "before1_after2",
+      "printed_cycle_day": "41.9281"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "16",
+      "A": "14",
+      "B": "36",
+      "C": "37",
+      "span_days": "328",
+      "mode": "before1_after2",
+      "printed_cycle_day": "41.9507"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "17",
+      "A": "13",
+      "B": "14",
+      "C": "35",
+      "span_days": "327",
+      "mode": "before2_after1",
+      "printed_cycle_day": "41.9798"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "18",
+      "A": "14",
+      "B": "15",
+      "C": "36",
+      "span_days": "327",
+      "mode": "before2_after1",
+      "printed_cycle_day": "41.9535"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "19",
+      "A": "13",
+      "B": "36",
+      "C": "37",
+      "span_days": "329",
+      "mode": "before1_after2",
+      "printed_cycle_day": "41.9636"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "20",
+      "A": "14",
+      "B": "35",
+      "C": "36",
+      "span_days": "327",
+      "mode": "before1_after2",
+      "printed_cycle_day": "41.9545"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "21",
+      "A": "15",
+      "B": "36",
+      "C": "37",
+      "span_days": "327",
+      "mode": "before1_after2",
+      "printed_cycle_day": "41.9198"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "22",
+      "A": "15",
+      "B": "35",
+      "C": "36",
+      "span_days": "326",
+      "mode": "before1_after2",
+      "printed_cycle_day": "41.9643"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "23",
+      "A": "13",
+      "B": "14",
+      "C": "36",
+      "span_days": "328",
+      "mode": "before2_after1",
+      "printed_cycle_day": "41.9519"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "24",
+      "A": "13",
+      "B": "14",
+      "C": "37",
+      "span_days": "329",
+      "mode": "before2_after1",
+      "printed_cycle_day": "41.9645"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "25",
+      "A": "14",
+      "B": "15",
+      "C": "35",
+      "span_days": "326",
+      "mode": "before2_after1",
+      "printed_cycle_day": "41.9636"
+    },
+    {
+      "season": "summer1278",
+      "case_id": "26",
+      "A": "14",
+      "B": "15",
+      "C": "37",
+      "span_days": "328",
+      "mode": "before2_after1",
+      "printed_cycle_day": "41.9826"
+    },
+    {
+      "season": "winter1278",
+      "case_id": "1",
+      "A": "40",
+      "B": "41",
+      "C": "42",
+      "span_days": "21",
+      "mode": "before1_after2",
+      "printed_cycle_day": "44.5801"
+    },
+    {
+      "season": "winter1278",
+      "case_id": "2",
+      "A": "38",
+      "B": "43",
+      "C": "44",
+      "span_days": "34",
+      "mode": "before1_after2",
+      "printed_cycle_day": "44.5865"
+    },
+    {
+      "season": "winter1278",
+      "case_id": "3",
+      "A": "39",
+      "B": "44",
+      "C": "45",
+      "span_days": "34",
+      "mode": "before1_after2",
+      "printed_cycle_day": "44.6115"
+    },
+    {
+      "season": "winter1278",
+      "case_id": "4",
+      "A": "38",
+      "B": "39",
+      "C": "45",
+      "span_days": "35",
+      "mode": "before2_after1",
+      "printed_cycle_day": "44.5512"
+    },
+    {
+      "season": "winter1278",
+      "case_id": "5",
+      "A": "38",
+      "B": "44",
+      "C": "45",
+      "span_days": "35",
+      "mode": "before1_after2",
+      "printed_cycle_day": "44.5797"
+    },
+    {
+      "season": "winter1278",
+      "case_id": "6",
+      "A": "39",
+      "B": "43",
+      "C": "44",
+      "span_days": "33",
+      "mode": "before1_after2",
+      "printed_cycle_day": "44.5786"
+    },
+    {
+      "season": "winter1278",
+      "case_id": "7",
+      "A": "38",
+      "B": "39",
+      "C": "43",
+      "span_days": "33",
+      "mode": "before2_after1",
+      "printed_cycle_day": "44.5774"
+    },
+    {
+      "season": "winter1278",
+      "case_id": "8",
+      "A": "38",
+      "B": "39",
+      "C": "44",
+      "span_days": "34",
+      "mode": "before2_after1",
+      "printed_cycle_day": "44.5851"
+    },
+    {
+      "season": "winter1278",
+      "case_id": "9",
+      "A": "34",
+      "B": "46",
+      "C": "47",
+      "span_days": "43",
+      "mode": "before1_after2",
+      "printed_cycle_day": "44.5816"
+    },
+    {
+      "season": "winter1278",
+      "case_id": "10",
+      "A": "27",
+      "B": "28",
+      "C": "54",
+      "span_days": "300",
+      "mode": "before2_after1",
+      "printed_cycle_day": "44.5768"
+    },
+    {
+      "season": "winter1278",
+      "case_id": "11",
+      "A": "25",
+      "B": "57",
+      "C": "58",
+      "span_days": "356",
+      "mode": "before1_after2",
+      "printed_cycle_day": "44.5188"
+    },
+    {
+      "season": "summer1279",
+      "case_id": "1",
+      "A": "55",
+      "B": "56",
+      "C": "59",
+      "span_days": "30",
+      "mode": "before2_after1",
+      "printed_cycle_day": "47.1941"
+    },
+    {
+      "season": "summer1279",
+      "case_id": "2",
+      "A": "53",
+      "B": "60",
+      "C": "61",
+      "span_days": "85",
+      "mode": "before1_after2",
+      "printed_cycle_day": "47.1879"
+    },
+    {
+      "season": "summer1279",
+      "case_id": "3",
+      "A": "52",
+      "B": "62",
+      "C": "63",
+      "span_days": "124",
+      "mode": "before1_after2",
+      "printed_cycle_day": "47.1881"
+    },
+    {
+      "season": "summer1279",
+      "case_id": "4",
+      "A": "51",
+      "B": "63",
+      "C": "64",
+      "span_days": "126",
+      "mode": "before1_after2",
+      "printed_cycle_day": "47.1451"
+    },
+    {
+      "season": "summer1279",
+      "case_id": "5",
+      "A": "50",
+      "B": "65",
+      "C": "66",
+      "span_days": "152",
+      "mode": "before1_after2",
+      "printed_cycle_day": "47.1882"
+    },
+    {
+      "season": "summer1279",
+      "case_id": "6",
+      "A": "49",
+      "B": "67",
+      "C": "68",
+      "span_days": "181",
+      "mode": "before1_after2",
+      "printed_cycle_day": "47.1965"
+    },
+    {
+      "season": "summer1279",
+      "case_id": "7",
+      "A": "48",
+      "B": "69",
+      "C": "70",
+      "span_days": "207",
+      "mode": "before1_after2",
+      "printed_cycle_day": "47.1959"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "1",
+      "A": "83",
+      "B": "84",
+      "C": "85",
+      "span_days": "32",
+      "mode": "before1_after2",
+      "printed_cycle_day": "49.8171"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "2",
+      "A": "80",
+      "B": "86",
+      "C": "87",
+      "span_days": "41",
+      "mode": "before1_after2",
+      "printed_cycle_day": "49.8556"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "3",
+      "A": "81",
+      "B": "87",
+      "C": "88",
+      "span_days": "41",
+      "mode": "before1_after2",
+      "printed_cycle_day": "49.8154"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "4",
+      "A": "82",
+      "B": "88",
+      "C": "89",
+      "span_days": "41",
+      "mode": "before1_after2",
+      "printed_cycle_day": "49.8313"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "5",
+      "A": "80",
+      "B": "81",
+      "C": "86",
+      "span_days": "40",
+      "mode": "before2_after1",
+      "printed_cycle_day": "49.7868"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "6",
+      "A": "81",
+      "B": "82",
+      "C": "87",
+      "span_days": "40",
+      "mode": "before2_after1",
+      "printed_cycle_day": "49.8203"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "7",
+      "A": "80",
+      "B": "87",
+      "C": "88",
+      "span_days": "42",
+      "mode": "before1_after2",
+      "printed_cycle_day": "49.8205"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "8",
+      "A": "80",
+      "B": "88",
+      "C": "89",
+      "span_days": "43",
+      "mode": "before1_after2",
+      "printed_cycle_day": "49.8166"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "9",
+      "A": "81",
+      "B": "86",
+      "C": "87",
+      "span_days": "40",
+      "mode": "before1_after2",
+      "printed_cycle_day": "49.8289"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "10",
+      "A": "81",
+      "B": "88",
+      "C": "89",
+      "span_days": "42",
+      "mode": "before1_after2",
+      "printed_cycle_day": "49.8176"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "11",
+      "A": "82",
+      "B": "86",
+      "C": "87",
+      "span_days": "39",
+      "mode": "before1_after2",
+      "printed_cycle_day": "49.8155"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "12",
+      "A": "82",
+      "B": "87",
+      "C": "88",
+      "span_days": "40",
+      "mode": "before1_after2",
+      "printed_cycle_day": "49.8231"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "13",
+      "A": "80",
+      "B": "81",
+      "C": "87",
+      "span_days": "41",
+      "mode": "before2_after1",
+      "printed_cycle_day": "49.8122"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "14",
+      "A": "80",
+      "B": "81",
+      "C": "88",
+      "span_days": "42",
+      "mode": "before2_after1",
+      "printed_cycle_day": "49.8173"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "15",
+      "A": "80",
+      "B": "81",
+      "C": "89",
+      "span_days": "43",
+      "mode": "before2_after1",
+      "printed_cycle_day": "49.8162"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "16",
+      "A": "81",
+      "B": "82",
+      "C": "86",
+      "span_days": "39",
+      "mode": "before2_after1",
+      "printed_cycle_day": "49.8073"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "17",
+      "A": "81",
+      "B": "82",
+      "C": "88",
+      "span_days": "41",
+      "mode": "before2_after1",
+      "printed_cycle_day": "49.8125"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "18",
+      "A": "81",
+      "B": "82",
+      "C": "89",
+      "span_days": "42",
+      "mode": "before2_after1",
+      "printed_cycle_day": "49.7984"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "19",
+      "A": "79",
+      "B": "90",
+      "C": "91",
+      "span_days": "47",
+      "mode": "before1_after2",
+      "printed_cycle_day": "49.8194"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "20",
+      "A": "77",
+      "B": "78",
+      "C": "92",
+      "span_days": "50",
+      "mode": "before2_after1",
+      "printed_cycle_day": "49.8202"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "21",
+      "A": "74",
+      "B": "75",
+      "C": "93",
+      "span_days": "64",
+      "mode": "before2_after1",
+      "printed_cycle_day": "49.8187"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "22",
+      "A": "75",
+      "B": "76",
+      "C": "93",
+      "span_days": "63",
+      "mode": "before2_after1",
+      "printed_cycle_day": "49.8120"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "23",
+      "A": "73",
+      "B": "94",
+      "C": "95",
+      "span_days": "77",
+      "mode": "before1_after2",
+      "printed_cycle_day": "49.8178"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "24",
+      "A": "72",
+      "B": "96",
+      "C": "97",
+      "span_days": "96",
+      "mode": "before1_after2",
+      "printed_cycle_day": "49.8158"
+    },
+    {
+      "season": "winter1279",
+      "case_id": "25",
+      "A": "77",
+      "B": "97",
+      "C": "98",
+      "span_days": "99",
+      "mode": "before1_after2",
+      "printed_cycle_day": "49.8177"
+    }
+  ],
+  "season_means": [
+    {
+      "season": "winter1277",
+      "printed_calendar_date": "1277-12-14",
+      "printed_source_label": "癸卯日辰初三刻",
+      "branch": "辰",
+      "half": "初",
+      "ke": "3",
+      "printed_mean_cycle_day": "39.3248",
+      "printed_modern_cycle_day": "39.3513",
+      "printed_error1_minutes": "-2.69",
+      "printed_error2_minutes": "35.43",
+      "printed_error3_minutes": "38.12"
+    },
+    {
+      "season": "summer1278",
+      "printed_calendar_date": "1278-06-14",
+      "printed_source_label": "乙巳日亥正三刻",
+      "branch": "亥",
+      "half": "正",
+      "ke": "3",
+      "printed_mean_cycle_day": "41.9537",
+      "printed_modern_cycle_day": "41.9273",
+      "printed_error1_minutes": "2.93",
+      "printed_error2_minutes": "-35.09",
+      "printed_error3_minutes": "-38.01"
+    },
+    {
+      "season": "winter1278",
+      "printed_calendar_date": "1278-12-14",
+      "printed_source_label": "戊申日未初三刻",
+      "branch": "未",
+      "half": "初",
+      "ke": "3",
+      "printed_mean_cycle_day": "44.5752",
+      "printed_modern_cycle_day": "44.5896",
+      "printed_error1_minutes": "-2.11",
+      "printed_error2_minutes": "18.58",
+      "printed_error3_minutes": "20.69"
+    },
+    {
+      "season": "summer1279",
+      "printed_calendar_date": "1279-06-15",
+      "printed_source_label": "辛亥日寅正二刻",
+      "branch": "寅",
+      "half": "正",
+      "ke": "2",
+      "printed_mean_cycle_day": "47.1851",
+      "printed_modern_cycle_day": "47.1677",
+      "printed_error1_minutes": "-9.46",
+      "printed_error2_minutes": "-34.58",
+      "printed_error3_minutes": "-25.12"
+    },
+    {
+      "season": "winter1279",
+      "printed_calendar_date": "1279-12-14",
+      "printed_source_label": "癸丑日戌初二刻",
+      "branch": "戌",
+      "half": "初",
+      "ke": "2",
+      "printed_mean_cycle_day": "49.8174",
+      "printed_modern_cycle_day": "49.8290",
+      "printed_error1_minutes": "1.06",
+      "printed_error2_minutes": "17.72",
+      "printed_error3_minutes": "16.66"
+    },
+    {
+      "season": "winter1280",
+      "printed_calendar_date": "1280-12-14",
+      "printed_source_label": "己未日丑初一刻",
+      "branch": "丑",
+      "half": "初",
+      "ke": "1",
+      "printed_mean_cycle_day": "55.0599",
+      "printed_modern_cycle_day": "55.0713",
+      "printed_error1_minutes": "-0.14",
+      "printed_error2_minutes": "16.23",
+      "printed_error3_minutes": "16.37"
+    }
+  ],
+  "method_policy": {
+    "profile": "li2013_yuanshi_three_shadow_v1",
+    "paper_already_read_before_domain_implementation": true,
+    "independent_expert_or_blind_holdout": false,
+    "source_observations_retained": 98,
+    "all_paper_table2_triads_retained": 75,
+    "all_paper_table3_rows_retained": 6,
+    "source_calendar_policy": "proleptic_julian_reconstruction_of_published_pre1582_public_calendar_dates",
+    "source_noon_offset_day": "1/2",
+    "clock_policy": "100_ke_24_equal_half_shichen_full_ke_bins",
+    "counter_basis": "hko2016_ganzhi_date_label_bridge_v1",
+    "paper_table2_quantization_day": "1/10000",
+    "paper_table2_comparison_half_unit_day": "1/20000",
+    "paper_table3_mean_comparison_half_unit_day": "1/20000",
+    "full_table1_independently_collated_to_NLC": false,
+    "selected_first_triad_each_of5_seasons_NLC_visually_checked": true,
+    "printed_values_changed_after_domain_comparison": false,
+    "best_subset_or_mode_chosen_by_match": false,
+    "source_epoch_constant_55_06_to_be_overwritten": false,
+    "paper_116_4_degree_location_treated_as_precise_historical_observatory": false,
+    "physical_clock_calibration_accepted": false
+  },
+  "date_bridge_data_sha256": "6857f16f84c94d01d3b401a8a0985a9a5851886cf09e3af21e231c0ea3f31644",
+  "source_year_data_sha256": "17a9e2f7383d718eec56ec1e81d8b98583f256c01be36dea22888ebc58f019d3",
+  "used_in_native_birth_chart": false,
+  "physical_epoch_calibrated": false
+}

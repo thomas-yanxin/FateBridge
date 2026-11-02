@@ -1,6 +1,7 @@
 """Every object reachable by field projection must accept missing siblings."""
 
 import asyncio
+import copy
 import json
 from pathlib import Path
 
@@ -18,6 +19,8 @@ from fatebridge.cli import run
 from fatebridge.core.fengshui.output import Ruleset
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.fengshui import PAYLOADS, payload
+from tests.golden.canonical import canonical_json
+from tests.test_agentic_nested_outputs import unrounded_linux_business
 
 SPECS = {spec.key: spec for spec in CATALOG}
 SNAPSHOTS = Path(__file__).parent / "golden" / "snapshots"
@@ -75,7 +78,9 @@ def leaves(value, path=()):
 
 
 @pytest.mark.parametrize("key", list(SPECS))
-def test_every_golden_leaf_projection_validates_without_rewriting_snapshots(key):
+def test_every_golden_leaf_projection_validates_without_rewriting_snapshots(
+    key, unrounded_linux_business
+):
     spec = SPECS[key]
     slug = (
         spec.rest_path.strip("/").replace("/", "_") if spec.rest_path else "mcp_" + key
@@ -85,7 +90,26 @@ def test_every_golden_leaf_projection_validates_without_rewriting_snapshots(key)
     original = (SNAPSHOTS / (slug + ".json")).read_text()
     # Golden canonicalization deliberately omits volatile receipt fields such
     # as run_id and generated_at. Those are not complete live RunMetadata.
-    result = {k: v for k, v in json.loads(original).items() if k != "run_metadata"}
+    # Rounded canonical snapshots are not raw TT/accounting ledgers. Use the
+    # separately sealed unrounded response and retain the exact snapshot tie.
+    result = copy.deepcopy(unrounded_linux_business[slug])
+    if key == "export_registry":
+        from tests.repair_business_reference import qualify_sixyao_registry
+
+        result = qualify_sixyao_registry(result)
+    elif key == "nongli_time":
+        from tests.repair_business_reference import qualify_nongli_clock_precision
+
+        result = qualify_nongli_clock_precision(result)
+    elif key == "decennials":
+        from tests.repair_business_reference import qualify_decennials_snapshot
+
+        result = qualify_decennials_snapshot(result)
+    assert canonical_json(result) == canonical_json(
+        {k: v for k, v in json.loads(original).items() if k != "run_metadata"}
+    )
+    before = copy.deepcopy(result)
+    spec.output_model.model_validate(result)
     validator = Draft202012Validator(spec.output_model.model_json_schema())
     for field, expected in leaves(result):
         projected = project_fields(result, [field], strict_fields=True)
@@ -95,9 +119,8 @@ def test_every_golden_leaf_projection_validates_without_rewriting_snapshots(key)
         for part in field.split("."):
             value = value[part]
         assert value == expected
-    assert result == {
-        k: v for k, v in json.loads(original).items() if k != "run_metadata"
-    }
+    assert result == before
+    assert (SNAPSHOTS / (slug + ".json")).read_text() == original
 
 
 @pytest.fixture
@@ -193,6 +216,9 @@ def test_each_ruleset_field_projects_on_native_mcp_rest_and_cli(
                             "fields": [field],
                             "strict_fields": True,
                             "include_snapshot_text": False,
+                            # Test source projection independently of the
+                            # budget; REST/CLI also use unlimited responses.
+                            "response_char_limit": 0,
                         },
                         raise_on_error=False,
                     )

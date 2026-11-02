@@ -1,0 +1,29 @@
+{
+  "id": "utokyo_t30107_selected_mean_and_solar_recalculation_v1",
+  "source_title": "宿曜經算曜直章第七 後附文化十三年重算選段",
+  "holding": "東京大学総合図書館 T30107",
+  "catalogue_url": "https://da.dl.itc.u-tokyo.ac.jp/portal/assets/1cf6a35f-73cd-8598-57ce-f0706cd68972",
+  "manifest_sha256": "bf2f09b7bb5796084cd554f364ad379f501fc93c546d406f956ae35e98a1f548",
+  "mean_cycle": {
+    "locator": "T30107 canvas p19 left through p20 right",
+    "elapsed_years_per_cycle": 19,
+    "regular_months_per_cycle": 228,
+    "intercalary_months_per_cycle": 7,
+    "nominal_days_per_month": 30,
+    "omission_numerator": 11,
+    "omission_denominator": 703,
+    "omission_bias": 0,
+    "retains_fractional_days": true,
+    "scope": "Whole 19-year cycles only; no entered-month or civil-date mapping, no later correction."
+  },
+  "solar_recalculation": {
+    "locator": "T30107 canvas p20 left; p21 left; p22 right through left top",
+    "scaled_day_unit": 10000,
+    "baseline_scaled_year": "3652423.49669203",
+    "recalibrated_scaled_year": "3652443.42041162105",
+    "calibration_elapsed_years": 2603,
+    "literal_heading": "就太陽曆求積年之歲差",
+    "scope": "Reproduce two printed year coefficients and their products. The derivation of the recalibrated coefficient from the lunar/secular calculation is not accepted; arbitrary-year products are algebraic extrapolation only."
+  },
+  "scope": "Selected later mean/solar products, not the general +500 integer algorithm, complete secular correction, Tang epoch identification, civil-date conversion, daybreak or hourly sequence."
+}

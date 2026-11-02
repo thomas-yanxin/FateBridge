@@ -1,20 +1,8 @@
 """
 学业分析模块
 
-基于八字命理的学业分析功能，综合以下经典技法：
-- 十神看学历：印星主学习力与文凭，官印相生主高学历（参《如何从八字十神看学历高低》）
-- 食伤看才华：食伤主聪明才艺、表达创造，与印配合定学术/技艺方向
-- 文昌贵人：日干引文昌，主聪慧、利读书考试
-- 破格提示：财破印、伤官见官（无制）主学业波折
-
-核心分析维度：
-1. 印星与食伤（学习力与才华）评估
-2. 学历层次倾向（官印相生 / 食伤配印 / 破印等）
-3. 文昌等利学神煞
-4. 适合学科方向（文理倾向）
-5. 考试/升学时机（大运流年引动印星、官星、文昌）
-
-说明：学历高低受现实条件影响，命理仅供潜质与时机参考。
+输出十神加权计数、文昌命中及时间柱对应关系。兼容分数是未校准的固定
+规则索引，不测量智力、学历、学科能力或录取概率。结构成败另由证据链审查。
 """
 
 from __future__ import annotations
@@ -87,6 +75,7 @@ class EducationAnalysis:
         suggestions = EducationAnalysis._generate_suggestions(level, subjects, gods)
 
         return {
+            "counting_basis": "非日干每次1，全部柱支每个藏干每次0.5；日干不计，日支藏干计入；是出现量，不是旺衰。",
             "study_stars": gods,
             "education_level": level,
             "wenchang": wenchang,
@@ -100,7 +89,7 @@ class EducationAnalysis:
         pillars: Dict[str, Tuple[str, str]],
         day_stem: str,
     ) -> Dict[str, Any]:
-        """统计印星、食伤、官星、财星力量（学业关键十神）。"""
+        """统计可见干与藏干的固定加权出现量，不计算力量。"""
         # 四组十神互不相交，逐组求和与原 elif 单遍累加结果一致。
         return {
             "seal_weight": sum_ten_god_weight(
@@ -135,23 +124,23 @@ class EducationAnalysis:
         # 官印相生：高学历经典格
         if officer >= 1.0 and seal >= 1.0:
             score += 18
-            notes.append("官印相生，学历层次高，利于体制内、学术与功名")
+            notes.append("官杀与印的加权计数均至少1；仅为同现，尚未裁定官印相生或成格")
         # 食伤配印：才学兼备
         if food_hurt >= 1.0 and seal >= 1.0:
             score += 10
-            notes.append("食伤配印，聪明又有定力，才学兼备，宜深造")
+            notes.append("食伤与印的加权计数均至少1；尚未核定配印所需位置、旺衰及制化")
         # 印为用而有力
         if seal >= 2.0:
             score += 8
-            notes.append("印星有力，学习能力强、记忆专注佳，读书运好")
+            notes.append("印星加权计数至少2；出现量不等于旺度或学习能力")
         elif seal == 0:
             score -= 8
-            notes.append("命局无印，学历靠后天努力，或以技艺、实务见长")
+            notes.append("本次四柱计数未见印星；不能据此判断学历或学习能力")
 
         # 破格：财破印
         if wealth >= 2.0 and 0 < seal <= 1.0:
             score -= 12
-            notes.append("财旺破印，求学易受外务/经济牵扯而中断，宜专心、忌过早逐利")
+            notes.append("财计数至少2且印计数在0至1之间；不足以认定财破印或求学中断")
 
         # 破格：伤官见官无制
         has_hurt = False
@@ -165,20 +154,23 @@ class EducationAnalysis:
                 has_officer_zheng = True
         if has_hurt and has_officer_zheng and seal < 1.0:
             score -= 8
-            notes.append("伤官见官而印不制，学途易有波折、与师长制度生摩擦")
+            notes.append("非日干同时见伤官、正官且印计数低于1；未裁定作用路径及救应")
 
         score = max(30, min(95, score))
         if score >= 82:
-            tier = "高学历潜质（本科以上/研究型）"
+            tier = "规则索引82–95"
         elif score >= 68:
-            tier = "学历良好（本科可期）"
+            tier = "规则索引68–81"
         elif score >= 55:
-            tier = "学历中等（务实进取可提升）"
+            tier = "规则索引55–67"
         else:
-            tier = "应试学历偏弱，宜走技能/实务路线"
+            tier = "规则索引30–54"
 
         return {
             "score": score,
+            "score_kind": "uncalibrated_rule_index",
+            "assessment_status": "counts_only_not_education_prediction",
+            "score_basis": "基础58；官印同现+18、食伤印同现+10、印计数至少2加8、无印减8、财印计数条件减12、伤官正官同透且印低于1减8；截断至30–95。非概率。",
             "tier": tier,
             "notes": notes,
         }
@@ -192,9 +184,9 @@ class EducationAnalysis:
         target = WENCHANG_TABLE.get(day_stem)
         hits = [p_name for p_name, (_, branch) in pillars.items() if branch == target]
         if hits:
-            note = f"命带文昌贵人（{target}），聪慧好学、利读书考试与文书"
+            note = f"按日干{day_stem}查文昌{target}，命中柱位：{'、'.join(hits)}；这是神煞查表结果"
         else:
-            note = f"命无文昌（日干{day_stem}文昌在{target}），逢{target}之大运流年学运增强"
+            note = f"日干{day_stem}的文昌目标为{target}，本次四柱未命中；不代表学习或考试不利"
         return {
             "wenchang_branch": target,
             "hit_pillars": hits,
@@ -214,14 +206,21 @@ class EducationAnalysis:
         food_hurt = gods["food_hurt_weight"]
         officer = gods["officer_weight"]
 
-        if seal > food_hurt and seal >= officer:
-            inclination = "偏文科/学术理论型（印主），擅长记忆、研究、系统知识"
-        elif food_hurt > seal:
-            inclination = "偏才艺/技术应用型（食伤主），擅长创造、动手、表达"
-        elif officer >= seal:
-            inclination = "偏管理/法政规则型（官杀主），擅长纪律、组织、规范"
-        else:
-            inclination = "文理较均衡，可依兴趣选择"
+        weights = {"印": seal, "食伤": food_hurt, "官杀": officer}
+        leading = [
+            name for name, weight in weights.items() if weight == max(weights.values())
+        ]
+        analogies = {"印": "知识整理", "食伤": "表达与制作", "官杀": "组织与规则"}
+        inclination = (
+            "、".join(leading) + "计数并列最高"
+            if len(leading) > 1
+            else leading[0] + "计数最高"
+        )
+        inclination += (
+            "；现代主题类比："
+            + "、".join(analogies[name] for name in leading)
+            + "，需用兴趣和实际成绩验证"
+        )
 
         # 以喜用神五行给学科方向
         profile = BaZiRules.chart_useful_profile(pillars)
@@ -237,6 +236,7 @@ class EducationAnalysis:
             "favorable_fields": fields,
             "conditional_elements": profile["conditional_elements"],
             "reference_scope": profile["resolution_policy"],
+            "assessment_status": "modern_analogy_not_aptitude_measurement",
         }
 
     @staticmethod
@@ -254,28 +254,35 @@ class EducationAnalysis:
             god = get_ten_god(day_stem, stem)
             if god in (TenGod.POSITIVE_SEAL, TenGod.PARTIAL_SEAL):
                 signals.append(
-                    f"{label}{stem}{branch}见印星，学习运、文书运佳，利考试升学"
+                    f"{label}{stem}{branch}的天干对应{god.value}；传统主题为学习、文书"
                 )
             elif god in (TenGod.POSITIVE_OFFICER, TenGod.SEVEN_KILLER):
                 signals.append(
-                    f"{label}{stem}{branch}见官星，功名考运动，利考公、考编、竞争性考试"
+                    f"{label}{stem}{branch}的天干对应{god.value}；传统主题为规范、资格"
                 )
             elif god in (TenGod.FOOD_GOD, TenGod.HURT_OFFICER):
                 signals.append(
-                    f"{label}{stem}{branch}见食伤，思维活跃、表达灵感佳，利创作型考核"
+                    f"{label}{stem}{branch}的天干对应{god.value}；传统主题为表达、输出"
                 )
             if branch == wenchang:
-                signals.append(f"{label}逢文昌{wenchang}，读书考试如有神助")
+                signals.append(
+                    f"{label}地支{branch}命中文昌目标{wenchang}；不据此推断考试结果"
+                )
 
         if dayun_pillar:
             _assess("大运", dayun_pillar)
         if liunian_pillar:
             _assess("流年", liunian_pillar)
 
-        if not signals:
-            signals.append("未提供大运/流年，无法判断考试升学时机")
-
-        return {"timing_signals": signals}
+        provided = bool(dayun_pillar or liunian_pillar)
+        return {
+            "timing_signals": signals,
+            "assessment_status": (
+                "matched"
+                if signals
+                else "no_matching_rule" if provided else "missing_timing_input"
+            ),
+        }
 
     @staticmethod
     def _generate_suggestions(
@@ -284,15 +291,8 @@ class EducationAnalysis:
         gods: Dict[str, Any],
     ) -> List[str]:
         """生成学业建议。"""
-        suggestions: List[str] = []
-        suggestions.append(f"学历倾向：{level['tier']}")
-        suggestions.append(f"学科方向：{subjects['inclination']}")
-        if gods["seal_weight"] == 0:
-            suggestions.append(
-                "命局缺印，宜培养专注与持续学习习惯，或走技能证照路线扬长避短"
-            )
-        if gods["wealth_weight"] >= 2.0 and gods["seal_weight"] <= 1.0:
-            suggestions.append(
-                "求学阶段宜专注学业、节制逐利与外务，以免财旺破印影响学运"
-            )
-        return suggestions
+        return [
+            "现实规划：用实际成绩、兴趣、课程要求和可支配时间选择学习路径",
+            "备考安排：记录练习正确率、错题类型及复习进度，再据此调整计划",
+            f"可讨论的文化类比：{subjects['inclination']}",
+        ]

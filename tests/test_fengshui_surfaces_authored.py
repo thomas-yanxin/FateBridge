@@ -19,7 +19,11 @@ from fatebridge.core.fengshui.surface_inputs import SurfaceZone
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.fengshui import assess
 from fatebridge.services.tool_catalog import CATALOG
-from tests.test_fengshui_surfaces import rest_client, without_transport
+from tests.test_fengshui_surfaces import (
+    rest_client,
+    same_run_projected_response,
+    without_transport,
+)
 
 
 def surface_input(goal="abundance", zone="near_right", basis="user_confirmed"):
@@ -413,7 +417,8 @@ def test_authored_surfaces_match_rest_mcp_cli_and_strict_projection(
             Draft202012Validator(
                 schemas["fengshui_assess"].model_dump(by_alias=True)["inputSchema"]
             ).validate({**inputs, **controls})
-            return await client.call_tool("fengshui_assess", {**inputs, **controls})
+            result = await client.call_tool("fengshui_assess", {**inputs, **controls})
+            return await same_run_projected_response(client, result)
 
     protocol = asyncio.run(call())
     path = tmp_path / "surface.json"
@@ -430,10 +435,10 @@ def test_authored_surfaces_match_rest_mcp_cli_and_strict_projection(
         ]
     )
     cli = json.loads(capsys.readouterr().out)
-    assert response.status_code == 200 and code == 0 and not protocol.is_error
+    assert response.status_code == 200 and code == 0
     assert (
         without_transport(response.json())
-        == without_transport(protocol.structured_content)
+        == without_transport(protocol)
         == without_transport(cli)
     )
     Draft202012Validator(FengshuiOutput.model_json_schema()).validate(cli)

@@ -1,0 +1,44 @@
+{
+  "ruleset_id": "zengshan_moving_si_growth_v40",
+  "ruleset_version": "40.2.0",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "method": "Same-edition PDF85,97-98 visually reread; first unsupported control-negation interpretation retained separately"
+  },
+  "clauses": [
+    {
+      "id": "metal-supported-moving-si-growth",
+      "pdf_pages": [
+        97
+      ],
+      "quote": "金雖長生在巳須宜金爻旺相或日月動爻生扶再遇巳日占卦或是卦中動出巳爻或是金爻動而化出巳火皆謂之遇長生"
+    },
+    {
+      "id": "metal-fire-pressure",
+      "pdf_pages": [
+        97,
+        98
+      ],
+      "quote": "倘若金爻休囚無氣再遇巳午火多者烈火煎金論尅不論生也"
+    },
+    {
+      "id": "supported-metal-still-described-as-si-controlled",
+      "pdf_pages": [
+        85
+      ],
+      "quote": "酉金子孫雖則春令休囚得日辰生之二爻巳火動而尅金得未日沖動丑土火動生土土動生金"
+    }
+  ],
+  "interpretation": {
+    "precedence": "Preserve the original ordinary directed-control permission and its condition_match/status exactly. Encounter-growth qualification is a distinct predicate. Neither known permission nor known encounter determines combined effect.",
+    "independent_root": "Raw monthly/day generation or peer support, or the existing qualified moving-earth proof excluding the target metal. No moving-Si credit or target-dependent path may prove its own premise.",
+    "source_admission": "Use the same directed-control source eligibility and activity, not a newly invented source-strength requirement. Blocked source remains blocked, unresolved source remains unresolved; active target alone does not override the specific clause.",
+    "no_root": "Failure to prove independent root does not prove total absence of qi or the fire-many condition; Si control and growth remain pending when otherwise admissible.",
+    "preservation": "Keep other Wu fire, independent calendar controls, original/changed void-break-binding and separate target admission. Static Si, merely another line's changed Si and hidden Si are not actual visible moving-Si actors in this implemented branch.",
+    "iteration": "Compute growth premises from the already completed ordinary closure; annotate controls and strength witnesses without feeding a new effect decision into ordinary permissions.",
+    "cross_passage_effect": "PDF85 and97 are not collapsed into an automatic exemption. No total injury, automatic benefit or successful treatment is inferred from either passage."
+  },
+  "scope": "Moving-Si encounter qualification alongside unchanged ordinary control permissions and explicit unadjudicated combined effect. No total effect or predictive certificate."
+}

@@ -6,7 +6,7 @@
 - 桃花（咸池）神煞：申子辰见酉、寅午戌见卯、亥卯未见子、巳酉丑见午
 - 红鸾、天喜：主婚恋喜庆
 - 异性缘星：男命以财为异性缘，女命以官杀为异性缘
-- 桃花正邪：逢合为正缘助力，逢刑冲为烂桃花/感情波折
+- 桃花关系：分别记录六合、六冲；不据此评价他人的品行或认定正缘身份
 
 核心分析维度：
 1. 桃花（咸池）定位与多寡
@@ -92,6 +92,7 @@ class RomanceAnalysis:
         )
 
         return {
+            "counting_basis": "非日干每次1，全部柱支每个藏干每次0.5；日干不计，日支藏干计入；是出现量，不是旺衰。",
             "gender_basis": opposite["basis"],
             "peach_blossom": peach,
             "hongluan_tianxi": luan_xi,
@@ -116,9 +117,13 @@ class RomanceAnalysis:
         targets = RomanceAnalysis._peach_targets(branches)
         hits = [name for name, b in branches.items() if b in targets]
         if hits:
-            note = "命带桃花（咸池），异性缘旺、有魅力；多则需防感情纷扰"
+            note = (
+                "按年支、日支查咸池，命中柱位："
+                + "、".join(hits)
+                + "；命中数不等于追求者人数或魅力"
+            )
         else:
-            note = "命无明显桃花，异性缘平稳，逢桃花之大运流年增强"
+            note = "按年支、日支查咸池，本次四柱未命中；不能推断现实感情状态"
         return {
             "peach_branches": sorted(targets),
             "hit_pillars": hits,
@@ -137,12 +142,16 @@ class RomanceAnalysis:
         xi_hits = [n for n, b in branches.items() if b == tianxi]
         notes: List[str] = []
         if luan_hits:
-            notes.append("命带红鸾，主婚恋喜事、姻缘显")
+            notes.append(
+                f"以年支{year_branch}查红鸾{hongluan}，命中：{'、'.join(luan_hits)}"
+            )
         if xi_hits:
-            notes.append("命带天喜，主喜庆、添丁、婚嫁之喜")
+            notes.append(
+                f"以年支{year_branch}查天喜{tianxi}，命中：{'、'.join(xi_hits)}"
+            )
         if not notes:
             notes.append(
-                f"命无红鸾天喜（红鸾在{hongluan}、天喜在{tianxi}），逢之流年主婚恋喜庆"
+                f"本次四柱未命中红鸾{hongluan}、天喜{tianxi}；目标支不等于实际命中"
             )
         return {
             "hongluan_branch": hongluan,
@@ -173,11 +182,11 @@ class RomanceAnalysis:
 
         weight = sum_ten_god_weight(pillars, day_stem, gods)
         if weight == 0:
-            status = "异性缘星不显，感情主动性弱或缘分较晚，宜主动把握"
+            status = "所选传统对应星加权计数为0；不能据此判断关系早晚或主动性"
         elif weight >= 2.5:
-            status = "异性缘星旺，异性缘佳、追求者多，但易眼花缭乱、感情多波"
+            status = "所选传统对应星加权计数至少2.5；不代表旺度、追求者人数或关系质量"
         else:
-            status = "异性缘星适中，感情发展平稳"
+            status = "所选传统对应星加权计数在0至2.5之间；不判断现实关系状态"
         return {"basis": basis, "weight": weight, "status": status}
 
     @staticmethod
@@ -185,20 +194,42 @@ class RomanceAnalysis:
         peach: Dict[str, Any], pillars: Dict[str, Tuple[str, str]]
     ) -> Dict[str, Any]:
         notes: List[str] = []
-        branches = [b for _, b in pillars.values()]
+        relations: List[Dict[str, str]] = []
         for name in peach["hit_pillars"]:
             pb = dict(pillars)[name][1] if name in pillars else None
             if pb is None:
                 continue
-            if any(o != pb and check_branch_conflict(pb, o) for o in branches):
-                notes.append(f"{name}桃花逢冲，主烂桃花/感情起伏、聚散无常")
-            elif any(o != pb and check_branch_combination(pb, o) for o in branches):
-                notes.append(f"{name}桃花逢合，主正桃花/感情有归宿、易成姻缘")
+            for other_name, (_, other_branch) in pillars.items():
+                if other_name == name:
+                    continue
+                for kind, check in (
+                    ("六冲", check_branch_conflict),
+                    ("六合", check_branch_combination),
+                ):
+                    if check(pb, other_branch):
+                        relations.append(
+                            {
+                                "peach_pillar": name,
+                                "peach_branch": pb,
+                                "other_pillar": other_name,
+                                "other_branch": other_branch,
+                                "relation": kind,
+                            }
+                        )
+                        notes.append(
+                            f"{name}咸池{pb}与{other_name}支{other_branch}{kind}；不据此认定关系成败或他人品行"
+                        )
         if not peach["hit_pillars"]:
-            notes.append("命无桃花入局，感情较少外缘干扰")
+            notes.append("本次四柱未命中咸池，未执行咸池合冲关系检查")
         elif not notes:
-            notes.append("桃花无明显刑冲合，异性缘平稳")
-        return {"notes": notes}
+            notes.append(
+                "已命中的咸池与其他柱支未见六合、六冲；本模块未检查刑害破，不判断现实感情"
+            )
+        return {
+            "notes": notes,
+            "relations": relations,
+            "assessment_status": "structural_relations_only",
+        }
 
     @staticmethod
     def _romance_timing(
@@ -234,19 +265,25 @@ class RomanceAnalysis:
             stem, branch = pillar
             if get_ten_god(day_stem, stem) in star_gods:
                 signals.append(
-                    f"{label}{stem}{branch}引动异性缘星，利于桃花、恋爱、正缘出现"
+                    f"{label}{stem}{branch}天干对应{get_ten_god(day_stem, stem).value}，命中所选传统关系星"
                 )
             if branch in peach_targets:
-                signals.append(f"{label}逢桃花{branch}，异性缘旺、易有感情际遇")
+                signals.append(f"{label}地支{branch}命中咸池目标；不推断恋爱事件")
             if branch == hongluan:
-                signals.append(f"{label}逢红鸾{branch}，主姻缘、婚恋喜事")
+                signals.append(f"{label}地支{branch}命中红鸾目标")
             elif branch == tianxi:
-                signals.append(f"{label}逢天喜{branch}，主喜庆、婚嫁添丁")
+                signals.append(f"{label}地支{branch}命中天喜目标")
 
         if dayun_pillar:
             _assess("大运", dayun_pillar)
         if liunian_pillar:
             _assess("流年", liunian_pillar)
-        if not signals:
-            signals.append("未提供大运/流年，无法判断正缘/桃花时机")
-        return {"timing_signals": signals}
+        provided = bool(dayun_pillar or liunian_pillar)
+        return {
+            "timing_signals": signals,
+            "assessment_status": (
+                "matched"
+                if signals
+                else "no_matching_rule" if provided else "missing_timing_input"
+            ),
+        }

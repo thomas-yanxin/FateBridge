@@ -1,0 +1,10 @@
+{
+  "source_id": "gujin_43_digital_620325_cardinal_example_318_v1",
+  "source_url": "https://zh.wikisource.org/w/index.php?title=古今律厯考_(四庫全書本)/卷43&oldid=620325",
+  "locator": "邢云路·古今律历考卷43·距元积年318；冬至黄道日度、次年冬至黄道日度、定象限度、四正定气、四正黄道日度",
+  "printed_winter_ecliptic_du": ["4.6380", "4.6236"],
+  "yingchu_suomo_days": "88.90915",
+  "suochu_yingmo_days": "93.71195",
+  "facsimile_newly_collated": false,
+  "scope": "Explicit operands from this one printed example; no universal truncation rule or modern epoch inferred"
+}

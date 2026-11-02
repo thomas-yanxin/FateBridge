@@ -1,0 +1,753 @@
+{
+  "source_pdf_sha256": "fd203ebcd4dc355dbb1ddd3cbee0a72051a2ca6f7a3e0945027690aac8de0b0c",
+  "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf",
+  "review_status": "same_reviewer_named_primary_readings; independent_second_review_pending",
+  "pure_tables": [
+    {
+      "trigram": "乾",
+      "bits": [
+        1,
+        1,
+        1
+      ],
+      "gua": "乾為天",
+      "page": 119,
+      "lines": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "direct": [
+        "甲子",
+        "甲寅",
+        "甲辰",
+        "壬午",
+        "壬申",
+        "壬戌"
+      ],
+      "borrowed": [
+        [
+          "壬子"
+        ],
+        [
+          "壬寅"
+        ],
+        [
+          "壬辰"
+        ],
+        [
+          "甲午"
+        ],
+        [
+          "甲申"
+        ],
+        [
+          "甲戌"
+        ]
+      ]
+    },
+    {
+      "trigram": "坤",
+      "bits": [
+        0,
+        0,
+        0
+      ],
+      "gua": "坤為地",
+      "page": 122,
+      "lines": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "direct": [
+        "乙未",
+        "乙巳",
+        "乙卯",
+        "癸丑",
+        "癸亥",
+        "癸酉"
+      ],
+      "borrowed": [
+        [
+          "癸未"
+        ],
+        [
+          "癸巳"
+        ],
+        [
+          "癸卯"
+        ],
+        [
+          "乙丑"
+        ],
+        [
+          "乙亥"
+        ],
+        [
+          "乙酉"
+        ]
+      ]
+    },
+    {
+      "trigram": "坎",
+      "bits": [
+        0,
+        1,
+        0
+      ],
+      "gua": "坎為水",
+      "page": 187,
+      "lines": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0
+      ],
+      "direct": [
+        "戊寅",
+        "戊辰",
+        "戊午",
+        "戊申",
+        "戊戌",
+        "戊子"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "trigram": "離",
+      "bits": [
+        1,
+        0,
+        1
+      ],
+      "gua": "離為火",
+      "page": 189,
+      "lines": [
+        1,
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "direct": [
+        "己卯",
+        "己丑",
+        "己亥",
+        "己酉",
+        "己未",
+        "己巳"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "trigram": "震",
+      "bits": [
+        1,
+        0,
+        0
+      ],
+      "gua": "震為雷",
+      "page": 240,
+      "lines": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "direct": [
+        "庚子",
+        "庚寅",
+        "庚辰",
+        "庚午",
+        "庚申",
+        "庚戌"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "trigram": "艮",
+      "bits": [
+        0,
+        0,
+        1
+      ],
+      "gua": "艮為山",
+      "page": 243,
+      "lines": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        1
+      ],
+      "direct": [
+        "丙辰",
+        "丙午",
+        "丙申",
+        "丙戌",
+        "丙子",
+        "丙寅"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "trigram": "巽",
+      "bits": [
+        0,
+        1,
+        1
+      ],
+      "gua": "巽為風",
+      "page": 255,
+      "lines": [
+        0,
+        1,
+        1,
+        0,
+        1,
+        1
+      ],
+      "direct": [
+        "辛丑",
+        "辛亥",
+        "辛酉",
+        "辛未",
+        "辛巳",
+        "辛卯"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "trigram": "兌",
+      "bits": [
+        1,
+        1,
+        0
+      ],
+      "gua": "兌為澤",
+      "page": 257,
+      "lines": [
+        1,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "direct": [
+        "丁巳",
+        "丁卯",
+        "丁丑",
+        "丁亥",
+        "丁酉",
+        "丁未"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    }
+  ],
+  "hexagram_entries": [
+    {
+      "gua": "乾為天",
+      "page": 119,
+      "lines": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "direct": [
+        "甲子",
+        "甲寅",
+        "甲辰",
+        "壬午",
+        "壬申",
+        "壬戌"
+      ],
+      "borrowed": [
+        [
+          "壬子"
+        ],
+        [
+          "壬寅"
+        ],
+        [
+          "壬辰"
+        ],
+        [
+          "甲午"
+        ],
+        [
+          "甲申"
+        ],
+        [
+          "甲戌"
+        ]
+      ]
+    },
+    {
+      "gua": "坤為地",
+      "page": 122,
+      "lines": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "direct": [
+        "乙未",
+        "乙巳",
+        "乙卯",
+        "癸丑",
+        "癸亥",
+        "癸酉"
+      ],
+      "borrowed": [
+        [
+          "癸未"
+        ],
+        [
+          "癸巳"
+        ],
+        [
+          "癸卯"
+        ],
+        [
+          "乙丑"
+        ],
+        [
+          "乙亥"
+        ],
+        [
+          "乙酉"
+        ]
+      ]
+    },
+    {
+      "gua": "水雷屯",
+      "page": 124,
+      "lines": [
+        1,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "direct": [
+        "庚子",
+        "庚寅",
+        "庚辰",
+        "戊申",
+        "戊戌",
+        "戊子"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "gua": "水地比",
+      "page": 136,
+      "lines": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "direct": [
+        "乙未",
+        "乙巳",
+        "乙卯",
+        "戊申",
+        "戊戌",
+        "戊子"
+      ],
+      "borrowed": [
+        [
+          "癸未"
+        ],
+        [
+          "癸巳"
+        ],
+        [
+          "癸卯"
+        ],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "gua": "風天小畜",
+      "page": 139,
+      "lines": [
+        1,
+        1,
+        1,
+        0,
+        1,
+        1
+      ],
+      "direct": [
+        "甲子",
+        "甲寅",
+        "甲辰",
+        "辛未",
+        "辛巳",
+        "辛卯"
+      ],
+      "borrowed": [
+        [
+          "壬子"
+        ],
+        [
+          "壬寅"
+        ],
+        [
+          "壬辰"
+        ],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "gua": "離為火",
+      "page": 189,
+      "lines": [
+        1,
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "direct": [
+        "己卯",
+        "己丑",
+        "己亥",
+        "己酉",
+        "己未",
+        "己巳"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "gua": "水風井",
+      "page": 233,
+      "lines": [
+        0,
+        1,
+        1,
+        0,
+        1,
+        0
+      ],
+      "direct": [
+        "辛丑",
+        "辛亥",
+        "辛酉",
+        "戊申",
+        "戊戌",
+        "戊子"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "gua": "風水渙",
+      "page": 260,
+      "lines": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        1
+      ],
+      "direct": [
+        "戊寅",
+        "戊辰",
+        "戊午",
+        "辛未",
+        "辛巳",
+        "辛卯"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "gua": "坎為水",
+      "page": 187,
+      "lines": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0
+      ],
+      "direct": [
+        "戊寅",
+        "戊辰",
+        "戊午",
+        "戊申",
+        "戊戌",
+        "戊子"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "gua": "震為雷",
+      "page": 240,
+      "lines": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "direct": [
+        "庚子",
+        "庚寅",
+        "庚辰",
+        "庚午",
+        "庚申",
+        "庚戌"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "gua": "艮為山",
+      "page": 243,
+      "lines": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        1
+      ],
+      "direct": [
+        "丙辰",
+        "丙午",
+        "丙申",
+        "丙戌",
+        "丙子",
+        "丙寅"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "gua": "巽為風",
+      "page": 255,
+      "lines": [
+        0,
+        1,
+        1,
+        0,
+        1,
+        1
+      ],
+      "direct": [
+        "辛丑",
+        "辛亥",
+        "辛酉",
+        "辛未",
+        "辛巳",
+        "辛卯"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    },
+    {
+      "gua": "兌為澤",
+      "page": 257,
+      "lines": [
+        1,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "direct": [
+        "丁巳",
+        "丁卯",
+        "丁丑",
+        "丁亥",
+        "丁酉",
+        "丁未"
+      ],
+      "borrowed": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ]
+    }
+  ],
+  "order_issues": [
+    {
+      "gua": "雷水解",
+      "literal_najia_list": [
+        "戊寅",
+        "戊辰",
+        "戊午",
+        "庚午",
+        "庚戌",
+        "庚申"
+      ],
+      "rule_derived_positional_list": [
+        "戊寅",
+        "戊辰",
+        "戊午",
+        "庚午",
+        "庚申",
+        "庚戌"
+      ],
+      "witnesses": [
+        {
+          "edition": "NLC_Wenming",
+          "page": 214,
+          "source_url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf#page=214"
+        },
+        {
+          "edition": "NAJDA_305_0271",
+          "image_index": 23,
+          "source_url": "https://www.digital.archives.go.jp/api/iiif/3671440/canvas/C101098343100"
+        }
+      ],
+      "membership_agrees": true,
+      "ordinal_list_semantics_resolved": false,
+      "scope": "Both printings use the same outer-pair prose order; do not assert a one-printing error or remap computed fifth/sixth positions."
+    }
+  ],
+  "ruleset_id": "heluo_wenming_najia_sources_v1",
+  "version": "1.0.0",
+  "scope": "Source basis for actual computed Najia positions; pure-table component derivation is not individual composite-entry collation or complete deSheng/Xie judgment.",
+  "unquantified_timing_najia_clauses": [
+    {
+      "gua": "坎為水",
+      "page": 187,
+      "literal": "生於及時與納甲者",
+      "status": "timely_predicate_not_reduced_to_assigned_month; connector_unresolved",
+      "month_numbers": null
+    }
+  ]
+}

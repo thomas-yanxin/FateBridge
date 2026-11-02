@@ -1,0 +1,60 @@
+{
+  "id": "taiyi-key-historical-dates-v1",
+  "source": {
+    "title": "兩千年中西曆對照表",
+    "authors": "薛仲三、歐陽頤",
+    "edition": "商務印書館1940年本，NTUL-9900013521F03",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/NTUL-9900013521F03_%E5%85%A9%E5%8D%83%E5%B9%B4%E4%B8%AD%E8%A5%BF%E6%9B%86%E5%B0%8D%E7%85%A7%E8%A1%A8.pdf",
+    "pdf_page": 101,
+    "printed_page": 313,
+    "calendar_policy_source": "https://sinocal.sinica.edu.tw/",
+    "policy": "中研院说明1582-10-15改历之前采用儒略历；本页旧式日期并由月首星期/干支核对，不把旧式日期直接当推算公历。"
+  },
+  "records": [
+    {
+      "id": "ming-1561-month11-start",
+      "chinese_date": "嘉靖四十年辛酉十一月初一",
+      "julian_date": "1561-12-07",
+      "gregorian_date": "1561-12-17",
+      "day_ganzhi": "丁亥",
+      "printed_cycle_index": 23,
+      "printed_weekday_monday_zero": 6,
+      "role": "independent_month_start_anchor"
+    },
+    {
+      "id": "key-1561-dingwei-day",
+      "chinese_date": "嘉靖四十年辛酉十一月二十一日丁未",
+      "julian_date": "1561-12-27",
+      "gregorian_date": "1562-01-06",
+      "day_ganzhi": "丁未",
+      "mode": "day",
+      "expected_accumulation": 44,
+      "representative_clock": "12:00:00",
+      "source_time_scope": "日计只载日期；12时是现代适配验收的代表钟面，非补造古例时刻。"
+    },
+    {
+      "id": "ming-1561-month12-start",
+      "chinese_date": "嘉靖四十年辛酉十二月初一",
+      "julian_date": "1562-01-05",
+      "gregorian_date": "1562-01-15",
+      "day_ganzhi": "丙辰",
+      "printed_cycle_index": 52,
+      "printed_weekday_monday_zero": 0,
+      "role": "independent_month_start_anchor"
+    },
+    {
+      "id": "key-1561-dingchou-xu-hour",
+      "chinese_date": "嘉靖四十年辛酉十二月二十二日丁丑庚戌时",
+      "julian_date": "1562-01-26",
+      "gregorian_date": "1562-02-05",
+      "day_ganzhi": "丁丑",
+      "mode": "hour",
+      "expected_day_number": 74,
+      "expected_accumulation": 887,
+      "source_hour_branch": "戌",
+      "representative_clock": "20:00:00",
+      "source_time_scope": "原书载戌时，20时是现代代表钟面；原地点、具体分秒和唐明古历时实未复原。"
+    }
+  ],
+  "scope": "四条日期事实包括两个独立月首锚与两条太乙课例；不是四条完整命理课例，不认证所有历史日期或原典断语。"
+}

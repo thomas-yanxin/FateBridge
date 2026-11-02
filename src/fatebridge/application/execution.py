@@ -1,6 +1,6 @@
 """Shared service execution, output validation and execution receipts."""
 
-from typing import Optional
+from typing import Any, Optional, cast
 
 from pydantic import BaseModel, ValidationError
 
@@ -12,7 +12,9 @@ from fatebridge.core.execution_context import (
 )
 from fatebridge.utils.errors import (
     VALIDATION_ERROR_CODE,
+    EphemerisSourceError,
     ErrorEnvelope,
+    NumerologySourceError,
     handle_calculation_error,
 )
 
@@ -28,9 +30,25 @@ def execute_spec(spec: ToolSpec, request: BaseModel) -> ServiceResult:
     restricted = restricted_intent_path(request.model_dump())
     if restricted:
         return restriction_result(restricted)
-    service, args, kwargs = spec.bind(request)
-    result = service(*args, **kwargs)
-    validate_output(spec, result)
+    from fatebridge.core.physical_ephemeris_policy import data_file_policy
+    from fatebridge.core.requests.western_policy import uses_western_policy
+
+    mode = (
+        getattr(request, "ephemeris_policy", "auto")
+        if uses_western_policy(request)
+        else "auto"
+    )
+    try:
+        with data_file_policy(mode) as policy:
+            service, args, kwargs = spec.bind(request)
+            result = service(*args, **kwargs)
+        if policy is not None and not result_is_error(spec, result):
+            result = {**result, "ephemeris_data_policy": policy.receipt()}
+    except EphemerisSourceError as error:
+        if mode == "auto":
+            raise
+        result = handle_calculation_error(error, spec.operation_label_zh)
+    validate_output(spec, result, request=request)
     return result
 
 
@@ -71,6 +89,12 @@ def execute_tool(
         started = perf_counter()
         try:
             result = execute_spec(spec, request)
+        except EphemerisSourceError as exc:
+            # Source failures inherit ValueError for native/Pydantic callers,
+            # but are server calculation failures rather than bad user input.
+            return correlate_error(
+                handle_calculation_error(exc, spec.operation_label_zh), controls
+            )
         except ValueError:
             return correlate_error(invalid_input_result(spec), controls)
         except Exception as exc:
@@ -98,7 +122,26 @@ def execute_tool(
                 result["run_metadata"]["warnings"].append("approximate_engine")
             if controls.trace_id is not None:
                 result["run_metadata"]["trace_id"] = controls.trace_id
-            validate_output(spec, result)
+            validate_output(
+                spec,
+                result,
+                request=(
+                    request
+                    if spec.key
+                    in {
+                        "heluo",
+                        "canping",
+                        "knowledge_read",
+                        "knowledge_registry",
+                        "suzhan",
+                    }
+                    else None
+                ),
+            )
+        except (NumerologySourceError, EphemerisSourceError) as exc:
+            return correlate_error(
+                handle_calculation_error(exc, spec.operation_label_zh), controls
+            )
         except Exception:
             # Receipt generation, attachment and final validation are server
             # output work, never bad user input even if they raise ValueError.
@@ -116,7 +159,9 @@ class OutputContractError(RuntimeError):
     """A service bug, never a user-input error."""
 
 
-def validate_output(spec: ToolSpec, result: ServiceResult) -> None:
+def validate_output(
+    spec: ToolSpec, result: ServiceResult, *, request: Optional[BaseModel] = None
+) -> None:
     if result_is_error(spec, result):
         try:
             ErrorEnvelope.model_validate(result, strict=True)
@@ -130,11 +175,74 @@ def validate_output(spec: ToolSpec, result: ServiceResult) -> None:
         for field in spec.required_output_fields
     ):
         raise OutputContractError("完整工具输出缺少必需业务字段")
+    if spec.key == "suzhan":
+        from fatebridge.core.suzhan_clock_input import require_clock_input_binding
+
+        try:
+            require_clock_input_binding(result, request=request)
+        except ValueError as exc:
+            raise OutputContractError("宿占输出与钟时计算层不符") from exc
+    if spec.key == "meihua_analysis" and request is not None:
+        from fatebridge.application.meihua_clock_binding import (
+            require_meihua_clock_binding,
+        )
+
+        try:
+            require_meihua_clock_binding(result, request)
+        except (ValueError, TypeError, KeyError) as exc:
+            raise OutputContractError("完整梅花时卦结果与本次钟时输入分量不符") from exc
+    if spec.key in {"heluo", "canping"}:
+        from fatebridge.core.numerology_clock_input import (
+            require_clock_input_binding as require_numerology_clock_input_binding,
+        )
+
+        require_numerology_clock_input_binding(
+            result,
+            requested_time=cast(Any, request).time if request is not None else None,
+        )
+    if spec.key in {"knowledge_read", "knowledge_registry"}:
+        from fatebridge.application.human_design_knowledge_binding import (
+            require_human_design_reference_binding,
+        )
+        from fatebridge.application.numerology_knowledge_binding import (
+            require_reference_binding,
+        )
+
+        require_human_design_reference_binding(spec.key, result, request)
+        require_reference_binding(spec.key, result, request)
+    if spec.key == "canping":
+        from fatebridge.core.canping_schedule_validation import require_schedule_binding
+
+        require_schedule_binding(result)
     if spec.output_model is not None:
         try:
             spec.output_model.model_validate(result)
         except ValidationError as exc:
             raise OutputContractError("工具输出不符合公开契约") from exc
+    from fatebridge.core.output_bazi_anchors import require_complete_bazi_anchors
+
+    try:
+        require_complete_bazi_anchors(spec.key, result)
+    except ValueError as exc:
+        raise OutputContractError("完整八字输出缺少计算依据") from exc
+    if spec.key in {"jinkou", "liureng_gods", "liureng_runyear", "sanshiunited"}:
+        from fatebridge.core.output_ren_anchors import require_complete_ren_anchors
+
+        try:
+            require_complete_ren_anchors(spec.key, result)
+        except ValueError as exc:
+            raise OutputContractError("完整六壬金口诀输出缺少计算依据") from exc
+        if request is not None:
+            from fatebridge.application.ren_request_binding import (
+                require_request_binding,
+            )
+
+            try:
+                require_request_binding(spec.key, result, request)
+            except EphemerisSourceError:
+                raise
+            except (ValueError, TypeError, KeyError, OverflowError) as exc:
+                raise OutputContractError("完整六壬金口诀结果与本次请求不符") from exc
 
 
 def result_is_error(spec: ToolSpec, result: ServiceResult) -> bool:

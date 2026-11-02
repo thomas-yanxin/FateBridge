@@ -1,0 +1,128 @@
+{
+  "model_id": "fatebridge_vsop2013_solar_v1",
+  "version": "1.1.0",
+  "abi_version": 1,
+  "native_core_version": "2.10.03",
+  "software_input_years": [
+    1700,
+    2300
+  ],
+  "qualified_solar_term_years": [
+    1684,
+    2304
+  ],
+  "working_jd_tt": [
+    2336128.5,
+    2605312.5
+  ],
+  "reference": "https://ftp.imcce.fr/pub/ephem/planets/vsop2013/solution/README.pdf",
+  "sources": {
+    "pyswisseph-2.10.3.2.tar.gz": {
+      "url": "https://files.pythonhosted.org/packages/66/a6/db70d67a00dda42ebd033538c086879328f4c17f670eafe8aca2f11abfef/pyswisseph-2.10.3.2.tar.gz",
+      "sha256": "c54c305e83dbd5d2b71e58d8a69d8ee41de24c4d3328ce09e2af860a3537624d",
+      "core_version": "2.10.03"
+    },
+    "VSOP2013.f": {
+      "url": "https://ftp.imcce.fr/pub/ephem/planets/vsop2013/solution/VSOP2013.f",
+      "sha256": "58b972ad10ed8e9b24957d9b3a4d61d7069b1617585e0eacd7d52e152ba4ae8e"
+    },
+    "VSOP2013.ctl": {
+      "url": "https://ftp.imcce.fr/pub/ephem/planets/vsop2013/solution/VSOP2013.ctl",
+      "sha256": "ac3a375a7da0b53863bcf2e0824d6291e932e7b76ae79aede11a6a4327cda223"
+    },
+    "README.pdf": {
+      "url": "https://ftp.imcce.fr/pub/ephem/planets/vsop2013/solution/README.pdf",
+      "sha256": "966df954260618401eecd9854415205aebbe0a9bfe923f86626778c4fecac5b9"
+    },
+    "VSOP2013p3.dat": {
+      "url": "https://ftp.imcce.fr/pub/ephem/planets/vsop2013/solution/VSOP2013p3.dat",
+      "sha256": "5f620e683e620e011ea3468ecadea0332094e0c22e208c06860bc2e16ddc4a76"
+    },
+    "dtdb.c": {
+      "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/dtdb.c",
+      "sha256": "228bd7c7c1c88dda44c29a076f289c968f64d77a2dc389138b03ab5d1d442105"
+    },
+    "erfa.h": {
+      "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/erfa.h",
+      "sha256": "9549553b95ca2fbbcdcabcc69d82fb3cdd376c28b03c2793200138ff55727088"
+    },
+    "erfam.h": {
+      "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/erfam.h",
+      "sha256": "0da6313033aacf9c64533a7e74be49ecda97b4aaa87e134f98287e4ff279886f"
+    }
+  },
+  "native_source_files_sha256": {
+    "LICENSE": "b6345743292c516d07799dfad46f1a641e5270da2160cc4d6bd54594d6faa991",
+    "Makefile": "1f872c7fb49d45577452caea3bf09c62945e8ba67389f38556827d059e3be805",
+    "swecl.c": "ab46bdc303978523c69d814d236432541ff48cb410b756ef78cc1e8d2b2be303",
+    "swedate.c": "6790e989a003cb6422080d9aecf3c6567a25030f5b5647fd749e5b16422cfac7",
+    "swedate.h": "886b001815561f2c5f5e40418ce00d62377cb8962180c38062ac83bfdab77b38",
+    "swedll.h": "8bfe26da8ddab988bf4980828da231f6b8608158606b679ce7f68ee44cf692ad",
+    "sweephe4.h": "2cab6af5381da9bb7cb08644577b71c7dd9e3a0e69a7080a659d30817448f7b1",
+    "swehel.c": "7b4be28627afd22b059389abc4ef679b7259a0bcb9d0510e7ca3825901754b93",
+    "swehouse.c": "384c1d7b2a8bcef9f2cf16f7fbf02e7aa18f372bc11320874a5543b92aed95d9",
+    "swehouse.h": "7a91a007a4de0900ed6d234d74da421b2372d245b09a2ba8b74d6e2e054a200c",
+    "swejpl.c": "44014e260ae9ab2b1e8f413bb8a35fa270e369e3fb4907cd137ae103d2a8d0c2",
+    "swejpl.h": "f61ae6173b150f456540afba68500989c642506822e0397cf99c2cb7f50aac0d",
+    "swemmoon.c": "1d5f5ef9a95cf9a2f395b6334a58c63851ce0512d65bf08e49d3caf0a9fecb00",
+    "swemplan.c": "d13502ca7b92e3e32317b67ba7f012d92fabd1d358c3394c094d5515a3567caa",
+    "swemptab.h": "dc7595b81bd49e86a6204ed1e0a041c410a9de5c068fd1d90d350a82d604fb85",
+    "swenut2000a.h": "83b0a2f569174b56c8e26971b00f85f5ae52265b34c1c53436c7122e0f1faad7",
+    "sweodef.h": "a2ace0fc0ea81ffbf9eb0a7f9fc1c1446d98f07d3a170a2c54b8ef4908325462",
+    "sweph.c": "80761ccfae7cd7207a33559d8898b9c5386cced609cfaebbbbf050f7a80ddc4f",
+    "sweph.h": "8e44b9c00d23a0b583581f17fc6798ea376649d2517abbb556ee1b1aff6a138a",
+    "swephexp.h": "dd8e74e2853915a316041397f31730219b7910333be6bba3934fd77130335f22",
+    "swephlib.c": "d41eb2f396163fedd574749de02a25e8547b4e1e4c66783d47ccc0c7e4885a05",
+    "swephlib.h": "29a151bb0c6adcb73fa73eff805b498c26bdffbb81e82d55e1b50f79218ea82a",
+    "swevents.h": "82ce992f909854f7816386aaaf52f52826c315d5c926172195b57edbe32364e0"
+  },
+  "embedded_series_sha256": "57c98a114d77680dc312f6727746e8a5b2e013c1b4f2ef1418fa5e19ae0f7668",
+  "lunar_replacement_c": "\n  /* Named VSOP2013/full-Moshier-Moon model, not a stock build.\n     Use the full standalone geometric lunar series and the exact queried\n     epoch's obliquity. Do not depend on cached oec at another sample time. */\n  {\n    double moon[3];\n    double epsilon = swi_epsiln(tjd, 0);\n    int k;\n    if (swi_moshmoon2(tjd, moon) != 0) {\n      for (k = 0; k < 3; k++) xemb[k] = NAN;\n      return;\n    }\n    swi_polcart(moon, moon);\n    swi_coortrf2(moon, moon, -sin(epsilon), cos(epsilon));\n    swi_precess(moon, tjd, 0, J_TO_J2000);\n    for (k = 0; k < 3; k++) xemb[k] -= moon[k] / (EARTH_MOON_MRAT + 1.0);\n    return;\n  }\n",
+  "source_identity_scope": "Pinned full-series EMB and complete lunar offset; geocentric full ERFA time conversion. Local source/build identity is not upstream endorsement, future UTC certification, continuous all-epoch physical certification or stock Moshier certification.",
+  "qualification_reference": "Original14904DE440TTreference rows remain unchanged; R97derived116Lichunrows and originalreplay separately qualified. Workingrange is notcontinuousphysical/civilaccuracy certification.",
+  "accuracy_certified": false,
+  "legacy_native_moshier_relabelled": false,
+  "calculation_files_sha256": {
+    "LICENSE": "b6345743292c516d07799dfad46f1a641e5270da2160cc4d6bd54594d6faa991",
+    "Makefile": "1f872c7fb49d45577452caea3bf09c62945e8ba67389f38556827d059e3be805",
+    "dtdb.c": "228bd7c7c1c88dda44c29a076f289c968f64d77a2dc389138b03ab5d1d442105",
+    "emb-series.bin": "57c98a114d77680dc312f6727746e8a5b2e013c1b4f2ef1418fa5e19ae0f7668",
+    "embedded_series.S": "963cba643ecd752e547c822b2be1bb406e32a2eb6f457f7108df755c1186b5a8",
+    "erfa.h": "9549553b95ca2fbbcdcabcc69d82fb3cdd376c28b03c2793200138ff55727088",
+    "erfam.h": "0da6313033aacf9c64533a7e74be49ecda97b4aaa87e134f98287e4ff279886f",
+    "native_api.c": "8a27f454147f2c4e4ef0741b94259b3b44f31d2713b19e0bc3a8d7548d1c7d84",
+    "native_bridge.c": "ead52691254a9f7265405d7c4e89f2e9eabb2b134ab37373fbeebd93278abaa6",
+    "swecl.c": "ab46bdc303978523c69d814d236432541ff48cb410b756ef78cc1e8d2b2be303",
+    "swedate.c": "6790e989a003cb6422080d9aecf3c6567a25030f5b5647fd749e5b16422cfac7",
+    "swedate.h": "886b001815561f2c5f5e40418ce00d62377cb8962180c38062ac83bfdab77b38",
+    "swedll.h": "8bfe26da8ddab988bf4980828da231f6b8608158606b679ce7f68ee44cf692ad",
+    "sweephe4.h": "2cab6af5381da9bb7cb08644577b71c7dd9e3a0e69a7080a659d30817448f7b1",
+    "swehel.c": "7b4be28627afd22b059389abc4ef679b7259a0bcb9d0510e7ca3825901754b93",
+    "swehouse.c": "384c1d7b2a8bcef9f2cf16f7fbf02e7aa18f372bc11320874a5543b92aed95d9",
+    "swehouse.h": "7a91a007a4de0900ed6d234d74da421b2372d245b09a2ba8b74d6e2e054a200c",
+    "swejpl.c": "44014e260ae9ab2b1e8f413bb8a35fa270e369e3fb4907cd137ae103d2a8d0c2",
+    "swejpl.h": "f61ae6173b150f456540afba68500989c642506822e0397cf99c2cb7f50aac0d",
+    "swemmoon.c": "1d5f5ef9a95cf9a2f395b6334a58c63851ce0512d65bf08e49d3caf0a9fecb00",
+    "swemplan-vsop2013.c": "1aba47030c66be0915c3dd6d5b8173499b0bbb969eb67f7c98141b5d5657eb7c",
+    "swemplan.c": "d13502ca7b92e3e32317b67ba7f012d92fabd1d358c3394c094d5515a3567caa",
+    "swemptab.h": "dc7595b81bd49e86a6204ed1e0a041c410a9de5c068fd1d90d350a82d604fb85",
+    "swenut2000a.h": "83b0a2f569174b56c8e26971b00f85f5ae52265b34c1c53436c7122e0f1faad7",
+    "sweodef.h": "a2ace0fc0ea81ffbf9eb0a7f9fc1c1446d98f07d3a170a2c54b8ef4908325462",
+    "sweph.c": "80761ccfae7cd7207a33559d8898b9c5386cced609cfaebbbbf050f7a80ddc4f",
+    "sweph.h": "8e44b9c00d23a0b583581f17fc6798ea376649d2517abbb556ee1b1aff6a138a",
+    "swephexp.h": "dd8e74e2853915a316041397f31730219b7910333be6bba3934fd77130335f22",
+    "swephlib.c": "d41eb2f396163fedd574749de02a25e8547b4e1e4c66783d47ccc0c7e4885a05",
+    "swephlib.h": "29a151bb0c6adcb73fa73eff805b498c26bdffbb81e82d55e1b50f79218ea82a",
+    "swevents.h": "82ce992f909854f7816386aaaf52f52826c315d5c926172195b57edbe32364e0",
+    "vsop_emb.c": "896645fbb1c347fa39531c4e915260a68e32822a76f5b6966f5a1f647df52e27"
+  },
+  "calculation_source_sha256": "d9fae5a1b235da9089ce9fabffea9a85c071f6cbd5d9b5c17bbe90c3327ce0a2",
+  "derived_lichun_scope": {
+    "years": [
+      2305,
+      2420
+    ],
+    "target_degrees": 315.0,
+    "purpose": "Complete120yearCanping horizon for planned1700..2300inputs; qualification in separately frozenR97evidence; notfullannualgridextension"
+  }
+}

@@ -1,0 +1,670 @@
+{
+  "id": "naoj2019_selected_guchureki_clock_v1",
+  "source_title": "「御堂関白記」の時刻制度 / System of Time Appearing in Midô-Kanpaku-Ki",
+  "source_authors": [
+    "相馬充",
+    "渡辺瑞穂子",
+    "谷川清隆"
+  ],
+  "source_publisher": "国立天文台報 第20巻 1–32 (2019)",
+  "source_url": "https://www.nao.ac.jp/contents/about/reports/report-naoj/20-1.pdf",
+  "source_sha256": "755a41d5f776e165e8fb4984388ec30a967a9a283c030bf3de0e5389bbdedfa6",
+  "source_kind": "Named research interpretation and its selected Table 3 synthesis, not a new independently read original diary witness.",
+  "selected_locations": {
+    "units": "pp.1–2,5,10–12",
+    "seasonal_axis": "pp.5–6 §2.3",
+    "paired_readings": "p.9 Table 3",
+    "symmetry": "p.10 §3.1",
+    "event_definition": "pp.12–13 §3.3",
+    "half_fun_variants": "pp.9,14–15 §3.5"
+  },
+  "table_capture": {
+    "kind": "pdfplumber text extraction of visually inspected Table 3 from fixed publisher PDF",
+    "pdf_page_one_based": 9,
+    "page_size_points": [
+      595.276,
+      841.89
+    ],
+    "crop_bbox_points": [
+      312.5199,
+      235.72920000000002,
+      543.486988,
+      768.64557
+    ],
+    "extracted_text_sha256": "65bb03b5cff836efcef845952fc193500d5dc9fc940961dca2756bc964a0c64b",
+    "all_40_groups_and_both_half_variants_preserved": true
+  },
+  "original_diary_manuscripts_independently_collated": false,
+  "study_diary_period": {
+    "first_year": 998,
+    "last_year": 1020,
+    "is_current_input_date_evaluation": false
+  },
+  "selected_model": {
+    "id": "naoj2019_guchureki_50koku6fun",
+    "double_hours_per_day": 12,
+    "koku_per_day": 50,
+    "fun_per_koku": 6,
+    "whole_koku_per_double_hour": 4,
+    "remainder_fun_per_double_hour": 1,
+    "first_koku_starts_at_zero_fun": true,
+    "shizheng_is_half_double_hour": true,
+    "four_koku_one_fun_is_next_branch_boundary": true
+  },
+  "comparative_units": {
+    "guchureki_day_night_duration_counts": {
+      "koku_per_day": 100,
+      "fun_per_koku": null,
+      "kind": "Duration counts printed alongside the 50-koku clock points; do not decode as point readings."
+    },
+    "senmyoreki_clock_definition": {
+      "koku_per_day": 100,
+      "double_hours_per_day": 12,
+      "fun_per_koku": 84,
+      "whole_koku_per_double_hour": 8,
+      "remainder_fun_per_double_hour": 28,
+      "same_unit_as_selected_model": false,
+      "source_location": "p.2 footnote"
+    },
+    "engishiki_comparison": {
+      "koku_per_day": 48,
+      "first_clock_koku_number": 1,
+      "fun_per_koku_admitted": null,
+      "decoder_admitted": false,
+      "source_location": "p.5 §2.2"
+    }
+  },
+  "english_abstract_body_unit_difference": {
+    "english_abstract_selected_label": "half (半) koku",
+    "japanese_abstract_unit": "Not specified next to 半 in the inspected PDF, do not silently add 刻.",
+    "body_and_table3_selected_half_unit": "fun",
+    "body_selected_label": "分の半分",
+    "terminological_difference_retained": true,
+    "authorial_intent_or_erratum_established": false,
+    "calculation_basis": "The explicitly selected body/Table 3 fun interpretation; no replacement of the abstract text."
+  },
+  "seasonal_axis": {
+    "kind": "nominal_pingqi_360_day_axis_excluding_mo_ri",
+    "nominal_days_per_term": 15,
+    "nominal_days_per_year": 360,
+    "term_order_from_winter_solstice": [
+      "冬至",
+      "小寒",
+      "大寒",
+      "立春",
+      "雨水",
+      "驚蟄",
+      "春分",
+      "清明",
+      "穀雨",
+      "立夏",
+      "小満",
+      "芒種",
+      "夏至",
+      "小暑",
+      "大暑",
+      "立秋",
+      "処暑",
+      "白露",
+      "秋分",
+      "寒露",
+      "霜降",
+      "立冬",
+      "小雪",
+      "大雪"
+    ],
+    "mo_ri": "没日 excluded from this seasonal ordinal; the study describes five or six such civil days per year.",
+    "mie_ri": "滅日 relates to nominal thirtyfold division of a mean lunation; the study does not use it in its Table 3 seasonal-day counts.",
+    "civil_date_conversion_established": false,
+    "actual_year_specific_mo_ri_positions_and_pingqi_instants_supplied": false,
+    "hinoo_short_month_half_equivalence_established": false,
+    "scope": "The final 18-unit interval closes a 360-unit nominal cycle. Do not add ordinal minus one to a Gregorian winter-solstice date or substitute true solar terms."
+  },
+  "paper_event_definition": {
+    "kind": "authors_inference_for_selected_diary",
+    "solar_center_geometric_horizon": true,
+    "atmospheric_refraction_applied": false,
+    "apparent_upper_limb_definition": false,
+    "used_for_current_input_sun_event": false,
+    "proves_T1299_pingming_zero_altitude": false,
+    "physical_model_comparison_reproduced_here": false
+  },
+  "applied_to_runtime_day_boundary": false,
+  "applied_to_hinoo_half": false,
+  "leap_short_month_priority_established": false,
+  "source_claim_is_real_world_outcome_validation": false,
+  "nominal_24h_equivalents_are_current_civil_times": false,
+  "scope": "Exact selected-research clock arithmetic and full selected Table 3 comparison. Not a reconstructed ancient civil clock, T1299 daybreak, new calendar basis, complete original collation, Hinoo precedence rule or empirical prediction validation.",
+  "record_groups": [
+    {
+      "id": "table3_01",
+      "season_label": "小寒1日",
+      "nominal_seasonal_ordinal": 16,
+      "readings": [
+        {
+          "sunrise": "辰初2分",
+          "sunset": "申3刻5分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 12
+    },
+    {
+      "id": "table3_02",
+      "season_label": "小寒13日",
+      "nominal_seasonal_ordinal": 28,
+      "readings": [
+        {
+          "sunrise": "辰初1分",
+          "sunset": "申4刻",
+          "printed_sum": "4刻1分"
+        }
+      ],
+      "printed_interval_to_next": 10
+    },
+    {
+      "id": "table3_03",
+      "season_label": "大寒8日",
+      "nominal_seasonal_ordinal": 38,
+      "readings": [
+        {
+          "sunrise": "卯4刻1分",
+          "sunset": "酉初1分",
+          "printed_sum": "4刻2分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_04",
+      "season_label": "立春1日",
+      "nominal_seasonal_ordinal": 46,
+      "readings": [
+        {
+          "sunrise": "卯3刻5分",
+          "sunset": "酉初2分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_05",
+      "season_label": "立春9日",
+      "nominal_seasonal_ordinal": 54,
+      "readings": [
+        {
+          "sunrise": "卯3刻4分",
+          "sunset": "酉初3分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_06",
+      "season_label": "雨水2日",
+      "nominal_seasonal_ordinal": 62,
+      "readings": [
+        {
+          "sunrise": "卯3刻2分",
+          "sunset": "酉初5分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_07",
+      "season_label": "雨水10日",
+      "nominal_seasonal_ordinal": 70,
+      "readings": [
+        {
+          "sunrise": "卯3刻",
+          "sunset": "酉1刻1分",
+          "printed_sum": "4刻1分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_08",
+      "season_label": "驚蟄3日",
+      "nominal_seasonal_ordinal": 78,
+      "readings": [
+        {
+          "sunrise": "卯2刻4分",
+          "sunset": "酉1刻3分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_09",
+      "season_label": "驚蟄11日",
+      "nominal_seasonal_ordinal": 86,
+      "readings": [
+        {
+          "sunrise": "卯2刻2分",
+          "sunset": "酉1刻5分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 7
+    },
+    {
+      "id": "table3_10",
+      "season_label": "春分3日",
+      "nominal_seasonal_ordinal": 93,
+      "readings": [
+        {
+          "sunrise": "卯時正",
+          "sunset": "酉時正",
+          "printed_sum": null
+        }
+      ],
+      "printed_interval_to_next": 7
+    },
+    {
+      "id": "table3_11",
+      "season_label": "春分10日",
+      "nominal_seasonal_ordinal": 100,
+      "readings": [
+        {
+          "sunrise": "卯1刻5分",
+          "sunset": "酉2刻2分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_12",
+      "season_label": "清明3日",
+      "nominal_seasonal_ordinal": 108,
+      "readings": [
+        {
+          "sunrise": "卯1刻3分",
+          "sunset": "酉2刻4分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_13",
+      "season_label": "清明11日",
+      "nominal_seasonal_ordinal": 116,
+      "readings": [
+        {
+          "sunrise": "卯1刻1分",
+          "sunset": "酉3刻",
+          "printed_sum": "4刻1分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_14",
+      "season_label": "穀雨4日",
+      "nominal_seasonal_ordinal": 124,
+      "readings": [
+        {
+          "sunrise": "卯初5分",
+          "sunset": "酉3刻2分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_15",
+      "season_label": "穀雨12日",
+      "nominal_seasonal_ordinal": 132,
+      "readings": [
+        {
+          "sunrise": "卯初3分",
+          "sunset": "酉3刻4分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_16",
+      "season_label": "立夏5日",
+      "nominal_seasonal_ordinal": 140,
+      "readings": [
+        {
+          "sunrise": "卯初2分",
+          "sunset": "酉3刻5分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_17",
+      "season_label": "立夏13日",
+      "nominal_seasonal_ordinal": 148,
+      "readings": [
+        {
+          "sunrise": "卯初1分",
+          "sunset": "酉4刻1分",
+          "printed_sum": "4刻2分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_18",
+      "season_label": "小満6日",
+      "nominal_seasonal_ordinal": 156,
+      "readings": [
+        {
+          "sunrise": "寅4刻",
+          "sunset": "戌初1分",
+          "printed_sum": "4刻1分"
+        }
+      ],
+      "printed_interval_to_next": 10
+    },
+    {
+      "id": "table3_19",
+      "season_label": "芒種1日",
+      "nominal_seasonal_ordinal": 166,
+      "readings": [
+        {
+          "sunrise": "寅3刻5分",
+          "sunset": "戌初2分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 12
+    },
+    {
+      "id": "table3_20",
+      "season_label": "芒種13日",
+      "nominal_seasonal_ordinal": 178,
+      "readings": [
+        {
+          "sunrise": "寅3刻4分半",
+          "sunset": "戌初2分",
+          "printed_sum": "3刻6分半"
+        },
+        {
+          "sunrise": "寅3刻4分",
+          "sunset": "戌初2分",
+          "printed_sum": "3刻6分"
+        }
+      ],
+      "printed_interval_to_next": 18
+    },
+    {
+      "id": "table3_21",
+      "season_label": "小暑1日",
+      "nominal_seasonal_ordinal": 196,
+      "readings": [
+        {
+          "sunrise": "寅3刻5分",
+          "sunset": "戌初2分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 12
+    },
+    {
+      "id": "table3_22",
+      "season_label": "小暑13日",
+      "nominal_seasonal_ordinal": 208,
+      "readings": [
+        {
+          "sunrise": "寅4刻",
+          "sunset": "戌初1分",
+          "printed_sum": "4刻1分"
+        }
+      ],
+      "printed_interval_to_next": 10
+    },
+    {
+      "id": "table3_23",
+      "season_label": "大暑8日",
+      "nominal_seasonal_ordinal": 218,
+      "readings": [
+        {
+          "sunrise": "卯初1分",
+          "sunset": "酉4刻1分",
+          "printed_sum": "4刻2分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_24",
+      "season_label": "立秋1日",
+      "nominal_seasonal_ordinal": 226,
+      "readings": [
+        {
+          "sunrise": "卯初2分",
+          "sunset": "酉3刻5分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_25",
+      "season_label": "立秋9日",
+      "nominal_seasonal_ordinal": 234,
+      "readings": [
+        {
+          "sunrise": "卯初3分",
+          "sunset": "酉3刻4分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_26",
+      "season_label": "処暑2日",
+      "nominal_seasonal_ordinal": 242,
+      "readings": [
+        {
+          "sunrise": "卯初5分",
+          "sunset": "酉3刻2分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_27",
+      "season_label": "処暑10日",
+      "nominal_seasonal_ordinal": 250,
+      "readings": [
+        {
+          "sunrise": "卯1刻1分",
+          "sunset": "酉3刻",
+          "printed_sum": "4刻1分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_28",
+      "season_label": "白露3日",
+      "nominal_seasonal_ordinal": 258,
+      "readings": [
+        {
+          "sunrise": "卯1刻3分",
+          "sunset": "酉2刻4分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_29",
+      "season_label": "白露11日",
+      "nominal_seasonal_ordinal": 266,
+      "readings": [
+        {
+          "sunrise": "卯1刻5分",
+          "sunset": "酉2刻2分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 7
+    },
+    {
+      "id": "table3_30",
+      "season_label": "秋分3日",
+      "nominal_seasonal_ordinal": 273,
+      "readings": [
+        {
+          "sunrise": "卯時正",
+          "sunset": "酉時正",
+          "printed_sum": null
+        }
+      ],
+      "printed_interval_to_next": 7
+    },
+    {
+      "id": "table3_31",
+      "season_label": "秋分10日",
+      "nominal_seasonal_ordinal": 280,
+      "readings": [
+        {
+          "sunrise": "卯2刻2分",
+          "sunset": "酉1刻5分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_32",
+      "season_label": "寒露3日",
+      "nominal_seasonal_ordinal": 288,
+      "readings": [
+        {
+          "sunrise": "卯2刻4分",
+          "sunset": "酉1刻3分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_33",
+      "season_label": "寒露11日",
+      "nominal_seasonal_ordinal": 296,
+      "readings": [
+        {
+          "sunrise": "卯3刻",
+          "sunset": "酉1刻1分",
+          "printed_sum": "4刻1分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_34",
+      "season_label": "霜降4日",
+      "nominal_seasonal_ordinal": 304,
+      "readings": [
+        {
+          "sunrise": "卯3刻2分",
+          "sunset": "酉初5分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_35",
+      "season_label": "霜降12日",
+      "nominal_seasonal_ordinal": 312,
+      "readings": [
+        {
+          "sunrise": "卯3刻4分",
+          "sunset": "酉初3分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_36",
+      "season_label": "立冬5日",
+      "nominal_seasonal_ordinal": 320,
+      "readings": [
+        {
+          "sunrise": "卯3刻5分",
+          "sunset": "酉初2分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_37",
+      "season_label": "立冬13日",
+      "nominal_seasonal_ordinal": 328,
+      "readings": [
+        {
+          "sunrise": "卯4刻1分",
+          "sunset": "酉初1分",
+          "printed_sum": "4刻2分"
+        }
+      ],
+      "printed_interval_to_next": 8
+    },
+    {
+      "id": "table3_38",
+      "season_label": "小雪6日",
+      "nominal_seasonal_ordinal": 336,
+      "readings": [
+        {
+          "sunrise": "辰初1分",
+          "sunset": "申4刻",
+          "printed_sum": "4刻1分"
+        }
+      ],
+      "printed_interval_to_next": 10
+    },
+    {
+      "id": "table3_39",
+      "season_label": "大雪1日",
+      "nominal_seasonal_ordinal": 346,
+      "readings": [
+        {
+          "sunrise": "辰初2分",
+          "sunset": "申3刻5分",
+          "printed_sum": "3刻7分"
+        }
+      ],
+      "printed_interval_to_next": 12
+    },
+    {
+      "id": "table3_40",
+      "season_label": "大雪13日",
+      "nominal_seasonal_ordinal": 358,
+      "readings": [
+        {
+          "sunrise": "辰初2分",
+          "sunset": "申3刻4分半",
+          "printed_sum": "3刻6分半"
+        },
+        {
+          "sunrise": "辰初2分",
+          "sunset": "申3刻4分",
+          "printed_sum": "3刻6分"
+        }
+      ],
+      "printed_interval_to_next": 18
+    }
+  ]
+}

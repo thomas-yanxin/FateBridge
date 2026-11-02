@@ -23,7 +23,8 @@ from fatebridge.diagnostics import (
 )
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fixtures.compatibility import assert_score_reference
+from tests.compatibility_reference import assert_score_reference
+from tests.fixtures.mcp_receipt import verified_inline_business
 
 SUBJECT = str(Path(__file__).parents[1] / "examples/demo-subject.json")
 
@@ -32,6 +33,11 @@ def invoke(capsys, *args):
     code = cli.run(list(args))
     text = capsys.readouterr().out
     return code, json.loads(text), text
+
+
+async def _assert_inline_first_view_with_lossless_runtime(client, payload):
+    """Supplementary receipt paging never removes a first-view business fact."""
+    await verified_inline_business(client, payload)
 
 
 def test_scenario_words_find_tools_and_keep_filters():
@@ -303,11 +309,12 @@ async def test_mcp_input_contract_is_small_and_projections_are_callable():
             record["surfaces"]["mcp_name"],
             {
                 **record["example_input"],
-                "fields": ["career_analysis"],
+                "fields": ["career_analysis.career_structure"],
                 "strict_fields": True,
             },
         )
-        assert set(result.structured_content) == {"career_analysis", "run_metadata"}
+        restored = await verified_inline_business(client, result.structured_content)
+        assert set(restored) == {"career_analysis", "run_metadata"}
         with pytest.raises(Exception):
             await client.read_resource("fatebridge://tools/astro_hellen/input")
     async with Client(create_mcp_app(families="astro")) as client:
@@ -326,7 +333,8 @@ def test_career_positive_factor_does_not_claim_overall_high_grade():
         "hour": ("辛", "巳"),
     }
     result = CareerAnalysis._analyze_career_structure(pillars, "庚")
-    assert result["score"] == 75 and result["level"] == "中等格局"
+    # 日辰的财、伤官补回后，食伤财和财官两项分别加10、8。
+    assert result["score"] == 95 and result["level"].startswith("规则索引95")
     assert any("官印相生" in note for note in result["notes"])
     assert all("事业格局高" not in note for note in result["notes"])
 
@@ -358,15 +366,20 @@ async def test_consultation_first_views_keep_interpretable_evidence_across_surfa
                 "include_snapshot_text": False,
             },
         )
+        assert not result.is_error
+        await _assert_inline_first_view_with_lossless_runtime(
+            client, result.structured_content
+        )
     payload = result.structured_content
-    assert not result.is_error and "result_delivery" not in payload
+    assert not result.is_error
     if key == "analyze_destiny":
         assert payload["four_pillars"]["day"]["stem"]
         assert payload["day_master"]["element"]
         assert payload["ten_gods"]
         assert payload["structure_profile"]["decision_basis"]
         profile = payload["structure_profile"]
-        assert profile["resolution_policy"] == "layered_conflict_review_v1"
+        assert profile["resolution_policy"] == "source_conditions_before_preference_v3"
+        assert profile["dominant_structure"]["key"] == "selected_month_reference"
         assert set(profile["useful_elements"]).isdisjoint(profile["avoid_elements"])
         assert profile["layers"] and profile["conditional_elements"]
         assert payload["person_info"]["normalized_birth_datetime"]
@@ -374,14 +387,19 @@ async def test_consultation_first_views_keep_interpretable_evidence_across_surfa
         assert {"Sun", "Moon"} <= {p["id"] for p in payload["planets"]}
         assert payload["aspects"] and all("orb" in a for a in payload["aspects"])
     elif key == "ziwei_birth":
-        assert len(payload["ziwei_birth"]["palaces"]) == 12
-        assert any(p["stars"] for p in payload["ziwei_birth"]["palaces"])
+        reading = payload["ziwei_birth"]["reading_view"]
+        assert reading["schema_version"] == "ziwei_natal_reading_v1"
+        assert len(reading["palaces"]) == 12
+        assert sum(len(p["stars"]) for p in reading["palaces"]) == 66
+        assert all(len(p["sanfang_sizheng_branches"]) == 4 for p in reading["palaces"])
         assert payload["ziwei_birth"]["sihua"]
     else:
         assert 1 <= payload["meihua"]["seed"]["moving_line"] <= 6
         assert payload["meihua"]["body_use_relation"]
         assert payload["analysis_context"]["analysis_datetime"]
-    mcp_business = {k: v for k, v in payload.items() if k != "run_metadata"}
+    mcp_business = {
+        k: v for k, v in payload.items() if k not in {"run_metadata", "result_delivery"}
+    }
     query = [("fields", field) for field in fields] + [
         ("as_of", as_of),
         ("strict_fields", "true"),
@@ -449,7 +467,7 @@ async def test_published_tool_description_is_sufficient_for_strict_first_call():
         assert not result.is_error
         assert (
             result.structured_content["career_analysis"]["career_structure"]["score"]
-            == 75
+            == 95
         )
         assert "run_metadata" in result.structured_content
 
@@ -509,7 +527,7 @@ async def test_explicit_pillar_context_can_be_projected_without_a_retry():
         )
     assert not response.is_error
     career = response.structured_content["career_analysis"]
-    assert career["career_structure"]["score"] == 75
+    assert career["career_structure"]["score"] == 95
     assert career["timing_context"]["source"] == "explicit_pillar_overrides"
     assert "analysis_date" not in career["timing_context"]
     assert "dayun_age" not in career["timing_context"]
@@ -525,6 +543,8 @@ def test_timing_first_view_keeps_current_basis_without_year_grids(capsys):
         "--strict-fields",
         "--as-of",
         "2026-10-12T04:00:00Z",
+        "--response-char-limit",
+        "8192",
     )
     assert code == 0
     calendar = result["analysis_calendar"]

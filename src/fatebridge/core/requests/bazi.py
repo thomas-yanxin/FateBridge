@@ -7,12 +7,43 @@ from typing import List, Optional
 from pydantic import Field
 
 from fatebridge.core.metaphysics.common import SEXAGENARY_CYCLE
-from fatebridge.core.requests.birth import FateBridgeRequest
+from fatebridge.core.requests.base import _DeferredModel
+from fatebridge.core.requests.birth import BaziClockRequest
 
 PILLAR_PATTERN = "^(?:" + "|".join(SEXAGENARY_CYCLE) + ")$"
+LITERAL_PILLAR_PATTERN = "^[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥]$"
 
 
-class BaziDimensionRequest(FateBridgeRequest):
+class BaziSourceCompareRequest(_DeferredModel):
+    """Retain literal text even when modern calendar checks disagree."""
+
+    year_pillar: str = Field(
+        min_length=2,
+        max_length=2,
+        pattern=LITERAL_PILLAR_PATTERN,
+        description="原样年柱，天干与地支各一字；不推造出生日期",
+    )
+    month_pillar: str = Field(
+        min_length=2,
+        max_length=2,
+        pattern=LITERAL_PILLAR_PATTERN,
+        description="原样月柱；现代起月干关系另行核对，不擅改录文",
+    )
+    day_pillar: str = Field(
+        min_length=2,
+        max_length=2,
+        pattern=LITERAL_PILLAR_PATTERN,
+        description="原样日柱，天干与地支各一字",
+    )
+    hour_pillar: str = Field(
+        min_length=2,
+        max_length=2,
+        pattern=LITERAL_PILLAR_PATTERN,
+        description="原样时柱；必须已经明确，不能猜生时或套示例",
+    )
+
+
+class BaziDimensionRequest(BaziClockRequest):
     """Shared base for BaZi single-dimension analyses.
 
     大运/流年默认由命盘 + 分析日期内部推算（analysis_* 缺省为今天），用户无需自己
@@ -44,7 +75,7 @@ class BaziDimensionRequest(FateBridgeRequest):
     )
 
 
-class BaziBirthRequest(FateBridgeRequest):
+class BaziBirthRequest(BaziClockRequest):
     """Request model for standalone BaZi birth output."""
 
     analysis_year: Optional[int] = Field(default=None, description="Analysis year")

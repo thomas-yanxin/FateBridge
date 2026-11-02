@@ -31,12 +31,13 @@ FateBridge 引擎提供可复核的盘面与规则，Onda 指导主题、对象�
 | 明确起卦或问事 | [onda-zhanbu](onda-zhanbu/SKILL.md) | 使用所选卜法；普通决定不自动起卦 |
 | 多主题全面画像 | [onda-zige](onda-zige/SKILL.md) | 组合相关主题，多体系能力由各主题共享 |
 
-共 13 个技能包（9 主题、3 服务、1 多主题组合）；机器场景另有独立的 `fengshui` 基础计算，共 14 项。REST 公开 86 个工具，MCP 公开 87 个工具，工具数不因主题重组而增加，实际范围见[算法覆盖](../docs/algorithm-coverage.md)。
+共 13 个技能包（9 主题、3 服务、1 多主题组合）；机器场景另有独立的 `fengshui` 基础计算，共 14 项。REST 公开 91 个工具，MCP 公开 92 个工具，工具数不因主题重组而增加，实际范围见[算法覆盖](../docs/algorithm-coverage.md)。
 
 ## 共用参考如何分工
 
 | 参考 | 负责什么 |
 | --- | --- |
+| [咨询核心](_shared/consultation-core.md) | 必读的事实、范围、计算与交付约束及按需索引 |
 | [硬边界](_shared/safety-boundaries.md) | 在选法与计算前识别生死、临床诊断治疗、医疗择时等禁区 |
 | [本轮范围与多视角选择](_shared/consultation-routing.md) | 识别主题、对象、任务与深度，避免扩大问题或重复取证 |
 | [时间选择](_shared/timing-selection.md) | 选择阶段、年度与更细粒度，保留各体系真实边界 |
@@ -48,7 +49,7 @@ FateBridge 引擎提供可复核的盘面与规则，Onda 指导主题、对象�
 | [八字专题细问](_shared/bazi-topic-evidence.md) | 财库、财富结构、学业、六亲与子女等专项的实际字段和解释范围 |
 | [时运技法任务卡](onda-shiyun/references/techniques.md) | 各技法的新增信息、选择条件、真实读取与追问复用 |
 
-普通咨询按匹配技能读取所需参考，无需先读整个仓库。风水有独立的[咨询闭环](onda-fengshui/references/consultation.md)，事实、来源与动作条件在该目录分层维护。
+普通咨询先读匹配技能与短的[咨询核心](_shared/consultation-core.md)，再按本轮条件定位所需参考；引擎地图、表达范例和完整 Schema 不要求全文预读。风水有独立的[咨询闭环](onda-fengshui/references/consultation.md)，事实、来源与动作条件在该目录分层维护。
 
 ## 发现与文件职责
 
@@ -72,3 +73,5 @@ FateBridge 引擎提供可复核的盘面与规则，Onda 指导主题、对象�
 静态技能检查、真实 MCP 调用与独立模型对话分别报告；接口边界变动还须核对 REST、MCP 与 CLI。后台工具数量不作为咨询交付质量指标。
 
 本目录随 Git 仓库按 Apache-2.0 分发，当前 wheel 不包含技能目录。回到[文档中心](../docs/README.md)选择接入或开发任务。
+
+可安装分发包、MCP 依赖与干净环境验证见[Onda 插件](../docs/onda-plugin.md)；真实对话与人工评分见[行为验收](../docs/agent-evaluation.md)。`agents/interface.yaml` 是项目内部合同，不是宿主的通用依赖安装格式。

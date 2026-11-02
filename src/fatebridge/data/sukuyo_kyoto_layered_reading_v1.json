@@ -1,0 +1,564 @@
+{
+  "id": "kyoto_RB00017868_layered_followup_v1",
+  "expected_legacy": {
+    "source_bundle_sha256": "68932a94aa22082aed0fab9dc05cf92fe0f2d3ce7cd2e63fb1c9bfe6661df3e7",
+    "selected_primary_canonical_sha256": "3f0d8f449895e607570cc623692e3857756931fdd8f4fc95d6b698d76dbb02db",
+    "apparatus_span_canonical_sha256": "8d9d263cc7ef0d7c1470b913f57d4fdcc54b4a9157420737e7ffff55c819a7a4",
+    "id": "kyoto_RB00017868_selected_calendar_v2",
+    "image_sha256": "ac5c280af97d81ddfd57fafdb384f770039cd6d5b6010229bfb4ed9d3ba0e99d",
+    "manifest_sha256": "aa3df8175b1844c8261ca0b7486a13104e33e43d4488b656e779ecf49e10a795",
+    "canvas_index_one_based": 28
+  },
+  "evidence_status": "attributed_model_working_readings_not_human_collation",
+  "source_readings": [
+    {
+      "task": "v103-kyoto-redlayer-generator-first",
+      "raw_first_sha256": "2b86c8274d963648cc4393603967621312c981a9770bf1e2e8e24df594259e7d",
+      "reading_round": "v103",
+      "image_sha256": "ac5c280af97d81ddfd57fafdb384f770039cd6d5b6010229bfb4ed9d3ba0e99d",
+      "independent_human_acceptance": false
+    },
+    {
+      "task": "v104-kyoto-image-reviewer-first",
+      "raw_first_sha256": "5f698e7709869f067bf75dae6a92ca047058c833803d6dc37eda5f5c1acf8103",
+      "reading_round": "v104",
+      "image_sha256": "ac5c280af97d81ddfd57fafdb384f770039cd6d5b6010229bfb4ed9d3ba0e99d",
+      "independent_human_acceptance": false
+    }
+  ],
+  "source_applicability_review": {
+    "task": "v104-kyoto-layer-relevance-reviewer-first",
+    "raw_first_sha256": "532a4c021317859fdf57072ccfab35cd5457abeb7de2bdb3824f8393724a77d1",
+    "material_error_groups_found_in_legacy_scope": 1,
+    "important_omission_groups_found": 1,
+    "glyph_uncertainty_groups_not_resolved": 5
+  },
+  "image_dimensions": [
+    5616,
+    3744
+  ],
+  "mapped_legacy_observations": [
+    {
+      "legacy_observation_id": "ordinary_month_repeats",
+      "legacy_field": "/selected_primary/observations/0",
+      "legacy_normalized_transcription": "其正月直宿即亦重直閏月",
+      "image_regions_xyxy": [
+        [
+          2460,
+          900,
+          2630,
+          3280
+        ]
+      ],
+      "later_working_assessment": "本角色首读与生成角色选读均记录此片段。正文支持普通月与同名闰月配宿重用这一局部含义；不能扩成与小月补配交叠时的优先规则。",
+      "assessment_raw_first_sha256": "532a4c021317859fdf57072ccfab35cd5457abeb7de2bdb3824f8393724a77d1"
+    },
+    {
+      "legacy_observation_id": "twelfth_day_1",
+      "legacy_field": "/selected_primary/observations/1",
+      "legacy_normalized_transcription": "十二月一日重宿是虚宿",
+      "image_regions_xyxy": [
+        [
+          2280,
+          1150,
+          2445,
+          2740
+        ]
+      ],
+      "later_working_assessment": "一日及虛宿有本角色首读支持；动词仍有工作读法冲突。当前根任务及v103生成角色选重，本角色v104首读作直，不据票数裁定。",
+      "assessment_raw_first_sha256": "532a4c021317859fdf57072ccfab35cd5457abeb7de2bdb3824f8393724a77d1"
+    },
+    {
+      "legacy_observation_id": "twelfth_day_15",
+      "legacy_field": "/selected_primary/observations/2",
+      "legacy_normalized_transcription": "十五日直宿是星宿",
+      "image_regions_xyxy": [
+        [
+          2280,
+          2300,
+          2445,
+          3280
+        ]
+      ],
+      "later_working_assessment": "本角色首读有直接支持；十五日位于第二列，并非后面被朱笔划改的合体日号。",
+      "assessment_raw_first_sha256": "532a4c021317859fdf57072ccfab35cd5457abeb7de2bdb3824f8393724a77d1"
+    },
+    {
+      "legacy_observation_id": "twelfth_day_30",
+      "legacy_field": "/selected_primary/observations/3",
+      "legacy_normalized_transcription": "乃至三十日直宿是室宿",
+      "image_regions_xyxy": [
+        [
+          2090,
+          900,
+          2255,
+          2110
+        ]
+      ],
+      "later_working_assessment": "该处三、十分写，可与后面四处叠改数字区分。本角色此次工作读室；旧婁／室分歧仍保留，不据与计算相合删除婁记录。",
+      "assessment_raw_first_sha256": "532a4c021317859fdf57072ccfab35cd5457abeb7de2bdb3824f8393724a77d1"
+    },
+    {
+      "legacy_observation_id": "repeat_unchanged",
+      "legacy_field": "/selected_primary/observations/4",
+      "legacy_normalized_transcription": "如是閏十二月直宿亦同之更無異也",
+      "image_regions_xyxy": [
+        [
+          1930,
+          900,
+          2255,
+          3280
+        ]
+      ],
+      "later_working_assessment": "分跨第三、第四列，选读与本角色首读相容。支持局部亦同、更無異，不认证全部校改层或规则交叠先后。",
+      "assessment_raw_first_sha256": "532a4c021317859fdf57072ccfab35cd5457abeb7de2bdb3824f8393724a77d1"
+    },
+    {
+      "legacy_observation_id": "base_sixteen_characters_present",
+      "legacy_field": "/selected_primary/observations/5",
+      "legacy_normalized_transcription": "先月是正十二月閏月是傍十二月也故傍月",
+      "image_regions_xyxy": [
+        [
+          1930,
+          900,
+          2090,
+          3280
+        ],
+        [
+          1750,
+          950,
+          1955,
+          1220
+        ]
+      ],
+      "later_working_assessment": "前部先月是正十二月閏月是傍十二月也有本角色首读支持；末端故傍月的傍位涉及黑字被朱划叠压、旁朱傍。旧串可作为根任务历史归一化工作录保留，不能整体称为清楚、同层黑正文。",
+      "assessment_raw_first_sha256": "532a4c021317859fdf57072ccfab35cd5457abeb7de2bdb3824f8393724a77d1"
+    },
+    {
+      "legacy_observation_id": "first_day_half_above",
+      "legacy_field": "/selected_primary/observations/6",
+      "legacy_normalized_transcription": "次二月初一日半已上者",
+      "image_regions_xyxy": [
+        [
+          1260,
+          880,
+          1450,
+          3280
+        ]
+      ],
+      "later_working_assessment": "次二月初一日、半及上者有直接工作读支持；本角色保留已／己候选。原scope拒绝推出12:00或固定六小时的限制仍适用。",
+      "assessment_raw_first_sha256": "532a4c021317859fdf57072ccfab35cd5457abeb7de2bdb3824f8393724a77d1"
+    },
+    {
+      "legacy_observation_id": "current_day_assignment",
+      "legacy_field": "/selected_primary/observations/7",
+      "legacy_normalized_transcription": "下者即彼當日宿直",
+      "image_regions_xyxy": [
+        [
+          1100,
+          880,
+          1280,
+          3280
+        ]
+      ],
+      "later_working_assessment": "这是避开半后覆黑区的可辨片段，与本角色首读相容。仅录片段、不据另一文本补字的scope仍适用。",
+      "assessment_raw_first_sha256": "532a4c021317859fdf57072ccfab35cd5457abeb7de2bdb3824f8393724a77d1"
+    }
+  ],
+  "clear_date_example_positions": [
+    {
+      "lunar_month": 12,
+      "lunar_day": 1,
+      "legacy_mansion": "虚",
+      "region_xyxy": [
+        2280,
+        1150,
+        2445,
+        2740
+      ],
+      "scope": "该例题字位与后段四处叠改数字分开；保持既有宿名，不由模型相合接受字形。"
+    },
+    {
+      "lunar_month": 12,
+      "lunar_day": 15,
+      "legacy_mansion": "星",
+      "region_xyxy": [
+        2280,
+        2300,
+        2445,
+        3280
+      ],
+      "scope": "该例题字位与后段四处叠改数字分开；保持既有宿名，不由模型相合接受字形。"
+    },
+    {
+      "lunar_month": 12,
+      "lunar_day": 30,
+      "legacy_mansion": "室",
+      "region_xyxy": [
+        2090,
+        900,
+        2255,
+        2110
+      ],
+      "scope": "该例题字位与后段四处叠改数字分开；保持既有宿名，不由模型相合接受字形。"
+    }
+  ],
+  "corrected_number_positions": [
+    {
+      "id": "altered-number-1",
+      "region_xyxy": [
+        1760,
+        1380,
+        1960,
+        1700
+      ],
+      "local_context": "直宿□日皆用",
+      "black_accepted_literal": null,
+      "black_candidates": [
+        "廿",
+        "卅"
+      ],
+      "reviewer_working_black_reading": "廿",
+      "red_working_reading": "三十",
+      "source_task": "v104-kyoto-image-reviewer-first",
+      "scope": "来自v104复核角色该处工作读；不将旁朱三十反填为底层黑字，不外推为三个日期例题有同样改数。"
+    },
+    {
+      "id": "altered-number-2",
+      "region_xyxy": [
+        1640,
+        2170,
+        1775,
+        2420
+      ],
+      "local_context": "小月闕第□日直宿",
+      "black_accepted_literal": null,
+      "black_candidates": [
+        "廿",
+        "卅"
+      ],
+      "reviewer_working_black_reading": "廿",
+      "red_working_reading": "三十",
+      "source_task": "v104-kyoto-image-reviewer-first",
+      "scope": "来自v104复核角色该处工作读；不将旁朱三十反填为底层黑字，不外推为三个日期例题有同样改数。"
+    },
+    {
+      "id": "altered-number-3",
+      "region_xyxy": [
+        1435,
+        1410,
+        1625,
+        1675
+      ],
+      "local_context": "正月……小闕第□日",
+      "black_accepted_literal": null,
+      "black_candidates": [
+        "廿",
+        "卅"
+      ],
+      "reviewer_working_black_reading": "廿",
+      "red_working_reading": "三十",
+      "source_task": "v104-kyoto-image-reviewer-first",
+      "scope": "来自v104复核角色该处工作读；不将旁朱三十反填为底层黑字，不外推为三个日期例题有同样改数。"
+    },
+    {
+      "id": "altered-number-4",
+      "region_xyxy": [
+        1460,
+        2100,
+        1605,
+        2390
+      ],
+      "local_context": "……第□日而彼日分……",
+      "black_accepted_literal": null,
+      "black_candidates": [
+        "廿",
+        "卅"
+      ],
+      "reviewer_working_black_reading": "廿",
+      "red_working_reading": "三十",
+      "source_task": "v104-kyoto-image-reviewer-first",
+      "scope": "来自v104复核角色该处工作读；不将旁朱三十反填为底层黑字，不外推为三个日期例题有同样改数。"
+    }
+  ],
+  "span_scope_qualification": {
+    "legacy_scope": "保留イ标记，未独立取得甲本；京都新写本清楚保留这段，不把其等同甲本或把删除重建说成独立校勘。",
+    "normalized_candidate_span": "是正十二月閏月是傍十二月也故傍月",
+    "candidate_character_count": 16,
+    "shorter_candidate_character_count": 13,
+    "contested_candidate_character_one_based": 15,
+    "local_context": "故□月",
+    "region_xyxy": [
+      1750,
+      950,
+      1955,
+      1220
+    ],
+    "black_accepted_literal": null,
+    "black_candidates": [
+      "隔",
+      "傍"
+    ],
+    "red_working_reading": "傍",
+    "current_scope": "保留イ标记，未独立取得甲本；十六字范围仍为依校记字数重建的候选。京都既有归一化十六字候选第15字（故□月的中间字）字位有覆划及旁朱傍，不能把整串声称为清楚同层黑正文；未据此认证甲本身份、完整原文或删除范围。"
+  },
+  "unresolved_readings": [
+    {
+      "id": "first-day-verb",
+      "location_zh": "十二月初一动词",
+      "legacy_root_selected": "重",
+      "generator_v103_working": "重",
+      "reviewer_v104_working": "直",
+      "candidates": [
+        "重",
+        "直"
+      ],
+      "accepted_literal": null
+    },
+    {
+      "id": "upper-half-glyph",
+      "location_zh": "半与上之间",
+      "legacy_selected": "已",
+      "reviewer_v104_working": "已／己",
+      "candidates": [
+        "已",
+        "己"
+      ],
+      "accepted_literal": null
+    },
+    {
+      "id": "lower-half-covered-glyph",
+      "location_zh": "半与下之间的字及覆黑区",
+      "legacy_selected": "仅录下者即彼當日宿直",
+      "reviewer_v104_working": "已／己及未定覆盖字",
+      "candidates": [
+        "已",
+        "己",
+        "覆黑底字未定"
+      ],
+      "accepted_literal": null
+    },
+    {
+      "id": "closing-clause",
+      "location_zh": "京都末句毎／無",
+      "legacy_selected": "直宿無改代也（未接纳）",
+      "reviewer_v104_working": "直宿毎改代也",
+      "candidates": [
+        "毎",
+        "無"
+      ],
+      "accepted_literal": null
+    },
+    {
+      "id": "middle-red-addition",
+      "location_zh": "中部朱笔旁添",
+      "generator_v103_working": "重／東",
+      "reviewer_v104_working": "東（候选）",
+      "candidates": [
+        "重",
+        "東"
+      ],
+      "accepted_literal": null
+    }
+  ],
+  "quotation_context": {
+    "prefixed_glyph": {
+      "region_xyxy": [
+        3100,
+        1900,
+        3400,
+        3240
+      ],
+      "working_reading": "勘",
+      "accepted_literal": null
+    },
+    "side_note": {
+      "region_xyxy": [
+        3080,
+        2390,
+        3400,
+        3040
+      ],
+      "working_reading": "如來教也",
+      "layer": "正文列旁较小黑字，邻有朱色曲线和竖线",
+      "scope": "小字作者、引用起讫、各笔先后未定，不与正文合并。"
+    },
+    "inline_note": {
+      "region_xyxy": [
+        2910,
+        2120,
+        3155,
+        2630
+      ],
+      "right_small_column": [
+        "依",
+        "口"
+      ],
+      "left_small_column": [
+        "決",
+        "記"
+      ],
+      "working_reading": "依口決記",
+      "layer": "法字后两小行黑字",
+      "scope": "口决记录的小字层不自动成为T1299逐字原文；传授者、具体引本和引用范围未认证。"
+    },
+    "following_condition_working_readings": {
+      "generator_v103": "若有潤月時",
+      "reviewer_v104": "若有閏月一時",
+      "accepted_literal": null
+    },
+    "red_bracket_function_accepted": null
+  },
+  "acceptance_flags": {
+    "independent_human_transcription_accepted": false,
+    "complete_manuscript_collation": false,
+    "unmodified_black_text_whole_span_certified": false,
+    "taisho_base_or_ko_identity_established": false,
+    "independent_textual_lineage_established": false,
+    "leap_short_month_priority_established": false,
+    "modern_clock_mapping_established": false,
+    "algorithm_override_applied": false
+  },
+  "scope": "同一京都原图的后期局部分层工作读与活动来源强度限定；保留旧归一化录文、旧首读及所有分歧，不把同图复读计为新古本或独立历史观察，不改变配宿算法或关闭原180门。",
+  "middle_black_overwrite_and_side_writing": {
+    "id": "middle-black-overwrite-and-small-adjacent-writing",
+    "image_sha256": "ac5c280af97d81ddfd57fafdb384f770039cd6d5b6010229bfb4ed9d3ba0e99d",
+    "region_xyxy": [
+      1415,
+      900,
+      1755,
+      2440
+    ],
+    "layers": "大字黑正文、黑色涂压、较小黑旁字、朱笔旁添及连接线",
+    "black_undertext_accepted_literal": null,
+    "insertion_order_accepted": null,
+    "annotator_identity_accepted": null,
+    "source_working_records": [
+      {
+        "task": "v103-kyoto-redlayer-generator-first",
+        "raw_first_sha256": "2b86c8274d963648cc4393603967621312c981a9770bf1e2e8e24df594259e7d",
+        "record_id": "left-small-and-rewritten-black",
+        "region_xyxy": [
+          1500,
+          1210,
+          1870,
+          2250
+        ],
+        "preserved_layers": [
+          {
+            "layer": "较细黑字",
+            "literal_segments": [
+              "准",
+              "之",
+              "耳"
+            ]
+          },
+          {
+            "layer": "较重黑字",
+            "literal": "知",
+            "visible_features": "知字比邻近准、之、耳明显粗重。"
+          },
+          {
+            "layer": "之与知附近的朱字",
+            "literal": "可"
+          },
+          {
+            "layer": "更左下的黑色覆盖及旁添",
+            "literal": null,
+            "visible_features": "两处字位有浓黑覆盖；右旁各有较小黑字，并见弧线或引线。",
+            "working_side_readings": [
+              {
+                "position": "较上方旁添字",
+                "literal": null,
+                "candidates": [
+                  "雖",
+                  "雜"
+                ]
+              },
+              {
+                "position": "较下方旁添字",
+                "literal": "失",
+                "qualification": "工作读；不据句意补出与上方字的连续关系。"
+              }
+            ]
+          }
+        ],
+        "unresolved": [
+          "浓黑覆盖下原来写的字不能可靠复原。",
+          "字色和粗细差异可观察，但不能仅据此认证不同书手或完整改写时序。",
+          "没有将准、之、朱可、重黑知及耳不加分层地宣布为一条原始连续正文。",
+          "旁添字与覆盖字之间的线条尚不足以唯一确定插入顺序。"
+        ]
+      },
+      {
+        "task": "v104-kyoto-image-reviewer-first",
+        "raw_first_sha256": "5f698e7709869f067bf75dae6a92ca047058c833803d6dc37eda5f5c1acf8103",
+        "record_id": "left-black-overwriting",
+        "region_xyxy": [
+          1415,
+          900,
+          1755,
+          2440
+        ],
+        "readable_spans": [
+          "月閏月推之知耳",
+          "小月闕第□日直宿之法假令",
+          "正月［黑色覆写］小闕第□日",
+          "第□日而彼日分直宿猶"
+        ],
+        "side_characters": [
+          {
+            "reading": "雖",
+            "location": "较大涂压字块右旁，约x1610、y1760附近",
+            "certainty": "工作读法"
+          },
+          {
+            "reading": "失",
+            "location": "下方另一涂压字块右旁，约x1610、y2000附近",
+            "certainty": "工作读法"
+          },
+          {
+            "reading": "東",
+            "location": "知耳之后下方、小月附近的朱笔旁添，约x1740、y1830附近",
+            "certainty": "候选，未唯一确定"
+          },
+          {
+            "reading": "可",
+            "location": "知字上方附近的朱笔",
+            "certainty": "候选，可能兼有读序标记性质"
+          }
+        ],
+        "unresolved": [
+          "正月之后及日之后有数个浓黑覆写区，底层原字不可唯一恢复。",
+          "不能确定各小旁字分别替换哪一个底字，也不能将可辨旁字直接插入形成唯一连续正文。",
+          "朱色弯线、点和黑色牵引线的精确引用范围未定。"
+        ]
+      }
+    ],
+    "small_black_side_characters": [
+      {
+        "position_zh": "较上方黑旁字",
+        "generator_v103_candidates": [
+          "雖",
+          "雜"
+        ],
+        "reviewer_v104_working": "雖",
+        "candidates": [
+          "雖",
+          "雜"
+        ],
+        "accepted_literal": null
+      },
+      {
+        "position_zh": "较下方黑旁字",
+        "generator_v103_working": "失",
+        "reviewer_v104_working": "失",
+        "candidates": [
+          "失"
+        ],
+        "accepted_literal": null
+      }
+    ],
+    "scope": "中部浓黑覆盖及小黑旁字与半后覆黑是不同字位；雖／雜、失、较重知和朱可分别是所绑定时点工作读，不接纳覆盖底字、旁字插入范围与顺序、注者或书手年代，不拼成清洁连续正文，不改变历法、半日或补配优先。"
+  }
+}

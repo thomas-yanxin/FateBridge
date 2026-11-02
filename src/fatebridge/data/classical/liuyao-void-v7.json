@@ -1,0 +1,78 @@
+{
+  "ruleset_id": "zengshan_void_effects_v7",
+  "ruleset_version": "7.0.0",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "method": "Selected original scan pages visually read; detail crops preserve source pixels."
+  },
+  "clauses": [
+    {
+      "id": "nonfinal-void",
+      "pdf_pages": [
+        93
+      ],
+      "quote": "旺不爲空動不爲空有日建動爻生扶者亦不爲空動而化空伏而旺相皆不爲空"
+    },
+    {
+      "id": "empty-obstructions",
+      "pdf_pages": [
+        93
+      ],
+      "quote": "月破爲空有氣不動亦爲空伏而被尅亦爲空眞空爲空"
+    },
+    {
+      "id": "seasonal-true-void",
+      "pdf_pages": [
+        94
+      ],
+      "quote": "眞空者春土夏金秋是木三冬逢火是眞空"
+    },
+    {
+      "id": "defeated-moving-generator",
+      "pdf_pages": [
+        94
+      ],
+      "quote": "巳火又化回頭之尅不能生丑土之財"
+    },
+    {
+      "id": "uncertain-qi-example",
+      "pdf_pages": [
+        94
+      ],
+      "quote": "又因三月之丑土財還有氣古法有氣不爲空不敢竟斷命之再占"
+    },
+    {
+      "id": "horizon-and-pending-use",
+      "pdf_pages": [
+        96
+      ],
+      "quote": "謂之懸空以待凡占遇空不可即以爲空須視其所占之事或近或遠如在旬內則爲空也然亦有出空之日實空之時"
+    },
+    {
+      "id": "not-a-permanent-void-shortcut",
+      "pdf_pages": [
+        96
+      ],
+      "quote": "若占遠大之事尙無定期非出旬可以成者大象不吉乃可謂到底空也大象若吉太歲月建亦可塡之"
+    }
+  ],
+  "textual_issues": [
+    {
+      "id": "qi-not-gua",
+      "transcription": "有卦不動爲空",
+      "scan": "有氣不動亦爲空",
+      "pdf_page": 93,
+      "action": "Preserve frozen raw transcription; do not treat every static hexagram as automatically empty"
+    },
+    {
+      "id": "mingyi-to-xiaoguo-not-feng",
+      "transcription": "又得明夷之豐",
+      "scan": "又得明夷之小過",
+      "pdf_page": 95,
+      "action": "Use the scan chart with moving positions 1 and 4 for this source case; keep raw transcription unchanged"
+    }
+  ],
+  "scope": "Void/nonvoid condition branches, effective outgoing-source obstructions and explicit unresolved time horizon. Literal seasonal labels are not a total-strength verdict. No repeat-casting recommendation, invented date, event grade or automatic permanent-void verdict."
+}

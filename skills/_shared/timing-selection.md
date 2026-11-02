@@ -18,10 +18,16 @@
 
 ## 计算路径
 
-- 中式全景用 `timing_analysis`，窄层分别为 `dayun_analysis`、`liunian_analysis`、`liuyue_analysis`、`liuri_analysis`、`liushi_analysis`。专项已有 `timing_context` 的大运流年在同一目标范围与精度内复用；日期级零点不能替代交节当日指定小时，见下方边界补证。单步大运需要的 `analysis_age` 按工具虚岁合同整理，不能套实岁。
+- 中式全景用 `timing_analysis`，窄层分别为 `dayun_analysis`、`liunian_analysis`、`liuyue_analysis`、`liuri_analysis`、`liushi_analysis`。专项已有 `timing_context` 的大运流年在同一目标范围与精度内复用；日期级零点不能替代交节当日指定小时，见下方边界补证。独立大运默认按目标真实瞬间选运；`analysis_age`只是用户明确给出的年龄参考，不必由助手推算或自套虚岁。
+
+问“当前”时，五个八字时间入口的分析日期分量全部省略，必要时以带时区`as_of`冻结已确认瞬间；不要只补上当前年月而触发旧部分日期的日1／日15规则。读取`analysis_reference`核对完整当地／UTC瞬间、偏移、fold及补齐来源。显式日期的不存在／重复钟时不能猜第一遍；可保持出生时区、用`as_of`表达已确认UTC瞬间。时柱整点标签不能替代交气或交运的完整比较时刻，见[分析瞬间](../../docs/bazi-analysis-instant.md)。
 - 紫微用 `ziwei_horoscope` 的实际 scopes 和动态四化；普通首轮取 `analysis_context`、`birth_context`、`ziwei_horoscope.interpretation_scope/nominal_age/calendar_rules/scopes`。`analysis_context` 须回显目标，出生 context 与目标分开。scopes 整体取回再按本次粒度解释；运限命宫所临本命宫、完整运限其他功能宫、本命宫不能互换，四化优先读实际 `mutagen_natal_links`。已有连接无需再排本命，细则见[紫微专题取证](ziwei-topic-evidence.md)。
 - 西占多层确有价值时用 `western_timing_analysis`；阶段窄问可直接 `firdaria`，年度可选 `profection`，按问题选 `solarreturn`、`lunarreturn`、`transit`，另有 `zr`、`decennials`、`solararc`、`pd`、`pdchart`、`givenyear` 及相关生命周期技法。保留法达实际主／分运、时间线、夜盘顺序和年长口径；不自行换版本找更好的答案。
 - 给定活动时刻用 `astro_election`。先有活动、地点和现实可用候选，不索取无关出生资料；不使用医疗／手术主题，不由个人流日替代活动择时。
+
+## 印占阶段
+
+印占阶段是正常候选之一，详见[印占取证](vedic-evidence.md)。`astro_vimshottari` 支持 Moon-nakshatra 大运／次运、出生剩余运与目标所在规则周期。首次按 `stage` 卡保留目标、年长与真实起止、本命运星上下文；不把一个锚点当全年扫描。它与八字大运、法达各有机制，不合并成总分或事件成功率。
 
 ## 西占首次字段按任务选择
 
@@ -49,6 +55,14 @@
 ## 时间范围与复用
 
 使用已确认日期、时区和目标钟时。西占明确时点传 `analysis_hour/minute` 并核对返回时刻；零点／零分有效，`as_of` 不替代目标钟时。未指定的内部取数锚点仅作定位，不称用户指定或全年全段已审；边界可能影响所问范围时按实际边界分段。
+
+八字只在用户确认出生参考的正负经过分钟范围后传 `birth_time_uncertainty_minutes`，不从省略分秒推定误差区间。读取 `birth_time_sensitivity` 的全部四柱候选、`event_analysis` 未决顺序与未覆盖层。`sample_count` 只计原分钟网格；为0而有 `event_probe_count` 的候选仍有实际派生探针依据，不能忽略，也不能把任一计数说成概率。派生微秒和求根括区间不认证出生记录或物理精度；`dayun_boundary_ranges` 是已核对点的包络，未认证连续极值。只对名义盘作单一解释、把已核对点稳定说成整段稳定，都超出实际结果。
+
+读取 `dayun_event_analysis` 时，名义月进位两侧可能同时读到已起运与尚未起运；按实际返回的 `current_dayun_candidates` 解释。30个名义日与公历月份的长度不同，不能假定边界始终单调，也不能只用分钟点的一致状态覆盖事件探针。大运事件、原本命事件和合并探针数量分别列出，不能相加当作独立观测数。
+
+未来交运的民用钟时若遇跳时，不存在钟时顺延的政策会在跳时结束处产生边界跳变。`dayun_future_civil_gap_end` 是当前分析日附近已加载时区规则的计算逆像，覆盖初始、内部及已配置末期边界；它不保证未来时区法律或全部连续状态。读取 `future_clock_scan` 与 `unresolved_cells`，保留全部候选及其 `period`；`before_dayun` 解释为尚未起运，`beyond_calculation` 解释为超出已配置期数，不能解读为寿命或死亡。
+
+`dayun_analysis_moment` 核对实际分析时刻的边界逆像；`dayun_decade_leap_clip` 核对十年加年时2月29日裁成2月28日的回跳；`dayun_future_civil_fold_end` 核对采用较早重复钟时时，回拨结束处的边界跳变。只解释实际返回的事件及候选，回拨事件存在不必新增候选，也不能将探针包络称为连续极值。当前分析日之外的未来钟时事件仍未完整覆盖；各层未决与物理精度限制继续保留。
 
 ### 日期级锚点与交界补证
 

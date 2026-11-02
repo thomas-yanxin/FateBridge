@@ -9,11 +9,17 @@
 """
 
 import math
-from datetime import datetime, timedelta
+from calendar import isleap
+from copy import deepcopy
+from datetime import datetime, timedelta, timezone
 from functools import lru_cache
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple, cast
+
+from dateutil.relativedelta import relativedelta
+from dateutil.tz import resolve_imaginary
 
 from fatebridge.utils.birth_input import normalize_gender
+from fatebridge.utils.timezones import validate_local_clock
 
 from ..utils.data import (
     EARTHLY_BRANCHES,
@@ -31,25 +37,24 @@ from .almanac import (
     get_bazi_month_boundaries,
     get_bazi_month_context,
     get_bazi_year,
+    get_solar_term_environment_key,
     get_solar_terms_for_year,
     localize_datetime,
+    require_calculated_solar_term,
 )
 from .calendar import BaZiCalendar, resolve_bazi_effective_date
 
 
 def _copy_timing_info(info: Dict) -> Dict:
-    """Detach the cached scalar payload and its solar-term dictionaries.
+    """Detach the cached scalar payload and all nested solar-term metadata.
 
-    The cache builders below own this shape: only ``solar_term_window`` and
-    its two term records are mutable containers. Copy those explicitly rather
-    than traversing every immutable scalar with ``deepcopy`` on each hit.
+    The window contains model dictionaries and lists below its term records.
+    Copy the entire window so caller edits cannot corrupt subsequent hits.
+    The remaining cache-owned fields are immutable scalars.
     """
     result = info.copy()
     if "solar_term_window" in info:
-        window = info["solar_term_window"].copy()
-        window["start_term"] = window["start_term"].copy()
-        window["next_term"] = window["next_term"].copy()
-        result["solar_term_window"] = window
+        result["solar_term_window"] = deepcopy(info["solar_term_window"])
     return result
 
 
@@ -60,6 +65,7 @@ def _calculate_liuyue_cached(
     target_day: int,
     timezone_name: str,
     target_date: Optional[datetime],
+    _solar_environment: Tuple[Any, ...] = (),
 ) -> Dict:
     """Cache deterministic liuyue calculations for repeated timing analysis."""
     effective_target_date = target_date or datetime(
@@ -130,6 +136,7 @@ def _calculate_liushi_cached(
 def _calculate_liuri_cached(
     target_date: datetime,
     timezone_name: str,
+    _solar_environment: Tuple[Any, ...] = (),
 ) -> Dict:
     """Cache deterministic liuri calculations for repeated timeline analysis.
 
@@ -191,6 +198,9 @@ def _calculate_liuri_cached(
     }
 
 
+DEFAULT_DAYUN_PERIODS = 12
+
+
 class TimingAnalysis:
     """
     时运分析工具类，负责计算和分析八字中的时间运势变化
@@ -248,16 +258,168 @@ class TimingAnalysis:
         )
         target_term = next_term if forward_direction else start_term
         delta_days = abs(elapsed_days_between(local_birth_date, target_term.moment))
-        start_age_precise = round(delta_days / 3, 2)
+        start_age_unrounded = delta_days / 3
+        start_age_precise = round(start_age_unrounded, 2)
 
         return {
             "forward_direction": forward_direction,
             "year_stem": year_stem,
             "reference_term": target_term.as_dict(),
+            "reference_term_resolution": target_term.resolution_provider,
             "days_to_boundary": round(delta_days, 4),
             "start_age_precise": start_age_precise,
-            "start_age_rounded": max(1, math.ceil(start_age_precise)),
+            "start_age_unrounded": start_age_unrounded,
+            # Integer display policy; the actual timeline uses the raw age.
+            # Two-decimal rounding first can erase a crossed integer age.
+            "start_age_rounded": max(1, math.ceil(start_age_unrounded)),
+            "elapsed_seconds": delta_days * 86400,
+            "elapsed_scale": "nominal_utc_label_seconds",
+            "leap_second_policy": "not_counted",
         }
+
+    @staticmethod
+    def _dayun_calendar_wall_context(
+        birth_date: datetime,
+        gender: Optional[str],
+        timezone_name: str,
+    ) -> Tuple[datetime, Dict, datetime, Dict[str, int]]:
+        """Keep the existing wall-start arithmetic shared with event inverses."""
+        birth = localize_datetime(birth_date, timezone_name)
+        details = TimingAnalysis.calculate_dayun_start_details(
+            birth, gender, timezone_name
+        )
+        nominal_us = round(details["elapsed_seconds"] * 120 * 1_000_000)
+        day_us = 86400 * 1_000_000
+        years, remainder = divmod(nominal_us, 360 * day_us)
+        months, remainder = divmod(remainder, 30 * day_us)
+        days, remainder = divmod(remainder, day_us)
+        wall_birth = birth.replace(tzinfo=None)
+        start_wall = wall_birth + relativedelta(
+            years=years, months=months, days=days, microseconds=remainder
+        )
+        offset = {
+            "years": years,
+            "months": months,
+            "days": days,
+            "microseconds": remainder,
+        }
+        return birth, details, start_wall, offset
+
+    @staticmethod
+    def _dayun_wall_year_preimages(
+        boundary_wall: datetime, year_offset: int
+    ) -> Tuple[datetime, ...]:
+        """Invert decade year addition, retaining both leap-day preimages."""
+        if boundary_wall.tzinfo is not None:
+            raise ValueError("大运年份逆像需要未附民用时区的钟面标签")
+        year = boundary_wall.year - year_offset
+        if not 1 <= year <= 9999:
+            return ()
+        try:
+            targets = [boundary_wall.replace(year=year)]
+        except ValueError:
+            return ()
+        if (
+            boundary_wall.month == 2
+            and boundary_wall.day == 28
+            and not isleap(boundary_wall.year)
+            and isleap(year)
+        ):
+            targets.append(boundary_wall.replace(year=year, day=29))
+        return tuple(targets)
+
+    @staticmethod
+    def calculate_dayun_timeline(
+        birth_date: datetime,
+        gender: Optional[str],
+        month_pillar: tuple[str, str],
+        timezone_name: str = DEFAULT_TIMEZONE,
+        periods: int = DEFAULT_DAYUN_PERIODS,
+    ) -> Dict:
+        """Calendar boundaries under an explicit three-days/one-year policy.
+
+        The traditional 360-day conversion gives years/months/days, which are
+        added to the civil birth clock in one calendar operation. It is neither
+        a fixed tropical-year duration nor an integer-birthday selector.
+        """
+        # One nominal UTC-label birth-to-jie second becomes 120 offset seconds.
+        # Leap seconds are excluded by the disclosed elapsed-time policy.
+        # Keep all precision until the final microsecond representation.
+        birth, details, start_wall, calendar_offset = (
+            TimingAnalysis._dayun_calendar_wall_context(
+                birth_date, gender, timezone_name
+            )
+        )
+        initial_fold_adjusted = False
+
+        def civil_boundary(year_offset: int) -> datetime:
+            nonlocal initial_fold_adjusted
+            resolved, adjusted = TimingAnalysis._resolve_dayun_calendar_boundary(
+                birth, start_wall, year_offset, timezone_name
+            )
+            initial_fold_adjusted = initial_fold_adjusted or adjusted
+            return resolved
+
+        initial_boundary = civil_boundary(0)
+        sequence = TimingAnalysis.calculate_dayun_sequence(
+            month_pillar[0],
+            month_pillar[1],
+            gender,
+            details["year_stem"],
+            periods=periods,
+            start_age=details["start_age_unrounded"],
+        )
+        for index, item in enumerate(sequence):
+            item["start_at"] = (
+                initial_boundary if index == 0 else civil_boundary(index * 10)
+            ).isoformat()
+            item["end_at"] = civil_boundary((index + 1) * 10).isoformat()
+        return {
+            "method_id": "three_days_one_year_calendar_v1",
+            "timezone": timezone_name,
+            "birth_at": birth.isoformat(),
+            "start_at": initial_boundary.isoformat(),
+            "start_details": details,
+            "calendar_offset": calendar_offset,
+            "boundary_policy": "start_inclusive_end_exclusive",
+            "calendar_policy": "360_nominal_days_to_year_30_to_month_then_civil_addition",
+            "dst_policy": (
+                "fold_0_gap_forward_initial_not_before_birth"
+                if initial_fold_adjusted
+                else "fold_0_gap_forward"
+            ),
+            "reference_policy": "next_jie_strict_for_forward_previous_jie_inclusive_for_reverse",
+            "source": {
+                "title": "三命通会·卷二·论大运",
+                "url": "https://zh.wikisource.org/zh-hant/三命通會/卷二#論大運",
+            },
+            "scope": "三日一年及十年一运为传统规则；公历加法、秒级延拓和DST处理是工程约定。边界精度受出生时间和节气精度限制，覆盖期数不是寿命估计。",
+            "periods": sequence,
+        }
+
+    @staticmethod
+    def _resolve_dayun_calendar_boundary(
+        birth: datetime, start_wall: datetime, year_offset: int, timezone_name: str
+    ) -> Tuple[datetime, bool]:
+        """Shared existing year-clipping/fold policy for timelines and inverses."""
+        wall = start_wall + relativedelta(years=year_offset)
+        local = localize_datetime(wall, timezone_name).replace(fold=0)
+        resolved = cast(
+            datetime,
+            resolve_imaginary(local).astimezone(timezone.utc).astimezone(birth.tzinfo),
+        )
+        if year_offset == 0 and resolved.astimezone(timezone.utc) < birth.astimezone(
+            timezone.utc
+        ):
+            later = wall.replace(tzinfo=birth.tzinfo, fold=1)
+            instant = later.astimezone(timezone.utc)
+            roundtrip = instant.astimezone(birth.tzinfo)
+            if roundtrip.replace(tzinfo=None) == wall and instant >= birth.astimezone(
+                timezone.utc
+            ):
+                return cast(datetime, roundtrip), True
+            raise ValueError("首运边界不能早于已确认的出生时刻")
+        return resolved, False
 
     @staticmethod
     def calculate_dayun_sequence(
@@ -404,7 +566,17 @@ class TimingAnalysis:
                 target_month,
                 target_day,
                 timezone_name,
-                target_date,
+                (
+                    target_date.astimezone(timezone.utc)
+                    if target_date is not None and target_date.utcoffset() is not None
+                    else target_date
+                ),
+                get_solar_term_environment_key(
+                    year=localize_datetime(
+                        target_date or datetime(target_year, target_month, target_day),
+                        timezone_name,
+                    ).year
+                ),
             )
         )
 
@@ -417,14 +589,22 @@ class TimingAnalysis:
         将节气切换点规范到外部接口可复现的最早分钟锚点。
 
         FastMCP / REST 当前只暴露到小时、分钟精度，因此时间轴里的
-        analysis_anchor 需要落在“节气发生后的第一个整分钟”，这样调用方
-        可以直接把该锚点回放到专项分析工具，而不会因秒级偏移产生歧义。
+        analysis_anchor 需要落在节气后最早可接受的无歧义整分钟。
+        重复区间不能用现有分钟字段和IANA名称区分fold，跳过重复或不存在
+        的钟时，避免给出无法回放的锚点。锚点不是节气本身的天文时刻。
         """
         local_moment = localize_datetime(moment, timezone_name)
-        anchor = local_moment.replace(second=0, microsecond=0)
-        if anchor <= local_moment:
+        anchor = local_moment.replace(second=0, microsecond=0) + timedelta(minutes=1)
+        instant = local_moment.astimezone(timezone.utc)
+        while True:
+            try:
+                validate_local_clock(anchor)
+            except ValueError:
+                anchor += timedelta(minutes=1)
+                continue
+            if anchor.astimezone(timezone.utc) > instant:
+                return anchor
             anchor += timedelta(minutes=1)
-        return anchor
 
     @staticmethod
     def calculate_liuyue_timeline(
@@ -453,6 +633,8 @@ class TimingAnalysis:
                 if index + 1 < len(current_year_terms)
                 else next_year_terms[0]
             )
+            require_calculated_solar_term(start_term)
+            require_calculated_solar_term(next_term)
             anchor = TimingAnalysis._next_supported_analysis_anchor(
                 start_term.moment,
                 timezone_name=timezone_name,
@@ -469,8 +651,10 @@ class TimingAnalysis:
                     "order": index + 1,
                     "analysis_anchor": anchor.strftime("%Y-%m-%d %H:%M:%S"),
                     "gregorian_window": {
-                        "start": start_term.moment.strftime("%Y-%m-%d %H:%M:%S"),
-                        "end": next_term.moment.strftime("%Y-%m-%d %H:%M:%S"),
+                        "start": start_term.moment.replace(tzinfo=None).isoformat(
+                            sep=" "
+                        ),
+                        "end": next_term.moment.replace(tzinfo=None).isoformat(sep=" "),
                         "days": round(
                             elapsed_days_between(start_term.moment, next_term.moment),
                             4,
@@ -492,7 +676,19 @@ class TimingAnalysis:
         """
         计算指定时点的流日干支。
         """
-        return _copy_timing_info(_calculate_liuri_cached(target_date, timezone_name))
+        return _copy_timing_info(
+            _calculate_liuri_cached(
+                (
+                    target_date.astimezone(timezone.utc)
+                    if target_date.utcoffset() is not None
+                    else target_date
+                ),
+                timezone_name,
+                get_solar_term_environment_key(
+                    year=localize_datetime(target_date, timezone_name).year
+                ),
+            )
+        )
 
     @staticmethod
     def calculate_liushi(
@@ -596,6 +792,7 @@ class TimingAnalysis:
         for index, term in enumerate(
             get_solar_terms_for_year(target_year, timezone_name)
         ):
+            require_calculated_solar_term(term)
             anchor = TimingAnalysis._next_supported_analysis_anchor(
                 term.moment,
                 timezone_name=timezone_name,
@@ -783,71 +980,22 @@ class TimingAnalysis:
         Returns:
             吉凶分析结果
         """
-        fortune_score = 0
-        fortune_factors = []
-
-        # 基于十神关系评分
-        shishen_scores = {
-            "比肩": 0,
-            "劫财": -1,
-            "食神": 2,
-            "伤官": -1,
-            "正财": 1,
-            "偏财": 1,
-            "正官": 1,
-            "七杀": -2,
-            "正印": 2,
-            "偏印": -1,
-        }
-
-        stem_score = shishen_scores.get(stem_shishen, 0)
-        fortune_score += stem_score
-        fortune_factors.append(
-            f"十神{stem_shishen}: {'+' if stem_score >= 0 else ''}{stem_score}分"
-        )
-
-        # 基于地支关系评分
-        for relation in branch_relations:
-            if relation["type"] == "六冲":
-                fortune_score -= 2
-                fortune_factors.append(f"{relation['description']}: -2分")
-            elif relation["type"] == "六合":
-                fortune_score += 2
-                fortune_factors.append(f"{relation['description']}: +2分")
-
-        # 基于纳音属性评分（简化处理）
-        nayin = liuyue_info["nayin"]
-        if "金" in nayin:
-            nayin_desc = "金类纳音，主收敛、坚毅"
-        elif "木" in nayin:
-            nayin_desc = "木类纳音，主生发、创新"
-        elif "水" in nayin:
-            nayin_desc = "水类纳音，主智慧、灵活"
-        elif "火" in nayin:
-            nayin_desc = "火类纳音，主热情、积极"
-        elif "土" in nayin:
-            nayin_desc = "土类纳音，主稳重、务实"
-        else:
-            nayin_desc = "纳音属性平和"
-
-        # 判断总体吉凶
-        if fortune_score >= 3:
-            overall_fortune = "大吉"
-        elif fortune_score >= 1:
-            overall_fortune = "小吉"
-        elif fortune_score >= -1:
-            overall_fortune = "平"
-        elif fortune_score >= -3:
-            overall_fortune = "小凶"
-        else:
-            overall_fortune = "大凶"
-
+        # A ten-god name or a combine/clash table hit alone cannot establish
+        # favourability. Preserve the old keys with an explicit null score.
         return {
-            "fortune_score": fortune_score,
-            "fortune_factors": fortune_factors,
-            "overall_fortune": overall_fortune,
-            "nayin_description": nayin_desc,
-            "detailed_analysis": f"{scope_label}运势{overall_fortune}，总分{fortune_score}分",
+            "method_id": "context_required_no_fortune_score_v1",
+            "assessment_status": "context_required",
+            "fortune_score": None,
+            "fortune_factors": [f"天干十神：{stem_shishen}"]
+            + [relation["description"] for relation in branch_relations],
+            "overall_fortune": "未判定",
+            "nayin_description": f"纳音{liuyue_info['nayin']}仅作传统分类，不参与吉凶判断",
+            "detailed_analysis": f"{scope_label}关系已列出；未完成原局喜忌与制化核验，不作吉凶定级",
+            "required_context": [
+                "原局用神与相神",
+                "旺衰及根气",
+                "会合能否成立及制化救应",
+            ],
         }
 
     @staticmethod
@@ -857,54 +1005,14 @@ class TimingAnalysis:
         fortune_analysis: Dict,
         scope_label: str = "本阶段",
     ) -> List[str]:
-        """
-        生成流月运势建议
-
-        Args:
-            stem_shishen: 天干十神关系
-            branch_relations: 地支关系
-            fortune_analysis: 吉凶分析
-
-        Returns:
-            建议列表
-        """
-        suggestions = []
-
-        # 基于十神关系的建议
-        shishen_suggestions = {
-            "比肩": "适合团队合作，与同行交流",
-            "劫财": "注意财务管理，避免冲动消费",
-            "食神": "发挥创造力，展现才华的好时机",
-            "伤官": "注意言行，避免与人发生冲突",
-            "正财": "财运不错，适合投资理财",
-            "偏财": "偏财运佳，但需谨慎决策",
-            "正官": "工作运势良好，适合求职晋升",
-            "七杀": "面临压力挑战，需谨慎应对",
-            "正印": "学习运佳，适合进修充电",
-            "偏印": "思维活跃但易多变，需专注",
-        }
-
-        if stem_shishen in shishen_suggestions:
-            suggestions.append(shishen_suggestions[stem_shishen])
-
-        # 基于地支关系的建议
-        has_conflict = any(r["type"] == "六冲" for r in branch_relations)
-        has_combination = any(r["type"] == "六合" for r in branch_relations)
-
-        if has_conflict:
-            suggestions.append(f"{scope_label}有冲克之象，宜静不宜动，避免重大决策")
-        if has_combination:
-            suggestions.append(f"{scope_label}有合化之象，人际关系和谐，适合合作")
-
-        # 基于总体运势的建议
-        overall_fortune = fortune_analysis["overall_fortune"]
-        if overall_fortune in ["大吉", "小吉"]:
-            suggestions.append("运势良好，可积极进取，把握机会")
-        elif overall_fortune == "平":
-            suggestions.append("运势平稳，保持现状，稳中求进")
-        else:
-            suggestions.append("运势欠佳，宜保守行事，等待时机")
-
+        """Return a reading aid rather than advice inferred from a bare label."""
+        suggestions = [
+            f"{scope_label}十神{stem_shishen}是关系分类，需结合原局判断其作用。"
+        ]
+        if any(r["type"] == "六冲" for r in branch_relations):
+            suggestions.append("六冲须辨所冲位置及喜忌，不能直接据此否定行动。")
+        if any(r["type"] == "六合" for r in branch_relations):
+            suggestions.append("六合只确认配对，尚未证明合化、助益或现实合作顺利。")
         return suggestions
 
     @staticmethod

@@ -223,9 +223,9 @@ def calculate_nongli_time(
             "ad": ad,
         },
         "analysis_context": {
-            "input_datetime": input_datetime.strftime("%Y-%m-%d %H:%M:%S"),
-            "corrected_datetime": corrected_datetime.strftime("%Y-%m-%d %H:%M:%S"),
-            "effective_datetime": analysis_datetime.strftime("%Y-%m-%d %H:%M:%S"),
+            "input_datetime": input_datetime.isoformat(sep=" "),
+            "corrected_datetime": corrected_datetime.isoformat(sep=" "),
+            "effective_datetime": analysis_datetime.isoformat(sep=" "),
             "time_algorithm": time_algorithm_label,
             "longitude": effective_longitude,
             "total_correction_minutes": round(total_correction_minutes, 2),

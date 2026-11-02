@@ -1,0 +1,580 @@
+{
+  "call_guidance": {
+    "depth": "evidence_chain按星位、根气与条件取证；structure_checks只审有限前提，formation_status=not_adjudicated不能解释成已成格。topic.timing使用实际生效柱，不是全年扫描；未知性别保留传统选星分支。",
+    "evidence": "首次按问题选evidence_views.direction/target_year；默认视图保留完整十神权重、并列与作用域，primary只作兼容首标签，不表示显著占优。",
+    "patterns": "career_structure/entrepreneurship中的共现标签为heuristic_candidate_only；按rule_signals.trigger、unverified_conditions解释，分数及level不认证古典成格或现实能力。",
+    "target_clock": "日期级专项固定出生时区的本地零点，timing_context回显analysis_datetime、timezone和boundary_status；交节当日涉及钟时才按实际目标用timing_analysis补证，不以已有流年阻止必要补证。"
+  },
+  "evidence_views": {
+    "bureau_season_reference": {
+      "fields": [
+        "career_analysis.evidence_chain.bureau_season_reference"
+      ],
+      "when": "区分同次月支本气、寅卯辰等季支归组与实际相位旺门槛；保留门槛不一致及未运行状态，不据归组宣称已合化、改旺衰或分钟换柱。"
+    },
+    "calendar_basis": {
+      "fields": [
+        "career_analysis.calendar_context"
+      ],
+      "when": "复核同次出生历法、节气来源与实际星历模型；提供者状态不等于天文精度或原典认证。"
+    },
+    "candidate_selection": {
+      "fields": [
+        "career_analysis.evidence_chain.candidate_selection",
+        "career_analysis.evidence_chain.month_command",
+        "career_analysis.evidence_chain.ten_gods"
+      ],
+      "when": "核对月令本气与所选取神、印用杀/杀用印/伤官用杀印等原典路径及缺少的力量条件；共现或旧优先级不认证成格、兼格或相神。"
+    },
+    "carriers": {
+      "fields": [
+        "career_analysis.timing_context.analysis_datetime",
+        "career_analysis.evidence_chain.topic.timing.pillar_carriers",
+        "career_analysis.evidence_chain.topic.timing.carrier_source",
+        "career_analysis.evidence_chain.topic.timing.carrier_scope"
+      ],
+      "when": "同一目标日期核对大运与流年的本柱承载和原局外援，喜干与喜支分别读条件；未知性别时不补造大运，不以承载条件判断吉凶或合化。"
+    },
+    "clash_reasoning": {
+      "fields": [
+        "career_analysis.evidence_chain.strength_context.strength_level",
+        "career_analysis.evidence_chain.strength_context.method_id",
+        "career_analysis.evidence_chain.strength_context.clash_comparison"
+      ],
+      "when": "核对六冲为什么采用某保留系数、合解冲或四墓土分支；读取同次初始藏干预算与未参与因素。工程冲力代理不等于原典有效根力、拔根或吉凶裁定。"
+    },
+    "classical_routes": {
+      "fields": [
+        "career_analysis.evidence_chain.classical_routes",
+        "career_analysis.evidence_chain.month_command",
+        "career_analysis.evidence_chain.ten_gods"
+      ],
+      "when": "按所选月令核对生克合、财印隔位、同根及透藏条件；只支持有限路径观察，不认证全局成格。"
+    },
+    "depth": {
+      "fields": [
+        "career_analysis.evidence_chain",
+        "career_analysis.timing_context"
+      ],
+      "when": "核对星位、根气、格局前提与目标日期大运流年触点；保留不满足和未裁定条件。"
+    },
+    "direction": {
+      "fields": [
+        "career_analysis.interpretation_scope",
+        "career_analysis.dominant_ten_gods",
+        "career_analysis.career_structure",
+        "career_analysis.entrepreneurship",
+        "career_analysis.suggestions",
+        "career_analysis.evidence_chain.method_id",
+        "career_analysis.evidence_chain.strength_context.strength_level",
+        "career_analysis.evidence_chain.strength_context.method_id",
+        "career_analysis.evidence_chain.strength_context.status",
+        "career_analysis.evidence_chain.strength_context.requires_special_structure_review",
+        "career_analysis.evidence_chain.strength_context.candidate_strengths",
+        "career_analysis.evidence_chain.strength_context.root_effect_policy",
+        "career_analysis.evidence_chain.strength_context.root_qualifications",
+        "career_analysis.evidence_chain.strength_context.storage_movement_effects",
+        "career_analysis.evidence_chain.strength_context.stem_energy_accounting.method_id",
+        "career_analysis.evidence_chain.strength_context.stem_energy_accounting.arithmetic_policy",
+        "career_analysis.evidence_chain.strength_context.stem_energy_accounting.conversion_policy",
+        "career_analysis.evidence_chain.topic.first_view"
+      ],
+      "when": "工作方向、职责或创业角色比较，保留并列、计权口径及启发式条件；不展开未问行业。 保留旺衰、根气与关系依据及能量算法摘要；逐项未取整账本见stem_energy深度视图。"
+    },
+    "element_presence": {
+      "fields": [
+        "career_analysis.evidence_chain.element_presence"
+      ],
+      "when": "分别核对含日干的天干、地支本气与全部藏干的实际五行；本气是藏干子集，层间不相加。无、不杂须按原文语境另审，不能把某层缺项推成全局缺失或成格。"
+    },
+    "force_arithmetic": {
+      "fields": [
+        "career_analysis.evidence_chain.strength_context.threshold_arithmetic",
+        "career_analysis.evidence_chain.force_components.engineering_composition",
+        "career_analysis.evidence_chain.force_components.classical_adjudication"
+      ],
+      "purpose": "核对同次精确身印工程预算、保留浮点比较及未裁定的原典身印力量；精确预算相等不认证身印等力。"
+    },
+    "force_components": {
+      "fields": [
+        "career_analysis.evidence_chain.force_components",
+        "career_analysis.evidence_chain.strength_context",
+        "career_analysis.evidence_chain.classical_root_profile",
+        "career_analysis.evidence_chain.ten_gods"
+      ],
+      "when": "身、印、食伤、财、官杀分列；原局藏根与同次工程能量分开，不能由身印总量裁定原典身重印重。"
+    },
+    "force_roots": {
+      "fields": [
+        "career_analysis.evidence_chain.force_components.source_root_observations",
+        "career_analysis.evidence_chain.force_components.classical_adjudication",
+        "career_analysis.evidence_chain.classical_root_profile.life_stage_profile"
+      ],
+      "when": "逐干比较身、印等原局根类与冲的位置；不按身印合计或有冲即无根裁定力量。"
+    },
+    "from_child": {
+      "fields": [
+        "career_analysis.evidence_chain.from_child_reference"
+      ],
+      "when": "核对任注顺局从儿的月柱食伤、食伤分布、财星与印官阻碍；从儿不以普通身弱为前提，可观察筛选不证明成格。符合筛选时普通扶抑只列条件参考，继续核对力量、承接及救应。"
+    },
+    "hidden_carriers": {
+      "fields": [
+        "career_analysis.evidence_chain.natal_hidden_carriers"
+      ],
+      "when": "核对同柱天干与每个真实藏干的生克，特别是丁丑对丑藏辛财的盖头候选；目标藏干、本气与其他藏干分开。关系不等于实际喜忌、根损或制化效力。"
+    },
+    "hidden_carriers_timing": {
+      "fields": [
+        "career_analysis.timing_context.analysis_datetime",
+        "career_analysis.evidence_chain.topic.timing.pillar_carriers",
+        "career_analysis.evidence_chain.topic.timing.hidden_target_carriers",
+        "career_analysis.evidence_chain.topic.timing.hidden_target_reference"
+      ],
+      "when": "在同一目标时点逐项核对运年柱的真实藏干生克；与公共hidden_target_reference合读来源、方法和效力边界，不能从盖头候选推成全支或实际根损。"
+    },
+    "passage": {
+      "fields": [
+        "career_analysis.evidence_chain.classical_passage.source",
+        "career_analysis.evidence_chain.classical_passage.summary",
+        "career_analysis.evidence_chain.classical_passage.visible_paths",
+        "career_analysis.evidence_chain.classical_passage.principal_hidden_paths",
+        "career_analysis.evidence_chain.classical_passage.scope"
+      ],
+      "when": "先核对透干与本气的生克中介、位置、剩余根和合绊；数量不证明有效通关，不改旺衰。全部藏干、跨层及同柱步骤分别见passage_hidden和passage_mixed。 同次关系条件另读passage_relations；no_binding_recorded不表示条件全清。"
+    },
+    "passage_hidden": {
+      "fields": [
+        "career_analysis.evidence_chain.classical_passage.source",
+        "career_analysis.evidence_chain.classical_passage.nodes",
+        "career_analysis.evidence_chain.classical_passage.all_hidden_paths",
+        "career_analysis.evidence_chain.classical_passage.scope"
+      ],
+      "when": "核对全部藏干的生克中介，本气子集不能代表全部藏干；同柱步骤单列，路径不自动判为有效。"
+    },
+    "passage_mixed": {
+      "fields": [
+        "career_analysis.evidence_chain.classical_passage.source",
+        "career_analysis.evidence_chain.classical_passage.summary",
+        "career_analysis.evidence_chain.classical_passage.mixed_paths",
+        "career_analysis.evidence_chain.classical_passage.scope"
+      ],
+      "when": "核对干支跨层、日支印接日主等实际路径；数组完整保留，较大结果沿同一run分页读取，位置不自动证明有效通关。"
+    },
+    "passage_relations": {
+      "fields": [
+        "career_analysis.evidence_chain.classical_passage.source",
+        "career_analysis.evidence_chain.classical_passage.summary",
+        "career_analysis.evidence_chain.classical_passage_relations"
+      ],
+      "when": "逐项读取同次争合、半合、条件转化与冲刑原回执；透干合和支中根载体分列，零剩余根所在柱仍保留。未提供与已给空列表分开，no_binding_recorded不表示条件全清；不据关系记录认定有效通关。较大结果沿同一run分页读取。"
+    },
+    "root_predicates": {
+      "fields": [
+        "career_analysis.evidence_chain.strength_context.threshold_arithmetic",
+        "career_analysis.evidence_chain.strength_context.strength_level",
+        "career_analysis.evidence_chain.force_components.classical_adjudication",
+        "career_analysis.evidence_chain.month_command.intra_month_duty.status",
+        "career_analysis.evidence_chain.classical_passage.summary"
+      ],
+      "when": "核对实际藏干根预算达到既定单位门槛的精确比较、旧浮点标记及财官结构条件；预算资格不代表有效根力或通关成立。"
+    },
+    "seasonal_conditions": {
+      "fields": [
+        "career_analysis.evidence_chain.seasonal_reference",
+        "career_analysis.evidence_chain.force_components.classical_adjudication",
+        "career_analysis.evidence_chain.month_command.intra_month_duty.status",
+        "career_analysis.evidence_chain.classical_passage.summary"
+      ],
+      "when": "核对所选甲木或丙火原典提要、正文、接引与根的不同语义，以及同次未裁定的身印、司令、通关。旧简表候选保留；不把读过来源当作完成取用。"
+    },
+    "seasonal_reference": {
+      "fields": [
+        "career_analysis.evidence_chain.seasonal_reference"
+      ],
+      "when": "区分旧调候简表、已目校的甲木选段与丙火完整单元、实际干见支藏；全盘取用未裁定，其余96格仍待对应底本校勘。"
+    },
+    "stage_profile": {
+      "fields": [
+        "career_analysis.evidence_chain.classical_root_profile.life_stage_profile",
+        "career_analysis.evidence_chain.classical_root_profile.day_stem",
+        "career_analysis.evidence_chain.classical_root_profile.roots",
+        "career_analysis.evidence_chain.classical_root_profile.source",
+        "career_analysis.evidence_chain.classical_root_profile.global_strength_status"
+      ],
+      "when": "核对十二阶段采用的查表口径、土随火选择及出处；阶段不代替根气、旺衰、司令或有效通关。"
+    },
+    "star_occurrences": {
+      "fields": [
+        "career_analysis.evidence_chain.star_occurrences"
+      ],
+      "when": "逐项实数对照一杀四制、五杀五制、印不透与藏印，日干不作额外支持票；实数不是加权旺衰或制化成败。"
+    },
+    "stem_energy": {
+      "fields": [
+        "career_analysis.evidence_chain.strength_context.strength_level",
+        "career_analysis.evidence_chain.strength_context.method_id",
+        "career_analysis.evidence_chain.strength_context.stem_energy_accounting"
+      ],
+      "when": "逐干核对原字、实际根激活、合绊预算和未舍入能量；成化候选未获原典验收，不能把合绊当已成化或把工程量当现实概率。"
+    },
+    "stem_order": {
+      "fields": [
+        "career_analysis.evidence_chain.strength_context.stem_energy_accounting",
+        "career_analysis.evidence_chain.strength_context.strength_level",
+        "career_analysis.evidence_chain.force_components.classical_adjudication",
+        "career_analysis.evidence_chain.month_command.intra_month_duty.status",
+        "career_analysis.evidence_chain.classical_passage.summary"
+      ],
+      "purpose": "核对所选原典月时五合候选、同次非日干合绊预算及未裁定的身印、司令与通关；不把未记录当作原典不合，不启用数值候选。"
+    },
+    "target_year": {
+      "fields": [
+        "career_analysis.interpretation_scope",
+        "career_analysis.dominant_ten_gods",
+        "career_analysis.career_timing",
+        "career_analysis.timing_context",
+        "career_analysis.career_structure",
+        "career_analysis.entrepreneurship",
+        "career_analysis.suggestions",
+        "career_analysis.evidence_chain.method_id",
+        "career_analysis.evidence_chain.strength_context.strength_level",
+        "career_analysis.evidence_chain.strength_context.method_id",
+        "career_analysis.evidence_chain.strength_context.status",
+        "career_analysis.evidence_chain.strength_context.requires_special_structure_review",
+        "career_analysis.evidence_chain.strength_context.candidate_strengths",
+        "career_analysis.evidence_chain.strength_context.root_effect_policy",
+        "career_analysis.evidence_chain.strength_context.root_qualifications",
+        "career_analysis.evidence_chain.strength_context.storage_movement_effects",
+        "career_analysis.evidence_chain.strength_context.stem_energy_accounting.method_id",
+        "career_analysis.evidence_chain.strength_context.stem_energy_accounting.arithmetic_policy",
+        "career_analysis.evidence_chain.strength_context.stem_energy_accounting.conversion_policy",
+        "career_analysis.evidence_chain.topic.first_view"
+      ],
+      "when": "工作方向与目标年份转职安排，结构与目标锚点一起取；日期锚点不代表全年时间线。 保留旺衰、根气与关系依据及能量算法摘要；逐项未取整账本见stem_energy深度视图。"
+    },
+    "thresholds": {
+      "fields": [
+        "career_analysis.evidence_chain.strength_context.threshold_arithmetic",
+        "career_analysis.evidence_chain.strength_context.strength_level",
+        "career_analysis.evidence_chain.strength_context.method_id",
+        "career_analysis.evidence_chain.strength_context.requires_special_structure_review"
+      ],
+      "purpose": "核对既定工程系数的精确阈值比较、保留浮点原判与最终结构判级；不修改原典标签，不把算术修复当预测准确率。"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "career_analysis.interpretation_scope",
+      "career_analysis.dominant_ten_gods",
+      "career_analysis.career_timing",
+      "career_analysis.timing_context",
+      "career_analysis.career_structure",
+      "career_analysis.entrepreneurship",
+      "career_analysis.suggestions",
+      "career_analysis.evidence_chain.method_id",
+      "career_analysis.evidence_chain.strength_context.strength_level",
+      "career_analysis.evidence_chain.strength_context.method_id",
+      "career_analysis.evidence_chain.strength_context.status",
+      "career_analysis.evidence_chain.strength_context.requires_special_structure_review",
+      "career_analysis.evidence_chain.strength_context.candidate_strengths",
+      "career_analysis.evidence_chain.strength_context.root_effect_policy",
+      "career_analysis.evidence_chain.strength_context.root_qualifications",
+      "career_analysis.evidence_chain.strength_context.storage_movement_effects",
+      "career_analysis.evidence_chain.strength_context.stem_energy_accounting.method_id",
+      "career_analysis.evidence_chain.strength_context.stem_energy_accounting.arithmetic_policy",
+      "career_analysis.evidence_chain.strength_context.stem_energy_accounting.conversion_policy",
+      "career_analysis.evidence_chain.topic.first_view"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "analysis_day": {
+        "anyOf": [
+          {
+            "maximum": 31,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis day (1-31)"
+      },
+      "analysis_month": {
+        "anyOf": [
+          {
+            "maximum": 12,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis month (1-12)"
+      },
+      "analysis_year": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis year (defaults to current year)"
+      },
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "birth_day": {
+        "description": "Birth day (1-31)",
+        "maximum": 31,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "birth_hour": {
+        "description": "Birth hour (0-23)",
+        "maximum": 23,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_longitude": {
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth longitude (optional)"
+      },
+      "birth_minute": {
+        "default": 0,
+        "description": "Birth minute (0-59)",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "birth_month": {
+        "description": "Birth month (1-12)",
+        "maximum": 12,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "birth_place": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "Birth place (optional)"
+      },
+      "birth_second": {
+        "anyOf": [
+          {
+            "maximum": 59,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "已知出生秒数0–59；提供时必须显式提供birth_minute。未知请省略或传null；沿用00秒作为兼容计算参考，并返回省略分量说明，不代表已知出生在整分、不推定误差区间或记录精度。不接受闰秒60。"
+      },
+      "birth_timezone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Birth timezone (IANA name or UTC offset)"
+      },
+      "birth_utc_offset": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "已确认的出生民用UTC偏移，格式±HH:MM或±HH:MM:SS；用于消歧重复钟时。必须与解析出的birth_timezone在该钟时的规则一致；不据此猜测时区，不替未知的重复小时选边，不能使跳过的钟时有效。保留原IANA时区用于后续交运边界；不认证出生记录精度。未知请省略或传null。"
+      },
+      "birth_year": {
+        "description": "Birth year (1900–2100, the existing individual-birth service range)",
+        "maximum": 2100,
+        "minimum": 1900,
+        "type": "integer"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "dayun_pillar": {
+        "anyOf": [
+          {
+            "maxLength": 2,
+            "minLength": 2,
+            "pattern": "^(?:甲子|乙丑|丙寅|丁卯|戊辰|己巳|庚午|辛未|壬申|癸酉|甲戌|乙亥|丙子|丁丑|戊寅|己卯|庚辰|辛巳|壬午|癸未|甲申|乙酉|丙戌|丁亥|戊子|己丑|庚寅|辛卯|壬辰|癸巳|甲午|乙未|丙申|丁酉|戊戌|己亥|庚子|辛丑|壬寅|癸卯|甲辰|乙巳|丙午|丁未|戊申|己酉|庚戌|辛亥|壬子|癸丑|甲寅|乙卯|丙辰|丁巳|戊午|己未|庚申|辛酉|壬戌|癸亥)$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional override: exactly one valid sexagenary pillar, e.g. '甲子'"
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "gender": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未知",
+        "description": "性别（可选但建议提供：影响大运顺逆排布与部分六亲判断）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法。"
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "liunian_pillar": {
+        "anyOf": [
+          {
+            "maxLength": 2,
+            "minLength": 2,
+            "pattern": "^(?:甲子|乙丑|丙寅|丁卯|戊辰|己巳|庚午|辛未|壬申|癸酉|甲戌|乙亥|丙子|丁丑|戊寅|己卯|庚辰|辛巳|壬午|癸未|甲申|乙酉|丙戌|丁亥|戊子|己丑|庚寅|辛卯|壬辰|癸巳|甲午|乙未|丙申|丁酉|戊戌|己亥|庚子|辛丑|壬寅|癸卯|甲辰|乙巳|丙午|丁未|戊申|己酉|庚戌|辛亥|壬子|癸丑|甲寅|乙卯|丙辰|丁巳|戊午|己未|庚申|辛酉|壬戌|癸亥)$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Optional override: exactly one valid sexagenary pillar, e.g. '丙寅'"
+      },
+      "name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未提供",
+        "description": "姓名（可选，仅用于结果快照中的标识，不参与计算）"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "use_true_solar_time": {
+        "default": true,
+        "description": "Rebase the birth clock onto true solar time (longitude + equation of time). Default on in the current software policy; this option does not certify a classical text's clock rule. Set false for the raw civil clock.",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "birth_year",
+      "birth_month",
+      "birth_day",
+      "birth_hour"
+    ],
+    "type": "object"
+  },
+  "tool": "bazi_career"
+}

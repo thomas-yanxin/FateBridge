@@ -12,7 +12,8 @@ from fatebridge.core.requests.astrology import AstroRelativeRequest
 assert not SixYaoRequest.__pydantic_complete__
 assert not AstroRelativeRequest.__pydantic_complete__
 sixyao = SixYaoRequest.model_validate({'date': '2028-01-01', 'time': '00:00:00',
-    'lines': [{'value': 1, 'change': True}]})
+    'lines': [{'value': 1, 'change': True}] + [{'value': 0, 'change': False}] * 5})
+assert len(sixyao.lines) == 6
 assert sixyao.lines[0].value == 1 and sixyao.lines[0].change
 assert 'SixYaoLineRequest' in SixYaoRequest.model_json_schema()['$defs']
 assert 'AstroRelativePartyRequest' in AstroRelativeRequest.model_json_schema()['$defs']

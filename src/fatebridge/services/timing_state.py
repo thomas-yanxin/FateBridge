@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional
 from fatebridge.analysis.life_dimensions import LifeDimensionAnalysis
 from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
 from fatebridge.core.timing import TimingAnalysis
+from fatebridge.core.timing_interactions import analyze_timing_interactions
 from fatebridge.services.birth_context import BirthComputationContext
 
 logger = logging.getLogger(__name__)
@@ -98,6 +99,7 @@ def compute_life_dimensions_for_moment(
                 analysis_age,
                 timezone_name=timezone_name,
                 original_element_counts=birth_context.original_element_counts,
+                analysis_moment=analysis_date,
             )
             dayun_info = (
                 dayun_result.get("dayun_info")
@@ -123,6 +125,9 @@ def serialize_element_effects(element_effects: Dict[str, Any]) -> Dict[str, Any]
     serialized = {
         "overall_effect": element_effects["overall_effect"],
         "element_changes": {},
+        "method_id": element_effects.get("method_id"),
+        "interpretation_scope": element_effects.get("interpretation_scope"),
+        "counting_basis": element_effects.get("counting_basis"),
     }
     for element, change_info in (element_effects.get("element_changes") or {}).items():
         if change_info.get("change") != 0:
@@ -170,6 +175,8 @@ def build_current_timing_state(
         current_age,
         timezone_name=timezone_name,
         original_element_counts=birth_context.original_element_counts,
+        analysis_moment=analysis_date if analysis_age is None else None,
+        allow_missing_gender=True,
     )
     liunian_analysis = TimingEffectsAnalysis.analyze_liunian_effects(
         birth_context.birth_pillars,
@@ -241,6 +248,9 @@ def build_current_timing_state(
         "liuri_analysis": liuri_analysis,
         "liushi_analysis": liushi_analysis,
         "combined_effects": combined_effects,
+        "interaction_analysis": analyze_timing_interactions(
+            birth_context.birth_pillars, combined_timing_pillars
+        ),
         "comprehensive_summary": TimingEffectsAnalysis._generate_comprehensive_summary(
             dayun_analysis,
             liunian_analysis,

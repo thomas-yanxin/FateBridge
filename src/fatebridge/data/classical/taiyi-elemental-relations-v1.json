@@ -1,0 +1,178 @@
+{
+  "author": "FateBridge contributors",
+  "classical_acceptance_passed": false,
+  "classical_author": "王希明；淘金歌图书集成所录本作者未据本段裁定",
+  "id": "taojin_eyes_wuxing_fragment_v1",
+  "interpretation_scope": "原断仅作有条件传统片段；不并入空间同宫关、五将三项或总体胜负；金土相生原例的和解不推广成所有相生必和解；主客为盘内角色，不自动对应用户或对方。",
+  "method_scope": "卷四明言日計納音；此组件仅按淘金歌明列的二目十六神五行比较，不替换成六十甲子日柱纳音，不认证完整日计纳音或其他计法适用。",
+  "real_world_efficacy": "not_tested",
+  "role_scope": "本盘文昌属主、始击属客；金镜卷二在地/在天角色补核卷四本段地目/天目，不能把卷三表头天目一词全局固定为一方。",
+  "source_manifest_sha256": "24ad1335ed9f09a5f1ba83993199e56dca132e09f08989824ad27847d3f65810",
+  "source_title": "金镜卷四推主客相关；图书集成所录淘金歌定胜负",
+  "source_urls": [
+    "https://zh.wikisource.org/wiki/太乙金鏡式經_(四庫全書本)/卷04#推主客相闗法",
+    "https://zh.wikisource.org/wiki/欽定古今圖書集成/博物彙編/藝術典/第687卷#定勝負",
+    "https://commons.wikimedia.org/wiki/File:NCL-06604_太乙金鏡式經.pdf"
+  ],
+  "spirit_elements": [
+    {
+      "element": "水",
+      "position": "子",
+      "source_name": "地主"
+    },
+    {
+      "element": "土",
+      "position": "丑",
+      "source_name": "陽德"
+    },
+    {
+      "element": "土",
+      "position": "艮",
+      "source_name": "和德"
+    },
+    {
+      "element": "木",
+      "position": "寅",
+      "source_name": "呂申"
+    },
+    {
+      "element": "木",
+      "position": "卯",
+      "source_name": "高叢"
+    },
+    {
+      "element": "土",
+      "position": "辰",
+      "source_name": "太陽"
+    },
+    {
+      "element": "木",
+      "position": "巽",
+      "source_name": "太炅"
+    },
+    {
+      "element": "火",
+      "position": "巳",
+      "source_name": "大神"
+    },
+    {
+      "element": "火",
+      "position": "午",
+      "source_name": "大威"
+    },
+    {
+      "element": "土",
+      "position": "未",
+      "source_name": "天道"
+    },
+    {
+      "element": "土",
+      "position": "坤",
+      "source_name": "大武"
+    },
+    {
+      "element": "金",
+      "position": "申",
+      "source_name": "武德"
+    },
+    {
+      "element": "金",
+      "position": "酉",
+      "source_name": "太簇"
+    },
+    {
+      "element": "土",
+      "position": "戌",
+      "source_name": "陰主"
+    },
+    {
+      "element": "金",
+      "position": "乾",
+      "source_name": "陰德"
+    },
+    {
+      "element": "水",
+      "position": "亥",
+      "source_name": "大義"
+    }
+  ],
+  "version": "1.0.0",
+  "worked_examples": [
+    {
+      "guest": {
+        "element": "金",
+        "position": "酉",
+        "source_label": "天目",
+        "source_name": "太蔟"
+      },
+      "id": "jinjing-v4-gaocong-taicu",
+      "main": {
+        "element": "木",
+        "position": "卯",
+        "source_label": "地目",
+        "source_name": "髙叢"
+      },
+      "profile": "jinjing_vol4",
+      "quote": "假令髙叢為地目木神也太蔟為天目金神也金制木此為客闗得主人客勝也",
+      "relation": "guest_controls_main",
+      "source_tendency": "客勝"
+    },
+    {
+      "guest": {
+        "element": "水",
+        "position": "子",
+        "source_label": "天目",
+        "source_name": "地主"
+      },
+      "id": "jinjing-v4-yinzhu-dizhu",
+      "main": {
+        "element": "土",
+        "position": "戌",
+        "source_label": "地目",
+        "source_name": "隂主"
+      },
+      "profile": "jinjing_vol4",
+      "quote": "假令隂主為地目土神也地主為天目水神也土能制水此謂主人闗得客主人勝也",
+      "relation": "main_controls_guest",
+      "source_tendency": "主人勝"
+    },
+    {
+      "guest": {
+        "element": "土",
+        "position": "丑",
+        "source_label": "客目",
+        "source_name": "陽德"
+      },
+      "id": "taojin-gaocong-yangde",
+      "main": {
+        "element": "木",
+        "position": "卯",
+        "source_label": "主目",
+        "source_name": "高叢"
+      },
+      "profile": "taojin",
+      "quote": "假令主目在高叢卯木上，客目在陽德丑土上。木克土，主勝客敗。",
+      "relation": "main_controls_guest",
+      "source_tendency": "主勝客敗"
+    },
+    {
+      "guest": {
+        "element": "土",
+        "position": "丑",
+        "source_label": "客目",
+        "source_name": "陽德"
+      },
+      "id": "taojin-wude-yangde",
+      "main": {
+        "element": "金",
+        "position": "申",
+        "source_label": "主目",
+        "source_name": "武德"
+      },
+      "profile": "taojin",
+      "quote": "若客目在陽德丑土上，主目在武。\n​\n\n\n德申金上，金土相生，陰陽和同，戰必和解也。",
+      "relation": "guest_generates_main",
+      "source_tendency": "金土相生，陰陽和同，戰必和解"
+    }
+  ]
+}

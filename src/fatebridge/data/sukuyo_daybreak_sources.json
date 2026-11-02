@@ -1,0 +1,582 @@
+{
+  "source_data": {
+    "id": "named_vinaya_daybreak_comparison_v1",
+    "sources": [
+      {
+        "id": "X0744",
+        "title": "四分律名義標釋",
+        "edition": "CBETA pinned electronic main text; inline notes separately recorded, no new printed or manuscript collation",
+        "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/X/X44/X44n0744.xml",
+        "sha256": "ae88ebd75dad749fc0b958ef49e6402ad638ace743b35617cdfea169fe5c8949",
+        "bytes": 3415725,
+        "capture_file": "X0744.xml",
+        "windows": {
+          "dawn": {
+            "locator": "X0744_0466b17-0466c03",
+            "main_literal": "明相梵語阿樓那。善見云。阿留那者。漢言明相。明了論云。東方已赤。通慧指歸云。此方。約日未出前二刻為曉。此為明相也。又以觀見掌文為限也。十誦律。名地了時。謂見地色。分了故也。薩婆多論云。外國明相。有種種名。婆羅門。名日請。諸富貴人。名易。諸山胡。名却沙。種作人。名種作時。捕魚人。名顯。如是諸相。盡非明相。但於明相上。作是諸名。復有三種色。若日照閻浮提樹。則有黑色。若照樹葉。則有青色。若過樹。照閻浮提界。則有白色。於三色中。白色為正。",
+            "inline_notes": {
+              "0466c03": [
+                "以此閻浮提地北。有大樹王。名閻浮。日初出時。照彼樹故。故有異色生也"
+              ]
+            }
+          },
+          "time": {
+            "locator": "X0744_0519a12-0519b19",
+            "main_literal": "初中後夜如來聖制。分一夜為三時。西國諸俗。則別為四。此方定為五更。西域記云。時極短者。謂剎那也。百二十剎那。為一呾剎那。六十呾剎那。為一臘縛。三十臘縛。為一牟呼栗多。五十牟呼栗多。為一時。六時合成一日一夜。夜三晝三。居俗日分為八時。晝四夜四。如寄歸傳云。西國大寺。皆有漏水。並是積代君王之所奉施。并給漏子。為眾警時。下以銅盆盛水。上乃銅椀浮內。其椀薄妙。可受二升。孔在下穿。水便上涌。細若鍼許。量時準宜。椀水既盡沉。即便打鼓。始從平旦一椀沉。打鼓一下。兩椀沉。兩下。三椀三下。四椀四下。然後吹螺兩聲。更別打一下。名為一時也。即日東禺矣。更過四椀。同前打四。更復鳴螺。別打兩下。名兩時。即正午也。若聞兩打。則僧徒不食。若見食者。寺法即便驅擯。過午兩時。法亦同爾。夜有四時。與晝相似。總論一日一夜。成八時也。若初夜盡時。其知事人。則於寺上閣。鳴鼓以警眾。此是那蘭陀寺漏法。又日將沒時。及天曉時。皆於門前打鼓一通。斯等雜任。皆是淨人。及戶人所作。日沒之後。乃至天光。大眾全無鳴揵椎法。凡打揵椎。不使淨人。皆維那自打。其餘諸寺漏。或有從日至中。椀沉十六。亦有銅釜盛水。穿孔下流。水盡之時。即便打鼓。一盡一打。四椎至中。齊暮還然。夜同斯八。總成十六。由斯漏故。縱使重雲闇晝。長無惑午之辰。密雨連宵。終罕疑更之夜。其漏器法。然須先取晝夜停時。旦至午時。八椀沉沒。如其減八。鑽孔令大。調停節數。還須巧匠。若日夜漸短。即可增其半抄。若日夜漸長。復須減其半酌。然以消息為度。維那。若房設小盃。準理亦應無過。然而東夏五更。西方四節。調御之教。但列三時。謂分一夜為三分也。初分。後分。念誦思惟。處中一時。繫心而睡。無病乖此。更招違教之愆。敬而奉行。卒有自他之",
+            "inline_notes": {}
+          }
+        },
+        "new_independent_historical_measurement": false
+      },
+      {
+        "id": "T2131",
+        "title": "翻譯名義集",
+        "edition": "CBETA pinned electronic main text; inline notes separately recorded, no new printed or manuscript collation",
+        "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T54/T54n2131.xml",
+        "sha256": "9094078afad441c2fb0b48cb32a9e5e190895e1d0218a597e8760683c6816a58",
+        "bytes": 2209193,
+        "capture_file": "T2131.xml",
+        "windows": {
+          "aruna": {
+            "locator": "T2131_1093b22-1093c04",
+            "main_literal": "【阿留那】或阿樓那，或云薩埵，漢言明相。《明了論》云：「東方已赤。」通慧《指歸》云：「此方約日未出前二刻為曉，此為明相也。以觀見掌文為限，是四分明。又別宗名地了時，謂見地色分了故。」又云：日出映閻浮樹色，名明相。《虛空藏經》云：「是初行菩薩，明星出時，從座而起，向於明星，說如是言：『南無阿嘍那！成就大悲。今者初出閻浮提，願以大悲覆護，我以言說白大悲虛空藏菩薩，於夜夢中示我方便，以是緣故，得悔所犯根本重罪。』」翻譯名義集第二",
+            "inline_notes": {}
+          }
+        },
+        "new_independent_historical_measurement": false
+      },
+      {
+        "id": "T1440",
+        "title": "薩婆多毘尼毘婆沙",
+        "edition": "CBETA pinned electronic main text; inline notes separately recorded, no new printed or manuscript collation",
+        "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T23/T23n1440.xml",
+        "sha256": "e3e863f58974c673fc63dc95bf66549b88a26b1efe16b30d341b5c794c9c2447",
+        "bytes": 1018907,
+        "capture_file": "T1440.xml",
+        "windows": {
+          "robe_dawn": {
+            "locator": "T1440_0529b06-0529b18",
+            "main_literal": "善神所護，是以為檀越故，通聚落結也。若結大界，僧應盡集，不得與欲。著上下衣遊行諸國者，上衣欝多羅僧，下衣安陀會。一夜者，又云：但以色陰晝夜，以明曉為晝、黑冥為夜。又云：以五陰為晝夜。日沒者，若日過閻浮提界，名日沒。明相者，有種種異名。有三種色，若日照閻浮提樹則有黑色，若照樹葉則有青色，若過樹照閻浮提界則有白色。於三色中白色為正。離衣宿至明相出，尼薩耆波逸提。或有捨衣不得罪，如比丘出界至他處宿，借衣受持，過地了時捨衣還他，是謂捨衣無罪。或有得罪不捨衣，如比丘出界至他處宿，借衣受，持過地了時即還他衣，不說捨",
+            "inline_notes": {}
+          }
+        },
+        "new_independent_historical_measurement": false
+      },
+      {
+        "id": "T2087",
+        "title": "大唐西域記",
+        "edition": "CBETA pinned electronic main text; inline notes separately recorded, no new printed or manuscript collation",
+        "url": "https://raw.githubusercontent.com/cbeta-org/xml-p5/dbdea41071e1e260ad84b72faefd4587333cf76d/T/T51/T51n2087.xml",
+        "sha256": "ac50f33584ac90ecb9fd61a1fbfa1f8a802464103b4eb6a26d20ff6f9d578763",
+        "bytes": 2599669,
+        "capture_file": "T2087.xml",
+        "windows": {
+          "units": {
+            "locator": "T2087_0875c16-0875c20",
+            "main_literal": "異，隨其星建，以標月名。時極短者，謂剎那也。百二十剎那為一呾剎那，六十呾剎那為一臘縛，三十臘縛為一牟呼栗多，五牟呼栗多為一時，六時合成一日一夜。居俗日夜分為八時。月盈至",
+            "inline_notes": {
+              "0875c19": [
+                "晝三夜三"
+              ],
+              "0875c20": [
+                "晝四夜四，於一一時各有四分"
+              ]
+            }
+          }
+        },
+        "new_independent_historical_measurement": false
+      }
+    ],
+    "criteria": [
+      {
+        "id": "eastern_red",
+        "literal": "東方已赤",
+        "source_id": "T2131",
+        "attribution": "引《明了論》；本輪未取得該上游原段",
+        "original_upstream_acquired": false
+      },
+      {
+        "id": "before_sunrise_two_ke",
+        "literal": "日未出前二刻",
+        "source_id": "T2131",
+        "attribution": "引通慧《指歸》，原文限定此方；本輪未取得上游原段",
+        "original_upstream_acquired": false
+      },
+      {
+        "id": "palm_lines",
+        "literal": "觀見掌文",
+        "source_id": "T2131",
+        "attribution": "原文作是四分明，不據此統一別宗",
+        "original_upstream_acquired": false
+      },
+      {
+        "id": "ground_visible",
+        "literal": "見地色分了",
+        "source_id": "T2131",
+        "attribution": "原文作又別宗名地了時；X0744引十誦律，本輪未取得十誦律原段",
+        "original_upstream_acquired": false
+      },
+      {
+        "id": "white_dawn",
+        "literal": "三色中白色為正",
+        "source_id": "T1440",
+        "attribution": "直接所選薩婆多毘尼毘婆沙離衣宿語境；黑青白的樹照說保留為原文",
+        "original_upstream_acquired": true
+      }
+    ],
+    "unit_controls": {
+      "X0744": {
+        "muhurta_per_part": 50,
+        "day_night_parts": 6
+      },
+      "T2087": {
+        "muhurta_per_part": 5,
+        "day_night_parts": 6
+      }
+    },
+    "source_hierarchy": {
+      "X0744_declares_Xiyuji_quotation": true,
+      "X0744_declares_Jigui_quotation": true,
+      "X0744_shared_dawn_words_with_T2131_are_independent_observations": false,
+      "direct_T2131_to_X0744_dependence_established": false,
+      "quoted_source_numeric_difference_cause_adjudicated": false,
+      "X0744_fifty_silently_emended_to_five": false,
+      "T2087_already_acquired_before_this_round": true
+    },
+    "scope": {
+      "modern_seconds_per_ke": null,
+      "solar_altitude_degrees": null,
+      "measurement_precision_seconds": null,
+      "modern_clock_conversion_established": false,
+      "T1299_pingming_equivalence_established": false,
+      "birth_date_boundary_override": false,
+      "hinoo_half_mapping_established": false,
+      "leap_short_month_priority_established": false,
+      "full_source_collation_accepted": false,
+      "new_dated_instrument_measurements": 0,
+      "real_samples": 0
+    }
+  },
+  "selected_apparatus": {
+    "records": [
+      {
+        "source_id": "X0744",
+        "body_anchor_lines": [
+          "0466b19"
+        ],
+        "kind": "app",
+        "attributes": {
+          "from": "#beg0466b1901",
+          "to": "#end0466b1901"
+        },
+        "text_with_inline_content": "已巳",
+        "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0466b1901\" to=\"#end0466b1901\"><ns0:lem wit=\"#wit.cbeta\" resp=\"#resp3\">已</ns0:lem><ns0:rdg wit=\"#wit.orig\">巳</ns0:rdg></ns0:app>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "X0744",
+        "body_anchor_lines": [
+          "0466b19"
+        ],
+        "kind": "note",
+        "attributes": {
+          "n": "0466b1901",
+          "resp": "#resp2",
+          "type": "add",
+          "target": "#nkr_note_add_0466b1901"
+        },
+        "text_with_inline_content": "已【CB】，巳【卍續】",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0466b1901\" resp=\"#resp2\" type=\"add\" target=\"#nkr_note_add_0466b1901\">已【CB】，巳【卍續】</ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2131",
+        "body_anchor_lines": [
+          "1093c03"
+        ],
+        "kind": "note",
+        "attributes": {
+          "n": "1093010",
+          "resp": "#resp1",
+          "type": "mod",
+          "target": "#nkr_note_mod_1093010"
+        },
+        "text_with_inline_content": "不分卷【明】，此篇及皇后第二十六明本在長者第十八前cf.P.1083b[28].",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"1093010\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_1093010\">不分卷【明】，此篇及皇后第二十六明本在長者第十八前 cf. P. 1083b [28].</ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2131",
+        "body_anchor_lines": [
+          "1093b22"
+        ],
+        "kind": "note",
+        "attributes": {
+          "n": "1093009",
+          "resp": "#resp2",
+          "type": "orig",
+          "place": "foot text",
+          "target": "#nkr_note_orig_1093009"
+        },
+        "text_with_inline_content": "Aruṇa.",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"1093009\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_1093009\">Aruṇa.</ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2131",
+        "body_anchor_lines": [
+          "1093c03"
+        ],
+        "kind": "note",
+        "attributes": {
+          "n": "1093010",
+          "resp": "#resp2",
+          "type": "orig",
+          "place": "foot text",
+          "target": "#nkr_note_orig_1093010"
+        },
+        "text_with_inline_content": "不分卷【明】，此篇及皇后第二十六明本在長者第十八前cf.P.1083b[28].",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"1093010\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_1093010\">不分卷【明】，此篇及皇后第二十六明本在長者第十八前 cf. P. 1083b [28].</ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2131",
+        "body_anchor_lines": [
+          "1093b22"
+        ],
+        "kind": "note",
+        "attributes": {
+          "target": "#nkr_note_foreign_1093009"
+        },
+        "text_with_inline_content": "Aruṇa.",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" xmlns:ns1=\"http://www.cbeta.org/ns/1.0\" target=\"#nkr_note_foreign_1093009\"><ns0:foreign ns1:place=\"foot\" ns1:resp=\"#resp2\" n=\"1093009\" xml:lang=\"sa\">Aruṇa.</ns0:foreign></ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T1440",
+        "body_anchor_lines": [
+          "0529b08"
+        ],
+        "kind": "app",
+        "attributes": {
+          "from": "#beg0529005",
+          "to": "#end0529005"
+        },
+        "text_with_inline_content": "者著",
+        "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0529005\" to=\"#end0529005\"><ns0:lem wit=\"#wit.orig\">者</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit3\">著</ns0:rdg></ns0:app>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T1440",
+        "body_anchor_lines": [
+          "0529b08"
+        ],
+        "kind": "note",
+        "attributes": {
+          "n": "0529005",
+          "resp": "#resp1",
+          "type": "mod",
+          "target": "#nkr_note_mod_0529005"
+        },
+        "text_with_inline_content": "者【大】，著【明】",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0529005\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0529005\">者【大】，著【明】</ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T1440",
+        "body_anchor_lines": [
+          "0529b08"
+        ],
+        "kind": "note",
+        "attributes": {
+          "n": "0529005",
+          "resp": "#resp2",
+          "type": "orig",
+          "place": "foot text",
+          "target": "#nkr_note_orig_0529005"
+        },
+        "text_with_inline_content": "者＝著【明】",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0529005\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0529005\">者＝著【明】</ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2087",
+        "body_anchor_lines": [
+          "0875c19"
+        ],
+        "kind": "app",
+        "attributes": {
+          "from": "#beg0875033",
+          "to": "#end0875033"
+        },
+        "text_with_inline_content": "合念",
+        "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0875033\" to=\"#end0875033\"><ns0:lem wit=\"#wit.orig\">合</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2\">念</ns0:rdg></ns0:app>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2087",
+        "body_anchor_lines": [
+          "0875c19"
+        ],
+        "kind": "app",
+        "attributes": {
+          "from": "#beg0875034",
+          "to": "#end0875034"
+        },
+        "text_with_inline_content": "晝三夜夜三晝",
+        "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0875034\" to=\"#end0875034\"><ns0:lem wit=\"#wit.orig\">晝三夜</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit4 #wit5 #wit6\">夜三晝</ns0:rdg></ns0:app>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2087",
+        "body_anchor_lines": [
+          "0875c20"
+        ],
+        "kind": "app",
+        "attributes": {
+          "from": "#beg0875035",
+          "to": "#end0875035"
+        },
+        "text_with_inline_content": "於于",
+        "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0875035\" to=\"#end0875035\"><ns0:lem wit=\"#wit.orig\">於</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit6\">于</ns0:rdg></ns0:app>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2087",
+        "body_anchor_lines": [
+          "0875c20"
+        ],
+        "kind": "app",
+        "attributes": {
+          "from": "#beg0875036",
+          "to": "#end0875036"
+        },
+        "text_with_inline_content": "一一二",
+        "xml_element": "<ns0:app xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" from=\"#beg0875036\" to=\"#end0875036\"><ns0:lem wit=\"#wit.orig\">一一</ns0:lem><ns0:rdg resp=\"#resp2\" wit=\"#wit2\">二</ns0:rdg></ns0:app>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2087",
+        "body_anchor_lines": [
+          "0875c19"
+        ],
+        "kind": "note",
+        "attributes": {
+          "n": "0875033",
+          "resp": "#resp1",
+          "type": "mod",
+          "target": "#nkr_note_mod_0875033"
+        },
+        "text_with_inline_content": "合【大】，念【甲】",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0875033\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0875033\">合【大】，念【甲】</ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2087",
+        "body_anchor_lines": [
+          "0875c19"
+        ],
+        "kind": "note",
+        "attributes": {
+          "n": "0875034",
+          "resp": "#resp1",
+          "type": "mod",
+          "target": "#nkr_note_mod_0875034"
+        },
+        "text_with_inline_content": "晝三夜【大】，夜三晝【宋】【元】【明】",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0875034\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0875034\">晝三夜【大】，夜三晝【宋】【元】【明】</ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2087",
+        "body_anchor_lines": [
+          "0875c20"
+        ],
+        "kind": "note",
+        "attributes": {
+          "n": "0875035",
+          "resp": "#resp1",
+          "type": "mod",
+          "target": "#nkr_note_mod_0875035"
+        },
+        "text_with_inline_content": "於【大】下同，于【明】下同",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0875035\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0875035\">於【大】下同，于【明】下同</ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2087",
+        "body_anchor_lines": [
+          "0875c20"
+        ],
+        "kind": "note",
+        "attributes": {
+          "n": "0875036",
+          "resp": "#resp1",
+          "type": "mod",
+          "target": "#nkr_note_mod_0875036"
+        },
+        "text_with_inline_content": "一一【大】，二【甲】",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0875036\" resp=\"#resp1\" type=\"mod\" target=\"#nkr_note_mod_0875036\">一一【大】，二【甲】</ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2087",
+        "body_anchor_lines": [
+          "0875c19"
+        ],
+        "kind": "note",
+        "attributes": {
+          "n": "0875033",
+          "resp": "#resp2",
+          "type": "orig",
+          "place": "foot text",
+          "target": "#nkr_note_orig_0875033"
+        },
+        "text_with_inline_content": "合＝念【甲】",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0875033\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0875033\">合＝念【甲】</ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2087",
+        "body_anchor_lines": [
+          "0875c19"
+        ],
+        "kind": "note",
+        "attributes": {
+          "n": "0875034",
+          "resp": "#resp2",
+          "type": "orig",
+          "place": "foot text",
+          "target": "#nkr_note_orig_0875034"
+        },
+        "text_with_inline_content": "晝三夜＝夜三晝【三】",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0875034\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0875034\">晝三夜＝夜三晝【三】</ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2087",
+        "body_anchor_lines": [
+          "0875c20"
+        ],
+        "kind": "note",
+        "attributes": {
+          "n": "0875035",
+          "resp": "#resp2",
+          "type": "orig",
+          "place": "foot text",
+          "target": "#nkr_note_orig_0875035"
+        },
+        "text_with_inline_content": "於＝于【明】下同",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0875035\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0875035\">於＝于【明】下同</ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      },
+      {
+        "source_id": "T2087",
+        "body_anchor_lines": [
+          "0875c20"
+        ],
+        "kind": "note",
+        "attributes": {
+          "n": "0875036",
+          "resp": "#resp2",
+          "type": "orig",
+          "place": "foot text",
+          "target": "#nkr_note_orig_0875036"
+        },
+        "text_with_inline_content": "一一＝二【甲】",
+        "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"0875036\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_0875036\">一一＝二【甲】</ns0:note>\n",
+        "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+      }
+    ],
+    "all_postposed_note_and_app_records_linked_to_all_five_windows": true,
+    "source_xml_sha256": {
+      "X0744": "ae88ebd75dad749fc0b958ef49e6402ad638ace743b35617cdfea169fe5c8949",
+      "T2131": "9094078afad441c2fb0b48cb32a9e5e190895e1d0218a597e8760683c6816a58",
+      "T1440": "e3e863f58974c673fc63dc95bf66549b88a26b1efe16b30d341b5c794c9c2447",
+      "T2087": "ac50f33584ac90ecb9fd61a1fbfa1f8a802464103b4eb6a26d20ff6f9d578763"
+    },
+    "paper_or_manuscript_witness_independently_inspected": false,
+    "runtime_text_emendation_applied": false
+  },
+  "header_attribution": {
+    "sources": [
+      {
+        "source_id": "X0744",
+        "title_stmt_author_literals": [
+          "明 弘贊輯"
+        ],
+        "selected_body_bylines": [
+          "明　廣州沙門釋　弘贊在犙　輯",
+          "新安沙門釋　弘麗羅峰　校"
+        ],
+        "source_sha256": "ae88ebd75dad749fc0b958ef49e6402ad638ace743b35617cdfea169fe5c8949",
+        "scope": "XML题头与所选正文署名，非独立纸本认证或作者每条所述皆亲历；序文署名不移作本书编译者。"
+      },
+      {
+        "source_id": "T2131",
+        "title_stmt_author_literals": [
+          "宋 法雲編"
+        ],
+        "selected_body_bylines": [
+          "無機子法雲奉勉",
+          "姑蘇景德寺普潤大師法雲編",
+          "姑蘇景德寺法潤大師法雲編",
+          "姑蘇景德寺普潤大師法雲篇"
+        ],
+        "source_sha256": "9094078afad441c2fb0b48cb32a9e5e190895e1d0218a597e8760683c6816a58",
+        "scope": "XML题头与所选正文署名，非独立纸本认证或作者每条所述皆亲历；序文署名不移作本书编译者。"
+      },
+      {
+        "source_id": "T1440",
+        "title_stmt_author_literals": [
+          "失譯"
+        ],
+        "selected_body_bylines": [
+          "失譯人名今附秦錄"
+        ],
+        "source_sha256": "e3e863f58974c673fc63dc95bf66549b88a26b1efe16b30d341b5c794c9c2447",
+        "scope": "XML题头与所选正文署名，非独立纸本认证或作者每条所述皆亲历；序文署名不移作本书编译者。"
+      },
+      {
+        "source_id": "T2087",
+        "title_stmt_author_literals": [
+          "唐 玄奘譯．辯機撰"
+        ],
+        "selected_body_bylines": [
+          "三藏法師玄奘奉　詔譯",
+          "大總持寺沙門辯機撰"
+        ],
+        "source_sha256": "ac50f33584ac90ecb9fd61a1fbfa1f8a802464103b4eb6a26d20ff6f9d578763",
+        "scope": "XML题头与所选正文署名，非独立纸本认证或作者每条所述皆亲历；序文署名不移作本书编译者。"
+      }
+    ],
+    "T2131_lexical_layer": {
+      "headword_literal": "阿留那",
+      "other_forms_as_text": [
+        "阿樓那",
+        "薩埵"
+      ],
+      "foreign_footnote_records": [
+        {
+          "source_id": "T2131",
+          "body_anchor_lines": [
+            "1093b22"
+          ],
+          "kind": "note",
+          "attributes": {
+            "n": "1093009",
+            "resp": "#resp2",
+            "type": "orig",
+            "place": "foot text",
+            "target": "#nkr_note_orig_1093009"
+          },
+          "text_with_inline_content": "Aruṇa.",
+          "xml_element": "<ns0:note xmlns:ns0=\"http://www.tei-c.org/ns/1.0\" n=\"1093009\" resp=\"#resp2\" type=\"orig\" place=\"foot text\" target=\"#nkr_note_orig_1093009\">Aruṇa.</ns0:note>\n",
+          "scope": "Actual back-matter record linked to selected body window, not independently acquired printed witness."
+        }
+      ],
+      "sanskrit_identity_or_physical_instant_equivalence_adjudicated": false
+    },
+    "editorial_or_printed_identity_independently_certified": false
+  }
+}

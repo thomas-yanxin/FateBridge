@@ -1,0 +1,355 @@
+{
+  "call_guidance": {
+    "god_yin_scope": "类神阴神按实际天将所乘支再查上神，天乙依所选昼夜表互取；与四课第二、四课的阴神称谓分层。年命上神缺项保留未知，季节本空事实不替代有效空亡及日辰德合相生，综合类神可用性仍未裁。金口诀附带六壬盘的本层不替代金口诀四位取用。",
+    "published_term_dates_scope": "逐项读取实际solar_term_dependencies中的published_date_reference：按固定UTC+08对照香港天文台1901—2100逐日表，日期相符只表示同一天，不认证交气秒数或全部历法。date_mismatch保留两日期，不能称官方一致或移动交界凑表；outside_published_range是无资料，不能说相符或不符。与分析时区、真太阳钟、历史时间约定及未来闰秒假设分列，金口诀仍按同次四位解释。",
+    "seasonal_evidence_scope": "探原季节五态用本次月建支，不用月将支。当前季月整月配置分别计算支神、天将固有五行和地盘五态，日干五态不替代它们。真空／半空只列支神本空与季节状态的条件，天空天将及坐空不替换本空；季末十八日异法、扶助冲剋及角色例外后的有效真半未裁，不把原文效力折扣说成成功率。金口诀本课与附带六壬分开，不能借本层代替金口诀日下五态或综合取用。",
+    "transmission_progression_scope": "探原PDF110–111三传连茹／间断：sequence_direction只指支序；raw_branch_empty_conditional_*仅在支神本空适用假设下释读，不把坐空或天将天空替代本空。effective_direction和comprehensive_judgement仍未裁定，不从进退字样推成败、概率或应期。"
+  },
+  "evidence_views": {
+    "branch_relations": {
+      "fields": [
+        "four_pillars",
+        "liureng.month_general",
+        "liureng.four_lessons",
+        "liureng.three_transmissions",
+        "liureng.branch_relations",
+        "liureng.ruleset"
+      ],
+      "purpose": "探原支位的六合、六冲、六害、六破与双向刑并列；寅亥破合、巳申刑合不取消其他关系，首课寄宫支不替代日干五行，不据合独断成局。"
+    },
+    "core": {
+      "fields": [
+        "analysis_context",
+        "four_pillars",
+        "liureng.month_general",
+        "liureng.four_lessons",
+        "liureng.three_transmissions",
+        "liureng.life_stages",
+        "liureng.auxiliary_stars",
+        "liureng.month_building_element",
+        "liureng.guiren_order",
+        "liureng.classification",
+        "liureng.meta",
+        "liureng.kongwang",
+        "liureng.xun_head",
+        "liureng.ruleset",
+        "liureng.rule_trace"
+      ],
+      "purpose": "四课三传、旬遁空亡、探原十干十二运、贵人方向与来源；各规则口径分列，不能据此认证现实预测。"
+    },
+    "cross_harmony": {
+      "fields": [
+        "four_pillars",
+        "liureng.cross_harmony",
+        "liureng.ruleset"
+      ],
+      "purpose": "核对干上神与日支、支上神与日干寄宫的两边六合，以及五个干支同宫日的排除条件；按所选原文列实际支位和来源。"
+    },
+    "day_placement_patterns": {
+      "fields": [
+        "four_pillars",
+        "liureng.day_placement_patterns",
+        "liureng.ruleset"
+      ],
+      "purpose": "探原干加支／支加干的十条生克比和条件，按日干本五行与日支计算；归合、求合两条未知保留。附带六壬盘不替代金口诀本课规则，不据课名推断他人意图或现实成败。"
+    },
+    "emptiness_evidence": {
+      "fields": [
+        "four_pillars",
+        "liureng.month_general",
+        "liureng.twelve_board",
+        "liureng.three_transmissions",
+        "liureng.emptiness_evidence",
+        "liureng.ruleset"
+      ],
+      "purpose": "探原论空亡的天盘本空、地盘落底空、日干寄宫地盘例外与太岁月建月将角色；综合有效空亡、年命和填实冲实未裁定。"
+    },
+    "god_yin": {
+      "fields": [
+        "four_pillars",
+        "liureng.twelve_board",
+        "liureng.four_lessons",
+        "liureng.three_transmissions",
+        "liureng.god_yin",
+        "liureng.meta",
+        "liureng.ruleset"
+      ],
+      "purpose": "探原类神之阴：十一天将取实际所乘支上神，天乙依当前昼夜表互取；课传及已知年命上神定位，缺年命保留未知，综合可用性未裁。"
+    },
+    "published_term_dates": {
+      "fields": [
+        "analysis_context",
+        "four_pillars",
+        "liureng.calendar_policy"
+      ],
+      "purpose": "逐项读取实际solar_term_dependencies中的published_date_reference：按固定UTC+08对照香港天文台1901—2100逐日表，日期相符只表示同一天，不认证交气秒数或全部历法。date_mismatch保留两日期，不能称官方一致或移动交界凑表；outside_published_range是无资料，不能说相符或不符。与分析时区、真太阳钟、历史时间约定及未来闰秒假设分列，金口诀仍按同次四位解释。"
+    },
+    "seasonal_evidence": {
+      "fields": [
+        "four_pillars",
+        "liureng.month_general",
+        "liureng.three_transmissions",
+        "liureng.seasonal_evidence",
+        "liureng.emptiness_evidence",
+        "liureng.ruleset"
+      ],
+      "purpose": "探原季节五态用本次月建支，不用月将支。当前季月整月配置分别计算支神、天将固有五行和地盘五态，日干五态不替代它们。真空／半空只列支神本空与季节状态的条件，天空天将及坐空不替换本空；季末十八日异法、扶助冲剋及角色例外后的有效真半未裁，不把原文效力折扣说成成功率。金口诀本课与附带六壬分开，不能借本层代替金口诀日下五态或综合取用。"
+    },
+    "transmission_progression": {
+      "fields": [
+        "four_pillars",
+        "liureng.three_transmissions",
+        "liureng.transmission_progression",
+        "liureng.emptiness_evidence",
+        "liureng.ruleset"
+      ],
+      "purpose": "探原PDF110–111三传连茹／间断：sequence_direction只指支序；raw_branch_empty_conditional_*仅在支神本空适用假设下释读，不把坐空或天将天空替代本空。effective_direction和comprehensive_judgement仍未裁定，不从进退字样推成败、概率或应期。"
+    },
+    "transmission_relations": {
+      "fields": [
+        "four_pillars",
+        "liureng.four_lessons",
+        "liureng.three_transmissions",
+        "liureng.transmission_relations",
+        "liureng.ruleset"
+      ],
+      "purpose": "三传内外战、支神与天将五行、初末生墓、递克与朝日朝枝、三合名义局体；不改本支六亲或裁定综合吉凶、合化和应期。"
+    }
+  },
+  "first_view": {
+    "fields": [
+      "analysis_context",
+      "four_pillars",
+      "liureng.month_general",
+      "liureng.four_lessons",
+      "liureng.three_transmissions",
+      "liureng.life_stages",
+      "liureng.auxiliary_stars",
+      "liureng.month_building_element",
+      "liureng.guiren_order",
+      "liureng.classification",
+      "liureng.meta",
+      "liureng.kongwang",
+      "liureng.xun_head",
+      "liureng.calendar_policy",
+      "liureng.ruleset",
+      "liureng.rule_trace"
+    ],
+    "include_snapshot_text": false,
+    "strict_fields": true
+  },
+  "input": {
+    "additionalProperties": false,
+    "properties": {
+      "analysis_day": {
+        "description": "Analysis day (1-31)",
+        "maximum": 31,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "analysis_hour": {
+        "description": "Analysis hour (0-23)",
+        "maximum": 23,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "analysis_longitude": {
+        "anyOf": [
+          {
+            "maximum": 180,
+            "minimum": -180,
+            "type": "number"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis longitude"
+      },
+      "analysis_minute": {
+        "default": 0,
+        "description": "Analysis minute (0-59)",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "analysis_month": {
+        "description": "Analysis month (1-12)",
+        "maximum": 12,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "analysis_second": {
+        "default": 0,
+        "description": "起课钟表秒数，保留交中气和太阳时辰边界；不代表秒级预测能力。",
+        "maximum": 59,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "analysis_timezone": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Analysis timezone (IANA name or UTC offset)"
+      },
+      "analysis_utc_offset": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "起课民用钟时的明确UTC偏移，格式±HH:MM或±HH:MM:SS；与analysis_timezone共同核对并选择重复时刻，不替换命名时区规则。省略时拒绝歧义或不存在的钟时。"
+      },
+      "analysis_year": {
+        "description": "Analysis year, e.g., 2026",
+        "type": "integer"
+      },
+      "as_of": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Freeze implicit current time: ISO 8601 datetime with timezone"
+      },
+      "compact": {
+        "default": true,
+        "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
+        "type": "boolean"
+      },
+      "fields": {
+        "anyOf": [
+          {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "仅返回选定字段以节省 token：接受顶层键（如 'snapshot_text'）或点路径子字段（如 'bazi_birth.day_master'）。run_metadata 始终保留；留空请求全部字段，超出响应字符预算的部分由 result_delivery 保留供读取。无效路径默认附 projection_warnings；strict_fields=true 时拒绝。"
+      },
+      "gender": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": "未知",
+        "description": "性别（可选）。接受 男/女、male/female/m/f、阳/阴、乾/坤 等写法；省略默认 未知。"
+      },
+      "guiren_profile": {
+        "default": "liuren_common_v1",
+        "description": "大六壬昼夜贵人表：liuren_common_v1 为既有表；tanyuan_xieji_v1 按探原日夜贵人歌。金口诀仅影响附带六壬盘，本课独立用古本表。",
+        "enum": [
+          "liuren_common_v1",
+          "tanyuan_xieji_v1"
+        ],
+        "type": "string"
+      },
+      "include_snapshot_text": {
+        "default": true,
+        "description": "是否包含人类可读的 snapshot_text 文本段（默认随工具而定）；设为 false 可显著减少返回的 token 数。",
+        "type": "boolean"
+      },
+      "is_diurnal": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "显式昼贵/夜贵：true 昼、false 夜；省略按卯至申昼、酉至寅夜。未自动计算当地星没星出。"
+      },
+      "parent_run_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Parent call's run_id; correlation only, no stored execution lookup"
+      },
+      "response_char_limit": {
+        "anyOf": [
+          {
+            "const": 0,
+            "type": "integer"
+          },
+          {
+            "maximum": 65536,
+            "minimum": 4096,
+            "type": "integer"
+          }
+        ],
+        "default": 8192,
+        "description": "完整 JSON 响应字符预算：0 不限制，或 4096–65536。MCP 默认 8192，REST/CLI 默认 0。超限不截断数据，返回 result_delivery 完整结果引用和可读取字段；按 manifest_uri 或字段分页读取原 run 的数据，不要重新计算或解析单页为完整文档。"
+      },
+      "selected_sections": {
+        "default": [],
+        "description": "Optional snapshot section titles for filtered export payload",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "strict_fields": {
+        "default": false,
+        "description": "是否拒绝无效 fields 路径；默认 false，使用宽松投影并返回警告。",
+        "type": "boolean"
+      },
+      "trace_id": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Caller trace ID"
+      },
+      "use_true_solar_time": {
+        "default": true,
+        "description": "Enable true solar time correction (default on — 式占 keys off the apparent-solar 时辰)",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "analysis_year",
+      "analysis_month",
+      "analysis_day",
+      "analysis_hour"
+    ],
+    "type": "object"
+  },
+  "tool": "liureng_gods"
+}

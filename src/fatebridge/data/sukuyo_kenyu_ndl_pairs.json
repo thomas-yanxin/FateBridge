@@ -1,0 +1,86 @@
+{
+  "id": "kenyu_ndl14487241_readable_weekday_mansion_memberships_v1",
+  "title": "宿曜経撮要",
+  "holder": "国立国会図書館 特2-721",
+  "source_url": "https://dl.ndl.go.jp/pid/14487241",
+  "manifest_url": "https://dl.ndl.go.jp/api/iiif/14487241/manifest.json",
+  "manifest_sha256": "5f8772dccd5ba8366dec441020d3822a86e67ac2d5aeecfd953c4ff1ab52344d",
+  "credit": "国立国会図書館 National Diet Library, JAPAN",
+  "rights_manifest": "PDM",
+  "source_image": {
+    "frame": 6,
+    "url": "https://dl.ndl.go.jp/api/iiif/14487241/R0000006/full/full/0/default.jpg",
+    "sha256": "59af9bf9dadbfa82f5075fc5be73f92c486ca382b502b20d5f5c2cdea8be9285"
+  },
+  "locator": "帧6右页，轮图上方曜宿小表",
+  "adjacent_literal": "二十八宿與七曜如是相尅名陵逼",
+  "memberships": {
+    "日": [
+      "壁",
+      "參",
+      "軫",
+      "尾"
+    ],
+    "月": [
+      "奎",
+      "井",
+      "箕"
+    ],
+    "火": [
+      "婁",
+      "鬼",
+      "角",
+      "斗"
+    ],
+    "水": [
+      "胃",
+      "柳",
+      "亢",
+      "女"
+    ],
+    "木": [
+      "昴",
+      "星",
+      "氐",
+      "虛"
+    ],
+    "金": [
+      "畢",
+      "張",
+      "房",
+      "危"
+    ],
+    "土": [
+      "觜",
+      "翼",
+      "室",
+      "心"
+    ]
+  },
+  "readable_memberships": 27,
+  "adjacent_stated_mansions": 28,
+  "unread_fourth_monday_mansion": null,
+  "normalization": {
+    "虛": "虚",
+    "婁": "娄",
+    "畢": "毕",
+    "參": "参",
+    "張": "张",
+    "軫": "轸"
+  },
+  "cell_topology_or_order_accepted": false,
+  "ring_yuan_automatically_normalized_to_kang": false,
+  "prior_curation_sha256": "ef85e421fb25f169cd84910248d021e055ca038ec8ad41f5a4f9fe862a659cb3",
+  "model_reading_receipts": [
+    {
+      "file": "generator-primary-first.json",
+      "sha256": "f4a9c87023c85204dc3aef63e2bca0c56f64585fbb460e2b96b2dd457435953e"
+    },
+    {
+      "file": "reviewer-primary-first.json",
+      "sha256": "3bd8485c7bf0c791b8eea5981e6962b52876a7880500b846a89ac0d8b83b95e3"
+    }
+  ],
+  "source_identity": "NDL特2-721与NIJL100159236名古屋148.8-Ke为不同实物见证；版次、同版印次及传承身份未认证。",
+  "scope": "仅接纳27个可读曜宿成员集合；不补第四月曜宿，不据此认证轮盘机械操作、古代钟时、闰月继承或T1299实际天体陵逼。"
+}

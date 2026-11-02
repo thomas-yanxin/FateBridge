@@ -1,0 +1,464 @@
+{
+  "id": "naj_ming_prerequisites_v1",
+  "version": "1.0.0",
+  "title": "新鋟希夷陳先生紫微斗数全書",
+  "source_url": "https://www.digital.archives.go.jp/item/4468520",
+  "printed_volume": "三",
+  "manual_reader_count": 1,
+  "ming_shen": {
+    "frame": 73,
+    "quote": "俱從寅上起正月順數至本生月止又自人生月上起子時逆至本生時安命順至本生時安身",
+    "leap_quote": "又若閏正月生者要在二月內起安身命凡有閏月俱要依此為例",
+    "source_leap_policy": "all_next_month_for_ming_shen",
+    "first_month_by_hour": [
+      {
+        "hour": "子",
+        "ming_branch": "寅",
+        "shen_branch": "寅"
+      },
+      {
+        "hour": "丑",
+        "ming_branch": "丑",
+        "shen_branch": "卯"
+      },
+      {
+        "hour": "寅",
+        "ming_branch": "子",
+        "shen_branch": "辰"
+      },
+      {
+        "hour": "卯",
+        "ming_branch": "亥",
+        "shen_branch": "巳"
+      },
+      {
+        "hour": "辰",
+        "ming_branch": "戌",
+        "shen_branch": "午"
+      },
+      {
+        "hour": "巳",
+        "ming_branch": "酉",
+        "shen_branch": "未"
+      },
+      {
+        "hour": "午",
+        "ming_branch": "申",
+        "shen_branch": "申"
+      },
+      {
+        "hour": "未",
+        "ming_branch": "未",
+        "shen_branch": "酉"
+      },
+      {
+        "hour": "申",
+        "ming_branch": "午",
+        "shen_branch": "戌"
+      },
+      {
+        "hour": "酉",
+        "ming_branch": "巳",
+        "shen_branch": "亥"
+      },
+      {
+        "hour": "戌",
+        "ming_branch": "辰",
+        "shen_branch": "子"
+      },
+      {
+        "hour": "亥",
+        "ming_branch": "卯",
+        "shen_branch": "丑"
+      }
+    ],
+    "derived_seed_note": "Twelve first-month hour pairs hand-derived from the directional prose; only 子丑寅 examples explicitly printed. Subsequent months rotate these pairs clockwise."
+  },
+  "palace_order": {
+    "frame": 74,
+    "direction_quote": "男女俱從逆轉",
+    "names_as_written": [
+      "命宮",
+      "兄弟",
+      "妻妾",
+      "子女",
+      "財帛",
+      "疾厄",
+      "遷移",
+      "奴僕",
+      "官祿",
+      "田宅",
+      "福德",
+      "父母"
+    ],
+    "modern_names": [
+      "命宫",
+      "兄弟",
+      "夫妻",
+      "子女",
+      "财帛",
+      "疾厄",
+      "迁移",
+      "仆役",
+      "官禄",
+      "田宅",
+      "福德",
+      "父母"
+    ],
+    "aliases": {
+      "妻妾": "夫妻",
+      "奴僕": "仆役"
+    },
+    "alias_note": "Modern names are declared translations, not literal printed spellings."
+  },
+  "wuhu_dun": {
+    "frame": 74,
+    "rows": [
+      {
+        "year_stems": "甲己",
+        "yin_stem": "丙"
+      },
+      {
+        "year_stems": "乙庚",
+        "yin_stem": "戊"
+      },
+      {
+        "year_stems": "丙辛",
+        "yin_stem": "庚"
+      },
+      {
+        "year_stems": "丁壬",
+        "yin_stem": "壬"
+      },
+      {
+        "year_stems": "戊癸",
+        "yin_stem": "甲"
+      }
+    ]
+  },
+  "nayin": {
+    "frame": 74,
+    "rows": [
+      {
+        "ganzhi_pair": [
+          "甲子",
+          "乙丑"
+        ],
+        "name_reading": "海中金",
+        "element": "金",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "丙寅",
+          "丁卯"
+        ],
+        "name_reading": "爐中火",
+        "element": "火",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "戊辰",
+          "己巳"
+        ],
+        "name_reading": "大林木",
+        "element": "木",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "庚午",
+          "辛未"
+        ],
+        "name_reading": "路傍土",
+        "element": "土",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "壬申",
+          "癸酉"
+        ],
+        "name_reading": "劍鋒金",
+        "element": "金",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "甲戌",
+          "乙亥"
+        ],
+        "name_reading": "山頭火",
+        "element": "火",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "丙子",
+          "丁丑"
+        ],
+        "name_reading": "澗下水",
+        "element": "水",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "戊寅",
+          "己卯"
+        ],
+        "name_reading": "城頭土",
+        "element": "土",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "庚辰",
+          "辛巳"
+        ],
+        "name_reading": "白〔鑞／臘字形待定〕金",
+        "element": "金",
+        "name_reading_complete": false,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "壬午",
+          "癸未"
+        ],
+        "name_reading": "楊柳木",
+        "element": "木",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "甲申",
+          "乙酉"
+        ],
+        "name_reading": "泉中水",
+        "element": "水",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "丙戌",
+          "丁亥"
+        ],
+        "name_reading": "屋上土",
+        "element": "土",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "戊子",
+          "己丑"
+        ],
+        "name_reading": "霹靂火",
+        "element": "火",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "庚寅",
+          "辛卯"
+        ],
+        "name_reading": "松柏木",
+        "element": "木",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "壬辰",
+          "癸巳"
+        ],
+        "name_reading": "長流水",
+        "element": "水",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "甲午",
+          "乙未"
+        ],
+        "name_reading": "沙中金",
+        "element": "金",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "丙申",
+          "丁酉"
+        ],
+        "name_reading": "山下火",
+        "element": "火",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "戊戌",
+          "己亥"
+        ],
+        "name_reading": "平地木",
+        "element": "木",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "庚子",
+          "辛丑"
+        ],
+        "name_reading": "壁上土",
+        "element": "土",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "壬寅",
+          "癸卯"
+        ],
+        "name_reading": "金泊金",
+        "element": "金",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "甲辰",
+          "乙巳"
+        ],
+        "name_reading": "覆灯火",
+        "element": "火",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "丙午",
+          "丁未"
+        ],
+        "name_reading": "天河水",
+        "element": "水",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "戊申",
+          "己酉"
+        ],
+        "name_reading": "大驛土",
+        "element": "土",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "庚戌",
+          "辛亥"
+        ],
+        "name_reading": "釵釧金",
+        "element": "金",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "壬子",
+          "癸丑"
+        ],
+        "name_reading": "桑柘木",
+        "element": "木",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "甲寅",
+          "乙卯"
+        ],
+        "name_reading": "大溪水",
+        "element": "水",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "丙辰",
+          "丁巳"
+        ],
+        "name_reading": "沙中土",
+        "element": "土",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "戊午",
+          "己未"
+        ],
+        "name_reading": "天上火",
+        "element": "火",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "庚申",
+          "辛酉"
+        ],
+        "name_reading": "石榴木",
+        "element": "木",
+        "name_reading_complete": true,
+        "frame": 74
+      },
+      {
+        "ganzhi_pair": [
+          "壬戌",
+          "癸亥"
+        ],
+        "name_reading": "大海水",
+        "element": "水",
+        "name_reading_complete": true,
+        "frame": 74
+      }
+    ],
+    "name_scope": "Compare final element only; no assertion of exact modern label equivalence. Editorial brackets mark an unresolved internal glyph; 金 is clear."
+  },
+  "bureau_numbers": {
+    "values": {
+      "水": 2,
+      "木": 3,
+      "金": 4,
+      "土": 5,
+      "火": 6
+    },
+    "reference": "../naj_ming_day_tables_v1/collation.json",
+    "derivation": "Numbers are independently visible in the five bureau diagram headings in frames 84-86; not additional source rows on frames 73-74.",
+    "reference_sha256": "9f95bf8e709689e8bddd145ac71e12df3e1a926727fda00425227a3fec7b03ba"
+  },
+  "limits": [
+    "One edition, one manual reader; no independent second-reader acceptance.",
+    "Only prerequisite placement from supplied lunar month/hour/year stem. Civil-to-lunar conversion, timezone and hour branch determination need independent acceptance.",
+    "Leap-next-month prose explicitly concerns Ming/Shen; no certification of every monthly auxiliary-star rule.",
+    "Nayin numerical comparisons concern element and bureau, not exact modern label spellings.",
+    "No whole-book profile or whole-book acceptance."
+  ]
+}

@@ -351,8 +351,17 @@ def evaluate_alternatives(req: AssessRequest, layers: Dict[str, Any]) -> Dict[st
                             "source_ids",
                         )
                     }
+                    | {
+                        key: finding[key]
+                        for key in ("house_candidate_id", "house_sitting_trigram")
+                        if key in finding
+                    }
                 )
-            elif finding["method"] in {"annual_stars", "xuankong_natal"}:
+            elif finding["method"] in {
+                "annual_stars",
+                "monthly_stars",
+                "xuankong_natal",
+            }:
                 comparisons.append(
                     {
                         **finding,

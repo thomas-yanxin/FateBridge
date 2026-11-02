@@ -37,7 +37,7 @@ flowchart TD
 
 `application/discovery.py` 在生成 Schema 前筛选目录，供 REST `/api/tools`、CLI `discover` 和 MCP 摘要/单工具资源共用。MCP host 的 family 配置只筛选注册表；默认保留完整集合。`ToolSpec.execution_hints` 是三端发现记录与 MCP annotations 的共同来源，描述环境影响，不描述数值确定性。
 
-当前 FastAPI 提供 86 个业务 REST 路由，另有 `GET /api/tools` 发现接口与 `/health`、`/ready`、`/metrics` 运维端点；FastMCP 默认提供 87 个 MCP 工具。中央目录包含 88 条记录，CLI 可执行其中 87 条。CLI 另有 `list`、`discover`、`describe`、`profile`、`doctor`；风水工具明确启用嵌套 JSON `--request-file`，关系盘嵌套入口仍使用已有扁平变体。
+当前 FastAPI 提供 91 个业务 REST 路由，另有 `GET /api/tools` 发现接口与 `/health`、`/ready`、`/metrics` 运维端点；FastMCP 默认提供 92 个 MCP 工具。中央目录包含 93 条记录，CLI 可执行其中 92 条。CLI 另有 `list`、`discover`、`describe`、`profile`、`doctor`；风水工具明确启用嵌套 JSON `--request-file`，关系盘嵌套入口仍使用已有扁平变体。
 
 家居风水领域位于 `core/fengshui/`，请求、响应、公共方位、历法边界、八宅、年度飞星、玄空历史宅盘、砂水与可读快照各有模块。`services/fengshui.py` 只编排独立层和逐人差异，`data/fengshui/rules-v1.json` 保存版本与来源并随包发布。工具在中央目录显式绑定领域响应模型；`cli_request_file` 声明复杂 CLI 输入支持，不改变未启用工具的行为。规则与验收边界见 [家居风水](fengshui.md)。
 
@@ -111,7 +111,9 @@ sequenceDiagram
 
 `application/result_delivery.py` 将超预算结果写入按操作系统用户隔离的私有临时目录。保留范围是投影与快照选项处理后的响应，不能从摘要交付恢复未选字段；完整导出须首次保留完整范围。原 JSON 保留 `payload`，字符分页用 UTF-8 字节边界索引 seek 原正文，散列与小型 manifest 在写入时生成；字段展开首次定位后仅保存索引，不复制正文或无限缓存用户结果。
 
-跨进程锁覆盖容量预留、提交、读取与回收，容量计量包含已提交 sidecar。POSIX 使用 owner-only 权限和 flock；Windows 通过平台限定的 pywin32 使用用户 SID、私有 ACL 与原生文件锁，拒绝重解析点。缺少当前索引元数据的旧记录返回 `result_unavailable`，不会自动升级或改写；临时原子替换文件可能增加瞬时磁盘峰值。此机制提供同 run 展开，不提供咨询事实继承；`parent_run_id` 仍只是关联标记。
+跨进程锁覆盖容量预留、提交、普通索引分页与回收，容量计量包含已提交 sidecar。POSIX 使用 owner-only 权限和 flock；Windows 通过平台限定的 pywin32 使用用户 SID、私有 ACL 与原生文件锁，拒绝重解析点。缺少当前索引元数据的旧记录返回 `result_unavailable`，不会自动升级或改写；临时原子替换文件可能增加瞬时磁盘峰值。此机制提供同 run 展开，不提供咨询事实继承；`parent_run_id` 仍只是关联标记。
+
+确定性校验读取以元数据最后提交的既有结果为输入，无需可写锁或临时目录探测。它先验证私有文件、期限、原完整payload散列、run、清单一致性和工具公开范围，再从同一内存对象选页；并发回收可令结果不可用，不能将不一致数据认证为原结果。导入存储模块不选择可写临时目录，写入时才按既有策略选择；只读客户端按结果ID发现既有缓存，存在歧义就拒绝，CLI可显式指定原私有目录。
 
 原生 MCP 从投影后的字典直接生成 structuredContent 和 JSON text，不经过文本反解析。协议工具仅通过原生 FastMCP 调用，REST 通过已挂载路由调用；旧 Python 别名和模块级 `.fn` 包装已删除。内部导入使用定义模块（如 `utils.errors`、`core.requests`、`core.predictive` 的具体子模块），不依赖兼容重导出。
 
@@ -147,6 +149,12 @@ Swiss Ephemeris 存在共享 C 状态。直接调用与会修改目录的第三�
 | 请求模型 | `core/requests/base.py` 管理未知字段和日期校验；`birth.py` 管理出生基类，领域模块直接导入所需类型 |
 | 工具声明 | `services/catalog/` 各领域拥有 `SPECS`、绑定和延迟服务代理；不反向导入中央装配器或提前加载计算引擎 |
 | 输入与展示 | `utils/birth_input.py`、`solar_time.py`、`formatting.py`、`analysis_clock.py`、`elements.py` 各自承担单一公共职责 |
+| 领域共享定义 | 河洛卦关系、人类图 mechanics、六壬约定、金口诀表与太乙几何由各领域的定义模块维护；计算入口和规则消费者共同依赖定义模块 |
+| 人类图知识 | `human_design_line_catalogue.py` 维护基础目录，版本化读者依赖基础目录；`human_design_knowledge.py` 负责版本分派 |
+| 星历来源 | `physical_source_observation.py` 记录来源，`physical_ephemeris_policy.py` 管理外层策略；运行时向策略与压缩星历传入实际 native 对象、探测和路径回调 |
+| 完整结果校验 | 金口诀完整课体的气状态校验与参平年序绑定分别由 `output_jinkou_course_qi.py`、`canping_schedule_validation.py` 承担；字段模型与底层规则不反向导入完整输出模型 |
+
+共享定义留在对应领域，避免消费者为了取常量、类型或纯计算函数导入完整排盘入口。函数内导入同样计入依赖图；延迟导入用于控制加载成本，不用于隐藏循环依赖。历史来源哈希核验其冻结原件，当前实现另按完整业务输出及领域回归验证，验收方法见[开发指南](development-guide.md#测试策略)。
 
 `tests/test_architecture_boundaries.py` 检查核心/分析/工具层不依赖应用与协议层、应用与服务不依赖协议适配器或旧兼容入口，并核对含函数内导入的静态导入图无循环。它不分析动态 `importlib` 调用或第三方库内部依赖。
 

@@ -1,0 +1,98 @@
+{
+  "ruleset_id": "zengshan_progression_v8",
+  "ruleset_version": "8.0.0",
+  "source": {
+    "file": "../liuyao_scan_v3/sources/nlc-1925-zengshan.pdf",
+    "sha256": "caac111bc5c5b1c08fd27b3828e7cf6b5430503800f2427d8f2b28809022abaa",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/NLC416-12jh005345-45344_%E5%A2%9E%E5%88%AA%E5%8D%9C%E6%98%93.pdf",
+    "method": "Original pages 58,116-123 visually read; hand-transcribed conditions frozen before implementation."
+  },
+  "advance_pairs": [
+    [
+      "亥",
+      "子"
+    ],
+    [
+      "寅",
+      "卯"
+    ],
+    [
+      "巳",
+      "午"
+    ],
+    [
+      "申",
+      "酉"
+    ],
+    [
+      "丑",
+      "辰"
+    ],
+    [
+      "辰",
+      "未"
+    ],
+    [
+      "未",
+      "戌"
+    ]
+  ],
+  "clauses": [
+    {
+      "id": "advance-supported",
+      "pdf_page": 123,
+      "quote": "動旺相而化旺相乘勢而進一也"
+    },
+    {
+      "id": "advance-both-weak",
+      "pdf_page": 123,
+      "quote": "動休囚而化休囚待時而進二也"
+    },
+    {
+      "id": "advance-either-weak",
+      "pdf_page": 123,
+      "quote": "動爻變爻有一而值休囚亦待旺相之日而進者三也"
+    },
+    {
+      "id": "advance-void-break",
+      "pdf_page": 123,
+      "quote": "動爻變爻有一而值空破待填實之日而進者四也"
+    },
+    {
+      "id": "retreat-supported-near",
+      "pdf_page": 123,
+      "quote": "動旺相而化旺相或有日月動爻生扶占近事得時而不退者一也"
+    },
+    {
+      "id": "retreat-both-weak",
+      "pdf_page": 123,
+      "quote": "動休囚而化休囚及時而退者二也"
+    },
+    {
+      "id": "retreat-either-supported",
+      "pdf_page": 123,
+      "quote": "動爻變爻有一而旺相待休囚之時而退者三也"
+    },
+    {
+      "id": "retreat-void-break",
+      "pdf_page": 123,
+      "quote": "有一而逢空破待填實之日而退者四也"
+    },
+    {
+      "id": "weak-moving-can-control",
+      "pdf_page": 58,
+      "quote": "酉金發動雖則休囚動而能尅旺相之卯木",
+      "implication": "Same-element transformation is not independent proof of strength; seasonal weakness does not imply zero outgoing effect."
+    }
+  ],
+  "textual_issues": [
+    {
+      "id": "advance-third-reading",
+      "pdf_page": 123,
+      "scan": "值休囚",
+      "frozen_wikisource": "值衰",
+      "action": "Keep raw prior transcription; use named scan reading for the four-clause profile."
+    }
+  ],
+  "scope": "Progression condition branches, no total-strength vote, no event success judgment, no inferred horizon or recovered civil year. Same chart under different horizons is one structure, not independent validation samples."
+}

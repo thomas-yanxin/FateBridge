@@ -37,12 +37,14 @@ dependencies = [
     # Version 6 changes return calculations and bundled ephemeris data layout.
     "kerykeion>=5.5.0,<6",
     "lunardate>=0.2.2",
+    "mpmath==1.3.0",
     "packaging>=23.0",  # doctor checks installed dependency version constraints
     "pydantic>=2.0.0",
+    "pygeomag==1.1.0",
     "pyswisseph>=2.10.0",
     "python-dateutil>=2.8.0",
     "python-multipart>=0.0.9",
-    "pytz>=2024.1",
+    "pytz>=2025.2",
     "pywin32>=306 ; sys_platform == 'win32'",
     "uvicorn>=0.27.0",
 ]
@@ -56,6 +58,13 @@ dev = [
     "isort>=5.12.0",
     "mypy>=1.5.0",
     "pyyaml>=6.0",  # test_skills_interface_contract parses agents/interface.yaml
+    "opencc-python-reimplemented==0.1.7",  # place-catalog importer only; no runtime dependency
+    "pyerfa>=2.0.1.5,<3",
+    "jplephem>=2.24,<3",
+]
+jpl = [
+    "jplephem>=2.24,<3",
+    "pyerfa>=2.0.1.5,<3",
 ]
 
 [project.urls]
@@ -81,18 +90,22 @@ include = ["fatebridge*"]
 # knowledge_store), so the JSON payloads MUST be declared here or an installed
 # wheel raises FileNotFoundError. ``py.typed`` ships the PEP 561 typed marker.
 [tool.setuptools.package-data]
-fatebridge = ["py.typed", "data/**/*.json"]
+fatebridge = ["py.typed", "data/**/*.json", "data/guolao/sefstars.txt", "data/western_stars/sefstars.txt", "data/astronomy/erfa-license.txt", "data/astronomy/vsop2013/*.c", "data/astronomy/vsop2013/*.S", "data/astronomy/vsop2013/*.in", "data/astronomy/*.bin.gz", "data/knowledge/iers-c04-ut1-v1.json.gz", "data/knowledge/iers-c04-LICENSE.txt", "data/sukuyo_dayan_reference_LICENSE.txt"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = ["native_engine_fault: inject a fault or spy inside a fresh native-engine test process"]
 
 [tool.black]
 line-length = 88
 target-version = ['py310']
+# Frozen programs are byte-checked regression inputs, not maintained code.
+extend-exclude = '^/tests/fixtures/'
 
 [tool.isort]
 profile = "black"
 multi_line_output = 3
+extend_skip_glob = ["tests/fixtures/**"]
 
 [tool.mypy]
 python_version = "3.10"

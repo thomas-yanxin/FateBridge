@@ -107,7 +107,13 @@ def test_build_classical_overview_shape():
         "hour": ("丙", "寅"),
     }
     overview = build_classical_overview(pillars)
-    assert set(overview) == {"monthly_structure", "seasonal_climate", "life_stages"}
+    assert set(overview) == {
+        "monthly_structure",
+        "seasonal_climate",
+        "life_stages",
+        "root_profile",
+    }
+    assert overview["root_profile"]["global_strength_status"] == "not_adjudicated"
     assert overview["life_stages"]["per_pillar"]["时支"] == "临官"
 
 

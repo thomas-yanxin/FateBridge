@@ -110,7 +110,7 @@ k = 0..7，量化单位为微秒
 
 ## 7. 验收用例与判定范围
 
-固定输入和期望值在 [`tests/fixtures/firdaria-reference.json`](../tests/fixtures/firdaria-reference.json)，核心执行入口为 [`tests/test_firdaria_reference.py`](../tests/test_firdaria_reference.py)，三端入口为 [`tests/test_firdaria_transports.py`](../tests/test_firdaria_transports.py)。独立数学参考保留，用同一批固定期望值核对实际生产代码。
+固定输入和期望值在 `tests/fixtures/firdaria-reference.json`（本地数据：`../tests/fixtures/firdaria-reference.json`），核心执行入口为 [`tests/test_firdaria_reference.py`](../tests/test_firdaria_reference.py)，三端入口为 [`tests/test_firdaria_transports.py`](../tests/test_firdaria_transports.py)。独立数学参考保留，用同一批固定期望值核对实际生产代码。
 
 | 类别 | 验收内容 | 实际被测对象 |
 | --- | --- | --- |

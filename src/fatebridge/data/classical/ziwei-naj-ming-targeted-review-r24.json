@@ -1,0 +1,63 @@
+{
+  "id": "naj_ming_targeted_rereading_r24_v1",
+  "source_url": "https://www.digital.archives.go.jp/item/4468520",
+  "source_report_sha256": "5643e3432b2603b63f15a5b8646b76ed7820ca3da54a6bbd24d5eaeb31628973",
+  "frozen_manifest_sha256": "470be9c5a76131b3269b7c5059a20128b51e5a6eaf08f963a5fd12562909b97b",
+  "reviewed_input_count": 5,
+  "new_witness_count": 0,
+  "external_human_experts": 0,
+  "whole_day_table_certified": false,
+  "records": [
+    {
+      "bureau": 2,
+      "day": 21,
+      "source_frame": 85,
+      "status": "not_directly_confirmed_in_targeted_rereading",
+      "direct_label_branches": [],
+      "literal_reading": "The left column is the single character 廿. No separate 一 is visibly confirmed beneath it in the acquired full opening or the close crop.",
+      "scope": "targeted_same_scan_rereading_not_a_new_witness_or_whole_table_review"
+    },
+    {
+      "bureau": 3,
+      "day": 11,
+      "source_frame": 85,
+      "status": "not_directly_confirmed_in_targeted_rereading",
+      "direct_label_branches": [],
+      "literal_reading": "Both the right column of 辰 and the middle column of 巳 visibly read 十二. This reader did not confirm an explicit 十一 entry in the full 木三局 table.",
+      "scope": "targeted_same_scan_rereading_not_a_new_witness_or_whole_table_review"
+    },
+    {
+      "bureau": 3,
+      "day": 12,
+      "source_frame": 85,
+      "status": "conflicting_direct_labels",
+      "direct_label_branches": [
+        "辰",
+        "巳"
+      ],
+      "literal_reading": "Both the right column of 辰 and the middle column of 巳 visibly read 十二. This reader did not confirm an explicit 十一 entry in the full 木三局 table.",
+      "scope": "targeted_same_scan_rereading_not_a_new_witness_or_whole_table_review"
+    },
+    {
+      "bureau": 6,
+      "day": 6,
+      "source_frame": 86,
+      "status": "not_directly_confirmed_in_targeted_rereading",
+      "direct_label_branches": [],
+      "literal_reading": "The right column of 戌 reads 初七. The right columns of 寅 and 未 both read 初八. This reader did not confirm an explicit 初六 entry in the full 火六局 table.",
+      "scope": "targeted_same_scan_rereading_not_a_new_witness_or_whole_table_review"
+    },
+    {
+      "bureau": 6,
+      "day": 8,
+      "source_frame": 86,
+      "status": "conflicting_direct_labels",
+      "direct_label_branches": [
+        "寅",
+        "未"
+      ],
+      "literal_reading": "The right column of 戌 reads 初七. The right columns of 寅 and 未 both read 初八. This reader did not confirm an explicit 初六 entry in the full 火六局 table.",
+      "scope": "targeted_same_scan_rereading_not_a_new_witness_or_whole_table_review"
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+{
+  "schema": "hko2016_ganzhi_date_label_bridge_v1",
+  "profile_id": "hko2016_ganzhi_date_label_bridge_v1",
+  "anchor": {
+    "calendar": "proleptic_gregorian",
+    "date": [
+      2016,
+      10,
+      9
+    ],
+    "sexagenary_index": 0,
+    "printed_ganzhi": "甲子",
+    "source_url": "https://www.hko.gov.hk/en/gts/astron2016/files/2016cal10.pdf",
+    "source_pdf_sha256": "bd94c44d64d8e35f16ecedecbc1aa080ba943a039c1eef050a3fffb746d77b61"
+  },
+  "hko31_literal_day_labels": [
+    {
+      "gregorian_date": "2016-10-01",
+      "printed_ganzhi": "丙辰"
+    },
+    {
+      "gregorian_date": "2016-10-02",
+      "printed_ganzhi": "丁巳"
+    },
+    {
+      "gregorian_date": "2016-10-03",
+      "printed_ganzhi": "戊午"
+    },
+    {
+      "gregorian_date": "2016-10-04",
+      "printed_ganzhi": "己未"
+    },
+    {
+      "gregorian_date": "2016-10-05",
+      "printed_ganzhi": "庚申"
+    },
+    {
+      "gregorian_date": "2016-10-06",
+      "printed_ganzhi": "辛酉"
+    },
+    {
+      "gregorian_date": "2016-10-07",
+      "printed_ganzhi": "壬戌"
+    },
+    {
+      "gregorian_date": "2016-10-08",
+      "printed_ganzhi": "癸亥"
+    },
+    {
+      "gregorian_date": "2016-10-09",
+      "printed_ganzhi": "甲子"
+    },
+    {
+      "gregorian_date": "2016-10-10",
+      "printed_ganzhi": "乙丑"
+    },
+    {
+      "gregorian_date": "2016-10-11",
+      "printed_ganzhi": "丙寅"
+    },
+    {
+      "gregorian_date": "2016-10-12",
+      "printed_ganzhi": "丁卯"
+    },
+    {
+      "gregorian_date": "2016-10-13",
+      "printed_ganzhi": "戊辰"
+    },
+    {
+      "gregorian_date": "2016-10-14",
+      "printed_ganzhi": "己巳"
+    },
+    {
+      "gregorian_date": "2016-10-15",
+      "printed_ganzhi": "庚午"
+    },
+    {
+      "gregorian_date": "2016-10-16",
+      "printed_ganzhi": "辛未"
+    },
+    {
+      "gregorian_date": "2016-10-17",
+      "printed_ganzhi": "壬申"
+    },
+    {
+      "gregorian_date": "2016-10-18",
+      "printed_ganzhi": "癸酉"
+    },
+    {
+      "gregorian_date": "2016-10-19",
+      "printed_ganzhi": "甲戌"
+    },
+    {
+      "gregorian_date": "2016-10-20",
+      "printed_ganzhi": "乙亥"
+    },
+    {
+      "gregorian_date": "2016-10-21",
+      "printed_ganzhi": "丙子"
+    },
+    {
+      "gregorian_date": "2016-10-22",
+      "printed_ganzhi": "丁丑"
+    },
+    {
+      "gregorian_date": "2016-10-23",
+      "printed_ganzhi": "戊寅"
+    },
+    {
+      "gregorian_date": "2016-10-24",
+      "printed_ganzhi": "己卯"
+    },
+    {
+      "gregorian_date": "2016-10-25",
+      "printed_ganzhi": "庚辰"
+    },
+    {
+      "gregorian_date": "2016-10-26",
+      "printed_ganzhi": "辛巳"
+    },
+    {
+      "gregorian_date": "2016-10-27",
+      "printed_ganzhi": "壬午"
+    },
+    {
+      "gregorian_date": "2016-10-28",
+      "printed_ganzhi": "癸未"
+    },
+    {
+      "gregorian_date": "2016-10-29",
+      "printed_ganzhi": "甲申"
+    },
+    {
+      "gregorian_date": "2016-10-30",
+      "printed_ganzhi": "乙酉"
+    },
+    {
+      "gregorian_date": "2016-10-31",
+      "printed_ganzhi": "丙戌"
+    }
+  ],
+  "usno5_published_examples": [
+    {
+      "calendar": "proleptic_gregorian",
+      "date": [
+        1978,
+        1,
+        1
+      ],
+      "ut1_fraction": "0",
+      "jd": "2443509.5",
+      "url": "https://aa.usno.navy.mil/faq/JD_formula"
+    },
+    {
+      "calendar": "proleptic_gregorian",
+      "date": [
+        1978,
+        7,
+        21
+      ],
+      "ut1_fraction": "0.625",
+      "jd": "2443711.125",
+      "url": "https://aa.usno.navy.mil/faq/JD_formula"
+    },
+    {
+      "calendar": "proleptic_gregorian",
+      "date": [
+        1877,
+        8,
+        11
+      ],
+      "ut1_fraction": "0.3125",
+      "jd": "2406842.8125",
+      "url": "https://aa.usno.navy.mil/faq/JD_formula"
+    },
+    {
+      "calendar": "proleptic_julian",
+      "date": [
+        1582,
+        10,
+        4
+      ],
+      "ut1_fraction": "0",
+      "jd": "2299159.5",
+      "url": "https://aa.usno.navy.mil/data/JulianDate"
+    },
+    {
+      "calendar": "proleptic_gregorian",
+      "date": [
+        1582,
+        10,
+        15
+      ],
+      "ut1_fraction": "0",
+      "jd": "2299160.5",
+      "url": "https://aa.usno.navy.mil/data/JulianDate"
+    }
+  ],
+  "source_year_labels_data_sha256": "17a9e2f7383d718eec56ec1e81d8b98583f256c01be36dea22888ebc58f019d3",
+  "search_policy": "preceding_winter_year_gregorian_december",
+  "source_counter_basis": "named_unwrapped_cycle_day",
+  "source_midnight_to_published_date_label_continuity_accepted": false,
+  "source_local_clock_or_timezone_assigned": false,
+  "native_birth_chart_integration": false
+}

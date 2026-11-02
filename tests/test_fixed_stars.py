@@ -1,14 +1,10 @@
-"""Phase 3b (part 2) tests: fixed stars (恒星).
+"""Legacy helper compatibility and production fixed-star integration.
 
-The catalogue is vendored (J2000 tropical longitudes extracted from the Swiss
-Ephemeris star catalogue — public astronomical fact) and precessed in pure
-Python, so the feature needs no ephemeris data file and runs on every engine.
-
-* **Pure** tests (precession, conjunction detection, catalogue integrity) run
-  everywhere.
-* A **calibration** test locks the vendored table against swisseph's
-  authoritative ``fixstar_ut`` — gated on the ``sefstars.txt`` catalogue being
-  reachable (kerykeion bundles it), so it runs locally and skips in CI.
+The linear helper is retained explicitly as an approximation. Its optional
+old 0.05-degree calibration is not the production accuracy gate. Unconditional
+independent ERFA checks and native catalogue/frame tests are maintained in
+test_western_fixed_star_accuracy.py; production ships its own twenty numerical
+SIMBAD records and uses native apparent positions, not this legacy helper.
 """
 
 from __future__ import annotations
@@ -152,10 +148,13 @@ def test_snapshot_renders_fixed_stars_section():
 
 
 @pytest.fixture
-def star_catalogue():
+def star_catalogue(monkeypatch):
     # Configure when the calibration runs, and restore the production path.
     # Collection-time configuration is overwritten by isolated predictive calls.
-    with preserve_ephemeris_path():
+    with preserve_ephemeris_path(), monkeypatch.context() as patch:
+        # Raw Swiss calls honor a nonempty environment path before the
+        # explicit catalogue directory; isolate this calibration's setup.
+        patch.delenv("SE_EPHE_PATH", raising=False)
         if not _configure_star_catalogue():
             pytest.skip("sefstars.txt 不可达：恒星表校准需要 swisseph 星表")
         yield

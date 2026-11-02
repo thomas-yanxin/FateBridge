@@ -33,11 +33,67 @@ def _unique(lessons: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return list(by_upper.values())
 
 
+def harm_walk(
+    lesson: Dict[str, Any], day_stem: str, sky: Dict[str, str]
+) -> Dict[str, Any]:
+    """Expose the existing 正五行/寄干 walk without adopting another endpoint.
+
+    The terminal home is excluded by the current algorithm. Including its
+    lodged stem changes ten counts and one fine name across the 720 boards;
+    the printed aggregate conflict is preserved rather than scored away.
+    """
+    earth = {upper: lower for lower, upper in sky.items()}
+    upper = lesson["upper_branch"]
+    element = branch_element_text(upper)
+    lower_element = (
+        stem_element_text(day_stem)
+        if lesson["index"] == 1
+        else branch_element_text(lesson["lower_branch"])
+    )
+    thief = _controls(lower_element, element)
+    steps: List[Dict[str, Any]] = []
+    position = earth[upper]
+    while position != upper:
+        contributions: List[Dict[str, Any]] = [
+            {
+                "kind": "branch",
+                "token": position,
+                "element": branch_element_text(position),
+            }
+        ] + [
+            {"kind": "lodged_stem", "token": stem, "element": stem_element_text(stem)}
+            for stem, house in STEM_HOUSES.items()
+            if house == position
+        ]
+        for item in contributions:
+            item["counts_as_harm"] = (
+                _controls(item["element"], element)
+                if thief
+                else _controls(element, item["element"])
+            )
+        steps.append({"earth_branch": position, "contributions": contributions})
+        position = _shift(position, 1)
+    return {
+        "lesson_index": lesson["index"],
+        "upper_branch": upper,
+        "upper_element": element,
+        "starting_earth_branch": earth[upper],
+        "direction": "受克" if thief else "施克",
+        "steps": steps,
+        "harm_count": sum(
+            item["counts_as_harm"] for step in steps for item in step["contributions"]
+        ),
+        "terminal_home_counted": False,
+    }
+
+
 def select_transmissions(
     day_stem: str,
     day_branch: str,
     sky: Dict[str, str],
     lessons: List[Dict[str, Any]],
+    *,
+    trace: Optional[List[Dict[str, Any]]] = None,
 ) -> Tuple[str, str, str, List[str], Optional[int]]:
     """Return styles, derivation, three gods, and the actual source lesson.
 
@@ -58,38 +114,54 @@ def select_transmissions(
 
     def choose(candidates: List[Dict[str, Any]]) -> Tuple[Dict[str, Any], str]:
         candidates = _unique(candidates)
+        if trace is not None:
+            trace.append(
+                {
+                    "rule_id": "liuren.direct_or_remote_candidates",
+                    "source_section": "贼克 / 比用 / 遥克",
+                    "result": {
+                        "lessons": [l["index"] for l in candidates],
+                        "uppers": [l["upper_branch"] for l in candidates],
+                    },
+                }
+            )
         if len(candidates) == 1:
             return candidates[0], "贼克"
         preferred = [l for l in candidates if same_polarity(l)]
+        if trace is not None:
+            trace.append(
+                {
+                    "rule_id": "liuren.polarity",
+                    "source_section": "比用法",
+                    "result": {"preferred_lessons": [l["index"] for l in preferred]},
+                }
+            )
         if len(preferred) == 1:
             return preferred[0], "比用"
         candidates = preferred or candidates
 
-        def depth(lesson: Dict[str, Any]) -> int:
-            upper = lesson["upper_branch"]
-            element = branch_element_text(upper)
-            lower_element = (
-                stem_element
-                if lesson["index"] == 1
-                else branch_element_text(lesson["lower_branch"])
+        walks = [harm_walk(lesson, day_stem, sky) for lesson in candidates]
+        depths = [
+            (lesson, walk["harm_count"]) for lesson, walk in zip(candidates, walks)
+        ]
+        if trace is not None:
+            trace.append(
+                {
+                    "rule_id": "liuren.harm_paths",
+                    "source_section": "探原·涉害·正五行及十干寄宫",
+                    "result": {
+                        "candidates": walks,
+                        "scope": "当前算法逐站列正五行及十干寄宫，不用地支藏干；终本家寄干异法未据单条表注裁定，不代表全书认证。",
+                    },
+                }
             )
-            thief = _controls(lower_element, element)
-            count = 0
-            position = earth[upper]
-            while position != upper:
-                elements = [branch_element_text(position)] + [
-                    stem_element_text(stem)
-                    for stem, house in STEM_HOUSES.items()
-                    if house == position
-                ]
-                count += sum(
-                    _controls(e, element) if thief else _controls(element, e)
-                    for e in elements
-                )
-                position = _shift(position, 1)
-            return count
-
-        depths = [(l, depth(l)) for l in candidates]
+            trace.append(
+                {
+                    "rule_id": "liuren.harm_depth",
+                    "source_section": "涉害法",
+                    "result": {str(l["index"]): value for l, value in depths},
+                }
+            )
         deepest = max(value for _, value in depths)
         candidates = [l for l, value in depths if value == deepest]
         if len(candidates) == 1:
@@ -98,9 +170,28 @@ def select_transmissions(
         # earthly position, not the upper god's own branch.
         for group, detail in (("寅巳申亥", "见机"), ("子卯午酉", "察微")):
             match = [l for l in candidates if earth[l["upper_branch"]] in group]
-            if match:
+            if len(match) == 1:
                 return match[0], detail
-        return lessons[0 if yang else 2], "复等"
+            if match:
+                candidates = match
+                break
+        # More than one 孟 must not silently become the first 见机. In the
+        # attested 戊辰/戊戌 examples the remaining tie is 复等 (缀瑕).
+        order = lessons[:2] + lessons[2:] if yang else lessons[2:] + lessons[:2]
+        selected = next(l for l in order if l in candidates)
+        if trace is not None:
+            trace.append(
+                {
+                    "rule_id": "liuren.harm_tie",
+                    "source_section": "涉害法·复等（缀瑕）",
+                    "result": {
+                        "remaining_lessons": [l["index"] for l in candidates],
+                        "selected_lesson": selected["index"],
+                        "day_polarity": "阳" if yang else "阴",
+                    },
+                }
+            )
+        return selected, "复等"
 
     thieves = _unique([l for l in lessons if l["upper_lower_relation"] == "下贼上"])
     killers = _unique([l for l in lessons if l["upper_lower_relation"] == "上克下"])

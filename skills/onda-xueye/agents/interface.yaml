@@ -37,6 +37,7 @@ input_notes:
 - 按当前问题与所选工具实际 Schema 核对必要资料；不是完整问卷
 - 主题、对象与时间范围沿用当前聊天，限定方法优先，缺项仅限制对应层
 reads:
+- ../../_shared/consultation-core.md
 - ../../_shared/consultation-routing.md
 - ../../_shared/safety-boundaries.md
 - ../../_shared/fatebridge-engine.md

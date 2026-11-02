@@ -1,0 +1,15 @@
+{
+  "house": {
+    "facing_degrees": 60,
+    "north_reference": "magnetic"
+  },
+  "period": {
+    "basis": "expert_confirmed",
+    "period_number": 7,
+    "evidence": "虚构七运申山寅向，用于原书数表差异回归"
+  },
+  "interpretation": {
+    "current_period_number": 9,
+    "period_evidence": "虚构评价九运，与历史七运分别确认"
+  }
+}
