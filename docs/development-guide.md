@@ -31,7 +31,7 @@ uv sync --locked --extra dev
 
 首次 `doctor` 应能识别包版本和已安装依赖；缺少外部星历文件时按返回的能力范围处理。Windows 的环境准备见[快速入门](getting-started.md)。
 
-历史验证原件、回归输入与黄金快照在 Git 之外单独保存。完整验收前，需将与当前测试版本配套的冻结数据恢复到 `docs/validation/`、`tests/fixtures/` 和 `tests/golden/snapshots/`；当前 Python 测试辅助模块与维护文档仍由 Git 管理。CI 也需要预先提供同一份数据。数据缺失时保留原测试失败，不通过重建基线或跳过断言替代验收。本文中的本地数据路径在恢复数据后可用。
+历史验证原件、回归输入与黄金快照在 Git 之外按固定版本保存。按[仓库维护](repository-maintenance.md#恢复-ci-冻结数据)恢复与当前测试版本配套的数据到 `docs/validation/`、`tests/fixtures/` 和 `tests/golden/snapshots/`；当前 Python 测试辅助模块与维护文档仍由 Git 管理。CI 在测试前下载并核对固定资产的大小和 SHA-256，需要配置私有数据仓库的只读下载 Secret。数据或凭据缺失时保留失败，不通过重建基线或跳过断言替代验收。本文中的本地数据路径在恢复数据后可用。
 
 开发依赖继续声明在 `project.optional-dependencies.dev`，兼容既有的 dev extra。本页统一用 `uv run --locked --extra dev <command>` 运行仓库命令，无需激活虚拟环境。提交依赖变更时同时审查 `pyproject.toml` 和 `uv.lock`；不要手改锁文件。
 

@@ -6,7 +6,7 @@ import tarfile
 
 import pytest
 
-from scripts.restore_test_data import DataManifest, restore
+from scripts.restore_test_data import DataManifest, main, restore
 
 
 def bundle(tmp_path, name="tests/fixtures/reference.json", content=b'{"value": 1}'):
@@ -75,3 +75,11 @@ def test_core_jobs_leave_full_research_inputs_for_the_full_matrix(tmp_path):
         )
         == 0
     )
+
+
+def test_missing_ci_credential_reports_configuration_before_download(monkeypatch):
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    monkeypatch.delenv("GH_TOKEN", raising=False)
+    monkeypatch.setattr("sys.argv", ["restore_test_data.py"])
+    with pytest.raises(RuntimeError, match="FATEBRIDGE_FIXTURE_TOKEN"):
+        main()

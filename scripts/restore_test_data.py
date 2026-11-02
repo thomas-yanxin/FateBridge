@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import shutil
 import subprocess
 import tarfile
@@ -122,6 +123,15 @@ def main() -> int:
     parser.add_argument("--core-only", action="store_true")
     parser.add_argument("--archive-directory", type=Path)
     options = parser.parse_args()
+    if (
+        os.environ.get("GITHUB_ACTIONS") == "true"
+        and options.archive_directory is None
+        and not os.environ.get("GH_TOKEN")
+    ):
+        raise RuntimeError(
+            "Configure FATEBRIDGE_FIXTURE_TOKEN with read access to the private "
+            "test-data repository before running CI."
+        )
     manifest = DataManifest.model_validate_json(
         (ROOT / "tests/fixture-data.json").read_text(encoding="utf-8")
     )

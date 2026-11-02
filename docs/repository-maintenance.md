@@ -47,7 +47,9 @@ uv run --locked --extra dev python scripts/restore_test_data.py --archive-direct
 
 Linux 完整矩阵和最低依赖任务恢复全部清单，Windows 任务和锁定环境的入口检查只恢复核心夹具。离线目录中的压缩包名称与清单一致，使用同一套大小及散列检查。
 
-下载使用 GitHub CLI 的 `GH_TOKEN`。公开资产可用工作流的只读 `GITHUB_TOKEN`；私有数据源使用仅限该数据仓库、具有 `Contents: read` 权限的凭据，配置为 `FATEBRIDGE_FIXTURE_TOKEN` 仓库 Secret。工作流优先使用该 Secret，并继续保持仓库的只读默认权限。数据应放在可下载的固定 Release 资产中；只读工作流令牌读取主仓库的未公开 Release 草稿会被拒绝。资产读取权限见 [GitHub 官方说明](https://docs.github.com/en/rest/releases/assets#get-a-release-asset)。
+数据存放于私有 `thomas-yanxin/FateBridge-test-data` 仓库的固定 Release 资产。CI 下载使用 `FATEBRIDGE_FIXTURE_TOKEN` 仓库 Secret：凭据仅限该数据仓库，具有 `Contents: read` 权限；工作流自身的默认权限继续保持只读。缺少凭据时在下载前明确失败，不跳过依赖数据的测试。资产读取权限见 [GitHub 官方说明](https://docs.github.com/en/rest/releases/assets#get-a-release-asset)。
+
+来自 fork 的 pull request 不会获得该 Secret，需要维护者在受信分支执行同一套回归。本地可使用 GitHub CLI 的已有登录，或通过离线压缩包目录恢复数据。
 
 ## 文档和依赖检查
 
