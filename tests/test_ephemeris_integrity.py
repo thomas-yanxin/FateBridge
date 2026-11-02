@@ -2,6 +2,8 @@
 
 import hashlib
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -15,6 +17,62 @@ from tests.fixtures.ephemeris_manifest import manifest_for_payloads
 
 NAME = "sepl_96.se1"
 VALID = b"SW-referenced-planet-data"
+
+
+def test_windows_style_checkout_preserves_lahiri_source_bytes(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    repository = tmp_path / "repository"
+    repository.mkdir()
+    source = "src/fatebridge/core/astro/continuous_lahiri.py"
+    coefficients = "src/fatebridge/data/astronomy/lahiri-frame-v1.json"
+    paths = (
+        ".gitattributes",
+        source,
+        coefficients,
+        "src/fatebridge/data/sukuyo_dayan_reference_LICENSE.txt",
+    )
+    for name in paths:
+        target = repository / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((root / name).read_bytes())
+    subprocess.run(["git", "init", "-q", str(repository)], check=True)
+    subprocess.run(
+        ["git", "-C", str(repository), "config", "core.autocrlf", "true"],
+        check=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(repository), "add", "--", *paths],
+        check=True,
+        capture_output=True,
+    )
+    checkout = tmp_path / "checkout"
+    checkout.mkdir()
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repository),
+            "checkout-index",
+            "--all",
+            "--prefix=" + str(checkout) + "/",
+        ],
+        check=True,
+        capture_output=True,
+    )
+    for name in (coefficients, source, paths[-1]):
+        assert (checkout / name).read_bytes() == (root / name).read_bytes(), name
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import runpy, sys; runpy.run_path(sys.argv[1])",
+            str(checkout / source),
+        ],
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert result.returncode == 0, result.stderr
 
 
 @pytest.mark.parametrize(

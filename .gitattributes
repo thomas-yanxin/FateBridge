@@ -1,5 +1,6 @@
 # Preserve the line endings of maintained, fingerprinted sources.
 # Historical data outside Git retains its original bytes in the data bundle.
+* text=auto eol=lf
 src/fatebridge/data/sukuyo_dayan_reference_LICENSE.txt -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 src/fatebridge/data/classical/ziwei-quanshu-v2-table.json text eol=lf
 src/fatebridge/data/human_design/*.json text eol=lf

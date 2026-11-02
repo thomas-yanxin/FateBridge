@@ -72,3 +72,5 @@ uv run --locked --extra dev python -m pytest -q \
 默认 pytest 收集排除 `tests/fixtures/` 内的历史测试程序；当前 `tests/test_*.py` 仍通过夹具、来源哈希与独立复放核对这些材料。原程序保留，可在对应冻结环境显式复放。
 
 结构整理保留业务输出与公开合同；源码变化会自然改变实现指纹。算法、数据来源、数值阈值和黄金样本的修改应作为独立工程变更验证。完整开发与发布要求见[开发指南](development-guide.md)。
+
+Git 跟踪的文本统一以 LF 检出，避免 Windows 的 `core.autocrlf` 改变来源文件字节、触发哈希校验失败。需保留原始换行的文件在 `.gitattributes` 中用 `-text` 明确标注；冻结数据包继续保留原字节，不重算其哈希。
