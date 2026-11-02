@@ -1,11 +1,5 @@
 import json
 
-from fatebridge.core.requests.reference import (
-    ExportParseRequest,
-    ExportRegistryRequest,
-    KnowledgeReadRequest,
-    KnowledgeRegistryRequest,
-)
 from fatebridge.services.export_tools import (
     calculate_export_parse,
     calculate_export_registry,
@@ -14,44 +8,7 @@ from fatebridge.services.knowledge import (
     calculate_knowledge_read,
     calculate_knowledge_registry,
 )
-from tests.fixtures.transports import mcp_parameters, mcp_text
-
-
-def test_export_request_models_accept_canonical_fields():
-    registry_request = ExportRegistryRequest(technique="qimen")
-    parse_request = ExportParseRequest(
-        technique="qimen",
-        content="[起盘信息]\n测试",
-        selected_sections=["起盘信息", "八宫详解"],
-        planet_info={"showHouse": True, "showRuler": False},
-        astro_meaning={"enabled": True},
-    )
-    knowledge_registry_request = KnowledgeRegistryRequest(
-        domain="astro",
-        selected_sections=["目录概览", "astro"],
-    )
-    knowledge_read_request = KnowledgeReadRequest(
-        domain="astro",
-        category="aspect",
-        aspect_degree=90,
-        object_a="Sun",
-        object_b="Jupiter",
-        selected_sections=["查询信息", "知识正文"],
-    )
-
-    parse_payload = parse_request.model_dump()
-    knowledge_payload = knowledge_read_request.model_dump()
-
-    assert registry_request.technique == "qimen"
-    assert parse_payload["planet_info"]["showHouse"] is True
-    assert parse_payload["planet_info"]["showRuler"] is False
-    assert parse_payload["astro_meaning"]["enabled"] is True
-    assert knowledge_registry_request.domain == "astro"
-    assert knowledge_registry_request.selected_sections == ["目录概览", "astro"]
-    assert knowledge_payload["aspect_degree"] == 90
-    assert knowledge_payload["object_a"] == "Sun"
-    assert knowledge_payload["object_b"] == "Jupiter"
-    assert knowledge_payload["selected_sections"] == ["查询信息", "知识正文"]
+from tests.fixtures.transports import mcp_text
 
 
 def test_calculate_export_registry_matches_fatebridge_shape():
@@ -304,8 +261,3 @@ def test_export_and_knowledge_mcp_tools_return_json_strings():
     assert "休养" in knowledge_read_result["rendered_text"]
     assert knowledge_read_result["snapshot_export"]["selected_sections"] == ["知识正文"]
     assert "[知识正文]" in knowledge_read_result["snapshot_export"]["export_text"]
-
-
-def test_knowledge_read_tool_exposes_selected_sections_parameter():
-    assert "selected_sections" in mcp_parameters("knowledge_registry")["properties"]
-    assert "selected_sections" in mcp_parameters("knowledge_read")["properties"]

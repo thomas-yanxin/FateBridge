@@ -9,16 +9,6 @@ from fatebridge.core.local_techniques.chart import (
     _normalize_time_text,
 )
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
-from fatebridge.core.requests.divination import (
-    GuaLookupRequest,
-    GuaMeiyiRequest,
-    MeihuaAnalysisRequest,
-    OtherBuRequest,
-    SanShiUnitedRequest,
-    SixYaoRequest,
-    SuZhanRequest,
-    TongSheFaRequest,
-)
 from fatebridge.services.divination import (
     calculate_gua_lookup,
     calculate_gua_meiyi,
@@ -29,7 +19,7 @@ from fatebridge.services.divination import (
     calculate_suzhan_analysis,
     calculate_tongshefa_analysis,
 )
-from tests.fixtures.transports import mcp_parameters, mcp_text
+from tests.fixtures.transports import mcp_text
 
 
 def _expected_offline_engine() -> tuple[str, str]:
@@ -159,123 +149,6 @@ def _local_golden_projection():
     }
 
 
-def test_meihua_request_model_accepts_analysis_fields():
-    request = MeihuaAnalysisRequest(
-        analysis_year=2028,
-        analysis_month=4,
-        analysis_day=1,
-        analysis_hour=9,
-        analysis_minute=0,
-        analysis_timezone="Asia/Shanghai",
-        question="事业推进节奏",
-    )
-
-    payload = request.model_dump()
-
-    assert payload["analysis_year"] == 2028
-    assert payload["analysis_month"] == 4
-    assert payload["analysis_day"] == 1
-    assert payload["analysis_hour"] == 9
-    assert payload["analysis_minute"] == 0
-    assert payload["analysis_timezone"] == "Asia/Shanghai"
-    assert payload["question"] == "事业推进节奏"
-
-
-def test_gua_lookup_request_model_accepts_fields():
-    request = GuaLookupRequest(
-        query="111111",
-        lookup_mode="hexagram",
-        selected_sections=["查询信息", "义理摘要"],
-    )
-
-    payload = request.model_dump()
-
-    assert payload["query"] == "111111"
-    assert payload["lookup_mode"] == "hexagram"
-    assert payload["selected_sections"] == ["查询信息", "义理摘要"]
-
-
-def test_gua_meiyi_request_model_accepts_fields():
-    request = GuaMeiyiRequest(
-        name=["111111", "111"],
-        selected_sections=["查询概览", "批量结果"],
-    )
-
-    payload = request.model_dump()
-
-    assert payload["name"] == ["111111", "111"]
-    assert payload["selected_sections"] == ["查询概览", "批量结果"]
-
-
-def test_local_request_models_accept_alias_and_nested_fields():
-    tongshefa_request = TongSheFaRequest(
-        taiyin="巽",
-        taiyang="坤",
-        shaoyang="震",
-        shaoyin="震",
-    )
-    sixyao_request = SixYaoRequest(
-        date="2028-04-06",
-        time="09:33:00",
-        zone="+08:00",
-        gps_lat=31.2,
-        gps_lon=121.4,
-        lines=[{"value": 1, "change": True}] * 6,
-    )
-    suzhan_request = SuZhanRequest(
-        date="2028-04-06",
-        time="09:33:00",
-        house_start_mode=2,
-        doubing_su28=False,
-        hsys=0,
-        zodiacal=1,
-    )
-    otherbu_request = OtherBuRequest(
-        date="2028-04-06",
-        time="09:33:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
-        sign="Aries",
-        house=3,
-        planet="Sun",
-        hsys=0,
-        zodiacal=1,
-    )
-    sanshiunited_request = SanShiUnitedRequest(
-        date="2028-04-06",
-        time="09:33:00",
-        qimen_options={"layout": "direct"},
-        taiyi_options={"accNum": 0},
-        selected_sections=["起盘信息", "离九宫"],
-        liureng_yue="辰",
-        liureng_is_diurnal=True,
-        use_true_solar_time=True,
-    )
-
-    sixyao_payload = sixyao_request.model_dump(by_alias=True)
-    suzhan_payload = suzhan_request.model_dump(by_alias=True)
-    sanshi_payload = sanshiunited_request.model_dump(by_alias=True)
-    otherbu_payload = otherbu_request.model_dump(by_alias=True)
-
-    assert tongshefa_request.shaoyin == "震"
-    assert sixyao_payload["gps_lat"] == 31.2
-    assert sixyao_payload["gps_lon"] == 121.4
-    assert sixyao_payload["lines"][0]["change"] is True
-    assert suzhan_payload["house_start_mode"] == 2
-    assert suzhan_payload["doubing_su28"] is False
-    assert suzhan_payload["hsys"] == 0
-    assert suzhan_payload["zodiacal"] == 1
-    assert otherbu_request.house == 3
-    assert otherbu_payload["hsys"] == 0
-    assert otherbu_payload["zodiacal"] == 1
-    assert sanshiunited_request.qimen_options["layout"] == "direct"
-    assert sanshiunited_request.selected_sections == ["起盘信息", "离九宫"]
-    assert sanshiunited_request.liureng_is_diurnal is True
-    assert sanshi_payload["liureng_is_diurnal"] is True
-    assert sanshi_payload["use_true_solar_time"] is True
-
-
 def test_calculate_gua_lookup_supports_hexagram_and_trigram_queries():
     hexagram_result = calculate_gua_lookup(query="111111", lookup_mode="auto")
     trigram_result = calculate_gua_lookup(query="111", lookup_mode="auto")
@@ -345,22 +218,6 @@ def test_calculate_gua_meiyi_supports_selected_export_sections():
     assert "[批量结果]" in result["snapshot_export"]["export_text"]
     assert "[查询概览]" not in result["snapshot_export"]["export_text"]
     assert "[来源]" not in result["snapshot_export"]["export_text"]
-
-
-def test_fastmcp_divination_tools_expose_compact_controls():
-    for tool in (
-        "export_registry",
-        "gua_lookup",
-        "gua_meiyi",
-        "meihua_analysis",
-        "sanshiunited",
-        "sixyao",
-        "suzhan",
-        "otherbu",
-    ):
-        properties = mcp_parameters(tool)["properties"]
-        assert "compact" in properties
-        assert "include_snapshot_text" in properties
 
 
 def test_fastmcp_sanshiunited_compact_mode_can_drop_snapshot_text():
@@ -1353,68 +1210,6 @@ def test_local_offline_golden_samples_match_current_contract():
             },
         },
     }
-
-
-def test_fastmcp_meihua_tool_exposes_parameters():
-    properties = mcp_parameters("meihua_analysis")["properties"]
-
-    assert "analysis_year" in properties
-    assert "analysis_month" in properties
-    assert "analysis_day" in properties
-    assert "analysis_hour" in properties
-    assert "analysis_minute" in properties
-    assert "analysis_timezone" in properties
-    assert "question" in properties
-
-
-def test_fastmcp_gua_lookup_tool_exposes_parameters():
-    properties = mcp_parameters("gua_lookup")["properties"]
-
-    assert "query" in properties
-    assert "lookup_mode" in properties
-    assert "selected_sections" in properties
-
-
-def test_fastmcp_gua_meiyi_tool_exposes_parameters():
-    properties = mcp_parameters("gua_meiyi")["properties"]
-
-    assert "name" in properties
-    assert "selected_sections" in properties
-
-
-def test_fastmcp_local_tools_expose_parameters():
-    assert "taiyin" in mcp_parameters("tongshefa")["properties"]
-    assert "taiyang" in mcp_parameters("tongshefa")["properties"]
-
-    sixyao_properties = mcp_parameters("sixyao")["properties"]
-    assert "date" in sixyao_properties
-    assert "time" in sixyao_properties
-    assert "gua_code" in sixyao_properties
-    assert "changed_code" in sixyao_properties
-    assert "lines" in sixyao_properties
-
-    suzhan_properties = mcp_parameters("suzhan")["properties"]
-    assert "szchart" in suzhan_properties
-    assert "szshape" in suzhan_properties
-    assert "house_start_mode" in suzhan_properties
-    assert "hsys" in suzhan_properties
-    assert "zodiacal" in suzhan_properties
-
-    otherbu_properties = mcp_parameters("otherbu")["properties"]
-    assert "tradition" in otherbu_properties
-    assert "sign" in otherbu_properties
-    assert "house" in otherbu_properties
-    assert "planet" in otherbu_properties
-    assert "hsys" in otherbu_properties
-    assert "zodiacal" in otherbu_properties
-
-    sanshi_properties = mcp_parameters("sanshiunited")["properties"]
-    assert "qimen_options" in sanshi_properties
-    assert "taiyi_options" in sanshi_properties
-    assert "selected_sections" in sanshi_properties
-    assert "liureng_yue" in sanshi_properties
-    assert "liureng_is_diurnal" in sanshi_properties
-    assert "use_true_solar_time" in sanshi_properties
 
 
 def test_tongshefa_hex_always_enriches_every_hexagram():

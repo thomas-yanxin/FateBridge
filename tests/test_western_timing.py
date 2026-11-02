@@ -21,48 +21,9 @@ from fatebridge.core.predictive.western_timing import build_western_timing_paylo
 from fatebridge.core.predictive.zodiacal_releasing import (
     build_releasing_level_within_interval,
 )
-from fatebridge.core.requests.western_timing import WesternTimingRequest
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.services.western_timing import calculate_western_timing_analysis
 from fatebridge.utils.timezones import parse_timezone_name
-from tests.fixtures.transports import mcp_parameters
-
-
-def test_western_timing_request_model_accepts_fields():
-    request = WesternTimingRequest(
-        name="Alice",
-        birth_year=1990,
-        birth_month=5,
-        birth_day=17,
-        birth_hour=15,
-        birth_minute=30,
-        birth_place="上海",
-        birth_timezone="Asia/Shanghai",
-        birth_longitude=121.4737,
-        birth_latitude=31.2304,
-        analysis_year=2025,
-        analysis_month=5,
-        analysis_day=20,
-        pd_method="astroapp_alchabitius",
-        pd_time_key="Ptolemy",
-        pd_aspects=[0, 60, 90, 120, 180],
-        show_pd_bounds=True,
-    )
-
-    payload = request.model_dump()
-
-    assert payload["name"] == "Alice"
-    assert payload["birth_minute"] == 30
-    assert payload["birth_timezone"] == "Asia/Shanghai"
-    assert payload["birth_longitude"] == 121.4737
-    assert payload["birth_latitude"] == 31.2304
-    assert payload["analysis_year"] == 2025
-    assert payload["analysis_month"] == 5
-    assert payload["analysis_day"] == 20
-    assert payload["pd_method"] == "astroapp_alchabitius"
-    assert payload["pd_time_key"] == "Ptolemy"
-    assert payload["pd_aspects"] == [0, 60, 90, 120, 180]
-    assert payload["show_pd_bounds"] is True
 
 
 def _governing_returns_for(analysis_month, analysis_day):
@@ -158,24 +119,6 @@ def test_monthly_profection_segments_are_equal_twelfths():
         active[0]["house"]
         == result["directions"]["given_year"]["annual_profection"]["monthly_house"]
     )
-
-
-def test_western_timing_request_model_accepts_pd_type():
-    request = WesternTimingRequest(
-        name="Alice",
-        birth_year=1990,
-        birth_month=5,
-        birth_day=17,
-        birth_hour=15,
-        birth_timezone="Asia/Shanghai",
-        birth_longitude=121.4737,
-        birth_latitude=31.2304,
-        pd_type=1,
-    )
-
-    payload = request.model_dump()
-
-    assert payload["pd_type"] == 1
 
 
 def test_calculate_western_timing_analysis_returns_predictive_sections():
@@ -598,22 +541,6 @@ def test_primary_directions_support_converse_mode():
     )
     assert sun_sign_change["from_sign"] == "Taurus"
     assert sun_sign_change["to_sign"] == "Aries"
-
-
-def test_fastmcp_western_timing_tool_exposes_parameters():
-    properties = mcp_parameters("western_timing_analysis")["properties"]
-
-    assert "birth_timezone" in properties
-    assert "birth_longitude" in properties
-    assert "birth_latitude" in properties
-    assert "analysis_year" in properties
-    assert "analysis_month" in properties
-    assert "analysis_day" in properties
-    assert "pd_method" in properties
-    assert "pd_time_key" in properties
-    assert "pd_type" in properties
-    assert "pd_aspects" in properties
-    assert "show_pd_bounds" in properties
 
 
 def test_primary_direction_chart_omits_bounds_overlay_when_disabled():

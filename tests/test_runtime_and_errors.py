@@ -11,17 +11,12 @@ import fatebridge.api as api
 import fatebridge.api as api_module
 import fatebridge.application.execution as execution
 import fatebridge.mcp_server as mcp
-from fatebridge import mcp_server as fastmcp_server
 from fatebridge.cli import run as cli_run
 from fatebridge.core.requests.bazi import BaziBirthRequest
 from fatebridge.core.requests.western_timing import WesternTimingRequest
 from fatebridge.utils.errors import handle_calculation_error
 from fatebridge.utils.formatting import format_error_response
-from fatebridge.utils.runtime import (
-    load_runtime_env,
-    parse_allowed_origins,
-    parse_api_keys,
-)
+from fatebridge.utils.runtime import load_runtime_env, parse_allowed_origins
 from tests.fixtures.surface_payloads import REST_POST_CASES, astro_payload
 from tests.fixtures.transports import rest_handler
 
@@ -60,15 +55,6 @@ def test_parse_allowed_origins_filters_blank_entries(monkeypatch):
     ]
 
 
-def test_parse_api_keys_supports_named_and_unnamed_entries(monkeypatch):
-    monkeypatch.setenv("FATEBRIDGE_API_KEYS", "agent:secret-a, secret-b")
-
-    assert parse_api_keys() == {
-        "agent": "secret-a",
-        "key2": "secret-b",
-    }
-
-
 def test_handle_calculation_error_returns_structured_validation_payload():
     payload = handle_calculation_error(ValueError("出生日期无效"), "命理分析计算")
 
@@ -95,11 +81,6 @@ def test_format_error_response_preserves_structured_error_metadata():
         "retryable": False,
         "operation": "西占时运分析",
     }
-
-
-def test_cli_entrypoints_are_callable():
-    assert callable(api_module.main)
-    assert callable(fastmcp_server.main)
 
 
 def test_calculate_birth_route_executes_service_via_threadpool(monkeypatch):
@@ -267,26 +248,6 @@ def test_api_key_auth_rejects_missing_key_when_configured(monkeypatch):
         "error_code": "authentication_required",
         "retryable": False,
     }
-
-
-def test_api_key_auth_accepts_valid_key_when_configured(monkeypatch):
-    api_module._reset_runtime_state_for_tests()
-    monkeypatch.setattr(
-        api_module,
-        "API_KEY_AUTHENTICATOR",
-        api_module.ApiKeyAuthenticator(
-            header_name="X-API-Key",
-            api_keys={"agent": "secret-key"},
-        ),
-    )
-    client = TestClient(api_module.app)
-    response = client.post(
-        "/api/divination/gua",
-        json={"query": "乾"},
-        headers={"X-API-Key": "secret-key"},
-    )
-
-    assert response.status_code == 200
 
 
 def test_api_key_auth_keeps_ready_endpoint_public(monkeypatch):

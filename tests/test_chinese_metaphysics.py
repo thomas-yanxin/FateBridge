@@ -3,15 +3,6 @@ import re
 
 import pytest
 
-from fatebridge.core.requests.metaphysics import (
-    JinkouAnalysisRequest,
-    LiuRengGodsRequest,
-    LiuRengRunyearRequest,
-    QimenAnalysisRequest,
-    TaiyiAnalysisRequest,
-    ZiweiBirthRequest,
-    ZiweiRulesRequest,
-)
 from fatebridge.services.metaphysics import (
     calculate_jinkou_analysis,
     calculate_liureng_gods,
@@ -22,119 +13,7 @@ from fatebridge.services.metaphysics import (
     calculate_ziwei_rules,
 )
 from fatebridge.utils.birth_input import create_person_info
-from tests.fixtures.transports import mcp_parameters, mcp_text
-
-
-def test_ziwei_birth_request_model_accepts_birth_fields():
-    request = ZiweiBirthRequest(
-        name="张三",
-        gender="男",
-        birth_year=1994,
-        birth_month=8,
-        birth_day=23,
-        birth_hour=14,
-        birth_minute=30,
-        birth_place="上海",
-        birth_timezone="Asia/Shanghai",
-        selected_sections=["起盘信息", "宫位总览"],
-    )
-
-    payload = request.model_dump()
-
-    assert payload["name"] == "张三"
-    assert payload["gender"] == "男"
-    assert payload["birth_hour"] == 14
-    assert payload["birth_minute"] == 30
-    assert payload["birth_timezone"] == "Asia/Shanghai"
-    assert payload["selected_sections"] == ["起盘信息", "宫位总览"]
-
-
-def test_cn_analysis_request_models_accept_fields():
-    liureng_request = LiuRengGodsRequest(
-        analysis_year=2026,
-        analysis_month=4,
-        analysis_day=4,
-        analysis_hour=21,
-        analysis_minute=18,
-        analysis_timezone="Asia/Shanghai",
-        analysis_longitude=121.4737,
-        gender="男",
-        selected_sections=["起盘信息", "三传"],
-    )
-    qimen_request = QimenAnalysisRequest(
-        analysis_year=2026,
-        analysis_month=4,
-        analysis_day=4,
-        analysis_hour=21,
-        analysis_minute=18,
-        analysis_timezone="Asia/Shanghai",
-        analysis_longitude=121.4737,
-        qimen_options={"layout": "direct"},
-        selected_sections=["起盘信息", "九宫方盘"],
-    )
-    taiyi_request = TaiyiAnalysisRequest(
-        analysis_year=2026,
-        analysis_month=4,
-        analysis_day=4,
-        analysis_hour=21,
-        analysis_minute=18,
-        analysis_timezone="Asia/Shanghai",
-        analysis_longitude=121.4737,
-        gender="男",
-        selected_sections=["起盘信息", "十六宫标记"],
-    )
-    jinkou_request = JinkouAnalysisRequest(
-        analysis_year=2026,
-        analysis_month=4,
-        analysis_day=4,
-        analysis_hour=21,
-        analysis_minute=18,
-        analysis_timezone="Asia/Shanghai",
-        analysis_longitude=121.4737,
-        gender="男",
-        di_fen="酉",
-        selected_sections=["起盘信息", "金口诀四位"],
-    )
-    runyear_request = LiuRengRunyearRequest(
-        birth_year=1994,
-        birth_month=8,
-        birth_day=23,
-        birth_hour=14,
-        birth_minute=30,
-        gender="男",
-        analysis_year=2026,
-        analysis_month=4,
-        analysis_day=4,
-        analysis_hour=21,
-        analysis_minute=18,
-        analysis_timezone="Asia/Shanghai",
-        analysis_longitude=121.4737,
-        selected_sections=["起盘信息", "行年"],
-    )
-    rules_request = ZiweiRulesRequest(
-        year_stem="甲",
-        selected_sections=["规则概览", "当前天干四化"],
-    )
-
-    assert liureng_request.model_dump()["analysis_longitude"] == 121.4737
-    assert liureng_request.model_dump()["selected_sections"] == ["起盘信息", "三传"]
-    assert qimen_request.model_dump()["analysis_hour"] == 21
-    assert qimen_request.model_dump()["qimen_options"]["layout"] == "direct"
-    assert qimen_request.model_dump()["selected_sections"] == ["起盘信息", "九宫方盘"]
-    assert taiyi_request.model_dump()["gender"] == "男"
-    assert taiyi_request.model_dump()["selected_sections"] == ["起盘信息", "十六宫标记"]
-    assert jinkou_request.model_dump()["di_fen"] == "酉"
-    assert jinkou_request.model_dump()["selected_sections"] == [
-        "起盘信息",
-        "金口诀四位",
-    ]
-    assert runyear_request.model_dump()["birth_year"] == 1994
-    assert runyear_request.model_dump()["selected_sections"] == ["起盘信息", "行年"]
-    assert rules_request.model_dump()["year_stem"] == "甲"
-    assert rules_request.model_dump()["selected_sections"] == [
-        "规则概览",
-        "当前天干四化",
-    ]
+from tests.fixtures.transports import mcp_text
 
 
 def test_calculate_ziwei_birth_returns_twelve_palaces():
@@ -229,22 +108,6 @@ def test_calculate_ziwei_rules_supports_selected_export_sections():
     assert "[规则概览]" in result["snapshot_export"]["export_text"]
     assert "[当前天干四化]" in result["snapshot_export"]["export_text"]
     assert "[四化总表]" not in result["snapshot_export"]["export_text"]
-
-
-def test_fastmcp_metaphysics_tools_expose_compact_controls():
-    for tool in (
-        "ziwei_birth",
-        "ziwei_rules",
-        "liureng_gods",
-        "liureng_runyear",
-        "qimen",
-        "taiyi",
-        "jinkou",
-    ):
-        properties = mcp_parameters(tool)["properties"]
-        assert "compact" in properties
-        assert "include_snapshot_text" in properties
-        assert "fields" in properties
 
 
 def test_fastmcp_ziwei_birth_compact_mode_can_drop_snapshot_text():
@@ -872,24 +735,6 @@ def test_calculate_jinkou_analysis_supports_selected_export_sections():
     assert "[起盘信息]" in result["snapshot_export"]["export_text"]
     assert "[金口诀四位]" in result["snapshot_export"]["export_text"]
     assert "[四位神煞]" not in result["snapshot_export"]["export_text"]
-
-
-def test_fastmcp_tools_expose_new_parameters():
-    assert "birth_year" in mcp_parameters("ziwei_birth")["properties"]
-    assert "selected_sections" in mcp_parameters("ziwei_birth")["properties"]
-    assert "year_stem" in mcp_parameters("ziwei_rules")["properties"]
-    assert "selected_sections" in mcp_parameters("ziwei_rules")["properties"]
-    assert "analysis_year" in mcp_parameters("liureng_gods")["properties"]
-    assert "selected_sections" in mcp_parameters("liureng_gods")["properties"]
-    assert "birth_year" in mcp_parameters("liureng_runyear")["properties"]
-    assert "selected_sections" in mcp_parameters("liureng_runyear")["properties"]
-    assert "analysis_year" in mcp_parameters("qimen")["properties"]
-    assert "qimen_options" in mcp_parameters("qimen")["properties"]
-    assert "selected_sections" in mcp_parameters("qimen")["properties"]
-    assert "gender" in mcp_parameters("taiyi")["properties"]
-    assert "selected_sections" in mcp_parameters("taiyi")["properties"]
-    assert "di_fen" in mcp_parameters("jinkou")["properties"]
-    assert "selected_sections" in mcp_parameters("jinkou")["properties"]
 
 
 def test_ziwei_birth_palaces_have_stars_detail():

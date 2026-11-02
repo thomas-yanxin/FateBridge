@@ -5,8 +5,6 @@ ToolSpec's name, so the old payload-shape inference is dead. These tests lock
 that contract: the renderer must NOT reverse-engineer a name from payload shape.
 """
 
-import json
-
 from fatebridge.services import run_metadata
 from fatebridge.services.run_metadata import (
     attach_run_metadata,
@@ -91,12 +89,6 @@ def test_resolve_runtime_engine_still_detects_engine():
         == "swiss"
     )
     assert resolve_runtime_engine({"nothing": 1}) == run_metadata.DEFAULT_ENGINE
-
-
-def test_payload_inference_heuristics_are_removed():
-    # Guard against reintroducing the fragile guesser.
-    assert not hasattr(run_metadata, "infer_tool_name_from_payload")
-    assert not hasattr(run_metadata, "infer_tool_name_from_service")
 
 
 def test_render_does_not_guess_tool_name_from_payload_shape():

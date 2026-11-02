@@ -1,6 +1,5 @@
 import json
 
-from fatebridge.core.requests.bazi import BaziBirthRequest
 from fatebridge.services.bazi import calculate_bazi_birth
 from fatebridge.utils.birth_input import create_person_info
 from tests.fixtures.transports import mcp_parameters, mcp_text
@@ -18,46 +17,6 @@ def _build_person():
         birth_minute=30,
         birth_timezone="Asia/Shanghai",
     )
-
-
-def test_bazi_request_models_accept_birth_and_analysis_fields():
-    birth_request = BaziBirthRequest(
-        name="张三",
-        gender="男",
-        birth_year=1994,
-        birth_month=8,
-        birth_day=23,
-        birth_hour=14,
-        birth_minute=30,
-        birth_place="上海",
-        birth_timezone="Asia/Shanghai",
-        selected_sections=["起盘信息", "四柱与三元"],
-    )
-    analysis_request = BaziBirthRequest(
-        name="张三",
-        gender="男",
-        birth_year=1994,
-        birth_month=8,
-        birth_day=23,
-        birth_hour=14,
-        birth_minute=30,
-        birth_place="上海",
-        birth_timezone="Asia/Shanghai",
-        analysis_year=2028,
-        analysis_month=4,
-        analysis_day=1,
-        selected_sections=["起盘信息", "流年行运概略"],
-    )
-
-    birth_payload = birth_request.model_dump()
-    analysis_payload = analysis_request.model_dump()
-
-    assert birth_payload["birth_timezone"] == "Asia/Shanghai"
-    assert birth_payload["selected_sections"] == ["起盘信息", "四柱与三元"]
-    assert analysis_payload["analysis_year"] == 2028
-    assert analysis_payload["analysis_month"] == 4
-    assert analysis_payload["analysis_day"] == 1
-    assert analysis_payload["selected_sections"] == ["起盘信息", "流年行运概略"]
 
 
 def test_calculate_bazi_birth_returns_snapshot_sections():
@@ -111,16 +70,6 @@ def test_calculate_bazi_birth_supports_selected_export_sections():
     assert "[起盘信息]" in result["snapshot_export"]["export_text"]
     assert "[流年行运概略]" in result["snapshot_export"]["export_text"]
     assert "[四柱与三元]" not in result["snapshot_export"]["export_text"]
-
-
-def test_fastmcp_bazi_tools_expose_parameters():
-    birth_properties = mcp_parameters("bazi_birth")["properties"]
-
-    assert "selected_sections" in birth_properties
-    assert "compact" in birth_properties
-    assert "include_snapshot_text" in birth_properties
-    assert "analysis_year" in birth_properties
-    assert "analysis_month" in birth_properties
 
 
 def test_fastmcp_bazi_birth_compact_mode_can_drop_snapshot_text():

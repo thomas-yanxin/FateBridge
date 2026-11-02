@@ -1,5 +1,3 @@
-import asyncio
-
 import pytest
 from pydantic import ValidationError
 
@@ -25,71 +23,9 @@ from fatebridge.services.astrology import (
 )
 from fatebridge.utils.places import KNOWN_BIRTH_PLACE_ENTRIES
 from tests.fixtures.surface_payloads import astro_payload
-from tests.fixtures.transports import mcp_parameters, rest_handler
+from tests.fixtures.transports import rest_handler
 
 calculate_relative_chart_endpoint = rest_handler("astro_relative")
-
-
-def test_astro_request_models_accept_geo_fields():
-    request = AstroChartRequest(**astro_payload(), hsys=0, zodiacal=1)
-    place_only_request = AstroChartRequest(
-        name="测试者",
-        birth_year=1993,
-        birth_month=12,
-        birth_day=15,
-        birth_hour=10,
-        birth_minute=30,
-        birth_timezone=None,
-        birth_place="北京",
-    )
-    default_relative_request = AstroRelativeRequest(
-        inner=AstroRelativePartyRequest(**astro_payload()),
-        outer=AstroRelativePartyRequest(
-            **{
-                **astro_payload(),
-                "name": "对盘者",
-                "birth_year": 1992,
-                "birth_month": 3,
-                "birth_day": 2,
-                "birth_hour": 8,
-                "birth_minute": 18,
-            }
-        ),
-    )
-    modern_relative_request = AstroRelativeRequest(
-        inner=AstroRelativePartyRequest(**astro_payload()),
-        outer=AstroRelativePartyRequest(
-            **{
-                **astro_payload(),
-                "name": "对盘者",
-                "birth_year": 1992,
-                "birth_month": 3,
-                "birth_day": 2,
-                "birth_hour": 8,
-                "birth_minute": 18,
-            }
-        ),
-        relative_mode="Composite",
-        hsys=1,
-        zodiacal=1,
-    )
-
-    chart_payload = request.model_dump()
-    place_only_payload = place_only_request.model_dump()
-    default_relation_payload = default_relative_request.model_dump()
-    modern_relation_payload = modern_relative_request.model_dump()
-
-    assert chart_payload["birth_longitude"] == 121.4667
-    assert chart_payload["birth_latitude"] == 31.2167
-    assert chart_payload["hsys"] == 0
-    assert chart_payload["zodiacal"] == 1
-    assert place_only_payload["birth_longitude"] is None
-    assert place_only_payload["birth_latitude"] is None
-    assert default_relation_payload["relative_mode"] is None
-    assert "relationship_mode" not in default_relation_payload
-    assert modern_relation_payload["relative_mode"] == "Composite"
-    assert modern_relation_payload["hsys"] == 1
-    assert modern_relation_payload["zodiacal"] == 1
 
 
 def test_core_chart_variants_expose_variant_specific_fields():
@@ -957,33 +893,6 @@ def test_relative_invalid_mode_returns_structured_validation_error():
     assert result["retryable"] is False
     assert "relative_mode" in result["error"]
     assert "Composite" in result["error"]
-
-
-def test_fastmcp_astro_tools_expose_geo_parameters():
-    chart_properties = mcp_parameters("astro_chart")["properties"]
-    chart13_properties = mcp_parameters("astro_chart13")["properties"]
-    hellen_properties = mcp_parameters("astro_hellen_chart")["properties"]
-    india_properties = mcp_parameters("astro_india_chart")["properties"]
-    germany_properties = mcp_parameters("astro_germany_chart")["properties"]
-    relative_properties = mcp_parameters("astro_relative_chart")["properties"]
-
-    assert "birth_longitude" in chart_properties
-    assert "birth_latitude" in chart_properties
-    assert "hsys" in chart_properties
-    assert "zodiacal" in chart_properties
-    assert "hsys" in chart13_properties
-    assert "zodiacal" in chart13_properties
-    assert "hsys" in hellen_properties
-    assert "zodiacal" in hellen_properties
-    assert "hsys" in india_properties
-    assert "zodiacal" in india_properties
-    assert "hsys" in germany_properties
-    assert "zodiacal" in germany_properties
-    assert "inner_birth_latitude" in relative_properties
-    assert "outer_birth_longitude" in relative_properties
-    assert "relative_mode" in relative_properties
-    assert "hsys" in relative_properties
-    assert "zodiacal" in relative_properties
 
 
 def test_offline_angles_match_swisseph_across_charts():

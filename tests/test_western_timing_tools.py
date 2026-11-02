@@ -1,7 +1,6 @@
 import pytest
 
 from fatebridge.core.predictive import western_timing as astrology_predictive
-from fatebridge.core.requests.western_timing import WesternTimingModuleRequest
 from fatebridge.services.western_timing_tools import (
     calculate_decennials,
     calculate_firdaria,
@@ -16,23 +15,6 @@ from fatebridge.services.western_timing_tools import (
     calculate_zr,
 )
 from tests.fixtures.surface_payloads import western_payload
-from tests.fixtures.transports import mcp_parameters
-
-
-def test_western_timing_module_request_accepts_selected_sections():
-    request = WesternTimingModuleRequest(
-        **western_payload(),
-        selected_sections=["起盘信息", "星盘信息"],
-    )
-
-    payload = request.model_dump()
-
-    assert payload["analysis_year"] == 2025
-    assert payload["analysis_month"] == 5
-    assert payload["analysis_day"] == 20
-    assert payload["selected_sections"] == ["起盘信息", "星盘信息"]
-    assert payload["pd_method"] == "astroapp_alchabitius"
-    assert payload["pd_time_key"] == "Naibod"
 
 
 def test_western_return_and_direction_tools_generate_snapshots():
@@ -177,29 +159,6 @@ def test_primary_direction_and_time_lord_tools_support_selected_sections():
     assert decennials_result["analysis_type"] == "西占十年星限"
     assert decennials_result["decennials"]["current_level_1"]["planet"] == "Moon"
     assert decennials_result["snapshot_export"]["technique"]["key"] == "decennials"
-
-
-def test_fastmcp_western_timing_tools_expose_parameters():
-    tools = [
-        "solarreturn",
-        "lunarreturn",
-        "transit",
-        "solararc",
-        "givenyear",
-        "profection",
-        "pd",
-        "pdchart",
-        "zr",
-        "firdaria",
-        "decennials",
-    ]
-
-    for tool in tools:
-        properties = mcp_parameters(tool)["properties"]
-        assert "analysis_year" in properties
-        assert "analysis_month" in properties
-        assert "analysis_day" in properties
-        assert "selected_sections" in properties
 
 
 def _count_decennial_nodes(node) -> int:

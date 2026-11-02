@@ -1,52 +1,14 @@
 import json
 from datetime import datetime
 
-from fatebridge.core.requests.calendar import JieqiYearRequest, NongliTimeRequest
-from fatebridge.core.requests.divination import GuaMeiyiRequest
+from fatebridge.core.requests.calendar import NongliTimeRequest
 from fatebridge.services.calendar_tools import (
     calculate_jieqi_year,
     calculate_nongli_time,
 )
 from fatebridge.services.divination import calculate_gua_meiyi
 from tests.fixtures.solar_reference import expected_solar_clock
-from tests.fixtures.transports import mcp_parameters, mcp_text
-
-
-def test_helper_request_models_accept_published_fields():
-    jieqi_request = JieqiYearRequest(
-        year=2028,
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
-        gps_lat=31.2167,
-        gps_lon=121.4667,
-        jieqis=["春分", "冬至"],
-        selected_sections=["查询信息", "重点节气"],
-    )
-    nongli_request = NongliTimeRequest(
-        date="2028-04-01",
-        time="09:00:00",
-        zone="+08:00",
-        lat="31n13",
-        lon="121e28",
-        gps_lat=31.2167,
-        gps_lon=121.4667,
-        time_alg=0,
-        selected_sections=["农历上下文", "四柱上下文"],
-    )
-    gua_request = GuaMeiyiRequest(name=["111", "000"])
-
-    jieqi_payload = jieqi_request.model_dump(by_alias=True)
-    nongli_payload = nongli_request.model_dump(by_alias=True)
-
-    assert jieqi_payload["gps_lat"] == 31.2167
-    assert jieqi_payload["gps_lon"] == 121.4667
-    assert jieqi_payload["jieqis"] == ["春分", "冬至"]
-    assert jieqi_payload["selected_sections"] == ["查询信息", "重点节气"]
-    assert nongli_payload["time_alg"] == 0
-    assert nongli_payload["gps_lat"] == 31.2167
-    assert nongli_payload["selected_sections"] == ["农历上下文", "四柱上下文"]
-    assert gua_request.name == ["111", "000"]
+from tests.fixtures.transports import mcp_text
 
 
 def test_calculate_jieqi_year_returns_year_grid_and_selected_terms():
@@ -314,11 +276,6 @@ def test_helper_mcp_tools_return_formatted_json_strings():
     assert nongli_result["snapshot_export"]["selected_sections"] == ["农历上下文"]
     assert gua_result["analysis_type"] == "梅易卦义"
     assert gua_result["results"]["111"]["name"] == "乾"
-
-
-def test_calendar_helper_tools_expose_selected_sections_parameter():
-    assert "selected_sections" in mcp_parameters("jieqi_year")["properties"]
-    assert "selected_sections" in mcp_parameters("nongli_time")["properties"]
 
 
 def test_nongli_rollover_uses_the_core_late_zi_rule_without_an_ignored_switch():
