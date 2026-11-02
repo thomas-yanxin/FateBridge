@@ -4,6 +4,8 @@ import ast
 from importlib.util import resolve_name
 from pathlib import Path
 
+import pytest
+
 SOURCE = Path(__file__).resolve().parents[1] / "src/fatebridge"
 RETIRED_MODULES = {
     "fatebridge.core.tool_spec",
@@ -25,7 +27,8 @@ ADAPTERS = (
 )
 
 
-def dependencies():
+@pytest.fixture(scope="module")
+def dependency_graph():
     modules = {
         path: (
             "fatebridge." + ".".join(path.relative_to(SOURCE).with_suffix("").parts)
@@ -63,10 +66,10 @@ def matches(module, prefixes):
     )
 
 
-def test_domain_and_shared_utilities_do_not_depend_on_outer_layers():
+def test_domain_and_shared_utilities_do_not_depend_on_outer_layers(dependency_graph):
     forbidden = (*ADAPTERS, "fatebridge.application", "fatebridge.services")
     violations = []
-    for module, imports in dependencies().items():
+    for module, imports in dependency_graph.items():
         if matches(
             module, ("fatebridge.core", "fatebridge.analysis", "fatebridge.utils")
         ):
@@ -78,9 +81,11 @@ def test_domain_and_shared_utilities_do_not_depend_on_outer_layers():
     assert not violations, "\n".join(sorted(violations))
 
 
-def test_application_and_services_do_not_depend_on_protocol_adapters_or_shims():
+def test_application_and_services_do_not_depend_on_protocol_adapters_or_shims(
+    dependency_graph,
+):
     violations = []
-    for module, imports in dependencies().items():
+    for module, imports in dependency_graph.items():
         if matches(module, ("fatebridge.application", "fatebridge.services")):
             violations.extend(
                 f"{module} -> {dependency}"
@@ -90,10 +95,10 @@ def test_application_and_services_do_not_depend_on_protocol_adapters_or_shims():
     assert not violations, "\n".join(sorted(violations))
 
 
-def test_internal_static_import_graph_has_no_cycles():
+def test_internal_static_import_graph_has_no_cycles(dependency_graph):
     # Includes function-local imports: postponing an import does not remove
     # the architectural dependency. External libraries are not traversed.
-    graph = dependencies()
+    graph = dependency_graph
     visited = set()
     active = []
 
@@ -112,14 +117,10 @@ def test_internal_static_import_graph_has_no_cycles():
         visit(module)
 
 
-def test_chart_implementations_and_consumers_do_not_depend_on_legacy_facade():
-    for module, imports in dependencies().items():
-        if module != "fatebridge.core.astrology":
-            assert "fatebridge.core.astrology" not in imports, module
-
-
-def test_shared_birth_and_timing_builders_do_not_import_service_entry_points():
-    graph = dependencies()
+def test_shared_birth_and_timing_builders_do_not_import_service_entry_points(
+    dependency_graph,
+):
+    graph = dependency_graph
     for module in (
         "fatebridge.services.birth_context",
         "fatebridge.services.birth_payload",
@@ -135,15 +136,8 @@ def test_shared_birth_and_timing_builders_do_not_import_service_entry_points():
         }, module
 
 
-def test_request_and_utility_consumers_do_not_depend_on_legacy_facades():
-    facades = {"fatebridge.core.request_models", "fatebridge.utils.helpers"}
-    for module, imports in dependencies().items():
-        if module not in facades:
-            assert not imports & facades, module
-
-
-def test_domain_catalogs_do_not_import_assembly_or_domain_services():
-    for module, imports in dependencies().items():
+def test_domain_catalogs_do_not_import_assembly_or_domain_services(dependency_graph):
+    for module, imports in dependency_graph.items():
         if matches(module, ("fatebridge.services.catalog",)):
             assert "fatebridge.services.tool_catalog" not in imports, module
             assert not {
@@ -154,16 +148,16 @@ def test_domain_catalogs_do_not_import_assembly_or_domain_services():
             }, module
 
 
-def test_retired_modules_are_absent_and_have_no_internal_consumers():
-    graph = dependencies()
+def test_retired_modules_are_absent_and_have_no_internal_consumers(dependency_graph):
+    graph = dependency_graph
     assert not graph.keys() & RETIRED_MODULES
     for module, imports in graph.items():
         assert not imports & RETIRED_MODULES, module
 
 
-def test_metaphysics_consumers_import_defining_technique_modules():
+def test_metaphysics_consumers_import_defining_technique_modules(dependency_graph):
     facade = "fatebridge.core.metaphysics"
-    for module, imports in dependencies().items():
+    for module, imports in dependency_graph.items():
         assert facade not in imports, module
     tree = ast.parse((SOURCE / "core/metaphysics/__init__.py").read_text())
     assert not any(

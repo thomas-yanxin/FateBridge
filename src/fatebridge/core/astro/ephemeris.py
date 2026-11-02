@@ -5,7 +5,6 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, List, Optional, Tuple
 
-from fatebridge.core import guolao_moira
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import (
     native_ecliptic_horizon_angle_definition,
@@ -229,55 +228,6 @@ def _swisseph_planet_state(
         if source_trace is None:
             trace.finish()
         return state, native_factor_model(PLANET_SWISSEPH_IDS[planet], flag)
-
-
-def _guolao_si_yu_signidx(
-    julian_day: float,
-    sidereal: bool,
-    ayanamsha: float,
-) -> Dict[str, int]:
-    """七政四余 之 四余（孛/罗/计/炁）的星座序号（0=白羊…11=双鱼）。
-
-    孛 = 月亮平均远地点（swisseph ``MEAN_APOG``）；罗 = 月亮平交点（``MEAN_NODE``）；
-    计 = 罗 + 180°。紫炁（木余）无 swisseph 对应，由 ``guolao_moira.purple_clouds_longitude``
-    以 horosa 标定的线性步紫气算出（不依赖星历，恒可得）。孛/罗/计 在星历缺失时回退 -1。
-    """
-
-    def _eff(lon: float) -> int:
-        effective = (
-            normalize_angle(lon - ayanamsha) if sidereal else normalize_angle(lon)
-        )
-        return int(effective // 30) % 12
-
-    # 紫炁：纯线性公式，与 swisseph 无关，先行算出。
-    result = {
-        "孛": -1,
-        "罗": -1,
-        "计": -1,
-        "炁": _eff(guolao_moira.purple_clouds_longitude(julian_day)),
-    }
-    if runtime.swe is None:
-        return result
-
-    def _sign_idx(body_id: int) -> int:
-        try:
-            coordinates, retflag = runtime.ephemeris_call(
-                "calc_ut", julian_day, body_id, runtime.swe.FLG_SWIEPH
-            )
-        except Exception as error:  # pragma: no cover - swe runtime guard
-            runtime._log_swe_runtime_failure("calc_ut", error)
-            return -1
-        if retflag < 0:
-            return -1
-        return _eff(float(coordinates[0]))
-
-    apogee_id = getattr(runtime.swe, "MEAN_APOG", 12)
-    result["孛"] = _sign_idx(apogee_id)
-    node_idx = _sign_idx(runtime.swe.MEAN_NODE)
-    result["罗"] = node_idx
-    if node_idx >= 0:
-        result["计"] = (node_idx + 6) % 12
-    return result
 
 
 def _build_planet_states(
