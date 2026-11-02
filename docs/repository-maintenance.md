@@ -35,6 +35,20 @@ uv run --locked --extra dev python scripts/clean_repository.py --apply
 
 云端清理通过普通 Git 提交同步当前文件树。CI 回归产物保留14天；需长期保存的验收材料应另行下载归档。手动移除旧 Actions 产物或日志前，保存运行元数据、原始压缩包和校验摘要；最近运行及发布依据继续保留，历史失败不因清理改判。
 
+## 恢复 CI 冻结数据
+
+`tests/fixture-data.json` 固定数据源仓库、来源提交、Release 资产 ID、大小及 SHA-256。`scripts/restore_test_data.py` 在测试前逐包下载并核验，仅恢复夹具、黄金快照和历史验证目录；已有文件字节不同会停止，不覆盖现有参考。数据包更新须审阅原件及清单，不通过重算样本修补旧失败。
+
+```bash
+uv run --locked --extra dev python scripts/restore_test_data.py
+uv run --locked --extra dev python scripts/restore_test_data.py --core-only
+uv run --locked --extra dev python scripts/restore_test_data.py --archive-directory /path/to/frozen-archives
+```
+
+Linux 完整矩阵和最低依赖任务恢复全部清单，Windows 任务和锁定环境的入口检查只恢复核心夹具。离线目录中的压缩包名称与清单一致，使用同一套大小及散列检查。
+
+下载使用 GitHub CLI 的 `GH_TOKEN`。公开资产可用工作流的只读 `GITHUB_TOKEN`；私有数据源使用仅限该数据仓库、具有 `Contents: read` 权限的凭据，配置为 `FATEBRIDGE_FIXTURE_TOKEN` 仓库 Secret。工作流优先使用该 Secret，并继续保持仓库的只读默认权限。数据应放在可下载的固定 Release 资产中；只读工作流令牌读取主仓库的未公开 Release 草稿会被拒绝。资产读取权限见 [GitHub 官方说明](https://docs.github.com/en/rest/releases/assets#get-a-release-asset)。
+
 ## 文档和依赖检查
 
 ```bash

@@ -31,7 +31,7 @@ class DataManifest(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
 
     schema_version: Literal[1]
-    repository: Literal["thomas-yanxin/FateBridge"]
+    repository: str = Field(pattern=r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
     source_revision: str = Field(pattern=r"^[a-f0-9]{40}$")
     parts: list[DataPart] = Field(min_length=1)
 
