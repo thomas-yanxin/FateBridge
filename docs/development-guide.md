@@ -149,19 +149,17 @@ PYTHONPATH="$PWD:$PWD/src" UV_PROJECT_ENVIRONMENT="$PWD/.venv-nonuniform-referen
 
 梅花时间戳签名测试还需要支持 `ts -attime`、`-check_ss_sig` 的 OpenSSL。macOS 自带程序可能缺少这些选项；可将已安装的 OpenSSL 3 的 `bin` 目录放在本次测试命令的 `PATH` 前部，或向审计 CLI 显式传 `--openssl`。缺少能力应报告环境错误，不删验证参数，也不跳过签名验证。
 
+黄金环境同时固定空星历目录与 `FATEBRIDGE_SOLAR_TERM_MODEL=native`，并在退出时恢复调用方策略；空目录或单独的Swiss探测标志不能证明实际交节采用Moshier。来源与元数据确有行为新增时，逐字段审核、保留旧结果并只更新受影响基线，不以重新冻结取得天文精度或原典符合。风水实例与已保留差异见[运行来源比较](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-source-comparison.md)。
+
+黄金快照会规范化浮点，原始未舍入账本应先独立校验，再要求规范化结果与快照一致，不把舍入后的副本当作原始账本，也不放宽账本恒等式。
+
+六壬／金口诀的行年核对、历史封套补证与完整合同门槛见[专题审计的本地复核入口](liuren-jinkou-audit.md#本地复核入口)。
+
 ### CI 运行范围
 
 每次主分支 push 和 PR 都运行同一组自包含检查；同一分支或 PR 的新提交会取消旧 CI。工作流只浅克隆当前源码，不为变更分流拉取完整历史。Python 3.10–3.13、最低直接依赖和 Windows 共用 `scripts/run_ci_checks.py` 的检查清单，锁定环境另外检查文档、生成合同与 stdio MCP。
 
 云端不下载冻结夹具、黄金快照、外部星历或独立参考。完整领域回归、数值基线、原典复放和 SciPy 独立对照保留在本地，使用原数据、断言与固定门槛执行；云端通过不能作为这些项目的验收结论。混合测试文件中依赖本地资料的用例标记为 `local_data`，默认本地 `pytest` 不排除它们。
-
-黄金环境同时固定空星历目录与 `FATEBRIDGE_SOLAR_TERM_MODEL=native`，并在退出时恢复调用方策略；空目录或单独的Swiss探测标志不能证明实际交节采用Moshier。来源与元数据确有行为新增时，逐字段审核、保留旧结果并只更新受影响基线，不以重新冻结取得天文精度或原典符合。风水实例与已保留差异见[运行来源比较](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-source-comparison.md)。
-
-京本金口诀行年使用 `uv run --locked --extra dev python scripts/audit_jinkou_year_fate.py --output /tmp/jinkou-year-fate.json` 及 `tests/test_jinkou_year_fate.py` 核对。出生年干支、指定一岁起算岁序和性别分别保留；岁首与占时实际年龄联动未认证，另课地分是行年支推导，不能写成观测方位。原书标签、循环推导、业务合同与进程内三端分别报告；可选旧720盘基线不作为新占断答案，详见第四十六轮记录（本地数据：`validation/jinkou-year-fate-validation-2026-10-23.md`）。
-
-六壬／金口诀历史封套的受控补证使用 `scripts/audit_ren_golden_evidence.py --capture --candidate-dir <新目录> --output <审计文件>`，捕获真实REST结果后核对冻结原件、手算预期、原计算保持与限定路径；默认不写黄金文件。canonical收据缺少UUID与生成时间，业务主体与实际返回的完整收据分别验证。黄金时钟的进入失败、异常清理、UTC跨区及重复钟回归见 `tests/test_ren_golden_evidence.py`；不要重新替换已退役模块里的datetime入口。确切范围、旧误标及未迁移差异见第四十五轮记录（本地数据：`validation/ren-golden-evidence-validation-2026-10-23.md`）。
-
-历史补证结果缺少后续版本新增字段时，审计保留 `current_contract_error`，完整合同门槛仍为未通过，命令返回非零并拒绝写回黄金文件。旧对象的可逆补证、来源与原计算核验继续保留；当前响应另用严格完整合同验收。黄金快照会规范化浮点，原始未舍入账本应先独立校验，再要求规范化结果与快照一致，不把舍入后的副本当作原始账本，也不放宽账本恒等式。
 
 Black、isort 和 mypy 在 Python 3.12 作业检查一次；通用文档检查由 locked 作业执行。`CI result` 要求锁定环境、Python 矩阵、最低依赖和 Windows 作业全部成功，失败或意外跳过均不能通过汇总。
 

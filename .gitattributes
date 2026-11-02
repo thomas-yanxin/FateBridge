@@ -2,23 +2,3 @@
 # Historical data outside Git retains its original bytes in the data bundle.
 * text=auto eol=lf
 src/fatebridge/data/sukuyo_dayan_reference_LICENSE.txt -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-src/fatebridge/data/classical/ziwei-quanshu-v2-table.json text eol=lf
-src/fatebridge/data/human_design/*.json text eol=lf
-scripts/build_human_design*.py text eol=lf
-scripts/gen_human_design*.py text eol=lf
-scripts/check_human_design*.py text eol=lf
-src/fatebridge/core/human_design*.py text eol=lf
-src/fatebridge/validation/human_design*.py text eol=lf
-scripts/human_design_bridge_oracle.c text eol=lf
-src/fatebridge/data/canping/*.json text eol=lf
-src/fatebridge/data/astronomy/analytic-solar-v1.json text eol=lf
-src/fatebridge/data/astronomy/erfa-license.txt text eol=lf
-src/fatebridge/data/classical/liuyao-month-break-v24.json text eol=lf
-scripts/plan_human_design_cross_coverage.py text eol=lf
-scripts/read_human_design_official_pdf.py text eol=lf
-src/fatebridge/data/classical/liuyao-void-control-v31.json text eol=lf
-src/fatebridge/data/human_design/primary-diagrams-2008-reference.json text eol=lf
-scripts/audit_human_design_semantics.py text eol=lf
-src/fatebridge/data/guolao/nijl-life-grid-v1.json text eol=lf
-src/fatebridge/data/guolao/table-usage-v1.json text eol=lf
-src/fatebridge/data/guolao/qianyuan-initial-limit-v1.json text eol=lf
