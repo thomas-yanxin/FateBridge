@@ -14,6 +14,8 @@ CACHES = (
     ".pytest_cache",
     ".mypy_cache",
     ".ruff_cache",
+    ".coverage",
+    "htmlcov",
     "__pycache__",
     ".DS_Store",
 )
@@ -22,6 +24,7 @@ CACHES = (
 def find_artifacts(root: Path) -> list[Path]:
     """Return a narrow allowlist; never descend into fixtures or frozen copies."""
     candidates = [root / name for name in CACHES]
+    candidates.extend(root.glob(".coverage.*"))
     dist = root / "dist"
     if not dist.is_symlink():
         candidates.extend(dist.glob("*.whl"))

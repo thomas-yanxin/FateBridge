@@ -42,7 +42,7 @@
 
 独立wheel首次构建因磁盘耗尽失败，首次完整日志保留。清理前将本任务已淘汰的临时来源与1786文件归档逐字节核对；重建成功，1272个包文件与冻结来源一致，安装包72项测试通过。审计器首次两次错误地假定旧回执有特定命名的散列侧文件，失败源码与日志保留；现按此前已固定的父回执散列复核1838个旧文件绑定，没有补造旧侧文件或跳过绑定。详见封存回执（本地数据：`validation/bazi-condition-evaluation-local-v1.json`）。测试数、准备数及源码封存数都不换算为预测准确率。
 
-[19题执行方案](bazi-original19-explanation-plan.md)已固定默认模型、顺序执行、每题一次首次尝试和240秒上限。此前额度授权针对已完成的旧11题，新19题授权待回复；模型语义验收仍为`not_tested`。现实预测没有真实数据，继续`not_tested`，总体完成状态仍未证明。
+[19题解释验收方案](bazi-semantics-evaluation.md#原19例条件解释待验)已固定默认模型、顺序执行、每题一次首次尝试和240秒上限。此前额度授权针对已完成的旧11题，新19题授权待回复；模型语义验收仍为`not_tested`。现实预测没有真实数据，继续`not_tested`，总体完成状态仍未证明。
 
 ```bash
 uv run --locked --extra dev pytest tests/test_evaluation_evidence_assets.py tests/test_agent_evaluation.py tests/test_agent_expected_errors.py tests/test_agent_capture.py tests/test_agent_tool_contract.py tests/test_bazi_first_model_grades.py tests/test_bazi_grader_policy.py

@@ -28,4 +28,4 @@
 
 原116,906条候选复放仍使用原冻结运行时，本轮缓存修复未进入该进程。原全队列新结论须等待六片完整结束，不能用这245项检查替代。原41项TT冲突、原典分歧、五例真实模型机械0/5及现实预测效度均未由本轮关闭。
 
-针对仍在复放的原包络失败，另见[冻结前缀的节气标签诊断](bazi-original-prefix-root-label-diagnostic.md)。
+原包络失败中的根值与标签差异，见后续[全量消费根的独立时标核对](bazi-consumed-root-clock-reference.md)。原前缀诊断及其失败记录保存在本地材料 `validation/bazi-boundary-replay-prefix-diagnostic-v1/`。

@@ -1,157 +1,23 @@
-# Captured manifests, schemas and validation receipts are generated evidence.
-# Keep their original bytes while making code reviews focus on implementation.
-docs/audits/** linguist-generated=true
-# Preserve pytest-rendered whitespace in the two raw failure records.
-# Source, tests, JSON receipts and all other files keep normal checks.
-# HKO source hashes cover the original HTTP bytes, including CRLF.
-# Preserve the upstream Sukuyo license's CRLF bytes.
+# Preserve the line endings of maintained, fingerprinted sources.
+# Historical data outside Git retains its original bytes in the data bundle.
 src/fatebridge/data/sukuyo_dayan_reference_LICENSE.txt -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-tests/fixtures/ziwei_independent/hko/*.txt -text
-tests/fixtures/ziwei_independent/*.json text eol=lf
-tests/fixtures/ziwei_independent/nasa-*.html -text
-tests/fixtures/ziwei_independent/naj_ming/*.json text eol=lf
-tests/fixtures/ziwei_independent/naj_ming/*.jpg -text
 src/fatebridge/data/classical/ziwei-quanshu-v2-table.json text eol=lf
-tests/fixtures/liuyao-hko-2026.txt -text
-# Human Design oracle and plan fingerprints bind these exact checkout bytes.
-tests/fixtures/human-design-*.json text eol=lf
 src/fatebridge/data/human_design/*.json text eol=lf
 scripts/build_human_design*.py text eol=lf
 scripts/gen_human_design*.py text eol=lf
 scripts/check_human_design*.py text eol=lf
 src/fatebridge/core/human_design*.py text eol=lf
 src/fatebridge/validation/human_design*.py text eol=lf
-docs/validation/human-design-comparison-before.json text eol=lf
 scripts/human_design_bridge_oracle.c text eol=lf
-# Canping collation and literal references bind exact UTF-8 / LF bytes.
 src/fatebridge/data/canping/*.json text eol=lf
-tests/fixtures/canping_water_v1/*.json text eol=lf
-tests/fixtures/canping_water_v1/*.tsv text eol=lf
-tests/fixtures/canping_witness_v1/*.json text eol=lf
-tests/fixtures/canping_witness_v1/*.tsv text eol=lf
-# Analytic solar coefficients and primary ERFA captures bind exact bytes.
-tests/fixtures/analytic_solar_v23/** -text
 src/fatebridge/data/astronomy/analytic-solar-v1.json text eol=lf
 src/fatebridge/data/astronomy/erfa-license.txt text eol=lf
-# Same-edition month-break source and pre-implementation cases bind exact bytes.
-tests/fixtures/liuyao_month_break_v24/** -text
 src/fatebridge/data/classical/liuyao-month-break-v24.json text eol=lf
-# HD frozen cross-coverage planning and visible PDF property extraction.
 scripts/plan_human_design_cross_coverage.py text eol=lf
 scripts/read_human_design_official_pdf.py text eol=lf
-# Focus fidelity fixtures and official2027 source bytes are fingerprinted.
-tests/fixtures/liuyao_focus_v25/** -text
-# TZif data and independent interval references bind exact captured bytes.
-tests/fixtures/liuyao_civil_windows_v26/** -text
-# Paired solar-path inputs and old primary outputs are byte-frozen.
-tests/fixtures/liuyao_model_boundary_v27/** -text
-docs/validation/human-design-sampling-before.json text eol=lf
-docs/validation/human-design-natal-source-before.json text eol=lf
-docs/validation/human-design-natal-source-late-before.json text eol=lf
-docs/validation/human-design-native-state-before.json text eol=lf
-# Frozen Human Design request-clock contamination evidence.
-docs/validation/human-design-cycle-input-before.json text eol=lf
-tests/fixtures/human-design-cycle-input-plan.json text eol=lf
-docs/validation/human-design-ordinary-clock-before.json text eol=lf
-# Frozen Human Design clock replay criteria and prior interval failure.
-tests/fixtures/human-design-clock-replay-plan.json text eol=lf
-docs/validation/human-design-interval-clock-before.json text eol=lf
-# Same-edition current-void control qualification binds exact frozen bytes.
-tests/fixtures/liuyao_void_control_v31/** -text
 src/fatebridge/data/classical/liuyao-void-control-v31.json text eol=lf
-# Frozen narrow primary-diagram observations and acceptance criteria.
-tests/fixtures/human-design-primary-diagrams-plan.json text eol=lf
 src/fatebridge/data/human_design/primary-diagrams-2008-reference.json text eol=lf
-tests/fixtures/human-design-primary-diagrams-extraction.json text eol=lf
-# Frozen Human Design reference-order counterexamples and criteria.
-tests/fixtures/human-design-reference-order-plan.json text eol=lf
-docs/validation/human-design-reference-order-before.json text eol=lf
-# Freeze the directed-generation readout development inputs.
-tests/fixtures/liuyao_generation_readout_v33/** -text
-# Preserve the frozen moving-earth premises and post-implementation mappings.
-tests/fixtures/liuyao_metal_moving_v34/** -text
-# Preserve the original own-Si premises, old-error adjudication and date mapping.
-tests/fixtures/liuyao_metal_own_si_v35/** -text
-# Frozen actual design-root body counterexamples and acceptance criteria.
-docs/validation/human-design-root-body-before.json text eol=lf
-tests/fixtures/human-design-root-body-plan.json text eol=lf
-tests/fixtures/human-design-root-body-linux-1.31-baseline.json text eol=lf
-# Original HD model prompts, first answers and chained captures bind exact bytes.
-tests/fixtures/agent_behavior/human_design_semantic_cases_v1.json text eol=lf
-tests/fixtures/human_design_semantics_v1/** -text
-docs/validation/human-design-semantics/** -text
 scripts/audit_human_design_semantics.py text eol=lf
-# Frozen Decimal/SOFA offset oracle, criteria and original failed receipt.
-tests/fixtures/human_design_decimal_offset_v1/** -text
-# NIJL source transcription and research receipts bind exact archived bytes.
 src/fatebridge/data/guolao/nijl-life-grid-v1.json text eol=lf
-tests/fixtures/guolao-nijl-grid-v1/** -text
-docs/validation/guolao-nijl-grid-v1/** -text
-# Conditional NIJL table-use research retains raw unknowns and source bytes.
 src/fatebridge/data/guolao/table-usage-v1.json text eol=lf
-tests/fixtures/guolao-table-usage-v1/** -text
-docs/validation/guolao-table-usage-v1/** -text
-# Qianyuan time-ratio and unresolved circular-chart research retain source bytes.
 src/fatebridge/data/guolao/qianyuan-initial-limit-v1.json text eol=lf
-tests/fixtures/guolao-qianyuan-initial-v1/** -text
-tests/fixtures/guolao-circular-rows-v1/** -text
-docs/validation/guolao-qianyuan-initial-v1/** -text
-# Preserve fractional-leap input labels and the independent SOFA oracle.
-tests/fixtures/human_design_fractional_leap_v1/** -text
-# Native coordinate-contract counterexamples and execution receipts retain bytes.
-tests/fixtures/guolao-native-frame-v1/** -text
-docs/validation/guolao-native-frame-v1/** -text
-# Gate-context graph oracle and source-disagreement facts retain exact bytes.
-tests/fixtures/human_design_gate_context_v1/** -text
-# Same-sky Guolao construction and original boundary failures retain exact bytes.
-tests/fixtures/guolao-same-sky-construction-v1/** -text
-docs/validation/guolao-same-sky-construction-v1/** -text
-tests/fixtures/human_design_reference_fraction_v1/** -text
-# Solar-input native frames and rejected epochs retain original evidence bytes.
-tests/fixtures/guolao-solar-input-preflight-v1/** -text
-docs/validation/guolao-solar-input-preflight-v1/** -text
-# Explicit solar labels, original failures and replay parts retain exact bytes.
-tests/fixtures/guolao-solar-input-integration-v1/** -text
-docs/validation/guolao-solar-input-integration-v1/** -text
-# Native TT/UT1 solar epochs and failed calendar rows retain exact bytes.
-tests/fixtures/guolao-native-solar-epoch-v1/** -text
-docs/validation/guolao-native-solar-epoch-v1/** -text
-# Human Design profile continuation keeps original receipts and failures byte exact.
-docs/validation/human-design-profile-continuation-v1/** -text
-# Portable projection oracles, strict legacy rejections and raw logs retain bytes.
-docs/validation/human-design-portable-projection-v1/** -text
-# Preserve final portable-projection sources, CI failures and official receipts.
-docs/validation/human-design-portable-projection-ci-v1/** -text
-# Keep original cohort failures, raw official PDFs and audit custody byte exact.
-docs/validation/human-design-profile-cohort-integrity-v1/** -text
-# Preserve public-source diagnostics, all official observations and old failures.
-docs/validation/human-design-public-source-continuation-v1/** -text
-# Keep the complete original 768 matrix, failed labels and audit receipts exact.
-docs/validation/human-design-profile-all768-v1/** -text
-# Preserve solar-disc source conflicts, historical clocks and failed replays.
-docs/validation/human-design-solar-disc-clock-v1/** -text
-# Keep adaptive source queries, rejected clock models and prior controls exact.
-docs/validation/human-design-neptune-transition-v1/** -text
-# Preserve historical source identities, raw interpolation and apparent failures.
-docs/validation/human-design-historical-models-v1/** -text
-# Preserve Human Design coordinate meaning, first-answer evidence and custody.
-docs/validation/human-design-coordinate-interpretation-v2/** -text
-tests/fixtures/agent_behavior/human_design_semantic_cases_v2.json -text
-tests/fixtures/human_design_coordinate_context_v1/** -text
-# Exact Human Design reference/contact and native-declaration evidence.
-docs/validation/human-design-cycle-reference-brackets-v1/** -text
-tests/fixtures/human-design-cycle-reference-brackets.json -text
-tests/fixtures/human-design-native-declaration-v5-variants.json -text
-# Preserve native-evaluation config, all original outcomes and complete answers.
-docs/validation/human-design-evaluation-native-config-v1/** -text
-tests/fixtures/agent_behavior/human_design_complete_case_v3.json -text
-# Keep path-context diagnostics, original failures and dated retest answers exact.
-docs/validation/human-design-evaluation-path-context-v2/** -text
-# Keep source-clause candidates, rejected leads and original-scope receipts exact.
-docs/validation/human-design-primary-clause-scope-v1/** -text
-# Preserve native-extremum probes, original intervals and failed prototypes.
-docs/validation/human-design-cycle-solar-stations-v1/** -text
-docs/validation/human-design-solar-oracle-context-v1/** -text
-docs/validation/human-design-cycle-summary-v1/** -text
-docs/validation/human-design-calendar-retention-v1/** -text
-docs/validation/human-design-line-knowledge-v1/** -text

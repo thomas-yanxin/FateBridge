@@ -107,3 +107,9 @@ uv run --locked --extra dev python scripts/audit_bazi_semantic_batch.py --artifa
 补充的解释回归记录（本地数据：`validation/bazi-semantic-refresh-v1.md`）和响应预算复核（本地数据：`validation/bazi-budget-guide-v1.md`）分别保留首次答案、逐句依据、默认响应预算失败与同次分页交付的分项证据。
 
 原五例五行解释的复验准备收据（本地数据：`validation/bazi-element-revalidation-preparation-v1/local-report.json`）另行保留首次机械 0／5、四例来源版本交付不完整、原答案及冻结过程的失败。准备材料和 MCP 参照不等于实际模型复验；新增模型执行须有对应授权，原判据与首次成绩保持。
+
+## 原19例条件解释待验
+
+身印分离、月内司令与通关另有19题冻结方案，覆盖全部原19例。它与上述11题分开，不增加独立命例或原典符合数。模型输入使用中性编号、完整计算事实、原文锚点及相邻页，不带原强弱标签或评分理由；原编号、姓名勘误、首次材料和51张完整原页均另行保留。工作区内容隔离不等于操作系统级保密认证。
+
+方案固定默认模型、逐题顺序、每题一次首次尝试、240秒上限及8192字符预算；保留失败、未运行项、实际读取事件和同run回执，不选优重跑。方案与逐例预检见本地材料 `../tests/fixtures/bazi_condition_evaluation_v1/requested-execution-neutral-first.json`、`all19-neutral-workspace-preflight-first.json`，后台读取证明见 `validation/bazi-condition-evaluation-files-v1/neutral-backend-reference-proof.json`。本批尚未执行，状态仍为 `not_tested`；此前11题授权不覆盖这19题，材料准备不构成解释或现实预测验收。

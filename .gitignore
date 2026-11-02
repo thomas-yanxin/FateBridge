@@ -51,7 +51,11 @@ ephe/
 .mypy_cache/
 .ruff_cache/
 .coverage
+.coverage.*
 htmlcov/
+/pytest-results.xml
+/nonuniform-reference-results.xml
+/resolved-dependencies.txt
 
 # Node modules (for frontend)
 node_modules/

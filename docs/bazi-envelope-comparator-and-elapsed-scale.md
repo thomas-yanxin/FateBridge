@@ -2,7 +2,7 @@
 
 本轮修正了起运“物理经过秒数”的错误描述，并公开既有的名义UTC标签秒政策，数值算法没有改成原子时。同时完成原116,906条队列的逐项比较器准备。原队列候选算法的全量复放仍在运行，当前没有新的完整失败总数。
 
-后续进展见[时运缓存隔离修复](bazi-timing-cache-isolation.md)及[原队列冻结前缀诊断](bazi-original-prefix-root-label-diagnostic.md)。下文保留本轮当时的233通过、4失败及其未修复状态，未回写历史验收结果。
+后续进展见[时运缓存隔离修复](bazi-timing-cache-isolation.md)及[全量消费根的独立时标核对](bazi-consumed-root-clock-reference.md)。下文保留本轮当时的233通过、4失败及其未修复状态，未回写历史验收结果。
 
 ## 原失败和比较判据
 

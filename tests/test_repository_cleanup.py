@@ -31,6 +31,9 @@ def test_preview_is_read_only_and_apply_preserves_evidence(repository):
             "dist/fatebridge-0.0.1.whl",
             "dist/fatebridge-0.0.1.tar.gz",
             ".pytest_cache/state",
+            ".coverage",
+            ".coverage.worker-1",
+            "htmlcov/index.html",
             "src/fatebridge/__pycache__/retired.pyc",
             "scripts/__pycache__/old.pyc",
             "tests/__pycache__/old.pyc",
@@ -48,6 +51,7 @@ def test_preview_is_read_only_and_apply_preserves_evidence(repository):
             "tests/fixtures/evidence/__pycache__/record.pyc",
             "tests/fixtures/evidence/manifest.sha256",
             "uv.lock",
+            ".coveragerc",
             ".venv/pyvenv.cfg",
         )
     ]
