@@ -243,7 +243,7 @@ uv run --locked --extra dev mypy src/fatebridge/
 
 核心算法、分析规则和共享工具不得导入应用层、领域服务或协议适配器。工具目录承担装配职责；协议签名与 FastAPI/FastMCP 注册放在 `transports`，执行时钟、receipt 和字段投影放在 `application`。共享出生计算从 `services.birth_context` 导入；共用占星基础表从 `core.astrology_tables` 导入。
 
-请求模型从 `core.requests` 的领域定义模块导入；输入与显示分别使用 `utils.birth_input`、`solar_time`、`formatting`、`analysis_clock`、`elements`。领域工具声明不反向导入中央 `tool_catalog`，服务使用 `lazy_service` 代理保持延迟加载。保留全目录顺序、唯一性和公共合同；不得新增历史入口的兼容包装。
+请求模型从 `core.requests` 的领域定义模块导入；输入与显示分别使用 `utils.birth_input`、`solar_time`、`formatting`、`elements`。分析时刻由 `services.timing_clock` 归一化，隐式当前时间统一读取 `core.execution_context.current_datetime`。领域工具声明不反向导入中央 `tool_catalog`，服务使用 `lazy_service` 代理保持延迟加载。保留全目录顺序、唯一性和公共合同；不得新增历史入口的兼容包装。
 
 星盘内部代码从 `core.astro.birth`、`chart`、`relationship` 等定义模块导入，旧 `core.astrology` 已删除。故障注入应针对 `core.astro.runtime` 的 `swe`、`ephemeris_call` 或日志状态，以验证真实后端调用。原有 Swiss Ephemeris 锁与目录恢复仍由 `core.ephemeris_runtime` 管理。
 

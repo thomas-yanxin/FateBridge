@@ -57,7 +57,7 @@ flowchart TD
 | 分析 | `analysis/*.py` | 婚姻、事业、健康等专项及配合度/时运复合规则 |
 | 核心 | `core/*.py`、`core/metaphysics/` | 历法、八字、占星、紫微、六壬、太乙等领域计算 |
 | 子技法 | `core/predictive/`、`core/local_techniques/` | 西占推运和本地技法模块；两者均为目录，不是旧单文件模块 |
-| 运行公共层 | `utils/birth_input.py`、`solar_time.py`、`formatting.py`、`analysis_clock.py`、`elements.py`、`places.py`、`timezones.py`、`runtime.py`、`errors.py` | 出生输入、太阳钟、展示、分析时钟、五行关系、地点/时区、配置与错误 |
+| 运行公共层 | `utils/birth_input.py`、`solar_time.py`、`formatting.py`、`elements.py`、`places.py`、`timezones.py`、`runtime.py`、`errors.py` | 出生输入、太阳钟、展示、五行关系、地点/时区、配置与错误 |
 | 星历运行时 | `core/ephemeris_runtime.py` | 数据路径、模型标识、共享状态与并发保护 |
 | 数据 | `data/knowledge/`、`data/canping/`、`data/heluo/` | 知识与条文 JSON，打包进 wheel |
 | 导出 | `core/export_contracts.py`、`export_parser.py`、`services/structured_snapshot.py` | section 合同、文本解析与快照构造 |
@@ -144,11 +144,11 @@ Swiss Ephemeris 存在共享 C 状态。直接调用与会修改目录的第三�
 | 关注点 | 当前模块与维护规则 |
 | --- | --- |
 | 出生公共计算 | `services/birth_context.py` 复用归一化、四柱与历法；`birth_payload.py` 构造公共命盘响应 |
-| 时运与日历 | `services/timing.py` 编排时运，`timing_state.py` 计算各层状态，`timing_snapshots.py` 组织文本；日历查询用 `calendar_tools.py` / `calendar_input.py` |
+| 时运与日历 | `services/timing.py` 编排时运，`timing_clock.py` 归一化分析时刻并读取 `core.execution_context` 的执行时钟，`timing_state.py` 计算各层状态，`timing_snapshots.py` 组织文本；日历查询用 `calendar_tools.py` / `calendar_input.py` |
 | 星盘 | `core/astro/` 按出生、几何、星历、宫位、盘面与关系盘拆分；公共星座、庙旺和界表位于 `core/astrology_tables.py` |
 | 请求模型 | `core/requests/base.py` 管理未知字段和日期校验；`birth.py` 管理出生基类，领域模块直接导入所需类型 |
 | 工具声明 | `services/catalog/` 各领域拥有 `SPECS`、绑定和延迟服务代理；不反向导入中央装配器或提前加载计算引擎 |
-| 输入与展示 | `utils/birth_input.py`、`solar_time.py`、`formatting.py`、`analysis_clock.py`、`elements.py` 各自承担单一公共职责 |
+| 输入与展示 | `utils/birth_input.py`、`solar_time.py`、`formatting.py`、`elements.py` 各自承担单一公共职责 |
 | 领域共享定义 | 河洛卦关系、人类图 mechanics、六壬约定、金口诀表与太乙几何由各领域的定义模块维护；计算入口和规则消费者共同依赖定义模块 |
 | 人类图知识 | `human_design_line_catalogue.py` 维护基础目录，版本化读者依赖基础目录；`human_design_knowledge.py` 负责版本分派 |
 | 星历来源 | `physical_source_observation.py` 记录来源，`physical_ephemeris_policy.py` 管理外层策略；运行时向策略与压缩星历传入实际 native 对象、探测和路径回调 |

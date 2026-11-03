@@ -225,13 +225,6 @@ def essential_dignities(
     }
 
 
-def is_above_horizon(house: Optional[int]) -> Optional[bool]:
-    """Houses 7–12 are above the horizon (Desc → MC → Asc)."""
-    if not house:
-        return None
-    return house >= 7
-
-
 def angularity(house: Optional[int]) -> Optional[str]:
     """Angular (1/4/7/10) · succedent (2/5/8/11) · cadent (3/6/9/12)."""
     if not house:

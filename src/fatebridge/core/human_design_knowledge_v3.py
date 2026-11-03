@@ -185,12 +185,6 @@ def _registry_category() -> tuple[dict, dict[Path, bytes]]:
     return result, snapshot
 
 
-def registry_category() -> dict:
-    result, snapshot = _registry_category()
-    base._check_end(snapshot)
-    return result
-
-
 def read_reference(*, key: str | None) -> dict:
     with coherent_human_design_references():
         entry = base.read_reference(category="lines", key=key)

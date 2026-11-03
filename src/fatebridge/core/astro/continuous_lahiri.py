@@ -202,21 +202,6 @@ def frame_state(tt: float) -> Dict[str, Any]:
     }
 
 
-def longitude_frame_rate(omega: Matrix, longitude: float, latitude: float) -> float:
-    if (
-        not math.isfinite(longitude)
-        or not math.isfinite(latitude)
-        or not -90.0 < latitude < 90.0
-    ):
-        raise ValueError("Finite direction away from a longitude singularity required")
-    longitude = math.radians(math.remainder(longitude, 360.0))
-    latitude = math.radians(latitude)
-    c = math.cos(latitude)
-    q = (c * math.cos(longitude), c * math.sin(longitude), math.sin(latitude))
-    v = mv(omega, q)
-    return (q[0] * v[1] - q[1] * v[0]) / (q[0] * q[0] + q[1] * q[1]) * DEG
-
-
 def _vector(values: Sequence[float]) -> Vector:
     if len(values) != 3 or any(isinstance(v, bool) for v in values):
         raise ValueError("A finite Cartesian three-vector is required")

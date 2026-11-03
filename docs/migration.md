@@ -36,7 +36,8 @@ uv run --locked --extra dev fatebridge describe bazi_birth --detail full
 | `core/discovery.py`、`core/scenarios.py` | `application.discovery`、`application.scenarios` |
 | `core/request_models.py` | `core.requests` 中各领域的定义模块 |
 | `core/astrology.py` | `core.astro` 中的职责模块；共用表使用 `core.astrology_tables` |
-| `utils/helpers.py` | `utils.birth_input/solar_time/formatting/analysis_clock/elements` |
+| `utils/helpers.py` | `utils.birth_input/solar_time/formatting/elements`；分析时刻见下一行 |
+| `utils/analysis_clock.py` | `services.timing_clock.resolve_analysis_moment` 归一化分析输入；隐式当前时刻读取 `core.execution_context.current_datetime` |
 | `core.predictive`、`core.local_techniques`、`core.metaphysics` 的包级重导出 | 按技法导入具体子模块 |
 | `services.calculation` 的出生构造器/响应私有别名 | `services.birth_context.build_birth_computation_context`、`birth_payload.build_destiny_payload` |
 | `services.timing` 的日历查询和私有 helper 重导出 | `services.calendar_tools/calendar_input/timing_state/timing_snapshots` |
