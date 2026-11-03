@@ -229,7 +229,7 @@ uv run --locked --extra dev python scripts/audit_astrodice_apparent.py \
 
 每项结果保留 `rulesets` 的作者、版本、来源 URL／仓库相对路径、来源类型和范围，以及 `rule_trace` 的输入、命中规则和结果。现代关键词和现实建议不冒充原典引文；附加天象也不能为骰面解释补充不存在的事实。
 
-## 四方面验收
+## 验证范围与现实预测
 
 星历文件获取采用[固定官方提交](https://github.com/aloistr/swisseph/tree/c69c14adb7a0f94829586ffd92cd422aacb21e86/ephe)的完整SHA-256指纹，覆盖清单中的153份 `.se1` 文件。下载和缓存复用都检查完整内容；旧缓存替换前保留原文件，`--verify-only` 可离线核验。它修复了两字节 `SW` 内容被接受、以及月球文件错存为行星文件仍被复用的问题。清单只包含指纹，实际数据仍单独获取。
 

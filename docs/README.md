@@ -1,97 +1,72 @@
 # FateBridge 文档中心
 
-FateBridge 为 AI 应用提供可核对的术数与占星计算。你可以在终端运行一次计算、把能力接入自己的产品，或搭配 Onda 技能，让 AI 助手围绕事业、关系、学习和空间布局等问题组织解读。
+FateBridge 提供术数与占星计算，Onda 技能指导咨询，接入应用提供模型对话与界面。按下面的任务选择入口；组件分工和结果层次见[核心概念](concepts.md)。
 
-想先体验一次计算，从入门指南开始；准备构建应用，阅读接入指南；需要核对结果依据，再查专题参考。首次了解项目，先读[项目首页](../README.md)；已安装的用户可直接选择下面的任务路径。计算引擎、咨询技能与对话客户端的分工见[核心概念](concepts.md#计算解读与对话的分工)。
+文档对应当前开发分支。使用已发布包时，查阅对应 Git 标签的文档；尚未发布的变化见 [CHANGELOG](../CHANGELOG.md#unreleased)。
 
-文档内容对应当前开发分支；使用已发布包时，以对应 Git 标签下的文档为准。最新功能的源码安装见[快速入门](getting-started.md)，尚未发布的变化见 [CHANGELOG](../CHANGELOG.md#unreleased)。
+## 从这里开始
 
-## 第一次使用
-
-| 你的目标 | 建议路径 | 完成标志 |
-| --- | --- | --- |
-| 在终端完成计算 | [快速入门](getting-started.md) → CLI 虚构示例 | 命令成功，能找到业务字段与计算回执 |
-| 在 Codex 中咨询 | [快速入门](getting-started.md) → [Codex 使用指南](codex-guide.md) | 新聊天能围绕虚构问题调用计算，并说明解读依据 |
-| 集成到应用或其他 Agent | [快速入门](getting-started.md) → [接入指南](agent-guide.md) | 能按产品任务发现工具、处理响应并保存所需结果 |
-| 贡献代码或文档 | [贡献指南](../CONTRIBUTING.md) → [开发指南](development-guide.md) | 锁定环境可用，按修改范围完成检查 |
-
-CLI 可直接执行，无需启动 REST。REST 默认端口为 `8010`，MCP 默认使用 stdio，由 host 启动子进程。三个入口共享领域计算，实际名称、输入与公开范围见[三端能力边界](api-reference.md#24-三端能力边界)。
-
-## 完成具体任务
-
-| 任务 | 阅读入口 |
+| 目标 | 阅读顺序 |
 | --- | --- |
-| 安装、配置环境变量或获取星历 | [快速入门](getting-started.md) |
-| 部署本地 stdio 或远程 HTTP MCP，升级与停用 | [MCP 部署指南](mcp-deployment.md) |
-| 注册 Codex 并完成第一次对话 | [Codex 使用指南](codex-guide.md) |
-| 发现工具、接入客户端或恢复错误 | [Agent 与应用接入指南](agent-guide.md) |
-| 保存完整 JSON 或全部时间线 | [完整结果交付与同次导出](agent-guide.md#完整结果交付与同次导出) |
-| 根据生活问题选择场景 | [场景路由矩阵](scenario-routing.md) · [Onda 技能索引](../skills/README.md) |
-| 提交住宅、工位或布局候选 | [家居风水](fengshui.md) · [可运行示例索引](examples/README.md) |
-| 升级旧接口 | [迁移指南](migration.md) · [变更记录](../CHANGELOG.md) |
-| 定位安装、MCP、参数或结果交付错误 | [故障排除](troubleshooting.md) |
+| 在终端完成第一次计算 | [快速入门](getting-started.md) |
+| 在 Codex 中使用 | 快速入门 → [Codex 使用指南](codex-guide.md) |
+| 接入应用或其他 Agent | 快速入门 → [Agent 接入指南](agent-guide.md) |
+| 贡献代码或文档 | [贡献指南](../CONTRIBUTING.md) → [开发指南](development-guide.md) |
+
+CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由客户端启动。各端名称与可用范围见[三端能力边界](api-reference.md#24-三端能力边界)。
+
+## 安装、接入与交付
+
+| 任务 | 指南 |
+| --- | --- |
+| 安装、环境变量与外部星历 | [快速入门](getting-started.md) |
+| 本地 stdio、远程 HTTP、Onda 插件与停用 | [MCP 部署](mcp-deployment.md) |
+| 工具发现、错误恢复与字段投影 | [Agent 接入](agent-guide.md) |
+| 读取和保存同次完整结果 | [完整结果交付](agent-guide.md#完整结果交付与同次导出) |
+| 按问题选择咨询场景 | [场景路由](scenario-routing.md) · [Onda 技能](../skills/README.md) |
+| 运行请求示例 | [示例索引](examples/README.md) |
+| 升级旧接口或解决故障 | [迁移指南](migration.md) · [故障排除](troubleshooting.md) |
 | 报告安全问题 | [安全策略](../SECURITY.md) |
-| 评估外部命例的输入质量、解释与边界 | [MingLi-Bench 外部评估](mingli-bench-evaluation.md) · [Agent 行为验收](agent-evaluation.md) |
-| 查询四柱、年柱、月柱及可核验来源 | [八字知识查询](bazi-assessment.md#原典知识查询) |
 
-## 理解计算与结果
+## 计算原理与专题
 
-[核心概念](concepts.md)说明计算、解读与对话各由谁负责，以及如何阅读业务字段、快照、交付物和回执。初次接入时读这一页，可帮助你向产品用户说明结果来自哪里、保留了什么，以及哪些判断仍需条件。
+专题页解释规则、来源和适用条件。字段定义以实际 Schema 为准；局部软件回归、原典对照、模型解释与现实效度分别报告。
 
-| 原理与专题 | 说明范围 |
+| 主题 | 指南 |
 | --- | --- |
-| [架构说明](architecture.md) | 工具目录、领域服务与三端数据流 |
-| [八字判定说明](bazi-assessment.md) · [八字时运](bazi-timing.md) | 旺衰、喜用、历法边界、原典条件与验证范围 |
-| [紫微斗数](ziwei.md) | 规则配置、历法、原典与专业验收 |
-| [双人配合评分](compatibility-scoring.md) | 分项权重、舍入、方向性与解释范围 |
-| [梅花易数](meihua.md) · [六爻与周易](liuyao-depth-audit.md) | 取数、动变、原文规则与验收边界 |
-| [河洛与参评数](numerology-audit.md) | 原典算例、交节边界、取数与解释来源 |
-| [奇门遁甲](qimen-depth-audit.md) · [太乙与三式](taiyi-sanshi-audit.md) · [六壬与金口诀](liuren-jinkou-audit.md) | 盘式规则、底本校勘与独立验证 |
-| [人类图](human-design.md) | 太阳求根、身体图、原典数值与未决分歧 |
-| [印度占星](jyotish.md) | Lahiri、本命／分盘、Vimshottari 与时间精度 |
-| [果老星宗](guolao.md) · [宿曜与宿占](sukuyo.md) | 七政四余、宿界、历法与来源限制 |
-| [西方占星](western-astrology.md) · [其他流派](other-chart-schools.md) | 时标、星历、宫制、德国盘与13等分扇区 |
-| [法达兼容性](firdaria-compatibility.md) | 模式、时间口径、版本差异与对照方法 |
-| [占星骰](astrodice.md) | 骰面、原典关系、解释来源与验证边界 |
-| [家居风水](fengshui.md) · [玄空宅盘](fengshui-xuankong.md) | 分层规则、输入事实、作者版本与独立验证 |
+| 八字 | [旺衰、喜用与原典查询](bazi-assessment.md) · [时运与历法边界](bazi-timing.md) |
+| 紫微斗数 | [规则选择、时间与原典](ziwei.md) |
+| 双人配合 | [评分与解释范围](compatibility-scoring.md) |
+| 易占 | [梅花](meihua.md) · [六爻与周易](liuyao-depth-audit.md) |
+| 河洛与参评 | [取数、配运与来源](numerology-audit.md) |
+| 三式与金口诀 | [奇门](qimen-depth-audit.md) · [太乙与三式](taiyi-sanshi-audit.md) · [六壬与金口诀](liuren-jinkou-audit.md) |
+| 人类图 | [计算、专业结构与原典](human-design.md) |
+| 印度占星 | [本命、分盘与 Vimshottari](jyotish.md) |
+| 果老与宿曜 | [果老星宗](guolao.md) · [宿曜与宿占](sukuyo.md) |
+| 西方占星 | [天文、宫位与技法](western-astrology.md) · [法达日期口径](firdaria-compatibility.md) · [其他流派](other-chart-schools.md) |
+| 占星骰 | [骰面、原典与解释](astrodice.md) |
+| 风水 | [家居与布局](fengshui.md) · [玄空宅盘](fengshui-xuankong.md) |
+| 计算基础 | [可选太阳后端](solar-backends.md) · [地点与坐标](place-catalog.md) |
 
-各专题页维护当前计算行为、来源与限制；接口字段与完整证据按对应入口查询。
+风水咨询从 [onda-fengshui](../skills/onda-fengshui/SKILL.md)进入；规则作者、版本、现场条件与动作许可在该技能及其参考资料中维护。
 
-## 查询接口与覆盖
+## 开发与验证
 
-| 参考 | 适合查什么 |
+| 需要查什么 | 入口 |
 | --- | --- |
-| [API 参考](api-reference.md) | 请求族、端点、公共选项、错误、快照与跨端差异 |
-| [算法覆盖矩阵](algorithm-coverage.md) | 逐工具实现范围、依赖、精度、近似路径与快照覆盖 |
-| [场景路由矩阵](scenario-routing.md) | 各任务的候选依据，以及全部工具的归属 |
-| [Onda 技能索引](../skills/README.md) | 各主题的取证与交付规则、共享参考、发现与维护 |
-| [开发指南](development-guide.md) | 目录职责、扩展步骤、CI、发布与文档验证 |
+| 工具、参数、端点和错误 | [API 参考](api-reference.md) · [按需调用合同](contracts/README.md) |
+| 实现覆盖、依赖与近似路径 | [算法覆盖矩阵](algorithm-coverage.md) |
+| 模块职责、数据流与依赖边界 | [架构说明](architecture.md) |
+| 扩展、测试、CI、打包与发布 | [开发指南](development-guide.md) |
+| 本地清理与冻结数据恢复 | [仓库维护](repository-maintenance.md) |
+| 真实模型的调用与解释质量 | [Agent 行为验收](agent-evaluation.md) |
+| 外部命例评估 | [MingLi-Bench](mingli-bench-evaluation.md) |
+| 计算引用、现实预测与奇门研究绑定 | [验证方法](prediction-validation.md) |
 
-接口默认值与参数约束以当前代码和 Schema 为准。规则资料记录其作者、版本与适用范围；软件回归、Linux 黄金快照、独立规则比较、真实模型对话与现实效力分别提供不同层次的证据。
+当前指南保留行为、依据和限制；逐轮进度、首次失败与旧验收记录按页内固定提交链接查阅。冻结资料在 Git 之外保留原字节，历史成绩不代表当前版本或完整验收。生成合同与场景清单由脚本维护。
 
-## 风水专题
-
-普通咨询从 [onda-fengshui](../skills/onda-fengshui/SKILL.md)进入，工程接入从[家居风水](fengshui.md)进入。[示例索引](examples/README.md)区分原始盘、布局、候选方案与执行条件。
-
-| 需要核对的内容 | 规则资料 |
-| --- | --- |
-| 事实采集、选法、家庭楼层与闭环 | [咨询闭环](../skills/onda-fengshui/references/consultation.md) · [场景与候选](../skills/onda-fengshui/references/scene-planning.md) |
-| 作者、版本、方位与基础判据 | [规则来源](../skills/onda-fengshui/references/rule-sources.md) · [布局规则](../skills/onda-fengshui/references/layout-rules.md) |
-| 厨卫、镜、梁管、尖角、材质器形 | [室内关系与材质](../skills/onda-fengshui/references/sourced-interior-rules.md) |
-| 历史宅运、山水条件与有限解释 | [宅盘来源](../skills/onda-fengshui/references/xuankong.md) · [有限解释](../skills/onda-fengshui/references/xuankong-interpretation.md) |
-| 宅运、兼向候选、盘层与来源差异 | [玄空宅盘](fengshui-xuankong.md) |
-| 工位活动、隔挡与材料条件 | [工位作者规则](../skills/onda-fengshui/references/workstation-authored.md) |
-| 用户明确另选的 BTB 桌面规则 | [桌面作者规则](../skills/onda-fengshui/references/surface-rules.md) |
-| 结果表达、逐物件与候选对照 | [结果交付](../skills/onda-fengshui/references/delivery.md) |
-
-普通解释使用已有依据；动作可执行状态与规则审查是否完整分别核对。详细输入和来源限制以对应规则资料为准。
-
-## 维护文档
-
-文档修改应同时检查读者任务、代码事实、可复制示例和链接。信源与同步范围见[文档维护与验证](development-guide.md#文档维护与验证)，检查命令在锁定开发环境中运行：
+修改文档后按[文档维护与验证](development-guide.md#文档维护与验证)检查内容、示例、链接与生成物：
 
 ```bash
 uv run --locked --extra dev python scripts/check_docs.py
 ```
-
-场景清单与调用合同由脚本生成，不手改生成区。仓库维护当前指南、规则资料、示例及回归测试；历史变更保留在 CHANGELOG 与 Git。逐轮审计、实验复盘和单次修复记录已从当前文档目录移除，被引用的依据使用固定提交链接；完整旧文档见[清理前版本](https://github.com/thomas-yanxin/FateBridge/tree/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs)。一次性评审、运行回执和实现快照放在仓库外，`docs/reviews/` 只供本地临时使用，不入库。

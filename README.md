@@ -304,7 +304,7 @@ MCP URL 为 `http://127.0.0.1:8011/mcp`。`fatebridge-mcp` 入口本身仍使用
 
 ### 使用 Onda 咨询技能
 
-MCP 提供计算工具，Onda 提供按问题组织咨询的技能。使用源码仓库作为 Codex 项目时，仓库的 `AGENTS.md` 与 `.agents/skills/` 提供项目指导和技能入口；在新聊天确认发现状态。其他客户端需要按其技能机制加载 `skills/` 中的内容，不会因 MCP 连接自动获得这些文件。详见 [Onda 技能索引](skills/README.md)。可按[插件构建指南](docs/onda-plugin.md)生成本地可安装包，携带共享引用、当前后端源码及锁定依赖清单，并用来源散列核对；首次启动需下载目标平台依赖，宿主安装另行验收。
+MCP 提供计算工具，Onda 提供按问题组织咨询的技能。使用源码仓库作为 Codex 项目时，仓库的 `AGENTS.md` 与 `.agents/skills/` 提供项目指导和技能入口；在新聊天确认发现状态。其他客户端需要按其技能机制加载 `skills/` 中的内容，不会因 MCP 连接自动获得这些文件。详见 [Onda 技能索引](skills/README.md)。可按[插件构建指南](docs/mcp-deployment.md#onda-插件的构建与安装)生成本地可安装包，携带共享引用、当前后端源码及锁定依赖清单，并用来源散列核对；首次启动需下载目标平台依赖，宿主安装另行验收。
 
 ModelScope 入口：[FateBridge MCP Server](https://www.modelscope.cn/mcp/servers/thomas/FateBridge) · [Onda Skills 合集](https://www.modelscope.cn/collections/thomas/Onda-Skills)。平台接入按对应页面说明操作，本地安装与配置按本文流程进行。
 
@@ -471,7 +471,7 @@ PR 以 `CI result` 汇总状态确认检查完成；代码变更还会核对六�
 | 在 Codex 中完成咨询 | [Codex 指南](docs/codex-guide.md) · [Onda 技能](skills/README.md) |
 | 编写应用与 Agent 集成 | [接入指南](docs/agent-guide.md) · [API 参考](docs/api-reference.md) |
 | 查实现范围、方法与精度 | [算法覆盖](docs/algorithm-coverage.md) · [核心概念](docs/concepts.md) |
-| 查主题路由、规则与示例 | [场景路由](docs/scenario-routing.md) · [示例索引](docs/examples/README.md) · [规则文档](docs/README.md#理解计算与结果) |
+| 查主题路由、规则与示例 | [场景路由](docs/scenario-routing.md) · [示例索引](docs/examples/README.md) · [规则文档](docs/README.md#计算原理与专题) |
 | 开发、迁移或定位问题 | [架构](docs/architecture.md) · [开发指南](docs/development-guide.md) · [迁移指南](docs/migration.md) · [故障排除](docs/troubleshooting.md) |
 
 全部文档见[文档中心](docs/README.md)，版本变化见 [CHANGELOG](CHANGELOG.md)。

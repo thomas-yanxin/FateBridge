@@ -74,4 +74,4 @@ FateBridge 引擎提供可复核的盘面与规则，Onda 指导主题、对象�
 
 本目录随 Git 仓库按 Apache-2.0 分发，当前 wheel 不包含技能目录。回到[文档中心](../docs/README.md)选择接入或开发任务。
 
-可安装分发包、MCP 依赖与干净环境验证见[Onda 插件](../docs/onda-plugin.md)；真实对话与人工评分见[行为验收](../docs/agent-evaluation.md)。`agents/interface.yaml` 是项目内部合同，不是宿主的通用依赖安装格式。
+可安装分发包、MCP 依赖与干净环境验证见[Onda 插件](../docs/mcp-deployment.md#onda-插件的构建与安装)；真实对话与人工评分见[行为验收](../docs/agent-evaluation.md)。`agents/interface.yaml` 是项目内部合同，不是宿主的通用依赖安装格式。

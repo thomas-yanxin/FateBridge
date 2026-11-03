@@ -130,7 +130,7 @@ MCP 场景 `onda-fengshui` 与 `fengshui` 分别供咨询和基础计算发现�
 | 现象 | 下一步 |
 | --- | --- |
 | `isError=true` / 退出码非零 | 读 `error_code` 和 `issues`，不要先解读业务数据 |
-| 缺少 `birth_hour` | 向用户确认小时；当前没有无时盘入口 |
+| 所选工具必需但缺少 `birth_hour` | 确认时刻；明确未知后按对应技能交付可答部分，不用默认时刻补齐 |
 | 日期无效、未知字段、投影拼错 | 按字段路径修正后重发；不要重复发送原请求 |
 | `dependency_missing` | 用 doctor 检查同一解释器，再核对具体后端/星历；不伪造成功结果 |
 | 工具或资源不可见 | 检查 family/scenario 交集与当前连接的 `tools/list` |

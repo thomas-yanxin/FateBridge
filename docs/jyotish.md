@@ -72,7 +72,7 @@ v7新增显式可选的五星运动力平均模型，默认 `cheshta_model=unadj
 
 五星来源回执还会核对声明TT、模型均值、实际操作数、几何字段与完整角度分支，拒绝末值相同但过程矛盾的包；实际对径仍保留双分支和null。该计算链校验（本地数据：`validation/jyotish-cheshta-chain-audit.md`）不替代独立星历参考、原典裁定或真实模型盲审，正常输出保持原值。
 
-## v9 名义盘、条件证据与解读范围
+## 名义盘、条件证据与解读范围
 
 `india.reading_basis`明确按所填出生时刻的名义值计算。没有给出生时误差时，`options_basis=nominal_only`且敏感性仍为`not_assessed`，不能当作已证实精确；给定误差后，星宿、宿主及宿足与分盘使用同一最多30秒UTC网格。`nakshatra_alternatives`列出发生变化的星体／上升及覆盖数，覆盖数不是概率；没有列出变化也不证明连续区间内没有边界。原生解读会把名义月宿与抽样候选一并陈述，达沙摘要也明确使用名义生时。
 
@@ -80,7 +80,7 @@ v7新增显式可选的五星运动力平均模型，默认 `cheshta_model=unadj
 
 Vimshottari生时端点／中心样本若晚于目标，返回`omitted_samples`和实际覆盖数，不能悄悄略过后声称全范围完成。这里核验的是计算和原生文案的证据传递；任意模型自由文本仍须独立审阅。6个语义准备案例属于已知开发回归集，不计作独立留出样本或现实预测。详见解读证据审计（本地数据：`validation/jyotish-fidelity-audit.md`）。
 
-## v8 条件式星战金额
+## 条件式星战金额
 
 `kala_bala.components.yuddha_bala`按已核验页图的Raman76–77计算：遍历五星全部10对，以最短黄经差严格小于1度检索候选；两星独立交战时，取Sthana、Dig及Natha至Hora的同分支合计差，除以原书固定Bimba系数差，按较小黄经者加、另一星减。该前置合计不含Ayana、Cheshta、Drik、Naisargika或星战自身。固定盘面系数不是当前测得的角直径，不按天文距离动态替换，也不自行截断到60。
 
@@ -88,7 +88,7 @@ Vimshottari生时端点／中心样本若晚于目标，返回`omitted_samples`�
 
 这是Raman星战公式对本次已声明力量输入的应用：上游仍各有Santhanam／所选七分盘读法，不认证完整单一Raman六力。Santhanam27.20给出另一公式，不混作同一规则。详见星战规则与独立对照审计（本地数据：`validation/jyotish-war-audit.md`）。
 
-## v6 时间分量与月亮分类修正
+## 时间分量与月亮分类修正
 
 `kala_bala`计算视太阳昼夜、月相、昼夜三分、岁／月／日／时主和Ayana；第九项星战在v8按上文条件计算；无候选给0，不能计算的参与者保留缺失。Hora为日出后的等长平均小时，和西占昼夜不等时小时分开；岁／月主为原书360／30日传统口径。`cheshta_bala`太阳取本次Ayana、月亮取本次Paksha；其他五星默认保留null，v7可显式选择上文的现代平均模型。它们都是出生时刻的本命分量，不是分析年份的时运。
 
@@ -96,7 +96,7 @@ Vimshottari生时端点／中心样本若晚于目标，返回`omitted_samples`�
 
 细节、失败和复现方法见时间分量审计（本地数据：`validation/jyotish-kala-audit.md`）。完整六力总量仍为null，未给出强弱达标排名。
 
-## v5 新增力量计算
+## 新增力量计算
 
 `india.strengths` 新增 `dig_bala`、`naisargika_bala`、`drik_bala` 及 `shadbala_assessment`，每层保留自身来源、算法和范围。
 
@@ -263,11 +263,11 @@ uv run --locked --extra dev pytest -q tests/test_jyotish_independent_audit.py
 
 没有独立现实数据时保留 `not_tested`。已实现预注册、完整队列封存与延后揭盲流程（本地数据：`validation/jyotish-prospective-study.md`），含材料指纹、训练／盲测隔离、基线与覆盖率检查。流程合成测试和规则算例均不计作预测成绩。
 
-## v3 时间与原典增量
+## 时间与原典增量
 
 度数规则、Uchcha Bala 和 Baladi 已对照 R. Santhanam 卷一的固定扫描本，太阳角距条件明确来自译者第 7 章注释表。顺逆阈值、源文与注释层、端点及 OCR 算例差异见时间尺度与原典复核（本地数据：`validation/jyotish-times-classics-audit.md`）。仅确认这些具体条文及注释，未声明整部原典已验收。
 
-## v4 分盘与位置强度
+## 分盘与位置强度
 
 新增 D2（传统日月 Hora）、D3、D7、D12、D30，采用上述 Santhanam 扫描本第 6 章。D30 是五个不等长区段的星座分配，原表没有唯一的盘内度数，故其 `longitude/degree_in_sign=null`；其他等分盘的盘内度数是声明的线性显示约定，不是天文黄经。D30 的符号与宫位不用于补写原典未审的事件解释。
 

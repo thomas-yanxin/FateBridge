@@ -1,17 +1,17 @@
-# 八字四项能力的独立验收
+# 计算、解释与现实预测的验证
 
 历法数值、某部原典的规则、解读是否引用实际结果、现实预测效果需要分别验证。一个维度通过，不能替其他维度计分；有限样本全部符合，也不能证明所有输入或未来事件均正确。
 
-## 当前证据
+## 八字的历史对照与未决范围
 
-| 维度 | 本轮可复核结果 | 尚未成立的部分 |
+| 维度 | 固定版本的可复核结果 | 尚未成立的部分 |
 | --- | --- | --- |
 | 历法 | 2026–2028 年 72 个香港天文台节气时刻均在 60 秒容差内，最大差异约31秒（以当次审计快照为准）；另有上海、纽约的 144 个交节／中气月界探针 | 未覆盖全部支持年份、历史地方时及所有独立历书；发表到分钟的资料不验证秒级精度 |
 | 原典 | 冻结的《秘本子平真诠》命例取格名称目前10/10相符；原文明示旺衰仍为1/3；7例原文未裁定 | 十例已用于开发，不再是盲测；两例旺衰分歧及成格、相神、救应的完整规则仍未通过；`classical_acceptance_passed=false` |
 | 解读忠实 | 新增同 run、完整业务摘要、路径、值与类型的结构化引用核验；时运快照显示已声明出生时间范围及大运候选 | 不验证任意自由文本的全部语义；也未完成真实模型多轮行为验收 |
 | 现实预测 | 新增固定队列、事前预测、外部结果和基线的评估模块；空示例实际运行返回 `not_tested` | 没有独立现实预测／结果数据，不能计算现实准确率或认证权威 |
 
-上述历法夹具保留官方原始 XML 及散列（本地数据：`../tests/fixtures/calendar_hko_v1/reference.json`），数据来自[香港天文台二十四节气](https://www.hko.gov.hk/en/gts/astronomy/Solar_Term.htm)，期望值未由 FateBridge 生成。边界探针在已发表分钟前后各两分钟查询，以避免把参考资料舍入误差当换月错误。
+表中成绩来自既有固定审计，不是本轮重新执行的结果。上述历法夹具保留官方原始 XML 及散列（本地数据：`../tests/fixtures/calendar_hko_v1/reference.json`），数据来自[香港天文台二十四节气](https://www.hko.gov.hk/en/gts/astronomy/Solar_Term.htm)，期望值未由 FateBridge 生成。边界探针在已发表分钟前后各两分钟查询，以避免把参考资料舍入误差当换月错误。
 
 ## 原典修正如何复核
 
@@ -106,3 +106,93 @@ uv run --locked --extra dev pytest -q \
 模型和参考按case ID配对同一可评估子集的实际事件，比较各自Brier损失。逐例参考值不能预先平均成常数，也不按输入列表顺序配对。原配对Hoeffding单侧界及Bonferroni分配仍适用其原有独立有界假设，未把参考异质性改成新置信度或权威分；主体相关性和预注册执行仍须外部核验。输出 `baseline_comparison` 明确标记常数／逐例模式，来源与参考强度都没有本地认证。
 
 在未绑定方案的旧人工记录上，同一组1000条预测相对0.5常数有Brier技能0.75，但更强逐例参考使技能变为−24；预测和结果记录哈希不变。这种对照现在只保留为诊断，两个方案均不能靠这些无绑定记录通过协议门槛；已绑定记录不能换基线方案重用。这只说明技能依赖所选参照，不是任何术数的现实成绩。参考依据为[ECMWF逐例Brier定义](https://www.ecmwf.int/sites/default/files/elibrary/2006/74335-application-and-verification-ecmwf-products-member-states-and-co-operating-states_0.pdf)和[Hoeffding独立有界和](https://doi.org/10.1080/01621459.1963.10500830)。后见结果后挑选基线、同一资料反复调参和真实来源造假均不能由数值门槛解决。
+
+
+## 奇门研究的盘面绑定
+
+`scripts/audit_qimen_study.py` 将每条预测绑定到实际问时、明确的排局口径、完整奇门结果和冻结解释策略，然后逐案重算再交给通用二元结果评估器。它检查研究记录的一致性，不是已经验证的预测模型，也不提供权威认证。
+
+目前没有可核验的真实奇门预测队列。随附第九轮2.6.0规则演示报告（本地数据：`validation/qimen-study-synthetic-v9/report.json`）使用明确标为 `synthetic` 的三个人工案例、全部弃权和空结果列表，可评估数为0，现实效度为 `not_tested`。演示中的目标、日期、主体、记录哈希和时间戳都不是外部登记或经验材料。2.5.0规则演示仍保留在 `qimen-study-synthetic/`；后续规则也只做本地合成重放，不增加真实样本。不同冻结版本须用各自环境重放，不能改写旧记录冒充新版本预测。
+
+### 输入、策略与封存
+
+- `StudyInput` 须包含完整 `plan/policy/castings`。当前v3沿用v2的完整输入绑定，并纳入逐例基线的概率、发布时刻、相同目标／窗口及来源记录。计算错误和弃权留在队列；仅同步删除所有列表里的弃权案例或改基线，不能沿用原证据哈希通过评估。
+- 每条起局须明确带时区的物理时刻、时区名、经度、记录时刻和问事原始档案的引用及哈希。当前计算接口只有分钟精度，拒绝静默截去秒数；不猜地点和时区。记录只接受注册后、目标窗口前的实际问时，不用于未来候选择时盘。
+- 策略冻结置闰／拆补、八神章节、旺衰章节、真太阳时开关及原典分歧处理方式。模型指纹绑定整个包的源码及数据、项目锁文件、Python与平台、依赖版本、关键历法依赖实际文件、Swiss原生模块和配置搜索路径中的星历文件清单。实际盘面还包含所用时区规则指纹。无关包文件变化也会使研究环境失配，需要在独立固定环境重放。
+- 发布预测只读取问事记录与盘面，不读取结果标签。规则概率是研究者事前明确冻结的假设值，`null` 是弃权；程序不把格局数、吉凶、旺衰或传统规则分换算为概率。这个接口不提供经过验证的概率映射。
+- 解释策略采用有序的首条匹配规则，`all_of` 为合取。规则条件有真、假、未知三态；已知假能排除一条规则，可能匹配却含未知的较早规则会弃权，不能跳到后面的有利规则。日甲身份未明时，伏干／飞干特征为未知，不会把未输出格局当作不存在；其他已知门星神仍可独立使用。
+- 格局名命中与附加条件已观察到是两种不同特征。计算保留整条格局证据、同宫冲突及源文限定；附加条件字段未评估时返回未知。`pattern_conditions_observed=true` 只表示至少一个匹配结构的已记录条件满足，不是全盘吉或现实成功。
+- 真实数据封存使用当前本地时钟，不接受手填历史发布时间。计算期间源码或星历改变、时钟倒退，或实际封存时目标窗口已经开始，均拒绝。合成演示才允许注入时刻。
+- 评估先重算每个实际奇门盘及策略决策，再检查预测、证据哈希与已封存结果。重放检查预测是否由该策略算得；全包指纹另核对是否仍是事前封存的那份计划及预测。真实研究必须提供从独立登记或可信存档取得的事前全包指纹，拒绝缺失或不匹配。仅靠重放不能发现整个计划、基线、队列和收据被一致重做；合成演示可以省略外部指纹，但报告明确标为未锚定的合成包。
+
+第二十一轮采用 `qimen_forecast_commitment_v3`，对应常数／逐例基线二选一的新研究输入。旧v1及v2必须在原固定环境重放，保留当时协议的范围；禁止自动补新字段、重算旧收据后把它当成原来的封存。`study_input_sha256` 在封存时绑定完整输入，不证明计划在问事发生前已经外部登记。
+
+盘级 `qimen.source_disagreements` 可预先固定为 `source_disagreement_action=abstain` 或 `use_declared_rules`。前者保留该例并弃权，后者保留该例分歧并按已声明规则计算；不能看过结果再切换。这个开关不等于所有原典范围、释读和优先未决项都已完成自动裁决或自动弃权。整条引用或冻结条件的检查不认证任意自由文本解释。
+
+### 合成演示与重放
+
+源码环境先执行 `uv sync --locked --extra dev`。以下目录须是尚未生成过这些文件的新目录；命令拒绝覆盖已有封存记录。
+
+```bash
+uv run --locked --extra dev python scripts/demo_qimen_study.py \
+  --output-dir /tmp/fatebridge-qimen-synthetic-demo
+
+uv run --locked --extra dev python scripts/audit_qimen_study.py fingerprint \
+  --policy /tmp/fatebridge-qimen-synthetic-demo/policy.json \
+  --output /tmp/fatebridge-qimen-synthetic-demo/fingerprint.json
+
+uv run --locked --extra dev python scripts/audit_qimen_study.py seal \
+  --study /tmp/fatebridge-qimen-synthetic-demo/study.json \
+  --synthetic-at 2026-12-31T00:00:00+00:00 \
+  --output /tmp/fatebridge-qimen-synthetic-demo/resealed.json \
+  > /tmp/fatebridge-qimen-synthetic-demo/reseal-receipt.json
+
+uv run --locked --extra dev python scripts/audit_qimen_study.py evaluate \
+  --commitment /tmp/fatebridge-qimen-synthetic-demo/resealed.json \
+  --outcomes /tmp/fatebridge-qimen-synthetic-demo/outcomes.json \
+  --as-of 2027-03-01T00:00:00+00:00 \
+  --expected-commitment-sha256 "$(uv run --locked --extra dev python -c \
+    'import json,sys; print(json.load(open(sys.argv[1]))["commitment_sha256"])' \
+    /tmp/fatebridge-qimen-synthetic-demo/reseal-receipt.json)" \
+  --output /tmp/fatebridge-qimen-synthetic-demo/replayed-report.json
+```
+
+预期：注册案例数3、可评估数0、覆盖率0、`real_world_efficacy=not_tested`、`authority_certified=false`。其中一例保留《演义》已知分歧，一例保留日甲未决身份，一例检查纽约重复钟时的明确偏移。当前实现保留 `casting_at` 对应的实际UTC时刻及IANA时区，全部弃权仍无可评估结果。旧版本把第三例报为计算错误的封存原件仍保留，不能改写旧收据。合成时间可设在未来，不代表已经收集到未来资料。
+
+`seal` 的标准输出提供 `commitment_sha256/study_input_sha256`；演示脚本也保存 `seal-receipt.json`。上面只演示读取封存时另存的本地收据，未进行真实外部登记。该指纹计算自经模型验证后的规范化JSON，不是对磁盘JSON文件直接执行 `sha256sum` 的结果；缩进和对象键顺序不影响指纹。
+
+第十五轮修复明确实际时刻转换成当地字段后丢失偏移的问题。公开奇门接口可同时给 `analysis_timezone=America/New_York` 和 `analysis_utc_offset=-04:00`（或该重复小时的 `-05:00`）；偏移须与该命名时区在指定钟时的规则一致，不会把全年时区换成固定偏移。研究接口从已知 `casting_at` 自动提取偏移，历史整秒偏移也保留；裸重复钟时和不存在的钟时继续拒绝。输出 `qimen.calendar_policy.civil_clock_resolution` 保留原偏移、核对后的偏移、fold和实际UTC时刻，正文同步显示。
+
+实际时刻的先后统一换成UTC比较，原记录不改写。包含同一个ZoneInfo对象的重复小时也要遵守注册、起局、记录、发布及结果窗口顺序；窗口未结束或结果记录晚于评估时刻时不能计入。新增回拨对抗案例是软件回归，不是现实预测样本。
+
+### 真实研究输入
+
+输入结构可参照合成 study.json（本地数据：`validation/qimen-study-synthetic-v9/study.json`），不能沿用其中虚构资料当作实测资料。完整机器字段由 `StudyInput`、`FrozenQimenPolicy`、`Condition` 和通用 `StudyPlan/Outcome` 定义。
+
+| 部分 | 必须事先明确的内容 |
+| --- | --- |
+| `plan` | `data_kind=real_world_submission`、目标定义、注册时刻、共同结果窗口、完整队列、基线及冻结时刻、训练主体（无也须显式 `[]`）、样本与停止规则、计划检验次数、模型与解释策略指纹、真实外部登记引用 |
+| `policy` | 排局／章节口径、冲突处理、唯一规则ID、有序条件、每条规则的冻结概率或弃权、显式兜底概率或弃权 |
+| `castings` | 队列中每例的 `case_id/subject_id/casting_at/timezone_name/longitude/recorded_at/question_record_sha256/question_record_reference` |
+| `outcomes` | 每例独立判定的是否发生；发生时刻（阳性必需）、完整窗口结束后的记录时刻、原始结果档案哈希和引用 |
+
+`plan.model_sha256` 使用 `fingerprint` 输出的模型指纹，`plan.interpretation_policy_sha256` 使用该命令输出的策略指纹。指纹生成只是本地草稿，不替代事前外部登记。登记后不得改写目标、队列、基线、概率映射、样本量或停止规则；变更须作为新研究或明确的探索分析。真实研究封存命令去掉 `--synthetic-at`，真实评估也拒绝未来的 `--as-of`。
+
+真实研究封存后、目标窗口开始前，应将完整封存包及其规范化指纹提交可信独立登记或存档，并在评估时从该记录取得 `--expected-commitment-sha256`。不得在看过结果后从当前待评文件新算一个指纹，再把它称为事前外部锚。程序核对调用者提供的指纹是否吻合，不能自行认证它何时、由谁保存，故 `expected_digest_provenance_authenticated/external_registration_authenticated` 仍为false；指纹吻合不等于预注册、盲法或独立结果核验已经完成。
+
+条件目录限定为全盘星／门伏吟反吟、五不遇、所选卷二六组时干支入墓，指定外八宫的门／主星／神、主星旺衰、门迫、时旬空亡范围，以及已经实现的格局存在／已记录附加条件。`hour_branch_tomb` 是字面时柱条件，不检查天盘时干的墓宫。不能给任意JSON路径，不能读取结果或主体ID，也不能给中宫补门星神。岁格、月朔格可使用 `year_stem_block/lunar_month_start_block`；年界、甲身份或历法锚点未解决时返回未知，不能把缺项当阴性。`stem_pair` 表示已实现干对类别中的任意命中，不是某个格名或总体吉凶。
+
+目前研究接口仅支持共同窗口下的二元事件、每例一个独立主体，重复主体会拒绝；重复观察、聚类、连续结果、不同结果窗口、人工自由解释盲评及打乱问时对照需要另行预注册和实现。独立的现实信息基线与对照不能由本程序凭空补出。
+
+规则取法必须在策略中事先冻结。三奇入墓、六仪击刑的广义／窄读、门迫方向、三诈共享证据、五假及人假未知等条件，统一按[奇门规则与未决范围](qimen-depth-audit.md)核对；`pattern_conditions_observed` 不表示全盘条件满足。未知不能补为否，原文比例不能变成预测概率，旧封存不按新格名回填。
+
+### 核验边界
+
+本地哈希不证明问时真实、时钟可信、档案存在或不可回写，也不证明外部登记的内容一致、盲法执行、纳入规则执行、样本独立、主体同意、无人泄露结果、未试过其他未披露策略或结果判定公正。包源码与依赖文件指纹也不证明进程内代码未被篡改。研究应在独立固定检出和新进程中运行，并由可信登记和独立结果核验补足这些边界。即使全部程序门槛通过，也只得到提交记录的有限统计结果，不能据此宣称普遍预测有效、100%总体准确或最权威系统。
+
+
+真太阳时版本还应冻结 `calendar_policy.solar_time_adjustment` 所载实际分项与方法。当前UTC近似UT1，不将距换时／换日的秒数当作误差界或确定性；独立太阳钟在5秒核对容差内仍有一例边界不能认证。每条研究证据绑定整个返回，修正依据变化会改变证据及引擎指纹；旧封存必须沿用其固定环境，不能据传统规则仍为2.12.0补写新回执。
+
+
+
+逐例基线与统计公式使用本页[同一事件的逐例冻结基线](#同一事件的逐例冻结基线)。演示也可添加 `--baseline-kind per-case`；所生成的0.5概率、主体与来源均为人工示例，不成为真实外部参照。

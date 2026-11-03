@@ -1,84 +1,90 @@
-# 河洛理数与邵子参评数：规则审计与使用
+# 河洛理数与邵子参评数：计算口径与使用
 
-第一百零四轮补齐默认DE440在1700—2300全部14424个节气的有限TT网格核对，连同480个内部组件及116个参评立春共15020项，在固定1秒线内。独立CSPICE解码75100行状态通过；保留研究核8字节DAF补齐前的失败、原生12个超差和全部旧判据。同观测谱系不认证独立物理准确度，历史UTC、连续域和三维满分仍未完成，见公开年份节气核对（本地数据：`validation/heluo-solar-domain-audit.md`）。
+`heluo` 提供河洛本命卦与时运，`canping` 提供参评取数及具名配运方法。两者的取数、年代、原典与时间映射分别核对，不把河洛本命卦、皇极经世、铁板数和金锁银匙统称为一个已认证体系。
 
-第一百零三轮接入大畜六爻及24个完整父段，两层各156／384、各228条待核，新增两处字形仍存疑。九二叶者段引贲未印目标爻，上九不叶者段明印泰上，均不替代正式后天盘；五马官制词义明确另列为编校说明。原6331节点保留，125模块6382项通过；52份完整计算与1554条知识输出逐项对照通过，默认安装包及14次新stdio查询通过。旧失败、原判据与三维／四维false保留，共享MCP未重连，见大畜原页与接入验收（本地数据：`validation/heluo-daxu26-adoption.md`）。
+[文档中心](README.md) · [调用合同](contracts/README.md) · [可选太阳后端](solar-backends.md)
 
-第一百零二轮已接入復、無妄十二爻标题和完整条件注文，两层各150／384、各234条待核，新增三处字形仍存疑；两条有条件引卦保持目标爻未知，出处页脚未提供的版本显示为“未提供”且结构化空值保留。124模块6331项通过并保留原6232节点；384条完整记录、46份完整计算、1554条完整知识参照、默认安装包及单独启动的新stdio进程26次查询通过。旧资料、初败和撤回全部保留，三维／四维与权威认证仍false，共享MCP未重连，见復／無妄原页与接入验收（本地数据：`validation/heluo-fu24-wuwang25-adoption.md`）。
+原典只覆盖指定底本的已读段落。逐爻解说、诗诀、疑字、引用卦爻与正式后天盘分别返回；未核内容保留待核，不按已核比例推定全书符合。参评时间线保持120条年序；具现代立春映射的方法保留121个边界，其他方法不补造未知的 UTC 映射。
 
-第一百轮将已登记28页112块参评原生图的重取与固定散列核验做成开发工具，实际112块均相符；第96帧四块另核逐字节和RGB像素。保留PNG请求400及已撤回的语法假设，不改主本47格未决、历法12项超差、来源版本或计算。新增12项工具检查通过，未重跑R99的6159项全套；共享MCP未重连，整体资格不提升，见原生图访问与身份核验（本地数据：`validation/canping-source-access-audit.md`）。
+民用钟时须结合地区时区与必要的明确偏移；重复钟时的两种瞬间不能互换。DE440／VSOP2013 的有限 TT 网格按原1秒线报告，原生12个超差及历史失败继续保留。历法、原典、解释与现实预测各自验收，不因来源修复改判其他层。
 
-第九十九轮已按文明书局金部原页登记同号多处正文，保留两处3322与未匹配2328，不改主本1123格读清／47格未决；修复知识目录旧散列造成的503及同号说明缺失。最终116模块6159项通过，原6056节点保留；所有初败、跨Python版本校验修订与归档收集错误均保留。全书、自由解释、现实预测及权威认证仍未通过，见金部对读与来源绑定（本地数据：`validation/canping-gold-wenming-alignment-audit.md`）。
+逐轮运行成绩、原始反例、诗诀／爻段覆盖增量及旧英文报告见[历史记录](https://github.com/thomas-yanxin/FateBridge/blob/73ec8912677b2b687a4b11ccb06727332296e8e1/docs/numerology-audit.md)与[历史英文报告](https://github.com/thomas-yanxin/FateBridge/blob/73ec8912677b2b687a4b11ccb06727332296e8e1/docs/numerology-audit.en.md)。以下对照表及复核记录仅适用于其具名版本。
 
-第九十八轮已接入显式VSOP2013太阳来源、参评完整120年边界和实际三端回执，并修复原自动／原生路线可缓存混源年表的配置竞态。源码及独立安装包各15,020项原TT对照通过；采用后主工作区29项实际接口、64项路由与来源控制通过。638模块仍有405失败、139错误、84跳过，全部失败保留并与修订前核对，不计作全仓全绿。原生12项超差、原典与解释缺口、现实预测未验证及权威认证false均保持，见接入与混源修复（本地数据：`validation/numerology-vsop-integration-audit.md`）。
+## 调用
 
-第九十六轮已接入《賁》六爻完整注文，标题与注文各132／384，待核各252条；诗仍48组117首、336组待核。原3822节点保留并新增51项，最终冻结3873项全过，前一完整轮4项版本断言失败及所有更早失败保留；当前工作区222项、两层各12项新stdio另验。无新增独立读稿、模型评测或现实结果，三维／四维与权威认证仍false，见《賁》接入验收（本地数据：`validation/heluo-ben22-adoption.md`）。
+```bash
+uv sync --locked --extra dev
 
-第九十五轮固定核对作者月球、两套岁差配方与实际启用质量比。月球位置对DE404更接近，太阳几何最大差却未改善；整套替换对太阳黄经最多改变约0.000035″，因此不采用，也不重判原生12个超差。首轮误取关闭分支常数及修订全部保留，见作者月球与归心核对（本地数据：`validation/numerology-author-moon-audit.md`）。
+uv run --locked --extra dev fatebridge heluo \
+  --date 2026-06-21 --time 16:30:00 --zone Asia/Shanghai \
+  --gender 女 --use-true-solar-time false --response-char-limit 0
 
-第九十四轮沿用全部原96点核对DE404／DE440谱系差；补充官方DE441独立读取控制、DE403的48点有限覆盖及公布检验表。保留远端DE403／DE440的自动回退、DE404二进制身份未知、未覆盖点与原生12个1秒超差；没有生产算法变更或改评分，见太阳星历谱系核对（本地数据：`validation/numerology-solar-lineage-audit.md`）。
+uv run --locked --extra dev fatebridge canping \
+  --date 1990-06-15 --time 09:33:00 --zone Asia/Shanghai \
+  --gender 男 --method gu --use-true-solar-time false \
+  --fields benming numerology_evidence --strict-fields true \
+  --include-snapshot-text false --response-char-limit 0
 
-第九十三轮核验两处并行fsum改动：同原96个TT点的完整输出逐字节相同，79项消费与来源回归、8次独立stdio计算通过。进一步固定分离系数与地月归心：原生几何最大差约0.069986″，既有AA1996组合约0.032270″；正确黄赤交角常数差不是本组主因。原生12个1秒超差不改分，没有切换默认模型或新增独立精度样本，见太阳系数与归心核对（本地数据：`validation/numerology-solar-coefficient-components-audit.md`）。
+uv run --locked --extra dev fatebridge heluo \
+  --date 1990-06-15 --time 09:33:00 --zone Asia/Shanghai \
+  --gender 男 --use-true-solar-time false --analysis-year 2028 \
+  --month-index 3 --day-index 10 \
+  --fields heluo_timing.selected_annual heluo_timing.selected_month \
+    heluo_timing.selected_day heluo_timing.selected_texts heluo_timing.calendar_policy \
+  --strict-fields true --response-char-limit 0
 
-第九十二轮将已封存的噬嗑六爻注文／比六组16首诗接入运行数据，标题与完整注文各126／384、普通爻诗48组117首，仍有258条、336组待核。冻结3822项回归保留原3760项并新增62项迁移检查；当前工作区116项与独立stdio12项另验。首轮失败、疑读、旧夹具及数学结果保留，完整三维／四维与权威认证仍false，见来源接入验收（本地数据：`validation/heluo-shike21-bi8-adoption.md`）。
+uv run --locked --extra dev fatebridge canping \
+  --date 2026-02-06 --time 04:02:00 --zone Asia/Shanghai \
+  --gender 女 --use-true-solar-time false \
+  --dayun-method bazi_appendix_v1 \
+  --analysis-datetime 2037-02-06T04:02:00+08:00 \
+  --fields canping_timing numerology_evidence.selected_texts \
+  --strict-fields true --include-snapshot-text false --response-char-limit 0
 
-第六十五轮据文明书局本PDF154—156补入谦六爻标题与完整条件注文，两层各90／384、各294条待校；90表示已作目校记录，仍含未决字形，不表示全部读字确定。初、四爻有条件引明夷／小过，目标爻未印，不替代正式后天晋／颐；二、五爻諂／謟、彀字候选仍未决，初稿错误及撤回拟改保留。旧84条不变，原历法12项超差、五处同版月号冲突及完整验收false继续保留，见谦原页、条件与计算结果核对（本地数据：`validation/heluo-qian15-commentary-audit.md`）。
+uv run --locked --extra dev fatebridge heluo \
+  --date 2026-02-10 --time 12:00:00 --zone Asia/Shanghai \
+  --gender 女 --use-true-solar-time false \
+  --fields chart.tian chart.di judge.seasonal_numbers \
+  --strict-fields true --include-snapshot-text false --response-char-limit 0
+```
 
-第六十四轮按实际太阳边界回执修正二数固定JPL引用，并为AA1996补齐有界派生立春及来源不足503。原96点与全部1800—2200年9624点分别量验，AA1996具名候选在原1秒线内，Native旧失败仍保留；不改默认源或取数算法。完整回归及范围见太阳模型来源与有界立春（本地数据：`validation/numerology-solar-providers-audit.md`）。
+示例为虚构测试输入。`--use-true-solar-time false` 是显式选择；使用默认真太阳时应提供实际经度。REST 路径仍为 `/api/divination/heluo`、`/api/divination/canping`，MCP 工具名仍为 `heluo`、`canping`；请求与输出模型由同一工具目录发布。
 
-第六十三轮据文明书局本PDF151—153补入大有六爻完整标题与条件注文，两层各84／384、各300条待校。九三有条件引睽只列卦名，未指定目标爻或引其正文，不替代正式后天革上；八组初稿修订及独立模型读稿全部分歧保留，复读修正误字和增字，矜／衿仍未决；人工专家及全语料独立复核未完成。原历法12项超差、同版五处月号冲突及完整验收false不改变，见大有原页与计算结果核对（本地数据：`validation/heluo-dayou-commentary-audit.md`）。
+两工具均须明确 `gender`，不能默认男命。河洛已知中英文性别别名归一化；缺失、未知或拼写错误直接报错，因为性别影响命卦和元堂。
 
-第六十二轮核读同版卷首《八宫所属》全64条月号，发现与卦条五处不一致。新增`month_assignment_method`显式选择卷首或卦条优先，双方出处与本月匹配并列；無妄八月现有卷首直接见证，卦条缺号及五世疑点保留。原历法12项超差、五处月号矛盾和完整验收false保留，见月表原文位置核对（本地数据：`validation/heluo-month-source-profiles-audit.md`）。
+两工具的 `time` 也必须是已知的当地钟时，空白、未知与夹带时区的字符串会拒绝；时区单独放 `zone`，显式 `00:00` 有效。`judge.deTime` 仅为卦属月匹配，另述窗口、来源及未决边界见 `judge.month_affinity`；其中月号暂按四柱月支解释，不等于农历月或精确节气区间。
 
-第六十一轮据同一文明书局本PDF149—151补入同人六爻标题及完整条件注文，两层各78／384、各306条待校。修复继承错文，保留九三負面葉者段、九五跨页不葉者续文，以及九四“士後見榮”的疑义；旧72条正文保持。新增独立复核、原典出生例和模型评测均为0；原历法96点中的12个超差仍未通过，见同人原页核对及本轮证据（本地数据：`validation/heluo-tongren-commentary-audit.md`）。
+真太阳时默认开启，须提供明确经度`lon`或数值`gps_lon`，0°有效；缺经度不再用上海缺省值。只在用户选择钟表时时明确传`use_true_solar_time=false`，不为绕过错误自动改换钟制。两工具的`birth_clock`视图可核对实际输入来源与所用钟面。
 
-第五十八轮修复独立评测没有把太阳模型选择传给MCP的问题，实际核验19次数术调用均采用所选Native／Moshier。三组解释对照结果混合，候选指导已撤回，原始判据和失败保留；另复现只读结果校验器的写入依赖，见来源与解释对照（本地数据：`validation/numerology-explanation-conditions-audit.md`）。没有据测试或模型计数提升完整验收状态。
+解释时先使用 `rule_trace` 和实际选中条文。`selected_texts` 仍可能同时包含葉者、不葉者、岁运等分支；现阶段没有完整综合判断，不能挑最有利的一段充当确定结论。
 
-第五十七轮将Native已知差异定位到实际Moshier回退的上游位置模型：同模型直接求根最大仅差0.000121秒；另一个具名Swiss文件配置对原96点最大差0.115秒。原空目录12项超1秒失败、全部参考与主审计false保持，不以改配置通过冒充普遍修复，见精度诊断（本地数据：`validation/heluo-native-precision-diagnosis.md`）。
+上面的 `month-index 3 / day-index 10` 是原典序号，不是3月10日。缺父级选择、超过卦序范围或无效序号会报错，不回退当前年或最后一步大运。完整年序位于 `heluo_timing.annual_rows`，月序位于 `monthly_rows`，日定式位于 `daily_template`；大结果按同次交付机制读取。
 
-第五十六轮补齐配运回执的释文／书目／完整原句角色／时钟策略绑定，并核对同次实际钟面、来源轨迹和固定释文段。矛盾在投影前返回不可重试503；六份重新计算的正常业务输出保持。显式Native配置另暴露12个TT旧参考点超出原1秒比较线，最大约1.576秒；对应审计保留失败，不以默认JPL通过覆盖。模型解释的两项遗漏也未重判，见回执与精度核对（本地数据：`validation/canping-receipt-binding-audit.md`）。
+## 来源及版本限制
 
-第五十五轮据文明书局印本PDF144–148补入泰、否十二爻的完整注文及标题，两层各72／384、各312条待校。三处具名引卦保留实际条件段，否九四引观位于葉者段，不能当成岁运通用指令或正式后天卦；疑读、三组撤回草稿及独立复核未完成的状态一并保留，见泰否原文与条件核对（本地数据：`validation/heluo-taipi-commentary-audit.md`）。
+- [《河洛理數》卷一，识典古籍转录](https://www.shidianguji.com/book/NA09030/chapter/1m8od60nhc1me)：取数、五寄宫、元堂、后天卦、化工。正文有明显 OCR 错字和混排，例如第一例总数转录与分项运算不一致；参考夹具保留手算方法说明，未声称影印逐字校勘完成。
+- [卷六转录](https://www.shidianguji.com/zh/book/NA09030/chapter/1m8od6rwizt4b)：金锁银匙五行算例，以及大运替时、流年用太岁与大运支的规则。金部明确给出同支十三位，可独立定位移植错误。
+- [日本国立公文书馆卷四至七影印](https://www.digital.archives.go.jp/DAS/contents/pdf/lossy/03050271000050/0001.pdf)：核读PDF第50、105、106页，保存三张原页及散列。卷七把附入的子平运法与河洛六九年卦运明确区分；卷六的配运段落未唯一指定采用哪套时间轴。[馆藏目录](https://www.digital.archives.go.jp/file/3611497)记载明刊／清印，具体印年未定。
+- [国家图书馆藏本影印 PDF 的公开镜像](https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf)：提供后续底本校勘入口；本次未完成整本图像核读。
+- [日本国立天文台 2026 年暦要項](https://eco.mtk.nao.ac.jp/koyomi/yoko/2026/rekiyou262.html)：24 节气时刻，原表为日本标准时 UTC+9，测试按绝对时刻比较。
+- [中央研究院中国文哲研究所维护的《参评秘诀金锁银匙歌》馆藏记录](https://hannom.openmuseum.tw/muse/digi_object/c814fd85d043d6e38fbb7ca4723db287)：该抄本记录编者不详。它是另一文献记录，不能据此确认本系统条文全部出自邵雍。
 
-第五十四轮补读卷六PDF64的逐句释明，确认太岁与大运支的配对依据；修复固定四柱Python函数未知公历年时退回出生日支、起运前套第一运的问题。相对干支继续推进而公历年保留未知，原有相对延展能力保留，见相对流年与替支释文（本地数据：`validation/canping-relative-years-audit.md`）。出生三端此前默认日期配运的未起运处理未被冒充为本轮新修复。
+`numerology_evidence.selected_texts` 中河洛条文按 `text_provenance` 分开报告爻辞、注文与诗歌状态；九卦54条爻辞按指定影印目校，其余330条仍待校，独立复核尚未完成。`corpus_sha256` 仅标识继承语料，`yaoci_collation.sha256` 标识局部校勘层，旧文与页码随所用条目保存。另附已有周易语料中的同卦同爻经文、修订号和散列作为参照；它不替代河洛版本校勘。散列只能证明内容身份，不能证明内容正确。
 
-第五十三轮修复旧命宫方案在立春前把流年首年错置为公历出生年的问题：现在按同次实际年柱对应的立春年标签起排，太岁、取数与岁运选文随之纠正，底层拒绝矛盾年标签。该修复没有核实旧命宫配运或赋予UTC区间，见旧方案年序核对（本地数据：`validation/canping-legacy-year-label-audit.md`）。
+土用目前明确采用“四立前十八个连续日、左闭右开”的计算约定。卷一季月十八日的计日法、不同底本及纯卦阴阳令与其他月令术语的差异需继续核对，不能把工程边界测试当作版本争议已经解决。
 
-[文档中心](README.md) · [英文说明](numerology-audit.en.md) · 第61轮完整审计（本地数据：`validation/heluo-tongren-full-audit.json`） · 历史v56报告（本地数据：`validation/numerology-audit.json`） · 检查记录（本地数据：`validation/numerology-checks.md`）
+## 规则与时间口径
 
-本次改进以《河洛理數》史應選校訂本卷一、卷六的指定段落为核对对象。它不等于所有“邵子数术”，也不把《皇極經世》、铁板数、河洛本命卦和金锁银匙合并为一个已获认证的体系。书中传统署名与历史作者身份亦分别处理。
+1. **交节时刻**：原服务按生日零点取化工，又用月支近似冬夏半年；现在以出生民用时刻代表的绝对瞬间判断节气及至点。真太阳时仍可调整四柱日时，不用调整后的墙钟重新判断太阳交节。
+2. **三元五寄宫**：由弘治十七年甲子（1504）上元起，六十年一元、180 年循环；2044 年回到上元。公历一月仍属于上一个干支年时，用该干支年确定寄宫。
+3. **天地数归卦**：超过正数时只减一次 25／30，再按原文去十取零；不反复作模运算。例如天数 55 减 25 得 30，取 3，旧循环算法会得到 5。该扩展用例是规则推演，区别于书中四组现成算例。
+4. **参评数同支**：卷六金部的申日申时例绕行一周，连首尾计十三位，结果 3322。旧实现顺数为一位，误得 2122；现在顺逆均为十三位。其余非同支按顺逆各自的包含首尾计数。
+5. **默认方法**：`canping.method` 从 `ming` 改为 `gu`。`gu` 使用真实日支，符合卷六该段不用月令的规则；显式 `ming` 保留月支反向变法，输出说明其与该段原典不同。未知方法直接拒绝，避免拼写错误静默换流派。
+6. **后天卦与纳甲**：后天卦包含明确上下卦，先后天均参与匹配。第三轮进一步改为实际六爻纳甲，并纳入乾坤借用，修正旧的上下纯卦全表合并造成的误报及借用漏报。五卦原页已核对，其余按规则推演；不代替完整得势判断。
+7. **参评长时间线**：先修复91–120岁钳制，第四轮再移除默认固定一岁起运和命宫顺排。默认 `bazi_appendix_v1` 明确选用卷七附子平法的月柱顺逆、三日一岁及余日借除；连续折算另列 `bazi_continuous_v1`，旧方法须显式 `legacy_minggong_v1`。卷六未唯一指定配运法，民用日计数、生日加整年和立春年界均作为具名实现约定。120行是年序覆盖范围，绝非寿命预测。
+8. **解释边界**：简化 `judge.xie` 只表示元气或化工命中。快照不再据此宣布综合葉否；天地数“有余／不足”只与25／30比较，相等称正数。`judge.seasonal_numbers` 另列至弱太过、十一数式和六个时令窗口；原文重叠不裁优先，得中数值条件为 `null`。缺条、空条和缺字标注语料状态，不据此断现实灾祸。
 
-第五十二轮增加参评具名配运的原句与日期映射回执，区分卷七完整采用条、来源语境及另一《三命通会》的十年背景；所核附段未明载十年步长的状态保留。连续法不冒用整数借除认证，旧命宫法全部只作对照。新增`timing_policy`短视图与同次首运摘要，完整时间线仍在；五例既有字段不变，见配运来源映射核对（本地数据：`validation/canping-schedule-basis-audit.md`）。
-
-第五十一轮以香港天文台2021年11月月历与IANA古巴规则核对跨立冬的重复出生钟时。新增两数`birth_utc_offset`，保留地区时区；修复参评附法零岁起运重贴fold=0、导致起运早于已确认出生一小时的问题。未知偏移、缺失钟时、调钟缺口继续拒绝；参评日支本命数可相同而月柱配运不同。该月历锚点复用已封存原件，不增加独立天文观测或现实样本，见重复钟时核对（本地数据：`validation/numerology-birth-fold-audit.md`）。
-
-第四十八轮修复`onda-xingpan/topic`实际未暴露河洛／参评工具、参照准备却默认打开全部工具的问题，并补齐选文视图的同次输入／钟面证据及原序交付核验指导。同九个虚构解释诊断、45条预定判据实际执行四批，追加复核后的首批38／2／5，最后一批45／0／0（通过／未满足／未决）。初次失败、回退及审阅更正全部保留；这只是已知诊断集，不是全域解释或现实预测认证，见入口与解释诊断（本地数据：`validation/numerology-semantics-preparation.md`）。
-
-卷三诗诀已接入乾、坤、屯十八个普通爻组，共四十二首，分开保留象曰与旧合并文；其余366个爻组待核，不能把首数除以384爻组。乾卦前批五处字词或字序差异原样保留，本批另核坤屯十处所选底本差异和七处撤回草稿读法；屯初否定不可省，屯四仅一首不补其二。当前范围见坤屯诗诀核对（本地数据：`validation/heluo-kuntun-poem-audit.md`），乾卦前批（本地数据：`validation/heluo-poem-collation-audit.md`）、原始来源定位（本地数据：`validation/heluo-poem-source-discovery.md`）及草稿原样保留。
-
-第四十七轮补校小畜履十二爻和履六条标题，两层各60／384、各324条待校。小畜九三按原段未单列不葉者，不补标签或判false；小畜初有条件引巽初与正式后天巽四同卦异爻，分别返回，见小畜履核对（本地数据：`validation/heluo-xiaochuli-commentary-audit.md`）。
-
-第四十六轮核校师比十二爻，完整单次目校达48／384，336条待校。纠正比六二混入全卦纳甲条件的归属，保留该条件的独立证据；师六三引升三只作有条件的单爻变核对，不替代正式后天盘。初稿十五组修订及独立二审为0的状态保留，见师比核对（本地数据：`validation/heluo-shibi-commentary-audit.md`）。
-
-第四十五轮修复参平完整120年配运的未来立春依赖，保留121个实际边界、显式模型及同次查询两端。先冻120个TT根和1440组状态比较，公开模型年限及完整验收状态不变，见完整年序核对（本地数据：`validation/canping-projection-audit.md`）。
-
-第四十四轮修复河洛化工／阴阳令及二数时令独立按UTC年取表导致端点年失败、默认模式与共享历法来源不一致的问题。现在按原民用年使用共享相邻窗口，保留实际边界来源并核对同次上下文；未扩大公开模型年份或修复参平长程越界。见第四十四轮核对（本地数据：`validation/heluo-solar-context-audit.md`）。
-
-第四十三轮新增逐阶段反元气的“无正而有反”前提，分开实际卦体命中、缺席条件与只看上下体的范围比较；绑定出生年干支映射并拒绝内部源表冲突，反中有救条件不擅自量化。见第四十三轮核对（本地数据：`validation/heluo-yuanqi-opposition-audit.md`）。
-
-第四十二轮新增需讼十二条完整单次目校，注文共36／384、待校348；修复非空换文或交换条件正文仍被标已校的来源校验缺口。标题／注文分别绑定规范内容身份并报告实际载入字节身份，排版变化不会被误判换文；来源说明从实际覆盖数生成，不再硬写乾坤十二条。见第四十二轮核对（本地数据：`validation/heluo-xusong-commentary-audit.md`）。
-
-第四十一轮新增完整二十四节卦对应、七十二项原列候卦标签和六十卦的两种显式名义日序重建。保留四处爻名／卦形差异，两模型对原例和表头的吻合不同而不自动择优；实际候卦、化工与日期仍未裁定，见第四十一轮核对（本地数据：`validation/heluo-jiehou-audit.md`）。
-
-第四十轮修复出生年标签与干支混用会改变岁卦的问题；新增卷一百刻不等长支及六日移支的相对算术，六十块合365源日，无需选定分制。每日添分、物理原点和实际日卦日期仍未接通；18分一刻只作另一组等时假设的条件解，见第四十轮核对（本地数据：`validation/heluo-clock-year-context-audit.md`）。
-
-第十七轮对读文明书局册四12行36格：其中“晚風、商山、鐵柱、斷路”在另一印本中有实际依据，更正此前笼统称作继承错字的归因。所选格增加`witnesses`，主选文与对读文、两版疑读和页码分别保留；不按吉凶择本，不用对读文填主本缺字，当轮主本201格完成数不增加。见第十七轮核对（本地数据：`validation/canping-witness-audit.md`）。
-
-第十六轮整段目读卷六水部78行234格，其中40格疑读不计入已确定校勘；全表累计201格已确定单次目校、969格待完成。修正南山／商山、鐵杵／鐵柱和补写原页圈空等转录问题；○为原页圈空，□为编辑未定，二者分开返回，不按典故猜补。见第十六轮核对（本地数据：`validation/canping-water-audit.md`）。
-
-第十五轮修复参评火2838、土3373的继承错号及两处转录，按原页区分上层男命、中层女命、下层共用岁运。13／1170格已单次目校，其余1157格与独立复核仍待完成；顺逆只有一方有诗是原书允许的情况。同数只指同一行，附列2869不能由所核公式生成且栏目未明，保留疑点并停止通用补文。新增同次`selectionShun/Ni`、`pair_resolution`、语料散列和`text_selection`视图，见第十五轮核对（本地数据：`validation/canping-text-audit.md`）。
-
-## 验收范围
+## 固定版本的对照范围
 
 第三十九轮新增屯蒙十二爻完整注文核读，注文覆盖增至24／384、待校360；保留原页龍妾、掌無權等异读，八组草稿撤回不冒充继承错误。修复来源损坏被归为出生参数400的问题，标题／注文损坏返回不可重试503；实际选文、条件分支和同次散列一致，见第三十九轮核对（本地数据：`validation/heluo-tunmeng-commentary-audit.md`）。
 
@@ -158,31 +164,7 @@
 
 验收结果见 JSON 中的 `calculation_checks_passed` 与 `four_dimension_acceptance_passed`。两者含义不同；四项总验收目前为 `false`。有限参考样本全部通过，也不能推出样本外全部正确。
 
-## 修正内容
-
-1. **交节时刻**：原服务按生日零点取化工，又用月支近似冬夏半年；现在以出生民用时刻代表的绝对瞬间判断节气及至点。真太阳时仍可调整四柱日时，不用调整后的墙钟重新判断太阳交节。
-2. **三元五寄宫**：由弘治十七年甲子（1504）上元起，六十年一元、180 年循环；2044 年回到上元。公历一月仍属于上一个干支年时，用该干支年确定寄宫。
-3. **天地数归卦**：超过正数时只减一次 25／30，再按原文去十取零；不反复作模运算。例如天数 55 减 25 得 30，取 3，旧循环算法会得到 5。该扩展用例是规则推演，区别于书中四组现成算例。
-4. **参评数同支**：卷六金部的申日申时例绕行一周，连首尾计十三位，结果 3322。旧实现顺数为一位，误得 2122；现在顺逆均为十三位。其余非同支按顺逆各自的包含首尾计数。
-5. **默认方法**：`canping.method` 从 `ming` 改为 `gu`。`gu` 使用真实日支，符合卷六该段不用月令的规则；显式 `ming` 保留月支反向变法，输出说明其与该段原典不同。未知方法直接拒绝，避免拼写错误静默换流派。
-6. **后天卦与纳甲**：后天卦包含明确上下卦，先后天均参与匹配。第三轮进一步改为实际六爻纳甲，并纳入乾坤借用，修正旧的上下纯卦全表合并造成的误报及借用漏报。五卦原页已核对，其余按规则推演；不代替完整得势判断。
-7. **参评长时间线**：先修复91–120岁钳制，第四轮再移除默认固定一岁起运和命宫顺排。默认 `bazi_appendix_v1` 明确选用卷七附子平法的月柱顺逆、三日一岁及余日借除；连续折算另列 `bazi_continuous_v1`，旧方法须显式 `legacy_minggong_v1`。卷六未唯一指定配运法，民用日计数、生日加整年和立春年界均作为具名实现约定。120行是年序覆盖范围，绝非寿命预测。
-8. **解释边界**：简化 `judge.xie` 只表示元气或化工命中。快照不再据此宣布综合葉否；天地数“有余／不足”只与25／30比较，相等称正数。`judge.seasonal_numbers` 另列至弱太过、十一数式和六个时令窗口；原文重叠不裁优先，得中数值条件为 `null`。缺条、空条和缺字标注语料状态，不据此断现实灾祸。
-
-## 来源及版本限制
-
-- [《河洛理數》卷一，识典古籍转录](https://www.shidianguji.com/book/NA09030/chapter/1m8od60nhc1me)：取数、五寄宫、元堂、后天卦、化工。正文有明显 OCR 错字和混排，例如第一例总数转录与分项运算不一致；参考夹具保留手算方法说明，未声称影印逐字校勘完成。
-- [卷六转录](https://www.shidianguji.com/zh/book/NA09030/chapter/1m8od6rwizt4b)：金锁银匙五行算例，以及大运替时、流年用太岁与大运支的规则。金部明确给出同支十三位，可独立定位移植错误。
-- [日本国立公文书馆卷四至七影印](https://www.digital.archives.go.jp/DAS/contents/pdf/lossy/03050271000050/0001.pdf)：核读PDF第50、105、106页，保存三张原页及散列。卷七把附入的子平运法与河洛六九年卦运明确区分；卷六的配运段落未唯一指定采用哪套时间轴。[馆藏目录](https://www.digital.archives.go.jp/file/3611497)记载明刊／清印，具体印年未定。
-- [国家图书馆藏本影印 PDF 的公开镜像](https://upload.wikimedia.org/wikipedia/commons/4/4a/NLC416-13jh000625-42999_%E6%B2%B3%E6%B4%9B%E7%90%86%E6%95%B8.pdf)：提供后续底本校勘入口；本次未完成整本图像核读。
-- [日本国立天文台 2026 年暦要項](https://eco.mtk.nao.ac.jp/koyomi/yoko/2026/rekiyou262.html)：24 节气时刻，原表为日本标准时 UTC+9，测试按绝对时刻比较。
-- [中央研究院中国文哲研究所维护的《参评秘诀金锁银匙歌》馆藏记录](https://hannom.openmuseum.tw/muse/digi_object/c814fd85d043d6e38fbb7ca4723db287)：该抄本记录编者不详。它是另一文献记录，不能据此确认本系统条文全部出自邵雍。
-
-`numerology_evidence.selected_texts` 中河洛条文按 `text_provenance` 分开报告爻辞、注文与诗歌状态；九卦54条爻辞按指定影印目校，其余330条仍待校，独立复核尚未完成。`corpus_sha256` 仅标识继承语料，`yaoci_collation.sha256` 标识局部校勘层，旧文与页码随所用条目保存。另附已有周易语料中的同卦同爻经文、修订号和散列作为参照；它不替代河洛版本校勘。散列只能证明内容身份，不能证明内容正确。
-
-土用目前明确采用“四立前十八个连续日、左闭右开”的计算约定。卷一季月十八日的计日法、不同底本及纯卦阴阳令与其他月令术语的差异需继续核对，不能把工程边界测试当作版本争议已经解决。
-
-## 第二轮：影印本岁运卦序
+## 影印本岁运卦序
 
 已下载并按 SHA-256 固定 NLC416-13jh000625-42999 PDF，封面明确为上海文明书局印行本，具体出版年份尚未确认。核读 PDF 第37–40页（卷一页二五至二八）并保存四张原页图像、来源清单和独立手录算例。此举只完成指定页的规则核读，不把近代印本说成明刻原叶，也不等于整本校勘完成。详见岁运第二轮审计（本地数据：`validation/heluo-timing-audit.md`）。
 
@@ -197,62 +179,35 @@
 
 第三轮把实际六爻正纳、借用及命中位置放入 `judge.najia`。`deSheng` 仅表示这项年命纳甲匹配；`deTime` 与 `deTi` 仍分别是继承的月支表和日干映射，不能独自选定综合葉否。`yuanTang.heLi` 仅表示用爻阴阳与所用阴阳令是否同类；快照已去掉把它直接称为“顺气／逆气”的概括。指定岁运的快照现在使用对应年、月序、日序的实际用爻。
 
-## 第四轮：参评实际配运
+## 参评实际配运
 
 `canping` 现在要求明确 `gender`，不能默认男命。`dayun_method` 与本命取数参数 `method` 分别控制配运和日支起数。默认附法按出生民用日期到前／后节的日差作整日借除；日内分数如何折算仍有未决处，结果不会把该约定称为原典秒级应期。新方案不使用命宫，因此 `ming_gong` 为 `null`；实际起运信息位于 `canping_timing`。
 
 `analysis_datetime` 必须是带时区ISO时刻。查询按实际大运区间和立春干支年取数，不默认当前时刻。流年 `segments` 在交运时刻拆分；整年若有多个段，不再返回一个冒充全年通用的数。`not_started` 不产生大运／流年编号和断语，也不套第一运。具体同次选文位于 `canping_timing.selected.verses` 及 `numerology_evidence.selected_texts`。
 
-## 调用
+## 《豫》六爻与逐条爻辞状态
 
-```bash
-uv sync --locked --extra dev
+新增所选印本豫六爻标题／完整注文目校，各96/384、288待校，仍含暂读；固守替换继承有守，两项错误首稿撤回，六二注文与九四头辞各一字未决。九四嵌套条件保留在不葉者父段内。修复全局标题状态覆盖单条疑字的问题，实际三端及临时stdio核验完成。完整相关104模块4954通过／2跳过，原全部节点保留；不是全仓CI。Native原96点仍12项超1秒，原典冲突、上轮模型未满足项及预测未验证状态不变，本轮模型调用0、现实结局0。详见报告（本地数据：`validation/heluo-yu16-commentary-audit.md`）与原始材料（本地数据：`../tests/fixtures/heluo_yu16_v1/README.md`）。
 
-uv run --locked --extra dev fatebridge heluo \
-  --date 2026-06-21 --time 16:30:00 --zone Asia/Shanghai \
-  --gender 女 --use-true-solar-time false --response-char-limit 0
 
-uv run --locked --extra dev fatebridge canping \
-  --date 1990-06-15 --time 09:33:00 --zone Asia/Shanghai \
-  --gender 男 --method gu --use-true-solar-time false \
-  --fields benming numerology_evidence --strict-fields true \
-  --include-snapshot-text false --response-char-limit 0
+## 配运阅读上下文
 
-uv run --locked --extra dev fatebridge heluo \
-  --date 1990-06-15 --time 09:33:00 --zone Asia/Shanghai \
-  --gender 男 --use-true-solar-time false --analysis-year 2028 \
-  --month-index 3 --day-index 10 \
-  --fields heluo_timing.selected_annual heluo_timing.selected_month \
-    heluo_timing.selected_day heluo_timing.selected_texts heluo_timing.calendar_policy \
-  --strict-fields true --response-char-limit 0
+配运结果新增同次`reading_context`，连接实际方法、钟制条件与书名／版本／书影、页码、引用角色；地区未来规则、固定偏移假设与旧法无日期映射分别披露。原始条款、首行、首运、查询身份与计算值保留。公开审计中的显式审阅私有段在模型工作区过滤，完整源文仍供人工审阅；完整历法、原典和模型解释验收仍未完成。执行状态和证据见审计报告（本地数据：`validation/canping-reading-context-audit.md`）。
 
-uv run --locked --extra dev fatebridge canping \
-  --date 2026-02-06 --time 04:02:00 --zone Asia/Shanghai \
-  --gender 女 --use-true-solar-time false \
-  --dayun-method bazi_appendix_v1 \
-  --analysis-datetime 2037-02-06T04:02:00+08:00 \
-  --fields canping_timing numerology_evidence.selected_texts \
-  --strict-fields true --include-snapshot-text false --response-char-limit 0
 
-uv run --locked --extra dev fatebridge heluo \
-  --date 2026-02-10 --time 12:00:00 --zone Asia/Shanghai \
-  --gender 女 --use-true-solar-time false \
-  --fields chart.tian chart.di judge.seasonal_numbers \
-  --strict-fields true --include-snapshot-text false --response-char-limit 0
-```
+## 参评扩围端点的完整年界
 
-示例为虚构测试输入。`--use-true-solar-time false` 是显式选择；使用默认真太阳时应提供实际经度。REST 路径仍为 `/api/divination/heluo`、`/api/divination/canping`，MCP 工具名仍为 `heluo`、`canping`；请求与输出模型由同一工具目录发布。
+共享DE440独立年表登记1700—2300年后，参评新增具名有界立春数据与许可，覆盖低端1699年界和高端完整120年序列至2420年；旧产品、旧出生范围的计算与原判据继续保留。派生许可不扩大独立年表范围，原典符合、未来UTC及解释满分仍未建立；数值与完整相关验证见审计报告（本地数据：`validation/canping-extended-projection-audit.md`）。
 
-两工具均须明确 `gender`，不能默认男命。河洛已知中英文性别别名归一化；缺失、未知或拼写错误直接报错，因为性别影响命卦和元堂。
 
-两工具的 `time` 也必须是已知的当地钟时，空白、未知与夹带时区的字符串会拒绝；时区单独放 `zone`，显式 `00:00` 有效。`judge.deTime` 仅为卦属月匹配，另述窗口、来源及未决边界见 `judge.month_affinity`；其中月号暂按四柱月支解释，不等于农历月或精确节气区间。
+## 太阳提供器来源身份与120年年界前置资格
 
-真太阳时默认开启，须提供明确经度`lon`或数值`gps_lon`，0°有效；缺经度不再用上海缺省值。只在用户选择钟表时时明确传`use_true_solar_time=false`，不为绕过错误自动改换钟制。两工具的`birth_clock`视图可核对实际输入来源与所用钟面。
+修复VSOP2013完整来源配置可被非空改写、配置读取异常漏出统一来源错误的两类缺陷；修订1.1.0将工作TT终点扩至2421年初。完整节气队列仍仅1684—2304年，另对2305—2420年116个立春完成原1秒TT线对照，服务于计划输入1700—2300年的参评120年边界。源码及独立安装包各15,020项通过，原14,904根逐点不变；新增最大差0.816974秒。当前工作区44项来源检查、2项默认三端兼容检查通过，24,372份旧夹具保持。全局选择器及公开排盘尚未接入VSOP2013，原生96项的84过／12失不重评；原典、模型解释及现实预测缺口保持。完整报告（本地数据：`validation/numerology-vsop-projection-audit.md`）和初败与数值证据（本地数据：`../tests/fixtures/vsop2013_projection_v1/README.md`）保留。
 
-解释时先使用 `rule_trace` 和实际选中条文。`selected_texts` 仍可能同时包含葉者、不葉者、岁运等分支；现阶段没有完整综合判断，不能挑最有利的一段充当确定结论。
 
-上面的 `month-index 3 / day-index 10` 是原典序号，不是3月10日。缺父级选择、超过卦序范围或无效序号会报错，不回退当前年或最后一步大运。完整年序位于 `heluo_timing.annual_rows`，月序位于 `monthly_rows`，日定式位于 `daily_template`；大结果按同次交付机制读取。
+## 《剝》六爻与摘要较窄条件
 
+新增所选印本《剝》六爻标题、完整注文及24个父段目校，各138/384、246待校；剝二标题仍有疑读，剝五首稿误字已撤回。泰二和剝上短摘要保留较窄前提，适用性未知且不替换正式卦盘。120模块6227项完整回归通过；随后审计水部／全局分母修复另经5项验收。默认安装包1426文件一致，新stdio14次查询与六个排盘的三端18次调用通过，共享MCP未重连。原始失败、25,537份历史夹具与原数值容差保留，三个专业维度及四维总验收仍均未通过。详见报告（本地数据：`validation/heluo-bo23-adoption.md`）。
 ## 重跑验收
 
 ```bash
@@ -280,36 +235,9 @@ uv run --locked --extra dev python scripts/audit_numerology.py \
 
 现实预测层应使用预先登记、锁定代码和规则的研究，预先定义可判定事件、时间窗、样本、基线和主要指标，保存预测发出时间与独立结果来源，公开漏报、弃权及缺失。已交付可执行研究方案草案（本地数据：`validation/numerology-prospective-protocol.md`），状态为尚未预注册，不能计作已验证。仓库已有 `scripts/audit_prediction_study.py` 支持研究计划、预测及结果审计；其防泄漏和评分测试不构成本术数的实际有效性证据。没有真实前瞻数据时保持未验证，不生成虚构“命中案例”，不通过事后改口或挑样本抬高分数。
 
-
 <!-- agent-evaluation-private:start -->
-## R66：资料检索与解释保真修复
+## 解释评估的历史记录
 
 公开河洛／参评入口拆为短入口及六张任务资料卡，保留原41个资料块（39个原样、两处更新过时覆盖表述）。修复旧评测文档进入模型工作区的隔离缺口，普通原典资料仍可读。原有11例、61判据不变：当前旧组24/25、新组36/36；仍有未来钟制条件漏述及一处额外引文缺口，不能认证解释满分。本地相关118项通过；原96历法点仍12项超过1秒，原典各90/384已目校及未决项不变，新增现实结局0。未执行本轮全仓回归。详见报告（本地数据：`validation/numerology-guidance-retrieval-audit.md`）与原始证据（本地数据：`../tests/fixtures/numerology_guidance_retrieval_v1/README.md`）。
 
 <!-- agent-evaluation-private:end -->
-
-本轮资料拆分与评测隔离的工程变更见审计报告（本地数据：`validation/numerology-guidance-retrieval-audit.md`）；历法、原典和模型解释的完整验收仍未完成。
-
-## R67：《豫》六爻与逐条爻辞状态
-
-新增所选印本豫六爻标题／完整注文目校，各96/384、288待校，仍含暂读；固守替换继承有守，两项错误首稿撤回，六二注文与九四头辞各一字未决。九四嵌套条件保留在不葉者父段内。修复全局标题状态覆盖单条疑字的问题，实际三端及临时stdio核验完成。完整相关104模块4954通过／2跳过，原全部节点保留；不是全仓CI。Native原96点仍12项超1秒，原典冲突、上轮模型未满足项及预测未验证状态不变，本轮模型调用0、现实结局0。详见报告（本地数据：`validation/heluo-yu16-commentary-audit.md`）与原始材料（本地数据：`../tests/fixtures/heluo_yu16_v1/README.md`）。
-
-
-## R68：配运阅读上下文
-
-配运结果新增同次`reading_context`，连接实际方法、钟制条件与书名／版本／书影、页码、引用角色；地区未来规则、固定偏移假设与旧法无日期映射分别披露。原始条款、首行、首运、查询身份与计算值保留。公开审计中的显式审阅私有段在模型工作区过滤，完整源文仍供人工审阅；完整历法、原典和模型解释验收仍未完成。执行状态和证据见审计报告（本地数据：`validation/canping-reading-context-audit.md`）。
-
-
-## R69：参评扩围端点的完整年界
-
-共享DE440独立年表登记1700—2300年后，参评新增具名有界立春数据与许可，覆盖低端1699年界和高端完整120年序列至2420年；旧产品、旧出生范围的计算与原判据继续保留。派生许可不扩大独立年表范围，原典符合、未来UTC及解释满分仍未建立；数值与完整相关验证见审计报告（本地数据：`validation/canping-extended-projection-audit.md`）。
-
-
-## R97：太阳提供器来源身份与120年年界前置资格
-
-修复VSOP2013完整来源配置可被非空改写、配置读取异常漏出统一来源错误的两类缺陷；修订1.1.0将工作TT终点扩至2421年初。完整节气队列仍仅1684—2304年，另对2305—2420年116个立春完成原1秒TT线对照，服务于计划输入1700—2300年的参评120年边界。源码及独立安装包各15,020项通过，原14,904根逐点不变；新增最大差0.816974秒。当前工作区44项来源检查、2项默认三端兼容检查通过，24,372份旧夹具保持。全局选择器及公开排盘尚未接入VSOP2013，原生96项的84过／12失不重评；原典、模型解释及现实预测缺口保持。完整报告（本地数据：`validation/numerology-vsop-projection-audit.md`）和初败与数值证据（本地数据：`../tests/fixtures/vsop2013_projection_v1/README.md`）保留。
-
-
-## R101：《剝》六爻与摘要较窄条件
-
-新增所选印本《剝》六爻标题、完整注文及24个父段目校，各138/384、246待校；剝二标题仍有疑读，剝五首稿误字已撤回。泰二和剝上短摘要保留较窄前提，适用性未知且不替换正式卦盘。120模块6227项完整回归通过；随后审计水部／全局分母修复另经5项验收。默认安装包1426文件一致，新stdio14次查询与六个排盘的三端18次调用通过，共享MCP未重连。原始失败、25,537份历史夹具与原数值容差保留，三个专业维度及四维总验收仍均未通过。详见报告（本地数据：`validation/heluo-bo23-adoption.md`）。

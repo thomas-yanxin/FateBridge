@@ -329,7 +329,7 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 | `firdaria_year_basis` | string | `fixed_365_2425`（默认）或 `calendar_anniversary`；只影响法达日期计算 |
 | `selected_sections` | string[] | 仅独立 timing tools 支持 |
 
-两项法达参数可独立组合，同时适用于综合时运和独立 `firdaria`，REST / MCP 同名，CLI 使用 `--firdaria-night-order` / `--firdaria-year-basis`。公历周年的闰日、UTC 七等分、时区异常拒绝及分钟展示规则见[法达兼容约定](firdaria-compatibility.md#8-生产接口选择)。默认组合保留现有返回结构，非默认组合在法达对象内增加 `calculation_options` 回执。
+两项法达参数可独立组合，同时适用于综合时运和独立 `firdaria`，REST / MCP 同名，CLI 使用 `--firdaria-night-order` / `--firdaria-year-basis`。公历周年的闰日、UTC 七等分、时区异常拒绝及分钟展示规则见[法达兼容约定](firdaria-compatibility.md#参数与调用)。默认组合保留现有返回结构，非默认组合在法达对象内增加 `calculation_options` 回执。
 
 完整非法分析日期返回 `validation_error`；只给部分年月日时逐字段补齐默认值，部分日期补齐时可约束到月底。目标日期与钟时按 `birth_timezone` 解释，`return_timezone` 用于转换同一时刻。指定某日某时应同时传齐五项 `analysis_*`，核对聚合结果的 `analysis_context.analysis_datetime`；`as_of` 不替代目标钟时。复现计算还应保留出生时区与返照/行运地点。
 

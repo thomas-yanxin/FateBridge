@@ -306,7 +306,7 @@ A remote machine can keep its loopback binding and accept connections through an
 
 ### Onda consultation skills
 
-MCP supplies calculation tools; Onda supplies consultation workflows. When you use the source repository as a Codex project, `AGENTS.md` and `.agents/skills/` provide project guidance and skill entry points. Confirm discovery in a new chat. Other clients must load `skills/` through their own skill mechanisms; MCP does not transfer these files. See the [Onda skill index](skills/README.md). The [plugin build guide](docs/onda-plugin.md) packages shared references, the current backend source, locked runtime requirements, and source hashes. The first launch downloads dependencies for the target platform; host installation remains a separate check.
+MCP supplies calculation tools; Onda supplies consultation workflows. When you use the source repository as a Codex project, `AGENTS.md` and `.agents/skills/` provide project guidance and skill entry points. Confirm discovery in a new chat. Other clients must load `skills/` through their own skill mechanisms; MCP does not transfer these files. See the [Onda skill index](skills/README.md). The [plugin build guide](docs/mcp-deployment.md#onda-插件的构建与安装) packages shared references, the current backend source, locked runtime requirements, and source hashes. The first launch downloads dependencies for the target platform; host installation remains a separate check.
 
 ModelScope entries: [FateBridge MCP Server](https://www.modelscope.cn/mcp/servers/thomas/FateBridge) · [Onda Skills collection](https://www.modelscope.cn/collections/thomas/Onda-Skills). Follow those pages for platform-specific setup, or this README for local installation and configuration.
 
@@ -471,7 +471,7 @@ Detailed guides are currently maintained in Chinese; commands and configuration 
 | Consult through Codex | [Codex guide](docs/codex-guide.md) · [Onda skills](skills/README.md) |
 | Build an application or agent integration | [Integration guide](docs/agent-guide.md) · [API reference](docs/api-reference.md) |
 | Check implementation, methods, precision | [Algorithm coverage](docs/algorithm-coverage.md) · [Core concepts](docs/concepts.md) |
-| Find topic routes, rules, examples | [Scenario routing](docs/scenario-routing.md) · [Examples](docs/examples/README.md) · [Rule documentation](docs/README.md#理解计算与结果) |
+| Find topic routes, rules, examples | [Scenario routing](docs/scenario-routing.md) · [Examples](docs/examples/README.md) · [Rule documentation](docs/README.md#计算原理与专题) |
 | Develop, migrate, troubleshoot | [Architecture](docs/architecture.md) · [Development](docs/development-guide.md) · [Migration](docs/migration.md) · [Troubleshooting](docs/troubleshooting.md) |
 
 See the full [documentation index](docs/README.md) and [CHANGELOG](CHANGELOG.md).

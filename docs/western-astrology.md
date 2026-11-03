@@ -454,7 +454,7 @@ uv run --locked --extra dev python scripts/gen_western_returns_reference.py
 
 首轮本地验收记录（本地数据：`validation/western-local-verification.json`）与推运深化验收记录（本地数据：`validation/western-timing-local-verification.json`）分别记录对应代码状态的专项、三端、类型、格式、构建及全仓检查，不能把不同状态下的通过数直接相加。
 
-## 当前四项验收分别记账
+## 验证范围与未决条件
 
 当前请求包含历法／天文、指定原典、解释忠实和现实预测四个维度。四项均保留为要求，当前通过的子集不替代完整目标。详细缺口与下一步见要求账本（本地数据：`validation/western-three-axis-requirements.json`）及四项状态回执（本地数据：`validation/western-four-axis-status.json`）；账本沿用历史文件名，旧报告的三项范围不被追溯改写。
 

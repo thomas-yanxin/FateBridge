@@ -203,7 +203,7 @@ uv run --locked --extra dev fatebridge human_design \
 
 解释为字段绑定的简要中文释义，实际依据在 `rule_trace`、`rulesets`、`gate_evidence`。同次结果引用可由[结构化引用核验](../src/fatebridge/validation/claims.py)核对，不能把该核验说成所有自由文本的语义认证。
 
-## 新增193盘的完整结构与解释核对
+## 结构与解释的固定对照
 
 规则集1.22.0另按预先冻结的计划（本地数据：`../tests/fixtures/human-design-cross-coverage-plan.json`）核对193个新官方整盘（本地数据：`../tests/fixtures/human-design-official-cross-charts.json`）：1980年的64个人格太阳门分别各取右角、并置和左角，另取按顺序搜索的首个四分定义。全部输入在读取新官方结果前固定，属于实现参与选取的结构覆盖，不是盲测人群。原19盘、494个门线和15项名称失败均保持不变。
 
@@ -386,7 +386,7 @@ assert report["status"] == "verified_fixed_template_reading", report
 
 `definition`证据视图只预览前三组方案的新增门及新通道，保留总数、预览截断标识、作者、版本和来源。完整输出的`minimum_solutions`保留全部见证；需要全文时首次请求`fields=null`，沿用同一run的`result_delivery`读取，不能为补齐摘要而重算。固定释义及回执核验会重建全部方案，拒绝漏项、假门、错误最少门数、篡改预览或将假设写成现实断言。
 
-## 三项专业验收与独立的现实预测记录
+## 验证范围与现实预测
 
 | 维度 | 已完成的可复核范围 | 未完成的验收 |
 | --- | --- | --- |

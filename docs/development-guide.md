@@ -398,6 +398,6 @@ uv run --locked --extra dev python scripts/sync_github_release.py \
 - API 参考：[api-reference.md](api-reference.md)
 - 故障排除：[troubleshooting.md](troubleshooting.md)
 
-真实模型行为与激活评测按[Agent 行为验收](agent-evaluation.md)执行，分别报告机械判据与人工解释质量；安装分发见[Onda 插件](onda-plugin.md)。
+真实模型行为与激活评测按[Agent 行为验收](agent-evaluation.md)执行，分别报告机械判据与人工解释质量；安装分发见[Onda 插件](mcp-deployment.md#onda-插件的构建与安装)。
 
 [MingLi-Bench 外部评估](mingli-bench-evaluation.md)另行维护固定来源、完整题目分类和命例级开发／留出划分。运行 `uv run --locked --extra dev python scripts/build_mingli_evaluation.py --check` 核对清洗产物漂移；普通测试不启动模型，真实对话继续使用上述运行器，分别保留机械成绩和待人工审阅状态。

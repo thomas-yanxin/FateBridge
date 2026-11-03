@@ -4,7 +4,7 @@
 
 [起运整数展示修复](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-dayun-integer-age.md)另保留先取两位再向上取整的一岁误差与首次失败。`start_age_unrounded`是同次折算原值，旧名`start_age_precise`仍是两位展示，`start_age`为向上取整、至少1岁的整数展示；实际选运继续比较`start_at/end_at`，不能由整数4推成四周岁生日交运。完整矩阵验证状态单独记录，不替代既有历法与原典门槛。
 
-## 本次找到并修复的原因
+## 时运取值与边界
 
 | 盲区 | 原实现怎样改变结果 | 当前处理 |
 | --- | --- | --- |
@@ -52,7 +52,7 @@
 它不等价于任意一个实际日期；独立大运工具禁止同时传年龄与分析日期。
 综合工具的显式年龄覆盖仍保留，用于调用者明确构造的参考场景，返回相同的依据标识。
 
-## 新增的岁运关系证据
+## 岁运关系证据
 
 综合时运的 `interaction_analysis` 采用 `natal_timing_relations_v1`：
 
@@ -120,7 +120,7 @@ MCP 对应 `dayun_analysis`、`timing_analysis`，参数来自同一请求模型
 完整导出不投影，按默认响应预算及 `result_delivery` 读取同一run。
 任务字段视图 `interactions` 和 `dayun_timeline` 只是选字段参考，不是新请求参数。
 
-## 验证及尚未越过的门槛
+## 验证范围与未决门槛
 
 新增回归分别验证物理间隔换算、生日之前的真实交运、边界前后、过早舍入、DST、闰日、立春、位置关系与反例。
 三端测试核对完整业务JSON、字段投影、显式年龄与日期冲突、未起运状态及冻结时钟回执；实际stdio子进程亦完成选运调用。
