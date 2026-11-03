@@ -159,7 +159,7 @@ PYTHONPATH="$PWD:$PWD/src" UV_PROJECT_ENVIRONMENT="$PWD/.venv-nonuniform-referen
 
 代码变更在 PR 与 main／master push 上保留同一组自包含检查。同一 PR 的新提交取消旧 CI；主分支每次 push 使用独立并发组，运行中与排队中的提交均不互相替换。普通 README 和 `docs/` Markdown 变更只运行路径筛选与 `CI result` 汇总，不启动重测试；`docs/scenario-routing.md` 是生成源，仍执行检查。文档 JSON、技能、工作流、源码和测试变更也保留完整检查。
 
-Python 3.10–3.13 最新依赖、Python 3.10 最低直接依赖及 Windows／Python 3.12 锁定依赖共六种环境，各按收集后的节点分成三片并行执行。`scripts/run_ci_checks.py` 的默认本地命令仍运行整个自包含集合；分片不改变标记排除与断言。每片上传实际节点清单，汇总验证每个环境的全部节点恰好执行一次。uv 使用 setup action 的依赖缓存，按 Python／依赖策略隔离并仅由首片写入，不缓存测试资料或虚拟环境。
+Python 3.10–3.13 最新依赖、Python 3.10 最低直接依赖及 Windows／Python 3.12 锁定依赖共六种环境，各按收集后的节点分成三片并行执行；按近期 CI 的相对耗时均衡分配，每片再使用最多四个独立 pytest 进程调度。`.github/ci-test-costs.json` 只影响分片归属，不筛掉任何测试，也不是数值验收门槛。`scripts/run_ci_checks.py` 的默认本地命令仍运行整个自包含集合；分片不改变标记排除与断言。每片上传实际节点清单，汇总验证每个环境的全部节点恰好执行一次。uv 使用 setup action 的依赖缓存，按 Python／依赖策略隔离并仅由首片写入，不缓存测试资料或虚拟环境。只有 Ubuntu 静态检查作业另缓存 Black／Mypy 的增量状态，按锁文件、工具配置与 Python 源码区分；工具仍按文件内容自行失效。
 
 云端不下载冻结夹具、黄金快照、外部星历或独立参考。完整领域回归、数值基线、原典复放和 SciPy 独立对照保留在本地，使用原数据、断言与固定门槛执行；云端通过不能作为这些项目的验收结论。混合测试文件中依赖本地资料的用例标记为 `local_data`，默认本地 `pytest` 不排除它们。
 

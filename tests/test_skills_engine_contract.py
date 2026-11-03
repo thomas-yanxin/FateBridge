@@ -139,7 +139,11 @@ def test_documented_cli_examples_use_real_flags():
 
 
 @pytest.mark.parametrize(
-    "example", _documented_cli_examples(), ids=lambda row: f"{row[0].name}-{row[1]}"
+    "example",
+    {
+        tuple(shlex.split(row[2]))[1:]: row for row in _documented_cli_examples()
+    }.values(),
+    ids=lambda row: f"{row[0].name}-{row[1]}",
 )
 def test_documented_cli_examples_run_clean(example):
     """Runnability gate: every concrete example actually executes (exit 0).

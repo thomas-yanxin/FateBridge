@@ -52,6 +52,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install uv
+        id: uv
         uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
@@ -66,7 +67,7 @@ jobs:
       - name: Verify installed commands and real stdio MCP
         run: |
           uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye
-          uv run --locked --extra dev python -m pytest -q tests/test_cli.py tests/test_api_alignment.py
+          uv run --locked --extra dev python -m pytest -q tests/test_cli.py tests/test_api_alignment.py -n auto --maxprocesses=4 --dist worksteal
 
   quality:
     needs: changes
@@ -80,6 +81,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install uv
+        id: uv
         uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
@@ -90,6 +92,15 @@ jobs:
             uv.lock
       - name: Install the locked development environment
         run: uv sync --locked --extra dev
+      - name: Restore incremental formatter and type-check caches
+        uses: actions/cache@v4
+        with:
+          path: |
+            .mypy_cache
+            ~/.cache/black
+          key: quality-${{ runner.os }}-py3.12-${{ hashFiles('uv.lock', 'pyproject.toml') }}-${{ hashFiles('src/**/*.py', 'scripts/**/*.py', 'tests/test_*.py') }}
+          restore-keys: |
+            quality-${{ runner.os }}-py3.12-${{ hashFiles('uv.lock', 'pyproject.toml') }}-
       - name: Check formatting
         run: uv run --locked --extra dev black --check src/fatebridge scripts tests
       - name: Check import order
@@ -135,6 +146,7 @@ jobs:
         with:
           python-version: ${{ matrix.environment.python }}
       - name: Install uv
+        id: uv
         uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
@@ -151,7 +163,11 @@ jobs:
             uv pip install --system --resolution "$CI_RESOLUTION" -e ".[dev]"
           fi
       - name: Record resolved dependencies
+        env:
+          UV_CACHE_HIT: ${{ steps.uv.outputs.cache-hit }}
         run: |
+          echo "$UV_CACHE_HIT" > cache-status.txt
+          python -c "import os; print('Runner logical CPUs:', os.cpu_count())"
           if [ "$CI_RESOLUTION" = locked ]; then
             uv pip list --python .venv > resolved-dependencies.txt
           else
@@ -166,23 +182,24 @@ jobs:
             uv run --locked --extra dev python scripts/run_ci_checks.py \
               --shard-index "$CI_SHARD" --shard-count 3 \
               --environment-id "$CI_ENVIRONMENT" --selection-report ci-selection.json \
-              --junitxml=pytest-results.xml --durations=20
+              --junitxml=pytest-results.xml --durations=20 -n auto --maxprocesses=4 --dist worksteal
           else
             python scripts/run_ci_checks.py \
               --shard-index "$CI_SHARD" --shard-count 3 \
               --environment-id "$CI_ENVIRONMENT" --selection-report ci-selection.json \
-              --junitxml=pytest-results.xml --durations=20
+              --junitxml=pytest-results.xml --durations=20 -n auto --maxprocesses=4 --dist worksteal
           fi
       - name: Save regression evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ci-${{ env.CI_ENVIRONMENT }}-${{ matrix.shard }}
+          name: ci-${{ env.CI_ENVIRONMENT }}-${{ matrix.shard }}-attempt${{ github.run_attempt }}
           retention-days: 14
           path: |
             resolved-dependencies.txt
             pytest-results.xml
             ci-selection.json
+            cache-status.txt
 
   ci:
     name: CI result
@@ -211,14 +228,6 @@ jobs:
           else
             exit 1
           fi
-      - name: Checkout coverage verifier
-        if: needs.changes.outputs.checks == 'true'
-        uses: actions/checkout@v4
-      - name: Set up Python
-        if: needs.changes.outputs.checks == 'true'
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
       - name: Download shard coverage evidence
         if: needs.changes.outputs.checks == 'true'
         uses: actions/download-artifact@v4
@@ -228,16 +237,21 @@ jobs:
       - name: Verify every collected test ran exactly once per environment
         if: needs.changes.outputs.checks == 'true'
         run: |
-          python - <<'PY'
+          python3 - <<'PY'
           import json
           from collections import defaultdict
           from pathlib import Path
 
-          files = list(Path("ci-evidence").glob("*/ci-selection.json"))
-          assert len(files) == 18, f"Expected 18 shard reports, found {len(files)}"
-          groups = defaultdict(list)
-          for path in files:
+          latest = {}
+          for path in Path("ci-evidence").glob("*/ci-selection.json"):
               report = json.loads(path.read_text(encoding="utf-8"))
+              attempt = int(path.parent.name.rsplit("-attempt", 1)[1])
+              key = (report["environment"], report["shard_index"])
+              if key not in latest or attempt > latest[key][0]:
+                  latest[key] = (attempt, report)
+          assert len(latest) == 18, f"Expected 18 shard reports, found {len(latest)}"
+          groups = defaultdict(list)
+          for _, report in latest.values():
               groups[report["environment"]].append(report)
           assert len(groups) == 6, f"Expected six dependency/platform environments: {list(groups)}"
           for environment, reports in groups.items():

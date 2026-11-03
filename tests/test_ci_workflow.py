@@ -129,6 +129,7 @@ def test_docs_summary_accepts_only_the_explicit_skip_path(changed):
         "missing_node",
         "different_collection",
         "duplicate_index",
+        "partial_rerun",
     ],
 )
 def test_live_gate_rejects_missing_or_overlapping_test_coverage(tmp_path, fault):
@@ -138,7 +139,7 @@ def test_live_gate_rejects_missing_or_overlapping_test_coverage(tmp_path, fault)
             reports[
                 tmp_path
                 / "ci-evidence"
-                / f"env{environment}-part{index}"
+                / f"env{environment}-part{index}-attempt1"
                 / "ci-selection.json"
             ] = {
                 "environment": f"env{environment}",
@@ -158,12 +159,19 @@ def test_live_gate_rejects_missing_or_overlapping_test_coverage(tmp_path, fault)
         reports[first]["collected"] = ["test_a"]
     elif fault == "duplicate_index":
         reports[first]["shard_index"] = 1
+    elif fault == "partial_rerun":
+        newer = (
+            first.parent.with_name(first.parent.name.replace("attempt1", "attempt2"))
+            / first.name
+        )
+        reports[newer] = {**reports[first], "selected": ["test_a"]}
+        reports[first]["selected"] = []
     for path, report in reports.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(report), encoding="utf-8")
     step = WORKFLOW["jobs"]["ci"]["steps"][-1]
-    code = step["run"].split("python - <<'PY'\n", 1)[1].rsplit("\nPY", 1)[0]
+    code = step["run"].split("python3 - <<'PY'\n", 1)[1].rsplit("\nPY", 1)[0]
     result = subprocess.run(
         [sys.executable, "-c", code], cwd=tmp_path, capture_output=True, text=True
     )
-    assert (result.returncode == 0) is (fault is None), result.stderr
+    assert (result.returncode == 0) is (fault in {None, "partial_rerun"}), result.stderr
