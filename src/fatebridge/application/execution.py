@@ -33,11 +33,7 @@ def execute_spec(spec: ToolSpec, request: BaseModel) -> ServiceResult:
     from fatebridge.core.physical_ephemeris_policy import data_file_policy
     from fatebridge.core.requests.western_policy import uses_western_policy
 
-    mode = (
-        getattr(request, "ephemeris_policy", "auto")
-        if uses_western_policy(request)
-        else "auto"
-    )
+    mode = request.ephemeris_policy if uses_western_policy(request) else "auto"
     try:
         with data_file_policy(mode) as policy:
             service, args, kwargs = spec.bind(request)

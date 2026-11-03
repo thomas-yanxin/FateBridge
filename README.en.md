@@ -422,7 +422,7 @@ uv run --locked --extra dev python -m pytest -q \
 git diff --check
 ```
 
-CI runs self-contained checks in the locked environment, across Python 3.10–3.13 and minimum direct dependencies, and on Windows. Test data stays local: CI does not restore external fixtures, ephemeris files, or golden snapshots. Full domain regression and numerical acceptance run separately with local data; a green CI result does not establish those results. See [CI scope](docs/development-guide.md#ci-运行范围).
+CI runs self-contained checks in the locked environment, across Python 3.10–3.13 and minimum direct dependencies, and on Windows, with the same coverage split across parallel shards. Passive README/Markdown-only changes run a lightweight path and summary gate. Test data stays local: CI does not restore external fixtures, ephemeris files, or golden snapshots. Full domain regression and numerical acceptance run separately with local data; a green CI result does not establish those results. See [CI scope](docs/development-guide.md#ci-运行范围).
 
 ## Deployment and upgrades
 

@@ -36,6 +36,7 @@ def decade_half(
         textual_group=None,
         conditional_on_existing_age_convention=True,
         calendar_boundaries_classically_verified=False,
+        unresolved_reason="selected_decade_range_missing_or_inconsistent",
     )
     if scope.get("status") == "not_started":
         result.update(
@@ -43,14 +44,13 @@ def decade_half(
         )
         return result
     candidates = [p for p in palaces if p["ganzhi"][1] == scope.get("branch")]
+    if scope.get("status") != "computed" or len(candidates) != 1:
+        return result
     try:
-        if scope.get("status") != "computed" or len(candidates) != 1:
-            raise ValueError("no unique computed decade")
         lo, hi = (int(v) for v in candidates[0]["daxian"].split("~"))
-        if lo < 1 or hi - lo != 9 or not lo <= nominal_age <= hi:
-            raise ValueError("invalid decade range")
     except (ValueError, TypeError, AttributeError, KeyError):
-        result["unresolved_reason"] = "selected_decade_range_missing_or_inconsistent"
+        return result
+    if lo < 1 or hi - lo != 9 or not lo <= nominal_age <= hi:
         return result
     upper = nominal_age - lo < 5
     result.update(

@@ -55,11 +55,13 @@ uv run --locked --extra dev python -m pytest -q
 
 ## 云端自包含检查
 
-云端不上传、下载或恢复外部测试数据。`scripts/run_ci_checks.py` 集中维护云端检查文件：覆盖架构、请求与响应合同、REST／MCP／CLI、私有存储、临时夹具和文档。Windows 使用跨平台集合，其他平台另检查文档、技能与 CI 配置。混合文件中需本地参考的用例用 `local_data` 标记，保留原断言并从云端集合中排除。
+云端不上传、下载或恢复外部测试数据。`scripts/run_ci_checks.py` 集中维护云端检查文件：覆盖架构、请求与响应合同、REST／MCP／CLI、私有存储、临时夹具和文档。Windows 使用跨平台集合，其他平台另检查文档、技能与 CI 配置。六种既有版本／依赖／平台环境各分三片；汇总同时核对每个节点恰好执行一次。混合文件中需本地参考的用例用 `local_data` 标记，保留原断言并从云端集合中排除。
 
 ```bash
 uv run --locked --extra dev python scripts/run_ci_checks.py
 ```
+
+普通 README 与 `docs/` Markdown 改动只运行路径筛选和成功的汇总状态；场景路由生成源、JSON、技能及代码变更仍触发完整检查。PR 更新取消旧运行，main／master 的每次 push 不互相取消。格式、类型、文档和生成合同在 Ubuntu 独立并行执行。
 
 新增云端检查须在没有 `docs/validation/`、外部夹具、黄金快照与星历目录的干净 checkout 验证。默认 `pytest` 仍收集本地全部测试；历史原件、独立来源和数值门槛继续由本地全量与专题验证负责。云端检查通过不代表这些验证已执行或通过。
 
@@ -69,7 +71,7 @@ uv run --locked --extra dev python scripts/run_ci_checks.py
 uv run --locked --extra dev python scripts/check_docs.py
 uv run --locked --extra dev python scripts/check_docs.py --include-archives
 uv run --locked --extra dev python -m pytest -q \
-  tests/test_architecture_boundaries.py tests/test_retired_entries.py \
+  tests/test_architecture_boundaries.py tests/test_runtime_contracts.py \
   tests/test_repository_cleanup.py tests/test_documentation_integrity.py
 ```
 

@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CHECKS = (
     "test_architecture_boundaries.py",
-    "test_retired_entries.py",
+    "test_runtime_contracts.py",
     "test_repository_cleanup.py",
     "test_restore_test_data.py",
     "test_private_files.py",
@@ -33,6 +33,7 @@ CHECKS = (
     "test_response_budget_contract.py",
     "test_request_catalog_isolation.py",
     "test_complete_output_contracts.py",
+    "test_ci_runner.py",
 )
 POSIX_CHECKS = (
     "test_documentation_integrity.py",
@@ -52,6 +53,8 @@ def main() -> int:
             sys.executable,
             "-m",
             "pytest",
+            "-p",
+            "scripts.ci_sharding",
             "-q",
             "-m",
             "not local_data",

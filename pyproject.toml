@@ -61,6 +61,7 @@ dev = [
     "opencc-python-reimplemented==0.1.7",  # place-catalog importer only; no runtime dependency
     "pyerfa>=2.0.1.5,<3",
     "jplephem>=2.24,<3",
+    "pytest-xdist>=3.6.1",
 ]
 jpl = [
     "jplephem>=2.24,<3",

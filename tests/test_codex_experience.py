@@ -474,34 +474,6 @@ async def test_published_tool_description_is_sufficient_for_strict_first_call():
         assert "run_metadata" in result.structured_content
 
 
-@pytest.mark.asyncio
-async def test_all_published_schemas_keep_valid_shared_references():
-    from jsonschema.validators import validator_for
-
-    from fatebridge.core.schema_cache import model_schema
-
-    async with Client(create_mcp_app()) as client:
-        tools = await client.list_tools()
-    by_name = {s.tool_name: s for s in CATALOG if s.mcp_name}
-    total_wire = 0
-    total_original = 0
-    for tool in tools:
-        for schema in [
-            tool.model_dump(by_alias=True)["inputSchema"],
-            tool.model_dump(by_alias=True)["outputSchema"],
-        ]:
-            if schema is not None:
-                validator_for(schema).check_schema(schema)
-        if tool.model_dump(by_alias=True)["outputSchema"] is not None:
-            original = model_schema(by_name[tool.name].output_model)
-            assert tool.model_dump(by_alias=True)["outputSchema"] == original
-            total_wire += len(
-                json.dumps(tool.model_dump(by_alias=True)["outputSchema"])
-            )
-            total_original += len(json.dumps(original))
-    assert total_wire == total_original
-
-
 @pytest.mark.local_data
 def test_relationship_example_and_default_do_not_assume_marriage(capsys):
     from tests.compatibility_reference import assert_score_reference

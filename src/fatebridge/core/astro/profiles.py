@@ -35,20 +35,8 @@ def physical_ephemeris_summary(models: Mapping[str, str]) -> str:
     physical = {model for name, model in models.items() if name not in NODE_BODIES}
     if not physical or physical == {APPROXIMATE_ORBIT_MODEL}:
         return "none"
-    return _consolidate_ephemeris_model(physical)
-
-
-def _consolidate_ephemeris_model(models: set[str]) -> str:
-    """Collapse the per-planet ephemeris models into one chart-level label.
-
-    All bodies in a chart normally resolve through the same model; "mixed" only
-    appears if a build genuinely served some planets from data files and others
-    from Moshier.
-    """
-    if not models:
-        return "unknown"
-    if len(models) == 1:
-        return next(iter(models))
+    if len(physical) == 1:
+        return next(iter(physical))
     return "mixed"
 
 

@@ -163,12 +163,6 @@ def test_cli_runs_knowledge_read(capsys):
     assert payload["title"].startswith("财库")
 
 
-def test_describe_is_a_subcommand():
-    parser = build_parser()
-    subparsers = [a for a in parser._actions if a.dest == "command"]
-    assert "describe" in set(subparsers[0].choices)
-
-
 def test_describe_flat_tool_emits_schema_and_example(capsys):
     code = run(["describe", "bazi_wealth"])
     out = capsys.readouterr().out

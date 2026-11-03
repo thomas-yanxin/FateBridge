@@ -103,3 +103,10 @@ docs/reviews/
 !/tests/fixtures/bazi_same_target_bureau_v1/reference_geometry.py
 !/tests/fixtures/bazi_seasonal_bing_v1/transport_reader.py
 !/tests/fixtures/bazi_strength_threshold_v1/independent_reference_v2.py
+
+# Generated CI evidence, kept as workflow artifacts rather than source.
+/ci-selection.json
+/cache-status.txt
+/pytest-results.xml
+/resolved-dependencies.txt
+/ci-evidence/
