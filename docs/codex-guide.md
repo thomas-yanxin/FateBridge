@@ -1,8 +1,10 @@
 # Codex 使用 FateBridge
 
-在 Codex 中，可以用日常语言提出事业、关系或学习等问题，由 Codex 调用 FateBridge 计算，并结合 Onda 技能解释依据。从注册本地 MCP 开始，按下面三个步骤完成连接与一次虚构咨询。
+在 Codex 中，你可以直接提出事业、关系或学习方面的问题。Codex 调用 FateBridge 完成计算，并结合 Onda 技能解释依据。
 
-配合项目技能体验咨询时，使用[源码安装](getting-started.md#安装)，无需启动 REST。仅使用已发布工具的 PyPI 安装、其他 MCP host、Windows 与远程 HTTP 接入见 [MCP 部署指南](mcp-deployment.md)。
+要让这一过程真正发生，需要先连接本地 MCP。下面三个步骤将带你检查安装、注册服务，并用虚构资料完成一次咨询。
+
+使用项目技能体验咨询，需要[源码安装](getting-started.md#安装)，无需启动 REST。仅使用已发布工具的 PyPI 安装、其他 MCP host、Windows 与远程 HTTP 接入见 [MCP 部署指南](mcp-deployment.md)。
 
 1. [确认安装与接入范围](#1-确认安装与接入范围)：运行 doctor，取得当前解释器的注册命令。
 2. [注册到 Codex](#2-注册到-codex)：保存配置并在新聊天检查工具。
@@ -20,7 +22,7 @@ Codex 负责理解问题、选择工具和解释结果，FateBridge 负责计算
 .venv/bin/fatebridge doctor --mcp --scenario onda-shiye
 ```
 
-`ok=true` 表示依赖版本检查、独立 stdio 进程初始化、工具发现、资源读取和一条虚构计算通过。进程在仓库之外的临时目录启动，能检查 GUI host 常见的工作目录问题。它不证明所有工具、真实对话或远程部署都已验证。
+看到 `ok=true`，表示依赖版本检查、独立 stdio 进程初始化、工具发现、资源读取和一条虚构计算通过。进程在仓库之外的临时目录启动，能检查 GUI host 常见的工作目录问题。这个结果不证明所有工具、真实对话或远程部署都已验证。
 
 `codex.add_command` 给出使用当前解释器绝对路径的注册命令；`codex.cli` 记录 CLI 来源。桌面环境存在 `CODEX_CLI_PATH` 时优先使用桌面版自带 CLI，避免 PATH 中旧版 CLI 与账号可用模型不一致。诊断只输出配置，不修改 Codex 设置。`--scenario` 限制实际公开的工具，并展开场景声明的知识支撑、条件服务和组合主题依赖；这些工具按问题使用，不自动全部执行；`--family` 可以进一步筛选，二者取交集。没有筛选时检查全部 MCP 工具。无效分类和空交集返回失败，先修正筛选。
 
@@ -54,7 +56,7 @@ FATEBRIDGE_MCP_SCENARIOS = "onda-shiye"
 
 Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不能直接粘进 TOML。stdio 服务由 Codex 启动，无需另外开一个终端运行，也不使用 `http://localhost:8010`。
 
-注册或调整范围后，在新聊天中检查 FateBridge 工具是否可见；CLI TUI 可用 `/mcp` 查看连接。`codex mcp get` 只证明配置存在，doctor 只证明 MCP 进程可用，都不等于当前聊天已加载。配置约定依据 [OpenAI 官方 MCP 文档](https://developers.openai.com/codex/mcp)。
+注册或调整范围后，在新聊天中检查 FateBridge 工具是否可见；CLI TUI 可用 `/mcp` 查看连接。这一步有自己的意义：`codex mcp get` 只证明配置存在，doctor 只证明 MCP 进程可用，都不等于当前聊天已加载。配置约定依据 [OpenAI 官方 MCP 文档](https://developers.openai.com/codex/mcp)。
 
 想公开全部工具时，清空两个筛选变量并重新启动连接；想查住宅风水时可以只设 `FATEBRIDGE_MCP_FAMILIES=fengshui` 并清空场景变量。更新已有配置中的同一条目即可。范围受限的连接不能调用隐藏工具，读取场景详情时检查 `availability`。
 
@@ -64,13 +66,13 @@ Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不�
 
 > 请用 FateBridge 帮我看看事业。我最近想换工作，也在考虑自己做点生意。以下是虚构体验资料：男，公历 1990 年 5 月 15 日上午 10:30，在北京出生，按当地钟表时间记录。看 2026 年的情况，请用普通人能懂的话讲。
 
-这一步应看到 Codex 使用 FateBridge 工具，并基于返回结果解释本次事业问题。回答应包含实际依据的传统含义和现实建议；只显示连接成功、工具清单或限制说明，还没有完成这次体验。
+观察 Codex 是否实际使用 FateBridge 工具，并根据返回结果回答事业问题。回答应讲清实际依据的传统含义和现实建议；如果只看到了连接成功、工具清单或限制说明，体验还没有完成。
 
 你不需要记工具名、查坐标或填写专业表单。城市能够被引擎解析时，时区、经度和太阳时处理由 Codex 与工具完成；实际解析有歧义再核对。只有“上午”、确实不知道几点时，不能猜时刻生成个人命盘，但仍可解释相关方法、讨论已给的现实选项，并说明哪些个人判断暂时不能计算。只问术语含义时，直接核对知识来源解释即可。
 
 ### 调用与解读约定
 
-维护集成或检查 Agent 行为时，使用以下流程。普通用户可在完成上述对话后按实际问题继续追问，无需逐项操作。
+连接完成后，怎样判断一次调用与解读是否到位？维护集成或检查 Agent 行为时，可以按以下流程核对。普通用户可在完成上述对话后按实际问题继续追问，无需逐项操作。
 
 1. 按所选计算核对当前用户已确认的资料；缺小时或只有时段时说明影响并简短追问，用户明确不知道后停止索取同项，转交可用范围。不能补零点、借用示例或沿用确定时刻的盘。可选精度和无关方法缺项不作为全局门槛。双人关系未说明类型时用 `general`，不能从性别推断婚姻。
 2. 先读取匹配的场景技能，按主题与时间范围选择有价值的依据。已发布工具的参数 Schema 和描述够用时直接计算；描述包含经过验证的首轮 `fields` 建议。专项已自动推算的大运、流年不重复计算，也不手工覆盖。普通咨询无需先列资源、读完整输出契约或搜索仓库。
@@ -79,7 +81,7 @@ Codex 使用 `[mcp_servers.fatebridge]`；其他 host 的 `mcpServers` JSON 不�
 5. 先检查 `isError`，再读取 `structuredContent`。保存原输入与 `run_metadata`；后续调用沿用前次 `trace_id`，用前次 `run_id` 作为 `parent_run_id`。不要把同一出生资料的多次计算当成独立证据。
 6. 先回答问题，再讲清依据的传统含义与本题的联系，区分可复算计算、有来源解释和现实建议。有充分依据的选项偏向应直接说明理由与条件，避免只有“不能替你决定”。用户要求深入时再扩展已有结果；同一主题边界无需反复重述。日期、时区、地点、太阳时及精度以实际返回为准。
 
-上述精简字段用于摘要咨询。用户要求完整 JSON、全部时间线或完整文件时，首次调用改用 `fields=null`，保留默认响应预算及所需快照，超限后从 `result_delivery` 读取同一 run。不能先裁出摘要再重新计算来补全文。资源分页、文件提取与 SHA-256 校验见 [完整结果交付](agent-guide.md#完整结果交付与同次导出)。西占推运须显式传目标 `analysis_hour` / `analysis_minute`，并核对返回的 `analysis_context.analysis_datetime`；`as_of` 不替代目标钟时。
+上述精简字段适合摘要咨询。若用户要完整 JSON、全部时间线或完整文件，就要在首次调用时改用 `fields=null`，保留默认响应预算及所需快照；超限后从 `result_delivery` 读取同一 run。先裁出摘要，再重新计算，不能补回原次运行的全文。资源分页、文件提取与 SHA-256 校验见 [完整结果交付](agent-guide.md#完整结果交付与同次导出)。西占推运须显式传目标 `analysis_hour` / `analysis_minute`，并核对返回的 `analysis_context.analysis_datetime`；`as_of` 不替代目标钟时。
 
 双人关系中，`summary.overall_score` 是 0–100 的规则加权分，`traditional_compatibility.score` 是加减净分，`detailed_analysis.traditional_analysis.score` 是独立摩擦维度；三处的 `score_basis` 说明口径。不能平均、视为成功概率或用一个子项等级替代整体评价。首轮建议字段保留完整依据、人物和建议，避免为了补解释再计算一遍。
 

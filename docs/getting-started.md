@@ -1,8 +1,10 @@
 # FateBridge 快速入门
 
-从一条本地计算开始体验 FateBridge：安装后运行虚构请求，查看计算数据与运行回执，再按目标选择应用集成或 AI 助手接入。领域计算在本地完成，自然语言对话由所选客户端与模型提供。
+想知道 FateBridge 能做什么，先看一次实际返回。安装后，用虚构资料运行一条本地计算，查看数据与运行回执，再决定如何接入应用或 AI 助手。
 
-首次体验可只完成[安装](#安装)和[CLI 调用](#选择运行方式)，无需启动服务；后续使用路径见下表。所有人物资料均为虚构示例。
+领域计算在本地完成；自然语言对话由你选择的客户端与模型提供。
+
+第一次体验只需完成[安装](#安装)和 [CLI 调用](#选择运行方式)，无需启动服务。要接入应用或助手，可以按目标选择下面的路径。本文中的人物资料均为虚构示例。
 
 | 你的目标 | 从这里开始 |
 | --- | --- |
@@ -15,7 +17,7 @@
 
 ## 安装
 
-下方 PyPI 命令安装最新已发布版本，实际版本可用 `fatebridge doctor` 确认；需要当前开发分支的场景、技能与接口范围时，选择源码安装。版本差异见 [CHANGELOG](../CHANGELOG.md#unreleased)，已发布版本的使用说明以对应 Git 标签为准。
+先确定需要哪个版本：下方 PyPI 命令安装最新已发布版本，可用 `fatebridge doctor` 确认实际版本；需要当前开发分支的场景、技能与接口范围时，选择源码安装。版本差异见 [CHANGELOG](../CHANGELOG.md#unreleased)，已发布版本的使用说明以对应 Git 标签为准。
 
 包管理统一使用 [uv](https://docs.astral.sh/uv/getting-started/installation/)。需要 Python 3.10+；当前 CI 覆盖 3.10–3.13，源码环境默认使用 `.python-version` 中的 Python 3.12。依赖与三个控制台入口由 `pyproject.toml` 声明。从 PyPI 安装独立命令工具：
 
@@ -55,7 +57,7 @@ uv run --locked --extra dev fatebridge describe bazi_birth --detail input
 | REST | 是，由你启动 HTTP 服务 | [配置](#配置环境变量)后[启动 REST](#启动-rest-并检查状态) |
 | MCP | 是，由 host 启动 stdio 子进程 | [MCP 与 CLI](#mcp-与-cli)；Codex 用户看[注册步骤](codex-guide.md#2-注册到-codex) |
 
-CLI 可直接调用，不需要启动 REST：
+想先验证安装，直接运行 CLI 即可，无需启动 REST：
 
 ```bash
 fatebridge bazi_birth --birth-year 1990 --birth-month 5 --birth-day 15 \
@@ -63,13 +65,13 @@ fatebridge bazi_birth --birth-year 1990 --birth-month 5 --birth-day 15 \
   --birth-timezone Asia/Shanghai --fields bazi_birth.day_master --strict-fields
 ```
 
-执行成功时退出码为 `0`，返回 JSON 中包含 `bazi_birth.day_master` 和 `run_metadata`。这说明当前安装能够完成一次八字计算；`run_metadata` 用于记录本次运行，字段含义见 [核心概念](concepts.md)。
+执行成功时，退出码为 `0`，返回 JSON 包含 `bazi_birth.day_master` 和 `run_metadata`。这表明当前安装完成了这一次八字计算；`run_metadata` 记录本次运行，字段含义见 [核心概念](concepts.md)。
 
 CLI 不自动读取 `.env`，不需要配置 REST 密钥；如果已有进程环境配置，仍会按实际设置运行。
 
 ## 配置环境变量
 
-CLI 首次体验可跳过本节。启动 REST、配置 MCP 工具范围或使用自定义星历目录时，再设置相应变量。
+如果只是第一次用 CLI，可跳过本节。准备启动 REST、配置 MCP 工具范围或使用自定义星历目录时，再设置相应变量。
 
 源码安装时可选复制模板；已有 `.env` 时直接编辑，避免覆盖：
 
@@ -162,7 +164,7 @@ curl -X POST http://localhost:8010/api/astro/chart \
 
 ## 星历数据与精度
 
-`swisseph` 可导入，只能证明运行时可用。缺少相应 `.se1` 文件时，它可能使用内置 Moshier 模型；没有运行时的核心星盘则使用 FateBridge 轨道近似。显式复杂宫制与西占推运缺 backend 时会报错。
+计算能运行，还需要知道它实际用了什么数据。`swisseph` 可导入，只能证明运行时可用。缺少相应 `.se1` 文件时，它可能使用内置 Moshier 模型；没有运行时的核心星盘则使用 FateBridge 轨道近似。显式复杂宫制与西占推运缺 backend 时会报错。
 
 源码安装可在仓库根目录下载默认星历段（此步骤需要网络）：
 
@@ -211,7 +213,7 @@ uv run --no-project --with fatebridge python -m fatebridge.fetch_ephe \
 
 需要固定版本时，将 `--with fatebridge` 改为当前服务使用的 `fatebridge==<version>`。
 
-重启服务后检查核心盘的 `chart_profile.ephemeris_model`（如 `swieph`、`jpl`、`moshier`、`mixed`），以及 `run_metadata.engine_is_approximate`。`engine_backend` / `engine_precision` 不能单独证明加载了数据文件。数据路径、版本和算法限制见 [算法覆盖矩阵](algorithm-coverage.md)。
+重启服务后，检查核心盘的 `chart_profile.ephemeris_model`（如 `swieph`、`jpl`、`moshier`、`mixed`）和 `run_metadata.engine_is_approximate`，确认本次实际使用的模型。仅凭 `engine_backend` / `engine_precision` 不能证明加载了数据文件。数据路径、版本和算法限制见 [算法覆盖矩阵](algorithm-coverage.md)。
 
 跨年代精度核对可显式安装完整原始 DE441（2,788,676,624 字节），再选择已有的严格 JPL 后端：
 

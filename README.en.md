@@ -29,7 +29,9 @@
   <a href="#contributing">Contributing</a>
 </p>
 
-FateBridge is an open-source calculation toolkit for developers and AI agents. It brings BaZi, Zi Wei Dou Shu, Western astrology, divination, and Feng Shui into AI applications, providing calculations for exploring personal patterns, career and relationships, life stages, and living or working spaces through traditional cultural frameworks.
+When someone asks an AI, “What kind of work suits me?”, the question may involve birth details, calendars, the rules of different traditions, and choices the person faces today. A fluent answer alone cannot show how a chart was calculated, where its interpretation came from, or what remains uncertain.
+
+FateBridge addresses the parts that can be calculated and inspected. It is an open-source toolkit for developers and AI agents, bringing BaZi, Zi Wei Dou Shu, Western astrology, divination, and Feng Shui into AI applications. Its calculations support exploration of personal patterns, career and relationships, life stages, and living or working spaces through traditional cultural frameworks.
 
 Through **MCP, REST API, and CLI**, applications can call shared domain calculations, read structured results, and inspect timing, precision, and rule coverage. Paired with [Onda consultation skills](skills/README.md), agents can select methods and timing layers around everyday questions, keeping calculated facts, traditional interpretation, and practical advice distinct.
 
@@ -54,10 +56,10 @@ The calculation service runs locally and requires no LLM API key. Natural-langua
 
 ## Why FateBridge
 
-- **Start with the user's question**: Users describe questions such as “What patterns shape how I work?” or “Where might we need to adjust to each other?” and provide what they know. Onda guides agents in selecting evidence, explaining results, and handling follow-up questions; users need not learn tool names or API fields first.
-- **Explain the basis and scope**: Domain engines supply calculation data. Each tool reports timing conventions, precision, rule sources, and coverage as supported. Onda guides interpretation to retain disagreements and unknowns, helping users understand conclusions and developers inspect results.
-- **One integration, several ways to use it**: Connect AI assistants through MCP, integrate products through REST, or run calculations through the CLI. Shared input validation, a tool catalog, and error formats reduce integration and maintenance work across methods.
-- **Run in your own environment**: Once dependencies and ephemeris data are ready, local calculations do not depend on an online fortune-telling service. Use one-shot CLI commands, client-managed MCP processes, or an independent REST service, with your choice of conversation client and model.
+- **Start with the question**: Users can ask “What patterns shape how I work?” or “Where might we need to adjust to each other?” and provide what they know. Onda guides agents in selecting evidence, explaining results, and handling follow-up questions; users need not learn tool names or API fields first.
+- **Make the basis open to questions**: Domain engines supply calculation data. Each tool reports timing conventions, precision, rule sources, and coverage as supported; Onda guides interpretations to retain disagreements and unknowns. Readers can ask about the basis, and developers can inspect the results.
+- **Bring calculations into existing applications**: Connect AI assistants through MCP, integrate products through REST, or run calculations through the CLI. The interfaces share input validation, a tool catalog, and error formats, while their exposed capabilities must still be checked separately.
+- **Choose your runtime**: Once dependencies and any required ephemeris data are ready, local calculations do not depend on an online fortune-telling service. Use one-shot CLI commands, client-managed MCP processes, or an independent REST service, with your choice of conversation client and model.
 
 ## Capabilities
 
