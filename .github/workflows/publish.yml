@@ -61,9 +61,6 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
           persist-credentials: false
-          # setuptools reads __version__ from source (static), but keep full
-          # history so any future switch to a git-tag version scheme works.
-          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5

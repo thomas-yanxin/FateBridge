@@ -157,11 +157,13 @@ PYTHONPATH="$PWD:$PWD/src" UV_PROJECT_ENVIRONMENT="$PWD/.venv-nonuniform-referen
 
 ### CI 运行范围
 
-每次主分支 push 和 PR 都运行同一组自包含检查；同一分支或 PR 的新提交会取消旧 CI。工作流只浅克隆当前源码，不为变更分流拉取完整历史。Python 3.10–3.13、最低直接依赖和 Windows 共用 `scripts/run_ci_checks.py` 的检查清单，锁定环境另外检查文档、生成合同与 stdio MCP。
+代码变更在 PR 与 main／master push 上保留同一组自包含检查。同一 PR 的新提交取消旧 CI；主分支每次 push 使用独立并发组，运行中与排队中的提交均不互相替换。普通 README 和 `docs/` Markdown 变更只运行路径筛选与 `CI result` 汇总，不启动重测试；`docs/scenario-routing.md` 是生成源，仍执行检查。文档 JSON、技能、工作流、源码和测试变更也保留完整检查。
+
+Python 3.10–3.13 最新依赖、Python 3.10 最低直接依赖及 Windows／Python 3.12 锁定依赖共六种环境，各按收集后的节点分成三片并行执行。`scripts/run_ci_checks.py` 的默认本地命令仍运行整个自包含集合；分片不改变标记排除与断言。每片上传实际节点清单，汇总验证每个环境的全部节点恰好执行一次。uv 使用 setup action 的依赖缓存，按 Python／依赖策略隔离并仅由首片写入，不缓存测试资料或虚拟环境。
 
 云端不下载冻结夹具、黄金快照、外部星历或独立参考。完整领域回归、数值基线、原典复放和 SciPy 独立对照保留在本地，使用原数据、断言与固定门槛执行；云端通过不能作为这些项目的验收结论。混合测试文件中依赖本地资料的用例标记为 `local_data`，默认本地 `pytest` 不排除它们。
 
-Black、isort 和 mypy 在 Python 3.12 作业检查一次；通用文档检查由 locked 作业执行。`CI result` 要求锁定环境、Python 矩阵、最低依赖和 Windows 作业全部成功，失败或意外跳过均不能通过汇总。
+Black、isort、mypy、通用文档与生成合同在独立 Ubuntu／Python 3.12 锁定环境作业执行一次，与测试并行。原有 Ubuntu 锁定环境的 CLI／API 和真实 stdio MCP 验证保留。`CI result` 要求所有选中作业成功且分片覆盖完整；失败、取消或意外跳过均不能通过，只有已确认的纯普通文档变更允许重作业全部跳过。
 
 Windows Server 2022 / Python 3.12 在没有外部测试数据的锁定环境验证 stdio MCP、私有 ACL、重解析点拒绝、线程与跨进程锁、完整分页及三端合同。Windows 权限检查使用原生 ACL，不将 POSIX mode bits 当作 Windows 私有性的证明。
 
@@ -337,7 +339,7 @@ uvx --from twine twine check dist/*
 
 CI 的 `locked` 作业检查 `uv.lock` 和文档；该环境还验证命令入口与真实 stdio MCP。现有最新版依赖矩阵和最低依赖作业使用独立的 `uv pip` 环境，不受开发锁文件约束。
 
-`.github/workflows/ci.yml` 的 `test` 作业在 Ubuntu 24.04 / Python 3.10–3.13 执行自包含检查，Python 3.12 另检查 Black、isort 和 mypy；`floor` 在 Python 3.10 按最低直接依赖运行相同检查。每个作业记录依赖清单并上传自包含检查的 JUnit。`floor` 用 `uv pip install --system --resolution lowest-direct -e ".[dev]"` 在全新环境解析，不能仅固定 FastMCP 版本代替最低直接依赖验证。本地黄金快照比对仍限定受支持的 Linux x86_64 / Python 3.12 环境，其他环境跳过不代表通过。
+`.github/workflows/ci.yml` 的测试矩阵在 Ubuntu 24.04 / Python 3.10–3.13 最新依赖、Python 3.10 最低直接依赖和 Windows Server 2022／Python 3.12 锁定依赖下保留自包含检查，每种环境分三片。每片记录依赖、JUnit 与实际节点，`quality` 独立运行 Black、isort、mypy、文档和生成合同检查。最低直接依赖用 `uv pip install --system --resolution lowest-direct -e ".[dev]"` 在全新环境解析，不能仅固定 FastMCP 版本代替最低直接依赖验证。本地黄金快照比对仍限定受支持的 Linux x86_64 / Python 3.12 环境，其他环境跳过不代表通过。
 
 发布前另行完成与改动相关的本地领域及外部数据验收；云端 CI 只证明其明确列出的检查通过。
 

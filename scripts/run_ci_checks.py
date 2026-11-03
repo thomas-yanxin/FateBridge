@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
-import subprocess
+import argparse
+import json
 import sys
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 CHECKS = (
@@ -33,6 +36,7 @@ CHECKS = (
     "test_response_budget_contract.py",
     "test_request_catalog_isolation.py",
     "test_complete_output_contracts.py",
+    "test_ci_runner.py",
 )
 POSIX_CHECKS = (
     "test_documentation_integrity.py",
@@ -45,21 +49,78 @@ POSIX_CHECKS = (
 )
 
 
+class CIShard:
+    """Partition the already marker-filtered collection and record coverage."""
+
+    def __init__(
+        self,
+        index: int,
+        count: int,
+        report: Path | None = None,
+        environment: str = "local",
+    ) -> None:
+        self.index = index
+        self.count = count
+        self.report = report
+        self.environment = environment
+
+    @pytest.hookimpl(trylast=True)
+    def pytest_collection_modifyitems(
+        self, config: pytest.Config, items: list[pytest.Item]
+    ) -> None:
+        collected = [item.nodeid for item in items]
+        selected = items[self.index :: self.count]
+        deselected = [
+            item for i, item in enumerate(items) if i % self.count != self.index
+        ]
+        items[:] = selected
+        config.hook.pytest_deselected(items=deselected)
+        if self.report is not None:
+            self.report.write_text(
+                json.dumps(
+                    {
+                        "environment": self.environment,
+                        "shard_index": self.index,
+                        "shard_count": self.count,
+                        "collected": collected,
+                        "selected": [item.nodeid for item in selected],
+                    },
+                    indent=2,
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--shard-index", type=int, default=0)
+    parser.add_argument("--shard-count", type=int, default=1)
+    parser.add_argument("--selection-report", type=Path)
+    parser.add_argument("--environment-id", default="local")
+    options, pytest_args = parser.parse_known_args()
+    if not 0 <= options.shard_index < options.shard_count:
+        parser.error("shard-index must be in [0, shard-count)")
     selected = CHECKS if sys.platform == "win32" else (*CHECKS, *POSIX_CHECKS)
-    return subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "pytest",
-            "-q",
-            "-m",
-            "not local_data",
-            *(str(ROOT / "tests" / name) for name in selected),
-            *sys.argv[1:],
-        ],
-        cwd=ROOT,
-    ).returncode
+    return int(
+        pytest.main(
+            [
+                "-q",
+                "-m",
+                "not local_data",
+                *(str(ROOT / "tests" / name) for name in selected),
+                *pytest_args,
+            ],
+            plugins=[
+                CIShard(
+                    options.shard_index,
+                    options.shard_count,
+                    options.selection_report,
+                    options.environment_id,
+                )
+            ],
+        )
+    )
 
 
 if __name__ == "__main__":

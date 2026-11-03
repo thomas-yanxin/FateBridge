@@ -26,6 +26,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 from tests.fixtures.catalog import cli_specs_by_name
 
 _SKILLS_ROOT = Path(__file__).resolve().parents[1] / "skills"
@@ -136,20 +138,18 @@ def test_documented_cli_examples_use_real_flags():
     )
 
 
-def test_documented_cli_examples_run_clean():
+@pytest.mark.parametrize(
+    "example", _documented_cli_examples(), ids=lambda row: f"{row[0].name}-{row[1]}"
+)
+def test_documented_cli_examples_run_clean(example):
     """Runnability gate: every concrete example actually executes (exit 0).
 
     The engine is fully offline and returns structured error payloads on stdout
     with a non-zero exit code, so exit 0 is the clean-run signal."""
-    failures: list[str] = []
-    for md, tool, line, _flags in _documented_cli_examples():
-        command = shlex.split(line)
-        assert command[0] in {"python", "python3"}, line
-        command[0] = sys.executable
-        proc = subprocess.run(command, capture_output=True, text=True, timeout=180)
-        if proc.returncode != 0:
-            tail = (proc.stdout or proc.stderr).strip().replace("\n", " ")[:200]
-            failures.append(f"{md.name}: `{tool}` exit={proc.returncode} :: {tail}")
-    assert not failures, "Documented CLI examples failed to run:\n" + "\n".join(
-        failures
-    )
+    md, tool, line, _flags = example
+    command = shlex.split(line)
+    assert command[0] in {"python", "python3"}, line
+    command[0] = sys.executable
+    proc = subprocess.run(command, capture_output=True, text=True, timeout=180)
+    tail = (proc.stdout or proc.stderr).strip().replace("\n", " ")[:200]
+    assert proc.returncode == 0, f"{md.name}: `{tool}` exit={proc.returncode} :: {tail}"
