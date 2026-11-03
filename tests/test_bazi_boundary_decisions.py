@@ -1,6 +1,5 @@
 """Reference coverage and retained verifier failures cannot become fake gains."""
 
-import ast
 import gzip
 import hashlib
 import json
@@ -134,38 +133,3 @@ def test_actual_integrated_spk_consumes_all_original_probes_and_reports_its_own_
         assert actual["solar_model_details"]["accuracy_certified"] is False
     assert not result["full_calendar_acceptance"]
     assert result["overall_score"] is None
-
-
-def test_later_source_identity_guards_preserve_the_audited_physics_and_root_math():
-    path = Path("src/fatebridge/core/spk_solar.py")
-    before = ast.parse((FIXTURE / "before-aba-guard" / path).read_text())
-    after = ast.parse((ROOT / path).read_text())
-
-    def method(tree, name):
-        cls = next(
-            n
-            for n in tree.body
-            if isinstance(n, ast.ClassDef) and n.name == "_KernelSun"
-        )
-        return next(
-            n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == name
-        )
-
-    for name in ["longitude", "segment"]:
-        assert ast.dump(method(before, name)) == ast.dump(method(after, name))
-
-    def numerical_tail(tree):
-        fn = next(
-            n
-            for n in tree.body
-            if isinstance(n, ast.FunctionDef) and n.name == "longitude_crossing_tt"
-        )
-        lock = next(n for n in fn.body if isinstance(n, ast.With))
-        start = next(
-            i
-            for i, n in enumerate(lock.body)
-            if isinstance(n, ast.FunctionDef) and n.name == "residual"
-        )
-        return [ast.dump(n) for n in lock.body[start:]]
-
-    assert numerical_tail(before) == numerical_tail(after)

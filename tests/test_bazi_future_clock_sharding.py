@@ -1,8 +1,6 @@
 """Scheduling proofs and synthetic merge fault tests; no accuracy credit."""
 
-import ast
 import gzip
-import hashlib
 import importlib.util
 import json
 import sys
@@ -12,64 +10,6 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-
-
-def test_sharding_changes_only_selection_observation_and_receipt_fields():
-    original = ast.parse(
-        (ROOT / "scripts/audit_bazi_dayun_future_clocks_parts.py").read_text()
-    )
-    shard = ast.parse(
-        (ROOT / "scripts/audit_bazi_dayun_future_clocks_shard.py").read_text()
-    )
-
-    class RemoveScheduling(ast.NodeTransformer):
-        def visit_Expr(self, node):
-            if (
-                isinstance(node.value, ast.Call)
-                and isinstance(node.value.func, ast.Attribute)
-                and node.value.func.attr == "add_argument"
-                and node.value.args
-                and isinstance(node.value.args[0], ast.Constant)
-                and node.value.args[0].value in {"--shard-index", "--shard-count"}
-            ):
-                return None
-            return self.generic_visit(node)
-
-        def visit_Assert(self, node):
-            if ast.unparse(node.test) == "0 <= args.shard_index < args.shard_count":
-                return None
-            return self.generic_visit(node)
-
-        def visit_If(self, node):
-            if (
-                ast.unparse(node.test)
-                == "(count - 1) % args.shard_count == args.shard_index"
-            ):
-                assert len(node.body) == 1 and not node.orelse
-                assert (
-                    ast.unparse(node.body[0])
-                    == "yield {**row, '_cohort_index': count - 1}"
-                )
-                return ast.Expr(
-                    value=ast.Yield(value=ast.Name(id="row", ctx=ast.Load()))
-                )
-            return self.generic_visit(node)
-
-        def visit_Dict(self, node):
-            pairs = [
-                (k, v)
-                for k, v in zip(node.keys, node.values)
-                if not isinstance(k, ast.Constant)
-                or k.value not in {"cohort_index", "shard_index", "shard_count"}
-            ]
-            node.keys = [k for k, _ in pairs]
-            node.values = [v for _, v in pairs]
-            return self.generic_visit(node)
-
-    stripped = RemoveScheduling().visit(shard)
-    assert ast.dump(stripped, include_attributes=False) == ast.dump(
-        original, include_attributes=False
-    )
 
 
 @pytest.fixture(

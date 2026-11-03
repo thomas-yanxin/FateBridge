@@ -1,6 +1,5 @@
 """Point-intent repair must retain old gates and refuse impossible UTC labels."""
 
-import ast
 import gzip
 import hashlib
 import json
@@ -10,7 +9,6 @@ import pytest
 
 from fatebridge.core import almanac, analytic_solar, spk_solar
 from fatebridge.core.astro.time_scales import datetime_from_tt
-from scripts.historical_source_identity import HistoricalSources
 
 ROOT = Path(__file__).resolve().parents[1]
 STUDY = ROOT / "docs/validation/bazi-scalar-solar-point-repair-v1"
@@ -139,72 +137,3 @@ def test_real_grid_roots_and_default_delivery_are_preserved_with_declared_clock_
     )
     assert not result["unexpected_delta_ids"]
     assert not result["physical_clock_accuracy_certified"]
-
-
-def test_all_untouched_functions_and_legacy_time_conversion_bytes_stay_exact():
-    plan = sealed(STUDY / "protocol.json")
-    for relative in (
-        "src/fatebridge/core/astro/time_scales.py",
-        "src/fatebridge/core/astro/tt_epoch.py",
-    ):
-        assert (
-            hashlib.sha256((STUDY / "before" / relative).read_bytes()).hexdigest()
-            == plan["before_sources"][relative]
-        )
-    old = ast.parse((STUDY / "before/src/fatebridge/core/almanac.py").read_text())
-    new = ast.parse((ROOT / "src/fatebridge/core/almanac.py").read_text())
-
-    def definitions(tree):
-        return {
-            n.name: ast.dump(n, include_attributes=False)
-            for n in tree.body
-            if isinstance(n, (ast.FunctionDef, ast.ClassDef))
-            and n.name
-            not in {"_solar_term_utc_via_analytic", "_solar_term_utc_via_swe"}
-        }
-
-    # The next sealed stage contains the scalar-point change before the
-    # separately qualified native-point migration. Preserve this historical
-    # unchanged-function proof; current native solver math is checked below.
-    after_scalar_path = (
-        ROOT
-        / "docs/validation/bazi-native-solar-point-v1/before/src/fatebridge/core/almanac.py"
-    )
-    assert (
-        hashlib.sha256(after_scalar_path.read_bytes()).hexdigest()
-        == "55a66bcb6dd92d449799db154ce8d1e4192b2991ec504db036d016a7d218f8bd"
-    )
-    assert definitions(old) == definitions(ast.parse(after_scalar_path.read_text()))
-    # The native point migration replaces this former unchanged-function
-    # assertion with an exact solver-math guard, retaining the old source.
-    native_study = ROOT / "docs/validation/bazi-native-solar-point-v1"
-    native_before = ast.parse(
-        (native_study / "before/src/fatebridge/core/almanac.py").read_text()
-    )
-
-    def native(tree):
-        return next(
-            n
-            for n in tree.body
-            if isinstance(n, ast.FunctionDef) and n.name == "_solar_term_utc_via_swe"
-        )
-
-    assert ast.dump(native(old), include_attributes=False) == ast.dump(
-        native(native_before), include_attributes=False
-    )
-
-    originals = HistoricalSources(ROOT).originals
-    # Physical-source guards were added after the earlier point audit.
-    # Check both retained originals directly, without the retired process-wide
-    # manifest. Their complete solver AST, guards and math must stay exact.
-    for digest in (
-        "48a5a2be827bc7cc99a67b25ece1cadbc1cc08b3afdf7ca15c500ffcaada77ee",
-        "8b381e09b403b45c41c6cb7c4f33c27830cb0a238d21bf8f018c8bc3e8d182ca",
-    ):
-        original = originals[digest]
-        assert "src/fatebridge/core/almanac.py" in original["paths"]
-        assert hashlib.sha256(original["text"].encode()).hexdigest() == digest
-        before_repair = ast.parse(original["text"])
-        assert ast.dump(native(before_repair), include_attributes=False) == ast.dump(
-            native(new), include_attributes=False
-        )

@@ -134,7 +134,7 @@
   "tests/test_mcp_native_contracts.py::test_real_mcp_omission_and_explicit_solar_flags[bazi_birth-payload0]": 5,
   "tests/test_mcp_native_contracts.py::test_real_mcp_omission_and_explicit_solar_flags[qimen-payload1]": 6,
   "tests/test_repository_cleanup.py::test_default_collection_does_not_execute_frozen_fixture_programs": 2,
-  "tests/test_request_catalog_isolation.py::test_catalog_cold_import_does_not_load_domain_engines_or_legacy_facades": 3,
+  "tests/test_request_catalog_isolation.py::test_catalog_cold_import_does_not_load_domain_engines": 3,
   "tests/test_response_budget_contract.py::test_explicit_zero_http_budget_and_invalid_budget_before_execution": 2,
   "tests/test_response_budget_contract.py::test_rest_mcp_flags_and_renderer_agree_on_disjoint_response_budget": 25,
   "tests/test_result_delivery.py::test_real_western_exact_time_and_delivery_match_all_transports": 11,
