@@ -48,9 +48,11 @@ def cheshta_arc(
     opposed = delta == 180
     midpoints = [midpoint, (midpoint + 180) % 360] if opposed else [midpoint]
     branches = []
+    exact_values: list[Fraction] = []
     for point in midpoints:
         kendra = (apogee - point) % 360
         reduced = min(kendra, 360 - kendra)
+        exact_values.append(reduced / 3)
         branches.append(
             {
                 "midpoint": float(point),
@@ -62,7 +64,7 @@ def cheshta_arc(
     return {
         "status": "opposed_midpoint_not_adjudicated" if opposed else "calculated_arc",
         "frame": mean_frame,
-        "value": None if opposed else branches[0]["virupa"],
+        "value": float(exact_values[0]) if len(set(exact_values)) == 1 else None,
         "unit": "virupa",
         "branches": branches,
         "rule_id": "jyotish.cheshta_arc.v1",

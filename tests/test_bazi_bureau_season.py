@@ -29,7 +29,7 @@ def test_source_month_chen_branch_group_keeps_actual_phase_and_unadopted_numeric
     row = result["combination_observations"][0]
     assert row["positions"] == ["year", "month", "day", "hour"]
     assert row["month_in_target_branch_group"] is True
-    assert row["calculated_target_phase"] == "死"
+    assert row["calculated_target_phase"] == "囚"
     assert row["supplied_season_support_flag"] is False
     assert row["criteria_differ"] is True
     assert row["classical_transformation"] == "not_adjudicated"

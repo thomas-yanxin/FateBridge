@@ -12,9 +12,11 @@ from fatebridge.core.branch_candidates import (
 from fatebridge.core.output_base import PartialOutput
 from fatebridge.core.output_classical_passage import Pillar
 from fatebridge.core.punishment_resolution import (
+    CURRENT_STRENGTH_METHODS as CURRENT_PUNISHMENT_METHODS,
+)
+from fatebridge.core.punishment_resolution import (
     PREVIOUS_STRENGTH_METHOD as PREVIOUS_PUNISHMENT_METHOD,
 )
-from fatebridge.core.punishment_resolution import STRENGTH_METHOD as PUNISHMENT_METHOD
 
 Kind = Literal["三会", "三合", "六合", "半合"]
 Target = Literal["木", "火", "土", "金", "水"]
@@ -358,7 +360,10 @@ def validate_punishment_resolution(
     branches: Optional[Mapping[str, str]] = None,
 ) -> None:
     """Check co-known covering combinations even without a candidate sidecar."""
-    if method not in {PREVIOUS_PUNISHMENT_METHOD, PUNISHMENT_METHOD}:
+    if (
+        method != PREVIOUS_PUNISHMENT_METHOD
+        and method not in CURRENT_PUNISHMENT_METHODS
+    ):
         return
     cover = set()
     for event in relations:

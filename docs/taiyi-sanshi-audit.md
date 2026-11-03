@@ -1,40 +1,16 @@
 # 太乙与三式合参：原典、历法与解释验收
 
-V44修复[输入年与邻年节气](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-solar-context-years.md)的端点误拒及模型混用；合参同时修复奇门置闰年表的输入年与来源缓存。原720条端点控制、全部参考根及首轮605／720保留；不增加独立古例或实际模型解释通过数，见V44记录（本地数据：`validation/taiyi-jinjing-v44/README.md`）。
+太乙公开入口通过 `calculation_mode` 提供年、月、日、时四计。年计核心为 `jinjing_year_core_v1`，六纪节月为 `jinjing_month_jie_360_v1`，金钥匙日计配置为 `key_day_winter_jiazi_v1`，至点时计为 `jinjing_hour_solstice_v1`；时计另有显式金钥匙配置。月、日、时计采用已声明的现代天文节气和钟面适配，不称为唐历复原。日计的零时日界、冬至同日甲子纳入及历史日期限制分别披露。
 
-V43补齐[实际节气模型与数据闭包](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-solar-sources.md)：确认V42临时快照因缺少项目星历数据，在503／504年回退Moshier而产生约1.23秒漂移；带回预先冻结的同批37份数据后，原大差异消失，约10微秒的表示差异另保留。两模型28个TT点与8个事后边界反例分开记录，新增同次换节／换遁与冬至起元的模型证据；不据共享模型一致性宣称古历或原典通过。旧报告与模型评分不重判，见V43验证（本地数据：`validation/taiyi-jinjing-v43/README.md`）。
+基本盘位和两算依据唐王希明《太乙金镜式经》四库本转录，计算规则取卷一、二，独立主客算表取卷三，整十将位另核卷六、九；金钥匙日／时计的积数起例另据《太乙金钥匙》续集。初版原始转录、72局预期值和指纹在 冻结材料（本地数据：`../tests/fixtures/taiyi_jinjing_v1/manifest.json`），实际结果在 审计报告（本地数据：`validation/taiyi-jinjing-v1/report.json`）。
 
-V42补齐[完整计数与纪元坐标](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-counter-cycles.md)：同盘交付360／60／72分解及单位，避免局号、行宫捷数冒充完整积数；未据分组推定实际干支或改默认起点。十卷所选题注包含10条案例，9条在明确坐标假设下有唯一相位，1条题注不相容；数值相符仍不替代完整原例通过。全部差异与旧成绩保留，见V42验证（本地数据：`validation/taiyi-jinjing-v42/README.md`）。
+当前仍保留《金镜》144局中11项两算与三处始击分歧。另有[阴37／43／44局的具名版本书影旁证](taiyi-edition-witness.md)，只支持该版所选18项，不改原《金镜》分母、默认通则或完整验收状态。逐轮修复、首次失败与旧成绩见[固定提交的历史整页](https://github.com/thomas-yanxin/FateBridge/blob/b17c475a6e933c615c33119574bf03fa53251495/docs/taiyi-sanshi-audit.md)，不能代替现行算法的重新验收。
 
-V41补齐[当时法完整条件与四维两支候选](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-dangshi-sectors.md)：同次六壬实际地盘神将全部并列，保持未选寄支；核心十项旧例相符不替代完整古例。明钞五项候选相容只有两项单支直接相符，四库“天定”原字未改，寅时自动夜贵与源例朝条件的负对照保留。两本完整原例均未通过，古历与V25原评分保持，见V41验证（本地数据：`validation/taiyi-jinjing-v41/README.md`）。
-
-V40补齐[当时法贵人逐版对照](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-dangshi-nobles.md)：四库与明钞完整二十项朝暮本位有十项不同，现有通行／探原协纪配置分别对应两版表。三式新增显式选表、同盘实际起点及来源路径，默认不变、不按结果自动选版；本位相符不认证朝暮判界、四维寄支或全套联合断法。月计专题和咨询参考的旧取年措辞也已同步到V39实际1.2.0计算。所有原历法／原典失败和V25原模型评分保留，见V40验证（本地数据：`validation/taiyi-jinjing-v40/README.md`）。
-
-太乙公开计算已从第三方命法移植改为有来源范围的年计核心 `jinjing_year_core_v1`，并扩展六纪节月 `jinjing_month_jie_360_v1` 与冬夏至换遁时计 `jinjing_hour_solstice_v1`。后两者明确使用现代天文节气及所选时钟适配，不称为唐历复原。依据为唐王希明《太乙金镜式经》四库本转录，计算规则取卷一、二，独立主客算表取卷三，整十将位另核卷六、九。原始转录、72局预期值和指纹在 冻结材料（本地数据：`../tests/fixtures/taiyi_jinjing_v1/manifest.json`），实际结果在 审计报告（本地数据：`validation/taiyi-jinjing-v1/report.json`）。
-
-V29进一步修复明确回拨瞬间在月／日／时计被二次校验误拒的问题，太乙单术增加明确偏移校验与同次瞬间回执；来源、参数语义和验收范围见[民用时刻](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-civil-clock.md)与V29记录（本地数据：`validation/taiyi-jinjing-v29/README.md`）。这不改变原典分歧或整体验收状态。
-
-V30按先冻结的日本2025—2027完整节气表及香港2027中气表，分别核对native、DE440、auto和节／中气、二至边界；原26项官方预期及60秒容差保持，来源身份按明确后端逐项要求，见[太阳源与定界](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-solar-boundaries.md)和V30记录（本地数据：`validation/taiyi-jinjing-v30/README.md`）。分钟资料未认证亚秒精度或完整古历。
-
-V31两版邢云路《古今律厯考》卷65书影确认梁例“九日甲申非八日”及入纪21／22异议，扩核十项盘面，发现原积数9项相符而始击卯／酉不同、加一假设十项全异。源位置重算单列揭示客算相同不能认证始击；日期、历元、算路与外迫解释分别保留，详见[梁例校议](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-liang-collation.md)及V31记录（本地数据：`validation/taiyi-jinjing-v31/README.md`）。本次未安装古历、改原文或增加完整有日期原例通过数。
-
-V32补齐[节月积数、经朔累月与年标](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-month-count-domains.md)的来源及交付。武经书影确认章岁657而非线上652，另记庆历甲申年／月片段与两版福应经月法；两版金镜逐月保留小余，八组假设均核13个月首／12个月长。明钞一支为12／13月首、10／12月长相符，原例积日仍不同，未选用该分支改生产古历。默认月计新增实际取年及单位回执，摘要／快照同源，数值公式保持；V32记录（本地数据：`validation/taiyi-jinjing-v32/README.md`）继续保留完整古历和全盘验收未完成状态。
-
-V33修正前轮明钞日干支漏读，分四库年字、明钞故事段日字和重述积数句保存依据；给定原积数与明钞甲申日局部相合，八组日期求积日候选仍全部不符。新增闰余／小余量纲及冬至—经朔精确相位诊断，两种取年皆可通过模60而展开间隔不同；展开历元仍为条件假设，不能据此选年或安装古历。见[日字与朔气相位](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-day-token-phase.md)及V33记录（本地数据：`validation/taiyi-jinjing-v33/README.md`）。
-
-V34补齐[积日计数表示](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-day-count-encodings.md)：已过日数和从一日号须耦合转换日名；两篇历算研究的27项外部相位控制单列，不充作太乙古例。全部八组经朔候选、两种初始商解释与完整355日保留，初九的一支条件整数吻合仍不能通过原书初八、授时22、始击及全年约束。新诊断收紧日期存在性，最佳326个日名吻合中只有325个有效日期；完整目标仍未通过，见V34记录（本地数据：`validation/taiyi-jinjing-v34/README.md`）。
-
-V35核《宋书》元嘉历原图，分清梁初历史历法与王氏同元四分历。所选完整501—505五年63个月首干支、62个月长和1831日干支均可重放，但502年闰四月与两种中气解释所得闰五月／六月不同，月标及完整日期仍未联合通过。旧梁例积数、初八／初九、授时22和始击分歧不因换用另一历法而消失，见[元嘉算法与历表](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-yuanjia-calendar.md)及V35记录（本地数据：`validation/taiyi-jinjing-v35/README.md`）。
-
-V36将已冻501—505完整齐梁史历表接入明确的年计配置`jinjing_year_qiliang_table_v1`；原表502闰四月、元嘉候选闰五月／六月及未决状态随同次结构化／快照交付。范围外、默认配置及日／月／时计不自动换历，既有16份完整服务结果保持；来源、实际三端与投影验收见[历史年计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-year-calendar.md)和V36记录（本地数据：`validation/taiyi-jinjing-v36/README.md`）。这不是王氏古日积或完整古例恢复。
-
-V38将明钞经朔、同本冬至和完整月份身份接起来，八组固定候选逐项核旧五年63月首、62月长及1831日。各支均不全合，整日／分数置闰还在505年给出闰二月／三月差别；缺月、未覆盖中气与不存在的三十日不借位或记成通过。没有修改生产古历或把代数推导补成原字，见[王氏完整朔气窗口](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-wang-mean-calendar.md)及V38记录（本地数据：`validation/taiyi-jinjing-v38/README.md`）。
-
-V39取得金钥匙续集末尾完整积日算例，七个中间数可复算；同段月名／日名仍需不同编号解释。独立1561全年14月首、13月长及384日比较保留全部八支失败，算出707887076但月标为四月亦不能冒作源五月。该例另与武经“年前十一月”共同约束十二节月取年，修复默认金镜月计重复减年的少12月问题；计法仍是现代节月适配，不修改古日积或安装新古历。见[算例与名义年修正](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-key-worked-accumulation.md)及V39记录（本地数据：`validation/taiyi-jinjing-v39/README.md`）。
+历法与当时法的联合未通过项目仍保留：梁例初八／初九、授时22与始击位置异文；502年史历闰四月与元嘉候选闰五月／六月；王氏朔气及1561年原积日到年月日的完整映射。`jinjing_year_qiliang_table_v1`仅在显式年计选择501—505史历表，不替换默认或日／月／时计。朝暮贵人两版20项中10项不同，可显式选表；完整朝暮判界、四维寄支及两本当时法整例仍未验收，不能把候选集合相容当单一实盘相符。
 
 ## 计算、原典与解释的验证范围
 
-| 目标 | 本轮做到的范围 | 尚不能声称的结论 |
+| 目标 | 固定版本核对范围 | 尚不能声称的结论 |
 | --- | --- | --- |
 | 算对历法 | 农历岁首、立春与太岁口径分开；采用输入钟表日期定年，真太阳时跨日不改年计。用香港天文台2025、2026、2033、2034年表核对边界，涵盖闰六月和2033闰十一月后的岁首 | 月/时计节气另核两家天文台；并未复原唐代四分历或认证全部历史日期；岁首和时辰边界是已声明的约定 |
 | 符合某部原典 | 卷三阴阳共144局、288项两算逐项比较；阳70/72、阴63/72，合计133/144局、277/288项相符；11项分歧全部保留 | 这些数据只验两算，不能扩大为全书、完整时计/命法认证；原典审计仍失败 |

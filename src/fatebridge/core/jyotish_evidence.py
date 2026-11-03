@@ -238,7 +238,12 @@ def cheshta_ruler_provenance(
             rule = "jyotish.cheshta_simon1994.v1"
             supporting = {"supporting_source_id": SOURCE["id"]}
             state = evidence["arc"]["status"]
-            description = "本五星宫主采用本次已计算的Simon1994平均黄经、同框架J2000几何真位置与Santhanam27.24-25角度步骤；对径中点未裁定时保留缺失。这不是Raman1900表的校勘结果。"
+            description = (
+                "本五星宫主的对径中点仍有两个候选，但角度公式的两分支精确同值，故仅交付共同强度；未裁定中点，也不是Raman1900表的校勘结果。"
+                if state == "opposed_midpoint_not_adjudicated"
+                and evidence["arc"]["value"] is not None
+                else "本五星宫主采用本次已计算的Simon1994平均黄经、同框架J2000几何真位置与Santhanam27.24-25角度步骤；对径中点未裁定时保留缺失。这不是Raman1900表的校勘结果。"
+            )
         else:
             rule = "jyotish.cheshta_arc.v1"
             origin = "unavailable_five_star_mean_model"

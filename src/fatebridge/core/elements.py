@@ -46,7 +46,7 @@ class ElementAnalysis:
         """各五行相对月令的旺衰相位（旺 / 相 / 休 / 囚 / 死）。
 
         经典确定映射，无主观加权：与月令同类为旺；月令所生为相；生月令者为休；
-        月令所克者为囚；克月令者为死。补足 element_distribution 缺失的旺衰维度。
+        克月令者为囚；月令所克者为死。补足 element_distribution 缺失的旺衰维度。
         """
         month_element = BRANCH_ELEMENTS[month_branch][0]
         phases: Dict[str, str] = {}
@@ -58,9 +58,9 @@ class ElementAnalysis:
             elif GENERATION_CYCLE[element] == month_element:
                 phase = "休"
             elif DESTRUCTION_CYCLE[month_element] == element:
-                phase = "囚"
-            else:  # 克月令者
                 phase = "死"
+            else:  # 克月令者
+                phase = "囚"
             phases[element.value] = phase
         return phases
 

@@ -23,6 +23,11 @@ from fatebridge.core.timing_roots import (
     RootRelationReference,
     build_timing_root_context,
 )
+from fatebridge.core.timing_strength import (
+    BudgetEffectRelation,
+    StrengthProjectionBaseline,
+    project_timing_root_effects,
+)
 from fatebridge.utils.data import (
     BRANCH_COMBINATIONS,
     BRANCH_CONFLICTS,
@@ -48,6 +53,8 @@ SOURCE_URL = "https://zh.wikisource.org/zh-hant/三命通會/卷二"
 def analyze_timing_interactions(
     natal: Mapping[str, Tuple[str, str]],
     timing: Mapping[str, Mapping[str, str]],
+    *,
+    strength_baseline: StrengthProjectionBaseline | None = None,
 ) -> Dict[str, Any]:
     """Match actual node occurrences, including natal/timing and timing/timing.
 
@@ -228,6 +235,28 @@ def analyze_timing_interactions(
         if node["scope"] == "timing"
     ]
     return {
+        **(
+            {
+                "strength_projection": project_timing_root_effects(
+                    natal,
+                    timing,
+                    [
+                        BudgetEffectRelation(
+                            id=e["id"],
+                            rule_id=e["rule_id"],
+                            participants=e["participants"],
+                            complete=e.get("complete", False),
+                        )
+                        for e in events
+                        if e["rule_id"] in BRANCH_RELATION_KINDS
+                        or e["rule_id"] == "stem_combination"
+                    ],
+                    strength_baseline,
+                )
+            }
+            if strength_baseline is not None
+            else {}
+        ),
         "method_id": METHOD_ID,
         "assessment_status": "structural_evidence_only",
         "nodes": nodes,

@@ -6,7 +6,10 @@ PREVIOUS_POLICY = "completed_combination_punishment_resolution_v1"
 POLICY = "completed_combination_unique_pair_resolution_v2"
 LEGACY_POLICY = "initial_candidate_protection_v1"
 PREVIOUS_STRENGTH_METHOD = "season_root_revelation_relations_v9"
-STRENGTH_METHOD = "season_root_revelation_relations_v10"
+STRENGTH_METHOD = "season_root_revelation_relations_v11"
+CURRENT_STRENGTH_METHODS = frozenset(
+    {"season_root_revelation_relations_v10", STRENGTH_METHOD}
+)
 SOURCE = {
     "id": "ziping_completed_combination_resolution_primary_v1",
     "author": "沈孝瞻",

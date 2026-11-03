@@ -5,6 +5,7 @@ import copy
 import gzip
 import hashlib
 import json
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -12,19 +13,20 @@ from pydantic import ValidationError
 
 from fatebridge.application.examples import suggested_fields
 from fatebridge.core.bazi_evidence import build_natal_evidence
+from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.classical_force import build_force_components
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.output_bazi_evidence import StrengthContext
 from fatebridge.core.output_classical_force import EngineeringForceComposition
 from fatebridge.core.output_strength_thresholds import StrengthThresholdArithmetic
 from fatebridge.core.strength_thresholds import threshold_snapshot_lines
-from tests.bazi_refactor_reference import exact_digest
+from tests import bazi_strength_reference_v3 as current_reference
 from tests.fixtures.bazi_strength_threshold_v1.independent_reference_v2 import (
     reconstruct,
 )
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
 from tests.test_agentic_nested_outputs import rest as _rest_fixture
-from tests.test_bazi_strength_thresholds import delivered_payload
+from tests.test_bazi_strength_thresholds import delivered_payload, evaluate
 
 rest = _rest_fixture
 FIXTURE = Path(__file__).parent / "fixtures/bazi_strength_consumers_v1"
@@ -51,59 +53,16 @@ def assess(values):
 
 
 @pytest.mark.parametrize("row", BODY, ids=lambda r: str(r["index"]))
-def test_all_187_actual_first_comparison_errors_use_same_assessment_exact_budget(row):
-    pillars, strength = assess(row["pillars"])
-    force = build_natal_evidence(pillars, strength)["force_components"]
+def test_all_187_historical_comparison_errors_keep_explicit_legacy_phase_replay(row):
+    pillars = dict(zip(current_reference.ORDER, map(tuple, row["pillars"])))
+    assessment = evaluate(row["pillars"], legacy=True)
+    force = build_force_components(pillars, assessment, {})
     after = force["engineering_composition"]
     before = row["force_before"]["engineering_composition"]
-    if row["index"] in {241988, 336427, 440107}:
-        # The subsequently adopted same-target affiliation rule changes these
-        # three original samples. Keep their original equal-budget counterexample
-        # intact, and require full pre-repair objects plus independent exact math.
-        path = (
-            Path(__file__).parent
-            / "fixtures/architecture_refactor_v1/strength-consumer-revisions-before.json"
-        )
-        raw = path.read_bytes()
-        assert (
-            hashlib.sha256(raw).hexdigest()
-            == "3a26bf900329ade2af1ebe3fe4e4c30cfc38cec835dee865ea289547081fe9eb"
-        )
-        accepted = json.loads(raw)
-        source = FIXTURE / "body-builder-confirmed-before-first.json.gz"
-        assert (
-            hashlib.sha256(source.read_bytes()).hexdigest()
-            == accepted["original_source_sha256"]
-        )
-        assert {r["index"] for r in accepted["rows"]} == {241988, 336427, 440107}
-        expected = next(r for r in accepted["rows"] if r["index"] == row["index"])
-        assert row["pillars"] == expected["pillars"]
-        assert (
-            exact_digest({"strength": strength, "force": force})
-            == expected["business_sha256"]
-        )
-        exact = reconstruct(row["pillars"], strength["assessment"]["relations"])[
-            "energies"
-        ]
-        assert {e: str(v) for e, v in exact.items()} == strength["assessment"][
-            "threshold_arithmetic"
-        ]["energies_exact"]
-        body = exact[force["components"]["body"]["element"]]
-        seal = exact[force["components"]["seal"]["element"]]
-        assert after["body_energy_exact"] == str(body)
-        assert after["seal_energy_exact"] == str(seal)
-        assert after["body_within_support_exact"] == str(body / (body + seal))
-        assert after["body_seal_energy_relation"] == (
-            "body_greater"
-            if body > seal
-            else "seal_greater" if seal > body else "equal"
-        )
-        assert row["expected"]["relation"] == "equal"
-        EngineeringForceComposition.model_validate(after)
-        StrengthThresholdArithmetic.model_validate(
-            strength["assessment"]["threshold_arithmetic"]
-        )
-        return
+    exact = reconstruct(row["pillars"], assessment["relations"])["energies"]
+    assert assessment["threshold_arithmetic"]["energies_exact"] == {
+        element: str(value) for element, value in exact.items()
+    }
     assert after["body_seal_energy_relation"] == row["expected"]["relation"] == "equal"
     assert after["comparison_basis"] == "exact_rational_same_assessment"
     assert (
@@ -124,26 +83,96 @@ def test_all_187_actual_first_comparison_errors_use_same_assessment_exact_budget
         "support_share",
         "strength_level",
     ):
-        assert strength["assessment"][key] == row["strength_before"]["assessment"][key]
+        assert assessment[key] == row["strength_before"]["assessment"][key]
     assert (
         force["classical_adjudication"] == row["force_before"]["classical_adjudication"]
     )
     assert set(force["classical_adjudication"].values()) == {"not_adjudicated"}
     EngineeringForceComposition.model_validate(after)
-    StrengthThresholdArithmetic.model_validate(
-        strength["assessment"]["threshold_arithmetic"]
+    StrengthThresholdArithmetic.model_validate(assessment["threshold_arithmetic"])
+
+
+def test_three_sha_only_revision_receipts_remain_immutable_historical_evidence():
+    path = (
+        Path(__file__).parent
+        / "fixtures/architecture_refactor_v1/strength-consumer-revisions-before.json"
     )
+    raw = path.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == (
+        "3a26bf900329ade2af1ebe3fe4e4c30cfc38cec835dee865ea289547081fe9eb"
+    )
+    accepted = json.loads(raw)
+    source = FIXTURE / "body-builder-confirmed-before-first.json.gz"
+    assert (
+        hashlib.sha256(source.read_bytes()).hexdigest()
+        == accepted["original_source_sha256"]
+    )
+    assert {row["index"] for row in accepted["rows"]} == {241988, 336427, 440107}
+    originals = {row["index"]: row for row in BODY}
+    for row in accepted["rows"]:
+        assert row["pillars"] == originals[row["index"]]["pillars"]
+        assert set(row) == {"index", "pillars", "business_sha256"}
+        assert len(row["business_sha256"]) == 64
+        assert set(row["business_sha256"]) <= set("0123456789abcdef")
+    # These three receipts contain hashes, not complete old result objects.
+    # Pin their envelope and provenance; do not forge v11 metadata into an old
+    # hash or claim that this validates the unavailable historical result bytes.
+
+
+@pytest.mark.parametrize("row", BODY, ids=lambda r: str(r["index"]))
+def test_current_v11_all_187_budgets_match_independent_literal_season_arithmetic(row):
+    pillars, strength = assess(row["pillars"])
+    assessment = strength["assessment"]
+    assert assessment["method_id"] == "season_root_revelation_relations_v11"
+    assert assessment["seasonal_phases"] == current_reference.seasonal_phases(
+        row["pillars"][1][1]
+    )
+    # The relation decisions are premises; this independently verifies their
+    # budget arithmetic, not whether those traditional relations should apply.
+    expected = current_reference.reconstruct(row["pillars"], assessment["relations"])
+    receipt = assessment["threshold_arithmetic"]
+    assert receipt["energies_exact"] == {
+        element: str(value) for element, value in expected["energies"].items()
+    }
+    assert receipt["support_exact"] == str(expected["support"])
+    assert receipt["weaken_exact"] == str(expected["weaken"])
+    assert receipt["share_exact"] == str(expected["share"])
+    assert receipt["numerical_label"] == expected["numerical_grade"]
+    assert (
+        assessment["structural_decision"]["numerical_label"]
+        == expected["numerical_grade"]
+    )
+    assert (
+        receipt["requires_special_structure_review"]
+        is expected["requires_special_structure_review"]
+    )
+    assert (
+        assessment["requires_special_structure_review"]
+        is expected["requires_special_structure_review"]
+    )
+    force = build_natal_evidence(pillars, strength)["force_components"]
+    composition = force["engineering_composition"]
+    assert composition["body_energy_exact"] == str(expected["body"])
+    assert composition["seal_energy_exact"] == str(expected["seal"])
+    assert composition["body_within_support_exact"] == str(
+        expected["body_within_support"]
+    )
+    assert composition["body_seal_energy_relation"] == expected["body_seal_relation"]
+    assert set(force["classical_adjudication"].values()) == {"not_adjudicated"}
+    EngineeringForceComposition.model_validate(composition)
+    StrengthThresholdArithmetic.model_validate(receipt)
 
 
 @pytest.mark.parametrize("row", SPECIAL, ids=lambda r: str(r["index"]))
-def test_three_first_strict_boundary_misclassifications_are_corrected_and_explained(
+def test_three_historical_strict_boundary_errors_keep_legacy_phase_explanation(
     row,
 ):
-    pillars, strength = assess(row["pillars"])
-    assessment = strength["assessment"]
+    assessment = evaluate(row["pillars"], legacy=True)
     old = row["actual_strength_result"]["assessment"]
     assert old["requires_special_structure_review"] is True
-    assert assessment["requires_special_structure_review"] is False
+    assert (
+        assessment["threshold_arithmetic"]["requires_special_structure_review"] is False
+    )
     assert assessment["threshold_arithmetic"]["share_exact"] == row["share_exact"]
     assert assessment["support_share"] == old["support_share"]
     assert assessment["strength_level"] == old["strength_level"]
@@ -154,7 +183,23 @@ def test_three_first_strict_boundary_misclassifications_are_corrected_and_explai
         for line in lines
     )
     assert assessment == original
-    assert ElementAnalysis.get_favorable_elements(strength)
+
+
+@pytest.mark.parametrize("row", SPECIAL, ids=lambda r: str(r["index"]))
+def test_current_v11_special_flags_match_independent_exact_inequalities(row):
+    _, strength = assess(row["pillars"])
+    assessment = strength["assessment"]
+    expected = current_reference.reconstruct(row["pillars"], assessment["relations"])
+    assert assessment["threshold_arithmetic"]["share_exact"] == str(expected["share"])
+    assert (
+        assessment["requires_special_structure_review"]
+        is expected["requires_special_structure_review"]
+    )
+    favorable = ElementAnalysis.get_favorable_elements(strength)
+    if expected["requires_special_structure_review"]:
+        assert favorable == []
+    else:
+        assert favorable
 
 
 @pytest.mark.parametrize("row", CLIMATE, ids=lambda r: r["id"])
@@ -212,9 +257,16 @@ def test_missing_or_partial_exact_evidence_is_never_recalculated_or_promoted():
         {"special_lower_threshold_exact": "1/5"},
     ],
 )
-def test_contradictory_exact_receipts_rejected_while_partial_projection_allowed(patch):
-    _, strength = assess(SPECIAL[0]["pillars"])
-    receipt = strength["assessment"]["threshold_arithmetic"]
+@pytest.mark.parametrize("legacy", [False, True], ids=["current_v11", "historical"])
+def test_contradictory_exact_receipts_rejected_while_partial_projection_allowed(
+    patch, legacy
+):
+    receipt = evaluate(SPECIAL[0]["pillars"], legacy=legacy)["threshold_arithmetic"]
+    patch = dict(patch)
+    if not legacy and "requires_special_structure_review" in patch:
+        patch["requires_special_structure_review"] = not receipt[
+            "requires_special_structure_review"
+        ]
     with pytest.raises(ValidationError):
         StrengthThresholdArithmetic.model_validate({**receipt, **patch})
     assert StrengthThresholdArithmetic.model_validate(
@@ -222,7 +274,12 @@ def test_contradictory_exact_receipts_rejected_while_partial_projection_allowed(
     ).energies_exact == {"水": "1/2"}
     with pytest.raises(ValidationError):
         StrengthContext.model_validate(
-            {"threshold_arithmetic": receipt, "requires_special_structure_review": True}
+            {
+                "threshold_arithmetic": receipt,
+                "requires_special_structure_review": not receipt[
+                    "requires_special_structure_review"
+                ],
+            }
         )
 
 
@@ -235,20 +292,62 @@ def test_contradictory_exact_receipts_rejected_while_partial_projection_allowed(
         {"seal_energy_exact": "-1"},
     ],
 )
-def test_comparison_receipt_rejects_contradictory_explanation_fields(patch):
-    pillars, strength = assess(BODY[0]["pillars"])
-    composition = build_natal_evidence(pillars, strength)["force_components"][
-        "engineering_composition"
-    ]
+@pytest.mark.parametrize("legacy", [False, True], ids=["current_v11", "historical"])
+def test_comparison_receipt_rejects_contradictory_explanation_fields(patch, legacy):
+    pillars = dict(zip(current_reference.ORDER, map(tuple, BODY[0]["pillars"])))
+    composition = build_force_components(
+        pillars, evaluate(BODY[0]["pillars"], legacy=legacy), {}
+    )["engineering_composition"]
+    patch = dict(patch)
+    if not legacy and "body_seal_energy_relation" in patch:
+        patch["body_seal_energy_relation"] = (
+            "body_greater"
+            if composition["body_seal_energy_relation"] != "body_greater"
+            else "seal_greater"
+        )
+    if (
+        not legacy
+        and patch.get("body_within_support_exact")
+        == composition["body_within_support_exact"]
+    ):
+        patch["body_within_support_exact"] = "1/3"
     with pytest.raises(ValidationError):
         EngineeringForceComposition.model_validate({**composition, **patch})
     EngineeringForceComposition.model_validate({"body_energy_exact": "1/3"})
 
 
 @pytest.mark.parametrize("case", PUBLIC, ids=lambda r: r["id"])
-def test_five_fictional_identities_across_eleven_published_tools_and_transports(
+def test_five_fictional_identities_use_v11_reference_on_eleven_tools_and_transports(
     case, rest, tmp_path, capsys
 ):
+    original = next(row for row in [*BODY, *SPECIAL] if row["index"] == case["index"])
+    if case["kind"] == "special":
+        assert case["share_exact"] == original["share_exact"]
+    else:
+        assert case["pillars"] == original["pillars"]
+        assert original["expected"]["relation"] == "equal"
+        assert (
+            case["legacy_relation"]
+            == original["force_before"]["engineering_composition"][
+                "body_seal_energy_relation"
+            ]
+        )
+    arguments = case["arguments"]
+    birth_pillars = BaZiCalendar.get_four_pillars(
+        datetime(
+            arguments["birth_year"],
+            arguments["birth_month"],
+            arguments["birth_day"],
+            arguments["birth_hour"],
+        ),
+        timezone_name=arguments["birth_timezone"],
+    )
+    values = ["".join(birth_pillars[name]) for name in current_reference.ORDER]
+    assert values == original["pillars"]
+    _, strength = assess(values)
+    assessment = strength["assessment"]
+    assert assessment["method_id"] == "season_root_revelation_relations_v11"
+    expected = current_reference.reconstruct(values, assessment["relations"])
     selected = SPECS[case["tool"]]
     fields = suggested_fields(selected, view="force_arithmetic")
     assert len(fields) == 3
@@ -301,13 +400,20 @@ def test_five_fictional_identities_across_eleven_published_tools_and_transports(
     receipt, composition, adjudication = values
     assert composition["comparison_basis"] == "exact_rational_same_assessment"
     assert set(adjudication.values()) == {"not_adjudicated"}
-    if case["kind"] == "special":
-        assert receipt["share_exact"] == case["share_exact"]
-        assert receipt["requires_special_structure_review"] is False
-    else:
-        assert composition["body_seal_energy_relation"] == "equal"
-        assert (
-            composition["legacy_float_body_seal_energy_relation"]
-            == case["legacy_relation"]
-        )
-        assert composition["body_within_support_exact"] == "1/2"
+    assert receipt["energies_exact"] == {
+        element: str(value) for element, value in expected["energies"].items()
+    }
+    assert receipt["support_exact"] == str(expected["support"])
+    assert receipt["weaken_exact"] == str(expected["weaken"])
+    assert receipt["share_exact"] == str(expected["share"])
+    assert receipt["numerical_label"] == expected["numerical_grade"]
+    assert (
+        receipt["requires_special_structure_review"]
+        is expected["requires_special_structure_review"]
+    )
+    assert composition["body_energy_exact"] == str(expected["body"])
+    assert composition["seal_energy_exact"] == str(expected["seal"])
+    assert composition["body_within_support_exact"] == str(
+        expected["body_within_support"]
+    )
+    assert composition["body_seal_energy_relation"] == expected["body_seal_relation"]

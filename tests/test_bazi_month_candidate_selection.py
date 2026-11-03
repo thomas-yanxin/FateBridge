@@ -226,7 +226,7 @@ def test_both_pdf85_examples_keep_wealth_as_a_bridge_without_erasing_hurt_or_sel
     row = path_by_id(selection, case["expected_path"])
     assert row["status"] == "requires_force_adjudication"
     assert row["source_pdf_pages"] == [85]
-    assert selection["method_id"] == "month_path_conditions_v3"
+    assert selection["method_id"] == "month_path_conditions_v4"
     assert pillars == before and evidence["ten_gods"]["伤官"]
     assert selection["chosen_path_id"] is None and case["expected_strength"] is None
     assert all(c["status"] == "unknown" for c in row["force_conditions"])
@@ -358,4 +358,4 @@ def test_published_candidate_views_are_same_on_actual_rest_native_mcp_and_cli(
             and selection["adjudication_status"] == "not_adjudicated"
         )
         assert selection["source"]["source_sha256"] == REFERENCE["source_sha256"]
-        assert selection["method_id"] == "month_path_conditions_v3"
+        assert selection["method_id"] == "month_path_conditions_v4"

@@ -36,6 +36,7 @@ uv run --locked --extra dev fatebridge describe bazi_birth --detail full
 | `core/discovery.py`、`core/scenarios.py` | `application.discovery`、`application.scenarios` |
 | `core/request_models.py` | `core.requests` 中各领域的定义模块 |
 | `core/astrology.py` | `core.astro` 中的职责模块；共用表使用 `core.astrology_tables` |
+| `core.astro.geometry._midpoint` | `core.astro.relationship_geometry.unique_midpoint` 或 `midpoint_candidates`；精确相隔 180° 时分别报告歧义或保留两个候选 |
 | `utils/helpers.py` | `utils.birth_input/solar_time/formatting/elements`；分析时刻见下一行 |
 | `utils/analysis_clock.py` | `services.timing_clock.resolve_analysis_moment` 归一化分析输入；隐式当前时刻读取 `core.execution_context.current_datetime` |
 | `core.predictive`、`core.local_techniques`、`core.metaphysics` 的包级重导出 | 按技法导入具体子模块 |
@@ -82,7 +83,13 @@ uv run --locked --extra dev fatebridge describe bazi_birth --detail full
 
 主限赤经推运使用唯一方法名 `equatorial`；`legacy_reference` 和 `legacy_equatorial` 已移除。导出章节按当前注册名称精确匹配，不映射历史标题。当前 FastMCP 最低版本为 3.4.2，直接使用其原生 `ToolResult`，不保留旧版本结果子类。
 
+### 年小限与月段边界
+
+月小限修正为按 UTC 经过时长等分周年区间，跨夏令时的本地月段钟面可能随之变化。2 月 29 日出生者从平年进入闰年时，年区间终点恢复为 2 月 29 日，不再提前结束于 2 月 28 日。`givenyear` 的分析时刻和周年边界转换到 `return_timezone` 时保留原瞬间，修正旧版重贴时区造成的偏移。活动月序与公开月段使用同一组边界；请求字段和响应结构不变，详见[边界约定](western-astrology.md#年小限与月段边界)。
+
 ### 专题输出与结果存储
+
+Lahiri 日月返照搜索直接使用同一 TT 的严格原生偏移。原生偏移失败不再沿用线性近似继续求解，而是返回计算错误；仍保留来源一致性错误的原类型。
 
 `liushi_analysis.life_dimensions` 中没有对应信号的维度使用中性 50；
 未知性别时的爱情分值从 11.9 修正为 50。非零信号的既有权重与归一化标度保持。

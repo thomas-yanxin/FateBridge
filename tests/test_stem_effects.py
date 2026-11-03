@@ -135,32 +135,44 @@ def test_no_synthetic_stem_identity_or_root_activation():
     assert [r["physical_stem"] for r in effects["ledger"]] == ["癸", "戊", "壬"]
 
 
-def test_production_binding_has_closed_form_fraction_without_display_rounding():
+@pytest.mark.parametrize("seasonal_policy", ["historical_reversed", "corrected_v11"])
+def test_production_binding_has_closed_form_fraction_without_display_rounding(
+    seasonal_policy,
+):
     pillars = dict(
         zip(("year", "month", "day", "hour"), map(tuple, "癸丑 戊午 丙午 壬辰".split()))
     )
-    result = assess_strength(pillars, ElementAnalysis.seasonal_phases("午"))
+    phases = ElementAnalysis.seasonal_phases("午")
+    if seasonal_policy == "historical_reversed":
+        # Preserve the old hand-calculated numbers against their explicit old
+        # input convention; v11's actual seasonal map is checked separately.
+        phases = {**phases, "水": "死", "金": "囚"}
+    result = assess_strength(pillars, phases)
     receipt = result["stem_energy_accounting"]
     # Independent hand derivation: 癸根丑4/7 + 辰2/7 = 6/7;
-    # activation 1/4 + 3/4*6/7 = 25/28; summer water factor1/2;
-    # binding17/20 gives85/224. The hour壬 is unbound25/56.
+    # activation 1/4 + 3/4*6/7 = 25/28. Historical reversed water factor1/2
+    # with binding17/20 gives85/224; hour壬 is unbound25/56. Correct 囚3/4
+    # scales only water energy by3/2, giving255/448 and75/112 respectively.
+    scale = Fraction(1) if seasonal_policy == "historical_reversed" else Fraction(3, 2)
     assert receipt["ledger"][0]["energy"] == pytest.approx(
-        float(Fraction(85, 224)), abs=1e-15
+        float(Fraction(85, 224) * scale), abs=1e-15
     )
     assert receipt["ledger"][1]["energy"] == pytest.approx(
         float(Fraction(51, 40)), abs=1e-15
     )
     assert receipt["ledger"][2]["energy"] == pytest.approx(
-        float(Fraction(25, 56)), abs=1e-15
+        float(Fraction(25, 56) * scale), abs=1e-15
     )
-    assert result["effective_elements"]["水"] == round(float(Fraction(305, 224)), 6)
+    assert result["effective_elements"]["水"] == round(
+        float(Fraction(305, 224) * scale), 6
+    )
     # Raw weighted-energy accounting closes before display rounding.
     assert result["support_strength"] + result["weaken_strength"] == pytest.approx(
         fsum(r["engineering_energy"] for r in result["hidden_stem_ledger"])
         + fsum(r["energy"] for r in receipt["ledger"]),
         abs=1e-13,
     )
-    assert result["method_id"] == "season_root_revelation_relations_v10"
+    assert result["method_id"] == "season_root_revelation_relations_v11"
     assert result["strength_level"] == "中和"  # no unaccepted conversion promotion
     assert "stem_effects" not in result
     assert all(

@@ -17,9 +17,8 @@ from datetime import timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
 from fatebridge.core.astro.ephemeris import _swisseph_planet_state
-from fatebridge.core.astro.geometry import _ayanamsha
-from fatebridge.core.astro.julian_day import _julian_day
 from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
+from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.astrology_lifespan import (
     build_age_point_payload,
     build_balbillus_payload,
@@ -928,22 +927,15 @@ def calculate_vedicprog(
     zodiac_type: str = "Tropic",
     **birth_kwargs: Any,
 ) -> Dict[str, Any]:
-    """生成恒星推运盘（恒星黄道二次推运，推运点对本命的相位）。
+    """原生Lahiri恒星黄道次限，推运点与同一黄道本命点比较。
 
-    技法恒以恒星黄道读取，故输出固定 Sidereal；请求里的 ``zodiac_type`` 被接收但忽略。
-
-    实现上**以热带黄道排盘再整体减去 ayanamsa** 转恒星：推运相位是 推运点−本命点 的
-    经差，对二者减去同一 ayanamsa 后不变，故相位与热带一致；唯落座（星座）随 ayanamsa
-    平移到恒星黄道。这样既得到恒星位置，又避开了 kerykeion 在依赖下限版本对恒星宫位
-    计算的回归 bug（热带排盘在 floor 上稳定，与 ``planetaryarc`` 同路径）。
-    采用 FateBridge 自带的 Lahiri 式 ``_ayanamsha``（吠陀标准），确定且不依赖 kerykeion
-    的恒星模式默认值。
+    技法固定为Sidereal；兼容请求中的zodiac_type不改变该定义。
+    本命与次限都由共享原生底盘求值，不调用可降级的线性岁差近似。
     """
     label = "恒星推运"
     try:
-        # Cast tropical (floor-safe), then offset to sidereal by the ayanamsa below.
         birth_info, natal_subject, natal_reference, sect = _prepare_chart(
-            house_system=house_system, zodiac_type="Tropic", **birth_kwargs
+            house_system=house_system, zodiac_type="Sidereal", **birth_kwargs
         )
         analysis_datetime = build_analysis_datetime(
             birth_info,
@@ -957,26 +949,11 @@ def calculate_vedicprog(
             natal_subject,
             analysis_datetime=analysis_datetime,
             house_system=house_system,
-            zodiac_type="Tropic",
+            zodiac_type="Sidereal",
         )
-        # Secondary progression advances the chart one day per year of life.
-        progressed_ayanamsha = _ayanamsha(
-            _julian_day(birth_info.require_utc_datetime + timedelta(days=age_years))
-        )
-        natal_ayanamsha = _ayanamsha(_julian_day(birth_info.require_utc_datetime))
-        progressed_sidereal = {
-            body: (lon - progressed_ayanamsha) % 360.0
-            for body, lon in extract_reference_longitudes(
-                progression["subject"]
-            ).items()
-        }
-        natal_sidereal = {
-            body: (lon - natal_ayanamsha) % 360.0
-            for body, lon in extract_reference_longitudes(natal_subject).items()
-        }
         payload = build_vedic_progression_payload(
-            progressed_sidereal,
-            natal_sidereal,
+            extract_reference_longitudes(progression["subject"]),
+            extract_reference_longitudes(natal_subject),
             orb=orb,
         )
         summary = (
@@ -988,9 +965,9 @@ def calculate_vedicprog(
             birth_info=birth_info,
             sect=sect,
             house_system=house_system,
-            zodiac_type="Sidereal",  # output zodiac (tropical cast offset by ayanamsa)
+            zodiac_type="Sidereal",
         )
-        context["ayanamsha"] = "Lahiri-like (FateBridge offset)"
+        context["ayanamsha"] = "Lahiri (Swiss Ephemeris native)"
         context["analysis_datetime"] = analysis_datetime.isoformat()
         context["age_years"] = round(age_years, 4)
         sections = [
@@ -1013,10 +990,10 @@ def calculate_vedicprog(
 
 def _body_declinations(utc_datetime: Any) -> Dict[str, float]:
     """Equatorial declination of each tracked body at a UTC moment (swisseph)."""
-    julian_day = _julian_day(utc_datetime)
+    times = ephemeris_time(utc_datetime)
     declinations: Dict[str, float] = {}
     for body in _DECLINATION_BODIES:
-        state = _swisseph_planet_state(body, julian_day)
+        state = _swisseph_planet_state(body, julian_day_tt=times.jd_tt)
         if state is not None and state[0].get("declination") is not None:
             declinations[body] = float(state[0]["declination"])
     return declinations

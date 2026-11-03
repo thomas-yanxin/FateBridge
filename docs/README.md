@@ -57,7 +57,7 @@ CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由�
 | 需要查什么 | 入口 |
 | --- | --- |
 | 工具、参数、端点和错误 | [API 参考](api-reference.md) · [按需调用合同](contracts/README.md) |
-| 实现覆盖、依赖与近似路径 | [算法覆盖矩阵](algorithm-coverage.md) |
+| 实现覆盖、依赖与近似路径 | [算法覆盖矩阵](algorithm-coverage.md) · [当前算法状态](algorithm-status.md) |
 | 模块职责、数据流与依赖边界 | [架构说明](architecture.md) |
 | 扩展、测试、CI、打包与发布 | [开发指南](development-guide.md) |
 | 本地清理与冻结数据恢复 | [仓库维护](repository-maintenance.md) |

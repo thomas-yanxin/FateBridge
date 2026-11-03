@@ -13,8 +13,6 @@ from fatebridge.application.result_delivery import bound_response
 from fatebridge.application.tool_spec import ToolSpec
 from fatebridge.core.execution_context import (
     ExecutionOptions,
-    correlate_error,
-    safe_correlation,
 )
 from fatebridge.transports.flags import FIELDS_FLAG_DESC as _FIELDS_FLAG_DESC
 from fatebridge.transports.flags import RESPONSE_LIMIT_DESC

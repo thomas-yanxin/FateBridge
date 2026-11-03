@@ -44,7 +44,7 @@ def test_storage_receipt_and_explanation_match_on_rest_mcp_cli(rest, tmp_path, c
     assert business(result) == business(local) == business(protocol.structured_content)
     birth = result["bazi_birth"]
     assessment = birth["day_master"]["assessment"]
-    assert assessment["method_id"] == "season_root_revelation_relations_v10"
+    assert assessment["method_id"] == "season_root_revelation_relations_v11"
     events = [e for e in assessment["relations"] if "storage_effect" in e]
     assert len(events) == 1 and events[0]["positions"] == ["year", "month"]
     assert (

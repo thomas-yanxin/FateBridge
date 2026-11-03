@@ -276,10 +276,6 @@ def _san_cai(lines: List[int]) -> List[str]:
     ]
 
 
-def _short_name(name: str) -> str:
-    return name[0] if name[1] == "為" else name[2:]
-
-
 # ── 天数(去25)/地数(去30) 归卦数 1-9（5 表示寄中宫）──
 def _reduce_tian(t: int) -> int:
     v = t
@@ -320,17 +316,6 @@ def _flip_line(lines: List[int], pos: int) -> List[int]:
     out = lines[:]
     out[pos - 1] = 0 if out[pos - 1] else 1
     return out
-
-
-def _yuan_tang(
-    lines: List[int], hour_zhi: str, is_male: bool, gua: Dict[str, Any]
-) -> int:
-    """起元堂（动爻 1-6）。"""
-    return int(
-        yuantang_placement(lines, hour_zhi, is_male, gua.get("yangLing"))[
-            "selected_pos"
-        ]
-    )
 
 
 def _swap_trigrams(lines: List[int]) -> List[int]:

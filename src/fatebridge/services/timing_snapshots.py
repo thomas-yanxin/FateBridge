@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 
 from fatebridge.core.timing_carriers import timing_carrier_snapshot_lines
 from fatebridge.core.timing_roots import timing_root_snapshot_lines
+from fatebridge.core.timing_strength import timing_strength_snapshot_lines
 from fatebridge.services.snapshot_builders import (
     render_snapshot_lines as _render_snapshot_text,
 )
@@ -671,6 +672,10 @@ def _build_comprehensive_timing_snapshot_text(
     if interaction_analysis and "root_context" in interaction_analysis:
         impact_lines.extend(
             timing_root_snapshot_lines(interaction_analysis["root_context"])
+        )
+    if interaction_analysis and "strength_projection" in interaction_analysis:
+        impact_lines.extend(
+            timing_strength_snapshot_lines(interaction_analysis["strength_projection"])
         )
     return _render_snapshot_text(
         [

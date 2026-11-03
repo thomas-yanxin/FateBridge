@@ -158,7 +158,9 @@ def _normalize_date_text(date_text: str) -> str:
 def _normalize_time_text(time_text: str) -> str:
     value = (time_text or "").strip()
     if not value:
-        return "00:00:00"
+        raise ValueError(
+            "time须提供已知钟时，空字符串不能补作00:00；未知钟时仅在支持的工具中省略或用null"
+        )
     parts = value.split(":")
     if len(parts) < 2 or len(parts) > 3:
         return value

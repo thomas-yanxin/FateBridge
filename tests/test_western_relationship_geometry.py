@@ -2,7 +2,6 @@
 
 import json
 import math
-from datetime import datetime, timezone
 from decimal import Decimal, localcontext
 from pathlib import Path
 
@@ -10,7 +9,6 @@ import pytest
 
 from fatebridge.core.astro.aspects import (
     _build_directional_relative_midpoints,
-    _build_relative_midpoint_catalog,
     _match_cross_aspect,
 )
 from fatebridge.core.astro.birth import build_astro_birth_info
@@ -120,11 +118,13 @@ def test_exact_diametric_points_keep_both_candidates_for_comparison_only():
     assert midpoint_candidates(0, 180) == midpoint_candidates(180, 0) == (90, 270)
     with pytest.raises(ValueError, match="没有唯一"):
         unique_midpoint(0, 180)
-    catalog = _build_relative_midpoint_catalog(
-        [{"id": "Sun", "longitude": 0}, {"id": "Moon", "longitude": 180}]
-    )
-    assert [row["longitude"] for row in catalog] == [90, 270]
-    assert all(row["antipodal_inputs"] for row in catalog)
+    hits = _build_directional_relative_midpoints(
+        [{"id": "Jupiter", "longitude": 90}],
+        [{"id": "Sun", "longitude": 0}, {"id": "Moon", "longitude": 180}],
+    )["Jupiter"]
+    assert [row["midpoint"]["longitude"] for row in hits] == [90, 270]
+    assert [row["aspect"] for row in hits] == ["conjunction", "opposition"]
+    assert all(row["midpoint"]["antipodal_inputs"] for row in hits)
 
 
 @pytest.mark.parametrize("degree,expected", [(33.0, False), (32.9999999, True)])

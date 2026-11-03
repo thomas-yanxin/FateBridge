@@ -108,6 +108,7 @@ SOLAR_TERM_MINUTE_OFFSETS = [
 
 MILLISECONDS_PER_TROPICAL_YEAR = 31556925974.7
 SOLAR_TERM_BASE_UTC = datetime(1900, 1, 6, 2, 5, tzinfo=timezone.utc)
+NATIVE_SOLAR_ROOT_MODEL_ID = "native_swiss_tt_solar_bisection_v2"
 
 GAN = tuple("甲乙丙丁戊己庚辛壬癸")
 ZHI = tuple("子丑寅卯辰巳午未申酉戌亥")
@@ -487,8 +488,7 @@ def _solar_term_utc_via_swe(
     # Coarse scan at ~daily resolution to find a sign change of
     # wrapped(longitude - target). Bisect within the bracket.
     def wrapped_diff(jd: float) -> float:
-        diff = (sun_longitude(jd) - target_longitude + 540.0) % 360.0 - 180.0
-        return diff
+        return math.remainder(sun_longitude(jd) - target_longitude, 360.0)
 
     try:
         anchor_jd = ephemeris_time(anchor_utc).jd_tt
@@ -499,6 +499,11 @@ def _solar_term_utc_via_swe(
         previous_jd = jd_start
         previous_diff = wrapped_diff(previous_jd)
         step = 1.0  # one day
+        if previous_diff == 0.0:
+            # Retain a crossing exactly at the scan's first sample. Sun
+            # longitude increases through it; the previous day brackets it.
+            previous_jd -= step
+            previous_diff = wrapped_diff(previous_jd)
         jd = previous_jd + step
         crossing: Optional[Tuple[float, float]] = None
         while jd <= jd_end:
@@ -541,11 +546,15 @@ def _solar_term_utc_via_swe(
                 )
         for _ in range(48):  # 2^-48 days is well below any needed precision
             mid = (low + high) / 2.0
+            if mid in (low, high):
+                break
             if wrapped_diff(mid) < 0.0:
                 low = mid
             else:
                 high = mid
-        resolved_jd = (low + high) / 2.0
+        # The adjacent lower float is still before the numerical crossing.
+        # A rounded midpoint can choose it and publish a pre-crossing boundary.
+        resolved_jd = high
         moment = native_solar_root_datetime(resolved_jd)
         if provenance is not None:
             provenance.update(
@@ -555,7 +564,7 @@ def _solar_term_utc_via_swe(
                 resolved_jd_tt=resolved_jd,
                 resolved_datetime_utc=moment.astimezone(timezone.utc).isoformat(),
                 solar_model_details={
-                    "model_id": "native_swiss_tt_solar_bisection_v1",
+                    "model_id": NATIVE_SOLAR_ROOT_MODEL_ID,
                     "ephemeris_model": next(iter(models)),
                     "ephemeris_retflags": list(sorted(retflags)),
                     "ephemeris_library_version": str(
@@ -565,6 +574,7 @@ def _solar_term_utc_via_swe(
                     "root_bracket_tt": [low, high],
                     "root_bracket_seconds": (high - low) * 86400,
                     "root_time_scale": "TT",
+                    "root_selection_policy": "first_post_crossing_tt_float",
                     "numerical_epoch_representation": "explicit_ieee_float_tt_point",
                     "scalar_jd_scope": "exact_value_of_selected_ieee_float",
                     "civil_time_method": "datetime_from_tt_point",

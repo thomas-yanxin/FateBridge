@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import geographic_pole_angle_definition
@@ -22,14 +22,10 @@ from fatebridge.core.astro.ephemeris import (
 )
 from fatebridge.core.astro.ephemeris_files import ephemeris_files_for_years
 from fatebridge.core.astro.geometry import (
-    _degree_in_sign,
-    _midpoint,
     _nakshatra,
     _sign_name,
-    _week_ruler,
     combine_longitudes,
     is_prograde_house_partition,
-    normalize_angle,
 )
 from fatebridge.core.astro.horizon import populate_horizon
 from fatebridge.core.astro.house_positions import build_ecliptic_house_projection
@@ -53,7 +49,6 @@ from fatebridge.core.astro.profiles import (
     _resolve_core_chart_zodiacal_mode,
 )
 from fatebridge.core.astro.reference import (
-    _TRADITIONAL_PLANET_IDS,
     ASPECTS,
     BALANCE_BASIS,
     DEFAULT_PLANET_ORBS,

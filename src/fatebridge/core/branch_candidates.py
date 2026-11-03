@@ -22,6 +22,7 @@ KNOWN_SCREEN_METHODS = frozenset(
         CURRENT_METHOD,
         "season_root_revelation_relations_v9",
         "season_root_revelation_relations_v10",
+        "season_root_revelation_relations_v11",
     }
 )
 KINDS = {"三会", "三合", "六合", "半合"}

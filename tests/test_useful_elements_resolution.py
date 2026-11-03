@@ -80,7 +80,7 @@ def test_strong_label_cannot_make_wood_both_useful_and_avoided(strength):
 
 
 @pytest.mark.parametrize(
-    "stem,branch", product("甲乙丙丁戊己庚辛壬癸", "子丑寅卯辰巳午未申酉戌亥")
+    "stem,branch", tuple(product("甲乙丙丁戊己庚辛壬癸", "子丑寅卯辰巳午未申酉戌亥"))
 )
 def test_all_day_stem_month_pairs_partition_without_losing_climate(stem, branch):
     pillars = {**PILLARS, "day": (stem, "寅"), "month": ("戊", branch)}

@@ -64,7 +64,7 @@ def test_primary_anchors_and_entire_supported_layout_space():
 
 
 @pytest.mark.parametrize(
-    "stem,peak", zip("甲乙丙丁戊己庚辛壬癸", "卯寅午巳午巳酉申子亥")
+    "stem,peak", tuple(zip("甲乙丙丁戊己庚辛壬癸", "卯寅午巳午巳酉申子亥"))
 )
 def test_chongwei_zero_is_explained_by_a_necessary_condition(stem, peak):
     result = pair_layout_necessity(stem, "帝旺", "贵人")

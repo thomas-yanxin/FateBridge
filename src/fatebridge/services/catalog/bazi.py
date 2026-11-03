@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, List
 
 from fatebridge.application.bindings import lazy_service, person_invoke, raw_invoke
 from fatebridge.application.tool_spec import ToolSpec

@@ -16,6 +16,7 @@ from fatebridge.services.timing_snapshots import (
     _build_jieqi_year_snapshot_text,
     _build_nongli_time_snapshot_text,
 )
+from fatebridge.utils.civil_clock import resolve_civil_clock
 from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.errors import calculation_guard
 from fatebridge.utils.formatting import create_pillar_dict
@@ -120,6 +121,7 @@ def calculate_nongli_time(
     timezone_name = zone or DEFAULT_BIRTH_TIMEZONE
     normalized_time_alg = _normalize_time_alg(time_alg)
     input_datetime = _parse_calendar_datetime(date, time)
+    civil_datetime = resolve_civil_clock(input_datetime, timezone_name)
     corrected_datetime = input_datetime
     analysis_datetime = input_datetime
     total_correction_minutes = 0.0
@@ -133,7 +135,7 @@ def calculate_nongli_time(
     if normalized_time_alg == 0:
         if effective_longitude is not None:
             adjustment = calculate_solar_time_adjustment(
-                input_datetime,
+                civil_datetime,
                 timezone_name,
                 effective_longitude,
             )
@@ -151,13 +153,13 @@ def calculate_nongli_time(
     pillars = BaZiCalendar.get_four_pillars(
         analysis_datetime,
         timezone_name=timezone_name,
-        civil_datetime=input_datetime,
+        civil_datetime=civil_datetime,
     )
     calendar_context = build_calendar_context(
         analysis_datetime,
         timezone_name=timezone_name,
         pillars=pillars,
-        civil_datetime=input_datetime,
+        civil_datetime=civil_datetime,
     )
     lunar_calendar = calendar_context.get("lunar_calendar") or {}
     lunar_support = calendar_context.get("lunar_calendar_support") or {}

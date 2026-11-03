@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from fatebridge.core.astro.geometry import _ayanamsha
+from fatebridge.core.astro.geometry import native_lahiri_ayanamsha
 from fatebridge.core.astro.time_scales import datetime_from_tt, ephemeris_time
 from fatebridge.core.ephemeris_runtime import (
     ephemeris_call,
@@ -24,10 +24,7 @@ def _longitude_tt(
         raise ValueError("Return search ephemeris failed")
     longitude = float(coordinates[0])
     if sidereal:
-        ut1 = julian_day_tt
-        for _ in range(4):
-            ut1 = julian_day_tt - ephemeris_call("deltat_ex", ut1, swe.FLG_SWIEPH)
-        longitude -= _ayanamsha(ut1)
+        longitude -= native_lahiri_ayanamsha(julian_day_tt=julian_day_tt)
     return longitude % 360
 
 

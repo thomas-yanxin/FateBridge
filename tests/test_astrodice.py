@@ -32,7 +32,7 @@ FACES = dict(planet="Mercury", sign="Virgo", house=6)
 SKY = dict(date="2000-02-29", time="18:15:00", zone="UTC", lat="0", lon="0")
 
 
-@pytest.mark.parametrize("sign,planet", product(SIGNS, REFERENCE["planets"]))
+@pytest.mark.parametrize("sign,planet", tuple(product(SIGNS, REFERENCE["planets"])))
 def test_sign_conditions_against_manually_transcribed_primary_text(sign, planet):
     code = REFERENCE["rows"][sign][REFERENCE["planets"].index(planet)]
     expected = [

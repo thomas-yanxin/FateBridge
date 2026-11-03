@@ -26,7 +26,7 @@ ORACLE = json.loads((FIXTURES / "jyotish-balas-reference.json").read_text())
 
 
 @pytest.mark.parametrize(
-    "angle,expected", zip(PRIMARY["base_angles"], PRIMARY["base_virupa"])
+    "angle,expected", tuple(zip(PRIMARY["base_angles"], PRIMARY["base_virupa"]))
 )
 def test_primary_ordinary_aspect_table(angle, expected):
     assert aspect_value("Sun", 0, angle)["value"] == expected

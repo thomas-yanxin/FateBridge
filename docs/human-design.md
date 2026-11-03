@@ -497,11 +497,11 @@ uv run --locked --extra dev python scripts/build_historical_utc_reference.py --c
 uv run --locked --extra dev pytest -q tests/test_utc1960.py
 uv run --locked --extra dev python scripts/build_utc1960_reference.py /absolute/path/sofa/20231011/c/src --check
 uv run --isolated --no-project --with pyerfa==2.0.1.5 --with jplephem==2.23 --with numpy==2.5.4 python scripts/gen_human_design_node_reference.py --kernel /absolute/path/de440.bsp --check
-uv run --locked --extra dev python scripts/audit_human_design.py --output /tmp/human-design-audit.json
-uv run --locked --extra dev python scripts/audit_human_design.py --require-professional-acceptance
+uv run --locked --extra dev python -m scripts.audit_human_design --output /tmp/human-design-audit.json
+uv run --locked --extra dev python -m scripts.audit_human_design --require-professional-acceptance
 ```
 
-普通审计退出0表示成功产出报告；最后一条应退出1，保留三项专业目标尚未完成的状态；现实预测另行记录，不替代或阻塞三项专业验收。本次审计快照（本地数据：`validation/human-design-audit.json`）包括实现与参考的散列，不以软件测试通过数换算原典或预测分数。
+普通审计写出报告后，仍按日历、扩展历法参考和2024原例检查的失败状态决定是否退出1；报告文件存在不等于数值检查通过。最后一条还要求完整三项专业验收，目前应退出1，保留专业目标尚未完成的状态；现实预测另行记录，不替代或阻塞三项专业验收。本次审计快照（本地数据：`validation/human-design-audit.json`）包括实现与参考的散列，不以软件测试通过数换算原典或预测分数。
 
 SOFA参考维护命令需可用的C编译器；生成器核验官方发布的8个源文件／头文件散列，不导入FateBridge或Swiss。普通测试使用冻结数值事实，无需下载、编译或新增运行依赖。SOFA源文件本身不随FateBridge分发。
 

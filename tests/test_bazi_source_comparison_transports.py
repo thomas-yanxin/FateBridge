@@ -57,7 +57,7 @@ def test_same_literal_comparison_full_and_published_view_on_three_surfaces(
         assert result["source_comparison"]["status"] == expected
         assert (
             result["current_calculation"]["method_id"]
-            == "season_root_revelation_relations_v10"
+            == "season_root_revelation_relations_v11"
         )
         assert result["source_comparison"]["calculation_overridden"] is False
         assert (

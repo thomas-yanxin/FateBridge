@@ -88,6 +88,36 @@ def test_bad_calendar_coordinates_fail_identically(monkeypatch, capsys, changes)
     assert all("run_metadata" not in output for output in outputs)
 
 
+@pytest.mark.parametrize(
+    "date,time,reason",
+    [
+        ("2024-03-10", "02:30", "nonexistent local time"),
+        ("2024-11-03", "01:30", "ambiguous local time"),
+    ],
+)
+@pytest.mark.parametrize("time_alg", [0, 1])
+def test_nongli_rejects_unresolved_civil_clock_on_every_transport(
+    monkeypatch, capsys, date, time, reason, time_alg
+):
+    response, code, protocol, outputs = invoke(
+        "nongli_time",
+        {
+            "date": date,
+            "time": time,
+            "zone": "America/New_York",
+            "time_alg": time_alg,
+        },
+        monkeypatch,
+        capsys,
+    )
+    assert response.status_code == 400 and code == 1 and protocol.is_error
+    for output in outputs:
+        assert output["error_code"] == "validation_error"
+        assert output["retryable"] is False
+        assert reason in output["error"]
+        assert "run_metadata" not in output
+
+
 def test_unknown_gender_love_score_is_neutral_on_every_transport(monkeypatch, capsys):
     response, code, protocol, outputs = invoke(
         "liushi_analysis",
@@ -167,3 +197,11 @@ def test_birth_strength_uses_one_assessment_on_every_transport(monkeypatch, caps
         assert "element_relations" not in birth
         assessment = birth["day_master"]["assessment"]
         assert set(assessment["effective_elements"]) == {"木", "火", "土", "金", "水"}
+        assert assessment["method_id"] == "season_root_revelation_relations_v11"
+        assert assessment["seasonal_phases"] == {
+            "木": "休",
+            "火": "旺",
+            "土": "相",
+            "金": "死",
+            "水": "囚",
+        }

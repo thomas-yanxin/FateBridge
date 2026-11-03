@@ -1269,7 +1269,8 @@ def test_normalize_date_text_zero_pads_single_digits() -> None:
 def test_normalize_time_text_zero_pads_hours_and_seconds() -> None:
     assert _normalize_time_text("9:15") == "09:15:00"
     assert _normalize_time_text("9:5:3") == "09:05:03"
-    assert _normalize_time_text("") == "00:00:00"
+    with pytest.raises(ValueError, match="time"):
+        _normalize_time_text("")
     assert _normalize_time_text("12:00:00") == "12:00:00"
 
 

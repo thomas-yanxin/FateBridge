@@ -510,7 +510,7 @@ uv run --locked --extra dev python scripts/build_sukuyo_japanese_calendar.py --c
 uv run --locked --extra dev python scripts/build_sukuyo_historical_calendar.py --check
 uv run --locked --extra dev python scripts/check_sukuyo_historical_daily.py
 uv run --locked --extra dev python scripts/audit_sukuyo_taibai_primary.py
-uv run --locked --extra dev python scripts/audit_sukuyo.py --output /tmp/sukuyo-audit.json
+uv run --locked --extra dev python -m scripts.audit_sukuyo --output /tmp/sukuyo-audit.json
 uv run --locked --extra dev pytest -q tests/test_sukuyo_boundary_receipts.py tests/test_sukuyo.py tests/test_sukuyo_depth.py tests/test_sukuyo_calendar_text.py tests/test_sukuyo_time_gloss.py tests/test_sukuyo_directions.py tests/test_sukuyo_special_days.py tests/test_sukuyo_profiles.py tests/test_sukuyo_lower.py tests/test_sukuyo_lower_methods.py tests/test_sukuyo_padas.py tests/test_sukuyo_rule_scope.py tests/test_sukuyo_date_support.py tests/test_sukuyo_study.py tests/test_sukuyo_transports.py
 uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 ```

@@ -312,7 +312,7 @@ uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 git diff --check
 ```
 
-`check_docs.py` 只使用标准库，默认检查根目录、`docs/` 中的当前维护文档与 `skills/` 的 Markdown 内联链接、本地标题锚点、代码围栏、JSON 代码块及示例 JSON 语法。`docs/validation/` 中的历史记录、冻结源码与第三方文档保留原文，使用 `--include-archives` 单独检查；当前文档指向历史材料的文件和标题仍须存在。本地 `reviews/` 始终排除。它不访问外网，不执行代码块，也不证明自然语言或接口参数正确；外部来源保留版本，按受影响内容另行核对。CI 由 `locked` 作业执行当前维护文档检查。
+`check_docs.py` 只使用标准库，默认检查根目录、`docs/` 中的当前维护文档与 `skills/` 的 Markdown 内联链接、本地标题锚点、代码围栏、JSON 代码块及示例 JSON 语法。`docs/validation/` 中的历史记录、冻结源码与第三方文档保留原文，使用 `--include-archives` 单独检查；当前文档指向历史材料的文件和标题仍须存在。本地 `reviews/` 始终排除。它不访问外网，不执行代码块，也不证明自然语言或接口参数正确；外部来源保留版本，按受影响内容另行核对。CI 由 `quality` 作业执行当前维护文档检查。
 
 现有文档测试把计数、路由覆盖、技能与生成合同关联到实时目录；`test_skills_engine_contract.py` 还会实际执行 CLI 示例，绑定测试进程解释器。修改可运行请求时，按[示例索引](examples/README.md)选择对应工具，验证模型与实际结果；结构校验成功不能替代三端或真实模型体验。
 

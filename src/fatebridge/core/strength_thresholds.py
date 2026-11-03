@@ -7,8 +7,8 @@ combination, root qualification or classical formation should be effective.
 from fractions import Fraction
 from typing import Any, Mapping, Sequence
 
+from fatebridge.core.root_budget import initial_hidden_budgets
 from fatebridge.utils.data import (
-    BRANCH_HIDDEN_STEMS,
     GENERATION_CYCLE,
     STEM_ELEMENTS,
     Element,
@@ -24,21 +24,25 @@ def exact_threshold_decision(
     parameters: Mapping[str, float],
     relations: Sequence[Mapping[str, Any]],
     float_numerical_label: str,
+    *,
+    external_root_retention: Mapping[str, Mapping[Element, Fraction]] | None = None,
+    external_stem_retention: Mapping[str, Fraction] | None = None,
+    include_hidden_ledger: bool = False,
 ) -> dict[str, Any]:
     """Compare declared decimal coefficients without widening their thresholds."""
     q = {key: Fraction(str(value)) for key, value in parameters.items()}
     # Entries keep their original stem identity; None denotes synthetic budget.
-    tokens: dict[str, list[list[Any]]] = {}
+    initial = initial_hidden_budgets(
+        {name: pillars[name][1] for name in ORDER},
+        {
+            name: q["branch_budget"] * (q["month_multiplier"] if name == "month" else 1)
+            for name in ORDER
+        },
+    )
+    tokens: dict[str, list[list[Any]]] = {
+        name: [list(row) for row in rows] for name, rows in initial.items()
+    }
     losses = {name: {e: Fraction(1) for e in Element} for name in ORDER}
-    for name in ORDER:
-        hidden = BRANCH_HIDDEN_STEMS[pillars[name][1]]
-        weights = [2**rank for rank in reversed(range(len(hidden)))]
-        total = sum(weights)
-        budget = q["branch_budget"] * (q["month_multiplier"] if name == "month" else 1)
-        tokens[name] = [
-            [stem, STEM_ELEMENTS[stem][0], budget * Fraction(weight, total)]
-            for stem, weight in zip(hidden, weights)
-        ]
 
     for event in relations:
         kind, status = event["kind"], event["status"]
@@ -83,6 +87,11 @@ def exact_threshold_decision(
                 for element in Element:
                     losses[name][element] = min(losses[name][element], q["punishment"])
 
+    if external_root_retention is not None:
+        for name, elements in external_root_retention.items():
+            for element, retention in elements.items():
+                losses[name][element] = min(losses[name][element], retention)
+
     factors = {
         element: 1
         + (Fraction(str(phase_factors[phases[element.value]])) - 1)
@@ -92,11 +101,21 @@ def exact_threshold_decision(
     visible = {stem for stem, _ in pillars.values()}
     roots = {e: Fraction(0) for e in Element}
     energy = {e: Fraction(0) for e in Element}
+    hidden_ledger = []
     for name, entries in tokens.items():
         for stem, element, mass in entries:
             remaining = mass * losses[name][element]
             if stem is not None:
                 roots[element] += remaining
+                if include_hidden_ledger:
+                    hidden_ledger.append(
+                        {
+                            "pillar": name,
+                            "stem": stem,
+                            "element": element.value,
+                            "remaining_mass_exact": str(remaining),
+                        }
+                    )
             energy[element] += (
                 remaining
                 * factors[element]
@@ -107,6 +126,9 @@ def exact_threshold_decision(
         if event["kind"] == "天干合" and event["status"] == "binding":
             for name in event["positions"]:
                 binding[name] = q["binding"]
+    if external_stem_retention is not None:
+        for name, retention in external_stem_retention.items():
+            binding[name] = min(binding[name], retention)
     for name, available in binding.items():
         element = STEM_ELEMENTS[pillars[name][0]][0]
         activation = q["floating_stem"] + (q["rooted_stem"] - q["floating_stem"]) * min(
@@ -124,6 +146,7 @@ def exact_threshold_decision(
         else "弱" if share < q["weak_share"] else "中和"
     )
     return {
+        **({"hidden_ledger_exact": hidden_ledger} if include_hidden_ledger else {}),
         "method_id": "exact_rational_strength_thresholds_v1",
         "basis": "declared_decimal_policy_conditioned_on_recorded_relations",
         "day_element": body.value,

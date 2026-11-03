@@ -218,8 +218,9 @@ SPECS = (
         "伤官格兼用财印",
         ("伤官",),
         (WEALTH, SEAL),
-        ("财印干头两清而不相碍", "财太旺或印太重时的调停", "身伤财印相对力量"),
+        ("财印两不相碍的实际作用与位置", "财太旺或印太重时的调停", "身伤财印相对力量"),
         (83, 84),
+        observed_check="wealth_seal_revealed",
     ),
     PathSpec(
         "hurt_officer",
@@ -340,7 +341,25 @@ def build_candidate_selection(
                     "scope": "实际透干或藏干出现；不是得力、透干或制化已成的结论。",
                 }
             )
-        if spec.observed_check == "blade_present":
+        if spec.observed_check == "wealth_seal_revealed":
+            # PDF83–84's 干头两清 is observable; hidden occurrence alone
+            # cannot satisfy it. Revelation does not decide 两不相碍 or force.
+            for name, group in (("wealth", WEALTH), ("seal", SEAL)):
+                refs = [
+                    s["evidence_id"]
+                    for god in group
+                    for s in stars.get(god, [])
+                    if s["location"] == "天干"
+                ]
+                observations.append(
+                    {
+                        "id": f"{name}_revealed_for_combined_wealth_seal",
+                        "status": "matched" if refs else "not_matched",
+                        "star_refs": refs,
+                        "scope": "PDF83–84伤官兼用财印须干头两清；仅核透干，不裁财印不碍、相对力量或成格。",
+                    }
+                )
+        elif spec.observed_check == "blade_present":
             blade = YANG_BLADE_SEATS.get(pillars["day"][0])
             positions = [p for p, (_, b) in pillars.items() if b == blade]
             observations.append(
@@ -427,7 +446,7 @@ def build_candidate_selection(
             }
         )
     return {
-        "method_id": "month_path_conditions_v3",
+        "method_id": "month_path_conditions_v4",
         "source": deepcopy(SOURCE),
         "selected_month": {
             "branch": monthly["month_branch"],

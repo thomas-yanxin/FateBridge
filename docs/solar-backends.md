@@ -17,7 +17,9 @@ export FATEBRIDGE_SOLAR_TERM_MODEL=swiss
 
 每个交点仍返回实际旗标、TT 括区和观测到的行星／月球文件身份；环境回执的 `analytical_fallback_allowed=false` 仅描述选择政策。能使用文件不自动证明任意年份或全部交点达到一秒；数值验收必须同时绑定所用文件、参考和样本。依据为 [Swiss 请求与实际返回模型的区别](https://www.astro.com/swisseph/swephprg.htm)。
 
-同一批冻结96点的当前复核见[数值与失败保留记录](validation/solar-numerics-20261103-v1/report.md)。原1秒 TT 门槛下，严格 Swiss 文件路径无超差，原空目录 Native 对照的12项超差单列保留；这是不同模型的分别验收，不表示 Moshier 系数误差已修复。
+同一批冻结96点的固定版本复核见[数值与失败保留记录](validation/solar-numerics-20261103-v1/report.md)。原1秒 TT 门槛下，严格 Swiss 文件路径无超差，原空目录 Native 对照的12项超差单列保留；这是不同模型的分别验收，不表示 Moshier 系数误差已修复。
+
+当前原生求根回执使用 `native_swiss_tt_solar_bisection_v2`：选择首个达到或越过目标太阳黄经的可表示 TT 浮点点，前一浮点点仍在交点之前，策略为 `first_post_crossing_tt_float`。旧v1回执采用最终括区中点，按原版本保留。该修正约束同一太阳模型数值方程的边界取点，不修正 Moshier 系数，也不把浮点分辨率当作物理精度；上述旧96点报告不据此重写。实现见 [`almanac.py`](../src/fatebridge/core/almanac.py)，同模型前后侧验证见 [`test_native_solar_crossing_side.py`](../tests/test_native_solar_crossing_side.py)。
 
 ## 模型与适用范围
 

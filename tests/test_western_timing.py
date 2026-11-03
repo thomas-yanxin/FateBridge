@@ -84,8 +84,8 @@ def test_lunar_return_governs_analysis_instant():
 
 
 def test_monthly_profection_segments_are_equal_twelfths():
-    # Hellenistic monthly profections divide the profected year into 12 EQUAL
-    # parts (~30.44 days), not unequal calendar months. Every segment must have
+    # The declared monthly policy divides the profected year into 12 equal
+    # elapsed-time parts. Every segment must have
     # the same duration, and exactly one must be active and agree with the
     # annual payload's monthly lord.
     from dateutil import parser as _dtp
@@ -111,8 +111,8 @@ def test_monthly_profection_segments_are_equal_twelfths():
         (_dtp.isoparse(s["end"]) - _dtp.isoparse(s["start"])).total_seconds()
         for s in segments
     ]
-    # All twelfths equal to within a minute (float rounding only).
-    assert max(durations) - min(durations) < 60, durations
+    # Datetime boundaries have microsecond resolution; a minute is not rounding.
+    assert max(durations) - min(durations) <= 1e-6, durations
     active = [s for s in segments if s["active"]]
     assert len(active) == 1
     assert (

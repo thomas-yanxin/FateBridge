@@ -212,12 +212,6 @@ def _flatten_directional_relative_aspects(
     return flattened
 
 
-def _build_relative_midpoint_catalog(
-    target_planets: List[Dict[str, Any]],
-) -> List[Dict[str, Any]]:
-    return [row for _, row in _relative_midpoint_catalog_fraction(target_planets)]
-
-
 def _relative_midpoint_catalog_fraction(
     target_planets: List[Dict[str, Any]],
 ) -> List[Tuple[Fraction, Dict[str, Any]]]:

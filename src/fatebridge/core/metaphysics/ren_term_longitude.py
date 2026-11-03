@@ -9,7 +9,11 @@ from typing import Any
 
 from ...utils.errors import EphemerisSourceError
 from .. import aa1996_solar, analytic_solar, de440_solar, spk_solar, vsop2013_solar
-from ..almanac import SOLAR_TERM_LONGITUDES, SOLAR_TERM_NAMES
+from ..almanac import (
+    NATIVE_SOLAR_ROOT_MODEL_ID,
+    SOLAR_TERM_LONGITUDES,
+    SOLAR_TERM_NAMES,
+)
 from ..ephemeris_runtime import (
     ephemeris_call,
     lock_ephemeris_configuration,
@@ -95,17 +99,25 @@ def _native(
         raise _fail()
     if library_version != str(getattr(swe, "version", "unknown")):
         raise _fail()
-    _source(
-        details,
-        dict(
-            model_id="native_swiss_tt_solar_bisection_v1",
-            ephemeris_model=model,
-            ephemeris_retflags=[expected_flag],
-            ephemeris_library_version=library_version,
-            accuracy_certified=False,
-        ),
-        complete,
+    native_model_id = details.get("model_id", "native_swiss_tt_solar_bisection_v1")
+    if native_model_id not in {
+        "native_swiss_tt_solar_bisection_v1",
+        NATIVE_SOLAR_ROOT_MODEL_ID,
+    }:
+        raise _fail()
+    expected = dict(
+        model_id=native_model_id,
+        ephemeris_model=model,
+        ephemeris_retflags=[expected_flag],
+        ephemeris_library_version=library_version,
+        accuracy_certified=False,
     )
+    if native_model_id == NATIVE_SOLAR_ROOT_MODEL_ID:
+        expected.update(
+            root_selection_policy="first_post_crossing_tt_float",
+            selected_crossing_jd_tt=points[1][0],
+        )
+    _source(details, expected, complete)
     if any(len(point) != 1 for point in points):
         raise _fail()
     with lock_ephemeris_configuration():
@@ -244,7 +256,10 @@ def validate_term_longitude(
             raise _fail()
         if len(values) != 2 or not all(math.isfinite(v) for v in values):
             raise _fail()
-        if provider == "swisseph":
+        if (
+            provider == "swisseph"
+            and details.get("model_id") != NATIVE_SOLAR_ROOT_MODEL_ID
+        ):
             low, high = [(v % 360.0 - target + 540.0) % 360.0 - 180.0 for v in values]
         else:
             low, high = [math.remainder(v - target, 360) for v in values]

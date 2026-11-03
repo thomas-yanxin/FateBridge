@@ -11,6 +11,7 @@ from fatebridge.core.output_hidden_carriers import (
     TemporalHiddenCarrier,
 )
 from fatebridge.core.output_timing_carriers import TimingCarrier, TimingCarrierSummary
+from fatebridge.core.output_timing_strength import TimingStrengthProjection
 from fatebridge.core.timing_roots import BRANCH_RELATION_KINDS
 
 
@@ -90,6 +91,7 @@ class TimingInteractions(PartialOutput):
     hidden_target_carriers: Optional[List[TemporalHiddenCarrier]] = None
     relations: Optional[List[TimingRelation]] = None
     root_context: Optional[TimingRootContext] = None
+    strength_projection: Optional[TimingStrengthProjection] = None
     rulesets: Optional[List[Dict[str, str]]] = None
     rule_trace: Optional[List[str]] = None
     coverage: Optional[Dict[str, List[str]]] = None

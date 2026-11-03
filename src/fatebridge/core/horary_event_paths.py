@@ -207,13 +207,18 @@ def evaluate_event_paths(
                 and event["bodies"] == [applicant]
                 and event["direction"] < 0
             ):
-                recipient_reversed = any(
+                # The recipient must still move forward when the applicant
+                # reverses (p111). Overlapping closed root brackets, including
+                # a station touching the question epoch, cannot establish this
+                # by sorting their rounded representative instants.
+                recipient_reversal_may_precede = any(
                     e["kind"] == "station"
                     and e["bodies"] == [recipient]
-                    and e["julian_day_tt"] <= event["julian_day_tt"]
-                    for e in transitions
+                    and e["epoch_relation"] in {"future", "question_boundary"}
+                    and e["root_bracket_tt"][0] <= event["root_bracket_tt"][1]
+                    for e in events
                 )
-                if not recipient_reversed and (
+                if not recipient_reversal_may_precede and (
                     future is None
                     or event["root_bracket_tt"][1] < future["root_bracket_tt"][0]
                 ):

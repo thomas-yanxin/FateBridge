@@ -34,6 +34,9 @@ def source_catalog() -> tuple[dict[str, Any], dict[tuple[bool, int], Any]]:
 
 
 def count_source_assessment(core: dict[str, Any]) -> dict[str, Any]:
+    from fatebridge.core.metaphysics.taiyi_edition_witness import (
+        edition_comparisons,
+    )
     from fatebridge.core.metaphysics.taiyi_geometry import (
         BRANCHES,
         PALACES,
@@ -89,6 +92,7 @@ def count_source_assessment(core: dict[str, Any]) -> dict[str, Any]:
             "positions": [],
             "counts": [],
             "facsimile_readings": [],
+            "edition_comparisons": [],
             "scope": data["scope"],
         }
     row = rows[(core["yin_dun"], core["kook_number"])]
@@ -197,6 +201,16 @@ def count_source_assessment(core: dict[str, Any]) -> dict[str, Any]:
         "positions": positions,
         "counts": counts,
         "facsimile_readings": [dict(check) for check in row["facsimile_checks"]],
+        "edition_comparisons": edition_comparisons(
+            core["yin_dun"],
+            core["kook_number"],
+            {fact["field"]: fact["actual_value"] for fact in positions}
+            | {fact["field"]: fact["actual_count"] for fact in counts},
+            {fact["field"]: fact["source_value"] for fact in positions}
+            | {fact["field"]: fact["source_table_count"] for fact in counts},
+            {fact["field"]: fact["source_literal"] for fact in positions}
+            | {fact["field"]: str(fact["source_table_count"]) for fact in counts},
+        ),
         "summary": {
             "status": (
                 "differences_unadjudicated"
@@ -252,5 +266,14 @@ def source_alignment_text(assessment: dict[str, Any]) -> str:
             lines.append(
                 f"初录整理误写{check['initial_manual_reading']}；旧转录与图{check['page']}书影均为{check['facsimile_reading']}。此为本次录入错误，不是旧转录错误；初录保留。"
             )
+    for witness in assessment["edition_comparisons"]:
+        facts = {f["field"]: f for f in witness["observations"]}
+        lines.append(
+            f"具名版本旁证：{witness['provider']}藏{witness['source_title']}，{witness['edition']}，"
+            f"阴{witness['ju']}局始击{facts['shiji']['edition_literal']}→{facts['shiji']['edition_value']}，"
+            f"主算{facts['main_count']['edition_value']}、客算{facts['guest_count']['edition_value']}；"
+            f"本盘与该版所选{witness['required_observations']}项相合{witness['matching_current_observations']}项。"
+            + witness["scope"]
+        )
     lines.append(assessment["summary"]["scope"])
     return "\n".join(lines)

@@ -3065,6 +3065,15 @@
           "interaction_analysis.root_context.source",
           "interaction_analysis.root_context.scope"
         ]
+      },
+      "root_effects": {
+        "when": "核对时间支冲刑及唯一大运干五合对原局既有预算的限定投影、来源、同次参数与阻塞关系；其它时间粒度的干合未定量，残存原局数值档不能解释为完整行运后旺衰。",
+        "fields": [
+          "personal_info.analysis_datetime",
+          "interaction_analysis.nodes",
+          "interaction_analysis.relations",
+          "interaction_analysis.strength_projection"
+        ]
       }
     },
     "astro_relative_chart": {

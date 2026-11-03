@@ -62,6 +62,15 @@
       ],
       "when": "核对原局、大运至流时之间的结构关系；关系成立不代表合化或吉凶，按所问时间层筛选"
     },
+    "root_effects": {
+      "fields": [
+        "personal_info.analysis_datetime",
+        "interaction_analysis.nodes",
+        "interaction_analysis.relations",
+        "interaction_analysis.strength_projection"
+      ],
+      "when": "核对时间支冲刑及唯一大运干五合对原局既有预算的限定投影、来源、同次参数与阻塞关系；其它时间粒度的干合未定量，残存原局数值档不能解释为完整行运后旺衰。"
+    },
     "roots": {
       "fields": [
         "personal_info.analysis_datetime",

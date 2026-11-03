@@ -6,7 +6,7 @@ mean ayanamsha from apparent tropical positions leaves nutation unremoved.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import (

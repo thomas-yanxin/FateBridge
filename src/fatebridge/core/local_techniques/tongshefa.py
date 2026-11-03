@@ -146,12 +146,16 @@ def build_tongshefa_result(
     shaoyang: Optional[str] = None,
     shaoyin: Optional[str] = None,
 ) -> Dict[str, Any]:
-    selected = {
-        "taiyin": taiyin if taiyin in BAGUA_BY_NAME else "巽",
-        "taiyang": taiyang if taiyang in BAGUA_BY_NAME else "坤",
-        "shaoyang": shaoyang if shaoyang in BAGUA_BY_NAME else "震",
-        "shaoyin": shaoyin if shaoyin in BAGUA_BY_NAME else "震",
-    }
+    selected = {}
+    for field, value, default in (
+        ("taiyin", taiyin, "巽"),
+        ("taiyang", taiyang, "坤"),
+        ("shaoyang", shaoyang, "震"),
+        ("shaoyin", shaoyin, "震"),
+    ):
+        if value is not None and value not in BAGUA_BY_NAME:
+            raise ValueError(f"{field}必须为乾、兑、离、震、巽、坎、艮或坤")
+        selected[field] = default if value is None else value
     taiyin_gua = _bagua(selected["taiyin"])
     taiyang_gua = _bagua(selected["taiyang"])
     shaoyang_gua = _bagua(selected["shaoyang"])

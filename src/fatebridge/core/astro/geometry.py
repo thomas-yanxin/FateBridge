@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from datetime import datetime, timezone
+from datetime import datetime
 from fractions import Fraction
 from typing import Any, Dict, List, Optional, Union
 
@@ -12,7 +12,6 @@ from fatebridge.core.astro.angle_definitions import ecliptic_horizon_angle_defin
 from fatebridge.core.astro.julian_day import _julian_day
 from fatebridge.core.astro.reference import NAKSHATRAS, SU28
 from fatebridge.core.astrology_tables import SIGNS as SIGNS
-from fatebridge.utils.civil_time import utc_calendar
 from fatebridge.utils.errors import EphemerisSourceError
 
 Angle = Union[float, Fraction]
@@ -163,13 +162,6 @@ def _sector13_for_longitude(longitude: float, ascendant: float) -> int:
     # rounding a negative tiny angle modulo 360 can even produce sector 14.
     relative = (Fraction(longitude) - Fraction(ascendant)) % 360
     return int(relative * 13 // 360) + 1
-
-
-def _midpoint(longitude_a: float, longitude_b: float) -> float:
-    delta = normalize_angle(longitude_b - longitude_a)
-    if delta > 180:
-        delta -= 360
-    return normalize_angle(longitude_a + delta / 2)
 
 
 def native_lahiri_ayanamsha(

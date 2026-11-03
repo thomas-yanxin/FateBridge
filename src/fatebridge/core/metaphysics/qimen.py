@@ -572,13 +572,6 @@ def _qimen_parse_meta(ju_text: str) -> Dict[str, str]:
     }
 
 
-def _qimen_resolve_special_zhishi(
-    *, dun_type: str, current_term: Optional[str] = None
-) -> str:
-    """遁甲演义·时家奇门：天禽为直符时，死门为直使。"""
-    return "死"
-
-
 def _qimen_zhifu_zhishi(
     time_ganzhi: str,
     ju_text: str,

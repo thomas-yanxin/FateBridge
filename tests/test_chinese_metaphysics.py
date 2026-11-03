@@ -893,18 +893,3 @@ def test_ziwei_horoscope_registered_on_all_surfaces():
 
     assert any(getattr(s, "key", None) == "ziwei_horoscope" for s in rest_specs())
     assert any(getattr(s, "mcp_name", None) == "ziwei_horoscope" for s in mcp_specs())
-
-
-def test_qimen_qinxing_zhishi_is_always_death_door():
-    """天禽星作值符时值使门恒为「死」——锁定已验证规则。
-
-    天禽寄坤宫（死门），故禽为值符时值使门恒为死门，与阴/阳遁、节气无关。
-    已对照权威实现 kentang2017/kinqimen 验证：禽为值符的多个时辰/落宫下，
-    其「值使門」均为「死」（如 2024-01-04 多个时辰：禽→中/離/艮/兌，门皆死）。
-    本测试防止该规则被误改或被「补」成随遁向/节气变化的伪逻辑。
-    """
-    from fatebridge.core.metaphysics.qimen import _qimen_resolve_special_zhishi
-
-    assert _qimen_resolve_special_zhishi(dun_type="阳", current_term="冬至") == "死"
-    assert _qimen_resolve_special_zhishi(dun_type="阴", current_term="夏至") == "死"
-    assert _qimen_resolve_special_zhishi(dun_type="阳") == "死"

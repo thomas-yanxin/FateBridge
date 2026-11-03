@@ -8,6 +8,7 @@ from fatebridge.analysis.life_dimensions import LifeDimensionAnalysis
 from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.core.timing_interactions import analyze_timing_interactions
+from fatebridge.core.timing_strength import StrengthProjectionBaseline
 from fatebridge.services.birth_context import BirthComputationContext
 
 logger = logging.getLogger(__name__)
@@ -238,6 +239,7 @@ def build_current_timing_state(
         combined_timing_pillars,
         original_element_counts=birth_context.original_element_counts,
     )
+    natal_assessment = birth_context.element_analysis["day_master"]["assessment"]
 
     return {
         "analysis_date": analysis_date,
@@ -249,7 +251,25 @@ def build_current_timing_state(
         "liushi_analysis": liushi_analysis,
         "combined_effects": combined_effects,
         "interaction_analysis": analyze_timing_interactions(
-            birth_context.birth_pillars, combined_timing_pillars
+            birth_context.birth_pillars,
+            combined_timing_pillars,
+            strength_baseline=StrengthProjectionBaseline(
+                method_id=natal_assessment["method_id"],
+                strength_level=natal_assessment["strength_level"],
+                numerical_label=natal_assessment["threshold_arithmetic"][
+                    "numerical_label"
+                ],
+                support_share_exact=natal_assessment["threshold_arithmetic"][
+                    "share_exact"
+                ],
+                energies_exact=natal_assessment["threshold_arithmetic"][
+                    "energies_exact"
+                ],
+                parameters=natal_assessment["parameters"],
+                seasonal_phases=natal_assessment["seasonal_phases"],
+                seasonal_factors=natal_assessment["seasonal_factors"],
+                relations=natal_assessment["relations"],
+            ),
         ),
         "comprehensive_summary": TimingEffectsAnalysis._generate_comprehensive_summary(
             dayun_analysis,

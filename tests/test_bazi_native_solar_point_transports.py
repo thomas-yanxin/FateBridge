@@ -68,7 +68,8 @@ def test_native_actual_selected_points_are_public_and_identical(
         term = calendar["current_solar_term"]
         details = term["solar_model_details"]
         assert term["resolution_provider"] == "swisseph"
-        assert details["model_id"] == "native_swiss_tt_solar_bisection_v1"
+        assert details["model_id"] == "native_swiss_tt_solar_bisection_v2"
+        assert details["root_selection_policy"] == "first_post_crossing_tt_float"
         assert term["ephemeris_model"] == details["ephemeris_model"] == "moshier"
         assert details["ephemeris_retflags"] == [4]
         assert (
@@ -76,6 +77,7 @@ def test_native_actual_selected_points_are_public_and_identical(
             <= details["selected_crossing_jd_tt"]
             <= details["root_bracket_tt"][1]
         )
+        assert details["selected_crossing_jd_tt"] == details["root_bracket_tt"][1]
         assert details["accuracy_certified"] is False
 
 

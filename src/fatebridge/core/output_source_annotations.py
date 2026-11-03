@@ -13,6 +13,9 @@ from fatebridge.core.output_branch_candidates import (
 )
 from fatebridge.core.output_energy_provenance import EnergyProvenance, bind_assessment
 from fatebridge.core.output_source_conditions import SourceConditionReview
+from fatebridge.core.punishment_resolution import (
+    CURRENT_STRENGTH_METHODS as CURRENT_PUNISHMENT_METHODS,
+)
 from fatebridge.core.punishment_resolution import POLICY as PUNISHMENT_POLICY
 from fatebridge.core.punishment_resolution import (
     PREVIOUS_POLICY as PREVIOUS_PUNISHMENT_POLICY,
@@ -20,7 +23,6 @@ from fatebridge.core.punishment_resolution import (
 from fatebridge.core.punishment_resolution import (
     PREVIOUS_STRENGTH_METHOD as PREVIOUS_PUNISHMENT_METHOD,
 )
-from fatebridge.core.punishment_resolution import STRENGTH_METHOD as PUNISHMENT_METHOD
 
 Grade = Literal["强", "中和", "弱"]
 
@@ -303,11 +305,11 @@ class SourceCurrentCalculation(PartialOutput):
     def preserve_known_punishment_status(self) -> "SourceCurrentCalculation":
         assessment = self.assessment or {}
         method = self.method_id or assessment.get("method_id")
-        if method in {PREVIOUS_PUNISHMENT_METHOD, PUNISHMENT_METHOD}:
+        if method == PREVIOUS_PUNISHMENT_METHOD or method in CURRENT_PUNISHMENT_METHODS:
             policy = assessment.get("punishment_resolution_policy")
             expected_policy = (
                 PUNISHMENT_POLICY
-                if method == PUNISHMENT_METHOD
+                if method in CURRENT_PUNISHMENT_METHODS
                 else PREVIOUS_PUNISHMENT_POLICY
             )
             if policy is not None and policy != expected_policy:

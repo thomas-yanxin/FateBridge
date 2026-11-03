@@ -1,4 +1,4 @@
-"""Current v10 provenance with the unchanged independent score ledgers.
+"""Current v11 provenance with the unchanged independent score ledgers.
 
 The original helper remains sealed as historical evidence. Its numeric checks
 are reused verbatim after separately checking the actual current method ID.
@@ -15,7 +15,7 @@ from tests.fixtures.compatibility import (
 )
 from tests.fixtures.compatibility import reference_dimensions, reference_total
 
-CURRENT_STRENGTH_METHOD_ID = "season_root_revelation_relations_v10"
+CURRENT_STRENGTH_METHOD_ID = "season_root_revelation_relations_v11"
 
 
 def assert_score_reference(summary, detailed_analysis=None, kind="general"):

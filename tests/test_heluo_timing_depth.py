@@ -10,9 +10,6 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core.heluo import (
-    MONTH_GUA,
-    _gua_tables,
-    _short_name,
     calculate,
     gua_lines,
     judge,
@@ -208,10 +205,7 @@ def test_inconsistent_birth_year_and_pillars_cannot_generate_a_plausible_year_la
         )
 
 
-def test_month_table_can_match_all_64_existing_hexagram_names_including_wuwang():
-    assert {_short_name(n) for n in _gua_tables()[0]} == {
-        n for v in MONTH_GUA.values() for n in v
-    }
+def test_month_table_matches_wuwang_through_actual_judge():
     # Test the matching operation independently of the birth calculator.
     chart = example_chart()
     chart["xian"].update(

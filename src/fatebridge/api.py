@@ -24,7 +24,7 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from starlette.concurrency import run_in_threadpool
 from starlette.middleware.base import RequestResponseEndpoint
 from starlette.responses import Response
-from starlette.routing import Match, Route
+from starlette.routing import Match
 
 from fatebridge.utils.runtime import (
     get_api_key_header_name,

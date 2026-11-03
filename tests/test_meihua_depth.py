@@ -112,7 +112,7 @@ def test_original_examples_and_explicit_pure_hexagram_rule(case):
         assert row["body"] == cast["body_trigram"]["name"]
 
 
-@pytest.mark.parametrize("upper,lower", product(DIAGRAMS, repeat=2))
+@pytest.mark.parametrize("upper,lower", tuple(product(DIAGRAMS, repeat=2)))
 def test_all_64_diagrams_and_all_384_single_line_changes(upper, lower):
     base = build_hexagram(upper, lower)
     expected = DIAGRAMS[lower] + DIAGRAMS[upper]

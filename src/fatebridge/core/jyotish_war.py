@@ -156,11 +156,17 @@ def war_bala(
             denominator = abs(Fraction(BIMBA[a]) - Fraction(BIMBA[b]))
             amount = None
             state = pair["status"]
-            if winner is not None and left is not None and right is not None:
-                # Exact input sums; never round a display back into arithmetic.
+            if (
+                left is not None
+                and right is not None
+                and state != "simultaneous_multi_planet_war_unadjudicated"
+            ):
+                # The magnitude does not depend on the unresolved winner.
+                # Multiple simultaneous wars still lack a registered pair rule.
                 amount = float(abs(left - right) / denominator)
                 if not math.isfinite(amount):
                     raise ValueError("War amount exceeds finite numerical range")
+            if winner is not None and amount is not None:
                 loser = b if winner == a else a
                 values[winner], values[loser] = amount, -amount
             else:

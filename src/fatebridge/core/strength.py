@@ -56,7 +56,7 @@ from ..utils.data import (
 )
 
 POSITIONS = ("year", "month", "day", "hour")
-STRENGTH_METHOD_ID = "season_root_revelation_relations_v10"
+STRENGTH_METHOD_ID = "season_root_revelation_relations_v11"
 # Descending geometric rank, normalized to one branch budget; no double 本气 count.
 SHARES = {1: (1.0,), 2: (2 / 3, 1 / 3), 3: (4 / 7, 2 / 7, 1 / 7)}
 PHASE_FACTORS = {"旺": 2.0, "相": 1.5, "休": 1.0, "囚": 0.75, "死": 0.5}
@@ -71,6 +71,12 @@ STEM_PAIRS = {
     )
 }
 SOURCES: list[dict[str, Any]] = [
+    {
+        "id": "sanming_seasonal_phases",
+        "title": "三命通會·論五行旺相休囚死並寄生十二宫",
+        "url": "https://www.shidianguji.com/zh/book/SK1610/chapter/1kf5v6ol1tqg5",
+        "scope": "季相名称的生克对应：克当令者囚、当令所克者死；数值系数仍是工程约定。电子转录不等同书影校勘。",
+    },
     {
         "id": "ditian_complete_same_element_bureau_capacity_v1",
         "title": "任注滴天髓闡微·眾寡（1947年李雨田校訂本PDF268）",

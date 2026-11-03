@@ -51,7 +51,7 @@ def test_primary_complete_formation_survives_same_target_affiliate(
     }
     assert pair["additional_budget"] == 0.0 and pair["calculation_effect"] == "none"
     assert set(pair["outside_positions"]).isdisjoint(seats)
-    assert result["method_id"] == "season_root_revelation_relations_v10"
+    assert result["method_id"] == "season_root_revelation_relations_v11"
     assert "附合" in "\n".join(complete_bureau_snapshot_lines(result))
     natal = build_natal_evidence(chart, strength)
     BaziEvidenceChain.model_validate(natal)

@@ -47,7 +47,7 @@ def test_public_root_qualification_receipt_text_and_claims_match_on_all_transpor
     ]
     assessment = birth["day_master"]["assessment"]
     assert birth["day_master"]["strength"] == "强"
-    assert assessment["method_id"] == "season_root_revelation_relations_v10"
+    assert assessment["method_id"] == "season_root_revelation_relations_v11"
     assert assessment["structural_decision"]["numerical_label"] == "中和"
     assert assessment["structural_decision"]["vigorous_roots"] == ["month", "hour"]
     shared = birth["structure_profile"]["evidence_chain"]["strength_context"]

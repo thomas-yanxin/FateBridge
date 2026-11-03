@@ -85,6 +85,50 @@ class TaiyiSourceAlignmentSummary(PartialOutput):
     scope: Optional[str] = None
 
 
+class TaiyiEditionImage(PartialOutput):
+    book_number: Optional[int] = None
+    image_number: Optional[int] = None
+    url: Optional[str] = None
+    sha256: Optional[str] = None
+
+
+class TaiyiEditionObservation(PartialOutput):
+    field: Optional[str] = None
+    actual_value: Optional[Union[int, str]] = None
+    selected_source_value: Optional[Union[int, str]] = None
+    selected_source_literal: Optional[str] = None
+    edition_value: Optional[Union[int, str]] = None
+    edition_literal: Optional[str] = None
+    matches_current: Optional[bool] = None
+    matches_selected_source: Optional[bool] = None
+
+
+class TaiyiEditionComparison(PartialOutput):
+    source_id: Optional[str] = None
+    source_title: Optional[str] = None
+    classical_author: Optional[str] = None
+    provider: Optional[str] = None
+    catalog_identity: Optional[str] = None
+    catalog_url: Optional[str] = None
+    catalog_sha256: Optional[str] = None
+    edition: Optional[str] = None
+    bibliographic_note: Optional[str] = None
+    chapter_image_url: Optional[str] = None
+    chapter_image_sha256: Optional[str] = None
+    images: Optional[List[TaiyiEditionImage]] = None
+    location: Optional[str] = None
+    yin_dun: Optional[bool] = None
+    ju: Optional[int] = None
+    observations: Optional[List[TaiyiEditionObservation]] = None
+    required_observations: Optional[int] = None
+    matching_current_observations: Optional[int] = None
+    matching_selected_source_observations: Optional[int] = None
+    review_status: Optional[str] = None
+    textual_lineage_independence_established: Optional[bool] = None
+    whole_work_acceptance_passed: Optional[bool] = None
+    scope: Optional[str] = None
+
+
 class TaiyiSourceAlignment(PartialOutput):
     ruleset: Optional[TaiyiSourceAlignmentRuleset] = None
     status: Optional[str] = None
@@ -97,5 +141,6 @@ class TaiyiSourceAlignment(PartialOutput):
     positions: Optional[List[TaiyiSourcePosition]] = None
     counts: Optional[List[TaiyiSourceCount]] = None
     facsimile_readings: Optional[List[TaiyiSourceFacsimileCheck]] = None
+    edition_comparisons: Optional[List[TaiyiEditionComparison]] = None
     summary: Optional[TaiyiSourceAlignmentSummary] = None
     scope: Optional[str] = None

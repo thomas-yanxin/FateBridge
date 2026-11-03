@@ -30,7 +30,9 @@ REFERENCE = json.loads(
 SPEC = next(spec for spec in CATALOG if spec.key == "otherbu")
 
 
-@pytest.mark.parametrize("case,reference", zip(PROTOCOL["cases"], REFERENCE["rows"]))
+@pytest.mark.parametrize(
+    "case,reference", tuple(zip(PROTOCOL["cases"], REFERENCE["rows"]))
+)
 def test_frozen_independent_calendar_reference(case, reference):
     local = datetime.fromisoformat(case["date"] + "T" + case["time"]).replace(
         tzinfo=parse_timezone_name(case["zone"])

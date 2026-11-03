@@ -20,7 +20,9 @@ REFERENCE = json.loads(
 )
 
 
-@pytest.mark.parametrize("planet,house", product(REFERENCE["joy_houses"], range(12)))
+@pytest.mark.parametrize(
+    "planet,house", tuple(product(REFERENCE["joy_houses"], range(12)))
+)
 def test_house_joy_against_lilly_transcription(planet, house):
     result = build_symbolic_evidence(planet, "Virgo", house)
     condition = result["symbolic_details"]["house_condition"]
@@ -85,7 +87,7 @@ def test_text_and_emoji_presentation_do_not_change_the_sign(glyph):
 
 
 @pytest.mark.parametrize(
-    "hsys,zodiacal,time", product([0, 3, 5, 8], [0, 1], ["06:30:00", "00:30:00"])
+    "hsys,zodiacal,time", tuple(product([0, 3, 5, 8], [0, 1], ["06:30:00", "00:30:00"]))
 )
 def test_optional_sky_preserves_canonical_fortune_and_house_assignments(
     hsys, zodiacal, time

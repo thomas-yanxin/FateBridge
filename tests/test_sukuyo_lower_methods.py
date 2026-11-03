@@ -76,17 +76,19 @@ def test_light_heading_is_collated_without_turning_zhen_into_a_sixth_member():
 
 @pytest.mark.parametrize(
     "luminary,title",
-    zip(
-        "日月火水木金土",
-        [
-            "太陽直日",
-            "大陰直日",
-            "熒惑直日",
-            "辰星直日",
-            "歲星直日",
-            "太白直日",
-            "鎮星直日",
-        ],
+    tuple(
+        zip(
+            "日月火水木金土",
+            [
+                "太陽直日",
+                "大陰直日",
+                "熒惑直日",
+                "辰星直日",
+                "歲星直日",
+                "太白直日",
+                "鎮星直日",
+            ],
+        )
     ),
 )
 def test_all_seven_lower_weekday_records_retain_their_own_primary_title(

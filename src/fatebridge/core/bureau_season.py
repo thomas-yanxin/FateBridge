@@ -27,6 +27,7 @@ KNOWN_PHASE_GATES = {
     "season_root_revelation_relations_v8",
     "season_root_revelation_relations_v9",
     "season_root_revelation_relations_v10",
+    "season_root_revelation_relations_v11",
 }
 
 

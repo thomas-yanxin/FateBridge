@@ -3,6 +3,7 @@
 import asyncio
 import copy
 import json
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
@@ -13,6 +14,7 @@ from fatebridge.application.examples import suggested_fields
 from fatebridge.core.bazi_evidence import build_natal_evidence, build_topic_evidence
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.output_bazi_evidence import BaziEvidenceChain
+from fatebridge.core.strength import assess_strength
 from tests.test_agentic_nested_outputs import (
     SPECS,
     business,
@@ -169,7 +171,20 @@ def test_book_weak_label_is_not_replaced_by_modern_strength_as_classical_truth()
     assert (
         condition["model_observation"]["strength_level"] == strength["strength_level"]
     )
-    assert result["strength_context"]["requires_special_structure_review"] is True
+    # v10's reversed summer water phase yielded120/1133 (<3/20).
+    # With 水囚/金死 the same coefficients yield180/1153 (>3/20), so the
+    # engineering extreme flag is false. Neither flag adjudicates the book's
+    # relative-force condition; that condition must remain unknown above.
+    exact = strength["assessment"]["threshold_arithmetic"]
+    assert exact["share_exact"] == "180/1153"
+    assert Fraction(exact["share_exact"]) > Fraction(3, 20)
+    assert result["strength_context"]["requires_special_structure_review"] is False
+    historical = assess_strength(
+        p, {**ElementAnalysis.seasonal_phases("午"), "水": "死", "金": "囚"}
+    )
+    assert historical["threshold_arithmetic"]["share_exact"] == "120/1133"
+    assert Fraction("120/1133") < Fraction(3, 20)
+    assert historical["requires_special_structure_review"] is True
 
 
 def test_spouse_star_only_in_day_palace_is_not_lost():

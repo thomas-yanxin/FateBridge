@@ -246,21 +246,6 @@ def build_analysis_datetime(
     return target
 
 
-def rebuild_local_datetime(moment: datetime, timezone_name: str) -> datetime:
-    # Predictive charts use the target local wall clock at the directed place.
-    tzinfo = parse_timezone_name(timezone_name)
-    return datetime(
-        moment.year,
-        moment.month,
-        moment.day,
-        moment.hour,
-        moment.minute,
-        moment.second,
-        moment.microsecond,
-        tzinfo=tzinfo,
-    )
-
-
 def resolve_local_birthday_anniversary(
     birth_local_datetime: datetime,
     target_year: int,

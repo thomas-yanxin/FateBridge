@@ -22,7 +22,6 @@ from fatebridge.core.heluo import (
     _reduce_di,
     _reduce_tian,
     _wu_ji_gong,
-    _yuan_tang,
 )
 from fatebridge.core.heluo import calculate as heluo
 from fatebridge.core.heluo import (
@@ -34,6 +33,7 @@ from fatebridge.core.heluo import (
     transform_houtian,
     yao_text,
 )
+from fatebridge.core.heluo_yuantang import placement
 from fatebridge.core.zhouyi import classical_hexagram
 from fatebridge.services.divination import (
     calculate_canping_analysis,
@@ -181,9 +181,7 @@ def test_middle_yuan_yin_male_yang_female_and_pre_lichun_cycle_year():
 )
 def test_yuantang_explicit_tables_from_volume_one(up, low, hours, expected):
     lines = gua_lines(up, low)
-    assert [
-        _yuan_tang(lines, h, True, {"up": up, "yangLing": True}) for h in hours
-    ] == expected
+    assert [placement(lines, h, True, True)["selected_pos"] for h in hours] == expected
 
 
 @pytest.mark.parametrize(
@@ -200,7 +198,7 @@ def test_yuantang_explicit_tables_from_volume_one(up, low, hours, expected):
 def test_pure_hexagrams_have_separate_sex_and_solstice_tables(up, male, yang, expected):
     lines = gua_lines(up, up)
     assert [
-        _yuan_tang(lines, h, male, {"up": up, "yangLing": yang}) for h in BRANCHES
+        placement(lines, h, male, yang)["selected_pos"] for h in BRANCHES
     ] == expected
 
 

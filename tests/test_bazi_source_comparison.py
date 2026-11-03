@@ -243,7 +243,7 @@ def test_all349_v6_v7_receipts_replay_and_current_matches_before_refactor():
             assert "error" not in result, result
             current = result["current_calculation"]
             assessment = current["assessment"]
-            assert current["method_id"] == "season_root_revelation_relations_v10"
+            assert current["method_id"] == "season_root_revelation_relations_v11"
             # The source lookup never selects or replaces the computed grade.
             assert assessment == assess_strength(pillars, phases)
             assert current == accepted[row["group"], row["id"]]

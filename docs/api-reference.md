@@ -150,7 +150,7 @@ REST OpenAPI、MCP `tools/list`、`/api/tools` 和 CLI `describe` 发布中央�
 
 ### 2.4 三端能力边界
 
-中央目录含 93 条记录；REST 默认公开 88 项，MCP 默认公开 89 项，CLI 可执行 92 条目录命令（另有 `list`、`discover`、`describe`、`profile`）。13 个 family 的能力矩阵按 MCP 集合统计，不能把目录长度当作单端工具数。
+中央目录含 93 条记录；REST 默认公开 91 项，MCP 默认公开 92 项，CLI 可执行 92 条目录命令（另有 `list`、`discover`、`describe`、`profile`）。13 个 family 的能力矩阵按 MCP 集合统计，不能把目录长度当作单端工具数。
 
 | 能力 | REST | MCP / CLI | 差异 |
 | --- | --- | --- | --- |
@@ -416,6 +416,8 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 
 综合时运的 `interaction_analysis.root_context` 分列日主在时运支的根类与运干在原局四支的根类，复用原局根类规则并引用同次地支关系。`roots`、`stem_roots` 是字段视图名；`effective_force_status=not_adjudicated` 表示尚未裁定作用后的旺衰，流月不替换原局月令。字段和来源见[岁运根类与根位触点](bazi-timing.md#岁运根类与根位触点)。
 
+`interaction_analysis.strength_projection` 另提供单层时间支冲刑及唯一大运干五合对原局既有预算的限定投影，字段视图为 `root_effects`。运干数值作用仅限大运、非日干、唯一配对且无争合；其它时间粒度出现干合或合会未解时返回 `blocked`。来源与既有工程系数分别保留，`residual_natal_numerical_label` 仅属残存原局预算，完整行运后旺衰仍为 `not_adjudicated`，不能据此推导吉凶。详见[限定投影](bazi-timing.md#单层岁运支对原局根预算的限定投影)。
+
 ### 4.3 Calendar / knowledge / export helper
 
 | 方法 | 路径 | 说明 |
@@ -560,6 +562,8 @@ REST 在 JSON 请求体传入这五项，MCP 使用同名参数，CLI 使用
 `--analysis-year/month/day/hour/minute` 对应的独立开关。实际采用时刻见
 `analysis_context.analysis_datetime`，行运地点的时刻见聚合结果的
 `transits.current_transit.analysis_datetime` 或独立工具的 `transit.analysis_datetime`。
+
+`profection`、`givenyear` 和综合推运的月小限采用周年区间的 UTC 时长十二等分；2 月 29 日出生者在平年采用 2 月 28 日，闰年恢复原生日。年区间、月段端点和活动月序共用该口径，见[年小限与月段边界](western-astrology.md#年小限与月段边界)。
 
 ### 4.8 事件占星（事件盘）
 

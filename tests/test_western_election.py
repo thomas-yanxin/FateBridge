@@ -1,7 +1,7 @@
 """
 Tests for the 择日 (electional) engine.
 
-The scoring primitives (dignity, void-of-course, verdict banding, angular gap)
+The scoring primitives (dignity, void-of-course and verdict banding)
 are pure and pinned exactly; the service-level tests assert structural facts
 (topic → significator/house, valid verdict, hard-block routing) rather than
 ephemeris-sensitive exact scores — the byte-level output is golden-locked.
@@ -9,7 +9,6 @@ ephemeris-sensitive exact scores — the byte-level output is golden-locked.
 
 from fatebridge.core.astrology_election import (
     TOPIC_MASTER,
-    _angular_gap,
     _dignity,
     _moon_void_of_course,
     _verdict,
@@ -34,11 +33,6 @@ def test_dignity_table():
     # Saturn at Sagittarius27 has a face in Lilly's table. Sign alone cannot
     # establish peregrine; the election score only consumes major dignities.
     assert _dignity("Saturn", "Sagittarius") == "no_major_dignity"
-
-
-def test_angular_gap_wraps():
-    assert _angular_gap(10.0, 350.0) == 20.0
-    assert _angular_gap(0.0, 180.0) == 180.0
 
 
 def test_verdict_hard_block_overrides_score():

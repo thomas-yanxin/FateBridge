@@ -177,7 +177,9 @@ def calculate_extrareturns(
         for body_name, spec in RETURN_BODIES.items():
             planet_id = int(spec["planet_id"])  # type: ignore[call-overload]
             natal_longitude = planet_longitude_at_utc(
-                planet_id, birth_info.require_utc_datetime
+                planet_id,
+                birth_info.require_utc_datetime,
+                sidereal=zodiac_type == "Sidereal",
             )
             moments = find_planet_returns(
                 planet_id,
@@ -186,6 +188,7 @@ def calculate_extrareturns(
                 reference_utc=reference_utc,
                 past=1,
                 future=1,
+                sidereal=zodiac_type == "Sidereal",
             )
             most_recent = next(
                 (m for m in reversed(moments) if m <= reference_utc), None

@@ -1,7 +1,7 @@
 """Carry original request presence and check the full clock receipt before projection."""
 
 import inspect
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import Any, Callable
 
 from pydantic import BaseModel

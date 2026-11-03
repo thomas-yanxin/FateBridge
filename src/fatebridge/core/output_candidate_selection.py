@@ -76,6 +76,7 @@ class CandidateSelection(PartialOutput):
             "month_path_conditions_v1",
             "month_path_conditions_v2",
             "month_path_conditions_v3",
+            "month_path_conditions_v4",
         ]
     ] = None
     source: Optional[Dict[str, Any]] = None

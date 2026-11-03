@@ -130,11 +130,6 @@ TOPIC_MASTER: Dict[str, Dict[str, Any]] = {
 BASE_SCORE = 60
 
 
-def _angular_gap(first: float, second: float) -> float:
-    """Display value; decisions compare the exact rational separation."""
-    return float(angular_separation_fraction(first, second))
-
-
 def _dignity(planet: str, sign: str) -> str:
     """Sign-only major dignity; missing minor dignities cannot prove peregrine."""
     opposite = SIGNS[(SIGNS.index(sign) + 6) % 12]

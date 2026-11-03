@@ -273,7 +273,7 @@ uv run --locked --extra dev pytest -q \
   tests/test_other_chart_meridian_houses.py tests/test_other_chart_meridian_transports.py tests/test_other_chart_meridian_native_clock.py \
   tests/test_other_chart_day_meridian.py tests/test_other_chart_solar_arc.py tests/test_other_chart_sensitivity.py \
   tests/test_other_chart_depth.py tests/test_other_chart_schools.py tests/test_other_chart_schools_transports.py
-uv run --locked --extra dev python scripts/audit_other_chart_schools.py \
+uv run --locked --extra dev python -m scripts.audit_other_chart_schools \
   --output docs/validation/other-chart-schools-evidence.json
 uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 ```

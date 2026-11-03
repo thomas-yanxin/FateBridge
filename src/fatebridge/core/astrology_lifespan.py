@@ -31,9 +31,10 @@ assembly and snapshot rendering live in the service layer, mirroring
 
 from __future__ import annotations
 
+from fractions import Fraction
 from typing import Any, Dict, List, Optional
 
-from fatebridge.core.astrology_tables import ELEMENT_BY_SIGN
+from fatebridge.core.astrology_tables import ELEMENT_BY_SIGN, SIGNS
 from fatebridge.core.predictive._common import (
     TIMING_POINT_NAMES,
     collect_aspect_hits,
@@ -469,22 +470,21 @@ def _bound_segments_from(
     directed Ascendant enters that bound.
     """
     segments: List[Dict[str, Any]] = []
-    cursor = 0.0
-    while cursor < span_degrees:
-        directed = longitude_to_point_dict("Ascendant", asc_longitude + cursor)
-        sign_name = directed["sign"]
-        degree_in_sign = directed["degree"]
-        bound = resolve_egyptian_bound(sign_name, degree_in_sign)
-        # Arc remaining until the directed Ascendant leaves this bound.
-        to_boundary = bound["segment_end_degree"] - degree_in_sign
-        if to_boundary <= 1e-9:
-            to_boundary = 30.0 - degree_in_sign  # safety: step into the next sign
+    origin = Fraction(asc_longitude) % 360
+    span = Fraction(span_degrees)
+    cursor = Fraction(0)
+    while cursor < span:
+        directed = (origin + cursor) % 360
+        sign_name = SIGNS[int(directed // 30)]
+        degree_in_sign = directed % 30
+        bound = resolve_egyptian_bound(sign_name, float(degree_in_sign))
+        to_boundary = Fraction(bound["segment_end_degree"]) - degree_in_sign
         segments.append(
             {
                 "bound": bound,
                 "sign": sign_name,
                 "enter_arc": cursor,
-                "exit_arc": min(cursor + to_boundary, span_degrees),
+                "exit_arc": min(cursor + to_boundary, span),
             }
         )
         cursor += to_boundary
@@ -519,7 +519,7 @@ def build_distributions_payload(
             if point_name in ("Ascendant", "Medium_Coeli"):
                 continue
             # Arc from the Ascendant to this body, measured forward.
-            contact_arc = _wrap360(natal_lon - asc_longitude)
+            contact_arc = (Fraction(natal_lon) - Fraction(asc_longitude)) % 360
             if segment["enter_arc"] <= contact_arc < segment["exit_arc"]:
                 participants.append(
                     {
