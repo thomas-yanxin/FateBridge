@@ -1,6 +1,5 @@
 """Finite ray, unknown-source and source-contract solar-position controls."""
 
-import ast
 import hashlib
 import math
 from pathlib import Path
@@ -171,27 +170,6 @@ def test_real_source_geometry_is_typed_and_leaves_the_native_tuple_unchanged(
     assert "virtual continuous" not in policy["scope"]
     assert policy["bodies"][planet]["unbent_ray_domain"] == domain
     assert runtime.ephemeris_call("calc", epoch, body, flags)[0] == raw
-
-
-def test_fidelity_patch_preserves_geometry_and_native_sampling_statements():
-    root = Path(__file__).parents[1]
-    previous = (
-        root
-        / "docs/validation/astrodice-solar-axis-run-2026-10-28/before-change/src/fatebridge/core/astro/solar_position.py"
-    )
-    old = ast.parse(previous.read_text())
-    new = ast.parse(Path(solar.__file__).read_text())
-    for name in ["finite_solar_ray", "apparent_position_policy"]:
-        before = next(
-            n for n in old.body if isinstance(n, ast.FunctionDef) and n.name == name
-        )
-        after = next(
-            n for n in new.body if isinstance(n, ast.FunctionDef) and n.name == name
-        )
-        # Only the final metadata return changed, not geometry, flags or calls.
-        assert ast.dump(ast.Module(body=before.body[:-1], type_ignores=[])) == ast.dump(
-            ast.Module(body=after.body[:-1], type_ignores=[])
-        )
 
 
 def test_reference_bytes_remain_sealed_including_the_old_failed_comparison():

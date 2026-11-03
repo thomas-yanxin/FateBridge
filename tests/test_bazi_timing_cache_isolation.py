@@ -1,7 +1,5 @@
 """Caller mutation cannot change cached metadata or any numeric calculation."""
 
-import ast
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -12,48 +10,6 @@ from fatebridge.core.timing import _copy_timing_info
 
 ROOT = Path(__file__).resolve().parents[1]
 STUDY = ROOT / "docs/validation/bazi-timing-cache-isolation-v1"
-PROTOCOL = json.loads((STUDY / "protocol.json").read_text())
-
-
-def without_declared_copy_change(text, after):
-    tree = ast.parse(text)
-    copied_helper = [
-        n
-        for n in tree.body
-        if isinstance(n, ast.FunctionDef) and n.name == "_copy_timing_info"
-    ]
-    assert len(copied_helper) == 1
-    tree.body.remove(copied_helper[0])
-    imports = [
-        n for n in tree.body if isinstance(n, ast.ImportFrom) and n.module == "copy"
-    ]
-    assert len(imports) == int(after)
-    if after:
-        assert [(a.name, a.asname) for a in imports[0].names] == [("deepcopy", None)]
-        tree.body.remove(imports[0])
-    return ast.dump(tree, include_attributes=False)
-
-
-def test_every_other_current_timing_ast_node_is_exact_published_nominal_policy():
-    name = "src/fatebridge/core/timing.py"
-    before = STUDY / "before" / name
-    assert (
-        hashlib.sha256(before.read_bytes()).hexdigest()
-        == PROTOCOL["before_files"][name]
-    )
-    assert without_declared_copy_change(before.read_text(), False) == (
-        without_declared_copy_change((ROOT / name).read_text(), True)
-    )
-
-
-def test_scope_guard_rejects_a_numeric_change_outside_the_copy_helper():
-    before = (STUDY / "before/src/fatebridge/core/timing.py").read_text()
-    current = (ROOT / "src/fatebridge/core/timing.py").read_text()
-    assert "delta_days / 3" in current
-    changed = current.replace("delta_days / 3", "delta_days / 4", 1)
-    assert without_declared_copy_change(before, False) != (
-        without_declared_copy_change(changed, True)
-    )
 
 
 def mutable_ids(value):

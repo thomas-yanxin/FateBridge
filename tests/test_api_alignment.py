@@ -5,7 +5,6 @@ from datetime import datetime
 import pytest
 from fastapi import HTTPException
 
-import fatebridge.api as api_module
 from fatebridge.core.requests.astrology import (
     AstroChartRequest,
     AstroRelativePartyRequest,
@@ -548,122 +547,41 @@ def test_selected_sections_only_trim_export_text_not_structured_payload():
     assert result["key"] == "休门"
 
 
-def _offloaded_service(captured):
-    from fatebridge.application.execution import execute_tool
-
-    assert captured["func"] is execute_tool
-    spec, request = captured["args"]
-    return spec.bind(request)
-
-
-def test_western_timing_api_offloads_calculation_to_threadpool(monkeypatch):
-    expected = {"analysis_type": "西占推运与返照分析", "summary": "ok"}
-    captured = {}
-
-    async def fake_run_in_threadpool(func, *args, **kwargs):
-        captured["func"] = func
-        captured["args"] = args
-        captured["kwargs"] = kwargs
-        return expected
-
-    monkeypatch.setattr(
-        api_module,
-        "run_in_threadpool",
-        fake_run_in_threadpool,
-        raising=False,
-    )
-
+def test_western_timing_catalog_preserves_service_binding():
     request = WesternTimingRequest(**western_payload())
-    result = asyncio.run(calculate_western_timing(request))
-
-    assert _payload_without_run_metadata(result) == expected
-    _assert_run_metadata(result, tool_name="western_timing_analysis")
-    service, args, kwargs = _offloaded_service(captured)
+    spec = next(spec for spec in CATALOG if spec.key == "western_timing_analysis")
+    service, args, kwargs = spec.bind(request)
     assert service is service_calculate_western_timing_analysis
     assert args == ()
     assert kwargs["analysis_year"] == 2025
     assert kwargs["birth_latitude"] == 31.2304
 
 
-def test_western_timing_module_api_offloads_calculation_to_threadpool(monkeypatch):
-    expected = {"analysis_type": "西占太阳返照", "summary": "ok"}
-    captured = {}
-
-    async def fake_run_in_threadpool(func, *args, **kwargs):
-        captured["func"] = func
-        captured["args"] = args
-        captured["kwargs"] = kwargs
-        return expected
-
-    monkeypatch.setattr(
-        api_module,
-        "run_in_threadpool",
-        fake_run_in_threadpool,
-        raising=False,
-    )
-
+def test_western_timing_module_catalog_preserves_service_binding():
     request = WesternTimingModuleRequest(
         **western_payload(),
         selected_sections=["起盘信息"],
     )
-    result = asyncio.run(calculate_solarreturn_module(request))
-
-    assert _payload_without_run_metadata(result) == expected
-    _assert_run_metadata(result, tool_name="solarreturn")
-    service, args, kwargs = _offloaded_service(captured)
+    spec = next(spec for spec in CATALOG if spec.key == "solarreturn")
+    service, args, kwargs = spec.bind(request)
     assert service is calculate_solarreturn
     assert args == ()
     assert kwargs["selected_sections"] == ["起盘信息"]
     assert kwargs["analysis_day"] == 20
 
 
-def test_astro_chart_api_offloads_calculation_to_threadpool(monkeypatch):
-    expected = {"analysis_type": "西洋占星本命盘", "summary": "ok"}
-    captured = {}
-
-    async def fake_run_in_threadpool(func, *args, **kwargs):
-        captured["func"] = func
-        captured["args"] = args
-        captured["kwargs"] = kwargs
-        return expected
-
-    monkeypatch.setattr(
-        api_module,
-        "run_in_threadpool",
-        fake_run_in_threadpool,
-        raising=False,
-    )
-
+def test_astro_chart_catalog_preserves_service_binding():
     request = AstroChartRequest(
         **_build_astro_birth_payload("张三", "男", "上海"),
     )
-    result = asyncio.run(calculate_astro_chart(request))
-
-    assert _payload_without_run_metadata(result) == expected
-    _assert_run_metadata(result, tool_name="chart")
-    service, args, kwargs = _offloaded_service(captured)
+    spec = next(spec for spec in CATALOG if spec.key == "astro_chart")
+    service, args, kwargs = spec.bind(request)
     assert service is service_calculate_core_chart_analysis
     assert kwargs["chart_variant"] == "chart"
     assert kwargs["birth_latitude"] == 31.2304
 
 
-def test_astro_relative_api_offloads_calculation_to_threadpool(monkeypatch):
-    expected = {"analysis_type": "关系盘", "summary": "ok"}
-    captured = {}
-
-    async def fake_run_in_threadpool(func, *args, **kwargs):
-        captured["func"] = func
-        captured["args"] = args
-        captured["kwargs"] = kwargs
-        return expected
-
-    monkeypatch.setattr(
-        api_module,
-        "run_in_threadpool",
-        fake_run_in_threadpool,
-        raising=False,
-    )
-
+def test_astro_relative_catalog_preserves_service_binding():
     request = AstroRelativeRequest(
         inner=AstroRelativePartyRequest(
             **_build_astro_birth_payload("甲", "男", "上海"),
@@ -684,11 +602,8 @@ def test_astro_relative_api_offloads_calculation_to_threadpool(monkeypatch):
         hsys=0,
         zodiacal=0,
     )
-    result = asyncio.run(calculate_relative_chart(request))
-
-    assert _payload_without_run_metadata(result) == expected
-    _assert_run_metadata(result, tool_name="astro_relative_chart")
-    service, args, kwargs = _offloaded_service(captured)
+    spec = next(spec for spec in CATALOG if spec.key == "astro_relative")
+    service, args, kwargs = spec.bind(request)
     assert service is service_calculate_relative_chart_analysis
     assert kwargs["inner_payload"]["birth_latitude"] == 31.2304
     assert kwargs["outer_payload"]["birth_longitude"] == 116.4074

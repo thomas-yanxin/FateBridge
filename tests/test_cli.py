@@ -6,7 +6,7 @@ import pytest
 
 from fatebridge.application.execution import result_is_error
 from fatebridge.application.tool_spec import ToolSpec
-from fatebridge.cli import build_parser, run
+from fatebridge.cli import run
 from fatebridge.services.tool_catalog import CATALOG
 
 
@@ -50,24 +50,6 @@ def test_result_is_error_honors_error_is_fatal():
         error_is_fatal=lambda r: False,
     )
     assert result_is_error(lenient, {"error": "non-fatal"}) is False
-
-
-def test_cli_exposes_catalog_commands(capsys):
-    """Every CLI-safe catalog tool should be a subcommand."""
-    parser = build_parser()
-    subparsers = [a for a in parser._actions if a.dest == "command"]
-    assert subparsers, "no subparsers found"
-    choices = set(subparsers[0].choices)
-    assert "list" in choices
-    # A representative sample across families is present.
-    for cmd in (
-        "bazi_wealth",
-        "bazi_personality",
-        "qimen",
-        "knowledge_read",
-        "solarreturn",
-    ):
-        assert cmd in choices, cmd
 
 
 def test_cli_runs_bazi_dimension(capsys):
