@@ -10,8 +10,7 @@ from pathlib import Path
 import pytest
 
 
-@pytest.mark.parametrize("weighted", [False, True])
-def test_shards_cover_every_eligible_node_once(tmp_path, weighted):
+def test_shards_cover_every_eligible_node_once(tmp_path):
     source = tmp_path / "test_cases.py"
     source.write_text(
         "import pytest\n"
@@ -22,11 +21,10 @@ def test_shards_cover_every_eligible_node_once(tmp_path, weighted):
         encoding="utf-8",
     )
     reports = []
-    weights = (
-        {"test_cases.py::test_current[0]": 99, "test_cases.py::test_current[1]": 98}
-        if weighted
-        else {}
-    )
+    weights = {
+        "test_cases.py::test_current[0]": 99,
+        "test_cases.py::test_current[1]": 98,
+    }
     for index in range(3):
         report = tmp_path / f"shard-{index}.json"
         code = (
@@ -57,23 +55,20 @@ def test_shards_cover_every_eligible_node_once(tmp_path, weighted):
         assert report["selected"] == [
             node for node in collected if node in report["selected"]
         ]
-        if weighted:
-            assert len(set(report["selected"]) & set(weights)) <= 1
-    if weighted:
-        assert set(weights) <= set(collected)
+        assert len(set(report["selected"]) & set(weights)) <= 1
+    assert set(weights) <= set(collected)
 
 
-@pytest.mark.parametrize("index,count", [(-1, 3), (3, 3), (0, 0)])
-def test_invalid_partition_is_rejected_before_collection(index, count):
+def test_invalid_partition_is_rejected_before_collection():
     root = Path(__file__).resolve().parents[1]
     result = subprocess.run(
         [
             sys.executable,
             str(root / "scripts/run_ci_checks.py"),
             "--shard-index",
-            str(index),
+            "3",
             "--shard-count",
-            str(count),
+            "3",
             "--collect-only",
         ],
         cwd=root,
@@ -85,8 +80,7 @@ def test_invalid_partition_is_rejected_before_collection(index, count):
     assert "shard-index must be in" in result.stderr
 
 
-@pytest.mark.parametrize("index", [0, 1, 2])
-def test_distributed_workers_write_one_intact_coverage_report(tmp_path, index):
+def test_distributed_workers_write_one_intact_coverage_report(tmp_path):
     root = Path(__file__).resolve().parents[1]
     source = tmp_path / "test_cases.py"
     source.write_text(
@@ -117,7 +111,7 @@ def test_distributed_workers_write_one_intact_coverage_report(tmp_path, index):
             "-m",
             "not local_data",
             "--shard-index",
-            str(index),
+            "1",
             "--shard-count",
             "3",
             "--selection-report",

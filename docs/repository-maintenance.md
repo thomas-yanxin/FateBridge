@@ -71,7 +71,7 @@ uv run --locked --extra dev python scripts/run_ci_checks.py
 uv run --locked --extra dev python scripts/check_docs.py
 uv run --locked --extra dev python scripts/check_docs.py --include-archives
 uv run --locked --extra dev python -m pytest -q \
-  tests/test_architecture_boundaries.py tests/test_retired_entries.py \
+  tests/test_architecture_boundaries.py tests/test_runtime_contracts.py \
   tests/test_repository_cleanup.py tests/test_documentation_integrity.py
 ```
 

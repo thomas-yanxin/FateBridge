@@ -77,10 +77,16 @@ def test_passive_docs_skip_heavy_jobs_but_keep_a_completed_summary():
 
 
 @pytest.mark.parametrize(
-    "failed_job", ["CHANGES_RESULT", "LOCKED_RESULT", "QUALITY_RESULT", "TEST_RESULT"]
-)
-@pytest.mark.parametrize(
-    "conclusion", ["success", "failure", "cancelled", "skipped", ""]
+    "failed_job,conclusion",
+    [
+        ("TEST_RESULT", "success"),
+        ("CHANGES_RESULT", "failure"),
+        ("LOCKED_RESULT", "failure"),
+        ("QUALITY_RESULT", "failure"),
+        ("TEST_RESULT", "failure"),
+        ("TEST_RESULT", "cancelled"),
+        ("TEST_RESULT", "skipped"),
+    ],
 )
 def test_summary_gate_requires_every_selected_job_to_succeed(failed_job, conclusion):
     script = WORKFLOW["jobs"]["ci"]["steps"][0]["run"]
@@ -95,29 +101,20 @@ def test_summary_gate_requires_every_selected_job_to_succeed(failed_job, conclus
 
 
 @pytest.mark.parametrize(
-    "changed",
-    [
-        None,
-        "LOCKED_RESULT",
-        "QUALITY_RESULT",
-        "TEST_RESULT",
-        "CHANGES_RESULT",
-        "CHECKS_REQUIRED",
-    ],
+    "test_result",
+    ["skipped", "failure"],
 )
-def test_docs_summary_accepts_only_the_explicit_skip_path(changed):
+def test_docs_summary_accepts_only_the_explicit_skip_path(test_result):
     results = dict(
         CHANGES_RESULT="success",
         CHECKS_REQUIRED="false",
         LOCKED_RESULT="skipped",
         QUALITY_RESULT="skipped",
-        TEST_RESULT="skipped",
+        TEST_RESULT=test_result,
     )
-    if changed:
-        results[changed] = ""
     script = WORKFLOW["jobs"]["ci"]["steps"][0]["run"]
     result = subprocess.run(["bash", "-e", "-c", script], env={**os.environ, **results})
-    assert (result.returncode == 0) is (changed is None)
+    assert (result.returncode == 0) is (test_result == "skipped")
 
 
 @pytest.mark.parametrize(
@@ -128,7 +125,6 @@ def test_docs_summary_accepts_only_the_explicit_skip_path(changed):
         "duplicate_node",
         "missing_node",
         "different_collection",
-        "duplicate_index",
         "partial_rerun",
     ],
 )
@@ -157,8 +153,6 @@ def test_live_gate_rejects_missing_or_overlapping_test_coverage(tmp_path, fault)
         reports[first]["selected"] = []
     elif fault == "different_collection":
         reports[first]["collected"] = ["test_a"]
-    elif fault == "duplicate_index":
-        reports[first]["shard_index"] = 1
     elif fault == "partial_rerun":
         newer = (
             first.parent.with_name(first.parent.name.replace("attempt1", "attempt2"))

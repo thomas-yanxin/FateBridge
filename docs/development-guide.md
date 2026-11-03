@@ -115,7 +115,7 @@ curl http://localhost:8010/health
 | --- | --- |
 | 单个算法或边界条件 | 对应领域测试与独立参考用例 |
 | 请求模型、输出模型或默认值 | `tests/test_full_surface_validation.py`、`tests/test_output_projection_contracts.py` |
-| 模块整理或入口移除 | `tests/test_architecture_boundaries.py`、`tests/test_retired_entries.py` |
+| 模块整理或入口移除 | `tests/test_architecture_boundaries.py`、`tests/test_runtime_contracts.py` |
 | 合同缓存 | `tests/test_schema_cache.py` |
 | 纯文档与导航 | [文档维护与验证](#文档维护与验证)中的检查 |
 
@@ -249,11 +249,11 @@ uv run --locked --extra dev mypy src/fatebridge/
 
 出生公共响应使用 `services.birth_payload.build_destiny_payload`，当前时运状态使用 `services.timing_state.build_current_timing_state`。共享构造器不回调 `calculation`、`bazi`、`compatibility` 或 `timing` 用例服务；快照渲染留在 `timing_snapshots`，节气/农历查询留在 `calendar_tools`。这使计算状态和文本调整能分别维护，同时保持已有公开响应。
 
-结构整理后运行 `uv run --locked --extra dev python -m pytest -q tests/test_architecture_boundaries.py tests/test_retired_entries.py`，并核对全工具输出与发现合同。完整测试和类型检查仍必须通过；不得为纯结构调整重新冻结数值基线。
+结构整理后运行 `uv run --locked --extra dev python -m pytest -q tests/test_architecture_boundaries.py tests/test_runtime_contracts.py`，并核对全工具输出与发现合同。完整测试和类型检查仍必须通过；不得为纯结构调整重新冻结数值基线。
 
 ## 测试策略
 
-测试从已安装的 `src` 包导入，仓库根 `conftest.py` 负责 `tests.*` 命名空间；测试文件不再单独修改 `sys.path`。请求模型从 `core.requests` 领域模块导入，工具实现从定义模块导入。`tests/fixtures/transports.py` 提供已挂载 REST endpoint 查询及原生 FastMCP Client 调用，协议测试检查 text JSON 与 structuredContent 一致。`test_retired_entries.py` 检查旧模块、路由和包装保持移除，并验证原生协议成功/错误响应；`test_request_catalog_isolation.py` 在新进程验证独立嵌套模型 Schema、延迟编译与目录不加载计算引擎。
+测试从已安装的 `src` 包导入，仓库根 `conftest.py` 负责 `tests.*` 命名空间；测试文件不再单独修改 `sys.path`。请求模型从 `core.requests` 领域模块导入，工具实现从定义模块导入。`tests/fixtures/transports.py` 提供已挂载 REST endpoint 查询及原生 FastMCP Client 调用，协议测试检查 text JSON 与 structuredContent 一致。`test_runtime_contracts.py` 验证运行时导入隔离与原生协议成功/错误响应；`test_request_catalog_isolation.py` 在新进程验证独立嵌套模型 Schema、延迟编译与目录不加载计算引擎。
 
 修改合同缓存时运行 `tests/test_schema_cache.py`，检查副本隔离、并发冷启动、同名类／输出覆写、模型重建、失败不缓存及逐次业务执行。不要缓存业务输入或结果。核心数值变更之外的清理，应先保存同环境的业务输出和发现合同，再与修改后结果比较；黄金快照仍需在规定的 Linux 环境完整核对，不应为清理重新冻结。
 

@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CHECKS = (
     "test_architecture_boundaries.py",
-    "test_retired_entries.py",
+    "test_runtime_contracts.py",
     "test_repository_cleanup.py",
     "test_restore_test_data.py",
     "test_private_files.py",

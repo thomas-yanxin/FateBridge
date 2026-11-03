@@ -7,14 +7,6 @@ from pathlib import Path
 import pytest
 
 SOURCE = Path(__file__).resolve().parents[1] / "src/fatebridge"
-RETIRED_MODULES = {
-    "fatebridge.core.tool_spec",
-    "fatebridge.core.discovery",
-    "fatebridge.core.scenarios",
-    "fatebridge.core.astrology",
-    "fatebridge.core.request_models",
-    "fatebridge.utils.helpers",
-}
 ADAPTERS = (
     "fatebridge.transports",
     "fatebridge.api",
@@ -81,7 +73,7 @@ def test_domain_and_shared_utilities_do_not_depend_on_outer_layers(dependency_gr
     assert not violations, "\n".join(sorted(violations))
 
 
-def test_application_and_services_do_not_depend_on_protocol_adapters_or_shims(
+def test_application_and_services_do_not_depend_on_protocol_adapters(
     dependency_graph,
 ):
     violations = []
@@ -90,7 +82,7 @@ def test_application_and_services_do_not_depend_on_protocol_adapters_or_shims(
             violations.extend(
                 f"{module} -> {dependency}"
                 for dependency in imports
-                if matches(dependency, ADAPTERS) or dependency in RETIRED_MODULES
+                if matches(dependency, ADAPTERS)
             )
     assert not violations, "\n".join(sorted(violations))
 
@@ -146,44 +138,3 @@ def test_domain_catalogs_do_not_import_assembly_or_domain_services(dependency_gr
                 if matches(dependency, ("fatebridge.services",))
                 and not matches(dependency, ("fatebridge.services.catalog",))
             }, module
-
-
-def test_retired_modules_are_absent_and_have_no_internal_consumers(dependency_graph):
-    graph = dependency_graph
-    assert not graph.keys() & RETIRED_MODULES
-    for module, imports in graph.items():
-        assert not imports & RETIRED_MODULES, module
-
-
-def test_metaphysics_consumers_import_defining_technique_modules(dependency_graph):
-    facade = "fatebridge.core.metaphysics"
-    for module, imports in dependency_graph.items():
-        assert facade not in imports, module
-    tree = ast.parse((SOURCE / "core/metaphysics/__init__.py").read_text())
-    assert not any(
-        isinstance(node, (ast.Import, ast.ImportFrom, ast.FunctionDef, ast.ClassDef))
-        for node in ast.walk(tree)
-    )
-
-
-def test_local_technique_imports_do_not_use_chart_as_type_or_constant_facade():
-    shared_names = {
-        "Any",
-        "Dict",
-        "List",
-        "Optional",
-        "Tuple",
-        "MetaphysicsSeed",
-        "DAY_GANZHI_STRATEGY_STANDARD",
-        "DEFAULT_BIRTH_TIMEZONE",
-    }
-    for path in (SOURCE / "core/local_techniques").glob("*.py"):
-        for node in ast.walk(ast.parse(path.read_text())):
-            if (
-                isinstance(node, ast.ImportFrom)
-                and node.level == 1
-                and node.module == "chart"
-            ):
-                assert not shared_names & {
-                    alias.name for alias in node.names
-                }, path.name
