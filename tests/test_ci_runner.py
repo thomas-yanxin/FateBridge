@@ -33,7 +33,7 @@ def test_shards_cover_every_eligible_node_once(tmp_path, weighted):
             "import pytest; from pathlib import Path; "
             "from scripts.ci_sharding import CIShard; "
             "raise SystemExit(pytest.main(['-q','-m','not local_data',"
-            f"'--rootdir={str(tmp_path)}',"
+            f"'--rootdir',{str(tmp_path)!r},"
             f"{str(source)!r}], plugins=[CIShard({index},3,Path({str(report)!r}),weights={weights!r})]))"
         )
         result = subprocess.run(
