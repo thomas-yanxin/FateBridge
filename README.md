@@ -489,3 +489,5 @@ CI 在锁定环境、Python 3.10–3.13 最新依赖、最低直接依赖和 Win
 项目代码采用 [Apache-2.0](LICENSE)，第三方组件与来源见 [NOTICE](NOTICE)。依赖与星历数据遵循各自许可，分发或商用集成时需分别核对。
 
 [返回顶部 ↑](#fatebridge)
+
+<!-- CI documentation-filter probe; this branch is not merged. -->
