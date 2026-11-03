@@ -1,6 +1,6 @@
 """Shared explicit source-admission control for Western requests."""
 
-from typing import Any, Literal
+from typing import Any, Literal, TypeGuard
 
 from pydantic import BaseModel, Field
 
@@ -18,7 +18,7 @@ class WesternEphemerisRequest(_DeferredModel):
         return True
 
 
-def uses_western_policy(request: BaseModel) -> bool:
+def uses_western_policy(request: BaseModel) -> TypeGuard[WesternEphemerisRequest]:
     return (
         isinstance(request, WesternEphemerisRequest)
         and request.uses_western_ephemeris_policy()

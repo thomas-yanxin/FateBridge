@@ -89,25 +89,24 @@ app.add_middleware(
 )
 
 
-def _get_env_int(name: str, default: int) -> int:
-    try:
-        return int(os.getenv(name, str(default)))
-    except ValueError:
-        logger.warning("Invalid integer for %s, falling back to %s", name, default)
-        return default
-
-
-def _default_heavy_calc_max_concurrency() -> int:
-    return min(4, max(1, os.cpu_count() or 1))
-
-
-HEAVY_CALC_MAX_CONCURRENCY = max(
-    1,
-    _get_env_int(
+_DEFAULT_HEAVY_CALC_MAX_CONCURRENCY = min(4, max(1, os.cpu_count() or 1))
+try:
+    HEAVY_CALC_MAX_CONCURRENCY = max(
+        1,
+        int(
+            os.getenv(
+                "FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY",
+                str(_DEFAULT_HEAVY_CALC_MAX_CONCURRENCY),
+            )
+        ),
+    )
+except ValueError:
+    logger.warning(
+        "Invalid integer for %s, falling back to %s",
         "FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY",
-        _default_heavy_calc_max_concurrency(),
-    ),
-)
+        _DEFAULT_HEAVY_CALC_MAX_CONCURRENCY,
+    )
+    HEAVY_CALC_MAX_CONCURRENCY = _DEFAULT_HEAVY_CALC_MAX_CONCURRENCY
 HEAVY_CALC_SEMAPHORE: Optional[asyncio.Semaphore] = None
 HEAVY_CALC_SEMAPHORE_LOOP: Optional[asyncio.AbstractEventLoop] = None
 
@@ -414,13 +413,6 @@ def _build_error_detail(result: Dict[str, Any]) -> Dict[str, Any]:
     ).model_dump(exclude_none=True)
 
 
-def _raise_service_http_error(result: Dict[str, Any]) -> None:
-    raise HTTPException(
-        status_code=int(result.get("status_code", 500)),
-        detail=_build_error_detail(result),
-    )
-
-
 @app.exception_handler(RequestValidationError)
 async def _request_validation_error_envelope(
     request: Request, exc: RequestValidationError
@@ -476,16 +468,6 @@ def _get_heavy_calc_semaphore() -> asyncio.Semaphore:
     return HEAVY_CALC_SEMAPHORE
 
 
-async def _run_heavy_calculation(
-    service: Callable[..., Dict[str, Any]],
-    *args: Any,
-    **kwargs: Any,
-) -> Dict[str, Any]:
-    semaphore = _get_heavy_calc_semaphore()
-    async with semaphore:
-        return await run_in_threadpool(service, *args, **kwargs)
-
-
 async def _execute_service(
     service: Callable[..., Dict[str, Any]],
     *args: Any,
@@ -495,12 +477,16 @@ async def _execute_service(
     **kwargs: Any,
 ) -> Dict[str, Any]:
     if cpu_bound:
-        result = await _run_heavy_calculation(service, *args, **kwargs)
+        async with _get_heavy_calc_semaphore():
+            result = await run_in_threadpool(service, *args, **kwargs)
     else:
         result = await run_in_threadpool(service, *args, **kwargs)
     fatal_error = error_is_fatal(result) if error_is_fatal else "error" in result
     if fatal_error:
-        _raise_service_http_error(result)
+        raise HTTPException(
+            status_code=int(result.get("status_code", 500)),
+            detail=_build_error_detail(result),
+        )
     # tool_name is supplied by the catalog registrar (spec.run_metadata_name);
     # the neutral fallback only guards a stray non-catalog caller.
     return attach_run_metadata(result, tool_name=tool_name or "unknown_tool")
