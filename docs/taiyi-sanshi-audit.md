@@ -44,7 +44,7 @@ V39取得金钥匙续集末尾完整积日算例，七个中间数可复算；�
 
 ## 盘面规则与边界
 
-1. **把软件移植一致误当规则正确。** 原有14例 `kintaiyi` 对齐测试仍保留，作为历史软件差分参考；公开入口改用单独实现的原典年计规则，不再称其为完整人道命法。
+1. **把软件移植一致误当规则正确。** 旧 `kintaiyi` 命法移植、常量表及14例软件对齐测试已删除，不再维护旧算法或兼容入口。公开入口使用单独实现的原典规则；历史23/72局、79/144字段的软件对照记录留在原始验收资料中，不再由现行审计重算。现行原典审计继续保留全部来源分歧。
 2. **间神漏加一、同宫算成零。** 卷二例“太乙九宫、天目大义亥”应计 `亥1 + 子8 + 艮3 + 卯4 = 16`。正宫与太乙同宫时按本宫数起算，并用卷三对应局数验证。
 3. **始击机械重复36项表。** 改按“计神加和德，求文昌所临”在十六神上旋转求位。它改变客算，不能只移动展示星标。
 4. **主客算与大将来自不同来源。** 现在大将从本次算数导出。整十取首位，例如卷九第二十五局的客算40、大将4、参将2，不再把所有整十统一置5。
@@ -82,7 +82,7 @@ uv run --locked --extra dev python scripts/audit_taiyi_classical.py \
   --output docs/validation/taiyi-jinjing-v1/report.json
 uv run --locked --extra dev pytest -q \
   tests/test_taiyi_accuracy.py tests/test_taiyi_transports.py \
-  tests/test_taiyi_kintaiyi_parity.py tests/test_metaphysics_lunar_required.py
+  tests/test_metaphysics_lunar_required.py
 ```
 
 审计脚本有未决分歧就返回非零；测试验证审计是否诚实保留这些分歧，所以测试绿色和原典审计失败可以同时成立。测试不得删去失败局或只改分母。

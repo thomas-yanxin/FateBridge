@@ -90,7 +90,7 @@ cp -n .env.example .env
 | `FATEBRIDGE_MCP_FAMILIES` | 空 | MCP 公开的工具分类，逗号分隔；空时保留全部工具，分类拼错阻止启动；不影响 REST / CLI |
 | `FATEBRIDGE_MCP_SCENARIOS` | 空 | MCP 场景 ID，逗号分隔；与 family 配置取交集，空时不限制，拼错阻止启动 |
 | `SE_EPHE_PATH` | 未设置 | 自定义本地星历目录，不在模板内 |
-| `FATEBRIDGE_SOLAR_TERM_MODEL` | `auto` | 当前源码在1800—2200年默认使用随包DE440交节，首尾输入所需相邻年份边界沿用同一模型；`native`、`analytic`、`spk`、`de440`用于明确来源，严格原生JPL优先于`auto` |
+| `FATEBRIDGE_SOLAR_TERM_MODEL` | `auto` | 当前源码在1700—2300年默认使用随包DE440交节，首尾输入所需相邻年份边界沿用对应模型；`swiss`在1800—2200年要求实际Swiss文件模型，缺数据明确失败；`native`保留原生回退，其他具名模型与准备方式见[可选太阳后端](solar-backends.md)，严格原生JPL优先于`auto` |
 | `FATEBRIDGE_SOLAR_SPK_FILE` | 未设置 | 仅显式`spk`模式使用的外部文件，需可选`jpl`依赖；默认随包系数不读取该文件 |
 | `FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY` | `min(4, max(1, CPU 数))` | 单 REST 进程的重计算并发上限，至少为 1；不是请求速率限制 |
 

@@ -62,6 +62,49 @@ def test_large_inventory_keeps_business_and_exact_receipt_in_same_run(store, com
     assert delivery.bound_response(original, 0) is original
 
 
+def test_semicolon_directory_inventory_is_equal_across_transports(
+    monkeypatch, rest, tmp_path, capsys
+):
+    monkeypatch.chdir(tmp_path)
+    for name in ("first", "second"):
+        directory = tmp_path / name
+        directory.mkdir()
+        # Small auxiliary file, tracked by provenance but unused in this chart.
+        (directory / "seasnam.txt").write_text(name)
+    monkeypatch.setenv("SE_EPHE_PATH", "first;second")
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    expected = replay_metadata.ephemeris_inventory()
+    assert set(expected["files"]) == {"0/seasnam.txt", "1/seasnam.txt"}
+    spec = SPECS["bazi_career"]
+    payload = inputs(spec)
+    options = dict(
+        fields=[PATH],
+        strict_fields=True,
+        response_char_limit=0,
+        include_snapshot_text=False,
+    )
+    response = rest.post(spec.rest_path, json=payload, params=options)
+    protocol = asyncio.run(native(spec, payload, **options))
+    code, cli = call_cli(
+        spec,
+        payload,
+        tmp_path,
+        capsys,
+        flags=[
+            "--fields",
+            PATH,
+            "--strict-fields",
+            "true",
+            "--response-char-limit",
+            "0",
+        ],
+    )
+    assert response.status_code == 200 and code == 0 and not protocol.is_error
+    for output in (response.json(), protocol.structured_content, cli):
+        assert output["run_metadata"]["runtime"]["ephemeris"] == expected
+
+
 @pytest.mark.parametrize("limit", [4096, 8192])
 def test_real_career_stays_readable_with_large_inventory_across_transports(
     monkeypatch, limit, rest, tmp_path, capsys, store

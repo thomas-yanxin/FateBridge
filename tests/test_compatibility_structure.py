@@ -89,8 +89,6 @@ def test_build_structure_profile_detects_yang_ren_jia_sha():
         structure_profile["dominant_structure"]["formation_status"] == "not_adjudicated"
     )
     assert structure_profile["dominant_structure"]["useful_ten_gods"] == []
-    assert structure_profile["legacy_dominant_structure"]["label"] == "羊刃驾杀"
-    assert "七杀" in structure_profile["legacy_dominant_structure"]["useful_ten_gods"]
     assert any(
         item["label"] == "羊刃驾杀"
         for item in structure_profile["recognized_structures"]

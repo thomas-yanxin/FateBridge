@@ -1,6 +1,5 @@
 """External phase controls, coupled representations and all old failures."""
 
-import gzip
 import hashlib
 import json
 import shutil
@@ -245,39 +244,6 @@ def test_same_printed_integer_still_has_two_unadjudicated_interpretations(report
     assert not report["source_epoch_identity_adjudicated"]
     assert not report["fixed_day_correction_installed"]
     assert report["new_complete_dated_classical_cases_passed"] == 0
-
-
-def test_current_legacy_auditors_preserve_every_other_field():
-    from scripts.audit_taiyi_day_epoch import audit as old_day
-    from scripts.audit_taiyi_liang_collation import audit as old_liang
-
-    current_path = (
-        ROOT
-        / "tests/fixtures/architecture_refactor_v1/taiyi-day-profiles-before-v9.json.gz"
-    )
-    assert hashlib.sha256(current_path.read_bytes()).hexdigest() == (
-        "ed273220e1aa2b0ff9e62f16cbaf895622fd01c57d7e4ec40915fca7ed12a14c"
-    )
-    current_before = json.loads(gzip.decompress(current_path.read_bytes()))
-    for version, run in [(28, old_day), (31, old_liang)]:
-        actual = run()
-        assert actual == current_before[str(version)]
-        scope = actual.pop("counter_representation_scope")
-        assert not scope["legacy_raw_difference_is_adjudicated_calendar_error"]
-        assert not scope["source_integer_encoding_and_epoch_adjudicated"]
-        before = json.loads(
-            (
-                ROOT
-                / f"docs/validation/taiyi-jinjing-v33/v{version}-corrected-current-report.json"
-            ).read_text()
-        )
-        if "public_current_day_profile" in actual:
-            assert (
-                actual.pop("public_current_day_profile")
-                == current_before[str(version)]["public_current_day_profile"]
-            )
-            before.pop("public_current_day_profile")
-        assert actual == before
 
 
 def test_all27_external_controls_and_failure_exit_remain_visible(report, tmp_path):

@@ -61,6 +61,33 @@
         "interaction_analysis"
       ],
       "when": "核对原局、大运至流时之间的结构关系；关系成立不代表合化或吉凶，按所问时间层筛选"
+    },
+    "roots": {
+      "fields": [
+        "personal_info.analysis_datetime",
+        "interaction_analysis.nodes",
+        "interaction_analysis.relations",
+        "interaction_analysis.root_context.method_id",
+        "interaction_analysis.root_context.month_command_node_id",
+        "interaction_analysis.root_context.day_master_roots",
+        "interaction_analysis.root_context.effective_force_status",
+        "interaction_analysis.root_context.source",
+        "interaction_analysis.root_context.scope"
+      ],
+      "when": "核对日主在时运支的原典根类、真实藏干及同次冲合刑触点；月令仍属原局，阴长生参考不补根，未见根不直接判弱，关系触点不等于有效损益。"
+    },
+    "stem_roots": {
+      "fields": [
+        "personal_info.analysis_datetime",
+        "interaction_analysis.nodes",
+        "interaction_analysis.relations",
+        "interaction_analysis.root_context.method_id",
+        "interaction_analysis.root_context.timing_stem_natal_roots",
+        "interaction_analysis.root_context.effective_force_status",
+        "interaction_analysis.root_context.source",
+        "interaction_analysis.root_context.scope"
+      ],
+      "when": "核对运干在四个原局支的根类及关系触点；共享根位不能重复相加为预算，不据原局根存在宣称已算行运后旺衰。"
     }
   },
   "first_view": {

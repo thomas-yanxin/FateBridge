@@ -50,7 +50,10 @@ def test_deltat_inventory_changes_for_same_size_same_mtime_bytes(environment, na
     assert str(directory) not in str(before)
 
 
-def test_inventory_covers_native_semicolon_search_paths(tmp_path):
+@pytest.mark.parametrize("separator", [";", ";;"])
+def test_inventory_covers_native_semicolon_search_paths(
+    tmp_path, monkeypatch, separator
+):
     from fatebridge.services.replay_metadata import _ephemeris_inventory
 
     a, b = tmp_path / "first", tmp_path / "second"
@@ -58,7 +61,9 @@ def test_inventory_covers_native_semicolon_search_paths(tmp_path):
     b.mkdir()
     (a / "sepl_18.se1").write_bytes(b"synthetic-first-file")
     (b / "sedeltat.txt").write_text("2026 100.0\n")
-    inventory = _ephemeris_inventory(str(a) + ";" + str(b))
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "seasnam.txt").write_text("not in the selected search roots")
+    inventory = _ephemeris_inventory(str(a) + separator + str(b))
     assert set(inventory["files"]) == {"0/sepl_18.se1", "1/sedeltat.txt"}
 
 

@@ -16,6 +16,7 @@ from typing import Any, Dict, Optional
 from fatebridge import __version__
 from fatebridge.application.discovery import select_mcp_specs
 from fatebridge.application.examples import example_input
+from fatebridge.core.ephemeris_paths import ephemeris_search_directories
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.runtime import load_runtime_env
@@ -263,9 +264,8 @@ def diagnose(
         output["fengshui_calendar"] = {
             "active_search_path": active,
             "active_directories": [
-                fengshui_file_status(Path(item))
-                for item in str(active).split(os.pathsep)
-                if active and item
+                fengshui_file_status(item)
+                for item in ephemeris_search_directories(active)
             ],
             "user_cache": fengshui_file_status(user_ephemeris_dir()),
             "setup_argv": [
@@ -298,9 +298,8 @@ def diagnose(
         output["human_design"] = {
             "active_search_path": active,
             "active_directories": [
-                human_design_file_status(Path(item))
-                for item in str(active).split(os.pathsep)
-                if active and item
+                human_design_file_status(item)
+                for item in ephemeris_search_directories(active)
             ],
             "user_cache": human_design_file_status(user_ephemeris_dir()),
             "setup_argv": setup,

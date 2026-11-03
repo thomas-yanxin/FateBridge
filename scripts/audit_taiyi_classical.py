@@ -12,7 +12,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-from fatebridge.core.metaphysics.taiyi import _TaiyiLife
 from fatebridge.core.metaphysics.taiyi_year import RULESET_ID, cyclic_core, yearly_core
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -95,22 +94,10 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     passed_cases = 0
     matching_fields = 0
     checked_fields = 0
-    legacy_matching_cases = 0
-    legacy_matching_fields = 0
     for case in cases:
         if set(case["expected"]) != {"main_count", "guest_count"}:
             raise ValueError("每局必须验收主客两算，不能删除未匹配字段")
         computed = yearly_core(case["year"])
-        # The old public transform's counts did not depend on these pillar
-        # labels; only the frozen year/ju matters for this limited comparison.
-        legacy = _TaiyiLife("甲子", "甲子", "甲子", "甲子", case["year"])
-        legacy_counts = {
-            "main_count": legacy.home_cal(),
-            "guest_count": legacy.away_cal(),
-        }
-        legacy_checks = [legacy_counts[f] == v for f, v in case["expected"].items()]
-        legacy_matching_cases += int(all(legacy_checks))
-        legacy_matching_fields += sum(legacy_checks)
         if computed["kook_number"] != case["ju"]:
             raise ValueError("案例年份与局数不一致")
         ok = True
@@ -143,13 +130,6 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         "matching_cases": passed_cases,
         "checked_fields": checked_fields,
         "matching_fields": matching_fields,
-        "legacy_port_baseline": {
-            "matching_cases": legacy_matching_cases,
-            "total_cases": len(cases),
-            "matching_fields": legacy_matching_fields,
-            "checked_fields": checked_fields,
-            "scope": "same_frozen_main_and_guest_count_table_only",
-        },
         "disagreements": disagreements,
         "classical_acceptance_passed": not disagreements,
         "whole_book_conformance": "not_established",

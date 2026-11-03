@@ -47,6 +47,7 @@ from fatebridge.core.ephemeris_installation import (
     user_ephemeris_dir,
     verified_user_ephemeris_dir,
 )
+from fatebridge.core.ephemeris_paths import ephemeris_search_directories
 
 # Alois Treindl's official mirror serves the raw .se1 files reliably; the
 # astro.com HTTP front returns an HTML page for these same paths.
@@ -288,7 +289,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     cached = verified_user_ephemeris_dir()
     override = os.environ.get("SE_EPHE_PATH")
     if override:
-        chosen = [Path(item).resolve() for item in override.split(os.pathsep) if item]
+        chosen = [item.resolve() for item in ephemeris_search_directories(override)]
         if destination.resolve() in chosen:
             print(
                 "Done. SE_EPHE_PATH already includes this directory; restart FateBridge to reload data."

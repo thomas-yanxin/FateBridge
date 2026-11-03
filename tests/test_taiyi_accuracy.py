@@ -60,8 +60,6 @@ def test_unresolved_cases_are_counted_and_block_classical_acceptance():
     assert {d["ju"] for d in report["disagreements"]} == {39, 50}
     assert report["classical_acceptance_passed"] is False
     assert report["real_world_efficacy"] == "not_tested"
-    assert report["legacy_port_baseline"]["matching_cases"] == 23
-    assert report["legacy_port_baseline"]["matching_fields"] == 79
 
 
 def test_independent_corpus_tampering_is_rejected(tmp_path):

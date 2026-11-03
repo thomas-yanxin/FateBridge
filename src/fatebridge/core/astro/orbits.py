@@ -1,4 +1,8 @@
-"""Offline orbital approximation, independent of chart assembly."""
+"""Offline geocentric orbital approximation, independent of chart assembly.
+
+Paul Schlyter's low-precision formulae: https://stjarnhimlen.se/comp/ppcomp.html
+The Pluto fit is described for about 1800–2100, not the whole public year range.
+"""
 
 from __future__ import annotations
 
@@ -131,7 +135,7 @@ def _moon_state(day_number: float, sun_state: Dict[str, float]) -> Dict[str, flo
     return {"longitude": normalize_angle(longitude), "latitude": latitude}
 
 
-def _pluto_state(day_number: float) -> Dict[str, float]:
+def _pluto_heliocentric_coords(day_number: float) -> Tuple[float, float, float]:
     s = 50.03 + 0.033459652 * day_number
     p = 238.95 + 0.003968789 * day_number
     longitude = (
@@ -168,7 +172,20 @@ def _pluto_state(day_number: float) -> Dict[str, float]:
         - 0.026 * _cos_deg(6 * p)
         + 0.011 * _cos_deg(s - p)
     )
-    return {"longitude": normalize_angle(longitude), "latitude": latitude}
+    radius = (
+        40.72
+        + 6.68 * _sin_deg(p)
+        + 6.90 * _cos_deg(p)
+        - 1.18 * _sin_deg(2 * p)
+        - 0.03 * _cos_deg(2 * p)
+        + 0.15 * _sin_deg(3 * p)
+        - 0.14 * _cos_deg(3 * p)
+    )
+    return (
+        radius * _cos_deg(longitude) * _cos_deg(latitude),
+        radius * _sin_deg(longitude) * _cos_deg(latitude),
+        radius * _sin_deg(latitude),
+    )
 
 
 def _planet_state(
@@ -178,15 +195,19 @@ def _planet_state(
         return {"longitude": sun_state["longitude"], "latitude": 0.0}
     if planet == "Moon":
         return _moon_state(day_number, sun_state)
-    if planet == "Pluto":
-        return _pluto_state(day_number)
     if planet == "North Node":
         return {
             "longitude": normalize_angle(125.1228 - 0.0529538083 * day_number),
             "latitude": 0.0,
         }
 
-    xh, yh, zh = _planet_heliocentric_coords(planet, day_number)
+    # Pluto's Fourier fit is heliocentric too; apply the same Earth-centred
+    # translation as the Keplerian planets instead of returning the raw fit.
+    xh, yh, zh = (
+        _pluto_heliocentric_coords(day_number)
+        if planet == "Pluto"
+        else _planet_heliocentric_coords(planet, day_number)
+    )
     xg = xh + sun_state["x"]
     yg = yh + sun_state["y"]
     zg = zh

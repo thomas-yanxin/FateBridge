@@ -2,14 +2,16 @@
 
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import Field, model_validator
+from pydantic import Field, JsonValue, model_validator
 
 from fatebridge.core.output_base import PartialOutput
+from fatebridge.core.output_classical_roots import ClassicalRoot
 from fatebridge.core.output_hidden_carriers import (
     HiddenCarrierRelations,
     TemporalHiddenCarrier,
 )
 from fatebridge.core.output_timing_carriers import TimingCarrier, TimingCarrierSummary
+from fatebridge.core.timing_roots import BRANCH_RELATION_KINDS
 
 
 class AnalysisReference(PartialOutput):
@@ -58,6 +60,23 @@ class TimingRelation(PartialOutput):
     definition: Optional[str] = None
 
 
+class TimingRootObservation(PartialOutput):
+    stem_node_id: Optional[str] = None
+    branch_node_id: Optional[str] = None
+    classification: Optional[ClassicalRoot] = None
+    branch_relation_ids: Optional[List[str]] = None
+
+
+class TimingRootContext(PartialOutput):
+    method_id: Optional[Literal["natal_timing_root_support_v1"]] = None
+    month_command_node_id: Optional[Literal["natal.month"]] = None
+    day_master_roots: Optional[List[TimingRootObservation]] = None
+    timing_stem_natal_roots: Optional[List[TimingRootObservation]] = None
+    effective_force_status: Optional[Literal["not_adjudicated"]] = None
+    source: Optional[Dict[str, JsonValue]] = None
+    scope: Optional[str] = None
+
+
 class TimingInteractions(PartialOutput):
     method_id: Optional[str] = None
     assessment_status: Optional[str] = None
@@ -70,6 +89,7 @@ class TimingInteractions(PartialOutput):
     hidden_target_reference: Optional[HiddenCarrierRelations] = None
     hidden_target_carriers: Optional[List[TemporalHiddenCarrier]] = None
     relations: Optional[List[TimingRelation]] = None
+    root_context: Optional[TimingRootContext] = None
     rulesets: Optional[List[Dict[str, str]]] = None
     rule_trace: Optional[List[str]] = None
     coverage: Optional[Dict[str, List[str]]] = None
@@ -102,6 +122,47 @@ class TimingInteractions(PartialOutput):
                     and row.external_natal_root_count != len(raw.external_natal_roots)
                 ):
                     raise ValueError("外援根摘要数量必须忠于同次原局根明细")
+        if self.root_context is not None:
+            roots = (self.root_context.day_master_roots or []) + (
+                self.root_context.timing_stem_natal_roots or []
+            )
+            nodes = {n.id: n for n in self.nodes or [] if n.id is not None}
+            relations = {r.id: r for r in self.relations or [] if r.id is not None}
+            for root in roots:
+                for node_id, component in (
+                    (root.stem_node_id, "stem"),
+                    (root.branch_node_id, "branch"),
+                ):
+                    if node_id is None or self.nodes is None:
+                        continue
+                    if node_id not in nodes:
+                        if all(n.id is not None for n in self.nodes):
+                            raise ValueError("时运根气必须引用同次实际节点")
+                        continue
+                    if root.classification is not None:
+                        shown = getattr(root.classification, component)
+                        actual = getattr(nodes[node_id], component)
+                        if shown is not None and actual is not None and shown != actual:
+                            raise ValueError("时运根类必须匹配所引用节点的干支")
+                for relation_id in root.branch_relation_ids or []:
+                    if self.relations is None:
+                        continue
+                    relation = relations.get(relation_id)
+                    if relation is None:
+                        if all(r.id is not None for r in self.relations):
+                            raise ValueError("根位触点必须引用同次地支关系")
+                        continue
+                    if (
+                        relation.rule_id is not None
+                        and relation.rule_id not in BRANCH_RELATION_KINDS
+                    ):
+                        raise ValueError("根位触点必须引用同次地支关系")
+                    if (
+                        root.branch_node_id is not None
+                        and relation.participants is not None
+                        and root.branch_node_id not in relation.participants
+                    ):
+                        raise ValueError("根位触点必须实际包含该地支节点")
         return self
 
 

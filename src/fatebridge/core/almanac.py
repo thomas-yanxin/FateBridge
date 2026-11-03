@@ -901,6 +901,10 @@ def _calculate_solar_terms_for_year(
             utc_moment = _solar_term_utc_via_swe(
                 year, float(target_longitude), linear_utc, provenance
             )
+        if selected_mode == "swiss" and (
+            utc_moment is None or provenance.get("ephemeris_model") != "swieph"
+        ):
+            raise EphemerisSourceError("solar_swiss_files_required")
         provider = (
             "vsop2013"
             if explicit_vsop2013

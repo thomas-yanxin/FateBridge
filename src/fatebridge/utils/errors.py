@@ -164,6 +164,8 @@ class EphemerisSourceError(ValueError):
         "ren_solar_term_point_inconsistent": "Consumed Liu Ren or Jin Kou solar-term numerical TT evidence does not match its bracket or civil instant",
         "solar_de440_invalid": "Packaged DE440 solar coefficients are missing, corrupt, or inconsistent with their declared source",
         "solar_analytic_invalid": "Packaged analytic solar or frame coefficients are missing, corrupt, or differ from the reviewed ERFA source",
+        "solar_swiss_files_required": "Explicit Swiss solar mode requires a solved crossing from Swiss planet and Moon files; analytical or linear fallback is not allowed",
+        "solar_swiss_range": "Explicit Swiss solar mode does not cover the requested derived solar boundary; no shortened horizon or substitute model is returned",
         "solar_de440_range": "Packaged DE440 solar coefficients do not cover the requested TDB epoch including light time",
         "solar_spk_unavailable": "Selected solar SPK file is unavailable",
         "solar_spk_invalid": "Selected solar SPK requires valid type2 Earth, Earth-Moon barycenter and Sun segments in J2000 frame 1",

@@ -54,7 +54,7 @@
 
 ## 岁运关系证据
 
-综合时运的 `interaction_analysis` 采用 `natal_timing_relations_v1`：
+综合时运的 `interaction_analysis` 采用 `natal_timing_relations_v2`：
 
 - 节点区分原局年、月、日、时与大运、流年、流月、流日、流时；重复的同字地支仍保留为不同位置。
 - 每个时间柱列出对日主的透干十神、支中藏干十神及原局同五行根的位置。根的存在与有效根力分开。
@@ -68,6 +68,21 @@
 通用的同柱重见提示也不能替代古籍特定位置下的“伏吟／返吟”判断。
 
 当前年度、月度或小时层同时出现，只说明查询时刻下各层的关系。不能用流时命中解释全年，也不能把年度关系细化成某日必然应验。
+
+### 岁运根类与根位触点
+
+`interaction_analysis.root_context` 使用独立版本 `natal_timing_root_support_v1`，复用原局的 `classify_classical_root`，不另建一套根类表：
+
+- `day_master_roots` 逐层核对日主在大运、流年、流月、流日、流时地支中的根类。
+- `timing_stem_natal_roots` 逐个时间天干核对原局四支，保留禄、阳刃、阳长生、库、余气等分类、实际同气藏干，以及无根／阴长生参考项。
+- 每项用 `stem_node_id`、`branch_node_id` 保留实体位置；重见同字不合并，多干引用同一根位不产生额外预算。`branch_relation_ids` 引用同次关系图中涉及该根位的时运地支关系，不是全部原局关系或损益裁定。
+- `month_command_node_id=natal.month`：流月不替换出生月令，时间柱不拼成本命第五柱重新计旺衰。
+
+来源沿用沈孝瞻《秘本子平真诠》国家图书馆藏本、上海世界图书馆发行本，书影 PDF 第22–23页（印页13–14）；输出保留版本、页码及 SHA-256。所选原页区分根类，不提供数值系数。阴长生名不补造真实藏干，未见根也不能直接判身弱；`effective_force_status=not_adjudicated` 与逐根的 `root_effect_not_adjudicated` 明确保留尚未完成的作用后旺衰。
+
+字段视图 `roots`、`stem_roots` 分别读取这两组证据，并包含所引用的节点与关系；均不是请求参数。超过响应预算时经 `result_delivery` 读取同次结果，不重算补详情。完整快照同时展示日主在时间支中的根类与触点数量，不从关系数量推导吉凶。
+
+2026-11-03 本机回放在修改前后均为27组、367条记录、321个不同输入、24个不同输入分歧，原19例保留；分组结果、原标签及失败集合一致。这是复用既有规则的回归核对，没有新增独立命例或提高旺衰原典符合数。材料保存在本地 `validation/bazi-timing-roots-20261103-v1/`，旧门槛和首败不覆盖。
 
 ## 出生时刻范围与解释忠实
 
@@ -118,7 +133,7 @@ REST 对应 `/api/timing/dayun` 和 `/api/timing/comprehensive`；`fields`、`st
 MCP 对应 `dayun_analysis`、`timing_analysis`，参数来自同一请求模型。
 日期全部省略时，综合、流月、流日、流时及独立大运使用冻结时钟的完整当地瞬间，保留偏移、fold和秒微秒；不再替换为月初、月中或零点。`analysis_reference`记录实际比较时刻与补齐来源。提供部分日期时仍沿用各工具原补齐约定；独立大运缺年取当地当前年，缺月日取1，缺时分取0。显式不存在或重复的分析墙钟须消歧，已确认UTC瞬间通过`as_of`表达并保持出生时区，详见[分析瞬间修复](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-analysis-instant.md)。
 完整导出不投影，按默认响应预算及 `result_delivery` 读取同一run。
-任务字段视图 `interactions` 和 `dayun_timeline` 只是选字段参考，不是新请求参数。
+任务字段视图 `interactions`、`dayun_timeline`、`roots` 和 `stem_roots` 只是选字段参考，不是新请求参数。
 
 ## 验证范围与未决门槛
 

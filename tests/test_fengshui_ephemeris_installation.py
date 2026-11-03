@@ -232,3 +232,22 @@ def test_existing_environment_path_is_not_misreported_as_auto_discovery(
     output = capsys.readouterr().out
     assert "auto-discovers" not in output
     assert ("already includes" if same else "selects another") in output
+
+
+def test_semicolon_search_path_agrees_in_setup_and_domain_diagnostics(
+    profile, monkeypatch, tmp_path, capsys
+):
+    from fatebridge.diagnostics import diagnose
+
+    monkeypatch.chdir(tmp_path)
+    Path("first").mkdir()
+    monkeypatch.setenv("SE_EPHE_PATH", "first;second")
+    assert fetch_ephe.main(["--profile", "fengshui_calendar", "--dest", "second"]) == 0
+    assert "already includes" in capsys.readouterr().out
+    output = diagnose()
+    for key in ("fengshui_calendar", "human_design"):
+        assert [r["directory"] for r in output[key]["active_directories"]] == [
+            "first",
+            "second",
+        ]
+    assert output["fengshui_calendar"]["active_directories"][1]["all_files_verified"]

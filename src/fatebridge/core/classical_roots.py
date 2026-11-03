@@ -5,7 +5,7 @@ and 阴长生. It does not supply numeric coefficients or a universal strong lab
 """
 
 from copy import deepcopy
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Literal, Tuple, TypedDict
 
 from fatebridge.core.classical_stages import (
     LU_SEATS,
@@ -16,9 +16,22 @@ from fatebridge.core.classical_stages import (
 from fatebridge.utils.data import BRANCH_CONFLICTS, BRANCH_HIDDEN_STEMS, STEM_ELEMENTS
 
 PillarMap = Dict[str, Tuple[str, str]]
+SOURCE_ID = "ziping_root_categories_v1"
 
-SOURCE = {
-    "id": "ziping_root_categories_v1",
+
+class RootSource(TypedDict):
+    id: str
+    author: str
+    title: str
+    edition: str
+    url: str
+    pdf_pages: list[int]
+    printed_pages: list[int]
+    source_sha256: str
+
+
+SOURCE: RootSource = {
+    "id": SOURCE_ID,
     "author": "沈孝瞻",
     "title": "秘本子平真诠·论十干得时不旺失时不弱",
     "edition": "国家图书馆藏本，上海世界图书馆发行",
@@ -45,7 +58,20 @@ _RESIDUAL = {"木": "辰", "火": "未", "金": "戌", "水": "丑"}
 _POSITIONS = ("year", "month", "day", "hour")
 
 
-def classify_classical_root(stem: str, branch: str) -> Dict[str, Any]:
+class RootClassification(TypedDict):
+    stem: str
+    branch: str
+    life_stage: str
+    kind: str
+    label: str
+    matching_hidden_stems: list[str]
+    hidden_element_present: bool
+    source_weight_class: str
+    effect_status: Literal["root_effect_not_adjudicated"]
+    source_ref: str
+
+
+def classify_classical_root(stem: str, branch: str) -> RootClassification:
     """Classify one explicit stem/branch without inventing a complete chart."""
     element = STEM_ELEMENTS[stem][0]
     hidden = [s for s in BRANCH_HIDDEN_STEMS[branch] if STEM_ELEMENTS[s][0] == element]
@@ -97,7 +123,7 @@ def classify_classical_root(stem: str, branch: str) -> Dict[str, Any]:
             )
         ),
         "effect_status": "root_effect_not_adjudicated",
-        "source_ref": SOURCE["id"],
+        "source_ref": SOURCE_ID,
     }
 
 

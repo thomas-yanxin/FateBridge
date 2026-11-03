@@ -414,6 +414,8 @@ CLI profile 沿用批量入口，子工具共用 as_of / trace，parent_run_id �
 | `POST` | `/api/timing/liushi` | 流时 |
 | `POST` | `/api/timing/jieqi` | 全年节气节点时间轴 |
 
+综合时运的 `interaction_analysis.root_context` 分列日主在时运支的根类与运干在原局四支的根类，复用原局根类规则并引用同次地支关系。`roots`、`stem_roots` 是字段视图名；`effective_force_status=not_adjudicated` 表示尚未裁定作用后的旺衰，流月不替换原局月令。字段和来源见[岁运根类与根位触点](bazi-timing.md#岁运根类与根位触点)。
+
 ### 4.3 Calendar / knowledge / export helper
 
 | 方法 | 路径 | 说明 |
@@ -872,6 +874,8 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 两数默认开启真太阳时，必须明确`lon`或数值`gps_lon`，GPS字段优先，0°有效；缺经度会报错，不再使用上海缺省值。只有明确选择钟表时才传`use_true_solar_time=false`，此时未给经度输出null。`birth_clock`公开视图读取同次`numerology_evidence.birth_clock`，区分民用时刻、物理UTC瞬间、计算钟面与经度是否使用，见第十二轮核对（本地数据：`validation/numerology-clock-audit.md`）。
 
 `heluo.judge.seasonal_numbers` 返回原始二数的正数比较、绝对数段、十一数式及六个实际节气窗口。原文重叠全部保留；`active` 表示是否落入时窗，`numeric_band_match` 只表示对应绝对数条件，得中未量化时为 `null`。`erShu` 相等标签现为“正数”，超出正数为“有余”；不据此裁定季节得中。公开 `number_conditions` 视图提供该组字段，调用时复制其 `fields`，视图名不是请求参数。
+
+共享太阳模型可显式选 `FATEBRIDGE_SOLAR_TERM_MODEL=swiss`，要求实际 Swiss 文件模型。参评投影若超出该模式的已声明范围，返回 `solar_swiss_range`，完整120年要求不缩短；缺文件返回 `solar_swiss_files_required`。两者均为非重试503。选择范围、文件准备与原失败保留见[严格 Swiss 文件模式](solar-backends.md#严格-swiss-文件模式)。
 
 #### 中国术数独立盘（family `metaphysics`）
 

@@ -995,18 +995,6 @@ class BaZiRules:
         recognized_structures = BaZiRules._build_structure_candidates(pillars, day_stem)
         candidate_selection = build_candidate_selection(pillars)
         selected_month = candidate_selection["selected_month"]
-        if recognized_structures:
-            legacy_dominant_structure = recognized_structures[0]
-        else:
-            legacy_dominant_structure = {
-                "key": "default_support",
-                "label": "扶抑参考",
-                "priority": BaZiRules.STRUCTURE_PRIORITIES["default_support"],
-                "reason": "未识别高影响白名单格局，按日主强弱与五行扶抑作为主判断。",
-                "useful_elements": baseline_useful,
-                "avoid_elements": [],
-                "useful_ten_gods": baseline_useful_ten_gods,
-            }
         dominant_structure = {
             "key": "selected_month_reference",
             "label": selected_month["label"],
@@ -1045,7 +1033,6 @@ class BaZiRules:
         structure_profile: Dict[str, Any] = {
             **resolution,
             "dominant_structure": dominant_structure,
-            "legacy_dominant_structure": legacy_dominant_structure,
             "candidate_selection": candidate_selection,
             "secondary_structures": secondary_structures,
             "secondary_structure_scope": "旧共现候选完整保留，不代表次格成立或已选定取用路径。",

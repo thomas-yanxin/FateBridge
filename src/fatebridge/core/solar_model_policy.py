@@ -8,7 +8,9 @@ from typing import Any, Dict, Tuple
 from fatebridge.core.analytic_solar import MODEL_ID, profile
 
 ENVIRONMENT_NAME = "FATEBRIDGE_SOLAR_TERM_MODEL"
-MODES = frozenset({"auto", "native", "analytic", "spk", "de440", "aa1996", "vsop2013"})
+MODES = frozenset(
+    {"auto", "native", "swiss", "analytic", "spk", "de440", "aa1996", "vsop2013"}
+)
 VALIDATED_SOFTWARE_YEARS = (1800, 2200)
 DE440_SOFTWARE_YEARS = (1700, 2300)
 VSOP2013_SOFTWARE_YEARS = (1700, 2300)
@@ -18,7 +20,7 @@ def solar_model_policy() -> str:
     mode = os.environ.get(ENVIRONMENT_NAME, "auto").strip().lower()
     if mode not in MODES:
         raise ValueError(
-            f"{ENVIRONMENT_NAME} must be auto, native, analytic, spk, de440, aa1996, or vsop2013"
+            f"{ENVIRONMENT_NAME} must be auto, native, swiss, analytic, spk, de440, aa1996, or vsop2013"
         )
     return mode
 
@@ -81,7 +83,13 @@ def solar_model_cache_key(*, year: int | None = None) -> Tuple[Any, ...]:
     # The hash identifies loaded coefficients, as the clock cache identifies
     # its loaded tables. It is not an atomic filesystem-read certificate.
     mode = solar_model_policy()
-    if mode == "native":
+    if mode in {"native", "swiss"}:
+        if (
+            mode == "swiss"
+            and year is not None
+            and not VALIDATED_SOFTWARE_YEARS[0] <= year <= VALIDATED_SOFTWARE_YEARS[1]
+        ):
+            raise ValueError("Explicit Swiss solar mode currently covers1800..2200")
         # Native coefficients live in the selected Swiss library/files. The
         # surrounding solar_term_cache_context already tracks those inputs
         # and the loaded clock tables; ERFA analytic coefficients are unused.
@@ -184,6 +192,15 @@ def solar_model_environment_receipt(
             "sources": receipts,
         }
     key = solar_model_cache_key()
+    if key[0] == "swiss":
+        return {
+            "mode": "swiss",
+            "source_selection": "required_swiss_files",
+            "source_resolution": "configuration_only",
+            "software_input_years": list(VALIDATED_SOFTWARE_YEARS),
+            "analytical_fallback_allowed": False,
+            "scope": "Actual crossings must use SWIEPH and retain observed planet/Moon file contexts. This selection does not certify physical accuracy or atomic file reads.",
+        }
     if key[0] == "native":
         return {
             "mode": "native",

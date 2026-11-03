@@ -1,6 +1,23 @@
 # 可选太阳后端
 
-AA1996 与 VSOP2013 都需要显式构建和配置。它们为节气及领域历法提供具名太阳模型；默认选择仍为 `auto`。先完成[源码环境准备](development-guide.md#环境准备)，再按所选模型构建。外部星历与默认路线见[星历数据与精度](getting-started.md#星历数据与精度)。
+太阳模型由 `FATEBRIDGE_SOLAR_TERM_MODEL` 显式选择，默认仍为 `auto`。`swiss` 要求实际使用 Swiss 文件模型；AA1996 与 VSOP2013 需要另行构建。先完成[源码环境准备](development-guide.md#环境准备)，再按所选模型准备数据。外部星历与默认路线见[星历数据与精度](getting-started.md#星历数据与精度)。
+
+## 严格 Swiss 文件模式
+
+需要原生 Swiss 视位置流程、并希望在缺少文件时停止计算，可选择 `swiss`。公开节气输入为1800—2200年；首尾输入所需1799／2201年边界仅在原上下文内读取，不扩展公开年份。原 `native` 选择继续保留原生回退行为和既有 Moshier 失败。
+
+```bash
+uv run --locked --extra dev python -m fatebridge.fetch_ephe --profile fengshui_calendar
+export FATEBRIDGE_SOLAR_TERM_MODEL=swiss
+```
+
+该文件配置含所需的 `sepl_12`／`semo_12`／`sepl_18`／`semo_18` 分段；自定目录通过 `SE_EPHE_PATH` 选择。严格模式复用现有 TT 求根及文件来源核查，不拟合参考交点，也不修改 Moshier 的系数。缺文件、返回 Moshier 或不能取得交点时，三端返回非重试503及 `solar_swiss_files_required`；无法核查文件来源时保留相应来源错误。与显式原生 JPL 配置冲突时返回配置错误。
+
+参评1800年初所需的1799年立春沿用已核对的相邻年组件；120年投影若越过2201年边界，则返回 `solar_swiss_range`，不交付缩水年序或更换模型。风水等领域另需范围外历史边界时也须按该领域的模型支持范围选择来源，不能从文件存在推定已扩展资格。
+
+每个交点仍返回实际旗标、TT 括区和观测到的行星／月球文件身份；环境回执的 `analytical_fallback_allowed=false` 仅描述选择政策。能使用文件不自动证明任意年份或全部交点达到一秒；数值验收必须同时绑定所用文件、参考和样本。依据为 [Swiss 请求与实际返回模型的区别](https://www.astro.com/swisseph/swephprg.htm)。
+
+同一批冻结96点的当前复核见[数值与失败保留记录](validation/solar-numerics-20261103-v1/report.md)。原1秒 TT 门槛下，严格 Swiss 文件路径无超差，原空目录 Native 对照的12项超差单列保留；这是不同模型的分别验收，不表示 Moshier 系数误差已修复。
 
 ## 模型与适用范围
 

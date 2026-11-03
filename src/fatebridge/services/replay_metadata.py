@@ -3,7 +3,6 @@
 import hashlib
 import os
 import platform
-import re
 from functools import lru_cache
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
@@ -12,6 +11,7 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel
 
 from fatebridge import __version__
+from fatebridge.core.ephemeris_paths import ephemeris_search_directories
 from fatebridge.core.execution_context import CallClock, ExecutionOptions
 from fatebridge.core.reproducibility import BAZI_ANALYSIS_CLOCK_TOOLS
 from fatebridge.core.schema_cache import contract_fingerprint
@@ -82,18 +82,10 @@ def _stat_signature(path: Path) -> tuple[int, ...]:
     return (stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_ino, stat.st_dev)
 
 
-def _ephemeris_directories(directory: Any) -> List[Path]:
-    if not directory:
-        return []
-    separators = r"[;:]" if os.pathsep == ":" else r";"
-    return [Path(item or ".") for item in re.split(separators, str(directory))]
-
-
-def _ephemeris_inventory(directory: Any) -> Dict[str, Any]:
+def _ephemeris_inventory(directory: Optional[str]) -> Dict[str, Any]:
     files: Dict[str, str] = {}
     if directory:
-        # Swiss also accepts semicolons on Unix; preserve Windows drive colons.
-        for index, root in enumerate(_ephemeris_directories(directory)):
+        for index, root in enumerate(ephemeris_search_directories(directory)):
             for path in sorted(root.glob("*.se1")):
                 if path.is_file():
                     files[f"{index}/{path.name}"] = _large_ephemeris_digest(

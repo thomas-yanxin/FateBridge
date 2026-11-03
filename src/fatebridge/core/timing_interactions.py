@@ -18,6 +18,11 @@ from fatebridge.core.timing_carriers import (
     describe_timing_carrier,
     summarize_timing_carriers,
 )
+from fatebridge.core.timing_roots import (
+    BRANCH_RELATION_KINDS,
+    RootRelationReference,
+    build_timing_root_context,
+)
 from fatebridge.utils.data import (
     BRANCH_COMBINATIONS,
     BRANCH_CONFLICTS,
@@ -238,6 +243,15 @@ def analyze_timing_interactions(
             if node["scope"] == "timing"
         ],
         "relations": events,
+        "root_context": build_timing_root_context(
+            natal,
+            timing,
+            [
+                RootRelationReference(id=e["id"], participants=e["participants"])
+                for e in events
+                if e["rule_id"] in BRANCH_RELATION_KINDS
+            ],
+        ),
         "rulesets": [
             {
                 "id": METHOD_ID,
@@ -254,6 +268,7 @@ def analyze_timing_interactions(
                 "透干十神与支中藏干",
                 "原局同五行根的存在",
                 "时运本柱主气生克与真实藏根，区别原局外援",
+                "日主在时运支及运干在原局的原典根类与同次支关系触点",
             ],
             "not_assessed": [
                 "行运后有效旺衰",

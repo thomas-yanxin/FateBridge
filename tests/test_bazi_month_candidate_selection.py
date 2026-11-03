@@ -248,10 +248,6 @@ def test_arbitrary_legacy_priority_cannot_choose_the_source_path_or_promote_usef
         {key: -value for key, value in BaZiRules.STRUCTURE_PRIORITIES.items()},
     )
     after = BaZiRules.chart_useful_profile(pillars)
-    assert (
-        before["legacy_dominant_structure"]["key"]
-        != after["legacy_dominant_structure"]["key"]
-    )
     assert before["dominant_structure"] == after["dominant_structure"]
     assert before["candidate_selection"] == after["candidate_selection"]
     for field in [

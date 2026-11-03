@@ -260,6 +260,7 @@ def test_one_failed_body_and_its_model_project_across_three_transports(
         "zodiacal": zodiacal,
     }
     fields = [
+        "chart.chart.objects",
         "chart.params.chart_profile.engine_precision",
         "chart.params.chart_profile.planetary_models.Sun",
         "chart.params.chart_profile.planetary_models.Pluto",
@@ -286,7 +287,13 @@ def test_one_failed_body_and_its_model_project_across_three_transports(
     async def invoke():
         async with Client(create_mcp_app()) as client:
             result = await client.call_tool(
-                "otherbu", {**inputs, "fields": fields, "strict_fields": True}
+                "otherbu",
+                {
+                    **inputs,
+                    "fields": fields,
+                    "strict_fields": True,
+                    "response_char_limit": 0,
+                },
             )
             assert not result.is_error
             return result.structured_content

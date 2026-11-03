@@ -9,11 +9,9 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
-import re
-from pathlib import Path
 from typing import Any
 
+from .ephemeris_paths import ephemeris_search_directories
 from .ephemeris_runtime import effective_ephemeris_search_path
 from .jpl_ephemeris import configured_jpl_file
 
@@ -49,19 +47,20 @@ def solar_term_cache_context(
     jpl_file = configured_jpl_file()
     from .solar_model_policy import solar_model_cache_key, solar_model_policy
 
-    if (
-        not native_only
-        and jpl_file is not None
-        and solar_model_policy() in {"analytic", "spk", "de440", "aa1996", "vsop2013"}
-    ):
+    mode = "native" if native_only else solar_model_policy()
+    if jpl_file is not None and mode in {
+        "swiss",
+        "analytic",
+        "spk",
+        "de440",
+        "aa1996",
+        "vsop2013",
+    }:
+        label = {"swiss": "Swiss", "vsop2013": "VSOP2013", "aa1996": "AA1996"}.get(
+            mode, "analytic/SPK/DE440"
+        )
         raise ValueError(
-            "Explicit VSOP2013 solar mode conflicts with strict JPL selection"
-            if solar_model_policy() == "vsop2013"
-            else (
-                "Explicit AA1996 solar mode conflicts with strict JPL selection"
-                if solar_model_policy() == "aa1996"
-                else "Explicit analytic/SPK/DE440 solar mode conflicts with strict JPL selection"
-            )
+            f"Explicit {label} solar mode conflicts with strict JPL selection"
         )
     # An explicit native reobservation must not load an unrelated configured
     # analytic/SPK source merely to fingerprint its native data candidates.
@@ -80,13 +79,9 @@ def solar_term_cache_context(
         )
     clock_profile = loaded_clock_profile_key()
     selected = effective_ephemeris_search_path()
-    # Swiss accepts semicolons, and colons on Unix. Do not split a Windows
-    # drive letter on platforms where the path separator is a semicolon.
-    separators = r"[;:]" if os.pathsep == ":" else r";"
-    directories = re.split(separators, selected or ".")
     entries = []
-    for directory in directories:
-        path = Path(directory or ".").absolute()
+    for directory in ephemeris_search_directories(selected or "."):
+        path = directory.absolute()
         files: list[tuple[Any, ...]] = []
         try:
             candidates = {

@@ -14,6 +14,37 @@ SKY = {"date": "2024-03-20", "time": "06:30", "zone": "UTC", "lat": 51.5, "lon":
 APPROXIMATE = "fatebridge_approximate_orbital_model"
 
 
+@pytest.mark.skipif(
+    runtime.swe is None, reason="Independent Moshier reference required"
+)
+@pytest.mark.parametrize(
+    "year,month", list(product((1900, 1950, 2000, 2026, 2050, 2099), (1, 7)))
+)
+def test_pluto_fallback_is_geocentric_against_independent_moshier(year, month):
+    """Bounded 0.05-degree regression, not a full-range accuracy certificate.
+
+    Schlyter section 14 returns heliocentric coordinates and explicitly requires
+    the section 11 Earth-centred conversion. The native reference uses geometric
+    mean-equinox-of-date coordinates, matching that low-precision convention.
+    """
+    from fatebridge.core.astro.orbits import _planet_state, _sun_state
+
+    with runtime.preserve_ephemeris_path():
+        jd = runtime.swe.julday(year, month, 1, 12)
+        reference, flags = runtime.ephemeris_call(
+            "calc_ut",
+            jd,
+            runtime.swe.PLUTO,
+            runtime.swe.FLG_MOSEPH | runtime.swe.FLG_TRUEPOS | runtime.swe.FLG_NONUT,
+        )
+    assert flags & runtime.swe.FLG_MOSEPH
+    d = jd - 2451543.5
+    actual = _planet_state("Pluto", d, _sun_state(d))
+    longitude_error = (actual["longitude"] - reference[0] + 180) % 360 - 180
+    assert abs(longitude_error) < 0.05
+    assert abs(actual["latitude"] - reference[1]) < 0.05
+
+
 @pytest.mark.parametrize(
     "failed_planet,zodiacal", list(product(PLANET_SEQUENCE, [0, 1]))
 )

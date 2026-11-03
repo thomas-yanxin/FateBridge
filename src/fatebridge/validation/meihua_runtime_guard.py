@@ -11,11 +11,11 @@ from typing import Any
 def capture_calendar_runtime() -> dict[str, Any]:
     """Fingerprint the selected configuration without changing native state."""
     from fatebridge.core import ephemeris_runtime
+    from fatebridge.core.ephemeris_paths import ephemeris_search_directories
     from fatebridge.core.jpl_ephemeris import configured_jpl_file
     from fatebridge.core.solar_model_policy import solar_model_environment_receipt
     from fatebridge.core.solar_term_runtime import loaded_clock_profile_key
     from fatebridge.services.replay_metadata import (
-        _ephemeris_directories,
         _ephemeris_inventory,
         _large_ephemeris_digest,
         _stat_signature,
@@ -28,7 +28,7 @@ def capture_calendar_runtime() -> dict[str, Any]:
     jpl_name = configured_jpl_file()
     jpl_inputs = {}
     if jpl_name is not None:
-        for index, directory in enumerate(_ephemeris_directories(selected)):
+        for index, directory in enumerate(ephemeris_search_directories(selected)):
             candidate = directory / jpl_name
             if candidate.is_file():
                 jpl_inputs[f"{index}/{jpl_name}"] = _large_ephemeris_digest(
@@ -43,7 +43,7 @@ def capture_calendar_runtime() -> dict[str, Any]:
     receipt = {
         "guard_id": "meihua_calendar_runtime_guard_v1",
         "effective_search_path_sha256": digest(
-            [str(p.resolve()) for p in _ephemeris_directories(selected)]
+            [str(p.resolve()) for p in ephemeris_search_directories(selected)]
         ),
         "ephemeris_inventory": inventory,
         "configured_native_jpl_filename": jpl_name,

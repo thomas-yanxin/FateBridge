@@ -50,7 +50,6 @@ def test_original_case_preserves_wood_conflict_and_fire_reference():
     assert set(profile["conditional_elements"]) == {"木", "火", "土", "金"}
     # A sensitive baseline supplies no preference; an unadjudicated
     # co-occurrence candidate must not reintroduce automatic useful elements.
-    assert profile["legacy_dominant_structure"]["key"] == "yang_ren_jia_sha"
     assert profile["candidate_selection"]["chosen_path_id"] is None
     assert profile["neutral_elements"] == ["水"]
     wood = next(item for item in profile["conflicts"] if item["element"] == "木")

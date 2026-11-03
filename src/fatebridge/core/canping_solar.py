@@ -195,11 +195,18 @@ def projection_boundary(
         )
     )
     if not extension:
-        term = next(
-            t for t in almanac.get_solar_terms_for_year(year, zone) if t.name == "立春"
-        )
+        if mode == "swiss" and not low_year <= year <= high_year:
+            if year not in {low_year - 1, high_year + 1}:
+                raise EphemerisSourceError("solar_swiss_range")
+            terms = almanac._solar_terms_for_context_year(
+                year, zone, low_year if year < low_year else high_year
+            )
+            selection = "bounded_derived_lichun_event"
+        else:
+            terms = almanac.get_solar_terms_for_year(year, zone)
+            selection = "ordinary_public_year_grid"
+        term = next(t for t in terms if t.name == "立春")
         almanac.require_calculated_solar_term(term)
-        selection = "ordinary_public_year_grid"
     else:
         if (
             not low_year <= year <= high_year

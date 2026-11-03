@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from fatebridge.core.timing_carriers import timing_carrier_snapshot_lines
+from fatebridge.core.timing_roots import timing_root_snapshot_lines
 from fatebridge.services.snapshot_builders import (
     render_snapshot_lines as _render_snapshot_text,
 )
@@ -667,6 +668,10 @@ def _build_comprehensive_timing_snapshot_text(
         "引用：fatebridge.analysis.timing_effects / comprehensive_timing_analysis",
     ]
     impact_lines.extend(timing_carrier_snapshot_lines(interaction_analysis or {}))
+    if interaction_analysis and "root_context" in interaction_analysis:
+        impact_lines.extend(
+            timing_root_snapshot_lines(interaction_analysis["root_context"])
+        )
     return _render_snapshot_text(
         [
             ("查询信息", query_lines),

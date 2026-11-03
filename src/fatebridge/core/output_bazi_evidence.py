@@ -1,9 +1,9 @@
 """Published, projection-compatible contracts for position-aware BaZi facts."""
 
 from fractions import Fraction
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
 
 from fatebridge.core.output_base import PartialOutput
 from fatebridge.core.output_branch_candidates import (
@@ -360,75 +360,9 @@ class BaziEvidenceChain(PartialOutput):
         return self
 
 
-class LegacyMonthStructureReference(PartialOutput):
-    """Read earlier published records; current calculations use the month model."""
-
-    key: Optional[
-        Literal[
-            "default_support",
-            "yang_ren_jia_sha",
-            "shi_shen_zhi_sha",
-            "sha_yin_xiang_sheng",
-            "shang_guan_pei_yin",
-            "shang_guan_jian_guan",
-        ]
-    ] = None
-    label: Optional[str] = None
-    priority: Optional[int] = None
-    reason: Optional[str] = None
-    useful_elements: Optional[List[str]] = None
-    avoid_elements: Optional[List[str]] = None
-    useful_ten_gods: Optional[List[str]] = None
-
-
-def _source_policy_schema(schema: Dict[str, Any]) -> None:
-    # Build from the actual leaf contract only when schema is requested.
-    # Historical projections lack the policy sibling and remain readable.
-    current = MonthStructureReference.model_json_schema()
-    schema.setdefault("allOf", []).append(
-        {
-            "if": {
-                "properties": {
-                    "resolution_policy": {
-                        "enum": [
-                            "source_conditions_before_preference_v2",
-                            "source_conditions_before_preference_v3",
-                        ]
-                    }
-                },
-                "required": ["resolution_policy"],
-            },
-            "then": {
-                "properties": {
-                    "dominant_structure": {"anyOf": [current, {"type": "null"}]}
-                }
-            },
-        }
-    )
-
-
 class EvidenceStructureProfile(PartialOutput):
-    model_config = ConfigDict(json_schema_extra=_source_policy_schema)
     resolution_policy: Optional[str] = None
-    dominant_structure: Optional[
-        Union[MonthStructureReference, LegacyMonthStructureReference]
-    ] = None
-    legacy_dominant_structure: Optional[Dict[str, Any]] = None
+    dominant_structure: Optional[MonthStructureReference] = None
     candidate_selection: Optional[CandidateSelection] = None
     from_child_reference: Optional[FromChildReference] = None
     evidence_chain: Optional[BaziEvidenceChain] = None
-
-    @model_validator(mode="after")
-    def preserve_current_source_semantics(self) -> "EvidenceStructureProfile":
-        if (
-            self.resolution_policy
-            in {
-                "source_conditions_before_preference_v2",
-                "source_conditions_before_preference_v3",
-            }
-            and self.dominant_structure is not None
-        ):
-            MonthStructureReference.model_validate(
-                self.dominant_structure.model_dump(exclude_unset=True)
-            )
-        return self
