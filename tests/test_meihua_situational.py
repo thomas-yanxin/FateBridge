@@ -52,7 +52,7 @@ def at_path(value, path):
 
 
 def test_frozen_literals_and_precode_correction_are_not_production_expectations():
-    manifest = json.loads((FIXTURE / "manifest.json").read_bytes())
+    manifest = json.loads((FIXTURE / "source-files.json").read_bytes())
     assert not manifest["implementation_present_at_reference_freeze"]
     assert not manifest["new_lookup_values_from_production"]
     assert manifest["new_category_contexts"] == len(CASES) == 184

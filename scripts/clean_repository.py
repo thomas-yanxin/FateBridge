@@ -18,6 +18,12 @@ CACHES = (
     "htmlcov",
     "__pycache__",
     ".DS_Store",
+    "ci-selection.json",
+    "cache-status.txt",
+    "pytest-results.xml",
+    "nonuniform-reference-results.xml",
+    "resolved-dependencies.txt",
+    "ci-evidence",
 )
 
 
@@ -35,6 +41,8 @@ def find_artifacts(root: Path) -> list[Path]:
             continue
         if name == "src":
             candidates.extend(base.glob("*.egg-info"))
+        if name == "tests" and not (base / "fixtures").is_symlink():
+            candidates.append(base / "fixtures/__pycache__")
         for current, directories, files in os.walk(base, followlinks=False):
             parent = Path(current)
             directories[:] = [

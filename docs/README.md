@@ -60,7 +60,7 @@ CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由�
 | 实现覆盖、依赖与近似路径 | [算法覆盖矩阵](algorithm-coverage.md) · [当前算法状态](algorithm-status.md) |
 | 模块职责、数据流与依赖边界 | [架构说明](architecture.md) |
 | 扩展、测试、CI、打包与发布 | [开发指南](development-guide.md) |
-| 本地清理与冻结数据恢复 | [仓库维护](repository-maintenance.md) |
+| 仓库维护与本地清理 | [仓库维护](repository-maintenance.md) |
 | 真实模型的调用与解释质量 | [Agent 行为验收](agent-evaluation.md) |
 | 外部命例评估 | [MingLi-Bench](mingli-bench-evaluation.md) |
 | 计算引用、现实预测与奇门研究绑定 | [验证方法](prediction-validation.md) |

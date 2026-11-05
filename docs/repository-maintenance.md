@@ -25,9 +25,11 @@ uv run --locked --extra dev python scripts/clean_repository.py
 uv run --locked --extra dev python scripts/clean_repository.py --apply
 ```
 
-脚本只处理根目录构建、测试与类型检查缓存、覆盖率数据（`.coverage`、`.coverage.*`、`htmlcov/`），`dist/` 直属 wheel／sdist，以及当前源码、脚本、测试中的 Python 缓存和 Finder 元数据。覆盖率配置 `.coveragerc` 保留。Git 索引不可读或候选范围包含受版本控制的文件时，整个清理停止。符号链接不进入清理范围。
+脚本只处理根目录构建、测试与类型检查缓存、根目录 CI 产物、覆盖率数据（`.coverage`、`.coverage.*`、`htmlcov/`），`dist/` 直属 wheel／sdist，以及当前源码、脚本、测试中的 Python 缓存和 Finder 元数据。覆盖率配置 `.coveragerc` 保留。Git 索引不可读或候选范围包含受版本控制的文件时，整个清理停止。符号链接不进入清理范围。
 
 脚本保留虚拟环境、星历、资料书籍、`tmp/`、`dist/validation/`、`docs/validation/` 与 `tests/fixtures/`。这些目录可能保存独有证据，需核对引用后另行归档。不要使用全仓库 `git clean -fdx`，也不要按 `.log`、`.sha256` 或 JSON 扩展名删除文件。
+
+历史审查目录和退役输出先在仓库外归档并校验，再移出工作区；梅花现场应事测试的当前来源清单继续校验原始资料，不携带旧算法输出哈希。
 
 一次性整理报告、命令日志、Git 状态清单和旧构建回执放在仓库外，不加入当前文档索引。归档前核对代码、测试和清单引用，并保留原字节、相对路径与校验摘要；需要复放时恢复对应相对路径，不用当前重跑替代历史原件。移出工作仓库不会释放归档占用的磁盘空间。
 

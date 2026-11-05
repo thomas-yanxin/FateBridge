@@ -37,6 +37,13 @@ def test_preview_is_read_only_and_apply_preserves_evidence(repository):
             "src/fatebridge/__pycache__/retired.pyc",
             "scripts/__pycache__/old.pyc",
             "tests/__pycache__/old.pyc",
+            "tests/fixtures/__pycache__/surface_payloads.pyc",
+            "ci-selection.json",
+            "cache-status.txt",
+            "pytest-results.xml",
+            "nonuniform-reference-results.xml",
+            "resolved-dependencies.txt",
+            "ci-evidence/run.json",
             ".DS_Store",
             "src/.DS_Store",
         )
@@ -90,7 +97,7 @@ def test_nested_directory_cannot_borrow_its_parent_git_index(repository, monkeyp
 def test_symlinked_trees_are_not_cleanup_candidates(repository, tmp_path_factory):
     external = tmp_path_factory.mktemp("external")
     preserved = put(external, "__pycache__/keep.pyc")
-    for name in ("src", "build", "dist"):
+    for name in ("src", "tests", "build", "dist"):
         try:
             (repository / name).symlink_to(external, target_is_directory=True)
         except OSError:
@@ -103,8 +110,10 @@ def test_nested_symlinks_do_not_expose_external_caches(repository, tmp_path_fact
     external = tmp_path_factory.mktemp("external")
     preserved = put(external, "__pycache__/keep.pyc")
     (repository / "scripts").mkdir()
+    (repository / "tests").mkdir()
     try:
         (repository / "scripts/linked").symlink_to(external, target_is_directory=True)
+        (repository / "tests/fixtures").symlink_to(external, target_is_directory=True)
     except OSError:
         pytest.skip("Directory symlinks unavailable")
     assert clean_repository.main(["--apply"]) == 0

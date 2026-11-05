@@ -1,0 +1,14 @@
+{
+  "implementation_present_at_reference_freeze": false,
+  "new_lookup_values_from_production": false,
+  "new_category_contexts": 184,
+  "new_real_outcomes": 0,
+  "prior_draft_word_corrected_before_code": true,
+  "scope": "Current independent literal lookups, source reading and reused geometry; no production-output baseline.",
+  "files": {
+    "expected-lookup.json": "8c92b8149e8561e46e0a5bd7badd07b24a98607e9b92b1a6859b8f4061355b71",
+    "source-reading-correction.json": "b848240c671dbc913fc719c5258c5ec8528fadbf142417b5b6ac0f6535bcbe44",
+    "source-reading.json": "4dd399534d31a3a2520c0588a34378fcfc6ba371ab16d857019a790408e9a383",
+    "geometry384-reused.json": "d75186c6f02cf954b29e93e053f4e59e3cfca954a5fa17400444b1a67def7bd6"
+  }
+}
