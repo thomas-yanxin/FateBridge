@@ -27,7 +27,7 @@ from tests.test_fengshui_surfaces import (
     without_transport,
 )
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_geomagnetic_v1"
+FOLDER = Path(__file__).parent / "data/fengshui_geomagnetic_v1"
 DATA = (
     Path(__file__).parents[1]
     / "src/fatebridge/data/fengshui/geomagnetic-wmm2025-v1.json"

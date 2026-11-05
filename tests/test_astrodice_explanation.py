@@ -13,7 +13,7 @@ from fatebridge.core.local_techniques.otherbu import build_otherbu_result
 from fatebridge.core.output_astrodice import ConditionEvidence, InterpretationBasis
 
 REFERENCE = json.loads(
-    (Path(__file__).parent / "fixtures/astrodice-sign-reference.json").read_text()
+    (Path(__file__).parent / "data/astrodice/tables/sign-reference.json").read_text()
 )
 CONDITIONS = [("D", "domicile"), ("E", "exaltation"), ("d", "detriment"), ("F", "fall")]
 FACES = {"planet": "Mercury", "sign": "Virgo", "house": 0}

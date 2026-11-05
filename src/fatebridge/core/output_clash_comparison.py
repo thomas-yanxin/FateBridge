@@ -71,18 +71,23 @@ class ClashDecision(PartialOutput):
     positions: Optional[List[Position]] = None
     branches: Optional[List[str]] = None
     distance: Optional[int] = Field(default=None, ge=1, le=3)
-    event_status: Optional[Literal["active", "resolved_by_combination"]] = None
+    event_status: Optional[
+        Literal[
+            "active", "resolved_by_combination", "resolved_by_ordered_generation_path"
+        ]
+    ] = None
     calculation_branch: Optional[
         Literal[
             "initial_hidden_budget",
             "combination_resolution",
             "storage_movement",
-            "legacy_power_unavailable",
+            "ordered_generation_path_resolution",
         ]
     ] = None
     powers: Optional[List[ClashPower]] = None
     applied_root_retention: Optional[Dict[Position, float]] = None
     source_ref: Optional[str] = None
+    intermediary_positions: Optional[List[Position]] = None
 
     @model_validator(mode="after")
     def literal_pair(self) -> "ClashDecision":
@@ -109,23 +114,36 @@ class ClashDecision(PartialOutput):
                 ):
                     raise ValueError("Power sides must follow the actual branch order")
         if (
-            self.calculation_branch in {"combination_resolution", "storage_movement"}
+            self.calculation_branch
+            in {
+                "combination_resolution",
+                "storage_movement",
+                "ordered_generation_path_resolution",
+            }
             and self.powers is not None
         ):
             raise ValueError("This calculation branch did not compare raw powers")
         if self.calculation_branch is not None and self.event_status is not None:
-            resolved = self.calculation_branch == "combination_resolution"
-            if resolved != (self.event_status == "resolved_by_combination"):
+            expected_status = {
+                "combination_resolution": "resolved_by_combination",
+                "ordered_generation_path_resolution": "resolved_by_ordered_generation_path",
+                "initial_hidden_budget": "active",
+                "storage_movement": "active",
+            }[self.calculation_branch]
+            if self.event_status != expected_status:
                 raise ValueError(
                     "Calculation branch must match the supplied event status"
                 )
-        if (
-            self.calculation_branch == "legacy_power_unavailable"
-            and self.powers is not None
-        ):
-            raise ValueError(
-                "Unavailable legacy powers cannot be supplied as calculated"
-            )
+        if self.calculation_branch == "ordered_generation_path_resolution":
+            if self.applied_root_retention is not None:
+                raise ValueError("通关免冲分支不能同时施加根损系数")
+            if self.positions is not None and self.intermediary_positions is not None:
+                left, right = sorted(ORDER.index(p) for p in self.positions)
+                if (
+                    not self.intermediary_positions
+                    or self.intermediary_positions != list(ORDER[left + 1 : right])
+                ):
+                    raise ValueError("通关中介必须为冲支之间实际有序柱位")
         if self.applied_root_retention is not None:
             if any(not 0 <= v <= 1 for v in self.applied_root_retention.values()):
                 raise ValueError("Retention must be a finite fraction")

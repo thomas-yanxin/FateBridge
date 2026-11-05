@@ -19,13 +19,9 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
 
-FIXTURE = Path(__file__).parent / "fixtures/guolao-native-frame-v1"
-BEFORE_RAW_SHA = "a833b6d84a131c3ad04af9d92f4c6c506e491a8693f1ec0363c3b3d901d1b3d9"
-PRECHANGE_SHA = "e709230532de3a5d228441a1b0dc03a7549e02bf0c73e3fa5b63b48ef20d09bc"
-HELD = json.loads(
-    gzip.decompress((FIXTURE / "before-contract-probes.json.gz").read_bytes())
+CASES = json.loads(
+    (Path(__file__).parent / "data/guolao/native_frame_cases.json").read_bytes()
 )
-CASES = [row["case"] for row in HELD[1:]]
 BIRTH = dict(
     birth_year=2000,
     birth_month=1,
@@ -124,25 +120,6 @@ def inject_case(monkeypatch, case):
 
     monkeypatch.setattr(guolao.runtime, "ephemeris_call", alternate)
     return calls
-
-
-def test_prechange_counterexamples_are_pinned_and_not_real_observations():
-    for name, digest in json.loads((FIXTURE / "reference.json").read_text())[
-        "files"
-    ].items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
-    raw = gzip.decompress((FIXTURE / "before-contract-probes.json.gz").read_bytes())
-    assert hashlib.sha256(raw).hexdigest() == BEFORE_RAW_SHA
-    assert (
-        hashlib.sha256((FIXTURE / "prechange_guolao.py").read_bytes()).hexdigest()
-        == PRECHANGE_SHA
-    )
-    assert len(CASES) == 17 and all(row["status"] == "accepted" for row in HELD)
-    assert HELD[0]["consumed"]["solar_clock"]["birth_hour_branch"] == "丑"
-    assert HELD[1]["consumed"]["solar_clock"]["birth_hour_branch"] == "戌"
-    assert not json.loads((FIXTURE / "before-contract-summary.json").read_text())[
-        "real_world_cases"
-    ]
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["site"] + "-" + c["change"])

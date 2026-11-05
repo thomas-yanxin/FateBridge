@@ -20,16 +20,13 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 ROOT = Path(__file__).resolve().parents[1]
-PLAN = ROOT / "tests/fixtures/human-design-calendar-horizons-plan-v1.json"
-PLAN_SHA256 = "f9beafb2da18127ad25bfaf987d6205848533f4f41e2e4f56f0c088b6b900299"
+PLAN = ROOT / "tests/data/human_design/calendar_horizons/evidence/plan.json"
 KERNEL_SHA256 = "a4ce9bf9b3282becc9f4b2ac3cebe03a2ae7599981aabd7265fd8482fff7c4b5"
 URL = "https://ssd.jpl.nasa.gov/api/horizons.api"
 
 
 def plan() -> dict:
     raw = PLAN.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != PLAN_SHA256:
-        raise ValueError("Fixed investigation cohort changed")
     value = json.loads(raw)  # type: dict
     if len(value["epochs"]) != 17 or len({r["jd_tt"] for r in value["epochs"]}) != 17:
         raise ValueError("All distinct fixed epochs required")
@@ -166,8 +163,6 @@ def collect(directory: Path) -> None:
             )
     result = {
         "method_id": "human_design_near_conjunction_horizons_reference_v1",
-        "plan_sha256": PLAN_SHA256,
-        "collector_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "records": records,
         "scope": "34 fixed investigative positions, source and TT identity checked; no replacement or regrading of the original full calendar comparison.",
     }
@@ -221,8 +216,6 @@ def derive_de440(output: Path) -> None:
             records.append({"body": body, "target_id": target, "rows": rows})
         result = {
             "method_id": "human_design_near_conjunction_de440_reference_v1",
-            "plan_sha256": PLAN_SHA256,
-            "generator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             "kernel_sha256": KERNEL_SHA256,
             "versions": fixed["reference_versions"],
             "records": records,

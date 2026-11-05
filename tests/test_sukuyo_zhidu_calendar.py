@@ -16,7 +16,7 @@ from fatebridge.core.sukuyo_zhidu_calendar import (
     zhidu_reference,
 )
 
-FIXTURE = Path(__file__).parent / "fixtures/sukuyo-zhidu-before-code-v89.json"
+FIXTURE = Path(__file__).parent / "data/sukuyo-zhidu-before-code-v89.json"
 
 
 def frozen():

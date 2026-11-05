@@ -28,11 +28,43 @@ from fatebridge.utils.errors import EphemerisSourceError
 from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES
 from tests.test_western_origin_preflight import directories, selected
 
-FIXTURE = Path(__file__).parent / "fixtures/western-request-policy-v1"
 SPECS = {s.key: s for s in CATALOG}
 WESTERN_KEYS = [
-    row["key"]
-    for row in json.loads((FIXTURE / "before-policy-requests.json").read_text())
+    "astro_chart",
+    "astro_chart13",
+    "astro_hellen",
+    "astro_germany",
+    "astro_relative",
+    "astro_relative_chart",
+    "western_timing_analysis",
+    "solarreturn",
+    "lunarreturn",
+    "transit",
+    "solararc",
+    "givenyear",
+    "profection",
+    "pd",
+    "pdchart",
+    "zr",
+    "firdaria",
+    "decennials",
+    "astro_harmonic",
+    "astro_planetary_ages",
+    "astro_triplicity_rulers",
+    "astro_lunation_phase",
+    "astro_distributions",
+    "astro_balbillus",
+    "astro_keypoints",
+    "astro_yearsystem129",
+    "astro_planetaryarc",
+    "astro_persiandirected",
+    "astro_agepoint",
+    "astro_vedicprog",
+    "astro_jaynesprog",
+    "astro_mundane",
+    "astro_extrareturns",
+    "astro_horary",
+    "astro_election",
 ]
 
 
@@ -48,18 +80,6 @@ def payload(key, **updates):
 
 def request(key, **updates):
     return SPECS[key].request_model.model_validate(payload(key, **updates))
-
-
-def test_reference_precedes_policy_and_does_not_import_producer():
-    for name, digest in json.loads(
-        (FIXTURE / "reference-seal.json").read_text()
-    ).items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
-    reference = json.loads((FIXTURE / "native-reference.json").read_text())
-    assert sum(len(row["rows"]) for row in reference) == 120
-    assert all(not row["fatebridge_imported"] for row in reference)
-    old = json.loads((FIXTURE / "before-policy-requests.json").read_text())
-    assert all(row.get("error_type") == "ValidationError" for row in old)
 
 
 @pytest.mark.parametrize("key", WESTERN_KEYS)

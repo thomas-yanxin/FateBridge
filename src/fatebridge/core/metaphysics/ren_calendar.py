@@ -148,7 +148,14 @@ def require_ren_solar_term(term: SolarTerm) -> None:
     provider = term.resolution_provider
     if (
         provider
-        in {"fatebridge_analytic", "jpl_spk", "jpl_de440", "moshier_aa1996", "vsop2013"}
+        in {
+            "fatebridge_analytic",
+            "fatebridge_moshier",
+            "jpl_spk",
+            "jpl_de440",
+            "moshier_aa1996",
+            "vsop2013",
+        }
         and term.ephemeris_retflags
     ):
         raise RuntimeError("独立太阳模型不能借用原生星历返回标志")
@@ -296,6 +303,7 @@ def require_ren_calendar(
     from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_SOLAR_MODEL
     from fatebridge.core.de440_solar import EXTENDED_MODEL_ID as DE440_EXTENDED_MODEL
     from fatebridge.core.de440_solar import MODEL_ID as DE440_SOLAR_MODEL
+    from fatebridge.core.moshier_solar import MODEL_ID as COMPLETE_MOSHIER_SOLAR_MODEL
     from fatebridge.core.spk_solar import MODEL_ID as SPK_SOLAR_MODEL
     from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
 
@@ -307,6 +315,7 @@ def require_ren_calendar(
             DE440_SOLAR_MODEL,
             DE440_EXTENDED_MODEL,
             AA1996_SOLAR_MODEL,
+            COMPLETE_MOSHIER_SOLAR_MODEL,
             VSOP2013_SOLAR_MODEL,
         }
         for t in dependencies
@@ -345,6 +354,11 @@ def require_ren_calendar(
             result["solar_longitude_definition"].update(
                 source_section="Per-boundary AA1996 EMB and full Moshier Moon, complete Swiss2.10.03 native apparent recomputation",
                 scope="逐交气保留改版模型的实际二进制、源图与配置散列；底层Moshier类别标志不代表原版模型身份，不将有限数值比较认证为全部时刻、民用时制或Horizons等同。",
+            )
+        if COMPLETE_MOSHIER_SOLAR_MODEL in models:
+            result["solar_longitude_definition"].update(
+                source_section="Per-boundary complete Moshier December 1996 EMB, full native geometric Moon, IAU2006/P03 and IAU2000B",
+                scope="逐交气记录完整Moshier修订的系数来源、月球原生依赖与参考系；不重标为原版Swiss默认太阳，也不以有限TT对照认证整个时域、绝对UTC或预测。",
             )
         if VSOP2013_SOLAR_MODEL in models:
             result["solar_longitude_definition"].update(

@@ -9,9 +9,9 @@ substrate primitives are imported from ``.chart``.
 from __future__ import annotations
 
 import random
-from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
+from fatebridge.utils.civil_clock import parse_iso_datetime
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 from fatebridge.utils.timezones import validate_local_clock
 
@@ -399,7 +399,7 @@ def _build_context(
     timezone_name: Optional[str],
 ) -> Dict[str, Any]:
     moment = parse_local_datetime(date_text, time_text, timezone_name)
-    raw_clock = datetime.fromisoformat(
+    raw_clock = parse_iso_datetime(
         f"{_normalize_date_text(date_text)} {_normalize_time_text(time_text)}"
     )
     if raw_clock.tzinfo is None:

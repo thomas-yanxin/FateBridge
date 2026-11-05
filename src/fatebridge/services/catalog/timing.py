@@ -6,6 +6,7 @@ from typing import List
 
 from fatebridge.application.bindings import lazy_service, person_invoke, raw_invoke
 from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.core.method_contracts import LIFE_DIMENSION_INDEX
 from fatebridge.core.requests.calendar import JieqiYearRequest, NongliTimeRequest
 from fatebridge.core.requests.timing import (
     DayunAnalysisRequest,
@@ -126,6 +127,7 @@ SPECS: List[ToolSpec] = [
         key="liushi_analysis",
         bind=person_invoke(calculate_liushi_analysis),
         request_model=LiushiAnalysisRequest,
+        methods=(LIFE_DIMENSION_INDEX,),
         summary="单看流时（时辰）影响；日期全省略时用as_of/当前完整当地瞬间，实际时刻与补齐见analysis_reference。时柱整点缓存不代替交气比较时刻。要多粒度整合用 timing_analysis。",
         operation_label_zh="流时分析",
         family="timing",

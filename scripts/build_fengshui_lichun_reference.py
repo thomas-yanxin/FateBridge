@@ -26,11 +26,7 @@ def main() -> int:
     if hashlib.md5(blob).hexdigest() != "c9d581bfd84209dbeee8b1583939b148":
         raise ValueError("Kernel differs from the JPL published DE440 checksum")
     protocol = json.loads(args.protocol.read_text())
-    spans = {
-        "fengshui_lichun_de440_tt_v1": (1800, 2200),
-        "fengshui_lichun_de440_tt_v2": (1784, 2204),
-    }
-    if protocol["id"] not in spans:
+    if protocol["id"] != "fengshui_lichun_de440_tt_v2":
         raise ValueError("Unsupported frozen collection protocol")
 
     import numpy as np
@@ -40,8 +36,7 @@ def main() -> int:
     ts = load.timescale(builtin=True)
     eph = load_file(str(args.kernel))
     function = almanac_east_asia.solar_terms(eph)
-    first, last = spans[protocol["id"]]
-    years = np.arange(first, last + 1)
+    years = np.arange(1784, 2205)
     low, high = ts.tt(years, 2, 1).tt, ts.tt(years, 2, 8).tt
     if not (
         np.all(function(ts.tt_jd(low)) == 20) and np.all(function(ts.tt_jd(high)) == 21)

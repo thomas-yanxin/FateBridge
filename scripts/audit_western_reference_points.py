@@ -1,4 +1,4 @@
-"""Separate reference-frame and target-center errors without changing the old oracle."""
+"""Separate reference-frame and target-center errors against independent fixed observations."""
 
 import argparse
 import hashlib
@@ -11,6 +11,7 @@ from typing import Any
 
 from fatebridge.core.astro.ephemeris import _swisseph_planet_state
 from fatebridge.core.astro.geometry import angular_separation_fraction
+from fatebridge.core.astro.opaque_solar import opaque_solar_positions
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.time_scales import ut1_from_tt
 from fatebridge.core.horary_events import native_planetary_events
@@ -66,7 +67,98 @@ def compare_events(
     return rows
 
 
-def audit() -> dict[str, Any]:
+def audit_opaque_solar_positions() -> dict[str, Any]:
+    """Sample the named position model against every unchanged source row.
+
+    Frame B is projected from the computed ICRS direction, not relabelled
+    frame-A coordinates. The two frames reuse the same observations.
+    """
+    import erfa
+
+    corpus = json.loads(
+        (FIXTURES / "western-event-reference-points-horizons.json").read_text()
+    )
+    plan = json.loads(
+        (FIXTURES / "western-event-reference-points-protocol.json").read_text()
+    )
+    trace = PhysicalEphemerisTrace()
+    maxima: dict[str, dict[str, Any]] = {}
+    failures = []
+    count = 0
+    intercepted_count = 0
+    for case in corpus["cases"]:
+        names = list(case["rows"])
+        for i, epoch in enumerate(case["rows"][names[0]]):
+            tt = epoch["julian_day_tt"]
+            sampled = opaque_solar_positions(tt, names, source_trace=trace)
+            for state in sampled["positions"]:
+                row = case["rows"][state["body"]][i]
+                assert row["julian_day_tt"] == tt
+                for frame, expected in row["projections"].items():
+                    if frame.endswith("2000A_true_ecliptic_of_date"):
+                        lon, lat = state["longitude"], state["latitude"]
+                    else:
+                        delta = tt - 2451545.0
+                        dpsi, deps = erfa.nut00b(2451545.0, delta)
+                        eps, *_, matrix = erfa.pn06(2451545.0, delta, dpsi, deps)
+                        eps += deps
+                        equator = matrix @ state["apparent_icrs_unit_direction"]
+                        x = equator[0]
+                        y = math.cos(eps) * equator[1] + math.sin(eps) * equator[2]
+                        z = -math.sin(eps) * equator[1] + math.cos(eps) * equator[2]
+                        lon = math.degrees(math.atan2(y, x)) % 360
+                        lat = math.degrees(math.atan2(z, math.hypot(x, y)))
+                    residual = (
+                        float(angular_separation_fraction(lon, expected[0])) * 3600
+                    )
+                    lat_residual = abs(lat - expected[1]) * 3600
+                    key = state["body"] + ":" + frame
+                    previous = maxima.get(key)
+                    if previous is None or residual > previous["longitude_arcseconds"]:
+                        maxima[key] = dict(
+                            longitude_arcseconds=residual,
+                            julian_day_tt=tt,
+                            case_id=case["case_id"],
+                            solar_disc_intercepted=state["solar_disc_intercepted"],
+                        )
+                    if (
+                        residual > plan["position_diagnostic_arcseconds"]
+                        or lat_residual > plan["position_diagnostic_arcseconds"]
+                    ):
+                        failures.append(
+                            dict(
+                                body=state["body"],
+                                frame=frame,
+                                julian_day_tt=tt,
+                                longitude_arcseconds=residual,
+                                latitude_arcseconds=lat_residual,
+                            )
+                        )
+                count += 1
+                intercepted_count += state["solar_disc_intercepted"]
+    expected_count = sum(
+        len(rows) for case in corpus["cases"] for rows in case["rows"].values()
+    )
+    return dict(
+        method_id="finite_source_opaque_solar_apparent_positions_v1",
+        apparent_model="opaque_solar",
+        scope="standalone_positions_only",
+        body_epoch_pairs=count,
+        expected_body_epoch_pairs=expected_count,
+        solar_disc_intercepted_body_epoch_pairs=intercepted_count,
+        frame_comparisons=2 * count,
+        frames_are_not_independent_samples=True,
+        original_tolerance_arcseconds=plan["position_diagnostic_arcseconds"],
+        maximum_longitude_error_arcseconds=maxima,
+        failures=failures,
+        passed=count == expected_count == 7070 and not failures,
+        physical_ephemeris_source=trace.finish(),
+        natal_chart_recomputed=False,
+        native_mismatch_overridden=False,
+    )
+
+
+def audit(*, apparent_model: str = "native") -> dict[str, Any]:
     point_plan_path = FIXTURES / "western-event-reference-points-protocol.json"
     frame_plan_path = FIXTURES / "western-event-frames-protocol.json"
     plan = json.loads(point_plan_path.read_text())
@@ -216,13 +308,12 @@ def audit() -> dict[str, Any]:
         for p in positions
         for v in p["maximum_same_point_longitude_error_arcseconds"].values()
     )
-    historical = ROOT / "docs/validation/western-event-paths-evidence.json"
     return dict(
+        opaque_solar_positions=(
+            audit_opaque_solar_positions() if apparent_model == "opaque_solar" else None
+        ),
         protocol_sha256=hashlib.sha256(point_plan_path.read_bytes()).hexdigest(),
         frame_protocol_sha256=hashlib.sha256(frame_plan_path.read_bytes()).hexdigest(),
-        historical_body_center_evidence_sha256=hashlib.sha256(
-            historical.read_bytes()
-        ).hexdigest(),
         current_native_physical_sources=sources,
         position_source=trace.finish(),
         positions=positions,
@@ -270,8 +361,26 @@ def audit() -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--apparent-model",
+        choices=("native", "opaque_solar"),
+        default="native",
+        help="Select the acceptance gate. Native chart/event gates remain separate and unchanged.",
+    )
     args = parser.parse_args()
-    result = audit()
+    result = audit(apparent_model=args.apparent_model)
+    selected_gate = (
+        result["opaque_solar_positions"]["passed"]
+        if args.apparent_model == "opaque_solar"
+        else result["same_point_numerical_acceptance"]
+    )
+    result["selected_apparent_model"] = args.apparent_model
+    result["selected_model_scope"] = (
+        "standalone_positions_only"
+        if args.apparent_model == "opaque_solar"
+        else "native_chart_and_events"
+    )
+    result["selected_model_numerical_acceptance"] = selected_gate
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(
         json.dumps(
@@ -279,6 +388,9 @@ def main() -> int:
                 k: result[k]
                 for k in (
                     "same_point_numerical_acceptance",
+                    "selected_apparent_model",
+                    "selected_model_scope",
+                    "selected_model_numerical_acceptance",
                     "same_point_event_times_passed",
                     "same_point_event_times_compared",
                     "same_point_positions_passed",
@@ -289,7 +401,7 @@ def main() -> int:
             ensure_ascii=False,
         )
     )
-    return 0 if result["same_point_numerical_acceptance"] else 1
+    return 0 if selected_gate else 1
 
 
 if __name__ == "__main__":

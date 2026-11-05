@@ -25,8 +25,7 @@ from fatebridge.validation.fengshui_host_guest import (
 from fatebridge.validation.fengshui_reading import verify_fengshui_reading
 from tests.test_fengshui_surfaces import mcp_call, rest_client, without_transport
 
-SOURCE = Path(__file__).parent / "fixtures/fengshui_host_guest_v1"
-OLD = Path(__file__).parent / "fixtures/fengshui_author_phase_fault_v1"
+SOURCE = Path(__file__).parent / "data/fengshui_host_guest_v1"
 
 
 def inputs():
@@ -386,22 +385,6 @@ def test_offline_guard_rejects_an_actual_fault_run_with_its_genuine_served_recei
     assert checked["status"] == "rejected"
     assert {e["code"] for e in checked["errors"]} >= {"host_guest_inconsistent"}
     assert checked["host_guest_coverage_verified"] is False
-
-
-def test_genuine_older_receipt_remains_valid_without_new_host_guest_credit():
-    result = json.loads(gzip.decompress((OLD / "correct-result.json.gz").read_bytes()))
-    receipt = json.loads((OLD / "correct-trusted-receipt.json").read_text())
-    checked = verify_fengshui_reading(result, trusted_run_metadata=receipt)
-    assert checked["status"] == "verified_served_fixed_reading"
-    assert checked["host_guest_relation_count"] == 0
-    assert checked["host_guest_coverage_verified"] is False
-
-
-def test_older_reading_versions_do_not_inherit_new_relation_coverage():
-    result = executed(inputs())
-    old = reading.build_natal_reading(result, version="1.1.0")
-    assert old["status"] == "rendered"
-    assert all(not s["kind"].startswith("host_guest") for s in old["statements"])
 
 
 def test_new_profile_is_explicit_and_invalid_ids_fail_request_validation():

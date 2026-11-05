@@ -33,9 +33,12 @@ from tests.test_guolao_native_frames import fixed_moshier  # noqa: F401
 
 FIXTURE = Path(__file__).parent / "fixtures/guolao-solar-input-preflight-v1"
 JPL = FIXTURE.parent / "guolao-apparent-clock-v1"
-HELD = json.loads((FIXTURE / "before-clock-contract.json").read_text())["rows"]
-SWISS = json.loads((FIXTURE / "before-swieph-clock-contract.json").read_text())["rows"]
-FORMS = [row["form"] for row in HELD[1:] if row["direct"]["status"] == "computed"]
+FORMS = json.loads(
+    (Path(__file__).parent / "data/guolao/solar_clock_frame_forms.json").read_bytes()
+)
+SWISS = json.loads(
+    (Path(__file__).parent / "data/guolao/raw_swiss_clock_vectors.json").read_bytes()
+)
 CASE = dict(
     birth_year=2000,
     birth_month=1,
@@ -47,41 +50,13 @@ CASE = dict(
 )
 
 
-def original_module():
-    spec = importlib.util.spec_from_file_location(
-        "preflight_old_solar_clock", FIXTURE / "prechange_birth_clock.py"
-    )
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
 def invoke(module=clock):
     time = ephemeris_time(datetime(2000, 1, 1, 12, tzinfo=timezone.utc))
     return module._sun_clock(time.jd_ut1, _julian_day_tt=time.jd_tt)
 
 
-def test_before_sources_and_both_normal_and_failed_rows_remain_hash_bound():
-    ref = json.loads((FIXTURE / "reference.json").read_text())
-    for name, digest in ref["files_sha256"].items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
-    ref = json.loads((FIXTURE / "independent-reference.json").read_text())
-    for name, digest in ref["assets_sha256"].items():
-        assert hashlib.sha256((JPL / name).read_bytes()).hexdigest() == digest
-    assert len(HELD) == 14 and len(FORMS) == 11
-    assert all(row["direct"]["status"] == "computed" for row in SWISS)
-    assert (
-        HELD[1]["resolution"]["conversion"]["input_clock_roundtrip_error_seconds"]
-        == -0.000017
-    )
-    assert HELD[1]["resolution"]["independent_phase_error_seconds"] > 20000
-
-
 @pytest.mark.parametrize("form", FORMS)
-def test_actual_native_frame_was_consumed_by_old_clock_and_now_rejects_before_eot(
-    monkeypatch, fixed_moshier, form
-):
+def test_actual_native_frame_rejects_before_eot(monkeypatch, fixed_moshier, form):
     native = clock.runtime.ephemeris_call
 
     def alternate(operation, *args, **kwargs):
@@ -101,13 +76,12 @@ def test_actual_native_frame_was_consumed_by_old_clock_and_now_rejects_before_eo
     clock.runtime.swe.set_topo(0, 0, 0)
     clock.runtime.swe.set_sid_mode(clock.runtime.swe.SIDM_LAHIRI, 0, 0)
     monkeypatch.setattr(clock.runtime, "ephemeris_call", alternate)
-    assert math.isfinite(invoke(original_module())["equation_of_time_seconds"])
     with pytest.raises(EphemerisSourceError, match="coordinate|坐标") as error:
         invoke()
     assert error.value.reason == "coordinate_contract_changed"
 
 
-@pytest.mark.parametrize("row", SWISS[1:], ids=[row["form"] for row in SWISS[1:]])
+@pytest.mark.parametrize("row", SWISS, ids=[row["form"] for row in SWISS])
 def test_all13_saved_real_swiss_frames_reject_before_source_or_clock_consumption(
     monkeypatch, fixed_moshier, row
 ):
@@ -187,10 +161,6 @@ def test_provider_source_error_is_preserved_instead_of_recategorized_as_a_value(
     with pytest.raises(EphemerisSourceError) as caught:
         invoke()
     assert caught.value is failure
-
-
-def test_unchanged_native_clock_result_equals_old_module_completely(fixed_moshier):
-    assert invoke() == invoke(original_module())
 
 
 @pytest.mark.parametrize("index", [0, 1])

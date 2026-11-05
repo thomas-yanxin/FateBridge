@@ -1,4 +1,4 @@
-"""Preview or remove regenerable local artifacts, preserving validation evidence."""
+"""Preview or remove regenerable local artifacts, preserving current references."""
 
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ CACHES = (
 
 
 def find_artifacts(root: Path) -> list[Path]:
-    """Return a narrow allowlist; never descend into fixtures or frozen copies."""
+    """Return a narrow allowlist without touching external reference bundles."""
     candidates = [root / name for name in CACHES]
     candidates.extend(root.glob(".coverage.*"))
     dist = root / "dist"

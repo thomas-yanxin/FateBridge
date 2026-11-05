@@ -12,10 +12,11 @@ from fatebridge.core import almanac
 from fatebridge.core.ephemeris_runtime import ephemeris_call, swe
 from fatebridge.core.metaphysics.ren_calendar import require_ren_solar_term
 from fatebridge.core.native_solar_source import POLICY_ID, prime_swiss_solar_context
+from tests.solar_source_facts import canonical_c_first_post
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/ren_native_context_v1"
-PIN = "9d98cff244870e19c0fae041485effd6ab12d40d0747ebbbe40470d008f257c4"
+PIN = "526029f1c5d985e6722629b6d598929a33644e1473c6d07b4d7b8c8e8b630589"
 
 
 def reference():
@@ -42,31 +43,6 @@ def native_files(monkeypatch):
 
 
 @pytest.mark.parametrize("case", reference()["rows"], ids=lambda x: x["term"])
-@pytest.mark.parametrize("warmup", [-30, 30])
-def test_solver_matches_pre_fix_independent_canonical_c_reference(
-    case, warmup, native_files
-):
-    almanac.get_solar_terms_for_year.cache_clear()
-    point = case["expected_jd_tt"]
-    ephemeris_call("calc", point + warmup, swe.SUN, swe.FLG_SWIEPH)
-    term = next(
-        t
-        for t in almanac.get_solar_terms_for_year(1800, "UTC")
-        if t.name == case["term"]
-    )
-    d = term.solar_model_details
-    assert d["selected_crossing_jd_tt"] == case["expected_jd_tt"]
-    assert d["root_bracket_tt"] == case["expected_bracket_tt"]
-    assert d["native_source_context"]["policy_id"] == POLICY_ID
-    for actual, expected in zip(
-        d["native_source_context"]["file_windows"], case["file_windows"]
-    ):
-        assert {k: actual[k] for k in expected} == expected
-        assert len(actual["sha256"]) == 64
-    require_ren_solar_term(term)
-
-
-@pytest.mark.parametrize("case", reference()["rows"], ids=lambda x: x["term"])
 def test_source_reobservation_after_1799_warmup_selects_current_epoch_files(
     case, native_files
 ):
@@ -82,16 +58,43 @@ def test_source_reobservation_after_1799_warmup_selects_current_epoch_files(
     assert context["preflight_state_returned_as_target"] is False
 
 
-def test_analytic_native_probe_keeps_its_new_actual_file_context(
+@pytest.mark.parametrize("case", reference()["rows"], ids=lambda x: x["term"])
+@pytest.mark.parametrize("warmup", [-30, 30])
+def test_current_solver_selects_independent_first_post_without_changing_c_context(
+    case, warmup, native_files
+):
+    point = canonical_c_first_post(case)
+    almanac.get_solar_terms_for_year.cache_clear()
+    ephemeris_call("calc", point + warmup, swe.SUN, swe.FLG_SWIEPH)
+    term = next(
+        t
+        for t in almanac.get_solar_terms_for_year(1800, "UTC")
+        if t.name == case["term"]
+    )
+    details = term.solar_model_details
+    assert details["selected_crossing_jd_tt"] == point == case["expected_bracket_tt"][1]
+    assert details["root_bracket_tt"] == case["expected_bracket_tt"]
+    assert details["model_id"] == "native_swiss_tt_solar_bisection_v2"
+    assert details["root_selection_policy"] == "first_post_crossing_tt_float"
+    assert details["native_source_context"]["policy_id"] == POLICY_ID
+    for actual, expected in zip(
+        details["native_source_context"]["file_windows"], case["file_windows"]
+    ):
+        assert {k: actual[k] for k in expected} == expected
+        assert len(actual["sha256"]) == 64
+    require_ren_solar_term(term)
+
+
+def test_current_analytic_probe_keeps_independent_first_post_and_actual_file_context(
     native_files, monkeypatch
 ):
+    expected = {r["term"]: canonical_c_first_post(r) for r in reference()["rows"]}
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "analytic")
-    terms = almanac.get_solar_terms_for_year(1800, "UTC")
-    expected = {r["term"]: r for r in reference()["rows"]}
-    for term in terms[:2]:
-        d = term.solar_model_details
-        assert d["native_choice_probe_jd_tt"] == expected[term.name]["expected_jd_tt"]
-        assert d["native_choice_probe_source_context"]["policy_id"] == POLICY_ID
+    almanac.get_solar_terms_for_year.cache_clear()
+    for term in almanac.get_solar_terms_for_year(1800, "UTC")[:2]:
+        details = term.solar_model_details
+        assert details["native_choice_probe_jd_tt"] == expected[term.name]
+        assert details["native_choice_probe_source_context"]["policy_id"] == POLICY_ID
         require_ren_solar_term(term)
 
 

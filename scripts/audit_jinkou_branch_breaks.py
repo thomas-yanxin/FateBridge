@@ -48,50 +48,7 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     )
 
 
-def legacy(before_dir: Path) -> dict[str, Any]:
-    from fatebridge.core.metaphysics.jinkou import build_jinkou_board
-    from fatebridge.services.tool_catalog import CATALOG
-    from scripts.audit_ren_classical import make_seed
-    from scripts.jinkou_branch_breaks_archive import without_branch_breaks
-
-    receipt_path = before_dir / "before-capture-receipt.json"
-    if sha(receipt_path) != BASELINE_PIN:
-        raise ValueError("Before-feature capture identity changed")
-    receipt = json.loads(receipt_path.read_text())
-    for name, digest in receipt["files"].items():
-        if sha(before_dir / name) != digest:
-            raise ValueError("Before-feature captured result changed")
-    failures, count = [], 0
-    with gzip.open(before_dir / "before-boards.jsonl.gz", "rt") as stream:
-        for line in stream:
-            record = json.loads(line)
-            case = record["input"]
-            actual = build_jinkou_board(
-                make_seed(case),
-                {"month_general": {"branch": case["general"]}},
-                di_fen=case["ground"],
-                is_diurnal_override=True,
-            )
-            if without_branch_breaks(actual) != record["board"]:
-                failures.append(dict(kind="symbolic", input=case))
-            count += 1
-    spec = next(s for s in CATALOG if s.key == "jinkou")
-    businesses = json.loads((before_dir / "before-business.json").read_text())
-    for case in businesses:
-        fn, args, kwargs = spec.bind(spec.request_model.model_validate(case["input"]))
-        actual = without_branch_breaks(fn(*args, **kwargs))
-        if actual != case["body"]:
-            failures.append(dict(kind="full_business", input=case["input"]))
-    return dict(
-        symbolic_count=count,
-        full_business_count=len(businesses),
-        failures=failures,
-        passed=count == 720 and len(businesses) == 3 and not failures,
-        baseline_pin=BASELINE_PIN,
-    )
-
-
-def audit(before_dir: Path | None = None) -> dict[str, Any]:
+def audit() -> dict[str, Any]:
     data = reference()
     files = sorted((ROOT / "src").rglob("*.py")) + [
         ROOT / "pyproject.toml",
@@ -149,7 +106,6 @@ def audit(before_dir: Path | None = None) -> dict[str, Any]:
                 )
             )
         count += 1
-    previous = legacy(before_dir) if before_dir else dict(status="not_assessed")
     from scripts.audit_jinkou_strength import audit as strength_audit
 
     original = strength_audit()
@@ -175,7 +131,6 @@ def audit(before_dir: Path | None = None) -> dict[str, Any]:
         position_comparison_count=count * 3,
         failures=failures,
         finite_pair_facts_passed=passed,
-        legacy=previous,
         original_scan={
             k: original[k]
             for k in [
@@ -199,11 +154,10 @@ def audit(before_dir: Path | None = None) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--before-dir", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--require-full-conformance", action="store_true")
     options = parser.parse_args()
-    result = audit(options.before_dir)
+    result = audit()
     content = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     if options.output:
         with options.output.open("x") as stream:

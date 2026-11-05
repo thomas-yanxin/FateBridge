@@ -1,7 +1,7 @@
 """Native boundaries must be the first representable TT point after crossing.
 
-This checks the numerical equation against direct native Sun coordinates, not
-independent physical accuracy. Original Moshier one-second failures remain.
+This checks the declared complete Moshier equation, not physical accuracy.
+Independent DE440 gates and retained stock failures are checked separately.
 """
 
 import math
@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from fatebridge.core import almanac, solar_term_clock
+from fatebridge.core import almanac, moshier_solar, solar_term_clock
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.ephemeris_runtime import ephemeris_call, swe
 from fatebridge.core.metaphysics.ren_calendar import require_ren_solar_term
@@ -30,13 +30,12 @@ def test_all_original_native_events_select_the_first_post_crossing_point(
         details = term.solar_model_details
         point = details["selected_crossing_jd_tt"]
         before = math.nextafter(point, -math.inf)
-        # Explicit MOSHIER avoids obtaining the expected side through the
-        # production wrapped-difference or bisection implementation.
-        left, left_flags = ephemeris_call("calc", before, swe.SUN, swe.FLG_MOSEPH)
-        right, right_flags = ephemeris_call("calc", point, swe.SUN, swe.FLG_MOSEPH)
-        assert left_flags == right_flags == swe.FLG_MOSEPH
-        assert math.remainder(left[0] - target, 360) < 0, term.name
-        assert math.remainder(right[0] - target, 360) >= 0, term.name
+        assert term.resolution_provider == moshier_solar.PROVIDER
+        assert term.ephemeris_model == moshier_solar.MODEL_ID
+        left = moshier_solar.solar_longitude(before)
+        right = moshier_solar.solar_longitude(point)
+        assert math.remainder(left - target, 360) < 0, term.name
+        assert math.remainder(right - target, 360) >= 0, term.name
         assert details["root_bracket_tt"] == [before, point]
         assert details["root_selection_policy"] == "first_post_crossing_tt_float"
         assert ephemeris_time(term.moment).jd_tt == point
@@ -53,6 +52,9 @@ def test_exact_crossing_at_the_first_scan_sample_is_not_lost(monkeypatch):
         return ((point - root) % 360, 0, 1, 1, 0, 0), swe.FLG_MOSEPH
 
     monkeypatch.setattr(almanac, "ephemeris_call", linear_sun)
+    monkeypatch.setattr(
+        moshier_solar, "solar_longitude", lambda point: (point - root) % 360
+    )
     provenance = {}
     moment = almanac._solar_term_utc_via_swe(2000, 0, anchor, provenance)
     assert moment is not None
@@ -79,9 +81,9 @@ def test_new_post_crossing_contract_rejects_a_coherent_pre_crossing_point(
         require_ren_solar_term(bad)
     assert caught.value.reason == "ren_solar_term_longitude_inconsistent"
 
-    # The old receipt explicitly used midpoint selection. Its original
-    # lower-side point remains admissible under its original version only.
+    # A retired model name cannot bypass the current crossing contract.
     historical = dict(details)
     historical["model_id"] = "native_swiss_tt_solar_bisection_v1"
     historical.pop("root_selection_policy")
-    require_ren_solar_term(replace(bad, solar_model_details=historical))
+    with pytest.raises((EphemerisSourceError, RuntimeError)):
+        require_ren_solar_term(replace(bad, solar_model_details=historical))

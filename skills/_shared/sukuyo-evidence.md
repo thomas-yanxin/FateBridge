@@ -75,7 +75,7 @@ Hinoo另返`critical_calendar_reference.image_witness_research`时，按其中�
 
 ## 新旧历与二十八宿名目的来源核对
 
-用户问《宿曜帳》117-20或新旧历方法时，可参照[所选页校读](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/sukuyo-shukuyocho-collation.md)。第10—11帧跨页的“无相違”论七曜直日，不是新旧历的月宿、全部历数或闰月法相同。正文另比较旧历二十七宿和新历二十八宿，小字又存异说；这些是本册主张，未认证全部历史历本。
+用户问《宿曜帳》117-20或新旧历方法时，可参照[所选页校读](../../docs/sukuyo.md)。第10—11帧跨页的“无相違”论七曜直日，不是新旧历的月宿、全部历数或闰月法相同。正文另比较旧历二十七宿和新历二十八宿，小字又存异说；这些是本册主张，未认证全部历史历本。
 
 本册所述逐日二十八宿、T1299上卷月日二十八宿表、现代距星不等宽天文二十八宿以及legacy等分示意不可互换。现有`mansion_method`不能冒充本册新历排法，参考历法范围也不能证明古代平明、桧尾半日或闰小月先后。图像全部取得、数学相容、同提供方模型首评与原典定本、历史观察和现实预测效力分别报告。
 
@@ -85,9 +85,9 @@ Hinoo另返`critical_calendar_reference.image_witness_research`时，按其中�
 
 采用NAOJ日本历史宿主且实际返回`calendar_reference.edo_calendar_method_reference`时，按该对象的实际阴历年和具名时段解释，不由宝历、寛政等年号或公历年份推断历法。宝历三、四年仍属貞享暦；公历1755年初可能仍属阴历1754年。来源的夜半注法不等于宿曜平明或桧尾半日。
 
-`intercalation_research`保留内田论文全十行以及作者提出的三例，表3另一月名是规则闰月的翌月。不能只取三例拟合普遍时刻规则，也不把作者判断改成本次宿主月号。`reform_month_length_reference`保留1872十二月原定大月与改历覆盖两天的30／2差别；两种单位不改标相等、不延长已停用日期。完整来源与边界见[近世历法资料](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/sukuyo-edo-calendar.md)。
+`intercalation_research`保留内田论文全十行以及作者提出的三例，表3另一月名是规则闰月的翌月。不能只取三例拟合普遍时刻规则，也不把作者判断改成本次宿主月号。`reform_month_length_reference`保留1872十二月原定大月与改历覆盖两天的30／2差别；两种单位不改标相等、不延长已停用日期。完整来源与边界见[近世历法资料](../../docs/sukuyo.md)。
 
-核对善通寺109-4的题记、历法疑字或前瞻取证时，另读[所选读录与前瞻文件](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/sukuyo-hinoo-colophon-and-output.md)。旧接纳片段与新增模型也／己形、被／彼、改／放形工作读法分开；没有定字、实物年代或谱系证明时，不把新读录当已校改原典。目录“閏月小月宿”、仪轨“時”字及“七日等不解界”条名均不能裁定钟界或规则优先。
+核对善通寺109-4的题记、历法疑字或前瞻取证时，另读[所选读录与前瞻文件](../../docs/sukuyo.md)。旧接纳片段与新增模型也／己形、被／彼、改／放形工作读法分开；没有定字、实物年代或谱系证明时，不把新读录当已校改原典。目录“閏月小月宿”、仪轨“時”字及“七日等不解界”条名均不能裁定钟界或规则优先。
 
 ## 发送前核对
 

@@ -22,22 +22,12 @@ from fatebridge.core.astro.relationship_geometry import (
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.ephemeris_runtime import swe
 from fatebridge.services.astrology import calculate_relative_chart_analysis
+from tests.relationship_inputs import A, B
 
 REFERENCE = json.loads(
     (
         Path(__file__).parent / "fixtures/western-geographiclib-midpoints.json"
     ).read_text()
-)
-A = dict(
-    name="甲",
-    birth_year=1990,
-    birth_month=4,
-    birth_day=6,
-    birth_hour=9,
-    birth_minute=33,
-    birth_timezone="UTC",
-    birth_longitude=179,
-    birth_latitude=10,
 )
 B = dict(
     name="乙",

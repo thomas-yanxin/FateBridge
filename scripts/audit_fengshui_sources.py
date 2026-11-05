@@ -57,7 +57,7 @@ def main() -> int:
         "--reference",
         type=Path,
         default=Path(__file__).resolve().parents[1]
-        / "tests/fixtures/fengshui_classical_v1/reference.json",
+        / "tests/data/fengshui_classical_v1/reference.json",
     )
     parser.add_argument("--output", type=Path)
     parser.add_argument("--facsimile", type=Path)
@@ -65,13 +65,13 @@ def main() -> int:
         "--city-gate-reference",
         type=Path,
         default=Path(__file__).resolve().parents[1]
-        / "tests/fixtures/fengshui_city_gate_v1/reference.json",
+        / "tests/data/fengshui_city_gate_v1/reference.json",
     )
     parser.add_argument(
         "--bazhai-depth-dir",
         type=Path,
         default=Path(__file__).resolve().parents[1]
-        / "tests/fixtures/fengshui_classical_v2",
+        / "tests/data/fengshui_classical_v2",
     )
     args = parser.parse_args()
     facsimile_path = args.facsimile or args.reference.with_name("facsimile-checks.json")
@@ -85,28 +85,27 @@ def main() -> int:
     result = audit_classical_reference(
         json.loads(args.reference.read_text(encoding="utf-8")), facsimile
     )
-    # The legacy count covers web prose versus three earlier facsimile spots.
+    # This count covers web prose versus three earlier facsimile spots.
     # It must not erase conflicts within the separately fixed 2011 edition.
     result["unresolved_disagreement_count_scope"] = (
-        "legacy_web_versus_earlier_facsimile_spot_checks_only"
+        "web_versus_earlier_facsimile_spot_checks_only"
     )
     lower_folder = (
-        Path(__file__).resolve().parents[1] / "tests/fixtures/fengshui_lower_clauses_v1"
+        Path(__file__).resolve().parents[1] / "tests/data/fengshui_lower_clauses_v1"
     )
     result["same_edition_lower_clauses"] = audit_lower_clauses(
         load_lower_clause_reference(lower_folder),
         json.loads(args.reference.read_text(encoding="utf-8")),
     )
     diagram_folder = (
-        Path(__file__).resolve().parents[1]
-        / "tests/fixtures/fengshui_lower_diagrams_v1"
+        Path(__file__).resolve().parents[1] / "tests/data/fengshui_lower_diagrams_v1"
     )
     result["complete_lower_diagrams"] = audit_lower_diagrams(
         load_lower_diagram_reference(diagram_folder)
     )
     replacement_diagram_folder = (
         Path(__file__).resolve().parents[1]
-        / "tests/fixtures/fengshui_replacement_diagrams_v1"
+        / "tests/data/fengshui_replacement_diagrams_v1"
     )
     result["complete_replacement_diagrams"] = audit_replacement_diagrams(
         load_replacement_diagram_reference(replacement_diagram_folder)
@@ -135,7 +134,7 @@ def main() -> int:
             raise ValueError("City gate primary page image changed")
     result["city_gate"] = audit_city_gate_reference(city_gate_reference)
     replacement_folder = (
-        Path(__file__).resolve().parents[1] / "tests/fixtures/fengshui_replacement_v1"
+        Path(__file__).resolve().parents[1] / "tests/data/fengshui_replacement_v1"
     )
     manifest = json.loads((replacement_folder / "hashes.json").read_text())
     for filename, digest in manifest.items():
@@ -151,13 +150,13 @@ def main() -> int:
         json.loads((replacement_folder / "wang-numeric-reference.json").read_text()),
     )
     angle_folder = (
-        Path(__file__).resolve().parents[1] / "tests/fixtures/fengshui_angle_sources_v1"
+        Path(__file__).resolve().parents[1] / "tests/data/fengshui_angle_sources_v1"
     )
     result["angle_source_research"] = audit_angle_source_reference(
         load_angle_source_reference(angle_folder)
     )
     pattern_folder = (
-        Path(__file__).resolve().parents[1] / "tests/fixtures/fengshui_patterns_v1"
+        Path(__file__).resolve().parents[1] / "tests/data/fengshui_patterns_v1"
     )
     pattern_manifest = json.loads((pattern_folder / "hashes.json").read_text())
     for filename, digest in pattern_manifest.items():
@@ -170,7 +169,7 @@ def main() -> int:
         json.loads((pattern_folder / "reference.json").read_text())
     )
     timeliness_folder = (
-        Path(__file__).resolve().parents[1] / "tests/fixtures/fengshui_timeliness_v1"
+        Path(__file__).resolve().parents[1] / "tests/data/fengshui_timeliness_v1"
     )
     for filename, digest in json.loads(
         (timeliness_folder / "hashes.json").read_text()
@@ -186,17 +185,16 @@ def main() -> int:
     result["wang_mutual_geometry"] = audit_mutual_geometry_reference(
         load_mutual_geometry_reference(
             Path(__file__).resolve().parents[1]
-            / "tests/fixtures/fengshui_mutual_geometry_v1"
+            / "tests/data/fengshui_mutual_geometry_v1"
         )
     )
     result["shen_host_guest"] = audit_host_guest_reference(
         load_host_guest_reference(
-            Path(__file__).resolve().parents[1]
-            / "tests/fixtures/fengshui_host_guest_v1"
+            Path(__file__).resolve().parents[1] / "tests/data/fengshui_host_guest_v1"
         )
     )
     lingzheng_folder = (
-        Path(__file__).resolve().parents[1] / "tests/fixtures/fengshui_lingzheng_v1"
+        Path(__file__).resolve().parents[1] / "tests/data/fengshui_lingzheng_v1"
     )
     for filename, digest in json.loads(
         (lingzheng_folder / "hashes.json").read_text()
@@ -210,22 +208,19 @@ def main() -> int:
         json.loads((lingzheng_folder / "reference.json").read_text())
     )
     structure_folder = (
-        Path(__file__).resolve().parents[1]
-        / "tests/fixtures/fengshui_structure_reading_v1"
+        Path(__file__).resolve().parents[1] / "tests/data/fengshui_structure_reading_v1"
     )
-    for filename, digest in json.loads(
-        (structure_folder / "hashes.json").read_text()
-    ).items():
-        if (
-            hashlib.sha256((structure_folder / filename).read_bytes()).hexdigest()
-            != digest
-        ):
-            raise ValueError("Printed structure or archived reading reference changed")
+    structure_reference = structure_folder / "printed-charts.json"
+    if (
+        hashlib.sha256(structure_reference.read_bytes()).hexdigest()
+        != "66e4dc34c1d6eba8ced19705d6e68a11f2ae31efa5e71bde243faad05b044e98"
+    ):
+        raise ValueError("Printed independent structure reference changed")
     result["printed_structures"] = audit_printed_structures(
         json.loads((structure_folder / "printed-charts.json").read_text())
     )
     opposite_folder = (
-        Path(__file__).resolve().parents[1] / "tests/fixtures/fengshui_opposite_v1"
+        Path(__file__).resolve().parents[1] / "tests/data/fengshui_opposite_v1"
     )
     for filename, digest in json.loads(
         (opposite_folder / "hashes.json").read_text()
@@ -240,7 +235,7 @@ def main() -> int:
         json.loads((structure_folder / "printed-charts.json").read_text()),
     )
     monthly_folder = (
-        Path(__file__).resolve().parents[1] / "tests/fixtures/fengshui_monthly_v1"
+        Path(__file__).resolve().parents[1] / "tests/data/fengshui_monthly_v1"
     )
     for filename, expected in json.loads(
         (monthly_folder / "hashes.json").read_text()
@@ -254,14 +249,13 @@ def main() -> int:
         json.loads((monthly_folder / "reference.json").read_text())
     )
     day_hour_folder = (
-        Path(__file__).resolve().parents[1]
-        / "tests/fixtures/fengshui_day_hour_tables_v1"
+        Path(__file__).resolve().parents[1] / "tests/data/fengshui_day_hour_tables_v1"
     )
     result["day_hour_table_research"] = audit_day_hour_reference(
         load_day_hour_reference(day_hour_folder)
     )
     calendar_folder = (
-        Path(__file__).resolve().parents[1] / "tests/fixtures/fengshui_day_calendar_v1"
+        Path(__file__).resolve().parents[1] / "tests/data/fengshui_day_calendar_v1"
     )
     result["day_hour_calendar_selection_research"] = (
         audit_calendar_selection_hypotheses(

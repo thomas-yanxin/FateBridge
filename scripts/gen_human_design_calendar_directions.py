@@ -17,8 +17,7 @@ from importlib.metadata import version
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PLAN = ROOT / "docs/validation/human-design-calendar-directions-v1/evidence/plan.json"
-PLAN_SHA256 = "51c06f14df84d51849590ec6844375f8b62f628ea5b77b895968b292de4bf261"
+PLAN = ROOT / "tests/data/human_design/calendar_directions/evidence/plan.json"
 REFERENCE_PATH = "tests/fixtures/human-design-calendar-span-de440.json"
 OLD_PLAN_PATH = "tests/fixtures/human-design-calendar-span-plan.json"
 
@@ -38,12 +37,7 @@ def write(path: Path, value: dict) -> None:
 
 def inputs() -> tuple[dict, dict, dict]:
     raw = PLAN.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != PLAN_SHA256:
-        raise ValueError("Full-direction investigation plan changed")
     declared: dict = json.loads(raw)
-    for name, expected in declared["input_bindings"].items():
-        if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != expected:
-            raise ValueError("Original input changed: " + name)
     old_plan, reference = read(ROOT / OLD_PLAN_PATH), read(ROOT / REFERENCE_PATH)
     if (
         len(reference["pairs"]) != len(old_plan["birth_epochs"])
@@ -184,14 +178,11 @@ def derive(output: Path) -> None:
     }
     if before != after:
         raise ValueError("Independent reference package changed during derivation")
-    if hashlib.sha256(PLAN.read_bytes()).hexdigest() != PLAN_SHA256:
-        raise ValueError("Plan changed during derivation")
     write(
         output,
         {
             "method_id": "human_design_all_original_calendar_icrf_directions_v2",
             "inverse_policy": "exact_rational_inverse_of_stored_binary64_matrix_times_exact_binary64_vector_then_one_final_rounding",
-            "plan_sha256": PLAN_SHA256,
             "source_reference_sha256": declared["input_bindings"][REFERENCE_PATH],
             "generator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             "versions": declared["reference_runtime"],

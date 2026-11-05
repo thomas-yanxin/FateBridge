@@ -58,12 +58,10 @@
             }
           ],
           "source_binding": {
-            "protocol_sha256": "3cd171eef27321afb8af3702efe02ac32b65d003239fdc24b9cfcc5538d13268",
-            "reviewed_binding_sha256": "5dadfdc20f19f5d060beda21b3bdda7ef82a8cecb18b7b0003a487b3469c4eca",
             "source_supplement_sha256": "8e103a5435c1ba81be4f3a0562337aaa3fd9ed271c05a870620a346e4d025725",
             "gap_review_sha256": "c296fc6035f25cf7cdaa0d99165e7af2f26ef2f5fd13e377070ba0b53860676d",
             "source_leaf_images_sha256": {
-              "docs/validation/bazi-source-leaf-alignment-v1/candidate-detail-first/leaf-0051.png": "a4817814f5f961b1c80bbd73c9b2a4caaa19fb57a029b6c6ece9af93750c796f"
+              "tests/data/bazi/primary/leaf-0051.png": "a4817814f5f961b1c80bbd73c9b2a4caaa19fb57a029b6c6ece9af93750c796f"
             },
             "original516_source_not_replaced": true
           },
@@ -75,7 +73,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/strength.py",
-              "source_sha256": "a6a52ba57159825b8f71ebf867e64442148c37f124982a4a9709e221f1b36c16",
               "support_scope": "只支持工程模型强、中和、弱三档及系数为工程政策；不为原典四字设立数值定义。"
             }
           ],
@@ -139,12 +136,10 @@
             }
           ],
           "source_binding": {
-            "protocol_sha256": "3cd171eef27321afb8af3702efe02ac32b65d003239fdc24b9cfcc5538d13268",
-            "reviewed_binding_sha256": "5dadfdc20f19f5d060beda21b3bdda7ef82a8cecb18b7b0003a487b3469c4eca",
             "source_supplement_sha256": "8e103a5435c1ba81be4f3a0562337aaa3fd9ed271c05a870620a346e4d025725",
             "gap_review_sha256": "c296fc6035f25cf7cdaa0d99165e7af2f26ef2f5fd13e377070ba0b53860676d",
             "source_leaf_images_sha256": {
-              "docs/validation/bazi-source-leaf-alignment-v1/candidate-detail-first/leaf-0052.png": "8566e9f31bcd0cc0b3c578c98355921ca006cca8b714322530bd8f753f5285f2"
+              "tests/data/bazi/primary/leaf-0052.png": "8566e9f31bcd0cc0b3c578c98355921ca006cca8b714322530bd8f753f5285f2"
             },
             "original516_source_not_replaced": true
           },
@@ -223,15 +218,13 @@
             }
           ],
           "source_binding": {
-            "protocol_sha256": "3cd171eef27321afb8af3702efe02ac32b65d003239fdc24b9cfcc5538d13268",
-            "reviewed_binding_sha256": "5dadfdc20f19f5d060beda21b3bdda7ef82a8cecb18b7b0003a487b3469c4eca",
             "source_supplement_sha256": "8e103a5435c1ba81be4f3a0562337aaa3fd9ed271c05a870620a346e4d025725",
             "gap_review_sha256": "c296fc6035f25cf7cdaa0d99165e7af2f26ef2f5fd13e377070ba0b53860676d",
             "source_leaf_images_sha256": {
-              "docs/validation/bazi-source-leaf-alignment-v1/candidate-detail-first/leaf-0052.png": "8566e9f31bcd0cc0b3c578c98355921ca006cca8b714322530bd8f753f5285f2",
-              "docs/validation/bazi-source-leaf-alignment-v1/candidate-detail-first/leaf-0053.png": "e9cb28e7c5db1b61cdb262ebb38c30cf0ea4c3684517fc0a11e1a7b05dd9ef73",
-              "docs/validation/bazi-source-leaf-alignment-v1/candidate-detail-first/leaf-0054.png": "27de8c9827f0c0ef829ec1b947839711ae99c7341b3bd9c85ec8be02a8c2cdcf",
-              "docs/validation/bazi-source-leaf-alignment-v1/candidate-detail-first/leaf-0056.png": "e23f8200e04e60e42b42a8f581a455d3ea1b232bd9a1b5808d9a9699cc4c12cf"
+              "tests/data/bazi/primary/leaf-0052.png": "8566e9f31bcd0cc0b3c578c98355921ca006cca8b714322530bd8f753f5285f2",
+              "tests/data/bazi/primary/leaf-0053.png": "e9cb28e7c5db1b61cdb262ebb38c30cf0ea4c3684517fc0a11e1a7b05dd9ef73",
+              "tests/data/bazi/primary/leaf-0054.png": "27de8c9827f0c0ef829ec1b947839711ae99c7341b3bd9c85ec8be02a8c2cdcf",
+              "tests/data/bazi/primary/leaf-0056.png": "e23f8200e04e60e42b42a8f581a455d3ea1b232bd9a1b5808d9a9699cc4c12cf"
             },
             "original516_source_not_replaced": true
           },

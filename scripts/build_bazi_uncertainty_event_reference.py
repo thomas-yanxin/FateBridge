@@ -15,7 +15,7 @@ from pathlib import Path
 from scripts.build_bazi_birth_fold_reference import offset_text, parse_tzif
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_uncertainty_events_v1"
+FIXTURE = ROOT / "tests/data/bazi_uncertainty_events_v1"
 EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 SECOND = 1_000_000
 HOUR = 3600 * SECOND
@@ -71,7 +71,7 @@ def main():
     counts, rows, zone_hashes = Counter(), [], {}
     margin = round(protocol["known_reference_order_margin_seconds"] * SECOND)
     for zone, receipt in clock["zones"].items():
-        path = ROOT / "tests/fixtures/bazi_birth_fold_v1/compiled" / zone
+        path = ROOT / "tests/data/bazi_birth_fold_v1/compiled" / zone
         assert sha(path) == receipt["compiled_sha256"]
         zone_hashes[zone] = sha(path)
         times, indices, kinds = parse_tzif(path.read_bytes())
@@ -194,7 +194,6 @@ def main():
     result = {
         "recorded_at_utc": datetime.now(timezone.utc).isoformat(),
         "protocol_sha256": sha(protocol_path),
-        "collector_sha256": sha(Path(__file__)),
         "sources": protocol["sources"],
         "compiled_zone_sha256": zone_hashes,
         "zone_count": len(zone_hashes),

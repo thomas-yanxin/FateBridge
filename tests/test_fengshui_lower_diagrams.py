@@ -12,7 +12,7 @@ import pytest
 
 from fatebridge.validation import fengshui_lower_diagrams as audit
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_lower_diagrams_v1"
+FOLDER = Path(__file__).parent / "data/fengshui_lower_diagrams_v1"
 
 
 def source():

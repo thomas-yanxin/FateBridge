@@ -8,7 +8,14 @@ from fractions import Fraction
 from typing import Any
 
 from ...utils.errors import EphemerisSourceError
-from .. import aa1996_solar, analytic_solar, de440_solar, spk_solar, vsop2013_solar
+from .. import (
+    aa1996_solar,
+    analytic_solar,
+    de440_solar,
+    moshier_solar,
+    spk_solar,
+    vsop2013_solar,
+)
 from ..almanac import (
     NATIVE_SOLAR_ROOT_MODEL_ID,
     SOLAR_TERM_LONGITUDES,
@@ -99,11 +106,8 @@ def _native(
         raise _fail()
     if library_version != str(getattr(swe, "version", "unknown")):
         raise _fail()
-    native_model_id = details.get("model_id", "native_swiss_tt_solar_bisection_v1")
-    if native_model_id not in {
-        "native_swiss_tt_solar_bisection_v1",
-        NATIVE_SOLAR_ROOT_MODEL_ID,
-    }:
+    native_model_id = details.get("model_id")
+    if native_model_id != NATIVE_SOLAR_ROOT_MODEL_ID:
         raise _fail()
     expected = dict(
         model_id=native_model_id,
@@ -112,11 +116,10 @@ def _native(
         ephemeris_library_version=library_version,
         accuracy_certified=False,
     )
-    if native_model_id == NATIVE_SOLAR_ROOT_MODEL_ID:
-        expected.update(
-            root_selection_policy="first_post_crossing_tt_float",
-            selected_crossing_jd_tt=points[1][0],
-        )
+    expected.update(
+        root_selection_policy="first_post_crossing_tt_float",
+        selected_crossing_jd_tt=points[1][0],
+    )
     _source(details, expected, complete)
     if any(len(point) != 1 for point in points):
         raise _fail()
@@ -194,6 +197,20 @@ def validate_term_longitude(
         target = TARGETS[name]
         if provider == "swisseph":
             values = _native(points, model, flags, library_version, details, complete)
+        elif provider == moshier_solar.PROVIDER:
+            if (
+                model != moshier_solar.MODEL_ID
+                or flags
+                or any(len(p) != 1 for p in points)
+            ):
+                raise _fail()
+            expected = moshier_solar.model_details()
+            expected.update(
+                root_selection_policy="first_post_crossing_tt_float",
+                selected_crossing_jd_tt=points[1][0],
+            )
+            _source(details, expected, complete)
+            values = [moshier_solar.solar_longitude(p[0]) for p in points]
         elif provider == "fatebridge_analytic":
             if (
                 model != analytic_solar.MODEL_ID

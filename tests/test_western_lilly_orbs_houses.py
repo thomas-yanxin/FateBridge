@@ -28,6 +28,7 @@ from fatebridge.core.lilly_orbs import (
 )
 from fatebridge.core.requests.western_events import AstroHoraryRequest
 from fatebridge.services.western_horary import calculate_horary
+from tests.lunar_sampler import sampled_motion
 from tests.test_western_horary import QUESTION
 from tests.test_western_horary_motion import state
 
@@ -111,7 +112,7 @@ def test_orb_equality_convention_classifies_adjacent_floats_before_rounding(
 
 
 def test_profile_selection_is_local_for_proxy_lunar_annotations_and_concurrent_calls():
-    a, b = state("Mars", 0, 1), state("Mercury", 7.125, 0.5)
+    a, b = (state("Mars", 0, 1), state("Mercury", 7.125, 0.5))
     moon = state("Moon", 7, 13)
     states = {
         p: state(p, lon, speed)
@@ -125,17 +126,16 @@ def test_profile_selection_is_local_for_proxy_lunar_annotations_and_concurrent_c
     states.update(Mars=a, Mercury=b, Moon=moon)
     for profile, expected in ((FIRST, True), (SECOND, False), (FIRST, True)):
         value = _judge_perfection(
-            a,
-            b,
-            moon,
-            states,
-            "Mars",
-            "Mercury",
-            orb_profile=profile,
+            a, b, moon, states, "Mars", "Mercury", orb_profile=profile
         )
         assert (value["mode"] == "direct") is expected
         result = _moon_void_of_course(
-            state("Moon", 0, 13), [state("Mars", 9.8, 0)], orb_profile=profile
+            state("Moon", 0, 13),
+            [state("Mars", 9.8, 0)],
+            orb_profile=profile,
+            physical_motion=sampled_motion(
+                state("Moon", 0, 13), [state("Mars", 9.8, 0)]
+            ),
         )
         assert result["next_aspect"]["inside_current_orb"] is expected
         assert result["next_aspect"]["orb_profile"] == profile
@@ -221,7 +221,7 @@ def dwelling_inputs():
         "constant_velocity_projection": False,
         "events": [contact("Mars", -1), contact("Venus", 1)],
     }
-    return states, history
+    return (states, history)
 
 
 def clause(states, history, querent="Venus", quesited="Mars", event_paths=None):
@@ -335,8 +335,6 @@ def test_matching_p126_receipts_remain_distinct_from_p127_necessary_subcondition
 
 
 def test_actual_root_solver_feeds_dwelling_invariant_to_event_array_order():
-    # Analytical motion realizes the named clause; these are engineering
-    # controls, not observations or historical ephemerides printed by Lilly.
     positions = {p: 40.0 for p in BODIES}
     speeds = {p: 0.0 for p in BODIES}
     positions.update(Moon=12.0, Mars=10.0, Venus=14.0)
@@ -356,10 +354,10 @@ def test_actual_root_solver_feeds_dwelling_invariant_to_event_array_order():
     result = clause(states, history)
     assert result["lunar_sequence_subconditions_satisfied"] is True
     assert result["prior_lunar_contact"]["julian_day_tt"] == pytest.approx(
-        2451545.0 - 2 / 12.5, abs=1e-8
+        2451545.0 - 2 / 12.5, abs=1e-08
     )
     assert result["next_lunar_contact"]["julian_day_tt"] == pytest.approx(
-        2451545.0 + 2 / 12, abs=1e-8
+        2451545.0 + 2 / 12, abs=1e-08
     )
     history["events"].reverse()
     assert clause(states, history) == result

@@ -333,11 +333,7 @@ def test_reading_quotes_this_calculation_and_preserves_research_limitations():
     assert all(p["dignity"] is None for p in result["planets"])
 
 
-def test_native_gods_never_fall_back_to_the_external_legacy_table(monkeypatch):
-    def rejected(*args, **kwargs):
-        pytest.fail("native Guolao must use its collated edition table")
-
-    monkeypatch.setattr(guolao_moira, "compute_god_signidx", rejected)
+def test_native_gods_use_the_collated_edition_table():
     result = chart()
     g = result["guolao"]
     god = g["god_positions"]

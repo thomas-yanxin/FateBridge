@@ -57,9 +57,9 @@
 
 索取全部激活／固定时覆盖双侧实际26项，依据各项 `calculation_path` 列侧、星体、门线和 `fixing_state`。`status` 的单极性类别不等于本盘已经上升触发；`unfixed` 不等于无极性星体，也不等于行运或人际互动永远不触发。固定机制及其逐项reading不构成完整原典爻义，未取得的正文不补写为已验收解释。
 
-公开2001版PDF包含384线正文；“未交付／未完成审校”不能说成“公开正文不存在”。逐线条款续核（本地数据：`../../../docs/validation/human-design-primary-clause-scope-v1/README.md`）已检查全部384个文本块和11个星体／极性候选，仍不构成384线完整解释验收。另找到公开2005年周期课转录：太阳回归的双侧时点说明只用于该节范围；凯龙七年窗口是解读时机建议，不能代替数值求根范围、误差容限或首末触规则。第三方转录副本不作出版方母本认证，土星／凯龙起点及多触优先性继续按实际未决状态交付。
+公开2001版PDF包含384线正文；“未交付／未完成审校”不能说成“公开正文不存在”。逐线条款续核已检查全部384个文本块和11个星体／极性候选，仍不构成384线完整解释验收。另找到公开2005年周期课转录：太阳回归的双侧时点说明只用于该节范围；凯龙七年窗口是解读时机建议，不能代替数值求根范围、误差容限或首末触规则。第三方转录副本不作出版方母本认证，土星／凯龙起点及多触优先性继续按实际未决状态交付。
 
-58.5的历史分歧读取 `historical_polarity` 卡：当前2001字面表、2002年zc design通知条件模型及两张既有官方盘的相反标记同时保留。逐项给所选与条件状态、实际供给路径；通知适用版次及出版方母版未认证，不自动切换默认、不声称完整线义解决。完整记录见历史极性续核（本地数据：`../../../docs/validation/human-design-historical-polarity-v1/README.md`）。
+58.5的历史分歧读取 `historical_polarity` 卡：当前2001字面表、2002年zc design通知条件模型及两张既有官方盘的相反标记同时保留。逐项给所选与条件状态、实际供给路径；通知适用版次及出版方母版未认证，不自动切换默认、不声称完整线义解决。来源分歧和限定见[当前计算说明](../../../docs/human-design.md)。
 
 太阳附近视位置、名义太阳圆盘投影与偏折延拓分歧，按本盘 `apparent_position_context` 及相应解释说明；名义投影不是实际遮掩或可见性观测。既有独立参考行属于其冻结TT，不把差值移植为另一个民用输入的实测误差。即使求根括区极窄、有限端点的门至Base一致，也不认证物理精度、整个连续区间或真实出生记录。
 
@@ -69,6 +69,6 @@
 几何解释先读 `apparent_position_context.coordinate_context` 与 `interpretation.coordinate_frame_meaning`，核对观测原点、坐标架、单位和夹角顶点。当前批次只允许地心视位置：太阳角距是地心处太阳视线与目标视线的夹角；“太阳”是视线端点，不是观测原点。不能因名称含太阳就称日心角距，也不能把角距当日心距离。未读到这些字段时不能自行换原点；数值相同不代表几何含义相同。
 
 
-周期规则1.6.0的`station_witnesses[*].coordinate_probe`保留有限坐标补探：原生速度零点不直接当作返回黄经极值，原扫描完成后才补探；目标进入严格扩展的已观察极值范围时才追加分段。网格端点零速度和连续已观察零值分别处理，不把零值段两端当作两次物理交会。`motion`仍取原生返回速度符号，对照`motion_evidence.search_segment_phase_trend`及`native_speed_agrees_with_segment_trend`；不一致时分别说明，不把搜索段方向说成已认证的瞬时导数。缺失的motion_evidence为未知，不能补造；完整新回执核验仍要求实际依据。新增数值候选不等于新增公转轮数，极窄括区也不证明物理时刻精度。原一秒参考分歧和连续根数未认证状态继续保留，见周期坐标极值续核（本地数据：`../../../docs/validation/human-design-cycle-solar-stations-v1/README.md`）。
+周期规则1.6.0的`station_witnesses[*].coordinate_probe`保留有限坐标补探：原生速度零点不直接当作返回黄经极值，原扫描完成后才补探；目标进入严格扩展的已观察极值范围时才追加分段。网格端点零速度和连续已观察零值分别处理，不把零值段两端当作两次物理交会。`motion`仍取原生返回速度符号，对照`motion_evidence.search_segment_phase_trend`及`native_speed_agrees_with_segment_trend`；不一致时分别说明，不把搜索段方向说成已认证的瞬时导数。缺失的motion_evidence为未知，不能补造；完整新回执核验仍要求实际依据。新增数值候选不等于新增公转轮数，极窄括区也不证明物理时刻精度。原一秒参考分歧和连续根数未认证状态继续保留，见周期坐标极值续核。
 
-`summary_format=human_design_cycle_summary_compact_v1`的周期卡将重复状态放在`contact_defaults`，方向约定放在`motion_evidence_defaults`。必须连同这些声明读取：每条显式例外优先，`segment_phase_trend=null`仍是未知；非空例外可与原生`motion`相反，不得说二者一致。省略完整分段端点只表示摘要投影，实际见证与原有范围说明在同次`cycle_context`及`summary_conventions`，需要时读取同一run，不重算替代。没有格式声明或默认表时不能猜省略值，也不能把默认映射当作瞬时坐标导数认证。完整接触日期、TT、运动、区间宽度及残差保留；原典取舍和第六线阶段未定状态不变。见摘要与三端复核（本地数据：`../../../docs/validation/human-design-cycle-summary-v1/README.md`）。
+`summary_format=human_design_cycle_summary_compact_v1`的周期卡将重复状态放在`contact_defaults`，方向约定放在`motion_evidence_defaults`。必须连同这些声明读取：每条显式例外优先，`segment_phase_trend=null`仍是未知；非空例外可与原生`motion`相反，不得说二者一致。省略完整分段端点只表示摘要投影，实际见证与原有范围说明在同次`cycle_context`及`summary_conventions`，需要时读取同一run，不重算替代。没有格式声明或默认表时不能猜省略值，也不能把默认映射当作瞬时坐标导数认证。完整接触日期、TT、运动、区间宽度及残差保留；原典取舍和第六线阶段未定状态不变。见摘要与三端复核。

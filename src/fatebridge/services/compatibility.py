@@ -75,6 +75,7 @@ def calculate_compatibility_analysis(
             "compatibility_level": advanced_analysis["summary"],
             "relationship_type": relationship_type,
             "score_basis": "多维度规则加权的 0–100 分；不是关系成功概率。",
+            "status": advanced_analysis["scoring"]["status"],
             "scoring": advanced_analysis["scoring"],
         },
         "detailed_analysis": {
@@ -111,6 +112,17 @@ def calculate_compatibility_analysis(
                 "day_master": f"{analysis1['day_master']['stem']}({analysis1['day_master']['element']})",
                 "strength": analysis1["day_master"]["strength"],
                 "favorable_elements": analysis1.get("favorable_elements", []),
+                "preference_assessment": {
+                    key: analysis1["structure_profile"][key]
+                    for key in (
+                        "resolution_policy",
+                        "assessment_status",
+                        "useful_elements",
+                        "avoid_elements",
+                        "conditional_elements",
+                        "neutral_elements",
+                    )
+                },
             },
             "person2": {
                 "name": analysis2["person_info"]["name"],
@@ -118,6 +130,17 @@ def calculate_compatibility_analysis(
                 "day_master": f"{analysis2['day_master']['stem']}({analysis2['day_master']['element']})",
                 "strength": analysis2["day_master"]["strength"],
                 "favorable_elements": analysis2.get("favorable_elements", []),
+                "preference_assessment": {
+                    key: analysis2["structure_profile"][key]
+                    for key in (
+                        "resolution_policy",
+                        "assessment_status",
+                        "useful_elements",
+                        "avoid_elements",
+                        "conditional_elements",
+                        "neutral_elements",
+                    )
+                },
             },
         },
         "element_relationship": {

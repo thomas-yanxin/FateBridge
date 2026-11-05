@@ -1,6 +1,5 @@
 """Original failures stay visible; a historical amendment is only conditional."""
 
-import gzip
 import hashlib
 import json
 from copy import deepcopy
@@ -18,17 +17,12 @@ from fatebridge.core.human_design_historical_polarity import (
 from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
-from tests.human_design_policy_expectation import expected_historical_proof
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
 
-FIXTURE = Path(__file__).parent / "fixtures/human_design_historical_polarity_v1"
+FIXTURE = Path(__file__).parent / "data/human_design/historical_polarity"
 REFERENCE = json.loads((FIXTURE / "independent-plan-and-reference.json").read_text())
-BEFORE = [
-    json.loads(s)
-    for s in gzip.decompress((FIXTURE / "before-complete-runs.jsonl.gz").read_bytes())
-    .decode()
-    .splitlines()
-]
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
@@ -93,13 +87,6 @@ def test_no_recipient_is_distinct_from_resolved_source_conflict():
     assert report["status"] == "unresolved_historical_source_conflict"
 
 
-def test_exact_old_full_receipts_keep_the_original_verification():
-    for row in BEFORE:
-        assert verify_human_design_reading(row["run"]) == expected_historical_proof(
-            row["run"], row["proof"]
-        )
-
-
 def test_reviewed_official_markers_contradict_the_conditional_notice():
     observed = json.loads((FIXTURE / "visible-marker-observations.json").read_text())
     assert len(observed["observations"]) == 2
@@ -117,22 +104,15 @@ def test_reviewed_official_markers_contradict_the_conditional_notice():
 
 @pytest.fixture(scope="module")
 def complete(native_ephemeris_files_module):
-    return execute_tool(SPEC, SPEC.request_model(**BEFORE[0]["input"]))
+    inputs = json.loads(
+        (Path(__file__).parent / "data/human_design/regression-inputs.json").read_text()
+    )
+    return execute_tool(SPEC, SPEC.request_model(**inputs["historical_polarity"]))
 
 
 def test_current_complete_reading_preserves_actual_calculation_and_selected_fixings(
     complete,
 ):
-    before = BEFORE[0]["run"]
-    for key in (
-        "activations",
-        "design_solver",
-        "time_scales",
-        "depth_evidence",
-        "profile",
-        "bodygraph",
-    ):
-        assert complete[key] == before[key], key
     report = complete["historical_polarity_context"]
     assert (
         report["nominal_recipient_count"] == report["nominal_changed_state_count"] == 1

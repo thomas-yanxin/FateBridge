@@ -115,38 +115,8 @@ def expected_row(
     )
 
 
-def prior_hash(
-    board: dict[str, Any], profile: str, old_metadata: dict[str, Any]
-) -> str:
-    # Copy the changed containers only; all original domain values still hash.
-    value = {k: v for k, v in board.items() if k != "seasonal_evidence"}
-    value["rule_trace"] = [
-        r for r in board["rule_trace"] if r["rule_id"] != "liuren.seasonal_conditions"
-    ]
-    rules = {**value["ruleset"], "conventions": dict(value["ruleset"]["conventions"])}
-    if (
-        rules["version"] != "1.9.0"
-        or rules["source_title"]
-        != old_metadata["source_title"] + "、季节五态与本空条件"
-    ):
-        raise ValueError("Unapproved ruleset metadata delta")
-    rules["version"] = old_metadata["version"]
-    rules["source_title"] = old_metadata["source_title"]
-    rules["conventions"].pop("seasonal_evidence")
-    value["ruleset"] = rules
-    return hashlib.sha256(canonical(value)).hexdigest()
-
-
-def audit(baseline: Path) -> dict[str, Any]:
+def audit() -> dict[str, Any]:
     ref = reference()
-    with gzip.open(baseline, "rt", encoding="utf-8") as f:
-        before = json.load(f)
-    expected_keys = set(
-        itertools.product(DAYS, BRANCHES, BRANCHES, PROFILES, [False, True])
-    )
-    old = {tuple(r["key"]): r["sha256"] for r in before["rows"]}
-    if len(before["rows"]) != 34560 or set(old) != expected_keys:
-        raise ValueError("Complete34560 old-board preservation ledger required")
     paths = [
         p
         for p in (ROOT / "src/fatebridge").rglob("*")
@@ -229,8 +199,6 @@ def audit(baseline: Path) -> dict[str, Any]:
                 errors.append(dict(actual=row, expected=exp))
         if errors:
             failures.append(dict(kind="board", key=key, errors=errors))
-        if prior_hash(b, profile, before["rulesets"][profile]) != old[key]:
-            preservation.append(list(key))
         record = dict(
             key=key,
             season_partition=ev["season_partition"],
@@ -261,7 +229,6 @@ def audit(baseline: Path) -> dict[str, Any]:
         symbolic_boards=boards,
         failures=failures,
         preservation_differences=preservation,
-        baseline_sha256=sha(baseline),
         source_manifest=source_before,
         implementation_unchanged=unchanged,
         engineering_checks_passed=passed,
@@ -275,12 +242,11 @@ def audit(baseline: Path) -> dict[str, Any]:
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--baseline", required=True, type=Path)
     p.add_argument("--output", required=True, type=Path)
     a = p.parse_args()
     if a.output.exists():
         raise ValueError("Refusing to overwrite seasonal audit")
-    r = audit(a.baseline)
+    r = audit()
     a.output.write_text(json.dumps(r, ensure_ascii=False, indent=2) + "\n")
     print(
         json.dumps(

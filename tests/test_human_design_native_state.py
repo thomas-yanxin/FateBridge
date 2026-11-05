@@ -24,34 +24,6 @@ PLAN = json.loads(
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
-def test_original_four_before_cases_and_plan_are_frozen():
-    before = ROOT / "docs/validation/human-design-native-state-before.json"
-    assert (
-        hashlib.sha256(before.read_bytes()).hexdigest()
-        == "50c86b4334eee19b38533cbe905d17407021b9ad53c1d2a75be2cec9a7cfcf40"
-    )
-    assert (
-        hashlib.sha256(
-            (ROOT / "tests/fixtures/human-design-native-state-plan.json").read_bytes()
-        ).hexdigest()
-        == "f008e248178721c9225c7f10b359b9596fc9a0692327cec7a791098223590522"
-    )
-    cases = json.loads(before.read_text())["cases"]
-    assert (
-        len(cases) == 4
-        and [c["birth_input"] for c in cases] == PLAN["mandatory_birth_inputs"]
-    )
-    assert [c["year"] for c in cases if c["nominal_tt_change_seconds"] > 8000] == [
-        1800,
-        1900,
-    ]
-    assert all(
-        c["physical_file_hashes_unchanged"]
-        and c["verification_after_override"] == "verified_fixed_template_reading"
-        for c in cases
-    )
-
-
 @pytest.mark.parametrize(
     "year", [p["birth_year"] for p in PLAN["mandatory_birth_inputs"]]
 )

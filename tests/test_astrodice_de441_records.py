@@ -15,7 +15,7 @@ from scripts.astrodice_de441_records import (
     mini_kernel,
 )
 
-J2000 = Path(__file__).parent / "fixtures/astrodice-de441-j2000.eph"
+J2000 = Path(__file__).parent / "data/astrodice/tables/de441-j2000.eph"
 
 
 @pytest.mark.parametrize("degree", range(15))

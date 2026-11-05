@@ -15,7 +15,7 @@ from fatebridge.services.fengshui import calculate_xuankong_natal
 from fatebridge.validation.fengshui_patterns import audit_classical_patterns
 from tests.test_fengshui_surfaces import mcp_call, rest_client, without_transport
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_patterns_v1"
+FOLDER = Path(__file__).parent / "data/fengshui_patterns_v1"
 REFERENCE = json.loads((FOLDER / "reference.json").read_text())
 NAMES = [m["name"] for m in natal_rules()["mountains"]]
 

@@ -15,7 +15,7 @@ from fatebridge.core.elements import ElementAnalysis
 from fatebridge.utils.data import GENERATION_CYCLE
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_focus_validation_v1"
+FIXTURE = ROOT / "tests/data/bazi_focus_validation_v1"
 ORDER = ("year", "month", "day", "hour")
 SOURCES = (
     "src/fatebridge/core/strength.py",
@@ -100,7 +100,7 @@ def audit() -> dict[str, Any]:
     for name, expected in protocol["originals"].items():
         if digest(ROOT / name) != expected:
             raise ValueError("Original input, counterexample or protocol changed")
-    original = frozen(ROOT / "tests/fixtures/bazi_disagreement_review_v1/review.json")
+    original = frozen(ROOT / "tests/data/bazi_disagreement_review_v1/review.json")
     notes = frozen(FIXTURE / "source-focus-notes.json")
     if [c["id"] for c in original["cases"]] != [c["id"] for c in notes["cases"]]:
         raise ValueError("An original anchor disappeared")

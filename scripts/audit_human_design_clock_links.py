@@ -76,7 +76,7 @@ def main() -> None:
     raw = args.cohort.read_bytes()
     cohort = json.loads(raw)
     links = source_plan_links(args.plan.read_bytes(), cohort, args.expected_plan_sha256)
-    report = official_chart_checks(cohort, include_clock_link_evidence=True)
+    report = official_chart_checks(cohort)
     observed = len(cohort["cases"])
     source_complete = links["complete_source_plan_links"]
     result = {

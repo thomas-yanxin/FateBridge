@@ -13,9 +13,11 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_tt_utc_exact_transports import check_terms
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("key", ["bazi_birth", "dayun_analysis", "timing_analysis"])

@@ -10,7 +10,6 @@ from fatebridge.core.human_design_apparent_positions import add_apparent_evidenc
 from fatebridge.core.human_design_birth_clock import verify_birth_clock
 from fatebridge.core.human_design_depth import cross_identifier
 from fatebridge.core.human_design_evidence import evidence
-from fatebridge.core.human_design_gate_context import METHOD as GATE_CONTEXT_METHOD
 from fatebridge.core.human_design_mechanics import (
     VALID_PROFILES,
     bodygraph,
@@ -27,7 +26,6 @@ from fatebridge.validation.claims import (
 )
 from fatebridge.validation.human_design_apparent_positions import (
     checked_context,
-    declares_legacy_apparent_contract,
 )
 from fatebridge.validation.human_design_backend import verify_full_backend_report
 from fatebridge.validation.human_design_clocks import verify_clock_records
@@ -39,45 +37,14 @@ from fatebridge.validation.human_design_cycle_origins import (
 )
 from fatebridge.validation.human_design_cycles import verify_cycle_context
 from fatebridge.validation.human_design_execution import verify_native_context
-from fatebridge.validation.human_design_historical_polarity import (
-    declares_legacy_historical_polarity_contract,
-)
 from fatebridge.validation.human_design_joint import verify_run_joint_snapshots
 from fatebridge.validation.human_design_natal_sources import verify_natal_sources
 from fatebridge.validation.human_design_profile_partition import (
     checked_profile_partition,
-    declares_legacy_partition_contract,
 )
 from fatebridge.validation.human_design_provenance import verify_selected_provenance
 from fatebridge.validation.human_design_sampling import verify_sampled_interval
 from fatebridge.validation.human_design_solar_root import verify_solar_root_context
-
-# These are complete pre-extension schema fingerprints, not selected case IDs.
-# A current or unknown contract must include the extension even if all four of
-# its regions have been deleted and the business payload has been rehashed.
-_PRE_GATE_CONTEXT_CONTRACTS = frozenset(
-    {
-        "570410131790378bf9a4e34e1f7031d5767e6dd9103c88426746099d870400b2",
-        "56806b2004d57149ad0067f1e7cb090d4fd3325413a6f21b04b4dc91dd02d4aa",
-    }
-)
-
-
-def _declares_legacy_gate_contract(payload: dict[str, Any]) -> bool:
-    if payload.get("run_metadata", {}).get("contract_sha256") not in (
-        _PRE_GATE_CONTEXT_CONTRACTS
-    ):
-        return False
-    if (
-        "gate_activation_context" in payload
-        or "gate_activation_context" in payload.get("interpretation", {})
-    ):
-        return False
-    return not any(
-        any(row.get(k) == GATE_CONTEXT_METHOD for k in ("id", "rule_id", "ruleset_id"))
-        for key in ("rulesets", "rule_trace")
-        for row in payload.get(key, [])
-    )
 
 
 def verify_human_design_reading(payload: dict[str, Any]) -> dict[str, Any]:
@@ -109,34 +76,22 @@ def _verify_human_design_reading(payload: dict[str, Any]) -> dict[str, Any]:
     checked_node_reports = 0
     checked_interval_evaluations = 0
     checked_natal_sources = 0
-    legacy_historical_polarity_contract = False
-    legacy_gate_contract = False
-    legacy_apparent_contract = False
-    legacy_partition_contract = False
     profile_partition = None
     checked_position_batches = 0
     native_context = None
     try:
-        legacy_gate_contract = _declares_legacy_gate_contract(payload)
-        legacy_apparent_contract = declares_legacy_apparent_contract(payload)
-        legacy_partition_contract = declares_legacy_partition_contract(payload)
-        legacy_historical_polarity_contract = (
-            declares_legacy_historical_polarity_contract(payload)
-        )
-        if not legacy_partition_contract:
-            try:
-                profile_partition = checked_profile_partition(payload)
-            except (KeyError, TypeError, ValueError, IndexError, OverflowError):
-                errors.append({"code": "profile_partition_context_mismatch"})
+        try:
+            profile_partition = checked_profile_partition(payload)
+        except (KeyError, TypeError, ValueError, IndexError, OverflowError):
+            errors.append({"code": "profile_partition_context_mismatch"})
         apparent_context = None
-        if not legacy_apparent_contract:
-            try:
-                apparent_context = checked_context(payload)
-                checked_position_batches = apparent_context["unique_batch_count"]
-            except (KeyError, TypeError, ValueError, IndexError, OverflowError):
-                # A new evidence fault must not suppress pre-existing source
-                # diagnostics. Retain the rejection and run the old checks too.
-                errors.append({"code": "apparent_position_context_mismatch"})
+        try:
+            apparent_context = checked_context(payload)
+            checked_position_batches = apparent_context["unique_batch_count"]
+        except (KeyError, TypeError, ValueError, IndexError, OverflowError):
+            # A new evidence fault must not suppress pre-existing source
+            # diagnostics. Retain the rejection and run the old checks too.
+            errors.append({"code": "apparent_position_context_mismatch"})
         verify_birth_clock(payload)
         clock_replay = verify_clock_records(payload)
         native_context = verify_native_context(payload)
@@ -177,45 +132,42 @@ def _verify_human_design_reading(payload: dict[str, Any]) -> dict[str, Any]:
             for statement in statements
             for basis in statement["basis"]
         ]
-        if not legacy_gate_contract:
-            context_report = payload["gate_activation_context"]
-            context_bindings = [
-                b
-                for c in [context_report["nominal"], *context_report["witnesses"]]
-                for b in c["basis"]
-            ] + actual_interpretation["gate_activation_context"]["basis"]
-            claims.extend(
-                CalculationClaim(
-                    path=b["path"],
-                    value=b["value"],
-                    run_id=receipt["run_id"],
-                    business_output_sha256=receipt["business_output_sha256"],
-                )
-                for b in context_bindings
+        context_report = payload["gate_activation_context"]
+        context_bindings = [
+            b
+            for c in [context_report["nominal"], *context_report["witnesses"]]
+            for b in c["basis"]
+        ] + actual_interpretation["gate_activation_context"]["basis"]
+        claims.extend(
+            CalculationClaim(
+                path=b["path"],
+                value=b["value"],
+                run_id=receipt["run_id"],
+                business_output_sha256=receipt["business_output_sha256"],
             )
-        if not legacy_apparent_contract:
-            claims.extend(
-                CalculationClaim(
-                    path=b["path"],
-                    value=b["value"],
-                    run_id=receipt["run_id"],
-                    business_output_sha256=receipt["business_output_sha256"],
-                )
-                for b in actual_interpretation["apparent_position_context"]["basis"]
+            for b in context_bindings
+        )
+        claims.extend(
+            CalculationClaim(
+                path=b["path"],
+                value=b["value"],
+                run_id=receipt["run_id"],
+                business_output_sha256=receipt["business_output_sha256"],
             )
-        if not legacy_partition_contract:
-            claims.extend(
-                CalculationClaim(
-                    path=b["path"],
-                    value=b["value"],
-                    run_id=receipt["run_id"],
-                    business_output_sha256=receipt["business_output_sha256"],
-                )
-                for b in (
-                    payload["profile_partition_context"]["basis"]
-                    + actual_interpretation["profile_partition_context"]["basis"]
-                )
+            for b in actual_interpretation["apparent_position_context"]["basis"]
+        )
+        claims.extend(
+            CalculationClaim(
+                path=b["path"],
+                value=b["value"],
+                run_id=receipt["run_id"],
+                business_output_sha256=receipt["business_output_sha256"],
             )
+            for b in (
+                payload["profile_partition_context"]["basis"]
+                + actual_interpretation["profile_partition_context"]["basis"]
+            )
+        )
         result = verify_calculation_claims(payload, claims)
         if result["status"] != "verified_structured_facts":
             errors.append({"code": "original_run_or_field_quotation_mismatch"})
@@ -357,12 +309,7 @@ def _verify_human_design_reading(payload: dict[str, Any]) -> dict[str, Any]:
             "design_earth",
         ]:
             errors.append({"code": "cross_order_mismatch"})
-        expected_evidence = evidence(
-            payload,
-            include_gate_context=not legacy_gate_contract,
-            include_profile_partition=not legacy_partition_contract,
-            include_historical_polarity=not legacy_historical_polarity_contract,
-        )
+        expected_evidence = evidence(payload)
         if apparent_context is not None:
             add_apparent_evidence(expected_evidence, apparent_context)
         checked_cross_observations = len(
@@ -393,15 +340,6 @@ def _verify_human_design_reading(payload: dict[str, Any]) -> dict[str, Any]:
             "definition_bridging",
             "profile_evidence",
         ):
-            if key == "gate_activation_context" and legacy_gate_contract:
-                continue
-            if key == "profile_partition_context" and legacy_partition_contract:
-                continue
-            if (
-                key == "historical_polarity_context"
-                and legacy_historical_polarity_contract
-            ):
-                continue
             if not _same_value(payload.get(key), expected_evidence[key]):
                 errors.append({"code": "source_or_acceptance_mismatch", "path": key})
         joint = verify_run_joint_snapshots(payload)
@@ -430,24 +368,14 @@ def _verify_human_design_reading(payload: dict[str, Any]) -> dict[str, Any]:
             "not_verified"
             if errors
             else (
-                "not_in_declared_legacy_contract"
-                if legacy_partition_contract
-                else (
-                    "verified_nominal_role_and_exact_solar_arc_partition"
-                    if profile_partition is not None
-                    else "not_verified"
-                )
+                "verified_nominal_role_and_exact_solar_arc_partition"
+                if profile_partition is not None
+                else "not_verified"
             )
         ),
         "checked_apparent_position_batch_count": checked_position_batches,
         "apparent_position_context_status": (
-            "not_verified"
-            if errors
-            else (
-                "not_in_declared_legacy_contract"
-                if legacy_apparent_contract
-                else "verified_supplied_native_batch_geometry"
-            )
+            "not_verified" if errors else ("verified_supplied_native_batch_geometry")
         ),
         "checked_nominal_native_source_count": checked_natal_sources,
         "checked_node_report_count": checked_node_reports,
@@ -458,13 +386,7 @@ def _verify_human_design_reading(payload: dict[str, Any]) -> dict[str, Any]:
         "method_id": "human_design_source_bound_reading_verification_v1",
         "status": "rejected" if errors else "verified_fixed_template_reading",
         "gate_activation_context_status": (
-            "not_verified"
-            if errors
-            else (
-                "not_in_declared_legacy_contract"
-                if legacy_gate_contract
-                else "verified_all_current_contexts"
-            )
+            "not_verified" if errors else ("verified_all_current_contexts")
         ),
         "checked_statement_count": checked,
         "checked_joint_snapshot_count": checked_snapshots,

@@ -9,7 +9,7 @@ import pytest
 
 from fatebridge.core.sukuyo import calendar_mansion, day_evidence
 
-FIXTURE = Path(__file__).parent / "fixtures/sukuyo-known-vs-unknown-before-c-v78.json"
+FIXTURE = Path(__file__).parent / "data/sukuyo-known-vs-unknown-before-c-v78.json"
 RAW = FIXTURE.read_bytes()
 REF = json.loads(RAW)
 

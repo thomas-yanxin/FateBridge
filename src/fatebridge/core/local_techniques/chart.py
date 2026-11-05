@@ -10,10 +10,12 @@ back through the package facade.
 
 from __future__ import annotations
 
+import math
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
+from fatebridge.utils.civil_clock import parse_iso_datetime
 from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 from fatebridge.utils.solar_time import (
@@ -30,6 +32,7 @@ from ..almanac import (
 )
 from ..astro.birth import AstroBirthInfo, build_astro_birth_info
 from ..astro.chart import build_core_chart_payload
+from ..astro.geometry import angle_fraction, combine_longitudes
 from ..calendar import BaZiCalendar
 
 SU28_NAMES = [
@@ -177,7 +180,7 @@ def parse_local_datetime(
     time_text: str,
     timezone_name: Optional[str] = None,
 ) -> datetime:
-    moment = datetime.fromisoformat(
+    moment = parse_iso_datetime(
         f"{_normalize_date_text(date_text)} {_normalize_time_text(time_text)}"
     )
     return localize_datetime(moment, timezone_name or DEFAULT_BIRTH_TIMEZONE)
@@ -194,9 +197,13 @@ def _sign_name(longitude: float) -> str:
 
 
 def _su28_name(longitude: float) -> str:
-    span = 360.0 / 28.0
-    index = int(longitude // span) % 28
-    return SU28_NAMES[index]
+    return _su28_position(longitude)[0]
+
+
+def _su28_position(longitude: float) -> Tuple[str, float]:
+    index, remainder = divmod((angle_fraction(longitude) % 360) * 28, 360)
+    degree = min(float(remainder / 28), math.nextafter(360 / 28, 0.0))
+    return SU28_NAMES[int(index)], degree
 
 
 def _split_degree(value: Any) -> Tuple[int, int]:
@@ -405,7 +412,7 @@ def _build_point_object(
         "lon": round(longitude, 4),
     }
     if include_su28:
-        payload["su28"] = _su28_name(longitude)
+        payload["su28"], payload["su28_degree"] = _su28_position(longitude)
     return payload
 
 
@@ -424,7 +431,8 @@ def _adapt_chart_objects(
         point_id = str(item.get("id") or "")
         if tradition and point_id in OUTER_PLANETS:
             continue
-        longitude = round(float(item.get("longitude", 0.0)), 4)
+        source_longitude = float(item.get("longitude", 0.0))
+        longitude = round(source_longitude, 4)
         # The core assigns houses before formatting longitudes/cusps. Repeating
         # that comparison on four-decimal display values can cross a cusp.
         house_id = (
@@ -440,14 +448,19 @@ def _adapt_chart_objects(
             "lon": longitude,
         }
         if include_su28:
-            payload["su28"] = _su28_name(payload["lon"])
+            payload["su28"], payload["su28_degree"] = _su28_position(source_longitude)
         objects.append(payload)
 
     north_node = next(
         (item for item in objects if item.get("id") == "North Node"), None
     )
     if north_node is not None:
-        south_node_longitude = round((float(north_node["lon"]) + 180.0) % 360.0, 4)
+        source_node = next(
+            item["longitude"]
+            for item in core_payload["planets"]
+            if item["id"] == "North Node"
+        )
+        south_node_longitude = combine_longitudes(float(source_node), 180.0)
         objects.append(
             _build_point_object(
                 point_id="South Node",
@@ -682,7 +695,7 @@ def _build_metaphysics_seed(
     day_pillar_strategy: str = DAY_GANZHI_STRATEGY_STANDARD,
 ) -> MetaphysicsSeed:
     timezone_value = timezone_name or DEFAULT_BIRTH_TIMEZONE
-    input_datetime_naive = datetime.fromisoformat(
+    input_datetime_naive = parse_iso_datetime(
         f"{_normalize_date_text(date_text)} {_normalize_time_text(time_text)}"
     )
     input_datetime = localize_datetime(input_datetime_naive, timezone_value)

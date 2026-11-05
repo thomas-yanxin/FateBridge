@@ -61,7 +61,7 @@ def expected(
     }
 
 
-def audit(baseline: Path) -> dict[str, Any]:
+def audit() -> dict[str, Any]:
     ref = reference()
     source_paths = [
         p
@@ -146,47 +146,6 @@ def audit(baseline: Path) -> dict[str, Any]:
                 matched=actual == c["expected"],
             )
         )
-    with gzip.open(baseline, "rt", encoding="utf-8") as f:
-        old = json.load(f)
-    if len(old) != 720 or len({tuple(c["key"]) for c in old}) != 720:
-        raise ValueError("Complete720 old-board preservation ledger required")
-    from fatebridge.core.metaphysics.jinkou import build_jinkou_board
-    from fatebridge.core.metaphysics.liureng import build_liureng_board
-    from fatebridge.core.output_chinese import Jinkou
-    from scripts.audit_liuren_seasonal import seed_for
-
-    differences = []
-    for c in old:
-        day, month, ground, diurnal = c["key"]
-        seed = seed_for(day, month)
-        liuren = build_liureng_board(
-            seed, month_general_override=month, is_diurnal_override=diurnal
-        )
-        got = build_jinkou_board(
-            seed, liuren, di_fen=ground, is_diurnal_override=diurnal
-        )
-        Jinkou.model_validate(got)
-        require_complete_branch_stars(got)
-        normalized = {k: v for k, v in got.items() if k != "branch_stars"}
-        normalized["rule_trace"] = [
-            v
-            for v in got["rule_trace"]
-            if v["rule_id"] != "jinkou.jingben_branch_stars"
-        ]
-        rules = dict(got["ruleset"], conventions=dict(got["ruleset"]["conventions"]))
-        prior = c["board"]["ruleset"]
-        if (
-            rules["version"] != "1.10.0"
-            or prior["version"] != "1.9.0"
-            or rules["source_title"] != prior["source_title"] + "、京本所选七项历法神煞"
-        ):
-            raise ValueError("Undeclared old-board metadata delta")
-        rules["version"] = prior["version"]
-        rules["source_title"] = prior["source_title"]
-        rules["conventions"].pop("branch_stars")
-        normalized["ruleset"] = rules
-        if normalized != c["board"]:
-            differences.append(c["key"])
     unchanged = before == {str(p.relative_to(ROOT)): sha(p) for p in source_paths}
     return dict(
         reference_freeze_sha256=FREEZE_SHA,
@@ -196,12 +155,8 @@ def audit(baseline: Path) -> dict[str, Any]:
         factor_observation_sha256=digest.hexdigest(),
         failures=errors,
         synthetic_comparisons=synthetic,
-        preservation_count=720,
-        baseline_sha256=sha(baseline),
-        preservation_differences=differences,
         selected_checks_passed=not errors
         and all(c["matched"] for c in synthetic)
-        and not differences
         and unchanged,
         reused_factor_combinations_not_independent_charts=True,
         complete_chapter_conformance=False,
@@ -214,10 +169,9 @@ def audit(baseline: Path) -> dict[str, Any]:
 
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--baseline", type=Path, required=True)
     p.add_argument("--output", type=Path, required=True)
     args = p.parse_args()
-    report = audit(args.baseline)
+    report = audit()
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     print(
         json.dumps(

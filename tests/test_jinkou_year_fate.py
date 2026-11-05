@@ -12,7 +12,7 @@ from fatebridge.core.output_chinese import Jinkou, JinkouYearFate
 from fatebridge.core.requests.metaphysics import JinkouAnalysisRequest
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
 from scripts.audit_jinkou_year_fate import course_cases, references
-from tests.golden.canonical import canonical_json
+from tests.output_facts import canonical_json
 from tests.test_agentic_nested_outputs import AS_OF, SPECS, call_cli, native, rest
 
 REF, _RAW, _ERRATA = references()

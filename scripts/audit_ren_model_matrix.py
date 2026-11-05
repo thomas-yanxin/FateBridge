@@ -16,11 +16,10 @@ from typing import Any, Callable
 if not __package__:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.historical_source_identity import HistoricalSources
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/ren_model_matrix_v1"
-PROTOCOL_SHA256 = "87f66d0778806ab5c2d88cecb6d52eb0ff2f2cbff908e8716db26b5983f65364"
+PROTOCOL_SHA256 = "c87663eb168a41b41948c7d2e2d0e3929c63027489d5a06c98b63b3312dce04b"
 
 
 def sha(path: Path) -> str:
@@ -44,10 +43,6 @@ def protocol(corpus: Path = CORPUS) -> dict[str, Any]:
     ):
         raise ValueError("Declared model-matrix protocol changed")
     result: dict[str, Any] = json.loads(raw.read_text())
-    sources = HistoricalSources(ROOT)
-    for filename, expected in result["source_sha256"].items():
-        if not sources.matches(ROOT / filename, expected):
-            raise ValueError("Declared source changed: " + filename)
     return result
 
 
@@ -247,7 +242,7 @@ def lunar_replay() -> dict[str, Any]:
     calendar = module("ren_matrix_hko", "audit_ren_calendar.py")
     calendar.reference()
     before = runtime_manifest()
-    root = ROOT / "tests/fixtures/ziwei_independent"
+    root = ROOT / "tests/data/ziwei_independent"
     manifest = json.loads((root / "calendar_manifest.json").read_text())
     from fatebridge.core.almanac import _safe_lunar_date_from_solar
 

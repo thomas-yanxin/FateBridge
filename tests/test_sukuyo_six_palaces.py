@@ -11,7 +11,7 @@ from fatebridge.core.sukuyo_six_palaces import SOURCE, six_palace_reference
 from fatebridge.services.tool_catalog import CATALOG
 
 PRIMARY = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-six-palaces-primary.json").read_bytes()
+    (Path(__file__).parent / "data/sukuyo-six-palaces-primary.json").read_bytes()
 )
 
 

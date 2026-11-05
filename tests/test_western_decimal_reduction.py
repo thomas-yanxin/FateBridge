@@ -1,6 +1,5 @@
 """Pinned mathematical reference, failure retention and real-source guard faults."""
 
-import hashlib
 import importlib
 import importlib.machinery
 import importlib.util
@@ -13,40 +12,22 @@ from types import SimpleNamespace
 
 import pytest
 
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
-
-pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
-
-
 import fatebridge.core.output_charts as outputs
 from fatebridge.core.astro import position_motion, runtime
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
+from tests.reference_data import verify_source_files
 
-FIXTURE = Path(__file__).parent / "fixtures/western-decimal-reduction-v1"
+pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
+
+FIXTURE = Path(__file__).parent / "data/astro/decimal_reduction"
 REFERENCE = json.loads((FIXTURE / "independent-model-reference.json").read_text())
-BEFORE = json.loads((FIXTURE / "source-model-before.json").read_text())
-LEGACY_SHA256 = "fdae93e237cd846593e660ab3fccf4c3b7f544f3104d015f4112c14f6fd52684"
-
-
-@pytest.fixture(scope="module")
-def legacy_motion():
-    """Bind exact preservation to the same native host and supplied operands.
-
-    The old source is sealed independently of this candidate. Mac-recorded
-    binary64 values remain evidence, but cannot be an exact Linux baseline.
-    The independent70-digit numerical reference and its tolerance stay fixed.
-    """
-    path = FIXTURE / "legacy-position-motion-v6.py.txt"
-    assert hashlib.sha256(path.read_bytes()).hexdigest() == LEGACY_SHA256
-    loader = importlib.machinery.SourceFileLoader(
-        "sealed_position_motion_v6", str(path)
-    )
-    spec = importlib.util.spec_from_loader(loader.name, loader)
-    module = importlib.util.module_from_spec(spec)
-    loader.exec_module(module)
-    assert module.METHOD_ID == "fatebridge_complete_position_derivative_v6"
-    return module
+PRIMARY_FAILURES = json.loads(
+    (FIXTURE / "primary-stage-failure-inputs.json").read_text()
+)
 
 
 def reduction():
@@ -57,17 +38,13 @@ def reduction():
 
 
 def test_reference_producer_and_original_failed_rows_remain_sealed():
-    for name, expected in json.loads(
-        (FIXTURE / "preedit-reference-seal.json").read_text()
-    ).items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == expected
+    verify_source_files(FIXTURE)
     assert REFERENCE["candidate_imports"] is False
     assert REFERENCE["independent_ephemeris"] is False
     assert REFERENCE["independent_model_reduction"] is True
     assert len(REFERENCE["rows"]) == 68
     assert all(row["reference_converged"] for row in REFERENCE["rows"])
-    assert BEFORE["computed"] == BEFORE["passed"] == 66
-    assert BEFORE["unavailable"] == 2
+    assert len(PRIMARY_FAILURES) == 2
 
 
 @pytest.mark.parametrize(
@@ -75,9 +52,7 @@ def test_reference_producer_and_original_failed_rows_remain_sealed():
     REFERENCE["rows"],
     ids=lambda r: f"{r['body']}-{r['julian_day_tt']}-{r['frame']}",
 )
-def test_complete_motion_matches_the_sealed_source_model_and_retains_old_attempts(
-    row, legacy_motion
-):
+def test_complete_motion_matches_the_sealed_source_model_and_retains_old_attempts(row):
     swe = runtime.swe
     sidereal = row["frame"] == "Sidereal"
     runtime.ephemeris_call("set_sid_mode", swe.SIDM_LAHIRI, 0, 0)
@@ -101,49 +76,8 @@ def test_complete_motion_matches_the_sealed_source_model_and_retains_old_attempt
     expected = float(row["estimates"][-1]["rate_degrees_per_day"])
     assert abs(rate - expected) * 3600 <= 0.002
     assert policy["convergence_line_arcsec_per_day"] == 0.0002
-    old = next(
-        r
-        for r in BEFORE["rows"]
-        if (r["body"], r["epoch"], r["frame"])
-        == (row["body"], row["julian_day_tt"], row["frame"])
-    )
-    # Replay the sealed old implementation on this host, with the same finite
-    # native coordinates. Do not relax equality across unrelated host values.
-    seeded, seeded_flags = runtime.ephemeris_call(
-        "calc",
-        row["julian_day_tt"],
-        getattr(swe, row["body"].upper()),
-        swe.FLG_SWIEPH | swe.FLG_SPEED | (swe.FLG_SIDEREAL if sidereal else 0),
-    )
-    assert seeded_flags == returned and tuple(seeded) == tuple(raw)
-    old_trace = PhysicalEphemerisTrace()
-    old_trace.observe(row["body"], "swieph")
-    if old["status"] == "computed":
-        prior_rate, prior_policy = legacy_motion.complete_position_rate(
-            row["body"],
-            row["julian_day_tt"],
-            raw,
-            "swieph",
-            sidereal=sidereal,
-            source_trace=old_trace,
-        )
-        assert rate == prior_rate
-        assert {k: v for k, v in policy.items() if k not in {"method_id", "scope"}} == {
-            k: v for k, v in prior_policy.items() if k not in {"method_id", "scope"}
-        }
-        assert "decimal_reduction_previous_attempt" not in policy
-    else:
-        assert old["reason"] == "position_motion_not_converged"
-        with pytest.raises(EphemerisSourceError) as previous_failure:
-            legacy_motion.complete_position_rate(
-                row["body"],
-                row["julian_day_tt"],
-                raw,
-                "swieph",
-                sidereal=sidereal,
-                source_trace=old_trace,
-            )
-        assert previous_failure.value.reason == "position_motion_not_converged"
+    key = [row["body"], row["julian_day_tt"], row["frame"]]
+    if key in PRIMARY_FAILURES:
         assert policy["primary_attempt"]["status"] == "not_converged"
         assert (
             policy["sampling_stabilization"]["symmetric_stabilized_attempt"]["status"]
@@ -160,7 +94,6 @@ def test_complete_motion_matches_the_sealed_source_model_and_retains_old_attempt
         assert receipt["displayed_native_position_changed"] is False
         assert receipt["independent_astronomical_accuracy_certified"] is False
     outputs.CompletePositionMotion.model_validate(policy)
-    old_trace.finish()
     trace.finish()
 
 

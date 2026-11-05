@@ -27,7 +27,7 @@ def test_decade_inverse_retains_every_leap_clipped_source_and_no_false_source():
 
 
 def test_future_clock_cache_uses_loaded_data_object_even_when_zone_names_match():
-    compiled = Path(__file__).parent / "fixtures/bazi_birth_fold_v1/compiled"
+    compiled = Path(__file__).parent / "data/bazi_birth_fold_v1/compiled"
     with (compiled / "America/New_York").open("rb") as stream:
         new_york = ZoneInfo.from_file(stream, key="same-test-name")
     with (compiled / "Australia/Lord_Howe").open("rb") as stream:

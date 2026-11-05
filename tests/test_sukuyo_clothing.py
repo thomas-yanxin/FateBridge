@@ -17,7 +17,7 @@ from scripts.audit_sukuyo_clothing_primary import verify_primary
 from tests.test_sukuyo_calendar_text import payload, quotes
 
 FACTS = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-clothing-primary.json").read_bytes()
+    (Path(__file__).parent / "data/sukuyo-clothing-primary.json").read_bytes()
 )
 
 

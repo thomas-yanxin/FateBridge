@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate tests/fixtures/ziwei_brightness_reference.json.
+"""Generate tests/data/ziwei_brightness_reference.json.
 
 PATH B (source-derived full-table fixture) — this script does NOT require
 py-iztro to run.  It is a second, independent transcription of the star
@@ -133,7 +133,7 @@ def main() -> None:
     out_path = (
         pathlib.Path(__file__).resolve().parent.parent
         / "tests"
-        / "fixtures"
+        / "data"
         / "ziwei_brightness_reference.json"
     )
     out_path.parent.mkdir(parents=True, exist_ok=True)

@@ -30,7 +30,7 @@ from scripts.verify_astrodice_observer_clock import (
 )
 from scripts.verify_astrodice_vector_clock import bernstein_bounds, derivative
 
-DESIGN_SHA = "d601da17f122bf78d63eccd0f0905087ce31efa004ebc5157688cde44096c2e8"
+DESIGN_SHA = "654e43fed5db8f17f57adecf9c1e339e8c42ea2e1a6b2166cd7a91840eb6a63d"
 SRS = Q("0.0000000197412574336")
 
 

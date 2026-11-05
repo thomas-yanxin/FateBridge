@@ -8,7 +8,10 @@ from pathlib import Path
 
 from scripts.audit_astrodice_horizons_wide_reference import validate
 
-FIXTURE = Path(__file__).parent / "fixtures/astrodice-local-interval-development-v1"
+FIXTURE = (
+    Path(__file__).parent
+    / "data/astrodice/reference_sets/fixture-local-interval-development-v1"
+)
 
 
 def test_real_out_of_budget_epoch_stays_missing_while_other_rows_are_reused(tmp_path):

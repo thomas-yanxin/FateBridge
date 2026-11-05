@@ -7,34 +7,38 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.examples import suggested_fields
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_source_comparison_transports import (
     SPEC,
     business,
     call_cli,
     native,
     reject_bad_fact,
-    rest,
 )
 
+rest = _shared_rest
+
 ROOT = Path(__file__).resolve().parents[1]
-PLAN = json.loads(
-    (
-        ROOT / "docs/validation/bazi-source-index-input-revision-v1/protocol-first.json"
-    ).read_text()
-)
+RECORDS = [
+    r
+    for r in json.loads(
+        (
+            ROOT / "src/fatebridge/data/reference/bazi-source-annotations.json"
+        ).read_text()
+    )["records"]
+    if "input_reading_evidence" in r
+]
 
 
 @pytest.mark.parametrize("project", [False, True])
-@pytest.mark.parametrize(
-    "patch", PLAN["patches"], ids=[p["reference_id"] for p in PLAN["patches"]]
-)
+@pytest.mark.parametrize("patch", RECORDS, ids=[p["reference_id"] for p in RECORDS])
 def test_all_six_revised_records_and_provenance_on_all_surfaces(
     patch, project, rest, tmp_path, capsys
 ):
     values = dict(
         zip(
             ("year_pillar", "month_pillar", "day_pillar", "hour_pillar"),
-            patch["after"]["pillars"],
+            patch["pillars"],
         )
     )
     options, flags = {"response_char_limit": 0}, ["--response-char-limit", "0"]
@@ -55,12 +59,11 @@ def test_all_six_revised_records_and_provenance_on_all_surfaces(
         record = next(
             r for r in comp["records"] if r["reference_id"] == patch["reference_id"]
         )
-        assert {k: v for k, v in record.items() if k != "comparison"} == patch["after"]
+        assert {k: v for k, v in record.items() if k != "comparison"} == patch
         assert record["comparison"] == "unadjudicated"
         assert (
-            record["input_reading_revision"]["original_index_record"] == patch["before"]
+            record["input_reading_evidence"]["source_strength_label_assigned"] is False
         )
-        assert comp["reference_index"]["total_registered_input_reading_revisions"] == 6
         assert comp["calculation_overridden"] is False
 
 
@@ -76,6 +79,6 @@ def test_invalid_revision_claims_rejected_before_projection(
     field, value, rest, monkeypatch, tmp_path, capsys
 ):
     fault = {
-        "source_comparison": {"records": [{"input_reading_revision": {field: value}}]}
+        "source_comparison": {"records": [{"input_reading_evidence": {field: value}}]}
     }
     reject_bad_fact("bazi_source_compare", fault, rest, monkeypatch, tmp_path, capsys)

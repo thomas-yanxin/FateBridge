@@ -5,7 +5,7 @@ from pathlib import Path
 
 from fatebridge.application.discovery import select_mcp_specs
 from fatebridge.services.tool_catalog import CATALOG
-from scripts.evaluate_agent import grade, reference_scenarios
+from scripts.evaluate_agent import grade_case, reference_scenarios
 
 DATASET = Path(__file__).parent / "fixtures/agent_behavior/jyotish_semantic_cases.json"
 
@@ -64,13 +64,13 @@ def test_known_debugging_cases_cannot_be_relabelled_as_independent_holdouts():
                 "command": "cat skills/onda-xingpan/SKILL.md",
             },
         }
-        assert grade(case, [skill, event], "placeholder, never a semantic grade", 0)[
-            "mechanical_checks_passed"
-        ]
+        assert grade_case(
+            case, [skill, event], "placeholder, never a semantic grade", 0
+        )["mechanical_checks_passed"]
         event["item"]["arguments"] = {
             **request["arguments"],
             "birth_hour": (request["arguments"]["birth_hour"] + 1) % 24,
         }
-        assert not grade(case, [skill, event], "placeholder", 0)[
+        assert not grade_case(case, [skill, event], "placeholder", 0)[
             "mechanical_checks_passed"
         ]

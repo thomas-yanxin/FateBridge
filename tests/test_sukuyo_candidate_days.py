@@ -10,7 +10,7 @@ from fatebridge.core.sukuyo import calendar_mansion, day_evidence
 
 REFERENCE = json.loads(
     (
-        Path(__file__).parent / "fixtures/sukuyo-candidate-days-before-code-v98.json"
+        Path(__file__).parent / "data/sukuyo-candidate-days-before-code-v98.json"
     ).read_bytes()
 )
 PROFILE = "hinoo_t1299_host27"

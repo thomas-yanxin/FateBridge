@@ -80,6 +80,15 @@ async def call_contracts():
                 if evidence_views(specs[name])
                 else {}
             ),
+            **(
+                {
+                    "method_contracts": [
+                        method.as_manifest() for method in specs[name].methods
+                    ]
+                }
+                if specs[name].methods
+                else {}
+            ),
         }
         for name in TOOLS
     ]

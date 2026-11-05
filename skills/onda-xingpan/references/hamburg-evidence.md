@@ -38,7 +38,7 @@
 
 `time_sensitivity.source_pattern.sampled_status` 及解释中的 `birth_time_sampled_status` 决定这条含义如何表达：`varies_across_samples` 表示已找到范围内反例，要保留“名义时刻满足，但范围内会变化”。不要抹去名义结果，也不要把它写成整个范围确定成立。全部样点满足仍不证明连续区间稳定；样点频率不是成功概率或置信度。当前只审该原文条件，不能外推成全部中点联系均稳定。
 
-精确地理极点的MC只有输入经度所定子午线约定时，本命和太阳弧的原文条件都须保留未定：读取`unresolved_reference_sample_count`、`unresolved_reference_sample_indices`、`resolved_condition_sample_count`及`condition_by_sample`。已知成立／缺失计数不含未知；`backend_convention`只保留形式条件，不能据它判定原文主题适用。推运样点的实际条件、角距及MC可为null，形式值另存；可计算太阳弧继续保留。范围外弧的`unavailable_sample_count`与参考未知数分开，不补零、不丢样点。名义解释的`source_application_status=underdetermined_reference_geometry`及`reading_zh`表明适用条件未知，`backend_reading_zh`仅为形式文案；空解释列表也不证明主题不适用。仅ASC交线退化不限制独立MC。详见资格核验（本地数据：`../../../docs/validation/specialty-source-pattern-qualification.md`）。
+精确地理极点的MC只有输入经度所定子午线约定时，本命和太阳弧的原文条件都须保留未定：读取`unresolved_reference_sample_count`、`unresolved_reference_sample_indices`、`resolved_condition_sample_count`及`condition_by_sample`。已知成立／缺失计数不含未知；`backend_convention`只保留形式条件，不能据它判定原文主题适用。推运样点的实际条件、角距及MC可为null，形式值另存；可计算太阳弧继续保留。范围外弧的`unavailable_sample_count`与参考未知数分开，不补零、不丢样点。名义解释的`source_application_status=underdetermined_reference_geometry`及`reading_zh`表明适用条件未知，`backend_reading_zh`仅为形式文案；空解释列表也不证明主题不适用。仅ASC交线退化不限制独立MC。详见资格核验。
 
 ## 指定时刻的真太阳弧
 
@@ -52,11 +52,11 @@
 
 `daily_meridian` 是另一个具名层，采用 Witte 1924 印刷页 15 的黄道算式：本命 IC 加太阳弧、减本命回归太阳、加目标时刻实际回归太阳；相对的上天顶为 MC。核对它自己的 `profile.upper_meridian_longitude/lower_meridian_longitude/target_tropical_sun` 和 `birth_time_sensitivity`。它不等于只加太阳弧的 MC，也不等于目标时刻真实物理天顶；不把该层坐标代入 Udo 例并自动新增主题解释。该历史例1923／1924的3°04′差值已由第八宫宫头构造偏移解释，只适用于该例，不能加到当前盘；另项4′残差与完整时间钥匙仍未裁定。按实际`source_comparison`交付，保留原典整体和现实效果的未验收状态。原页与范围见[审查记录](../../../docs/other-chart-schools.md#witte-1924-黄道和差式日推运天顶)。
 
-日推运的MC参考资格另读其自身`profile`，不能从原文条件或父层状态代替判断。`partial`可仅限制MC依赖坐标；太阳与可计算弧继续交付。形式值位于`backend_convention`，实际范围另看参考已解析数及未知数，不跨未知间隙连线。`input_coherence`只是同run角色／网格绑定，不是独立天文验收；`day_meridian_inputs`503属于内部来源不一致。详见日推运参考核验（本地数据：`../../../docs/validation/day-meridian-reference-qualification.md`）。
+日推运的MC参考资格另读其自身`profile`，不能从原文条件或父层状态代替判断。`partial`可仅限制MC依赖坐标；太阳与可计算弧继续交付。形式值位于`backend_convention`，实际范围另看参考已解析数及未知数，不跨未知间隙连线。`input_coherence`只是同run角色／网格绑定，不是独立天文验收；`day_meridian_inputs`503属于内部来源不一致。详见日推运参考核验。
 
 ## Witte1924比较换基与镜点
 
-使用`comparative_geometry`视图读取`midpoint_analysis.comparative_geometry`摘要。五个锚点及四点坐标是本命资料的象征几何，镜像轴用实际原生白羊点；恒星显示不能直接按数值0°／90°套轴。框架内名为Aries Point的输入因素同样旋转，轴基准仍取`profile.native_aries_point_longitude`。`defined_anchor_identity`只表示锚点坐标按定义抵消，不能把未解析物理ASC／MC说成已经确定；实际坐标为null时保留其后端形式值限定。生时偏移只覆盖已确认有限样点，不是连续界或概率。原表四行残差仍在，不套用未读的地球宫、事件或第五版反映点章节。规则与完整原表见比较换基核验（本地数据：`../../../docs/validation/witte-comparative-geometry.md`）。
+使用`comparative_geometry`视图读取`midpoint_analysis.comparative_geometry`摘要。五个锚点及四点坐标是本命资料的象征几何，镜像轴用实际原生白羊点；恒星显示不能直接按数值0°／90°套轴。框架内名为Aries Point的输入因素同样旋转，轴基准仍取`profile.native_aries_point_longitude`。`defined_anchor_identity`只表示锚点坐标按定义抵消，不能把未解析物理ASC／MC说成已经确定；实际坐标为null时保留其后端形式值限定。生时偏移只覆盖已确认有限样点，不是连续界或概率。原表四行残差仍在，不套用未读的地球宫、事件或第五版反映点章节。规则与完整原表见比较换基核验。
 
 ## 交付时保留来源和含义
 

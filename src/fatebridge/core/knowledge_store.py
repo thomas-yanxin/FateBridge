@@ -281,7 +281,7 @@ def _normalize_house_key(key: str) -> str:
     )
     aliases = {
         "asc": "House1",
-        "命宫": "House1",
+        "命": "House1",
     }
     return aliases.get(normalized, text)
 
@@ -720,11 +720,6 @@ def read_knowledge_entry(payload: dict[str, Any]) -> dict[str, Any]:
         provenance = _knowledge_provenance(domain=domain, category=category, key=key)
         curation = entry.get("curation")
         if isinstance(curation, dict):
-            from fatebridge.core.knowledge_revalidation import (
-                revalidate_structure_curation,
-            )
-
-            curation = revalidate_structure_curation(category, key, curation)
             # Copy nested sources so callers cannot mutate the cached bundle.
             provenance = {
                 **provenance,

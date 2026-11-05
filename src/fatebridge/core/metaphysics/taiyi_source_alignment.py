@@ -239,6 +239,8 @@ def source_alignment_text(assessment: dict[str, Any]) -> str:
         "wenchang_palace": "文昌",
         "shiji": "始击",
         "jishen": "计神",
+        "main_count": "主算",
+        "guest_count": "客算",
     }
     for fact in assessment["positions"]:
         if not fact["matches"]:
@@ -267,11 +269,14 @@ def source_alignment_text(assessment: dict[str, Any]) -> str:
                 f"初录整理误写{check['initial_manual_reading']}；旧转录与图{check['page']}书影均为{check['facsimile_reading']}。此为本次录入错误，不是旧转录错误；初录保留。"
             )
     for witness in assessment["edition_comparisons"]:
-        facts = {f["field"]: f for f in witness["observations"]}
+        facts = "、".join(
+            f"{names[f['field']]}：{f['edition_literal']}→{f['edition_value']}"
+            for f in witness["observations"]
+        )
+        polarity = "阴" if witness["yin_dun"] else "阳"
         lines.append(
             f"具名版本旁证：{witness['provider']}藏{witness['source_title']}，{witness['edition']}，"
-            f"阴{witness['ju']}局始击{facts['shiji']['edition_literal']}→{facts['shiji']['edition_value']}，"
-            f"主算{facts['main_count']['edition_value']}、客算{facts['guest_count']['edition_value']}；"
+            f"{polarity}{witness['ju']}局{facts}；"
             f"本盘与该版所选{witness['required_observations']}项相合{witness['matching_current_observations']}项。"
             + witness["scope"]
         )

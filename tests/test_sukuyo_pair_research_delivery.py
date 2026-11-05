@@ -12,7 +12,7 @@ from tests.test_sukuyo_transports import (
 
 REFERENCE = json.loads(
     (
-        Path(__file__).parent / "fixtures/sukuyo-pair-research-before-code-v89.json"
+        Path(__file__).parent / "data/sukuyo-pair-research-before-code-v89.json"
     ).read_text()
 )
 

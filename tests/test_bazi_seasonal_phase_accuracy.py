@@ -32,6 +32,20 @@ from fatebridge.core.strength import STRENGTH_METHOD_ID
 def test_all_twelve_month_branches_follow_literal_seasonal_table(months, phases):
     for branch in months:
         assert ElementAnalysis.seasonal_phases(branch) == phases
+        pillars = dict(
+            zip(
+                ("year", "month", "day", "hour"),
+                (("庚", "辰"), ("戊", branch), ("壬", "寅"), ("乙", "巳")),
+            )
+        )
+        result = ElementAnalysis.analyze_day_master_strength(pillars)
+        assert result["element_seasonal_phase"] == phases
+        assert result["assessment"]["seasonal_phases"] == phases
+        assert (
+            result["element_distribution_basis"] == ElementAnalysis.DISTRIBUTION_BASIS
+        )
+        assert "结构计数" in result["element_distribution_basis"]
+        assert "element_seasonal_phase" in result["element_distribution_basis"]
 
 
 def test_corrected_phases_feed_exact_budget_without_changing_weights():
@@ -46,7 +60,7 @@ def test_corrected_phases_feed_exact_budget_without_changing_weights():
     assert (
         assessment["method_id"]
         == STRENGTH_METHOD_ID
-        == "season_root_revelation_relations_v11"
+        == "season_root_revelation_relations_v12"
     )
     assert assessment["relations"] == []
     # Ten units of 卯/乙 root budget at 旺2 and revelation1.25, plus
@@ -75,9 +89,13 @@ def test_corrected_phases_feed_exact_budget_without_changing_weights():
 
 @pytest.mark.parametrize(
     "method",
-    ["season_root_revelation_relations_v10", "season_root_revelation_relations_v11"],
+    [
+        "season_root_revelation_relations_v10",
+        "season_root_revelation_relations_v11",
+        "season_root_revelation_relations_v12",
+    ],
 )
-def test_season_upgrade_retains_same_punishment_contract_for_old_and_new_methods(
+def test_current_punishment_contract_and_retired_method_rejection(
     method,
 ):
     invalid = [
@@ -87,8 +105,14 @@ def test_season_upgrade_retains_same_punishment_contract_for_old_and_new_methods
             "status": "resolved_by_combination",
         }
     ]
+    payload = {"method_id": method, "assessment": {"relations": deepcopy(invalid)}}
+    if method != STRENGTH_METHOD_ID:
+        # Retired calculation labels are rejected by the public receipt model;
+        # they no longer select a historical implementation or validation policy.
+        with pytest.raises(ValidationError, match="只接收当前旺衰计算回执"):
+            SourceCurrentCalculation.model_validate(payload)
+        return
     with pytest.raises(ValueError, match="实际会合覆盖"):
         validate_punishment_resolution(method, invalid)
-    payload = {"method_id": method, "assessment": {"relations": deepcopy(invalid)}}
     with pytest.raises(ValidationError, match="实际会合覆盖"):
         SourceCurrentCalculation.model_validate(payload)

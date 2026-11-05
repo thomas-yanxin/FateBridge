@@ -15,7 +15,7 @@ from fatebridge.core.strength import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi-strength-reference.json"
+FIXTURE = ROOT / "tests/data/bazi-strength-reference.json"
 
 
 def build_report() -> dict[str, Any]:

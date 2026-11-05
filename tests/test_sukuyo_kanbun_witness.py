@@ -14,7 +14,7 @@ from fatebridge.core.sukuyo_quotation_comparison import (
     validate_kanbun,
 )
 
-FIXTURE = Path(__file__).parent / "fixtures/sukuyo-kanbun-before-code-v88.json"
+FIXTURE = Path(__file__).parent / "data/sukuyo-kanbun-before-code-v88.json"
 
 
 def test_entire_print_reference_keeps_all_first_readings_and_source_layers():

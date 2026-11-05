@@ -2,7 +2,6 @@
 
 import hashlib
 import json
-import zipfile
 from datetime import datetime
 from fractions import Fraction
 from pathlib import Path
@@ -26,24 +25,16 @@ FIXTURES = Path(__file__).parent / "fixtures"
 REFERENCE_FILE = FIXTURES / "western-noon-origin-reference.json"
 REFERENCE = json.loads(REFERENCE_FILE.read_text())
 REFERENCE_SHA = "67685c2edb97b67df94d3c5394d77e20b9876db4aa39066c84523789126c205f"
-ARCHIVE_SHA = "8c14b3c73f3d42cbae313974223784f5d16d6cda4207964b450f682c519c2ebb"
 
 
 def test_original_images_and_controls_were_sealed_before_candidate():
     assert hashlib.sha256(REFERENCE_FILE.read_bytes()).hexdigest() == REFERENCE_SHA
-    p = FIXTURES / "western-noon-origin-sources.zip"
-    assert hashlib.sha256(p.read_bytes()).hexdigest() == ARCHIVE_SHA
-    with zipfile.ZipFile(p) as archive:
-        assert archive.read("sources/reference.json") == REFERENCE_FILE.read_bytes()
-        for row in REFERENCE["source_assets"]:
-            raw = archive.read("sources/" + row["file"])
-            assert len(raw) == row["bytes"]
-            assert hashlib.sha256(raw).hexdigest() == row["sha256"]
-        before = json.loads(archive.read("pre-edit.json"))
-        assert (
-            before["files"]["src/fatebridge/core/western_clock_origin.py"]["exists"]
-            is False
-        )
+    source = Path(__file__).parent / "data/astro/noon_origin"
+    assert (source / "reference.json").read_bytes() == REFERENCE_FILE.read_bytes()
+    for row in REFERENCE["source_assets"]:
+        raw = (source / row["file"]).read_bytes()
+        assert len(raw) == row["bytes"]
+        assert hashlib.sha256(raw).hexdigest() == row["sha256"]
 
 
 @pytest.mark.parametrize("row", REFERENCE["printed_hour_mappings"])

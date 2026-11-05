@@ -13,7 +13,7 @@ from fatebridge.core.sukuyo_quotation_comparison import (
 )
 from fatebridge.core.sukuyo_t2217_collation import collation_lines, collation_reference
 
-FIXTURE = Path(__file__).parent / "fixtures/sukuyo-quotation-before-code-v88.json"
+FIXTURE = Path(__file__).parent / "data/sukuyo-quotation-before-code-v88.json"
 
 
 def test_entire_before_code_reference_and_legacy_snapshot_are_retained():

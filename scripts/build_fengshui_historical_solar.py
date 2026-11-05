@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/fengshui_historical_solar_v1"
+FIXTURE = ROOT / "tests/data/fengshui_historical_solar_v1"
 DATA = ROOT / "src/fatebridge/data/astronomy"
 
 

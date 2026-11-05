@@ -28,6 +28,7 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from scripts.audit_ziwei_limits import _seed
+from scripts.ziwei_conditional_inputs import synthetic_birth_clock
 from tests.fixtures.mcp_receipt import assert_same_run_receipt, verified_inline_business
 
 
@@ -83,7 +84,7 @@ def test_original_image_and_definition_sources_are_required(tmp_path):
 def test_split_uses_selected_start_not_age_last_digit(first):
     for period in range(12):
         lo = first + 10 * period
-        palace = dict(ganzhi="甲子", daxian=f"{lo}~{lo+9}")
+        palace = dict(ganzhi="甲子", daxian=f"{lo}~{lo + 9}")
         for offset in range(10):
             r = decade_half([palace], dict(status="computed", branch="子"), lo + offset)
             assert r["year_ordinal_in_decade"] == offset + 1
@@ -117,7 +118,7 @@ def test_missing_or_duplicate_branch_cannot_select_half():
 def _chart_and_horoscope():
     c = build_ziwei_chart(_seed(1984, 11), "男")
     h = build_ziwei_horoscope(
-        nominal_age_basis="legacy_mixed_clock",
+        birth_seed=synthetic_birth_clock(int((c)["lunar_date"]["year"])),
         chart=c,
         gender="男",
         target_seed=_seed(1990),

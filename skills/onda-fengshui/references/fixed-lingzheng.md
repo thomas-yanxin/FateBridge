@@ -1,10 +1,10 @@
 # 沈氏固定零正与飞星条件分别读取
 
-[玄空有限解读](xuankong-interpretation.md) · [历史宅盘](xuankong.md) · 原页与完整数表（本地数据：`../../../tests/fixtures/fengshui_lingzheng_v1/reference.json`）
+[玄空有限解读](xuankong-interpretation.md) · [历史宅盘](xuankong.md) · 原页与完整数表（本地数据：`../../../tests/data/fengshui_lingzheng_v1/reference.json`）
 
 `shen_fixed_lingzheng_v1@1.0.0` 明确选用《增广沈氏玄空学》卷一“论阴阳零正”。[历史影印上册](https://vr-d.com/pdf-file/%E9%A3%8E%E6%B0%B4/%E6%B2%89%E6%B0%8F%E7%8E%84%E7%A9%BA_%E4%B8%8A.pdf)完整 SHA-256 为 `30d653cd53a768a957d2416d2c1586b65310f3aad3b103c90cf8af4347e4a490`，确切印记未认证。仓库保留PDF第40–42页的原始页图、指纹与转录，方便独立核对；不是整本校勘或现实效力认证。
 
-原页可直接核对：印刷80–81页（本地数据：`../../../tests/fixtures/fengshui_lingzheng_v1/shen-upper-40.png`）、82–83页（本地数据：`../../../tests/fixtures/fengshui_lingzheng_v1/shen-upper-41.png`）、84–85页（本地数据：`../../../tests/fixtures/fengshui_lingzheng_v1/shen-upper-42.png`）。
+原页可直接核对：印刷80–81页（本地数据：`../../../tests/data/fengshui_lingzheng_v1/shen-upper-40.png`）、82–83页（本地数据：`../../../tests/data/fengshui_lingzheng_v1/shen-upper-41.png`）、84–85页（本地数据：`../../../tests/data/fengshui_lingzheng_v1/shen-upper-42.png`）。
 
 - 沈竹礽正文（SFL1，印刷81–82）：明确当元正神数、对待零神数，五运前十年寄坤、以八为零；后十年寄艮、以二为零。正文还明确否定把“山顺水逆”误当作山盘一律顺飞、水盘一律逆飞。
 - 志伊署名按语（SFL2，印刷82–83）：引用温明远，说明飞星语境的旺星与实际山水，不能拿它替代固定地盘。

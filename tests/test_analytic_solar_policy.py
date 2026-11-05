@@ -12,7 +12,10 @@ from fatebridge.core.ephemeris_runtime import (
     configure_ephemeris_path,
     configured_ephemeris_path,
 )
+from fatebridge.core.moshier_solar import MODEL_ID as COMPLETE_MOSHIER_MODEL
+from fatebridge.core.moshier_solar import PROVIDER as COMPLETE_MOSHIER_PROVIDER
 from fatebridge.core.solar_model_policy import analytic_selected, solar_model_policy
+from fatebridge.utils.errors import EphemerisSourceError
 
 
 @pytest.fixture
@@ -46,7 +49,8 @@ def test_default_empty_directory_uses_named_model_and_native_control_remains(
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     native = almanac.get_solar_terms_for_year(2026, "UTC")
     assert all(
-        t.resolution_provider == "swisseph" and t.ephemeris_model == "moshier"
+        t.resolution_provider == COMPLETE_MOSHIER_PROVIDER
+        and t.ephemeris_model == COMPLETE_MOSHIER_MODEL
         for t in native
     )
     assert native is not enhanced
@@ -83,10 +87,8 @@ def test_native_solver_failure_cannot_be_silently_promoted_to_success(
 ):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", lambda *a, **kw: None)
-    terms = almanac.get_solar_terms_for_year(2026, "UTC")
-    assert all(t.resolution_provider == "linear_1900_fallback" for t in terms)
-    with pytest.raises(RuntimeError):
-        almanac.require_calculated_solar_term(terms[0])
+    with pytest.raises(EphemerisSourceError, match="no linear approximation"):
+        almanac.get_solar_terms_for_year(2026, "UTC")
 
 
 def test_receipt_policy_is_live_even_when_deployment_fingerprints_are_cached(
@@ -100,7 +102,7 @@ def test_receipt_policy_is_live_even_when_deployment_fingerprints_are_cached(
     second = solar_model_environment_receipt()
     assert first["mode"] == "auto" and second["mode"] == "native"
     assert len(first["frame_coefficient_sha256"]) == 64
-    assert second["source_selection"] == "native_swiss_runtime"
+    assert second["source_selection"] == "native_swiss_or_complete_moshier"
     assert second["source_resolution"] == "configuration_only"
     assert second["analytic_source_resolved"] is False
     assert "model_id" not in second and "loaded_coefficient_sha256" not in second
@@ -126,8 +128,11 @@ def test_explicit_analytic_control_preserves_the_original_source(
     for term in terms:
         assert term.resolution_provider == "fatebridge_analytic"
         assert term.ephemeris_model == MODEL_ID
-        assert term.solar_model_details["native_choice_probe_model"] == "moshier"
-        assert term.solar_model_details["native_choice_probe_retflags"] == [4]
+        assert (
+            term.solar_model_details["native_choice_probe_model"]
+            == COMPLETE_MOSHIER_MODEL
+        )
+        assert term.solar_model_details["native_choice_probe_retflags"] == []
 
 
 @pytest.mark.parametrize("year", [1799, 2201])

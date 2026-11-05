@@ -440,15 +440,6 @@ class CareerAnalysis:
 
         score = max(30, min(95, score))
 
-        if score >= 85:
-            level = "上等格局"
-        elif score >= 70:
-            level = "中等格局"
-        elif score >= 55:
-            level = "普通格局"
-        else:
-            level = "需努力突破"
-
         return {
             "score": score,
             "score_kind": "uncalibrated_rule_index",
@@ -461,13 +452,12 @@ class CareerAnalysis:
                 "生克制化力度及救应",
                 "格局成败",
             ],
-            "interpretation_scope": "共现标签与分数只描述本实现的启发式线索；level为规则索引；legacy_level只保留旧评分分档供迁移，不是古典成格或现实事业层级认证。",
+            "interpretation_scope": "共现标签与分数只描述本实现的启发式线索；level为规则索引；不是古典成格或现实事业层级认证。",
             "score_basis": (
                 "以60为基准，按官印、食伤与财、财官及日主强弱规则加减，"
                 "限制在30–95；不是事业成就或收入概率。"
             ),
             "level": f"规则索引{score}（未裁定古典格局）",
-            "legacy_level": level,
             "notes": notes,
         }
 
@@ -543,13 +533,6 @@ class CareerAnalysis:
 
         entrepreneur_score = max(20, min(90, entrepreneur_score))
 
-        if entrepreneur_score >= 70:
-            tendency = "强烈创业倾向"
-        elif entrepreneur_score >= 55:
-            tendency = "可创业可打工"
-        else:
-            tendency = "更适合稳定工作"
-
         return {
             "score": entrepreneur_score,
             "weighted_counts": god_counts,
@@ -570,7 +553,6 @@ class CareerAnalysis:
                 "限制在20–90。计数包含日支藏干，指数未校准为创业适合度或成功率。"
             ),
             "tendency": f"未校准规则索引{entrepreneur_score}；不据此决定创业或就业",
-            "legacy_tendency": tendency,
             "notes": notes,
         }
 

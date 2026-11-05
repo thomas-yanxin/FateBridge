@@ -16,7 +16,6 @@ from fatebridge.core.metaphysics.jinkou_branch_breaks import branch_breaks, pair
 from fatebridge.core.output_chinese import JinkouCourse
 from fatebridge.core.output_jinkou_breaks import JinkouBranchBreaks
 from scripts.audit_jinkou_branch_breaks import CORPUS, reference
-from scripts.jinkou_branch_breaks_archive import without_branch_breaks
 from tests.test_agentic_nested_outputs import (
     AS_OF,
     REST_POST_CASES,
@@ -231,23 +230,6 @@ def test_sparse_views_keep_missing_anchors_missing_and_trace_facts_are_checked()
     trace["result"]["source_sha256"] = "invented"
     with pytest.raises(ValidationError):
         JinkouCourse.model_validate(dict(rule_trace=[trace]))
-
-
-def test_offline_inverse_cannot_hide_invented_facts():
-    bad = copy.deepcopy(raw())
-    bad["jinkou"]["branch_breaks"]["rows"][0]["source_pair_present"] = not bad[
-        "jinkou"
-    ]["branch_breaks"]["rows"][0]["source_pair_present"]
-    with pytest.raises(ValueError, match="cannot hide"):
-        without_branch_breaks(bad)
-
-
-def test_offline_version_line_normalization_does_not_rewrite_calculation_text():
-    bad = copy.deepcopy(raw())
-    bad["snapshot_text"] += "\n虚构用神：人元；任意文字1.16.0\n"
-    old = without_branch_breaks(bad)
-    assert old["snapshot_text"].endswith("\n虚构用神：人元；任意文字1.16.0\n")
-    assert "jinkou_guben_excerpt_v1 / 1.15.0" in old["snapshot_text"]
 
 
 def test_shared_producer_validator_metadata_cannot_be_its_own_source_oracle(

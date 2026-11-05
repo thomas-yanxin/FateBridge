@@ -120,7 +120,7 @@ def is_prograde_house_partition(house_cusps: List[float]) -> bool:
 
 
 def _house_for_longitude(
-    longitude: float,
+    longitude: Angle,
     ascendant: float,
     house_system: str,
     house_cusps: Optional[List[float]] = None,
@@ -229,12 +229,12 @@ def _ayanamsha(julian_day: float) -> float:
 
 
 def _nakshatra(longitude: float) -> str:
-    index = int(normalize_angle(longitude) // (360.0 / 27.0))
+    index = int((angle_fraction(longitude) % 360) * 27 // 360)
     return NAKSHATRAS[index]
 
 
 def _su28(longitude: float) -> str:
-    index = int(normalize_angle(longitude) // (360.0 / 28.0))
+    index = int((angle_fraction(longitude) % 360) * 28 // 360)
     return SU28[index]
 
 

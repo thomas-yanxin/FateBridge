@@ -6,7 +6,8 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.utils.birth_input import PersonInfo
-from tests.test_agentic_nested_outputs import SPECS, call_cli, native, rest
+from tests.test_agentic_nested_outputs import SPECS, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 
 TOPICS = [
     "birth",
@@ -20,6 +21,9 @@ TOPICS = [
     "marriage",
     "romance",
 ]
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("topic", TOPICS)

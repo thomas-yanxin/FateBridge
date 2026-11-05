@@ -21,12 +21,13 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
-from tests.test_result_delivery import reconstruct, store
+from tests.test_agentic_nested_outputs import rest as _shared_rest
+from tests.test_result_delivery import reconstruct
+from tests.test_result_delivery import store as _shared_store
 
 CASES = json.loads(
-    (Path(__file__).parent / "fixtures/bazi_classical_v1/cases.json").read_text()
+    (Path(__file__).parent / "data/bazi_classical_v1/cases.json").read_text()
 )
 
 
@@ -40,6 +41,10 @@ def source_case(case_id):
 
 def check(result, key):
     return next(c for c in result["structure_checks"] if c["id"] == key)
+
+
+rest = _shared_rest
+store = _shared_store
 
 
 @pytest.mark.parametrize(
@@ -130,9 +135,7 @@ def test_rob_wealth_in_month_is_not_automatically_yang_blade():
     # The frozen 孤官无辅 case is 戊 in 未; its 乙官 is actually 透 in 时.
     month = build_natal_evidence(source_case("ZP31-LONE"))["month_command"]
     assert month["label"] == "正官格"  # 杂气透乙、卯未会支，不能误作月刃。
-    assert month["legacy_label"] == "月刃格"  # 旧标签保留，不能覆盖校正结果。
     assert not month["yang_blade_seat"]
-    assert month["legacy_blade_qualification_conflict"]
     officer = next(c for c in month["candidates"] if c["ten_god"] == "正官")
     assert officer["visible_in"] == ["hour"]
 
@@ -344,6 +347,7 @@ def test_nine_recommended_first_views_keep_analysis_within_default_budget(topic)
         assert deferred and set(deferred) <= {
             "run_metadata.runtime",
             "run_metadata.provenance",
+            "run_metadata.calculation_evidence",
         }
         assert len(deferred) == len(set(deferred))
     analysis = result[topic + "_analysis"]

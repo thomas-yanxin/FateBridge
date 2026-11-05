@@ -17,7 +17,7 @@ from fatebridge.validation.sukuyo_semantic_packet import (
 
 ROOT = Path(__file__).resolve().parents[1]
 REFERENCE = json.loads(
-    (ROOT / "tests/fixtures/sukuyo-semantic-packet-before-code-v96.json").read_bytes()
+    (ROOT / "tests/data/sukuyo-semantic-packet-before-code-v96.json").read_bytes()
 )
 
 

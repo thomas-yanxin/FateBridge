@@ -19,7 +19,7 @@ else:
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v32"
-FREEZE_SHA256 = "ac1ac83ea797cc7f48dccfd9801d8e22a095a7995cc96d16cc5e376474a4c47b"
+FREEZE_SHA256 = "903bc7911f1d3c763f3b4d61f3518e542e954ffae53e97a098a25dad528f345d"
 
 
 def _json(path: Path) -> dict[str, Any]:

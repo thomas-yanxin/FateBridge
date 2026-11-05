@@ -11,10 +11,16 @@ from tests.test_agentic_nested_outputs import (
     business,
     call_cli,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_timing_roots_transports import PAYLOAD
-from tests.test_result_delivery import reconstruct, store
+from tests.test_result_delivery import reconstruct
+from tests.test_result_delivery import store as _store_fixture
+
+store = _store_fixture
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize(

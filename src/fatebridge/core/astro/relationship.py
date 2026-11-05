@@ -93,9 +93,12 @@ def _normalize_relationship_focus(focus: Any) -> str:
     if focus is None:
         return "general"
     raw = str(focus).strip()
-    if raw in _RELATIONSHIP_FOCUS_ALIASES:
-        return _RELATIONSHIP_FOCUS_ALIASES[raw]
-    return _RELATIONSHIP_FOCUS_ALIASES.get(raw.casefold(), "general")
+    normalized = _RELATIONSHIP_FOCUS_ALIASES.get(raw.casefold())
+    if normalized is None:
+        raise ValueError(
+            "relationship_focus 无效，请使用 marriage/婚姻、romance/恋爱或 general/泛"
+        )
+    return normalized
 
 
 def relationship_focus_block(

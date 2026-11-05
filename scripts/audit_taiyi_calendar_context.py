@@ -21,7 +21,7 @@ else:
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_calendar_context_v37"
-FREEZE_SHA256 = "6933532d38054d86a075f4633f64ab045b0b0c53710fc1fed66e9d46308ccef7"
+FREEZE_SHA256 = "9540b3fdbdbda3f644d8f032bf2ead04814d64ac2880af8a87f0c22695b37bda"
 STEMS = "甲乙丙丁戊己庚辛壬癸"
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 CYCLE = [STEMS[i % 10] + BRANCHES[i % 12] for i in range(60)]
@@ -119,8 +119,9 @@ def candidates(root: Path) -> list[dict[str, Any]]:
     for row, following in zip(rows, rows[1:]):
         if row["lunar_year"] != 502:
             continue
-        begin, end = julian_jdn(row["julian_start"]), julian_jdn(
-            following["julian_start"]
+        begin, end = (
+            julian_jdn(row["julian_start"]),
+            julian_jdn(following["julian_start"]),
         )
         printed.append(
             {

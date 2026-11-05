@@ -11,7 +11,7 @@ from xml.etree import ElementTree
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "src/fatebridge/data/sukuyo_xuanying_source_chain.json"
-FIXTURE = ROOT / "tests/fixtures/sukuyo-xuanying-before-production-v65.json"
+FIXTURE = ROOT / "tests/data/sukuyo-xuanying-before-production-v65.json"
 
 
 def verify_primary(captures: dict[str, Path] | None = None) -> dict:

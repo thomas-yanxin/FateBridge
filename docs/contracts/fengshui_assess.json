@@ -13,6 +13,7 @@
     "natal_interpretation": "玄空有限解释需 xuankong.interpretation 显式启用 xuankong_conditioned_v1；当前评价运 current_period_number 与 period_evidence 成对，不改历史宅运。external_forms 按全宅中心八宫独立确认外部山形/水形，未知省略，照片保留候选，不复用金锁砂水或室内靠背；床/门取用结合顶层 placements.location_direction，桌/灶未覆盖。fields 追加 layout_analysis.natal_interpretation；仅有限五行与当令形势条件，不是完整81组合吉凶或可立即搬动建议。",
     "scene_selection": "工位scene=workstation，合租scene=shared_rental，家居scene=home；自动按事实展开飞星、金锁、八宅，局部前两法优先，显式methods优先。不为优先级补年份或宅运；年盘不替代历史宅盘。独立形态/桌面/context不要求生辰或罗盘。无场景无作者无context保留原三法默认。场景首轮fields按需追加method_policy；细节参考按需读method_details。 method_policy.priority_review_status/missing与已选计算状态独立；available_engine_layers仅现状已完整计算层，候选读priority_review_by_scope.candidates及available_candidate_engine_layers，不以候选代替现状。priority_missing_inputs为可选审查索引，不是待传参数或必追问清单。",
     "surface_frame": "以坐着使用的桌沿为近沿near，远离坐者的桌沿为far；这是桌面坐标，不是房间前后或罗盘方向",
+    "workstation_measured": "有实际尺寸的人工标注用workstation_layout.scene；+y图纸前方、桌面+x右/+y远沿，米制尺寸/高度/眼高/头顶高分别明确。compass独立提供北基准、角误差、参考中心和chart_binding_confirmed，sector_anchor明确坐者或桌中心；不自动立极。照片/坐标误差保持候选，清单不完整时未列观察仍未知。search提供完整有限位置/角度域，复用layout_constraints搬转许可；实测同一对象不重复提交placements/form_observations/features或旧关系。fields按需追加layout_analysis.workstation_layout_analysis；保留全部search.receipts、拒绝与未显示前沿数量，不把ready或Pareto集合解释为风水总分。BTB与wofs_desktop_compass_v1须逐个明确另选；植物身份、状态及几何分别核对，向星不等于坐向或桌面水体需求。 搜索域可用positions或grid二选一；grid明确原点和步长，默认从房间/桌面生成中心候选。竖直屏幕可在items[].screen实测，检查整面透视遮挡，required_visible明确是否硬约束，不推断眩光。算法完工审查读取research_completion_status/research_coverage；请求complete不代表完整81或24山已完成。",
     "workstation_review": "工位工作/学习用途用 environmental_context.workstation_review.activities，逐项显式选 workstation_activity_authored_v1 并给实际活动/证据；按 placements.location_direction 读取各候选宅盘向星，位置与朝向分开，不要求外部有水或桌上放水。评价运可用该review.evaluation_period独立确认，不以日期/宅运代替。入口隔挡用 entry_barriers 显式 afsi_entry_barrier_v1，分别登记实际入口/桌/隔挡、两端直线与隔挡介入观察及 operation；执行许可和通行/视野/操作/容纳独立。fields追加layout_analysis.workstation_analysis，rulesets/rule_trace保留。WOFS桌面只作reference_only，不开启固定吉位。",
     "zone_legend": {
       "far_center": "远中/远沿中",
@@ -24,6 +25,30 @@
       "near_center": "近中/靠身体中",
       "near_left": "左前/靠身体左",
       "near_right": "右前/靠身体右"
+    }
+  },
+  "evidence_views": {
+    "measured_workstation": {
+      "fields": [
+        "layout_analysis.workstation_layout_analysis.research_coverage",
+        "layout_analysis.workstation_layout_analysis.research_completion_status",
+        "layout_analysis.workstation_layout_analysis.geometry",
+        "layout_analysis.workstation_layout_analysis.readings",
+        "layout_analysis.workstation_layout_analysis.rule_comparisons",
+        "coverage.analysis_progress",
+        "rulesets",
+        "rule_trace"
+      ],
+      "scope": "Requires workstation_layout. Measured facts, source-scoped role/period conditions and independently selected desktop rules. Preserve unknowns, coordinate frames and source disagreement; view name is not a request parameter."
+    },
+    "measured_workstation_search": {
+      "fields": [
+        "layout_analysis.workstation_layout_analysis",
+        "coverage.analysis_progress",
+        "rulesets",
+        "rule_trace"
+      ],
+      "scope": "Requires explicit workstation_layout.search. Preserve every finite-search receipt and rejection, frontier IDs and display omissions. Read deferred evidence from the same run; ready only describes geometry and action permissions, not universal auspiciousness."
     }
   },
   "first_view": {
@@ -5519,6 +5544,1233 @@
         "default": null,
         "description": "Caller trace ID"
       },
+      "workstation_layout": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "evaluation_period": {
+                "anyOf": [
+                  {
+                    "maximum": 9,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "evaluation_period_evidence": {
+                "anyOf": [
+                  {
+                    "maxLength": 1000,
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "ruleset_id": {
+                "const": "workstation_layout_v1",
+                "default": "workstation_layout_v1",
+                "type": "string"
+              },
+              "scene": {
+                "additionalProperties": false,
+                "properties": {
+                  "bodies": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "blocks_view": {
+                          "type": "boolean"
+                        },
+                        "bottom_m": {
+                          "minimum": 0,
+                          "type": "number"
+                        },
+                        "footprint": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "center": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "x": {
+                                  "type": "number"
+                                },
+                                "y": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "x",
+                                "y"
+                              ],
+                              "type": "object"
+                            },
+                            "depth_m": {
+                              "exclusiveMinimum": 0,
+                              "type": "number"
+                            },
+                            "rotation_degrees": {
+                              "default": 0,
+                              "description": "相对图纸+y顺时针；局部+x为右，+y为远离坐者",
+                              "type": "number"
+                            },
+                            "width_m": {
+                              "exclusiveMinimum": 0,
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "center",
+                            "width_m",
+                            "depth_m"
+                          ],
+                          "type": "object"
+                        },
+                        "has_sharp_corners": {
+                          "anyOf": [
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "default": null,
+                          "description": "独立确认是否为本次作者规则所指实体尖角；不由矩形包络猜测"
+                        },
+                        "kind": {
+                          "enum": [
+                            "desk",
+                            "furniture",
+                            "screen",
+                            "plant",
+                            "pillar",
+                            "beam"
+                          ],
+                          "type": "string"
+                        },
+                        "object_id": {
+                          "maxLength": 100,
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "type": "string"
+                        },
+                        "sand_water": {
+                          "anyOf": [
+                            {
+                              "additionalProperties": false,
+                              "properties": {
+                                "classification": {
+                                  "enum": [
+                                    "sand",
+                                    "water",
+                                    "mixed",
+                                    "unknown"
+                                  ],
+                                  "type": "string"
+                                },
+                                "evidence": {
+                                  "maxLength": 1000,
+                                  "minLength": 1,
+                                  "pattern": "\\S",
+                                  "type": "string"
+                                },
+                                "observation_basis": {
+                                  "enum": [
+                                    "measured",
+                                    "user_confirmed",
+                                    "image_observed"
+                                  ],
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "classification",
+                                "observation_basis",
+                                "evidence"
+                              ],
+                              "type": "object"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "default": null,
+                          "description": "独立确认砂水分类；不能由几何高低或物件名称推断"
+                        },
+                        "top_m": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "object_id",
+                        "kind",
+                        "footprint",
+                        "bottom_m",
+                        "top_m",
+                        "blocks_view"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 100,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "boundary": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "vertices": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "x": {
+                              "type": "number"
+                            },
+                            "y": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "x",
+                            "y"
+                          ],
+                          "type": "object"
+                        },
+                        "maxItems": 100,
+                        "minItems": 3,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "vertices"
+                    ],
+                    "type": "object"
+                  },
+                  "compass": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": false,
+                        "properties": {
+                          "chart_binding_confirmed": {
+                            "description": "明确确认该立极、范围、北基准与本次所选宅/年/月盘一致；不自动定中心或套小太极",
+                            "type": "boolean"
+                          },
+                          "evidence": {
+                            "maxLength": 1000,
+                            "minLength": 1,
+                            "pattern": "\\S",
+                            "type": "string"
+                          },
+                          "north_reference": {
+                            "enum": [
+                              "magnetic",
+                              "true"
+                            ],
+                            "type": "string"
+                          },
+                          "reference_scope": {
+                            "enum": [
+                              "house",
+                              "floor",
+                              "room",
+                              "workstation"
+                            ],
+                            "type": "string"
+                          },
+                          "sector_origin": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "x": {
+                                "type": "number"
+                              },
+                              "y": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "x",
+                              "y"
+                            ],
+                            "type": "object"
+                          },
+                          "uncertainty_degrees": {
+                            "maximum": 180,
+                            "minimum": 0,
+                            "type": "number"
+                          },
+                          "y_axis_bearing_degrees": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "y_axis_bearing_degrees",
+                          "north_reference",
+                          "uncertainty_degrees",
+                          "sector_origin",
+                          "reference_scope",
+                          "chart_binding_confirmed",
+                          "evidence"
+                        ],
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "coordinate_uncertainty_m": {
+                    "default": 0,
+                    "description": "坐标误差半径；0仅表示按所给坐标计算，不认证测量仪器精度",
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "desktops": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "desk_id": {
+                          "maxLength": 100,
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "type": "string"
+                        },
+                        "goal": {
+                          "default": "career",
+                          "enum": [
+                            "career",
+                            "abundance"
+                          ],
+                          "type": "string"
+                        },
+                        "items": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "blocks_view": {
+                                "type": "boolean"
+                              },
+                              "evidence": {
+                                "maxLength": 1000,
+                                "minLength": 1,
+                                "pattern": "\\S",
+                                "type": "string"
+                              },
+                              "footprint": {
+                                "additionalProperties": false,
+                                "description": "相对桌面中心，局部+x右、+y远",
+                                "properties": {
+                                  "center": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "x": {
+                                        "type": "number"
+                                      },
+                                      "y": {
+                                        "type": "number"
+                                      }
+                                    },
+                                    "required": [
+                                      "x",
+                                      "y"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "depth_m": {
+                                    "exclusiveMinimum": 0,
+                                    "type": "number"
+                                  },
+                                  "rotation_degrees": {
+                                    "default": 0,
+                                    "description": "相对图纸+y顺时针；局部+x为右，+y为远离坐者",
+                                    "type": "number"
+                                  },
+                                  "width_m": {
+                                    "exclusiveMinimum": 0,
+                                    "type": "number"
+                                  }
+                                },
+                                "required": [
+                                  "center",
+                                  "width_m",
+                                  "depth_m"
+                                ],
+                                "type": "object"
+                              },
+                              "healthy": {
+                                "anyOf": [
+                                  {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "evidence": {
+                                        "maxLength": 1000,
+                                        "minLength": 1,
+                                        "pattern": "\\S",
+                                        "type": "string"
+                                      },
+                                      "observation_basis": {
+                                        "enum": [
+                                          "measured",
+                                          "user_confirmed",
+                                          "image_observed"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "value": {
+                                        "anyOf": [
+                                          {
+                                            "type": "boolean"
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": [
+                                      "value",
+                                      "observation_basis",
+                                      "evidence"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ],
+                                "default": null,
+                                "description": "植物/鲜花状态的独立事实；位置与活植物身份不证明状态良好"
+                              },
+                              "height_m": {
+                                "exclusiveMinimum": 0,
+                                "type": "number"
+                              },
+                              "object_id": {
+                                "maxLength": 100,
+                                "minLength": 1,
+                                "pattern": "\\S",
+                                "type": "string"
+                              },
+                              "representation": {
+                                "enum": [
+                                  "living_plant",
+                                  "fresh_flowers",
+                                  "lamp",
+                                  "smooth_crystal_ball",
+                                  "metal_office_equipment",
+                                  "water_image",
+                                  "dark_accessory",
+                                  "other",
+                                  "unknown"
+                                ],
+                                "type": "string"
+                              },
+                              "representation_basis": {
+                                "enum": [
+                                  "measured",
+                                  "user_confirmed",
+                                  "image_observed"
+                                ],
+                                "type": "string"
+                              },
+                              "screen": {
+                                "anyOf": [
+                                  {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "bottom_above_desktop_m": {
+                                        "minimum": 0,
+                                        "type": "number"
+                                      },
+                                      "center": {
+                                        "additionalProperties": false,
+                                        "description": "显示面中心的水平投影，相对物件局部坐标",
+                                        "properties": {
+                                          "x": {
+                                            "type": "number"
+                                          },
+                                          "y": {
+                                            "type": "number"
+                                          }
+                                        },
+                                        "required": [
+                                          "x",
+                                          "y"
+                                        ],
+                                        "type": "object"
+                                      },
+                                      "front_degrees": {
+                                        "description": "显示面朝向观察者的水平法线，相对物件+y顺时针",
+                                        "type": "number"
+                                      },
+                                      "height_m": {
+                                        "exclusiveMinimum": 0,
+                                        "type": "number"
+                                      },
+                                      "required_visible": {
+                                        "description": "是否将整块显示面无遮挡且在声明水平视野内作为候选硬约束",
+                                        "type": "boolean"
+                                      },
+                                      "width_m": {
+                                        "exclusiveMinimum": 0,
+                                        "type": "number"
+                                      }
+                                    },
+                                    "required": [
+                                      "center",
+                                      "front_degrees",
+                                      "width_m",
+                                      "height_m",
+                                      "bottom_above_desktop_m",
+                                      "required_visible"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ],
+                                "default": null,
+                                "description": "独立实测的竖直显示面；不由设备名称猜尺寸、朝向或眩光"
+                              }
+                            },
+                            "required": [
+                              "object_id",
+                              "footprint",
+                              "height_m",
+                              "blocks_view",
+                              "representation",
+                              "representation_basis",
+                              "evidence"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 30,
+                          "type": "array"
+                        },
+                        "protected_zones": {
+                          "description": "桌面局部坐标的键盘/书写/屏幕等保留区",
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "vertices": {
+                                "items": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "x": {
+                                      "type": "number"
+                                    },
+                                    "y": {
+                                      "type": "number"
+                                    }
+                                  },
+                                  "required": [
+                                    "x",
+                                    "y"
+                                  ],
+                                  "type": "object"
+                                },
+                                "maxItems": 100,
+                                "minItems": 3,
+                                "type": "array"
+                              }
+                            },
+                            "required": [
+                              "vertices"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 20,
+                          "type": "array"
+                        },
+                        "ruleset_ids": {
+                          "description": "逐个显式另选；不默认开启BTB或罗盘桌面处方",
+                          "items": {
+                            "enum": [
+                              "desktop_bagua_btb_v1",
+                              "wofs_desktop_compass_v1"
+                            ],
+                            "type": "string"
+                          },
+                          "maxItems": 2,
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "desk_id"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 20,
+                    "type": "array"
+                  },
+                  "evidence": {
+                    "maxLength": 1000,
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  "frame_id": {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "pattern": "\\S",
+                    "type": "string"
+                  },
+                  "inventory_confirmed": {
+                    "description": "确认本次空间对象/门窗/通道/梁/背靠清单完整；false时缺项保持未知，普通解释可先进行",
+                    "type": "boolean"
+                  },
+                  "keep_clear_zones": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "vertices": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "x": {
+                                "type": "number"
+                              },
+                              "y": {
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "x",
+                              "y"
+                            ],
+                            "type": "object"
+                          },
+                          "maxItems": 100,
+                          "minItems": 3,
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "vertices"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 30,
+                    "type": "array"
+                  },
+                  "observation_basis": {
+                    "enum": [
+                      "measured",
+                      "user_confirmed",
+                      "image_observed"
+                    ],
+                    "type": "string"
+                  },
+                  "openings": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "inward_degrees": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "default": null,
+                          "description": "实际入口向室内的直线方向，相对图纸+y顺时针"
+                        },
+                        "kind": {
+                          "enum": [
+                            "entrance",
+                            "window",
+                            "bathroom_door",
+                            "staircase"
+                          ],
+                          "type": "string"
+                        },
+                        "object_id": {
+                          "maxLength": 100,
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "type": "string"
+                        },
+                        "segment": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "end": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "x": {
+                                  "type": "number"
+                                },
+                                "y": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "x",
+                                "y"
+                              ],
+                              "type": "object"
+                            },
+                            "start": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "x": {
+                                  "type": "number"
+                                },
+                                "y": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "x",
+                                "y"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "start",
+                            "end"
+                          ],
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "object_id",
+                        "kind",
+                        "segment"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 30,
+                    "type": "array"
+                  },
+                  "passages": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "centerline": {
+                          "additionalProperties": false,
+                          "description": "start到end为走道进入工位的方向",
+                          "properties": {
+                            "end": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "x": {
+                                  "type": "number"
+                                },
+                                "y": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "x",
+                                "y"
+                              ],
+                              "type": "object"
+                            },
+                            "start": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "x": {
+                                  "type": "number"
+                                },
+                                "y": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "x",
+                                "y"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "start",
+                            "end"
+                          ],
+                          "type": "object"
+                        },
+                        "object_id": {
+                          "maxLength": 100,
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "type": "string"
+                        },
+                        "width_m": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "object_id",
+                        "centerline",
+                        "width_m"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 30,
+                    "type": "array"
+                  },
+                  "seats": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "activity": {
+                          "enum": [
+                            "work",
+                            "study",
+                            "meditation",
+                            "storage",
+                            "mixed",
+                            "unknown"
+                          ],
+                          "type": "string"
+                        },
+                        "body_depth_m": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "body_width_m": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "desk_id": {
+                          "maxLength": 100,
+                          "minLength": 1,
+                          "pattern": "\\S",
+                          "type": "string"
+                        },
+                        "entrance_id": {
+                          "anyOf": [
+                            {
+                              "maxLength": 100,
+                              "minLength": 1,
+                              "pattern": "\\S",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "default": null
+                        },
+                        "eye_height_m": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "facing_offset_degrees": {
+                          "default": 0,
+                          "type": "number"
+                        },
+                        "head_height_m": {
+                          "exclusiveMinimum": 0,
+                          "type": "number"
+                        },
+                        "offset": {
+                          "additionalProperties": false,
+                          "description": "相对书桌中心的局部米坐标；近侧为-y",
+                          "properties": {
+                            "x": {
+                              "type": "number"
+                            },
+                            "y": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "x",
+                            "y"
+                          ],
+                          "type": "object"
+                        },
+                        "operating_zone": {
+                          "additionalProperties": false,
+                          "description": "书桌局部坐标中的地面椅位/活动净空；独立于桌面键盘区",
+                          "properties": {
+                            "center": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "x": {
+                                  "type": "number"
+                                },
+                                "y": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "x",
+                                "y"
+                              ],
+                              "type": "object"
+                            },
+                            "depth_m": {
+                              "exclusiveMinimum": 0,
+                              "type": "number"
+                            },
+                            "rotation_degrees": {
+                              "default": 0,
+                              "description": "相对图纸+y顺时针；局部+x为右，+y为远离坐者",
+                              "type": "number"
+                            },
+                            "width_m": {
+                              "exclusiveMinimum": 0,
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "center",
+                            "width_m",
+                            "depth_m"
+                          ],
+                          "type": "object"
+                        },
+                        "sector_anchor": {
+                          "description": "明确按实际坐者还是桌中心关联落宫，不能相互替代",
+                          "enum": [
+                            "seat",
+                            "desk_center"
+                          ],
+                          "type": "string"
+                        },
+                        "subject_ids": {
+                          "anyOf": [
+                            {
+                              "items": {
+                                "maxLength": 100,
+                                "minLength": 1,
+                                "pattern": "\\S",
+                                "type": "string"
+                              },
+                              "maxItems": 50,
+                              "minItems": 1,
+                              "type": "array"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "default": null,
+                          "description": "可选绑定本次已提供的实际使用人；省略沿用全部使用人的既有合同，不从座位猜身份"
+                        },
+                        "view_half_angle_degrees": {
+                          "description": "用户明确的正常正面视野工程模型；不是传统吉凶阈值",
+                          "exclusiveMinimum": 0,
+                          "maximum": 90,
+                          "type": "number"
+                        },
+                        "window_id": {
+                          "anyOf": [
+                            {
+                              "maxLength": 100,
+                              "minLength": 1,
+                              "pattern": "\\S",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ],
+                          "default": null,
+                          "description": "多窗时须明确本次核对的窗；不任取第一扇"
+                        }
+                      },
+                      "required": [
+                        "desk_id",
+                        "offset",
+                        "body_width_m",
+                        "body_depth_m",
+                        "eye_height_m",
+                        "head_height_m",
+                        "view_half_angle_degrees",
+                        "operating_zone",
+                        "activity",
+                        "sector_anchor"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 20,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "solid_backing_segments": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "end": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "x": {
+                              "type": "number"
+                            },
+                            "y": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "x",
+                            "y"
+                          ],
+                          "type": "object"
+                        },
+                        "start": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "x": {
+                              "type": "number"
+                            },
+                            "y": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "x",
+                            "y"
+                          ],
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "start",
+                        "end"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "units": {
+                    "const": "m",
+                    "default": "m",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "frame_id",
+                  "boundary",
+                  "observation_basis",
+                  "evidence",
+                  "inventory_confirmed",
+                  "bodies",
+                  "seats"
+                ],
+                "type": "object"
+              },
+              "search": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "domains": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "grid": {
+                              "anyOf": [
+                                {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "center_region": {
+                                      "anyOf": [
+                                        {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "vertices": {
+                                              "items": {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "x": {
+                                                    "type": "number"
+                                                  },
+                                                  "y": {
+                                                    "type": "number"
+                                                  }
+                                                },
+                                                "required": [
+                                                  "x",
+                                                  "y"
+                                                ],
+                                                "type": "object"
+                                              },
+                                              "maxItems": 100,
+                                              "minItems": 3,
+                                              "type": "array"
+                                            }
+                                          },
+                                          "required": [
+                                            "vertices"
+                                          ],
+                                          "type": "object"
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ],
+                                      "default": null,
+                                      "description": "可选中心搜索区；省略时家具用场景边界，桌面物件用所属桌面。坐标沿用对象所属参考系"
+                                    },
+                                    "origin": {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "x": {
+                                          "type": "number"
+                                        },
+                                        "y": {
+                                          "type": "number"
+                                        }
+                                      },
+                                      "required": [
+                                        "x",
+                                        "y"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    "step_x_m": {
+                                      "exclusiveMinimum": 0,
+                                      "type": "number"
+                                    },
+                                    "step_y_m": {
+                                      "exclusiveMinimum": 0,
+                                      "type": "number"
+                                    }
+                                  },
+                                  "required": [
+                                    "origin",
+                                    "step_x_m",
+                                    "step_y_m"
+                                  ],
+                                  "type": "object"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ],
+                              "default": null
+                            },
+                            "object_id": {
+                              "maxLength": 100,
+                              "minLength": 1,
+                              "pattern": "\\S",
+                              "type": "string"
+                            },
+                            "positions": {
+                              "anyOf": [
+                                {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "x": {
+                                        "type": "number"
+                                      },
+                                      "y": {
+                                        "type": "number"
+                                      }
+                                    },
+                                    "required": [
+                                      "x",
+                                      "y"
+                                    ],
+                                    "type": "object"
+                                  },
+                                  "maxItems": 30,
+                                  "minItems": 1,
+                                  "type": "array"
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ],
+                              "default": null
+                            },
+                            "rotations_degrees": {
+                              "items": {
+                                "type": "number"
+                              },
+                              "maxItems": 16,
+                              "minItems": 1,
+                              "type": "array"
+                            }
+                          },
+                          "required": [
+                            "object_id",
+                            "rotations_degrees"
+                          ],
+                          "type": "object"
+                        },
+                        "maxItems": 6,
+                        "minItems": 1,
+                        "type": "array"
+                      },
+                      "max_results": {
+                        "default": 10,
+                        "maximum": 50,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "required_checks": {
+                        "items": {
+                          "enum": [
+                            "entrance_visible",
+                            "no_entry_direct_line",
+                            "no_passage_direct_line",
+                            "no_overhead_beam",
+                            "no_sharp_corner",
+                            "solid_backing"
+                          ],
+                          "type": "string"
+                        },
+                        "maxItems": 6,
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "domains"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "timeliness_ruleset_id": {
+                "anyOf": [
+                  {
+                    "const": "wang_zhongzhou_timeliness_v1",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "scene"
+            ],
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "带米制尺寸与显式参考系的工位几何、传统条件解释及有限候选搜索；单独输出workstation_layout_analysis，不默认开启桌面流派。照片/误差保持候选，动作沿用layout_constraints。"
+      },
       "xuankong": {
         "anyOf": [
           {
@@ -5545,20 +6797,6 @@
               }
             ],
             "properties": {
-              "bearing_uncertainty_degrees": {
-                "anyOf": [
-                  {
-                    "maximum": 7.5,
-                    "minimum": 0,
-                    "type": "number"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ],
-                "default": null,
-                "description": "兼容原玄空输入的宅向测量误差半径；优先在house.bearing_uncertainty_degrees声明共享事实，两处显式值须相等。合参同一宅向的此项误差也传递给八宅，不只限制玄空。跨山界或下/替卦阈值保留候选。"
-              },
               "city_gate": {
                 "anyOf": [
                   {
@@ -7502,5 +8740,209 @@
     },
     "type": "object"
   },
+  "method_contracts": [
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现/数据指纹、选项与实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "calendar_model",
+        "north_reference",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/services/fengshui.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.fengshui_minggua_bazhai.contract_v1",
+      "output_paths": [
+        "status",
+        "rulesets",
+        "coverage",
+        "rule_trace"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "traditional_rule_result",
+      "role": "calculation",
+      "selector_fields": [
+        "ruleset_id",
+        "form_ruleset_id",
+        "element_ruleset_id",
+        "annual_remedy_ruleset_id",
+        "methods",
+        "jinsuo_ruleset_id",
+        "annual_ruleset_id"
+      ],
+      "source_refs": [
+        "docs/fengshui.md"
+      ],
+      "unit": "categorical",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    },
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现/数据指纹、选项与实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "north_reference",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/services/fengshui.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.fengshui_jinsuo.contract_v1",
+      "output_paths": [
+        "status",
+        "rulesets",
+        "coverage",
+        "rule_trace"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "traditional_rule_result",
+      "role": "calculation",
+      "selector_fields": [
+        "ruleset_id",
+        "form_ruleset_id",
+        "element_ruleset_id",
+        "annual_remedy_ruleset_id",
+        "methods",
+        "jinsuo_ruleset_id",
+        "annual_ruleset_id"
+      ],
+      "source_refs": [
+        "docs/fengshui.md"
+      ],
+      "unit": "categorical",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    },
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现/数据指纹、选项与实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "calendar_model",
+        "north_reference",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/services/fengshui.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.fengshui_annual_monthly_stars.contract_v1",
+      "output_paths": [
+        "status",
+        "rulesets",
+        "coverage",
+        "rule_trace"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "traditional_rule_result",
+      "role": "calculation",
+      "selector_fields": [
+        "ruleset_id",
+        "form_ruleset_id",
+        "element_ruleset_id",
+        "annual_remedy_ruleset_id",
+        "methods",
+        "jinsuo_ruleset_id",
+        "annual_ruleset_id"
+      ],
+      "source_refs": [
+        "docs/fengshui.md"
+      ],
+      "unit": "categorical",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    },
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现/数据指纹、选项与实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "calendar_model",
+        "north_reference",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/services/fengshui.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.fengshui_xuankong_natal.contract_v1",
+      "output_paths": [
+        "status",
+        "rulesets",
+        "coverage",
+        "rule_trace"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "traditional_rule_result",
+      "role": "calculation",
+      "selector_fields": [
+        "ruleset_id",
+        "form_ruleset_id",
+        "element_ruleset_id",
+        "annual_remedy_ruleset_id",
+        "methods",
+        "jinsuo_ruleset_id",
+        "annual_ruleset_id"
+      ],
+      "source_refs": [
+        "docs/fengshui-xuankong.md"
+      ],
+      "unit": "categorical",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    }
+  ],
   "tool": "fengshui_assess"
 }

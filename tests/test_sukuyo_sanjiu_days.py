@@ -16,7 +16,7 @@ from fatebridge.core.sukuyo_sanjiu_days import (
 from fatebridge.services.tool_catalog import CATALOG
 
 PRIMARY = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-sanjiu-days-primary.json").read_text()
+    (Path(__file__).parent / "data/sukuyo-sanjiu-days-primary.json").read_text()
 )
 
 

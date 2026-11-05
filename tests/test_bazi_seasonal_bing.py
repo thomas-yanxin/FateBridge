@@ -17,7 +17,7 @@ from fatebridge.core.classical import (
     seasonal_climate_god,
 )
 from fatebridge.core.output_classical_seasonal import SeasonalClimateReference
-from tests.fixtures.bazi_seasonal_bing_v1.transport_reader import (
+from tests.bazi_transport_reader import (
     cli_payload,
     file_payload,
     native_with_manifest,
@@ -29,23 +29,14 @@ from tests.test_agentic_nested_outputs import rest as _rest_fixture
 
 rest = _rest_fixture
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_seasonal_bing_v1"
+FIXTURE = ROOT / "tests/data/bazi_seasonal_bing_v1"
 SOURCE = json.loads((FIXTURE / "source-collation-first.json").read_bytes())[
     "source_profile"
 ]
 SOURCE_NOTES = json.loads((FIXTURE / "input-witness-notes-first.json").read_bytes())
 CASES = SOURCE["examples"]
 PUBLIC = json.loads((FIXTURE / "public-inputs-first.json").read_bytes())["cases"]
-LEGACY = json.loads(
-    (ROOT / "tests/fixtures/bazi_seasonal_jia_v1/legacy-table.json").read_bytes()
-)
-MODULE = importlib.util.spec_from_file_location(
-    "bing_independent_hidden",
-    ROOT / "tests/fixtures/bazi_strength_threshold_v1/independent_reference_v2.py",
-)
-assert MODULE is not None and MODULE.loader is not None
-REFERENCE = importlib.util.module_from_spec(MODULE)
-MODULE.loader.exec_module(REFERENCE)
+from tests import bazi_strength_reference_v3 as REFERENCE
 
 
 def pillars(values):
@@ -88,14 +79,12 @@ def test_full_unit_first_transcription_retains_bounded_labels_and_all_charts():
     )
 
 
-@pytest.mark.parametrize(
-    "stem,branch,entry", [(s, b, v) for s, m in LEGACY.items() for b, v in m.items()]
-)
-def test_all_120_legacy_candidate_cells_remain_identical_and_scopes_stay_distinct(
-    stem, branch, entry
+@pytest.mark.parametrize("stem", list("甲乙丙丁戊己庚辛壬癸"))
+@pytest.mark.parametrize("branch", list("子丑寅卯辰巳午未申酉戌亥"))
+def test_current_candidate_cells_keep_source_scope_and_never_claim_adjudication(
+    stem, branch
 ):
     value = seasonal_climate_god(stem, branch)
-    assert [value["primary"], value["secondary"]] == entry
     assert value["chart_adjudication_status"] == "not_performed"
     expected = (
         "selected_jia_passages_not_full_acceptance"
@@ -103,7 +92,7 @@ def test_all_120_legacy_candidate_cells_remain_identical_and_scopes_stay_distinc
         else (
             "bing_unit_developer_collation_not_full_acceptance"
             if stem == "丙"
-            else "legacy_table_source_pending"
+            else "source_not_collated"
         )
     )
     assert value["source_review_status"] == expected
@@ -279,7 +268,7 @@ def test_all_twelve_months_eleven_entries_actual_transports_and_scope_controls(
             == "selected_jia_passages_not_full_acceptance"
         )
     else:
-        assert climate["source_review_status"] == "legacy_table_source_pending"
+        assert climate["source_review_status"] == "source_not_collated"
         assert "source_ref" not in climate
 
 

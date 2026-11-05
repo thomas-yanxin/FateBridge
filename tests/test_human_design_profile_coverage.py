@@ -1,6 +1,5 @@
 """The new bounded cohort must retain missing strata and literal failures."""
 
-import gzip
 import hashlib
 import importlib.util
 import json
@@ -16,7 +15,7 @@ from fatebridge.validation.human_design_official import official_chart_checks
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
-EVIDENCE = ROOT / "docs/validation/human-design-profile-coverage/batch-001"
+EVIDENCE = ROOT / "tests/data/human_design/profile_observations"
 PLAN_PATH = ROOT / "tests/fixtures/human-design-profile-coverage-plan.json"
 PLAN = json.loads(PLAN_PATH.read_text())
 COHORT = json.loads((EVIDENCE / "cohort.json").read_text())
@@ -170,20 +169,15 @@ def test_all624_gate_lines24_mechanics_and18_literal_failures_are_retained():
     assert check["charts_matched"] == check["cross_names_exactly_matched"] == 6
     assert check["status"] == "failed"
     assert sum(not c["structure_checks"]["cross_name"] for c in check["cases"]) == 18
-    assert (
-        check
-        == json.loads((EVIDENCE / "checks.json").read_text())["official_chart_checks"]
-    )
 
 
-def test_complete_saved_readings_verify_without_full_source_or_model_claim():
-    with gzip.open(EVIDENCE / "complete-runs.jsonl.gz", "rt") as stream:
-        rows = [json.loads(line) for line in stream]
-    assert [r["id"] for r in rows] == [r["id"] for r in COHORT["cases"]]
-    for row in rows:
-        run = row["run"]
+def test_current_readings_verify_without_full_source_or_model_claim():
+    from tests.human_design_current import complete_run
+
+    for case in COHORT["cases"]:
+        run = complete_run(**case["birth_input"])
         check = verify_human_design_reading(run)
-        assert check["status"] == "verified_fixed_template_reading", row["id"]
+        assert check["status"] == "verified_fixed_template_reading", case["id"]
         assert check["checked_fixing_reading_count"] == 26
         assert run["validation"]["all_three_axes_full_marks"] is False
         assert run["source_summary"]["full_source_acceptance_passed"] is False

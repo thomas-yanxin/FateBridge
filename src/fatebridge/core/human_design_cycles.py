@@ -48,9 +48,6 @@ STATION_METHOD = "human_design_adjacent_float_cycle_station_v1"
 COORDINATE_EXTREMUM_METHOD = "human_design_bounded_observed_coordinate_extremum_v1"
 NUMERICAL_SCOPE = "交会/速度驻点收敛至观测零值或相邻TT；速度零点不等于返回黄经极值，另在同一变号区间作有限坐标探查，只以严格更极端的已观察坐标补充分段。连续已观察零端点合为一候选，不认证其连续零区间；motion取原生速度符号，另列搜索段相位方向。黄经量化可掩盖极近峰值，不认证连续根数量、物理精度或传统首末触优先性。"
 SUMMARY_NUMERICAL_SCOPE = "零值/相邻TT加有限坐标极值探查；原生速度与搜索段相位方向分别列出，量化近峰、连续根数及物理精度未认证。"
-LEGACY_SUMMARY_NUMERICAL_SCOPE = (
-    "零值/相邻TT按残差/速度择端点；量化可掩近峰，根数及物理精度未认证。"
-)
 REFERENCE_CONTACT_METHOD = "source_defined_reference_TT_vs_binary64_contact_brackets_v1"
 REFERENCE_CONTACT_SCOPE = "按已声明时标的精确有理TT，将参考民用钟与已报告的闭合二进制TT数值括区比较，避免微秒标签先舍入到单个JD后混入括区。只说明参考输入与数值区间的先后，不认证真实物理交会、未来闰秒、连续根数量、首末触传统优先或第六线当前阶段。"
 ARITHMETIC_SCOPE = "展开角与残差由实际返回黄经的精确二进制有理数求差，不逐段累加舍入后的浮点角差；这不提高原星历或出生钟精度，交会数值区间不认证物理时刻误差，也不裁定传统多次交会的取舍。"
@@ -61,34 +58,21 @@ SOURCE_URLS = [
     "https://jovianarchive.com/pages/cycle-analysis-in-human-design",
     "https://www.astro.com/swisseph/swephprg.htm",
 ]
-LEGACY_SCOPE = "出生人格侧黄经为显式计算起点；从出生起65儒略年内按2日TT网格、已观测速度变号细查首轮360°回归或180°对冲，保留顺逆行多次交会。65年仅为搜索上限，不是寿命或阶段年龄。有限采样不认证连续穷尽；原始资料未裁定人格/设计起点及多次交会首触/末触的优先性，故不指定唯一传统阶段分界。"
-PRE_COORDINATE_SCOPE = "人格出生黄经起算；65儒略年内以2日TT网格及已观测速度变号细查首轮360°回归/180°对冲，保留顺逆多触。65年仅为搜索上限，非寿命/阶段年龄；采样不认证连续穷尽。天王星出生原点有公开明文；土星/凯龙起点及各项首末触优先未定，不指定唯一传统阶段。"
 SCOPE = "人格出生黄经起算；65儒略年内以2日TT网格、已观测速度变号及区间内有限坐标极值探查，细查首轮360°回归/180°对冲。连续已观察零端点合为一候选，原生速度符号与搜索段相位方向分别保留。65年仅为搜索上限，非寿命/阶段年龄；采样不认证连续穷尽。天王星出生原点有公开明文；土星/凯龙起点及各项首末触优先未定，不指定唯一传统阶段。"
 PHASE_SCOPE = "仅列原有第六线教学顺序；不由年龄、交会日期或人格/设计起点约定分配当前阶段，不将教学转成现实成熟度、健康、寿命或事件预测。"
 Row = list[float | int]
 Reader = Callable[[float], Row]
 
 
-LEGACY_CYCLE_SOURCE_SHA256 = (
-    "e996dd71b8bce8dc0722c85d8656579ddee21e85ed91f20fe00b9b3f50594945"
-)
-
-
-def cycle_ruleset(
-    *, legacy: bool = False, legacy_reference_relation: bool = False
-) -> dict[str, Any]:
+def cycle_ruleset() -> dict[str, Any]:
     raw = reference_bytes("cycles-2026-reference.json")
     reference = json.loads(raw)
     return {
         "id": "human_design_first_cycle_contacts_v1",
-        "version": (
-            "1.3.0" if legacy else "1.4.2" if legacy_reference_relation else "1.6.0"
-        ),
+        "version": ("1.6.0"),
         "author": "FateBridge computational implementation",
         "source_author": reference["author"],
-        "source_catalog_sha256": (
-            LEGACY_CYCLE_SOURCE_SHA256 if legacy else hashlib.sha256(raw).hexdigest()
-        ),
+        "source_catalog_sha256": (hashlib.sha256(raw).hexdigest()),
     }
 
 
@@ -567,17 +551,8 @@ def summary_conventions(
     }
 
 
-def cycle_summary(context: dict[str, Any], profile: str) -> dict[str, Any]:
-    scope = (
-        LEGACY_SCOPE
-        if context["status"] == "not_requested"
-        or context.get("ruleset") == cycle_ruleset(legacy=True)
-        else (
-            PRE_COORDINATE_SCOPE
-            if context.get("ruleset") == cycle_ruleset(legacy_reference_relation=True)
-            else SCOPE
-        )
-    )
+def _cycle_summary_facts(context: dict[str, Any], profile: str) -> dict[str, Any]:
+    scope = SCOPE
     if context["status"] == "not_requested":
         return {
             "status": "not_requested",
@@ -590,16 +565,11 @@ def cycle_summary(context: dict[str, Any], profile: str) -> dict[str, Any]:
             },
             "scope": scope,
         }
-    exact_reference = context["ruleset"] == cycle_ruleset()
-    if not exact_reference and context["ruleset"] not in (
-        cycle_ruleset(legacy=True),
-        cycle_ruleset(legacy_reference_relation=True),
-    ):
+    if context["ruleset"] != cycle_ruleset():
         raise ValueError("Unknown cycle reference/contact comparison ruleset")
     reference_tt: float | Fraction = context["reference_jd_tt"]
-    if exact_reference:
-        ratio = context["reference_ordering"]["reference"]["exact_jd_tt"]
-        reference_tt = Fraction(int(ratio["numerator"]), int(ratio["denominator"]))
+    ratio = context["reference_ordering"]["reference"]["exact_jd_tt"]
+    reference_tt = Fraction(int(ratio["numerator"]), int(ratio["denominator"]))
     summaries = []
     contact_keys = (
         "jd_tt",
@@ -609,7 +579,7 @@ def cycle_summary(context: dict[str, Any], profile: str) -> dict[str, Any]:
         "motion",
         "bracket_width_seconds",
         "residual_degrees",
-    ) + (("motion_evidence",) if exact_reference else ())
+    ) + (("motion_evidence",))
     for row in context["bodies"]:
         contacts = row["contacts"]
         relative = reference_contact_relation(row, reference_tt)
@@ -643,11 +613,7 @@ def cycle_summary(context: dict[str, Any], profile: str) -> dict[str, Any]:
         "phase_arithmetic_method": PHASE_METHOD,
         "root_method": ROOT_METHOD,
         "station_method": STATION_METHOD,
-        "numerical_scope": (
-            SUMMARY_NUMERICAL_SCOPE
-            if exact_reference
-            else LEGACY_SUMMARY_NUMERICAL_SCOPE
-        ),
+        "numerical_scope": (SUMMARY_NUMERICAL_SCOPE),
         "arithmetic_scope": ARITHMETIC_SCOPE,
         "bodies": summaries,
         "sixth_line": {
@@ -674,11 +640,15 @@ def cycle_summary(context: dict[str, Any], profile: str) -> dict[str, Any]:
         "timing_accuracy_certified": False,
         "source_evidence": cycle_source_summary(context["source_evidence"]),
     }
-    if exact_reference:
-        result["reference_contact_ordering"] = reference_contact_policy()
-    if exact_reference and context.get("summary_format") == SUMMARY_FORMAT:
-        return compact_cycle_summary(result)
+    result["reference_contact_ordering"] = reference_contact_policy()
     return result
+
+
+def cycle_summary(context: dict[str, Any], profile: str) -> dict[str, Any]:
+    facts = _cycle_summary_facts(context, profile)
+    if context["status"] == "not_requested":
+        return facts
+    return compact_cycle_summary(facts)
 
 
 def _native_reader(

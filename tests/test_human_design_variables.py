@@ -133,9 +133,9 @@ def test_opposite_pair_cannot_be_spliced_even_if_both_tones_point_left():
 def test_node_backend_diagnostic_rebuilds_variable_and_returns_both_actual_structures(
     monkeypatch,
 ):
-    from tests.golden.runner import golden_ephemeris
+    from tests.ephemeris_context import moshier_ephemeris
 
-    with golden_ephemeris():
+    with moshier_ephemeris():
         chart = chart_at(datetime.fromisoformat("2000-01-01T12:00:00+00:00"))
     # Simulated 4 arcsecond node shift; not an independent celestial reference.
     assert chart["variables"]["code"] == "PRL DLL"

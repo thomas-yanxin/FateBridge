@@ -7,7 +7,6 @@ publisher backend, replace physical accuracy tests or complete source prose.
 from __future__ import annotations
 
 import argparse
-import gzip
 import hashlib
 import json
 import math
@@ -116,7 +115,6 @@ def compare_all(
     supplement: dict[str, Any],
     cohort: dict[str, Any],
     packets: list[dict[str, Any]],
-    pdf_checks: list[dict[str, Any]],
     expected_plan_sha256: str = PLAN_SHA256,
 ) -> dict[str, Any]:
     if hashlib.sha256(plan_raw).hexdigest() != expected_plan_sha256:
@@ -224,11 +222,9 @@ def compare_all(
         == ("complete" if source_complete else "incomplete")
         and cohort["source"]["plan_sha256"] == expected_plan_sha256
     )
-    pdf_ids = [p["id"] for p in pdf_checks]
-    pdf_bound = pdf_ids == observed_ids and all(
-        p["sha256_matches"] and p["size_matches"] and p["all13_text_properties_match"]
-        for p in pdf_checks
-    )
+    # The retained cohort is a transcription reference. Its ten original PDFs
+    # are unavailable; past boolean binding receipts cannot verify them now.
+    pdf_bound = False
     hypotheses = []
     for clock_policy in (
         "common_swiss_IANA",
@@ -279,15 +275,15 @@ def compare_all(
                     "clock_policy": clock_policy,
                     "cases": checks,
                     "observed_target_matches": sum(c["matched"] for c in checks),
-                    "all_observed_targets_compatible": bool(
+                    "conditional_on_transcriptions_targets_compatible": bool(
                         predictions_complete
                         and source_rows_bound
-                        and pdf_bound
                         and observed_ids
                         and all(
                             c["matched"] for c in checks if c["observed"] is not None
                         )
                     ),
+                    "all_observed_targets_compatible": False,
                     "all24_required_targets_compatible": bool(
                         predictions_complete
                         and source_complete
@@ -313,7 +309,6 @@ def compare_all(
             {
                 "id": c["id"],
                 "proof": proof,
-                "saved_proof_identical": bool(supplied and proof == rows[0]["proof"]),
             }
         )
         if not supplied:
@@ -382,6 +377,8 @@ def compare_all(
         "source_collection_complete": source_complete,
         "source_metadata_consistent": metadata_consistent,
         "all_obtained_pdf_text_bound": pdf_bound,
+        "primary_source_status": "not_available",
+        "primary_source_scope": "Ten preserved transcribed source rows; original PDFs and original raw observation file are unavailable. Model label agreement is conditional on these transcriptions, not primary-source authentication.",
         "initial_prediction_inventory": initial_inventory,
         "production_prediction_inventory": production_inventory,
         "all_required_predictions_bound": predictions_complete,
@@ -396,7 +393,6 @@ def compare_all(
         "all24_fixed_readings_verified": packets_bound
         and all(
             r["proof"]["status"] == "verified_fixed_template_reading"
-            and r["saved_proof_identical"]
             for r in fixed_readings
         ),
         "clock_policy_comparison": clock_comparison,
@@ -423,9 +419,28 @@ def compare_all(
     }
 
 
-def main() -> None:
-    from audit_human_design_source_transitions import pdf_bindings
+def current_packets(plan):
+    """Run each declared input now; no archived result or proof supplies facts."""
+    import os
+    from unittest.mock import patch
 
+    from fatebridge.application.execution import execute_tool
+    from fatebridge.services.tool_catalog import CATALOG
+
+    root = Path(__file__).resolve().parents[1]
+    spec = next(s for s in CATALOG if s.key == "human_design")
+    results = []
+    with patch.dict(os.environ, {"SE_EPHE_PATH": str(root / "ephe")}):
+        os.environ.pop("FATEBRIDGE_JPL_FILE", None)
+        for case in plan["cases"]:
+            run = execute_tool(spec, spec.request_model(**case["birth_input"]))
+            results.append(
+                {"id": case["id"], "birth_input": case["birth_input"], "run": run}
+            )
+    return results
+
+
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -436,36 +451,7 @@ def main() -> None:
         return json.loads((base / name).read_bytes())
 
     cohort = read("source-cohort.json")
-    observations = read("source-observations.json")
-    if (
-        cohort["source"]["observation_file_sha256"]
-        != hashlib.sha256((base / "source-observations.json").read_bytes()).hexdigest()
-    ):
-        raise ValueError("Original source observation bytes changed")
-    if [r["id"] for r in observations] != [r["id"] for r in cohort["cases"]] or any(
-        any(
-            row[key] != raw["facts"][key]
-            for key in (
-                "columns",
-                "properties",
-                "defined_centers",
-                "defined_channel_render_ids",
-            )
-        )
-        or row["pdf_sha256"] != raw["source"]["pdf_sha256"]
-        for row, raw in zip(cohort["cases"], observations)
-    ):
-        raise ValueError("Cohort facts differ from raw source observations")
-    # Re-extract current PDF bytes; saved booleans never supply fresh binding.
-    bindings = pdf_bindings(observations, base / "queries")
-    if bindings != read("source-pdf-bindings.json"):
-        raise ValueError("Saved PDF binding receipt differs from fresh extraction")
-    packets = [
-        json.loads(line)
-        for line in gzip.decompress(
-            (base / "complete-native-runs.jsonl.gz").read_bytes()
-        ).splitlines()
-    ]
+    packets = current_packets(json.loads((base / "source-plan.json").read_bytes()))
     report = compare_all(
         (base / "source-plan.json").read_bytes(),
         read("model-predictions.json"),
@@ -473,7 +459,6 @@ def main() -> None:
         read("production-clock-supplement-plan.json"),
         cohort,
         packets,
-        bindings,
     )
     report["input_sha256"] = {
         name: hashlib.sha256((base / name).read_bytes()).hexdigest()
@@ -483,13 +468,8 @@ def main() -> None:
             "production-clock-model-predictions.json",
             "production-clock-supplement-plan.json",
             "source-cohort.json",
-            "complete-native-runs.jsonl.gz",
-            "source-pdf-bindings.json",
         )
     }
-    report["audit_script_sha256"] = hashlib.sha256(
-        Path(__file__).read_bytes()
-    ).hexdigest()
     with args.output.open("x") as stream:
         stream.write(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     print(

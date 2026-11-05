@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, Optional, Tuple, Type
 
 from pydantic import BaseModel
 
+from fatebridge.core.method_contracts import MethodContract
 from fatebridge.core.reproducibility import ReproducibilityPolicy
 
 ServiceResult = Dict[str, Any]
@@ -61,6 +62,7 @@ class ToolSpec:
     reproducibility: ReproducibilityPolicy = field(
         default_factory=ReproducibilityPolicy
     )
+    methods: Tuple[MethodContract, ...] = ()
 
     @property
     def tool_name(self) -> str:

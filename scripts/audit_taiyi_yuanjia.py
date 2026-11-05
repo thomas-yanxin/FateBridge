@@ -19,7 +19,7 @@ else:
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v35"
-FREEZE_SHA256 = "e24226d89c43f82c39d8b57ff6f9264ef449bfcf2c9f88828533d1704e36aa2e"
+FREEZE_SHA256 = "2a1ef5c6acf6b11dbeadd5b6104f2780b7effcb01032c176f29aadea561511b9"
 
 
 def _json(path: Path) -> dict[str, Any]:
@@ -206,8 +206,12 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
                 "source_assignment_selected_by_fit": False,
             }
         )
-    old_path = root / "docs/validation/taiyi-jinjing-v34/report.json"
-    old = _json(old_path)
+    if __package__:
+        from scripts.audit_taiyi_day_count_encodings import audit as day_encoding_audit
+    else:
+        from audit_taiyi_day_count_encodings import audit as day_encoding_audit
+
+    old = day_encoding_audit(root=root)
     return {
         "source_freeze_sha256": FREEZE_SHA256,
         "prior_pinned_files": len(frozen["prior_sources"]),
@@ -234,8 +238,7 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
             "equal_calendar_or_epoch_identity_proved": False,
         },
         "previous_v34_evidence": {
-            "path": str(old_path.relative_to(root)),
-            "sha256": hashlib.sha256(old_path.read_bytes()).hexdigest(),
+            "source": "current_taiyi_day_encoding_audit",
             "all48_candidates_and96_counter_comparisons_retained_in_pinned_report": True,
             "original_observed_joint_matches": old["original_observed_joint_matches"],
             "xing_observed_joint_matches": old["xing_observed_joint_matches"],

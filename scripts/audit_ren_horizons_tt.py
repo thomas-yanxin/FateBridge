@@ -22,8 +22,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/ren_horizons_tt_v1"
 COMPARISON = ROOT / "tests/fixtures/ren_horizons_tt_comparison_v1"
-PIN = "42bd4c14b3157e7689ba357f9aeb981b218514071c0a4b647167d79e90301944"
-COMPARISON_PIN = "578227bc47c3739d5e63aedffc2a93717e11d38287764b09c76fc6590ad7574e"
+PIN = "4f22aef6865e48d22dcc74450258982e7029c195b71ec45031b1cee82f9e530d"
+COMPARISON_PIN = "501caf8e7465ab3a2fbd846486e2d61710ce441f495b457d02de7276e372c57f"
 TERMS = "小寒 大寒 立春 雨水 惊蛰 春分 清明 谷雨 立夏 小满 芒种 夏至 小暑 大暑 立秋 处暑 白露 秋分 寒露 霜降 立冬 小雪 大雪 冬至".split()
 J2000 = datetime(2000, 1, 1, 12)
 
@@ -47,22 +47,6 @@ def frozen(folder: Path, pin: str) -> dict[str, str]:
         if sha(folder / name) != digest:
             raise ValueError("Frozen TT reference content changed: " + name)
     return manifest
-
-
-def generator(corpus: Path) -> dict[str, Any]:
-    pre = json.loads((corpus / "precomparison-freeze.json").read_text())
-    with zipfile.ZipFile(corpus / "reference-generator.zip") as archive:
-        if archive.namelist() != ["collect_reference.py"]:
-            raise ValueError("TT generator member inventory changed")
-        content = archive.read("collect_reference.py")
-    if hashlib.sha256(content).hexdigest() != pre["collector_logical_sha256"]:
-        raise ValueError("TT generator bytes changed")
-    namespace: dict[str, Any] = {
-        "__file__": str(corpus / "collect_reference.py"),
-        "__name__": "independent_tt_reference_reader",
-    }
-    exec(compile(content, "frozen-tt-reference-generator", "exec"), namespace)
-    return namespace
 
 
 def reference(corpus: Path = CORPUS, comparison: Path = COMPARISON) -> dict[str, Any]:
@@ -114,8 +98,11 @@ def reference(corpus: Path = CORPUS, comparison: Path = COMPARISON) -> dict[str,
             for s in (-300, -150, 0, 150, 300)
         ]:
             raise ValueError("Independent TT query window changed")
-    namespace = generator(corpus)
-    erfa, numpy = namespace["erfa"], namespace["np"]
+    import erfa
+    import numpy
+
+    from tests.ren_horizons_reference import crossing, parse, transform
+
     if (
         erfa.__version__,
         erfa.version.erfa_version,
@@ -173,8 +160,8 @@ def reference(corpus: Path = CORPUS, comparison: Path = COMPARISON) -> dict[str,
                 or status["response_sha256"] != sha(response)
             ):
                 raise ValueError("Unsuccessful or replaced remote TT response")
-            rows.extend(namespace["parse"](response, batch))
-        observed[stage] = [namespace["transform"](row) for row in rows]
+            rows.extend(parse(response, batch))
+        observed[stage] = [transform(row) for row in rows]
     if len(observed["initial"]) != 565 or len(observed["refinement"]) != 226:
         raise ValueError("All 791 direct TT probes are required")
     if observed["initial"] != initial["transformed_probes"]:
@@ -183,9 +170,9 @@ def reference(corpus: Path = CORPUS, comparison: Path = COMPARISON) -> dict[str,
         zip(cases, initial["events"], data["events"], strict=True)
     ):
         target = (285 + TERMS.index(case["term"]) * 15) % 360
-        root = namespace["crossing"](observed["initial"][5 * i : 5 * i + 5], target)
+        root = crossing(observed["initial"][5 * i : 5 * i + 5], target)
         pair = observed["refinement"][2 * i : 2 * i + 2]
-        refined = namespace["crossing"](pair, target)
+        refined = crossing(pair, target)
         expected_seed = case | {
             "target_longitude": target,
             "initial_root_tt": root.isoformat(sep=" ", timespec="microseconds"),

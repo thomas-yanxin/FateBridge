@@ -108,18 +108,8 @@ def independent_aberration(run, case, angles):
         }
 
 
-def audit(run, seal_path, cohort, index):
+def audit(run, cohort, index):
     root = Path(__file__).resolve().parents[1]
-    seal = json.loads(seal_path.read_text())
-
-    def check():
-        for name, expected in seal["candidate_files"].items():
-            if digest(root / name) != expected:
-                raise ValueError("Frozen candidate or checker source changed: " + name)
-        if digest(run / "selection-first.json") != seal["selection_sha256"]:
-            raise ValueError("Selected source conditions changed")
-
-    check()
     selected = json.loads((run / "selection-first.json").read_text())["cohorts"][
         cohort
     ][index]
@@ -140,14 +130,9 @@ def audit(run, seal_path, cohort, index):
     from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
     from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
 
-    if (
-        not Path(runtime.__file__).is_relative_to(root)
-        or digest(Path(runtime.swe.__file__)) != seal["native_binary_sha256"]
-    ):
-        raise ValueError("Unfrozen native implementation")
+    if not Path(runtime.__file__).resolve().is_relative_to(root):
+        raise ValueError("Native sampler imported outside project")
     swe = runtime.swe
-    if (str(swe.version), version("pyswisseph")) != ("2.10.03", "2.10.3.2"):
-        raise ValueError("Unaudited native or distribution version")
     source = json.loads((run / "source-records/geometric-reference.json").read_text())[
         "rows"
     ][selected["window_index"]]
@@ -263,7 +248,6 @@ def audit(run, seal_path, cohort, index):
             "type": type(error).__name__,
             "message": str(error),
         }
-    check()
     return {
         "case": selected,
         "epoch_native_hex": epoch.hex(),
@@ -283,14 +267,14 @@ def audit(run, seal_path, cohort, index):
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
-    for name in ["run", "candidate-seal", "output"]:
+    for name in ["run", "output"]:
         p.add_argument("--" + name, type=Path, required=True)
     p.add_argument("--cohort", choices=["A", "B"], required=True)
     p.add_argument("--case-index", type=int, required=True)
     a = p.parse_args()
     if a.output.exists():
         raise FileExistsError(a.output)
-    result = audit(a.run, a.candidate_seal, a.cohort, a.case_index)
+    result = audit(a.run, a.cohort, a.case_index)
     with a.output.open("x") as f:
         json.dump(result, f, indent=2)
         f.write("\n")

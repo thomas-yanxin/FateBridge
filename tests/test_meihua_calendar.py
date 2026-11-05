@@ -15,11 +15,6 @@ from fatebridge.validation.meihua_calendar import (
 )
 
 REFERENCES = Path(__file__).parent / "fixtures/meihua_calendar_v2"
-pytestmark = [
-    pytest.mark.filterwarnings("ignore:fromSolarDate is deprecated:DeprecationWarning"),
-    pytest.mark.filterwarnings("ignore:toSolarDate is deprecated:DeprecationWarning"),
-    pytest.mark.filterwarnings("ignore:use is_leap_month:DeprecationWarning"),
-]
 
 
 def cells():

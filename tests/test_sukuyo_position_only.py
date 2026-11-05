@@ -12,7 +12,7 @@ from fatebridge.core import guolao, suzhan_astronomy
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.time_scales import datetime_from_tt
 
-FIXTURES = Path(__file__).parent / "fixtures"
+FIXTURES = Path(__file__).parent / "data/guolao"
 KERNEL = "guolao-de441-j2000.eph"
 
 

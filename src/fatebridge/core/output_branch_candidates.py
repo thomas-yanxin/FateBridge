@@ -14,9 +14,6 @@ from fatebridge.core.output_classical_passage import Pillar
 from fatebridge.core.punishment_resolution import (
     CURRENT_STRENGTH_METHODS as CURRENT_PUNISHMENT_METHODS,
 )
-from fatebridge.core.punishment_resolution import (
-    PREVIOUS_STRENGTH_METHOD as PREVIOUS_PUNISHMENT_METHOD,
-)
 
 Kind = Literal["三会", "三合", "六合", "半合"]
 Target = Literal["木", "火", "土", "金", "水"]
@@ -360,10 +357,7 @@ def validate_punishment_resolution(
     branches: Optional[Mapping[str, str]] = None,
 ) -> None:
     """Check co-known covering combinations even without a candidate sidecar."""
-    if (
-        method != PREVIOUS_PUNISHMENT_METHOD
-        and method not in CURRENT_PUNISHMENT_METHODS
-    ):
+    if method not in CURRENT_PUNISHMENT_METHODS:
         return
     cover = set()
     for event in relations:
@@ -384,10 +378,6 @@ def validate_punishment_resolution(
             continue
         seats, status = event["positions"], event.get("status")
         full_cover = all(p in cover for p in seats)
-        if method == PREVIOUS_PUNISHMENT_METHOD:
-            if status == "resolved_by_combination" and not full_cover:
-                raise ValueError("v9解刑必须有同次已成立会合的全组覆盖")
-            continue
         unique_pair = None
         if complete_branches and branches is not None:
             physical_pair = [p for p in ORDER if branches[p] in {"子", "卯"}]
@@ -403,6 +393,6 @@ def validate_punishment_resolution(
             not full_cover and (len(seats) != 2 or unique_pair is False)
         )
         if status == "resolved_by_combination" and impossible:
-            raise ValueError("v10解刑须有实际会合覆盖；单端条件只适用唯一实体子卯对")
+            raise ValueError("当前解刑须有实际会合覆盖；单端条件只适用唯一实体子卯对")
         if status == "active" and expected_resolved:
-            raise ValueError("v10不能遗漏同次成立会合对唯一子卯对的解刑条件")
+            raise ValueError("当前算法不能遗漏同次成立会合对唯一子卯对的解刑条件")

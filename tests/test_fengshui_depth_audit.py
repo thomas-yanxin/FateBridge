@@ -19,18 +19,17 @@ from fatebridge.services.fengshui import (
     calculate_annual_stars,
     calculate_xuankong_natal,
 )
+from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from fatebridge.validation.fengshui import audit_classical_reference
 from tests.test_fengshui_surfaces import mcp_call, rest_client, without_transport
 
 REFERENCE = json.loads(
-    (
-        Path(__file__).parent / "fixtures/fengshui_classical_v1/reference.json"
-    ).read_text()
+    (Path(__file__).parent / "data/fengshui_classical_v1/reference.json").read_text()
 )
 FACSIMILE = json.loads(
     (
-        Path(__file__).parent / "fixtures/fengshui_classical_v1/facsimile-checks.json"
+        Path(__file__).parent / "data/fengshui_classical_v1/facsimile-checks.json"
     ).read_text()
 )
 
@@ -67,7 +66,7 @@ def test_literal_sources_keep_all_280_comparisons_and_three_disputes():
 
 
 def test_facsimile_page_pixels_and_unresolved_source_status_remain_verifiable():
-    folder = Path(__file__).parent / "fixtures/fengshui_classical_v1"
+    folder = Path(__file__).parent / "data/fengshui_classical_v1"
     for item in FACSIMILE["images"]:
         assert (
             hashlib.sha256((folder / item["file"]).read_bytes()).hexdigest()
@@ -151,11 +150,9 @@ def test_current_evaluation_period_never_rewrites_historical_structure():
 
 @pytest.mark.parametrize("days", [-30, 30, 150])
 @pytest.mark.parametrize("zone", ["Asia/Shanghai", "UTC", "America/New_York"])
-def test_period_changeover_fallback_does_not_block_distant_events(
+def test_missing_crossing_rejects_even_events_distant_from_the_boundary(
     monkeypatch, days, zone
 ):
-    # Inject into the selected native path; the default DE440 path correctly
-    # remains calculated when a different provider is unavailable.
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     almanac.get_solar_terms_for_year.cache_clear()
@@ -163,38 +160,33 @@ def test_period_changeover_fallback_does_not_block_distant_events(
     monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", lambda *args: None)
     almanac.get_solar_terms_for_year.cache_clear()
     try:
-        result = period_context(
-            HousePeriod(
-                basis="first_occupancy",
-                event_at=boundary + timedelta(days=days),
-                timezone_name=zone,
-                evidence="Known event far from the uncertain boundary",
+        with pytest.raises(EphemerisSourceError, match="no linear approximation"):
+            period_context(
+                HousePeriod(
+                    basis="first_occupancy",
+                    event_at=boundary + timedelta(days=days),
+                    timezone_name=zone,
+                    evidence="Known event; actual crossing is unavailable",
+                )
             )
-        )
     finally:
         almanac.get_solar_terms_for_year.cache_clear()
-    assert result["resolution_status"] == "resolved"
-    assert result["number"] == (8 if days < 0 else 9)
-    assert result["timing"]["event_year_boundary"]["approximate"]
 
 
-def test_each_validity_endpoint_reports_its_actual_fallback(monkeypatch):
-    original = calendar.lichun_resolution
+def test_unavailable_end_boundary_rejects_the_whole_validity_interval(monkeypatch):
+    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
+    original = almanac._solar_term_utc_via_swe
 
-    def resolution(year, zone):
-        return {
-            **original(year, zone),
-            "provider": "linear_1900_fallback" if year == 2027 else "swisseph",
-            "approximate": year == 2027,
-        }
+    def solve(year, *args):
+        return None if year == 2027 else original(year, *args)
 
-    monkeypatch.setattr(calendar, "lichun_resolution", resolution)
-    timing = calculate_annual_stars(effective_year=2026)["layers"]["annual_stars"][
-        "time_context"
-    ]["timing"]
-    assert not timing["start_resolution"]["approximate"]
-    assert timing["end_resolution"]["approximate"]
-    assert timing["possible_linear_fallback"]
+    monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", solve)
+    almanac.get_solar_terms_for_year.cache_clear()
+    try:
+        with pytest.raises(EphemerisSourceError, match="no linear approximation"):
+            calculate_annual_stars(effective_year=2026)
+    finally:
+        almanac.get_solar_terms_for_year.cache_clear()
 
 
 @pytest.mark.parametrize(
@@ -206,7 +198,7 @@ def test_fengshui_year_period_and_birth_follow_independent_published_instants(zo
     existing = json.loads(
         (Path(__file__).parent / "fixtures/calendar_hko_v1/reference.json").read_text()
     )
-    folder = Path(__file__).parent / "fixtures/fengshui_calendar_v1"
+    folder = Path(__file__).parent / "data/fengshui_calendar_v1"
     source = json.loads((folder / "reference.json").read_text())
     raw = (folder / source["file"]).read_bytes()
     assert hashlib.sha256(raw).hexdigest() == source["sha256"]

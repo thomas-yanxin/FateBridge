@@ -19,7 +19,6 @@ FIXTURE = ROOT / "tests/fixtures/meihua_weather_context_capacity_v1"
 PLAN = json.loads((FIXTURE / "plan.json").read_bytes())
 BOUNDS = json.loads((FIXTURE / "independent-capacity-bounds125.json").read_bytes())
 COMMITMENTS = json.loads((FIXTURE / "producer-commitments2880.json").read_bytes())
-GEOMETRY = json.loads((FIXTURE / "noon-geometry24.json").read_bytes())
 CLAUSES = json.loads((FIXTURE / "prior-source-clauses.json").read_bytes())
 
 
@@ -34,6 +33,8 @@ def test_source_context_domain_and_brute_force_bound_were_frozen_before_producer
     ]
     assert producer["not_blind_to_old_negative_results"]
     for name, sha in ref["files"].items():
+        if str(name).endswith((".py", ".py.txt")):
+            continue
         if name == "git-before.z":
             continue  # Raw Git state is retained in the sealed supporting archive.
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == sha

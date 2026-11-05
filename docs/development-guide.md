@@ -31,7 +31,7 @@ uv sync --locked --extra dev
 
 首次 `doctor` 应能识别包版本和已安装依赖；缺少外部星历文件时按返回的能力范围处理。Windows 的环境准备见[快速入门](getting-started.md)。
 
-历史验证原件、回归输入与黄金快照只在本地按固定版本保存。按[仓库维护](repository-maintenance.md#本地恢复冻结数据)从本地归档恢复到 `docs/validation/`、`tests/fixtures/` 和 `tests/golden/snapshots/`；当前 Python 测试辅助模块仍由 Git 管理。云端仅运行不依赖这些资料的自包含检查，不上传或下载测试数据。执行本地全量前需准备匹配数据，缺失时保留失败，不重建基线或放宽断言。本文中的本地数据路径在恢复后可用。
+当前独立输入、数值与原典转录维护在 `tests/data/`；`tests/fixtures/` 的 Python 模块提供代表请求与协议辅助。外部星历和大型参考按实际测试准备，缺失仍应报错。退役源码、旧输出快照、迁移哈希链和单次日志不再作为当前测试依赖，规则见[仓库维护](repository-maintenance.md)。
 
 开发依赖继续声明在 `project.optional-dependencies.dev`，兼容既有的 dev extra。本页统一用 `uv run --locked --extra dev <command>` 运行仓库命令，无需激活虚拟环境。提交依赖变更时同时审查 `pyproject.toml` 和 `uv.lock`；不要手改锁文件。
 
@@ -45,45 +45,9 @@ cp -n .env.example .env
 
 ## 项目结构概览
 
-```text
-FateBridge/
-├── src/
-│   └── fatebridge/         # 包代码（src layout：装包后才可 import）
-│       ├── api.py          # REST (FastAPI) 入口
-│       ├── mcp_server.py   # MCP (FastMCP) 入口
-│       ├── cli.py          # CLI 入口
-│       ├── application/   # 工具声明、绑定、执行与发现
-│       ├── transports/    # REST/MCP 协议注册
-│       ├── analysis/
-│       ├── core/
-│       ├── data/
-│       ├── services/
-│       └── utils/
-├── tests/
-├── docs/
-├── pyproject.toml
-└── CONTRIBUTING.md
-```
+代码位于 `src/fatebridge/`。领域声明由 `services/catalog/` 装配为中央目录，REST、MCP、CLI 经 `application/` 的共享执行层调用 `services/`，再进入 `core/` 与 `analysis/`。规则与知识位于包内 `data/`，Onda 技能在仓库 `skills/`。
 
-各目录的职责大致如下：
-
-- `src/fatebridge/services/catalog/`：各领域唯一工具声明及绑定；`tool_catalog.py` 按固定顺序装配 `CATALOG` 并补全合同，REST、MCP、CLI 共用这一份目录。
-- `src/fatebridge/application/tool_spec.py`：`ToolSpec` 定义；`bindings.py`、`execution.py`、`projection.py` 分别负责绑定、执行和投影。
-- `src/fatebridge/transports/rest.py`、`transports/mcp.py`：`register_rest` / `register_mcp` 注册器。
-- 应用编排从 `application` 的定义模块导入，协议注册从 `transports` 导入；旧 core 兼容入口已删除。
-- `src/fatebridge/application/discovery.py`：先筛选再描述目录，三端共用摘要与完整发现记录。
-- `src/fatebridge/api.py`：从目录派生 REST 路由，处理 HTTP 层错误。
-- `src/fatebridge/core/response_models.py`：公开根输出模型；`output_base.py`、`output_western.py`、`output_charts.py`、`output_chinese.py`、`output_bazi.py`、`output_reference.py` 共用部分响应基类，声明专业嵌套事实。
-- `src/fatebridge/mcp_server.py`：从目录派生 MCP 工具，使用原生 FastMCP 协议工具。
-- `src/fatebridge/mcp_transport.py`：原生 MCP 结构化结果、失败标记及安全输入校验。
-- `src/fatebridge/cli.py`：从目录派生 CLI 子命令，支持 `list` / `describe` 自助发现。
-- `src/fatebridge/core`：核心算法与合同。
-- `src/fatebridge/services`：面向 transport 的编排层。
-- `src/fatebridge/analysis`：复合分析逻辑。
-- `src/fatebridge/core/requests/`：请求基类与领域模型。
-- `src/fatebridge/utils`：出生输入、太阳时、展示、分析时钟、五行关系、地点与时区等公共能力。
-- `tests`：回归测试、合同测试、API/MCP 对齐测试。
-- `docs`：用户文档与开发者文档。
+完整目录职责、导入方向、请求流和[历法依赖](architecture.md#历法与星历依赖)统一维护在[架构说明](architecture.md#分层职责)。开发时从实际工具的目录声明、请求模型及领域测试定位修改入口。
 
 ## 本地运行
 
@@ -138,22 +102,9 @@ uv run --locked --extra dev python -m pytest -q tests/test_chinese_metaphysics.p
 
 测试需要在已安装 dev extra 的 Python 3.10–3.13 环境里跑，这跟 CI 矩阵保持一致。注意不要用系统自带的解释器，否则容易出现伪失败。例如异步测试在缺少 `pytest-asyncio` 时不会真正执行，而是直接报 `FAILED`，错误信息通常是 `async def functions are not natively supported`。这类失败是环境问题，不是代码问题：先执行 `uv sync --locked --extra dev` 并通过 `uv run --locked --extra dev` 使用该环境，再判断测试本身是否有错。同理，`black`、`isort`、`mypy` 也都来自 dev extra，系统解释器里一般没有。
 
-非均匀节点的 SciPy 独立对照使用封存的专用锁文件；其依赖与主源码环境分别维护。该检查仅在本地专用环境执行；云端不恢复此环境或数据，不能把主环境中缺少 SciPy 的跳过计作对照通过：
+数值测试按实际模型选择星历；`tests/ephemeris_context.py` 显式选择 Moshier，并在退出时恢复环境、原生路径和相关历法缓存。`tests/execution_clock.py` 固定一个带时区的瞬间，避免把不同地区的相同钟面误当同一瞬间。
 
-```bash
-PYTHONPATH="$PWD:$PWD/src" UV_PROJECT_ENVIRONMENT="$PWD/.venv-nonuniform-reference" \
-  uv run --project tests/fixtures/astrodice-nonuniform-v1/solver-environment \
-  --python 3.12 --locked --extra dev python -m pytest -q \
-  tests/test_astrodice_nonuniform_reference.py::test_exact_interval_contains_analytic_derivative_on_asymmetric_nodes
-```
-
-梅花时间戳签名测试还需要支持 `ts -attime`、`-check_ss_sig` 的 OpenSSL。macOS 自带程序可能缺少这些选项；可将已安装的 OpenSSL 3 的 `bin` 目录放在本次测试命令的 `PATH` 前部，或向审计 CLI 显式传 `--openssl`。缺少能力应报告环境错误，不删验证参数，也不跳过签名验证。
-
-黄金环境同时固定空星历目录与 `FATEBRIDGE_SOLAR_TERM_MODEL=native`，并在退出时恢复调用方策略；空目录或单独的Swiss探测标志不能证明实际交节采用Moshier。来源与元数据确有行为新增时，逐字段审核、保留旧结果并只更新受影响基线，不以重新冻结取得天文精度或原典符合。风水实例与已保留差异见[运行来源比较](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-source-comparison.md)。
-
-黄金快照会规范化浮点，原始未舍入账本应先独立校验，再要求规范化结果与快照一致，不把舍入后的副本当作原始账本，也不放宽账本恒等式。
-
-六壬／金口诀的行年核对、历史封套补证与完整合同门槛见[专题审计的本地复核入口](liuren-jinkou-audit.md#本地复核入口)。
+当前输出对齐用 `tests/output_facts.py` 比较完整未舍入事实，只排除执行回执。精确分界、逐分量守恒、物理参考和原典来源分别验证，不用整包旧快照或重新冻结认证准确性。
 
 ### CI 运行范围
 
@@ -161,7 +112,7 @@ PYTHONPATH="$PWD:$PWD/src" UV_PROJECT_ENVIRONMENT="$PWD/.venv-nonuniform-referen
 
 Python 3.10–3.13 最新依赖、Python 3.10 最低直接依赖及 Windows／Python 3.12 锁定依赖共六种环境，各按收集后的节点分成三片并行执行；按近期 CI 的相对耗时均衡分配，每片再使用最多四个独立 pytest 进程调度。`.github/ci-test-costs.json` 只影响分片归属，不筛掉任何测试，也不是数值验收门槛。`scripts/run_ci_checks.py` 的默认本地命令仍运行整个自包含集合；分片不改变标记排除与断言。每片上传实际节点清单，汇总验证每个环境的全部节点恰好执行一次。uv 使用 setup action 的依赖缓存，按 Python／依赖策略隔离并仅由首片写入，不缓存测试资料或虚拟环境。只有 Ubuntu 静态检查作业另缓存 Black／Mypy 的增量状态，按锁文件、工具配置与 Python 源码区分；工具仍按文件内容自行失效。
 
-云端不下载冻结夹具、黄金快照、外部星历或独立参考。完整领域回归、数值基线、原典复放和 SciPy 独立对照保留在本地，使用原数据、断言与固定门槛执行；云端通过不能作为这些项目的验收结论。混合测试文件中依赖本地资料的用例标记为 `local_data`，默认本地 `pytest` 不排除它们。
+云端不下载外部星历或大型独立参考。完整领域回归、数值与原典对照在本地使用原数据和固定门槛执行；云端通过不能作为这些项目的验收结论。混合测试文件中依赖本地资料的用例标记为 `local_data`，默认本地 `pytest` 不排除它们。
 
 Black、isort、mypy、通用文档与生成合同在独立 Ubuntu／Python 3.12 锁定环境作业执行一次，与测试并行。原有 Ubuntu 锁定环境的 CLI／API 和真实 stdio MCP 验证保留。`CI result` 要求所有选中作业成功且分片覆盖完整；失败、取消或意外跳过均不能通过，只有已确认的纯普通文档变更允许重作业全部跳过。
 
@@ -195,7 +146,7 @@ uv run --locked --extra dev mypy src/fatebridge/
    大型独立领域也可拆为领域模型（如 `core/fengshui/models.py`）。在 `core/response_models.py` 声明响应根字段，复用 `core/output_*.py` 的专业嵌套类型，或在 ToolSpec 显式绑定领域 `output_model`；根输出继承 `ProjectedOutput` 以声明兼容投影警告，嵌套业务模型继承 `PartialOutput`，字段需支持投影缺省。动态字典键保持开放，值和列表条目应使用领域模型；同名但语义不同的根字段按工具覆写，避免以宽泛 union 掩盖错误。模型只校验、不回写响应。新增字段须检查真实构建器、可空与非默认分支，不能只照一个快照收紧类型。新工具缺少输出声明会在目录加载时失败。
 4. 在 `src/fatebridge/services/catalog/` 的对应领域 `SPECS` 追加一个 `ToolSpec`；新领域还须接入 `tool_catalog.py` 的有序装配。声明的 REST / MCP 入口及 CLI 可支持的命令会自动派生，常规新增不需要再改 `api.py`、`mcp_server.py` 或 `cli.py`。`execution_hints` 默认描述已有本地只读计算；新增外部访问或写入能力时须声明实际环境影响，不能用 `idempotentHint` 表示结果确定性。
 5. 在 `tests/` 增加能力测试。三端 parity 由 `tests/test_full_surface_validation.py` 自动覆盖，记得为新工具补一个代表性的 payload fixture。
-   修改输出合同时运行 `tests/test_output_projection_contracts.py`：检查全目录可投影对象的必填字段、黄金样例的合法叶路径，以及原生 MCP 客户端与 REST、CLI 的结果。可经点路径裁剪的对象不能要求兄弟字段同时存在；数组条目与始终整块保留的 `run_metadata` 可保留必填事实。
+   修改输出合同时运行 `tests/test_output_projection_contracts.py`：检查全目录可投影对象的必填字段、当前代表请求的合法叶路径，以及原生 MCP 客户端与 REST、CLI 的结果。可经点路径裁剪的对象不能要求兄弟字段同时存在；数组条目与始终整块保留的 `run_metadata` 可保留必填事实。
 6. 更新 `docs/api-reference.md`、`docs/algorithm-coverage.md`、`docs/scenario-routing.md` 与相关技能说明；若改了技能工具/输入，同步 `agents/interface.yaml`。工具计数、路由覆盖和技能契约均有现成测试。
 
 家居风水的 `cli_request_file=True` 同时启用 JSON 对象／数组参数与 `--request-file`；新增复杂工具需明确启用、补嵌套校验与文件合并测试，不能仅依据模型顶层是否嵌套声称 CLI 可用。规则数据必须登记来源类别、版本、适用范围与约定，独立比较事实记录提交与 SHA-256；详见 [家居风水维护](fengshui.md#验证与维护)。
@@ -255,9 +206,13 @@ uv run --locked --extra dev mypy src/fatebridge/
 
 测试从已安装的 `src` 包导入，仓库根 `conftest.py` 负责 `tests.*` 命名空间；测试文件不再单独修改 `sys.path`。请求模型从 `core.requests` 领域模块导入，工具实现从定义模块导入。`tests/fixtures/transports.py` 提供已挂载 REST endpoint 查询及原生 FastMCP Client 调用，协议测试检查 text JSON 与 structuredContent 一致。`test_runtime_contracts.py` 验证运行时导入隔离与原生协议成功/错误响应；`test_request_catalog_isolation.py` 在新进程验证独立嵌套模型 Schema 与目录不加载计算引擎。
 
-修改合同缓存时运行 `tests/test_schema_cache.py`，检查副本隔离、并发冷启动、同名类／输出覆写、模型重建、失败不缓存及逐次业务执行。不要缓存业务输入或结果。核心数值变更之外的清理，应先保存同环境的业务输出和发现合同，再与修改后结果比较；黄金快照仍需在规定的 Linux 环境完整核对，不应为清理重新冻结。
+修改合同缓存时运行 `tests/test_schema_cache.py`，检查副本隔离、并发冷启动、同名类／输出覆写、模型重建、失败不缓存及逐次业务执行。不要缓存业务输入或结果。共享计算和合同变化同时验证 REST、MCP、CLI 的当前未舍入事实及严格输出模型；独立期望值来自手算、原始参考或所选原典，不从当前算法重新生成。
 
 清理测试时，先确认保留用例覆盖同一输入、行为与失败方式，再移除重复检查。已有完整接口测试和领域断言覆盖的冒烟测试、仅把请求字段原样读回的测试无需重复维护；多版本实现的相同行为可用参数化保留各版本输入和故障场景。原典参考、独立数值对照、历史失败记录与封存源码属于验证证据，不因文件多或体积大而删除。
+
+计算正确性需要独立的期望值：手算常量不导入被测实现的数据表，天文数值使用注明坐标系、时标、后端、日期范围与容差的外部参考，原典规则注明所选版本与未裁定项。复制生产公式、比较三端输出或验证 Schema 不能单独证明算法正确。现行算法与测试冲突时依据独立来源和数学推导裁定，删除被当前独立参考取代的旧默认断言。
+
+自包含 CI 包含 `test_bazi_seasonal_phase_accuracy.py` 的十二月支逐格对照与有理数手算、`test_element_primitive.py` 的固定结构计数向量，以及 `test_solar_term_published_reference.py` 的香港天文台2026年十二中气核对。后者维持分钟出版资料对应的60秒容差，不替代既有Moshier历史1秒门槛；这些测试均不认证旺衰工程系数或现实预测。完整本地参考测试和已知分歧见[当前算法状态](algorithm-status.md)，CI 绿灯只覆盖其实际选择的测试。
 
 ### 什么时候补 API/MCP 对齐测试
 
@@ -290,10 +245,10 @@ uv run --locked --extra dev mypy src/fatebridge/
 | 变更内容 | 权威信源 | 需要同步的文档 / 生成物 |
 | --- | --- | --- |
 | 产品定位、使用场景与组件分工 | 当前工具目录、运行入口、技能规则与分发内容 | 中英文 README、文档中心、核心概念、接入指南与技能索引 |
-| 安装、版本、入口与运行配置 | `pyproject.toml`、`__init__.py`、`utils/runtime.py`、`.env.example`、入口模块 | 快速入门与 MCP 部署指南；中英文 README 保留可完成首次接入的命令和配置；安全配置还查 `SECURITY.md` |
+| 安装、版本、入口与运行配置 | `pyproject.toml`、`__init__.py`、`utils/runtime.py`、`.env.example`、入口模块 | 快速入门与 MCP 部署指南；中英文 README 保留最小安装与计算命令，完整配置集中在部署指南；安全配置还查 `SECURITY.md` |
 | 工具、字段、端口名称、公开数量 | `services/catalog/`、请求 / 响应模型、协议注册器、实时发现记录 | API 参考、算法矩阵；受影响的 README、接入例子和技能 |
 | 选法、首轮字段、解读与来源 | 场景 `SKILL.md`、`agents/interface.yaml`、共享字段及规则数据 | 场景路由、技能资料；重建场景 manifest / 调用合同 |
-| 模块职责和数据流 | 实际导入、绑定与执行代码 | 架构说明；已删除入口集中记录到迁移指南 |
+| 模块职责和数据流 | 实际导入、绑定与执行代码 | 架构说明；公开入口的替代方式集中记录到故障排除 |
 | CI、打包与发布 | `.github/workflows/`、`pyproject.toml` | 本页与贡献指南；真实结果另行报告 |
 | 可运行请求 | 当前请求模型和实际三端调用 | `docs/examples/` JSON 与示例索引；仅用虚构资料 |
 
@@ -312,7 +267,7 @@ uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 git diff --check
 ```
 
-`check_docs.py` 只使用标准库，默认检查根目录、`docs/` 中的当前维护文档与 `skills/` 的 Markdown 内联链接、本地标题锚点、代码围栏、JSON 代码块及示例 JSON 语法。`docs/validation/` 中的历史记录、冻结源码与第三方文档保留原文，使用 `--include-archives` 单独检查；当前文档指向历史材料的文件和标题仍须存在。本地 `reviews/` 始终排除。它不访问外网，不执行代码块，也不证明自然语言或接口参数正确；外部来源保留版本，按受影响内容另行核对。CI 由 `quality` 作业执行当前维护文档检查。
+`check_docs.py` 只使用标准库，默认检查根目录、`docs/` 中的当前维护文档与 `skills/` 的 Markdown 内联链接、本地标题锚点、代码围栏、JSON 代码块及示例 JSON 语法。当前引用的文件和标题必须存在；原始文献按其实际位置保留，不混入过程日志。本地 `reviews/` 始终排除。它不访问外网，不执行代码块，也不证明自然语言或接口参数正确；外部来源保留版本，按受影响内容另行核对。CI 由 `quality` 作业执行当前维护文档检查。
 
 现有文档测试把计数、路由覆盖、技能与生成合同关联到实时目录；`test_skills_engine_contract.py` 还会实际执行 CLI 示例，绑定测试进程解释器。修改可运行请求时，按[示例索引](examples/README.md)选择对应工具，验证模型与实际结果；结构校验成功不能替代三端或真实模型体验。
 
@@ -320,26 +275,28 @@ git diff --check
 
 新增工具还须在 `core/response_models.py` 声明完整结果的必需业务根，目录装配缺声明会失败；不要为了让错误的 service 输出通过而放宽要求。公共投影模型允许字段缺失与合法 null，完整执行的必需根则不可缺失或为 null。相关回归包括 `tests/test_complete_output_contracts.py`、`tests/test_fengshui_analysis_progress.py`、`tests/test_relationship_and_career_semantics.py`、`tests/test_result_delivery_storage.py` 和 `tests/test_response_budget_contract.py`；验证跨端成功／失败、合法投影、状态转移、字符无损读取及多进程容量，而非只冻结一个用户答案。
 
+必需业务根也不能仅为空对象；不可用应返回明确状态，合法空列表按领域合同保留。嵌套必要事实使用 `FullFact[T]`（必须存在且非null）或 `PresentFact[T]`（必须存在、可为null），由共享完整执行上下文递归核验。公开Schema的 `x-fatebridge-full-result` 声明该规则；集合可另声明唯一身份及必要成员。投影后的读取不启用完整执行上下文。规则进入合同指纹，不能通过删除必需事实让错误输出成功。回归见 `tests/test_algorithm_review_repairs.py`。
+
 ### 最低同步面
 
-接口或能力范围变化至少检查 README、API 参考和算法覆盖矩阵；涉及路由或技能再检查场景源及生成物。结构变化更新架构说明，删除支持的入口更新迁移指南。非生成源页面的导航或措辞调整通常无需改生成数据；生成器 `--check` 报告源文件散列变化时，重新生成后审查差异。
+接口或能力范围变化至少检查 README、API 参考和算法覆盖矩阵；涉及路由或技能再检查场景源及生成物。结构变化更新架构说明，删除支持的入口更新故障排除中的升级说明。非生成源页面的导航或措辞调整通常无需改生成数据；生成器 `--check` 报告源文件散列变化时，重新生成后审查差异。
 
-当前维护文档与具体实现应相互指向；历史审计只作为特定版本证据。一轮修改的测试数量、临时回执与工作区路径写在验收报告中，不作为长期能力承诺。
+当前维护文档与具体实现应相互指向；历史审计只作为特定版本证据。一轮修改的测试数量、临时回执与工作区路径写在验收报告中，不作为长期能力承诺。历史报告并入专题时标明日期、模型与范围，保留失败和未决项，并与当前使用步骤分开。
 
 ## CI、打包与发布
 
 发布从干净 checkout 构建，并核对 wheel 的 Python 模块和 JSON 与当前源码清单一致。删除源模块后，旧 `build/lib` 的增量残留可能仍进入 wheel，因此发布构建应使用全新的工作目录。
 
-日常整理使用[仓库维护](repository-maintenance.md)中的预览与清理命令。构建缓存、当前源码、冻结回归材料和历史运行证据各自维护，不能按扩展名批量删除日志或哈希。
+日常整理使用[仓库维护](repository-maintenance.md)中的预览与清理命令。构建缓存与当前参考分别维护；退役材料按实际依赖清理，不按扩展名误删当前来源或完整性校验。
 
 ```bash
 uv build
 uvx --from twine twine check dist/*
 ```
 
-CI 的 `locked` 作业检查 `uv.lock` 和文档；该环境还验证命令入口与真实 stdio MCP。现有最新版依赖矩阵和最低依赖作业使用独立的 `uv pip` 环境，不受开发锁文件约束。
+CI 的 `locked` 作业检查 `uv.lock`、安装环境、命令入口与真实 stdio MCP；文档和生成物检查在 `quality` 作业中执行。现有最新版依赖矩阵和最低依赖作业使用独立的 `uv pip` 环境，不受开发锁文件约束。
 
-`.github/workflows/ci.yml` 的测试矩阵在 Ubuntu 24.04 / Python 3.10–3.13 最新依赖、Python 3.10 最低直接依赖和 Windows Server 2022／Python 3.12 锁定依赖下保留自包含检查，每种环境分三片。每片记录依赖、JUnit 与实际节点，`quality` 独立运行 Black、isort、mypy、文档和生成合同检查。最低直接依赖用 `uv pip install --system --resolution lowest-direct -e ".[dev]"` 在全新环境解析，不能仅固定 FastMCP 版本代替最低直接依赖验证。本地黄金快照比对仍限定受支持的 Linux x86_64 / Python 3.12 环境，其他环境跳过不代表通过。
+矩阵与路径筛选见[CI 运行范围](#ci-运行范围)。最低直接依赖用 `uv pip install --system --resolution lowest-direct -e ".[dev]"` 在全新环境解析，不能仅固定 FastMCP 版本代替最低直接依赖验证。本地数值与来源检查按其实际后端、数据及适用范围报告。
 
 发布前另行完成与改动相关的本地领域及外部数据验收；云端 CI 只证明其明确列出的检查通过。
 

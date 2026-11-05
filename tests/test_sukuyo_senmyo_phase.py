@@ -19,7 +19,7 @@ from fatebridge.core.sukuyo_senmyo_phase import (
 )
 from fatebridge.core.sukuyo_sources import load_source
 
-FIXTURE = Path(__file__).parent / "fixtures/sukuyo-senmyo-phase-oracle-v1.json"
+FIXTURE = Path(__file__).parent / "data/sukuyo-senmyo-phase-oracle-v1.json"
 
 
 def test_complete_before_code_possible_world_oracle_including_rejected_rows():

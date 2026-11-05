@@ -15,7 +15,7 @@ from pathlib import Path
 from scripts.build_utc1960_reference import SOURCE_SHA256
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/human_design_fractional_leap_v1"
+FIXTURE = ROOT / "tests/data/human_design/fractional_leap"
 
 
 def derive(source: Path, compiler: str) -> dict:

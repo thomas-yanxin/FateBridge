@@ -841,7 +841,7 @@ def main() -> None:
             from fatebridge.core.suzhan_astronomy import build_equatorial_mansions
 
             reference_path = (
-                args.source_root / "tests/fixtures/sukuyo-equatorial-horizons.json"
+                args.source_root / "tests/data/sukuyo-equatorial-horizons.json"
             )
             reference_raw = reference_path.read_bytes()
             reference = json.loads(reference_raw)
@@ -911,7 +911,7 @@ def main() -> None:
             from fatebridge.validation.sukuyo_calendar_sources import audit_candidate
 
             candidate = audit_candidate(
-                args.source_root / "tests/fixtures/sukuyo_hutime_v1"
+                args.source_root / "tests/data/sukuyo_hutime_v1"
             )
             assert not candidate["structural_import_eligible"]
             assert not candidate["runtime_calendar_enabled"]

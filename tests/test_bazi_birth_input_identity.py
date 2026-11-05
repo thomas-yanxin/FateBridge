@@ -4,7 +4,8 @@ import asyncio
 
 import pytest
 
-from tests.test_agentic_nested_outputs import AS_OF, call_cli, inputs, native, rest
+from tests.test_agentic_nested_outputs import AS_OF, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_birth_component_presence import omitted_payload
 from tests.test_bazi_birth_seconds import SPECS
 from tests.test_bazi_birth_seconds_transports import leaf, receipt_path
@@ -33,6 +34,9 @@ def test_mcp_omitted_and_explicit_zero_minute_have_distinct_input_identity():
         omitted["run_metadata"]["business_output_sha256"]
         != explicit["run_metadata"]["business_output_sha256"]
     )
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize(

@@ -10,13 +10,16 @@ from tests.test_agentic_nested_outputs import (
     business,
     call_cli,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_agentic_nested_outputs import (
     test_nested_fact_faults_are_internal_failures_on_all_surfaces as reject_bad_fact,
 )
 
 SPEC = next(s for s in CATALOG if s.key == "bazi_source_compare")
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("project", [False, True])
@@ -29,6 +32,8 @@ SPEC = next(s for s in CATALOG if s.key == "bazi_source_compare")
         (["己巳", "辛未", "丙午", "丁酉"], "agrees_with_known_annotations"),
         (["癸卯", "丙辰", "甲辰", "丙寅"], "agrees_with_known_annotations"),
         (["癸丑", "壬戌", "丙午", "庚寅"], "agrees_with_known_annotations"),
+        (["癸酉", "甲子", "丁卯", "丙午"], "agrees_with_known_annotations"),
+        (["甲子", "丙子", "甲申", "己巳"], "agrees_with_known_annotations"),
     ],
 )
 def test_same_literal_comparison_full_and_published_view_on_three_surfaces(
@@ -57,7 +62,7 @@ def test_same_literal_comparison_full_and_published_view_on_three_surfaces(
         assert result["source_comparison"]["status"] == expected
         assert (
             result["current_calculation"]["method_id"]
-            == "season_root_revelation_relations_v11"
+            == "season_root_revelation_relations_v12"
         )
         assert result["source_comparison"]["calculation_overridden"] is False
         assert (

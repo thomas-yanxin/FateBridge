@@ -16,7 +16,7 @@ from fatebridge.validation.taiyi_epoch import (
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v34"
-FREEZE_SHA256 = "5fdae72efc70c070cba08136d10b7e9fbd08481ae7da73070df11362be1d6e9b"
+FREEZE_SHA256 = "c4f30775d179daef799cbbcd56724d54928a70fb3627b3b2a1c095460dd65189"
 
 
 def _read(path: Path) -> dict[str, Any]:
@@ -96,9 +96,15 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
                 }
             )
 
-    previous = root / "docs/validation"
-    old28 = _read(previous / "taiyi-jinjing-v28/report.json")
-    old32 = _read(previous / "taiyi-jinjing-v32/report.json")
+    if __package__:
+        from scripts.audit_taiyi_day_epoch import audit as day_epoch_audit
+        from scripts.audit_taiyi_lunation_chain import audit as lunation_audit
+    else:
+        from audit_taiyi_day_epoch import audit as day_epoch_audit
+        from audit_taiyi_lunation_chain import audit as lunation_audit
+
+    old28 = day_epoch_audit()
+    old32 = lunation_audit(root=root)
     printed = old28["calendar_cohort"]["records"]
     board_source = _read(root / "tests/fixtures/taiyi_jinjing_v31/readings.json")[
         "board"

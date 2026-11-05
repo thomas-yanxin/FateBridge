@@ -8,7 +8,7 @@ import pytest
 
 from fatebridge.core.sukuyo import calendar_mansion, day_evidence
 
-BEFORE_PATH = Path(__file__).parent / "fixtures/sukuyo-arc-clock-before-code-v111.json"
+BEFORE_PATH = Path(__file__).parent / "data/sukuyo-arc-clock-before-code-v111.json"
 BEFORE = json.loads(BEFORE_PATH.read_bytes())
 ROOT = Path(__file__).resolve().parents[1]
 

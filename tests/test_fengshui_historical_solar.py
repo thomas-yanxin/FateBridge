@@ -25,14 +25,12 @@ from fatebridge.utils.errors import EphemerisSourceError
 from tests.test_fengshui_surfaces import rest_client, without_transport
 
 ROOT = Path(__file__).parents[1]
-FOLDER = ROOT / "tests/fixtures/fengshui_historical_solar_v1"
+FOLDER = ROOT / "tests/data/fengshui_historical_solar_v1"
 PROTOCOL = json.loads((FOLDER / "protocol.json").read_text())
 DATA = ROOT / "src/fatebridge/data/astronomy"
 MODEL = de440_solar.HISTORICAL_MODEL_ID
 REFERENCE = json.loads(
-    (
-        ROOT / "tests/fixtures/fengshui_calendar_v10/period-lichun-reference.json"
-    ).read_text()
+    (ROOT / "tests/data/fengshui_lichun_tt/reference.json").read_text()
 )
 
 

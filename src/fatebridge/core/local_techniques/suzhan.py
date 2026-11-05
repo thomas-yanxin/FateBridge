@@ -25,6 +25,7 @@ from .chart import (
     _normalize_time_text,
     _render_snapshot_text,
     _split_degree,
+    _su28_position,
 )
 
 
@@ -111,7 +112,11 @@ def _build_suzhan_snapshot_text(
             su28 = str(item.get("su28") or "").strip()
             # A zodiac-sign degree is not a degree within a 360/28 band.
             value = (
-                item.get("su28_degree", float(item["lon"]) % (360.0 / 28.0))
+                (
+                    item["su28_degree"]
+                    if "su28_degree" in item
+                    else _su28_position(float(item["lon"]))[1]
+                )
                 if su28
                 else item.get("signlon", item.get("lon"))
             )

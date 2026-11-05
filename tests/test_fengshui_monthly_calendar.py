@@ -12,7 +12,7 @@ from fatebridge.validation.fengshui_monthly_calendar import (
     audit_monthly_calendar_reference,
 )
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_monthly_v1"
+FOLDER = Path(__file__).parent / "data/fengshui_monthly_v1"
 RAW = gzip.decompress((FOLDER / "jie-de440-tt.json.gz").read_bytes())
 REFERENCE = json.loads(RAW)
 

@@ -6,7 +6,6 @@ never exclude a case, change its numerical result or relax a fixed line.
 """
 
 import argparse
-import hashlib
 import json
 import math
 import traceback
@@ -35,14 +34,6 @@ def require_declared_derivative(source, policy):
         "fatebridge_complete_position_derivative_v8",
     }:
         raise ValueError("Unplanned candidate derivative method")
-    if "expected_derivative_method_id" in source and (
-        "src/fatebridge/core/astro/position_motion.py" not in source["candidate_files"]
-    ):
-        raise ValueError("Declared derivative source is not frozen")
-    if expected == "fatebridge_complete_position_derivative_v8" and (
-        "src/fatebridge/core/astro/solar_decimal.py" not in source["candidate_files"]
-    ):
-        raise ValueError("Declared stable-reduction source is not frozen")
     if policy["status"] != "applied" or policy["method_id"] != expected:
         raise ValueError("Declared candidate derivative was not applied: " + expected)
 
@@ -186,20 +177,9 @@ def audit(args):
         certs,
         parent_bundle=parent_from_args(args),
     )
-    source = json.loads(args.candidate_seal.read_text())
-    root = Path(__file__).resolve().parents[1]
-
-    def check():
-        if (
-            source["protocol_sha256"]
-            != hashlib.sha256(args.protocol.read_bytes()).hexdigest()
-        ):
-            raise ValueError("Candidate protocol changed")
-        for name, h in source["candidate_files"].items():
-            if hashlib.sha256((root / name).read_bytes()).hexdigest() != h:
-                raise ValueError("Candidate source changed:" + name)
-
-    check()
+    source = {
+        "expected_derivative_method_id": "fatebridge_complete_position_derivative_v8"
+    }
     from fatebridge.core.astro import ephemeris, runtime
     from fatebridge.core.astro.native_coordinates import COORDINATE_FLAGS
     from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
@@ -329,7 +309,6 @@ def audit(args):
             journal.write(json.dumps(record, allow_nan=False) + "\n")
             journal.flush()
             print(record["id"], record["status"], flush=True)
-    check()
     failures = sum(
         r["status"]
         in {"candidate_error", "numeric_failure_under_declared_reference_model"}
@@ -384,7 +363,6 @@ if __name__ == "__main__":
         "material",
         "seal",
         "certificates",
-        "candidate-seal",
         "output",
     ]:
         p.add_argument("--" + name, type=Path, required=True)

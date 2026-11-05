@@ -15,10 +15,10 @@ from scripts.audit_astrodice_kernel import validate_reference
 
 ROOT = Path(__file__).resolve().parents[1]
 PROTOCOL = json.loads(
-    (ROOT / "tests/fixtures/astrodice-kernel-protocol.json").read_text()
+    (ROOT / "tests/data/astrodice/tables/kernel-protocol.json").read_text()
 )
 REFERENCE = json.loads(
-    (ROOT / "tests/fixtures/astrodice-kernel-horizons.json").read_text()
+    (ROOT / "tests/data/astrodice/tables/kernel-horizons.json").read_text()
 )
 
 
@@ -27,7 +27,7 @@ def test_frozen_reference_hashes_frame_time_and_target_identity():
     assert (
         REFERENCE["protocol_sha256"]
         == hashlib.sha256(
-            (ROOT / "tests/fixtures/astrodice-kernel-protocol.json").read_bytes()
+            (ROOT / "tests/data/astrodice/tables/kernel-protocol.json").read_bytes()
         ).hexdigest()
     )
     assert (

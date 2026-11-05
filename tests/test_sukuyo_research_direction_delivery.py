@@ -11,9 +11,7 @@ from fatebridge.core.sukuyo_dayan_reconstruction import (
     reconstruction_scope_reference,
 )
 
-FIXTURE = (
-    Path(__file__).parent / "fixtures/sukuyo-research-direction-before-code-v89.json"
-)
+FIXTURE = Path(__file__).parent / "data/sukuyo-research-direction-before-code-v89.json"
 
 
 def frozen_scope():

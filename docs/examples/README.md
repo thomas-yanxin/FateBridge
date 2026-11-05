@@ -18,16 +18,19 @@
 | [年度作者规则](fengshui-annual-remedy.json) | `fengshui_assess` | 显式选择限定年份与作者的补充规则 |
 | [住宅候选比较](fengshui-home-alternatives.json) | `fengshui_assess` | 现状、候选独立事实与分层差异 |
 | [工位候选规划](fengshui-workstation-planning.json) | `fengshui_assess` | 场景选法、搬转许可与物理可行性 |
+| [实测工位与完整有限搜索](fengshui-workstation-measured.json) | `fengshui_assess` | 多边形/高度几何、入口与背靠、独立BTB/WOFS规则、逐组合拒绝回执与取舍方案 |
+| [自动网格与屏幕视线](fengshui-workstation-grid-screen.json) | `fengshui_assess` | 明确网格自动生成中心候选、整面透视遮挡、候选独立重算及算法覆盖状态 |
 | [玄空历史宅盘](fengshui-xuankong.json) | `fengshui_xuankong_natal` | 历史事件定运、宅向与候选角区 |
 | [早期宅运完整区间](fengshui-historical-period.json) | `fengshui_xuankong_natal` | 虚构1800年输入；1784–1804端点使用的实际轨道来源 |
 | [原书数表差异](fengshui-source-differences.json) | `fengshui_xuankong_natal` | 原图五与计算二分别保留，读取逐候选来源比较 |
 | [起星图数表差异](fengshui-replacement-source-differences.json) | `fengshui_xuankong_natal` | 五运子午替卦原图九与计算六、编者范围及未验证的兼向条件 |
-| [事件有效年候选](fengshui-event-year-candidates.json) | `fengshui_xuankong_natal` | 依[受控模型运行方法](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-event-year-fidelity.md#可复现的虚构示例)，分开读取候选有效年和已确定宅运 |
-| [候选节月有效期](fengshui-month-interval-candidates.json) | `fengshui_monthly_stars` | 依[受控模型运行方法](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-month-interval-fidelity.md#可复现的虚构输入)，读取各候选节月的完整区间与来源 |
+| [事件有效年候选](fengshui-event-year-candidates.json) | `fengshui_xuankong_natal` | 依[受控模型运行方法](../fengshui-xuankong.md)，分开读取候选有效年和已确定宅运 |
+| [候选节月有效期](fengshui-month-interval-candidates.json) | `fengshui_monthly_stars` | 依[受控模型运行方法](../fengshui.md)，读取各候选节月的完整区间与来源 |
 | [宅向误差支持角区](fengshui-bearing-support.json) | `fengshui_xuankong_natal` | 同一个宅盘由哪些测量角区与选盘理由支持 |
 | [WMM2025地磁参考](fengshui-geomagnetic.json) | `fengshui_directions` | NOAA数值测试例；原始方位与模型换算候选分别保留 |
 | [独立沈氏城门](fengshui-city-gate.json) | `fengshui_xuankong_natal` | 显式参考运、同元龙门位、顺逆；无需编造历史宅运 |
 | [玄空与年度并列](fengshui-xuankong-with-annual.json) | `fengshui_assess` | 历史宅盘与年盘的独立作用域 |
+| [沈氏主客规则](fengshui-host-guest.json) | `fengshui_xuankong_natal` | 显式选择主客生克；历史宅运、评价运及来源条件分别核对 |
 | [玄空有限解释](fengshui-xuankong-interpretation.json) | `fengshui_assess` | 显式启用有来源的有限解释条件 |
 | [工位活动](fengshui-workstation-activity.json) | `fengshui_assess` | 书桌工作 / 学习用途与宅盘向星 |
 | [入口隔挡](fengshui-entry-barrier.json) | `fengshui_assess` | 入口、桌与隔挡的明确关系和执行条件 |
@@ -35,11 +38,15 @@
 
 ## 未解析ASC与13扇区
 
-[原生角度退化请求](chart13-unresolved-ascendant.json)是构造的虚构几何反例。未解析的实际落区返回null，后端约定值和全部生时样点分别保留；命令与来源见参考角退化核验（本地数据：`../validation/specialty-reference-angle-qualification.md`）。
+[原生角度退化请求](chart13-unresolved-ascendant.json)是构造的虚构几何反例。未解析的实际落区返回null，后端约定值和全部生时样点分别保留；计算范围见[其他星盘流派](../other-chart-schools.md)。
 
 ## 德国盘生时区间
 
-[太阳弧边界请求](germany-solar-arc-boundary.json)以明确的虚构出生、目标时刻及±1分钟区间，演示名义结果有效而部分推运样点未计算的返回。两种入口、CLI命令及状态读取见生时区间核验（本地数据：`../validation/solar-arc-boundary-sampling.md`）。全部样点须保留，未计算项不算作条件未成立或概率。
+[太阳弧边界请求](germany-solar-arc-boundary.json)以明确的虚构出生、目标时刻及±1分钟区间，演示名义结果有效而部分推运样点未计算的返回。生时区间的读取见[其他星盘流派](../other-chart-schools.md)。全部样点须保留，未计算项不算作条件未成立或概率。
+
+## 六爻教学输入
+
+[旬空、动静与日级条件](liuyao-conditional-demo.json)和[需之讼装卦](liuyao-need-to-song.json)用于 `sixyao`。它们是构造的教学资料，不代表历史占例的真实日期或现实问事。JSON 可作为 MCP 参数或发送至 REST `/api/divination/sixyao`；CLI 按 `describe sixyao --detail input` 转成对应字段参数，不套用风水的 `--request-file`。
 
 ## 历法核对示例
 

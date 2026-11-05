@@ -12,10 +12,13 @@ from tests.test_agentic_nested_outputs import (
     business,
     call_cli,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 
 ORDER = ("year", "month", "day", "hour")
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize(

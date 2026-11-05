@@ -12,8 +12,8 @@ import pytest
 from fatebridge.validation import fengshui_day_calendar as audit
 from fatebridge.validation.fengshui_day_hour import load_day_hour_reference
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_day_calendar_v1"
-TABLES = Path(__file__).parent / "fixtures/fengshui_day_hour_tables_v1"
+FOLDER = Path(__file__).parent / "data/fengshui_day_calendar_v1"
+TABLES = Path(__file__).parent / "data/fengshui_day_hour_tables_v1"
 
 
 def reference():

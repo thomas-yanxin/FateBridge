@@ -11,7 +11,7 @@ from xml.etree import ElementTree as E
 N = "{http://www.tei-c.org/ns/1.0}"
 XI = "{http://www.w3.org/XML/1998/namespace}id"
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/sukuyo-apparatus-before-production-v77.json"
+FIXTURE = ROOT / "tests/data/sukuyo-apparatus-before-production-v77.json"
 SOURCE = ROOT / "src/fatebridge/data/sukuyo_apparatus_scope.json"
 REFERENCE_SHA256 = "55cd0e1a524680a76bb6022837ed8c0bd6e9ec9547edd0ef277bdcdda01fb425"
 

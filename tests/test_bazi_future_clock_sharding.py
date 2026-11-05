@@ -25,7 +25,7 @@ def merge_case(request, tmp_path, monkeypatch):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     root = tmp_path.resolve()
-    fixture = root / "tests/fixtures/bazi_dayun_future_clocks_v2"
+    fixture = root / "tests/data/bazi_dayun_future_clocks_v2"
     fixture.mkdir(parents=True)
     monkeypatch.setattr(module, "ROOT", root)
     monkeypatch.setattr(module, "FIXTURE", fixture)
@@ -65,9 +65,7 @@ def merge_case(request, tmp_path, monkeypatch):
             root / "scripts/audit_bazi_dayun_future_clocks_shard.py"
         ),
     }
-    write(
-        root / "tests/fixtures/bazi_historical_point_v1/shard-protocol.json", protocol
-    )
+    write(root / "tests/data/bazi_historical_point_v1/shard-protocol.json", protocol)
     rows = [
         {
             "record_type": "control",

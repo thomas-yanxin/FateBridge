@@ -23,7 +23,7 @@ from scripts.select_astrodice_source_boundaries import geometry
 
 def select(run, fixture):
     check_source(fixture)
-    plan = json.loads((run / "plan-before-selection.json").read_text())
+    plan = json.loads((run / "selection-plan.json").read_text())
     bases = json.loads((fixture / "geometric-reference.json").read_text())["rows"]
     results = {name: [] for name in plan["cohort_impact_radius_fractions"]}
     roots = []
@@ -129,7 +129,7 @@ def select(run, fixture):
         raise ValueError("Source selection duplicated a condition")
     return {
         "plan_sha256": hashlib.sha256(
-            (run / "plan-before-selection.json").read_bytes()
+            (run / "selection-plan.json").read_bytes()
         ).hexdigest(),
         "cohorts": results,
         "roots": roots,

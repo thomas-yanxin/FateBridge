@@ -171,7 +171,7 @@ def build_jinkou_board(
                 "content": content,
                 "shenjiang": shenjiang,
                 "element": element,
-                "power": seasonal_power(month_branch, element),
+                "seasonal_power": seasonal_power(month_branch, element),
                 "polarity": "阳" if index % 2 == 0 else "阴",
                 "dun_stem": (
                     _wuzidun_stem(day_stem, content)
@@ -197,7 +197,6 @@ def build_jinkou_board(
     use_position, use_basis, pattern = _jinkou_pick_use_position(rows)
     for row in rows:
         row["is_use"] = row["label"] == use_position
-        row["seasonal_power"] = row["power"]
         row["internal_power"] = strength["powers"][row["label"]]
     patterns = structural_patterns(rows, day_ganzhi=day_ganzhi)
     definitions = definition_evidence(

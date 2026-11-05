@@ -1,76 +1,52 @@
 """Keep the actual first row available without inventing a dated legacy period."""
 
+import ast
 import gzip
+import hashlib
 import json
+import math
 from copy import deepcopy
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
+from dateutil.relativedelta import relativedelta
+from dateutil.tz import resolve_imaginary
 from pydantic import ValidationError
 
 from fatebridge.application.examples import evidence_views
 from fatebridge.application.projection import project_fields
+from fatebridge.core import almanac
+from fatebridge.core.astro.time_scales import datetime_from_tt_point
+from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.core.canping_schedule_validation import require_schedule_binding
+from fatebridge.core.ephemeris_runtime import ephemeris_call, swe
 from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.output_chinese import CanpingTiming
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import NumerologySourceError
-from tests.canping_witness_fixture_compat import upgrade_frozen_witnesses
-from tests.test_numerology_solar_providers import (
-    preserve_original_canping_snapshot_with_source_changes_checked,
-)
+from fatebridge.utils.timezones import parse_timezone_name
 
-FIX = Path(__file__).parent / "fixtures/canping_first_row_v1"
-REFERENCES = json.loads(gzip.decompress((FIX / "reference.json.gz").read_bytes()))
+REFERENCES = json.loads(
+    (Path(__file__).parent / "data/canping/first_row_inputs.json").read_bytes()
+)
 SPEC = next(s for s in CATALOG if s.key == "canping")
+# HKO table1, transcribed independently of the production name/angle arrays:
+# https://www.hko.gov.hk/sc/gts/time/24solarterms.htm
+from tests.solar_source_facts import HKO_TERM_LONGITUDES
+
+
+def test_literal_term_targets_match_the_published_hko_table():
+    assert len(HKO_TERM_LONGITUDES) == 24
+    assert dict(zip(almanac.SOLAR_TERM_NAMES, almanac.SOLAR_TERM_LONGITUDES)) == (
+        HKO_TERM_LONGITUDES
+    )
 
 
 @pytest.fixture(autouse=True)
 def native_model(monkeypatch):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setenv("SE_EPHE_PATH", "/tmp/fatebridge-heluo-fiftysecond/empty-ephe")
-
-
-@pytest.mark.parametrize("reference", REFERENCES, ids=lambda r: r["id"])
-def test_same_result_first_row_keeps_all_prior_business_facts(reference):
-    frozen_reference = reference
-    assert reference["expected_first_row"] == reference["output"]["dayun"][0]
-    upgraded = upgrade_frozen_witnesses(reference["output"])
-    reference = {
-        **reference,
-        "output": upgraded,
-        "expected_first_row": upgraded["dayun"][0],
-    }
-    out = build_canping_result(**reference["arguments"])
-    timing = out["canping_timing"]
-    assert timing["first_row"] == reference["expected_first_row"] == out["dayun"][0]
-    assert timing["first_row"] is not out["dayun"][0]
-    assert timing["first_row"]["verses"] is not out["dayun"][0]["verses"]
-    original = deepcopy(out)
-    del original["canping_timing"]["first_row"]
-    original = preserve_original_canping_snapshot_with_source_changes_checked(
-        original, frozen_reference["output"]
-    )
-    assert original == reference["output"]
-    if timing["profile_id"] == "legacy_minggong_v1":
-        assert timing["first_period"] is None
-        assert (
-            not {"start_at", "end_at", "start_age", "end_age"}
-            & timing["first_row"].keys()
-        )
-    else:
-        assert timing["first_row"] == timing["first_period"]
-        assert timing["first_row"] is not timing["first_period"]
-    if reference["id"].startswith("queried-"):
-        assert timing["selected"]["dayun_index"] > 0
-        assert timing["first_row"]["index"] == 0
-        # Use the same result after validating the three added clock labels above.
-        assert (
-            original["canping_timing"]["selected"]
-            == reference["output"]["canping_timing"]["selected"]
-        )
-    SPEC.output_model.model_validate(out)
-    require_schedule_binding(out)
 
 
 @pytest.mark.parametrize(
@@ -106,7 +82,7 @@ def test_wrong_summary_facts_cannot_survive_complete_output_validation(
 ):
     out = deepcopy(
         next(
-            r["output"]
+            build_canping_result(**r["arguments"])
             for r in REFERENCES
             if r["arguments"]["dayun_method"] == "bazi_appendix_v1"
         )
@@ -124,7 +100,7 @@ def test_wrong_summary_facts_cannot_survive_complete_output_validation(
 def test_coherent_but_wrong_two_summaries_do_not_override_the_actual_row():
     out = deepcopy(
         next(
-            r["output"]
+            build_canping_result(**r["arguments"])
             for r in REFERENCES
             if r["arguments"]["dayun_method"] == "bazi_appendix_v1"
         )
@@ -138,7 +114,7 @@ def test_coherent_but_wrong_two_summaries_do_not_override_the_actual_row():
 
 
 def test_nonempty_summaries_cannot_survive_an_empty_actual_sequence():
-    out = deepcopy(REFERENCES[0]["output"])
+    out = build_canping_result(**REFERENCES[0]["arguments"])
     out["canping_timing"]["first_row"] = deepcopy(out["dayun"][0])
     out["dayun"] = []
     with pytest.raises(NumerologySourceError):

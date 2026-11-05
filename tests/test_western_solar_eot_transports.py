@@ -6,12 +6,15 @@ from datetime import datetime
 
 import pytest
 
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
 from tests.test_western_solar_eot_ut1 import COHERENT_BY_UTC
 
-ROW = COHERENT_BY_UTC["9999-08-11T12:00:00+00:00"]
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
+
+ROW = COHERENT_BY_UTC["9999-08-11T12:00:00+00:00"]
 
 
 @pytest.mark.parametrize(

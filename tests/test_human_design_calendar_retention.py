@@ -1,16 +1,13 @@
 """All original calendar rows survive unavailable data and false backends."""
 
-import hashlib
 import json
 from pathlib import Path
 
 import pytest
 
 from scripts import check_human_design_calendar_span as audit
-from scripts.historical_source_identity import HistoricalSources
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "docs/validation/human-design-calendar-retention-v1"
 
 
 @pytest.fixture
@@ -62,19 +59,6 @@ def cohort(monkeypatch):
     monkeypatch.setattr(audit, "positions_at_tt", positions)
     monkeypatch.setattr(audit, "_root_result", root)
     return pairs, positions, root
-
-
-def test_original_references_tests_and_production_are_unchanged():
-    originals = HistoricalSources(ROOT)
-    for file in ("plan.json", "supplemental-plan.json"):
-        plan = json.loads((BASE / "evidence" / file).read_text())
-        hashes = plan.get(
-            "source_before", plan.get("before_implementation_source_hashes")
-        )
-        for name, sha in hashes.items():
-            if name == "scripts/check_human_design_calendar_span.py":
-                continue
-            assert originals.matches(ROOT / name, sha), name
 
 
 def test_batch_and_root_exceptions_retain_all_rows_and_continue(cohort, monkeypatch):

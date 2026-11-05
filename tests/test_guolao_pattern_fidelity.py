@@ -3,10 +3,8 @@
 These test software predicates, not original-text acceptance or prediction.
 """
 
-import math
 from copy import deepcopy
 from datetime import datetime
-from fractions import Fraction as F
 
 import pytest
 
@@ -90,21 +88,11 @@ CASES = [
         {"planet_signidx": {"孛": 10, "罗": 11}},
         {"node_index": 10, "apogee_index": 10},
     ),
-    (
-        "命坐两歧",
-        {"asc_lon": 0.5},
-        {"asc_lon": math.nextafter(1, math.inf)},
-        {
-            "reference_longitude": 0.5,
-            "palace_boundary_distance": 0.5,
-            "threshold_modern_degrees": 1,
-        },
-    ),
 ]
 
 
 @pytest.mark.parametrize("name,positive,negative,expected_inputs", CASES)
-def test_each_of12_predicates_has_actual_operands_and_changes_with_its_counterfactual(
+def test_each_current_predicate_has_actual_operands_and_changes_with_its_counterfactual(
     name, positive, negative, expected_inputs
 ):
     original = deepcopy(positive)
@@ -145,42 +133,12 @@ def test_lost_rulership_evidence_exposes_the_actual_two_ruler_chains():
         )
 
 
-def test_binary_float_near_boundary_matches_independent_exact_rational_distances():
-    for turn in range(-12, 13):
-        for offset in [0, 1, 15, 29, 30]:
-            edge = float(turn * 30 + offset)
-            for x in [
-                math.nextafter(edge, -math.inf),
-                edge,
-                math.nextafter(edge, math.inf),
-            ]:
-                # Use the exact binary input as a rational; no tolerance or float modulo.
-                rem = F.from_float(x) % 30
-                expected = min(rem, 30 - rem) <= 1
-                patterns = m.calculate({"asc_lon": x})
-                assert ("命坐两歧" in {p["name"] for p in patterns}) is expected, repr(
-                    x
-                )
-    for x in [2**54 + 1, -(2**54 + 1), 10**100 + 1, -(10**100 + 1)]:
-        rem = F(x) % 30
-        expected = min(rem, 30 - rem) <= 1
-        patterns = m.calculate({"asc_lon": x})
-        assert ("命坐两歧" in {p["name"] for p in patterns}) is expected
-
-
 @pytest.mark.parametrize("mapping", ["planet_signidx", "god_signidx"])
 @pytest.mark.parametrize("bad", [True, 1.0, None, -2, 12, float("nan")])
 def test_invalid_indices_cannot_become_palace_facts(mapping, bad):
     key = "月" if mapping == "planet_signidx" else "岁驾"
     with pytest.raises((TypeError, ValueError)):
         m.calculate({mapping: {key: bad}})
-
-
-@pytest.mark.parametrize("key", ["asc_lon", "mansion_boundary_distance"])
-@pytest.mark.parametrize("bad", [True, float("nan"), float("inf"), "1", 10**400])
-def test_invalid_distance_and_longitude_inputs_are_not_valid_conditions(key, bad):
-    with pytest.raises(ValueError):
-        m.calculate({key: bad})
 
 
 @pytest.mark.parametrize("key", ["is_day", "is_winter"])

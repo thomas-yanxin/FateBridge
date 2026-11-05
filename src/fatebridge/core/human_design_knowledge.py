@@ -4,38 +4,20 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from fatebridge.core.human_design_additional_polarities import facts_for
-from fatebridge.core.human_design_depth import depth_reference
 from fatebridge.core.human_design_line_catalogue import (
-    CATALOGUE_PATH,
-    CATALOGUE_SHA256,
     DOMAIN,
-    FIXING_READING_SOURCE,
-    KEY,
-    MANIFEST_PATH,
-    MANIFEST_SHA256,
-    POLICY_ID,
     SOURCE,
-    SUPPLEMENT_PATH,
-    _base_catalogue,
-    _canonical,
     _catalogue,
     _check_end,
     _coverage,
-    _nonfinite,
-    _object,
     _provenance,
-    _scope,
 )
 from fatebridge.core.human_design_line_catalogue import (
     read_reference as read_base_reference,
 )
 from fatebridge.core.human_design_references import (
     coherent_human_design_references,
-    reference_sha256,
 )
-from fatebridge.core.knowledge_store import ToolValidationError
-from fatebridge.utils.errors import EphemerisSourceError
 
 
 def build_registry() -> dict:

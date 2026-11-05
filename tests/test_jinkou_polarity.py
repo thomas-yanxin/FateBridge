@@ -33,14 +33,6 @@ def test_formal_truth_table_retains_unreachable_masks_and_explicit_source_scope(
     assert data["readings"]["annotation"]["reader_count"] == 1
     assert data["readings"]["annotation"]["blinded"] is False
     assert answers["scope"]["new_independent_real_events"] == 0
-    parsed = ast.parse((CORPUS / "generate_reference.py").read_text())
-    modules = {
-        node.module if isinstance(node, ast.ImportFrom) else alias.name
-        for node in ast.walk(parsed)
-        if isinstance(node, (ast.Import, ast.ImportFrom))
-        for alias in node.names
-    }
-    assert modules == {"__future__", "hashlib", "json", "collections", "pathlib"}
 
 
 def test_entire_symbolic_cohort_passes_only_the_named_finite_gate():

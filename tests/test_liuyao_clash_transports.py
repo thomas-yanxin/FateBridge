@@ -8,8 +8,6 @@ from jsonschema import Draft202012Validator
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
 from tests.test_liuyao_transports import assert_same_run_receipt
 
-pytest_plugins = ["tests.test_agentic_nested_outputs"]
-
 
 def all_surfaces(payload, fields, rest, tmp_path, capsys, budget=0):
     spec = SPECS["sixyao"]

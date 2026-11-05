@@ -1,16 +1,10 @@
-"""Audit a newly frozen wider lunar template without replacing old failures.
-
-Optional --candidate-source is an archived, hash-pinned DEVELOPMENT experiment;
-its formulas are not imported into production. All cohorts and failures remain.
-"""
+"""Compare the maintained lunar derivative with independent source references."""
 
 import argparse
-import ast
 import hashlib
 import json
 import math
 import platform
-import types
 from datetime import datetime, timedelta
 from fractions import Fraction
 from pathlib import Path
@@ -35,6 +29,7 @@ def validate_reference(protocol, reference):
         "astrodice_lunar_wide_stencil_v1": 137,
         "astrodice_lunar_source_window_boundary48_v1": 48,
         "astrodice_lunar_source_window_fractional51_v2": 51,
+        "astrodice_lunar_precise_source_holdout12_v1": 12,
     }
     count = counts.get(protocol["protocol_id"])
     if count is None or len(dates) != count or len(set(dates)) != count:
@@ -215,16 +210,17 @@ def validate_reference(protocol, reference):
     }
 
 
-def audit(protocol, reference, candidate=None, *, production_order=False):
-    from fatebridge.core.astro import runtime
-    from fatebridge.core.astro.lunar_motion import LIGHT_SPEED_AU_PER_DAY as C
-    from fatebridge.core.astro.lunar_motion import aberration_position_jvp, dot
+def audit(protocol, reference, *, production_order=False):
+    from fatebridge.core.astro import continuous_lahiri as frame
+    from fatebridge.core.astro import ephemeris, runtime
     from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
+    from scripts.astrodice_lunar_pipeline import BIAS
     from scripts.audit_astrodice_apparent import direction_derivative
 
     swe = runtime.swe
     trace = PhysicalEphemerisTrace()
     rows = []
+    model = None
     flags = (
         swe.FLG_SWIEPH
         | swe.FLG_SPEED
@@ -233,29 +229,6 @@ def audit(protocol, reference, candidate=None, *, production_order=False):
         | swe.FLG_EQUATORIAL
         | swe.FLG_XYZ
     )
-    diagnostic = None
-    if candidate:
-        expected = "3e5e93845f374e5fd7c47067748650f831816dccbe4d6668e51a04c70f07b8ca"
-        if digest(candidate) != expected:
-            raise ValueError("Experimental candidate changed after freeze")
-        tree = ast.parse(candidate.read_text())
-        limit = next(
-            i
-            for i, n in enumerate(tree.body)
-            if isinstance(n, ast.Assign)
-            and isinstance(n.targets[0], ast.Name)
-            and n.targets[0].id == "rows"
-        )
-        namespace = {"__file__": str(candidate)}
-        exec(
-            compile(
-                ast.Module(body=tree.body[:limit], type_ignores=[]),
-                str(candidate),
-                "exec",
-            ),
-            namespace,
-        )
-        diagnostic = namespace
     for row in reference["rows"]:
         if row["status"] != "available":
             rows.append(
@@ -264,17 +237,16 @@ def audit(protocol, reference, candidate=None, *, production_order=False):
             continue
         jd = row["jd_tt"]
         production_metadata = {}
+        produced, model = ephemeris._swisseph_planet_state(
+            "Moon",
+            jd,
+            julian_day_tt=jd,
+            source_trace=trace,
+            motion_metadata=production_metadata,
+        )
         if production_order:
-            from fatebridge.core.astro import ephemeris
             from fatebridge.core.astro.zodiac import native_lahiri_positions
 
-            produced, produced_model = ephemeris._swisseph_planet_state(
-                "Moon",
-                jd,
-                julian_day_tt=jd,
-                source_trace=trace,
-                motion_metadata=production_metadata,
-            )
             native_lahiri_positions(
                 ["Moon"],
                 julian_day_ut1=jd,
@@ -282,106 +254,98 @@ def audit(protocol, reference, candidate=None, *, production_order=False):
                 lunar_adjustments={
                     "Moon": (
                         produced["longitude_speed_light_time_correction"],
-                        produced_model,
+                        model,
+                        produced["longitude_speed_spatial_aberration_correction"],
+                        produced.get(
+                            "longitude_speed_lunar_source_remainder_correction"
+                        ),
                     )
                 },
                 source_trace=trace,
                 motion_metadata=production_metadata,
             )
         native, returned = runtime.ephemeris_call("calc", jd, swe.MOON, flags)
-        model = runtime.ephemeris_model_from_retflag(returned)
-        icrf_policy = None
-        if production_order:
-            from fatebridge.core.astro.lunar_source_window import (
-                coherent_lunar_native_state,
-            )
-
-            native, returned, icrf_policy = coherent_lunar_native_state(
-                "calc",
-                jd,
-                flags,
-                jd,
-                model,
-                trace,
-                initial=native,
-                initial_flags=returned,
-            )
+        if runtime.ephemeris_model_from_retflag(returned) != model:
+            raise ValueError("Lunar diagnostic source changed")
         trace.observe("Moon", model)
-
-        def state(epoch, body):
-            x, ret = runtime.ephemeris_call(
-                "calc",
-                epoch,
-                body,
-                flags | swe.FLG_TRUEPOS | (swe.FLG_BARYCTR if body == swe.EARTH else 0),
-            )
-            if runtime.ephemeris_model_from_retflag(ret) != model:
-                raise ValueError("Lunar source changed")
-            return x
-
-        geo = state(jd, swe.MOON)
-        radius = math.hypot(*geo[:3])
-        tau = radius / C
-        dtau = dot(geo[:3], geo[3:]) / (radius * C)
-        earth = state(jd, swe.EARTH)
-        moon, ret = runtime.ephemeris_call(
-            "calc", jd - tau, swe.MOON, flags | swe.FLG_TRUEPOS | swe.FLG_BARYCTR
-        )
-        if runtime.ephemeris_model_from_retflag(ret) != model:
-            raise ValueError("Lunar retarded model changed")
-        apparent, change = aberration_position_jvp(
-            [a - b for a, b in zip(moon[:3], earth[:3])],
-            [-v * dtau for v in moon[3:]],
-            [v / C for v in earth[3:]],
-        )
-        v1 = direction_derivative(
-            native[:3], [a + b for a, b in zip(native[3:], change)]
-        )
+        fixed = production_metadata["lunar_light_time"]["fixed_frame_source_derivative"]
         result = {k: row[k] for k in ["date_tt", "cohort", "status"]}
-        if production_order:
-            result["domain_state"] = produced
-            result["source_windows"] = production_metadata.get("lunar_source_windows")
-            result["icrf_source_window"] = icrf_policy
-        result["v1_error_arcsec_per_day"] = (
-            math.degrees(math.dist(v1, row["icrf_direction_derivative_per_day"])) * 3600
-        )
-        result["template_step_difference_arcsec_per_day"] = row[
-            "step_difference_arcsec_per_day"
-        ]
-        result["icrf_position_error_arcsec"] = angle_arcsec(
-            native[:3], row["icrf_unit_direction"]
-        )
-        if diagnostic:
-            diagnostic["sys"] = types.SimpleNamespace(argv=["frozen_candidate", model])
-            rate = diagnostic["derivative"](jd, 0.0625)
-            result["experimental_full_aberration_error_arcsec_per_day"] = (
-                math.degrees(math.dist(rate, row["icrf_direction_derivative_per_day"]))
-                * 3600
+        result.update(
+            domain_state=produced,
+            template_step_difference_arcsec_per_day=row[
+                "step_difference_arcsec_per_day"
+            ],
+            native_icrf_position_error_arcsec=angle_arcsec(
+                native[:3], row["icrf_unit_direction"]
+            ),
+            native_icrf_rate_error_arcsec_per_day=math.degrees(
+                math.dist(
+                    direction_derivative(native[:3], native[3:]),
+                    row["icrf_direction_derivative_per_day"],
+                )
             )
+            * 3600,
+            source_motion_status=fixed["status"],
+        )
+        if fixed["status"] != "applied":
+            result.update(
+                status="current_source_motion_unavailable", reason=fixed["reason"]
+            )
+            rows.append(result)
+            continue
+        decoded = frame.decode_native_fixed_reception_state(
+            jd,
+            fixed["full_fixed_frame_apparent_position_au"],
+            fixed["full_fixed_frame_velocity_au_per_native_argument_day"],
+        )
+        # The decoder supplies dynamical J2000. The original Horizons directions
+        # are ICRF; invert the inspected, constant IAU2006 native frame bias.
+        inverse_bias = frame.transpose(BIAS)
+        position = frame.mv(inverse_bias, decoded["position"])
+        velocity = frame.mv(inverse_bias, decoded["velocity_per_native_argument_day"])
+        result.update(
+            current_fixed_source_rate_error_arcsec_per_day=math.degrees(
+                math.dist(
+                    direction_derivative(position, velocity),
+                    row["icrf_direction_derivative_per_day"],
+                )
+            )
+            * 3600,
+            icrf_position_error_arcsec=angle_arcsec(
+                position, row["icrf_unit_direction"]
+            ),
+            current_source_method_id=fixed["method_id"],
+            shared_frame_decoder_independently_certified=False,
+        )
+        if production_order:
+            result["source_windows"] = production_metadata.get("lunar_source_windows")
         rows.append(result)
     available = [r for r in rows if r["status"] == "available"]
     metrics = [
-        "v1_error_arcsec_per_day",
+        "current_fixed_source_rate_error_arcsec_per_day",
+        "native_icrf_rate_error_arcsec_per_day",
         "template_step_difference_arcsec_per_day",
         "icrf_position_error_arcsec",
-    ] + (["experimental_full_aberration_error_arcsec_per_day"] if diagnostic else [])
+    ]
     summary = {
         cohort: {
-            m: {
+            metric: {
                 "count": len(rs),
-                "max": max(r[m] for r in rs),
+                "max": max((r[metric] for r in rs), default=None),
                 "above_fixed_line": sum(
-                    r[m] > (0.02 if m == "icrf_position_error_arcsec" else 0.002)
+                    r[metric]
+                    > (0.02 if metric == "icrf_position_error_arcsec" else 0.002)
                     for r in rs
                 ),
             }
-            for m in metrics
+            for metric in metrics
         }
         for cohort in ["development", "holdout", "all"]
         for rs in [[r for r in available if cohort == "all" or r["cohort"] == cohort]]
     }
     numeric_failed = any(
-        r["v1_error_arcsec_per_day"] > 0.002 or r["icrf_position_error_arcsec"] > 0.02
+        r["current_fixed_source_rate_error_arcsec_per_day"] > 0.002
+        or r["icrf_position_error_arcsec"] > 0.02
         for r in available
     )
     reference_unresolved = len(available) != len(rows) or any(
@@ -401,15 +365,17 @@ def audit(protocol, reference, candidate=None, *, production_order=False):
         "platform": platform.platform(),
         "model": model,
         "request_order": (
-            "domain_and_lahiri_then_icrf" if production_order else "direct_icrf"
+            "domain_and_lahiri_then_icrf"
+            if production_order
+            else "domain_tropical_then_icrf"
         ),
+        "gated_rate_metric": "current_fixed_source_rate_error_arcsec_per_day",
         "fixed_line_arcsec_per_day": 0.002,
         "fixed_position_line_arcsec": 0.02,
         "summary": summary,
         "cases": rows,
         "physical_sources": trace.finish(),
-        "candidate_source_sha256": digest(candidate) if candidate else None,
-        "scope": "Original seven-point failures remain. Experimental full-aberration derivative is unshipped and compared first against the frozen new template here. No authority or prediction certification.",
+        "scope": "Actual maintained fixed-reception source derivative, not a former light-time-only correction. Raw native rates are diagnostic only. Original missing endpoints/reference quality remain; shared frame decoding and native argument-day comparisons do not certify physical TT/TDB equivalence or predictive validity.",
     }
 
 
@@ -417,7 +383,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(__doc__)
     for key in ["protocol", "reference", "output"]:
         parser.add_argument("--" + key, required=True, type=Path)
-    parser.add_argument("--candidate-source", type=Path)
     parser.add_argument("--validate-only", action="store_true")
     parser.add_argument("--production-order", action="store_true")
     args = parser.parse_args()
@@ -432,7 +397,6 @@ if __name__ == "__main__":
         else audit(
             protocol,
             reference,
-            args.candidate_source,
             production_order=args.production_order,
         )
     )

@@ -17,14 +17,14 @@
 
 [月令领域实现](../src/fatebridge/core/classical.py)将建禄、阳刃的资格与“本气是比肩／劫财”分开；戊日未月不能因己土劫财直接命名月刃，戊巳建禄与戊午阳刃也不能只看主气判定。规则依据所选[《秘本子平真诠》书影](https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf)的《论阳刃》（PDF86–87，书页77–78），并以不同命式反例核对。
 
-杂气月增加“透干且有实际会支支持”的有限取格条件；仍保留所有候选，不把会支存在解释为已经合化或成格。PDF65的戊日丁未月命例因此从误报月刃改为正官。后续又按PDF65–66正官章补上本气正官、财印辅助的限定分支，同页乙日壬申月命例不再因印透自动改为印格；详细条件、旧标签和藏干根语义见[本轮四项验证](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-four-axis-validation.md)。`original_structure`、`seat_qualification`、`selection_rule`显示选择依据，不能把标签当完整原典裁定。
+杂气月增加“透干且有实际会支支持”的有限取格条件；仍保留所有候选，不把会支存在解释为已经合化或成格。PDF65的戊日丁未月命例因此从误报月刃改为正官。后续又按PDF65–66正官章补上本气正官、财印辅助的限定分支，同页乙日壬申月命例不再因印透自动改为印格；详细条件和藏干根语义见[八字判定](bazi-assessment.md)。`original_structure`、`seat_qualification`、`selection_rule`显示选择依据，不能把标签当完整原典裁定。
 
 ```bash
 uv run --locked --extra dev python scripts/audit_bazi_classical.py \
   --output /tmp/fatebridge-classical-audit.json
 ```
 
-当前此命令应退出 1，表示算法验收仍未通过。不得通过修改冻结命例或将未裁定强弱补成中和来取得满分。书目、冻结范围及分组状态见[原典对照](bazi-assessment.md#原典对照基准与未覆盖范围)。
+当前此命令应退出 1，表示算法验收仍未通过。不得通过修改冻结命例或将未裁定强弱补成中和来取得满分。书目、冻结范围及分组状态见[原典对照](bazi-assessment.md#原典资料与未决范围)。
 
 ## 同次结果引用核验
 
@@ -44,7 +44,7 @@ verification = verify_calculation_claims(payload, [claim])
 assert verification["status"] == "verified_structured_facts"
 ```
 
-换 run、修改标签或数值、把布尔值当整数、引用不存在或未计算的时间层、以投影结果冒充完整输出均不能通过。哈希核对只在可信原始回执的前提下成立，不提供数字签名，也不能认证自造回执。这一接口适合调用方核对解读所引用的事实；自由文本推论与现实建议仍需独立审核。出生范围的计算与摘要约束见[时运审计](bazi-timing.md#出生时刻范围与解释忠实)。
+换 run、修改标签或数值、把布尔值当整数、引用不存在或未计算的时间层、以投影结果冒充完整输出均不能通过。哈希核对只在可信原始回执的前提下成立，不提供数字签名，也不能认证自造回执。这一接口适合调用方核对解读所引用的事实；自由文本推论与现实建议仍需独立审核。出生范围的计算与摘要约束见[时运审计](bazi-timing.md#范围与检验)。
 
 ## 可证伪的现实预测评估
 
@@ -63,13 +63,13 @@ assert verification["status"] == "verified_structured_facts"
 `StudyPlan.registration_reference`保存外部事前登记引用，`interpretation_policy_sha256`冻结解释政策，
 `baseline_frozen_at`不得晚于计划登记时刻。每条`Forecast.interpretation_policy_sha256`必须与计划一致；
 即使计算模型不变，也不能更换解释政策后混入同一评估。
-这些新增字段为兼容旧记录允许省略，但`protocol_blockers`会逐项列出缺失，
+描述性诊断允许资料尚未齐全，`protocol_blockers`会逐项列出缺失，
 `protocol_status`不会报为完整，且完整预注册门槛保持false；描述性指标仍可计算。
 填写引用、时间及散列只构成内部声明，外部登记真实性和执行时间仍须独立核验。
 
-通用评估器v4另核对每条预测与结果的 `study_plan_sha256`，其值为 `digest(StudyPlan.model_validate_json(plan_text).model_dump(mode="json"))`。它绑定整个校验后方案，包含事件、窗口、队列、基线及统计政策；不是原始文件字节散列。错配直接拒绝，缺少绑定的旧记录仍可作数值诊断，但列出 `missing_forecast_plan_commitment`／`missing_outcome_plan_commitment`，不能通过完整预注册或统计证据门槛。不能在看过结果后补字段并冒充当初承诺。具体反例、生成方法和虚构完整流程见方案绑定核验（本地数据：`validation/other-chart-study-plan-binding.md`）。审计脚本的输出路径必须尚不存在，避免覆盖以前的报告。
+通用评估器v4另核对每条预测与结果的 `study_plan_sha256`，其值为 `digest(StudyPlan.model_validate_json(plan_text).model_dump(mode="json"))`。它绑定整个校验后方案，包含事件、窗口、队列、基线及统计政策；不是原始文件字节散列。错配直接拒绝，缺少绑定的记录仅可作数值诊断，但列出 `missing_forecast_plan_commitment`／`missing_outcome_plan_commitment`，不能通过完整预注册或统计证据门槛。不能在看过结果后补字段并冒充当初承诺。虚构完整流程见下方示例。审计脚本的输出路径必须尚不存在，避免覆盖以前的报告。
 
-输出包括准确率、[NIST Wilson 准确率区间](https://www.itl.nist.gov/div898/handbook/prc/section2/prc241.htm)、Brier分数、固定基线比较与覆盖率。10/10的样本全对，在独立样本假设下95% Wilson下界仍约为72.25%；不能据此宣称总体准确率为100%。现新增`statistical_evidence_gate_met`，以配对损失的Hoeffding保守单侧界检验注册的技能阈值，并对登记检验次数作Bonferroni分配；`preregistered_performance_gate_met`表示点估计、覆盖及协议完整门槛，`registered_numeric_gate_met`只表示数值门槛；统计门槛也不能绕过协议缺失。该方法不是Brier技能比值的专用区间，也不证明现实记录真实性。公式、假设及反例见[精度深化](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-accuracy-depth.md#现实预测点估计与证据门槛分开)。
+输出包括准确率、[NIST Wilson 准确率区间](https://www.itl.nist.gov/div898/handbook/prc/section2/prc241.htm)、Brier分数、固定基线比较与覆盖率。10/10的样本全对，在独立样本假设下95% Wilson下界仍约为72.25%；不能据此宣称总体准确率为100%。现新增`statistical_evidence_gate_met`，以配对损失的Hoeffding保守单侧界检验注册的技能阈值，并对登记检验次数作Bonferroni分配；`preregistered_performance_gate_met`表示点估计、覆盖及协议完整门槛，`registered_numeric_gate_met`只表示数值门槛；统计门槛也不能绕过协议缺失。该方法不是Brier技能比值的专用区间，也不证明现实记录真实性。
 
 `training_subject_ids`可声明训练主体匿名清单；与评估队列重叠会被拒绝，省略时报告`not_declared`，不能假定已经检查无泄漏。概率另按固定五档给出样本数、平均预测概率和实际发生比例；空档保留，不把小样本校准表当效度认证。
 
@@ -112,7 +112,7 @@ uv run --locked --extra dev pytest -q \
 
 `scripts/audit_qimen_study.py` 将每条预测绑定到实际问时、明确的排局口径、完整奇门结果和冻结解释策略，然后逐案重算再交给通用二元结果评估器。它检查研究记录的一致性，不是已经验证的预测模型，也不提供权威认证。
 
-目前没有可核验的真实奇门预测队列。随附第九轮2.6.0规则演示报告（本地数据：`validation/qimen-study-synthetic-v9/report.json`）使用明确标为 `synthetic` 的三个人工案例、全部弃权和空结果列表，可评估数为0，现实效度为 `not_tested`。演示中的目标、日期、主体、记录哈希和时间戳都不是外部登记或经验材料。2.5.0规则演示仍保留在 `qimen-study-synthetic/`；后续规则也只做本地合成重放，不增加真实样本。不同冻结版本须用各自环境重放，不能改写旧记录冒充新版本预测。
+目前没有可核验的真实奇门预测队列。当前演示脚本生成明确标为 `synthetic` 的三个人工案例、全部弃权和空结果列表，可评估数为0，现实效度为 `not_tested`。演示中的目标、日期、主体、记录哈希和时间戳都不是外部登记或经验材料。
 
 ### 输入、策略与封存
 
@@ -125,7 +125,7 @@ uv run --locked --extra dev pytest -q \
 - 真实数据封存使用当前本地时钟，不接受手填历史发布时间。计算期间源码或星历改变、时钟倒退，或实际封存时目标窗口已经开始，均拒绝。合成演示才允许注入时刻。
 - 评估先重算每个实际奇门盘及策略决策，再检查预测、证据哈希与已封存结果。重放检查预测是否由该策略算得；全包指纹另核对是否仍是事前封存的那份计划及预测。真实研究必须提供从独立登记或可信存档取得的事前全包指纹，拒绝缺失或不匹配。仅靠重放不能发现整个计划、基线、队列和收据被一致重做；合成演示可以省略外部指纹，但报告明确标为未锚定的合成包。
 
-第二十一轮采用 `qimen_forecast_commitment_v3`，对应常数／逐例基线二选一的新研究输入。旧v1及v2必须在原固定环境重放，保留当时协议的范围；禁止自动补新字段、重算旧收据后把它当成原来的封存。`study_input_sha256` 在封存时绑定完整输入，不证明计划在问事发生前已经外部登记。
+当前采用 `qimen_forecast_commitment_v3`，对应常数／逐例基线二选一的研究输入。封存不得通过补字段或重算而冒充原来的事前承诺。`study_input_sha256` 在封存时绑定完整输入，不证明计划在问事发生前已经外部登记。
 
 盘级 `qimen.source_disagreements` 可预先固定为 `source_disagreement_action=abstain` 或 `use_declared_rules`。前者保留该例并弃权，后者保留该例分歧并按已声明规则计算；不能看过结果再切换。这个开关不等于所有原典范围、释读和优先未决项都已完成自动裁决或自动弃权。整条引用或冻结条件的检查不认证任意自由文本解释。
 
@@ -157,17 +157,17 @@ uv run --locked --extra dev python scripts/audit_qimen_study.py evaluate \
   --output /tmp/fatebridge-qimen-synthetic-demo/replayed-report.json
 ```
 
-预期：注册案例数3、可评估数0、覆盖率0、`real_world_efficacy=not_tested`、`authority_certified=false`。其中一例保留《演义》已知分歧，一例保留日甲未决身份，一例检查纽约重复钟时的明确偏移。当前实现保留 `casting_at` 对应的实际UTC时刻及IANA时区，全部弃权仍无可评估结果。旧版本把第三例报为计算错误的封存原件仍保留，不能改写旧收据。合成时间可设在未来，不代表已经收集到未来资料。
+预期：注册案例数3、可评估数0、覆盖率0、`real_world_efficacy=not_tested`、`authority_certified=false`。其中一例保留《演义》已知分歧，一例保留日甲未决身份，一例检查纽约重复钟时的明确偏移。当前实现保留 `casting_at` 对应的实际UTC时刻及IANA时区，全部弃权仍无可评估结果。合成时间可设在未来，不代表已经收集到未来资料。
 
 `seal` 的标准输出提供 `commitment_sha256/study_input_sha256`；演示脚本也保存 `seal-receipt.json`。上面只演示读取封存时另存的本地收据，未进行真实外部登记。该指纹计算自经模型验证后的规范化JSON，不是对磁盘JSON文件直接执行 `sha256sum` 的结果；缩进和对象键顺序不影响指纹。
 
-第十五轮修复明确实际时刻转换成当地字段后丢失偏移的问题。公开奇门接口可同时给 `analysis_timezone=America/New_York` 和 `analysis_utc_offset=-04:00`（或该重复小时的 `-05:00`）；偏移须与该命名时区在指定钟时的规则一致，不会把全年时区换成固定偏移。研究接口从已知 `casting_at` 自动提取偏移，历史整秒偏移也保留；裸重复钟时和不存在的钟时继续拒绝。输出 `qimen.calendar_policy.civil_clock_resolution` 保留原偏移、核对后的偏移、fold和实际UTC时刻，正文同步显示。
+公开奇门接口可同时给 `analysis_timezone=America/New_York` 和 `analysis_utc_offset=-04:00`（或该重复小时的 `-05:00`）；偏移须与该命名时区在指定钟时的规则一致，不会把全年时区换成固定偏移。研究接口从已知 `casting_at` 自动提取偏移，历史整秒偏移也保留；裸重复钟时和不存在的钟时继续拒绝。输出 `qimen.calendar_policy.civil_clock_resolution` 保留原偏移、核对后的偏移、fold和实际UTC时刻，正文同步显示。
 
 实际时刻的先后统一换成UTC比较，原记录不改写。包含同一个ZoneInfo对象的重复小时也要遵守注册、起局、记录、发布及结果窗口顺序；窗口未结束或结果记录晚于评估时刻时不能计入。新增回拨对抗案例是软件回归，不是现实预测样本。
 
 ### 真实研究输入
 
-输入结构可参照合成 study.json（本地数据：`validation/qimen-study-synthetic-v9/study.json`），不能沿用其中虚构资料当作实测资料。完整机器字段由 `StudyInput`、`FrozenQimenPolicy`、`Condition` 和通用 `StudyPlan/Outcome` 定义。
+输入结构可参照上方演示命令生成的 `study.json`，不能沿用其中虚构资料当作实测资料。完整机器字段由 `StudyInput`、`FrozenQimenPolicy`、`Condition` 和通用 `StudyPlan/Outcome` 定义。
 
 | 部分 | 必须事先明确的内容 |
 | --- | --- |

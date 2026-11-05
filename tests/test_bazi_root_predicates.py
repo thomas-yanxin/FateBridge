@@ -2,7 +2,6 @@
 
 import asyncio
 import copy
-import gzip
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -11,14 +10,14 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.application.examples import suggested_fields
-from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.output_strength_thresholds import (
     PhysicalRootUnitComparison,
     StrengthThresholdArithmetic,
 )
 from fatebridge.core.strength import DEFAULT_POLICY, _evaluate
 from fatebridge.core.strength_thresholds import threshold_snapshot_lines
-from tests.fixtures.bazi_root_predicate_v1.transport_reader import (
+from tests.bazi_strength_reference_v3 import reconstruct, seasonal_phases
+from tests.bazi_transport_reader import (
     cli_payload,
     file_payload,
     native_with_manifest,
@@ -30,29 +29,23 @@ from tests.test_agentic_nested_outputs import rest as _rest_fixture
 
 rest = _rest_fixture
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_root_predicate_v1"
-FILES = ROOT / "docs/validation/bazi-root-predicate-files-v1"
-PLAN = json.loads((FIXTURE / "implementation-plan-first.json").read_bytes())
-PUBLIC = json.loads((FIXTURE / "public-inputs-first.json").read_bytes())["cases"]
-SELECTED = set(PLAN["public_input_selection"]["indexes"])
-with gzip.open(FILES / "baseline-first-disagreements.jsonl.gz", "rt") as handle:
-    EXAMPLES = {
-        r["index"]: r for line in handle if (r := json.loads(line))["index"] in SELECTED
-    }
+DATA = ROOT / "tests/data/bazi"
+PUBLIC = json.loads((DATA / "root-public-inputs.json").read_text())
+EXAMPLES = {r["index"]: r for r in json.loads((DATA / "root-inputs.json").read_text())}
+SELECTED = set(EXAMPLES)
+BOUNDARIES = json.loads((DATA / "root-boundary-inputs.json").read_text())
 
 
 def evaluate(values, policy=DEFAULT_POLICY):
-    ps = dict(zip(("year", "month", "day", "hour"), map(tuple, values)))
     return _evaluate(
-        ps,
-        ElementAnalysis.seasonal_phases(values[1][1]),
+        dict(zip(("year", "month", "day", "hour"), map(tuple, values))),
+        seasonal_phases(values[1][1]),
         policy,
-        stem_effect_mode="precise_binding_only_v1",
     )
 
 
 @pytest.mark.parametrize("index", sorted(SELECTED))
-def test_first_counterexamples_follow_frozen_independent_exact_expectation(index):
+def test_first_counterexamples_keep_root_predicates_and_current_exact_arithmetic(index):
     first = EXAMPLES[index]
     current = evaluate(first["pillars"])
     receipt = current["threshold_arithmetic"]
@@ -61,34 +54,32 @@ def test_first_counterexamples_follow_frozen_independent_exact_expectation(index
     assert root["rooted_controller_stems"] == first["expected_controller_count"]
     assert root["rooted_wealth_visible"] == first["expected_wealth"]
     assert current["strength_level"] == first["expected_grade"]
-    assert current["root_qualifications"] == first["before"]["root_qualifications"]
-    assert current["relations"] == first["before"]["relations"]
-    assert (
-        current["effective_elements_unrounded"]
-        == first["before"]["effective_elements_unrounded"]
+    # Root masses and predicate thresholds are unaffected by the corrected
+    # seasonal factors. Energy expectations must use the declared v11 table.
+    expected = reconstruct(first["pillars"], current["relations"])
+    assert receipt["energies_exact"] == {
+        element: str(value) for element, value in expected["energies"].items()
+    }
+    assert current["effective_elements_unrounded"] == pytest.approx(
+        {element: float(value) for element, value in expected["energies"].items()},
+        rel=0,
+        abs=1e-12,
     )
-    assert (
-        receipt["energies_exact"]
-        == first["before"]["threshold_arithmetic"]["energies_exact"]
-    )
+    assert receipt["support_exact"] == str(expected["support"])
+    assert receipt["weaken_exact"] == str(expected["weaken"])
+    assert receipt["share_exact"] == str(expected["share"])
+    assert receipt["numerical_label"] == expected["numerical_grade"]
     assert root["effective_classical_root_force"] == "not_adjudicated"
     StrengthThresholdArithmetic.model_validate(receipt)
-    legacy = first["before"]["structural_decision"]
-    assert (
-        root["legacy_float_rooted_controller_stems"]
-        == legacy["rooted_controller_stems"]
-    )
-    assert root["legacy_float_rooted_wealth_visible"] == legacy["rooted_wealth_visible"]
     lines = threshold_snapshot_lines(current)
-    consumed_changed = (
-        first["changes"]["rooted_controller_count"] or first["changes"]["rooted_wealth"]
+    assert bool(lines) == bool(
+        receipt["float_comparison_differs"]
+        or root["rooted_controller_stems"] != root["float_rooted_controller_stems"]
+        or root["rooted_wealth_visible"] != root["float_rooted_wealth_visible"]
     )
-    assert any("财官根量的工程比较" in line for line in lines) == consumed_changed
 
 
-@pytest.mark.parametrize(
-    "case", PLAN["expected_final_changes"], ids=lambda r: str(r["index"])
-)
+@pytest.mark.parametrize("case", BOUNDARIES, ids=lambda r: str(r["index"]))
 @pytest.mark.parametrize("budget,expected", [(1.7, False), (2.0, True), (2.3, True)])
 def test_same_existing_unit_boundary_is_bracketed_without_an_epsilon(
     case, budget, expected
@@ -138,7 +129,7 @@ def test_complete_receipt_cannot_miscount_same_run_visible_financial_or_control_
     receipt = copy.deepcopy(
         evaluate(EXAMPLES[399737]["pillars"])["threshold_arithmetic"]
     )
-    name = ("legacy_float_" if legacy else "") + field
+    name = ("float_" if legacy else "") + field
     current = receipt["physical_root_unit_comparison"][name]
     receipt["physical_root_unit_comparison"][name] = (
         not current if type(current) is bool else (current + 1) % 4

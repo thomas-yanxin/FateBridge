@@ -17,7 +17,7 @@ from fatebridge.services.divination import (
 )
 
 REFERENCE = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-palace-pada-primary.json").read_text()
+    (Path(__file__).parent / "data/sukuyo-palace-pada-primary.json").read_text()
 )
 
 

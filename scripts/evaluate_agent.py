@@ -52,16 +52,12 @@ def source_files(root=ROOT, profile="full", extra_files=()):
         "tests/test_agent_capture.py",
         "tests/test_agent_tool_contract.py",
         "tests/test_bazi_focus_precision.py",
-        "tests/test_bazi_grader_policy.py",
-        "scripts/audit_bazi_grader_policy.py",
         "tests/fixtures/agent_behavior/cases.json",
         "tests/fixtures/agent_behavior/other_chart_cases.json",
         "tests/fixtures/agent_behavior/meihua_semantic_cases.json",
         "tests/fixtures/agent_behavior/ren_semantic_cases.json",
         "tests/fixtures/agent_behavior/taiyi_semantic_cases_v1.json",
         "tests/fixtures/agent_behavior/ren_semantic_refresh_cases_v1.json",
-        "tests/fixtures/ren_semantic_run_v1/report.json",
-        "tests/fixtures/ren_semantic_run_v1/ren_waiting_symbol_not_calendar_prediction/delivery-1.json",
         "tests/test_ren_semantic_refresh_preparation.py",
         "scripts/audit_ren_semantic_refresh.py",
         "tests/fixtures/agent_behavior/jyotish_semantic_cases.json",
@@ -188,33 +184,6 @@ def observations(events):
                         (item.get("result") or {}).get("isError")
                         or (item.get("result") or {}).get("is_error")
                     ),
-                }
-            )
-        for node in walk(item):
-            if isinstance(node.get("command"), str):
-                commands.append(node["command"])
-    return calls, commands
-
-
-def observations_expected_errors(events):
-    calls, commands = [], []
-    for event in events:
-        # Only completed items: started/completed events refer to the same call.
-        if event.get("type") != "item.completed":
-            continue
-        item = event.get("item", {})
-        if item.get("type") == "mcp_tool_call":
-            calls.append(
-                {
-                    "server": item.get("server"),
-                    "tool": item.get("tool"),
-                    "arguments": item.get("arguments", {}),
-                    "status": item.get("status"),
-                    "error": item.get("error"),
-                    "protocol_error": bool(
-                        (item.get("result") or {}).get("isError")
-                        or (item.get("result") or {}).get("is_error")
-                    ),
                     "error_response": error_response(item.get("result") or {}),
                 }
             )
@@ -277,116 +246,8 @@ def expected_error_call(call, expected):
     )
 
 
-def grade(case, events, final, returncode):
+def grade_case(case, events, final, returncode, captured_tool_records=None):
     calls, commands = observations(events)
-    own = [c for c in calls if c["server"] == "fatebridge"]
-    names = {c["tool"] for c in own}
-    failures = []
-    if returncode or not final.strip():
-        failures.append("execution_failed_or_empty_answer")
-    if any(c["server"] != "fatebridge" for c in calls):
-        failures.append("unexpected_external_service")
-    last = {c["tool"]: c for c in own}
-    if any(
-        c["status"] == "failed" or c["error"] or c["protocol_error"]
-        for c in last.values()
-    ):
-        failures.append("unrecovered_tool_failure")
-    for choices in case.get("required_any", []):
-        if not names.intersection(choices):
-            failures.append("missing_tool:" + "|".join(choices))
-    if case.get("no_calculation") and any(
-        name
-        not in {
-            "knowledge_read",
-            "knowledge_registry",
-            "read_mcp_resource",
-            "list_mcp_resources",
-            "list_mcp_resource_templates",
-        }
-        for name in names
-    ):
-        failures.append("unexpected_calculation")
-    if names.intersection(case.get("forbidden_tools", [])):
-        failures.append("out_of_scope_tool")
-    if "allowed_tools" in case and names - set(case["allowed_tools"]):
-        failures.append("out_of_scope_tool")
-    skill_sets = case.get("expected_skill_sets") or (
-        [[case["expected_skill"]]] if case.get("expected_skill") else []
-    )
-    if skill_sets and not any(
-        all(
-            any(skill in cmd and "SKILL.md" in cmd for cmd in commands)
-            for skill in group
-        )
-        for group in skill_sets
-    ):
-        failures.append(
-            "skill_not_observed:" + "|".join("+".join(group) for group in skill_sets)
-        )
-    for name, expected in case.get("arguments", {}).items():
-        selected = [c for c in own if c["tool"] == name]
-        if not selected or any(
-            c["arguments"].get(key) != value
-            for c in selected
-            for key, value in expected.items()
-        ):
-            failures.append("input_mismatch:" + name)
-    for name, expected in case.get("argument_paths", {}).items():
-        selected = [c for c in own if c["tool"] == name]
-        if not selected or any(
-            not _same_argument_path(c["arguments"], path, value)
-            for c in selected
-            for path, value in expected.items()
-        ):
-            failures.append("input_mismatch:" + name)
-    for name, expected in case.get("instant_arguments", {}).items():
-        selected = [c for c in own if c["tool"] == name]
-
-        def same_instant(actual, expected):
-            try:
-                actual_time = datetime.fromisoformat(actual)
-                expected_time = datetime.fromisoformat(expected)
-                return (
-                    actual_time.utcoffset() is not None
-                    and expected_time.utcoffset() is not None
-                    and actual_time == expected_time
-                )
-            except (TypeError, ValueError):
-                return False
-
-        if not selected or any(
-            not same_instant(c["arguments"].get(key), value)
-            for c in selected
-            for key, value in expected.items()
-        ):
-            failures.append("instant_mismatch:" + name)
-    for name, maximum in case.get("max_successful_calls", {}).items():
-        successful = [
-            c
-            for c in own
-            if c["tool"] == name
-            and c["status"] == "completed"
-            and not c["error"]
-            and not c["protocol_error"]
-        ]
-        if len(successful) > maximum:
-            failures.append("repeated_calculation:" + name)
-    if case.get("full_export"):
-        selected = [c for c in own if c["tool"] == case["full_export"]]
-        if not selected or selected[0]["arguments"].get("fields") is not None:
-            failures.append("projected_full_export")
-    return {
-        "mechanical_checks_passed": not failures,
-        "failures": failures,
-        "tool_calls": own,
-        "commands": commands,
-        "manual_review": case["manual_review"],
-    }
-
-
-def grade_expected_errors(case, events, final, returncode, captured_tool_records=None):
-    calls, commands = observations_expected_errors(events)
     own = [c for c in calls if c["server"] == "fatebridge"]
     # Some CLI versions mark a returned MCP business error as status=failed and
     # omit isError. Only an identity-matched, independently captured server reply
@@ -531,26 +392,7 @@ def grade_expected_errors(case, events, final, returncode, captured_tool_records
 
 
 # These ids describe predeclared case contracts, never model outcomes.
-LEGACY_GRADING_POLICY = "observable_tools_v1"
-EXPECTED_ERRORS_GRADING_POLICY = "expected_errors_v1"
-
-
-def scoring_policy(case):
-    """The presence of an explicit new case contract opts into the extension."""
-    return (
-        EXPECTED_ERRORS_GRADING_POLICY
-        if "expected_tool_errors" in case or "max_total_calls" in case
-        else LEGACY_GRADING_POLICY
-    )
-
-
-def grade_case(case, events, final, returncode, captured_tool_records=None):
-    """Route actual execution; legacy cases use the unwrapped frozen grader."""
-    if scoring_policy(case) == LEGACY_GRADING_POLICY:
-        return grade(case, events, final, returncode)
-    return grade_expected_errors(
-        case, events, final, returncode, captured_tool_records=captured_tool_records
-    )
+GRADING_POLICY = "observed_calls_and_declared_errors_v2"
 
 
 def _same_argument_path(arguments, path, expected):
@@ -807,7 +649,7 @@ def run_case(
         "elapsed_seconds": round(time.monotonic() - started, 2),
         "exit_code": code,
         "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
-        "grading_policy": scoring_policy(case),
+        "grading_policy": GRADING_POLICY,
         **grade_case(case, events, final, code),
     }
     if "evaluation_layer" in case:

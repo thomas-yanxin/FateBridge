@@ -11,8 +11,7 @@ from pathlib import Path
 from scripts.gen_human_design_calendar_horizons import KERNEL_SHA256, ROOT, plan
 
 ABLATION_PLAN = (
-    ROOT
-    / "docs/validation/human-design-calendar-horizons-v1/evidence/ablation-plan.json"
+    ROOT / "tests/data/human_design/calendar_horizons/evidence/ablation-plan.json"
 )
 ABLATION_SHA256 = "117ff676a27142f549f6d152005ce37424ee038d9124d1a0b9db58954211bb63"
 
@@ -60,7 +59,6 @@ def derive(output: Path) -> None:
         value = {
             "method_id": "human_design_skyfield_no_deflectors_diagnostic_v1",
             "ablation_plan_sha256": ABLATION_SHA256,
-            "generator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             "kernel_sha256": KERNEL_SHA256,
             "versions": fixed["reference_versions"],
             "deflectors": [],

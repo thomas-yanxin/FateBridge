@@ -129,7 +129,7 @@ def test_published_compact_view_and_partial_contract(topic, rest):
         else body[topic + "_analysis"]["evidence_chain"]
     )
     context = chain["strength_context"]
-    assert context["method_id"] == "season_root_revelation_relations_v11"
+    assert context["method_id"] == "season_root_revelation_relations_v12"
     StemEnergyAccounting.model_validate(context["stem_energy_accounting"])
     StemEnergyRow.model_validate({"energy": 0.1})  # legal object projection
     with pytest.raises(ValidationError):

@@ -19,8 +19,9 @@
 ## 计算路径
 
 - 中式全景用 `timing_analysis`，窄层分别为 `dayun_analysis`、`liunian_analysis`、`liuyue_analysis`、`liuri_analysis`、`liushi_analysis`。专项已有 `timing_context` 的大运流年在同一目标范围与精度内复用；日期级零点不能替代交节当日指定小时，见下方边界补证。独立大运默认按目标真实瞬间选运；`analysis_age`只是用户明确给出的年龄参考，不必由助手推算或自套虚岁。
+- 读取流时 `life_dimensions` 时同时读取 `life_dimensions_assessment`，核对 `life_dimension_tanh_v2`、参与层与缺项。爱情为null表示性别口径不足，未知大运与尚未起运分别保留。索引只可在同方法、同参与层内比较，不作为现实成功率或心理测量。
 
-问“当前”时，五个八字时间入口的分析日期分量全部省略，必要时以带时区`as_of`冻结已确认瞬间；不要只补上当前年月而触发旧部分日期的日1／日15规则。读取`analysis_reference`核对完整当地／UTC瞬间、偏移、fold及补齐来源。显式日期的不存在／重复钟时不能猜第一遍；可保持出生时区、用`as_of`表达已确认UTC瞬间。时柱整点标签不能替代交气或交运的完整比较时刻，见[分析瞬间](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-analysis-instant.md)。
+问“当前”时，五个八字时间入口的分析日期分量全部省略，必要时以带时区`as_of`冻结已确认瞬间；不要只补上当前年月而触发旧部分日期的日1／日15规则。读取`analysis_reference`核对完整当地／UTC瞬间、偏移、fold及补齐来源。显式日期的不存在／重复钟时不能猜第一遍；可保持出生时区、用`as_of`表达已确认UTC瞬间。时柱整点标签不能替代交气或交运的完整比较时刻，见[分析瞬间](../../docs/bazi-timing.md)。
 - 紫微用 `ziwei_horoscope` 的实际 scopes 和动态四化；普通首轮取 `analysis_context`、`birth_context`、`ziwei_horoscope.interpretation_scope/nominal_age/calendar_rules/scopes`。`analysis_context` 须回显目标，出生 context 与目标分开。scopes 整体取回再按本次粒度解释；运限命宫所临本命宫、完整运限其他功能宫、本命宫不能互换，四化优先读实际 `mutagen_natal_links`。已有连接无需再排本命，细则见[紫微专题取证](ziwei-topic-evidence.md)。
 - 西占多层确有价值时用 `western_timing_analysis`；阶段窄问可直接 `firdaria`，年度可选 `profection`，按问题选 `solarreturn`、`lunarreturn`、`transit`，另有 `zr`、`decennials`、`solararc`、`pd`、`pdchart`、`givenyear` 及相关生命周期技法。保留法达实际主／分运、时间线、夜盘顺序和年长口径；不自行换版本找更好的答案。
 - 给定活动时刻用 `astro_election`。先有活动、地点和现实可用候选，不索取无关出生资料；不使用医疗／手术主题，不由个人流日替代活动择时。

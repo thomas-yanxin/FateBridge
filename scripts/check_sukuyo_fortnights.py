@@ -14,7 +14,7 @@ from fatebridge.core.sukuyo_fortnights import declared_fortnight_ordinal
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "src/fatebridge/data/sukuyo_fortnights.json"
-FIXTURE = ROOT / "tests/fixtures/sukuyo-fortnight-before-production-v69.json"
+FIXTURE = ROOT / "tests/data/sukuyo-fortnight-before-production-v69.json"
 
 
 def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:

@@ -1,41 +1,23 @@
 """A scoring assignment must never be described as geometric occupancy."""
 
-import hashlib
 import json
 from pathlib import Path
-from zipfile import ZipFile
 
 import pytest
 
+from tests.reference_data import verify_source_files
 from tests.test_western_lilly_fortitudes import inputs, result, row
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/western-lilly-house-wording-v1"
+FIXTURE = ROOT / "tests/data/astro/lilly_house_wording"
 PROTOCOL = json.loads((FIXTURE / "protocol.json").read_text())
 HOUSE_CODES = {"F01", "F02", "F03", "F04", "F05", "D01", "D02"}
 
 
 def test_house_wording_reference_precedes_candidate_and_keeps_real_counterexamples():
-    manifest = json.loads((FIXTURE / "manifest.json").read_text())
-    assert (
-        hashlib.sha256((FIXTURE / "protocol.json").read_bytes()).hexdigest()
-        == manifest["protocol_sha256"]
-    )
+    verify_source_files(FIXTURE)
     assert len(PROTOCOL["cases"]) == 12
     assert not PROTOCOL["numeric_rule_or_source_weight_change"]
-    assert (
-        sum(
-            len(r["observed_counterexamples"])
-            for r in PROTOCOL["real_preexisting_captures"]
-        )
-        == 5
-    )
-    with ZipFile(FIXTURE / "prior-native-responses.zip") as archive:
-        for capture in PROTOCOL["real_preexisting_captures"]:
-            assert (
-                hashlib.sha256(archive.read(Path(capture["path"]).name)).hexdigest()
-                == capture["sha256"]
-            )
 
 
 @pytest.mark.parametrize(

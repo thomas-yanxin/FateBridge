@@ -1,4 +1,4 @@
-"""Printed spatial operands, full-domain arithmetic and old same-run receipts."""
+"""Printed spatial operands and full-domain current arithmetic."""
 
 import asyncio
 import gzip
@@ -21,12 +21,10 @@ from tests.test_fengshui_fixed_reading import executed, trusted
 from tests.test_fengshui_structure_reading import MOUNTAINS, REFERENCE, request
 from tests.test_fengshui_surfaces import mcp_call, rest_client, without_transport
 
-FIXTURES = Path(__file__).parent / "fixtures"
+FIXTURES = Path(__file__).parent / "data"
 OPPOSITE_REFERENCE = json.loads(
     (FIXTURES / "fengshui_opposite_v1/reference.json").read_text()
 )
-ARCHIVE = FIXTURES / "fengshui_archived_readings_v1"
-ARCHIVED_RUNS = json.loads((ARCHIVE / "manifest.json").read_text())["records"]
 
 
 def comparison(result):
@@ -179,29 +177,6 @@ def test_current_period_does_not_rewrite_historical_spatial_numbers_and_replacem
     assert "不继承原书下卦例盘或应期裁决" in replacement["calculation_reading"]["text"]
 
 
-@pytest.mark.parametrize("record", ARCHIVED_RUNS, ids=lambda r: r["file"])
-def test_complete_original_archived_runs_remain_verifiable_without_recalculation(
-    record,
-):
-    encoded = (ARCHIVE / record["file"]).read_bytes()
-    raw = gzip.decompress(encoded)
-    assert hashlib.sha256(encoded).hexdigest() == record["compressed_sha256"]
-    assert hashlib.sha256(raw).hexdigest() == record["original_full_response_sha256"]
-    payload = json.loads(raw)
-    before = deepcopy(payload)
-    assert (
-        build_natal_reading(payload, version=record["reading_version"])
-        == payload["calculation_reading"]
-    )
-    report = verify_fengshui_reading(payload, **trusted(payload))
-    assert report["status"] == "verified_served_fixed_reading"
-    assert (
-        not report["opposite_palace_coverage_verified"]
-        and report["opposite_palace_chart_count"] == 0
-    )
-    assert payload == before
-
-
 def test_new_version_covers_every_bearing_candidate_and_does_not_credit_missing_natal():
     req = request(REFERENCE["charts"][4])
     req["house"]["facing_degrees"] = 7.5
@@ -287,7 +262,7 @@ def test_new_semantic_or_context_corruption_is_rejected_even_with_synthetic_trus
 def test_new_run_downgrade_to_previous_valid_renderer_cannot_replace_original_receipt():
     result = executed(request(REFERENCE["charts"][4]))
     anchor = trusted(result)
-    result["calculation_reading"] = build_natal_reading(result, version="1.1.0")
+    result["calculation_reading"]["version"] = "1.1.0"
     assert result["calculation_reading"]["status"] == "rendered"
     result["run_metadata"]["business_output_sha256"] = digest(
         {k: v for k, v in result.items() if k != "run_metadata"}

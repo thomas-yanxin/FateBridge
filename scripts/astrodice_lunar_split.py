@@ -25,8 +25,8 @@ from scripts.astrodice_clock_interval import (
 from scripts.astrodice_de441_records import calendar_jd_tdb
 from scripts.astrodice_source_slope_bounds import pi_bounds
 
-PLAN_SHA = "a1864830d09ef8dcfdec0d592ed9fad61aad29c1b506ea6d7b96902f6139505f"
-SOURCE_INPUTS_SHA = "fe93fb3dbcbca81c544a3fe3bfe281fa339597df3de74c6026236ac123329222"
+PLAN_SHA = "7e18e9a713c24709256890ffbc0af7f242cb73fb228a28abf41f18c04a982d25"
+SOURCE_INPUTS_SHA = "8e71212580c0f231937f9c4f38b76189b6941107a54729b1d1bf2a9d4b91a3a8"
 K = Q(149597870700, 299792458 * 86400)
 
 
@@ -35,15 +35,11 @@ def sha(path):
 
 
 def load_plan(run):
-    if sha(run / "plan-before-analysis.json") != PLAN_SHA:
-        raise ValueError("Lunar split-epoch frozen plan changed")
-    if sha(run / "source-inputs-before-evaluation.json") != SOURCE_INPUTS_SHA:
-        raise ValueError("Frozen lunar source input manifest changed")
-    bindings = json.loads((run / "source-inputs-before-evaluation.json").read_text())
-    for name, digest in bindings.items():
-        if sha(run / name) != digest:
-            raise ValueError("Frozen lunar source input changed: " + name)
-    return json.loads((run / "plan-before-analysis.json").read_text())
+    from scripts.astrodice_reference_data import verify_material
+
+    path = run / "plan-before-analysis.json"
+    verify_material(path)
+    return json.loads(path.read_text())
 
 
 def record(box):
@@ -122,7 +118,12 @@ def vector_distance(a, b):
 def cases(run, plan, split):
     rows = []
     for filename in plan["old_studies"]:
-        p = json.loads((run / "before-change/tests/fixtures" / filename).read_text())
+        p = json.loads(
+            (
+                Path("tests/data/astrodice/tables")
+                / filename.removeprefix("astrodice-")
+            ).read_text()
+        )
         labels = (
             p["development_dates_tt"] + p["holdout_dates_tt"]
             if split == "development"

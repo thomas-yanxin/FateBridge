@@ -7,20 +7,30 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.examples import suggested_fields
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_source_comparison_transports import (
     SPEC,
     business,
     call_cli,
     native,
     reject_bad_fact,
-    rest,
 )
 
+rest = _shared_rest
+
 ROOT = Path(__file__).resolve().parents[1]
-STUDY = ROOT / "docs/validation/bazi-editorial-annotation-projection-v1"
-CASES = json.loads((STUDY / "transport-case-selection-first.json").read_text())["cases"]
-PLAN = json.loads((STUDY / "protocol-first.json").read_text())
-PATCHES = {p["reference_id"]: p for p in PLAN["patches"]}
+CASES = json.loads(
+    (ROOT / "tests/data/bazi/editorial-transport-inputs.json").read_text()
+)
+PATCHES = {
+    r["reference_id"]: r
+    for r in json.loads(
+        (
+            ROOT / "src/fatebridge/data/reference/bazi-source-annotations.json"
+        ).read_text()
+    )["records"]
+    if "editorial_annotation_provenance" in r
+}
 
 
 @pytest.mark.parametrize("project", [False, True])
@@ -60,21 +70,21 @@ def test_editorial_notes_and_original_failures_full_and_projected_on_all_surface
             assert (
                 row["annotation_basis"]
                 == row["retained_context"]
-                == patch["source_record"]["annotation"]
+                == patch["annotation_basis"]
             )
             assert (
                 row["editorial_annotation_provenance"]
-                == patch["after"]["editorial_annotation_provenance"]
+                == patch["editorial_annotation_provenance"]
             )
             assert (
                 row["retained_strength_annotation"]
-                == patch["before"]["retained_strength_annotation"]
+                == patch["retained_strength_annotation"]
             )
             assert (
                 row["editorial_annotation_provenance"]["is_verbatim_original_text"]
                 is False
             )
-            assert PLAN["summary_note"] in result["summary"]
+            assert "已附登记编辑说明" in result["summary"]
         if case["case_id"] == "known_original_disagreement":
             assert comparison["status"] == "known_annotation_mismatch"
             assert comparison["retained_expected_strengths"] == ["弱"]

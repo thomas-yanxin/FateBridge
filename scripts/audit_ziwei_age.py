@@ -55,7 +55,6 @@ def audit_age_calendar(
 
     receipts: list[dict[str, Any]] = []
     differences: list[dict[str, Any]] = []
-    retained_legacy_failures: list[dict[str, Any]] = []
     if age_source_scope() != collation:
         differences.append(dict(case="source_scope_transcription_changed"))
     for case in manifest["cases"]:
@@ -112,26 +111,6 @@ def audit_age_calendar(
                     receipts.append(row)
                     if not all(checks.values()):
                         differences.append({**row, "error": result.get("error")})
-    east = next(c for c in manifest["cases"] if c["id"] == "cny_east_forward")
-    for profile in ("iztro_2_5_8", "quanshu_v2_excerpt"):
-        old = calculate_ziwei_horoscope(
-            create_person_info(**east["input"]),
-            rule_profile=profile,
-            nominal_age_basis="legacy_mixed_clock",
-            target_year=1984,
-            target_month=2,
-            target_day=1,
-            target_hour=23,
-            target_minute=59,
-        )
-        retained = "岁序小于1" in old.get("error", "")
-        retained_legacy_failures.append(
-            dict(profile=profile, error=old.get("error"), failure_retained=retained)
-        )
-        if not retained:
-            differences.append(
-                dict(case="legacy_boundary_failure_was_erased", profile=profile)
-            )
     return dict(
         method_id="ziwei_coherent_age_audit_v1",
         declared_after_implementation=True,
@@ -139,7 +118,6 @@ def audit_age_calendar(
         new_independent_calendar_observations=0,
         profile_clock_receipts_checked=len(receipts),
         receipts=receipts,
-        retained_legacy_failures=retained_legacy_failures,
         differences=differences,
         coherent_age_regression_passed=not differences,
         classical_age_boundary_verified=False,

@@ -1,11 +1,9 @@
 """Timezone-source faults reject the complete reading on every public adapter."""
 
 import asyncio
-import gzip
 import hashlib
 import json
 from io import BytesIO
-from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -135,24 +133,3 @@ def test_valid_named_zone_still_has_a_complete_verified_reading():
     assert value["clock_evidence"]["timezone_rules"]["tzif_sha256"] == expected
     check = verify_human_design_reading(value)
     assert check["status"] == "verified_fixed_template_reading", check
-
-
-def test_original_accepted_mixed_source_counterexample_is_now_rejected():
-    path = (
-        Path(__file__).parent
-        / "fixtures/human_design_timezone_source_v1/mixed-source-run.json.gz"
-    )
-    assert (
-        hashlib.sha256(path.read_bytes()).hexdigest()
-        == "e4fe7500ff0d9732b181d717cb97ae3e33b77ad47b27839d0caef2c199b16cd4"
-    )
-    with gzip.open(path, "rt") as stream:
-        value = json.load(stream)
-    # The original payload and original business hash are retained verbatim.
-    assert value["birth_utc"] == "1980-07-01T16:00:00+00:00"
-    assert (
-        value["clock_evidence"]["timezone_rules"]["tzif_sha256"]
-        == "8b85846791ab2c8a5463c83a5be3c043e2570d7448434d41398969ed47e3e6f2"
-    )
-    check = verify_human_design_reading(value)
-    assert check["status"] == "rejected", check

@@ -5,12 +5,16 @@ import asyncio
 import pytest
 
 from fatebridge.application.examples import suggested_fields
-from tests.test_agentic_nested_outputs import business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_birth_seconds import SPECS
 from tests.test_bazi_dayun_state_clipping import SELECTED
 
 CASES = [SELECTED[0], SELECTED[10]]
 TOOLS = [s for s in SPECS if s.key in {"timing_analysis", "dayun_analysis"}]
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("row", CASES, ids=lambda r: r["id"])

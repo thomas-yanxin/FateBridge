@@ -21,9 +21,7 @@ from fatebridge.core.sukuyo_sources import load_source
 
 
 def test_two_image_witnesses_match_before_code_facts_without_erasing_emendation():
-    raw = (
-        Path(__file__).parent / "fixtures/sukuyo-shoku766-source-v1.json"
-    ).read_bytes()
+    raw = (Path(__file__).parent / "data/sukuyo-shoku766-source-v1.json").read_bytes()
     assert hashlib.sha256(raw).hexdigest() == (
         "f207ffd8d4adf29ac9f6d51c5328eb3ce8ed8087ef7388b101bbc69f9453967d"
     )
@@ -154,7 +152,7 @@ def test_product_explanation_preserves_base_emendation_retrospection_and_limits(
 
 def test_complete_fixed_host_scope_preserves_every_before_code_row_and_unknown():
     raw = (
-        Path(__file__).parent / "fixtures/sukuyo-dayan-advance-host-v1.json"
+        Path(__file__).parent / "data/sukuyo-dayan-advance-host-v1.json"
     ).read_bytes()
     assert (
         hashlib.sha256(raw).hexdigest()

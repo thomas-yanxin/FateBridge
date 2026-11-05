@@ -9,7 +9,7 @@ import pytest
 from fatebridge.application.examples import suggested_fields
 from fatebridge.core.output_classical_passage import ClassicalPassage
 from fatebridge.core.output_passage_relations import PassageRelationContext
-from tests.fixtures.bazi_root_predicate_v1.transport_reader import (
+from tests.bazi_transport_reader import (
     cli_payload,
     file_payload,
     native_with_manifest,
@@ -21,11 +21,7 @@ from tests.test_agentic_nested_outputs import rest as _rest_fixture
 
 rest = _rest_fixture
 ROOT = Path(__file__).resolve().parents[1]
-PUBLIC = json.loads(
-    (
-        ROOT / "tests/fixtures/bazi_root_predicate_v1/public-inputs-first.json"
-    ).read_bytes()
-)["cases"]
+PUBLIC = json.loads((ROOT / "tests/data/bazi/root-public-inputs.json").read_text())
 
 
 def get(payload, path):

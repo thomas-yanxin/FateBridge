@@ -17,7 +17,7 @@ from fatebridge.core.sukuyo_sanskrit_editions import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-REFERENCE = ROOT / "tests/fixtures/sukuyo-sanskrit-before-production-v80.json"
+REFERENCE = ROOT / "tests/data/sukuyo-sanskrit-before-production-v80.json"
 
 
 class TextReader(HTMLParser):

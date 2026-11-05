@@ -7,7 +7,7 @@ from calendar import monthrange
 from collections import Counter
 from datetime import datetime, timedelta
 from fractions import Fraction
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Mapping, Optional
 
 from fatebridge.core.astro.birth import (
     AstroBirthInfo,
@@ -15,6 +15,7 @@ from fatebridge.core.astro.birth import (
     require_resolved_birth_timezone,
 )
 from fatebridge.core.astro.geometry import (
+    Angle,
     angular_separation_fraction,
     combine_longitudes,
     normalize_angle,
@@ -586,8 +587,8 @@ def extract_named_longitudes(
 
 def collect_aspect_hits(
     *,
-    source_longitudes: Dict[str, float],
-    target_longitudes: Dict[str, float],
+    source_longitudes: Mapping[str, Angle],
+    target_longitudes: Mapping[str, Angle],
     orb_limit: float = 1.5,
 ) -> List[Dict[str, Any]]:
     if not math.isfinite(orb_limit) or not 0 <= orb_limit <= 180:

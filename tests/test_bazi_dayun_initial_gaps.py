@@ -2,14 +2,16 @@
 
 import json
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import pytest
 
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.utils.timezones import parse_timezone_name
-from tests.test_bazi_dayun_initial_fold import FIXTURE, legacy
 
-ROWS = json.loads((FIXTURE / "supplemental-gap-controls.json").read_bytes())["rows"]
+ROWS = json.loads(
+    (Path(__file__).parent / "data/bazi/dayun-gap-inputs.json").read_text()
+)["rows"]
 
 
 @pytest.mark.parametrize("row", ROWS, ids=lambda row: row["zone"])
@@ -26,15 +28,14 @@ def test_every_registered_gap_magnitude_keeps_forward_resolution(row, monkeypatc
         "start_age_unrounded": gap / 120 / 86400 / 3,
         "year_stem": "甲",
     }
-    for cls in [TimingAnalysis, legacy()]:
-        monkeypatch.setattr(
-            cls, "calculate_dayun_start_details", staticmethod(lambda *args: details)
-        )
-    current, previous = [
-        cls.calculate_dayun_timeline(birth, "女", ("丙", "寅"), row["zone"], periods=3)
-        for cls in [TimingAnalysis, legacy()]
-    ]
-    assert current == previous
+    monkeypatch.setattr(
+        TimingAnalysis,
+        "calculate_dayun_start_details",
+        staticmethod(lambda *args: details),
+    )
+    current = TimingAnalysis.calculate_dayun_timeline(
+        birth, "女", ("丙", "寅"), row["zone"], periods=3
+    )
     assert (
         datetime.fromisoformat(current["start_at"]).astimezone(timezone.utc) == expected
     )

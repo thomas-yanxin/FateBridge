@@ -181,7 +181,6 @@ class CareerStructure(PartialOutput):
     score_basis: Optional[str] = None
     score: Optional[int] = None
     level: Optional[str] = None
-    legacy_level: Optional[str] = None
     notes: Optional[List[str]] = None
     formation_status: Optional[Literal["heuristic_candidate_only"]] = None
     rule_signals: Optional[List[CareerRuleSignal]] = None
@@ -195,7 +194,6 @@ class Entrepreneurship(PartialOutput):
     score_basis: Optional[str] = None
     score: Optional[int] = None
     tendency: Optional[str] = None
-    legacy_tendency: Optional[str] = None
     weighted_counts: Optional[Dict[str, float]] = None
     partial_star_weight: Optional[float] = None
     normal_star_weight: Optional[float] = None
@@ -241,7 +239,6 @@ class WealthStructure(PartialOutput):
     wealth_strength: Optional[float] = None
     score: Optional[int] = None
     notes: Optional[List[str]] = None
-    legacy_pattern: Optional[str] = None
     formation_status: Optional[str] = None
     score_kind: Optional[str] = None
     score_basis: Optional[str] = None

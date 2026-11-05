@@ -13,7 +13,6 @@ from tests.test_liuyao_clash_transports import all_surfaces
 from tests.test_liuyao_transports import assert_same_run_receipt
 from tests.test_liuyao_void_control_qualification import CASES, pair
 
-pytest_plugins = ["tests.test_agentic_nested_outputs"]
 ROOT = "liuyao_evidence.conditional_analysis"
 
 

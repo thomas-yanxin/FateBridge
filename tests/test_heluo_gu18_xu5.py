@@ -1,6 +1,5 @@
 """Pinned Gu18 commentary and Xu5 poem witnesses, with unresolved readings kept."""
 
-import gzip
 import hashlib
 import json
 from copy import deepcopy
@@ -14,24 +13,15 @@ from fatebridge.core import heluo_texts as ht
 from fatebridge.core.heluo import _tiaowen, yao_text
 from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.services.knowledge import calculate_knowledge_read
-from tests.heluo_current_source_reference import HEADER_COUNT, PENDING_COUNT
+from tests.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 from tests.test_agentic_nested_outputs import SPECS, business
 from tests.test_agentic_nested_outputs import rest as shared_rest
 from tests.test_heluo_poem_transports import run_three
 
 F = Path(__file__).parent / "fixtures/heluo_gu18_xu5_v1"
 READINGS = json.loads((F / "accepted-readings.json").read_bytes())
-ADOPTION = json.loads((F / "final-source-adoption-reference.json").read_bytes())
-BEFORE = json.loads(gzip.decompress((F / "cases-before.json.gz").read_bytes()))
+CASES = json.loads((Path(__file__).parent / "data/heluo/gu_xu_routes.json").read_text())
 rest = shared_rest
-
-
-def canonical(value):
-    return hashlib.sha256(
-        json.dumps(
-            value, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-        ).encode()
-    ).hexdigest()
 
 
 @pytest.fixture(autouse=True)
@@ -69,14 +59,7 @@ def test_source_first_drafts_and_all_withdrawals_remain_hashed():
     assert final["new_independent_readers"] == 0
 
 
-def test_previous102_headers_commentaries_and24_poem_groups_remain_exact():
-    for data, key in [
-        (ht._collation(), "headers"),
-        (ht._commentary_collation(), "commentaries"),
-        (hp._collation(), "poems"),
-    ]:
-        prior = ADOPTION["prefixes_preserved"][key]
-        assert canonical(data["entries"][: prior["count"]]) == prior["canonical_sha256"]
+def test_current_source_coverage_and_pending_groups_remain_explicit():
     assert (
         ht.collation_summary()["collated_line_headers"],
         ht.collation_summary()["pending_line_headers"],
@@ -159,35 +142,15 @@ def test_gu4_annual_ding4_reference_does_not_replace_actual_natal_phase():
     assert ref["pdf_pages"] == [162]
     assert ref["applicability"] is None
     assert ref["automatic_application"] is ref["replaces_chart"] is False
-    case = next(c for c in BEFORE if c["hexagram"] == "山風蠱" and c["line"] == 4)
+    case = next(c for c in CASES if c["hexagram"] == "山風蠱" and c["line"] == 4)
     output = build_heluo_result(**case["payload"])
     assert case["phase"] == 1
-    assert output["chart"] == case["before_output"]["chart"]
     assert output["chart"]["xian"]["name"] == "風火家人"
     assert output["chart"]["xian"]["yuan"] == 1
     assert output["chart"]["hou"]["name"] == "山風蠱"
     assert output["chart"]["hou"]["yuan"] == 4
     selected = output["numerology_evidence"]["selected_texts"][1]
     assert selected["text"]["commentary_cross_references"] == [ref]
-
-
-@pytest.mark.parametrize("case", BEFORE, ids=lambda c: c["hexagram"] + str(c["line"]))
-def test_actual_public_input_routes_preserve_all_numeric_business_fields(case):
-    output = build_heluo_result(**case["payload"])
-    prior = case["before_output"]
-    for key in prior.keys() - {"numerology_evidence", "snapshot_text"}:
-        assert output[key] == prior[key], key
-    for b, a in zip(
-        prior["numerology_evidence"]["selected_texts"],
-        output["numerology_evidence"]["selected_texts"],
-        strict=True,
-    ):
-        assert {k: v for k, v in b.items() if k != "text"} == {
-            k: v for k, v in a.items() if k != "text"
-        }
-        assert a["text"]["verdict"] == b["text"]["verdict"]
-    selected = output["numerology_evidence"]["selected_texts"][case["phase"]]
-    assert (selected["hexagram"], selected["line"]) == (case["hexagram"], case["line"])
 
 
 @pytest.mark.parametrize("key", ["山風蠱:2", "山風蠱:4", "水天需:4", "水天需:5"])

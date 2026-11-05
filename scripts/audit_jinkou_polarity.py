@@ -16,7 +16,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/jinkou_polarity_reachability_v1"
-PIN = "1d022b836257b7283b504e1a81e2283e65ddef1012a7689219204afaa7bda183"
+PIN = "0ae525f95df2f12c037f5010ab6c3700c740df278c5bf70e7cda5d80dccf991b"
 
 
 def sha(path: Path) -> str:
@@ -34,7 +34,6 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     expected = {
         "readings.json",
         "reference.json",
-        "generate_reference.py",
         *(f"page-{page:03}.jpg" for page in range(41, 47)),
     }
     if set(manifest["files"]) != expected or {
@@ -55,14 +54,10 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     from scripts.audit_ren_classical import load_frozen_corpus
 
     load_frozen_corpus()
-    spec = importlib.util.spec_from_file_location(
-        "independent_polarity_reference", corpus / "generate_reference.py"
-    )
-    assert spec and spec.loader
-    generator = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(generator)
+    from tests.ren_source_arithmetic import polarity
+
     answer = json.loads((corpus / "reference.json").read_text())
-    if generator.build(readings) != answer or len(answer["cases"]) != 17280:
+    if polarity(readings) != answer or len(answer["cases"]) != 17280:
         raise ValueError("Independent polarity reference cannot be reproduced")
     return dict(readings=readings, reference=answer)
 

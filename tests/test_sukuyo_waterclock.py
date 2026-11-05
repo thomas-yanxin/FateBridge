@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 RAW = (
-    Path(__file__).parent / "fixtures/sukuyo-waterclock-before-production-v73.json"
+    Path(__file__).parent / "data/sukuyo-waterclock-before-production-v73.json"
 ).read_bytes()
 R = json.loads(RAW)
 

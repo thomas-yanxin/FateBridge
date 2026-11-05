@@ -13,9 +13,7 @@ from fatebridge.core.sukuyo_profiles import source_bundle
 from tests.test_sukuyo_witness_research import critical
 
 REFERENCE = json.loads(
-    (
-        Path(__file__).parent / "fixtures/sukuyo-seibunkan-before-code-v97.json"
-    ).read_bytes()
+    (Path(__file__).parent / "data/sukuyo-seibunkan-before-code-v97.json").read_bytes()
 )
 
 

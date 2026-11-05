@@ -21,8 +21,8 @@ from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.time_scales import datetime_from_tt
 
 ROOT = Path(__file__).resolve().parents[1]
-PROTOCOL_SHA256 = "e2a6c87911fb3f65fcdc9b15f5fb017c412aae454278fdda8e9e84ae2b137ae0"
-REFERENCE_SHA256 = "f1596cb384fa05a33d5f36bca9ae34e601bc556a9a1c3debb34d33929297a6d8"
+PROTOCOL_SHA256 = "9c46e6590bbdd5cfb891d499b03f889fffa258e6294b6b7e87bb2eab74b877d5"
+REFERENCE_SHA256 = "4fff4d0817aeb6e4514f6fbae75609357c52eb86c5acc228490470f6195758c3"
 
 
 def digest(path: Path) -> str:
@@ -46,7 +46,6 @@ def load_reference(
         reference["protocol_sha256"] != protocol_sha256
         or reference["versions"] != protocol["versions"]
         or reference["forbidden_implementation_imports"] != []
-        or reference["collector_source_sha256"] != protocol["collector_source_sha256"]
     ):
         raise ValueError("Independent collector provenance changed")
     for target in reference["references"]:
@@ -185,12 +184,12 @@ def main() -> int:
     parser.add_argument(
         "--protocol",
         type=Path,
-        default=ROOT / "tests/fixtures/guolao-longitude-motion-protocol.json",
+        default=ROOT / "tests/data/astro/guolao_motion/protocol.json",
     )
     parser.add_argument(
         "--reference",
         type=Path,
-        default=ROOT / "tests/fixtures/guolao-longitude-motion-reference.json",
+        default=ROOT / "tests/data/astro/guolao_motion/reference.json",
     )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()

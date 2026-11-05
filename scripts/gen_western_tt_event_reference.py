@@ -17,7 +17,7 @@ def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--directory", type=Path, required=True)
     args = parser.parse_args()
-    protocol_path = ROOT / "tests/fixtures/western-tt-events-v1/protocol.json"
+    protocol_path = ROOT / "tests/data/astro/tt_events/protocol.json"
     protocol = json.loads(protocol_path.read_text())
     raw_dir = args.directory / "raw"
     raw_dir.mkdir(parents=True, exist_ok=False)

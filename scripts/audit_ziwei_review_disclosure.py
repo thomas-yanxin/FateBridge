@@ -10,7 +10,7 @@ from typing import Any
 from fatebridge.core.ziwei_sources import ziwei_day_source_evidence
 
 ROOT = Path(__file__).resolve().parents[1]
-FROZEN = ROOT / "tests/fixtures/ziwei_independent/independent_readings_r22_v1"
+FROZEN = ROOT / "tests/data/ziwei_independent/independent_readings_r22_v1"
 TARGET = ROOT / "src/fatebridge/data/classical/ziwei-naj-ming-days-review-r22.json"
 
 
@@ -37,8 +37,8 @@ def audit_review_disclosure() -> dict[str, Any]:
         "frozen_manifest_sha256": hashlib.sha256(
             (FROZEN / "manifest.json").read_bytes()
         ).hexdigest(),
-        "source_report": "docs/validation/ziwei-r22-day-tables-review-raw.json",
-        "separate_erratum": "docs/validation/ziwei-r22-day-tables-review-raw.errata-01.json",
+        "source_report": "tests/data/ziwei_independent/independent_readings_r22_v1/reports/day-review.json",
+        "separate_erratum": "tests/data/ziwei_independent/independent_readings_r22_v1/reports/day-review-errata-01.json",
         "new_edition": False,
         "external_human_experts": 0,
     }

@@ -1,7 +1,6 @@
 """Retain the complete second printed table, including unknowns and conflicts."""
 
 import argparse
-import hashlib
 import json
 from fractions import Fraction
 from pathlib import Path
@@ -12,15 +11,11 @@ from fatebridge.core.lilly_star_orbs import STELLAR_ORB_DEGREES
 from scripts.audit_western_lilly_fortitudes import worked_inputs
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/western-lilly-merchant-1647-v1"
+FIXTURE = ROOT / "tests/data/astro/lilly_merchant_1647"
 
 
-def assess_prior_regulus_resolution():
+def assess_regulus_resolution():
     """Re-evaluate the old diagnosis under the actual corrected stellar rule."""
-    seal = json.loads((FIXTURE / "resolution-supplement-seal.json").read_text())
-    for name, digest in seal.items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
-    old = json.loads((FIXTURE / "prior-stellar-resolution.json").read_text())
     original = json.loads(
         (ROOT / "tests/fixtures/western-lilly-fortitudes-1647.json").read_text()
     )
@@ -56,8 +51,6 @@ def assess_prior_regulus_resolution():
             )
         )
     return dict(
-        prior_diagnosis=old,
-        old_five_degree_diagnosis_preserved=True,
         current_rule_controls=result,
         original_fixture_replaced=False,
         new_independent_original_charts=0,
@@ -66,9 +59,6 @@ def assess_prior_regulus_resolution():
 
 
 def audit():
-    manifest = json.loads((FIXTURE / "manifest.json").read_text())
-    for name, digest in manifest["fixture_files"].items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
     source = json.loads((FIXTURE / "annotation.json").read_text())
     planets = source["planets"]
     states = {
@@ -184,7 +174,7 @@ def audit():
             calculated_classification=combustion_state(venus_lon, sun_lon),
             minute_quantized_source_not_subminute_observational_bound=True,
         ),
-        prior_regulus_resolution=assess_prior_regulus_resolution(),
+        regulus_resolution=assess_regulus_resolution(),
         p115_cross_scope_diagnostic=True,
         p115_method_adopted_as_book3_rule=False,
         numeric_daily_motion_invented=False,

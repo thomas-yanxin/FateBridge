@@ -7,7 +7,6 @@ import pytest
 
 from fatebridge.core.month_duty_scan_reference import build_month_duty_scan_reference
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS
-from scripts.audit_bazi_month_duty_identity import audit
 from tests.test_agentic_nested_outputs import (
     AS_OF,
     SPECS,
@@ -31,21 +30,6 @@ def chart(branch="寅"):
 
 def layer(pillars):
     return build_month_duty_scan_reference(pillars)["cross_chapter_identities"]
-
-
-def test_first_reading_and_complete349_prior_evidence_keep_original_nineteen():
-    result = audit()
-    assert result["record_count"] == 349
-    assert len(result["original_nineteen"]) == 19
-    assert all(r["original_disagreement_remains"] for r in result["original_nineteen"])
-    assert all(
-        r["exact_civil_birth_instant"] is None for r in result["original_nineteen"]
-    )
-    assert result["retained_pages"] == list(range(9, 37))
-    assert result["new_classical_correct_cases_credited"] == 0
-    assert not result["new_force_rules_adopted"]
-    assert result["new_model_executions"] == 0
-    assert result["real_world_predictive_validity"] == "not_tested"
 
 
 @pytest.mark.parametrize("branch", list("寅卯辰巳午未申酉戌亥子丑"))

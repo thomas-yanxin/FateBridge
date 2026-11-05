@@ -12,7 +12,7 @@ from fatebridge.services.timing_uncertainty import analyze_birth_time_range
 from fatebridge.utils.birth_input import PersonInfo
 
 REFERENCE = (
-    Path(__file__).parent / "fixtures/bazi_dayun_calendar_carries_v1/reference.json.gz"
+    Path(__file__).parent / "data/bazi_dayun_calendar_carries_v1/reference.json.gz"
 )
 assert (
     hashlib.sha256(REFERENCE.read_bytes()).hexdigest()

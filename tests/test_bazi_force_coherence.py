@@ -1,10 +1,7 @@
 """Same-receipt body/seal arithmetic must stay coherent without filling gaps."""
 
-import gzip
 import itertools
-import json
 from copy import deepcopy
-from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -15,9 +12,6 @@ from fatebridge.core.output_classical_force import (
     EngineeringForceComposition,
     ForceComponent,
 )
-
-ROOT = Path(__file__).resolve().parents[1]
-FILES = ROOT / "docs/validation/bazi-force-coherence-files-v1"
 
 
 @pytest.mark.parametrize("share", ["0", "1/2", "1"])
@@ -46,9 +40,7 @@ def force(body, seal, basis="unrounded_same_assessment", **composition):
 
 
 @pytest.mark.parametrize("share", [0.0, 0.5, 1.0])
-@pytest.mark.parametrize(
-    "basis", ["unrounded_same_assessment", "rounded_legacy_assessment"]
-)
+@pytest.mark.parametrize("basis", ["unrounded_same_assessment"])
 def test_zero_recorded_float_total_cannot_have_a_defined_body_share(share, basis):
     with pytest.raises(ValidationError):
         ClassicalForceComponents.model_validate(
@@ -56,15 +48,13 @@ def test_zero_recorded_float_total_cannot_have_a_defined_body_share(share, basis
         )
 
 
-@pytest.mark.parametrize(
-    "basis", ["unrounded_same_assessment", "rounded_legacy_assessment"]
-)
+@pytest.mark.parametrize("basis", ["unrounded_same_assessment"])
 @pytest.mark.parametrize(
     "fault",
     [
         {"body_within_support_share": 0.75},
-        {"legacy_float_body_seal_energy_relation": "body_greater"},
-        {"legacy_float_body_seal_energy_relation": "equal"},
+        {"float_body_seal_energy_relation": "body_greater"},
+        {"float_body_seal_energy_relation": "equal"},
         {"body_seal_energy_relation": "body_greater"},
     ],
 )
@@ -140,14 +130,14 @@ def test_known_same_chain_strength_receipt_and_force_facts_cannot_be_mixed(
 
 
 def test_correct_zero_positive_and_float_exact_disagreements_survive():
-    for basis in ["unrounded_same_assessment", "rounded_legacy_assessment"]:
+    for basis in ["unrounded_same_assessment"]:
         ClassicalForceComponents.model_validate(
             force(
                 0.0,
                 0.0,
                 basis,
                 body_within_support_share=None,
-                legacy_float_body_seal_energy_relation="equal",
+                float_body_seal_energy_relation="equal",
             )
         )
         ClassicalForceComponents.model_validate(
@@ -156,7 +146,7 @@ def test_correct_zero_positive_and_float_exact_disagreements_survive():
                 3.0,
                 basis,
                 body_within_support_share=0.0,
-                legacy_float_body_seal_energy_relation="seal_greater",
+                float_body_seal_energy_relation="seal_greater",
             )
         )
         ClassicalForceComponents.model_validate(
@@ -165,7 +155,7 @@ def test_correct_zero_positive_and_float_exact_disagreements_survive():
                 3.0,
                 basis,
                 body_within_support_share=0.25,
-                legacy_float_body_seal_energy_relation="seal_greater",
+                float_body_seal_energy_relation="seal_greater",
             )
         )
     b, s = 0.1, 0.10000000000000002
@@ -175,7 +165,7 @@ def test_correct_zero_positive_and_float_exact_disagreements_survive():
             b,
             s,
             body_within_support_share=b / (b + s),
-            legacy_float_body_seal_energy_relation="seal_greater",
+            float_body_seal_energy_relation="seal_greater",
             comparison_basis="exact_rational_same_assessment",
             body_energy_exact="1/10",
             seal_energy_exact="1/10",
@@ -191,13 +181,13 @@ def test_projection_subsets_keep_missing_unknown_and_never_insert_facts():
         ("components", "seal", "engineering_energy_unrounded"),
         ("engineering_composition", "ratio_basis"),
         ("engineering_composition", "body_within_support_share"),
-        ("engineering_composition", "legacy_float_body_seal_energy_relation"),
+        ("engineering_composition", "float_body_seal_energy_relation"),
     ]
     complete = force(
         1.0,
         3.0,
         body_within_support_share=0.25,
-        legacy_float_body_seal_energy_relation="seal_greater",
+        float_body_seal_energy_relation="seal_greater",
     )
     for flags in itertools.product([False, True], repeat=len(paths)):
         value = {}
@@ -228,35 +218,3 @@ def test_projection_subsets_keep_missing_unknown_and_never_insert_facts():
             },
         }
     )
-
-
-def test_all408_frozen_complete_chains_and_original19_uncertainties_survive():
-    total = original = unresolved = zero = 0
-    with gzip.open(FILES / "all408-before-first.jsonl.gz", "rt") as handle:
-        for line in handle:
-            row = json.loads(line)
-            before = deepcopy(row)
-            BaziEvidenceChain.model_validate(row["natal"])
-            assert row == before
-            comp = row["natal"]["force_components"]["engineering_composition"]
-            if comp["body_energy_exact"] == comp["seal_energy_exact"] == "0":
-                assert (
-                    comp["body_within_support_exact"] is None
-                    and comp["body_within_support_share"] is None
-                )
-                zero += 1
-            if row["case"].get("is_original_nineteen"):
-                original += 1
-                unresolved += (
-                    row["case"]["expected_strength"]
-                    != row["strength"]["strength_level"]
-                )
-                assert set(
-                    row["natal"]["force_components"]["classical_adjudication"].values()
-                ) == {"not_adjudicated"}
-                assert (
-                    row["natal"]["month_command"]["intra_month_duty"]["selected_stem"]
-                    is None
-                )
-            total += 1
-    assert (total, original, unresolved, zero) == (408, 19, 17, 3)

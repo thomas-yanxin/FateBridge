@@ -413,9 +413,7 @@ if __name__ == "__main__":
     fixture = json.loads(args.reference.read_text())
     if digest(args.protocol) != fixture["protocol_sha256"]:
         raise ValueError("Lunar frozen protocol identity changed")
-    previous_path = args.reference.with_name(
-        "astrodice-apparent-position-derivative.json"
-    )
+    previous_path = args.reference.with_name("apparent-position-derivative.json")
     if digest(previous_path) != protocol["development_reference_sha256"]:
         raise ValueError("Lunar development reference identity changed")
     validate_reference(protocol, fixture, json.loads(previous_path.read_text()))

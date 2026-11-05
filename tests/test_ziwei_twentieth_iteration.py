@@ -442,7 +442,7 @@ def test_same_run_claim_rejects_hko_as_the_actual_prefix_implementation():
     )
 
 
-def test_source_attribution_does_not_claim_to_fix_mixed_age_clock():
+def test_source_attribution_keeps_current_civil_age_boundary_unverified():
     person = create_person_info(
         birth_year=1984,
         birth_month=2,
@@ -456,11 +456,17 @@ def test_source_attribution_does_not_claim_to_fix_mixed_age_clock():
     )
     r = calculate_ziwei_horoscope(
         person,
-        nominal_age_basis="legacy_mixed_clock",
         target_year=1984,
         target_month=2,
         target_day=1,
         target_hour=23,
         target_minute=59,
     )
-    assert r["status_code"] == 400 and "此边界暂不支持" in r["error"]
+    horoscope = r["ziwei_horoscope"]
+    receipt = horoscope["nominal_age_calendar"]
+    assert horoscope["nominal_age"] == 1
+    assert receipt["basis"] == "birth_civil_timezone"
+    assert receipt["birth_placement_lunar_year"] == 1984
+    assert receipt["birth_lunar_year"] == receipt["target_lunar_year"] == 1983
+    assert receipt["physical_order_checked"]
+    assert not receipt["age_boundary_classically_verified"]

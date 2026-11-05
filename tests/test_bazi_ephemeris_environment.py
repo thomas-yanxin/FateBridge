@@ -20,8 +20,8 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_solar_provider import clear_solar_caches
 from tests.test_bazi_year_contract import TOPICS
 
@@ -138,6 +138,9 @@ def test_real_file_to_moshier_switch_never_keeps_old_pillars_or_windows(
                 ]["name"]
                 == start
             )
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("topic", TOPICS)

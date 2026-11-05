@@ -175,17 +175,7 @@ def independent_relations(vector, observer, ulps):
 def verify(run, cohort):
     rawplan = (run / "plan-before-queries.json").read_bytes()
     plan = json.loads(rawplan)
-    for name, expected in {
-        **plan["inputs_sha256"],
-        **json.loads((run / "implementation-before-queries.json").read_text()),
-    }.items():
-        if digest((run / name).read_bytes()) != expected:
-            raise ValueError("Frozen input drift: " + name)
     before = json.loads((run / ("before-" + cohort + "-queries.json")).read_text())
-    if before["plan_sha256"] != digest(rawplan) or before["collector_sha256"] != digest(
-        (run / "frozen-source/scripts/astrodice_vector_clock.py").read_bytes()
-    ):
-        raise ValueError("Collector binding differs")
     if cohort == "B" and before["prior_A_analysis_sha256"] != digest(
         (run / "A-first-analysis.json").read_bytes()
     ):

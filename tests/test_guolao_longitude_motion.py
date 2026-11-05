@@ -17,7 +17,8 @@ restore_configuration = shared_sources.restore_configuration
 
 REFERENCE = json.loads(
     (
-        Path(__file__).parent / "fixtures/astrodice-apparent-position-derivative.json"
+        Path(__file__).parent
+        / "data/astrodice/tables/apparent-position-derivative.json"
     ).read_text()
 )
 BY_BODY = {

@@ -46,6 +46,7 @@ dependencies = [
     "python-multipart>=0.0.9",
     "pytz>=2025.2",
     "pywin32>=306 ; sys_platform == 'win32'",
+    "shapely>=2.1,<3",
     "uvicorn>=0.27.0",
 ]
 
@@ -62,6 +63,7 @@ dev = [
     "pyerfa>=2.0.1.5,<3",
     "jplephem>=2.24,<3",
     "pytest-xdist>=3.6.1",
+    "types-shapely>=2.1.0.20261030",
 ]
 jpl = [
     "jplephem>=2.24,<3",
@@ -103,13 +105,13 @@ markers = [
 [tool.black]
 line-length = 88
 target-version = ['py310']
-# Frozen programs are byte-checked regression inputs, not maintained code.
-extend-exclude = '^/tests/fixtures/'
+# External primary references are kept byte-exact rather than reformatted.
+extend-exclude = '^/tests/(fixtures|data)/'
 
 [tool.isort]
 profile = "black"
 multi_line_output = 3
-extend_skip_glob = ["tests/fixtures/**"]
+extend_skip_glob = ["tests/fixtures/**", "tests/data/**"]
 
 [tool.mypy]
 python_version = "3.10"

@@ -31,18 +31,19 @@ def test_autocrlf_keeps_sealed_case_original_answer_and_capture_bytes(tmp_path):
     repository = tmp_path / "repo"
     repository.mkdir()
     checkout = tmp_path / "checkout"
-    paths = [
-        "tests/fixtures/agent_behavior/human_design_semantic_cases_v1.json",
-        *[
-            f"tests/fixtures/human_design_semantics_v1/model-run-desktop/hd_unknown_hour/{n}"
-            for n in ["answer.txt", "events.jsonl", "mcp-calls.jsonl"]
-        ],
-    ]
+    dataset = "tests/fixtures/agent_behavior/human_design_semantic_cases_v1.json"
+    samples = {
+        dataset: (ROOT / dataset).read_bytes(),
+        "answer.txt": "Current synthetic answer.\n中文行。\n".encode(),
+        "events.jsonl": b'{"type":"synthetic.current.event"}\n',
+        "mcp-calls.jsonl": b'{"event":"synthetic.current.call"}\n',
+    }
+    paths = list(samples)
     (repository / ".gitattributes").write_bytes((ROOT / ".gitattributes").read_bytes())
     for name in paths:
         p = repository / name
         p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_bytes((ROOT / name).read_bytes())
+        p.write_bytes(samples[name])
     command = [
         git,
         "-c",
@@ -57,7 +58,7 @@ def test_autocrlf_keeps_sealed_case_original_answer_and_capture_bytes(tmp_path):
     ]:
         subprocess.run(command + args, cwd=repository, check=True, capture_output=True)
     for name in paths:
-        assert (checkout / name).read_bytes() == (ROOT / name).read_bytes(), name
+        assert (checkout / name).read_bytes() == samples[name], name
 
 
 def records():

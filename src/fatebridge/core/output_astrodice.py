@@ -4,10 +4,10 @@ from typing import Dict, List, Literal, Optional
 
 from pydantic import Field, JsonValue
 
+from fatebridge.core import output_charts
 from fatebridge.core.output_base import PartialOutput
 from fatebridge.core.output_charts import (
     ChartProfile,
-    EphemerisReferencePoints,
     HousePositionProjection,
 )
 from fatebridge.core.output_chinese import LocalAngles, LocalHouse, LocalObject
@@ -224,7 +224,7 @@ class DiceSkyParams(PartialOutput):
     housePositionProjection: Optional[HousePositionProjection] = None
     lunarNodeModel: Optional[str] = None
     fortuneDefinition: Optional[FortuneDefinition] = None
-    ephemerisReferencePoints: Optional[EphemerisReferencePoints] = None
+    ephemerisReferencePoints: Optional[output_charts.EphemerisReferencePoints] = None
     motionPolicy: Optional["DiceMotionPolicy"] = None
 
 

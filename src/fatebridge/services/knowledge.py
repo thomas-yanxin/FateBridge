@@ -223,21 +223,21 @@ def calculate_knowledge_registry(
         elif domain_key in DOMAINS:
             registry = build_registry(domain_key)
         elif domain is None or domain == "":
-            legacy = build_knowledge_registry(domain=domain)
+            base_registry = build_knowledge_registry(domain=domain)
             added = [build_registry(name) for name in DOMAINS]
             added.append(human_design_knowledge.build_registry())
             registry = {
-                **legacy,
+                **base_registry,
                 "source": "fatebridge_mixed_knowledge",
                 "bundle_version": None,
                 "domains": [
-                    *legacy["domains"],
+                    *base_registry["domains"],
                     *(item for r in added for item in r["domains"]),
                 ],
                 "provenance": {
                     "source_domain": "fatebridge_mixed_knowledge",
                     "components": [
-                        legacy["provenance"],
+                        base_registry["provenance"],
                         *(r["provenance"] for r in added),
                     ],
                     "added_reference_source": SOURCE,

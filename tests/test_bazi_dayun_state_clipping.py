@@ -2,9 +2,7 @@
 
 import gzip
 import hashlib
-import importlib.util
 import json
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -16,7 +14,7 @@ from fatebridge.services.timing_uncertainty import analyze_birth_time_range
 from fatebridge.utils.birth_input import PersonInfo
 
 ROOT = Path(__file__).resolve().parents[1]
-STUDY = ROOT / "docs/validation/bazi-dayun-state-clipping-v1"
+STUDY = ROOT / "tests/data/bazi/dayun-clipping"
 
 
 def frozen(name):
@@ -190,34 +188,3 @@ def test_snapshot_names_only_additional_events_actually_returned(kind, label):
         line.startswith("本次实际核对的补充事件")
         for line in _birth_range_snapshot_lines(data)
     )
-
-
-@pytest.mark.parametrize(
-    "zone",
-    [
-        "UTC",
-        "America/New_York",
-        "Australia/Lord_Howe",
-        "Pacific/Apia",
-        "Europe/Amsterdam",
-    ],
-)
-@pytest.mark.parametrize("gender", ["男", "女"])
-@pytest.mark.parametrize(
-    "date", [(1900, 1, 15), (1960, 8, 15), (2000, 2, 29), (2020, 11, 1)]
-)
-def test_existing_single_point_timeline_is_exactly_preserved(zone, gender, date):
-    name = "fatebridge.core._dayun_before_state_probes"
-    path = STUDY / "before/src/fatebridge/core/timing.py"
-    spec = importlib.util.spec_from_file_location(name, path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[name] = module
-    spec.loader.exec_module(module)
-    birth = datetime(*date, 12, 34, 56)
-    before = module.TimingAnalysis.calculate_dayun_timeline(
-        birth, gender, ("甲", "子"), zone
-    )
-    after = TimingAnalysis.calculate_dayun_timeline(birth, gender, ("甲", "子"), zone)
-    assert after["start_details"].pop("elapsed_scale") == "nominal_utc_label_seconds"
-    assert after["start_details"].pop("leap_second_policy") == "not_counted"
-    assert after == before

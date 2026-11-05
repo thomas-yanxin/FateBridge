@@ -67,7 +67,7 @@ def test_full_main_and_annual_basis_is_required_and_calculation_bound(fault):
         execution.validate_output(SPEC, AUDIT.corrupt(output(), fault))
 
 
-@pytest.mark.parametrize("fault", ["power", "seasonal_power", "basis", "invalid_month"])
+@pytest.mark.parametrize("fault", ["seasonal_power", "basis", "invalid_month"])
 def test_partial_course_uses_its_present_month_anchor(fault):
     with pytest.raises(ValidationError):
         JinkouCourse.model_validate(AUDIT.corrupt(output(), "sparse_" + fault))
@@ -104,11 +104,11 @@ def test_contradictory_explanation_is_rejected_before_projection_on_three_ports(
 def test_projection_does_not_invent_missing_month_or_five_state_values():
     for value in (
         {},
-        {"rows": [{"power": "旺"}]},
+        {"rows": [{"seasonal_power": "旺"}]},
         {"overview": {"power_basis": None}},
         {
             "qi_evidence": {"month_building_branch": "寅"},
-            "rows": [{"element": "木", "power": None}],
+            "rows": [{"element": "木", "seasonal_power": None}],
         },
     ):
         assert (

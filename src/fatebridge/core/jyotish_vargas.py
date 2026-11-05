@@ -8,6 +8,7 @@ Equal-division coordinates are a declared linear display convention.
 from __future__ import annotations
 
 import math
+from fractions import Fraction
 from typing import Optional
 
 SUPPORTED_DIVISIONS = (2, 3, 7, 9, 10, 12, 30)
@@ -28,14 +29,20 @@ RASI_LORDS = [
 ]
 
 
-def longitude_ratio(longitude: float) -> tuple[int, int]:
+def longitude_ratio(longitude: float | Fraction) -> tuple[int, int]:
     if not math.isfinite(longitude):
         raise ValueError("经度必须为有限数。")
-    n, d = float(longitude).as_integer_ratio()
+    n, d = (
+        longitude.as_integer_ratio()
+        if isinstance(longitude, Fraction)
+        else float(longitude).as_integer_ratio()
+    )
     return n % (360 * d), d
 
 
-def varga_coordinates(longitude: float, division: int) -> tuple[int, Optional[float]]:
+def varga_coordinates(
+    longitude: float | Fraction, division: int
+) -> tuple[int, Optional[float]]:
     """Return zodiac sign index and transformed degree, or None for D30."""
     n, d = longitude_ratio(longitude)
     sign, degree_numerator = divmod(n, 30 * d)
@@ -69,11 +76,11 @@ def varga_coordinates(longitude: float, division: int) -> tuple[int, Optional[fl
     return destination, min(remainder / d, math.nextafter(30.0, 0.0))
 
 
-def varga_sign(longitude: float, division: int) -> int:
+def varga_sign(longitude: float | Fraction, division: int) -> int:
     return varga_coordinates(longitude, division)[0]
 
 
-def varga_longitude(longitude: float, division: int) -> float:
+def varga_longitude(longitude: float | Fraction, division: int) -> float:
     sign, degree = varga_coordinates(longitude, division)
     if degree is None:
         raise ValueError("D30 仅分配星座；所选原典未规定唯一的盘内度数。")

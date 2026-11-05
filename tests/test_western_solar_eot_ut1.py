@@ -4,25 +4,25 @@ References use standalone calendar arithmetic/native-model inversion, not
 FateBridge output. Both routes reuse the same96 development epochs.
 """
 
-import hashlib
 import json
 from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
 
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
+from fatebridge.core.astro.birth import build_astro_birth_info
+from fatebridge.core.astro.sensitivity import _sample_birth
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
+from tests.reference_data import verify_source_files
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
-
-from fatebridge.core.astro.birth import build_astro_birth_info
-from fatebridge.core.astro.sensitivity import _sample_birth
-
-FIXTURE = Path(__file__).parent / "fixtures/western-solar-eot-ut1-v1"
+FIXTURE = Path(__file__).parent / "data/astro/solar_eot_ut1"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 COHERENT = json.loads(
-    (FIXTURE.parent / "western-solar-clock-coherence-v1/reference.json").read_text()
+    (FIXTURE.parent / "solar_clock_coherence/reference.json").read_text()
 )
 COHERENT_BY_UTC = {
     row["utc"]: row for row in COHERENT["rows"] if row["source"] == "swiss_delta_t"
@@ -31,13 +31,7 @@ LINE_SECONDS = 0.0002
 
 
 def test_independent_model_reference_identity():
-    seal = json.loads((FIXTURE / "reference-seal.json").read_text())
-    for name, key in [
-        ("protocol.json", "protocol_sha256"),
-        ("reference.json", "reference_sha256"),
-        ("collector.py.txt", "collector_sha256"),
-    ]:
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == seal[key]
+    verify_source_files(FIXTURE)
     assert len(REFERENCE["rows"]) == 96
     assert REFERENCE["fatebridge_imported"] is False
     assert REFERENCE["independent_dynamical_model"] is False

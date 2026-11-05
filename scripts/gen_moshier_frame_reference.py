@@ -6,7 +6,6 @@ it does not establish agreement with an inspected original almanac page.
 """
 
 import argparse
-import hashlib
 import json
 import math
 from pathlib import Path
@@ -123,9 +122,6 @@ if __name__ == "__main__":
         "Independent reference pipeline; NASA and Swiss can share DE441 dynamics. "
         "No inspected original-page or human-outcome validation."
     )
-    result["projection_source_sha256"] = hashlib.sha256(
-        Path(__file__).read_bytes()
-    ).hexdigest()
     args.output.write_text(
         json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
     )

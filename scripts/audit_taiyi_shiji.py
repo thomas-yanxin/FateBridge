@@ -10,7 +10,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v24"
-MANIFEST_SHA = "9d8298d054398da8353b4af3fb69c3c26a0652d9e200014e88b64c78b97a16d5"
+MANIFEST_SHA = "ccd2d9b5cbaef1ace5a1233367b5baa5c3d2f9aace4e91a5443d72a002fcc485"
 
 
 def source_data(corpus: Path = CORPUS) -> dict[str, Any]:

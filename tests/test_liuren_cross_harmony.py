@@ -19,8 +19,6 @@ from fatebridge.core.output_chinese import Liuren
 from fatebridge.core.output_liuren_cross_harmony import LiurenCrossHarmony
 from fatebridge.core.output_ren_anchors import require_complete_ren_anchors
 from scripts.audit_liuren_cross_harmony import CORPUS, expected_facts, reference, sha
-from scripts.liuren_cross_harmony_archive import historical_cross_harmony
-from scripts.liuren_day_placement_archive import canonical, restore
 from tests.test_agentic_nested_outputs import (
     AS_OF,
     SPECS,
@@ -321,57 +319,3 @@ def test_broken_condition_is_rejected_before_projection_on_every_port(
     protocol = asyncio.run(native(spec, PAYLOADS[key], **options))
     code, cli = call_cli(spec, PAYLOADS[key], tmp_path, capsys, flags=flags)
     assert http.status_code == 500 and protocol.is_error and code != 0
-
-
-@pytest.mark.parametrize(
-    "slug",
-    [
-        "api_cn_liureng_gods",
-        "api_cn_liureng_runyear",
-        "api_cn_jinkou",
-        "api_divination_sanshiunited",
-    ],
-)
-def test_offline_annotation_is_exactly_reversible_and_does_not_edit_goldens(slug):
-    from scripts.jinkou_archive_proofs import ARCHIVE_SNAPSHOTS
-
-    path = ARCHIVE_SNAPSHOTS / (slug + ".json")
-    before = path.read_bytes()
-    value = json.loads(before)
-    added, receipt = historical_cross_harmony(value)
-    restored, _ = historical_cross_harmony(added, mode="strip")
-    assert restored == value and path.read_bytes() == before
-    assert receipt["golden_files_written"] is False
-    board = (
-        added["liureng"]
-        if "liureng" in added
-        else added["subresults"]["liureng_gods"]["liureng"]
-    )
-    board["cross_harmony"]["matched"] = not board["cross_harmony"]["matched"]
-    with pytest.raises(ValueError):
-        historical_cross_harmony(added, mode="strip")
-
-
-def test_offline_strip_restores_a_raw_services_shared_root_and_nested_board(results):
-    board = copy.deepcopy(results["liureng_gods"]["liureng"])
-    value = {
-        "liureng": board,
-        "subresults": {"liureng_gods": {"liureng": board}},
-        "synthesis": {
-            "source_profiles": {
-                "liureng": [
-                    dict(
-                        source_title=board["ruleset"]["source_title"],
-                        version=board["ruleset"]["version"],
-                    )
-                ]
-            }
-        },
-    }
-    assert value["liureng"] is value["subresults"]["liureng_gods"]["liureng"]
-    stripped, receipt = historical_cross_harmony(value, mode="strip")
-    assert canonical(restore(stripped, receipt["changes"])) == canonical(value)
-    assert (
-        "cross_harmony" in value["liureng"]
-        and "cross_harmony" not in stripped["liureng"]
-    )

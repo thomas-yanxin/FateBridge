@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
+from fractions import Fraction
 from typing import Any, Dict, Optional
 
 from fatebridge.core.astro import runtime
@@ -48,7 +49,12 @@ class EclipticHouseProjection:
     def _native_pole_convention(self) -> bool:
         return self.house_code in (b"R", b"T") and abs(self.geographic_latitude) == 90
 
-    def position(self, tropical_longitude: float) -> float:
+    def position(
+        self,
+        tropical_longitude: float,
+        *,
+        exact_longitude: Optional[Fraction] = None,
+    ) -> float:
         if runtime.swe is None:
             raise ValueError("非单圈宫头的原生落宫投影需要Swiss Ephemeris")
         longitude = normalize_angle(tropical_longitude)
@@ -88,7 +94,11 @@ class EclipticHouseProjection:
                     # A rounded [0,360) float can move an almost-zero input
                     # enough to cross a T phase boundary near a pole. Preserve
                     # the supplied binary64 value for the precision solver.
-                    longitude=float(tropical_longitude),
+                    longitude=(
+                        exact_longitude
+                        if exact_longitude is not None
+                        else float(tropical_longitude)
+                    ),
                     native_position=position,
                 )
             except Exception as error:
@@ -106,6 +116,15 @@ class EclipticHouseProjection:
                     "phase_degrees_decimal": checked_t.phase_degrees_decimal,
                     "working_decimal_digits": list(checked_t.working_digits),
                     "action": checked_t.action,
+                    **(
+                        {
+                            "exact_tropical_longitude_ratio": list(
+                                exact_longitude.as_integer_ratio()
+                            )
+                        }
+                        if exact_longitude is not None
+                        else {}
+                    ),
                     "topocentric_branch": checked_t.branch,
                 }
             )
@@ -116,7 +135,9 @@ class EclipticHouseProjection:
                     latitude=self.geographic_latitude,
                     armc=self.armc,
                     obliquity=self.obliquity,
-                    longitude=longitude,
+                    longitude=(
+                        exact_longitude if exact_longitude is not None else longitude
+                    ),
                     house_code=self.house_code,
                     native_position=position,
                 )
@@ -134,6 +155,15 @@ class EclipticHouseProjection:
                     "phase_degrees_decimal": checked.phase_degrees_decimal,
                     "working_decimal_digits": list(checked.working_digits),
                     "action": checked.action,
+                    **(
+                        {
+                            "exact_tropical_longitude_ratio": list(
+                                exact_longitude.as_integer_ratio()
+                            )
+                        }
+                        if exact_longitude is not None
+                        else {}
+                    ),
                 }
             )
             return checked.position
@@ -171,7 +201,7 @@ class EclipticHouseProjection:
                 "method_id": RC_PLANE_PROJECTION_METHOD,
                 "phase_forward_offset_arcseconds": PHASE_FORWARD_OFFSET_ARCSECONDS,
                 "boundary_policy": "geometric_phase_plus_forward_offset_not_longitude_cusp_snap",
-                "input_precision_scope": "exact_supplied_binary64_angle_and_longitude_model",
+                "input_precision_scope": "exact_supplied_binary64_angles_and_rational_derived_longitudes_when_recorded",
                 "maximum_physical_error_arcseconds": None,
                 # The per-chart projector is also consumed by later lots. Keep
                 # those actual calls in the same record rather than truncating.
@@ -218,7 +248,7 @@ class EclipticHouseProjection:
                 "input_precision_scope": (
                     "native_pole_convention_preserved_without_independent_geometry_qualification"
                     if self._native_pole_convention
-                    else "exact_supplied_binary64_angles_and_latitude_without_native_inverse_clip"
+                    else "exact_supplied_binary64_angles_and_rational_derived_longitudes_when_recorded_without_native_inverse_clip"
                 ),
                 "maximum_physical_error_arcseconds": None,
                 "checks": self._precision_records,

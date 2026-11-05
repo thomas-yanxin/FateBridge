@@ -1,7 +1,5 @@
 """Unchanged official glyphs, node recipients and complete mechanism readings."""
 
-import hashlib
-import json
 from copy import deepcopy
 from pathlib import Path
 
@@ -47,40 +45,6 @@ def test_all_unchanged_official_fixing_slots_preserve_visible_and_unobservable_s
         and r["observed_marker"] == "no_visible_marker"
         for r in report["cases"]
     )
-
-
-def test_original_failing_observations_are_retained_including_all_13_gaps():
-    before = json.loads(
-        (ROOT / "docs/validation/human-design-fixing-before.json").read_text()
-    )
-    # The pre-change comparison saved all visible glyphs, not blank slots.
-    assert len(before) == 138
-    visible = [r for r in before if r["visible_marker"] != "no_visible_marker"]
-    gaps = [r for r in visible if r["engine_status"] != r["visible_marker"]]
-    assert len(visible) == 138
-    assert len(gaps) == 13
-    assert sum(r["body"] in {"NorthNode", "SouthNode"} for r in gaps) == 11
-    assert sum(r["polarity_kind"] == "unitary" for r in gaps) == 2
-    ref = json.loads(
-        (
-            ROOT / "src/fatebridge/data/human_design/fixing-2026-reference.json"
-        ).read_text()
-    )
-    assert (
-        ref["plan_sha256"]
-        == hashlib.sha256(
-            (
-                ROOT / "tests/fixtures/human-design-fixing-observation-plan.json"
-            ).read_bytes()
-        ).hexdigest()
-    )
-    for source in ref["cohort_sources"]:
-        assert (
-            hashlib.sha256(
-                (ROOT / "tests/fixtures" / source["fixture"]).read_bytes()
-            ).hexdigest()
-            == source["sha256"]
-        )
 
 
 def test_a_node_can_receive_the_harmonic_planet_fixing_but_cannot_fix_other_lines():

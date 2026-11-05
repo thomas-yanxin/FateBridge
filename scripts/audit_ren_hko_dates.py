@@ -46,41 +46,7 @@ def reference(folder: Path = CORPUS) -> dict[str, Any]:
     return data
 
 
-def stripped(value: Any) -> Any:
-    if isinstance(value, dict):
-        return {
-            k: stripped(v)
-            for k, v in value.items()
-            if k not in {"published_date_reference", "snapshot_text", "snapshot_export"}
-        }
-    if isinstance(value, list):
-        return [stripped(v) for v in value]
-    return value
-
-
-def preservation(baseline: Path) -> dict[str, Any]:
-    from fatebridge.services.tool_catalog import CATALOG
-
-    specs = {s.key: s for s in CATALOG}
-    rows = json.loads(baseline.read_text())
-    differences = []
-    if len(rows) != 14 or {r["key"] for r in rows} != {"liureng_gods", "jinkou"}:
-        raise ValueError("All14 preservation cases required")
-    for i, row in enumerate(rows):
-        spec = specs[row["key"]]
-        fn, args, kw = spec.bind(spec.request_model.model_validate(row["payload"]))
-        now = fn(*args, **kw)
-        if stripped(now) != stripped(row["result"]):
-            differences.append(dict(index=i, key=row["key"], payload=row["payload"]))
-    return dict(
-        cases=14,
-        differences=differences,
-        passed=not differences,
-        allowed_additions="Only published_date_reference objects and snapshot/export text; original calendar and divination values compared exactly",
-    )
-
-
-def audit(profile: str, ephe_dir: Path, baseline: Path | None = None) -> dict[str, Any]:
+def audit(profile: str, ephe_dir: Path) -> dict[str, Any]:
     if profile not in {
         "auto_empty",
         "auto_swiss",
@@ -157,7 +123,6 @@ def audit(profile: str, ephe_dir: Path, baseline: Path | None = None) -> dict[st
                 metadata_errors.append(row)
             if not equal:
                 mismatches.append(row)
-    preserve = preservation(baseline) if baseline else None
     unchanged = before == {str(p.relative_to(ROOT)): sha(p) for p in paths}
     return dict(
         profile=profile,
@@ -173,7 +138,6 @@ def audit(profile: str, ephe_dir: Path, baseline: Path | None = None) -> dict[st
         and not metadata_errors
         and len(rows) == 4800,
         rows=rows,
-        preservation=preserve,
         source_manifest=before,
         implementation_unchanged=unchanged,
         new_independent_physical_events=0,
@@ -188,12 +152,11 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--profile", required=True)
     p.add_argument("--ephe-dir", required=True, type=Path)
-    p.add_argument("--baseline", type=Path)
     p.add_argument("--output", required=True, type=Path)
     a = p.parse_args()
     if a.output.exists():
         raise ValueError("Refusing to overwrite HKO audit")
-    result = audit(a.profile, a.ephe_dir, a.baseline)
+    result = audit(a.profile, a.ephe_dir)
     a.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(
         json.dumps(

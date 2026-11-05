@@ -1,9 +1,11 @@
-"""波斯向运 / Persian Directed — two-layer parity against 星阙 (horosa).
+"""波斯向运 / Persian Directed — historical values and independent ordering.
 
-Layer 1 (algorithm byte-lock): feed the core builder the SAME natal object set 星阙
-fed its own engine (a trimmed capture of ``chart_1998_predictive.json``) and assert
-the structured hits — (age, promittor, aspect, significator) — are identical to
-星阙's output. This locks the symbolic 1°/year arithmetic, language-neutrally.
+Layer 1 (historical value check): feed the core builder the SAME natal object set
+星阙 fed its own engine (a trimmed capture of ``chart_1998_predictive.json``) and
+check the hit multiset against 星阙's unchanged output. Independent Decimal
+arithmetic checks the actual unrounded chronological sequence and first120
+selection. The historical display-age ordering has14 changed positions, all
+within equal display ages.
 
 Layer 2 (end-to-end): cast a chart through FateBridge's own engine and assert the
 tool runs, the hits stay bounded (0 < age ≤ max), are sorted by age, and never name
@@ -17,6 +19,8 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+from collections import Counter
+from decimal import Decimal, localcontext
 from pathlib import Path
 
 from fatebridge.core.astrology_lifespan import build_persian_directed_payload
@@ -42,11 +46,11 @@ def _structured(hits: list[dict]) -> list[tuple]:
 
 
 # --------------------------------------------------------------------------- #
-# Layer 1 — algorithm byte-lock against 星阙 on a fixed object set.
+# Layer 1 — unchanged historical hit values plus independent exact chronology.
 # --------------------------------------------------------------------------- #
-def test_algorithm_matches_horosa_oracle() -> None:
+def test_historical_values_and_independent_decimal_chronology() -> None:
     chart = _chart()
-    # Preserve 星阙's object order so stable-sort tie ordering matches byte-for-byte.
+    # Original iteration order resolves only genuine equal, unrounded ages.
     natal = {o["id"]: float(o["lon"]) for o in chart["objects"]}
     payload = build_persian_directed_payload(
         natal,
@@ -55,7 +59,46 @@ def test_algorithm_matches_horosa_oracle() -> None:
         max_age_years=90.0,
     )
     expected = _oracle()
-    assert _structured(payload["hits"]) == _structured(expected)
+    with localcontext() as context:
+        context.prec = 100
+        circle = Decimal(360)
+        source = {name: Decimal.from_float(lon) for name, lon in natal.items()}
+        targets = list(source.items()) + [
+            (f"{index + 1}宫头", Decimal.from_float(float(cusp)))
+            for index, cusp in enumerate(chart["house_cusps"])
+        ]
+        candidates = []
+        for mover in ("Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"):
+            for target, longitude in targets:
+                if mover == target:
+                    continue
+                for aspect in (0, 60, 90, 120, 180):
+                    for direction in ((1,) if aspect in (0, 180) else (1, -1)):
+                        arc = (longitude + direction * aspect - source[mover]) % circle
+                        if arc < 0:
+                            arc += circle
+                        if 0 < arc <= 90:
+                            candidates.append((arc, mover, aspect, target))
+        candidates.sort(key=lambda row: row[0])
+        independent = [
+            (round(float(arc) * 100) / 100, mover, aspect, target)
+            for arc, mover, aspect, target in candidates[:120]
+        ]
+    actual, historical = _structured(payload["hits"]), _structured(expected)
+    assert actual == independent
+    assert Counter(actual) == Counter(historical)
+    changes = [
+        (i, before, after)
+        for i, (before, after) in enumerate(zip(historical, actual))
+        if before != after
+    ]
+    assert len(changes) == 14
+    assert all(before[0] == after[0] for _, before, after in changes)
+    assert changes[0] == (
+        33,
+        (8.78, "Jupiter", 60, "IC"),
+        (8.78, "Jupiter", 120, "4宫头"),
+    )
     assert len(payload["hits"]) == 120
 
 

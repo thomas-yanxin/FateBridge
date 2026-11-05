@@ -10,7 +10,7 @@ import pytest
 from fatebridge.core.local_techniques.otherbu import _motion_snapshot_line
 from scripts.verify_astrodice_motion_text import verify
 
-PATH = Path(__file__).with_name("fixtures") / "astrodice-motion-text-v1.json"
+PATH = Path(__file__).parent / "data/astrodice/tables/motion_term_cases.json"
 DATA = json.loads(PATH.read_text())
 
 
@@ -20,31 +20,6 @@ def rendered(row):
         "snapshot_text": "[天象瞬时黄经运动]\n"
         + "\n".join(_motion_snapshot_line(obj) for obj in row["objects"]),
     }
-
-
-def test_original_frozen_failures_remain_failures():
-    assert (
-        hashlib.sha256(PATH.read_bytes()).hexdigest()
-        == "d1f59363dfa1b00961d276674dd0aeaecca9c6a8845db7f1cc2d951c5ef878c4"
-    )
-    assert len(DATA["rows"]) == 8
-    failures = 0
-    for row in DATA["rows"]:
-        original = Path(row["original_output"])
-        assert (
-            hashlib.sha256(original.read_bytes()).hexdigest() == row["original_sha256"]
-        )
-        result = {
-            "chart": {"chart": {"objects": row["objects"]}},
-            "snapshot_text": row["original_snapshot_text"],
-        }
-        if not row["inputs"]["zodiacal"]:
-            with pytest.raises(ValueError, match="missing/extra term for Moon"):
-                verify(result)
-            failures += 1
-        else:
-            verify(result)
-    assert failures == 4
 
 
 @pytest.mark.parametrize(

@@ -22,13 +22,11 @@ def main() -> int:
     root = Path(__file__).resolve().parents[1]
     args.output_dir.mkdir(parents=True, exist_ok=False)
     protocol = load_consumer_protocol(
-        root / "tests/fixtures/fengshui_calendar_consumers_v1/protocol.json"
+        root / "tests/data/fengshui_calendar_consumers_v1/protocol.json"
     )
-    reference = load_solar_terms_reference(
-        root / "tests/fixtures/fengshui_all_terms_v1"
-    )
+    reference = load_solar_terms_reference(root / "tests/data/fengshui_all_terms_v1")
     literal = load_literal_month_table(
-        root / "tests/fixtures/fengshui_monthly_v1/reference.json"
+        root / "tests/data/fengshui_monthly_v1/reference.json"
     )
     keys = ["FATEBRIDGE_SOLAR_TERM_MODEL", "FATEBRIDGE_JPL_FILE", "SE_EPHE_PATH"]
     prior = {k: os.environ.get(k) for k in keys}

@@ -180,7 +180,7 @@ def exact_threshold_decision(
         "requires_special_structure_review": share < Fraction(3, 20)
         or share > Fraction(17, 20),
         "numerical_label": grade,
-        "legacy_float_numerical_label": float_numerical_label,
+        "float_numerical_label": float_numerical_label,
         "float_comparison_differs": grade != float_numerical_label,
         "calculation_effect": "threshold_comparison_only",
         "scope": "既定十进制工程系数、几何藏干份额及实际藏干根预算单位门槛的精确比较；关系成立条件沿用同次记录。原浮点能量及份额另保留，不认证系数、根的有效力量、通关或现实精度。",
@@ -195,7 +195,7 @@ def threshold_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
         lines.append(
             f"旺衰阈值算术：既定工程预算的精确份额为{receipt['share_exact']}，"
             f"数值档为{receipt['numerical_label']}；浮点比较原为"
-            f"{receipt['legacy_float_numerical_label']}，该偏差已纠正。"
+            f"{receipt['float_numerical_label']}，判定采用精确值。"
             "结构规则另审；此处不增加原典或现实准确率。"
         )
     if (
@@ -212,19 +212,18 @@ def threshold_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
     roots = receipt.get("physical_root_unit_comparison") or {}
     if (
         roots.get("rooted_controller_stems") is not None
-        and roots.get("legacy_float_rooted_controller_stems") is not None
+        and roots.get("float_rooted_controller_stems") is not None
         and (
-            roots["rooted_controller_stems"]
-            != roots["legacy_float_rooted_controller_stems"]
+            roots["rooted_controller_stems"] != roots["float_rooted_controller_stems"]
             or roots.get("rooted_wealth_visible")
-            != roots.get("legacy_float_rooted_wealth_visible")
+            != roots.get("float_rooted_wealth_visible")
         )
     ):
         lines.append(
             "财官根量的工程比较已按精确预算更正："
-            f"官杀有根透干数由{roots['legacy_float_rooted_controller_stems']}"
+            f"官杀有根透干数由{roots['float_rooted_controller_stems']}"
             f"改为{roots['rooted_controller_stems']}，"
-            f"财有根标记由{roots.get('legacy_float_rooted_wealth_visible')}"
+            f"财有根标记由{roots.get('float_rooted_wealth_visible')}"
             f"改为{roots.get('rooted_wealth_visible')}。"
             "这只修正既定单位门槛的比较，不裁定原典有效根力或通关成立。"
         )

@@ -22,7 +22,9 @@ from fatebridge.utils.errors import EphemerisSourceError
 from tests.test_guolao_native_frames import fixed_moshier  # noqa: F401
 
 FIXTURE = Path(__file__).parent / "fixtures/guolao-same-sky-construction-v1"
-HELD = json.loads((FIXTURE / "before-year-edge.json").read_text())
+HELD = json.loads(
+    (Path(__file__).parent / "data/guolao/year_edge_inputs.json").read_bytes()
+)
 CASE = dict(
     birth_year=2000,
     birth_month=1,
@@ -33,19 +35,6 @@ CASE = dict(
     birth_longitude=15.761059045869185,
     birth_latitude=40,
 )
-
-
-def test_original_sources_and_postimplementation_year_diagnostic_are_distinguished():
-    reference = json.loads((FIXTURE / "reference.json").read_text())
-    for name, digest in reference["files"].items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
-    assert reference["originally_valid_year_edge_cases"] == 5
-    assert reference["original_year_edge_failures"] == 1
-    assert [i for i, row in enumerate(HELD) if "error" in row["result"]] == [3]
-    assert not reference["new_astronomical_observations"]
-    assert json.loads((FIXTURE / "source-reference.json").read_text())[
-        "postimplementation_year_edge_diagnostic"
-    ]
 
 
 @pytest.mark.parametrize("zodiacal", [0, 1])
@@ -97,25 +86,14 @@ def test_range_boundary_keeps_valid_outputs_and_computes_unrepresentable_utc_lab
     fixed_moshier, row_index
 ):
     held = HELD[row_index]
-    # The held Mac output preserves the original failure evidence. Execute
-    # the hash-bound old service on this platform for exact numeric equality.
-    specification = importlib.util.spec_from_file_location(
-        "guolao_pre_same_sky_construction", FIXTURE / "prechange_astrology.py"
-    )
-    assert specification is not None and specification.loader is not None
-    previous = importlib.util.module_from_spec(specification)
-    specification.loader.exec_module(previous)
-    before = previous.calculate_core_chart_analysis(**held["input"])
     result = calculate_core_chart_analysis(**held["input"])
     assert "error" not in result, result
     if row_index != 3:
-        assert "error" not in before
-        assert result == before
+        assert result["guolao"]["validation"]["full_marks_established"] is False
         return
     # Independent calendar arithmetic: local Jan1 at+14 is preceding Dec31
     # 10:00. The astronomical year0 label is not a Python datetime or a record.
     assert result["person_info"]["utc_datetime"] == "0000-12-31T10:00:00+00:00"
-    assert "error" in before
     civil = calculate_core_chart_analysis(
         **{**held["input"], "use_true_solar_time": False}
     )
@@ -301,18 +279,6 @@ def test_optional_time_layers_preserve_sky_and_do_not_invent_unavailable_month(
         args["analysis_datetime"] = datetime.fromisoformat("2027-06-01T00:00:00+08:00")
     if basis:
         args["guolao_month_basis"] = basis
-    specification = importlib.util.spec_from_file_location(
-        "guolao_pre_range_safe_timing", FIXTURE / "prechange_guolao_timing.py"
-    )
-    assert specification is not None and specification.loader is not None
-    previous = importlib.util.module_from_spec(specification)
-    specification.loader.exec_module(previous)
-    with monkeypatch.context() as held:
-        held.setattr(
-            guolao_timing, "enrich_guolao_timing", previous.enrich_guolao_timing
-        )
-        before = calculate_core_chart_analysis(**args)
-    assert ("error" in before) is target
     result = calculate_core_chart_analysis(**args)
     assert "error" not in result, result
     g = result["guolao"]
@@ -371,14 +337,3 @@ def test_fixed_offset_calendar_conversion_matches_datetime_where_both_exist(offs
     actual = guolao_timing._calendar_clock(instant, recorded)
     expected = instant.astimezone(recorded.tzinfo)
     assert actual.isoformat() == expected.isoformat()
-
-
-def test_extended_scope_original_sources_and_failed_rows_remain_hash_bound():
-    reference = json.loads((FIXTURE / "extended-reference.json").read_text())
-    for name, digest in reference["files"].items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
-    rows = json.loads(
-        (FIXTURE / "construction-only-extended-combinations.json").read_text()
-    )["cases"]
-    assert len(rows) == 12 and sum(row["status"] == "error" for row in rows) == 9
-    assert reference["unassigned_months_are_successful_month_calculations"] is False

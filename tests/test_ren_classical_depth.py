@@ -78,7 +78,7 @@ def test_jinkou_uses_ground_and_inherent_god_without_liuren_lessons():
     assert (
         board["overview"]["use_position"] == "贵神"
     )  # four yang, not a strongest-rank guess.
-    assert [r["power"] for r in board["rows"]] == ["相", "休", "休", "囚"]
+    assert [r["seasonal_power"] for r in board["rows"]] == ["相", "休", "休", "囚"]
     assert [r["si_da_kong"] for r in board["rows"]] == [False, True, True, False]
     assert {m["name"] for m in board["motions"]} == {"妻动", "官动"}
     assert next(m for m in board["motions"] if m["name"] == "官动")[

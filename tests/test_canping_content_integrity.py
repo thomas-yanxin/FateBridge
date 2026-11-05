@@ -12,7 +12,6 @@ from tests.test_agentic_nested_outputs import rest as shared_rest
 from tests.test_heluo_poem_transports import run_three
 
 rest = shared_rest
-REFERENCE = Path(__file__).parent / "fixtures/numerology_knowledge_v1"
 
 
 @pytest.fixture(autouse=True)

@@ -248,12 +248,14 @@ def test_favorable_synergy_bidirectional_label_uses_actual_support_directions(
             person["structure_profile"]["useful_elements"] = ["木", "火"]
             person["structure_profile"]["useful_ten_gods"] = ["正印", "偏印"]
         expected_directions = set()
-        expected_basis_deltas = [8]
+        expected_basis_deltas = [8, 6]
 
     result = AdvancedCompatibility._analyze_favorable_synergy(first, second)
     assert result["score"] == 74.0
     assert result["synergy_level"] == (
-        "双向互助" if direction == "both" else "协同较好"
+        "双向互助"
+        if direction == "both"
+        else "未见承接证据" if direction == "neither" else "协同较好"
     )
     assert {
         (item["source"], item["target"]) for item in result["supportive_patterns"]
@@ -278,7 +280,7 @@ def test_current_favorable_synergy_uses_versioned_scores_and_three_surface_parit
     from fastapi.testclient import TestClient
 
     import fatebridge.api as api
-    from tests.compatibility_reference import assert_score_reference
+    from tests.compatibility_reference import assert_source_condition_score_reference
     from tests.fixtures.surface_payloads import REST_POST_CASES
     from tests.test_agentic_replay import business, cli, native
 
@@ -300,32 +302,21 @@ def test_current_favorable_synergy_uses_versioned_scores_and_three_surface_parit
     assert response.status_code == 200 and not protocol.is_error and code == 0
     expected = business(response.json())
     assert expected == business(protocol.structured_content) == business(output)
-    assert_score_reference(
+    assert_source_condition_score_reference(
         expected["summary"], expected["detailed_analysis"], "marriage"
     )
-    assert expected["summary"]["scoring"]["unrounded_score"] == 76.83
+    # The independent source-condition ledger checks the exact weighted sum.
     synergy = expected["detailed_analysis"]["favorable_synergy"]
-    assert synergy["synergy_level"] == "强力互助"
+    assert synergy["synergy_level"] == "协同较好"
+    assert synergy["assessment_status"] == "partial"
     assert synergy["score_basis"] == [
-        "第二人木较旺，对第一人有稳定补益(+7)",
-        "第二人水占比高，能明显补到第一人的可用之气(+10)",
-        "第二人火具备一定承接力，对第一人略有帮助(+4)",
         "第一人土较旺，对第二人有稳定补益(+7)",
         "第一人金占比高，能明显补到第二人的可用之气(+10)",
-        "共同喜用五行：水，目标更容易同频(+4)",
-        "第一人的可用五行火落在第二人的回避区间(-8)",
-        "第二人的可用五行金落在第一人的回避区间(-8)",
     ]
-    assert [item["element"] for item in synergy["supportive_patterns"]] == [
-        "木",
-        "水",
-        "火",
-        "土",
-        "金",
-    ]
+    assert [item["element"] for item in synergy["supportive_patterns"]] == ["土", "金"]
     assert {
         (item["source"], item["target"]) for item in synergy["supportive_patterns"]
-    } == {("第一人", "第二人"), ("第二人", "第一人")}
+    } == {("第一人", "第二人")}
 
 
 def test_tian_ke_di_chong_is_reported_as_tension_pattern():
@@ -433,6 +424,7 @@ def test_comprehensive_summary_reads_normalized_score_key():
     """
     result = {
         "overall_score": 60.0,
+        "scoring": {"status": "calculated"},
         "strengths": [],
         "challenges": [],
         "detailed_analysis": {

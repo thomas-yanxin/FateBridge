@@ -19,36 +19,32 @@ from scripts.audit_astrodice_apparent import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures"
-PROTOCOL = json.loads(
-    (FIXTURES / "astrodice-apparent-motion-protocol.json").read_text()
-)
-REFERENCE = json.loads((FIXTURES / "astrodice-apparent-horizons.json").read_text())
+FIXTURES = ROOT / "tests/data/astrodice/tables"
+PROTOCOL = json.loads((FIXTURES / "apparent-motion-protocol.json").read_text())
+REFERENCE = json.loads((FIXTURES / "apparent-horizons.json").read_text())
 DERIVATIVE_PROTOCOL = json.loads(
-    (FIXTURES / "astrodice-apparent-derivative-protocol.json").read_text()
+    (FIXTURES / "apparent-derivative-protocol.json").read_text()
 )
-DERIVATIVE = json.loads(
-    (FIXTURES / "astrodice-apparent-position-derivative.json").read_text()
-)
+DERIVATIVE = json.loads((FIXTURES / "apparent-position-derivative.json").read_text())
 
 
 @pytest.mark.parametrize(
     "name,expected",
     [
         (
-            "astrodice-apparent-motion-protocol.json",
+            "apparent-motion-protocol.json",
             "7e0dd4d4b3f1e26d48650edac23fe551162a3ed733c612515c702eb82b7f6504",
         ),
         (
-            "astrodice-apparent-derivative-protocol.json",
+            "apparent-derivative-protocol.json",
             "2eb190bf90ab03daff59d4ad21d227f9300cafadc4daab648e0dfd18b474071e",
         ),
         (
-            "astrodice-apparent-horizons.json",
+            "apparent-horizons.json",
             "fa94b712f6390dd117b9e8a00916ab7ff0cda90f3779afb255e9889e594042db",
         ),
         (
-            "astrodice-apparent-position-derivative.json",
+            "apparent-position-derivative.json",
             "434c99c5836d2f9fdf1673b7cbd0d905b8a4346c0e10d38e53d95e2b8c6824fb",
         ),
     ],

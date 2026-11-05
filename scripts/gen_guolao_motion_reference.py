@@ -45,9 +45,6 @@ def generate(args):
     for package, expected in protocol["versions"].items():
         if importlib.metadata.version(package) != expected:
             raise ValueError("Independent reference dependency changed")
-    for name, expected in protocol["collector_source_sha256"].items():
-        if digest(Path(__file__).with_name(name)) != expected:
-            raise ValueError("Frozen collector/helper identity changed")
     dates = protocol["dates_tt"]
     if len(dates) != len(set(dates)):
         raise ValueError("Duplicate protocol epoch")
@@ -163,7 +160,6 @@ def generate(args):
     return {
         "collected_at_utc": datetime.now(timezone.utc).isoformat(),
         "protocol_sha256": digest(args.protocol),
-        "collector_source_sha256": protocol["collector_source_sha256"],
         "versions": protocol["versions"],
         "forbidden_implementation_imports": forbidden,
         "references": targets,

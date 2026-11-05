@@ -272,5 +272,88 @@
     ],
     "type": "object"
   },
+  "method_contracts": [
+    {
+      "comparison_requirements": [
+        "相同评分版本、关系类型及输入判定方法",
+        "相同可用分项；partial不作为完整配合结论"
+      ],
+      "dependencies": [
+        "both_birth_contexts",
+        "strength_assessments",
+        "useful_element_profiles"
+      ],
+      "error_sources": [
+        "rule_adjudication"
+      ],
+      "implementation_refs": [],
+      "limitations": [
+        "基分及权重是工程约定；未决项不改权重、不推为支持或反对",
+        "多个分项共享出生和结构依据，不能视为独立证据或概率",
+        "关系类型权重不等于双向角色模型或多人关系模型"
+      ],
+      "method_id": "compatibility_weighted_rules_v3",
+      "output_paths": [
+        "summary.overall_score",
+        "summary.scoring"
+      ],
+      "prerequisites": [
+        "两份经请求边界校验的出生资料，关系类型由用户明确或采用general",
+        "喜忌及成局方向须有明确裁定；未知、条件及中性分别传递"
+      ],
+      "quantity_kind": "uncalibrated_rule_index",
+      "role": "calculation",
+      "selector_fields": [],
+      "source_refs": [],
+      "unit": "index_points_0_100",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    },
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现/数据指纹、选项与实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "solar_clock",
+        "calendar_model",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/services/birth_context.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.bazi_natal.contract_v1",
+      "output_paths": [
+        "summary",
+        "detailed_analysis",
+        "traditional_compatibility"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "traditional_rule_result",
+      "role": "calculation",
+      "selector_fields": [],
+      "source_refs": [
+        "docs/bazi-assessment.md"
+      ],
+      "unit": "per_field",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    }
+  ],
   "tool": "two_person_compatibility"
 }

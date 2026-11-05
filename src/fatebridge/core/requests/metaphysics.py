@@ -70,7 +70,7 @@ class ZiweiHoroscopeRequest(FateBridgeRequest):
     )
     nominal_age_basis: ZiweiAgeBasis = Field(
         default="birth_civil_timezone",
-        description="岁序默认birth_civil_timezone：出生与目标实际瞬间都按出生民用时区查农历年，正月初一00:00换岁，独立于真太阳安星及目标流曜钟。legacy_mixed_clock显式回放旧的目标钟表年减出生排盘年，可能拒绝春节边界；两者均非原典岁首认证。",
+        description="岁序默认birth_civil_timezone：出生与目标实际瞬间都按出生民用时区查农历年，正月初一00:00换岁，独立于真太阳安星及目标流曜钟。该软件约定尚非原典岁首认证。",
     )
     rule_profile: ZiweiRuleProfile = Field(
         default=DEFAULT_ZIWEI_PROFILE,

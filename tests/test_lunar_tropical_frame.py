@@ -3,23 +3,33 @@
 import copy
 import json
 from fractions import Fraction as Q
+from functools import lru_cache
 from pathlib import Path
 
 import pytest
 
 from fatebridge.core.astro import lunar_tropical_frame as frame
 from scripts.astrodice_clock_interval import I
+from scripts.astrodice_current_sampling import sample
 from scripts.astrodice_display_frame import pi_interval
+from scripts.audit_astrodice_display_rate import audit
 
 ROOT = Path(__file__).parents[1]
-RUN = ROOT / "docs/validation/astrodice-display-rate-run-2026-10-28"
+RUN = ROOT / "tests/data/astrodice/reference_sets/study-display-rate"
 
 
+@lru_cache(maxsize=6)
 def native(index=0, backend="swieph"):
-    data = json.loads(
-        (RUN / f"native-development-candidate-first/{backend}-{index}.json").read_text()
+    plan = json.loads((RUN / "plan-before-evaluation.json").read_text())
+    data = sample(plan["development"][index], backend)
+    row = next(r for r in data["rows"] if r["body"] == "Moon")
+    diagnostic = next(
+        call
+        for call in row["native_calls"]
+        if call["args"][1] == -1 and call["args"][0] == row["native_numeric_jd"]
     )
-    return next(r for r in data["rows"] if r["body"] == "Moon")
+    row["native_ecl_nut_diagnostic"] = {"coordinates": diagnostic["coordinates"]}
+    return row
 
 
 def mv(matrix, vector):
@@ -155,7 +165,7 @@ def test_a_different_native_frame_is_not_silently_assumed(kind, monkeypatch):
 
 
 def test_same_domain_frame_formula_keeps_known_source_failure():
-    data = json.loads((RUN / "development-candidate-audit-first.json").read_text())
+    data = audit(RUN, RUN / "development-reference-first.json")
     failed = [r for r in data["rows"] if not r["qualified"]]
     assert len(failed) == 1 and failed[0]["label"] == "3000-12-07T04:07:32"
     assert failed[0]["body"] == "Moon" and failed[0]["backend"] == "swieph"
@@ -163,19 +173,4 @@ def test_same_domain_frame_formula_keeps_known_source_failure():
         failed[0]["signed_complete_display_rate_error_arcsec_per_source_day"]["lower"]
         > 0.002
     )
-    baseline = json.loads((RUN / "development-baseline-audit-first.json").read_text())
-    before = next(
-        r
-        for r in baseline["rows"]
-        if r["body"] == "Moon" and r["case_index"] == 0 and r["backend"] == "swieph"
-    )
-    after = next(
-        r
-        for r in data["rows"]
-        if r["body"] == "Moon" and r["case_index"] == 0 and r["backend"] == "swieph"
-    )
-    # Removing a frame error can remove an accidental cancellation. Keep the
-    # worsened total residual; never filter it out of the population.
-    assert abs(
-        after["signed_complete_display_rate_error_arcsec_per_source_day"]["lower"]
-    ) > abs(before["signed_complete_display_rate_error_arcsec_per_source_day"]["lower"])
+    assert data["exit_code"] == 1 and not data["declared_source_lines_satisfied"]

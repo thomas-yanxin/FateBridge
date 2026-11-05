@@ -41,48 +41,7 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     return data
 
 
-def legacy(before_dir: Path) -> dict[str, Any]:
-    from fatebridge.core.metaphysics.jinkou import build_jinkou_board
-    from fatebridge.services.tool_catalog import CATALOG
-    from scripts.audit_ren_classical import make_seed
-
-    if sha(before_dir / "before-capture-receipt.json") != BEFORE_PIN:
-        raise ValueError("Before-qi-repair capture identity changed")
-    receipt = json.loads((before_dir / "before-capture-receipt.json").read_text())
-    for name, digest in receipt["files"].items():
-        if sha(before_dir / name) != digest:
-            raise ValueError("Before-qi-repair result bytes changed")
-    failures, count = [], 0
-    with gzip.open(before_dir / "before-boards.jsonl.gz", "rt") as stream:
-        for line in stream:
-            record = json.loads(line)
-            case = record["input"]
-            actual = build_jinkou_board(
-                make_seed(case),
-                {"month_general": {"branch": case["general"]}},
-                di_fen=case["ground"],
-                is_diurnal_override=True,
-            )
-            if actual != record["board"]:
-                failures.append(dict(kind="symbolic", input=case))
-            count += 1
-    spec = next(s for s in CATALOG if s.key == "jinkou")
-    businesses = json.loads((before_dir / "before-business.json").read_text())
-    for case in businesses:
-        fn, args, kwargs = spec.bind(spec.request_model.model_validate(case["input"]))
-        if fn(*args, **kwargs) != case["body"]:
-            failures.append(dict(kind="full_business", input=case["input"]))
-    return dict(
-        symbolic_count=count,
-        full_business_count=len(businesses),
-        failures=failures,
-        passed=count == 720 and len(businesses) == 3 and not failures,
-        baseline_pin=BEFORE_PIN,
-        normalization="none",
-    )
-
-
-def audit(before_dir: Path | None = None) -> dict[str, Any]:
+def audit() -> dict[str, Any]:
     data = reference()
     paths = sorted((ROOT / "src").rglob("*.py")) + [
         ROOT / "pyproject.toml",
@@ -139,7 +98,6 @@ def audit(before_dir: Path | None = None) -> dict[str, Any]:
             if actual != expected:
                 combined_failures.append(dict(expected=expected, actual=actual))
             count += 1
-    old = legacy(before_dir) if before_dir else dict(status="not_assessed")
     if before != {str(p.relative_to(ROOT)): sha(p) for p in paths}:
         raise ValueError("Source changed during qi-fidelity audit")
     return dict(
@@ -153,7 +111,6 @@ def audit(before_dir: Path | None = None) -> dict[str, Any]:
         finite_facts_passed=not (
             monthly_failures or daily_failures or combined_failures
         ),
-        legacy=old,
         implementation_sha256=before,
         implementation_unchanged=True,
         daily_five_states_adjudicated=False,
@@ -167,11 +124,10 @@ def audit(before_dir: Path | None = None) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--before-dir", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--require-full-conformance", action="store_true")
     options = parser.parse_args()
-    result = audit(options.before_dir)
+    result = audit()
     content = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     if options.output:
         with options.output.open("x") as stream:

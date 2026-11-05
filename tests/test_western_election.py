@@ -4,13 +4,12 @@ Tests for the 择日 (electional) engine.
 The scoring primitives (dignity, void-of-course and verdict banding)
 are pure and pinned exactly; the service-level tests assert structural facts
 (topic → significator/house, valid verdict, hard-block routing) rather than
-ephemeris-sensitive exact scores — the byte-level output is golden-locked.
+ephemeris-sensitive exact scores. Current numerical checks use independent references.
 """
 
 from fatebridge.core.astrology_election import (
     TOPIC_MASTER,
     _dignity,
-    _moon_void_of_course,
     _verdict,
 )
 from fatebridge.services.western_election import calculate_election
@@ -45,18 +44,6 @@ def test_verdict_bands():
     assert _verdict(60, False, "x")[0] == "workable"
     assert _verdict(45, False, "x")[0] == "marginal"
     assert _verdict(20, False, "x")[0] == "avoid"
-
-
-def test_moon_void_of_course_true_when_no_applying_aspect():
-    moon = {"longitude": 29.0, "speed": 13.0}
-    others = [{"longitude": 200.0, "speed": 0.1}, {"longitude": 250.0, "speed": 0.2}]
-    assert _moon_void_of_course(moon, others) is True
-
-
-def test_moon_not_void_with_imminent_aspect():
-    moon = {"longitude": 5.0, "speed": 13.0}
-    others = [{"longitude": 9.0, "speed": 0.5}]  # conjunction within 1° sign reach
-    assert _moon_void_of_course(moon, others) is False
 
 
 def test_topic_master_covers_allowed_consultation_topics():

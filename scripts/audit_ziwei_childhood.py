@@ -16,7 +16,7 @@ else:
     from audit_ziwei_limits import _seed
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures/ziwei_independent"
+FIXTURES = ROOT / "tests/data/ziwei_independent"
 
 
 def audit_childhood(fixtures: Path = FIXTURES) -> dict[str, Any]:

@@ -18,7 +18,7 @@ from scripts.gen_human_design_calendar_horizons import (
     plan,
 )
 
-EVIDENCE = ROOT / "docs/validation/human-design-calendar-horizons-v1/evidence"
+EVIDENCE = ROOT / "tests/data/human_design/calendar_horizons/evidence"
 BINDINGS = {
     "horizons-attempt1/reference.json": "a96f2658c3ec33a3a4c6ad4801cde92f2f4699ae55d4a92a78b8ca910bf32ea3",
     "de440-reference.json": "1fb6e869926ab8b4c74fd5dbe56e6459ce0ac6b90bc03fce41b88d559dfb3824",
@@ -59,7 +59,8 @@ def references() -> dict:
 
 def capture() -> dict:
     from fatebridge.core.astro import runtime
-    from fatebridge.core.human_design import BODY_IDS, positions_at_tt
+    from fatebridge.core.human_design import positions_at_tt
+    from fatebridge.core.human_design_mechanics import BODY_IDS
     from fatebridge.core.human_design_natal_sources import guard_natal_sources
 
     @guard_natal_sources
@@ -264,8 +265,6 @@ def compare(production: dict, sources: dict) -> dict:
         "position_count": len(rows),
         "comparison_counts": counts,
         "rows": rows,
-        "original_failed_row_reproduced_exactly": center["longitudes"]["swiss_default"]
-        == original["computed_longitude"],
         "original_failed_row_passed": original_passed,
         "original_historical_failed_row": original,
         "original_calendar_status": (

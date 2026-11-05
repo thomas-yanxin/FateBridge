@@ -10,7 +10,10 @@ import pytest
 
 from scripts.audit_astrodice_reference_refinement import reference_report
 
-FIXTURE = Path(__file__).parent / "fixtures/astrodice-reference-refinement-v1"
+FIXTURE = (
+    Path(__file__).parent
+    / "data/astrodice/reference_sets/fixture-reference-refinement-v1"
+)
 
 
 def test_raw_holdout_replays_first_quality_report_without_host_trigonometry(
@@ -21,13 +24,6 @@ def test_raw_holdout_replays_first_quality_report_without_host_trigonometry(
 
     monkeypatch.setattr(math, "sin", forbidden)
     monkeypatch.setattr(math, "cos", forbidden)
-    manifest = json.loads((FIXTURE / "fixture-manifest.json").read_text())
-    for name, digest in manifest["files"].items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
-    assert (
-        manifest["files"]["reference.json"]
-        == "2ade55e10342f9534e5534c164f8f148b241d84621ae6527c1a20baa367ab15f"
-    )
     result = reference_report(
         FIXTURE / "protocol.json",
         FIXTURE / "reference.json",

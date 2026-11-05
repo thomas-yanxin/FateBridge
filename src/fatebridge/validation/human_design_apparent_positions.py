@@ -9,66 +9,11 @@ import math
 from typing import Any
 
 from fatebridge.core.human_design_apparent_positions import (
-    METHOD,
     PHYSICAL_BODIES,
     build_context,
 )
 from fatebridge.core.human_design_provenance import position_flag_model
 from fatebridge.validation.claims import _same_value
-
-PRE_APPARENT_CONTRACTS = frozenset(
-    {
-        "168d79463454686ee3e8afb731ea2ee8d29ae906f0d9ca88c5cf364ea7daba30",
-        "570410131790378bf9a4e34e1f7031d5767e6dd9103c88426746099d870400b2",
-        "56806b2004d57149ad0067f1e7cb090d4fd3325413a6f21b04b4dc91dd02d4aa",
-    }
-)
-
-# These two complete schema identities emitted the original libm geometry.
-# They retain that exact algorithm and strict comparison, including its known
-# cross-platform failure. No case-specific whitelist or new-contract downgrade.
-PRE_PORTABLE_GEOMETRY_CONTRACTS = frozenset(
-    {
-        "30e391eb24c92dc5b61f9f27b296536cc5891c34367b73e7cc33daee91b8f765",
-        "f66b042abb0a9b04261477989e147609fc9b011cea0e4613fb4183e6c483ae7e",
-    }
-)
-
-# Exact complete schemas predating the explicit observer-frame extension.
-# Current/unknown schemas cannot delete its geometry and interpretation fields.
-PRE_COORDINATE_CONTEXT_CONTRACTS = frozenset(
-    {
-        "5b8d14718cf5015eb9b4f89740da82ca63c9a0af12c5c2169df87ebb0563e04e",
-        "fa56c62beed008e190217f69fc8eb89f7abe858c5a4c46fb0d0ac0e77c6c93d4",
-        "f66b042abb0a9b04261477989e147609fc9b011cea0e4613fb4183e6c483ae7e",
-        "30e391eb24c92dc5b61f9f27b296536cc5891c34367b73e7cc33daee91b8f765",
-        "168d79463454686ee3e8afb731ea2ee8d29ae906f0d9ca88c5cf364ea7daba30",
-        "570410131790378bf9a4e34e1f7031d5767e6dd9103c88426746099d870400b2",
-        "56806b2004d57149ad0067f1e7cb090d4fd3325413a6f21b04b4dc91dd02d4aa",
-    }
-)
-
-
-def declares_legacy_apparent_contract(payload: dict[str, Any]) -> bool:
-    if (
-        payload.get("run_metadata", {}).get("contract_sha256")
-        not in PRE_APPARENT_CONTRACTS
-    ):
-        return False
-    if (
-        "apparent_position_context" in payload
-        or "apparent_position_context" in payload.get("interpretation", {})
-    ):
-        return False
-    if "apparent_position_context" in payload.get("interpretation", {}).get(
-        "basis", []
-    ):
-        return False
-    return not any(
-        any(row.get(k) == METHOD for k in ("id", "rule_id", "ruleset_id"))
-        for key in ("rulesets", "rule_trace")
-        for row in payload.get(key, [])
-    )
 
 
 def checked_context(payload: dict[str, Any]) -> dict[str, Any]:
@@ -189,25 +134,7 @@ def checked_context(payload: dict[str, Any]) -> dict[str, Any]:
                 raise ValueError(
                     "Nominal activation not from its declared native batch"
                 )
-    legacy = "arithmetic_method" not in context
-    if legacy and (
-        payload.get("run_metadata", {}).get("contract_sha256")
-        not in PRE_PORTABLE_GEOMETRY_CONTRACTS
-        or context["ruleset"]["version"] != "1.0.0"
-    ):
-        raise ValueError("Current or unknown contract cannot omit portable arithmetic")
-    old_coordinate_contract = (
-        payload.get("run_metadata", {}).get("contract_sha256")
-        in PRE_COORDINATE_CONTEXT_CONTRACTS
-        and "coordinate_context" not in context
-        and "coordinate_frame_meaning" not in payload.get("interpretation", {})
-    )
-    expected = build_context(
-        raw_batches,
-        refs,
-        legacy=legacy,
-        include_coordinate_context=not old_coordinate_contract,
-    )
+    expected = build_context(raw_batches, refs)
     if not _same_value(context, expected):
         raise ValueError("Apparent position geometry or declared scope mismatch")
     return expected

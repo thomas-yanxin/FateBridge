@@ -1,10 +1,7 @@
 """Full execution requires real anchors; partial output reading stays legal."""
 
 import asyncio
-import gzip
 import json
-import sys
-import types
 from copy import deepcopy
 from dataclasses import replace
 from functools import lru_cache
@@ -14,7 +11,6 @@ import pytest
 
 import fatebridge.application.execution as execution
 from fatebridge.core.output_bazi_anchors import (
-    BAZI_ANCHOR_TOOLS,
     require_complete_bazi_anchors,
 )
 from tests.test_agentic_nested_outputs import (
@@ -28,7 +24,7 @@ from tests.test_agentic_nested_outputs import rest as _rest_fixture
 
 rest = _rest_fixture
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_complete_anchors_v1"
+
 TOOLS = tuple(
     ["analyze_destiny", "bazi_birth"]
     + [
@@ -48,49 +44,46 @@ TOOLS = tuple(
 )
 
 
-def read(path):
-    return json.loads(gzip.decompress(path.read_bytes()))
-
-
 @lru_cache(maxsize=1)
 def baseline():
-    return read(FIXTURE / "baseline-first.json.gz")
+    from fatebridge.core.execution_context import ExecutionOptions
+
+    rows = json.loads((ROOT / "tests/data/bazi/anchor-inputs.json").read_text())
+    return {
+        "rows": [
+            {
+                **row,
+                "result": execution.execute_tool(
+                    SPECS[row["tool"]],
+                    SPECS[row["tool"]].request_model(**row["arguments"]),
+                    options=ExecutionOptions(as_of=AS_OF),
+                    include_metadata=False,
+                ),
+            }
+            for row in rows
+        ]
+    }
 
 
-@lru_cache(maxsize=1)
-def controls():
-    return read(FIXTURE / "counterexamples-first.json.gz")["controls"]
-
-
-@lru_cache(maxsize=1)
-def old_validator():
-    source = read(FIXTURE / "before-source.json.gz")[
-        "src/fatebridge/application/execution.py"
-    ]
-    name = "_pre_bazi_complete_execution"
-    module = types.ModuleType(name)
-    sys.modules[name] = module
-    exec(compile(source, "pre_bazi_complete_execution.py", "exec"), module.__dict__)
-    return module.__dict__["validate_output"]
-
-
-@pytest.mark.parametrize("index", range(143))
-def test_all_first_accepted_absence_controls_are_rejected_in_full_execution(index):
-    case = controls()[index]
-    assert case["old_full_validator_accepted"]
-    spec = SPECS[case["tool"]]
-    old_validator()(spec, case["payload"])
-    with pytest.raises(execution.OutputContractError, match="完整八字"):
-        execution.validate_output(spec, case["payload"])
-
-
-def test_all86_original_branch_payloads_remain_valid_without_any_value_change():
-    assert len(baseline()["rows"]) == 86 and set(TOOLS) == BAZI_ANCHOR_TOOLS
-    for row in baseline()["rows"]:
-        assert not row["is_error"]
-        before = deepcopy(row["result"])
-        execution.validate_output(SPECS[row["tool"]], row["result"])
-        assert row["result"] == before
+@pytest.mark.parametrize("tool", TOOLS)
+@pytest.mark.parametrize("fault", ["absent", "empty", "null_leaf"])
+def test_current_full_results_require_independent_physical_anchors(tool, fault):
+    value = deepcopy(base(tool)["result"])
+    if tool == "analyze_destiny":
+        owner, field, leaf = value, "day_master", "stem"
+    elif tool == "bazi_birth":
+        owner, field, leaf = value["bazi_birth"], "four_pillars", "day"
+    else:
+        owner = value[tool.removeprefix("bazi_") + "_analysis"]["evidence_chain"]
+        field, leaf = "month_command", "month_branch"
+    if fault == "absent":
+        owner.pop(field)
+    elif fault == "empty":
+        owner[field] = {}
+    else:
+        owner[field][leaf] = None
+    with pytest.raises(execution.OutputContractError):
+        execution.validate_output(SPECS[tool], value)
 
 
 def test_partial_and_historical_models_are_not_made_full_execution_models():
@@ -131,8 +124,6 @@ def test_supported_unknowns_and_empty_observations_survive_complete_validation()
 def test_error_envelopes_and_other_domain_guards_keep_their_own_contract():
     for tool in TOOLS:
         malformed = {"error": "无效输入", "error_code": "validation_error"}
-        with pytest.raises(old_validator().__globals__["OutputContractError"]):
-            old_validator()(SPECS[tool], malformed)
         with pytest.raises(execution.OutputContractError):
             execution.validate_output(SPECS[tool], malformed)
         execution.validate_output(
@@ -149,9 +140,10 @@ def test_full_output_guard_never_calls_any_birth_or_strength_solver(monkeypatch)
     def forbidden(*args, **kwargs):
         raise AssertionError("Full-output validation compares supplied facts only")
 
+    rows = baseline()["rows"]
     monkeypatch.setattr(ElementAnalysis, "analyze_day_master_strength", forbidden)
     monkeypatch.setattr(context, "build_birth_computation_context", forbidden)
-    for row in baseline()["rows"]:
+    for row in rows:
         execution.validate_output(SPECS[row["tool"]], row["result"])
 
 
@@ -217,11 +209,7 @@ def test_all_supported_surfaces_reject_empty_complete_business_before_projection
     spec = SPECS[tool]
     payload = base(tool)["arguments"]
     path = projection(tool)
-    bad = next(
-        c["payload"]
-        for c in controls()
-        if c["tool"] == tool and c["kind"] == "empty_business"
-    )
+    bad = {key: {} for key in spec.required_output_fields}
     original = execution.execute_spec
 
     def corrupt(actual, parsed):

@@ -97,7 +97,7 @@ def verify_guchureki_clock(
 ) -> dict[str, Any]:
     source = load_source(SOURCE)
     bundle = source.data
-    fixture = ROOT / "tests/fixtures/sukuyo-guchureki-table3.txt"
+    fixture = ROOT / "tests/data/sukuyo-guchureki-table3.txt"
     raw = fixture.read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
     errors: list[Any] = []

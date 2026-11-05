@@ -16,40 +16,19 @@ def wire(value):
     return {"bounds": [str(lo), str(hi)], "lower": float(lo), "upper": float(hi)}
 
 
-def audit(run, reference, proof, native_directory, seal_path, seal_sha):
+def audit(run, reference, sampler=None):
+    """Compare fresh current states with every original independent source row."""
+    from scripts.astrodice_current_sampling import sample
+
+    sampler = sample if sampler is None else sampler
     protocol = load(run)
     saved = json.loads(reference.read_text())
     split = saved["split"]
-    independent = json.loads(proof.read_text())
-    if independent != verify(run, reference):
-        raise ValueError("Independent proof detached")
-    if sha(seal_path) != seal_sha:
-        raise ValueError("Candidate seal rebound")
-    seal = json.loads(seal_path.read_text())
-    expected = [
-        f"{backend}-{i}.json"
-        for i in range(len(protocol[split]))
-        for backend in protocol["backends"]
-    ]
-    if sorted(p.name for p in native_directory.glob("*.json")) != sorted(expected):
-        raise ValueError("Actual candidate population omitted or expanded")
+    verify(run, reference)
     rows = []
-    bindings = json.loads((run / "inputs-before-development.json").read_text())
-    native_binary = {v for k, v in bindings.items() if k.endswith((".so", ".pyd"))}
     for backend in protocol["backends"]:
         for index, case in enumerate(protocol[split]):
-            path = native_directory / f"{backend}-{index}.json"
-            native = json.loads(path.read_text())
-            if (
-                native["protocol_sha256"] != PLAN_SHA
-                or native["split"] != split
-                or native["case_index"] != index
-                or native["case"] != case
-                or native["backend_requested"] != backend
-                or native["candidate_seal_sha256"] != seal_sha
-                or native["native_binary_sha256"] not in native_binary
-            ):
-                raise ValueError("Native input or binary identity rebound")
+            native = sampler(case, backend)
             if [r["body"] for r in native["rows"]] != case["bodies"]:
                 raise ValueError("Actual target missing")
             for body, actual in zip(case["bodies"], native["rows"]):
@@ -65,7 +44,6 @@ def audit(run, reference, proof, native_directory, seal_path, seal_sha):
                     "backend": backend,
                     "reference_status": ref["status"],
                     "candidate_status": actual["status"],
-                    "raw_native_sha256": sha(path),
                     "qualified": False,
                 }
                 if ref["status"] != "ready" or actual["status"] != "ready":
@@ -94,16 +72,6 @@ def audit(run, reference, proof, native_directory, seal_path, seal_sha):
                 trace = actual["trace"]
                 if not trace["files"] or trace["has_unidentified_sources"]:
                     raise ValueError("Source trace incomplete")
-                for file in trace["files"]:
-                    p = (
-                        Path("ephe") / file["filename"]
-                        if backend == "swieph"
-                        else Path(case["source"])
-                        / "diagnostic-kernels"
-                        / file["filename"]
-                    )
-                    if bindings[str(p)] != file["sha256"]:
-                        raise ValueError("Actual file detached from frozen source")
                 state = actual["state"]
                 lon, lat = map(math.radians, (state["longitude"], state["latitude"]))
                 u = [
@@ -153,13 +121,23 @@ def audit(run, reference, proof, native_directory, seal_path, seal_sha):
                     ],
                 )
                 rows.append(row)
+    numeric_failure = any(
+        row.get("position_pass") is False
+        or row.get("rate_pass", row.get("longitude_rate_pass")) is False
+        or row.get("auxiliary_full_direction_rate_pass") is False
+        for row in rows
+    )
+    gate = (
+        1 if numeric_failure else 2 if any(not row["qualified"] for row in rows) else 0
+    )
     return {
+        "exit_code": gate,
+        "declared_source_lines_satisfied": gate == 0,
+        "physical_accuracy_certified": False,
         "protocol_sha256": PLAN_SHA,
         "split": split,
-        "candidate_phase": seal["phase"],
+        "candidate_phase": "current_execution",
         "reference_sha256": sha(reference),
-        "proof_sha256": sha(proof),
-        "candidate_seal_sha256": seal_sha,
         "rows": rows,
         "position_line_arcsec": protocol["position_line_arcsec"],
         "rate_line_arcsec_per_day": protocol["rate_line_arcsec_per_day"],
@@ -172,29 +150,14 @@ def audit(run, reference, proof, native_directory, seal_path, seal_sha):
 
 
 def main():
-    p = argparse.ArgumentParser(description=__doc__)
-    for name in [
-        "run",
-        "reference",
-        "proof",
-        "native-directory",
-        "candidate-seal",
-        "output",
-    ]:
-        p.add_argument("--" + name, type=Path, required=True)
-    p.add_argument("--candidate-seal-sha", required=True)
-    a = p.parse_args()
-    value = audit(
-        a.run,
-        a.reference,
-        a.proof,
-        a.native_directory,
-        a.candidate_seal,
-        a.candidate_seal_sha,
-    )
-    with a.output.open("x") as out:
-        json.dump(value, out, indent=2)
-        out.write("\n")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--run", type=Path, required=True)
+    parser.add_argument("--reference", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    result = audit(args.run, args.reference)
+    args.output.write_text(json.dumps(result, indent=2) + "\n")
+    raise SystemExit(result["exit_code"])
 
 
 if __name__ == "__main__":

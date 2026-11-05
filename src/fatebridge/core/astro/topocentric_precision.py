@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from fractions import Fraction
 from typing import Any
 
 from mpmath import mp  # type: ignore[import-untyped]
@@ -38,11 +39,20 @@ class TopocentricPosition:
 
 
 def _solve(
-    latitude: float, armc: float, obliquity: float, longitude: float, digits: int
+    latitude: float,
+    armc: float,
+    obliquity: float,
+    longitude: float | Fraction,
+    digits: int,
 ) -> dict[str, Any]:
     ctx = mp.clone()
     ctx.dps = digits
-    p, t, e, lam = [ctx.mpf(x) for x in (latitude, armc, obliquity, longitude)]
+    p, t, e = [ctx.mpf(x) for x in (latitude, armc, obliquity)]
+    lam = (
+        ctx.mpf(longitude.numerator) / longitude.denominator
+        if isinstance(longitude, Fraction)
+        else ctx.mpf(longitude)
+    )
     cp, sp = ctx.cospi(p / 180), ctx.sinpi(p / 180)
     ct, st = ctx.cospi(t / 180), ctx.sinpi(t / 180)
     ce, se = ctx.cospi(e / 180), ctx.sinpi(e / 180)
@@ -181,7 +191,7 @@ def checked_topocentric_position(
     latitude: float,
     armc: float,
     obliquity: float,
-    longitude: float,
+    longitude: float | Fraction,
     native_position: float,
 ) -> TopocentricPosition:
     if not all(math.isfinite(x) for x in (latitude, armc, obliquity, longitude)):

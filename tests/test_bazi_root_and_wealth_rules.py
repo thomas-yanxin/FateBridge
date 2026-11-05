@@ -63,7 +63,7 @@ def test_original_food_wealth_case_exposes_financial_root_without_fitting_body_s
     assert result["formation_status"] == "not_adjudicated"
     # The source strength label stays unchanged; our root facts do not invent it.
     source = json.loads(
-        (Path(__file__).parent / "fixtures/bazi_classical_v1/cases.json").read_text()
+        (Path(__file__).parent / "data/bazi_classical_v1/cases.json").read_text()
     )
     assert (
         next(c for c in source if c["id"] == "ZP37-LIANG")["adjudication"]["strength"]

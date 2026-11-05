@@ -14,7 +14,6 @@ from fastmcp.client.transports import StdioTransport
 from tests.test_agentic_nested_outputs import AS_OF, SPECS, business, call_cli
 from tests.test_liuyao_moving_si import BASE, CASES, check
 
-pytest_plugins = ["tests.test_agentic_nested_outputs"]
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = json.loads((BASE / "public-payloads.json").read_text())["rows"]
 IDS = [
@@ -110,7 +109,9 @@ def test_public_dates_are_bound_to_independent_calendars():
     assert (
         mapping["reference_sha256"]
         == hashlib.sha256(
-            (BASE.parent / "bazi_all_terms_v1/reference.json").read_bytes()
+            (
+                Path(__file__).parent / "data/bazi_all_terms_v1/reference.json"
+            ).read_bytes()
         ).hexdigest()
     )
 

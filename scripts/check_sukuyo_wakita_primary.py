@@ -21,8 +21,8 @@ from fatebridge.core.sukuyo_weekday import (
     classical_source_year_count,
 )
 
-FIXTURE = ROOT / "tests/fixtures/sukuyo-wakita-weekday-primary.json"
-PRECISION_FIXTURE = ROOT / "tests/fixtures/sukuyo-calibration-precision-primary.json"
+FIXTURE = ROOT / "tests/data/sukuyo-wakita-weekday-primary.json"
+PRECISION_FIXTURE = ROOT / "tests/data/sukuyo-calibration-precision-primary.json"
 
 
 def verify_printed_chapter(capture_dir: Path | None = None) -> dict[str, Any]:

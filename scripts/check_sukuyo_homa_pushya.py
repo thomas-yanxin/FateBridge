@@ -12,7 +12,7 @@ from scripts.check_sukuyo_commentarial_clock import check_literal_days
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "src/fatebridge/data/sukuyo_homa_pushya_manuscript.json"
-FIXTURE = ROOT / "tests/fixtures/sukuyo-homa-pushya-primary.json"
+FIXTURE = ROOT / "tests/data/sukuyo-homa-pushya-primary.json"
 
 
 def verify_primary(

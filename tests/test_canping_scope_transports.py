@@ -4,8 +4,8 @@ from copy import deepcopy
 
 import pytest
 
+from tests.canping_output_injection import inject_canping_output as return_frozen_output
 from tests.test_agentic_nested_outputs import rest as shared_rest
-from tests.test_canping_receipt_binding_transports import return_frozen_output
 from tests.test_canping_scope_rendering import REFERENCE, SPEC, _synchronize
 from tests.test_canping_scope_rendering import generated as shared_generated
 from tests.test_heluo_poem_transports import run_three

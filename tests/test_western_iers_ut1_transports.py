@@ -7,25 +7,24 @@ from pathlib import Path
 
 import pytest
 
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
+from tests.test_agentic_nested_outputs import SPECS, call_cli, native
+from tests.test_agentic_nested_outputs import rest as rest
+from tests.test_western_event_clock_transports import surfaces
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
-
-from tests.test_agentic_nested_outputs import SPECS, call_cli, native, rest
-from tests.test_western_event_clock_transports import surfaces
-
 REF = json.loads(
     gzip.decompress(
-        (
-            Path(__file__).parent / "fixtures/western-iers-c04-v2/controls.json.gz"
-        ).read_bytes()
+        (Path(__file__).parent / "data/astro/iers_c04/controls.json.gz").read_bytes()
     )
 )
 NORMAL = next(r for r in REF if r["utc"] == "2024-06-01T12:00:00")
 LEAP = next(r for r in REF if r["utc"] == "2016-12-31T23:59:60.5")
 GEOMETRY = json.loads(
-    (Path(__file__).parent / "fixtures/western-iers-c04-v2/geometry.json").read_text()
+    (Path(__file__).parent / "data/astro/iers_c04/geometry.json").read_text()
 )
 
 
@@ -76,7 +75,7 @@ def test_required_observed_ut1_on_rest_mcp_cli(
             body + ".calculation_basis",
             body + ".verdict",
         ],
-        rest,
+        rest,  # noqa: F811 - pytest fixture dependency
         tmp_path,
         capsys,
     )
@@ -102,7 +101,9 @@ def test_required_observed_ut1_on_rest_mcp_cli(
             assert c["utc_representation"]["utc_is_leap_second"]
 
 
-def test_observed_partial_source_and_default_null_source(rest, tmp_path, capsys):
+def test_observed_partial_source_and_default_null_source(
+    rest, tmp_path, capsys
+):  # noqa: F811 - pytest fixture dependency
     fields = [
         "clock_conversion.ut1_reference",
         "election.calculation_basis.earth_rotation.measured_eop_applied",
@@ -120,7 +121,7 @@ def test_observed_partial_source_and_default_null_source(rest, tmp_path, capsys)
         "astro_election",
         {**base, "ut1_source": "iers_c04"},
         fields,
-        rest,
+        rest,  # noqa: F811 - pytest fixture dependency
         tmp_path,
         capsys,
     )
@@ -139,7 +140,9 @@ def test_observed_partial_source_and_default_null_source(rest, tmp_path, capsys)
 
 
 @pytest.mark.parametrize("source", ["auto_observed", "unverified"])
-def test_invalid_source_on_real_protocols(source, rest, tmp_path, capsys):
+def test_invalid_source_on_real_protocols(
+    source, rest, tmp_path, capsys
+):  # noqa: F811 - pytest fixture dependency
     spec = SPECS["astro_election"]
     args = dict(
         candidate_year=2024,
@@ -158,7 +161,7 @@ def test_invalid_source_on_real_protocols(source, rest, tmp_path, capsys):
 
 
 def test_closed_source_edge_preserves_nominal_facts_and_computes_tt_lunar_events(
-    rest, tmp_path, capsys
+    rest,  # noqa: F811 - pytest fixture dependency tmp_path, capsys
 ):
     args = dict(
         candidate_year=2026,
@@ -180,7 +183,7 @@ def test_closed_source_edge_preserves_nominal_facts_and_computes_tt_lunar_events
             "election.verdict",
             "election.calculation_basis",
         ],
-        rest,
+        rest,  # noqa: F811 - pytest fixture dependency
         tmp_path,
         capsys,
     )

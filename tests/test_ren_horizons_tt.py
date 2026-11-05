@@ -85,7 +85,8 @@ def test_frozen_identity_inventory_and_content_cannot_be_rewritten(
 
 @pytest.mark.parametrize("change", ["scale", "label", "body", "frame", "nonfinite"])
 def test_remote_parser_rejects_wrong_time_geometry_or_angles(tmp_path, change):
-    reader = AUDIT.generator(AUDIT.CORPUS)
+    from tests.ren_horizons_reference import parse
+
     path = AUDIT.CORPUS / "collection/refinement-get20/batch-00.response.json"
     query = json.loads(path.with_name("batch-00.query.json").read_text())
     labels = AUDIT.shlex.split(query["params"]["TLIST"])
@@ -108,7 +109,7 @@ def test_remote_parser_rejects_wrong_time_geometry_or_angles(tmp_path, change):
     target = tmp_path / "wrong.json"
     target.write_text(json.dumps(data))
     with pytest.raises((ValueError, StopIteration)):
-        reader["parse"](target, labels)
+        parse(target, labels)
 
 
 def test_tt_label_is_not_an_utc_label_and_microseconds_are_retained():

@@ -94,7 +94,7 @@ def test_short_arc_is_selected_before_rounding_at_the_antipodal_discontinuity():
     assert midpoint["computed_from_unrounded"] is True
 
 
-def test_exact_antipodal_legacy_view_reports_both_endpoints_without_order_bias():
+def test_exact_antipodal_seven_planet_view_reports_both_endpoints_without_order_bias():
     factors = [{"id": "Sun", "longitude": 0.0}, {"id": "Moon", "longitude": 180.0}]
     for sequence in (factors, factors[::-1]):
         row = seven_planet_view(sequence)["midpoints"][0]

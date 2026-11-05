@@ -12,7 +12,7 @@ from fatebridge.core.jpl_ephemeris import jpl_header
 
 FIXTURE = (
     Path(__file__).parent
-    / "fixtures/astrodice-de441-records-v1/diagnostic-kernels/case-02.eph"
+    / "data/astrodice/reference_sets/study-lunar-split/diagnostic-kernels/case-02.eph"
 )
 
 

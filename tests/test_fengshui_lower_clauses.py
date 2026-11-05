@@ -12,8 +12,8 @@ import pytest
 
 from fatebridge.validation import fengshui_lower_clauses as audit
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_lower_clauses_v1"
-WEB = Path(__file__).parent / "fixtures/fengshui_classical_v1/reference.json"
+FOLDER = Path(__file__).parent / "data/fengshui_lower_clauses_v1"
+WEB = Path(__file__).parent / "data/fengshui_classical_v1/reference.json"
 
 
 def sources():
@@ -216,7 +216,7 @@ def test_unaltered_global_source_gate_keeps_both_edition_scopes(tmp_path):
     assert result["unresolved_disagreement_count"] == 0
     assert (
         result["unresolved_disagreement_count_scope"]
-        == "legacy_web_versus_earlier_facsimile_spot_checks_only"
+        == "web_versus_earlier_facsimile_spot_checks_only"
     )
     modern = result["same_edition_lower_clauses"]
     assert modern["unresolved_source_conflict_count"] == 3

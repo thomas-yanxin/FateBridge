@@ -40,6 +40,9 @@ load_runtime_env()
 # isort: split
 
 from fatebridge import __version__ as APP_VERSION
+from fatebridge.application.compute_limits import (
+    MAX_CONCURRENCY as HEAVY_CALC_MAX_CONCURRENCY,
+)
 from fatebridge.application.discovery import discover_specs
 from fatebridge.application.result_delivery import RESULT_STORE
 from fatebridge.application.scenarios import discover_scenarios
@@ -89,24 +92,6 @@ app.add_middleware(
 )
 
 
-_DEFAULT_HEAVY_CALC_MAX_CONCURRENCY = min(4, max(1, os.cpu_count() or 1))
-try:
-    HEAVY_CALC_MAX_CONCURRENCY = max(
-        1,
-        int(
-            os.getenv(
-                "FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY",
-                str(_DEFAULT_HEAVY_CALC_MAX_CONCURRENCY),
-            )
-        ),
-    )
-except ValueError:
-    logger.warning(
-        "Invalid integer for %s, falling back to %s",
-        "FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY",
-        _DEFAULT_HEAVY_CALC_MAX_CONCURRENCY,
-    )
-    HEAVY_CALC_MAX_CONCURRENCY = _DEFAULT_HEAVY_CALC_MAX_CONCURRENCY
 HEAVY_CALC_SEMAPHORE: Optional[asyncio.Semaphore] = None
 HEAVY_CALC_SEMAPHORE_LOOP: Optional[asyncio.AbstractEventLoop] = None
 

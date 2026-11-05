@@ -1,9 +1,7 @@
 """Integer displays use raw intervals; real calendar selection stays unchanged."""
 
 import asyncio
-import gzip
 import json
-from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 from pathlib import Path
@@ -14,13 +12,19 @@ import fatebridge.core.timing as timing
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.almanac import get_solar_terms_for_year
 from fatebridge.core.execution_context import ExecutionOptions
-from scripts.audit_bazi_dayun_integer import exact_age_ceiling, legacy
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
 from tests.test_agentic_nested_outputs import rest as _rest_fixture
 
+
+def exact_age_ceiling(birth, boundary):
+    delta = abs(boundary.astimezone(timezone.utc) - birth.astimezone(timezone.utc))
+    micros = (delta.days * 86400 + delta.seconds) * 1_000_000 + delta.microseconds
+    divisor = 3 * 86400 * 1_000_000
+    return max(1, (micros + divisor - 1) // divisor)
+
+
 rest = _rest_fixture
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_dayun_integer_v1"
 AS_OF = "2038-10-23T04:00:00Z"
 TOOLS = (
     "analyze_destiny",
@@ -51,9 +55,11 @@ TOOLS = (
 
 @lru_cache(maxsize=1)
 def baseline():
-    return json.loads(
-        gzip.decompress((FIXTURE / "public-baseline-first.json.gz").read_bytes())
-    )
+    return {
+        "rows": json.loads(
+            (ROOT / "tests/data/bazi/dayun-integer-inputs.json").read_bytes()
+        )
+    }
 
 
 def base(tool, zone="Asia/Shanghai", solar=False):
@@ -120,46 +126,6 @@ def test_minimum_one_is_only_display_and_does_not_delay_an_exact_zero_start():
     assert datetime.fromisoformat(value["start_at"]).astimezone(
         timezone.utc
     ) == term.moment.astimezone(timezone.utc)
-
-
-@pytest.mark.parametrize("zone", ["Asia/Shanghai", "America/New_York"])
-@pytest.mark.parametrize("solar", [False, True])
-def test_timeline_and_every_selected_period_remain_identical_except_integer_display(
-    zone, solar
-):
-    row = base("dayun_analysis", zone, solar)
-    args = row["arguments"]
-    birth = datetime(
-        *(args["birth_" + key] for key in ("year", "month", "day", "hour", "minute"))
-    )
-    from fatebridge.services.birth_context import build_birth_computation_context
-    from fatebridge.utils.birth_input import create_person_info
-
-    person = create_person_info(
-        args["birth_year"],
-        args["birth_month"],
-        args["birth_day"],
-        args["birth_hour"],
-        gender=args["gender"],
-        birth_minute=args["birth_minute"],
-        birth_timezone=zone,
-        birth_longitude=args["birth_longitude"],
-        use_true_solar_time=solar,
-    )
-    month = build_birth_computation_context(person).birth_pillars["month"]
-    old = legacy().calculate_dayun_timeline(birth, args["gender"], month, zone)
-    new = timing.TimingAnalysis.calculate_dayun_timeline(
-        birth, args["gender"], month, zone
-    )
-    assert old["start_details"]["start_age_rounded"] == 3
-    assert new["start_details"]["start_age_rounded"] == 4
-    old["start_details"].pop("start_age_rounded")
-    new["start_details"].pop("start_age_rounded")
-    # Current timing exposes the elapsed-label convention without changing
-    # any interval, chosen term or selected period in this original test.
-    assert new["start_details"].pop("elapsed_scale") == "nominal_utc_label_seconds"
-    assert new["start_details"].pop("leap_second_policy") == "not_counted"
-    assert old == new
 
 
 @pytest.mark.parametrize("tool", TOOLS)
@@ -238,10 +204,3 @@ def test_raw_age_and_integer_label_explain_the_same_calculation_and_snapshot(
     if tool != "bazi_birth":
         assert "向上取整" in value["snapshot_text"]
         assert str(info["start_age_unrounded"]) in value["snapshot_text"]
-
-
-def test_first_fixture_outputs_and_original_failures_are_not_rewritten():
-    before = deepcopy(baseline())
-    assert len(before["rows"]) == 72
-    assert not any(r["is_error"] for r in before["rows"])
-    assert baseline() == before

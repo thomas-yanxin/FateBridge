@@ -15,7 +15,7 @@ from typing import Any
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
 from fatebridge.services.metaphysics import _build_analysis_seed
 
-FIXTURES = Path(__file__).resolve().parents[1] / "tests/fixtures/ziwei_independent"
+FIXTURES = Path(__file__).resolve().parents[1] / "tests/data/ziwei_independent"
 
 
 def audit_natal(fixtures: Path = FIXTURES) -> dict[str, Any]:

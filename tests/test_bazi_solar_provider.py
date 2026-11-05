@@ -9,7 +9,9 @@ import pytest
 from fatebridge.core import almanac, timing
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.timing import TimingAnalysis
-from tests.test_agentic_nested_outputs import SPECS, call_cli, inputs, native, rest
+from fatebridge.utils.errors import EphemerisSourceError
+from tests.test_agentic_nested_outputs import SPECS, call_cli, inputs, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_year_contract import TOPICS
 
 
@@ -38,6 +40,9 @@ def failed_solver(monkeypatch):
         clear_solar_caches()
 
 
+rest = _shared_rest
+
+
 @pytest.mark.parametrize(
     "key",
     ["bazi_" + topic for topic in TOPICS]
@@ -51,7 +56,7 @@ def failed_solver(monkeypatch):
         "jieqi_timeline_analysis",
     ],
 )
-def test_bazi_and_timing_reject_linear_terms_on_all_three_surfaces(
+def test_missing_native_crossings_are_rejected_on_all_three_surfaces(
     key, rest, tmp_path, capsys, failed_solver
 ):
     spec = SPECS[key]
@@ -60,11 +65,12 @@ def test_bazi_and_timing_reject_linear_terms_on_all_three_surfaces(
     code, local = call_cli(spec, payload, tmp_path, capsys)
     protocol = asyncio.run(native(spec, payload))
     assert http.status_code == 503 and code != 0 and protocol.is_error
-    for envelope in (http.json(), local):
-        assert envelope["error_code"] == "dependency_missing"
+    for envelope in (http.json(), local, protocol.structured_content):
+        assert envelope["error_code"] == "ephemeris_source_inconsistent"
+        assert envelope["issues"][0]["code"] == "solar_native_unavailable"
         assert envelope["retryable"] is False
         assert not any(k in envelope for k in ("bazi_birth", "four_pillars", "liuyue"))
-    assert "dependency_missing" in str(protocol.content)
+    assert "solar_native_unavailable" in str(protocol.content)
 
 
 @pytest.mark.parametrize("provider", ["linear_1900_fallback", "unknown", ""])
@@ -91,8 +97,8 @@ def test_unknown_provenance_is_not_promoted_to_a_calculated_term(provider):
         lambda: TimingAnalysis.calculate_jieqi_transition_timeline(2026),
     ],
 )
-def test_direct_domain_operations_reject_fallback(operation, failed_solver):
-    with pytest.raises(RuntimeError, match="swisseph"):
+def test_direct_domain_operations_reject_missing_native_roots(operation, failed_solver):
+    with pytest.raises(EphemerisSourceError, match="no linear approximation"):
         operation()
 
 

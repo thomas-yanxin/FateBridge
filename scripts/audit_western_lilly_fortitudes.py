@@ -77,13 +77,10 @@ def audit():
         for r in reference["rows"]
     ]
     original_annotation_row_table_matches = actual_rows == frozen_rows
-    correction_dir = ROOT / "tests/fixtures/western-lilly-regulus-orb-v2"
+    correction_dir = ROOT / "tests/data/astro/lilly_regulus_orb"
     correction_bytes = (correction_dir / "correction.json").read_bytes()
     assert hashlib.sha256(correction_bytes).hexdigest() == CORRECTION_SHA256
     correction = json.loads(correction_bytes)
-    correction_manifest = json.loads((correction_dir / "manifest.json").read_text())
-    for name, digest in correction_manifest["files"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
     assert set(correction["corrected_rows"]) == {"F17"}
     assert (
         not correction["book_weights_changed"]

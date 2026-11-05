@@ -16,12 +16,12 @@ from fatebridge.core.metaphysics.taiyi_year import RULESET_ID, cyclic_core
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v22"
-MANIFEST_SHA256 = "0bc9a2523bd8438910d46450a8ea13e4287676717d9b8407d6a0bd3a2f4ffacb"
+MANIFEST_SHA256 = "e9d33f823e9c1810249b5d02ad0e50b5a4e69a1549c9cbbc7723bc34d76363d8"
 NAME_MANIFEST_SHA256 = (
-    "1fb894e7e7bf4cd2b9678d078016c4c3bb615c8d2ebd739fda8ca56a446f6cf6"
+    "3aecfdc0742e8f8ea201348d7dedae14d4d5510771b78f93f16aac1c4ebc37e3"
 )
 FACSIMILE_MANIFEST_SHA256 = (
-    "29ba02aaae60e29071a52f0ce24247755e27d8b994be0e80c0bba92ec872fa6b"
+    "027570d862636f04b9b77ac916860341d9c29b251888232640f8284c3debe848"
 )
 FIELDS = (
     "taiyi_number",

@@ -111,7 +111,7 @@ def test_explicit_offset_retains_named_zone_and_physical_solar_input(
     assert (c["fold"], c["instant_utc"], c["timezone"]) == (fold, utc, "Asia/Shanghai")
     assert (
         b["placement_datetime"]
-        == f"1991-09-15 {'00' if solar and fold==0 else '01'}:30:00"
+        == f"1991-09-15 {'00' if solar and fold == 0 else '01'}:30:00"
     )
     if solar:
         assert seen[0] == utc

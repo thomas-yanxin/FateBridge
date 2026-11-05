@@ -83,7 +83,7 @@ def test_seasonal_and_internal_powers_are_independent_and_traced():
     board = V1.observe_jinkou(V1.load_frozen_corpus()["cases"]["cases"][0])
     assert [r["seasonal_power"] for r in board["rows"]] == ["相", "休", "休", "囚"]
     assert [r["internal_power"] for r in board["rows"]] == ["死", "旺", "旺", "休"]
-    assert all(r["power"] == r["seasonal_power"] for r in board["rows"])
+    assert all("power" not in r for r in board["rows"])
     assert board["internal_strength"]["anchor_element"] == "水"
     assert (
         next(

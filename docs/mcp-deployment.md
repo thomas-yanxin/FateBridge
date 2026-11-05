@@ -42,9 +42,49 @@ uv run --locked --extra dev fatebridge doctor --mcp
 
 ## 注册本地 stdio
 
-[README](../README.md#本地-mcp由客户端启动-stdio-进程)提供可合并的 Codex TOML 和通用 `mcpServers` JSON。替换 `command` 为本次 doctor 的 `executable`，不要使用系统 Python、未展开的 `~` 或依赖激活的相对路径。
+以下模板合并到客户端现有配置中。替换 `command` 为本次 doctor 的 `executable` 绝对路径；参数分别放在 `args`，保留已有的其他服务。
 
-- Codex：编辑 `~/.codex/config.toml` 的 `[mcp_servers.fatebridge]`；也可执行 doctor 的 `codex.add_command`，二选一。详见 [Codex 指南](codex-guide.md#2-注册到-codex)。
+### Codex
+
+配置文件为 `~/.codex/config.toml`：
+
+```toml
+[mcp_servers.fatebridge]
+command = "/absolute/path/to/python"
+args = ["-m", "fatebridge.mcp_server"]
+startup_timeout_sec = 30
+tool_timeout_sec = 60
+
+[mcp_servers.fatebridge.env]
+FATEBRIDGE_MCP_FAMILIES = ""
+FATEBRIDGE_MCP_SCENARIOS = ""
+PYTHONUTF8 = "1"
+```
+
+也可执行 doctor 返回的 `codex.add_command`，二选一。完整首次对话见 [Codex 指南](codex-guide.md#2-注册到-codex)。
+
+### Claude Desktop 与 Cursor
+
+合并 `mcpServers.fatebridge`：
+
+```json
+{
+  "mcpServers": {
+    "fatebridge": {
+      "command": "/absolute/path/to/python",
+      "args": ["-m", "fatebridge.mcp_server"],
+      "env": {
+        "FATEBRIDGE_MCP_FAMILIES": "",
+        "FATEBRIDGE_MCP_SCENARIOS": "",
+        "PYTHONUTF8": "1"
+      }
+    }
+  }
+}
+```
+
+Cursor 在 `fatebridge` 条目内另加 `"type": "stdio"`。
+
 - Claude Desktop：通过客户端的开发者设置打开 MCP 配置，合并 `mcpServers.fatebridge`；配置位置见 [MCP 官方本地接入说明](https://modelcontextprotocol.io/docs/develop/connect-local-servers)。
 - Cursor：项目 `.cursor/mcp.json` 或用户 `~/.cursor/mcp.json`，条目使用 `"type": "stdio"`、`command`、`args` 和 `env`，见 [Cursor 官方说明](https://cursor.com/docs/context/mcp)。
 
@@ -112,12 +152,11 @@ uv run --locked --extra dev fatebridge bazi_birth `
 
 默认不筛选工具。可在客户端的 `env` 中明确设置：
 
-以下 topic 开关需当前源码环境，已发布版本按对应标签的文档。支持延迟工具加载时可保留完整目录；不支持时在选定场景下加 `FATEBRIDGE_MCP_TOOL_SCOPE=topic`。默认 `complete` 保留条件依赖，topic 只公开直接工具和知识支撑。隐藏分支在场景 `availability` 中如实标缺，不会通过通用调度工具绕过过滤；需要条件技法时切回 complete 并重启连接。未指定场景的 topic 配置启动失败。
+`FATEBRIDGE_MCP_TOOL_SCOPE` 选择场景依赖范围，需当前源码环境；已发布版本按对应标签的文档。支持延迟工具加载时可保留完整目录；不支持时在选定场景下加 `FATEBRIDGE_MCP_TOOL_SCOPE=topic`。默认 `complete` 保留条件依赖，topic 只公开直接工具和知识支撑。隐藏分支在场景 `availability` 中如实标缺，不会通过通用调度工具绕过过滤；需要条件技法时切回 complete 并重启连接。未指定场景的 `topic` 配置启动失败；未知 scope 值也会拒绝启动。
 
 ```bash
 uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye --tool-scope topic
 ```
-
 
 | 目标 | `FATEBRIDGE_MCP_FAMILIES` | `FATEBRIDGE_MCP_SCENARIOS` |
 | --- | --- | --- |
@@ -127,7 +166,7 @@ uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye --tool
 
 筛选是服务端实际公开范围，两个变量取交集，错误名称或空交集会导致启动失败。可先执行 `fatebridge doctor --mcp --family fengshui --scenario ""` 验证该范围；源码用户加 `uv run --locked --extra dev`。`fatebridge scenarios` 和 `fatebridge discover --surface mcp` 可查场景与工具。限制工具只影响 MCP，不提供用户权限管理。
 
-源码 MCP 启动时读取仓库根目录 `.env`，已有进程环境优先。GUI 客户端应通过 `env` 注入设置，独立工具安装不要依赖当前工作目录的 `.env`。自定义星历目录可加 `SE_EPHE_PATH`，下载步骤与精度检查见[星历说明](getting-started.md#星历数据与精度)。日志写 stderr，stdout 留给 stdio 协议；启动包装脚本也应遵守此约定。
+源码 MCP 启动时读取仓库根目录 `.env`，已有进程环境优先。GUI 客户端应通过 `env` 注入设置，独立工具安装不要依赖当前工作目录的 `.env`。自定义星历目录可加 `SE_EPHE_PATH`，下载步骤与精度检查见[星历说明](ephemeris.md)。日志写 stderr，stdout 留给 stdio 协议；启动包装脚本也应遵守此约定。
 
 [Onda 技能](../skills/README.md)与 MCP 进程分开加载。Codex 使用该源码仓库作为项目时，从 `AGENTS.md` 和 `.agents/skills/` 获取项目指导及技能入口；其他客户端需按自身机制加载 `skills/`。只安装 Python 包或连接远程 MCP，不会向客户端复制技能文件。
 
@@ -270,7 +309,9 @@ uv run --locked --extra dev python -m pytest -q tests/test_onda_plugin.py
 
 1. 本地 stdio 运行 doctor；HTTP 使用上面的协议脚本，确认服务本身可用。
 2. 保存客户端配置，重新加载连接；必要时重启客户端并打开新聊天。
-3. 确认实际工具可见，使用 [README 的虚构提示](../README.md#确认客户端可用)完成一次真实调用。
+3. 确认实际工具可见，用以下虚构提示完成一次真实调用；看到工具成功返回才表示客户端接入完成：
+
+   > 请使用 FateBridge，计算男、公历 1990 年 5 月 15 日上午 10:30、北京出生的八字，只解释日主的传统含义。
 
 | 失败现象 | 检查 |
 | --- | --- |

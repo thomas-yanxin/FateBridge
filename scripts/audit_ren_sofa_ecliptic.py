@@ -55,24 +55,12 @@ def prior_module() -> Any:
 
 
 def source_contents(corpus: Path) -> dict[str, bytes]:
-    """Preserve the original generator bytes inside a single-member archive.
-
-    This is a packaging change after collection, not a new reference freeze.
-    The original logical name and all precomparison content hashes remain.
-    """
-    contents = {
-        str(p.relative_to(corpus)): p.read_bytes()
-        for p in corpus.rglob("*")
-        if p.is_file() and p.name != "freeze.json"
+    """Read current raw source/reference material, with no archived-code rebinding."""
+    return {
+        str(path.relative_to(corpus)): path.read_bytes()
+        for path in corpus.rglob("*")
+        if path.is_file() and path.name != "freeze.json"
     }
-    if "reference-generator.zip" in contents:
-        if "build_reference.py" in contents:
-            raise ValueError("Duplicate frozen ecliptic generator")
-        with zipfile.ZipFile(io.BytesIO(contents.pop("reference-generator.zip"))) as z:
-            if z.namelist() != ["build_reference.py"]:
-                raise ValueError("Frozen ecliptic generator archive inventory changed")
-            contents["build_reference.py"] = z.read("build_reference.py")
-    return contents
 
 
 def reference(corpus: Path = CORPUS) -> dict[str, Any]:

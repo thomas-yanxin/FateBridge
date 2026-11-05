@@ -7,7 +7,7 @@ from __future__ import annotations
 from collections import Counter
 from dataclasses import replace
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from fatebridge.core import guolao_moira
 from fatebridge.core.astro.birth import AstroBirthInfo, build_astro_birth_info
@@ -1468,6 +1468,7 @@ def calculate_core_chart_analysis(
     birth_longitude: Optional[float],
     birth_latitude: Optional[float],
     chart_variant: str = "chart",
+    apparent_model: Literal["native", "opaque_solar"] = "native",
     birth_minute: int = 0,
     birth_second: int = 0,
     birth_microsecond: int = 0,
@@ -1667,6 +1668,12 @@ def calculate_core_chart_analysis(
             uncertainty_minutes=birth_time_uncertainty_minutes,
         )
     result.update(_build_chart_snapshot(result, chart_variant))
+    if apparent_model == "opaque_solar":
+        from fatebridge.core.astro.opaque_solar import opaque_solar_positions
+
+        result["apparent_model_positions"] = opaque_solar_positions(
+            result["chart_profile"]["julian_day_tt"]
+        )
     return result
 
 

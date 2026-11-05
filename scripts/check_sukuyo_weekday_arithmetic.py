@@ -16,7 +16,7 @@ if not __package__:
 
 from fatebridge.core.sukuyo_weekday import SOURCE, classical_weekday_arithmetic
 
-FIXTURE = ROOT / "tests/fixtures/sukuyo-weekday-arithmetic-primary.json"
+FIXTURE = ROOT / "tests/data/sukuyo-weekday-arithmetic-primary.json"
 
 
 def verify_arithmetic(capture_dir: Path | None = None) -> dict[str, Any]:

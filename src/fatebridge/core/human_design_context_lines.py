@@ -52,7 +52,7 @@ def _context(path: str, kind: str, chart: dict, mode: str, times: dict) -> dict:
             "expanded_cross_name_comparison": expanded_cross_evidence(rebuilt),
             "primary_transcript_diagrams": primary_diagram_evidence(rebuilt),
             "historical_polarity_comparison": comparison_report(rebuilt),
-            "legacy_nominal_field_names_refer_to_this_context_only": True,
+            "nominal_field_names_refer_to_this_context_only": True,
         },
     }
 

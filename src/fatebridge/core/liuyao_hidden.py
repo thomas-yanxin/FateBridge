@@ -330,7 +330,7 @@ def qualify_hidden_reception(
             r["position"]
             for r in lines
             if activity_condition(r, conditions[r["position"] - 1]) is not False
-            and not conditions[r["position"] - 1].get("outgoing_obstructions")
+            and outgoing_blocker(conditions[r["position"] - 1]) is not True
             and (
                 element_relation(r["element"], ELEMENTS[branch]) == "克爻"
                 or branch_facts(branch, month, r["branch"], void)["is_day_clash"]

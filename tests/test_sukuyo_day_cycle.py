@@ -29,9 +29,7 @@ def test_malformed_or_non_cycle_source_labels_are_rejected(value):
 
 def test_syntactically_valid_one_day_source_shift_is_detected():
     facts = json.loads(
-        (
-            Path(__file__).parent / "fixtures/sukuyo-historical-edge-probes.json"
-        ).read_bytes()
+        (Path(__file__).parent / "data/sukuyo-historical-edge-probes.json").read_bytes()
     )
     record = next(row for row in facts["naoj"] if row["lunar_year"] == 806)
     months = parse_naoj(base64.b64decode(record["raw_csv_base64"]), 806)

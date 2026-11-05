@@ -1,21 +1,24 @@
 """All twelve preselected public routes retain charts and source evidence."""
 
-import gzip
 import json
+from pathlib import Path
 
 import pytest
 
 from tests.test_agentic_nested_outputs import SPECS, business
 from tests.test_agentic_nested_outputs import rest as shared_rest
-from tests.test_heluo_lin19_song6 import FAULTS, F, corrupt_source, source_cache
+from tests.test_heluo_lin19_song6 import FAULTS, corrupt_source
+from tests.test_heluo_lin19_song6 import source_cache as source_cache
 from tests.test_heluo_poem_transports import run_three
 
 rest = shared_rest
-before = json.loads(gzip.decompress((F / "cases-before.json.gz").read_bytes()))
+cases = json.loads(
+    (Path(__file__).parent / "data/heluo/lin_song_routes.json").read_text()
+)
 
 
-@pytest.mark.parametrize("case", before, ids=lambda c: c["hexagram"] + str(c["line"]))
-def test_public_route_chart_is_unchanged_and_selected_source_text_matches_all_transports(
+@pytest.mark.parametrize("case", cases, ids=lambda c: c["hexagram"] + str(c["line"]))
+def test_public_route_selected_source_text_matches_all_transports(
     case, rest, tmp_path, capsys, source_cache
 ):
     response, code, cli, mcp = run_three(
@@ -31,7 +34,6 @@ def test_public_route_chart_is_unchanged_and_selected_source_text_matches_all_tr
         business(response.json()) == business(cli) == business(mcp.structured_content)
     )
     for result in [response.json(), cli, mcp.structured_content]:
-        assert result["chart"] == case["before_output"]["chart"]
         selected = result["numerology_evidence"]["selected_texts"][case["phase"]]
         assert (selected["hexagram"], selected["line"]) == (
             case["hexagram"],

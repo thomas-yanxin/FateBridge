@@ -17,7 +17,7 @@ if not __package__:
 
 from scripts.audit_sukuyo_t2465_primary import SATQuotationParser
 
-FIXTURE = ROOT / "tests/fixtures/sukuyo-taibai-primary.json"
+FIXTURE = ROOT / "tests/data/sukuyo-taibai-primary.json"
 NS = {"t": "http://www.tei-c.org/ns/1.0"}
 XML_ID = "{http://www.w3.org/XML/1998/namespace}id"
 

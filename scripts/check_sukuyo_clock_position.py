@@ -48,7 +48,7 @@ def main_text(raw: str, after_anchor: str | None = None) -> str:
 def verify_clock_position(
     xml_path: Path | None = None, symbol_capture: Path | None = None
 ) -> dict[str, Any]:
-    fixture_path = ROOT / "tests/fixtures/sukuyo-clock-transposition-primary.json"
+    fixture_path = ROOT / "tests/data/sukuyo-clock-transposition-primary.json"
     fixture = json.loads(fixture_path.read_bytes())
     source = load_source(CLOCK_POSITION)
     bundle = source.data

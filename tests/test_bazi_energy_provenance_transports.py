@@ -16,9 +16,7 @@ from tests.test_agentic_nested_outputs import rest as shared_rest
 rest = shared_rest
 ROOT = Path(__file__).resolve().parents[1]
 DATA = json.loads(
-    (
-        ROOT / "tests/fixtures/bazi_single_end_resolution_v1/protocol-cases-first.json"
-    ).read_text()
+    (ROOT / "tests/data/bazi/single-end-transport-inputs.json").read_text()
 )
 CASES = DATA["cases"][:12]
 

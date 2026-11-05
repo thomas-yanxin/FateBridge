@@ -14,7 +14,7 @@ from scripts.check_sukuyo_commentarial_clock import source_lines
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "src/fatebridge/data/sukuyo_phase_clock.json"
-FIXTURE = ROOT / "tests/fixtures/sukuyo-phase-clock-primary.json"
+FIXTURE = ROOT / "tests/data/sukuyo-phase-clock-primary.json"
 
 
 def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:

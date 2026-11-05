@@ -204,10 +204,6 @@ def source_activation_impacts(chart: Dict[str, Any]) -> Dict[str, Any]:
 
 def evidence(
     chart: Dict[str, Any],
-    *,
-    include_gate_context: bool = True,
-    include_profile_partition: bool = True,
-    include_historical_polarity: bool = True,
 ) -> Dict[str, Any]:
     graph = chart["bodygraph"]
     bridges = definition_bridging(graph)
@@ -478,12 +474,9 @@ def evidence(
             ],
         },
     }
-    if include_gate_context:
-        result = add_gate_context_evidence(chart, result)
-    if include_profile_partition:
-        result = add_profile_partition_evidence(chart, result)
-    if include_historical_polarity:
-        result = add_historical_polarity_evidence(chart, result)
+    result = add_gate_context_evidence(chart, result)
+    result = add_profile_partition_evidence(chart, result)
+    result = add_historical_polarity_evidence(chart, result)
     return result
 
 

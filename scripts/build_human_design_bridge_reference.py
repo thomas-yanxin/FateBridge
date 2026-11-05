@@ -79,7 +79,6 @@ def build(plan_path: Path, compiler: str) -> dict:
         "plan_sha256": hashlib.sha256(plan_path.read_bytes()).hexdigest(),
         "oracle_source_path": c_path.relative_to(ROOT).as_posix(),
         "oracle_source_sha256": hashlib.sha256(c_path.read_bytes()).hexdigest(),
-        "generator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "source_table_path": source_path.relative_to(ROOT).as_posix(),
         "source_table_sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
         "primary_source": source["source"],

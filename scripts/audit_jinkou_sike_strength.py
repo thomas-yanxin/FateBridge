@@ -12,7 +12,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/jinkou_sike_strength_v1"
-PIN = "ed512c4fd41889926cd5a25209d2e38c692367ce25770238c0cfe57f26c6badc"
+PIN = "ce8fa80c94242aa1ee7e10a2e98bd65b5762e3982dbdd52ad49e7965b2360d9e"
 
 
 def sha(path: Path) -> str:
@@ -35,15 +35,10 @@ def reference(folder: Path = CORPUS) -> dict[str, Any]:
     witness = json.loads((folder / "witness.json").read_text())
     if sha(ROOT / witness["source_path"]) != witness["source_sha256"]:
         raise ValueError("Original complete Jingben PDF changed")
-    with tempfile.TemporaryDirectory(prefix="jinkou-sike-reference-") as name:
-        temp = Path(name)
-        for item in ("readings.json", "generate_reference.py.txt"):
-            (temp / item).write_bytes((folder / item).read_bytes())
-        runpy.run_path(str(temp / "generate_reference.py.txt"))
-        if (temp / "reference.json").read_bytes() != (
-            folder / "reference.json"
-        ).read_bytes():
-            raise ValueError("Independent Sike inference reconstruction differs")
+    from tests.ren_source_arithmetic import sike_strength
+
+    if sike_strength(folder) != json.loads((folder / "reference.json").read_text()):
+        raise ValueError("Independent source arithmetic differs")
     return {
         key: json.loads((folder / (key + ".json")).read_text())
         for key in ("readings", "reference", "witness", "protocol")

@@ -11,7 +11,7 @@ from fatebridge.core.ziwei_auxiliary import attach_natal_cycles
 from fatebridge.core.ziwei_cycle_sources import cycle_source_evidence
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures/ziwei_independent"
+FIXTURES = ROOT / "tests/data/ziwei_independent"
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 
 

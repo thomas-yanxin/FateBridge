@@ -8,8 +8,8 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).parents[1]
-R1 = ROOT / "tests/fixtures/sukuyo-matanga-before-production-v79.json"
-R2 = ROOT / "tests/fixtures/sukuyo-matanga-edition-before-production-v79.json"
+R1 = ROOT / "tests/data/sukuyo-matanga-before-production-v79.json"
+R2 = ROOT / "tests/data/sukuyo-matanga-edition-before-production-v79.json"
 
 
 def test_entire_source_and_edition_layers_equal_both_before_code_references():

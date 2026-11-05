@@ -40,7 +40,7 @@ def _half_month_list(text: str, *, favorable: bool) -> list[int]:
 
 def verify_general_days(xml_path: Path | None = None) -> dict[str, Any]:
     fixture = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-general-day-lists-primary.json").read_bytes()
+        (ROOT / "tests/data/sukuyo-general-day-lists-primary.json").read_bytes()
     )
     fragments = fixture["raw_selected_xml_paragraphs"]
     text = {

@@ -10,9 +10,10 @@ from fatebridge.core.fengshui.bazhai import minggua
 from fatebridge.core.fengshui.calendar import lichun_resolution, solar_term_resolution
 from fatebridge.core.fengshui.models import HousePeriod, MingguaRequest
 from fatebridge.core.fengshui.xuankong import period_context
+from fatebridge.core.moshier_solar import MODEL_ID as COMPLETE_MOSHIER_SOLAR_MODEL
 from fatebridge.services.fengshui import calculate_annual_stars, calculate_monthly_stars
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_monthly_v1"
+FOLDER = Path(__file__).parent / "data/fengshui_monthly_v1"
 REGRESSION = json.loads((FOLDER / "moshier-boundary-regression.json").read_text())
 TERMS = [
     "小寒",
@@ -36,7 +37,10 @@ def actual_moshier(monkeypatch, tmp_path):
     # when files are absent. Never relabel that result as Moshier.
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
-    assert solar_term_resolution(2026, "立春", "UTC")["ephemeris_model"] == "moshier"
+    assert (
+        solar_term_resolution(2026, "立春", "UTC")["ephemeris_model"]
+        == COMPLETE_MOSHIER_SOLAR_MODEL
+    )
 
 
 @pytest.mark.parametrize("term", TERMS)
@@ -55,7 +59,7 @@ def test_every_jie_keeps_both_candidates_inside_the_guard_and_computes_beyond_it
         assert time["solar_month_number"] is None
         assert all(
             r["uncertainty_reason"]
-            == "moshier_numeric_model_guard_not_accuracy_certification"
+            == "complete_moshier_solar_model_guard_not_accuracy_certification"
             for r in time["uncertain_boundary_resolutions"]
         )
         assert time["precision_policy"]["numeric_acceptance_gate_seconds"] == 1.0
@@ -104,7 +108,7 @@ def test_year_star_minggua_and_twenty_year_changeover_share_the_same_guard(
     assert period["number"] is None and period["candidate_period_numbers"] == [8, 9]
     assert (
         period["confirmation_reason"]
-        == "moshier_model_precision_guard_in_period_changeover_year"
+        == "complete_moshier_solar_model_precision_guard_in_period_changeover_year"
     )
     other = datetime.fromisoformat(lichun_resolution(2025, "UTC")["moment"])
     same = period_context(

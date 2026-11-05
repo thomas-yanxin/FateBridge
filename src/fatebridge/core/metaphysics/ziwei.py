@@ -1036,8 +1036,7 @@ def build_ziwei_horoscope(
     Scope ``branch`` is the actual natal palace, not the calendar branch of
     the target date. Month/day/hour stems still determine their own 四化.
     Flowing scopes retain the target clock. Age ordinals use one civil clock
-    for both physical endpoints by default. Explicit legacy mode replays the
-    former mixed-clock rule, including its unsupported boundary.
+    for both physical endpoints. A chart alone cannot supply its birth instant.
     """
     palaces = chart["palaces"]
     rule_profile = chart.get("ruleset", {}).get("id", DEFAULT_ZIWEI_PROFILE)
@@ -1110,7 +1109,6 @@ def build_ziwei_horoscope(
         )
         daxian["status"] = "computed"
     daxian["first_age"] = first_daxian_age
-    daxian["is_childhood_limit"] = False
 
     xiao_palace = _palace_by_branch(
         palaces, _xiaoxian_branch(natal_year_branch, nominal_age, gender)

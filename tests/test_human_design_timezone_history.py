@@ -1,6 +1,5 @@
 """Unspecified historical offsets must never become asserted UTC births."""
 
-import gzip
 import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -13,10 +12,9 @@ from fatebridge.core.human_design_birth_clock import resolve_birth_clock
 from fatebridge.core.requests.human_design import HumanDesignRequest
 from fatebridge.utils.errors import validation_error_result
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
-from fatebridge.validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[1]
-E = ROOT / "docs/validation/human-design-timezone-history-v1/evidence"
+E = ROOT / "tests/data/human_design/timezone"
 VECTORS = json.loads((E / "unspecified-offset-control-vectors.json").read_text())[
     "vectors"
 ]
@@ -123,22 +121,3 @@ def test_named_zone_resolution_follows_its_actual_period(zone, year, known):
     value = resolve_birth_clock(**arguments)
     assert value.local_anchor.tzname() != "-00"
     assert value.utc_anchor == value.local_anchor.astimezone(timezone.utc)
-
-
-@pytest.mark.parametrize("name", ["Antarctica-Casey1900", "Antarctica-Troll1900"])
-def test_original_complete_false_clock_acceptances_are_retained_and_now_rejected(name):
-    with gzip.open(E / ("before-" + name + ".json.gz"), "rt") as source:
-        value = json.load(source)
-    assert value["birth_utc"] == "1900-01-01T12:00:00+00:00"
-    before = json.loads((E / "before-public-unknown-offset-results.json").read_text())
-    assert (
-        next(r for r in before if r["zone"].replace("/", "-") + str(r["year"]) == name)[
-            "verification"
-        ]["status"]
-        == "verified_fixed_template_reading"
-    )
-    with patch(
-        "fatebridge.core.astro.runtime.ephemeris_call",
-        side_effect=AssertionError("native replay"),
-    ):
-        assert verify_human_design_reading(value)["status"] == "rejected"

@@ -1,9 +1,7 @@
 """Invalid duty facts cannot hide behind an unrelated projection on any entry."""
 
 import asyncio
-import gzip
 import json
-import tarfile
 from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
@@ -11,7 +9,7 @@ from pathlib import Path
 import pytest
 
 import fatebridge.application.execution as execution
-from tests.fixtures.bazi_month_command_integrity_v1.capture_counterexamples import (
+from tests.bazi_month_command_faults import (
     perturb,
 )
 from tests.test_agentic_nested_outputs import AS_OF, SPECS, call_cli, native
@@ -19,12 +17,11 @@ from tests.test_agentic_nested_outputs import rest as rest_fixture
 
 rest = rest_fixture
 ROOT = Path(__file__).resolve().parents[1]
-DATA = json.loads(
-    (
-        ROOT
-        / "tests/fixtures/bazi_same_target_bureau_v1/protocol-cases-affiliation-first.json"
-    ).read_text()
-)
+DATA = {
+    "cases": json.loads(
+        (ROOT / "tests/data/bazi/month-command-transport-inputs.json").read_text()
+    )
+}
 
 
 def evidence(payload, tool):
@@ -44,16 +41,14 @@ def test_wrong_full_month_facts_fail_before_unrelated_projection(
 ):
     tool = case["tool"]
     spec = SPECS[tool]
-    with tarfile.open(
-        ROOT
-        / "docs/validation/bazi-same-target-bureau-files-v1/affiliation-protocols-source-first.tar.gz"
-    ) as archive:
-        raw = archive.extractfile(
-            tool + "-synthetic-affiliation-full/mcp-full.json.gz"
-        ).read()
-    payload = {
-        k: v for k, v in json.loads(gzip.decompress(raw)).items() if k != "run_metadata"
-    }
+    from fatebridge.core.execution_context import ExecutionOptions
+
+    payload = execution.execute_tool(
+        spec,
+        spec.request_model(**case["arguments"]),
+        options=ExecutionOptions(as_of=AS_OF),
+        include_metadata=False,
+    )
     chain = evidence(payload, tool)
     changed = perturb(chain, fault)
     chain.clear()

@@ -16,7 +16,10 @@ from scripts.astrodice_tt_models import (
 )
 from scripts.verify_astrodice_tt_models import NativeModel
 
-AUTHOR = Path(__file__).parent / "fixtures/astrodice-clock-budget-v1/dtdb.c"
+AUTHOR = (
+    Path(__file__).parent
+    / "data/astrodice/reference_sets/fixture-clock-budget-v1/dtdb.c"
+)
 
 
 @pytest.mark.parametrize("argument", [0, -4, Q(22, 7), 1000000, -1000000])

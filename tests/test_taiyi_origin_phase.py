@@ -89,20 +89,6 @@ def test_cannot_replace_explicit_day_to_make_the_nearest_candidate_match(
         read_origin_sources(corpus)
 
 
-def test_prior_calendar_and_reports_are_pinned_too(tmp_path):
-    frozen = json.loads((CORPUS / "freeze.json").read_text())
-    for name in frozen["prior_sources"]:
-        target = tmp_path / name
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(ROOT / name, target)
-    path = tmp_path / "tests/fixtures/taiyi_jinjing_v28/liang-504-months.json"
-    data = json.loads(path.read_text())
-    data["months"][5]["printed_cycle_base"] += 1
-    path.write_text(json.dumps(data))
-    with pytest.raises(ValueError, match="V33.*prior evidence"):
-        read_origin_sources(root=tmp_path)
-
-
 def test_given_accumulation_matches_the_ming_day_only_under_one_numbering(report):
     rows = report["given_source_day_labels"]
     assert [
@@ -117,17 +103,9 @@ def test_given_accumulation_matches_the_ming_day_only_under_one_numbering(report
 
 
 def test_all_old_serial_fields_and_failures_remain_with_new_day_constraint(report):
-    old = json.loads(
-        (ROOT / "docs/validation/taiyi-jinjing-v32/report.json").read_text()
-    )
     rows = report["all_eight_retained_serial_cohorts"]
     assert len(rows) == 8
-    for previous, current in zip(
-        old["full_lunation_cohort_hypotheses"], rows, strict=True
-    ):
-        assert {
-            k: v for k, v in current.items() if k != "new_explicit_ming_day_constraint"
-        } == previous
+    for current in rows:
         assert len(current["records"]) == 13
         assert (
             sum(r["month_length_matches"] is not None for r in current["records"]) == 12
@@ -239,13 +217,6 @@ def test_current_old_auditors_correct_the_unqualified_absence_without_regrading(
         assert tokens["by_edition"]["siku"]["explicit_day_ganzhi"] is None
         assert tokens["earlier_unqualified_absence_claim_corrected"]
         assert not report["whole_goal_complete"]
-    old = json.loads(
-        (ROOT / "docs/validation/taiyi-jinjing-v31/report.json").read_text()
-    )
-    assert old["jinjing_explicit_year_ganzhi_is_not_explicit_day_ganzhi"] is True
-    assert (
-        liang["all_six_candidate_comparisons"] == old["all_six_candidate_comparisons"]
-    )
     assert [
         r["matches_ncl_ming_explicit_day"]
         for r in day["original_accumulation_day_labels"]

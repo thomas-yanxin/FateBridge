@@ -15,7 +15,7 @@ from pathlib import Path
 from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET = ROOT / "tests/fixtures/ziwei_independent"
+TARGET = ROOT / "tests/data/ziwei_independent"
 YEARS = tuple(range(1901, 2101))
 
 

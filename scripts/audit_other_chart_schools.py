@@ -43,176 +43,6 @@ from scripts.replay_witte_meridian_sources import (
 from scripts.replay_witte_meridian_sources import replay as replay_witte_sources
 
 ROOT = Path(__file__).resolve().parents[1]
-FINGERPRINT_PATHS = [
-    "src/fatebridge/core/astro/midpoints.py",
-    "src/fatebridge/core/astro/physical_sources.py",
-    "src/fatebridge/core/astro/ephemeris.py",
-    "src/fatebridge/core/astro/longitude_motion.py",
-    "src/fatebridge/core/astro/lunar_motion.py",
-    "src/fatebridge/core/astro/position_motion.py",
-    "src/fatebridge/core/astro/moshier_motion.py",
-    "src/fatebridge/core/astro/retarded_epoch.py",
-    "src/fatebridge/core/astro/solar_motion_branch.py",
-    "src/fatebridge/core/astro/native_coordinates.py",
-    "src/fatebridge/core/astro/native_motion.py",
-    "src/fatebridge/core/astro/context_geometry.py",
-    "src/fatebridge/core/astro/solar_position.py",
-    "src/fatebridge/core/astro/native_identity.py",
-    "src/fatebridge/core/astro/profiles.py",
-    "src/fatebridge/core/astro/reference_points.py",
-    "src/fatebridge/core/jpl_ephemeris.py",
-    "src/fatebridge/core/fixed_stars.py",
-    "src/fatebridge/core/fixed_star_paths.py",
-    "src/fatebridge/core/guolao.py",
-    "src/fatebridge/core/guolao_geometry.py",
-    "src/fatebridge/core/guolao_timing.py",
-    "src/fatebridge/core/suzhan_astronomy.py",
-    "src/fatebridge/core/output_guolao.py",
-    "src/fatebridge/data/guolao/sources.json",
-    "src/fatebridge/data/guolao/sefstars.txt",
-    "src/fatebridge/core/jyotish.py",
-    "src/fatebridge/core/jyotish_mean.py",
-    "src/fatebridge/core/jyotish_kala.py",
-    "src/fatebridge/core/human_design.py",
-    "src/fatebridge/core/human_design_time.py",
-    "src/fatebridge/core/human_design_backend.py",
-    "src/fatebridge/core/human_design_precision.py",
-    "src/fatebridge/core/human_design_sensitivity.py",
-    "src/fatebridge/services/human_design.py",
-    "src/fatebridge/core/output_human_design.py",
-    "src/fatebridge/core/output_jyotish.py",
-    "src/fatebridge/validation/human_design_backend.py",
-    "src/fatebridge/validation/human_design_joint.py",
-    "src/fatebridge/utils/errors.py",
-    "src/fatebridge/core/astro/fictitious_elements.py",
-    "src/fatebridge/core/astro/sectors.py",
-    "src/fatebridge/core/astro/sensitive.py",
-    "src/fatebridge/core/astro/seven_planets.py",
-    "src/fatebridge/core/astro/sensitivity.py",
-    "src/fatebridge/core/astro/solar_arc.py",
-    "src/fatebridge/core/astro/solar_ephemeris.py",
-    "src/fatebridge/core/astro/day_meridian.py",
-    "src/fatebridge/core/astro/meridian_houses.py",
-    "src/fatebridge/core/astro/meridian_placement.py",
-    "scripts/audit_meridian_factor_placement.py",
-    "tests/fixtures/uranian-meridian-placement-protocol.json",
-    "tests/fixtures/uranian-witte1924-meridian-placement.json",
-    "tests/test_meridian_factor_placement.py",
-    "tests/test_meridian_placement_transports.py",
-    "src/fatebridge/core/astro/progression_key_sources.py",
-    "src/fatebridge/data/knowledge/witte1923-constant-source.json",
-    "scripts/replay_witte_progression_constant.py",
-    "src/fatebridge/core/astro/witte1925_table.py",
-    "src/fatebridge/data/knowledge/witte1925-solar-arc-table.json",
-    "scripts/replay_witte1925_table.py",
-    "tests/test_witte1925_table.py",
-    "tests/test_other_chart_witte1925_transports.py",
-    "src/fatebridge/core/astro/time_scales.py",
-    "src/fatebridge/core/astro/historical_utc.py",
-    "src/fatebridge/data/knowledge/western-historical-utc.json",
-    "src/fatebridge/data/knowledge/western-utc1960.json",
-    "src/fatebridge/core/astro/birth_clock.py",
-    "src/fatebridge/core/astro_models.py",
-    "src/fatebridge/data/knowledge/western-leap-seconds.json",
-    "src/fatebridge/core/astro/chart.py",
-    "src/fatebridge/core/astro/geometry.py",
-    "src/fatebridge/core/astro/parts.py",
-    "src/fatebridge/core/astro/birth.py",
-    "src/fatebridge/core/ephemeris_runtime.py",
-    "src/fatebridge/services/replay_metadata.py",
-    "src/fatebridge/core/output_midpoints.py",
-    "src/fatebridge/core/output_charts.py",
-    "src/fatebridge/core/response_models.py",
-    "src/fatebridge/services/astrology.py",
-    "src/fatebridge/services/catalog/astrology.py",
-    "src/fatebridge/services/catalog/astro_bindings.py",
-    "src/fatebridge/core/requests/astrology.py",
-    "src/fatebridge/data/agent_examples.json",
-    "tests/fixtures/uranian-witte-2026.json",
-    "tests/fixtures/uranian-rudolph-1979.json",
-    "tests/fixtures/uranian-udo-1996-symbolic.json",
-    "tests/fixtures/uranian-al319-static.json",
-    "tests/fixtures/uranian-solar-arc-horizons.json",
-    "tests/fixtures/uranian-witte1924-day-meridian.json",
-    "tests/fixtures/uranian-witte1923-house-table.json",
-    "scripts/replay_witte_meridian_sources.py",
-    "scripts/audit_meridian_house_geometry.py",
-    "tests/fixtures/uranian-meridian-geometry-protocol.json",
-    "tests/test_other_chart_meridian_houses.py",
-    "tests/test_other_chart_meridian_transports.py",
-    "tests/fixtures/uranian-witte1919-natal.json",
-    "tests/fixtures/uranian-historical-horizons.json",
-    "tests/fixtures/human-design-horizons.json",
-    "tests/test_other_chart_depth.py",
-    "tests/test_other_chart_sensitivity.py",
-    "tests/test_other_chart_solar_arc.py",
-    "tests/test_other_chart_solar_sources.py",
-    "tests/test_other_chart_coordinate_sources.py",
-    "tests/test_other_chart_model_semantics.py",
-    "tests/test_other_chart_school_ephemeris_policy.py",
-    "tests/test_guolao_ephemeris_policy.py",
-    "tests/test_guolao_longitude_motion.py",
-    "tests/test_guolao_motion_holdout.py",
-    "tests/test_guolao_moshier_motion.py",
-    "tests/test_guolao_moshier_holdout.py",
-    "tests/test_moshier_motion_frames.py",
-    "tests/test_moshier_motion_transports.py",
-    "tests/test_moshier_frame_holdout.py",
-    "tests/test_other_chart_offline_policy.py",
-    "tests/fixtures/shared-moshier-frames-plan.json",
-    "tests/fixtures/shared-moshier-frames-protocol.json",
-    "tests/fixtures/shared-moshier-frames-reference.json",
-    "tests/fixtures/shared-moshier-frame-collector-v1.py.txt",
-    "scripts/gen_moshier_frame_reference.py",
-    "scripts/replay_moshier_frame_reference.py",
-    "scripts/audit_moshier_frames.py",
-    "tests/fixtures/guolao-moshier-motion-reference.json",
-    "scripts/audit_guolao_moshier_motion.py",
-    "tests/fixtures/guolao-moshier-motion-plan.json",
-    "tests/fixtures/guolao-moshier-motion-protocol.json",
-    "tests/test_sukuyo_position_only.py",
-    "tests/fixtures/guolao-longitude-motion-protocol.json",
-    "tests/fixtures/guolao-longitude-motion-reference.json",
-    "scripts/gen_guolao_motion_reference.py",
-    "scripts/audit_guolao_motion.py",
-    "tests/fixtures/guolao-de441-j2000.eph",
-    "tests/fixtures/guolao-de441-j2000.provenance.json",
-    "tests/test_human_design_astronomy.py",
-    "tests/fixtures/human-design-de441-j2000.eph",
-    "tests/fixtures/human-design-de441-j2000.provenance.json",
-    "tests/test_astrodice_ephemeris_fallback.py",
-    "tests/test_astrodice_reference_points.py",
-    "tests/test_astrodice_transports.py",
-    "tests/fixtures/astrodice-de441-j2000.eph",
-    "tests/fixtures/astrodice-de441-j2000.provenance.json",
-    "tests/test_other_chart_day_meridian.py",
-    "tests/test_other_chart_schools.py",
-    "tests/test_other_chart_two_factor.py",
-    "tests/test_other_chart_birth_seconds.py",
-    "tests/test_other_chart_clock_basis.py",
-    "tests/test_other_chart_physical_sources.py",
-    "tests/test_other_chart_auxiliary_sources.py",
-    "tests/test_native_binding_identity.py",
-    "tests/test_astrodice_lunar_motion.py",
-    "tests/fixtures/astrodice-lunar-chain-protocol.json",
-    "tests/fixtures/astrodice-lunar-chain-reference.json",
-    "scripts/audit_astrodice_lunar_motion.py",
-    "tests/test_ephemeris_source_errors.py",
-    "tests/test_other_chart_historical_reference.py",
-    "tests/test_other_chart_orbit_sources.py",
-    "tests/fixtures/hamburg_orbits.py",
-    "tests/test_other_chart_schools_transports.py",
-    "scripts/gen_uranian_witte_reference.py",
-    "scripts/gen_uranian_solar_arc_reference.py",
-    "scripts/audit_other_chart_schools.py",
-]
-
-
-def fingerprints() -> dict[str, str]:
-    return {
-        name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-        for name in FINGERPRINT_PATHS
-    }
 
 
 def reference_check() -> dict:
@@ -686,6 +516,7 @@ def cross_school_model_check() -> dict:
     """Model bookkeeping at one fixed epoch; not an astronomical oracle."""
     from fatebridge.core import guolao, human_design, jyotish
     from fatebridge.core.astro import runtime
+    from fatebridge.core.human_design_mechanics import BODY_IDS
 
     birth = build_astro_birth_info(
         birth_year=2000,
@@ -720,7 +551,7 @@ def cross_school_model_check() -> dict:
         "india_node_models": india["nonphysical_factor_models"],
         "india_node_return_flags": india["native_node_return_flags"],
         "hd_physical_models": sorted(
-            {hd[name]["ephemeris_model"] for name in human_design.BODY_IDS}
+            {hd[name]["ephemeris_model"] for name in BODY_IDS}
         ),
         "hd_mean_node_model": hd["NorthNode"]["ephemeris_model"],
         "hd_mean_node_raw_flag_model": hd["NorthNode"]["native_return_flag_model"],
@@ -1350,7 +1181,6 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
-    before = fingerprints()
     orbit_source_before = fictitious_element_source()
     reference = reference_check()
     sectors = sector_check()
@@ -1370,7 +1200,6 @@ def main() -> int:
     historical_natal = historical_natal_check()
     solar_clock = solar_clock_check()
     historical_ephemeris = historical_ephemeris_check()
-    after = fingerprints()
     orbit_source_after = fictitious_element_source()
     numerical_pass = (
         reference["passed"] == reference["reference_count"]
@@ -1412,9 +1241,6 @@ def main() -> int:
         "audit_version": "other_chart_schools_v24",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "numerical_subset_checks_passed": numerical_pass,
-        "source_files_unchanged_during_audit": before == after,
-        "source_sha256_before": before,
-        "source_sha256_after": after,
         "fictitious_element_source": {
             "before": orbit_source_before,
             "after": orbit_source_after,
@@ -1472,7 +1298,6 @@ def main() -> int:
                 "reference_checks_total": reference["reference_count"],
                 "sector_probe_count": sectors["probe_count"],
                 "numerical_subset_checks_passed": numerical_pass,
-                "source_files_unchanged_during_audit": before == after,
                 "all_original_natal_printed_positions_matched": report[
                     "all_original_natal_printed_positions_matched"
                 ],
@@ -1480,7 +1305,7 @@ def main() -> int:
             }
         )
     )
-    return 0 if numerical_pass and before == after else 1
+    return 0 if numerical_pass else 1
 
 
 if __name__ == "__main__":

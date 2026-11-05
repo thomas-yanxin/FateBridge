@@ -78,36 +78,6 @@ SOLAR_TERM_NAMES = [
     "冬至",
 ]
 
-# Standard fixed-qì approximation often used in offline Chinese calendar tools.
-SOLAR_TERM_MINUTE_OFFSETS = [
-    0,
-    21208,
-    42467,
-    63836,
-    85337,
-    107014,
-    128867,
-    150921,
-    173149,
-    195551,
-    218072,
-    240693,
-    263343,
-    285989,
-    308563,
-    331033,
-    353350,
-    375494,
-    397447,
-    419210,
-    440795,
-    462224,
-    483532,
-    504758,
-]
-
-MILLISECONDS_PER_TROPICAL_YEAR = 31556925974.7
-SOLAR_TERM_BASE_UTC = datetime(1900, 1, 6, 2, 5, tzinfo=timezone.utc)
 NATIVE_SOLAR_ROOT_MODEL_ID = "native_swiss_tt_solar_bisection_v2"
 
 GAN = tuple("甲乙丙丁戊己庚辛壬癸")
@@ -292,6 +262,15 @@ class SolarTerm:
 
 
 def is_calculated_solar_term(term: SolarTerm) -> bool:
+    if term.resolution_provider == "fatebridge_moshier":
+        from .moshier_solar import MODEL_ID, model_details
+
+        details = term.solar_model_details or {}
+        return (
+            term.ephemeris_model == MODEL_ID
+            and all(details.get(k) == v for k, v in model_details().items())
+            and not term.ephemeris_retflags
+        )
     if term.resolution_provider == "swisseph":
         return True
     if term.resolution_provider in {"moshier_aa1996", "vsop2013"}:
@@ -351,14 +330,14 @@ def is_calculated_solar_term(term: SolarTerm) -> bool:
 
 
 def require_calculated_solar_term(term: SolarTerm) -> None:
-    """Reject coarse/unknown boundaries used by BaZi calculations.
+    """Reject coarse or unknown solar-term boundaries.
 
     Checking the actual consumed term avoids certifying a separate cache or
     a different year. Provider availability alone is not an accuracy verdict.
     """
     if not is_calculated_solar_term(term):
         raise RuntimeError(
-            f"八字交气计算需要 swisseph 或具名解析太阳模型；{term.name}的来源为"
+            f"交气计算需要 swisseph 或具名解析太阳模型；{term.name}的来源为"
             f" {term.resolution_provider}，不能使用线性或未知节气边界。"
         )
 
@@ -442,11 +421,11 @@ def _solar_term_utc_via_swe(
 
     The anchor is used to disambiguate which yearly crossing to return
     (so 冬至 for civil year 2024 is Dec 2024 rather than Dec 2023). We
-    scan a ±30-day window around the linear-approximation anchor; the
+    scan a ±30-day window around the calendar-month anchor; the
     Sun moves ~1°/day so a crossing is guaranteed in that window.
 
-    Returns None if swisseph is unavailable or no crossing is found
-    (so the caller can fall back to the linear approximation).
+    Return None if swisseph is unavailable or no crossing is found. The caller
+    must reject the unavailable crossing.
     """
     if swe is None:
         return None
@@ -474,6 +453,13 @@ def _solar_term_utc_via_swe(
             raise RuntimeError(
                 "Solar position has no valid ephemeris model or longitude"
             )
+        if model == "moshier":
+            from .moshier_solar import MODEL_ID, solar_longitude
+
+            longitude = solar_longitude(jd)
+            model = MODEL_ID
+        else:
+            longitude = float(result[0] % 360.0)
         models.add(model)
         retflags.add(flags)
         if len(models) != 1:
@@ -483,7 +469,7 @@ def _solar_term_utc_via_swe(
             and native_solar_file_context(swe) != refinement_context
         ):
             raise EphemerisSourceError("solar_configuration_changed")
-        return float(result[0] % 360.0)
+        return longitude
 
     # Coarse scan at ~daily resolution to find a sign change of
     # wrapped(longitude - target). Bisect within the bracket.
@@ -587,6 +573,17 @@ def _solar_term_utc_via_swe(
                 provenance["solar_model_details"][
                     "native_source_context"
                 ] = refinement_context
+            from .moshier_solar import MODEL_ID, PROVIDER, model_details
+
+            if models == {MODEL_ID}:
+                # These are composed positions, not a stock native Sun. Keep
+                # the model identity separate from native category flags.
+                provenance.update(
+                    resolution_provider=PROVIDER,
+                    ephemeris_retflags=(),
+                )
+                provenance["solar_model_details"].update(model_details())
+                provenance["solar_model_details"].pop("ephemeris_retflags")
         return moment
     except EphemerisSourceError:
         # A selected strict source must not silently become a linear year.
@@ -601,16 +598,9 @@ def _solar_term_utc_via_swe(
         return None
 
 
-def _solar_term_utc_via_linear(year: int, term_index: int) -> datetime:
-    """Linear fixed-qì approximation anchored at 1900. Used as fallback
-    when swisseph is unavailable; drift grows as the year moves away from
-    the anchor (errors can be hours even in the current century).
-    """
-    offset_minutes = SOLAR_TERM_MINUTE_OFFSETS[term_index]
-    total_milliseconds = (
-        MILLISECONDS_PER_TROPICAL_YEAR * (year - 1900) + offset_minutes * 60_000
-    )
-    return SOLAR_TERM_BASE_UTC + timedelta(milliseconds=total_milliseconds)
+def _solar_term_search_anchor_utc(year: int, term_index: int) -> datetime:
+    """Choose a calendar month for the ±30-day native root search only."""
+    return datetime(year, term_index // 2 + 1, 15, tzinfo=timezone.utc)
 
 
 def _solar_term_utc_via_analytic(
@@ -777,17 +767,8 @@ def _solar_term_utc_via_analytic(
     }
 
 
-_LINEAR_FALLBACK_WARNED = False
-
-
 class _SolarTermEnvironmentChanged(RuntimeError):
     pass
-
-
-class _UncachedSolarYear(RuntimeError):
-    def __init__(self, terms: Tuple[SolarTerm, ...]):
-        self.terms = terms
-        super().__init__("Transient numerical failure must not poison the year cache")
 
 
 def get_solar_terms_for_year(
@@ -816,8 +797,6 @@ def _solar_terms_for_context_year(
             terms = _get_solar_terms_for_year_cached(
                 year, timezone_name, context, context_year
             )
-        except _UncachedSolarYear as unverified:
-            terms = unverified.terms
         except _SolarTermEnvironmentChanged:
             _get_solar_terms_for_year_cached.cache_clear()
             continue
@@ -843,18 +822,14 @@ def _get_solar_terms_for_year_cached(
         )
         if solar_term_cache_context(swe, year=context_year) != _context:
             raise _SolarTermEnvironmentChanged()
-        if swe is not None and any(not is_calculated_solar_term(t) for t in terms):
-            # lru_cache does not store exceptions. Return this unverified year
-            # to non-strict consumers via the wrapper, but let the next request
-            # retry the numerical provider without a manual cache reset.
-            raise _UncachedSolarYear(terms)
+        if any(not is_calculated_solar_term(t) for t in terms):
+            raise EphemerisSourceError("solar_term_source_unverified")
         return terms
 
 
 def _calculate_solar_terms_for_year(
     year: int, timezone_name: str, *, context_year: Optional[int] = None
 ) -> Tuple[SolarTerm, ...]:
-    global _LINEAR_FALLBACK_WARNED
     tzinfo = parse_timezone_name(timezone_name or DEFAULT_TIMEZONE)
     terms: List[SolarTerm] = []
     model_year = year if context_year is None else context_year
@@ -864,11 +839,9 @@ def _calculate_solar_terms_for_year(
     for index, (term_name, target_longitude) in enumerate(
         zip(SOLAR_TERM_NAMES, SOLAR_TERM_LONGITUDES)
     ):
-        # The linear approximation is used both as a fallback and as a
-        # disambiguation anchor for the swe bisection: it picks the "correct"
-        # yearly crossing (e.g. Dec 2024 冬至 vs Dec 2023) because the linear
-        # anchor is always in civil-year ``year``.
-        linear_utc = _solar_term_utc_via_linear(year, index)
+        # A calendar anchor identifies the intended year/month; only a solved
+        # longitude crossing may become a returned solar term.
+        anchor_utc = _solar_term_search_anchor_utc(year, index)
 
         utc_moment: Optional[datetime] = None
         provenance: Dict[str, Any] = {}
@@ -909,7 +882,7 @@ def _calculate_solar_terms_for_year(
             )
         elif using_swe:
             utc_moment = _solar_term_utc_via_swe(
-                year, float(target_longitude), linear_utc, provenance
+                year, float(target_longitude), anchor_utc, provenance
             )
         if selected_mode == "swiss" and (
             utc_moment is None or provenance.get("ephemeris_model") != "swieph"
@@ -924,18 +897,11 @@ def _calculate_solar_terms_for_year(
                 else (
                     "jpl_de440"
                     if packaged_de440
-                    else (
-                        "jpl_spk"
-                        if explicit_spk
-                        else (
-                            "swisseph"
-                            if utc_moment is not None
-                            else "linear_1900_fallback"
-                        )
-                    )
+                    else ("jpl_spk" if explicit_spk else "swisseph")
                 )
             )
         )
+        provider = provenance.get("resolution_provider", provider)
         if (
             utc_moment is not None
             and not explicit_spk
@@ -970,22 +936,7 @@ def _calculate_solar_terms_for_year(
             raise _SolarTermEnvironmentChanged()
 
         if utc_moment is None:
-            # Fall back to the linear approximation; warn once per process so
-            # operators can spot a missing swisseph install without flooding logs.
-            if using_swe and not _LINEAR_FALLBACK_WARNED:
-                logger.warning(
-                    "Solar-term resolution falling back to linear approximation "
-                    "for year=%s; check swisseph ephemeris configuration.",
-                    year,
-                )
-                _LINEAR_FALLBACK_WARNED = True
-            elif not using_swe and not _LINEAR_FALLBACK_WARNED:
-                logger.info(
-                    "swisseph unavailable; solar terms use the linear fixed-qì "
-                    "approximation anchored at 1900 (errors can be hours)."
-                )
-                _LINEAR_FALLBACK_WARNED = True
-            utc_moment = linear_utc
+            raise EphemerisSourceError("solar_native_unavailable")
 
         local_moment = utc_moment.astimezone(tzinfo)
         terms.append(

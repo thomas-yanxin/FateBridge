@@ -12,18 +12,16 @@ class PhysicalRootUnitComparison(PartialOutput):
     masses_exact: Optional[dict[Literal["木", "火", "土", "金", "水"], str]] = None
     unit_threshold_exact: Optional[str] = None
     at_least_unit: Optional[dict[Literal["木", "火", "土", "金", "水"], bool]] = None
-    legacy_float_at_least_unit: Optional[
-        dict[Literal["木", "火", "土", "金", "水"], bool]
-    ] = None
+    float_at_least_unit: Optional[dict[Literal["木", "火", "土", "金", "水"], bool]] = (
+        None
+    )
     visible_non_day_elements: Optional[
         dict[Literal["year", "month", "hour"], Literal["木", "火", "土", "金", "水"]]
     ] = None
     rooted_controller_stems: Optional[int] = Field(default=None, ge=0, le=3)
-    legacy_float_rooted_controller_stems: Optional[int] = Field(
-        default=None, ge=0, le=3
-    )
+    float_rooted_controller_stems: Optional[int] = Field(default=None, ge=0, le=3)
     rooted_wealth_visible: Optional[bool] = None
-    legacy_float_rooted_wealth_visible: Optional[bool] = None
+    float_rooted_wealth_visible: Optional[bool] = None
     comparison_basis: Optional[Literal["exact_rational_physical_hidden_budget"]] = None
     quantity_kind: Optional[Literal["remaining_physical_hidden_stem_budget"]] = None
     effective_classical_root_force: Optional[Literal["not_adjudicated"]] = None
@@ -71,7 +69,7 @@ class StrengthThresholdArithmetic(PartialOutput):
     special_upper_threshold_exact: Optional[str] = None
     requires_special_structure_review: Optional[bool] = None
     numerical_label: Optional[Literal["弱", "中和", "强"]] = None
-    legacy_float_numerical_label: Optional[Literal["弱", "中和", "强"]] = None
+    float_numerical_label: Optional[Literal["弱", "中和", "强"]] = None
     float_comparison_differs: Optional[bool] = None
     calculation_effect: Optional[Literal["threshold_comparison_only"]] = None
     scope: Optional[str] = None
@@ -97,9 +95,9 @@ class StrengthThresholdArithmetic(PartialOutput):
                     root.rooted_wealth_visible,
                 ),
                 (
-                    root.legacy_float_at_least_unit,
-                    root.legacy_float_rooted_controller_stems,
-                    root.legacy_float_rooted_wealth_visible,
+                    root.float_at_least_unit,
+                    root.float_rooted_controller_stems,
+                    root.float_rooted_wealth_visible,
                 ),
             ):
                 if flags is None or controller not in flags or wealth not in flags:
@@ -199,10 +197,10 @@ class StrengthThresholdArithmetic(PartialOutput):
                     raise ValueError("数值档与精确阈值不符")
         if (
             self.numerical_label is not None
-            and self.legacy_float_numerical_label is not None
+            and self.float_numerical_label is not None
             and self.float_comparison_differs is not None
             and self.float_comparison_differs
-            != (self.numerical_label != self.legacy_float_numerical_label)
+            != (self.numerical_label != self.float_numerical_label)
         ):
             raise ValueError("浮点判档差异标记不符")
         return self

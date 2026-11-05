@@ -16,7 +16,7 @@ from fatebridge.core.sukuyo_calendar_text import source_bundle as day_bundle
 from fatebridge.core.sukuyo_lower import source_bundle as lower_bundle
 
 FIXTURE = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-rule-scope-primary.json").read_text()
+    (Path(__file__).parent / "data/sukuyo-rule-scope-primary.json").read_text()
 )
 
 

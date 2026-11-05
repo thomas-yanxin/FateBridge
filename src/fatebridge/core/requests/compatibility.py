@@ -134,20 +134,6 @@ class SukuyoCompatibilityRequest(_DeferredModel):
         default="+08:00",
         description="第一人出生时区，默认+08:00；按calendar_basis转换，不因日本参考自动改成东京",
     )
-    person1_lat: Optional[str] = Field(
-        default="31n13",
-        description="First person latitude text or decimal; 兼容旧参数，不参与定宿",
-    )
-    person1_lon: Optional[str] = Field(
-        default="121e28",
-        description="First person longitude text or decimal; 兼容旧参数，不参与定宿",
-    )
-    person1_gps_lat: Optional[float] = Field(
-        default=None, description="First person GPS latitude"
-    )
-    person1_gps_lon: Optional[float] = Field(
-        default=None, description="First person GPS longitude"
-    )
     person2_name: str = Field(default="乙方", description="Second person name / label")
     person2_date: str = Field(description="Second person birth date")
     person2_time: Optional[str] = Field(
@@ -157,20 +143,6 @@ class SukuyoCompatibilityRequest(_DeferredModel):
     person2_zone: Optional[str] = Field(
         default="+08:00",
         description="第二人出生时区，默认+08:00；按calendar_basis转换，不因日本参考自动改成东京",
-    )
-    person2_lat: Optional[str] = Field(
-        default="31n13",
-        description="Second person latitude text or decimal; 兼容旧参数，不参与定宿",
-    )
-    person2_lon: Optional[str] = Field(
-        default="121e28",
-        description="Second person longitude text or decimal; 兼容旧参数，不参与定宿",
-    )
-    person2_gps_lat: Optional[float] = Field(
-        default=None, description="Second person GPS latitude"
-    )
-    person2_gps_lon: Optional[float] = Field(
-        default=None, description="Second person GPS longitude"
     )
 
     @model_validator(mode="after")

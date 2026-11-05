@@ -26,7 +26,7 @@ from fatebridge.core.astrology_tables import RULER_BY_SIGN, SIGNS
 from fatebridge.core.classical_western import _aspect_phase
 from fatebridge.core.horary_conditions import evaluate_lilly_conditions
 from fatebridge.core.horary_events import native_planetary_events
-from fatebridge.core.horary_motion import linear_lunar_contacts, native_lunar_contacts
+from fatebridge.core.horary_motion import native_lunar_contacts
 from fatebridge.core.lilly import dignity_at, pair_reception
 from fatebridge.core.lilly_fortitude_inputs import collect_fortitude_inputs
 from fatebridge.core.lilly_fortitudes import evaluate_fortitudes
@@ -272,17 +272,14 @@ def _moon_void_of_course(
     """
     others = {state["planet"]: state for state in other_states}
     if physical_motion is None:
-        try:
-            physical_motion = linear_lunar_contacts(moon_state, others)
-        except ValueError as error:
-            physical_motion = {
-                "status": "unavailable",
-                "method_id": "linear_signed_velocity_projection_v1",
-                "constant_velocity_projection": True,
-                "void_of_course": None,
-                "contacts": [],
-                "unavailable_reason": str(error),
-            }
+        physical_motion = {
+            "status": "unavailable",
+            "method_id": "native_tt_lunar_contacts_before_ingress_v1",
+            "constant_velocity_projection": False,
+            "void_of_course": None,
+            "contacts": [],
+            "unavailable_reason": "Native lunar-event evidence was not supplied",
+        }
     for contact in physical_motion["contacts"]:
         contact["other_label"] = others[contact["other"]]["planet_label"]
         exact_orb = abs(
@@ -811,7 +808,7 @@ def _verdict(
     stricture_codes = {
         s["code"] for s in strictures if s.get("exception_satisfied") is not True
     }
-    too_early_or_late = stricture_codes & {"ascendant_too_early", "ascendant_too_late"}
+    too_early_or_late = stricture_codes & {"C01", "C02"}
 
     if too_early_or_late:
         return (

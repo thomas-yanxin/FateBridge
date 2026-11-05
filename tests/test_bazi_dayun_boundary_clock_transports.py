@@ -1,18 +1,25 @@
 """Full and projected REST/MCP/CLI preserve analysis-independent gap probes."""
 
 import asyncio
+import json
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pytest
 
 from fatebridge.application.examples import suggested_fields
 from fatebridge.core.timing import TimingAnalysis
-from tests.test_agentic_nested_outputs import business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_birth_seconds import SPECS
-from tests.test_bazi_dayun_boundary_clock_window import frozen
 
-ROW = frozen("reference-first.json.gz")["rows"][0]
+ROW = json.loads(
+    (Path(__file__).parent / "data/bazi/dayun-boundary-clock-input.json").read_text()
+)
 TOOLS = [s for s in SPECS if s.key in {"timing_analysis", "dayun_analysis"}]
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("spec", TOOLS, ids=lambda s: s.key)

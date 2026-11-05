@@ -40,7 +40,7 @@ from fatebridge.core.astro.geometry import (
 )
 from fatebridge.core.astrology_tables import EXALTATION_SIGNS, RULER_BY_SIGN, SIGNS
 from fatebridge.core.classical_western import combustion_state, solar_condition_policy
-from fatebridge.core.horary_motion import linear_lunar_contacts, native_lunar_contacts
+from fatebridge.core.horary_motion import native_lunar_contacts
 from fatebridge.core.predictive._common import (
     planet_label,
     point_absolute_position,
@@ -50,7 +50,6 @@ from fatebridge.core.predictive._common import (
 BENEFICS = ("Venus", "Jupiter")
 MALEFICS = ("Mars", "Saturn")
 ANGLE_ORB = 5.0  # a planet within this of the Asc/MC degree counts as "on the angle"
-COMBUST_ORB = 8.5  # Compatibility constant; actual solar state uses shared p113 policy.
 
 PLANET_ATTRIBUTES: Dict[str, str] = {
     "Sun": "sun",
@@ -546,19 +545,6 @@ def build_election_payload(subject: Any, *, topic_id: str) -> Dict[str, Any]:
             + payload["recommendation"]
         )
     return payload
-
-
-def _moon_void_of_course(
-    moon: Dict[str, Any], others: List[Dict[str, Any]]
-) -> Optional[bool]:
-    """Private constant-velocity research query, never the production path."""
-    try:
-        result = linear_lunar_contacts(
-            moon, {f"synthetic_{i}": row for i, row in enumerate(others)}
-        )["void_of_course"]
-        return result if isinstance(result, bool) else None
-    except ValueError:
-        return None
 
 
 def _score_with_unknowns(

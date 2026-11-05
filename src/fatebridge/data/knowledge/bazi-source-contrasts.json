@@ -90,13 +90,7 @@
               "support_scope": "只支持年干配月、日干配时及本书夜子候选，不能据干支反推出唯一现代出生日期或钟点。"
             }
           ],
-          "implementation_refs": [
-            {
-              "source_path": "scripts/audit_bazi_source_contrast_dependencies.py",
-              "source_sha256": "02c4544a0c579eb7609cb5f1279c4319c1ce02fd4f594885b30d3051a43a0708",
-              "support_scope": "只支持逐位差异、配月配时表联动、六十甲子和缺项候选的符号核查；没有新增强弱计算或现实预测验收。"
-            }
-          ],
+          "implementation_refs": [],
           "source_contrast_binding": {
             "source_analysis_sha256": "5ddf81f171ea071be15ca21c394e7d61c8698039d72dd03c3aeeafbc95266a94",
             "source_bindings_sha256": "5f695cc03340c70a7f1c4d40240bb6fe446fd73a4f54a7bad281cd75ea8dc8ce",
@@ -3112,23 +3106,19 @@
               "input4": [
                 {
                   "case_id": "MAIN-C219",
-                  "kind": "printed_source_conflict",
-                  "review_protocol": "docs/validation/bazi-census-input-claim-alignment-v1/protocol-first.json"
+                  "kind": "printed_source_conflict"
                 },
                 {
                   "case_id": "MAIN-C368",
-                  "kind": "printed_source_conflict",
-                  "review_protocol": "docs/validation/bazi-census-input-claim-alignment-v1/protocol-first.json"
+                  "kind": "printed_source_conflict"
                 },
                 {
                   "case_id": "MAIN-C488",
-                  "kind": "printed_source_conflict",
-                  "review_protocol": "docs/validation/bazi-census-input-claim-alignment-v1/protocol-first.json"
+                  "kind": "printed_source_conflict"
                 },
                 {
                   "case_id": "MAIN-C457",
-                  "kind": "glyph_review_pending",
-                  "review_protocol": "docs/validation/bazi-census-input-claim-alignment-v1/protocol-first.json"
+                  "kind": "glyph_review_pending"
                 }
               ]
             },

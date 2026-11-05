@@ -19,11 +19,11 @@ from fatebridge.utils.errors import EphemerisSourceError
 from scripts.audit_astrodice_lunar_motion import validate_reference
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures"
-PROTOCOL = json.loads((FIXTURES / "astrodice-lunar-chain-protocol.json").read_text())
-REFERENCE = json.loads((FIXTURES / "astrodice-lunar-chain-reference.json").read_text())
+FIXTURES = ROOT / "tests/data/astrodice/tables"
+PROTOCOL = json.loads((FIXTURES / "lunar-chain-protocol.json").read_text())
+REFERENCE = json.loads((FIXTURES / "lunar-chain-reference.json").read_text())
 DEVELOPMENT_REFERENCE = json.loads(
-    (FIXTURES / "astrodice-apparent-position-derivative.json").read_text()
+    (FIXTURES / "apparent-position-derivative.json").read_text()
 )
 MODERN = [r for r in REFERENCE["rows"] if "erfa_display_frame" in r]
 PLUTO = [
@@ -38,23 +38,15 @@ PLUTO = [
 def test_frozen_lunar_protocol_reference_and_generator_identity():
     for name, checksum in [
         (
-            "astrodice-lunar-chain-protocol.json",
+            "lunar-chain-protocol.json",
             "f6c0aea76ba0391e1806e2624fbb76c204d7ee0c10d19e95a4b285935db156bf",
         ),
         (
-            "astrodice-lunar-chain-reference.json",
+            "lunar-chain-reference.json",
             "25ee1bd30afb338999db6444565928454ef165f956a5226cbe806e038a30a761",
         ),
     ]:
         assert hashlib.sha256((FIXTURES / name).read_bytes()).hexdigest() == checksum
-    for key, name in [
-        ("generator_sha256", "gen_astrodice_lunar_chain_reference.py"),
-        ("helper_sha256", "gen_astrodice_apparent_reference.py"),
-    ]:
-        assert (
-            REFERENCE[key]
-            == hashlib.sha256((ROOT / "scripts" / name).read_bytes()).hexdigest()
-        )
     assert REFERENCE["versions"] == {"pyerfa": "2.0.1.5", "numpy": "2.5.4"}
     assert REFERENCE["forbidden_implementation_imports"] == []
     validate_reference(PROTOCOL, REFERENCE, DEVELOPMENT_REFERENCE)

@@ -18,8 +18,7 @@ from tests.test_agentic_nested_outputs import rest as _rest_fixture
 rest = _rest_fixture
 ANCHORS = json.loads(
     (
-        Path(__file__).parent
-        / "fixtures/bazi_stage_profile_v1/source-anchors-first.json"
+        Path(__file__).parent / "data/bazi_stage_profile_v1/source-anchors-first.json"
     ).read_text()
 )
 PAYLOAD = {

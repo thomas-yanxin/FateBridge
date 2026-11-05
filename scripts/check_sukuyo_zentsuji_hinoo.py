@@ -10,7 +10,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "src/fatebridge/data/sukuyo_t2465_zentsuji.json"
-FIXTURE = ROOT / "tests/fixtures/sukuyo-zentsuji-hinoo-primary.json"
+FIXTURE = ROOT / "tests/data/sukuyo-zentsuji-hinoo-primary.json"
 
 
 def verify_primary(

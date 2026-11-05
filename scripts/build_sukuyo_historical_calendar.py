@@ -11,9 +11,8 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 from fatebridge.validation.sukuyo_historical_sources import normalize
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_FIXTURE = ROOT / "tests/fixtures/sukuyo_historical_calendar_v1"
+DEFAULT_FIXTURE = ROOT / "tests/data/sukuyo_historical_calendar_v1"
 DATA = ROOT / "src/fatebridge/data/sukuyo_japanese_historical_v1.json"
-REPORT = ROOT / "docs/validation/sukuyo-historical-calendar-source-admission.json"
 
 
 def freeze(capture: Path, target: Path) -> None:
@@ -75,6 +74,9 @@ def main() -> int:
     parser.add_argument("--capture-dir", type=Path)
     parser.add_argument("--fixture-dir", type=Path, default=DEFAULT_FIXTURE)
     parser.add_argument("--check", action="store_true")
+    parser.add_argument(
+        "--report", type=Path, help="Optional current admission report destination"
+    )
     args = parser.parse_args()
     if args.capture_dir:
         if args.check:
@@ -84,18 +86,19 @@ def main() -> int:
     data, report = normalize(files, manifest)
     report_text = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if not report["naoj_reference_import_eligible"]:
-        if not args.check:
-            REPORT.write_text(report_text)
+        if args.report:
+            args.report.write_text(report_text)
         raise SystemExit(
             "NAOJ reference admission failed; retained findings cannot be hidden by writing a runtime table"
         )
     text = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
     if args.check:
-        if DATA.read_text() != text or REPORT.read_text() != report_text:
-            raise SystemExit("Historical reference table/report is stale")
+        if DATA.read_text() != text:
+            raise SystemExit("Historical reference table is stale")
     else:
         DATA.write_text(text)
-        REPORT.write_text(report_text)
+    if args.report:
+        args.report.write_text(report_text)
     print(
         json.dumps(
             {

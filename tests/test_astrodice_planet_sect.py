@@ -13,7 +13,7 @@ from fatebridge.core.output_astrodice import PlanetSectCondition
 
 REFERENCE = json.loads(
     (
-        Path(__file__).parent / "fixtures/astrodice-planet-sect-robbins-1940.json"
+        Path(__file__).parent / "data/astrodice/tables/planet-sect-robbins-1940.json"
     ).read_text()
 )
 SIGNS = [

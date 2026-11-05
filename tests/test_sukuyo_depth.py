@@ -19,7 +19,7 @@ from fatebridge.core.sukuyo_activities import source_bundle
 from fatebridge.core.suzhan_astronomy import build_equatorial_mansions
 from fatebridge.services.divination import calculate_suzhan_analysis
 
-FIXTURES = Path(__file__).parent / "fixtures"
+FIXTURES = Path(__file__).parent / "data"
 
 
 def test_all_42_physical_ra_dec_positions_against_external_jpl(monkeypatch):

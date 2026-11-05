@@ -17,10 +17,7 @@ from fatebridge.validation.claims import _same_value
 from fatebridge.validation.human_design import verify_human_design_reading
 
 PLAN = json.loads(
-    (
-        Path(__file__).parent
-        / "fixtures/human_design_decimal_offset_v1/precision-followup-plan.json"
-    ).read_text()
+    (Path(__file__).parent / "data/human_design/numeric_offsets.json").read_text()
 )
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 INPUT = dict(

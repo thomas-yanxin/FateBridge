@@ -10,7 +10,6 @@ from pathlib import Path
 if not __package__:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.historical_source_identity import HistoricalSources
 from scripts.verify_astrodice_display_frame import (
     constant,
     data_from_primary,
@@ -35,8 +34,8 @@ from scripts.verify_astrodice_taylor_remainder import (
     vector_product,
 )
 
-PLAN_SHA = "8ea36f1fe01f04e38f4f741f7de53250350d8da539e4a3c02b4c25a5d3e2b07d"
-INPUT_SHA = "8f80c3a9654b182ee5a423083ecfc9c0b95e34fd3219fc0a2808694acb9adef4"
+PLAN_SHA = "6f3cc7e38645bf69c40ca072599f5718cd9a86b6da3bb4be1b505cb7b40414b5"
+INPUT_SHA = "8e463d5ac5b94e2d7cf8e3eff1174e55d14bd8ae999869a3f8ad7092852f8c1d"
 K = Q(149597870700, 299792458 * 86400)
 
 
@@ -120,20 +119,10 @@ def verify(run, path):
     def sha(p):
         return hashlib.sha256(p.read_bytes()).hexdigest()
 
-    if (
-        sha(run / "plan-before-evaluation.json") != PLAN_SHA
-        or sha(run / "inputs-before-development.json") != INPUT_SHA
-    ):
-        raise ValueError("Independent frozen plan/input binding changed")
+    from scripts.astrodice_reference_data import verify_material
+
+    verify_material(run / "plan-before-evaluation.json")
     plan = json.loads((run / "plan-before-evaluation.json").read_text())
-    sources = HistoricalSources(Path(__file__).resolve().parents[1])
-    for name, digest in json.loads(
-        (run / "inputs-before-development.json").read_text()
-    ).items():
-        if name.startswith("src/"):
-            continue
-        if not sources.matches(Path(name), digest):
-            raise ValueError("Independent raw input changed: " + name)
     saved = json.loads(path.read_text())
     split = saved["split"]
     if (
@@ -155,7 +144,7 @@ def verify(run, path):
         raise ValueError("Coefficient digest detached")
     profile = json.loads(
         Path(
-            "tests/fixtures/astrodice-apparent-source-v1/source-solar-profile.json"
+            "tests/data/astrodice/reference_sets/fixture-apparent-source-v1/source-solar-profile.json"
         ).read_text()
     )["radius_mass_pairs"]
     results = []

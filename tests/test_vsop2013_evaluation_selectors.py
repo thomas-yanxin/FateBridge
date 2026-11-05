@@ -1,4 +1,4 @@
-"""Versioned optional source selectors keep legacy bytes readable and explicit."""
+"""Current optional source selectors preserve explicit missingness."""
 
 import hashlib
 import json
@@ -41,38 +41,14 @@ def test_capture_keeps_full_optional_selector_values_and_explicit_nulls(tmp_path
     assert json.loads(env.context_bytes(chosen, tmp_path))["method_id"] == NEW_CONTEXT
 
 
-@pytest.mark.parametrize("context", [False, True])
-def test_legacy_records_remain_readable_without_invented_source_selectors(
-    context, tmp_path
-):
+@pytest.mark.parametrize("method", [OLD_METHOD, OLD_CONTEXT])
+def test_retired_selector_records_are_rejected(method, tmp_path):
     values = {key: None for key in OLD_KEYS}
-    values["SE_EPHE_PATH"] = "relative ephe"
-    data = dict(method_id=OLD_CONTEXT if context else OLD_METHOD, values=values)
-    if context:
-        data["working_directory"] = dict(flavor="posix", path=str(tmp_path))
-    raw = (
-        json.dumps(data, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
-    ).encode()
-    p = tmp_path / "legacy.json"
-    p.write_bytes(raw)
-    actual, original = env.load_selection(p, hashlib.sha256(raw).hexdigest())
-    assert (
-        actual == values and original == raw and VSOP not in actual and AA not in actual
-    )
-    assert (
-        env.selection_bytes(actual)
-        == (
-            json.dumps(
-                dict(method_id=OLD_METHOD, values=values),
-                ensure_ascii=False,
-                sort_keys=True,
-                indent=2,
-            )
-            + "\n"
-        ).encode()
-    )
-    if context:
-        assert env.context_bytes(actual, tmp_path) == raw
+    raw = json.dumps(dict(method_id=method, values=values)).encode()
+    path = tmp_path / "retired.json"
+    path.write_bytes(raw)
+    with pytest.raises(ValueError):
+        env.load_selection(path, hashlib.sha256(raw).hexdigest())
 
 
 @pytest.mark.parametrize("method,extended", [(OLD_METHOD, True), (NEW_METHOD, False)])
@@ -89,9 +65,8 @@ def test_recomputed_hash_cannot_change_the_versioned_selector_shape(
         env.load_selection(p, hashlib.sha256(raw).hexdigest())
 
 
-@pytest.mark.parametrize("legacy", [False, True])
-def test_later_ambient_optional_sources_are_cleared_without_mutating_caller(legacy):
-    chosen = {key: None for key in OLD_KEYS} if legacy else env.capture_selection({})
+def test_later_ambient_optional_sources_are_cleared_without_mutating_caller():
+    chosen = env.capture_selection({})
     ambient = {
         VSOP: "/later/vsop.json",
         AA: "/later/aa.json",

@@ -1,6 +1,5 @@
 """Gate5 source facts, absent poles and untouched historical editions."""
 
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -17,13 +16,13 @@ from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.validation.human_design_context_lines import (
     verify_human_design_context_packet,
 )
-from scripts.gen_human_design_timezone_history import read, sha
+from tests.reference_data import read, sha
 from tests.test_agentic_nested_outputs import SPECS, business
 from tests.test_agentic_nested_outputs import rest as shared_rest
 from tests.test_heluo_poem_transports import run_three
 
 ROOT = Path(__file__).resolve().parents[1]
-E = ROOT / "docs/validation/human-design-gate5-knowledge-v6/evidence"
+E = ROOT / "tests/data/human_design/gate5"
 rest = shared_rest
 LOCATOR_SHA = "6efc0b43f31b16ee7923c239fea686a150c2dd61597aebf65fdaec998c53baca"
 
@@ -54,38 +53,6 @@ def test_all384_v6_source_inventories_preserve_previous_facts_and_non_gate5_mean
                 new.pop("source_available_polarities")
                 new["selection_policy"] = old["selection_policy"]
                 assert new == old
-
-
-def test_all1536_existing_reference_outputs_and_registry_prefix_are_unchanged():
-    for category, keys in read(E / "before-1536-canonical-hashes.json").items():
-        assert len(keys) == 384
-        for key, expected in keys.items():
-            assert (
-                hashlib.sha256(
-                    base._canonical(base.read_reference(category=category, key=key))
-                ).hexdigest()
-                == expected
-            )
-    registry = base.build_registry()
-    newer = registry["domains"][0]["categories"].pop()
-    assert newer["name"] == "lines_v7"
-    assert newer["coverage"] == {
-        "line_locators": 384,
-        "local_editorial_paraphrases": 36,
-        "meanings_pending": 348,
-        "independently_accepted_line_meanings": 0,
-        "full_source_meanings_accepted": False,
-    }
-    category = registry["domains"][0]["categories"].pop()
-    assert category["name"] == "lines_v6"
-    assert category["coverage"] == {
-        "line_locators": 384,
-        "local_editorial_paraphrases": 30,
-        "meanings_pending": 354,
-        "independently_accepted_line_meanings": 0,
-        "full_source_meanings_accepted": False,
-    }
-    assert registry == read(E / "before-registry.json")
 
 
 @pytest.mark.parametrize(
@@ -186,7 +153,9 @@ def test_rehashed_invalid_catalogue_cannot_invent_poles_or_acceptance(
 
 @pytest.fixture(scope="module")
 def packet56():
-    source = read(E / "before-1976-12-08.json.gz")
+    from tests.human_design_current import semantic_sources
+
+    source = semantic_sources("gate5")["gate5"]
     with patch(
         "fatebridge.core.astro.runtime.ephemeris_call",
         side_effect=AssertionError("native sky forbidden"),

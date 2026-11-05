@@ -13,15 +13,13 @@ from pydantic import ValidationError
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.human_design import (
-    CENTER_GATES,
-    CHANNELS,
-    GATE_ORDER,
     bodygraph,
     chart_at,
     longitude_activation,
     planetary_positions,
 )
 from fatebridge.core.human_design_evidence import reference_table_audit
+from fatebridge.core.human_design_mechanics import CENTER_GATES, CHANNELS, GATE_ORDER
 from fatebridge.core.requests.human_design import HumanDesignRequest
 from fatebridge.services.human_design import calculate_human_design
 
@@ -374,10 +372,10 @@ def test_returned_source_evidence_cannot_mutate_later_runs():
 def test_moshier_is_explicit_and_can_be_refused(monkeypatch, tmp_path):
     from fatebridge.application.execution import execute_tool
     from fatebridge.services.tool_catalog import CATALOG
-    from tests.golden.runner import golden_ephemeris
+    from tests.ephemeris_context import moshier_ephemeris
 
     spec = next(s for s in CATALOG if s.key == "human_design")
-    with golden_ephemeris():
+    with moshier_ephemeris():
         result = execute_tool(spec, HumanDesignRequest(**INPUT))
         assert result["calculation_policy"]["ephemeris_model"] == "moshier"
         assert result["run_metadata"]["engine_is_approximate"] is True

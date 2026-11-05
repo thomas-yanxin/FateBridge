@@ -16,7 +16,7 @@ from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_dangshi_case_v41"
-FREEZE = "aa2c0929a54a50f68b162cd7210e758b8b92a3f4036b858da3bad4ca8fe0b13f"
+FREEZE = "2af3019b0654def7551606b36f682af1059599565991ca57e98bf7527580cf74"
 
 
 def source_readings() -> dict[str, Any]:

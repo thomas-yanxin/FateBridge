@@ -444,6 +444,7 @@ def analyze_layout(req: AssessRequest, layers: Dict[str, Any]) -> Dict[str, Any]
         and not req.form_observations
         and not req.surface_layouts
         and req.environmental_context is None
+        and req.workstation_layout is None
     ):
         missing.append("form_observations_or_surface_layouts_or_selected_methods")
     if not req.placements and any(

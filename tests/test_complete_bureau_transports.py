@@ -49,7 +49,7 @@ def test_full_bureau_roots_and_text_are_same_run_facts_on_rest_native_mcp_cli(
         "辛丑",
     ]
     a = b["day_master"]["assessment"]
-    assert a["method_id"] == "season_root_revelation_relations_v11"
+    assert a["method_id"] == "season_root_revelation_relations_v12"
     (event,) = [e for e in a["relations"] if e["kind"] == "三合"]
     assert event["positions"] == ["year", "month", "day", "hour"]
     assert event["status"] == "conditioned_transformation"

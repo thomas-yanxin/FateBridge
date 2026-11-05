@@ -18,7 +18,7 @@ from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.validation.human_design import verify_human_design_reading
-from tests.golden.runner import golden_ephemeris
+from tests.ephemeris_context import moshier_ephemeris
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -161,7 +161,7 @@ def source_run(request):
         cycle_reference_datetime="2029-07-01T00:00:00Z",
     )
     if request.param:
-        with golden_ephemeris():
+        with moshier_ephemeris():
             return execute_tool(spec, spec.request_model(**data))
     return execute_tool(spec, spec.request_model(**data))
 

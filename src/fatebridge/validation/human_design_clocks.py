@@ -395,7 +395,12 @@ def verify_clock_records(payload: dict[str, Any]) -> ClockReplay:
                 )
                 replay.check_time(value["design_utc"], times["design"], DESIGN)
             for key, child in value.items():
-                if key not in {"clock_evidence", "interpretation", "rule_trace"}:
+                if key not in {
+                    "clock_evidence",
+                    "interpretation",
+                    "rule_trace",
+                    "run_metadata",
+                }:
                     walk(child, path + "." + key)
         elif isinstance(value, list):
             for child in value:

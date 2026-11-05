@@ -220,6 +220,8 @@ def portable_projection_scalars(
     radius_m: int,
     au_m: int,
     resolution: float,
+    *,
+    include_enclosures: bool = False,
 ) -> dict:
     distance = Fraction(sun[2])
     ratio = Fraction(radius_m, au_m) / distance
@@ -256,6 +258,20 @@ def portable_projection_scalars(
                 "arithmetic_interval_bits": bits,
                 "arithmetic_rounding_status": "enclosure_endpoints_round_to_same_binary64",
                 "zero_sign_policy": "canonical_positive_zero",
+                **(
+                    {
+                        "arithmetic_enclosures_exact": {
+                            key: [str(Fraction(v, a.s)) for v in bounds]
+                            for key, bounds in (
+                                ("separation_radians", separation),
+                                ("nominal_solar_radius_radians", radius),
+                                ("projection_margin_radians", margin),
+                            )
+                        }
+                    }
+                    if include_enclosures
+                    else {}
+                ),
             }
         except _MorePrecision:
             continue

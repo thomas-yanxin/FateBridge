@@ -13,6 +13,7 @@ from fatebridge.core.ephemeris_runtime import (
     configure_ephemeris_path,
     configured_ephemeris_path,
 )
+from fatebridge.utils.errors import EphemerisSourceError
 
 
 @pytest.fixture
@@ -92,18 +93,17 @@ def test_installing_or_replacing_data_in_same_directory_invalidates_old_year(
     assert removed[0].moment == before[0].moment
 
 
-def test_provider_availability_change_does_not_reuse_linear_fallback(
+def test_provider_availability_recovers_without_caching_an_approximate_year(
     data_environment, monkeypatch
 ):
     library = almanac.swe
     install_symbolic_solver(monkeypatch, lambda: 7)
     monkeypatch.setattr(almanac, "swe", None)
-    before = almanac.get_solar_terms_for_year(2026, "UTC")
-    assert {t.resolution_provider for t in before} == {"linear_1900_fallback"}
+    with pytest.raises(EphemerisSourceError, match="no linear approximation"):
+        almanac.get_solar_terms_for_year(2026, "UTC")
     monkeypatch.setattr(almanac, "swe", library)
     after = almanac.get_solar_terms_for_year(2026, "UTC")
     assert {t.resolution_provider for t in after} == {"swisseph"}
-    assert after[0].moment != before[0].moment
 
 
 def test_transient_solver_failure_does_not_poison_the_same_environment_cache(
@@ -121,11 +121,11 @@ def test_transient_solver_failure_does_not_poison_the_same_environment_cache(
         return anchor + timedelta(seconds=7)
 
     monkeypatch.setattr(almanac, "_solar_term_utc_via_swe", solve)
-    first = almanac.get_solar_terms_for_year(2026, "UTC")
-    assert first[0].resolution_provider == "linear_1900_fallback"
+    with pytest.raises(EphemerisSourceError, match="no linear approximation"):
+        almanac.get_solar_terms_for_year(2026, "UTC")
     recovered = almanac.get_solar_terms_for_year(2026, "UTC")
     assert all(t.resolution_provider == "swisseph" for t in recovered)
-    assert recovered[0].moment != first[0].moment
+    assert calls == 25
 
 
 def test_file_change_during_a_year_discards_the_inconsistent_result(
@@ -147,7 +147,8 @@ def test_file_change_during_a_year_discards_the_inconsistent_result(
     result = almanac.get_solar_terms_for_year(2026, "UTC")
     assert len(calls) > 24
     assert all(
-        t.moment == almanac._solar_term_utc_via_linear(2026, i) + timedelta(seconds=2)
+        t.moment
+        == almanac._solar_term_search_anchor_utc(2026, i) + timedelta(seconds=2)
         for i, t in enumerate(result)
     )
 
@@ -172,7 +173,7 @@ def test_continuously_changing_files_fail_instead_of_returning_a_mixed_year(
 def test_solver_records_the_returned_model_rather_than_the_requested_one(
     monkeypatch, actual_model
 ):
-    from fatebridge.core import native_solar_source
+    from fatebridge.core import moshier_solar, native_solar_source
 
     civil = datetime(2020, 3, 20, 3, 50, tzinfo=timezone.utc)
     # Independent civil JD anchor and published TT-UTC = 69.184 seconds.
@@ -191,6 +192,7 @@ def test_solver_records_the_returned_model_rather_than_the_requested_one(
         return ((at - tt) % 360, 0, 1, 0, 0, 0), actual_flag
 
     monkeypatch.setattr(almanac, "ephemeris_call", sun)
+    monkeypatch.setattr(moshier_solar, "solar_longitude", lambda at: (at - tt) % 360)
     # This unit fixture has symbolic coordinates, hence symbolic file state.
     # Real compressed-file identities and warmup orders are covered separately.
     monkeypatch.setattr(
@@ -201,8 +203,13 @@ def test_solver_records_the_returned_model_rather_than_the_requested_one(
     provenance = {}
     resolved = almanac._solar_term_utc_via_swe(2020, 0, civil, provenance)
     assert resolved is not None and abs((resolved - civil).total_seconds()) < 0.0002
-    assert provenance["ephemeris_model"] == actual_model
-    assert provenance["ephemeris_retflags"] == (returned_flag,)
+    if actual_model == "moshier":
+        assert provenance["ephemeris_model"] == moshier_solar.MODEL_ID
+        assert provenance["resolution_provider"] == moshier_solar.PROVIDER
+        assert provenance["ephemeris_retflags"] == ()
+    else:
+        assert provenance["ephemeris_model"] == actual_model
+        assert provenance["ephemeris_retflags"] == (returned_flag,)
 
 
 @pytest.mark.parametrize(

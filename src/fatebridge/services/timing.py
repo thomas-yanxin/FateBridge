@@ -830,6 +830,11 @@ def calculate_liushi_analysis(
     )
 
     liushi_info = liushi_result["liushi_info"]
+    life_assessment = compute_life_dimensions_for_moment(
+        birth_context,
+        analysis_date,
+        liushi_pillar=(liushi_info["stem"], liushi_info["branch"]),
+    )
     detailed_analysis = liushi_result["detailed_analysis"]
     element_effects = liushi_result["element_effects"]
     summary = liushi_result["enhanced_summary"]
@@ -892,9 +897,10 @@ def calculate_liushi_analysis(
             "suggestions": detailed_analysis["suggestions"],
         },
         "element_effects": serialize_element_effects(element_effects),
-        "life_dimensions": compute_life_dimensions_for_moment(
-            birth_context, analysis_date
-        ),
+        "life_dimensions": life_assessment["scores"],
+        "life_dimensions_assessment": {
+            key: value for key, value in life_assessment.items() if key != "scores"
+        },
         "summary": summary,
         "snapshot_text": snapshot_text,
         "snapshot_export": snapshot_export,

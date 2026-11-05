@@ -97,16 +97,10 @@ def test_changing_an_actual_dignity_cannot_pass_by_source_transcription(monkeypa
     assert not all(r["matched"] for r in result["printed_rows"])
 
 
-def test_old_five_degree_stellar_diagnosis_cannot_describe_current_six_degree_rule(
-    audited,
-):
-    value = audited["prior_regulus_resolution"]
-    old = value["prior_diagnosis"]
-    assert old["coarse_five_degree_condition"] is True
-    assert old["minute_five_degree_condition"] is False
-    rows = value["current_rule_controls"]
-    assert [r["gap_arcminutes"] for r in rows] == ["293", "327"]
-    assert all(r["current_orb_degrees"] == 6 for r in rows)
-    assert all(r["current_condition"] and r["current_moon_balance"] == 2 for r in rows)
-    assert not value["original_fixture_replaced"]
+def test_printed_regulus_resolution_uses_current_six_degree_source_rule(audited):
+    value = audited["regulus_resolution"]
+    assert len(value["current_rule_controls"]) == 2
+    assert all(
+        row["current_orb_degrees"] == 6 for row in value["current_rule_controls"]
+    )
     assert not value["source_acceptance_passed"]

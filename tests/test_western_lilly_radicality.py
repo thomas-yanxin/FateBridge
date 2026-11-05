@@ -127,7 +127,7 @@ def test_late_ascendant_27_boundary_does_not_drop_exact_27_or_round_adjacent_dou
     )
     value = review(at)
     assert clause(value, "C02")["condition_present"] is late
-    assert ("ascendant_too_late" in {c["code"] for c in value["strictures"]}) is late
+    assert ("C02" in {c["code"] for c in value["strictures"]}) is late
     assert value["safe_to_judge"] is None
 
 
@@ -213,7 +213,7 @@ def test_void_moon_sign_qualification_never_changes_the_geometric_voc_flag(sign_
         and row["inputs"]["some_performance_sign_qualification"] is True
     )
     assert row["exception_satisfied"] is None
-    assert any(c["code"] == "moon_void_of_course" for c in value["strictures"])
+    assert any(c["code"] == "C05" for c in value["strictures"])
     strong = review(
         planets=s,
         voc=True,
@@ -226,7 +226,7 @@ def test_void_moon_sign_qualification_never_changes_the_geometric_voc_flag(sign_
 def test_unavailable_moon_history_is_not_a_void_moon_caution():
     value = review(voc=None)
     assert clause(value, "C05")["condition_present"] is None
-    assert not any(c["code"] == "moon_void_of_course" for c in value["strictures"])
+    assert not any(c["code"] == "C05" for c in value["strictures"])
 
 
 def test_seventh_topic_guard_does_not_erase_separate_saturn_clause():
@@ -238,10 +238,8 @@ def test_seventh_topic_guard_does_not_erase_separate_saturn_clause():
     assert clause(value, "C06")["condition_present"] is True
     assert clause(value, "C06")["status"] == "not_applicable"
     assert clause(value, "C08")["condition_present"] is True
-    assert any(c["code"] == "saturn_in_seventh" for c in value["strictures"])
-    assert not any(
-        c["code"] == "seventh_matter_context_caution" for c in value["strictures"]
-    )
+    assert any(c["code"] == "C08" for c in value["strictures"])
+    assert not any(c["code"] == "C06" for c in value["strictures"])
 
 
 def test_saturn_cusp_virtue_is_not_mislabeled_as_literal_geometric_occupancy():

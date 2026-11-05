@@ -1,6 +1,5 @@
 """Mathematical/domain guards, then frozen independent acceptance fixtures."""
 
-import copy
 import json
 import math
 from pathlib import Path
@@ -19,8 +18,8 @@ from scripts.audit_astrodice_position_motion import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-PROTOCOL = ROOT / "tests/fixtures/astrodice-inner-position-protocol.json"
-REFERENCE = ROOT / "tests/fixtures/astrodice-inner-position-reference.json"
+PROTOCOL = ROOT / "tests/data/astrodice/tables/inner-position-protocol.json"
+REFERENCE = ROOT / "tests/data/astrodice/tables/inner-position-reference.json"
 
 
 @pytest.mark.parametrize("power", range(7))

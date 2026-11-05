@@ -25,9 +25,7 @@ from fatebridge.services.divination import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-REFERENCE = json.loads(
-    (ROOT / "tests/fixtures/sukuyo-t1299-reference.json").read_text()
-)
+REFERENCE = json.loads((ROOT / "tests/data/sukuyo-t1299-reference.json").read_text())
 
 
 def test_month_starts_against_naoj_and_t1299_birth_example():
@@ -90,7 +88,8 @@ def test_compatibility_uses_lunar_dates_without_a_chart_or_guessed_birth_time(
     assert r["su27_basis"] == "t1299_lower_fullmoon27_v1"
     assert r["person1"]["natal_su27"] == "娄"
     assert r["person2"]["natal_su27"] == "氐"
-    assert r["person1"]["moon_longitude"] is None
+    assert {"natal_su28", "moon_longitude"}.isdisjoint(r["person1"])
+    assert {"coordinates", "deprecated_fields"}.isdisjoint(r["interpretation_contract"])
     assert r["person1"]["calendar"]["birth_time_known"] is False
     assert r["person1_to_person2"]["relation"] == "壊"
     assert r["person2_to_person1"]["relation"] == "安"
@@ -163,9 +162,7 @@ def test_every_published_hko_day_in_1901_2099_and_chinese_supplement():
     builder = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(builder)
     sources = builder.read_sources()
-    manifest = json.loads(
-        (ROOT / "tests/fixtures/sukuyo_hko_v1/manifest.json").read_text()
-    )
+    manifest = json.loads((ROOT / "tests/data/sukuyo_hko_v1/manifest.json").read_text())
     for source in manifest["sources"]:
         assert hashlib.sha256(sources[source["file"]]).hexdigest() == source["sha256"]
     expected = builder.published_rows(sources)

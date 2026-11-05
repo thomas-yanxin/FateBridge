@@ -1,0 +1,212 @@
+{
+  "bundle_version": "1.1.0",
+  "sources": {
+    "SP1": {
+      "title": "Shapely User Manual",
+      "url": "https://shapely.readthedocs.io/en/stable/manual.html",
+      "kind": "official_software_documentation",
+      "scope": "平面包含、相交、遮挡与坐标变换；高度独立核对，不提供传统吉凶规则",
+      "author": "Shapely contributors",
+      "retrieved_at": "2026-11-04"
+    },
+    "SP2": {
+      "title": "Constraint Optimization",
+      "url": "https://developers.google.com/optimization/cp",
+      "kind": "official_software_documentation",
+      "scope": "约束满足与有限候选可行性；本版采用穷举剪枝，不宣称调用CP-SAT",
+      "author": "Google OR-Tools",
+      "retrieved_at": "2026-11-04"
+    },
+    "W1": {
+      "title": "7 Quick Tips to Bring You Career Success",
+      "url": "https://www.wofs.com/7-quick-tips-career-success/",
+      "kind": "institution_editorial_authored_guidance",
+      "scope": "第7节：东鲜花、东南健康小植物、西南光滑水晶球、南灯；同桌金属办公设备在坐者右且左有更高物。只采用署名摆放规则，不采纳效力保证",
+      "author": "WOFS",
+      "published": "2021-10-07",
+      "retrieved_at": "2026-11-04"
+    },
+    "K0": {
+      "title": "The Feng Shui Approach to the Same Room, Different Function",
+      "url": "https://fengshuisolutions.net/the-feng-shui-approach-to-the-same-room-different-function-by-kartar-diamond/",
+      "kind": "author_published_article",
+      "scope": "工作/学习清醒用途取向星角色；睡眠及混用分别处理，不等于座位朝向",
+      "author": "Kartar Diamond",
+      "published": "2018-07-06",
+      "retrieved_at": "2026-11-04"
+    },
+    "K2": {
+      "title": "Excerpt from the Mountain Dragons and Water Dragons Case Study",
+      "url": "https://fengshuisolutions.net/excerpt-from-the-mountain-dragons-and-water-dragons-case-study-by-kartar-diamond/",
+      "kind": "author_published_article",
+      "scope": "时令、形态、用途分别核对；向星角色不是星自身水五行，不由其角色处方桌面水体",
+      "author": "Kartar Diamond",
+      "published": "2025-04-26",
+      "retrieved_at": "2026-11-04"
+    },
+    "K3": {
+      "title": "A Little Primer on the Flying Stars",
+      "url": "https://fengshuisolutions.net/a-little-primer-on-the-flying-stars-by-kartar-diamond/",
+      "kind": "author_published_article",
+      "author": "Kartar Diamond",
+      "published": "2026-05-10",
+      "retrieved_at": "2026-11-04",
+      "scope": "说明81为有序山向配对且解释依赖用途与时令；本文没有逐对条件表，不作为81组合断语实现依据"
+    },
+    "JS_REVIEW": {
+      "title": "陈益峰：金锁玉关九砂九水白话注解（上）",
+      "url": "https://www.163.com/dy/article/DRG7R2P20528KPTC.html",
+      "kind": "attributed_commentary_repost",
+      "retrieved_at": "2026-11-04",
+      "scope": "本次检索线索；非作者完整底本，未取得可独立校验的24山形态距离条件，不升级现有S5来源地位"
+    }
+  },
+  "rulesets": {
+    "workstation_layout_v1": {
+      "ruleset_id": "workstation_layout_v1",
+      "version": "1.1.0",
+      "method": "measured_workstation_geometry",
+      "source_ids": [
+        "SP1",
+        "SP2"
+      ],
+      "scope": "所给二维米制场景的几何/显式高度、竖直屏幕透视遮挡、明确网格与完整有限搜索；不是自动立极、眩光或风水总分"
+    },
+    "workstation_conditioned_v1": {
+      "ruleset_id": "workstation_conditioned_v1",
+      "version": "1.0.0",
+      "method": "authored_workstation_conditions",
+      "source_ids": [
+        "K0",
+        "K2"
+      ],
+      "scope": "工位用途角色、显式评价运、星五行和独立形势/外局条件；各流派、时层和候选分列，不覆盖完整81组合断语"
+    },
+    "wofs_desktop_compass_v1": {
+      "ruleset_id": "wofs_desktop_compass_v1",
+      "version": "1.0.0",
+      "method": "authored_compass_desktop",
+      "source_ids": [
+        "W1"
+      ],
+      "scope": "明确另选的WOFS有限桌面方向及坐者高低关系；按物件完整范围保留跨区候选，不类推手机或固定高度数值"
+    }
+  },
+  "desktop_rules": [
+    {
+      "rule_id": "wofs_desktop_compass_v1.flowers_east",
+      "representation": "fresh_flowers",
+      "direction": "E",
+      "source_ids": [
+        "W1"
+      ]
+    },
+    {
+      "rule_id": "wofs_desktop_compass_v1.plant_southeast",
+      "representation": "living_plant",
+      "direction": "SE",
+      "source_ids": [
+        "W1"
+      ]
+    },
+    {
+      "rule_id": "wofs_desktop_compass_v1.crystal_southwest",
+      "representation": "smooth_crystal_ball",
+      "direction": "SW",
+      "source_ids": [
+        "W1"
+      ]
+    },
+    {
+      "rule_id": "wofs_desktop_compass_v1.lamp_south",
+      "representation": "lamp",
+      "direction": "S",
+      "source_ids": [
+        "W1"
+      ]
+    }
+  ],
+  "condition_rules": [
+    {
+      "rule_id": "workstation_conditioned_v1.current_role_period_match",
+      "source_ids": [
+        "K0",
+        "K2"
+      ],
+      "predicate": "明确工作/学习用途所取向星与显式评价运是否相同",
+      "scope": "独立条件比较维度；不当令不等于不利，不将基本时令或未观察的外局转成吉凶"
+    }
+  ],
+  "limitations": [
+    "全部几何只覆盖登记场景；未确认完整清单时缺项保持未知。",
+    "误差或照片候选不能认证现场可执行；立极及宅盘绑定须显式确认。",
+    "没有传统距离、重量、数量或效力数值；计算容差仅用于浮点几何。",
+    "工位条件层不把坐向轴主客规则推广到其他宫，不把不当令直接判为凶。",
+    "WOFS与其他作者的尖角/物件立场分别保留，桌面规则不作为三法共识。"
+  ],
+  "research_coverage": [
+    {
+      "algorithm_id": "measured_scene_geometry",
+      "status": "implemented",
+      "implemented_scope": "显式参考系、凹多边形、家具和物件包络、平面/高度、入口与屏幕遮挡、梁角、净空与保留区",
+      "source_ids": [
+        "SP1"
+      ]
+    },
+    {
+      "algorithm_id": "finite_layout_generation",
+      "status": "implemented",
+      "implemented_scope": "明确网格自动产生位置域或显式位置域；最多4096完整组合，逐候选复算、许可、失败和未知回执及独立条件Pareto取舍",
+      "source_ids": [
+        "SP1",
+        "SP2"
+      ]
+    },
+    {
+      "algorithm_id": "authored_desktop_rules",
+      "status": "implemented",
+      "implemented_scope": "显式另选的BTB及WOFS已注册方向/左右/高低/植物状态规则；作者冲突保留",
+      "source_ids": [
+        "W1"
+      ]
+    },
+    {
+      "algorithm_id": "workstation_conditioned_reasoning",
+      "status": "partial",
+      "implemented_scope": "已选宅盘、用途角色、显式评价运、基本时令、山向五行、独立形势外局及实际轴范围主客引用",
+      "remaining_scope": "完整81山向配对的来源化条件解释及超出既有轴范围的主客规则",
+      "required_resolution": "取得逐条带版本、适用条件与独立核对实例的作者原始规则；不能以星数或五行表代替条件判词",
+      "source_ids": [
+        "K0",
+        "K2",
+        "K3"
+      ]
+    },
+    {
+      "algorithm_id": "jinsuo_24_mountain_interpretation",
+      "status": "source_blocked",
+      "implemented_scope": "沿用既有八方九砂九水基础及24山角度索引，实测砂水分类回流既有方法",
+      "remaining_scope": "24山形态、距离、相互组合和元运的全部细断",
+      "required_resolution": "取得可核验完整底本并逐条明确砂水形态、距离及组合谓词；当前转载和标题不足以确定规则，不编造数字阈值",
+      "source_ids": [
+        "JS_REVIEW"
+      ]
+    },
+    {
+      "algorithm_id": "automatic_image_reconstruction_and_chart_center",
+      "status": "not_implemented",
+      "implemented_scope": "人工标注实测数据入口，明确立极/范围/盘式绑定及照片候选",
+      "remaining_scope": "照片或户型图自动提取比例、三维对象及自动立极/全楼层宅盘建立",
+      "required_resolution": "独立标注数据集、尺度与中心约定以及识别误差验收；未将人工标注实现计作自动识别",
+      "source_ids": []
+    },
+    {
+      "algorithm_id": "sanhe_and_xuankong_dagua",
+      "status": "not_implemented",
+      "implemented_scope": "未以当前三法或桌面规则替代",
+      "remaining_scope": "三合水法和玄空大卦",
+      "required_resolution": "独立来源规则、输入合同和对照案例；不混用现有流派",
+      "source_ids": []
+    }
+  ]
+}

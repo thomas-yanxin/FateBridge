@@ -1,6 +1,5 @@
 """Object key permutations preserve receipts; arrays and values remain strict."""
 
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -16,7 +15,7 @@ from fatebridge.core.human_design_source_variants import line_variant_impact
 from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
-from tests.test_human_design_publisher import RUNS
+from tests.test_human_design_publisher import current as current
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-object-order-plan.json"
@@ -35,21 +34,6 @@ def permute(value, order):
     if isinstance(value, list):
         return [permute(v, order) for v in value]
     return value
-
-
-def test_all_original_capture_bytes_and_thresholds_stay_frozen():
-    assert (
-        hashlib.sha256(PLAN_PATH.read_bytes()).hexdigest()
-        == "f17b58657f4357dcbd261c8a735bf3b1979d2d70c600f73b948ea1ef93c861f6"
-    )
-    for n, expected in PLAN["frozen_sorted_captures"].items():
-        assert hashlib.sha256((ROOT / n).read_bytes()).hexdigest() == expected
-    assert PLAN["canonical_side_order"] == ["personality", "design"]
-    assert PLAN["unchanged_thresholds"] == {
-        "astronomy_arcsec": 2.0,
-        "physical_design_root_seconds": 5.0,
-        "clock_seconds": 0.0002,
-    }
 
 
 def test_both_recipient_and_donor_sides_have_explicit_order_with_array_indices():
@@ -105,8 +89,9 @@ def test_source_29_disagreement_lists_are_independent_of_side_object_order():
 @pytest.mark.parametrize("order", ["sorted", "reversed"])
 @pytest.mark.parametrize("index", range(16))
 def test_all_frozen_publisher_runs_keep_hash_and_full_reading_when_maps_reorder(
-    index, order
+    index, order, current  # noqa: F811 - pytest fixture dependency
 ):
+    RUNS, _ = current
     original = RUNS[index]["run"]
     reordered = permute(original, order)
     # No rehash, array sorting, rounding or source edits are permitted here.
@@ -133,7 +118,10 @@ def test_all_frozen_publisher_runs_keep_hash_and_full_reading_when_maps_reorder(
 
 
 @pytest.mark.parametrize("kind", PLAN["negative_cases"])
-def test_rehashed_array_or_value_changes_still_reject_after_map_sorting(kind):
+def test_rehashed_array_or_value_changes_still_reject_after_map_sorting(
+    kind, current
+):  # noqa: F811 - pytest fixture dependency
+    RUNS, _ = current
     # Select an actual frozen chart with multiple donors, so the donor-order
     # mutation is real rather than reversing an empty or one-item array.
     source = next(

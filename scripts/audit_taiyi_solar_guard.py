@@ -13,7 +13,7 @@ from typing import Any, Iterator
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_solar_guard_v44"
-FREEZE_SHA = "e213c7b2b5e9f191cd611b268e724da39756c0aed948857ca45a1366921057b7"
+FREEZE_SHA = "b0f03b4240351a941443b62cab4cf62c4826c29020c08d77ef0ec1a07423ba8c"
 MODEL = "fatebridge_de440_solar_v1"
 NAMES = {10: "芒种", 11: "夏至", 22: "大雪", 23: "冬至"}
 

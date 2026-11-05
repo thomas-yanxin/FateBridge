@@ -479,7 +479,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/education.py",
-              "source_sha256": "e4b47876696af06ef1cbbfa297f42695279ab9eb5503bb9f1975f29f4be03872",
               "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -498,7 +497,6 @@
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF49,50,51；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；文昌表或女命对应仍待扫描本校勘。"
         }
       },
@@ -661,23 +659,11 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/classical.py",
-              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
               "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
             }
           ],
           "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
-          "implementation_ref_history": [
-            {
-              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
-              "previous_ref": {
-                "source_path": "src/fatebridge/core/classical.py",
-                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
-                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
-              },
-              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
-            }
-          ]
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。"
         }
       },
       "七杀格": {
@@ -714,23 +700,11 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/classical.py",
-              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
               "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
             }
           ],
           "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
-          "implementation_ref_history": [
-            {
-              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
-              "previous_ref": {
-                "source_path": "src/fatebridge/core/classical.py",
-                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
-                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
-              },
-              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
-            }
-          ]
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。"
         }
       },
       "食神格": {
@@ -767,23 +741,11 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/classical.py",
-              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
               "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
             }
           ],
           "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
-          "implementation_ref_history": [
-            {
-              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
-              "previous_ref": {
-                "source_path": "src/fatebridge/core/classical.py",
-                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
-                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
-              },
-              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
-            }
-          ]
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。"
         }
       },
       "伤官格": {
@@ -820,23 +782,11 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/classical.py",
-              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
               "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
             }
           ],
           "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
-          "implementation_ref_history": [
-            {
-              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
-              "previous_ref": {
-                "source_path": "src/fatebridge/core/classical.py",
-                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
-                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
-              },
-              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
-            }
-          ]
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。"
         }
       },
       "正财格": {
@@ -873,23 +823,11 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/classical.py",
-              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
               "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
             }
           ],
           "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
-          "implementation_ref_history": [
-            {
-              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
-              "previous_ref": {
-                "source_path": "src/fatebridge/core/classical.py",
-                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
-                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
-              },
-              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
-            }
-          ]
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。"
         }
       },
       "偏财格": {
@@ -926,23 +864,11 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/classical.py",
-              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
               "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
             }
           ],
           "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
-          "implementation_ref_history": [
-            {
-              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
-              "previous_ref": {
-                "source_path": "src/fatebridge/core/classical.py",
-                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
-                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
-              },
-              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
-            }
-          ]
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。"
         }
       },
       "正印格": {
@@ -981,23 +907,11 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/classical.py",
-              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
               "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
             }
           ],
           "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30,72,73；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
-          "implementation_ref_history": [
-            {
-              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
-              "previous_ref": {
-                "source_path": "src/fatebridge/core/classical.py",
-                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
-                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
-              },
-              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
-            }
-          ]
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30,72,73；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。"
         }
       },
       "偏印格": {
@@ -1036,23 +950,11 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/classical.py",
-              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
               "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
             }
           ],
           "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30,72,73；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
-          "implementation_ref_history": [
-            {
-              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
-              "previous_ref": {
-                "source_path": "src/fatebridge/core/classical.py",
-                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
-                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
-              },
-              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
-            }
-          ]
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30,72,73；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。"
         }
       },
       "建禄格": {
@@ -1091,23 +993,11 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/classical.py",
-              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
               "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
             }
           ],
           "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30,89,90；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
-          "implementation_ref_history": [
-            {
-              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
-              "previous_ref": {
-                "source_path": "src/fatebridge/core/classical.py",
-                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
-                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
-              },
-              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
-            }
-          ]
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30,89,90；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。"
         }
       },
       "羊刃驾杀格": {
@@ -1147,23 +1037,11 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/classical.py",
-              "source_sha256": "b01378c49545342be938810112af48d8a245f3bf7f7b4b70fe0b37bb1ea53a2d",
               "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
             }
           ],
           "known_force_disagreements": "Existing adjudicated cohort4/7 remains unchanged; these cards are not new case observations.",
-          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30,86,87,88；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。",
-          "implementation_ref_history": [
-            {
-              "reviewed_at_utc": "2026-10-22T03:52:50.409431+00:00",
-              "previous_ref": {
-                "source_path": "src/fatebridge/core/classical.py",
-                "source_sha256": "6fe27e7d228bb88601f4f119d644ae33c0d54ff4b7e65331b50578253149de8a",
-                "support_scope": "当前月令候选、透干会支与实际禄刃资格选择；选择标签不等于完整成格。"
-              },
-              "review_note": "Reviewed exact old/new source diff: renderer states month reference and unresolved formation/use, and distinguishes original month principal from finite selector. No month-selection calculation changed. Selected semantics only; no independent formation or expert acceptance."
-            }
-          ]
+          "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本 NLC416-11jh010455-35296，上海世界图书馆发行，PDF26,27,28,29,30,86,87,88；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；候选与成败条件分开，未完成独立专家验收。"
         }
       }
     },
@@ -1268,7 +1146,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/elements.py",
-              "source_sha256": "68f3f6ae850374e70ad70474f26c76802363dc4d740a3560ebdb6e981eab13f5",
               "support_scope": "只支持元素出现量、季相和工程旺衰的程序定义；不为古籍、人格或医疗效度背书。"
             }
           ],
@@ -1390,7 +1267,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/elements.py",
-              "source_sha256": "68f3f6ae850374e70ad70474f26c76802363dc4d740a3560ebdb6e981eab13f5",
               "support_scope": "只支持元素出现量、季相和工程旺衰的程序定义；不为古籍、人格或医疗效度背书。"
             }
           ],
@@ -1512,7 +1388,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/elements.py",
-              "source_sha256": "68f3f6ae850374e70ad70474f26c76802363dc4d740a3560ebdb6e981eab13f5",
               "support_scope": "只支持元素出现量、季相和工程旺衰的程序定义；不为古籍、人格或医疗效度背书。"
             }
           ],
@@ -1634,7 +1509,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/elements.py",
-              "source_sha256": "68f3f6ae850374e70ad70474f26c76802363dc4d740a3560ebdb6e981eab13f5",
               "support_scope": "只支持元素出现量、季相和工程旺衰的程序定义；不为古籍、人格或医疗效度背书。"
             }
           ],
@@ -1756,7 +1630,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/elements.py",
-              "source_sha256": "68f3f6ae850374e70ad70474f26c76802363dc4d740a3560ebdb6e981eab13f5",
               "support_scope": "只支持元素出现量、季相和工程旺衰的程序定义；不为古籍、人格或医疗效度背书。"
             }
           ],
@@ -1859,7 +1732,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/health.py",
-              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
               "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -1885,7 +1757,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/health.py",
-              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
               "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -1911,7 +1782,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/health.py",
-              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
               "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -1937,7 +1807,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/health.py",
-              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
               "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -1963,7 +1832,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/health.py",
-              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
               "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -1989,7 +1857,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/health.py",
-              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
               "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -2029,7 +1896,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/health.py",
-              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
               "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -2068,7 +1934,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/health.py",
-              "source_sha256": "067a3357200646e29902a9ec225bc2c92149e4b08c3ad040102ca167c30b0198",
               "support_scope": "本实现的符号权重、分组阈值与输出范围；不是医学文献或医疗效力证据。"
             }
           ],
@@ -2110,7 +1975,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/children.py",
-              "source_sha256": "aa000bb0f4c006e321fa646436584369a92d5225681d9eb14543d5ba374cab87",
               "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2129,7 +1993,6 @@
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；文昌表或女命对应仍待扫描本校勘。"
         }
       },
@@ -2164,7 +2027,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/children.py",
-              "source_sha256": "aa000bb0f4c006e321fa646436584369a92d5225681d9eb14543d5ba374cab87",
               "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2181,7 +2043,6 @@
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
         }
       },
@@ -2216,7 +2077,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/children.py",
-              "source_sha256": "aa000bb0f4c006e321fa646436584369a92d5225681d9eb14543d5ba374cab87",
               "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2233,7 +2093,6 @@
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
         }
       },
@@ -2268,7 +2127,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/children.py",
-              "source_sha256": "aa000bb0f4c006e321fa646436584369a92d5225681d9eb14543d5ba374cab87",
               "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2285,7 +2143,6 @@
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
         }
       }
@@ -2324,7 +2181,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/education.py",
-              "source_sha256": "e4b47876696af06ef1cbbfa297f42695279ab9eb5503bb9f1975f29f4be03872",
               "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2341,7 +2197,6 @@
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,72,73,74,75；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
         }
       },
@@ -2377,7 +2232,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/education.py",
-              "source_sha256": "e4b47876696af06ef1cbbfa297f42695279ab9eb5503bb9f1975f29f4be03872",
               "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2394,7 +2248,6 @@
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,72,73,75；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
         }
       },
@@ -2435,7 +2288,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/education.py",
-              "source_sha256": "e4b47876696af06ef1cbbfa297f42695279ab9eb5503bb9f1975f29f4be03872",
               "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2452,7 +2304,6 @@
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,73,76,77,78,82,83,84,85；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
         }
       },
@@ -2488,7 +2339,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/education.py",
-              "source_sha256": "e4b47876696af06ef1cbbfa297f42695279ab9eb5503bb9f1975f29f4be03872",
               "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2507,7 +2357,6 @@
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF49,50,51；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；文昌表或女命对应仍待扫描本校勘。"
         }
       },
@@ -2544,7 +2393,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/education.py",
-              "source_sha256": "e4b47876696af06ef1cbbfa297f42695279ab9eb5503bb9f1975f29f4be03872",
               "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2561,7 +2409,6 @@
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,30,73,74,75；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
         }
       },
@@ -2599,7 +2446,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/education.py",
-              "source_sha256": "e4b47876696af06ef1cbbfa297f42695279ab9eb5503bb9f1975f29f4be03872",
               "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2616,7 +2462,6 @@
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF28,30,82,83,84,85；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
         }
       }
@@ -2677,7 +2522,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/relatives.py",
-              "source_sha256": "0fccc3f89b18dd9e37892d5538b9c7cce8108416225ba7d39f0401f63efe9782",
               "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2696,7 +2540,6 @@
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,53；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；文昌表或女命对应仍待扫描本校勘。"
         }
       },
@@ -2732,7 +2575,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/relatives.py",
-              "source_sha256": "0fccc3f89b18dd9e37892d5538b9c7cce8108416225ba7d39f0401f63efe9782",
               "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2749,7 +2591,6 @@
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,53,54,55；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
         }
       },
@@ -2783,7 +2624,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/relatives.py",
-              "source_sha256": "0fccc3f89b18dd9e37892d5538b9c7cce8108416225ba7d39f0401f63efe9782",
               "scope": "逐项核对当前函数的输入、计数、触发条件和输出；程序散列不证明原典或现实预测有效。"
             }
           ],
@@ -2800,7 +2640,6 @@
           "independent_expert_review": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_topic_knowledge_v2/source-review.json",
           "citation": "FateBridge限域编释，非逐字引文；沈孝瞻《秘本子平真诠》，国家图书馆藏本，上海世界图书馆发行，PDF52,53；https://upload.wikimedia.org/wikipedia/commons/f/fe/NLC416-11jh010455-35296_%E5%AD%90%E5%B9%B3%E7%9C%9F%E8%A9%AE.pdf；原典条件与程序、现代讨论分开，未完成独立专家及现实效度验收。"
         }
       }
@@ -3093,7 +2932,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/strength.py",
-              "source_sha256": "9e6a63fa40819a0fe9dc40345071fd79b6e0b4fcfd1c857ed8cfc1909b589ad6",
               "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
             }
           ],
@@ -3167,23 +3005,15 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/utils/data.py",
-              "source_sha256": "19da28049dfa33e35ffde82e1d9e095ef426214ed26d2b6cdbddfd2ed8a23272",
               "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
             },
             {
               "source_path": "src/fatebridge/core/classical_force.py",
-              "source_sha256": "22ce2befb45b2ea4756af9678331cb8660864dc3746d5609341bc0446b682347",
               "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
             },
             {
               "source_path": "src/fatebridge/core/classical_passage.py",
-              "source_sha256": "9b51f1e5c7068434d0b48ef33d13e802d12bcbcddb6f444b18a0bba6329510a6",
               "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
-            },
-            {
-              "source_path": "scripts/audit_bazi_current_collation.py",
-              "source_sha256": "c2b35b2ee99696e8a8cc7e3fede922f600ecc65e74e88dfb589dd6bf19e6947e",
-              "support_scope": "完整重放同一历史预测，再按整段校勘对比现行预期；不修改数值计算、原强标签、采用门槛或未知状态。"
             }
           ],
           "validation_status": "text_semantics_not_model_force_adjudication",
@@ -3195,8 +3025,6 @@
           "revision_history": [
             {
               "previous_revision": 1,
-              "previous_bundle_sha256": "e069bd34cd32a31bc452158a257a17f421e3e4cf953ab204caaa418889b83df5",
-              "previous_entry_path": "tests/fixtures/bazi_current_collation_v1/before/src/fatebridge/data/knowledge/bazi.json",
               "change": "Append full-passage conversion contrast; preserve all four existing tips and original cited source context."
             }
           ]
@@ -3242,7 +3070,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/classical_candidate_selection.py",
-              "source_sha256": "cf370ce675ffed86aacbaed6bd946d2206850532d1110128a0c729d80d25e8dd",
               "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
             }
           ],
@@ -3295,12 +3122,10 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/analysis/career.py",
-              "source_sha256": "08f65da05c2c3f6b898c140889e1d347c177f586a2f7ef51729185147a518a1d",
               "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
             },
             {
               "source_path": "src/fatebridge/core/strength.py",
-              "source_sha256": "9e6a63fa40819a0fe9dc40345071fd79b6e0b4fcfd1c857ed8cfc1909b589ad6",
               "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
             }
           ],
@@ -3353,7 +3178,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/strength.py",
-              "source_sha256": "9e6a63fa40819a0fe9dc40345071fd79b6e0b4fcfd1c857ed8cfc1909b589ad6",
               "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
             }
           ],
@@ -3441,7 +3265,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/strength.py",
-              "source_sha256": "a6a52ba57159825b8f71ebf867e64442148c37f124982a4a9709e221f1b36c16",
               "support_scope": "只说明所引用当前程序的工程三档、根预算与未裁定范围；不为李氏四词、任氏四态提供数值认证，也不证明现实结果。"
             }
           ],
@@ -3721,7 +3544,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/core/strength.py",
-              "source_sha256": "9e6a63fa40819a0fe9dc40345071fd79b6e0b4fcfd1c857ed8cfc1909b589ad6",
               "support_scope": "只说明所引用程序的藏字、计数、路径或未裁定范围，不证明原典有效力量或现实结果。"
             }
           ],
@@ -3807,7 +3629,6 @@
           "implementation_refs": [
             {
               "source_path": "src/fatebridge/utils/data.py",
-              "source_sha256": "19da28049dfa33e35ffde82e1d9e095ef426214ed26d2b6cdbddfd2ed8a23272",
               "supporting_tip_indexes": [
                 4,
                 5
@@ -3816,7 +3637,6 @@
             },
             {
               "source_path": "src/fatebridge/core/strength.py",
-              "source_sha256": "4dbf210329e41b72f44af0fe2d82e44f3448d4f6bde5afe85c09d6259cd07769",
               "supporting_tip_indexes": [
                 4,
                 5

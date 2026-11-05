@@ -7,19 +7,18 @@ from pathlib import Path
 
 import pytest
 
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
+from fatebridge.core.astro import runtime
+from fatebridge.utils.errors import EphemerisSourceError
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
-
-from fatebridge.core.astro import runtime
-from fatebridge.utils.errors import EphemerisSourceError
-from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
-
 REFERENCE = json.loads(
     (
-        Path(__file__).parent
-        / "fixtures/western-solar-clock-coherence-v1/reference.json"
+        Path(__file__).parent / "data/astro/solar_clock_coherence/reference.json"
     ).read_text()
 )
 ROWS = [

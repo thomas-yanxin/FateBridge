@@ -17,12 +17,6 @@ from fatebridge.core.punishment_resolution import (
     CURRENT_STRENGTH_METHODS as CURRENT_PUNISHMENT_METHODS,
 )
 from fatebridge.core.punishment_resolution import POLICY as PUNISHMENT_POLICY
-from fatebridge.core.punishment_resolution import (
-    PREVIOUS_POLICY as PREVIOUS_PUNISHMENT_POLICY,
-)
-from fatebridge.core.punishment_resolution import (
-    PREVIOUS_STRENGTH_METHOD as PREVIOUS_PUNISHMENT_METHOD,
-)
 
 Grade = Literal["强", "中和", "弱"]
 
@@ -34,29 +28,15 @@ class SourceReference(PartialOutput):
     source_id: Optional[str] = None
     pdf_pages: Optional[List[int]] = None
     locator: Optional[str] = None
-    registered_document: Optional[str] = None
-    registered_document_sha256: Optional[str] = None
     whole_pdf_sha256: Optional[str] = None
-    identity_evidence: Optional[str] = None
-    identity_evidence_sha256: Optional[str] = None
-    registered_document_scope: Optional[
-        Literal["original_transcription_before_input_revision"]
-    ] = None
 
 
-class SourceInputReadingRevision(PartialOutput):
-    revision_id: Optional[Literal["ditian_1947_six_reviewed_inputs_v1"]] = None
-    source_input_plan_path: Optional[str] = None
-    source_input_plan_sha256: Optional[str] = None
-    review_path: Optional[str] = None
-    review_sha256: Optional[str] = None
+class SourceInputReadingEvidence(PartialOutput):
     reason: Optional[str] = None
     old_image_sha256: Optional[str] = None
     additional_image_sha256: Optional[str] = None
     original_pdf_page: Optional[int] = None
     additional_scan_leaf: Optional[int] = None
-    original_source_record: Optional[Dict[str, JsonValue]] = None
-    original_index_record: Optional[Dict[str, JsonValue]] = None
     source_strength_label_assigned: Optional[Literal[False]] = None
     independent_edition_or_expert_review: Optional[Literal[False]] = None
     new_independent_validation_credit: Optional[Literal[0]] = None
@@ -79,30 +59,20 @@ class SourceStrengthConstraint(PartialOutput):
 
 class SourceEditorialAnnotationProvenance(PartialOutput):
     content_kind: Optional[Literal["registered_editorial_annotation"]] = None
-    registered_document: Optional[str] = None
-    registered_document_sha256: Optional[str] = None
     case_id: Optional[str] = None
-    source_field_pointer: Optional[str] = None
-    source_record_sha256: Optional[str] = None
     annotation_sha256: Optional[str] = None
-    previous_index_record_sha256: Optional[str] = None
-    source_label_kind: Optional[str] = None
-    previous_strength_annotation: Optional[Grade] = None
     is_verbatim_original_text: Optional[Literal[False]] = None
     strength_label_assigned_or_regraded: Optional[Literal[False]] = None
     new_independent_validation_credit: Optional[Literal[0]] = None
 
 
 class SourceNameCorrection(PartialOutput):
-    legacy_registered_name: Optional[str] = None
     name_as_printed: Optional[str] = None
     source_pdf_page: Optional[Literal[73]] = None
     source_image_sha256: Optional[str] = None
-    legacy_case_identifier_retained: Optional[Literal[True]] = None
     historical_person_identity_asserted: Optional[Literal[False]] = None
 
     @field_validator(
-        "legacy_case_identifier_retained",
         "historical_person_identity_asserted",
         mode="before",
     )
@@ -115,8 +85,6 @@ class SourceNameCorrection(PartialOutput):
 
 class SourceIdentityRevision(PartialOutput):
     revision_id: Optional[Literal["ziping_witness_identity_v1"]] = None
-    original_record_sha256: Optional[str] = None
-    original_edition: Optional[str] = None
     publisher_as_printed: Optional[str] = None
     source_pdf_page: Optional[Literal[1]] = None
     source_image_sha256: Optional[str] = None
@@ -177,7 +145,7 @@ class RegisteredSourceRecord(PartialOutput):
     retained_context: Optional[str] = None
     source_reference: Optional[SourceReference] = None
     bounded_strength_constraints: Optional[List[SourceStrengthConstraint]] = None
-    input_reading_revision: Optional[SourceInputReadingRevision] = None
+    input_reading_evidence: Optional[SourceInputReadingEvidence] = None
     editorial_annotation_provenance: Optional[SourceEditorialAnnotationProvenance] = (
         None
     )
@@ -195,15 +163,7 @@ class RegisteredSourceRecord(PartialOutput):
             if self.reference_id is not None and review.review_id is not None:
                 from fatebridge.core.source_conditions import validate_review_record
 
-                validate_review_record(
-                    self.reference_id,
-                    review.review_id,
-                    (
-                        review.provenance.parent_index_record_sha256
-                        if review.provenance is not None
-                        else None
-                    ),
-                )
+                validate_review_record(self.reference_id, review.review_id)
             if (
                 self.case_id is not None
                 and review.case_id is not None
@@ -222,37 +182,20 @@ class RegisteredSourceRecord(PartialOutput):
 
 class SourceIndexContext(PartialOutput):
     source_condition_review_method_id: Optional[
-        Literal["original19_source_conditions_public_v1"]
+        Literal["registered_source_conditions_v1"]
     ] = None
     source_condition_review_sha256: Optional[str] = None
-    total_registered_source_condition_reviews: Optional[Literal[19]] = None
-    total_records_with_source_condition_review: Optional[Literal[21]] = None
-    method_id: Optional[
-        Literal[
-            "registered_literal_source_annotations_v3",
-            "registered_literal_source_annotations_with_bounds_v4",
-            "registered_literal_source_annotations_reviewed_inputs_v5",
-        ]
-    ] = None
+    total_registered_source_condition_reviews: Optional[int] = None
+    total_records_with_source_condition_review: Optional[int] = None
+    method_id: Optional[Literal["registered_literal_source_annotations_v1"]] = None
     index_sha256: Optional[str] = None
-    registry_sha256: Optional[str] = None
     total_registered_records: Optional[int] = None
     total_registered_literal_inputs: Optional[int] = None
     total_registered_strength_constraints: Optional[int] = None
     all_records_previously_exposed: Optional[Literal[True]] = None
-    total_registered_input_reading_revisions: Optional[int] = None
-    input_reading_plan_sha256: Optional[str] = None
-    data_revision: Optional[
-        Literal[
-            "source_annotations_v7_editorial_projection",
-            "source_annotations_v8_witness_identity",
-        ]
-    ] = None
     total_registered_editorial_annotations: Optional[int] = None
-    editorial_annotation_projection_sha256: Optional[str] = None
-    source_identity_plan_sha256: Optional[str] = None
-    total_registered_source_identity_revisions: Optional[int] = None
-    total_registered_printed_name_corrections: Optional[int] = None
+    total_registered_source_identity_witnesses: Optional[int] = None
+    total_registered_printed_name_readings: Optional[int] = None
 
 
 class SourceAnnotationComparison(PartialOutput):
@@ -305,13 +248,11 @@ class SourceCurrentCalculation(PartialOutput):
     def preserve_known_punishment_status(self) -> "SourceCurrentCalculation":
         assessment = self.assessment or {}
         method = self.method_id or assessment.get("method_id")
-        if method == PREVIOUS_PUNISHMENT_METHOD or method in CURRENT_PUNISHMENT_METHODS:
+        if method is not None and method not in CURRENT_PUNISHMENT_METHODS:
+            raise ValueError("只接收当前旺衰计算回执")
+        if method in CURRENT_PUNISHMENT_METHODS:
             policy = assessment.get("punishment_resolution_policy")
-            expected_policy = (
-                PUNISHMENT_POLICY
-                if method in CURRENT_PUNISHMENT_METHODS
-                else PREVIOUS_PUNISHMENT_POLICY
-            )
+            expected_policy = PUNISHMENT_POLICY
             if policy is not None and policy != expected_policy:
                 raise ValueError("解刑策略须忠于已声明的旺衰版本")
             relations = assessment.get("relations")

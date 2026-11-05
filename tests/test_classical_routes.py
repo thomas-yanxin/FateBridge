@@ -13,7 +13,7 @@ from fatebridge.application.examples import suggested_fields
 from fatebridge.core.bazi_evidence import build_natal_evidence
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
 
-FIXTURE = Path(__file__).parent / "fixtures/bazi_classical_routes_v1/reference.json"
+FIXTURE = Path(__file__).parent / "data/bazi_classical_routes_v1/reference.json"
 REFERENCE = json.loads(FIXTURE.read_text())
 
 

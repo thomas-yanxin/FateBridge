@@ -6,6 +6,7 @@ from copy import deepcopy
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.energy_provenance import build_energy_provenance
 from fatebridge.core.output_bazi_evidence import BaziEvidenceChain
 from fatebridge.core.output_energy_provenance import EnergyProvenance
@@ -58,7 +59,9 @@ def test_native_sources_close_without_changing_or_recomputing_input():
     assert p["fronts"]["body"]["synthetic_branch"]["refs"] == [
         "combination_contributions:0"
     ]
-    SourceCurrentCalculation.model_validate(packet())
+    EnergyProvenance.model_validate(p)
+    with pytest.raises(ValidationError, match="只接收当前旺衰计算回执"):
+        SourceCurrentCalculation.model_validate(packet())
     p["synthetic_contributions"][0]["mass"] = 9
     assert "mass" not in a["combination_contributions"][0]
 
@@ -127,7 +130,19 @@ def test_missing_and_null_are_unknown_but_known_empty_is_zero(kind):
     ],
 )
 def test_co_known_false_attribution_is_rejected_even_if_total_is_unchanged(fault):
-    p = packet()
+    pillars = dict(
+        zip(
+            ("year", "month", "day", "hour"),
+            map(tuple, ["壬申", "壬子", "壬辰", "辛亥"]),
+        )
+    )
+    assessment = ElementAnalysis.analyze_day_master_strength(pillars)["assessment"]
+    p = {
+        "method_id": assessment["method_id"],
+        "assessment": assessment,
+        "energy_provenance": build_energy_provenance(assessment, "水"),
+    }
+    SourceCurrentCalculation.model_validate(p)
     q = p["energy_provenance"]
     f = q["fronts"]["body"]
     if fault == "sum":

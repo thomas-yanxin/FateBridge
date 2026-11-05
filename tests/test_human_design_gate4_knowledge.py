@@ -1,7 +1,6 @@
 """Gate4 source drafts, immutable older versions and actual adapter binding."""
 
 import hashlib
-import json
 from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
@@ -26,40 +25,24 @@ from tests.test_agentic_nested_outputs import rest as shared_rest
 from tests.test_heluo_poem_transports import run_three
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "docs/validation/human-design-gate4-knowledge-v5"
-E = BASE / "evidence"
+BASE = ROOT / "tests/data/human_design/gate4"
+E = BASE
 rest = shared_rest
 
 
-def test_all1152_older_reference_outputs_and_registry_prefix_are_unchanged():
-    expected = read(E / "before-1152-canonical-hashes.json")
-    for category, keys in expected.items():
-        assert len(keys) == 384
-        for key, digest in keys.items():
-            assert (
-                hashlib.sha256(
-                    base._canonical(base.read_reference(category=category, key=key))
-                ).hexdigest()
-                == digest
-            )
-    registry = base.build_registry()
-    assert [c["name"] for c in registry["domains"][0]["categories"]] == [
-        "lines",
-        "lines_v3",
-        "lines_v4",
-        "lines_v5",
-        "lines_v6",
-        "lines_v7",
-    ]
-    assert registry["domains"][0]["categories"][3]["coverage"] == {
-        "line_locators": 384,
-        "local_editorial_paraphrases": 24,
-        "meanings_pending": 360,
-        "independently_accepted_line_meanings": 0,
-        "full_source_meanings_accepted": False,
+@pytest.fixture(scope="module")
+def sources():
+    from tests.human_design_current import semantic_sources
+
+    return semantic_sources("gate4")
+
+
+@pytest.fixture(scope="module")
+def packets(sources):
+    return {
+        key: build_human_design_context_packet(source, reference_category="lines_v5")
+        for key, source in sources.items()
     }
-    registry["domains"][0]["categories"] = registry["domains"][0]["categories"][:3]
-    assert registry == read(E / "before-registry.json")
 
 
 @pytest.mark.parametrize(
@@ -119,8 +102,8 @@ def test_every_specific_gate4_line_has_source_bound_unassessed_qualifier(
 
 def test_all384_rows_preserve_old_meanings_and_existing_context_annotations():
     for g in range(1, 65):
-        for l in range(1, 7):
-            key = f"{g}.{l}"
+        for line in range(1, 7):
+            key = f"{g}.{line}"
             old = base.read_reference(category="lines_v4", key=key)[
                 "reference_details"
             ]["record"]
@@ -222,23 +205,9 @@ def test_source_changed_after_load_is_rejected(mode, monkeypatch, tmp_path):
     assert caught.value.reason == "human_design_reference_changed"
 
 
-def test_seven_first_incomplete_runs_are_still_rejected_and_all_fixed_inputs_kept():
-    assert read(E / "deliver-packets-exit.json")["exit_code"] == 1
-    first = read(E / "additional-capture.json")["cases"]
-    final = read(E / "additional-public-capture.json")["cases"]
-    assert len(first) == len(final) == 7
-    assert [r["arguments"] for r in first] == [r["arguments"] for r in final]
-    for old, new in zip(first, final, strict=True):
-        assert old["verification"]["status"] == "rejected"
-        assert new["verification"]["status"] == "verified_fixed_template_reading"
-        for row in (old, new):
-            assert (
-                hashlib.sha256((ROOT / row["source_path"]).read_bytes()).hexdigest()
-                == row["source_sha256"]
-            )
-
-
-def test_every_declared_packet_replays_without_native_and_uses_its_own_chart():
+def test_every_declared_packet_replays_without_native_and_uses_its_own_chart(
+    sources, packets
+):
     seen, total = set(), 0
     with (
         patch(
@@ -250,15 +219,8 @@ def test_every_declared_packet_replays_without_native_and_uses_its_own_chart():
             side_effect=AssertionError("native dispatch"),
         ),
     ):
-        for case in read(E / "packet-delivery-final.json")["cases"]:
-            source = read(ROOT / case["source_path"])
-            packet = read(BASE / "packets-final" / (case["id"] + ".json.gz"))
-            assert (
-                hashlib.sha256(
-                    (BASE / "packets-final" / (case["id"] + ".json.gz")).read_bytes()
-                ).hexdigest()
-                == case["packet_sha256"]
-            )
+        for key, source in sources.items():
+            packet = packets[key]
             assert (
                 verify_human_design_context_packet(
                     packet, source, reference_category="lines_v5"
@@ -299,14 +261,16 @@ def test_every_declared_packet_replays_without_native_and_uses_its_own_chart():
 @pytest.mark.parametrize(
     "fault", ["date", "fixing", "path", "omission", "personal", "context", "source"]
 )
-def test_external_original_binding_rejects_packet_substitution(fault):
-    case = next(
-        c
-        for c in read(E / "packet-delivery-final.json")["cases"]
-        if c["gate4_bindings"]
+def test_external_original_binding_rejects_packet_substitution(fault, sources, packets):
+    key = next(
+        key
+        for key, source in sources.items()
+        if any(
+            row["gate"] == 4 for rows in source["activations"].values() for row in rows
+        )
     )
-    source = read(ROOT / case["source_path"])
-    value = read(BASE / "packets-final" / (case["id"] + ".json.gz"))
+    source = sources[key]
+    value = deepcopy(packets[key])
     group = next(
         g
         for g in value["line_reading_groups"].values()

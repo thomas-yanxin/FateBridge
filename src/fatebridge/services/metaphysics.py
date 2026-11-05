@@ -527,7 +527,7 @@ def _build_liureng_snapshot_text(
         [
             "三传关系依据：探原卷下论三传、论十二天将、论合（所选结构）",
             *(
-                f"{ {'initial':'初传','middle':'中传','final':'末传'}[r['position']]}：支神{r['branch']}{r['element']}，天将{r['god']}{r['god_element']}；将对神{r['god_to_spirit']}，{r['war'] or '无内外战'}；六亲仍按支神为{r['day_relation']}"
+                f"{ {'initial': '初传', 'middle': '中传', 'final': '末传'}[r['position']] }：支神{r['branch']}{r['element']}，天将{r['god']}{r['god_element']}；将对神{r['god_to_spirit']}，{r['war'] or '无内外战'}；六亲仍按支神为{r['day_relation']}"
                 for r in relation_evidence["rows"]
             ),
             "三传结构："
@@ -1260,7 +1260,7 @@ def _build_ziwei_horoscope_snapshot_text(
                     f"出生：{seed.calendar_context['solar_datetime']}",
                     f"目标：{target_seed.calendar_context['solar_datetime']}",
                     f"虚岁：{horoscope.get('nominal_age', '无')}",
-                    f"岁序方法：{horoscope['nominal_age_calendar']['method_id']}；参考时区：{horoscope['nominal_age_calendar']['timezone'] or '旧混合时钟'}；原典岁首尚未认证",
+                    f"岁序方法：{horoscope['nominal_age_calendar']['method_id']}；参考时区：{horoscope['nominal_age_calendar']['timezone']}；原典岁首尚未认证",
                     f"目标时区：{target_seed.timezone}；目标时刻采用钟表时间",
                     "出生" + basis_text(horoscope["calendar_basis"]["birth"]),
                     "目标" + basis_text(horoscope["calendar_basis"]["target"]),

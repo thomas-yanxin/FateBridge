@@ -140,7 +140,6 @@ def test_actual_stages_and_corrected_snapshot_across_three_transports(
         "liureng.life_stages",
         "liureng.three_transmissions",
         "liureng.month_building_element",
-        "liureng.twelve_life_element",
     ]
     params = [("response_char_limit", "0")]
     flags = ["--response-char-limit", "0"]
@@ -172,7 +171,7 @@ def test_actual_stages_and_corrected_snapshot_across_three_transports(
         assert life["day_stem"] == "己" and life["direction"] == "逆"
         assert life["changsheng_branch"] == "酉" and life["tomb_branch"] == "丑"
         assert life["source_sha256"] == REFERENCE["source_sha256"]
-        assert board["month_building_element"] == board["twelve_life_element"] == "土"
+        assert board["month_building_element"] == "土"
         for label in ("initial", "middle", "final"):
             t = board["three_transmissions"][label]
             assert t["day_stem_life_stage"] == life["stage_by_branch"][t["branch"]]

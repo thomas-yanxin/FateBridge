@@ -14,7 +14,7 @@ from fatebridge.core.sukuyo_profiles import fullmoon_calculation, source_bundle
 ROOT = Path(__file__).resolve().parents[1]
 REFERENCE = json.loads(
     (
-        ROOT / "tests/fixtures/sukuyo-witness-research-before-production-v84.json"
+        ROOT / "tests/data/sukuyo-witness-research-before-production-v84.json"
     ).read_bytes()
 )
 EXPECTED = REFERENCE["expected_bundle"]

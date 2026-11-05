@@ -58,45 +58,28 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "tests/fixtures/bazi_foundations_v1/program/calendar.py.txt",
-              "source_sha256": "b002a383f47c99ad4be7bd6e509d57f27ba7d38eba3ffd7139b2fb776bbd89b3",
+              "source_path": "src/fatebridge/core/calendar.py",
               "functions": [
                 "calculate_year_pillar",
                 "calculate_month_pillar_by_branch",
                 "_get_four_pillars_cached"
               ],
-              "support_scope": "source_path为审阅源码快照；current_source_path中所列函数按文本散列核对一致。只支持程序干支结构、立春年界、十二节月界与月干取法，不认证外部依赖精度、全部流派或现实预测。",
-              "current_source_path": "src/fatebridge/core/calendar.py",
-              "source_digest_scope": "reviewed_snapshot_file",
-              "function_text_sha256": {
-                "calculate_year_pillar": "3e070d439313cf689cebeb57e9de941e5a32ea865893e0c6dca76b694e4469e6",
-                "calculate_month_pillar_by_branch": "eb011a931a63f8d683abef9b0bd3ab820017e6d7156bb40a1f0ac054b40b908c",
-                "_get_four_pillars_cached": "58f936b2fc5d6afd4405a8d9e7b6b3647e27d7e2e8f7325ea42f2ce3a7a5a156"
-              }
+              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度、全部流派或现实预测。"
             },
             {
-              "source_path": "tests/fixtures/bazi_foundations_v1/program/almanac.py.txt",
-              "source_sha256": "1257e9031da3d3d55777d261355bd8bcb0f85cba62e7ca7889d1872c1fb63db6",
+              "source_path": "src/fatebridge/core/almanac.py",
               "functions": [
                 "get_bazi_year",
                 "get_bazi_month_context",
                 "get_bazi_month_boundaries"
               ],
-              "support_scope": "source_path为审阅源码快照；current_source_path中所列函数按文本散列核对一致。只支持程序干支结构、立春年界、十二节月界与月干取法，不认证外部依赖精度、全部流派或现实预测。",
-              "current_source_path": "src/fatebridge/core/almanac.py",
-              "source_digest_scope": "reviewed_snapshot_file",
-              "function_text_sha256": {
-                "get_bazi_year": "8ab5634cf91863ae17ac5d585fedc72a3f24eda4f0d13e171cc46052a030d412",
-                "get_bazi_month_context": "c1922bbb4823f80c7c8b084cc832cf0f415394107eac40a7af3b0377f5888cbb",
-                "get_bazi_month_boundaries": "6a723982f16e2a2b87f12e38eb7a71660321f07ae320746509800c3e5d58560d"
-              }
+              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度、全部流派或现实预测。"
             }
           ],
           "independent_expert_review": "not_completed",
           "scan_collation": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_foundations_v1/curation-review.json",
           "citation": "FateBridge术语整理，非逐字引文；萬民英《三命通會》四庫全書本数字转录，卷二〈論年月日時／論遁月時〉，維基文庫固定修订761691；https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691；原典选段与当前程序历法口径分别归属，未作影印、独立专家或现实效度认证。"
         }
       },
@@ -154,45 +137,28 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "tests/fixtures/bazi_foundations_v1/program/calendar.py.txt",
-              "source_sha256": "b002a383f47c99ad4be7bd6e509d57f27ba7d38eba3ffd7139b2fb776bbd89b3",
+              "source_path": "src/fatebridge/core/calendar.py",
               "functions": [
                 "calculate_year_pillar",
                 "calculate_month_pillar_by_branch",
                 "_get_four_pillars_cached"
               ],
-              "support_scope": "source_path为审阅源码快照；current_source_path中所列函数按文本散列核对一致。只支持程序干支结构、立春年界、十二节月界与月干取法，不认证外部依赖精度、全部流派或现实预测。",
-              "current_source_path": "src/fatebridge/core/calendar.py",
-              "source_digest_scope": "reviewed_snapshot_file",
-              "function_text_sha256": {
-                "calculate_year_pillar": "3e070d439313cf689cebeb57e9de941e5a32ea865893e0c6dca76b694e4469e6",
-                "calculate_month_pillar_by_branch": "eb011a931a63f8d683abef9b0bd3ab820017e6d7156bb40a1f0ac054b40b908c",
-                "_get_four_pillars_cached": "58f936b2fc5d6afd4405a8d9e7b6b3647e27d7e2e8f7325ea42f2ce3a7a5a156"
-              }
+              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度、全部流派或现实预测。"
             },
             {
-              "source_path": "tests/fixtures/bazi_foundations_v1/program/almanac.py.txt",
-              "source_sha256": "1257e9031da3d3d55777d261355bd8bcb0f85cba62e7ca7889d1872c1fb63db6",
+              "source_path": "src/fatebridge/core/almanac.py",
               "functions": [
                 "get_bazi_year",
                 "get_bazi_month_context",
                 "get_bazi_month_boundaries"
               ],
-              "support_scope": "source_path为审阅源码快照；current_source_path中所列函数按文本散列核对一致。只支持程序干支结构、立春年界、十二节月界与月干取法，不认证外部依赖精度、全部流派或现实预测。",
-              "current_source_path": "src/fatebridge/core/almanac.py",
-              "source_digest_scope": "reviewed_snapshot_file",
-              "function_text_sha256": {
-                "get_bazi_year": "8ab5634cf91863ae17ac5d585fedc72a3f24eda4f0d13e171cc46052a030d412",
-                "get_bazi_month_context": "c1922bbb4823f80c7c8b084cc832cf0f415394107eac40a7af3b0377f5888cbb",
-                "get_bazi_month_boundaries": "6a723982f16e2a2b87f12e38eb7a71660321f07ae320746509800c3e5d58560d"
-              }
+              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度、全部流派或现实预测。"
             }
           ],
           "independent_expert_review": "not_completed",
           "scan_collation": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_foundations_v1/curation-review.json",
           "citation": "FateBridge术语整理，非逐字引文；萬民英《三命通會》四庫全書本数字转录，卷二〈論年月日時／論遁月時〉，維基文庫固定修订761691；https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691；原典选段与当前程序历法口径分别归属，未作影印、独立专家或现实效度认证。"
         }
       },
@@ -250,45 +216,28 @@
           ],
           "implementation_refs": [
             {
-              "source_path": "tests/fixtures/bazi_foundations_v1/program/calendar.py.txt",
-              "source_sha256": "b002a383f47c99ad4be7bd6e509d57f27ba7d38eba3ffd7139b2fb776bbd89b3",
+              "source_path": "src/fatebridge/core/calendar.py",
               "functions": [
                 "calculate_year_pillar",
                 "calculate_month_pillar_by_branch",
                 "_get_four_pillars_cached"
               ],
-              "support_scope": "source_path为审阅源码快照；current_source_path中所列函数按文本散列核对一致。只支持程序干支结构、立春年界、十二节月界与月干取法，不认证外部依赖精度、全部流派或现实预测。",
-              "current_source_path": "src/fatebridge/core/calendar.py",
-              "source_digest_scope": "reviewed_snapshot_file",
-              "function_text_sha256": {
-                "calculate_year_pillar": "3e070d439313cf689cebeb57e9de941e5a32ea865893e0c6dca76b694e4469e6",
-                "calculate_month_pillar_by_branch": "eb011a931a63f8d683abef9b0bd3ab820017e6d7156bb40a1f0ac054b40b908c",
-                "_get_four_pillars_cached": "58f936b2fc5d6afd4405a8d9e7b6b3647e27d7e2e8f7325ea42f2ce3a7a5a156"
-              }
+              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度、全部流派或现实预测。"
             },
             {
-              "source_path": "tests/fixtures/bazi_foundations_v1/program/almanac.py.txt",
-              "source_sha256": "1257e9031da3d3d55777d261355bd8bcb0f85cba62e7ca7889d1872c1fb63db6",
+              "source_path": "src/fatebridge/core/almanac.py",
               "functions": [
                 "get_bazi_year",
                 "get_bazi_month_context",
                 "get_bazi_month_boundaries"
               ],
-              "support_scope": "source_path为审阅源码快照；current_source_path中所列函数按文本散列核对一致。只支持程序干支结构、立春年界、十二节月界与月干取法，不认证外部依赖精度、全部流派或现实预测。",
-              "current_source_path": "src/fatebridge/core/almanac.py",
-              "source_digest_scope": "reviewed_snapshot_file",
-              "function_text_sha256": {
-                "get_bazi_year": "8ab5634cf91863ae17ac5d585fedc72a3f24eda4f0d13e171cc46052a030d412",
-                "get_bazi_month_context": "c1922bbb4823f80c7c8b084cc832cf0f415394107eac40a7af3b0377f5888cbb",
-                "get_bazi_month_boundaries": "6a723982f16e2a2b87f12e38eb7a71660321f07ae320746509800c3e5d58560d"
-              }
+              "support_scope": "所列文件和函数定位当前确定性实现；不认证外部依赖精度、全部流派或现实预测。"
             }
           ],
           "independent_expert_review": "not_completed",
           "scan_collation": "not_completed",
           "new_independent_chart_cases": 0,
           "reality_prediction_efficacy": "not_tested",
-          "review_record": "tests/fixtures/bazi_foundations_v1/curation-review.json",
           "citation": "FateBridge术语整理，非逐字引文；萬民英《三命通會》四庫全書本数字转录，卷二〈論年月日時／論遁月時〉，維基文庫固定修订761691；https://zh.wikisource.org/w/index.php?title=%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B702&oldid=761691；原典选段与当前程序历法口径分别归属，未作影印、独立专家或现实效度认证。"
         }
       }

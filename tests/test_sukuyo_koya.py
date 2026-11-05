@@ -14,7 +14,7 @@ from fatebridge.core.sukuyo_sources import load_source
 from scripts.check_sukuyo_koya import verify_printed
 
 FIXTURE = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-koya-1736-table.json").read_bytes()
+    (Path(__file__).parent / "data/sukuyo-koya-1736-table.json").read_bytes()
 )
 
 

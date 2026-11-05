@@ -134,18 +134,6 @@ def longitude_stencil(values: Sequence[float], center: float, step: float) -> fl
     return math.fsum(w * v for w, v in zip(WEIGHTS, differences)) / (60 * step)
 
 
-def one_sided_longitude_stencil(
-    values: Sequence[float], center: float, step: float, direction: int
-) -> float:
-    if direction not in {-1, 1}:
-        raise EphemerisSourceError("coordinate_motion_unavailable")
-    longitude_stencil(values, center, step)  # Domain and branch checks.
-    differences = [math.remainder(v - center, 360) for v in values]
-    return math.fsum(w * v for w, v in zip(ONE_SIDED_WEIGHTS, differences)) / (
-        direction * step
-    )
-
-
 def _one_sided_weights(count: int) -> Tuple[Tuple[float, ...], Tuple[float, ...]]:
     """Degree-six LS derivative at zero on a fixed [0,6] node geometry.
 
@@ -496,24 +484,6 @@ def complete_position_rate(
                 passed = (
                     math.isfinite(spread) and spread <= CONVERGENCE_LINE_ARCSEC_PER_DAY
                 )
-                # Preserve the former six-point guard as diagnostic evidence;
-                # it is not the better-conditioned redundant acceptance fit.
-                legacy_sides = [
-                    one_sided_longitude_stencil(
-                        [provider(direction * k * h) for k in range(1, 7)],
-                        center,
-                        h,
-                        direction,
-                    )
-                    for direction in (1, -1)
-                ]
-                legacy_error = (
-                    max(
-                        abs(legacy_sides[0] - legacy_sides[1]),
-                        *(abs(v - rate) for v in legacy_sides),
-                    )
-                    * 3600
-                )
                 checks.append(
                     dict(
                         method_id=DIRECTIONAL_GUARD_ID,
@@ -525,10 +495,6 @@ def complete_position_rate(
                         central_rates=trial_rates[-3:],
                         disagreement_arcsec_per_day=spread,
                         passed=passed,
-                        legacy_six_point_forward_rate=legacy_sides[0],
-                        legacy_six_point_backward_rate=legacy_sides[1],
-                        legacy_disagreement_arcsec_per_day=legacy_error,
-                        legacy_passed=legacy_error <= CONVERGENCE_LINE_ARCSEC_PER_DAY,
                     )
                 )
                 if passed:

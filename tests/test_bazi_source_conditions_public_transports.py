@@ -17,10 +17,7 @@ from tests.test_agentic_nested_outputs import rest as shared_rest_fixture
 rest = shared_rest_fixture
 ROOT = Path(__file__).resolve().parents[1]
 PLAN = json.loads(
-    (
-        ROOT
-        / "tests/fixtures/bazi_source_conditions_public_v1/publication-plan-first.json"
-    ).read_text()
+    (ROOT / "src/fatebridge/data/reference/bazi-source-conditions.json").read_text()
 )
 SPEC = SPECS["bazi_source_compare"]
 
@@ -34,7 +31,7 @@ def arguments(row):
     )
 
 
-@pytest.mark.parametrize("row", PLAN["reviews"], ids=lambda r: r["case_id"])
+@pytest.mark.parametrize("row", PLAN["reviews"], ids=lambda r: r["review"]["case_id"])
 def test_all19_real_conditions_and_old_annotations_agree_across_surfaces(
     row, rest, tmp_path, capsys
 ):
@@ -65,9 +62,7 @@ def test_all19_real_conditions_and_old_annotations_agree_across_surfaces(
     for value in values:
         SPEC.output_model.model_validate(value)
         for record in value["source_comparison"]["records"]:
-            if record["reference_id"] in {
-                b["reference_id"] for b in row["reference_bindings"]
-            }:
+            if record["reference_id"] in {ref for ref in row["reference_ids"]}:
                 assert (
                     record["source_condition_review"]["review_id"]
                     == row["review"]["review_id"]

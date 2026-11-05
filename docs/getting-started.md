@@ -43,11 +43,11 @@ uv run --locked --extra dev fatebridge describe bazi_birth --detail input
 
 独立工具安装可直接使用 `fatebridge`、`fatebridge-api` 与 `fatebridge-mcp`，不会把该包加入系统 Python 环境。下文 `python -m ...` 形式须使用已安装 FateBridge 的虚拟环境解释器；独立工具用户下载星历时使用[星历数据与精度](#星历数据与精度)中的专用命令。
 
-源码用户可在简写命令前加 `uv run --locked --extra dev`，或先激活环境。macOS / Linux 使用 `source .venv/bin/activate`，Windows PowerShell 使用 `.\.venv\Scripts\Activate.ps1`。开发工作流见 [开发指南](development-guide.md)。
+下文 CLI 简写面向独立工具安装。源码用户统一加 `uv run --locked --extra dev`；Windows PowerShell 多行命令与 MCP 路径见[部署指南](mcp-deployment.md#windows-powershell)。开发工作流见[开发指南](development-guide.md)。
 
 安装入口为 `fatebridge`、`fatebridge-api` 和 `fatebridge-mcp`。`pyswisseph` / `kerykeion` 都是常规依赖；FateBridge 的规则、知识与场景 JSON 随包安装，外部星历文件不随 FateBridge wheel 分发，见下文。
 
-当前源码构建另附无损裁取的DE440太阳轨道系数，供默认交节计算使用，不需要可选`jpl`依赖或外部SPK文件。[默认交节审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-de440-default-audit.md)列出数据体积、实际模型、适用范围和完整有限验收；已安装环境仍以自己的实际模型回执为准。
+当前源码构建另附无损裁取的DE440太阳轨道系数，供默认交节计算使用，不需要可选`jpl`依赖或外部SPK文件。[默认交节审计](solar-backends.md)列出数据体积、实际模型、适用范围和完整有限验收；已安装环境仍以自己的实际模型回执为准。
 
 ## 选择运行方式
 
@@ -62,10 +62,13 @@ uv run --locked --extra dev fatebridge describe bazi_birth --detail input
 ```bash
 fatebridge bazi_birth --birth-year 1990 --birth-month 5 --birth-day 15 \
   --birth-hour 10 --birth-minute 30 --gender 男 --birth-place 北京 \
-  --birth-timezone Asia/Shanghai --fields bazi_birth.day_master --strict-fields
+  --birth-timezone Asia/Shanghai \
+  --fields bazi_birth.day_master.stem bazi_birth.day_master.element \
+    bazi_birth.day_master.polarity --strict-fields --no-include-snapshot-text \
+  --response-char-limit 8192
 ```
 
-执行成功时，退出码为 `0`，返回 JSON 包含 `bazi_birth.day_master` 和 `run_metadata`。这表明当前安装完成了这一次八字计算；`run_metadata` 记录本次运行，字段含义见 [核心概念](concepts.md)。
+执行成功时，退出码为 `0`，返回 JSON 包含 `bazi_birth.day_master` 的 `stem/element/polarity` 和 `run_metadata`。较大的运行证据通过 `result_delivery` 延后交付，按[同次结果读取](agent-guide.md#完整结果交付与同次导出)展开。这表明当前安装完成了这一次八字计算；`run_metadata` 记录本次运行，字段含义见 [核心概念](concepts.md)。
 
 CLI 不自动读取 `.env`，不需要配置 REST 密钥；如果已有进程环境配置，仍会按实际设置运行。
 
@@ -89,8 +92,9 @@ cp -n .env.example .env
 | `API_KEY_HEADER_NAME` | `X-API-Key` | 密钥请求头名称 |
 | `FATEBRIDGE_MCP_FAMILIES` | 空 | MCP 公开的工具分类，逗号分隔；空时保留全部工具，分类拼错阻止启动；不影响 REST / CLI |
 | `FATEBRIDGE_MCP_SCENARIOS` | 空 | MCP 场景 ID，逗号分隔；与 family 配置取交集，空时不限制，拼错阻止启动 |
+| `FATEBRIDGE_MCP_TOOL_SCOPE` | `complete` | 当前源码支持；`complete` 包含场景条件依赖，`topic` 仅保留直接工具与知识支撑且必须指定场景；见[MCP 范围](mcp-deployment.md#工具范围环境与技能) |
 | `SE_EPHE_PATH` | 未设置 | 自定义本地星历目录，不在模板内 |
-| `FATEBRIDGE_SOLAR_TERM_MODEL` | `auto` | 当前源码在1700—2300年默认使用随包DE440交节，首尾输入所需相邻年份边界沿用对应模型；`swiss`在1800—2200年要求实际Swiss文件模型，缺数据明确失败；`native`保留原生回退，其他具名模型与准备方式见[可选太阳后端](solar-backends.md)，严格原生JPL优先于`auto` |
+| `FATEBRIDGE_SOLAR_TERM_MODEL` | `auto` | 当前源码在 1700–2300 年默认使用随包 DE440；严格原生 JPL 配置优先。各模式、年份和相邻边界见[太阳后端](solar-backends.md) |
 | `FATEBRIDGE_SOLAR_SPK_FILE` | 未设置 | 仅显式`spk`模式使用的外部文件，需可选`jpl`依赖；默认随包系数不读取该文件 |
 | `FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY` | `min(4, max(1, CPU 数))` | 单 REST 进程的重计算并发上限，至少为 1；不是请求速率限制 |
 
@@ -143,7 +147,7 @@ curl -X POST http://localhost:8010/api/cn/bazi/birth \
 
 中式出生信息默认开启真太阳时，显式 true 时必须提供可解析地点或经度；没有经度且只使用模型默认值时，按钟表时间计算并附提示。小时必填。固定时区、经度和分析日期有助于复现。
 
-八字与七个时运入口可另传已知 `birth_second`（整数0—59，同时显式给出分钟）。未知秒数省略或传null；输入回执区分未知分量与兼容00值，不推定实际出生范围，见[出生时间分量](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-birth-seconds-audit.md)。
+八字与七个时运入口可另传已知 `birth_second`（整数0—59，同时显式给出分钟）。未知秒数省略或传null；输入回执区分未知分量与兼容00值，不推定实际出生范围，见[出生时间分量](bazi-timing.md)。
 
 ## 第一条星盘请求
 
@@ -164,69 +168,9 @@ curl -X POST http://localhost:8010/api/astro/chart \
 
 ## 星历数据与精度
 
-计算能运行，还需要知道它实际用了什么数据。`swisseph` 可导入，只能证明运行时可用。缺少相应 `.se1` 文件时，它可能使用内置 Moshier 模型；没有运行时的核心星盘则使用 FateBridge 轨道近似。显式复杂宫制与西占推运缺 backend 时会报错。
+首次 CLI 示例无需下载星历。占星与历法结果仍须核对实际使用的模型：Python 库可导入，不代表读取了 Swiss `.se1` 文件；Moshier、JPL、随包 DE440 和近似轨道各有适用范围。
 
-源码安装可在仓库根目录下载默认星历段（此步骤需要网络）：
-
-```bash
-uv run --locked --extra dev python -m fatebridge.fetch_ephe
-```
-
-默认下载 `sepl_18.se1`、`semo_18.se1`、`seas_18.se1` 到源码仓库 `ephe/`；所需年代/天体的数据可能不同。
-
-按所需公历年份选择行星和月球分段，可用 `--years 1500 9999`；连续范围用 `--year-range 2399 2401`。这些选项与 `--files` 互斥，并在600年分段交界包含相邻年份可能需要的文件，以覆盖民用时、TT/UT与历史历法换年边界。年份选择不下载主小行星文件，也不证明所有输入的星历精度；实际计算模型仍以回执为准。例如：
-
-```bash
-uv run --locked --extra dev python -m fatebridge.fetch_ephe --years 9999
-```
-
-这会选择 `sepl_96.se1`、`semo_96.se1`，对应官方文件表的9600–10199年分段。直接提供文件名的旧入口继续可用。下载到自定义目录后，须设置运行服务的 `SE_EPHE_PATH`；下载成功本身不代表服务已读取该目录。
-
-下载器按随包的 `ephemeris-manifest-v1.json` 固定官方提交，并核验文件长度及完整SHA-256；当前清单包含153份官方 `.se1` 文件的指纹，不包含数据文件本身。已有缓存也须校验；需要替换的旧内容先保存到目标目录的 `.fatebridge-ephemeris-backups/<旧SHA-256>/<文件名>`，下载或写入失败时保留原文件。并发修改会中止替换，不能把只有 `SW` 前缀或错放的分段误报为可用。
-
-可离线检查已有文件：
-
-```bash
-uv run --locked --extra dev python -m fatebridge.fetch_ephe \
-  --year-range 1 9999 --verify-only
-```
-
-`--base-url` 可选择镜像，但仍须匹配所选清单。不同版本或自定义文件可传 `--manifest /absolute/path/catalog.json`；清单使用 `schema_version=1`、`base_url` 以及 `files` 映射，每份文件须有 `bytes` 和64位小写 `sha256`。自定义指纹仅证明字节符合该清单。文件校验不认证天文误差，也不会持续监控服务运行期间的数据修改。
-
-使用已安装包的虚拟环境时，可显式指定可写目录：
-
-```bash
-python -m fatebridge.fetch_ephe --dest /absolute/path/to/ephe
-export SE_EPHE_PATH=/absolute/path/to/ephe
-```
-
-通过 `uv tool install` 安装的用户可用独立运行环境下载到同一目录，无需寻找工具环境中的 Python：
-
-```bash
-uv run --no-project --with fatebridge python -m fatebridge.fetch_ephe \
-  --dest /absolute/path/to/ephe
-```
-
-在各服务启动前设置 `SE_EPHE_PATH` 指向该目录；上面的 `export` 为 macOS / Linux 写法，Windows PowerShell 使用 `$env:SE_EPHE_PATH="C:\path\to\ephe"`。
-
-非空 `SE_EPHE_PATH` 在 Swiss 底层优先于代码传入的显式路径，回执记录实际选择。当前接口的路径总长须在 242 个编码字节内，避免底层静默回退；可以使用更短的挂载路径。德国盘的 `seorbel.txt` 可能覆盖假设点轨道，即使物理星体仍使用 Moshier；查看 `midpoint_analysis.profile.hypothetical_element_source` 的来源与散列。库的默认搜索路径还可能含当前工作目录。外部数据应在服务运行期间保持不变，更新后重启并复核实际模型及回执。
-
-需要固定版本时，将 `--with fatebridge` 改为当前服务使用的 `fatebridge==<version>`。
-
-重启服务后，检查核心盘的 `chart_profile.ephemeris_model`（如 `swieph`、`jpl`、`moshier`、`mixed`）和 `run_metadata.engine_is_approximate`，确认本次实际使用的模型。仅凭 `engine_backend` / `engine_precision` 不能证明加载了数据文件。数据路径、版本和算法限制见 [算法覆盖矩阵](algorithm-coverage.md)。
-
-跨年代精度核对可显式安装完整原始 DE441（2,788,676,624 字节），再选择已有的严格 JPL 后端：
-
-```bash
-uv run --locked --extra dev python -m fatebridge.fetch_jpl --dest /absolute/path/to/jpl-de441
-uv run --locked --extra dev python -m fatebridge.fetch_jpl --dest /absolute/path/to/jpl-de441 --verify-only
-export SE_EPHE_PATH=/absolute/path/to/jpl-de441
-export FATEBRIDGE_JPL_FILE=linux_m13000p17000.441
-```
-
-省略 `--dest` 时使用当前用户星历缓存下的 `jpl-de441/`，命令会打印实际目录。下载器从 JPL 官方地址流式下载，检查固定字节数、完整 SHA-256 和 DE441 文件头，校验后原子安装；已有不匹配文件会报错并保留。指纹来自本项目历史独立读取器核对记录，并非 NASA 发布的校验和。`--verify-only` 不联网；自定义 CA 可用 `--ca-file /absolute/path/to/ca.pem`，仍须通过 TLS 证书验证。下载不会自动切换后端，也不修改服务配置；在启动环境设置上述两个变量并重启客户端／服务后，检查实际模型及 `physical_ephemeris_source.files` 中的文件指纹。
-
-DE441 的长时间覆盖不代表各年代精度一致；[JPL 原论文](https://ssd.jpl.nasa.gov/doc/de440_de441.html)明确说明 DE440 在当前世纪更准确。原始文件头采用 TDB，现有原生调用入口采用 TT；文件校验不认证时标换算、视位置模型或预测效力。本轮冻结留出样本、固定误差线和仍未通过的项目见 DE441 恢复验收（本地数据：`validation/astrodice-de441-restore.md`）。
+需要外部数据时，按[星历安装指南](ephemeris.md)选择 Swiss 分段或严格 JPL，并在服务启动前设置实际数据路径。下载后重启进程，核对 `chart_profile.ephemeris_model`、来源回执及 `run_metadata.engine_is_approximate`。太阳交节模型另见[太阳后端](solar-backends.md)。
 
 ## MCP 与 CLI
 

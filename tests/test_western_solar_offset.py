@@ -10,8 +10,9 @@ import pytest
 from fatebridge.core.astro.birth import AstroBirthInfo, build_astro_birth_info
 from fatebridge.core.astro.sensitivity import _sample_birth
 from fatebridge.utils.timezones import parse_timezone_name, timezone_rules_metadata
+from tests.reference_data import verify_source_files
 
-FIXTURE = Path(__file__).parent / "fixtures/western-solar-offset-v1"
+FIXTURE = Path(__file__).parent / "data/astro/solar_offset"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 ROWS = REFERENCE["rows"]
 NAMED = [r for r in ROWS if not r["ambiguous_nominal_label"]]
@@ -19,13 +20,7 @@ AMBIGUOUS = [r for r in ROWS if r["ambiguous_nominal_label"]]
 
 
 def test_reference_and_copied_timezone_rules_are_frozen_before_candidate():
-    for name, digest in json.loads(
-        (FIXTURE / "reference-seal.json").read_text()
-    ).items():
-        path = FIXTURE / (
-            "collector.py.txt" if name == "collect-reference.py" else name
-        )
-        assert hashlib.sha256(path.read_bytes()).hexdigest() == digest
+    verify_source_files(FIXTURE)
     for name, digest in json.loads((FIXTURE / "timezone-data.json").read_text())[
         "sha256"
     ].items():

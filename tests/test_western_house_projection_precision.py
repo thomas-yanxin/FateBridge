@@ -17,7 +17,7 @@ from fatebridge.core.astro.house_projection_precision import RC_PLANE_PROJECTION
 from fatebridge.core.predictive.native_chart import build_native_subject
 from fatebridge.utils.errors import EphemerisSourceError
 
-FIXTURE = Path(__file__).parent / "fixtures/western-house-projection-precision-v1"
+FIXTURE = Path(__file__).parent / "data/astro/house_projection_precision"
 MODELS = json.loads((FIXTURE / "inputs.json").read_text())["cases"]
 
 

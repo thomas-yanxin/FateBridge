@@ -19,7 +19,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/ren_boundary_decisions_v1"
-FREEZE_SHA = "35e00eefca1f0f0007ce1f55843b411cf9cbd1c43a5052020787d62bfbe96f88"
+FREEZE_SHA = "1d69d52ba83fbf9f9338946166102bc5744c0a1f5f7e64167eb7e82ce33a8680"
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 STEMS = "甲乙丙丁戊己庚辛壬癸"
 
@@ -47,10 +47,10 @@ def reference(fixture: Path = FIXTURE) -> dict[str, Any]:
         if sha(ROOT / name) != checksum:
             raise ValueError(f"Frozen Ren boundary source changed: {name}")
     roots = json.loads(
-        (ROOT / "tests/fixtures/bazi_all_terms_v1/reference.json").read_text()
+        (ROOT / "tests/data/bazi_all_terms_v1/reference.json").read_text()
     )["rows"]
     probes = json.loads(
-        (ROOT / "tests/fixtures/bazi_boundary_decisions_v1/probes.json").read_text()
+        (ROOT / "tests/data/bazi_boundary_decisions_v1/probes.json").read_text()
     )["rows"]
     if len(roots) != 4872 or len(probes) != 9744:
         raise ValueError("Full Ren boundary denominators required")
@@ -219,12 +219,12 @@ def audit(profile: str, ephe_dir: Path, kernel: Path | None) -> dict[str, Any]:
     old = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(old)
     manifest = json.loads(
-        (ROOT / "tests/fixtures/ziwei_independent/calendar_manifest.json").read_text()
+        (ROOT / "tests/data/ziwei_independent/calendar_manifest.json").read_text()
     )
     hko = {}
     lunar_state = (1900, 11, False)
     for src in manifest["sources"]:
-        path = ROOT / "tests/fixtures/ziwei_independent" / src["path"]
+        path = ROOT / "tests/data/ziwei_independent" / src["path"]
         if sha(path) != src["sha256"]:
             raise ValueError("Original HKO annual source changed")
         rows, lunar_state = old.annual_rows(

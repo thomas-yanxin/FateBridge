@@ -1214,7 +1214,6 @@ class HoraryPerfection(PartialOutput):
 class HoraryStricture(PartialOutput):
     code: Optional[str] = None
     detail: Optional[str] = None
-    source_clause: Optional[str] = None
     source_pages: Optional[List[int]] = None
     status: Optional[str] = None
     exception_satisfied: Optional[bool] = None

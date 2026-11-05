@@ -12,7 +12,7 @@ import pytest
 from fatebridge.validation.sukuyo_engineering import Artifact
 from fatebridge.validation.sukuyo_iiif import inspect_iiif_manifest
 
-FIXTURES = Path(__file__).parent / "fixtures/sukuyo-iiif-manifests-v1"
+FIXTURES = Path(__file__).parent / "data/sukuyo-iiif-manifests-v1"
 REFERENCE = json.loads((FIXTURES / "reference.json").read_bytes())
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts/inspect_sukuyo_iiif.py"
 

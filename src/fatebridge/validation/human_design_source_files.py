@@ -30,16 +30,17 @@ def verify_source_files(
             or row["de_number"] <= 0
         ):
             raise ValueError("Malformed cycle source file identity")
-        start, end = row["start_julian_day_tt"], row["end_julian_day_tt"]
+        prefix = row["id"].split(":")[0]
+        if prefix not in {"se1", "jpl"} or (prefix == "jpl" and slot != 0):
+            raise ValueError("Invalid cycle file slot/prefix")
+        scale = "tdb" if prefix == "jpl" else "tt"
+        start, end = row[f"start_julian_day_{scale}"], row[f"end_julian_day_{scale}"]
         if (
             type(start) not in (float, int)
             or type(end) not in (float, int)
             or not -1e9 < start < end < 1e9
         ):
             raise ValueError("Malformed cycle file range")
-        prefix = row["id"].split(":")[0]
-        if prefix not in {"se1", "jpl"} or (prefix == "jpl" and slot != 0):
-            raise ValueError("Invalid cycle file slot/prefix")
         if row["id"] != f"{prefix}:{slot}:{digest}":
             raise ValueError("Cycle file id does not bind its digest")
         record = manifest.get(name)
@@ -49,8 +50,9 @@ def verify_source_files(
             "filename": name,
             "sha256": digest,
             "bytes": row["bytes"],
-            "start_julian_day_tt": start,
-            "end_julian_day_tt": end,
+            "range_time_scale": scale.upper(),
+            f"start_julian_day_{scale}": start,
+            f"end_julian_day_{scale}": end,
             "de_number": row["de_number"],
             "matches_packaged_manifest": bool(
                 record

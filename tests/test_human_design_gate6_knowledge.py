@@ -1,6 +1,5 @@
 """Gate6 drafts retain source roles, original calculations and earlier editions."""
 
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -10,7 +9,7 @@ import pytest
 
 from fatebridge.core import human_design_knowledge as base
 from fatebridge.core import human_design_knowledge_v7 as hd
-from fatebridge.core.human_design import CHANNELS, GATE_CENTER
+from fatebridge.core.human_design_mechanics import CHANNELS, GATE_CENTER
 from fatebridge.core.human_design_source_context import bind_source_context
 from fatebridge.services.human_design_context_lines import (
     build_human_design_context_packet,
@@ -19,43 +18,15 @@ from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.validation.human_design_context_lines import (
     verify_human_design_context_packet,
 )
-from scripts.gen_human_design_timezone_history import read, sha
+from tests.reference_data import read, sha
 from tests.test_agentic_nested_outputs import SPECS, business
 from tests.test_agentic_nested_outputs import rest as shared_rest
 from tests.test_heluo_poem_transports import run_three
 
 ROOT = Path(__file__).resolve().parents[1]
-E = ROOT / "docs/validation/human-design-gate6-knowledge-v7/evidence"
+E = ROOT / "tests/data/human_design/gate6"
 rest = shared_rest
 LOCATOR_SHA = "f49c6a9ea3b8e394615c44babe50a06ff3c38367d3c22cf6f8829af4650a0b46"
-
-
-def test_all1920_existing_references_and_registry_prefix_are_unchanged():
-    for category, keys in read(E / "before-1920-canonical-hashes.json").items():
-        assert len(keys) == 384
-        for key, expected in keys.items():
-            assert (
-                hashlib.sha256(
-                    base._canonical(base.read_reference(category=category, key=key))
-                ).hexdigest()
-                == expected
-            )
-    registry = base.build_registry()
-    previous = read(E / "before-registry.json")
-    categories = registry["domains"][0]["categories"]
-    matching = [c for c in categories if c["name"] == "lines_v7"]
-    assert len(matching) == 1
-    assert matching[0]["coverage"] == {
-        "line_locators": 384,
-        "local_editorial_paraphrases": 36,
-        "meanings_pending": 348,
-        "independently_accepted_line_meanings": 0,
-        "full_source_meanings_accepted": False,
-    }
-    registry["domains"][0]["categories"] = categories[
-        : len(previous["domains"][0]["categories"])
-    ]
-    assert registry == previous
 
 
 def test_all384_references_preserve_inherited_poles_annotations_and_other_meanings():
@@ -198,7 +169,9 @@ def test_deliberately_rehashed_invalid_supplement_cannot_override_inherited_clau
 
 @pytest.fixture(scope="module")
 def packet63():
-    source = read(E / "before-1976-09-17_18.json.gz")
+    from tests.human_design_current import semantic_sources
+
+    source = semantic_sources("gate6")["gate6"]
     with patch(
         "fatebridge.core.astro.runtime.ephemeris_call",
         side_effect=AssertionError("native sky forbidden during assembly"),

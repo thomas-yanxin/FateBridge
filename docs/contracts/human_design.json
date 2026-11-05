@@ -554,6 +554,11 @@
         "description": "紧凑 JSON 输出（无缩进）；设为 false 则美化缩进。默认 true。",
         "type": "boolean"
       },
+      "compare_apparent_models": {
+        "default": false,
+        "description": "可选在原人格/设计TT比较Swiss重心状态、有限源太阳点质量偏折、ERFA光行差和IAU2006真黄道模型，并用该模型自己的太阳重求88度设计根及该根位置；需jpl额外依赖与重心文件。不替换原生激活或原生设计根，不证明原典优先；太阳盘内仅数学延拓，物理误差界未知。",
+        "type": "boolean"
+      },
       "compare_cycle_origins": {
         "default": false,
         "description": "可选比较人格与实际88度太阳弧设计TT两个周期原点；须同时提供cycle_reference_datetime。人格主结果不改，设计原点仅为数学敏感性假设，未获原典优先性认证；完整保留两边交会及失败，不指定首末触优先或人生阶段。",
@@ -672,5 +677,155 @@
     ],
     "type": "object"
   },
+  "method_contracts": [
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现/数据指纹、选项与实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "earth_rotation",
+        "ephemeris_model",
+        "numerical_solver",
+        "display_quantization",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/core/human_design.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.human_design_solar_arc_and_mechanics.contract_v1",
+      "output_paths": [
+        "activations",
+        "variables",
+        "bodygraph",
+        "profile",
+        "design_solver",
+        "rulesets",
+        "rule_trace",
+        "source_consistency",
+        "gate_evidence",
+        "historical_polarity_context",
+        "gate_activation_context",
+        "profile_partition_context",
+        "apparent_position_context",
+        "depth_evidence",
+        "definition_bridging",
+        "incarnation_cross",
+        "cycle_context",
+        "cycle_summary",
+        "interpretation",
+        "validation"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "astronomy_and_rule_result",
+      "role": "calculation",
+      "selector_fields": [
+        "node_mode"
+      ],
+      "source_refs": [
+        "docs/human-design.md"
+      ],
+      "unit": "per_field",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    },
+    {
+      "comparison_requirements": [
+        "同TT、同重心状态来源、相同有限源偏折/光行差/真黄道约定"
+      ],
+      "dependencies": [
+        "time_scales.personality.jd_tt",
+        "time_scales.design.jd_tt"
+      ],
+      "error_sources": [
+        "ephemeris_model",
+        "numerical_solver",
+        "display_quantization",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/core/human_design_point_mass.py"
+      ],
+      "limitations": [
+        "不改变原生激活；固定TT位置与候选自有设计根分别比较；太阳盘内为数学延拓",
+        "固定队列误差不是全域物理误差界；未认证原版软件来源优先级"
+      ],
+      "method_id": "swiss_barycentric_sun_monopole_iau2006_v1",
+      "output_paths": [
+        "apparent_model_comparison"
+      ],
+      "prerequisites": [
+        "compare_apparent_models=true；pyerfa与实际重心星历文件可用"
+      ],
+      "quantity_kind": "astronomy_model_comparison",
+      "role": "calculation",
+      "selector_fields": [
+        "compare_apparent_models"
+      ],
+      "source_refs": [
+        "docs/human-design.md"
+      ],
+      "unit": "degrees",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    },
+    {
+      "comparison_requirements": [
+        "同TT、同重心状态来源、相同有限源偏折/光行差/真黄道约定"
+      ],
+      "dependencies": [
+        "time_scales.personality.jd_tt"
+      ],
+      "error_sources": [
+        "ephemeris_model",
+        "numerical_solver",
+        "display_quantization",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/core/human_design_point_mass.py"
+      ],
+      "limitations": [
+        "88度根仅使用同一候选坐标模型的太阳；数值相邻端点不是物理时刻误差界",
+        "不替换原生设计根；数值队列通过不认证原版软件模型或现实效度"
+      ],
+      "method_id": "human_design_point_mass_design_root_v1",
+      "output_paths": [
+        "apparent_model_comparison.candidate_design_root"
+      ],
+      "prerequisites": [
+        "compare_apparent_models=true；pyerfa与实际重心星历文件可用"
+      ],
+      "quantity_kind": "event_time",
+      "role": "calculation",
+      "selector_fields": [
+        "compare_apparent_models"
+      ],
+      "source_refs": [
+        "docs/human-design.md"
+      ],
+      "unit": "per_field",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    }
+  ],
   "tool": "human_design"
 }

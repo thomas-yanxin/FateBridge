@@ -10,7 +10,7 @@ from fatebridge.application.discovery import select_mcp_specs
 from fatebridge.services.tool_catalog import CATALOG
 from scripts.evaluate_agent import (
     command_for,
-    grade,
+    grade_case,
     model_prompt,
     prepare_workspace,
     reference_scenarios,
@@ -118,13 +118,14 @@ def test_mechanical_success_never_claims_semantic_success_and_input_errors_fail(
             "status": "completed",
         },
     }
-    result = grade(case, [skill, call], "placeholder; not a semantic judgment", 0)
+    result = grade_case(case, [skill, call], "placeholder; not a semantic judgment", 0)
     assert result["mechanical_checks_passed"]
     assert "semantic_acceptance" not in result
     assert "semantic_status" not in result
     call["item"]["arguments"]["birth_hour"] = (arguments["birth_hour"] + 1) % 24
     assert (
-        "input_mismatch:human_design" in grade(case, [skill, call], "x", 0)["failures"]
+        "input_mismatch:human_design"
+        in grade_case(case, [skill, call], "x", 0)["failures"]
     )
 
 

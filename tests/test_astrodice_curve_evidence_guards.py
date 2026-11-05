@@ -8,7 +8,7 @@ import pytest
 
 from scripts.verify_astrodice_compressed_curve import verify
 
-RUN = Path("docs/validation/astrodice-compressed-curve-run-2026-10-28")
+RUN = Path("tests/data/astrodice/reference_sets/study-compressed-curve")
 INPUT = RUN / "development-0-first.json"
 pytestmark = pytest.mark.skipif(
     not INPUT.exists(), reason="Frozen local evidence absent"

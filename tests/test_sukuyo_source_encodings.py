@@ -8,9 +8,7 @@ import pytest
 
 from scripts.check_sukuyo_source_novelty import search_sources
 
-FIXTURE = (
-    Path(__file__).parent / "fixtures/sukuyo-source-encodings-before-code-v88.json"
-)
+FIXTURE = Path(__file__).parent / "data/sukuyo-source-encodings-before-code-v88.json"
 
 
 def prepared(tmp_path, index=0):

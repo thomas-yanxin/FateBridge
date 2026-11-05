@@ -1,0 +1,59 @@
+{
+  "scene": "workstation",
+  "methods": [],
+  "workstation_layout": {
+    "scene": {
+      "frame_id": "synthetic-office-plan",
+      "units": "m",
+      "boundary": {"vertices": [{"x": -3, "y": -3}, {"x": 3, "y": -3}, {"x": 3, "y": 3}, {"x": -3, "y": 3}]},
+      "observation_basis": "user_confirmed",
+      "evidence": "合成验收场景；不是实际用户工位",
+      "inventory_confirmed": true,
+      "coordinate_uncertainty_m": 0,
+      "compass": {
+        "y_axis_bearing_degrees": 0,
+        "north_reference": "magnetic",
+        "uncertainty_degrees": 0,
+        "sector_origin": {"x": 0, "y": -2},
+        "reference_scope": "house",
+        "chart_binding_confirmed": true,
+        "evidence": "合成资料明确选择的参考中心和磁北，不代表自动立极"
+      },
+      "bodies": [{
+        "object_id": "desk", "kind": "desk",
+        "footprint": {"center": {"x": 0, "y": 1}, "width_m": 1.4, "depth_m": 0.8, "rotation_degrees": 0},
+        "bottom_m": 0, "top_m": 0.75, "blocks_view": false, "has_sharp_corners": false
+      }],
+      "openings": [{"object_id": "entry", "kind": "entrance", "segment": {"start": {"x": 1.5, "y": 3}, "end": {"x": 2.3, "y": 3}}, "inward_degrees": 180}],
+      "solid_backing_segments": [{"start": {"x": -2, "y": -2}, "end": {"x": 2, "y": -2}}],
+      "seats": [{
+        "desk_id": "desk", "offset": {"x": 0, "y": -0.8}, "facing_offset_degrees": 0,
+        "body_width_m": 0.5, "body_depth_m": 0.5, "eye_height_m": 1.2, "head_height_m": 1.4,
+        "view_half_angle_degrees": 80,
+        "operating_zone": {"center": {"x": 0, "y": -0.8}, "width_m": 0.7, "depth_m": 0.6, "rotation_degrees": 0},
+        "entrance_id": "entry", "activity": "work", "sector_anchor": "seat"
+      }],
+      "desktops": [{
+        "desk_id": "desk", "ruleset_ids": ["desktop_bagua_btb_v1", "wofs_desktop_compass_v1"], "goal": "career",
+        "items": [{
+          "object_id": "plant", "footprint": {"center": {"x": -0.45, "y": 0.3}, "width_m": 0.1, "depth_m": 0.1, "rotation_degrees": 0},
+          "height_m": 0.3, "blocks_view": true, "representation": "living_plant", "representation_basis": "user_confirmed", "evidence": "合成资料：确认是活植物，不从标签推断",
+          "healthy": {"value": true, "observation_basis": "user_confirmed", "evidence": "合成资料独立确认状态良好"}
+        }],
+        "protected_zones": [{"vertices": [{"x": -0.25, "y": -0.4}, {"x": 0.25, "y": -0.4}, {"x": 0.25, "y": -0.1}, {"x": -0.25, "y": -0.1}]}]
+      }]
+    },
+    "search": {
+      "domains": [
+        {"object_id": "desk", "positions": [{"x": 0, "y": 1}, {"x": 2.8, "y": 1}], "rotations_degrees": [0, 180]},
+        {"object_id": "plant", "positions": [{"x": -0.45, "y": 0.3}, {"x": 0.45, "y": -0.3}, {"x": 0, "y": -0.25}], "rotations_degrees": [0]}
+      ],
+      "max_results": 10,
+      "required_checks": []
+    }
+  },
+  "layout_constraints": [
+    {"object_id": "desk", "can_relocate": true, "can_rotate": true, "evidence": "合成动作许可"},
+    {"object_id": "plant", "can_relocate": true, "can_rotate": true, "evidence": "合成动作许可"}
+  ]
+}

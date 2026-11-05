@@ -18,7 +18,7 @@ else:
     from audit_ziwei_limits import _seed
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures/ziwei_independent"
+FIXTURES = ROOT / "tests/data/ziwei_independent"
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 
 

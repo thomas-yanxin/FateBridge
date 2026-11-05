@@ -1,6 +1,5 @@
 """Rotation must derive TT with the same policy as the physical clock."""
 
-import hashlib
 import json
 from pathlib import Path
 
@@ -9,22 +8,15 @@ import pytest
 from fatebridge.core import astro_models as rotation
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.iers_ut1 import c04_table, use_ut1_source
+from tests.reference_data import verify_source_files
 
-FIXTURE = Path(__file__).parent / "fixtures/western-rotation-tt-policy-v1"
+FIXTURE = Path(__file__).parent / "data/astro/rotation_tt_policy"
 PROTOCOL = json.loads((FIXTURE / "protocol.json").read_text())
 ANCHORS = json.loads((FIXTURE / "boundary-anchors.json").read_text())
 
 
 def test_native_policy_controls_are_sealed_and_not_independent_observations():
-    seal = json.loads((FIXTURE / "manifest.json").read_text())
-    assert hashlib.sha256((FIXTURE / "protocol.json").read_bytes()).hexdigest() == (
-        seal["protocol_sha256"]
-    )
-    assert hashlib.sha256(
-        (FIXTURE / "boundary-anchors.json").read_bytes()
-    ).hexdigest() == (
-        json.loads((FIXTURE / "boundary-anchors-seal.json").read_text())["sha256"]
-    )
+    verify_source_files(FIXTURE)
     assert len(PROTOCOL["cases"]) == 26
     assert not PROTOCOL["production_imports"]
     assert PROTOCOL["known_lead_not_blind"]

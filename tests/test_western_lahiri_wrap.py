@@ -11,7 +11,7 @@ from fatebridge.core.astro.physical_epoch import PhysicalEpoch
 from fatebridge.core.astro.time_scales import EphemerisTime, ut1_from_tt
 from fatebridge.core.predictive.native_chart import build_native_subject
 
-FIXTURE = Path(__file__).parent / "fixtures/western-lahiri-wrap-v1"
+FIXTURE = Path(__file__).parent / "data/astro/lahiri_wrap"
 PLAN = json.loads((FIXTURE / "protocol.json").read_text())
 
 

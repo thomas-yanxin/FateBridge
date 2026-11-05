@@ -1,12 +1,9 @@
 """Preserve pending/partial events and physical carrier scope across entries."""
 
 import asyncio
-import gzip
 import json
 from copy import deepcopy
 from dataclasses import replace
-from functools import lru_cache
-from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -30,13 +27,6 @@ from tests.test_result_delivery import store as _store_fixture
 
 rest = _rest_fixture
 store = _store_fixture
-ROOT = Path(__file__).resolve().parents[1]
-
-
-@lru_cache(maxsize=1)
-def replay():
-    path = ROOT / "docs/validation/bazi-passage-relations-accepted-v1.json.gz"
-    return json.loads(gzip.decompress(path.read_bytes()))
 
 
 def controlled(assessment=None):
@@ -71,18 +61,6 @@ def controlled(assessment=None):
         }
     passage = build_passage_evidence(pillars, assessment)
     return build_passage_relation_context(passage, assessment)
-
-
-def test_all349_original_events_and_natal_values_and19_explanation_claims_are_retained():
-    d = replay()
-    assert d["record_count"] == 349 and d["raw_event_occurrences"] == 626
-    assert len(d["event_kind_status_pairs"]) == 17
-    assert len(d["original_nineteen_developer_explanation_checks"]) == 19
-    assert d["original_nineteen_unresolved"] == 19
-    for row in d["rows"]:
-        before = deepcopy(row)
-        PassageRelationContext.model_validate(row["context"])
-        assert row == before and row["old_values_unchanged"]
 
 
 def test_visible_combination_does_not_bind_hidden_stems_and_zero_remaining_root_keeps_context():

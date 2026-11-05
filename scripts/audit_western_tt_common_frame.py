@@ -21,7 +21,7 @@ from fatebridge.core.astro.reference_points import ephemeris_reference_points
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/western-tt-common-frame-v2"
+FIXTURE = ROOT / "tests/data/astro/tt_common_frame"
 
 
 def unit(longitude, latitude):
@@ -44,15 +44,11 @@ def angular_distance(a, b):
 
 
 def validate_corpus():
-    manifest = json.loads((FIXTURE / "manifest.json").read_text())
-    for relative, expected in manifest["files"].items():
-        if hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() != expected:
-            raise ValueError("Sealed source identity changed: " + relative)
+    manifest = json.loads((FIXTURE / "source-files.json").read_text())
+    for filename, expected in manifest["files"].items():
+        if hashlib.sha256((FIXTURE / filename).read_bytes()).hexdigest() != expected:
+            raise ValueError("Independent physical reference changed: " + filename)
     plan = json.loads((FIXTURE / "protocol.json").read_text())
-    old = ROOT / "tests/fixtures/western-tt-events-v1/manifest.json"
-    assert (
-        hashlib.sha256(old.read_bytes()).hexdigest() == plan["original_manifest_sha256"]
-    )
     ref = json.loads(gzip.decompress((FIXTURE / "reference.json.gz").read_bytes()))
     assert ref["production_imports"] is False
     assert (

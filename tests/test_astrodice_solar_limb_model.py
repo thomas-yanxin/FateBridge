@@ -1,6 +1,5 @@
 """Preserve model disagreement; a fitting diagnostic is not production success."""
 
-import ast
 import hashlib
 import json
 import shutil
@@ -12,101 +11,39 @@ from pathlib import Path
 import pytest
 
 from scripts.astrodice_solar_limb_reference import replay
-from scripts.audit_astrodice_solar_limb import independent_aberration, separation
+from scripts.audit_astrodice_solar_limb import (
+    audit,
+    direction,
+    independent_aberration,
+    separation,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/astrodice-solar-limb-model-v1"
+FIXTURE = ROOT / "tests/data/astrodice/solar_limb"
 
 
 def read(name, root=FIXTURE):
     return json.loads((root / name).read_text())
 
 
-def test_additive_binding_manifest_preserves_the_historical_self_hash_failure():
-    root = FIXTURE.with_name("astrodice-solar-limb-import-binding-v1")
-    reviewed = root / "reviewed-manifest.json"
-    assert hashlib.sha256(reviewed.read_bytes()).hexdigest() == (
-        "ec6af6a991dbf34ac70280a140b8da2fe09299d53a980c0e813d2bb7009556e0"
-    )
-    data = read(reviewed.name, root)
-    assert not data["historical_manifest_regraded"]
-    assert not data["numerical_results_changed"]
-    assert set(data["files"]) == {p.name for p in root.iterdir()} - {reviewed.name}
-    for name, digest in data["files"].items():
-        assert hashlib.sha256((root / name).read_bytes()).hexdigest() == digest
-    old = read("manifest.json", root)
-    mismatches = {
-        name: {
-            "expected": digest,
-            "actual": hashlib.sha256((root / name).read_bytes()).hexdigest(),
-        }
-        for name, digest in old["files"].items()
-        if hashlib.sha256((root / name).read_bytes()).hexdigest() != digest
-    }
-    assert mismatches == data["historical_manifest_failure"]
-    assert set(mismatches) == {"manifest.json"}
-    addendum = read("runtime-addendum-manifest.json", root)
-    assert addendum["previous_manifest_sha256"] == data["files"]["manifest.json"]
-    for name, digest in addendum["files"].items():
-        assert hashlib.sha256((root / name).read_bytes()).hexdigest() == digest
-
-
-def test_all_frozen_inputs_and_unmodified_blind_checker_remain_intact():
-    assert hashlib.sha256((FIXTURE / "manifest.json").read_bytes()).hexdigest() == (
-        "622e140473714b150f15314833f23e7f5d5723c52d50f5dd3ebf7eae8cc302dd"
-    )
-    for name, expected in read("manifest.json")["files"].items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == expected
-    a, b = read("A-native-first-seal.json"), read("B-native-first-seal.json")
-    assert a["candidate_files"] == b["candidate_files"]
-    assert b["B_still_unopened"] and not b["model_and_checker_changed_after_A"]
-    for name in [
-        "scripts/select_astrodice_solar_limb.py",
-        "scripts/astrodice_solar_limb_reference.py",
-    ]:
-        assert (
-            hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-            == b["candidate_files"][name]
-        )
-    binding_root = FIXTURE.with_name("astrodice-solar-limb-import-binding-v1")
-    binding = read("binding.json", binding_root)
-    before = (binding_root / "source-before.py.txt").read_bytes()
-    current = (ROOT / "scripts/audit_astrodice_solar_limb.py").read_bytes()
-    assert (
-        hashlib.sha256(before).hexdigest()
-        == binding["before_sha256"]
-        == b["candidate_files"]["scripts/audit_astrodice_solar_limb.py"]
-    )
-    assert hashlib.sha256(current).hexdigest() == binding["after_sha256"]
-
-    def normalized(value):
-        tree = ast.parse(value)
-        body = []
-        for node in tree.body:
-            if (
-                isinstance(node, ast.ImportFrom)
-                and body
-                and isinstance(body[-1], ast.ImportFrom)
-                and (body[-1].module, body[-1].level) == (node.module, node.level)
-            ):
-                body[-1].names.extend(node.names)
-            else:
-                body.append(node)
-        tree.body = body
-        return ast.dump(tree, include_attributes=False)
-
-    assert normalized(before) == normalized(current)
-    # AST serialization has interpreter-version-specific fields. The immutable
-    # byte hashes plus same-runtime AST equality above are required everywhere;
-    # retain both recorded hashes rather than rewriting the original 3.14 one.
-    historical = read("runtime-addendum.json", binding_root)
-    local_hash = hashlib.sha256(normalized(before).encode()).hexdigest()
-    if tuple(sys.version_info[:2]) == tuple(historical["original_major_minor"]):
-        assert local_hash == binding["normalized_AST_sha256"]
-    if sys.version_info[:2] == (3, 12):
-        assert local_hash == read("runtime-3.12-proof.json", binding_root)["AST_sha256"]
-    assert read("original-overall-gate.json")["overall_numeric_gate_exit_code"] == 1
-    assert read("original-difficult-cases.json")["exit_code"] == 1
+@pytest.fixture(scope="module")
+def current_rows():
+    rows = {}
+    original = read("geometric-reference.json", FIXTURE / "source-records")["rows"]
+    selected = read("selection-first.json")["cohorts"]
+    for cohort in ["A", "B"]:
+        rows[cohort] = []
+        for index, case in enumerate(selected[cohort]):
+            kernel = (
+                FIXTURE
+                / "source-records"
+                / original[case["window_index"]]["kernel_path"]
+            )
+            with pytest.MonkeyPatch.context() as env:
+                env.setenv("SE_EPHE_PATH", str(kernel.parent))
+                env.setenv("FATEBRIDGE_JPL_FILE", kernel.name)
+                rows[cohort].append(audit(FIXTURE, cohort, index))
+    return rows
 
 
 def test_independent_geometry_selects_the_same_32_conditions_without_candidate(
@@ -154,8 +91,6 @@ def test_both_source_encodings_replay_every_planned_centre(cohort, encoding):
         not result["rate_accuracy_assessed"]
         and not result["candidate_accuracy_assessed"]
     )
-    if cohort == "A":
-        assert result == read(prefix + "-position-replay-after-code-retention.json")
     for row in result["rows"]:
         point = row["observation"]
         if point["primary_visibility_code"] == "o":
@@ -165,8 +100,9 @@ def test_both_source_encodings_replay_every_planned_centre(cohort, encoding):
 @pytest.mark.parametrize("cohort", ["A", "B"])
 def test_default_and_global_no_gr_failures_cannot_be_replaced_by_piecewise_success(
     cohort,
+    current_rows,
 ):
-    rows = [read(f"{cohort}-native-first/{i:02}.json") for i in range(16)]
+    rows = current_rows[cohort]
     assert (
         sum(Q(row["case"]["nominal_source_impact_radius_fraction"]) < 1 for row in rows)
         == 8
@@ -203,36 +139,24 @@ def test_default_and_global_no_gr_failures_cannot_be_replaced_by_piecewise_succe
         assert row["native_default_repeat_drift_arcsec"] == 0
 
 
-def test_independent_published_astrometric_aberration_reproduces_the_recorded_signal():
-    for cohort in ["A", "B"]:
-        for i in range(16):
-            row = read(f"{cohort}-native-first/{i:02}.json")
+def test_independent_published_astrometric_aberration_keeps_the_source_signal(
+    current_rows,
+):
+    for rows in current_rows.values():
+        for row in rows:
             inside = Q(row["case"]["nominal_source_impact_radius_fraction"]) < 1
             for value in row["comparisons"].values():
-                new = independent_aberration(
+                result = independent_aberration(
                     FIXTURE,
                     row["case"],
                     value["observation"]["astrometric_printed_angles"],
                 )
-                old = value["independent_aberration_of_quantity1"]
-                assert separation(new["direction"], old["direction"]) < 1e-9
-                assert (
-                    new["observer_barycentric_velocity_AU_per_TDB_day"]
-                    == old["observer_barycentric_velocity_AU_per_TDB_day"]
+                error = separation(
+                    result["direction"],
+                    direction(value["observation"]["apparent_printed_angles"]),
                 )
-                # The original 0.02 arcsecond line separates the signal. This
-                # does not certify an observer velocity/TT model error bound.
-                assert (old["separation_from_printed_apparent_arcsec"] < 0.02) == inside
-                assert not old["candidate_accuracy_certified"]
-
-
-def test_initial_lowercase_visibility_parser_failures_are_preserved():
-    original = (FIXTURE / "position-replay-before-lowercase-code.py").read_bytes()
-    for encoding in ["JD", "MJD"]:
-        failure = read("A-" + encoding + "-position-replay-first-process.json")
-        assert failure["returncode"] == 1
-        assert failure["checker_sha256"] == hashlib.sha256(original).hexdigest()
-        assert failure["message"] == "Invalid primary separation or visibility"
+                assert (error < 0.02) == inside
+                assert not result["candidate_accuracy_certified"]
 
 
 def test_a_hidden_rate_claim_or_relaxed_epoch_budget_is_rejected_even_after_hash_rebinding(

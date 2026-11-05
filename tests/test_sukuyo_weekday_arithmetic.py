@@ -13,9 +13,7 @@ from fatebridge.core.sukuyo_weekday import (
 )
 
 FIXTURE = json.loads(
-    (
-        Path(__file__).parent / "fixtures/sukuyo-weekday-arithmetic-primary.json"
-    ).read_bytes()
+    (Path(__file__).parent / "data/sukuyo-weekday-arithmetic-primary.json").read_bytes()
 )
 
 

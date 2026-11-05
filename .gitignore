@@ -90,19 +90,14 @@ docs/reviews/
 # Local scratch output
 /tmp/
 
-# Historical validation data and regression inputs are supplied separately.
+# External reference data stays local; current Python helpers are maintained.
 /docs/validation/
-/tests/golden/snapshots/
+/tests/data/**
+!/tests/data/**/
+!/tests/data/**/*.py
 /tests/fixtures/**
 !/tests/fixtures/**/
 !/tests/fixtures/*.py
-!/tests/fixtures/bazi_branch_inventory_v1/literal_geometry.py
-!/tests/fixtures/bazi_month_command_integrity_v1/capture_counterexamples.py
-!/tests/fixtures/bazi_punishment_resolution_v1/literal_reference_corrected.py
-!/tests/fixtures/bazi_root_predicate_v1/transport_reader.py
-!/tests/fixtures/bazi_same_target_bureau_v1/reference_geometry.py
-!/tests/fixtures/bazi_seasonal_bing_v1/transport_reader.py
-!/tests/fixtures/bazi_strength_threshold_v1/independent_reference_v2.py
 
 # Generated CI evidence, kept as workflow artifacts rather than source.
 /ci-selection.json

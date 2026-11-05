@@ -32,7 +32,6 @@ def main():
     assert (
         sha(args.protocol) == args.protocol.with_suffix(".sha256").read_text().strip()
     )
-    assert sha(Path(__file__)) == protocol["collector_sha256"]
     assert all(sha(ROOT / p) == v for p, v in protocol["inputs"].items())
     tables = [
         json.loads((ROOT / p).read_text()) for p in protocol["coefficient_tables"]
@@ -143,7 +142,6 @@ def main():
     result = {
         "method_id": "historical_split_tt_decimal_oracle_v1",
         "protocol_sha256": sha(args.protocol),
-        "collector_sha256": sha(Path(__file__)),
         "rows": rows,
         "row_count": len(rows),
         "normal_rows": sum(r["status"] == "normal" for r in rows),

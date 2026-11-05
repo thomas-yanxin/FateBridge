@@ -180,8 +180,12 @@ def test_history_points_and_velocity_decomposition_match_same_subject(
     assert events["full_original_text_acceptance"] is False
 
 
-def test_existing_astrodice_reference_contract_is_reexported_from_shared_definition():
-    from fatebridge.core.output_astrodice import EphemerisReferencePoints as legacy
+def test_astrodice_reference_field_uses_the_shared_definition():
+    from fatebridge.core.output_astrodice import DiceSkyParams
     from fatebridge.core.output_charts import EphemerisReferencePoints
 
-    assert legacy is EphemerisReferencePoints
+    points = EphemerisReferencePoints()
+    assert (
+        DiceSkyParams(ephemerisReferencePoints=points).ephemerisReferencePoints
+        is points
+    )

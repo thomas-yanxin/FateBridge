@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_dangshi_noble_v40"
-FREEZE = "2ad83f1a72c0c941dd83f2ff5f4247871ae18227be9a8bdcb06baaa08b0de47c"
+FREEZE = "05d2c3b1b75dce1c8261225c2d0b3822c59966d9da229ea6f5852a5c9d3790c2"
 OUTPUT = ROOT / "src/fatebridge/data/classical/taiyi-dangshi-nobles-v1.json"
 
 

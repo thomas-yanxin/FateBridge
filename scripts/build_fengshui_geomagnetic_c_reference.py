@@ -15,7 +15,7 @@ def main() -> None:
     parser.add_argument("--source-dir", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
-    folder = Path(__file__).parents[1] / "tests/fixtures/fengshui_geomagnetic_v1"
+    folder = Path(__file__).parents[1] / "tests/data/fengshui_geomagnetic_v1"
     reference = json.loads((folder / "NOAA_C_100_main_field_values.json").read_text())
     source = args.source_dir.resolve()
     for name, expected in reference["source_hashes"].items():

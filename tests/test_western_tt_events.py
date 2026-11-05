@@ -13,7 +13,7 @@ from fatebridge.core.astro.ephemeris import _swisseph_planet_state
 from fatebridge.core.astro.iers_ut1 import C04Table, use_ut1_source
 from fatebridge.core.horary_motion import native_lunar_contacts
 
-FIXTURE = Path(__file__).parent / "fixtures/western-tt-events-v1"
+FIXTURE = Path(__file__).parent / "data/astro/tt_events"
 PROTOCOL = json.loads((FIXTURE / "protocol.json").read_text())
 REFERENCE = json.loads(gzip.decompress((FIXTURE / "reference.json.gz").read_bytes()))
 
@@ -35,10 +35,9 @@ def refuse_ut1(monkeypatch):
 
 
 def test_external_corpus_remains_predeclared_and_not_a_production_oracle():
-    manifest = json.loads((FIXTURE / "manifest.json").read_text())
-    root = Path(__file__).resolve().parents[1]
-    for relative, expected in manifest["files"].items():
-        assert hashlib.sha256((root / relative).read_bytes()).hexdigest() == expected
+    from scripts.audit_western_tt_events import validate_reference_identity
+
+    validate_reference_identity(FIXTURE)
     assert REFERENCE["production_imports"] is False
     assert (
         REFERENCE["protocol_sha256"]
@@ -48,11 +47,6 @@ def test_external_corpus_remains_predeclared_and_not_a_production_oracle():
     assert PROTOCOL["comparison_tolerance_event_seconds"] == 30
     assert PROTOCOL["real_world_outcomes"] == 0
     assert not PROTOCOL["full_original_text_acceptance"]
-
-
-# The initial raw cross-frame/body-point gates and their failures are retained
-# in docs/validation/western-tt-common-frame/raw-v1-test.py.txt. Valid same-point
-# position gates, including the TT-only guard, live in test_western_tt_common_frame.
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda r: r["case_id"])

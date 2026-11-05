@@ -9,7 +9,8 @@ import pytest
 from pydantic import ValidationError
 
 import fatebridge.core.heluo_structure as structure
-from fatebridge.core.heluo import _gua_tables, gua_lines, judge
+from fatebridge.core.heluo import gua_lines, judge
+from fatebridge.core.heluo_hexagrams import _gua_tables
 from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.core.output_numerology import HeluoBodyStructure, HeluoStructurePhase
 from fatebridge.utils.errors import NumerologySourceError

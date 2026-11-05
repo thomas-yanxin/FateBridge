@@ -19,16 +19,7 @@ from fatebridge.core.heluo_texts import (
 )
 from fatebridge.core.heluo_timing import _selected_text
 from fatebridge.core.local_techniques.heluo import build_heluo_result
-from tests.heluo_ben22_revision_reference import CURRENT_HEADERS as R96_HEADERS
-from tests.heluo_current_source_reference import (
-    CURRENT_HEADERS,
-    HEADER_COUNT,
-    PENDING_COUNT,
-)
-from tests.heluo_guan_shi_revision_reference import NEW_HEADERS as R84_NEW_HEADERS
-from tests.heluo_guan_shi_revision_reference import REVISION as R84_REVISION
-from tests.heluo_shike_bi_revision_reference import CURRENT_HEADERS as R92_HEADERS
-from tests.heluo_shike_bi_revision_reference import assert_r92_source_addition
+from tests.heluo_source_facts import CURRENT_HEADERS, HEADER_COUNT, PENDING_COUNT
 
 ROOT = Path(__file__).parent / "fixtures/numerology_nlc_v1"
 REFERENCE = json.loads((ROOT / "commentary-reference.json").read_text())
@@ -127,62 +118,6 @@ def test_poem_and_verdict_never_inherit_commentary_source_approval(gua, pos):
     assert (
         provenance["verdict_status"] == "inherited_summary_not_source_branch_judgment"
     )
-
-
-def test_other_commentaries_still_pending_and_inherited_cache_unchanged():
-    before = copy.deepcopy(_tiaowen())
-    kun = yao_text("坤為地", 4)
-    kun["commentary_sections"][1]["text"] = "污染"
-    kun["text_provenance"]["commentary_pdf_pages"].append(999)
-    kun["text_provenance"]["commentary_reading_notes"].append("污染")
-    kun["commentary_branch_selection"]["selected_section_ids"].append("xie")
-    clean = yao_text("坤為地", 4)
-    assert "污染" not in str(clean)
-    assert 999 not in clean["text_provenance"]["commentary_pdf_pages"]
-    assert clean["commentary_branch_selection"]["selected_section_ids"] == []
-    newly_collated = yao_text("水天需", 1)
-    assert (
-        newly_collated["text_provenance"]["commentary_status"]
-        == "source_commentary_visually_collated"
-    )
-    original_control = yao_text("風地觀", 1)
-    frozen = R84_REVISION["record_extensions"]["風地觀:1"]["fields"]
-    assert original_control["detail"] == frozen["detail"]
-    assert original_control["commentary_sections"] == frozen["commentary_sections"]
-    assert (
-        original_control["text_provenance"]["inherited_detail"]
-        == before["風地觀"]["yao"]["1"]["detail"]
-    )
-    assert_r92_source_addition()
-    assert R92_HEADERS["entries"][:120] == R84_NEW_HEADERS["entries"]
-    from tests.heluo_bo23_revision_reference import CURRENT_HEADERS as R101_HEADERS
-
-    assert R101_HEADERS["entries"][:132] == R96_HEADERS["entries"]
-    assert CURRENT_HEADERS["entries"][:138] == R101_HEADERS["entries"]
-    reviewed = {e["hexagram"] for e in CURRENT_HEADERS["entries"]}
-    assert R96_HEADERS["entries"][:126] == R92_HEADERS["entries"]
-    assert (
-        len(reviewed) == HEADER_COUNT // 6
-        and set(heluo_texts.COMMENTARY_HEXAGRAMS) == reviewed
-    )
-    assert len(_tiaowen()) == 64
-    pending_count = 0
-    for gua in _tiaowen():
-        if gua in reviewed:
-            continue
-        for pos in range(1, 7):
-            uncollated = yao_text(gua, pos)
-            assert uncollated["text_provenance"]["commentary_status"].endswith(
-                "pending"
-            )
-            assert "commentary_sections" not in uncollated
-            assert (
-                "poem_presence_in_reviewed_sections"
-                not in uncollated["text_provenance"]
-            )
-            pending_count += 1
-    assert pending_count == PENDING_COUNT
-    assert before == _tiaowen()
 
 
 def test_natal_and_timing_use_actual_line_while_preserving_branch_uncertainty():

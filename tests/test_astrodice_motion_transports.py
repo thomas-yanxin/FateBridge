@@ -3,6 +3,8 @@
 import asyncio
 import hashlib
 import json
+from fractions import Fraction
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,9 +15,11 @@ import fatebridge.api as api
 from fatebridge.application.examples import suggested_fields
 from fatebridge.cli import run
 from fatebridge.core.astro import ephemeris, runtime
+from fatebridge.core.astro.time_scales import datetime_from_tt
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.ephemeris_case_runtime import native_ephemeris_files
+from tests.output_facts import canonical_json
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files")
 
@@ -191,3 +195,77 @@ def test_missing_requested_speed_is_a_safe_source_error_in_every_transport(
     cli = json.loads(capsys.readouterr().out)
     assert cli["error_code"] == expected["error_code"]
     assert cli["issues"] == expected["issues"]
+
+
+def test_original_lunar_rate_counterexample_is_identical_on_all_transports(
+    rest, capsys, record_property
+):
+    reference = json.loads(
+        (
+            Path(__file__).resolve().parents[1]
+            / "tests/data/astrodice/reference_sets/study-display-rate/development-reference-first.json"
+        ).read_text()
+    )
+    row = next(
+        row
+        for row in reference["rows"]
+        if row["body"] == "Moon" and row["label"] == "3000-12-07T04:07:32"
+    )
+    tt = float(Fraction(row["exact_binary64_numeric_jd"]))
+    utc = datetime_from_tt(tt)
+    inputs = {
+        **INPUTS,
+        "planet": "Moon",
+        "date": utc.date().isoformat(),
+        "time": utc.time().isoformat(),
+        "gps_lat": 0,
+        "gps_lon": 0,
+    }
+    fields = [
+        "chart.chart.objects",
+        "chart.params.chart_profile.julian_day_tt",
+        "chart.params.chart_profile.ephemeris_model",
+        "chart.params.chart_profile.longitude_motion",
+        "chart.params.chart_profile.physical_ephemeris_source",
+    ]
+    response = rest.post(
+        SPEC.rest_path,
+        json=inputs,
+        params={"fields": fields, "strict_fields": True, "response_char_limit": 0},
+    )
+    assert response.status_code == 200, response.text
+    native = asyncio.run(invoke(inputs, fields))
+    assert (
+        run(
+            [
+                *flags(inputs),
+                "--fields",
+                *fields,
+                "--strict-fields",
+                "--response-char-limit",
+                "0",
+            ]
+        )
+        == 0
+    )
+    cli = json.loads(capsys.readouterr().out)
+    outputs = [response.json(), native, cli]
+    assert len({canonical_json(output) for output in outputs}) == 1
+    profile = outputs[0]["chart"]["params"]["chart_profile"]
+    assert profile["julian_day_tt"] == tt
+    assert profile["ephemeris_model"] == "swieph"
+    moon = next(
+        point
+        for point in outputs[0]["chart"]["chart"]["objects"]
+        if point["id"] == "Moon"
+    )
+    assert moon["motion"]["source_model"] == "swieph"
+    assert moon["motion"]["correction_status"] == "applied"
+    # Delivery equality does not certify the independent numerical line. Keep
+    # the original source interval and report its actual residual separately.
+    lo, hi = map(Fraction, row["longitude_rate_arcsec_per_source_day"])
+    speed = Fraction(moon["motion"]["longitude_speed"]) * 3600
+    error = max(abs(speed - lo), abs(speed - hi))
+    record_property("original_rate_line_arcsec_per_source_day", "0.002")
+    record_property("actual_rate_error_arcsec_per_source_day", float(error))
+    record_property("numerical_line_satisfied", error <= Fraction("0.002"))

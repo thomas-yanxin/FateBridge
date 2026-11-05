@@ -29,7 +29,7 @@ FACES = {"planet": "Saturn", "sign": "Aries", "house": 0}
 SKY = {"date": "2000-01-01", "time": "12:00", "zone": "UTC", "lat": 51.5, "lon": 0}
 FRAME = "tropical_ecliptic_of_date"
 PROTOCOL = json.loads(
-    (ROOT / "tests/fixtures/astrodice-velocity-protocol.json").read_text()
+    (ROOT / "tests/data/astrodice/tables/velocity-protocol.json").read_text()
 )
 
 
@@ -196,18 +196,18 @@ def test_approximate_orbit_without_derivative_remains_unknown(
 def test_frozen_velocity_protocol_and_reference_identity():
     assert (
         hashlib.sha256(
-            (ROOT / "tests/fixtures/astrodice-velocity-protocol.json").read_bytes()
+            (ROOT / "tests/data/astrodice/tables/velocity-protocol.json").read_bytes()
         ).hexdigest()
         == "bae5666fedb9a6678784f8342ae0b1544140f3e8be5119f0529fbb5b7e7422af"
     )
     for key, relative in [
-        ("position_protocol_sha256", "astrodice-kernel-protocol.json"),
-        ("reference_fixture_sha256", "astrodice-kernel-horizons.json"),
+        ("position_protocol_sha256", "kernel-protocol.json"),
+        ("reference_fixture_sha256", "kernel-horizons.json"),
     ]:
         assert (
             PROTOCOL[key]
             == hashlib.sha256(
-                (ROOT / "tests/fixtures" / relative).read_bytes()
+                (ROOT / "tests/data/astrodice/tables" / relative).read_bytes()
             ).hexdigest()
         )
     assert PROTOCOL["require_speed_flag"] is True

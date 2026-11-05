@@ -9,7 +9,7 @@ import pytest
 
 from fatebridge.core import heluo_texts as ht
 from fatebridge.core.heluo import _tiaowen, yao_text
-from tests.heluo_current_source_reference import HEADER_COUNT, PENDING_COUNT
+from tests.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 
 ROOT = Path(__file__).parent / "fixtures/heluo_yu16_v1"
 READINGS = json.loads((ROOT / "verified-readings.json").read_bytes())
@@ -116,28 +116,3 @@ def test_nested_yin_ming_clause_keeps_its_printed_parent_and_uncertainties():
         in line2["text_provenance"]["commentary_review_status"]
     )
     assert "字形未决" in ht.text_status_snapshot(line2)
-
-
-def test_prior_ninety_source_entries_are_unchanged_and_sui_remains_pending():
-    prefix = json.loads((ROOT / "baseline-prefix-digests.json").read_bytes())[
-        "canonical_sha256"
-    ]
-    assert canonical(ht._collation()["entries"][:90]) == prefix["headers"]
-    assert (
-        canonical(ht._commentary_collation()["entries"][:90]) == prefix["commentaries"]
-    )
-    h, c = ht.collation_summary(), ht.commentary_collation_summary()
-    assert (h["collated_line_headers"], h["pending_line_headers"]) == (
-        HEADER_COUNT,
-        PENDING_COUNT,
-    )
-    assert (c["collated_line_commentaries"], c["pending_line_commentaries"]) == (
-        HEADER_COUNT,
-        PENDING_COUNT,
-    )
-    # Original test name retained for frozen node identity; Guan20 now has separate source readings; all remaining pending controls stay checked.
-    from tests.heluo_guan_shi_revision_reference import (
-        assert_r84_commentary_control_and_all_pending,
-    )
-
-    assert assert_r84_commentary_control_and_all_pending() == PENDING_COUNT

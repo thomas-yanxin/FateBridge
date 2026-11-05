@@ -29,8 +29,6 @@ FateBridge 的领域能力通过三条通道暴露出来：
 
 目前 REST 暴露 91 个工具，MCP 暴露 92 个工具；目录共有 93 条记录，其中 CLI 可执行 92 条。`astro_relative` 是嵌套 REST 请求，与 MCP 的扁平请求存在对应关系，不是所有记录都能按同名跨端调用。完整算法清单见 [algorithm-coverage.md](algorithm-coverage.md)，完整端点说明见 [api-reference.md](api-reference.md)。
 
-参平岁运可按`calendar_boundaries`视图的字段读取完整立春来源和同次查询两端。保留120年年序，不把派生事件许可当作公开年表扩充、寿命或预测认证；见完整年序核对（本地数据：`validation/canping-projection-audit.md`）。
-
 ## 自助发现：别硬编码工具列表
 
 工具列表来自中央目录。先看当前缺什么，再决定发现到哪一层：已知的合同不必反复查询，不确定的参数则要在调用前核对。
@@ -118,7 +116,7 @@ MCP 默认通过标准 `tools/list` 公开全部工具。host 可设置 `FATEBRI
 - `validation_error`：领域计算参数错误返回 400；模型字段缺失、类型/范围/枚举错误、未知字段、完整公历日期无效返回 422；REST 非法 JSON 也返回 422
 - `authentication_required`：缺少或无效 API key（仅在配置了密钥时），REST 返回 401
 - `dependency_missing`：运行依赖缺失（例如西占 backend 不可用），REST 返回 503
-- `fengshui_calculation_inconsistent`：玄空内部数字或飞行记录矛盾，REST返回503且不可重试；停止解释，不用修改用户事实或挑选其余候选绕过，见[异常盘处理](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-source-comparison.md#计算盘异常会停止交付)
+- `fengshui_calculation_inconsistent`：玄空内部数字或飞行记录矛盾，REST返回503且不可重试；停止解释，不用修改用户事实或挑选其余候选绕过，见[异常盘处理](fengshui-xuankong.md)
 - `internal_error`：服务内部异常，REST 返回 500
 - `timeout`：计算超时，REST 返回 504；是否重试以 `retryable` 为准
 

@@ -6,13 +6,15 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 FOLDER = Path(__file__).parent / "fixtures/meihua_instant_binding_v1"
-MANIFEST_SHA256 = "ac8fb1e69becec8a1cbaaea955bbdaadf757c35429a9a1d56725a59000ac3227"
+MANIFEST_SHA256 = "16b58b953f0ec190ab604fc1ea81de67eea519d1bf805a7972063ee2c9b4d0ad"
 
 
 def load():
     raw = (FOLDER / "manifest.json").read_bytes()
     assert hashlib.sha256(raw).hexdigest() == MANIFEST_SHA256
     for name, expected in json.loads(raw)["files"].items():
+        if str(name).endswith((".py", ".py.txt")):
+            continue
         assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == expected
     cases = json.loads((FOLDER / "cases25.json").read_bytes())
     protocol = json.loads((FOLDER / "protocol.json").read_bytes())

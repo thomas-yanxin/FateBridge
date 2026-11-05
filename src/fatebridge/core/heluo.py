@@ -21,13 +21,10 @@ from typing import Any, Dict, List, Optional
 from fatebridge.core.almanac import localize_datetime
 from fatebridge.core.heluo_body import body_evidence, body_snapshot
 from fatebridge.core.heluo_hexagrams import (
-    _DATA_PATH,
     GAN,
-    NATURAL,
     TRIGRAM_BITS,
     ZHI,
     _gua_name,
-    _gua_tables,
     _tiaowen,
     _trigram_of,
     gua_lines,
@@ -251,20 +248,6 @@ MONTH_GUA: Dict[str, List[str]] = {
     "子": ["小畜", "賁", "復", "節"],
     "丑": ["大畜", "解", "鼎", "臨"],
 }
-# 得体：日干→纳甲卦
-DAY_TI: Dict[str, str] = {
-    "甲": "乾",
-    "乙": "坤",
-    "丙": "艮",
-    "丁": "兌",
-    "戊": "坎",
-    "己": "離",
-    "庚": "震",
-    "辛": "巽",
-    "壬": "乾",
-    "癸": "坤",
-}
-
 # 四立 — 土用 window markers.
 LI_TERMS = frozenset({"立春", "立夏", "立秋", "立冬"})
 
@@ -710,7 +693,6 @@ def judge(
     """命运篇：元气/化工/得势得时得体/葉否/二数/元堂。"""
     year_g = four_pillars["year"][0]
     year_z = four_pillars["year"][1]
-    day_g = four_pillars["day"][0]
     tri_set = set(_san_cai(chart["xian"]["lines"]) + _san_cai(chart["hou"]["lines"]))
 
     def mk(gua: str) -> Dict[str, Any]:
@@ -773,7 +755,6 @@ def judge(
         assignment_method=month_assignment_method,
     )
     de_time = any(row["assigned_month_match"] for row in month_evidence["phases"])
-    day_stem_mapping = mk(DAY_TI[day_g])
     de_ti = body_evidence(
         four_pillars["year"],
         {
@@ -814,8 +795,6 @@ def judge(
     yuan_tang_info = {
         "pos": y_pos,
         "yang": y_yang,
-        "dangWei": (y_pos % 2 == 1) == y_yang,
-        "dangWei_policy": "legacy_alias_for_position_polarity_match; not_source_dangwei",
         "position_polarity_match": line_evidence["phases"][0][
             "position_polarity_match"
         ],
@@ -831,7 +810,7 @@ def judge(
         "deSheng_policy": "year_najia_by_actual_six_lines_with_qiankun_borrowed_v2",
         "najia": najia,
         "deTime_policy": "selected_month_source_profile_v4; five_intra_edition_conflicts_retained; distinct_month_clauses_not_complete_detime",
-        "deTi_policy": "source_separated_year_nayin_body_relations_v2; complete_deti_present_null; legacy_lookup_in_day_stem_mapping",
+        "deTi_policy": "source_separated_year_nayin_body_relations_v2; complete_deti_present_null",
         "yuan": yuan,
         "fanYuan": fan_yuan,
         "fanYuan_policy": "opposite_trigram_body_presence_union_only; absence_premise_in_qi_phases.yuanqi_opposition",
@@ -842,7 +821,6 @@ def judge(
         "deTime": de_time,
         "month_affinity": month_evidence,
         "deTi": de_ti,
-        "day_stem_mapping": day_stem_mapping,
         "xie": xie,
         "erShu": er_shu,
         "seasonal_numbers": seasonal_number_evidence(
@@ -927,7 +905,7 @@ def build_snapshot_text(
             f"合并化工 {'/'.join(jg['huagong']['guas'])}{hg_present}　基础命中{'有' if jg['xie'] else '无'}（综合葉否未定）"
         )
         lines.append(
-            f"年命纳甲{'有' if jg['deSheng'] else '无'}（按实际六爻含乾坤借用）　月表匹配{'有' if jg['deTime'] else '无'}　日干映射 {jg['day_stem_mapping']['gua']}{'(有)' if jg['day_stem_mapping']['present'] else '(无)'}（得时、得体综合未定）"
+            f"年命纳甲{'有' if jg['deSheng'] else '无'}（按实际六爻含乾坤借用）　月表匹配{'有' if jg['deTime'] else '无'}（得时、得体综合未定）"
         )
         lines.append(
             f"二数（仅对25/30比较，非四时旺衰定论）：天{jg['erShu']['tian']}({jg['erShu']['tianState']}) 地{jg['erShu']['di']}({jg['erShu']['diState']})"

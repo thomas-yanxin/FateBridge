@@ -15,7 +15,7 @@ def main() -> int:
     parser.add_argument(
         "--reference-folder",
         type=Path,
-        default=Path(__file__).parents[1] / "tests/fixtures/fengshui_all_terms_v1",
+        default=Path(__file__).parents[1] / "tests/data/fengshui_all_terms_v1",
     )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()

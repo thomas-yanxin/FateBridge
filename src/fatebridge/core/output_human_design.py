@@ -484,6 +484,7 @@ class HDTimeSensitivity(PartialOutput):
 
 
 class HumanDesignOutput(ProjectedOutput):
+    apparent_model_comparison: Optional[Dict[str, JsonValue]] = None
     apparent_position_context: Optional[Dict[str, JsonValue]] = None
     native_execution_context: Optional[Dict[str, JsonValue]] = None
     run_metadata: Optional[RunMetadata] = None

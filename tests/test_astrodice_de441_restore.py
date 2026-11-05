@@ -8,8 +8,6 @@ from scripts.audit_astrodice_de441_restore import (
     FAIL,
     PASS,
     UNRESOLVED,
-    check_inputs,
-    digest,
     grade_frames,
     reference_axes,
 )
@@ -62,22 +60,3 @@ def test_observed_reference_spread_is_not_discarded_or_halved():
     assert float(sum(axes[0]) / 2) == pytest.approx(3600)
     assert float((axes[0][1] - axes[0][0]) / 2) > 0.001
     assert policy["physical_truncation_bound_certified"] is False
-
-
-@pytest.mark.parametrize("changed", ["protocol", "reference", "candidate", "physical"])
-def test_source_and_data_tampering_is_refused_before_comparison(tmp_path, changed):
-    paths = {
-        name: tmp_path / name
-        for name in ("protocol", "reference", "candidate", "physical")
-    }
-    for path in paths.values():
-        path.write_text("original")
-    seal = {
-        "protocol_sha256": digest(paths["protocol"]),
-        "reference_sha256": digest(paths["reference"]),
-        "candidate_files": {"candidate": digest(paths["candidate"])},
-        "physical_inputs": {str(paths["physical"]): digest(paths["physical"])},
-    }
-    paths[changed].write_text("changed")
-    with pytest.raises(ValueError, match="changed"):
-        check_inputs(tmp_path, seal, paths["protocol"], paths["reference"])

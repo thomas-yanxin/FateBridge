@@ -20,11 +20,9 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
-    SerializerFunctionWrapHandler,
     StrictBool,
     StrictFloat,
     StrictInt,
-    model_serializer,
     model_validator,
 )
 
@@ -108,18 +106,6 @@ class StudyPlan(Record):
     )
     cohort: list[CohortMember] = Field(min_length=1)
 
-    @model_serializer(mode="wrap")
-    def preserve_legacy_plan_shape(
-        self, handler: SerializerFunctionWrapHandler
-    ) -> dict[str, Any]:
-        payload: dict[str, Any] = handler(self)
-        # Adding an optional domain commitment must not change the canonical
-        # digest of already-issued v4 records whose plans have no such field.
-        # Supplied commitments are retained in Python and JSON serializations.
-        if self.protocol_context_sha256 is None:
-            payload.pop("protocol_context_sha256", None)
-        return payload
-
     @model_validator(mode="after")
     def ordered_and_unique(self) -> StudyPlan:
         if (self.baseline_probability is None) == (self.baseline_forecasts is None):
@@ -176,7 +162,7 @@ class Forecast(Record):
     study_plan_sha256: Optional[Hash] = Field(
         default=None,
         pattern=r"^[a-f0-9]{64}$",
-        description="Canonical validated StudyPlan digest committed when issuing the forecast; missing legacy bindings cannot pass protocol gates",
+        description="Canonical validated StudyPlan digest committed when issuing the forecast; missing bindings cannot pass protocol gates",
     )
     issued_at: AwareDatetime
     model_sha256: Hash = Field(pattern=r"^[a-f0-9]{64}$")

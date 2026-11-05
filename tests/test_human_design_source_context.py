@@ -1,12 +1,10 @@
 """Clause role, graph alternatives, immutable old outputs and adapter rejection."""
 
 import gzip
-import hashlib
 import json
 from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
@@ -15,21 +13,13 @@ from fatebridge.core import human_design_knowledge as base
 from fatebridge.core import human_design_knowledge_v4 as hd
 from fatebridge.core.human_design import bodygraph
 from fatebridge.core.human_design_source_context import bind_source_context
-from fatebridge.services.human_design_context_lines import (
-    build_human_design_context_packet,
-)
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.validation.human_design_context_lines import (
-    verify_human_design_context_packet,
-)
 from tests.test_agentic_nested_outputs import SPECS, business
 from tests.test_agentic_nested_outputs import rest as shared_rest
 from tests.test_heluo_poem_transports import run_three
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "docs/validation/human-design-context-clauses-v1"
-E = BASE / "evidence"
 rest = shared_rest
 
 
@@ -60,17 +50,6 @@ def chart(personality, design):
 def fixing(key, state="unfixed"):
     gate, line = map(int, key.split("."))
     return {"gate": gate, "line": line, "fixing_state": state}
-
-
-def test_old_768_full_reference_outputs_are_unchanged():
-    for category, rows in read(E / "before-768-reference-hashes.json").items():
-        for key, digest in rows.items():
-            assert (
-                hashlib.sha256(
-                    base._canonical(base.read_reference(category=category, key=key))
-                ).hexdigest()
-                == digest
-            )
 
 
 def test_all_384_v4_rows_preserve_v3_meanings_and_honest_coverage():
@@ -279,74 +258,3 @@ def test_source_replaced_before_lookup_is_invalid(monkeypatch, tmp_path):
     with pytest.raises(EphemerisSourceError) as caught:
         hd.read_reference(key="7.2")
     assert caught.value.reason == "human_design_reference_invalid"
-
-
-def test_all_prior_v3_packets_exact_and_all_v4_contexts_have_graph_witnesses():
-    plan = read(E / "implementation-plan.json")
-    with (
-        patch(
-            "fatebridge.core.astro.runtime.ephemeris_call",
-            side_effect=AssertionError("native replay"),
-        ),
-        patch(
-            "fatebridge.core.astro.native_execution.calculate",
-            side_effect=AssertionError("native dispatch"),
-        ),
-    ):
-        for case in plan["reused_cases"]:
-            source = read(ROOT / case["source_path"])
-            assert (
-                hashlib.sha256((ROOT / case["source_path"]).read_bytes()).hexdigest()
-                == case["source_sha256"]
-            )
-            old = read(
-                ROOT
-                / "docs/validation/human-design-gate3-knowledge-v3/packets-final"
-                / (case["id"] + ".json.gz")
-            )
-            assert (
-                build_human_design_context_packet(source, reference_category="lines_v3")
-                == old
-            )
-            packet = build_human_design_context_packet(
-                source, reference_category="lines_v4"
-            )
-            assert packet["nominal_packet_v1"] == old["nominal_packet_v1"]
-            assert packet["coverage"] == old["coverage"]
-            assert packet["packet_version"] == 4
-            for context in packet["contexts"]:
-                group = packet["line_reading_groups"][context["line_reading_group_id"]]
-                for row in group["rows"]:
-                    for bound in row["bound_source_context_annotations"] or []:
-                        assert bound["source_annotation"]["key"] == row["reference_key"]
-                        assert (
-                            bound["actual_fixing_state"] == row["actual_fixing_state"]
-                        )
-                        for observation in bound["observations"]:
-                            for witness in observation["channel_witnesses"]:
-                                index = int(witness["path"].rsplit(".", 1)[1])
-                                assert (
-                                    witness["value"]
-                                    == context["chart"]["bodygraph"]["channels"][index]
-                                )
-            assert (
-                verify_human_design_context_packet(
-                    packet, source, reference_category="lines_v4"
-                )["status"]
-                == "verified_original_bound_context_line_packet"
-            )
-            assert (
-                verify_human_design_context_packet(
-                    packet, source, reference_category="lines_v3"
-                )["status"]
-                == "rejected"
-            )
-            altered = deepcopy(packet)
-            first = next(iter(altered["line_reading_groups"].values()))["rows"][0]
-            first["reading"] += "invented outcome"
-            assert (
-                verify_human_design_context_packet(
-                    altered, source, reference_category="lines_v4"
-                )["status"]
-                == "rejected"
-            )

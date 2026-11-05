@@ -81,14 +81,14 @@ def inspect_markdown(text: str) -> Document:
     return document
 
 
-def markdown_paths(*, include_archives: bool = False) -> list[Path]:
+def markdown_paths() -> list[Path]:
     paths = set(ROOT.glob("*.md")) | set((ROOT / "skills").rglob("*.md"))
     for current, directories, files in os.walk(ROOT / "docs", followlinks=False):
         directories[:] = [
             name
             for name in directories
             if name != "reviews"
-            and (include_archives or name != "validation")
+            and name != "validation"
             and not (Path(current) / name).is_symlink()
         ]
         paths.update(Path(current) / name for name in files if name.endswith(".md"))
@@ -97,13 +97,8 @@ def markdown_paths(*, include_archives: bool = False) -> list[Path]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--include-archives",
-        action="store_true",
-        help="also inspect historical validation snapshots and vendored documents",
-    )
-    options = parser.parse_args(argv)
-    paths = markdown_paths(include_archives=options.include_archives)
+    parser.parse_args(argv)
+    paths = markdown_paths()
     documents = {
         path.resolve(): inspect_markdown(path.read_text(encoding="utf-8"))
         for path in paths
@@ -141,9 +136,8 @@ def main(argv: list[str] | None = None) -> int:
         print("\n".join(errors))
         return 1
     blocks = sum(document.json_blocks for document in documents.values())
-    scope = "including archives" if options.include_archives else "maintained documents"
     print(
-        f"OK ({scope}): {len(documents)} Markdown files, {checked_links} local links, "
+        f"OK: {len(documents)} Markdown files, {checked_links} local links, "
         f"{blocks} JSON blocks, {len(json_paths)} JSON example files"
     )
     return 0

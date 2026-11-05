@@ -347,9 +347,9 @@ def test_reference_backend_requires_actual_return_flags(monkeypatch):
 
 
 def test_analytic_mean_node_flag_cannot_turn_moshier_into_file_comparison():
-    from tests.golden.runner import golden_ephemeris
+    from tests.ephemeris_context import moshier_ephemeris
 
-    with golden_ephemeris():
+    with moshier_ephemeris():
         chart = chart_at_tt(2451545, "mean")
         report = compare_full_backends(chart, "mean")
     north = next(

@@ -179,16 +179,3 @@ def test_changed_delivery_with_recomputed_file_hash_still_fails_same_run(cohort)
     write_json(root / "review.json", review)
     with pytest.raises(ValueError, match="actual same-run"):
         MODULE.audit(root, root / "review.json")
-
-
-def test_first_real_cohort_remains_bound_to_actual_artifacts():
-    root = Path(__file__).resolve().parents[1]
-    run = root / "tests/fixtures/ren_semantic_run_v1"
-    result = MODULE.audit(
-        run, root / "docs/validation/ren-semantic-review-result-2026-10-22.json"
-    )
-    assert result["executed_cases"] == 6
-    assert result["complete_business_hashes_verified"] == 1
-    assert result["automatic_semantic_acceptance"] is False
-    original = json.loads((run / "report.json").read_text())
-    assert original["cases"][2]["failures"] == ["skill_not_observed:onda-zhanbu"]

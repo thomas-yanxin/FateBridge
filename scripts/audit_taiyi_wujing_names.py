@@ -13,8 +13,7 @@ from scripts.audit_taiyi_wujing_facsimile import audit as native_audit
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_wujing_names_v47"
-FREEZE_SHA = "445c5775e56cc245a6251c43fb5cf761b8d2596d28bad520eb647ed26f8c0db7"
-BASELINE = "docs/validation/taiyi-jinjing-v46/final-report.json"
+FREEZE_SHA = "050b16b4e2af8f31ebe44d8f59fd9b0c1ef318116f8d205306eb006d2ec299f2"
 NAME_FIELDS = {"wenchang_palace", "shiji"}
 
 
@@ -72,7 +71,7 @@ def compare(current: dict[str, Any], profile: dict[str, Any]) -> dict[str, Any]:
     # Keep the original evidence and grades independent of future runtime repairs.
     if profile != verify():
         raise ValueError("不能替换冻结的武经同书名位表")
-    baseline = json.loads((ROOT / BASELINE).read_text())
+    baseline = native_audit()
     actuals = {
         (r["id"], c["original_comparison"]["actual_field"]): c["actual_value"]
         for r in current["source_rows"]

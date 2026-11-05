@@ -13,8 +13,8 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_year_contract import TOPICS
 
 
@@ -83,6 +83,9 @@ def test_yin_growth_reference_does_not_manufacture_a_hidden_stem_or_support_vote
         assert row["matching_hidden_stems"] == []
         assert row["hidden_element_present"] is False
     assert day["force_status"] == "not_adjudicated"
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("topic", TOPICS)

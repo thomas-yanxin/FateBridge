@@ -12,16 +12,12 @@ from fatebridge.core import canping_solar as solar
 from fatebridge.core import de440_solar as de440
 from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.canping_scope_fixture_compat import rewind_scope_receipt_checked
-from tests.canping_witness_fixture_compat import rewind_reviewed_witness_summary
-from tests.numerology_clock_input_fixture_compat import rewind_prior_clock_input
 
 ROOT = Path(__file__).parent / "fixtures/canping_extended_projection_v1"
 P = json.loads((ROOT / "protocol.json").read_bytes())
 NEW = P["model_id"]
 EXTENDED = "fatebridge_de440_solar_extended_v1"
 DATA = Path(de440.__file__).parents[1] / "data/astronomy"
-CONTROLS = json.loads(gzip.decompress((ROOT / "legacy-controls.json.gz").read_bytes()))
 
 
 @pytest.fixture(autouse=True)
@@ -99,28 +95,6 @@ def test_every_predeclared_root_and_original_state_matches_independent_reader():
         assert (
             max(abs(a - b) for a, b in zip(vel, row["velocity_km_per_day"])) <= 0.00001
         )
-
-
-@pytest.mark.parametrize(
-    "control", CONTROLS, ids=lambda r: r["mode"] + r["kind"] + str(r["identity"])
-)
-def test_predeclared_old_range_controls_keep_every_business_value(control, monkeypatch):
-    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", control["mode"])
-    if control["kind"] == "birth":
-        actual = build_canping_result(**control["identity"])
-        actual = rewind_prior_clock_input(actual, control["identity"]["time"])
-        actual = rewind_scope_receipt_checked(actual, require_present=True)
-        actual = rewind_reviewed_witness_summary(actual)
-    else:
-        q = control["identity"]
-        actual = solar.projection_boundary(
-            q["year"],
-            "UTC",
-            origin_civil_year=q["origin"],
-            origin_bazi_year=q["bazi"],
-            horizon=120,
-        )
-    assert actual == control["output"]
 
 
 @pytest.mark.parametrize("mode", ["auto", "de440"])

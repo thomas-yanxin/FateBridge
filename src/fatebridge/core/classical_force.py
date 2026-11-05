@@ -159,19 +159,13 @@ def build_force_components(
                 else None
             ),
         }
-    basis = (
-        "unrounded_same_assessment"
-        if exact_available
-        else "rounded_legacy_assessment" if available else "not_supplied"
-    )
-    energy_key = (
-        "engineering_energy_unrounded" if exact_available else "engineering_energy"
-    )
+    basis = "unrounded_same_assessment" if exact_available else "not_supplied"
+    energy_key = "engineering_energy_unrounded"
     body_energy = components["body"][energy_key]
     seal_energy = components["seal"][energy_key]
     relation = "not_supplied"
     body_share = None
-    if exact_available or available:
+    if exact_available:
         relation = (
             "body_greater"
             if body_energy > seal_energy
@@ -184,7 +178,7 @@ def build_force_components(
     rational = receipt.get("energies_exact")
     rational_energy = {}
     # Consume only a complete, correctly identified same-assessment receipt.
-    # Legacy/partial evidence never causes an unrequested recalculation.
+    # Partial evidence never causes an unrequested recalculation.
     if isinstance(rational, dict) and receipt.get("day_element") == body.value:
         try:
             rational_energy = {
@@ -234,7 +228,7 @@ def build_force_components(
             "body_within_support_share": body_share,
             "body_seal_energy_relation": relation,
             "comparison_basis": comparison_basis,
-            "legacy_float_body_seal_energy_relation": float_relation,
+            "float_body_seal_energy_relation": float_relation,
             "body_within_support_exact": body_share_exact,
             "body_energy_exact": (
                 str(rational_energy[body.value]) if rational_energy else None

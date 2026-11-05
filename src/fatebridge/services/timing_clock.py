@@ -33,7 +33,7 @@ def resolve_analysis_moment(
     analysis_hour: Optional[int] = None,
     analysis_minute: Optional[int] = None,
 ) -> AnalysisMoment:
-    """Implicit now retains its instant; explicit components retain old defaults.
+    """Implicit now retains its instant; explicit components follow declared defaults.
 
     An aware execution clock already identifies the correct DST occurrence.
     Explicit wall components do not, and must pass the local-clock validator.
@@ -103,7 +103,9 @@ def resolve_analysis_moment(
                 + "；请更正分析钟时，或省略analysis_*日期分量并用含时区as_of提供已确认的目标瞬间；勿改出生时区来消歧。"
             ) from exc
         basis = (
-            "legacy_partial_components" if len(provided) < 5 else "explicit_components"
+            "declared_partial_components"
+            if len(provided) < 5
+            else "explicit_components"
         )
         precision = "minute"
     reference = {

@@ -68,6 +68,7 @@ def apply_equatorial_mansions(chart: dict[str, Any], astronomy: dict[str, Any]) 
     by_name = {body["id"]: body for body in astronomy["bodies"]}
     for point in chart["objects"]:
         point.pop("su28", None)
+        point.pop("su28_degree", None)
         if point["id"] not in by_name:
             point["su28_unavailable_reason"] = "outside_seven_physical_luminaries_scope"
             continue

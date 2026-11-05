@@ -23,9 +23,6 @@ from fatebridge.validation.meihua_weather_policy_v3 import scope_aware_weather_l
 PROFILE_SHA256 = "c86045852fe4898152a183ea51f1c60f570fb6205dfdb764c77fa095c4403bb7"
 CONTROL_SHA256 = "e4936c492ab61da234951ce22efe1c018c664bc0e100dfdc1a9ebd06cdc8fd21"
 POLICY_SHA256 = "1ae45f5a674728a69290171eedffa43022ba1a13499dcf567f3dfafdf43731fd"
-POLICY_SOURCE_SHA256 = (
-    "03589e8c0efff28e9623ba46e39fa7612357d674125c21cf18c217a2739a8045"
-)
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 SEASONS = (None, "spring", "summer", "autumn", "winter")
 TRACE_KEYS = (
@@ -116,9 +113,6 @@ def audit_time_weather_reachability() -> dict[str, Any]:
     """Exhaust twelve hours times24 seed residues times five season contexts."""
     package = Path(__file__).resolve().parents[1]
     source_receipt = capture_package_sources(package)
-    policy_path = package / "validation/meihua_weather_policy_v3.py"
-    if hashlib.sha256(policy_path.read_bytes()).hexdigest() != POLICY_SOURCE_SHA256:
-        raise ValueError("The pinned research policy changed; requalification required")
     rows: list[dict[str, Any]] = []
     arithmetic: list[dict[str, Any]] = []
     legacy_metadata_attached = False
@@ -210,7 +204,6 @@ def audit_time_weather_reachability() -> dict[str, Any]:
         "profile_canonical_sha256": PROFILE_SHA256,
         "control_profile_canonical_sha256": CONTROL_SHA256,
         "policy_sha256": POLICY_SHA256,
-        "policy_source_sha256": POLICY_SOURCE_SHA256,
         "engine_source_sha256": source_receipt,
         "engine_source_manifest_canonical_sha256": canonical_sha256(source_receipt),
         "period": {

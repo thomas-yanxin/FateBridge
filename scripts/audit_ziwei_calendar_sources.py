@@ -13,7 +13,7 @@ from fatebridge.services.metaphysics import calculate_ziwei_birth
 from fatebridge.utils.birth_input import create_person_info
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures/ziwei_independent"
+FIXTURES = ROOT / "tests/data/ziwei_independent"
 
 
 def frozen_calendar_rows(

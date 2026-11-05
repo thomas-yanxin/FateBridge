@@ -34,7 +34,7 @@ def angle_error(a, b):
 def audit(ephemeris_dir=None):
     positions_path = ROOT / "tests/fixtures/western-horizons.json"
     returns_path = ROOT / "tests/fixtures/western-returns-horizons.json"
-    hko_path = ROOT / "tests/fixtures/bazi-timing-hko-2026.json"
+    hko_path = ROOT / "tests/data/bazi-timing-hko-2026.json"
     fortune_path = ROOT / "tests/fixtures/western-ptolemy-fortune-robbins-1940.json"
     positions = json.loads(positions_path.read_text())
     returns = json.loads(returns_path.read_text())

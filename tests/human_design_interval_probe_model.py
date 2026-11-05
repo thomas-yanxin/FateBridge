@@ -1,24 +1,22 @@
-"""Frozen artificial curve sampler; never a physical complete-run reader."""
+"""Artificial curve sampler with current chart scaffolding; never a physical complete-run reader."""
 
 import json
 from copy import deepcopy
 from fractions import Fraction
 from pathlib import Path
 
-from fatebridge.core.human_design import longitude_activation
+from fatebridge.core.human_design import chart_at_tt, longitude_activation
 from fatebridge.core.human_design_root_interpretations import candidate_chart
 
 ROOT = Path(__file__).resolve().parents[1]
-E = ROOT / "docs/validation/human-design-interval-coordinate-extrema-v1/evidence"
+E = ROOT / "tests/data/human_design"
 
 
 def model(case_id):
-    reference = json.loads((E / "rational-reference.json").read_text())
+    reference = json.loads((E / "interval-rational-reference.json").read_text())
     case = next(r for r in reference["cases"] if r["id"] == case_id)
-    source = json.loads(
-        (ROOT / "tests/fixtures/human-design-transition-case.json").read_text()
-    )["physical_samples"]["nominal"]
     origin = reference["origin_jd_tt"]
+    source = chart_at_tt(origin, backend="moshier")
     cache = {}
     calls = []
 

@@ -23,7 +23,7 @@ if not __package__:
 
 from scripts import check_sukuyo_month_transitions as monthly
 
-PROTOCOL = ROOT / "tests/fixtures/sukuyo-boundary-composition-protocol-v1.json"
+PROTOCOL = ROOT / "tests/data/sukuyo-boundary-composition-protocol-v1.json"
 PROTOCOL_SHA256 = "0302bfb789d030f2e1475783d46a33b93f4a2c600078f1cb67672bd3396a81b8"
 DAY_US = 86_400_000_000
 EPOCH_US = (date(1970, 1, 1).toordinal() - 1) * DAY_US
@@ -53,7 +53,7 @@ def source_expectations() -> tuple[Iterator[dict[str, Any]], dict[str, Any]]:
     """Use captured provider labels, literal T1299 anchors and Fraction only."""
     rows, original = monthly.source_expectations()
     anchors = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-t1299-reference.json").read_bytes()
+        (ROOT / "tests/data/sukuyo-t1299-reference.json").read_bytes()
     )["naoj_month_starts"]
     starts = {(r["basis"], r["date"]): r for r in rows}
 
@@ -265,7 +265,7 @@ def compare_case(row: dict[str, Any], result: dict[str, Any]) -> dict[str, Any]:
                     context["before_regular_fields"],
                 )
                 anchors = json.loads(
-                    (ROOT / "tests/fixtures/sukuyo-t1299-reference.json").read_bytes()
+                    (ROOT / "tests/data/sukuyo-t1299-reference.json").read_bytes()
                 )["naoj_month_starts"]
 
                 def first(fields: list[Any]) -> str:

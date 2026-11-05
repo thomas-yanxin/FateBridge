@@ -233,7 +233,7 @@ def test_independent_2026_cohort_retains_date_precision_limits(mode, monkeypatch
 def test_source_parser_rejects_omitted_rows_and_the_frozen_bundle_rejects_tampering(
     tmp_path,
 ):
-    source = (ROOT / "tests/fixtures/ziwei_independent/hko/T2026c.txt").read_text(
+    source = (ROOT / "tests/data/ziwei_independent/hko/T2026c.txt").read_text(
         encoding="utf-8-sig"
     )
     with pytest.raises(ValueError, match="missing"):

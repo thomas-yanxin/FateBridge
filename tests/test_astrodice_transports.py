@@ -14,6 +14,7 @@ from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
+from tests.fixtures.mcp_receipt import verified_inline_business
 
 SPEC = next(spec for spec in CATALOG if spec.key == "otherbu")
 FACES = {"planet": "☊", "sign": "处女座", "house": 11}
@@ -151,7 +152,7 @@ def test_actual_reference_points_project_across_three_transports(
                 },
             )
             assert not result.is_error
-            return result.structured_content
+            return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
     flags = ["otherbu"]
@@ -224,7 +225,7 @@ def test_i7_natural_assignment_and_unknown_chart_sect_project_across_three_trans
                 },
             )
             assert not result.is_error
-            return result.structured_content
+            return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
     flags = ["otherbu"]
@@ -520,7 +521,7 @@ def test_joy_and_self_dispositor_fields_project_on_all_surfaces(rest, capsys):
                 "otherbu", {**inputs, "fields": fields, "strict_fields": True}
             )
             assert not result.is_error
-            return result.structured_content
+            return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
     assert (
@@ -586,7 +587,7 @@ def test_pole_convention_projects_across_three_transports(
                 "otherbu", {**inputs, "fields": fields, "strict_fields": True}
             )
             assert not result.is_error
-            return result.structured_content
+            return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
     flags = ["otherbu"]
@@ -640,7 +641,7 @@ def test_horizon_degeneracy_projects_across_three_transports(
                 "otherbu", {**inputs, "fields": fields, "strict_fields": True}
             )
             assert not result.is_error
-            return result.structured_content
+            return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
     flags = ["otherbu"]
@@ -709,7 +710,7 @@ def test_rotation_phase_policy_and_angles_project_across_three_transports(
                 "otherbu", {**inputs, "fields": fields, "strict_fields": True}
             )
             assert not result.is_error
-            return result.structured_content
+            return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
     flags = ["otherbu"]
@@ -786,7 +787,7 @@ def test_sky_formula_provenance_projects_on_all_surfaces(rest, capsys):
                 "otherbu", {**inputs, "fields": fields, "strict_fields": True}
             )
             assert not result.is_error
-            return result.structured_content
+            return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
     flags = ["otherbu"]
@@ -851,7 +852,7 @@ def test_triangle_assignment_and_conditional_roles_project_across_three_transpor
                 },
             )
             assert not result.is_error
-            return result.structured_content
+            return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
     assert (
@@ -957,7 +958,7 @@ def test_native_sidereal_method_and_offsets_project_without_losing_their_meaning
                 "otherbu", {**inputs, "fields": fields, "strict_fields": True}
             )
             assert not result.is_error
-            return result.structured_content
+            return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
     flags = ["otherbu"]
@@ -1094,7 +1095,7 @@ def test_conditional_triplicity_projects_without_selecting_sect(
                 "otherbu", {**inputs, "fields": fields, "strict_fields": True}
             )
             assert not result.is_error
-            return result.structured_content
+            return await verified_inline_business(client, result.structured_content)
 
     native = asyncio.run(invoke())
     assert (

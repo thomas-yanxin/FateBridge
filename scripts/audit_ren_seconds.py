@@ -13,8 +13,8 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-CORPUS = ROOT / "tests/fixtures/ren_seconds_v1"
-FREEZE_SHA = "9571df5d38c0f1b17af1b59d662de30435d018f7249d62909605535566b9ca82"
+CORPUS = ROOT / "tests/data/ren/second_boundary_inputs"
+FREEZE_SHA = "9593cb737bca892c8884ff5901c3a774449cdd0a6fed08fc742f7df6cc16bc35"
 
 
 def sha(p: Path) -> str:
@@ -164,7 +164,7 @@ def audit(profile: str, ephe: Path, details: Path) -> dict[str, Any]:
 
     assert Path(almanac.__file__).resolve() == ROOT / "src/fatebridge/core/almanac.py"
     roots = json.loads(
-        (ROOT / "docs/validation/liuyao-v23/full1800-reference.json").read_text()
+        (ROOT / "tests/data/solar/liuyao_de440_tt1800_2200.json").read_text()
     )["rows"]
     by_year = {y: [r for r in roots if r["year"] == y] for y in range(1800, 2201)}
     probes = {y: [r for r in data["rows"] if r["year"] == y] for y in range(1800, 2201)}

@@ -16,6 +16,7 @@ from fatebridge.core.metaphysics.ziwei import build_ziwei_chart, build_ziwei_hor
 from fatebridge.core.ziwei_rulesets import ziwei_ruleset_metadata
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
+from scripts.ziwei_conditional_inputs import synthetic_birth_clock
 from tests.fixtures.mcp_receipt import verified_inline_business
 
 
@@ -103,7 +104,7 @@ def test_leap_doujun_and_childhood_substitution_remain_unverified():
         audit._seed(1984, 4, 16, leap=True), "女", rule_profile="quanshu_v2_excerpt"
     )
     h = build_ziwei_horoscope(
-        nominal_age_basis="legacy_mixed_clock",
+        birth_seed=synthetic_birth_clock(int((c)["lunar_date"]["year"])),
         chart=c,
         gender="女",
         target_seed=audit._seed(1984),

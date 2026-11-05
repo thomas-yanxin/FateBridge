@@ -1,6 +1,5 @@
 """Solar rebase and chart use one physical TT and adopted UT1/GAST model."""
 
-import hashlib
 import json
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -13,24 +12,17 @@ from fatebridge.core.astro.iers_ut1 import use_ut1_source
 from fatebridge.core.astro.sensitivity import _sample_birth
 from fatebridge.core.astro.solar_rebase import solar_rebase_adjustment
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.reference_data import verify_source_files
 
-FIXTURE = Path(__file__).parent / "fixtures/western-solar-clock-coherence-v1"
+FIXTURE = Path(__file__).parent / "data/astro/solar_clock_coherence"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 
 
 def test_reference_precedes_candidate_and_reuses_original96_without_regrading():
-    seal = json.loads((FIXTURE / "reference-seal.json").read_text())
-    for name, digest in seal.items():
-        source = FIXTURE / (
-            "collector.py.txt" if name == "collect-reference.py" else name
-        )
-        assert hashlib.sha256(source.read_bytes()).hexdigest() == digest
+    verify_source_files(FIXTURE)
     assert len(REFERENCE["rows"]) == 112
     assert not REFERENCE["fatebridge_imported"]
     assert REFERENCE["shared_swiss_ephemeris_dynamics"]
-    assert json.loads((FIXTURE / "original96.json").read_text()) == json.loads(
-        (FIXTURE.parent / "western-solar-eot-ut1-v1/reference.json").read_text()
-    )
 
 
 @pytest.mark.parametrize("sampled", [False, True])

@@ -1,86 +1,12 @@
 """Actual native-selected roots, error closure and truthful source metadata."""
 
-import gzip
-import hashlib
 import json
 from datetime import datetime, timezone
-from pathlib import Path
 
 import pytest
 
 from fatebridge.core import almanac, solar_term_clock
 from fatebridge.utils.errors import EphemerisSourceError
-
-ROOT = Path(__file__).resolve().parents[1]
-STUDY = ROOT / "docs/validation/bazi-native-solar-point-v1"
-
-
-def read(name):
-    path = STUDY / name
-    assert (
-        hashlib.sha256(path.read_bytes()).hexdigest()
-        == path.with_suffix(".sha256").read_text().strip()
-    )
-    raw = (
-        gzip.decompress(path.read_bytes())
-        if path.suffix == ".gz"
-        else path.read_bytes()
-    )
-    return json.loads(raw)
-
-
-def test_all6391_requested_inputs_and_actual_selected_roots_are_retained():
-    before = read("native-control-before-first.json.gz")
-    after = read("native-control-after-second.json.gz")
-    reference = read("selected-reference-first.json.gz")
-    assert len(before["rows"]) == len(after["rows"]) == len(reference["rows"]) == 6391
-    counts = {
-        "normal": 0,
-        "unrepresentable_utc_label": 0,
-        "pre_atomic_policy_unadjudicated": 0,
-    }
-    for old, new, expected in zip(
-        before["rows"], after["rows"], reference["rows"], strict=True
-    ):
-        assert (
-            old["original_reference"]
-            == new["original_reference"]
-            == expected["original_reference"]
-        )
-        assert (
-            old["actual_selected_jd_tt"]
-            == new["actual_selected_jd_tt"]
-            == expected["actual_selected_jd_tt"]
-        )
-        counts[expected["selected_point_status"]] += 1
-        if expected["selected_point_status"] == "normal":
-            assert new["actual_datetime_utc"] == expected["expected_datetime_utc"]
-            details = new["provenance"]["solar_model_details"]
-            assert (
-                details["selected_crossing_jd_tt"] == expected["actual_selected_jd_tt"]
-            )
-            assert details["ephemeris_model"] == "moshier"
-            assert details["ephemeris_retflags"] == [4]
-            assert details["accuracy_certified"] is False
-        elif expected["selected_point_status"] == "unrepresentable_utc_label":
-            assert new["structured_error"]["issues"] == [
-                {
-                    "path": "runtime.solar_term_clock",
-                    "code": "solar_root_civil_unrepresentable",
-                }
-            ]
-            assert new["structured_error"]["status_code"] == 503
-    assert counts == {
-        "normal": 3931,
-        "unrepresentable_utc_label": 242,
-        "pre_atomic_policy_unadjudicated": 2218,
-    }
-    assert (
-        before["root_equals_requested_count"]
-        == after["root_equals_requested_count"]
-        == 5644
-    )
-    assert after["none_outcomes"] == 0
 
 
 @pytest.mark.parametrize(
@@ -117,20 +43,6 @@ def test_original_strict_source_error_is_preserved_not_wrapped(monkeypatch):
     with pytest.raises(EphemerisSourceError) as caught:
         solar_term_clock.native_solar_root_datetime(2451545.0)
     assert caught.value is error
-
-
-def test_all_actual_events_and_native_probe_changes_match_declared_clock_policy():
-    result = read("actual-assessment-first.json")
-    assert result["counts"]["actual_TT_points_checked"] == 576
-    assert result["counts"]["before_point_mismatch"] == 48
-    assert result["counts"]["after_point_mismatch"] == 0
-    assert result["counts"]["public_native_labels_changed"] == 48
-    assert result["counts"]["analytic_native_probe_labels_changed"] == 48
-    assert result["counts"]["unchanged_full_auto"] == 144
-    assert result["counts"]["unchanged_full_spk"] == 144
-    assert result["counts"]["same_run_private_native_receipts_checked"] == 288
-    assert not result["unexpected_delta_ids"]
-    assert not result["physical_clock_accuracy_certified"]
 
 
 def test_no_native_engine_and_no_crossing_keep_their_original_unverified_fallback(

@@ -48,6 +48,10 @@ class HumanDesignRequest(_DeferredModel):
         default=False,
         description="可选比较人格与实际88度太阳弧设计TT两个周期原点；须同时提供cycle_reference_datetime。人格主结果不改，设计原点仅为数学敏感性假设，未获原典优先性认证；完整保留两边交会及失败，不指定首末触优先或人生阶段。",
     )
+    compare_apparent_models: bool = Field(
+        default=False,
+        description="可选在原人格/设计TT比较Swiss重心状态、有限源太阳点质量偏折、ERFA光行差和IAU2006真黄道模型，并用该模型自己的太阳重求88度设计根及该根位置；需jpl额外依赖与重心文件。不替换原生激活或原生设计根，不证明原典优先；太阳盘内仅数学延拓，物理误差界未知。",
+    )
 
     @model_validator(mode="after")
     def _validate_clock(self) -> "HumanDesignRequest":

@@ -21,6 +21,7 @@ from .geomagnetic_inputs import GeomagneticReference
 from .layout_inputs import ElementAdjustment, FormObservation
 from .lingzheng_inputs import FixedLingzhengRequest
 from .numeric_inputs import FengshuiInput as _DeferredModel
+from .spatial_request import WorkstationLayoutInput
 from .surface_inputs import SurfaceConstraints, SurfaceLayout
 from .workstation_inputs import validate_review
 
@@ -197,9 +198,6 @@ class House(_DeferredModel):
             raise ValueError("宅向误差半径须同时提供 facing_degrees")
         if self.facing_degrees is not None and self.north_reference is None:
             raise ValueError("角度输入必须明确 north_reference")
-        # A legacy XuankongRequest can supply this same measurement's radius
-        # outside House. Public calculation requests perform the complete check
-        # after that surrounding context is available.
         if self.bearing_uncertainty_degrees is not None:
             self.check_sitting_trigram(self.bearing_uncertainty_degrees)
         return self
@@ -358,11 +356,8 @@ class BazhaiRequest(_DeferredModel):
     @model_validator(mode="after")
     def unique_ids(self) -> "BazhaiRequest":
         if self.house is not None:
-            natal = getattr(self, "xuankong", None)
-            legacy = natal.bearing_uncertainty_degrees if natal is not None else None
-            radius = self.house.bearing_uncertainty_degrees
             self.house.check_sitting_trigram(
-                radius if radius is not None else legacy or 0
+                self.house.bearing_uncertainty_degrees or 0
             )
         ids = [o.subject_id for o in self.occupants]
         context = getattr(self, "environmental_context", None)
@@ -775,13 +770,6 @@ class XuankongRequest(_DeferredModel):
         default=None,
         description="历史建成、入住或合资格大修定运的独立依据；查询日期不能代替",
     )
-    bearing_uncertainty_degrees: Optional[float] = Field(
-        default=None,
-        ge=0,
-        le=7.5,
-        allow_inf_nan=False,
-        description="兼容原玄空输入的宅向测量误差半径；优先在house.bearing_uncertainty_degrees声明共享事实，两处显式值须相等。合参同一宅向的此项误差也传递给八宅，不只限制玄空。跨山界或下/替卦阈值保留候选。",
-    )
     ruleset_id: Literal["xuankong_zhongzhou_v1"] = Field(
         default="xuankong_zhongzhou_v1",
         description="中州派玄空规则版本，误差跨边界保留候选",
@@ -801,12 +789,6 @@ class XuankongRequest(_DeferredModel):
             self.house is not None
             and self.house.bearing_uncertainty_degrees is not None
         ):
-            if (
-                self.bearing_uncertainty_degrees is not None
-                and self.bearing_uncertainty_degrees
-                != self.house.bearing_uncertainty_degrees
-            ):
-                raise ValueError("同一宅向的两处 bearing_uncertainty_degrees 必须一致")
             if self.house.bearing_uncertainty_degrees > 7.5:
                 raise ValueError("本玄空版本的宅向误差半径最多支持7.5度")
         if self.house is not None:
@@ -826,7 +808,7 @@ class XuankongRequest(_DeferredModel):
             and self.house.bearing_uncertainty_degrees is not None
         ):
             return self.house.bearing_uncertainty_degrees
-        return self.bearing_uncertainty_degrees or 0.0
+        return 0.0
 
 
 class LayoutConstraint(_DeferredModel):
@@ -1040,6 +1022,10 @@ def _context_roles(context: Optional[EnvironmentalContext]) -> Dict[str, set[str
 
 
 class AssessRequest(BazhaiRequest):
+    workstation_layout: Optional[WorkstationLayoutInput] = Field(
+        default=None,
+        description="带米制尺寸与显式参考系的工位几何、传统条件解释及有限候选搜索；单独输出workstation_layout_analysis，不默认开启桌面流派。照片/误差保持候选，动作沿用layout_constraints。",
+    )
     scene: Optional[Literal["workstation", "shared_rental", "home"]] = Field(
         default=None,
         description="工位/合租/家居场景；局部按九宫飞星、金锁优先审查，八宅命卦独立。未指定 methods 时按已有事实选层，显式列表优先。",
@@ -1160,6 +1146,7 @@ class AssessRequest(BazhaiRequest):
             and not self.form_observations
             and not self.surface_layouts
             and self.environmental_context is None
+            and self.workstation_layout is None
             and self.scene is None
         ):
             raise ValueError(
@@ -1210,6 +1197,97 @@ class AssessRequest(BazhaiRequest):
             raise ValueError("元素调节请求 ID 必须唯一")
         objects = {p.object_id for p in self.placements}
         known = objects | set(forms)
+        if self.workstation_layout is not None:
+            spatial = self.workstation_layout
+            scene = spatial.scene
+            desk_ids = {s.desk_id for s in scene.seats}
+            occupant_ids = {occupant.subject_id for occupant in self.occupants}
+            if any(
+                seat.subject_ids is not None and set(seat.subject_ids) - occupant_ids
+                for seat in scene.seats
+            ):
+                raise ValueError("实测工位subject_ids须引用本次明确提供的使用人")
+            desktop_ids = {s.desk_id for s in scene.desktops}
+            if desk_ids & (objects | set(forms)) or desktop_ids & set(surfaces):
+                raise ValueError(
+                    "实测工位的位置/形态/桌面由空间层负责；同一对象不能同时提交另一份位置或形态"
+                )
+            geometry_ids = {b.object_id for b in scene.bodies}
+            geometry_ids.update(o.object_id for o in scene.openings)
+            geometry_ids.update(i.object_id for d in scene.desktops for i in d.items)
+            if geometry_ids & (objects | set(forms)):
+                raise ValueError(
+                    "实测场景对象不能同时提交另一份位置/形态；候选关系须由自己的新几何重算"
+                )
+            known.update(geometry_ids)
+            if any(f.object_id in geometry_ids for f in self.features):
+                raise ValueError(
+                    "实测对象砂水分类用scene.bodies[].sand_water，方区由所选实测参考系计算，不重复提交features"
+                )
+            if any(c.object_id in geometry_ids for c in self.layout_alternatives):
+                raise ValueError(
+                    "实测对象候选通过workstation_layout.search提供，避免旧关系与新几何混用"
+                )
+            if self.environmental_context:
+                if any(
+                    set(floor.object_ids) & geometry_ids
+                    for floor in self.environmental_context.floors
+                ):
+                    raise ValueError(
+                        "实测对象的参考层级与中心由scene.compass独立确认，不叠加另一份floors坐标绑定"
+                    )
+                if any(
+                    observation.object_id in geometry_ids
+                    for observation in self.environmental_context.observations
+                ):
+                    raise ValueError(
+                        "实测对象的形态由场景重算，不继承旧environmental_context.observations"
+                    )
+                if {
+                    obj.object_id for obj in self.environmental_context.objects
+                } & geometry_ids:
+                    raise ValueError(
+                        "实测空间对象身份由scene负责，不同时提交environmental_context.objects中的另一份身份"
+                    )
+                if any(
+                    {r.source_object_id, r.target_object_id} & geometry_ids
+                    for r in self.environmental_context.interior_relations
+                ):
+                    raise ValueError(
+                        "实测对象的室内关系由空间层重算，不同时接受另一份关系判断"
+                    )
+                review = self.workstation_review
+                if review and (
+                    any(a.object_id in desk_ids for a in review.activities)
+                    or any(
+                        {r.entrance_id, r.desk_id, r.barrier_id} & geometry_ids
+                        for r in review.entry_barriers
+                    )
+                ):
+                    raise ValueError(
+                        "实测工位活动/入口关系由空间层负责，不重复提交作者观察"
+                    )
+            interpretation = self.xuankong.interpretation if self.xuankong else None
+            if (
+                interpretation
+                and spatial.evaluation_period is not None
+                and interpretation.current_period_number is not None
+                and spatial.evaluation_period != interpretation.current_period_number
+            ):
+                raise ValueError("工位评价运与明确的玄空评价运不得矛盾")
+            if scene.compass and scene.compass.chart_binding_confirmed:
+                for house in (
+                    self.house,
+                    self.xuankong.house if self.xuankong else None,
+                ):
+                    if (
+                        house
+                        and house.north_reference
+                        and house.north_reference != scene.compass.north_reference
+                    ):
+                        raise ValueError(
+                            "已绑定宅盘的图纸北基准须与宅向一致，不自动换算"
+                        )
         if self.environmental_context is not None:
             self.environmental_context.validate_references(
                 known | set(surfaces) | {f.object_id for f in self.features},

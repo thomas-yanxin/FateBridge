@@ -41,7 +41,6 @@ FIELDS = [
     ("models", "Occupant", "effective_birth_year"),
     ("models", "Occupant", "birth_at"),
     ("models", "XuankongInterpretationRequest", "current_period_number"),
-    ("models", "XuankongRequest", "bearing_uncertainty_degrees"),
     ("workstation_inputs", "EvaluationPeriod", "number"),
 ]
 

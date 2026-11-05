@@ -20,7 +20,7 @@ from .liuyao_growth import (
     metal_si_month_supported,
 )
 from .liuyao_metal_change import INTERNAL_KEY as OWN_SI_KEY
-from .liuyao_metal_change import back_control_condition
+from .liuyao_metal_change import back_control_condition, outgoing_blocker
 from .liuyao_metal_moving import moving_growth_qualified
 from .liuyao_month_break import day_value_exception, month_opposition_applies
 from .liuyao_moving_si import actor_reason
@@ -339,19 +339,20 @@ def build_classical_assessment(
             if (moving and relation in ("生爻", "比和")) or (
                 static_allowed and relation == "生爻"
             ):
-                (
-                    blocked_supports
-                    if oc.get("outgoing_obstructions")
-                    else possible_supports
-                ).append(
+                blocker = outgoing_blocker(oc)
+                (blocked_supports if blocker is True else possible_supports).append(
                     {
                         "location": "visible",
                         "position": op,
                         "branch": other["branch"],
                         "reason": (
                             "回头克来源暂不能作为向外生扶"
-                            if oc.get("outgoing_obstructions")
-                            else ("明暗动生扶" if moving else "全静旺爻相生")
+                            if blocker is True
+                            else (
+                                "本位金化巳的长生或回头克资格待审"
+                                if blocker is None
+                                else ("明暗动生扶" if moving else "全静旺爻相生")
+                            )
                         ),
                         "held": bool(oc["binding_cues"]),
                         "activity_pending": moving

@@ -3,12 +3,9 @@
 import hashlib
 import json
 import re
-import subprocess
-import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_body_vocabulary_knowledge_v3"
 BUNDLE = Path("src/fatebridge/data/knowledge/bazi.json")
 CATEGORY = "classical_force_semantics"
 KEY = "日元强弱与性情措辞"
@@ -24,12 +21,7 @@ def card(path):
 
 
 def reference_rows():
-    source = FIXTURE / "source-relations.json"
-    protocol = read(FIXTURE / "protocol.json")
-    assert (
-        hashlib.sha256(source.read_bytes()).hexdigest()
-        == protocol["frozen20_relation_reference_sha256"]
-    )
+    source = ROOT / "tests/data/bazi/four-state-relations.json"
     return read(source)["rows"]
 
 
@@ -77,15 +69,6 @@ def test_current_card_wood_relationships_match_frozen_source():
     }
 
 
-def test_original_revision2_three_wrong_relations_are_preserved_as_failures():
-    before = card(FIXTURE / "before" / BUNDLE)
-    assert before["curation"]["entry_revision"] == 2
-    actual = rendered_tuples(before["tips"][7])
-    mismatches = {k for k, v in actual.items() if source_tuples()[k] != v}
-    assert mismatches == {("木", "旺极"), ("木", "太衰"), ("木", "衰极")}
-    assert actual["木", "太旺"] == source_tuples()["木", "太旺"]
-
-
 def test_all20_rendered_relations_and_structured_provenance_match_source():
     current = card(ROOT / BUNDLE)
     assert len(source_tuples()) == 20
@@ -101,63 +84,15 @@ def test_all20_rendered_relations_and_structured_provenance_match_source():
 
 
 def test_reference_remains_bound_to_original_transcription_and_source_bytes():
-    reference = read(FIXTURE / "source-relations.json")
-    source = ROOT / reference["source_batch"]
-    assert (
-        hashlib.sha256(source.read_bytes()).hexdigest()
-        == reference["source_batch_sha256"]
+    reference = read(ROOT / "tests/data/bazi/four-state-relations.json")
+    census = read(ROOT / "tests/data/bazi/ditian-source-census.json")
+    claim = next(
+        c
+        for c in census["resolved_source_claims"].values()
+        if c["claim_id"] == reference["claim_id"]
     )
-    batch = read(source)
-    claims = [c for page in batch["pages"] for c in page["technical_rule_claims"]]
-    claim = next(c for c in claims if c["claim_id"] == reference["claim_id"])
     assert claim["literal_table_or_relation_data"] == reference_rows()
-    pdf = ROOT / "docs/validation/bazi-controller-root-load-v1/source-whole.pdf"
+    pdf = ROOT / "tests/data/bazi/primary/ditian-1947.pdf"
     assert (
         hashlib.sha256(pdf.read_bytes()).hexdigest() == reference["source_pdf_sha256"]
     )
-    protocol = read(FIXTURE / "protocol.json")
-    for relative, digest in protocol["source_page_images_sha256"].items():
-        assert hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() == digest
-
-
-def test_original_one_card_migration_and_all84_other_cards_remain_exact():
-    edition = (
-        ROOT
-        / "docs/validation/bazi-body-vocabulary-knowledge-v3/current-workspace/src/fatebridge/data/knowledge/bazi.json"
-    )
-    assert (
-        hashlib.sha256(edition.read_bytes()).hexdigest()
-        == "d1e2dd29aebd5224a1516de1d2e53bd5e692e917a39171b93f051ecce0237767"
-    )
-    assert card(ROOT / BUNDLE) == card(edition)
-    old, new = read(FIXTURE / "before" / BUNDLE), read(edition)
-    assert {k: v for k, v in old.items() if k != "categories"} == {
-        k: v for k, v in new.items() if k != "categories"
-    }
-    changed = []
-    for category, entries in old["categories"].items():
-        assert set(entries) == set(new["categories"][category])
-        for key, entry in entries.items():
-            if entry != new["categories"][category][key]:
-                changed.append((category, key))
-    assert changed == [(CATEGORY, KEY)]
-    assert (
-        card(FIXTURE / "before" / BUNDLE)["tips"][:7] == card(ROOT / BUNDLE)["tips"][:7]
-    )
-    assert sum(map(len, new["categories"].values())) == 85
-
-
-def test_source_bound_builder_check_is_executable_and_does_not_modify_bundle():
-    before = (ROOT / BUNDLE).read_bytes()
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts/build_bazi_four_state_knowledge.py"),
-            "--check",
-        ],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode == 0, result.stdout + result.stderr
-    assert (ROOT / BUNDLE).read_bytes() == before

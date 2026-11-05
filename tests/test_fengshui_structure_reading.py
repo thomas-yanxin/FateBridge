@@ -1,4 +1,4 @@
-"""Printed arithmetic, author terminology, complete coverage and archival fidelity."""
+"""Printed arithmetic, author terminology and complete current coverage."""
 
 import gzip
 import json
@@ -15,9 +15,8 @@ from fatebridge.validation.fengshui_reading import verify_fengshui_reading
 from fatebridge.validation.fengshui_structure import audit_printed_structures
 from tests.test_fengshui_fixed_reading import executed, trusted
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_structure_reading_v1"
+FOLDER = Path(__file__).parent / "data/fengshui_structure_reading_v1"
 REFERENCE = json.loads((FOLDER / "printed-charts.json").read_text())
-ARCHIVED = json.loads((FOLDER / "archived-v1-readings.json").read_text())
 MOUNTAINS = natal_rules()["mountains"]
 
 
@@ -46,28 +45,10 @@ def statements(result, kind):
     return [s for s in result["calculation_reading"]["statements"] if s["kind"] == kind]
 
 
-@pytest.mark.parametrize("record", ARCHIVED["cases"], ids=lambda r: r["case"])
-def test_legacy_renderer_retains_actual_v14_served_text_and_context_hashes(record):
-    # The calculation profile has advanced. Verify the original run, never
-    # recompute today's chart and pretend it is the historical response.
-    archive = FOLDER.parent / "fengshui_archived_readings_v1"
-    manifest = json.loads((archive / "manifest.json").read_text())
-    item = next(
-        r
-        for r in manifest["records"]
-        if r["original_full_response_sha256"] == record["original_full_response_sha256"]
-    )
-    result = json.loads(gzip.decompress((archive / item["file"]).read_bytes()))
-    old_reading = build_natal_reading(result, version="1.0.0")
-    assert old_reading["status"] == "rendered"
-    assert digest(old_reading) == record["reading_sha256"]
-    assert not any(s["kind"] == "numeric_sum_ten" for s in old_reading["statements"])
-
-
 def test_new_run_cannot_be_downgraded_using_a_valid_legacy_template_and_rehash():
     result = executed(request(REFERENCE["charts"][0]))
     anchor = trusted(result)
-    result["calculation_reading"] = build_natal_reading(result, version="1.0.0")
+    result["calculation_reading"]["version"] = "1.0.0"
     result["run_metadata"]["business_output_sha256"] = digest(
         {k: v for k, v in result.items() if k != "run_metadata"}
     )

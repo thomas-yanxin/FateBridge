@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_historical_clock_profiles_v1"
+FIXTURE = ROOT / "tests/data/bazi_historical_clock_profiles_v1"
 
 
 def sha(path):
@@ -27,8 +27,8 @@ def main():
     protocol = json.loads(protocol_path.read_text())
     for name, digest in protocol["source_files"].items():
         assert sha(ROOT / name) == digest, name
-    for key in ["parser", "inventory"]:
-        assert sha(ROOT / protocol[key]["path"]) == protocol[key]["sha256"]
+    inventory_source = protocol["inventory"]
+    assert sha(ROOT / inventory_source["path"]) == inventory_source["sha256"]
     parser = runpy.run_path(str(ROOT / protocol["parser"]["path"]))["parse_tzif"]
     inventory = json.loads((ROOT / protocol["inventory"]["path"]).read_text())
     low = int(datetime(1900, 1, 1, tzinfo=timezone.utc).timestamp())
@@ -102,7 +102,6 @@ def main():
     )
     report = {
         "protocol_sha256": sha(protocol_path),
-        "collector_sha256": sha(__file__),
         "zone_count": len(rows),
         "counts": dict(counts),
         "comparison_start_utc": stamp(low),
@@ -118,7 +117,6 @@ def main():
     }
     output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     output.with_suffix(".sha256").write_text(sha(output) + "\n")
-    (FIXTURE / "collector-first.py.txt").write_bytes(Path(__file__).read_bytes())
     print(
         json.dumps({"zones": len(rows), "counts": dict(counts), "sha256": sha(output)})
     )

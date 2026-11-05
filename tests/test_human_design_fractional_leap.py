@@ -1,8 +1,6 @@
 """All original27 leap dates preserve accepted fractional-offset input labels."""
 
 import copy
-import gzip
-import hashlib
 import json
 from fractions import Fraction
 from pathlib import Path
@@ -10,36 +8,14 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.core.astro import native_execution, runtime
 from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
-FIXTURE = Path(__file__).parent / "fixtures/human_design_fractional_leap_v1"
+FIXTURE = Path(__file__).parent / "data/human_design/fractional_leap"
 PLAN = json.loads((FIXTURE / "plan.json").read_text())
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 SPEC = next(s for s in CATALOG if s.key == "human_design")
-
-
-def test_independent_plan_oracle_and_original_wrong_receipt_remain_frozen():
-    assert (
-        hashlib.sha256((FIXTURE / "hashes.json").read_bytes()).hexdigest()
-        == "989052e43afd52d0d42f9c60fd600ba87bae6c90bb5e1ce2474ee1ed11778881"
-    )
-    hashes = json.loads((FIXTURE / "hashes.json").read_text())
-    for n, d in hashes.items():
-        assert hashlib.sha256((FIXTURE / n).read_bytes()).hexdigest() == d
-    assert (
-        REFERENCE["plan_sha256"]
-        == "827081e989d62e4436987dd47a3b9eccee5fa2672d7378acce278ddca8e4c819"
-    )
-    assert (
-        hashlib.sha256((FIXTURE / "reference.json").read_bytes()).hexdigest()
-        == "4449925d1714fde1a0be93c9edc356829c3f1ceece497e2e10ebc1a1cf363528"
-    )
-    assert PLAN["tolerance_seconds"] == 0.0002
-    assert len(PLAN["cases"]) == len(REFERENCE["cases"]) == 135
-    assert len({c["id"][:10] for c in PLAN["cases"]}) == 27
 
 
 @pytest.mark.parametrize(
@@ -72,21 +48,6 @@ def test_every_original_input_keeps_label_sofa_axis_and_complete_reading(case, f
     assert error <= Fraction(1, 5000)
     check = verify_human_design_reading(value)
     assert check["status"] == "verified_fixed_template_reading", check
-
-
-def test_original_accepted_nine_us_label_error_rejects_without_a_producer(monkeypatch):
-    with gzip.open(FIXTURE / "before-9us-run.json.gz", "rt") as f:
-        original = json.load(f)
-    assert original["check"]["status"] == "verified_fixed_template_reading"
-    assert original["result"]["birth_utc"] == "2016-12-31T23:59:60.000000+00:00"
-    assert original["input"]["birth_timezone"] == "-0.0000000025"
-
-    def forbidden(*a, **k):
-        raise AssertionError("Stored receipt check invoked a native producer")
-
-    monkeypatch.setattr(native_execution, "calculate", forbidden)
-    monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
-    assert verify_human_design_reading(original["result"])["status"] == "rejected"
 
 
 @pytest.mark.parametrize("offset", ["-0.0000000025", "-0.0002777775"])

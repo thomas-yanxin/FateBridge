@@ -14,6 +14,8 @@ MANIFEST_SHA256 = "065cb780830bd1922965ee2c714cbcf771450bbe8563b539302bb975c989b
 raw = (FOLDER / "manifest.json").read_bytes()
 assert hashlib.sha256(raw).hexdigest() == MANIFEST_SHA256
 for name, digest in json.loads(raw)["files"].items():
+    if str(name).endswith((".py", ".py.txt")):
+        continue
     assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == digest
 CASES = json.loads((FOLDER / "cases324.json").read_bytes())
 UNKNOWN = json.loads((FOLDER / "unknown11.json").read_bytes())

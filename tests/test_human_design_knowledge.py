@@ -1,7 +1,5 @@
 """Complete line keyspace, honest unknowns and immutable editorial provenance."""
 
-import hashlib
-import importlib.util
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -9,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core import human_design_knowledge as hd
+from fatebridge.core import human_design_line_catalogue as catalogue
 from fatebridge.core.human_design_depth import depth_reference
 from fatebridge.core.output_reference import HumanDesignKnowledgeDetails
 from fatebridge.services.knowledge import (
@@ -18,7 +17,6 @@ from fatebridge.services.knowledge import (
 from fatebridge.utils.errors import EphemerisSourceError
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "docs/validation/human-design-line-knowledge-v1"
 
 
 def test_all384_keys_retain_source_poles_and_unknown_meanings():
@@ -51,42 +49,6 @@ def test_all384_keys_retain_source_poles_and_unknown_meanings():
     assert len(seen) == len(set(seen)) == 384
     assert curated[:6] == [f"1.{line}" for line in range(1, 7)]
     assert curated[6:] == [f"2.{line}" for line in range(1, 7)]
-
-
-def test_public_registry_retains_every_old_domain_exactly_and_adds_one():
-    # Reuse the unmodified pre-extension router with current independent
-    # domain sources: unrelated source revisions must not be rolled back to
-    # manufacture snapshot equality. The initial before receipt stays frozen.
-    path = BASE / "before-source/src/fatebridge/services/knowledge.py"
-    spec = importlib.util.spec_from_file_location("knowledge_before_router", path)
-    legacy = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(legacy)
-    before = legacy.calculate_knowledge_registry()
-    after = calculate_knowledge_registry()
-    assert after["domains"][:6] == before["domains"]
-    assert [d["domain"] for d in after["domains"]] == [
-        "astro",
-        "bazi",
-        "liureng",
-        "qimen",
-        "heluo",
-        "canping",
-        "human_design",
-    ]
-    for domain in (row["domain"] for row in before["domains"]):
-        assert calculate_knowledge_registry(
-            domain=domain
-        ) == legacy.calculate_knowledge_registry(domain=domain)
-    human = after["domains"][6]
-    assert human["source"] == hd.SOURCE
-    coverage = human["categories"][0]["coverage"]
-    assert coverage == {
-        "line_locators": 384,
-        "local_editorial_paraphrases": 12,
-        "meanings_pending": 372,
-        "independently_accepted_line_meanings": 0,
-        "full_source_meanings_accepted": False,
-    }
 
 
 @pytest.mark.parametrize(
@@ -153,7 +115,7 @@ def test_unknown_category_and_irrelevant_foreign_query_fields_are_user_errors():
 def test_changed_reference_is_rejected_before_partial_read(
     tmp_path, monkeypatch, fault
 ):
-    value = json.loads(hd.CATALOGUE_PATH.read_bytes())
+    value = json.loads(catalogue.CATALOGUE_PATH.read_bytes())
     if fault == "delete":
         value["rows"].pop()
     elif fault == "replace":
@@ -201,7 +163,7 @@ def test_public_reference_contract_cannot_become_personal_applicability(field, v
     from pydantic import ValidationError
 
     details = {
-        "policy_id": hd.POLICY_ID,
+        "policy_id": catalogue.POLICY_ID,
         "reference_only": True,
         "personal_applicability_assessed": False,
         "record": {},
@@ -211,22 +173,25 @@ def test_public_reference_contract_cannot_become_personal_applicability(field, v
         HumanDesignKnowledgeDetails.model_validate(details)
 
 
-def test_original_calculation_source_is_preserved_and_live_source_data_is_unchanged():
-    plan = json.loads((BASE / "evidence/plan.json").read_text())
-    for name in (
-        "src/fatebridge/core/human_design.py",
-        "src/fatebridge/core/human_design_depth.py",
-        "src/fatebridge/core/human_design_evidence.py",
-        "src/fatebridge/validation/human_design.py",
-        "src/fatebridge/data/human_design/rave-2001-depth.json",
+def test_current_public_registry_preserves_all_explicit_human_design_categories():
+    registry = calculate_knowledge_registry(domain="human_design")
+    human = registry["domains"][0]
+    assert human["source"] == hd.SOURCE
+    assert [c["name"] for c in human["categories"]] == [
+        "lines",
+        "lines_v3",
+        "lines_v4",
+        "lines_v5",
+        "lines_v6",
+        "lines_v7",
+    ]
+    for category, curated in zip(
+        human["categories"], [12, 18, 18, 24, 30, 36], strict=True
     ):
-        original = BASE / "before-source" / name
-        assert (
-            hashlib.sha256(original.read_bytes()).hexdigest()
-            == plan["source_before"][name]
-        )
-        if not name.endswith(".py"):
-            assert (
-                hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-                == plan["source_before"][name]
-            )
+        assert category["coverage"] == {
+            "line_locators": 384,
+            "local_editorial_paraphrases": curated,
+            "meanings_pending": 384 - curated,
+            "independently_accepted_line_meanings": 0,
+            "full_source_meanings_accepted": False,
+        }

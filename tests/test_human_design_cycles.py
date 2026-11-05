@@ -19,7 +19,7 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_cycle_reference import independent_cycle_checks
 from tests.ephemeris_case_runtime import native_ephemeris_files
-from tests.golden.runner import golden_ephemeris
+from tests.ephemeris_context import moshier_ephemeris
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = next(s for s in CATALOG if s.key == "human_design")
@@ -98,7 +98,7 @@ def test_omission_never_reads_now_or_runs_the_cycle_sampler(monkeypatch):
 
 
 def test_empty_installation_preserves_planets_and_reports_missing_chiron():
-    with golden_ephemeris():
+    with moshier_ephemeris():
         result = calculate_human_design(
             **INPUT, cycle_reference_datetime="2029-07-01T00:00:00Z"
         )

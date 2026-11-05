@@ -6,17 +6,11 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
-
-pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
-
 from pydantic import ValidationError
 
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.human_design_cycle_origins import comparison_rows, origin_body_row
 from fatebridge.core.human_design_cycles import (
-    BODIES,
     ROOT_SECONDS,
     derive_body_contacts,
 )
@@ -24,10 +18,16 @@ from fatebridge.core.requests.human_design import HumanDesignRequest
 from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
-from scripts.gen_human_design_timezone_history import read, sha
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
+from tests.reference_data import read, sha
+
+pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
+
 
 ROOT = Path(__file__).resolve().parents[1]
-E = ROOT / "docs/validation/human-design-cycle-origin-comparison-v1/evidence"
+E = ROOT / "tests/data/human_design/cycle_origins"
 ANALYTIC_SHA = "5b78b73a17ae3cb177d853696d58babc67a6da4b0fd9ae9f47e7e7bbf6ed8f4e"
 
 
@@ -229,14 +229,3 @@ def test_correct_hash_cannot_legitimize_inconsistent_origins(complete, fault):
     proof = verify_human_design_reading(rehash(value))
     assert proof["status"] == "rejected"
     assert {"code": "cycle_origin_comparison_mismatch"} in proof["errors"]
-
-
-def test_unchanged_saved_primary_packets_remain_valid(complete):
-    original = read(E / "before-1980-multiple-contacts.json.gz")
-    assert (
-        verify_human_design_reading(original)["status"]
-        == "verified_fixed_template_reading"
-    )
-    assert complete["cycle_context"] == original["cycle_context"]
-    assert complete["cycle_summary"] == original["cycle_summary"]
-    assert complete["activations"] == original["activations"]

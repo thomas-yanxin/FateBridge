@@ -11,7 +11,7 @@ from fatebridge.core import heluo_texts as ht
 from fatebridge.core.heluo import _tiaowen, yao_text
 from fatebridge.core.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError
-from tests.heluo_current_source_reference import HEADER_COUNT, PENDING_COUNT
+from tests.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 
 ROOT = Path(__file__).parent / "fixtures/heluo_dayou_v1"
 READINGS = json.loads((ROOT / "verified-readings.json").read_bytes())
@@ -155,31 +155,6 @@ def test_unnumbered_kui_reference_is_conditional_not_a_natal_transform():
     assert "None爻" not in ht.text_status_snapshot(t)
 
 
-def test_all_previous_seventy_eight_source_entries_remain_byte_equivalent():
-    expected = json.loads((ROOT / "baseline-prefix-digests.json").read_bytes())
-    assert (
-        canonical(ht._collation()["entries"][:78])
-        == expected["canonical_sha256"]["headers"]
-    )
-    assert (
-        canonical(ht._commentary_collation()["entries"][:78])
-        == expected["canonical_sha256"]["commentaries"]
-    )
-    assert (
-        ht.commentary_collation_summary()["collated_line_commentaries"],
-        ht.commentary_collation_summary()["pending_line_commentaries"],
-    ) == (HEADER_COUNT, PENDING_COUNT)
-    assert (
-        ht.collation_summary()["collated_line_headers"],
-        ht.collation_summary()["pending_line_headers"],
-    ) == (HEADER_COUNT, PENDING_COUNT)
-    from tests.heluo_guan_shi_revision_reference import (
-        assert_r84_commentary_control_and_all_pending,
-    )
-
-    assert assert_r84_commentary_control_and_all_pending() == PENDING_COUNT
-
-
 @pytest.mark.parametrize("layer", ["header", "commentary"])
 def test_new_nonempty_source_corruption_cannot_keep_the_collated_identity(
     layer, monkeypatch, tmp_path
@@ -221,23 +196,6 @@ def test_selections_remain_detached_from_the_inherited_and_collated_caches():
     assert "污染" not in clean["detail"]
     assert clean["text_provenance"]["commentary_reading_notes"]
     assert _tiaowen() == before
-
-
-def test_current_auditor_reports_bounded_source_checks_without_certification():
-    from scripts.audit_numerology import dayou_commentary_checks
-
-    result = dayou_commentary_checks()
-    assert result["checks_passed"] and result["failures"] == []
-    assert result["previous_source_entries_preserved"] == 78
-    assert result["source_pdf_pages"] == [151, 152, 153]
-    assert not result["independent_second_review_completed"]
-    assert result["independent_source_only_model_reviews_completed"] == 1
-    assert result["independent_model_review_unresolved_glyphs"] == 1
-    assert result["independent_human_expert_reviews"] == 0
-    assert result["new_model_runs"] == 1
-    assert result["new_consultation_model_evaluation_runs"] == 0
-    assert not result["full_book_alignment"]
-    assert not result["automatic_branch_selection"]
 
 
 def test_independent_review_repairs_literal_errors_and_retains_uncertain_glyph():

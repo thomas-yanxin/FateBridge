@@ -12,7 +12,7 @@
 - relationship (人际)
 
 分值是本模块按固定权重生成的文化参考指标，不是现实成功概率。
-没有对应信号时使用中性值 50；未知性别不推断爱情维度的性别加成。
+已知零计数与其他计数使用同一连续标度；未知性别的爱情维度为null。
 
 十神 → 维度映射（gender-aware）：
 - 比肩 / 劫财  →  人际
@@ -27,12 +27,14 @@ from __future__ import annotations
 import math
 from typing import Dict, Mapping, Optional, Tuple
 
+from ..core.method_contracts import LIFE_DIMENSION_INDEX
 from ..utils.data import BRANCH_HIDDEN_STEMS, TenGod, get_ten_god, normalize_gender
 
 PillarMap = Mapping[str, Tuple[str, str]]
 """柱位映射: {label: (stem, branch)}, 例如 {"year": ("丙", "午")}"""
 
 DIMENSION_KEYS = ("love", "wealth", "career", "learning", "relationship")
+LIFE_DIMENSION_METHOD = LIFE_DIMENSION_INDEX.method_id
 
 # 各时间层柱在当前时刻的影响权重
 # （本命柱固定为 1.0，下表只覆盖时间柱）
@@ -53,7 +55,7 @@ class LifeDimensionAnalysis:
         birth_pillars: PillarMap,
         current_pillars: Optional[PillarMap] = None,
         gender: Optional[str] = None,
-    ) -> Dict[str, float]:
+    ) -> Dict[str, Optional[float]]:
         """
         计算五维生命维度分值。
 
@@ -63,12 +65,11 @@ class LifeDimensionAnalysis:
             current_pillars: 当前时间各层柱，子集即可，可选键
                 ``"dayun" / "liunian" / "liuyue" / "liuri" / "liushi"``。
                 None 或空字典时只使用本命基线。
-            gender: ``"male" / "female" / "男" / "女"`` 等。None 时不做性别加成
-                （爱情维度回归到中性 50）。
+            gender: ``"male" / "female" / "男" / "女"`` 等。未知时爱情维度为空。
 
         Returns:
             ``{"love": float, "wealth": float, "career": float,
-              "learning": float, "relationship": float}``，每个值在 0-100 之间。
+              "learning": float, "relationship": float}``，已计算值在0–100之间。
         """
         if "day" not in birth_pillars:
             raise ValueError("birth_pillars 必须包含 'day' 柱以确定日主")
@@ -87,7 +88,11 @@ class LifeDimensionAnalysis:
         )
 
         return {
-            key: round(LifeDimensionAnalysis._normalize_to_score(raw[key]), 1)
+            key: (
+                None
+                if key == "love" and normalize_gender(gender) not in {"male", "female"}
+                else round(LifeDimensionAnalysis._normalize_to_score(raw[key]), 1)
+            )
             for key in DIMENSION_KEYS
         }
 
@@ -134,10 +139,7 @@ class LifeDimensionAnalysis:
         *,
         weight: float,
     ) -> None:
-        try:
-            ten_god = get_ten_god(day_stem, other_stem)
-        except (KeyError, ValueError):
-            return
+        ten_god = get_ten_god(day_stem, other_stem)
         counts[ten_god] += weight
 
     @staticmethod
@@ -182,7 +184,7 @@ class LifeDimensionAnalysis:
             raw["love"] += wealth * 0.6
         elif norm_gender == "female":
             raw["love"] += officer * 0.6
-        # 未知性别保持 0，归一化后落在 50 中性
+        # 未知性别的爱情维度由调用处保留为null，不把它当作零计数。
 
         return raw
 
@@ -191,11 +193,8 @@ class LifeDimensionAnalysis:
         """
         将原始十神计数映射到 0-100 区间。
 
-        零信号使用中性 50；非零信号保留既有 tanh 标度，以 raw=3.0 为中位。
-        缺信号与计数偏低是不同情况，不将缺失信息解释为低分。
+        已知计数统一沿用以raw=3.0为中位的tanh标度；缺失在调用处单独处理。
         """
-        if raw_value == 0:
-            return 50.0
         centered = raw_value - 3.0
         score = 50.0 + 50.0 * math.tanh(centered / 3.0)
         # 软夹紧到 [0, 100]

@@ -12,7 +12,7 @@ from fatebridge.core.sukuyo_waterclock import (
     source_specific_time_reference,
 )
 
-FIXTURE = Path(__file__).parent / "fixtures/sukuyo-daybreak-before-production-v75.json"
+FIXTURE = Path(__file__).parent / "data/sukuyo-daybreak-before-production-v75.json"
 
 
 def test_new_source_layer_matches_entire_before_code_reference():

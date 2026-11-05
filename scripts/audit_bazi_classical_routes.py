@@ -11,7 +11,7 @@ from typing import Any
 from fatebridge.core.bazi_evidence import build_natal_evidence
 
 ROOT = Path(__file__).resolve().parents[1]
-REFERENCE = ROOT / "tests/fixtures/bazi_classical_routes_v1/reference.json"
+REFERENCE = ROOT / "tests/data/bazi_classical_routes_v1/reference.json"
 
 
 def audit() -> dict[str, Any]:

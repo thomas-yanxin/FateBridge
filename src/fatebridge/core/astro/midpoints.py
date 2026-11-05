@@ -513,7 +513,7 @@ def build_midpoint_analysis(
             "hypothetical_model": "Swiss Ephemeris fictitious elements; external seorbel.txt may override defaults",
             "aries_point": "tropical equinox transformed to the selected display zodiac",
             "node_mode": "mean",
-            "legacy_view": "top-level midpoints/midpoint_aspects: seven-planet 360-degree view from unrounded coordinates",
+            "seven_planet_view": "top-level midpoints/midpoint_aspects: seven-planet 360-degree view from unrounded coordinates",
             "sensitive_point_policy": "midpoint period/orb multiplied by two in sum form; full-circle direct occupancy assessed separately",
             **{
                 key: value

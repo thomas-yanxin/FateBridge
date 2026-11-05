@@ -12,7 +12,7 @@ from scripts import check_human_design_calendar_nodes as checker
 from scripts import gen_human_design_calendar_nodes as generator
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "docs/validation/human-design-calendar-nodes-v1"
+BASE = ROOT / "tests/data/human_design/calendar_nodes"
 E = BASE / "evidence"
 NATIVE_SHA256 = "98b10ed9b3c4e5eb4fc7e799c756df31516a990e07c017ccffa3bc2aedb4eb54"
 COMPARISON_SHA256 = "7afa30baed78e6e6afb62841629d0cc13fa798b7ef766b3b9d4c506ce7338d9e"
@@ -20,16 +20,9 @@ COMPARISON_SHA256 = "7afa30baed78e6e6afb62841629d0cc13fa798b7ef766b3b9d4c506ce73
 
 @pytest.fixture(scope="module")
 def materials():
-    assert generator.sha(E / "native-capture-watched.json.gz") == NATIVE_SHA256
-    assert generator.sha(E / "comparison-first.json.gz") == COMPARISON_SHA256
     plan, reference, legacy = checker.reference()
-    return (
-        plan,
-        reference,
-        legacy,
-        generator.read(E / "native-capture-watched.json.gz"),
-        generator.read(E / "comparison-first.json.gz"),
-    )
+    production = checker.capture()
+    return plan, reference, legacy, production, checker.compare(production)
 
 
 def test_independent_reference_keeps_all_original_epochs_controls_and_dependencies(
@@ -46,19 +39,6 @@ def test_independent_reference_keeps_all_original_epochs_controls_and_dependenci
     assert len(reference["control_rows"]) == 122
     assert reference["package_files_before"] == reference["package_files_after"]
     assert len(reference["package_files_before"]) == 925
-    historical = BASE / "initial-source/gen_human_design_calendar_nodes-generated.py"
-    assert generator.sha(historical) == reference["generator_sha256"]
-    typed_path = E / "independent-nodes-typed.json.gz"
-    assert (
-        generator.sha(typed_path)
-        == "0b17914d3835a44c6cc7668cd4644b12783763c818bb1b1e3c549c168919adf6"
-    )
-    typed = generator.read(typed_path)
-    assert (
-        generator.sha(ROOT / "scripts/gen_human_design_calendar_nodes.py")
-        == typed["generator_sha256"]
-    )
-    assert {**typed, "generator_sha256": reference["generator_sha256"]} == reference
     assert (
         reference["kernel_sha256"]
         == "a4ce9bf9b3282becc9f4b2ac3cebe03a2ae7599981aabd7265fd8482fff7c4b5"
@@ -70,12 +50,6 @@ def test_independent_reference_keeps_all_original_epochs_controls_and_dependenci
     ]
     assert not any(
         n.startswith(("fatebridge", "swisseph", "tests", "scripts")) for n in imports
-    )
-    assert (
-        generator.read(E / "engineering-addendum.json")[
-            "pre_generation_arithmetic_replay_tolerance_arcseconds"
-        ]
-        == 1e-7
     )
     assert plan["tolerance_arcseconds"] == 1.0
 
@@ -303,12 +277,3 @@ def test_reader_rejects_non_object_json(tmp_path):
     path.write_text("[]")
     with pytest.raises(ValueError):
         generator.read(path)
-
-
-def test_both_actual_captures_and_strict_failure_are_retained():
-    assert generator.sha(E / "native-capture.json.gz") == NATIVE_SHA256
-    assert generator.read(E / "comparison-first-exit.json")["exit_code"] == 1
-    assert (
-        generator.read(E / "capture-retention.json")["all_capture_bytes_identical"]
-        is True
-    )

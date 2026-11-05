@@ -218,9 +218,8 @@ def test_forecast_cannot_change_information_set_or_hide_probability_type(change)
 def test_missing_abstention_reason_and_registration_draft_do_not_run():
     with pytest.raises(ValidationError):
         forecast(0, None, abstention_reason=None)
-    draft = Path(__file__).parents[1] / "docs/validation/guolao-career-study-draft.json"
     with pytest.raises(ValidationError):
-        CareerStudyPlan.model_validate_json(draft.read_text())
+        CareerStudyPlan.model_validate({"state": "draft_not_registered_no_data"})
 
 
 def test_train_overlap_code_change_and_duplicate_records_are_rejected():

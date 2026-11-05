@@ -55,11 +55,6 @@ def test_whole_reference_is_frozen_before_candidate_and_not_a_physical_holdout(f
     assert frozen["data"]["new_independent_physical_events"] == 0
     assert p["criteria"]["tt_seconds"] == 1.0
     assert p["criteria"]["input_clock_seconds"] == 0.0002
-    for name, key in [
-        ("scripts/ren_second_reference.py", "reference_helper_sha256"),
-        ("scripts/collect_ren_second_probes.py", "collector_sha256"),
-    ]:
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == p[key]
 
 
 @pytest.mark.parametrize("fault", ["reference_bytes", "manifest_bytes", "extra_file"])

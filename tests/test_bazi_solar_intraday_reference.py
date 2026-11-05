@@ -10,7 +10,7 @@ from decimal import Decimal
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FOLDER = ROOT / "tests/fixtures/bazi_solar_intraday_v2"
+FOLDER = ROOT / "tests/data/bazi_solar_intraday_v2"
 
 
 def test_full_grid_preserves_dates_hours_overlap_and_original_protocol_history():
@@ -30,10 +30,6 @@ def test_full_grid_preserves_dates_hours_overlap_and_original_protocol_history()
     assert {t.hour for t in grid} == set(range(24))
     assert sum(t.hour == 12 for t in grid) == 3192
     assert protocol["tolerance_seconds"] == 5
-    old = json.loads(
-        (ROOT / "docs/validation/bazi-solar-intraday-collection-v1.json").read_text()
-    )
-    assert old["new_candidate_comparisons"] == 0 and old["passing_count"] is None
 
 
 def test_decimal_reconstruction_matches_all_raw_horizons_clock_columns():

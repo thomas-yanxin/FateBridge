@@ -14,7 +14,6 @@ from tests.test_liuyao_clash_transports import all_surfaces
 from tests.test_liuyao_roles import classical
 from tests.test_liuyao_transports import assert_same_run_receipt
 
-pytest_plugins = ["tests.test_agentic_nested_outputs"]
 BASE = Path(__file__).parent / "fixtures/liuyao_explanation_v30"
 CASES = json.loads((BASE / "cases.json").read_text())["cases"]
 

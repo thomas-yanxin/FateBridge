@@ -11,9 +11,10 @@ from tests.test_agentic_nested_outputs import (
     business,
     call_cli,
     native,
-    rest,
 )
-from tests.test_result_delivery import reconstruct, store
+from tests.test_agentic_nested_outputs import rest as _shared_rest
+from tests.test_result_delivery import reconstruct
+from tests.test_result_delivery import store as _shared_store
 
 PAYLOAD = dict(
     birth_year=1990,
@@ -29,6 +30,10 @@ PAYLOAD = dict(
     analysis_day=20,
     analysis_hour=12,
 )
+
+
+rest = _shared_rest
+store = _shared_store
 
 
 @pytest.mark.parametrize("view", ["roots", "stem_roots"])

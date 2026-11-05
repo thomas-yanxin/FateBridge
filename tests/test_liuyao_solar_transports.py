@@ -8,8 +8,6 @@ from fatebridge.core.almanac import get_solar_terms_for_year
 from tests.test_liuyao_clash_transports import all_surfaces
 from tests.test_liuyao_transports import assert_same_run_receipt
 
-pytest_plugins = ["tests.test_agentic_nested_outputs"]
-
 
 @pytest.mark.parametrize("offset", [-1, 0])
 def test_fractional_boundary_clock_on_all_surfaces(offset, rest, tmp_path, capsys):

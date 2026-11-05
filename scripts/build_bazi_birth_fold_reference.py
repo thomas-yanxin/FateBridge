@@ -15,7 +15,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_birth_fold_v1"
+FIXTURE = ROOT / "tests/data/bazi_birth_fold_v1"
 EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 INPUT_LOW = int((datetime(1900, 1, 1, tzinfo=timezone.utc) - EPOCH).total_seconds())
 INPUT_HIGH = int((datetime(2101, 1, 1, tzinfo=timezone.utc) - EPOCH).total_seconds())

@@ -1,5 +1,6 @@
 """Regression coverage for the first-use journeys a Codex user follows."""
 
+import hashlib
 import json
 import shlex
 from pathlib import Path
@@ -105,7 +106,7 @@ def test_all_hexagram_summaries_have_one_caution_prefix():
 
 @pytest.mark.local_data
 def test_relationship_summary_deduplicates_without_losing_evidence(capsys):
-    from tests.compatibility_reference import assert_score_reference
+    from tests.compatibility_reference import assert_source_condition_score_reference
 
     spec = next(s for s in CATALOG if s.key == "two_person_compatibility")
     example = cli._cli_example(
@@ -114,7 +115,9 @@ def test_relationship_summary_deduplicates_without_losing_evidence(capsys):
     code, result, _ = invoke(capsys, *shlex.split(example)[1:])
     assert code == 0
     assert len(result["challenges"]) == len(set(result["challenges"]))
-    assert_score_reference(result["summary"], result["detailed_analysis"], "marriage")
+    assert_source_condition_score_reference(
+        result["summary"], result["detailed_analysis"], "marriage"
+    )
     assert result["detailed_analysis"]
     assert "0–100" in result["summary"]["score_basis"]
     assert "净分" in result["traditional_compatibility"]["score_basis"]
@@ -450,6 +453,59 @@ def test_published_starter_projection_is_runnable(key, capsys):
 
 
 @pytest.mark.asyncio
+async def test_published_tool_description_delivers_strict_fields_from_one_run():
+    async with Client(create_mcp_app(families="bazi")) as client:
+        tool = next(t for t in await client.list_tools() if t.name == "bazi_career")
+        fields = json.loads(
+            tool.description.split("fields=", 1)[1].split("; strict_fields", 1)[0]
+        )
+        spec = next(s for s in CATALOG if s.tool_name == tool.name)
+        result = await client.call_tool(
+            tool.name,
+            {
+                **example_input(spec),
+                "fields": fields,
+                "strict_fields": True,
+                "include_snapshot_text": False,
+            },
+        )
+        assert not result.is_error
+        payload = result.structured_content
+        assert len(result.content[0].text) <= 8192
+        if "result_delivery" in payload:
+            reference = payload["result_delivery"]
+            manifest = json.loads(
+                (await client.read_resource(reference["manifest_uri"]))[0].text
+            )
+            assert manifest["sha256"] == reference["sha256"]
+            assert (
+                manifest["run_metadata"]["run_id"] == payload["run_metadata"]["run_id"]
+            )
+            text, offset, uri = "", 0, manifest["first_page_uri"]
+            while uri is not None:
+                assert (
+                    uri
+                    == f"fatebridge://results/{reference['result_id']}/pages/{offset}"
+                )
+                page = json.loads((await client.read_resource(uri))[0].text)
+                assert page["result_id"] == reference["result_id"]
+                assert page["sha256"] == reference["sha256"]
+                assert page["offset"] == offset
+                text += page["text"]
+                offset += len(page["text"])
+                assert page["next_offset"] == (
+                    offset if offset < reference["total_chars"] else None
+                )
+                uri = page["next_uri"]
+            assert len(text) == reference["total_chars"]
+            assert hashlib.sha256(text.encode()).hexdigest() == reference["sha256"]
+            payload = json.loads(text)
+            assert payload["run_metadata"] == manifest["run_metadata"]
+        assert payload["career_analysis"]["career_structure"]["score"] == 95
+        assert "run_metadata" in payload
+
+
+@pytest.mark.asyncio
 async def test_published_tool_description_is_sufficient_for_strict_first_call():
     async with Client(create_mcp_app(families="bazi")) as client:
         tool = next(t for t in await client.list_tools() if t.name == "bazi_career")
@@ -476,7 +532,7 @@ async def test_published_tool_description_is_sufficient_for_strict_first_call():
 
 @pytest.mark.local_data
 def test_relationship_example_and_default_do_not_assume_marriage(capsys):
-    from tests.compatibility_reference import assert_score_reference
+    from tests.compatibility_reference import assert_source_condition_score_reference
 
     spec = next(s for s in CATALOG if s.key == "two_person_compatibility")
     inputs = example_input(spec)
@@ -485,7 +541,9 @@ def test_relationship_example_and_default_do_not_assume_marriage(capsys):
     assert spec.request_model.model_validate(inputs).relationship_type == "general"
     code, result, _ = invoke(capsys, *shlex.split(cli._cli_example(spec, inputs))[1:])
     assert code == 0 and result["summary"]["relationship_type"] == "general"
-    assert_score_reference(result["summary"], result["detailed_analysis"])
+    assert_source_condition_score_reference(
+        result["summary"], result["detailed_analysis"]
+    )
 
 
 @pytest.mark.asyncio

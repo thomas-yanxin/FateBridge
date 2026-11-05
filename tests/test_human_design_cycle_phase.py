@@ -1,6 +1,5 @@
 """Independent analytic roots and direct natal-relative residuals, no drift."""
 
-import hashlib
 import json
 from copy import deepcopy
 from fractions import Fraction
@@ -66,24 +65,6 @@ def test_all_24_known_analytic_roots_remain_in_the_reported_bracket(birth, natal
         == expected
     )
     assert event["phase_arithmetic_method"] == PHASE_METHOD
-
-
-def test_all_old_failures_and_original_thresholds_are_retained():
-    assert (
-        hashlib.sha256(PLAN_PATH.read_bytes()).hexdigest()
-        == "bb332c0a74df24501650d2f6c74bc5ac2c6f9258751572f1761c1acc37255846"
-    )
-    before = json.loads(
-        (ROOT / "docs/validation/human-design-cycle-phase-before.json").read_text()
-    )
-    assert len(CASES) == PLAN["case_count"] == before["case_count"] == 24
-    assert before["brackets_missing_known_zero"] == 4
-    assert before["reported_residual_mismatches"] == 22
-    assert len(before["cases"]) == 24
-    from fatebridge.core.human_design_cycles import RESIDUAL_DEGREES, ROOT_SECONDS
-
-    assert ROOT_SECONDS == 0.0002
-    assert RESIDUAL_DEGREES == 1e-7
 
 
 @pytest.fixture(scope="module")

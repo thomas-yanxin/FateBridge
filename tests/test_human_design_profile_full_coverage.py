@@ -15,10 +15,7 @@ SPEC = importlib.util.spec_from_file_location(
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 PROFILE = json.loads(
-    (
-        ROOT
-        / "docs/validation/human-design-portable-projection-ci-v1/official-through-192/cohort.json"
-    ).read_text()
+    (ROOT / "tests/data/human_design/profile_cohort/cohort.json").read_text()
 )
 
 

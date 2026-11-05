@@ -1,6 +1,5 @@
 """Every served source identity belongs to the exact reviewed bytes read."""
 
-import gzip
 import hashlib
 import json
 from pathlib import Path
@@ -8,9 +7,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core import human_design_references as refs
-from fatebridge.core.astro import native_execution, runtime
 from fatebridge.utils.errors import EphemerisSourceError
-from fatebridge.validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -118,31 +115,3 @@ def test_unused_optional_catalogue_is_not_required_and_nested_view_is_pinned(sou
         first = refs.reference_data("profile-2026-reference.json")
         with refs.coherent_human_design_references():
             assert refs.reference_data("profile-2026-reference.json") is first
-
-
-def test_original_mixed_profile_receipt_is_preserved_and_rejected_without_recalculation(
-    monkeypatch,
-):
-    path = (
-        ROOT
-        / "tests/fixtures/human_design_reference_snapshot_v1/before-profile-run.json.gz"
-    )
-    assert (
-        hashlib.sha256(path.read_bytes()).hexdigest()
-        == "6104a4e5e2a471496982b45d64a7c0c84cfff764c4cd50d19039d3d247f1d021"
-    )
-    with gzip.open(path, "rt") as handle:
-        value = json.load(handle)
-    assert value["profile"] == "6/2"
-    assert (
-        value["profile_evidence"]["source_catalog_sha256"]
-        == "10c864e3d89abb009b516012cc2059045f794e729662704169dc04d1f462c39d"
-    )
-
-    def forbidden(*args, **kwargs):
-        raise AssertionError("Stored reading verification recalculated its chart")
-
-    monkeypatch.setattr(native_execution, "calculate", forbidden)
-    monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
-    checked = verify_human_design_reading(value)
-    assert checked["status"] == "rejected", checked

@@ -12,7 +12,7 @@ from fatebridge.utils.birth_input import PersonInfo
 
 FIXTURE = (
     Path(__file__).parent
-    / "fixtures/bazi_uncertainty_events_v1/unknown-second-transition.json"
+    / "data/bazi_uncertainty_events_v1/unknown-second-transition.json"
 )
 
 

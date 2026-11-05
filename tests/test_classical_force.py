@@ -11,25 +11,25 @@ from jsonschema import Draft202012Validator
 from fatebridge.application.examples import suggested_fields
 from fatebridge.core.bazi_evidence import build_natal_evidence
 from fatebridge.core.elements import ElementAnalysis
-from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
+
+rest = _shared_rest
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_root_force_experiment_v1"
+FIXTURE = ROOT / "tests/data/bazi_root_force_experiment_v1"
 
 
 def chart(text):
     return dict(zip(("year", "month", "day", "hour"), map(tuple, text.split())))
 
 
-def test_prospective_reference_and_first_outcome_are_frozen_separately():
-    for path in (
-        FIXTURE / "reference.json",
-        ROOT / "docs/validation/bazi-root-force-first-v1.json",
-    ):
-        assert (
-            hashlib.sha256(path.read_bytes()).hexdigest()
-            == path.with_suffix(".sha256").read_text().strip()
-        )
+def test_primary_reference_retains_unknown_labels_and_transcription_variants():
+    path = FIXTURE / "reference.json"
+    assert (
+        hashlib.sha256(path.read_bytes()).hexdigest()
+        == path.with_suffix(".sha256").read_text().strip()
+    )
     ref = json.loads((FIXTURE / "reference.json").read_text())
     assert len(ref["cases"]) == 34
     assert sum(c["expected_strength"] is None for c in ref["cases"]) == 27

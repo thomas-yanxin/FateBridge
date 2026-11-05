@@ -15,7 +15,7 @@ from fatebridge.core.sukuyo_lower import (
 )
 
 REFERENCE = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-lower-primary.json").read_text()
+    (Path(__file__).parent / "data/sukuyo-lower-primary.json").read_text()
 )
 ALIASES = str.maketrans("虛婁畢參張軫", "虚娄毕参张轸")
 

@@ -205,8 +205,7 @@
       "ziwei_horoscope.nominal_age_calendar.basis",
       "ziwei_horoscope.nominal_age_calendar.timezone",
       "ziwei_horoscope.nominal_age_calendar.birth_lunar_year",
-      "ziwei_horoscope.nominal_age_calendar.target_lunar_year",
-      "ziwei_horoscope.nominal_age_calendar.difference_from_legacy"
+      "ziwei_horoscope.nominal_age_calendar.target_lunar_year"
     ],
     "include_snapshot_text": false,
     "strict_fields": true
@@ -357,12 +356,9 @@
         "description": "姓名（可选，仅用于结果快照中的标识，不参与计算）"
       },
       "nominal_age_basis": {
+        "const": "birth_civil_timezone",
         "default": "birth_civil_timezone",
-        "description": "岁序默认birth_civil_timezone：出生与目标实际瞬间都按出生民用时区查农历年，正月初一00:00换岁，独立于真太阳安星及目标流曜钟。legacy_mixed_clock显式回放旧的目标钟表年减出生排盘年，可能拒绝春节边界；两者均非原典岁首认证。",
-        "enum": [
-          "birth_civil_timezone",
-          "legacy_mixed_clock"
-        ],
+        "description": "岁序默认birth_civil_timezone：出生与目标实际瞬间都按出生民用时区查农历年，正月初一00:00换岁，独立于真太阳安星及目标流曜钟。该软件约定尚非原典岁首认证。",
         "type": "string"
       },
       "parent_run_id": {
@@ -499,5 +495,50 @@
     ],
     "type": "object"
   },
+  "method_contracts": [
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现/数据指纹、选项与实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "solar_clock",
+        "calendar_model",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/services/metaphysics.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.ziwei_natal_and_temporal_rules.contract_v1",
+      "output_paths": [
+        "ziwei_horoscope"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "traditional_rule_result",
+      "role": "calculation",
+      "selector_fields": [
+        "nominal_age_basis",
+        "rule_profile"
+      ],
+      "source_refs": [
+        "docs/algorithm-coverage.md"
+      ],
+      "unit": "categorical",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    }
+  ],
   "tool": "ziwei_horoscope"
 }

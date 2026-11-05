@@ -5,18 +5,16 @@ from pathlib import Path
 
 import pytest
 
-from tests.test_bazi_source_comparison_transports import (
-    rest,
-)
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_source_comparison_transports import (
     test_same_literal_comparison_full_and_published_view_on_three_surfaces as check_surfaces,
 )
 
-REFERENCE = (
-    Path(__file__).resolve().parent
-    / "fixtures/bazi_capacity_three_units_v1/reference.json"
-)
+REFERENCE = Path(__file__).resolve().parent / "data/bazi/complete-units-source.json"
 CASES = json.loads(REFERENCE.read_text())["cases"]
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("project", [False, True])

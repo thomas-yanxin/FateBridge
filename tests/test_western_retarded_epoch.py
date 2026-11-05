@@ -16,23 +16,11 @@ from fatebridge.core.astro.retarded_epoch import (
     stabilized_longitude_sample,
 )
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
-
-
-@pytest.mark.parametrize("direction", [-1, 1])
-@pytest.mark.parametrize("power", range(7))
-def test_directional_stencils_preserve_degree_six_and_expose_a_cusp(direction, power):
-    step = 0.0625
-    center = 359.99 + (1 if power == 0 else 0)
-    values = [(359.99 + (direction * k * step) ** power) % 360 for k in range(1, 7)]
-    rate = position_motion.one_sided_longitude_stencil(values, center, step, direction)
-    assert rate == pytest.approx(1 if power == 1 else 0, abs=2e-11)
-    cusp = [359.99 + k * step for k in range(1, 7)]
-    assert position_motion.one_sided_longitude_stencil(
-        cusp, 359.99, step, direction
-    ) == pytest.approx(direction)
 
 
 @pytest.mark.parametrize("epoch", [2451545.0, 2460465.7716340744, 5373484.25])

@@ -145,7 +145,7 @@ def reference_sha256(name: str) -> str:
 
 
 def clear_reference_cache() -> None:
-    """Compatibility for internal cache controls; active views remain pinned."""
+    """Clear reusable source data; active calculation views remain pinned."""
     _load.cache_clear()
 
 

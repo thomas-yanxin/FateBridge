@@ -23,9 +23,9 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
 
-pytestmark = pytest.mark.skipif(e.swe is None, reason="Swiss Ephemeris required")
 FIXTURES = Path(__file__).parent / "fixtures"
 KERNEL = "guolao-de441-j2000.eph"
+RAW_DATA = Path(__file__).parent / "data/guolao"
 BIRTH = dict(
     birth_year=2000,
     birth_month=1,
@@ -40,12 +40,12 @@ AS_OF = "2000-01-02T12:00:00+00:00"
 
 
 def test_extended_fixture_keeps_original_records_and_required_scan_windows():
-    from fatebridge.core.almanac import _solar_term_utc_via_linear
+    from fatebridge.core.almanac import _solar_term_search_anchor_utc
     from fatebridge.core.astro.time_scales import ephemeris_time
     from fatebridge.core.jpl_ephemeris import jpl_header
 
-    data = (FIXTURES / KERNEL).read_bytes()
-    proof = json.loads((FIXTURES / "guolao-de441-j2000.provenance.json").read_text())
+    data = (RAW_DATA / KERNEL).read_bytes()
+    proof = json.loads((RAW_DATA / "guolao-de441-j2000.provenance.json").read_text())
     assert len(data) == proof["fixture_bytes"] == 162880
     assert hashlib.sha256(data).hexdigest() == proof["fixture_sha256"]
     part = next(p for p in proof["download_parts"] if p["part"] == "coefficients")
@@ -58,20 +58,20 @@ def test_extended_fixture_keeps_original_records_and_required_scan_windows():
     assert data[16288 : 16288 + 6 * 8144] == old[16288:]
     assert proof["modified_header_byte_ranges"] == [[2652, 2667]]
     assert proof["coefficients_unmodified"] and not proof["complete_original_kernel"]
-    header = jpl_header(FIXTURES / KERNEL)
-    assert header["start_julian_day_tt"] == 2451408.5
-    assert header["end_julian_day_tt"] == 2451984.5
+    header = jpl_header(RAW_DATA / KERNEL)
+    assert header["start_julian_day_tdb"] == 2451408.5
+    assert header["end_julian_day_tdb"] == 2451984.5
     for i in range(24):
-        anchor = ephemeris_time(_solar_term_utc_via_linear(2000, i)).jd_tt
-        assert header["start_julian_day_tt"] <= anchor - 30
-        assert anchor + 30 <= header["end_julian_day_tt"]
+        anchor = ephemeris_time(_solar_term_search_anchor_utc(2000, i)).jd_tt
+        assert header["start_julian_day_tdb"] <= anchor - 30
+        assert anchor + 30 <= header["end_julian_day_tdb"]
 
 
 @pytest.fixture
 def selected(tmp_path, monkeypatch):
     previous = e.configured_ephemeris_path()
     target = tmp_path / KERNEL
-    shutil.copyfile(FIXTURES / KERNEL, target)
+    shutil.copyfile(RAW_DATA / KERNEL, target)
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", KERNEL)
     e.swe.close()

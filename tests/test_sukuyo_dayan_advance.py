@@ -18,7 +18,7 @@ from fatebridge.core.sukuyo_dayan_advance import (
 )
 from fatebridge.core.sukuyo_sources import load_source
 
-FIXTURES = Path(__file__).parent / "fixtures"
+FIXTURES = Path(__file__).parent / "data"
 
 
 def test_every_before_code_source_and_host_row_preserves_52_conflicts_and_unknown():

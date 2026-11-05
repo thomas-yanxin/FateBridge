@@ -92,12 +92,10 @@ def test_dingyou_xiaoguo_original_nuclear_example_and_actual_positions():
     assert actual["yuanqi_absent"] is False
 
 
-def test_day_stem_lookup_moves_out_of_deti_and_does_not_change_nayin_relations():
+def test_day_stem_changes_do_not_change_year_nayin_body_relations():
     chart = chart_for("坎為水")
     a = judge(chart, {**PILLARS, "year": "丙寅", "day": "戊子"}, "卯")
     b = judge(chart, {**PILLARS, "year": "丙寅", "day": "己丑"}, "卯")
-    assert a["day_stem_mapping"] == {"gua": "坎", "present": True}
-    assert b["day_stem_mapping"] == {"gua": "離", "present": False}
     assert a["deTi"] == b["deTi"]
     assert [r["relation"] for r in a["deTi"]["bodies"][:4]] == [
         "body_controls_nayin",
@@ -117,7 +115,6 @@ def test_day_stem_lookup_moves_out_of_deti_and_does_not_change_nayin_relations()
         {"deTi": {"generating_qi": {"condition_match": "true"}}},
         {"deTi": {"generating_qi": {"direction": "nayin_generates_body"}}},
         {"deTi": {"bodies": [{"line_positions": [True]}]}},
-        {"day_stem_mapping": {"present": "true"}},
     ],
 )
 def test_output_contract_rejects_changed_meanings_and_wrong_fact_types(payload):

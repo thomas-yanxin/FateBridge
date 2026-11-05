@@ -1,7 +1,5 @@
 """From-child source conditions are not an ordinary weak-body classification."""
 
-import gzip
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -19,11 +17,10 @@ from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.output_bazi_evidence import EvidenceStructureProfile
 from fatebridge.core.output_from_child import FromChildReference
 from fatebridge.core.rules import BaZiRules
+from tests.bazi_strength_reference_v3 import assert_current_assessment_arithmetic
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_from_child_v1"
-REFERENCE = ROOT / "tests/fixtures/bazi_body_seal_v5_followup_v1/reference.json"
-CASES = json.loads(REFERENCE.read_text())["cases"]
+CASES = json.loads((ROOT / "tests/data/bazi/from-child-source-cases.json").read_text())
 
 
 def pillars(values):
@@ -111,40 +108,18 @@ def test_visible_opposing_stars_missing_wealth_and_missing_month_anchor_are_reta
     FromChildReference.model_validate(ref)
 
 
-def test_current_strength_and_complete_profiles_match_before_repair_on273_inputs():
-    protocol = json.loads((FIXTURE / "protocol.json").read_text())
-    archive = FIXTURE / "before.json.gz"
-    assert hashlib.sha256(archive.read_bytes()).hexdigest() == protocol["before_sha256"]
-    records = json.loads(gzip.decompress(archive.read_bytes()))
-    assert len(records) == protocol["known_inputs"] == 273
-    manifest_path = (
-        ROOT
-        / "tests/fixtures/architecture_refactor_v1/fromchild273-before-manifest.json"
-    )
-    packed = manifest_path.read_bytes()
-    assert (
-        hashlib.sha256(packed).hexdigest()
-        == "48b0a59141613ef8b5788d912e77245f0f1718b7e33da23f5e89effe74b6d558"
-    )
-    baseline = json.loads(packed)
-    assert baseline["source_sha256"] == protocol["before_sha256"]
-    assert len(baseline["rows"]) == len(records) == 273
-    for row, expected in zip(records, baseline["rows"], strict=True):
-        assert row["pillars"] == expected["pillars"]
+def test_all273_frozen_inputs_keep_current_arithmetic_and_from_child_reference():
+    records = json.loads((ROOT / "tests/data/bazi/from-child-inputs.json").read_text())
+    assert len(records) == 273
+    for row in records:
         p = pillars(row["pillars"])
         analysis = ElementAnalysis.comprehensive_analysis(p)
         profile = BaZiRules.build_structure_profile(p, analysis)
-        # Current v10 objects are compared to the actual pre-repair source,
-        # including every profile field and every unrounded numeric leaf.
-        for key, value in (("analysis", analysis), ("profile", profile)):
-            encoded = json.dumps(
-                value,
-                ensure_ascii=False,
-                sort_keys=True,
-                separators=(",", ":"),
-                allow_nan=False,
-            ).encode()
-            assert hashlib.sha256(encoded).hexdigest() == expected[key + "_sha256"]
+        assert_current_assessment_arithmetic(
+            row["pillars"], analysis["day_master"]["assessment"]
+        )
+        assert profile["from_child_reference"] == build_from_child_reference(p)
+        FromChildReference.model_validate(profile["from_child_reference"])
 
 
 def test_structured_contract_keeps_projections_but_rejects_false_formation():

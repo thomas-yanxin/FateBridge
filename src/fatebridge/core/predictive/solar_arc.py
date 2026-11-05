@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from fractions import Fraction
+
+from fatebridge.core.astro.geometry import longitude_float
+
 from ._common import (
     Any,
     Dict,
@@ -18,28 +22,30 @@ def build_solar_arc_payload(
 ) -> Dict[str, Any]:
     natal_longitudes = extract_reference_longitudes(natal_subject)
     arc_degrees = (
-        point_absolute_position(progressed_subject, "Sun")
-        - point_absolute_position(natal_subject, "Sun")
-    ) % 360.0
-    directed_points = {}
+        Fraction(point_absolute_position(progressed_subject, "Sun"))
+        - Fraction(point_absolute_position(natal_subject, "Sun"))
+    ) % 360
+    directed_points: Dict[str, Fraction] = {}
     for point_name, longitude in natal_longitudes.items():
-        directed_points[point_name] = (longitude + arc_degrees) % 360.0
+        directed_points[point_name] = (Fraction(longitude) + arc_degrees) % 360
     hits = collect_aspect_hits(
         source_longitudes=directed_points,
         target_longitudes=natal_longitudes,
         orb_limit=1.5,
     )
     return {
-        "arc_degrees": round(arc_degrees, 4),
-        "sun": longitude_to_point_dict("Sun", directed_points["Sun"]),
-        "moon": longitude_to_point_dict("Moon", directed_points["Moon"]),
+        "arc_degrees": round(float(arc_degrees), 4),
+        "sun": longitude_to_point_dict("Sun", longitude_float(directed_points["Sun"])),
+        "moon": longitude_to_point_dict(
+            "Moon", longitude_float(directed_points["Moon"])
+        ),
         "ascendant": longitude_to_point_dict(
             "Ascendant",
-            directed_points["Ascendant"],
+            longitude_float(directed_points["Ascendant"]),
         ),
         "medium_coeli": longitude_to_point_dict(
             "Medium_Coeli",
-            directed_points["Medium_Coeli"],
+            longitude_float(directed_points["Medium_Coeli"]),
         ),
         "hits": hits[:8],
     }

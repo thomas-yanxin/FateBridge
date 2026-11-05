@@ -33,7 +33,10 @@
       "right_context": "日分爲八時",
       "root_first_working_glyph": "每",
       "reviewer_first_working_glyph": "審",
-      "root_after_feedback_candidates": ["審", "晝"],
+      "root_after_feedback_candidates": [
+        "審",
+        "晝"
+      ],
       "candidate_list_is_exhaustive": false,
       "accepted_unique_glyph": null,
       "full_sentence_exact_transcription_accepted": false
@@ -52,7 +55,10 @@
       "reading_status": "selected_model_working_reading",
       "reported_addition": "直",
       "reported_position": "after當",
-      "sigla_literals": ["明", "高"],
+      "sigla_literals": [
+        "明",
+        "高"
+      ],
       "specific_sigla_exemplars_identified": false,
       "reported_exemplars_obtained": false
     }
@@ -66,13 +72,13 @@
   "source_records": [
     {
       "role": "reviewer_pixel_first",
-      "public_record": "docs/validation/sukuyo-semantic-continuation-v110-ARC-image-reviewer-first.json",
+      "public_record": "tests/data/sukuyo_source_readings/sukuyo-semantic-continuation-v110-ARC-image-reviewer-first.json",
       "sha256": "41ac11361196d66dae57b1296b30ea9d528f3d500955d7f8dc5a3c76508e0a6e",
       "scope": "First selected pixel reading by the existing readonly role; shared provider and history, not external blind validation."
     },
     {
       "role": "root_feedback_exposed_correction",
-      "public_record": "docs/validation/sukuyo-semantic-continuation-v110-ARC-root-correction-first.json",
+      "public_record": "tests/data/sukuyo_source_readings/sukuyo-semantic-continuation-v110-ARC-root-correction-first.json",
       "sha256": "85eeafdb4ed422e83aa69a975e36a19284ca2ea391685b8726718e832622700e",
       "scope": "Correction after reading reviewer feedback; the old root first and uncertain glyph remain preserved."
     }

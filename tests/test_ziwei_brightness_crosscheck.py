@@ -4,9 +4,7 @@ from pathlib import Path
 
 from fatebridge.core.ziwei_tables import lookup_star_brightness
 
-FIXTURE = (
-    Path(__file__).resolve().parent / "fixtures" / "ziwei_brightness_reference.json"
-)
+FIXTURE = Path(__file__).resolve().parent / "data" / "ziwei_brightness_reference.json"
 _GENERATOR = (
     Path(__file__).resolve().parents[1] / "scripts" / "gen_ziwei_brightness_fixture.py"
 )

@@ -83,9 +83,9 @@ class WesternTimingRequest(AstroBirthRequest, WesternEphemerisRequest):
             "equatorial, or fatebridge_mundane_semiarc"
         ),
     )
-    pd_time_key: str = Field(
+    pd_time_key: Literal["Ptolemy", "Naibod", "Cardan"] = Field(
         default="Ptolemy",
-        description="Primary direction time key, e.g. Ptolemy or Naibod",
+        description="Primary direction time key: Ptolemy, Naibod or Cardan",
     )
     pd_type: int = Field(
         default=0,

@@ -102,33 +102,6 @@ def audit():
         and "偏强" not in rendering["ties"]
         and "重视结果、责任与长期结构的建立" in rendering["separate_mc"]
     )
-    sources = [
-        "src/fatebridge/core/astro/geometry.py",
-        "src/fatebridge/core/astro/parts.py",
-        "src/fatebridge/core/astro/aspects.py",
-        "src/fatebridge/core/astro/chart.py",
-        "src/fatebridge/core/astro/classical.py",
-        "src/fatebridge/core/astro/relationship_charts.py",
-        "src/fatebridge/core/classical_western.py",
-        "src/fatebridge/core/ptolemy.py",
-        "src/fatebridge/core/predictive/_common.py",
-        "src/fatebridge/core/predictive/native_chart.py",
-        "src/fatebridge/core/predictive/firdaria.py",
-        "src/fatebridge/core/astrology_events.py",
-        "src/fatebridge/core/output_charts.py",
-        "src/fatebridge/core/output_western.py",
-        "src/fatebridge/core/response_models.py",
-        "src/fatebridge/services/astrology.py",
-        "src/fatebridge/services/western_events.py",
-        "tests/golden/canonical.py",
-        "tests/golden/test_canonical.py",
-        "tests/test_classical_oracle.py",
-        "tests/test_firdaria_reference.py",
-        "tests/test_western_semantic_fidelity.py",
-        "tests/test_western_accuracy_transports.py",
-        "scripts/audit_western_fidelity.py",
-        "scripts/audit_western_golden.py",
-    ]
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "method_id": "western_boundary_and_template_counterfactual_audit_v1",
@@ -164,10 +137,6 @@ def audit():
             "full_original_treatise_implemented": False,
             "authority_certified": False,
             "all_three_full_marks_established": False,
-        },
-        "code_sha256": {
-            name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-            for name in sources
         },
     }
 

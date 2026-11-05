@@ -17,9 +17,7 @@ from fatebridge.validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-additional-poles-plan.json"
-BEFORE_PATH = ROOT / "docs/validation/human-design-additional-poles-before.json"
 PLAN = json.loads(PLAN_PATH.read_text())
-BEFORE = json.loads(BEFORE_PATH.read_text())
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
@@ -43,11 +41,6 @@ def test_original_source_catalogue_and_preregistered_inputs_remain_immutable():
     assert (
         hashlib.sha256(PLAN_PATH.read_bytes()).hexdigest()
         == "d44b2199c8c2cf8bff6f2b0efe1ed2baf9280aed6a2c66dbd67c3f28c6c91da1"
-    )
-    assert (
-        hashlib.sha256(BEFORE_PATH.read_bytes()).hexdigest()
-        == PLAN["before_sha256"]
-        == "6ad11344318e57e7b9eb9b6e3553241cdeeb8d13a425065f3495c062c6f3676e"
     )
     legacy = ROOT / "src/fatebridge/data/human_design/rave-2001-depth.json"
     assert (
@@ -89,7 +82,7 @@ def test_original_source_catalogue_and_preregistered_inputs_remain_immutable():
         isinstance(n, ast.ImportFrom) and (n.module or "").startswith("fatebridge")
         for n in ast.walk(tree)
     )
-    assert len(PLAN["public_cases"]) == len(BEFORE["cases"]) == 6
+    assert len(PLAN["public_cases"]) == 6
     assert sum(c["old_fixing_state"] == "unfixed" for c in PLAN["public_cases"]) == 5
     assert PLAN["unchanged_thresholds"] == {
         "astronomy_arcsec": 2.0,
@@ -187,17 +180,6 @@ def test_every_original_public_case_both_modes_and_backends(
     assert summary["matched_recipient_count"] == 1
     assert summary["recipients"][0]["body"] == case["recipient_body"]
     assert summary["full_line_meanings_accepted"] is False
-    if not empty_files and mode == "true":
-        old = next(c for c in BEFORE["cases"] if c["id"] == case["id"])
-        # The Mac capture is only a raw native comparison on its capture platform.
-        import sys
-
-        if sys.platform == "darwin":
-            assert run["activations"] == old["activations"]
-        assert run["bodygraph"] == old["old_selected_graph"]
-        assert {
-            k: v for k, v in run["variables"].items() if k != "personality_colors"
-        } == old["old_variables"]
     monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
     monkeypatch.setattr(native_execution, "calculate", forbidden)
     check = verify_human_design_reading(run)

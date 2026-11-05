@@ -23,8 +23,8 @@ else:
     from audit_guolao_motion import load_reference
 
 ROOT = Path(__file__).resolve().parents[1]
-PROTOCOL_SHA256 = "ac36c3a6aba775e2d09651798ce586196a01e4719ccfd903aae2f7e0454ddf33"
-REFERENCE_SHA256 = "0346ef453fc07325325e7fff3a70936e4ab14097f4671e40f957d16f8d7a70e6"
+PROTOCOL_SHA256 = "7500bb8ad80313e886b461882ab81386110e87a933181df3ec67fec1cc625675"
+REFERENCE_SHA256 = "3441dca5cb939edbfef37171da87b7c44a0a56bb0a6800c2e126784030fda78b"
 
 
 def loaded(protocol_path: Path, reference_path: Path) -> tuple[dict, dict]:
@@ -161,12 +161,12 @@ def main() -> int:
     parser.add_argument(
         "--protocol",
         type=Path,
-        default=ROOT / "tests/fixtures/shared-moshier-frames-protocol.json",
+        default=ROOT / "tests/data/astro/moshier_frames/protocol.json",
     )
     parser.add_argument(
         "--reference",
         type=Path,
-        default=ROOT / "tests/fixtures/shared-moshier-frames-reference.json",
+        default=ROOT / "tests/data/astro/moshier_frames/reference.json",
     )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()

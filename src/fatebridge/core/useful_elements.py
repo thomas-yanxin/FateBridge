@@ -34,7 +34,8 @@ def resolve_useful_elements(
     from_child = build_from_child_reference(pillars)
     from_child_review = from_child["ordinary_fuyi_requires_review"]
     if (
-        assessment.get("requires_special_structure_review")
+        assessment.get("ordinary_fuyi_requires_review")
+        or assessment.get("requires_special_structure_review")
         or assessment.get("status") == "boundary_sensitive"
     ):
         baseline_avoid = []

@@ -16,10 +16,6 @@ from fatebridge.core.numerology_clock_input import (
 )
 from fatebridge.core.numerology_inputs import CLOCK_POLICY_ID, require_birth_clock
 from fatebridge.core.output_numerology import NumerologyBirthClock, NumerologyClockInput
-from tests.numerology_clock_input_fixture_compat import (
-    rewind_prior_clock_input,
-    upgrade_prior_clock_input,
-)
 from tests.test_agentic_nested_outputs import SPECS, business
 from tests.test_agentic_nested_outputs import rest as shared_rest
 from tests.test_heluo_poem_transports import run_three
@@ -152,34 +148,6 @@ def test_forgery_is_rejected_against_actual_request_before_any_projection(
     assert error["error_code"] == "numerology_source_inconsistent"
     assert error["status_code"] == 503 and error["retryable"] is False
     assert error["issues"][0]["code"] == "runtime_numerology_clock_input_conflict"
-
-
-def test_absent_original_components_in_archived_library_result_stay_unknown(
-    complete_result,
-):
-    _, _, result = complete_result
-    old = rewind_prior_clock_input(result, BASE["time"])
-    require_clock_input_binding(old)
-    assert "input_representation" not in old["numerology_evidence"]["birth_clock"]
-
-
-def test_historical_additive_migration_is_exactly_reversible_and_rejects_forgery():
-    old = json.loads(
-        gzip.decompress(
-            (
-                Path(__file__).parent
-                / "fixtures/canping_receipt_binding_v1/baseline-results.json.gz"
-            ).read_bytes()
-        )
-    )
-    for row in old:
-        updated = upgrade_prior_clock_input(row["output"], row["input"]["time"])
-        assert rewind_prior_clock_input(updated, row["input"]["time"]) == row["output"]
-        updated["numerology_evidence"]["birth_clock"]["input_representation"][
-            "observed_precision_certified"
-        ] = True
-        with pytest.raises(AssertionError):
-            rewind_prior_clock_input(updated, row["input"]["time"])
 
 
 @pytest.mark.parametrize("key", ["heluo", "canping"])

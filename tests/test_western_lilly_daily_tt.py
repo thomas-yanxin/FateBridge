@@ -12,83 +12,30 @@ from pathlib import Path
 
 import pytest
 
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
-
-pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
-
-
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.iers_ut1 import use_ut1_source
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.core.lilly_fortitude_inputs import collect_fortitude_inputs
 from fatebridge.core.predictive.native_chart import build_native_subject
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
 from tests.test_western_tt_events import refuse_ut1
 
+pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
+
+
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/western-lilly-daily-tt-v1"
+FIXTURE = ROOT / "tests/data/astro/lilly_daily_tt"
 PROTOCOL = json.loads((FIXTURE / "protocol.json").read_text())
-CONTROLS = json.loads((FIXTURE / "native-api-controls.json").read_text())
-ISOLATED = json.loads(
-    (FIXTURE / "isolated-native-controls-post-candidate.json").read_text()
-)
 EXTERNAL = json.loads(
     gzip.decompress(
-        (
-            ROOT / "tests/fixtures/western-tt-common-frame-v2/reference.json.gz"
-        ).read_bytes()
+        (ROOT / "tests/data/astro/tt_common_frame/reference.json.gz").read_bytes()
     )
 )
 EXTERNAL_PLAN = json.loads(
-    (ROOT / "tests/fixtures/western-tt-common-frame-v2/protocol.json").read_text()
+    (ROOT / "tests/data/astro/tt_common_frame/protocol.json").read_text()
 )
-
-
-def test_controls_sealed_before_candidate_are_not_independent_astronomy_or_original_truth():
-    manifest = json.loads((FIXTURE / "manifest.json").read_text())
-    for name, digest in manifest["files"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
-    assert (
-        CONTROLS["protocol_sha256"]
-        == hashlib.sha256((FIXTURE / "protocol.json").read_bytes()).hexdigest()
-    )
-    assert ISOLATED["collected_after_candidate"]
-    assert not ISOLATED["independent_astronomy"]
-    assert not ISOLATED["input_cases_or_arithmetic_line_changed"]
-    assert not CONTROLS["production_imports"] and not CONTROLS["independent_dynamics"]
-    assert not PROTOCOL["full_original_text_acceptance"]
-    assert PROTOCOL["real_world_outcomes"] == 0
-    assert (
-        manifest["external_reference_manifest_sha256"]
-        == hashlib.sha256(
-            (
-                ROOT / "tests/fixtures/western-tt-common-frame-v2/manifest.json"
-            ).read_bytes()
-        ).hexdigest()
-    )
-
-
-def test_original_warm_state_acquisition_is_repeatable_in_this_native_build(tmp_path):
-    # Preserve the original acquisition semantics as a separate diagnostic.
-    # Its cross-century cache history is not the state reader's per-body reset.
-    target = tmp_path / "tests/fixtures/western-lilly-daily-tt-v1"
-    target.mkdir(parents=True)
-    (target / "protocol.json").write_bytes((FIXTURE / "protocol.json").read_bytes())
-    replays = []
-    for _ in range(2):
-        subprocess.run(
-            [sys.executable, "-c", (FIXTURE / "collect-native-api.py.txt").read_text()],
-            cwd=tmp_path,
-            check=True,
-            capture_output=True,
-            text=True,
-            timeout=30,
-            env={**os.environ, "SE_EPHE_PATH": configured_ephemeris_path() or ""},
-        )
-        replays.append(json.loads((target / "native-api-controls.json").read_text()))
-    assert replays[0] == replays[1]
-    assert [(r["stamp"], r["tt"]) for r in replays[0]["rows"]] == [
-        (r["stamp"], r["tt"]) for r in CONTROLS["rows"]
-    ]
 
 
 @pytest.fixture(scope="module")
@@ -114,13 +61,16 @@ def isolated_native_build_controls(tmp_path_factory):
         env={**os.environ, "SE_EPHE_PATH": configured_ephemeris_path() or ""},
     )
     result = json.loads(output.read_text())
-    assert result["protocol_sha256"] == CONTROLS["protocol_sha256"]
+    assert (
+        result["protocol_sha256"]
+        == hashlib.sha256((FIXTURE / "protocol.json").read_bytes()).hexdigest()
+    )
     assert not result["production_imports"] and not result["independent_astronomy"]
     return result
 
 
 @pytest.mark.parametrize(
-    "case", CONTROLS["rows"], ids=lambda r: f"{r['source']}-{r['stamp']}-{r['zodiac']}"
+    "case", PROTOCOL["cases"], ids=lambda r: f"{r['source']}-{r['stamp']}-{r['zodiac']}"
 )
 def test_native_subject_and_fortitudes_share_tt_frame_without_trial_ut1(
     case, monkeypatch, isolated_native_build_controls
@@ -150,7 +100,11 @@ def test_native_subject_and_fortitudes_share_tt_frame_without_trial_ut1(
             assert (
                 abs(
                     subject.calculation_basis["ayanamsha_degrees"]
-                    - case["ayanamsha_tt"]
+                    - next(
+                        row
+                        for row in isolated_native_build_controls["rows"]
+                        if all(row[k] == case[k] for k in ("stamp", "source", "zodiac"))
+                    )["ayanamsha_tt"]
                 )
                 <= PROTOCOL["native_api_arithmetic_line_degrees"]
             )
@@ -188,7 +142,7 @@ def test_native_subject_and_fortitudes_share_tt_frame_without_trial_ut1(
 def test_complete_one_tt_day_displacements_match_preexisting_external_reference(index):
     case = next(
         c
-        for c in CONTROLS["rows"]
+        for c in PROTOCOL["cases"]
         if c["source"] == "iers_c04"
         and c["zodiac"] == "Tropic"
         and c["stamp"].startswith(("1962-01-01", "2026-09-19")[index])

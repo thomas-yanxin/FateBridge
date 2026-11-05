@@ -661,28 +661,29 @@ class MarriageAnalysis:
                 timing_signals.append(f"流年{l_branch}为天喜到位，主感情顺遂")
 
         # 早婚/晚婚倾向判断
-        marriage_tendency = "正常"
+        timing_cues = set()
         tendency_notes: List[str] = []
 
-        # 配偶星在年柱 → 早婚倾向
-        for p_name, (stem, branch) in pillars.items():
-            if p_name == "day":
-                continue
-            god = get_ten_god(day_stem, stem)
-            if is_male and god in (TenGod.POSITIVE_WEALTH, TenGod.PARTIAL_WEALTH):
-                if p_name == "year":
-                    marriage_tendency = "偏早"
-                    tendency_notes.append("财星在年柱，早婚倾向")
-                elif p_name == "hour":
-                    marriage_tendency = "偏晚"
-                    tendency_notes.append("财星在时柱，晚婚倾向")
-            elif not is_male and god in (TenGod.POSITIVE_OFFICER, TenGod.SEVEN_KILLER):
-                if p_name == "year":
-                    marriage_tendency = "偏早"
-                    tendency_notes.append("官星在年柱，早婚倾向")
-                elif p_name == "hour":
-                    marriage_tendency = "偏晚"
-                    tendency_notes.append("官星在时柱，晚婚倾向")
+        spouse_gods = (
+            (TenGod.POSITIVE_WEALTH, TenGod.PARTIAL_WEALTH)
+            if is_male
+            else (TenGod.POSITIVE_OFFICER, TenGod.SEVEN_KILLER)
+        )
+        star_label = "财星" if is_male else "官星"
+        # Opposite positional cues coexist; insertion order is not a rule for
+        # adjudicating them. Preserve both without inventing a priority.
+        for p_name, cue, note in (
+            ("year", "偏早", f"{star_label}在年柱，早婚倾向"),
+            ("hour", "偏晚", f"{star_label}在时柱，晚婚倾向"),
+        ):
+            if get_ten_god(day_stem, pillars[p_name][0]) in spouse_gods:
+                timing_cues.add(cue)
+                tendency_notes.append(note)
+        marriage_tendency = (
+            "早晚信号并存，未裁定"
+            if len(timing_cues) == 2
+            else next(iter(timing_cues)) if timing_cues else "正常"
+        )
 
         return {
             "timing_signals": timing_signals,

@@ -53,11 +53,7 @@ class ForceComponents(PartialOutput):
 
 class EngineeringForceComposition(PartialOutput):
     status: Optional[Literal["supplied_calculation", "not_supplied"]] = None
-    ratio_basis: Optional[
-        Literal[
-            "unrounded_same_assessment", "rounded_legacy_assessment", "not_supplied"
-        ]
-    ] = None
+    ratio_basis: Optional[Literal["unrounded_same_assessment", "not_supplied"]] = None
     strength_method_id: Optional[str] = None
     strength_level: Optional[str] = None
     support_share: Optional[float] = Field(default=None, ge=0, le=1)
@@ -69,11 +65,10 @@ class EngineeringForceComposition(PartialOutput):
         Literal[
             "exact_rational_same_assessment",
             "unrounded_same_assessment",
-            "rounded_legacy_assessment",
             "not_supplied",
         ]
     ] = None
-    legacy_float_body_seal_energy_relation: Optional[
+    float_body_seal_energy_relation: Optional[
         Literal["body_greater", "seal_greater", "equal", "not_supplied"]
     ] = None
     body_energy_exact: Optional[str] = None
@@ -211,7 +206,6 @@ class ClassicalForceComponents(PartialOutput):
             return self
         fields = {
             "unrounded_same_assessment": "engineering_energy_unrounded",
-            "rounded_legacy_assessment": "engineering_energy",
         }
         key = fields.get(composition.ratio_basis or "")
         if key is None or components.body is None or components.seal is None:
@@ -226,8 +220,8 @@ class ClassicalForceComponents(PartialOutput):
             else "seal_greater" if seal > body else "equal"
         )
         if (
-            composition.legacy_float_body_seal_energy_relation is not None
-            and composition.legacy_float_body_seal_energy_relation != expected_relation
+            composition.float_body_seal_energy_relation is not None
+            and composition.float_body_seal_energy_relation != expected_relation
         ):
             raise ValueError("浮点身印比较必须忠于同次已给分量")
         # Exact arithmetic can legitimately disagree at a float boundary.

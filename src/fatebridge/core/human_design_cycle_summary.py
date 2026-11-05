@@ -107,7 +107,7 @@ def compact_cycle_summary(rich: dict[str, Any]) -> dict[str, Any]:
 
 
 def cycle_contact_facts(summary: dict[str, Any]) -> list[dict[str, Any]]:
-    """Read explicit contact facts from either published summary format.
+    """Read contact facts from the current card or its internal unformatted input.
 
     Compact defaults must be present and exact. No raw segment endpoints are
     invented; those remain in the complete cycle_context contact witnesses.

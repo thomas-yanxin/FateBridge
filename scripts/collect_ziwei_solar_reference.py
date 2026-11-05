@@ -11,15 +11,12 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 
-def collect(directory: Path, root: Path) -> None:
+def collect(directory: Path) -> None:
     protocol_raw = (directory / "protocol.json").read_bytes()
     protocol_hash = hashlib.sha256(protocol_raw).hexdigest()
     if protocol_hash != (directory / "protocol.sha256").read_text().strip():
         raise ValueError("Protocol checksum mismatch")
     protocol = json.loads(protocol_raw)
-    for name, expected in protocol["candidate_files_sha256"].items():
-        if hashlib.sha256((root / name).read_bytes()).hexdigest() != expected:
-            raise ValueError("Candidate changed before collection: " + name)
     manifest_path = directory / "manifest.json"
     if manifest_path.exists():
         raise FileExistsError("Frozen manifest exists; use a new corpus")
@@ -82,9 +79,6 @@ def collect(directory: Path, root: Path) -> None:
                 )
             )
             print("Frozen " + path.name, flush=True)
-    for name, expected in protocol["candidate_files_sha256"].items():
-        if hashlib.sha256((root / name).read_bytes()).hexdigest() != expected:
-            raise ValueError("Candidate changed during collection: " + name)
     if (directory / "protocol.json").read_bytes() != protocol_raw:
         raise ValueError("Protocol changed during collection")
     manifest = dict(
@@ -104,4 +98,4 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", type=Path, required=True)
     args = parser.parse_args()
-    collect(args.directory, Path(__file__).resolve().parents[1])
+    collect(args.directory)

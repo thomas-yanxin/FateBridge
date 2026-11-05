@@ -4,32 +4,39 @@ import argparse
 import hashlib
 import json
 from datetime import datetime, timezone
+from fractions import Fraction
 from pathlib import Path
 
 from fatebridge.core.astro.time_scales import datetime_from_tt
-from fatebridge.core.astrology_election import (
-    _moon_void_of_course,
-    build_election_payload,
-)
+from fatebridge.core.astrology_election import build_election_payload
+from fatebridge.core.horary_motion import solve_lunar_contacts
 from fatebridge.core.predictive.native_chart import build_native_subject
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def audit():
-    protocol_path = ROOT / "tests/fixtures/western-election-conditions-protocol.json"
-    protocol = json.loads(protocol_path.read_text())
-    for name, digest in protocol["reference_files"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
-    retained = json.loads(
-        (ROOT / "docs/validation/western-election-motion-open.json").read_text()
-    )
-    observed = _moon_void_of_course(
-        retained["input"]["moon"], retained["input"]["others"]
-    )
-    reference = json.loads(
-        (ROOT / "tests/fixtures/western-horary-horizons.json").read_text()
-    )
+    def sample(planet, at):
+        if planet == "Moon":
+            return {"longitude": 13 * at, "speed": 13.0}
+        return {"longitude": 0.1, "speed": 0.0}
+
+    motion = solve_lunar_contacts(0.0, sample, bodies=("Mercury",))
+    observed = motion["void_of_course"]
+    expected_contact_days = Fraction(0.1) / 13
+    expected_ingress_days = Fraction(30, 13)
+    assert 0 < expected_contact_days < expected_ingress_days
+    reference_path = ROOT / "tests/fixtures/western-horary-horizons.json"
+    reference_bytes = reference_path.read_bytes()
+    reference_sha256 = hashlib.sha256(reference_bytes).hexdigest()
+    if (
+        reference_sha256
+        != "fddfbe44f8e9db2b71e62f6fec07a2c958705f8fd05b7f43fd5d2f7ec44a034f"
+    ):
+        raise ValueError("Independent JPL lunar-event reference changed")
+    reference = json.loads(reference_bytes)
+    if len(reference["cases"]) != 3:
+        raise ValueError("All three independent JPL windows are required")
     cases = []
     for case in reference["cases"]:
         subject = build_native_subject(
@@ -42,6 +49,17 @@ def audit():
         )
         result = build_election_payload(subject, topic_id="general")
         actual = result["moon"]["motion_basis"]
+        if actual["status"] != "computed":
+            cases.append(
+                {
+                    "case_id": case["case_id"],
+                    "status": actual["status"],
+                    "unavailable_reason": actual.get("unavailable_reason"),
+                    "nominal_epoch_matches_motion": False,
+                    "passed": False,
+                }
+            )
+            continue
         expected = case["expected"]
         keys = [(e["other"], e["ray_degrees"]) for e in actual["contacts"]]
         ref_keys = [(e["other"], e["ray_degrees"]) for e in expected["contacts"]]
@@ -75,15 +93,12 @@ def audit():
         )
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "protocol_sha256": hashlib.sha256(protocol_path.read_bytes()).hexdigest(),
-        "reference_sha256": hashlib.sha256(
-            (ROOT / "tests/fixtures/western-horary-horizons.json").read_bytes()
-        ).hexdigest(),
-        "retained_prior_failure": "western-election-motion-open.json",
-        "prior_observed_void_of_course": retained["observed_void_of_course"],
+        "reference_sha256": reference_sha256,
+        "synthetic_contact_after_days_exact": str(expected_contact_days),
+        "synthetic_ingress_after_days_exact": str(expected_ingress_days),
         "current_observed_void_of_course": observed,
         "expected_geometric_void_of_course": False,
-        "prior_geometric_failure_closed": observed is False,
+        "synthetic_contact_precedes_ingress": observed is False,
         "cases": cases,
         "new_independent_astronomy_cases": 0,
         "event_tolerance_seconds": 30,
@@ -91,14 +106,6 @@ def audit():
         "full_original_text_acceptance": False,
         "passed": observed is False
         and all(c["passed"] and c["nominal_epoch_matches_motion"] for c in cases),
-        "source_sha256": {
-            r: hashlib.sha256((ROOT / r).read_bytes()).hexdigest()
-            for r in [
-                "src/fatebridge/core/astrology_election.py",
-                "src/fatebridge/core/astrology_horary.py",
-                "scripts/audit_western_election_conditions.py",
-            ]
-        },
     }
 
 
@@ -110,6 +117,6 @@ if __name__ == "__main__":
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     print(
-        f"Retained geometric failure closed={report['prior_geometric_failure_closed']}; three reused JPL windows passed={report['passed']}"
+        f"Retained geometric failure closed={report['synthetic_contact_precedes_ingress']}; three reused JPL windows passed={report['passed']}"
     )
     raise SystemExit(0 if report["passed"] else 1)

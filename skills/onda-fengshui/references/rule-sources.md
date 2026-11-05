@@ -257,7 +257,7 @@ flight_path = [中, 西北, 西, 东北, 南, 北, 西南, 东, 东南]
 
 年度有效期按明确约定从立春至下次立春，并非元旦或农历正月初一；本次采用的当代说明见 Sean Chan。香港天文台另确认 2026 立春日期为 2 月 4 日。[S7](https://www.masterseanchan.com/fengshui-2026-flying-star-chart)、[S8](https://www.hko.gov.hk/tc/gts/time/calendar/pdf/files/2026.pdf)。
 
-不能硬编码“每年 2 月 4 日零时”；应按节气模块解析查询时刻并返回实际边界与时区。若节气计算使用近似回退，必须暴露这一事实；`engine_is_approximate=false` 不足以证明交节时刻精确。
+不能硬编码“每年 2 月 4 日零时”；应按节气模块解析查询时刻并返回实际边界与时区。节气求根不可用时返回错误，不使用线性近似回退；`engine_is_approximate=false` 不足以证明交节时刻精确。
 
 ### 6.3 年盘能提供什么
 

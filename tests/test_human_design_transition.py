@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import copy
-import hashlib
 import json
 from datetime import datetime
 from pathlib import Path
@@ -22,12 +21,10 @@ from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_transition import verify_transition_trace
-from tests.golden.runner import golden_ephemeris
+from tests.ephemeris_context import moshier_ephemeris
 
 ROOT = Path(__file__).resolve().parents[1]
-CASE = json.loads(
-    (ROOT / "tests/fixtures/human-design-transition-case.json").read_text()
-)
+CASE = json.loads((ROOT / "tests/data/human_design/transition-inputs.json").read_text())
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 MOMENT = datetime.fromisoformat(CASE["nominal_birth_utc"])
 INPUT = dict(
@@ -41,38 +38,22 @@ INPUT = dict(
 )
 
 
-def test_frozen_search_and_old_missed_state_are_not_replaced_by_new_expectations():
-    plan = ROOT / CASE["plan_path"]
-    assert hashlib.sha256(plan.read_bytes()).hexdigest() == CASE["plan_sha256"]
-    assert CASE["search_samples_checked"] == 207349
-    assert CASE["legacy_grid_sample_count"] == 13
-    assert CASE["legacy_joint_variant_count"] == 2
-    assert CASE["legacy_joint_key_absent"] is True
-
-
 def test_actual_ten_second_alias_retains_the_missing_coherent_state_with_one_extra_chart():
-    with golden_ephemeris():
+    with moshier_ephemeris():
         nominal = chart_at(MOMENT)
         result = assess_birth_interval(nominal, 1, "true")
         missed = chart_at_tt(CASE["missed_witness_tt"], backend="moshier")
-    from scripts.audit_human_design import transition_fixture_diagnostics
-
-    for label, chart in [("nominal", nominal), ("missed", missed)]:
-        comparison = transition_fixture_diagnostics(
-            chart["activations"], CASE["physical_samples"][label]["activations"]
-        )
-        assert comparison["discrete_fields_equal"]
-        assert comparison["positions_within_existing_reference_tolerances"]
-        frozen = CASE["physical_samples"][label]["time_scales"]
-        assert (
-            chart["time_scales"]["personality"]["jd_tt"]
-            == frozen["personality"]["jd_tt"]
-        )
-        assert (
-            abs(chart["time_scales"]["design"]["jd_tt"] - frozen["design"]["jd_tt"])
-            * 86400
-            <= 0.0002
-        )
+        witnesses = [
+            chart_at_tt(tt, backend="moshier")
+            for tt in CASE["given_witness_jd_tt"].values()
+        ]
+    variant_keys = {
+        JointSnapshotCache().key(row["value"])
+        for row in result["classification_variants"]
+    }
+    for chart in witnesses:
+        assert chart["design_solver"]["bracket_width_seconds"] <= 0.0002
+        assert JointSnapshotCache().key(chart) in variant_keys
     assert len(result["classification_variants"]) == 3
     assert result["sampling"]["grid_sample_count"] == 13
     assert result["sampling"]["total_evaluation_count"] == 14
@@ -103,11 +84,13 @@ def synthetic(first=4.0, second=4.25, *, same_source=False, reversal=False):
     origin = 2450000.5
     calls = []
     cache = {}
+    with moshier_ephemeris():
+        scaffold = chart_at(MOMENT)
 
     def at(jd):
         if jd not in cache:
             calls.append(jd)
-            chart = copy.deepcopy(CASE["physical_samples"]["nominal"])
+            chart = copy.deepcopy(scaffold)
             t = (jd - origin) * 86400
             bodies = {a["body"]: a for a in chart["activations"]["personality"]}
             if same_source:
@@ -201,7 +184,7 @@ def test_unobserved_reversal_does_not_become_a_stability_certificate():
 
 @pytest.fixture(scope="module")
 def full_run():
-    with golden_ephemeris():
+    with moshier_ephemeris():
         result = execute_tool(SPEC, SPEC.request_model(**INPUT))
     assert (
         verify_human_design_reading(result)["status"]
@@ -265,7 +248,7 @@ def test_fresh_hash_does_not_accept_forged_finite_refinement_evidence(full_run, 
 
 
 def test_unassessed_interval_cannot_acquire_a_refinement_claim():
-    with golden_ephemeris():
+    with moshier_ephemeris():
         value = execute_tool(
             SPEC, SPEC.request_model(**{**INPUT, "birth_time_uncertainty_minutes": 0})
         )
@@ -288,7 +271,9 @@ def test_audit_rejects_a_degraded_checker_that_drops_the_missed_state(monkeypatc
         == "observed_transition_regression_passed"
     )
     original = audit.assess_birth_interval
-    missed = JointSnapshotCache().key(CASE["physical_samples"]["missed"])
+    with moshier_ephemeris():
+        witness = chart_at_tt(CASE["missed_witness_tt"], backend="moshier")
+    missed = JointSnapshotCache().key(witness)
 
     def degraded(*args, **kwargs):
         result = original(*args, **kwargs)
@@ -304,30 +289,3 @@ def test_audit_rejects_a_degraded_checker_that_drops_the_missed_state(monkeypatc
     assert result["status"] == "failed"
     assert result["missed_witness_recovered"] is False
     assert result["trace_verification"]["status"] == "rejected"
-
-
-def test_float_replay_drift_is_reported_instead_of_being_called_exact():
-    from scripts.audit_human_design import transition_fixture_diagnostics
-
-    frozen = CASE["physical_samples"]["nominal"]["activations"]
-    current = copy.deepcopy(frozen)
-    current["personality"][0]["longitude"] += 1e-9
-    result = transition_fixture_diagnostics(current, frozen)
-    assert result["raw_activations_equal"] is False
-    assert result["raw_float_differences"]
-    assert result["discrete_fields_equal"] is True
-    assert result["positions_within_existing_reference_tolerances"] is True
-    assert result["speed_accuracy_certified"] is False
-
-
-@pytest.mark.parametrize("body,delta", [("Moon", 3), ("NorthNode", 1.1)])
-def test_diagnostic_thresholds_cannot_accept_larger_position_errors(body, delta):
-    from scripts.audit_human_design import transition_fixture_diagnostics
-
-    frozen = CASE["physical_samples"]["nominal"]["activations"]
-    current = copy.deepcopy(frozen)
-    row = next(r for r in current["personality"] if r["body"] == body)
-    row["longitude"] += delta / 3600
-    result = transition_fixture_diagnostics(current, frozen)
-    assert result["positions_within_existing_reference_tolerances"] is False
-    assert result["raw_activations_equal"] is False

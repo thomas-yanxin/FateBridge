@@ -19,7 +19,7 @@ from fatebridge.services.tool_catalog import CATALOG
 from scripts.build_sukuyo_japanese_calendar import normalize, parse_day, read_fixture
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/sukuyo_hutime_daily_v1"
+FIXTURE = ROOT / "tests/data/sukuyo_hutime_daily_v1"
 
 
 def reference(civil, **kwargs):

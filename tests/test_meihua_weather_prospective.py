@@ -238,7 +238,6 @@ def test_invalid_or_predating_audit_clock_fails(at):
         "study/plan.json",
         "study/forecasts.json",
         "study/evidence.jsonl",
-        "study/generate.py",
         "study/status.json",
         "attestation/manifest.json",
         "attestation/tsa.crt",

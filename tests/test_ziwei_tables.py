@@ -12,7 +12,7 @@ def test_table_shape_is_twelve_per_star():
         assert len(row) == 12, f"{star} must have 12 branch entries"
 
 
-def test_lookup_known_authoritative_cells():
+def test_lookup_known_iztro_software_cells():
     # 寅-indexed: 寅=0, 午=4, 丑=11 (ZIWEI_BRANCH_SEQUENCE order)
     assert lookup_star_brightness("紫微", "午") == "庙"  # ziweiMaj[4]=miao
     assert lookup_star_brightness("紫微", "寅") == "旺"  # ziweiMaj[0]=wang

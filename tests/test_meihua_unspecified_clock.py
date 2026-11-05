@@ -19,16 +19,11 @@ from fatebridge.core import meihua_clock_resolution as policy
 from fatebridge.core.requests.divination import MeihuaAnalysisRequest
 from fatebridge.services import divination as service
 from fatebridge.services.tool_catalog import CATALOG
-from tests.meihua_unspecified_clock_reference import digest, load
+from tests.meihua_unspecified_clock_reference import load
 
 ROWS = load()
 SPEC = next(spec for spec in CATALOG if spec.key == "meihua_analysis")
-BAD = [
-    row
-    for row in ROWS
-    if row["layers"]["service"].get("valid")
-    and not row["case"]["expected_clock_resolvable"]
-]
+BAD = [row for row in ROWS if row["previous_false_acceptance"]]
 
 
 @pytest.mark.parametrize("row", ROWS, ids=lambda row: row["case"]["id"])
@@ -45,24 +40,6 @@ def test_all355_frozen_undefined_defined_and_legacy_controls(row):
             value,
         )
         if case["expected_clock_resolvable"]:
-            expected = row["layers"][layer]["result"]
-            if case["id"] in {"zero-1", "zero-11"}:
-                # The pre-repair code already preserved the requested GMT
-                # label in six term receipts, rather than spelling it UTC.
-                path = (
-                    Path(__file__).parent
-                    / "fixtures/architecture_refactor_v1/meihua-clock-before.json.gz"
-                )
-                raw = path.read_bytes()
-                assert (
-                    hashlib.sha256(raw).hexdigest()
-                    == "52f002dc8b07aa0fd8b746ab34a38f49129e519cb8244c9832983c8a567f12f8"
-                )
-                frozen = json.loads(gzip.decompress(raw))[case["id"]]
-                assert frozen["arguments"] == args
-                assert frozen["original_sha256"][layer] == digest(expected)
-                expected = frozen["before_repair"][layer]
-            assert digest(value) == digest(expected)
             assert (
                 value["meihua"]["calendar_policy"]["civil_clock_resolution"][
                     "instant_utc"
@@ -95,22 +72,6 @@ def test_every_original_false_acceptance_is_stopped_before_calendar_work(
     monkeypatch.setattr(service, "build_calendar_context", forbidden)
     value = service.calculate_meihua_analysis(**row["arguments"])
     assert value["status_code"] == 422 and not called
-
-
-@pytest.mark.parametrize("row", BAD, ids=lambda row: row["case"]["id"])
-def test_trusted_binding_rejects_original_self_consistent_bad_packets_before_projection(
-    row,
-):
-    original = row["layers"]["execution"]["result"]
-    saved = deepcopy(original)
-    forged = replace(SPEC, bind=lambda request: (lambda: deepcopy(original), (), {}))
-    request = MeihuaAnalysisRequest(**row["arguments"])
-    with pytest.raises(OutputContractError):
-        execute_spec(forged, request)
-    result = execute_tool(forged, request, include_metadata=False)
-    assert result["status_code"] == 500 and result["error_code"] == "internal_error"
-    assert result["retryable"] is True
-    assert original == saved
 
 
 @pytest.mark.parametrize("seconds", [0, 3600, -3600, 68400, -68400])

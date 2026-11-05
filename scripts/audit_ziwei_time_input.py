@@ -10,7 +10,7 @@ from typing import Any
 from fatebridge.services.metaphysics import calculate_ziwei_birth
 from fatebridge.utils.birth_input import create_person_info
 
-FIXTURES = Path(__file__).resolve().parents[1] / "tests/fixtures/ziwei_independent"
+FIXTURES = Path(__file__).resolve().parents[1] / "tests/data/ziwei_independent"
 
 
 def audit_time_input(fixtures: Path = FIXTURES) -> dict[str, Any]:

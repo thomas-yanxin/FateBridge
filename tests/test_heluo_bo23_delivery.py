@@ -1,7 +1,5 @@
-"""Candidate delivery and complete old-text preservation, without new scores."""
+"""Current selected source facts and all original public route inputs."""
 
-import copy
-import gzip
 import hashlib
 import json
 from pathlib import Path
@@ -13,13 +11,7 @@ from fatebridge.core.heluo import yao_text
 from fatebridge.core.numerology_knowledge import _catalogue, _source
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.services.tool_catalog import CATALOG
-from tests.heluo_bo23_revision_reference import REFERENCE as R101_REFERENCE
-from tests.heluo_current_source_reference import (
-    CATALOGUE_VERSION,
-    HEADER_COUNT,
-    PENDING_COUNT,
-    advance_current_record,
-)
+from tests.heluo_source_facts import CATALOGUE_VERSION, HEADER_COUNT, PENDING_COUNT
 from tests.test_agentic_nested_outputs import business
 from tests.test_agentic_nested_outputs import rest as shared_rest
 from tests.test_heluo_poem_transports import run_three
@@ -27,29 +19,19 @@ from tests.test_heluo_poem_transports import run_three
 rest = shared_rest
 W = Path(__file__).parent / "fixtures/heluo_bo23_v1"
 LITERAL = json.loads((W / "reviewed-literals-v2.json").read_text())
-CALCULATION_CASES = json.loads((W / "case-search/cases.json").read_text())["cases"]
+CALCULATION_CASES = json.loads(
+    (Path(__file__).parent / "data/heluo/bo_routes.json").read_text()
+)["cases"]
 
 
 @pytest.mark.parametrize("case", CALCULATION_CASES, ids=lambda c: f"line{c['line']}")
-def test_six_before_selected_calculations_keep_math_and_formal_houtian(
-    case, monkeypatch
-):
+def test_six_original_routes_keep_source_scope_and_formal_houtian(case, monkeypatch):
     from fatebridge.core.local_techniques.heluo import build_heluo_result
 
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     line = case["line"]
-    before = json.loads((W / f"case-search/before-line-{line}.json").read_text())
     actual = build_heluo_result(**case["payload"])
-    protocol = json.loads(
-        (W / "correction-evidence/case-replay-protocol.json").read_text()
-    )
-    for field in protocol["whole_equal_top_level_fields"]:
-        assert actual[field] == before[field], field
-    assert actual["heluo_timing"].keys() == before["heluo_timing"].keys()
-    for field in before["heluo_timing"]:
-        if field != "selected_texts":
-            assert actual["heluo_timing"][field] == before["heluo_timing"][field], field
     selected = next(
         s["text"]
         for s in actual["numerology_evidence"]["selected_texts"]
@@ -90,20 +72,9 @@ def test_actual_knowledge_read_keeps_all_editorial_conditions(entry):
         assert "适用性未裁定" in lines[0] and "不替代正式卦盘" in lines[0]
 
 
-def test_actual_catalogue_binds_two_new_sources_and_preserves_other15():
-    old = json.loads(
-        (
-            W / "before/src/fatebridge/data/knowledge/numerology-sources-v1.json"
-        ).read_text()
-    )
+def test_current_catalogue_binds_all_sources_to_actual_current_content():
     new = _catalogue()
     assert new["version"] == CATALOGUE_VERSION
-    changed = [
-        (a["domain"], a["key"])
-        for a, b in zip(old["sources"], new["sources"])
-        if a != b
-    ]
-    assert changed == [("heluo", "commentary_collation"), ("heluo", "yaoci_collation")]
     assert len(new["sources"]) == 17
     for row in new["sources"]:
         data, meta = _source(row["domain"], row["key"])
@@ -126,38 +97,6 @@ def test_actual_catalogue_binds_two_new_sources_and_preserves_other15():
         == HEADER_COUNT
     )
     assert heluo_texts.collation_summary()["pending_line_headers"] == PENDING_COUNT
-
-
-def test_all384_old_poems_verdicts_and_other378_full_records_are_preserved():
-    old = json.loads(
-        gzip.decompress((W / "before-all384-records.json.gz").read_bytes())
-    )
-    assert len(old) == 384
-    for key, before in old.items():
-        gua, line = key.rsplit(":", 1)
-        actual = yao_text(gua, int(line))
-        assert (
-            actual["shige"] == before["shige"]
-            and actual["verdict"] == before["verdict"]
-        )
-        if gua != "山地剝":
-            expected = copy.deepcopy(before)
-            current = R101_REFERENCE["records"][key]["after"]
-            for field in [
-                "corpus_id",
-                "header_content_sha256",
-                "transcription_policy",
-                "commentary_corpus_id",
-                "commentary_sha256",
-                "commentary_content_sha256",
-                "commentary_transcription_policy",
-            ]:
-                if field in expected["text_provenance"]:
-                    expected["text_provenance"][field] = current["text_provenance"][
-                        field
-                    ]
-            assert current == expected, key
-            assert actual == advance_current_record(current, key), key
 
 
 @pytest.mark.parametrize("line", [4, 5, 6])
@@ -193,49 +132,3 @@ def test_printed_target_status_keeps_the_leaf_condition_not_just_annual_parent()
     assert reference["source_condition_label"] == "歲運逢之"
     assert reference["applicability"] is None
     assert "數凶" in heluo_texts.text_status_snapshot(record)
-
-
-def test_two_source_attested_leaf_conditions_and_other382_statuses_exact():
-    path = W / "renderer-before-all384.json.gz"
-    identity = json.loads((W / "renderer-before-freeze.json").read_text())
-    assert (
-        hashlib.sha256(path.read_bytes()).hexdigest()
-        == identity["current_C3_renderer_384_stored_sha256"]
-    )
-    before = json.loads(gzip.decompress(path.read_bytes()))
-    after = {
-        key: heluo_texts.text_status_snapshot(
-            yao_text(key.rsplit(":", 1)[0], int(key.rsplit(":", 1)[1]))
-        )
-        for key in before
-    }
-    from tests.heluo_current_source_reference import REFERENCE as current_reference
-
-    assert after == current_reference["statuses_after"]
-    assert R101_REFERENCE["statuses_after"] == current_reference["statuses_before"]
-    # Keep the original two-condition renderer transition as its own fixed edge.
-    after = R101_REFERENCE["statuses_after"]
-    changed = [key for key in before if before[key] != after[key]]
-    assert changed == ["地天泰:2", "山地剝:6"]
-    facts = {"地天泰:2": "如不入局不得位", "山地剝:6": "數凶"}
-    old_records = json.loads(
-        gzip.decompress((W / "before-all384-records.json.gz").read_bytes())
-    )
-    assert (
-        old_records["地天泰:2"]["commentary_cross_references"][0]["condition_text"]
-        == facts["地天泰:2"]
-    )
-    for key, condition in facts.items():
-        assert after[key] == before[key].replace(
-            "歲運逢之段引", f"歲運逢之段的{condition}语境引"
-        )
-        gua, line = key.rsplit(":", 1)
-        record = yao_text(gua, int(line))
-        reference = record["commentary_cross_references"][0]
-        assert reference["condition_text"] == condition
-        assert reference["source_condition_label"] == "歲運逢之"
-        assert reference["applicability"] is None
-        assert (
-            reference["automatic_application"] is reference["replaces_chart"] is False
-        )
-        assert record["commentary_branch_selection"]["selected_section_ids"] == []

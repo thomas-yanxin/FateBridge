@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -29,7 +30,8 @@ def _longitude_tt(
 
 
 def _signed_offset(longitude: float, target: float) -> float:
-    return (longitude - target + 180) % 360 - 180
+    offset = math.remainder(longitude - target, 360.0)
+    return offset - 360.0 if offset == 180.0 else offset
 
 
 def governing_return_tt(

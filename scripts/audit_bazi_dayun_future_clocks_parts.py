@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_dayun_future_clocks_v2"
+FIXTURE = ROOT / "tests/data/bazi_dayun_future_clocks_v2"
 
 
 def sha(path):

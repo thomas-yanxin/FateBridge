@@ -95,7 +95,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-dir", type=Path, required=True)
     parser.add_argument(
-        "--output-dir", type=Path, default=ROOT / "tests/fixtures/sukuyo_hutime_v1"
+        "--output-dir", type=Path, default=ROOT / "tests/data/sukuyo_hutime_v1"
     )
     args = parser.parse_args()
     freeze(args.source_dir, args.output_dir)

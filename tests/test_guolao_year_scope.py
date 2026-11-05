@@ -131,7 +131,7 @@ def test_natal_year_around_independently_published_hko_minute_uses_physical_cloc
     solar, offset, expected
 ):
     fixture = json.loads(
-        (Path(__file__).parent / "fixtures/bazi-timing-hko-2026.json").read_text()
+        (Path(__file__).parent / "data/bazi-timing-hko-2026.json").read_text()
     )
     assert fixture["precision"] == "published_minute"
     published = datetime.fromisoformat(

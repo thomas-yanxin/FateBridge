@@ -14,7 +14,6 @@ ROOT = Path(__file__).resolve().parents[1]
 BINDINGS = {
     "tests/fixtures/human-design-solar-projection-plan.json": "ec98cd33f17fc8bd837263df58eec684121c23398028f9bcb178d9c3a7ab93d5",
     "tests/fixtures/human-design-solar-projection-reference.json.gz": "8c11e2821c9dd64312d8dce2398cbb5d4466426d5876c1b86742bc47e2925a7a",
-    "scripts/gen_human_design_solar_projection_reference.py": "fe6baacb0d49773fa15b6f4cce796905a4f6a631af694594eacf096b99b59ebb",
 }
 
 

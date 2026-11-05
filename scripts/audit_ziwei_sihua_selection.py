@@ -19,7 +19,7 @@ if TYPE_CHECKING or __package__:
 else:
     from audit_ziwei_limits import _seed
 
-FIXTURES = Path(__file__).resolve().parents[1] / "tests/fixtures/ziwei_independent"
+FIXTURES = Path(__file__).resolve().parents[1] / "tests/data/ziwei_independent"
 ABBREVIATIONS = dict(
     zip(
         "廉破武陽機梁紫月同昌貞巨貪弼曲日相府陰",

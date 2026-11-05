@@ -153,7 +153,7 @@
 
 ### 具体问事与占卜（onda-zhanbu）
 
-太乙年／月／日／时计及三式合参的技法核对、已有结果解释也使用本入口，读取太乙分层参考。只核计算时沿用已确认的日期和配置，不追加现实占问或出生资料；指定占式方法不转成本命盘请求。 历史年计可明确选择381—385晋历或501—505齐梁史历表，参数与日期范围见[年计历表](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-year-calendar.md)；保留502年闰标争议，不自动改用另一配置或扩展为原书日计。
+太乙年／月／日／时计及三式合参的技法核对、已有结果解释也使用本入口，读取太乙分层参考。只核计算时沿用已确认的日期和配置，不追加现实占问或出生资料；指定占式方法不转成本命盘请求。 历史年计可明确选择381—385晋历或501—505齐梁史历表，参数与日期范围见[年计历表](taiyi-sanshi-audit.md)；保留502年闰标争议，不自动改用另一配置或扩展为原书日计。
 
 | 用户任务 | `meihua_analysis` `meihua_cast` `sixyao` | `qimen` `liureng_gods` `liureng_runyear` `jinkou` | `taiyi` `suzhan` `sanshiunited` `otherbu` `tongshefa` | `astro_horary` | `gua_lookup` `gua_meiyi` |
 | --- | --- | --- | --- | --- | --- |

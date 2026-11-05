@@ -27,12 +27,10 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 
-FIXTURE = (
-    Path(__file__).parent / "fixtures/bazi_month_paths_v1/source-observations.json"
-)
+FIXTURE = Path(__file__).parent / "data/bazi_month_paths_v1/source-observations.json"
 REFERENCE = json.loads(FIXTURE.read_text())
 ORDER = ("year", "month", "day", "hour")
 TOPICS = [
@@ -57,6 +55,9 @@ def chart(values):
 
 def path_by_id(selection, key):
     return next(p for p in selection["paths"] if p["id"] == key)
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda c: c["id"])

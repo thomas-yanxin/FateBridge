@@ -8,19 +8,17 @@ from fatebridge.validation.fengshui_calendar import audit_lichun_reference
 
 
 def main() -> int:
-    folder = Path(__file__).parents[1] / "tests/fixtures/fengshui_calendar_v10"
-    manifest = json.loads((folder / "provenance.json").read_text())
+    folder = Path(__file__).parents[1] / "tests/data/fengshui_lichun_tt"
+    manifest = json.loads((folder / "hashes.json").read_text())
     integrity = {
         name: hashlib.sha256((folder / name).read_bytes()).hexdigest() == digest
-        for name, digest in manifest["files"].items()
+        for name, digest in manifest.items()
     }
     if not all(integrity.values()):
         raise ValueError(
             "Frozen reference integrity failure; no numeric acceptance claimed"
         )
-    report = audit_lichun_reference(
-        json.loads((folder / "period-lichun-reference.json").read_text())
-    )
+    report = audit_lichun_reference(json.loads((folder / "reference.json").read_text()))
     print(
         json.dumps(
             {"source_integrity": integrity, **report}, ensure_ascii=False, indent=2

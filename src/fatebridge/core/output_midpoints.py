@@ -1,6 +1,6 @@
 """Projection-compatible public contracts for specialized chart geometry."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import Field
 
@@ -158,13 +158,20 @@ class PhysicalEphemerisFile(PartialOutput):
     filename: Optional[str] = None
     sha256: Optional[str] = None
     bytes: Optional[int] = None
+    range_time_scale: Optional[Literal["TT", "TDB"]] = None
     start_julian_day_tt: Optional[float] = Field(
         default=None,
-        description="Native file range. In JPL mode this historical name aliases the raw TDB header start; no TDB-to-TT conversion. See time_scale_policy.",
+        description="Swiss se1 native range start in its TT argument convention; absent for JPL raw headers.",
     )
     end_julian_day_tt: Optional[float] = Field(
         default=None,
-        description="Native file range. In JPL mode this historical name aliases the raw TDB header end; no TDB-to-TT conversion. See time_scale_policy.",
+        description="Swiss se1 native range end in its TT argument convention; absent for JPL raw headers.",
+    )
+    start_julian_day_tdb: Optional[float] = Field(
+        default=None, description="JPL raw TDB header start; no TDB-to-TT conversion."
+    )
+    end_julian_day_tdb: Optional[float] = Field(
+        default=None, description="JPL raw TDB header end; no TDB-to-TT conversion."
     )
     de_number: Optional[int] = None
     matches_packaged_manifest: Optional[bool] = None
@@ -185,7 +192,6 @@ class EphemerisTimeScalePolicy(PartialOutput):
     raw_header_time_scale: Optional[str] = None
     tt_tdb_conversion_applied: Optional[bool] = None
     source_documented_maximum_difference_seconds: Optional[float] = None
-    legacy_tt_range_fields: Optional[str] = None
     source_function: Optional[str] = None
     source_url: Optional[str] = None
     native_source_url: Optional[str] = None
@@ -226,7 +232,7 @@ class MidpointProfile(PartialOutput):
     hypothetical_model: Optional[str] = None
     aries_point: Optional[str] = None
     node_mode: Optional[str] = None
-    legacy_view: Optional[str] = None
+    seven_planet_view: Optional[str] = None
     sensitive_point_policy: Optional[str] = None
     ephemeris_models: Optional[List[str]] = None
     julian_day_tt: Optional[float] = None

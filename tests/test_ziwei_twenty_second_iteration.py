@@ -25,7 +25,7 @@ from tests.fixtures.mcp_receipt import verified_inline_business
 SOURCE = json.loads(
     (
         Path(__file__).parent
-        / "fixtures/ziwei_independent/naj_ming_childhood_v1/collation.json"
+        / "data/ziwei_independent/naj_ming_childhood_v1/collation.json"
     ).read_text()
 )
 
@@ -56,7 +56,7 @@ def test_independent_reading_cannot_hide_the_failed_first_pass_or_unknowns():
 
 def test_independent_review_rejects_a_rewritten_raw_first_answer(tmp_path):
     name = "independent_readings_r22_v1"
-    fixtures = Path(__file__).parent / "fixtures/ziwei_independent"
+    fixtures = Path(__file__).parent / "data/ziwei_independent"
     shutil.copytree(fixtures / name, tmp_path / name)
     path = tmp_path / name / "reports/day-review.json"
     record = json.loads(path.read_text())

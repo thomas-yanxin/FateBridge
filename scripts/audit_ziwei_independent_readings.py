@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures/ziwei_independent"
+FIXTURES = ROOT / "tests/data/ziwei_independent"
 
 
 def audit_independent_readings(fixtures: Path = FIXTURES) -> dict[str, Any]:

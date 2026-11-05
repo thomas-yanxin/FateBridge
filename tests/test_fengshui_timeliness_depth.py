@@ -20,7 +20,7 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.fengshui_timeliness import audit_timeliness_reference
 from tests.test_fengshui_surfaces import mcp_call, rest_client, without_transport
 
-REFERENCE = Path(__file__).parent / "fixtures/fengshui_timeliness_v1/reference.json"
+REFERENCE = Path(__file__).parent / "data/fengshui_timeliness_v1/reference.json"
 PROFILE = "wang_zhongzhou_timeliness_v1"
 
 

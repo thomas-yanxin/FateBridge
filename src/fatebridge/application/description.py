@@ -116,7 +116,30 @@ def _describe_contract(
         "family": spec.family,
         "annotations": spec.execution_hints.as_annotations(),
         "reproducibility": spec.reproducibility.as_manifest(),
+        "method_contract_coverage": (
+            "declared_subset" if spec.methods else "not_registered"
+        ),
+        "method_contracts": [method.as_manifest() for method in spec.methods],
+        "method_registration": {
+            "scope": "domain_methods_and_runtime_policy_witnesses",
+            "status": (
+                "registered"
+                if spec.methods
+                else (
+                    "excluded_by_request"
+                    if spec.key == "bazi_personality"
+                    else "not_registered"
+                )
+            ),
+            "applicability_contract": "input_schema_and_runtime_domain_preconditions",
+            "version_semantics": "contract_v1 is a registration contract; actual algorithm versions are recorded separately",
+        },
         "full_result_required_fields": list(spec.required_output_fields),
+        "full_result_empty_object_policy": "reject_required_roots",
+        "execution": {
+            "cpu_bound": spec.cpu_bound,
+            "budget_scope": "process_shared_across_transports",
+        },
         "surfaces": {
             "cli": cli_safe,
             "cli_name": spec.tool_name if cli_safe else None,
@@ -155,6 +178,11 @@ def summarize_spec(spec: ToolSpec) -> Dict[str, Any]:
         "cli_request_file": spec.cli_request_file,
         "annotations": spec.execution_hints.as_annotations(),
         "reproducibility": spec.reproducibility.as_manifest(),
+        "method_ids": [method.method_id for method in spec.methods],
+        "execution": {
+            "cpu_bound": spec.cpu_bound,
+            "budget_scope": "process_shared_across_transports",
+        },
     }
 
 
@@ -178,6 +206,9 @@ def mcp_description(spec: ToolSpec) -> str:
             "只有提供environmental_context时才追加layout_analysis.environmental_context；"
             "只有提交对应关系或材质事实时才追加interior_analysis/material_analysis，"
             "避免严格投影读取未生成的分支。"
+            "提交workstation_layout时可追加layout_analysis.workstation_layout_analysis；"
+            "算法完工读research_completion_status/research_coverage，不以请求complete代替全部算法覆盖。"
+            "实测候选保留完整回执及动作许可，不把ready解释为综合吉凶。"
         )
     summary = spec.summary + (
         " 调用参考系：" + json.dumps(guidance, ensure_ascii=False) if guidance else ""

@@ -8,6 +8,7 @@ from fatebridge.core.de440_solar import (
     HISTORICAL_MODEL_ID,
 )
 from fatebridge.core.de440_solar import MODEL_ID as DE440_SOLAR_MODEL
+from fatebridge.core.moshier_solar import MODEL_ID as COMPLETE_MOSHIER_SOLAR_MODEL
 from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
 
 from .host_guest import statements as host_guest_statements
@@ -41,14 +42,15 @@ def _bazhai_application(entry: Dict[str, Any]) -> str:
 def _calendar_cautions(layer: Dict[str, Any]) -> List[str]:
     """Render actual clock policies without changing year or natal results."""
     stack: List[Any] = [layer]
-    approximate = historical = future = moshier = analytic = guarded_de440 = aa1996 = (
-        False
-    )
-    vsop2013 = False
+    historical = future = moshier = analytic = guarded_de440 = aa1996 = False
+    vsop2013 = complete_moshier = False
     while stack:
         current = stack.pop()
         if isinstance(current, dict):
             moshier |= current.get("ephemeris_model") == "moshier"
+            complete_moshier |= (
+                current.get("ephemeris_model") == COMPLETE_MOSHIER_SOLAR_MODEL
+            )
             analytic |= current.get("ephemeris_model") == ANALYTIC_SOLAR_MODEL
             aa1996 |= current.get("ephemeris_model") == AA1996_SOLAR_MODEL
             vsop2013 |= current.get("ephemeris_model") == VSOP2013_SOLAR_MODEL
@@ -62,8 +64,6 @@ def _calendar_cautions(layer: Dict[str, Any]) -> List[str]:
                     "de440_historical_solar_model_guard_not_accuracy_certification",
                 )
             )
-            if current.get("approximate") is True and "precision_scope" in current:
-                approximate = True
             basis = current.get("time_basis", {})
             if isinstance(basis, dict):
                 historical |= basis.get("historical_ut1_convention") is True
@@ -72,10 +72,12 @@ def _calendar_cautions(layer: Dict[str, Any]) -> List[str]:
         elif isinstance(current, (list, tuple)):
             stack.extend(current)
     lines = []
-    if approximate:
-        lines.append("交节采用近似回退；是否待确认以本次边界状态为准，不认证交节秒。")
     if moshier:
         lines.append("交节所报TT处星历为Moshier；该配置完整范围尚未通过1秒实现验收。")
+    if complete_moshier:
+        lines.append(
+            "交节采用完整Moshier太阳修订；逐边界保留1996年级数与完整月球依赖，有限TT验收不认证全部时刻或绝对UTC。"
+        )
     if vsop2013:
         lines.append(
             "交节采用FateBridge VSOP2013太阳模型；TT数值对照与边界候选保护不认证绝对UTC精度。"
@@ -526,6 +528,48 @@ def sections(result: Dict[str, Any]) -> List[Tuple[str, List[str]]]:
                 )
         if "workstation_analysis" in layout:
             lines.append("WOFS非BTB桌面摆放仅作者参考，未启用摆放规则。")
+        measured = layout.get("workstation_layout_analysis")
+        if measured is not None:
+            geometry = measured["geometry"]
+            lines.append(
+                f"实测工位：{measured['status']}；图纸{geometry['frame_id']}；"
+                f"名义几何可行{geometry['physically_feasible']}；候选观察{geometry['candidate_only']}。"
+            )
+            for seat in geometry["seats"]:
+                lines.append(
+                    f"工位{seat['desk_id']}：按{seat['sector_anchor']}关联候选方区"
+                    f"{'/'.join(seat['location_directions']) or '未绑定'}；"
+                    f"实际位置与坐向分列，绑定状态{seat['chart_binding_status']}。"
+                )
+            for reading in measured["readings"]:
+                lines.append(
+                    f"工位{reading['desk_id']}／{reading['direction']}／候选{reading['chart_candidate_id']}："
+                    f"历史{reading['historical_period_number']}运；评价运{reading['evaluation_period_number']}；"
+                    f"{reading['conclusion']}"
+                )
+            for comparison in measured["rule_comparisons"]:
+                if comparison["reference_frame"] in {
+                    "seated_desktop_nine_cells",
+                    "desktop_compass_not_house_palace",
+                    "seated_right_with_higher_left_object",
+                }:
+                    lines.append(
+                        f"桌面物件{comparison['object_id']}：{comparison['rule_id']}；"
+                        f"{comparison['status']}；参考系{comparison['reference_frame']}，不与房间落宫混同。"
+                    )
+            search = measured.get("search")
+            if search is not None:
+                lines.append(
+                    f"有限布局搜索：已算{search['evaluated_count']}个完整组合，"
+                    f"拒绝{search['rejected_count']}个；完整枚举{search['enumeration_complete']}；"
+                    f"显示{len(search['returned_candidate_ids'])}个取舍方案，"
+                    f"另有{search['omitted_frontier_count']}个前沿方案未显示。"
+                )
+                for candidate in search["candidates"]:
+                    lines.append(
+                        f"方案{candidate['candidate_id']}：{candidate['status']}；"
+                        f"直接调整{len(candidate['actions'])}个对象；不是综合吉凶或效果保证。"
+                    )
         if context is not None:
             orientation = context["orientation_review"]
             lines.append(

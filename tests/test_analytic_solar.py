@@ -9,7 +9,7 @@ import pytest
 
 from fatebridge.core import analytic_solar as solar
 
-PRIMARY = Path(__file__).parent / "fixtures/analytic_solar_v23"
+PRIMARY = Path(__file__).parent / "data/solar/erfa-2.0.1"
 
 
 def test_pinned_primary_sources_and_complete_harmonic_series():

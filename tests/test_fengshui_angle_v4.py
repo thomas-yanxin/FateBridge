@@ -10,8 +10,14 @@ import pytest
 from fatebridge.cli import run
 from fatebridge.core.fengshui.xuankong import _selectors
 from fatebridge.services.fengshui import calculate_xuankong_natal
-from tests.test_fengshui_depth_audit import natal
+from tests.test_fengshui_depth_audit import natal as natal_request
 from tests.test_fengshui_surfaces import mcp_call, rest_client, without_transport
+
+
+def natal(angle, radius=0):
+    data = natal_request(angle=angle)
+    data["house"]["bearing_uncertainty_degrees"] = radius
+    return data
 
 
 def test_rounded_half_ulp_endpoints_do_not_manufacture_candidates():
@@ -38,7 +44,7 @@ def test_actual_endpoint_contact_still_keeps_both_one_sided_limits():
 
 
 def test_multiple_angle_reasons_are_retained_even_when_chart_is_unique():
-    data = {**natal(angle=4), "bearing_uncertainty_degrees": 1}
+    data = natal(angle=4, radius=1)
     layer = calculate_xuankong_natal(**data)["layers"]["xuankong_natal"]
     # [3, 5] spans central 子 and its same-polarity wing; one chart.
     zi = next(c for c in layer["candidates"] if c["facing"]["name"] == "子")
@@ -73,7 +79,7 @@ def test_multiple_angle_reasons_are_retained_even_when_chart_is_unique():
 
 
 def test_north_wrap_has_all_four_candidates_and_exact_endpoint_only_support():
-    result = calculate_xuankong_natal(**natal(angle=0), bearing_uncertainty_degrees=7.5)
+    result = calculate_xuankong_natal(**natal(angle=0, radius=7.5))
     layer = result["layers"]["xuankong_natal"]
     candidates = {
         (c["facing"]["name"], c["chart_mode"]): c for c in layer["candidates"]
@@ -93,16 +99,14 @@ def test_north_wrap_has_all_four_candidates_and_exact_endpoint_only_support():
         assert support["source_ids"] == ["X2"]
     assert "角区支持不表示概率或测量认证" in result["snapshot_text"]
     assert "[-15/2, -15/2]°" in result["snapshot_text"]
-    assert result == calculate_xuankong_natal(
-        **natal(angle=360), bearing_uncertainty_degrees=7.5
-    )
+    assert result == calculate_xuankong_natal(**natal(angle=360, radius=7.5))
 
 
 @pytest.mark.parametrize("angle,radius", [(0, 7.5), (6, 2), (22.5, 1), (355.5, 0)])
 def test_all_reported_support_is_within_the_original_exact_measurement(angle, radius):
-    layer = calculate_xuankong_natal(
-        **natal(angle=angle), bearing_uncertainty_degrees=radius
-    )["layers"]["xuankong_natal"]
+    layer = calculate_xuankong_natal(**natal(angle=angle, radius=radius))["layers"][
+        "xuankong_natal"
+    ]
     lower, upper = Fraction(angle) - Fraction(radius), Fraction(angle) + Fraction(
         radius
     )
@@ -123,7 +127,7 @@ def test_exact_boundaries_and_candidate_support_match_rest_mcp_cli(
     monkeypatch, tmp_path, capsys, tool
 ):
     angle = math.nextafter(22.5, -math.inf)
-    data = {**natal(angle=angle), "bearing_uncertainty_degrees": math.ulp(22.5) / 2}
+    data = natal(angle=angle, radius=math.ulp(22.5) / 2)
     if tool == "assess":
         data = {"methods": ["xuankong_natal"], "xuankong": data}
     http = rest_client(monkeypatch).post("/api/fengshui/" + tool, json=data)
@@ -148,8 +152,7 @@ def test_strict_projection_keeps_new_support_on_real_mcp():
         mcp_call(
             "xuankong_natal",
             {
-                **natal(angle=6),
-                "bearing_uncertainty_degrees": 1,
+                **natal(angle=6, radius=1),
                 "fields": [
                     "layers.xuankong_natal.chart.bearing_support",
                     "rulesets",

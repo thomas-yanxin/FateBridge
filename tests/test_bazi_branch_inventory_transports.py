@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = json.loads(
     (
         ROOT
-        / "tests/fixtures/bazi_same_target_bureau_v1/protocol-cases-affiliation-first.json"
+        / "tests/data/bazi_same_target_bureau_v1/protocol-cases-affiliation-first.json"
     ).read_text()
 )
 

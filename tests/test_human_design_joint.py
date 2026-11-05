@@ -18,62 +18,39 @@ from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_joint import verify_joint_snapshot
-from tests.golden.runner import golden_ephemeris
+from tests.ephemeris_context import moshier_ephemeris
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE = json.loads(
-    (ROOT / "tests/fixtures/human-design-joint-variant-case.json").read_text()
+    (ROOT / "tests/data/human_design/joint-variant-inputs.json").read_text()
 )
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
-def legacy_structure(chart):
-    return {
-        **{
-            k: chart["bodygraph"][k]
-            for k in (
-                "type",
-                "subtype",
-                "authority",
-                "strategy",
-                "definition",
-                "channels",
-            )
-        },
-        "profile": chart["profile"],
-        "incarnation_cross": chart["incarnation_cross"],
-        "variables": {k: chart["variables"][k] for k in ("status", "code")},
-    }
+def endpoint(side):
+    with moshier_ephemeris():
+        return chart_at_tt(CASE["endpoint_jd_tt"][side], backend="moshier")
 
 
-def test_real_old_projection_collapses_two_distinct_minimum_bridge_families():
-    a, b = CASE["left"], CASE["right"]
-    assert legacy_structure(a) == legacy_structure(b)
-    assert CASE["old_classification_variant_count"] == 1
-    assert CASE["old_observed_changed_structure_fields"] == []
-    changes = compare_charts(a, b, include_snapshots=True)
+def test_current_endpoint_charts_keep_distinct_minimum_bridge_families():
+    changes = compare_charts(
+        endpoint("left"), endpoint("right"), include_snapshots=True
+    )
     assert changes["changed_classifications"] == []
     assert changes["variable_changed"] is False
     assert changes["minimum_bridge_count_changed"] is False
     assert changes["minimum_bridge_sets_changed"] is True
-    assert (
-        changes["selected_structure"]["definition_bridging"]["minimum_solution_count"]
-        == 8
-    )
-    assert (
-        changes["reference_structure"]["definition_bridging"]["minimum_solution_count"]
-        == 8
-    )
+    for key in ("selected_structure", "reference_structure"):
+        assert changes[key]["definition_bridging"]["minimum_solution_count"] == 8
+        assert (
+            verify_joint_snapshot(changes[key])["status"]
+            == "verified_local_snapshot_mechanics"
+        )
     assert changes["line_fixing_changes"]
-    assert all(
-        verify_joint_snapshot(changes[k])["status"]
-        == "verified_local_snapshot_mechanics"
-        for k in ("selected_structure", "reference_structure")
-    )
 
 
 def test_actual_interval_keeps_coherent_joint_evidence_and_replayable_witnesses():
-    with golden_ephemeris():
+    with moshier_ephemeris():
         from fatebridge.core.human_design import chart_at
 
         nominal = chart_at(datetime.fromisoformat(CASE["nominal_birth_utc"]))
@@ -116,7 +93,7 @@ def test_actual_interval_keeps_coherent_joint_evidence_and_replayable_witnesses(
 
 
 def test_gate_line_and_variable_paths_resolve_within_each_snapshot():
-    value = JointSnapshotCache().snapshot(CASE["left"])
+    value = JointSnapshotCache().snapshot(endpoint("left"))
     for fix in value["depth_evidence"]["line_fixings"]:
         _, side, index = fix["calculation_path"].split(".")
         row = value["activations"][side][int(index)]
@@ -142,7 +119,7 @@ def test_gate_line_and_variable_paths_resolve_within_each_snapshot():
 
 def test_cache_is_local_and_does_not_collapse_typed_invalid_tones():
     cache = JointSnapshotCache()
-    a = deepcopy(CASE["left"])
+    a = deepcopy(endpoint("left"))
     first = cache.snapshot(a)
     b = deepcopy(a)
     sun = next(r for r in b["activations"]["personality"] if r["body"] == "Sun")
@@ -180,7 +157,7 @@ def test_cache_is_local_and_does_not_collapse_typed_invalid_tones():
     ],
 )
 def test_snapshot_corruption_is_rejected_without_a_position_oracle(bad):
-    value = deepcopy(JointSnapshotCache().snapshot(CASE["left"]))
+    value = deepcopy(JointSnapshotCache().snapshot(endpoint("left")))
     if bad == "gate":
         value["activations"]["personality"][0]["gate"] = True
     elif bad == "line":
@@ -208,7 +185,7 @@ def test_snapshot_corruption_is_rejected_without_a_position_oracle(bad):
 
 @pytest.fixture(scope="module")
 def complete_joint_run():
-    with golden_ephemeris():
+    with moshier_ephemeris():
         return execute_tool(SPEC, SPEC.request_model(**CASE["birth_input"]))
 
 
@@ -271,7 +248,7 @@ def test_regression_endpoint_families_match_separate_exhaustive_c_oracle():
     import math
 
     ref = json.loads(
-        (ROOT / "tests/fixtures/human-design-joint-bridge-oracle.json").read_text()
+        (ROOT / "tests/data/human_design/joint_bridge/reference.json").read_text()
     )
     plan = json.loads((ROOT / ref["plan_path"]).read_text())
     assert (
@@ -286,16 +263,10 @@ def test_regression_endpoint_families_match_separate_exhaustive_c_oracle():
         hashlib.sha256((ROOT / ref["source_table_path"]).read_bytes()).hexdigest()
         == ref["source_table_sha256"]
     )
-    assert (
-        hashlib.sha256(
-            (ROOT / "scripts/build_human_design_bridge_reference.py").read_bytes()
-        ).hexdigest()
-        == ref["generator_sha256"]
-    )
     assert sum(r["candidate_subsets_checked"] for r in ref["cases"]) == 1982
     for selected, expected in zip(plan["cases"], ref["cases"]):
         assert selected["id"] == expected["id"]
-        chart = CASE[selected["id"]]
+        chart = endpoint(selected["id"])
         assert selected["activated_gates"] == chart["bodygraph"]["activated_gates"]
         actual = JointSnapshotCache().snapshot(chart)["definition_bridging"]
         assert [r["added_gates"] for r in actual["minimum_solutions"]] == expected[

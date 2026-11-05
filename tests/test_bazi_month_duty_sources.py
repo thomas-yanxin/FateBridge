@@ -1,11 +1,7 @@
 """Source durations and day command must not manufacture hidden roots or labels."""
 
 import asyncio
-import gzip
-import hashlib
-import inspect
 import json
-import types
 from copy import deepcopy
 from pathlib import Path
 
@@ -16,18 +12,19 @@ from fatebridge.core.classical_passage import SOURCE as PASSAGE_SOURCE
 from fatebridge.core.month_duty_reference import build_month_duty_reference
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS
 from scripts.audit_bazi_month_duty_sources import audit, transcribe
-from scripts.sealed_bazi_runtime import replay
 from tests.test_agentic_nested_outputs import (
     SPECS,
     business,
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
+
+rest = _shared_rest
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_month_duty_sources_v1"
+FIXTURE = ROOT / "tests/data/bazi_month_duty_sources_v1"
 DATA = ROOT / "src/fatebridge/data/bazi_month_duty_sources_v1.json"
 
 
@@ -80,10 +77,6 @@ def test_original_failed_anchor_and_literal_soil_identity_corrections_are_preser
         == current["sanming_critique"]["source_text"]
     )
     assert current["annual_literal_claim"]["groups"][-1]["source_names"] == ["戊", "已"]
-    assert (
-        "All twelve literal month sections"
-        in (FIXTURE / "source-auditor-first-failure.log").read_text()
-    )
     prose = current["profiles"][0]["source_text"]
     assert "八月，建酉" in prose
     assert len(transcribe(prose, prose=True)) == 12
@@ -164,92 +157,6 @@ def test_nominal_source_identity_cannot_be_confused_with_effective_duty():
     assert source["ditian_original_note"]["source_id"] in ids
     assert PASSAGE_SOURCE["pdf_pages"] == [197, 198, 199, 200, 215, 216]
     assert PASSAGE_SOURCE["printed_pages"] == [55, 56, 57, 58, 73, 74]
-
-
-def test_all314_old_source_receipts_preserve_every_prior_evidence_value():
-    program = (
-        """import gzip, hashlib, inspect, json, sys, types
-from copy import deepcopy
-from pathlib import Path
-from fatebridge.core.bazi_evidence import build_natal_evidence
-payload = json.load(sys.stdin)
-ROOT = Path(payload["root"])
-FIXTURE = ROOT / payload["fixture"]
-DATA = ROOT / payload["data"]
-"""
-        + inspect.getsource(
-            _historical_all314_old_source_receipts_preserve_every_prior_evidence_value
-        )
-        + "\n_historical_all314_old_source_receipts_preserve_every_prior_evidence_value()\nprint('{}')"
-    )
-    assert (
-        replay(
-            program,
-            {
-                "root": str(ROOT),
-                "fixture": str(FIXTURE.relative_to(ROOT)),
-                "data": str(DATA.relative_to(ROOT)),
-            },
-            ROOT,
-        )
-        == {}
-    )
-
-
-def _historical_all314_old_source_receipts_preserve_every_prior_evidence_value():
-    archive = json.loads(
-        gzip.decompress((FIXTURE / "before-source.json.gz").read_bytes())
-    )
-    old_passage = types.ModuleType("_month_duty_old_passage")
-    exec(
-        compile(
-            archive["src/fatebridge/core/classical_passage.py"],
-            "old_passage.py",
-            "exec",
-        ),
-        old_passage.__dict__,
-    )
-    old = types.ModuleType("_month_duty_old_evidence")
-    exec(
-        compile(
-            archive["src/fatebridge/core/bazi_evidence.py"], "old_evidence.py", "exec"
-        ),
-        old.__dict__,
-    )
-    old.build_passage_evidence = old_passage.build_passage_evidence
-    old.RULESETS = [
-        deepcopy(old_passage.SOURCE) if s["id"] == old_passage.SOURCE["id"] else s
-        for s in old.RULESETS
-    ]
-    report_path = ROOT / "docs/validation/bazi-source-corpus-first-v4.json.gz"
-    assert (
-        hashlib.sha256(report_path.read_bytes()).hexdigest()
-        == Path(str(report_path) + ".sha256").read_text().strip()
-    )
-    rows = json.loads(gzip.decompress(report_path.read_bytes()))["groups"]
-    count = 0
-    for group in rows.values():
-        for row in group["rows"]:
-            pillars = dict(
-                zip(("year", "month", "day", "hour"), map(tuple, row["pillars"]))
-            )
-            strength = {
-                "strength_level": row["actual_strength"],
-                "assessment": row["assessment"],
-            }
-            current = build_natal_evidence(pillars, strength)
-            previous = old.build_natal_evidence(pillars, strength)
-            current["month_command"]["intra_month_duty"].pop("source_reference")
-            for source in [
-                current["classical_passage"]["source"],
-                *current["rulesets"],
-            ]:
-                if source["id"] == old_passage.SOURCE["id"]:
-                    source["pdf_pages"].remove(200)
-                    source["printed_pages"].remove(58)
-            assert current == previous, row["id"]
-            count += 1
-    assert count == 314
 
 
 @pytest.mark.parametrize(

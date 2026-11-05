@@ -83,26 +83,26 @@ def verify_fengshui_reading(
         )
     except (KeyError, AttributeError, TypeError):
         errors.append({"code": "author_mutual_geometry_inconsistent"})
-    if version in {"1.1.0", "1.2.0"}:
+    if version == "1.2.0":
         try:
             for chart in (
                 payload.get("layers", {})
                 .get("xuankong_natal", {})
                 .get("candidates", [])
             ):
-                validate_natal_structure(chart, include_opposite=version == "1.2.0")
+                validate_natal_structure(chart)
         except (FengshuiCalculationError, AttributeError, TypeError):
             errors.append({"code": "numeric_structure_inconsistent"})
-    expected = build_natal_reading(
-        payload, version=version if isinstance(version, str) else ""
-    )
+    if version != "1.2.0":
+        errors.append({"code": "unsupported_reading_version"})
+    expected = build_natal_reading(payload)
     if expected["status"] != "rendered" or not expected["statements"]:
         errors.append({"code": "unsupported_reading_context"})
     if not _same_value(actual, expected):
         errors.append({"code": "fixed_text_context_or_coverage_mismatch"})
     numeric_charts = (
         sum(s["kind"] == "natal_distribution" for s in expected.get("statements", []))
-        if version in {"1.1.0", "1.2.0"} and not errors
+        if version == "1.2.0" and not errors
         else 0
     )
     opposite_charts = (

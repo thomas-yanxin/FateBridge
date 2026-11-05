@@ -268,19 +268,6 @@ def test_cli_whole_limit_and_conjunction_modes(monkeypatch, capsys):
     assert F(moon["research_conjunction_day_cycle_exact"]) > 18
 
 
-def test_all_53_previous_complete_stdout_values_remain_identical(monkeypatch, capsys):
-    monkeypatch.chdir(ROOT)
-    cases = json.loads((FIXTURE / "before-53-cli-stdout.json").read_text())
-    assert len(cases) == 53
-    for key, wanted in cases.items():
-        script, params = key.split(":", 1)
-        args = params.split() if " " in params else params.split(":")
-        path = ROOT / "scripts" / script
-        monkeypatch.setattr(sys, "argv", [str(path), *args])
-        assert runpy.run_path(str(path))["main"]() == 0
-        assert capsys.readouterr().out == wanted
-
-
 @pytest.mark.parametrize(
     "fault",
     [

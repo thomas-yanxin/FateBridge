@@ -420,7 +420,7 @@ REST_POST_CASES = {
     "/api/divination/sanshiunited": lambda: {
         **_local_base(),
         "qimen_options": {"layout": "direct"},
-        "taiyi_options": {"accNum": 0},
+        "taiyi_options": {},
         "liureng_yue": "申",
         "liureng_is_diurnal": False,
     },
@@ -818,7 +818,7 @@ MCP_CASES = {
             "gps_lat": 31.2,
             "gps_lon": 121.4,
             "qimen_options": {"layout": "direct"},
-            "taiyi_options": {"accNum": 0},
+            "taiyi_options": {},
             "liureng_yue": "申",
             "liureng_is_diurnal": False,
         },

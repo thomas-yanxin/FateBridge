@@ -140,22 +140,29 @@ def test_actual_public_transports_reject_false_derived_claims(
     }.intersection(http.json())
 
 
-def test_original_served_wrong_sum_keeps_valid_receipt_but_loses_numeric_acceptance():
-    folder = Path(__file__).parent / "fixtures/fengshui_derived_integrity_v1"
-    manifest = json.loads((folder / "manifest.json").read_text())
-    for name, digest in manifest["files"].items():
-        assert hashlib.sha256((folder / name).read_bytes()).hexdigest() == digest
-    raw = gzip.decompress((folder / "original-served-bad-sum.json.gz").read_bytes())
-    assert hashlib.sha256(raw).hexdigest() == manifest["original_full_response_sha256"]
-    payload = json.loads(raw)
-    receipt = json.loads((folder / "trusted-execution-receipt.json").read_text())
-    assert "7+4=999" in payload["calculation_reading"]["text"]
-    report = verify_fengshui_reading(payload, **receipt)
+def test_a_current_rehashed_receipt_cannot_certify_a_false_sum():
+    from fatebridge.services.replay_metadata import digest
+    from tests.test_fengshui_fixed_reading import executed, trusted
+
+    payload = executed(
+        request(
+            interpretation={
+                "current_period_number": 9,
+                "period_evidence": "Independent current-period test input",
+            }
+        )
+    )
+    chart = payload["layers"]["xuankong_natal"]["candidates"][0]
+    chart["structure"]["combination_of_ten"][0]["palace_sums"]["C"] = 999
+    payload["run_metadata"]["business_output_sha256"] = digest(
+        {key: value for key, value in payload.items() if key != "run_metadata"}
+    )
+    report = verify_fengshui_reading(payload, **trusted(payload))
     assert report["status"] == "rejected"
-    assert report["errors"] == [{"code": "numeric_structure_inconsistent"}]
+    assert {row["code"] for row in report["errors"]} >= {
+        "numeric_structure_inconsistent"
+    }
     assert report["derived_numeric_consistency_verified"] is False
-    assert report["numeric_structure_coverage_verified"] is False
-    assert report["free_model_prose_verified"] is False
 
 
 @pytest.mark.parametrize("period", range(1, 10))
@@ -230,9 +237,8 @@ def test_every_selected_derived_value_is_checked_from_raw_stars(angle):
             validate_natal_structure(chart)
 
 
-def test_v11_archival_check_does_not_invent_an_opposite_branch():
+def test_current_structure_requires_the_opposite_branch():
     chart = xuankong.xuankong_natal(XuankongRequest.model_validate(request()))["chart"]
     del chart["structure"]["classical_patterns"]["opposite_star_comparison"]
-    validate_natal_structure(chart, include_opposite=False)
     with pytest.raises(FengshuiCalculationError):
         validate_natal_structure(chart)

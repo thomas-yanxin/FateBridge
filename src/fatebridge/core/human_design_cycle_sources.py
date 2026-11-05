@@ -74,8 +74,8 @@ class CycleSourceTrace:
         if jpl:
             header = jpl_header(path)
             start, end, de_number = (
-                header["start_julian_day_tt"],
-                header["end_julian_day_tt"],
+                header["start_julian_day_tdb"],
+                header["end_julian_day_tdb"],
                 header["de_number"],
             )
         if (
@@ -99,8 +99,8 @@ class CycleSourceTrace:
                     raise EphemerisSourceError("edition_changed")
                 if (
                     saved["slot"],
-                    saved["start_julian_day_tt"],
-                    saved["end_julian_day_tt"],
+                    saved["start_julian_day_tdb" if jpl else "start_julian_day_tt"],
+                    saved["end_julian_day_tdb" if jpl else "end_julian_day_tt"],
                 ) != (slot, start, end):
                     raise EphemerisSourceError("slot_changed")
                 self._metadata_cache[key_metadata] = path, signature, identity
@@ -122,8 +122,9 @@ class CycleSourceTrace:
             "filename": path.name,
             "sha256": digest,
             "bytes": signature[2],
-            "start_julian_day_tt": float(start),
-            "end_julian_day_tt": float(end),
+            "range_time_scale": "TDB" if jpl else "TT",
+            ("start_julian_day_tdb" if jpl else "start_julian_day_tt"): float(start),
+            ("end_julian_day_tdb" if jpl else "end_julian_day_tt"): float(end),
             "de_number": de_number,
             "matches_packaged_manifest": bool(
                 expected

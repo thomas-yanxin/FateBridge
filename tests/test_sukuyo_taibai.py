@@ -12,7 +12,7 @@ from fatebridge.services.tool_catalog import CATALOG
 from scripts.audit_sukuyo_taibai_primary import verify_primary
 
 PRIMARY = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-taibai-primary.json").read_bytes()
+    (Path(__file__).parent / "data/sukuyo-taibai-primary.json").read_bytes()
 )
 
 

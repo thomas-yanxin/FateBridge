@@ -599,7 +599,6 @@ def build_liureng_board(
         ],
         "kongwang": kongwang,
         "xun_head": xun_head,
-        "twelve_life_element": branch_element_text(month_branch),
         "month_building_element": branch_element_text(month_branch),
         "life_stages": life_stages,
         "auxiliary_stars": auxiliary_stars,

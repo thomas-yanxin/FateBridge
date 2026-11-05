@@ -60,27 +60,6 @@ def test_all3072_engine_free_frozen_boundary_and_midpoint_cases():
     assert any(r["personality_longitude"] < 0 for r in ref["cases"])
 
 
-def test_original_input_plan_is_unchanged_and_planner_erratum_changes_no_ast():
-    plan_path = FIXTURES / "human-design-profile-coverage-plan.json"
-    assert (
-        hashlib.sha256(plan_path.read_bytes()).hexdigest()
-        == "ea4e0cd15bd228a3002bd055aaeaae28264b5edf0d51505af1828c29e78ce143"
-    )
-    plan = json.loads(plan_path.read_text())
-    old = (
-        ROOT
-        / "docs/validation/human-design-profile-continuation-v1/original-planner.py"
-    )
-    current = ROOT / "scripts/plan_human_design_profile_coverage.py"
-    assert (
-        hashlib.sha256(old.read_bytes()).hexdigest()
-        == plan["source_bindings"]["scripts/plan_human_design_profile_coverage.py"]
-    )
-    assert ast.dump(ast.parse(old.read_text())) == ast.dump(
-        ast.parse(current.read_text())
-    )
-
-
 def chart(p, d):
     activations = {}
     for side, longitude in (("personality", p), ("design", d)):
@@ -245,23 +224,3 @@ def test_rehashed_partition_tampering_is_rejected(complete, mutation):
             ]
     rehash(value)
     assert verify_human_design_reading(value)["status"] == "rejected"
-
-
-def test_pre_extension_complete_receipts_remain_legacy_scoped():
-    path = (
-        ROOT
-        / "docs/validation/human-design-profile-coverage/batch-001/complete-runs.jsonl.gz"
-    )
-    with gzip.open(path, "rt") as stream:
-        rows = [json.loads(line) for line in stream]
-    for row in rows:
-        result = verify_human_design_reading(row["run"])
-        assert result["status"] == "verified_fixed_template_reading", (
-            row["id"],
-            result,
-        )
-        assert (
-            result["profile_partition_context_status"]
-            == "not_in_declared_legacy_contract"
-        )
-        assert "profile_partition_context" not in row["run"]

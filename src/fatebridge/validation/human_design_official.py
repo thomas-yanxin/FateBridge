@@ -59,9 +59,7 @@ def _birth_clock_link(calculated: str, displayed: str) -> dict[str, Any]:
     }
 
 
-def official_chart_checks(
-    reference: dict[str, Any], *, include_clock_link_evidence: bool = False
-) -> dict[str, Any]:
+def official_chart_checks(reference: dict[str, Any]) -> dict[str, Any]:
     if (
         set(reference["planet_order"])
         != {
@@ -248,10 +246,9 @@ def official_chart_checks(
                 "source_pdf_sha256": case["pdf_sha256"],
             }
         )
-        if include_clock_link_evidence:
-            cases[-1]["birth_clock_link"] = _birth_clock_link(
-                actual["birth_utc"], case["displayed_birth_utc"]
-            )
+        cases[-1]["birth_clock_link"] = _birth_clock_link(
+            actual["birth_utc"], case["displayed_birth_utc"]
+        )
     passed = bool(cases) and all(c["status"] == "matched" for c in cases)
     report = {
         "status": "bounded_official_examples_matched" if passed else "failed",
@@ -320,33 +317,26 @@ def official_chart_checks(
         "full_original_text_certified": False,
         "physical_subdivision_accuracy_certified": False,
     }
-    if include_clock_link_evidence:
-        linked = [
-            c
-            for c in cases
-            if c.get("birth_clock_link", {}).get("same_nominal_instant") is True
-        ]
-        unlinked = [
-            c
-            for c in cases
-            if c.get("birth_clock_link", {}).get("same_nominal_instant") is False
-        ]
-        report["birth_clock_link_summary"] = {
-            "same_nominal_instant_case_ids": [c["id"] for c in linked],
-            "nominal_clock_disagreement_case_ids": [c["id"] for c in unlinked],
-            "unassessed_case_ids": [
-                c["id"] for c in cases if "birth_clock_link" not in c
-            ],
-            "linked_gate_lines_checked": sum(c["gate_lines_checked"] for c in linked),
-            "linked_gate_lines_matched": sum(c["gate_lines_matched"] for c in linked),
-            "unlinked_gate_lines_checked": sum(
-                c["gate_lines_checked"] for c in unlinked
-            ),
-            "unlinked_gate_lines_matched": sum(
-                c["gate_lines_matched"] for c in unlinked
-            ),
-            "original_counts_and_grades_retained": True,
-            "physical_clock_accuracy_certified": False,
-            "scope": "Additional causal context only. Original failed cases and raw comparison counts are unchanged; neither group certifies ephemeris truth or source clock accuracy.",
-        }
+    linked = [
+        c
+        for c in cases
+        if c.get("birth_clock_link", {}).get("same_nominal_instant") is True
+    ]
+    unlinked = [
+        c
+        for c in cases
+        if c.get("birth_clock_link", {}).get("same_nominal_instant") is False
+    ]
+    report["birth_clock_link_summary"] = {
+        "same_nominal_instant_case_ids": [c["id"] for c in linked],
+        "nominal_clock_disagreement_case_ids": [c["id"] for c in unlinked],
+        "unassessed_case_ids": [c["id"] for c in cases if "birth_clock_link" not in c],
+        "linked_gate_lines_checked": sum(c["gate_lines_checked"] for c in linked),
+        "linked_gate_lines_matched": sum(c["gate_lines_matched"] for c in linked),
+        "unlinked_gate_lines_checked": sum(c["gate_lines_checked"] for c in unlinked),
+        "unlinked_gate_lines_matched": sum(c["gate_lines_matched"] for c in unlinked),
+        "original_counts_and_grades_retained": True,
+        "physical_clock_accuracy_certified": False,
+        "scope": "Additional causal context only. Original failed cases and raw comparison counts are unchanged; neither group certifies ephemeris truth or source clock accuracy.",
+    }
     return report

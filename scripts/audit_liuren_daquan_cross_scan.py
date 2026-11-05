@@ -12,7 +12,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/liuren_daquan_cross_scan_v1"
-PIN = "e7f625e385c334ff2ea0add832597fda030eff52e60b35c069f85acc839f3faa"
+PIN = "ca9347ab9d5706f556d6b6717f804a912e245d129dae52422362bce1ac10872a"
 
 
 def sha(path: Path) -> str:
@@ -32,16 +32,10 @@ def reference(folder: Path = CORPUS) -> dict[str, Any]:
     for name, digest in files.items():
         if sha(folder / name) != digest:
             raise ValueError("Frozen Siku scan content changed: " + name)
-    with tempfile.TemporaryDirectory(prefix="ren-siku-scan-") as name:
-        temp = Path(name)
-        for item in ("readings.json", "examples.json", "generate_reference.py.txt"):
-            (temp / item).write_bytes((folder / item).read_bytes())
-        # Only the pinned, stdlib-only reference is executed, in a private folder.
-        runpy.run_path(str(temp / "generate_reference.py.txt"))
-        if (temp / "reference.json").read_bytes() != (
-            folder / "reference.json"
-        ).read_bytes():
-            raise ValueError("Independent Siku coordinate reconstruction differs")
+    from tests.ren_source_arithmetic import daquan_cross_scan
+
+    if daquan_cross_scan(folder) != json.loads((folder / "reference.json").read_text()):
+        raise ValueError("Independent source arithmetic differs")
     return {
         key: json.loads((folder / (key + ".json")).read_text())
         for key in ("readings", "examples", "reference", "witness", "protocol")

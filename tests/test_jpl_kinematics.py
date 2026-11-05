@@ -13,7 +13,7 @@ from fatebridge.core.astro.jpl_kinematics import (
 )
 from fatebridge.utils.errors import EphemerisSourceError
 
-FIXTURE = Path(__file__).parent / "fixtures/astrodice-de441-j2000.eph"
+FIXTURE = Path(__file__).parent / "data/astrodice/tables/de441-j2000.eph"
 
 
 @pytest.mark.parametrize("x", [-1.0, -0.5, 0.0, 0.25, 1.0])

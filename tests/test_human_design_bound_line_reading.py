@@ -11,8 +11,9 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core import human_design_knowledge as knowledge
-from fatebridge.core.human_design import CHANNELS
+from fatebridge.core.human_design_line_catalogue import _canonical
 from fatebridge.core.human_design_line_reading import _condition
+from fatebridge.core.human_design_mechanics import CHANNELS
 from fatebridge.services.human_design_line_reading import (
     LineReadingInputError,
     build_human_design_line_packet,
@@ -23,8 +24,6 @@ from fatebridge.validation.human_design_line_reading import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "docs/validation/human-design-bound-line-reading-v1"
-E = BASE / "evidence"
 # Reading contract: the teaching describes emphasis, not exclusive access.
 # These expectations are independent of the implementation's lookup table.
 EXPECTED_EMPHASIS = {
@@ -38,22 +37,9 @@ EXPECTED_EMPHASIS = {
 
 @pytest.fixture(scope="module")
 def cases():
-    rows = json.loads((E / "original-run-captures.json").read_text())
-    assert [r["id"] for r in rows] == [
-        "may6_1988_synthetic",
-        "may6_2030_synthetic",
-        "may6_2023_synthetic",
-        "j2000_control_synthetic",
-    ]
-    rows += json.loads((E / "additional-run-captures.json").read_text())
-    result = {}
-    for r in rows:
-        raw = (E / r["file"]).read_bytes()
-        assert hashlib.sha256(raw).hexdigest() == r["gzip_sha256"]
-        data = gzip.decompress(raw)
-        assert hashlib.sha256(data).hexdigest() == r["uncompressed_sha256"]
-        result[r["id"]] = json.loads(data)
-    return result
+    from tests.human_design_current import semantic_sources
+
+    return semantic_sources("bound")
 
 
 @pytest.fixture(scope="module")
@@ -274,7 +260,7 @@ def test_every_forged_packet_field_is_rejected_even_with_extra_rehash_claims(
     # Keep the separately bound source digest correct. A reading fault must be
     # rejected for its own field, not masked by an intentionally invalid hash.
     packet["source_identity"]["original_result_sha256"] = hashlib.sha256(
-        knowledge._canonical(packet["original_result"])
+        _canonical(packet["original_result"])
     ).hexdigest()
     assert packet["source_identity"] == packets[key]["source_identity"]
     check = verify_human_design_line_packet(packet, cases[key])
@@ -355,7 +341,12 @@ def test_actual_module_cli_matches_library_and_requires_external_source(
     cases, packets, tmp_path
 ):
     key = "may6_2030_synthetic"
-    source = E / "may6_2030_synthetic.json.gz"
+    source = tmp_path / "source.json.gz"
+    source.write_bytes(gzip.compress(json.dumps(cases[key]).encode()))
+    wrong_source = tmp_path / "wrong-source.json.gz"
+    wrong_source.write_bytes(
+        gzip.compress(json.dumps(cases["may6_2023_synthetic"]).encode())
+    )
     packet_path = tmp_path / "packet.json.gz"
     command = [
         sys.executable,
@@ -379,7 +370,7 @@ def test_actual_module_cli_matches_library_and_requires_external_source(
         and json.loads(result.stdout)["checked_activation_count"] == 26
     )
     result = subprocess.run(
-        [*command, "verify", str(E / "may6_2023_synthetic.json.gz"), str(packet_path)],
+        [*command, "verify", str(wrong_source), str(packet_path)],
         capture_output=True,
         text=True,
     )

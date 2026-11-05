@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/sukuyo-t2465-downloaded-primary.json"
+FIXTURE = ROOT / "tests/data/sukuyo-t2465-downloaded-primary.json"
 
 
 class SATQuotationParser(HTMLParser):

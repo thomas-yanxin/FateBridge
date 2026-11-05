@@ -21,7 +21,7 @@ from fatebridge.core.requests.divination import CanpingRequest, HeluoRequest
 from tests.fixtures.solar_reference import expected_solar_clock
 
 ROOT = Path(__file__).parent / "fixtures"
-JPL = json.loads((ROOT / "bazi-solar-regression-jpl-v1.json").read_text())
+JPL = json.loads((ROOT.parent / "data/bazi-solar-regression-jpl-v1.json").read_text())
 BUILDERS = [build_heluo_result, build_canping_result]
 BASE = dict(date="2000-05-15", time="09:00:00", zone="Asia/Shanghai", gender="男")
 
@@ -134,7 +134,9 @@ def test_actual_calculation_wall_clock_against_frozen_independent_jpl(
 def test_reference_reuse_is_identified_without_inventing_new_external_instants():
     reference = json.loads((ROOT / "numerology_clock_v1/reference.json").read_text())
     assert (
-        hashlib.sha256((ROOT / reference["jpl_fixture"]).read_bytes()).hexdigest()
+        hashlib.sha256(
+            (ROOT.parent / "data" / reference["jpl_fixture"]).read_bytes()
+        ).hexdigest()
         == reference["jpl_fixture_sha256"]
     )
     assert reference["reused_independent_instants"] == 4

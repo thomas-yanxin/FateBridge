@@ -18,9 +18,7 @@ from fatebridge.core.timing_interactions import analyze_timing_interactions
 NATAL = dict(
     zip(("year", "month", "day", "hour"), map(tuple, "乙未 戊子 庚辰 丁丑".split()))
 )
-FIXTURE = (
-    Path(__file__).parent / "fixtures/bazi_timing_carriers_v1/source-examples.json"
-)
+FIXTURE = Path(__file__).parent / "data/bazi_timing_carriers_v1/source-examples.json"
 REFERENCE = json.loads(FIXTURE.read_text())
 
 

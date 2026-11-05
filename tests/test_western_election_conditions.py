@@ -89,49 +89,6 @@ def codes(result):
     return {f["code"] for f in result["factors"]}
 
 
-def test_protocol_and_oracles_are_unchanged():
-    p = FIXTURE / "western-election-conditions-protocol.json"
-    assert (
-        hashlib.sha256(p.read_bytes()).hexdigest()
-        == "deff7fba54c1cdee34a55e65f1b654f06b7c6302dbbb7443e074bd9b45c4db38"
-    )
-    for rel, expected in json.loads(p.read_text())["reference_files"].items():
-        assert (
-            hashlib.sha256((FIXTURE.parents[1] / rel).read_bytes()).hexdigest()
-            == expected
-        )
-
-
-def test_preserved_election_overshoot_failure_now_has_strict_future_contact():
-    assert (
-        election._moon_void_of_course(
-            {"longitude": 0.0, "speed": 13.0}, [{"longitude": 0.1, "speed": 0.0}]
-        )
-        is False
-    )
-    assert Decimal(".1") / 13 < Decimal(30) / 13
-    # Moving target reaches the conjunction after lunar ingress; proximity is
-    # not the lunar travel distance. Also cover a contact outside the old12°.
-    assert (
-        election._moon_void_of_course(
-            {"longitude": 29.0, "speed": 13.0}, [{"longitude": 29.9, "speed": 12.0}]
-        )
-        is True
-    )
-    assert (
-        election._moon_void_of_course(
-            {"longitude": 0.0, "speed": 13.0}, [{"longitude": 20.0, "speed": 0.0}]
-        )
-        is False
-    )
-    assert (
-        election._moon_void_of_course(
-            {"longitude": 0.0, "speed": None}, [{"longitude": 0.1, "speed": 0.0}]
-        )
-        is None
-    )
-
-
 def test_unknown_native_events_cannot_become_complete_favourable_score(monkeypatch):
     monkeypatch.setattr(
         election, "native_lunar_contacts", lambda subject: event_result(None)

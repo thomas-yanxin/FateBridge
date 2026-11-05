@@ -1,7 +1,6 @@
 """Lunar longitude contacts before ingress, with explicit numerical models.
 
 The production path samples the physical ephemeris in TT and brackets roots.
-The analytical constant-velocity function is a separate test/research model.
 Neither a future angular contact nor an absent contact establishes an outcome.
 """
 
@@ -86,51 +85,6 @@ def _event_fields(moon: State, other: State, ray: int) -> Dict[str, Any]:
         ),
         "phase": phase,
         "applying": {"applying": True, "separating": False}.get(phase),
-    }
-
-
-def linear_lunar_contacts(moon: State, others: Dict[str, State]) -> Dict[str, Any]:
-    """Exact constant-velocity research projection; never the native service path."""
-    speed = moon.get("speed")
-    if speed is None or not math.isfinite(speed) or speed <= 0:
-        raise ValueError("Positive known lunar speed required for the linear model")
-    start = angle_fraction(moon["longitude"]) % 360
-    distance = 30 - start % 30
-    exit_days = distance / Fraction(speed)
-    events = []
-    for planet, state in others.items():
-        other_speed = state.get("speed")
-        if other_speed is None or not math.isfinite(other_speed):
-            raise ValueError("Missing target speed in linear lunar projection")
-        relative_speed = Fraction(speed) - Fraction(other_speed)
-        delta = start - angle_fraction(state["longitude"]) % 360
-        if relative_speed == 0:
-            if delta % 360 in RAYS:
-                raise ValueError("Continuous exact contact has no isolated future root")
-            continue
-        for ray in RAYS:
-            turn = (delta - ray) // 360
-            target = Fraction(ray + 360 * (turn + (relative_speed > 0)))
-            if relative_speed < 0 and target == delta:
-                target -= 360
-            after_days = (target - delta) / relative_speed
-            if 0 < after_days < exit_days:
-                event = {
-                    "other": planet,
-                    "after_days": float(after_days),
-                    **_event_fields(moon, state, ray),
-                }
-                events.append((after_days, event))
-    events.sort(key=lambda row: (row[0], row[1]["other"], row[1]["ray_degrees"]))
-    return {
-        "status": "computed",
-        "method_id": "linear_signed_velocity_projection_v1",
-        "constant_velocity_projection": True,
-        "degrees_left_in_sign": float(distance),
-        "sign_exit_after_days": float(exit_days),
-        "contacts": [row for _, row in events],
-        "void_of_course": not events,
-        "source_scope": "Research projection of future longitude contacts; no acceleration, stations or full original-text acceptance",
     }
 
 

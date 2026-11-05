@@ -22,13 +22,6 @@ from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.validation.meihua import audit_meihua, reference_bundle
 
 REFERENCES = Path(__file__).parent / "fixtures/meihua_v1"
-pytestmark = [
-    # The minimum supported lunardate version exposes the camelCase API;
-    # newer versions deprecate those aliases without changing this audit.
-    pytest.mark.filterwarnings("ignore:fromSolarDate is deprecated:DeprecationWarning"),
-    pytest.mark.filterwarnings("ignore:toSolarDate is deprecated:DeprecationWarning"),
-    pytest.mark.filterwarnings("ignore:use is_leap_month:DeprecationWarning"),
-]
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
 # Literal trigram diagrams in bottom-to-top order, independently read from
 # 卷一「八卦象例」; expected diagrams do not come from BAGUA_BY_NAME.

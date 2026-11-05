@@ -424,6 +424,13 @@ def test_real_western_exact_time_and_delivery_match_all_transports(
                 restored["ephemeris"]["sha256"] == runtime["ephemeris_inventory_sha256"]
             )
             inline_metadata["runtime"] = restored
+        evidence = inline_metadata.get("calculation_evidence")
+        if evidence and "delivery_path" in evidence:
+            restored = reconstruct(store, ref["result_id"], evidence["delivery_path"])
+            from fatebridge.utils.json_digest import digest
+
+            assert digest(restored) == evidence["sha256"]
+            inline_metadata["calculation_evidence"] = restored
         assert original["run_metadata"] == inline_metadata
         full.append({k: v for k, v in original.items() if k != "run_metadata"})
         page = rest.get(
@@ -453,7 +460,8 @@ def test_recommended_western_first_view_fits_default_budget(store):
     assert not result.is_error
     if "result_delivery" in result.structured_content:
         assert result.structured_content["result_delivery"]["deferred_fields"] == [
-            "run_metadata.runtime"
+            "run_metadata.calculation_evidence",
+            "run_metadata.runtime",
         ]
     assert (
         result.structured_content["transits"]["current_transit"]["analysis_datetime"]

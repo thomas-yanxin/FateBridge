@@ -208,54 +208,6 @@
         "description": "First person birth date, e.g. 1990-06-15",
         "type": "string"
       },
-      "person1_gps_lat": {
-        "anyOf": [
-          {
-            "type": "number"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "First person GPS latitude"
-      },
-      "person1_gps_lon": {
-        "anyOf": [
-          {
-            "type": "number"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "First person GPS longitude"
-      },
-      "person1_lat": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": "31n13",
-        "description": "First person latitude text or decimal; 兼容旧参数，不参与定宿"
-      },
-      "person1_lon": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": "121e28",
-        "description": "First person longitude text or decimal; 兼容旧参数，不参与定宿"
-      },
       "person1_name": {
         "default": "甲方",
         "description": "First person name / label",
@@ -318,54 +270,6 @@
       "person2_date": {
         "description": "Second person birth date",
         "type": "string"
-      },
-      "person2_gps_lat": {
-        "anyOf": [
-          {
-            "type": "number"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Second person GPS latitude"
-      },
-      "person2_gps_lon": {
-        "anyOf": [
-          {
-            "type": "number"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": null,
-        "description": "Second person GPS longitude"
-      },
-      "person2_lat": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": "31n13",
-        "description": "Second person latitude text or decimal; 兼容旧参数，不参与定宿"
-      },
-      "person2_lon": {
-        "anyOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "null"
-          }
-        ],
-        "default": "121e28",
-        "description": "Second person longitude text or decimal; 兼容旧参数，不参与定宿"
       },
       "person2_name": {
         "default": "乙方",
@@ -449,5 +353,53 @@
     ],
     "type": "object"
   },
+  "method_contracts": [
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现/数据指纹、选项与实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "calendar_model",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/core/local_techniques/suzhan.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.sukuyo_calendar_and_relations.contract_v1",
+      "output_paths": [
+        "person1",
+        "person2",
+        "rulesets",
+        "status"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "calendar_and_symbolic_result",
+      "role": "calculation",
+      "selector_fields": [
+        "calendar_basis",
+        "calendar_profile",
+        "leap_month_policy"
+      ],
+      "source_refs": [
+        "docs/algorithm-coverage.md"
+      ],
+      "unit": "per_field",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    }
+  ],
   "tool": "sukuyo_compatibility"
 }

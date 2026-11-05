@@ -21,7 +21,7 @@ from fatebridge.utils.timezones import parse_timezone_name
 def enrich_india_chart(
     result: Dict[str, Any], birth: AstroBirthInfo, **options: Any
 ) -> None:
-    """Keep legacy top-level coordinates; place all Indian evidence in india."""
+    """Keep the public Western reference view separate from Indian calculations."""
     if (
         result["chart_profile"]["zodiac"] != "sidereal"
         or result["chart_profile"]["house_system"] != "whole_sign"
@@ -29,7 +29,7 @@ def enrich_india_chart(
         result["india"].update(
             {
                 "status": "configuration_not_supported",
-                "interpretation_scope": "Requested legacy zodiac/house override retained. Parashari D1/D9/D10 require sidereal Lahiri and whole-sign; not computed for this configuration.",
+                "interpretation_scope": "Requested public zodiac/house configuration selected. Parashari D1/D9/D10 require sidereal Lahiri and whole-sign; not computed for this configuration.",
             }
         )
         return
@@ -38,19 +38,17 @@ def enrich_india_chart(
     asc = india["charts"]["D1"]["ascendant"]
     prose = natal_prose(india)
     reading = {
-        "scope": "india only; generic Western top-level fields retained as separate legacy reference",
+        "scope": "india only; generic Western top-level fields form a separate public reference view",
         **prose,
         "reading_basis": india["reading_basis"],
         "variant_note": f"{india['ruleset_id']}；Lahiri，{india['profile']['node_mode']} node。",
         "topic_evidence": india["topic_evidence"],
         "development_advice": "把传统结构描述与实际职责、相处经历核对；分盘变化先核对出生时间范围。",
     }
-    # Existing clients may select the old interpretation leaves directly.
-    # Preserve them as explicitly labelled Western reference, and keep the
-    # Indian reading in its own namespace rather than changing their doctrine.
+    # Each public view retains its own coordinate and interpretive doctrine.
     result["interpretation"][
         "scope"
-    ] = "legacy_western_reference_only; Indian reading: india and interpretation.vedic"
+    ] = "western_reference_view_only; Indian reading: india and interpretation.vedic"
     result["interpretation"]["vedic"] = reading
     result["summary"] = (
         f"印占本命（名义生时）：上升{asc['sign_zh']}，月宿{india['moon_nakshatra']}；已计算{', '.join(india['charts'])}。"

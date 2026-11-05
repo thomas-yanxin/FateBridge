@@ -83,7 +83,10 @@ def test_all_five_pairs_both_directions_match_independent_existing_budget_math(
 ):
     target, incoming = pair[::-1] if reverse else pair
     other = next(s for s in STEMS if s not in pair)
-    pillar = lambda s: s + ("子" if STEMS.index(s) % 2 == 0 else "卯")
+
+    def pillar(s):
+        return s + ("子" if STEMS.index(s) % 2 == 0 else "卯")
+
     values = [pillar(other), pillar(target), pillar(other), pillar(other)]
     timing_branch = "寅" if STEMS.index(incoming) % 2 == 0 else "巳"
     result, baseline = projection(

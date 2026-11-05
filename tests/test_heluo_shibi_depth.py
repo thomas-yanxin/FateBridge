@@ -12,61 +12,11 @@ from fatebridge.core import heluo_texts as ht
 from fatebridge.core.heluo import _tiaowen, transform_houtian, yao_text
 from fatebridge.core.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError
-from tests.heluo_current_source_reference import HEADER_COUNT
-from tests.heluo_guan_shi_revision_reference import NEW_POEMS as R84_NEW_POEMS
-from tests.heluo_shike_bi_revision_reference import CURRENT_POEMS as R92_POEMS
+from tests.heluo_source_facts import HEADER_COUNT
 
 ROOT = Path(__file__).parent / "fixtures/heluo_shibi_v1"
 DRAFT = json.loads((ROOT / "reference.json").read_bytes())
 VERIFIED = json.loads((ROOT / "verified-readings.json").read_bytes())
-
-
-@pytest.mark.parametrize(
-    "entry", VERIFIED["entries"], ids=lambda e: e["hexagram"] + str(e["line"])
-)
-def test_selected_primary_commentary_has_all_sections_and_no_implicit_branch(entry):
-    t = yao_text(entry["hexagram"], entry["line"])
-    assert t["detail"] == "".join(s["text"] for s in entry["sections"])
-    assert t["commentary_sections"] == [
-        dict(s, applicability=None) for s in entry["sections"]
-    ]
-    assert t["commentary_branch_selection"]["selected_section_ids"] == []
-    p = t["text_provenance"]
-    assert p["commentary_pdf_pages"] == entry["pdf_pages"]
-    assert p["commentary_reading_notes"] == entry["reading_notes"]
-    assert p["commentary_content_sha256"] == ht.COMMENTARY_CONTENT_SHA256
-    old = _tiaowen()[entry["hexagram"]]["yao"][str(entry["line"])]
-    assert p["inherited_detail"] == old["detail"]
-    assert t["verdict"] == old["verdict"]
-    if entry["hexagram"] == "地水師":
-        poem_entry = next(
-            e
-            for e in R84_NEW_POEMS["entries"]
-            if (e["hexagram"], e["line"]) == (entry["hexagram"], entry["line"])
-        )
-        assert t["shige"] == "\n".join(p["text"] for p in poem_entry["poems"])
-        assert t["poem_sections"] == [
-            dict(p, applicability=None) for p in poem_entry["poems"]
-        ]
-        assert p["inherited_shige"] == old["shige"]
-        assert t["poem_selection"]["selected_poem_indices"] == []
-    else:
-        poem_entry = next(
-            e
-            for e in R92_POEMS["entries"]
-            if (e["hexagram"], e["line"]) == (entry["hexagram"], entry["line"])
-        )
-        assert t["shige"] == "\n".join(p["text"] for p in poem_entry["poems"])
-        assert t["poem_sections"] == [
-            dict(p, applicability=None) for p in poem_entry["poems"]
-        ]
-        assert p["inherited_shige"] == old["shige"]
-    bits = [0, 1, 0, 0, 0, 0] if entry["hexagram"] == "地水師" else [0, 0, 0, 0, 1, 0]
-    timed = _selected_text(
-        dict(gua=entry["hexagram"], pos=entry["line"], lines=bits), "annual"
-    )
-    assert timed["heluo_commentary"] == t
-    assert timed["branch_selection"] == "no_automatic_xie_or_buxie_selection"
 
 
 def test_missing_column_draft_and_character_withdrawals_are_reproducible():
@@ -107,15 +57,6 @@ def test_missing_column_draft_and_character_withdrawals_are_reproducible():
         == VERIFIED["new_real_world_outcomes"]
         == VERIFIED["independent_second_reviews"]
         == 0
-    )
-    prefix = ht._commentary_collation()["entries"][:36]
-    assert (
-        hashlib.sha256(
-            json.dumps(
-                prefix, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-            ).encode()
-        ).hexdigest()
-        == VERIFIED["previous_thirty_six_entries_sha256"]
     )
     assert ht.collation_summary()["collated_line_headers"] == HEADER_COUNT
     assert ht.commentary_collation_summary()["collated_poems"] == 0

@@ -637,5 +637,55 @@
     ],
     "type": "object"
   },
+  "method_contracts": [
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现/数据指纹、选项与实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "observer_location",
+        "earth_rotation",
+        "ephemeris_model",
+        "numerical_solver",
+        "display_quantization",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/services/western_events.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.western_horary.contract_v1",
+      "output_paths": [
+        "horary"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "astronomy_and_rule_result",
+      "role": "calculation",
+      "selector_fields": [
+        "ephemeris_policy",
+        "question_clock_basis",
+        "orb_profile",
+        "house_system"
+      ],
+      "source_refs": [
+        "docs/western-astrology.md"
+      ],
+      "unit": "per_field",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    }
+  ],
   "tool": "astro_horary"
 }

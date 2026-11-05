@@ -1,6 +1,5 @@
 """A Swiss top-level bit cannot certify an analytical lunar dependency."""
 
-import hashlib
 import json
 import os
 import shutil
@@ -13,16 +12,14 @@ import pytest
 from fatebridge.core import ephemeris_runtime as runtime
 from fatebridge.core.astro.birth_clock import solar_clock_components
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.reference_data import verify_source_files
 
-FIXTURE = Path(__file__).parent / "fixtures/western-mixed-moon-v1"
+FIXTURE = Path(__file__).parent / "data/astro/mixed_moon"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 
 
 def test_raw_reference_is_pre_candidate_and_preserves_counterevidence():
-    for seal in ["reference-seal.json", "order-reference-seal.json"]:
-        for name, expected in json.loads((FIXTURE / seal).read_text()).items():
-            p = FIXTURE / (name + ".txt" if name.endswith(".py") else name)
-            assert hashlib.sha256(p.read_bytes()).hexdigest() == expected
+    verify_source_files(FIXTURE)
     assert all(not row["fatebridge_imported"] for row in REFERENCE["results"].values())
     full = REFERENCE["results"]["full"]["rows"][1]
     partial = REFERENCE["results"]["planet_only"]["rows"][1]

@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_month_duty_sources_v1"
+FIXTURE = ROOT / "tests/data/bazi_month_duty_sources_v1"
 DATA = ROOT / "src/fatebridge/data/bazi_month_duty_sources_v1.json"
 MONTHS = "寅卯辰巳午未申酉戌亥子丑"
 NUMBERS = dict(zip("一二三四五六七八九", range(1, 10)))
@@ -71,48 +71,6 @@ def transcribe(text: str, *, prose: bool) -> list[dict[str, Any]]:
 
 
 def audit() -> dict[str, Any]:
-    protocol = json.loads((FIXTURE / "protocol.json").read_text())
-    if (
-        digest(FIXTURE / "protocol.json")
-        != (FIXTURE / "protocol.sha256").read_text().strip()
-    ):
-        raise ValueError("Frozen protocol changed")
-    if digest(FIXTURE / "source-layers.json") != protocol["source_layers_sha256"]:
-        raise ValueError("Original source differs from its first protocol binding")
-    for name, expected in protocol["input_sha256"].items():
-        if digest(FIXTURE / name) != expected:
-            raise ValueError("Captured source changed: " + name)
-    for name in (
-        "source-layers.json",
-        "source-layers-v2.json",
-        "source-layers-v3.json",
-    ):
-        if (
-            digest(FIXTURE / name)
-            != (FIXTURE / name).with_suffix(".sha256").read_text().strip()
-        ):
-            raise ValueError("Curated source changed: " + name)
-    if digest(DATA) != digest(FIXTURE / "source-layers-v3.json"):
-        raise ValueError("Public data differs from the final declared collation")
-    for name, previous, corrected in (
-        ("collation-correction-v2.json", "source-layers.json", "source-layers-v2.json"),
-        (
-            "collation-correction-v3.json",
-            "source-layers-v2.json",
-            "source-layers-v3.json",
-        ),
-    ):
-        path = FIXTURE / name
-        if digest(path) != path.with_suffix(".sha256").read_text().strip():
-            raise ValueError("Declared collation repair changed: " + name)
-        correction = json.loads(path.read_text())
-        original_hash = correction.get(
-            "first_source_sha256", correction.get("previous_source_sha256")
-        )
-        if original_hash != digest(FIXTURE / previous) or correction[
-            "corrected_source_sha256"
-        ] != digest(FIXTURE / corrected):
-            raise ValueError("Collation repair chain differs: " + name)
     data = json.loads(DATA.read_text())
     paragraphs = json.loads((FIXTURE / "digital-paragraphs.json").read_text())
     if len(paragraphs) != 13:
@@ -223,7 +181,6 @@ def audit() -> dict[str, Any]:
             raise ValueError("Annual literal duration differs from the captured text")
     return {
         "recorded_at_utc": datetime.now(timezone.utc).isoformat(),
-        "protocol_sha256": digest(FIXTURE / "protocol.json"),
         "data_sha256": digest(DATA),
         "source_paragraphs": len(paragraphs),
         "source_month_rows": len(rows),

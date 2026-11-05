@@ -70,11 +70,6 @@ def jpl_header(path: Path) -> Dict[str, Any]:
                 "time_scale": "TDB",
                 "start_julian_day_tdb": start,
                 "end_julian_day_tdb": end,
-                # Retained for existing provenance consumers. These values
-                # came from the raw header; no TDB-to-TT conversion occurred.
-                "start_julian_day_tt": start,
-                "end_julian_day_tt": end,
-                "legacy_tt_range_fields": "Compatibility aliases for raw TDB header values; not converted TT bounds",
                 "de_number": de,
                 "bytes": size,
             }

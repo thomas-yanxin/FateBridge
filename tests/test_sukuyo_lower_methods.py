@@ -16,7 +16,7 @@ from fatebridge.core.sukuyo_lower_methods import lower_methods_evidence, source_
 from fatebridge.validation.sukuyo import required_quote_paths
 
 PRIMARY = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-lower-methods-primary.json").read_text()
+    (Path(__file__).parent / "data/sukuyo-lower-methods-primary.json").read_text()
 )
 
 

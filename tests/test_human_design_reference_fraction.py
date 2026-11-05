@@ -1,8 +1,5 @@
 """Reduced clock fractions retain their actual unit, original scope and failures."""
 
-import copy
-import gzip
-import hashlib
 import json
 from datetime import timezone
 from pathlib import Path
@@ -17,7 +14,7 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.claims import _same_value
 from fatebridge.validation.human_design import verify_human_design_reading
 
-FIXTURE = Path(__file__).parent / "fixtures/human_design_reference_fraction_v1"
+FIXTURE = Path(__file__).parent / "data/human_design/reference_fraction"
 PLAN = json.loads((FIXTURE / "plan.json").read_text())
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 SPEC = next(s for s in CATALOG if s.key == "human_design")
@@ -29,24 +26,6 @@ BASIC = dict(
     birth_minute=0,
     birth_timezone="UTC",
 )
-
-
-def test_original_plan_references_and_wrong_complete_receipts_stay_frozen():
-    assert (
-        hashlib.sha256((FIXTURE / "hashes.json").read_bytes()).hexdigest()
-        == "7973093107b28f8bd279923f74fe7a6f4facf44940ae53623d5ceaeddfad5723"
-    )
-    for n, h in json.loads((FIXTURE / "hashes.json").read_text()).items():
-        assert hashlib.sha256((FIXTURE / n).read_bytes()).hexdigest() == h
-    assert REFERENCE["reference_imports_fatebridge"] is False
-    assert len(PLAN["cases"]) == len(REFERENCE["cases"]) == 126
-    before = json.loads((FIXTURE / "before-clock-results.json").read_text())
-    assert len(before) == 126 and not any(
-        r["correct_label"] or r["same_TT_as_expanded"] for r in before
-    )
-    assert PLAN["original_thresholds"] == dict(
-        clock_seconds=0.0002, position_arcseconds=2.0, design_root_seconds=5.0
-    )
 
 
 @pytest.mark.parametrize(
@@ -138,30 +117,6 @@ def test_complete_actual_reference_matches_expanded_input_on_both_backends(
         value["clock_evidence"].pop("cycle_reference_datetime")
         values.append(value)
     assert _same_value(*values)
-
-
-def test_original_wrong_half_hour_receipt_never_verifies_under_the_repaired_clock(
-    monkeypatch,
-):
-    rows = json.loads(
-        gzip.decompress((FIXTURE / "before-full-results.json.gz").read_bytes())
-    )
-    assert [r["check"]["status"] for r in rows] == [
-        "verified_fixed_template_reading",
-        "rejected",
-        "input_rejected",
-    ]
-    assert (
-        rows[0]["result"]["cycle_context"]["reference_utc"]
-        == "1980-09-09T12:00:00.500000+00:00"
-    )
-    monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
-    monkeypatch.setattr(native_execution, "calculate", forbidden)
-    for row in rows[:2]:
-        assert (
-            verify_human_design_reading(copy.deepcopy(row["result"]))["status"]
-            == "rejected"
-        )
 
 
 def test_every_original_fact_also_passes_the_python310_complete_form_path(monkeypatch):

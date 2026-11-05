@@ -16,17 +16,19 @@ from fatebridge.core.source_identity import (
 
 ORDER = ("year", "month", "day", "hour")
 GRADES = {"强", "中和", "弱"}
+SOURCE_DATA_SHA256 = "3f38d35ed00c7bfa8c5539a579c33b66d451fde840fbf01eb6d2a7abfd099170"
 
 
 @lru_cache(maxsize=1)
 def _index() -> Tuple[Dict[tuple, list], Dict[str, Any]]:
     path = (
         Path(__file__).resolve().parents[1]
-        / "data/reference/bazi-source-annotations-v8.json"
+        / "data/reference/bazi-source-annotations.json"
     )
     raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != SOURCE_DATA_SHA256:
+        raise ValueError("当前来源数据与已核书影记录不一致")
     data = json.loads(raw)
-    identity_data = deepcopy(data)
     if data["schema_version"] != 1 or len(data["records"]) != data["record_count"]:
         raise ValueError("原典参考索引结构或记录数不一致")
     grouped: Dict[tuple, list] = {}
@@ -45,20 +47,15 @@ def _index() -> Tuple[Dict[tuple, list], Dict[str, Any]]:
         if record["retained_strength_annotation"] not in GRADES | {None}:
             raise ValueError("原典参考含未登记的强弱编释")
         grouped.setdefault(tuple(record["pillars"]), []).append(record)
-    revisions = [r for r in data["records"] if "input_reading_revision" in r]
-    if len(revisions) != data["input_reading_revision_count"]:
-        raise ValueError("原典输入校读修订数不一致")
-    for record in revisions:
-        revision = record["input_reading_revision"]
-        original = revision["original_index_record"]
+    readings = [r for r in data["records"] if "input_reading_evidence" in r]
+    for record in readings:
+        evidence = record["input_reading_evidence"]
         if (
-            original["reference_id"] != record["reference_id"]
-            or original["retained_strength_annotation"] is not None
-            or record["retained_strength_annotation"] is not None
-            or revision["source_strength_label_assigned"] is not False
-            or revision["new_independent_validation_credit"] != 0
+            record["retained_strength_annotation"] is not None
+            or evidence["source_strength_label_assigned"] is not False
+            or evidence["new_independent_validation_credit"] != 0
         ):
-            raise ValueError("输入校读不得改写原典等级或增加独立验证信用")
+            raise ValueError("输入校读不得补定强弱或增加独立验证信用")
     notes = [r for r in data["records"] if "editorial_annotation_provenance" in r]
     if len(notes) != data["editorial_annotation_count"]:
         raise ValueError("登记编辑说明投影数不一致")
@@ -70,12 +67,6 @@ def _index() -> Tuple[Dict[tuple, list], Dict[str, Any]]:
             or provenance["is_verbatim_original_text"] is not False
             or provenance["strength_label_assigned_or_regraded"] is not False
             or provenance["new_independent_validation_credit"] != 0
-            or provenance["previous_strength_annotation"]
-            != record["retained_strength_annotation"]
-            or provenance["registered_document"]
-            != record["source_reference"]["registered_document"]
-            or provenance["registered_document_sha256"]
-            != record["source_reference"]["registered_document_sha256"]
             or record["annotation_basis"] != record["retained_context"]
             or hashlib.sha256(record["annotation_basis"].encode()).hexdigest()
             != provenance["annotation_sha256"]
@@ -83,10 +74,8 @@ def _index() -> Tuple[Dict[tuple, list], Dict[str, Any]]:
             raise ValueError("编辑说明不得冒充原典引文、重判标签或丢失原说明")
     if len(grouped) != data["literal_input_count"]:
         raise ValueError("原典参考字面输入数不一致")
-    validate_identity_index(identity_data, path.parent)
-    reviews, condition_metadata = condition_reviews(
-        identity_data, path.parent, hashlib.sha256(raw).hexdigest()
-    )
+    validate_identity_index(data)
+    reviews, condition_metadata = condition_reviews(data)
     for record in data["records"]:
         if record["reference_id"] in reviews:
             record["source_condition_review"] = reviews[record["reference_id"]]
@@ -94,25 +83,17 @@ def _index() -> Tuple[Dict[tuple, list], Dict[str, Any]]:
         **condition_metadata,
         "method_id": data["method_id"],
         "index_sha256": hashlib.sha256(raw).hexdigest(),
-        "registry_sha256": data["registry_sha256"],
         "total_registered_records": data["record_count"],
         "total_registered_literal_inputs": data["literal_input_count"],
         "total_registered_strength_constraints": len(constraints),
         "all_records_previously_exposed": True,
-        "total_registered_input_reading_revisions": len(revisions),
-        "input_reading_plan_sha256": data["input_reading_plan_sha256"],
-        "data_revision": data["data_revision"],
         "total_registered_editorial_annotations": len(notes),
-        "editorial_annotation_projection_sha256": data[
-            "editorial_annotation_projection_sha256"
-        ],
-        "source_identity_plan_sha256": data["source_identity_plan_sha256"],
-        "total_registered_source_identity_revisions": data[
-            "source_identity_revision_count"
-        ],
-        "total_registered_printed_name_corrections": data[
-            "source_identity_name_revision_count"
-        ],
+        "total_registered_source_identity_witnesses": sum(
+            "source_identity_revision" in row for row in data["records"]
+        ),
+        "total_registered_printed_name_readings": sum(
+            "name_as_printed" in row for row in data["records"]
+        ),
     }
     return grouped, metadata
 
@@ -267,7 +248,7 @@ def annotation_comparison_summary(comparison: Mapping[str, Any]) -> str:
         summary += NAME_NOTE
     if any("editorial_annotation_provenance" in r for r in comparison["records"]):
         summary += "已附登记编辑说明，须与原典引文分开；说明未重判强弱。"
-    revisions = sum("input_reading_revision" in r for r in comparison["records"])
+    revisions = sum("input_reading_evidence" in r for r in comparison["records"])
     if revisions:
         summary += (
             f"其中{revisions}条参考输入已按图版校读修订，原录文与修订依据均保留；"

@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import Field, JsonValue, model_validator
 
-from fatebridge.core.output_base import PartialOutput
+from fatebridge.core.output_base import FullFact, PartialOutput, PresentFact
 from fatebridge.core.output_classical_roots import ClassicalRoot
 from fatebridge.core.output_hidden_carriers import (
     HiddenCarrierRelations,
@@ -15,13 +15,33 @@ from fatebridge.core.output_timing_strength import TimingStrengthProjection
 from fatebridge.core.timing_roots import BRANCH_RELATION_KINDS
 
 
+class LifeDimensionScores(PartialOutput):
+    love: PresentFact[Optional[float]] = Field(default=None, ge=0, le=100)
+    wealth: FullFact[Optional[float]] = Field(default=None, ge=0, le=100)
+    career: FullFact[Optional[float]] = Field(default=None, ge=0, le=100)
+    learning: FullFact[Optional[float]] = Field(default=None, ge=0, le=100)
+    relationship: FullFact[Optional[float]] = Field(default=None, ge=0, le=100)
+
+
+class LifeDimensionAssessment(PartialOutput):
+    method_id: FullFact[Optional[Literal["life_dimension_tanh_v2"]]] = None
+    status: FullFact[Optional[Literal["calculated", "partial"]]] = None
+    score_kind: FullFact[Optional[Literal["uncalibrated_rule_index"]]] = None
+    included_layers: FullFact[Optional[List[str]]] = None
+    unavailable_layers: FullFact[Optional[Dict[str, str]]] = None
+    not_applicable_layers: FullFact[Optional[List[str]]] = None
+    unavailable_dimensions: FullFact[Optional[List[str]]] = None
+    score_basis: FullFact[Optional[str]] = None
+    interpretation_scope: FullFact[Optional[str]] = None
+
+
 class AnalysisReference(PartialOutput):
     method_id: Optional[Literal["bazi_analysis_instant_v1"]] = None
     basis: Optional[
         Literal[
             "implicit_execution_clock",
             "explicit_components",
-            "legacy_partial_components",
+            "declared_partial_components",
             "explicit_age_reference",
         ]
     ] = None

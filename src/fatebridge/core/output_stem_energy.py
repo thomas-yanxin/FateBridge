@@ -68,9 +68,7 @@ class StemEnergyRow(PartialOutput):
 class StemEnergyAccounting(PartialOutput):
     method_id: Optional[Literal["unrounded_non_day_stem_budget_v1"]] = None
     arithmetic_policy: Optional[Literal["round_only_for_display"]] = None
-    conversion_policy: Optional[
-        Literal["legacy_binding_only_conversion_prototype_not_adopted"]
-    ] = None
+    conversion_policy: Optional[Literal["not_applied"]] = None
     ledger: Optional[List[StemEnergyRow]] = None
     source_order_review: Optional[StemOrderSourceReview] = None
     quantity_kind: Optional[Literal["non_day_stem_budget_weighted_energy"]] = None

@@ -101,7 +101,7 @@ fatebridge <tool> [参数...]
 - `ziwei_horoscope` → 普通运限首轮可取 `analysis_context`、`birth_context`、`ziwei_horoscope.interpretation_scope`、`ziwei_horoscope.nominal_age`、`ziwei_horoscope.calendar_rules`、`ziwei_horoscope.scopes`，同时设 `strict_fields=true`、`include_snapshot_text=false`；省略 `fields` 并不会因严格模式自动变精简。`scopes` 是数组，当前投影必须整体取，不能编造 `scopes.流年` 或索引路径；按本轮粒度解释其中所需层，其余不展开，也不默认取 `snapshot_export`。核对 `analysis_context.context_role=target` 及 `analysis_datetime`，出生处理另读 `birth_context`；旧进程若返回出生 context，不能将它当目标时刻，也不凭字段名忽略实际值。本命／运限宫位身份与四化连接读[紫微专题取证](ziwei-topic-evidence.md)。
 - `astro_chart` → 根字段 `angles`、`chart_profile`、`planets`、`aspects`、`interpretation`、`person_info`。普通首轮的解释子项按工具公布的字段选择；出生钟时读 `person_info`。`western_timing_analysis` 的 `analysis_context` 不能移作本命盘字段。
 - 八字 9 专项 → `{"analysis_type": "...", "<dim>_analysis": {...}}`。解读读 `<dim>_analysis`，里面是该维度的子项。例如 `bazi_romance` → `romance_analysis.{peach_blossom, hongluan_tianxi, opposite_sex_star, peach_quality, romance_timing, timing_context}`；`bazi_wealth` → `wealth_analysis.{...}`。`timing_context` 段是引擎自动推算的当前大运/流年，看时机就看它。
-- `two_person_compatibility` → `summary`（`overall_score` / `compatibility_level`）、`traditional_compatibility`、`detailed_analysis`（`element_balance` / `favorable_synergy`）、`strengths`、`challenges`、`recommendations`。不同规则段的分数保留各自名称与作用域，不合成成功概率；`person_info` 中的个人内部结构不能直接解释为双方互动。建议列表为空时如实说明，现实沟通建议另作标记。
+- `two_person_compatibility` → `summary`（`overall_score` / `compatibility_level` / `status`）、`traditional_compatibility`、`detailed_analysis`（`element_balance` / `favorable_synergy`）、`strengths`、`challenges`、`recommendations`。v3的 `summary.scoring.unresolved_dimensions`、相克 `control_evidence` 和逐人 `preference_assessment` 保留未决、中性及明确喜忌；基础分不证明互助，`partial` 不解读为确定匹配等级。不同规则段分数保留各自作用域，不合成概率；个人内部结构不直接等同双方互动。建议列表为空时如实说明，现实建议另作标记。
 - `sukuyo_compatibility` → 现代中国农历月日及T1299下卷望宿两法定27宿，**有方向**：`person1_to_person2` 与 `person2_to_person1` 分别读取；`pair`仅为配对类别，`su27_basis`是算法版本，各自本命宿在 `person1/2.natal_su27`。闰月或可选桧尾半日/补配次序未定时保留候选；`candidate_relation_analysis`仅列条件组合，不能挑一行当已定结果；`source_table_variant`是T1299印本28宿月建表异文，不能替代三九所用27宿。
 - `astro_relative_chart` → `relationship_profile`、`inner_chart`、`outer_chart`、`synastry_aspects`、`chart`、`compatibility`。
 
@@ -382,4 +382,4 @@ python3 -m fatebridge.cli --no-metadata fengshui_annual_stars --effective-year 2
 fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json --compact
 ```
 
-太乙 `calculation_mode=day` 明确采用金钥匙积日法，见 [日计依据](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-day.md)。先设day再取 `daily_calendar` / `daily_essences`，零时日界不可套时计23时子初；天时和太乙数宫位未知、正文/课式异数需忠实解释。返回分页时读同一run载荷及哈希，不凭被延后字段作否定。
+太乙 `calculation_mode=day` 明确采用金钥匙积日法，见 [日计依据](../../docs/taiyi-sanshi-audit.md)。先设day再取 `daily_calendar` / `daily_essences`，零时日界不可套时计23时子初；天时和太乙数宫位未知、正文/课式异数需忠实解释。返回分页时读同一run载荷及哈希，不凭被延后字段作否定。

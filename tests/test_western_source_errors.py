@@ -1,6 +1,5 @@
 """An integrity failure is not an undefined optional astronomical quantity."""
 
-import hashlib
 import inspect
 import json
 from pathlib import Path
@@ -21,8 +20,9 @@ from fatebridge.core.astro.profiles import (
     _resolve_relative_zodiacal_mode,
 )
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.reference_data import verify_source_files
 
-FIXTURE = Path(__file__).parent / "fixtures/western-source-errors-v1"
+FIXTURE = Path(__file__).parent / "data/astro/source_errors"
 PROTOCOL = json.loads((FIXTURE / "protocol.json").read_text())
 
 
@@ -107,9 +107,7 @@ def invoke(target):
 
 
 def test_protocol_and_before_reference_remain_sealed():
-    seal = json.loads((FIXTURE / "seal.json").read_text())
-    for name, digest in seal["files"].items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
+    verify_source_files(FIXTURE)
     assert len(PROTOCOL["targets"]) == 8
 
 

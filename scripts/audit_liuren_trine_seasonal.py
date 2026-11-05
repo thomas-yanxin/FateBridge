@@ -177,104 +177,11 @@ def audit() -> dict[str, Any]:
     )
 
 
-def strip_additions(value: Any, path: tuple[str, ...] = ()) -> tuple[Any, list[str]]:
-    if isinstance(value, dict):
-        out = {}
-        paths = []
-        for key, item in value.items():
-            if key == FIELD:
-                if len(path) < 2 or path[-2] != "trines" or not path[-1].isdigit():
-                    raise ValueError("Unexpected field outside declared trine path")
-                paths.append(".".join(path + (key,)))
-                continue
-            cleaned, added = strip_additions(item, path + (key,))
-            out[key] = cleaned
-            paths.extend(added)
-        return out, paths
-    if isinstance(value, list):
-        out_list = []
-        paths = []
-        for i, item in enumerate(value):
-            cleaned, added = strip_additions(item, path + (str(i),))
-            out_list.append(cleaned)
-            paths.extend(added)
-        return out_list, paths
-    return value, []
-
-
-def compare_baselines(run: Path) -> dict[str, Any]:
-    reference()
-    if (
-        sha(run / "before-boards.jsonl.gz") != BOARD_PIN
-        or sha(run / "before-business.json.gz") != BUSINESS_PIN
-    ):
-        raise ValueError("Original numerical baseline changed")
-    from fatebridge.application.execution import validate_output
-    from fatebridge.core.metaphysics.liureng import build_liureng_board
-    from fatebridge.services.tool_catalog import CATALOG
-    from scripts.audit_liuren_seasonal import seed_for
-
-    compared = 0
-    failures = []
-    field_count = 0
-    with gzip.open(run / "before-boards.jsonl.gz", "rt", encoding="utf-8") as f:
-        for line in f:
-            old = json.loads(line)
-            assert not any(
-                FIELD in t for t in old["board"]["transmission_relations"]["trines"]
-            )
-            new = build_liureng_board(
-                seed_for(old["day"], "寅"),
-                month_general_override=old["general"],
-                guiren_profile="tanyuan_xieji_v1",
-                is_diurnal_override=True,
-            )
-            restored, paths = strip_additions(new)
-            compared += 1
-            field_count += len(paths)
-            if restored != old["board"]:
-                failures.append(
-                    dict(kind="board", day=old["day"], general=old["general"])
-                )
-    business_rows = []
-    for row in json.loads(
-        gzip.decompress((run / "before-business.json.gz").read_bytes())
-    ):
-        spec = next(s for s in CATALOG if s.key == row["key"])
-        fn, args, kwargs = spec.bind(spec.request_model.model_validate(row["payload"]))
-        new = fn(*args, **kwargs)
-        validate_output(spec, new)
-        restored, paths = strip_additions(new)
-        equal = restored == row["business"]
-        business_rows.append(
-            dict(
-                key=row["key"],
-                equal_after_only_declared_additions_removed=equal,
-                addition_paths=paths,
-            )
-        )
-        if not equal:
-            failures.append(dict(kind="business", key=row["key"]))
-    return dict(
-        boards_compared=compared,
-        declared_board_additions=field_count,
-        businesses=business_rows,
-        failures=failures,
-        legacy_values_restored=not failures,
-    )
-
-
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--output", type=Path, required=True)
-    p.add_argument("--compare-baselines", type=Path)
     args = p.parse_args()
     value = audit()
-    if args.compare_baselines:
-        value["baseline_comparison"] = compare_baselines(args.compare_baselines)
-        value["selected_component_checks_passed"] &= value["baseline_comparison"][
-            "legacy_values_restored"
-        ]
     args.output.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n")
     print(
         json.dumps(

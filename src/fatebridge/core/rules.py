@@ -1298,9 +1298,14 @@ class BaZiRules:
                 return "risk", "对双方格局都形成明显干扰。"
             if useful_hits >= 2:
                 return "supportive", "对双方格局都形成支持。"
-            if useful_hits or avoid_hits:
+            if useful_hits and avoid_hits:
                 return "tension", "一方受益而另一方承压，属于拉扯型事件。"
-            return "supportive", "整体偏和合，可作为合盘支持因素。"
+            if useful_hits or avoid_hits:
+                return (
+                    "unresolved",
+                    "仅一方取用参考有命中；另一方效力未定，不据此认定双向受益或承压。",
+                )
+            return "unresolved", "已见名义合局，双方取用效力未定，不据此计为支持。"
 
         if avoid_hits >= 2:
             return "risk", "冲击双方可用之气，风险较高。"
@@ -1339,6 +1344,7 @@ class BaZiRules:
         supportive_patterns: List[Dict[str, Any]] = []
         tension_patterns: List[Dict[str, Any]] = []
         risk_patterns: List[Dict[str, Any]] = []
+        unresolved_patterns: List[Dict[str, Any]] = []
 
         def _append_event(event: Dict[str, Any]) -> None:
             events.append(event)
@@ -1354,6 +1360,8 @@ class BaZiRules:
                 supportive_patterns.append(summary)
             elif event["classification"] == "risk":
                 risk_patterns.append(summary)
+            elif event["classification"] == "unresolved":
+                unresolved_patterns.append(summary)
             else:
                 tension_patterns.append(summary)
 
@@ -1608,6 +1616,7 @@ class BaZiRules:
             "supportive_patterns": supportive_patterns,
             "tension_patterns": tension_patterns,
             "risk_patterns": risk_patterns,
+            "unresolved_patterns": unresolved_patterns,
         }
 
     @staticmethod

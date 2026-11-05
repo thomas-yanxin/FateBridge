@@ -16,7 +16,7 @@ from fatebridge.core.local_techniques.chart import (
 )
 
 REFERENCE = json.loads(
-    (Path(__file__).parent / "fixtures/astrodice-house-reference.json").read_text()
+    (Path(__file__).parent / "data/astrodice/tables/house-reference.json").read_text()
 )
 
 

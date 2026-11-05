@@ -3,20 +3,18 @@
 Originally ported from horosa guolaoMoira.js. Compatibility is intentionally
 broken when a legacy rule treated missing data as a fact (missing purple clouds
 in isolated-Moon counting, or missing nobles wrapped into valid sign indices).
-Day/night and winter must be supplied explicitly; mansion proximity must come
-from the caller's declared boundary model. No equal-28 placeholder is used.
+Day/night and winter must be supplied explicitly. Native callers provide
+source-selected discrete palace indices and god positions.
 
 The purple-cloud point remains a fit to four horosa software fixtures. It is
 NOT an astronomical body or a calibration to the Tohoku printed edition, whose
 volume 1 states an approximately 29-year revolution rather than this fit's 28.
-The legacy god helper retains the Sanming Tonghui convention for old callers.
-Native Guolao instead uses the collated Lu Wei table in core.guolao_classical.
+Native Guolao supplies the collated Lu Wei god table from core.guolao_classical.
 """
 
 from __future__ import annotations
 
-import math
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 PATTERN_MODEL_ID = "moira_compatibility_conditions_v2"
 
@@ -61,56 +59,6 @@ _OVERCOMING = {
     "计": "木",
 }
 
-# 地支 → 星座序号（七政四余 戌将盘；SZConst.ZiSign 之逆）。
-_ZI_TO_SIGNIDX = {
-    "子": 10,
-    "丑": 9,
-    "寅": 8,
-    "卯": 7,
-    "辰": 6,
-    "巳": 5,
-    "午": 4,
-    "未": 3,
-    "申": 2,
-    "酉": 1,
-    "戌": 0,
-    "亥": 11,
-}
-
-# 七政四余 神煞 起例（键以年干/年支起例）。无 horosa 字节对照，且 贵人 之阳/阴
-# (昼/夜) 定向流派有别（《三命通会》与《三历会同》互异，FateBridge 既有 rules.py 日贵格亦为
-# 混用）；本旧兼容助手保留《三命通会》口径，不作为原生陆位本的回退：
-#   阳贵(昼/天贵)：甲加丑「逆行」—— 甲丑 乙子 丙亥 丁酉 戊丑 己申 庚未 辛午 壬巳 癸卯
-#   阴贵(夜/玉贵)：甲加未「顺行」—— 甲未 乙申 丙酉 丁亥 戊未 己子 庚丑 辛寅 壬卯 癸巳
-# 戊从甲（戊土寄宫）。十干两贵地支对仍与既有 TIAN_YI_TARGETS（天乙贵人）逐干同对，仅此处
-# 明确昼/夜定向。注：与 rules.py 日贵格(丁亥昼/丁酉夜)在丁干上不同口径——后者为独立 BaZi
-# 格局、流派混用，不在本段统一范围内。岁驾=太岁=年支本位。
-_TIANGUI_BY_YEAR_STEM = {  # 阳贵（昼/天贵）——《三命通会》甲加丑逆行
-    "甲": "丑",
-    "乙": "子",
-    "丙": "亥",
-    "丁": "酉",
-    "戊": "丑",
-    "己": "申",
-    "庚": "未",
-    "辛": "午",
-    "壬": "巳",
-    "癸": "卯",
-}
-_YUGUI_BY_YEAR_STEM = {  # 阴贵（夜/玉贵）——《三命通会》甲加未顺行
-    "甲": "未",
-    "乙": "申",
-    "丙": "酉",
-    "丁": "亥",
-    "戊": "未",
-    "己": "子",
-    "庚": "丑",
-    "辛": "寅",
-    "壬": "卯",
-    "癸": "巳",
-}
-
-
 # 步紫气（紫炁/木余）—— 七政四余「四余」之一，无 swisseph 天体对应。以 horosa 后端 4 张
 # 七政四余盘 fixture（1985-03-21 / 1998 / 2026，chart_guolao·1998_predictive·liureng·traditional）
 # 作最小二乘线性标定：周期 ≈ 27.9994 年（软件拟合，非原典历元），4 点残差 < 1e-5°。
@@ -127,28 +75,6 @@ def purple_clouds_longitude(julian_day: float) -> float:
         julian_day - _PURPLE_CLOUDS_ANCHOR_JD
     )
     return lon % 360.0
-
-
-def compute_god_signidx(year_stem: str, year_branch: str) -> Dict[str, int]:
-    """Legacy 三命通会 compatibility table, not the native Guolao edition.
-
-    Native Guolao uses core.guolao_classical.year_god_branches after collation
-    with Lu Wei bundle vols. 1-2 images 33-34. Keep this explicitly different legacy
-    helper for old callers and software oracles, never as an edition fallback.
-
-    依《三命通会》起例，由年柱干支算出 天贵、玉贵、岁驾三神煞的星座序号。
-
-    天贵(昼/阳贵)、玉贵(夜/阴贵) 以年干起例（旧兼容约定为甲加丑逆/甲加未顺，
-    见上方常量注释）；岁驾(太岁) 即年支本位。地支经 戌将盘 ``_ZI_TO_SIGNIDX`` 映射为
-    星座序号。缺值回退 -1（对应格局自然失效）。
-    """
-    gods: Dict[str, int] = {}
-    tian = _TIANGUI_BY_YEAR_STEM.get(year_stem)
-    yu = _YUGUI_BY_YEAR_STEM.get(year_stem)
-    gods["天贵"] = _ZI_TO_SIGNIDX.get(tian, -1) if tian else -1
-    gods["玉贵"] = _ZI_TO_SIGNIDX.get(yu, -1) if yu else -1
-    gods["岁驾"] = _ZI_TO_SIGNIDX.get(year_branch, -1)
-    return gods
 
 
 # 命宫起十二宫的次序偏移（localMoiraHouseSign）。
@@ -279,21 +205,6 @@ def _lost_rulership(signof: _Resolver, subject: str) -> bool:
     return ruler_of_ruler == _OVERCOMING.get(ruler_cn)
 
 
-def _sign_boundary_distance(lon: float) -> float:
-    # Preserve exact integers too; converting an unwrapped integer to float
-    # first can move it across the threshold above the binary precision limit.
-    if isinstance(lon, int):
-        remainder = lon % 30
-        return min(remainder, 30 - remainder)
-    return abs(math.remainder(lon, 30))
-
-
-def _near_sign_boundary(lon: Optional[float]) -> bool:
-    if lon is None:
-        return False
-    return _sign_boundary_distance(lon) <= 1
-
-
 def _indices(value: Any, label: str, allowed: set[str]) -> Dict[str, int]:
     if value is None:
         return {}
@@ -309,19 +220,6 @@ def _indices(value: Any, label: str, allowed: set[str]) -> Dict[str, int]:
         if not -1 <= index < 12:
             raise ValueError(f"{label}.{key}须为0至11；未知仅可显式用-1或省略")
     return dict(value)
-
-
-def _finite_optional(value: Any, label: str) -> None:
-    try:
-        valid = value is None or (
-            not isinstance(value, bool)
-            and isinstance(value, (int, float))
-            and math.isfinite(value)
-        )
-    except OverflowError:
-        valid = False
-    if not valid:
-        raise ValueError(f"{label}须为有限数值或未提供，不能以布尔或非有限值制造条件")
 
 
 def _rulership_inputs(signof: _Resolver, subject: str) -> Dict[str, Any]:
@@ -347,19 +245,16 @@ def calculate(facts: Dict[str, Any]) -> List[Dict[str, Any]]:
     ``facts`` 形如::
 
         {
-          "life_sign_idx": int,                 # 显式离散命宫，优先于旧ASC推宫
-          "asc_lon": float,                     # 旧兼容参考经度，不是原典命度
+          "life_sign_idx": int,                 # 显式离散命宫
           "planet_signidx": {"日": int, "月": int, "金": int, "水": int,
                               "火": int, "木": int, "土": int,
                               "孛": int, "罗": int, "计": int, "炁": int},  # 缺省 -1
           "god_signidx": {"天贵": int, "玉贵": int, "岁驾": int},  # 神煞星座序号，缺省 -1
           "is_day": bool,                       # 按调用方明示的昼夜口径
           "is_winter": bool,                    # 按调用方明示的节气口径
-          "mansion_boundary_distance": float,     # 已声明宿界模型下的角距离，可缺省
         }
 
-    ``god_signidx`` 由 :func:`compute_god_signidx` 依年柱算出（天贵/玉贵/岁驾）；
-    留空则相应神煞格局（日月拱贵人/命登岁驾）失效，与 horosa 离线版一致。
+    ``god_signidx`` 由调用者提供明确的来源起例；缺失时相应神煞格局不评。
 
     保留兼容格局名、等级及排序（good 在前、bad 在后），附实际条件证据；
     不宣称新增证据结构与旧JS逐字段相同，也不以兼容测试认证原典或预测效力。
@@ -370,18 +265,12 @@ def calculate(facts: Dict[str, Any]) -> List[Dict[str, Any]]:
     god_signidx = _indices(
         facts.get("god_signidx"), "god_signidx", {"天贵", "玉贵", "岁驾"}
     )
-    asc_lon = facts.get("asc_lon")
-    _finite_optional(asc_lon, "asc_lon")
-    distance = facts.get("mansion_boundary_distance")
-    _finite_optional(distance, "mansion_boundary_distance")
-    if distance is not None and distance < 0:
-        raise ValueError("宿界距离须非负；缺失不能用负值当有效数据")
     if "life_sign_idx" in facts:
         life_sign_idx = facts["life_sign_idx"]
         if type(life_sign_idx) is not int or not 0 <= life_sign_idx < 12:
             raise ValueError("显式命宫索引须为0至11的整数")
     else:
-        life_sign_idx = -1 if asc_lon is None else int(asc_lon // 30) % 12
+        life_sign_idx = -1
     self_sign_idx = planet_signidx.get("月", -1)
     is_day = facts.get("is_day")
     is_winter = facts.get("is_winter")
@@ -591,29 +480,6 @@ def calculate(facts: Dict[str, Any]) -> List[Dict[str, Any]]:
             "?{罗孛遇}",
             rule_id="moira_node_apogee_same_palace_v2",
             inputs={"node_index": north_node, "apogee_index": dark_moon},
-        )
-
-    # 命坐两歧（兼容规则）：1度阈值来自软件约定，不声称原典阈值。
-    near_mansion = distance is not None and distance <= 1
-    if _near_sign_boundary(asc_lon) or near_mansion:
-        _add(
-            patterns,
-            "命坐两歧",
-            "bad",
-            "2.0.4",
-            "政余忌格：给定兼容参考经度距30度分宫界不超过1度，或所给宿界距离不超过1度；不证明原典命度。",
-            "?{命宫歧} | ?{命宿歧}",
-            rule_id="moira_given_reference_near_boundary_v2",
-            inputs={
-                "reference_longitude": asc_lon,
-                "reference_longitude_basis": "legacy_asc_argument_not_classical_life_degree",
-                "palace_boundary_distance": (
-                    _sign_boundary_distance(asc_lon) if asc_lon is not None else None
-                ),
-                "declared_mansion_boundary_distance": distance,
-                "threshold_modern_degrees": 1,
-            },
-            granularity="declared_modern_angular_distance",
         )
 
     def _level_rank(level: str) -> int:

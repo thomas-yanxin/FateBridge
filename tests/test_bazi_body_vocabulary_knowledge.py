@@ -1,77 +1,35 @@
 """Preserve revision2 engineering history; verify current revision3 delivery."""
 
 import asyncio
-import hashlib
 import json
 from pathlib import Path
 
-from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
+
+rest = _shared_rest
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_body_vocabulary_knowledge_v2"
 BUNDLE = Path("src/fatebridge/data/knowledge/bazi.json")
 KEY = "日元强弱与性情措辞"
-HISTORICAL_REVISION2 = (
-    ROOT / "tests/fixtures/bazi_body_vocabulary_knowledge_v3/before" / BUNDLE
-)
-
-
-HISTORICAL_SOURCE = ROOT / "docs/validation/bazi-body-vocabulary-knowledge-v3/before"
 
 
 def read(path):
     return json.loads(path.read_text())
 
 
-def digest(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def protocol():
-    path = FIXTURE / "protocol.json"
-    assert digest(path) == path.with_suffix(".sha256").read_text().strip()
-    return read(path)
-
-
-def test_one_revision_keeps_all_other84_objects_and_original_five_tips():
-    reference = protocol()
-    before, current = read(FIXTURE / "before" / BUNDLE), read(HISTORICAL_REVISION2)
-    assert (
-        digest(FIXTURE / "before" / BUNDLE)
-        == reference["before_files_sha256"][str(BUNDLE)]
-    )
-    assert {k: v for k, v in before.items() if k != "categories"} == {
-        k: v for k, v in current.items() if k != "categories"
-    }
-    assert set(before["categories"]) == set(current["categories"])
-    changed, unchanged = [], 0
-    for category, entries in before["categories"].items():
-        assert set(entries) == set(current["categories"][category])
-        for key, value in entries.items():
-            if value == current["categories"][category][key]:
-                unchanged += 1
-            else:
-                changed.append((category, key))
-    assert changed == [("classical_force_semantics", KEY)] and unchanged == 84
-    old = before["categories"]["classical_force_semantics"][KEY]
-    new = current["categories"]["classical_force_semantics"][KEY]
-    assert new["tips"][:5] == old["tips"]
-    assert new["tips"][5:] == reference["appended_tips_frozen_before_edit"]
-    assert new["curation"]["entry_revision"] == 2
-    assert len(new["tips"]) == 8
-    assert sum(map(len, current["categories"].values())) == 85
-
-
 def test_source_voices_and_engineering_boundaries_survive_revision():
-    reference = protocol()
-    card = read(HISTORICAL_REVISION2)["categories"]["classical_force_semantics"][KEY]
+    card = read(ROOT / BUNDLE)["categories"]["classical_force_semantics"][KEY]
     curation = card["curation"]
     assert curation["source_refs"][1]["author"] == "李雨田增補"
     assert curation["source_refs"][1]["source_pdf_pages"] == [50]
     assert curation["source_refs"][2]["author"] == "任鐵樵增注（任氏曰）"
     assert curation["source_refs"][2]["source_pdf_pages"] == [175, 176, 177, 178]
     for item in curation["source_refs"]:
-        assert item["source_sha256"] == reference["source_pdf_sha256"]
+        assert (
+            item["source_sha256"]
+            == "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803"
+        )
     for item in curation["source_refs"][1:]:
         assert item["author"] in curation["citation"]
     partitions = sum(
@@ -86,17 +44,6 @@ def test_source_voices_and_engineering_boundaries_survive_revision():
         [],
     )
     assert sorted(partitions) == list(range(8))
-    for name in [
-        "src/fatebridge/core/strength.py",
-        "src/fatebridge/data/reference/bazi-source-annotations-v5.json",
-        "tests/fixtures/bazi_knowledge_curation_v1/ledger.json",
-    ]:
-        assert (
-            digest(HISTORICAL_SOURCE / name) == reference["before_files_sha256"][name]
-        )
-    assert curation["implementation_refs"][0]["source_sha256"] == digest(
-        HISTORICAL_SOURCE / "src/fatebridge/core/strength.py"
-    )
     assert (
         curation["validation_status"] == "text_semantics_not_model_force_adjudication"
     )

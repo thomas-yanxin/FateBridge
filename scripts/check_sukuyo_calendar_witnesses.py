@@ -11,7 +11,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "src/fatebridge/data/sukuyo_calendar_witnesses.json"
-FIXTURE = ROOT / "tests/fixtures/sukuyo-calendar-witnesses-before-production-v70.json"
+FIXTURE = ROOT / "tests/data/sukuyo-calendar-witnesses-before-production-v70.json"
 NS = {"t": "http://www.tei-c.org/ns/1.0"}
 
 

@@ -11,9 +11,7 @@ from fatebridge.validation.sukuyo_semantic import (
     semantic_calculation_view,
 )
 
-FIXTURE = (
-    Path(__file__).parent / "fixtures/sukuyo-semantic-complete-before-code-v86.json"
-)
+FIXTURE = Path(__file__).parent / "data/sukuyo-semantic-complete-before-code-v86.json"
 
 
 def prepared():

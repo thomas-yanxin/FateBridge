@@ -10,7 +10,8 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.core import heluo_jiehou as jh
-from fatebridge.core.heluo import _gua_tables, solar_term
+from fatebridge.core.heluo import solar_term
+from fatebridge.core.heluo_hexagrams import _gua_tables
 from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.core.output_heluo_jiehou import (
     HeluoJiehouEvidence,

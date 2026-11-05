@@ -18,7 +18,7 @@ from fatebridge.services.fengshui import calculate_xuankong_natal
 from fatebridge.validation.fengshui_replacement import audit_replacement_reference
 from tests.test_fengshui_surfaces import mcp_call, rest_client, without_transport
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_replacement_v1"
+FOLDER = Path(__file__).parent / "data/fengshui_replacement_v1"
 ORIGINAL = json.loads((FOLDER / "reference.json").read_text())
 PRINTED = json.loads((FOLDER / "wang-numeric-reference.json").read_text())
 EXPECTED = {

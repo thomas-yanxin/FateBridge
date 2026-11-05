@@ -20,6 +20,7 @@ from fatebridge.services.catalog.timing import SPECS as TIMING_SPECS
 from fatebridge.services.catalog.western_events import SPECS as WESTERN_EVENTS_SPECS
 from fatebridge.services.catalog.western_lifespan import SPECS as WESTERN_LIFESPAN_SPECS
 from fatebridge.services.catalog.western_timing import SPECS as WESTERN_TIMING_SPECS
+from fatebridge.services.method_registration import register_methods
 
 CATALOG: List[ToolSpec] = [
     *BAZI_SPECS,
@@ -60,6 +61,9 @@ CATALOG = [
     )
     for spec in CATALOG
 ]
+
+
+CATALOG = [replace(spec, methods=register_methods(spec)) for spec in CATALOG]
 
 
 def rest_specs() -> List[ToolSpec]:

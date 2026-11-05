@@ -56,7 +56,8 @@ def test_equal_mc_anchors_the_tenth_cusp_rather_than_the_house_center(mc):
     )
 
 
-def test_historical_mislabel_is_input_compatible_but_never_the_canonical_name():
-    assert normalize_house_system("天顶为10宫中点等宫制") == "D"
+def test_equal_mc_uses_its_tenth_cusp_name():
     assert normalize_house_system("天顶为第10宫宫头的等宫制") == "D"
     assert "宫头" in house_system_fields("D")["house_system_label_zh"]
+    with pytest.raises(ValueError):
+        normalize_house_system("天顶为10宫中点等宫制")

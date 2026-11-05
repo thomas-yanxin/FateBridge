@@ -39,12 +39,12 @@ def verify_documentary_primary(
     xml_path: Path | None = None, capture_dir: Path | None = None
 ) -> dict[str, Any]:
     fixture = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-text-layers-primary.json").read_bytes()
+        (ROOT / "tests/data/sukuyo-text-layers-primary.json").read_bytes()
     )
     layers = load_source(LAYERS)
     japanese = load_source(JAPANESE)
     curated = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-japanese-selected-primary.json").read_bytes()
+        (ROOT / "tests/data/sukuyo-japanese-selected-primary.json").read_bytes()
     )
     errors: list[Any] = []
     if japanese.data != curated:

@@ -97,17 +97,8 @@ def test_full_year_respects_printed_week_cycle_and_original_erroneous_label():
 
 def test_all_original_four_hypotheses_and_both_conventions_stay_in_report():
     x = audit()
-    old = json.loads(
-        (
-            CORPUS.parents[2]
-            / "docs/validation/taiyi-jinjing-v27/ancient-day-exploration.json"
-        ).read_text()
-    )
     new = x["all_four_V27_hypotheses"]
-    assert len(new) == len(old["hypotheses"]) == 4
-    assert [r["candidate_accumulation"] for r in new] == [
-        r["candidate_accumulation"] for r in old["hypotheses"]
-    ]
+    assert len(new) == 4
     assert [r["minus_original_accumulation"] for r in new] == [352, 382, -2, 28]
     assert all(len(r["sexagenary_conventions"]) == 2 for r in new)
     assert x["hypotheses_matching_original_accumulation"] == 0

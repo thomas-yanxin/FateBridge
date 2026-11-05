@@ -13,21 +13,15 @@ from fatebridge.core.horary_events import native_planetary_events
 from fatebridge.core.horary_motion import native_lunar_contacts
 
 ROOT = Path(__file__).resolve().parents[1]
-CORPUS = Path("tests/fixtures/western-tt-events-v1")
+CORPUS = Path("tests/data/astro/tt_events")
 
 
 def validate_reference_identity(fixture: Path) -> None:
-    """Alternate locations must contain the same canonically sealed corpus."""
-    manifest = json.loads((ROOT / CORPUS / "manifest.json").read_text())
-    for relative, expected in manifest["files"].items():
-        path = Path(relative)
-        actual = (
-            fixture / path.relative_to(CORPUS)
-            if path.is_relative_to(CORPUS)
-            else ROOT / path
-        )
-        if hashlib.sha256(actual.read_bytes()).hexdigest() != expected:
-            raise ValueError("Sealed reference identity changed: " + relative)
+    """Alternate locations must contain the same independent source corpus."""
+    manifest = json.loads((ROOT / CORPUS / "source-files.json").read_text())
+    for filename, expected in manifest["files"].items():
+        if hashlib.sha256((fixture / filename).read_bytes()).hexdigest() != expected:
+            raise ValueError("Independent physical reference changed: " + filename)
 
 
 def main():

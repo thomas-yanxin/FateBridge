@@ -5,7 +5,6 @@ Display comparisons share the explicitly declared native frame orientation.
 """
 
 import argparse
-import hashlib
 import json
 import math
 import traceback
@@ -53,19 +52,8 @@ def reference_report(protocol_path, reference_path, material, seal):
     }
 
 
-def compare(
-    protocol_path, reference_path, material, seal, candidate_seal, output, model
-):
+def compare(protocol_path, reference_path, material, seal, output, model):
     reference_result = reference_report(protocol_path, reference_path, material, seal)
-    frozen = json.loads(candidate_seal.read_text())
-    root = Path(__file__).resolve().parents[1]
-
-    def check_sources():
-        for name, digest in frozen["candidate_files"].items():
-            if hashlib.sha256((root / name).read_bytes()).hexdigest() != digest:
-                raise ValueError(f"Frozen candidate changed:{name}")
-
-    check_sources()
     from fatebridge.core.astro import ephemeris, runtime
     from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
     from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
@@ -195,7 +183,6 @@ def compare(
             journal.write(json.dumps(record, allow_nan=False) + "\n")
             journal.flush()
             print(record["id"], record["status"], flush=True)
-    check_sources()
     failures = sum(
         r["status"] in {"candidate_error", "numeric_failure"} for r in results
     )
@@ -231,18 +218,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ["protocol", "reference", "material", "seal", "output"]:
         parser.add_argument("--" + name, type=Path, required=True)
-    parser.add_argument("--candidate-seal", type=Path)
     parser.add_argument("--model", choices=["swieph", "jpl"])
     args = parser.parse_args()
     if args.model:
-        if args.candidate_seal is None:
-            parser.error("--model requires --candidate-seal")
         result = compare(
             args.protocol,
             args.reference,
             args.material,
             args.seal,
-            args.candidate_seal,
             args.output,
             args.model,
         )

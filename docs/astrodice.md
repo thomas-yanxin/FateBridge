@@ -1,8 +1,10 @@
 # 占星骰：符号、原典关系与天象背景
 
+阅读导航：[骰面输入](#输入) · [知识与来源](#知识范围与来源) · [运动与日速](#瞬时运动与速度核验) · [坐标与参考](#坐标含义太阳高度与独立视运动参考) · [验证边界](#验证范围与现实预测)
+
 `otherbu` 解读用户已有的三枚骰面，规则版本 `astrodice_symbolic_v7`。它不代替用户抽骰，不接收塔罗牌阵。缺失或无效骰面会被拒绝，不再默认为太阳、白羊、一宫。
 
-## 输入与迁移
+## 输入
 
 `planet`、`sign`、`house` 三项必填。`house` 保持原有的 **0..11 索引**：实体骰子的第 1 宫传 `0`，第 12 宫传 `11`。输出 `symbolic_details.house_number` 为自然宫号 1..12。浮点数、布尔值、负数和越界值不能被截断或钳制。
 
@@ -29,7 +31,7 @@ curl -sS -X POST \
 
 若请求独立天象背景，同时提供 `date`、`time`、`zone` 及完整经纬度（`lat/lon` 或 `gps_lat/gps_lon`）。不再默认上海坐标和东八区。日期为公历，时间为当地民用时，可保留秒和微秒；IANA 时区的夏令时歧义或不存在时刻应拒绝，使用已核对的 UTC 偏移消歧。`chart.params` 保留实际 UTC 时刻、星历模型和历法/时间尺度信息。
 
-有效本地年 1／9999 的 UTC 标签可能跨到天文年 0／公历年 10000。现在保留该物理时刻及扩展年份字符串，例如 `0000-12-31T10:00:00+00:00`、`+010000-01-01T11:59:00+00:00`，不裁剪输入日期。UTC 整数日序、微秒、固定闰秒假设和三种协议的限定验收见UTC 跨年界修复（本地数据：`validation/astrodice-utc-boundary.md`）；Python `datetime` 不能直接解析这些扩展标签。
+有效本地年 1／9999 的 UTC 标签可能跨到天文年 0／公历年 10000。现在保留该物理时刻及扩展年份字符串，例如 `0000-12-31T10:00:00+00:00`、`+010000-01-01T11:59:00+00:00`，不裁剪输入日期。UTC 整数日序、微秒、固定闰秒假设和三种协议的限定验收见UTC 跨年界修复；Python `datetime` 不能直接解析这些扩展标签。
 
 同时提供文本坐标和 GPS 坐标时，两者须一致（数值比较容差 `1e-9°`，经度按圆周比较，`180°/-180°` 等价）；该容差仅吸收表示误差，不宣称实地定位精度。无效或空白的任一已提供别名均会拒绝，GPS 布尔值不能变成 `0/1°`。有精确 GPS 而文本坐标只是约数时，只提交已核对的 GPS 一组即可。`chart.params.birthLatitude/birthLongitude` 和快照保留实际用于计算的浮点坐标。
 
@@ -48,7 +50,7 @@ curl -sS -X POST \
 | 七曜喜乐宫 | William Lilly，《Christian Astrology》，1647，pp.51–56，[原文转录](https://www.skyscript.co.uk/lilly_houses.html) | 水星1、月亮3、金星5、火星6、太阳9、木星11、土星12；只核对骰面宫号关系，不移用原文的生死、灾祸或临床断言 |
 | 现代解释与示意轮 | FateBridge contributors，`astrodice_symbolic_v7` | 中文词义、元素/模式、角续果宫、现实核对提示及假设整宫轮，明确标作产品约定，不伪称原典直译 |
 
-`symbolic_details.sign_condition.condition_evidence` 固定按 `domicile/exaltation/detriment/fall` 返回四项依据。七曜的 `matched` 是 `true/false`；超出七曜范围则为 `null`，对应 `basis_signs=null`，不能解释为四项均被否定。每项保留适用星座、推导方式、实际规则集和具体来源页。入庙使用 Ashmand XX，擢升和落陷使用 XXII；失势的对宫定义另引 Deborah Houlding [作者说明第二部分](https://www.skyscript.co.uk/dig2.html)，不再将混合结果全部挂在托勒密条文下。检索定位、短引文和页面 SHA-256 保留在来源见证（本地数据：`../tests/fixtures/astrodice-detriment-source.json`）。合成的 `sign_relationships` 规则属于 FateBridge，另列 `supporting_ruleset_ids`。
+`symbolic_details.sign_condition.condition_evidence` 固定按 `domicile/exaltation/detriment/fall` 返回四项依据。七曜的 `matched` 是 `true/false`；超出七曜范围则为 `null`，对应 `basis_signs=null`，不能解释为四项均被否定。每项保留适用星座、推导方式、实际规则集和具体来源页。入庙使用 Ashmand XX，擢升和落陷使用 XXII；失势的对宫定义另引 Deborah Houlding [作者说明第二部分](https://www.skyscript.co.uk/dig2.html)，不再将混合结果全部挂在托勒密条文下。检索定位、短引文和页面 SHA-256 保留在来源见证（本地数据：`../tests/data/astrodice/tables/detriment-source.json`）。合成的 `sign_relationships` 规则属于 FateBridge，另列 `supporting_ruleset_ids`。
 
 `interpretation.evidence` 把每段解释的 `text_path` 映射到实际 `fact_paths`、`rule_ids`、`ruleset_ids` 与解释类型。现代关键词、传统含义的现代转述、昼夜条件解释、现实核对提示分别标明；转述没有被标为原文引文。键名如 `condition_meanings_0` 可用点路径投影，`text_path` 才是实际文字位置。所有引用路径均针对同一份完整业务结果；只读了摘要的调用方应按同一 run 取回所需字段，不能为补来源另算一盘。现有 `verify_calculation_claims` 可核验这些字段的同 run 引述；它不认证任意自由文本语义。
 
@@ -64,7 +66,7 @@ curl -sS -X POST \
 
 恒星黄道背景采用 Swiss Ephemeris 的原生 Lahiri 接口：星体位置与速度使用 `FLG_SIDEREAL`，宫头与角度使用原生恒星黄道宫位接口。旧实现把含章动的视黄经减去不含章动的平均偏移，核验样例中造成约4–18角秒偏差；现已修复。`chart.params.chart_profile` 的 `sidereal_position_method`、`sidereal_house_method`、`ayanamsha_includes_nutation` 保留实际方法，`ayanamsha` 与 `ayanamsha_mean` 分别保留含章动和平均偏移，不能混作同一数值。地平线、赤纬和太阳昼夜条件仍使用实际天球坐标，不能用恒星黄道黄经代替。无 Swiss 运行时时仍明确标为偏移近似，不冒充原生计算。
 
-原生接口一致性验证只证明符合声明的方法，独立 NASA/JPL 样本仍负责天文参考核对；二者均不能外推为全历元正确或占卜有效。依据见 [Swiss Ephemeris §12.2、§15.4](https://www.astro.com/swisseph/swephprg.htm)，本轮证据见恒星黄道审计（本地数据：`validation/astrodice-sidereal-audit.json`）。
+原生接口一致性验证只证明符合声明的方法，独立 NASA/JPL 样本仍负责天文参考核对；二者均不能外推为全历元正确或占卜有效。依据见 [Swiss Ephemeris §12.2、§15.4](https://www.astro.com/swisseph/swephprg.htm)，本轮证据见恒星黄道审计。
 
 `fortune_method` 选择附加天象福点的具体公式：
 
@@ -77,7 +79,7 @@ curl -sS -X POST \
 
 天象背景通常以 `housePositionMethod=ecliptic_longitude_cusp_intervals` 按黄经宫头区间落宫。宫头需构成单圈顺行的十二个区间，边界比较保留输入浮点数的精确关系。高纬度 Regiomontanus 或 Polich/Page 宫头可能逆序或折返，此时原先的“不断加360°”会展开成多圈并错误分宫。现在保留原宫头及其宫号，改用 `swisseph_house_pos_zero_ecliptic_latitude`：按 [Swiss Ephemeris §16](https://www.astro.com/swisseph/swephprg.htm) 的原生 `house_pos`，传入热带黄经和0°黄纬，返回连续宫位，整数部分对应宫号。恒星黄道显示不会被直接当作热带输入。
 
-原生投影参数保留在 `chart.params.housePositionProjection` 及核心 `chart_profile.house_position_projection`，包括版本、ARMC、真黄赤交角、地理纬度、宫制和输入坐标系。星体、交点与福点保留 `ecliptic_house_position`，快照也说明实际方法。0°黄纬投影延续仅依赖黄经的选择，不等于计入星体实际黄纬的空间落宫；逆序或折返的宫头标为 `native_nonprograde_cusps`。投影失败返回错误，不补成第一宫、十二宫或其他宫制。具体反例与限定验证见宫序与落宫审计（本地数据：`validation/astrodice-house-position-audit.json`）。
+原生投影参数保留在 `chart.params.housePositionProjection` 及核心 `chart_profile.house_position_projection`，包括版本、ARMC、真黄赤交角、地理纬度、宫制和输入坐标系。星体、交点与福点保留 `ecliptic_house_position`，快照也说明实际方法。0°黄纬投影延续仅依赖黄经的选择，不等于计入星体实际黄纬的空间落宫；逆序或折返的宫头标为 `native_nonprograde_cusps`。投影失败返回错误，不补成第一宫、十二宫或其他宫制。具体反例与限定验证见宫序与落宫审计。
 
 极区宫制若采用相反的ASC或MC制宫分支，`chart_profile.house_axis_convention` 分别保留公开天球轴和原制宫轴；原宫头与落宫投影继续保留。占星骰快照同步附上这一字段的说明，解读时按各字段使用对应的轴。
 
@@ -87,20 +89,32 @@ curl -sS -X POST \
 
 已发布的 `astronomical_context` 视图同时读取实际输入、完整独立天象与计算依据；视图名不是请求参数，应将其 `fields` 传入调用。它保留默认 `symbolic` 首轮的用途。若天象业务字段分页延后，读取同一run的完整投影载荷并核对SHA-256后再解读，不把未读取当作不存在，也不重算来代替取回。
 
-独立底层核验使用[Horizons几何向量](https://ssd-api.jpl.nasa.gov/doc/horizons.html)：明确TT、ICRF、地心、无光行时／光行差修正，并让目标ID与上述参考点一致。它避开不同日期黄道模型的混淆，但只核验给定时标的几何数据，不代替民用时标、视位置修正、宫位或交点验证。冻结协议（本地数据：`../tests/fixtures/astrodice-kernel-protocol.json`）的方向容差为0.02角秒，坐标分量诊断线为 `1e-8 AU`；不能事后放宽以掩盖失败。补充的9999年12月29日样本不会替代原协议中无法获取的12月31日参考。
+独立底层核验使用[Horizons几何向量](https://ssd-api.jpl.nasa.gov/doc/horizons.html)：明确TT、ICRF、地心、无光行时／光行差修正，并让目标ID与上述参考点一致。它避开不同日期黄道模型的混淆，但只核验给定时标的几何数据，不代替民用时标、视位置修正、宫位或交点验证。冻结协议（本地数据：`../tests/data/astrodice/tables/kernel-protocol.json`）的方向容差为0.02角秒，坐标分量诊断线为 `1e-8 AU`；不能事后放宽以掩盖失败。补充的9999年12月29日样本不会替代原协议中无法获取的12月31日参考。
 
-本轮两平台各比较270组可用向量，方向检查全部在冻结容差内，但108组坐标分量未达诊断线，另有10组原始请求缺少外部参考。因此数值验收仍返回失败；应用回归通过不替代天文精度验收。原始响应、失败分布、独立原始系数插值探查及限定结论见参考点与底层星历审计（本地数据：`validation/astrodice-kernel-reference-audit.json`）。
+本轮两平台各比较270组可用向量，方向检查全部在冻结容差内，但108组坐标分量未达诊断线，另有10组原始请求缺少外部参考。因此数值验收仍返回失败；应用回归通过不替代天文精度验收。原始响应、失败分布、独立原始系数插值探查及限定结论见参考点与底层星历审计。
 
 源码环境可执行数据验收，报告保留每项结果、失败和缺失参考；数值失败退出1，只有参考缺失退出2，两者都不能称为完整通过：
 
 ```bash
 uv run --locked --extra dev python scripts/audit_astrodice_kernel.py \
-  --ephe ephe --protocol tests/fixtures/astrodice-kernel-protocol.json \
-  --reference tests/fixtures/astrodice-kernel-horizons.json \
+  --ephe ephe --protocol tests/data/astrodice/tables/kernel-protocol.json \
+  --reference tests/data/astrodice/tables/kernel-horizons.json \
   --output /tmp/astrodice-kernel.json
 ```
 
 需要更高的向量精度时，可显式选择[JPL原始DE441二进制文件](https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de441/)，绕过压缩数据及其求值路径。将完整文件放入 `SE_EPHE_PATH` 的搜索目录，设置 `FATEBRIDGE_JPL_FILE` 为文件名（不含目录）。该模式仅支持原始直接访问格式的DE441，不接受SPK/BSP文件；默认压缩数据路径保持原有行为。
+
+也可准备完整、连续的所需年域，避免下载完整三万年文件。下例约下载 929 MB 原始记录，覆盖公历年 1 至 9999，并在两端保留至少 32 日供光行时和求导使用。准备器复制全部天体、原始常数及系数字节，只调整文件头的标题和覆盖范围；保存 HTTP 范围、ETag、字节摘要及失败状态。该 `--output` 年域模式与原有整文件下载的 `--dest`／`--ca-file` 模式互斥。它拒绝覆盖已有文件，不在计算请求中下载，也不切换默认来源。缓存应放在仓库及安装包之外。
+
+```bash
+uv run --locked --extra dev python -m fatebridge.fetch_jpl \
+  --start-year 1 --end-year 10000 \
+  --output /absolute/path/to/raw-jpl/de441-0001-10000.eph
+uv run --locked --extra dev python -m fatebridge.fetch_jpl \
+  --output /absolute/path/to/raw-jpl/de441-0001-10000.eph --verify-only
+```
+
+使用该文件时将下例的 `FATEBRIDGE_JPL_FILE` 改为 `de441-0001-10000.eph`。`--end-year` 为不包含的结束年；例如 `3000` 至 `3600` 会生成整个 600 年段，约 56 MB。单个测试记录窗口不能替代这样的完整来源。
 
 ```bash
 SE_EPHE_PATH=/absolute/path/to/raw-jpl \
@@ -121,14 +135,14 @@ JPL模式的 `chart.params.chart_profile.physical_ephemeris_source` 返回实际
 ```bash
 uv run --locked --extra dev python scripts/audit_astrodice_kernel.py \
   --ephe /absolute/path/to/raw-jpl --jpl-file linux_m13000p17000.441 \
-  --protocol tests/fixtures/astrodice-kernel-protocol.json \
-  --reference tests/fixtures/astrodice-kernel-horizons.json \
+  --protocol tests/data/astrodice/tables/kernel-protocol.json \
+  --reference tests/data/astrodice/tables/kernel-horizons.json \
   --output /tmp/astrodice-jpl-kernel.json
 ```
 
 原始JPL路径通过可用样本也不能补成Horizons未返回的十项原始时刻，或认证全部视位置、时标、交点、宫位和原典解释。这里仍保留Swiss对给定TT的星历参数处理，未独立认证TT/TDB转换或实际观测精度。
 
-可选路径、严格错误边界、双平台实际数据比较及未通过项见原始JPL路径审计（本地数据：`validation/astrodice-jpl-kernel-audit.json`）。
+可选路径、严格错误边界、双平台实际数据比较及未通过项见原始JPL路径审计。
 
 ### 瞬时运动与速度核验
 
@@ -138,15 +152,15 @@ uv run --locked --extra dev python scripts/audit_astrodice_kernel.py \
 
 `chart.params.chart_profile.longitude_motion` 记录源码推导的方法、版本、适用状态及物理来源。针对已检查的原生2.10.03／绑定2.10.3.2，月球JPL与Swiss物理后端增加所采用光行时定义的链式导数，并经光行差位置变换的雅可比传播；热带日速另补最终黄道转动中的章动黄赤交角导数项，Lahiri的NONUT路径不加此项。这些项来自位置算法的求导，不按参考残差拟合。未验证版本或不支持的月球后端保留原生值并明确标记；参与修正的来源、坐标标志或位置重现不一致时拒绝计算。位置及骰面规则保持原算法。
 
-独立参考仍有超线项及模板不确定性，新增留出样本的局部改善不等于整体通过。原始量46失败、早先模板失败和缺失端点均保留。推导与后续证据见视运动调查（本地数据：`validation/astrodice-apparent-motion-investigation.md`）及月球运动审计（本地数据：`validation/astrodice-lunar-motion-audit.json`）。
+独立参考仍有超线项及模板不确定性，新增留出样本的局部改善不等于整体通过。原始量46失败、早先模板失败和缺失端点均保留。推导与后续证据见视运动调查及月球运动审计。
 
 复核新的月球诊断时，物理数据仍按前述环境变量选择；显式JPL示例：
 
 ```bash
 SE_EPHE_PATH=/absolute/path/to/raw-jpl FATEBRIDGE_JPL_FILE=linux_m13000p17000.441 \
 uv run --locked --extra dev python -m scripts.audit_astrodice_lunar_motion \
-  --protocol tests/fixtures/astrodice-lunar-chain-protocol.json \
-  --reference tests/fixtures/astrodice-lunar-chain-reference.json \
+  --protocol tests/data/astrodice/tables/lunar-chain-protocol.json \
+  --reference tests/data/astrodice/tables/lunar-chain-reference.json \
   --output /tmp/astrodice-lunar-motion.json
 ```
 
@@ -154,18 +168,18 @@ uv run --locked --extra dev python -m scripts.audit_astrodice_lunar_motion \
 
 这些运动属于独立天象背景，不是骰面星的运动条件，不能替三枚骰面添加逆行、留站或应期。`astronomical_motion` 是已发布字段视图；按其字段列表传 `fields`，视图名本身不是参数。保留 `motionPolicy` 和 `validation`，不能只读一个方向标签。
 
-底层几何速度另按冻结速度协议（本地数据：`../tests/fixtures/astrodice-velocity-protocol.json`）核验。它复用已有公开Horizons参考中的速度分量；阈值在查看速度残差前固定为每坐标分量 `1e-10 AU/日`、视线单位向量导数差 `0.002角秒/日`，不改动原位置容差，也不把方向导数称为黄经速度。这是限定工程诊断，不是全历元Swiss精度保证，也不是新盲测。协议明确保留原始缺失时刻和补充样本的区别。
+底层几何速度另按冻结速度协议（本地数据：`../tests/data/astrodice/tables/velocity-protocol.json`）核验。它复用已有公开Horizons参考中的速度分量；阈值在查看速度残差前固定为每坐标分量 `1e-10 AU/日`、视线单位向量导数差 `0.002角秒/日`，不改动原位置容差，也不把方向导数称为黄经速度。这是限定工程诊断，不是全历元Swiss精度保证，也不是新盲测。协议明确保留原始缺失时刻和补充样本的区别。
 
 ```bash
 uv run --locked --extra dev python scripts/audit_astrodice_kernel.py \
   --ephe /path/to/jpl-directory --jpl-file linux_m13000p17000.441 \
-  --protocol tests/fixtures/astrodice-kernel-protocol.json \
-  --reference tests/fixtures/astrodice-kernel-horizons.json \
-  --velocity-protocol tests/fixtures/astrodice-velocity-protocol.json \
+  --protocol tests/data/astrodice/tables/kernel-protocol.json \
+  --reference tests/data/astrodice/tables/kernel-horizons.json \
+  --velocity-protocol tests/data/astrodice/tables/velocity-protocol.json \
   --output /tmp/astrodice-jpl-velocity.json
 ```
 
-[Horizons手册](https://ssd.jpl.nasa.gov/horizons/manual.html)说明内部动力学采用TDB。这里比较的是已有TT标签历元返回的几何状态；没有独立认证TT速率变换、日期黄道视黄经日速、真实留站时刻或现实预测能力。已知失败、缺项、负对照和双平台结果见运动审计（本地数据：`validation/astrodice-velocity-audit.json`）。
+[Horizons手册](https://ssd.jpl.nasa.gov/horizons/manual.html)说明内部动力学采用TDB。这里比较的是已有TT标签历元返回的几何状态；没有独立认证TT速率变换、日期黄道视黄经日速、真实留站时刻或现实预测能力。已知失败、缺项、负对照和双平台结果见运动审计。
 
 ### 坐标含义、太阳高度与独立视运动参考
 
@@ -173,19 +187,19 @@ uv run --locked --extra dev python scripts/audit_astrodice_kernel.py \
 
 太阳几何中心高度为零仍计昼，这一约定只作用于有效的有限高度。旧实现中 `NaN>=0` 为假，会错误选夜，连带改变按昼夜反转的福点；现已拒绝这种来源错误。原生地平接口返回畸形结果也不会靠近似回退掩盖；正常的接口不可用回退仍按已有近似模型标注。
 
-新的冻结视运动协议（本地数据：`../tests/fixtures/astrodice-apparent-motion-protocol.json`）单独比较Horizons量45/46的视ICRF方向与角速度，含光行时、引力偏折及光行差；目标参考点和TT历元均显式记录。新增30个日期由固定SHA-256种子选定，不根据残差挑选。ERFA的IAU2006/2000A偏置—岁差—章动矩阵及真黄赤交角只用于这30个现代日期的显示黄道核验，并保留坐标轴导数，不能只旋转位置后遗漏速度中的参考系运动。
+新的冻结视运动协议（本地数据：`../tests/data/astrodice/tables/apparent-motion-protocol.json`）单独比较Horizons量45/46的视ICRF方向与角速度，含光行时、引力偏折及光行差；目标参考点和TT历元均显式记录。新增30个日期由固定SHA-256种子选定，不根据残差挑选。ERFA的IAU2006/2000A偏置—岁差—章动矩阵及真黄赤交角只用于这30个现代日期的显示黄道核验，并保留坐标轴导数，不能只旋转位置后遗漏速度中的参考系运动。
 
-本次取得570组可用视方向／速率和300组现代显示黄道参考，但量46与位置求导出现不一致。为查明差异，另在发现问题后冻结位置求导协议（本地数据：`../tests/fixtures/astrodice-apparent-derivative-protocol.json`），获取每个可用时刻前后的六个位置，用固定一小时和半小时五点模板分别求导。它是追加诊断，不能冒充原始盲测、替换原协议或抹掉原始速率比较失败。两步模板之间也有高于诊断线的差异，不能把全部派生速率当作无误差真值。
+本次取得570组可用视方向／速率和300组现代显示黄道参考，但量46与位置求导出现不一致。为查明差异，另在发现问题后冻结位置求导协议（本地数据：`../tests/data/astrodice/tables/apparent-derivative-protocol.json`），获取每个可用时刻前后的六个位置，用固定一小时和半小时五点模板分别求导。它是追加诊断，不能冒充原始盲测、替换原协议或抹掉原始速率比较失败。两步模板之间也有高于诊断线的差异，不能把全部派生速率当作无误差真值。
 
-目前这些证据没有证明视黄经日速全面达标；原生速度与位置导数的残余差异仍须调查。原始响应、来源量之间的差异、模板收敛、具体计算修复和双平台结果见视运动与坐标契约审计（本地数据：`validation/astrodice-apparent-motion-audit.json`），光行时链式导数原型和后续运行修正分别见调查推导（本地数据：`validation/astrodice-apparent-motion-investigation.md`）及月球运动审计（本地数据：`validation/astrodice-lunar-motion-audit.json`）。几何速度通过、位置通过、应用测试通过分别保留，不合并成“满分”。
+目前这些证据没有证明视黄经日速全面达标；原生速度与位置导数的残余差异仍须调查。原始响应、来源量之间的差异、模板收敛、具体计算修复和双平台结果见视运动与坐标契约审计，光行时链式导数原型和后续运行修正分别见调查推导及月球运动审计。几何速度通过、位置通过、应用测试通过分别保留，不合并成“满分”。
 
 ```bash
 uv run --locked --extra dev python scripts/audit_astrodice_apparent.py \
   --ephe /path/to/jpl-directory --jpl-file linux_m13000p17000.441 \
-  --protocol tests/fixtures/astrodice-apparent-motion-protocol.json \
-  --reference tests/fixtures/astrodice-apparent-horizons.json \
-  --derivative-protocol tests/fixtures/astrodice-apparent-derivative-protocol.json \
-  --derivative-reference tests/fixtures/astrodice-apparent-position-derivative.json \
+  --protocol tests/data/astrodice/tables/apparent-motion-protocol.json \
+  --reference tests/data/astrodice/tables/apparent-horizons.json \
+  --derivative-protocol tests/data/astrodice/tables/apparent-derivative-protocol.json \
+  --derivative-reference tests/data/astrodice/tables/apparent-position-derivative.json \
   --output /tmp/astrodice-apparent-motion.json
 ```
 
@@ -195,33 +209,33 @@ uv run --locked --extra dev python scripts/audit_astrodice_apparent.py \
 
 成功天体的模型标签取自原生返回标志。平交点不是实体行星；[Swiss文档§2.2.1](https://www.astro.com/swisseph/swisseph.htm)说明平交点使用另行构建的月球理论模型，JPL星历本身不提供平交点。因此平北交点返回 `swieph` 标志，并不证明它读取了某份 `.se1` 文件，也不能用这个标志认证节点的独立天文准确度。
 
-远期日期可按[官方分段表](https://www.astro.com/swisseph/swisseph.htm)补齐数据：`uv run --locked --extra dev python -m fatebridge.fetch_ephe --years 9999` 选择 `sepl_96.se1` 和 `semo_96.se1`。600年分段交界会同时选择相邻年份可能需要的文件。自定义下载目录须设置 `SE_EPHE_PATH`，服务重启后再核对实际模型。仅解读三枚骰面仍不需要星历下载。具体反例和验证记录见逐体回退与分段审计（本地数据：`validation/astrodice-ephemeris-fallback-audit.json`）。
+远期日期可按[官方分段表](https://www.astro.com/swisseph/swisseph.htm)补齐数据：`uv run --locked --extra dev python -m fatebridge.fetch_ephe --years 9999` 选择 `sepl_96.se1` 和 `semo_96.se1`。600年分段交界会同时选择相邻年份可能需要的文件。自定义下载目录须设置 `SE_EPHE_PATH`，服务重启后再核对实际模型。仅解读三枚骰面仍不需要星历下载。具体反例和验证记录见逐体回退与分段审计。
 
 缺少原生星历时，共享近似角度公式仍按东侧黄道／地平交点选取ASC。旧公式在部分高纬度时刻会选中西侧对点，偏差可达180°，并传递到宫位和福点；现已增加东半球分支判定。核验分别检查[USNO地平坐标方程](https://aa.usno.navy.mil/faq/alt_az)的地平线约束、东侧方向，以及相同ARMC和黄赤交角下的原生接口。近似恒星时和黄赤交角仍有误差，分支修正不能认证所有历元的天文准确度。[Swiss Ephemeris通用文档§6.4](https://www.astro.com/swisseph/swisseph.htm)说明了其东半球约定。
 
-精确地理极点（纬度±90°）保留星体、宫位和角度的约定计算，`chart.params.chart_profile.angle_definition` 同时返回 `geographic_pole_meridian_convention`：输入经度在此定义参考子午线；固定天球方向不发生由地球自转造成的每日升落。ASC、天顶、宫位和依赖ASC的福点应连同此约定读取，不能当作物理升起时刻。核心摘要与本工具快照使用同一说明；邻近极点的普通纬度不被改标为精确极点。几何推导、具体反例、测试范围与残余问题见高纬度角度审计（本地数据：`validation/astrodice-polar-angle-audit.json`）。
+精确地理极点（纬度±90°）保留星体、宫位和角度的约定计算，`chart.params.chart_profile.angle_definition` 同时返回 `geographic_pole_meridian_convention`：输入经度在此定义参考子午线；固定天球方向不发生由地球自转造成的每日升落。ASC、天顶、宫位和依赖ASC的福点应连同此约定读取，不能当作物理升起时刻。核心摘要与本工具快照使用同一说明；邻近极点的普通纬度不被改标为精确极点。几何推导、具体反例、测试范围与残余问题见高纬度角度审计。
 
 另一种退化发生在黄道与地平面接近重合时。按[USNO地平坐标方程](https://aa.usno.navy.mil/faq/alt_az)推导，零黄纬方向的高度满足 `sin(alt)=A cos(λ)+B sin(λ)`，其中 `A=cos(φ) cos(ARMC)`、`B=cos(φ) sin(ARMC) cos(ε)+sin(φ) sin(ε)`。`R=hypot(A,B)` 是两平面锐夹角的正弦，`R=0` 时整条黄道均在地平面上，不存在唯一几何ASC。这是从坐标方程得出的几何结论，不是某部占星原典的引文。
 
 `angle_definition` 在 `R≤sqrt(binary64 ε)` 时返回 `ecliptic_horizon_ill_conditioned`，在 `R≤64 binary64 ε` 时改为 `ecliptic_horizon_numerically_unresolved`、`geometric_ascendant_resolved=false`。前者仍有数值交线但对扰动高度敏感；后者不能用这些浮点数分辨唯一ASC，返回角度仅为后端数值约定。这里的阈值用于数值条件检查，不是观测、经纬度、时间或天文模型误差界，也不能证明物理平面精确重合。返回实际ARMC、黄赤交角、系数、R和所用阈值；核心摘要与占星骰快照保留同一解释。仅依赖ASC的宫头、落宫及福点受此限定，MC和不依赖ASC的星体位置继续保留。
 
-检查使用实际角度模型：原生路径读取 `houses_ex` 的赤道ARMC及与其内部UT1／Delta-T约定一致的真黄赤交角；恒星黄道也不把Lahiri黄经或黄道偏移当作ARMC。离线路径使用自身的近似恒星时和平均黄赤交角。原有数值没有被替换成一个假定的正确上升点。具体反例及验证范围见地平交线退化审计（本地数据：`validation/astrodice-horizon-degeneracy-audit.json`）。
+检查使用实际角度模型：原生路径读取 `houses_ex` 的赤道ARMC及与其内部UT1／Delta-T约定一致的真黄赤交角；恒星黄道也不把Lahiri黄经或黄道偏移当作ARMC。离线路径使用自身的近似恒星时和平均黄赤交角。原有数值没有被替换成一个假定的正确上升点。具体反例及验证范围见地平交线退化审计。
 
 `chart.params.chart_profile.earth_rotation` 记录实际采用的地球自转模型。`fatebridge_standard_rotation_v2` 在J2000前后各200儒略年范围内采用[IERS 2010表5.2e](https://iers-conventions.obspm.fr/content/chapter5/additional_info/tab5.2e.txt)的恒星时表达式，并使用Swiss的章动及平均黄赤交角；范围外保留Swiss长期模型的变化形状，在对应边界加一个常数相位差，使两模型的角度连续衔接。范围和常数由FateBridge确定；[Swiss文档6.1](https://www.astro.com/swisseph/swisseph.htm)提供的是常数偏移衔接的方法说明，不是对本系统边界或精度的认证。
 
 旧采纳边界的硬切换会产生约0.36、0.68角秒的跳变，现由相位对齐消除。公开原生几何接口接收的是经恒星时差旋转后的计算坐标系经度，用户输入的实际经纬度继续保留；不改动UTC、UT1或TT输入。`longterm_phase_alignment` 在使用长期相位对齐时记录方法、边界和未认证范围，未应用时为 `null`。常数对齐只保证所检验的角度衔接，不保证导数连续，也不证明远期绝对位置准确。
 
-独立ERFA参考冻结39个时刻、195个地点组合，生成进程不导入FateBridge或Swiss；它核验给定TT／UT1下的恒星时与空间两轴，不独立认证输入时标、实测地球定向或所有宫制。原生Lahiri合同继续以 `1e-9` 度容差检查几何及黄道转换，同时让时钟接受独立参考核验；不再把2050年后采用不同默认时钟的原生 `houses_ex` 当作同模型对照。故意关闭标准自转或恢复边界硬切换的负对照必须失败。具体数值及残余问题见恒星时模型与衔接审计（本地数据：`validation/astrodice-rotation-model-audit.json`）。
+独立ERFA参考冻结39个时刻、195个地点组合，生成进程不导入FateBridge或Swiss；它核验给定TT／UT1下的恒星时与空间两轴，不独立认证输入时标、实测地球定向或所有宫制。原生Lahiri合同继续以 `1e-9` 度容差检查几何及黄道转换，同时让时钟接受独立参考核验；不再把2050年后采用不同默认时钟的原生 `houses_ex` 当作同模型对照。故意关闭标准自转或恢复边界硬切换的负对照必须失败。具体数值及残余问题见恒星时模型与衔接审计。
 
 `symbolic_details.triplicity_condition` 将《四书》Robbins I.18 的总体分派与条件角色分别保留。`assigned_rulers` 列出该章分派给三角的主星，`in_assigned_group` 表示骰面星在这个总体分派中的关系；火象为太阳、木星，土象为月亮、金星，风象为土星、水星，水象为火星、月亮、金星。这不是对所有昼夜条件逐一授予尊贵，也不是 Dorotheus 的三主星轮替。
 
 `rulers_by_sect.day/night` 继续列首要主星及原文明确列出的条件共管主星，`matches_by_sect` 继续只比较这些所列角色。`match_definition` 保留这一口径，`roles_by_sect` 用 `primary/co_ruler/assigned_not_selected/not_assigned/outside_seven_planet_scope` 说明具体关系。比如木星白羊座属于火象三角总体分派，但昼条件所列首要主星为太阳：`in_assigned_group=true`、`matches_by_sect.day=false`、`roles_by_sect.day=assigned_not_selected`；夜条件则为木星首要治理。原解释“不属于该组”在v6中修正为对总体分派和具体条件角色的分别说明。
 
-水象保留火星与昼金星／夜月亮共管。`sect=null` 保留未知；三王星、交点的总体匹配及条件匹配均为 `null`，不是 `false`。`interpretation.triplicity_meaning` 和 `conditional_triplicity` 规则链同步呈现总体分派与昼夜条件，附加天象不会替骰面选择昼夜。`sign_condition.unassessed` 中的 `applied_triplicity_sect` 仍表示尚未选定适用条件。原典转录及反例见三角分派参考表（本地数据：`../tests/fixtures/astrodice-triangle-assignment-robbins-1940.json`）和v6原典角色审计（本地数据：`validation/astrodice-triplicity-role-audit.json`）。
+水象保留火星与昼金星／夜月亮共管。`sect=null` 保留未知；三王星、交点的总体匹配及条件匹配均为 `null`，不是 `false`。`interpretation.triplicity_meaning` 和 `conditional_triplicity` 规则链同步呈现总体分派与昼夜条件，附加天象不会替骰面选择昼夜。`sign_condition.unassessed` 中的 `applied_triplicity_sect` 仍表示尚未选定适用条件。原典转录及反例见三角分派参考表（本地数据：`../tests/data/astrodice/tables/triangle-assignment-robbins-1940.json`）和v6原典角色审计。
 
 `symbolic_details.planet_sect_condition` 在v7补入同译本I.7的星体昼夜分派。`natural_sect` 是原典对星体的分派：太阳、木星、土星为 `day`；月亮、金星、火星为 `night`。土星和火星的分派按原文的调和原则说明，不能按“冷就属夜、干热就属昼”倒推。它也不是I.18的三分性治理角色，例如木星是昼曜，不改变其在火象三角的夜条件首要治理角色。
 
-水星的 `natural_sect=null`；`assignments_by_solar_phase` 同时保留 `morning_star=day`、`evening_star=night`，表示尚缺晨昏条件，不把“兼具两种条件”输出成一个已选定的 `neutral` 派别。三王星、交点超出七曜范围，分派和条件表均为 `null`。所有骰面均保留 `solar_phase/applied_chart_sect/matches_chart_sect=null`；骰面宫号不决定太阳高度，独立天象背景也不为符号骰面补上观测位置。新增解释、规则链和快照均引用同一字段及I.7来源，见原典标注（本地数据：`../tests/fixtures/astrodice-planet-sect-robbins-1940.json`）。
+水星的 `natural_sect=null`；`assignments_by_solar_phase` 同时保留 `morning_star=day`、`evening_star=night`，表示尚缺晨昏条件，不把“兼具两种条件”输出成一个已选定的 `neutral` 派别。三王星、交点超出七曜范围，分派和条件表均为 `null`。所有骰面均保留 `solar_phase/applied_chart_sect/matches_chart_sect=null`；骰面宫号不决定太阳高度，独立天象背景也不为符号骰面补上观测位置。新增解释、规则链和快照均引用同一字段及I.7来源，见原典标注（本地数据：`../tests/data/astrodice/tables/planet-sect-robbins-1940.json`）。
 
 三枚骰面没有精确度数、两颗星的实际相对位置或实际盘的昼夜条件，因此不计算界、面、度数尊贵、出入相、逆行、燃烧、是否合派／逆派、接纳或精确应期。星体的原典昼夜分派与这些未计算项分别保留。没有列出四种星座关系不等于“游离”或“毫无尊贵”。
 
@@ -231,72 +245,27 @@ uv run --locked --extra dev python scripts/audit_astrodice_apparent.py \
 
 ## 验证范围与现实预测
 
-星历文件获取采用[固定官方提交](https://github.com/aloistr/swisseph/tree/c69c14adb7a0f94829586ffd92cd422aacb21e86/ephe)的完整SHA-256指纹，覆盖清单中的153份 `.se1` 文件。下载和缓存复用都检查完整内容；旧缓存替换前保留原文件，`--verify-only` 可离线核验。它修复了两字节 `SW` 内容被接受、以及月球文件错存为行星文件仍被复用的问题。清单只包含指纹，实际数据仍单独获取。
+独立数值参考和原始物理资料保存在 `tests/data/astrodice`，由 `reference-material.json` 给出唯一当前相对路径、来源身份和原始数据摘要。原始 JPL 系数、Horizons 响应、打印区间、源算法常数及原协议中的全部样本与误差线保留。维护中的 Python 文件和原生二进制不作为正确性真值；退役的生产源码、执行日志和整盘快照不参与当前评分。
 
-本地已补齐公元1–9999年所需的34个行星／月球分段。文件区间、每年年首年尾及600年换段邻域的原生返回模型另行核查；这证明指定数据与运行时的可用性，不能据此声称所有历元位置、未来UTC/UT1或宫位都无误差。实际JPL数据版本取自原生文件头，平交点仍按其单独理论模型说明。来源、反例和限定验证见文件完整性与年代覆盖审计（本地数据：`validation/astrodice-ephemeris-integrity-audit.json`）。
+`scripts/audit_astrodice_display_rate.py` 对原开发／留出群体的 40 项目标／后端组合执行当前计算，再与独立区间参考比较；`scripts/audit_astrodice_lunar_pipeline.py` 对原 12 项月球固定框架组合执行相同流程。位置线为 `0.02` 角秒，日速线为 `0.002` 角秒／源日。每项失败、不可用状态和两种后端都保留，不以选择编码、尺度或删除样本改善结果。源坐标使用的名义 TDB 数值与 TT 命名参数相同，不证明两种物理时标等价；共享旋转也不是独立显示框架精度证明。
 
-| 方面 | 可检验内容 | 当前证据能支持什么 |
-| --- | --- | --- |
-| 算对历法/天文 | 独立 NASA/JPL 经度、闰日跨日、等价时区、秒/微秒、夏令时边界、实际星历模型 | 骰面层无历法运算；附加天象按具体参考时刻和容差核验。不能将“不适用”算成100分 |
-| 符合指定原典 | 指定译本中的七曜×十二星座，84 项星座关系与昼夜三分性关系逐一对照，并对照七曜喜乐宫、I.7昼夜分派及水星晨昏条件 | 自行根据原文标注的参考表与实现一致；这是限定子集、第一方转录核验，未获独立学者的整部原典认证 |
-| 解释忠于结果 | 穷举1,728组合，检查骰面、宫号、关键词、尊贵标签及规则链；检查问题/天象选项不改变符号证据 | 保证本工具的确定性解释模板与所返字段相符；不能据此认证外部大模型的任意自由文本 |
-| 能够预测现实 | 冻结规则、预注册、独立前瞻样本、基线、盲评、覆盖率与不确定性 | 当前没有本星骰系统的已核验现实预测样本，状态为 `not_validated`，无可报告的准确率 |
+在原 `3000-12-07T04:07:32` 数值时刻，压缩星历后端的月球视黄经日速仍比原独立区间高约 `0.00260713472` 角秒／源日，超过 `0.002` 原线；位置误差约 `0.00030606` 角秒，在 `0.02` 原线内。独立原始 DE441 系数核对将主要速度残差定位到压缩星历的几何源层；原生速度与自身位置多步长求导相符，不能用重新求导恢复已丢失的源精度。当前官方 `semo_30.se1` 与所检查的本地文件字节一致。对 2.10.3.2 所含原生 C 源码的系数计数作独立解包和重新编译实验，保留末个有效项或全部项后，该点仍分别约为 `0.00260317`、`0.00260318`，均未过线，且留出样本有轻微变差；这些实验未替换运行库或默认数据。
 
-七曜参考表在 astrodice-sign-reference.json（本地数据：`../tests/fixtures/astrodice-sign-reference.json`），不是从运行时规则生成。原有视黄经测试复用带原始响应和 SHA-256 的 NASA/JPL 样本，覆盖七个实体及三个时刻；2角秒阈值含输出经度四位小数的量化误差。新增几何向量核验采用上文单独的协议、容差和失败记录。这两组证据都不涵盖全部历元、节点、宫头或黄道偏移，不能外推成全时域保证。
+`scripts/audit_astrodice_lunar_precision.py` 评分当前完整固定接收框架导数，并把原生未修正速度另列诊断。原 137 个中心中的 135 个可评项保留，另两项缺测仍未通过；当前可评项只有上述月球点的日速超过 `0.002`，最大位置误差约 `0.00206794` 角秒。该审计继续返回非零。REST、MCP、CLI 在该点交付相同的原生来源、位置及日速，传输一致不改变数值失败结论。NASA 将原始 DE 系数的积分时标定义为 [TDB](https://ssd.jpl.nasa.gov/planets/eph_export.html)；在该点代入两种时标模型的日速灵敏度约为 `0.000019` 角秒／日，不能解释现有超差，也不构成年 3000 的物理时标精度证明。
 
-运行：
+显式选择准备器生成的完整 AD1 至 AD10000 原始 DE441 源后，原 135 个可评项均满足原线，最大方向日速误差约 `0.00109586` 角秒／日、位置误差约 `0.00213165` 角秒；两项原缺测仍为缺测，因此完整 137 项审计返回 `reference_evidence_unresolved` 和退出码 2。另在查询和候选评分前声明的 12 个跨域留出时刻，228 个同 TT／ICRF／地心参考探针得到的日速与位置误差最大分别约 `0.00055658`、`0.00170741` 角秒，均满足原线。这条精确来源路径使用已有公开 JPL 选择，不代表恢复了 Swiss 压缩文件的信息，也不改判其原失败。新留出的原协议和 NASA 响应位于 `tests/data/astrodice/precise-source-holdout`。
+
+原缺证的两个中心另有独立补证，未修改旧 137 项参考：AD1 中心原来因采集器不能表示年 0，漏取了 7 个负偏移探针。按 Horizons 的公元前标签重新请求后，全部 19 个原模板探针可得；完整 JPL 源的方向日速误差约 `0.00044182` 角秒／日、位置误差约 `0.00131508` 角秒，模板步长差约 `0.00004922` 角秒／日，均满足原线。AD9999 中心则仍受 NASA 实际返回的 `9999-DEC-30 12:00:00.0011 TT` 上界限制，原模板的 6 个正偏移探针不可得；不改用单边模板。[Horizons 文档](https://ssd.jpl.nasa.gov/horizons/manual.html#long-term-ephemerides)也说明当前公开年域受 Y10K 问题限制。因此可报告原 135 项加独立补证 1 项，另 1 项原协议仍未验收；不能称旧 137 项文件通过。新补证的协议、原始响应及实际采集时间保存在 `tests/data/astrodice/original-endpoint-supplement`。
+
+按现行进程环境复核补证，命令在完整 JPL 源下仍返回退出码 2，保留 AD9999 未验收状态：
 
 ```bash
-uv run --locked --extra dev python -m pytest -q \
-  tests/test_astrodice.py tests/test_astrodice_depth.py \
-  tests/test_astrodice_geometry.py tests/test_astrodice_context.py \
-  tests/test_astrodice_explanation.py tests/test_astrodice_sidereal.py \
-  tests/test_astrodice_house_positions.py tests/test_astrodice_triplicity_roles.py \
-  tests/test_astrodice_planet_sect.py \
-  tests/test_astrodice_transports.py
-uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
+SE_EPHE_PATH=/absolute/path/to/raw-jpl FATEBRIDGE_JPL_FILE=de441-0001-10000.eph \
+uv run --locked --extra dev python -m scripts.audit_astrodice_lunar_endpoint_supplement \
+  --directory tests/data/astrodice/original-endpoint-supplement \
+  --output /tmp/astrodice-lunar-endpoint-supplement.json
 ```
 
-测试是本地算法与协议验证；真实大模型行为、远程部署和现实预测研究需分别验收。v2历史证据见首轮审计（本地数据：`validation/astrodice-audit.json`），v3变更及验收见深度审计（本地数据：`validation/astrodice-depth-audit.json`），v4见计算与原典审计（本地数据：`validation/astrodice-v4-audit.json`）；坐标与福点方法后续核验见天象背景审计（本地数据：`validation/astrodice-context-audit.json`）；v5解释忠实度见解释审计（本地数据：`validation/astrodice-explanation-audit.json`）。现实研究的可执行流程见前瞻验证方案（本地数据：`validation/astrodice-prediction-protocol.md`）。
+历史负证据单独保存在 `historical-failures.json`，不作为当前原生输出的预期快照，也不因当前工程测试通过改判。保留的问题包括：压缩星历的月球日速超线、近太阳盘内或盘后水星的位置／日速分离、金星参考模板与标签预算未决、远未来缺测，以及原始几何坐标分量诊断线失败。独立模型或新增局部留出通过只限定所列样本与参考模型；事件根比较通过也不能替代同点位置精度；原完整数值门槛、物理时标、全历元准确度和现实预测效度仍不能据此认证。
 
-v7的I.7昼夜分派、原有1,728组合不变性、负对照、同run分页核对、坐标示例修正及双平台验收见原典分派与接口审计（本地数据：`validation/astrodice-planet-sect-audit.json`）。
-
-内行星与太阳另有完整视位置导数余项 `position_derivative_correction`。它与原生日速、光行时及旋转项共同组成最终 `longitude_speed`；`complete_position_derivatives` 保留实际方法版本、尝试步长、所选差分或多项式路径、失败的初始尝试和来源。外部验收误差线仍为 0.002 角秒/日，内部收敛线为 0.0002 角秒/日。来源模型改变、坐标合同不符或所有有界尝试均不收敛时拒绝计算，不能用未知速度填成顺行。月球继续使用单独方法。
-
-本轮两批内行星留出按版本分开封存，共 180 项；跨年代月球新增宽模板仍保留两个不完整端点，Swiss 后端也仍有超线及调用顺序反例。数值与历史失败见后续审计（本地数据：`validation/astrodice-position-motion-audit.json`）和调查记录（本地数据：`validation/astrodice-apparent-motion-investigation.md#2026-10-22内行星留出验收与跨年代模板复核`）。不能据此宣称全历元正确或预测有效。
-
-跨压缩星历文件边界的月球计算现通过共同光路窗口处理，方法和各参考系状态见 `chart.params.chart_profile.longitude_motion.lunar_source_windows`。黄道、赤道及 ICRF 核验入口均在观测与迟发时刻的共同文件覆盖范围内重算。首次原生状态保留为 `initial_native_state`，实际采用的状态为 `coherent_native_state`；最终日速中的原生项采用后一状态。新旧失败、重新冻结的 48 项边界留出和仍未通过的压缩数据日速见调查记录（本地数据：`validation/astrodice-apparent-motion-investigation.md#后续修复共同光路窗口与全参考系入口`）。
-
-端点参考另有两项冻结的单侧研究，每项保留两个旧端点和 8 个新历元。两项均有 4 个参考步长检查未通过，尚不能认证端点日速；数据完整不代表参考精度合格。原对称模板的缺失记录、候选超线值与固定误差线均未改写。源状态精度和历元舍入的进一步诊断见端点补证（本地数据：`validation/astrodice-apparent-motion-investigation.md#剩余源数据误差与端点补证2026-10-23`）。
-
-新增的 双段 TDB 参考（本地数据：`validation/astrodice-split-time-reference.md`）含 16 个新跨年代历元及 4 个控制历元，独立读取和标量复算均通过所声明模型的质量检查。它没有转换或认证 TT 日期，也没有回填旧端点。原始 JPL 结果现通过 `physical_ephemeris_source.time_scale_policy` 披露原生 TT／TDB 近似；文件头提供正确的 TDB 范围字段，历史 TT 范围名称仅作注明含义的兼容别名。压缩数据仍有日速超线。
-
-当前 v6 的跨年代 TT 验收（本地数据：`validation/astrodice-v6-wide-tt.md`）新增 166 个目标历元的独立参考研究。公元 1 年跨界探针使用明确 BC 标签，并按返回 JD 匹配，补齐了该端点的对称模板；9 项月球限定比较均在原定线内。156 项内行星／太阳比较中，155 项满足固定线，一项近太阳水星参考模板未合格；远未来端点也仍缺资料。后续局部尺度诊断单独保留，没有改判首次失败或把旧样本重计为新留出。
-
-同轮还穷举核对了公元 1—9999 年的全部公历年月日组合：有效午夜日期精确一致，无效日期状态保留。两项初始 UTC 年界溢出已有后续修复与冻结验收（本地数据：`validation/astrodice-utc-boundary.md`），原始失败仍保留；全时间域及物理天文准确度尚未完成验收。
-
-多尺度模板与新近太阳留出（本地数据：`validation/astrodice-reference-refinement.md`）进一步固定五档步长和三个阶数，只按参考自身质量选尺度。6 组新几何条件含 12 个新目标历元，两后端均有 11 项满足原定线；另两项已知控制作为回归保留。2500 年水星参考仍不收敛，整批未通过；已知 3000 年控制的新方法结果没有覆盖旧失败。
-
-局部打印区间参考（本地数据：`validation/astrodice-local-interval-reference.md`）另冻结 6 个新条件及 2 个已知控制，使用可精确重放的区间证书并计入参考余量。双平台、双后端均有 4 项满足本轮条件、3 项数值超线、1 项参考不完整。新增反例指向近太阳引力偏折约定的差异，仍需修正和新的独立验收；原失败、缺失探针及固定误差线均保留。
-
-太阳修正与分层验收（本地数据：`validation/astrodice-solar-layers.md`）修复了日速参考不合格时跳过中心位置的问题，并将核心已有的太阳盘前后景及原生视位置约定呈现在占星骰快照。又冻结 6 个跨年代条件，保留两个太阳盘后水星的位置、日速超线，以及两项远未来参考缺测。JPL 数据后端仍由 Swiss 修正引擎计算；模型差异没有被改判为通过。数值公式、固定误差线和全部历史失败保持不变。
-
-参考请求首历元保护（本地数据：`validation/astrodice-tlist-first-epoch.md`）显式保留一个更早的整数 JD 辅助行，在不扩大批次预算、不改变主 TT 或误差线的条件下，补齐 7 个已见条件的 2023 个主探针。6 项局部日速参考达到声明质量线，1 项仍未决，太阳盘后水星仍数值超线。另冻结的四个源时间身份条件全部满足历元匹配线，其四项宽差分日速模板的失败也继续保留；不计作新增候选数值精度留出。
-
-5 秒参考与局部模型反证（本地数据：`validation/astrodice-grid5-reference.md`）保留全部原观测及固定门槛，5 份精确证书证明部分金星观测与所选局部模型、打印区间不相容。原四项跨年代条件在当前冻结源码的 Swiss 路径下仍满足限定比较，旧太阳盘后水星仍超线；旧完整候选与平台日志缺失的证据边界也已列明。另四项新冻结条件因 Horizons 服务错误未取得任何参考，保持未决。版本绑定、日速明细及三端检查通过，没有把测试通过或参考不可用记为天文精度、全面原典或预测效度通过。
-
-DE441 原始记录与时刻表示诊断（本地数据：`validation/astrodice-de441-records.md`）提取 7 个固定年代的原始连续系数，以两个独立有理数算法核对 420 个组件，并完成原生 JPL 几何比较。原金星反证对绝对 JD 舍入的几何代理敏感，仍需确认实际服务的时标与视位置路径；原失败和打印区间未改。诊断节选只覆盖各 96 日，不代表完整 DE441 安装；这项名义 TDB 几何研究没有替换原 TT／Horizons 验收。
-
-连续视位置参考与内行星日速验收（本地数据：`validation/astrodice-apparent-source.md`）从原始 DE441 记录独立求完整视位置导数；3 个已见控制和 28 个预定首次源模型条件均满足原位置／日速线，另由标量基函数算法重放。结点两侧 A／B 两批均在打开前固定，未调整生产公式。新增验收器完整入口回归已修复，错误版本与失败日志保留，31 条重跑与首次结果完全一致。这里仍按名义 TDB 相同数值参数和共享显示旋转比较；旧 Horizons 水星超线、金星模板未决及四项精确 TT 留出未决保持原判，不能称为全时域或预测有效性通过。
-
-完整视位置的时标误差包围（本地数据：`validation/astrodice-clock-budget.md`）将时差幅值与时标变化率分开处理，冻结 28 个新诊断条件，并用向外舍入区间和独立 100 位参考交叉核对。两项太阳盘后水星在声明的源模型与分析时标假设内仍与旧参考显著分离，不能只调毫秒偏移来消除差异。长年代时标模型物理外推仍未合格，新增候选精度通过数为 0；旧失败、金星反证及精确 TT 留出未决保持原判。
-
-插值节点邻近历元的修复与留出验收（本地数据：`validation/astrodice-knot-neighbour.md`）修复近太阳水星的 8 个日速计算拒绝项：辅助高精度约化使用稳定叉积判断自身单元，并在来源身份匹配时支持 JPL 文件后端。A 组已见 32 项修复回归及 B 组预定 32 个邻近数值历元均满足原位置／日速线，旧 24 个成功项数值未变。64 项旧有限差分参考仍不合格，另一个独立区间导数参考与其并存；本轮未替换旧 TT／Horizons 判定。实际 REST、MCP、CLI 交付保持 v2 来源与失败尝试证据，现实预测仍未验证。
-
-等价 TT 输入与交叉验收（本地数据：`validation/astrodice-dual-encoding-tt.md`）在参考服务恢复后补采原四项跨年代条件，发现 JD 与 MJD 输入各有不同的标签拒绝，保留两条完整链并增加独立有理数 MJD 校验。查询前冻结的交叉规则要求所有合格参考区间相容、候选同时过线，原四项后续比较及另外四项首次留出均满足原线。两条单链各自仍退出 2，旧服务错误、全部拒绝节点及旧太阳盘后水星超线保持原判；新结果仅覆盖所列条件及声明的参考模型，生产公式和公开接口未在该轮更改。
-
-太阳盘内外模型与冻结留出（本地数据：`validation/astrodice-solar-limb-model.md`）按原始 DE441 几何预先选择 A／B 各 16 个新时刻，量 1／12／45 及 JD／MJD 双路径支持近太阳偏折约定差异的定位：两组默认模型各有 8 个盘内位置超线，全局关闭偏折则各有 8 个盘外位置失败。预先声明的分段假设仅作诊断，没有改入生产算法或覆盖原判；本研究不验收日速、精确盘缘或物理 TT／TDB 转换。固定误差线、原完整数值门槛退出 1 及全部旧失败保持不变。
-
-金星输入表示与串行补采（本地数据：`validation/astrodice-venus-epoch.md`）保留原8103年中心的五份精确反证与完整参考未通过状态。相同13个支持点的MJD／日历输入虽然改变反证组合，但完整网格各有8个标签超预算，不能据此通过。采集入口现共享跨进程串行控制和503退避，原两项预定留出在复用166个成功批次、补取29个失败批次后，JD参考及两后端位置／日速均满足原线；MJD／日历各26个标签拒绝仍未决。生产数值公式、固定误差线和原完整数值门槛退出1保持不变，首次并发采集及全部故障记录另存。
-
-时刻包围与错误缓存修复（本地数据：`validation/astrodice-epoch-envelope.md`）对三项已见金星条件保留完整网格、窗口、阶数及原误差线，明确检验尚未认证的时刻／斜率假设。66组必要外包围虽取得精确证书，参考半径仍超质量线，三项继续未决；独立原始单位算法复核264个最优值，不把代数可行性认证为真实时刻或预测准确度。HTTP200服务错误现保留但不复用为成功缓存，130份历史错误的离线恢复资格已核对，未发出新请求。原数值门槛退出1和全部旧判保持不变。
+骰面规则的可复现、原典解释的忠实程度、天文数值精度和现实预测效度分别验收。符号组合的描述不等于事件概率，也不能用工程回归通过替代现实证据。

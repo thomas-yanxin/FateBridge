@@ -7,7 +7,7 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/human_design_reference_fraction_v1"
+FIXTURE = ROOT / "tests/data/human_design/reference_fraction"
 
 
 def derive():

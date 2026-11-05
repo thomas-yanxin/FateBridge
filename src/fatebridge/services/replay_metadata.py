@@ -12,6 +12,7 @@ from pydantic import BaseModel
 
 from fatebridge import __version__
 from fatebridge.core.ephemeris_paths import ephemeris_search_directories
+from fatebridge.core.evidence_graph import execution_evidence
 from fatebridge.core.execution_context import CallClock, ExecutionOptions
 from fatebridge.core.reproducibility import BAZI_ANALYSIS_CLOCK_TOOLS
 from fatebridge.core.schema_cache import contract_fingerprint
@@ -169,9 +170,13 @@ def execution_receipt(
     # These omissions affect either fail-loud solar behavior or the declared
     # birth-clock input components, even when the nominal values are equal.
     # A null/omitted second has the same unknown meaning and needs no extra bit.
+    supplied_paths: set[str] = set()
+
     def semantic_presence(model: BaseModel, prefix: str = "") -> List[str]:
         present = []
         for field in type(model).model_fields:
+            if field in model.model_fields_set:
+                supplied_paths.add(prefix + field)
             value = getattr(model, field)
             if isinstance(value, BaseModel):
                 present.extend(semantic_presence(value, prefix + field + "."))
@@ -266,7 +271,10 @@ def execution_receipt(
         "metadata_schema_version": METADATA_SCHEMA_VERSION,
         "package_version": __version__,
         "contract_sha256": contract_fingerprint(
-            spec.request_model, spec.output_model, spec.required_output_fields
+            spec.request_model,
+            spec.output_model,
+            spec.required_output_fields,
+            spec.methods,
         ),
         "input_sha256": input_digest,
         "business_output_sha256": digest(body),
@@ -283,6 +291,21 @@ def execution_receipt(
         },
         "runtime": environment,
         "provenance": observed_provenance,
+        **(
+            {
+                "calculation_evidence": execution_evidence(
+                    spec.methods,
+                    inputs,
+                    body,
+                    input_digest,
+                    frozenset(supplied_paths),
+                    frozenset({"seed"}) if generated_seed else frozenset(),
+                    digest(environment),
+                )
+            }
+            if spec.methods
+            else {}
+        ),
         "replay": {
             "as_of": as_of,
             "overrides": overrides,

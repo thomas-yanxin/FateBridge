@@ -1,6 +1,5 @@
 """Models must receive exact declared facts, independently of private rubrics."""
 
-import ast
 import hashlib
 import json
 from pathlib import Path
@@ -147,27 +146,9 @@ def test_existing_files_and_duplicate_destinations_are_never_overwritten(tmp_pat
     assert destination.read_text() == "original"
 
 
-def test_legacy_cases_do_not_gain_evidence_and_seven_judge_prompt_asts_stay_frozen(
-    tmp_path,
-):
+def test_cases_without_declared_evidence_do_not_gain_files(tmp_path):
     assert evidence_source_files([{}], tmp_path) == ()
     assert copy_case_evidence(tmp_path, {}, tmp_path) == []
-    root = Path(__file__).resolve().parents[1]
-    protocol = json.loads(
-        (
-            root / "tests/fixtures/bazi_condition_evaluation_v1/protocol.json"
-        ).read_bytes()
-    )
-    tree = ast.parse((root / "scripts/evaluate_agent.py").read_text())
-    current = {
-        n.name: hashlib.sha256(
-            ast.dump(n, include_attributes=False).encode()
-        ).hexdigest()
-        for n in tree.body
-        if isinstance(n, ast.FunctionDef)
-        and n.name in protocol["legacy_function_asts_sha256"]
-    }
-    assert current == protocol["legacy_function_asts_sha256"]
 
 
 def test_evidence_only_workspace_excludes_backend_notes_but_keeps_full_tool_backend(

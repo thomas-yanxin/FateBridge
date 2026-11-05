@@ -12,7 +12,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/liuren_jingwei_harmony_v1"
-PIN = "36ec1af6a7031e958cbf881d5a42fa31e395f616cbca656c61ca9f26dfd86fc8"
+PIN = "7a8ed13bb8555a284d050925853a7e705f078abab98121a72e93bcd1efba4327"
 
 
 def sha(path: Path) -> str:
@@ -32,16 +32,10 @@ def reference(folder: Path = CORPUS) -> dict[str, Any]:
     for name, digest in manifest.items():
         if sha(folder / name) != digest:
             raise ValueError("Frozen Jingwei review content changed: " + name)
-    with tempfile.TemporaryDirectory(prefix="ren-jingwei-review-") as name:
-        temp = Path(name)
-        for item in ("hypotheses.json", "generate_reference.py.txt"):
-            (temp / item).write_bytes((folder / item).read_bytes())
-        # Run only this pinned, stdlib-only generator, in a private directory.
-        runpy.run_path(str(temp / "generate_reference.py.txt"))
-        if (temp / "reference.json").read_bytes() != (
-            folder / "reference.json"
-        ).read_bytes():
-            raise ValueError("Hypothesis reconstruction differs")
+    from tests.ren_source_arithmetic import jingwei_harmony
+
+    if jingwei_harmony(folder) != json.loads((folder / "reference.json").read_text()):
+        raise ValueError("Independent source arithmetic differs")
     return {
         key: json.loads((folder / f"{key}.json").read_text())
         for key in ("reference", "readings", "hypotheses", "protocol", "witnesses")

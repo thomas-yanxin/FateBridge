@@ -203,8 +203,14 @@ class InputValidationMiddleware(Middleware):
             )
         try:
             OutputFlags.model_validate(flags)
-            spec.request_model.model_validate(inputs)
-            return cast(ToolResult, await call_next(context))
+            request = spec.request_model.model_validate(inputs)
+            from fatebridge.transports.request_context import MCP_REQUEST
+
+            token = MCP_REQUEST.set((spec.key, request))
+            try:
+                return cast(ToolResult, await call_next(context))
+            finally:
+                MCP_REQUEST.reset(token)
         except ValidationError as exc:
             return protocol_result(
                 correlate_error(

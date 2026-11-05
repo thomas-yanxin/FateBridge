@@ -42,7 +42,7 @@ OPTIONS = {"ephemeris_policy": "require_data_files", "cheshta_model": "simon1994
 @pytest.fixture
 def jpl(tmp_path, monkeypatch):
     previous = e.configured_ephemeris_path()
-    raw = (FIXTURES / "astrodice-de441-j2000.eph").read_bytes()
+    raw = (Path(__file__).parent / "data/astrodice/tables/de441-j2000.eph").read_bytes()
     assert len(raw) == 40720 and hashlib.sha256(raw).hexdigest() == KERNEL_SHA
     kernel = tmp_path / KERNEL
     kernel.write_bytes(raw)

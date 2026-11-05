@@ -14,110 +14,10 @@ from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.fetch_aa1996 import build
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.canping_reading_fixture_compat import rewind_reading_context_checked
-from tests.numerology_clock_input_fixture_compat import (
-    rewind_clock_from_original_first_row_request,
-)
 
 FIXTURE = Path(__file__).parent / "fixtures/numerology_solar_providers_v1"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_bytes())
 TRACE_ID = "numerology_consumed_solar_sources_v1"
-CLOCK_FIXTURE = Path(__file__).parent / "fixtures/numerology_clock_metadata_v1"
-
-
-def preserve_original_native_clock_metadata_checked(current, expected):
-    """Qualify three added labels and their exact receipt hashes, then compare old facts."""
-    reference = json.loads((CLOCK_FIXTURE / "reference.json").read_bytes())
-    data = (
-        Path(almanac.__file__).resolve().parents[1]
-        / "data/knowledge/western-leap-seconds.json"
-    )
-    assert (
-        hashlib.sha256(data.read_bytes()).hexdigest() == reference["leap_table_sha256"]
-    )
-    assert (
-        hashlib.sha256(
-            (
-                Path(__file__).parent
-                / "fixtures/canping_first_row_v1/reference.json.gz"
-            ).read_bytes()
-        ).hexdigest()
-        == reference["original_reference_sha256"]
-    )
-    expiry = datetime.fromisoformat(reference["leap_table_expires_at"])
-    lower = datetime.fromisoformat(reference["minimum_supported_reference_instant"])
-    result = deepcopy(current)
-
-    def receipts_hash(rows):
-        return hashlib.sha256(
-            json.dumps(
-                rows,
-                ensure_ascii=False,
-                sort_keys=True,
-                separators=(",", ":"),
-                allow_nan=False,
-            ).encode()
-        ).hexdigest()
-
-    def contexts(output):
-        return [
-            output["canping_timing"]["solar_year_context"],
-            output["liunian_series"]["solar_context"],
-            next(
-                t["facts"]
-                for t in output["numerology_evidence"]["rule_trace"]
-                if t["rule_id"] == "canping_actual_lichun_dependencies"
-            ),
-        ]
-
-    has_boundaries = "year_boundaries" in result.get("liunian_series", {})
-    if has_boundaries:
-        before_hash = receipts_hash(result["liunian_series"]["year_boundaries"])
-        assert all(
-            c["boundary_receipts_sha256"] == before_hash for c in contexts(result)
-        )
-    else:
-        assert result["canping_timing"]["profile_id"] == "legacy_minggong_v1"
-
-    qualified_details = {}
-
-    def qualify_and_remove(new, old):
-        if isinstance(new, dict) and isinstance(old, dict):
-            if "solar_model_details" in new and "solar_model_details" in old:
-                details, prior = new["solar_model_details"], old["solar_model_details"]
-                moment = datetime.fromisoformat(old["datetime_with_offset"])
-                assert moment.tzinfo is not None and moment >= lower
-                assert new["ephemeris_model"] == old["ephemeris_model"] == "moshier"
-                assert not (set(reference["three_added_fields"]) & prior.keys())
-                assert details["civil_time_policy"] == reference["policy"]
-                assert details["historical_ut1_convention"] is False
-                assert details["future_leap_seconds_assumed_unchanged"] is (
-                    moment >= expiry
-                )
-                qualified_details[id(details)] = details
-            for key in new.keys() & old.keys():
-                qualify_and_remove(new[key], old[key])
-        elif isinstance(new, list) and isinstance(old, list):
-            assert len(new) == len(old)
-            for a, b in zip(new, old):
-                qualify_and_remove(a, b)
-
-    qualify_and_remove(result, expected)
-    # deepcopy preserves aliases between actual receipts and their rule traces.
-    # Validate every occurrence first, then remove fields once per shared object.
-    for details in qualified_details.values():
-        for key in reference["three_added_fields"]:
-            del details[key]
-    if has_boundaries:
-        after_hash = receipts_hash(result["liunian_series"]["year_boundaries"])
-        old_hash = receipts_hash(expected["liunian_series"]["year_boundaries"])
-        assert after_hash == old_hash
-        assert all(
-            c["boundary_receipts_sha256"] == old_hash for c in contexts(expected)
-        )
-        for context in contexts(result):
-            context["boundary_receipts_sha256"] = old_hash
-    return result
 
 
 @pytest.fixture(scope="session")
@@ -188,66 +88,6 @@ def assert_actual_source(result, family, mode):
         )
         assert all(p["ephemeris_model"] != "moshier" for p in profiles)
     return trace
-
-
-def preserve_original_canping_snapshot_with_source_changes_checked(current, expected):
-    """Verify the new source facts before comparing every retained old fact."""
-    result = rewind_reading_context_checked(
-        rewind_clock_from_original_first_row_request(current, expected)
-    )
-    if current["canping_timing"]["profile_id"] == "legacy_minggong_v1":
-        assert not any(
-            t["rule_id"] == TRACE_ID
-            for t in current["numerology_evidence"]["rule_trace"]
-        )
-        return preserve_original_native_clock_metadata_checked(result, expected)
-    facts = assert_actual_source(current, "canping", "native")
-    encoded = json.dumps(
-        facts["source_profiles"],
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-        allow_nan=False,
-    ).encode()
-    assert hashlib.sha256(encoded).hexdigest() == facts["source_profiles_sha256"]
-    boundaries = current["liunian_series"]["year_boundaries"]
-    matched = []
-    for profile in facts["source_profiles"]:
-        rows = [
-            (i, b)
-            for i, b in enumerate(boundaries)
-            if b["record"]["ephemeris_model"] == profile["ephemeris_model"]
-            and b["record"]["resolution_provider"] == profile["resolution_provider"]
-            and b["ephemeris_library_version"] == profile["ephemeris_library_version"]
-            and b["ephemeris_retflags"] == profile["ephemeris_retflags"]
-        ]
-        assert len(rows) == profile["boundary_count"]
-        for i, row in rows:
-            details = row["record"]["solar_model_details"]
-            assert all(details[k] == v for k, v in profile["model_metadata"].items())
-            matched.append(i)
-    assert sorted(matched) == list(range(len(boundaries)))
-    policy = "canping_lichun_projection_context_v1"
-    new_rule = next(
-        r
-        for r in result["numerology_evidence"]["rulesets"]
-        if r["ruleset_id"] == policy
-    )
-    old_rule = next(
-        r
-        for r in expected["numerology_evidence"]["rulesets"]
-        if r["ruleset_id"] == policy
-    )
-    assert old_rule["source_url"] == "https://ssd.jpl.nasa.gov/doc/de440_de441.html"
-    assert new_rule["source_url"] == REFERENCE["native_documentation_url"]
-    # The old snapshot's wrong citation is retained, never treated as the new truth.
-    new_rule["source_url"] = old_rule["source_url"]
-    result["numerology_evidence"]["rule_trace"] = [
-        t
-        for t in result["numerology_evidence"]["rule_trace"]
-        if t["rule_id"] != TRACE_ID
-    ]
-    return preserve_original_native_clock_metadata_checked(result, expected)
 
 
 @pytest.mark.parametrize("mode", REFERENCE["provider_modes"])

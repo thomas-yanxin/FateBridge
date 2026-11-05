@@ -4,11 +4,6 @@ import asyncio
 import json
 
 import pytest
-
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
-
-pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
-
 from fastapi.testclient import TestClient
 from fastmcp import Client
 from jsonschema import Draft202012Validator
@@ -20,6 +15,13 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from fatebridge.validation.human_design import verify_human_design_reading
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
+from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.test_result_delivery import store as store
+
+pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 INPUT = dict(
@@ -123,7 +125,7 @@ def test_cycle_range_edges_keep_original_natal_basis_on_actual_three_surfaces(
         birth_timezone="UTC",
         node_mode=node_mode,
         require_swiss_files=True,
-        cycle_reference_datetime=f"{year+66}-01-01T00:00:00Z",
+        cycle_reference_datetime=f"{year + 66}-01-01T00:00:00Z",
     )
     response = rest.post(SPEC.rest_path, json=params)
     assert response.status_code == 200, response.text
@@ -406,7 +408,7 @@ def test_integration_group_card_and_conservation_match_all_three_surfaces(
 
 
 def test_joint_transition_case_and_compact_summary_survive_all_three_surfaces(
-    rest, capsys, monkeypatch, tmp_path
+    rest, capsys, monkeypatch, tmp_path, store
 ):
     from datetime import datetime
     from pathlib import Path
@@ -415,9 +417,7 @@ def test_joint_transition_case_and_compact_summary_survive_all_three_surfaces(
 
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     case = json.loads(
-        (
-            Path(__file__).parent / "fixtures/human-design-transition-case.json"
-        ).read_text()
+        (Path(__file__).parent / "data/human_design/transition-inputs.json").read_text()
     )
     moment = datetime.fromisoformat(case["nominal_birth_utc"])
     params = dict(
@@ -452,19 +452,13 @@ def test_joint_transition_case_and_compact_summary_survive_all_three_surfaces(
                     "include_snapshot_text": False,
                 },
             )
+            assert not card.is_error
+            card_value = await verified_inline_business(client, card.structured_content)
             assert (
-                not card.is_error and "result_delivery" not in card.structured_content
-            )
-            assert (
-                card.structured_content["time_sensitivity"][
-                    "joint_transition_refinement_summary"
-                ]
+                card_value["time_sensitivity"]["joint_transition_refinement_summary"]
                 == summary
             )
-            assert (
-                "joint_transition_refinement"
-                not in card.structured_content["time_sensitivity"]
-            )
+            assert "joint_transition_refinement" not in card_value["time_sensitivity"]
             return full.structured_content
 
     actual = asyncio.run(call())

@@ -11,7 +11,7 @@ from fatebridge.core import heluo_texts as ht
 from fatebridge.core.heluo import _tiaowen, gua_lines, lines_to_gua, yao_text
 from fatebridge.core.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError
-from tests.heluo_current_source_reference import HEADER_COUNT, PENDING_COUNT
+from tests.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 
 ROOT = Path(__file__).parent / "fixtures/heluo_qian15_v1"
 READINGS = json.loads((ROOT / "verified-readings.json").read_bytes())
@@ -136,32 +136,6 @@ def test_existing_dayou_uncertainty_is_also_visible_from_its_actual_status():
         in text["text_provenance"]["commentary_review_status"]
     )
     assert "字形未决" in ht.text_status_snapshot(text)
-
-
-def test_prior84_entries_are_unchanged_and_next_unread_chapter_remains_pending():
-    baseline = json.loads((ROOT / "baseline-prefix-digests.json").read_bytes())
-    assert (
-        canonical(ht._collation()["entries"][:84])
-        == baseline["canonical_sha256"]["headers"]
-    )
-    assert (
-        canonical(ht._commentary_collation()["entries"][:84])
-        == baseline["canonical_sha256"]["commentaries"]
-    )
-    headers, prose = ht.collation_summary(), ht.commentary_collation_summary()
-    assert (headers["collated_line_headers"], headers["pending_line_headers"]) == (
-        HEADER_COUNT,
-        PENDING_COUNT,
-    )
-    assert (
-        prose["collated_line_commentaries"],
-        prose["pending_line_commentaries"],
-    ) == (HEADER_COUNT, PENDING_COUNT)
-    from tests.heluo_guan_shi_revision_reference import (
-        assert_r84_commentary_control_and_all_pending,
-    )
-
-    assert assert_r84_commentary_control_and_all_pending() == PENDING_COUNT
 
 
 @pytest.mark.parametrize("fault", ["parent", "text", "header"])

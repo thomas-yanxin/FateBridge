@@ -11,7 +11,7 @@ from typing import Any
 
 from fatebridge.core.almanac import _lunar_date_from_solar
 
-FIXTURES = Path(__file__).resolve().parents[1] / "tests/fixtures/ziwei_independent"
+FIXTURES = Path(__file__).resolve().parents[1] / "tests/data/ziwei_independent"
 MONTHS = dict(
     zip(
         (

@@ -12,7 +12,7 @@ from fatebridge.core.sukuyo_date_support import local_date_support
 from fatebridge.services.divination import calculate_sukuyo_compatibility
 
 REFERENCE = (
-    Path(__file__).parent / "fixtures/sukuyo-fixed-interval-before-production-v72.json"
+    Path(__file__).parent / "data/sukuyo-fixed-interval-before-production-v72.json"
 )
 RAW = REFERENCE.read_bytes()
 ROWS = json.loads(RAW)["expected_cases"]

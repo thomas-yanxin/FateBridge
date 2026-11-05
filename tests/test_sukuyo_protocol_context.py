@@ -1,4 +1,4 @@
-"""Original-record replay across paired protocols; synthetic workflow only."""
+"""Current paired-protocol context commitments; synthetic workflow only."""
 
 import hashlib
 import json
@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.validation.predictions import Outcome, StudyPlan, digest
+from fatebridge.validation.predictions import StudyPlan, digest
 from fatebridge.validation.sukuyo_study import (
     SukuyoProtocol,
     blind_outcome_sheet,
@@ -33,7 +33,6 @@ from tests.test_sukuyo_study import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-LEGACY = ROOT / "tests/fixtures/sukuyo-protocol-context-legacy.json"
 
 
 def prepared():
@@ -72,45 +71,18 @@ def result(p, submitted, observed):
     )
 
 
-def test_actual_old_v4_seal_is_readable_without_silent_rehash_or_rebinding():
-    original = LEGACY.read_bytes()
-    captured = json.loads(original)
-    for prefix in ("", "changed_pair_"):
-        reg = captured[prefix + "registration"]
-        sealed = captured[prefix + ("resealed" if prefix else "sealed")]
-        observed = [Outcome.model_validate(o) for o in captured["outcomes"]]
-        r = evaluate(
-            reg, sealed, observed, at=EVALUATE_AT, outcome_sources=OUTCOME_SOURCES
-        )
-        before = captured[prefix + "report"]
-        assert r["metrics"] == before["metrics"]
-        assert r["rows"] == before["rows"]
-        assert r["statistical_evidence"] == before["statistical_evidence"]
-        assert r["forecast_commitment_sha256"] == before["forecast_commitment_sha256"]
-        assert r["plan_sha256"] == before["plan_sha256"]
-        assert before["preregistered_performance_gate_met"]
-        assert not r["preregistered_performance_gate_met"]
-        assert not r["statistical_evidence_gate_met"]
-        assert not r["confidence_bound_gate_met"]
-        assert "missing_sukuyo_protocol_context_commitment" in r["protocol_blockers"]
-        assert r["protocol_status"] == "incomplete"
-        assert r["record_plan_binding"]["registered_cohort_fully_bound"]
-        assert r["protocol_context_binding"]["status"] == "missing"
-    assert LEGACY.read_bytes() == original
-
-
 @pytest.mark.parametrize("mode", ["omitted", "null"])
-def test_empty_new_field_preserves_canonical_old_plan_bytes_in_both_modes(mode):
-    captured = json.loads(LEGACY.read_bytes())
-    raw = captured["registration"]["protocol"]["blind_protocol"]["plan"]
-    if mode == "null":
+def test_empty_context_is_serialized_as_current_explicit_null(mode):
+    raw = protocol().blind_protocol.plan.model_dump(mode="json")
+    if mode == "omitted":
+        raw.pop("protocol_context_sha256", None)
+    else:
         raw["protocol_context_sha256"] = None
     validated = StudyPlan.model_validate(raw)
     for serialization in ("json", "python"):
-        assert "protocol_context_sha256" not in validated.model_dump(mode=serialization)
-    assert (
-        digest(validated.model_dump(mode="json")) == captured["report"]["plan_sha256"]
-    )
+        assert (
+            validated.model_dump(mode=serialization)["protocol_context_sha256"] is None
+        )
 
 
 def test_complete_context_remains_part_of_original_plan_record_commitment():

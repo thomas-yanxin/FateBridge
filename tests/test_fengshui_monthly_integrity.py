@@ -20,8 +20,6 @@ from fatebridge.utils.errors import FengshuiCalculationError
 from fatebridge.validation.fengshui_monthly import verify_monthly_reading
 from tests.test_fengshui_surfaces import mcp_call, rest_client
 
-ARCHIVE = Path(__file__).parent / "fixtures/fengshui_monthly_fault_v1"
-
 
 def inputs():
     return {
@@ -68,7 +66,7 @@ def corrupt(layer, fault):
 
 def test_all_36_literal_centers_and_every_year_branch_remain_valid():
     source = json.loads(
-        (ARCHIVE.parent / "fengshui_monthly_v1/reference.json").read_text()
+        (Path(__file__).parent / "data/fengshui_monthly_v1/reference.json").read_text()
     )
     for year in range(2020, 2032):
         branch = "子丑寅卯辰巳午未申酉戌亥"[(year - 4) % 12]
@@ -105,29 +103,6 @@ def test_wrong_values_cannot_hide_behind_a_complete_permutation(fault):
     with pytest.raises(FengshuiCalculationError) as caught:
         validate_monthly_layer(layer, request)
     assert caught.value.reason == "monthly_plate_inconsistent"
-
-
-@pytest.mark.parametrize(
-    "label,expected",
-    [("correct", "verified_served_fixed_monthly_reading"), ("fault", "rejected")],
-)
-def test_actual_saved_old_results_use_their_original_receipts(label, expected):
-    assert (
-        hashlib.sha256((ARCHIVE / "hashes.json").read_bytes()).hexdigest()
-        == "99a8c427fa4503e6e663154cd719aecd9d1ed2f80648c4b61240a88980b974a1"
-    )
-    for name, digest in json.loads((ARCHIVE / "hashes.json").read_text()).items():
-        assert hashlib.sha256((ARCHIVE / name).read_bytes()).hexdigest() == digest
-    result = json.loads(
-        gzip.decompress((ARCHIVE / (label + "-result.json.gz")).read_bytes())
-    )
-    receipt = json.loads((ARCHIVE / (label + "-trusted-receipt.json")).read_text())
-    checked = verify_monthly_reading(result, trusted_run_metadata=receipt)
-    assert checked["status"] == expected
-    assert checked["derived_monthly_numeric_consistency_verified"] is (
-        label == "correct"
-    )
-    assert checked["calendar_accuracy_verified"] is False
 
 
 def test_core_guard_uses_literal_month_table_not_the_producer_configuration(

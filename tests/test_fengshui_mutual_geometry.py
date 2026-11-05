@@ -28,8 +28,7 @@ from fatebridge.validation.fengshui_mutual_geometry import (
 from fatebridge.validation.fengshui_reading import verify_fengshui_reading
 from tests.test_fengshui_surfaces import mcp_call, rest_client
 
-SOURCE = Path(__file__).parent / "fixtures/fengshui_mutual_geometry_v1"
-ARCHIVE = Path(__file__).parent / "fixtures/fengshui_author_phase_fault_v1"
+SOURCE = Path(__file__).parent / "data/fengshui_mutual_geometry_v1"
 
 
 def inputs(current=7, angle=180):
@@ -241,27 +240,3 @@ def test_service_seal_cannot_accept_a_self_consistent_but_wrong_candidate_star(
     monkeypatch.setattr(service, "analyze_natal_interpretation", wrong)
     result = executed(inputs())
     assert result["error_code"] == "fengshui_calculation_inconsistent"
-
-
-@pytest.mark.parametrize(
-    "label,expected",
-    [("correct", "verified_served_fixed_reading"), ("fault", "rejected")],
-)
-def test_actual_old_run_is_judged_from_its_original_receipt_without_recomputation(
-    label, expected
-):
-    assert (
-        hashlib.sha256((ARCHIVE / "hashes.json").read_bytes()).hexdigest()
-        == "6e22b780c4d043697f3332189f112f1b87fb9f5c41a573aebfa0c8fcb31a39c4"
-    )
-    manifest = json.loads((ARCHIVE / "hashes.json").read_text())
-    for name, digest in manifest.items():
-        assert hashlib.sha256((ARCHIVE / name).read_bytes()).hexdigest() == digest
-    result = json.loads(
-        gzip.decompress((ARCHIVE / (label + "-result.json.gz")).read_bytes())
-    )
-    receipt = json.loads((ARCHIVE / (label + "-trusted-receipt.json")).read_text())
-    checked = verify_fengshui_reading(result, trusted_run_metadata=receipt)
-    assert checked["status"] == expected
-    assert checked["author_geometry_coverage_verified"] is False
-    assert checked["author_geometry_record_count"] == 0

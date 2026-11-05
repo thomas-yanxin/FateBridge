@@ -21,9 +21,9 @@ from fatebridge.core.metaphysics import ren_calendar
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/ren_term_longitude_v1"
-PIN = "58e631da28cfe023b07572e8c5b055599381bccc6c5dcfe796cb7eb907e99cde"
+PIN = "5ac7cdfe4bb123f8aab1f4c592b819eb1cd5402fe560cb4c0f1b286e33700255"
 ROOTS_SHA256 = "d5a3603dec39032eef026706c7c1119270541601f22c397fd0a9fefd3ffadee9"
-NATIVE_PIN = "9d98cff244870e19c0fae041485effd6ab12d40d0747ebbbe40470d008f257c4"
+NATIVE_PIN = "526029f1c5d985e6722629b6d598929a33644e1473c6d07b4d7b8c8e8b630589"
 
 
 def native_reference() -> tuple[dict[str, Any], dict[str, Any]]:

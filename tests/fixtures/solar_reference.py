@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 
 def expected_solar_clock(civil: datetime, zone: str, longitude: float) -> datetime:
     fixture = json.loads(
-        (Path(__file__).parent / "bazi-solar-regression-jpl-v1.json").read_text()
+        (Path(__file__).parents[1] / "data/bazi-solar-regression-jpl-v1.json").read_text()
     )
     instant = civil.replace(tzinfo=ZoneInfo(zone)).astimezone(timezone.utc)
     case = next(row for row in fixture["rows"] if row["instant"] == instant.isoformat())

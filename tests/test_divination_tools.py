@@ -1,4 +1,6 @@
+import asyncio
 import json
+from fractions import Fraction
 
 import pytest
 
@@ -20,6 +22,7 @@ from fatebridge.services.divination import (
     calculate_tongshefa_analysis,
 )
 from tests.fixtures.transports import mcp_text
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
 
 
 def _expected_offline_engine() -> tuple[str, str]:
@@ -80,7 +83,7 @@ def _local_golden_projection():
         lat="31n13",
         lon="121e28",
         qimen_options={"layout": "direct"},
-        taiyi_options={"accNum": 0},
+        taiyi_options={},
         liureng_yue="申",
         liureng_is_diurnal=False,
     )
@@ -229,7 +232,7 @@ def test_fastmcp_sanshiunited_compact_mode_can_drop_snapshot_text():
         lat="31n13",
         lon="121e28",
         qimen_options={"layout": "direct"},
-        taiyi_options={"accNum": 0},
+        taiyi_options={},
         liureng_yue="申",
         liureng_is_diurnal=False,
         compact=True,
@@ -543,7 +546,8 @@ def test_calculate_suzhan_analysis_returns_chart_and_snapshot():
     assert "˚" in result["snapshot_text"]
 
 
-def test_suzhan_uses_shared_local_chart_runtime():
+@pytest.mark.parametrize("mansion_method", ["equatorial_research28", "legacy_equal28"])
+def test_suzhan_uses_shared_local_chart_runtime(mansion_method, rest, tmp_path, capsys):
     local_chart = _build_local_chart_response(
         date_text="2028-04-06",
         time_text="09:33:00",
@@ -560,6 +564,7 @@ def test_suzhan_uses_shared_local_chart_runtime():
         zone="+08:00",
         lat="31n13",
         lon="121e28",
+        mansion_method=mansion_method,
     )
     expected_precision, expected_backend = _expected_offline_engine()
     local_sun = next(
@@ -571,14 +576,79 @@ def test_suzhan_uses_shared_local_chart_runtime():
 
     assert local_chart["chart"]["houses"] == suzhan_result["chart"]["houses"]
     assert local_chart["chart"]["angles"] == suzhan_result["chart"]["angles"]
-    # Physical zodiac/house facts still use the same chart runtime. 宿位 now
-    # comes from the declared unequal RA model instead of the local equal band.
-    assert {k: v for k, v in local_sun.items() if k != "su28"} == {
-        k: suzhan_sun[k] for k in local_sun if k != "su28"
+    # The mansion label and degree share the declared model; physical zodiac
+    # and house facts still use the same chart runtime under both methods.
+    mansion_fields = {"su28", "su28_degree"}
+    assert {k: v for k, v in local_sun.items() if k not in mansion_fields} == {
+        k: suzhan_sun[k] for k in local_sun if k not in mansion_fields
     }
-    assert suzhan_sun["su28_method"] == "modern_equatorial_research_anchors_v1"
+    if mansion_method == "equatorial_research28":
+        sky = suzhan_result["astronomy"]
+        source = next(body for body in sky["bodies"] if body["id"] == "Sun")
+        boundary = next(
+            b for b in sky["boundaries"] if b["su28"] == source["mansion"]["su28"]
+        )
+        assert (
+            suzhan_sun["su28_method"]
+            == sky["method_id"]
+            == "modern_equatorial_research_anchors_v1"
+        )
+        assert suzhan_sun["su28"] == source["mansion"]["su28"].removesuffix("宿")
+        assert (
+            suzhan_sun["su28_degree"]
+            == (source["right_ascension"] - boundary["right_ascension"]) % 360
+        )
+        # Independent equal-band definition on the unrounded source longitude.
+        # The four-decimal displayed longitude is not the calculation input.
+        longitude = Fraction(source["longitude"]) % 360
+        sector = int(longitude * 28 / 360)
+        assert local_sun["su28_degree"] == float(longitude - sector * Fraction(360, 28))
+        assert local_sun["su28_degree"] != float(
+            Fraction(local_sun["lon"]) - sector * Fraction(360, 28)
+        )
+        # This original failing clock is a counterexample to equating RA
+        # mansion degrees with the legacy equal-ecliptic-band coordinates.
+        assert suzhan_sun["su28"] != local_sun["su28"]
+        assert suzhan_sun["su28_degree"] != local_sun["su28_degree"]
+    else:
+        assert suzhan_sun == local_sun
+        assert suzhan_result["astronomy"] is None
+        assert (
+            suzhan_result["params"]["su28Method"]
+            == "legacy_equal_ecliptic28_illustration"
+        )
     assert local_chart["params"]["enginePrecision"] == expected_precision
     assert local_chart["params"]["engineBackend"] == expected_backend
+
+    payload = dict(
+        date="2028-04-06",
+        time="09:33:00",
+        zone="+08:00",
+        lat="31n13",
+        lon="121e28",
+        mansion_method=mansion_method,
+    )
+    spec = SPECS["suzhan"]
+    fields = ["params.su28Method", "chart", "astronomy"]
+    response = rest.post(
+        spec.rest_path, json=payload, params={"fields": fields, "strict_fields": True}
+    )
+    code, cli = call_cli(
+        spec, payload, tmp_path, capsys, flags=("--fields", *fields, "--strict-fields")
+    )
+    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
+    assert response.status_code == 200, response.text
+    assert code == 0 and not protocol.is_error
+    assert (
+        business(response.json())
+        == business(cli)
+        == business(protocol.structured_content)
+        == {
+            "params": {"su28Method": suzhan_result["params"]["su28Method"]},
+            "chart": suzhan_result["chart"],
+            "astronomy": suzhan_result["astronomy"],
+        }
+    )
 
 
 def test_calculate_suzhan_analysis_exposes_runtime_engine_metadata():
@@ -1061,13 +1131,13 @@ def test_calculate_sanshiunited_analysis_respects_liureng_overrides():
     assert result["liureng"]["meta"]["is_diurnal"] is False
 
 
-def test_calculate_sanshiunited_analysis_applies_qimen_and_taiyi_options():
+def test_calculate_sanshiunited_qimen_options_preserve_default_taiyi():
     payload = dict(
         date="2028-04-06", time="09:33:00", zone="+08:00", lat="31n13", lon="121e28"
     )
     default_result = calculate_sanshiunited_analysis(**payload)
     optioned_result = calculate_sanshiunited_analysis(
-        **payload, qimen_options={"ju_method": "chaibu"}, taiyi_options={"accNum": 0}
+        **payload, qimen_options={"ju_method": "chaibu"}, taiyi_options={}
     )
     assert optioned_result["qimen"]["ju_method"] == "chaibu"
     assert optioned_result["qimen"]["ju_term"] == "清明"

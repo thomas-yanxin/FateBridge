@@ -28,15 +28,6 @@ def synthetic():
     )
 
 
-def test_sources_and_old_67_stdout_are_pinned_without_rebasing():
-    for artifact in SOURCE["artifacts"]:
-        raw = (FIXTURE / artifact["path"]).read_bytes()
-        assert len(raw) == artifact["bytes"]
-        assert hashlib.sha256(raw).hexdigest() == artifact["sha256"]
-    assert len(json.loads((FIXTURE / "before-67-cli-stdout.json").read_text())) == 67
-    assert SOURCE["single_collator"] and not SOURCE["second_independent_collator"]
-
-
 def test_worked_intercalary_label_matches_independent_original_transcription(worked):
     assignment = worked["month_assignment"]
     ref = SOURCE["independent_reference"]

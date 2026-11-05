@@ -11,6 +11,7 @@ from fatebridge.application.execution import execute_tool
 from fatebridge.core.human_design import bodygraph
 from fatebridge.core.human_design_circuit_topology import topology_reference
 from fatebridge.core.human_design_evidence import reference_table_audit
+from fatebridge.core.human_design_references import clear_reference_cache
 from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
@@ -120,7 +121,7 @@ def test_returned_source_observations_cannot_poison_the_reference_cache():
             "Solar Plexus",
         ]
     finally:
-        topology_reference.cache_clear()
+        clear_reference_cache()
 
 
 def test_channel_subsets_match_the_independent_source_gate_presence_oracle():

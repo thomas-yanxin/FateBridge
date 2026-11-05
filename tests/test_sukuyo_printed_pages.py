@@ -12,7 +12,7 @@ from scripts.check_sukuyo_printed_pages import verify_primary
 
 BEFORE = json.loads(
     (
-        Path(__file__).parent / "fixtures/sukuyo-printed-before-production-v71.json"
+        Path(__file__).parent / "data/sukuyo-printed-before-production-v71.json"
     ).read_bytes()
 )
 

@@ -1,17 +1,30 @@
 """Shared timing-layer computation and timeline enrichment from one birth context."""
 
-import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TypedDict
 
-from fatebridge.analysis.life_dimensions import LifeDimensionAnalysis
+from fatebridge.analysis.life_dimensions import (
+    LIFE_DIMENSION_METHOD,
+    LifeDimensionAnalysis,
+)
 from fatebridge.analysis.timing_effects import TimingEffectsAnalysis
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.core.timing_interactions import analyze_timing_interactions
 from fatebridge.core.timing_strength import StrengthProjectionBaseline
 from fatebridge.services.birth_context import BirthComputationContext
 
-logger = logging.getLogger(__name__)
+
+class LifeDimensionAssessment(TypedDict):
+    method_id: str
+    status: str
+    score_kind: str
+    scores: Dict[str, Optional[float]]
+    included_layers: List[str]
+    unavailable_layers: Dict[str, str]
+    not_applicable_layers: List[str]
+    unavailable_dimensions: List[str]
+    score_basis: str
+    interpretation_scope: str
 
 
 def calculate_analysis_age(
@@ -34,92 +47,75 @@ def calculate_analysis_age(
 def compute_life_dimensions_for_moment(
     birth_context: BirthComputationContext,
     analysis_date: datetime,
-) -> Optional[Dict[str, float]]:
+    *,
+    liushi_pillar: Optional[tuple[str, str]] = None,
+) -> LifeDimensionAssessment:
     """
     为指定时刻计算用户的五维生命维度分值（爱情/财富/事业/学习/人际）。
 
-    汇总本命四柱 + 当前可用的时间层柱（大运/流年/流月/流日/流时），
-    任何一层失败都不会让整体崩溃 —— 只是少一个层级权重，
-    最终 dimension 分数仍然有意义。
+    必需时间层失败交给服务错误边界；大运缺资料与尚未起运分别披露。
+    已算流时可以由同次服务传入，避免重复计算。
     """
-    try:
-        normalized_birth_time = birth_context.normalized_birth_time
-        timezone_name = normalized_birth_time.timezone
-        gender = birth_context.person.gender
-
-        current_pillars: Dict[str, tuple] = {}
-
-        # 流时（小时粒度）
-        try:
-            liushi = TimingAnalysis.calculate_liushi(
-                analysis_date, timezone_name=timezone_name
-            )
-            current_pillars["liushi"] = (liushi["stem"], liushi["branch"])
-        except Exception:
-            logger.warning("life_dimensions: liushi 计算失败", exc_info=True)
-
-        # 流日
-        try:
-            liuri = TimingAnalysis.calculate_liuri(
-                analysis_date, timezone_name=timezone_name
-            )
-            current_pillars["liuri"] = (liuri["stem"], liuri["branch"])
-        except Exception:
-            logger.warning("life_dimensions: liuri 计算失败", exc_info=True)
-
-        # 流月
-        try:
-            liuyue = TimingAnalysis.calculate_liuyue(
-                analysis_date.year,
-                analysis_date.month,
-                analysis_date.day,
-                timezone_name=timezone_name,
-                target_date=analysis_date,
-            )
-            current_pillars["liuyue"] = (liuyue["stem"], liuyue["branch"])
-        except Exception:
-            logger.warning("life_dimensions: liuyue 计算失败", exc_info=True)
-
-        # 流年
-        try:
-            liunian = TimingAnalysis.calculate_liunian(
-                analysis_date.year, moment=analysis_date, timezone_name=timezone_name
-            )
-            current_pillars["liunian"] = (liunian["stem"], liunian["branch"])
-        except Exception:
-            logger.warning("life_dimensions: liunian 计算失败", exc_info=True)
-
-        # 大运（依赖 gender + age）
-        try:
-            birth_date = normalized_birth_time.input_datetime
-            analysis_age = calculate_analysis_age(birth_date, analysis_date)
-            dayun_result = TimingEffectsAnalysis.analyze_dayun_effects(
-                birth_context.birth_pillars,
-                birth_date,
-                gender,
-                analysis_age,
-                timezone_name=timezone_name,
-                original_element_counts=birth_context.original_element_counts,
-                analysis_moment=analysis_date,
-            )
-            dayun_info = (
-                dayun_result.get("dayun_info")
-                if isinstance(dayun_result, dict)
-                else None
-            )
-            if dayun_info and dayun_info.get("stem") and dayun_info.get("branch"):
-                current_pillars["dayun"] = (dayun_info["stem"], dayun_info["branch"])
-        except Exception:
-            logger.warning("life_dimensions: dayun 计算失败", exc_info=True)
-
-        return LifeDimensionAnalysis.calculate_life_dimensions(
-            birth_pillars=birth_context.birth_pillars,
-            current_pillars=current_pillars,
-            gender=gender,
-        )
-    except Exception:
-        logger.warning("life_dimensions 计算整体失败，返回 None", exc_info=True)
-        return None
+    normalized = birth_context.normalized_birth_time
+    zone = normalized.timezone
+    gender = birth_context.person.gender
+    if liushi_pillar is None:
+        liushi = TimingAnalysis.calculate_liushi(analysis_date, timezone_name=zone)
+        liushi_pillar = (liushi["stem"], liushi["branch"])
+    liuri = TimingAnalysis.calculate_liuri(analysis_date, timezone_name=zone)
+    liuyue = TimingAnalysis.calculate_liuyue(
+        analysis_date.year,
+        analysis_date.month,
+        analysis_date.day,
+        timezone_name=zone,
+        target_date=analysis_date,
+    )
+    liunian = TimingAnalysis.calculate_liunian(
+        analysis_date.year, moment=analysis_date, timezone_name=zone
+    )
+    current_pillars = {
+        "liushi": liushi_pillar,
+        "liuri": (liuri["stem"], liuri["branch"]),
+        "liuyue": (liuyue["stem"], liuyue["branch"]),
+        "liunian": (liunian["stem"], liunian["branch"]),
+    }
+    dayun = TimingEffectsAnalysis.analyze_dayun_effects(
+        birth_context.birth_pillars,
+        normalized.input_datetime,
+        gender,
+        calculate_analysis_age(normalized.input_datetime, analysis_date),
+        timezone_name=zone,
+        original_element_counts=birth_context.original_element_counts,
+        analysis_moment=analysis_date,
+        allow_missing_gender=True,
+    )
+    unavailable_layers = {}
+    not_applicable_layers = []
+    if "dayun_info" in dayun:
+        info = dayun["dayun_info"]
+        current_pillars["dayun"] = (info["stem"], info["branch"])
+    elif dayun["status"] == "before_dayun":
+        not_applicable_layers.append("dayun")
+    else:
+        unavailable_layers["dayun"] = dayun["status"]
+    scores = LifeDimensionAnalysis.calculate_life_dimensions(
+        birth_context.birth_pillars, current_pillars, gender
+    )
+    unavailable_dimensions = [name for name, value in scores.items() if value is None]
+    return {
+        "method_id": LIFE_DIMENSION_METHOD,
+        "status": (
+            "partial" if unavailable_layers or unavailable_dimensions else "calculated"
+        ),
+        "score_kind": "uncalibrated_rule_index",
+        "scores": scores,
+        "included_layers": ["natal", *current_pillars],
+        "unavailable_layers": unavailable_layers,
+        "not_applicable_layers": not_applicable_layers,
+        "unavailable_dimensions": unavailable_dimensions,
+        "score_basis": "全部已知计数统一使用50+50*tanh((raw-3)/3)，保留一位小数；零计数同式，未知不填50。",
+        "interpretation_scope": "固定权重的文化规则索引，非心理测量或成功概率；只比较相同方法和相同可用层。缺性别时爱情为空且大运不可用，尚未起运另列不适用。",
+    }
 
 
 def serialize_element_effects(element_effects: Dict[str, Any]) -> Dict[str, Any]:

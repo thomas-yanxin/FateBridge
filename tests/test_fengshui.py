@@ -30,7 +30,7 @@ from fatebridge.services.fengshui import (
 from tests.fixtures.fengshui import payload
 
 REFERENCE = json.loads(
-    (Path(__file__).parent / "fixtures" / "fengshui-reference.json").read_text()
+    (Path(__file__).parent / "data" / "fengshui-reference.json").read_text()
 )
 
 
@@ -322,7 +322,7 @@ def test_three_method_output_preserves_scopes_sources_and_differences():
 
 
 def test_missing_inputs_are_layer_specific_and_unselected_layers_not_computed():
-    result = assess(effective_year=2026)
+    result = assess(methods=["bazhai", "jinsuo", "annual_stars"], effective_year=2026)
     assert result["status"] == "partial"
     assert result["layers"]["annual_stars"]["status"] == "complete"
     assert "confirmed_environment_features" in result["coverage"]["missing_inputs"]

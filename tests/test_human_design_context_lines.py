@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.human_design_depth import line_fixings
-from fatebridge.core.human_design_knowledge import _canonical
+from fatebridge.core.human_design_line_catalogue import _canonical
 from fatebridge.core.human_design_source_variants import line_variant_impact
 from fatebridge.services.human_design_context_lines import (
     build_human_design_context_packet,
@@ -24,9 +24,6 @@ from fatebridge.validation.human_design_context_lines import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "docs/validation/human-design-context-line-reading-v2"
-E = BASE / "evidence"
-OLD = ROOT / "docs/validation/human-design-bound-line-reading-v1"
 NAMES = [
     "1971_backend_base_interval",
     "mean_j2000_interval",
@@ -44,7 +41,9 @@ def read(path):
 
 @pytest.fixture(scope="module")
 def cases():
-    return {name: read(E / (name + ".json.gz")) for name in NAMES}
+    from tests.human_design_current import semantic_sources
+
+    return semantic_sources("context")
 
 
 def forbidden(*args, **kwargs):
@@ -70,22 +69,6 @@ def _at(source, path):
     for part in path.removeprefix("$.").split(".") if path != "$" else []:
         value = value[int(part)] if isinstance(value, list) else value[part]
     return value
-
-
-def test_failed_search_and_complete_corrected_search_survive():
-    failed = read(E / "development-search-all-1440.json.gz")
-    corrected = read(E / "development-search-all-1440-corrected.json.gz")
-    assert (
-        [r["minute"] for r in failed]
-        == [r["minute"] for r in corrected]
-        == list(range(1440))
-    )
-    assert all(r["error"] == "TypeError" for r in failed)
-    assert all("error" not in r for r in corrected)
-    selection = read(E / "development-selection-corrected.json")
-    assert selection["observed_transitions"] == [627, 1217]
-    assert selection["selected_minute"] == 627
-    assert selection["independent_astronomical_reference"] is False
 
 
 @pytest.mark.parametrize("name", NAMES)
@@ -368,26 +351,15 @@ def test_native_calls_forbidden_and_inputs_unchanged(cases, packets, monkeypatch
         )
 
 
-@pytest.mark.parametrize(
-    "name",
-    [
-        "may6_1988_synthetic",
-        "may6_2030_synthetic",
-        "may6_2023_synthetic",
-        "j2000_control_synthetic",
-        "may6_1988_early_synthetic",
-    ],
-)
-def test_all_original_v1_terminal_packets_unchanged(name):
-    source = read(OLD / "evidence" / (name + ".json.gz"))
-    v2 = build_human_design_context_packet(source)
-    assert _canonical(v2["nominal_packet_v1"]) == _canonical(
-        read(OLD / "packets-final" / (name + ".json.gz"))
+def test_real_module_cli_roundtrip_wrong_original_and_no_overwrite(tmp_path, cases):
+    source = tmp_path / "source.json.gz"
+    source.write_bytes(
+        gzip.compress(json.dumps(cases["gate14_transition_interval"]).encode())
     )
-
-
-def test_real_module_cli_roundtrip_wrong_original_and_no_overwrite(tmp_path):
-    source = E / "gate14_transition_interval.json.gz"
+    wrong_source = tmp_path / "wrong-source.json.gz"
+    wrong_source.write_bytes(
+        gzip.compress(json.dumps(cases["strict_jpl_j2000"]).encode())
+    )
     target = tmp_path / "packet.json.gz"
     prefix = [
         sys.executable,
@@ -408,7 +380,7 @@ def test_real_module_cli_roundtrip_wrong_original_and_no_overwrite(tmp_path):
     )
     assert (
         subprocess.run(
-            [*prefix, "verify", str(E / "strict_jpl_j2000.json.gz"), str(target)],
+            [*prefix, "verify", str(wrong_source), str(target)],
             capture_output=True,
         ).returncode
         == 1

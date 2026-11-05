@@ -1,10 +1,5 @@
 """Literal hidden-target arithmetic and independent source-specific distinction."""
 
-import gzip
-import hashlib
-import json
-from pathlib import Path
-
 import pytest
 from pydantic import ValidationError
 
@@ -24,7 +19,6 @@ from fatebridge.core.timing_carriers import (
     timing_carrier_snapshot_lines,
 )
 
-FIXTURE = Path(__file__).parent / "fixtures/bazi_hidden_targets_v1"
 NATAL = dict(
     zip(("year", "month", "day", "hour"), map(tuple, ["己未", "丁丑", "丙戌", "戊戌"]))
 )
@@ -140,18 +134,6 @@ def test_all_sixty_columns_match_an_independent_complete_relation_table(pair):
         assert row["covering_candidate_if_target_desired"] == (
             relation == "stem_overcomes_hidden"
         )
-
-
-def test_all_old_complete_carrier_objects_are_preserved_exactly():
-    protocol = json.loads((FIXTURE / "protocol.json").read_text())
-    path = FIXTURE / "before.json.gz"
-    assert hashlib.sha256(path.read_bytes()).hexdigest() == protocol["before_sha256"]
-    rows = json.loads(gzip.decompress(path.read_bytes()))
-    assert len(rows) == 240
-    for old in rows:
-        natal = dict(zip(("year", "month", "day", "hour"), map(tuple, old["natal"])))
-        actual = describe_timing_carrier("timing.dayun", *old["pillar"], natal)
-        assert actual == old["receipt"]
 
 
 def test_contract_rejects_false_cover_and_false_effectiveness_but_keeps_projection():

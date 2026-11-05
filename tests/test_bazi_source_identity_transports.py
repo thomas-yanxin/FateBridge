@@ -53,8 +53,8 @@ def test_exact_corrected_identity_and_retained_labels_on_three_surfaces(
         comparison = result["source_comparison"]
         assert comparison["new_independent_validation_credit"] == 0
         assert (
-            comparison["reference_index"]["data_revision"]
-            == "source_annotations_v8_witness_identity"
+            comparison["reference_index"]["method_id"]
+            == "registered_literal_source_annotations_v1"
         )
         if printed_name:
             row = next(
@@ -105,11 +105,7 @@ def test_exact_corrected_identity_and_retained_labels_on_three_surfaces(
                 "name_correction": {"historical_person_identity_asserted": 0}
             }
         },
-        {
-            "source_identity_revision": {
-                "name_correction": {"legacy_case_identifier_retained": 1}
-            }
-        },
+        {"source_identity_revision": {"name_correction": {"name_as_printed": 123}}},
         {"source_identity_revision": {"name_correction": {"source_pdf_page": 72}}},
         {"name_as_printed": 123},
     ],

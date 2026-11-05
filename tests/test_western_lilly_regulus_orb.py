@@ -1,6 +1,5 @@
 """Source-corrected Regulus range; retain the original erroneous annotation."""
 
-import hashlib
 import json
 from fractions import Fraction
 from pathlib import Path
@@ -9,10 +8,11 @@ import pytest
 
 from fatebridge.core.lilly_fortune import evaluate_fortune
 from scripts.audit_western_lilly_fortitudes import audit
+from tests.reference_data import verify_source_files
 from tests.test_western_lilly_fortitudes import inputs, result, row
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/western-lilly-regulus-orb-v2"
+FIXTURE = ROOT / "tests/data/astro/lilly_regulus_orb"
 CORRECTION = json.loads((FIXTURE / "correction.json").read_text())
 RAW = json.loads((FIXTURE / "cases.json").read_text())["cases"]
 # The sealed list contains repeated zero offsets in its two directions.
@@ -21,9 +21,7 @@ CASES = list({(c["star"], c["gap_exact"]): c for c in RAW}.values())
 
 
 def test_manual_source_correction_is_sealed_and_does_not_replace_original_answers():
-    manifest = json.loads((FIXTURE / "manifest.json").read_text())
-    for name, digest in manifest["files"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
+    verify_source_files(FIXTURE)
     assert len(RAW) == 42 and len(CASES) == 39
     assert CORRECTION["stellar_orbs_degrees"] == {"Regulus": 6, "Spica": 5, "Algol": 5}
     assert CORRECTION["original_annotation_preserved"]

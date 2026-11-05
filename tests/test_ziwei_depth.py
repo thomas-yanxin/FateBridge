@@ -27,6 +27,7 @@ from scripts.audit_ziwei import (
     report,
     synthetic_seed,
 )
+from scripts.ziwei_conditional_inputs import synthetic_birth_clock
 
 pytestmark = [
     pytest.mark.filterwarnings("ignore:fromSolarDate is deprecated:DeprecationWarning"),
@@ -107,7 +108,7 @@ def test_profile_changes_every_sihua_layer_and_actual_labels(profile):
         analysis_year=2032, analysis_month=6, analysis_day=15, analysis_hour=12
     )
     horoscope = build_ziwei_horoscope(
-        nominal_age_basis="legacy_mixed_clock",
+        birth_seed=synthetic_birth_clock(int((chart)["lunar_date"]["year"])),
         chart=chart,
         gender="男",
         target_seed=target,
@@ -183,7 +184,7 @@ def test_unknown_gender_keeps_natal_stars_but_does_not_guess_direction():
     ]
     with pytest.raises(ValueError, match="需要明确性别"):
         build_ziwei_horoscope(
-            nominal_age_basis="legacy_mixed_clock",
+            birth_seed=synthetic_birth_clock(int((unknown)["lunar_date"]["year"])),
             chart=unknown,
             gender="未知",
             target_seed=synthetic_seed(2026),
@@ -200,7 +201,7 @@ def test_natal_leap_excerpt_is_not_silently_extended_to_target_months():
     for profile in ("iztro_2_5_8", "quanshu_v2_excerpt"):
         chart = build_ziwei_chart(synthetic_seed(1984), "男", rule_profile=profile)
         result = build_ziwei_horoscope(
-            nominal_age_basis="legacy_mixed_clock",
+            birth_seed=synthetic_birth_clock(int((chart)["lunar_date"]["year"])),
             chart=chart,
             gender="男",
             target_seed=target,
@@ -227,7 +228,13 @@ def test_unknown_nayin_and_invalid_profiles_or_dates_cannot_produce_plausible_ch
     invalid = replace(seed, calendar_context={"lunar_calendar": {"month": 1, "day": 1}})
     with pytest.raises(ValueError, match="目标农历年缺失"):
         build_ziwei_horoscope(
-            nominal_age_basis="legacy_mixed_clock",
+            birth_seed=synthetic_birth_clock(
+                int(
+                    (build_ziwei_chart(synthetic_seed(1984), "男"))["lunar_date"][
+                        "year"
+                    ]
+                )
+            ),
             chart=build_ziwei_chart(synthetic_seed(1984), "男"),
             gender="男",
             target_seed=invalid,
@@ -263,14 +270,13 @@ def test_ming_sanfang_contains_career_wealth_and_opposite_without_borrowing_star
 def test_childhood_palace_is_not_silently_labelled_as_an_actual_decade():
     chart = build_ziwei_chart(synthetic_seed(2025), "女")
     result = build_ziwei_horoscope(
-        nominal_age_basis="legacy_mixed_clock",
+        birth_seed=synthetic_birth_clock(int((chart)["lunar_date"]["year"])),
         chart=chart,
         gender="女",
         target_seed=synthetic_seed(2025),
     )
     daxian = result["scopes"][0]
     assert daxian["status"] == "not_started"
-    assert daxian["is_childhood_limit"] is False
     assert daxian["natal_palace_name"] is None
     assert daxian["mutagen"] is None
     assert result["childhood_limit"]["natal_palace_name"] == "命宫"

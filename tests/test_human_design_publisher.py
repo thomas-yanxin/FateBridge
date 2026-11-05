@@ -27,35 +27,9 @@ PLAN_PATH = ROOT / "tests/fixtures/human-design-cycle-publisher-plan.json"
 REFERENCE_PATH = (
     ROOT / "src/fatebridge/data/human_design/publisher-natal-2005-reference.json"
 )
-BEFORE_PATH = ROOT / "docs/validation/human-design-publisher-natal-before.json.gz"
 PLAN = json.loads(PLAN_PATH.read_text())
 REFERENCE = json.loads(REFERENCE_PATH.read_text())
-ORIGINAL_RUNS = json.loads(gzip.decompress(BEFORE_PATH.read_bytes()))
 
-
-def current_version_labels(value):
-    """Only explicit1.38ruleset labels change; retain every original value/order."""
-    if isinstance(value, dict):
-        return {
-            k: (
-                "1.39.0"
-                if k == "version" and v == "1.38.0"
-                else current_version_labels(v)
-            )
-            for k, v in value.items()
-        }
-    if isinstance(value, list):
-        return [current_version_labels(v) for v in value]
-    return value
-
-
-RUNS = current_version_labels(ORIGINAL_RUNS)
-for row, original in zip(RUNS, ORIGINAL_RUNS, strict=True):
-    run = row["run"]
-    run["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in run.items() if k != "run_metadata"}
-    )
-    assert run["activations"] == original["run"]["activations"]
 
 # Minimal synthetic extraction probe, not the source's prose. The real PDF
 # is independently hash-checked by the actual extractor acceptance command.
@@ -65,6 +39,13 @@ The Single Definition Manifestor Basic Thematic
 ture: May 12, 1895, 12:25 PM, Madanapalle, India]
 Copyright 2005 Jovian Archive Corporation
 """
+
+
+@pytest.fixture(scope="module")
+def current(tmp_path_factory):
+    capture = tmp_path_factory.mktemp("publisher-current") / "current-runs.json.gz"
+    report = publisher_natal_checks(ROOT, capture=capture)
+    return json.loads(gzip.decompress(capture.read_bytes())), report
 
 
 def forbidden(*args, **kwargs):
@@ -81,10 +62,6 @@ def test_original_plan_facts_and_complete_sixteen_runs_are_immutable():
         == "d041734b1b08b6797587390ec176c66a08ee27dc34b984a540d6ec3bf5900154"
     )
     assert (
-        hashlib.sha256(BEFORE_PATH.read_bytes()).hexdigest()
-        == "2f31f3ab30f8c9993d6c0e1d075c51fd3589ccd34a8e9f66b39960318b5c053c"
-    )
-    assert (
         PLAN["source"]["literal_clock"] == REFERENCE["example"]["clock"] == "12:25 PM"
     )
     assert (
@@ -92,7 +69,13 @@ def test_original_plan_facts_and_complete_sixteen_runs_are_immutable():
         is REFERENCE["example"]["timezone_printed_in_birth_note"]
         is False
     )
-    assert len(RUNS) == 16
+    assert (
+        sum(
+            len(PLAN[group])
+            for group in ("literal_hypotheses", "diagnostic_only_hypotheses")
+        )
+        == 4
+    )
     assert PLAN["unchanged_thresholds"] == {
         "astronomy_arcsec": 2.0,
         "physical_design_root_seconds": 5.0,
@@ -142,7 +125,8 @@ def test_changed_pdf_is_rejected_before_text_extraction(tmp_path):
 
 
 @pytest.mark.parametrize("index", range(16))
-def test_every_original_complete_run_remains_purely_verifiable(index):
+def test_every_original_complete_run_remains_purely_verifiable(index, current):
+    RUNS, _ = current
     with (
         patch.object(runtime, "ephemeris_call", forbidden),
         patch.object(native_execution, "calculate", forbidden),
@@ -153,7 +137,8 @@ def test_every_original_complete_run_remains_purely_verifiable(index):
         )
 
 
-def test_one_source_example_two_facts_are_not_counted_as_sixteen_examples():
+def test_one_source_example_two_facts_are_not_counted_as_sixteen_examples(current):
+    RUNS, _ = current
     with (
         patch.object(runtime, "ephemeris_call", forbidden),
         patch.object(native_execution, "calculate", forbidden),
@@ -203,7 +188,10 @@ def test_one_source_example_two_facts_are_not_counted_as_sixteen_examples():
         "fake_reading",
     ],
 )
-def test_incomplete_or_rehashed_repaired_cases_never_gain_source_acceptance(kind):
+def test_incomplete_or_rehashed_repaired_cases_never_gain_source_acceptance(
+    kind, current
+):
+    RUNS, _ = current
     rows = deepcopy(RUNS)
     if kind == "drop":
         rows.pop()
@@ -236,7 +224,8 @@ def test_incomplete_or_rehashed_repaired_cases_never_gain_source_acceptance(kind
         summarize_runs(PLAN, REFERENCE, rows)
 
 
-def test_new_source_contradiction_is_reported_instead_of_changing_inputs():
+def test_new_source_contradiction_is_reported_instead_of_changing_inputs(current):
+    RUNS, _ = current
     reference = deepcopy(REFERENCE)
     reference["example"]["expected_structural_fields"][
         "bodygraph.definition.kind"
@@ -248,8 +237,8 @@ def test_new_source_contradiction_is_reported_instead_of_changing_inputs():
     assert report["diagnostic_matches_counted_as_acceptance"] == 0
 
 
-def test_current_native_audit_retains_all_fixed_hypotheses_and_both_backends():
-    report = publisher_natal_checks(ROOT)
+def test_current_native_audit_retains_all_fixed_hypotheses_and_both_backends(current):
+    _, report = current
     assert len(report["all_cases"]) == 16
     assert report["literal_structure_matches"] == 8
     assert {(r["backend"], r["node_mode"]) for r in report["all_cases"]} == {

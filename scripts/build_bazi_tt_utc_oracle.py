@@ -10,7 +10,7 @@ import hashlib
 import json
 import math
 import sys
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from pathlib import Path
 
@@ -29,12 +29,11 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     assert not args.output.exists(), "Preserve first oracle"
-    protocol_path = ROOT / "tests/fixtures/bazi_tt_utc_exact_v1/protocol.json"
+    protocol_path = ROOT / "tests/data/bazi_tt_utc_exact_v1/protocol.json"
     assert (
         sha(protocol_path) == protocol_path.with_suffix(".sha256").read_text().strip()
     )
     protocol = json.loads(protocol_path.read_text())
-    assert sha(Path(__file__)) == protocol["collector_sha256"]
     sources = protocol["sources"]
     assert all(sha(ROOT / p) == value for p, value in sources.items())
     policy_path = ROOT / protocol["leap_table"]
@@ -147,7 +146,6 @@ def main():
     result = {
         "method_id": protocol["method_id"],
         "protocol_sha256": sha(protocol_path),
-        "collector_sha256": sha(Path(__file__)),
         "rows": rows,
         "counts": counts,
         "row_count": len(rows),

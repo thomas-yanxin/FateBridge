@@ -31,7 +31,7 @@ def source_records() -> list[dict[str, Any]]:
             {
                 "id": ident,
                 "url": "https://jovianarchive.com/pages/get-your-human-design-chart",
-                "archive_path": "docs/validation/human-design-profile-all768-v1/official-through-768/pdfs/"
+                "archive_path": "tests/data/human_design/source-charts/"
                 + ident
                 + ".pdf",
                 "pdf_sha256": sha,

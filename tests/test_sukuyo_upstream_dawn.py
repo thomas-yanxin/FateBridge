@@ -11,7 +11,7 @@ from fatebridge.core.sukuyo_waterclock import (
     source_specific_time_reference,
 )
 
-FIXTURE = Path(__file__).parent / "fixtures/sukuyo-upstream-before-production-v76.json"
+FIXTURE = Path(__file__).parent / "data/sukuyo-upstream-before-production-v76.json"
 
 
 def test_entire_source_first_reference_is_delivered():

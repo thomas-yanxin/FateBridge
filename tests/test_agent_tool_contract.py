@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from scripts.evaluate_agent import command_for, grade, model_prompt
+from scripts.evaluate_agent import command_for, grade_case, model_prompt
 from tests.test_agent_evaluation import event
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,7 +29,7 @@ def test_original_failed_comprehensive_call_still_fails_the_same_tool_gates():
     )["cases"]
     case = cases[0]
     assert "bazi_birth" in model_prompt(case)
-    failed = grade(
+    failed = grade_case(
         case,
         [event("analyze_destiny", case["reference_request"]["arguments"])],
         "actual answer",

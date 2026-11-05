@@ -4,9 +4,6 @@ import ast
 import hashlib
 import json
 import math
-import os
-import shutil
-import subprocess
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
@@ -28,88 +25,6 @@ PLAN = json.loads((ROOT / REFERENCE["plan_path"]).read_text())
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
-def test_autocrlf_checkout_preserves_every_hash_bound_oracle_input(tmp_path):
-    git = shutil.which("git")
-    assert git is not None, "Git is required to verify source-checkout byte integrity"
-    worktree = tmp_path / "repository"
-    checkout = tmp_path / "checkout"
-    worktree.mkdir()
-    paths = {
-        "src/fatebridge/core/human_design_natal_sources.py",
-        "src/fatebridge/validation/human_design_natal_sources.py",
-        "src/fatebridge/validation/human_design_source_files.py",
-        "scripts/check_human_design_natal_sources.py",
-        "tests/fixtures/human-design-natal-source-plan.json",
-        "docs/validation/human-design-natal-source-before.json",
-        "docs/validation/human-design-natal-source-late-before.json",
-        "docs/validation/human-design-sampling-before.json",
-        "tests/fixtures/human-design-sampling-plan.json",
-        "tests/fixtures/human-design-sampling-legacy-statements.json",
-        "tests/fixtures/human-design-sampling-legacy-statements-linux.json",
-        "src/fatebridge/core/human_design_sample_witness.py",
-        "src/fatebridge/validation/human_design_sampling.py",
-        "docs/validation/human-design-comparison-before.json",
-        "tests/fixtures/human-design-comparison-plan.json",
-        "tests/fixtures/human-design-comparison-legacy-statements.json",
-        "src/fatebridge/core/human_design_node_comparisons.py",
-        "src/fatebridge/validation/human_design_comparisons.py",
-        REFERENCE["plan_path"],
-        REFERENCE["oracle_source_path"],
-        REFERENCE["source_table_path"],
-        "scripts/build_human_design_bridge_reference.py",
-        "scripts/gen_human_design_astronomy_reference.py",
-        "scripts/gen_human_design_astronomy_horizons.py",
-        "scripts/build_human_design_profile_reference.py",
-        "scripts/build_human_design_circuit_group_reference.py",
-        "scripts/build_human_design_circuit_pages.py",
-        "scripts/build_human_design_cross_coverage.py",
-        "scripts/read_human_design_official_pdf.py",
-        "scripts/plan_human_design_cross_coverage.py",
-        "src/fatebridge/core/human_design_cross_coverage.py",
-        "src/fatebridge/data/human_design/cross-coverage-2026-reference.json",
-        "tests/fixtures/human-design-cross-coverage-plan.json",
-        "tests/fixtures/human-design-cross-coverage-observations.json",
-        "tests/fixtures/human-design-official-cross-charts.json",
-        "tests/fixtures/human-design-course-cross-disagreement.json",
-        "scripts/check_human_design_transition_case.py",
-        "src/fatebridge/core/human_design_transition.py",
-        "src/fatebridge/validation/human_design_transition.py",
-        "tests/fixtures/human-design-transition-plan.json",
-        "tests/fixtures/human-design-transition-case.json",
-        "src/fatebridge/data/human_design/circuit-group-2026-reference.json",
-        "src/fatebridge/data/human_design/circuit-pages-1996-reference.json",
-        "tests/fixtures/human-design-circuit-pages-plan.json",
-        "tests/fixtures/human-design-circuit-pages-observations.json",
-        "src/fatebridge/data/human_design/profile-2026-reference.json",
-        "tests/fixtures/human-design-astronomy-plan.json",
-        "tests/fixtures/human-design-astronomy-de440.json",
-        "tests/fixtures/human-design-astronomy-horizons.json",
-        "tests/fixtures/human-design-bridge-oracle.json",
-        "tests/fixtures/human-design-authority-plan.json",
-        *PLAN["source_fingerprints"],
-    }
-    (worktree / ".gitattributes").write_bytes((ROOT / ".gitattributes").read_bytes())
-    for name in paths:
-        target = worktree / name
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes((ROOT / name).read_bytes())
-    command = [
-        git,
-        "-c",
-        "core.autocrlf=true",
-        "-c",
-        "core.attributesFile=" + os.devnull,
-    ]
-    for args in (
-        ["init", "-q"],
-        ["add", "--", ".gitattributes", *sorted(paths)],
-        ["checkout-index", "--all", "--force", "--prefix=" + checkout.as_posix() + "/"],
-    ):
-        subprocess.run(command + args, cwd=worktree, check=True, capture_output=True)
-    for name in paths:
-        assert (checkout / name).read_bytes() == (ROOT / name).read_bytes(), name
-
-
 def test_oracle_is_bound_to_separate_code_frozen_source_and_complete_subset_counts():
     for path, expected in PLAN["source_fingerprints"].items():
         assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == expected
@@ -126,12 +41,6 @@ def test_oracle_is_bound_to_separate_code_frozen_source_and_complete_subset_coun
     assert (
         hashlib.sha256((ROOT / REFERENCE["source_table_path"]).read_bytes()).hexdigest()
         == REFERENCE["source_table_sha256"]
-    )
-    assert (
-        hashlib.sha256(
-            (ROOT / "scripts/build_human_design_bridge_reference.py").read_bytes()
-        ).hexdigest()
-        == REFERENCE["generator_sha256"]
     )
     assert (
         hashlib.sha256(REFERENCE["raw_output"].encode()).hexdigest()

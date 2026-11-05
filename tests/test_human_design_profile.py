@@ -18,7 +18,7 @@ from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_profile import public_profile_checks
-from tests.golden.runner import golden_ephemeris
+from tests.ephemeris_context import moshier_ephemeris
 
 ROOT = Path(__file__).resolve().parents[1]
 REFERENCE = json.loads(
@@ -163,7 +163,7 @@ def test_ordinary_activation_six_and_return_teaching_never_assign_current_age_ph
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 def test_every_official_profile_replays_in_real_run_and_joint_snapshots(case):
-    with golden_ephemeris():
+    with moshier_ephemeris():
         run = execute_tool(SPEC, SPEC.request_model(**case["birth_input"]))
     assert run["profile_evidence"]["status"] == "computed"
     assert run["profile_evidence"]["profile"] == case["properties"]["Profile"]
@@ -191,7 +191,7 @@ def test_every_official_profile_replays_in_real_run_and_joint_snapshots(case):
 @pytest.fixture(scope="module")
 def real_sixth_profile_run():
     case = next(c for c in CASES if "6" in c["properties"]["Profile"])
-    with golden_ephemeris():
+    with moshier_ephemeris():
         return execute_tool(SPEC, SPEC.request_model(**case["birth_input"]))
 
 

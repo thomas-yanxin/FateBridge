@@ -13,6 +13,7 @@ from fatebridge.application.examples import example_input, suggested_fields
 from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
+from fatebridge.utils.json_digest import digest as evidence_digest
 
 
 async def _same_run_payload(client, result, *, require_business_inline=False):
@@ -44,44 +45,44 @@ async def _same_run_payload(client, result, *, require_business_inline=False):
     assert hashlib.sha256(raw.encode()).hexdigest() == ref["sha256"]
     original = json.loads(raw)
     receipt = first["run_metadata"]
-    runtime = receipt.get("runtime", {})
     full_receipt = original["run_metadata"]
-    if "run_metadata" in ref["deferred_fields"]:
-        assert ref["deferred_fields"] == ["run_metadata"]
-        assert set(receipt) == {
-            "run_id",
-            "trace_id",
-            "tool_name",
-            "generated_at",
-            "engine",
-            "engine_is_approximate",
+    restored_receipt = dict(receipt)
+    for path in ref["deferred_fields"]:
+        if not path.startswith("run_metadata."):
+            continue
+        assert path in {
+            "run_metadata.runtime",
+            "run_metadata.provenance",
+            "run_metadata.determinism",
+            "run_metadata.calculation_evidence",
         }
-        assert receipt == {key: full_receipt[key] for key in receipt}
-    elif runtime.get("delivery_path") == "run_metadata.runtime":
-        assert "run_metadata.runtime" in ref["deferred_fields"]
-        full_runtime = full_receipt["runtime"]
-        files = full_runtime["ephemeris"]["files"]
-        assert runtime["ephemeris_files_count"] == len(files)
-        digest = hashlib.sha256(
-            json.dumps(
-                files, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-            ).encode()
-        ).hexdigest()
-        assert (
-            runtime["ephemeris_inventory_sha256"]
-            == full_runtime["ephemeris"]["sha256"]
-            == digest
-        )
-        assert runtime["environment_sha256"] == full_runtime["environment_sha256"]
-        restored_receipt = {**receipt, "runtime": full_runtime}
-        for path in ref["deferred_fields"]:
-            if path in {"run_metadata.provenance", "run_metadata.determinism"}:
-                key = path.removeprefix("run_metadata.")
-                assert key not in receipt
-                restored_receipt[key] = full_receipt[key]
-        assert restored_receipt == full_receipt
-    else:
-        assert receipt == full_receipt
+        key = path.removeprefix("run_metadata.")
+        if key == "calculation_evidence":
+            assert receipt[key] == {
+                "delivery_path": path,
+                "sha256": evidence_digest(full_receipt[key]),
+                "coverage": full_receipt[key].get("coverage"),
+            }
+        elif key == "runtime":
+            summary, runtime = receipt[key], full_receipt[key]
+            assert summary["delivery_path"] == path
+            files = runtime["ephemeris"]["files"]
+            file_digest = hashlib.sha256(
+                json.dumps(
+                    files, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+                ).encode()
+            ).hexdigest()
+            assert summary["ephemeris_files_count"] == len(files)
+            assert (
+                summary["ephemeris_inventory_sha256"]
+                == runtime["ephemeris"]["sha256"]
+                == file_digest
+            )
+            assert summary["environment_sha256"] == runtime["environment_sha256"]
+        else:
+            assert key not in receipt
+        restored_receipt[key] = full_receipt[key]
+    assert restored_receipt == full_receipt
     if require_business_inline:
         assert "run_metadata" not in ref["deferred_fields"]
         business_deferred = {
@@ -410,7 +411,10 @@ def test_taiyi_evidence_across_real_transports(
     assert "= " + str(taiyi["core_board"]["main_count"]) in bodies[0]["snapshot_text"]
 
 
-def test_fabricated_offset_rejected_by_rest_mcp_and_cli(monkeypatch, capsys):
+@pytest.mark.parametrize(
+    "obsolete", [{"accNum": 0}, {"acc_num": 0}, {"rotation": "顺布"}]
+)
+def test_obsolete_options_rejected_by_rest_mcp_and_cli(monkeypatch, capsys, obsolete):
     api._reset_runtime_state_for_tests()
     monkeypatch.setattr(
         api,
@@ -421,11 +425,11 @@ def test_fabricated_offset_rejected_by_rest_mcp_and_cli(monkeypatch, capsys):
         "date": "2026-04-04",
         "time": "12:00:00",
         "use_true_solar_time": False,
-        "taiyi_options": {"accNum": 1},
+        "taiyi_options": obsolete,
     }
     response = TestClient(api.app).post("/api/divination/sanshiunited", json=payload)
     assert response.status_code == 400
-    assert "原典" in response.text
+    assert "未实现的太乙选项" in response.text
 
     async def protocol():
         async with Client(create_mcp_app()) as client:
@@ -449,7 +453,10 @@ def test_fabricated_offset_rejected_by_rest_mcp_and_cli(monkeypatch, capsys):
     )
     assert code != 0
     result = json.loads(capsys.readouterr().out)
-    assert "taiyi" not in result
+    for body in [response.json(), native.structured_content, result]:
+        assert "未实现的太乙选项" in body["error"]
+        assert next(iter(obsolete)) in body["error"]
+        assert "taiyi" not in body
 
 
 @pytest.mark.parametrize("mode", ["year", "day"])

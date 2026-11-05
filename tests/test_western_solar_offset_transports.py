@@ -7,17 +7,15 @@ from pathlib import Path
 
 import pytest
 
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
-
-from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
-
 REFERENCE = json.loads(
-    (
-        Path(__file__).parent / "fixtures/western-solar-offset-v1/reference.json"
-    ).read_text()
+    (Path(__file__).parent / "data/astro/solar_offset/reference.json").read_text()
 )
 IDS = [
     "America/New_York-2024-03-10-1",

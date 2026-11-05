@@ -13,7 +13,7 @@ from xml.etree import ElementTree
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "src/fatebridge/data/sukuyo_commentarial_boundaries.json"
-FIXTURE = ROOT / "tests/fixtures/sukuyo-commentarial-clock-primary.json"
+FIXTURE = ROOT / "tests/data/sukuyo-commentarial-clock-primary.json"
 
 
 def check_literal_days(source: dict[str, Any]) -> None:

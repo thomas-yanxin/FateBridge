@@ -26,7 +26,7 @@ from scripts.audit_taiyi_cycles import audit
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_cycles_v42"
-FREEZE = "19e96a08e9bc7f55fafa12803e83a6e098b1e46e79bc1d2cfeb0e041424b8cfa"
+FREEZE = "b01f239e7db1d83ca34563788173e5e1c9b0136dc7191866294a5a07dba4771f"
 
 
 def source():

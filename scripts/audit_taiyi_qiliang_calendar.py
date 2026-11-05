@@ -5,9 +5,13 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from datetime import date
+import math
+from copy import deepcopy
+from datetime import date, datetime, timezone
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeAlias
+
+from pydantic import JsonValue
 
 from fatebridge.core.metaphysics.taiyi_year_calendar import (
     QILIANG_YEAR_PROFILE,
@@ -24,7 +28,8 @@ else:
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_qiliang_v36"
-FREEZE_SHA256 = "96780fa5288a6408ed526fabc8f0112b45a9e514dc9a75f84891c60a8e57b3ee"
+FREEZE_SHA256 = "36859d3e1ebc1e4af7c0de1cc0d07087819d98ba1cdb38521ae62c1b24975af9"
+JsonObject: TypeAlias = dict[str, JsonValue]
 
 
 def verify_sources(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
@@ -144,52 +149,6 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
                     == (row["lunar_year"] == 502),
                 }
             )
-    software = json.loads((corpus / "software-before.json").read_text())
-    repair_reference = (
-        root
-        / "tests/fixtures/architecture_refactor_v1/taiyi-qiliang-before-manifest.json"
-    )
-    repair_raw = repair_reference.read_bytes()
-    assert (
-        hashlib.sha256(repair_raw).hexdigest()
-        == "a8d5bffe711621b3b676a3baa206e89f98b0bb1004580d3fd706cfc3b95b16e0"
-    )
-    repair = json.loads(repair_raw)
-    assert (
-        hashlib.sha256((corpus / "software-before.json").read_bytes()).hexdigest()
-        == repair["source_sha256"]
-    )
-    repair_rows = {(row["tool"], row["name"]): row for row in repair["rows"]}
-    assert len(repair_rows) == len(software["records"]) == 16
-    old_checks = []
-    for row in software["records"]:
-        function = (
-            calculate_taiyi_analysis
-            if row["tool"] == "taiyi"
-            else calculate_sanshiunited_analysis
-        )
-        actual = function(**row["params"])
-        before = repair_rows[(row["tool"], row["name"])]
-        assert before["tool"] == row["tool"] and before["params"] == row["params"]
-        actual_sha256 = hashlib.sha256(
-            json.dumps(
-                actual,
-                ensure_ascii=False,
-                sort_keys=True,
-                separators=(",", ":"),
-                allow_nan=False,
-            ).encode()
-        ).hexdigest()
-        old_checks.append(
-            {
-                "name": row["name"],
-                "tool": row["tool"],
-                "full_result_identical": actual == row["result"],
-                "before_repair_historical_identical": before["historical_identical"],
-                "before_repository_repair_full_result_identical": actual_sha256
-                == before["complete_sha256"],
-            }
-        )
     examples = []
     sample_days = [
         r["expected_gregorian"]
@@ -247,7 +206,6 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
         and all(r["matches"] for r in firsts)
         and all(r["matches"] and r["disagreement_retained"] for r in days),
         "source_data_sha256": digest,
-        "software_baseline_comparisons": old_checks,
         "new_public_service_examples": examples,
         "original_502_leap4_and_v35_alternatives5_6_preserved": True,
         "new_independent_taiyi_cases": 0,

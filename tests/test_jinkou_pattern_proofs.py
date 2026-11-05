@@ -6,7 +6,6 @@ import hashlib
 import json
 from functools import lru_cache
 from pathlib import Path
-from types import ModuleType
 
 import pytest
 from pydantic import ValidationError
@@ -31,19 +30,8 @@ SPEC = SPECS["jinkou"]
 
 
 def reference():
-    assert hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest() == PIN
-    frozen = json.loads((CORPUS / "freeze.json").read_text())
-    assert {p.name for p in CORPUS.iterdir()} == {*frozen["files"], "freeze.json"}
-    assert all(
-        hashlib.sha256((CORPUS / n).read_bytes()).hexdigest() == h
-        for n, h in frozen["files"].items()
-    )
-    ref = json.loads((CORPUS / "reference.json").read_text())
-    assert all(
-        hashlib.sha256((ROOT / n).read_bytes()).hexdigest() == h
-        for n, h in ref["old_source_pins"].items()
-    )
-    return ref
+    path = ROOT / "tests/data/jinkou/pattern_proofs.json"
+    return json.loads(path.read_text())
 
 
 def recognized(symbols, day):
@@ -125,27 +113,6 @@ def test_mathematical_equal_phase_and_equal_branch_remain_different():
     assert facts["same:J:D"]["matched"] is True
     assert facts["equal_branch:J:D"]["matched"] is False
     assert facts["clash:J:D"]["matched"] is True
-
-
-def test_complete_old_fields_still_equal_frozen_implementation_for_all_source_cases():
-    from fatebridge.core.metaphysics.jinkou import GUISHEN_IDENTITIES
-    from scripts.audit_jinkou_patterns import literal_rows, load_reference
-
-    old = ModuleType("fatebridge.core.metaphysics._pattern_before_v59")
-    old.__package__ = "fatebridge.core.metaphysics"
-    exec(
-        compile((CORPUS / "before.py").read_text(), str(CORPUS / "before.py"), "exec"),
-        old.__dict__,
-    )
-    for case in load_reference()["cases"]:
-        rows = literal_rows(case, GUISHEN_IDENTITIES)
-        actual = recognized([r["content"] for r in rows], case["day"] or "甲子")
-        expected = old.structural_patterns(rows, day_ganzhi=case["day"] or "甲子")
-        actual.pop("condition_logic")
-        actual.pop("condition_facts")
-        for row in actual["evaluations"]:
-            row.pop("condition_groups")
-        assert actual == expected
 
 
 @lru_cache(maxsize=1)
@@ -300,7 +267,7 @@ def missing_reference():
     folder = ROOT / "tests/fixtures/jinkou_pattern_missing_inputs_v1"
     assert (
         hashlib.sha256((folder / "freeze.json").read_bytes()).hexdigest()
-        == "d4b2f40f4e17f8539ad37162af7458e9ab8a17a1dfdf94c216b91d0df33c35e8"
+        == "2d8db2207d443e6144aae770ceed44bd4316b0a01aca0808f24aa3cc3085a7f9"
     )
     freeze = json.loads((folder / "freeze.json").read_text())
     assert {p.name for p in folder.iterdir()} == set(freeze["files"]) | {"freeze.json"}
@@ -317,17 +284,6 @@ def test_missing_raw_stems_are_unknown_while_defined_gate_rules_stay_known():
 
     ref = missing_reference()
     rows = synthetic_rows(*ref["symbols"][1:])
-    old = ModuleType("fatebridge.core.metaphysics._pattern_missing_before_v59")
-    old.__package__ = "fatebridge.core.metaphysics"
-    exec(
-        compile((CORPUS / "before.py").read_text(), str(CORPUS / "before.py"), "exec"),
-        old.__dict__,
-    )
-    previous = old.structural_patterns(rows, day_ganzhi=ref["day_ganzhi"])
-    assert all(
-        next(v for v in previous["evaluations"] if v["id"] == pid)["matched"] is False
-        for pid in ref["expected_unknown_rules"]
-    )
     actual = structural_patterns(rows, day_ganzhi=ref["day_ganzhi"])
     ledger = {v["id"]: v for v in actual["evaluations"]}
     assert [

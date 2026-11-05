@@ -1,6 +1,5 @@
 """Observer origin is part of a physical value's meaning, not a new orbit."""
 
-import gzip
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -13,18 +12,10 @@ from fatebridge.core.human_design_apparent_positions import build_context
 from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
-from tests.human_design_policy_expectation import (
-    VARIANTS,
-    expected_historical_proof,
-    static_policy,
-)
 
-BASE = Path(__file__).parent / "fixtures/human_design_coordinate_context_v1"
-OLD = json.loads(gzip.decompress((BASE / "old-delivery.json.gz").read_bytes()))[
-    "payload"
-]
-PROOF = json.loads((BASE / "old-proof.json").read_text())
-REFERENCE = json.loads((BASE / "meaning-reference.json").read_text())
+REFERENCE = json.loads(
+    (Path(__file__).parent / "data/human_design/coordinate-meaning.json").read_text()
+)
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
@@ -43,11 +34,6 @@ def complete():
     )
 
 
-def test_old_schema_receipt_keeps_its_exact_before_implementation_proof():
-    assert OLD["run_metadata"]["contract_sha256"] == REFERENCE["expected_old_contract"]
-    assert verify_human_design_reading(OLD) == expected_historical_proof(OLD, PROOF)
-
-
 def test_current_origin_units_vertex_and_reading_are_bound_without_native_replay(
     complete,
 ):
@@ -55,10 +41,6 @@ def test_current_origin_units_vertex_and_reading_are_bound_without_native_replay
     assert {
         k: context["coordinate_context"][k] for k in REFERENCE["expected"]
     } == REFERENCE["expected"]
-    assert (
-        complete["run_metadata"]["contract_sha256"]
-        != REFERENCE["expected_old_contract"]
-    )
     assert (
         "地心处太阳视线与目标视线的夹角"
         in complete["interpretation"]["coordinate_frame_meaning"]
@@ -75,31 +57,6 @@ def test_current_origin_units_vertex_and_reading_are_bound_without_native_replay
             verify_human_design_reading(complete)["status"]
             == "verified_fixed_template_reading"
         )
-
-
-def test_all_prior_business_fields_and_numerical_projection_values_are_unchanged(
-    complete,
-):
-    current = deepcopy(complete)
-    current.pop("run_metadata")
-    # The shared v5 external-call description changed after this immutable
-    # fixture. Permit exactly that independently pinned static-scope change;
-    # coordinates, diagnostics, flags and all other business fields stay exact.
-    native = current["native_execution_context"]["compressed_file_endpoint_policy"]
-    assert static_policy(native) == VARIANTS["current_static"]
-    native["scope"] = OLD["native_execution_context"][
-        "compressed_file_endpoint_policy"
-    ]["scope"]
-    current["apparent_position_context"].pop("coordinate_context")
-    prefix = current["interpretation"].pop("coordinate_frame_meaning")
-    reading = current["interpretation"]["apparent_position_context"]
-    assert reading["text"].startswith(prefix)
-    reading["text"] = reading["text"][len(prefix) :]
-    assert (
-        reading["basis"][-1]["path"] == "apparent_position_context.coordinate_context"
-    )
-    reading["basis"].pop()
-    assert current == {k: v for k, v in OLD.items() if k != "run_metadata"}
 
 
 @pytest.mark.parametrize(

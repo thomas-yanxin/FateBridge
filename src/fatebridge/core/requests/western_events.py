@@ -16,7 +16,7 @@ class AstroMundaneRequest(WesternEphemerisRequest):
 
     name: Optional[str] = Field(default=None, description="Optional chart name")
     year: int = Field(description="Civil year of the ingress, e.g. 2026")
-    ingress_term: str = Field(
+    ingress_term: Literal["春分", "夏至", "秋分", "冬至"] = Field(
         default="春分",
         description="Cardinal ingress: 春分 (spring equinox) / 夏至 / 秋分 / 冬至",
     )

@@ -27,7 +27,7 @@ from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.timezones import parse_timezone_name
 from scripts.audit_ziwei_age import audit_age_calendar
 
-FIXTURES = Path(__file__).parent / "fixtures/ziwei_independent"
+FIXTURES = Path(__file__).parent / "data/ziwei_independent"
 CASES = json.loads((FIXTURES / "clock_manifest.json").read_text())["cases"]
 EAST = next(c["input"] for c in CASES if c["id"] == "cny_east_forward")
 WEST = next(c["input"] for c in CASES if c["id"] == "cny_west_backward")
@@ -60,27 +60,16 @@ def test_old_failure_is_repaired_by_two_clock_endpoints_not_clamping(profile, si
         iso="1984-02-02T00:00:00+08:00", rule_profile=profile, sihua_source=sihua
     )["ziwei_horoscope"]
     assert before["nominal_age"] == 1 and after["nominal_age"] == 2
-    for h, years, old_age in [(before, (1983, 1983), 0), (after, (1983, 1984), 1)]:
+    for h, years in [(before, (1983, 1983)), (after, (1983, 1984))]:
         a = h["nominal_age_calendar"]
         assert (a["birth_lunar_year"], a["target_lunar_year"]) == years
         assert a["birth_placement_lunar_year"] == 1984
-        assert a["legacy_mixed_clock_age"] == old_age
-        assert a["legacy_comparison_applied"] is False
-        assert a["legacy_comparison_is_separate_run"] is False
-        assert a["legacy_ordinal_status"] == (
-            "would_reject_below_one" if old_age == 0 else "ordinal_at_least_one"
-        )
-        assert a["difference_from_legacy"] == 1
         assert a["physical_order_checked"]
         assert not a["age_boundary_classically_verified"]
         assert h["childhood_limit"]["given_age_ordinal"] == h["nominal_age"]
     assert before["scopes"][0]["status"] == "not_started"
     assert after["scopes"][0]["status"] == "computed"
     assert before["scopes"][1]["branch"] != after["scopes"][1]["branch"]
-    old = result(
-        rule_profile=profile, sihua_source=sihua, nominal_age_basis="legacy_mixed_clock"
-    )
-    assert "岁序小于1" in old["error"] and "此边界暂不支持" in old["error"]
 
 
 @pytest.mark.parametrize("profile", PROFILES)
@@ -91,8 +80,6 @@ def test_westward_solar_label_does_not_add_a_civil_year(profile):
     a = h["nominal_age_calendar"]
     assert a["birth_placement_lunar_year"] == 1983
     assert a["birth_lunar_year"] == a["target_lunar_year"] == 1984
-    assert a["legacy_mixed_clock_age"] == 2
-    assert a["difference_from_legacy"] == -1
     natal = calculate_ziwei_birth(create_person_info(**WEST), rule_profile=profile)[
         "ziwei_birth"
     ]
@@ -119,7 +106,7 @@ def test_same_target_instant_does_not_change_age_when_display_zone_changes(
     assert h["ming_limit_subperiods"] == expected["ming_limit_subperiods"]
 
 
-@pytest.mark.parametrize("basis", ["birth_civil_timezone", "legacy_mixed_clock"])
+@pytest.mark.parametrize("basis", ["birth_civil_timezone"])
 def test_physical_prebirth_guard_is_not_bypassed_by_age_choice(basis):
     r = result(iso="1984-02-01T23:54:00+08:00", nominal_age_basis=basis)
     assert "目标时刻早于出生时刻" in r["error"]
@@ -155,10 +142,6 @@ def test_age_receipt_cannot_claim_classical_verification():
     a = deepcopy(result()["ziwei_horoscope"]["nominal_age_calendar"])
     ZiweiNominalAgeCalendar.model_validate(a)
     a["age_boundary_classically_verified"] = True
-    with pytest.raises(ValidationError):
-        ZiweiNominalAgeCalendar.model_validate(a)
-    a = deepcopy(result()["ziwei_horoscope"]["nominal_age_calendar"])
-    a["legacy_comparison_is_separate_run"] = True
     with pytest.raises(ValidationError):
         ZiweiNominalAgeCalendar.model_validate(a)
 
@@ -207,7 +190,7 @@ def test_repeated_birth_clock_uses_physical_order_for_both_age_methods():
     target = dict(
         target_year=1991, target_month=9, target_day=15, target_hour=1, target_minute=20
     )
-    for basis in ("birth_civil_timezone", "legacy_mixed_clock"):
+    for basis in ("birth_civil_timezone",):
         r = calculate_ziwei_horoscope(
             birth,
             **target,
@@ -229,9 +212,7 @@ def test_repeated_birth_clock_uses_physical_order_for_both_age_methods():
         assert "目标时刻早于出生时刻" in earlier["error"]
 
 
-@pytest.mark.parametrize(
-    "basis,age", [("birth_civil_timezone", 2), ("legacy_mixed_clock", 1)]
-)
+@pytest.mark.parametrize("basis,age", [("birth_civil_timezone", 2)])
 def test_age_basis_is_equal_in_real_rest_native_mcp_cli(
     basis, age, monkeypatch, capsys
 ):
@@ -293,6 +274,5 @@ def test_age_basis_is_equal_in_real_rest_native_mcp_cli(
     assert facts[0] == facts[1] == facts[2]
     assert facts[0]["nominal_age"] == age
     a = facts[0]["nominal_age_calendar"]
-    assert a["legacy_comparison_applied"] == (basis == "legacy_mixed_clock")
-    assert a["legacy_comparison_is_separate_run"] is False
-    assert a["legacy_ordinal_status"] == "ordinal_at_least_one"
+    assert a["basis"] == "birth_civil_timezone"
+    assert a["physical_order_checked"] is True

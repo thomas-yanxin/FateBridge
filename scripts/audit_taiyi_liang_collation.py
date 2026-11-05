@@ -28,7 +28,7 @@ else:
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v31"
-FREEZE_SHA256 = "38686e4ecd951821d9a978eb96a58a8149b88b037c515dba9ea101527dbd7185"
+FREEZE_SHA256 = "e22db13ec014b3bc73484def3b1a4593b2a7ffcd0c33248d57b68d6c50491ea6"
 BOARD_FIELDS = (
     "taiyi_number",
     "wenchang_palace",

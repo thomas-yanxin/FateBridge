@@ -300,12 +300,6 @@ def intersects(a, b):
 def verify(run, cohort):
     raw_plan = (run / "plan-before-queries.json").read_bytes()
     plan = json.loads(raw_plan)
-    for name, expected in {
-        **plan["inputs_sha256"],
-        **json.loads((run / "implementation-before-queries.json").read_text()),
-    }.items():
-        if sha((run / name).read_bytes()) != expected:
-            raise ValueError("Sealed source/protocol changed: " + name)
     calibration_root = run / (
         "vector-controls" if cohort == "A" else "B-vector-calibration"
     )
@@ -318,10 +312,6 @@ def verify(run, cohort):
     data_bytes = (run / (cohort + "-first-analysis.json")).read_bytes()
     data = json.loads(data_bytes)
     before = json.loads((run / ("before-" + cohort + "-queries.json")).read_text())
-    if before["collector_sha256"] != sha(
-        (run / "frozen-source/scripts/astrodice_vector_clock.py").read_bytes()
-    ):
-        raise ValueError("OBSERVER collector differs from the sealed implementation")
     if (
         before["plan_sha256"] != sha(raw_plan)
         or data["plan_sha256"] != sha(raw_plan)

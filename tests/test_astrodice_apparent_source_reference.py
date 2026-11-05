@@ -18,7 +18,9 @@ from scripts.astrodice_apparent_source_reference import (
 )
 from scripts.gen_astrodice_apparent_source_reference import reference_row
 
-FIXTURE = Path(__file__).parent / "fixtures/astrodice-de441-records-v1"
+FIXTURE = (
+    Path(__file__).parent / "data/astrodice/reference_sets/fixture-de441-records-v1"
+)
 
 
 def test_dual_chain_product_quotient_and_sqrt_match_closed_derivative():

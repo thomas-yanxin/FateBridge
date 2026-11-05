@@ -109,7 +109,7 @@ def test_same96_references_with_original_native_failures_retained(
                     term.ephemeris_model
                     == {
                         "swiss": "swieph",
-                        "native": "moshier",
+                        "native": "fatebridge_complete_moshier_solar_v1",
                         "auto": "fatebridge_de440_solar_v1",
                     }[mode]
                 )
@@ -122,8 +122,12 @@ def test_same96_references_with_original_native_failures_retained(
         observed[mode] = rows
     assert max(observed["swiss"].values()) <= 1.0
     assert max(observed["auto"].values()) <= 1.0
+    assert max(observed["native"].values()) <= 1.0
     # The twelve historical Moshier failures are retained separately.
-    assert {key for key, error in observed["native"].items() if error > 1.0} == {
+    from scripts.audit_solar_model_reference import audit
+
+    stock_failures = audit()["retained_stock_moshier_failed_ids"]
+    assert {tuple(key) for key in stock_failures} == {
         (1799, 3),
         (1799, 4),
         (1799, 5),

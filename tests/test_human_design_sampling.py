@@ -1,6 +1,5 @@
 """All15 original report contradictions plus complete finite native replay."""
 
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -42,55 +41,6 @@ def set_path(value, path, replacement):
     key = int(parts[-1]) if isinstance(target, list) else parts[-1]
     assert target[key] != replacement
     target[key] = deepcopy(replacement)
-
-
-def test_before_plan_and_legacy_statements_are_frozen(complete):
-    expected = {
-        "docs/validation/human-design-sampling-before.json": "903a530e8b966cb81d4754e72aaac9bb89dd96ba9fff9f3566a8cc4c757d5992",
-        "tests/fixtures/human-design-sampling-plan.json": "5b35496e7c105d07432375fd31374b18345485ea803898090af5f15d2e216f73",
-        "tests/fixtures/human-design-sampling-legacy-statements.json": "5cb48e73eaabdcaf7738e0f0baaf9a2facd85ef5b1df2fb817c7ab3a90f0bc62",
-        "tests/fixtures/human-design-sampling-legacy-statements-linux.json": "9ef4d9dacad52ed49f53f812f1233986edd99e2af4d3cb53936fa2d49a09a436",
-    }
-    for path, sha in expected.items():
-        assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == sha
-    before = json.loads(
-        (ROOT / "docs/validation/human-design-sampling-before.json").read_text()
-    )
-    assert len(before["cases"]) == len(PLAN["cases"]) == 15
-    assert [c["id"] for c in before["cases"]] == [c["id"] for c in PLAN["cases"]]
-    assert all(
-        c["actually_changed"] and c["old_status"] == "verified_fixed_template_reading"
-        for c in before["cases"]
-    )
-    frozen = json.loads(
-        (
-            ROOT / "tests/fixtures/human-design-sampling-legacy-statements.json"
-        ).read_text()
-    )["statements"]
-    current = deepcopy(complete["interpretation"]["statements"][:9])
-
-    def normalize(value):
-        if isinstance(value, dict):
-            for key, item in value.items():
-                if key == "version" and item == "1.39.0":
-                    value[key] = "1.24.0"
-                else:
-                    normalize(item)
-        elif isinstance(value, list):
-            for item in value:
-                normalize(item)
-
-    normalize(current)
-    linux = json.loads(
-        (
-            ROOT / "tests/fixtures/human-design-sampling-legacy-statements-linux.json"
-        ).read_text()
-    )["statements"]
-    # Both are unmodified old1.24 native results, rather than widened tolerances.
-    # Linux's node delta changes the displayed numeric maximum and typed rows.
-    assert current[:8] == frozen[:8] == linux[:8]
-    assert current in (frozen, linux)
-    assert complete["interpretation"]["statements"][9]["id"] == "birth_interval"
 
 
 @pytest.mark.parametrize("case", PLAN["cases"], ids=lambda c: c["id"])

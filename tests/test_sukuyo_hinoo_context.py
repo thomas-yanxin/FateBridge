@@ -14,7 +14,7 @@ from tests.test_sukuyo_witness_research import critical
 
 REFERENCE = json.loads(
     (
-        Path(__file__).parent / "fixtures/sukuyo-hinoo-context-before-code-v95.json"
+        Path(__file__).parent / "data/sukuyo-hinoo-context-before-code-v95.json"
     ).read_bytes()
 )["expected_bundle"]
 

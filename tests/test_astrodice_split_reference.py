@@ -15,12 +15,12 @@ from scripts.audit_astrodice_split_reference import (
 )
 from scripts.gen_astrodice_split_reference import shifted
 
-FIXTURES = Path(__file__).parent / "fixtures"
+FIXTURES = Path(__file__).parent / "data/astrodice/tables"
 
 
 def inputs():
     return [
-        json.loads((FIXTURES / f"astrodice-lunar-split-tdb-{name}.json").read_text())
+        json.loads((FIXTURES / f"lunar-split-tdb-{name}.json").read_text())
         for name in ["protocol", "reference"]
     ]
 
@@ -28,13 +28,13 @@ def inputs():
 def test_frozen_split_reference_replays_every_source_state_and_stencil():
     assert (
         hashlib.sha256(
-            (FIXTURES / "astrodice-lunar-split-tdb-reference.json").read_bytes()
+            (FIXTURES / "lunar-split-tdb-reference.json").read_bytes()
         ).hexdigest()
         == REFERENCE_SHA256
     )
     assert (
         hashlib.sha256(
-            (FIXTURES / "astrodice-split-tdb-collector-source.txt").read_bytes()
+            (FIXTURES / "split-tdb-collector-source.txt").read_bytes()
         ).hexdigest()
         == GENERATOR_SHA256
     )

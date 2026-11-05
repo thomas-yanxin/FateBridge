@@ -1,9 +1,8 @@
-"""Causal model-upgrade checks, independent ledgers and public score provenance."""
+"""Current independent ledgers, exact energy budgets and score provenance."""
 
-import hashlib
 import json
 from copy import deepcopy
-from decimal import Decimal
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
@@ -15,17 +14,20 @@ from fatebridge.services.birth_payload import build_destiny_payload
 from fatebridge.services.tool_catalog import CATALOG
 from tests.compatibility_reference import (
     CURRENT_STRENGTH_METHOD_ID,
-    CURRENT_VERSION,
     REFERENCE,
+    SOURCE_CONDITION_REFERENCE,
     assert_score_reference,
-    reference_dimensions,
-    reference_total,
+    assert_source_condition_score_reference,
+    current_reference_dimensions,
+    current_reference_total,
+    source_condition_reference_dimensions,
+    source_condition_reference_total,
 )
 
 
-def frozen_analyses(version):
-    """Replay old/new input contracts without running or restoring old source."""
-    record = REFERENCE["versions"][version]
+def literal_analyses():
+    """Fixed independently enumerated input facts for the current scoring rules."""
+    record = REFERENCE
     results = []
     for person, profile in zip(REFERENCE["persons"], record["profiles"], strict=True):
         results.append(
@@ -40,14 +42,12 @@ def frozen_analyses(version):
                     "element": person["element"],
                     "strength": profile["strength"],
                     "assessment": {
-                        "method_id": record["strength_method_id"],
-                        "status": "frozen_reference",
+                        "method_id": CURRENT_STRENGTH_METHOD_ID,
+                        "status": "literal_test_input",
                     },
                 },
                 "structure_profile": {
-                    "resolution_policy": record.get(
-                        "resolution_policy", REFERENCE["resolution_policy"]
-                    ),
+                    "resolution_policy": "source_conditions_before_preference_v3",
                     "assessment_status": "conditional",
                     "useful_elements": profile["useful"],
                     "avoid_elements": profile["avoid"],
@@ -61,32 +61,6 @@ def frozen_analyses(version):
     return results
 
 
-def test_source_condition_policy_retains_every_old_ledger_and_numeric_term():
-    archive = (
-        Path(__file__).parent
-        / "fixtures/compatibility-score-reference-before-source-conditions-v2.json"
-    )
-    assert (
-        hashlib.sha256(archive.read_bytes()).hexdigest()
-        == archive.with_suffix(".sha256").read_text().strip()
-    )
-    historical = json.loads(archive.read_text())
-    for key in ["weights", "persons", "compatibility_method_id", "resolution_policy"]:
-        assert REFERENCE[key] == historical[key]
-    for key, value in historical["versions"].items():
-        assert REFERENCE["versions"][key] == value
-    current = REFERENCE["versions"][CURRENT_VERSION]
-    previous = REFERENCE["versions"]["source_root_v4"]
-    for key in ["profiles", "dimension_ledgers", "ten_gods_ledgers"]:
-        assert current[key] == previous[key]
-    assert (
-        REFERENCE["versions"]["source_conditions_v2"]["strength_method_id"]
-        == previous["strength_method_id"]
-    )
-    assert current["strength_method_id"] == "season_root_revelation_relations_v6"
-    assert current["resolution_policy"] == "source_conditions_before_preference_v2"
-
-
 @pytest.fixture
 def production_analyses():
     spec = next(s for s in CATALOG if s.key == "two_person_compatibility")
@@ -98,27 +72,20 @@ def production_analyses():
 
 
 @pytest.mark.parametrize("kind", list(RelationshipType))
-@pytest.mark.parametrize(
-    "version",
-    [
-        "static_v1",
-        "season_root_v2",
-        "source_root_v4",
-        "source_conditions_v2",
-        "source_conditions_v2_v5",
-        "source_conditions_v2_v6",
-    ],
-)
-def test_frozen_old_and_new_inputs_match_independent_dimension_ledgers(kind, version):
+def test_current_inputs_match_independent_dimension_ledgers(kind):
     result = AdvancedCompatibility.analyze_comprehensive_compatibility(
-        *frozen_analyses(version), kind
+        *literal_analyses(), kind
     )
     scores = {
         name: value.get("score", value.get("normalized_score"))
         for name, value in result["detailed_analysis"].items()
     }
-    assert scores == reference_dimensions(kind.value, version)
-    assert result["overall_score"] == reference_total(kind.value, version)
+    assert scores == current_reference_dimensions(kind.value)
+    assert_score_reference(
+        {"scoring": result["scoring"], "overall_score": result["overall_score"]},
+        kind=kind.value,
+    )
+    assert result["overall_score"] == current_reference_total(kind.value)
     assert {
         name: data["weight"] for name, data in result["scoring"]["dimensions"].items()
     } == REFERENCE["weights"][kind.value]
@@ -127,7 +94,12 @@ def test_frozen_old_and_new_inputs_match_independent_dimension_ledgers(kind, ver
 def test_production_inputs_explain_the_new_strength_instead_of_retuning_weights(
     production_analyses,
 ):
-    expected_profiles = REFERENCE["versions"][CURRENT_VERSION]["profiles"]
+    # The original ledger deliberately supplies fully selected preferences.
+    # A structural strong label is not a source decision to use that profile.
+    expected_profiles = [
+        SOURCE_CONDITION_REFERENCE["source_premises"]["first"],
+        REFERENCE["profiles"][1],
+    ]
     for index, analysis in enumerate(production_analyses):
         assert {
             name: value["stem"] + value["branch"]
@@ -144,12 +116,67 @@ def test_production_inputs_explain_the_new_strength_instead_of_retuning_weights(
         assert set(profile["avoid_elements"]) == set(expected["avoid"])
         assert set(profile["conditional_elements"]) == set(expected["conditional"])
         assert set(profile["useful_ten_gods"]) == set(expected["useful_ten_gods"])
+        assert set(profile["neutral_elements"]) == set(expected["neutral"])
     first = production_analyses[0]["day_master"]["assessment"]
-    assert first["support_share"] == pytest.approx(0.43421052631578955)
-    assert first["structural_decision"]["numerical_label"] == "中和"
+    assert first["relations"] == []
+    # Independent hand ledger for 庚午/辛巳/庚辰/辛巳, not a replay of SUT
+    # arithmetic. 午 has 2:1 hidden shares; 巳 and 辰 have 4:2:1. Month
+    # budget is 4, other branches 2. Only hidden 庚 is revealed (x5/4);
+    # the three non-day metal stems each have one rooted unit.
+    roots = {
+        "木": Fraction(2 * 2, 7),
+        "火": Fraction(2 * 2, 3) + Fraction((4 + 2) * 4, 7),
+        "土": Fraction(2, 3) + Fraction(4 + 2, 7) + Fraction(2 * 4, 7),
+        "金": Fraction((4 + 2) * 2, 7),
+        "水": Fraction(2, 7),
+    }
+    # v11 correctly selects summer metal=死1/2 and water=囚3/4.
+    expected_energy = {
+        "木": roots["木"],
+        "火": roots["火"] * 2,
+        "土": roots["土"] * Fraction(3, 2),
+        "金": (roots["金"] * Fraction(5, 4) + 3) * Fraction(1, 2),
+        "水": roots["水"] * Fraction(3, 4),
+    }
+    assert {
+        name: Fraction(value)
+        for name, value in first["threshold_arithmetic"]["energies_exact"].items()
+    } == expected_energy
+    expected_share = (expected_energy["金"] + expected_energy["土"]) / sum(
+        expected_energy.values(), Fraction()
+    )
+    assert expected_share == Fraction(276, 709)
+    assert first["support_share"] == pytest.approx(float(expected_share))
+    assert first["threshold_arithmetic"]["share_exact"] == str(expected_share)
+    assert first["structural_decision"]["numerical_label"] == "弱"
     assert first["structural_decision"]["vigorous_roots"] == ["month", "hour"]
     assert first["structural_decision"]["rule"] == (
-        "multiple_vigorous_roots_and_visible_support"
+        "multiple_vigorous_roots_and_rooted_visible_support"
+    )
+    assert first["ordinary_fuyi_requires_review"] is True
+    profile = production_analyses[0]["structure_profile"]
+    assert profile["metadata"]["baseline_useful_elements"] == []
+    assert profile["layers"][0]["useful_elements"] == []
+    assert profile["layers"][0]["avoid_elements"] == []
+    climate = next(
+        layer for layer in profile["layers"] if layer["source"] == "调候简表"
+    )
+    assert climate["status"] == "reference_only"
+    assert set(climate["useful_elements"]) == {"火", "土", "水"}
+    selection = profile["candidate_selection"]
+    assert selection["chosen_path_id"] is None
+    assert selection["adjudication_status"] == "not_adjudicated"
+    paths = {path["id"]: path for path in selection["paths"]}
+    assert paths["killer_seal"]["status"] == "requires_force_adjudication"
+    assert all(
+        row["status"] == "unknown" for row in paths["killer_seal"]["force_conditions"]
+    )
+    # Printed pillar facts contain seals but no 壬食神 or 酉阳刃. Presence of
+    # 戊/己 does not adjudicate 杀印有情 or 身轻杀重 and cannot select the path.
+    assert (
+        paths["killer_food"]["status"]
+        == paths["killer_blade"]["status"]
+        == "observable_prerequisite_not_met"
     )
     second = production_analyses[1]["day_master"]["assessment"]
     assert second["method_id"] == CURRENT_STRENGTH_METHOD_ID
@@ -163,60 +190,28 @@ def test_production_inputs_explain_the_new_strength_instead_of_retuning_weights(
     )
 
 
-def test_historical_v2_only_second_person_upgrade_explains_historical_delta():
-    old = frozen_analyses("static_v1")
-    upgraded = frozen_analyses("season_root_v2")
-    evaluate = AdvancedCompatibility.analyze_comprehensive_compatibility
-    before = evaluate(*old)
-    person1_only = evaluate(upgraded[0], old[1])
-    person2_only = evaluate(old[0], upgraded[1])
-    current = evaluate(*upgraded)
-    assert before["overall_score"] == person1_only["overall_score"] == 62.4
-    assert (
-        person2_only["overall_score"]
-        == current["overall_score"]
-        == reference_total(version="season_root_v2")
+@pytest.mark.parametrize("kind", list(RelationshipType))
+def test_explicit_unadjudicated_inputs_match_the_independent_conditional_ledger(kind):
+    analyses = deepcopy(literal_analyses())
+    first = SOURCE_CONDITION_REFERENCE["source_premises"]["first"]
+    analyses[0]["structure_profile"].update(
+        useful_elements=first["useful"],
+        avoid_elements=first["avoid"],
+        conditional_elements=first["conditional"],
+        neutral_elements=first["neutral"],
+        useful_ten_gods=first["useful_ten_gods"],
     )
-    for name, expected_delta in REFERENCE["general_weighted_deltas"].items():
-        old_term = before["scoring"]["dimensions"][name]
-        new_term = current["scoring"]["dimensions"][name]
-        assert (
-            old_term["weight"]
-            == new_term["weight"]
-            == REFERENCE["weights"]["general"][name]
-        )
-        assert Decimal(str(new_term["weighted_score"])) - Decimal(
-            str(old_term["weighted_score"])
-        ) == Decimal(str(expected_delta))
-    assert current["scoring"]["unrounded_score"] == 71.63
-    assert (
-        current["scoring"]["input_methods"]["person2"]["strength_method_id"]
-        != before["scoring"]["input_methods"]["person2"]["strength_method_id"]
-    )
-
-
-def test_v4_only_first_person_root_upgrade_explains_the_new_delta(production_analyses):
-    old = frozen_analyses("season_root_v2")
-    evaluate = AdvancedCompatibility.analyze_comprehensive_compatibility
-    before = evaluate(*old)
-    first_only = evaluate(production_analyses[0], old[1])
-    second_only = evaluate(old[0], production_analyses[1])
-    current = evaluate(*production_analyses)
-    assert second_only["overall_score"] == before["overall_score"] == 71.6
-    assert first_only["overall_score"] == current["overall_score"] == 80.0
-    assert current["scoring"]["unrounded_score"] == 80.03
-    for name, delta in REFERENCE["v4_general_weighted_deltas_from_v2"].items():
-        previous = before["scoring"]["dimensions"][name]
-        actual = current["scoring"]["dimensions"][name]
-        assert actual["weight"] == previous["weight"]
-        assert Decimal(str(actual["weighted_score"])) - Decimal(
-            str(previous["weighted_score"])
-        ) == Decimal(str(delta))
+    result = AdvancedCompatibility.analyze_comprehensive_compatibility(*analyses, kind)
+    assert {
+        name: row["score"] for name, row in result["scoring"]["dimensions"].items()
+    } == source_condition_reference_dimensions(kind.value)
+    assert result["overall_score"] == source_condition_reference_total(kind.value)
+    assert result["scoring"]["status"] == "partial"
 
 
 def test_family_score_uses_exact_decimal_half_even_instead_of_binary_tie_drift():
     result = AdvancedCompatibility.analyze_comprehensive_compatibility(
-        *frozen_analyses("source_root_v4"), RelationshipType.FAMILY
+        *literal_analyses(), RelationshipType.FAMILY
     )
     assert result["scoring"]["unrounded_score"] == 75.85
     assert result["overall_score"] == 75.8
@@ -234,7 +229,12 @@ def test_public_service_receipt_matches_independent_reference(kind):
     service, args, kwargs = spec.bind(request)
     result = service(*args, **kwargs)
     assert "error" not in result
-    assert_score_reference(result["summary"], result["detailed_analysis"], kind.value)
+    first_profile = result["person_info"]["person1"]["preference_assessment"]
+    assert first_profile["useful_elements"] == first_profile["avoid_elements"] == []
+    assert set(first_profile["conditional_elements"]) == {"火", "土", "水"}
+    assert_source_condition_score_reference(
+        result["summary"], result["detailed_analysis"], kind.value
+    )
     assert result["summary"]["scoring"]["unrounded_score"] == pytest.approx(
         sum(
             entry["weighted_score"]
@@ -244,7 +244,7 @@ def test_public_service_receipt_matches_independent_reference(kind):
 
 
 def test_missing_method_is_not_mislabeled_as_current_version():
-    analyses = deepcopy(frozen_analyses("static_v1"))
+    analyses = deepcopy(literal_analyses())
     for analysis in analyses:
         analysis["day_master"].pop("assessment")
     result = AdvancedCompatibility.analyze_comprehensive_compatibility(*analyses)
@@ -252,3 +252,19 @@ def test_missing_method_is_not_mislabeled_as_current_version():
         item["strength_method_id"] == "unversioned"
         for item in result["scoring"]["input_methods"].values()
     )
+
+
+@pytest.mark.local_data
+def test_inline_source_case_preserves_the_primary_independent_hand_ledger():
+    packet = json.loads(
+        (
+            Path(__file__).parent / "data/compatibility/source-condition-ledger.json"
+        ).read_text()
+    )
+    assert {
+        key: packet[key] for key in SOURCE_CONDITION_REFERENCE
+    } == SOURCE_CONDITION_REFERENCE
+    original = json.loads(
+        (Path(__file__).parent / "data/compatibility/score-ledger.json").read_text()
+    )
+    assert REFERENCE == original

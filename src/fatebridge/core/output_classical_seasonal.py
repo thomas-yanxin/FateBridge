@@ -28,7 +28,7 @@ class SeasonalClimateReference(PartialOutput):
     chart_adjudication_status: Optional[Literal["not_performed"]] = None
     source_review_status: Optional[
         Literal[
-            "legacy_table_source_pending",
+            "source_not_collated",
             "selected_jia_passages_not_full_acceptance",
             "bing_unit_developer_collation_not_full_acceptance",
         ]
@@ -41,7 +41,7 @@ class SeasonalClimateReference(PartialOutput):
 
     @model_validator(mode="after")
     def preserve_pending_source_scope(self) -> "SeasonalClimateReference":
-        if self.source_review_status == "legacy_table_source_pending" and (
+        if self.source_review_status == "source_not_collated" and (
             self.source_ref is not None or self.source_layers is not None
         ):
             raise ValueError("待核简表不能同时声称已核对的原典出处与层次")

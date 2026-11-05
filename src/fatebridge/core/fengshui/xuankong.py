@@ -144,6 +144,10 @@ def period_context(period: HousePeriod) -> Dict[str, Any]:
             confirmation_reason = (
                 "moshier_model_precision_guard_in_period_changeover_year"
             )
+        elif reason.startswith("complete_moshier_solar"):
+            confirmation_reason = (
+                "complete_moshier_solar_model_precision_guard_in_period_changeover_year"
+            )
         elif reason.startswith("analytic_solar"):
             confirmation_reason = (
                 "analytic_solar_model_precision_guard_in_period_changeover_year"

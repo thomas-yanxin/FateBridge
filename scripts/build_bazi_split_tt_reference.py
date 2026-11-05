@@ -112,7 +112,6 @@ def main():
     result = {
         "method_id": "independent_split_tt_solar_terms_v1",
         "protocol_sha256": sha(args.protocol),
-        "collector_sha256": sha(Path(__file__)),
         "versions": versions,
         "rows": rows,
         "row_count": len(rows),

@@ -59,7 +59,7 @@ def test_different_unrounded_values_do_not_become_equal_through_display_rounding
     assert force["engineering_composition"]["body_within_support_share"] < 0.5
 
 
-def test_legacy_and_missing_receipts_are_distinguished_without_recomputation(
+def test_partial_and_missing_receipts_do_not_recalculate_or_use_rounded_energy(
     monkeypatch,
 ):
     def forbidden(*args, **kwargs):
@@ -70,13 +70,11 @@ def test_legacy_and_missing_receipts_are_distinguished_without_recomputation(
     absent = build_force_components(pillars, {}, {})
     assert absent["engineering_composition"]["ratio_basis"] == "not_supplied"
     assert absent["engineering_composition"]["body_within_support_share"] is None
-    legacy = build_force_components(
+    partial = build_force_components(
         pillars, {"effective_elements": dict.fromkeys("木火土金水", 1.0)}, {}
     )
-    assert (
-        legacy["engineering_composition"]["ratio_basis"] == "rounded_legacy_assessment"
-    )
-    assert legacy["components"]["body"]["engineering_energy_unrounded"] is None
+    assert partial["engineering_composition"]["ratio_basis"] == "not_supplied"
+    assert partial["components"]["body"]["engineering_energy_unrounded"] is None
 
 
 def test_rounded_elapsed_days_cannot_be_used_as_a_subday_duty_boundary():
@@ -103,7 +101,10 @@ def test_monthly_elapsed_seconds_use_physical_time_across_dst(monkeypatch):
     zone = ZoneInfo("America/New_York")
     start = datetime(2024, 3, 10, tzinfo=zone)
     end = datetime(2024, 4, 4, tzinfo=zone)
-    term = lambda name, moment: almanac.SolarTerm(name, moment, "", "")
+
+    def term(name, moment):
+        return almanac.SolarTerm(name, moment, "", "")
+
     monkeypatch.setattr(
         almanac,
         "get_bazi_month_boundaries",

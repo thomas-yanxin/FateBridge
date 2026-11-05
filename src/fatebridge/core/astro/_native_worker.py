@@ -106,9 +106,7 @@ def main() -> None:
                 auxiliary.check()
             response = {
                 "kind": "result",
-                "value": execution.encode_result(
-                    result, request.get("result_encoding")
-                ),
+                "value": execution.encode_result(result),
             }
             if policy is not None:
                 response["physical_ephemeris_policy"] = policy.receipt()

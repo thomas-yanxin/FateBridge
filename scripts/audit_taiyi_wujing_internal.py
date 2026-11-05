@@ -10,7 +10,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_wujing_internal_v48"
-FREEZE_SHA = "699fc465ad34ed399e25e771dd548112b66340c355464179f48045523375e93f"
+FREEZE_SHA = "9d1302c6d19fcdea9ad2c6799eac9ee0564be24fb5606d48f42b6050e7f42e0d"
 HYPOTHESES = ("literal_v18_names", "swap_only_yin_yang_de")
 
 

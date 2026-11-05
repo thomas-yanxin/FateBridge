@@ -2,11 +2,11 @@
 
 No FateBridge imports or numerical-output inputs. Relations are supplied discrete
 premises, not independently adjudicated rules. Coefficients are declared decimal
-engineering policy, not classical constants. The frozen v2 reference remains
-unchanged; its reversed 囚/死 mapping is retained explicitly for historical replay.
+engineering policy, not classical constants. The literal seasonal rows and exact budget equations are independent of production.
 """
 
 from fractions import Fraction as Q
+from math import isclose
 
 ORDER = ("year", "month", "day", "hour")
 ELEMENTS = "木火土金水"
@@ -61,13 +61,6 @@ SEASONAL_PHASES = {
     "冬": dict(zip(ELEMENTS, ("相", "死", "囚", "休", "旺"))),
     "季月": dict(zip(ELEMENTS, ("囚", "休", "旺", "相", "死"))),
 }
-LEGACY_SEASONAL_PHASES = {
-    "春": dict(zip(ELEMENTS, ("旺", "相", "囚", "死", "休"))),
-    "夏": dict(zip(ELEMENTS, ("休", "旺", "相", "囚", "死"))),
-    "秋": dict(zip(ELEMENTS, ("囚", "死", "休", "旺", "相"))),
-    "冬": dict(zip(ELEMENTS, ("相", "囚", "死", "休", "旺"))),
-    "季月": dict(zip(ELEMENTS, ("死", "休", "旺", "相", "囚"))),
-}
 POLICY = {
     "branch_budget": "2",
     "month_multiplier": "2",
@@ -87,9 +80,8 @@ POLICY = {
 }
 
 
-def seasonal_phases(month_branch, *, legacy=False):
-    table = LEGACY_SEASONAL_PHASES if legacy else SEASONAL_PHASES
-    return dict(table[MONTH_SEASONS[month_branch]])
+def seasonal_phases(month_branch):
+    return dict(SEASONAL_PHASES[MONTH_SEASONS[month_branch]])
 
 
 def reconstruct(values, relations, policy=None):
@@ -196,10 +188,30 @@ def reconstruct(values, relations, policy=None):
         "requires_special_structure_review": share < Q(3, 20) or share > Q(17, 20),
         "body": energies[body],
         "seal": energies[seal],
-        "body_within_support": energies[body] / support,
+        "body_within_support": energies[body] / support if support else None,
         "body_seal_relation": (
             "body_greater"
             if energies[body] > energies[seal]
             else "seal_greater" if energies[body] < energies[seal] else "equal"
         ),
     }
+
+
+def assert_current_assessment_arithmetic(values, assessment):
+    """Audit current arithmetic; supplied discrete relations remain premises."""
+    expected = reconstruct(values, assessment["relations"])
+    receipt = assessment["threshold_arithmetic"]
+    assert assessment["method_id"] == "season_root_revelation_relations_v12"
+    assert receipt["energies_exact"] == {
+        element: str(value) for element, value in expected["energies"].items()
+    }
+    for name in ("support", "weaken", "share"):
+        assert receipt[name + "_exact"] == str(expected[name])
+    assert receipt["numerical_label"] == expected["numerical_grade"]
+    for element, value in expected["energies"].items():
+        assert isclose(
+            assessment["effective_elements_unrounded"][element],
+            float(value),
+            rel_tol=0,
+            abs_tol=1e-12,
+        )

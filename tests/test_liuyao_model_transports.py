@@ -7,6 +7,7 @@ from tests.test_liuyao_clash_transports import all_surfaces
 from tests.test_liuyao_model_boundary import (
     CASES,
     ROOT,
+    SOURCE_CASES,
     analytic_environment,
     assert_comparison,
 )
@@ -25,7 +26,7 @@ def test_same_completed_path_comparison_in_rest_native_mcp_cli(
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda x: x["id"])
-def test_false_and_true_month_change_leaf_survives_strict_projection(
+def test_source_adjudicated_current_month_change_survives_strict_projection(
     case, rest, tmp_path, capsys
 ):
     for output in all_surfaces(
@@ -34,7 +35,11 @@ def test_false_and_true_month_change_leaf_survives_strict_projection(
         value = output["liuyao_evidence"]["calendar_conventions"][
             "month_model_comparison"
         ]
-        assert value == {"month_changed": case["month_changed"]}
+        assert value == {
+            "month_changed": SOURCE_CASES[case["id"]][
+                "current_month_changed_between_completed_paths"
+            ]
+        }
 
 
 @pytest.mark.parametrize("case", CASES[:2], ids=lambda x: x["id"])

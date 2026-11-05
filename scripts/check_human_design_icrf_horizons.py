@@ -15,11 +15,11 @@ from scripts.gen_human_design_icrf_horizons import (
     plan,
 )
 
-BASE = ROOT / "docs/validation/human-design-icrf-horizons-v1"
+BASE = ROOT / "tests/data/human_design/icrf_horizons"
 E = BASE / "evidence"
 BINDINGS = {
-    "nasa-attempt1/reference.json": "d783a6e8cb436b3ca808938165f3ad7a1ec337d99aee166d9458b15d9ad17249",
-    "de440-icrf-reference.json": "2a018b02c5e627646fc4eeeaf29f3b4e16218b62e1a20445397c4c9466168f2f",
+    "nasa-attempt1/reference.json": "cb3ae3f62cc64647132e005f20edaea502654adb31e1f6302473c17a0eb87201",
+    "de440-icrf-reference.json": "b3515286b47a91bd9265d8e315cc40ad5bdcebecd44fb254196baa65f16179b1",
 }
 # Inspected swi_bias(FALSE), IAU2006, applies rb transpose to the input.
 # This is a declared source formula, never a fit to NASA residuals.
@@ -89,8 +89,9 @@ def signed(a: float, b: float) -> float:
 
 
 def separation(a: dict[str, float], b: dict[str, float]) -> float:
-    x, y = vector(a["right_ascension"], a["declination"]), vector(
-        b["right_ascension"], b["declination"]
+    x, y = (
+        vector(a["right_ascension"], a["declination"]),
+        vector(b["right_ascension"], b["declination"]),
     )
     cross = [
         x[1] * y[2] - x[2] * y[1],
@@ -155,7 +156,8 @@ def spherical_separation(a: dict[str, float], b: dict[str, float]) -> float:
 
 def capture() -> dict:
     from fatebridge.core.astro import runtime
-    from fatebridge.core.human_design import BODY_IDS, positions_at_tt
+    from fatebridge.core.human_design import positions_at_tt
+    from fatebridge.core.human_design_mechanics import BODY_IDS
     from fatebridge.core.human_design_natal_sources import guard_natal_sources
 
     @guard_natal_sources

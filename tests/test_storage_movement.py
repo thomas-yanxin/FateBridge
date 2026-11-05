@@ -12,7 +12,7 @@ from fatebridge.core.strength import DEFAULT_POLICY, _evaluate
 from fatebridge.utils.data import STEM_ELEMENTS, get_shishen
 from tests.test_strength_v2 import pillars, score
 
-PATH = Path(__file__).parent / "fixtures/bazi_storage_movement_v1/reference.json"
+PATH = Path(__file__).parent / "data/bazi_storage_movement_v1/reference.json"
 REFERENCE = json.loads(PATH.read_text())
 
 

@@ -284,9 +284,9 @@ def test_stage_binding_never_reconstructs_or_substitutes_a_selection(tmp_path, f
     elif fault == "legacy":
         (run / "report.json").write_text("{}")
         (prepared / "preparation.json").write_text("{}")
-    if fault in {"changed_stage", "changed_bytes", "missing_metadata"}:
+    if fault in {"changed_stage", "changed_bytes", "missing_metadata", "legacy"}:
         with pytest.raises(ValueError):
             verify_stage_selection(prepared, run)
     else:
         result = verify_stage_selection(prepared, run)
-        assert result["stage_equivalence_verified"] is (fault is None)
+        assert result["stage_equivalence_verified"] is True

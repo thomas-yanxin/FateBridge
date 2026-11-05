@@ -3,6 +3,8 @@
 from itertools import combinations
 from typing import Any, Dict, List
 
+from pydantic import JsonValue, TypeAdapter
+
 from fatebridge.core.fengshui.annual import annual_stars
 from fatebridge.core.fengshui.bazhai import bazhai, minggua
 from fatebridge.core.fengshui.directions import bearing_context, provenance, rule_data
@@ -34,6 +36,8 @@ from fatebridge.core.fengshui.natal_interpretation import (
 )
 from fatebridge.core.fengshui.planning import evaluate_alternatives
 from fatebridge.core.fengshui.snapshot import sections
+from fatebridge.core.fengshui.spatial_delivery import merge_measured_layout
+from fatebridge.core.fengshui.spatial_layout import prepare_spatial_request
 from fatebridge.core.fengshui.surface import summarize_analysis_progress
 from fatebridge.core.fengshui.xuankong import natal_provenance, xuankong_natal
 from fatebridge.services.snapshot_builders import (
@@ -104,6 +108,21 @@ def _compose(
     }
     if layout is not None:
         result["layout_analysis"] = layout
+        measured = layout.get("workstation_layout_analysis")
+        if measured is not None:
+            result["coverage"]["unavailable_layers"] = [
+                name
+                for name in result["coverage"]["unavailable_layers"]
+                if name != "automatic_floorplan_geometry"
+            ] + ["automatic_image_floorplan_extraction"]
+            result["coverage"]["measured_workstation"] = {
+                "status": measured["status"],
+                "scope": measured["scope"],
+                "candidate_only": measured["geometry"]["candidate_only"],
+                "search_enumeration_complete": measured.get("search", {}).get(
+                    "enumeration_complete"
+                ),
+            }
         # Top-level status retains the raw-chart contract. Requested layout
         # readiness is separate and must survive a coverage-only projection.
         result["coverage"].update(
@@ -145,6 +164,7 @@ def _compose(
             "interior_analysis",
             "material_analysis",
             "workstation_analysis",
+            "workstation_layout_analysis",
         ):
             result["rule_trace"].extend(layout.get(branch, {}).get("rule_trace", []))
     source_comparison = layers.get("xuankong_natal", {}).get("source_comparison")
@@ -448,6 +468,10 @@ def _differences(layers: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 def assess(**kwargs: Any) -> Dict[str, Any]:
     req = AssessRequest.model_validate(kwargs)
+    original = req
+    geometry = None
+    if req.workstation_layout is not None:
+        req, geometry = prepare_spatial_request(req, req.workstation_layout.scene)
     layers = {}
     if "bazhai" in req.selected_methods:
         layers["bazhai"] = _layer(bazhai(req), req.ruleset_id)
@@ -495,8 +519,17 @@ def assess(**kwargs: Any) -> Dict[str, Any]:
         or req.surface_layouts
         or req.element_adjustments
         or req.annual_remedy_ruleset_id is not None
+        or req.workstation_layout is not None
         else None
     )
+    if layout is not None and geometry is not None:
+        layout = merge_measured_layout(
+            original,
+            req,
+            geometry,
+            TypeAdapter(dict[str, JsonValue]).validate_python(layers),
+            TypeAdapter(dict[str, JsonValue]).validate_python(layout),
+        )
     if layout is not None and req.layout_alternatives:
         alternatives = evaluate_alternatives(req, layers)
         layout["alternatives_analysis"] = alternatives
@@ -557,7 +590,11 @@ def assess(**kwargs: Any) -> Dict[str, Any]:
                 if req.form_observations
                 else "not_provided"
             ),
-            "geometry": "user_confirmed_house_sectors_no_automatic_floorplan_geometry",
+            "geometry": (
+                "measured_planar_scene_with_explicit_chart_binding"
+                if req.workstation_layout
+                else "user_confirmed_house_sectors_no_automatic_floorplan_geometry"
+            ),
             "natal_interpretation": (
                 "conditioned_element_pairs_current_star_external_forms_and_bed_door_roles"
                 if layers.get("xuankong_natal", {}).get("interpretation") is not None

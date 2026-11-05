@@ -12,9 +12,7 @@ from fatebridge.core import sukuyo_naoj_adjustments as module
 from fatebridge.core.sukuyo import calendar_mansion, day_evidence
 from fatebridge.core.sukuyo_historical_calendar import date_reference
 
-FIXTURE = (
-    Path(__file__).parent / "fixtures/sukuyo-naoj-adjustments-before-code-v1.json.gz"
-)
+FIXTURE = Path(__file__).parent / "data/sukuyo-naoj-adjustments-before-code-v1.json.gz"
 
 
 def frozen():

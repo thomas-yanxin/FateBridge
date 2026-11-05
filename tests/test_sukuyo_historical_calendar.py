@@ -26,9 +26,7 @@ def reference(value, **kwargs):
 
 
 def test_all_683734_reference_dates_follow_raw_naoj_month_start_records():
-    files, manifest = read_fixture(
-        ROOT / "tests/fixtures/sukuyo_historical_calendar_v1"
-    )
+    files, manifest = read_fixture(ROOT / "tests/data/sukuyo_historical_calendar_v1")
     starts = {}
     for year in range(1873):
         rows = csv.reader(
@@ -92,9 +90,7 @@ def test_source_edge_dates_and_legal_two_day_month_are_explicit(value, fields):
 
 
 def test_all_retained_source_disagreement_dates_have_unapplied_alternative_fields():
-    files, manifest = read_fixture(
-        ROOT / "tests/fixtures/sukuyo_historical_calendar_v1"
-    )
+    files, manifest = read_fixture(ROOT / "tests/data/sukuyo_historical_calendar_v1")
     _, report = normalize(files, manifest)
     checked = 0
     for row in report["cross_source_disagreement_intervals"]:

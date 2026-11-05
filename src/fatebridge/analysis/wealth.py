@@ -1,6 +1,6 @@
 """Wealth-star positions, root prerequisites and actual storage/clash relations.
 
-Fixed rule indices are retained as uncalibrated compatibility fields, never
+Fixed rule indices are uncalibrated descriptions, never
 wealth levels, investment probabilities or forecasts of financial outcomes.
 《秘本子平真诠》PDF44–45 rejects universal storage-opening rules; PDF76
 requires examining wealth roots and relative body/food/wealth force.
@@ -157,7 +157,7 @@ class WealthAnalysis:
         day_stem: str,
         wealth_element: Element,
     ) -> Dict[str, Any]:
-        """保留旧固定指数，显式区分模型分类、计数与原典成格。"""
+        """计算固定规则指数，显式区分模型分类、计数与原典成格。"""
         from ..core.elements import ElementAnalysis
 
         dm_analysis = ElementAnalysis.analyze_day_master_strength(pillars)
@@ -169,30 +169,24 @@ class WealthAnalysis:
 
         score = 60
         notes: List[str] = []
-        pattern = ""
 
         has_wealth = wealth_strength >= 1.5
 
         if strength == "强" and has_wealth:
             score += 18
-            pattern = "身旺财旺"
             notes.append(
                 "扶抑模型为强且财元素计权达到1.5；不能据计数认定财旺或财富层次"
             )
         elif strength == "中和" and has_wealth:
             score += 12
-            pattern = "身财两停"
             notes.append("扶抑模型为中和且财元素计权达到1.5；不等于原典身财两停")
         elif strength == "弱" and wealth_strength >= 2.5:
             score -= 12
-            pattern = "财多身弱"
             notes.append("扶抑模型为弱且财元素计权至少2.5；不推断现实贫富或守财能力")
         elif strength == "强" and not has_wealth:
             score -= 5
-            pattern = "身旺财轻"
             notes.append("扶抑模型为强且财元素计权低于1.5；不推断致富路径")
         else:
-            pattern = "财星平常"
             notes.append("未命中上述模型和计数阈值分支；不能把规则未命中解释为财务平稳")
 
         # 食伤生财：财源活水
@@ -222,10 +216,9 @@ class WealthAnalysis:
             "day_master_strength": strength,
             "wealth_strength": wealth_strength,
             "pattern": f"模型{strength}／财元素计权{wealth_strength:g}（未裁定格局）",
-            "legacy_pattern": pattern,
             "formation_status": "not_adjudicated",
             "score_kind": "uncalibrated_rule_index",
-            "score_basis": "基础60；旧模型强且财计权达1.5加18，中和且达1.5加12，弱且达2.5减12，强且低于1.5减5；非日干见食伤且财达阈值加8；截断30–95。非概率。",
+            "score_basis": "基础60；扶抑模型强且财计权达1.5加18，中和且达1.5加12，弱且达2.5减12，强且低于1.5减5；非日干见食伤且财达阈值加8；截断30–95。非概率。",
             "wealth_strength_kind": "element_occurrence_weight",
             "score": score,
             "level": level,

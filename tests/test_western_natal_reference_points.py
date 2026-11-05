@@ -1,6 +1,5 @@
 """Natal point identities follow actual factors, models and delivery contracts."""
 
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -10,8 +9,9 @@ import pytest
 from fatebridge.core.astro import chart as core_chart
 from fatebridge.core.output_charts import ChartProfile
 from fatebridge.services.astrology import calculate_core_chart_analysis
+from tests.reference_data import verify_source_files
 
-FIXTURE = Path(__file__).parent / "fixtures/western-natal-reference-points-v1"
+FIXTURE = Path(__file__).parent / "data/astro/natal_reference_points"
 PROTOCOL = json.loads((FIXTURE / "protocol.json").read_text())
 INPUT = dict(
     birth_year=2026,
@@ -27,10 +27,7 @@ INPUT = dict(
 
 
 def test_expected_point_contract_was_frozen_before_production_change():
-    manifest = json.loads((FIXTURE / "manifest.json").read_text())
-    assert hashlib.sha256((FIXTURE / "protocol.json").read_bytes()).hexdigest() == (
-        manifest["protocol_sha256"]
-    )
+    verify_source_files(FIXTURE)
     assert len(PROTOCOL["cases"]) == 18
     assert PROTOCOL["real_world_outcomes"] == 0
 

@@ -106,7 +106,6 @@ def test_scan_confirmed_adjacent_repetition_stays_a_diagnostic_without_correctio
         "manifest.json",
         "wujing-literal-cycles.json",
         "wujing-siku-yin.html",
-        "initial-extractor.py.txt",
         "wujing-cadal06047942.djvu",
         "wujing-cadal-page90.jpg",
         "name-reference.json",

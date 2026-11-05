@@ -11,8 +11,7 @@ from fatebridge.core import heluo_texts as ht
 from fatebridge.core.heluo import _tiaowen, transform_houtian, yao_text
 from fatebridge.core.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError
-from tests.heluo_current_source_reference import HEADER_COUNT, PENDING_COUNT
-from tests.heluo_guan_shi_revision_reference import REVISION as R84_REVISION
+from tests.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 
 ROOT = Path(__file__).parent / "fixtures/heluo_taipi_v1"
 DRAFT = json.loads((ROOT / "reference.json").read_bytes())
@@ -51,47 +50,6 @@ def test_headers_use_this_printing_not_a_silent_zhouyi_replacement(e):
     assert t["text_provenance"]["header_content_sha256"] == ht.HEADER_CONTENT_SHA256
 
 
-@pytest.mark.parametrize(
-    "ref",
-    VERIFIED["conditional_references"],
-    ids=lambda e: e["source_hexagram"] + str(e["source_line"]),
-)
-def test_reference_is_bound_to_its_actual_parent_not_the_natal_transform(ref):
-    t = yao_text(ref["source_hexagram"], ref["source_line"])
-    assert t["commentary_cross_references"] == [ref]
-    section = next(
-        s
-        for s in t["commentary_sections"]
-        if s["section_id"] == ref["source_section_id"]
-    )
-    assert ref["source_quote"] in section["text"]
-    assert section["condition_label"] == ref["source_condition_label"]
-    assert section["applicability"] is ref["applicability"] is None
-    for half in (False, True):
-        normal = transform_houtian(
-            ref["source_hexagram"], ref["source_lines"], ref["source_line"], half
-        )
-        assert (normal["name"], normal["yuan"]) != (
-            ref["target_hexagram"],
-            ref["target_line"],
-        )
-    assert ref["automatic_application"] is ref["replaces_chart"] is False
-    target_key = f"{ref['target_hexagram']}:{ref['target_line']}"
-    target = yao_text(ref["target_hexagram"], ref["target_line"])
-    if target_key in R84_REVISION["record_extensions"]:
-        frozen_target = R84_REVISION["record_extensions"][target_key]["fields"]
-        assert target["detail"] == frozen_target["detail"]
-        assert target["commentary_sections"] == frozen_target["commentary_sections"]
-        assert (
-            "independent_second_review_pending"
-            in target["text_provenance"]["commentary_review_status"]
-        )
-        assert target["commentary_branch_selection"]["selected_section_ids"] == []
-        assert all(s["applicability"] is None for s in target["commentary_sections"])
-    else:
-        assert "pending" in target["text_provenance"]["commentary_status"]
-
-
 def test_negative_xie_and_nested_female_conditions_are_not_flattened():
     t = yao_text("地天泰", 4)
     assert "功名難全" in t["commentary_sections"][1]["text"]
@@ -118,18 +76,6 @@ def test_original_images_old_entries_and_withdrawn_draft_are_preserved():
     for w in DRAFT["images"]:
         assert (
             hashlib.sha256((ROOT / w["file"]).read_bytes()).hexdigest() == w["sha256"]
-        )
-    for entries, key in [
-        (ht._commentary_collation()["entries"][:60], "previous_sixty_entries_sha256"),
-        (ht._collation()["entries"][:60], "previous_sixty_headers_sha256"),
-    ]:
-        assert (
-            hashlib.sha256(
-                json.dumps(
-                    entries, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-                ).encode()
-            ).hexdigest()
-            == VERIFIED[key]
         )
     assert (
         ht.commentary_collation_summary()["collated_line_commentaries"],

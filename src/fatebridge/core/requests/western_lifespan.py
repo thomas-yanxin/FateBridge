@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
-from typing import Optional, Union
+from typing import Literal, Optional, Union
 
 from pydantic import Field
 
 from fatebridge.core.requests.birth import AstroBirthRequest
 from fatebridge.core.requests.western_policy import WesternEphemerisRequest
 from fatebridge.utils.house_systems import TWELVE_HOUSE_SYSTEM_NOTE
+
+ClassicalPlanet = Literal[
+    "Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"
+]
 
 
 class AstroLifespanRequest(AstroBirthRequest, WesternEphemerisRequest):
@@ -67,7 +71,7 @@ class AstroTriplicityRulersRequest(AstroLifespanRequest):
         le=200,
         description="Nominal lifespan (years) the stages divide — a dividing convention, not a prediction",
     )
-    division: str = Field(
+    division: Literal["thirds", "halves"] = Field(
         default="thirds",
         description="Stage split: 'thirds' (three equal stages) or 'halves' (main/secondary halves + participating throughout)",
     )
@@ -87,7 +91,7 @@ class AstroLunationPhaseRequest(AstroLifespanRequest):
 class AstroDistributionsRequest(AstroLifespanRequest):
     """Request model for the 界推运 / 分配法 (distributions) tool."""
 
-    time_key: str = Field(
+    time_key: Literal["Ptolemy", "Naibod"] = Field(
         default="Ptolemy",
         description="Time key for directing the Ascendant: Ptolemy (1°/yr) or Naibod",
     )
@@ -102,11 +106,11 @@ class AstroDistributionsRequest(AstroLifespanRequest):
 class AstroBalbillusRequest(AstroLifespanRequest):
     """Request model for the Balbillus 129年系统 tool."""
 
-    start_planet: str = Field(
+    start_planet: ClassicalPlanet = Field(
         default="Sun",
         description="Starting planet for the period chain (Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn)",
     )
-    mode: str = Field(
+    mode: Literal["nearest", "forward"] = Field(
         default="nearest",
         description="Exaltation-distance mode: 'nearest' (with reduction fit) or 'forward'",
     )
@@ -121,7 +125,7 @@ class AstroBalbillusRequest(AstroLifespanRequest):
 class AstroKeypointsRequest(AstroLifespanRequest):
     """Request model for the 数字相位推运 (120-year keypoints) tool."""
 
-    release_mode: str = Field(
+    release_mode: Literal["soul", "body"] = Field(
         default="soul",
         description="Release point: 'soul' (from the Moon) or 'body' (from the Ascendant)",
     )
@@ -136,7 +140,7 @@ class AstroKeypointsRequest(AstroLifespanRequest):
 class AstroYearSystem129Request(AstroLifespanRequest):
     """Request model for the 129年系统 tool."""
 
-    start_planet: str = Field(
+    start_planet: ClassicalPlanet = Field(
         default="Sun",
         description="Starting planet for the small-year rotation (Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn)",
     )
@@ -151,7 +155,7 @@ class AstroYearSystem129Request(AstroLifespanRequest):
 class AstroPlanetaryArcRequest(AstroLifespanRequest):
     """Request model for the 行星弧方向 (planetary arc directions) tool."""
 
-    arc_source: str = Field(
+    arc_source: Union[ClassicalPlanet, Literal["Ascendant", "Medium_Coeli"]] = Field(
         default="Moon",
         description="Body whose secondary-progressed arc directs the whole chart (default Moon)",
     )

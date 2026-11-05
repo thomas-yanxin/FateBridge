@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-CORPUS = ROOT / "tests/fixtures/bazi_classical_v1"
+CORPUS = ROOT / "tests/data/bazi_classical_v1"
 FREEZE = CORPUS / "provenance/reference-freeze.json"
 PILLAR_NAMES = ("year", "month", "day", "hour")
 
@@ -148,7 +148,7 @@ def audit(split: str = "all") -> dict[str, Any]:
                 "disagreements": case["disagreements"],
             }
         )
-    from fatebridge.core.classical import _STRONG_STAGES, twelve_life_stage
+    from fatebridge.core.classical import twelve_life_stage
     from fatebridge.utils.data import BRANCH_HIDDEN_STEMS, STEM_ELEMENTS
 
     probes = []
@@ -167,10 +167,6 @@ def audit(split: str = "all") -> dict[str, Any]:
                     "reference": probe,
                     "actual_hidden_stem_root": hidden_root,
                     "life_stage": twelve_life_stage(inp["day_stem"], inp["branch"]),
-                    "in_production_life_stage_strong_bucket": twelve_life_stage(
-                        inp["day_stem"], inp["branch"]
-                    )
-                    in _STRONG_STAGES,
                     "hidden_root_status": (
                         "match"
                         if hidden_root == probe["expected"]["hidden_stem_root"]

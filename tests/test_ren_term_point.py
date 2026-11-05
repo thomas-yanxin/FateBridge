@@ -24,7 +24,7 @@ from tests.test_ren_transports import PAYLOAD
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/ren_term_point_v1"
-PIN = "135c9c197860fdf409cd0f71a7eeccd13fc896bd5d3863ad3d2e2d824433d77a"
+PIN = "7b2674b81b7323a046ebd39fc6516ab68c57e60d6ef8c890cb6135742a7fc4b9"
 
 
 def reference():
@@ -113,7 +113,7 @@ def payload_for(key):
             time="21:18:37",
             zone="+08:00",
             qimen_options={"layout": "direct"},
-            taiyi_options={"accNum": 0},
+            taiyi_options={},
             use_true_solar_time=False,
             liureng_is_diurnal=False,
         )

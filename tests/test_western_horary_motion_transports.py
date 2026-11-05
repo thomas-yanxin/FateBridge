@@ -121,10 +121,7 @@ def test_failed_native_event_search_remains_unknown_in_public_schema(rest, monke
     output = result.json()["horary"]
     assert output["moon"]["void_of_course"] is None
     assert output["moon"]["motion_basis"]["status"] == "unavailable"
-    assert not any(
-        row["code"] == "moon_void_of_course"
-        for row in output["radicality"]["strictures"]
-    )
+    assert not any(row["code"] == "C05" for row in output["radicality"]["strictures"])
     assert output["verdict"] == "uncertain"
 
 

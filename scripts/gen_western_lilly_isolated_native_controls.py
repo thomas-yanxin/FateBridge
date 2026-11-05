@@ -1,9 +1,7 @@
-"""Raw native definition controls with explicit cache isolation, not astronomy truth.
+"""Same-build raw native definition controls; independent physical tests are separate.
 
-The v1 collector reused C state across centuries. Its bytes and failed
-arithmetic comparison are retained. This post-candidate control keeps the same
-epochs and arithmetic line but resets native state before each body, as the
-production state reader does. No FateBridge code is imported.
+Reset before each body, matching the production reader's cache policy. These
+controls verify native API arithmetic, not independent dynamics or source truth.
 """
 
 from __future__ import annotations
@@ -44,10 +42,7 @@ def collect(protocol: Path) -> dict:
         "native_version": swe.version,
         "production_imports": False,
         "independent_astronomy": False,
-        "collected_after_candidate": True,
-        "input_cases_or_arithmetic_line_changed": False,
         "native_state_policy": "close and set path before each body",
-        "v1_raw_failure_reclassified_as_pass": False,
         "rows": rows,
     }
 

@@ -100,7 +100,7 @@ def expected_rows(board: dict[str, Any], day: str) -> list[tuple[str, str, str]]
     return rows
 
 
-def audit(baseline: Path | None = None) -> dict[str, Any]:
+def audit() -> dict[str, Any]:
     ref = reference()
     paths = [
         p
@@ -134,12 +134,6 @@ def audit(baseline: Path | None = None) -> dict[str, Any]:
                     matched=actual == exp,
                 )
             )
-    baseline_map = None
-    if baseline is not None:
-        base = json.loads(baseline.read_text())["rows"]
-        if len(base) != 720 or len({(v["day"], v["general"]) for v in base}) != 720:
-            raise ValueError("Full720 engineering baseline required")
-        baseline_map = {(v["day"], v["general"]): v["board"] for v in base}
     boards, failures, differences = [], [], []
     core_keys = [
         "month_general",
@@ -192,30 +186,6 @@ def audit(baseline: Path | None = None) -> dict[str, Any]:
                     )
             if errors:
                 failures.append(dict(day=day, general=general, errors=errors))
-            if baseline_map is not None:
-                old = baseline_map[day, general]
-                for key in core_keys:
-                    if old[key] != board[key]:
-                        differences.append(dict(day=day, general=general, key=key))
-                for a, b in zip(old["four_lessons"], board["four_lessons"]):
-                    if {k: v for k, v in a.items() if k != "style_basis"} != {
-                        k: v for k, v in b.items() if k != "style_basis"
-                    }:
-                        differences.append(
-                            dict(day=day, general=general, key="four_lessons")
-                        )
-                    if a["style_basis"] != b["style_basis"] and not (
-                        a["style_basis"] == "上神与下神相合，以和合成局为先。"
-                        and b["style_basis"]
-                        == "上下六合；刑、破等关系另列，不据合独断成局。"
-                    ):
-                        differences.append(
-                            dict(
-                                day=day,
-                                general=general,
-                                key="unapproved_style_basis_difference",
-                            )
-                        )
             boards.append(
                 dict(day=day, general=general, compared_pairs=47, matched=not errors)
             )
@@ -230,7 +200,6 @@ def audit(baseline: Path | None = None) -> dict[str, Any]:
         symbolic_board_count=len(boards),
         symbolic_pair_comparisons=count,
         matrix_failures=failures,
-        engineering_baseline_count=720 if baseline_map is not None else 0,
         baseline_core_differences=differences,
         implementation_sha256=before,
         implementation_unchanged=before == after,
@@ -249,11 +218,10 @@ def audit(baseline: Path | None = None) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--baseline", type=Path)
     args = parser.parse_args()
     if args.output.exists():
         raise FileExistsError("Refuse to overwrite original branch evidence")
-    result = audit(args.baseline)
+    result = audit()
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     return 0 if result["engineering_checks_passed"] else 1
 

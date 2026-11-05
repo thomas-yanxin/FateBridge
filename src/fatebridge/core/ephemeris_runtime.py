@@ -48,6 +48,9 @@ _PROJECT_ROOT = Path(__file__).resolve().parents[3]
 _EPHEMERIS_LOCK = RLock()
 _configured_path: Optional[str] = None
 _THREAD_STATE = local()
+# Some native builds share this path across threads. Keep both caches under
+# the same lock; other builds still require each thread's own initialization.
+_LAST_APPLIED_PATH: tuple[int, str | None] | None = None
 # Swiss 2.10's AS_MAXCH=256 reserves a trailing separator and file-name space.
 # Longer inputs are silently replaced by the library's compiled default path.
 _MAX_EPHE_PATH_BYTES = MAX_EPHEMERIS_PATH_BYTES
@@ -108,7 +111,7 @@ def configure_ephemeris_path(path: Optional[str] = None) -> Optional[str]:
     Direct calls also initialise the path in their calling thread; configuring
     the importing thread alone is insufficient for a fresh REST worker.
     """
-    global _configured_path
+    global _configured_path, _LAST_APPLIED_PATH
     with _EPHEMERIS_LOCK:
         if swe is None:
             return None
@@ -118,7 +121,9 @@ def configure_ephemeris_path(path: Optional[str] = None) -> Optional[str]:
         )
         # Initialisation and reset also matter with no custom data directory.
         swe.set_ephe_path(resolved or "")
-        _THREAD_STATE.signature = (id(swe), resolved)
+        signature = (id(swe), resolved)
+        _THREAD_STATE.signature = signature
+        _LAST_APPLIED_PATH = signature
         _configured_path = resolved
         return resolved
 
@@ -138,6 +143,7 @@ def preserve_ephemeris_path() -> Iterator[None]:
     used by direct ephemeris calls until its calculation and path restoration
     finish, including when the third-party call raises.
     """
+    global _LAST_APPLIED_PATH
     with _EPHEMERIS_LOCK:
         try:
             yield
@@ -145,11 +151,14 @@ def preserve_ephemeris_path() -> Iterator[None]:
             if swe is not None:
                 selected = configured_ephemeris_path()
                 swe.set_ephe_path(selected or "")
-                _THREAD_STATE.signature = (id(swe), selected)
+                signature = (id(swe), selected)
+                _THREAD_STATE.signature = signature
+                _LAST_APPLIED_PATH = signature
 
 
 def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
     """Run a direct Swiss Ephemeris call outside third-party path changes."""
+    global _LAST_APPLIED_PATH
     from fatebridge.core.physical_source_observation import native_call_policy
 
     with (
@@ -167,11 +176,15 @@ def ephemeris_call(operation: str, *args: Any, **kwargs: Any) -> Any:
             raise ImportError("swisseph is unavailable")
         selected = configured_ephemeris_path()
         signature = (id(swe), selected)
-        if getattr(_THREAD_STATE, "signature", None) != signature:
+        if (
+            getattr(_THREAD_STATE, "signature", None) != signature
+            or _LAST_APPLIED_PATH != signature
+        ):
             # deltat_ex requires initialisation even with no .se1 files.
             # Apply once per thread/path, avoiding a cache reset on every call.
             swe.set_ephe_path(selected or "")
             _THREAD_STATE.signature = signature
+            _LAST_APPLIED_PATH = signature
         jpl = configured_jpl_file()
         if jpl is None:
             return observe(

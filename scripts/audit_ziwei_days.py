@@ -12,7 +12,7 @@ from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures/ziwei_independent"
+FIXTURES = ROOT / "tests/data/ziwei_independent"
 BRANCHES_FROM_YIN = "寅卯辰巳午未申酉戌亥子丑"
 # A numeral parser for literal source labels, independent of placement code.
 DAY_LABELS = (

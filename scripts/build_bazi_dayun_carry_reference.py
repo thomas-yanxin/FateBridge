@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_dayun_calendar_carries_v1"
+FIXTURE = ROOT / "tests/data/bazi_dayun_calendar_carries_v1"
 US = timedelta(microseconds=1)
 DAY_US = 86400 * 1_000_000
 JIE = {
@@ -155,7 +155,6 @@ def main():
         "recorded_at_utc": datetime.now(timezone.utc).isoformat(),
         "protocol_sha256": sha(protocol_path),
         "source_sha256": sha(source),
-        "collector_sha256": sha(__file__),
         "counts": dict(counts),
         "rows": rows,
         "scope": protocol["source_scope"],

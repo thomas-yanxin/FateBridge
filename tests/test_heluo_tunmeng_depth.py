@@ -11,7 +11,7 @@ from fatebridge.core import heluo_texts
 from fatebridge.core.heluo import _tiaowen, yao_text
 from fatebridge.core.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError
-from tests.heluo_current_source_reference import HEADER_COUNT, PENDING_COUNT
+from tests.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 
 ROOT = Path(__file__).parent / "fixtures/heluo_tunmeng_v1"
 REF = json.loads((ROOT / "reference.json").read_text())

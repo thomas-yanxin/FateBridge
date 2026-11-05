@@ -7,9 +7,9 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
+from tests.canping_output_injection import inject_canping_output as return_frozen_output
 from tests.test_agentic_nested_outputs import SPECS, business
 from tests.test_agentic_nested_outputs import rest as shared_rest
-from tests.test_canping_receipt_binding_transports import return_frozen_output
 from tests.test_heluo_poem_transports import run_three
 
 rest = shared_rest

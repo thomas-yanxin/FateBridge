@@ -20,8 +20,8 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 ROOT = Path(__file__).resolve().parents[1]
-PLAN = ROOT / "docs/validation/human-design-icrf-horizons-v1/evidence/plan.json"
-PLAN_SHA256 = "c7941ea8847d782c46610da9d8b840d578f7ce267aecdb98b5013a4fe941f936"
+PLAN = ROOT / "tests/data/human_design/icrf_horizons/evidence/plan.json"
+PLAN_SHA256 = "44eb681353feabc2b3b2bb8fdea5944429f5668fb4edc8510e3d6594340a9833"
 URL = "https://ssd.jpl.nasa.gov/api/horizons.api"
 
 
@@ -186,7 +186,6 @@ def collect(directory: Path) -> None:
     result = {
         "method_id": "human_design_same_response_horizons31_45_reference_v1",
         "plan_sha256": PLAN_SHA256,
-        "collector_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "records": records,
         "errors": errors,
         "complete_all34_original_pairs": not errors and len(records) == 2,
@@ -255,7 +254,6 @@ def derive_de440(output: Path) -> None:
         value = {
             "method_id": "human_design_de440_icrf_apparent_reference_v1",
             "plan_sha256": PLAN_SHA256,
-            "generator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             "kernel_sha256": digest.hexdigest(),
             "versions": fixed["reference_versions"],
             "records": records,

@@ -17,6 +17,7 @@ from scripts.audit_ziwei import (
     synthetic_seed,
 )
 from scripts.audit_ziwei_phase import audit_phase_days, new_moons
+from scripts.ziwei_conditional_inputs import synthetic_birth_clock
 
 
 def test_nasa_new_moons_cover_335_pre_hko_days_without_claiming_month_numbering():
@@ -109,7 +110,7 @@ def test_annual_virtues_and_flying_stars_are_not_natal_or_boshi_stars():
     )
     before = deepcopy(chart)
     result = build_ziwei_horoscope(
-        nominal_age_basis="legacy_mixed_clock",
+        birth_seed=synthetic_birth_clock(int((chart)["lunar_date"]["year"])),
         chart=chart,
         gender="男",
         target_seed=synthetic_seed(2027, 6, 15),
@@ -146,7 +147,7 @@ def test_three_sha_returns_only_the_group_the_text_explicitly_supplies():
         synthetic_seed(1984), "男", rule_profile="quanshu_v2_excerpt"
     )
     result = build_ziwei_horoscope(
-        nominal_age_basis="legacy_mixed_clock",
+        birth_seed=synthetic_birth_clock(int((chart)["lunar_date"]["year"])),
         chart=chart,
         gender="男",
         target_seed=synthetic_seed(2027),

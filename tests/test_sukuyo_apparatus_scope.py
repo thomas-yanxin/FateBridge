@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-FIXTURE = Path(__file__).parent / "fixtures/sukuyo-apparatus-before-production-v77.json"
+FIXTURE = Path(__file__).parent / "data/sukuyo-apparatus-before-production-v77.json"
 
 
 def collector():

@@ -21,7 +21,6 @@ from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.chart import build_core_chart_payload
 from fatebridge.core.astro.geometry import _julian_day
 from fatebridge.core.classical_western import (
-    OUT_OF_BOUNDS_LIMIT,
     build_almuten_figuris,
     build_planet_classical,
     is_retrograde,
@@ -66,14 +65,15 @@ def test_is_retrograde_unknown_speed_is_none():
 
 
 def test_out_of_bounds_brackets_the_solar_limit():
-    assert out_of_bounds(OUT_OF_BOUNDS_LIMIT + 0.01) is True
-    assert out_of_bounds(-(OUT_OF_BOUNDS_LIMIT + 0.01)) is True  # symmetric
-    assert out_of_bounds(OUT_OF_BOUNDS_LIMIT - 0.01) is False
-    assert out_of_bounds(0.0) is False
+    assert out_of_bounds(23.41, 23.4) is True
+    assert out_of_bounds(-23.41, 23.4) is True  # symmetric
+    assert out_of_bounds(23.39, 23.4) is False
+    assert out_of_bounds(0.0, 23.4) is False
 
 
 def test_out_of_bounds_unknown_declination_is_none():
     assert out_of_bounds(None) is None
+    assert out_of_bounds(24.0) is None
 
 
 def test_build_planet_classical_degrades_without_ephemeris():
@@ -102,6 +102,7 @@ def test_build_planet_classical_threads_speed_and_declination():
         chart_sect="day",
         longitude_speed=-0.05,
         declination=25.0,
+        obliquity=23.4,
     )
     assert entry["retrograde"] is True
     assert entry["out_of_bounds"] is True

@@ -1,12 +1,11 @@
 """File-backed high-precision Sun identity, failure semantics and consumers."""
 
 import asyncio
-import gzip
 import hashlib
 import importlib.metadata
 import json
 import shutil
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -20,12 +19,14 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_year_contract import TOPICS
 
+rest = _shared_rest
+
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_boundary_decisions_v1"
+FIXTURE = ROOT / "tests/data/bazi_boundary_decisions_v1"
 KERNEL = ROOT / "ephe/solar-de440.bsp"
 if not KERNEL.exists():
     KERNEL = Path("/tmp/fatebridge-fengshui-calendar-v10/de440.bsp")

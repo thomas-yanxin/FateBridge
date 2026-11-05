@@ -1,15 +1,14 @@
-# 双人评分的计算与版本追踪
+# 双人评分的计算与依据
 
 [文档中心](README.md) · [八字判定](bazi-assessment.md) · [API 参考](api-reference.md)
 
 双人配合结果可以拆开阅读：先看各项规则怎样评价双方结构，再看关系类型如何影响权重，最后结合具体互动讨论相处与磨合。以下计算说明适用于 `two_person_compatibility` 的分数解释与版本核对。
 
-双人综合分使用 `compatibility_weighted_rules_v2`，将五项规则分数按关系类型加权。它表示模型内部的结构评价，不是现实关系的成功概率；其他关系技法的评分不适用这套权重。
+双人综合分使用 `compatibility_weighted_rules_v3`，将五项规则索引按关系类型加权。`score_kind=uncalibrated_rule_index` 表示未校准的内部指标；它不是现实关系的成功概率，其他关系技法不适用这套权重。
 
-个人层取用现为`source_conditions_before_preference_v2`：旧共现首候选不再越级授予全局喜用，
-详见[月令与取用条件](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-month-paths.md)。示例账本保留此前全部版本及原始文件，
-另立共享v5方法回执与新取用策略记录。该对示例的数值项不变；
-这不表示其他输入的个人取用或合盘分数不变，也没有为维持总分调整关系权重。
+个人层取用使用`source_conditions_before_preference_v3`，先核对来源条件，再确定可用的喜用与回避项，
+详见[八字判定](bazi-assessment.md)。独立手算账本列出固定输入、逐条加减、封顶及关系权重，
+不以旧算法输出或源码哈希作为正确答案。
 
 首次接入先按 [API 参考](api-reference.md) 提供两人的已确认资料；关系类型未指定时使用 `general`。读取结果时依次核对[分项权重](#分项权重与舍入)、[计算回执](#计算回执)和[解释范围](#解释范围)。
 
@@ -25,7 +24,7 @@
 
 总分用声明的十进制分项及权重求各项 `score × weight` 之和，再截到 0–100，
 按十进制 half-even（恰好一半时取偶数）保留一位小数。
-v2保留全部关系权重，修正v1二进制累加在半分位可能改变舍入方向的问题。
+相克扣分须命中明确回避项，中性和未裁定不补成忌；仅一方或双方未有喜忌命中的名义合局列为 `unresolved_patterns`，不计为双向支持或承压。基础60分本身不能生成互助结论。
 独立传统净分 `traditional_compatibility` 不加入综合分，
 与上表中的传统分析维度分开读取。
 
@@ -44,15 +43,19 @@ v2保留全部关系权重，修正v1二进制累加在半分位可能改变舍�
 `summary.scoring` 记录本次实际使用的输入版本和分项：
 
 - `method_id`：关系加权规则版本。
+- `evidence_policy/status/unresolved_dimensions`：取用证据政策、完整程度和未裁定分项；`partial` 时摘要只陈述规则索引及条件，不生成确定匹配等级。
 - `input_methods.person1/person2`：旺衰模型、分类、状态及喜用解析策略。
   无版本信息的输入标为 `unversioned`。
 - `dimensions`：每项实际使用的 `score/weight/weighted_score`。
+- `dependency_policy/dimension_dependencies`：分项共享的出生、强弱、分布及取用依据；不是五份独立证据，不能据分项数量增加置信度。
 - `unrounded_score`：最终截取、舍入之前的总和。
 - `rounding`：最终显示分数的截取和舍入规则。
 
 回执记录原计算，不另行打分。旺衰或喜用模型变化可改变喜用互助、十神承接及
 事件分类，即使四柱、五行结构计数和关系权重保持相同，总分也可能变化。
 比较版本时，应分别核对输入模型、逐项得分、权重和加权贡献。
+
+完整结果还核验五个具名分项、权重和为1、逐项乘积、未舍入总和、最终舍入及摘要状态。发现接口中的方法合同登记适用前提与比较范围，并参与回执合同散列。该校验验证账本一致性，不证明权重具有实证效度。
 
 旺衰与喜用的计算范围见[八字判定说明](bazi-assessment.md)。
 `strength_status=rule_based` 不代表喜用层已无条件成立；
@@ -62,24 +65,27 @@ v2保留全部关系权重，修正v1二进制累加在半分位可能改变舍�
 ## 解释范围
 
 格局协同会消费合并事件中的个人内部事件，综合分因此不等同于纯跨人互动分。
-单方喜用命中的事件分类是工程规则，不能据此断言另一方现实中承压。
+单方喜用命中只保留该方参考；另一方效力未定时列为未决。逐人 `person_info.*.preference_assessment` 保留已选喜用、回避、条件和中性，日主相克另列 `control_evidence`；不能据此断言另一方现实中承压。
 模型版本、固定命例符合度或参数稳定性均不证明现实预测效力。
 
 实现位于 [`analysis/compatibility.py`](../src/fatebridge/analysis/compatibility.py)。追查总分变化时，先看变化来自哪一项 `weighted_score`，再核对该项的输入与规则；只比较最终分数无法区分模型升级和关系权重变化。
 
 ## 回归依据
 
-固定输入、五种关系权重和逐条加减项保存在
-`compatibility-score-reference.json`（本地数据：`../tests/fixtures/compatibility-score-reference.json`）。
+固定输入、五种关系权重和逐条加减项保存在本地独立资料
+`tests/data/compatibility/score-ledger.json`。
 [`test_compatibility_score_provenance.py`](../tests/test_compatibility_score_provenance.py)
-使用独立十进制账本核对历史与当前输入、单人输入升级的影响、分项贡献、
-旺衰与喜用版本，以及 REST、MCP、CLI 的计算回执。
+使用有理数与十进制手算账本核对当前输入、分项贡献、
+旺衰与喜用依据，以及 REST、MCP、CLI 的计算回执。
 
-账本保留静态v1、旺衰v2及结构根v4三组输入。公开虚构示例在旺衰v4中，
-第一人因两处庚巳阳长生根计入原有结构规则，从中和改为强；第二人仍为强。
-一般关系精确总和由71.63变为80.03，显示80.0；这是上游变化，不是权重调优。
-家庭关系精确总和75.85按half-even显示75.8，避免原浮点累加误显示75.9。
-十神分项的原始加减和超过100时仍按原规则截到100，账本保留截取前的逐项值。
+两组独立账本的输入前提不同，不能互换结果：
+
+| 账本 | 输入前提 | 一般关系结果与用途 |
+| --- | --- | --- |
+| [当前来源条件账本](../tests/data/compatibility/source-condition-ledger.json) | 第一人结构判为强，身印预算为 276／709，但数值档为弱，普通扶抑取用仍待复核；喜忌不由“强”标签补出 | 当前目录的虚构示例五项为 69／77／90／52／39，加权和 72.71，显示 **72.7**，`status=partial` |
+| [明确给定喜忌的字面账本](../tests/data/compatibility/score-ledger.json) | 测试显式给定完整喜用、回避和条件项 | 加权和 80.03，显示 **80.0**；用于核对所声明前提下的有限评分算术，不作为当前示例的取用结论 |
+
+字面账本的家庭关系和为 75.85，按 half-even 显示 75.8，用来防止浮点累加误显示 75.9。十神分项原始和超过 100 时仍按原规则截到 100，截取前的逐项值保留。权重、封顶及原有字面账本没有因取用未决而修改。
 
 ```bash
 uv run --locked --extra dev pytest -q \

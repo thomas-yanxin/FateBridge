@@ -31,6 +31,21 @@ def assert_same_receipt_with_explicit_runtime_delivery(inline, complete, referen
         if path.startswith("run_metadata.")
     }
     restored_paths = set()
+    evidence = restored.get("calculation_evidence")
+    if (
+        evidence
+        and evidence.get("delivery_path") == "run_metadata.calculation_evidence"
+    ):
+        from fatebridge.utils.json_digest import digest
+
+        path = "run_metadata.calculation_evidence"
+        assert path in declared
+        assert evidence["sha256"] == digest(complete["calculation_evidence"])
+        assert evidence["coverage"] == complete["calculation_evidence"]["coverage"]
+        restored["calculation_evidence"] = copy.deepcopy(
+            complete["calculation_evidence"]
+        )
+        restored_paths.add(path)
     runtime = restored.get("runtime") or {}
     if runtime.get("delivery_path") == "run_metadata.runtime":
         assert "run_metadata.runtime" in declared
@@ -206,7 +221,7 @@ async def test_published_stage_view_retains_actual_period_boundaries():
 @pytest.mark.asyncio
 @pytest.mark.local_data
 async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls():
-    from tests.compatibility_reference import assert_score_reference
+    from tests.compatibility_reference import assert_source_condition_score_reference
 
     records = await builder.call_contracts()
     specs = {s.tool_name: s for s in CATALOG}
@@ -275,7 +290,15 @@ async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls():
                 )
                 assert "timing_context" in payload["career_analysis"]
             elif record["tool"] == "two_person_compatibility":
-                assert_score_reference(payload["summary"], payload["detailed_analysis"])
+                # This live source case has no first-person preference decision;
+                # the original full-profile literal ledger is a different input.
+                first = payload["person_info"]["person1"]["preference_assessment"]
+                assert first["useful_elements"] == first["avoid_elements"] == []
+                assert set(first["conditional_elements"]) == {"火", "土", "水"}
+                assert set(first["neutral_elements"]) == {"木", "金"}
+                assert_source_condition_score_reference(
+                    payload["summary"], payload["detailed_analysis"]
+                )
                 assert "score_basis" in payload["traditional_compatibility"]
             elif record["tool"] == "timing_analysis":
                 assert "analysis_calendar" in payload

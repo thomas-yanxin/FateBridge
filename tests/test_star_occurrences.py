@@ -10,9 +10,7 @@ from fatebridge.core.bazi_evidence import build_natal_evidence
 from fatebridge.core.output_star_occurrences import StarOccurrenceCount, StarOccurrences
 from fatebridge.core.star_occurrences import build_star_occurrences
 
-FIXTURE = (
-    Path(__file__).parent / "fixtures/bazi_root_force_experiment_v4/reference.json"
-)
+FIXTURE = Path(__file__).parent / "data/bazi/star-count-source-cases.json"
 CASES = [
     c
     for c in json.loads(FIXTURE.read_text())["cases"]

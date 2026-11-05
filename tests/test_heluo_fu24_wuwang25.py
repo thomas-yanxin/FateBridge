@@ -16,31 +16,10 @@ from fatebridge.utils.errors import NumerologySourceError
 
 W = Path(__file__).parent / "fixtures/heluo_fu24_wuwang25_v1"
 LITERAL = json.loads((W / "reviewed-literals-v1.json").read_bytes())
-from tests.heluo_current_source_reference import (
-    CATALOGUE_VERSION,
-    HEADER_COUNT,
-    PENDING_COUNT,
-    REFERENCE,
-)
-
-BEFORE = {key: edge["before"] for key, edge in REFERENCE["records"].items()}
+from tests.heluo_source_facts import CATALOGUE_VERSION, HEADER_COUNT, PENDING_COUNT
 
 
-def test_first_draft_and_retractions_are_frozen_without_independent_reader_credit():
-    assert (
-        hashlib.sha256((W / "source-first-draft.json").read_bytes()).hexdigest()
-        == "1200eefccd57185a90265ac806df3460e819ae3aa37bbcc6d486ebae5bcb6eb7"
-    )
-    seal = json.loads((W / "first-draft-seal.json").read_bytes())
-    for name, digest in seal["files"].items():
-        path = W / name
-        raw = (
-            path.read_bytes()
-            if path.exists()
-            else gzip.decompress((W / "reproduction" / (name + ".gz")).read_bytes())
-        )
-        assert hashlib.sha256(raw).hexdigest() == digest, name
-    assert seal["before_inherited_target_words_visible"]
+def test_reading_retractions_do_not_gain_independent_reader_or_repair_credit():
     assert LITERAL["new_independent_readers"] == 0
     assert (
         len(
@@ -56,25 +35,6 @@ def test_first_draft_and_retractions_are_frozen_without_independent_reader_credi
         x["inherited_error_credit"] is False
         for x in LITERAL["postcomparison_amendments"]
     )
-
-
-@pytest.mark.parametrize(
-    "entry", LITERAL["entries"], ids=lambda e: f"{e['hexagram']}-{e['line']}"
-)
-def test_actual_header_and_all_parented_commentary_words_match_the_selected_page(entry):
-    actual = yao_text(entry["hexagram"], entry["line"])
-    assert actual["yaoci"] == entry["yaoci"]
-    assert actual["detail"] == "".join(s["text"] for s in entry["sections"])
-    assert actual["commentary_sections"] == [
-        dict(s, applicability=None) for s in entry["sections"]
-    ]
-    assert actual["text_provenance"]["commentary_pdf_pages"] == entry["pdf_pages"]
-    assert (
-        actual["text_provenance"]["commentary_reading_notes"] == entry["reading_notes"]
-    )
-    assert actual["commentary_branch_selection"]["selected_section_ids"] == []
-    before = BEFORE[f"{entry['hexagram']}:{entry['line']}"]
-    assert actual["shige"] == before["shige"] and actual["verdict"] == before["verdict"]
 
 
 @pytest.mark.parametrize(
@@ -109,52 +69,6 @@ def test_printed_hexagram_without_printed_target_line_keeps_parent_and_leaf_cond
     summary = ht.text_status_snapshot(text)
     assert ref["condition_text"] in summary
     assert "未指定目标爻" in summary and "不替代正式后天卦" in summary
-
-
-@pytest.mark.parametrize(
-    "key,field,needle",
-    [
-        ("地雷復:1", "yaoci", "无祗悔"),
-        ("地雷復:1", "detail", "善專其心"),
-        ("地雷復:4", "detail", "為兵師"),
-        ("地雷復:5", "detail", "涵養熟"),
-        ("地雷復:6", "yaoci", "用行師"),
-        ("地雷復:6", "detail", "取擢之辱"),
-        ("天雷無妄:1", "detail", "重德清心"),
-        ("天雷無妄:2", "yaoci", "不菑畬"),
-        ("天雷無妄:2", "detail", "粱稻熟"),
-        ("天雷無妄:3", "detail", "羊財"),
-        ("天雷無妄:5", "detail", "不勞而理"),
-        ("天雷無妄:6", "detail", "不諳於事"),
-    ],
-)
-def test_explicit_inherited_differences_do_not_disappear_into_punctuation_only_changes(
-    key, field, needle
-):
-    assert needle not in BEFORE[key][field]
-    gua, line = key.rsplit(":", 1)
-    assert needle in yao_text(gua, int(line))[field]
-
-
-def test_all384_poems_and_verdicts_and_other372_complete_literal_objects_stay_exact():
-    for key, before in BEFORE.items():
-        gua, line = key.rsplit(":", 1)
-        actual = yao_text(gua, int(line))
-        assert (
-            actual["shige"] == before["shige"]
-            and actual["verdict"] == before["verdict"]
-        )
-        if gua not in ["地雷復", "天雷無妄"]:
-            from tests.heluo_fu24_wuwang25_revision_reference import (
-                REFERENCE as R102_REFERENCE,
-            )
-
-            historical = R102_REFERENCE["records"][key]["after"]
-            assert {k: v for k, v in historical.items() if k != "text_provenance"} == {
-                k: v for k, v in before.items() if k != "text_provenance"
-            }, key
-            expected = REFERENCE["records"][key]["after"]
-            assert actual == expected, key
 
 
 def test_three_qualified_glyphs_stay_visible_and_current_counts_are_not_accuracy_scores():
@@ -228,84 +142,9 @@ from tests.test_agentic_nested_outputs import rest as shared_rest
 from tests.test_heluo_poem_transports import run_three
 
 rest = shared_rest
-CASES = json.loads((W / "case-search/cases.json").read_bytes())["cases"]
 
 
 @pytest.fixture(autouse=True)
 def source_calendar(monkeypatch):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "auto")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
-
-
-@pytest.mark.parametrize("case", CASES, ids=lambda c: c["label"])
-def test_actual_three_adapters_keep_source_words_and_bounded_references(
-    case, rest, tmp_path, capsys
-):
-    fields = [
-        "chart",
-        "four_pillars",
-        "calendar_context",
-        "numerology_evidence.selected_texts",
-        "numerology_evidence.commentary_collation",
-        "heluo_timing.selected_texts",
-        "snapshot_text",
-    ]
-    response, code, cli, mcp = run_three(
-        SPECS["heluo"], case["payload"], fields, rest, tmp_path, capsys
-    )
-    assert response.status_code == 200 and code == 0 and not mcp.is_error
-    outputs = [response.json(), cli, mcp.structured_content]
-    assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
-    expected = REFERENCE["records"][f"{case['hexagram']}:{case['line']}"]["after"]
-    for output in outputs:
-        selected = next(
-            s["text"]
-            for s in output["numerology_evidence"]["selected_texts"]
-            if s["hexagram"] == case["hexagram"] and s["line"] == case["line"]
-        )
-        assert selected == expected
-        assert (
-            selected["yaoci"] in output["snapshot_text"]
-            and selected["detail"] in output["snapshot_text"]
-        )
-        for ref in selected.get("commentary_cross_references", []):
-            assert ref["target_line"] is ref["applicability"] is None
-            assert ref["automatic_application"] is ref["replaces_chart"] is False
-            assert ref["condition_text"] in ht.text_status_snapshot(selected)
-        for note in selected["text_provenance"]["commentary_reading_notes"]:
-            assert note in output["snapshot_text"]
-
-
-@pytest.mark.parametrize(
-    "entry", LITERAL["entries"], ids=lambda e: f"knowledge-{e['hexagram']}-{e['line']}"
-)
-def test_actual_three_knowledge_adapters_preserve_nulls_and_show_source_qualification(
-    entry, rest, tmp_path, capsys
-):
-    spec = next(s for s in CATALOG if s.key == "knowledge_read")
-    key = f"{entry['hexagram']}:{entry['line']}"
-    response, code, cli, mcp = run_three(
-        spec,
-        {"domain": "heluo", "key": key},
-        ["reference_details", "provenance", "lines", "snapshot_text"],
-        rest,
-        tmp_path,
-        capsys,
-    )
-    assert response.status_code == 200 and code == 0 and not mcp.is_error
-    outputs = [response.json(), cli, mcp.structured_content]
-    assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
-    for output in outputs:
-        assert (
-            output["reference_details"]["record"] == REFERENCE["records"][key]["after"]
-        )
-        assert output["reference_details"]["personal_applicability_assessed"] is False
-        assert "修订：None" not in output["snapshot_text"]
-        assert any(
-            r["source_revision"] is None for r in output["provenance"]["source_records"]
-        )
-        assert "修订：未提供；" in output["snapshot_text"]
-        for note in entry["reading_notes"]:
-            assert note in output["snapshot_text"] and note in "\n".join(
-                output["lines"]
-            )

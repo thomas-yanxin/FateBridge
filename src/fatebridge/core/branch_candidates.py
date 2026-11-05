@@ -23,6 +23,7 @@ KNOWN_SCREEN_METHODS = frozenset(
         "season_root_revelation_relations_v9",
         "season_root_revelation_relations_v10",
         "season_root_revelation_relations_v11",
+        "season_root_revelation_relations_v12",
     }
 )
 KINDS = {"三会", "三合", "六合", "半合"}
@@ -36,7 +37,11 @@ KNOWN_STATUSES = {
         "same_target_affiliation_only",
     },
     "半合": {"contested", "partial_tendency"},
-    "六冲": {"active", "resolved_by_combination"},
+    "六冲": {
+        "active",
+        "resolved_by_combination",
+        "resolved_by_ordered_generation_path",
+    },
     "刑": {"active", "resolved_by_combination"},
     "自刑": {"active"},
     "天干合": {"binding", "day_master_or_contested_review"},

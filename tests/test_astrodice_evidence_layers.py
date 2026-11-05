@@ -98,44 +98,17 @@ def test_fixed_position_line_accounts_for_printing_uncertainty(offset, status):
     )
 
 
-def test_derivative_version_cannot_change_without_an_explicit_frozen_declaration():
-    v6 = "fatebridge_complete_position_derivative_v6"
-    v7 = "fatebridge_complete_position_derivative_v7"
-    require_declared_derivative({}, {"status": "applied", "method_id": v6})
-    with pytest.raises(ValueError, match="not applied"):
-        require_declared_derivative({}, {"status": "applied", "method_id": v7})
+def test_current_derivative_policy_must_be_applied():
     declared = {
-        "expected_derivative_method_id": v7,
-        "candidate_files": {"src/fatebridge/core/astro/position_motion.py": "frozen"},
+        "expected_derivative_method_id": "fatebridge_complete_position_derivative_v8"
     }
-    require_declared_derivative(declared, {"status": "applied", "method_id": v7})
-    with pytest.raises(ValueError, match="not applied"):
-        require_declared_derivative(declared, {"status": "applied", "method_id": v6})
-    with pytest.raises(ValueError, match="not applied"):
-        require_declared_derivative(declared, {"status": "partial", "method_id": v7})
-    with pytest.raises(ValueError, match="not frozen"):
-        require_declared_derivative(
-            {**declared, "candidate_files": {}}, {"status": "applied", "method_id": v7}
-        )
-    with pytest.raises(ValueError, match="Unplanned"):
-        require_declared_derivative(
-            {**declared, "expected_derivative_method_id": "any-method"},
-            {"status": "applied", "method_id": "any-method"},
-        )
-
-
-def test_v8_requires_the_stable_reduction_dependency_and_an_explicit_declaration():
-    method = "fatebridge_complete_position_derivative_v8"
-    policy = {"status": "applied", "method_id": method}
-    with pytest.raises(ValueError, match="not applied"):
-        require_declared_derivative({}, policy)
-    source = {
-        "expected_derivative_method_id": method,
-        "candidate_files": {
-            "src/fatebridge/core/astro/position_motion.py": "frozen",
-        },
-    }
-    with pytest.raises(ValueError, match="not frozen"):
-        require_declared_derivative(source, policy)
-    source["candidate_files"]["src/fatebridge/core/astro/solar_decimal.py"] = "frozen"
-    require_declared_derivative(source, policy)
+    require_declared_derivative(
+        declared,
+        {"status": "applied", "method_id": declared["expected_derivative_method_id"]},
+    )
+    for policy in [
+        {"status": "partial", "method_id": declared["expected_derivative_method_id"]},
+        {"status": "applied", "method_id": "unreviewed_method"},
+    ]:
+        with pytest.raises(ValueError):
+            require_declared_derivative(declared, policy)

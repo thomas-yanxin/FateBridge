@@ -11,7 +11,7 @@ from fatebridge.core import sukuyo_dayan_reconstruction as model
 from fatebridge.core.sukuyo import calendar_mansion, day_evidence
 from fatebridge.core.sukuyo_historical_calendar import date_reference
 
-FIXTURE = Path(__file__).parent / "fixtures/sukuyo-dayan-model-all-months-v1.json.gz"
+FIXTURE = Path(__file__).parent / "data/sukuyo-dayan-model-all-months-v1.json.gz"
 
 
 def project(value):

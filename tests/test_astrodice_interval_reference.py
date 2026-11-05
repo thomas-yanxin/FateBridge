@@ -14,7 +14,10 @@ from scripts.astrodice_interval_reference import quality, replay_interval, verif
 from scripts.audit_astrodice_horizons_wide_reference import validate
 from scripts.audit_astrodice_local_motion import display_reference
 
-FIXTURE = Path(__file__).parent / "fixtures/astrodice-local-interval-development-v1"
+FIXTURE = (
+    Path(__file__).parent
+    / "data/astrodice/reference_sets/fixture-local-interval-development-v1"
+)
 
 
 def test_known_development_raw_and_every_exact_witness_replay_without_solver():

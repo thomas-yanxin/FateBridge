@@ -5,7 +5,6 @@ from typing import Any, Callable, cast
 
 from fatebridge.core.astro import native_execution
 from fatebridge.core.astro.source_session import source_session
-from fatebridge.core.human_design_context import CONTEXT_LIFETIME, CONTEXT_SCOPE
 
 
 def isolated_human_design(
@@ -21,7 +20,6 @@ def isolated_human_design(
                         "fatebridge.services.human_design.calculate_human_design",
                         args,
                         kwargs,
-                        result_encoding=native_execution.JSON_TREE_ENCODING,
                     ),
                 )
         result = function(*args, **kwargs)

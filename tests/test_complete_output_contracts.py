@@ -38,7 +38,7 @@ def test_complete_requirements_participate_in_contract_receipt_fingerprint():
     spec = career_spec()
     original = contract_fingerprint(spec.request_model, spec.output_model)
     guarded = contract_fingerprint(
-        spec.request_model, spec.output_model, spec.required_output_fields
+        spec.request_model, spec.output_model, spec.required_output_fields, spec.methods
     )
     assert original != guarded
     result = execution.execute_tool(

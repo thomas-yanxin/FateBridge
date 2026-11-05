@@ -8,6 +8,7 @@ from typing import Optional, Tuple, Type
 from pydantic import BaseModel
 from pydantic.json_schema import JsonSchemaValue
 
+from fatebridge.core.method_contracts import MethodContract
 from fatebridge.utils.json_digest import digest
 
 _LOCK = RLock()
@@ -57,6 +58,7 @@ def _fingerprint(
     output_model: Optional[Type[BaseModel]],
     output_revision: Optional[_SchemaRevision],
     required_output_fields: Tuple[str, ...],
+    methods: Tuple[MethodContract, ...],
 ) -> str:
     output_schema = None
     if output_model is not None:
@@ -68,6 +70,9 @@ def _fingerprint(
     }
     if required_output_fields:
         contract["full_result_required_fields"] = list(required_output_fields)
+        contract["full_result_empty_object_policy"] = "reject_required_roots"
+    if methods:
+        contract["methods"] = [method.as_manifest() for method in methods]
     return digest(contract)
 
 
@@ -75,6 +80,7 @@ def contract_fingerprint(
     request_model: Type[BaseModel],
     output_model: Optional[Type[BaseModel]],
     required_output_fields: Tuple[str, ...] = (),
+    methods: Tuple[MethodContract, ...] = (),
 ) -> str:
     """Hash model contracts and any complete-result requirements independently."""
     with _LOCK:
@@ -84,6 +90,7 @@ def contract_fingerprint(
             output_model,
             _revision(output_model) if output_model else None,
             required_output_fields,
+            methods,
         )
 
 

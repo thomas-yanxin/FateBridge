@@ -23,42 +23,42 @@ SOURCE_PATHS = [
     "src/fatebridge/data/sukuyo_comparative_time_units.json",
     "scripts/check_sukuyo_time_units.py",
     "tests/test_sukuyo_time_origin.py",
-    "tests/fixtures/sukuyo-comparative-time-primary.json",
+    "tests/data/sukuyo-comparative-time-primary.json",
     "src/fatebridge/core/sukuyo_printed_special.py",
     "src/fatebridge/data/sukuyo_wakita_special_days.json",
     "scripts/check_sukuyo_printed_special.py",
     "tests/test_sukuyo_printed_special.py",
-    "tests/fixtures/sukuyo-wakita-special-primary.json",
+    "tests/data/sukuyo-wakita-special-primary.json",
     "tests/test_sukuyo_sky_snapshot.py",
     "src/fatebridge/data/sukuyo_wakita_weekday.json",
     "src/fatebridge/data/sukuyo_t30107_calibration.json",
     "scripts/check_sukuyo_wakita_primary.py",
     "tests/test_sukuyo_wakita_primary.py",
-    "tests/fixtures/sukuyo-wakita-weekday-primary.json",
-    "tests/fixtures/sukuyo-calibration-precision-primary.json",
+    "tests/data/sukuyo-wakita-weekday-primary.json",
+    "tests/data/sukuyo-calibration-precision-primary.json",
     "src/fatebridge/data/sukuyo_t30107_recalculation.json",
     "scripts/check_sukuyo_weekday_recalculation.py",
     "tests/test_sukuyo_weekday_recalculation.py",
-    "tests/fixtures/sukuyo-weekday-recalculation-primary.json",
+    "tests/data/sukuyo-weekday-recalculation-primary.json",
     "src/fatebridge/core/sukuyo_weekday.py",
     "src/fatebridge/data/sukuyo_t30107_weekday_arithmetic.json",
     "scripts/check_sukuyo_weekday_arithmetic.py",
     "tests/test_sukuyo_weekday_arithmetic.py",
-    "tests/fixtures/sukuyo-weekday-arithmetic-primary.json",
+    "tests/data/sukuyo-weekday-arithmetic-primary.json",
     "src/fatebridge/core/sukuyo_clothing.py",
     "src/fatebridge/data/sukuyo_t1299_clothing.json",
     "scripts/audit_sukuyo_clothing_primary.py",
     "tests/test_sukuyo_clothing.py",
-    "tests/fixtures/sukuyo-clothing-primary.json",
+    "tests/data/sukuyo-clothing-primary.json",
     "scripts/check_sukuyo_historical_weekday.py",
-    "tests/fixtures/sukuyo-historical-weekday-primary.json",
+    "tests/data/sukuyo-historical-weekday-primary.json",
     "scripts/check_sukuyo_documentary_dates.py",
-    "tests/fixtures/sukuyo-documentary-dates.json",
+    "tests/data/sukuyo-documentary-dates.json",
     "tests/test_sukuyo_day_cycle.py",
     "src/fatebridge/core/sukuyo_taibai.py",
     "src/fatebridge/data/sukuyo_t1299_taibai.json",
     "tests/test_sukuyo_taibai.py",
-    "tests/fixtures/sukuyo-taibai-primary.json",
+    "tests/data/sukuyo-taibai-primary.json",
     "scripts/audit_sukuyo_taibai_primary.py",
     "src/fatebridge/core/sukuyo_historical_calendar.py",
     "src/fatebridge/validation/sukuyo_historical_sources.py",
@@ -68,11 +68,11 @@ SOURCE_PATHS = [
     "scripts/check_sukuyo_historical_daily.py",
     "tests/test_sukuyo_historical_calendar.py",
     "tests/test_sukuyo_historical_sources.py",
-    "tests/fixtures/sukuyo-historical-edge-probes.json",
-    "tests/fixtures/sukuyo_historical_calendar_v1/captures.zip",
-    "tests/fixtures/sukuyo_historical_calendar_v1/manifest.json",
-    "tests/fixtures/sukuyo_historical_daily_controls_v1/captures.zip",
-    "tests/fixtures/sukuyo_historical_daily_controls_v1/manifest.json",
+    "tests/data/sukuyo-historical-edge-probes.json",
+    "tests/data/sukuyo_historical_calendar_v1/captures.zip",
+    "tests/data/sukuyo_historical_calendar_v1/manifest.json",
+    "tests/data/sukuyo_historical_daily_controls_v1/captures.zip",
+    "tests/data/sukuyo_historical_daily_controls_v1/manifest.json",
     "uv.lock",
     "pyproject.toml",
     "src/fatebridge/core/sukuyo.py",
@@ -85,7 +85,7 @@ SOURCE_PATHS = [
     "scripts/check_sukuyo_hinoo_critical.py",
     "tests/test_sukuyo_hinoo_critical.py",
     "tests/test_sukuyo_boundary_receipts.py",
-    "tests/fixtures/sukuyo-t2465-kyoto-primary.json",
+    "tests/data/sukuyo-t2465-kyoto-primary.json",
     "src/fatebridge/core/sukuyo_lower.py",
     "src/fatebridge/core/sukuyo_lower_methods.py",
     "src/fatebridge/core/sukuyo_padas.py",
@@ -127,28 +127,28 @@ SOURCE_PATHS = [
     "src/fatebridge/data/sukuyo_t1299_palace_padas.json",
     "src/fatebridge/data/guolao/sefstars.txt",
     "src/fatebridge/data/guolao/sources.json",
-    "tests/fixtures/sukuyo_hko_v1/official_texts.zip",
-    "tests/fixtures/sukuyo_hutime_v1/captures.zip",
-    "tests/fixtures/sukuyo_hutime_v1/manifest.json",
-    "tests/fixtures/sukuyo_hutime_daily_v1/captures.zip",
-    "tests/fixtures/sukuyo_hutime_daily_v1/manifest.json",
-    "tests/fixtures/sukuyo-equatorial-horizons.json",
-    "tests/fixtures/sukuyo-activity-primary-excerpts.json",
-    "tests/fixtures/sukuyo-t1299-calendar-primary.json",
-    "tests/fixtures/sukuyo-fullmoon-primary.json",
-    "tests/fixtures/sukuyo-lower-primary.json",
-    "tests/fixtures/sukuyo-palace-pada-primary.json",
-    "tests/fixtures/sukuyo-rule-scope-primary.json",
-    "tests/fixtures/sukuyo-lower-methods-primary.json",
-    "tests/fixtures/sukuyo-time-gloss-primary.json",
-    "tests/fixtures/sukuyo-directions-primary.json",
-    "tests/fixtures/sukuyo-special-days-primary.json",
-    "tests/fixtures/sukuyo-hinoo-primary-cache.json",
-    "tests/fixtures/sukuyo-t2465-downloaded-primary.json",
-    "tests/fixtures/sukuyo-six-palaces-primary.json",
-    "tests/fixtures/sukuyo-sanjiu-days-primary.json",
-    "tests/fixtures/sukuyo-action-scope-primary.json",
-    "tests/fixtures/sukuyo-t1299-reference.json",
+    "tests/data/sukuyo_hko_v1/official_texts.zip",
+    "tests/data/sukuyo_hutime_v1/captures.zip",
+    "tests/data/sukuyo_hutime_v1/manifest.json",
+    "tests/data/sukuyo_hutime_daily_v1/captures.zip",
+    "tests/data/sukuyo_hutime_daily_v1/manifest.json",
+    "tests/data/sukuyo-equatorial-horizons.json",
+    "tests/data/sukuyo-activity-primary-excerpts.json",
+    "tests/data/sukuyo-t1299-calendar-primary.json",
+    "tests/data/sukuyo-fullmoon-primary.json",
+    "tests/data/sukuyo-lower-primary.json",
+    "tests/data/sukuyo-palace-pada-primary.json",
+    "tests/data/sukuyo-rule-scope-primary.json",
+    "tests/data/sukuyo-lower-methods-primary.json",
+    "tests/data/sukuyo-time-gloss-primary.json",
+    "tests/data/sukuyo-directions-primary.json",
+    "tests/data/sukuyo-special-days-primary.json",
+    "tests/data/sukuyo-hinoo-primary-cache.json",
+    "tests/data/sukuyo-t2465-downloaded-primary.json",
+    "tests/data/sukuyo-six-palaces-primary.json",
+    "tests/data/sukuyo-sanjiu-days-primary.json",
+    "tests/data/sukuyo-action-scope-primary.json",
+    "tests/data/sukuyo-t1299-reference.json",
     "tests/test_sukuyo_profiles.py",
     "tests/test_sukuyo_lower.py",
     "tests/test_sukuyo_padas.py",
@@ -156,11 +156,11 @@ SOURCE_PATHS = [
     "tests/test_sukuyo_lower_methods.py",
     "tests/test_sukuyo_transports.py",
     "tests/test_sukuyo_date_support.py",
-    "tests/fixtures/sukuyo_date_support_v1/reference.json",
-    "tests/fixtures/sukuyo_date_support_v1/northamerica-excerpts.txt",
-    "tests/fixtures/sukuyo_date_support_v1/asia-excerpts.txt",
-    "tests/fixtures/sukuyo_date_support_v1/australasia-excerpts.txt",
-    "tests/fixtures/sukuyo_date_support_v1/europe-excerpts.txt",
+    "tests/data/sukuyo_date_support_v1/reference.json",
+    "tests/data/sukuyo_date_support_v1/northamerica-excerpts.txt",
+    "tests/data/sukuyo_date_support_v1/asia-excerpts.txt",
+    "tests/data/sukuyo_date_support_v1/australasia-excerpts.txt",
+    "tests/data/sukuyo_date_support_v1/europe-excerpts.txt",
     "tests/test_sukuyo_calendar_text.py",
     "tests/test_sukuyo_time_gloss.py",
     "tests/test_sukuyo_directions.py",
@@ -242,9 +242,7 @@ def audit() -> dict:
     from scripts.check_sukuyo_time_units import verify_time_primary
 
     official = read_sources()
-    manifest = json.loads(
-        (ROOT / "tests/fixtures/sukuyo_hko_v1/manifest.json").read_text()
-    )
+    manifest = json.loads((ROOT / "tests/data/sukuyo_hko_v1/manifest.json").read_text())
     for source in manifest["sources"]:
         if hashlib.sha256(official[source["file"]]).hexdigest() != source["sha256"]:
             raise ValueError("Frozen HKO source hash mismatch")
@@ -259,7 +257,7 @@ def audit() -> dict:
             calendar_errors.append(civil)
 
     fixture = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-equatorial-horizons.json").read_text()
+        (ROOT / "tests/data/sukuyo-equatorial-horizons.json").read_text()
     )
     outputs = {}
     errors = []
@@ -317,10 +315,10 @@ def audit() -> dict:
         "activity_assessment"
     ]
     primary_cases = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-activity-primary-excerpts.json").read_text()
+        (ROOT / "tests/data/sukuyo-activity-primary-excerpts.json").read_text()
     )["cases"]
     calendar_primary = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-t1299-calendar-primary.json").read_text()
+        (ROOT / "tests/data/sukuyo-t1299-calendar-primary.json").read_text()
     )
     source_cell_errors = []
     checked_cells = 0
@@ -335,9 +333,9 @@ def audit() -> dict:
                 source_cell_errors.append([month, day])
             checked_cells += 1
     fullmoon_primary = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-fullmoon-primary.json").read_text()
+        (ROOT / "tests/data/sukuyo-fullmoon-primary.json").read_text()
     )
-    naoj = json.loads((ROOT / "tests/fixtures/sukuyo-t1299-reference.json").read_text())
+    naoj = json.loads((ROOT / "tests/data/sukuyo-t1299-reference.json").read_text())
     aliases = str.maketrans("虛婁畢參張軫", "虚娄毕参张轸")
     fullmoon_errors = []
     for month in range(1, 13):
@@ -392,7 +390,7 @@ def audit() -> dict:
         person2_calendar_day_part="second_half",
     )
     lower_primary = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-lower-primary.json").read_text()
+        (ROOT / "tests/data/sukuyo-lower-primary.json").read_text()
     )
     lower = lower_source_bundle()
     lower_refs = {r["mansion"]: r for r in lower_primary["paragraphs"]}
@@ -442,7 +440,7 @@ def audit() -> dict:
             }
         )
     pada_primary = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-palace-pada-primary.json").read_text()
+        (ROOT / "tests/data/sukuyo-palace-pada-primary.json").read_text()
     )
     pada_bundle = pada_source_bundle()
     pada_errors = []
@@ -471,7 +469,7 @@ def audit() -> dict:
     ):
         pada_errors.append("candidate_completeness_handling")
     scope_primary = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-rule-scope-primary.json").read_text()
+        (ROOT / "tests/data/sukuyo-rule-scope-primary.json").read_text()
     )
     rules = [
         *source_bundle()["rules"],
@@ -481,7 +479,7 @@ def audit() -> dict:
     ]
     passages = {r["rule_id"]: r for r in scope_primary["rule_passages"]}
     method_primary = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-lower-methods-primary.json").read_text()
+        (ROOT / "tests/data/sukuyo-lower-methods-primary.json").read_text()
     )
     passages.update({r["rule_id"]: r for r in method_primary["rule_passages"]})
     quote_errors = []
@@ -632,10 +630,10 @@ def audit() -> dict:
     import pytz
 
     support_reference = json.loads(
-        (ROOT / "tests/fixtures/sukuyo_date_support_v1/reference.json").read_text()
+        (ROOT / "tests/data/sukuyo_date_support_v1/reference.json").read_text()
     )
     for ref in support_reference["sources"]:
-        path = ROOT / "tests/fixtures/sukuyo_date_support_v1" / ref["excerpt_file"]
+        path = ROOT / "tests/data/sukuyo_date_support_v1" / ref["excerpt_file"]
         if hashlib.sha256(path.read_bytes()).hexdigest() != ref["excerpt_sha256"]:
             raise ValueError("Frozen IANA excerpt hash mismatch")
 
@@ -696,7 +694,7 @@ def audit() -> dict:
     if zone_changed:
         support_errors.append(["timezone_files_changed", zone_changed])
     gloss_primary = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-time-gloss-primary.json").read_text()
+        (ROOT / "tests/data/sukuyo-time-gloss-primary.json").read_text()
     )
     gloss_bundle = day_source_bundle()
     gloss_errors = []
@@ -741,7 +739,7 @@ def audit() -> dict:
         ):
             gloss_errors.append(["effective_day_witnesses", day])
     direction_primary = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-directions-primary.json").read_text()
+        (ROOT / "tests/data/sukuyo-directions-primary.json").read_text()
     )
     direction_bundle = direction_source_bundle()
     direction_errors = []
@@ -793,7 +791,7 @@ def audit() -> dict:
     if wall_south["evidence_status"] != "conflicted":
         direction_errors.append("wall_south_opposite_clauses")
     special_primary = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-special-days-primary.json").read_text()
+        (ROOT / "tests/data/sukuyo-special-days-primary.json").read_text()
     )
     special_bundle = special_source_bundle()
     special_errors = []
@@ -967,7 +965,7 @@ def audit() -> dict:
     ):
         capture_errors.append("loaded_source_data_alias")
     hinoo_cached_primary = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-hinoo-primary-cache.json").read_text()
+        (ROOT / "tests/data/sukuyo-hinoo-primary-cache.json").read_text()
     )
     production_cached_primary = profile_source_bundle()["hinoo_addendum"][
         "cached_primary_excerpt"
@@ -999,7 +997,7 @@ def audit() -> dict:
     if not capture_coupled:
         capture_errors.append("profile_branch_fingerprints_not_coupled")
     sanjiu_primary = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-sanjiu-days-primary.json").read_text()
+        (ROOT / "tests/data/sukuyo-sanjiu-days-primary.json").read_text()
     )
     sanjiu_paragraphs = {p["id"]: p["text"] for p in sanjiu_primary["paragraphs"]}
     sanjiu_errors = []
@@ -1060,7 +1058,7 @@ def audit() -> dict:
             }
         )
     action_primary = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-action-scope-primary.json").read_text()
+        (ROOT / "tests/data/sukuyo-action-scope-primary.json").read_text()
     )
     action_errors = []
     action_examples = []
@@ -1140,7 +1138,7 @@ def audit() -> dict:
     ):
         action_errors.append("lower_sun_actor_qualifier_not_preserved")
     japanese_files, japanese_manifest = read_japanese_fixture(
-        ROOT / "tests/fixtures/sukuyo_hutime_daily_v1"
+        ROOT / "tests/data/sukuyo_hutime_daily_v1"
     )
     japanese_bundle, japanese_admission = normalize_japanese(
         japanese_files, japanese_manifest
@@ -1184,7 +1182,7 @@ def audit() -> dict:
     )
 
     historical_files, historical_manifest = read_historical_fixture(
-        ROOT / "tests/fixtures/sukuyo_historical_calendar_v1"
+        ROOT / "tests/data/sukuyo_historical_calendar_v1"
     )
     historical_bundle, historical_admission = normalize_historical(
         historical_files, historical_manifest
@@ -1247,7 +1245,7 @@ def audit() -> dict:
         if primary_edition[key] != hinoo_downloaded_primary[key]:
             capture_errors.append(["hinoo_downloaded_primary_differs", key])
     six_primary = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-six-palaces-primary.json").read_bytes()
+        (ROOT / "tests/data/sukuyo-six-palaces-primary.json").read_bytes()
     )
     six_examples = []
     six_errors = []
@@ -1283,7 +1281,7 @@ def audit() -> dict:
     from fatebridge.core.sukuyo_taibai import taibai_direction_reference
 
     taibai_primary = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-taibai-primary.json").read_bytes()
+        (ROOT / "tests/data/sukuyo-taibai-primary.json").read_bytes()
     )
     taibai_errors = []
     taibai_source_check = verify_taibai_primary()
@@ -1295,7 +1293,7 @@ def audit() -> dict:
     clothing_errors = []
     clothing_rows = []
     for item in json.loads(
-        (ROOT / "tests/fixtures/sukuyo-clothing-primary.json").read_bytes()
+        (ROOT / "tests/data/sukuyo-clothing-primary.json").read_bytes()
     )["verse_rows"]:
         actual = clothing_reference({"natal_su27": item["mansion"]})
         if actual["candidate_references"][0]["verse"] != item:
@@ -1405,7 +1403,7 @@ def audit() -> dict:
             "scope": "Selected actor, purpose and social-action corrections; counts are inventory, not classical coverage or prediction scores.",
         },
         "japanese_calendar_source_candidate": audit_candidate(
-            ROOT / "tests/fixtures/sukuyo_hutime_v1"
+            ROOT / "tests/data/sukuyo_hutime_v1"
         ),
         "active_goal_axes": [
             "calendar_accuracy",

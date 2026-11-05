@@ -40,7 +40,7 @@ class UnsupportedGauquelinError(InvalidHouseSystemError):
 
 
 def reject_gauquelin_house_system(value: object) -> None:
-    """Reject known Gauquelin names without altering other legacy aliases."""
+    """Reject known Gauquelin names without altering supported identifiers."""
     if not isinstance(value, str):
         return
     token = "".join(normalize("NFKC", value).casefold().split())
@@ -51,7 +51,7 @@ def reject_gauquelin_house_system(value: object) -> None:
 
 # Swiss Ephemeris 宫位系统代码 ↔ 常见英文/中文别名
 # Keys normalized via casefold + strip for lookup. Values are the
-# single-letter codes accepted by swisseph / kerykeion.
+# single-letter codes accepted by Swiss Ephemeris.
 _HOUSE_SYSTEM_ALIASES: Dict[str, str] = {
     # Placidus (default)
     "placidus": "P",
@@ -120,8 +120,6 @@ _HOUSE_SYSTEM_ALIASES: Dict[str, str] = {
     "equalmc": "D",
     "equalmidheaven": "D",
     "天顶为第10宫宫头的等宫制": "D",
-    # Historical mislabel retained only as an input alias.
-    "天顶为10宫中点等宫制": "D",
     # Sripati (core chart code 7) — was missing, so "sripati" fell back to P
     "sripati": "S",
     # APC / Krusinski

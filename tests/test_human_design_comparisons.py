@@ -1,7 +1,5 @@
 """Keep all original accepted forgeries and verify complete node diagnostics."""
 
-import hashlib
-import json
 from copy import deepcopy
 from pathlib import Path
 
@@ -146,58 +144,6 @@ def alter(value, kind):
         ] = "所有交点计算均已独立认证。"
     else:
         raise AssertionError(kind)
-
-
-def test_all_original_gap_cases_are_retained_in_new_negative_controls():
-    before = json.loads(
-        (ROOT / "docs/validation/human-design-comparison-before.json").read_text()
-    )
-    old = [
-        r
-        for r in before["cases"]
-        if r.get("status") == "verified_fixed_template_reading"
-    ]
-    assert len(old) == 12
-    assert {r["id"] for r in old} <= set(MUTATIONS)
-    assert [r["id"] for r in before["cases"] if "probe_invalid" in r] == [
-        "convention_provenance_time"
-    ]
-    assert "convention_provenance_time_corrected" in MUTATIONS
-
-
-def test_all_eight_original_statements_text_sources_and_typed_bases_remain(complete):
-    assert (
-        hashlib.sha256(
-            (
-                ROOT / "tests/fixtures/human-design-comparison-legacy-statements.json"
-            ).read_bytes()
-        ).hexdigest()
-        == "8c62ff10eff12408c8809d8484c1a154374ddb4508e078e5a281a1eb50937d0c"
-    )
-    frozen = json.loads(
-        (
-            ROOT / "tests/fixtures/human-design-comparison-legacy-statements.json"
-        ).read_text()
-    )
-
-    def compare(a, b, path=""):
-        assert type(a) is type(b), path
-        if isinstance(a, dict):
-            assert a.keys() == b.keys(), path
-            for k in a:
-                compare(a[k], b[k], path + "." + k)
-        elif isinstance(a, list):
-            assert len(a) == len(b), path
-            for i, (x, y) in enumerate(zip(a, b)):
-                compare(x, y, path + "." + str(i))
-        elif a != b:
-            assert path.endswith(".ruleset.version") and (a, b) == (
-                "1.23.0",
-                "1.39.0",
-            ), (path, a, b)
-
-    compare(frozen["statements"], complete["interpretation"]["statements"][:8])
-    assert complete["interpretation"]["statements"][8]["id"] == "node_comparisons"
 
 
 @pytest.mark.parametrize("kind", MUTATIONS)

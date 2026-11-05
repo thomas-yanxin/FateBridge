@@ -329,30 +329,6 @@ def test_weather_negative_result_and_registered_denominator_unchanged():
     ) == (273, 29, 158, False)
 
 
-CACHED = r"""
-import importlib,importlib.util,sys
-from pathlib import Path
-f=Path(sys.argv[1]);importlib.import_module('fatebridge.core.requests');name='fatebridge.core.requests.meihua';spec=importlib.util.spec_from_file_location(name,f/'legacy-request-meihua.py');m=importlib.util.module_from_spec(spec);sys.modules[name]=m;spec.loader.exec_module(m);setattr(sys.modules['fatebridge.core.requests'],'meihua',m)
-assert 'response_context' not in m.MeihuaInterpretationOptions.model_fields
-from fatebridge.services.meihua import calculate_meihua_cast
-from fatebridge.services.divination import calculate_meihua_analysis
-for func,args in [(calculate_meihua_cast,{'casting':{'method':'existing','hexagram_code':'100111','moving_line':1}}),(calculate_meihua_analysis,{'analysis_year':2026,'analysis_month':10,'analysis_day':26,'analysis_hour':12,'analysis_timezone':'Asia/Shanghai'})]:
- for topic in ['general','weather','travel']:
-  for mode in ['omitted','none']:
-   kw={**args,'interpretation_topic':topic}
-   if mode=='none':kw['response_context']=None
-   out=func(**kw);assert 'error' not in out,out
-print('12legacydefault/None calls valid; new field still requires client refresh')
-"""
-
-
-def test_legacy_cached_schema_omitted_and_none_calls_stay_compatible():
-    result = subprocess.run(
-        [sys.executable, "-c", CACHED, str(FIXTURE)], capture_output=True, text=True
-    )
-    assert result.returncode == 0, result.stderr
-
-
 @pytest.mark.parametrize("body", list(REF["elements"]))
 @pytest.mark.parametrize("kind", ["rain", "snow"])
 def test_precipitation_supplement_separates_mapping_and_exact_rain_preference(

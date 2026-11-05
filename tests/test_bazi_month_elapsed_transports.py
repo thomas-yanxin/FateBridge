@@ -6,7 +6,10 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("topic", ["birth", "career", "education"])

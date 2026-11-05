@@ -13,7 +13,7 @@ import pytest
 from fatebridge.core.fengshui.xuankong import _fly
 from fatebridge.validation import fengshui_day_hour as audit
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_day_hour_tables_v1"
+FOLDER = Path(__file__).parent / "data/fengshui_day_hour_tables_v1"
 
 
 def reference():

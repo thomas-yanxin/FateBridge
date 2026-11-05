@@ -153,6 +153,8 @@ class EphemerisSourceError(ValueError):
     """Safe, enumerated data-consistency failure; no paths or personal input."""
 
     MESSAGES = {
+        "solar_native_unavailable": "Selected native solar model could not solve the requested crossing; no linear approximation is returned",
+        "solar_term_source_unverified": "Solar-term crossing lacks a verified current model and source record; no approximate boundary is returned",
         "horizon_direction_model_unavailable": "Eastern horizon direction requires a valid coherent native house-angle model",
         "house_projection_precision_unavailable": "House-plane direction or its half-open house could not be resolved at the available working precision",
         "horizon_direction_precision_unavailable": "Eastern horizon endpoint direction could not be resolved at the available working precision",
@@ -203,7 +205,12 @@ class EphemerisSourceError(ValueError):
         "compressed_endpoint_unverified": "Compressed ephemeris endpoint selection is not verified for the loaded native version",
         "coordinate_contract_changed": "Native ephemeris returned a different coordinate frame or correction convention than requested",
         "coordinate_values_unavailable": "Ephemeris coordinates are missing, nonfinite, or outside their valid domain",
+        "opaque_solar_barycentric_unavailable": "Opaque-Sun apparent positions could not obtain their native barycentric states",
+        "opaque_solar_requires_barycentric_files": "Opaque-Sun apparent positions require actual barycentric file states; analytical fallback is not accepted",
+        "opaque_solar_light_time_not_stabilized": "Opaque-Sun light time did not stabilize at the available TT precision",
         "coordinate_motion_unavailable": "Native ephemeris did not provide the requested finite longitude motion",
+        "point_mass_requires_barycentric_file_states": "Explicit Sun monopole comparison requires actual barycentric file states; analytical fallback is not accepted",
+        "point_mass_light_time_did_not_stabilize": "Explicit Sun monopole light time did not stabilize at the available TT precision",
         "jpl_filename_invalid": "Strict JPL kernel must be a short basename in the configured ephemeris search path",
         "jpl_file_unavailable": "Selected strict JPL kernel could not be opened",
         "jpl_kernel_invalid": "Selected strict JPL kernel is not a complete supported DE441 direct-access file",

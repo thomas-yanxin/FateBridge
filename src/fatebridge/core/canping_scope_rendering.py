@@ -1,24 +1,19 @@
 """Versioned software disclosures, separate from the original-book identity.
 
-The historical wording is retained for reading prior results. Current
-execution still binds its receipt and text to the current rendering below.
-Neither revision certifies a whole book, historical clock or prediction.
+Current execution binds its receipt and text to one published rendering.
+The disclosure does not certify a whole book, historical clock or prediction.
 """
 
 from hashlib import sha256
 from types import MappingProxyType
 from typing import Any, Literal, Mapping
 
-ScopeRevision = Literal["generic_regional_caveat_v1", "clock_context_separate_v2"]
+ScopeRevision = Literal["clock_context_separate_v2"]
 SCOPE_RENDERING_POLICY_ID = "canping_scope_rendering_v1"
 SCOPE_RENDERING_LAYER = "software_explanatory_scope"
 CURRENT_SCOPE_REVISION: ScopeRevision = "clock_context_separate_v2"
 _STATEMENTS: Mapping[ScopeRevision, str] = MappingProxyType(
     {
-        "generic_regional_caveat_v1": (
-            "所列为已单次目读的局部原句，未完成全书及独立复核；"
-            "未来地区规则有条件，显示分辨率不提升出生记录精度，也不证明现实预测效验。"
-        ),
         "clock_context_separate_v2": (
             "所列为已单次目读的局部原句，未完成全书及独立复核；"
             "显示分辨率不提升出生记录精度，也不证明现实预测效验。"

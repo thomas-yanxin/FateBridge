@@ -19,7 +19,7 @@ from fatebridge.core.astro.jpl_records import source_records
 from fatebridge.core.astro.longitude_motion import corrected_longitude_motion
 from fatebridge.utils.errors import EphemerisSourceError
 
-FIXTURE = Path(__file__).parent / "fixtures/astrodice-de441-j2000.eph"
+FIXTURE = Path(__file__).parent / "data/astrodice/tables/de441-j2000.eph"
 
 
 @pytest.fixture

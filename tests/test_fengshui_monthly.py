@@ -21,13 +21,14 @@ from fatebridge.core.fengshui.monthly import monthly_position_reading
 from fatebridge.core.fengshui.monthly_time import solar_month_context
 from fatebridge.services.fengshui import assess, calculate_monthly_stars
 from fatebridge.services.replay_metadata import digest
+from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.validation.fengshui_monthly import (
     audit_monthly_reference,
     verify_monthly_reading,
 )
 from tests.test_fengshui_surfaces import mcp_call, rest_client, without_transport
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_monthly_v1"
+FOLDER = Path(__file__).parent / "data/fengshui_monthly_v1"
 REFERENCE = json.loads((FOLDER / "reference.json").read_text())
 YEARS = [
     (2020, "子"),
@@ -60,7 +61,8 @@ TERMS = [
 OFFICIAL = []
 for year in [2024, 2026, 2027, 2028]:
     folder = "fengshui_calendar_v1" if year == 2024 else "calendar_hko_v1"
-    file = Path(__file__).parent / "fixtures" / folder / f"24SolarTerms_{year}.xml"
+    root = "data" if year == 2024 else "fixtures"
+    file = Path(__file__).parent / root / folder / f"24SolarTerms_{year}.xml"
     rows = list(ET.fromstring(file.read_text()))
     for term, row in zip(TERMS, rows[::2]):
         clock = datetime.fromisoformat(
@@ -298,34 +300,22 @@ def test_actual_instants_control_a_repeated_wall_clock_boundary(monkeypatch):
     assert first["solar_month_number"] == 9 and second["solar_month_number"] == 10
 
 
-def test_linear_fallback_near_any_jie_keeps_candidates_but_far_dates_are_computable(
-    monkeypatch,
-    request,
-):
+def test_missing_native_crossings_cannot_supply_month_boundaries(monkeypatch, request):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     monkeypatch.setattr(almanac, "swe", None)
     almanac.get_solar_terms_for_year.cache_clear()
     request.addfinalizer(almanac.get_solar_terms_for_year.cache_clear)
-    for term, official in OFFICIAL:
-        if official.year != 2026:
-            continue
-        # Query the real fallback term, not an exact Swiss term relabelled.
-        t = next(
-            x.moment for x in almanac.get_solar_terms_for_year(2026) if x.name == term
-        )
-        result = layer(query_at=t)
-        assert result["status"] == "partial" and result["palaces"] == {}
-        assert len(result["time_context"]["candidate_months"]) == 2
-        assert (
-            result["time_context"]["interval_scope"]
-            == "provisional_interval_until_boundary_confirmed"
-        )
-    far = layer(query_at="2026-10-20T12:00:00+08:00")
-    assert far["status"] == "complete"
-    assert far["time_context"]["timing"]["possible_linear_fallback"]
-    override = confirmed(2026, 9)
-    assert override["status"] == "complete" and override["center_star_number"] == 9
+    for _, official in OFFICIAL:
+        if official.year == 2026:
+            with pytest.raises(EphemerisSourceError, match="no linear approximation"):
+                calculate_monthly_stars(query_at=official.isoformat())
+    for inputs in (
+        {"query_at": "2026-10-20T12:00:00+08:00"},
+        {"effective_solar_year": 2026, "solar_month_number": 9},
+    ):
+        with pytest.raises(EphemerisSourceError, match="no linear approximation"):
+            calculate_monthly_stars(**inputs)
 
 
 @pytest.mark.parametrize(

@@ -20,16 +20,14 @@ from fatebridge.core.sukuyo_sources import load_source
 
 
 def test_822_document_and_766_quote_bind_to_before_code_primary_facts_separately():
-    raw = (
-        Path(__file__).parent / "fixtures/sukuyo-sandaikaku-source-v1.json"
-    ).read_bytes()
+    raw = (Path(__file__).parent / "data/sukuyo-sandaikaku-source-v1.json").read_bytes()
     assert (
         hashlib.sha256(raw).hexdigest()
         == "c0c6f02d1b1d0803efbe969a060f37bfff3be0eeac9dcda0670e9e1620c92df9"
     )
     expected = json.loads(raw)
     correction_raw = (
-        Path(__file__).parent / "fixtures/sukuyo-sandaikaku-boundary-v2.json"
+        Path(__file__).parent / "data/sukuyo-sandaikaku-boundary-v2.json"
     ).read_bytes()
     assert hashlib.sha256(correction_raw).hexdigest() == (
         "c2ae313577ab507f863485e57e0f2d52d62fe70d897ad92a8abb2d471473c432"
@@ -131,9 +129,7 @@ def test_quote_knowledge_or_source_status_cannot_be_silently_rewritten(mutation)
 
 def test_every_day_of_both_host_months_keeps_its_binding_role_and_real_input():
     raw = json.loads(
-        (
-            Path(__file__).parent / "fixtures/sukuyo-sandaikaku-source-v1.json"
-        ).read_bytes()
+        (Path(__file__).parent / "data/sukuyo-sandaikaku-source-v1.json").read_bytes()
     )
     for expected in raw["independent_before_code_host_reference"]["months"]:
         first = date.fromisoformat(expected["host_month_start_civil_label"])

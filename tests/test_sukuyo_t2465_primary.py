@@ -54,7 +54,7 @@ def test_delivered_active_edition_matches_frozen_quotations_and_original_apparat
     assert not primary["facsimile_collation_complete"]
     assert primary["downloaded_calendar_windows"][1]["text"].endswith("也｣")
     retained = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-hinoo-primary-cache.json").read_bytes()
+        (ROOT / "tests/data/sukuyo-hinoo-primary-cache.json").read_bytes()
     )
     assert source["cached_primary_excerpt"] == retained
 

@@ -10,7 +10,7 @@ from fatebridge.core.astro.geometry import _julian_day
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.human_design import chart_at, chart_at_tt, longitude_activation
 from fatebridge.core.human_design_sensitivity import assess_birth_interval
-from tests.golden.runner import golden_ephemeris
+from tests.ephemeris_context import moshier_ephemeris
 
 CASE = Path(__file__).parent / "fixtures/human-design-uncertainty-case.json"
 
@@ -26,7 +26,7 @@ CASE = Path(__file__).parent / "fixtures/human-design-uncertainty-case.json"
 )
 def test_tt_sampling_and_civil_nominal_use_identical_physical_activation(date):
     moment = datetime.fromisoformat(date)
-    with golden_ephemeris():
+    with moshier_ephemeris():
         direct = chart_at(moment)
         sampled = chart_at_tt(ephemeris_time(moment).jd_tt)
     assert direct["activations"] == sampled["activations"]
@@ -36,7 +36,7 @@ def test_tt_sampling_and_civil_nominal_use_identical_physical_activation(date):
 
 def test_actual_interior_node_base_variant_is_not_visible_in_old_three_samples():
     case = json.loads(CASE.read_text())
-    with golden_ephemeris():
+    with moshier_ephemeris():
         nominal = chart_at(datetime.fromisoformat(case["nominal_birth_utc"]))
         report = assess_birth_interval(nominal, 60, "true")
     assert report["sampling"]["grid_sample_count"] == 721
@@ -69,7 +69,7 @@ def test_actual_interior_node_base_variant_is_not_visible_in_old_three_samples()
 
 def test_mean_node_interval_does_not_invent_true_node_speed_reversal():
     case = json.loads(CASE.read_text())
-    with golden_ephemeris():
+    with moshier_ephemeris():
         nominal = chart_at(datetime.fromisoformat(case["nominal_birth_utc"]), "mean")
         report = assess_birth_interval(nominal, 60, "mean")
     assert report["node_mode"] == "mean"

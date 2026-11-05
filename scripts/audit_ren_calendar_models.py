@@ -35,7 +35,7 @@ def audit(years: list[int] | None = None, *, progress: bool = True) -> dict[str,
     if not requested or not requested <= set(range(1901, 2101)):
         raise ValueError("HKO years must be 1901..2100")
     manifest = json.loads(
-        (ROOT / "tests/fixtures/ziwei_independent/calendar_manifest.json").read_text()
+        (ROOT / "tests/data/ziwei_independent/calendar_manifest.json").read_text()
     )
     if [s["year"] for s in manifest["sources"]] != list(range(1901, 2101)):
         raise ValueError("The source cohort must retain all 200 HKO years")
@@ -58,7 +58,7 @@ def audit(years: list[int] | None = None, *, progress: bool = True) -> dict[str,
     legacy_provider_failures = []
     term_providers: dict[str, int] = {}
     state = (1900, 11, False)
-    source_root = ROOT / "tests/fixtures/ziwei_independent"
+    source_root = ROOT / "tests/data/ziwei_independent"
     totals = dict(
         civil_dates=0,
         day_checks=0,

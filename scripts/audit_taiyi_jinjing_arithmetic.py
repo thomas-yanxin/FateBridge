@@ -11,7 +11,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_arithmetic_v49"
-FREEZE_SHA = "b08ae841adbb3b0c257ef3e108592eecce20ea85b6592ff9dc721a4e5c6ac78a"
+FREEZE_SHA = "1a0f7c4ddbda302981762e8be8b1ad7c627996ceb87bd74f0a33c4dddd80de4e"
 
 
 def verify(corpus: Path = CORPUS) -> dict[str, Any]:
@@ -193,7 +193,7 @@ def compare(
                     "trace_matches": trace_agrees(recount, reference),
                 }
             )
-    old_path = ROOT / "docs/validation/taiyi-jinjing-v23/native-audit.json"
+    old_path = ROOT / "tests/data/taiyi/known_source_disagreements.json"
     old = json.loads(old_path.read_text())
     return {
         "completion_claim": False,

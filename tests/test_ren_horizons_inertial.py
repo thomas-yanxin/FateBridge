@@ -182,7 +182,7 @@ def test_observed_source_drift_prevents_a_pass(monkeypatch):
 
 
 def test_requested_swieph_fallback_is_reported_as_actual_moshier():
-    from tests.golden.runner import golden_ephemeris
+    from tests.ephemeris_context import moshier_ephemeris as golden_ephemeris
 
     with golden_ephemeris():
         report = AUDIT.audit()

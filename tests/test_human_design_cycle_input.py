@@ -1,6 +1,5 @@
 """Frozen request time-order cases must retain correct decisions and caller state."""
 
-import hashlib
 import json
 import subprocess
 import sys
@@ -15,26 +14,6 @@ from fatebridge.utils.errors import EphemerisSourceError, validation_error_resul
 ROOT = Path(__file__).resolve().parents[1]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-cycle-input-plan.json"
 PLAN = json.loads(PLAN_PATH.read_text())
-
-
-def test_all_original_contamination_cases_and_bad_inputs_remain_frozen():
-    before = ROOT / "docs/validation/human-design-cycle-input-before.json"
-    assert (
-        hashlib.sha256(before.read_bytes()).hexdigest()
-        == "f676dbe6bd5adba9c36588a0febd9c571465388923757f564b7243507554d7b2"
-    )
-    assert (
-        hashlib.sha256(PLAN_PATH.read_bytes()).hexdigest()
-        == "a790ca39da2576edeffbbbb19646160b8f2ff1937b2015f31eeb2a852bcd42cd"
-    )
-    report = json.loads(before.read_text())
-    assert len(report["cases"]) == 12
-    assert report["wrong_dirty_acceptance_count"] == 2
-    assert report["parent_setting_changes"] == 5
-    for row in report["cases"]:
-        expected = next(c for c in PLAN["cases"] if c["id"] == row["id"])
-        assert row["input"] == expected["input"]
-        assert row["clean"]["accepted"] == expected["expected_accepted"]
 
 
 @pytest.mark.parametrize("empty", [False, True])

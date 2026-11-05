@@ -7,19 +7,19 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.examples import suggested_fields
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_source_comparison_transports import (
     SPEC,
     business,
     call_cli,
     native,
     reject_bad_fact,
-    rest,
 )
 
+rest = _shared_rest
+
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = json.loads(
-    (ROOT / "tests/fixtures/bazi_qingqi_zhuoqi_v1/reference.json").read_text()
-)
+SOURCE = json.loads((ROOT / "tests/data/bazi/controller-source.json").read_text())
 CASES = [
     *[(r["id"], r["pillars"]) for r in SOURCE["cases"]],
     ("SJ05", ["甲午", "丁丑", "甲午", "丙寅"]),

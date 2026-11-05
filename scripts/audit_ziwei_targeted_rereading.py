@@ -10,7 +10,7 @@ from typing import Any
 from fatebridge.core.ziwei_sources import ziwei_day_source_evidence
 
 ROOT = Path(__file__).resolve().parents[1]
-FROZEN = ROOT / "tests/fixtures/ziwei_independent/targeted_rereading_r24_v1"
+FROZEN = ROOT / "tests/data/ziwei_independent/targeted_rereading_r24_v1"
 TARGET = ROOT / "src/fatebridge/data/classical/ziwei-naj-ming-targeted-review-r24.json"
 
 

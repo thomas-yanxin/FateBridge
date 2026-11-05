@@ -21,7 +21,7 @@ uv run --locked --extra dev python scripts/evaluate_agent.py --output /tmp/fateb
 
 德国中点与 13 等分盘另有 5 个虚构用例（本地数据：`../tests/fixtures/agent_behavior/other_chart_cases.json`）：原文解释的生时条件、指定时刻推运 MC、假设天体与重复证据的错误前提、13 分区的跨界和天文星座区别、完整同 run 文件交付。全部为**单轮用例**，不冒充跨轮验收；评分标准在运行前保留于文件中。时间参数按实际时刻比较，等价时区偏移不判错；完整导出只允许一次成功排盘，合法失败后的恢复不计成重复成功。
 
-梅花另有[10个解释忠实度诊断案例](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/meihua-semantics-evaluation.md)。`--prepare-only` 只冻结材料与真实MCP参照，不启动模型；获授权的模型运行可为指定案例留存实际MCP回执与同run分页，机械通过和人工语义审阅继续分开。
+梅花另有[10个解释忠实度诊断案例](meihua.md)。`--prepare-only` 只冻结材料与真实MCP参照，不启动模型；获授权的模型运行可为指定案例留存实际MCP回执与同run分页，机械通过和人工语义审阅继续分开。
 
 ```bash
 uv run --locked --extra dev python scripts/evaluate_agent.py \
@@ -40,9 +40,9 @@ uv run --locked --extra dev python scripts/evaluate_agent.py \
   --output /tmp/fatebridge-meridian-agent-preparation
 ```
 
-`--prepare-only` 不启动模型。参照 run 与未来模型的实际 run 分开保存；不得拿准备阶段的参照冒充模型读取的证据。第二十一轮已完成这项准备，`model_invocations=0`、`semantic_acceptance=not_run`，没有因此提高解释忠实度或现实效果评级。
+`--prepare-only` 不启动模型。参照 run 与未来模型的实际 run 分开保存；不得拿准备阶段的参照冒充模型读取的证据。该用例已完成参照准备，`model_invocations=0`、`semantic_acceptance=not_run`，没有因此提高解释忠实度或现实效果评级。
 
-年长钥匙另有原典失败与时角单位用例（本地数据：`../tests/fixtures/agent_behavior/other_chart_key_cases.json`），预先固定八条人工判据，重点核对当前 365.25 日钥匙、历史例与当前盘身份、两个有符号残差、时角时间秒、日期标签未裁定状态及整链失败。第二十二轮以相同 `--prepare-only --snapshot-profile runtime` 流程、改用这份 `--cases-file` 取得真实 MCP 参照；模型调用和人工语义评分均未执行。源算术检查失败、检测器测试通过和模型解释通过是三个分别验收的结果。
+年长钥匙另有原典失败与时角单位用例（本地数据：`../tests/fixtures/agent_behavior/other_chart_key_cases.json`），预先固定八条人工判据，重点核对当前 365.25 日钥匙、历史例与当前盘身份、两个有符号残差、时角时间秒、日期标签未裁定状态及整链失败。该用例使用相同 `--prepare-only --snapshot-profile runtime` 流程，并将 `--cases-file` 改为该文件以取得真实 MCP 参照；模型调用和人工语义评分均未执行。源算术检查失败、检测器测试通过和模型解释通过是三个分别验收的结果。
 
 ## 判据与证据
 
@@ -54,8 +54,8 @@ uv run --locked --extra dev python scripts/evaluate_agent.py \
 
 官方依据：[技能测试](https://developers.openai.com/plugins/build/skills#test-the-skill)、[Agent 评测](https://developers.openai.com/api/docs/guides/agent-evals)。`strict_fields` 检查输出投影路径，不能当成 [OpenAI function calling strict 模式](https://developers.openai.com/api/docs/guides/function-calling#strict-mode)。
 
-太乙与三式另有[13个解释忠实度案例](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-semantics-evaluation.md)，含52条预先固定语义要求，覆盖实际四计、来源差异、三值条件、天地盘推步、合参和完整同run交付。一个历史配置范围外案例按`expected_tool_errors`登记准确类型和值；`--prepare-only`可留存真实预期拒绝并继续其他参照，不将报错伪装成成功盘。常规工具错误仍失败，预期拒绝的空答、错误原因不符、回退成功或超过`max_total_calls`也失败。新评测说明及判据不进入模型工作目录；准备和真实模型评分仍分开。
+太乙与三式另有[13个解释忠实度案例](taiyi-sanshi-audit.md)，含52条预先固定语义要求，覆盖实际四计、来源差异、三值条件、天地盘推步、合参和完整同run交付。一个历史配置范围外案例按`expected_tool_errors`登记准确类型和值；`--prepare-only`可留存真实预期拒绝并继续其他参照，不将报错伪装成成功盘。常规工具错误仍失败，预期拒绝的空答、错误原因不符、回退成功或超过`max_total_calls`也失败。新评测说明及判据不进入模型工作目录；准备和真实模型评分仍分开。
 
-评分规则按运行前用例合同分版本：未声明`expected_tool_errors/max_total_calls`的旧用例继续由冻结的`grade/observations`执行；已声明者使用独立命名的拒绝规则。实际入口`grade_case`按声明分发，新记录保存`grading_policy`，不能按结果是否通过选择规则。八字33份原成绩及三函数AST保持，预声明拒绝规则和原测试断言也保留，见[版本隔离审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-grader-policy-audit.md)。
+机械评分统一使用当前 `grade_case/observations`：实际工具调用、预声明的允许范围、参数与成功次数共同核对；只有用例预先声明且实际返回类型完全相符的错误才可作为预期拒绝接受。当前记录保存 `observed_calls_and_declared_errors_v2`，不分发到旧评分器，也不保留旧函数 AST 白名单。机械通过仍不等于语义或预测通过。
 
-西方占星另有[八个解释忠实度诊断](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/western-semantics-evaluation.md)，预先固定44条人工要求。准备仅捕获参照，不启动模型；必须核对未来模型实际读到的同run回执。Marks双方个人盘、来源拒绝与末端缺失事件、历法／闰秒、宗派／行星时以及象征推运均分别验收。
+西方占星另有[八个解释忠实度诊断](western-astrology.md)，预先固定44条人工要求。准备仅捕获参照，不启动模型；必须核对未来模型实际读到的同run回执。Marks双方个人盘、来源拒绝与末端缺失事件、历法／闰秒、宗派／行星时以及象征推运均分别验收。

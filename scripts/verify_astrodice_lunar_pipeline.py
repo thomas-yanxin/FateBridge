@@ -14,7 +14,7 @@ from scripts.verify_astrodice_lunar_split import (
     tdb_label,
 )
 
-PLAN_SHA = "f4398b6cf40601b333185f0e6b732a51a86ae675d94e6796886f4f685c331fe9"
+PLAN_SHA = "be9f316e77e39200635358c6e17ea913c83c5f1917a42aaf93bd5686cc26f729"
 
 
 def verify(run, reference_path):

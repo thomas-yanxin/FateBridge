@@ -25,7 +25,6 @@ from scripts.astrodice_apparent_source_reference import (
     sub,
     unit,
 )
-from scripts.astrodice_de441_records import calendar_jd_tdb
 
 
 def geometry(reader, body, epoch):

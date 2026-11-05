@@ -10,8 +10,8 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_birth_seconds import BASE, SPECS
 
 
@@ -27,6 +27,9 @@ def leaf(payload, path):
     for part in path.split("."):
         payload = payload[part]
     return payload
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.key)

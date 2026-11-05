@@ -7,7 +7,8 @@ import pytest
 from fatebridge.application.examples import suggested_fields
 from fatebridge.core.classical_from_child import from_child_snapshot_lines
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_year_contract import TOPICS
 
 # A fabricated protocol subject, chosen to reproduce the literal SJ07 pillars.
@@ -29,6 +30,9 @@ def walk(value, path):
     for part in path.split("."):
         value = value[part]
     return value
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize(

@@ -36,19 +36,18 @@ def within(value, limit):
     return value.absolute_upper() <= Q(limit)
 
 
-def audit(run, split, directory, reference_path, proof_path):
+def audit(run, split, reference_path, sampler=None, *, jpl_file=None):
+    from scripts.astrodice_current_sampling import sample_lunar
+
+    if sampler is None:
+        from functools import partial
+
+        sampler = partial(sample_lunar, jpl_file=jpl_file)
     protocol = plan(run)
     reference = json.loads(reference_path.read_text())
-    proof = json.loads(proof_path.read_text())
-    if proof != verify(run, reference_path) or reference["split"] != split:
-        raise ValueError("Independent proof detached from this reference")
-    expected = [
-        f"{backend}-{index}.json"
-        for index in range(len(protocol[split]))
-        for backend in protocol["backends"]
-    ]
-    if sorted(p.name for p in directory.glob("*.json")) != sorted(expected):
-        raise ValueError("Native population omitted, duplicated or expanded")
+    verify(run, reference_path)
+    if reference["split"] != split:
+        raise ValueError("Independent reference split detached")
     scale = 648000 / I(*pi_bounds())
     rows = []
     for index, (case, ref) in enumerate(zip(protocol[split], reference["rows"])):
@@ -58,8 +57,7 @@ def audit(run, split, directory, reference_path, proof_path):
             list(map(interval, ref["model"]["direction_derivative_per_source_day"])),
         )
         for backend in protocol["backends"]:
-            path = directory / f"{backend}-{index}.json"
-            native = json.loads(path.read_text())
+            native = sampler(run, split, index, backend)
             if (
                 any(native[k] != value for k, value in case.items())
                 or native["protocol_sha256"] != PLAN_SHA
@@ -72,8 +70,13 @@ def audit(run, split, directory, reference_path, proof_path):
                 raise ValueError("Native row rebound from frozen input")
             row = {
                 **case,
-                "backend": backend,
-                "native_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                "backend": (
+                    "jpl_explicit_source"
+                    if backend == "jpl_record_window" and jpl_file is not None
+                    else backend
+                ),
+                "protocol_backend": backend,
+                "source_filename": native.get("configured_jpl_file"),
                 "status": native["status"],
             }
             if native["status"] != "ready":
@@ -139,11 +142,22 @@ def audit(run, split, directory, reference_path, proof_path):
                 bias_position_control=native["bias_position_control"],
             )
             rows.append(row)
+    numeric_failure = any(
+        row.get("position_pass") is False
+        or row.get("rate_pass", row.get("longitude_rate_pass")) is False
+        or row.get("auxiliary_full_direction_rate_pass") is False
+        for row in rows
+    )
+    gate = (
+        1 if numeric_failure else 2 if any(not row["qualified"] for row in rows) else 0
+    )
     return {
+        "exit_code": gate,
+        "declared_source_lines_satisfied": gate == 0,
+        "physical_accuracy_certified": False,
         "protocol_sha256": PLAN_SHA,
         "split": split,
         "reference_sha256": hashlib.sha256(reference_path.read_bytes()).hexdigest(),
-        "independent_proof_sha256": hashlib.sha256(proof_path.read_bytes()).hexdigest(),
         "position_line_arcsec": protocol["position_line_arcsec"],
         "rate_line_arcsec_per_source_day": protocol["rate_line_arcsec_per_source_day"],
         "rows": rows,
@@ -162,15 +176,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--split", choices=("development", "heldout"), required=True)
-    parser.add_argument("--native-directory", type=Path, required=True)
     parser.add_argument("--reference", type=Path, required=True)
-    parser.add_argument("--proof", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--jpl-file", type=Path)
     args = parser.parse_args()
-    write_new(
-        args.output,
-        audit(args.run, args.split, args.native_directory, args.reference, args.proof),
-    )
+    result = audit(args.run, args.split, args.reference, jpl_file=args.jpl_file)
+    write_new(args.output, result)
+    raise SystemExit(result["exit_code"])
 
 
 if __name__ == "__main__":

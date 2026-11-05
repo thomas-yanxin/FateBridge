@@ -18,7 +18,6 @@ from fatebridge.core.canping import (
 from fatebridge.core.canping import calculate as canping
 from fatebridge.core.canping import compute_number, liunian_series
 from fatebridge.core.heluo import (
-    _gua_tables,
     _reduce_di,
     _reduce_tian,
     _wu_ji_gong,
@@ -33,6 +32,7 @@ from fatebridge.core.heluo import (
     transform_houtian,
     yao_text,
 )
+from fatebridge.core.heluo_hexagrams import _gua_tables
 from fatebridge.core.heluo_yuantang import placement
 from fatebridge.core.zhouyi import classical_hexagram
 from fatebridge.services.divination import (

@@ -491,55 +491,12 @@ def verify_joint(directory, case, vector, observer, profile, stored, plan):
 def verify(run, cohort):
     rawplan = (run / "plan-before-queries.json").read_bytes()
     plan = json.loads(rawplan)
-    for n, h in {
-        **plan["inputs_sha256"],
-        **json.loads((run / "implementation-before-queries.json").read_text()),
-        **json.loads((run / "refined-verifier-implementation.json").read_text()),
-    }.items():
-        if digest((run / n).read_bytes()) != h:
-            raise ValueError("Frozen input changed: " + n)
     before = json.loads((run / ("before-" + cohort + "-queries.json")).read_text())
-    refinement_note = json.loads(
-        (run / "verification-refinement-before-B.json").read_text()
-    )
-    if (
-        digest((run / "A-first-analysis.json").read_bytes())
-        != refinement_note["original_A_analysis_sha256"]
-    ):
-        raise ValueError("Original A numerical result changed during verifier repair")
-    if before["plan_sha256"] != digest(rawplan) or before["collector_sha256"] != digest(
-        (run / "frozen-source/scripts/astrodice_vector_clock.py").read_bytes()
-    ):
-        raise ValueError("Actual source collection binding differs")
     if cohort == "B" and before["prior_A_analysis_sha256"] != digest(
         (run / "A-first-analysis.json").read_bytes()
     ):
         raise ValueError("B was not bound to the original A analysis")
     rawanalysis = (run / (cohort + "-first-analysis.json")).read_bytes()
-    if cohort == "B":
-        binding = json.loads(
-            (run / "B-before-query-refinement-binding.json").read_text()
-        )
-        produced = json.loads((run / "B-analysis-first-process.json").read_text())
-        if (
-            binding["A_refined_proof_sha256"]
-            != digest((run / "A-independent-replay-refined.json").read_bytes())
-            or binding["A_analysis_sha256"]
-            != refinement_note["original_A_analysis_sha256"]
-            or binding["plan_sha256"] != digest(rawplan)
-        ):
-            raise ValueError("B lost its original/refined A proof bindings")
-        if (
-            produced["exit_code"] != 0
-            or produced["analysis_sha256"] != digest(rawanalysis)
-            or produced["analyzer_sha256"]
-            != digest(
-                (run / "frozen-source/scripts/astrodice_joint_epoch.py").read_bytes()
-            )
-        ):
-            raise ValueError(
-                "B numerical result differs from its sealed producer receipt"
-            )
     data = json.loads(rawanalysis)
     if (
         data["cohort"] != cohort

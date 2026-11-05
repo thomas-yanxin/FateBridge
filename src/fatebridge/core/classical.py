@@ -36,9 +36,6 @@ PillarMap = Dict[str, Tuple[str, str]]
 # Day-master energy state at each branch. 阳干顺行、阴干逆行 from the 长生 branch.
 # A deterministic phase lookup; the stage alone does not establish 通根/旺衰.
 
-# Historical phase bucket, NOT proof of hidden-stem roots (notably 阴长生).
-_STRONG_STAGES = frozenset({"临官", "帝旺", "长生"})
-
 
 def life_stages_for_pillars(pillars: PillarMap) -> Dict[str, Any]:
     """Map the day master's 十二长生 state across all four branches."""
@@ -48,7 +45,6 @@ def life_stages_for_pillars(pillars: PillarMap) -> Dict[str, Any]:
         labels[key]: twelve_life_stage(day_stem, pillars[key][1])
         for key in ("year", "month", "day", "hour")
     }
-    rooted = [pos for pos, stage in per_pillar.items() if stage in _STRONG_STAGES]
     day_element = STEM_ELEMENTS[day_stem][0]
     hidden_roots = [
         labels[key]
@@ -62,8 +58,6 @@ def life_stages_for_pillars(pillars: PillarMap) -> Dict[str, Any]:
         "day_stem": day_stem,
         "life_stage_profile_id": STAGE_PROFILE_ID,
         "per_pillar": per_pillar,
-        "strong_roots": rooted,
-        "strong_roots_scope": "兼容字段，仅表示长生、临官、帝旺阶段命中，不是藏干通根或强根裁定。",
         "hidden_stem_roots": hidden_roots,
         "hidden_stem_root_scope": "仅核对藏干同五行是否存在，不裁定根深、根损或有效力量。",
     }
@@ -202,12 +196,6 @@ def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> Dict[str, 
         )
 
     god = _select_structure_god(candidates, day_stem, pillars)
-    # Historical v1 made every primary 比/劫 a 禄/刃 and otherwise selected
-    # the first revealed hidden stem. Keep its label so changed decisions can
-    # be audited; it is never used to override qualified selection.
-    legacy_god = candidates[0]
-    if legacy_god["ten_god"] not in ("比肩", "劫财"):
-        legacy_god = next((c for c in candidates if c["transparent"]), legacy_god)
     label = _TEN_GOD_TO_STRUCTURE.get(god["ten_god"], f"{god['ten_god']}格")
     if not god["is_special"] and god["ten_god"] in ("比肩", "劫财"):
         label = "比劫待取格"
@@ -225,7 +213,6 @@ def determine_monthly_structure(pillars: PillarMap, day_stem: str) -> Dict[str, 
 
     return {
         "method_id": "month_command_qualified_officer_v3",
-        "legacy_label": _TEN_GOD_TO_STRUCTURE[legacy_god["ten_god"]],
         "month_branch": month_branch,
         "label": label,
         "structure_god": god,

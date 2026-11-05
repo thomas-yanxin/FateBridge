@@ -1,4 +1,4 @@
-"""Separate a legacy table, selected source layers and actual stem positions.
+"""Separate an uncollated candidate table, selected source layers and actual stem positions.
 
 The Jia selected passages and Bing unit are declared developer collations,
 not a complete 120-cell edition or a chart-conditioned 用神 adjudicator.
@@ -40,13 +40,13 @@ def seasonal_reference_layers(
     lookup: Dict[str, Any],
     pillars: Optional[Mapping[str, Tuple[str, str]]] = None,
 ) -> Dict[str, Any]:
-    """Keep compatibility candidates without promoting them to final choices."""
+    """Keep unadjudicated candidates separate from source-supported choices."""
     result = {
         **lookup,
         "method_id": "seasonal_reference_layers_v2",
-        "lookup_scope": "日干与月支的旧简表候选；不是全盘最终用神",
+        "lookup_scope": "日干与月支的未校勘简表候选；不是全盘最终用神",
         "chart_adjudication_status": "not_performed",
-        "source_review_status": "legacy_table_source_pending",
+        "source_review_status": "source_not_collated",
     }
     candidates = {lookup["primary"], *lookup["secondary"]} - {None}
     profile = _source_profile(day_stem) if day_stem in {"甲", "丙"} else None

@@ -169,17 +169,6 @@ def _command(monkeypatch, capsys, script, args):
     return capsys.readouterr().out
 
 
-def test_29_prechange_complete_command_stdout_values_are_unchanged(monkeypatch, capsys):
-    expected = json.loads((FIXTURE / "before-cli-stdout.json").read_text())
-    assert len(expected) == 29
-    for key, stdout in expected.items():
-        script, params = key.split(":", 1)
-        args = (
-            params.split() if params.startswith("--zhongji-days") else params.split(":")
-        )
-        assert _command(monkeypatch, capsys, script, args) == stdout
-
-
 @pytest.mark.parametrize(
     "args",
     [

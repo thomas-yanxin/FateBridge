@@ -19,10 +19,8 @@ ROOT = Path(__file__).resolve().parents[1]
 BINDINGS = {
     "tests/fixtures/human-design-calendar-span-plan.json": "8dd18b55006024128f42efe5ab8671db4a4fd4ac76fbb23a593146289d957f86",
     "tests/fixtures/human-design-calendar-span-de440.json": "06ef8f4e29842187f7916734006d7c56467ead52a7f23797865912a5a5b14411",
-    "scripts/gen_human_design_calendar_span_reference.py": "428b7ae1c5a067662fbefea56b3ef8a08f303a6a2eebf5211bfda40a9983d09d",
     "tests/fixtures/human-design-astronomy-plan.json": "14475d33b6b664b8d1a7b9aaa746352ca5aaced242735f5e39c6e75dac129f50",
     "tests/fixtures/human-design-astronomy-de440.json": "949d4187a8bc6c4bacd8492a374c523d788cc72e73842c8e231850ff786733ca",
-    "scripts/gen_human_design_astronomy_reference.py": "c37337a83dd976b601d431fb40ca1ffe2e95cdf88980f42ba65090588740c1c1",
 }
 
 

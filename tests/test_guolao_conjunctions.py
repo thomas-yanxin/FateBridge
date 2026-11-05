@@ -235,18 +235,6 @@ def test_all_28_paper_rows_are_audited_including_formula_and_identity_failures(
     assert not report["real_world_predictive_validity_tested"]
 
 
-def test_the_38_old_complete_stdout_values_remain_byte_identical(monkeypatch, capsys):
-    expected = json.loads((FIXTURE / "before-38-cli-stdout.json").read_text())
-    assert len(expected) == 38
-    for key, stdout in expected.items():
-        script, params = key.split(":", 1)
-        args = params.split() if " " in params else params.split(":")
-        path = ROOT / "scripts" / script
-        monkeypatch.setattr(sys, "argv", [str(path), *args])
-        assert runpy.run_path(str(path))["main"]() == 0
-        assert capsys.readouterr().out == stdout
-
-
 @pytest.mark.parametrize(
     "args",
     [

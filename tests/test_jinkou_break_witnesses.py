@@ -13,7 +13,6 @@ from pydantic import ValidationError
 import fatebridge.application.execution as execution
 from fatebridge.core.output_jinkou_breaks import JinkouBranchBreaks
 from scripts.audit_jinkou_break_witnesses import CORPUS, audit, reference
-from scripts.jinkou_break_witnesses_archive import without_break_witnesses
 from tests.test_agentic_nested_outputs import AS_OF, business, call_cli, native, rest
 from tests.test_jinkou_branch_breaks import PAYLOAD, SPEC, course, native_solar, raw
 
@@ -71,25 +70,6 @@ def test_sparse_projection_does_not_fill_missing_readings():
                     )
                 )
             )
-
-
-def test_exact_offline_inverse_preserves_pairs_versions_and_arbitrary_prose():
-    body = copy.deepcopy(raw())
-    body["snapshot_text"] += "\n寅破巳1.16.0：不得删去旧事实\n"
-    previous = without_break_witnesses(body, reference())
-    assert previous["snapshot_text"] == body["snapshot_text"]
-    for role in ("primary", "natal_course", "year_fate"):
-        a, b = course(body, role), course(previous, role)
-        assert a["ruleset"] == b["ruleset"]
-        assert a["branch_breaks"]["rows"] == b["branch_breaks"]["rows"]
-        assert len(b["branch_breaks"]["written_pairs"]) == 7
-        assert b["branch_breaks"]["scan_extra_pairs"] == [["寅", "巳"]]
-        assert "witness_evidence" not in b["branch_breaks"]
-    body["jinkou"]["branch_breaks"]["witness_evidence"]["witnesses"][1][
-        "extra_phrase_present"
-    ] = False
-    with pytest.raises(ValueError, match="cannot hide"):
-        without_break_witnesses(body, reference())
 
 
 @pytest.mark.parametrize("project", [False, True])

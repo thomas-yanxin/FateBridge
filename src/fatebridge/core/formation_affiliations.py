@@ -10,7 +10,6 @@ from typing import Any, Mapping, Sequence, TypeVar
 from fatebridge.utils.data import BRANCH_CONFLICTS, Element
 
 POLICY = "complete_same_target_affiliation_v1"
-LEGACY_POLICY = "legacy_distinct_position_claims_v1"
 SOURCE = {
     "id": "complete_same_target_affiliation_primary_v1",
     "title": "子平真詮·論正官宣參國例；任注滴天髓闡微·方局、母象",

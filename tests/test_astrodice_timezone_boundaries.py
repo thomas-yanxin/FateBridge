@@ -20,13 +20,9 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.civil_time import utc_calendar
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
 
-FIXTURES = Path(__file__).parent / "fixtures"
-PROTOCOL = json.loads(
-    (FIXTURES / "astrodice-timezone-boundary-protocol.json").read_text()
-)
-REFERENCE = json.loads(
-    (FIXTURES / "astrodice-timezone-boundary-reference-v2.json").read_text()
-)
+FIXTURES = Path(__file__).parent / "data/astrodice/tables"
+PROTOCOL = json.loads((FIXTURES / "timezone-boundary-protocol.json").read_text())
+REFERENCE = json.loads((FIXTURES / "timezone-boundary-reference-v2.json").read_text())
 SPEC = next(spec for spec in CATALOG if spec.key == "otherbu")
 
 

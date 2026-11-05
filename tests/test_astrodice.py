@@ -17,8 +17,8 @@ from fatebridge.core.local_techniques.otherbu import build_otherbu_result
 from fatebridge.core.requests.divination import OtherBuRequest
 from fatebridge.services.divination import calculate_otherbu_analysis
 
-FIXTURES = Path(__file__).parent / "fixtures"
-REFERENCE = json.loads((FIXTURES / "astrodice-sign-reference.json").read_text())
+FIXTURES = Path(__file__).parent / "data/astrodice/tables"
+REFERENCE = json.loads((FIXTURES / "sign-reference.json").read_text())
 PLANETS = [
     *REFERENCE["planets"],
     "Uranus",
@@ -250,20 +250,24 @@ def test_sky_is_invariant_for_equivalent_offsets_and_changes_with_seconds():
 
 @pytest.mark.parametrize(
     "reference",
-    json.loads((FIXTURES / "jyotish-horizons.json").read_text())["references"],
+    json.loads((Path(__file__).parent / "fixtures/jyotish-horizons.json").read_text())[
+        "references"
+    ],
     ids=lambda r: r["body"],
 )
 @pytest.mark.parametrize("file_free", [False, True], ids=["configured", "moshier"])
 def test_optional_sky_positions_against_frozen_nasa_jpl_horizons(reference, file_free):
-    from tests.golden.runner import golden_ephemeris
+    from tests.ephemeris_context import moshier_ephemeris
 
-    fixture = json.loads((FIXTURES / "jyotish-horizons.json").read_text())
+    fixture = json.loads(
+        (Path(__file__).parent / "fixtures/jyotish-horizons.json").read_text()
+    )
     assert (
         hashlib.sha256(reference["response"]["result"].encode()).hexdigest()
         == reference["response_sha256"]
     )
 
-    with golden_ephemeris() if file_free else nullcontext():
+    with moshier_ephemeris() if file_free else nullcontext():
         for row in reference["rows"]:
             moment = datetime.fromisoformat(row["utc"])
             result = build_otherbu_result(

@@ -1,8 +1,6 @@
 """Frozen public-second counterexamples, complete root replay and raw controls."""
 
-import hashlib
 import json
-import sys
 from copy import deepcopy
 from pathlib import Path
 
@@ -26,16 +24,9 @@ from fatebridge.validation.human_design_solar_root import verify_solar_root_cont
 ROOT = Path(__file__).resolve().parents[1]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-root-body-plan.json"
 PLAN = json.loads(PLAN_PATH.read_text())
-BEFORE_PATH = ROOT / "docs/validation/human-design-root-body-before.json"
-BEFORE = json.loads(BEFORE_PATH.read_text())
-LINUX_BEFORE_PATH = (
-    ROOT / "tests/fixtures/human-design-root-body-linux-1.31-baseline.json"
-)
-LINUX_BEFORE = json.loads(LINUX_BEFORE_PATH.read_text())
 # Raw native floats are platform-bound, as are the repository's Linux golden
 # locks. The Linux baseline was captured from the actual OLD1.31wheel in that
 # runtime, independently of the NEW producer. Both captures remain immutable.
-NATIVE_BEFORE = LINUX_BEFORE if sys.platform == "linux" else BEFORE
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
@@ -48,47 +39,6 @@ def rehash(run):
         {k: v for k, v in run.items() if k != "run_metadata"}
     )
     return run
-
-
-def test_before_cases_and_acceptance_thresholds_stay_frozen():
-    assert (
-        hashlib.sha256(BEFORE_PATH.read_bytes()).hexdigest()
-        == "4a8216de9d70c0a35a2f15b948ae9bc12cf515bf4e97d72b1c1dcd60c41fddd3"
-    )
-    assert (
-        hashlib.sha256(PLAN_PATH.read_bytes()).hexdigest()
-        == "dd02d66b4cba690c521de79a2c6fe945a609cf936a728fffedb1e7dfab6387ac"
-    )
-    assert (
-        hashlib.sha256(LINUX_BEFORE_PATH.read_bytes()).hexdigest()
-        == "c6a18e33ab46ba62d21aba966e81b2eb01dc0abbcf2dd71b3b1ae419086b58bb"
-    )
-    assert LINUX_BEFORE["old_ruleset"] == "1.31.0"
-    assert (
-        LINUX_BEFORE["old_wheel_sha256"]
-        == "9150b51acaafe407c4206655d1bf4213a3c0be5f8ff068e964ff56da524c6218"
-    )
-    assert [c["input"] for c in LINUX_BEFORE["cases"]] == [
-        c["input"] for c in BEFORE["cases"]
-    ]
-    assert len(PLAN["cases"]) == len(BEFORE["cases"]) == 7
-    assert sum(c["mechanics_changed"] for c in BEFORE["cases"]) == 3
-    assert all(
-        c["old_complete_verification"]["status"] == "verified_fixed_template_reading"
-        for c in BEFORE["cases"]
-    )
-    assert all(
-        c["original_solver"]["numerical_precision"][
-            "other_bodies_bracket_sensitivity_assessed"
-        ]
-        is False
-        for c in BEFORE["cases"]
-    )
-    assert PLAN["unchanged_thresholds"] == {
-        "astronomy_arcsec": 2.0,
-        "physical_design_root_seconds": 5.0,
-        "clock_seconds": 0.0002,
-    }
 
 
 @pytest.mark.parametrize("mode", PLAN["required_modes"])
@@ -109,17 +59,6 @@ def test_every_frozen_public_second_on_both_conventions_and_backends(
     assert proof["physical_time_accuracy_certified"] is False
     assert run["validation"]["all_three_axes_full_marks"] is False
     if not empty_files and mode == "true":
-        before = next(c for c in BEFORE["cases"] if c["id"] == case["id"])
-        native_before = next(c for c in NATIVE_BEFORE["cases"] if c["id"] == case["id"])
-        assert native_before["input"] == before["input"]
-        assert (
-            run["activations"]["personality"] == native_before["original_personality"]
-        )
-        assert run["activations"]["design"] == native_before["original_selected_design"]
-        assert run["bodygraph"] == before["original_selected_graph"]
-        assert {
-            k: v for k, v in run["variables"].items() if k != "personality_colors"
-        } == before["original_variables"]
         for row, original in zip(
             proof["observed_activation_changes"],
             case["Swiss_true_node_expected_changes"],

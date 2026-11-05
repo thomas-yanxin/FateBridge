@@ -15,9 +15,10 @@ from fatebridge.core.metaphysics.ziwei import (
     build_ziwei_chart,
     build_ziwei_horoscope,
 )
+from scripts.ziwei_conditional_inputs import synthetic_birth_clock
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures/ziwei_independent"
+FIXTURES = ROOT / "tests/data/ziwei_independent"
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 # Normalized names from the separately frozen twelve-palace text (clockwise).
 PALACES = [
@@ -154,7 +155,9 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
                         assignments += 1
                     for age in (ju - 1, ju, ju + 9, ju + 10):
                         h = build_ziwei_horoscope(
-                            nominal_age_basis="legacy_mixed_clock",
+                            birth_seed=synthetic_birth_clock(
+                                int((chart)["lunar_date"]["year"])
+                            ),
                             chart=chart,
                             gender=gender,
                             target_seed=_seed(year + age - 1),
@@ -217,7 +220,9 @@ def audit_limits(fixtures: Path = FIXTURES) -> dict[str, Any]:
                     target = BRANCHES[(year - 1984) % 12]
                     wanted = walk(walk(target, month - 1, -1), BRANCHES.index(hour), 1)
                     h = build_ziwei_horoscope(
-                        nominal_age_basis="legacy_mixed_clock",
+                        birth_seed=synthetic_birth_clock(
+                            int((chart)["lunar_date"]["year"])
+                        ),
                         chart=chart,
                         gender="男",
                         target_seed=_seed(year),

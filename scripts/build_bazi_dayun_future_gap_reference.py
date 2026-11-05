@@ -11,7 +11,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_dayun_future_gaps_v1"
+FIXTURE = ROOT / "tests/data/bazi_dayun_future_gaps_v1"
 EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 SECOND = 1_000_000
 DAY = 86400 * SECOND
@@ -55,13 +55,10 @@ def main():
     for name, digest in protocol["files"].items():
         assert sha(ROOT / name) == digest, name
     parser = runpy.run_path(str(ROOT / "scripts/build_bazi_birth_fold_reference.py"))
-    clock_path = ROOT / "tests/fixtures/bazi_birth_fold_v1/compiled/America/New_York"
+    clock_path = ROOT / "tests/data/bazi_birth_fold_v1/compiled/America/New_York"
     times, indices, kinds = parser["parse_tzif"](clock_path.read_bytes())
     integer_operator = runpy.run_path(
-        str(
-            ROOT
-            / "tests/fixtures/bazi_dayun_calendar_carries_v1/collector-first.py.txt"
-        )
+        str(ROOT / "scripts/build_bazi_dayun_carry_reference.py")
     )["initial_boundary"]
     offsets = sorted({kind[0] for kind in kinds})
 
@@ -121,7 +118,7 @@ def main():
         return micros(wall - EPOCH)
 
     data = json.loads(
-        (ROOT / "tests/fixtures/bazi_boundary_decisions_v1/probes.json").read_text()
+        (ROOT / "tests/data/bazi_boundary_decisions_v1/probes.json").read_text()
     )
     roots = sorted(
         [r for r in data["rows"] if r["side"] == "next_minute" and r["name"] in JIE],
@@ -137,8 +134,9 @@ def main():
         )
         assert high_root - low_root <= 133 * MONTH
         for month in range(133):
-            low, high = low_root + month * MONTH, min(
-                high_root, low_root + (month + 1) * MONTH
+            low, high = (
+                low_root + month * MONTH,
+                min(high_root, low_root + (month + 1) * MONTH),
             )
             if low >= high:
                 continue
@@ -173,8 +171,9 @@ def main():
                     instant(a + offset * SECOND).date()
                     == instant(b - 1 + offset * SECOND).date()
                 )
-                first, last = wall_start(a, root, offset), wall_start(
-                    b - 1, root, offset
+                first, last = (
+                    wall_start(a, root, offset),
+                    wall_start(b - 1, root, offset),
                 )
                 assert last - first == 121 * (b - a - 1)
                 for gap in gaps[
@@ -201,7 +200,7 @@ def main():
                     grid = [center + shift * 60 * SECOND for shift in [-1, 0, 1]]
                     witnesses = [upper - 100000, lower, upper, upper + 100000]
                     record = {
-                        "id": f"{previous['year']}-{previous['name']}-month{month}-cell{cell_index}-gap{gap['at']//SECOND}",
+                        "id": f"{previous['year']}-{previous['name']}-month{month}-cell{cell_index}-gap{gap['at'] // SECOND}",
                         "source_jie": previous,
                         "next_jie_utc": instant(high_root).isoformat(),
                         "nominal_months": month,
@@ -302,7 +301,6 @@ def main():
     report = {
         "recorded_at_utc": datetime.now(timezone.utc).isoformat(),
         "protocol_sha256": sha(protocol_path),
-        "collector_sha256": sha(__file__),
         "compiled_tzif_sha256": sha(clock_path),
         "positive_source_gaps": len(gaps),
         "counts": dict(counts),

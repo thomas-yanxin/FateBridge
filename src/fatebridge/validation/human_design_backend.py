@@ -54,17 +54,9 @@ def verify_full_backend_report(payload: dict[str, Any]) -> dict[str, Any]:
             }
         elif status == "full_backend_compared":
             reference = report["reference_chart"]
-            # Historical raw fixtures retain their original solver facts. They
-            # cannot be upgraded into evidence of adjacent-TT convergence.
-            # A current run always has the selected witness, and therefore
-            # requires a verified witness in its reference chart as well.
-            if (
-                "numerical_precision" in payload["design_solver"]
-                or "numerical_precision" in reference["design_solver"]
-            ):
-                if verify_solar_root_context(reference)["errors"]:
-                    raise ValueError("Inconsistent reference solar root witness")
-                checked_roots = 1
+            if verify_solar_root_context(reference)["errors"]:
+                raise ValueError("Inconsistent reference solar root witness")
+            checked_roots = 1
             if verify_activation_provenance(reference["activations"], node_mode)[
                 "errors"
             ]:

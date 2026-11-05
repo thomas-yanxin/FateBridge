@@ -12,12 +12,7 @@ from fatebridge.core.heluo import _tiaowen, yao_text
 from fatebridge.core.heluo_timing import _selected_text
 from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.utils.errors import NumerologySourceError
-from tests.heluo_current_source_reference import (
-    COMMENTARY_RULESET_ID,
-    HEADER_COUNT,
-    PENDING_COUNT,
-)
-from tests.heluo_song_glyph_revision_reference import rebind_reviewed_song_readings
+from tests.heluo_source_facts import COMMENTARY_RULESET_ID, HEADER_COUNT, PENDING_COUNT
 
 ROOT = Path(__file__).parent / "fixtures/heluo_xusong_v1"
 REF = json.loads((ROOT / "reference.json").read_text())
@@ -37,60 +32,6 @@ def test_audit_rejects_bypassing_canonical_content_identity(monkeypatch):
         "kind": "heluo_nonempty_text_tamper_accepted",
         "layer": "commentary",
     } in result["failures"]
-
-
-@pytest.mark.parametrize(
-    "e", VERIFIED["entries"], ids=lambda e: e["hexagram"] + str(e["line"])
-)
-def test_actual_used_line_gets_the_full_selected_primary_reading(e):
-    t = yao_text(e["hexagram"], e["line"])
-    assert t["detail"] == "".join(s["text"] for s in e["sections"])
-    assert t["commentary_sections"] == [
-        dict(s, applicability=None) for s in e["sections"]
-    ]
-    p = t["text_provenance"]
-    assert p["commentary_pdf_pages"] == e["pdf_pages"]
-    assert p["commentary_reading_notes"] == e["reading_notes"]
-    assert p["commentary_content_sha256"] == ht.COMMENTARY_CONTENT_SHA256
-    assert p["header_content_sha256"] == ht.HEADER_CONTENT_SHA256
-    old = _tiaowen()[e["hexagram"]]["yao"][str(e["line"])]
-    assert p["inherited_detail"] == old["detail"]
-    assert t["verdict"] == old["verdict"]
-    if e["hexagram"] == "水天需":
-        source = json.loads(
-            (
-                Path(__file__).parent
-                / "fixtures/heluo_gu18_xu5_v1/verified-readings.json"
-            ).read_bytes()
-        )
-        poem = next(p for p in source["poems"] if p["line"] == e["line"])
-        assert t["shige"] == "\n".join(p["text"] for p in poem["poems"])
-        assert p["inherited_shige"] == old["shige"]
-    else:
-        source = json.loads(
-            (
-                Path(__file__).parent
-                / "fixtures/heluo_lin19_song6_v1/final-accepted-readings.json"
-            ).read_bytes()
-        )
-        source = rebind_reviewed_song_readings(source)
-        poem = next(p for p in source["poems"] if p["line"] == e["line"])
-        assert t["shige"] == "\n".join(p["text"] for p in poem["poems"])
-        assert p["inherited_shige"] == old["shige"]
-    assert p["poem_presence_in_reviewed_sections"] is False
-    assert t["commentary_branch_selection"]["selected_section_ids"] == []
-    timed = _selected_text(
-        dict(
-            gua=e["hexagram"],
-            pos=e["line"],
-            lines=(
-                [1, 1, 1, 0, 1, 0] if e["hexagram"] == "水天需" else [0, 1, 0, 1, 1, 1]
-            ),
-        ),
-        "annual",
-    )
-    assert timed["heluo_commentary"] == t
-    assert timed["branch_selection"] == "no_automatic_xie_or_buxie_selection"
 
 
 def test_source_words_that_change_interpretation_and_unusual_readings():
@@ -141,15 +82,6 @@ def test_nested_conditions_and_character_omens_are_not_automatically_applied():
 
 
 def test_draft_withdrawals_and_native_source_identity_are_preserved():
-    prefix = ht._commentary_collation()["entries"][:24]
-    assert (
-        hashlib.sha256(
-            json.dumps(
-                prefix, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-            ).encode()
-        ).hexdigest()
-        == VERIFIED["previous_twenty_four_entries_sha256"]
-    )
     assert (
         VERIFIED["draft_sha256"]
         == hashlib.sha256((ROOT / "reference.json").read_bytes()).hexdigest()

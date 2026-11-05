@@ -14,7 +14,7 @@ from pathlib import Path
 from scripts.astrodice_apparent_source_reference import Reader, sample
 from scripts.astrodice_de441_records import calendar_jd_tdb
 
-SOURCE_MANIFEST = "96f8c9b6a8b2fde8f5f11b43316928fc2694fb90ab89c7d438bc7d4ef5aa9d30"
+SOURCE_MANIFEST = "48f97f0490dfda470e363d6ba3209f209e90900cacb5c5d7ff114bf65efab660"
 
 
 def digest(path):

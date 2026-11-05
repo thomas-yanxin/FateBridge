@@ -13,12 +13,15 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 
 
 def unavailable():
     raise EphemerisSourceError("solar_de440_invalid")
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("key", ["knowledge_read", "gua_lookup"])

@@ -21,8 +21,6 @@ from tests.test_numerology_solar_providers import (
 )
 
 rest = shared_rest
-solar_aa1996_build = shared_build_fixture
-solar_provider_environment = shared_provider_fixture
 
 
 @pytest.mark.parametrize("mode", REFERENCE["provider_modes"])

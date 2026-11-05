@@ -1,7 +1,6 @@
 """Same-receipt contradictions fail before projection across all BaZi entries."""
 
 import asyncio
-import gzip
 import json
 from copy import deepcopy
 from dataclasses import replace
@@ -15,14 +14,7 @@ from tests.test_agentic_nested_outputs import rest as shared_rest_fixture
 
 rest = shared_rest_fixture
 ROOT = Path(__file__).resolve().parents[1]
-ROWS = json.loads(
-    gzip.decompress(
-        (
-            ROOT
-            / "docs/validation/bazi-force-coherence-files-v1/public11-before-first.json.gz"
-        ).read_bytes()
-    )
-)["rows"]
+ROWS = json.loads((ROOT / "tests/data/bazi/force-coherence-inputs.json").read_text())
 
 
 def evidence(result, tool):
@@ -48,10 +40,14 @@ def test_inconsistent_full_force_packet_cannot_hide_behind_unrelated_projection(
 ):
     tool = row["tool"]
     spec = SPECS[tool]
-    payload = deepcopy(row["result"])
+    from tests.test_bazi_complete_anchors import base
+
+    payload = deepcopy(base(tool)["result"])
     force = evidence(payload, tool)["force_components"]["engineering_composition"]
     if fault == "wrong_share":
-        force["body_within_support_share"] = row["first_accepted_mismatched_share"]
+        force["body_within_support_share"] = (
+            0.75 if force["body_within_support_share"] != 0.75 else 0.25
+        )
     else:
         force["strength_method_id"] = "stale-other-assessment"
     original = execution.execute_spec

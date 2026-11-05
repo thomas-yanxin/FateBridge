@@ -7,12 +7,7 @@ import pytest
 
 from fatebridge.core import canping_texts
 from fatebridge.core import numerology_knowledge as gateway
-from tests.canping_witness_knowledge_revision import (
-    REVISION,
-    rebind_r99_knowledge,
-    rebind_r99_metadata,
-)
-from tests.heluo_current_source_reference import CATALOGUE_VERSION
+from tests.heluo_source_facts import CATALOGUE_VERSION
 
 
 @pytest.mark.parametrize("domain", ["heluo", "canping"])
@@ -74,43 +69,3 @@ def test_unmatched2328_does_not_fill3328_or_resolve_primary_uncertainty():
     )
     assert uncertain["reference_details"]["record"]["text"].startswith("□")
     assert "□是编辑未定字标记" in "\n".join(uncertain["tips"])
-
-
-@pytest.mark.parametrize(
-    "field",
-    ["source_catalogue_version", "source_catalogue_content_sha256", "source_records"],
-)
-def test_knowledge_version_migration_rejects_unreviewed_old_metadata(field):
-    before = {k: pair[0] for k, pair in REVISION["provenance_pairs"].items()}
-    before["source_records"] = [
-        {
-            "key": "text_witnesses",
-            **{
-                k: pair[0]
-                for k, pair in REVISION["source_record_pairs"]["text_witnesses"].items()
-            },
-        }
-    ]
-    if field == "source_records":
-        before[field][0]["loaded_file_sha256"] = "unreviewed"
-    else:
-        before[field] = "unreviewed"
-    with pytest.raises(AssertionError):
-        rebind_r99_metadata({"provenance": before})
-
-
-def test_knowledge_migration_preserves_literal_body_and_unrelated_fields():
-    literal = REVISION["provenance_pairs"]["source_catalogue_content_sha256"][0]
-    old = {
-        "domain": "heluo",
-        "category": "line_texts",
-        "provenance": {k: pair[0] for k, pair in REVISION["provenance_pairs"].items()},
-        "reference_details": {"record": {"text": literal}},
-        "unreviewed_other_field": literal,
-    }
-    current = rebind_r99_knowledge(old)
-    assert current["reference_details"] == old["reference_details"]
-    assert current["unreviewed_other_field"] == literal
-    assert old["provenance"]["source_catalogue_version"] == 10
-    with pytest.raises(AssertionError):
-        rebind_r99_knowledge(current)

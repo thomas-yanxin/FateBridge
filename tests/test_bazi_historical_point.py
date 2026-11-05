@@ -12,7 +12,7 @@ from fatebridge.core.astro.time_scales import datetime_from_tt_point
 from fatebridge.core.astro.tt_epoch import TTInstant
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_historical_point_v1"
+FIXTURE = ROOT / "tests/data/bazi_historical_point_v1"
 
 
 def test_all506_original_rows_and_first_seven_failures_are_retained():

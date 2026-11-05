@@ -28,13 +28,12 @@ from fatebridge.core.requests.western_events import (
 )
 from fatebridge.core.western_event_clock import build_event_subject
 from fatebridge.services.western_election import calculate_election
+from tests.reference_data import verify_source_files
 
-FIXTURE = Path(__file__).parent / "fixtures/western-iers-c04-v1"
-MANIFEST = json.loads((FIXTURE / "manifest.json").read_text())
+FIXTURE = Path(__file__).parent / "data/astro/iers_c04"
+MANIFEST = json.loads((FIXTURE / "reference-info.json").read_text())
 ANCHORS = json.loads(gzip.decompress((FIXTURE / "anchors.json.gz").read_bytes()))
-OLD_CONTROLS = json.loads(gzip.decompress((FIXTURE / "controls.json.gz").read_bytes()))
-CORRECTED = FIXTURE.with_name("western-iers-c04-v2")
-CORRECTION_MANIFEST = json.loads((CORRECTED / "manifest.json").read_text())
+CORRECTED = FIXTURE
 CONTROLS = json.loads(gzip.decompress((CORRECTED / "controls.json.gz").read_bytes()))
 LINE = MANIFEST["tolerance_seconds"]
 GEOMETRY_PATH = CORRECTED / "geometry.json"
@@ -44,8 +43,7 @@ GEOMETRY = json.loads(GEOMETRY_PATH.read_text())
 def test_external_reference_and_full_source_are_sealed():
     assert MANIFEST["production_imports"] is MANIFEST["swiss_imports"] is False
     assert MANIFEST["published_daily_records"] == 23638
-    for name, digest in MANIFEST["assets"].items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
+    verify_source_files(FIXTURE)
     assert len(ANCHORS) == 23638 and len(CONTROLS) == 22
 
 
@@ -88,15 +86,19 @@ def test_declared_continuous_interpolation_preserves_all_frozen_controls(row):
 def test_direct_astropy_historical_differences_and_endpoint_are_not_erased():
     failures = [
         r
-        for r in OLD_CONTROLS
+        for r in CONTROLS
         if r["direct_astropy_difference_seconds"] is not None
         and abs(r["direct_astropy_difference_seconds"]) > LINE
     ]
     assert [r["utc"] for r in failures] == [
+        "1962-08-01T12:00:00",
         "1963-10-31T12:00:00",
+        "1963-11-01T12:00:00",
+        "1964-04-01T12:00:00",
         "1971-12-31T12:00:00",
     ]
-    assert all(abs(r["direct_astropy_difference_seconds"]) > 0.049 for r in failures)
+    large = [r for r in failures if abs(r["direct_astropy_difference_seconds"]) > 0.049]
+    assert [r["utc"] for r in large] == ["1963-10-31T12:00:00", "1971-12-31T12:00:00"]
     unavailable = [r for r in CONTROLS if r["direct_astropy_status"] < 0]
     assert [r["utc"] for r in unavailable] == ["2026-09-19T00:00:00"]
     assert unavailable[0]["jd_ut1_direct_astropy"] is None
@@ -213,11 +215,8 @@ def test_public_failed_observed_request_does_not_leak_its_context():
 
 
 def test_reference_correction_is_separate_and_scale_consistent():
-    assert CORRECTION_MANIFEST["created_after_candidate"]
-    assert CORRECTION_MANIFEST["development_reference_not_blind"]
-    assert CORRECTION_MANIFEST["production_imports"] is False
-    for name, sha in CORRECTION_MANIFEST["assets"].items():
-        assert hashlib.sha256((CORRECTED / name).read_bytes()).hexdigest() == sha
+    assert MANIFEST["development_reference_not_blind"]
+    verify_source_files(FIXTURE)
     changed = [r for r in CONTROLS if abs(r["reference_correction_seconds"]) > LINE]
     assert len(changed) == 5
     for row in CONTROLS:

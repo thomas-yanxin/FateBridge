@@ -272,9 +272,7 @@ def test_invalid_ganzhi_is_rejected_instead_of_becoming_false_evidence():
         analyze_timing_interactions(NATAL, {"liunian": {"stem": "甲", "branch": "丑"}})
 
 
-HKO = json.loads(
-    (Path(__file__).parent / "fixtures/bazi-timing-hko-2026.json").read_text()
-)
+HKO = json.loads((Path(__file__).parent / "data/bazi-timing-hko-2026.json").read_text())
 
 
 @pytest.mark.parametrize("case", HKO["cases"], ids=lambda case: case["term"])

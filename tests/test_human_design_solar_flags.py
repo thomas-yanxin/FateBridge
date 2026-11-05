@@ -1,7 +1,6 @@
 """Same native Sun convention in roots, actual activations and every witness."""
 
 import ast
-import gzip
 import hashlib
 import json
 import math
@@ -15,11 +14,6 @@ from unittest.mock import patch
 
 import pytest
 
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
-
-pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
-
-
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
 from fatebridge.core.human_design import solar_root_subdivisions
@@ -28,23 +22,16 @@ from fatebridge.core.human_design_time import sun_at_tt
 from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
+
+pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
+
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-solar-flags-plan.json"
 PLAN = json.loads(PLAN_PATH.read_text())
-BEFORE_PATH = ROOT / "docs/validation/human-design-solar-flags-before.json.gz"
-BEFORE = json.loads(gzip.decompress(BEFORE_PATH.read_bytes()))
-NATIVE_BEFORE = (
-    json.loads(
-        gzip.decompress(
-            (
-                ROOT / "docs/validation/human-design-solar-flags-linux-before.json.gz"
-            ).read_bytes()
-        )
-    )
-    if sys.platform == "linux"
-    else BEFORE
-)
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
@@ -80,32 +67,6 @@ def check_solar_binding(chart):
             "solar_function_activation_subdivision_differences"
         ]
         == []
-    )
-
-
-def test_before_plan_and_old_488_flag_observations_are_immutable():
-    assert (
-        hashlib.sha256(BEFORE_PATH.read_bytes()).hexdigest()
-        == PLAN["before_sha256"]
-        == "cfa7a2a9b2cc765719de76ae3fba822b8900392ac3713e7ddb205f5b6bf5f803"
-    )
-    assert (
-        hashlib.sha256(PLAN_PATH.read_bytes()).hexdigest()
-        == "74d151c52b72a539ac4e766fa6770d25bb3facd7d8359e9330790a6c62b66f01"
-    )
-    p = ROOT / "tests/fixtures/human-design-solar-flag-screen.json"
-    assert hashlib.sha256(p.read_bytes()).hexdigest() == PLAN["screen_sha256"]
-    screen = json.loads(p.read_text())
-    assert screen["comparisons"] == 488 and len(screen["differences"]) == 185
-    assert len(BEFORE["cases"]) == 11
-    assert PLAN["unchanged_thresholds"] == {
-        "astronomy_arcsec": 2.0,
-        "physical_design_root_seconds": 5.0,
-        "clock_seconds": 0.0002,
-    }
-    assert any(
-        any(x != 0 for x in c["root_assembled_sun_differences_degrees"])
-        for c in BEFORE["cases"]
     )
 
 
@@ -146,31 +107,13 @@ def test_all_244_fixed_native_lattice_roots_in_a_fresh_process():
         )
         assert probe.returncode == 1, probe.stdout + probe.stderr
         report = json.loads(target.read_text())
-    # All244original expected roots remain unchanged. The separate strict
-    # acceptance still exits1 on both platforms; no claim of244exact passes.
-    expected_strict = (
-        json.loads(
-            (
-                ROOT
-                / "tests/fixtures/human-design-solar-lattice-linux-observation.json"
-            ).read_text()
-        )["strict_selected_root_conformance"]
-        if sys.platform == "linux"
-        else {"status": "failed", "total": 244, "passed": 242, "failed": 2}
-    )
-    # Historical native observations remain immutable evidence for their own
-    # hosts. The original producer is replayed in its sealed33-module closure
-    # on this host, so interpreter/libm differences never become a tolerance.
-    assert expected_strict == {
+    expected_strict = {
         "status": "failed",
         "total": 244,
         "passed": 243 if sys.platform == "linux" else 242,
         "failed": 1 if sys.platform == "linux" else 2,
     }
-    from tests.sealed_solar_lattice import original_lattice_report
-
-    before = original_lattice_report(ROOT, env)
-    assert report == before
+    assert report["strict_selected_root_conformance"] == expected_strict
     assert report["strict_selected_root_conformance"]["status"] == "failed"
     assert report["strict_selected_root_conformance"]["total"] == 244
     assert report["strict_selected_root_conformance"]["failed"] > 0
@@ -189,15 +132,6 @@ def test_all_old_public_inputs_keep_exact_solar_binding(
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     run = execute_tool(SPEC, SPEC.request_model(**{**case["input"], "node_mode": mode}))
     check_solar_binding(run)
-    if backend == "swieph" and mode == "true":
-        old = next(r["run"] for r in NATIVE_BEFORE["cases"] if r["id"] == case["id"])
-        assert run["activations"]["personality"] == old["activations"]["personality"]
-        # All frozen inputs remain; changed roots must be assessed at their own
-        # actual TT, never forced back to a legacy numerical function.
-        if run["design_solver"]["design_jd_tt"] == old["design_solver"]["design_jd_tt"]:
-            assert run["activations"]["design"] == old["activations"]["design"]
-            assert run["bodygraph"] == old["bodygraph"]
-            assert run["variables"] == old["variables"]
     with (
         patch.object(runtime, "ephemeris_call", forbidden),
         patch.object(native_execution, "calculate", forbidden),

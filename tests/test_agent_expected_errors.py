@@ -9,7 +9,7 @@ import pytest
 from scripts.evaluate_agent import (
     ROOT,
     error_response,
-    grade_expected_errors,
+    grade_case,
     matches_expected_error,
     model_prompt,
     prepare_references,
@@ -41,17 +41,15 @@ def rejected(payload=ERROR):
 
 
 def test_registered_refusal_is_not_a_successful_chart_or_an_unexpected_error():
-    result = grade_expected_errors(CASE, [rejected()], "explain actual refusal", 0)
+    result = grade_case(CASE, [rejected()], "explain actual refusal", 0)
     assert result["mechanical_checks_passed"]
     assert result["tool_calls"][0]["protocol_error"]
     assert result["tool_calls"][0]["error_response"] == ERROR
-    assert not grade_expected_errors({"manual_review": []}, [rejected()], "x", 0)[
+    assert not grade_case({"manual_review": []}, [rejected()], "x", 0)[
         "mechanical_checks_passed"
     ]
-    assert not grade_expected_errors(CASE, [], "x", 0)["mechanical_checks_passed"]
-    assert not grade_expected_errors(CASE, [event("taiyi")], "x", 0)[
-        "mechanical_checks_passed"
-    ]
+    assert not grade_case(CASE, [], "x", 0)["mechanical_checks_passed"]
+    assert not grade_case(CASE, [event("taiyi")], "x", 0)["mechanical_checks_passed"]
 
 
 @pytest.mark.parametrize(
@@ -69,9 +67,7 @@ def test_registered_refusal_is_not_a_successful_chart_or_an_unexpected_error():
 def test_different_error_or_coerced_type_never_matches(changes):
     actual = {**ERROR, **changes}
     assert not matches_expected_error(actual, ERROR)
-    assert not grade_expected_errors(CASE, [rejected(actual)], "x", 0)[
-        "mechanical_checks_passed"
-    ]
+    assert not grade_case(CASE, [rejected(actual)], "x", 0)["mechanical_checks_passed"]
 
 
 @pytest.mark.parametrize(
@@ -100,10 +96,8 @@ def test_cli_failed_business_reply_needs_matching_actual_server_capture():
         "result": {"is_error": True, "structured_content": ERROR},
         "sha256": "actual-verified-journal-record",
     }
-    assert not grade_expected_errors(CASE, [item], "actual refusal", 0)[
-        "mechanical_checks_passed"
-    ]
-    result = grade_expected_errors(CASE, [item], "actual refusal", 0, [captured])
+    assert not grade_case(CASE, [item], "actual refusal", 0)["mechanical_checks_passed"]
+    result = grade_case(CASE, [item], "actual refusal", 0, [captured])
     assert result["mechanical_checks_passed"]
     assert result["tool_calls"][0]["status"] == "failed"
     assert result["tool_calls"][0]["protocol_error"] is False
@@ -126,10 +120,10 @@ def test_cli_failed_business_reply_needs_matching_actual_server_capture():
             }
         },
     ):
-        assert not grade_expected_errors(
-            CASE, [item], "x", 0, [{**captured, **changes}]
-        )["mechanical_checks_passed"]
-    assert not grade_expected_errors({"manual_review": []}, [item], "x", 0, [captured])[
+        assert not grade_case(CASE, [item], "x", 0, [{**captured, **changes}])[
+            "mechanical_checks_passed"
+        ]
+    assert not grade_case({"manual_review": []}, [item], "x", 0, [captured])[
         "mechanical_checks_passed"
     ]
 
@@ -137,20 +131,18 @@ def test_cli_failed_business_reply_needs_matching_actual_server_capture():
 def test_transport_failure_repetition_or_wrong_tools_still_fail():
     bad = rejected()
     bad["item"]["status"] = "failed"
-    assert not grade_expected_errors(CASE, [bad], "x", 0)["mechanical_checks_passed"]
+    assert not grade_case(CASE, [bad], "x", 0)["mechanical_checks_passed"]
     bad["item"]["status"] = "completed"
     bad["item"]["error"] = "transport disconnected"
-    assert not grade_expected_errors(CASE, [bad], "x", 0)["mechanical_checks_passed"]
+    assert not grade_case(CASE, [bad], "x", 0)["mechanical_checks_passed"]
     assert (
         "repeated_tool_attempt:taiyi"
-        in grade_expected_errors(CASE, [rejected(), rejected()], "x", 0)["failures"]
+        in grade_case(CASE, [rejected(), rejected()], "x", 0)["failures"]
     )
-    assert not grade_expected_errors(CASE, [rejected(), event("sixyao")], "x", 0)[
+    assert not grade_case(CASE, [rejected(), event("sixyao")], "x", 0)[
         "mechanical_checks_passed"
     ]
-    assert not grade_expected_errors(CASE, [rejected()], "", 0)[
-        "mechanical_checks_passed"
-    ]
+    assert not grade_case(CASE, [rejected()], "", 0)["mechanical_checks_passed"]
 
 
 def test_only_structured_or_json_error_codes_are_read_not_guessed_from_prose():

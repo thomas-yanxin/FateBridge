@@ -8,8 +8,6 @@ from jsonschema import Draft202012Validator
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
 from tests.test_liuyao_transports import assert_same_run_receipt
 
-pytest_plugins = ["tests.test_agentic_nested_outputs"]
-
 
 @pytest.mark.parametrize(
     "day,changed,checks",

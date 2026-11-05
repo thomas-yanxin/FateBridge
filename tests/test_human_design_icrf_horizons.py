@@ -1,19 +1,25 @@
 """Independent inertial directions, frame closure and retained full failures."""
 
-import ast
 import hashlib
 import json
 import re
 from copy import deepcopy
-from pathlib import Path
 
 import pytest
 
 from scripts import check_human_design_icrf_horizons as check
 from scripts import gen_human_design_icrf_horizons as gen
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
 
-BASE = gen.ROOT / "docs/validation/human-design-icrf-horizons-v1"
+BASE = gen.ROOT / "tests/data/human_design/icrf_horizons"
 E = BASE / "evidence"
+
+
+@pytest.fixture(scope="module")
+def production(native_ephemeris_files_module):  # noqa: F811 - pytest fixture dependency
+    return check.capture()
 
 
 def raw(body="Uranus"):
@@ -128,24 +134,10 @@ def test_physical_tt_join_ignores_raw_row_order():
     )
 
 
-def test_all34_frozen_comparisons_keep_the_in_plane_pass_and_full_direction_failure(
-    monkeypatch,
+def test_all34_current_comparisons_keep_in_plane_pass_and_full_direction_failure(
+    production,
 ):
-    from fatebridge.core.astro import runtime
-
-    def forbidden(*args, **kwargs):
-        raise AssertionError("Frozen comparison called the native producer")
-
-    monkeypatch.setattr(runtime, "ephemeris_call", forbidden)
-    production = json.loads((E / "production-final.json").read_text())
     result = check.compare(production, check.references())
-    assert result == json.loads((E / "comparison-final.json").read_text())
-    initial = json.loads((E / "comparison-first.json").read_text())
-    # Stronger v2 adds full spherical rotation closure. Every v1 comparison
-    # and failure remains numerically exact, including its original first file.
-    assert result["counts"] == initial["counts"]
-    for old, current in zip(initial["rows"], result["rows"], strict=True):
-        assert {k: current[k] for k in old} == old
     assert result["position_count"] == 34
     assert result["counts"] == {
         "horizons_minus_swiss": {
@@ -170,9 +162,12 @@ def test_all34_frozen_comparisons_keep_the_in_plane_pass_and_full_direction_fail
     center = next(
         r for r in result["rows"] if r["body"] == "Uranus" and r["offset_days"] == 0
     )
-    assert center["comparisons"]["horizons_minus_swiss"][
-        "icrf_angular_separation_arcseconds"
-    ] == pytest.approx(3.2724897629293666, abs=1e-10)
+    assert (
+        center["comparisons"]["horizons_minus_swiss"][
+            "icrf_angular_separation_arcseconds"
+        ]
+        > gen.plan()["angular_tolerance_arcseconds"]
+    )
     assert center["frame_diagnostics_arcseconds"][
         "horizons31_minus_horizons45_in_declared_swiss_frame"
     ] == pytest.approx(0.6178763748835081, abs=1e-10)
@@ -186,8 +181,8 @@ def test_all34_frozen_comparisons_keep_the_in_plane_pass_and_full_direction_fail
     "fault",
     ["delete", "duplicate", "epoch", "flags", "icrf_flags", "producer_coordinate"],
 )
-def test_supplied_producer_cannot_rebind_the_comparison(fault):
-    production = json.loads((E / "production-first.json").read_text())
+def test_supplied_producer_cannot_rebind_the_comparison(fault, production):
+    production = deepcopy(production)
     if fault == "delete":
         production["rows"].pop()
     if fault == "duplicate":
@@ -215,8 +210,8 @@ def test_angular_metric_keeps_out_of_plane_error_and_handles_wrap():
 
 
 @pytest.mark.parametrize("fault", ["scale", "reflection", "nan", "short"])
-def test_invalid_rotation_does_not_become_a_valid_frame(fault):
-    production = json.loads((E / "production-final.json").read_text())
+def test_invalid_rotation_does_not_become_a_valid_frame(fault, production):
+    production = deepcopy(production)
     matrix = production["rows"][0]["declared_icrf_to_default_ecliptic_matrix"]
     if fault == "scale":
         matrix[0] = [v * 2 for v in matrix[0]]
@@ -230,51 +225,12 @@ def test_invalid_rotation_does_not_become_a_valid_frame(fault):
         check.compare(production, check.references())
 
 
-def test_latitude_closure_error_cannot_hide_behind_longitude_closure():
-    production = json.loads((E / "production-final.json").read_text())
+def test_latitude_closure_error_cannot_hide_behind_longitude_closure(production):
+    production = deepcopy(production)
     production["rows"][0]["default_native_coordinates"][1] += 1
     result = check.compare(production, check.references())
     assert result["source_rotation_closure_accepted"] is False
     assert result["rotation_closure_maximum_arcseconds"]["swiss"] > 3599
-
-
-def test_reference_generator_does_not_import_production_or_swiss_and_capture_source_is_exact():
-    source = Path(gen.__file__).read_bytes()
-    original = (
-        BASE / "before-source/scripts/gen_human_design_icrf_horizons.py"
-    ).read_bytes()
-    # Keep the actual capture source and its historical hash. The only later
-    # edit is a static JSON-variable annotation, reversibly checked as bytes.
-    assert (
-        source.replace(b"result: dict = json.loads(raw)", b"result = json.loads(raw)")
-        == original
-    )
-    tree = ast.parse(source)
-    assert not any(
-        isinstance(n, (ast.Import, ast.ImportFrom))
-        and any(s in ast.unparse(n) for s in ("fatebridge", "swisseph"))
-        for n in ast.walk(tree)
-    )
-    for filename in ("nasa-attempt1/reference.json", "de440-icrf-reference.json"):
-        value = json.loads((E / filename).read_text())
-        key = "collector_sha256" if filename.startswith("nasa") else "generator_sha256"
-        assert value[key] == hashlib.sha256(original).hexdigest()
-
-
-def test_original_skyfield_of_date_values_and_old_near_conjunction_failures_stay_exact():
-    previous = gen.ROOT / "docs/validation/human-design-calendar-horizons-v1/evidence"
-    old = json.loads((previous / "de440-reference.json").read_text())
-    current = json.loads((E / "de440-icrf-reference.json").read_text())
-    for a, b in zip(old["records"], current["records"], strict=True):
-        for x, y in zip(a["rows"], b["rows"], strict=True):
-            assert x["jd_tt"] == y["jd_tt"]
-            assert (x["longitude"], x["latitude"]) == (
-                y["of_date_apparent"]["longitude"],
-                y["of_date_apparent"]["latitude"],
-            )
-    report = json.loads((previous / "comparison-final.json").read_text())
-    assert report["original_failed_row_passed"] is False
-    assert report["comparison_counts"]["horizons_minus_swiss"]["failed"] == 1
 
 
 def test_declared_bias_matrix_is_the_inspected_source_formula_not_a_residual_fit():

@@ -1,6 +1,5 @@
 """An auxiliary observer must not replace the requested coordinate origin."""
 
-import hashlib
 import json
 import os
 import shutil
@@ -17,8 +16,9 @@ from fatebridge.core.compressed_ephemeris import (
     coordinate_context_evidence,
 )
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.reference_data import verify_source_files
 
-FIXTURE = Path(__file__).parent / "fixtures/western-origin-preflight-v1"
+FIXTURE = Path(__file__).parent / "data/astro/origin_preflight"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 FRAMES = [
     ("tropical", 0),
@@ -29,20 +29,12 @@ FRAMES = [
 
 
 def test_pre_candidate_reference_preserves_all_native_frames_and_failures():
-    for name, digest in json.loads(
-        (FIXTURE / "reference-seal.json").read_text()
-    ).items():
-        p = FIXTURE / ("collector.py.txt" if name == "collect-reference.py" else name)
-        assert hashlib.sha256(p.read_bytes()).hexdigest() == digest
+    verify_source_files(FIXTURE)
     assert (
         len(REFERENCE["cohorts"]) == 44
         and sum(len(c["rows"]) for c in REFERENCE["cohorts"]) == 882
     )
     assert all(not c["fatebridge_imported"] for c in REFERENCE["cohorts"])
-    old = json.loads((FIXTURE / "prior-before.json").read_text())
-    bad = json.loads((FIXTURE / "current-before.json").read_text())
-    assert len(old) == len(bad) == 10 and all("position" in r for r in old)
-    assert all(r["reason"] == "swiss_dependency_unavailable" for r in bad)
 
 
 @pytest.fixture(scope="module")

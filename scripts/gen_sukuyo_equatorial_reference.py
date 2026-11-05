@@ -108,7 +108,7 @@ def main():
     }
     path = (
         Path(__file__).resolve().parents[1]
-        / "tests/fixtures/sukuyo-equatorial-horizons.json"
+        / "tests/data/sukuyo-equatorial-horizons.json"
     )
     path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(f'Frozen {sum(len(r["rows"]) for r in references)} external RA/Dec positions')

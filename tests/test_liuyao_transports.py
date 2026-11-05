@@ -10,14 +10,25 @@ from fatebridge.cli import run as cli_run
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
 
-pytest_plugins = ["tests.test_agentic_nested_outputs"]
-
 
 def assert_same_run_receipt(store, shaped, original):
     """Restore an explicitly deferred runtime before comparing exact receipts."""
     from tests.test_result_delivery import reconstruct
 
     inline = dict(shaped["run_metadata"])
+    evidence = inline.get("calculation_evidence")
+    if isinstance(evidence, dict) and "delivery_path" in evidence:
+        from fatebridge.utils.json_digest import digest
+
+        path = evidence["delivery_path"]
+        assert path == "run_metadata.calculation_evidence"
+        assert path in shaped["result_delivery"]["deferred_fields"]
+        restored_evidence = reconstruct(
+            store, shaped["result_delivery"]["result_id"], path
+        )
+        assert digest(restored_evidence) == evidence["sha256"]
+        assert restored_evidence["coverage"] == evidence["coverage"]
+        inline["calculation_evidence"] = restored_evidence
     runtime = inline["runtime"]
     if "delivery_path" in runtime:
         assert runtime["delivery_path"] == "run_metadata.runtime"

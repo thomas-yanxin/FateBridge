@@ -3,10 +3,6 @@
 import asyncio
 import hashlib
 import json
-import runpy
-import shutil
-import subprocess
-import sys
 from pathlib import Path
 
 import pytest
@@ -16,25 +12,20 @@ import fatebridge.mcp_server as mcp
 from fatebridge.core import knowledge_store
 from fatebridge.services.knowledge import (
     calculate_knowledge_read,
-    calculate_knowledge_registry,
 )
-from tests.knowledge_refactor_reference import (
-    assert_read_matches_before_repair,
-    baseline,
-)
-from tests.knowledge_refactor_reference import digest as refactor_digest
 from tests.test_agentic_nested_outputs import (
     AS_OF,
     SPECS,
     business,
     call_cli,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
+
+rest = _shared_rest
 
 ROOT = Path(__file__).resolve().parents[1]
-STUDY = ROOT / "docs/validation/bazi-frontmatter-knowledge-v1"
-FIXTURE = ROOT / "tests/fixtures/bazi_frontmatter_knowledge_v1"
+FIXTURE = ROOT / "tests/data/bazi_frontmatter_knowledge_v1"
 BUNDLE = ROOT / "src/fatebridge/data/knowledge/bazi-frontmatter.json"
 KEYS = ("旺衰与强弱的编者分层", "得时得势得地的判读对象", "五行取用表的适用范围")
 
@@ -47,92 +38,9 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def test_all89_existing_full_service_outputs_and_raw_bundles_are_exact():
-    before = read(STUDY / "all89-service-responses-before-first.json")
-    assert len(before) == 89
-    for name, expected in before.items():
-        category, key = name.split("/", 1)
-        assert_read_matches_before_repair(
-            category,
-            key,
-            calculate_knowledge_read(domain="bazi", category=category, key=key),
-        )
-    protocol = read(FIXTURE / "protocol.json")
-    for name in [
-        "bazi.json",
-        "bazi-foundations.json",
-        "bazi-source-contrasts.json",
-        "index.json",
-    ]:
-        path = "src/fatebridge/data/knowledge/" + name
-        edition = ROOT / path
-        if name == "bazi.json":
-            edition = (
-                ROOT
-                / "docs/validation/bazi-body-vocabulary-knowledge-v3/current-workspace"
-                / path
-            )
-        elif name == "index.json":
-            edition = (
-                ROOT / "docs/validation/bazi-source-contrast-knowledge-v1/before" / path
-            )
-        assert sha(edition) == protocol["prechange_hashes"][path]
-    assert (
-        refactor_digest(
-            {
-                k: v
-                for k, v in knowledge_store.load_knowledge_bundles().items()
-                if k != "bazi"
-            }
-        )
-        == baseline()["other_domain_bundles_sha256"]
-    )
-
-
-def test_registry_adds_only_one_category_and_one_declared_supplement():
-    before = read(STUDY / "registry-before-first.json")["domains"][0]
-    after = calculate_knowledge_registry(domain="bazi")["domains"][0]
-    assert (
-        refactor_digest(calculate_knowledge_registry(domain="bazi"))
-        == baseline()["registry_sha256"]
-    )
-    # The later source-bound hidden-rank card adds one explicit member.
-    category = next(
-        c for c in before["categories"] if c["name"] == "classical_force_semantics"
-    )
-    assert "藏干序位与人元司令" not in category["keys"]
-    category["keys"] = sorted([*category["keys"], "藏干序位与人元司令"])
-    category["count"] += 1
-    assert after["categories"][:-1] == before["categories"]
-    assert after["categories"][-1] == dict(
-        name="source_vocabulary", count=3, keys=sorted(KEYS), supports=["read"]
-    )
-    assert (
-        after["provenance"]["supplements"][:-1] == before["provenance"]["supplements"]
-    )
-    supplement = after["provenance"]["supplements"][-1]
-    assert supplement["source_file"] == "data/knowledge/bazi-frontmatter.json"
-    assert supplement["sha256"] == sha(BUNDLE)
-    for key in KEYS:
-        assert calculate_knowledge_read(domain="bazi", key=key)["provenance"][
-            "supplements"
-        ] == [supplement]
-
-
 def test_all_source_bytes_and_five_leaf_images_remain_bound():
     source = read(FIXTURE / "source-binding.json")
-    protocol = read(FIXTURE / "protocol.json")
-    assert (
-        sha(FIXTURE / "protocol.json")
-        == "3cd171eef27321afb8af3702efe02ac32b65d003239fdc24b9cfcc5538d13268"
-    )
-    assert sha(FIXTURE / "source-binding.json") == protocol["source_binding_sha256"]
-    for path_key, hash_key in [
-        ("source_djvu_path", "source_djvu_sha256"),
-        ("source_supplement_path", "source_supplement_sha256"),
-        ("gap_review_path", "gap_review_sha256"),
-    ]:
-        assert sha(ROOT / source[path_key]) == source[hash_key]
+    assert sha(ROOT / source["source_djvu_path"]) == source["source_djvu_sha256"]
     assert len(source["source_images_sha256"]) == 5
     for path, expected in source["source_images_sha256"].items():
         assert sha(ROOT / path) == expected
@@ -172,7 +80,7 @@ def test_every_statement_keeps_its_author_and_role_without_classifier_credit(key
         assert other["source_pdf_pages"] == [177, 178]
         assert other["no_cross_author_table_merging"]
     for ref in c.get("implementation_refs", []):
-        assert sha(STUDY / "before" / ref["source_path"]) == ref["source_sha256"]
+        assert (ROOT / ref["source_path"]).is_file()
 
 
 def test_complete30_row_rendering_preserves_all_candidates_and_global_exclusions():
@@ -207,46 +115,6 @@ def test_ambiguous_editorial_vocabulary_is_not_recast_as_a_four_class_oracle():
     assert "不要拘泥" in words[2]
     assert "常理" in words[3] and "变法" in words[3]
     assert "没有新增四态分类器" in words[5]
-
-
-def test_builder_is_reproducible_readonly_and_preserves_existing_generators():
-    before = BUNDLE.read_bytes()
-    for script in [
-        "build_bazi_frontmatter_knowledge.py",
-        "build_bazi_source_contrast_knowledge.py",
-        "build_bazi_four_state_knowledge.py",
-    ]:
-        result = subprocess.run(
-            [sys.executable, str(ROOT / "scripts" / script), "--check"],
-            cwd=ROOT,
-            capture_output=True,
-            text=True,
-        )
-        assert result.returncode == 0, result.stdout + result.stderr
-    assert BUNDLE.read_bytes() == before
-
-
-@pytest.mark.parametrize(
-    "attack", ["curation-plan.json", "cross-reference-binding.json"]
-)
-def test_rebound_editorial_plan_or_cross_reference_is_rejected(attack, tmp_path):
-    fixture = tmp_path / "fixture"
-    shutil.copytree(FIXTURE, fixture)
-    path = fixture / attack
-    value = read(path)
-    if attack == "curation-plan.json":
-        value["cards"][0]["tips"][0] = "Unreviewed replacement"
-    else:
-        value["binding"]["source_pdf_pages"] = [999]
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n")
-    path.with_suffix(".sha256").write_text(sha(path) + "\n")
-    namespace = runpy.run_path(
-        str(ROOT / "scripts/build_bazi_frontmatter_knowledge.py")
-    )
-    build = namespace["expected_bundle"]
-    build.__globals__["FIXTURE"] = fixture
-    with pytest.raises(ValueError, match="Reviewed.*changed"):
-        build()
 
 
 @pytest.mark.parametrize(

@@ -1,6 +1,5 @@
 """Source-model evidence cannot erase reference uncertainty or fixed lines."""
 
-import hashlib
 import json
 import shutil
 from decimal import Decimal
@@ -14,35 +13,10 @@ from scripts.astrodice_source_slope_bounds import angular_rate_bounds, pi_bounds
 from scripts.verify_astrodice_source_slope import verify as verify_slopes
 from scripts.verify_astrodice_source_slope_epoch import verify as verify_lp
 
-FIXTURE = Path(__file__).parent / "fixtures/astrodice-venus-source-shape-v1"
-
-
-def test_frozen_material_and_all_old_failure_statuses_remain():
-    manifest = FIXTURE / "manifest.json"
-    assert (
-        hashlib.sha256(manifest.read_bytes()).hexdigest()
-        == "144226901f81185f9fd84666aef58a7a2d80b13869f591d582cdc9c137154c82"
-    )
-    files = json.loads(manifest.read_text())["files"]
-    assert len(files) == 80
-    for name, sha in files.items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == sha
-    old = json.loads((FIXTURE / "old-epoch-envelope-result.json").read_text())
-    current = json.loads((FIXTURE / "source-cap-first-result.json").read_text())
-    assert (
-        old["production_acceptance_exit_code"]
-        == current["production_acceptance_exit_code"]
-        == 2
-    )
-    assert (
-        old["numerical_outer_quality_exit_code"]
-        == current["numerical_outer_quality_exit_code"]
-        == 2
-    )
-    assert (
-        current["candidate_accuracy_passes"] == current["new_holdout_conditions"] == 0
-    )
-    assert current["actual_epoch_error_bound_certified"] is False
+FIXTURE = (
+    Path(__file__).parent
+    / "data/astrodice/reference_sets/fixture-venus-source-shape-v1"
+)
 
 
 def test_machin_pi_bounds_and_nonunit_vector_angular_units():

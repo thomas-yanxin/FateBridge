@@ -12,7 +12,10 @@ import pytest
 from scripts import audit_astrodice_local_reference as audit
 from scripts.astrodice_interval_reference import quality, replay_interval, system
 
-OLD = Path(__file__).parent / "fixtures/astrodice-local-interval-holdout-v1"
+OLD = (
+    Path(__file__).parent
+    / "data/astrodice/reference_sets/fixture-local-interval-holdout-v1"
+)
 
 
 def linear_row():

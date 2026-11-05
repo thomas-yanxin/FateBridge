@@ -133,7 +133,7 @@ def in_native_worker() -> bool:
     return _WORKER_ACTIVE
 
 
-JSON_TREE_ENCODING = "json_tree_v1"
+RESULT_ENCODING = "native_result_v1"
 
 
 def _json_tree(value: Any) -> bool:
@@ -149,26 +149,23 @@ def _json_tree(value: Any) -> bool:
     return False
 
 
-def encode_result(value: Any, encoding: str | None = None) -> Any:
-    """Negotiate a lossless JSON-tree result, keeping legacy typed fallback."""
-    if encoding not in (None, JSON_TREE_ENCODING):
-        raise NativeExecutionError("Unsupported native result encoding")
-    if encoding == JSON_TREE_ENCODING and _json_tree(value):
-        return [JSON_TREE_ENCODING, value]
-    return encode(value)
+def encode_result(value: Any) -> Any:
+    """One explicit result envelope, preserving JSON and typed object values."""
+    if _json_tree(value):
+        return [RESULT_ENCODING, "json", value]
+    return [RESULT_ENCODING, "typed", encode(value)]
 
 
-def decode_result(value: Any, encoding: str | None = None) -> Any:
-    if encoding not in (None, JSON_TREE_ENCODING):
-        raise NativeExecutionError("Unsupported native result encoding")
-    if (
-        isinstance(value, list)
-        and value
-        and value[0] == JSON_TREE_ENCODING
-        and encoding != JSON_TREE_ENCODING
-    ):
-        raise NativeExecutionError("Unnegotiated native JSON-tree result")
-    return decode(value)
+def decode_result(value: Any) -> Any:
+    if not isinstance(value, list) or len(value) != 3 or value[0] != RESULT_ENCODING:
+        raise NativeExecutionError("Invalid native result envelope")
+    if value[1] == "json":
+        if not _json_tree(value[2]):
+            raise NativeExecutionError("Invalid native JSON tree")
+        return value[2]
+    if value[1] == "typed":
+        return decode(value[2])
+    raise NativeExecutionError("Invalid native result representation")
 
 
 def encode(value: Any) -> Any:
@@ -209,10 +206,6 @@ def decode(value: Any) -> Any:
     if not value:
         raise NativeExecutionError("Invalid native calculation envelope")
     tag = value[0]
-    if tag == JSON_TREE_ENCODING and len(value) == 2:
-        if not _json_tree(value[1]):
-            raise NativeExecutionError("Invalid native JSON tree")
-        return value[1]
     if tag == "datetime" and len(value) == 4:
         moment = datetime_fromisoformat_preserving_offset(value[1])
         if value[2] is not None:
@@ -291,8 +284,6 @@ def calculate(
     entry: str,
     args: tuple[Any, ...],
     kwargs: dict[str, Any],
-    *,
-    result_encoding: str | None = None,
 ) -> Any:
     """Parent dispatch. Caller holds the managed source-session lock."""
     from fatebridge.core.astro.iers_ut1 import active_ut1
@@ -306,8 +297,6 @@ def calculate(
 
     if entry not in _ENTRIES:
         raise NativeExecutionError("Unsupported private calculation entry")
-    if result_encoding not in (None, JSON_TREE_ENCODING):
-        raise NativeExecutionError("Unsupported native result encoding")
     session = current_source_session()
     if session is None:
         raise NativeExecutionError("Private calculation requires a source session")
@@ -329,8 +318,6 @@ def calculate(
     }
     if current_policy() is not None:
         request["physical_ephemeris_policy"] = policy_mode()
-    if result_encoding is not None:
-        request["result_encoding"] = result_encoding
     payload = message_bytes(request)
     worker = Path(__file__).with_name("_native_worker.py")
     deadline = time.monotonic() + _TIMEOUT
@@ -385,7 +372,7 @@ def calculate(
                         )
                     raise NativeExecutionError("Private native calculation failed")
                 merge_worker_policy(response.get("physical_ephemeris_policy"))
-                result = decode_result(response["value"], result_encoding)
+                result = decode_result(response["value"])
                 process.stdin.close()
                 process.wait(timeout=max(0.001, deadline - time.monotonic()))
                 if process.returncode:

@@ -361,7 +361,9 @@ class BaziEvidenceChain(PartialOutput):
 
 
 class EvidenceStructureProfile(PartialOutput):
-    resolution_policy: Optional[str] = None
+    resolution_policy: Optional[Literal["source_conditions_before_preference_v3"]] = (
+        None
+    )
     dominant_structure: Optional[MonthStructureReference] = None
     candidate_selection: Optional[CandidateSelection] = None
     from_child_reference: Optional[FromChildReference] = None

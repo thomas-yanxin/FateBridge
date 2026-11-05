@@ -9,7 +9,7 @@ from contextlib import ExitStack
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_dayun_future_clocks_v2"
+FIXTURE = ROOT / "tests/data/bazi_dayun_future_clocks_v2"
 
 
 def sha(path):
@@ -28,7 +28,7 @@ def main():
     parser.add_argument("shards", nargs="+", type=Path)
     args = parser.parse_args()
     assert not args.output.exists()
-    protocol_path = ROOT / "tests/fixtures/bazi_historical_point_v1/shard-protocol.json"
+    protocol_path = ROOT / "tests/data/bazi_historical_point_v1/shard-protocol.json"
     protocol = bound_json(protocol_path)
     assert sha(args.source_manifest) == protocol["source_manifest_sha256"]
     assert (

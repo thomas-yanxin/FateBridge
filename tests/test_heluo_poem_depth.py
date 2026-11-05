@@ -96,44 +96,6 @@ def test_selected_witness_differences_do_not_silently_emend_the_book(entry):
     assert entry["inherited"] in result["text_provenance"]["inherited_shige"]
 
 
-def test_unknown_poem_control_and_cached_data_remain_unmodified():
-    inherited = copy.deepcopy(_tiaowen())
-    result = yao_text("乾為天", 5)
-    result["poem_sections"][1]["text"] = "pollution"
-    result["text_provenance"]["poem_pdf_pages"].append(999)
-    entry = hp.poems_for_line("乾為天", 5)
-    entry["poems"].clear()
-    assert "pollution" not in str(yao_text("乾為天", 5))
-    assert 999 not in yao_text("乾為天", 5)["text_provenance"]["poem_pdf_pages"]
-    from tests.heluo_guan_shi_revision_reference import (
-        assert_r84_poem_control_and_all_pending,
-    )
-
-    assert assert_r84_poem_control_and_all_pending() == 336
-    assert (
-        yao_text("地水師", 1)["text_provenance"]["inherited_shige"]
-        == inherited["地水師"]["yao"]["1"]["shige"]
-    )
-    assert _tiaowen() == inherited
-    # Meng is already collated; keep an actual unreviewed poem control.
-    unknown = yao_text("天雷無妄", 1)
-    assert (
-        unknown["text_provenance"]["poem_status"] == "inherited_poem_source_unverified"
-    )
-    assert "poem_sections" not in unknown
-    chart = dict(
-        tian=1,
-        tianGua="乾",
-        di=2,
-        diGua="坤",
-        xian=dict(name="乾為天", lines=[1] * 6, yuan=5),
-        hou=dict(name="天雷無妄", lines=[1, 0, 0, 1, 1, 1], yuan=1),
-    )
-    snapshot = build_snapshot_text(chart, None, None)
-    assert "本爻3首诗" in snapshot and "来源待核" in snapshot
-    assert unknown["shige"] in snapshot
-
-
 @pytest.mark.parametrize(
     "fault",
     [

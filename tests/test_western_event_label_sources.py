@@ -1,6 +1,5 @@
 """Formatting carriers exercise source failures, not astronomical root accuracy."""
 
-import hashlib
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -9,8 +8,9 @@ import pytest
 
 from fatebridge.core import horary_events, horary_motion
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.reference_data import verify_source_files
 
-FIX = Path(__file__).parent / "fixtures/western-event-label-sources-v1"
+FIX = Path(__file__).parent / "data/astro/event_label_sources"
 PLAN = json.loads((FIX / "protocol.json").read_text())
 MODULES = {"planetary": horary_events, "lunar": horary_motion}
 
@@ -51,7 +51,8 @@ def install_carriers(monkeypatch):
         )
 
     def lunar(start, sample):
-        states = {p: sample(p, start) for p in ["Moon", *horary_motion.BODIES]}
+        for planet in ["Moon", *horary_motion.BODIES]:
+            sample(planet, start)
         event = dict(
             other="Sun",
             julian_day_tt=start + 0.25,
@@ -105,9 +106,7 @@ def labels(value, wrapper):
 
 
 def test_protocol_is_sealed_and_carriers_are_not_an_astronomical_oracle():
-    seal = json.loads((FIX / "seal.json").read_text())
-    for name, digest in seal["files"].items():
-        assert hashlib.sha256((FIX / name).read_bytes()).hexdigest() == digest
+    verify_source_files(FIX)
     assert PLAN["numeric_preservation_tolerance"] == 0
     assert "Synthetic" in PLAN["fault_carriers"]
 

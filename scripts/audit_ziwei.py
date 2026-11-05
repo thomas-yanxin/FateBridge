@@ -29,6 +29,7 @@ from fatebridge.core.metaphysics.ziwei import (
     build_ziwei_rules,
 )
 from fatebridge.core.ziwei_tables import lookup_star_brightness
+from scripts.ziwei_conditional_inputs import synthetic_birth_clock
 
 if TYPE_CHECKING or __package__:
     from .audit_ziwei_activation import audit_activation
@@ -86,7 +87,7 @@ else:
     from audit_ziwei_time_input import audit_time_input
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures/ziwei_independent"
+FIXTURES = ROOT / "tests/data/ziwei_independent"
 MONTHS = {
     name: i
     for i, name in enumerate(
@@ -533,9 +534,9 @@ def audit_depth_classical(fixtures: Path = FIXTURES) -> dict[str, Any]:
             for p in chart["palaces"]
             if any(s["name"] == "旬空" for s in p["stars_detail"])
         ]
-        check(f"void_pair/{1984+index}", sorted(displayed), sorted(expected))
+        check(f"void_pair/{1984 + index}", sorted(displayed), sorted(expected))
         check(
-            f"void_metadata/{1984+index}",
+            f"void_metadata/{1984 + index}",
             chart["void_systems"]["xun"]["displayed_star_branches"],
             expected,
         )
@@ -565,7 +566,7 @@ def audit_depth_classical(fixtures: Path = FIXTURES) -> dict[str, Any]:
     for offset, branch in enumerate("子丑寅卯辰巳午未申酉戌亥"):
         target = synthetic_seed(1996 + offset, month=6, day=15)
         horoscope = build_ziwei_horoscope(
-            nominal_age_basis="legacy_mixed_clock",
+            birth_seed=synthetic_birth_clock(int((natal)["lunar_date"]["year"])),
             chart=natal,
             gender="男",
             target_seed=target,

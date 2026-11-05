@@ -13,7 +13,7 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.sukuyo import required_quote_paths
 
 PRIMARY = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-directions-primary.json").read_text()
+    (Path(__file__).parent / "data/sukuyo-directions-primary.json").read_text()
 )
 
 

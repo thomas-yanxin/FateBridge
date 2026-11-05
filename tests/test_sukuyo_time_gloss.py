@@ -8,7 +8,7 @@ from fatebridge.core.sukuyo_calendar_text import calendar_day_evidence, source_b
 from fatebridge.services.tool_catalog import CATALOG
 
 PRIMARY = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-time-gloss-primary.json").read_text()
+    (Path(__file__).parent / "data/sukuyo-time-gloss-primary.json").read_text()
 )
 
 

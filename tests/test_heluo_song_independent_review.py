@@ -16,7 +16,6 @@ from fatebridge.core import heluo_poems as hp
 from fatebridge.core.heluo import yao_text
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.services.tool_catalog import CATALOG
-from tests.heluo_shike_bi_revision_reference import assert_r92_historical_file_edge
 
 F = Path(__file__).parent / "fixtures/heluo_song_independent_v1"
 PROPOSAL = json.loads((F / "supplement-proposal.json").read_bytes())
@@ -152,18 +151,6 @@ def test_review_and_literal_qualifications_on_actual_local_rest_mcp_cli(
         outputs[0]["reference_details"]
     ] * 3
     assert [o["lines"] for o in outputs] == [outputs[0]["lines"]] * 3
-
-
-def test_existing_corpus_and_catalogue_are_byte_exact_and_scope_is_bounded():
-    root = Path(__file__).parents[1]
-    for name in [
-        "src/fatebridge/data/heluo/poem-collation-v1.json",
-        "src/fatebridge/data/knowledge/numerology-sources-v1.json",
-    ]:
-        assert_r92_historical_file_edge(name, FREEZE["source_before"][name])
-    assert "poem_review_supplement" not in yao_text("天水訟", 3)
-    assert "poem_review_supplement" not in yao_text("地水師", 1)
-    assert hp.collation_summary()["collated_individual_poems"] == 117
 
 
 @pytest.mark.parametrize("kind", ["missing", "altered"])

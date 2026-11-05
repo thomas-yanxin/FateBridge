@@ -41,21 +41,19 @@ uv run --locked --extra dev fatebridge doctor
 
 - 工具定义位于 `services/catalog/`，由 `services/tool_catalog.py` 有序装配为唯一 `CATALOG`；请求模型位于 `core/requests/`。领域逻辑放在 `core` / `analysis` / `services`，不要在 transport 内复制算法。
 - 输入归一化、星历共享状态、快照导出复用现有公共实现。接口或默认值变化要检查 REST / MCP / CLI 的差异。
-- 算法修复提供有依据的边界/回归用例；不能用“更新黄金快照”替代正确性验证。黄金字节基线仅在指定参考平台上更新。
+- 算法修复提供有依据的边界／回归用例，保留独立参考的来源、期望值和门槛；不能从生产输出重新冻结答案来替代正确性验证。
 - 文档职责与同步范围见 [文档维护与验证](docs/development-guide.md#文档维护与验证)。涉及技能工具或输入时同步 `agents/interface.yaml`。
 - Python 代码遵循现有格式与类型约定；提交中保留无关工作，不进行顺带的大面积改写。
 
 ## 提交前验证
 
-代码变更运行与 CI 对齐的检查：
+按[开发指南的检查表](docs/development-guide.md#常用开发命令)选择与改动相关的领域、合同和静态检查。自包含云端检查可在本地运行：
 
 ```bash
-uv run --locked --extra dev python -m pytest -q
-uv run --locked --extra dev black --check src/fatebridge scripts tests
-uv run --locked --extra dev isort --check-only src/fatebridge scripts tests
-uv run --locked --extra dev mypy src/fatebridge/
-git diff --check
+uv run --locked --extra dev python scripts/run_ci_checks.py
 ```
+
+它只执行脚本明列的集合；完整本地回归还需要对应外部数据。共享计算或合同改动须核对 REST、MCP 与 CLI，具体命令与 CI 范围统一维护在开发指南。
 
 纯文档变更运行 `uv run --locked --extra dev python scripts/check_docs.py` 与[文档合同和示例检查](docs/development-guide.md#文档维护与验证)；修改生成源后重新生成并检查派生文件。报告实际测试结果与跳过项，不将本地通过写成 CI 已通过。
 

@@ -22,12 +22,13 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_year_contract import TOPICS
 
+rest = _shared_rest
+
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_de440_default_v1"
 DATA = ROOT / "src/fatebridge/data/astronomy"
 
 
@@ -44,6 +45,7 @@ def default_without_external_files(monkeypatch, tmp_path):
     try:
         yield
     finally:
+        monkeypatch.undo()
         configure_ephemeris_path(previous)
 
 
@@ -126,7 +128,7 @@ def test_default_corrects_all_five_analytic_and_the_swiss_term_counterexamples(
     default_without_external_files,
 ):
     probes = json.loads(
-        (ROOT / "tests/fixtures/bazi_boundary_decisions_v1/probes.json").read_text()
+        (ROOT / "tests/data/bazi_boundary_decisions_v1/probes.json").read_text()
     )["rows"]
     identifiers = [
         "1922-清明-floor",

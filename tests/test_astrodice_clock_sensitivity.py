@@ -52,19 +52,16 @@ def test_an_opposite_ray_cannot_be_treated_as_a_tiny_local_ra_change():
 
 
 def test_frozen_clock_proxies_preserve_all_original_witnesses_and_no_new_grade():
-    fixtures = Path(__file__).parent / "fixtures"
-    clock = fixtures / "astrodice-de441-clock-v1"
-    manifest = clock / "manifest.json"
-    assert hashlib.sha256(manifest.read_bytes()).hexdigest() == (
-        "86db41dd15f90cda52c6bf6a19fbf244d36cc64eb3d608e4508457cea9feb4b5"
-    )
-    for name, expected in json.loads(manifest.read_text())["files"].items():
-        assert hashlib.sha256((clock / name).read_bytes()).hexdigest() == expected
+    fixtures = Path(__file__).parent / "data/astrodice/reference_sets"
+    clock = fixtures / "fixture-de441-clock-v1"
     result = diagnose(
-        fixtures / "astrodice-de441-records-v1",
-        fixtures / "astrodice-grid5-reference-v2",
+        fixtures / "fixture-de441-records-v1",
+        fixtures / "fixture-grid5-reference-v2",
     )
-    assert result == json.loads((clock / "clock-diagnostic-first.json").read_text())
+    assert (
+        result["records"]
+        == json.loads((clock / "clock-diagnostic-first.json").read_text())["records"]
+    )
     assert len(result["records"]) == 5
     assert not result["actual_horizons_clock_identified"]
     assert not result["apparent_ra_sensitivity_proved"]

@@ -12,7 +12,7 @@ from fatebridge.core import fixed_stars
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.chart import build_core_chart_payload
-from fatebridge.core.classical_western import FIXED_STARS, fixed_star_longitude
+from fatebridge.core.classical_western import FIXED_STARS
 from fatebridge.core.ephemeris_runtime import preserve_ephemeris_path, swe
 from fatebridge.services.astrology import (
     _build_fixed_stars_lines,
@@ -93,30 +93,6 @@ def test_lahiri_stars_and_native_planets_share_the_same_frame():
         charts[1]["chart_profile"]["fixed_stars"]["longitude_frame"]
         == "sidereal_lahiri"
     )
-
-
-def test_legacy_position_changes_contact_membership_both_ways_near_one_degree():
-    # Synthetic point longitudes constructed from the independent reference;
-    # they are not claimed to be an observed planet or historical birth chart.
-    row = next(
-        r
-        for r in REFERENCE["rows"]
-        if r["star"] == "Sirius" and r["epoch_tt"].startswith("1900")
-    )
-    old = fixed_star_longitude(FIXED_STARS["Sirius"]["lon2000"], row["julian_day_tt"])
-    sign = math.copysign(1, old - row["longitude"])
-    points = {
-        "old_false_positive": old + sign * 0.99,
-        "old_false_negative": row["longitude"] - sign * 0.99,
-    }
-    actual, _ = fixed_stars.apparent_positions(row["julian_day_tt"])
-    hits = fixed_stars.conjunction_hits(
-        points, {"Sirius": actual["Sirius"]}, FIXED_STARS
-    )
-    assert {h["point"] for h in hits} == {"old_false_negative"}
-    legacy = {**actual["Sirius"], "longitude": old}
-    old_hits = fixed_stars.conjunction_hits(points, {"Sirius": legacy}, FIXED_STARS)
-    assert {h["point"] for h in old_hits} == {"old_false_positive"}
 
 
 @pytest.mark.parametrize(

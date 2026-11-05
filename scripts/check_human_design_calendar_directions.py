@@ -11,20 +11,17 @@ import hashlib
 import json
 import math
 from collections import Counter
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 from scripts.check_human_design_icrf_horizons import mv, rotation, validate_rotation
 from scripts.gen_human_design_calendar_directions import ROOT, inputs, read, write
 
-BASE = ROOT / "docs/validation/human-design-calendar-directions-v1"
+BASE = ROOT / "tests/data/human_design/calendar_directions"
 E = BASE / "evidence"
 REFERENCE = E / "icrf-reference-exact-inverse.json.gz"
 REFERENCE_SHA256 = "980fe8901a4783e78d0404121e70da75b9de45d0c4f0ca55050b9f4bc6433860"
-LEGACY = (
-    ROOT
-    / "docs/validation/human-design-calendar-retention-v1/evidence/final-full.json.gz"
-)
 
 
 def reference() -> tuple[dict, dict]:
@@ -95,7 +92,8 @@ def capture() -> dict:
     from fatebridge.core import human_design_apparent_positions as batches
     from fatebridge.core import human_design_natal_sources as sources
     from fatebridge.core.astro import runtime
-    from fatebridge.core.human_design import BODY_IDS, positions_at_tt
+    from fatebridge.core.human_design import positions_at_tt
+    from fatebridge.core.human_design_mechanics import BODY_IDS
 
     old_plan, independent = reference()
     swe = runtime.swe
@@ -215,16 +213,17 @@ def capture() -> dict:
     }
 
 
-def compare_row(actual: dict, epoch: dict, legacy: dict, bit: int) -> dict:
+def compare_row(actual: dict, epoch: dict, bit: int) -> dict:
     fact = epoch["directions"][actual["body"]]
     result = {
         k: actual[k] for k in ("label", "side", "body", "jd_tt", "requested_backend")
     }
     result.update(
-        original_longitude_row=legacy,
+        longitude_comparison={"accepted": False},
+        current_native_longitude=None,
+        current_return_flags=None,
         current_longitude_error_arcseconds=None,
         current_longitude_within_original2arcseconds=False,
-        current_computed_longitude_equals_original=None,
         icrf_angular_error_arcseconds=None,
         icrf_angular_within2arcseconds=False,
         distance_difference_au=None,
@@ -281,10 +280,15 @@ def compare_row(actual: dict, epoch: dict, legacy: dict, bit: int) -> dict:
             direction(values[0], values[1]), mv(matrix, direction(icrf[0], icrf[1]))
         )
         result.update(
+            longitude_comparison={
+                "computed_longitude": values[0],
+                "return_flags": raw["return_flags"],
+                "accepted": error <= 2 and result["default_and_icrf_backend_accepted"],
+            },
+            current_native_longitude=values[0],
+            current_return_flags=raw["return_flags"],
             current_longitude_error_arcseconds=error,
             current_longitude_within_original2arcseconds=error <= 2,
-            current_computed_longitude_equals_original=values[0]
-            == legacy["computed_longitude"],
             icrf_angular_error_arcseconds=angular,
             icrf_angular_within2arcseconds=angular <= 2,
             distance_difference_au=values[2] - fact["original_fact"]["distance_au"],
@@ -300,7 +304,6 @@ def compare_row(actual: dict, epoch: dict, legacy: dict, bit: int) -> dict:
             result["default_and_icrf_backend_accepted"]
             and result["current_longitude_within_original2arcseconds"]
             and result["icrf_angular_within2arcseconds"]
-            and legacy["accepted"]
             and result["default_icrf_direction_closure_accepted"]
         )
     except (TypeError, ValueError, KeyError, IndexError, OverflowError) as exc:
@@ -309,7 +312,6 @@ def compare_row(actual: dict, epoch: dict, legacy: dict, bit: int) -> dict:
 
 
 def compare(production: dict, independent: dict, old_plan: dict) -> dict:
-    legacy = read(LEGACY)
     identities = [
         (e["label"], e["side"], body, e["jd_tt"])
         for e in independent["rows"]
@@ -334,33 +336,25 @@ def compare(production: dict, independent: dict, old_plan: dict) -> dict:
             != identities
         ):
             raise ValueError("Native rows lost, duplicated, reordered or rebound")
-        before = legacy["backends"][label]["position_rows"]
-        if [
-            (r["label"], r["side"], r["body"], r["jd_tt"]) for r in before
-        ] != identities:
-            raise ValueError("Original longitude acceptance detached")
         rows = [
-            compare_row(row, epoch_by_key[row["label"], row["side"]], old, bit)
-            for row, old in zip(actual["rows"], before, strict=True)
+            compare_row(row, epoch_by_key[row["label"], row["side"]], bit)
+            for row in actual["rows"]
         ]
         observed = [r for r in rows if r["evaluation_status"] == "observed"]
         failures = [r for r in rows if not r["icrf_angular_within2arcseconds"]]
-        newly_exposed = [r for r in failures if r["original_longitude_row"]["accepted"]]
+        newly_exposed = [
+            r for r in failures if r["current_longitude_within_original2arcseconds"]
+        ]
         output[label] = {
             "rows": rows,
             "position_count": len(rows),
             "not_assessed": len(rows) - len(observed),
-            "original_longitude_failure_count": sum(not r["accepted"] for r in before),
             "current_longitude_failure_count": sum(
                 not r["current_longitude_within_original2arcseconds"] for r in rows
             ),
             "icrf_angular_failure_count": len(failures),
             "new_full_direction_failures_previously_longitude_accepted": newly_exposed,
             "angular_failures_by_body": dict(Counter(r["body"] for r in failures)),
-            "old_computed_longitude_difference_count": sum(
-                r["current_computed_longitude_equals_original"] is not True
-                for r in rows
-            ),
             "default_or_icrf_backend_unaccepted_count": sum(
                 not r["default_and_icrf_backend_accepted"] for r in rows
             ),
@@ -436,3 +430,9 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+@lru_cache(maxsize=1)
+def current_comparison():
+    plan, independent = reference()
+    return compare(capture(), independent, plan)

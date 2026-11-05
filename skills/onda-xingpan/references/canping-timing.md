@@ -14,10 +14,10 @@
 
 参评明确出生时刻、时区和已知性别，不能默认男命。`method=gu` 用真实日支，显式 `ming` 是月支变法。配运另由 `dayun_method` 控制，默认 `bazi_appendix_v1`；连续折算和旧命宫方案各有名字。核对实际 `canping_timing.profile_id`、政策和来源，不把具名附法说成卷六唯一排法，也不把它混称河洛六九年卦运。
 
-配运核对先按公开`timing_policy`视图取同次`schedule_basis`、`first_row`、`first_period`与`selected`。`first_row`保留同次`dayun[0]`的实际编号、岁运栏及条文，旧法也有首行年龄标签；旧法`first_period=null`只表示无已核日期首运，不表示无首行。现代日期首运与`first_row`的已返回事实须一致；两种首行摘要都不能代替查询当段；全运再读`periods`，完整立春另读`calendar_boundaries`。`schedule_basis.clauses`按`role`区分实际完整采用的目标附段、来源语境与另书子平背景；`applied_clause_ids`不能跨方法套用。卷七原段的整数借除与实际`calendar_mapping/age_conversion_result`分开；连续法未执行该整数条，legacy没有已核实际日期。引用原句交付各自书名、版本与页码，《三命通会》十年文字不能冒充所核河洛附段明载。结合实际`future_clock_policy`和验收布尔状态说明日期与证明范围，见配运来源映射（本地数据：`../../../docs/validation/canping-schedule-basis-audit.md`）。
+配运核对先按公开`timing_policy`视图取同次`schedule_basis`、`first_row`、`first_period`与`selected`。`first_row`保留同次`dayun[0]`的实际编号、岁运栏及条文，旧法也有首行年龄标签；旧法`first_period=null`只表示无已核日期首运，不表示无首行。现代日期首运与`first_row`的已返回事实须一致；两种首行摘要都不能代替查询当段；全运再读`periods`，完整立春另读`calendar_boundaries`。`schedule_basis.clauses`按`role`区分实际完整采用的目标附段、来源语境与另书子平背景；`applied_clause_ids`不能跨方法套用。卷七原段的整数借除与实际`calendar_mapping/age_conversion_result`分开；连续法未执行该整数条，legacy没有已核实际日期。引用原句交付各自书名、版本与页码，《三命通会》十年文字不能冒充所核河洛附段明载。结合实际`future_clock_policy`和验收布尔状态说明日期与证明范围，见配运来源映射。
 
-显式旧命宫方案的流年也按实际出生年柱对应的年标签起排；立春前首行可标上一公历年，并非更改出生日期。核对`liunian_series.birth_pillar_year/year_boundary/age_policy`，不把标签年龄当作已核UTC区间。见旧方案年序核对（本地数据：`../../../docs/validation/canping-legacy-year-label-audit.md`）。
+显式旧命宫方案的流年也按实际出生年柱对应的年标签起排；立春前首行可标上一公历年，并非更改出生日期。核对`liunian_series.birth_pillar_year/year_boundary/age_policy`，不把标签年龄当作已核UTC区间。见旧方案年序核对。
 
-需要核对参评替支本身时，`canping_luck_substitution_v1`来源轨迹给出所选本PDF64释文及实际查询配对；无查询时`query_pair=null`，不从第一运补当前配对。原生日支／时支、流年太岁和当段运支分别核对，部别仍取出生年纳音。固定四柱Python函数的相对年序不是出生接口新模式，也不能把未知公历年补成某个甲子年，见相对流年与替支释文（本地数据：`../../../docs/validation/canping-relative-years-audit.md`）。
+需要核对参评替支本身时，`canping_luck_substitution_v1`来源轨迹给出所选本PDF64释文及实际查询配对；无查询时`query_pair=null`，不从第一运补当前配对。原生日支／时支、流年太岁和当段运支分别核对，部别仍取出生年纳音。固定四柱Python函数的相对年序不是出生接口新模式，也不能把未知公历年补成某个甲子年，见相对流年与替支释文。
 
 实际时刻查询用带时区 `analysis_datetime`，读取同次 `canping_timing.selected` 与 `numerology_evidence.selected_texts`；`not_started` 不生成流年编号和断语，不取第一运代替。年行 `status=split` 时必须按 `segments` 的实际边界解释，不能把其中一段扩成全年。120行是干支年序覆盖，`age` 不是寿命或精确周岁；日期显示不能提升出生资料精度或原典应期精度。

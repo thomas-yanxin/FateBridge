@@ -16,14 +16,14 @@ from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_provenance import verify_selected_provenance
-from tests.golden.runner import golden_ephemeris
+from tests.ephemeris_context import moshier_ephemeris
 
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
 @pytest.fixture(scope="module")
 def complete_run():
-    with golden_ephemeris():
+    with moshier_ephemeris():
         result = execute_tool(SPEC, SPEC.request_model(**example_input(SPEC)))
     assert verify_human_design_reading(result)["status"] == (
         "verified_fixed_template_reading"
@@ -174,7 +174,7 @@ def test_real_complete_runs_keep_both_node_conventions_and_current_file_environm
                         assert row["ephemeris_model"] == ANALYTICAL_MEAN_NODE_MODEL
 
     if empty_files:
-        with golden_ephemeris():
+        with moshier_ephemeris():
             check()
     else:
         check()

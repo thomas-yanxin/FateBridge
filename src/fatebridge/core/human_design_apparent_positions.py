@@ -20,7 +20,6 @@ from fatebridge.core.human_design_solar_projection import (
     DEFLECTION_SOURCE,
     NOMINAL_SOLAR_RADIUS_M,
     RADIUS_SOURCE,
-    legacy_nominal_solar_projection,
     nominal_solar_projection,
 )
 
@@ -40,10 +39,10 @@ PHYSICAL_BODIES = (
 SCOPE = "仅同次positions_at_tt物理天体完整或中断批次已返回的原生坐标、旗标及其名义投影；覆盖本命、区间样本、根端点和整盘对照实际批次，中断前缀不补齐。仅太阳求根、仅交点对照或周期搜索的单体调用不在此计数。观察次数不是独立样本，不认证连续区间、原生执行真实性、物理精度、真实遮掩或可见性。"
 
 
-def ruleset(*, legacy: bool = False) -> dict[str, Any]:
+def ruleset() -> dict[str, Any]:
     result: dict[str, Any] = {
         "id": METHOD,
-        "version": "1.0.0" if legacy else "1.1.0",
+        "version": "1.1.0",
         "author": "FateBridge implementation of Swiss documentation and IAU nominal units",
         "source_kind": "astronomical_software_convention_and_nominal_conversion_constants",
         "sources": {
@@ -53,29 +52,23 @@ def ruleset(*, legacy: bool = False) -> dict[str, Any]:
         },
         "scope": SCOPE,
     }
-    if not legacy:
-        result["sources"].update(
-            {
-                "trigonometric_series": "https://dlmf.nist.gov/4.19",
-                "inverse_trigonometric_series": "https://dlmf.nist.gov/4.24",
-                "range_reduction": "https://dlmf.nist.gov/4.45",
-            }
-        )
-        result["arithmetic_method"] = ARITHMETIC_METHOD
+    result["sources"].update(
+        {
+            "trigonometric_series": "https://dlmf.nist.gov/4.19",
+            "inverse_trigonometric_series": "https://dlmf.nist.gov/4.24",
+            "range_reduction": "https://dlmf.nist.gov/4.45",
+        }
+    )
+    result["arithmetic_method"] = ARITHMETIC_METHOD
     return result
 
 
-def geometry(
-    bodies: list[dict[str, Any]], *, legacy: bool = False
-) -> list[dict[str, Any]]:
+def geometry(bodies: list[dict[str, Any]]) -> list[dict[str, Any]]:
     sun = bodies[0]["native_coordinates"][:3]
     rows = []
     for row in bodies[1:]:
         try:
-            function = (
-                legacy_nominal_solar_projection if legacy else nominal_solar_projection
-            )
-            projection = function(sun, row["native_coordinates"][:3])
+            projection = nominal_solar_projection(sun, row["native_coordinates"][:3])
             rows.append(
                 {
                     "body": row["body"],
@@ -109,9 +102,6 @@ def geometry(
 def build_context(
     batches: list[dict[str, Any]],
     nominal: dict[str, str],
-    *,
-    legacy: bool = False,
-    include_coordinate_context: bool = True,
 ) -> dict[str, Any]:
     context: dict[str, Any] = {
         "method_id": METHOD,
@@ -127,10 +117,7 @@ def build_context(
         "solar_deflection_policy": "Swiss_default_apparent_with_documented_transparent_solar_mass_continuation",
         "policy_basis": "validated_return_flags_exclude_NOGDEFL_TRUEPOS_NOABERR_J2000_NONUT_and_topocentric_bits",
         "nominal_side_batch_ids": dict(nominal),
-        "batches": [
-            {**b, "solar_projection": geometry(b["bodies"], legacy=legacy)}
-            for b in batches
-        ],
+        "batches": [{**b, "solar_projection": geometry(b["bodies"])} for b in batches],
         "unique_batch_count": len(batches),
         "observed_batch_count": sum(b["observed_count"] for b in batches),
         "observed_physical_position_count": sum(
@@ -148,32 +135,30 @@ def build_context(
         "physical_occultation_certified": False,
         "visibility_certified": False,
         "original_human_design_software_convention_certified": False,
-        "ruleset": ruleset(legacy=legacy),
+        "ruleset": ruleset(),
         "scope": SCOPE,
     }
-    if not legacy:
-        context["arithmetic_method"] = ARITHMETIC_METHOD
-        context["arithmetic_policy"] = (
-            "Outward-rounded integer intervals with analytic series-tail bounds; adapt until both endpoints round to one binary64 value and prove the unchanged1e-12radian classification. Positive zero is canonical; no platform transcendental fallback."
-        )
-    if include_coordinate_context and not legacy:
-        from fatebridge.core.human_design_provenance import position_flag_model
+    context["arithmetic_method"] = ARITHMETIC_METHOD
+    context["arithmetic_policy"] = (
+        "Outward-rounded integer intervals with analytic series-tail bounds; adapt until both endpoints round to one binary64 value and prove the unchanged1e-12radian classification. Positive zero is canonical; no platform transcendental fallback."
+    )
+    from fatebridge.core.human_design_provenance import position_flag_model
 
-        for batch in batches:
-            for body in batch["bodies"]:
-                position_flag_model(body["return_flags"])
-        context["coordinate_context"] = {
-            "schema_version": "1.0.0",
-            "observer_origin": "earth_geocenter",
-            "position_kind": "apparent",
-            "spatial_frame": "tropical_true_ecliptic_and_equinox_of_date",
-            "distance_origin": "earth_geocenter",
-            "distance_unit": "astronomical_unit",
-            "angular_separation_vertex": "earth_geocenter",
-            "angular_separation_rays": ["Sun", "target"],
-            "heliocentric_coordinates": False,
-            "basis": "Same native batches; declared SPEED plus one backend only; HELCTR/BARYCTR/TOPOCTR and other coordinate-changing flags excluded.",
-        }
+    for batch in batches:
+        for body in batch["bodies"]:
+            position_flag_model(body["return_flags"])
+    context["coordinate_context"] = {
+        "schema_version": "1.0.0",
+        "observer_origin": "earth_geocenter",
+        "position_kind": "apparent",
+        "spatial_frame": "tropical_true_ecliptic_and_equinox_of_date",
+        "distance_origin": "earth_geocenter",
+        "distance_unit": "astronomical_unit",
+        "angular_separation_vertex": "earth_geocenter",
+        "angular_separation_rays": ["Sun", "target"],
+        "heliocentric_coordinates": False,
+        "basis": "Same native batches; declared SPEED plus one backend only; HELCTR/BARYCTR/TOPOCTR and other coordinate-changing flags excluded.",
+    }
     return context
 
 

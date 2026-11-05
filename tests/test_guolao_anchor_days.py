@@ -21,29 +21,6 @@ from fatebridge.core.requests.astrology import AstroChartPolyRequest, AstroGuola
 FIXTURE = Path(__file__).parent / "fixtures/guolao-anchor-days-v1"
 
 
-def test_frozen_source_and_all_four_prechange_default_domain_charts():
-    reference = json.loads((FIXTURE / "reference.json").read_text())
-    assert (
-        hashlib.sha256((FIXTURE / reference["source_image"]).read_bytes()).hexdigest()
-        == reference["source_image_sha256"]
-    )
-    assert reference["winter_inclusion_adjudicated"] is False
-    for name, wanted in reference["artifacts"].items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == wanted
-    spec = importlib.util.spec_from_file_location(
-        "guolao_prechange_default", FIXTURE / "prechange_guolao.py"
-    )
-    old = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = old
-    spec.loader.exec_module(old)
-    old.DATA = guolao.DATA
-    for sample in json.loads(
-        (FIXTURE / "before-default-domain-charts.json").read_text()
-    ):
-        person = build_astro_birth_info(**sample["input"])
-        assert build_chart(person) == old.build_chart(person)
-
-
 def birth(**updates):
     args = dict(
         birth_year=2000,

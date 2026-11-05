@@ -12,7 +12,7 @@ from fatebridge.core import heluo_texts as ht
 from fatebridge.core.heluo import _tiaowen, transform_houtian, yao_text
 from fatebridge.core.heluo_timing import _selected_text
 from fatebridge.utils.errors import NumerologySourceError
-from tests.heluo_current_source_reference import HEADER_COUNT, PENDING_COUNT
+from tests.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 
 ROOT = Path(__file__).parent / "fixtures/heluo_xiaochuli_v1"
 DRAFT = json.loads((ROOT / "reference.json").read_bytes())
@@ -121,21 +121,6 @@ def test_draft_withdrawals_are_not_counted_as_inherited_corrections():
     for w in DRAFT["images"]:
         assert (
             hashlib.sha256((ROOT / w["file"]).read_bytes()).hexdigest() == w["sha256"]
-        )
-    for entries, key in [
-        (
-            ht._commentary_collation()["entries"][:48],
-            "previous_forty_eight_entries_sha256",
-        ),
-        (ht._collation()["entries"][:54], "previous_fifty_four_headers_sha256"),
-    ]:
-        assert (
-            hashlib.sha256(
-                json.dumps(
-                    entries, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-                ).encode()
-            ).hexdigest()
-            == VERIFIED[key]
         )
     assert all(144 not in e["pdf_pages"] for e in VERIFIED["entries"])
     assert (

@@ -99,6 +99,7 @@ def _western_lifespan_spec(name: str, service: Any, model: Any, label: str) -> T
         ),
         operation_label_zh=label,
         family="western_lifespan",
+        cpu_bound=True,
         rest_path=f"/api/astro/lifespan/{name}",
         mcp_name=f"astro_{name}",
     )

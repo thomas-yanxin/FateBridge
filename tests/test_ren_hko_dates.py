@@ -19,7 +19,7 @@ from fatebridge.core.output_ren_term_dates import (
     RenPublishedDateReference,
     require_complete_published_dates,
 )
-from scripts.audit_ren_hko_dates import CORPUS, reference, stripped
+from scripts.audit_ren_hko_dates import CORPUS, reference
 from scripts.build_hko_term_dates import build, encoded
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
 

@@ -20,7 +20,7 @@ from fatebridge.core.sukuyo_calendar_text import (
 )
 from fatebridge.core.sukuyo_sources import load_source
 
-FIXTURE = ROOT / "tests/fixtures/sukuyo-comparative-time-primary.json"
+FIXTURE = ROOT / "tests/data/sukuyo-comparative-time-primary.json"
 
 
 def selected_tei_lines(

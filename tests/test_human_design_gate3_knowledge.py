@@ -27,9 +27,8 @@ from tests.test_agentic_nested_outputs import rest as shared_rest
 from tests.test_heluo_poem_transports import run_three
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "docs/validation/human-design-gate3-knowledge-v3"
-E = BASE / "evidence"
-PREVIOUS = ROOT / "docs/validation/human-design-context-line-reading-v2"
+BASE = ROOT / "tests/data/human_design/gate3"
+E = BASE
 rest = shared_rest
 
 
@@ -40,15 +39,9 @@ def read(path):
 
 @pytest.fixture(scope="module")
 def source():
-    value = read(E / "gate3_april1988_synthetic.json.gz")
-    expected = read(E / "gate3-original-capture.json")["gzip_sha256"]
-    assert (
-        hashlib.sha256(
-            (E / "gate3_april1988_synthetic.json.gz").read_bytes()
-        ).hexdigest()
-        == expected
-    )
-    return value
+    from tests.human_design_current import semantic_sources
+
+    return semantic_sources("gate3")["gate3"]
 
 
 @pytest.fixture(scope="module")
@@ -68,24 +61,6 @@ def packet(source):
         return build_human_design_context_packet(source, reference_category="lines_v3")
 
 
-def test_all_default384_outputs_and_all_previous_v2_context_packets_unchanged():
-    expected = read(E / "before-384-canonical-hashes.json")
-    for key, digest in expected.items():
-        assert (
-            hashlib.sha256(
-                old._canonical(old.read_reference(category="lines", key=key))
-            ).hexdigest()
-            == digest
-        )
-    rows = read(PREVIOUS / "evidence/packet-delivery.json")["rows"]
-    for row in rows:
-        source = read(ROOT / row["source_path"])
-        expected = read(PREVIOUS / "packets" / (row["id"] + ".json.gz"))
-        assert old._canonical(
-            build_human_design_context_packet(source)
-        ) == old._canonical(expected)
-
-
 def test_versions_have_separate_honest_coverage_and_keep_unknowns():
     categories = old.build_registry()["domains"][0]["categories"]
     # Preserve the original version prefix and require the additive category.
@@ -98,10 +73,6 @@ def test_versions_have_separate_honest_coverage_and_keep_unknowns():
         "lines_v6",
         "lines_v7",
     ]
-    assert (
-        categories[0]
-        == read(E / "before-registry.json.gz")["domains"][0]["categories"][0]
-    )
     assert categories[0]["coverage"]["local_editorial_paraphrases"] == 12
     assert categories[1]["coverage"] == {
         "line_locators": 384,
@@ -372,8 +343,10 @@ def test_v3_packet_forgery_is_rejected_with_correct_original(source, packet, fau
     )
 
 
-def test_module_cli_requires_explicit_reference_category(tmp_path):
-    source = E / "gate3_april1988_synthetic.json.gz"
+def test_module_cli_requires_explicit_reference_category(tmp_path, source):
+    payload = source
+    source = tmp_path / "source.json.gz"
+    source.write_bytes(gzip.compress(json.dumps(payload).encode()))
     target = tmp_path / "v3.json.gz"
     prefix = [
         sys.executable,

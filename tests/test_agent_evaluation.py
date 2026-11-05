@@ -8,7 +8,7 @@ from scripts.evaluate_agent import (
     CASES,
     command_for,
     freeze_source,
-    grade,
+    grade_case,
     source_manifest,
 )
 
@@ -28,10 +28,12 @@ def event(tool, arguments=None, server="fatebridge"):
 
 def test_grade_rejects_empty_runs_external_calls_and_out_of_scope_computation():
     case = {"no_calculation": True, "manual_review": []}
-    assert grade(case, [], "", 1)["failures"]
-    assert grade(case, [event("bazi_birth")], "answer", 0)["failures"]
-    assert grade(case, [event("send_message", server="other")], "answer", 0)["failures"]
-    assert grade(case, [event("knowledge_read")], "answer", 0)[
+    assert grade_case(case, [], "", 1)["failures"]
+    assert grade_case(case, [event("bazi_birth")], "answer", 0)["failures"]
+    assert grade_case(case, [event("send_message", server="other")], "answer", 0)[
+        "failures"
+    ]
+    assert grade_case(case, [event("knowledge_read")], "answer", 0)[
         "mechanical_checks_passed"
     ]
 
@@ -47,12 +49,12 @@ def test_full_export_requires_unprojected_first_call_and_confirmed_inputs():
         event("bazi_birth", {"fields": ["summary"], "birth_hour": 0}),
         event("bazi_birth", {"fields": None, "birth_hour": 10}),
     ]
-    assert set(grade(case, invalid, "answer", 0)["failures"]) == {
+    assert set(grade_case(case, invalid, "answer", 0)["failures"]) == {
         "projected_full_export",
         "input_mismatch:bazi_birth",
     }
-    assert not grade(case, [], "answer", 0)["mechanical_checks_passed"]
-    assert grade(case, [event("bazi_birth", {"birth_hour": 10})], "answer", 0)[
+    assert not grade_case(case, [], "answer", 0)["mechanical_checks_passed"]
+    assert grade_case(case, [event("bazi_birth", {"birth_hour": 10})], "answer", 0)[
         "mechanical_checks_passed"
     ]
 
@@ -99,8 +101,11 @@ def test_completed_transport_does_not_hide_protocol_errors_and_recovery():
     failed = event("astro_india_chart")
     failed["item"]["result"] = {"isError": True}
     case = {"manual_review": []}
-    assert "unrecovered_tool_failure" in grade(case, [failed], "answer", 0)["failures"]
-    assert grade(case, [failed, event("astro_india_chart")], "answer", 0)[
+    assert (
+        "unrecovered_tool_failure"
+        in grade_case(case, [failed], "answer", 0)["failures"]
+    )
+    assert grade_case(case, [failed, event("astro_india_chart")], "answer", 0)[
         "mechanical_checks_passed"
     ]
 
@@ -123,11 +128,13 @@ def test_skill_routes_allow_complete_alternatives_but_not_partial_compositions()
             }
         ]
 
-    assert grade(case, read("onda-zige"), "answer", 0)["mechanical_checks_passed"]
-    assert grade(case, read("onda-shiye", "onda-xueye"), "answer", 0)[
+    assert grade_case(case, read("onda-zige"), "answer", 0)["mechanical_checks_passed"]
+    assert grade_case(case, read("onda-shiye", "onda-xueye"), "answer", 0)[
         "mechanical_checks_passed"
     ]
-    assert not grade(case, read("onda-shiye"), "answer", 0)["mechanical_checks_passed"]
+    assert not grade_case(case, read("onda-shiye"), "answer", 0)[
+        "mechanical_checks_passed"
+    ]
 
 
 def test_target_instants_accept_equivalent_offsets_but_reject_missing_timezones():
@@ -138,20 +145,20 @@ def test_target_instants_accept_equivalent_offsets_but_reject_missing_timezones(
         "manual_review": [],
     }
     for value in ("2000-02-01T00:00:00+00:00", "2000-02-01T08:00:00+08:00"):
-        assert grade(
+        assert grade_case(
             case, [event("astro_germany_chart", {"analysis_datetime": value})], "x", 0
         )["mechanical_checks_passed"]
     for value in (None, "invalid", "2000-02-01T00:00:00", "2000-02-01T00:00:01Z"):
         assert (
             "instant_mismatch:astro_germany_chart"
-            in grade(
+            in grade_case(
                 case,
                 [event("astro_germany_chart", {"analysis_datetime": value})],
                 "x",
                 0,
             )["failures"]
         )
-    assert grade(case, [], "x", 0)["failures"]
+    assert grade_case(case, [], "x", 0)["failures"]
 
 
 def test_same_run_export_limit_counts_successes_without_hiding_failed_recovery():
@@ -162,10 +169,10 @@ def test_same_run_export_limit_counts_successes_without_hiding_failed_recovery()
     success = event("astro_germany_chart")
     failed = event("astro_germany_chart")
     failed["item"]["result"] = {"isError": True}
-    assert grade(case, [failed, success], "x", 0)["mechanical_checks_passed"]
+    assert grade_case(case, [failed, success], "x", 0)["mechanical_checks_passed"]
     assert (
         "repeated_calculation:astro_germany_chart"
-        in grade(case, [success, success], "x", 0)["failures"]
+        in grade_case(case, [success, success], "x", 0)["failures"]
     )
 
 
@@ -189,17 +196,18 @@ def test_nested_arguments_allow_explicit_defaults_but_reject_wrong_values_and_bo
             "line_sum_basis": "raw_counts",
         }
     }
-    assert grade(case, [event("meihua_cast", good)], "answer", 0)[
+    assert grade_case(case, [event("meihua_cast", good)], "answer", 0)[
         "mechanical_checks_passed"
     ]
     for changes in ({"count": True}, {"count": 2}, {"hour_branch": "子"}):
         bad = {"casting": {**good["casting"], **changes}}
         assert (
             "input_mismatch:meihua_cast"
-            in grade(case, [event("meihua_cast", bad)], "answer", 0)["failures"]
+            in grade_case(case, [event("meihua_cast", bad)], "answer", 0)["failures"]
         )
     assert (
-        "out_of_scope_tool" in grade(case, [event("sixyao")], "answer", 0)["failures"]
+        "out_of_scope_tool"
+        in grade_case(case, [event("sixyao")], "answer", 0)["failures"]
     )
 
 

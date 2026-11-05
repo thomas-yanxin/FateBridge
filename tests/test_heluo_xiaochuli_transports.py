@@ -8,7 +8,7 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.core import heluo_texts as ht
-from tests.heluo_current_source_reference import HEADER_COUNT, PENDING_COUNT
+from tests.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
 from tests.test_agentic_nested_outputs import rest as shared_rest
 

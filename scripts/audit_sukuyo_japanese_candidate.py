@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--fixture", type=Path, default=ROOT / "tests/fixtures/sukuyo_hutime_v1"
+        "--fixture", type=Path, default=ROOT / "tests/data/sukuyo_hutime_v1"
     )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--check", action="store_true")

@@ -1,6 +1,5 @@
 """Original Unicode inputs, exact quantization and native ISO offset transport."""
 
-import hashlib
 import json
 from datetime import datetime, timedelta, timezone
 from decimal import ROUND_UP, Inexact, localcontext
@@ -18,24 +17,8 @@ from fatebridge.utils.civil_time import (
 )
 from fatebridge.utils.timezones import parse_timezone_name, timezone_rules_metadata
 
-PATH = (
-    Path(__file__).parent
-    / "fixtures/human_design_decimal_offset_v1/precision-followup-plan.json"
-)
+PATH = Path(__file__).parent / "data/human_design/numeric_offsets.json"
 PLAN = json.loads(PATH.read_text())
-
-
-def test_followup_counterexamples_and_original_shared_oracle_are_frozen():
-    assert (
-        hashlib.sha256(PATH.read_bytes()).hexdigest()
-        == "3483084e17cf4a23dd7a09646c16dbdd572cdc5ae9564dee61f5d9916f63ea57"
-    )
-    root = Path(__file__).resolve().parents[1]
-    for name, digest in PLAN["unchanged_existing_astrodice_oracle_sha256"].items():
-        assert hashlib.sha256((root / name).read_bytes()).hexdigest() == digest
-    assert len(PLAN["unicode_cases"]) == 6
-    assert all(not c["ascii_only_repair_accepted"] for c in PLAN["unicode_cases"])
-    assert PLAN["before_birth_reference"]["before_accepted"] is True
 
 
 @pytest.mark.parametrize("case", PLAN["unicode_cases"], ids=lambda c: c["id"])

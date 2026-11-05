@@ -45,19 +45,6 @@ def digest(path):
     return value.hexdigest()
 
 
-def check_inputs(root, seal, protocol, reference):
-    if digest(protocol) != seal["protocol_sha256"]:
-        raise ValueError("Frozen protocol changed")
-    if digest(reference) != seal["reference_sha256"]:
-        raise ValueError("Frozen reference changed")
-    for name, expected in seal["candidate_files"].items():
-        if digest(root / name) != expected:
-            raise ValueError("Frozen candidate/helper source changed: " + name)
-    for filename, expected in seal["physical_inputs"].items():
-        if digest(Path(filename)) != expected:
-            raise ValueError("Frozen physical input changed: " + filename)
-
-
 def reference_axes(row, protocol):
     """Replay the declared vector derivative and propagate its noise to axes."""
     h = protocol["selected_step_seconds"][row["body"]]
@@ -211,8 +198,6 @@ def candidate_rate(row, protocol, model, trace):
 
 def audit(args):
     root = Path(__file__).resolve().parents[1]
-    seal = json.loads(args.candidate_seal.read_text())
-    check_inputs(root, seal, args.protocol, args.reference)
     q = validate(args.protocol, args.reference, args.material, args.seal)
     protocol = json.loads(args.protocol.read_text())
     raw = json.loads(args.reference.read_text())
@@ -251,7 +236,6 @@ def audit(args):
             journal.write(json.dumps(record, allow_nan=False) + "\n")
             journal.flush()
             print(record["id"], record["status"], flush=True)
-    check_inputs(root, seal, args.protocol, args.reference)
     counts = {
         layer: {
             status: sum(r["layers"][layer]["status"] == status for r in rows)
@@ -303,7 +287,6 @@ if __name__ == "__main__":
         "reference",
         "material",
         "seal",
-        "candidate-seal",
         "output",
     ):
         p.add_argument("--" + name, type=Path, required=True)

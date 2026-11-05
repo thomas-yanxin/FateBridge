@@ -20,7 +20,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 from lunardate import LunarDate
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/sukuyo_hko_v1"
+FIXTURE = ROOT / "tests/data/sukuyo_hko_v1"
 BUNDLE = ROOT / "src/fatebridge/data/sukuyo_calendar_corrections.json"
 PREFIX = "https://www.hko.gov.hk/en/gts/time/calendar/text/files/"
 SUPPLEMENT = "https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2069c.txt"

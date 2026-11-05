@@ -262,12 +262,24 @@ def test_unsupported_transformations_never_create_a_plausible_board(options):
         _build_taiyi_with_options(seed, options)
 
 
-def test_compatibility_zero_options_are_noop_and_no_fabricated_patterns():
+@pytest.mark.parametrize("mode", ["year", "month", "day", "hour"])
+@pytest.mark.parametrize(
+    "obsolete",
+    [{"accNum": 0}, {"acc_num": 0}, {"rotation": "顺布"}, {"rotation": "forward"}],
+)
+def test_obsolete_noop_keys_are_rejected_in_every_current_mode(mode, obsolete):
+    seed = _build_analysis_seed(
+        analysis_year=2026, analysis_month=4, analysis_day=4, analysis_hour=12
+    )
+    with pytest.raises(ValueError, match="未实现的太乙选项"):
+        _build_taiyi_with_options(seed, {"calculation_mode": mode, **obsolete})
+
+
+def test_default_current_options_do_not_fabricate_patterns():
     seed = _build_analysis_seed(
         analysis_year=2026, analysis_month=4, analysis_day=4, analysis_hour=12
     )
     default = _build_taiyi_with_options(seed, {})
-    assert default == _build_taiyi_with_options(seed, {"accNum": 0, "rotation": "顺布"})
     assert "big_pattern" not in default
     assert "small_pattern" not in default
     assert default["ruleset"]["classical_acceptance_passed"] is False

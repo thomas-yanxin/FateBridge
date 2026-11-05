@@ -13,8 +13,8 @@ from typing import Any, Iterator
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_origin_activation_v45"
-SOURCE_SHA = "876bcf3e15d8365773a13d9f4de24836c08c6b8a2837c353dc5ad586d936a8ed"
-REFERENCE_SHA = "c6322710410eee20f5bc439b89375fe4a6939ae9a51f02ebf1b36a36154132e6"
+SOURCE_SHA = "817f6cf1aec21b790b8f15feec374fbd708de8033c9a678d07654c7301e551eb"
+REFERENCE_SHA = "f5ccd3a8ddbc3a3756d61dd8cfcb939e37d3b67e0891713ded61b9258a9e9c24"
 POLICY_ID = "latest_elapsed_winter_solstice_instant_modern_v1"
 
 

@@ -12,7 +12,7 @@ from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures/ziwei_independent"
+FIXTURES = ROOT / "tests/data/ziwei_independent"
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 STEMS = "甲乙丙丁戊己庚辛壬癸"
 

@@ -114,8 +114,9 @@ def test_real_natal_inputs_precede_annual_without_merging_their_dates():
     assert earlier["layers"]["annual_stars"] != later["layers"]["annual_stars"]
 
 
-def test_raw_legacy_default_and_form_only_selection_remain_compatible():
-    assert AssessRequest().selected_methods == ["bazhai", "jinsuo", "annual_stars"]
+def test_automatic_methods_require_actual_method_inputs():
+    with pytest.raises(ValueError, match="至少选择一层"):
+        AssessRequest()
     form = {
         "object_id": "desk",
         "purpose": "desk",

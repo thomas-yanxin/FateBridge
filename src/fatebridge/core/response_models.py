@@ -28,6 +28,11 @@ from fatebridge.core.output_chinese import (
     PersonInfo,
 )
 from fatebridge.core.output_classical_roots import ClassicalOverview
+from fatebridge.core.output_compatibility import (
+    CompatibilityDetails,
+    CompatibilitySummary,
+    TraditionalCompatibility,
+)
 from fatebridge.core.output_jyotish import Vimshottari
 from fatebridge.core.output_reference import REFERENCE_TOOL_FIELDS, SnapshotExport
 from fatebridge.core.output_ren_anchors import RenAnchoredOutput
@@ -39,6 +44,8 @@ from fatebridge.core.output_source_annotations import (
 from fatebridge.core.output_timing import (
     AnalysisReference,
     BirthTimeSensitivity,
+    LifeDimensionAssessment,
+    LifeDimensionScores,
     TimingInteractions,
 )
 from fatebridge.core.output_western import (
@@ -113,6 +120,7 @@ class RunMetadata(PartialOutput):
     determinism: Optional[Determinism] = None
     runtime: Optional[Object] = None
     provenance: Optional[Dict[str, List[str]]] = None
+    calculation_evidence: Optional[Object] = None
     replay: Optional[ReplayControls] = None
     warnings: Optional[List[str]] = None
 
@@ -268,10 +276,21 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> Any:
         "interaction_analysis": TimingInteractions,
         "analysis_reference": AnalysisReference,
         "birth_time_sensitivity": BirthTimeSensitivity,
+        "life_dimensions": LifeDimensionScores,
+        "life_dimensions_assessment": LifeDimensionAssessment,
         **CHINESE_TOOL_FIELDS.get(key, {}),
         **CHART_TOOL_FIELDS.get(key, {}),
         **REFERENCE_TOOL_FIELDS.get(key, {}),
         **(ASTRODICE_FIELDS if key == "otherbu" else {}),
+        **(
+            {
+                "summary": CompatibilitySummary,
+                "detailed_analysis": CompatibilityDetails,
+                "traditional_compatibility": TraditionalCompatibility,
+            }
+            if key == "two_person_compatibility"
+            else {}
+        ),
         **(
             {
                 "input_context": LiteralSourceInputContext,
@@ -285,7 +304,29 @@ def output_model_for(key: str, *, western_data_policy: bool = False) -> Any:
     }
     for field in _TOOL_FIELDS[key].split():
         annotation = overrides.get(field, _FIELD_TYPES.get(field, Object))
-        fields[field] = (Optional[annotation], None)
+        fields[field] = (
+            Optional[annotation],
+            (
+                Field(
+                    default=None,
+                    min_length=7,
+                    json_schema_extra={
+                        "x-fatebridge-full-result-unique-by": "id",
+                        "x-fatebridge-full-result-identities": [
+                            "Sun",
+                            "Moon",
+                            "Mercury",
+                            "Venus",
+                            "Mars",
+                            "Jupiter",
+                            "Saturn",
+                        ],
+                    },
+                )
+                if field == "planets"
+                else None
+            ),
+        )
     name = "".join(part.title() for part in key.split("_")) + "Output"
     bases = (
         (ProjectedOutput, RenAnchoredOutput)
@@ -300,7 +341,8 @@ def required_output_fields_for(key: str) -> tuple[str, ...]:
 
     This separate contract preserves projection-compatible public models. A
     missing declaration fails catalog assembly instead of leaving new tools
-    silently unprotected. Empty collections remain legitimate domain results.
+    silently unprotected. Required objects must contain a fact or explicit
+    status; empty lists can still be legitimate domain results.
     """
     return tuple(_REQUIRED_OUTPUT_FIELDS[key].split())
 
@@ -414,7 +456,7 @@ _TOOL_FIELDS = {
     "liunian_analysis": "analysis_type calendar_context element_effects liunian_info personal_info summary target_year_jieqi",
     "liuyue_analysis": "analysis_reference analysis_calendar analysis_type calendar_context combination_effects detailed_analysis element_effects liunian_info liuyue_info personal_info summary target_year_jieqi",
     "liuri_analysis": "analysis_reference analysis_calendar analysis_type calendar_context element_effects liuri_info personal_info summary",
-    "liushi_analysis": "analysis_reference analysis_calendar analysis_type calendar_context detailed_analysis element_effects life_dimensions liushi_info personal_info summary",
+    "liushi_analysis": "analysis_reference analysis_calendar analysis_type calendar_context detailed_analysis element_effects life_dimensions life_dimensions_assessment liushi_info personal_info summary",
     "jieqi_timeline_analysis": "analysis_type calendar_context jieqi_timeline personal_info summary target_year_jieqi",
     "jieqi_year": "analysis_type jieqi_year query_context selected_jieqi summary year",
     "nongli_time": "analysis_context analysis_type birth calendar_context day dayGanZi dayInt four_pillars input_context jiedelta jieqi leap lunar_calendar month monthGanZi monthInt nongli summary timeGanZi yearGanZi yearJieqi",
@@ -441,7 +483,7 @@ _TOOL_FIELDS = {
     "export_parse": "export_text missing_selected_sections section_titles_detected sections selected_sections settings_used technique unknown_detected_sections",
     "knowledge_registry": "bundle_version domains provenance source",
     "knowledge_read": "bundle_version category citation domain key lines provenance query_normalized reference_only reference_details rendered_text source tips title",
-    "astro_chart": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars houses india interpretation interpretation_evidence modality_balance person_info planetary_hours planets summary sector_profile midpoint_analysis thirteen_sectors time_sensitivity midpoints midpoint_aspects base_chart",
+    "astro_chart": "angles apparent_model_positions aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars houses india interpretation interpretation_evidence modality_balance person_info planetary_hours planets summary sector_profile midpoint_analysis thirteen_sectors time_sensitivity midpoints midpoint_aspects base_chart",
     "astro_chart13": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars houses interpretation interpretation_evidence modality_balance person_info planetary_hours planets summary thirteen_sectors sector_profile time_sensitivity",
     "astro_hellen": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars hellenistic houses interpretation interpretation_evidence modality_balance person_info planetary_hours planets summary",
     "astro_guolao": "angles aspect_evidence aspects balance_basis chart_profile classical classical_patterns element_balance fixed_stars guolao houses interpretation interpretation_evidence modality_balance person_info planetary_hours planets summary",
@@ -503,7 +545,7 @@ _REQUIRED_OUTPUT_FIELDS = {
     "liunian_analysis": "liunian_info",
     "liuyue_analysis": "liuyue_info",
     "liuri_analysis": "liuri_info",
-    "liushi_analysis": "liushi_info",
+    "liushi_analysis": "liushi_info life_dimensions life_dimensions_assessment",
     "jieqi_timeline_analysis": "jieqi_timeline",
     "jieqi_year": "jieqi_year",
     "nongli_time": "nongli four_pillars",
@@ -575,5 +617,7 @@ _REQUIRED_OUTPUT_FIELDS = {
     "fengshui_annual_stars": "status layers rulesets coverage rule_trace",
     "fengshui_monthly_stars": "status layers rulesets coverage rule_trace",
     "fengshui_xuankong_natal": "status layers rulesets coverage rule_trace",
-    "fengshui_assess": "status layers rulesets coverage rule_trace",
+    # Form-only assessment legitimately has layers={}; its typed FullFact
+    # still requires the map to be present and non-null in complete output.
+    "fengshui_assess": "status rulesets coverage rule_trace",
 }

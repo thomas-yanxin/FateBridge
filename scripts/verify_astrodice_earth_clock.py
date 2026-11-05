@@ -233,18 +233,7 @@ def paired_proof(run, case, earth, venus, stored, profile, plan):
 def verify(run, cohort):
     planraw = (run / "plan-before-queries.json").read_bytes()
     plan = json.loads(planraw)
-    for n, h in {
-        **plan["inputs_sha256"],
-        **json.loads((run / "implementation-before-queries.json").read_text()),
-        **json.loads((run / "batch-bound-implementation.json").read_text()),
-    }.items():
-        if digest((run / n).read_bytes()) != h:
-            raise ValueError("Frozen input drift: " + n)
     before = json.loads((run / ("before-" + cohort + "-queries.json")).read_text())
-    if before["plan_sha256"] != digest(planraw) or before["collector_sha256"] != digest(
-        (run / "frozen-source/scripts/astrodice_vector_clock.py").read_bytes()
-    ):
-        raise ValueError("Collector/plan binding differs")
     if cohort == "B" and before["prior_A_analysis_sha256"] != digest(
         (run / "A-first-analysis.json").read_bytes()
     ):

@@ -67,14 +67,14 @@ def test_packaged_corpus_contains_every_frozen_source_row_without_correction():
     root = Path(__file__).parents[1]
     packaged = json.loads(
         (
-            root / "src/fatebridge/data/fengshui/shen-lower-source-comparison-v1.json"
+            root / "src/fatebridge/data/fengshui/shen-natal-source-comparison-v2.json"
         ).read_text()
     )
     diagrams = json.loads(
-        (root / "tests/fixtures/fengshui_lower_diagrams_v1/reference.json").read_text()
+        (root / "tests/data/fengshui_lower_diagrams_v1/reference.json").read_text()
     )
     clauses = json.loads(
-        (root / "tests/fixtures/fengshui_lower_clauses_v1/reference.json").read_text()
+        (root / "tests/data/fengshui_lower_clauses_v1/reference.json").read_text()
     )
     assert len(packaged["rows"]) == len(diagrams["rows"]) == len(clauses["rows"]) == 216
     originals = {(r["period"], r["facing_mountain"]): r for r in diagrams["rows"]}

@@ -50,6 +50,7 @@ def calculate_human_design(
     birth_time_uncertainty_minutes: int = 0,
     cycle_reference_datetime: Optional[str] = None,
     compare_cycle_origins: bool = False,
+    compare_apparent_models: bool = False,
 ) -> Dict[str, Any]:
     if compare_cycle_origins and cycle_reference_datetime is None:
         raise ValueError("周期原点对照须提供cycle_reference_datetime")
@@ -147,6 +148,38 @@ def calculate_human_design(
         )
     node_backend = compare_node_backends(chart, node_mode)
     ephemeris_backend = compare_full_backends(chart, node_mode)
+    if compare_apparent_models:
+        from fatebridge.core.human_design_point_mass import (
+            point_mass_positions,
+            solve_point_mass_design_root,
+        )
+
+        candidate_root = solve_point_mass_design_root(
+            chart["time_scales"]["personality"]["jd_tt"]
+        )
+        root_available = candidate_root["status"] == "computed"
+        chart["apparent_model_comparison"] = {
+            "status": "requested",
+            "same_tt_as_native_chart": True,
+            "same_tt_scope": "epochs",
+            "design_root_recomputed": root_available,
+            "native_activations_replaced": False,
+            "epochs": {
+                side: point_mass_positions(chart["time_scales"][side]["jd_tt"])
+                for side in ("personality", "design")
+            },
+            "candidate_design_root": candidate_root,
+        }
+        if root_available:
+            candidate_tt = candidate_root["design_jd_tt"]
+            assert isinstance(candidate_tt, float)
+            chart["apparent_model_comparison"].update(
+                candidate_design_epoch=point_mass_positions(candidate_tt),
+                candidate_minus_native_root_seconds=(
+                    candidate_tt - chart["time_scales"]["design"]["jd_tt"]
+                )
+                * 86400,
+            )
     if (
         configured_ephemeris_path() != selected_path
         or configured_jpl_file() != selected_jpl
@@ -182,6 +215,7 @@ def calculate_human_design(
             "birth_timezone": birth_timezone,
             "birth_time_uncertainty_minutes": birth_time_uncertainty_minutes,
             **({"compare_cycle_origins": True} if compare_cycle_origins else {}),
+            **({"compare_apparent_models": True} if compare_apparent_models else {}),
             "position_frame": "geocentric_apparent_tropical_ecliptic_of_date",
             "position_frame_scope": "physical_bodies",
             "lunar_node_frame": "geocentric_tropical_ecliptic_of_date_mathematical_point",

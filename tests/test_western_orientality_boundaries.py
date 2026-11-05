@@ -1,7 +1,6 @@
 """Independent supplied-angle references and faithful consumer propagation."""
 
 import asyncio
-import hashlib
 import json
 import math
 from fractions import Fraction
@@ -14,6 +13,7 @@ import fatebridge.core.classical_western as classical
 import fatebridge.core.output_charts as contracts
 from fatebridge.core.astrology_tables import SIGNS
 from fatebridge.core.ptolemy import build_ptolemy_layer
+from tests.reference_data import verify_source_files
 from tests.test_agentic_nested_outputs import rest  # noqa: F401
 from tests.test_agentic_nested_outputs import (
     SPECS,
@@ -22,7 +22,7 @@ from tests.test_agentic_nested_outputs import (
     native,
 )
 
-FIXTURE = Path(__file__).parent / "fixtures/western-orientality-v1"
+FIXTURE = Path(__file__).parent / "data/astro/orientality"
 ANGLES = json.loads((FIXTURE / "independent-angle-reference.json").read_text())["cases"]
 NATIVE = json.loads((FIXTURE / "native-phase-reference.json").read_text())["rows"]
 PUBLIC = [
@@ -41,15 +41,7 @@ def decode(value):
 
 
 def test_independent_preedit_reference_seal_and_rejected_input_attempt_are_retained():
-    for name, digest in json.loads(
-        (FIXTURE / "preedit-plan-seal.json").read_text()
-    ).items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
-    old = json.loads((FIXTURE / "preedit-predicate-probe.json").read_text())
-    assert len(old["literal"]) == 140
-    assert sum(not row["matches"] for row in old["literal"]) == 86
-    assert len(old["native"]) == 49
-    assert sum(not row["matches"] for row in old["native"]) == 25
+    verify_source_files(FIXTURE)
     assert len(PUBLIC) == 42
 
 
@@ -126,7 +118,10 @@ def test_policy_cannot_claim_unperformed_observation_or_author_endpoint_acceptan
 
 @pytest.mark.parametrize("row", PUBLIC, ids=lambda row: row["id"])
 def test_all_frozen_event_inputs_across_public_rest_mcp_and_cli(
-    row, rest, tmp_path, capsys
+    row,
+    rest,  # noqa: F811 - pytest fixture dependency
+    tmp_path,
+    capsys,  # noqa: F811 - pytest fixture dependency
 ):
     spec = SPECS[row["key"]]
     prefix = "base_chart." if row["key"] == "astro_germany" else ""

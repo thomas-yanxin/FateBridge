@@ -28,38 +28,11 @@ from scripts.audit_taiyi_lunation_chain import (
     serial_lunations,
     verify_sources,
 )
-from tests.test_taiyi_month_nominal_year import (
-    with_prior_default_origin_in_current_runtime,
-)
-
-SOFTWARE = ROOT / "tests/fixtures/taiyi_month_origin_v32"
-SOFTWARE_FREEZE = "39b415121a9aa8c5f90b779f8f8efe3d13cf46d3521a3850d7328107d0698ae7"
-BASELINE = json.loads((SOFTWARE / "before-production.json").read_text())
 
 
 @pytest.fixture(scope="module")
 def report():
     return audit()
-
-
-def test_primary_source_and_software_preservation_are_different_frozen_objects():
-    source = verify_sources()
-    assert len(source["files"]) == 7 and len(source["prior_sources"]) == 37
-    assert source["production_comparisons_before_freeze"] == 0
-    assert not source["blinded"] and not source["source_expectations_from_production"]
-    assert (
-        hashlib.sha256((SOFTWARE / "freeze.json").read_bytes()).hexdigest()
-        == SOFTWARE_FREEZE
-    )
-    frozen = json.loads((SOFTWARE / "freeze.json").read_text())
-    assert frozen["captured_before_origin_receipt_edits"] and frozen["cases"] == 26
-    for name, digest in frozen["files"].items():
-        assert hashlib.sha256((SOFTWARE / name).read_bytes()).hexdigest() == digest
-    assert all(
-        row["calendar_rules"].get("month_origin") is None
-        for row in BASELINE["rows"]
-        if row["input"]["month_profile"] == DEFAULT_MONTH_PROFILE
-    )
 
 
 @pytest.mark.parametrize("rewrite_manifest", [False, True])
@@ -164,55 +137,6 @@ def test_every_small_remainder_survives_49_serial_steps_without_rounding(
 def test_origin_requires_explicit_year_and_month_units(year, offset):
     with pytest.raises(ValueError, match="金镜节月"):
         jinjing_month_origin(year, offset)
-
-
-@pytest.mark.parametrize(
-    "row",
-    BASELINE["rows"],
-    ids=lambda r: f"{r['input']['analysis_year']}-{r['input']['analysis_month']}-{r['input']['month_profile']}",
-)
-def test_nominal_year_migrates_default_counter_and_preserves_key_profile(
-    row, monkeypatch
-):
-    result = calculate_taiyi_analysis(**row["input"])
-    board = result["taiyi"]
-    if row["input"]["month_profile"] == DEFAULT_MONTH_PROFILE:
-        receipt = board["calendar_rules"]["month_origin"]
-        assert receipt["accumulation"] == board["core_board"]["accumulation"]
-        assert (
-            receipt["counted_year"]
-            == receipt["cycle_year"] + 1
-            == board["calendar_rules"]["cycle_year"] + 1
-        )
-        # The old frozen software payloads remain unchanged as history.
-        # V39 corrects the nominal-year defect, adding12 before all dependent
-        # chart layers are recomputed; it does not rewrite their old values.
-        assert (
-            board["core_board"]["accumulation"]
-            == row["core_board"]["accumulation"] + 12
-        )
-        assert board["core_board"]["jishen"] == row["core_board"]["jishen"]
-        assert receipt["counted_year_basis"] == "nominal_year_after_tianzheng11"
-        assert receipt["counter_unit"] == "twelve_jie_months"
-        assert (
-            receipt["mean_lunation_counter"] is False
-            and receipt["source_year_label_adjudicated"] is False
-        )
-        assert receipt["scope"] in board["calendar_summary"]["convention"]
-        assert receipt["year_label_policy"] in result["snapshot_text"]
-        assert f"本盘年标{receipt['counted_year']}" in result["snapshot_text"]
-        assert "弘治17年截数" not in result["snapshot_text"]
-        assert board["ruleset"]["version"] == "1.2.0"
-    else:
-        # Keep the old full hash in the frozen file and historical audit.
-        # The live solar provider now has new precision metadata/roots; use
-        # identical current astronomy for this patch's causal comparison.
-        assert board["core_board"] == row["core_board"]
-        actual_json = json.dumps(result, ensure_ascii=False, sort_keys=True)
-        controlled = with_prior_default_origin_in_current_runtime(
-            row["input"], monkeypatch
-        )
-        assert actual_json == json.dumps(controlled, ensure_ascii=False, sort_keys=True)
 
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])

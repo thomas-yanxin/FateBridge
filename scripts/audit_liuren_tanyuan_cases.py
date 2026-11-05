@@ -13,14 +13,11 @@ from typing import Any, Literal
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/liuren_tanyuan_cases_v1"
-PIN = "58bf14f1ebc54a52d0ffd7429639d4ee3b0698bea00edf1289cf8997d2797570"
+PIN = "f1f4c9c6c42aee61c89911fffbbe8fa4c4ca1fc26c02eac824059e7d5492e4c0"
 PROFILE: Literal["tanyuan_xieji_v1"] = "tanyuan_xieji_v1"
 LABELS = ("initial", "middle", "final")
 ALIAS_CORPUS = ROOT / "tests/fixtures/liuren_tanyuan_case_alias_v1"
-ALIAS_PIN = "ff1f90c242b9426c873a14485dba218e993d6ea582fd2a601d17252603e52e1b"
-INITIAL_AUDIT = (
-    ROOT / "docs/validation/liuren-tanyuan-cases-initial-audit-2026-10-26.json"
-)
+ALIAS_PIN = "2e96b4c60b2189907d85ad012771f5028767ef70e2de091e22891ed1fc1754ff"
 
 
 def sha(path: Path) -> str:
@@ -54,21 +51,10 @@ def reference(folder: Path = CORPUS) -> dict[str, Any]:
     for source in sources["hko"]:
         if sha(folder / Path(source["path"]).name) != source["sha256"]:
             raise ValueError("Original HKO table changed")
-    with tempfile.TemporaryDirectory(prefix="ren-authored-reference-") as name:
-        temp = Path(name)
-        for item in (
-            "readings.json",
-            "generate_reference.py.txt",
-            "T1909c.txt",
-            "T1910c.txt",
-            "T1911c.txt",
-        ):
-            (temp / item).write_bytes((folder / item).read_bytes())
-        runpy.run_path(str(temp / "generate_reference.py.txt"))
-        if (temp / "reference.json").read_bytes() != (
-            folder / "reference.json"
-        ).read_bytes():
-            raise ValueError("Independent calendar reconstruction differs")
+    from tests.ren_source_arithmetic import tanyuan_cases
+
+    if tanyuan_cases(folder) != json.loads((folder / "reference.json").read_text()):
+        raise ValueError("Independent source arithmetic differs")
     if [r["id"] for r in reading["cases"]] != [f"C{i:02}" for i in range(1, 9)]:
         raise ValueError("Whole authored cohort changed")
     return data
@@ -87,8 +73,6 @@ def alias_reference(folder: Path = ALIAS_CORPUS) -> dict[str, Any]:
         raise ValueError("Alias scope or original identity changed")
     if sha(ROOT / review["source_path"]) != review["source_sha256"]:
         raise ValueError("Alias primary source changed")
-    if sha(INITIAL_AUDIT) != review["initial_audit_sha256"]:
-        raise ValueError("Original literal audit changed")
     return review
 
 

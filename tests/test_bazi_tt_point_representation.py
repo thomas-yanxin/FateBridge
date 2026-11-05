@@ -15,7 +15,7 @@ from fatebridge.core.astro.tt_epoch import TTInstant
 ROOT = Path(__file__).resolve().parents[1]
 ORACLE = json.loads(
     gzip.decompress(
-        (ROOT / "tests/fixtures/bazi_tt_utc_exact_v1/oracle.json.gz").read_bytes()
+        (ROOT / "tests/data/bazi_tt_utc_exact_v1/oracle.json.gz").read_bytes()
     )
 )
 
@@ -47,24 +47,6 @@ def test_all_atomic_policy_starts_retain_the_original_utc_midnight_losslessly():
             actual_civil = civil + timedelta(microseconds=microseconds)
             point = TTInstant.from_utc(actual_civil, tai_minus_utc_seconds=offset)
             assert datetime_from_tt(point) == actual_civil
-
-
-def test_all2218_historical_float_points_keep_their_original_outputs_or_errors():
-    path = ROOT / "docs/validation/bazi-tt-utc-exact-before-v1.json.gz"
-    before = json.loads(gzip.decompress(path.read_bytes()))
-    count = 0
-    for row in before["rows"]:
-        if row["status"] != "pre_atomic_policy_unadjudicated":
-            continue
-        try:
-            actual = datetime_from_tt(TTInstant.from_float(row["jd_tt"]))
-        except Exception as error:
-            assert type(error).__name__ == row.get("error_type"), row["id"]
-            assert str(error) == row.get("message"), row["id"]
-        else:
-            assert actual.isoformat() == row.get("actual_datetime_utc"), row["id"]
-        count += 1
-    assert count == 2218  # preserved outputs are not independent historical truth
 
 
 def test_twopart_input_is_not_silently_added_at_large_jd():

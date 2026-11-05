@@ -16,7 +16,7 @@ from fatebridge.core.sukuyo_sources import load_source
 ROOT = Path(__file__).resolve().parents[1]
 if not __package__:
     sys.path.insert(0, str(ROOT))
-FIXTURE = ROOT / "tests/fixtures/sukuyo-historical-weekday-primary.json"
+FIXTURE = ROOT / "tests/data/sukuyo-historical-weekday-primary.json"
 
 
 def verify_weekday(capture: Path | None = None) -> dict:

@@ -22,7 +22,7 @@ from pathlib import Path
 
 METHOD = "jpl_horizons_serial_backoff_v1"
 USER_AGENT = (
-    "FateBridge-reference/1.0 " "(+https://github.com/thomas-yanxin/FateBridge/issues)"
+    "FateBridge-reference/1.0 (+https://github.com/thomas-yanxin/FateBridge/issues)"
 )
 
 

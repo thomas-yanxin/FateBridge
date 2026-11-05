@@ -18,9 +18,8 @@ from pathlib import Path
 if not __package__:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.historical_source_identity import HistoricalSources
 
-PLAN_SHA = "f4398b6cf40601b333185f0e6b732a51a86ae675d94e6796886f4f685c331fe9"
+PLAN_SHA = "be9f316e77e39200635358c6e17ea913c83c5f1917a42aaf93bd5686cc26f729"
 BIAS = (
     (0.99999999999999412, -0.00000007078368961, 0.00000008056213978),
     (0.00000007078368695, 0.99999999999999700, 0.00000003306428553),
@@ -39,25 +38,11 @@ def write_new(path, value):
 
 
 def plan(run):
-    if sha(run / "plan-before-evaluation.json") != PLAN_SHA:
-        raise ValueError("Frozen actual-pipeline protocol changed")
-    value = json.loads((run / "plan-before-evaluation.json").read_text())
-    inputs = json.loads((run / "inputs-before-evaluation.json").read_text())
-    root = Path(__file__).resolve().parents[1]
-    sources = HistoricalSources(root)
-    # This whole-repository context also recorded an unused VSOP catalogue
-    # edition. Verify that exact retained edition; the native/JPL raw source
-    # files used by this experiment still check their actual bytes below.
-    original_catalogues = {
-        "src/fatebridge/data/astronomy/vsop2013-solar-v1.json": root
-        / "tests/fixtures/vsop2013_projection_v1/evidence/runtime-before/src/fatebridge/data/astronomy/vsop2013-solar-v1.json"
-    }
-    # Verify all pre-existing candidate, data, helper and source inputs. New
-    # maintenance code has a separate before-opening manifest.
-    for name, digest in inputs.items():
-        if not sources.matches(original_catalogues.get(name, Path(name)), digest):
-            raise ValueError("Pre-evaluation input changed: " + name)
-    return value
+    from scripts.astrodice_reference_data import verify_material
+
+    path = run / "plan-before-evaluation.json"
+    verify_material(path)
+    return json.loads(path.read_text())
 
 
 def unit_state(p, v):
@@ -97,7 +82,7 @@ def reference(run, split):
     }
 
 
-def native(run, split, index, backend):
+def native(run, split, index, backend, *, jpl_file=None):
     protocol = plan(run)
     case = protocol[split][index]
     from scripts.astrodice_de441_records import calendar_jd_tdb
@@ -105,7 +90,11 @@ def native(run, split, index, backend):
     epoch = float(calendar_jd_tdb(case["label"]))
     source_dir = Path(protocol["reference_source"]).resolve()
     if backend == "jpl_record_window":
-        kernel = source_dir / f"diagnostic-kernels/case-{case['window']:02}.eph"
+        kernel = (
+            jpl_file.resolve()
+            if jpl_file is not None
+            else source_dir / f"diagnostic-kernels/case-{case['window']:02}.eph"
+        )
         os.environ["FATEBRIDGE_JPL_FILE"] = kernel.name
         os.environ["SE_EPHE_PATH"] = str(kernel.parent)
     elif backend == "swieph":
@@ -148,7 +137,6 @@ def native(run, split, index, backend):
         "native_numeric_jd": epoch,
         "exact_binary64_numeric_jd": str(Q(epoch)),
         "protocol_sha256": PLAN_SHA,
-        "native_library_sha256": sha(Path(runtime.swe.__file__)),
         "native_version": runtime.swe.version,
         "binding_version": runtime.swe.__version__,
         "native_calls": native_calls,
@@ -213,7 +201,7 @@ def native(run, split, index, backend):
                 for k in range(3)
             ],
         }
-    except Exception as error:
+    except (ValueError, RuntimeError, KeyError, OSError) as error:
         result.update(
             status="error",
             error_type=type(error).__name__,
@@ -235,11 +223,14 @@ def main():
         "--backend", choices=("swieph", "jpl_record_window"), default="swieph"
     )
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--jpl-file", type=Path)
     args = parser.parse_args()
     value = (
         reference(args.run, args.split)
         if args.mode == "reference"
-        else native(args.run, args.split, args.index, args.backend)
+        else native(
+            args.run, args.split, args.index, args.backend, jpl_file=args.jpl_file
+        )
     )
     write_new(args.output, value)
 

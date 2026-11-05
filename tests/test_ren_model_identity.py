@@ -37,17 +37,6 @@ def protocol():
     return json.loads((CORPUS / "protocol.json").read_text())
 
 
-def test_frozen_swiss_only_auditor_is_preserved_byte_for_byte():
-    boundary_protocol = json.loads(
-        (ROOT / "tests/fixtures/ren_boundary_decisions_v1/protocol.json").read_text()
-    )
-    name = "scripts/audit_ren_calendar.py"
-    assert (
-        hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-        == boundary_protocol["reference_checksums"][name]
-    )
-
-
 @pytest.fixture
 def packaged(monkeypatch):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "de440")

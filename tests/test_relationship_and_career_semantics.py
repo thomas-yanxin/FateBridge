@@ -19,7 +19,7 @@ from fatebridge.cli import run
 from fatebridge.core.requests.compatibility import TwoPersonCompatibilityRequest
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from tests.compatibility_reference import assert_score_reference
+from tests.compatibility_reference import assert_source_condition_score_reference
 
 SPECS = {
     spec.key: spec
@@ -126,7 +126,7 @@ def test_revised_relationship_scores_match_across_transports(
     bodies = [rest.json(), protocol.structured_content, cli]
     for body in bodies:
         assert body["summary"]["relationship_type"] == (kind or "general")
-        assert_score_reference(
+        assert_source_condition_score_reference(
             body["summary"], body["detailed_analysis"], kind or "general"
         )
         assert "不是关系成功概率" in body["summary"]["score_basis"]

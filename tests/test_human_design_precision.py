@@ -9,12 +9,8 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.astro import runtime
-from fatebridge.core.human_design import (
-    GATE_ORDER,
-    bodygraph,
-    chart_at,
-    longitude_activation,
-)
+from fatebridge.core.human_design import bodygraph, chart_at, longitude_activation
+from fatebridge.core.human_design_mechanics import GATE_ORDER
 from fatebridge.core.human_design_precision import compare_node_backends
 
 
@@ -153,9 +149,9 @@ def test_unavailable_reference_never_becomes_silent_agreement(monkeypatch, failu
 
 
 def test_moshier_compared_to_itself_is_explicitly_not_independent():
-    from tests.golden.runner import golden_ephemeris
+    from tests.ephemeris_context import moshier_ephemeris
 
-    with golden_ephemeris():
+    with moshier_ephemeris():
         chart = chart_at(datetime.fromisoformat("2000-01-01T12:00:00+00:00"))
         result = compare_node_backends(chart, "true")
     assert result["status"] == "same_backend_not_independent"
@@ -166,9 +162,9 @@ def test_moshier_compared_to_itself_is_explicitly_not_independent():
 
 def test_same_backend_equality_cannot_certify_fine_subdivision_accuracy():
     from fatebridge.services.human_design import calculate_human_design
-    from tests.golden.runner import golden_ephemeris
+    from tests.ephemeris_context import moshier_ephemeris
 
-    with golden_ephemeris():
+    with moshier_ephemeris():
         result = calculate_human_design(
             birth_year=2000,
             birth_month=1,

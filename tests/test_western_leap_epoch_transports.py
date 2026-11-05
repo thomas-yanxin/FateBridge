@@ -5,13 +5,13 @@ from pathlib import Path
 
 import pytest
 
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
-
-pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
-
-
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
 from tests.test_agentic_nested_outputs import rest
 from tests.test_western_event_clock_transports import surfaces
+
+pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
 REFERENCE = json.loads(
     (Path(__file__).parent / "fixtures/western-leap-epoch-reference.json").read_text()

@@ -416,6 +416,11 @@ class AstroVimshottariRequest(AstroIndiaRequest):
 class AstroChartPolyRequest(AstroIndiaRequest):
     """Polymorphic astro chart request (adds a chart_variant selector)."""
 
+    apparent_model: Literal["native", "opaque_solar"] = Field(
+        default="native",
+        description="chart only: native retains the native chart. opaque_solar additionally returns standalone geocentric apparent_model_positions, with finite-source solar deflection outside an opaque 695700 km Sun and zero deflection for intercepted rays. Requires local barycentric ephemeris files and the jpl extra. This position layer does not recompute native planets, speeds, houses, aspects or readings; its tropical IAU2006/2000A frame is explicit even for a sidereal native chart.",
+    )
+
     ephemeris_policy: Literal["auto", "require_data_files"] = Field(
         default="auto",
         json_schema_extra={"x-fatebridge-western-data-policy": True},
@@ -490,6 +495,8 @@ class AstroChartPolyRequest(AstroIndiaRequest):
 
     @model_validator(mode="after")
     def _india_options_scope(self) -> "AstroChartPolyRequest":
+        if self.apparent_model != "native" and self.chart_variant != "chart":
+            raise ValueError("apparent_model=opaque_solar requires chart_variant=chart")
         if self.guolao_seasonal_anchor_policy is not None:
             if self.chart_variant != "guolao_chart":
                 raise ValueError(

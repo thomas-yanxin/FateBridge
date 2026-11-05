@@ -12,8 +12,8 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 
 KEYS = [
     "bazi_birth",
@@ -34,6 +34,9 @@ def descend(result, path):
     for key in path.split("."):
         result = result[key]
     return result
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("key", KEYS)

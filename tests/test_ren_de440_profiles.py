@@ -15,7 +15,7 @@ from fatebridge.core.metaphysics import ren_calendar
 from fatebridge.core.output_chinese import RenTermDependency
 from fatebridge.services.metaphysics import _build_analysis_seed
 from fatebridge.utils.errors import EphemerisSourceError
-from scripts.audit_ren_extended_source import reference
+from tests.ren_de440_profile_reference import reference
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
 
 

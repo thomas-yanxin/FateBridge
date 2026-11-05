@@ -54,7 +54,7 @@ def test_full_original_source_values_and_old_failures_are_not_regraded(report):
         for r in report["independent_source_counts"]
     } == expected
     old = json.loads(
-        (ROOT / "docs/validation/taiyi-jinjing-v23/native-audit.json").read_text()
+        (ROOT / "tests/data/taiyi/known_source_disagreements.json").read_text()
     )
     assert (
         report["old_11_count_disagreements_retained"]

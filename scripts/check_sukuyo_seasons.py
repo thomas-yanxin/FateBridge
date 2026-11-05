@@ -12,7 +12,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "src/fatebridge/data/sukuyo_seasons.json"
-FIXTURE = ROOT / "tests/fixtures/sukuyo-season-before-production-v68.json"
+FIXTURE = ROOT / "tests/data/sukuyo-season-before-production-v68.json"
 
 
 def verify_primary(captures: dict[str, Path] | None = None) -> dict[str, Any]:

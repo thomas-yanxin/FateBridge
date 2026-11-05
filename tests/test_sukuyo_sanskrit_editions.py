@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-REFERENCE = ROOT / "tests/fixtures/sukuyo-sanskrit-before-production-v80.json"
+REFERENCE = ROOT / "tests/data/sukuyo-sanskrit-before-production-v80.json"
 
 
 @pytest.mark.parametrize("edition", ["cowell_neil_1886", "mukhopadhyaya_1954_titus"])

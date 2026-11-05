@@ -7,7 +7,8 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.core.heluo import MONTH_GUA, _gua_tables, gua_lines, judge
+from fatebridge.core.heluo import MONTH_GUA, gua_lines, judge
+from fatebridge.core.heluo_hexagrams import _gua_tables
 from fatebridge.core.heluo_months import MONTH_BRANCHES, month_affinity
 from fatebridge.core.output_numerology import HeluoMonthAffinity
 from fatebridge.utils.errors import NumerologySourceError

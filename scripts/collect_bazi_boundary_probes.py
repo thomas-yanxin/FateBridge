@@ -13,7 +13,7 @@ from fatebridge.core import ephemeris_runtime as runtime
 from fatebridge.core.astro.time_scales import datetime_from_tt, ephemeris_time
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_boundary_decisions_v1"
+FIXTURE = ROOT / "tests/data/bazi_boundary_decisions_v1"
 JIE_BRANCHES = {
     "立春": "寅",
     "惊蛰": "卯",

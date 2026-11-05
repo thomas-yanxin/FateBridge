@@ -1,26 +1,17 @@
 """A scanned duration witness must never become an adopted duty or hidden root."""
 
 import asyncio
-import gzip
-import inspect
-import json
-import types
 from copy import deepcopy
 
 import pytest
 
-from fatebridge.core.bazi_evidence import build_natal_evidence
 from fatebridge.core.month_duty_reference import build_month_duty_reference
 from fatebridge.core.month_duty_scan_reference import build_month_duty_scan_reference
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS
 from scripts.audit_bazi_month_duty_scan import (
-    DATA,
-    FIXTURE,
-    ROOT,
     audit,
     compare_claims,
 )
-from scripts.sealed_bazi_runtime import replay
 from tests.test_agentic_nested_outputs import (
     AS_OF,
     SPECS,
@@ -28,8 +19,8 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_year_contract import TOPICS
 
 
@@ -71,6 +62,9 @@ def test_source_differences_are_retained_without_a_must_agree_gate():
     ]
     assert glyphs[0]["digital"] == "已土" and glyphs[0]["scanned_reading"] == "己土"
     assert (old, new) == before
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("branch", list("寅卯辰巳午未申酉戌亥子丑"))
@@ -155,88 +149,6 @@ def test_returned_scan_pages_claims_and_critique_cannot_mutate_the_source_cache(
     one["duration_source_layers"][0]["claims"][0]["days"] = -1
     one["annual_duration_arithmetic"]["groups"][0]["each_days"] = -1
     assert build_month_duty_scan_reference(chart()) == expected
-
-
-def test_all349_previous_complete_evidence_objects_preserve_every_old_value():
-    program = (
-        """import gzip, hashlib, inspect, json, sys, types
-from copy import deepcopy
-from pathlib import Path
-from fatebridge.core.bazi_evidence import build_natal_evidence
-payload = json.load(sys.stdin)
-ROOT = Path(payload["root"])
-FIXTURE = ROOT / payload["fixture"]
-DATA = ROOT / payload["data"]
-"""
-        + inspect.getsource(
-            _historical_all349_previous_complete_evidence_objects_preserve_every_old_value
-        )
-        + "\n_historical_all349_previous_complete_evidence_objects_preserve_every_old_value()\nprint('{}')"
-    )
-    assert (
-        replay(
-            program,
-            {
-                "root": str(ROOT),
-                "fixture": str(FIXTURE.relative_to(ROOT)),
-                "data": str(DATA.relative_to(ROOT)),
-            },
-            ROOT,
-        )
-        == {}
-    )
-
-
-def _historical_all349_previous_complete_evidence_objects_preserve_every_old_value():
-    before = json.loads(
-        gzip.decompress((FIXTURE / "before-source.json.gz").read_bytes())
-    )
-    old_month = types.ModuleType("_scan_old_month_duty")
-    exec(
-        compile(
-            before["src/fatebridge/core/month_duty_reference.py"],
-            "old_month_duty.py",
-            "exec",
-        ),
-        old_month.__dict__,
-    )
-    old_evidence = types.ModuleType("_scan_old_evidence")
-    exec(
-        compile(
-            before["src/fatebridge/core/bazi_evidence.py"], "old_evidence.py", "exec"
-        ),
-        old_evidence.__dict__,
-    )
-    old_evidence.build_month_duty_reference = old_month.build_month_duty_reference
-    corpus = json.loads(
-        gzip.decompress(
-            (
-                ROOT / "docs/validation/bazi-grader-policy-source-corpus-v1.json.gz"
-            ).read_bytes()
-        )
-    )
-    count = 0
-    for group in corpus["groups"].values():
-        for row in group["rows"]:
-            pillars = dict(
-                zip(("year", "month", "day", "hour"), map(tuple, row["pillars"]))
-            )
-            strength = dict(
-                strength_level=row["actual_strength"], assessment=row["assessment"]
-            )
-            current = build_natal_evidence(pillars, strength)
-            current["month_command"]["intra_month_duty"]["source_reference"].pop(
-                "scanned_witness"
-            )
-            assert current == old_evidence.build_natal_evidence(pillars, strength), row[
-                "id"
-            ]
-            count += 1
-    assert count == 349
-    assert (ROOT / "src/fatebridge/data/bazi_month_duty_sources_v1.json").read_text(
-        encoding="utf-8"
-    ) == before["src/fatebridge/data/bazi_month_duty_sources_v1.json"]
-    assert DATA.read_bytes() == (FIXTURE / "witness-first.json").read_bytes()
 
 
 @pytest.mark.parametrize("topic", TOPICS)

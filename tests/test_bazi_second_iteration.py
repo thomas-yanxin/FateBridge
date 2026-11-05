@@ -71,7 +71,6 @@ def test_original_officer_god_survives_revealed_seal_with_legacy_audit_label():
     result = determine_monthly_structure(chart, "乙")
     assert result["original_structure"]["ten_god"] == "正官"
     assert result["label"] == "正官格"
-    assert result["legacy_label"] == "正印格"
     assert result["selection_rule"] == "officer_with_wealth_seal_support"
 
 

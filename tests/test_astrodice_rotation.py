@@ -20,7 +20,7 @@ from fatebridge.core.astro_models import (
 
 ROOT = Path(__file__).parents[1]
 REFERENCE = json.loads(
-    (ROOT / "tests/fixtures/astrodice-rotation-erfa.json").read_text()
+    (ROOT / "tests/data/astrodice/tables/rotation-erfa.json").read_text()
 )
 PROTOCOL = REFERENCE["protocol"]
 LOCATIONS = [
@@ -44,7 +44,7 @@ def test_reference_keeps_the_prepared_protocol_and_independent_generator():
     assert (
         REFERENCE["protocol_sha256"]
         == hashlib.sha256(
-            (ROOT / "tests/fixtures/astrodice-rotation-protocol.json").read_bytes()
+            (ROOT / "tests/data/astrodice/tables/rotation-protocol.json").read_bytes()
         ).hexdigest()
     )
     assert (

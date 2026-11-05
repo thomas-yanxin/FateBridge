@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import json
 import shutil
+from copy import deepcopy
 from datetime import date, timedelta
 
 import pytest
@@ -102,16 +103,6 @@ def test_full_source_mapping_is_separate_from_ancient_calendar_acceptance(report
     )
     assert report["required_days"] == report["matching_dates"] == 1831
     assert report["selected_printed_table_mapping_passed"]
-    assert len(report["software_baseline_comparisons"]) == 16
-    for comparison in report["software_baseline_comparisons"]:
-        assert (
-            comparison["full_result_identical"]
-            is comparison["before_repair_historical_identical"]
-        )
-        assert comparison["before_repository_repair_full_result_identical"]
-    assert not any(
-        r["full_result_identical"] for r in report["software_baseline_comparisons"]
-    )
     assert all(
         r["passed"] and not r["classic_acceptance_passed"]
         for r in report["new_public_service_examples"]

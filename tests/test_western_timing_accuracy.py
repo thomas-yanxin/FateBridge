@@ -85,7 +85,7 @@ def test_timing_positions_against_independent_nasa(reference, moshier):
 
 
 @pytest.mark.parametrize(
-    "case", RETURNS["cases"], ids=lambda c: f'{c["planet"]}-{c["case_id"]}'
+    "case", RETURNS["cases"], ids=lambda c: f"{c['planet']}-{c['case_id']}"
 )
 def test_return_against_independently_solved_nasa_event(case, moshier):
     natal = subject_at(datetime.fromisoformat(case["birth_utc"]))

@@ -10,7 +10,6 @@ from importlib.resources import files
 from typing import Any
 
 from fatebridge.core.human_design_mechanics import (
-    longitude_activation,
     opposite_activation,
 )
 
@@ -35,10 +34,8 @@ def check_opposition_arithmetic() -> dict[str, Any]:
     ]
     if len(gates) != 64 or set(gates) != set(range(1, 65)):
         raise ValueError("Primary gate reference is incomplete")
-    checked = current_wrong = legacy_wrong = 0
+    checked = current_wrong = 0
     current_counts = dict.fromkeys(LEVELS, 0)
-    legacy_counts = dict.fromkeys(LEVELS, 0)
-    examples: dict[str, Any] = {}
     for index in range(69120):
         boundary = float((Fraction(302) + Fraction(index, 192)) % 360)
         for direction in (-math.inf, math.inf):
@@ -64,24 +61,10 @@ def check_opposition_arithmetic() -> dict[str, Any]:
                 )
             )
             current = opposite_activation(source)
-            legacy = longitude_activation((source + 180.0) % 360.0)
-            old_diff = [k for k in LEVELS if legacy[k] != expected[k]]
             new_diff = [k for k in LEVELS if current[k] != expected[k]]
-            legacy_wrong += bool(old_diff)
             current_wrong += bool(new_diff)
             for level in LEVELS:
-                legacy_counts[level] += level in old_diff
                 current_counts[level] += level in new_diff
-                if level in old_diff and level not in examples:
-                    examples[level] = {
-                        "source_longitude": source,
-                        "source_hex": source.hex(),
-                        "legacy_display": legacy["longitude"],
-                        "current_display": current["longitude"],
-                        "expected": expected,
-                        "legacy": {k: legacy[k] for k in LEVELS},
-                        "current": {k: current[k] for k in LEVELS},
-                    }
             checked += 1
     return {
         "method_id": "human_design_exact_opposition_arithmetic_v1",
@@ -93,9 +76,6 @@ def check_opposition_arithmetic() -> dict[str, Any]:
         "probes_checked": checked,
         "current_wrong_probes": current_wrong,
         "current_wrong_by_level": current_counts,
-        "legacy_wrong_probes": legacy_wrong,
-        "legacy_wrong_by_level": legacy_counts,
-        "representative_legacy_failures": examples,
         "primary_gate_reference_sha256": hashlib.sha256(source_bytes).hexdigest(),
         "sampling_plan": "Both immediate binary-float neighbors of each uniform rational Base boundary, restricted to 0 <= source < 360; declared count 138239. No epsilon or tolerance shifts a sector.",
         "scope": "Synthetic arithmetic probes conditional on supplied binary floats and the declared uniform divisions. Does not measure real-birth error frequency, certify source ephemeris precision, resolve printed 29.1/29.2, or accept a complete original text.",

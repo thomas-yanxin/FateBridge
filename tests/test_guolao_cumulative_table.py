@@ -51,7 +51,6 @@ def test_complete_original_images_transcription_and_reading_corrections_are_pinn
     )
     assert len(journal["corrections"]) == 13
     assert journal["genuine_source_increment_conflicts_retained"] == [12, 155, 163]
-    assert len(json.loads((FIXTURE / "before-114-cli-stdout.json").read_text())) == 114
 
 
 def test_separately_printed_columns_keep_three_real_inconsistencies():

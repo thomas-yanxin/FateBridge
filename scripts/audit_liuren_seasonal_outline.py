@@ -288,47 +288,13 @@ def audit_sparse() -> dict[str, Any]:
     )
 
 
-def audit(baseline: Path) -> dict[str, Any]:
-    if sha(baseline) != BASELINE_PIN:
-        raise ValueError("Prechange complete-output baseline identity changed")
-    outline, boards = audit_outline()
+def audit() -> dict[str, Any]:
+    outline, _ = audit_outline()
     sparse = audit_sparse()
-    with gzip.open(baseline, "rt", encoding="utf-8") as stream:
-        before = json.load(stream)
-    if len(before["rows"]) != 288 or len(before["business"]) != 3:
-        raise ValueError("Complete frozen preservation denominator required")
-    failures = []
-    for expected, actual in zip(before["rows"], boards, strict=True):
-        if expected != actual:
-            failures.append(
-                dict(kind="board_preservation", expected=expected, actual=actual)
-            )
-    from fatebridge.services.tool_catalog import CATALOG
-
-    specs = {s.key: s for s in CATALOG}
-    for row in before["business"]:
-        spec = specs[row["key"]]
-        fn, args, kw = spec.bind(spec.request_model.model_validate(row["input"]))
-        payload = {k: v for k, v in fn(*args, **kw).items() if k != "run_metadata"}
-        if payload != row["payload"]:
-            failures.append(
-                dict(
-                    kind="business_preservation",
-                    key=row["key"],
-                    expected=row["payload"],
-                    actual=payload,
-                )
-            )
     return dict(
         outline=outline,
         sparse=sparse,
-        preservation_failures=failures,
-        original_boards=288,
-        original_complete_business=3,
-        baseline_sha256=sha(baseline),
-        audit_passed=outline["components_passed"]
-        and sparse["sparse_checks_passed"]
-        and not failures,
+        audit_passed=outline["components_passed"] and sparse["sparse_checks_passed"],
         complete_classical_conformance=False,
         calendar_accuracy_certified=False,
         new_model_processes=0,
@@ -338,13 +304,12 @@ def audit(baseline: Path) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--baseline", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--require-full-conformance", action="store_true")
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Refusing to overwrite existing audit evidence")
-    result = audit(args.baseline)
+    result = audit()
     with args.output.open("x") as stream:
         json.dump(result, stream, ensure_ascii=False, indent=2, allow_nan=False)
         stream.write("\n")

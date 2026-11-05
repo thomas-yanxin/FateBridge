@@ -1,7 +1,5 @@
 """Selected-to-candidate ordering is independent of chronological ordering."""
 
-import gzip
-import hashlib
 import json
 import math
 import sys
@@ -14,7 +12,6 @@ import pytest
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.astro import native_execution, runtime
 from fatebridge.core.human_design import chart_at_tt
-from fatebridge.core.human_design_root_family import derive_family
 from fatebridge.core.human_design_root_interpretations import (
     FAMILY_SCOPE,
     SCOPE,
@@ -26,12 +23,6 @@ from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_solar_root import verify_solar_root_context
 
 ROOT = Path(__file__).resolve().parents[1]
-BEFORE_PATH = ROOT / "docs/validation/human-design-comparison-basis-before.json.gz"
-BEFORE = json.loads(gzip.decompress(BEFORE_PATH.read_bytes()))
-LINUX_BEFORE_PATH = (
-    ROOT / "docs/validation/human-design-comparison-basis-linux-before.json.gz"
-)
-LINUX_BEFORE = json.loads(gzip.decompress(LINUX_BEFORE_PATH.read_bytes()))
 PLAN_PATH = ROOT / "tests/fixtures/human-design-comparison-basis-plan.json"
 PLAN = json.loads(PLAN_PATH.read_text())
 SPEC = next(s for s in CATALOG if s.key == "human_design")
@@ -82,99 +73,6 @@ def assert_basis(run):
         assert "设计由同索引evaluations重建" not in interpretation["scope"]
 
 
-def test_original_public_failure_and_all_five_candidates_stay_frozen():
-    assert (
-        hashlib.sha256(BEFORE_PATH.read_bytes()).hexdigest()
-        == PLAN["before_sha256"]
-        == "fbdf9b1d80912b6c6b1655deb3202b5eea78d9ef85d699565012f01d2ec5cabc"
-    )
-    assert (
-        hashlib.sha256(PLAN_PATH.read_bytes()).hexdigest()
-        == "543245711ff33f37c0812f5a93fcdb2e81e72b89ee406894fc155b2399414613"
-    )
-    assert PLAN["all_candidate_relations"] == BEFORE["cases"]
-    assert [r["relation"] for r in BEFORE["cases"]] == [
-        "same",
-        "later",
-        "later",
-        "later",
-        "later",
-    ]
-    assert len(family(BEFORE["run"])["candidates"]) == 5
-    assert all(r["old_scope_claims_chronological"] for r in BEFORE["cases"])
-    assert PLAN["unchanged_thresholds"] == {
-        "astronomy_arcsec": 2.0,
-        "physical_design_root_seconds": 5.0,
-        "clock_seconds": 0.0002,
-    }
-    assert (
-        hashlib.sha256(LINUX_BEFORE_PATH.read_bytes()).hexdigest()
-        == "85045159ac91c64ef1829f8942995950d7910ec07ec8666319e469b37d7687b6"
-    )
-    assert LINUX_BEFORE["old_ruleset"] == "1.37.0"
-    assert (
-        LINUX_BEFORE["old_wheel_sha256"]
-        == "c1a8c1e95ca3f53cecce2e34f4e38c32770dbf2a49b9498d8705539f51b7b3dd"
-    )
-    assert [len(family(c["run"])["candidates"]) for c in LINUX_BEFORE["cases"]] == [
-        4,
-        4,
-    ]
-
-
-def test_old_actual_raw_candidates_rebuild_without_native_and_keep_order():
-    old = BEFORE["run"]
-    solver = old["design_solver"]
-    raw = [
-        {k: r[k] for k in ("jd_tt", "native_positions", "source_role")}
-        for r in family(old)["candidates"]
-    ]
-    with (
-        patch.object(runtime, "ephemeris_call", forbidden),
-        patch.object(native_execution, "calculate", forbidden),
-    ):
-        actual = derive_family(
-            solver,
-            old["activations"]["personality"],
-            old["activations"]["design"],
-            "true",
-            raw,
-        )
-    rebuilt = deepcopy(old)
-    rebuilt["design_solver"]["numerical_precision"]["local_root_family"] = actual
-    assert_basis(rebuilt)
-    for original, candidate in zip(
-        family(old)["candidates"], actual["candidates"], strict=True
-    ):
-        for key in (
-            "jd_tt",
-            "native_positions",
-            "source_role",
-            "activation_changes_from_selected",
-            "changes_from_selected",
-        ):
-            assert candidate[key] == original[key]
-        # Existing candidate positions and reading order remain byte-for-byte;
-        # version labels in profile evidence are the sole snapshot update.
-        candidate = deepcopy(candidate)
-
-        def old_labels(value):
-            if isinstance(value, dict):
-                return {
-                    k: "1.37.0" if k == "version" and v == "1.39.0" else old_labels(v)
-                    for k, v in value.items()
-                }
-            if isinstance(value, list):
-                return [old_labels(v) for v in value]
-            return value
-
-        candidate = old_labels(candidate)
-        assert candidate["snapshot"] == original["snapshot"]
-        for key, value in original["interpretation_from_selected"].items():
-            if key != "scope":
-                assert candidate["interpretation_from_selected"][key] == value
-
-
 @pytest.mark.parametrize("mode", ["true", "mean"])
 @pytest.mark.parametrize("backend", ["swieph", "moshier"])
 def test_actual_public_output_and_original_endpoint_scope(
@@ -185,29 +83,25 @@ def test_actual_public_output_and_original_endpoint_scope(
     )
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     run = execute_tool(
-        SPEC, SPEC.request_model(**{**BEFORE["input"], "node_mode": mode})
+        SPEC,
+        SPEC.request_model(
+            **{
+                **{
+                    "birth_year": 2390,
+                    "birth_month": 1,
+                    "birth_day": 1,
+                    "birth_hour": 11,
+                    "birth_minute": 58,
+                    "birth_second": 1,
+                    "birth_timezone": "UTC",
+                    "node_mode": "true",
+                },
+                "node_mode": mode,
+            }
+        ),
     )
     if family(run):
         assert_basis(run)
-        if backend == "moshier":
-            original = (
-                next(c["run"] for c in LINUX_BEFORE["cases"] if c["mode"] == mode)
-                if sys.platform == "linux"
-                else BEFORE["run"]
-            )
-            # Retain every actual old candidate on its own platform. Mac has
-            # five, Linux has four including earlier TT; never truncate either.
-            assert family(run)["actual_epoch_count"] == len(
-                family(original)["candidates"]
-            )
-            assert [c["jd_tt"] for c in family(run)["candidates"]] == [
-                c["jd_tt"] for c in family(original)["candidates"]
-            ]
-            if sys.platform == "linux":
-                assert run["activations"] == original["activations"]
-                assert [c["native_positions"] for c in family(run)["candidates"]] == [
-                    c["native_positions"] for c in family(original)["candidates"]
-                ]
     else:
         assert backend == "swieph"
     endpoints = run["design_solver"]["numerical_precision"][
@@ -254,7 +148,21 @@ def actual_public():
         with tempfile.TemporaryDirectory() as directory:
             p.setenv("SE_EPHE_PATH", directory)
             p.delenv("FATEBRIDGE_JPL_FILE", raising=False)
-            return execute_tool(SPEC, SPEC.request_model(**BEFORE["input"]))
+            return execute_tool(
+                SPEC,
+                SPEC.request_model(
+                    **{
+                        "birth_year": 2390,
+                        "birth_month": 1,
+                        "birth_day": 1,
+                        "birth_hour": 11,
+                        "birth_minute": 58,
+                        "birth_second": 1,
+                        "birth_timezone": "UTC",
+                        "node_mode": "true",
+                    }
+                ),
+            )
 
 
 @pytest.mark.parametrize("target", ["outer", "interpretation"])

@@ -4,7 +4,7 @@ from copy import deepcopy
 from typing import Any, Mapping, Sequence, Tuple
 
 ORDER = ("year", "month", "day", "hour")
-SCOPE = "本表复用同次六冲决策。普通六冲仅比较两五行的初始藏干预算总量，包含月支预算倍数；未将季相、透干盖头、间接生扶、距离权重或寒暖纳入输赢。保留系数为工程政策，不等于原典有效根力、拔根、发福或吉凶。"
+SCOPE = "本表复用同次六冲决策。普通六冲仅比较两五行的初始藏干预算总量，包含月支预算倍数；未将季相、透干盖头、任意间接生扶、距离权重或寒暖纳入输赢。具名完整四支通关另列来源分支，不作预算输赢比较；不是见印即免冲。保留系数为工程政策，不等于原典完整有效根力、拔根、发福或吉凶。"
 
 
 def build_clash_comparison(
@@ -30,16 +30,15 @@ def build_clash_comparison(
         }
         if event["status"] == "resolved_by_combination":
             row["calculation_branch"] = "combination_resolution"
+        elif event["status"] == "resolved_by_ordered_generation_path":
+            row["calculation_branch"] = "ordered_generation_path_resolution"
+            row["intermediary_positions"] = list(event["intermediary_positions"])
         elif "storage_effect" in event:
             row["calculation_branch"] = "storage_movement"
         else:
-            comparison = event.get("power_comparison")
-            row["calculation_branch"] = (
-                "initial_hidden_budget" if comparison else "legacy_power_unavailable"
-            )
-            if comparison:
-                row["powers"] = deepcopy(comparison["powers"])
-            row["applied_root_retention"] = deepcopy(event.get("root_multipliers"))
+            row["calculation_branch"] = "initial_hidden_budget"
+            row["powers"] = deepcopy(event["power_comparison"]["powers"])
+            row["applied_root_retention"] = deepcopy(event["root_multipliers"])
         rows.append(row)
         source_ids.add(event["source_id"])
     return {
@@ -74,9 +73,14 @@ def clash_comparison_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
         )
         if row["calculation_branch"] == "combination_resolution":
             lines.append(f"六冲工程依据：{seats}本次按合解冲分支处理，未比较冲力。")
+        elif row["calculation_branch"] == "ordered_generation_path_resolution":
+            middle = "、".join(labels[p] for p in row["intermediary_positions"])
+            lines.append(
+                f"六冲来源依据：{seats}经{middle}进入完整有序杀印身通关分支，未扣根或比较预算输赢。"
+            )
         elif row["calculation_branch"] == "storage_movement":
             lines.append(f"六冲工程依据：{seats}本次按四墓土冲动分支处理，未比较冲力。")
-        elif row["powers"]:
+        else:
             powers = "、".join(
                 f"{p['element']}初始藏干预算{p['raw_budget']:.6f}"
                 for p in row["powers"]
@@ -86,8 +90,6 @@ def clash_comparison_snapshot_lines(assessment: Mapping[str, Any]) -> list[str]:
                 for p, m in (row["applied_root_retention"] or {}).items()
             )
             lines.append(f"六冲工程依据：{seats}，{powers}；本次保留系数{factors}。")
-        else:
-            lines.append(f"六冲工程依据：{seats}旧回执未保留冲力输入，不补算。")
     lines.append(
         "初始预算比较未含盖头、间接生扶、距离权重或寒暖；工程保留不等于原典有效根力与拔根裁定。"
     )

@@ -7,6 +7,7 @@ from fatebridge.core import almanac
 from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_SOLAR_MODEL
 from fatebridge.core.analytic_solar import MODEL_ID as ANALYTIC_SOLAR_MODEL
 from fatebridge.core.de440_solar import MODEL_ID as DE440_SOLAR_MODEL
+from fatebridge.core.moshier_solar import MODEL_ID as COMPLETE_MOSHIER_SOLAR_MODEL
 from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
 from fatebridge.utils.timezones import parse_timezone_name
 
@@ -16,6 +17,7 @@ from .historical_solar import historical_solar_resolution
 MOSHIER_BOUNDARY_GUARD_SECONDS = 5.0
 _MODEL_GUARD_REASONS = {
     "moshier": "moshier_numeric_model_guard_not_accuracy_certification",
+    COMPLETE_MOSHIER_SOLAR_MODEL: "complete_moshier_solar_model_guard_not_accuracy_certification",
     AA1996_SOLAR_MODEL: "aa1996_solar_model_guard_not_accuracy_certification",
     VSOP2013_SOLAR_MODEL: "vsop2013_solar_model_guard_not_accuracy_certification",
     ANALYTIC_SOLAR_MODEL: "analytic_solar_model_guard_not_accuracy_certification",
@@ -27,7 +29,6 @@ _MODEL_GUARD_REASONS = {
 def boundary_model_policy(resolution: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Identify a named numerical guard without turning it into an error bound.
 
-    A linear fallback takes precedence even if stale model metadata remains.
     Keep the established five-second operational policy and one-second numeric
     acceptance gate separate. Neither is a claim about real-world prediction.
     """
@@ -52,8 +53,6 @@ def boundary_uncertainty_reason(
     guard, not an asserted error bound or a new accuracy acceptance threshold.
     """
     boundary = datetime.fromisoformat(resolution["moment"])
-    if resolution["approximate"] and abs((local.date() - boundary.date()).days) <= 1:
-        return "linear_fallback_adjacent_civil_dates"
     policy = boundary_model_policy(resolution)
     if (
         policy is not None
@@ -73,8 +72,6 @@ def boundary_candidate_dates(
 ) -> set[date]:
     """Include dates crossed by the model guard without inventing birth hours."""
     moment = datetime.fromisoformat(resolution["moment"])
-    if resolution["approximate"]:
-        return {moment.date() + timedelta(days=n) for n in (-1, 0, 1)}
     policy = boundary_model_policy(resolution)
     if policy is not None:
         tz = parse_timezone_name(timezone_name)
@@ -121,47 +118,41 @@ def solar_term_resolution(
     result: Dict[str, Any] = {
         "moment": term.moment.isoformat(),
         "provider": term.resolution_provider,
-        "approximate": not almanac.is_calculated_solar_term(term),
+        "approximate": False,
         "precision_scope": "engine_computed_not_independently_certified_to_seconds",
     }
-    if almanac.is_calculated_solar_term(term):
-        from fatebridge.core.astro.time_scales import ephemeris_time
-        from fatebridge.core.astro.utc_policy import leap_table
-        from fatebridge.core.ephemeris_runtime import (
-            ephemeris_call,
-            ephemeris_model_from_retflag,
-        )
+    from fatebridge.core.astro.time_scales import ephemeris_time
+    from fatebridge.core.astro.utc_policy import leap_table
+    from fatebridge.core.ephemeris_runtime import (
+        ephemeris_call,
+        ephemeris_model_from_retflag,
+    )
 
-        clock = ephemeris_time(term.moment)
-        # The API name does not prove .se1 files were used. Inspect the actual
-        # return flag at this reported TT, rather than installed-file presence.
-        if term.resolution_provider == "swisseph":
-            _, returned = ephemeris_call(
-                "calc", clock.jd_tt, almanac.swe.SUN, almanac.swe.FLG_SWIEPH
-            )
-            result["ephemeris_model"] = ephemeris_model_from_retflag(returned)
-            result["ephemeris_model_scope"] = "sun_position_at_reported_TT"
-        else:
-            # A native probe here would describe a different Sun model.
-            result["ephemeris_model"] = term.ephemeris_model
-            result["ephemeris_model_scope"] = (
-                "named_analytic_solar_crossing"
-                if term.resolution_provider == "fatebridge_analytic"
-                else "named_ephemeris_solar_crossing"
-            )
-            result["solar_model_details"] = term.as_dict()["solar_model_details"]
-        result["time_basis"] = {
-            "root_time_scale": "TT",
-            "civil_policy": clock.method,
-            "historical_ut1_convention": clock.method == "pre_1972_swiss_UT1_delta_t",
-            "future_leap_seconds_assumed_unchanged": clock.future_leap_seconds_assumed_unchanged,
-            "leap_table_expires_at": leap_table()["expires_at"],
-        }
+    clock = ephemeris_time(term.moment)
+    # The API name does not prove .se1 files were used. Inspect the actual
+    # return flag at this reported TT, rather than installed-file presence.
+    if term.resolution_provider == "swisseph":
+        _, returned = ephemeris_call(
+            "calc", clock.jd_tt, almanac.swe.SUN, almanac.swe.FLG_SWIEPH
+        )
+        result["ephemeris_model"] = ephemeris_model_from_retflag(returned)
+        result["ephemeris_model_scope"] = "sun_position_at_reported_TT"
     else:
-        result["time_basis"] = {
-            "root_time_scale": None,
-            "civil_policy": "linear_1900_UTC_anchor_no_astronomical_TT_root",
-        }
+        # A native probe here would describe a different Sun model.
+        result["ephemeris_model"] = term.ephemeris_model
+        result["ephemeris_model_scope"] = (
+            "named_analytic_solar_crossing"
+            if term.resolution_provider == "fatebridge_analytic"
+            else "named_ephemeris_solar_crossing"
+        )
+        result["solar_model_details"] = term.as_dict()["solar_model_details"]
+    result["time_basis"] = {
+        "root_time_scale": "TT",
+        "civil_policy": clock.method,
+        "historical_ut1_convention": clock.method == "pre_1972_swiss_UT1_delta_t",
+        "future_leap_seconds_assumed_unchanged": clock.future_leap_seconds_assumed_unchanged,
+        "leap_table_expires_at": leap_table()["expires_at"],
+    }
     return result
 
 
@@ -247,9 +238,6 @@ def year_context(
         timing = {
             "provider": "fatebridge.core.almanac.get_solar_terms_for_year",
             "runtime_swiss_available": almanac.swe is not None,
-            "possible_linear_fallback": (
-                start_resolution["approximate"] or end_resolution["approximate"]
-            ),
             "start_resolution": start_resolution,
             "end_resolution": end_resolution,
             "independent_precision_verification": "no_arbitrary_year_second_certification",

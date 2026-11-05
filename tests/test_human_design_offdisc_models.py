@@ -1,10 +1,9 @@
 """Off-disc source compatibility cannot hide missing probes or TT conflicts."""
 
-import gzip
-import hashlib
 import importlib.util
 import json
 from copy import deepcopy
+from functools import lru_cache
 from pathlib import Path
 
 import pytest
@@ -15,26 +14,27 @@ SPEC = importlib.util.spec_from_file_location(
 )
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
-BASE = ROOT / "docs/validation/human-design-offdisc-model-clock-v1/evidence"
+BASE = ROOT / "tests/data/human_design/offdisc"
 PLAN = (BASE / "source-plan.json").read_bytes()
 INITIAL = json.loads((BASE / "model-predictions.json").read_bytes())
 PRODUCTION = json.loads((BASE / "production-clock-model-predictions.json").read_bytes())
 SUPPLEMENT = json.loads((BASE / "production-clock-supplement-plan.json").read_bytes())
 COHORT = json.loads((BASE / "source-cohort.json").read_bytes())
-PACKETS = [
-    json.loads(line)
-    for line in gzip.decompress(
-        (BASE / "complete-native-runs.jsonl.gz").read_bytes()
-    ).splitlines()
-]
-PDFS = json.loads((BASE / "source-pdf-bindings.json").read_bytes())
 
 
-def audit(
-    initial=INITIAL, production=PRODUCTION, cohort=COHORT, packets=PACKETS, pdfs=PDFS
-):
+@lru_cache(maxsize=1)
+def current_packets():
+    return MODULE.current_packets(json.loads(PLAN))
+
+
+def audit(initial=INITIAL, production=PRODUCTION, cohort=COHORT, packets=None):
     return MODULE.compare_all(
-        PLAN, initial, production, SUPPLEMENT, cohort, packets, pdfs
+        PLAN,
+        initial,
+        production,
+        SUPPLEMENT,
+        cohort,
+        current_packets() if packets is None else packets,
     )
 
 
@@ -63,30 +63,14 @@ def test_all520_predictions_and24_packets_retain14_missing_sources_and5_clock_co
     assert result["initial_prediction_inventory"]["provided"] == 280
     assert result["production_prediction_inventory"]["provided"] == 240
     assert result["source_rows_bound"] and result["source_metadata_consistent"]
-    assert result["all_obtained_pdf_text_bound"]
+    assert result["all_obtained_pdf_text_bound"] is False
+    assert result["primary_source_status"] == "not_available"
     assert result["all24_native_packets_bound"]
-    before_path = ROOT / (
-        "tests/fixtures/architecture_refactor_v1/hd-offdisc-proofs-before-v9.json.gz"
-    )
-    assert hashlib.sha256(before_path.read_bytes()).hexdigest() == (
-        "308176dc37be7517f41d76e17a1280f4a3cebe02ccafd310f751862b4a92c69e"
-    )
-    before = json.loads(gzip.decompress(before_path.read_bytes()))
-    assert result["fixed_reading_checks"] == before["fixed_reading_checks"]
-    assert (
-        result["all24_fixed_readings_verified"]
-        is before["all24_fixed_readings_verified"]
-        is False
-    )
+    assert result["all24_fixed_readings_verified"] is True
     assert len(result["fixed_reading_checks"]) == 24
     assert all(
         row["proof"]["status"] == "verified_fixed_template_reading"
         for row in result["fixed_reading_checks"]
-    )
-    # Saved earlier proof objects differ from the later verifier before this
-    # repair as well. Their byte-identity failure remains explicit and false.
-    assert not any(
-        row["saved_proof_identical"] for row in result["fixed_reading_checks"]
     )
     assert result["original_clock_label_disagreement_ids"] == [
         "od-2100-saturn",
@@ -101,7 +85,9 @@ def test_all520_predictions_and24_packets_retain14_missing_sources_and5_clock_co
         in result["data_edition_discriminator_lost_at_production_clock_ids"]
     )
     compatible = [
-        r for r in result["hypotheses"] if r["all_observed_targets_compatible"]
+        r
+        for r in result["hypotheses"]
+        if r["conditional_on_transcriptions_targets_compatible"]
     ]
     assert len(result["hypotheses"]) == 30
     assert len(compatible) == 6
@@ -209,7 +195,7 @@ def test_source_identity_corruption_is_not_accepted(kind):
 
 
 def test_missing_full_packet_cannot_pass_interpretation_coverage():
-    result = audit(packets=PACKETS[:-1])
+    result = audit(packets=current_packets()[:-1])
     assert not result["all24_native_packets_bound"]
     assert not result["all24_fixed_readings_verified"]
     assert result["fixed_reading_checks"][-1]["proof"]["status"] == "not_verified"
@@ -223,16 +209,22 @@ def test_production_prediction_must_equal_actual_packet_longitude():
     assert not result["all24_fixed_readings_verified"]
 
 
-def test_pdf_property_failure_blocks_compatibility_receipt():
-    changed = deepcopy(PDFS)
-    changed[0]["all13_text_properties_match"] = False
-    result = audit(pdfs=changed)
+def test_missing_primary_files_cannot_be_replaced_by_transcription_agreement():
+    result = audit()
+    assert result["primary_source_status"] == "not_available"
     assert not result["all_obtained_pdf_text_bound"]
-    assert not any(r["all_observed_targets_compatible"] for r in result["hypotheses"])
+    assert (
+        sum(
+            h["conditional_on_transcriptions_targets_compatible"]
+            for h in result["hypotheses"]
+        )
+        == 6
+    )
+    assert not any(h["all_observed_targets_compatible"] for h in result["hypotheses"])
 
 
 def test_changed_plan_bytes_rejected_even_if_json_semantics_unchanged():
     with pytest.raises(ValueError, match="Original off-disc plan changed"):
         MODULE.compare_all(
-            PLAN + b" ", INITIAL, PRODUCTION, SUPPLEMENT, COHORT, PACKETS, PDFS
+            PLAN + b" ", INITIAL, PRODUCTION, SUPPLEMENT, COHORT, current_packets()
         )

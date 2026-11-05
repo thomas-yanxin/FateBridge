@@ -29,7 +29,7 @@ from fatebridge.validation.fengshui import audit_bazhai_depth
 from tests.fixtures.fengshui import payload
 from tests.test_fengshui_surfaces import mcp_call, rest_client, without_transport
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_classical_v2"
+FOLDER = Path(__file__).parent / "data/fengshui_classical_v2"
 CHANGES = json.loads((FOLDER / "you-nian-origin.json").read_text())
 ELEMENTS = json.loads((FOLDER / "elements.json").read_text())
 TRIGRAM_DIRECTIONS = dict(zip("乾坎艮震巽离坤兑", "NW N NE E SE S SW W".split()))

@@ -12,7 +12,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/liuren_day_placements_v1"
-PIN = "c68b3cb890546d1462cfeb82edce75f4e9da8c7902ffc60ae6fa187286465903"
+PIN = "7d28a07e226ba07877428cc7e1574fae3f1a128268087142614f5617d942694d"
 SOURCE_SHA = "e8e6e0d5ce10c5d5d68282e5fd38a0b0317a8863c381e341b4a926575e86a59d"
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 STEMS = "甲乙丙丁戊己庚辛壬癸"
@@ -35,17 +35,10 @@ def reference(folder: Path = CORPUS) -> dict[str, Any]:
         != SOURCE_SHA
     ):
         raise ValueError("Original primary book changed")
-    with tempfile.TemporaryDirectory(prefix="ren-placement-reference-") as name:
-        temp = Path(name)
-        for source in ("readings.json", "generate_reference.py.txt"):
-            (temp / source).write_bytes((folder / source).read_bytes())
-        # Only this task's pinned, stdlib-only reference generator is executed.
-        # Its output is written in a temporary directory, never over the source.
-        runpy.run_path(str(temp / "generate_reference.py.txt"))
-        if (temp / "reference.json").read_bytes() != (
-            folder / "reference.json"
-        ).read_bytes():
-            raise ValueError("Independent arithmetic reconstruction differs")
+    from tests.ren_source_arithmetic import day_placements
+
+    if day_placements(folder) != json.loads((folder / "reference.json").read_text()):
+        raise ValueError("Independent source arithmetic differs")
     data: dict[str, Any] = json.loads((folder / "reference.json").read_text())
     data["reading"] = json.loads((folder / "readings.json").read_text())
     return data

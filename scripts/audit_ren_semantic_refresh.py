@@ -13,7 +13,6 @@ ROOT = Path(__file__).resolve().parents[1]
 DATASET = ROOT / "tests/fixtures/agent_behavior/ren_semantic_refresh_cases_v1.json"
 PIN = "69a57a9fe00e0014426eb443b1dbeebc23e847ececaa297e579ffd21de72ac2c"
 OLD_PIN = "c3a32dd38776d57763a1f12ecb71f0de0feb2487c46a749ec2e90801f87f592b"
-OLD_REPORT_PIN = "38d655e038a8f1a7ef14f4d901ee55abccc8efda396c841f1a27e661c97482ae"
 
 
 def sha(path: Path) -> str:
@@ -28,9 +27,8 @@ def dataset(path: Path = DATASET) -> dict[str, Any]:
     if sha(path) != PIN:
         raise ValueError("Frozen Ren replay dataset identity changed")
     old = ROOT / "tests/fixtures/agent_behavior/ren_semantic_cases.json"
-    report = ROOT / "tests/fixtures/ren_semantic_run_v1/report.json"
-    if sha(old) != OLD_PIN or sha(report) != OLD_REPORT_PIN:
-        raise ValueError("Original six-case inputs or first report identity changed")
+    if sha(old) != OLD_PIN:
+        raise ValueError("Original six-case research inputs changed")
     value: dict[str, Any] = json.loads(path.read_text())
     original = json.loads(old.read_text())
     cases = value["cases"]
@@ -198,7 +196,6 @@ def audit(preparation: Path) -> dict[str, Any]:
     return dict(
         dataset_sha256=PIN,
         old_dataset_sha256=OLD_PIN,
-        old_first_report_sha256=OLD_REPORT_PIN,
         original_six_objects_and_21_criteria_unchanged=True,
         selected_cases=9,
         supplemental_cases=3,

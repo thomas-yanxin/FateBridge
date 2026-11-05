@@ -20,7 +20,7 @@ from scripts.audit_astrodice_horizons_wide_reference import (
 from scripts.audit_astrodice_v6_wide import frame_rotation, rotate
 from scripts.gen_astrodice_horizons_wide import calendar_label, julian_day
 
-FIXTURE = Path(__file__).parent / "fixtures/astrodice-v6-wide-tt-v1"
+FIXTURE = Path(__file__).parent / "data/astrodice/reference_sets/fixture-v6-wide-tt-v1"
 
 
 def test_frozen_reference_preserves_both_unresolved_cases_without_platform_trig(

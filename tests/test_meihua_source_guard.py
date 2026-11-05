@@ -1,4 +1,4 @@
-"""A long calendar audit must reject changes outside its old13-file list."""
+"""A long calendar audit must reject changes in every maintained package source."""
 
 import os
 from pathlib import Path
@@ -10,7 +10,7 @@ from fatebridge.validation.meihua_source_guard import (
     verify_package_sources,
 )
 
-PREVIOUSLY_UNTRACKED = [
+SOURCE_FILES = [
     "core/calendar.py",
     "core/requests/meihua.py",
     "core/meihua_stage_emphasis.py",
@@ -21,17 +21,15 @@ PREVIOUSLY_UNTRACKED = [
 
 @pytest.fixture
 def package(tmp_path):
-    for name in ["__init__.py", "services/divination.py", *PREVIOUSLY_UNTRACKED]:
+    for name in ["__init__.py", "services/divination.py", *SOURCE_FILES]:
         p = tmp_path / name
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text('{"value":1}\n' if p.suffix == ".json" else "VALUE = 1\n")
     return tmp_path
 
 
-@pytest.mark.parametrize("name", PREVIOUSLY_UNTRACKED)
-def test_previously_untracked_change_is_detected_despite_same_size_and_time(
-    package, name
-):
+@pytest.mark.parametrize("name", SOURCE_FILES)
+def test_tracked_source_change_is_detected_despite_same_size_and_time(package, name):
     receipt = capture_package_sources(package)
     path = package / name
     stamp = path.stat()
@@ -100,5 +98,5 @@ def test_real_package_receipt_covers_indirect_calendar_and_current_rules():
     import fatebridge
 
     receipt = capture_package_sources(Path(fatebridge.__file__).parent)
-    assert all(name in receipt for name in PREVIOUSLY_UNTRACKED)
+    assert all(name in receipt for name in SOURCE_FILES)
     assert "validation/meihua_source_guard.py" in receipt

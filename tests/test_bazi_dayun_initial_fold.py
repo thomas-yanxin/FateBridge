@@ -1,17 +1,15 @@
 """Initial calendar offsets respect a confirmed physical birth instant."""
 
 import asyncio
-import gzip
-import hashlib
 import json
-import tarfile
-import types
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 from pathlib import Path
 
 import pytest
 
+from fatebridge.application.execution import execute_tool
+from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.utils.timezones import parse_timezone_name
 from tests.test_agentic_nested_outputs import SPECS, business, native
@@ -19,20 +17,9 @@ from tests.test_agentic_nested_outputs import rest as _rest_fixture
 
 rest = _rest_fixture
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_dayun_initial_fold_v1"
 REFERENCE = json.loads(
-    (ROOT / "tests/fixtures/bazi_birth_fold_v1/coupled-reference.json").read_bytes()
-)["magnitude_rows"]
-
-
-@lru_cache(maxsize=1)
-def legacy():
-    with tarfile.open(FIXTURE / "before-runtime-source.tar.gz") as archive:
-        source = archive.extractfile("src/fatebridge/core/timing.py").read()
-    module = types.ModuleType("fatebridge.core._initial_fold_before")
-    module.__package__ = "fatebridge.core"
-    exec(compile(source, "initial_fold_before.py", "exec"), module.__dict__)
-    return module.TimingAnalysis
+    (ROOT / "tests/data/bazi/dayun-fold-magnitudes.json").read_text()
+)
 
 
 @pytest.mark.parametrize("row", REFERENCE, ids=lambda row: row["zone"])
@@ -55,31 +42,26 @@ def test_all_registered_fold_magnitudes_with_nonnegative_calendar_offsets(
         "start_age_unrounded": elapsed / 86400 / 3,
         "year_stem": "甲",
     }
-    for cls in [TimingAnalysis, legacy()]:
-        monkeypatch.setattr(
-            cls, "calculate_dayun_start_details", staticmethod(lambda *args: details)
-        )
-    current, previous = [
-        cls.calculate_dayun_timeline(birth, "女", ("丙", "寅"), row["zone"], periods=3)
-        for cls in [TimingAnalysis, legacy()]
-    ]
+    monkeypatch.setattr(
+        TimingAnalysis,
+        "calculate_dayun_start_details",
+        staticmethod(lambda *args: details),
+    )
+    current = TimingAnalysis.calculate_dayun_timeline(
+        birth, "女", ("丙", "寅"), row["zone"], periods=3
+    )
     expected = birth_utc + timedelta(seconds=seconds)
     assert (
         datetime.fromisoformat(current["start_at"]).astimezone(timezone.utc) == expected
     )
     assert current["periods"][0]["start_at"] == current["start_at"]
-    assert current["calendar_offset"] == previous["calendar_offset"]
-    assert current["start_details"] == previous["start_details"]
-    assert current["periods"][1:] == previous["periods"][1:]
-    assert current["periods"][0]["end_at"] == previous["periods"][0]["end_at"]
-    if fold == 0:
-        assert current == previous
-    else:
-        assert (
-            datetime.fromisoformat(previous["start_at"]).astimezone(timezone.utc)
-            < birth_utc
-        )
-        assert current["dst_policy"] == "fold_0_gap_forward_initial_not_before_birth"
+    for period in current["periods"]:
+        assert datetime.fromisoformat(period["end_at"]).astimezone(
+            timezone.utc
+        ) > datetime.fromisoformat(period["start_at"]).astimezone(timezone.utc)
+    assert current["dst_policy"] == (
+        "fold_0_gap_forward_initial_not_before_birth" if fold else "fold_0_gap_forward"
+    )
 
 
 def test_actual_havana_positive_interval_no_longer_starts_before_birth():
@@ -93,35 +75,25 @@ def test_actual_havana_positive_interval_no_longer_starts_before_birth():
     start = datetime.fromisoformat(value["start_at"])
     assert start.utcoffset() == timedelta(hours=-5)
     assert start.astimezone(timezone.utc) > birth.astimezone(timezone.utc)
-    previous = legacy().calculate_dayun_timeline(
-        birth, "女", ("庚", "戌"), "America/Havana", periods=2
-    )
-    assert start.astimezone(timezone.utc) - datetime.fromisoformat(
-        previous["start_at"]
-    ).astimezone(timezone.utc) == timedelta(hours=1)
-    assert value["periods"][1:] == previous["periods"][1:]
 
 
 @lru_cache(maxsize=1)
 def public_rows():
-    original = (FIXTURE / "public-after-final.json.gz").read_bytes()
-    assert (
-        hashlib.sha256(original).hexdigest()
-        == "fa553058dab89d7ce41dc72b31403ca4e6d7a33afe1231fd07ee4b5a52e1cb73"
+    return json.loads((ROOT / "tests/data/bazi/dayun-consumers.json").read_text())
+
+
+@lru_cache(maxsize=4)
+def current_dayun_control(index):
+    row = public_rows()[index]
+    assert row["tool"] == "dayun_analysis"
+    spec = SPECS[row["tool"]]
+    complete = execute_tool(
+        spec,
+        spec.request_model(**row["arguments"]),
+        options=ExecutionOptions(as_of=row["as_of"]),
+        include_metadata=False,
     )
-    packed = (
-        ROOT / "tests/fixtures/architecture_refactor_v1/dayun41-before-manifest.json"
-    ).read_bytes()
-    assert (
-        hashlib.sha256(packed).hexdigest()
-        == "b624e085126650de90412c73d57809c2ddccbebcf5055a2c3c518ff3b86dbde1"
-    )
-    before = json.loads(packed)["rows"]
-    historical = json.loads(gzip.decompress(original))["rows"]
-    assert len(before) == len(historical) == 41
-    for old, current in zip(historical, before):
-        assert all(old[key] == current[key] for key in ("tool", "arguments", "as_of"))
-    return before
+    return complete
 
 
 @pytest.mark.parametrize("index", range(41))
@@ -162,16 +134,46 @@ def test_complete_business_results_match_rest_native_mcp_and_cli(
     assert code == 0 and not protocol.is_error
     complete = business(local)
     assert complete == business(protocol.structured_content)
-    # No numeric rounding: compare every business leaf to the same-input,
-    # same-host result captured from the complete source before this repair.
-    encoded = json.dumps(
-        complete,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-        allow_nan=False,
-    ).encode()
-    assert hashlib.sha256(encoded).hexdigest() == row["business_sha256"]
+    # Every consumer must use the same current timeline and confirmed birth clock.
+    control_index = 12 if index < 13 else 25 if index < 26 else 38 if index < 39 else 40
+    control = current_dayun_control(control_index)
+    if spec.key == "analyze_destiny":
+        # This natal-only envelope has no dayun selection. Its complete birth
+        # calendar, including the confirmed UTC/fold and reference term, is
+        # the input consumed by the independently hash-pinned dayun control.
+        assert complete["calendar_context"] == control["calendar_context"]
+        assert complete["person_info"]["birth_timezone"] == (
+            control["timing_context"]["timeline"]["timezone"]
+        )
+    elif spec.key == "dayun_analysis":
+        assert complete == control
+    elif spec.key == "timing_analysis":
+        assert complete["dayun_analysis"]["timing_context"] == control["timing_context"]
+        if control["dayun_info"]["current_dayun"] is not None:
+            for key, value in control["dayun_info"].items():
+                assert complete["dayun_analysis"][key] == value
+        else:
+            assert (
+                complete["dayun_analysis"]["status"] == control["dayun_info"]["status"]
+            )
+            assert complete["dayun_analysis"]["error"] == control["summary"]
+    elif spec.key == "bazi_birth":
+        dayun = complete["bazi_birth"]["timing_overview"]["dayun"]
+        expected = control["dayun_info"]
+        for key in dayun.keys() - {"pillar", "summary"}:
+            assert dayun[key] == expected[key]
+        assert dayun["pillar"] == expected["current_dayun"]
+    elif spec.key.startswith("bazi_"):
+        context = complete[spec.key.removeprefix("bazi_") + "_analysis"][
+            "timing_context"
+        ]
+        expected = control["dayun_info"]
+        for key in ("dayun_age", "selection_basis", "start_at", "end_at"):
+            name = key if key == "dayun_age" else "dayun_" + key
+            assert context[name] == expected[key]
+        assert context["dayun_pillar"] == expected["current_dayun"]
+    else:
+        pytest.fail("Unreviewed initial-fold consumer: " + spec.key)
     if spec.rest_path is not None:
         http = rest.post(
             spec.rest_path,

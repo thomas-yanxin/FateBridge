@@ -14,7 +14,8 @@ from zoneinfo import ZoneInfo
 
 from fatebridge.core.astro.time_scales import datetime_from_tt, ephemeris_time
 from fatebridge.core.ephemeris_runtime import configure_ephemeris_path
-from fatebridge.core.human_design import GATE_ORDER, chart_at
+from fatebridge.core.human_design import chart_at
+from fatebridge.core.human_design_mechanics import GATE_ORDER
 from fatebridge.core.human_design_time import sun_at_tt
 
 ROOT = Path(__file__).resolve().parents[1]

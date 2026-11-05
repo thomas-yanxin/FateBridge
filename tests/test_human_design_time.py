@@ -8,7 +8,7 @@ from fatebridge.core.astro import runtime
 from fatebridge.core.astro.time_scales import ephemeris_time, tt_from_ut1
 from fatebridge.core.human_design import chart_at, chart_at_tt
 from fatebridge.core.human_design_time import epoch_context_at_tt
-from tests.golden.runner import golden_ephemeris
+from tests.ephemeris_context import moshier_ephemeris
 
 
 @pytest.mark.parametrize("empty_files", [False, True])
@@ -25,7 +25,7 @@ def test_epoch_ut1_is_the_inverse_of_the_declared_forward_policy(year, empty_fil
         assert tt_from_ut1(context["jd_ut1"]) == forward.jd_tt
 
     if empty_files:
-        with golden_ephemeris():
+        with moshier_ephemeris():
             check()
     else:
         check()

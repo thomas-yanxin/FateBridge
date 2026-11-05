@@ -27,7 +27,7 @@ from fatebridge.core.sukuyo_weekday import (
     classical_solar_recalculation,
 )
 
-FIXTURE = ROOT / "tests/fixtures/sukuyo-weekday-recalculation-primary.json"
+FIXTURE = ROOT / "tests/data/sukuyo-weekday-recalculation-primary.json"
 
 
 def verify_recalculation(capture_dir: Path | None = None) -> dict[str, Any]:

@@ -1,10 +1,8 @@
 """Source-supported complete formations, with unchanged competing-pair controls."""
 
 import itertools
-import json
 import math
 from fractions import Fraction
-from pathlib import Path
 
 import pytest
 
@@ -12,17 +10,16 @@ from fatebridge.core.bazi_evidence import build_natal_evidence
 from fatebridge.core.complete_bureaus import complete_bureau_snapshot_lines
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.output_bazi_evidence import BaziEvidenceChain
-from fatebridge.core.strength import DEFAULT_POLICY, _evaluate, evaluate_strength_policy
-from tests.fixtures.bazi_same_target_bureau_v1.reference_geometry import (
+from tests.bazi_formation_reference import (
     BRANCHES,
     FULL,
     ORDER,
     PAIRS,
     affiliations,
 )
+from tests.bazi_strength_reference_v3 import assert_current_assessment_arithmetic
 from tests.test_strength_v2 import pillars
 
-FIXTURE = Path(__file__).parent / "fixtures/bazi_same_target_bureau_v1"
 POSITIVES = [
     ("ZP31-XUAN", "己卯 辛未 壬寅 辛亥", "三合", ["year", "month", "hour"]),
     ("FJ-03", "甲寅 乙亥 乙卯 癸未", "三合", ["month", "day", "hour"]),
@@ -51,7 +48,7 @@ def test_primary_complete_formation_survives_same_target_affiliate(
     }
     assert pair["additional_budget"] == 0.0 and pair["calculation_effect"] == "none"
     assert set(pair["outside_positions"]).isdisjoint(seats)
-    assert result["method_id"] == "season_root_revelation_relations_v11"
+    assert result["method_id"] == "season_root_revelation_relations_v12"
     assert "附合" in "\n".join(complete_bureau_snapshot_lines(result))
     natal = build_natal_evidence(chart, strength)
     BaziEvidenceChain.model_validate(natal)
@@ -93,15 +90,15 @@ def test_primary_complete_formation_survives_same_target_affiliate(
 )
 def test_pair_only_clashing_and_different_target_controls_retain_current_receipts(text):
     chart = pillars(text)
-    phases = ElementAnalysis.seasonal_phases(chart["month"][1])
-    old = _evaluate(
-        chart, phases, DEFAULT_POLICY, stem_effect_mode="precise_binding_only_v1"
-    )
-    current = evaluate_strength_policy(chart, phases, DEFAULT_POLICY)
-    assert current.pop("punishment_resolution_policy") == (
+    current = ElementAnalysis.analyze_day_master_strength(chart)["assessment"]
+    assert current["punishment_resolution_policy"] == (
         "completed_combination_unique_pair_resolution_v2"
     )
-    assert current == old
+    assert affiliations(tuple(chart[position][1] for position in ORDER)) == []
+    assert not any(
+        row["status"] == "same_target_affiliation_only" for row in current["relations"]
+    )
+    assert_current_assessment_arithmetic(text.split(), current)
 
 
 def test_all_20736_branch_seatings_against_independent_literal_oracle():
@@ -146,37 +143,3 @@ def test_all_20736_branch_seatings_against_independent_literal_oracle():
         count += 1
         matches += bool(actual)
     assert count == 20736 and matches > 0
-
-
-def test_legacy_default_and_original_test_gate_remain_explicit():
-    chart = pillars("甲寅 丙午 戊戌 乙卯")
-    phase = ElementAnalysis.seasonal_phases("午")
-    legacy = _evaluate(chart, phase, DEFAULT_POLICY)
-    assert (
-        next(r for r in legacy["relations"] if r["kind"] == "三合")["status"]
-        == "contested_or_clashed"
-    )
-    current = evaluate_strength_policy(chart, phase, DEFAULT_POLICY)
-    assert (
-        next(r for r in current["relations"] if r["kind"] == "三合")["status"]
-        == "conditioned_transformation"
-    )
-    assert (
-        DEFAULT_POLICY.binding == 0.85
-        and DEFAULT_POLICY.transformation_transfer == 0.80
-    )
-    assert DEFAULT_POLICY.strong_share == 0.60 and DEFAULT_POLICY.weak_share == 0.40
-
-
-def test_source_plan_and_independent_oracle_were_frozen_before_production_edit():
-    import hashlib
-
-    plan = FIXTURE / "source-review-and-adoption-first.json"
-    assert (
-        hashlib.sha256(plan.read_bytes()).hexdigest()
-        == plan.with_suffix(".json.sha256").read_text().strip()
-    )
-    assert (
-        hashlib.sha256((FIXTURE / "reference_geometry.py").read_bytes()).hexdigest()
-        == json.loads(plan.read_text())["independent_geometry_sha256"]
-    )

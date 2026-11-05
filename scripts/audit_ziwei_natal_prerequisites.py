@@ -15,7 +15,7 @@ from fatebridge.utils.civil_clock import utc_instant
 from fatebridge.utils.timezones import parse_timezone_name
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures/ziwei_independent"
+FIXTURES = ROOT / "tests/data/ziwei_independent"
 
 
 def audit_natal_prerequisites(fixtures: Path = FIXTURES) -> dict[str, Any]:

@@ -18,7 +18,6 @@ from fatebridge.cli import run as cli_run
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.human_design import (
-    GATE_ORDER,
     activation_longitude_fraction,
     chart_at,
     longitude_activation,
@@ -26,6 +25,7 @@ from fatebridge.core.human_design import (
     positions_at_tt,
 )
 from fatebridge.core.human_design_evidence import source_activation_impacts
+from fatebridge.core.human_design_mechanics import GATE_ORDER
 from fatebridge.core.human_design_precision import compare_node_backends
 from fatebridge.core.human_design_sensitivity import assess_birth_interval
 from fatebridge.mcp_server import create_mcp_app

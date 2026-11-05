@@ -20,7 +20,7 @@ def verify_pairs(materials: Path | None = None) -> dict[str, Any]:
     loaded = load_source(SOURCE)
     source = loaded.data
     fixture = json.loads(
-        (ROOT / "tests/fixtures/sukuyo-kenyu-ndl-pairs-primary.json").read_bytes()
+        (ROOT / "tests/data/sukuyo-kenyu-ndl-pairs-primary.json").read_bytes()
     )
     translation = str.maketrans(source["normalization"])
 

@@ -17,7 +17,7 @@ from fatebridge.core.sukuyo import SU27_ORDER
 from fatebridge.core.sukuyo_printed_special import SOURCE, printed_lower_comparison
 from fatebridge.core.sukuyo_sources import load_source
 
-FIXTURE = ROOT / "tests/fixtures/sukuyo-wakita-special-primary.json"
+FIXTURE = ROOT / "tests/data/sukuyo-wakita-special-primary.json"
 ALIASES = str.maketrans("軫畢張參", "轸毕张参")
 
 

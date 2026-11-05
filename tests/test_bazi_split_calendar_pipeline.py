@@ -21,8 +21,8 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 
 
 def check_actual_parts(value):
@@ -76,6 +76,9 @@ def check_actual_parts(value):
         for child in value:
             found += check_actual_parts(child)
     return found
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("key", ["bazi_birth", "timing_analysis", "dayun_analysis"])

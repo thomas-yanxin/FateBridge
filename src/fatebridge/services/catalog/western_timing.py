@@ -80,6 +80,7 @@ def _western_module_spec(name: str, service: Any, label: str) -> ToolSpec:
         ),
         operation_label_zh=label,
         family="western_timing_tool",
+        cpu_bound=True,
         rest_path=f"/api/astro/timing/{name}",
         mcp_name=name,
     )
@@ -96,6 +97,7 @@ SPECS: List[ToolSpec] = [
         ),
         operation_label_zh="西占时运",
         family="western_timing",
+        cpu_bound=True,
         rest_path="/api/astro/timing",
         mcp_name="western_timing_analysis",
     ),

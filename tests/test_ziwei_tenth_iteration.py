@@ -20,6 +20,7 @@ from fatebridge.services.metaphysics import calculate_ziwei_horoscope
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_input import create_person_info
 from scripts.audit_ziwei_limits import _seed
+from scripts.ziwei_conditional_inputs import synthetic_birth_clock
 from tests.fixtures.mcp_receipt import verified_inline_business
 
 BIRTH = dict(
@@ -120,7 +121,7 @@ def test_childhood_second_age_does_not_replace_formal_first_decade():
         _seed(1984, hour="丑"), "男", rule_profile="quanshu_v2_excerpt"
     )
     h = build_ziwei_horoscope(
-        nominal_age_basis="legacy_mixed_clock",
+        birth_seed=synthetic_birth_clock(int((chart)["lunar_date"]["year"])),
         chart=chart,
         gender="男",
         target_seed=_seed(1985),
@@ -129,7 +130,6 @@ def test_childhood_second_age_does_not_replace_formal_first_decade():
     assert h["childhood_limit"]["natal_palace_name"] == "财帛宫"
     daxian = next(s for s in h["scopes"] if s["scope"] == "大限")
     assert daxian["natal_palace_name"] == "父母宫"
-    assert daxian["is_childhood_limit"] is False
     assert h["childhood_limit"]["pre_decade_substitution_verified"] is False
 
 

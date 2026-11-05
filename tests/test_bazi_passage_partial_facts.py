@@ -20,7 +20,7 @@ from fatebridge.core.output_passage_relations import PassageRelationContext
 from fatebridge.core.passage_relations import build_passage_relation_context
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_month_passage_next_v1"
+FIXTURE = ROOT / "tests/data/bazi_month_passage_next_v1"
 CASES = json.loads((FIXTURE / "first-independent-counterexamples.json").read_bytes())[
     "cases"
 ]

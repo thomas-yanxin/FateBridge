@@ -13,9 +13,7 @@ from fatebridge.services.timing_uncertainty import analyze_birth_time_range
 from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.solar_time import normalize_birth_time
 
-REFERENCE = (
-    Path(__file__).parent / "fixtures/bazi_uncertainty_events_v1/reference.json.gz"
-)
+REFERENCE = Path(__file__).parent / "data/bazi_uncertainty_events_v1/reference.json.gz"
 assert (
     hashlib.sha256(REFERENCE.read_bytes()).hexdigest()
     == REFERENCE.with_suffix(".sha256").read_text().strip()

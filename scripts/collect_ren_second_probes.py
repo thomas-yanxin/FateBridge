@@ -14,11 +14,11 @@ import swisseph as swe
 from scripts.ren_second_reference import NAMES, ReferenceClock, source_expectation
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "tests/fixtures/ren_seconds_v1"
+OUT = ROOT / "tests/data/ren/second_boundary_inputs"
 PINS = {
-    "docs/validation/liuyao-v23/full1800-reference.json": "6068e0af04f8619ff158290e81c39c01d5e3b18913f534c8f1cf13663df64185",
-    "tests/fixtures/ren_calendar_guard_v1/freeze.json": "9ccd4ba277cfa91c184fe59bcf33f5d0f392c509f2197b9167460653353e2f76",
-    "tests/fixtures/ren_boundary_decisions_v1/protocol.json": "aac95c48ce34c11c5001630e155ebfd1bc3bf6622f1950349cbef67bde88a8ea",
+    "tests/data/solar/liuyao_de440_tt1800_2200.json": "7b64d68a9f91d9e0342ecadf39a423c736224b492128556187707e3ca3fb4e65",
+    "tests/fixtures/ren_calendar_guard_v1/freeze.json": "7f93b89d2761b854672530e7d60bf99e201cfa962c80a63b3947d776c48f47d9",
+    "tests/fixtures/ren_boundary_decisions_v1/protocol.json": "c980b9875b9201a6a6264173391aa13e7c16732eb9fc5460770c41653174f316",
     "tests/fixtures/ren_calendar_v1/reference.json": "7becec29a4e3416f73743ba49b55c2468922cfc9cfb14ddf82d52f9079e02600",
     "tests/fixtures/ren_classical_v1/rules.json": "c7640f353db970e83333a2171c01b1f5877dbb55f72f7c70a1d7741ecb391bb9",
     "tests/fixtures/historical-utc-sofa.json": "65a450c5777cfa8920694fffc382a14c691dd3e8092822d17e89a76f55f35642",
@@ -37,7 +37,7 @@ def main() -> None:
     for n, h in json.loads((guard / "freeze.json").read_text())["files"].items():
         assert sha(guard / n) == h
     full = json.loads(
-        (ROOT / "docs/validation/liuyao-v23/full1800-reference.json").read_text()
+        (ROOT / "tests/data/solar/liuyao_de440_tt1800_2200.json").read_text()
     )["rows"]
     extra = [
         r

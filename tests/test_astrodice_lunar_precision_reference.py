@@ -1,6 +1,5 @@
 """Preserve the new wider template, including every unresolved endpoint."""
 
-import copy
 import json
 from pathlib import Path
 
@@ -9,8 +8,8 @@ import pytest
 from scripts.audit_astrodice_lunar_precision import digest, validate_reference
 
 ROOT = Path(__file__).resolve().parents[1]
-P = ROOT / "tests/fixtures/astrodice-lunar-wide-protocol.json"
-R = ROOT / "tests/fixtures/astrodice-lunar-wide-reference.json"
+P = ROOT / "tests/data/astrodice/tables/lunar-wide-protocol.json"
+R = ROOT / "tests/data/astrodice/tables/lunar-wide-reference.json"
 
 
 def test_raw_reference_and_all_centers_remain_frozen_with_missing_endpoints():
@@ -54,8 +53,8 @@ def test_reference_tampering_cannot_turn_into_an_acceptance(problem):
 
 
 def test_fractional_boundary_holdout_is_frozen_and_complete():
-    p = ROOT / "tests/fixtures/astrodice-lunar-fractional-window-protocol.json"
-    r = ROOT / "tests/fixtures/astrodice-lunar-fractional-window-reference.json"
+    p = ROOT / "tests/data/astrodice/tables/lunar-fractional-window-protocol.json"
+    r = ROOT / "tests/data/astrodice/tables/lunar-fractional-window-reference.json"
     assert (
         digest(p) == "14cb0db262edb01b245bed8b60beea593f7f9e29ec7497329a08739ef5d9079c"
     )
@@ -77,3 +76,67 @@ def test_fractional_tt_calendar_labels_preserve_microseconds():
     assert parse_date(" 9600-Jan-01 00:00:00.750 ") == "9600-01-01T00:00:00.750000"
     with pytest.raises(ValueError):
         parse_date(" 9600-Jan-01 00:00:00.0000001 ")
+
+
+def test_new_precise_source_holdouts_keep_the_original_horizons_parameters():
+    directory = ROOT / "tests/data/astrodice/precise-source-holdout"
+    protocol = json.loads((directory / "protocol.json").read_text())
+    reference = json.loads((directory / "reference.json").read_text())
+    assert (
+        digest(directory / "protocol.json")
+        == "d966d6ebecf1af716ad3d291a0abd7d6d34ebf3c8d7f43552a80c177e5dc0d1e"
+    )
+    assert (
+        digest(directory / "reference.json")
+        == "0dd3025a7ef448894329e2019eb74fbf76819ac55d2e9a493c299a7bb7631c58"
+    )
+    original = json.loads(P.read_text())
+    for key in [
+        "reference_parameters",
+        "steps_seconds",
+        "chosen_step_seconds",
+        "offsets_seconds",
+    ]:
+        assert protocol[key] == original[key]
+    assert not protocol["development_dates_tt"]
+    assert not set(protocol["holdout_dates_tt"]) & set(
+        original["development_dates_tt"] + original["holdout_dates_tt"]
+    )
+    result = validate_reference(protocol, reference)
+    assert result["centers"] == result["available"] == 12
+    assert result["position_probes"] == 228
+    assert not result["incomplete"] and not result["template_failures"]
+
+
+def test_precision_audit_grades_the_current_complete_source_derivative(monkeypatch):
+    from scripts.audit_astrodice_lunar_precision import audit
+
+    monkeypatch.setenv("SE_EPHE_PATH", str(ROOT / "ephe"))
+    monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+    protocol = json.loads(P.read_text())
+    reference = json.loads(R.read_text())
+    row = next(r for r in reference["rows"] if r["date_tt"] == "3000-12-07T04:07:32")
+    result = audit(protocol, {"rows": [row]}, production_order=True)
+    assert (
+        result["gated_rate_metric"] == "current_fixed_source_rate_error_arcsec_per_day"
+    )
+    assert result["fixed_line_arcsec_per_day"] == 0.002
+    assert result["fixed_position_line_arcsec"] == 0.02
+    actual = result["cases"][0]
+    assert actual["source_motion_status"] == "applied"
+    assert (
+        actual["current_source_method_id"]
+        == "lunar_fixed_frame_source_derivative_with_observer_acceleration_v1"
+    )
+    assert (
+        actual["native_icrf_rate_error_arcsec_per_day"]
+        > actual["current_fixed_source_rate_error_arcsec_per_day"]
+    )
+    failed = (
+        actual["current_fixed_source_rate_error_arcsec_per_day"] > 0.002
+        or actual["icrf_position_error_arcsec"] > 0.02
+    )
+    assert result["exit_code"] == (1 if failed else 0)
+    assert result["summary"]["all"][result["gated_rate_metric"]][
+        "above_fixed_line"
+    ] == int(actual["current_fixed_source_rate_error_arcsec_per_day"] > 0.002)

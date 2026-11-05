@@ -1,4 +1,4 @@
-"""Typed interface for the evaluator, whose historical function ASTs are frozen."""
+"""Typed interface for the current observable-call evaluator."""
 
 import subprocess as subprocess
 from pathlib import Path
@@ -13,8 +13,7 @@ Grade = dict[str, Any]
 ROOT: Path
 CASES: Path
 EVALUATION_DOCS_EXCLUDED: set[str]
-LEGACY_GRADING_POLICY: Literal["observable_tools_v1"]
-EXPECTED_ERRORS_GRADING_POLICY: Literal["expected_errors_v1"]
+GRADING_POLICY: Literal["observed_calls_and_declared_errors_v2"]
 
 def source_files(
     root: Path = ..., profile: str = ..., extra_files: tuple[str, ...] = ...
@@ -30,21 +29,9 @@ def freeze_source(
 ) -> dict[str, str]: ...
 def walk(value: Any) -> Iterator[dict[str, Any]]: ...
 def observations(events: list[Event]) -> tuple[list[Event], list[str]]: ...
-def observations_expected_errors(
-    events: list[Event],
-) -> tuple[list[Event], list[str]]: ...
 def error_response(result: dict[str, Any]) -> dict[str, Any] | None: ...
 def matches_expected_error(actual: Any, expected: Any) -> bool: ...
 def expected_error_call(call: Event, expected: Any) -> bool: ...
-def grade(case: Case, events: list[Event], final: str, returncode: int) -> Grade: ...
-def grade_expected_errors(
-    case: Case,
-    events: list[Event],
-    final: str,
-    returncode: int,
-    captured_tool_records: list[Event] | None = ...,
-) -> Grade: ...
-def scoring_policy(case: Case) -> str: ...
 def grade_case(
     case: Case,
     events: list[Event],

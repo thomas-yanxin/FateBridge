@@ -14,7 +14,7 @@ from fatebridge.core.sukuyo_t2217_collation import (
 )
 from fatebridge.core.sukuyo_waterclock import source_specific_time_reference
 
-FIXTURE = Path(__file__).parent / "fixtures/sukuyo-t2217-before-production-v87.json"
+FIXTURE = Path(__file__).parent / "data/sukuyo-t2217-before-production-v87.json"
 
 
 def test_entire_preimplementation_print_reference_is_delivered():

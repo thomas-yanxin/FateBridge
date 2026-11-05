@@ -20,9 +20,12 @@ from fatebridge.core.output_western import WesternEventClockConversion
 from fatebridge.core.predictive._common import determine_sect
 from fatebridge.core.predictive.native_chart import build_native_subject
 from fatebridge.core.western_event_clock import build_event_subject
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
+
 
 FIXTURES = Path(__file__).parent / "fixtures"
 REFERENCE_PATH = FIXTURES / "western-leap-epoch-reference.json"

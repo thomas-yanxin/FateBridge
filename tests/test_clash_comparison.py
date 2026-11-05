@@ -1,8 +1,6 @@
 """Decision provenance and causal invariance, not classical accuracy scores."""
 
 import copy
-import gzip
-import hashlib
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -12,13 +10,12 @@ from pydantic import ValidationError
 
 from fatebridge.core.bazi_evidence import build_natal_evidence
 from fatebridge.core.clash_comparison import (
-    build_clash_comparison,
     clash_comparison_snapshot_lines,
 )
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.output_clash_comparison import ClashComparison
-from fatebridge.core.strength import DEFAULT_POLICY, SOURCES, evaluate_strength_policy
-from tests.bazi_refactor_reference import assert_strength_matches_before_repair
+from fatebridge.core.strength import DEFAULT_POLICY, evaluate_strength_policy
+from tests.bazi_strength_reference_v3 import assert_current_assessment_arithmetic
 
 
 def pillars(text):
@@ -29,10 +26,13 @@ def model(text):
     return ElementAnalysis.analyze_day_master_strength(pillars(text))["assessment"]
 
 
-def test_tender_wood_counterexample_discloses_the_actual_proxy_without_fixing_its_label():
+def test_tender_wood_counterexample_discloses_physical_proxy_and_current_arithmetic():
     a = model("丁丑 壬寅 丙申 壬辰")
     trace = a["clash_comparison"]
-    assert a["strength_level"] == "中和"  # Unresolved source disagreement.
+    # The old 中和 snapshot used reversed seasonal phases. Audit today's
+    # budget independently; the physical proxy still does not adjudicate
+    # the source's effective root-force claim.
+    assert_current_assessment_arithmetic(["丁丑", "壬寅", "丙申", "壬辰"], a)
     row = trace["events"][0]
     assert row["positions"] == ["month", "day"] and row["distance"] == 1
     wood, metal = row["powers"]
@@ -78,30 +78,13 @@ def test_non_power_branches_never_fabricate_a_winning_budget(text, branch):
     ClashComparison.model_validate(a["clash_comparison"])
 
 
-def test_legacy_and_no_clash_have_different_missingness_without_backfilling():
-    p = pillars("丁丑 壬寅 丙申 壬辰")
-    old = {
-        "kind": "六冲",
-        "positions": ["month", "day"],
-        "status": "active",
-        "source_id": "ditian_branch",
-        "root_multipliers": {"month": 0.9, "day": 0.5},
-    }
-    trace = build_clash_comparison(p, [old], SOURCES)
-    assert trace["events"][0]["calculation_branch"] == "legacy_power_unavailable"
-    assert trace["events"][0]["powers"] is None
-    assert "不补算" in "".join(
-        clash_comparison_snapshot_lines({"clash_comparison": trace})
-    )
+def test_no_clash_has_no_comparison_events():
     empty = model("甲寅 乙卯 丙辰 丁未")["clash_comparison"]
     assert empty["events"] == []
-    ClashComparison.model_validate(trace)
-    ClashComparison.model_validate({"classical_effective_force": "not_adjudicated"})
 
 
 @pytest.mark.parametrize(
-    "damage",
-    ["total", "double", "imaginary_root", "position", "branch_mode", "authority"],
+    "damage", ["total", "double", "imaginary_root", "position", "branch_mode", "force"]
 )
 def test_contract_rejects_fabricated_calculation_facts(damage):
     trace = copy.deepcopy(model("丁丑 壬寅 丙申 壬辰")["clash_comparison"])
@@ -137,15 +120,13 @@ def test_parameters_not_used_in_the_proxy_do_not_silently_enter_its_explanation(
     assert values[0] == values[1]
 
 
-def test_all_retained_inputs_keep_the_complete_prior_calculation_after_removing_only_new_trace():
-    folder = Path(__file__).parent / "fixtures/bazi_clash_trace_v1"
-    raw = (folder / "before.json.gz").read_bytes()
-    manifest = json.loads((folder / "manifest.json").read_text())
-    assert hashlib.sha256(raw).hexdigest() == manifest["baseline_sha256"]
-    before = json.loads(gzip.decompress(raw))
-    assert before["distinct_inputs"] == 228
-    for case in before["rows"]:
-        p = dict(zip(("year", "month", "day", "hour"), map(tuple, case["pillars"])))
+def test_all_retained_inputs_have_valid_clash_trace_and_current_exact_arithmetic():
+    cases = json.loads(
+        (Path(__file__).parent / "data/bazi/clash-inputs.json").read_text()
+    )
+    assert len(cases) == 228
+    for values in cases:
+        p = dict(zip(("year", "month", "day", "hour"), map(tuple, values)))
         after = ElementAnalysis.analyze_day_master_strength(p)
         ClashComparison.model_validate(after["assessment"]["clash_comparison"])
-        assert_strength_matches_before_repair(case["pillars"], after)
+        assert_current_assessment_arithmetic(values, after["assessment"])

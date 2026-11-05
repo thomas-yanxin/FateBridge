@@ -27,7 +27,6 @@ ROW_FIELDS = (
     "content",
     "element",
     "polarity",
-    "power",
     "seasonal_power",
     "internal_power",
     "xun_kong",
@@ -131,9 +130,8 @@ def validate_seasonal_evidence(board: dict[str, Any]) -> None:
         if phase is None:
             continue
         power = seasonal_power(month, phase)
-        for field in ("power", "seasonal_power"):
-            if row.get(field) is not None:
-                compare_present(row[field], power)
+        if row.get("seasonal_power") is not None:
+            compare_present(row["seasonal_power"], power)
 
 
 def validate_strength_evidence(board: dict[str, Any]) -> None:

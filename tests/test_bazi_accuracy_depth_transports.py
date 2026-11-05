@@ -2,7 +2,8 @@
 
 import asyncio
 
-from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 
 PAYLOAD = {
     "name": "虚构均时差边界回归",
@@ -71,3 +72,6 @@ def test_root_profile_can_be_projected_with_published_nested_contract(rest):
     result = response.json()["bazi_birth"]
     assert len(result["classical"]["root_profile"]["roots"]) == 4
     assert result["person_info"]["time_adjustment"]["solar_time_strategy"] == "apparent"
+
+
+rest = _shared_rest

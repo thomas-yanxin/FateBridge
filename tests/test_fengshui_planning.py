@@ -105,11 +105,12 @@ def test_scene_selection_uses_inputs_and_explicit_choice_wins():
     ] == ["annual_stars"]
 
 
-def test_empty_scene_is_partial_and_legacy_raw_request_keeps_its_layers():
+def test_empty_scene_is_partial_and_empty_request_invents_no_methods():
     result = assess(scene="workstation", analyze_layout=True)
     assert result["status"] == "partial"
     assert result["coverage"]["analysis_progress"]["assessment_complete"] is False
-    assert set(assess()["layers"]) == {"bazhai", "jinsuo", "annual_stars"}
+    with pytest.raises(ValueError, match="至少选择一层"):
+        assess()
 
 
 @pytest.mark.parametrize(

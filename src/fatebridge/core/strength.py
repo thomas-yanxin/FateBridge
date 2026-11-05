@@ -13,19 +13,9 @@ from fatebridge.core.classical_roots import SOURCE as ROOT_SOURCE
 from fatebridge.core.classical_roots import classify_classical_root
 from fatebridge.core.complete_bureaus import MEMBERSHIP_POLICY
 from fatebridge.core.complete_bureaus import SOURCE as COMPLETE_BUREAU_SOURCE
-from fatebridge.core.formation_affiliations import (
-    LEGACY_POLICY as LEGACY_FORMATION_POLICY,
-)
-from fatebridge.core.formation_affiliations import POLICY as FORMATION_POLICY
 from fatebridge.core.formation_affiliations import SOURCE as AFFILIATION_SOURCE
 from fatebridge.core.formation_affiliations import partition_affiliations
-from fatebridge.core.punishment_resolution import (
-    LEGACY_POLICY as LEGACY_PUNISHMENT_POLICY,
-)
 from fatebridge.core.punishment_resolution import POLICY as PUNISHMENT_POLICY
-from fatebridge.core.punishment_resolution import (
-    PREVIOUS_POLICY as PREVIOUS_PUNISHMENT_POLICY,
-)
 from fatebridge.core.punishment_resolution import SINGLE_PAIR_SOURCE
 from fatebridge.core.punishment_resolution import SOURCE as PUNISHMENT_SOURCE
 from fatebridge.core.punishment_resolution import (
@@ -56,7 +46,8 @@ from ..utils.data import (
 )
 
 POSITIONS = ("year", "month", "day", "hour")
-STRENGTH_METHOD_ID = "season_root_revelation_relations_v11"
+STRENGTH_METHOD_ID = "season_root_revelation_relations_v12"
+STRUCTURAL_PRIORITY_METHOD_ID = "source_root_capacity_priority_v3"
 # Descending geometric rank, normalized to one branch budget; no double 本气 count.
 SHARES = {1: (1.0,), 2: (2 / 3, 1 / 3), 3: (4 / 7, 2 / 7, 1 / 7)}
 PHASE_FACTORS = {"旺": 2.0, "相": 1.5, "休": 1.0, "囚": 0.75, "死": 0.5}
@@ -71,6 +62,30 @@ STEM_PAIRS = {
     )
 }
 SOURCES: list[dict[str, Any]] = [
+    {
+        "id": "ditian_ordered_four_branch_passage_v1",
+        "title": "任注滴天髓闡微·通關（1947年李雨田校訂本PDF199）",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "pdf_pages": [199],
+        "scope": "仅在四支依次财生官杀、官杀生印、印生身，天干年杀月印、时比劫归禄旺且无竞争会合时采用。不得推广到任意见印、隔支或残缺通关。",
+    },
+    {
+        "id": "ditian_rooted_body_before_season_proxy_v1",
+        "title": "任注滴天髓闡微·官殺、地支、月令的重根与印比条件",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "pdf_pages": [91, 172, 173, 203, 205],
+        "scope": "多处合格实际根配合有根印比，以及两处本气强根，不再要求三干全部印比；资格仍沿用既有未舍入根预算和保留门槛。不是有根即强或全书定理。",
+    },
+    {
+        "id": "ditian_winter_rootless_wood_v1",
+        "title": "任注滴天髓闡微·假化（1947年李雨田校訂本PDF386）",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/d/db/SSID-11335994_%E6%BB%B4%E5%A4%A9%E9%AB%93%E9%97%A1%E5%BE%AE.pdf",
+        "source_sha256": "d6a7d1daf6513ce9fb9940ff8331b96804c10cdafbeac00d4d3d0a37229e1803",
+        "pdf_pages": [386],
+        "scope": "冬水当令而木无任何实际同五行藏根时，不将旺印相加为日主强。此有限规则不裁定化气格或从格。",
+    },
     {
         "id": "sanming_seasonal_phases",
         "title": "三命通會·論五行旺相休囚死並寄生十二宫",
@@ -127,6 +142,22 @@ class _Token(TypedDict):
     origin: str
 
 
+class _QualifiedRoot(TypedDict):
+    pillar: str
+    branch: str
+    kind: str
+    matching_hidden_stems: list[str]
+    source_weight_class: str
+    qualification_basis: str
+    initial_hidden_mass: float
+    remaining_hidden_mass: float
+    retention_fraction: Optional[float]
+    minimum_retention_policy: float
+    qualified_for_structural_rule: bool
+    source_ref: str
+    scope: str
+
+
 @dataclass(frozen=True)
 class StrengthPolicy:
     """Frozen before reference-case evaluation; no per-chart overrides."""
@@ -163,26 +194,8 @@ def _evaluate(
     pillars: Dict[str, Tuple[str, str]],
     phases: Dict[str, str],
     policy: StrengthPolicy,
-    *,
-    stem_effect_mode: str = "legacy_v5",
-    formation_overlap_policy: str = LEGACY_FORMATION_POLICY,
-    punishment_resolution_policy: str = LEGACY_PUNISHMENT_POLICY,
 ) -> Dict[str, Any]:
     """Score physical positions once; interactions alter those same root budgets."""
-    if stem_effect_mode not in {
-        "legacy_v5",
-        "precise_binding_only_v1",
-        "non_day_transformation_v1",
-    }:
-        raise ValueError("Unknown stem effect mode")
-    if formation_overlap_policy not in {LEGACY_FORMATION_POLICY, FORMATION_POLICY}:
-        raise ValueError("Unknown formation overlap policy")
-    if punishment_resolution_policy not in {
-        LEGACY_PUNISHMENT_POLICY,
-        PREVIOUS_PUNISHMENT_POLICY,
-        PUNISHMENT_POLICY,
-    }:
-        raise ValueError("Unknown punishment resolution policy")
     # Stable pillar order, independent of dictionary insertion order.
     names = [name for name in POSITIONS if name in pillars]
     branches = {name: pillars[name][1] for name in names}
@@ -254,9 +267,7 @@ def _evaluate(
         for c in candidates
         if len(c[1]) >= 3 or not any(set(c[1]) <= full for full in full_members)
     ]
-    affiliations: list[Dict[str, Any]] = []
-    if formation_overlap_policy == FORMATION_POLICY:
-        candidates, affiliations = partition_affiliations(candidates, branches)
+    candidates, affiliations = partition_affiliations(candidates, branches)
     # A unique adjacent 六合 or complete 三合 may resolve an external clash. If both
     # ends have incompatible claims, keep the clash and mark all those claims uncertain.
     memberships = {name: [c for c in candidates if name in c[1]] for name in names}
@@ -268,8 +279,45 @@ def _evaluate(
         )
         if not incompatible:
             protected.update(members)
+    # Prespecified source profile: whole four-column wealth -> officer ->
+    # seal -> body branch path, matching visible officer -> seal -> body,
+    # with time LU/prosperity and no competing complete/paired formation.
+    branch_elements = [BRANCH_ELEMENTS[branches[n]][0] for n in names]
+    ordered_passage = (
+        names == list(POSITIONS)
+        and not candidates
+        and all(
+            GENERATION_CYCLE[a] == b
+            for a, b in zip(branch_elements, branch_elements[1:])
+        )
+        and branch_elements[2] == parent
+        and branch_elements[3] == day_element
+        and STEM_ELEMENTS[pillars["year"][0]][0]
+        == next(
+            e
+            for e, controlled in DESTRUCTION_CYCLE.items()
+            if controlled == day_element
+        )
+        and STEM_ELEMENTS[pillars["month"][0]][0] == parent
+        and STEM_ELEMENTS[pillars["hour"][0]][0] == day_element
+        and classify_classical_root(pillars["day"][0], branches["hour"])["kind"]
+        in {"lu_root", "yang_blade_root", "prosperity_root"}
+    )
     for left, right in combinations(names, 2):
         if BRANCH_CONFLICTS[branches[left]] != branches[right]:
+            continue
+        if ordered_passage and names.index(right) - names.index(left) >= 2:
+            events.append(
+                {
+                    "kind": "六冲",
+                    "positions": [left, right],
+                    "status": "resolved_by_ordered_generation_path",
+                    "source_id": "ditian_ordered_four_branch_passage_v1",
+                    "intermediary_positions": names[
+                        names.index(left) + 1 : names.index(right)
+                    ],
+                }
+            )
             continue
         resolved = (left in protected) != (right in protected)
         if resolved:
@@ -471,19 +519,12 @@ def _evaluate(
     # Initial candidate protection is needed to decide clashes above. By this
     # later stage candidates may have failed; only completed combinations can
     # then resolve a punishment. Half tendencies do not expand that criterion.
-    punishment_cover = (
-        completed_combination_positions(events)
-        if punishment_resolution_policy
-        in {PREVIOUS_PUNISHMENT_POLICY, PUNISHMENT_POLICY}
-        else protected
-    )
+    punishment_cover = completed_combination_positions(events)
     for punishment_group in BRANCH_THREE_PUNISHMENTS:
         punished = [n for n in names if branches[n] in punishment_group]
         if set(branches[n] for n in punished) != set(punishment_group):
             continue  # 寅巳/丑戌 two-branch fragments are not full 三刑 in this policy.
-        if punishment_is_resolved(
-            punished, branches, punishment_cover, punishment_resolution_policy
-        ):
+        if punishment_is_resolved(punished, branches, punishment_cover):
             events.append(
                 {
                     "kind": "刑",
@@ -614,103 +655,31 @@ def _evaluate(
                         "energy": round(energy, 6),
                     }
                 )
-    stem_effects: Optional[Dict[str, Any]] = None
-    stems_evidence: list[Dict[str, Any]] = []
-    if stem_effect_mode != "legacy_v5":
-        stem_effects = evaluate_stem_effects(
-            pillars,
-            phases,
-            factors,
-            hidden_stem_ledger,
-            non_root_mass,
-            floating_stem=policy.floating_stem,
-            rooted_stem=policy.rooted_stem,
-            binding=policy.binding,
-            minimum_retention=policy.clash_equal,
-            enable_transformation=stem_effect_mode == "non_day_transformation_v1",
-        )
-        stems_evidence = stem_effects["revealed_stems"]
-        if stem_effect_mode == "precise_binding_only_v1":
-            # Applied historical binding retains its own source. The rejected
-            # 任注 conversion hypothesis must not become public provenance.
-            events.extend(
-                {
-                    "kind": event["kind"],
-                    "positions": event["positions"],
-                    "status": event["status"],
-                    "source_id": "ziping_5",
-                }
-                for event in stem_effects["relations"]
-            )
-            for stem_row in stems_evidence:
-                stem_row["root_activation_policy"] = (
-                    "remaining_physical_hidden_stems_only_v1"
-                )
-        else:
-            events.extend(stem_effects["relations"])
-        for element in Element:
-            effective[element] += stem_effects["energies"][element.value]
-    else:
-        # Day stem is the target, not an extra vote supporting itself.
-        for name in names:
-            stem = pillars[name][0]
-            element = STEM_ELEMENTS[stem][0]
-            if name == "day":
-                continue
-            activation = policy.floating_stem + (
-                policy.rooted_stem - policy.floating_stem
-            ) * min(1.0, root_mass[element])
-            energy = activation * factors[element]
-            effective[element] += energy
-            stems_evidence.append(
-                {
-                    "pillar": name,
-                    "stem": stem,
-                    "root_mass": round(root_mass[element], 6),
-                    "non_root_combination_mass": round(non_root_mass[element], 6),
-                    "root_activation_policy": "remaining_physical_hidden_stems_only_v1",
-                    "energy": round(energy, 6),
-                }
-            )
-        # 天干合绊: adjacent, unique partners, no erasure of 日主 or inference of 化气格.
-        stem_links = [
-            (a, b)
-            for a, b in zip(names, names[1:])
-            if frozenset((pillars[a][0], pillars[b][0])) in STEM_PAIRS
-        ]
-        for a, b in stem_links:
-            contested = (
-                sum(a in pair for pair in stem_links) > 1
-                or sum(b in pair for pair in stem_links) > 1
-            )
-            if contested or "day" in (a, b):
-                events.append(
-                    {
-                        "kind": "天干合",
-                        "positions": [a, b],
-                        "status": "day_master_or_contested_review",
-                        "source_id": "ziping_5",
-                    }
-                )
-                continue
-            for item in stems_evidence:
-                if item["pillar"] in (a, b):
-                    element = STEM_ELEMENTS[item["stem"]][0]
-                    reduction = item["energy"] * (1 - policy.binding)
-                    effective[element] -= reduction
-                    item["energy"] = round(item["energy"] - reduction, 6)
-            events.append(
-                {
-                    "kind": "天干合",
-                    "positions": [a, b],
-                    "status": "binding",
-                    "source_id": "ziping_5",
-                }
-            )
+    stem_effects = evaluate_stem_effects(
+        pillars,
+        factors,
+        hidden_stem_ledger,
+        non_root_mass,
+        floating_stem=policy.floating_stem,
+        rooted_stem=policy.rooted_stem,
+        binding=policy.binding,
+    )
+    stems_evidence = stem_effects["revealed_stems"]
+    events.extend(
+        {
+            "kind": event["kind"],
+            "positions": event["positions"],
+            "status": event["status"],
+            "source_id": "ziping_5",
+        }
+        for event in stem_effects["relations"]
+    )
+    for element in Element:
+        effective[element] += stem_effects["energies"][element.value]
     support = effective[day_element] + effective[parent]
     weaken = sum(effective[e] for e in Element if e not in {day_element, parent})
     share = support / (support + weaken) if support + weaken else 0.5
-    root_qualifications = []
+    root_qualifications: list[_QualifiedRoot] = []
     for name in names:
         classification = classify_classical_root(pillars["day"][0], branches[name])
         initial = initial_day_root_mass[name]
@@ -751,31 +720,15 @@ def _evaluate(
         r["pillar"] for r in root_qualifications if r["qualified_for_structural_rule"]
     ]
     float_numerical_label = _label(share, policy)
-    threshold_arithmetic = (
-        exact_threshold_decision(
-            pillars,
-            phases,
-            PHASE_FACTORS,
-            asdict(policy),
-            events,
-            float_numerical_label,
-        )
-        if stem_effect_mode == "precise_binding_only_v1"
-        else None
+    threshold_arithmetic = exact_threshold_decision(
+        pillars, phases, PHASE_FACTORS, asdict(policy), events, float_numerical_label
     )
-    numerical_label = (
-        threshold_arithmetic["numerical_label"]
-        if threshold_arithmetic is not None
-        else float_numerical_label
-    )
+    numerical_label = threshold_arithmetic["numerical_label"]
+    # The independently evaluated root rule is not gated by the weighted
+    # proxy that it can override. Its roots, season and load guard remain
+    # explicit; no coefficient is fitted to a reference chart.
     structural_rule = (
-        numerical_label == "中和"
-        and (
-            threshold_arithmetic["support_above_half"]
-            if threshold_arithmetic is not None
-            else share > 0.5
-        )
-        and phases[day_element.value] == "旺"
+        phases[day_element.value] == "旺"
         and "month" in vigorous_roots
         and len(vigorous_roots) >= 2
     )
@@ -792,21 +745,20 @@ def _evaluate(
         e == controller and root_mass[e] >= 1 for e in visible_others
     )
     rooted_wealth = any(e == wealth and root_mass[e] >= 1 for e in visible_others)
-    if threshold_arithmetic is not None:
-        root_comparison = threshold_arithmetic["physical_root_unit_comparison"]
-        unit_flags = root_comparison["at_least_unit"]
-        legacy_controllers, legacy_wealth = rooted_controllers, rooted_wealth
-        rooted_controllers = sum(
-            e == controller and unit_flags[e.value] for e in visible_others
-        )
-        rooted_wealth = any(e == wealth and unit_flags[e.value] for e in visible_others)
-        root_comparison.update(
-            legacy_float_at_least_unit={e.value: root_mass[e] >= 1 for e in Element},
-            legacy_float_rooted_controller_stems=legacy_controllers,
-            legacy_float_rooted_wealth_visible=legacy_wealth,
-            rooted_controller_stems=rooted_controllers,
-            rooted_wealth_visible=rooted_wealth,
-        )
+    root_comparison = threshold_arithmetic["physical_root_unit_comparison"]
+    unit_flags = root_comparison["at_least_unit"]
+    float_controllers, float_wealth = rooted_controllers, rooted_wealth
+    rooted_controllers = sum(
+        e == controller and unit_flags[e.value] for e in visible_others
+    )
+    rooted_wealth = any(e == wealth and unit_flags[e.value] for e in visible_others)
+    root_comparison.update(
+        float_at_least_unit={e.value: root_mass[e] >= 1 for e in Element},
+        float_rooted_controller_stems=float_controllers,
+        float_rooted_wealth_visible=float_wealth,
+        rooted_controller_stems=rooted_controllers,
+        rooted_wealth_visible=rooted_wealth,
+    )
     support_visible = sum(e in {day_element, parent} for e in visible_others)
     # 得令不能掩盖有根财生官杀连续透干；得地得势也不能被单一季相否定。
     wealth_officer_chain = (
@@ -817,7 +769,9 @@ def _evaluate(
         and len(vigorous_roots) <= 1
     )
     rooted_support_front = (
-        len(vigorous_roots) >= 2 and len(visible_others) == 3 and support_visible == 3
+        len(vigorous_roots) >= 2
+        and len(visible_others) == 3
+        and any(e in {day_element, parent} and root_mass[e] > 0 for e in visible_others)
     )
     complete_support_bureau = len(vigorous_roots) >= 2 and any(
         event.get("kind") in {"三合", "三会"}
@@ -826,7 +780,22 @@ def _evaluate(
         and event.get("status") in {"binding", "conditioned_transformation"}
         for event in events
     )
-    if wealth_officer_chain:
+    principal_roots = [
+        r["pillar"]
+        for r in root_qualifications
+        if r["qualified_for_structural_rule"]
+        and BRANCH_ELEMENTS[r["branch"]][0] == day_element
+    ]
+    winter_floating_wood = (
+        day_element == Element.WOOD
+        and branches["month"] in {"亥", "子"}
+        and not any(r["matching_hidden_stems"] for r in root_qualifications)
+    )
+    if winter_floating_wood:
+        final_label, decision = "弱", "winter_rootless_wood_cannot_receive_water"
+    elif ordered_passage:
+        final_label, decision = "强", "aligned_four_branch_generation_and_time_lu"
+    elif wealth_officer_chain:
         final_label, decision = (
             "弱",
             "rooted_wealth_officer_front_without_visible_support",
@@ -838,36 +807,57 @@ def _evaluate(
         )
     elif structural_rule:
         final_label, decision = "强", "in_command_multiple_vigorous_roots"
+    elif len(principal_roots) >= 2:
+        final_label, decision = "强", "multiple_surviving_principal_body_roots"
     elif rooted_support_front:
-        final_label, decision = "强", "multiple_vigorous_roots_and_visible_support"
+        final_label, decision = (
+            "强",
+            "multiple_vigorous_roots_and_rooted_visible_support",
+        )
     else:
         final_label, decision = numerical_label, "weighted_balance"
     return {
-        **(
-            {"punishment_resolution_policy": punishment_resolution_policy}
-            if punishment_resolution_policy
-            in {PREVIOUS_PUNISHMENT_POLICY, PUNISHMENT_POLICY}
-            else {}
-        ),
-        **(
-            {"threshold_arithmetic": threshold_arithmetic}
-            if threshold_arithmetic is not None
-            else {}
-        ),
+        "punishment_resolution_policy": PUNISHMENT_POLICY,
+        "threshold_arithmetic": threshold_arithmetic,
         "structural_decision": {
+            "method_id": STRUCTURAL_PRIORITY_METHOD_ID,
             "rule": decision,
             "vigorous_roots": vigorous_roots,
             "numerical_label": numerical_label,
             "source_id": (
-                "ditian_complete_same_element_bureau_capacity_v1"
-                if decision
-                == "complete_same_element_bureau_with_surviving_vigorous_roots"
-                else "ditian_zhonghe" if wealth_officer_chain else "ziping_6"
+                "ditian_winter_rootless_wood_v1"
+                if winter_floating_wood
+                else (
+                    "ditian_ordered_four_branch_passage_v1"
+                    if ordered_passage
+                    else (
+                        "ditian_rooted_body_before_season_proxy_v1"
+                        if decision
+                        in {
+                            "multiple_surviving_principal_body_roots",
+                            "multiple_vigorous_roots_and_rooted_visible_support",
+                        }
+                        else (
+                            "ditian_complete_same_element_bureau_capacity_v1"
+                            if decision
+                            == "complete_same_element_bureau_with_surviving_vigorous_roots"
+                            else (
+                                "ditian_zhonghe" if wealth_officer_chain else "ziping_6"
+                            )
+                        )
+                    )
+                )
             ),
             "rooted_controller_stems": rooted_controllers,
             "rooted_wealth_visible": rooted_wealth,
             "support_visible_stems": support_visible,
             "root_qualification_method": "source_category_surviving_root_v1",
+            "source_premises": {
+                "ordered_branch_elements": [e.value for e in branch_elements],
+                "uncontested_full_generation_path": ordered_passage,
+                "surviving_principal_root_positions": principal_roots,
+                "winter_rootless_wood": winter_floating_wood,
+            },
         },
         "root_qualifications": root_qualifications,
         "branch_budgets": {
@@ -886,7 +876,7 @@ def _evaluate(
         "hidden_stem_ledger": hidden_stem_ledger,
         "combination_contributions": combination_contributions,
         "revealed_stems": stems_evidence,
-        **({"stem_effects": stem_effects} if stem_effects is not None else {}),
+        "stem_effects": stem_effects,
         "relations": events,
         "effective_elements": {e.value: round(v, 6) for e, v in effective.items()},
         "effective_elements_unrounded": {e.value: v for e, v in effective.items()},
@@ -898,27 +888,14 @@ def evaluate_strength_policy(
     phases: Dict[str, str],
     policy: StrengthPolicy,
 ) -> Dict[str, Any]:
-    """Evaluate a supplied policy with the adopted arithmetic, before presentation.
-
-    Historical experiments deliberately keep _evaluate's legacy default. Public
-    assessment and current-policy sensitivity must instead use the same mode.
-    """
-    return _evaluate(
-        pillars,
-        phases,
-        policy,
-        stem_effect_mode="precise_binding_only_v1",
-        formation_overlap_policy=FORMATION_POLICY,
-        punishment_resolution_policy=PUNISHMENT_POLICY,
-    )
+    """Evaluate a supplied policy with the sole adopted arithmetic."""
+    return _evaluate(pillars, phases, policy)
 
 
 def assess_strength(
     pillars: Dict[str, Tuple[str, str]], phases: Dict[str, str]
 ) -> Dict[str, Any]:
-    # The conversion prototype failed its frozen source gate. Adopt only the
-    # independently justified arithmetic repair: binding acts on unrounded
-    # energy. Original stem identities and the legacy binding policy remain.
+    # Binding acts on unrounded energy and preserves original stem identities.
     result = evaluate_strength_policy(pillars, phases, DEFAULT_POLICY)
     result["clash_comparison"] = build_clash_comparison(
         pillars, result["relations"], SOURCES
@@ -927,7 +904,7 @@ def assess_strength(
     result["stem_energy_accounting"] = {
         "method_id": "unrounded_non_day_stem_budget_v1",
         "arithmetic_policy": "round_only_for_display",
-        "conversion_policy": "legacy_binding_only_conversion_prototype_not_adopted",
+        "conversion_policy": "not_applied",
         "ledger": stem_receipt["ledger"],
         "source_order_review": build_stem_order_review(
             {name: pillars[name][0] for name in POSITIONS},
@@ -957,10 +934,19 @@ def assess_strength(
                     "parameter": field,
                     "scale": scale,
                     "strength": alternative["strength_level"],
+                    "numerical_strength": alternative["threshold_arithmetic"][
+                        "numerical_label"
+                    ],
                     "support_share": round(alternative["support_share"], 6),
                 }
             )
     labels = sorted({result["strength_level"], *(v["strength"] for v in variants)})
+    numerical_labels = sorted(
+        {
+            result["threshold_arithmetic"]["numerical_label"],
+            *(v["numerical_strength"] for v in variants),
+        }
+    )
     special_review = result["threshold_arithmetic"]["requires_special_structure_review"]
     result.update(
         {
@@ -977,7 +963,13 @@ def assess_strength(
                 if result["weaken_strength"]
                 else None
             ),
-            "sensitivity": {"candidate_strengths": labels, "variants": variants},
+            "sensitivity": {
+                "candidate_strengths": labels,
+                "numerical_candidate_strengths": numerical_labels,
+                "variants": variants,
+            },
+            "ordinary_fuyi_requires_review": set(numerical_labels)
+            != {result["strength_level"]},
             "requires_special_structure_review": special_review,
             "month_command": {
                 "branch": pillars["month"][1],
@@ -993,6 +985,7 @@ def assess_strength(
                 "刑害有门派分歧；三刑取全组、子卯取成对，自刑轻减，六害不机械减根。",
                 "四墓土刑冲按所选原典区别冲动与冲克，土根不统一减损，不增造开库能量；水根减损幅度仍为工程约定。",
                 "旺衰极端或参数敏感时停止自动扶抑取用，另行核对从格及专旺。",
+                "结构三档不替代数值扶抑前提；两者不同或数值敏感时，普通扶抑喜忌继续待判。",
             ],
         }
     )

@@ -118,7 +118,9 @@ def test_nongli_rejects_unresolved_civil_clock_on_every_transport(
         assert "run_metadata" not in output
 
 
-def test_unknown_gender_love_score_is_neutral_on_every_transport(monkeypatch, capsys):
+def test_unknown_gender_score_and_missing_layer_are_disclosed_on_every_transport(
+    monkeypatch, capsys
+):
     response, code, protocol, outputs = invoke(
         "liushi_analysis",
         dict(
@@ -138,7 +140,14 @@ def test_unknown_gender_love_score_is_neutral_on_every_transport(monkeypatch, ca
         capsys,
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
-    assert all(output["life_dimensions"]["love"] == 50 for output in outputs)
+    for output in outputs:
+        assert output["life_dimensions"]["love"] is None
+        assessment = output["life_dimensions_assessment"]
+        assert assessment["status"] == "partial"
+        assert assessment["unavailable_layers"] == {
+            "dayun": "unavailable_missing_gender"
+        }
+        assert assessment["unavailable_dimensions"] == ["love"]
 
 
 def test_removed_rollover_switch_is_rejected_on_every_transport(monkeypatch, capsys):
@@ -197,7 +206,7 @@ def test_birth_strength_uses_one_assessment_on_every_transport(monkeypatch, caps
         assert "element_relations" not in birth
         assessment = birth["day_master"]["assessment"]
         assert set(assessment["effective_elements"]) == {"木", "火", "土", "金", "水"}
-        assert assessment["method_id"] == "season_root_revelation_relations_v11"
+        assert assessment["method_id"] == "season_root_revelation_relations_v12"
         assert assessment["seasonal_phases"] == {
             "木": "休",
             "火": "旺",

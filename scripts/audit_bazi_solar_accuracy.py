@@ -23,16 +23,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def _summary(rows: list[dict[str, Any]], tolerance: float) -> dict[str, Any]:
     errors = []
-    old_errors = []
     failed = []
     for row in rows:
         instant = datetime.fromisoformat(row["instant"])
         actual = calculate_equation_of_time_minutes(instant)
         error = abs(actual - row["equation_of_time_minutes"]) * 60
         errors.append(error)
-        b = 2 * math.pi * (instant.timetuple().tm_yday - 81) / 364
-        old = 9.87 * math.sin(2 * b) - 7.53 * math.cos(b) - 1.5 * math.sin(b)
-        old_errors.append(abs(old - row["equation_of_time_minutes"]) * 60)
         if error > tolerance:
             failed.append({"instant": row["instant"], "absolute_error_seconds": error})
     return {
@@ -40,14 +36,13 @@ def _summary(rows: list[dict[str, Any]], tolerance: float) -> dict[str, Any]:
         "within_tolerance": len(rows) - len(failed),
         "maximum_error_seconds": max(errors),
         "mean_error_seconds": math.fsum(errors) / len(errors),
-        "old_formula_maximum_error_seconds": max(old_errors),
         "failed_count": len(failed),
         "first_failures": failed[:20],
     }
 
 
 def load_daily_sweep() -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    folder = ROOT / "tests/fixtures/bazi_solar_sweep_v1"
+    folder = ROOT / "tests/data/bazi_solar_sweep_v1"
     manifest = folder / "manifest.json"
     if (
         hashlib.sha256(manifest.read_bytes()).hexdigest()
@@ -82,14 +77,7 @@ def load_daily_sweep() -> tuple[list[dict[str, Any]], dict[str, Any]]:
 
 
 def audit_solar(include_sweep: bool = False) -> dict[str, Any]:
-    candidate_hash = hashlib.sha256(
-        (ROOT / "src/fatebridge/utils/solar_time.py").read_bytes()
-    ).hexdigest()
-    first_candidate = json.loads(
-        (ROOT / "docs/validation/bazi-solar-candidate-v1.json").read_text()
-    )
-    first_candidate_unchanged = candidate_hash == first_candidate["candidate_sha256"]
-    fixture = ROOT / "tests/fixtures/bazi-solar-jpl-v1.json"
+    fixture = ROOT / "tests/data/bazi-solar-jpl-v1.json"
     if (
         hashlib.sha256(fixture.read_bytes()).hexdigest()
         != fixture.with_suffix(".sha256").read_text().strip()
@@ -108,21 +96,13 @@ def audit_solar(include_sweep: bool = False) -> dict[str, Any]:
     if include_sweep:
         rows, manifest = load_daily_sweep()
         all_rows["exploratory_daily"] = _summary(rows, manifest["tolerance_seconds"])
-        all_rows["exploratory_daily"]["classification"] = (
-            manifest["classification"]
-            if first_candidate_unchanged
-            else "exposed independent reference regression; not a blind trial of the current implementation"
-        )
+        all_rows["exploratory_daily"][
+            "classification"
+        ] = "exposed independent reference regression; not a blind trial"
     return {
         "method_id": "bazi_solar_equation_independent_audit_v1",
-        "candidate_sha256": candidate_hash,
         "equation_of_time_method": EQUATION_OF_TIME_METHOD,
-        "first_evaluated_candidate_sha256": first_candidate["candidate_sha256"],
-        "evaluation_classification": (
-            "first_candidate_regression_after_original_holdout"
-            if first_candidate_unchanged
-            else "current_implementation_on_exposed_independent_reference_not_blind"
-        ),
+        "evaluation_classification": "current_implementation_on_exposed_independent_reference_not_blind",
         "reference_sha256": hashlib.sha256(fixture.read_bytes()).hexdigest(),
         "tolerance_seconds": data["tolerance_seconds"],
         "comparisons": all_rows,
@@ -130,7 +110,7 @@ def audit_solar(include_sweep: bool = False) -> dict[str, Any]:
             r["failed_count"] == 0 for r in all_rows.values()
         ),
         "scope": "Equatorial Greenwich apparent-minus-mean solar clock only; UTC/UT1, date, zone and longitude assumptions remain explicit. Does not certify full calendars, classical rules, interpretation or life-event prediction.",
-        "independence": "JPL responses retained verbatim. Whole-year split and tolerance fixed before the first Meeus/NOAA candidate evaluation; that source and first report are archived separately. The merged Swiss implementation is evaluated on already exposed independent data, not assigned the former candidate's holdout status.",
+        "independence": "JPL responses retained verbatim. Whole-year split and tolerance fixed before the first Meeus/NOAA candidate evaluation; The current implementation is evaluated on already exposed independent data, not assigned the former candidate's holdout status.",
     }
 
 

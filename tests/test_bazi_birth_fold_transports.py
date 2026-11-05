@@ -10,11 +10,13 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_birth_fold import SHANGHAI
 from tests.test_bazi_birth_seconds import SPECS
 from tests.test_bazi_birth_seconds_transports import leaf, receipt_path
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.key)

@@ -119,26 +119,9 @@ def test_noble_tables_are_from_the_selected_edition_including_wu_exception():
     assert c.year_god_branches("戊", "子") == {"天贵": "丑", "玉贵": "未", "岁驾": "子"}
     assert c.year_god_branches("甲", "子") == {"天贵": "未", "玉贵": "丑", "岁驾": "子"}
     # 戊 follows 庚 here, so swapping every value from the legacy table fails.
-    legacy = guolao_moira.compute_god_signidx("戊", "子")
-    assert legacy["玉贵"] == 3  # 未, not the source's daytime 丑
     for invalid in ("", "甲乙", "X"):
         with pytest.raises(ValueError, match="年干"):
             c.year_god_branches(invalid, "子")
-
-
-def test_noble_correction_changes_a_concrete_compatibility_pattern():
-    # Synthetic sign positions: 卯 and 亥 flank 未 by four palaces.
-    # Lu Wei's 甲昼贵 is 未; the legacy helper's 甲昼贵 is 丑.
-    branches = c.year_god_branches("甲", "子")
-    branch_order = "戌酉申未午巳辰卯寅丑子亥"
-    source_gods = {k: branch_order.index(b) for k, b in branches.items()}
-    facts = {"planet_signidx": {"日": 7, "月": 11}, "is_day": True}
-    source_patterns = guolao_moira.calculate({**facts, "god_signidx": source_gods})
-    legacy_patterns = guolao_moira.calculate(
-        {**facts, "god_signidx": guolao_moira.compute_god_signidx("甲", "子")}
-    )
-    assert "日月拱贵人" in {p["name"] for p in source_patterns}
-    assert "日月拱贵人" not in {p["name"] for p in legacy_patterns}
 
 
 def test_purple_cycle_replays_source_arithmetic_without_fitting_a_modern_epoch():

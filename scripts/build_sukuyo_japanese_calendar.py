@@ -159,9 +159,9 @@ def normalize(files: dict[str, bytes], manifest: dict) -> tuple[dict, dict]:
     if checked != (last - first).days + 1 or len(nulls) != (ADVERTISED_END - last).days:
         raise ValueError("Source grid coverage disagrees with the declared domains")
     old_manifest = json.loads(
-        (ROOT / "tests/fixtures/sukuyo_hutime_v1/manifest.json").read_bytes()
+        (ROOT / "tests/data/sukuyo_hutime_v1/manifest.json").read_bytes()
     )
-    old_path = ROOT / "tests/fixtures/sukuyo_hutime_v1/captures.zip"
+    old_path = ROOT / "tests/data/sukuyo_hutime_v1/captures.zip"
     if (
         hashlib.sha256(old_path.read_bytes()).hexdigest()
         != old_manifest["archive_sha256"]
@@ -341,9 +341,12 @@ def main() -> None:
     parser.add_argument("--source-dir", type=Path)
     parser.add_argument("--metadata-dir", type=Path)
     parser.add_argument(
-        "--fixture", type=Path, default=ROOT / "tests/fixtures/sukuyo_hutime_daily_v1"
+        "--fixture", type=Path, default=ROOT / "tests/data/sukuyo_hutime_daily_v1"
     )
     parser.add_argument("--check", action="store_true")
+    parser.add_argument(
+        "--report", type=Path, help="Optional current admission report destination"
+    )
     args = parser.parse_args()
     if args.source_dir:
         if args.check or args.metadata_dir is None:
@@ -353,7 +356,6 @@ def main() -> None:
     bundle, report = normalize(files, manifest)
     for path, data in [
         (ROOT / "src/fatebridge/data/sukuyo_japanese_daily_v1.json", bundle),
-        (ROOT / "docs/validation/sukuyo-japanese-daily-admission.json", report),
     ]:
         text = json.dumps(data, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
         if args.check:
@@ -361,6 +363,10 @@ def main() -> None:
                 raise SystemExit(f"Daily reference drift: {path}")
         else:
             path.write_text(text)
+    if args.report:
+        args.report.write_text(
+            json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
+        )
     print(
         json.dumps(
             {

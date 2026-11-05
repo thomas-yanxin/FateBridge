@@ -27,7 +27,7 @@ ROOT = Path(__file__).parents[1]
 def test_all_216_replacement_source_rows_are_original_numbers_not_engine_outputs():
     original = json.loads(
         (
-            ROOT / "tests/fixtures/fengshui_replacement_diagrams_v1/reference.json"
+            ROOT / "tests/data/fengshui_replacement_diagrams_v1/reference.json"
         ).read_text()
     )
     data = json.loads(source_comparison.DATA.read_text())
@@ -234,36 +234,7 @@ def test_replacement_source_facts_are_identical_on_rest_mcp_cli(
     )
 
 
-def test_both_actual_archived_v29_readings_still_verify_without_regeneration():
-    folder = ROOT / "tests/fixtures/fengshui_replacement_runtime_v1"
-    manifest = json.loads((folder / "manifest.json").read_text())
-    raw_receipts = (folder / "legacy-receipts.json").read_bytes()
-    assert hashlib.sha256(raw_receipts).hexdigest() == manifest["receipts_sha256"]
-    receipts = json.loads(raw_receipts)
-    for record in manifest["records"]:
-        raw = (folder / record["file"]).read_bytes()
-        assert hashlib.sha256(raw).hexdigest() == record["sha256"]
-        original = gzip.decompress(raw)
-        assert (
-            hashlib.sha256(original).hexdigest() == record["original_response_sha256"]
-        )
-        payload = json.loads(original)
-        assert record["source_profile"] == "shen_2011_lower_numeric_comparison_v1"
-        assert (
-            verify_fengshui_reading(
-                payload, trusted_run_metadata=receipts[record["file"]]
-            )["status"]
-            == "verified_served_fixed_reading"
-        )
-
-
-def test_generator_preserves_old_freeze_and_builds_new_profile_without_engine_import():
-    before = hashlib.sha256(
-        (
-            ROOT / "src/fatebridge/data/fengshui/shen-lower-source-comparison-v1.json"
-        ).read_bytes()
-    ).hexdigest()
-    assert before == "6bc0a2d7f559fff1bbbebc0e77d96deff8a8f7159ec85cc3ba3aba18115beb82"
+def test_generator_builds_current_source_profile_without_engine_import():
     process = subprocess.run(
         [sys.executable, "scripts/build_fengshui_source_comparison.py", "--check"],
         capture_output=True,

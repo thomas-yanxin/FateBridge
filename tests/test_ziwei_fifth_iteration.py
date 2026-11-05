@@ -41,22 +41,11 @@ def test_primary_day_tables_separate_coverage_conflicts_and_derived_cases():
     ]
 
 
-def test_original_failed_comparison_and_transcription_drafts_are_retained():
+def test_original_transcription_and_unresolved_printed_conflicts_are_retained():
     root = days_audit.FIXTURES / "naj_ming_day_tables_v1"
     source = json.loads((root / "collation.json").read_text())
     initial = (root / "collation-pre-adjudication.json").read_bytes()
     assert hashlib.sha256(initial).hexdigest() == source["initial_collation_sha256"]
-    forensic = root / source["initial_comparison_report"]
-    assert (
-        hashlib.sha256(forensic.read_bytes()).hexdigest()
-        == source["initial_comparison_report_sha256"]
-    )
-    report = json.loads(forensic.read_text())
-    assert report["status"] == "failed"
-    assert len(report["mismatches"]) == 4
-    assert (
-        report["initial_source_collation_sha256"] == source["initial_collation_sha256"]
-    )
     draft = json.loads((root / "wood3-manual-before-comparison.json").read_text())
     assert "十一" in draft["literal_days_by_branch"]["巳"]
     final = next(t for t in source["tables"] if t["bureau"] == 3)
@@ -133,7 +122,7 @@ def test_rewriting_runtime_source_data_cannot_change_frozen_readings(
 
 
 def test_source_glyph_adjudication_requires_the_actual_image_bytes(tmp_path):
-    destination = tmp_path / "checkout/tests/fixtures/ziwei_independent"
+    destination = tmp_path / "checkout/tests/data/ziwei_independent"
     source = days_audit.FIXTURES / "naj_ming_day_tables_v1"
     copied = destination / source.name
     copied.mkdir(parents=True)

@@ -68,7 +68,7 @@ class PhysicalEphemerisTrace:
         # Analytical fallback can leave old Swiss slots populated. Do not
         # attribute those stale contexts to a Moshier calculation.
         if model in {"swieph", "jpl"} and getter is not None:
-            for slot in ((0,) if model == "jpl" else (0, 1)):
+            for slot in (0,) if model == "jpl" else (0, 1):
                 filename, start, end, de_number = getter(slot)
                 if not filename:
                     continue
@@ -100,8 +100,17 @@ class PhysicalEphemerisTrace:
                         "filename": path.name,
                         "sha256": digest,
                         "bytes": size,
-                        "start_julian_day_tt": float(start),
-                        "end_julian_day_tt": float(end),
+                        "range_time_scale": "TDB" if model == "jpl" else "TT",
+                        (
+                            "start_julian_day_tdb"
+                            if model == "jpl"
+                            else "start_julian_day_tt"
+                        ): float(start),
+                        (
+                            "end_julian_day_tdb"
+                            if model == "jpl"
+                            else "end_julian_day_tt"
+                        ): float(end),
                         "de_number": int(de_number),
                         "matches_packaged_manifest": bool(
                             expected
@@ -186,7 +195,6 @@ def jpl_time_scale_policy() -> Dict[str, Any]:
         "raw_header_time_scale": "TDB",
         "tt_tdb_conversion_applied": False if inspected else None,
         "source_documented_maximum_difference_seconds": 0.002 if inspected else None,
-        "legacy_tt_range_fields": "Raw TDB header bounds retained under historical TT field names for compatibility; not converted TT bounds",
         "source_function": "pyswisseph2.10.3.2/libswe/sweph.c:jplplan",
         "source_url": "https://ssd.jpl.nasa.gov/doc/de440_de441.html",
         "native_source_url": "https://github.com/astrorigin/swisseph/blob/696bda432298d482d27e67a0cf1238920301a7dd/sweph.c",

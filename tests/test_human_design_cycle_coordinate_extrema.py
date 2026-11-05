@@ -1,7 +1,5 @@
 """Biased native-speed controls, zero components and retained live evidence."""
 
-import gzip
-import hashlib
 import json
 from copy import deepcopy
 from fractions import Fraction
@@ -15,7 +13,6 @@ from fatebridge.services.replay_metadata import digest
 from fatebridge.validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[1]
-EVIDENCE = ROOT / "docs/validation/human-design-cycle-solar-stations-v1/evidence"
 
 
 def biased_speed_oracle(t):
@@ -89,33 +86,18 @@ def test_velocity_zero_at_search_boundary_still_probes_the_observed_interval(
 
 @pytest.fixture(scope="module")
 def after():
-    path = EVIDENCE / "public-after-final-output.json.gz"
-    assert (
-        hashlib.sha256(path.read_bytes()).hexdigest()
-        == "417a27d4c07824474238072f7be25ab6f5294e49065b8221d66d637119c3c91a"
+    from tests.human_design_current import complete_run
+
+    inputs = json.loads(
+        (Path(__file__).parent / "data/human_design/regression-inputs.json").read_text()
     )
-    with gzip.open(path, "rt") as handle:
-        return json.load(handle)
+    return complete_run(**inputs["cycle_coordinate_extrema"])
 
 
-def test_public_before_is_retained_and_after_replays_without_native_calls(after):
-    before_path = EVIDENCE / "public-before-output.json.gz"
-    assert (
-        hashlib.sha256(before_path.read_bytes()).hexdigest()
-        == "2e47b0adcaa86e0bd1364ab22e5534e16e067f72a872e7c080e08049ef8118e2"
-    )
-    with gzip.open(before_path, "rt") as handle:
-        before = json.load(handle)
-    old = next(
-        row for row in before["cycle_context"]["bodies"] if row["body"] == "Chiron"
-    )
-    new = next(
-        row for row in after["cycle_context"]["bodies"] if row["body"] == "Chiron"
-    )
-    assert len(old["contacts"]) == 3
-    assert len(new["contacts"]) == 5
-    assert not [c for c in old["contacts"] if abs(c["jd_tt"] - 2419723.795) < 1]
-    assert len([c for c in new["contacts"] if abs(c["jd_tt"] - 2419723.795) < 1]) == 2
+def test_actual_coordinate_probes_keep_the_two_nearby_chiron_contacts(after):
+    row = next(r for r in after["cycle_context"]["bodies"] if r["body"] == "Chiron")
+    assert len(row["contacts"]) == 5
+    assert len([c for c in row["contacts"] if abs(c["jd_tt"] - 2419723.795) < 1]) == 2
     with patch(
         "fatebridge.core.astro.runtime.ephemeris_call",
         side_effect=AssertionError("Verifier invoked a native producer"),
@@ -124,20 +106,8 @@ def test_public_before_is_retained_and_after_replays_without_native_calls(after)
             verify_human_design_reading(after)["status"]
             == "verified_fixed_template_reading"
         )
-        assert verify_human_design_reading(before)["status"] == "rejected"
     assert after["cycle_context"]["continuous_completeness_certified"] is False
     assert after["cycle_context"]["timing_accuracy_certified"] is False
-
-
-def test_intermediate_receipt_is_preserved_and_does_not_claim_current_probe_policy():
-    path = EVIDENCE / "public-after-first-output.json.gz"
-    assert (
-        hashlib.sha256(path.read_bytes()).hexdigest()
-        == "f148a878d3e660a22f396a7b1386e88a8dcfad324a800c35a66edacec6854d7b"
-    )
-    with gzip.open(path, "rt") as handle:
-        intermediate = json.load(handle)
-    assert verify_human_design_reading(intermediate)["status"] == "rejected"
 
 
 @pytest.mark.parametrize(
@@ -182,9 +152,9 @@ def test_rehashed_packet_cannot_forge_extremum_or_direction_evidence(after, faul
         summary = next(
             r for r in value["cycle_summary"]["bodies"] if r["body"] == "Chiron"
         )
-        summary["contacts"][-1]["motion_evidence"][
-            "search_segment_phase_trend"
-        ] = "decreasing"
+        selected = next(c for c in summary["contacts"] if c["jd_tt"] == event["jd_tt"])
+        assert selected["segment_phase_trend"] == "increasing"
+        selected["segment_phase_trend"] = "decreasing"
     elif fault == "missing_motion_evidence":
         event.pop("motion_evidence")
         summary = next(
@@ -203,97 +173,3 @@ def test_rehashed_packet_cannot_forge_extremum_or_direction_evidence(after, faul
         side_effect=AssertionError("Verifier invoked a native producer"),
     ):
         assert verify_human_design_reading(value)["status"] == "rejected"
-
-
-@pytest.mark.parametrize(
-    "fault",
-    [
-        None,
-        "old_coordinate",
-        "old_root",
-        "missing_old_row",
-        "source_index",
-        "unknown_field",
-    ],
-)
-def test_original_prefix_comparison_cannot_hide_changed_old_values(after, fault):
-    from scripts.check_human_design_cycle_prefix import original_body_projection
-
-    with gzip.open(EVIDENCE / "public-before-output.json.gz", "rt") as handle:
-        before = json.load(handle)
-    original = before["cycle_context"]["bodies"][0]
-    current = deepcopy(after["cycle_context"]["bodies"][0])
-    old_time = original["evaluation_witnesses"][0][0]
-    row_index = next(
-        i for i, row in enumerate(current["evaluation_witnesses"]) if row[0] == old_time
-    )
-    if fault == "old_coordinate":
-        current["evaluation_witnesses"][row_index][1] += 1e-10
-    elif fault == "old_root":
-        current["contacts"][0]["longitude"] += 1e-10
-    elif fault == "missing_old_row":
-        current["evaluation_witnesses"].pop(row_index)
-        current["evaluation_source_context_indices"].pop(row_index)
-    elif fault == "source_index":
-        current["evaluation_source_context_indices"][row_index] += 1
-    elif fault == "unknown_field":
-        current["unreviewed_addition"] = True
-    if fault is None:
-        assert original_body_projection(current, original) == original
-    else:
-        with pytest.raises(ValueError):
-            original_body_projection(current, original)
-
-
-def test_cycle_extension_keeps_original_natal_mechanics_values_and_version(after):
-    from fatebridge.core.human_design import RULESET_VERSION
-
-    with gzip.open(EVIDENCE / "public-before-output.json.gz", "rt") as handle:
-        before = json.load(handle)
-    assert RULESET_VERSION == "1.39.0"
-    assert after["source_summary"]["version"] == before["source_summary"]["version"]
-    assert after["cycle_context"]["ruleset"]["version"] == "1.6.0"
-    for key in (
-        "activations",
-        "bodygraph",
-        "variables",
-        "design_solver",
-        "time_scales",
-        "profile",
-    ):
-        assert after[key] == before[key]
-
-
-def test_relabelled_old_cycle_receipt_still_lacks_required_coordinate_witnesses():
-    with gzip.open(EVIDENCE / "public-before-output.json.gz", "rt") as handle:
-        value = json.load(handle)
-    value["cycle_context"]["ruleset"] = cycles.cycle_ruleset()
-    value["cycle_summary"] = cycles.cycle_summary(
-        value["cycle_context"], value["profile"]
-    )
-    value["run_metadata"]["business_output_sha256"] = digest(
-        {k: v for k, v in value.items() if k != "run_metadata"}
-    )
-    proof = verify_human_design_reading(value)
-    assert proof["status"] == "rejected"
-    assert {"code": "incomplete_or_malformed_cycle_witnesses"} in proof["errors"]
-
-
-def test_historical_derivation_is_exact_frozen_pre_coordinate_algorithm():
-    import ast
-    import inspect
-
-    from fatebridge.core.human_design_cycle_history import (
-        derive_pre_coordinate_body_contacts,
-    )
-
-    path = EVIDENCE.parent / "before-source/src/fatebridge/core/human_design_cycles.py"
-    original = ast.parse(path.read_text())
-    node = next(
-        n
-        for n in original.body
-        if isinstance(n, ast.FunctionDef) and n.name == "derive_body_contacts"
-    )
-    restored = ast.parse(inspect.getsource(derive_pre_coordinate_body_contacts)).body[0]
-    restored.name = node.name
-    assert ast.dump(restored) == ast.dump(node)

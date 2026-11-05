@@ -1,0 +1,185 @@
+{
+  "scene": "workstation",
+  "methods": [],
+  "workstation_layout": {
+    "scene": {
+      "frame_id": "synthetic-office-plan",
+      "units": "m",
+      "boundary": {
+        "vertices": [
+          {
+            "x": -3,
+            "y": -3
+          },
+          {
+            "x": 3,
+            "y": -3
+          },
+          {
+            "x": 3,
+            "y": 3
+          },
+          {
+            "x": -3,
+            "y": 3
+          }
+        ]
+      },
+      "observation_basis": "user_confirmed",
+      "evidence": "合成验收场景；不是实际用户工位",
+      "inventory_confirmed": true,
+      "coordinate_uncertainty_m": 0,
+      "bodies": [
+        {
+          "object_id": "desk",
+          "kind": "desk",
+          "footprint": {
+            "center": {
+              "x": 0,
+              "y": 0
+            },
+            "width_m": 2,
+            "depth_m": 1,
+            "rotation_degrees": 0
+          },
+          "bottom_m": 0,
+          "top_m": 0.75,
+          "blocks_view": false
+        },
+        {
+          "object_id": "movable",
+          "kind": "screen",
+          "footprint": {
+            "center": {
+              "x": 0.1,
+              "y": -1
+            },
+            "width_m": 0.1,
+            "depth_m": 0.1,
+            "rotation_degrees": 0
+          },
+          "bottom_m": 0,
+          "top_m": 2,
+          "blocks_view": true
+        }
+      ],
+      "openings": [],
+      "solid_backing_segments": [],
+      "seats": [
+        {
+          "desk_id": "desk",
+          "offset": {
+            "x": 0,
+            "y": -2
+          },
+          "facing_offset_degrees": 0,
+          "body_width_m": 0.5,
+          "body_depth_m": 0.5,
+          "eye_height_m": 1.2,
+          "head_height_m": 1.4,
+          "view_half_angle_degrees": 80,
+          "operating_zone": {
+            "center": {
+              "x": 0,
+              "y": -2
+            },
+            "width_m": 0.7,
+            "depth_m": 0.6,
+            "rotation_degrees": 0
+          },
+          "entrance_id": null,
+          "activity": "work",
+          "sector_anchor": "seat"
+        }
+      ],
+      "desktops": [
+        {
+          "desk_id": "desk",
+          "ruleset_ids": [],
+          "items": [
+            {
+              "object_id": "display",
+              "footprint": {
+                "center": {
+                  "x": 0,
+                  "y": 0
+                },
+                "width_m": 0.8,
+                "depth_m": 0.1
+              },
+              "height_m": 0.8,
+              "blocks_view": true,
+              "representation": "other",
+              "representation_basis": "measured",
+              "evidence": "Synthetic display; no placement prescription",
+              "screen": {
+                "center": {
+                  "x": 0,
+                  "y": 0
+                },
+                "front_degrees": 180,
+                "width_m": 0.8,
+                "height_m": 0.6,
+                "bottom_above_desktop_m": 0.2,
+                "required_visible": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "search": {
+      "domains": [
+        {
+          "object_id": "movable",
+          "grid": {
+            "origin": {
+              "x": 0.1,
+              "y": -1
+            },
+            "step_x_m": 1,
+            "step_y_m": 1,
+            "center_region": {
+              "vertices": [
+                {
+                  "x": 0,
+                  "y": -1.1
+                },
+                {
+                  "x": 1.2,
+                  "y": -1.1
+                },
+                {
+                  "x": 1.2,
+                  "y": -0.9
+                },
+                {
+                  "x": 0,
+                  "y": -0.9
+                }
+              ]
+            }
+          },
+          "rotations_degrees": [
+            0
+          ]
+        }
+      ],
+      "max_results": 10
+    }
+  },
+  "layout_constraints": [
+    {
+      "object_id": "display",
+      "can_relocate": true,
+      "can_rotate": true,
+      "evidence": "Synthetic explicit permission"
+    },
+    {
+      "object_id": "movable",
+      "can_relocate": true,
+      "can_rotate": true,
+      "evidence": "合成场景明确许可；不是现场动作授权"
+    }
+  ]
+}

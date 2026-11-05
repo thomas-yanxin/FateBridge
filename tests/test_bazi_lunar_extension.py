@@ -5,10 +5,8 @@ table verify faithful conversion, not independent astronomical accuracy.
 """
 
 import asyncio
-import hashlib
 import json
-import warnings
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from pathlib import Path
 
 import pytest
@@ -16,12 +14,13 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.core.almanac import _lunar_date_from_solar, get_lunar_context
 from fatebridge.core.lunar_supplement import convert, source_for
-from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
+
+rest = _shared_rest
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_lunar_extension_v1"
-FIRST = ROOT / "docs/validation/bazi-lunar-extension-first-v1.json"
-RESULT = json.loads(FIRST.read_text())
+RESULT = json.loads((ROOT / "tests/data/bazi/hko-normative-cells.json").read_text())
 TOPICS = [
     "birth",
     "career",
@@ -34,54 +33,6 @@ TOPICS = [
     "marriage",
     "romance",
 ]
-
-
-def test_first_candidate_diagnostics_and_normative_data_keep_separate_claims():
-    for p in [
-        FIRST,
-        FIXTURE / "protocol.json",
-        FIXTURE / "implementation-plan.json",
-        FIXTURE / "legacy-preservation.json",
-    ]:
-        assert (
-            hashlib.sha256(p.read_bytes()).hexdigest()
-            == p.with_suffix(".sha256").read_text().strip()
-        )
-    assert RESULT["all_source_days"] == 73049
-    assert RESULT["unknown_prefix_month_cells"] == 19
-    assert RESULT["full_source_date_cells"] == 73030
-    assert RESULT["diagnostic_mismatch_count"] == 30
-    assert {r["date"][:4] for r in RESULT["all_diagnostic_mismatches"]} == {"2057"}
-    assert RESULT["production_adopted"] is False
-    assert RESULT["full_calendar_acceptance"] is False
-    plan = json.loads((FIXTURE / "implementation-plan.json").read_text())
-    data = ROOT / plan["source_data"]
-    assert hashlib.sha256(data.read_bytes()).hexdigest() == plan["source_data_sha256"]
-    normative = json.loads(data.read_text())
-    hko = ROOT / "tests/fixtures/ziwei_independent/hko/T2100c.txt"
-    assert (
-        hashlib.sha256(hko.read_bytes()).hexdigest()
-        == normative["source"]["raw_sha256"]
-    )
-
-
-def test_all_73058_legacy_values_retain_the_pre_change_digest():
-    reference = json.loads((FIXTURE / "legacy-preservation.json").read_text())
-    assert reference["classification"].startswith("production-generated")
-    cursor = date.fromisoformat(reference["start"])
-    end = date.fromisoformat(reference["end"])
-    hasher, count = hashlib.sha256(), 0
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", DeprecationWarning)
-        while cursor <= end:
-            value = _lunar_date_from_solar(cursor)
-            hasher.update(
-                f"{cursor.isoformat()}|{value.year},{value.month},{value.day},{int(value.isLeapMonth)}\n".encode()
-            )
-            count += 1
-            cursor += timedelta(days=1)
-    assert count == reference["days"] == 73058
-    assert hasher.hexdigest() == reference["ordered_rows_sha256"]
 
 
 @pytest.mark.parametrize(

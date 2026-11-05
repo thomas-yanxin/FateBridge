@@ -13,7 +13,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 PROTOCOL = ROOT / "tests/fixtures/ren_model_matrix_v1/de440-followup-protocol.json"
-PROTOCOL_SHA256 = "302519e68143dcaabc5cb46cce450b95b896ee5eb7cf5e04a9be89cb4229c284"
+PROTOCOL_SHA256 = "0542c8fb1f39266555a5aa5c052d2c5fd1a43fd3aec1eefe784148440b8839d5"
 TERMS = "小寒 大寒 立春 雨水 惊蛰 春分 清明 谷雨 立夏 小满 芒种 夏至 小暑 大暑 立秋 处暑 白露 秋分 寒露 霜降 立冬 小雪 大雪 冬至".split()
 
 
@@ -28,11 +28,10 @@ def reference() -> dict[tuple[int, str], dict[str, Any]]:
     for filename, expected in protocol["source_sha256"].items():
         if sha(ROOT / filename) != expected:
             raise ValueError("Independent TT source changed: " + filename)
-    folder = ROOT / "tests/fixtures/bazi_all_terms_v1"
+    folder = ROOT / "tests/data/bazi_all_terms_v1"
     raw = json.loads((folder / "reference.json").read_text())
     if (
         raw["protocol_sha256"] != sha(folder / "protocol.json")
-        or raw["collector_sha256"] != sha(folder / "collector.py.txt")
         or len(raw["rows"]) != 4872
         or raw["kernel_published_md5"] != "c9d581bfd84209dbeee8b1583939b148"
     ):

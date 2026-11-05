@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from fractions import Fraction
 from typing import Any
 
 from mpmath import mp  # type: ignore[import-untyped]
@@ -38,15 +39,22 @@ def _phase(
     latitude: float,
     armc: float,
     obliquity: float,
-    longitude: float,
+    longitude: float | Fraction,
     house_code: bytes,
     digits: int,
 ) -> tuple[Any, Any]:
     ctx = mp.clone()
     ctx.dps = digits
-    phi, theta, eps, lam = [
-        ctx.mpf(v) * ctx.pi / 180 for v in (latitude, armc, obliquity, longitude)
-    ]
+    phi, theta, eps = [ctx.mpf(v) * ctx.pi / 180 for v in (latitude, armc, obliquity)]
+    lam = (
+        (
+            ctx.mpf(longitude.numerator) / longitude.denominator
+            if isinstance(longitude, Fraction)
+            else ctx.mpf(longitude)
+        )
+        * ctx.pi
+        / 180
+    )
     east = -ctx.sin(theta) * ctx.cos(lam) + ctx.cos(theta) * ctx.cos(eps) * ctx.sin(lam)
     up = ctx.cos(phi) * (
         ctx.cos(theta) * ctx.cos(lam) + ctx.sin(theta) * ctx.cos(eps) * ctx.sin(lam)
@@ -65,7 +73,7 @@ def checked_house_plane_position(
     latitude: float,
     armc: float,
     obliquity: float,
-    longitude: float,
+    longitude: float | Fraction,
     house_code: bytes,
     native_position: float,
 ) -> HousePlanePosition:

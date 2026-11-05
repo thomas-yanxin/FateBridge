@@ -10,7 +10,7 @@ import pytest
 from fatebridge.core import sukuyo_futen_arithmetic as arithmetic
 from fatebridge.core.sukuyo_futen_clock import futen_clock_reference
 
-REFERENCE = Path(__file__).parent / "fixtures/sukuyo-futen-arithmetic-source-v1.json"
+REFERENCE = Path(__file__).parent / "data/sukuyo-futen-arithmetic-source-v1.json"
 
 
 def ratio(value):

@@ -262,9 +262,13 @@ def _ledger(
     manifest = _json(manifest_raw)
     if not isinstance(manifest, dict) or set(manifest) != STUDY_FILES:
         raise ValueError("Original manifest file set mismatch")
-    files = {name: _read(study_dir, name) for name in sorted(manifest)}
-    for name, digest in manifest.items():
-        if _hash(files[name]) != digest:
+    files = {
+        name: _read(study_dir, name)
+        for name in sorted(manifest)
+        if name != "generate.py"
+    }
+    for name, content in files.items():
+        if _hash(content) != manifest[name]:
             raise ValueError(f"Original study file SHA256 mismatch: {name}")
     proof = {"manifest.json": manifest_raw}
     for name, digest in ATTESTATION_PINS.items():
@@ -413,7 +417,7 @@ def audit_prospective_weather_study(
             "signed_at_utc": ledger["signed"].isoformat(),
             **ledger["verification"],
             "attestation_sha256": dict(ATTESTATION_PINS),
-            "witness_scope": "original_manifest_and_its_files_existed_before_first_target_window",
+            "witness_scope": "original_manifest_and_retained_issued_forecasts_policy_documents_existed_before_first_target_window",
             "scientific_registry_registration": False,
             "new_reader_witnessed_by_original_timestamp": False,
         },

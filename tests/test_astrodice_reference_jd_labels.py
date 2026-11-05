@@ -12,7 +12,10 @@ import pytest
 from scripts.audit_astrodice_horizons_wide_reference import DAY_US, input_tick
 from scripts.gen_astrodice_horizons_wide import julian_input_label
 
-FIXTURE = Path(__file__).parent / "fixtures/astrodice-local-interval-development-v1"
+FIXTURE = (
+    Path(__file__).parent
+    / "data/astrodice/reference_sets/fixture-local-interval-development-v1"
+)
 
 
 @pytest.mark.parametrize(

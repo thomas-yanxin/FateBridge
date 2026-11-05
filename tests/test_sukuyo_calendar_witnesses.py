@@ -15,7 +15,7 @@ from scripts.check_sukuyo_calendar_witnesses import verify_primary
 BEFORE = json.loads(
     (
         Path(__file__).parent
-        / "fixtures/sukuyo-calendar-witnesses-before-production-v70.json"
+        / "data/sukuyo-calendar-witnesses-before-production-v70.json"
     ).read_bytes()
 )
 

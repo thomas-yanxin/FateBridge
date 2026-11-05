@@ -772,8 +772,7 @@
       "ziwei_horoscope.nominal_age_calendar.basis",
       "ziwei_horoscope.nominal_age_calendar.timezone",
       "ziwei_horoscope.nominal_age_calendar.birth_lunar_year",
-      "ziwei_horoscope.nominal_age_calendar.target_lunar_year",
-      "ziwei_horoscope.nominal_age_calendar.difference_from_legacy"
+      "ziwei_horoscope.nominal_age_calendar.target_lunar_year"
     ],
     "astro_chart": [
       "angles",
@@ -1436,7 +1435,7 @@
   },
   "call_guidance": {
     "jinkou": {
-      "month_general_scope": "jinkou.overview.month_general是依中气确定的月将本位；兼容字段yuejiang是月将加时后落在地分的将神，对应四位将神行。两支可不同，解释分别说明，不将落地分的支称为中气月将本位。快照使用月将本位、将神落地分两个标签。",
+      "month_general_scope": "jinkou.overview.month_general是依中气确定的月将本位；yuejiang是月将加时后落在地分的将神，对应四位将神行。两支可不同，解释分别说明，不将落地分的支称为中气月将本位。快照使用月将本位、将神落地分两个标签。",
       "transmission_progression_scope": "探原PDF110–111三传连茹／间断：sequence_direction只指支序；raw_branch_empty_conditional_*仅在支神本空适用假设下释读，不把坐空或天将天空替代本空。effective_direction和comprehensive_judgement仍未裁定，不从进退字样推成败、概率或应期。",
       "published_term_dates_scope": "逐项读取实际solar_term_dependencies中的published_date_reference：按固定UTC+08对照香港天文台1901—2100逐日表，日期相符只表示同一天，不认证交气秒数或全部历法。date_mismatch保留两日期，不能称官方一致或移动交界凑表；outside_published_range是无资料，不能说相符或不符。与分析时区、真太阳钟、历史时间约定及未来闰秒假设分列，金口诀仍按同次四位解释。",
       "seasonal_evidence_scope": "探原季节五态用本次月建支，不用月将支。当前季月整月配置分别计算支神、天将固有五行和地盘五态，日干五态不替代它们。真空／半空只列支神本空与季节状态的条件，天空天将及坐空不替换本空；季末十八日异法、扶助冲剋及角色例外后的有效真半未裁，不把原文效力折扣说成成功率。金口诀本课与附带六壬分开，不能借本层代替金口诀日下五态或综合取用。",
@@ -1493,7 +1492,7 @@
     },
     "sanshiunited": {
       "scope": "按synthesis.time_scopes解释年/月/日/时计；palace_correspondences按真实方位联接五将与星门神，太乙宫数不可直接套奇门宫数。",
-      "options": "taiyi_options.calculation_mode选择year/month/day/hour；accNum/acc_num仅兼容0，日/时计不接受rotation覆盖阴阳遁。",
+      "options": "taiyi_options只接受calculation_mode=year/month/day/hour及对应year_profile/month_profile/hour_profile；阴阳遁和布盘方向由实际计法与日期计算。",
       "interpretation": "三式共用输入与历法，不能当三份独立证据；未定义统一事件规则，不输出综合胜率。",
       "sources": "首读source_profiles保留实际规则版本、作者、原典链接及未决条数；完整未决内容按source_path回原盘rulesets/ruleset读取，摘要不表示已全书验收。",
       "conditions": "五将/门具问题读取conditions视图（合参taiyi_conditions）；全部阻断按同次patterns路径解释。年/月计以实际门盘合取；时计三门未评估/null不能改成满足。即使两层满足也不推出实际成败。",
@@ -1544,7 +1543,8 @@
       "method_reference": "纯方法/职业家具参考可用scene=home作通用家居参考查询标签，analyze_layout=false，按问题显式methods并投影method_details；年度对照仅加实际effective_year或确认的query_at。无真实环境事实时省略environmental_context，不提交空对象或仅household_scope。scene不生成房屋/房间/观察/摆位结论；household_scope=symbolic_reference只用于已给household_members的家庭象意，不等于通用reference_only。",
       "interpretation": "先解释已有依据，再给条件式建议；照片候选不升级事实，但不等待全部complete或动作ready才解释。analysis_progress.interpretation_status区分available/conditional/scope_only/insufficient_evidence；follow_up.conclusion_candidates只择会改变当前所问结论的缺项追问，execution_only仅用于落实动作。未实现或无规则直接说明，不反复索取资料；计算定宫与宅运校验保留，边界简述一次。",
       "workstation_review": "工位工作/学习用途用 environmental_context.workstation_review.activities，逐项显式选 workstation_activity_authored_v1 并给实际活动/证据；按 placements.location_direction 读取各候选宅盘向星，位置与朝向分开，不要求外部有水或桌上放水。评价运可用该review.evaluation_period独立确认，不以日期/宅运代替。入口隔挡用 entry_barriers 显式 afsi_entry_barrier_v1，分别登记实际入口/桌/隔挡、两端直线与隔挡介入观察及 operation；执行许可和通行/视野/操作/容纳独立。fields追加layout_analysis.workstation_analysis，rulesets/rule_trace保留。WOFS桌面只作reference_only，不开启固定吉位。",
-      "material_application": "material_facts.application显式选afsi_application_conditions_v1；有明确element_use才核相应水体清洁/流动、金属暴露/定性尺度或植物健康，各条件用value/observation_basis/evidence独立证据。target_request_id可引用本轮element_adjustments.request_id，只有实际算出的introduced_element才可绑定；资格、条件、目标绑定、实际位置、剂量和效力分开，不因条件确认返回ready。摆位候选须重核已有application的条件和目标，不能换目标或漏旧属性。"
+      "material_application": "material_facts.application显式选afsi_application_conditions_v1；有明确element_use才核相应水体清洁/流动、金属暴露/定性尺度或植物健康，各条件用value/observation_basis/evidence独立证据。target_request_id可引用本轮element_adjustments.request_id，只有实际算出的introduced_element才可绑定；资格、条件、目标绑定、实际位置、剂量和效力分开，不因条件确认返回ready。摆位候选须重核已有application的条件和目标，不能换目标或漏旧属性。",
+      "workstation_measured": "有实际尺寸的人工标注用workstation_layout.scene；+y图纸前方、桌面+x右/+y远沿，米制尺寸/高度/眼高/头顶高分别明确。compass独立提供北基准、角误差、参考中心和chart_binding_confirmed，sector_anchor明确坐者或桌中心；不自动立极。照片/坐标误差保持候选，清单不完整时未列观察仍未知。search提供完整有限位置/角度域，复用layout_constraints搬转许可；实测同一对象不重复提交placements/form_observations/features或旧关系。fields按需追加layout_analysis.workstation_layout_analysis；保留全部search.receipts、拒绝与未显示前沿数量，不把ready或Pareto集合解释为风水总分。BTB与wofs_desktop_compass_v1须逐个明确另选；植物身份、状态及几何分别核对，向星不等于坐向或桌面水体需求。 搜索域可用positions或grid二选一；grid明确原点和步长，默认从房间/桌面生成中心候选。竖直屏幕可在items[].screen实测，检查整面透视遮挡，required_visible明确是否硬约束，不推断眩光。算法完工审查读取research_completion_status/research_coverage；请求complete不代表完整81或24山已完成。"
     },
     "western_timing_analysis": {
       "target_clock": "analysis_hour/minute 是目标钟时，按 birth_timezone；显式0有效。省略分别沿用出生小时/分钟，仅兼容日期级调用。return_timezone转换同一时刻。",
@@ -8946,6 +8946,15 @@
           "analysis_reference"
         ],
         "when": "核对同次完整分析瞬间、UTC偏移/fold及分析日期的补齐来源；不把默认月初、月中或整点当成当前。"
+      },
+      "life_index": {
+        "fields": [
+          "life_dimensions",
+          "life_dimensions_assessment",
+          "analysis_reference"
+        ],
+        "label": "五维规则索引与实际计算范围",
+        "purpose": "核对连续标度版本、参与层、不可用大运及未知爱情。不同层集合不可直接比较，规则索引不是概率或心理测量；视图名不是请求参数。"
       }
     },
     "bazi_source_compare": {
@@ -9031,6 +9040,30 @@
           "reference_details"
         ],
         "scope": "For domain=heluo/canping only. Preserve original source identity, actual column and part-specific review status. Reference roles do not select personal applicability or dated periods. Full source objects remain in reference_details.record; use fields=null for a complete export and read the same retained delivery."
+      }
+    },
+    "fengshui_assess": {
+      "measured_workstation": {
+        "fields": [
+          "layout_analysis.workstation_layout_analysis.research_coverage",
+          "layout_analysis.workstation_layout_analysis.research_completion_status",
+          "layout_analysis.workstation_layout_analysis.geometry",
+          "layout_analysis.workstation_layout_analysis.readings",
+          "layout_analysis.workstation_layout_analysis.rule_comparisons",
+          "coverage.analysis_progress",
+          "rulesets",
+          "rule_trace"
+        ],
+        "scope": "Requires workstation_layout. Measured facts, source-scoped role/period conditions and independently selected desktop rules. Preserve unknowns, coordinate frames and source disagreement; view name is not a request parameter."
+      },
+      "measured_workstation_search": {
+        "fields": [
+          "layout_analysis.workstation_layout_analysis",
+          "coverage.analysis_progress",
+          "rulesets",
+          "rule_trace"
+        ],
+        "scope": "Requires explicit workstation_layout.search. Preserve every finite-search receipt and rejection, frontier IDs and display omissions. Read deferred evidence from the same run; ready only describes geometry and action permissions, not universal auspiciousness."
       }
     }
   }

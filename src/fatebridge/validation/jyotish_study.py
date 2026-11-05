@@ -126,17 +126,7 @@ def seal_forecasts(
         for f in forecasts
     ):
         raise ValueError("预测早于实际注册封存时刻")
-    serialized = []
-    for forecast in forecasts:
-        payload = forecast.model_dump(mode="json")
-        # Retain the exact v1 packet shape for legacy omitted bindings. An
-        # explicit null stays explicit; a supplied commitment is never removed.
-        if (
-            forecast.study_plan_sha256 is None
-            and "study_plan_sha256" not in forecast.model_fields_set
-        ):
-            payload.pop("study_plan_sha256")
-        serialized.append(payload)
+    serialized = [forecast.model_dump(mode="json") for forecast in forecasts]
     body = {
         "format": "jyotish_blind_forecasts_v1",
         "registration_sha256": registration["registration_sha256"],

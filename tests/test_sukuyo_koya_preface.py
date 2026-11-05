@@ -194,7 +194,7 @@ def test_modern_transcription_is_bound_to_preface_images_and_keeps_new_uncertain
 
 
 def test_raw_naoj_month_starts_independently_locate_all_three_named_labels():
-    base = Path(__file__).parent / "fixtures/sukuyo_historical_calendar_v1"
+    base = Path(__file__).parent / "data/sukuyo_historical_calendar_v1"
     manifest = json.loads((base / "manifest.json").read_bytes())
     expected = [
         (806, 1, 2, "0806-01-29"),

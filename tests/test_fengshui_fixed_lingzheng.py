@@ -23,7 +23,7 @@ from fatebridge.validation.fengshui_lingzheng import audit_lingzheng_reference
 from tests.test_fengshui_surfaces import mcp_call, rest_client, without_transport
 
 DIRS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
-REF = Path(__file__).parent / "fixtures/fengshui_lingzheng_v1/reference.json"
+REF = Path(__file__).parent / "data/fengshui_lingzheng_v1/reference.json"
 
 
 def observation(direction, **facts):

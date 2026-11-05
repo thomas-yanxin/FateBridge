@@ -147,10 +147,13 @@ def test_invalid_nested_inputs_fail_on_every_surface(
     )
 
 
-def test_partial_is_success_not_protocol_error(monkeypatch, capsys):
-    rest = rest_client(monkeypatch).post("/api/fengshui/assess", json={})
-    protocol = asyncio.run(mcp_call("assess", {}))
-    code = run(["fengshui_assess"])
+def test_partial_is_success_not_protocol_error(monkeypatch, capsys, tmp_path):
+    inputs = {"methods": ["bazhai", "jinsuo", "annual_stars"]}
+    rest = rest_client(monkeypatch).post("/api/fengshui/assess", json=inputs)
+    protocol = asyncio.run(mcp_call("assess", inputs))
+    path = tmp_path / "selected-layers.json"
+    path.write_text(json.dumps(inputs))
+    code = run(["fengshui_assess", "--request-file", str(path)])
     assert code == 0 and rest.status_code == 200 and not protocol.is_error
     assert json.loads(capsys.readouterr().out)["status"] == "partial"
     assert without_transport(rest.json()) == without_transport(

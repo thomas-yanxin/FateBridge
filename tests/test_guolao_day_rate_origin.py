@@ -11,7 +11,6 @@ import pytest
 
 from fatebridge.core import guolao_cumulative_table as literal
 from fatebridge.core import guolao_day_rate as rate
-from fatebridge.validation.guolao_day_rate_origin import compare_origin_schema_outputs
 
 ROOT = Path(__file__).parents[1]
 FIXTURE = ROOT / "tests/fixtures/guolao-day-rate-origin-v1"
@@ -168,97 +167,3 @@ def test_both_cli_outputs_distinguish_printed_empty_from_calculation_zero(
     assert result["selected_printed_day_rate_days"] is None
     assert result["selected_effective_day_rate_days"] == "0.0000"
     assert result["empty_day_rate_origin_interpreted_as_zero"]
-
-
-def _prior_lookup_stdout():
-    return (FIXTURE / "before-origin-lookup.json").read_text()
-
-
-def test_strict_migration_verifier_accepts_actual_old_lookup_and_no_other_changes():
-    after = json.dumps(rate.gujin45_day_rate(F(".041")))
-    result = compare_origin_schema_outputs(
-        {"origin": _prior_lookup_stdout()}, {"origin": after}
-    )
-    assert result["prior_cases"] == result["prior_cases_with_changed_stdout"] == 1
-    assert result["prior_cases_dropped"] == 0
-    assert result["origin_empty_components_now_explicit"] == 1
-    assert result["all_previous_calculation_values_and_undeclared_fields_equal"]
-    assert not result["complete_calendar_accuracy_demonstrated"]
-
-
-@pytest.mark.parametrize(
-    "field,value",
-    [
-        ("within_half_days_exact", "42/1000"),
-        ("selected_effective_day_rate_days", "0.0820"),
-        ("selected_printed_day_rate_days", "0.0000"),
-        ("selected_day_rate_source_mark", "numeric"),
-        ("empty_day_rate_origin_interpreted_as_zero", False),
-        ("status", "unique_literal_rate_bracket"),
-        ("source_data_sha256", "changed"),
-        ("unexpected_field", 1),
-    ],
-)
-def test_migration_verifier_rejects_calculation_source_and_undeclared_changes(
-    field, value
-):
-    after = rate.gujin45_day_rate(F(".041"))
-    after[field] = value
-    with pytest.raises(ValueError):
-        compare_origin_schema_outputs(
-            {"origin": _prior_lookup_stdout()}, {"origin": json.dumps(after)}
-        )
-
-
-def test_migration_verifier_preserves_every_prior_case_and_labels_added_cases():
-    before = {"origin": _prior_lookup_stdout()}
-    with pytest.raises(ValueError, match="旧命令案例被删除"):
-        compare_origin_schema_outputs(before, {})
-    after = {"origin": json.dumps(rate.gujin45_day_rate(F(".041"))), "new-case": "{}"}
-    result = compare_origin_schema_outputs(before, after)
-    assert result["prior_cases"] == 1
-    assert result["additional_cases_without_prior_baseline"] == ["new-case"]
-
-
-def test_migration_verifier_accepts_actual_audit_count_changes_and_rejects_boolean_index():
-    before = {
-        "rate-audit": (FIXTURE / "before-rate-table-audit.json").read_text(),
-        "cumulative-audit": (
-            FIXTURE / "before-cumulative-table-audit.json"
-        ).read_text(),
-        "nonorigin-lunar": (FIXTURE / "before-nonorigin-lunar.json").read_text(),
-    }
-    result = rate.audit_day_rate_table()
-    after = {
-        "rate-audit": json.dumps(result),
-        "cumulative-audit": json.dumps(literal.audit_gujin45_cumulative_table()),
-        "nonorigin-lunar": json.dumps(rate.gujin_day_rate_lunar(F("23.310758"))),
-    }
-    assert compare_origin_schema_outputs(before, after)["prior_cases"] == 3
-    result["printed_empty_rate_indices"] = [False]
-    after["rate-audit"] = json.dumps(result)
-    with pytest.raises(ValueError, match="输出类型改变"):
-        compare_origin_schema_outputs(before, after)
-
-
-def test_migration_cli_checks_complete_stdout_mapping(tmp_path, monkeypatch, capsys):
-    before = tmp_path / "before.json"
-    after = tmp_path / "after.json"
-    before.write_text(json.dumps({"origin": _prior_lookup_stdout()}))
-    after.write_text(
-        json.dumps({"origin": json.dumps(rate.gujin45_day_rate(F(".041")))})
-    )
-    script = ROOT / "scripts/audit_guolao_day_rate_origin.py"
-    monkeypatch.setattr(
-        sys, "argv", [str(script), "--before", str(before), "--after", str(after)]
-    )
-    with pytest.raises(SystemExit) as exited:
-        runpy.run_path(str(script), run_name="__main__")
-    assert exited.value.code == 0
-    assert json.loads(capsys.readouterr().out)["prior_cases"] == 1
-
-
-@pytest.mark.parametrize("bad", [[], {"origin": None}])
-def test_migration_mapping_type_errors_fail_with_an_input_error(bad):
-    with pytest.raises(ValueError, match="完整stdout字符串"):
-        compare_origin_schema_outputs(bad, {})

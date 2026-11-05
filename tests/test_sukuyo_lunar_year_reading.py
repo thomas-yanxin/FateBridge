@@ -8,7 +8,7 @@ import pytest
 
 from fatebridge.core.sukuyo import calendar_mansion, day_evidence
 
-HKO = Path(__file__).parent / "fixtures/ziwei_independent/hko"
+HKO = Path(__file__).parent / "data/ziwei_independent/hko"
 
 
 def test_primary_cny_rows_bind_the_two_lunar_years():

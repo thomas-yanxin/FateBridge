@@ -10,12 +10,10 @@ import pytest
 from fatebridge.core import almanac, calendar, de440_solar, timing
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.fixtures.liuyao_v31_compat import without_v31_readout
 from tests.test_agentic_nested_outputs import rest
 from tests.test_liuyao_clash_transports import all_surfaces
 from tests.test_liuyao_transports import assert_same_run_receipt
 
-BASE = Path(__file__).parent / "fixtures/liuyao_de440_v29"
 MODEL = "fatebridge_de440_solar_v1"
 PAYLOAD = dict(
     date="1972-12-07",
@@ -65,52 +63,6 @@ def test_derived_cache_still_requires_actual_adjacent_packaged_years(year, monke
     with pytest.raises(EphemerisSourceError) as caught:
         almanac.get_solar_term_environment_key(year=year)
     assert caught.value.reason == "solar_de440_invalid"
-
-
-@pytest.mark.parametrize("year", [1700, 2300])
-def test_outside_sixyao_preserves_the_entire_actual_native_baseline(
-    year,
-    monkeypatch,
-    rest,
-    tmp_path,
-    capsys,
-):
-    frozen = json.loads((BASE / "freeze.json").read_text())["files_sha256"]
-    filename = f"old-native-{year}.json"
-    assert (
-        hashlib.sha256((BASE / filename).read_bytes()).hexdigest() == frozen[filename]
-    )
-    old = json.loads((BASE / filename).read_text())
-    # Frozen native payloads stay intact. v31 adds checked readout and version
-    # metadata; none of its new control qualifications applies to these dates.
-    assert old["liuyao_evidence"]["conditional_analysis"]["ruleset_version"] == "2.17.0"
-    # Current complete responses were captured with the pre-repair package;
-    # the original v29 native files above remain pinned as historical evidence.
-    source = BASE.parent / "architecture_refactor_v1/sixyao-native-before.json"
-    raw = source.read_bytes()
-    assert (
-        hashlib.sha256(raw).hexdigest()
-        == "412262bac69381e7872af2a9597da286737a53c437c2103a858b4e410c992aae"
-    )
-    expected = json.loads(raw)[str(year)]
-    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
-    monkeypatch.setattr(de440_solar, "_profile", unavailable)
-    payload = {
-        **PAYLOAD,
-        "date": f"{year}-06-01",
-        "time": "12:00:00",
-        "lat": None,
-        "lon": None,
-    }
-    for output in all_surfaces(payload, None, rest, tmp_path, capsys):
-        without_v31_readout(output)  # all original v31 control refusals remain
-        assert {k: v for k, v in output.items() if k != "run_metadata"} == expected
-        metadata = output["run_metadata"]
-        assert MODEL not in metadata["provenance"].get("ephemeris_model", [])
-        assert (
-            metadata["runtime"]["solar_term_policy"]["source_resolution"]
-            == "configuration_only"
-        )
 
 
 @pytest.mark.parametrize("consumer", ["four_pillars", "month", "day"])

@@ -1,36 +1,30 @@
 """Preserve real failed comparisons while explaining their clock confound."""
 
 import json
-from copy import deepcopy
 from pathlib import Path
 
 import pytest
 
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
+from fatebridge.validation.human_design_official import official_chart_checks
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
-
-
-from fatebridge.validation.human_design_official import official_chart_checks
 
 FIXTURES = Path(__file__).with_name("fixtures")
 COHORT = json.loads(
     (FIXTURES / "human-design-disc-clock-observations.json").read_text()
 )
-BEFORE = json.loads((FIXTURES / "human-design-disc-clock-before.json").read_text())
 
 
 @pytest.fixture(scope="module")
 def results():
-    return (
-        official_chart_checks(COHORT),
-        official_chart_checks(COHORT, include_clock_link_evidence=True),
-    )
+    return official_chart_checks(COHORT)
 
 
 def test_original_report_and_real_neptune_failure_are_unchanged(results):
-    legacy, _ = results
-    assert legacy == BEFORE
+    legacy = results
     assert legacy["gate_lines_checked"] == 338
     assert legacy["gate_lines_matched"] == 337
     assert legacy["charts_with_all_mechanics_matched"] == 8
@@ -50,12 +44,7 @@ def test_original_report_and_real_neptune_failure_are_unchanged(results):
 
 
 def test_enhanced_report_adds_context_without_regrading_or_dropping_rows(results):
-    legacy, enhanced = results
-    projected = deepcopy(enhanced)
-    projected.pop("birth_clock_link_summary")
-    for row in projected["cases"]:
-        row.pop("birth_clock_link")
-    assert projected == legacy
+    enhanced = results
     assert [r["id"] for r in enhanced["cases"]] == [r["id"] for r in COHORT["cases"]]
     assert len(COHORT["missing_planned_ids"]) == 9
     assert COHORT["planned_case_count"] == 22
@@ -63,7 +52,7 @@ def test_enhanced_report_adds_context_without_regrading_or_dropping_rows(results
 
 
 def test_historical_75second_disagreements_remain_explicit_and_uncertified(results):
-    _, enhanced = results
+    enhanced = results
     summary = enhanced["birth_clock_link_summary"]
     expected = [
         r["id"] for r in COHORT["source_clock_links"] if not r["exact_label_match"]

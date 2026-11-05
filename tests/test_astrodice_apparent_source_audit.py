@@ -64,16 +64,6 @@ def test_complete_audit_entry_keeps_delivered_rate_failure(
             }
         )
     )
-    seal = tmp_path / "seal.json"
-    seal.write_text(
-        json.dumps(
-            {
-                "candidate_files": {},
-                "expected_derivative_method_id": "test-method",
-                "reference_sha256": hashlib.sha256(reference.read_bytes()).hexdigest(),
-            }
-        )
-    )
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", kernel.name)
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     flags = (
@@ -123,7 +113,9 @@ def test_complete_audit_entry_keeps_delivered_rate_failure(
     monkeypatch.setattr(
         grader, "orientation_derivative", lambda *args: (identity, [zero, zero], {})
     )
-    result = audit(tmp_path, tmp_path, reference, seal, 0)
+    result = audit(
+        tmp_path, tmp_path, reference, 0, expected_derivative_method_id="test-method"
+    )
     assert result["layers"]["position"]["status"] == PASS, result["layers"]["position"]
     numeric_status = FAIL if delivered_arcsec else PASS
     expected_status = (

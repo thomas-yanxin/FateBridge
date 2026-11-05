@@ -25,13 +25,15 @@ else:
 
 def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
     reading = read_origin_sources(corpus, root=root)
-    prior = root / "docs/validation"
-    v28 = json.loads(
-        (prior / "taiyi-jinjing-v28/report.json").read_text(encoding="utf-8")
-    )
-    v32 = json.loads(
-        (prior / "taiyi-jinjing-v32/report.json").read_text(encoding="utf-8")
-    )
+    if __package__:
+        from scripts.audit_taiyi_day_epoch import audit as day_epoch_audit
+        from scripts.audit_taiyi_lunation_chain import audit as lunation_audit
+    else:
+        from audit_taiyi_day_epoch import audit as day_epoch_audit
+        from audit_taiyi_lunation_chain import audit as lunation_audit
+
+    v28 = day_epoch_audit()
+    v32 = lunation_audit(root=root)
     given = reading["given_accumulation"]
     ming_day = reading["day_tokens"]["ncl_ming"]["explicit_day_ganzhi"]
     old_calendar = v28["calendar_cohort"]

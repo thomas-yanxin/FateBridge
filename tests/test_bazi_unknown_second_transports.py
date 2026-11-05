@@ -5,7 +5,8 @@ import json
 
 import pytest
 
-from tests.test_agentic_nested_outputs import AS_OF, business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import AS_OF, business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_birth_seconds import SPECS
 from tests.test_bazi_unknown_second_transition import reference
 
@@ -33,6 +34,9 @@ def payload(case, second=None):
         "analysis_day": 1,
         "analysis_hour": 12,
     }
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("spec", RANGE_SPECS, ids=lambda s: s.key)

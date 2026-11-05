@@ -27,7 +27,7 @@ from tests.test_ren_term_point import payload_for
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/ren_term_longitude_v1"
-PIN = "58e631da28cfe023b07572e8c5b055599381bccc6c5dcfe796cb7eb907e99cde"
+PIN = "5ac7cdfe4bb123f8aab1f4c592b819eb1cd5402fe560cb4c0f1b286e33700255"
 
 
 def reference():
@@ -176,7 +176,9 @@ def test_native_moshier_receipt_uses_moshier_when_swiss_files_are_available(
 ):
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     term = term_for("native", monkeypatch)
-    assert term.ephemeris_model == "moshier"
+    from fatebridge.core.moshier_solar import MODEL_ID
+
+    assert term.ephemeris_model == MODEL_ID
     monkeypatch.setenv("SE_EPHE_PATH", str(ROOT / "ephe"))
     ren_calendar.require_ren_solar_term(term)
 

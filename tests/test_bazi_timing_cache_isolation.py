@@ -1,15 +1,10 @@
 """Caller mutation cannot change cached metadata or any numeric calculation."""
 
-import json
 from copy import deepcopy
-from pathlib import Path
 
 import pytest
 
 from fatebridge.core.timing import _copy_timing_info
-
-ROOT = Path(__file__).resolve().parents[1]
-STUDY = ROOT / "docs/validation/bazi-timing-cache-isolation-v1"
 
 
 def mutable_ids(value):
@@ -59,21 +54,3 @@ def test_no_window_scalar_cache_payload_is_also_a_new_caller_owned_dictionary():
     first, second = _copy_timing_info(source), _copy_timing_info(source)
     first.clear()
     assert source == second == {"pillar": "甲子", "hour": 3}
-
-
-def test_all5_saved_actual_initial_objects_are_preserved_after_caller_mutation():
-    before = json.loads(
-        (
-            ROOT
-            / "docs/validation/bazi-nominal-elapsed-policy-v1/cache-policy-first.json"
-        ).read_text()
-    )
-    after = json.loads((STUDY / "cache-after-first.json").read_text())
-    assert before["mismatches"] == 4 and after["mismatches"] == 0
-    assert [r["case"] for r in before["records"]] == [
-        r["case"] for r in after["records"]
-    ]
-    for old, new in zip(before["records"], after["records"]):
-        assert old["before_mutation"] == new["before_mutation"]
-        assert old["before_mutation"] == new["after_mutation"]
-        assert new["changed_paths"] == []

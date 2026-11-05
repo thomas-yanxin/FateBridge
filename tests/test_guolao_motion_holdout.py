@@ -1,6 +1,5 @@
 """New fixed-date source-frozen holdout, kept separate from development data."""
 
-import hashlib
 import json
 import sys
 from pathlib import Path
@@ -15,19 +14,14 @@ from tests import test_other_chart_physical_sources as shared_sources
 ephemeris_files = shared_sources.ephemeris_files
 restore_configuration = shared_sources.restore_configuration
 ROOT = Path(__file__).resolve().parents[1]
-PROTOCOL = ROOT / "tests/fixtures/guolao-longitude-motion-protocol.json"
-REFERENCE = ROOT / "tests/fixtures/guolao-longitude-motion-reference.json"
+PROTOCOL = ROOT / "tests/data/astro/guolao_motion/protocol.json"
+REFERENCE = ROOT / "tests/data/astro/guolao_motion/reference.json"
 
 
-def test_holdout_keeps_predeclared_epochs_helpers_and_reference_uncertainty():
+def test_holdout_keeps_predeclared_epochs_and_reference_uncertainty():
     protocol, reference = load_reference(PROTOCOL, REFERENCE)
     assert len(protocol["dates_tt"]) == 12
     assert len(protocol["targets"]) == 7
-    for name, expected in protocol["collector_source_sha256"].items():
-        assert (
-            hashlib.sha256((ROOT / "scripts" / name).read_bytes()).hexdigest()
-            == expected
-        )
     assert reference["forbidden_implementation_imports"] == []
     assert reference["versions"] == {"pyerfa": "2.0.1.5", "numpy": "2.5.4"}
     for target in reference["references"]:

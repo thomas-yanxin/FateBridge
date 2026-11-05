@@ -12,7 +12,9 @@ from fatebridge.core.astro import solar_position as solar
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.output_charts import ApparentPositionPolicy
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.ephemeris_case_runtime import native_ephemeris_files_module
+from tests.ephemeris_case_runtime import (
+    native_ephemeris_files_module as native_ephemeris_files_module,
+)
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
@@ -172,12 +174,11 @@ def test_real_source_geometry_is_typed_and_leaves_the_native_tuple_unchanged(
     assert runtime.ephemeris_call("calc", epoch, body, flags)[0] == raw
 
 
-def test_reference_bytes_remain_sealed_including_the_old_failed_comparison():
+def test_independent_solar_position_reference_bytes_are_preserved():
     root = Path(__file__).parents[1]
     wanted = {
         "tests/fixtures/western-solar-position-protocol.json": "064ebd6f554cd94b2a3c3471a1f82d7afc4edf4abeabf1e76d2aac180e516973",
         "tests/fixtures/western-solar-position-horizons.json": "de2a112a588aad555916969edd49849a31ba7e8ae829926ef86861bd54e2ea6f",
-        "docs/validation/western-event-paths-evidence.json": "644722df88f19760c2d1ab1c7fcade399b2b46370a57921c4b2f7bdcdab6c8ad",
     }
     for name, digest in wanted.items():
         assert hashlib.sha256((root / name).read_bytes()).hexdigest() == digest

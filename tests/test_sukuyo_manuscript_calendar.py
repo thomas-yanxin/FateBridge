@@ -15,9 +15,7 @@ from fatebridge.validation.sukuyo_manuscript_calendar import (
     audit_month_start_insertions,
 )
 
-FIXTURE = (
-    Path(__file__).parent / "fixtures/sukuyo-manuscript-month-cells-first-v100.json"
-)
+FIXTURE = Path(__file__).parent / "data/sukuyo-manuscript-month-cells-first-v100.json"
 DATA = json.loads(FIXTURE.read_bytes())
 ROWS = DATA["literal_records"]["suspected_leap_insertions"]
 

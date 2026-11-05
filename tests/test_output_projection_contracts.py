@@ -18,12 +18,10 @@ from fatebridge.application.projection import project_fields
 from fatebridge.cli import run
 from fatebridge.core.fengshui.output import Ruleset
 from fatebridge.services.tool_catalog import CATALOG
+from tests.current_outputs import current_business
 from tests.fixtures.fengshui import PAYLOADS, payload
-from tests.golden.canonical import canonical_json
-from tests.test_agentic_nested_outputs import unrounded_linux_business
 
 SPECS = {spec.key: spec for spec in CATALOG}
-SNAPSHOTS = Path(__file__).parent / "golden" / "snapshots"
 AS_OF = "2026-10-12T02:00:00Z"
 
 
@@ -78,36 +76,11 @@ def leaves(value, path=()):
 
 
 @pytest.mark.parametrize("key", list(SPECS))
-def test_every_golden_leaf_projection_validates_without_rewriting_snapshots(
-    key, unrounded_linux_business
+def test_every_current_leaf_projection_validates_without_rewriting_facts(
+    key, current_business
 ):
     spec = SPECS[key]
-    slug = (
-        spec.rest_path.strip("/").replace("/", "_") if spec.rest_path else "mcp_" + key
-    )
-    if key == "astro_relative_chart":
-        slug = "api_astro_relative"
-    original = (SNAPSHOTS / (slug + ".json")).read_text()
-    # Golden canonicalization deliberately omits volatile receipt fields such
-    # as run_id and generated_at. Those are not complete live RunMetadata.
-    # Rounded canonical snapshots are not raw TT/accounting ledgers. Use the
-    # separately sealed unrounded response and retain the exact snapshot tie.
-    result = copy.deepcopy(unrounded_linux_business[slug])
-    if key == "export_registry":
-        from tests.repair_business_reference import qualify_sixyao_registry
-
-        result = qualify_sixyao_registry(result)
-    elif key == "nongli_time":
-        from tests.repair_business_reference import qualify_nongli_clock_precision
-
-        result = qualify_nongli_clock_precision(result)
-    elif key == "decennials":
-        from tests.repair_business_reference import qualify_decennials_snapshot
-
-        result = qualify_decennials_snapshot(result)
-    assert canonical_json(result) == canonical_json(
-        {k: v for k, v in json.loads(original).items() if k != "run_metadata"}
-    )
+    result = copy.deepcopy(current_business[key])
     before = copy.deepcopy(result)
     spec.output_model.model_validate(result)
     validator = Draft202012Validator(spec.output_model.model_json_schema())
@@ -120,7 +93,6 @@ def test_every_golden_leaf_projection_validates_without_rewriting_snapshots(
             value = value[part]
         assert value == expected
     assert result == before
-    assert (SNAPSHOTS / (slug + ".json")).read_text() == original
 
 
 @pytest.fixture

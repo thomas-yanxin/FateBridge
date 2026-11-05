@@ -14,7 +14,6 @@ from fatebridge.validation.qimen import audit_day_stem_collation
 from tests.test_qimen_depth import fixed_board
 
 BUNDLE = Path(__file__).parent / "fixtures/qimen_classical_v6"
-MANIFEST = json.loads((BUNDLE / "sources-and-stems.json").read_text())
 DAY_RULES = {"hidden_day_stem", "flying_day_stem"}
 
 

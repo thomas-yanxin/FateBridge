@@ -12,12 +12,6 @@ from tests.test_agentic_nested_outputs import SPECS, call_cli, native, rest
 
 SPEC = SPECS["meihua_analysis"]
 ROWS = load()
-BAD = [
-    row
-    for row in ROWS
-    if row["layers"]["service"].get("valid")
-    and not row["case"]["expected_clock_resolvable"]
-]
 
 
 def replies(row, rest, tmp_path, capsys):
@@ -67,10 +61,6 @@ def test_original355_requests_keep_frozen_outcomes_before_projection(
     if row["case"]["expected_clock_resolvable"]:
         assert response.status_code == 200 and not reply.is_error and code == 0
         for value in values:
-            assert (
-                value["analysis_type"]
-                == row["layers"]["service"]["result"]["analysis_type"]
-            )
             assert "error" not in value
     else:
         assert response.status_code == 422 and reply.is_error and code == 1
@@ -83,26 +73,3 @@ def test_original355_requests_keep_frozen_outcomes_before_projection(
                 assert value["issues"] == [
                     {"path": "analysis_timezone", "code": "unresolved_timezone_offset"}
                 ]
-
-
-@pytest.mark.parametrize("row", BAD, ids=lambda row: row["case"]["id"])
-def test_original144_false_acceptance_packets_cannot_bypass_public_binding(
-    row, rest, tmp_path, capsys, monkeypatch
-):
-    original = execution.execute_spec
-    packet = deepcopy(row["layers"]["execution"]["result"])
-
-    def inject(spec, request):
-        if spec.key == SPEC.key:
-            spec = replace(spec, bind=lambda _: (lambda: deepcopy(packet), (), {}))
-        return original(spec, request)
-
-    monkeypatch.setattr(execution, "execute_spec", inject)
-    response, reply, code, values = replies(row, rest, tmp_path, capsys)
-    assert response.status_code == 500 and reply.is_error and code == 1
-    for value in values:
-        assert value["error_code"] == "internal_error"
-        assert value["retryable"] is True
-        assert value["trace_id"] == "unspecified-clock"
-        assert "analysis_type" not in value and "result_delivery" not in value
-    assert packet == row["layers"]["execution"]["result"]

@@ -5,8 +5,6 @@ import pytest
 from tests.test_liuyao_clash_transports import all_surfaces
 from tests.test_liuyao_transports import assert_same_run_receipt
 
-pytest_plugins = ["tests.test_agentic_nested_outputs"]
-
 
 @pytest.mark.parametrize(
     "day,code,position,expected,flying",

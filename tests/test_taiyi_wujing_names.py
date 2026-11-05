@@ -8,8 +8,8 @@ import sys
 
 import pytest
 
+from scripts.audit_taiyi_wujing_facsimile import audit as native_audit
 from scripts.audit_taiyi_wujing_names import (
-    BASELINE,
     CORPUS,
     ROOT,
     audit,
@@ -39,7 +39,7 @@ def test_same_book_yin_yang_de_definitions_keep_the_conflict_and_suffix():
 
 
 def test_full_cohort_and_original_results_are_retained(report):
-    baseline = json.loads((ROOT / BASELINE).read_text())
+    baseline = native_audit()
     assert report["original_v46_layer"] == baseline
     assert (
         report["current_actual_rule_profile"]

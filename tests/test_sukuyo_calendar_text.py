@@ -23,7 +23,7 @@ from fatebridge.validation.sukuyo import (
 )
 
 FIXTURE = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-t1299-calendar-primary.json").read_text()
+    (Path(__file__).parent / "data/sukuyo-t1299-calendar-primary.json").read_text()
 )
 ALIASES = str.maketrans("虛婁畢參張軫", "虚娄毕参张轸")
 
@@ -455,6 +455,14 @@ async def test_default_mcp_budget_preserves_the_full_original_context_without_re
             )
             assert restored["environment_sha256"] == runtime["environment_sha256"]
             inline_metadata["runtime"] = restored
+        evidence = inline_metadata.get("calculation_evidence")
+        if evidence and "delivery_path" in evidence:
+            path = evidence["delivery_path"]
+            assert path == "run_metadata.calculation_evidence"
+            assert path in ref["deferred_fields"]
+            inline_metadata["calculation_evidence"] = await read_json_pages(
+                f"fatebridge://results/{ref['result_id']}/fields/{path}"
+            )
         assert original["run_metadata"] == inline_metadata
         assert (
             original["sukuyo"]["calendar_day"]["clock_evaluation_status"]

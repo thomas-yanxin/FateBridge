@@ -27,7 +27,7 @@ from fatebridge.validation.meihua_semantic_binding import (
     portable_ast_sha,
     preparation_commitment,
 )
-from scripts.evaluate_agent import grade, model_prompt, source_manifest
+from scripts.evaluate_agent import model_prompt, source_manifest
 from tests.test_agent_evaluation import event
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -607,10 +607,6 @@ async def test_actual_local_stdio_projection_and_field_resources_bind_without_mo
 
 @pytest.mark.parametrize("error", ["is_error", "isError", "business_error"])
 def test_actual_server_errors_cannot_be_hidden_by_successful_cli_events(error):
-    legacy = grade({"manual_review": []}, [event("meihua_cast")], "answer", 0)
-    assert legacy[
-        "mechanical_checks_passed"
-    ]  # Preserve the old observable-only grader.
     row = call(packet(value=None))
     if error == "business_error":
         row["result"]["structured_content"]["error_code"] = "BAD_INPUT"

@@ -79,7 +79,7 @@ def main() -> None:
     )
     out = (
         Path(__file__).resolve().parents[1]
-        / "tests/fixtures/ziwei_horoscope_reference.json"
+        / "tests/data/ziwei_horoscope_reference.json"
     )
     out.write_text(
         json.dumps(fixture, ensure_ascii=False, indent=2, sort_keys=True) + "\n",

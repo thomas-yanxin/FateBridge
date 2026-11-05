@@ -19,7 +19,7 @@ def main() -> int:
     raw = args.reference.read_bytes()
     if args.reference.suffix == ".gz":
         raw = gzip.decompress(raw)
-    fixture = Path(__file__).resolve().parents[1] / "tests/fixtures/fengshui_monthly_v1"
+    fixture = Path(__file__).resolve().parents[1] / "tests/data/fengshui_monthly_v1"
     manifest = json.loads((fixture / "calendar-reference.json").read_text())
     if hashlib.sha256(raw).hexdigest() != manifest["raw_sha256"]:
         raise ValueError("The independently collected frozen oracle cannot be replaced")

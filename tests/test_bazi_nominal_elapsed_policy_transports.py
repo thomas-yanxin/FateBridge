@@ -4,8 +4,16 @@ import asyncio
 
 import pytest
 
-from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
-from tests.test_bazi_nominal_elapsed_policy import DECLARATIONS
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
+
+DECLARATIONS = {
+    "elapsed_scale": "nominal_utc_label_seconds",
+    "leap_second_policy": "not_counted",
+}
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("tool", ["timing_analysis", "dayun_analysis"])

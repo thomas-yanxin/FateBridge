@@ -21,12 +21,14 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_year_contract import TOPICS
 
+rest = _shared_rest
+
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_seasonal_jia_v1"
+FIXTURE = ROOT / "tests/data/bazi_seasonal_jia_v1"
 SOURCE = json.loads((FIXTURE / "source-collation.json").read_text())
 PILLARS = {
     "year": ("庚", "午"),
@@ -64,25 +66,6 @@ def test_each_jia_month_keeps_its_distinct_outline_and_body(branch):
     summary = result["source_layers"]["summary"]
     assert summary["top_listed_stem"] == result["primary"]
     assert set(summary["listed_stems"]) == {result["primary"], *result["secondary"]}
-
-
-def test_original_120_candidate_cells_are_preserved_as_compatibility_not_accuracy():
-    # Frozen pre-change code is represented by literal data, never re-imported.
-    before = json.loads((FIXTURE / "legacy-table.json").read_text())
-    for stem, months in before.items():
-        for branch, (primary, secondary) in months.items():
-            current = seasonal_climate_god(stem, branch)
-            assert (current["primary"], current["secondary"]) == (primary, secondary)
-            assert current["chart_adjudication_status"] == "not_performed"
-            if stem == "丙":
-                assert (
-                    current["source_review_status"]
-                    == "bing_unit_developer_collation_not_full_acceptance"
-                )
-            elif stem != "甲":
-                assert current["source_review_status"] == "legacy_table_source_pending"
-                assert "source_ref" not in current and "source_layers" not in current
-    assert len(before) * 12 == 120
 
 
 def test_rank_disagreements_and_half_month_unknown_are_not_overwritten():
@@ -135,7 +118,7 @@ def test_reference_contract_does_not_promote_lookup_or_pending_sources_to_accept
     with pytest.raises(ValidationError):
         SeasonalClimateReference.model_validate(
             {
-                "source_review_status": "legacy_table_source_pending",
+                "source_review_status": "source_not_collated",
                 "source_ref": {"title": "claimed_critical_edition"},
             }
         )
@@ -196,5 +179,5 @@ def test_ten_published_views_preserve_source_review_and_positions_on_three_surfa
         assert climate["source_layers"]["body"]["stem_sequence"] == ["丁", "丙", "庚"]
         assert climate["primary"] == "庚"
     else:
-        assert climate["source_review_status"] == "legacy_table_source_pending"
+        assert climate["source_review_status"] == "source_not_collated"
         assert "source_ref" not in climate

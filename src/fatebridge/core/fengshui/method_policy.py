@@ -13,15 +13,6 @@ def select_methods(value: Mapping[str, Any]) -> List[str]:
     explicit = value.get("methods")
     if explicit is not None:
         return list(explicit)
-    authored = bool(value.get("form_observations") or value.get("surface_layouts"))
-    if (
-        value.get("scene") is None
-        and not authored
-        and value.get("environmental_context") is None
-        and value.get("monthly") is None
-    ):
-        # The original raw-chart entry point remains a compatibility surface.
-        return ["bazhai", "jinsuo", "annual_stars"]
     selected = []
     # Both layers belong to flying stars, but an annual chart is never a
     # substitute for a historical natal chart. Keep their inputs independent.
@@ -31,18 +22,25 @@ def select_methods(value: Mapping[str, Any]) -> List[str]:
         selected.append("annual_stars")
     if value.get("monthly") is not None:
         selected.append("monthly_stars")
-    if value.get("features") or any(
-        (
-            candidate.get("features")
-            if isinstance(candidate, Mapping)
-            else getattr(candidate, "features", None)
+    spatial = value.get("workstation_layout") or {}
+    spatial_features = any(
+        body.get("sand_water") is not None
+        for body in spatial.get("scene", {}).get("bodies", [])
+    )
+    if (
+        value.get("features")
+        or spatial_features
+        or any(
+            (
+                candidate.get("features")
+                if isinstance(candidate, Mapping)
+                else getattr(candidate, "features", None)
+            )
+            for candidate in (value.get("layout_alternatives") or [])
         )
-        for candidate in (value.get("layout_alternatives") or [])
     ):
         selected.append("jinsuo")
-    if (value.get("placements") or value.get("scene") == "home") and (
-        value.get("house") or value.get("occupants")
-    ):
+    if value.get("house") or value.get("occupants"):
         selected.append("bazhai")
     return selected
 

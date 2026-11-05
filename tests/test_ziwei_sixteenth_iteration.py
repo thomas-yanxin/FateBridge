@@ -3,7 +3,6 @@
 import asyncio
 import json
 import shutil
-from copy import deepcopy
 
 import pytest
 from fastapi.testclient import TestClient
@@ -38,6 +37,7 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from scripts.audit_ziwei_limits import _seed
+from scripts.ziwei_conditional_inputs import synthetic_birth_clock
 from tests.fixtures.mcp_receipt import verified_inline_business
 
 BIRTH = dict(
@@ -175,7 +175,7 @@ def test_horoscope_rejects_missing_or_contradictory_natal_source_identity(fault)
         )
     with pytest.raises(ValueError, match="四化.*不一致"):
         build_ziwei_horoscope(
-            nominal_age_basis="legacy_mixed_clock",
+            birth_seed=synthetic_birth_clock(int((chart)["lunar_date"]["year"])),
             chart=chart,
             gender="女",
             target_seed=_seed(2026),
@@ -205,14 +205,18 @@ def test_source_selection_does_not_masquerade_as_solving_the_clock_age_boundary(
     r = calculate_ziwei_horoscope(
         create_person_info(**m["cases"][0]["input"]),
         sihua_source="naj_ming_v1",
-        nominal_age_basis="legacy_mixed_clock",
         target_year=1984,
         target_month=2,
         target_day=1,
         target_hour=23,
         target_minute=59,
     )
-    assert r["status_code"] == 400 and "此边界暂不支持" in r["error"]
+    age = r["ziwei_horoscope"]["nominal_age_calendar"]
+    assert age["basis"] == "birth_civil_timezone"
+    assert age["birth_placement_lunar_year"] == 1984
+    assert age["birth_lunar_year"] == age["target_lunar_year"] == 1983
+    assert age["nominal_age"] == 1
+    assert age["age_boundary_classically_verified"] is False
 
 
 def test_same_run_claims_reject_the_former_marker_on_the_new_source():

@@ -10,7 +10,7 @@ from pathlib import Path
 
 from scripts.verify_astrodice_lunar_split import binary64_nearest
 
-PLAN_SHA = "35c8e1e320cc8af3921a3976aeda9ad4b2370189e01eda886724e49c8eedec49"
+PLAN_SHA = "6356429ab6b78a319a61393289399d8487bed68a6748e52edd2e87295e926f31"
 INPUT_SHA = "b48f6d48c9d60a9ed5896ec340890f33dfd892971e07abaf39ef41a055c032e6"
 
 

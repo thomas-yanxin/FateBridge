@@ -34,6 +34,7 @@ from __future__ import annotations
 from fractions import Fraction
 from typing import Any, Dict, List, Optional
 
+from fatebridge.core.astro.geometry import longitude_float
 from fatebridge.core.astrology_tables import ELEMENT_BY_SIGN, SIGNS
 from fatebridge.core.predictive._common import (
     TIMING_POINT_NAMES,
@@ -148,12 +149,6 @@ def _wrap360(degree: float) -> float:
     return degree % 360.0
 
 
-def _angular_separation(first_degree: float, second_degree: float) -> float:
-    """Smallest unsigned separation between two ecliptic longitudes (0–180°)."""
-    delta = abs(_wrap360(first_degree) - _wrap360(second_degree)) % 360.0
-    return delta if delta <= 180.0 else 360.0 - delta
-
-
 def _natal_longitudes(natal_reference: Dict[str, Dict[str, Any]]) -> Dict[str, float]:
     """Map ``TIMING_POINT_NAMES`` to their absolute natal longitudes."""
     longitudes: Dict[str, float] = {}
@@ -214,34 +209,43 @@ def build_harmonic_payload(
     """
     longitudes = _natal_longitudes(natal_reference)
 
+    # Keep the product before one display conversion: 7 * float(30/7) can
+    # round a value below 30 onto the next sign, and alter orb membership.
+    exact_longitudes = {
+        point_name: (Fraction(natal_lon) * harmonic) % 360
+        for point_name, natal_lon in longitudes.items()
+    }
     positions: Dict[str, Dict[str, Any]] = {}
     for point_name, natal_lon in longitudes.items():
-        harmonic_lon = _wrap360(natal_lon * harmonic)
+        harmonic_lon = longitude_float(exact_longitudes[point_name])
         position = longitude_to_point_dict(point_name, harmonic_lon)
         position["natal_absolute_degree"] = round(natal_lon, 4)
         positions[point_name.lower()] = position
 
-    conjunctions: List[Dict[str, Any]] = []
+    conjunctions = []
     ordered = list(longitudes.keys())
     for index, first_name in enumerate(ordered):
         for second_name in ordered[index + 1 :]:
-            separation = _angular_separation(
-                positions[first_name.lower()]["absolute_degree"],
-                positions[second_name.lower()]["absolute_degree"],
-            )
+            difference = (
+                exact_longitudes[first_name] - exact_longitudes[second_name]
+            ) % 360
+            separation = min(difference, 360 - difference)
             if separation <= orb:
                 conjunctions.append(
-                    {
-                        "points": [first_name, second_name],
-                        "points_label": [
-                            planet_label(first_name),
-                            planet_label(second_name),
-                        ],
-                        "separation_degree": round(separation, 4),
-                        "orb": orb,
-                    }
+                    (
+                        separation,
+                        {
+                            "points": [first_name, second_name],
+                            "points_label": [
+                                planet_label(first_name),
+                                planet_label(second_name),
+                            ],
+                            "separation_degree": round(float(separation), 4),
+                            "orb": orb,
+                        },
+                    )
                 )
-    conjunctions.sort(key=lambda item: item["separation_degree"])
+    conjunctions.sort(key=lambda item: item[0])
 
     return {
         "harmonic": harmonic,
@@ -249,7 +253,7 @@ def build_harmonic_payload(
         "method": "natal_longitude_times_harmonic",
         "method_label": f"{harmonic} 调波（本命黄经 × {harmonic} 取模 360°）",
         "positions": positions,
-        "resonant_conjunctions": conjunctions,
+        "resonant_conjunctions": [row for _, row in conjunctions],
     }
 
 
@@ -984,22 +988,21 @@ def build_persian_directed_payload(
     list each age at which a directed promittor reaches a Ptolemaic aspect to a natal
     target, capped at ``max_age_years`` and the first ``limit`` hits by age.
 
-    The arithmetic is exact and language-neutral — :mod:`tests.test_persian_directed`
-    byte-locks the structured hits against 星阙's own output on a fixed chart. The hit set
+    Rational arcs determine selection before display rounding. The fixed chart in
+    :mod:`tests.test_persian_directed` retains the historical hit values and checks
+    actual chronological order with an independent Decimal calculation. The hit set
     is bounded by the natal objects FateBridge exposes (planets + nodes + 12 cusps); it
     does NOT include 星阙's enriched bodies (asteroids / midpoints / Arabic lots / 四余),
     so the table is a clean subset of 星阙's, not a row-for-row match on a live chart.
     """
     import datetime as _dt
 
-    by_id: Dict[str, float] = {
-        name: float(lon) % 360.0 for name, lon in natal_longitudes.items()
-    }
-    targets: List[tuple[str, float]] = [(oid, lon) for oid, lon in by_id.items()]
+    by_id = {name: Fraction(lon) % 360 for name, lon in natal_longitudes.items()}
+    targets = list(by_id.items())
     for index, cusp in enumerate(house_cusps):
-        targets.append((f"{index + 1}宫头", float(cusp) % 360.0))
+        targets.append((f"{index + 1}宫头", Fraction(cusp) % 360))
 
-    hits: List[Dict[str, Any]] = []
+    hits = []
     for promittor in PERSIAN_MOVERS:
         mover_lon = by_id.get(promittor)
         if mover_lon is None:
@@ -1011,36 +1014,41 @@ def build_persian_directed_payload(
                 for sign in (1, -1):
                     if aspect in (0, 180) and sign == -1:
                         continue
-                    contact = (target_lon + sign * aspect) % 360.0
-                    arc = (contact - mover_lon) % 360.0
-                    age = arc / PERSIAN_RATE_DEG_PER_YEAR
+                    contact = (target_lon + sign * aspect) % 360
+                    arc = (contact - mover_lon) % 360
+                    age = arc / Fraction(PERSIAN_RATE_DEG_PER_YEAR)
                     if not 0 < age <= max_age_years:
                         continue
                     date = ""
                     if birth_datetime is not None:
                         date = (
                             birth_datetime
-                            + _dt.timedelta(days=age * PERSIAN_TROPICAL_YEAR_DAYS)
+                            + _dt.timedelta(
+                                days=float(age) * PERSIAN_TROPICAL_YEAR_DAYS
+                            )
                         ).strftime("%Y-%m-%d")
                     hits.append(
-                        {
-                            "age": round(age * 100) / 100,
-                            "promittor": promittor,
-                            "promittor_label": planet_label(promittor),
-                            "aspect": aspect,
-                            "significator": target_id,
-                            "date": date,
-                        }
+                        (
+                            age,
+                            {
+                                "age": round(float(age) * 100) / 100,
+                                "promittor": promittor,
+                                "promittor_label": planet_label(promittor),
+                                "aspect": aspect,
+                                "significator": target_id,
+                                "date": date,
+                            },
+                        )
                     )
-    hits.sort(key=lambda hit: hit["age"])
-    hits = hits[:limit]
+    hits.sort(key=lambda hit: hit[0])
+    selected = [row for _, row in hits[:limit]]
     return {
         "system": "persian_directed",
         "system_label": "波斯向运",
         "rate_deg_per_year": PERSIAN_RATE_DEG_PER_YEAR,
         "max_age_years": max_age_years,
-        "hit_count": len(hits),
-        "hits": hits,
+        "hit_count": len(selected),
+        "hits": selected,
     }
 
 
@@ -1054,21 +1062,23 @@ AGE_POINT_YEARS_PER_HOUSE = 6.0
 AGE_POINT_CYCLE_YEARS = 72.0
 
 
-def _house_containing(longitude: float, koch_cusps: List[float]) -> tuple[int, float]:
+def _house_containing(
+    longitude: float, koch_cusps: List[float]
+) -> tuple[int, Fraction]:
     """Return (0-indexed house, fractional position within it) for ``longitude``.
 
     Houses partition the circle, so exactly one Koch segment ``[cusp_h, cusp_{h+1})``
     contains the point; the fraction is how far along that segment the point sits.
     """
-    point = longitude % 360.0
+    point = Fraction(longitude) % 360
     for house_index in range(12):
-        start = koch_cusps[house_index] % 360.0
-        end = koch_cusps[(house_index + 1) % 12] % 360.0
-        arc = (end - start) % 360.0
-        offset = (point - start) % 360.0
+        start = Fraction(koch_cusps[house_index]) % 360
+        end = Fraction(koch_cusps[(house_index + 1) % 12]) % 360
+        arc = (end - start) % 360
+        offset = (point - start) % 360
         if arc > 0 and offset < arc:
             return house_index, offset / arc
-    return 0, 0.0
+    raise ValueError("年龄推进点宫头未覆盖给定黄经，不能补为零岁上升点")
 
 
 def build_age_point_payload(
@@ -1092,41 +1102,39 @@ def build_age_point_payload(
     age at which the point conjoins each natal body; ``points`` is the per-year
     timeline (position + house), tagged with any conjunction landing that year.
     """
-    cusps = [lon % 360.0 for lon in koch_cusps]
+    cusps = koch_cusps
+    years_per_house = Fraction(AGE_POINT_YEARS_PER_HOUSE)
+    cycle_years = Fraction(AGE_POINT_CYCLE_YEARS)
 
     # Exact conjunction ages: where the swept point crosses each natal longitude.
-    contacts: List[Dict[str, Any]] = []
+    contacts: list[tuple[Fraction, str, float]] = []
     for body, longitude in natal_longitudes.items():
         house_index, fraction = _house_containing(longitude, cusps)
-        base_age = (house_index + fraction) * AGE_POINT_YEARS_PER_HOUSE
+        base_age = (house_index + fraction) * years_per_house
         cycle = 0
-        while base_age + cycle * AGE_POINT_CYCLE_YEARS <= max_age_years:
-            age = base_age + cycle * AGE_POINT_CYCLE_YEARS
-            if age > 0:
-                contacts.append(
-                    {
-                        "age": round(age, 2),
-                        "body": body,
-                        "body_label": planet_label(body),
-                        "longitude": round(longitude % 360.0, 4),
-                    }
-                )
+        while base_age + cycle * cycle_years <= max_age_years:
+            contact_age = base_age + cycle * cycle_years
+            if contact_age > 0:
+                contacts.append((contact_age, body, round(longitude % 360.0, 4)))
             cycle += 1
-    contacts.sort(key=lambda contact: contact["age"])
+    contacts.sort(key=lambda contact: contact[0])
 
     # Per-year timeline: position + house, tagged with a conjunction landing that year.
     points: List[Dict[str, Any]] = []
     for age in range(int(max_age_years) + 1):
         cycle_pos = age % AGE_POINT_CYCLE_YEARS
         house_index = int(cycle_pos // AGE_POINT_YEARS_PER_HOUSE)
-        within = (cycle_pos - house_index * AGE_POINT_YEARS_PER_HOUSE) / (
-            AGE_POINT_YEARS_PER_HOUSE
+        within = (Fraction(age) % cycle_years - house_index * years_per_house) / (
+            years_per_house
         )
-        start = cusps[house_index]
-        arc = (cusps[(house_index + 1) % 12] - start) % 360.0
-        longitude = (start + within * arc) % 360.0
+        start = Fraction(cusps[house_index]) % 360
+        arc = (Fraction(cusps[(house_index + 1) % 12]) - start) % 360
+        longitude = longitude_float((start + within * arc) % 360)
         point = longitude_to_point_dict("AgePoint", longitude)
-        aspect_to = next((c["body"] for c in contacts if round(c["age"]) == age), None)
+        aspect_to = next(
+            (body for exact_age, body, _ in contacts if round(exact_age) == age),
+            None,
+        )
         points.append(
             {
                 "age": age,
@@ -1146,7 +1154,15 @@ def build_age_point_payload(
         "years_per_house": AGE_POINT_YEARS_PER_HOUSE,
         "cycle_years": AGE_POINT_CYCLE_YEARS,
         "max_age_years": max_age_years,
-        "contacts": contacts,
+        "contacts": [
+            {
+                "age": round(float(age), 2),
+                "body": body,
+                "body_label": planet_label(body),
+                "longitude": longitude,
+            }
+            for age, body, longitude in contacts
+        ],
         "points": points,
     }
 

@@ -22,9 +22,10 @@ from fatebridge.utils.solar_time import (
     calculate_solar_time_adjustment,
 )
 from tests.fixtures.solar_reference import expected_solar_clock
-from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 
-FIXTURE = Path(__file__).parent / "fixtures/bazi-solar-jpl-v1.json"
+FIXTURE = Path(__file__).parent / "data/bazi-solar-jpl-v1.json"
 REFERENCE = json.loads(FIXTURE.read_text())
 CASES = [
     {**case, "split": ref["split"]}
@@ -73,6 +74,9 @@ def test_daily_sweep_covers_every_supported_date_with_the_original_tolerance():
     )
     result = module._summary(rows, manifest["tolerance_seconds"])
     assert result["failed_count"] == 0
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["instant"])

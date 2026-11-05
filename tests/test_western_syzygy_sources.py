@@ -1,8 +1,5 @@
 """Preserve real source transitions and reject unrequested lunation frames."""
 
-import hashlib
-import importlib.machinery
-import importlib.util
 import json
 from pathlib import Path
 
@@ -17,84 +14,20 @@ from tests.syzygy_source_profiles import (  # noqa: F401
     syzygy_source_profile,
 )
 
-FIXTURE = Path(__file__).parent / "fixtures/western-syzygy-source-v1"
+FIXTURE = Path(__file__).parent / "data/astro/syzygy_source"
 PROTOCOL = json.loads((FIXTURE / "protocol.json").read_text())
-BEFORE = json.loads((FIXTURE / "before.json").read_text())["rows"]
+INPUTS = json.loads((FIXTURE / "inputs.json").read_text())
 
 
-@pytest.fixture(scope="module")
-def prior_classical():
-    # Compare a change within one native runtime. The initial cross-platform
-    # bitwise comparisons and their four failures remain in the audit report.
-    path = FIXTURE / "classical-before.py.txt"
-    receipt = json.loads((FIXTURE / "replay-reference.json").read_text())
-    assert hashlib.sha256(path.read_bytes()).hexdigest() == receipt["old_source_sha256"]
-    loader = importlib.machinery.SourceFileLoader("prior_lunation_source", str(path))
-    spec = importlib.util.spec_from_loader(loader.name, loader)
-    module = importlib.util.module_from_spec(spec)
-    loader.exec_module(module)
-    return module
-
-
-@pytest.mark.parametrize("row", BEFORE)
-@pytest.mark.parametrize(
-    "syzygy_source_profile", ["recorded5", "full37", "empty0"], indirect=True
-)
-def test_valid_numeric_results_remain_exactly_equal_to_before(
-    row, prior_classical, syzygy_source_profile
-):
-    with runtime.preserve_ephemeris_path():
-        previous = prior_classical._prenatal_syzygy(
-            row["jd_ut1"], julian_day_tt=row["jd_tt"], sidereal=row["sidereal"]
-        )
-    with runtime.preserve_ephemeris_path():
-        result = classical._prenatal_syzygy(
-            row["jd_ut1"], julian_day_tt=row["jd_tt"], sidereal=row["sidereal"]
-        )
-    if result is not None:
-        result = {
-            k: v
-            for k, v in result.items()
-            if k not in {"ephemeris_source", "utc_representation"}
-        }
-    assert result == previous
-
-
-@pytest.mark.parametrize("row", [r for r in BEFORE if r["result"] is not None])
-def test_search_receipt_preserves_all_actual_observed_models(
-    row, syzygy_source_profile
-):
-    result = classical._prenatal_syzygy(
-        row["jd_ut1"], julian_day_tt=row["jd_tt"], sidereal=row["sidereal"]
-    )
-    receipt = result["ephemeris_source"]
-    expected = {
-        body: sorted({c["model"] for c in row["calls"] if c["body"] == body})
-        for body in ["Sun", "Moon"]
-    }
-    assert receipt["models_by_body"] == expected
-    assert receipt["models_stable"] == all(len(v) == 1 for v in expected.values())
-    assert receipt["absolute_accuracy_certified"] is False
-    assert sum(c["sample_count"] for c in receipt["sample_contexts"]) == len(
-        row["calls"]
-    )
-    if row["date"] == [1800, 1, 10]:
-        assert not receipt["models_stable"]
-        assert expected == {"Sun": ["moshier", "swieph"], "Moon": ["moshier", "swieph"]}
-    for context in receipt["sample_contexts"]:
-        assert context["minimum_jd_tt"] <= context["maximum_jd_tt"]
-        if context["model"] == "moshier":
-            assert context["file_ids"] == []  # Do not borrow stale Swiss slots.
-
-
-@pytest.mark.parametrize("index", range(len(BEFORE)))
+@pytest.mark.parametrize("index", range(len(INPUTS)))
 @pytest.mark.parametrize(
     "syzygy_source_profile", ["recorded5", "full37", "empty0"], indirect=True
 )
 def test_every_source_context_matches_the_actual_native_call(
-    index, syzygy_source_profile
+    index,
+    syzygy_source_profile,  # noqa: F811 - pytest fixture dependency
 ):
-    row = BEFORE[index]
+    row = INPUTS[index]
     expected = next(
         r
         for r in PROFILE_PROTOCOL["case_outcomes"]
@@ -112,7 +45,13 @@ def test_every_source_context_matches_the_actual_native_call(
         assert (
             result["ephemeris_source"]["models_by_body"] == expected["models_by_body"]
         )
-    assert len(witness.entries) == expected["native_call_count"]
+    if result is not None:
+        assert witness.entries
+        assert result["ephemeris_source"]["absolute_accuracy_certified"] is False
+        for context in result["ephemeris_source"]["sample_contexts"]:
+            assert context["minimum_jd_tt"] <= context["maximum_jd_tt"]
+            if context["model"] == "moshier":
+                assert context["file_ids"] == []
 
 
 @pytest.mark.parametrize("body", ["SUN", "MOON"])

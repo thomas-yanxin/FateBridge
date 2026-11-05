@@ -46,49 +46,7 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     return evidence
 
 
-def legacy(before_dir: Path, evidence: dict[str, Any]) -> dict[str, Any]:
-    from fatebridge.core.metaphysics.jinkou import build_jinkou_board
-    from fatebridge.services.tool_catalog import CATALOG
-    from scripts.audit_ren_classical import make_seed
-    from scripts.jinkou_break_witnesses_archive import without_break_witnesses
-
-    if sha(before_dir / "before-capture-receipt.json") != BEFORE_PIN:
-        raise ValueError("Before-witness capture identity changed")
-    receipt = json.loads((before_dir / "before-capture-receipt.json").read_text())
-    for name, digest in receipt["files"].items():
-        if sha(before_dir / name) != digest:
-            raise ValueError("Before-witness captured bytes changed")
-    failures, count = [], 0
-    with gzip.open(before_dir / "before-boards.jsonl.gz", "rt") as stream:
-        for line in stream:
-            record = json.loads(line)
-            case = record["input"]
-            actual = build_jinkou_board(
-                make_seed(case),
-                {"month_general": {"branch": case["general"]}},
-                di_fen=case["ground"],
-                is_diurnal_override=True,
-            )
-            if without_break_witnesses(actual, evidence) != record["board"]:
-                failures.append(dict(kind="symbolic", input=case))
-            count += 1
-    spec = next(s for s in CATALOG if s.key == "jinkou")
-    businesses = json.loads((before_dir / "before-business.json").read_text())
-    for case in businesses:
-        fn, args, kwargs = spec.bind(spec.request_model.model_validate(case["input"]))
-        if without_break_witnesses(fn(*args, **kwargs), evidence) != case["body"]:
-            failures.append(dict(kind="full_business", input=case["input"]))
-    return dict(
-        baseline_pin=BEFORE_PIN,
-        symbolic_count=count,
-        full_business_count=len(businesses),
-        failures=failures,
-        passed=count == 720 and len(businesses) == 3 and not failures,
-        inverse_scope="only witness_evidence on the course block and its unique trace; no version, text or calculation normalization",
-    )
-
-
-def audit(before_dir: Path | None = None) -> dict[str, Any]:
+def audit() -> dict[str, Any]:
     evidence = reference()
     from scripts.audit_jinkou_branch_breaks import reference as seven_pair_reference
 
@@ -98,7 +56,6 @@ def audit(before_dir: Path | None = None) -> dict[str, Any]:
         ROOT / "pyproject.toml",
         ROOT / "uv.lock",
         Path(__file__),
-        ROOT / "scripts/jinkou_break_witnesses_archive.py",
     ]
     before = {str(p.relative_to(ROOT)): sha(p) for p in paths}
     from fatebridge.core.metaphysics.jinkou_branch_breaks import (
@@ -116,7 +73,6 @@ def audit(before_dir: Path | None = None) -> dict[str, Any]:
         actual = branch_breaks(*case["branches"])
         if actual.get("witness_evidence") != evidence or actual["rows"] != case["rows"]:
             failures.append(dict(expected=case, actual=actual))
-    old = legacy(before_dir, evidence) if before_dir else dict(status="not_assessed")
     if before != {str(p.relative_to(ROOT)): sha(p) for p in paths}:
         raise ValueError("Source changed during textual-witness audit")
     return dict(
@@ -126,7 +82,6 @@ def audit(before_dir: Path | None = None) -> dict[str, Any]:
         matrix_failures=matrix_failures,
         triple_count=len(seven["reference"]["contexts"]),
         failures=failures,
-        legacy=old,
         bounded_textual_evidence_passed=not matrix_failures and not failures,
         implementation_sha256=before,
         implementation_unchanged=True,
@@ -141,11 +96,10 @@ def audit(before_dir: Path | None = None) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--before-dir", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--require-full-conformance", action="store_true")
     options = parser.parse_args()
-    result = audit(options.before_dir)
+    result = audit()
     content = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     if options.output:
         with options.output.open("x") as stream:

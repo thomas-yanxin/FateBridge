@@ -61,7 +61,7 @@ flowchart TD
 | 星历运行时 | `core/ephemeris_runtime.py` | 数据路径、模型标识、共享状态与并发保护 |
 | 数据 | `data/knowledge/`、`data/canping/`、`data/heluo/` | 知识与条文 JSON，打包进 wheel |
 | 导出 | `core/export_contracts.py`、`export_parser.py`、`services/structured_snapshot.py` | section 合同、文本解析与快照构造 |
-| 验证 | `tests/`、`tests/golden/` | 领域回归、跨端对齐、完整工具面、快照与文档契约 |
+| 验证 | `tests/`、`tests/data/` | 领域回归、独立参考、跨端对齐与文档契约 |
 
 ## 典型请求流
 
@@ -89,7 +89,7 @@ sequenceDiagram
     R-->>C: JSON 响应
 ```
 
-`api.py` 不直接手工构造领域对象。`ToolSpec.bind` 通过公共绑定器构造请求，再交服务执行。REST 同步服务均在线程池执行，标为 `cpu_bound` 的重计算另受信号量限制；这保护事件循环并限制进程内并发，不是速率限制或任务队列。
+`api.py` 不直接手工构造领域对象。`ToolSpec.bind` 通过公共绑定器构造请求，再交服务执行。REST 同步服务均在线程池执行，并在提交重计算前异步限流。`application/compute_limits.py` 在共享执行层用同一进程信号量限制 `cpu_bound` 工作，REST、MCP和CLI均遵守；上限来自 `FATEBRIDGE_HEAVY_CALC_MAX_CONCURRENCY`。发现记录的 `execution` 披露是否计入该预算。它限制进程内实际计算，不是跨进程队列或速率限制。
 
 `analyze_destiny` 的 MCP / CLI 绑定进入 `services/calculation.py::calculate_destiny_analysis`，在命盘之上组织综合分析。独立八字命盘绑定到 `services/bazi.py::calculate_bazi_birth`。
 
@@ -105,7 +105,7 @@ sequenceDiagram
 
 `core/schema_cache.py` 缓存默认验证 Schema 和合同 SHA-256：按实际模型类、core schema 身份及完整结果必需根声明区分，每类缓存最多 256 条；模型 `model_rebuild()` 后自动使用新版本，公开 Schema 返回深拷贝。
 
-动态修改模型配置、Schema hook 或嵌套模型而未重建根模型时，需要调用 `clear_contract_caches()`。业务输入、输出、调用时间和 execution receipt 仍逐次生成。输出在领域返回后、receipt 附加后分别校验；完整执行必须包含 `ToolSpec.required_output_fields` 的非 null 业务根，公共可投影模型仍允许省略字段。异常错误包络按内部输出错误处理。REST 不再重复第三次校验同一完整结果。
+动态修改模型配置、Schema hook 或嵌套模型而未重建根模型时，需要调用 `clear_contract_caches()`。业务输入、输出、调用时间和 execution receipt 仍逐次生成。输出在领域返回后、receipt 附加后分别校验；完整执行必须包含非null且不只是空对象的 `ToolSpec.required_output_fields`。共享 `PartialOutput` 根据完整执行上下文递归核验Schema中的 `FullFact`／`PresentFact`、集合唯一性及必要成员；这些声明和空对象政策均参与合同指纹。公共投影验证仍允许省略对象字段，合法空列表按各领域合同保留。异常错误包络按内部输出错误处理。REST 不再重复第三次校验同一完整结果。
 
 ### 大结果交付
 
@@ -137,6 +137,12 @@ Swiss Ephemeris 存在共享 C 状态。直接调用与会修改目录的第三�
 
 `data/agent_scenarios.json` 从 13 个技能 YAML、共享规则与场景路由文档生成，共 14 项（9 主题、3 服务、1 多主题组合及独立的 `fengshui` 基础计算路由），`application.scenarios` 将其关联到实时 ToolSpec。REST / CLI / MCP resources 共用 manifest，生产只读 JSON，不增加 YAML 运行依赖；CI 核对生成物与源资料。接口将直接工具与知识支撑、条件服务、组合主题依赖分开，生成和运行时验证依赖闭包及循环，场景筛选展开依赖后再与传输和 family 求交集。发现结果保留依赖条件、原始路由和逐项缺失，不把可调用工具当作自动执行清单。
 
+### 方法合同与数量语义
+
+`core/method_contracts.py`与`services/method_registration.py`维护领域方法合同。当前92个工具登记65个共享领域方法；人格入口明确排除。完整发现返回`method_contracts/method_registration`，摘要返回`method_ids`；合同进入重放指纹，运行时实际策略版本与见证路径另记入`run_metadata.calculation_evidence`。
+
+共享证据层绑定全部业务根、输入提供状态和环境，解析已有领域账本中的具名依赖，检查DAG闭合并支持保守失效传播。误差预算区分已知界、声明范围、未量化和不适用；没有传播依据时不生成输出误差界。声明依赖、包含与规则输入见证分开，未决语义依赖保持显式，详见[计算证据合同](computation-evidence.md)。完整业务覆盖不等于全部细粒度因果关系或连续稳定性已被证明。
+
 ## 内聚与依赖边界
 
 入口和协议适配器调用应用层，应用层调用领域服务，领域服务调用 `core`、`analysis` 与公共工具。`services/tool_catalog.py` 是装配入口，可以依赖应用层的 `ToolSpec` 与绑定工厂；普通领域服务不依赖协议适配器。`application` 不导入 FastAPI / FastMCP，动态协议签名由 `transports` 生成。
@@ -154,9 +160,30 @@ Swiss Ephemeris 存在共享 C 状态。直接调用与会修改目录的第三�
 | 星历来源 | `physical_source_observation.py` 记录来源，`physical_ephemeris_policy.py` 管理外层策略；运行时向策略与压缩星历传入实际 native 对象、探测和路径回调 |
 | 完整结果校验 | 金口诀完整课体的气状态校验与参平年序绑定分别由 `output_jinkou_course_qi.py`、`canping_schedule_validation.py` 承担；字段模型与底层规则不反向导入完整输出模型 |
 
-共享定义留在对应领域，避免消费者为了取常量、类型或纯计算函数导入完整排盘入口。函数内导入同样计入依赖图；延迟导入用于控制加载成本，不用于隐藏循环依赖。历史来源哈希核验其冻结原件，当前实现另按完整业务输出及领域回归验证，验收方法见[开发指南](development-guide.md#测试策略)。
+共享定义留在对应领域，避免消费者为了取常量、类型或纯计算函数导入完整排盘入口。函数内导入同样计入依赖图；延迟导入用于控制加载成本，不用于隐藏循环依赖。当前实现按独立参考、完整业务输出及领域回归验证，验收方法见[开发指南](development-guide.md#测试策略)。
 
 `tests/test_architecture_boundaries.py` 检查核心/分析/工具层不依赖应用与协议层、应用与服务不依赖协议适配器或旧兼容入口，并核对含函数内导入的静态导入图无循环。它不分析动态 `importlib` 调用或第三方库内部依赖。
+
+## 历法与星历依赖
+
+修改共享历法时，先沿实际消费路径确定影响范围。下表列出已核对入口，并非穷尽所有间接调用。数值、时标、民用转换及边界两侧的领域分类分别验证；不同模型的通过结果不能抵销原模型失败。
+
+| 依赖 | 已核对的消费路径 | 修改时重点 |
+| --- | --- | --- |
+| `core/almanac.py` 的节气年表和相邻节气 | `services/calendar_tools.py`、`core/timing.py`、`core/metaphysics/ren_calendar.py`、`core/liuyao_calendar_models.py`、`core/fengshui/calendar.py`、`core/fengshui/monthly_time.py` | 分别检查实际提供者、TT 交点、民用时间转换及各消费者在边界两侧的分类；参见[六壬审计](liuren-jinkou-audit.md)与[风水历法审计](fengshui.md)。 |
+| 同一节气年表的河洛／参评路径 | `core/heluo_solar_context.py`、`core/heluo_seasonal.py`、`core/canping_solar.py` | 河洛绑定当前节气、前一至点及下一四立；参评还取投影立春。保留实际消费的模型与来源，不能用另一路模型的通过结果改写 Native 失败。见[太阳模型边界](solar-backends.md)。 |
+| 农历日期与时区 | `core/ziwei_age.py`、`core/ziwei_calendar.py` | 安星时钟、岁序参考时钟与目标流曜时钟各有职责；修改其中之一应检查其他输出是否被误改。见[紫微岁序](ziwei.md#时钟与岁序)。 |
+| Swiss 星历与时间尺度 | `services/human_design.py` 及人类图计算链 | 按实际旗标和文件核对出生及设计时刻，分别检查后端对坐标、太阳根和细分的影响；不能仅以可导入库判断使用了数据文件。见[人类图验收](human-design.md)。 |
+
+这些路径共享某些基础组件，不意味着它们的全部历法策略、覆盖年份或后端选择相同。扩展影响范围时应沿实际调用链核实。
+
+### 星历路径解析的一致性
+
+`core/ephemeris_paths.py` 统一处理星历目录列表，供安装提示、`doctor` 的风水／人类图检查、节气缓存、运行来源记录及梅花历法审计使用。Unix 同时支持冒号和分号，Windows 保留盘符冒号；原有目录顺序和相对路径含义保持。路径约定参照 [Swiss 官方接口文档](https://www.astro.com/swisseph/swephprg.htm)及[原生文件搜索实现](https://github.com/aloistr/swisseph/blob/master/sweph.c)。
+
+此前在 Unix 使用 `SE_EPHE_PATH=first;second`，诊断与安装提示会将其视作单个目录，和节气缓存及来源记录的解析不一致。统一后可逐目录报告实际文件状态，并正确识别新文件目录已在搜索路径中。连续分隔符合并处理，依据[原生 `swi_cutstr` 实现](https://github.com/aloistr/swisseph/blob/master/swephlib.c)，不再将列表中间的空段当作额外当前目录写入缓存及来源记录。此项修复针对文件就绪诊断和目录清单，不改变太阳模型、交气数值或上表的固定失败。
+
+当前未决项由各专题维护：[太阳模型](solar-backends.md)、[六壬分钟标签](liuren-jinkou-audit.md)、[紫微岁序](ziwei.md#时钟与岁序)及[人类图精度](human-design.md)。固定样本、分母和容差随原参考保留，汇总见[算法状态](algorithm-status.md)。
 
 ## 运行配置与边界
 
@@ -168,10 +195,6 @@ REST 默认监听 `0.0.0.0:8010`，可选 API Key 鉴权；CORS、运维路径�
 
 新增能力通常先实现 `core` / `analysis`，封装 service 和 request model，再追加 `ToolSpec`。常规新增工具无需手工修改三个 transport 的领域入口，但只有声明对应 surface 且 CLI 模型可表达时才会实际暴露。
 
-为新工具补 `tests/fixtures/surface_payloads.py` 的代表请求，运行领域回归与 `test_full_surface_validation.py`；涉及输出、默认值或投影时补跨端对齐证据。文档、场景清单及技能契约同步方式见 [开发指南](development-guide.md#文档维护与验证)。黄金快照与 CI 平台约束也在那里统一维护。
+为新工具补 `tests/fixtures/surface_payloads.py` 的代表请求，运行领域回归与 `test_full_surface_validation.py`；涉及输出、默认值或投影时补跨端对齐证据。文档、场景清单及技能契约同步方式见 [开发指南](development-guide.md#文档维护与验证)。独立参考与 CI 运行范围也在那里统一维护。
 
 玄空版本独立放在 `data/fengshui/xuankong-v1.json`，与基础规则版本分别发布。`core/fengshui/xuankong.py` 只使用历史定运及磁北宅向，按输入误差解析候选角区；合参新增的是独立层，不给年度盘添加山向星，也不按当前元运重算宅盘。详见 [来源与合同](fengshui-xuankong.md)。
-
-## 旧入口迁移
-
-旧路由、字段别名、包级重导出与 `.fn` 包装的替换表统一见 [迁移指南](migration.md)。当前代码直接导入职责模块，协议调用使用正式路由或原生 MCP Client。

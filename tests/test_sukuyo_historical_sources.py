@@ -18,7 +18,7 @@ from fatebridge.validation.sukuyo_historical_sources import (
 )
 
 PRIMARY = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-historical-edge-probes.json").read_bytes()
+    (Path(__file__).parent / "data/sukuyo-historical-edge-probes.json").read_bytes()
 )
 
 

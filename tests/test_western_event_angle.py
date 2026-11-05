@@ -1,6 +1,5 @@
 """Unresolved native ASC is not a physical ruler or a known score input."""
 
-import hashlib
 import json
 from datetime import datetime
 from pathlib import Path
@@ -12,18 +11,14 @@ from fatebridge.core.astrology_election import build_election_payload
 from fatebridge.core.astrology_horary import build_horary_payload
 from fatebridge.core.astrology_tables import SIGNS
 from fatebridge.core.predictive.native_chart import build_native_subject
+from tests.reference_data import verify_source_files
 
-FIXTURE = Path(__file__).parent / "fixtures/western-event-angle-v1"
+FIXTURE = Path(__file__).parent / "data/astro/event_angle"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 
 
 def test_geometry_reference_precedes_candidate_and_retains_all_conditions():
-    seal = json.loads((FIXTURE / "reference-seal.json").read_text())
-    for name, digest in seal.items():
-        path = FIXTURE / (
-            "collector.py.txt" if name == "collect-reference.py" else name
-        )
-        assert hashlib.sha256(path.read_bytes()).hexdigest() == digest
+    verify_source_files(FIXTURE)
     assert len(REFERENCE["rows"]) == 28
     assert not REFERENCE["fatebridge_imported"]
 

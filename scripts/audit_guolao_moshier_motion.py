@@ -17,8 +17,8 @@ else:
     from audit_guolao_motion import evaluate, load_reference
 
 ROOT = Path(__file__).resolve().parents[1]
-PROTOCOL_SHA256 = "2d9c8026a5a2d27d827b91f80f7510ddfa1bdc80b9363d7ee7ce8d6113777d81"
-REFERENCE_SHA256 = "c49f8086506011b7f5c01a7471db04e62dbd63ea94a81b3fa27fbfe7808f2790"
+PROTOCOL_SHA256 = "3a80c3399083fcbbcae582fc71b570a8ed1d82b1f10af589af74de75cde3bb2b"
+REFERENCE_SHA256 = "27622cc6d3baef2e984b2350aa502a448f14efec8e159acb3be2ecd9aa7b8a4d"
 
 
 def main() -> int:
@@ -26,12 +26,12 @@ def main() -> int:
     parser.add_argument(
         "--protocol",
         type=Path,
-        default=ROOT / "tests/fixtures/guolao-moshier-motion-protocol.json",
+        default=ROOT / "tests/data/astro/guolao_moshier_motion/protocol.json",
     )
     parser.add_argument(
         "--reference",
         type=Path,
-        default=ROOT / "tests/fixtures/guolao-moshier-motion-reference.json",
+        default=ROOT / "tests/data/astro/guolao_moshier_motion/reference.json",
     )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()

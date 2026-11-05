@@ -12,9 +12,7 @@ from fatebridge.core.sukuyo_profiles import fullmoon_calculation, source_bundle
 from scripts.check_sukuyo_hinoo_critical import verify_primary
 
 ROOT = Path(__file__).resolve().parents[1]
-PRIMARY = json.loads(
-    (ROOT / "tests/fixtures/sukuyo-t2465-kyoto-primary.json").read_bytes()
-)
+PRIMARY = json.loads((ROOT / "tests/data/sukuyo-t2465-kyoto-primary.json").read_bytes())
 
 
 def reference():

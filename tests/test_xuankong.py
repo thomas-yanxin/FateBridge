@@ -21,6 +21,7 @@ from fatebridge.core.fengshui.xuankong import (
     xuankong_natal,
 )
 from fatebridge.services.fengshui import assess, calculate_xuankong_natal
+from fatebridge.utils.errors import EphemerisSourceError
 from tests.fixtures.fengshui import payload
 
 REFERENCE = json.loads(
@@ -35,13 +36,13 @@ def request(period=7, angle=0, uncertainty=0):
                 "object_id": "home",
                 "facing_degrees": angle,
                 "north_reference": "magnetic",
+                "bearing_uncertainty_degrees": uncertainty,
             },
             "period": {
                 "basis": "expert_confirmed",
                 "period_number": period,
                 "evidence": "已核实宅运",
             },
-            "bearing_uncertainty_degrees": uncertainty,
         }
     )
 
@@ -147,9 +148,7 @@ def test_confirmed_sitting_trigram_constrains_cross_palace_candidates(i):
 
 
 @pytest.mark.parametrize("failure", ["unavailable", "per_term_failure"])
-def test_changeover_event_does_not_certify_approximate_lichun(monkeypatch, failure):
-    # Fault the selected native provider. The packaged default is independent
-    # of Swiss availability and must not be relabelled as a linear fallback.
+def test_changeover_event_rejects_an_unavailable_native_crossing(monkeypatch, failure):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     almanac.get_solar_terms_for_year.cache_clear()
     if failure == "unavailable":
@@ -161,25 +160,14 @@ def test_changeover_event_does_not_certify_approximate_lichun(monkeypatch, failu
         inputs["period"] = {
             "basis": "first_occupancy",
             "event_at": "2024-02-04T16:20:00+08:00",
-            "evidence": "入伙时间已确认，节气尚待核实",
+            "evidence": "confirmed event time; selected provider unavailable",
         }
-        result = calculate_xuankong_natal(**inputs)
-        layer = result["layers"]["xuankong_natal"]
-        assert result["status"] == layer["status"] == "partial"
-        assert layer["chart"] is None and layer["candidates"] == []
-        p = layer["period_context"]
-        assert p["number"] is None and p["candidate_period_numbers"] == [8, 9]
-        assert p["timing"]["event_year_boundary"]["provider"] == "linear_1900_fallback"
-        assert (
-            "xuankong_natal.period.effective_year_or_period_confirmation"
-            in result["coverage"]["missing_inputs"]
-        )
+        with pytest.raises(EphemerisSourceError, match="no linear approximation"):
+            calculate_xuankong_natal(**inputs)
         inputs["period"].pop("event_at")
         inputs["period"]["effective_event_year"] = 2024
-        confirmed = calculate_xuankong_natal(**inputs)["layers"]["xuankong_natal"]
-        assert confirmed["status"] == "complete"
-        assert confirmed["period_context"]["number"] == 9
-        assert confirmed["period_context"]["timing"]["start"]["approximate"]
+        with pytest.raises(EphemerisSourceError, match="no linear approximation"):
+            calculate_xuankong_natal(**inputs)
     finally:
         almanac.get_solar_terms_for_year.cache_clear()
 
@@ -356,7 +344,10 @@ def test_natal_and_annual_are_independent_aggregate_scopes_and_explicit_opt_in()
     assert a["layers"]["annual_stars"] != b["layers"]["annual_stars"]
     assert a["layers"]["xuankong_natal"]["period_context"]["number"] == 8
     assert a["layers"]["annual_stars"]["current_period"]["number"] == 9
-    assert "xuankong_natal" not in assess()["layers"]
+    assert (
+        "xuankong_natal"
+        not in assess(methods=["annual_stars"], effective_year=2026)["layers"]
+    )
     assert "xuankong_natal" not in a["coverage"]["unavailable_layers"]
     assert "玄空宅盘" in a["snapshot_text"] and "年度飞星" in a["snapshot_text"]
     FengshuiOutput.model_validate(a)
@@ -411,7 +402,13 @@ def test_natal_and_annual_are_independent_aggregate_scopes_and_explicit_opt_in()
             }
         },
         {"house": {"facing_degrees": 0, "north_reference": "true"}},
-        {"bearing_uncertainty_degrees": 8},
+        {
+            "house": {
+                "facing_degrees": 0,
+                "north_reference": "magnetic",
+                "bearing_uncertainty_degrees": 8,
+            }
+        },
         {"annual_year": 2026},
     ],
 )
@@ -437,8 +434,12 @@ def test_confirmed_renovation_evidence_is_returned_not_automatically_inferred():
 
 
 def test_aggregate_rejects_unselected_or_inconsistent_nested_house():
-    with pytest.raises(ValidationError):
-        assess(xuankong=payload("xuankong_natal"))
+    auto = assess(xuankong=payload("xuankong_natal"))
+    expected = calculate_xuankong_natal(**payload("xuankong_natal"))
+    assert (
+        auto["layers"]["xuankong_natal"]["chart"]
+        == expected["layers"]["xuankong_natal"]["chart"]
+    )
     with pytest.raises(ValidationError):
         assess(
             methods=["xuankong_natal"],

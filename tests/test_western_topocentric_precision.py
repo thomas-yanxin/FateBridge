@@ -17,7 +17,7 @@ from fatebridge.core.astro.house_positions import EclipticHouseProjection
 from fatebridge.core.astro.topocentric_precision import TOPOCENTRIC_PROJECTION_METHOD
 from fatebridge.utils.errors import EphemerisSourceError
 
-FIXTURE = Path(__file__).parent / "fixtures/western-topocentric-precision-v1"
+FIXTURE = Path(__file__).parent / "data/astro/topocentric_precision"
 MODELS = json.loads((FIXTURE / "inputs.json").read_text())["cases"]
 BY_ID = {m["id"]: m for m in MODELS}
 BOUNDARIES = json.loads((FIXTURE / "candidate-boundary-reference.json").read_text())[

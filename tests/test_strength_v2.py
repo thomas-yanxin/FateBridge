@@ -9,10 +9,9 @@ import pytest
 
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.strength import DEFAULT_POLICY, _evaluate
-from fatebridge.utils.data import Element
 
 REFERENCE = json.loads(
-    (Path(__file__).parent / "fixtures/bazi-strength-reference.json").read_text()
+    (Path(__file__).parent / "data/bazi-strength-reference.json").read_text()
 )
 
 

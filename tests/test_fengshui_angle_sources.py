@@ -14,7 +14,7 @@ from fatebridge.validation.fengshui_angle_sources import (
     normalize_source_quantities,
 )
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_angle_sources_v1"
+FOLDER = Path(__file__).parent / "data/fengshui_angle_sources_v1"
 
 
 def test_frozen_source_preserves_author_context_and_different_local_units():

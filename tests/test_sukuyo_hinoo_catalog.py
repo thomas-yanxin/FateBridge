@@ -22,7 +22,7 @@ NOTE = "＜原＞建久六年寫高山寺藏本, ＜甲＞寶暦十一年寫智�
 
 def test_complete_catalogue_facts_match_before_production_source_snapshot():
     raw = (
-        Path(__file__).parent / "fixtures/sukuyo-hinoo-catalogue-source-v1.json"
+        Path(__file__).parent / "data/sukuyo-hinoo-catalogue-source-v1.json"
     ).read_bytes()
     assert hashlib.sha256(raw).hexdigest() == (
         "cccfed4983475f02164adc60b9f993c0e290c71c9dc769f89d053a91c16a2b18"

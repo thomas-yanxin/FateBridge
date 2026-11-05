@@ -8,6 +8,7 @@ from typing import Any, Sequence
 
 from .almanac import BAZI_MONTH_START_TERMS, SolarTerm, get_solar_terms_for_year
 from .analytic_solar import MODEL_ID
+from .moshier_solar import MODEL_ID as COMPLETE_MOSHIER_MODEL
 
 SCOPE = (
     "只比较本次实际完成的交气路径；十二节才换月，中气不换月。"
@@ -41,7 +42,12 @@ def _native_record(term: SolarTerm) -> dict[str, Any] | None:
     model = details.get("native_choice_probe_model")
     text = details.get("native_choice_probe_datetime_utc")
     jd = details.get("native_choice_probe_jd_tt")
-    if model not in {"moshier", "swieph", "jpl"} or not isinstance(text, str):
+    if model not in {
+        "moshier",
+        "swieph",
+        "jpl",
+        COMPLETE_MOSHIER_MODEL,
+    } or not isinstance(text, str):
         return None
     if (
         isinstance(jd, bool)

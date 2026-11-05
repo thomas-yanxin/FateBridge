@@ -23,10 +23,10 @@ from fatebridge.services.divination import (
 from scripts.fetch_sukuyo_reference import published_rows, read_sources
 
 REFERENCE = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-fullmoon-primary.json").read_text()
+    (Path(__file__).parent / "data/sukuyo-fullmoon-primary.json").read_text()
 )
 NAOJ = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-t1299-reference.json").read_text()
+    (Path(__file__).parent / "data/sukuyo-t1299-reference.json").read_text()
 )
 ALIASES = str.maketrans("虛婁畢參張軫", "虚娄毕参张轸")
 

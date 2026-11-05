@@ -27,9 +27,9 @@ else:
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v28"
-FREEZE_SHA256 = "b269106b408d86efe8567d896a5860740f420d40ca5dcb1ab90c854905f67fce"
-ERRATA_SHA256 = "fbe4c00d13edf3f7e22d990e830a74ebd5ec9b7348a2c47a1f32ae58e74e685f"
-ADDITIONAL_SHA256 = "7c3e60b3d84bf1d58ad1d9cf4f42af3674d4be4dfcffa4593bd156751e8b2929"
+FREEZE_SHA256 = "4016257063e9b8009a9b9c50d8cfa3c7fb90ccf7832aa00402f8a35ac47cdc76"
+ERRATA_SHA256 = "7b1b0f40ec743d4f1797da316de5246ed1ff4e893e61637f79fd35cf359303d3"
+ADDITIONAL_SHA256 = "04fa504ec1cfc6de6768373686bd5dc6790635e0fa4a456fb7638fcaf2423ce9"
 STEMS = "甲乙丙丁戊己庚辛壬癸"
 BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 # Deductive controls from the two explicit Key clauses, not historical examples.

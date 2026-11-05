@@ -19,10 +19,10 @@ from fatebridge.core.sukuyo_sources import load_source
 from fatebridge.services.tool_catalog import CATALOG
 
 PRIMARY = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-fullmoon-primary.json").read_text()
+    (Path(__file__).parent / "data/sukuyo-fullmoon-primary.json").read_text()
 )
 HINOO_PRIMARY = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-hinoo-primary-cache.json").read_text()
+    (Path(__file__).parent / "data/sukuyo-hinoo-primary-cache.json").read_text()
 )
 
 

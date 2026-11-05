@@ -116,7 +116,6 @@ _UNDER_BEAMS_LIMIT = 17.0
 # within this orb on each side, else nearest-neighbour over-reports.
 _ENCLOSURE_ORB = 15.0
 # Solar obliquity bound — a body beyond this declination is "out of bounds".
-OUT_OF_BOUNDS_LIMIT = 23.4367
 
 
 def _angular_distance(first: Angle, second: Angle) -> Fraction:
@@ -358,13 +357,13 @@ def is_retrograde(longitude_speed: Optional[float]) -> Optional[bool]:
 
 
 def out_of_bounds(
-    declination: Optional[float], obliquity: Optional[float] = OUT_OF_BOUNDS_LIMIT
+    declination: Optional[float], obliquity: Optional[float] = None
 ) -> Optional[bool]:
     """A body is *out of bounds* when its declination exceeds the Sun's maximum.
 
     Compare with the epoch's obliquity in the same true-equator frame as the
-    declination. The default retains the legacy modern-epoch approximation for
-    standalone callers; chart assembly supplies the actual epoch value.
+    declination. Unknown obliquity stays unknown; chart assembly supplies the
+    actual epoch value.
     """
     if declination is None or obliquity is None:
         return None
@@ -1020,165 +1019,93 @@ def build_classical_patterns(
 # ── fixed stars (恒星) ──────────────────────────────────────────────
 
 # Curated classical catalogue: the 15 Behenian stars + 5 notable bright stars.
-# ``lon2000`` / ``lat`` retain legacy rounded coordinates for callers of the
-# explicitly approximate fixed_star_longitude helper. Production positions use
-# the separate SIMBAD ICRS catalogue and native apparent-position model. ``nature`` is
-# the Ptolemaic planetary nature (a cited traditional attribution, the raw
-# material for a reading); ``cn`` the traditional Chinese name. Interpretation of
-# what a conjunction *means* is the skills layer's job, not the engine's.
+# Numerical positions come from the separate SIMBAD ICRS catalogue and native
+# apparent model. This table contains cited traditional natures and labels.
 FIXED_STARS: Dict[str, Dict[str, Any]] = {
     "Algol": {
-        "lon2000": 56.1682,
-        "lat": 22.430,
         "nature": ["Saturn", "Jupiter"],
         "cn": "大陵五",
     },
     "Alcyone": {
-        "lon2000": 59.9929,
-        "lat": 4.051,
         "nature": ["Moon", "Jupiter"],
         "cn": "昴宿六",
     },
     "Aldebaran": {
-        "lon2000": 69.7903,
-        "lat": -5.468,
         "nature": ["Mars"],
         "cn": "毕宿五",
     },
     "Rigel": {
-        "lon2000": 76.8319,
-        "lat": -31.124,
         "nature": ["Jupiter", "Saturn"],
         "cn": "参宿七",
     },
     "Capella": {
-        "lon2000": 81.8600,
-        "lat": 22.865,
         "nature": ["Mars", "Mercury"],
         "cn": "五车二",
     },
     "Betelgeuse": {
-        "lon2000": 88.7566,
-        "lat": -16.027,
         "nature": ["Mars", "Mercury"],
         "cn": "参宿四",
     },
     "Sirius": {
-        "lon2000": 104.0853,
-        "lat": -39.605,
         "nature": ["Jupiter", "Mars"],
         "cn": "天狼",
     },
     "Pollux": {
-        "lon2000": 113.2175,
-        "lat": 6.684,
         "nature": ["Mars"],
         "cn": "北河三",
     },
     "Procyon": {
-        "lon2000": 115.7875,
-        "lat": -16.019,
         "nature": ["Mercury", "Mars"],
         "cn": "南河三",
     },
     "Regulus": {
-        "lon2000": 149.8290,
-        "lat": 0.465,
         "nature": ["Mars", "Jupiter"],
         "cn": "轩辕十四",
     },
     "Denebola": {
-        "lon2000": 171.6156,
-        "lat": 12.266,
         "nature": ["Saturn", "Venus"],
         "cn": "五帝座一",
     },
     "Algorab": {
-        "lon2000": 193.4476,
-        "lat": -12.195,
         "nature": ["Mars", "Saturn"],
         "cn": "轸宿三",
     },
     "Spica": {
-        "lon2000": 203.8361,
-        "lat": -2.054,
         "nature": ["Venus", "Mars"],
         "cn": "角宿一",
     },
     "Arcturus": {
-        "lon2000": 204.2282,
-        "lat": 30.733,
         "nature": ["Jupiter", "Mars"],
         "cn": "大角",
     },
     "Alphecca": {
-        "lon2000": 222.2877,
-        "lat": 44.320,
         "nature": ["Venus", "Mercury"],
         "cn": "贯索四",
     },
     "Antares": {
-        "lon2000": 249.7534,
-        "lat": -4.570,
         "nature": ["Mars", "Jupiter"],
         "cn": "心宿二",
     },
     "Vega": {
-        "lon2000": 285.3003,
-        "lat": 61.733,
         "nature": ["Venus", "Mercury"],
         "cn": "织女一",
     },
     "Deneb Algedi": {
-        "lon2000": 323.5344,
-        "lat": -2.602,
         "nature": ["Saturn", "Jupiter"],
         "cn": "垒壁阵四",
     },
     "Fomalhaut": {
-        "lon2000": 333.8527,
-        "lat": -21.137,
         "nature": ["Venus", "Mercury"],
         "cn": "北落师门",
     },
     "Markab": {
-        "lon2000": 353.4799,
-        "lat": 19.408,
         "nature": ["Mars", "Mercury"],
         "cn": "室宿一",
     },
 }
 
-# Legacy linear approximation only. It omits space motion, non-linear
-# precession and apparent-place effects and has no precision certification.
-PRECESSION_DEG_PER_YEAR = 50.2877 / 3600.0
-_J2000_JD = 2451545.0
 # Classical fixed-star conjunctions use a tight orb; 1° is the common default.
 FIXED_STAR_ORB = 1.0
-
-
-def fixed_star_longitude(lon2000: float, julian_day: float) -> float:
-    """Legacy approximate tropical longitude; not used by chart calculations."""
-    years = (julian_day - _J2000_JD) / 365.25
-    return (lon2000 + PRECESSION_DEG_PER_YEAR * years) % 360.0
-
-
-def build_fixed_star_hits(
-    points: Dict[str, float],
-    julian_day: float,
-    orb: float = FIXED_STAR_ORB,
-    *,
-    julian_day_tt: Optional[float] = None,
-    sidereal: bool = False,
-) -> List[Dict[str, Any]]:
-    """Native apparent conjunctions; ``julian_day`` is UT1, TT may be supplied.
-
-    Call build_fixed_star_layer to distinguish unavailable positions from no
-    hits. The old linear approximation is not used as a silent fallback.
-    """
-    return build_fixed_star_layer(
-        points, julian_day, orb=orb, julian_day_tt=julian_day_tt, sidereal=sidereal
-    )[0]
 
 
 def build_fixed_star_layer(
@@ -1347,7 +1274,7 @@ def build_planet_classical(
     longitude_speed: Optional[float] = None,
     declination: Optional[float] = None,
     altitude: Optional[float] = None,
-    obliquity: Optional[float] = OUT_OF_BOUNDS_LIMIT,
+    obliquity: Optional[float] = None,
 ) -> Dict[str, Any]:
     """The per-planet ``classical`` entry surfaced on the chart payload.
 

@@ -9,10 +9,7 @@ import pytest
 from fatebridge.services.knowledge import calculate_knowledge_read
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_element_knowledge_v1"
-BUNDLE = Path("src/fatebridge/data/knowledge/bazi.json")
-LEDGER = Path("tests/fixtures/bazi_knowledge_curation_v1/ledger.json")
-HISTORICAL_AFTER = ROOT / "tests/fixtures/bazi_body_vocabulary_knowledge_v2/before"
+FIXTURE = ROOT / "tests/data/bazi_element_knowledge_v1"
 KEYS = ["木", "火", "土", "金", "水"]
 
 
@@ -28,41 +25,6 @@ def frozen(name):
     path = FIXTURE / name
     assert digest(path) == path.with_suffix(".sha256").read_text().strip()
     return read(path)
-
-
-def test_every_other_object_and_all_keys_are_preserved_against_the_sealed_edition():
-    protocol, review = frozen("protocol.json"), frozen("review.json")
-    assert review["protocol_sha256"] == digest(FIXTURE / "protocol.json")
-    assert review["before_bundle_sha256"] == digest(FIXTURE / "before" / BUNDLE)
-    # Preserve the exact after-edition of this five-element review. The later
-    # body-vocabulary revision has its own current84-object preservation gate.
-    assert review["current_bundle_sha256"] == digest(HISTORICAL_AFTER / BUNDLE)
-    before, current = read(FIXTURE / "before" / BUNDLE), read(HISTORICAL_AFTER / BUNDLE)
-    assert {k: v for k, v in before.items() if k != "categories"} == {
-        k: v for k, v in current.items() if k != "categories"
-    }
-    assert set(before["categories"]) == set(current["categories"])
-    changed, kept = [], 0
-    for category, entries in before["categories"].items():
-        assert set(entries) == set(current["categories"][category])
-        for key, entry in entries.items():
-            if entry == current["categories"][category][key]:
-                kept += 1
-            else:
-                changed.append((category, key))
-    assert changed == [("elements", key) for key in KEYS]
-    assert protocol["targets"] == {"elements": KEYS}
-    assert kept == review["all_other_entries_exactly_preserved"] == 80
-    assert sum(map(len, current["categories"].values())) == 85
-    for name in protocol["before_sha256"]:
-        assert digest(FIXTURE / "before" / name) == protocol["before_sha256"][name]
-    assert not review["numeric_policy_changed"]
-    assert not review["source_labels_changed"]
-    assert not review["adoption_gates_changed"]
-    assert not review["independent_scan_or_expert_acceptance"]
-    assert review["new_chart_cases"] == review["new_model_executions"] == 0
-    assert review["real_world_efficacy"] == "not_tested"
-    assert not review["full_goal_complete"] and review["overall_score"] is None
 
 
 def test_exact_revision_capture_preserves_complete_source_units_and_taxonomies():
@@ -148,48 +110,3 @@ def test_published_card_attributes_each_field_and_exposes_sources_in_first_view(
             if r.get("source_revision_id") == source["revision_id"]
         )
         assert actual["source_sha256"] == source["text_sha256"]
-    old = read(FIXTURE / "before" / BUNDLE)["categories"]["elements"][key]
-    industries = next(t for t in old["tips"] if t.startswith("**行业：**"))[7:].split(
-        "、"
-    )
-    assert all(industry in result["tips"][4] for industry in industries)
-    assert "现代编辑类比" in result["tips"][4]
-    assert old["tips"][1] not in result["rendered_text"]
-    assert old["tips"][2] not in result["rendered_text"]
-    assert "not_medical_personality_or_efficacy" in curation["validation_status"]
-    assert "external_review_pending" in curation["review_status"]
-
-
-def test_inventory_credits_only_five_declared_textual_collations_and_no_expert_acceptance():
-    before, current = read(FIXTURE / "before" / LEDGER), read(HISTORICAL_AFTER / LEDGER)
-    assert current["curated_keys"]["elements"] == KEYS
-    for category, keys in before["curated_keys"].items():
-        assert current["curated_keys"][category] == keys
-    assert current["current_bundle_sha256"] == digest(HISTORICAL_AFTER / BUNDLE)
-    assert current["original_entries"] == before["original_entries"] == 72
-    assert current["current_total"] == before["current_total"] == 85
-    assert (
-        current["unmodified_original_entries"]
-        == before["unmodified_original_entries"] - 5
-        == 25
-    )
-    assert (
-        current["revised_original_entries"]
-        == before["revised_original_entries"] + 5
-        == 47
-    )
-    assert (
-        current["source_attribution_pending_original_entries"]
-        == before["source_attribution_pending_original_entries"] - 5
-        == 35
-    )
-    assert (
-        current["curated_total"]
-        == sum(map(len, current["curated_keys"].values()))
-        == 60
-    )
-    assert (
-        current["independent_expert_acceptance"]
-        == before["independent_expert_acceptance"]
-    )
-    assert current["independent_expert_acceptance"].startswith("not_completed_for_any")

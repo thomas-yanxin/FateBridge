@@ -102,12 +102,10 @@ def solar_month_context(
             "provider": "fatebridge.core.almanac.get_solar_terms_for_year",
             "start_resolution": start,
             "end_resolution": end,
-            "possible_linear_fallback": start["approximate"] or end["approximate"],
             "precision_scope": "engine_computed_not_arbitrary_year_second_certification",
         },
         interval_scope="computed_interval_not_second_certification",
         precision_policy={
-            "linear_fallback": "adjacent_civil_dates_preserve_candidates",
             "moshier_guard_seconds": MOSHIER_BOUNDARY_GUARD_SECONDS,
             "guard_scope": "operational_candidate_preservation_not_error_bound_or_accuracy_credit",
             "numeric_acceptance_gate_seconds": 1.0,

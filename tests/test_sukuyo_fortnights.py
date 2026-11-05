@@ -12,7 +12,7 @@ from fatebridge.core.sukuyo_commentarial_clock import commentarial_boundary_refe
 from fatebridge.core.sukuyo_sources import LoadedSource
 from scripts.check_sukuyo_fortnights import verify_primary
 
-FIXTURE = Path(__file__).parent / "fixtures/sukuyo-fortnight-before-production-v69.json"
+FIXTURE = Path(__file__).parent / "data/sukuyo-fortnight-before-production-v69.json"
 BEFORE = json.loads(FIXTURE.read_bytes())
 
 

@@ -1,8 +1,6 @@
 """Exact decimal-hour offsets must not be rounded to integer seconds."""
 
-import hashlib
 import json
-from datetime import datetime
 from decimal import Decimal, localcontext
 from fractions import Fraction
 from pathlib import Path
@@ -12,30 +10,16 @@ import pytest
 
 from fatebridge.utils.timezones import parse_timezone_name, timezone_rules_metadata
 
-FIXTURE = Path(__file__).parent / "fixtures/human_design_decimal_offset_v1"
+FIXTURE = Path(__file__).parent / "data/human_design/decimal_offset"
 PLAN = json.loads((FIXTURE / "plan.json").read_text())
 
 
-def test_independent_decimal_sofa_inputs_and_original_results_remain_frozen():
-    assert (
-        hashlib.sha256((FIXTURE / "hashes.json").read_bytes()).hexdigest()
-        == "2ae7be0926583952f7b01ddf0332f27bc23bda177cad0b15bca525c75148bca3"
-    )
-    hashes = json.loads((FIXTURE / "hashes.json").read_text())
-    for name, digest in hashes.items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
+def test_declared_decimal_sofa_cohort_keeps_all_inputs_and_tolerance():
     reference = json.loads((FIXTURE / "reference.json").read_text())
-    before = json.loads((FIXTURE / "before-results.json").read_text())
-    assert (
-        reference["plan_sha256"]
-        == hashlib.sha256((FIXTURE / "plan.json").read_bytes()).hexdigest()
-    )
     assert PLAN["tolerance_seconds"] == 0.0002
     assert len(PLAN["valid_cases"]) == len(reference["cases"]) == 24
     assert len(PLAN["reject_cases"]) == 7
-    assert before["exact_UTC_labels"] == 6
-    assert before["independent_axis_pass_count"] == 11
-    assert sum(c["accepted"] for c in before["reject_cases"]) == 4
+    assert reference["independent_generator_imports_fatebridge"] is False
 
 
 @pytest.mark.parametrize("case", PLAN["valid_cases"], ids=lambda c: c["id"])

@@ -31,7 +31,7 @@ def _julian_ordinal(year: int, month: int, day: int) -> int:
 def verify_headers(pdf_path: Path | None = None) -> dict[str, Any]:
     source = load_source(SOURCE)
     bundle = source.data
-    fixture_path = ROOT / "tests/fixtures/sukuyo-shogonji-headers.json"
+    fixture_path = ROOT / "tests/data/sukuyo-shogonji-headers.json"
     fixture_bytes = fixture_path.read_bytes()
     fixture = json.loads(fixture_bytes)
     errors: list[Any] = []

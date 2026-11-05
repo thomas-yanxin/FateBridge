@@ -10,6 +10,7 @@ from decimal import ROUND_HALF_EVEN, Decimal
 from enum import Enum
 from typing import Any, Dict, List
 
+from ..core.method_contracts import COMPATIBILITY_INDEX
 from ..core.rules import BaZiRules
 from ..utils.data import (
     BRANCH_HIDDEN_STEMS,
@@ -19,6 +20,8 @@ from ..utils.data import (
     TenGod,
     get_ten_god,
 )
+
+COMPATIBILITY_METHOD = COMPATIBILITY_INDEX.method_id
 
 
 class RelationshipType(Enum):
@@ -214,7 +217,39 @@ class AdvancedCompatibility:
                 ),
             }
         result["scoring"] = {
-            "method_id": "compatibility_weighted_rules_v2",
+            "method_id": COMPATIBILITY_METHOD,
+            "score_kind": "uncalibrated_rule_index",
+            "evidence_policy": "explicit_preference_and_unresolved_events_v1",
+            "dependency_policy": "shared_natal_inputs_not_independent_evidence_v1",
+            "dimension_dependencies": {
+                "element_balance": [
+                    "both_natal_pillars",
+                    "both_strength",
+                    "both_preferences",
+                    "both_element_distribution",
+                ],
+                "favorable_synergy": [
+                    "both_preferences",
+                    "both_element_distribution",
+                    "both_structure_profile",
+                ],
+                "ten_gods_relationship": ["both_natal_pillars"],
+                "pattern_synergy": ["both_natal_pillars", "both_structure_profile"],
+                "traditional_analysis": ["both_natal_pillars"],
+            },
+            "status": (
+                "partial"
+                if any(
+                    item.get("assessment_status") == "partial"
+                    for item in result["detailed_analysis"].values()
+                )
+                else "calculated"
+            ),
+            "unresolved_dimensions": [
+                name
+                for name, item in result["detailed_analysis"].items()
+                if item.get("assessment_status") == "partial"
+            ],
             "input_methods": input_methods,
             "dimensions": {
                 name: {
@@ -304,6 +339,7 @@ class AdvancedCompatibility:
         """分析五行平衡互补，返回0-100分"""
         analysis: Dict[str, Any] = {
             "score": 65.0,
+            "assessment_status": "calculated",
             "details": [],
             "balance_type": "",
             "mutual_support": [],
@@ -313,8 +349,8 @@ class AdvancedCompatibility:
         person2_elements = analysis2.get("element_distribution", {})
         person1_day_master = analysis1.get("day_master", {}) or {}
         person2_day_master = analysis2.get("day_master", {}) or {}
-        person1_strength = person1_day_master.get("strength", "中和")
-        person2_strength = person2_day_master.get("strength", "中和")
+        person1_strength = person1_day_master.get("strength")
+        person2_strength = person2_day_master.get("strength")
         person1_element = person1_day_master.get("element", "")
         person2_element = person2_day_master.get("element", "")
 
@@ -360,10 +396,33 @@ class AdvancedCompatibility:
                 有情之克的两种来源：
                 - 被克方格局正需此制（控方五行属被克方喜用，如羊刃驾杀需官杀）；
                 - 被克方之气正是控方喜用（财为我克），克之为取用。
-                两者皆无时，才按无情之克(忌神相战)扣分。
+                扣分须命中明确回避项；条件项、中性与未知分别保留。
                 """
                 needed_by_controlled = controller_element in controlled_useful
                 wealth_for_controller = controlled_element in controller_useful
+                profiles = {"第一人": profile1, "第二人": profile2}
+                observations = []
+                for label, element in (
+                    (controlled_label, controller_element),
+                    (controller_label, controlled_element),
+                ):
+                    profile = profiles[label]
+                    state = next(
+                        (
+                            state
+                            for state in ("useful", "avoid", "conditional", "neutral")
+                            if element in profile.get(state + "_elements", [])
+                        ),
+                        "unknown",
+                    )
+                    observations.append(
+                        {"person": label, "element": element, "state": state}
+                    )
+                analysis["control_evidence"] = observations
+                if any(
+                    row["state"] in {"unknown", "conditional"} for row in observations
+                ):
+                    analysis["assessment_status"] = "partial"
 
                 if needed_by_controlled and wealth_for_controller:
                     analysis["details"].append(
@@ -389,12 +448,21 @@ class AdvancedCompatibility:
                     )
                     analysis["score"] += 5
                     analysis["balance_type"] = "相克有情"
-                else:
+                elif any(row["state"] == "avoid" for row in observations):
                     analysis["details"].append(
-                        f"{controller_element}克{controlled_element}，互动中容易出现压制感"
+                        f"{controller_element}克{controlled_element}：所选取用参考命中回避项，规则索引扣8；现实压制感仍须核实"
                     )
                     analysis["score"] -= 8
                     analysis["balance_type"] = "相克制约"
+                else:
+                    analysis["balance_type"] = (
+                        "相克取用待定"
+                        if analysis["assessment_status"] == "partial"
+                        else "相克中性参考"
+                    )
+                    analysis["details"].append(
+                        f"{controller_element}克{controlled_element}仅为五行关系；未命中明确喜忌，不据此加减分或推定压制"
+                    )
 
             if person1_element == person2_element:
                 analysis["details"].append(
@@ -475,6 +543,9 @@ class AdvancedCompatibility:
             )
             analysis["score"] -= 4
 
+        if not person1_strength or not person2_strength:
+            analysis["assessment_status"] = "partial"
+
         if person1_elements and person2_elements:
             complement_score = 0
             for element in ["木", "火", "土", "金", "水"]:
@@ -506,6 +577,7 @@ class AdvancedCompatibility:
         """分析喜用神互助，返回0-100分"""
         analysis: Dict[str, Any] = {
             "score": 60.0,
+            "assessment_status": "calculated",
             "details": [],
             "mutual_help": [],
             "synergy_level": "",
@@ -585,33 +657,46 @@ class AdvancedCompatibility:
             profile2.get("useful_ten_gods", [])
         )
         if common_useful_ten_gods:
+            delta = min(8, len(common_useful_ten_gods) * 3)
             analysis["useful_ten_gods_support"].append(
                 {
                     "common_ten_gods": sorted(common_useful_ten_gods),
                     "description": "双方在可用十神上存在交集，格局取向更容易对齐。",
                 }
             )
-            analysis["score"] += min(8, len(common_useful_ten_gods) * 3)
+            analysis["score_basis"].append(
+                f"共同可用十神：{', '.join(sorted(common_useful_ten_gods))}(+{delta})"
+            )
+            analysis["score"] += delta
 
         forward_conflict = person1_favorable_elements & person2_avoid_elements
         reverse_conflict = person2_favorable_elements & person1_avoid_elements
         if forward_conflict:
             text = f"第一人的可用五行{', '.join(sorted(forward_conflict))}落在第二人的回避区间"
+            delta = len(forward_conflict) * 8
             analysis["risk_reasons"].append(text)
-            analysis["score_basis"].append(f"{text}(-8)")
-            analysis["score"] -= len(forward_conflict) * 8
+            analysis["score_basis"].append(f"{text}(-{delta})")
+            analysis["score"] -= delta
         if reverse_conflict:
             text = f"第二人的可用五行{', '.join(sorted(reverse_conflict))}落在第一人的回避区间"
+            delta = len(reverse_conflict) * 8
             analysis["risk_reasons"].append(text)
-            analysis["score_basis"].append(f"{text}(-8)")
-            analysis["score"] -= len(reverse_conflict) * 8
+            analysis["score_basis"].append(f"{text}(-{delta})")
+            analysis["score"] -= delta
+
+        if not person1_favorable_elements or not person2_favorable_elements:
+            analysis["assessment_status"] = "partial"
+            analysis["details"].append(
+                "至少一方尚无已选喜用；未判定部分不视为无冲突或互助"
+            )
 
         if not analysis["supportive_patterns"]:
-            analysis["details"].append("在可用五行承接上没有形成明显双向互助")
-        if not analysis["risk_reasons"]:
-            analysis["risk_reasons"].append("未见明显的喜用-回避五行正面冲突")
-
-        if analysis["score"] >= 82:
+            analysis["synergy_level"] = (
+                "待取用裁定"
+                if analysis["assessment_status"] == "partial"
+                else "未见承接证据"
+            )
+        elif analysis["score"] >= 82:
             analysis["synergy_level"] = "强力互助"
         elif analysis["score"] >= 70:
             # 等级分档不变；“双向”须由两种实际承接方向共同支持。
@@ -633,6 +718,11 @@ class AdvancedCompatibility:
 
         # 确保分数在0-100范围内
         analysis["score"] = min(100.0, max(0.0, analysis["score"]))
+        analysis["score_evidence"] = {
+            "base_score": 60.0,
+            "has_scored_observations": bool(analysis["score_basis"]),
+            "base_score_is_support_evidence": False,
+        }
 
         return analysis
 
@@ -800,9 +890,11 @@ class AdvancedCompatibility:
             description = (
                 f"双方共同认可能用的十神为：{', '.join(sorted(common_useful_ten_gods))}"
             )
+            delta = min(10, len(common_useful_ten_gods) * 3)
             analysis["relationship_dynamics"].append(description)
             analysis["compatibility_aspects"].append("共同取用一致")
-            analysis["score"] += min(10, len(common_useful_ten_gods) * 3)
+            analysis["score_basis"].append(f"{description}(+{delta})")
+            analysis["score"] += delta
 
         if not analysis["details"]:
             analysis["details"].append(
@@ -900,6 +992,7 @@ class AdvancedCompatibility:
         """分析格局配合，返回0-100分"""
         analysis: Dict[str, Any] = {
             "score": 68.0,
+            "assessment_status": "calculated",
             "details": [],
             "pattern_combination": "",
             "synergy_effects": [],
@@ -930,6 +1023,9 @@ class AdvancedCompatibility:
         analysis["supportive_patterns"] = merged_events["supportive_patterns"]
         analysis["tension_patterns"] = merged_events["tension_patterns"]
         analysis["risk_patterns"] = merged_events["risk_patterns"]
+        analysis["unresolved_patterns"] = merged_events["unresolved_patterns"]
+        if analysis["unresolved_patterns"]:
+            analysis["assessment_status"] = "partial"
 
         supportive_harmony_labels: List[str] = []
         for pattern in analysis["supportive_patterns"]:
@@ -1031,6 +1127,8 @@ class AdvancedCompatibility:
         overall_score = result["overall_score"]
 
         for analysis_type, analysis_data in result["detailed_analysis"].items():
+            if analysis_data.get("assessment_status") == "partial":
+                continue
             # 多数维度的得分键是 "score"；唯独 traditional_analysis 维度按语义
             # 命名为 "normalized_score"（避免与外层全局 overall_score 混淆）。
             # 此处必须回退读取该键，否则 .get("score", 0) 会静默拿到 0，把传统
@@ -1055,7 +1153,11 @@ class AdvancedCompatibility:
             if key in result:
                 result[key] = list(dict.fromkeys(result[key]))
 
-        if overall_score >= 82:
+        if result["scoring"]["status"] == "partial":
+            result["summary"] = (
+                f"规则索引{overall_score:g}；存在未裁定分项，须连同取用条件与实际互动阅读"
+            )
+        elif overall_score >= 82:
             result["summary"] = "非常匹配，各方面都很协调，是理想的组合"
         elif overall_score >= 70:
             result["summary"] = "比较匹配，大部分方面都很好，小部分需要磨合"

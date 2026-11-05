@@ -114,7 +114,9 @@ def test_three_selected_rows_against_independent_ring_and_integer_arithmetic(
 
 
 @pytest.mark.parametrize("key", ["taiyi", "sanshiunited"])
-@pytest.mark.parametrize("day,hour,ju", [(24, 16, 37), (25, 4, 43), (25, 6, 44)])
+@pytest.mark.parametrize(
+    "day,hour,ju", [(24, 16, 37), (25, 4, 43), (25, 6, 44), (23, 16, 25)]
+)
 def test_actual_rest_mcp_cli_keep_both_editions(
     key, day, hour, ju, capsys, monkeypatch
 ):
@@ -161,7 +163,9 @@ def test_actual_rest_mcp_cli_keep_both_editions(
     assert expected["core_board"]["kook_number"] == ju
     assessment = expected["count_source_assessment"]
     assert assessment["summary"]["status"] == "differences_unadjudicated"
-    assert assessment["edition_comparisons"][0]["matching_current_observations"] == 6
+    assert assessment["edition_comparisons"][0]["matching_current_observations"] == (
+        1 if ju == 25 else 6
+    )
     assert assessment["edition_comparisons"][0]["ju"] == ju
     args = [key, "--strict-fields", "--no-use-true-solar-time", "--fields", *fields]
     for name, value in payload.items():
@@ -189,3 +193,42 @@ def test_actual_rest_mcp_cli_keep_both_editions(
             assert result.structured_content["taiyi"] == expected
 
     asyncio.run(call())
+
+
+@pytest.mark.parametrize(
+    "yin,ju,field,printed,selected",
+    [
+        (False, 39, "main_count", 35, 25),
+        (False, 50, "main_count", 16, 6),
+        (True, 11, "guest_count", 26, 36),
+        (True, 15, "guest_count", 25, 29),
+        (True, 25, "main_count", 31, 21),
+        (True, 26, "main_count", 30, 31),
+        (True, 27, "main_count", 29, 39),
+        (True, 43, "guest_count", 1, 38),
+        (True, 44, "guest_count", 38, 31),
+        (True, 46, "guest_count", 1, 2),
+        (True, 70, "main_count", 32, 22),
+    ],
+)
+def test_all_original_count_conflicts_have_named_variants_without_regrading(
+    yin, ju, field, printed, selected
+):
+    assessment = board(ju, yin)["count_source_assessment"]
+    (witness,) = assessment["edition_comparisons"]
+    fact = next(f for f in witness["observations"] if f["field"] == field)
+    assert fact["edition_value"] == printed
+    assert fact["selected_source_value"] == selected
+    assert fact["matches_current"]
+    assert not fact["matches_selected_source"]
+    assert witness["yin_dun"] is yin
+    assert (
+        witness["count_conflict_status"]
+        == "printed_edition_variant_observed_pending_expert_collation"
+    )
+    assert witness["whole_work_acceptance_passed"] is False
+    assert assessment["summary"]["status"] == "differences_unadjudicated"
+    if ju not in (43, 44):
+        assert witness["required_observations"] == 1
+        assert len(witness["unread_fields"]) == 5
+    assert "原《金镜》分歧保留" in source_alignment_text(assessment)

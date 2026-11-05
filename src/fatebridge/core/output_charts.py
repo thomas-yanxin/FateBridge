@@ -8,7 +8,7 @@ from typing import Annotated, Any, Dict, List, Literal, Optional, Union
 
 from pydantic import Field
 
-from fatebridge.core.output_base import PartialOutput
+from fatebridge.core.output_base import FullFact, PartialOutput
 from fatebridge.core.output_chinese import PersonInfo
 from fatebridge.core.output_clock_labels import WesternUTCRepresentation
 from fatebridge.core.output_ephemeris import (
@@ -56,13 +56,16 @@ class Dignity(PartialOutput):
     scope: Optional[str] = None
 
 
-class ChartPlanet(PartialOutput):
-    id: Optional[str] = None
-    longitude: Optional[float] = Field(default=None, ge=0, lt=360)
-    latitude: Optional[float] = Field(default=None, ge=-90, le=90)
+class ChartPoint(PartialOutput):
+    longitude: FullFact[Optional[float]] = Field(default=None, ge=0, lt=360)
     degree_in_sign: Optional[float] = Field(default=None, ge=0, lt=30)
     sign: Optional[str] = None
     sign_zh: Optional[str] = None
+
+
+class ChartPlanet(ChartPoint):
+    id: FullFact[Optional[str]] = None
+    latitude: Optional[float] = Field(default=None, ge=-90, le=90)
     house: Optional[int] = None
     ecliptic_house_position: Optional[float] = Field(default=None, ge=1, lt=13)
     element: Optional[str] = None
@@ -448,10 +451,6 @@ class DirectionalMotionCheck(PartialOutput):
     backward_rate: Optional[float] = None
     disagreement_arcsec_per_day: Optional[float] = None
     passed: Optional[bool] = None
-    legacy_six_point_forward_rate: Optional[float] = None
-    legacy_six_point_backward_rate: Optional[float] = None
-    legacy_disagreement_arcsec_per_day: Optional[float] = None
-    legacy_passed: Optional[bool] = None
 
 
 class PositionMotionAttempt(PartialOutput):
@@ -557,12 +556,9 @@ class SolarBranchLevel(PartialOutput):
 
 
 class DecimalApparentReduction(PartialOutput):
-    method_id: Optional[
-        Literal[
-            "native_geometric_decimal_apparent_reduction_v1",
-            "native_geometric_decimal_apparent_reduction_v2",
-        ]
-    ] = None
+    method_id: Optional[Literal["native_geometric_decimal_apparent_reduction_v2"]] = (
+        None
+    )
     ephemeris_model: Optional[Literal["swieph", "jpl"]] = None
     center_interpolation_branch: Optional[SolarBranchGeometry] = None
     precision_decimal_digits: Optional[Literal[50]] = None
@@ -741,8 +737,8 @@ class ChartProfile(PartialOutput):
     ayanamsha_includes_nutation: Optional[bool] = None
     sidereal_position_method: Optional[str] = None
     sidereal_house_method: Optional[str] = None
-    chart_type: Optional[str] = None
-    engine_backend: Optional[str] = None
+    chart_type: FullFact[Optional[str]] = None
+    engine_backend: FullFact[Optional[str]] = None
     engine_precision: Optional[str] = None
     ephemeris_model: Optional[str] = None
     house_system: Optional[str] = None
@@ -1074,7 +1070,7 @@ class ClassicalPatterns(PartialOutput):
 class Hellenistic(PartialOutput):
     angular_planets: Optional[List[str]] = None
     ascendant_ruler: Optional[str] = None
-    lot_of_fortune: Optional[ChartPlanet] = None
+    lot_of_fortune: Optional[ChartPoint] = None
     sect: Optional[str] = None
 
 
@@ -1445,8 +1441,105 @@ CHART_FIELDS: Dict[str, Any] = {
     },
 }
 
+
+class OpaqueSolarConvention(PartialOutput):
+    observer: Optional[Literal["Earth_geocenter"]] = None
+    solar_radius_m: Optional[Literal[695700000]] = None
+    deflection: Optional[
+        Literal["finite_source_solar_monopole_except_intercepted_opaque_rays"]
+    ] = None
+    tangent_boundary: Optional[Literal["exterior"]] = None
+    opaque_intersection_arithmetic: Optional[
+        Literal["exact_supplied_binary64_states"]
+    ] = None
+    deflection_limiter: Optional[float] = Field(default=None, gt=0, allow_inf_nan=False)
+    aberration: Optional[Literal["ERFA_ab"]] = None
+    light_speed_au_day: Optional[float] = Field(default=None, gt=0, allow_inf_nan=False)
+    inside_solar_disk: Optional[Literal["nonobservable_mathematical_extension"]] = None
+
+
+class OpaqueSolarLightTimeSolution(PartialOutput):
+    method_id: Optional[Literal["exact_source_light_cone_adjacent_tt_v1"]] = None
+    selected_endpoint: Optional[Literal["first_nonnegative_F"]] = None
+    lower_jd_tt: Optional[float] = Field(default=None, allow_inf_nan=False)
+    upper_jd_tt: Optional[float] = Field(default=None, allow_inf_nan=False)
+    lower_residual_seconds: Optional[float] = Field(
+        default=None, le=0, allow_inf_nan=False
+    )
+    upper_residual_seconds: Optional[float] = Field(
+        default=None, ge=0, allow_inf_nan=False
+    )
+    bracket_width_seconds: Optional[float] = Field(
+        default=None, ge=0, allow_inf_nan=False
+    )
+    exact_root: Optional[bool] = None
+    lower_target_barycentric_icrs_au_au_day: Optional[List[float]] = Field(
+        default=None, min_length=6, max_length=6
+    )
+
+
+class OpaqueSolarPosition(PartialOutput):
+    body: Literal[
+        "Sun",
+        "Moon",
+        "Mercury",
+        "Venus",
+        "Mars",
+        "Jupiter",
+        "Saturn",
+        "Uranus",
+        "Neptune",
+        "Pluto",
+    ]
+    longitude: float = Field(ge=0, lt=360, allow_inf_nan=False)
+    latitude: float = Field(ge=-90, le=90, allow_inf_nan=False)
+    distance_au: float = Field(gt=0, allow_inf_nan=False)
+    apparent_icrs_unit_direction: List[float] = Field(min_length=3, max_length=3)
+    solar_disc_intercepted: bool
+    solar_deflection_applied: bool
+    emission_jd_tt: float = Field(allow_inf_nan=False)
+    solar_passage_jd_tt: float = Field(allow_inf_nan=False)
+    light_time_iterations: int = Field(ge=1, le=20)
+    light_time_solution: OpaqueSolarLightTimeSolution
+    target_barycentric_icrs_au_au_day: List[float] = Field(min_length=6, max_length=6)
+    solar_barycentric_icrs_au_au_day: List[float] = Field(min_length=6, max_length=6)
+    input_state_return_flags: List[int] = Field(min_length=2, max_length=2)
+
+
+class OpaqueSolarPositions(PartialOutput):
+    status: Optional[Literal["computed"]] = None
+    method_id: Optional[Literal["finite_source_opaque_solar_apparent_positions_v1"]] = (
+        None
+    )
+    apparent_model: Optional[Literal["opaque_solar"]] = None
+    scope: Optional[Literal["standalone_positions_only"]] = None
+    frame: Optional[Literal["IAU2006/2000A_true_ecliptic_of_date"]] = None
+    jd_tt: Optional[float] = Field(default=None, allow_inf_nan=False)
+    positions: Optional[List[OpaqueSolarPosition]] = Field(
+        default=None, min_length=10, max_length=10
+    )
+    earth_barycentric_icrs_au_au_day: Optional[List[float]] = Field(
+        default=None, min_length=6, max_length=6
+    )
+    sun_at_observation_barycentric_icrs_au_au_day: Optional[List[float]] = Field(
+        default=None, min_length=6, max_length=6
+    )
+    input_state_return_flags: Optional[List[int]] = Field(
+        default=None, min_length=2, max_length=2
+    )
+    physical_ephemeris_source: Optional[PhysicalEphemerisSource] = None
+    ephemeris_reference_points: Optional[EphemerisReferencePoints] = None
+    convention: Optional[OpaqueSolarConvention] = None
+    natal_chart_recomputed: Optional[Literal[False]] = None
+    speeds_and_derived_chart_assessed: Optional[Literal[False]] = None
+    physical_accuracy_certified: Optional[Literal[False]] = None
+
+
 CHART_TOOL_FIELDS: Dict[str, Dict[str, Any]] = {
-    "astro_chart": {"person_info": ChartPerson},
+    "astro_chart": {
+        "person_info": ChartPerson,
+        "apparent_model_positions": OpaqueSolarPositions,
+    },
     "astro_chart13": {"person_info": ChartPerson},
     "astro_relative": {"chart": Chart},
     "astro_relative_chart": {"chart": Chart},

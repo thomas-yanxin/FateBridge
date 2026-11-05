@@ -5,9 +5,7 @@ from fatebridge.core.metaphysics.ziwei import build_ziwei_chart, build_ziwei_hor
 from fatebridge.services.metaphysics import _build_analysis_seed, _build_person_seed
 from fatebridge.utils.birth_input import create_person_info
 
-FIXTURE = (
-    Path(__file__).resolve().parent / "fixtures" / "ziwei_horoscope_reference.json"
-)
+FIXTURE = Path(__file__).resolve().parent / "data" / "ziwei_horoscope_reference.json"
 
 # Frozen software-reference differences are asserted, never skipped or edited
 # into source agreement. These three rows use a six-year bureau and precede
@@ -54,7 +52,7 @@ def _our_horoscope(case: dict) -> dict:
         analysis_year=ty, analysis_month=tm, analysis_day=td, analysis_hour=th
     )
     h = build_ziwei_horoscope(
-        nominal_age_basis="legacy_mixed_clock",
+        birth_seed=natal_seed,
         chart=chart,
         gender=person.gender or "未知",
         target_seed=target_seed,
@@ -81,7 +79,6 @@ def test_horoscope_matches_iztro_oracle():
                 assert got["branch"] is None and got["mutagen"] is None
                 assert got["natal_palace_name"] is None and got["stem"] is None
                 assert got["palace_map"] == got["mutagen_natal_links"] == []
-                assert got["is_childhood_limit"] is False
                 unavailable_rows.add(label)
                 continue
             compared_scope_records += 1

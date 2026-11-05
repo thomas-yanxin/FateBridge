@@ -269,7 +269,14 @@ def _make_mcp_fn(
         }
         try:
             options = ExecutionOptions.model_validate(controls)
-            request = model(**kwargs)
+            from fatebridge.transports.request_context import MCP_REQUEST
+
+            contextual = MCP_REQUEST.get()
+            request = (
+                contextual[1]
+                if contextual is not None and contextual[0] == spec.key
+                else model(**kwargs)
+            )
             result = execute_tool(spec, request, options=options)
         except ValidationError as exc:
             return render_error(

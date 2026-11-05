@@ -38,43 +38,19 @@ def calculate_meihua_cast(
         {
             "interpretation_topic": interpretation_topic,
             "weather_context": weather_context,
-            **(
-                {"reputation_context": reputation_context}
-                if reputation_context is not None
-                else {}
-            ),
-            **(
-                {"response_context": response_context}
-                if response_context is not None
-                else {}
-            ),
-            **(
-                {"observation_context": observation_context}
-                if observation_context is not None
-                else {}
-            ),
-            **(
-                {"observer_activity": observer_activity}
-                if observer_activity is not None
-                else {}
-            ),
-            **(
-                {"matter_scenario": matter_scenario}
-                if matter_scenario is not None
-                else {}
-            ),
-            **(
-                {"external_observations": external_observations}
-                if external_observations is not None
-                else {}
-            ),
+            "reputation_context": reputation_context,
+            "response_context": response_context,
+            "observation_context": observation_context,
+            "observer_activity": observer_activity,
+            "matter_scenario": matter_scenario,
+            "external_observations": external_observations,
         }
     )
     from fatebridge.core.meihua_observation import ensure_observation_method_context
 
     normalized_observation = (
         options.observation_context.model_dump(mode="json")
-        if observation_context is not None and options.observation_context is not None
+        if options.observation_context is not None
         else None
     )
     ensure_observation_method_context(casting.get("method"), normalized_observation)
@@ -243,8 +219,7 @@ def calculate_meihua_cast(
                 item.model_dump(mode="json", exclude_none=True)
                 for item in options.external_observations
             ]
-            if external_observations is not None
-            and options.external_observations is not None
+            if options.external_observations is not None
             else None
         ),
     )
@@ -253,9 +228,7 @@ def calculate_meihua_cast(
     apply_stage_emphasis(
         cast,
         interpretation,
-        matter_scenario=(
-            options.matter_scenario if matter_scenario is not None else None
-        ),
+        matter_scenario=options.matter_scenario,
         scenario_fact_path="input_normalized.matter_scenario",
     )
     from fatebridge.core.meihua_motion import apply_motion_context
@@ -263,9 +236,7 @@ def calculate_meihua_cast(
     apply_motion_context(
         cast,
         interpretation,
-        observer_activity=(
-            options.observer_activity if observer_activity is not None else None
-        ),
+        observer_activity=options.observer_activity,
         observer_fact_path="input_normalized.observer_activity",
     )
     from fatebridge.core.meihua_timing import apply_postheaven_count_reference
@@ -295,7 +266,7 @@ def calculate_meihua_cast(
 
     normalized_response = (
         options.response_context.model_dump(mode="json")
-        if response_context is not None and options.response_context is not None
+        if options.response_context is not None
         else None
     )
     apply_situational_responses(
@@ -326,7 +297,7 @@ def calculate_meihua_cast(
 
     normalized_reputation = (
         options.reputation_context.model_dump(mode="json", exclude_none=True)
-        if reputation_context is not None and options.reputation_context is not None
+        if options.reputation_context is not None
         else None
     )
     apply_reputation_supplement(

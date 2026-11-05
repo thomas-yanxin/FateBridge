@@ -13,13 +13,14 @@ from fatebridge.core.human_design_context_lines import (
     subdivision_changes,
     unavailable_contexts,
 )
+from fatebridge.core.human_design_line_catalogue import _canonical
 from fatebridge.core.human_design_line_reading import _compose
 from fatebridge.core.human_design_references import coherent_human_design_references
 from fatebridge.services.human_design_line_reading import build_human_design_line_packet
 
 
 def _digest(value: object) -> str:
-    return sha256(knowledge._canonical(value)).hexdigest()
+    return sha256(_canonical(value)).hexdigest()
 
 
 def build_human_design_context_packet(

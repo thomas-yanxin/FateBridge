@@ -439,23 +439,10 @@ def evaluate_radicality(
             "p115_zero_balance_substituted": False,
         },
     )
-    legacy_codes = {
-        "C01": "ascendant_too_early",
-        "C02": "ascendant_too_late",
-        "C04": "moon_via_combusta",
-        "C05": "moon_void_of_course",
-        "C07": "saturn_in_first",
-        "C08": "saturn_in_seventh",
-        "C06": "seventh_matter_context_caution",
-        "C09": "ascendant_lord_combust",
-        "C10": "seventh_lord_condition_caution",
-        "C11": "equal_testimonies_reported",
-    }
     strictures = [
         {
-            "code": legacy_codes[r["code"]],
+            "code": r["code"],
             "detail": r["conditional_reading_zh"],
-            "source_clause": r["code"],
             "source_pages": r["source_pages"],
             "status": r["status"],
             "exception_satisfied": r["exception_satisfied"],
@@ -463,7 +450,7 @@ def evaluate_radicality(
             "attributed_variant": r["attributed_variant"],
         }
         for r in rows
-        if r["code"] in legacy_codes
+        if r["code"] not in {"R01", "C03"}
         and r["applicable"]
         and r["condition_present"] is True
     ]

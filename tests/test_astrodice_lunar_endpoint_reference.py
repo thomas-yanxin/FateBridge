@@ -11,12 +11,12 @@ import pytest
 
 from scripts.audit_astrodice_lunar_endpoints import validate_reference
 
-FIXTURES = Path(__file__).parent / "fixtures"
+FIXTURES = Path(__file__).parent / "data/astrodice/tables"
 
 
 def inputs():
     return [
-        json.loads((FIXTURES / f"astrodice-lunar-endpoint-{name}.json").read_text())
+        json.loads((FIXTURES / f"lunar-endpoint-{name}.json").read_text())
         for name in ["protocol", "reference"]
     ]
 
@@ -25,7 +25,7 @@ def test_first_endpoint_study_keeps_all_four_failed_template_checks():
     protocol, reference = inputs()
     assert (
         hashlib.sha256(
-            (FIXTURES / "astrodice-lunar-endpoint-reference.json").read_bytes()
+            (FIXTURES / "lunar-endpoint-reference.json").read_bytes()
         ).hexdigest()
         == "083cc2b6ef8da612aed3a93fc4776dcf8391b38f9e818c25a582cbd4c428a19d"
     )
@@ -41,12 +41,12 @@ def test_first_endpoint_study_keeps_all_four_failed_template_checks():
 def test_second_endpoint_study_preserves_its_failed_controls_and_new_cohort():
     first, _ = inputs()
     protocol, reference = [
-        json.loads((FIXTURES / f"astrodice-lunar-endpoint-v2-{name}.json").read_text())
+        json.loads((FIXTURES / f"lunar-endpoint-v2-{name}.json").read_text())
         for name in ["protocol", "reference"]
     ]
     assert (
         hashlib.sha256(
-            (FIXTURES / "astrodice-lunar-endpoint-v2-reference.json").read_bytes()
+            (FIXTURES / "lunar-endpoint-v2-reference.json").read_bytes()
         ).hexdigest()
         == "f29f59a60c5ea758d0f98d0fc7a53f4fc3ec48e9abf1413af76760ede366ccdc"
     )
@@ -66,14 +66,14 @@ def test_endpoint_validation_cli_exits_unresolved_for_failed_reference(tmp_path)
             "-m",
             "scripts.audit_astrodice_lunar_endpoints",
             "--protocol",
-            str(FIXTURES / "astrodice-lunar-endpoint-v2-protocol.json"),
+            str(FIXTURES / "lunar-endpoint-v2-protocol.json"),
             "--reference",
-            str(FIXTURES / "astrodice-lunar-endpoint-v2-reference.json"),
+            str(FIXTURES / "lunar-endpoint-v2-reference.json"),
             "--validate-only",
             "--output",
             str(output),
         ],
-        cwd=FIXTURES.parents[1],
+        cwd=Path(__file__).parents[1],
         capture_output=True,
         text=True,
     )

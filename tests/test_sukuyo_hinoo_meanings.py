@@ -14,7 +14,7 @@ from tests.test_sukuyo_witness_research import critical
 
 ROOT = Path(__file__).resolve().parents[1]
 REFERENCE = json.loads(
-    (ROOT / "tests/fixtures/sukuyo-hinoo-meanings-before-code-v94.json").read_bytes()
+    (ROOT / "tests/data/sukuyo-hinoo-meanings-before-code-v94.json").read_bytes()
 )["expected_bundle"]
 
 

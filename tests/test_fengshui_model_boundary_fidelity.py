@@ -160,27 +160,13 @@ def test_confirmed_minggua_year_does_not_invent_a_solver_observation(actual_mode
 
 
 @pytest.mark.parametrize("model", ["moshier", MODEL_ID, "unknown_model"])
-def test_linear_fallback_does_not_borrow_stale_numerical_model_metadata(model):
-    # Synthetic contradictory metadata exercises precedence, not solar accuracy.
+def test_unqualified_resolution_does_not_borrow_numerical_model_credit(model):
     resolution = {
         "moment": "2024-02-04T00:00:02+00:00",
         "approximate": True,
         "ephemeris_model": model,
     }
     assert boundary_model_policy(resolution) is None
-    assert (
-        boundary_uncertainty_reason(
-            datetime.fromisoformat(resolution["moment"]), resolution
-        )
-        == "linear_fallback_adjacent_civil_dates"
-    )
-    assert sorted(
-        d.isoformat() for d in boundary_candidate_dates(resolution, "UTC")
-    ) == [
-        "2024-02-03",
-        "2024-02-04",
-        "2024-02-05",
-    ]
 
 
 def test_returned_analytic_provenance_cannot_poison_the_cached_term(

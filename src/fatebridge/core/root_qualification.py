@@ -16,7 +16,10 @@ def root_qualification_snapshot_lines(assessment: Mapping[str, Any]) -> list[str
         "weighted_balance": "有效五行扶身与减身份额",
         "rooted_wealth_officer_front_without_visible_support": "财生官杀且无印比透出",
         "in_command_multiple_vigorous_roots": "得令且有含月支在内的至少两处健全根",
-        "multiple_vigorous_roots_and_visible_support": "至少两处健全根且年、月、时三干均为印比",
+        "multiple_vigorous_roots_and_rooted_visible_support": "至少两处健全根且另有实际通根的透干印比",
+        "multiple_surviving_principal_body_roots": "至少两处保留合格的同类本气根",
+        "aligned_four_branch_generation_and_time_lu": "完整四支顺生、干支杀印身相承且时归禄旺",
+        "winter_rootless_wood_cannot_receive_water": "冬水当令而木无实际藏根，不以印旺代替身强",
     }
     details = []
     for row in rows:

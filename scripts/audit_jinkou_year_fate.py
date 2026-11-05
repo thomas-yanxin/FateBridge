@@ -46,7 +46,7 @@ def course_cases() -> tuple[dict[str, Any], list[dict[str, Any]]]:
     return raw, cases
 
 
-def audit(baseline: Path | None = None) -> dict[str, Any]:
+def audit() -> dict[str, Any]:
     source, raw, _ = references()
     names = [
         "src/fatebridge/core/metaphysics/jinkou_year_fate.py",
@@ -184,42 +184,6 @@ def audit(baseline: Path | None = None) -> dict[str, Any]:
                 ),
             )
         )
-    legacy = None
-    if baseline is not None:
-        from fatebridge.core.metaphysics.jinkou import build_jinkou_board
-        from scripts.audit_ren_classical import make_seed
-
-        with gzip.open(baseline, "rt", encoding="utf-8") as f:
-            old = json.load(f)
-        assert len(old) == 720
-        for row in old:
-            current = build_jinkou_board(
-                make_seed(dict(day=row["day"], hour="巳", month="辰")),
-                {"month_general": {"branch": "戌"}},
-                di_fen=row["ground"],
-            )
-            expected_ruleset = copy.deepcopy(row["board"]["ruleset"])
-            assert expected_ruleset["version"] == "1.10.0"
-            expected_ruleset["version"] = "1.11.0"
-            expected_ruleset["source_title"] += "与六甲旬行年另课"
-            expected_ruleset["conventions"][
-                "year_fate"
-            ] = "京本按明确出生年干支所属六甲旬取男女起点，男顺女逆；只用指定一岁起算岁序，另课采用行年支作地分的所选释读，不表示已观测来人方位；不借用大六壬通用行年起点。"
-            expected_ruleset["conventions"][
-                "natal_absolute"
-            ] = "将命大绝取显式本命支，或明确birth_year_ganzhi的年支，与本次将神支核对京本四组配对；两者均缺仍未知，不以分析年日时、地分或行年替代本命"
-            expected_ruleset["unresolved"].append(
-                "京本行年换岁边界及己亥行年见甲人元所指课干未裁定，未认证综合喜用"
-            )
-            assert current["ruleset"] == expected_ruleset, "Undeclared ruleset change"
-            current["ruleset"] = row["board"]["ruleset"]
-            assert current == row["board"], (row["day"], row["ground"])
-        legacy = dict(
-            boards=720,
-            full_old_board_preserved_except_declared_ruleset_metadata=True,
-            baseline_sha256=sha(baseline),
-            declared_ruleset_metadata_checked_on_all_boards=True,
-        )
     after = {n: sha(ROOT / n) for n in names}
     assert before == after
     return dict(
@@ -244,7 +208,6 @@ def audit(baseline: Path | None = None) -> dict[str, Any]:
         parity_digest=hashlib.sha256(
             json.dumps(parity, ensure_ascii=False, separators=(",", ":")).encode()
         ).hexdigest(),
-        legacy_boards=legacy,
         engineering_checks_passed=all(r["matched"] for r in starts + printed + courses),
         age_boundary_classically_verified=False,
         comprehensive_year_fate_adjudicated=False,
@@ -259,9 +222,8 @@ def audit(baseline: Path | None = None) -> dict[str, Any]:
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--output", type=Path, required=True)
-    p.add_argument("--baseline", type=Path)
     args = p.parse_args()
-    result = audit(args.baseline)
+    result = audit()
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(
         json.dumps(

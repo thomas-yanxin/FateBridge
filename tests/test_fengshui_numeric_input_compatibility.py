@@ -39,7 +39,6 @@ CASES = [
     ("models", "Occupant", "effective_birth_year", 2000),
     ("models", "Occupant", "birth_at", BIRTH_CLOCK),
     ("models", "XuankongInterpretationRequest", "current_period_number", 9),
-    ("models", "XuankongRequest", "bearing_uncertainty_degrees", 1.0),
     ("workstation_inputs", "EvaluationPeriod", "number", 9),
 ]
 

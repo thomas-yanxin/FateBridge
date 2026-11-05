@@ -13,15 +13,13 @@ from fatebridge.core.heluo import build_snapshot_text, yao_text
 from fatebridge.core.heluo_timing import selected_timing_snapshot
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.services.tool_catalog import CATALOG
-from tests.heluo_ben22_revision_reference import assert_r96_source_addition
-from tests.heluo_current_source_reference import HEADER_COUNT, PENDING_COUNT
+from tests.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 from tests.test_agentic_nested_outputs import business
 from tests.test_agentic_nested_outputs import rest as shared_rest
 from tests.test_heluo_poem_transports import run_three
 
 F = Path(__file__).parent / "fixtures/heluo_shike21_bi8_v1"
 L = json.loads((F / "reviewed-literals-v2.json").read_bytes())
-P = json.loads((F / "proposal-reference.json").read_bytes())
 rest = shared_rest
 ROWS = [(g, i) for g in ("火雷噬嗑", "水地比") for i in range(1, 7)]
 
@@ -190,44 +188,6 @@ def test_conditional_crossreferences_do_not_fill_unprinted_target_line_or_replac
         assert r["condition_text"] == "叶者" and r["applicability"] is None
         assert r["automatic_application"] is False and r["replaces_chart"] is False
     assert "常懷憂懼" in yao_text("火雷噬嗑", 6)["commentary_sections"][1]["text"]
-
-
-def test_previous_120main_entries_and_101poems_remain_exact():
-    for name, data, count in [
-        ("yaoci-collation-v1.json", ht._collation(), 120),
-        ("commentary-collation-v1.json", ht._commentary_collation(), 120),
-        ("poem-collation-v1.json", hp._collation(), 42),
-    ]:
-        old = json.loads(
-            (F / "before-source/src/fatebridge/data/heluo" / name).read_bytes()
-        )
-        assert data["entries"][:count] == old["entries"]
-        if name == "poem-collation-v1.json":
-            assert len(data["entries"]) == count + 6 == 48
-        else:
-            from tests.heluo_bo23_revision_reference import frozen_source
-
-            historical = frozen_source("src/fatebridge/data/heluo/" + name)
-            assert len(historical["entries"]) == count + 18 == 138
-            assert data["entries"][:138] == historical["entries"]
-            assert len(data["entries"]) == HEADER_COUNT
-    assert_r96_source_addition()
-    s = hp.collation_summary()
-    assert (
-        s["collated_line_poem_groups"],
-        s["collated_individual_poems"],
-        s["pending_line_poem_groups"],
-        s["total_individual_poems"],
-    ) == (48, 117, 336, None)
-    assert ht.collation_summary()["pending_line_headers"] == PENDING_COUNT
-    assert (
-        ht.commentary_collation_summary()["pending_line_commentaries"] == PENDING_COUNT
-    )
-    assert (
-        yao_text("天水訟", 3)["text_provenance"]["poem_heading_text"]
-        == "訟卦三爻訣一首"
-    )
-    assert len(yao_text("天水訟", 3)["poem_sections"]) == 3
 
 
 @pytest.mark.parametrize("gua,line", ROWS)

@@ -14,11 +14,10 @@ from pathlib import Path
 from typing import Any
 
 from fatebridge.core.human_design import longitude_activation, opposite_activation
-from scripts.gen_human_design_calendar_nodes import BASE, ROOT, inputs, read, sha, write
+from scripts.gen_human_design_calendar_nodes import BASE, inputs, read, sha, write
 
 REFERENCE = BASE / "evidence/independent-nodes.json.gz"
 REFERENCE_SHA256 = "75592092338443860801167c4e428f082f3412d25dabd7d88d5f8ecc3cc636d9"
-LEGACY_PATH = "docs/validation/human-design-calendar-directions-v1/evidence/comparison-corrected.json.gz"
 LEVELS = ("gate", "line", "color", "tone", "base", "tone_orientation")
 
 
@@ -45,9 +44,9 @@ def reference() -> tuple[dict, dict, dict]:
     ]
     if [(r["label"], r["side"], r["jd_tt"]) for r in value["rows"]] != expected:
         raise ValueError("Independent original epoch or ordering changed")
-    if sha(ROOT / LEGACY_PATH) != plan["input_bindings"][LEGACY_PATH]:
-        raise ValueError("Original full-direction evidence changed")
-    return plan, value, read(ROOT / LEGACY_PATH)
+    from scripts.check_human_design_calendar_directions import current_comparison
+
+    return plan, value, current_comparison()
 
 
 def _error(exc: Exception) -> dict[str, str]:
@@ -205,7 +204,7 @@ def compare_row(
         )
         changed_physical = []
         for old in physical:
-            before = old["original_longitude_row"]
+            before = old["longitude_comparison"]
             after = positions[old["body"]]
             if (before["computed_longitude"], before["return_flags"]) != (
                 after["longitude"],

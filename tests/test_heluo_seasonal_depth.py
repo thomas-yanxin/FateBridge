@@ -20,7 +20,7 @@ from fatebridge.core.heluo_seasonal import (
 )
 from fatebridge.core.output_numerology import HeluoSeasonalNumbers
 from fatebridge.services.divination import calculate_heluo_analysis
-from tests.golden.runner import golden_ephemeris
+from tests.ephemeris_context import moshier_ephemeris as golden_ephemeris
 
 ROOT = Path(__file__).parent / "fixtures/numerology_nlc_v1"
 REF = json.loads((ROOT / "seasonal-reference.json").read_text())

@@ -615,6 +615,20 @@ def bound_response(
     # inventory. Keep their identity/count inline and their exact bytes in
     # the already-stored SAME run, without mutating the original receipt.
     if isinstance(metadata, dict):
+        evidence = metadata.get("calculation_evidence")
+        if isinstance(evidence, dict) and len(_json(evidence, compact)) > 512:
+            from fatebridge.utils.json_digest import digest
+
+            path = "run_metadata.calculation_evidence"
+            metadata = {
+                **metadata,
+                "calculation_evidence": {
+                    "delivery_path": path,
+                    "sha256": digest(evidence),
+                    "coverage": evidence.get("coverage"),
+                },
+            }
+            deferred_metadata.append(path)
         runtime = metadata.get("runtime")
         ephemeris = runtime.get("ephemeris") if isinstance(runtime, dict) else None
         files = ephemeris.get("files") if isinstance(ephemeris, dict) else None

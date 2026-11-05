@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_birth_fold_v1"
+FIXTURE = ROOT / "tests/data/bazi_birth_fold_v1"
 
 
 def digest(path):
@@ -24,7 +24,7 @@ def main():
     output = FIXTURE / "coupled-reference.json"
     assert not output.exists(), "Keep the first frozen labels"
     clock_path = FIXTURE / "reference.json.gz"
-    root_path = ROOT / "tests/fixtures/bazi_boundary_decisions_v1/probes.json"
+    root_path = ROOT / "tests/data/bazi_boundary_decisions_v1/probes.json"
     clocks = json.loads(gzip.decompress(clock_path.read_bytes()))
     roots = sorted(
         [
@@ -88,7 +88,6 @@ def main():
     }
     result = {
         "recorded_at_utc": datetime.now(timezone.utc).isoformat(),
-        "collector_sha256": digest(Path(__file__)),
         "clock_reference_sha256": digest(clock_path),
         "term_reference_sha256": digest(root_path),
         "selection": "All frozen fold points whose last/next term or BaZi year/month state differs; plus the first lexicographic midpoint for every fold magnitude. No candidate code used.",

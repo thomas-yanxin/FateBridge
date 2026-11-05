@@ -8,7 +8,7 @@ from typing import Any
 from fatebridge.core.sukuyo_sources import load_source
 
 SOURCE = Path(__file__).resolve().parents[1] / "data/sukuyo_arc_clock_collation_v1.json"
-SOURCE_SHA256 = "40bec216f980c6b29508d434e8302425c6ad7be576a8366a12cc50cb5b267ceb"
+SOURCE_SHA256 = "87bce0889c0fa74593d1a448dd194e033fe8c9c400057f63e2b1c30f0575b7a3"
 
 
 def arc_clock_reference() -> dict[str, Any]:

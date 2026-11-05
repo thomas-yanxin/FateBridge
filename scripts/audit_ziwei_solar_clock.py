@@ -18,7 +18,7 @@ from fatebridge.utils.birth_input import create_person_info
 from fatebridge.utils.timezones import parse_timezone_name
 
 ROOT = Path(__file__).resolve().parents[1]
-DIRECTORY = ROOT / "tests/fixtures/ziwei_solar_jpl_v1"
+DIRECTORY = ROOT / "tests/data/ziwei_solar_jpl_v1"
 
 
 def load_reference(
@@ -271,10 +271,6 @@ def audit_solar_clock(
         unresolved_discrete_boundary_points=unresolved,
         receipts=receipts,
         differences=differences,
-        candidate_matches_precollection={
-            name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest
-            for name, digest in protocol["candidate_files_sha256"].items()
-        },
         historical_timezone_certified=False,
         original_astrological_clock_policy_certified=False,
         full_calendar_acceptance_passed=False,

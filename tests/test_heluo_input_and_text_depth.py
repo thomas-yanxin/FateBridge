@@ -15,11 +15,7 @@ from fatebridge.core.local_techniques.canping import build_canping_result
 from fatebridge.core.local_techniques.heluo import build_heluo_result
 from fatebridge.core.numerology_inputs import require_birth_clock
 from fatebridge.core.requests.divination import CanpingRequest, HeluoRequest
-from tests.heluo_current_source_reference import (
-    ALL_HEADER_PAGES,
-    HEADER_COUNT,
-    PENDING_COUNT,
-)
+from tests.heluo_source_facts import ALL_HEADER_PAGES, HEADER_COUNT, PENDING_COUNT
 
 PILLARS = {"year": "甲子", "month": "丁卯", "day": "庚申", "hour": "庚辰"}
 ARGS = dict(four_pillars=PILLARS, hour_zhi="辰", birth_year=1924, month_zhi="卯")

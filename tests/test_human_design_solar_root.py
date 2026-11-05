@@ -128,8 +128,10 @@ def test_current_full_reading_keeps_numeric_root_and_physical_precision_separate
     assert check["status"] == "verified_fixed_template_reading", check
 
 
+@pytest.mark.parametrize("delete_selected_witness", [False, True])
 def test_current_full_backend_cannot_bypass_root_check_by_deleting_reference_witness(
     complete,
+    delete_selected_witness,
 ):
     from fatebridge.validation.human_design_backend import verify_full_backend_report
 
@@ -139,6 +141,8 @@ def test_current_full_backend_cannot_bypass_root_check_by_deleting_reference_wit
     assert report["status"] == "full_backend_compared"
     assert verify_full_backend_report(value)["checked_adjacent_solar_root_count"] == 1
     report["reference_chart"]["design_solver"].pop("numerical_precision")
+    if delete_selected_witness:
+        value["design_solver"].pop("numerical_precision")
     assert verify_full_backend_report(value)["errors"]
 
 

@@ -458,6 +458,7 @@ def test_complete_default_reading_survives_the_same_budget_on_three_surfaces(
                 "run_metadata.runtime",
                 "run_metadata.provenance",
                 "run_metadata.determinism",
+                "run_metadata.calculation_evidence",
             }
             chunks = []
             offset = 0

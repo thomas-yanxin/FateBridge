@@ -17,7 +17,9 @@ from scripts.verify_astrodice_emission_epoch import exact_position
 @pytest.mark.parametrize("body", ["Earth", "Venus"])
 @pytest.mark.parametrize("axis", [0, 1, 2])
 def test_source_axes_equal_independent_original_coefficients(body, axis):
-    source = Path(__file__).parent / "fixtures/astrodice-de441-records-v1"
+    source = (
+        Path(__file__).parent / "data/astrodice/reference_sets/fixture-de441-records-v1"
+    )
     epoch = Q("5166012.3")
     evaluate = exact_axis(source, 6, epoch, body, axis)
     for t in [epoch - Q(1, 86400), epoch, epoch + Q(1, 86400)]:

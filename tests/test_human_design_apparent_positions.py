@@ -27,7 +27,7 @@ def test_failed_reference_retains_observed_prefix_without_inventing_positions(
     failed_body,
 ):
     from fatebridge.core.astro import runtime
-    from fatebridge.core.human_design import BODY_IDS
+    from fatebridge.core.human_design_mechanics import BODY_IDS
 
     original = runtime.ephemeris_call
     body_id = (

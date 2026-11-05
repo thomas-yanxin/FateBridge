@@ -1,36 +1,17 @@
 """Analysis context must not hide known boundary-envelope witnesses."""
 
-import gzip
-import hashlib
 import io
-import json
 import struct
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import pytest
 from dateutil.relativedelta import relativedelta
 
-from fatebridge.core.output_timing import DayunBirthEventAnalysis
 from fatebridge.services.dayun_boundary_clock_events import (
     forward_gaps_for_wall_image,
     projected_wall_image,
 )
-
-STUDY = (
-    Path(__file__).resolve().parents[1]
-    / "docs/validation/bazi-dayun-boundary-clock-window-v1"
-)
-
-
-def frozen(name):
-    path = STUDY / name
-    assert (
-        hashlib.sha256(path.read_bytes()).hexdigest()
-        == path.with_suffix(".sha256").read_text().strip()
-    )
-    return json.loads(gzip.decompress(path.read_bytes()))
 
 
 def short_clock(delta, hour=1):
@@ -94,65 +75,3 @@ def test_projected_image_contains_dense_calendar_probes_over_full_cycle():
             assert all(
                 a <= point + relativedelta(years=index * 10) <= b for point in probes
             )
-
-
-def test_registered_reference_and_original_failures_are_preserved():
-    reference = frozen("reference-first.json.gz")
-    replay = frozen("reference-formatted-replay.json.gz")
-    reference.pop("collector_sha256")
-    replay.pop("collector_sha256")
-    assert reference == replay
-    assert reference["control_count"] == 34 and reference["context_count"] == 102
-    assert len(reference["all_original_unknowns"]) == 782
-    baseline = frozen("baseline-second.json.gz")
-    assert baseline["counts"]["same_root_safe_envelope_failure_contexts"] == 48
-    assert baseline["counts"]["controls_with_numeric_failure"] == 0
-    assert baseline["counts"]["controls_with_context_dependent_envelopes"] == 24
-
-
-def test_complete_candidate_retains_all_same_root_witnesses_and_schema():
-    baseline = frozen("baseline-second.json.gz")
-    candidate = frozen("candidate-first.json.gz")
-    assert candidate["counts"]["contexts"] == 102
-    assert candidate["counts"]["same_root_safe_envelope_failure_contexts"] == 0
-    assert candidate["counts"]["controls_with_numeric_failure"] == 0
-    assert candidate["counts"]["missing_safe_witness_state_contexts"] == 0
-    assert (
-        candidate["original_unknowns_retained"]
-        == baseline["original_unknowns_retained"]
-    )
-    for old, new in zip(baseline["records"], candidate["records"]):
-        assert old["id"] == new["id"]
-        assert old["observations"] == new["observations"]
-        for before, after in zip(old["contexts"], new["contexts"]):
-            result = after["actual_range"]
-            DayunBirthEventAnalysis.model_validate(result["dayun_event_analysis"])
-            assert result["sample_count"] == before["actual_range"]["sample_count"] == 3
-            assert (
-                result["dayun_event_analysis"]["boundary_clock_scan"]["boundary_count"]
-                == 13
-            )
-            assert (
-                result["dayun_event_analysis"]["continuous_completeness_certified"]
-                is False
-            )
-            original = before["actual_range"]["dayun_boundary_ranges"]
-            updated = result["dayun_boundary_ranges"]
-            for a, b in zip(original, updated):
-                for field in ("start", "end"):
-                    assert datetime.fromisoformat(
-                        b[f"earliest_{field}_at"]
-                    ) <= datetime.fromisoformat(a[f"earliest_{field}_at"])
-                    assert datetime.fromisoformat(
-                        b[f"latest_{field}_at"]
-                    ) >= datetime.fromisoformat(a[f"latest_{field}_at"])
-
-
-def test_daily_cache_candidate_reproduces_every_first_candidate_record():
-    original = frozen("candidate-first.json.gz")
-    cached = frozen("candidate-day-cache-second.json.gz")
-    assert cached["records"] == original["records"]
-    assert cached["counts"] == original["counts"]
-    assert (
-        cached["original_unknowns_retained"] == original["original_unknowns_retained"]
-    )

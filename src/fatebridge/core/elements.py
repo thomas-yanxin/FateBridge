@@ -209,7 +209,8 @@ class ElementAnalysis:
 
         assessment = day_master_analysis.get("assessment", {})
         if (
-            assessment.get("requires_special_structure_review")
+            assessment.get("ordinary_fuyi_requires_review")
+            or assessment.get("requires_special_structure_review")
             or assessment.get("status") == "boundary_sensitive"
         ):
             return []

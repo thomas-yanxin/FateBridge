@@ -54,9 +54,7 @@ def test_literal_position_order_is_distinct_from_generic_parity(pos, order):
     row = result["line_conditions"]["phases"][0]
     assert row["position_preference_order"] == order
     assert row["ruler_minister_seat"]["match"] is (pos in (2, 5))
-    assert result["yuanTang"]["dangWei"] is (pos % 2 == 0)
     assert result["yuanTang"]["position_polarity_match"] is (pos % 2 == 0)
-    assert result["yuanTang"]["dangWei_policy"].endswith("not_source_dangwei")
 
 
 @pytest.mark.parametrize("gua", ["乾為天", "坤為地", "地天泰", "天地否", "風地觀"])

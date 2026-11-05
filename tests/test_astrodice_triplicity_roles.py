@@ -12,7 +12,7 @@ from fatebridge.core.ptolemy import triplicity_assigned_rulers, triplicity_ruler
 REFERENCE = json.loads(
     (
         Path(__file__).parent
-        / "fixtures/astrodice-triangle-assignment-robbins-1940.json"
+        / "data/astrodice/tables/triangle-assignment-robbins-1940.json"
     ).read_text()
 )
 CASES = [

@@ -2,7 +2,7 @@
   "call_guidance": {
     "branch_stars_scope": "京本PDF118–120所选七项神煞只给历法目标与三位本支事实。驿马条用月建支，天赦比完整日干支；不以名称或条件推出现实结局，不借六壬日马、月将或贵神落宫替代。",
     "god_yin_scope": "类神阴神按实际天将所乘支再查上神，天乙依所选昼夜表互取；与四课第二、四课的阴神称谓分层。年命上神缺项保留未知，季节本空事实不替代有效空亡及日辰德合相生，综合类神可用性仍未裁。金口诀附带六壬盘的本层不替代金口诀四位取用。",
-    "month_general_scope": "jinkou.overview.month_general是依中气确定的月将本位；兼容字段yuejiang是月将加时后落在地分的将神，对应四位将神行。两支可不同，解释分别说明，不将落地分的支称为中气月将本位。快照使用月将本位、将神落地分两个标签。",
+    "month_general_scope": "jinkou.overview.month_general是依中气确定的月将本位；yuejiang是月将加时后落在地分的将神，对应四位将神行。两支可不同，解释分别说明，不将落地分的支称为中气月将本位。快照使用月将本位、将神落地分两个标签。",
     "natal_course_scope": "jinkou.natal_course以已确认本命支另起完整四位课；未给本命支及明确出生年干支则course=null。它不是出生时刻命盘，不需要猜生时、性别或岁序；本命支作派生地分，主课原地分保留，日干、占时、月将、昼夜选择不改。不因重复提问自动换将或换日，也不宣称原典全书或预测有效。",
     "published_term_dates_scope": "逐项读取实际solar_term_dependencies中的published_date_reference：按固定UTC+08对照香港天文台1901—2100逐日表，日期相符只表示同一天，不认证交气秒数或全部历法。date_mismatch保留两日期，不能称官方一致或移动交界凑表；outside_published_range是无资料，不能说相符或不符。与分析时区、真太阳钟、历史时间约定及未来闰秒假设分列，金口诀仍按同次四位解释。",
     "seasonal_evidence_scope": "探原季节五态用本次月建支，不用月将支。当前季月整月配置分别计算支神、天将固有五行和地盘五态，日干五态不替代它们。真空／半空只列支神本空与季节状态的条件，天空天将及坐空不替换本空；季末十八日异法、扶助冲剋及角色例外后的有效真半未裁，不把原文效力折扣说成成功率。金口诀本课与附带六壬分开，不能借本层代替金口诀日下五态或综合取用。",
@@ -453,5 +453,49 @@
     ],
     "type": "object"
   },
+  "method_contracts": [
+    {
+      "comparison_requirements": [
+        "相同方法合同、实现/数据指纹、选项与实际计算层"
+      ],
+      "dependencies": [
+        "validated_request"
+      ],
+      "error_sources": [
+        "civil_clock",
+        "solar_clock",
+        "calendar_model",
+        "rule_adjudication"
+      ],
+      "implementation_refs": [
+        "src/fatebridge/services/metaphysics.py"
+      ],
+      "limitations": [
+        "contract_v1是登记合同版本，不冒充上游原典或数值算法版本；实际版本另列runtime_method_ids",
+        "登记不认证全书、全部历史范围、连续区间稳定或现实预测"
+      ],
+      "method_id": "fatebridge.jinkou_four_positions.contract_v1",
+      "output_paths": [
+        "jinkou"
+      ],
+      "prerequisites": [
+        "请求Schema及领域前提必须成立；条件分支以本次实际回执为准"
+      ],
+      "quantity_kind": "traditional_rule_result",
+      "role": "calculation",
+      "selector_fields": [
+        "guiren_profile"
+      ],
+      "source_refs": [
+        "docs/liuren-jinkou-audit.md"
+      ],
+      "unit": "categorical",
+      "validation_scope": {
+        "numerical": "method_specific_reference_required",
+        "real_world_validity": "not_established",
+        "source_conformity": "not_fully_accepted"
+      }
+    }
+  ],
   "tool": "jinkou"
 }

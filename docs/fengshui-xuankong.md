@@ -16,9 +16,9 @@
 
 1.2.0把替星表完整登记为24项，明确区分13改数与11同数；缺项不再默认回退原星。每侧 `replacement_lookup`说明下卦未用替、同数保留、实际替换或五黄不替。完整原典与作者语境见[替星依据](../skills/onda-fengshui/references/replacement-stars.md)，五幅原书完整九宫盘的135个数字独立核对通过，原有山／向／运数及兼向选择条件保持一致。
 
-计算候选必须先通过宅运山向身份、九星排列、逐宫表示、中心星和顺逆飞行记录的一致性检查，才能进入结构解释。内部矛盾使整次调用返回 `fengshui_calculation_inconsistent`，不能丢弃异常候选后继续下结论；具体错误与原书差异的区别见[计算盘异常处理](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-source-comparison.md#计算盘异常会停止交付)。正常计算的数字规则及版本保持不变，这项工程检查不授予原典或预测有效性。
+计算候选必须先通过宅运山向身份、九星排列、逐宫表示、中心星和顺逆飞行记录的一致性检查，才能进入结构解释。内部矛盾使整次调用返回 `fengshui_calculation_inconsistent`，不能丢弃异常候选后继续下结论；具体错误与原书差异的区别见计算盘异常处理。正常计算的数字规则及版本保持不变，这项工程检查不授予原典或预测有效性。
 
-运行来源比较另采用 `shen_2011_natal_numeric_comparison_v2@2.0.0`，逐候选核对指定整理本216下卦正文、216下卦图和216起星图。替卦原图的三个数字差异及卷五编者范围随盘返回；起星正文、星名与兼向选盘条件未验证。它不改变中州起盘版本或候选选择，不能将局部图数相合扩大为整套技法符合；详见[运行来源比较](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-source-comparison.md)。
+运行来源比较另采用 `shen_2011_natal_numeric_comparison_v2@2.0.0`，逐候选核对指定整理本216下卦正文、216下卦图和216起星图。替卦原图的三个数字差异及卷五编者范围随盘返回；起星正文、星名与兼向选盘条件未验证。它不改变中州起盘版本或候选选择，不能将局部图数相合扩大为整套技法符合；详见运行来源比较。
 
 ## 三端调用
 
@@ -34,7 +34,6 @@
     "effective_event_year": 2004,
     "evidence": "已核实立春后竣工，按竣工事件定运"
   },
-  "bearing_uncertainty_degrees": 0,
   "ruleset_id": "xuankong_zhongzhou_v1"
 }
 ```
@@ -57,11 +56,11 @@ MCP `fengshui_xuankong_natal` 的参数就是上面 JSON 对象。认证设置�
 
 定运事件、有效年、宅运三选一的输入语义，磁北、测量误差及边界候选的解释，见 [历史宅盘资料核对](../skills/onda-fengshui/references/xuankong.md#定运输入和不确定性)。请求字段及取值以共享 Schema 为准；三端使用同一校验路径。
 
-事件有效年与宅运分别读取：立春保护区内 `effective_event_year=null`，候选年和暂取年单列；若全部候选年同运，宅盘仍可complete而年份保持待确认。跨运时无唯一宅盘，`timing.candidate_period_intervals` 保留候选历史运区间，见[字段与示例](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-event-year-fidelity.md)。
+事件有效年与宅运分别读取：立春保护区内 `effective_event_year=null`，候选年和暂取年单列；若全部候选年同运，宅盘仍可complete而年份保持待确认。跨运时无唯一宅盘，`timing.candidate_period_intervals` 保留候选历史运区间，见字段与示例。
 
-公开1800–2199事件年所需的完整运区间端点可落在1784–2204。风水层在原打包模型范围外，按既定选择启用独立[历史DE440轨道扩展](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-historical-calendar.md)，逐端点保留实际模型及资料散列；公开输入范围不扩大。DE440边界候选保护与线性近似回退分别标记，不能用操作保护区替代1秒TT验收。
+公开1800–2199事件年所需的完整运区间端点可落在1784–2204。风水层在原打包模型范围外，按既定选择启用独立[历史DE440轨道扩展](fengshui.md)，逐端点保留实际模型及资料散列；公开输入范围不扩大。选定模型无法求根时返回错误；边界候选保护不替代1秒TT验收。
 
-共享宅向误差可在 `house.bearing_uncertainty_degrees` 提供，玄空上限仍为7.5°；旧顶层字段省略为null，两个显式值不一致则拒绝。同一测量在合参八宅层也保留支持坐卦，参见[共享误差与布局候选](../skills/onda-fengshui/references/house-bearing-uncertainty.md)。
+宅向误差在 `house.bearing_uncertainty_degrees` 提供，玄空上限为7.5°。同一测量在合参八宅层也保留支持坐卦，参见[共享误差与布局候选](../skills/onda-fengshui/references/house-bearing-uncertainty.md)。
 
 1.0.1改为闭角区与测量闭区间的直接相交判断，不扩张浮点容差。所有24山的±4.5°、±7.5°均验证分界及两侧最近可表示浮点数；区间端点碰线也保留双侧候选。给定 `house.sitting_trigram` 时，用已确认坐卦约束候选宫位，避免跨宫误差盘与八宅已确认坐卦冲突；同宫内两山或下／替模式的歧义仍保留。
 
@@ -75,7 +74,7 @@ MCP `fengshui_xuankong_natal` 的参数就是上面 JSON 对象。认证设置�
 
 `trace.mountain`、`trace.facing` 保留原入中星、借用的原星／宅运、同元龙山、阴阳、顺逆、最终入中星、是否发生数值替换与五黄政策。宫位飞行路径是 `C,NW,W,NE,S,N,SW,E,SE`；运盘始终顺飞，山向盘按各自原元龙阴阳顺逆。
 
-1.1.0 的 `chart/candidates.*.structure` 返回历史宅运当运数的山、向星位置与星位结构，以及运／山／向三组逐宫合十比较。结构不随当前评价运改变，也不表示当前旺衰、外局匹配或现实吉凶。历法有效期两端分别报告实际求解器；详见[深度审计与未解决原文分歧](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-depth-audit.md)。
+1.1.0 的 `chart/candidates.*.structure` 返回历史宅运当运数的山、向星位置与星位结构，以及运／山／向三组逐宫合十比较。结构不随当前评价运改变，也不表示当前旺衰、外局匹配或现实吉凶。历法有效期两端分别报告实际求解器；详见深度审计与未解决原文分歧。
 
 1.1.1 的 `chart/candidates.*.bearing_support` 保留各候选实际支持角区及全部 `mode_reasons`。`regions.from_degrees_exact/until_degrees_exact` 是有理数字符串，表示围绕已归一输入宅向展开的闭区间；例如跨北时可以出现负角度，它与加360°后的方位相同。多段角区可能支持同一个盘，不能因去重宅盘而丢掉理由；此时顶层 `mode_reason=multiple_supported_angle_regions`，实际理由逐段读取。X2只支持选定角区规则，闭端点及精确有理数运算是本系统的工程约定。
 
@@ -89,7 +88,7 @@ uv run --locked --extra dev fatebridge fengshui_xuankong_natal \
 
 聚合年星仅出现在 `layers.annual_stars.palaces.*.annual_star_number`。住宅星与年度星不加总，当前九运不覆盖历史八运，未提供观察形势不产生综合吉凶。快照“玄空宅盘”和“年度飞星”是两个章节，导出注册表也分别识别。
 
-原始中州运山向版本不包含其他门派替卦策略、玄空大卦、七星打劫、自动立极／纳气定向、月日时盘或峦头裁决。另可显式启用[独立沈氏城门](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-city-gate.md)，其参考运、同元龙数字和水形条件单列，不改写历史宅盘。完整运山向数字盘不等于完整住宅勘察断法。
+原始中州运山向版本不包含其他门派替卦策略、玄空大卦、七星打劫、自动立极／纳气定向、月日时盘或峦头裁决。另可显式启用独立沈氏城门，其参考运、同元龙数字和水形条件单列，不改写历史宅盘。完整运山向数字盘不等于完整住宅勘察断法。
 
 ## 独立验证与复现
 
@@ -106,11 +105,11 @@ uv run --locked --extra dev pytest -q tests/test_xuankong.py tests/test_fengshui
 
 另覆盖9运24山正向及左右兼向共648组合、立春前后／跨时区、定运来源、五运、磁北要求、精确山界与角度误差、缺失输入、聚合层不互相覆盖及REST／实际MCP协议／CLI一致性。规则计算一致与现实预测有效性是不同验证范围。
 
-[沈氏整理本同版校勘](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-lower-clause-collation.md)另固定完整216条下卦种子与顺逆，213条与程序一致、3条保留差异；三处同版图中81数与程序一致，显示图文冲突，不能只归因于网页转录。未修改原文、切换版本或用三图通过认证整本，来源审计继续退出1。
+沈氏整理本同版校勘另固定完整216条下卦种子与顺逆，213条与程序一致、3条保留差异；三处同版图中81数与程序一致，显示图文冲突，不能只归因于网页转录。未修改原文、切换版本或用三图通过认证整本，来源审计继续退出1。
 
-后续[完整盘图校勘](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-lower-diagram-collation.md)覆盖全部216图5,832星数：215盘、5,831数吻合；七运申山寅向东宫山星的整理本与旧影印均印五，引擎为二。来源山星重复五、缺二，完整验收仍为false；故意把算法改为五虽然可使字面全合，却破坏九星完整性，不能获得整体通过。
+后续完整盘图校勘覆盖全部216图5,832星数：215盘、5,831数吻合；七运申山寅向东宫山星的整理本与旧影印均印五，引擎为二。来源山星重复五、缺二，完整验收仍为false；故意把算法改为五虽然可使字面全合，却破坏九星完整性，不能获得整体通过。
 
-领域回归、跨传输合同、Linux golden 与真实模型咨询分别验证。可在对应环境运行 `scripts/audit_linux_golden.py`；环境不匹配时不得伪造平台或跳过差异来声称通过。规则计算一致不证明现实效果。
+领域回归、独立数值与原典参考、跨传输合同及真实模型咨询分别验证。规则计算一致不证明现实效果。
 
 ## 显式启用有限解释
 
@@ -158,7 +157,7 @@ MCP 使用同一文件中的 JSON 调用 `fengshui_assess`。读取字段、状�
 
 在已有 `interpretation` 中加入 `"host_guest_ruleset_id": "shen_2011_host_guest_v1"`，可逐候选计算实际坐山宫与向首宫的地运、运山、运向及山向主客关系，每候选八条。向首宫以向星为主，运盘数字取该宫运星，不拿历史运数替代。旁六宫和中宫不扩用此规则；生入、生出与时令之生分开。
 
-该层同时保留216条下卦的432个原文角色槽：422吻合、6在固定山向比较下不同、4字面未定，不逐例换基准配平，也不预断不同处都是笔误。来源、署名、可运行请求和解释校验见[主客生克出入](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-host-guest.md)。这是盘层关系知识的增量，不是81对专门断语或全书吉凶认证。
+该层同时保留216条下卦的432个原文角色槽：422吻合、6在固定山向比较下不同、4字面未定，不逐例换基准配平，也不预断不同处都是笔误。来源、署名、可运行请求和解释校验见主客生克出入。这是盘层关系知识的增量，不是81对专门断语或全书吉凶认证。
 
 ## 王亭之基本时令的独立选择
 
@@ -166,7 +165,7 @@ MCP 使用同一文件中的 JSON 调用 `fengshui_assess`。读取字段、状�
 
 基本标签不表示房屋或人的成败，互用成员不表示现场可用。生气与互用星不会自动获得当令山水条件判断；历史宅盘、年度年星与候选盘保持各自依据。完整来源、九运表、反例与验证见[作者时令规则](../skills/onda-fengshui/references/wang-timeliness.md)。
 
-作者子版本1.1.0另返回[两条先后天图位推导](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-mutual-geometry.md)，保留原表列示顺序与有向路径顺序。五运只列原表数字，评价运未知则不选择图位。基本时令、互用成员和图位须与实际候选星数一致，内部矛盾停止交付；固定释义不把数字相合解释为现场可用。
+作者子版本1.1.0另返回两条先后天图位推导，保留原表列示顺序与有向路径顺序。五运只列原表数字，评价运未知则不选择图位。基本时令、互用成员和图位须与实际候选星数一致，内部矛盾停止交付；固定释义不把数字相合解释为现场可用。
 
 ## 固定零正与五运分段
 
@@ -182,4 +181,4 @@ MCP 使用同一文件中的 JSON 调用 `fengshui_assess`。读取字段、状�
 
 ## 逐候选的原书数表证据
 
-数字宅盘默认返回 `source_comparison`，分别比较固定沈氏整理本下卦正文与盘图。它不改变起盘规则、星数、历史定运或候选；摘要在 `coverage.natal_source_comparison`，已知差异可在实际结果与快照中直接读取。原书值与计算值分开，替卦未覆盖不能当作相合。完整来源、生成命令和虚构调用见[运行来源比较](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-source-comparison.md)。
+数字宅盘默认返回 `source_comparison`，分别比较固定沈氏整理本下卦正文与盘图。它不改变起盘规则、星数、历史定运或候选；摘要在 `coverage.natal_source_comparison`，已知差异可在实际结果与快照中直接读取。原书值与计算值分开，替卦未覆盖不能当作相合。完整来源、生成命令和虚构调用见运行来源比较。

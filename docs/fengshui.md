@@ -6,7 +6,7 @@
 
 当前提供八个工具：公共方位、个人命卦、八宅、金锁玉关基础砂水、年度紫白飞星、月紫白、玄空历史宅盘和分层合参。三端来自同一目录，核心规则离线计算，不依赖外部风水服务。布局、室内关系、材质及候选方案通过 `fengshui_assess` 的独立分支审查。结果表示选定传统规则中的关系；规则来源、计算一致性和现实预测效力是不同事项。
 
-[沈氏城门](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-city-gate.md)作为玄空请求中的独立可选分支，显式参考运，计算同元龙门位与运星顺逆；现场水形另行确认，历史宅盘保持原值。
+[沈氏城门](fengshui-xuankong.md)作为玄空请求中的独立可选分支，显式参考运，计算同元龙门位与运星顺逆；现场水形另行确认，历史宅盘保持原值。
 
 本项目采用的专家访谈口径以九宫飞星、金锁玉关和八宅为主要方法；局部工位／合租先考虑飞星、次金锁，八宅命卦独立处理。政策是用户提供的专家口径，来源、方法细节及环境上下文各自有版本；不将本人或周围人的八字／紫微喜忌代入房屋五行。现代 BTB 仅用户明确另选时作为作者辅助，不作默认替代。
 
@@ -31,9 +31,9 @@
 | `/api/fengshui/xuankong_natal` | `fengshui_xuankong_natal` | `house`、历史 `period`，按需提供测量误差及 `interpretation` | 运／山／向盘、下卦／替星与分界候选；有限解释须显式启用 |
 | `/api/fengshui/assess` | `fengshui_assess` | 已确认的住宅、住户、环境、年度或历史宅运输入；可选 `methods`、`scene`，布局时 `analyze_layout=true` | `bazhai` / `jinsuo` / `annual_stars` / `xuankong_natal` 独立分层；布局及所请求补充审查 |
 
-同一宅向的已知测量误差使用 `house.bearing_uncertainty_degrees`，在已选八宅及玄空层共同传播；旧玄空误差字段继续兼容。八宅跨宫时保留各自宅卦及布局条件，详见[共享宅向误差](../skills/onda-fengshui/references/house-bearing-uncertainty.md)。省略误差只沿用点输入约定，不认证现场误差为零。
+同一宅向的已知测量误差使用 `house.bearing_uncertainty_degrees`，在已选八宅及玄空层共同传播。八宅跨宫时保留各自宅卦及布局条件，详见[共享宅向误差](../skills/onda-fengshui/references/house-bearing-uncertainty.md)。省略误差只沿用点输入约定，不认证现场误差为零。
 
-数值用JSON数值，日期和时刻按明确的ISO形式提交；布尔值、数字字符串或Unix时间戳不能冒充角度、运数及历法事实。范围内的整数值 `8.0` 仍可使用，非整数不舍入。详见[风水输入类型](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-input-type-contract.md)。
+数值用JSON数值，日期和时刻按明确的ISO形式提交；布尔值、数字字符串或Unix时间戳不能冒充角度、运数及历法事实。范围内的整数值 `8.0` 仍可使用，非整数不舍入。详见风水输入类型。
 
 可运行输入按用途列于[示例索引](examples/README.md)。完整约束见 `/openapi.json`、MCP `tools/list` 和 `fatebridge describe fengshui_assess`。新 family 是 `fengshui`；不加入个人 `analyze_destiny` 或 `profile` 默认系统。[月紫白参考](../skills/onda-fengshui/references/monthly-stars.md)说明立春有效年、十二节换月、原表标签差异与原始回执核验；合参可显式选择 `monthly_stars` 或提供独立 `monthly`。
 
@@ -121,7 +121,7 @@ asyncio.run(main())
 
 详见[基础规则与来源](../skills/onda-fengshui/references/rule-sources.md)。未知规则 ID 拒绝；改变纪元、换年、坐山起法或砂水规则时，应新增规则版本与独立样本，不能静默替换原版本。`january_1` 是命卦中显式可选的现代计算约定，不宣称所有《八宅明镜》古本都按立春换年。
 
-八宅1.1.0新增累计变爻与净变爻、宫星有向关系及伏位文本语境；历法输入拒绝不存在的地区钟时，并保留已指定重时时刻。专业缺口、独立来源样本与验证范围见[深度审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-depth-audit.md#第二轮累计变爻宫星生克与无效钟时)。
+八宅1.1.0新增累计变爻与净变爻、宫星有向关系及伏位文本语境；历法输入拒绝不存在的地区钟时，并保留已指定重时时刻。专业缺口、独立来源样本与验证范围见[深度审计](fengshui-xuankong.md)。
 
 定义 `wrap9(n) = (n - 1) % 9 + 1`，有效年为 Y：
 
@@ -137,9 +137,9 @@ asyncio.run(main())
 
 ### 方位与分宫
 
-角度范围0–360，360归零；八方中心间隔45°，半宽22.5°；24山中心间隔15°，半宽7.5°。正好22.5°归东北／丑山。宅向推导坐山时加180°；同时提供 `sitting_trigram` 必须一致。基础方位／八宅角度必须声明 `north_reference=magnetic|true`（玄空当前版本要求 magnetic），不自动改写宅向。`fengshui_directions.geomagnetic_reference` 可选提供WMM2025地磁参考与独立换算候选，详见[地磁合同](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-geomagnetic.md)。只有已确认宅卦时可直接提供 `sitting_trigram`。
+角度范围0–360，360归零；八方中心间隔45°，半宽22.5°；24山中心间隔15°，半宽7.5°。正好22.5°归东北／丑山。宅向推导坐山时加180°；同时提供 `sitting_trigram` 必须一致。基础方位／八宅角度必须声明 `north_reference=magnetic|true`（玄空当前版本要求 magnetic），不自动改写宅向。`fengshui_directions.geomagnetic_reference` 可选提供WMM2025地磁参考与独立换算候选，详见地磁合同。只有已确认宅卦时可直接提供 `sitting_trigram`。
 
-`house.division_method` 只接受 `confirmed_angular_sectors`。八方角区、九等分网格和示意九宫图不是同一个几何计算；当前不自动识别户型图片、不自动定中心，也不推断不规则户型分宫。
+`house.division_method` 只接受 `confirmed_angular_sectors`。八方角区、九等分网格和示意九宫图不是同一个几何计算。带尺寸的人工标注多边形可用[实测工位](fengshui-workstation-layout.md)计算空间关系及明确参考中心下的候选方区；不自动识别户型图片、不自动定中心。
 
 ### 环境与实际使用范围
 
@@ -159,11 +159,11 @@ asyncio.run(main())
 
 命卦另接受公历 `birth_date`，与有效生年、出生时刻三选一。按所选时区计算立春所在日期；之前取上一有效生年，之后取本年，立春当日保留 `partial` 并要求出生时刻。选择 `january_1` 时日期即可确定生年。该路径不构造虚假的出生小时，也不使用真太阳时。
 
-年盘有效期是 `[立春, 下次立春)`，不硬编码2月4日午夜，也不按春节。节气沿用现有 `almanac`，逐端点报告实际求解器、星历返回模型及时间政策；固定气回退和Moshier降级分开。外部分钟表与独立421年TT实现比对各自保留，均不认证绝对UTC秒级精度；详见[立春验收](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-calendar.md)。
+年盘有效期是 `[立春, 下次立春)`，不硬编码2月4日午夜，也不按春节。节气沿用现有 `almanac`，逐端点报告实际求解器、星历返回模型及时间政策；选定模型无法求根时返回不可重试的503错误，不使用线性节气回退。外部分钟表与独立421年TT实现比对各自保留，均不认证绝对UTC秒级精度；详见[太阳模型与边界](solar-backends.md)。
 
 月层另有1800–2200年全部十二节4,812个独立TT参考交点，完整Swiss配置通过一秒实现门槛，Moshier保留569项失败。Moshier计算交节前后5秒使用候选保护，年星、命卦和宅运跨运边界共用；保护不改变原始数值验收门槛，也不证明现实准确率。只有日期的命卦会考虑该窗口跨过的相邻民用日。[月紫白参考](../skills/onda-fengshui/references/monthly-stars.md)给出模型、时标、候选与离线复核范围。
 
-源码与本地wheel可通过[完整星历安装配置](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/fengshui-ephemeris-setup.md)补齐宅运端点数据，并在新进程中发现已验证缓存。未取得数据的Moshier配置仍保留降级标记和原精度失败，不能借用完整配置的验收结果。
+源码与本地wheel可通过[完整星历安装配置](solar-backends.md)补齐宅运端点数据，并在新进程中发现已验证缓存。未取得数据的Moshier配置仍保留降级标记和原精度失败，不能借用完整配置的验收结果。
 
 ### 物件位置与朝向
 
@@ -199,7 +199,7 @@ asyncio.run(main())
 
 该请求直接给出离命西向五鬼及个人匹配方向 N/E/SE/S，保留宅向和位置缺失，不强制补出生分钟。若加入年盘或宅盘，必须补对象的位置才能关联相应落宫；面朝西不能证明对象位于西宫。
 
-室内入口视野、入口直线与实体背靠另按明确作者版本计算；有条件的元素代表物和2026年度候选规则见下节。完整峦头、距离吉凶阈值、搬动几何可行性和具体物件效果大小仍列在 `unsupported_queries`，不会以生活常识或虚构阈值填补。
+室内入口视野、入口直线与实体背靠另按明确作者版本计算；有条件的元素代表物和2026年度候选规则见下节。带实际尺寸的搬动几何可行性由[实测工位](fengshui-workstation-layout.md)计算；旧观察入口不自动补几何。完整峦头、距离吉凶阈值和具体物件效果大小仍列在 `unsupported_queries`，不会以生活常识或虚构阈值填补。
 
 ## 室内形态与有条件物件规则
 
@@ -252,7 +252,7 @@ run_metadata: 三端通用运行元数据
 
 `method_details.status=reference_only` 表示方法与象意参考。按 `mapping_boundaries` 区分固定宫 `palaces`、实际临宫星数 `flying_star_references`、八宅游年星名 `bazhai_you_nian_references`，不能因同名混用五行。跨文本本卦人物／器物、Joey Yap 一至九星主题与有限职业例分别保留来源及条件；未覆盖职业不补造。`object_observation_references`、各法 `application_references`、砂水 `form_condition_references` 和 `material_shape_reference` 补观察与用途说明，不构成自动分类、摆放处方或职业预测。精确字段以实际返回的 `method_details` 为准，来源及剩余边界见[方法补充说明](../skills/onda-fengshui/references/sourced-interior-rules.md#与方法细节的区别)。
 
-本版明确未实现：月飞星、金锁24山及形态／距离／元运组合、自动户型几何。24山角度索引可用不表示这些24山论断可用。没有三法总分，也不生成疾病、死亡或财富断语。
+月紫白已支持独立十二节换月；实测工位已支持人工标注几何和有限候选生成。明确未实现：金锁24山全部细断及形态／距离／元运组合、自动图片建模与立极。24山角度索引可用不表示这些24山论断可用。没有三法总分，也不生成疾病、死亡或财富断语。
 
 可用通用 `fields` 投影及快照开关降低体积：
 
@@ -269,7 +269,7 @@ uv run --locked --extra dev fatebridge fengshui_assess --request-file home.json 
 uv run --locked --extra dev pytest -q tests/test_fengshui.py tests/test_fengshui_surfaces.py
 ```
 
-离线测试用固定参考事实（本地数据：`../tests/fixtures/fengshui-reference.json`）登记的提交／SHA-256核对1900–2099男女命卦400项、独立八宅字典64项，并测试纪元／世纪／五数寄宫、立春前后与时区等价、方位边界、坐向反转、门床灶用途、不同住户、未知／混合砂水、来源版本、三端真实调用／校验／投影／请求文件。2026九宫另用作者出版年盘核对。代表性输入加入现有全端与 golden 覆盖，新增快照不重写旧工具数值基线。
+离线测试用固定参考事实（本地数据：`../tests/data/fengshui-reference.json`）登记的提交／SHA-256核对1900–2099男女命卦400项、独立八宅字典64项，并测试纪元／世纪／五数寄宫、立春前后与时区等价、方位边界、坐向反转、门床灶用途、不同住户、未知／混合砂水、来源版本、三端真实调用／校验／投影／请求文件。2026九宫另用作者出版年盘核对。代表性输入加入当前全端合同检查，数值精度使用独立参考及边界反例验证。
 
 外部参考 [JackieL233/fengshui-master 固定提交](https://github.com/JackieL233/fengshui-master/blob/2666304c5cb4ac13091c8c1fcdd4e40c218b275a/fengshui-master/scripts/minggua.py) 仅核对有效生年和八宅关系，不覆盖精确出生时间、年飞星、金锁玉关或完整玄空。金锁玉关未登记独立引擎比较；其验收依据为明确登记的八宫传本规则与输入语义检查。
 
@@ -310,4 +310,6 @@ uv run --locked --extra dev pytest -q tests/test_fengshui.py tests/test_fengshui
 
 ## 工位活动、隔挡与材料条件
 
-书桌工作／学习用途、入口隔挡与材料施用条件沿用 `fengshui_assess` 的共享请求模型，详细字段、来源与边界见[工位作者规则](../skills/onda-fengshui/references/workstation-authored.md)。可运行虚构请求：[玄空活动](examples/fengshui-workstation-activity.json)、[入口隔挡](examples/fengshui-entry-barrier.json)、[材料条件](examples/fengshui-material-application.json)。REST、MCP、CLI 使用同一嵌套输入，严格投影按需追加 `layout_analysis.workstation_analysis` 或 `layout_analysis.material_analysis`。WOFS 非 BTB 桌面摆放仅为作者参考，未启用固定吉位判定。
+书桌工作／学习用途、入口隔挡与材料施用条件沿用 `fengshui_assess` 的共享请求模型，详细字段、来源与边界见[工位作者规则](../skills/onda-fengshui/references/workstation-authored.md)。可运行虚构请求：[玄空活动](examples/fengshui-workstation-activity.json)、[入口隔挡](examples/fengshui-entry-barrier.json)、[材料条件](examples/fengshui-material-application.json)。REST、MCP、CLI 使用同一嵌套输入，严格投影按需追加 `layout_analysis.workstation_analysis` 或 `layout_analysis.material_analysis`。旧工位分支中的 WOFS 内容继续仅作参考。
+
+带尺寸的工位现状、形势计算、条件解释及自动有限候选用[实测工位布局](fengshui-workstation-layout.md)的 `workstation_layout`，读取 `layout_analysis.workstation_layout_analysis`。该分支支持显式另选 `wofs_desktop_compass_v1`，不改写旧参考分支，不默认启用BTB或WOFS。现状与每个候选均按自己的几何重算，保留全部搜索回执、失败和未知，没有风水总分。

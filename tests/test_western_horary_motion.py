@@ -1,5 +1,23 @@
 """Frozen primary-text cases, independent JPL events and analytical controls."""
 
+from tests.lunar_sampler import sampled_motion
+
+
+def test_missing_native_motion_stays_unknown_despite_known_instantaneous_speeds():
+    result = _moon_void_of_course(state("Moon", 0, 13), [state("Mercury", 0.1, 0)])
+    assert result["void_of_course"] is None
+    assert result["next_aspect"] is None
+    assert result["motion_basis"]["status"] == "unavailable"
+    assert result["motion_basis"]["constant_velocity_projection"] is False
+
+
+def test_current_numerical_solver_matches_exact_dyadic_contact_and_ingress():
+    result = sampled_motion(state("Moon", 0, 16), [state("Mercury", 1, 0)])
+    assert result["void_of_course"] is False
+    assert result["contacts"][0]["after_days"] == 1 / 16
+    assert result["sign_exit_after_days"] == 30 / 16
+
+
 import hashlib
 import json
 import math
@@ -21,11 +39,7 @@ from fatebridge.core.classical_western import (
     combustion_state,
     ptolemy_latitude_condition,
 )
-from fatebridge.core.horary_motion import (
-    linear_lunar_contacts,
-    native_lunar_contacts,
-    solve_lunar_contacts,
-)
+from fatebridge.core.horary_motion import native_lunar_contacts, solve_lunar_contacts
 from fatebridge.services.western_horary import calculate_horary
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.test_western_horary import QUESTION
@@ -97,29 +111,41 @@ def test_original_horary_overshoot_is_applying_and_exact_is_not_separating():
 
 def test_horary_uses_unrounded_native_state_and_never_guesses_missing_speed():
     point = SimpleNamespace(
-        sign="Pisces", abs_pos=math.nextafter(360.0, 0), speed=-1e-9
+        sign="Pisces", abs_pos=math.nextafter(360.0, 0), speed=-1e-09
     )
     result = _planet_state(SimpleNamespace(mercury=point), "Mercury")
     assert result["longitude"] < 360 and result["degree"] < 30
-    assert result["speed"] == -1e-9 and result["retrograde"] is True
+    assert result["speed"] == -1e-09 and result["retrograde"] is True
     del point.speed
     result = _planet_state(SimpleNamespace(mercury=point), "Mercury")
     assert result["speed"] is None and result["retrograde"] is None
 
 
 def test_moving_target_and_outside_current_orb_counterexamples():
-    result = _moon_void_of_course(state("Moon", 29, 13), [state("Mars", 29.9, 2)])
+    result = _moon_void_of_course(
+        state("Moon", 29, 13),
+        [state("Mars", 29.9, 2)],
+        physical_motion=sampled_motion(state("Moon", 29, 13), [state("Mars", 29.9, 2)]),
+    )
     assert result["void_of_course"] is True
-    result = _moon_void_of_course(state("Moon", 0, 13), [state("Mercury", 25, 0)])
+    result = _moon_void_of_course(
+        state("Moon", 0, 13),
+        [state("Mercury", 25, 0)],
+        physical_motion=sampled_motion(state("Moon", 0, 13), [state("Mercury", 25, 0)]),
+    )
     assert result["void_of_course"] is False
     assert result["next_aspect"]["inside_current_orb"] is False
     assert result["next_aspect"]["after_days"] == 25 / 13
-    assert result["motion_basis"]["constant_velocity_projection"] is True
+    assert result["motion_basis"]["constant_velocity_projection"] is False
 
 
 def test_time_order_is_not_orb_order():
     result = _moon_void_of_course(
-        state("Moon", 0, 13), [state("Venus", 2.8, 1.2), state("Mercury", 3, -1)]
+        state("Moon", 0, 13),
+        [state("Venus", 2.8, 1.2), state("Mercury", 3, -1)],
+        physical_motion=sampled_motion(
+            state("Moon", 0, 13), [state("Venus", 2.8, 1.2), state("Mercury", 3, -1)]
+        ),
     )
     assert result["next_aspect"]["other"] == "Mercury"
     assert result["next_aspect"]["after_days"] == 3 / 14
@@ -127,10 +153,7 @@ def test_time_order_is_not_orb_order():
 
 @pytest.mark.parametrize(
     "profile,sun_longitude,limit",
-    [
-        ("lilly_1647_p107_second", 14.0, 13.5),
-        ("lilly_1647_p107_first", 15.25, 14.75),
-    ],
+    [("lilly_1647_p107_second", 14.0, 13.5), ("lilly_1647_p107_first", 15.25, 14.75)],
 )
 def test_future_contact_inside_current_orb_flag_is_classified_before_rounding(
     profile, sun_longitude, limit
@@ -138,35 +161,12 @@ def test_future_contact_inside_current_orb_flag_is_classified_before_rounding(
     moon = state("Moon", math.nextafter(0.5, 0), 13.0)
     sun = state("Sun", sun_longitude, 0.0)
     assert _applying_aspect(moon, sun, orb_profile=profile) is None
-    result = _moon_void_of_course(moon, [sun], orb_profile=profile)
+    result = _moon_void_of_course(
+        moon, [sun], orb_profile=profile, physical_motion=sampled_motion(moon, [sun])
+    )
     assert result["void_of_course"] is False
     assert result["next_aspect"]["orb_limit"] == limit
     assert result["next_aspect"]["inside_current_orb"] is False
-
-
-def test_linear_projection_matches_decimal_closed_form_before_ingress():
-    with localcontext() as ctx:
-        ctx.prec = 80
-        for longitude in (0.0, 15.0, 29.0, 359.0):
-            for distance in (0.01, 0.1, 1.0, 5.0):
-                for other_speed in (-1.0, 0.0, 2.0):
-                    other = (longitude + distance) % 360
-                    exact_gap = (
-                        Decimal.from_float(other) - Decimal.from_float(longitude)
-                    ) % 360
-                    exact_gap = (exact_gap + 360) % 360
-                    after = exact_gap / (13 - Decimal.from_float(other_speed))
-                    exit_time = (30 - Decimal.from_float(longitude) % 30) / 13
-                    result = linear_lunar_contacts(
-                        state("Moon", longitude, 13),
-                        {"Mars": state("Mars", other, other_speed)},
-                    )
-                    conjs = [
-                        r for r in result["contacts"] if r["aspect"] == "conjunction"
-                    ]
-                    assert bool(conjs) is (0 < after < exit_time)
-                    if conjs:
-                        assert conjs[0]["after_days"] == float(after)
 
 
 @pytest.mark.parametrize("case", REFERENCE["cases"], ids=lambda row: row["case_id"])
@@ -185,7 +185,7 @@ def test_native_ingress_and_all_contacts_match_independent_jpl(case):
         * 86400
         <= PROTOCOL["comparison_tolerance_event_seconds"]
     )
-    actual, expected = result["contacts"], case["expected"]["contacts"]
+    actual, expected = (result["contacts"], case["expected"]["contacts"])
     assert [(r["other"], r["ray_degrees"]) for r in actual] == [
         (r["other"], r["ray_degrees"]) for r in expected
     ]
@@ -216,8 +216,8 @@ def test_native_root_solver_handles_acceleration_not_only_linear_orb():
         ctx.prec = 80
         exit_days = -12 + Decimal(144 + 40).sqrt()
         contact_days = -12 + Decimal(144 + 30).sqrt()
-    assert abs(result["sign_exit_after_days"] - float(exit_days)) < 1e-8
-    assert abs(result["contacts"][0]["after_days"] - float(contact_days)) < 1e-8
+    assert abs(result["sign_exit_after_days"] - float(exit_days)) < 1e-08
+    assert abs(result["contacts"][0]["after_days"] - float(contact_days)) < 1e-08
 
 
 def test_simultaneous_contact_and_ingress_are_unknown_at_jd_resolution():
@@ -284,7 +284,7 @@ def test_stationary_light_moon_cannot_be_lilly_heavier_collector():
         "day",
         speeds={"Moon": 0.0, "Saturn": 0.1, "Jupiter": 0.2},
     )
-    assert not any(r["collector"] == "Moon" for r in result["collection_of_light"])
+    assert not any((r["collector"] == "Moon" for r in result["collection_of_light"]))
 
 
 def test_unrelated_missing_speed_does_not_erase_known_route_geometry():

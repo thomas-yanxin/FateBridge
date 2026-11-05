@@ -211,63 +211,8 @@ def compare_natal_sources(charts: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def _legacy_comparison_statements(comparison: Dict[str, Any]) -> List[tuple[str, str]]:
-    """Render returned source facts; never recompute or silently correct them."""
-    source = comparison["ruleset"]["sources"][0]
-    statements = [
-        (
-            "summary",
-            f"原书数表比较：{source['author']}《{source['title']}》，{source['source_version']}。本次中州计算与该整理本分别保留；逐候选核对下卦正文种子顺逆与盘图，局部相合不证明全本符合、独立人工复核、历法精度或现实预测。",
-        )
-    ]
-    role_labels = {"period": "运星", "mountain": "山星", "facing": "向星"}
-    field_labels = {
-        "mountain_seed": "山星种子",
-        "facing_seed": "向星种子",
-        "mountain_flight": "山星顺逆",
-        "facing_flight": "向星顺逆",
-    }
-    for index, candidate in enumerate(comparison["candidates"]):
-        text = candidate["candidate_id"] + "："
-        if candidate["chart_mode"] != "lower":
-            text += "替卦不在这份216图下卦校勘覆盖内，未授予数表符合。"
-        else:
-            prose, diagram = candidate["prose"], candidate["diagram"]
-            text += f"正文4字段差异{len(prose['differences'])}项（PDF{prose['pdf_page']}），盘图27星数差异{len(diagram['differences'])}项（PDF{diagram['pdf_page']}）。"
-            for difference in prose["differences"]:
-                a, b = difference["source_value"], difference["computed_value"]
-                a = {"forward": "顺", "reverse": "逆"}.get(a, a)
-                b = {"forward": "顺", "reverse": "逆"}.get(b, b)
-                text += f"{field_labels[difference['field']]}：正文{a}、计算{b}；"
-            for difference in diagram["differences"]:
-                text += f"{difference['direction']}宫{role_labels[difference['role']]}：原图{difference['source_value']}、计算{difference['computed_value']}；"
-            invalid_source = [
-                role_labels[role]
-                for role, valid in diagram["source_plate_permutations"].items()
-                if not valid
-            ]
-            if invalid_source:
-                text += (
-                    "原图" + "、".join(invalid_source) + "存在重复或缺数，原样保留。"
-                )
-            text += "不改原图或计算值来取得相合，不据数表差异推出现实吉凶。"
-        if not all(candidate["computed_plate_integrity"].values()):
-            text += "本次计算盘未通过九星排列或多份数字表示的一致性检查，不能作为有效盘接受。"
-        statements.append((f"candidates.{index}", text))
-    if not comparison["candidates"]:
-        statements.append(
-            (
-                "summary",
-                "本次尚无计算宅盘候选，原书数表比较未执行，不能把缺少比较当作相合。",
-            )
-        )
-    return statements
-
-
 def comparison_statements(comparison: Dict[str, Any]) -> List[tuple[str, str]]:
-    """Render the selected source profile; retain exact historical v1 wording."""
-    if comparison["ruleset"]["ruleset_id"] == "shen_2011_lower_numeric_comparison_v1":
-        return _legacy_comparison_statements(comparison)
+    """Render the current source comparison without changing its facts."""
     source = comparison["ruleset"]["sources"][0]
     statements = [
         (

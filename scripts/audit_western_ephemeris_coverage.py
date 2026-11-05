@@ -11,6 +11,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Sequence
 
+from fatebridge.core.astro import runtime
+from fatebridge.core.astro.lunar_source_window import coherent_lunar_native_state
+from fatebridge.core.astro.native_coordinates import COORDINATE_FLAGS
+from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
+
 
 def require(condition: bool, message: str) -> None:
     if not condition:
@@ -20,18 +25,11 @@ def require(condition: bool, message: str) -> None:
 p = argparse.ArgumentParser()
 p.add_argument("--ephe-dir", dest="dataset", type=Path, required=True)
 p.add_argument("--output", type=Path, required=True)
-p.add_argument("--source-root", type=Path, default=Path(__file__).resolve().parents[1])
 a = p.parse_args()
-FIX = (
-    Path(__file__).resolve().parents[1] / "tests/fixtures/western-ephemeris-coverage-v1"
-)
-seal = json.loads((FIX / "seal.json").read_text())
+FIX = Path(__file__).resolve().parents[1] / "tests/data/astro/ephemeris_coverage"
 PROTOCOL_SHA256 = "74371d1cbcdaa6e400ac7ddbd2d51685e219ac9aa63cc02a3fcba6c478c63f36"
 REFERENCE_SHA256 = "bc87a9633d327927f5bbefa0f395db740bd171fc884aa26d3f8cc90c24d95c91"
 RAW_ARCHIVE_SHA256 = "a23d940040d8d9b9d71c53d42208e3d99478d787e51824d10aa2139d872cb95b"
-require(seal["protocol_sha256"] == PROTOCOL_SHA256, "Protocol seal changed")
-require(seal["reference_sha256"] == REFERENCE_SHA256, "Reference seal changed")
-require(seal["raw_archive_sha256"] == RAW_ARCHIVE_SHA256, "Raw archive seal changed")
 require(
     hashlib.sha256((FIX / "reference-raw.zip").read_bytes()).hexdigest()
     == RAW_ARCHIVE_SHA256,
@@ -47,11 +45,6 @@ require(
     "Protocol changed",
 )
 os.environ["SE_EPHE_PATH"] = str(a.dataset)
-sys.path.insert(0, str(a.source_root / "src"))
-from fatebridge.core.astro import runtime
-from fatebridge.core.astro.lunar_source_window import coherent_lunar_native_state
-from fatebridge.core.astro.native_coordinates import COORDINATE_FLAGS
-from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 
 plan = json.loads((FIX / "protocol.json").read_text())
 reference = json.loads((FIX / "reference.json").read_text())
@@ -179,19 +172,7 @@ result = dict(
     dataset=str(a.dataset),
     python=sys.version,
     swiss_version=swe.version,
-    source_root=str(a.source_root),
-    source_files={
-        n: hashlib.sha256((a.source_root / n).read_bytes()).hexdigest()
-        for n in [
-            "src/fatebridge/core/astro/lunar_source_window.py",
-            "src/fatebridge/core/astro_models.py",
-            "src/fatebridge/core/ephemeris_runtime.py",
-            "src/fatebridge/core/compressed_ephemeris.py",
-            "src/fatebridge/data/astro/ephemeris-manifest-v1.json",
-        ]
-    },
-    reference_sha256=seal["reference_sha256"],
-    comparison_protocol_sha256=seal["comparison_protocol_sha256"],
+    reference_sha256=REFERENCE_SHA256,
     position_line_arcseconds=plan["position_line_arcseconds"],
     explicit_tt_positions_not_future_utc_certification=True,
     shared_dynamics_not_independent_ephemeris=True,

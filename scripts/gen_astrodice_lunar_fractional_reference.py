@@ -4,25 +4,19 @@ Maintenance only: isolated pyerfa2.0.1.5/numpy2.5.4. All requests, including
 failures, are journalled; no FateBridge/Swiss import or residual selection.
 """
 
-import argparse
 import csv
 import hashlib
-import importlib.metadata
 import io
 import json
 import math
 import re
 import subprocess
-import sys
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
+from datetime import datetime
 from urllib.parse import urlencode
 
 from gen_astrodice_apparent_reference import (
     MONTHS,
     direction_and_rate,
-    julian_day_tt,
-    project_motion,
 )
 
 URL = "https://ssd.jpl.nasa.gov/api/horizons.api"

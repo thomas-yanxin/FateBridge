@@ -120,7 +120,6 @@ def compare_node_backends(chart: dict[str, Any], node_mode: str) -> dict[str, An
                 if body == "SouthNode"
                 else longitude_activation(source_longitude)
             )
-            longitude = activation["longitude"]
             reference = {
                 **selected,
                 **activation,

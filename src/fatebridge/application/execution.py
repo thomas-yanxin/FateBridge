@@ -1,9 +1,11 @@
 """Shared service execution, output validation and execution receipts."""
 
+from contextlib import nullcontext
 from typing import Any, Optional, cast
 
 from pydantic import BaseModel, ValidationError
 
+from fatebridge.application.compute_limits import HEAVY_CALCULATIONS
 from fatebridge.application.tool_spec import ServiceResult, ToolSpec
 from fatebridge.core.execution_context import (
     ExecutionOptions,
@@ -35,7 +37,10 @@ def execute_spec(spec: ToolSpec, request: BaseModel) -> ServiceResult:
 
     mode = request.ephemeris_policy if uses_western_policy(request) else "auto"
     try:
-        with data_file_policy(mode) as policy:
+        with (
+            HEAVY_CALCULATIONS if spec.cpu_bound else nullcontext(),
+            data_file_policy(mode) as policy,
+        ):
             service, args, kwargs = spec.bind(request)
             result = service(*args, **kwargs)
         if policy is not None and not result_is_error(spec, result):
@@ -167,10 +172,10 @@ def validate_output(
             raise OutputContractError("工具错误输出缺少错误事实")
         return
     if any(
-        field not in result or result[field] is None
+        field not in result or result[field] is None or result[field] == {}
         for field in spec.required_output_fields
     ):
-        raise OutputContractError("完整工具输出缺少必需业务字段")
+        raise OutputContractError("完整工具输出缺少必需业务事实或仅有空对象")
     if spec.key == "suzhan":
         from fatebridge.core.suzhan_clock_input import require_clock_input_binding
 
@@ -212,7 +217,7 @@ def validate_output(
         require_schedule_binding(result)
     if spec.output_model is not None:
         try:
-            spec.output_model.model_validate(result)
+            spec.output_model.model_validate(result, context={"full_result": True})
         except ValidationError as exc:
             raise OutputContractError("工具输出不符合公开契约") from exc
     from fatebridge.core.output_bazi_anchors import require_complete_bazi_anchors

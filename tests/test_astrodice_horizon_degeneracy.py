@@ -23,7 +23,9 @@ from fatebridge.core.local_techniques.chart import _build_birth_info
 from fatebridge.core.local_techniques.otherbu import build_otherbu_result
 
 REFERENCE = json.loads(
-    (Path(__file__).parent / "fixtures/astrodice-horizon-degeneracy.json").read_text()
+    (
+        Path(__file__).parent / "data/astrodice/tables/horizon-degeneracy.json"
+    ).read_text()
 )
 FACES = {"planet": "Jupiter", "sign": "Aries", "house": 0}
 SKY = {"date": "2024-06-21", "time": "12:00", "zone": "UTC"}

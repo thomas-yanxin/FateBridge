@@ -1,6 +1,5 @@
 """An unexpected COB bit cannot inherit default system-point semantics."""
 
-import hashlib
 import json
 from pathlib import Path
 
@@ -12,17 +11,14 @@ from fatebridge.core.astro.native_coordinates import require_spherical_coordinat
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.solar_position import apparent_position_policy
 from fatebridge.utils.errors import EphemerisSourceError
+from tests.reference_data import verify_source_files
 
-FIXTURE = Path(__file__).parent / "fixtures/western-point-flag-v1"
+FIXTURE = Path(__file__).parent / "data/astro/point_flag"
 PROTOCOL = json.loads((FIXTURE / "protocol.json").read_text())
 
 
 def test_flag_contract_and_expected_packets_are_frozen_before_candidate():
-    manifest = json.loads((FIXTURE / "manifest.json").read_text())
-    assert (
-        hashlib.sha256((FIXTURE / "protocol.json").read_bytes()).hexdigest()
-        == manifest["protocol_sha256"]
-    )
+    verify_source_files(FIXTURE)
     assert PROTOCOL["source_constant"]["value"] == 1048576
     assert runtime.swe.FLG_CENTER_BODY == 1048576
     assert len(PROTOCOL["cases"]) == 48

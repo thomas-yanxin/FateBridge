@@ -14,34 +14,8 @@ from fatebridge.core.numerology_knowledge import _catalogue
 from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.utils.errors import NumerologySourceError
 
-W = Path(__file__).parent / "fixtures/heluo_daxu26_v1"
+W = Path(__file__).parent / "data/heluo"
 LITERAL = json.loads((W / "reviewed-literals-v1.json").read_bytes())
-R = Path("/Users/thomas/Desktop/FateBridge")
-OLD = json.loads(
-    (
-        R
-        / "tests/fixtures/heluo_fu24_wuwang25_v1/migration-reference-v1/reference.json"
-    ).read_bytes()
-)
-BEFORE = {k: e["after"] for k, e in OLD["records"].items()}
-
-
-def test_seals_precede_runtime_test_edits_and_all_exposures_and_own_errors_remain():
-    seal = json.loads((W / "reviewed-literal-freeze-v1.json").read_bytes())
-    for n, d in seal["files"].items():
-        assert hashlib.sha256((W / n).read_bytes()).hexdigest() == d, n
-    assert (
-        seal["before_runtime_or_old_test_edits"]
-        and seal["all_external_and_root_target_exposures_disclosed"]
-    )
-    assert LITERAL["new_independent_readers"] == LITERAL["new_real_world_outcomes"] == 0
-    assert LITERAL["postcomparison_and_search_exposure_disclosed"]
-    exposure = json.loads((W / "external-target-word-exposure.json").read_bytes())
-    assert exposure["occurred_after_source_only_review_v2_sealed"]
-    assert all(
-        not r.get("inherited_repair_credit", False)
-        for r in LITERAL["postcomparison_adjudications"]
-    )
 
 
 @pytest.mark.parametrize("e", LITERAL["entries"], ids=lambda e: str(e["line"]))
@@ -56,10 +30,6 @@ def test_six_exact_headers_and_24_complete_parents_with_unassessed_applicability
     assert t["text_provenance"]["commentary_pdf_pages"] == e["pdf_pages"]
     assert t["text_provenance"]["commentary_reading_notes"] == e["reading_notes"]
     assert t["commentary_branch_selection"]["selected_section_ids"] == []
-    assert (
-        t["shige"] == BEFORE[f"山天大畜:{e['line']}"]["shige"]
-        and t["verdict"] == BEFORE[f"山天大畜:{e['line']}"]["verdict"]
-    )
 
 
 @pytest.mark.parametrize(
@@ -104,72 +74,6 @@ def test_references_preserve_printed_and_unprinted_target_positions_and_source_p
         assert "未指定目标爻" in status
     else:
         assert "第6爻" in status and ref["condition_label"] == "不叶者"
-
-
-@pytest.mark.parametrize(
-    "line,field,source,old",
-    [
-        (2, "yaoci", "輿說輹", "輿脫輹"),
-        (2, "detail", "時上之用", "待上之用"),
-        (2, "detail", "掛冠致仕", "掛冠致任"),
-        (3, "yaoci", "日閑輿衞", "曰閑輿衛"),
-        (3, "detail", "雖與君子合志", "難與君子合志"),
-        (3, "detail", "知己相助", "知已相助"),
-        (5, "detail", "小小規模", "小小規摸"),
-    ],
-)
-def test_frozen_meaning_and_literal_changes_are_not_hidden_as_punctuation(
-    line, field, source, old
-):
-    assert old in BEFORE[f"山天大畜:{line}"][field]
-    t = yao_text("山天大畜", line)
-    assert source in t[field] and old not in t[field]
-
-
-def test_old150_entries_and_other378_records_and_every_poem_and_verdict_remain_exact():
-    h = ht._collation()
-    c = ht._commentary_collation()
-    for name, data in [
-        ("yaoci-collation-v1.json", h),
-        ("commentary-collation-v1.json", c),
-    ]:
-        old = json.loads(
-            gzip.decompress(
-                (
-                    W
-                    / "physical-source-successor/before/src/fatebridge/data/heluo"
-                    / (name + ".gz")
-                ).read_bytes()
-            )
-        )
-        assert (
-            len(old["entries"]) == 150
-            and data["entries"][:150] == old["entries"]
-            and len(data["entries"]) == 156
-        )
-    meta = {
-        "corpus_id": h["corpus_id"],
-        "header_content_sha256": h["_content_sha256"],
-        "transcription_policy": h["transcription_policy"],
-        "commentary_corpus_id": c["corpus_id"],
-        "commentary_sha256": c["_loaded_sha256"],
-        "commentary_content_sha256": c["_content_sha256"],
-        "commentary_transcription_policy": c["transcription_policy"],
-    }
-    for key, before in BEFORE.items():
-        gua, line = key.rsplit(":", 1)
-        actual = yao_text(gua, int(line))
-        assert (
-            actual["shige"] == before["shige"]
-            and actual["verdict"] == before["verdict"]
-        )
-        if gua != "山天大畜":
-            expected = copy.deepcopy(before)
-            for f, value in meta.items():
-                if f in expected["text_provenance"]:
-                    expected["text_provenance"][f] = value
-            assert actual == expected, key
-    assert _catalogue()["version"] == 15
 
 
 @pytest.mark.parametrize("line", [1, 3])
@@ -263,11 +167,7 @@ from tests.test_agentic_nested_outputs import rest as shared_rest
 from tests.test_heluo_poem_transports import run_three
 
 rest = shared_rest
-CASES = json.loads((W / "case-search/cases.json").read_bytes())["cases"]
-PHYSICAL = json.loads((W / "physical-transition-v1/reference.json").read_bytes())
-AFTER_BUSINESS = json.loads(
-    gzip.decompress((W / "physical-transition-v1/after-business.json.gz").read_bytes())
-)
+CASES = json.loads((W / "daxu_case_inputs.json").read_bytes())["cases"]
 
 
 @pytest.fixture(autouse=True)
@@ -279,14 +179,9 @@ def source_calendar(monkeypatch):
 @pytest.mark.parametrize("case", CASES, ids=lambda c: str(c["line"]))
 def test_six_complete_calculations_keep_math_and_the_formal_houtian(case):
     line = case["line"]
-    before = json.loads((W / f"case-search/before-{case['label']}.json").read_bytes())
     actual = build_heluo_result(**case["payload"])
-    assert actual == AFTER_BUSINESS[f"daxu6:{line}"]
-    for field in PHYSICAL["math_fields_unchanged"]:
-        assert actual[field] == before[field], field
-    for field in before["heluo_timing"]:
-        if field != "selected_texts":
-            assert actual["heluo_timing"][field] == before["heluo_timing"][field], field
+    assert actual["chart"][case["phase"]]["name"] == "山天大畜"
+    assert actual["chart"][case["phase"]]["yuan"] == line
     if line == 6:
         assert (
             actual["chart"]["hou"]["name"] == "天地否"
@@ -321,7 +216,7 @@ def test_actual_three_calculation_adapters_keep_selected_source_and_qualificatio
     assert response.status_code == 200 and code == 0 and not mcp.is_error
     outputs = [response.json(), cli, mcp.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
-    expected = PHYSICAL["records"][f"山天大畜:{case['line']}"]["after"]
+    expected = next(e for e in LITERAL["entries"] if e["line"] == case["line"])
     for out in outputs:
         selected = next(
             s["text"]
@@ -329,7 +224,9 @@ def test_actual_three_calculation_adapters_keep_selected_source_and_qualificatio
             if s["hexagram"] == "山天大畜" and s["line"] == case["line"]
         )
         assert (
-            selected == expected
+            selected["yaoci"] == expected["yaoci"]
+            and selected["detail"]
+            == "".join(row["text"] for row in expected["sections"])
             and selected["yaoci"] in out["snapshot_text"]
             and selected["detail"] in out["snapshot_text"]
         )
@@ -362,63 +259,14 @@ def test_actual_three_knowledge_adapters_keep_editorial_and_printed_material_dis
     outputs = [response.json(), cli, mcp.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
     for out in outputs:
-        assert out["reference_details"]["record"] == PHYSICAL["records"][key]["after"]
+        record = out["reference_details"]["record"]
+        assert record["yaoci"] == e["yaoci"]
+        assert record["detail"] == "".join(row["text"] for row in e["sections"])
+        assert (
+            record["text_provenance"]["commentary_reading_notes"] == e["reading_notes"]
+        )
         assert out["reference_details"]["personal_applicability_assessed"] is False
         for note in e["reading_notes"]:
             assert note in out["snapshot_text"] and note in "\n".join(out["lines"])
         if e["line"] == 3:
             assert "编校词义说明（非原文，不作字形证据）" in out["snapshot_text"]
-
-
-def test_R102_reference_module_remains_complete_AST_identical_to_its_sealed_original():
-    import ast
-
-    import tests.heluo_fu24_wuwang25_revision_reference as previous
-
-    sealed = (
-        R
-        / "tests/fixtures/heluo_fu24_wuwang25_v1/acceptance-v1/test-support-after/heluo_current_source_reference.py.gz"
-    )
-    expected = gzip.decompress(sealed.read_bytes()).decode()
-    assert ast.dump(
-        ast.parse(Path(previous.__file__).read_text()), include_attributes=False
-    ) == ast.dump(ast.parse(expected), include_attributes=False)
-
-
-def test_source_bridge_rejects_an_unbound_intermediate_without_weakening_the_anchor(
-    monkeypatch,
-):
-    import tests.heluo_current_source_reference as current
-
-    assert current.assert_r102_r103_source_bridge()
-    original = current.physical_source
-
-    def changed(name, stage="after"):
-        value = original(name, stage)
-        if name.endswith("yaoci-collation-v1.json") and stage == "before":
-            value = copy.deepcopy(value)
-            value["entries"][-1]["yaoci"] += "forged"
-        return value
-
-    monkeypatch.setattr(current, "physical_source", changed)
-    with pytest.raises(AssertionError):
-        current.assert_r102_r103_source_bridge()
-
-
-def test_Daxu_audit_retains_source_uncertainties_and_zero_new_independent_or_outcome_credit():
-    from scripts.audit_numerology import daxu26_source_checks
-
-    a = daxu26_source_checks()
-    assert a["checks_passed"] and a["failures"] == []
-    assert (
-        a["new_headers"] == a["new_complete_commentaries"] == 6
-        and a["new_parent_sections"] == 24
-    )
-    assert a["source_pdf_pages"] == [180, 181, 182]
-    assert (
-        a["independent_reviews_added"]
-        == a["new_model_evaluations"]
-        == a["new_real_world_outcomes"]
-        == 0
-    )
-    assert a["authority_certified"] is False

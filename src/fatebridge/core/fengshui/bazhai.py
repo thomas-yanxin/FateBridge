@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from fatebridge.core.aa1996_solar import MODEL_ID as AA1996_SOLAR_MODEL
 from fatebridge.core.divination import BAGUA_BY_NAME
+from fatebridge.core.moshier_solar import MODEL_ID as COMPLETE_MOSHIER_SOLAR_MODEL
 from fatebridge.core.vsop2013_solar import MODEL_ID as VSOP2013_SOLAR_MODEL
 
 from .bazhai_interpretation import palace_star_relationship, you_nian_trace
@@ -101,13 +102,13 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> Dict[str, Any]
         boundary_day = (
             date.fromisoformat(resolution["moment"][:10]) if resolution else None
         )
-        # Do not certify a boundary date from the linear fallback. The adjacent
-        # days are conservatively held for a confirmed effective birth year.
+        # Preserve any date crossed by the selected model guard; it is not
+        # an independently certified physical error bound.
         uncertain_boundary = bool(
             resolution
             and boundary_day is not None
             and day in boundary_candidate_dates(resolution, req.timezone_name)
-            and (resolution["approximate"] or day != boundary_day)
+            and day != boundary_day
         )
         year = (
             None
@@ -129,12 +130,16 @@ def minggua(req: MingguaRequest, subject_id: str = "occupant") -> Dict[str, Any]
                     "moshier"
                     if policy["ephemeris_model"] == "moshier"
                     else (
-                        "vsop2013_solar"
-                        if policy["ephemeris_model"] == VSOP2013_SOLAR_MODEL
+                        "complete_moshier_solar"
+                        if policy["ephemeris_model"] == COMPLETE_MOSHIER_SOLAR_MODEL
                         else (
-                            "aa1996_solar"
-                            if policy["ephemeris_model"] == AA1996_SOLAR_MODEL
-                            else "analytic_solar"
+                            "vsop2013_solar"
+                            if policy["ephemeris_model"] == VSOP2013_SOLAR_MODEL
+                            else (
+                                "aa1996_solar"
+                                if policy["ephemeris_model"] == AA1996_SOLAR_MODEL
+                                else "analytic_solar"
+                            )
                         )
                     )
                 )
@@ -211,13 +216,6 @@ def _house_inputs(req: BazhaiRequest) -> Tuple[Optional[House], float, str, str]
             house.bearing_uncertainty_degrees,
             origin,
             origin + ".bearing_uncertainty_degrees",
-        )
-    if natal is not None and natal.bearing_uncertainty_degrees is not None:
-        return (
-            house,
-            natal.bearing_uncertainty_degrees,
-            origin,
-            "xuankong.bearing_uncertainty_degrees",
         )
     return house, 0, origin, "not_provided_point_input_convention"
 

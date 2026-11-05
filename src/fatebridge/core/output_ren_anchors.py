@@ -176,7 +176,6 @@ def _jinkou(board: Any, pillars: Any, liuren: Any) -> None:
         _same(row, "polarity", "阳" if sequence.index(value) % 2 == 0 else "阴")
         if month is not None:
             seasonal = status_against_anchor(branch_element_text(month), phase)
-            _same(row, "power", seasonal)
             _same(row, "seasonal_power", seasonal)
             _same(
                 row,
@@ -337,7 +336,6 @@ def _liuren(board: Any, pillars: Any, runyear: Any = None) -> None:
             (EARTHLY_BRANCHES.index(month) - 2) % 12 + 1,
         )
         _same(board, "month_building_element", branch_element_text(month))
-        _same(board, "twelve_life_element", branch_element_text(month))
     general = _branch(_get(board, "month_general", "branch"))
     if general is not None:
         _same(board, "emptiness_evidence.month_general_branch", general)

@@ -11,7 +11,7 @@ import pytest
 
 from fatebridge.validation import fengshui_solar_terms as audit
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_all_terms_v1"
+FOLDER = Path(__file__).parent / "data/fengshui_all_terms_v1"
 
 
 @pytest.fixture(scope="module")
@@ -34,9 +34,7 @@ def test_existing421_lichun_reference_is_preserved_and_independently_reproduced(
     reference,
 ):
     previous = json.loads(
-        (
-            FOLDER.parent / "fengshui_calendar_v10/period-lichun-reference.json"
-        ).read_text()
+        (FOLDER.parent / "fengshui_lichun_tt/reference.json").read_text()
     )
     current = [r for r in reference["rows"] if r["term"] == "立春"]
     assert len(current) == len(previous["rows"]) == 421

@@ -14,35 +14,24 @@ from fatebridge.core.astro.time_scales import leap_table
 from fatebridge.core.fengshui.calendar import lichun_resolution
 from fatebridge.services.fengshui import calculate_annual_stars
 from fatebridge.services.run_metadata import attach_run_metadata
+from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.validation.fengshui_calendar import audit_lichun_reference
 from tests.fixtures.fengshui import payload
 from tests.test_fengshui_surfaces import mcp_call, rest_client, without_transport
 
-FOLDER = Path(__file__).parent / "fixtures/fengshui_calendar_v10"
-REFERENCE = json.loads((FOLDER / "period-lichun-reference.json").read_text())
+FOLDER = Path(__file__).parent / "data/fengshui_lichun_tt"
+REFERENCE = json.loads((FOLDER / "reference.json").read_text())
 
 
-def test_all_421_independent_tt_crossings_and_original_401_reference_remain_frozen():
-    manifest = json.loads((FOLDER / "provenance.json").read_text())
-    for name, digest in manifest["files"].items():
+def test_all_421_independent_tt_crossings_retain_the_original_values_and_gate():
+    manifest = json.loads((FOLDER / "hashes.json").read_text())
+    for name, digest in manifest.items():
         assert hashlib.sha256((FOLDER / name).read_bytes()).hexdigest() == digest
-    original = json.loads((FOLDER / "lichun-reference.json").read_text())
-    assert len(original["rows"]) == 401
-    assert (
-        original["collector_sha256"]
-        == hashlib.sha256((FOLDER / "collector-v1.py.txt").read_bytes()).hexdigest()
-    )
-    # Extend coverage to complete historical house-period endpoints. This does
-    # not discard the first reference or relax its original one-second gate.
+    assert len(REFERENCE["rows"]) == 421
+    assert sum(1800 <= row["year"] <= 2200 for row in REFERENCE["rows"]) == 401
     assert REFERENCE["protocol"]["coverage_derivation"]["first_period_start"] == 1784
     assert REFERENCE["protocol"]["coverage_derivation"]["last_period_end"] == 2204
-    assert (
-        original["protocol"]["numeric_implementation_tolerance_seconds"]
-        == REFERENCE["protocol"]["numeric_implementation_tolerance_seconds"]
-        == 1.0
-    )
-    by_year = {row["year"]: row["jd_tt"] for row in REFERENCE["rows"]}
-    assert all(row["jd_tt"] == by_year[row["year"]] for row in original["rows"])
+    assert REFERENCE["protocol"]["numeric_implementation_tolerance_seconds"] == 1.0
     audit = audit_lichun_reference(REFERENCE)
     assert audit["rows"] == audit["matched"] == 421
     assert audit["all_scoped_tt_checks_passed"]
@@ -93,7 +82,7 @@ def test_one_changed_reference_row_is_reported_as_a_failed_comparison():
 
 
 @pytest.fixture(params=["missing_dependency", "solver_failure"])
-def actual_fallback(monkeypatch, request):
+def unavailable_native(monkeypatch, request):
     # These faults target Swiss, not the independent packaged DE440 model.
     # Keep the default model's numerical audit above unmodified.
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
@@ -106,7 +95,7 @@ def actual_fallback(monkeypatch, request):
     almanac.get_solar_terms_for_year.cache_clear()
 
 
-def test_real_fallback_never_passes_independent_numeric_acceptance(actual_fallback):
+def test_real_fallback_never_passes_independent_numeric_acceptance(unavailable_native):
     audit = audit_lichun_reference(REFERENCE)
     assert audit["rows"] == audit["failed_count"] == 421
     assert audit["matched"] == 0 and not audit["all_scoped_tt_checks_passed"]
@@ -115,8 +104,8 @@ def test_real_fallback_never_passes_independent_numeric_acceptance(actual_fallba
 
 
 @pytest.mark.parametrize("name", ["annual_stars", "minggua", "xuankong_natal"])
-def test_real_provider_fallback_is_honest_on_every_public_surface(
-    actual_fallback, monkeypatch, tmp_path, capsys, name
+def test_unavailable_native_crossing_is_rejected_on_every_public_surface(
+    unavailable_native, monkeypatch, tmp_path, capsys, name
 ):
     inputs = (
         {"effective_year": 2026}
@@ -128,26 +117,20 @@ def test_real_provider_fallback_is_honest_on_every_public_surface(
         inputs["period"] = {
             "basis": "construction_completion",
             "effective_event_year": 2004,
-            "evidence": "synthetic fallback test",
+            "evidence": "synthetic unavailable-provider test",
         }
     http = rest_client(monkeypatch).post("/api/fengshui/" + name, json=inputs)
     protocol = asyncio.run(mcp_call(name, inputs))
     path = tmp_path / "request.json"
     path.write_text(json.dumps(inputs))
-    assert run(["fengshui_" + name, "--request-file", str(path)]) == 0
+    code = run(["fengshui_" + name, "--request-file", str(path)])
     cli = json.loads(capsys.readouterr().out)
-    assert http.status_code == 200 and not protocol.is_error
-    assert (
-        without_transport(http.json())
-        == without_transport(protocol.structured_content)
-        == without_transport(cli)
-    )
+    assert http.status_code == 503 and protocol.is_error and code == 1
     for body in (http.json(), protocol.structured_content, cli):
-        assert body["status"] == "complete"  # away from the uncertain boundary
-        assert body["run_metadata"]["engine_is_approximate"] is True
-        assert "approximate_engine" in body["run_metadata"]["warnings"]
-        assert "交节采用近似回退" in body["snapshot_text"]
-        assert "linear_1900_fallback" in json.dumps(body)
+        assert body["error_code"] == "ephemeris_source_inconsistent"
+        assert body["retryable"] is False
+        assert body["issues"][0]["code"] == "solar_native_unavailable"
+        assert "layers" not in body
 
 
 @pytest.mark.parametrize(

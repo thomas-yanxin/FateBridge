@@ -14,8 +14,8 @@ from scripts.audit_taiyi_wujing_cycles import source_data, source_value
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_wujing_facsimile_v46"
-SOURCE_SHA = "79af0e8fbb41e7d7f6e5be446925c29fe6077386bdf665be36ec48899ba48ba2"
-READINGS_SHA = "2eab0aa9740150837143c7e0a456b07a75a42202056e2995f2e25f54c1e5c80d"
+SOURCE_SHA = "d27100bd4dd65809c712db2020a8d7bbf87f7941c2f0d3c5aab645b71679be88"
+READINGS_SHA = "dda4dace283f83f2b827ee386b8e7bd927177bb763440aab9f354b050574b764"
 
 
 def verify(corpus: Path = CORPUS) -> dict[str, Any]:
@@ -37,15 +37,6 @@ def verify(corpus: Path = CORPUS) -> dict[str, Any]:
         if name.startswith("src/") or name.endswith("requirements.json"):
             continue
         pinned = ROOT / name
-        if name == "scripts/audit_taiyi_wujing_cycles.py":
-            # This pin identifies the original v22 collector, not the evolving
-            # maintained script. Preserve its exact bytes and digest; audit()
-            # below still checks all 1,440 current facts against that old report.
-            pinned = (
-                ROOT
-                / "tests/fixtures/architecture_refactor_v1/frozen-scripts"
-                / "audit_taiyi_wujing_cycles.py.txt"
-            )
         if sha(pinned) != expected:
             raise ValueError(f"武经既有来源指纹不符：{name}")
     if sha(corpus / "readings-freeze.json") != READINGS_SHA:
@@ -96,17 +87,7 @@ def verify(corpus: Path = CORPUS) -> dict[str, Any]:
 
 def compare(legacy: dict[str, Any], readings: dict[str, Any]) -> dict[str, Any]:
     """Compare frozen readings against supplied actuals; never derive a source value."""
-    original_path = ROOT / "docs/validation/taiyi-jinjing-v22/report.json"
-    protocol = (CORPUS / "freeze.json").read_bytes()
-    expected = json.loads(protocol)["source_pins"][
-        "docs/validation/taiyi-jinjing-v22/report.json"
-    ]
-    if (
-        hashlib.sha256(protocol).hexdigest() != SOURCE_SHA
-        or hashlib.sha256(original_path.read_bytes()).hexdigest() != expected
-    ):
-        raise ValueError("武经原始报告指纹不符")
-    original = json.loads(original_path.read_text())
+    original = literal_audit()
     original_comparisons = {
         (row["id"], item["actual_field"]): item
         for row in original["source_rows"]

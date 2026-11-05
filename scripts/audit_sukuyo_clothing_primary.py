@@ -17,7 +17,7 @@ if not __package__:
 from scripts.audit_sukuyo_t2465_primary import SATQuotationParser
 from scripts.audit_sukuyo_taibai_primary import NS, XML_ID, _fragment, _render
 
-FIXTURE = ROOT / "tests/fixtures/sukuyo-clothing-primary.json"
+FIXTURE = ROOT / "tests/data/sukuyo-clothing-primary.json"
 DATA = ROOT / "src/fatebridge/data/sukuyo_t1299_clothing.json"
 
 

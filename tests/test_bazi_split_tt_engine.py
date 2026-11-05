@@ -1,10 +1,6 @@
-"""The new split path preserves sub-JD changes and the old scalar model."""
+"""Split TT retains sub-JD motion and matches original SPK kernel vectors."""
 
-import importlib.machinery
-import importlib.util
-import json
 import math
-import sys
 from pathlib import Path
 
 import pytest
@@ -13,32 +9,6 @@ from fatebridge.core import de440_solar
 from fatebridge.core.astro.tt_epoch import TTInstant
 
 ROOT = Path(__file__).resolve().parents[1]
-
-
-def original_engine():
-    path = ROOT / "tests/fixtures/bazi_split_tt_engine_v1/de440-before.py.txt"
-    name = "_bazi_split_tt_original_engine"
-    loader = importlib.machinery.SourceFileLoader(name, str(path))
-    spec = importlib.util.spec_from_loader(name, loader)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[name] = module
-    loader.exec_module(module)
-    return module
-
-
-def test_all1024_original_generic_scalar_longitudes_and_vectors_are_unchanged():
-    before = original_engine()
-    rows = json.loads(
-        (ROOT / "tests/fixtures/bazi_de440_default_v1/generic-epochs.json").read_text()
-    )["rows"]
-    assert len(rows) == 1024
-    for row in rows:
-        epoch = row["jd_tt"]
-        assert de440_solar.solar_longitude(epoch) == before.solar_longitude(epoch)
-        for pair in ((0, 3), (3, 399), (0, 10)):
-            assert de440_solar.state(pair, epoch - 2451545.0) == before.state(
-                pair, epoch - 2451545.0
-            )
 
 
 def test_time_smaller_than_a_scalar_jd_ulp_reaches_the_actual_orbit():

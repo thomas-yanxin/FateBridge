@@ -1,86 +1,44 @@
-# 印度占星：本命、分盘、Sthana Bala 与 Vimshottari
+# 印度占星：本命、分盘、力量与Vimshottari
 
-当前源码候选提供 `parashari_lahiri_core_v29` 有限 Parashari 实现。`astro_india_chart`（REST `/api/astro/india`）生成本命与分盘，`astro_vimshottari`（REST `/api/astro/vimshottari`）生成月宿 Vimshottari 主运／次运。CLI、REST 和 MCP 共享请求、计算和输出模型。源码功能与已发布包可能存在版本差异；本页不表示已完成发布。
+阅读导航：[输入与来源](#坐标速度与来源限制) · [力量与未决项](#力量口径与未裁定分支) · [计算范围](#计算范围与来源) · [接口](#接口与独立视图) · [示例](#可复制的虚构示例) · [验证](#数值与软件验证)
 
-印占出生钟制必须已确认。民用时刻须显式填写合法 `birth_timezone`（IANA 名称或 UTC 偏移），或由受支持且不歧义的 `birth_place` 解析；未知时区在星历计算前拒绝，不再默认 UTC。明确 UTC 及显式已知的 LMT／LAT 继续支持；坐标、分析时区和太阳钟显示不能确定出生民用时区。旧盘须结合保留的原始请求及运行回执核对，不能仅凭计算正文追认时区。反例、原回归失败、归档恢复与当前接入范围见出生时区来源审计（本地数据：`validation/jyotish-timezone-input-audit.md`）。
+当前提供`parashari_lahiri_core_v29`有限Parashari实现。`astro_india_chart`（REST `/api/astro/india`）计算本命与分盘，`astro_vimshottari`（REST `/api/astro/vimshottari`）计算月宿主运／次运。CLI、REST和MCP共用领域服务；源码可用范围、已发布包及部署验收分别报告。
 
-v29将D1逐星`physical_state.longitude_speed_degrees_per_day`接入共享视位置导数，并用同一返回速度判定顺逆／驻留及所选Santhanam太阳角距分支；原生值保留在`longitude_speed_native_degrees_per_day`。`longitude_motion_context.rate_basis`逐体、逐后端区分完整视位置导数、月球光行时链部分修正及原生值，不把月亮或木土星的有限修正写成已具备完整导数。Rahu／Ketu保留声明的解析交点理论。辅助采样后端变化时，只有精确复现原中心状态及文件上下文才保留原生速率；其他来源错误继续拒绝。该改动不替换古典平均运动或Cheshta Bala，不认证驻留时刻与现实事件精度。原参考与未达标案例、来源修复和主工作区验收见D1瞬时速度审计（本地数据：`validation/jyotish-d1-motion-audit.md`）。
+民用出生时刻须明确合法`birth_timezone`或可支持且不歧义的`birth_place`。未知时区在计算前拒绝，坐标与太阳钟显示不能代替出生钟制。已知历史LMT／LAT另由明确的`birth_clock_basis`输入；历史时标约定不认证真实地方钟。
 
-原 96 案的位置及速度框架差异现已作全量归因，但原 64/96 结果不重评。新增七曜 112 条参考已冻结，当前 110 条通过参考自检、两条远期月亮速度仍未收敛，新框架实现尚未比较；见框架归因与新参考（本地数据：`validation/jyotish-lahiri-frame-attribution-audit.md`）。
+## 坐标、速度与来源限制
 
-逐星 `physical_state.longitude_motion_context.continuous_frame_state` 另提供连续Lahiri框架的笛卡尔／球面状态对照，使用 `R x` 与 `R (gamma v) + R' x` 同时生成位置和速度。当前 `status=partial`：输入仍为原生J2000视位置／近似速度，单位时间映射与完整物理视速度未认证，不替换主D1因子或顺逆标签。原生J2000孤立位置分支的差异继续显式返回，不能把新的连续模型核对替换原兼容性失败。独立完整状态参考、业务日期端点、来源恢复与协议验收范围见连续状态接入审计（本地数据：`validation/jyotish-continuous-state.md`）。
+D1的`physical_state.longitude_speed_degrees_per_day`使用逐体声明的视位置导数，并据同一值判断顺逆／驻留和Santhanam太阳角距分支。原生速度保留在`longitude_speed_native_degrees_per_day`。`longitude_motion_context.rate_basis`分别标明完整视位置导数、月球光行时链／空间光行差／观测者项的部分修正，以及仍采用的原生近似；Rahu／Ketu使用声明的交点理论。这不替换古典平均运动或Cheshta Bala。
 
-月球在同一对象的 `source_derivative_state` 中另给出已核查固定框架源公式的三维导数变换，包含光行时与观测者导数；固定输入基底和随TT变化的输出框架分别处理。该状态仍为 `partial`，保留原生速度对照和原有主字段；未应用时按具体来源原因解释。数学参考、检出限制和保留失败见月球源状态审计（本地数据：`validation/jyotish-lunar-continuous-source-state.md`）。
+连续Lahiri辅助状态按`R x`与`R (gamma v) + R' x`同时传播位置和速度。`continuous_frame_state/source_derivative_state`仍为`partial`：原生J2000输入近似、完整移动框架、物理TT时差映射及完整原生二进制身份尚未统一验收，辅助状态不替换D1主因子。内部高精度公式符合不能代替物理参考资格。
 
-`india.profile.earth_rotation` 回显四轴实际采用的自转政策、TT/UT1历元与来源限定；`local_apparent_sidereal_meridian_degrees` 是当地视恒星子午圈的赤经角度，不能当作黄道MC经度。领域调用中显式选择的C04来源会传入隔离计算进程，并在表外报错；印占公开请求仍使用既有选项。默认结果保护、来源反例及旧版策略检查迁移见印占自转依据审计（本地数据：`validation/jyotish-rotation-provenance.md`）。
+原96例位置／速度框架比较的64／96结果仍有限；112条补充七曜参考中两条远期月亮速度未收敛。Horizons打印角速度与方向差分存在冲突，时间标签与舍入控制没有单独消除该冲突；密集TT查询的返回时刻不符也不能被默认为通过。共有112例、两种时间口径、五阶段的1,120组原型结果只支持其具名研究范围。
 
-后续完整核验了原112条的Horizons直接ICRF角速度，但其打印预算及与方向差分的冲突仍未解决，不能用它替换原参考；密集TT列表也因返回时刻不符被拒绝。见参考角速度来源审计（本地数据：`validation/jyotish-horizons-rate-source-audit.md`）。
+独立DE441几何解码参考共有364,687条官方样本：360,001条满足原准则、4,686条缺少来源，总门槛未通过。它提供TDB几何参考，不认证TT视位置、原典或预测。不同时间模型／CSPICE一致也不自动授予新的物理参考资格。
 
-独立DE441几何解码器已对照全部364687条官方样本，360001条达原准则、4686条缺源，总门槛未通过；修正了该研究解码器的最终文件端点及无效零状态输入。它只提供TDB几何参考基础，不认证TT视位置、原典或现实预测，见独立几何解码审计（本地数据：`validation/jyotish-direct-de441-decoder-audit.md`）。
+受管理求导须复现传入中心、绑定同一文件上下文和实际依赖TT，按既定文件窗口选取预定差分方向；来源错误拒绝，不删样本或换日期。当前私有原生进程覆盖出生钟解析、Lahiri／赤道／几何状态、宫位、太阳事件、生时范围和达沙，保留显式数据路径、JPL选择与执行钟，避免调用者陈旧Delta-T状态进入计算。辅助表或文件途中变化会报类型化来源错误，首末指纹相同不证明完整原子读取。
 
-独立接收时刻原型已保留全部112例、两种时间口径及五阶段的1120组视位置与完整导数结果；内部四步长差分和ERFA公式核对一致，远期时间模型资格及原两条月球速度参考仍未解决。未修改生产算法或重评旧门槛，见完整视位置导数原型审计（本地数据：`validation/jyotish-apparent-prototype-audit.md`）。
+`india.profile.earth_rotation`回显实际TT／UT1和自转来源。`local_apparent_sidereal_meridian_degrees`是当地视恒星子午圈赤经，不能当黄道MC。C04在表外不外推或静默回退；历史模型UT1不是实测地球定向。
 
-后续重新核对112份原始响应及224个旧速度向量，并完成42560个时间标签／舍入控制，未发现可单独解释原月球差异的舍入口径；两条旧失败保留。三来源数值时差模型随后完成独立解码、同输入CSPICE核对及局部TT逆解，原月球冲突及各源缺覆盖仍保留，未授予新物理参考资格；见时间绑定与舍入控制（本地数据：`validation/jyotish-clock-sampling-audit.md`）及数值时间独立核验（本地数据：`validation/jyotish-integrated-clock-audit.md`）。
+地方平均日期以给定UT1和经度的精确二进制值分类，角距与对点也先按未舍入值运算，再显示Virupa。它们解决给定数值的边界算术，不提高出生记录或星历物理精度。
 
-锁定月球源码的独立分解进一步验证了已有光行时链JVP，并保留两项剩余速度近似及其完整求导比较。该研究只在固定ICRF连续模型中成立，未接入生产或授予完整月球认证，见月球源公式导数审计（本地数据：`validation/jyotish-lunar-native-derivative-audit.md`）。
+## 力量口径与未裁定分支
 
-后续已将其中的空间光行差雅可比修正接入共享速度计算，光行时链项和空间项分别返回；D1继续声明为部分修正。加速度及框架传播检查、所有误差增大行、原生算术逐位一致性失败和源码恢复范围见月球空间速度修正审计（本地数据：`validation/jyotish-lunar-spatial-motion.md`）。旧参考及原门槛未重评，未新增现实预测证据。
+公开作者profile各自保留，不混取较高分。完整Shadbala仍未完成。默认`cheshta_model=unadjudicated`保留五星运动力缺项；可选`simon1994_j2000`仅在1900–2050出生TT范围内使用Simon完整长期平均黄经多项式及另算几何真位置，同属J2000平均动力黄道／春分点。它不是D1的Lahiri视位置，也不认证Raman1900历元表。
 
-新一轮已接入观测者加速度及固定接收框架的源公式导数余项，直接使用原生光行差前状态，按同一文件窗口选择预定差分方向并精确恢复中心。采样输入、估计及不适用原因保留，数值分项和文字同步；完整移动框架、原生二进制身份及物理TT时差映射仍未认证，见月球观测者与源导数审计（本地数据：`validation/jyotish-lunar-observer-motion.md`）。旧失败没有改判，现实预测和独立解释盲审样本仍为0。
+Raman运动表的54项关系矛盾、不同扫描见证的19个清晰单元差异及较早见证34条冲突均不以混接输入消除。Drekkana详细条文15 Virupa与摘要60的冲突另列`source_reading_conflicts`，不凭参考软件选常数。
 
-v27修正Uchcha及Dig角距的提前舍入：保留给定二进制经度、上升／天顶及其未舍入对点，求短弧后才把角距和力量各自转换为最终浮点数。原Santhanam系数、零力点和公式不变；Dig的`basis.numerical_policy`区分显示对点与实际操作数。冻结数学集合中旧实现分别有16和654个末值差异，最大约10^-14 Virupa；这不是天文或现实预测误差界。来源、完整依赖核对、失败记录和验收范围见力量角距数值审计（本地数据：`validation/jyotish-strength-arithmetic-audit.md`）。
-
-v26修复地方平均午夜附近的日期进位：对实际返回的UT1儒略日和给定经度按其精确二进制值分类，避免先把两者相加到大浮点数再转换日期。360／30日岁月主口径、传统历元和时间尺度模型均沿用原定义；更正日期后，岁月主、星战前置回执、Kala分支及生时网格、相关主题事实与数值文字须使用同一更正结果。297个冻结边界探针的旧45处差异全部消除；这是特定输入的数值检验，不是总体错误率或现实预测准确率。完整比较、首次重放失败与缓存缺失后的恢复范围见平均日期边界审计（本地数据：`validation/jyotish-mean-date-audit.md`）。
-
-v25另列Aiyar1905自己的七曜原始PAV／BAV／SAV及自身削减链，位于`india.ashtakavarga.charts.D1.source_profile_comparison.aiyar1905`。逐项原页核验发现其672个规则单元中有6个与Rao表不同，月亮／金星总量及SAV337仍相同，不能只凭总量或一个软件相符就认证同一来源。Rao默认保留；原v24比较继续表示“在Rao原始BAV上仅换削减读法”。新分支对每张盘和生时样本各用自己的完整输入，主题原生文字同时给两源实际局部计数与同run引用。非D1应用及分盘构造是另行声明的比较选择，不称Aiyar整书已验收，详见完整原始表来源比较（本地数据：`validation/jyotish-aiyar-bav-audit.md`）。
-
-v24另提供Aiyar1905英译注的八分法削减比较，位于每张表`reduction_analysis.source_profile_comparison.aiyar1905_commentary`。该口径完整保留其三合原始双零规则和同主单占据等值规则，回显逐步输入、规则与结果；Rao默认口径的空值与Pinda不被替换。来源是第IX章英文N.B.注释，不能写成Varahamihira某偈的逐字规则或整部Aiyar译本已验收。新口径只给削减计数及其和，没有另配Rao的Pinda乘数。实际来源与当前候选验收见译注削减比较审计（本地数据：`validation/jyotish-aiyar-reductions-audit.md`）。
-
-v23将Vimshottari各层的精确有理数偏移保留到同一个出生历元，最终边界只取最近微秒、正中取偶，避免已舍入主运起点再次带入递归舍入。`vimshottari.time_quantization`回显本次出生UTC、年长微秒数、月宿精确比例及实现口径；比例分子／分母以十进制字符串保存，避免JSON客户端整数精度丢失。Rao16.2／16.3负责传统比例，微秒舍入属于另列的FateBridge实现约定，不表示出生钟、月亮位置或事件预测的微秒准确度。当前候选验收与旧输出变化清单见全局边界舍入修复审计（本地数据：`validation/jyotish-dasha-global-epoch-audit.md`）。
-
-v19统一可选太阳时显示与本命计算的物理时标：保留记录民用时刻，从同一TT、模型UT1及视太阳时角推导无时区的墙钟标签。SDK对象携带的旧派生标签在本次隔离会话内重算，不移动其出生UTC；本命、分盘和达沙不因显示开关改变。`clock_context.solar_display_context`回显太阳来源、TT／UT1、均时差、模型和可表示状态。缺少可表示标签时保留物理计算，不能把显示精度当作实测DUT1或出生钟准确度。详见太阳时显示一致性审计（本地数据：`validation/jyotish-solar-display-audit.md`）。
-
-共享视黄经速度候选`fatebridge_complete_position_derivative_v6`处理重叠星历文件在求导途中切换的问题。原生中心状态须精确复现，辅助方向须来自同一文件上下文并通过连续三层联合检查；原有成功计算路径保留。原接缝出生时刻必须计算成功，不能由相邻日期替代。来源重建与数值收敛不是原典或预测有效性认证；候选的完整验收状态与独立参考范围见星历接缝求导审计（本地数据：`validation/jyotish-segment-motion-audit.md`）。
-
-共享前版`compressed_file_endpoint_context_v1`在受管理的物理`calc/calc_ut`实际落入已观察文件终点64个TT浮点单位内时，先以文件头选择邻接上下文，再重算完全相同的原调用。它可能修正原生中心星位，须与随后v6“保持传入中心”的求导契约分开解释。`india.profile.native_execution_context.compressed_file_endpoint_policy`记录原始／所选六维状态、TT、文件名、锚点和累计调用数；锚点只是文件选择，不是出生时刻。未能保持模型、DE版本、返回帧或原时标时拒算。尚非所有重叠文件的统一策略，也不覆盖第三方内部直接调用或原生日出搜索内部的每次求值。方法、独立参考与完整验收状态见文件端点上下文审计（本地数据：`validation/jyotish-endpoint-context-audit.md`）。
-
-此前`compressed_file_endpoint_context_v2`在印占私有进程中先清理所拥有的原生缓存，以原接收时刻的几何太阳预选来源，再执行完全相同的目标坐标调用；外部调用者保留旧的后调用保护。相关接收／发光时刻的依赖采样先验证同一文件区间、已建立的新接收状态、实际依赖TT及前后文件身份，再保留该上下文，不放宽来源检查。`native_coordinate_contexts`逐项回显实际目标和帧，未知的旧目标状态保持null，不伪称星位未变。`apparent_position_policy`及D1逐星`native_position_interpretation`直接给出太阳内部虚拟方向的模型限定；达沙生时分组保留离散含义，不把连续射线几何变成更多分组。参见私有坐标上下文审计（本地数据：`validation/jyotish-private-coordinate-context-audit.md`）。
-
-共享层另以`external_geocentric_solar_dependency_rebuild_v1`为普通原生地心视太阳调用重建接收与两个回溯时刻的共同来源，不重置外部调用者配置。它解决原1800年普通星盘的中心状态与求导两侧不一致；原收敛线与失败记录保留，印占私有计算继续沿用已有隔离。332条修改前来源记录及独立算术的范围见太阳共同来源审计（本地数据：`validation/jyotish-solar-common-window.md`），不作为新增物理精度、原典或现实预测资格。
-
-连续辅助状态的`continuous_native_input_binding_v2`将实际原生向量、返回标志和来源身份绑定到匹配输入的独立数学期望。全部518组当前输入在FateBridge之外逐位重建，2590次高精度投影核对通过；原夹具和阈值保留，49组旧生产者兼容性差异继续标为未通过。契约迁移与数学／物理资格的区别见输入绑定核验（本地数据：`validation/jyotish-native-input-binding.md`）。
-
-v17把印占请求的来源会话延伸到出生钟时解析之前，记录LAT反解迭代、最终求值与往返检查的实际太阳来源，并与名义时刻重算及原生赤道太阳对照。不同来源的旧对象返回类型化503来源错误，出生时刻不静默重定位。统一Moshier和完整数据文件均继续支持；LMT不增加太阳星位前提。旧对象缺少原始身份时保留`original_sun_identity_incomplete`，不能据此认证文件读取或出生钟精度。完整专项及跨平台验收状态见钟时来源修复审计（本地数据：`validation/jyotish-clock-source-fix-audit.md`）。
-
-v18将一次完整印占计算放入新的私有exec进程：从服务层出生钟时解析到星位、宫位、太阳事件、全部生时样本与达沙证据，均使用该进程的原生状态。它排除父进程陈旧Delta-T表及手动覆盖值，保留当前显式数据路径、JPL选择与冻结执行钟；SDK出生对象仍保留原始物理时刻。`india.profile.native_execution_context`记录隔离方式及辅助时间文件候选的首末指纹范围。外部表／旧名表与闰秒辅助文件的途中新增、删除或内容改变均返回类型化来源错误；这些检查不认证表内数值或原子文件读取。修复前反例与较弱原型的漏检保留在Delta-T状态调查（本地数据：`validation/jyotish-delta-t-investigation.md`），当前验收见完整原生上下文修复审计（本地数据：`validation/jyotish-native-context-fix-audit.md`）。
-
-v16新增逐物理星体、逐坐标帧的星历来源核验。本命、赤道帧及实际存在的J2000运动帧记录可观察文件的SHA-256、DE编号与覆盖范围；生时网格拒绝混合后端、跨样本改变版本或同名文件内容的比较；原生印占网格可使用合法相邻同版本数据段。通用建盘兼容层还受独立的运动差分收敛检查约束，冻结验收快照在2400年连接处的已知限制见v17修复审计。统一Moshier网格继续支持；不会删去不一致样本，也不自动把全盘改成较弱模型。`india.profile.physical_ephemeris_source`与`birth_time_sensitivity.source_comparison`保存来源及网格引用，单项可用如`by_factor.ecliptic_Sun.model`的严格字段投影读取。文件首末指纹相同不证明原子读取或天文精度，详见来源一致性审计（本地数据：`validation/jyotish-source-cohort-audit.md`）。
-
-v15修复同一UT1日期内出现两个日出或两个日落时，旧逐日一次查询漏掉第二个事件的问题。支撑窗口保持八日，逐个检索当前日界内的后续事件，日主／时主和昼夜三分使用实际完整事件序列；`solar_events.enumeration`回显检索口径。1秒仅是越过同一数值根的查询步长，事件时刻本身不平移，也不表示记录或观测精度。129个独立DE421／Skyfield事件及已知反例见太阳事件枚举审计（本地数据：`validation/jyotish-solar-enumeration-audit.md`）。
-
-v14修复极夜结束后因缺少不相关日落而抹去日主／时主／三分主星的问题。Dina／Hora使用连续日出对，Tribhaga独立使用当前相邻昼夜端点；`solar_context`分别回显`sunrise_day_status/active_arc_status`，部分有依据时保留部分结果。生时网格记录各依赖状态和覆盖数，解读回执携带同run状态；不补假日出、午夜或未知时主。详见太阳事件依赖审计（本地数据：`validation/jyotish-solar-brackets-audit.md`）。
-
-v13增加独立的 `drekkana_profile=santhanam_27_6|raman_36`，默认继续使用Santhanam。选择 `saptavargaja_profile=raman_30` 与 `drekkana_profile=raman_36` 后，五个位置分量及其合计可以完整对照已冻结的参考实现；其关系、分盘输入仍保留各自来源，不认证完整单一原典六力。Raman详细条文36及例12取15 Virupa，书末摘要105却取60，冲突保留在 `source_reading_conflicts`。详见分段力量来源审计（本地数据：`validation/jyotish-drekkana-audit.md`）。
-
-v10 的完整生时网格、独立运期运算对照及未通过项目见本轮验收记录（本地数据：`validation/jyotish-dasha-grid-audit.md`）。这些检查不证明现实预测有效。
-
-v7新增显式可选的五星运动力平均模型，默认 `cheshta_model=unadjudicated` 继续保留五星缺失。选择 `simon1994_j2000` 后，在1900–2050出生TT窗口内用Simon等人的完整长期平均黄经多项式及另算的几何真位置计算；两者统一到J2000平均动力黄道／春分点。此口径独立于D1的Lahiri地心视位置，不能把D1／分盘经度或真太阳代入平均位置。太阳平均黄经取地球平均黄经加180度。
-
-这是一项明确声明的现代天文模型，不代表Raman的1900历元表已通过验收。原表54项关系矛盾及参考软件反例仍保留在运动力来源审计（本地数据：`validation/jyotish-cheshta-audit.md`）；后续第二版见证校勘（本地数据：`validation/jyotish-raman-motion-collation-audit.md`）发现19个清晰单元与现用见证不同，较早见证自身仍有34条关系冲突，两版输入不能拼接。新模型来源、独立对照、适用范围与失败记录见平均模型审计（本地数据：`validation/jyotish-mean-model-audit.md`）。完整六力总量仍为null，真实事件独立检验仍为0例。
-
-角度核在平均／真位置恰好对径时保留两个中点；若两条角度分支的精确有理数强度相等，仅交付共同强度，仍标记中点未裁定。显示成同一浮点数不足以成立共识，同次来源回执会重新计算操作数和完整分支；该数学条件不扩大平均模型的物理验收范围。
-
-主题事实按本次宫主实际采用的来源标注运动力：太阳取同run的Ayana，月亮取同一性质分支的Paksha，二者不因选择五星模型而获得Simon标签。其余五星仅在模型实际计算时附带Simon辅助来源；默认未裁定或越界时明确未计算。`calculation_context.method_context.input_claims`保留实际上游字段路径和值，不把全局选择当成本宫主已用的算法。详见逐宫主来源修复（本地数据：`validation/jyotish-ruler-provenance-audit.md`）。
-
-五星来源回执还会核对声明TT、模型均值、实际操作数、几何字段与完整角度分支，拒绝末值相同但过程矛盾的包；对径时保留双分支，强度仅在精确同值时给共识，否则为null。该计算链校验（本地数据：`validation/jyotish-cheshta-chain-audit.md`）不替代独立星历参考、原典裁定或真实模型盲审。
+运动力对径角保留两个中点，仅在两条精确有理数强度相同时给共同值；显示成相同float不足以成立共识。太阳使用本次Ayana、月亮使用本次性质分支Paksha，不因选择五星模型获得Simon来源标签。逐宫主证据绑定自己的操作数、实际字段、条件和不可计算原因，不由全局设置推断已算。
 
 ## 名义盘、条件证据与解读范围
+
+Ketu由同次Rahu精确加180°得到。分盘、星宿与宿足使用这项未舍入派生关系，名义盘和时间误差采样采用同一口径；返回的经度仍为浮点数。独立传入的手工原盘继续尊重其显式Ketu值，不据Rahu重建。边界与三端回归见[对点分区测试](../tests/test_western_antipodes.py)，不构成独立天文精度认证。
 
 `india.reading_basis`明确按所填出生时刻的名义值计算。没有给出生时误差时，`options_basis=nominal_only`且敏感性仍为`not_assessed`，不能当作已证实精确；给定误差后，星宿、宿主及宿足与分盘使用同一最多30秒UTC网格。`nakshatra_alternatives`列出发生变化的星体／上升及覆盖数，覆盖数不是概率；没有列出变化也不证明连续区间内没有边界。原生解读会把名义月宿与抽样候选一并陈述，达沙摘要也明确使用名义生时。
 
 每项主题力量的`calculation_context`携带该宫主自己的条件数值、实际同run字段路径、模型／性质约束和局部不可用依据。`computed_consensus`是已算分支一致，`conditional_results`是分支都已计算但结果不同，`unavailable`是当前无可用数值，`partially_computed`是部分分支有值；共识不等于原典裁定。不能把null统一写成零、漏算或用户资料不足，也不能由某个星体的全局缺项否定另一个宫主的已算结果。
 
-Vimshottari生时端点／中心样本若晚于目标，返回`omitted_samples`和实际覆盖数，不能悄悄略过后声称全范围完成。这里核验的是计算和原生文案的证据传递；任意模型自由文本仍须独立审阅。6个语义准备案例属于已知开发回归集，不计作独立留出样本或现实预测。详见解读证据审计（本地数据：`validation/jyotish-fidelity-audit.md`）。
+Vimshottari生时端点／中心样本若晚于目标，返回`omitted_samples`和实际覆盖数，不能悄悄略过后声称全范围完成。这里核验的是计算和原生文案的证据传递；任意模型自由文本仍须独立审阅。6个语义准备案例属于已知开发回归集，不计作独立留出样本或现实预测。详见解读证据审计。
 
 ## 条件式星战金额
 
@@ -88,7 +46,7 @@ Vimshottari生时端点／中心样本若晚于目标，返回`omitted_samples`�
 
 计算保留每一分支的输入、前置合计、分母、金额及来源。水星／月亮性质未裁定时保持相关分支；最终Kala按同一分支相加，不能先拿不唯一的分量摘要相加。同经或跨黄经零点的独立星战虽未裁定胜者，前置输入齐全时仍能算出无符号金额，但两星获配的正负值继续缺失；连成三颗以上的同时交战或缺少前置输入时，金额也保持缺失。独立的另一对可计算。生时网格记录候选／判定变化及每个分支范围，范围与覆盖数均不是概率。
 
-这是Raman星战公式对本次已声明力量输入的应用：上游仍各有Santhanam／所选七分盘读法，不认证完整单一Raman六力。Santhanam27.20给出另一公式，不混作同一规则。详见星战规则与独立对照审计（本地数据：`validation/jyotish-war-audit.md`）。
+这是Raman星战公式对本次已声明力量输入的应用：上游仍各有Santhanam／所选七分盘读法，不认证完整单一Raman六力。Santhanam27.20给出另一公式，不混作同一规则。详见星战规则与独立对照审计。
 
 ## 时间分量与月亮分类修正
 
@@ -96,7 +54,7 @@ Vimshottari生时端点／中心样本若晚于目标，返回`omitted_samples`�
 
 此前v5只按盈亏处理月亮性质；原书还列有第八日窗口的另一表述。v6保留这项作者内分歧及边界日段，不能挑较高分或把条件分支当概率。新增赤道坐标与日出事件均有后端记录，严格星历模式覆盖两者；无极地日出不造默认时间。新JPL请求超时后，用原有21个JPL黄道位置及独立ERFA转换复核赤道帧，没有冒充新增数据。
 
-细节、失败和复现方法见时间分量审计（本地数据：`validation/jyotish-kala-audit.md`）。完整六力总量仍为null，未给出强弱达标排名。
+细节、失败和复现方法见时间分量审计。完整六力总量仍为null，未给出强弱达标排名。
 
 ## 新增力量计算
 
@@ -108,13 +66,13 @@ Vimshottari生时端点／中心样本若晚于目标，返回`omitted_samples`�
 
 Santhanam 第26章偈颂专式与注释附加法存在差异，第27.19又提到水星／木星完整相位量；本层选择有明确分段与例表的 Raman 条文，并登记选择与差异，不能宣称整套六力均按同一作者无争议实现。已核对固定Raman扫描本PDF43、87–93页图，具体重印版仍未核定。端点统一用右侧半开区间，是声明的实现约定，不冒充作者已裁定的端点。
 
-原书例53–55的角距及合计存在内部矛盾，现由`drik_bala.source_witness`与`source_reading_conflicts`保留。标准算例将水星判为负性质的脚注没有给出可推广的数值关联阈值，因此任意盘仍保留条件分支。公式数值未改，不能用有矛盾的例表反调公式或认证完整单一原典六力。详见页图与算例审计（本地数据：`validation/jyotish-drik-primary-audit.md`）。
+原书例53–55的角距及合计存在内部矛盾，现由`drik_bala.source_witness`与`source_reading_conflicts`保留。标准算例将水星判为负性质的脚注没有给出可推广的数值关联阈值，因此任意盘仍保留条件分支。公式数值未改，不能用有矛盾的例表反调公式或认证完整单一原典六力。详见页图与算例审计。
 
-Santhanam第26章与27.19现另有未施用来源字段，记录译文／注解读法、火星249度与Raman240度差异，以及540行普通表中的两处坐标关系冲突。初次转录漏读续表的更正过程、精确有理数审计及未通过的来源门槛见Santhanam相位校勘（本地数据：`validation/jyotish-santhanam-drishti-audit.md`）。新增字段不改变当前Raman数值；各读法不能拼接取高分。较早Raman见证现另有完整给定输入核验（本地数据：`validation/jyotish-drik-editions-audit.md`），区分原印数字冲突、公式计算和算例性质，不将不同版本的黄经或水星符号拼接。正式主题解释还会按本次D1核对完整相位力计算链，拒绝与矩阵、性质、贡献或来源声明不一致的包；这类内部错误不会要求用户改动出生资料。见计算链核验（本地数据：`validation/jyotish-drik-chain-audit.md`）。
+Santhanam第26章与27.19现另有未施用来源字段，记录译文／注解读法、火星249度与Raman240度差异，以及540行普通表中的两处坐标关系冲突。初次转录漏读续表的更正过程、精确有理数审计及未通过的来源门槛见Santhanam相位校勘。新增字段不改变当前Raman数值；各读法不能拼接取高分。较早Raman见证现另有完整给定输入核验，区分原印数字冲突、公式计算和算例性质，不将不同版本的黄经或水星符号拼接。正式主题解释还会按本次D1核对完整相位力计算链，拒绝与矩阵、性质、贡献或来源声明不一致的包；这类内部错误不会要求用户改动出生资料。见计算链核验。
 
 水星“好／坏关联”的精确判据尚未裁定，不用同星座或燃烧阈值擅自补成定论。`drik_bala.scenarios` 分别保存水星为传统 benefic／malefic 的结果及逐星贡献；v6同时保留月亮盈亏与原书第53节第八日窗口的不同读法，有分歧或边界不明时保留分类分支。`summary` 仅在所有分支值相同时给数值，否则为 `null`；null不表示零或没有相位，分支也不是成功概率上下界。正负号仅表示所选传统规则，不能直接翻译成现实事件吉凶。
 
-生时误差沿同一UTC网格给方向力连续范围及相位各分类分支的范围与样本覆盖数，覆盖数不是概率。`shadbala_assessment` 仍未完成：Kala、Cheshta及相位分类裁定未齐，总量为null，不拼完整六力总分或达标排名。详见方向与相位力量审计（本地数据：`validation/jyotish-balas-audit.md`）。
+生时误差沿同一UTC网格给方向力连续范围及相位各分类分支的范围与样本覆盖数，覆盖数不是概率。`shadbala_assessment` 仍未完成：Kala、Cheshta及相位分类裁定未齐，总量为null，不拼完整六力总分或达标排名。详见方向与相位力量审计。
 
 
 ## 计算范围与来源
@@ -137,23 +95,23 @@ Santhanam第26章与27.19现另有未施用来源字段，记录译文／注解�
 
 规则来源为 [P.V.R. Narasimha Rao《Vedic Astrology: An Integrated Approach》](https://www.vedicastrologer.org/articles/vedic_astro_textbook.pdf)，重点为第 2–4、6、10、16 章；天文接口来源为 [Swiss Ephemeris Programmer's Manual](https://www.astro.com/swisseph/swephprg.htm)。采用书中有限规则；有分歧的节点尊贵、节点相位和共主没有纳入本版本。`india.rulesets/rule_trace` 保留来源和规则 ID。
 
-新增规则及来源版本、教材冲突、剩余能力见深度规则审计（本地数据：`validation/jyotish-depth-audit.md`）。仍未覆盖完整 Shadbala（已实现位置力五分量、方向力与自然力，相位力保留分类分支）、八分法占据读法的唯一裁定与未决削减分支及事件推断、其他作者燃烧规则与真实出没可见性、复杂 Yoga 成格验收、D1/D2/D3/D7/D9/D10/D12/D30 以外分盘、其他 Dasha、出生时校正。`astro_vedicprog` 是已有的恒星二次推运，与本页的 Vimshottari 分开。
+新增规则及来源版本、教材冲突、剩余能力见深度规则审计。仍未覆盖完整 Shadbala（已实现位置力五分量、方向力与自然力，相位力保留分类分支）、八分法占据读法的唯一裁定与未决削减分支及事件推断、其他作者燃烧规则与真实出没可见性、复杂 Yoga 成格验收、D1/D2/D3/D7/D9/D10/D12/D30 以外分盘、其他 Dasha、出生时校正。`astro_vedicprog` 是已有的恒星二次推运，与本页的 Vimshottari 分开。
 
-## 接口与兼容
+## 接口与独立视图
 
 `astro_india_chart` 接受 `node_mode`、`divisions`、`birth_time_uncertainty_minutes`、`ephemeris_policy`、`saptavargaja_profile`、`cheshta_model`。`divisions` 默认为 `[9,10]`，可选不重复的 `2,3,7,9,10,12,30` 或 `[]`；D1 始终计算。`[]` 只控制导出的分盘，位置强度仍计算内部所需的七盘星座。`astro_chart` 的 `chart_variant=india_chart` 接受相同选项；其他盘型允许协议自动传入中性的默认值，拒绝非默认印占设置。
 
-独立印占证据在 `india.profile/nakshatras/charts/topic_evidence/birth_time_sensitivity`。现有印度盘顶层通用西占字段保持兼容，属于独立历史参考，不能把其中西占尊贵、相位容许度或现代星座文案解释为印占规则。两种坐标算法可能因原生恒星实现与历史岁差平移存在微差，印占分盘与达沙始终使用 `india` 原生数据。
+独立印占证据在 `india.profile/nakshatras/charts/topic_evidence/birth_time_sensitivity`。印度盘顶层通用西占字段是另一个公开参考视图，不能把其中西占尊贵、相位容许度或现代星座文案解释为印占规则。两种坐标算法可能因原生恒星实现与历史岁差平移存在微差，印占分盘与达沙始终使用 `india` 原生数据。
 
-旧印度盘允许显式覆盖 `zodiacal`／`hsys`；当不再是 Lahiri 恒星黄道、整宫时，返回 `india.status=configuration_not_supported`，不计算印占核心。独立 Vimshottari 工具直接拒绝这种配置。Swiss Ephemeris 缺失或运行失败时明确报错，不以低精度轨道生成分盘或达沙。实际物理 SWIEPH／Moshier／JPL 模型记录在 `india.profile.ephemeris_model`、逐星 `ephemeris_by_body` 及执行回执。`ephemeris_policy=auto` 保持自动选择并回显降级；`require_data_files` 在任一物理天体（包括生时抽样）回退 Moshier 时拒绝计算。`ephemeris_quality` 只表示后端来源，不认证精度或现实预测有效。
+通用印度盘入口允许显式覆盖 `zodiacal`／`hsys`；当不再是 Lahiri 恒星黄道、整宫时，返回 `india.status=configuration_not_supported`，不计算印占核心。独立 Vimshottari 工具直接拒绝这种配置。Swiss Ephemeris 缺失或运行失败时明确报错，不以低精度轨道生成分盘或达沙。实际物理 SWIEPH／Moshier／JPL 模型记录在 `india.profile.ephemeris_model`、逐星 `ephemeris_by_body` 及执行回执。`ephemeris_policy=auto` 保持自动选择并回显降级；`require_data_files` 在任一物理天体（包括生时抽样）回退 Moshier 时拒绝计算。`ephemeris_quality` 只表示后端来源，不认证精度或现实预测有效。
 
 `ephemeris_model_scope=physical_bodies` 的模型汇总只含七个物理天体及其实际赤道／所选几何运动帧；`nonphysical_factor_models` 另列 Rahu／Ketu。平交点采用 `swisseph_analytical_mean_node`，`native_node_return_flags` 保留原生回显位。依据 [Swiss 2.10.03 的解析实现](https://github.com/aloistr/swisseph/blob/v2.10.03/swemmoon.c#L1493)，请求的 SWIEPH／Moshier／JPL 位不证明平交点读取了相应物理矢量文件。`physical_backend_policy=strict_jpl` 是运行者显式 JPL 选择，黄经、赤道、Lahiri、J2000 几何运动帧及支撑太阳事件均遵守；文件缺失、损坏或超界会报来源错误，不能默退 Moshier。原生位置与可选运动几何共用受管理的配置会话，防止它们之间被其他线程切换数据目录；这不证明完整原子文件读取或现实预测有效。
 
-严格JPL已补充J2000系数子集与完整DE441文件的正向实算、5点网格、调用者ΔT隔离、异常拒降级及三端核对，见严格DE441审计（本地数据：`validation/jyotish-strict-jpl-audit.md`）。`physical_ephemeris_source.time_scale_policy`保留TT接口／TDB原始文件范围及未应用转换的近似；兼容字段名中的TT不能当作已转换的TDB边界。有限样本通过不认证完整历法、Lahiri、原典或现实预测。
+严格JPL已补充J2000系数子集与完整DE441文件的正向实算、5点网格、调用者ΔT隔离、异常拒降级及三端核对，见严格DE441审计。`physical_ephemeris_source.time_scale_policy`保留TT接口／TDB原始文件范围及未应用转换的近似；JPL原始头只返回TDB范围字段及`range_time_scale=TDB`，不再提供伪TT别名；这项标签修正没有实现TT／TDB物理转换。有限样本通过不认证完整历法、Lahiri、原典或现实预测。
 
-另有1900–2050的30个固定TT历元、150项五星J2000几何核对，原TT全部通过原0.02角秒线；补充量化TT／TDB近似在该组的影响，但移位参数不参与验收、不改变出生钟或运行时默认计算。它只验证可选几何帧的有限网格，不能外推到D1视速度或全时段观测精度。见跨年代几何与时标诊断（本地数据：`validation/jyotish-jpl-grid-audit.md`）。
+另有1900–2050的30个固定TT历元、150项五星J2000几何核对，原TT全部通过原0.02角秒线；补充量化TT／TDB近似在该组的影响，但移位参数不参与验收、不改变出生钟或运行时默认计算。它只验证可选几何帧的有限网格，不能外推到D1视速度或全时段观测精度。见跨年代几何与时标诊断。
 
-显式太阳钟时与建盘需保持来源一致。此前跨配置复用对象的问题及修改前归档见钟时来源衔接调查（本地数据：`validation/jyotish-clock-source-investigation.md`）；v17候选的来源核验与完整验收见上方修复审计。
+显式太阳钟时与建盘需保持来源一致。此前跨配置复用对象的问题及修改前归档见钟时来源衔接调查；v17候选的来源核验与完整验收见上方修复审计。
 
 ## 时间与不确定性
 
@@ -169,7 +127,7 @@ Santhanam第26章与27.19现另有未施用来源字段，记录译文／注解�
 
 边界采用 `[start,end)`，输出为带 UTC 偏移的 ISO 时间。时间线是**目标所在的 120 年规则周期**，首运可始于出生前；`timeline_scope.cycle_index=0` 表示以出生主运起点开始的周期。超过该周期的目标定位到后续相同规则周期。120 年不是寿命估计，计算出的微秒位不代表出生记录或现实事件有该精度。
 
-`astro_vimshottari`可选`dasha_depth=2..6`，默认2层MD／AD；3至6层依次加入PD、SD、PAD、DAD。`vimshottari.subdivisions.current_levels`返回当前完整运主链，`siblings_by_level`列出每个当前父期的九个子期；原有`timeline`继续只含九个MD与81个AD。内核按完整父期递归，从完整MD起点保留有理数偏移，输出边界只舍入一次；不将出生剩余期重新分割。生时抽样以完整`period_lord_chain`分组，宫主上下文来自各自候选。读取视图`evidence_views.dasha_levels`前须显式选择大于2的深度。来源、实现约定与分阶段验收见递归分期核验（本地数据：`validation/jyotish-deep-dasha-audit.md`）；层级细分不代表现实事件精度。
+`astro_vimshottari`可选`dasha_depth=2..6`，默认2层MD／AD；3至6层依次加入PD、SD、PAD、DAD。`vimshottari.subdivisions.current_levels`返回当前完整运主链，`siblings_by_level`列出每个当前父期的九个子期；原有`timeline`继续只含九个MD与81个AD。内核按完整父期递归，从完整MD起点保留有理数偏移，输出边界只舍入一次；不将出生剩余期重新分割。生时抽样以完整`period_lord_chain`分组，宫主上下文来自各自候选。读取视图`evidence_views.dasha_levels`前须显式选择大于2的深度。来源、实现约定与分阶段验收见递归分期核验；层级细分不代表现实事件精度。
 
 拒绝不存在或有歧义的 DST 钟时；重复时刻可用明确 UTC 偏移消歧。经纬度或城市解析范围由现有出生工具处理。
 
@@ -228,19 +186,19 @@ MCP 使用同名工具及相同业务参数。首次按工具公开的 `natal/ca
 
 `tests/fixtures/jyotish-reference.json` 来自隔离安装的 **PyJHora 4.8.7**，包含软件版本、源文件哈希及配置；6 组虚构资料覆盖三种年长、平／真交点、D1／D9／D10 和各 81 个次运起点。双方均使用 Swiss Ephemeris 天文库，所以这是独立规则实现对照，不是独立天文模型证明。PyJHora 的本地 JD 输入显式采用 UT1 加时区；分期比较相对出生锚点的历时，不将其 UT1 日期直接解释为 UTC。不同的 JD 浮点路径可相差约 40 微秒，并被分盘或多年运期放大；测试上升／分盘按分度放宽数值容差，达沙起点允许 1 秒差。
 
-另用 [NASA/JPL Horizons](https://ssd.jpl.nasa.gov/horizons/manual.html) 的地心视黄经冻结数据独立对照七个物理天体、三个 UTC 时刻；不使用 FateBridge 或 Swiss 产生参考答案。精确有理数测试覆盖星宿、足、D1／D9／D10 分界及主次运公式，独立几何公式另核对上升。验收范围、发现的缺陷和原书例 50 的日期分歧见独立算法审计（本地数据：`validation/jyotish-independent-audit.md`）。
+另用 [NASA/JPL Horizons](https://ssd.jpl.nasa.gov/horizons/manual.html) 的地心视黄经冻结数据独立对照七个物理天体、三个 UTC 时刻；不使用 FateBridge 或 Swiss 产生参考答案。精确有理数测试覆盖星宿、足、D1／D9／D10 分界及主次运公式，独立几何公式另核对上升。验收范围、发现的缺陷和原书例 50 的日期分歧见独立算法审计。
 
-未削减八分法已接入源码候选的`india.ashtakavarga`，按具名Rao2000规则为每张返回分盘提供PAV（逐贡献者二元表）、BAV（八个贡献者计数）及SAV（七曜BAV合计）。1按该作者称rekha，SAV不合计上升目标表，上升仍作为贡献者。分盘沿用各自声明的构造方法及来源，不能写成整部Rao原书已验收。生时变体位于`india.birth_time_sensitivity.ashtakavarga_variants`，按每个样本自己的星座保留完整计数；样本数不是概率。
+`india.ashtakavarga`按具名Rao2000规则为每张返回分盘提供PAV（逐贡献者二元表）、BAV（八个贡献者计数）及SAV（七曜BAV合计）。1按该作者称rekha，SAV不合计上升目标表，上升仍作为贡献者。分盘沿用各自声明的构造方法及来源，不能写成整部Rao原书已验收。生时变体位于`india.birth_time_sensitivity.ashtakavarga_variants`，按每个样本自己的星座保留完整计数；样本数不是概率。另保留[Rao原书的D10与BAV／SAV转录](../tests/data/astro/source_materials/jyotish-ashtakavarga-primary-supplement.json)作为来源资料；保留资料本身不增加已完成的验证样本数。
 
-一手参考准备（本地数据：`validation/jyotish-ashtakavarga-reference-audit.md`）在实现前已冻结768个规则单元和89组软件数值；未削减计数的验收见接入审计（本地数据：`validation/jyotish-ashtakavarga-implementation-audit.md`）。读取任务视图`evidence_views.ashtakavarga`提供的fields即可；视图名不是输入参数。
+一手参考准备在实现前已冻结768个规则单元和89组软件数值；未削减计数的验收见接入审计。读取任务视图`evidence_views.ashtakavarga`提供的fields即可；视图名不是输入参数。
 
-v21另在每张表的`reduction_analysis`提供三合／同主削减与Pinda，明确选择七曜作为占据者，上升仍是原始BAV贡献者。原始PAV／BAV／SAV保持未削减；单占据且两座非零相等的原文缺项保留`null`，不当作零。生时变体按各自输入重算。可用`evidence_views.ashtakavarga_reductions`所列fields读取，来源、逐步算式、637个目标参考及软件反例见具名削减接入审计（本地数据：`validation/jyotish-pinda-implementation-audit.md`）。该选择未证明整部原典的唯一读法，Pinda也不作为成功概率或事件择时结论。
+v21另在每张表的`reduction_analysis`提供三合／同主削减与Pinda，明确选择七曜作为占据者，上升仍是原始BAV贡献者。原始PAV／BAV／SAV保持未削减；单占据且两座非零相等的原文缺项保留`null`，不当作零。生时变体按各自输入重算。可用`evidence_views.ashtakavarga_reductions`所列fields读取，来源、逐步算式、637个目标参考及软件反例见具名削减接入审计。该选择未证明整部原典的唯一读法，Pinda也不作为成功概率或事件择时结论。
 
 v25新增`ashtakavarga_source_profiles`字段视图，分别读取Rao主表和Aiyar自己的完整原始表与削减链；视图名不是输入参数。`source_profile_comparison.aiyar1905`位于每张表上，旧的`reduction_analysis.source_profile_comparison.aiyar1905_commentary`位于Rao削减分析内，两者输入来源不同，不能互相替代。新分支不补造上升目标BAV或Pinda乘数。
 
 v24的Aiyar比较使用每张名义分盘和每个生时变体自己的同一原始BAV及七曜占据集合，只改变削减读法，不认证原始BAV或分盘构造也符合Aiyar。上层Rao的`partial_source_rule`不否定比较口径已算出的数值；比较口径完整也不填补Rao的缺项。`reduced_sum`是整数计数之和，不是Pinda、物理力量或成功概率。现有`ashtakavarga_reductions`字段视图包含新比较；请求参数没有新增。
 
-原书补充检查（本地数据：`validation/jyotish-pinda-reference-audit.md`）另复核例39与例108的给定输入和计数，并保留削减规则的未决读法及独立软件差异。这些公开算例提供算术与来源一致性的证据，不证明现实预测有效。
+原书补充检查另复核例39与例108的给定输入和计数，并保留削减规则的未决读法及独立软件差异。这些公开算例提供算术与来源一致性的证据，不证明现实预测有效。
 
 可在单独环境重建数值 fixture，生产依赖无需 PyJHora：
 
@@ -263,11 +221,11 @@ uv run --locked --extra dev pytest -q tests/test_jyotish_independent_audit.py
 
 ## 现实预测研究
 
-没有独立现实数据时保留 `not_tested`。已实现预注册、完整队列封存与延后揭盲流程（本地数据：`validation/jyotish-prospective-study.md`），含材料指纹、训练／盲测隔离、基线与覆盖率检查。流程合成测试和规则算例均不计作预测成绩。
+没有独立现实数据时保留 `not_tested`。已实现预注册、完整队列封存与延后揭盲流程，含材料指纹、训练／盲测隔离、基线与覆盖率检查。流程合成测试和规则算例均不计作预测成绩。
 
 ## 时间与原典增量
 
-度数规则、Uchcha Bala 和 Baladi 已对照 R. Santhanam 卷一的固定扫描本，太阳角距条件明确来自译者第 7 章注释表。顺逆阈值、源文与注释层、端点及 OCR 算例差异见时间尺度与原典复核（本地数据：`validation/jyotish-times-classics-audit.md`）。仅确认这些具体条文及注释，未声明整部原典已验收。
+度数规则、Uchcha Bala 和 Baladi 已对照 R. Santhanam 卷一的固定扫描本，太阳角距条件明确来自译者第 7 章注释表。顺逆阈值、源文与注释层、端点及 OCR 算例差异见时间尺度与原典复核。仅确认这些具体条文及注释，未声明整部原典已验收。
 
 ## 分盘与位置强度
 
@@ -284,10 +242,10 @@ uv run --locked --extra dev pytest -q tests/test_jyotish_independent_audit.py
 
 两者都明确采用星座分配，和 D1 独立的 moolatrikona 度数状态分开。`profile_comparison` 保存两种七分盘分量及其对总量的影响；它不是误差区间或成功概率。其余三分量采用Santhanam27.1、27.4–5的公式，Raman20、31–35也有相同算术。Drekkana独立选择：默认 `santhanam_27_6` 的第二段为月／金、第三段为水／土；`raman_36` 将这两组对调。两者均采用物理D1每星座内的[0,10)、[10,20)、[20,30)区间及15 Virupa，不能改用分盘D3经度。单选 `raman_30` 仍只改变七分盘计分。`drekkana_profile_comparison` 固定当前七分盘读法再比较Drekkana，原有 `profile_comparison` 则固定当前Drekkana比较七分盘读法；不能混取两组最高分。Kendradi 按 Rasi 整宫组，和另选 Bhava 中点算法分开。
 
-原书页图、手算、独立 PyJHora 的对齐项和保留差异见位置强度审计（本地数据：`validation/jyotish-sthana-audit.md`）。重建参考数据与测试：
+原书页图、手算、独立 PyJHora 的对齐项和保留差异见位置强度审计。重建参考数据与测试：
 
 ```bash
-/tmp/fatebridge-jyotish-oracle/bin/python scripts/gen_jyotish_sthana_reference.py
+# 用明确配置的独立参考环境运行生成器；普通测试不重建期望数据。
 uv run --locked --extra dev pytest -q tests/test_jyotish_sthana.py tests/test_jyotish_transports.py
 ```
 
@@ -304,13 +262,13 @@ uv run --locked --extra dev fatebridge astro_india_chart \
 
 ## 民用时刻与太阳钟标签
 
-v11修复旧版显式`use_true_solar_time=true`将太阳钟重新当民用钟、从而移动星历时刻的问题。印占本命和Vimshottari现在始终使用记录的民用出生时刻，经时区解析后进入共享UTC／TT／模型UT1转换；开关仅增加太阳钟显示。默认false的盘面、力量和运期数值不变。
+印占本命和Vimshottari始终使用记录的民用出生时刻，经时区解析后进入共享UTC／TT／模型UT1转换；开关仅增加太阳钟显示。默认false的盘面、力量和运期数值不变。
 
-`india.profile.clock_context`列出记录时刻、计算UTC、显示开关、无时区的`solar_wall_datetime`、修正分钟及来源。太阳钟标签可能跨日／跨年，甚至与某个IANA夏令时缺失钟时的数字相同；它不是该时区的另一个时间戳，不改变出生日期、达沙起点、分析日期锚点或平均模型窗口。当前显示按上文v19使用同一TT、模型UT1与视太阳时角，不把UTC直接当作实测UT1，也不认证记录精度或实测地球自转。
+`india.profile.clock_context`列出记录时刻、计算UTC、显示开关、无时区的`solar_wall_datetime`、修正分钟及来源。太阳钟标签可能跨日／跨年，甚至与某个IANA夏令时缺失钟时的数字相同；它不是该时区的另一个时间戳，不改变出生日期、达沙起点、分析日期锚点或平均模型窗口。太阳钟显示使用同一TT、模型UT1与视太阳时角，不把UTC直接当作实测UT1，也不认证记录精度或实测地球自转。
 
-已知历史LAT／LMT记录需要按其真实钟制转换，不能先当民用资料再打开此开关；v11尚未提供此输入；v12通过明确的birth_clock_basis接受LMT/LAT。直接领域调用也拒绝已经太阳时重定位而与记录时刻不一致的旧`AstroBirthInfo`。详见物理时刻修复验收（本地数据：`validation/jyotish-civil-instant-audit.md`）。
+已知历史LAT／LMT记录按其真实钟制和明确的`birth_clock_basis`转换，不能先当民用资料再打开显示开关。直接领域调用也拒绝已经太阳时重定位而与记录时刻不一致的旧`AstroBirthInfo`。详见物理时刻修复验收。
 
-## 已知历史太阳钟输入（v12）
+## 已知历史太阳钟输入
 
 `birth_clock_basis`可明确指定`local_mean_solar`（LMT）或`local_apparent_solar`（LAT），默认仍为`civil`。太阳钟记录省略`birth_timezone`，并保持`use_true_solar_time=false`，避免重复换算。日期统一为已正确换成的公历；未知原始历法、钟制或年代不凭星位／事件拟合补出。原记录中的秒可用`birth_second`，数值换算余数可用`birth_microsecond`，省略是分钟起点而非精确记录声明。
 
@@ -328,4 +286,4 @@ uv run --locked --extra dev fatebridge astro_vimshottari \
   --strict-fields --no-include-snapshot-text --response-char-limit 0
 ```
 
-这是虚构技术验算，不是历史人物预测。范围与独立对照见太阳钟输入验收（本地数据：`validation/jyotish-solar-input-audit.md`）。
+这是虚构技术验算，不是历史人物预测。范围与独立对照见太阳钟输入验收。

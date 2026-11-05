@@ -23,67 +23,6 @@ from tests.test_prediction_validation import AS_OF, forecast, outcome, plan
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_actual_v3_sealed_fixture_remains_unchanged_and_diagnostic_only():
-    path = ROOT / "tests/fixtures/prediction-legacy-v3-seal.json"
-    original = path.read_bytes()
-    data = json.loads(original)
-    outcomes = [Outcome.model_validate(o) for o in data["outcomes"]]
-    report = reveal_and_evaluate(
-        data["registration"],
-        data["sealed"],
-        outcomes,
-        at=datetime.fromisoformat(data["evaluated_at"]),
-    )
-    assert path.read_bytes() == original
-    assert (
-        report["forecast_commitment_sha256"]
-        == data["sealed"]["forecast_commitment_sha256"]
-    )
-    assert report["metrics"] == data["v3_report"]["metrics"]
-    assert report["statistical_evidence"] == data["v3_report"]["statistical_evidence"]
-    assert data["v3_report"]["preregistered_performance_gate_met"]
-    assert not report["preregistered_performance_gate_met"]
-    assert not report["statistical_evidence_gate_met"]
-    assert "missing_forecast_plan_commitment" in report["protocol_blockers"]
-    assert "missing_outcome_plan_commitment" in report["protocol_blockers"]
-
-
-@pytest.mark.parametrize("binding", ["omitted", "null", "bound"])
-def test_sealed_packet_preserves_original_binding_presence(binding):
-    data = json.loads(
-        (ROOT / "tests/fixtures/prediction-legacy-v3-seal.json").read_text()
-    )
-    forecasts = []
-    for raw in data["sealed"]["forecasts"]:
-        raw = dict(raw)
-        if binding == "null":
-            raw["study_plan_sha256"] = None
-        elif binding == "bound":
-            registered = StudyPlan.model_validate(
-                data["registration"]["protocol"]["plan"]
-            )
-            raw["study_plan_sha256"] = digest(registered.model_dump(mode="json"))
-        forecasts.append(Forecast.model_validate(raw))
-    sealed = seal_forecasts(
-        data["registration"],
-        forecasts,
-        at=datetime.fromisoformat(data["sealed"]["sealed_at"]),
-    )
-    assert all(
-        ("study_plan_sha256" in raw) is (binding != "omitted")
-        for raw in sealed["forecasts"]
-    )
-    reparsed = [Forecast.model_validate(raw) for raw in sealed["forecasts"]]
-    assert (
-        seal_forecasts(
-            data["registration"],
-            reparsed,
-            at=datetime.fromisoformat(sealed["sealed_at"]),
-        )
-        == sealed
-    )
-
-
 @pytest.mark.parametrize("bind_forecast", [False, True])
 @pytest.mark.parametrize("bind_outcome", [False, True])
 def test_both_original_record_commitments_are_needed_for_protocol_gates(

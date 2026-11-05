@@ -87,17 +87,16 @@
 明刊运限分段专题首次按需展开`evidence_views.limit_subperiods`或`limit_subperiod_details`的fields，读取`ming_limit_subperiods`。上/下五年依已选虚岁和实际大限十岁区间，不用年龄末位取余；起限前仍为not_started，不据此认证古典岁首。分类保留原文北斗、南斗、南北斗双属以及擎陀火铃，不从为福邻句筛吉星；六个双属名不选唯一五年段，未标属的星不自动补类。`natal_star_groups`的路径连接同次scopes.1.palace_map中的真实本命星，这个容器不代表该星参与小限应验。相关几何未定，`selected_as_relevant_star=null`；小限半年起止未定，不补公历7月1日或农历七月，`half/half_start/half_end`仍null。`full_traditional_judgment=null`，不把分段或原文应字改述为已经验证的事件。完整明细须首次请求，摘要run不能回补未投影字段；单次助手目读不等于独立专家、第二模型、整书或现实效果验收。
 
 
-日期来源专题首次选`evidence_views.calendar_sources`的fields，读取`calendar_basis.date_conversion_provenance`。`lookups`分别指实际排盘、钟表和UTC+08参考日期；不能把一条日期的provider移给另一条。1900年原始印刷参照是TAM全年表，最初30日实施使用PMO补表；1901—2100参照HKO，2100-02-09以后实施使用HKO补表。实施数据不是独立验证，两个出版机构也不是两次独立物理观测。源记录、出版者和范围按实际字段解释；未选来源或未换算的日期可为null，不补HKO。真太阳时跨年／跨表时三条来源可能不同。一般`calendar`视图保留时钟证据，来源账本在首次所选fields中单独请求；完整长结果沿同run取齐。`time_input/civil_clock=null`只说明该项未生成，不推成均时差、夏令时为0或已消除歧义。日期标签通过不认证原典校时；岁序默认已用出生民用时区统一两端，`legacy_mixed_clock`仍可显式回放旧混合规则。两者的原典岁首认证均未完成。
+日期来源专题首次选`evidence_views.calendar_sources`的fields，读取`calendar_basis.date_conversion_provenance`。`lookups`分别指实际排盘、钟表和UTC+08参考日期；不能把一条日期的provider移给另一条。1900年原始印刷参照是TAM全年表，最初30日实施使用PMO补表；1901—2100参照HKO，2100-02-09以后实施使用HKO补表。实施数据不是独立验证，两个出版机构也不是两次独立物理观测。源记录、出版者和范围按实际字段解释；未选来源或未换算的日期可为null，不补HKO。真太阳时跨年／跨表时三条来源可能不同。一般`calendar`视图保留时钟证据，来源账本在首次所选fields中单独请求；完整长结果沿同run取齐。`time_input/civil_clock=null`只说明该项未生成，不推成均时差、夏令时为0或已消除歧义。日期标签通过不认证原典校时；岁序已用出生民用时区统一两端；该软件约定的原典岁首认证仍未完成。
 
 普通日期由`fatebridge_lunardate_adapter_v1`实施，不能改述成未经本系统处理的上游原表。`applied_year_info_correction`逐时钟记录实际农历年使用的登记值；公历1934年一月仍可能使用农历1933年修正，不凭公历年替换。编码来自实施登记，不是额外独立天文观测。
 ## 岁序时钟
 
-`ziwei_horoscope`默认`nominal_age_basis=birth_civil_timezone`：把出生与目标的实际瞬间都转到出生民用时区，分别查该区日期的农历年，正月初一00:00换岁。先读`nominal_age_calendar`的两端年份、方法、参考时区和`difference_from_legacy`。本命安星及年干仍取已声明的出生排盘钟，流年／月／日／时仍取目标钟；跨时区时这些年标签可以不同，不能据计岁年份重写星位或阴阳顺逆。
+`ziwei_horoscope`默认`nominal_age_basis=birth_civil_timezone`：把出生与目标的实际瞬间都转到出生民用时区，分别查该区日期的农历年，正月初一00:00换岁。先读`nominal_age_calendar`的两端年份、方法及参考时区。本命安星及年干仍取已声明的出生排盘钟，流年／月／日／时仍取目标钟；跨时区时这些年标签可以不同，不能据计岁年份重写星位或阴阳顺逆。
 
-`legacy_mixed_clock`显式回放旧算法，包含原有春节边界报错。默认修复不靠把0岁钳成1岁；春节前后应分别得到实际岁序。`boundary_source_evidence`仅说明明刊所选段落支持哪些给定岁序后的操作，不能把软件换岁约定说成原典已定、整书已认证或现实预测有效。
+岁序不靠把0岁钳成1岁；春节前后应分别得到实际岁序。`boundary_source_evidence`仅说明明刊所选段落支持哪些给定岁序后的操作，不能把软件换岁约定说成原典已定、整书已认证或现实预测有效。
 
 
-旧公式比较值不是另一份旧口径成功回执。读取legacy_mixed_clock_age时同时核对legacy_comparison_applied、legacy_comparison_is_separate_run和legacy_ordinal_status：默认比较未应用、未另运行；0值标为would_reject_below_one，显式旧口径会拒算。ordinal_at_least_one只核公式下限，不保证完整旧运行成功，不能把比较值0说成旧回执返回0岁。
 
 原典比较同时出现`independent_review`与`targeted_rereading`时，两者是分阶段的读法记录。后者是五个输入的同一书影复读；若其`unique_source_confirmation_supported=false`，不得据旧`matches_source_record=true`或R22的唯一直接标签匹配，声称当前已由原文唯一确认。复读的冲突、未确认和旧记录均需按本次实际回执保留，不用安星结果补字；五个目标也不扩成全表或新版本认证。
 

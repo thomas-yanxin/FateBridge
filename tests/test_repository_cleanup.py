@@ -52,11 +52,11 @@ def test_preview_is_read_only_and_apply_preserves_evidence(repository):
         put(repository, name)
         for name in (
             "src/fatebridge/module.py",
-            "dist/validation/receipt.log",
-            "dist/validation/source/__pycache__/record.pyc",
-            "docs/validation/frozen-source/build/receipt.log",
-            "tests/fixtures/evidence/__pycache__/record.pyc",
-            "tests/fixtures/evidence/manifest.sha256",
+            "dist/references/observation.txt",
+            "dist/references/source/table.json",
+            "docs/references/source-reading.md",
+            "tests/fixtures/references/source-page.json",
+            "tests/fixtures/references/source.sha256",
             "uv.lock",
             ".coveragerc",
             ".venv/pyvenv.cfg",

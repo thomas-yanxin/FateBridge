@@ -20,10 +20,10 @@ def test_alternate_reference_and_its_rewritten_manifest_cannot_replace_answers(
     shutil.copytree(ROOT / CORPUS, chosen)
     target = chosen / "reference.json.gz"
     target.write_bytes(b"caller-changed answers")
-    manifest = json.loads((chosen / "manifest.json").read_text())
-    manifest["files"][str(CORPUS / "reference.json.gz")] = hashlib.sha256(
+    manifest = json.loads((chosen / "source-files.json").read_text())
+    manifest["files"]["reference.json.gz"] = hashlib.sha256(
         target.read_bytes()
     ).hexdigest()
-    (chosen / "manifest.json").write_text(json.dumps(manifest))
-    with pytest.raises(ValueError, match="Sealed reference identity changed"):
+    (chosen / "source-files.json").write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match="Independent physical reference changed"):
         validate_reference_identity(chosen)

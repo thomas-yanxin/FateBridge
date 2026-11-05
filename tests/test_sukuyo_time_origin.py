@@ -75,7 +75,7 @@ def test_comparative_time_evidence_is_detached_and_not_a_clock_solution():
 def test_changed_primary_file_is_rejected(tmp_path):
     fixture = json.loads(
         (
-            Path(__file__).parent / "fixtures/sukuyo-comparative-time-primary.json"
+            Path(__file__).parent / "data/sukuyo-comparative-time-primary.json"
         ).read_bytes()
     )
     for name in fixture["source_files"]:

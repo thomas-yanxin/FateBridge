@@ -18,7 +18,7 @@ from fatebridge.core.strength import DEFAULT_POLICY, _evaluate
 from fatebridge.utils.data import STEM_ELEMENTS
 from tests.test_strength_v2 import pillars, score
 
-FOLDER = Path(__file__).parent / "fixtures/bazi_complete_bureau_v1"
+FOLDER = Path(__file__).parent / "data/bazi_complete_bureau_v1"
 
 
 def test_scanned_source_retains_one_complete_gold_bureau_with_two_roosters():

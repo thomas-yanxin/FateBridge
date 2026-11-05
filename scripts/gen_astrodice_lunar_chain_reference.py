@@ -148,7 +148,7 @@ def generate(args):
                         )
                     missing.append({"date_tt": date, "reason": single["error"]})
         print(
-            f"Journalled {min(offset+20,len(samples))}/{len(samples)} apparent lunar positions",
+            f"Journalled {min(offset + 20, len(samples))}/{len(samples)} apparent lunar positions",
             flush=True,
         )
     source_rows = [r for b in batches if "error" not in b for r in b["rows"]]

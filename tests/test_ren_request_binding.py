@@ -25,7 +25,7 @@ from tests.test_agentic_nested_outputs import (
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/ren_request_binding_v3"
-PIN = "37ad211fdab87629e9f4c76f4bb66bfa16b18ac1ef1a2209d6b2e808f8c84248"
+PIN = "c3f0fa35bb0eaa078fa3350435559484f08bb8cbec47a4754da6f24266178184"
 
 
 def reference():

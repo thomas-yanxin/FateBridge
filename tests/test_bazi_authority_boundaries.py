@@ -26,11 +26,15 @@ from fatebridge.validation.predictions import (
     StudyPlan,
     evaluate_study,
 )
-from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 
 
 def pillars(values):
     return dict(zip(("year", "month", "day", "hour"), (tuple(v) for v in values)))
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize(
@@ -43,7 +47,6 @@ def pillars(values):
 def test_revealed_seal_does_not_automatically_replace_primary_officer(chart):
     result = determine_monthly_structure(pillars(chart), "乙")
     assert result["label"] == "正官格"
-    assert result["legacy_label"] == "正印格"
     assert result["selection_rule"] == "officer_with_wealth_seal_support"
     assert "成败救应未完整裁定" in result["selection_source"]["scope"]
 
@@ -60,7 +63,6 @@ def test_unqualified_peer_month_is_not_a_blade_and_keeps_historical_disagreement
         pillars(["壬戌", "丁未", "戊申", "乙卯"]), "戊"
     )
     assert result["label"] == "正官格"
-    assert result["legacy_label"] == "月刃格"
     assert result["seat_qualification"]["is_yang_blade"] is False
 
 
@@ -71,7 +73,6 @@ def test_yin_growth_stage_never_becomes_a_hidden_stem_root_in_chart_or_text(
     chart = {name: (stem, branch) for name in ("year", "month", "day", "hour")}
     stages = life_stages_for_pillars(chart)
     assert stages["per_pillar"]["日支"] == "长生"
-    assert stages["strong_roots"]  # compatibility phase bucket
     assert stages["hidden_stem_roots"] == []
     text = "\n".join(classical_snapshot_lines(build_classical_overview(chart)))
     assert "强根：" not in text

@@ -97,9 +97,7 @@ def test_printed_reference_is_detached_and_has_its_own_fingerprint():
 
 def test_checker_rejects_changed_captured_image(tmp_path):
     fixture = json.loads(
-        (
-            Path(__file__).parent / "fixtures/sukuyo-wakita-special-primary.json"
-        ).read_bytes()
+        (Path(__file__).parent / "data/sukuyo-wakita-special-primary.json").read_bytes()
     )
     for row in fixture["source_reference"]["images"]:
         (tmp_path / row["file"]).write_bytes(b"changed capture")

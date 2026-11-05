@@ -27,7 +27,7 @@ SPELLING = {
 
 
 def build(source_root: Path | None = None) -> dict[str, Any]:
-    folder = source_root or ROOT / "tests/fixtures/ziwei_independent"
+    folder = source_root or ROOT / "tests/data/ziwei_independent"
     raw = (folder / "calendar_manifest.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != MANIFEST_SHA:
         raise ValueError("Frozen HKO source manifest changed")

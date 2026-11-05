@@ -5,12 +5,16 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from tests.test_agentic_nested_outputs import business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_birth_seconds import SPECS
 
 SELECTED = [
     s for s in SPECS if s.key in {"bazi_birth", "timing_analysis", "dayun_analysis"}
 ]
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("spec", SELECTED, ids=lambda s: s.key)

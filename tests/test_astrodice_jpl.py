@@ -24,8 +24,8 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
 from scripts.audit_astrodice_kernel import angular_error_arcsec
 
-FIXTURES = Path(__file__).parent / "fixtures"
-KERNEL = "astrodice-de441-j2000.eph"
+FIXTURES = Path(__file__).parent / "data/astrodice/tables"
+KERNEL = "de441-j2000.eph"
 SPEC = next(x for x in CATALOG if x.key == "otherbu")
 INPUTS = {
     "planet": "Jupiter",
@@ -58,9 +58,7 @@ def jpl(tmp_path, monkeypatch):
 
 def test_fixture_is_a_declared_unmodified_coefficient_subset():
     data = (FIXTURES / KERNEL).read_bytes()
-    provenance = json.loads(
-        (FIXTURES / "astrodice-de441-j2000.provenance.json").read_text()
-    )
+    provenance = json.loads((FIXTURES / "de441-j2000.provenance.json").read_text())
     assert len(data) == provenance["fixture_bytes"] == 40720
     assert hashlib.sha256(data).hexdigest() == provenance["fixture_sha256"]
     assert provenance["complete_original_kernel"] is False
@@ -71,9 +69,12 @@ def test_fixture_is_a_declared_unmodified_coefficient_subset():
     assert jpl_header(FIXTURES / KERNEL)["de_number"] == 441
     header = jpl_header(FIXTURES / KERNEL)
     assert header["time_scale"] == "TDB"
-    assert header["start_julian_day_tdb"] == header["start_julian_day_tt"]
-    assert header["end_julian_day_tdb"] == header["end_julian_day_tt"]
-    assert "not converted TT" in header["legacy_tt_range_fields"]
+    raw_start, raw_end, _ = struct.unpack_from("<3d", data, 2652)
+    assert header["start_julian_day_tdb"] == raw_start
+    assert header["end_julian_day_tdb"] == raw_end
+    assert "start_julian_day_tt" not in header
+    assert "end_julian_day_tt" not in header
+    assert "legacy_tt_range_fields" not in header
 
 
 def test_uninspected_binding_does_not_inherit_the_native_clock_estimate(monkeypatch):
@@ -89,8 +90,8 @@ def test_uninspected_binding_does_not_inherit_the_native_clock_estimate(monkeypa
 
 
 def test_jpl_satisfies_the_original_vector_threshold_at_j2000(jpl):
-    fixture = json.loads((FIXTURES / "astrodice-kernel-horizons.json").read_text())
-    protocol = json.loads((FIXTURES / "astrodice-kernel-protocol.json").read_text())
+    fixture = json.loads((FIXTURES / "kernel-horizons.json").read_text())
+    protocol = json.loads((FIXTURES / "kernel-protocol.json").read_text())
     flags = (
         e.swe.FLG_SWIEPH
         | e.swe.FLG_J2000
@@ -127,8 +128,8 @@ def test_actual_context_exposes_jpl_identity_without_changing_symbols(jpl, zodia
     file = source["files"][0]
     assert file["de_number"] == 441
     assert file["sha256"] == hashlib.sha256(jpl.read_bytes()).hexdigest()
-    assert file["start_julian_day_tt"] == 2451504.5
-    assert file["end_julian_day_tt"] == 2451600.5
+    assert file["start_julian_day_tdb"] == 2451504.5
+    assert file["end_julian_day_tdb"] == 2451600.5
     assert file["matches_packaged_manifest"] is False
     policy = source["time_scale_policy"]
     assert policy["native_api_time_scale"] == "TT"
@@ -273,7 +274,7 @@ def test_header_reader_supports_both_direct_access_byte_orders(tmp_path, order):
             struct.pack_into(">" + fmt, data, offset, *values)
     path = tmp_path / "header-only-synthetic.eph"
     path.write_bytes(data)
-    assert jpl_header(path)["start_julian_day_tt"] == 2451504.5
+    assert jpl_header(path)["start_julian_day_tdb"] == 2451504.5
 
 
 def test_jpl_source_projects_identically_across_three_transports(

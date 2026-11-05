@@ -12,8 +12,8 @@ from tests.test_agentic_nested_outputs import (
     call_cli,
     inputs,
     native,
-    rest,
 )
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 
 KEYS = [
     "bazi_birth",
@@ -28,6 +28,9 @@ KEYS = [
     "bazi_health",
     "analyze_destiny",
 ]
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("key", KEYS)
@@ -102,7 +105,18 @@ def test_branch_group_and_actual_gate_match_on_rest_native_mcp_and_cli(
     assert result["branch_group_element"] == "木"
     row = result["combination_observations"][0]
     assert row["month_in_target_branch_group"] is True
-    assert row["calculated_target_phase"] == "死"
+    # 三命通會·論五行旺相休囚死：土旺时「木尅土則木囚」。
+    # https://www.shidianguji.com/zh/book/SK1610/chapter/1kf5v6ol1tqg5
+    # 辰整月采用土本气是本工具已声明的范围，不是古典司令日数认证。
+    # Keep the branch-group observation separate from that numerical gate.
+    assert result["calculated_phases"] == {
+        "木": "囚",
+        "火": "休",
+        "土": "旺",
+        "金": "相",
+        "水": "死",
+    }
+    assert row["calculated_target_phase"] == "囚"
     assert row["supplied_season_support_flag"] is False
     assert row["criteria_differ"] is True
     assert row["classical_transformation"] == "not_adjudicated"

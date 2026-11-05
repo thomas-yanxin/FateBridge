@@ -1,6 +1,6 @@
 """Derived uncertainty instants keep microseconds without rewriting records."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 import pytest
 

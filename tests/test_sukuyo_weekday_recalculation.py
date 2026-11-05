@@ -16,7 +16,7 @@ from scripts.check_sukuyo_weekday_recalculation import verify_recalculation
 
 FIXTURE = json.loads(
     (
-        Path(__file__).parent / "fixtures/sukuyo-weekday-recalculation-primary.json"
+        Path(__file__).parent / "data/sukuyo-weekday-recalculation-primary.json"
     ).read_bytes()
 )
 

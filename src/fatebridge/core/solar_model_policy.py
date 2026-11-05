@@ -1,4 +1,4 @@
-"""Explicit Sun model selection; the native Moshier control remains available."""
+"""Explicit Sun selection, with a named complete Moshier analytical revision."""
 
 from __future__ import annotations
 
@@ -90,10 +90,19 @@ def solar_model_cache_key(*, year: int | None = None) -> Tuple[Any, ...]:
             and not VALIDATED_SOFTWARE_YEARS[0] <= year <= VALIDATED_SOFTWARE_YEARS[1]
         ):
             raise ValueError("Explicit Swiss solar mode currently covers1800..2200")
-        # Native coefficients live in the selected Swiss library/files. The
-        # surrounding solar_term_cache_context already tracks those inputs
-        # and the loaded clock tables; ERFA analytic coefficients are unused.
-        return mode, "native_swiss_runtime"
+        if mode == "swiss":
+            return mode, "native_swiss_runtime"
+        from .moshier_solar import MODEL_ID as COMPLETE_MOSHIER_MODEL
+        from .moshier_solar import model_details as complete_moshier_details
+
+        details = complete_moshier_details()
+        return (
+            mode,
+            "native_swiss_runtime",
+            COMPLETE_MOSHIER_MODEL,
+            details["coefficient_sha256"],
+            details["frame_coefficient_sha256"],
+        )
     if mode == "auto":
         from .jpl_ephemeris import configured_jpl_file
 
@@ -102,7 +111,17 @@ def solar_model_cache_key(*, year: int | None = None) -> Tuple[Any, ...]:
     if year is not None and mode in {"auto", "de440"} and not de440_selected(year):
         # Only the requested model's source is a dependency of this year.
         # Explicit de440 has already rejected an out-of-range year above.
-        return mode, "native_outside_packaged_years"
+        from .moshier_solar import MODEL_ID as COMPLETE_MOSHIER_MODEL
+        from .moshier_solar import model_details as complete_moshier_details
+
+        details = complete_moshier_details()
+        return (
+            mode,
+            "native_outside_packaged_years",
+            COMPLETE_MOSHIER_MODEL,
+            details["coefficient_sha256"],
+            details["frame_coefficient_sha256"],
+        )
     if mode == "vsop2013":
         if (
             year is not None
@@ -204,10 +223,10 @@ def solar_model_environment_receipt(
     if key[0] == "native":
         return {
             "mode": "native",
-            "source_selection": "native_swiss_runtime",
+            "source_selection": "native_swiss_or_complete_moshier",
             "source_resolution": "configuration_only",
             "analytic_source_resolved": False,
-            "scope": "Configured Swiss runtime selection only. Actual per-boundary return flags identify Moshier, Swiss or JPL. This policy does not load or name the separate FateBridge analytic coefficient profile and does not certify accuracy or atomic native file reads.",
+            "scope": "Configured native selection only. Available Swiss/JPL data keep their native model; analytical fallback uses the named complete Moshier revision with its own orbit/frame receipt and no borrowed Sun flags. This configuration receipt does not prove which source a business calculation consumed or certify accuracy.",
         }
     if key[1] == "native_strict_jpl":
         return {

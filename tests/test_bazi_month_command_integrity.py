@@ -1,6 +1,5 @@
 """Known month-duty facts cannot become invented adjudication or false sums."""
 
-import gzip
 import itertools
 import json
 from copy import deepcopy
@@ -12,10 +11,6 @@ from pydantic import ValidationError
 from fatebridge.core.output_bazi_evidence import BaziEvidenceChain
 
 ROOT = Path(__file__).resolve().parents[1]
-D = ROOT / "docs/validation/bazi-month-command-integrity-files-v1"
-FIRST = json.loads(
-    gzip.decompress((D / "first152-accepted-contradictions.json.gz").read_bytes())
-)
 LITERAL_HIDDEN = {
     b: list(s)
     for b, s in zip(
@@ -38,28 +33,60 @@ LITERAL_HIDDEN = {
 }
 
 
-@pytest.mark.parametrize("row", FIRST, ids=lambda r: r["id"] + ":" + r["fault"])
-def test_all_first_accepted_month_contradictions_are_rejected(row):
-    assert row["first_accepted"] is True
-    original = deepcopy(row["value"])
+@pytest.mark.parametrize(
+    "row",
+    [
+        r
+        for r in json.loads(
+            (
+                ROOT / "src/fatebridge/data/reference/bazi-source-annotations.json"
+            ).read_text()
+        )["records"]
+        if r["group"] == "original"
+    ],
+)
+@pytest.mark.parametrize(
+    "fault",
+    [
+        "invented_duty",
+        "false_duration_sum",
+        "false_annual_match",
+        "mixed_witness_month",
+        "adopted_table_order",
+        "invented_source_duty",
+        "wrong_hidden_identity",
+        "wrong_conventional_roots",
+    ],
+)
+def test_current_month_facts_reject_false_adjudication_and_physical_identity(
+    row, fault
+):
+    from fatebridge.core.bazi_evidence import build_natal_evidence
+    from fatebridge.core.elements import ElementAnalysis
+    from tests.bazi_month_command_faults import perturb
+
+    chart = dict(zip(("year", "month", "day", "hour"), map(tuple, row["pillars"])))
+    natal = build_natal_evidence(
+        chart, ElementAnalysis.analyze_day_master_strength(chart)
+    )
     with pytest.raises(ValidationError):
-        BaziEvidenceChain.model_validate(row["value"])
-    assert row["value"] == original
+        BaziEvidenceChain.model_validate(perturb(natal, fault))
 
 
 def test_all408_existing_complete_outputs_roundtrip_without_rewriting_source_disagreements():
-    rows = [
-        json.loads(line)
-        for line in gzip.open(
-            ROOT
-            / "docs/validation/bazi-same-target-bureau-files-v1/all408-source-first.jsonl.gz",
-            "rt",
-        )
-    ]
+    from fatebridge.core.bazi_evidence import build_natal_evidence
+    from fatebridge.core.elements import ElementAnalysis
+
+    rows = json.loads((ROOT / "tests/data/bazi/arithmetic-inputs.json").read_text())
     for row in rows:
-        actual = row["natal"]
-        model = BaziEvidenceChain.model_validate(actual)
-        assert model.model_dump(exclude_unset=True) == actual, row["case"]["id"]
+        chart = dict(zip(("year", "month", "day", "hour"), map(tuple, row["pillars"])))
+        actual = build_natal_evidence(
+            chart, ElementAnalysis.analyze_day_master_strength(chart)
+        )
+        assert (
+            BaziEvidenceChain.model_validate(actual).model_dump(exclude_unset=True)
+            == actual
+        )
     assert len(rows) == 408
 
 
@@ -216,12 +243,7 @@ def test_literal_sum_32_and_26_and_380_360_remain_valid():
 
 @pytest.mark.parametrize(
     "value",
-    json.loads(
-        (
-            ROOT
-            / "tests/fixtures/bazi_month_command_integrity_v1/first5-partial-cross-binding-counterexamples.json"
-        ).read_text()
-    ),
+    json.loads((ROOT / "tests/data/bazi/month-command-cross-invalid.json").read_text()),
 )
 def test_first5_partial_cross_bindings_cannot_erase_known_month(value):
     with pytest.raises(ValidationError):

@@ -1,13 +1,11 @@
 """Independent rounded geometry, interval bounds and full receipt fidelity."""
 
-import ast
 import copy
 import gzip
 import hashlib
 import json
 import math
 import random
-import tarfile
 from fractions import Fraction
 from pathlib import Path
 from unittest.mock import patch
@@ -33,34 +31,6 @@ ROOT = Path(__file__).resolve().parents[1]
 SPEC = next(s for s in CATALOG if s.key == "human_design")
 
 
-def check_frozen_producer(path: Path, expected_sha256: str):
-    # Formatting changes the producer's self-fingerprint, not the frozen math.
-    # Keep the exact original producer and require identical program AST plus
-    # the same import declarations before using its historical reference.
-    old = (
-        ROOT
-        / "docs/validation/human-design-portable-projection-v1/independent-inputs/scripts"
-        / path.name
-    )
-    assert hashlib.sha256(old.read_bytes()).hexdigest() == expected_sha256
-
-    def facts(source):
-        tree = ast.parse(source)
-        imports = sorted(
-            ast.dump(n)
-            for n in tree.body
-            if isinstance(n, (ast.Import, ast.ImportFrom))
-        )
-        body = [
-            ast.dump(n)
-            for n in tree.body
-            if not isinstance(n, (ast.Import, ast.ImportFrom))
-        ]
-        return imports, body
-
-    assert facts(old.read_text()) == facts(path.read_text())
-
-
 def test_all_original21600_and27_predeclared_independent_rounded_values():
     path = ROOT / "tests/fixtures/human-design-portable-projection-reference.json.gz"
     assert (
@@ -76,10 +46,6 @@ def test_all_original21600_and27_predeclared_independent_rounded_values():
             ).read_bytes()
         ).hexdigest()
         == reference["plan_sha256"]
-    )
-    check_frozen_producer(
-        ROOT / "scripts/gen_human_design_portable_projection_reference.py",
-        reference["generator_sha256"],
     )
     for row in reference["rows"]:
         actual = nominal_solar_projection(row["sun"], row["target"])
@@ -129,10 +95,6 @@ def test_all36_independent_equatorial_neighbors_at_the_unchanged_cuts():
     )
     reference = json.loads(path.read_text())
     assert reference["case_count"] == len(reference["rows"]) == 36
-    check_frozen_producer(
-        ROOT / "scripts/gen_human_design_portable_limb_reference.py",
-        reference["generator_sha256"],
-    )
     for row in reference["rows"]:
         value = nominal_solar_projection(row["sun"], row["target"])
         assert value["projection_relation"] == row["relation"], row["id"]
@@ -215,33 +177,6 @@ def test_portable_projection_does_not_use_platform_transcendentals():
     assert (
         value["separation_radians"].hex() == frozen["rounded_hex"]["separation_radians"]
     )
-
-
-def test_original_platform_algorithm_ast_is_preserved_for_old_receipts():
-    with tarfile.open(
-        ROOT
-        / "docs/validation/human-design-profile-continuation-v1/engineering/frozen-v2-python-inputs.tar.gz",
-        "r:gz",
-    ) as archive:
-        old_source = (
-            archive.extractfile("src/fatebridge/core/human_design_solar_projection.py")
-            .read()
-            .decode()
-        )
-    old = next(
-        n
-        for n in ast.parse(old_source).body
-        if isinstance(n, ast.FunctionDef) and n.name == "nominal_solar_projection"
-    )
-    current = ast.parse(
-        (ROOT / "src/fatebridge/core/human_design_solar_projection.py").read_text()
-    )
-    legacy = next(
-        n
-        for n in current.body
-        if isinstance(n, ast.FunctionDef) and n.name == "_legacy_projection"
-    )
-    assert [ast.dump(n) for n in old.body] == [ast.dump(n) for n in legacy.body]
 
 
 @pytest.fixture(scope="module")

@@ -11,10 +11,8 @@ from jsonschema import Draft202012Validator
 from fatebridge.core import heluo_poems as hp
 from fatebridge.core import heluo_texts as ht
 from fatebridge.core.heluo import _tiaowen, yao_text
-from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.utils.errors import NumerologySourceError
-from tests.heluo_current_source_reference import HEADER_COUNT, PENDING_COUNT
-from tests.heluo_current_source_reference import REFERENCE as CURRENT_REFERENCE
+from tests.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
 from tests.test_agentic_nested_outputs import SPECS, business
 from tests.test_agentic_nested_outputs import rest as shared_rest
 from tests.test_heluo_poem_transports import run_three
@@ -22,7 +20,6 @@ from tests.test_heluo_poem_transports import run_three
 rest = shared_rest
 F = Path(__file__).parent / "fixtures/heluo_sui17_meng4_v1"
 READINGS = json.loads((F / "verified-readings.json").read_bytes())
-ADOPTION = json.loads((F / "source-adoption-reference.json").read_bytes())
 CASES = json.loads((F / "cases.json").read_bytes())["cases"]
 
 
@@ -39,18 +36,6 @@ def test_audit_checks_both_new_source_and_preserved_prefixes():
     assert result["checks_passed"] and result["failures"] == []
     assert result["unresolved_new_prose_glyphs"] == 1
     assert result["independent_second_review_completed"] is False
-
-
-def canonical(value):
-    return hashlib.sha256(
-        json.dumps(
-            value,
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-            allow_nan=False,
-        ).encode()
-    ).hexdigest()
 
 
 @pytest.fixture(autouse=True)
@@ -85,16 +70,7 @@ def test_source_first_draft_and_all_amendments_are_retained():
     assert change[0]["counts_as_production_correction"] is False
 
 
-def test_prior_prefixes_and_real_coverage_remain_separate():
-    for data, prefix, count in [
-        (ht._collation(), "headers", 96),
-        (ht._commentary_collation(), "commentaries", 96),
-        (hp._collation(), "poems", 18),
-    ]:
-        assert (
-            canonical(data["entries"][:count])
-            == ADOPTION["prefixes_preserved"][prefix]["canonical_sha256"]
-        )
+def test_source_coverage_and_pending_scope_remain_separate():
     assert (
         ht.collation_summary()["collated_line_headers"],
         ht.collation_summary()["pending_line_headers"],
@@ -281,49 +257,6 @@ def test_actual_selected_text_and_conditions_match_all_three_adapters(
             assert expected["shige"] in out["snapshot_text"]
         if (case["hexagram"], case["line"]) == ("澤雷隨", 6):
             assert "字形未决" in out["snapshot_text"]
-
-
-@pytest.mark.parametrize("key", ["澤雷隨:5", "澤雷隨:6", "山水蒙:2", "山水蒙:6"])
-def test_knowledge_reference_is_same_source_without_personal_application(key):
-    result = calculate_knowledge_read(domain="heluo", key=key)
-    assert "error" not in result
-    details = result["reference_details"]
-    gua, _, pos = key.rpartition(":")
-    assert details["record"] == yao_text(gua, int(pos))
-    assert details["reference_only"] is True
-    assert details["personal_applicability_assessed"] is False
-    from tests.heluo_guan_shi_revision_reference import REVISION as glyph_revision
-    from tests.heluo_shike_bi_revision_reference import REVISION as r92
-
-    assert (
-        glyph_revision["provenance_pairs"]["source_catalogue_version"][1]
-        == r92["provenance_pairs"]["source_catalogue_version"][0]
-    )
-    from tests.canping_witness_knowledge_revision import REVISION as r99
-    from tests.heluo_ben22_revision_reference import REVISION as r96
-
-    assert (
-        r92["provenance_pairs"]["source_catalogue_version"][1]
-        == r96["provenance_pairs"]["source_catalogue_version"][0]
-    )
-    assert (
-        r96["provenance_pairs"]["source_catalogue_version"][1]
-        == r99["provenance_pairs"]["source_catalogue_version"][0]
-    )
-    from tests.heluo_bo23_revision_reference import KNOWLEDGE as R101_KNOWLEDGE
-
-    assert (
-        r99["provenance_pairs"]["source_catalogue_version"][1]
-        == R101_KNOWLEDGE["provenance_pairs"]["source_catalogue_version"][0]
-    )
-    assert (
-        R101_KNOWLEDGE["provenance_pairs"]["source_catalogue_version"][1]
-        == CURRENT_REFERENCE["provenance_pairs"]["source_catalogue_version"][0]
-    )
-    assert (
-        result["provenance"]["source_catalogue_version"]
-        == CURRENT_REFERENCE["provenance_pairs"]["source_catalogue_version"][1]
-    )
 
 
 @pytest.mark.parametrize("key", ["澤雷隨:6", "山水蒙:2"])

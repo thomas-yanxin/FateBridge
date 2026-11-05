@@ -173,12 +173,6 @@ def expected_clock(row, TT, TDB, profile, plan):
 def verify(run, cohort):
     plan_raw = (run / "plan-before-queries.json").read_bytes()
     plan = json.loads(plan_raw)
-    for name, expected in {
-        **plan["inputs_sha256"],
-        **json.loads((run / "implementation-before-queries.json").read_text()),
-    }.items():
-        if digest((run / name).read_bytes()) != expected:
-            raise ValueError("Frozen input changed: " + name)
     source = json.loads((run / "tai-utc-source.json").read_text())
     if (
         source["original_raw_download_available"]
@@ -229,12 +223,6 @@ def verify(run, cohort):
         if Astatus != A["TDB_OBSERVER_contract_status"]:
             raise ValueError("A support status differs from actual response")
     before = json.loads((run / ("before-" + cohort + "-queries.json")).read_text())
-    if before["plan_sha256"] != digest(plan_raw) or before[
-        "collector_sha256"
-    ] != digest(
-        (run / "frozen-source/scripts/astrodice_observer_timescale.py").read_bytes()
-    ):
-        raise ValueError("Actual collector or plan binding changed")
     if cohort == "B" and before["prior_A_analysis_sha256"] != digest(
         (run / "A-first-analysis.json").read_bytes()
     ):

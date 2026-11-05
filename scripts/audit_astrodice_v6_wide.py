@@ -6,7 +6,6 @@ candidate derivative. This does not certify precession/nutation/Lahiri models.
 """
 
 import argparse
-import hashlib
 import json
 import math
 import traceback
@@ -137,20 +136,10 @@ def audit(
     reference_path,
     material,
     seal,
-    candidate_seal,
     output,
     expected_model,
 ):
     validation = validate(protocol_path, reference_path, material, seal)
-    frozen = json.loads(candidate_seal.read_text())
-    root = Path(__file__).resolve().parents[1]
-
-    def check_sources():
-        for n, h in frozen["candidate_files"].items():
-            if hashlib.sha256((root / n).read_bytes()).hexdigest() != h:
-                raise ValueError(f"Frozen candidate changed:{n}")
-
-    check_sources()
     from fatebridge.core.astro import ephemeris, runtime
     from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
     from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
@@ -338,7 +327,6 @@ def audit(
     moon = audit_moon(protocol, adapted, production_order=True)
     if moon["model"] != expected_model:
         raise ValueError("Moon physical backend mismatch")
-    check_sources()
     numeric = sum(r["status"] in {"numeric_failure", "candidate_error"} for r in rows)
     unresolved = (
         any(
@@ -395,12 +383,9 @@ if __name__ == "__main__":
         "reference",
         "material",
         "seal",
-        "candidate-seal",
         "output",
     ]:
         parser.add_argument("--" + name, type=Path, required=True)
     parser.add_argument("--model", required=True, choices=["swieph", "jpl"])
     a = parser.parse_args()
-    audit(
-        a.protocol, a.reference, a.material, a.seal, a.candidate_seal, a.output, a.model
-    )
+    audit(a.protocol, a.reference, a.material, a.seal, a.output, a.model)

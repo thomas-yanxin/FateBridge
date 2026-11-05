@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import shutil
+import struct
 import threading
 from pathlib import Path
 
@@ -22,6 +23,7 @@ from fatebridge.core import human_design as hd
 from fatebridge.core import jyotish
 from fatebridge.core.astro.birth import build_astro_birth_info
 from fatebridge.core.astro.profiles import ANALYTICAL_MEAN_NODE_MODEL
+from fatebridge.core.human_design_mechanics import BODY_IDS
 from fatebridge.core.jpl_ephemeris import jpl_header
 from fatebridge.core.jyotish_kala import solar_packet
 from fatebridge.core.jyotish_mean import geometric_points
@@ -80,19 +82,27 @@ def test_wider_fixture_retains_original_coefficients_and_old_fixture():
         p for p in provenance["download_parts"] if p["part"] == "coefficients"
     )
     assert hashlib.sha256(data[16288:]).hexdigest() == coefficient["sha256"]
-    old = (FIXTURES / "astrodice-de441-j2000.eph").read_bytes()
+    old = (Path(__file__).parent / "data/astrodice/tables/de441-j2000.eph").read_bytes()
     assert (
         hashlib.sha256(old).hexdigest()
         == "5e298b899542373c2f5814c8397cdea5a4627d1e4f5f6d1a89a11810955441cf"
     )
     assert data[5 * 8144 :] == old[2 * 8144 :]
     header = jpl_header(FIXTURES / KERNEL)
-    assert header["start_julian_day_tt"] == 2451408.5
-    assert header["end_julian_day_tt"] == 2451600.5
+    assert header["start_julian_day_tdb"] == 2451408.5
+    assert header["end_julian_day_tdb"] == 2451600.5
+    assert (
+        header["start_julian_day_tdb"],
+        header["end_julian_day_tdb"],
+    ) == struct.unpack_from("<2d", data, 2652)
+    assert "start_julian_day_tt" not in header and "end_julian_day_tt" not in header
+    assert "legacy_tt_range_fields" not in header
 
 
 def test_original_96_day_subset_still_fails_unchanged_hd_root_bracket(selected):
-    selected.write_bytes((FIXTURES / "astrodice-de441-j2000.eph").read_bytes())
+    selected.write_bytes(
+        (Path(__file__).parent / "data/astrodice/tables/de441-j2000.eph").read_bytes()
+    )
     with pytest.raises(EphemerisSourceError):
         hd.chart_at_tt(2451545.0, "true")
 
@@ -179,9 +189,7 @@ def test_hd_primary_chart_survives_forbidden_optional_reference(selected, mode):
     )
     assert verify_full_backend_report(result)["errors"] == []
     for rows in result["activations"].values():
-        assert all(
-            a["ephemeris_model"] == "jpl" for a in rows if a["body"] in hd.BODY_IDS
-        )
+        assert all(a["ephemeris_model"] == "jpl" for a in rows if a["body"] in BODY_IDS)
     bad = copy.deepcopy(result)
     bad["calculation_policy"]["physical_backend_policy"] = "auto"
     assert verify_full_backend_report(bad)["errors"]
@@ -240,7 +248,12 @@ def test_real_three_transport_policy_and_node_projection(
             analysis_timezone="UTC",
         )
     fields = (
-        ["calculation_policy", "activations", "ephemeris_backend_comparison"]
+        [
+            "calculation_policy",
+            "activations",
+            "ephemeris_backend_comparison",
+            "ephemeris_source_evidence",
+        ]
         if key == "human_design"
         else ["india.profile"]
     )
@@ -303,6 +316,20 @@ def test_real_three_transport_policy_and_node_projection(
         assert policy["ephemeris_model"] == "jpl"
         assert policy["ephemeris_model_scope"] == "physical_bodies"
         assert policy["physical_backend_policy"] == "strict_jpl"
+        if key == "human_design":
+            raw_bounds = struct.unpack_from("<2d", selected.read_bytes(), 2652)
+            files = result["ephemeris_source_evidence"]["files"]
+            assert files
+            for item in files:
+                assert item["range_time_scale"] == "TDB"
+                assert (
+                    item["start_julian_day_tdb"],
+                    item["end_julian_day_tdb"],
+                ) == raw_bounds
+                assert (
+                    "start_julian_day_tt" not in item
+                    and "end_julian_day_tt" not in item
+                )
 
 
 def test_strict_jpl_original_reading_verifier_retains_fidelity_checks(selected):

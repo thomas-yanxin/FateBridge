@@ -16,6 +16,7 @@ from dateutil import tz
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astro.geometry import combine_longitudes
 from fatebridge.core.astro.historical_utc import historical_utc_source
 from fatebridge.core.astro.jyotish_continuous_state import continuous_state_evidence
 from fatebridge.core.astro.jyotish_lunar_source_state import (
@@ -216,7 +217,7 @@ def validate_clock(moment: datetime, label: str) -> None:
         raise ValueError(f"{label}处于夏令时重复区间；请用明确 UTC 偏移消除歧义。")
 
 
-def nakshatra(longitude: float) -> Dict[str, Any]:
+def nakshatra(longitude: float | Fraction) -> Dict[str, Any]:
     numerator, denominator = _longitude_ratio(longitude)
     index, remainder = divmod(numerator * 3, denominator * 40)
     fraction = min(remainder / (denominator * 40), math.nextafter(1.0, 0.0))
@@ -467,7 +468,7 @@ def positions(
             or configured_jpl_file() != selected_jpl
         ):
             raise EphemerisSourceError("physical_configuration_changed")
-    values["Ketu"] = (values["Rahu"] + 180.0) % 360.0
+    values["Ketu"] = combine_longitudes(values["Rahu"], 180.0)
     states["Ketu"] = (-states["Rahu"][0], states["Rahu"][1])
     motion["Ketu"] = node_motion(
         jd_tt,
@@ -589,15 +590,21 @@ def point_record(
     }
 
 
-def divisional_chart(raw: Dict[str, Any], division: int) -> Dict[str, Any]:
+def divisional_chart(
+    raw: Dict[str, Any],
+    division: int,
+    *,
+    partition_longitudes: Optional[Dict[str, float | Fraction]] = None,
+) -> Dict[str, Any]:
+    longitudes = (
+        raw["longitudes"] if partition_longitudes is None else partition_longitudes
+    )
     asc_sign = varga_sign(raw["ascendant"], division)
     asc = None if division == 30 else varga_longitude(raw["ascendant"], division)
     planets = []
     for p in GRAHAS:
-        sign, _ = varga_coordinates(raw["longitudes"][p], division)
-        longitude = (
-            None if division == 30 else varga_longitude(raw["longitudes"][p], division)
-        )
+        sign, _ = varga_coordinates(longitudes[p], division)
+        longitude = None if division == 30 else varga_longitude(longitudes[p], division)
         planets.append(point_record(p, longitude, asc_sign, sign_index=sign))
     if division == 1:
         signs = {p["id"]: int(p["longitude"] // 30) for p in planets}
@@ -1150,11 +1157,20 @@ def build_india(
     )
     source_comparison = SourceComparison()
     nominal_source_index = source_comparison.add(raw)
+    # Ketu is an exact antipode of the supplied Rahu coordinate. Keep that
+    # rational value through all partitions; its returned longitude is display.
+    partition_longitudes: Dict[str, float | Fraction] = {
+        **raw["longitudes"],
+        "Ketu": (Fraction(raw["longitudes"]["Rahu"]) + 180) % 360,
+    }
     nominal_nakshatras = {
         p: nakshatra(lon)
-        for p, lon in {**raw["longitudes"], "Ascendant": raw["ascendant"]}.items()
+        for p, lon in {**partition_longitudes, "Ascendant": raw["ascendant"]}.items()
     }
-    charts = {f"D{d}": divisional_chart(raw, d) for d in [1, *selected]}
+    charts = {
+        f"D{d}": divisional_chart(raw, d, partition_longitudes=partition_longitudes)
+        for d in [1, *selected]
+    }
     ashtakavarga = ashtakavarga_for_charts(charts)
     sthana = calculate_sthana(raw, saptavargaja_profile, drekkana_profile)
     additional_balas = other_balas(raw)
@@ -1267,15 +1283,23 @@ def build_india(
             if _sample_observer is not None:
                 _sample_observer(offset, sample)
             ashtakavarga_grid.observe(offset, sample)
+            sample_longitudes: Dict[str, float | Fraction] = (
+                partition_longitudes
+                if offset == 0
+                else {
+                    **sample["longitudes"],
+                    "Ketu": (Fraction(sample["longitudes"]["Rahu"]) + 180) % 360,
+                }
+            )
             for name in charts:
                 d = int(name[1:])
                 asc_sign = varga_sign(sample["ascendant"], d)
                 seen[name]["Ascendant"].add((asc_sign, 1))
                 for p in GRAHAS:
-                    sign = varga_sign(sample["longitudes"][p], d)
+                    sign = varga_sign(sample_longitudes[p], d)
                     seen[name][p].add((sign, (sign - asc_sign) % 12 + 1))
             for p, lon in {
-                **sample["longitudes"],
+                **sample_longitudes,
                 "Ascendant": sample["ascendant"],
             }.items():
                 star = nakshatra(lon)
@@ -1653,7 +1677,7 @@ def build_india(
                 "vargas_other_than_D1_D2_D3_D7_D9_D10_D12_D30",
             ],
         },
-        "interpretation_scope": "Parashari subset; sources describe traditional rules, not empirical prediction validity. Generic top-level Western fields are a separate legacy reference.",
+        "interpretation_scope": "Parashari subset; sources describe traditional rules, not empirical prediction validity. Generic top-level Western fields are a separate public reference view.",
     }
 
 

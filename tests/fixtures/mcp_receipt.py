@@ -3,6 +3,8 @@
 import hashlib
 import json
 
+from fatebridge.utils.json_digest import digest as evidence_digest
+
 
 def assert_same_run_receipt(inline, full, *, deferred_fields=()):
     # The caller first verifies the complete artifact against the original
@@ -16,9 +18,17 @@ def assert_same_run_receipt(inline, full, *, deferred_fields=()):
             "run_metadata.runtime",
             "run_metadata.provenance",
             "run_metadata.determinism",
+            "run_metadata.calculation_evidence",
         }, path
         key = path.removeprefix("run_metadata.")
-        if key != "runtime":
+        if key == "calculation_evidence":
+            assert inline[key] == {
+                "delivery_path": path,
+                "sha256": evidence_digest(full[key]),
+                "coverage": full[key].get("coverage"),
+            }
+            restored[key] = full[key]
+        elif key != "runtime":
             assert key not in inline and key in full, key
             restored[key] = full[key]
     summary = inline.get("runtime", {})
@@ -50,11 +60,11 @@ async def verified_inline_business(client, payload):
     # business result behind pagination in a first-view budget assertion.
     deferred = delivery["deferred_fields"]
     assert deferred and len(deferred) == len(set(deferred)), delivery
-    assert "run_metadata.runtime" in deferred, delivery
     assert set(deferred) <= {
         "run_metadata.runtime",
         "run_metadata.provenance",
         "run_metadata.determinism",
+        "run_metadata.calculation_evidence",
     }, delivery
     # The compact manifest may omit the redundant first-page URI.
     text = ""

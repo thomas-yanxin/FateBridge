@@ -18,7 +18,7 @@ from fatebridge.core.sukuyo_historical_calendar import SOURCE
 from fatebridge.core.sukuyo_sources import load_source
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/sukuyo-documentary-dates.json"
+FIXTURE = ROOT / "tests/data/sukuyo-documentary-dates.json"
 
 
 def verify_documentary_controls(*, capture_dir: Path | None = None) -> dict:

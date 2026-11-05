@@ -6,28 +6,9 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import evidence_views, suggested_fields
+from tests.relationship_inputs import payloads
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
-from tests.test_western_relationship_geometry import A, B
 from tests.test_western_relationship_scoring import replay
-
-
-def payloads(mode, variant):
-    nested = {
-        "inner": A,
-        "outer": B,
-        "relative_mode": mode,
-        "davison_variant": variant,
-        "hsys": 0,
-        "zodiacal": 1,
-    }
-    flat = {
-        **{f"inner_{key}": value for key, value in A.items()},
-        **{f"outer_{key}": value for key, value in B.items()},
-        **{
-            key: value for key, value in nested.items() if key not in {"inner", "outer"}
-        },
-    }
-    return nested, flat
 
 
 @pytest.mark.parametrize("mode", ["TimeSpace", "Marks"])

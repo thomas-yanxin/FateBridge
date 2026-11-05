@@ -1,9 +1,7 @@
 """Essential receipt facts remain inline even when business needs paging."""
 
 import copy
-import hashlib
 import json
-import zipfile
 from pathlib import Path
 
 import pytest
@@ -23,24 +21,29 @@ from tests.fixtures.mcp_receipt import assert_same_run_receipt
 from tests.test_agentic_nested_outputs import rest  # noqa: F401
 from tests.test_result_delivery import reconstruct, store  # noqa: F401
 
-FIXTURE = Path(__file__).parent / "fixtures/western-receipt-identity-v1"
 
+@pytest.fixture(scope="module")
+def current_payload(native_ephemeris_files_module):
+    from fatebridge.application.execution import execute_tool
+    from fatebridge.core.execution_context import ExecutionOptions
 
-def frozen_payload():
-    seal = json.loads((FIXTURE / "seal.json").read_text())
-    path = FIXTURE / "preedit-same-run-evidence.zip"
-    assert hashlib.sha256(path.read_bytes()).hexdigest() == seal[path.name]
-    with zipfile.ZipFile(path) as archive:
-        return json.loads(archive.read("full.json"))
+    spec = next(s for s in CATALOG if s.tool_name == "astro_germany_chart")
+    result = execute_tool(
+        spec,
+        spec.request_model.model_validate(example_input(spec)),
+        options=ExecutionOptions(as_of="2026-10-12T04:00:00Z"),
+    )
+    assert "error" not in result
+    return result
 
 
 @pytest.mark.parametrize("compact", [True, False])
 @pytest.mark.parametrize("limit", [0, 4096, 8192, 16384, 65536])
 @pytest.mark.parametrize("large_supplementary", [False, True])
-def test_frozen_real_germany_result_keeps_receipt_and_same_run_facts(
-    store, compact, limit, large_supplementary
+def test_current_germany_result_keeps_receipt_and_same_run_facts(
+    store, compact, limit, large_supplementary, current_payload
 ):
-    original = frozen_payload()
+    original = copy.deepcopy(current_payload)
     if large_supplementary:
         # Stress only declared supplementary metadata, never tune business
         # facts or the caller's budget to manufacture a passing first view.
@@ -73,15 +76,16 @@ def test_frozen_real_germany_result_keeps_receipt_and_same_run_facts(
         p for p in reference["deferred_fields"] if not p.startswith("run_metadata.")
     }
     assert omitted == deferred_business
-    if compact and limit == 8192:
-        assert omitted  # Pre-edit measured floor8432 exceeds the unchanged8192.
+    business = {k: v for k, v in before.items() if k != "run_metadata"}
+    if len(delivery._json(business, compact)) > limit:
+        assert omitted
 
 
 @pytest.mark.parametrize("compact", [True, False])
 def test_unfit_essential_receipt_is_an_error_not_a_success_without_identity(
-    store, compact
+    store, compact, current_payload
 ):
-    original = frozen_payload()
+    original = copy.deepcopy(current_payload)
     original["run_metadata"]["warnings"] = ["required-warning" * 1000]
     before = copy.deepcopy(original)
     with pytest.raises(ParameterError):

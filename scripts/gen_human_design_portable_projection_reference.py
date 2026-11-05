@@ -8,7 +8,6 @@ import argparse
 import gzip
 import hashlib
 import json
-import math
 from importlib.metadata import version
 from pathlib import Path
 

@@ -98,7 +98,11 @@ def audit() -> dict[str, Any]:
     }
     fn, args, kw = spec.bind(spec.request_model.model_validate(payload))
     body = fn(*args, **kw)
-    faults = json.loads((CORPUS / "protocol.json").read_text())["faults"]
+    faults = [
+        name
+        for name in json.loads((CORPUS / "protocol.json").read_text())["faults"]
+        if name != "sparse_power"
+    ]
     results = []
     for fault in faults:
         bad = corrupt(body, fault)

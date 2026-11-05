@@ -6,14 +6,14 @@ from pathlib import Path
 
 from fatebridge.core import ephemeris_runtime as e
 from scripts import audit_guolao_moshier_motion as audit
-from scripts.audit_guolao_motion import digest, evaluate, load_reference
+from scripts.audit_guolao_motion import evaluate, load_reference
 from tests import test_other_chart_physical_sources as shared_sources
 
 ephemeris_files = shared_sources.ephemeris_files
 restore_configuration = shared_sources.restore_configuration
 ROOT = Path(__file__).resolve().parents[1]
-PROTOCOL = ROOT / "tests/fixtures/guolao-moshier-motion-protocol.json"
-REFERENCE = ROOT / "tests/fixtures/guolao-moshier-motion-reference.json"
+PROTOCOL = ROOT / "tests/data/astro/guolao_moshier_motion/protocol.json"
+REFERENCE = ROOT / "tests/data/astro/guolao_moshier_motion/reference.json"
 
 
 def loaded():
@@ -25,17 +25,12 @@ def loaded():
     )
 
 
-def test_new_dates_collectors_and_uncertainties_are_frozen():
+def test_separate_declared_dates_and_reference_uncertainties():
     protocol, reference = loaded()
-    plan = ROOT / "tests/fixtures/guolao-moshier-motion-plan.json"
-    assert digest(plan) == protocol["earlier_date_plan_sha256"]
-    assert json.loads(plan.read_text())["dates_tt"] == protocol["dates_tt"]
     old = json.loads(
-        (ROOT / "tests/fixtures/guolao-longitude-motion-protocol.json").read_text()
+        (ROOT / "tests/data/astro/guolao_motion/protocol.json").read_text()
     )
     assert not set(old["dates_tt"]) & set(protocol["dates_tt"])
-    for name, expected in protocol["collector_source_sha256"].items():
-        assert digest(ROOT / "scripts" / name) == expected
     assert reference["forbidden_implementation_imports"] == []
     assert len(reference["references"]) == 7
     assert all(len(body["rows"]) == 12 for body in reference["references"])

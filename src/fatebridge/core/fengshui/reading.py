@@ -17,15 +17,13 @@ from .source_comparison import comparison_statements
 
 FORMAT = "fengshui_natal_calculation_reading_v1"
 READING_VERSION = "1.2.0"
-SUPPORTED_READING_VERSIONS = {"1.0.0", "1.1.0", READING_VERSION}
 VERSIONS = {
-    "xuankong_zhongzhou_v1": ("1.3.0", "1.4.0"),
+    "xuankong_zhongzhou_v1": "1.4.0",
     "xuankong_conditioned_v1": "1.0.0",
-    "wang_zhongzhou_timeliness_v1": ("1.0.0", "1.1.0"),
+    "wang_zhongzhou_timeliness_v1": "1.1.0",
     "shen_fixed_lingzheng_v1": "1.0.0",
     "shen_2011_host_guest_v1": "1.0.0",
     "shen_city_gate_v1": "1.0.0",
-    "shen_2011_lower_numeric_comparison_v1": "1.0.0",
     "shen_2011_natal_numeric_comparison_v2": "2.0.0",
 }
 TIMELINESS = {
@@ -101,7 +99,7 @@ def _condition_text(condition: Dict[str, Any]) -> str:
     if "observed" in condition and condition["status"] != "not_applicable_center":
         facts = condition["observed"]
         text += "；观察记录为" + (
-            "、".join(labels[key] + observed(value) for key, value in facts.items())
+            "、".join((labels[key] + observed(value) for key, value in facts.items()))
             if isinstance(facts, dict)
             else observed(facts)
         )
@@ -125,18 +123,20 @@ def _numeric_statements(chart: Dict[str, Any]) -> List[tuple[str, str, str]]:
         len(pairs) != 3
         or {(p["left_role"], p["right_role"]) for p in pairs}
         != {("period", "mountain"), ("period", "facing"), ("mountain", "facing")}
-        or any(set(p["palace_sums"]) != directions for p in pairs)
-        or set(patterns["parental_triples"]["palaces"]) != directions
-        or set(patterns["ground_comparison"]["roles"]) != {"mountain", "facing"}
-        or set(patterns["ground_comparison"]["reference_numbers"]) != directions
+        or any((set(p["palace_sums"]) != directions for p in pairs))
+        or (set(patterns["parental_triples"]["palaces"]) != directions)
+        or (set(patterns["ground_comparison"]["roles"]) != {"mountain", "facing"})
+        or (set(patterns["ground_comparison"]["reference_numbers"]) != directions)
     ):
         raise ValueError("固定数式释义需要完整三对、九宫和两侧参照")
     roles = {"period": "历史运星", "mountain": "山星", "facing": "向星"}
     for index, pair in enumerate(structure["combination_of_ten"]):
-        left, right = pair["left_role"], pair["right_role"]
+        left, right = (pair["left_role"], pair["right_role"])
         evidence = "、".join(
-            f"{d}:{chart[left + '_chart'][d]}+{chart[right + '_chart'][d]}={total}"
-            for d, total in pair["palace_sums"].items()
+            (
+                f"{d}:{chart[left + '_chart'][d]}+{chart[right + '_chart'][d]}={total}"
+                for d, total in pair["palace_sums"].items()
+            )
         )
         statements.append(
             (
@@ -185,10 +185,12 @@ def _numeric_statements(chart: Dict[str, Any]) -> List[tuple[str, str, str]]:
             "替卦不适用此段下卦局名名单，对应状态未判定；未判定不等于数式不存在或不利"
         )
     endpoints = "、".join(
-        f"{roles[role]}在{named['endpoint_evidence'][key]['direction']}宫为{named['endpoint_evidence'][key]['star_number']}，固定地盘数{named['endpoint_evidence'][key]['ground_number']}"
-        for key, role in (
-            ("mountain_at_sitting", "mountain"),
-            ("facing_at_facing", "facing"),
+        (
+            f"{roles[role]}在{named['endpoint_evidence'][key]['direction']}宫为{named['endpoint_evidence'][key]['star_number']}，固定地盘数{named['endpoint_evidence'][key]['ground_number']}"
+            for key, role in (
+                ("mountain_at_sitting", "mountain"),
+                ("facing_at_facing", "facing"),
+            )
         )
     )
     statements.append(
@@ -236,9 +238,7 @@ def _opposite_statements(chart: Dict[str, Any]) -> List[tuple[str, str, str]]:
     return statements
 
 
-def build_natal_reading(
-    payload: Dict[str, Any], *, version: str = READING_VERSION
-) -> Dict[str, Any]:
+def build_natal_reading(payload: Dict[str, Any]) -> Dict[str, Any]:
     """Read every natal candidate and requested sublayer; never select the best.
 
     All field quotations are separate from the generated prose. A verifier can
@@ -261,13 +261,13 @@ def build_natal_reading(
                 "kind": kind,
                 "target_path": target,
                 "text": text,
-                "basis_paths": list(dict.fromkeys(quote(p) for p in [*paths, target])),
+                "basis_paths": list(
+                    dict.fromkeys((quote(p) for p in [*paths, target]))
+                ),
             }
         )
 
     try:
-        if version not in SUPPORTED_READING_VERSIONS:
-            raise ValueError("未支持的固定释义版本")
         root = "layers.xuankong_natal"
         natal = _get(payload, root)
         registered = {r["ruleset_id"]: r for r in payload["rulesets"]}
@@ -278,8 +278,10 @@ def build_natal_reading(
             if registered[key]["version"] not in allowed:
                 raise ValueError("未支持的规则版本")
             if record is not None and any(
-                record.get(field) != registered[key].get(field)
-                for field in ("ruleset_id", "version", "source_ids")
+                (
+                    record.get(field) != registered[key].get(field)
+                    for field in ("ruleset_id", "version", "source_ids")
+                )
             ):
                 raise ValueError("分支规则与来源登记不一致")
 
@@ -287,10 +289,7 @@ def build_natal_reading(
         comparison = natal.get("source_comparison")
         if comparison is not None:
             comparison_profile = comparison["ruleset"]["ruleset_id"]
-            if comparison_profile not in {
-                "shen_2011_lower_numeric_comparison_v1",
-                "shen_2011_natal_numeric_comparison_v2",
-            }:
+            if comparison_profile not in {"shen_2011_natal_numeric_comparison_v2"}:
                 raise ValueError("未支持的原书数字比较版本")
             require(comparison_profile, comparison["ruleset"])
             comparison_root = root + ".source_comparison"
@@ -340,23 +339,21 @@ def build_natal_reading(
                 f"{qualifier}{chart['candidate_id']}，历史{_period(chart['period_number'])}：历史当运山星在{distribution['mountain_period_star_direction']}，向星在{distribution['facing_period_star_direction']}，数字结构为{distribution['traditional_label']}。这不是当前旺衰或现场吉凶。",
                 [f"{root}.candidates.{index}"],
             )
-            if version != "1.0.0":
-                prefix = f"{qualifier}{chart['candidate_id']}，历史{_period(chart['period_number'])}、{ {'lower': '下卦', 'replacement': '替卦'}[chart['chart_mode']]}："
-                for kind, target, text in _numeric_statements(chart):
-                    add(
-                        kind,
-                        prefix + text,
-                        [f"{root}.candidates.{index}"],
-                        f"{root}.candidates.{index}.{target}",
-                    )
-                if version == "1.2.0":
-                    for kind, target, text in _opposite_statements(chart):
-                        add(
-                            kind,
-                            prefix + text,
-                            [f"{root}.candidates.{index}"],
-                            f"{root}.candidates.{index}.{target}",
-                        )
+            prefix = f"{qualifier}{chart['candidate_id']}，历史{_period(chart['period_number'])}、{ {'lower': '下卦', 'replacement': '替卦'}[chart['chart_mode']]}："
+            for kind, target, text in _numeric_statements(chart):
+                add(
+                    kind,
+                    prefix + text,
+                    [f"{root}.candidates.{index}"],
+                    f"{root}.candidates.{index}.{target}",
+                )
+            for kind, target, text in _opposite_statements(chart):
+                add(
+                    kind,
+                    prefix + text,
+                    [f"{root}.candidates.{index}"],
+                    f"{root}.candidates.{index}.{target}",
+                )
         if not charts:
             add(
                 "missing_natal",
@@ -415,7 +412,7 @@ def build_natal_reading(
                         [f"{ir}.candidates.{ci}", ir + ".current_period_context"],
                         f"{ir}.candidates.{ci}.palaces.{direction}",
                     )
-                    if version == "1.2.0" and (
+                    if (
                         interpretation.get("timeliness_ruleset", {}).get("version")
                         == "1.1.0"
                     ):
@@ -457,15 +454,15 @@ def build_natal_reading(
                         placement["purpose"]
                     ]
                     if placement["status"] == "unsupported":
-                        text = f"{candidate['candidate_id']}（历史{_period(candidate['natal_period_number'])}、评价{_period(current)}）的第{pi+1}项{purpose}用途：本有限床门规则不覆盖该用途，不能外推床门取用规则。"
+                        text = f"{candidate['candidate_id']}（历史{_period(candidate['natal_period_number'])}、评价{_period(current)}）的第{pi + 1}项{purpose}用途：本有限床门规则不覆盖该用途，不能外推床门取用规则。"
                     elif placement["status"] == "needs_location":
-                        text = f"{candidate['candidate_id']}（历史{_period(candidate['natal_period_number'])}、评价{_period(current)}）的第{pi+1}项{purpose}用途：全宅中心落宫未确认，朝向不能代替位置，未据此补出用途星数。"
+                        text = f"{candidate['candidate_id']}（历史{_period(candidate['natal_period_number'])}、评价{_period(current)}）的第{pi + 1}项{purpose}用途：全宅中心落宫未确认，朝向不能代替位置，未据此补出用途星数。"
                     else:
                         role = {"mountain": "山星", "facing": "向星"}[
                             placement["selected_star_role"]
                         ]
                         qualifier = "（仅候选）" if placement["candidate_only"] else ""
-                        text = f"{candidate['candidate_id']}（历史{_period(candidate['natal_period_number'])}、评价{_period(current)}）的第{pi+1}项{purpose}用途{qualifier}：落宫{placement['location_direction']}，本规则取{role}{placement['selected_star_number']}；{_condition_text(placement['external_form_condition'])}，不生成整体适用结论或移动许可。"
+                        text = f"{candidate['candidate_id']}（历史{_period(candidate['natal_period_number'])}、评价{_period(current)}）的第{pi + 1}项{purpose}用途{qualifier}：落宫{placement['location_direction']}，本规则取{role}{placement['selected_star_number']}；{_condition_text(placement['external_form_condition'])}，不生成整体适用结论或移动许可。"
                     add(
                         "placement_role",
                         text,
@@ -473,7 +470,7 @@ def build_natal_reading(
                         f"{ir}.candidates.{ci}.placement_findings.{pi}",
                     )
             host_guest = interpretation.get("host_guest_analysis")
-            if host_guest is not None and version == READING_VERSION:
+            if host_guest is not None and "1.2.0" == READING_VERSION:
                 require("shen_2011_host_guest_v1", host_guest["ruleset"])
                 hr = ir + ".host_guest_analysis"
                 add(
@@ -486,12 +483,7 @@ def build_natal_reading(
                     ],
                 )
                 for kind, target, text in host_guest_statements(host_guest):
-                    add(
-                        kind,
-                        text,
-                        [hr, root + ".candidates"],
-                        hr + "." + target,
-                    )
+                    add(kind, text, [hr, root + ".candidates"], hr + "." + target)
             fixed = interpretation.get("fixed_lingzheng_analysis")
             if fixed is not None:
                 require("shen_fixed_lingzheng_v1", fixed["ruleset"])
@@ -588,7 +580,7 @@ def build_natal_reading(
                     )
         return {
             "format_id": FORMAT,
-            "version": version,
+            "version": "1.2.0",
             "status": "rendered",
             "covered_layers": ["xuankong_natal"],
             "uncovered_layers": [
@@ -600,19 +592,15 @@ def build_natal_reading(
                 "whole_site_quality",
                 "free_model_prose",
                 "real_world_events",
-                *(
-                    [
-                        "ordinary_triples_usage",
-                        "seven_star_robbery",
-                        "authored_fortune_verdicts",
-                    ]
-                    if version != "1.0.0"
-                    else []
-                ),
+                *[
+                    "ordinary_triples_usage",
+                    "seven_star_robbery",
+                    "authored_fortune_verdicts",
+                ],
             ],
             "basis": basis,
             "statements": statements,
-            "text": "\n".join(s["text"] for s in statements),
+            "text": "\n".join((s["text"] for s in statements)),
             "scope": "fixed_templates_only_not_arbitrary_model_prose_or_real_world_prediction",
         }
     except (
@@ -625,7 +613,7 @@ def build_natal_reading(
     ) as exc:
         return {
             "format_id": FORMAT,
-            "version": version,
+            "version": "1.2.0",
             "status": "unsupported_context",
             "basis": {},
             "statements": [],

@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 from fatebridge.core.metaphysics.ziwei import build_ziwei_chart, build_ziwei_horoscope
 from fatebridge.core.ziwei_subperiods import decade_half
+from scripts.ziwei_conditional_inputs import synthetic_birth_clock
 
 if TYPE_CHECKING or __package__:
     from .audit_ziwei_limits import _seed
@@ -16,7 +17,7 @@ else:
     from audit_ziwei_limits import _seed
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures/ziwei_independent"
+FIXTURES = ROOT / "tests/data/ziwei_independent"
 
 
 def audit_subperiods(fixtures: Path = FIXTURES) -> dict[str, Any]:
@@ -48,7 +49,7 @@ def audit_subperiods(fixtures: Path = FIXTURES) -> dict[str, Any]:
         first, age = vector["first_age"], vector["given_age"]
         lo = first + (10 if age == first + 10 else 0)
         r = decade_half(
-            [dict(ganzhi="甲子", daxian=f"{lo}~{lo+9}")],
+            [dict(ganzhi="甲子", daxian=f"{lo}~{lo + 9}")],
             dict(status="not_started" if age < first else "computed", branch="子"),
             age,
         )
@@ -85,10 +86,12 @@ def audit_subperiods(fixtures: Path = FIXTURES) -> dict[str, Any]:
                 bureau_numbers.add(first)
                 for age in range(1, first + 120):
                     h = build_ziwei_horoscope(
-                        nominal_age_basis="legacy_mixed_clock",
+                        # These clocks supply only the conditional ordinal;
+                        # the natal rule chart remains the literal source input.
+                        birth_seed=synthetic_birth_clock(1901),
                         chart=c,
                         gender=gender,
-                        target_seed=_seed(year + age - 1),
+                        target_seed=_seed(1901 + age - 1),
                     )
                     evidence = h["ming_limit_subperiods"]
                     r = evidence["daxian"]
@@ -193,6 +196,7 @@ def audit_subperiods(fixtures: Path = FIXTURES) -> dict[str, Any]:
         observed_bureau_numbers=sorted(bureau_numbers),
         actual_star_joins_checked=joins,
         independent_calendar_or_placement_oracle=False,
+        synthetic_ordinal_clock_anchor_year=1901,
         xiaoxian_calendar_half_years_selected=0,
         full_traditional_judgments_evaluated=0,
         live_model_blind_evaluation="not_run",

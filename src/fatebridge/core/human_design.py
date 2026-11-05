@@ -12,44 +12,26 @@ from fractions import Fraction
 from typing import Any, Callable, Dict, Optional, Tuple
 
 from fatebridge.core.astro import runtime
-from fatebridge.core.astro.profiles import native_factor_model
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.human_design_apparent_positions import (
-    observed_coordinates,
     position_batch_id,
-    record_position_batch,
     register_chart,
 )
-from fatebridge.core.human_design_circuitry import circuitry_summary
-from fatebridge.core.human_design_classification import classification_evidence
 from fatebridge.core.human_design_depth import cross_identifier
 from fatebridge.core.human_design_mechanics import (
-    BODY_IDS,
-    CENTER_GATES,
-    CHANNELS,
-    GATE_CENTER,
-    GATE_ORDER,
-    MOTORS,
-    RULESET_ID,
-    RULESET_VERSION,
     VALID_PROFILES,
-    _components,
     _rational_activation,
     bodygraph,
     longitude_activation,
     opposite_activation,
     positions_at_tt,
 )
-from fatebridge.core.human_design_natal_sources import observe_native_source
-from fatebridge.core.human_design_provenance import position_flag_model
 from fatebridge.core.human_design_time import (
     epoch_context_at_tt,
     solve_design_epoch,
     solve_design_epoch_tt,
 )
 from fatebridge.core.human_design_variables import variables_from_activations
-from fatebridge.core.jpl_ephemeris import configured_jpl_file
-from fatebridge.utils.errors import EphemerisSourceError
 
 # Increasing tropical longitude. Gate 41 begins at 2 degrees Aquarius.
 # Gate pairs and circuit. Integration is kept distinct from Individual circuits.

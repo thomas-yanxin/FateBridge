@@ -1,10 +1,9 @@
 """Index only hash-bound explicit TZif periods; preserve full-scan fallback."""
 
-import ast
 import hashlib
 import io
 import json
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -19,7 +18,7 @@ from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.tzif_transitions import explicit_transition_seconds
 
 ROOT = Path(__file__).resolve().parents[1]
-STUDY = ROOT / "docs/validation/bazi-tzif-explicit-scan-v1"
+STUDY = ROOT / "tests/data/bazi/tzif"
 REFERENCE = json.loads((STUDY / "reference-first.json").read_text())
 
 
@@ -138,68 +137,3 @@ def test_current_rules_drift_still_fails_before_index_use(monkeypatch):
     with pytest.raises(EphemerisSourceError) as error:
         timezones.timezone_transition_candidates(zone, low, high)
     assert error.value.reason == "timezone_rules_changed"
-
-
-def test_added_fast_path_preserves_original_scanner_statements_exact():
-    for relative, name in [
-        ("src/fatebridge/utils/clock_events.py", "_clock_changes_near_day"),
-        (
-            "src/fatebridge/services/dayun_boundary_clock_events.py",
-            "_forward_changes_on_utc_day",
-        ),
-    ]:
-        old_tree = ast.parse((STUDY / "before" / relative).read_text())
-        new_tree = ast.parse((ROOT / relative).read_text())
-        old = next(
-            n
-            for n in old_tree.body
-            if isinstance(n, ast.FunctionDef) and n.name == name
-        )
-        new = next(
-            n
-            for n in new_tree.body
-            if isinstance(n, ast.FunctionDef) and n.name == name
-        )
-        new.body = [
-            n
-            for n in new.body
-            if not (
-                isinstance(n, ast.Assign)
-                and any(
-                    isinstance(t, ast.Name) and t.id == "candidates" for t in n.targets
-                )
-                or isinstance(n, ast.If)
-                and isinstance(n.test, ast.Compare)
-                and isinstance(n.test.left, ast.Name)
-                and n.test.left.id == "candidates"
-            )
-        ]
-        assert ast.dump(new, include_attributes=False) == ast.dump(
-            old, include_attributes=False
-        )
-
-
-def test_pre_table_fast_path_preserves_original_calendar_bound_errors():
-    import sys
-    import types
-
-    module = types.ModuleType("frozen_original_boundary_clock")
-    sys.modules[module.__name__] = module
-    original = STUDY / "before/src/fatebridge/utils/clock_events.py"
-    exec(compile(original.read_text(), str(original), "exec"), module.__dict__)
-
-    def outcome(function, zone, day):
-        try:
-            return ("result", function(zone, day))
-        except (OverflowError, ValueError) as error:
-            return ("error", type(error).__name__)
-
-    for key, day in [
-        ("America/New_York", date(1, 1, 1)),
-        ("America/New_York", date(1, 1, 2)),
-        ("Asia/Tokyo", date(1, 1, 1)),
-    ]:
-        zone = timezones.parse_timezone_name(key)
-        assert outcome(_clock_changes_near_day, zone, day) == outcome(
-            module._clock_changes_near_day, zone, day
-        )

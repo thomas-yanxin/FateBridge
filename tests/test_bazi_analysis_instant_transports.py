@@ -9,10 +9,13 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import suggested_fields
 from fatebridge.core.reproducibility import BAZI_ANALYSIS_CLOCK_TOOLS
-from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
+
+rest = _shared_rest
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_analysis_instant_v1"
+FIXTURE = ROOT / "tests/data/bazi_analysis_instant_v1"
 PROTOCOL = json.loads((FIXTURE / "protocol.json").read_text())
 WITNESSES = json.loads((FIXTURE / "date-side-witnesses.json").read_text())
 BIRTH = PROTOCOL["cases"][0]["input"]

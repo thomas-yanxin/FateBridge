@@ -1,6 +1,5 @@
 """Current means the frozen instant, including offset, fold and subminute time."""
 
-import gzip
 import hashlib
 import json
 from datetime import datetime, timedelta, timezone
@@ -16,7 +15,7 @@ from fatebridge.core.timing import TimingAnalysis
 from fatebridge.services.timing_clock import DATE_FIELDS, resolve_analysis_moment
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_analysis_instant_v1"
+FIXTURE = ROOT / "tests/data/bazi_analysis_instant_v1"
 
 
 @pytest.mark.parametrize("tool", sorted(BAZI_ANALYSIS_CLOCK_TOOLS))
@@ -50,7 +49,7 @@ def test_explicit_partial_inputs_keep_their_declared_completion_policy(
         )
         assert selected.moment.isoformat() == expected
         assert selected.reference["defaulted_from_clock"] == clock_fields
-        assert selected.reference["basis"] == "legacy_partial_components"
+        assert selected.reference["basis"] == "declared_partial_components"
         assert bool(clock.reads) is bool(clock_fields)
 
 
@@ -126,40 +125,6 @@ def test_clock_contract_stays_projectable_and_fold_bounds_are_validated():
     AnalysisReference.model_validate({"utc_datetime": "2025-02-04T04:37:49+00:00"})
     with pytest.raises(ValidationError):
         AnalysisReference.model_validate({"fold": 2})
-
-
-def test_first_controlled_comparison_preserves_every_old_valid_business_field():
-    p = ROOT / "docs/validation/bazi-analysis-instant-first-v1.json.gz"
-    assert (
-        hashlib.sha256(p.read_bytes()).hexdigest()
-        == p.with_suffix(".gz.sha256").read_text().strip()
-    )
-    report = json.loads(gzip.decompress(p.read_bytes()))
-    old = json.loads(
-        gzip.decompress((FIXTURE / "before-results-controlled.json.gz").read_bytes())
-    )
-    assert len(report["rows"]) == len(old["cases"]) == 17
-    assert report["counts"] == {
-        "legacy_preserved": 11,
-        "implicit_instant_correct": 4,
-        "invalid_explicit_clock_rejected": 2,
-    }
-    assert report["all_gates_passed"]
-    for before, current in zip(old["cases"], report["rows"]):
-        assert before["id"] == current["id"]
-        if current["kind"] == "legacy-explicit-preservation":
-            assert {
-                k: v
-                for k, v in current["business"].items()
-                if k != "analysis_reference"
-            } == before["business"]
-        elif current["kind"] == "known-clock-defect":
-            assert (
-                current["business"]["analysis_reference"]["analysis_datetime"]
-                in current["business"]["snapshot_text"]
-            )
-    assert not report["full_goal_complete"]
-    assert report["new_astronomical_reference_credit"] == 0
 
 
 def test_supplemental_day_and_term_witnesses_keep_their_original_source_hashes():

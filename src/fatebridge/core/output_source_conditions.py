@@ -49,11 +49,8 @@ class SourcePageAnchor(PartialOutput):
 
 
 class SourceConditionProvenance(PartialOutput):
-    method_id: Optional[Literal["original19_source_conditions_public_v1"]] = None
+    method_id: Optional[Literal["registered_source_conditions_v1"]] = None
     condition_layer_sha256: Optional[str] = None
-    registered_review_sha256: Optional[str] = None
-    registered_review_row_sha256: Optional[str] = None
-    parent_index_record_sha256: Optional[str] = None
 
 
 class SourceConditionReview(PartialOutput):

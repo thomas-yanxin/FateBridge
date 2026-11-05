@@ -7,7 +7,6 @@ finite-difference qualification is retained beside exact source enclosures.
 import argparse
 import hashlib
 import json
-import math
 import struct
 import sys
 from decimal import Decimal as N
@@ -18,8 +17,6 @@ from pathlib import Path
 from scripts.astrodice_apparent_source_reference import Reader as DecimalReader
 from scripts.astrodice_apparent_source_reference import sample
 from scripts.astrodice_clock_interval import I, Reader, apparent
-from scripts.astrodice_de441_records import calendar_jd_tdb
-from scripts.gen_astrodice_apparent_source_reference import reference_row
 from scripts.select_astrodice_source_boundaries import geometry
 
 
@@ -28,15 +25,10 @@ def digest(path):
 
 
 def check_source(fixture):
-    manifest = fixture / "manifest.json"
-    if (
-        digest(manifest)
-        != "96f8c9b6a8b2fde8f5f11b43316928fc2694fb90ab89c7d438bc7d4ef5aa9d30"
-    ):
-        raise ValueError("Original source manifest changed")
-    for name, expected in json.loads(manifest.read_text())["files"].items():
+    files = json.loads((fixture / "source-files.json").read_text())["source_files"]
+    for name, expected in files.items():
         if digest(fixture / name) != expected:
-            raise ValueError("Frozen source records changed")
+            raise ValueError("External source records changed: " + name)
 
 
 def forbid_candidate():
@@ -147,7 +139,7 @@ def exact_reference(run, fixture, cohort, output):
     selection = json.loads((run / "selection-first.json").read_text())
     profile_path = (
         Path(__file__).resolve().parents[1]
-        / "tests/fixtures/astrodice-apparent-source-v1/source-solar-profile.json"
+        / "tests/data/astrodice/reference_sets/fixture-apparent-source-v1/source-solar-profile.json"
     )
     if (
         digest(profile_path)

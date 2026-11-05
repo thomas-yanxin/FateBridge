@@ -6,8 +6,6 @@ from tests.test_agentic_nested_outputs import business
 from tests.test_liuyao_clash_transports import all_surfaces
 from tests.test_liuyao_transports import assert_same_run_receipt
 
-pytest_plugins = ["tests.test_agentic_nested_outputs"]
-
 
 @pytest.mark.parametrize(
     "day,base,changed,source,target,can_generate,benefit",

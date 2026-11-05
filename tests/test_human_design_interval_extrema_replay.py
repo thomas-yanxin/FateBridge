@@ -1,6 +1,5 @@
 """Actual small candidate receipts reject rehashed probe and reading forgeries."""
 
-import gzip
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -8,21 +7,18 @@ from unittest.mock import patch
 
 import pytest
 
-from fatebridge.core.human_design_sensitivity import LEGACY_METHOD
 from fatebridge.services.replay_metadata import digest
 from fatebridge.validation.human_design import verify_human_design_reading
 from fatebridge.validation.human_design_sampling import verify_sampled_interval
-
-E = (
-    Path(__file__).resolve().parents[1]
-    / "docs/validation/human-design-interval-coordinate-extrema-v1/evidence"
-)
+from tests.human_design_current import complete_run
 
 
 @pytest.fixture(scope="module")
 def complete():
-    with gzip.open(E / "wheel-final-rest.json.gz", "rt") as source:
-        return json.load(source)
+    inputs = json.loads(
+        (Path(__file__).parent / "data/human_design/regression-inputs.json").read_text()
+    )
+    return complete_run(**inputs["interval_extrema"])
 
 
 def rehash(value):
@@ -52,10 +48,6 @@ def test_actual_selected_probe_all_samples_and_explanation_replay_without_native
         == report["sampling"]["total_evaluation_count"]
     )
     assert report["station_coordinate_extremum_assessment"]["probe_count"] == 1
-    assert (
-        complete["run_metadata"]["contract_sha256"]
-        == "410a32d4ebddb1cbad641450b5b4701d00e037dbb6729046bedf3b73ea82f52b"
-    )
 
 
 @pytest.mark.parametrize(
@@ -107,7 +99,7 @@ def test_rehash_cannot_forge_or_remove_coordinate_evidence_or_downgrade(
     elif fault == "summary_downplay":
         report["summary"]["coordinate_extremum_probes"] = 0
     elif fault == "legacy_downgrade":
-        report["method_id"] = LEGACY_METHOD
+        report["method_id"] = "unsupported_interval_method"
     elif fault == "unknown_method":
         report["method_id"] = "unknown_method"
     rehash(value)

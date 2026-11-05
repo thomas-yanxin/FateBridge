@@ -9,7 +9,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/taiyi_jinjing_v33"
-FREEZE_SHA256 = "19cc09ec2f5d5f6fe0dd70e4e8aa47ca9c8c32aad4e182d169bcce10535ac711"
+FREEZE_SHA256 = "993b493c3a698a9987e6c13899a74d706d0818bafa51d8a736295a9dfac47408"
 
 
 def read_origin_sources(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:

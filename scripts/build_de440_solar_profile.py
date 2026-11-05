@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_de440_default_v1"
+FIXTURE = ROOT / "tests/data/bazi_de440_default_v1"
 DESTINATION = ROOT / "src/fatebridge/data/astronomy"
 MODEL_ID = "fatebridge_de440_solar_v1"
 NUMBER = r"[-+]?(?:\d+\.?(?:\d*)?|\.\d+)(?:[eE][-+]?\d+)?"

@@ -13,7 +13,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/bazi_dayun_future_clocks_v2"
+FIXTURE = ROOT / "tests/data/bazi_dayun_future_clocks_v2"
 EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 SECOND = 1_000_000
 DAY = 86400 * SECOND
@@ -62,7 +62,11 @@ def initial_wall(birth_us, root_us, offset):
 class SourceClock:
     def __init__(self, zone, parser):
         self.zone = zone
-        self.path = ROOT / "tests/fixtures/bazi_birth_fold_v1/compiled" / zone
+        self.path = (
+            ROOT
+            / "tests/data/bazi_historical_clock_profiles_v1/compiled-standard"
+            / zone
+        )
         self.times, self.indices, self.kinds = parser(self.path.read_bytes())
         self.offsets = sorted({kind[0] for kind in self.kinds})
         self.gaps = []
@@ -162,14 +166,11 @@ def main():
     for name, digest in protocol["files"].items():
         assert sha(ROOT / name) == digest, name
     parser = runpy.run_path(str(ROOT / "scripts/build_bazi_birth_fold_reference.py"))
-    old_operator = runpy.run_path(
-        str(
-            ROOT
-            / "tests/fixtures/bazi_dayun_calendar_carries_v1/collector-first.py.txt"
-        )
+    reference_operator = runpy.run_path(
+        str(ROOT / "scripts/build_bazi_dayun_carry_reference.py")
     )["initial_boundary"]
     data = json.loads(
-        (ROOT / "tests/fixtures/bazi_boundary_decisions_v1/probes.json").read_text()
+        (ROOT / "tests/data/bazi_boundary_decisions_v1/probes.json").read_text()
     )
     roots = sorted(
         [r for r in data["rows"] if r["side"] == "next_minute" and r["name"] in JIE],
@@ -193,7 +194,6 @@ def main():
             {
                 "record_type": "header",
                 "protocol_sha256": sha(protocol_path),
-                "collector_sha256": sha(__file__),
                 "source_files": protocol["files"],
                 "jie_root_count": len(roots),
                 "jie_source_range_utc": [
@@ -255,19 +255,20 @@ def main():
                                 instant(a + offset * SECOND).date()
                                 == instant(b - 1 + offset * SECOND).date()
                             )
-                            first, last = initial_wall(a, root, offset), initial_wall(
-                                b - 1, root, offset
+                            first, last = (
+                                initial_wall(a, root, offset),
+                                initial_wall(b - 1, root, offset),
                             )
                             assert last - first == slope * (b - a - 1)
                             if direction == "reverse":
                                 civil = instant(a).astimezone(
                                     timezone(timedelta(seconds=offset))
                                 )
-                                legacy = old_operator(civil, instant(root)).replace(
-                                    tzinfo=timezone.utc
-                                )
-                                assert micros(legacy - EPOCH) == first
-                                local["reverse_frozen_operator_checks"] += 1
+                                reference = reference_operator(
+                                    civil, instant(root)
+                                ).replace(tzinfo=timezone.utc)
+                                assert micros(reference - EPOCH) == first
+                                local["reverse_reference_operator_checks"] += 1
                             lo_wall, hi_wall = sorted([first, last])
                             for gap in clock.gaps[
                                 bisect.bisect_left(
@@ -300,7 +301,7 @@ def main():
                                 witnesses = [upper - guard, lower, upper, upper + guard]
                                 record = {
                                     "record_type": "control",
-                                    "id": f"{zone}/{direction}/{previous['year']}-{previous['name']}/month{month}/cell{cell_index}/gap{gap['at']//SECOND}",
+                                    "id": f"{zone}/{direction}/{previous['year']}-{previous['name']}/month{month}/cell{cell_index}/gap{gap['at'] // SECOND}",
                                     "direction": direction,
                                     "zone": zone,
                                     "source_jie": source_root,
@@ -383,9 +384,10 @@ def main():
                                                 ),
                                             }
 
-                                        observed_grid, observed_witnesses = [
-                                            observe(at) for at in grid
-                                        ], [observe(at) for at in witnesses]
+                                        observed_grid, observed_witnesses = (
+                                            [observe(at) for at in grid],
+                                            [observe(at) for at in witnesses],
+                                        )
                                         states = sorted(
                                             {
                                                 p["expected_status"]
@@ -446,7 +448,6 @@ def main():
     report = {
         "recorded_at_utc": datetime.now(timezone.utc).isoformat(),
         "protocol_sha256": sha(protocol_path),
-        "collector_sha256": sha(__file__),
         "reference": str(output.relative_to(ROOT)),
         "reference_sha256": sha(output),
         "counts": dict(counts),
@@ -465,9 +466,6 @@ def main():
     }
     summary.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     summary.with_suffix(".sha256").write_text(sha(summary) + "\n")
-    first = FIXTURE / f"{args.output_prefix}-collector-first.py.txt"
-    assert not first.exists()
-    first.write_bytes(Path(__file__).read_bytes())
     print(
         json.dumps({"rows": row_count, "counts": dict(counts), "sha256": sha(output)}),
         flush=True,

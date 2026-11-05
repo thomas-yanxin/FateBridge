@@ -15,7 +15,7 @@ from fatebridge.core.astro.house_axes import canonical_house_geometry
 from fatebridge.core.astro.zodiac import native_lahiri_houses
 from fatebridge.core.predictive.native_chart import build_native_subject
 
-FIXTURE = Path(__file__).parent / "fixtures/western-placidus-semiarc-v1"
+FIXTURE = Path(__file__).parent / "data/astro/placidus_semiarc"
 CASES = json.loads((FIXTURE / "inputs.json").read_text())["cases"]
 PUBLIC = json.loads((FIXTURE / "public-boundary-inputs.json").read_text())["cases"]
 

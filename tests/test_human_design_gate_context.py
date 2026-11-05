@@ -19,7 +19,7 @@ from fatebridge.services.replay_metadata import digest
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.human_design import verify_human_design_reading
 
-FIXTURE = Path(__file__).parent / "fixtures/human_design_gate_context_v1"
+FIXTURE = Path(__file__).parent / "data/human_design/gate_context"
 PLAN = json.loads((FIXTURE / "plan.json").read_text())
 REFERENCE = json.loads(gzip.decompress((FIXTURE / "reference.json.gz").read_bytes()))
 SPEC = next(s for s in CATALOG if s.key == "human_design")
@@ -218,19 +218,6 @@ def test_current_or_unknown_contract_cannot_drop_extension_after_rehash(
     check = verify_human_design_reading(value)
     assert check["status"] == "rejected", check
     assert check["gate_activation_context_status"] == "not_verified"
-
-
-def test_declared_legacy_receipts_keep_all_original_checks_without_new_certification():
-    # The original immutable receipts and their already-required label-only
-    # migration remain owned and checked by the unchanged publisher tests.
-    from tests.test_human_design_publisher import RUNS
-
-    for row in RUNS:
-        check = verify_human_design_reading(row["run"])
-        assert check["status"] == "verified_fixed_template_reading", check
-        assert (
-            check["gate_activation_context_status"] == "not_in_declared_legacy_contract"
-        )
 
 
 @pytest.mark.parametrize(

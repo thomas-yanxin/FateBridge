@@ -4,7 +4,8 @@ import asyncio
 
 import pytest
 
-from tests.test_agentic_nested_outputs import AS_OF, call_cli, inputs, native, rest
+from tests.test_agentic_nested_outputs import AS_OF, call_cli, inputs, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 from tests.test_bazi_birth_seconds import BASE, SPECS
 from tests.test_bazi_birth_seconds_transports import leaf, receipt_path
 
@@ -14,6 +15,9 @@ def omitted_payload(spec):
     result.pop("birth_minute", None)
     result.pop("birth_second", None)
     return result
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("spec", SPECS, ids=lambda s: s.key)

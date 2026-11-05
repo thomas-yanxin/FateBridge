@@ -29,7 +29,6 @@ from fatebridge.validation.meihua_weather_policy_v2 import canonical_sha256
 from fatebridge.validation.meihua_weather_policy_v3 import scope_aware_weather_label
 from fatebridge.validation.meihua_weather_reachability import (
     CONTROL_SHA256,
-    POLICY_SOURCE_SHA256,
     PROFILE_SHA256,
     TRACE_KEYS,
 )
@@ -39,6 +38,11 @@ from fatebridge.validation.meihua_weather_solar_binding import (
 from fatebridge.validation.meihua_weather_trace_binding import STUDY_PINS
 
 SEASONS = (None, "spring", "summer", "autumn", "winter")
+# Original context-capacity protocol pin; retained byte-for-byte after the
+# reachability auditor stopped owning this separate source-code constraint.
+POLICY_SOURCE_SHA256 = (
+    "03589e8c0efff28e9623ba46e39fa7612357d674125c21cf18c217a2739a8045"
+)
 PRIORS = (None, "prolonged_rain", "prolonged_clear", "neither_prolonged")
 THRESHOLDS = (None, 2, 3, 4, 5, 6)
 _LABELS = frozenset({"rain", "dry", "abstain"})

@@ -32,14 +32,14 @@ TOPIC_BLOCKS: dict[str, dict[str, str]] = {
     "career": {
         "dominant_ten_gods": "top_gods mapping_scope weighted_counts counting_basis tied_primary_gods primary_selection primary_career_type",
         "industry_analysis": "favorable_elements conditional_elements reference_scope mapping_status recommended_industries avoid_industries element_distribution",
-        "career_structure": "score score_kind scope formation_status rule_signals unverified_conditions interpretation_scope score_basis level legacy_level notes",
-        "entrepreneurship": "score weighted_counts partial_star_weight normal_star_weight score_kind scope formation_status rule_signals unverified_conditions score_basis tendency legacy_tendency notes",
+        "career_structure": "score score_kind scope formation_status rule_signals unverified_conditions interpretation_scope score_basis level notes",
+        "entrepreneurship": "score weighted_counts partial_star_weight normal_star_weight score_kind scope formation_status rule_signals unverified_conditions score_basis tendency notes",
         "career_timing": "timing_signals",
         "noble_direction": "favorable_directions conditional_elements reference_scope mapping_status",
     },
     "wealth": {
         "wealth_stars": "positions zheng_wealth_weight pian_wealth_weight total_weight visibility",
-        "wealth_structure": "day_master_strength wealth_strength pattern legacy_pattern formation_status score_kind score_basis wealth_strength_kind score level notes",
+        "wealth_structure": "day_master_strength wealth_strength pattern formation_status score_kind score_basis wealth_strength_kind score level notes",
         "wealth_storage": "has_storage storage_hits summary effect_status source_ref",
         "wealth_style": "primary_style recommendations",
         "wealth_direction": "wealth_element direction note",

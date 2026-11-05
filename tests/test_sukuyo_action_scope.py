@@ -14,7 +14,7 @@ from fatebridge.core.sukuyo_lower import source_bundle as mansion_bundle
 from fatebridge.core.sukuyo_lower_methods import source_bundle as method_bundle
 
 PRIMARY = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-action-scope-primary.json").read_bytes()
+    (Path(__file__).parent / "data/sukuyo-action-scope-primary.json").read_bytes()
 )
 
 

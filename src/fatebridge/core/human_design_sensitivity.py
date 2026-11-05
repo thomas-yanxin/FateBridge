@@ -29,7 +29,6 @@ GRID_STEP_SECONDS = 10
 STATION_BRACKET_SECONDS = 0.01
 SIDES = ("personality", "design")
 DERIVED_BODIES = {"Earth", "SouthNode"}
-LEGACY_METHOD = "human_design_continuous_TT_sampled_interval_v1"
 METHOD = "human_design_continuous_TT_coordinate_interval_v2"
 
 
@@ -116,7 +115,6 @@ def assess_birth_interval(
     *,
     require_swiss_files: bool = False,
     _chart_reader: Callable[[float], dict[str, Any]] | None = None,
-    _coordinate_extrema: bool = True,
 ) -> dict[str, Any]:
     if type(plus_minus_minutes) is not int or not 1 <= plus_minus_minutes <= 60:
         raise ValueError("人类图生时范围必须为1至60个整数分钟")
@@ -195,44 +193,39 @@ def assess_birth_interval(
                     }
                 )
 
-    # Complete the legacy observation prefix before any supplementary reads.
-    # Cached native coordinates and all historical v1 receipts remain intact.
     coordinate_assessment = None
-    if _coordinate_extrema:
-        for side in SIDES:
-            for body in (
-                a["body"]
-                for a in nominal["activations"][side]
-                if a["body"] not in DERIVED_BODIES
-            ):
-                for component in zero_speed_components(grid, side, body, activation):
-                    coordinate_candidates.append(component)
-                    tt = component["seed_birth_jd_tt"][0]
-                    chart = at(tt)
-                    a = activation(tt, side, body)
-                    stations.append(
-                        {
-                            "side": side,
-                            "body": body,
-                            "status": "sampled_zero_speed_component_candidate",
-                            **_witness(chart),
-                            "activation_jd_tt": chart["time_scales"][side]["jd_tt"],
-                            "longitude": a["longitude"],
-                            "longitude_speed": a["longitude_speed"],
-                            "ephemeris_model": a["ephemeris_model"],
-                            "birth_bracket_width_seconds": (
-                                component["coarse_bracket_jd_tt"][1]
-                                - component["coarse_bracket_jd_tt"][0]
-                            )
-                            * 86400,
-                            "observed_zero_component_jd_tt": component[
-                                "observed_zero_component_jd_tt"
-                            ],
-                        }
-                    )
-        coordinate_assessment = probe_station_coordinates(
-            coordinate_candidates, at, cache
-        )
+    for side in SIDES:
+        for body in (
+            a["body"]
+            for a in nominal["activations"][side]
+            if a["body"] not in DERIVED_BODIES
+        ):
+            for component in zero_speed_components(grid, side, body, activation):
+                coordinate_candidates.append(component)
+                tt = component["seed_birth_jd_tt"][0]
+                chart = at(tt)
+                a = activation(tt, side, body)
+                stations.append(
+                    {
+                        "side": side,
+                        "body": body,
+                        "status": "sampled_zero_speed_component_candidate",
+                        **_witness(chart),
+                        "activation_jd_tt": chart["time_scales"][side]["jd_tt"],
+                        "longitude": a["longitude"],
+                        "longitude_speed": a["longitude_speed"],
+                        "ephemeris_model": a["ephemeris_model"],
+                        "birth_bracket_width_seconds": (
+                            component["coarse_bracket_jd_tt"][1]
+                            - component["coarse_bracket_jd_tt"][0]
+                        )
+                        * 86400,
+                        "observed_zero_component_jd_tt": component[
+                            "observed_zero_component_jd_tt"
+                        ],
+                    }
+                )
+    coordinate_assessment = probe_station_coordinates(coordinate_candidates, at, cache)
 
     transitions = refine_joint_transitions(cache, at)
     samples = [cache[jd] for jd in sorted(cache)]
@@ -289,7 +282,7 @@ def assess_birth_interval(
     result = {
         "status": "grid_and_station_candidates_compared",
         "evaluation_witnesses": pack_sample_witnesses(samples),
-        "method_id": METHOD if _coordinate_extrema else LEGACY_METHOD,
+        "method_id": METHOD,
         "plus_minus_minutes": plus_minus_minutes,
         "node_mode": node_mode,
         "interval": {

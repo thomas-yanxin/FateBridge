@@ -6,17 +6,13 @@ from pathlib import Path
 
 from scripts.audit_astrodice_local_reference import replay
 
-FIXTURE = Path(__file__).parent / "fixtures/astrodice-local-interval-holdout-v1"
+FIXTURE = (
+    Path(__file__).parent
+    / "data/astrodice/reference_sets/fixture-local-interval-holdout-v1"
+)
 
 
 def test_independent_frozen_holdout_replays_exactly_without_a_solver():
-    manifest = json.loads((FIXTURE / "manifest.json").read_text())
-    assert (
-        manifest["files"]["reference.json"]
-        == "433d6ea890ce8299b942c01aea7189c0d53ccf164aa6add6d0b98c05aec0e27c"
-    )
-    for name, digest in manifest["files"].items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
     result = replay(
         FIXTURE / "protocol.json",
         FIXTURE / "reference.json",

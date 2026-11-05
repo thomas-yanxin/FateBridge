@@ -1,7 +1,7 @@
 name: onda-fengshui
-version: 0.6.0
+version: 0.8.0
 scenario: 居住与工作空间
-summary: 按空间事实和有来源的规则解释现状与候选，说明可保留、条件式与未覆盖部分
+summary: 按空间事实和有来源的规则解释现状；支持实测工位几何与有限候选，保留条件、失败和覆盖范围
 consultation:
   kind: topic
   topics:

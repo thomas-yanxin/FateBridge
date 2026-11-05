@@ -12,7 +12,7 @@ from fatebridge.core.sukuyo_printed_special import NTU_YONGLE_SOURCE
 from fatebridge.core.sukuyo_sources import load_source
 from fatebridge.core.sukuyo_special_days import special_day_evidence
 
-FIXTURE = Path(__file__).parent / "fixtures/sukuyo-ntu-yongle130-selected-v1.json"
+FIXTURE = Path(__file__).parent / "data/sukuyo-ntu-yongle130-selected-v1.json"
 MANSIONS = "角亢氐房心尾箕斗女虚危室壁奎娄胃昴毕觜参井鬼柳星张翼轸"
 
 

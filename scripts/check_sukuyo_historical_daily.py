@@ -26,7 +26,7 @@ def verify_daily_controls() -> dict:
     from fatebridge.core.sukuyo_historical_calendar import date_reference
 
     files, manifest = read_fixture(
-        ROOT / "tests/fixtures/sukuyo_historical_daily_controls_v1"
+        ROOT / "tests/data/sukuyo_historical_daily_controls_v1"
     )
     naoj_count = 0
     hutime_count = 0

@@ -54,6 +54,22 @@ def test_same_name_models_and_output_overrides_have_independent_contracts():
     )
 
 
+def test_registered_method_semantics_are_part_of_replay_contract_identity():
+    from dataclasses import replace
+
+    from fatebridge.core.method_contracts import LIFE_DIMENSION_INDEX
+
+    class Request(BaseModel):
+        value: int
+
+    current = contract_fingerprint(Request, None, methods=(LIFE_DIMENSION_INDEX,))
+    changed = replace(
+        LIFE_DIMENSION_INDEX, comparison_requirements=("different layers",)
+    )
+    assert current != contract_fingerprint(Request, None, methods=(changed,))
+    assert current != contract_fingerprint(Request, None)
+
+
 def test_concurrent_cold_calls_generate_one_schema_per_model():
     class Counted(BaseModel):
         value: int

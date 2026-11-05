@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "tests/fixtures/analytic_solar_v23"
+SOURCE = ROOT / "tests/data/solar/erfa-2.0.1"
 DESTINATION = ROOT / "src/fatebridge/data/astronomy/analytic-solar-v1.json"
 NUMBER = r"[-+]?(?:\d+\.?(?:\d*)?|\.\d+)(?:[eE][-+]?\d+)?"
 

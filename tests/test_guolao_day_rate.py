@@ -43,7 +43,6 @@ def test_original_images_and_complete_literal_transcription_are_pinned():
     )
     assert digest == hashlib.sha256(rate.DATA.read_bytes()).hexdigest()
     assert not reference["independent_second_collator"]
-    assert len(json.loads((FIXTURE / "before-96-cli-stdout.json").read_text())) == 96
 
 
 def test_all_rate_discrepancies_and_boundary_discontinuities_remain_visible():

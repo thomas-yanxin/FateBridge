@@ -76,3 +76,7 @@
 WOFS桌面内容仅在 `workstation_analysis.non_btb_desktop_reference` 中作为带来源参考，`placement_rules_enabled=false`；不注册其方位摆放、龙虎高低、手机方向或水晶球规则。BTB 仍需明确另选；这些规则不自动触发 BTB。
 
 三个入口均可读取示例 JSON：REST POST /api/fengshui/assess；MCP `fengshui_assess`；CLI `fatebridge fengshui_assess --request-file`。严格字段投影按本次实际存在的分支选择。
+
+## 有实际尺寸的工位
+
+原观察入口及旧 WOFS 参考分支保持原范围。新的 `workstation_layout` 支持人工标注几何、工位条件及有限候选，另可显式选择 `wofs_desktop_compass_v1`，见[实测工位](measured-workstation.md)。不能因旧参考分支的 `placement_rules_enabled=false` 否定新显式版本，也不能反过来认为旧分支自动启用了摆放。

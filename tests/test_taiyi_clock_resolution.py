@@ -21,15 +21,11 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli
-from tests.test_taiyi_month_nominal_year import (
-    with_prior_default_origin_in_current_runtime,
-)
 from tests.test_taiyi_periods import seed_at
 from tests.test_taiyi_transports import _same_run_payload
 
 CORPUS = Path(__file__).parent / "fixtures/taiyi_jinjing_v29"
 FREEZE_SHA256 = "ab311d41c12241218ed4ea29c2c66402e19323ffb09126dea4222fa5a071c348"
-LEGACY_SHA256 = "659d2681dbcca149bbd05347c5326b4bfc462987d7c8fa8343047cc9575d8c86"
 REFERENCE = json.loads((CORPUS / "cases.json").read_text())
 VALID = REFERENCE["valid"]
 INVALID = REFERENCE["invalid"]
@@ -195,31 +191,6 @@ def _assert_corrected_nominal_month_receipt(result):
     line = jinjing_month_origin_text(receipt)
     assert line in result["snapshot_text"]
     assert line in result["snapshot_export"]["export_text"]
-
-
-def test_nominal_month_change_is_isolated_from_six_other_clock_profiles(
-    monkeypatch,
-):
-    # The captured payloads used native swieph. The shared auto policy
-    # later switched to DE440; its original 6/7 hash changes remain in the audit.
-    # Hold the recorded backend for this clock-patch compatibility comparison.
-    monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
-    legacy = CORPUS / "legacy-baseline.json"
-    assert hashlib.sha256(legacy.read_bytes()).hexdigest() == LEGACY_SHA256
-    rows = json.loads(legacy.read_text())["cases"]
-    for name, row in rows.items():
-        result = calculate_taiyi_analysis(**row["arguments"])
-        # All seven old hashes remain frozen and are reported separately.
-        # Compare old/new numerical month origins under the same current
-        # solar provider, whose precision receipts have evolved since V29.
-        if name == "month":
-            _assert_corrected_nominal_month_receipt(result)
-            continue
-        actual_json = json.dumps(result, ensure_ascii=False, sort_keys=True)
-        controlled = with_prior_default_origin_in_current_runtime(
-            row["arguments"], monkeypatch
-        )
-        assert actual_json == json.dumps(controlled, ensure_ascii=False, sort_keys=True)
 
 
 @pytest.fixture

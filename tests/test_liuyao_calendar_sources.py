@@ -19,9 +19,9 @@ from fatebridge.core.ephemeris_runtime import (
 from fatebridge.core.solar_term_runtime import solar_term_cache_context
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.test_agentic_nested_outputs import SPECS, call_cli, native
+from tests.test_agentic_nested_outputs import rest as rest
 from tests.test_liuyao_clash_transports import all_surfaces
 
-pytest_plugins = ["tests.test_agentic_nested_outputs"]
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
@@ -146,7 +146,8 @@ def test_observed_selector_change_discards_partial_year(monkeypatch):
     terms = almanac.get_solar_terms_for_year(2026, "UTC")
     assert len(calls) > 24
     assert all(
-        t.moment == almanac._solar_term_utc_via_linear(2026, i) + timedelta(seconds=1)
+        t.moment
+        == almanac._solar_term_search_anchor_utc(2026, i) + timedelta(seconds=1)
         for i, t in enumerate(terms)
     )
 
@@ -224,9 +225,10 @@ def test_derived_year_and_month_cache_follow_loaded_clock_profile(monkeypatch):
 def test_real_limited_de441_kernel_against_reused_de440_tt_reference(
     monkeypatch, name, target, anchor
 ):
-    monkeypatch.setenv("SE_EPHE_PATH", str(FIXTURES))
-    configure_ephemeris_path(str(FIXTURES))
-    monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "astrodice-de441-j2000.eph")
+    kernel_dir = Path(__file__).parent / "data/astrodice/tables"
+    monkeypatch.setenv("SE_EPHE_PATH", str(kernel_dir))
+    configure_ephemeris_path(str(kernel_dir))
+    monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "de441-j2000.eph")
     provenance = {}
     root = almanac._solar_term_utc_via_swe(
         2000, target, datetime(2000, 1, anchor, tzinfo=timezone.utc), provenance
@@ -234,7 +236,9 @@ def test_real_limited_de441_kernel_against_reused_de440_tt_reference(
     row = next(
         r
         for r in json.loads(
-            (FIXTURES / "bazi_all_terms_v1/reference.json").read_text()
+            (
+                Path(__file__).parent / "data/bazi_all_terms_v1/reference.json"
+            ).read_text()
         )["rows"]
         if r["year"] == 2000 and r["name"] == name
     )

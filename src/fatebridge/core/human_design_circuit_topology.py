@@ -11,7 +11,6 @@ from copy import deepcopy
 from typing import Any, Iterable, Sequence
 
 from fatebridge.core.human_design_references import (
-    clear_reference_cache,
     reference_data,
     reference_sha256,
 )
@@ -42,7 +41,6 @@ def topology_completion(channels: Sequence[dict[str, Any]]) -> dict[str, Any]:
         pairs = sorted(tuple(sorted(p)) for p in source["image_read_listed_gate_pairs"])
         actual = [p for p in pairs if p in defined]
         missing = [p for p in pairs if p not in defined]
-        label = lambda p: f"{p[0]}-{p[1]}"
         result.append(
             {
                 "id": source["id"],
@@ -51,9 +49,9 @@ def topology_completion(channels: Sequence[dict[str, Any]]) -> dict[str, Any]:
                     if source["id"] == "integration"
                     else "circuit"
                 ),
-                "required_channel_ids": [label(p) for p in pairs],
-                "defined_channel_ids": [label(p) for p in actual],
-                "missing_channel_ids": [label(p) for p in missing],
+                "required_channel_ids": [f"{p[0]}-{p[1]}" for p in pairs],
+                "defined_channel_ids": [f"{p[0]}-{p[1]}" for p in actual],
+                "missing_channel_ids": [f"{p[0]}-{p[1]}" for p in missing],
                 "all_channels_defined": not missing,
                 "source_pdf_page_one_based": source["pdf_page_one_based"],
                 "source_printed_page": source["printed_page"],
@@ -160,7 +158,3 @@ def audit_archival_channel_pages(
         "all_source_disagreements_resolved": False,
         "scope": "36项扫描页直接门对观察，另保留OCR与运动中心标签分歧；旧6项官方分类及30项端点推断仍各自保留，不把此镜像核对改称出版方母版认证。",
     }
-
-
-# Retain the existing internal cleanup hook without caching a second copy.
-setattr(topology_reference, "cache_clear", clear_reference_cache)

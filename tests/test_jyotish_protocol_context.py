@@ -3,7 +3,6 @@
 import hashlib
 import json
 from copy import deepcopy
-from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -11,9 +10,6 @@ from pydantic import ValidationError
 from fatebridge.validation import jyotish_study_binding as api
 from tests import test_jyotish_study_binding as f
 
-ORACLE = json.loads(
-    (Path(__file__).parent / "fixtures/jyotish-protocol-context-v1.json").read_text()
-)
 FIELDS = [
     "baseline_derivation",
     "outcome_adjudication",
@@ -40,7 +36,7 @@ def canonical(value):
 
 def bound_protocol():
     data = f.protocol_data()
-    data["plan"]["protocol_context_sha256"] = ORACLE["expected_context_sha256"]
+    data["plan"]["protocol_context_sha256"] = expected_context()
     return api.JyotishProtocol.model_validate(data)
 
 
@@ -67,18 +63,31 @@ def changed_data(field):
     return data, artifacts
 
 
-def test_context_and_full_plan_match_the_independent_pre_edit_vector():
-    protocol = f.protocol()
-    assert api.protocol_context_digest(protocol) == ORACLE["expected_context_sha256"]
-    assert (
-        canonical(protocol.plan.model_dump(mode="json")) == ORACLE["legacy_plan_sha256"]
+def expected_context():
+    details = f.protocol_data()
+    details.pop("plan")
+    return canonical(
+        {"format": "jyotish_protocol_context_v1", "blind_protocol_details": details}
     )
+
+
+def test_context_commits_declared_outer_details_and_plan_explicitly_includes_binding():
+    protocol = f.protocol()
+    assert api.protocol_context_digest(protocol) == expected_context()
+    assert protocol.plan.model_dump(mode="json")["protocol_context_sha256"] is None
     bound = bound_protocol()
     assert (
-        canonical(bound.plan.model_dump(mode="json"))
-        == ORACLE["expected_bound_plan_sha256"]
+        bound.plan.model_dump(mode="json")["protocol_context_sha256"]
+        == expected_context()
     )
     assert api.protocol_context_digest(bound) == api.protocol_context_digest(protocol)
+    # Plan details and context have separate commitments; neither can hide changes.
+    changed = bound.plan.model_copy(
+        update={"target_definition": "another synthetic target"}
+    )
+    assert canonical(changed.model_dump(mode="json")) != canonical(
+        bound.plan.model_dump(mode="json")
+    )
 
 
 @pytest.mark.parametrize("field", FIELDS)
@@ -162,13 +171,12 @@ def test_complete_original_binding_allows_only_the_existing_limited_gates():
     assert (
         report["external_timestamp_and_blinding"] == "requires_independent_verification"
     )
-    assert (
-        api.blind_outcome_sheet(registration)["study_plan_sha256"]
-        == ORACLE["expected_bound_plan_sha256"]
+    assert api.blind_outcome_sheet(registration)["study_plan_sha256"] == canonical(
+        protocol.plan.model_dump(mode="json")
     )
 
 
-def test_legacy_packets_keep_original_bytes_and_scores_without_silent_rebinding():
+def test_missing_context_blocks_protocol_gate_without_silent_rebinding():
     protocol = f.protocol()
     registration = api.register(
         protocol, f.MODEL, at=f.REGISTERED, artifacts=f.ARTIFACTS

@@ -52,9 +52,7 @@ STAR_NAMES = {
     "绝": "绝命",
 }
 SOURCE = json.loads(
-    (
-        Path(__file__).parent / "fixtures/fengshui_classical_v1/reference.json"
-    ).read_text()
+    (Path(__file__).parent / "data/fengshui_classical_v1/reference.json").read_text()
 )
 
 
@@ -67,7 +65,7 @@ def house(angle=67.2, radius=1):
     }
 
 
-def request(angle=67.2, radius=1, legacy=False):
+def request(angle=67.2, radius=1):
     declared = house(angle, radius)
     natal = {
         "period": {
@@ -76,9 +74,6 @@ def request(angle=67.2, radius=1, legacy=False):
             "evidence": "合成验收输入，独立确认八运",
         }
     }
-    if legacy:
-        declared.pop("bearing_uncertainty_degrees")
-        natal["bearing_uncertainty_degrees"] = radius
     return {
         "methods": ["bazhai", "xuankong_natal"],
         "analyze_layout": True,
@@ -113,11 +108,10 @@ def assert_literal_chart(candidate):
 
 @pytest.mark.parametrize("divider,left,right", DIVIDERS)
 @pytest.mark.parametrize("offset", [-0.3, 0.3])
-@pytest.mark.parametrize("legacy", [False, True])
 def test_all_eight_shared_boundaries_retain_both_house_charts(
-    divider, left, right, offset, legacy
+    divider, left, right, offset
 ):
-    result = assess(**request(divider + offset, legacy=legacy))
+    result = assess(**request(divider + offset))
     b, x = result["layers"]["bazhai"], result["layers"]["xuankong_natal"]
     assert b["house"] is None and b["status"] == "partial"
     assert {c["sitting_trigram"] for c in b["house_candidates"]} == {left, right}
@@ -149,7 +143,7 @@ def test_all_eight_shared_boundaries_retain_both_house_charts(
 
 
 def test_original_counterexample_keeps_the_opposing_house_findings():
-    b = assess(**request(legacy=True))["layers"]["bazhai"]
+    b = assess(**request())["layers"]["bazhai"]
     findings = {
         f["house_sitting_trigram"]: f
         for f in b["placement_findings"]
@@ -165,12 +159,12 @@ def test_original_counterexample_keeps_the_opposing_house_findings():
     )
     assert (
         b["house_orientation_context"]["uncertainty_input_path"]
-        == "xuankong.bearing_uncertainty_degrees"
+        == "house.bearing_uncertainty_degrees"
     )
 
 
 def test_a_boundary_that_changes_the_basic_polarity_keeps_both_truth_values():
-    b = assess(**request(angle=22.2, legacy=True))["layers"]["bazhai"]
+    b = assess(**request(angle=22.2))["layers"]["bazhai"]
     findings = {
         f["house_sitting_trigram"]: f
         for f in b["placement_findings"]
@@ -228,11 +222,8 @@ def test_wrap_and_wide_intervals_cover_all_supported_cells_without_duplicates(
         assert_literal_chart(candidate)
 
 
-@pytest.mark.parametrize("legacy", [False, True])
-def test_independently_confirmed_trigram_filters_the_interval_even_opposite_the_nominal_side(
-    legacy,
-):
-    inputs = request(legacy=legacy)
+def test_independently_confirmed_trigram_filters_the_interval_even_opposite_the_nominal_side():
+    inputs = request()
     inputs["house"]["sitting_trigram"] = "兑"
     result = assess(**inputs)
     b = result["layers"]["bazhai"]
@@ -275,15 +266,12 @@ def test_invalid_shared_radii_are_rejected(value):
         BazhaiRequest(house=house(radius=value))
 
 
-def test_conflicting_radius_aliases_are_rejected_including_an_explicit_zero():
-    for legacy in [0, 2]:
+def test_retired_radius_alias_is_rejected():
+    for value in [0, 1, 2]:
         inputs = request()
-        inputs["xuankong"]["bearing_uncertainty_degrees"] = legacy
-        with pytest.raises(ValidationError, match="必须一致"):
+        inputs["xuankong"]["bearing_uncertainty_degrees"] = value
+        with pytest.raises(ValidationError):
             assess(**inputs)
-    inputs = request()
-    inputs["xuankong"]["bearing_uncertainty_degrees"] = 1
-    assert assess(**inputs)["layers"]["bazhai"]["house"] is None
 
 
 def test_public_schemas_preserve_fields_and_the_required_bearing_and_natal_limit():
@@ -302,7 +290,6 @@ def test_public_schemas_preserve_fields_and_the_required_bearing_and_natal_limit
         "ruleset_id",
         "interpretation",
         "city_gate",
-        "bearing_uncertainty_degrees",
     } <= set(natal["properties"])
     assert list(Draft202012Validator(natal).iter_errors({"house": house(radius=8)}))
     with pytest.raises(ValidationError, match="7.5"):
@@ -311,7 +298,7 @@ def test_public_schemas_preserve_fields_and_the_required_bearing_and_natal_limit
 
 
 def test_proposal_keeps_the_same_house_candidates_and_cannot_become_ready():
-    inputs = request(legacy=True)
+    inputs = request()
     inputs["layout_constraints"] = [
         {"object_id": "bed", "can_relocate": True, "evidence": "合成输入，允许移动"}
     ]
@@ -371,15 +358,11 @@ def test_new_house_candidates_match_rest_real_mcp_and_cli(
     assert len(cli["layers"]["bazhai"]["house_candidates"]) == 2
 
 
-def test_standalone_natal_uses_the_shared_field_without_changing_existing_numbers():
-    inputs = request()["xuankong"]
-    shared = calculate_xuankong_natal(**inputs, house=house())
-    legacy_house = house()
-    legacy_house.pop("bearing_uncertainty_degrees")
-    old = calculate_xuankong_natal(
-        **inputs, house=legacy_house, bearing_uncertainty_degrees=1
-    )
-    assert shared == old
+def test_standalone_natal_retains_the_same_measurement_interval():
+    result = calculate_xuankong_natal(**request()["xuankong"], house=house())
+    layer = result["layers"]["xuankong_natal"]
+    assert layer["orientation_context"]["uncertainty_degrees"] == 1
+    assert len(layer["candidates"]) > 1
 
 
 def test_point_and_explicit_zero_keep_the_original_float_wire_representation():
@@ -391,7 +374,6 @@ def test_point_and_explicit_zero_keep_the_original_float_wire_representation():
     base = {"facing_degrees": 255, "north_reference": "magnetic"}
     for extra, declared_house in [
         ({}, base),
-        ({"bearing_uncertainty_degrees": 0}, base),
         ({}, {**base, "bearing_uncertainty_degrees": 0}),
     ]:
         layer = calculate_xuankong_natal(house=declared_house, period=period, **extra)[

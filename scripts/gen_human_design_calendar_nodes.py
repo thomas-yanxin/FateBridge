@@ -16,9 +16,8 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "docs/validation/human-design-calendar-nodes-v1"
+BASE = ROOT / "tests/data/human_design/calendar_nodes"
 PLAN = BASE / "evidence/plan.json"
-PLAN_SHA256 = "e645ad528f6b889d92da372a9be031df0b2ed4726a0d4ad7160b190ba21fc429"
 
 
 def sha(path: Path) -> str:
@@ -44,14 +43,11 @@ def write(path: Path, value: dict) -> None:
 
 
 def inputs() -> tuple[dict, dict, dict]:
-    if sha(PLAN) != PLAN_SHA256:
-        raise ValueError("Node extension plan changed")
     plan = read(PLAN)
     names = (
         "tests/fixtures/human-design-calendar-span-plan.json",
         "tests/fixtures/human-design-calendar-span-de440.json",
         "tests/fixtures/human-design-node-de440.json",
-        "scripts/gen_human_design_node_reference.py",
     )
     for name in names:
         if sha(ROOT / name) != plan["input_bindings"][name]:
@@ -170,7 +166,6 @@ def derive(kernel_path: Path) -> dict:
         )
     return {
         "method_id": "human_design_original_calendar_de440_erfa_nodes_v1",
-        "plan_sha256": PLAN_SHA256,
         "generator_sha256": code_before,
         "kernel_sha256": kernel_before,
         "kernel_bytes": kernel_path.stat().st_size,

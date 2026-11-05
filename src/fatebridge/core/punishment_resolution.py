@@ -2,14 +2,9 @@
 
 from typing import Any, Mapping, Sequence
 
-PREVIOUS_POLICY = "completed_combination_punishment_resolution_v1"
 POLICY = "completed_combination_unique_pair_resolution_v2"
-LEGACY_POLICY = "initial_candidate_protection_v1"
-PREVIOUS_STRENGTH_METHOD = "season_root_revelation_relations_v9"
-STRENGTH_METHOD = "season_root_revelation_relations_v11"
-CURRENT_STRENGTH_METHODS = frozenset(
-    {"season_root_revelation_relations_v10", STRENGTH_METHOD}
-)
+STRENGTH_METHOD = "season_root_revelation_relations_v12"
+CURRENT_STRENGTH_METHODS = frozenset({STRENGTH_METHOD})
 SOURCE = {
     "id": "ziping_completed_combination_resolution_primary_v1",
     "author": "沈孝瞻",
@@ -47,12 +42,10 @@ def punishment_is_resolved(
     positions: Sequence[str],
     branches: Mapping[str, str],
     cover: set[str],
-    policy: str,
 ) -> bool:
-    """Keep earlier full-cover policy; only unique子卯 gains one-end cover."""
+    """Only the unique physical 子卯 pair permits one-end cover."""
     return all(p in cover for p in positions) or (
-        policy == POLICY
-        and len(positions) == 2
+        len(positions) == 2
         and {branches[p] for p in positions} == {"子", "卯"}
         and any(p in cover for p in positions)
     )

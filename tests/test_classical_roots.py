@@ -14,7 +14,7 @@ from fatebridge.core.classical_roots import (
 from fatebridge.core.output_classical_roots import ClassicalRootProfile
 
 REFERENCE = json.loads(
-    (Path(__file__).parent / "fixtures/bazi_roots_v1/reference.json").read_text(
+    (Path(__file__).parent / "data/bazi_roots_v1/reference.json").read_text(
         encoding="utf-8"
     )
 )

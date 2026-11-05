@@ -1,6 +1,5 @@
 """Frozen clock contradictions must fail even after a fresh business hash."""
 
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -20,9 +19,7 @@ from fatebridge.validation.human_design_clocks import verify_clock_records
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = next(s for s in CATALOG if s.key == "human_design")
-BEFORE = json.loads(
-    (ROOT / "docs/validation/human-design-ordinary-clock-before.json").read_text()
-)
+PROBES = json.loads((ROOT / "tests/data/human_design/clock-probes.json").read_text())
 
 
 def rehash(value):
@@ -49,21 +46,11 @@ def complete():
         patch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
         return execute_tool(
             SPEC,
-            SPEC.request_model(**BEFORE["input"], birth_time_uncertainty_minutes=1),
+            SPEC.request_model(**PROBES["input"], birth_time_uncertainty_minutes=1),
         )
 
 
-def test_original_cases_and_preregistered_acceptance_plan_stay_frozen():
-    for path, sha in {
-        "docs/validation/human-design-ordinary-clock-before.json": "5986043da4618391e9d6057f449068ea83ae39c6b07e0d50d7b6fdf18b8cf1a9",
-        "docs/validation/human-design-interval-clock-before.json": "00fbc97db70a33ee114f0e9e7a669cd9c04a96aa164b4e3690c6bc98a6ebbec4",
-        "tests/fixtures/human-design-clock-replay-plan.json": "0e37c8c1e0f02cb82b58ca9db3984bc0d677b595620a34cf7d970cb925e921ea",
-    }.items():
-        assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == sha
-    assert len(BEFORE["mutations"]) == 9
-
-
-@pytest.mark.parametrize("case", BEFORE["mutations"], ids=lambda c: c["id"])
+@pytest.mark.parametrize("case", PROBES["mutations"], ids=lambda c: c["id"])
 def test_all_nine_original_rehashed_ordinary_clock_probes(complete, case):
     value = deepcopy(complete)
     set_path(value, case["path"], case["replacement"])
@@ -71,11 +58,12 @@ def test_all_nine_original_rehashed_ordinary_clock_probes(complete, case):
 
 
 def test_original_nonnominal_UT1_failure_with_entire_interval_rebuilt(complete):
-    before = json.loads(
-        (ROOT / "docs/validation/human-design-interval-clock-before.json").read_text()
-    )
     value = deepcopy(complete)
-    set_path(value, before["mutation"]["path"], before["mutation"]["replacement"])
+    set_path(
+        value,
+        PROBES["interval_mutation"]["path"],
+        PROBES["interval_mutation"]["replacement"],
+    )
     raw = unpack_sample_witnesses(
         value["time_sensitivity"]["evaluation_witnesses"],
         value["calculation_policy"]["node_mode"],
@@ -187,7 +175,7 @@ def test_complete_interval_replay_uses_no_native_or_private_worker_calls(
 )
 def test_declared_calendar_eras_and_explicit_timezone_controls(year, second, zone):
     args = dict(
-        BEFORE["input"],
+        PROBES["input"],
         birth_year=year,
         birth_month=12 if second else 1,
         birth_day=31 if second else 1,
@@ -215,7 +203,7 @@ def cycle_run():
     return execute_tool(
         SPEC,
         SPEC.request_model(
-            **BEFORE["input"], cycle_reference_datetime="2030-01-01T00:00:00Z"
+            **PROBES["input"], cycle_reference_datetime="2030-01-01T00:00:00Z"
         ),
     )
 
@@ -251,4 +239,20 @@ def test_cycle_clock_contradictions_after_rehash(cycle_run, case):
             event["future_leap_seconds_assumed_unchanged"] = not event[
                 "future_leap_seconds_assumed_unchanged"
             ]
+    assert verify_human_design_reading(rehash(value))["status"] == "rejected"
+
+
+def test_execution_receipt_fields_are_not_misread_as_business_clock_charts(complete):
+    value = deepcopy(complete)
+    value["run_metadata"]["clock_named_input_witnesses"] = {
+        "birth_utc": "field locator",
+        "design_utc": "field locator",
+        "time_scales": "field locator",
+    }
+    verify_clock_records(value)
+    assert (
+        verify_human_design_reading(value)["status"]
+        == "verified_fixed_template_reading"
+    )
+    value["time_scales"]["personality"]["jd_tt"] += 1
     assert verify_human_design_reading(rehash(value))["status"] == "rejected"

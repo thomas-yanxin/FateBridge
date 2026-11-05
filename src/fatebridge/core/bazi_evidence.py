@@ -261,13 +261,10 @@ def build_natal_evidence(
         "label": monthly["label"],
         "selection_rule": monthly["selection_rule"],
         "selection_method": monthly["method_id"],
-        "legacy_label": monthly["legacy_label"],
         "candidates": month_candidates,
         "selected_god": monthly["structure_god"],
         "lu_seat": branch == lu[day],
         "yang_blade_seat": branch == blade.get(day),
-        "legacy_blade_qualification_conflict": monthly["legacy_label"] == "月刃格"
-        and branch != blade.get(day),
         "month_in_groups": [g for g in groups if "month" in g["positions"]],
         "selection_status": "requires_school_review",
         "intra_month_duty": {

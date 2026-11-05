@@ -43,7 +43,6 @@ def test_original_files_and_precomparison_transcription_remain_pinned():
     )
     assert SOURCE["single_collator"] and not SOURCE["independent_second_collator"]
     assert SOURCE["original_pdf_pages"] == 36
-    assert len(json.loads((FIXTURE / "before-82-cli-stdout.json").read_text())) == 82
 
 
 def test_complete_jiajing_summary_matches_all_twelve_month_starts_and_sizes(jiajing):

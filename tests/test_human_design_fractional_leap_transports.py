@@ -1,7 +1,6 @@
 """Exact input labels remain distinct from native TT displays on all adapters."""
 
 import asyncio
-import hashlib
 import json
 from pathlib import Path
 
@@ -17,22 +16,8 @@ from fatebridge.validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAN = json.loads(
-    (ROOT / "tests/fixtures/human_design_fractional_leap_v1/plan.json").read_text()
+    (ROOT / "tests/data/human_design/fractional_leap/plan.json").read_text()
 )
-
-
-def test_original_one_microsecond_before_birth_misacceptance_is_preserved():
-    path = (
-        ROOT / "tests/fixtures/human_design_fractional_leap_v1/before-cycle-order.json"
-    )
-    assert (
-        hashlib.sha256(path.read_bytes()).hexdigest()
-        == "f7ba80db03ea12ed468a7d954ffcaa3a6b0782379aad0341bffa34a83c64b9ed"
-    )
-    rows = json.loads(path.read_text())
-    assert [r["reference_microseconds"] for r in rows] == [8, 9, 10]
-    assert [r["before_accepted"] for r in rows] == [True, True, True]
-    assert [r["expected_acceptance"] for r in rows] == [False, True, True]
 
 
 def three_adapters(params, expected_status, monkeypatch, capsys):

@@ -77,39 +77,40 @@ def audit_clock_basis(
                 )
             receipts.append(dict(case=case["id"], profile=profile, checks=checks))
 
-    # Keep replaying the historical failing rule, even after a new default is
-    # introduced. Its rejection is evidence, not a failure to be erased.
+    # The physical civil endpoints determine age independently of the natal
+    # solar-date placement label. The source does not certify this boundary rule.
     case = next(c for c in manifest["cases"] if c["id"] == "cny_east_forward")
-    unsupported = []
+    age_boundaries = []
     for profile in ("iztro_2_5_8", "quanshu_v2_excerpt"):
         result = calculate_ziwei_horoscope(
             create_person_info(**case["input"]),
             rule_profile=profile,
-            nominal_age_basis="legacy_mixed_clock",
             target_year=1984,
             target_month=2,
             target_day=1,
             target_hour=23,
             target_minute=59,
         )
-        retained = "岁序小于1" in str(result.get("error")) and "此边界暂不支持" in str(
-            result.get("error")
-        )
-        unsupported.append(
-            dict(
-                profile=profile,
-                case=case["id"],
-                still_unsupported=True,
-                explicit_error_returned=retained,
-            )
-        )
-        if not retained:
+        horoscope = result["ziwei_horoscope"]
+        age_calendar = horoscope["nominal_age_calendar"]
+        civil_lunar = expected(case["civil_date"])
+        checks = {
+            "basis": age_calendar["basis"] == "birth_civil_timezone",
+            "physical_order": age_calendar["physical_order_checked"] is True,
+            "birth_lunar_date": age_calendar["birth_lunar_date"] == civil_lunar,
+            "target_lunar_date": age_calendar["target_lunar_date"] == civil_lunar,
+            "placement_year": age_calendar["birth_placement_lunar_year"]
+            == expected(case["placement_date"])["year"],
+            "nominal_age": horoscope["nominal_age"] == 1,
+            "classical_boundary_unverified": age_calendar[
+                "age_boundary_classically_verified"
+            ]
+            is False,
+        }
+        age_boundaries.append(dict(profile=profile, case=case["id"], checks=checks))
+        if not all(checks.values()):
             differences.append(
-                dict(
-                    case="unresolved_age_boundary",
-                    profile=profile,
-                    error=result.get("error"),
-                )
+                dict(case="civil_age_boundary", profile=profile, checks=checks)
             )
     return {
         "method_id": manifest["schema_version"],
@@ -117,7 +118,7 @@ def audit_clock_basis(
         "profile_receipts_checked": len(receipts),
         "receipts": receipts,
         "differences": differences,
-        "known_unsupported_boundaries": unsupported,
+        "civil_age_boundary_receipts": age_boundaries,
         "classical_clock_policy_verified": False,
         "full_clock_acceptance_passed": False,
         "scope": "Date-table receipt consistency only; correction magnitudes, historical clock choices and local lunations are separate",

@@ -22,7 +22,7 @@ from fatebridge.core.predictive.native_chart import (
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.utils.errors import EphemerisSourceError
 
-FIXTURE = Path(__file__).parent / "fixtures/western-horizon-precision-v1"
+FIXTURE = Path(__file__).parent / "data/astro/horizon_precision"
 INPUTS = json.loads((FIXTURE / "inputs.json").read_text())
 REFERENCE = json.loads((FIXTURE / "reference.json").read_text())
 EXPECTED = {row["id"]: row for row in REFERENCE["cases"]}

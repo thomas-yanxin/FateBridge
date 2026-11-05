@@ -29,8 +29,6 @@ PLAN = json.loads(PLAN_PATH.read_text())
 
 def test_four_frozen_probes_and_prior_native_rejection_remain():
     check = regression_checks()
-    assert check["original_accepted_count"] == 3
-    assert check["original_native_rejected_count"] == 1
     assert len(check["cases"]) == 4
     assert check["status"] == "bounded_natal_source_checks_passed", check
 

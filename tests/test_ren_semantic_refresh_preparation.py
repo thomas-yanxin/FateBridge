@@ -37,11 +37,39 @@ def test_new_prompt_generator_does_not_append_the_hidden_criteria():
     "case", ["ren_refresh_complete_water_trine", "ren_refresh_complete_metal_trine"]
 )
 def test_original_partial_case_cannot_be_relabelled_as_new_branch_coverage(case):
-    path = (
-        ROOT
-        / "tests/fixtures/ren_semantic_run_v1/ren_waiting_symbol_not_calendar_prediction/delivery-1.json"
-    )
-    payload = json.loads(path.read_text())["payload"]
+    payload = {
+        "run_metadata": {"run_id": "synthetic-partial-control"},
+        "jinkou": {
+            "rows": [
+                {"label": label, "intrinsic_ganzhi": "甲子", "dun_stem": "甲"}
+                for label in ["人元", "贵神", "将神", "地分"]
+            ],
+            "overview": {
+                "diurnal_evidence": {
+                    "explicit_choice": True,
+                    "stellar_visibility_observed": None,
+                }
+            },
+            "combinations": {
+                "trines": [
+                    {
+                        "element": element,
+                        "present_branches": [],
+                        "missing_branches": list(branches),
+                        "structural_status": "incomplete",
+                        "waiting_branch": branches[0],
+                        "du_he": None,
+                        "transformation_confirmed": None,
+                        "calendar_candidates": None,
+                        "source_listed_disruptors": [],
+                        "disruptor_application": "context_unadjudicated_not_presence_rule",
+                        "member_conditions": [],
+                    }
+                    for element, branches in [("水", "申子辰"), ("金", "巳酉丑")]
+                ]
+            },
+        },
+    }
     result = coverage(case, payload)
     assert result["coverage_ready"] is False
     assert result["checks"]["exact_complete_members"] is False

@@ -1,12 +1,12 @@
 """The corrected timing facts and their projections survive all public surfaces."""
 
 import asyncio
-import json
 
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
 
 INPUT = dict(
     birth_year=1990,
@@ -22,6 +22,9 @@ INPUT = dict(
     analysis_day=20,
     analysis_hour=12,
 )
+
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize("key", ["dayun_analysis", "timing_analysis"])

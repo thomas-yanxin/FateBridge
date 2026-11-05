@@ -25,7 +25,7 @@ from fatebridge.validation.fengshui_calendar_consumers import (
 )
 from fatebridge.validation.fengshui_solar_terms import load_solar_terms_reference
 
-FIXTURES = Path(__file__).parent / "fixtures"
+FIXTURES = Path(__file__).parent / "data"
 
 
 @pytest.fixture(scope="module")

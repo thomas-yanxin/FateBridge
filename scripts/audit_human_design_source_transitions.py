@@ -114,9 +114,10 @@ def repeat_checks(
             facts = new[0]["facts"]
             for field in ("columns", "defined_centers", "defined_channel_render_ids"):
                 fields[field] = facts[field] == old[0][field]
-            normalize = lambda p: {
-                k: " ".join(v.split()) for k, v in p.items() if k != "Name"
-            }
+
+            def normalize(p):
+                return {k: " ".join(v.split()) for k, v in p.items() if k != "Name"}
+
             fields["all12_other_properties"] = normalize(
                 facts["properties"]
             ) == normalize(old[0]["properties"])
@@ -339,7 +340,10 @@ def pdf_bindings(
         path = directory / row["id"] / "pdfs" / name
         raw = path.read_bytes()
         text = visible_properties(path)
-        normalized = lambda values: {k: " ".join(v.split()) for k, v in values.items()}
+
+        def normalized(values):
+            return {k: " ".join(v.split()) for k, v in values.items()}
+
         result.append(
             {
                 "id": row["id"],

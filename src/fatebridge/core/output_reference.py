@@ -752,8 +752,6 @@ class SuzhanAstronomy(PartialOutput):
 class SukuyoPerson(PartialOutput):
     name: Optional[str] = None
     natal_su27: Optional[str] = None
-    natal_su28: Optional[str] = None
-    moon_longitude: Optional[float] = None
     calendar: Optional[SukuyoCalendar] = None
     palace_reference: Optional[SukuyoPalaceReference] = None
 
@@ -763,8 +761,6 @@ class SukuyoRelation(PartialOutput):
     pair: Optional[str] = None
     distance: Optional[str] = None
     meaning: Optional[str] = None
-    self_su28: Optional[str] = None
-    other_su28: Optional[str] = None
     self_su27: Optional[str] = None
     other_su27: Optional[str] = None
     offset: Optional[int] = None

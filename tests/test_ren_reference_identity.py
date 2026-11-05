@@ -13,7 +13,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/ren_reference_identity_v1"
-PIN = "6243befcb02e6280bd60c5fe4fd4366a3072d42240752107c31bd8355b3c1b20"
+PIN = "30afbca8ef0f318cbfe9a72333ea69d62b49118eff055d703d9157042b125e69"
 
 
 def sha(path: Path) -> str:

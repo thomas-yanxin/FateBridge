@@ -9,7 +9,10 @@ import fatebridge.core.timing as timing
 from fatebridge.core.almanac import SolarTerm
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
-from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native, rest
+from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
+from tests.test_agentic_nested_outputs import rest as _shared_rest
+
+rest = _shared_rest
 
 
 @pytest.mark.parametrize(

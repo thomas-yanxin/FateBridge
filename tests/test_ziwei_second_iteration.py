@@ -20,6 +20,7 @@ from scripts.audit_ziwei import (
     synthetic_seed,
 )
 from scripts.audit_ziwei_natal import audit_natal
+from scripts.ziwei_conditional_inputs import synthetic_birth_clock
 
 pytestmark = [
     pytest.mark.filterwarnings("ignore:fromSolarDate is deprecated:DeprecationWarning"),
@@ -132,7 +133,7 @@ def test_annual_lucun_yang_tuo_follow_target_stem_without_moving_natal_stars():
         analysis_year=2029, analysis_month=6, analysis_day=15, analysis_hour=12
     )
     result = build_ziwei_horoscope(
-        nominal_age_basis="legacy_mixed_clock",
+        birth_seed=synthetic_birth_clock(int((chart)["lunar_date"]["year"])),
         chart=chart,
         gender="男",
         target_seed=target,

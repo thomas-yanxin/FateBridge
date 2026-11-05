@@ -11,7 +11,7 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.sukuyo import required_quote_paths
 
 PRIMARY = json.loads(
-    (Path(__file__).parent / "fixtures/sukuyo-special-days-primary.json").read_text()
+    (Path(__file__).parent / "data/sukuyo-special-days-primary.json").read_text()
 )
 ALIASES = str.maketrans("虛婁畢參張軫", "虚娄毕参张轸")
 

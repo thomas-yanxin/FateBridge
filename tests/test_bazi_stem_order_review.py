@@ -20,7 +20,7 @@ from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
 from tests.test_agentic_nested_outputs import rest as _rest_fixture
 
 rest = _rest_fixture
-FIXTURE = Path(__file__).parent / "fixtures/bazi_ordered_conditions_v1"
+FIXTURE = Path(__file__).parent / "data/bazi_ordered_conditions_v1"
 SOURCE = json.loads((FIXTURE / "source-review-first.json").read_text())
 KEYS = ["analyze_destiny", "bazi_birth"] + [
     "bazi_" + x

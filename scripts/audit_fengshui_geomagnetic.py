@@ -9,7 +9,7 @@ from fatebridge.validation.geomagnetic import audit_noaa_c_vectors, audit_noaa_v
 
 
 def main() -> int:
-    folder = Path(__file__).parents[1] / "tests/fixtures/fengshui_geomagnetic_v1"
+    folder = Path(__file__).parents[1] / "tests/data/fengshui_geomagnetic_v1"
     manifest = json.loads((folder / "provenance.json").read_text())
     integrity = {
         name: hashlib.sha256((folder / name).read_bytes()).hexdigest() == digest

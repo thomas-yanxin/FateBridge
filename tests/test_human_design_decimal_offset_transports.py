@@ -18,7 +18,7 @@ from fatebridge.validation.human_design import verify_human_design_reading
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAN = json.loads(
-    (ROOT / "tests/fixtures/human_design_decimal_offset_v1/plan.json").read_text()
+    (ROOT / "tests/data/human_design/decimal_offset/plan.json").read_text()
 )
 
 

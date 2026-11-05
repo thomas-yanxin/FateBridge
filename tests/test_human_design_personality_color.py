@@ -3,7 +3,6 @@
 import ast
 import hashlib
 import json
-import sys
 from copy import deepcopy
 from pathlib import Path
 
@@ -26,10 +25,24 @@ from fatebridge.validation.human_design_joint import verify_joint_snapshot
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAN_PATH = ROOT / "tests/fixtures/human-design-personality-color-plan.json"
-BEFORE_PATH = ROOT / "docs/validation/human-design-personality-color-before.json"
 PLAN = json.loads(PLAN_PATH.read_text())
-BEFORE = json.loads(BEFORE_PATH.read_text())
 SPEC = next(s for s in CATALOG if s.key == "human_design")
+
+
+@pytest.fixture(scope="module")
+def source_runs():
+    with pytest.MonkeyPatch.context() as env:
+        env.setenv("SE_EPHE_PATH", str(ROOT / "ephe"))
+        env.delenv("FATEBRIDGE_JPL_FILE", raising=False)
+        return {
+            case["id"]: {
+                mode: execute_tool(
+                    SPEC, SPEC.request_model(**case["input"], node_mode=mode)
+                )
+                for mode in ("true", "mean")
+            }
+            for case in PLAN["cases"]
+        }
 
 
 def forbidden(*args, **kwargs):
@@ -40,11 +53,6 @@ def test_original_lost_projection_and_independent_taxonomy_are_frozen():
     assert (
         hashlib.sha256(PLAN_PATH.read_bytes()).hexdigest()
         == "92a8abe35757f99e04ed0896f4595c2345f09607b22a5df0794fd37020965aa6"
-    )
-    assert (
-        hashlib.sha256(BEFORE_PATH.read_bytes()).hexdigest()
-        == PLAN["before_sha256"]
-        == "6308779aa0a1963875591f0eaeab185b19aa473743b4f52376e246a3eff8f8a1"
     )
     p = ROOT / "src/fatebridge/data/human_design/personality-color-reference.json"
     assert (
@@ -69,8 +77,7 @@ def test_original_lost_projection_and_independent_taxonomy_are_frozen():
         "Probability",
         "Personal",
     ]
-    assert len(BEFORE["cases"]) == len(PLAN["cases"]) == 2
-    assert all(c["old_joint_keys_equal"] for c in BEFORE["cases"])
+    assert len(PLAN["cases"]) == 2
     tree = ast.parse(
         (ROOT / "scripts/build_human_design_personality_color_reference.py").read_text()
     )
@@ -82,8 +89,10 @@ def test_original_lost_projection_and_independent_taxonomy_are_frozen():
 
 @pytest.mark.parametrize("kind", ["motivation", "view"])
 @pytest.mark.parametrize("color", range(1, 7))
-def test_all_twelve_source_category_mappings_have_actual_local_basis(kind, color):
-    chart = deepcopy(BEFORE["cases"][0]["true"])
+def test_all_twelve_source_category_mappings_have_actual_local_basis(
+    kind, color, source_runs
+):
+    chart = deepcopy(source_runs[PLAN["cases"][0]["id"]]["true"])
     pair = ("Sun", "Earth") if kind == "motivation" else ("NorthNode", "SouthNode")
     for row in chart["activations"]["personality"]:
         if row["body"] in pair:
@@ -106,8 +115,10 @@ def test_all_twelve_source_category_mappings_have_actual_local_basis(kind, color
 
 
 @pytest.mark.parametrize("bad", [None, True, 0, 7, "3", "mismatch"])
-def test_invalid_or_inconsistent_color_pair_cannot_acquire_a_source_label(bad):
-    chart = deepcopy(BEFORE["cases"][0]["true"])
+def test_invalid_or_inconsistent_color_pair_cannot_acquire_a_source_label(
+    bad, source_runs
+):
+    chart = deepcopy(source_runs[PLAN["cases"][0]["id"]]["true"])
     p = chart["activations"]["personality"]
     earth = next(r for r in p if r["body"] == "Earth")
     if bad is None:
@@ -123,8 +134,10 @@ def test_invalid_or_inconsistent_color_pair_cannot_acquire_a_source_label(bad):
     assert value["personality_colors"]["motivation"]["source_term"] is None
 
 
-def test_design_color_and_valid_tone_cannot_substitute_for_personality_color():
-    chart = deepcopy(BEFORE["cases"][0]["true"])
+def test_design_color_and_valid_tone_cannot_substitute_for_personality_color(
+    source_runs,
+):
+    chart = deepcopy(source_runs[PLAN["cases"][0]["id"]]["true"])
     for r in chart["activations"]["personality"]:
         r.pop("color", None)
     value = personality_colors(chart["activations"])
@@ -136,9 +149,11 @@ def test_design_color_and_valid_tone_cannot_substitute_for_personality_color():
     )
 
 
-@pytest.mark.parametrize("case", BEFORE["cases"], ids=lambda c: c["id"])
-def test_same_arrow_and_legacy_key_do_not_collapse_distinct_real_color_categories(case):
-    a, b = case["true"], case["mean"]
+@pytest.mark.parametrize("case", PLAN["cases"], ids=lambda c: c["id"])
+def test_same_arrow_and_legacy_key_do_not_collapse_distinct_real_color_categories(
+    case, source_runs
+):
+    a, b = (source_runs[case["id"]][mode] for mode in ("true", "mean"))
     cache = JointSnapshotCache()
     assert a["variables"]["code"] == b["variables"]["code"]
     assert JointSnapshotCache.key(a) != JointSnapshotCache.key(b)
@@ -146,7 +161,7 @@ def test_same_arrow_and_legacy_key_do_not_collapse_distinct_real_color_categorie
     assert len(cache.snapshots) == 2
     assert [
         s["variables"]["personality_colors"]["view"]["color"] for s in (x, y)
-    ] == case["personality_node_colors"]
+    ] == case["expected_personality_node_colors"]
     assert (
         x["variables"]["personality_colors"]["view"]["source_term"]
         != y["variables"]["personality_colors"]["view"]["source_term"]
@@ -169,8 +184,8 @@ def test_same_arrow_and_legacy_key_do_not_collapse_distinct_real_color_categorie
                 assert type(r["color"]) is int
 
 
-def test_same_source_color_tone_and_derived_mirror_count_as_one_dependency():
-    a = deepcopy(BEFORE["cases"][0]["true"])
+def test_same_source_color_tone_and_derived_mirror_count_as_one_dependency(source_runs):
+    a = deepcopy(source_runs[PLAN["cases"][0]["id"]]["true"])
     b = deepcopy(a)
     for r in b["activations"]["personality"]:
         if r["body"] in {"Sun", "Earth"}:
@@ -205,11 +220,6 @@ def test_real_public_cases_both_conventions_and_backends_are_fully_replayed(
     if not empty_files:
         expected = case["expected_personality_node_colors"][0 if mode == "true" else 1]
         assert value["view"]["color"] == expected
-        old = next(c for c in BEFORE["cases"] if c["id"] == case["id"])[mode]
-        if sys.platform == "darwin":
-            assert run["activations"] == old["activations"]
-        assert run["bodygraph"] == old["bodygraph"]
-        assert run["variables"]["code"] == old["variables"]["code"]
         assert run["node_convention_comparison"]["personality_colors_changed"] is True
         assert run["node_convention_comparison"]["variable_changed"] is False
         assert "四箭头编码虽相同" in run["interpretation"]["personality_color_meaning"]

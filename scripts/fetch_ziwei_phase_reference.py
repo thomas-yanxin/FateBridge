@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from urllib.request import urlopen
 
-TARGET = Path(__file__).resolve().parents[1] / "tests/fixtures/ziwei_independent"
+TARGET = Path(__file__).resolve().parents[1] / "tests/data/ziwei_independent"
 
 
 def main() -> None:

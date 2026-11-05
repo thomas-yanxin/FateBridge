@@ -24,9 +24,7 @@ def test_sukuyo_pair_source_matches_both_literal_membership_reads():
 
 def test_sukuyo_complete_preimplementation_grid_keeps_all_unlisted_conditions():
     fixture = json.loads(
-        (
-            Path(__file__).parent / "fixtures/sukuyo-kenyu-component-grid.json"
-        ).read_bytes()
+        (Path(__file__).parent / "data/sukuyo-kenyu-component-grid.json").read_bytes()
     )
     expected = {
         (r[0], r[1], r[2]): dict(zip(fixture["full_grid_columns"], r))

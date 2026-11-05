@@ -6,22 +6,22 @@ from typing import Any, Dict
 
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.fengshui.calendar import lichun_resolution
+from fatebridge.utils.errors import EphemerisSourceError
 
 
 def audit_lichun_reference(reference: Dict[str, Any]) -> Dict[str, Any]:
     protocol = reference["protocol"]
     tolerance = protocol["numeric_implementation_tolerance_seconds"]
-    spans = {
-        "fengshui_lichun_de440_tt_v1": (1800, 2200),
-        "fengshui_lichun_de440_tt_v2": (1784, 2204),
-    }
-    if protocol["id"] not in spans or isinstance(tolerance, bool) or tolerance != 1.0:
+    if (
+        protocol["id"] != "fengshui_lichun_de440_tt_v2"
+        or isinstance(tolerance, bool)
+        or tolerance != 1.0
+    ):
         raise ValueError(
             "The frozen Li Chun protocol and one-second gate must be retained"
         )
-    first, last = spans[protocol["id"]]
     rows = reference["rows"]
-    if [r["year"] for r in rows] != list(range(first, last + 1)):
+    if [r["year"] for r in rows] != list(range(1784, 2205)):
         raise ValueError("Retain every distinct ordered year, including both endpoints")
     for row in rows:
         if type(row["year"]) is not int:
@@ -40,7 +40,20 @@ def audit_lichun_reference(reference: Dict[str, Any]) -> Dict[str, Any]:
             )
     comparisons = []
     for row in rows:
-        resolved = lichun_resolution(row["year"], "UTC")
+        try:
+            resolved = lichun_resolution(row["year"], "UTC")
+        except EphemerisSourceError as error:
+            comparisons.append(
+                {
+                    "year": row["year"],
+                    "reference_jd_tt": row["jd_tt"],
+                    "difference_seconds": None,
+                    "resolution": None,
+                    "error": error.reason,
+                    "within_tolerance": False,
+                }
+            )
+            continue
         difference = None
         if not resolved["approximate"]:
             tt = ephemeris_time(datetime.fromisoformat(resolved["moment"])).jd_tt

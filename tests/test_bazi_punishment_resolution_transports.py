@@ -17,7 +17,7 @@ rest = shared_rest
 ROOT = Path(__file__).resolve().parents[1]
 DATA = json.loads(
     (
-        ROOT / "tests/fixtures/bazi_punishment_resolution_v1/protocol-cases-first.json"
+        ROOT / "tests/data/bazi_punishment_resolution_v1/protocol-cases-first.json"
     ).read_text()
 )
 CASES = DATA["cases"][:12]
@@ -50,7 +50,7 @@ def test_false_resolution_cannot_hide_behind_unrelated_projection(
         )
     if tool == "bazi_source_compare":
         current = payload["current_calculation"]
-        assert current["method_id"] == "season_root_revelation_relations_v11"
+        assert current["method_id"] == "season_root_revelation_relations_v12"
         target = current["assessment"]["relations"]
         if fault == "without_inventory":
             current.pop("branch_combination_candidates")
@@ -63,7 +63,7 @@ def test_false_resolution_cannot_hide_behind_unrelated_projection(
         chain = evidence(payload, tool)
         assert (
             chain["strength_context"]["method_id"]
-            == "season_root_revelation_relations_v11"
+            == "season_root_revelation_relations_v12"
         )
         target = [e["receipt"] for e in chain["classical_passage_relations"]["events"]]
         if fault == "without_inventory":

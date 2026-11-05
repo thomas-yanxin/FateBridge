@@ -9,14 +9,11 @@ ROOT = Path(__file__).resolve().parents[1]
 CLAUSES_SHA = "85a10d759544d5b7729e6ffbec6427a1a5ee443b353184d0daa49e34f3b5ac88"
 DIAGRAMS_SHA = "44488715143b6e6aebcfe8ae638397ced12ed07dfee392cce81440a43c8de483"
 REPLACEMENT_SHA = "43b04b453c5ae51cb6fc6e7ebb958a6e2da58e853b254e0c69f76e1458dd0fca"
-TARGET = ROOT / "src/fatebridge/data/fengshui/shen-lower-source-comparison-v1.json"
-NATAL_TARGET = (
-    ROOT / "src/fatebridge/data/fengshui/shen-natal-source-comparison-v2.json"
-)
+TARGET = ROOT / "src/fatebridge/data/fengshui/shen-natal-source-comparison-v2.json"
 
 
 def frozen(name: str, expected: str) -> dict:
-    raw = (ROOT / "tests/fixtures" / name / "reference.json").read_bytes()
+    raw = (ROOT / "tests/data" / name / "reference.json").read_bytes()
     if hashlib.sha256(raw).hexdigest() != expected:
         raise ValueError("Pre-engine source freeze changed: " + name)
     return json.loads(raw)
@@ -57,13 +54,6 @@ def build() -> str:
             }
         )
     data = {
-        "ruleset": {
-            "ruleset_id": "shen_2011_lower_numeric_comparison_v1",
-            "version": "1.0.0",
-            "method": "fixed_edition_lower_chart_numeric_comparison",
-            "source_ids": ["SLC1"],
-            "scope": "与固定沈氏整理本216条下卦正文的四项种子顺逆及216图星数分别比较；不修改中州计算，不认证全本、替卦、历法或现实效度",
-        },
         "source": {
             "source_id": "SLC1",
             "title": "沈氏玄空学",
@@ -87,12 +77,6 @@ def build() -> str:
         },
         "rows": rows,
     }
-    return json.dumps(data, ensure_ascii=False, indent=2) + "\n"
-
-
-def build_natal() -> str:
-    """Extend the unchanged lower corpus using the source-only replacement freeze."""
-    data = json.loads(build())
     printed = frozen("fengshui_replacement_diagrams_v1", REPLACEMENT_SHA)
     data["ruleset"] = {
         "ruleset_id": "shen_2011_natal_numeric_comparison_v2",
@@ -142,14 +126,17 @@ def build_natal() -> str:
         }
         for row in printed["rows"]
     ]
-    return json.dumps(data, ensure_ascii=False, indent=2) + "\n"
+    return (
+        json.dumps({"ruleset": data["ruleset"], **data}, ensure_ascii=False, indent=2)
+        + "\n"
+    )
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    for target, text in ((TARGET, build()), (NATAL_TARGET, build_natal())):
+    for target, text in ((TARGET, build()),):
         if args.check:
             if not target.is_file() or target.read_text(encoding="utf-8") != text:
                 print(

@@ -14,7 +14,6 @@ from tests.test_liuyao_clash_transports import all_surfaces
 from tests.test_liuyao_metal_moving import BASE, CASES, check
 from tests.test_liuyao_transports import assert_same_run_receipt
 
-pytest_plugins = ["tests.test_agentic_nested_outputs"]
 PUBLIC = json.loads((BASE / "public-payloads.json").read_text())["rows"]
 HIDDEN = json.loads((BASE / "hidden-engineering.json").read_text())
 

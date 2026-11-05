@@ -26,9 +26,9 @@ if not __package__:
     sys.path.insert(0, str(ROOT))
     sys.path.insert(0, str(ROOT / "src"))
 
-from scripts.build_sukuyo_historical_calendar import read_fixture
+from scripts.build_sukuyo_historical_calendar import read_fixture  # noqa: E402
 
-PROTOCOL = ROOT / "tests/fixtures/sukuyo-month-transition-protocol-v1.json"
+PROTOCOL = ROOT / "tests/data/sukuyo-month-transition-protocol-v1.json"
 PROTOCOL_SHA256 = "138728babb6b4e8e66db8bd4c291c9b09c53edad6ed40ac816635fe11c9cf6ef"
 PARENT_MANIFEST = "aecaba2e310475074245ef84af0d129dbf0a4a57f5172144d67a914edbf28969"
 
@@ -39,7 +39,7 @@ def sha(raw: bytes) -> str:
 
 def hko_days() -> dict[int, tuple[int, int, int, bool]]:
     """Read all published labels, including the separately captured Chinese gap."""
-    directory = ROOT / "tests/fixtures/sukuyo_hko_v1"
+    directory = ROOT / "tests/data/sukuyo_hko_v1"
     manifest = json.loads((directory / "manifest.json").read_bytes())
     with ZipFile(directory / "official_texts.zip") as archive:
         names = archive.namelist()
@@ -101,12 +101,12 @@ def source_expectations() -> tuple[list[dict[str, Any]], dict[str, Any]]:
     root = ROOT
 
     def fixture(name: str) -> tuple[dict[str, bytes], dict[str, Any]]:
-        return read_fixture(root / "tests/fixtures" / name)
+        return read_fixture(root / "tests/data" / name)
 
     # Literal circle and NAOJ first-day row are deliberately not imported from domain code.
     order = list("角亢氐房心尾箕斗女虚危室壁奎娄胃昴毕觜参井鬼柳星张翼轸")
     anchors = json.loads(
-        (root / "tests/fixtures/sukuyo-t1299-reference.json").read_bytes()
+        (root / "tests/data/sukuyo-t1299-reference.json").read_bytes()
     )["naoj_month_starts"]
 
     def mansion(m: int, d: int) -> str:
@@ -122,7 +122,7 @@ def source_expectations() -> tuple[list[dict[str, Any]], dict[str, Any]]:
     members = {}
     references["chinese_hko_utc08"] = hko_days()
     members["hko_fixture_manifest_sha256"] = sha(
-        (root / "tests/fixtures/sukuyo_hko_v1/manifest.json").read_bytes()
+        (root / "tests/data/sukuyo_hko_v1/manifest.json").read_bytes()
     )
     files, manifest = fixture("sukuyo_hutime_daily_v1")
     daily = {}
@@ -164,9 +164,9 @@ def source_expectations() -> tuple[list[dict[str, Any]], dict[str, Any]]:
     end = date(1873, 1, 1).toordinal()
     for i, start in enumerate(ordered):
         stop = min(ordered[i + 1] if i + 1 < len(ordered) else end, end)
-        y, m, l = starts[start]
+        y, m, leap = starts[start]
         for o in range(max(start, 1), stop):
-            historical[o] = (y, m, o - start + 1, l)
+            historical[o] = (y, m, o - start + 1, leap)
     references["japanese_naoj_historical_utc09"] = historical
     members["historical_archive_sha256"] = manifest["archive_sha256"]
     ledger = []
@@ -200,7 +200,7 @@ def source_expectations() -> tuple[list[dict[str, Any]], dict[str, Any]]:
             }
             if leap:
                 patterns[
-                    f'{prior[2] if prior else "unknown"}/{prev[2] if prev else "unknown"}'
+                    f"{prior[2] if prior else 'unknown'}/{prev[2] if prev else 'unknown'}"
                 ] += 1
             for half in [None, "first_half", "second_half"]:
                 incomplete = (

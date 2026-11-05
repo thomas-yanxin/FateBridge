@@ -12,13 +12,14 @@ from fatebridge.core.metaphysics.ziwei import (
     build_ziwei_chart,
     build_ziwei_horoscope,
 )
+from scripts.ziwei_conditional_inputs import synthetic_birth_clock
 
 if TYPE_CHECKING or __package__:
     from .audit_ziwei_limits import _seed
 else:
     from audit_ziwei_limits import _seed
 
-FIXTURES = Path(__file__).resolve().parents[1] / "tests/fixtures/ziwei_independent"
+FIXTURES = Path(__file__).resolve().parents[1] / "tests/data/ziwei_independent"
 
 
 def audit_activation(fixtures: Path = FIXTURES) -> dict[str, Any]:
@@ -64,7 +65,9 @@ def audit_activation(fixtures: Path = FIXTURES) -> dict[str, Any]:
                     formal_first = "父母宫" if gender == "男" else "兄弟宫"
                 for age in range(1, first + 2):
                     h = build_ziwei_horoscope(
-                        nominal_age_basis="legacy_mixed_clock",
+                        birth_seed=synthetic_birth_clock(
+                            int((chart)["lunar_date"]["year"])
+                        ),
                         chart=chart,
                         gender=gender,
                         target_seed=_seed(row["lunar_year"] + age - 1),
@@ -73,7 +76,7 @@ def audit_activation(fixtures: Path = FIXTURES) -> dict[str, Any]:
                     checks = {
                         "age": h["nominal_age"] == age,
                         "first_age": d["first_age"] == first,
-                        "not_a_childhood_substitute": d["is_childhood_limit"] is False,
+                        "not_a_childhood_substitute": "is_childhood_limit" not in d,
                         "other_scope_slots": [s["scope"] for s in h["scopes"][1:]]
                         == source["other_scopes"],
                     }

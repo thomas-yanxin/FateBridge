@@ -2,8 +2,9 @@
 
 from typing import Dict, List, Literal, Optional
 
-from pydantic import Field
+from pydantic import Field, ValidationInfo, model_validator
 
+from fatebridge.core.output_base import FullFact
 from fatebridge.core.response_models import (
     Object,
     PartialOutput,
@@ -11,6 +12,8 @@ from fatebridge.core.response_models import (
     RunMetadata,
     SnapshotExport,
 )
+
+from .spatial_outputs import MeasuredLayoutOutput
 
 
 class RuleSource(PartialOutput):
@@ -300,6 +303,7 @@ class SurfaceAnalysis(PartialOutput):
 
 
 class Coverage(PartialOutput):
+    measured_workstation: Optional[Object] = None
     city_gate_status: Optional[Literal["complete", "partial"]] = None
     city_gate_calculation_status: Optional[Literal["complete", "partial"]] = None
     city_gate_missing_inputs: Optional[List[str]] = None
@@ -327,7 +331,7 @@ class FengshuiOutput(ProjectedOutput):
     analysis_type: Optional[str] = None
     engine: Optional[str] = None
     status: Optional[Literal["complete", "partial"]] = None
-    layers: Optional[Layers] = None
+    layers: FullFact[Optional[Layers]] = None
     rulesets: Optional[List[Ruleset]] = None
     coverage: Optional[Coverage] = None
     conflicts: Optional[List[Object]] = None
@@ -338,8 +342,25 @@ class FengshuiOutput(ProjectedOutput):
     run_metadata: Optional[RunMetadata] = None
     layout_analysis: Optional["LayoutAnalysis"] = None
 
+    @model_validator(mode="after")
+    def require_declared_layers(self, info: ValidationInfo) -> "FengshuiOutput":
+        if info.context and info.context.get("full_result") and self.coverage:
+            actual = (
+                {
+                    name
+                    for name in self.layers.model_fields_set
+                    if getattr(self.layers, name) is not None
+                }
+                if self.layers is not None
+                else set()
+            )
+            if set(self.coverage.implemented_layers or []) - actual:
+                raise ValueError("完整风水结果缺少已声明计算的图层")
+        return self
+
 
 class LayoutAnalysis(PartialOutput):
+    workstation_layout_analysis: Optional[MeasuredLayoutOutput] = None
     environmental_context: Optional[Object] = None
     interior_analysis: Optional[Object] = None
     material_analysis: Optional[Object] = None

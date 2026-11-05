@@ -12,7 +12,9 @@ import pytest
 from scripts.astrodice_retarded_table import AU_KM, K, compare, parse
 from scripts.verify_astrodice_retarded_table import independent_relations
 
-FIXTURE = Path(__file__).parent / "fixtures/astrodice-retarded-table-v1"
+FIXTURE = (
+    Path(__file__).parent / "data/astrodice/reference_sets/fixture-retarded-table-v1"
+)
 PLAN = {
     "numerical_tube_profiles": {"printing_only": {"extra_binary64_ULPs": 0}},
     "interval_trig_terms": 80,

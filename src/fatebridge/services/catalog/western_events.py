@@ -61,6 +61,7 @@ def _western_event_spec(name: str, service: Any, model: Any, label: str) -> Tool
         ),
         operation_label_zh=label,
         family="western_event",
+        cpu_bound=True,
         rest_path=f"/api/astro/event/{name}",
         mcp_name=f"astro_{name}",
         cli_request_file=name == "horary",

@@ -3,8 +3,8 @@
   "source_report_sha256": "6236724d3bdce427d97d5ea1a015653ab5cb5c76ff5335b6361355cda4e4acd7",
   "erratum_sha256": "b0c2d0cd89c923e5abc578bdfce46001410b8a79d4054e73e21d19a687c021de",
   "frozen_manifest_sha256": "604af6bf5013770a5d2b4c040750f47a1f88c4b51df9dce5ab37a6cc892db828",
-  "source_report": "docs/validation/ziwei-r22-day-tables-review-raw.json",
-  "separate_erratum": "docs/validation/ziwei-r22-day-tables-review-raw.errata-01.json",
+  "source_report": "tests/data/ziwei_independent/independent_readings_r22_v1/reports/day-review.json",
+  "separate_erratum": "tests/data/ziwei_independent/independent_readings_r22_v1/reports/day-review-errata-01.json",
   "new_edition": false,
   "external_human_experts": 0,
   "records": [

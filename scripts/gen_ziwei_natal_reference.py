@@ -21,7 +21,7 @@ CONFIG = dict(
     dayDivide="current",
     algorithm="default",
 )
-TARGET = Path(__file__).resolve().parents[1] / "tests/fixtures/ziwei_independent"
+TARGET = Path(__file__).resolve().parents[1] / "tests/data/ziwei_independent"
 
 
 def cases() -> list[dict]:

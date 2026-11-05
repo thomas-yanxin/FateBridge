@@ -9,8 +9,10 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from fatebridge.core.astro.geometry import (
+    Angle,
     _house_for_longitude,
     _sign_name,
+    angle_fraction,
     combine_longitudes,
     normalize_angle,
 )
@@ -62,8 +64,12 @@ def build_context_geometry(
         )
         for name in planet_ids
     }
+    partition_longitudes: Dict[str, Angle] = {**longitudes}
     if "North Node" in longitudes:
-        longitudes["South Node"] = normalize_angle(longitudes["North Node"] + 180.0)
+        partition_longitudes["South Node"] = (
+            angle_fraction(longitudes["North Node"]) + 180
+        ) % 360
+        longitudes["South Node"] = combine_longitudes(longitudes["North Node"], 180.0)
     markers = {name.lower(): lon for name, lon in longitudes.items()}
     markers["asc"] = ascendant
     if fortune_method == "ptolemy_iii10":
@@ -100,15 +106,21 @@ def build_context_geometry(
     projected_positions: Dict[str, float] = {}
     if house_projection is not None:
         for name, lon in longitudes.items():
+            exact_tropical_longitude = None
             if name in states:
                 tropical_longitude = states[name]["longitude"]
             elif name == "South Node":
                 tropical_longitude = combine_longitudes(
                     states["North Node"]["longitude"], 180.0
                 )
+                exact_tropical_longitude = (
+                    angle_fraction(states["North Node"]["longitude"]) + 180
+                ) % 360
             else:
                 tropical_longitude = combine_longitudes(lon, ayanamsha)
-            projected_positions[name] = house_projection.position(tropical_longitude)
+            projected_positions[name] = house_projection.position(
+                tropical_longitude, exact_longitude=exact_tropical_longitude
+            )
     houses = _build_houses(
         ascendant,
         house_system,
@@ -142,7 +154,7 @@ def build_context_geometry(
                 "lon": lon,
                 "signlon": lon % 30.0,
                 "sign": _sign_name(lon),
-                "house": f"House{int(projected_positions[name]) if house_projection is not None else _house_for_longitude(lon, ascendant, house_system, house_cusps=house_cusps)}",
+                "house": f"House{int(projected_positions[name]) if house_projection is not None else _house_for_longitude(partition_longitudes.get(name, lon), ascendant, house_system, house_cusps=house_cusps)}",
                 **(
                     {
                         "motion": context_motion(

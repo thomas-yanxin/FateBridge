@@ -17,7 +17,7 @@ from pydantic import (
     model_validator,
 )
 
-from fatebridge.core.output_base import PartialOutput
+from fatebridge.core.output_base import FullFact, PartialOutput
 from fatebridge.core.output_canping_schedule import CanpingScheduleBasis
 from fatebridge.core.output_canping_solar import (
     CanpingSolarBoundary,
@@ -887,8 +887,8 @@ class ZiweiVoidSystems(PartialOutput):
 
 
 class ZiweiPalace(PartialOutput):
-    name: Optional[str] = None
-    ganzhi: Optional[str] = None
+    name: FullFact[Optional[str]] = None
+    ganzhi: FullFact[Optional[str]] = None
     daxian: Optional[str] = None
     daxian_period: Optional[int] = None
     stars: Optional[List[str]] = None
@@ -1045,11 +1045,11 @@ class ZiweiStructuralConditions(PartialOutput):
 
 
 class ZiweiBirth(PartialOutput):
-    engine: Optional[str] = None
-    calendar_basis: Optional[ZiweiCalendarBasis] = None
-    calendar_rules: Optional[ZiweiCalendarRules] = None
-    ruleset: Optional[ZiweiRuleset] = None
-    rule_trace: Optional[List[ZiweiRuleTrace]] = None
+    engine: FullFact[Optional[str]] = None
+    calendar_basis: FullFact[Optional[ZiweiCalendarBasis]] = None
+    calendar_rules: FullFact[Optional[ZiweiCalendarRules]] = None
+    ruleset: FullFact[Optional[ZiweiRuleset]] = None
+    rule_trace: FullFact[Optional[List[ZiweiRuleTrace]]] = None
     reading_view: Optional[ZiweiReadingView] = None
     symbolic_properties: Optional[ZiweiSymbolicProperties] = None
     ming_textual_properties: Optional[ZiweiMingProperties] = None
@@ -1063,12 +1063,17 @@ class ZiweiBirth(PartialOutput):
     daxian_direction: Optional[str] = None
     hour_branch: Optional[str] = None
     lunar_date: Optional[LunarDate] = None
-    ming_gong: Optional[ZiweiPosition] = None
-    shen_gong: Optional[ZiweiPosition] = None
-    palaces: Optional[List[ZiweiPalace]] = None
+    ming_gong: FullFact[Optional[ZiweiPosition]] = None
+    shen_gong: FullFact[Optional[ZiweiPosition]] = None
+    palaces: FullFact[Optional[List[ZiweiPalace]]] = Field(
+        default=None,
+        min_length=12,
+        max_length=12,
+        json_schema_extra={"x-fatebridge-full-result-unique-by": "name"},
+    )
     sihua: Optional[Dict[str, str]] = None
     time_algorithm: Optional[str] = None
-    wuxing_ju: Optional[WuxingJu] = None
+    wuxing_ju: FullFact[Optional[WuxingJu]] = None
     year_stem: Optional[str] = None
 
 
@@ -1109,7 +1114,6 @@ class ZiweiScope(PartialOutput):
     mutagen_natal_links: Optional[List[ZiweiMutagenNatalLink]] = None
     palace_map: Optional[List[ZiweiScopePalace]] = None
     stem_origin: Optional[str] = None
-    is_childhood_limit: Optional[bool] = None
     flowing_stars: Optional[List[ZiweiFlowingStar]] = None
     annual_three_sha: Optional[ZiweiAnnualThreeSha] = None
 
@@ -1243,7 +1247,7 @@ class ZiweiAgeSourceScope(PartialOutput):
 
 class ZiweiNominalAgeCalendar(PartialOutput):
     method_id: Optional[str] = None
-    basis: Optional[Literal["birth_civil_timezone", "legacy_mixed_clock"]] = None
+    basis: Optional[Literal["birth_civil_timezone"]] = None
     rule: Optional[str] = None
     timezone: Optional[str] = None
     birth_datetime: Optional[str] = None
@@ -1257,13 +1261,6 @@ class ZiweiNominalAgeCalendar(PartialOutput):
     birth_placement_lunar_year: Optional[int] = None
     target_civil_lunar_year: Optional[int] = None
     nominal_age: Optional[int] = None
-    legacy_mixed_clock_age: Optional[int] = None
-    legacy_comparison_applied: Optional[bool] = None
-    legacy_comparison_is_separate_run: Optional[Literal[False]] = None
-    legacy_ordinal_status: Optional[
-        Literal["would_reject_below_one", "ordinal_at_least_one"]
-    ] = None
-    difference_from_legacy: Optional[int] = None
     day_boundary: Optional[str] = None
     physical_order_checked: Optional[bool] = None
     date_lookup_convention: Optional[str] = None
@@ -1551,11 +1548,6 @@ class Liuren(PartialOutput):
     four_lessons: Optional[List[LiurenLesson]] = None
     three_transmissions: Optional[LiurenTransmissions] = None
     twelve_board: Optional[List[LiurenBoardRow]] = None
-    twelve_life_element: Optional[str] = Field(
-        default=None,
-        deprecated=True,
-        description="Deprecated alias of month_building_element; not a twelve-stage calculation.",
-    )
     month_building_element: Optional[str] = None
     life_stages: Optional[LiurenLifeStages] = None
     auxiliary_stars: Optional[LiurenAuxiliaryStars] = None
@@ -1687,7 +1679,7 @@ class QimenHexagram(PartialOutput):
 
 class QimenPalace(PartialOutput):
     god_sequence_index: Optional[int] = None
-    index: Optional[int] = None
+    index: FullFact[Optional[int]] = None
     direction: Optional[str] = None
     element: Optional[str] = None
     heaven_origin_trigram: Optional[str] = None
@@ -1738,23 +1730,28 @@ class Qimen(PartialOutput):
     time_ganzhi: Optional[str] = None
     day_xun_head: Optional[str] = None
     day_kongwang: Optional[str] = None
-    rulesets: Optional[List[QimenRuleset]] = None
-    rule_trace: Optional[List[QimenRuleTrace]] = None
-    calendar_policy: Optional[QimenCalendarPolicy] = None
+    rulesets: FullFact[Optional[List[QimenRuleset]]] = None
+    rule_trace: FullFact[Optional[List[QimenRuleTrace]]] = None
+    calendar_policy: FullFact[Optional[QimenCalendarPolicy]] = None
     structure: Optional[QimenStructure] = None
     patterns: Optional[List[QimenPattern]] = None
     assessment: Optional[QimenAssessment] = None
     source_disagreements: Optional[List[Dict[str, JsonValue]]] = None
     engine: Optional[str] = None
-    dun_type: Optional[str] = None
+    dun_type: FullFact[Optional[str]] = None
     fu_tou: Optional[str] = None
     fushi_hexagram: Optional[QimenHexagram] = None
-    ju_number: Optional[int] = None
+    ju_number: FullFact[Optional[int]] = None
     ju_text: Optional[str] = None
     kongwang: Optional[str] = None
     layout: Optional[str] = None
     options_applied: Optional[QimenOptions] = None
-    palaces: Optional[List[QimenPalace]] = None
+    palaces: FullFact[Optional[List[QimenPalace]]] = Field(
+        default=None,
+        min_length=9,
+        max_length=9,
+        json_schema_extra={"x-fatebridge-full-result-unique-by": "index"},
+    )
     reference: Optional[str] = None
     xun_head: Optional[str] = None
     yuan: Optional[str] = None
@@ -1797,7 +1794,7 @@ class TaiyiCore(PartialOutput):
     chenji: Optional[str] = None
     dingmu: Optional[str] = None
     diyi: Optional[str] = None
-    guest_count: Optional[int] = None
+    guest_count: FullFact[Optional[int]] = None
     guest_count_des: Optional[List[str]] = None
     guest_general: Optional[int] = None
     guest_vice_general: Optional[int] = None
@@ -1807,7 +1804,7 @@ class TaiyiCore(PartialOutput):
     kook_number: Optional[int] = None
     kook_year: Optional[str] = None
     main_calculation: Optional[str] = None
-    main_count: Optional[int] = None
+    main_count: FullFact[Optional[int]] = None
     main_count_des: Optional[List[str]] = None
     main_general: Optional[int] = None
     main_vice_general: Optional[int] = None
@@ -1966,13 +1963,15 @@ class Taiyi(PartialOutput):
     long_cycles: Optional[TaiyiLongCycles] = None
     long_cycle_summary: Optional[TaiyiLongSummary] = None
     extra_palace_marks: Optional[List[TaiyiPalace]] = None
-    engine: Optional[str] = None
+    engine: FullFact[Optional[str]] = None
     accumulation_label: Optional[str] = None
-    core_board: Optional[TaiyiCore] = None
-    life_method: Optional[str] = None
-    palace_marks: Optional[List[TaiyiPalace]] = None
+    core_board: FullFact[Optional[TaiyiCore]] = None
+    life_method: FullFact[Optional[str]] = None
+    palace_marks: FullFact[Optional[List[TaiyiPalace]]] = Field(
+        default=None, min_length=8
+    )
     center_marks: Optional[TaiyiPalace] = None
-    ruleset: Optional[TaiyiRuleset] = None
+    ruleset: FullFact[Optional[TaiyiRuleset]] = None
     calendar_rules: Optional[TaiyiCalendarRules] = None
     calendar_summary: Optional[TaiyiCalendarRules] = None
     pattern_summary: Optional[Object] = None
@@ -2003,7 +2002,7 @@ class JinkouOverview(PartialOutput):
     kongwang: Optional[str] = None
     month_general: Optional[BranchName] = Field(
         default=None,
-        description="依民用瞬间中气确定的月将本位，未移到地分；yuejiang为落地分后的将神。",
+        description="依民用瞬间中气确定的月将本位，未移到地分；yuejiang另记落地分后的将神。",
     )
     si_da_kong: Optional[str] = None
     transmission_method: Optional[str] = None
@@ -2011,7 +2010,7 @@ class JinkouOverview(PartialOutput):
     use_position_basis: Optional[str] = None
     yuejiang: Optional[BranchName] = Field(
         default=None,
-        description="兼容字段名；月将加时后落在地分的将神，与month_general月将本位分开。",
+        description="月将加时后落在地分的将神，对应将神行；与month_general月将本位分开。",
     )
     di_fen_source: Optional[str] = None
     xun_head: Optional[str] = None
@@ -2025,9 +2024,6 @@ class JinkouRow(PartialOutput):
     content: Optional[str] = None
     element: Optional[str] = None
     label: Optional[str] = None
-    power: Optional[str] = Field(
-        default=None, description="兼容别名，仅四季旺衰；不代表课内旺衰或预测概率。"
-    )
     seasonal_power: Optional[str] = Field(
         default=None, description="按月建约定的四季旺衰，与位内旺衰分开。"
     )

@@ -35,9 +35,7 @@ def _record(actual: Any, expected: Any) -> None:
         _require(actual == expected)
 
 
-def validate_natal_structure(
-    chart: dict[str, Any], *, include_opposite: bool = True
-) -> None:
+def validate_natal_structure(chart: dict[str, Any]) -> None:
     """No calls to natal_structure, numeric_patterns or opposite_star_comparison.
 
     Version 1.1 fixed readings predate the opposite-palace branch; only that
@@ -178,39 +176,38 @@ def validate_natal_structure(
             },
         )
         _require(set(named["endpoint_evidence"]) == set(endpoints))
-        if include_opposite:
-            pairs = {}
-            for index, direction in enumerate(OUTER):
-                opposite = OUTER[(index + 4) % 8]
-                a, b = plates["mountain"][direction], plates["facing"][opposite]
-                pairs[direction] = {
-                    "mountain_direction": direction,
-                    "facing_direction": opposite,
+        pairs = {}
+        for index, direction in enumerate(OUTER):
+            opposite = OUTER[(index + 4) % 8]
+            a, b = plates["mountain"][direction], plates["facing"][opposite]
+            pairs[direction] = {
+                "mountain_direction": direction,
+                "facing_direction": opposite,
+                "mountain_star_number": a,
+                "facing_star_number": b,
+                "sum": a + b,
+                "matches_sum_to_ten": a + b == 10,
+            }
+        a, b = plates["mountain"]["C"], plates["facing"]["C"]
+        comparison = patterns["opposite_star_comparison"]
+        _record(
+            comparison,
+            {
+                "pairs": pairs,
+                "spatial_pair_count": 8,
+                "all_eight_sum_to_ten": all(
+                    v["matches_sum_to_ten"] for v in pairs.values()
+                ),
+                "center_numeric_pair": {
                     "mountain_star_number": a,
                     "facing_star_number": b,
                     "sum": a + b,
                     "matches_sum_to_ten": a + b == 10,
-                }
-            a, b = plates["mountain"]["C"], plates["facing"]["C"]
-            comparison = patterns["opposite_star_comparison"]
-            _record(
-                comparison,
-                {
-                    "pairs": pairs,
-                    "spatial_pair_count": 8,
-                    "all_eight_sum_to_ten": all(
-                        v["matches_sum_to_ten"] for v in pairs.values()
-                    ),
-                    "center_numeric_pair": {
-                        "mountain_star_number": a,
-                        "facing_star_number": b,
-                        "sum": a + b,
-                        "matches_sum_to_ten": a + b == 10,
-                        "spatial_opposite_exists": False,
-                        "included_in_spatial_conjunction": False,
-                    },
+                    "spatial_opposite_exists": False,
+                    "included_in_spatial_conjunction": False,
                 },
-            )
-            _require(set(comparison["pairs"]) == set(OUTER))
+            },
+        )
+        _require(set(comparison["pairs"]) == set(OUTER))
     except (KeyError, TypeError, AttributeError, StopIteration) as exc:
         raise FengshuiCalculationError("natal_structure_inconsistent") from exc

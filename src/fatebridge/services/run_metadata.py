@@ -73,7 +73,12 @@ def engine_is_approximate(engine: str) -> bool:
 
 
 _DOWNGRADED_EPHEMERIS_MODELS = frozenset(
-    {"moshier", "mixed", "fatebridge_analytic_solar_v1"}
+    {
+        "moshier",
+        "mixed",
+        "fatebridge_analytic_solar_v1",
+        "fatebridge_complete_moshier_solar_v1",
+    }
 )
 
 

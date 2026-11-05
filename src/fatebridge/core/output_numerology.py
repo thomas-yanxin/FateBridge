@@ -733,11 +733,6 @@ class HeluoBodyEvidence(PartialOutput):
     unresolved: Optional[List[str]] = None
 
 
-class HeluoDayStemMapping(PartialOutput):
-    gua: Optional[str] = None
-    present: Optional[bool] = None
-
-
 class HeluoQiBody(PartialOutput):
     body_id: Optional[str] = None
     gua: Optional[str] = None
@@ -1207,6 +1202,16 @@ class HeluoBodyStructure(PartialOutput):
     constraints: Optional[List[str]] = None
 
 
+class HeluoSelectedYuantang(PartialOutput):
+    pos: Optional[Literal[1, 2, 3, 4, 5, 6]] = None
+    yang: Optional[bool] = None
+    position_polarity_match: Optional[bool] = None
+    youYing: Optional[bool] = None
+    youYing_policy: Optional[str] = None
+    heLi: Optional[bool] = None
+    heLi_policy: Optional[str] = None
+
+
 class HeluoJudge(PartialOutput):
     assessment_status: Optional[str] = None
     xie_policy: Optional[str] = None
@@ -1225,10 +1230,9 @@ class HeluoJudge(PartialOutput):
     fanhua: Optional[Dict[str, JsonValue]] = None
     qi_phases: Optional[HeluoPhaseQi] = None
     deTi: Optional[HeluoBodyEvidence] = None
-    day_stem_mapping: Optional[HeluoDayStemMapping] = None
     erShu: Optional[Dict[str, JsonValue]] = None
     seasonal_numbers: Optional[HeluoSeasonalNumbers] = None
-    yuanTang: Optional[Dict[str, JsonValue]] = None
+    yuanTang: Optional[HeluoSelectedYuantang] = None
     line_conditions: Optional[HeluoLineConditions] = None
     body_structure: Optional[HeluoBodyStructure] = None
 

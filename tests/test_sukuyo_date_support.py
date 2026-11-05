@@ -12,7 +12,7 @@ from fatebridge.core.sukuyo_date_support import local_date_support
 from fatebridge.core.sukuyo_padas import palace_reference
 from fatebridge.services.divination import calculate_sukuyo_compatibility
 
-ROOT = Path(__file__).parent / "fixtures/sukuyo_date_support_v1"
+ROOT = Path(__file__).parent / "data/sukuyo_date_support_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
 CHINA = timezone(timedelta(hours=8))
 

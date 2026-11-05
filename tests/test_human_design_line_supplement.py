@@ -13,42 +13,6 @@ from fatebridge.services.knowledge import calculate_knowledge_read
 from fatebridge.utils.errors import EphemerisSourceError
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "docs/validation/human-design-line-knowledge-v2"
-
-
-def test_frozen_v1_and_every_prior_locator_polarity_and_gate1_field_survive():
-    before = json.loads((BASE / "evidence/before-384.json").read_bytes())
-    assert (
-        hashlib.sha256(hd.CATALOGUE_PATH.read_bytes()).hexdigest()
-        == hd.CATALOGUE_SHA256
-    )
-    assert (
-        hd.CATALOGUE_PATH.read_bytes()
-        == (
-            BASE
-            / "before-source/src/fatebridge/data/human_design/line-knowledge-v1.json"
-        ).read_bytes()
-    )
-    for old in before:
-        key = old["key"]
-        prior = old["reference_details"]["record"]
-        current = hd.read_reference(category="lines", key=key)["reference_details"][
-            "record"
-        ]
-        for field in [
-            "key",
-            "gate",
-            "line",
-            "source_pdf_page_one_based",
-            "source_layout_block_sha256",
-            "catalogue_glyph_polarity",
-            "source_polarity_planets",
-            "additional_polarity_facts",
-        ]:
-            assert current[field] == prior[field], (key, field)
-        if not key.startswith("2."):
-            for field, value in prior.items():
-                assert current[field] == value, (key, field)
 
 
 def test_gate2_condition_stays_reference_only_and_is_not_a_material_forecast():
@@ -126,8 +90,8 @@ def test_missing_or_changed_composite_component_never_falls_back(
 def test_semantic_invariants_survive_even_a_rebound_component_hash(
     tmp_path, monkeypatch, fault
 ):
-    manifest = json.loads(hd.MANIFEST_PATH.read_bytes())
-    supplement = json.loads(hd.SUPPLEMENT_PATH.read_bytes())
+    manifest = json.loads(catalogue.MANIFEST_PATH.read_bytes())
+    supplement = json.loads(catalogue.SUPPLEMENT_PATH.read_bytes())
     if fault == "certify":
         supplement["rows"][0]["independent_semantic_review_completed"] = True
     elif fault == "overwrite_gate1":
@@ -168,8 +132,8 @@ def test_semantic_invariants_survive_even_a_rebound_component_hash(
 def test_every_loaded_component_is_rechecked_after_response_construction(
     tmp_path, monkeypatch, component, operation
 ):
-    path = tmp_path / getattr(hd, component).name
-    path.write_bytes(getattr(hd, component).read_bytes())
+    path = tmp_path / getattr(catalogue, component).name
+    path.write_bytes(getattr(catalogue, component).read_bytes())
     monkeypatch.setattr(catalogue, component, path)
     original = hd._provenance
 

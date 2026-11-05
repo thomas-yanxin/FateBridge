@@ -13,7 +13,7 @@ from tests.test_sukuyo_witness_research import critical
 
 ROOT = Path(__file__).resolve().parents[1]
 FROZEN = json.loads(
-    (ROOT / "tests/fixtures/sukuyo-native-completion-before-code-v93.json").read_bytes()
+    (ROOT / "tests/data/sukuyo-native-completion-before-code-v93.json").read_bytes()
 )["expected_bundle"]
 
 

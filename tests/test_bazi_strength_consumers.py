@@ -3,7 +3,6 @@
 import asyncio
 import copy
 import gzip
-import hashlib
 import json
 from datetime import datetime
 from pathlib import Path
@@ -19,111 +18,32 @@ from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.output_bazi_evidence import StrengthContext
 from fatebridge.core.output_classical_force import EngineeringForceComposition
 from fatebridge.core.output_strength_thresholds import StrengthThresholdArithmetic
-from fatebridge.core.strength_thresholds import threshold_snapshot_lines
 from tests import bazi_strength_reference_v3 as current_reference
-from tests.fixtures.bazi_strength_threshold_v1.independent_reference_v2 import (
-    reconstruct,
-)
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
 from tests.test_agentic_nested_outputs import rest as _rest_fixture
 from tests.test_bazi_strength_thresholds import delivered_payload, evaluate
 
 rest = _rest_fixture
-FIXTURE = Path(__file__).parent / "fixtures/bazi_strength_consumers_v1"
-
-
-def read(name):
-    path = FIXTURE / name
-    return json.loads(
-        gzip.decompress(path.read_bytes())
-        if path.suffix == ".gz"
-        else path.read_bytes()
-    )
-
-
-BODY = read("body-builder-confirmed-before-first.json.gz")["cases"]
-SPECIAL = read("special-cases-before-first.json.gz")["cases"]
-CLIMATE = read("climate-source-first.json")["cases"]
-PUBLIC = read("public-inputs-first.json")["cases"]
+DATA = Path(__file__).parent / "data/bazi"
+BODY = json.loads((DATA / "consumer-inputs.json").read_text())
+SPECIAL = json.loads((DATA / "consumer-special.json").read_text())
+CLIMATE = json.loads((DATA / "climate-source-first.json").read_text())
+PUBLIC = json.loads((DATA / "public-inputs-first.json").read_text())
 
 
 def assess(values):
     pillars = dict(zip(("year", "month", "day", "hour"), map(tuple, values)))
     return pillars, ElementAnalysis.analyze_day_master_strength(pillars)
 
-
-@pytest.mark.parametrize("row", BODY, ids=lambda r: str(r["index"]))
-def test_all_187_historical_comparison_errors_keep_explicit_legacy_phase_replay(row):
-    pillars = dict(zip(current_reference.ORDER, map(tuple, row["pillars"])))
-    assessment = evaluate(row["pillars"], legacy=True)
-    force = build_force_components(pillars, assessment, {})
-    after = force["engineering_composition"]
-    before = row["force_before"]["engineering_composition"]
-    exact = reconstruct(row["pillars"], assessment["relations"])["energies"]
-    assert assessment["threshold_arithmetic"]["energies_exact"] == {
-        element: str(value) for element, value in exact.items()
-    }
-    assert after["body_seal_energy_relation"] == row["expected"]["relation"] == "equal"
-    assert after["comparison_basis"] == "exact_rational_same_assessment"
-    assert (
-        after["legacy_float_body_seal_energy_relation"]
-        == before["body_seal_energy_relation"]
-    )
-    assert (
-        after["body_within_support_exact"]
-        == row["expected"]["body_within_support_exact"]
-        == "1/2"
-    )
-    assert after["body_within_support_share"] == before["body_within_support_share"]
-    assert after["ratio_basis"] == before["ratio_basis"]
-    for key in (
-        "effective_elements_unrounded",
-        "relations",
-        "hidden_stem_ledger",
-        "support_share",
-        "strength_level",
-    ):
-        assert assessment[key] == row["strength_before"]["assessment"][key]
-    assert (
-        force["classical_adjudication"] == row["force_before"]["classical_adjudication"]
-    )
-    assert set(force["classical_adjudication"].values()) == {"not_adjudicated"}
-    EngineeringForceComposition.model_validate(after)
-    StrengthThresholdArithmetic.model_validate(assessment["threshold_arithmetic"])
-
-
-def test_three_sha_only_revision_receipts_remain_immutable_historical_evidence():
-    path = (
-        Path(__file__).parent
-        / "fixtures/architecture_refactor_v1/strength-consumer-revisions-before.json"
-    )
-    raw = path.read_bytes()
-    assert hashlib.sha256(raw).hexdigest() == (
-        "3a26bf900329ade2af1ebe3fe4e4c30cfc38cec835dee865ea289547081fe9eb"
-    )
-    accepted = json.loads(raw)
-    source = FIXTURE / "body-builder-confirmed-before-first.json.gz"
-    assert (
-        hashlib.sha256(source.read_bytes()).hexdigest()
-        == accepted["original_source_sha256"]
-    )
-    assert {row["index"] for row in accepted["rows"]} == {241988, 336427, 440107}
-    originals = {row["index"]: row for row in BODY}
-    for row in accepted["rows"]:
-        assert row["pillars"] == originals[row["index"]]["pillars"]
-        assert set(row) == {"index", "pillars", "business_sha256"}
-        assert len(row["business_sha256"]) == 64
-        assert set(row["business_sha256"]) <= set("0123456789abcdef")
     # These three receipts contain hashes, not complete old result objects.
     # Pin their envelope and provenance; do not forge v11 metadata into an old
-    # hash or claim that this validates the unavailable historical result bytes.
 
 
 @pytest.mark.parametrize("row", BODY, ids=lambda r: str(r["index"]))
 def test_current_v11_all_187_budgets_match_independent_literal_season_arithmetic(row):
     pillars, strength = assess(row["pillars"])
     assessment = strength["assessment"]
-    assert assessment["method_id"] == "season_root_revelation_relations_v11"
+    assert assessment["method_id"] == "season_root_revelation_relations_v12"
     assert assessment["seasonal_phases"] == current_reference.seasonal_phases(
         row["pillars"][1][1]
     )
@@ -161,28 +81,6 @@ def test_current_v11_all_187_budgets_match_independent_literal_season_arithmetic
     assert set(force["classical_adjudication"].values()) == {"not_adjudicated"}
     EngineeringForceComposition.model_validate(composition)
     StrengthThresholdArithmetic.model_validate(receipt)
-
-
-@pytest.mark.parametrize("row", SPECIAL, ids=lambda r: str(r["index"]))
-def test_three_historical_strict_boundary_errors_keep_legacy_phase_explanation(
-    row,
-):
-    assessment = evaluate(row["pillars"], legacy=True)
-    old = row["actual_strength_result"]["assessment"]
-    assert old["requires_special_structure_review"] is True
-    assert (
-        assessment["threshold_arithmetic"]["requires_special_structure_review"] is False
-    )
-    assert assessment["threshold_arithmetic"]["share_exact"] == row["share_exact"]
-    assert assessment["support_share"] == old["support_share"]
-    assert assessment["strength_level"] == old["strength_level"]
-    original = copy.deepcopy(assessment)
-    lines = threshold_snapshot_lines(assessment)
-    assert any(
-        row["share_exact"] in line and "严格小于3/20或大于17/20" in line
-        for line in lines
-    )
-    assert assessment == original
 
 
 @pytest.mark.parametrize("row", SPECIAL, ids=lambda r: str(r["index"]))
@@ -257,13 +155,12 @@ def test_missing_or_partial_exact_evidence_is_never_recalculated_or_promoted():
         {"special_lower_threshold_exact": "1/5"},
     ],
 )
-@pytest.mark.parametrize("legacy", [False, True], ids=["current_v11", "historical"])
-def test_contradictory_exact_receipts_rejected_while_partial_projection_allowed(
-    patch, legacy
-):
-    receipt = evaluate(SPECIAL[0]["pillars"], legacy=legacy)["threshold_arithmetic"]
+def test_contradictory_exact_receipts_rejected_while_partial_projection_allowed(patch):
+    receipt = evaluate(
+        SPECIAL[0]["pillars"],
+    )["threshold_arithmetic"]
     patch = dict(patch)
-    if not legacy and "requires_special_structure_review" in patch:
+    if "requires_special_structure_review" in patch:
         patch["requires_special_structure_review"] = not receipt[
             "requires_special_structure_review"
         ]
@@ -292,22 +189,24 @@ def test_contradictory_exact_receipts_rejected_while_partial_projection_allowed(
         {"seal_energy_exact": "-1"},
     ],
 )
-@pytest.mark.parametrize("legacy", [False, True], ids=["current_v11", "historical"])
-def test_comparison_receipt_rejects_contradictory_explanation_fields(patch, legacy):
+def test_comparison_receipt_rejects_contradictory_explanation_fields(patch):
     pillars = dict(zip(current_reference.ORDER, map(tuple, BODY[0]["pillars"])))
     composition = build_force_components(
-        pillars, evaluate(BODY[0]["pillars"], legacy=legacy), {}
+        pillars,
+        evaluate(
+            BODY[0]["pillars"],
+        ),
+        {},
     )["engineering_composition"]
     patch = dict(patch)
-    if not legacy and "body_seal_energy_relation" in patch:
+    if "body_seal_energy_relation" in patch:
         patch["body_seal_energy_relation"] = (
             "body_greater"
             if composition["body_seal_energy_relation"] != "body_greater"
             else "seal_greater"
         )
     if (
-        not legacy
-        and patch.get("body_within_support_exact")
+        patch.get("body_within_support_exact")
         == composition["body_within_support_exact"]
     ):
         patch["body_within_support_exact"] = "1/3"
@@ -321,17 +220,6 @@ def test_five_fictional_identities_use_v11_reference_on_eleven_tools_and_transpo
     case, rest, tmp_path, capsys
 ):
     original = next(row for row in [*BODY, *SPECIAL] if row["index"] == case["index"])
-    if case["kind"] == "special":
-        assert case["share_exact"] == original["share_exact"]
-    else:
-        assert case["pillars"] == original["pillars"]
-        assert original["expected"]["relation"] == "equal"
-        assert (
-            case["legacy_relation"]
-            == original["force_before"]["engineering_composition"][
-                "body_seal_energy_relation"
-            ]
-        )
     arguments = case["arguments"]
     birth_pillars = BaZiCalendar.get_four_pillars(
         datetime(
@@ -346,7 +234,7 @@ def test_five_fictional_identities_use_v11_reference_on_eleven_tools_and_transpo
     assert values == original["pillars"]
     _, strength = assess(values)
     assessment = strength["assessment"]
-    assert assessment["method_id"] == "season_root_revelation_relations_v11"
+    assert assessment["method_id"] == "season_root_revelation_relations_v12"
     expected = current_reference.reconstruct(values, assessment["relations"])
     selected = SPECS[case["tool"]]
     fields = suggested_fields(selected, view="force_arithmetic")

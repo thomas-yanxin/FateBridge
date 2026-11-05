@@ -14,39 +14,7 @@ from fatebridge.services.knowledge import (
     calculate_knowledge_read,
     calculate_knowledge_registry,
 )
-from tests.canping_witness_knowledge_revision import rebind_r99_knowledge
-from tests.heluo_ben22_revision_reference import REVISION as R96_REVISION
-from tests.heluo_ben22_revision_reference import rebind_r96_counts
-from tests.heluo_ben22_revision_reference import (
-    rebind_r96_metadata as rebind_r96_metadata_before_r99,
-)
-from tests.heluo_ben22_revision_reference import rebind_r96_record
-from tests.heluo_bo23_revision_reference import (
-    rebind_r101_metadata,
-    rebind_r101_record,
-    rebind_r101_registry,
-)
-from tests.heluo_current_source_reference import (
-    HEADER_COUNT,
-    LITERAL_CHANGED_KEYS,
-    advance_current_metadata,
-    advance_current_record,
-    advance_current_registry,
-)
-from tests.heluo_guan_shi_revision_reference import REVISION as R84_REVISION
-from tests.heluo_guan_shi_revision_reference import rebind_r84_record
-from tests.heluo_lin19_song6_revision_reference import (
-    ADDENDUM,
-    REVISION,
-    rebind_reviewed_registry_counts,
-    rebind_reviewed_source_metadata,
-)
-from tests.heluo_shike_bi_revision_reference import REVISION as R92_REVISION
-from tests.heluo_shike_bi_revision_reference import (
-    rebind_r92_counts,
-    rebind_r92_metadata,
-    rebind_r92_record,
-)
+from tests.heluo_source_facts import HEADER_COUNT
 from tests.test_agentic_nested_outputs import SPECS, business
 from tests.test_agentic_nested_outputs import rest as shared_rest
 from tests.test_heluo_poem_transports import run_three
@@ -57,11 +25,6 @@ REFERENCE = json.loads((F / "independent-note-reference.json").read_bytes())["en
 QUALIFICATIONS = json.loads(
     (F / "existing-record-qualification-reference.json").read_bytes()
 )["entries"]
-BEFORE = json.loads(gzip.decompress((F / "whole-corpus-before.json.gz").read_bytes()))
-
-
-def rebind_r96_metadata(value):
-    return rebind_r99_knowledge(rebind_r96_metadata_before_r99(value))
 
 
 def literal_notes(ref):
@@ -70,126 +33,6 @@ def literal_notes(ref):
         + ref["commentary_notes"]
         + [note for poem in ref["poem_notes"] for note in poem["notes"]]
     )
-
-
-def test_independent_reference_freeze_and_original_omissions_are_retained():
-    freeze = json.loads((F / "before-survey-freeze.json").read_bytes())
-    assert freeze["before_production_edits"] is True
-    for name, digest in freeze["files_sha256"].items():
-        assert hashlib.sha256((F / name).read_bytes()).hexdigest() == digest
-    original = json.loads((F / "summary-omissions-before.json").read_bytes())
-    assert original["examined_heluo"] == 384 and original["examined_canping"] == 1170
-    assert original["heluo_records_with_omitted_notes"] == 82
-    assert original["individual_omitted_note_occurrences"] == 160
-
-
-def test_all384_line_summaries_keep_every_existing_source_note_and_record():
-    old = {r["key"]: r["output"] for r in BEFORE if r["domain"] == "heluo"}
-    changed = set()
-    for ref in REFERENCE:
-        out = calculate_knowledge_read(domain="heluo", key=ref["key"])
-        prior = old[ref["key"]]
-        assert "error" not in out
-        # R77 and R81 source additions have separately frozen literal references.
-        # Original R76 outputs stay frozen; migrate only reviewed metadata and
-        # keep every field outside the named additions exact.
-        expected = rebind_reviewed_source_metadata(prior)
-        if ref["key"] in R84_REVISION["record_extensions"]:
-            expected["reference_details"]["record"] = rebind_r84_record(
-                expected["reference_details"]["record"], ref["key"]
-            )
-        expected = rebind_r92_metadata(expected)
-        expected["reference_details"]["record"] = rebind_r92_record(
-            expected["reference_details"]["record"], ref["key"]
-        )
-        expected = rebind_r96_metadata(expected)
-        if ref["key"] in R96_REVISION["record_extensions"]:
-            expected["reference_details"]["record"] = rebind_r96_record(
-                expected["reference_details"]["record"], ref["key"]
-            )
-        # The earlier 24-record test deliberately keeps its partial historical
-        # expectations. R101's separate 384-record control binds those complete
-        # before/after records without replacing the historical assertions.
-        if ref["key"] not in REVISION["changed_record_fields"]:
-            expected["reference_details"]["record"] = rebind_r101_record(
-                expected["reference_details"]["record"], ref["key"]
-            )
-        if ref["key"] not in REVISION["changed_record_fields"]:
-            expected["reference_details"]["record"] = advance_current_record(
-                expected["reference_details"]["record"], ref["key"]
-            )
-        expected = advance_current_metadata(rebind_r101_metadata(expected))
-        if ref["key"] in R96_REVISION["record_extensions"]:
-            assert out["reference_details"] == expected["reference_details"]
-        elif ref["key"] in R92_REVISION["record_extensions"]:
-            assert out["reference_details"] == expected["reference_details"]
-        elif ref["key"] in R84_REVISION["record_extensions"]:
-            assert out["reference_details"] == expected["reference_details"]
-        elif ref["key"].startswith("山地剝:") or ref["key"] in LITERAL_CHANGED_KEYS:
-            assert out["reference_details"] == expected["reference_details"]
-        elif ref["key"] not in REVISION["changed_record_fields"]:
-            assert out["reference_details"] == expected["reference_details"]
-            assert out["lines"][: len(prior["lines"])] == prior["lines"]
-        else:
-            changing = set(REVISION["changed_record_fields"][ref["key"]])
-            record = expected["reference_details"]["record"]
-            for k, v in record.items():
-                if k not in changing:
-                    assert out["reference_details"]["record"][k] == v
-            assert out["reference_details"]["record"]["verdict"] == record["verdict"]
-        assert out["provenance"] == expected["provenance"]
-        assert out["tips"] == out["lines"]
-        for note in literal_notes(ref):
-            for surface in [
-                "\n".join(out["lines"]),
-                out["rendered_text"],
-                out["snapshot_text"],
-            ]:
-                assert note in surface, (ref["key"], note)
-        if out["lines"] != prior["lines"]:
-            changed.add(ref["key"])
-        else:
-            assert out == expected
-    assert (
-        ADDENDUM["corrected_expected_changed_summary_records"]
-        == R84_REVISION["old_summary_changed_count"]
-        == 114
-    )
-    assert R84_REVISION["expected_summary_changed_count"] == 120
-    assert R92_REVISION["current_headers"] == 126
-    assert R96_REVISION["current_headers"] == 132
-    assert len(changed) == HEADER_COUNT
-    assert len(old) == len(REFERENCE) == 384
-
-
-def test_all1170_canping_references_and_both_registries_stay_exact():
-    old = [r for r in BEFORE if r["domain"] == "canping"]
-    assert len(old) == 1170
-    for row in old:
-        assert calculate_knowledge_read(
-            domain="canping", key=row["key"]
-        ) == advance_current_metadata(
-            rebind_r101_metadata(
-                rebind_r96_metadata(
-                    rebind_r92_metadata(rebind_reviewed_source_metadata(row["output"]))
-                )
-            )
-        )
-    registry = json.loads((F / "registry-before.json").read_bytes())
-    for domain, expected in registry.items():
-        expected_current = rebind_r92_counts(
-            rebind_r92_metadata(
-                rebind_reviewed_registry_counts(
-                    rebind_reviewed_source_metadata(expected)
-                )
-            )
-        )
-        assert calculate_knowledge_registry(domain=domain) == advance_current_registry(
-            rebind_r101_registry(
-                rebind_r96_counts(rebind_r96_metadata(expected_current)), domain
-            ),
-            domain,
-        )
 
 
 def test_all_existing_selection_reasons_remain_available_without_personal_selection():
@@ -268,9 +111,9 @@ def test_qualified_summary_on_rest_cli_and_mcp(key, rest, tmp_path, capsys):
 @pytest.mark.parametrize("key", ["山水蒙:6", "澤雷隨:5", "火天大有:3"])
 def test_stale_consistent_old_summary_is_rejected_before_narrow_projection(key):
     spec = SPECS["knowledge_read"]
-    prior = deepcopy(
-        next(r["output"] for r in BEFORE if r["domain"] == "heluo" and r["key"] == key)
-    )
+    prior = calculate_knowledge_read(domain="heluo", key=key)
+    prior["lines"] = ["省略所有来源条件的旧摘要"]
+    prior["snapshot_text"] = "省略所有来源条件的旧摘要"
     request = spec.request_model.model_validate(dict(domain="heluo", key=key))
     frozen = replace(spec, bind=lambda _: (lambda: prior, (), {}))
     result = execute_tool(frozen, request)

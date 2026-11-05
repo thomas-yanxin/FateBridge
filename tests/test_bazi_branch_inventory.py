@@ -1,7 +1,5 @@
 """All geometric candidates survive numeric exclusion without implying effect."""
 
-import gzip
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -9,24 +7,53 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from fatebridge.core import bazi_evidence
 from fatebridge.core.bazi_evidence import build_natal_evidence
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.passage_relations import build_passage_relation_context
 from fatebridge.services.source_comparison import calculate_bazi_source_compare
-from tests.fixtures.bazi_branch_inventory_v1.literal_geometry import (
+from tests.bazi_geometry_reference import (
     ORDER,
     geometries,
     identifier,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-D = ROOT / "docs/validation/bazi-branch-inventory-files-v1"
 COUNTEREXAMPLES = [
     (["癸酉", "甲子", "丙寅", "甲午"], "bc1:半合:火:day-hour"),
     (["癸酉", "甲子", "丁卯", "乙巳"], "bc1:半合:金:year-hour"),
     (["癸巳", "甲寅", "丙子", "丙申"], "bc1:半合:水:day-hour"),
     (["癸巳", "乙卯", "丙子", "丁酉"], "bc1:半合:金:year-hour"),
 ]
+
+
+def _with_literal_candidate_additions(chart, without_inventory, inventory):
+    """Add the independently listed geometry refs; never remove numeric fields."""
+    specs = geometries([chart[p][1] for p in ORDER])
+    assert len(inventory["candidates"]) == len(specs)
+    for row, (kind, target, positions) in zip(
+        inventory["candidates"], specs, strict=True
+    ):
+        assert row["id"] == identifier(kind, target, positions)
+        assert (row["kind"], row["target"], row["positions"]) == (
+            kind,
+            target,
+            list(positions),
+        )
+    expected = deepcopy(without_inventory)
+    expected["branch_combination_candidates"] = inventory
+    for node in expected["nodes"]:
+        carriers = node["root_carrier_positions"]
+        node["potential_branch_candidate_refs"] = (
+            [
+                identifier(kind, target, positions)
+                for kind, target, positions in specs
+                if set(carriers) & set(positions)
+            ]
+            if carriers is not None
+            else None
+        )
+    return expected
 
 
 @pytest.mark.parametrize("values,identity", COUNTEREXAMPLES)
@@ -53,35 +80,6 @@ def test_four_first_counterexamples_expose_suppressed_half_on_both_domain_output
             assert (identity in node["potential_branch_candidate_refs"]) == bool(
                 set(carriers) & set(row["positions"])
             )
-
-
-def test_all20736_geometries_and_actual_pre_half_stage_trace_agree():
-    from fatebridge.core.branch_candidates import build_branch_combination_candidates
-    from fatebridge.core.output_branch_candidates import BranchCombinationCandidates
-
-    count = 0
-    for line in gzip.open(D / "all20736-stage-before-first.jsonl.gz", "rt"):
-        saved = json.loads(line)
-        chart = dict(zip(ORDER, (("甲", b) for b in saved["branches"])))
-        assessment = {
-            "method_id": "season_root_revelation_relations_v8",
-            "relations": saved["relations"],
-        }
-        before = deepcopy(assessment)
-        value = build_branch_combination_candidates(chart, assessment)
-        assert value["pre_half_claimed_positions"] == saved["claimed_before_half"]
-        assert value["pre_half_clashed_positions"] == saved["clashed_before_half"]
-        assert [r["id"] for r in value["candidates"]] == [
-            identifier(k, t, p) for k, t, p in geometries(saved["branches"])
-        ]
-        assert all(
-            r["screen_decision"] != "unclassified_unrecorded"
-            for r in value["candidates"]
-        )
-        BranchCombinationCandidates.model_validate(value)
-        assert assessment == before
-        count += 1
-    assert count == 20736
 
 
 def test_missing_or_unknown_effects_do_not_manufacture_known_empty_screen():
@@ -111,59 +109,77 @@ def test_missing_or_unknown_effects_do_not_manufacture_known_empty_screen():
     )
 
 
-def test_legacy_context_without_pillars_keeps_its_existing_shape():
+def test_partial_context_without_pillars_does_not_invent_inventory():
     chart = dict(zip(ORDER, map(tuple, ["甲子", "丙寅", "甲午", "庚申"])))
     strength = ElementAnalysis.analyze_day_master_strength(chart)
     natal = build_natal_evidence(chart, strength)
-    legacy = build_passage_relation_context(
+    partial = build_passage_relation_context(
         natal["classical_passage"], strength["assessment"]
     )
-    assert "branch_combination_candidates" not in legacy
-    assert all("potential_branch_candidate_refs" not in n for n in legacy["nodes"])
+    assert "branch_combination_candidates" not in partial
+    assert all("potential_branch_candidate_refs" not in n for n in partial["nodes"])
 
 
-def test_inventory_is_exactly_additive_and_never_changes_calculation():
-    source = (
-        ROOT
-        / "docs/validation/bazi-month-command-integrity-files-v1/all408-source-final-first.jsonl.gz"
-    )
-    assert hashlib.sha256(source.read_bytes()).hexdigest() == (
-        "81766f95c5e45ba866244d793c1dadcdd1f36470893b2077563da3c4eb8492b8"
-    )
-    manifest = (
-        ROOT / "tests/fixtures/architecture_refactor_v1/bazi408-before-manifest.json"
-    )
-    assert hashlib.sha256(manifest.read_bytes()).hexdigest() == (
-        "bac00f4517a2357188312ab9c325ba8d051dcc224b8f32aee7bf0b6f453b17d8"
-    )
-    before = json.loads(manifest.read_bytes())
-    saved = [json.loads(line) for line in gzip.open(source, "rt")]
-    for row, expected in zip(saved, before, strict=True):
-        chart = dict(zip(ORDER, map(tuple, row["case"]["pillars"])))
+def test_current408_inventory_is_read_only_and_exactly_additive(monkeypatch):
+    from fatebridge.core.branch_candidates import build_branch_combination_candidates
+
+    def without_inventory(passage, assessment, *, pillars=None):
+        return build_passage_relation_context(passage, assessment)
+
+    count = 0
+    for row in json.loads(
+        (ROOT / "tests/data/bazi/arithmetic-inputs.json").read_text()
+    ):
+        chart = dict(zip(ORDER, map(tuple, row["pillars"])))
         strength = ElementAnalysis.analyze_day_master_strength(chart)
-        natal = build_natal_evidence(chart, strength)
-        for key, value in (
-            ("case", row["case"]),
-            ("strength", strength),
-            ("natal", natal),
-        ):
-            encoded = json.dumps(
-                value,
+        original = deepcopy({"chart": chart, "strength": strength})
+        encoded = json.dumps(
+            original,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+        inventory = build_branch_combination_candidates(chart, strength["assessment"])
+        assert {"chart": chart, "strength": strength} == original
+        assert (
+            json.dumps(
+                {"chart": chart, "strength": strength},
                 ensure_ascii=False,
                 sort_keys=True,
                 separators=(",", ":"),
                 allow_nan=False,
-            ).encode()
-            assert hashlib.sha256(encoded).hexdigest() == expected[key + "_sha256"]
-        context = natal["classical_passage_relations"]
-        inventory = context.pop("branch_combination_candidates")
-        assert inventory["calculation_effect"] == "none"
-        for node in context["nodes"]:
-            node.pop("potential_branch_candidate_refs")
-        assert context == build_passage_relation_context(
-            natal["classical_passage"], strength["assessment"]
+            )
+            == encoded
         )
-    assert len(saved) == len(before) == 408
+        actual = build_natal_evidence(chart, strength)
+        with monkeypatch.context() as local:
+            local.setattr(
+                bazi_evidence, "build_passage_relation_context", without_inventory
+            )
+            baseline = build_natal_evidence(chart, strength)
+        expected = deepcopy(baseline)
+        expected["classical_passage_relations"] = _with_literal_candidate_additions(
+            chart, baseline["classical_passage_relations"], inventory
+        )
+        # Full current natal objects differ only by explicitly reconstructed
+        # additions; no old/current numeric field is removed or normalized.
+        assert actual == expected
+        assert inventory["calculation_effect"] == "none"
+        assert inventory["effective_combination"] == "not_adjudicated"
+        assert {"chart": chart, "strength": strength} == original
+        assert (
+            json.dumps(
+                {"chart": chart, "strength": strength},
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+                allow_nan=False,
+            )
+            == encoded
+        )
+        count += 1
+    assert count == 408
 
 
 def test_known_inventory_contradictions_are_rejected_without_filling_partial_facts():

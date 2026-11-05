@@ -22,7 +22,7 @@ from fatebridge.core.sukuyo_sources import load_source
 def verify_daily_annotations(capture: Path | None = None) -> dict[str, Any]:
     source = load_source(SOURCE)
     bundle = source.data
-    fixture = ROOT / "tests/fixtures/sukuyo-shogonji-daily.json"
+    fixture = ROOT / "tests/data/sukuyo-shogonji-daily.json"
     original = json.loads(fixture.read_bytes())
     errors: list[Any] = []
     if (

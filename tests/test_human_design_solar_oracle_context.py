@@ -1,7 +1,5 @@
 """Missing native reference observations cannot become implicit exact passes."""
 
-import gzip
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -9,10 +7,8 @@ from pathlib import Path
 import pytest
 
 from scripts.check_human_design_solar_speed_lattice import compare, compare_case
-from scripts.historical_source_identity import HistoricalSources
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "docs/validation/human-design-solar-oracle-context-v1"
 
 
 def example():
@@ -45,42 +41,13 @@ def example():
     return c, s
 
 
-def test_all_original_reference_generator_and_acceptance_assertions_remain_frozen():
-    plan = json.loads((BASE / "evidence/plan.json").read_text())
-    originals = HistoricalSources(ROOT)
-    for name in (
-        "scripts/build_human_design_solar_speed_reference.py",
-        "tests/fixtures/human-design-solar-speed-lattice.json",
-        "tests/fixtures/human-design-solar-speed-lattice-linux.json",
-        "tests/fixtures/human-design-solar-lattice-linux-observation.json",
-        "tests/test_human_design_solar_flags.py",
-    ):
-        if name == "tests/test_human_design_solar_flags.py":
-            original = (
-                ROOT
-                / "tests/fixtures/architecture_refactor_v1/frozen-tests/test_human_design_solar_flags.py.txt"
-            )
-            assert (
-                hashlib.sha256(original.read_bytes()).hexdigest()
-                == plan["source_before"][name]
-            )
-        else:
-            assert originals.matches(ROOT / name, plan["source_before"][name])
-    for name in (
-        "human-design-solar-speed-lattice.json",
-        "human-design-solar-speed-lattice-linux.json",
-    ):
-        assert (
-            len(json.loads((ROOT / "tests/fixtures" / name).read_text())["cases"])
-            == 244
-        )
-
-
 def test_first_real_missing_reference_keeps_failure_without_native_recalculation():
-    old = ROOT / "docs/validation/human-design-cycle-solar-stations-v1/evidence"
-    c = json.loads((old / "solar-missing-endpoint-plan.json").read_text())["case"]
-    with gzip.open(old / "solar-first-missing-endpoint-fresh.json.gz", "rt") as source:
-        solver = json.load(source)["solver"]
+    from fatebridge.core.human_design_time import solve_design_epoch_tt
+
+    c = json.loads(
+        (ROOT / "tests/data/human_design/solar-missing-endpoint-case.json").read_text()
+    )
+    solver = solve_design_epoch_tt(c["birth_jd_tt"], backend=c["backend"])["solver"]
     result = compare_case(c, solver)
     assert result["status"] == "compared"
     assert result["strict_root_equal"] is False

@@ -21,9 +21,6 @@ CALCULATIONS = {"meihua_cast", "meihua_analysis"}
 PROMPT_BUILDER_AST_SHA256 = (
     "dae635025428a509ba4d9b0ff797e11b6fbafbbf7a79d315229437733c66241c"
 )
-LEGACY_RAW_PROMPT_EVALUATOR_SHA256 = (
-    "b155dcffaf768cc42bc36d873e46f807d2c1593e003f561794356e8f53e93135"
-)
 
 
 def file_sha(path: Path) -> str:
@@ -98,12 +95,10 @@ def _packet(record: dict[str, Any]) -> dict[str, Any]:
     return packet
 
 
-def _expected_prompt(case: dict[str, Any], version: str) -> str:
+def _expected_prompt(case: dict[str, Any]) -> str:
     prompt = case["prompt"]
     if not isinstance(prompt, str):
         raise ValueError("Prepared prompt must be text")
-    if version == "raw_prompt_legacy":
-        return prompt
     allowed = case.get("allowed_tools")
     if allowed is None:
         return prompt
@@ -180,8 +175,6 @@ def audit_preparation(
         and portable_ast_sha(builders[0]) == PROMPT_BUILDER_AST_SHA256
     ):
         prompt_version = "allowed_tools_prefix_v1"
-    elif not builders and file_sha(evaluator) == LEGACY_RAW_PROMPT_EVALUATOR_SHA256:
-        prompt_version = "raw_prompt_legacy"
     else:
         raise ValueError("Unknown frozen prompt builder requires separate review")
     worksheet = json.loads((directory / "review-worksheet.json").read_bytes())
@@ -206,7 +199,7 @@ def audit_preparation(
         case = cases[reference["case"]]
         if (
             directory / "model-prompts" / (case["id"] + ".txt")
-        ).read_text() != _expected_prompt(case, prompt_version):
+        ).read_text() != _expected_prompt(case):
             raise ValueError(
                 "Prepared model prompt differs from its sealed case contract"
             )

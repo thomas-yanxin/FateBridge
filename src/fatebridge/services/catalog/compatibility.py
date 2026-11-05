@@ -6,6 +6,7 @@ from typing import List
 
 from fatebridge.application.bindings import lazy_service, pair_invoke
 from fatebridge.application.tool_spec import ToolSpec
+from fatebridge.core.method_contracts import COMPATIBILITY_INDEX
 from fatebridge.core.requests.compatibility import TwoPersonCompatibilityRequest
 
 calculate_compatibility_analysis = lazy_service(
@@ -24,5 +25,6 @@ SPECS: List[ToolSpec] = [
         rest_path="/api/compatibility",
         mcp_name="two_person_compatibility",
         cpu_bound=True,
+        methods=(COMPATIBILITY_INDEX,),
     ),
 ]

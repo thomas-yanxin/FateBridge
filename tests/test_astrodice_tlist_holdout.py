@@ -8,21 +8,18 @@ import pytest
 
 from scripts.audit_astrodice_horizons_wide_reference import validate
 
-FIXTURE = Path(__file__).parent / "fixtures/astrodice-tlist-guard-holdout-v1"
+FIXTURE = (
+    Path(__file__).parent
+    / "data/astrodice/reference_sets/fixture-tlist-guard-holdout-v1"
+)
 
 
 def test_independent_guard_holdout_keeps_auxiliaries_and_failed_rate_templates():
-    manifest_path = FIXTURE / "manifest.json"
-    assert hashlib.sha256(manifest_path.read_bytes()).hexdigest() == (
-        "cc4197bd336ec1b4123d9c8040fdce8519079b60c7d47675f7751286c852d2ab"
-    )
-    for name, digest in json.loads(manifest_path.read_text())["files"].items():
-        assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest
     result = validate(
         FIXTURE / "protocol.json",
         FIXTURE / "reference.json",
         FIXTURE / "raw",
-        FIXTURE / "seal.json",
+        FIXTURE / "source-identity.json",
     )
     assert result == json.loads((FIXTURE / "first-quality.json").read_text())
     assert result["position_probes"] == 76 and result["complete_cases"] == 4

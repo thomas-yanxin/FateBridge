@@ -10,7 +10,6 @@ from fatebridge.cli import run as cli_run
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
 from tests.test_liuyao_transports import assert_same_run_receipt
 
-pytest_plugins = ["tests.test_agentic_nested_outputs"]
 PAYLOAD = {
     "date": "2026-08-07",
     "time": "12:00:00",

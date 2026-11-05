@@ -17,7 +17,7 @@ from fatebridge.validation.sukuyo_calendar_sources import (
     require_importable,
 )
 
-FIXTURE = Path(__file__).parent / "fixtures/sukuyo_hutime_v1"
+FIXTURE = Path(__file__).parent / "data/sukuyo_hutime_v1"
 ROOT = Path(__file__).resolve().parents[1]
 
 

@@ -27,7 +27,7 @@ from tests.test_agentic_nested_outputs import (
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/ren_calendar_guard_v1"
-FREEZE_SHA = "9ccd4ba277cfa91c184fe59bcf33f5d0f392c509f2197b9167460653353e2f76"
+FREEZE_SHA = "7f93b89d2761b854672530e7d60bf99e201cfa962c80a63b3947d776c48f47d9"
 CASES = [
     (1800, 1, 1),
     (1800, 7, 1),

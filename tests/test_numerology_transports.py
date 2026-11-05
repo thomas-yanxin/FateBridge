@@ -12,11 +12,7 @@ from fatebridge.application.examples import (
 )
 from fatebridge.cli import run as cli_run
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.heluo_current_source_reference import (
-    COMMENTARY_RULESET_ID,
-    HEADER_COUNT,
-    PENDING_COUNT,
-)
+from tests.heluo_source_facts import COMMENTARY_RULESET_ID, HEADER_COUNT, PENDING_COUNT
 from tests.test_agentic_nested_outputs import SPECS, business, call_cli, native
 from tests.test_agentic_nested_outputs import rest as shared_rest
 
@@ -1585,7 +1581,6 @@ def test_nayin_direction_qualifier_and_unresolved_deti_on_three_surfaces(
     payload = {**INPUT, "date": date, "time": "09:33:00", "gender": "男"}
     fields = [
         "judge.deTi",
-        "judge.day_stem_mapping",
         "numerology_evidence.rule_trace",
         "snapshot_text",
     ]

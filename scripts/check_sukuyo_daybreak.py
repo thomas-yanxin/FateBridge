@@ -10,7 +10,7 @@ from typing import Any
 from xml.etree import ElementTree as E
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/sukuyo-daybreak-before-production-v75.json"
+FIXTURE = ROOT / "tests/data/sukuyo-daybreak-before-production-v75.json"
 SOURCE = ROOT / "src/fatebridge/data/sukuyo_daybreak_sources.json"
 R1_SHA256 = "49bfe3aa0b1e5187f06e5abec3b03530768423385422d53634228a584b6fc5af"
 R2_SHA256 = "08ff13f9f24581ca2432a250c2e1611217edbe0126df88a0c3b15df8a8f6093d"

@@ -15,7 +15,7 @@
 | 时刻、地点或命盘字段不符 | [出生信息与返回字段](#出生信息与返回字段) |
 | 星历降级或西占后端错误 | [占星与推运](#占星与推运) |
 | 只收到部分结果、引用失效 | [快照与结果交付](#快照导出) |
-| 旧路由、字段或 Python 导入失效 | [迁移指南](migration.md) |
+| 旧路由、字段或 Python 导入失效 | [接口合同](api-reference.md) |
 
 ## 先检查当前环境
 
@@ -144,7 +144,7 @@ MCP 已知工具的模型/业务失败返回 `isError=true` 与结构化错误�
 
 ### 本地 runtime 可用但精度仍降级
 
-同时检查 `chart_profile.engine_backend`、`engine_precision`、`ephemeris_model` 与 `run_metadata.engine_is_approximate`。运行时可用但缺 `.se1` 时可能使用 Moshier；仅看 backend 名称会遗漏降级。数据获取与 `SE_EPHE_PATH` 配置见 [快速入门](getting-started.md#星历数据与精度)。
+同时检查 `chart_profile.engine_backend`、`engine_precision`、`ephemeris_model` 与 `run_metadata.engine_is_approximate`。运行时可用但缺 `.se1` 时可能使用 Moshier；仅看 backend 名称会遗漏降级。数据获取与 `SE_EPHE_PATH` 配置见 [星历安装](ephemeris.md)。
 
 CLI 不自动读取 `.env`，`SE_EPHE_PATH` 应在启动前设进程环境。GUI MCP host 也需传入相同路径。选择一致的版本、数据路径和日期后重试，并保存结果的实际模型标识。
 

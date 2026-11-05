@@ -200,36 +200,12 @@ def calculate_meihua_analysis(
         {
             "interpretation_topic": interpretation_topic,
             "weather_context": weather_context,
-            **(
-                {"reputation_context": reputation_context}
-                if reputation_context is not None
-                else {}
-            ),
-            **(
-                {"response_context": response_context}
-                if response_context is not None
-                else {}
-            ),
-            **(
-                {"observation_context": observation_context}
-                if observation_context is not None
-                else {}
-            ),
-            **(
-                {"observer_activity": observer_activity}
-                if observer_activity is not None
-                else {}
-            ),
-            **(
-                {"matter_scenario": matter_scenario}
-                if matter_scenario is not None
-                else {}
-            ),
-            **(
-                {"external_observations": external_observations}
-                if external_observations is not None
-                else {}
-            ),
+            "reputation_context": reputation_context,
+            "response_context": response_context,
+            "observation_context": observation_context,
+            "observer_activity": observer_activity,
+            "matter_scenario": matter_scenario,
+            "external_observations": external_observations,
         }
     )
     timezone_name = analysis_timezone or DEFAULT_BIRTH_TIMEZONE
@@ -417,8 +393,7 @@ def calculate_meihua_analysis(
                 item.model_dump(mode="json", exclude_none=True)
                 for item in options.external_observations
             ]
-            if external_observations is not None
-            and options.external_observations is not None
+            if options.external_observations is not None
             else None
         ),
     )
@@ -427,9 +402,7 @@ def calculate_meihua_analysis(
     apply_stage_emphasis(
         meihua,
         interpretation,
-        matter_scenario=(
-            options.matter_scenario if matter_scenario is not None else None
-        ),
+        matter_scenario=options.matter_scenario,
         scenario_fact_path="analysis_context.matter_scenario",
     )
     from fatebridge.core.meihua_motion import apply_motion_context
@@ -437,9 +410,7 @@ def calculate_meihua_analysis(
     apply_motion_context(
         meihua,
         interpretation,
-        observer_activity=(
-            options.observer_activity if observer_activity is not None else None
-        ),
+        observer_activity=options.observer_activity,
         observer_fact_path="analysis_context.observer_activity",
     )
     from fatebridge.core.meihua_timing import apply_postheaven_count_reference
@@ -449,7 +420,7 @@ def calculate_meihua_analysis(
 
     normalized_observation = (
         options.observation_context.model_dump(mode="json")
-        if observation_context is not None and options.observation_context is not None
+        if options.observation_context is not None
         else None
     )
     apply_observation_context(
@@ -475,7 +446,7 @@ def calculate_meihua_analysis(
 
     normalized_response = (
         options.response_context.model_dump(mode="json")
-        if response_context is not None and options.response_context is not None
+        if options.response_context is not None
         else None
     )
     apply_situational_responses(
@@ -495,7 +466,7 @@ def calculate_meihua_analysis(
 
     normalized_reputation = (
         options.reputation_context.model_dump(mode="json", exclude_none=True)
-        if reputation_context is not None and options.reputation_context is not None
+        if options.reputation_context is not None
         else None
     )
     apply_reputation_supplement(
@@ -846,18 +817,10 @@ def calculate_sukuyo_compatibility(
     person1_date: str,
     person1_time: Optional[str] = None,
     person1_zone: Optional[str] = None,
-    person1_lat: Optional[str] = None,
-    person1_lon: Optional[str] = None,
-    person1_gps_lat: Optional[float] = None,
-    person1_gps_lon: Optional[float] = None,
     person2_name: str = "乙方",
     person2_date: str,
     person2_time: Optional[str] = None,
     person2_zone: Optional[str] = None,
-    person2_lat: Optional[str] = None,
-    person2_lon: Optional[str] = None,
-    person2_gps_lat: Optional[float] = None,
-    person2_gps_lon: Optional[float] = None,
     leap_month_policy: str = "unresolved",
     calendar_profile: str = "t1299_fullmoon27",
     person1_calendar_day_part: Optional[str] = None,
@@ -893,8 +856,6 @@ def calculate_sukuyo_compatibility(
         {
             "name": name,
             "natal_su27": context["natal_su27"],
-            "natal_su28": None,
-            "moon_longitude": None,
             "calendar": context,
             "palace_reference": palace_reference(context, pada),
         }
@@ -989,8 +950,6 @@ def calculate_sukuyo_compatibility(
         "interpretation_contract": {
             "basis": "仅引用本次calendar档案、完整候选和双向relation；不能把sequence_group解释为近中远距离，也不把原典半日自动当民用12:00。",
             "pair_labels": "六类配对标签只归类有向结果，不是原典六级吉凶或成功概率。",
-            "coordinates": "旧输入中的经纬度保留兼容；不参与月日表定宿。",
-            "deprecated_fields": "natal_su28及moon_longitude为null；本命宿由农历月日确定。",
             "palace_reference": "双方宫名仅按历日宿名和显式textual_pada查原典分足表；未定实际出生足位或本命宫，也未据此合成宫位相性或分数。",
             "research_reference": "fixed_host_research_scope是具名研究全表与固定NAOJ月首方向比较，不是双方本月选行、历日算法或关系预测；未知及不利行完整保留。",
         },

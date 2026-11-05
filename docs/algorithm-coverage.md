@@ -156,9 +156,9 @@
 | `bazi_relatives` | 六亲：父母/兄弟姐妹星、六亲宫位、贵人 | Implemented |
 | `bazi_romance` | 桃花咸池、红鸾天喜等传统关系象意，不确认具体对象或相遇时间 | Implemented，限定规则 |
 
-八字11个出生资料入口与七个时运入口可接收已知整秒，提供秒数时须显式提供分钟；出生上下文保留省略分量与兼容00值，见[出生秒数与输入分量](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-birth-seconds-audit.md)。这是输入传递能力，不认证真实出生记录精度，也不提高原典或现实预测的验收等级。
+八字11个出生资料入口与七个时运入口可接收已知整秒，提供秒数时须显式提供分钟；出生上下文保留省略分量与兼容00值，见[出生秒数与输入分量](bazi-timing.md)。这是输入传递能力，不认证真实出生记录精度，也不提高原典或现实预测的验收等级。
 
-上述入口可用已确认的 `birth_utc_offset` 消歧重复民用钟时；偏移须匹配已解析时区，未来交运保留原IANA地区规则。未知选择和跳过钟时继续拒绝，见[重复钟时审计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/bazi-birth-fold-audit.md)。
+上述入口可用已确认的 `birth_utc_offset` 消歧重复民用钟时；偏移须匹配已解析时区，未来交运保留原IANA地区规则。未知选择和跳过钟时继续拒绝，见[重复钟时审计](bazi-timing.md)。
 
 ### 2.2 `compatibility` —— 双人配合（Implemented）
 
@@ -221,7 +221,7 @@
 | `liureng_gods` | 四课三传、天将、按探原总说推导的细课名，及同盘支位合冲刑破害并存依据；表注仍有差异 | Implemented（部分原典核对） |
 | `liureng_runyear` | 农历虚岁行年与分析时刻六壬课（不含逐流月预测） | Implemented |
 | `qimen` | [时家转盘](qimen-depth-audit.md)：置闰／拆补、寄宫及有来源的格局证据；原典片段验收，现实预测未验证 | Implemented（限定规则） |
-| `taiyi` | 《太乙金镜式经》年计及卷五年度十神、六纪节月与冬夏至时计的现代天文适配；阴阳144局两算、七类空间条件、卷四五将合取；年/月定计及[分法八门](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-gates.md)，另有明选[金钥匙时计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-hour.md)完整积时与四门，及[金钥匙日计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-day.md)积日与分源十精；原表与定计课例分歧、古历异单位解释及引文异数保留，见[审计](taiyi-sanshi-audit.md)；显式[历史年计](https://github.com/thomas-yanxin/FateBridge/blob/99a5cecea99201823fc7e00d55a80dd9fd490c59/docs/taiyi-year-calendar.md)支持381—385晋历及501—505齐梁史历主表，502年闰标异说随结果保留，未据此认证原典古日计 | Partial |
+| `taiyi` | 《太乙金镜式经》年计及卷五年度十神、六纪节月与冬夏至时计的现代天文适配；阴阳144局两算、七类空间条件、卷四五将合取；年/月定计及[分法八门](taiyi-sanshi-audit.md)，另有明选[金钥匙时计](taiyi-sanshi-audit.md)完整积时与四门，及[金钥匙日计](taiyi-sanshi-audit.md)积日与分源十精；原表与定计课例分歧、古历异单位解释及引文异数保留，见[审计](taiyi-sanshi-audit.md)；显式[历史年计](taiyi-sanshi-audit.md)支持381—385晋历及501—505齐梁史历主表，502年闰标异说随结果保留，未据此认证原典古日计 | Partial |
 | `jinkou` | 四位、阴阳用位及受克空破、五动三动、季节与有限课内旺衰、得气、六十四课钤逐条三态判定、四绝及岁日结构、三合齐缺与成员空破条件 | Implemented（58条课钤结构已评估，6条未决，全部64条以true/false/null区分命中、未命中、未判；四败仅临地分，大绝按显式本命支计算、缺命保留未知；支齐不等于合化，完整合化及综合取用未裁定） |
 
 > 紫微斗数以 iztro 2.5.8 为对齐基线，采用正月初一年界、虚岁自然年递增、本命晚子时算当天、闰月后半月算下月的规则。当前冻结 1,080 张本命软件参考盘及 18 个运限用例，分别核对本命星曜／长生博士等和六层落宫／四化；流月/流日/流时比较实际落宫索引，不能用历法地支代替。返回的 `branch` 是实际落宫，`palace_ganzhi` 是本命宫干支，`stem` 是该运限四化所用天干；后两者可能不同。另以 `childhood_limit` 独立返回原文明示一至六岁之命、财帛、疾厄、夫妻、福德、官禄宫及实际本命星曜；后续岁序留空，岁首及大限前替代关系未认证。既有起大限前童限替代与独立童限分别披露；农历日期或大限超出支持范围时明确报错。
@@ -230,35 +230,19 @@
 
 > 运限的 `natal_prerequisites` 另携带同次内部本命的月时、年干、命身、宫干支纳音与局数推导，供解释局数及起限岁数时直接引用。它核实实际计算之间的连接；公历起算、原典岁首与现实效度仍需分别验收。
 
-> 六壬取传按九宗门，第一课生克用日干五行、寄宫只定位；贵人顺逆按贵人实际落地盘的位置判断（巳至戌逆布）。已与独立 daliurenpython 的 8,640 种日干支/时支/月将组合对照，三传全部一致。初轮 kinliuren 参考软件的部分三传存在不稳定与异常，不能把与该软件的所有差异一律判为 FateBridge 错误。固定参考来源与 720 张独立天地盘保存在三传基准（本地数据：`../tests/fixtures/liureng_transmissions_reference.json`），[全组合回归](../tests/test_metaphysics_reference.py)遍历每张盘的 12 个时支位置。此对照限于三传，不包含所有神煞、课体解释、流派差异或金口诀的完整独立认证。
+> 六壬按九宗门取传，第一课生克使用日干五行，寄宫负责定位；天盘顺布与贵人顺逆分别计算。原独立 daliurenpython 三传参考覆盖720张天地盘，全部12个时支展开为8,640组；原始向量保存在 [三传参考](../tests/fixtures/liureng_transmissions_reference.json)，由[当前对照测试](../tests/test_metaphysics_reference.py)读取。此范围只核三传，不认证全部课名、神煞、流派或现实预测。
 
-> 金口诀按本法地分起贵神，使用贵神固有干支；不以大六壬三传课体取用。六壬三传另返回日旬遁干、本空及坐空，空支不补造遁干；天盘顺布与贵人顺逆分开。三工具支持 `is_diurnal` 显式选择昼贵/夜贵，省略按时支约定。金口诀另据京本书影分列三合成员、虚一支、人元关系及空破事实，不据所忌支自身出现自动破局，详见第八轮验收（本地数据：`validation/jinkou-combinations-validation-2026-10-22.md`）。原典与历法各层范围见[专业能力审计](liuren-jinkou-audit.md)。
+> 金口诀使用本法地分与贵神固有干支，不借大六壬课体决定取用。四位的季节旺衰、课内旺衰、得气和阴阳用位分别返回；综合用位、完整合化及原典疑文保持未知。64课逐条使用true／false／null区分命中、未命中与未判，原四位重建46相符、16不同、2缺日的完整分母保留。三合支齐不证明合化，命支未给不补造大绝。来源、课钤对照及未决范围见[六壬与金口诀](liuren-jinkou-audit.md#盘面规则与同课条件)。
 
-> 三工具以 `calendar_policy` 公布实际时钟和23:00子初换日；天文求解失败返回依赖错误，不用线性节气回退起课。交气使用TT求解后按历史UTC/闰秒政策转换，五个实际依赖公开转换方法及未来闰秒假设；小数秒只表示数值分辨率。第三十五轮对原3,024个分钟值及4,536组换将边界分别验证原生Swiss、有文件解析和无文件默认模型：分钟超差为21／22／22项，边界失败均为0；同一队列DE440 TT对照均在原1秒线内。当前HKO 73,049日农历标签重放符合，原326日空缺由现有来源表补充覆盖；这不是独立月球理论认证。旧7项节气日期差异及交节当日未定探针未在本轮重评，详见部署模型验收（本地数据：`validation/ren-model-matrix-validation-2026-10-22.md`）及保留的第七轮记录（本地数据：`validation/ren-timescale-validation-2026-10-22.md`）。完整历法域未认证。
+> 三工具的`calendar_policy`声明输入瞬间、计算钟面、23:00子初换日、实际星历与时间尺度。交气使用TT求解及具名历史UTC／闰秒转换，求解失败不回退线性近似；小数秒是数值分辨率。原3,024个公布分钟标签在原生Swiss、有文件解析和无文件默认配置下分别有21／22／22项超差；4,536组换将边界均符合，同一队列DE440 TT对照在原1秒线内。1901—2100年HKO全部4,800个节气日期在四种配置下仍有原7项差异；日期级来源不替代天文瞬间或强制修改计算交界。原完整日期、失败项及交节当日未定范围见[历法依据](liuren-jinkou-audit.md#完整年表队列与历法依据)。
 
-> IMCCE OPALE三条时间路线也分别重放：原生／解析的初始504项均有1项历史UT1超差；文档时间约定244项分别有4／3项超差；来源自身钟差换算TT的288项均在原1秒线内。它们复用旧PMO事件，分钟差异继续保留，不能相加为新增独立命中。来源时间定义见第三十二轮验收（本地数据：`validation/ren-opale-seasons-validation-2026-10-22.md`），实际模型结果见第三十五轮（本地数据：`validation/ren-model-matrix-validation-2026-10-22.md`）。
+> IMCCE OPALE三种时间路线分别保留原分母和1秒线：初始504项的原生／解析配置各1项历史UT1超差；文档时间约定244项分别4／3项超差；来源自身钟差换算TT的288项均在该线内。这些比较复用原PMO事件，不能相加为新增独立观测；时间定义、物理模型与分钟标签失败分开报告，见[交气时间尺度](liuren-jinkou-audit.md#交气时间尺度与边界序列化)。
 
-> 六壬新增 `transmission_relations`，按《探原》分列天将与支神生克、初末生墓、递克、旬空、朝日朝枝及四组三合名义局体；原支六亲与取传不改，完整救制、有效空亡与合化未裁定，见第三十轮验收（本地数据：`validation/liuren-transmission-relations-validation-2026-10-22.md`）。
+> 六壬分层返回`classification`、`transmission_relations`、`emptiness_evidence`、`branch_relations`、`transmission_progression`、`seasonal_evidence`及`life_stages`。天将与支神生克、三合名义局体、三传初末生墓、空亡角色例外、进退支序及十二运各有实际盘面依据；47项接触、34,560组符号盘和48份金口诀课内参考是有限规则检查，不能当作现实样本。局部不空、支序方向和季节五态不推出完整有效空亡、合化或综合进退。月建五行由`month_building_element`承担，实际十二长生由`life_stages`承担，见[规则说明](liuren-jinkou-audit.md#盘面规则与同课条件)。
 
-> 六壬规则集1.6.0新增 `emptiness_evidence`，将天盘本空、地盘落底空、日干寄宫地盘例外、太岁月建月将角色及占时本空分别计算。原旬空两支、三传本空与坐空标志保留；局部不空条件不等于综合有效空亡已裁定，年命、真空半空及填实冲实仍未决，见第三十六轮验收（本地数据：`validation/liuren-empty-scope-validation-2026-10-23.md`）。
+> 金口诀`overview.month_general`是中气月将本位，`overview.yuejiang`是月将加时后落在地分的将神；两者是不同事实。`branch_stars`列七项历法目标及三位本支，驿马按月建、天赦比完整日干支；`year_fate`按生年旬、显式岁序及男女起点推导另课地分，不以推导值冒充观测方位。月序、岁首、实际年龄联动与综合效力各自声明未认证范围。
 
-> 六壬1.7.0新增 `branch_relations`，依《探原》印刷配对并列六合、六冲、六害、六破及双向刑，保留寅亥破合、巳申刑合。47项天地盘、四课、三传与年月日时接触是同盘位置比较，不据合独断成局；首课寄宫支不替代日干五行，金口诀附盘不覆盖其本课规则。原720盘核心数值保留，原典未决不重判，见第三十八轮验收（本地数据：`validation/liuren-branch-relations-validation-2026-10-23.md`）。
-
-> 金口诀1.11.0补入京本六甲旬起行年与独立另课，明确出生年干支、指定岁序、男女起点及推导地分来源；原问课保留，资料不足不补猜。原书行年干合例与另课路径仍有疑义，岁首、实际年龄联动及综合喜用未认证，见第四十六轮验收（本地数据：`validation/jinkou-year-fate-validation-2026-10-23.md`）。
-
-> 六壬／金口诀历史封套另按原始输入补齐完整依据，并核对四份业务合同及真实三端；旧时钟隔离与六合独断成局的文字缺口已修复。核心计算值保留，Linux全文件字节、原典全书和自由解释的未完成项分别记录，见第四十五轮验收（本地数据：`validation/ren-golden-evidence-validation-2026-10-23.md`）。
-
-> 金口诀1.10.0新增 `branch_stars`，按京本PDF118–120列七项历法目标及三位本支相同位置；驿马按月建支，天赦比完整日干支。月序采用明确的软件约定，综合效力为null，完整原典认证仍为false；720课旧本课对象保留，见第四十四轮验收（本地数据：`validation/jinkou-branch-stars-validation-2026-10-23.md`）。
-
-> 六壬1.9.0新增 `seasonal_evidence`，按《探原》五季25项状态表分别列支神、天将与地盘五态。月建支采用明确的季月整月配置，不冒充季末十八日异法已裁；支神本空真半只列条件，扶助冲剋、角色例外后的有效类别为null，原文效力折扣不转为成功率。原34,560组符号盘与48份金口诀本课对象保留，见第四十三轮验收（本地数据：`validation/liuren-seasonal-validation-2026-10-23.md`）。
-
-> 六壬／金口诀的五项交气依赖另列 `published_date_reference`，用固定UTC+08对照香港天文台1901—2100全部4,800个刊载日期。匹配只到日期层，冲突不改交界，范围外为null；原7项差异在四种配置下均保留。规则集及原数值不变，参考正确不冒充天文瞬间、全历法或全原典认证，见第四十二轮验收（本地数据：`validation/ren-hko-dates-validation-2026-10-23.md`）。
-
-> 六壬1.8.0新增 `transmission_progression`，按《探原》PDF110–111识别进退连茹与进退间断，另列仅按支神本空假设下的初空、末空及见空释读。支序方向与综合有效进退分开，后者仍为null；坐空与天将天空不替代本空，不更改九宗门或金口诀四位。冻结枚举与原典范围见第四十一轮验收（本地数据：`validation/liuren-progression-validation-2026-10-23.md`）。
-
-> 金口诀 `overview.month_general` 保留中气月将本位，`overview.yuejiang` 是兼容字段名，实际为月将加时后落在地分的将神。快照分别显示“月将本位”和“将神落地分”，四位数值及取用不因改名改变。完整整秒队列、三端与逐行说明核对见第四十轮验收（本地数据：`validation/ren-seconds-validation-2026-10-23.md`）；固定参考下的一致性不作为全书、真实授时或自由文本预测认证。
-
-> 六壬 `meta.diurnal_evidence` 与金口诀 `overview.diurnal_evidence/is_diurnal` 分列显式选择、默认时支和未记录的现场星象，快照同显依据。它们核验的是起贵人选择，不把固定时支或布尔覆盖冒充星出星没的天文观测，见第九轮验收（本地数据：`validation/ren-diurnal-validation-2026-10-22.md`）。金口诀课内旺衰、月建日辰得气与用位条件须回到同次四位核对，完整结果保留可空事实及唯一轨迹，见第三十三轮验收（本地数据：`validation/jinkou-strength-integrity-validation-2026-10-22.md`）。授权的六例真实模型已执行，首次机械检查5/6、人工21项中18符合和3覆盖不全，见第三十四轮记录（本地数据：`validation/ren-semantic-execution-validation-2026-10-22.md`）；本轮新增说明未再进行真实模型验收。
+> `diurnal_evidence`区分显式昼夜选择、默认时支约定与未记录的现场星象，固定时支不冒充星出星没观测。引用校验绑定同一run完整业务结果，不能代替自由文本语义验收。原六例真实模型研究首次机械5／6、人工21项中18符合及3覆盖不全的事实保留；当前新增说明未因此取得新的真实模型成绩。完整历法、全原典、独立自由解释与现实效度仍分别未完成，见[验收范围](liuren-jinkou-audit.md#解释忠实与现实预测)。
 
 ### 2.6 `astro` —— 离线核心星盘与关系盘（Implemented，精度依赖星历）
 
@@ -268,8 +252,8 @@
 | `astro_chart13` | 上升起点的 13 等分扇区，精确分界；自定义分区，不是 IAU 星座 | Implemented / Approximate（天文底盘依赖星历） |
 | `astro_hellen_chart` | 离线希腊盘 | Implemented / Approximate |
 | `astro_guolao_chart` | 七政四余连续坐标、不等赤经研究宿界、宫主/度主与规则轨迹 | Implemented（需 Swiss；原典全盘与现实效力未验收，见[果老说明](guolao.md)） |
-| `astro_india_chart` | Lahiri 九曜、星宿／Pada、D1/D2/D3/D7/D9/D10/D12/D30、宫主／尊贵／相位、生时敏感性、未削减八分法及声明七曜占据口径的削减／Pinda；另列Aiyar1905自己的原始表与削减链（本地数据：`validation/jyotish-aiyar-bav-audit.md`），保留仅换削减的历史口径（本地数据：`validation/jyotish-aiyar-reductions-audit.md`） | Implemented（需 Swiss Ephemeris；原典未决分支保留空值，非预测有效性认证，见[印占范围](jyotish.md)） |
-| `astro_vimshottari` | Moon-nakshatra 出生余运、MD／AD完整目标周期、可选2—6层当前路径及逐层子期；三种年长与完整运主链生时网格 | Implemented（需 Swiss Ephemeris；v23候选全局舍入验收（本地数据：`validation/jyotish-dasha-global-epoch-audit.md`），细分不代表事件精度） |
+| `astro_india_chart` | Lahiri 九曜、星宿／Pada、D1/D2/D3/D7/D9/D10/D12/D30、宫主／尊贵／相位、生时敏感性、未削减八分法及声明七曜占据口径的削减／Pinda；另列Aiyar1905自己的原始表与削减链，各具名参考口径分开读取 | Implemented（需 Swiss Ephemeris；原典未决分支保留空值，非预测有效性认证，见[印占范围](jyotish.md)） |
+| `astro_vimshottari` | Moon-nakshatra 出生余运、MD／AD完整目标周期、可选2—6层当前路径及逐层子期；三种年长与完整运主链生时网格 | Implemented（需 Swiss Ephemeris；计算范围见[印占说明](jyotish.md)，细分不代表事件精度） |
 | `astro_germany_chart` | 22 因素、253 中点轴、90°／45°对称式；可选指定时刻真太阳弧、本命／推运分层与生时重排；原文示例按实际直接占据触发并去重 | Implemented（需 Swiss Ephemeris；完整原典与现实效力未验收，保留七曜视图） |
 | `human_design` | [人类图](human-design.md)：88°设计时刻、26激活、36通道、类型权威与原典数值分歧；现实预测未验证 | Implemented（限定机制） |
 | `astro_relative_chart` | 离线关系/合盘（`compare`/`composite`/`influence`/`timespace`/`marks`） | Implemented / Approximate |
@@ -297,7 +281,7 @@
 | `firdaria` | 法达星限 | Implemented（依赖 backend） |
 | `decennials` | 十年星限 | Implemented（依赖 backend） |
 
-法达支持独立选择夜盘交点顺序和固定年／公历周年口径，默认行为保持；参数与日期边界见[版本兼容参考与验收约定](firdaria-compatibility.md)。
+法达支持独立选择夜盘交点顺序和固定年／公历周年口径，默认行为保持；参数与日期边界见[年长与夜盘交点顺序](firdaria-compatibility.md)。
 
 ### 2.8 `western_event` —— 事件占星（Implemented，依赖 backend）
 
@@ -310,15 +294,15 @@
 | `astro_horary` | 卜卦判断 | Implemented（依赖 backend） |
 | `astro_election` | 择日 | Implemented（依赖 backend） |
 
-此处Implemented表示接口与计算路径存在。卜卦已逐项实现Lilly1647的两列相位容许度、实际落宫、分别保留的宫位序次／宫位分值及居宫的必要月亮条件；完整偶然尊贵、传光／阻碍与全盘判词仍未验收，`verdict=uncertain`。具体来源与未通过项见容许度与居宫核验（本地数据：`validation/western-lilly-orbs-houses/report.md`）。判断前审查（本地数据：`validation/western-lilly-radicality/report.md`）补齐第121–123页12项手工清单与报告的例外，四个时主对应例复现；未知月亮晚度、受损定义及整盘判断资格仍保留，不能据此认证现实预测。
+此处Implemented表示接口与计算路径存在。卜卦已逐项实现Lilly1647的两列相位容许度、实际落宫、分别保留的宫位序次／宫位分值及居宫的必要月亮条件；完整偶然尊贵、传光／阻碍与全盘判词仍未验收，`verdict=uncertain`。具体来源与未通过项见[西方占星](western-astrology.md)。判断前审查按第121–123页12项手工清单与报告的例外，四个时主对应例复现；未知月亮晚度、受损定义及整盘判断资格仍保留，不能据此认证现实预测。
 
-卜卦与择日另支持显式儒略历日期，分别通过 `question_calendar`、`candidate_calendar` 选择；日期先按相应闰年规则校验、换成内部格里历，再处理时区。原日期与规范化日期并列返回，默认仍为前推格里历；其他出生／分析入口未据此扩展。地区改历、旧式年份与原典钟时不推断，见历法与例题精度核验（本地数据：`validation/western-civil-calendar/report.md`）。
+卜卦与择日另支持显式儒略历日期，分别通过 `question_calendar`、`candidate_calendar` 选择；日期先按相应闰年规则校验、换成内部格里历，再处理时区。原日期与规范化日期并列返回，默认仍为前推格里历；其他出生／分析入口未据此扩展。地区改历、旧式年份与原典钟时不推断，见[西占历法与方法](western-astrology.md)。
 
-已确认的地方平／地心视太阳时可分别由 `question_clock_basis`／`candidate_clock_basis` 显式输入，不能与民用时区叠加；默认民用钟时及省略时区的旧 `+08:00` 行为保留并标来源。`clock_conversion` 分开输入钟面和物理时刻；太阳时卜卦的行星日按声明钟时的开启日出日期取星期，未借用内部UTC载体的日期。两组复用JPL历元及手工算术只验有限转换，原书钟时鉴定、整图验收和现实预测仍未成立，见事件钟时核验（本地数据：`validation/western-event-clocks/report.md`）。
+已确认的地方平／地心视太阳时可分别由 `question_clock_basis`／`candidate_clock_basis` 显式输入，不能与民用时区叠加；默认民用钟时及省略时区的旧 `+08:00` 行为保留并标来源。`clock_conversion` 分开输入钟面和物理时刻；太阳时卜卦的行星日按声明钟时的开启日出日期取星期，未借用内部UTC载体的日期。两组复用JPL历元及手工算术只验有限转换，原书钟时鉴定、整图验收和现实预测仍未成立，见[西占钟时](western-astrology.md)。
 
-另以 `question_hour_origin`／`candidate_hour_origin` 显式处理午夜／正午起算的小时标签，支持跨日、世纪儒略闰日和有效终点越过不可表示中间日期。范围先在整数日编号上合并，再建立最终格里历钟面，时区与太阳时在后；没有推断全部历史原图的日起点。所选Lilly1647第30–31页条款及公开JD数例分别核验，1978年元旦UT1的UTC闰秒载体缺口仍列为失败，见正午日起点核验（本地数据：`validation/western-noon-origin/report.md`）。
+另以 `question_hour_origin`／`candidate_hour_origin` 显式处理午夜／正午起算的小时标签，支持跨日、世纪儒略闰日和有效终点越过不可表示中间日期。范围先在整数日编号上合并，再建立最终格里历钟面，时区与太阳时在后；没有推断全部历史原图的日起点。所选Lilly1647第30–31页条款及公开JD数例分别核验，1978年元旦UT1的UTC闰秒载体缺口仍列为失败，相关边界见[西方占星](western-astrology.md)。
 
-太阳时反解落入UTC闰秒时，卜卦／择日保留原生TT／UT1继续计算，`converted_utc`可返回含`23:59:60`的标签。`clock_conversion.utc_representation`明确区分UTC标签、闰秒与Python datetime可表示性；不要截断、平滑、移秒或把显示限制说成星盘不可算。仍不推断原资料精度、实测EOP、完整原典或现实预测有效性。见物理时刻与闰秒核验（本地数据：`validation/western-leap-epoch/report.md`）。
+太阳时反解落入UTC闰秒时，卜卦／择日保留原生TT／UT1继续计算，`converted_utc`可返回含`23:59:60`的标签。`clock_conversion.utc_representation`明确区分UTC标签、闰秒与Python datetime可表示性；不要截断、平滑、移秒或把显示限制说成星盘不可算。仍不推断原资料精度、实测EOP、完整原典或现实预测有效性。详见[西方占星](western-astrology.md)。
 
 ### 2.9 `western_lifespan` —— 全生命周期 / 寿命技法（Implemented，依赖 backend）
 
@@ -359,7 +343,7 @@
 | `fengshui_minggua` | 1864锚点命卦、原始五数寄宫、个人八方关系 | Implemented |
 | `fengshui_bazhai` | 坐山宅盘、逐人命盘、位置／朝向用途分开 | Implemented |
 | `fengshui_jinsuo` | 八宫固定砂水偏好、已确认特征逐项判定 | Implemented（传本来源限制明确登记） |
-| `fengshui_annual_stars` | 年度紫白九宫、立春区间、当前元运 | Implemented（交节时刻依赖现有节气引擎，可能近似回退） |
+| `fengshui_annual_stars` | 年度紫白九宫、立春区间、当前元运 | Implemented（交节时刻依赖所选节气模型，求根不可用时明确失败） |
 | `fengshui_monthly_stars` | 十二节月紫白、跨年有效年、九宫中性位置与固定释义 | Implemented / Limited（原表36数、独立节气口径；保留原表六月节候倒序，未实现月星用途处方或现实效度认证） |
 | `fengshui_xuankong_natal` | 中州派历史定运、24山／三元龙、五黄、下卦与兼向替星 | Implemented（xuankong_zhongzhou_v1） |
 | `fengshui_assess` | 多层布局关联、匹配方位、现代作者室内形态、条件式元素/年度方案、分歧与版本 | Implemented（限已登记规则版本） |
@@ -386,7 +370,7 @@
 | 显式 `hsys` 覆盖为 `1..8` 的离线宫制 | Implemented（但依赖 `swisseph`） | 缺失时**直接报错**，不静默退化为整宫制 |
 | `zodiacal=1` sidereal(Lahiri-like) | Implemented | 离线 sidereal 模式，非联网服务 |
 
-检查 `chart_profile.engine_precision` / `engine_backend` 确认代码路径，再用 `chart_profile.ephemeris_model` 确认实际模型：`swieph` / `jpl` 为相应数据模型，`moshier` 为内置模型，`mixed` 表示混合。`run_metadata.engine_is_approximate` 会标记已识别的降级。数据获取、路径与版本复现见 [快速入门](getting-started.md#星历数据与精度)。
+检查 `chart_profile.engine_precision` / `engine_backend` 确认代码路径，再用 `chart_profile.ephemeris_model` 确认实际模型：`swieph` / `jpl` 为相应数据模型，`moshier` 为内置模型，`mixed` 表示混合。`run_metadata.engine_is_approximate` 会标记已识别的降级。数据获取、路径与版本复现见 [星历安装](ephemeris.md)。
 
 `pyswisseph` 与 `kerykeion` 都是 `pyproject.toml` 的常规安装依赖。“缺依赖回退”描述的是异常/裁剪环境的能力边界，不是另一种官方安装模式。
 
@@ -414,7 +398,7 @@
 - 与核心 chart 不同，缺 backend 时不会使用 FateBridge 内置轨道近似；但这不保证所有 backend 都加载了相同星历数据，仍需检查返回的精度/模型字段
 - `pd` / `pdchart` 虽已实装，但内部会公开其近似/坐标策略（time key、direct/converse、相位列表等），不应被误读为单一路径高精度结果
 
-卜卦／择日的显式 `ut1_source=iers_c04` 接入固定IERS20 C04日值及TT上连续UT1−TAI线性插值；默认与其他西占入口仍为Swiss ΔT模型。固定覆盖期仅1962-01-01 00:00至2026-09-19 00:00 UTC，不外推。只应用UT1，极移／CIP／日内潮汐、插值物理误差、完整原典、实际模型解释与现实预测继续待验收。见来源和验证（本地数据：`validation/western-iers-ut1/report.md`）。
+卜卦／择日的显式 `ut1_source=iers_c04` 接入固定IERS20 C04日值及TT上连续UT1−TAI线性插值；默认与其他西占入口仍为Swiss ΔT模型。固定覆盖期仅1962-01-01 00:00至2026-09-19 00:00 UTC，不外推。只应用UT1，极移／CIP／日内潮汐、插值物理误差、完整原典、实际模型解释与现实预测继续待验收。来源与限制见[西方占星](western-astrology.md)。
 
 ## 4. 快照协议覆盖
 

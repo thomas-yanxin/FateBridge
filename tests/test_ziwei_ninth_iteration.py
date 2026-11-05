@@ -28,15 +28,15 @@ BIRTH = MANIFEST["cases"][0]["input"]
 TARGET = dict(target_year=2027, target_month=6, target_day=15, target_hour=12)
 
 
-def test_clock_receipts_have_external_day_cells_and_keep_unresolved_age_boundary():
+def test_clock_receipts_keep_external_day_cells_and_unverified_age_boundary():
     r = audit.audit_clock_basis(hko_rows, FIXTURES)
     assert r["independent_input_cases"] == 9
     assert r["profile_receipts_checked"] == 18
     assert not r["differences"]
     assert not r["full_clock_acceptance_passed"]
     assert not r["classical_clock_policy_verified"]
-    assert len(r["known_unsupported_boundaries"]) == 2
-    assert all(x["still_unsupported"] for x in r["known_unsupported_boundaries"])
+    assert len(r["civil_age_boundary_receipts"]) == 2
+    assert all(all(x["checks"].values()) for x in r["civil_age_boundary_receipts"])
 
 
 def test_clock_audit_rejects_wrong_reference_date_instead_of_learning_it(monkeypatch):
@@ -103,7 +103,7 @@ def test_cny_receipt_does_not_overwrite_calculated_chart_or_hide_date_difference
     assert not b["classical_clock_rule_verified"]
 
 
-def test_physical_prebirth_guard_is_kept_separate_from_mixed_calendar_age_error():
+def test_physical_prebirth_guard_and_current_civil_age_use_actual_endpoints():
     person = create_person_info(**BIRTH)
     earlier = calculate_ziwei_horoscope(
         person,
@@ -115,7 +115,6 @@ def test_physical_prebirth_guard_is_kept_separate_from_mixed_calendar_age_error(
     )
     later = calculate_ziwei_horoscope(
         person,
-        nominal_age_basis="legacy_mixed_clock",
         target_year=1984,
         target_month=2,
         target_day=1,
@@ -123,8 +122,14 @@ def test_physical_prebirth_guard_is_kept_separate_from_mixed_calendar_age_error(
         target_minute=59,
     )
     assert "目标时刻早于出生时刻" in earlier["error"]
-    assert "此边界暂不支持" in later["error"]
-    assert later["retryable"] is False
+    horoscope = later["ziwei_horoscope"]
+    receipt = horoscope["nominal_age_calendar"]
+    assert horoscope["nominal_age"] == 1
+    assert receipt["basis"] == "birth_civil_timezone"
+    assert receipt["birth_placement_lunar_year"] == 1984
+    assert receipt["birth_lunar_year"] == receipt["target_lunar_year"] == 1983
+    assert receipt["physical_order_checked"]
+    assert not receipt["age_boundary_classically_verified"]
 
 
 @pytest.mark.parametrize("profile", ["iztro_2_5_8", "quanshu_v2_excerpt"])

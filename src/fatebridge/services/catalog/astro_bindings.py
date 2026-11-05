@@ -35,6 +35,9 @@ def _astro_chart_bind(
 ) -> Tuple[Callable[..., Any], Tuple[Any, ...], Dict[str, Any]]:
     data = service_inputs(req)
     variant = data.pop("chart_variant", "chart")
+    apparent_model = data.pop("apparent_model", "native")
+    if variant == "chart":
+        data["apparent_model"] = apparent_model
     if variant == "germany":
         for key in (
             "guolao_month_basis",

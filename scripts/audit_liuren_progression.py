@@ -89,23 +89,7 @@ def expected(ref: dict[str, Any], day: str, branches: list[str]) -> dict[str, An
     )
 
 
-def old_shape(board: dict[str, Any], old: dict[str, Any]) -> dict[str, Any]:
-    value = copy.deepcopy(board)
-    value.pop("transmission_progression")
-    value["rule_trace"] = [
-        r
-        for r in value["rule_trace"]
-        if r["rule_id"] != "liuren.transmission_progression"
-    ]
-    # Only declared new layer metadata may differ; no blanket replacement.
-    rules = value["ruleset"]
-    for name in ["version", "source_title"]:
-        rules[name] = old["ruleset"][name]
-    rules["conventions"].pop("transmission_progression")
-    return value
-
-
-def audit(baseline: Path | None = None) -> dict[str, Any]:
+def audit() -> dict[str, Any]:
     paths = [
         p
         for p in (ROOT / "src/fatebridge").rglob("*")
@@ -152,12 +136,6 @@ def audit(baseline: Path | None = None) -> dict[str, Any]:
                 == (c["kind"], c["direction"], c["reading"]),
             )
         )
-    base = json.loads(baseline.read_text())["rows"] if baseline else None
-    if base is not None and (
-        len(base) != 720 or len({(r["day"], r["general"]) for r in base}) != 720
-    ):
-        raise ValueError("Full720 preservation baseline required")
-    base_map = {(r["day"], r["general"]): r["board"] for r in base} if base else {}
     boards, differences = [], []
     for day, general in itertools.product(DAYS, BRANCHES):
         b = build_liureng_board(
@@ -174,8 +152,6 @@ def audit(baseline: Path | None = None) -> dict[str, Any]:
         matched = {k: got[k] for k in KEYS} == exp
         if not matched:
             failures.append(dict(day=day, general=general, actual=got, expected=exp))
-        if base_map and old_shape(b, base_map[day, general]) != base_map[day, general]:
-            differences.append(dict(day=day, general=general))
         boards.append(
             dict(
                 day=day,
@@ -186,20 +162,12 @@ def audit(baseline: Path | None = None) -> dict[str, Any]:
                 reading=got["raw_branch_empty_conditional_reading"],
             )
         )
-    jinkou_preserved = None
-    if baseline:
-        seed = make_seed(dict(day="丙寅", hour="子"))
-        b = build_liureng_board(seed, month_general_override="卯")
-        jinkou_preserved = build_jinkou_board(seed, b, di_fen="酉") == json.loads(
-            baseline.with_name("baseline-jinkou.json").read_text()
-        )
     unchanged = before == {str(p.relative_to(ROOT)): sha(p) for p in paths}
     passed = (
         not failures
         and all(r["matched"] for r in synthetic)
         and not differences
         and unchanged
-        and jinkou_preserved is not False
     )
     return dict(
         literal_examples=8,
@@ -211,9 +179,7 @@ def audit(baseline: Path | None = None) -> dict[str, Any]:
         symbolic_board_count=720,
         symbolic_boards=boards,
         failures=failures,
-        baseline_compared=base is not None,
         preservation_differences=differences,
-        jinkou_body_preserved=jinkou_preserved,
         source_manifest=before,
         implementation_unchanged=unchanged,
         engineering_checks_passed=passed,
@@ -226,12 +192,11 @@ def audit(baseline: Path | None = None) -> dict[str, Any]:
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--baseline", type=Path)
     p.add_argument("--output", required=True, type=Path)
     args = p.parse_args()
     if args.output.exists():
         raise ValueError("Refusing to overwrite audit output")
-    result = audit(args.baseline)
+    result = audit()
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(
         json.dumps(

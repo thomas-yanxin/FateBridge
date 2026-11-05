@@ -16,7 +16,7 @@ from tests.test_ren_classical_depth import AUDIT
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "tests/fixtures/jinkou_relation_integrity_v1"
-PIN = "a78de3bad9dea2e4dc6ec5ec7dd0965d0952ac15afa8f5a13d7f01f3bc7b5db0"
+PIN = "a522ad91924073b0a74bbfd22e71270a2d33f16d5cb6b7337ef3826c042129dc"
 SPEC = SPECS["jinkou"]
 
 

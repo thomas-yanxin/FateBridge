@@ -10,8 +10,7 @@ import pytest
 from fatebridge.core.sukuyo_date_support import local_date_support
 
 FIXTURE = (
-    Path(__file__).parent
-    / "fixtures/sukuyo-number-transport-before-production-v78.json"
+    Path(__file__).parent / "data/sukuyo-number-transport-before-production-v78.json"
 )
 RAW = FIXTURE.read_bytes()
 REF = json.loads(RAW)

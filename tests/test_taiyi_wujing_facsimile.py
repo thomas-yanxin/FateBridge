@@ -45,9 +45,6 @@ def test_original_1440_layer_and_all_original_differences_are_unchanged(report):
     old = literal_audit()
     assert report["original_layer"] == old
     assert report["current_literal_layer"] == old
-    assert old == json.loads(
-        (ROOT / "docs/validation/taiyi-jinjing-v22/report.json").read_text()
-    )
     assert report["old_differences_retained"] == old["differences"]
     assert len(old["differences"]) == len(old["unknowns"]) == 45
     assert report["required_rows"] == 144

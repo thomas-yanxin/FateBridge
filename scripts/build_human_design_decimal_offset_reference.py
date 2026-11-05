@@ -23,7 +23,7 @@ from scripts.build_utc1960_reference import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests/fixtures/human_design_decimal_offset_v1"
+FIXTURE = ROOT / "tests/data/human_design/decimal_offset"
 
 
 def build(source: Path, compiler: str) -> dict:
