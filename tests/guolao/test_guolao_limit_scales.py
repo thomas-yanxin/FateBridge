@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import subprocess
-import sys
 from dataclasses import replace
 from fractions import Fraction
 from pathlib import Path
@@ -139,92 +137,3 @@ def test_source_six_palace_correction_does_not_become_global_modern_offset():
     assert not audit["modern_sky_mapping_accepted"]
     assert not audit["full_limit_schedule_accepted"]
     assert not audit["source_table_fully_collated"]
-
-
-def test_research_cli_has_no_calendar_or_birth_age_default():
-    result = subprocess.run(
-        [
-            sys.executable,
-            "scripts/guolao/audit_guolao_limits.py",
-            "--palace",
-            "官禄",
-            "--elapsed-source-years",
-            "1.5",
-        ],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    data = json.loads(result.stdout)
-    assert data["calculation"]["limit_scale_degrees_exact"] == "3"
-    assert data["calculation"]["calendar_date"] is None
-    assert data["calculation"]["birth_age"] is None
-    assert not data["real_world_efficacy_tested"]
-    invalid = subprocess.run(
-        [
-            sys.executable,
-            "scripts/guolao/audit_guolao_limits.py",
-            "--palace",
-            "命",
-            "--elapsed-source-years",
-            "1",
-        ],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-    )
-    assert invalid.returncode == 2
-    assert not invalid.stdout
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        [],
-        ["--palace", "福德", "--cell", "15"],
-        ["--palace", "福德", "--scale-degrees", "15"],
-    ],
-)
-def test_cli_audit_and_other_input_modes_preserve_ambiguity(args):
-    run = subprocess.run(
-        [sys.executable, "scripts/guolao/audit_guolao_limits.py", *args],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    result = json.loads(run.stdout)
-    assert (
-        result["table_discrepancies"][0]["printed_start_month_day_reading"]
-        == "二月十五"
-    )
-    if not args:
-        assert result["calculation"] is None
-        assert len(result["scales"]) == 7
-    elif "--cell" in args:
-        assert result["calculation"]["interval_start_source_years_exact"] == "77/15"
-        assert result["calculation"]["interval_end_source_years_exact"] == "11/2"
-    else:
-        assert result["calculation"]["elapsed_source_years_exact"] == "11/2"
-        assert result["calculation"]["limit_scale_degrees_exact"] == "15"
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        ["--palace", "官禄"],
-        ["--elapsed-source-years", "1"],
-        ["--palace", "官禄", "--elapsed-source-years", "1/0"],
-        ["--palace", "官禄", "--scale-degrees", "-1"],
-    ],
-)
-def test_cli_rejects_incomplete_or_invalid_local_units(args):
-    run = subprocess.run(
-        [sys.executable, "scripts/guolao/audit_guolao_limits.py", *args],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-    )
-    assert run.returncode == 2
-    assert not run.stdout

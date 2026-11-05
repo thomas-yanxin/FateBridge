@@ -1,6 +1,5 @@
 """Printed arithmetic, author terminology and complete current coverage."""
 
-import gzip
 import json
 from copy import deepcopy
 from pathlib import Path

@@ -12,19 +12,6 @@ from fatebridge.core import canping_texts as texts
 from fatebridge.core.canping_texts import lookup_record
 from fatebridge.utils.errors import NumerologySourceError
 
-
-@pytest.mark.parametrize(
-    "number,kind,text",
-    [
-        (3141, "female", "孤舟流水急，○向溪灘○。"),
-        (3242, "luck", "良馬羈其足，百鞭亦難進。"),
-        (2846, "luck", "風雲三吐哺，盡禮詩○賢。"),
-    ],
-)
-def test_printed_fire_readings_and_circles_are_selected(number, kind, text):
-    assert lookup_record("火", number, kind)["text"] == text
-
-
 ROOT = Path(__file__).parents[1] / "fixtures/canping_fire_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
 ROWS = list(csv.DictReader((ROOT / "literal.tsv").open(), delimiter="\t"))

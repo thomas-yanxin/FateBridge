@@ -3,8 +3,6 @@
 import copy
 import hashlib
 import json
-import runpy
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -203,21 +201,6 @@ def test_nonfraction_input_rejected(value):
 def test_bad_grid_not_silently_changed(start, stop):
     with pytest.raises(ValueError):
         audit_literal_candidate_grid(start, stop)
-
-
-def test_cli_exposes_diagnostic_policy_without_upgrading_strict_method(
-    monkeypatch, capsys
-):
-    monkeypatch.setattr(
-        sys, "argv", ["audit_guolao_literal_candidates.py", "--anomaly-days", "7.29"]
-    )
-    module = runpy.run_path(
-        str(ROOT / "scripts/guolao/audit_guolao_literal_candidates.py")
-    )
-    assert module["main"]() == 0
-    r = json.loads(capsys.readouterr().out)
-    assert r["candidate_limit_indices"] == [88, 89, 90]
-    assert r["strict_lookup"]["whole_limit_index"] is None
 
 
 def test_declared_policy_precedes_grid_and_does_not_claim_blinding():

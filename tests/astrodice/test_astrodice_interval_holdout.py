@@ -1,6 +1,5 @@
 """Frozen new reference keeps all eight cases and its rejected epoch."""
 
-import hashlib
 import json
 from pathlib import Path
 

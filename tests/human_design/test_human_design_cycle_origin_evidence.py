@@ -1,7 +1,6 @@
 """A birth-origin definition does not settle all returns or retrograde priority."""
 
 from copy import deepcopy
-from pathlib import Path
 
 import pytest
 

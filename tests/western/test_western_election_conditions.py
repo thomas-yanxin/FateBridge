@@ -4,7 +4,6 @@ Mock native-event rows isolate score propagation, never astronomy accuracy.
 The JPL cases are reused from the existing independent three-window corpus.
 """
 
-import hashlib
 import json
 import math
 from datetime import datetime, timezone

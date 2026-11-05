@@ -1,6 +1,5 @@
 """Preimplementation selected text and independent arithmetic on reused geometry."""
 
-import hashlib
 import json
 from pathlib import Path
 

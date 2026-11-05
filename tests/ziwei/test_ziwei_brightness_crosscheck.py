@@ -1,49 +1,35 @@
-import importlib.util
+"""Full independent iztro transcription, including gaps and uncovered stars."""
+
 import json
 from pathlib import Path
 
-from fatebridge.core.ziwei_tables import lookup_star_brightness
+from fatebridge.core.ziwei_tables import ZIWEI_STAR_BRIGHTNESS, lookup_star_brightness
+from scripts.ziwei.gen_ziwei_brightness_fixture import BRANCHES, build_fixture
 
-FIXTURE = (
-    Path(__file__).resolve().parents[1] / "data" / "ziwei_brightness_reference.json"
-)
-_GENERATOR = (
-    Path(__file__).resolve().parents[2] / "scripts" / "gen_ziwei_brightness_fixture.py"
-)
-
-
-def _load_build_fixture():
-    """Import ``build_fixture`` from the generator script by file path.
-
-    Loading by path avoids depending on ``scripts`` being an importable
-    package, which it is not.
-    """
-    spec = importlib.util.spec_from_file_location(
-        "gen_ziwei_brightness_fixture", _GENERATOR
+REFERENCE = json.loads(
+    (Path(__file__).parents[1] / "data/ziwei_brightness_reference.json").read_text(
+        encoding="utf-8"
     )
-    module = importlib.util.module_from_spec(spec)
-    assert spec and spec.loader
-    spec.loader.exec_module(module)
-    return module.build_fixture
+)
 
 
-def test_our_table_matches_reference_fixture():
-    reference = json.loads(FIXTURE.read_text(encoding="utf-8"))
-    assert reference, "fixture must not be empty"
-    mismatches = []
-    for key, expected in reference.items():
-        star, branch = key.split("@", 1)
-        actual = lookup_star_brightness(star, branch)
-        if actual != expected:
-            mismatches.append(f"{key}: ours={actual} ref={expected}")
-    assert not mismatches, "brightness mismatches:\n" + "\n".join(mismatches)
+def test_fixture_matches_independent_transcription():
+    assert REFERENCE == build_fixture()
 
 
-def test_fixture_matches_generator():
-    """The committed fixture must equal the generator's current output, so a
-    data edit to the generator without re-running it cannot drift silently."""
-    reference = json.loads(FIXTURE.read_text(encoding="utf-8"))
-    build_fixture = _load_build_fixture()
-    assert (
-        reference == build_fixture()
-    ), "Fixture is stale — re-run: python scripts/ziwei/gen_ziwei_brightness_fixture.py"
+def test_complete_table_and_brightness_gaps_match_reference():
+    stars = {key.split("@", 1)[0] for key in REFERENCE}
+    assert len(stars) == 20
+    assert set(ZIWEI_STAR_BRIGHTNESS) == stars
+    for star in stars:
+        assert len(ZIWEI_STAR_BRIGHTNESS[star]) == 12
+        for branch in BRANCHES:
+            assert lookup_star_brightness(star, branch) == REFERENCE.get(
+                f"{star}@{branch}"
+            ), (star, branch)
+
+
+def test_uncovered_stars_have_no_brightness():
+    for star in ("天刑", "天钺", "天魁", "左辅", "右弼", "禄存", "天马", "天姚"):
+        for branch in BRANCHES:
+            assert lookup_star_brightness(star, branch) is None

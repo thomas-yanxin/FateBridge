@@ -3,8 +3,6 @@
 import copy
 import hashlib
 import json
-import runpy
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -216,28 +214,3 @@ def test_overlap_keeps_both_cells_without_selecting_one_or_using_formula():
 def test_civil_year_or_untyped_date_not_coerced_into_the_table(date):
     with pytest.raises((TypeError, ValueError)):
         core.load_printed_limit_table(core.PROFILE).lookup("jie", date)
-
-
-@pytest.mark.parametrize(
-    "extra",
-    [
-        ["cell", "--group", "jie", "--column", "31"],
-        ["lookup", "--group", "jie", "--nominal-source-date", "2027-1-1"],
-        [
-            "lookup",
-            "--group",
-            "jie",
-            "--nominal-source-date",
-            "1-3-1",
-            "--fraction-of-nominal-day",
-            "1/0",
-        ],
-    ],
-)
-def test_cli_parameter_errors_emit_no_success_payload(monkeypatch, capsys, extra):
-    script = Path(__file__).parents[2] / "scripts/guolao/audit_guolao_printed_limits.py"
-    monkeypatch.setattr(sys, "argv", [str(script), "--profile", core.PROFILE, *extra])
-    with pytest.raises(SystemExit) as error:
-        runpy.run_path(str(script))["main"]()
-    assert error.value.code == 2
-    assert not capsys.readouterr().out

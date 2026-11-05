@@ -1,10 +1,7 @@
 """Declared source-day endpoints, same-sky root brackets and native scopes."""
 
 import copy
-import hashlib
 import importlib.util
-import json
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 

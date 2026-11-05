@@ -160,3 +160,32 @@ async def test_all_published_schemas_keep_valid_shared_references():
             total_wire += len(json.dumps(published["outputSchema"]))
             total_original += len(json.dumps(original))
     assert total_wire == total_original
+
+
+def test_rest_reserved_field_guard_rejects_clashing_model():
+    """A request model that declares a reserved transport field must fail loud."""
+    from pydantic import BaseModel
+
+    from fatebridge.application.bindings import person_invoke
+    from fatebridge.application.tool_spec import ToolSpec
+    from fatebridge.transports.rest import register_rest
+
+    class _Clashing(BaseModel):
+        fields: str = ""  # collides with the REST projection query param
+
+    bad = ToolSpec(
+        key="_clash",
+        bind=person_invoke(lambda *_a, **_k: {}),
+        request_model=_Clashing,
+        summary="x",
+        operation_label_zh="x",
+        family="x",
+        rest_path="/api/_clash",
+    )
+
+    class _DummyApp:
+        def add_api_route(self, *a, **k):  # pragma: no cover - never reached
+            raise AssertionError("route mounted despite reserved-field clash")
+
+    with pytest.raises(ValueError, match="reserved"):
+        register_rest(_DummyApp(), [bad], execute_service=lambda *a, **k: None)

@@ -4,7 +4,6 @@ The reference was hand-read by the same reviewer, not an independent second
 collation. Selection probes do not count as original historical horoscopes.
 """
 
-import copy
 import hashlib
 import json
 from pathlib import Path

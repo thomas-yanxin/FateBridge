@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import runpy
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -57,19 +55,3 @@ def test_upward_reconstruction_and_undefined_units_are_not_guessed():
     for bad in [True, 318.0, F(318), "318", None]:
         with pytest.raises(TypeError, match="距算"):
             shoushi_winter_cycle(bad)
-
-
-def test_actual_offline_command_connects_elapsed_years_to_middle_and_mansion(
-    monkeypatch, capsys
-):
-    script = Path(__file__).parents[2] / "scripts" / "audit_guolao_purple.py"
-    monkeypatch.setattr(sys, "argv", [str(script), "--elapsed-years", "318"])
-    assert runpy.run_path(str(script))["main"]() == 0
-    value = json.loads(capsys.readouterr().out)
-    assert value["input_kind"] == "source_elapsed_years_not_modern_calendar_year"
-    assert F(value["zhongji_days_exact"]) == F("116147.0196")
-    assert value["year_accumulation"]["winter_sexagenary_day"] == "丙午"
-    assert value["printed_historical_table"]["mansion"] == "毕"
-    assert value["printed_historical_table"]["next_mansion"] == "觜"
-    assert not value["year_accumulation"]["modern_calendar_date_assigned"]
-    assert value["modern_longitude"] is None

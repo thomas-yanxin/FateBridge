@@ -96,3 +96,14 @@ def test_invalid_supplied_optional_facts_are_rejected(field):
                 field: "invalid",
             }
         )
+
+
+def test_current_observation_model_retains_soil_generation_qualification():
+    out = calculate_meihua_cast(
+        casting={"method": "existing", "hexagram_code": "111111", "moving_line": 6},
+        external_observations=[{"manifestation": "soil", "label": "虚构新模型探针"}],
+    )
+    assert (
+        out["interpretation"]["external_omens"]["observations"][0]["qualification"]
+        == "substantive_generation"
+    )

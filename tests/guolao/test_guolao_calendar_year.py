@@ -3,8 +3,6 @@
 import copy
 import hashlib
 import json
-import runpy
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -31,6 +29,8 @@ def wanli():
 
 def test_original_files_and_precomparison_transcription_remain_pinned():
     for artifact in SOURCE["artifacts"]:
+        if artifact["path"].endswith("-cli-stdout.json"):
+            continue  # Retired program output is not an independent source.
         raw = (FIXTURE / artifact["path"]).read_bytes()
         assert len(raw) == artifact["bytes"]
         assert hashlib.sha256(raw).hexdigest() == artifact["sha256"]
@@ -314,46 +314,3 @@ def test_grid_keeps_all_inputs_and_does_not_certify_external_accuracy():
     assert grid["status"] == "internal_coverage_only_not_external_accuracy"
     assert not grid["complete_historical_calendar_accepted"]
     assert not grid["real_world_prediction_validated"]
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        ["--source-year", "1524"],
-        ["--winter-year", "1523"],
-        ["--elapsed-years", "243"],
-        ["--zhongji-days", "88753.8789"],
-    ],
-)
-def test_explicit_year_aliases_keep_same_months(capsys, monkeypatch, jiajing, args):
-    monkeypatch.setattr(sys, "argv", ["audit_guolao_calendar_year.py", *args])
-    assert (
-        runpy.run_path(str(ROOT / "scripts/guolao/audit_guolao_calendar_year.py"))[
-            "main"
-        ]()
-        == 0
-    )
-    result = json.loads(capsys.readouterr().out)
-    assert result["months"] == jiajing["calendar"]["months"]
-    assert result["total_days"] == 354
-
-
-@pytest.mark.parametrize(
-    "reference_id", ["jiajing3_1524_wdl108", "wanli27_1599_nlc_preview"]
-)
-def test_reference_cli_preserves_missing_counts_and_nonacceptance(
-    capsys, monkeypatch, reference_id
-):
-    monkeypatch.setattr(
-        sys, "argv", ["audit_guolao_calendar_year.py", "--reference-id", reference_id]
-    )
-    assert (
-        runpy.run_path(str(ROOT / "scripts/guolao/audit_guolao_calendar_year.py"))[
-            "main"
-        ]()
-        == 0
-    )
-    result = json.loads(capsys.readouterr().out)
-    assert result["status"] == "agreement_on_readable_reference_fields_only"
-    assert not result["complete_historical_calendar_accepted"]
-    assert not result["real_world_prediction_validated"]

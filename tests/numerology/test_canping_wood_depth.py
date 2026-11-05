@@ -9,19 +9,6 @@ import pytest
 
 from fatebridge.core.canping_texts import collation_summary, lookup_record
 
-
-@pytest.mark.parametrize(
-    "number,kind,text",
-    [
-        (2307, "female", "休彈陌上箏，莫娶桑間女。"),
-        (3115, "luck", "登高○○○，傳命探梅花。"),
-        (2414, "luck", "準定用權衡，輕重當自取。"),
-    ],
-)
-def test_wood_literal_readings_and_circles_are_selected(number, kind, text):
-    assert lookup_record("木", number, kind)["text"] == text
-
-
 ROOT = Path(__file__).parents[1] / "fixtures/canping_wood_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
 ROWS = list(csv.DictReader((ROOT / "literal.tsv").open(), delimiter="\t"))

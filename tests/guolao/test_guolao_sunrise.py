@@ -268,38 +268,3 @@ def test_loader_rejects_unit_metadata_or_boolean_literal_instead_of_reinterpreti
     path.write_text(json.dumps(bad))
     with pytest.raises(TypeError):
         subject.load_table("gujin37_siku")
-
-
-def test_cli_requires_explicit_table_basis_and_does_not_wrap_uncovered_angles(
-    monkeypatch,
-):
-    import importlib.util
-    import sys
-
-    path = Path(__file__).parents[2] / "scripts/guolao/audit_guolao_sunrise.py"
-    spec = importlib.util.spec_from_file_location("sunrise_cli_test", path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    for degree, extra in [
-        ("91.314375", []),
-        ("91.314375", ["--basis", "dadu_source_table"]),
-        ("1/0", ["--basis", "dadu_source_table"]),
-    ]:
-        monkeypatch.setattr(
-            sys,
-            "argv",
-            [
-                str(path),
-                "table",
-                "--profile",
-                "gujin37_siku",
-                "--local-degree",
-                degree,
-                "--solar-side",
-                "outside",
-                *extra,
-            ],
-        )
-        with pytest.raises(SystemExit) as error:
-            module.main()
-        assert error.value.code == 2

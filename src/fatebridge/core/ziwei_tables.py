@@ -17,7 +17,7 @@ plus 文昌、文曲、火星、铃星、擎羊(iztro 别名 ``qingyangMin``)、
 辅曜杂耀）在 iztro 中没有亮度数组**，因此 ``lookup_star_brightness`` 对它们
 返回 ``None`` 是**契约设计，而非数据缺漏**。换言之"天刑陷""天钺旺"这类判断
 不属于默认软件口径（也不属于 iztro）的亮度体系。覆盖集合由
-``tests/ziwei/test_ziwei_brightness_coverage.py`` 锁定，防止移植回归。
+``tests/ziwei/test_ziwei_brightness_crosscheck.py`` 锁定，防止移植回归。
 
 ``quanshu_v2_excerpt`` explicitly selects the pinned transcription's palace
 table instead. Its 240 published cells include 禄存 at eight branches; it is

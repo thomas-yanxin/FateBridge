@@ -1,6 +1,5 @@
 """Exact angular bounds for diagnostics must not depend on ray length."""
 
-import hashlib
 import json
 from fractions import Fraction as F
 from pathlib import Path

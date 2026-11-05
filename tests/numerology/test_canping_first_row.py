@@ -1,12 +1,8 @@
 """Keep the actual first row available without inventing a dated legacy period."""
 
 import ast
-import gzip
-import hashlib
 import json
-import math
 from copy import deepcopy
-from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest

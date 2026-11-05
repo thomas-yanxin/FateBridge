@@ -2,7 +2,6 @@
 
 import hashlib
 import json
-import sys
 import types
 from copy import deepcopy
 from pathlib import Path

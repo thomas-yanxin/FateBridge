@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import subprocess
-import sys
 from datetime import date
 from fractions import Fraction
 from pathlib import Path
@@ -196,83 +194,3 @@ def test_footer_palace_limit_labels_do_not_become_celestial_fraction_tails():
         "福德限",
         "官祿限",
     ]
-
-
-def run_cli(*args):
-    return subprocess.run(
-        [sys.executable, "scripts/guolao/audit_guolao_limits.py", *args],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-    )
-
-
-@pytest.mark.parametrize(
-    "args,expected_cell",
-    [
-        (["--nominal-source-date", "1-5-12"], 1),
-        (["--nominal-source-date", "1-5-13"], 2),
-        (["--scale-degrees", "1/2"], 1),
-        (["--cell", "30"], 30),
-    ],
-)
-def test_research_cli_explicit_named_calendar_and_exact_rationals(args, expected_cell):
-    result = run_cli("--source-calendar", "nlc3150", "--palace", "福德", *args)
-    assert result.returncode == 0, result.stderr
-    data = json.loads(result.stdout)
-    assert data["method_id"] == METHOD_ID
-    assert data["calculation"]["cell"] == expected_cell
-    assert data["calculation"]["calendar_date"] is None
-    assert not data["real_world_efficacy_tested"]
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        ["--palace", "福德", "--nominal-source-date", "1-5-12"],
-        [
-            "--source-calendar",
-            "nlc3150",
-            "--palace",
-            "福德",
-            "--elapsed-source-years",
-            "1",
-        ],
-        ["--source-calendar", "nlc3150", "--palace", "命", "--cell", "1"],
-        [
-            "--source-calendar",
-            "nlc3150",
-            "--palace",
-            "福德",
-            "--nominal-source-date",
-            "1-13-1",
-        ],
-        [
-            "--source-calendar",
-            "nlc3150",
-            "--palace",
-            "福德",
-            "--nominal-source-date",
-            "2027-1-1",
-        ],
-        [
-            "--source-calendar",
-            "nlc3150",
-            "--palace",
-            "福德",
-            "--nominal-source-date",
-            "1-1",
-        ],
-        ["--source-calendar", "nlc3150", "--palace", "福德", "--scale-degrees", "31"],
-    ],
-)
-def test_research_cli_invalid_inputs_fail_without_partial_results(args):
-    result = run_cli(*args)
-    assert result.returncode == 2
-    assert not result.stdout
-
-
-def test_research_cli_profile_only_returns_audit_and_no_birth_defaults():
-    result = run_cli("--source-calendar", "nlc3150")
-    assert result.returncode == 0, result.stderr
-    assert json.loads(result.stdout)["calculation"] is None

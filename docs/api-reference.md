@@ -799,99 +799,29 @@ uv run --locked --extra dev python -m fatebridge.mcp_server
 - `canping` / `heluo`
 - `suzhan` / `otherbu` / `sanshiunited`
 
-河洛新增`month_assignment_method`：默认`intro_preferred_v1`采用卦条63项、無妄缺号取卷首八月；`volume_one_table_v1`采用卷首64项。晋、节、睽、震、井五处异号均在`judge.month_affinity.source_assignment_conflicts`列出，逐阶段`source_readings`保留双方月号／页码／本月匹配。`source_consensus_match=null`可能是来源缺号或双方对本月判断相反，不能当false；所选`deTime`仍仅为月表匹配，不是综合得时。规范来源事实损坏为不可重试503。见[合同](contracts/heluo.json)与校勘记录。
+`heluo`、`canping` 的完整参数、字段投影和逐项语义分别由[河洛调用合同](contracts/heluo.json)与[参评调用合同](contracts/canping.json)生成；计算依据和未决范围集中在[河洛与参评数](numerology-audit.md)。
 
-河洛新增`jiehou_evidence`与`jiehou`视图，按本次已算节气名查四正节卦爻，并保留三项原列候卦、四处爻名差异和两模型对照。`selected_hou`／`huagong_assessment`／`selected_reconstruction_model`均null，不能拿十五名义日代替真实节气间隔或择优补实际日序。来源及上游上下文冲突均为不可重试503，见节候核对。
+共同输入要求：
 
-河洛新增`heluo_timing.year_context`及`source_clock`，`clock_basis`视图保留实际年柱标签、卷一百刻与六日移支相对推演。六十块全年闭合不证明日内添分或实际日期已解，分制及物理原点保持null，两个应用／完整映射标志false。内部年柱冲突或源式损坏均为不可重试503来源故障，见百刻与年上下文核对。
+`date` 为推算格里历 `YYYY-MM-DD`，不自动转换儒略历、年号或历史阴历；`time` 须明确提供当地钟时，可含小数秒，不能夹带时区后缀或用未知值补零点。
+`gender` 必填。`zone` 省略／null为固定 `+08:00`；地区历史规则须明确提供 IANA 名称。已确认的 `birth_utc_offset` 可在保留地区规则时选择重复钟时；不存在钟时或地区／偏移冲突报输入错误。
+真太阳时默认开启，须明确 `lon` 或数值 `gps_lon`，GPS 优先且0°有效；明确选择钟表时才传 `use_true_solar_time=false`。`birth_clock` 证据区分实际民用时刻、UTC瞬间和计算钟面。
 
-河洛`selected_texts`现含乾坤屯蒙需讼师比小畜履泰否同人大有谦90条单次目校记录（含未决字形，非90条全部确定），旧文另存`inherited_detail`；各条件段`applicability=null`，不按部分葉否或字兆挑选。两层`content_sha256`绑定该版本规范JSON正文／标签／元数据，`sha256`另报实际载入字节；排版可变，非空换文不可沿用已校身份。来源不符为不可重试503，完整校勘仍未完成，见需讼与内容身份核对。
+| 结果或选法 | 当前合同与边界 |
+| --- | --- |
+| 河洛属月 | `month_assignment_method` 默认 `intro_preferred_v1`，另选 `volume_one_table_v1`；`judge.month_affinity` 保留两表冲突、缺号与条件未决。`judge.deTime` 仅为月表匹配 |
+| 河洛元堂与结构 | `yuantang`、`body_structure`、`line_conditions`、`body_relations` 分别读取实际阶段、爻位及有向关系；完整得体、阴月当位与综合葉否仍未裁定 |
+| 河洛元气与时令 | `qi_phases`、`yuanqi_opposition`、`number_conditions`、`najia` 保留实际命中位置、来源角色与未决条件；候选命中不代替综合结论 |
+| 河洛岁运与源钟 | 年、月、日序是原典序号。`clock_basis`、`source_clock`、`jiehou` 保留年柱、百刻、节卦及候卦对照；未完成的分制、日内映射和实际日卦不补值 |
+| 参评取数 | `method=gu` 默认按日支起数；显式 `ming` 为另一选法，未知值拒绝。`text_selection` 保留五行、编号、男女／岁运栏、顺逆配对及选文状态 |
+| 参评配运 | `dayun_method=bazi_appendix_v1` 默认，另有 `bazi_continuous_v1`、`legacy_minggong_v1`。带时区的 `analysis_datetime` 查询实际当段；旧命宫法不支持日期查询，不由年龄标签补UTC区间 |
+| 参评首运与来源 | `timing_policy` 中的 `first_row`、`first_period`、`schedule_basis` 与同次实际首行、日期政策和来源角色绑定；旧法 `first_period=null` 不等于没有首行，也不代替 `selected` 查询 |
+| 太阳与年界 | `pillar_links`、`calendar_boundaries` 及来源轨迹保留实际柱、模型和边界。参评完整120年不因所选模型超范围而截短；严格 Swiss 模式的范围／缺文件错误见[太阳后端](solar-backends.md#严格-swiss-文件模式) |
+| 条文与版本 | `selected_texts` 分列爻辞、注文、诗歌、继承旧文与见证状态；条件适用为null时不择优解释，不用有条件引卦替换正式盘 |
 
-大有九三在岁运段“在庶俗／凶则”语境只印“变睽”，`target_line`／`target_quote`均null。单爻翻转可核对到睽，但原文未指定目标爻；正式后天仍按原算子取革上，适用未定，不能据此改盘。该六条经一次独立模型读稿，全部分歧及更正保留；九四矜／衿仍未决，`commentary_review_status`与读稿注记明示，人工专家未审。见大有完整注文与有条件引卦。
+上述视图仅提供可复制的 `fields` 清单，调用时传 `fields` 与 `strict_fields=true`，不传视图名。数组按合同整块选择，完整时间线从同次 `result_delivery` 读取。
 
-谦初、四爻在岁运条件中引明夷、小过；原文未指定目标爻，`target_line=null`，仅四爻有`target_quote="往厲必戒勿用"`。展示保留实际条件及所引字面，不能将所有未编号引卦写成“凶则”或“只印卦名”。正式后天晋／颐仍取实际算子结果。谦二、五爻的諂／謟与彀字候选未决，`snapshot_text`显式提示“字形未决”，条件适用仍null。旧84条保持；没有新增独立读稿或咨询模型复测。见谦完整注文与条件引文。
-
-二数太阳来源另有`numerology_consumed_solar_sources_v1`轨迹；规则集链接来自实际边界回执，Native供应方文档与精确文件身份区分，混合或未知总链接为null。`all_source_urls_available`仅表示链接存在；源自报的限定年份照录而非精度认证。AA1996派生立春保留公开年份护栏和完整年序，来源不足为不可重试503，见来源与精度核对。
-
-师六三选文的`commentary_cross_references`保留“如與命相合者”引升三原句和单爻变核对，适用仍null，`automatic_application`与`replaces_chart`均false；不交换上下体或改正式后天盘。比六二不再混入全卦纳甲句，总论条件仍在`month_affinity`／`najia`，见师比注文与引卦核对。
-
-小畜九三的`commentary_branch_selection.condition_labels_not_separately_printed`报告原段未单列不葉者，只有实际三段；不是不匹配或false。小畜初引用巽初与正式后天巽四的卦名相同但爻位不同，不能互换选文。标题层新增履六条，来源版本独立升级，见小畜履核对。
-
-两数新增`pillar_links`证据视图，读取`numerology_evidence.pillar_links`的实际基准年／日柱、原句头干、顺行步数及匹配。内部不相容柱或损坏来源返回不可重试503；匹配不认证完整历法。固定四柱Python起命拒绝不相容组合，原书冲突取数例仅作明确标记的形式算术，见起月起时核对。
-
-河洛新增`body_structure`证据视图，读取`judge.body_structure.phases[]`的八条混合爻数记录、原爻位映射、全卦倒序及原例／算子推演标签。完整伏体与得体仍未裁定，五命干支字表不自动选柱；旧纳音／化工取体保持。来源一致性故障不可重试，见渐卦结构核对。
-
-河洛`line_conditions.phases[].source_youyuan`逐先后天公布实际元堂／应爻阴阳及主本阴元堂、阳应爻式匹配，保留别本字面；反向相应不能代入。旧`yuanTang.youYing`值保持，仅表示先天通用阴阳相异，`youYing_policy`说明范围，未匹配不推出无援或现实结果。该来源一致性故障为不可重试HTTP503，见有援核对。
-
-河洛`line_conditions`证据视图返回逐先后天实际元堂的二五位、五同一异众宗式和爻位偏好。`yuanTang.position_polarity_match`表示位序阴阳比较；原典阴月当位位于`judge.line_conditions.source_dangwei`，定义待核、匹配为null，不用至点半年补定，也不生成十体评分，见爻位核对。
-
-两数`date`为推算格里历`YYYY-MM-DD`，含1582年前；不自动切换儒略历，不转换年号／历史阴历。`numerology_evidence.birth_clock.calendar_policy`、同次轨迹和快照同步说明输入历制与未复原历史颁历；历史题注须先有具名历制转换依据。见历史命例日期核对。
-
-宋历研究另有具名Python来源算术入口，返回原书干支日和有理日分，见纪元／统元核对及统天三位读法。统天另返回分步修正轨迹，以及逐气端点与次年重算冬至的差额。未新增REST／MCP历史历法参数；不要将`profile_id`传给现有`heluo`或`canping`工具，也不把原书日分直接当UTC。
-
-`core.song_clock`另有`source_clock_from_fraction`、`source_term_clock`及`compare_branch_window_to_term`三个Python来源入口，返回原辰刻、精确刻余及显式共用源钟制条件下的完整时支区间比较。相对源日位移须有独立日期依据；没有补生时中点、默认地点／UTC或切换公开月柱，见来源辰刻核对。
-
-两数`zone`省略／null统一为固定`+08:00`，不代表历史`Asia/Shanghai`；需要地区历史规则时明确传IANA名称。空白／非法时区拒绝；不存在或重复钟时不能猜，重复钟时须把已知UTC偏移放在`zone`。`birth_clock`证据增加实际时区、偏移秒数、夏令时量和规则库身份，见时区核对与兼容性。
-
-`canping.method` 默认 `gu`（卷六日支起数），`ming` 须显式指定，其他值拒绝。`canping`、`heluo` 返回 `numerology_evidence`，含规则来源、取数轨迹、选中条文、语料身份与四项验证状态；可使用 `fields` 严格投影。变更与未决规则见[河洛与参评数审计](numerology-audit.md)。
-
-`canping.gender` 必填且须明确男／女。配运 `dayun_method` 默认 `bazi_appendix_v1`（卷七附子平法与明确的整日借除约定），另有 `bazi_continuous_v1` 和保留旧命宫配运结构的 `legacy_minggong_v1`。可选 `analysis_datetime` 为带时区ISO时刻，返回 `canping_timing.selected`；无默认当前时刻，legacy不支持日期查询。新方案 `ming_gong` 为 `null`，实际起运和分段见 `canping_timing`、`dayun`、`liunian_series.rows[].segments`；未起运段不生成流年数。
-
-`canping_timing.first_row`保留本次实际`dayun[0]`的编号、栏目和条文，三个方案均有；`timing_policy`视图包含此行，无需连带读取整组时间线。旧法首行的`ageStart/ageEnd`仍为年龄标签，`first_period=null`表示没有已核日期首运，不表示没有首行。现代方案的`first_period`与首行一致；两者均不代替`selected`查询当段。完整输出在投影前核对两种摘要与实际首行，编号、选文、边界、年龄或额外未计算事实不一致时返回不可重试的`numerology_source_inconsistent`。部分投影仍保留缺项与null，不从旧法标签补UTC日期。
-
-旧命宫流年首年同样须与本次年柱一致，立春前可能标上一公历年；`liunian_series.birth_pillar_year`记录起始标签，`year_boundary=lichun_year_labels_only`与`age_policy`说明标签年龄。出生日期不变；这不表示旧配运或年序已有已核UTC起止，见旧方案年序核对。
-
-固定四柱Python函数`fatebridge.core.canping.liunian_series`另可在公历年未知时按已知年干支计算相对年序，返回`year=null`与`year_boundary=relative_ganzhi_year_labels_only`，不猜世纪；起运年龄前没有编号／诗文。这里不是REST／MCP／CLI的新入参模式，出生接口仍要求其既有出生资料。legacy行的`status=active`仅表示落在所给名义年龄运段，不能当作已核UTC区间。来源回执`canping_luck_substitution_v1`列出PDF64释文与同次实际查询配对，详见相对流年与替支释文。
-
-`heluo.gender` 同样必填，已知中英文别名统一归一化；缺失、未知或无法识别的值不默认男命。`numerology_evidence.yaoci_collation` 返回局部爻辞校勘层身份与覆盖数；选文的 `text_provenance` 分开标明爻辞、注文和诗歌状态，已核爻辞保留旧文与PDF页码。校勘层散列与原继承语料散列分别报告，详见第六轮核对。
-
-参评`canping_timing.schedule_basis`的固定摘要、范围说明、来源书目、版本与角色按当前载入资料及实际方法核验；时钟策略须与规则提供方一致。完整结果还核对同次`birth_clock`、对应`rule_trace`和原生释文段。矛盾在投影之前返回不可重试503 `numerology_source_inconsistent`，原因`runtime_canping_schedule_binding_conflict`；仅投影无关字段也不能隐藏它。缺失投影上下文不猜测，未知扩展字段保留；该约束不对任意人类释义作自动语义判分，见回执绑定核对。
-
-河洛泰否三处具名条件引卦增加`source_section_id`及`source_condition_label`：泰九二明夷二在歲運段，否九四观四在葉者段，否九五晋五在歲運段。引用的单爻翻转不交换上下体，`applicability=null`、`automatic_application=false`、`replaces_chart=false`；不据引文认证目标卦全文或改写正式后天盘。疑读见`commentary_reading_notes`，见泰否核对。
-
-同人六爻现采用同一底本PDF149—151页的单次目校文；九三“葉者”段保留不利措辞，九五“不葉者”续文跨页，九四“士後見榮”保留疑义注记。条件适用仍为null，诗歌及旧verdict来源不随注文提升，见同人原页核对。
-
-河洛公开`selected_texts`视图增加`numerology_evidence.commentary_collation`。乾坤十二条`detail`采用底本注文，原继承文保存在`text_provenance.inherited_detail`；`commentary_sections`按原文分段，`applicability=null`及空选择集合表示未综合裁定，不能从`judge.xie`挑选葉／不葉。标题、注文、诗歌和旧`verdict`各有独立状态；诗歌未见于这十二爻解段落，来源待核。这一初批之后已逐批扩为72条、312条待校，初批依据详见第十三轮核对。
-
-参评在已对读格的`selectionShun/Ni.witnesses`提供另一印本原文、`pdf_pages/body_pdf_page`、文本状态、`relation`及`replaces_selected_text=false`；实际主选文仍为`textShun/Ni`。`canping_text_collation.comparison_witness`提供独立版本与载入散列。对读仅36格，其中两格疑读，不增加主本1123格已确定数，不以对读文补主本○／□；字面不同不自动裁定错误，见印本对读核对。
-
-参评同馆藏原图复读格的`selectionShun/Ni.reading_revision`保留旧疑读、状态、页码、见证ID与原因，`canping_text_collation.rereading_witness`记录馆方原图区域及清单身份。水部旧40格疑读复读后30格确定、10格仍未决；旧夹具原样保留，新增编号格和独立审阅者均为0。实际采用本次`textShun/Ni`，原页○与剩余□不按另一印本或典故补齐，见原图复读核对。
-
-参评校勘层1.11.0追加土部三格复读，一格确定、两格仍未定；3377女文录晝字形，不据此裁定词义。3379既有檠／晝转录保持，拟改已撤回，不生成虚假修订；继承语料对外返回副本，不能串改后续来源旧文，见土部原图与缓存核对。
-
-参评校勘层1.10.0追加金部复读批次：15格保留1.9.0旧疑读，4格确定、11格仍未定；3314时运只补明花，仍带□及不确定状态，不能借用同号女文。保留麴蘖、追遊世，不按熟语改字；金部末十一条号文归属问题独立保留，不改计算编号。旧水火木及编号见证保持，见金部原图复读。
-
-参评校勘层1.9.0在`additional_rereading_witnesses`继续追加木部批次，水、火及编号见证保持；四格以`reading_revision`保存1.8.0旧疑读，三格确定、一格只补明傾字而仍保留□。原页少见字面不改成熟语，整格仍未定的不计入确认数，见木部原图复读。
-
-参评校勘层1.8.0在`canping_text_collation.additional_rereading_witnesses`分批记录后续复读见证，原`rereading_witness`水部记录保持。火部11格旧疑读经同一审阅者复读后六格确定、五格未决，逐格`reading_revision`保留1.7.0旧文及对应批次、页码与原因；未决末字不填，新旧批次不冒称独立复核，见火部原图复读。
-
-参评1.7.0对六处未决编号增加`number_reading_evidence`，保留可见编号片段、页码、遮损原因及`resolution_status=unresolved`；`body_reading_status`另列暂定行正文可读、全圈空、局部圈空或仍有编辑疑读。其依据为此前字面转录，`body_evidence_basis=prior_literal_transcription_not_new_body_collation`，不表示本轮新校正文。十八格仍为整体未决，不因正文或圈空可辨增加已确定数；这些字段与`reading_revision`均已声明类型并支持严格叶字段投影，见编号证据核对。
-
-参评原页编号遮损的行返回`number_attribution_status=provisional_inherited_key`和`number_reading_uncertainties`，表示暂沿继承键定位、号文归属未定；该行所有已录栏目均为`source_reading_uncertain`，即使正文没有□或只有○。仅正文有□时返回`editorial_unknown_marker`；快照分别说明编号与正文疑读，详见火部核对及木部核对。
-
-参评校勘层1.1.0起区分`source_printed_partial_blank`和`source_reading_uncertain`，分别表示原页局部○与编辑疑读□；后者带`reading_uncertainties`，仅正文含□时返回`editorial_unknown_marker`，不计入`collated_cells`。当前1.11.0已确定1123、未决47、未目读0，`pending_cells=47`；`part_coverage`分别列出五部覆盖。`numbered_table_visual_review_complete=true`仅表示编号表全部单次目读，`numbered_table_clear_readings_complete=false`仍有未决格；目读覆盖不代表全书符合、独立复核完成或预测有效，见土部与全表范围。金部末十一行按所选底本原页编号与正文归属选文，保留继承同号旧文，计算编号不重映射；差异原因与继承语料来源尚未核定，详见金部整段核对及水部整段核对。
-
-参评新增`text_selection`证据视图及`verses.selectionShun/selectionNi/pair_resolution`；逐条返回实际五行、编号、男命／女命／岁运栏及源文状态。`numerology_evidence.canping_text_collation`集中报告版本、实际载入语料散列和1123／1170格经目校及同一审阅者复读确定及疑读／未目读的分别计数。原页圈空、本地缺行与未选男女栏不同；顺逆仅一方有文为原典允许，同号为同一行。2838与3373错号已修正，未决2869不作通用补文，见第十五轮核对。视图提供字段清单，调用仍传`fields`和`strict_fields=true`，不传视图名。
-
-河洛新增`yuantang`证据视图，读取`chart.yuantang_derivation`的性别、配时序列、顺逆、实际至点半年、反事实敏感性和后天换卦。公开日期工具仍自动确定实际半年；`month_yang_ling`仅属固定四柱Python函数。该函数在子／午月缺半年时，仅结果唯一才保留计算与`yangLing=null`、`heLi=null`；结果有分歧则报错，见第十四轮核对。
-
-参评新增`canping_timing.schedule_basis`与`first_period`。来源回执按实际`profile_id`列原句的`role`及`applied_clause_ids`，区分所选附段与另书背景，并复制实际日期政策、折算结果和起运点；局部来源、全书与现实效验分别标注。`first_period`严格为同次`dayun[0]`摘要，不能代替`selected`查询当段；legacy为null且不补实际日期。首轮可复制`timing_policy`视图字段，完整`periods`、120年分段及121个立春继续按需读取。原句损坏或方法回执冲突在投影前返回不可重试503，不能更换出生参数绕过。详见配运来源映射。
-
-两工具支持可选`birth_utc_offset=±HH:MM[:SS]`：在保留IANA `zone`的前提下核对已确认出生偏移、选择重复钟时的实际瞬间。未知偏移不猜，不存在钟时或地区／偏移冲突仍报输入错误；不将出生偏移固化为未来地区规则。显式偏移时`numerology_evidence.birth_clock`增加请求与实际偏移、`civil_fold`、重复钟时状态和具名政策，可窄投影读取；无偏移的普通结果不新增这些回执字段。参评附法零岁起运保留实际出生瞬间，后续周年仍按具名fold／gap政策和地区规则。见第五十一轮核对。
-
-两工具 `time` 须明确为当地钟时 `HH:MM[:SS]`，可带显式小数秒；不将空白或未知补零点，不接受时间字段内的时区后缀，时区放 `zone`。显式零点有效。河洛 `judge.month_affinity` 的`version`为规则实现版本，`collation_version`与`collation_sha256`标识实际载入的校勘数据；缓存期不把后来文件的散列配给旧数据。它分开返回先后天的卦属月、另述月份条件和原页状态；`judge.deTime`仅卦属月匹配，未代表完整得时／得体。额外条件区分离散、跨年和季节；`month_label_match`仅月号，附加条件未决时即使月号未中也保持`match=null`。十三条`phases[].natal_najia_clause`另列原句、页码、月号和同阶段年命正纳／借用事实，及字连接范围与解卦例外未决，不输出整条吉凶；见第三十轮核对。`opposed_month_conditions`保留相反条件。公开 `month_affinity` 视图可按需读取，63项明确属月、无妄未决及边界限制见第八轮核对。
-
-河洛`judge.najia[].lines[].source`提供实际位置的原页依据：`basis=hexagram_entry`为该卦条目已核，`pure_trigram_rule`为按纯卦内外位推演。`numerology_evidence.najia_collation`分开报告八纯卦基础48项正纳／12项借用与十三条卦解78／18项观察；其余51卦未逐卦目校。`source_issues`保留解卦两印本的列举次序差异，不改计算爻位。可用公开`najia`视图读取，数组应整体选择。来源表载入或实际位置冲突返回`numerology_source_inconsistent`、HTTP503、`retryable=false`，需维护者核对源表；出生参数不作为修正提示。坎卦及時／纳甲句的月号仍为空，见基础表与源据。
-
-河洛`judge.deTi`为年柱纳音、实际上下体及两互体的有向五行关系，完整`present=null`；`generating_qi.condition_match`同时要求无元气与卦体生纳音，第87页反向关系另列于`mutual_generation`。公开`body_relations`视图可按需读取，语义与未决范围见第九轮核对。
-
-公开`qi_phases`视图读取`judge.qi_phases`：先后天分别保存正反元气、化工的实际上下体／互体位置与阶段得失，旧聚合字段只表示并集。春季反化工按所核底本保留离、巽重叠，土用与乙亥例乾化工冲突尚待核。见第十一轮核对。 新增`yuanqi_opposition`按出生年干支核正反目标，并逐阶段计算`yuan_absent && fan_present`；`direct_only_condition_match`只作范围比较，不覆盖包含两互体的所选取法。`fanYuan_policy`说明旧并集仅候选命中，`rescue_match=null`。来源非空改写或运行时目标／卦体冲突均返回不可重试503，见第四十三轮核对。 `solar_term.boundary_context`另保存当前节气、最近至点及下一四立的实际来源和绝对时刻，按原民用年使用共享相邻年窗口；`judge.seasonal_numbers`保留同一上下文及各起止来源。相邻求根不扩展显式模型公开年份，河洛端点来源见端点年核对。参平`liunian_series.year_boundaries/solar_context`另列完整121个立春与摘要，`canping_timing.solar_year_context`同次相等，`selected.year_start_boundary/year_end_boundary`绑定查询所选年两端。1800–2200输入民用年所需的有界立春保留显式模型、完整120年及未来钟面条件，不能扩充公开年表；`calendar_boundaries`视图传其中字段。见完整年序核对。
-
-两数默认开启真太阳时，必须明确`lon`或数值`gps_lon`，GPS字段优先，0°有效；缺经度会报错，不再使用上海缺省值。只有明确选择钟表时才传`use_true_solar_time=false`，此时未给经度输出null。`birth_clock`公开视图读取同次`numerology_evidence.birth_clock`，区分民用时刻、物理UTC瞬间、计算钟面与经度是否使用，见第十二轮核对。
-
-`heluo.judge.seasonal_numbers` 返回原始二数的正数比较、绝对数段、十一数式及六个实际节气窗口。原文重叠全部保留；`active` 表示是否落入时窗，`numeric_band_match` 只表示对应绝对数条件，得中未量化时为 `null`。`erShu` 相等标签现为“正数”，超出正数为“有余”；不据此裁定季节得中。公开 `number_conditions` 视图提供该组字段，调用时复制其 `fields`，视图名不是请求参数。
-
-共享太阳模型可显式选 `FATEBRIDGE_SOLAR_TERM_MODEL=swiss`，要求实际 Swiss 文件模型。参评投影若超出该模式的已声明范围，返回 `solar_swiss_range`，完整120年要求不缩短；缺文件返回 `solar_swiss_files_required`。两者均为非重试503。选择范围、文件准备与原失败保留见[严格 Swiss 文件模式](solar-backends.md#严格-swiss-文件模式)。
+来源、实际选文或同次回执不一致，在投影前返回 HTTP503、`error_code=numerology_source_inconsistent`、`retryable=false`；无关字段投影也不能隐藏故障。缺失投影上下文继续保留未知，来源故障应由维护者核对，不能更换出生参数绕过。历史历法和 `core.song_clock` 的具名来源算术属于 Python 研究入口，不是这里新增的请求字段。
 
 #### 中国术数独立盘（family `metaphysics`）
 

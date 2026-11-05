@@ -1,11 +1,8 @@
 """Consistent raw plates cannot justify contradictory derived numeric claims."""
 
 import asyncio
-import gzip
-import hashlib
 import json
 from copy import deepcopy
-from pathlib import Path
 
 import pytest
 from fastmcp import Client

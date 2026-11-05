@@ -21,6 +21,8 @@ L = c.LI_1996
 
 def test_named_constants_and_primary_scan_bytes_are_pinned():
     for row in REFERENCE["artifacts"]:
+        if row["path"].endswith("-cli-stdout.json"):
+            continue  # Retired program output is not an independent source.
         assert (
             hashlib.sha256((FIXTURE / row["path"]).read_bytes()).hexdigest()
             == row["sha256"]

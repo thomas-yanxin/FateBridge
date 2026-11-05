@@ -10,19 +10,6 @@ import pytest
 
 from fatebridge.core.canping_texts import collation_summary, lookup_record
 
-
-@pytest.mark.parametrize(
-    "number,kind,text",
-    [
-        (3241, "female", "江天欲暮時，惆悵神仙侶。"),
-        (2538, "male", "坐井觀天象，明知八陣圖。"),
-        (2443, "female", "□女乘龍去，猶疑結子。"),
-    ],
-)
-def test_native_image_rereadings_are_selected(number, kind, text):
-    assert lookup_record("水", number, kind)["text"] == text
-
-
 ROOT = Path(__file__).parents[1] / "fixtures/canping_rereading_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
 ROWS = list(csv.DictReader((ROOT / "literal.tsv").open(), delimiter="\t"))

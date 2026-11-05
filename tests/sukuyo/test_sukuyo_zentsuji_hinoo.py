@@ -1,7 +1,6 @@
 """Distinct physical witnesses may agree without deciding rule precedence."""
 
 import copy
-from pathlib import Path
 
 import pytest
 

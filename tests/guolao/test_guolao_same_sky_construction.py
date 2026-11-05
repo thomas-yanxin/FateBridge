@@ -1,7 +1,6 @@
 """The native Guolao solar clock must not depend on an unused legacy display."""
 
 import asyncio
-import hashlib
 import importlib.util
 import json
 from datetime import datetime, timedelta, timezone

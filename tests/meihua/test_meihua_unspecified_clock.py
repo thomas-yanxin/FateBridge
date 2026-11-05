@@ -1,12 +1,6 @@
 """Undefined local time never masquerades as a verified regional UTC offset."""
 
-import gzip
-import hashlib
-import json
-from copy import deepcopy
-from dataclasses import replace
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 
 import pytest
 

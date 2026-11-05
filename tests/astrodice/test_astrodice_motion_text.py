@@ -1,7 +1,6 @@
 """A frozen omitted-term counterexample and complete text/number fidelity."""
 
 import copy
-import hashlib
 import json
 from pathlib import Path
 

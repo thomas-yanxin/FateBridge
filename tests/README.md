@@ -42,8 +42,8 @@ uv run --locked --extra dev python -m pytest -q
 
 测试模块可以复用其他模块中的已命名辅助，但导入测试函数作为辅助时应使用不以 `test_` 开头的别名，避免额外收集同一测试。合并场景文件时保留全部参数、断言、标记及故障方式，并比较完整测试节点清单。
 
-pytest 使用 `importlib` 导入模式，允许不同领域的同名回归模块一起收集。三端夹具与调用在 [support/transports.py](support/transports.py) 维护，领域测试保留自己的输入、投影控制、执行顺序、故障注入与业务断言；相同控制才统一生成请求参数。不同来源、不同请求和故障控制继续分别验证。梅花主题协议测试集中在 [test_meihua_topics_transports.py](meihua/test_meihua_topics_transports.py)，每个主题仍保留原请求、资格断言及同次结果的完整分页核对。
+pytest 使用 `importlib` 导入模式，允许不同领域的同名模块一起收集。三端夹具与调用在 [support/transports.py](support/transports.py)维护；同主题的相同协议控制优先参数化，保留各请求、投影、分页、故障注入与业务断言。
 
-行人与失物共享 [三端和分页用例](meihua/test_meihua_travel_property_transports.py)，仍分别检查主题枚举、规则集及原包路径环境变量。同人、大有、谦的 [三端来源用例](numerology/test_heluo_source_transports.py) 按各自冻结输入、独立读录和投影模式参数化；无编号引文、字形未决及正式变卦仍有专门断言。八字刑的错误解除与漏解除共用 [故障注入用例](bazi/test_bazi_punishment_resolution_transports.py)，保留两个输入队列和各自三种故障，不合并为单向检查。
+测试精简以完整独立参考为准：参评逐格转录与复读对照覆盖的同值抽查无需另留；紫微亮度用完整独立转录同时核对20颗星、空缺分支和无亮度星。退役脚本的参数解析／JSON打印测试随入口移除，领域计算、来源校验和错误注入继续维护。
 
 原典字面冲突、数值超差和未裁定结果本身也需要回归：测试通过可能只证明这些失败被诚实保留。不得从当前计算输出重新生成期望值、删反例或把固定来源检查改成跳过。当前算法限制见[算法状态](../docs/algorithm-status.md)，验证方法见[计算与预测验收](../docs/prediction-validation.md)。

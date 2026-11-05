@@ -3,8 +3,6 @@
 import csv
 import hashlib
 import json
-import runpy
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -291,27 +289,3 @@ def test_malformed_or_overclaimed_source_tables_fail_closed(
 def test_exact_original_day_input_required(value):
     with pytest.raises(TypeError):
         table.gujin_literal_lunar(value)
-
-
-@pytest.mark.parametrize(
-    "arguments",
-    [["--conjunction-method", "literal_table"], ["--conjunction-method=literal_table"]],
-)
-def test_literal_pair_comparison_rejects_single_method_override(monkeypatch, arguments):
-    monkeypatch.setattr(
-        sys,
-        "argv",
-        [
-            "audit_guolao_calendar_year.py",
-            "--compare-literal-grid",
-            "0",
-            "1",
-            *arguments,
-        ],
-    )
-    with pytest.raises(SystemExit) as exited:
-        runpy.run_path(
-            str(ROOT / "scripts/guolao/audit_guolao_calendar_year.py"),
-            run_name="__main__",
-        )
-    assert exited.value.code == 2

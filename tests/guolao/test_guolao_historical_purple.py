@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import runpy
-import sys
 from dataclasses import asdict
 from fractions import Fraction as F
 from pathlib import Path
@@ -97,21 +95,3 @@ def test_undefined_input_units_are_rejected_instead_of_guessed():
     for wrong in [2451545.0, "116147.0196", 0, None, True]:
         with pytest.raises(TypeError, match="中积"):
             h.purple_historical_position(wrong)
-
-
-def test_offline_command_labels_historical_du_and_keeps_modern_epoch_unresolved(
-    monkeypatch, capsys
-):
-    script = Path(__file__).parents[2] / "scripts" / "audit_guolao_purple.py"
-    monkeypatch.setattr(sys, "argv", [str(script), "--zhongji-days", "116147.0196"])
-    assert runpy.run_path(str(script))["main"]() == 0
-    result = json.loads(capsys.readouterr().out)
-    assert result["input_kind"] == "source_zhongji_days_not_modern_julian_day"
-    table = result["printed_historical_table"]
-    assert table["mansion"] == "毕"
-    assert table["next_mansion"] == "觜"
-    assert F(table["days_until_next_mansion_exact"]) == F("60.2884")
-    assert F(table["circle_du_exact"]) == F("365.2564")
-    assert not table["used_in_native_birth_chart"]
-    assert result["modern_longitude"] is None
-    assert not result["modern_epoch_calibrated"]

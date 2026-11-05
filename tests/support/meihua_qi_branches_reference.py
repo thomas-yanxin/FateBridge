@@ -1,7 +1,6 @@
 """Frozen literal unit atoms and a narrow additive-view history adapter."""
 
 import json
-from copy import deepcopy
 from pathlib import Path
 
 FOLDER = Path(__file__).parents[1] / "fixtures/meihua_qi_branches_v1"

@@ -3,7 +3,6 @@
 import asyncio
 import json
 from copy import deepcopy
-from itertools import product
 from pathlib import Path
 
 import pytest

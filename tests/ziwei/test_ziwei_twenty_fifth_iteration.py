@@ -5,7 +5,6 @@ import hashlib
 import json
 import shutil
 from copy import deepcopy
-from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient

@@ -4,7 +4,6 @@ import asyncio
 import hashlib
 import json
 import shutil
-from copy import deepcopy
 from datetime import date, timedelta
 
 import pytest

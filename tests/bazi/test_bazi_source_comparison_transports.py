@@ -1,5 +1,8 @@
 """All public transports retain calculated/source disagreement before projection."""
 
+import json
+from pathlib import Path
+
 import pytest
 
 from fatebridge.application.examples import suggested_fields
@@ -12,6 +15,9 @@ from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls
 
 SPEC = next(s for s in CATALOG if s.key == "bazi_source_compare")
+SOURCE_UNITS = json.loads(
+    (Path(__file__).parents[1] / "data/bazi/complete-units-source.json").read_text()
+)["cases"]
 
 
 rest = _shared_rest
@@ -29,6 +35,17 @@ rest = _shared_rest
         (["癸丑", "壬戌", "丙午", "庚寅"], "agrees_with_known_annotations"),
         (["癸酉", "甲子", "丁卯", "丙午"], "agrees_with_known_annotations"),
         (["甲子", "丙子", "甲申", "己巳"], "agrees_with_known_annotations"),
+        *[
+            (
+                row["pillars"],
+                (
+                    "unadjudicated_records_only"
+                    if row["expected_strength"] is None
+                    else "agrees_with_known_annotations"
+                ),
+            )
+            for row in SOURCE_UNITS
+        ],
     ],
 )
 def test_same_literal_comparison_full_and_published_view_on_three_surfaces(

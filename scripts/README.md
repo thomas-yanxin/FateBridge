@@ -55,12 +55,16 @@ uv run --locked --extra dev python -m scripts.astronomy.audit_complete_moshier_a
 
 独立参考生成器即使不被生产代码导入，也可能承担来源复现职责。退役前检查测试、CI、文档、其他脚本及原始来源记录；保存仍有价值的参考、失败与取得方法。原始资料在 `tests/data/`、`tests/fixtures/` 或外部固定档案中维护，不混入脚本目录。完整规则见[仓库维护](../docs/repository-maintenance.md)。
 
-固定队列已有测试直接调用验证函数时，不再另维护只解析默认路径、打印 JSON 的脚本。梅花取数、历表、原典和天气规则统一运行 `uv run --locked --extra dev python -m pytest -q tests/meihua`；`scripts/meihua/` 保留参考采集、明确指纹的外部输入和原研究绑定检查。
+固定队列已有测试直接执行完整验证时，以对应领域测试为入口，不另维护一份默认路径、参数别名和 JSON 打印包装。果老原历、圭表、黄赤道、漏刻与限度核对统一运行 `uv run --locked --extra dev python -m pytest -q tests/guolao`；该目录继续保留原典字面、完整参考队列、刊差及输入拒绝验证。果老脚本只保留资料采集、外部数值审计、回放资料验证及预测研究等独立任务。
 
-果老卷45异本和人类图具名定爻例分别运行 `tests/guolao/test_guolao_witnesses.py` 与 `tests/human_design/test_human_design_primary_fixing_source.py`。测试直接执行来源审计，保留全部异文、未决项、冻结资料身份检查和错误注入；不另维护固定结果打印入口。
+需要专门运行方式的入口：
 
-六爻的常规来源配置统一用 `uv run --locked --extra dev python -m scripts.liuyao.build_profile --check` 核对，也可在 `--check` 前指定 `role`、`strength` 等名称。各配置仍校验自己的冻结材料、原扫描和适用勘误；扫描校读、月破、刑及动巳的专门裁定继续由各自的构建器处理。果老原历不再为每个领域函数维护 JSON 打印命令；直接对照见 `tests/guolao/`，独立参考采集与完整来源审计仍在 `scripts/guolao/`。
+| 任务 | 入口与要求 |
+| --- | --- |
+| 梅花取数、历表、原典和天气规则 | `uv run --locked --extra dev python -m pytest -q tests/meihua`；研究绑定与参考采集保留各自脚本 |
+| 六爻来源配置 | `python -m scripts.liuyao.build_profile --check`；可在 `--check` 前选 `role`、`strength` 等配置，专门扫描／勘误仍由对应构建器处理 |
+| 八字未来时钟 | [执行器](bazi/audit_bazi_dayun_future_clocks_shard.py)默认完整单片，分片时明确提供索引与数量；[合并器](bazi/merge_bazi_future_clock_shards.py)校验完整队列、顺序、未知与失败 |
+| 人类图 Profile | [完整队列审计](human_design/audit_human_design_profile_full_coverage.py)，保留19／193例、768计划及缺项 |
+| AA1996来源构建 | `python -m fatebridge.fetch_aa1996`，见[太阳后端](../docs/solar-backends.md) |
 
-八字未来时钟队列只保留 [一个执行器](bazi/audit_bazi_dayun_future_clocks_shard.py) 和 [一个合并器](bazi/merge_bazi_future_clock_shards.py)。执行器默认单片完整运行，需要分片时显式传入 `--shard-index` 与 `--shard-count`；合并仍检查完整原队列、顺序、未知状态与失败记录。
-
-旧的单独 Li Chun、地磁、出版方本命及太乙交节 JSON 打印包装已移除；对应的完整来源与失败控制分别由 `tests/fengshui/test_fengshui_calendar_v10.py`、`tests/fengshui/test_fengshui_geomagnetic.py`、`tests/human_design/test_human_design_publisher.py` 和 `tests/taiyi/test_taiyi_solar_sources.py` 保留。人类图 Profile 验收统一使用 [完整原队列入口](human_design/audit_human_design_profile_full_coverage.py)，保留原 19／193 例、768 计划与缺项，不再维护只审查单个子队列的旧入口。AA1996 构建使用 `python -m fatebridge.fetch_aa1996`，见[太阳后端](../docs/solar-backends.md)。
+表中 Python 命令均在仓库根目录使用 `uv run --locked --extra dev` 前缀。

@@ -216,24 +216,6 @@ uv run --locked --extra dev mypy src/fatebridge/
 
 自包含 CI 包含 `test_bazi_seasonal_phase_accuracy.py` 的十二月支逐格对照与有理数手算、`test_element_primitive.py` 的固定结构计数向量，以及 `test_solar_term_published_reference.py` 的香港天文台2026年十二中气核对。后者维持分钟出版资料对应的60秒容差，不替代既有Moshier历史1秒门槛；这些测试均不认证旺衰工程系数或现实预测。完整本地参考测试和已知分歧见[当前算法状态](algorithm-status.md)，CI 绿灯只覆盖其实际选择的测试。
 
-### 什么时候补 API/MCP 对齐测试
-
-满足以下任一条件时建议补：
-
-- 同时暴露 REST 与 MCP；
-- 修改了请求字段默认值；
-- 修改了响应结构；
-- 修改了 `selected_sections`、`snapshot_export` 或 section 名映射。
-
-### 什么时候补能力回归测试
-
-满足以下任一条件时建议补：
-
-- 改动了 `src/fatebridge/core/*`；
-- 改动了算法边界条件；
-- 改动了占星精度回退逻辑；
-- 改动了导出合同或知识索引。
-
 ## 文档维护与验证
 
 文档应让读者明确下一步：安装指南带读者跑通最小请求，任务指南解决具体问题，参考页提供可查的字段与契约，原理页解释实现选择。各类页面从[文档中心](README.md)进入；公共术语统一见[核心概念](concepts.md)。

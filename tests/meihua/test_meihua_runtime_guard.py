@@ -1,7 +1,6 @@
 """Calendar audits hold configured native/time inputs as well as package files."""
 
 import os
-from pathlib import Path
 from types import SimpleNamespace
 
 import pytest

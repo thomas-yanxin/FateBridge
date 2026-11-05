@@ -108,10 +108,16 @@ def test_lunar_calendar_uses_fixed_utc8_rather_than_historical_shanghai_dst():
 
 
 def test_jie_month_change_brackets_independent_hko_minute_and_consumes_exact_boundary():
-    ref = json.loads((FIXTURES.parent / "bazi-timing-hko-2026.json").read_text())
-    published = datetime.fromisoformat(
-        next(x["at"] for x in ref["cases"] if x["term"] == "立春")
+    # HKO's retained raw XML replaces the retired duplicate JSON transcription.
+    raw = (
+        Path(__file__).parents[1] / "fixtures/calendar_hko_v1/24SolarTerms_2026.xml"
+    ).read_bytes()
+    assert (
+        hashlib.sha256(raw).hexdigest()
+        == "3af98679f43d4d689941c55ba2a19f146ff111a6dff681235dc2b7110974ac74"
     )
+    assert b"<Data><M>02</M><D>04</D><hm>04:02</hm></Data>" in raw
+    published = datetime.fromisoformat("2026-02-04T04:02:00+08:00")
     before = monthly.month_context(published - timedelta(minutes=3), "jie_month")
     after = monthly.month_context(published + timedelta(minutes=3), "jie_month")
     assert (before["month_number"], after["month_number"]) == (12, 1)

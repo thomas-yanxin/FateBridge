@@ -1,11 +1,9 @@
 """Frozen original scores, independent source tokens and synthetic clock controls."""
 
 import ast
-import copy
 import gzip
 import hashlib
 import json
-import shutil
 from datetime import date, datetime, time, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path

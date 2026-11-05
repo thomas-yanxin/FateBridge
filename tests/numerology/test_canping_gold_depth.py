@@ -31,20 +31,6 @@ REREADINGS = {
 }
 
 
-@pytest.mark.parametrize(
-    "number,expected",
-    [
-        (2510, "梧桐金井上，枝葉接松筠。"),
-        (3322, "圭田如玉潔，一點不生塵。"),
-        (3328, "吾身何踐履，天外有煙霞。"),
-    ],
-)
-def test_primary_gold_number_selects_its_printed_text(number, expected):
-    actual = lookup_record("金", number, "male")
-    assert actual["text"] == expected
-    assert actual["selection"]["number"] == number
-
-
 @pytest.mark.parametrize("row,kind", CELLS)
 def test_every_gold_cell_keeps_its_number_column_page_and_reading_state(row, kind):
     n = int(row["number"])

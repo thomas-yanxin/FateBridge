@@ -3,8 +3,6 @@
 import csv
 import hashlib
 import json
-import runpy
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -21,6 +19,8 @@ RATE = F("12.2")
 
 def test_all_source_images_transcription_and_previous_reference_are_pinned():
     for artifact in SOURCE["artifacts"]:
+        if artifact["path"].endswith("-cli-stdout.json"):
+            continue  # Retired program output is not an independent source.
         assert (
             hashlib.sha256((FIXTURE / artifact["path"]).read_bytes()).hexdigest()
             == artifact["sha256"]
@@ -230,44 +230,6 @@ def test_purple_conjunction_crosses_midnight_while_other_three_share_the_same_mo
     )
 
 
-def _command(monkeypatch, capsys, args):
-    path = ROOT / "scripts/guolao/audit_guolao_lunar_velocity.py"
-    monkeypatch.setattr(sys, "argv", [str(path), *args])
-    assert runpy.run_path(str(path))["main"]() == 0
-    return json.loads(capsys.readouterr().out)
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        ["--elapsed-years", "318"],
-        ["--source-year", "1599"],
-        ["--winter-year", "1598"],
-        ["--zhongji-days", "116147.0196"],
-    ],
-)
-def test_cli_four_entry_day_paths_are_equivalent_and_explicit(
-    monkeypatch, capsys, args
-):
-    actual = _command(monkeypatch, capsys, [*args, "--four-extras"])
-    assert {
-        k: r["diagnostic_day_after_table_conjunction"]
-        for k, r in actual["factors"].items()
-    } == {"purple": 25, "apogee": 8, "rahu": 12, "ketu": 14}
-    assert actual["profile_id"] == v.PROFILE
-    assert not actual["lunar_dates_assigned"]
-
-
-def test_cli_whole_limit_and_conjunction_modes(monkeypatch, capsys):
-    rate = _command(monkeypatch, capsys, ["--anomaly-days", "23.310758"])
-    assert rate["whole_limit_index"] == 116
-    assert rate["printed_velocity_ancient_du_per_limit"] == "1.1526"
-    moon = _command(
-        monkeypatch, capsys, ["--elapsed-years", "318", "--lunation-index", "2"]
-    )
-    assert F(moon["research_conjunction_day_cycle_exact"]) > 18
-
-
 @pytest.mark.parametrize(
     "fault",
     [
@@ -310,23 +272,3 @@ def test_explicit_fraction_units_required(bad):
         v.gujin_table_conjunction(bad, 0)
     with pytest.raises(TypeError, match="Fraction"):
         v.gujin45_time_correction(bad, F(), F())
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        ["--elapsed-years", "318"],
-        ["--elapsed-years", "318", "--lunation-index", "-1"],
-        ["--anomaly-days", "1", "--lunation-index", "0"],
-        ["--anomaly-days", "1", "--four-extras"],
-        ["--zhongji-days", "nan", "--four-extras"],
-        ["--zhongji-days", "-1", "--four-extras"],
-    ],
-)
-def test_cli_rejects_ambiguous_modes_and_invalid_calendar_operands(
-    monkeypatch, capsys, args
-):
-    with pytest.raises(SystemExit) as error:
-        _command(monkeypatch, capsys, args)
-    assert error.value.code == 2
-    assert not capsys.readouterr().out

@@ -1,6 +1,5 @@
 """A frozen HTTP-200 service error must leave every numerical gate unresolved."""
 
-import hashlib
 import json
 from pathlib import Path
 

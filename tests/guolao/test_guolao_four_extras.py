@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import runpy
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -181,64 +179,3 @@ def test_damaged_source_table_fails_closed(tmp_path, monkeypatch, fault):
     monkeypatch.setattr(g, "DATA", path)
     with pytest.raises(ValueError):
         g.four_extras_source_days(F())
-
-
-def _command(monkeypatch, capsys, args):
-    script = ROOT / "scripts/guolao/audit_guolao_four_extras.py"
-    monkeypatch.setattr(sys, "argv", [str(script), *args])
-    assert runpy.run_path(str(script))["main"]() == 0
-    return json.loads(capsys.readouterr().out)
-
-
-@pytest.mark.parametrize(
-    "args",
-    [["--elapsed-years", "318"], ["--source-year", "1599"], ["--winter-year", "1598"]],
-)
-def test_actual_cli_year_paths_reproduce_all_four_worked_mansion_entries(
-    monkeypatch, capsys, args
-):
-    value = _command(monkeypatch, capsys, args)
-    assert value["elapsed_years"] == 318
-    for key, expected in EXAMPLE["factors"].items():
-        assert value["factors"][key]["mansion"] == expected["mansion"]
-        assert (
-            value["factors"][key]["next_entry_sexagenary_day"]
-            == expected["entry_sexagenary_day"]
-        )
-    for flag in [
-        "modern_epoch_calibrated",
-        "modern_calendar_date_assigned",
-        "used_in_native_birth_chart",
-        "gujin58_header_variants_resolved",
-    ]:
-        assert value[flag] is False
-
-
-def test_explicit_middle_and_winter_cli_matches_year_arithmetic(monkeypatch, capsys):
-    direct = _command(
-        monkeypatch,
-        capsys,
-        ["--zhongji-days", "116147.0196", "--winter-cycle-days", "42.0796"],
-    )
-    year = _command(monkeypatch, capsys, ["--elapsed-years", "318"])
-    year.pop("elapsed_years")
-    assert direct == year
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        [],
-        ["--source-year", "1280"],
-        ["--elapsed-years", "318", "--winter-cycle-days", "0"],
-        ["--source-year", "1599", "--winter-year", "1598"],
-        ["--zhongji-days", "1/0"],
-        ["--zhongji-days", "NaN"],
-        ["--zhongji-days", "0", "--winter-cycle-days", "60"],
-    ],
-)
-def test_cli_rejects_missing_conflicting_or_invalid_operands(monkeypatch, capsys, args):
-    with pytest.raises(SystemExit) as exc:
-        _command(monkeypatch, capsys, args)
-    assert exc.value.code == 2
-    assert not capsys.readouterr().out

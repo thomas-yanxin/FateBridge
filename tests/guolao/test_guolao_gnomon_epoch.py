@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import runpy
-import sys
 from decimal import Decimal, localcontext
 from fractions import Fraction as F
 from pathlib import Path
@@ -231,10 +229,3 @@ def test_collation_provenance_is_loaded_snapshot_not_later_file_hash(
         ]
         == wanted
     )
-
-
-def test_actual_cli_keeps_full_audit_and_both_profiles(monkeypatch, capsys):
-    path = ROOT / "scripts/guolao/audit_guolao_gnomon_epoch.py"
-    monkeypatch.setattr(sys, "argv", [str(path), "audit"])
-    assert runpy.run_path(str(path))["main"]() == 0
-    assert json.loads(capsys.readouterr().out) == audit_gnomon_epoch()

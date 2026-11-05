@@ -1,8 +1,6 @@
 """Actual alternate native units/frames cannot be consumed as date degrees."""
 
 import asyncio
-import gzip
-import hashlib
 import json
 from pathlib import Path
 

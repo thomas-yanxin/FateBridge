@@ -1,8 +1,6 @@
 """Replacement source differences and edition scope must reach actual readings."""
 
 import asyncio
-import gzip
-import hashlib
 import json
 import subprocess
 import sys

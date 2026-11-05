@@ -1,7 +1,6 @@
 """Source-bound host/guest operations, retained disagreements and fail-closed text."""
 
 import asyncio
-import gzip
 import hashlib
 import json
 import shutil

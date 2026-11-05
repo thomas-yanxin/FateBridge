@@ -1,7 +1,6 @@
 """Printed positions, directed traces and rejection of mislabelled author output."""
 
 import asyncio
-import gzip
 import hashlib
 import json
 import shutil

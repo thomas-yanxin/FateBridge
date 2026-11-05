@@ -1,6 +1,5 @@
 """Image-bound partial poem readings; same reader, not independent validation."""
 
-import copy
 import hashlib
 import json
 from pathlib import Path

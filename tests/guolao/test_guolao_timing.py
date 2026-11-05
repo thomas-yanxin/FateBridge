@@ -84,11 +84,16 @@ def test_source_reverse_small_limit_is_connected_to_explicit_year(
 
 
 def test_declared_lichun_policy_on_each_side_of_independent_hko_minute():
-    fixture = json.loads((FIXTURES / "bazi-timing-hko-2026.json").read_text())
-    published = next(c["at"] for c in fixture["cases"] if c["term"] == "立春")
-    instant = datetime.fromisoformat(published)
-    assert fixture["precision"] == "published_minute"
-    # Bracket outside the published rounding precision; not a seconds oracle.
+    # HKO's retained raw XML replaces the retired duplicate JSON transcription.
+    raw = (
+        Path(__file__).parents[1] / "fixtures/calendar_hko_v1/24SolarTerms_2026.xml"
+    ).read_bytes()
+    assert (
+        hashlib.sha256(raw).hexdigest()
+        == "3af98679f43d4d689941c55ba2a19f146ff111a6dff681235dc2b7110974ac74"
+    )
+    assert b"<Data><M>02</M><D>04</D><hm>04:02</hm></Data>" in raw
+    instant = datetime.fromisoformat("2026-02-04T04:02:00+08:00")
     before = chart(analysis_datetime=instant - timedelta(minutes=3))
     after = chart(analysis_datetime=instant + timedelta(minutes=3))
     a, b = (x["guolao"]["timing"]["small_limit"] for x in (before, after))

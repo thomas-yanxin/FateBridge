@@ -14,17 +14,6 @@ from fatebridge.utils.errors import NumerologySourceError
 from tests.numerology.test_canping_rereading_depth import jpeg_dimensions
 
 
-@pytest.mark.parametrize(
-    "number,kind,text",
-    [
-        (3377, "female", "晝夕掩重門，虛空久寂寞。"),
-        (3379, "male", "八尺長燈檠，清光射白晝。"),
-    ],
-)
-def test_native_earth_day_glyph_readings(number, kind, text):
-    assert lookup_record("土", number, kind)["text"] == text
-
-
 def test_inherited_corpus_callers_cannot_poison_source_cache_or_its_provenance(
     monkeypatch,
 ):

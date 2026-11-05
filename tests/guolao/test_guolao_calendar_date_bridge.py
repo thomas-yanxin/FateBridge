@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import runpy
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -280,49 +278,3 @@ def test_frozen_artifacts_and_audit_do_not_inflate_reference_counts():
     assert report["hko_published_anchor_count"] == 1
     assert not report["hko_remaining30_are_unseen_holdout"]
     assert not report["four_axis_perfect_scores_established"]
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        [],
-        [
-            "label",
-            "--profile",
-            bridge.PROFILE,
-            "--calendar",
-            "automatic_1582",
-            "--date",
-            "1582",
-            "10",
-            "4",
-        ],
-        [
-            "counter",
-            "--profile",
-            bridge.PROFILE,
-            "--source-year",
-            "1599",
-            "--search-policy",
-            bridge.SEARCH_POLICY,
-            "--counter-basis",
-            bridge.COUNTER_BASIS,
-            "--counter",
-            "10.98875",
-        ],
-    ],
-)
-def test_cli_invalid_inputs_are_errors_not_empty_success(monkeypatch, capsys, args):
-    path = ROOT / "scripts/guolao/audit_guolao_calendar_date_bridge.py"
-    monkeypatch.setattr(sys, "argv", [str(path), *args])
-    with pytest.raises(SystemExit) as error:
-        runpy.run_path(str(path))["main"]()
-    assert error.value.code == 2
-    assert not capsys.readouterr().out
-
-
-def test_actual_cli_audit_matches_domain_audit(monkeypatch, capsys):
-    path = ROOT / "scripts/guolao/audit_guolao_calendar_date_bridge.py"
-    monkeypatch.setattr(sys, "argv", [str(path), "audit"])
-    assert runpy.run_path(str(path))["main"]() == 0
-    assert json.loads(capsys.readouterr().out) == audit_calendar_date_bridge()

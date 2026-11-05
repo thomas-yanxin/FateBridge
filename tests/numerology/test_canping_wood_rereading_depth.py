@@ -12,19 +12,6 @@ from fatebridge.core.canping_texts import lookup_record
 from fatebridge.utils.errors import NumerologySourceError
 from tests.numerology.test_canping_rereading_depth import jpeg_dimensions
 
-
-@pytest.mark.parametrize(
-    "number,kind,text",
-    [
-        (2206, "male", "洞庭風葉舞，撫手上南山。"),
-        (2412, "male", "玉藍凝絲竹，蟾宮火上山。"),
-        (2519, "luck", "遇水得逢橋，憂心傾□然。"),
-    ],
-)
-def test_native_wood_rereadings_are_selected(number, kind, text):
-    assert lookup_record("木", number, kind)["text"] == text
-
-
 ROOT = Path(__file__).parents[1] / "fixtures/canping_wood_rereading_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
 CELLS = REFERENCE["cells"]

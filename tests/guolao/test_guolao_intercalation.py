@@ -1,9 +1,6 @@
 """Independent leap label, civil-vs-instant counterexample and missing inputs."""
 
-import hashlib
 import json
-import runpy
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -319,28 +316,6 @@ def test_missing_printed_conjunction_propagates_to_months_and_all_four_dates(
         f["source_calendar_date_under_named_policy"] is None
         for f in result["factors"].values()
     )
-
-
-@pytest.mark.parametrize(
-    "elapsed,gap", [(99, F(".01")), (100, F(".0001")), (318, F(".0003"))]
-)
-def test_cli_preserves_fixed_qice_and_reports_independent_year_accumulation(
-    capsys, monkeypatch, elapsed, gap
-):
-    monkeypatch.setattr(
-        sys, "argv", ["audit_guolao_intercalation.py", "--elapsed-years", str(elapsed)]
-    )
-    assert (
-        runpy.run_path(str(ROOT / "scripts/guolao/audit_guolao_intercalation.py"))[
-            "main"
-        ]()
-        == 0
-    )
-    result = json.loads(capsys.readouterr().out)
-    diagnostic = result["year_accumulation_diagnostic"]
-    assert F(diagnostic["printed_24_qice_minus_that_increment_days_exact"]) == gap
-    assert not diagnostic["qice_rescaled_or_endpoint_forced"]
-    assert F(result["qice_days_exact"]) * 24 == F("365.2425")
 
 
 def test_profile_constants_not_silently_rescaled(tmp_path, monkeypatch):

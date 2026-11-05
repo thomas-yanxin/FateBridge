@@ -3,8 +3,6 @@
 import csv
 import hashlib
 import json
-import runpy
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -294,29 +292,3 @@ def test_method_comparison_retains_disagreement_missingness_and_no_selection(
     assert result["rows"][0]["calendar_facts_agree"] is agree
     assert not result["methods_selected_by_year_or_reference_fit"]
     assert not result["method_disagreement_is_external_accuracy_evidence"]
-
-
-@pytest.mark.parametrize(
-    "arguments",
-    [["--conjunction-method", "day_rate"], ["--conjunction-method=day_rate"]],
-)
-def test_cli_does_not_silently_ignore_single_method_during_pair_comparison(
-    monkeypatch, arguments
-):
-    monkeypatch.setattr(
-        sys,
-        "argv",
-        [
-            "audit_guolao_calendar_year.py",
-            "--compare-methods-grid",
-            "0",
-            "1",
-            *arguments,
-        ],
-    )
-    with pytest.raises(SystemExit) as exited:
-        runpy.run_path(
-            str(ROOT / "scripts/guolao/audit_guolao_calendar_year.py"),
-            run_name="__main__",
-        )
-    assert exited.value.code == 2

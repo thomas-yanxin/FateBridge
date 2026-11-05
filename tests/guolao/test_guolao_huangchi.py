@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import subprocess
-import sys
 from dataclasses import replace
 from fractions import Fraction as F
 from pathlib import Path
@@ -230,79 +228,3 @@ def test_invalid_frame_name_missing_rate_and_mutable_collection_are_not_silent()
     frozen = replace(table, rows=rows)
     rows.pop()
     assert len(frozen.rows) == 93
-
-
-@pytest.mark.parametrize(
-    "args,kind",
-    [
-        (["--profile", "nlc166"], "audit"),
-        (
-            [
-                "--profile",
-                "wikisource",
-                "--degree",
-                "5.3608",
-                "--origin",
-                "solstice",
-                "--direction",
-                "equatorial_to_ecliptic",
-            ],
-            "local",
-        ),
-        (
-            ["--profile", "nlc166", "--winter-mansion", "箕", "--winter-degree", "10"],
-            "projection",
-        ),
-        (["--profile", "wikisource", "--elapsed-years", "318"], "chain"),
-    ],
-)
-def test_research_command_preserves_selected_source_and_chain(args, kind):
-    r = subprocess.run(
-        [sys.executable, "scripts/guolao/audit_guolao_huangchi.py", *args],
-        cwd=ROOT,
-        text=True,
-        capture_output=True,
-        check=True,
-    )
-    value = json.loads(r.stdout)
-    assert value["audit"]["segments"] == 92
-    if kind == "local":
-        assert F(value["calculation"]["output_local_accumulation_du_exact"]) == F(
-            53559, 10849
-        )
-    if kind == "projection":
-        assert not value["projection"]["printed_ecliptic_table_reproduced"]
-    if kind == "chain":
-        assert F(value["source_winter_sun"]["degree_in_mansion_du_exact"]) == F(
-            "5.0392"
-        )
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        [],
-        ["--profile", "nlc166", "--degree", "1"],
-        ["--profile", "nlc166", "--origin", "solstice"],
-        ["--profile", "nlc166", "--winter-degree", "10"],
-        ["--profile", "nlc166", "--elapsed-years", "-1"],
-        [
-            "--profile",
-            "nlc166",
-            "--degree",
-            "NaN",
-            "--origin",
-            "solstice",
-            "--direction",
-            "equatorial_to_ecliptic",
-        ],
-    ],
-)
-def test_cli_rejects_ambiguous_origins_or_fabricated_defaults(args):
-    r = subprocess.run(
-        [sys.executable, "scripts/guolao/audit_guolao_huangchi.py", *args],
-        cwd=ROOT,
-        text=True,
-        capture_output=True,
-    )
-    assert r.returncode == 2 and not r.stdout

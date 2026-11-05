@@ -1,7 +1,6 @@
 """Literal source and geometry controls, never observed prediction scores."""
 
 import copy
-import gzip
 import hashlib
 import json
 from pathlib import Path
@@ -15,9 +14,6 @@ from fatebridge.core.meihua_trigram_symbols import (
 )
 from fatebridge.services.meihua import calculate_meihua_cast
 from fatebridge.services.replay_metadata import digest
-from tests.support.meihua_reputation_reference import (
-    restore_pre_v50_reputation_supplement,
-)
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/fixtures/meihua_trigram_symbols_v1"

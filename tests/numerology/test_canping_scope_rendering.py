@@ -1,6 +1,5 @@
 """Versioned disclosure provenance preserves history and current-run guards."""
 
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path

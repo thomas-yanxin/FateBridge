@@ -12,21 +12,6 @@ from fatebridge.core.canping_texts import lookup_record
 from fatebridge.utils.errors import NumerologySourceError
 from tests.numerology.test_canping_rereading_depth import jpeg_dimensions
 
-
-@pytest.mark.parametrize(
-    "number,kind,text",
-    [
-        (2914, "male", "御苑溝渠裏，翩翩一點紅。"),
-        (2209, "luck", "冒暑去投林，當途風少息。"),
-        (2514, "male", "蝴蝶在林中，採花爲麴蘖。"),
-        (2221, "luck", "臨春花柳香，好遂追遊世。"),
-        (3314, "luck", "蕙蘭花□，各自逞馨香。"),
-    ],
-)
-def test_native_gold_rereadings_are_selected(number, kind, text):
-    assert lookup_record("金", number, kind)["text"] == text
-
-
 ROOT = Path(__file__).parents[1] / "fixtures/canping_gold_rereading_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
 CELLS = REFERENCE["cells"]

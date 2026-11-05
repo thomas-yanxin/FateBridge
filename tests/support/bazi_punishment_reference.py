@@ -1,11 +1,9 @@
 """Corrected primitive input order; first independent reference remains retained."""
 
 from fractions import Fraction
-from itertools import product
 
 ORDER = ("year", "month", "day", "hour")
 STEMS = "甲乙丙丁戊己庚辛壬癸"
-BRANCHES = "子丑寅卯辰巳午未申酉戌亥"
 GEOMETRIES = (
     "寅亥巳申",
     "寅亥申巳",
@@ -21,13 +19,6 @@ ELEMENT = dict(zip(STEMS, "木木火火土土金金水水"))
 PRINCIPAL = {"寅": "木", "亥": "水", "巳": "火", "申": "金"}
 CONFLICT = {"寅": "申", "申": "寅", "巳": "亥", "亥": "巳"}
 PUNISHED = frozenset("寅巳申")
-
-
-def inputs():
-    for branches in GEOMETRIES:
-        choices = [STEMS[BRANCHES.index(b) % 2 :: 2] for b in branches]
-        for stems in product(*choices):
-            yield [s + b for s, b in zip(stems, branches)]
 
 
 def remaining_masses(branches, punishment):

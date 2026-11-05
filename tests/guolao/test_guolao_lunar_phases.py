@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import runpy
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -238,39 +236,3 @@ def test_small_partition_counts_missing_sunrise_separately_from_time_gaps():
 def test_invalid_diagnostic_range_rejected(start, stop):
     with pytest.raises(ValueError):
         audit_lunar_phase_grid(start, stop)
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        ["--elapsed-years", "0"],
-        ["--elapsed-year-grid", "0", "1", "--phase-index", "2"],
-        ["--elapsed-year-grid", "0", "1", "--source-sunrise-fraction", "1/4"],
-    ],
-)
-def test_cli_rejects_missing_phase_or_hidden_sunrise_in_grid(monkeypatch, args):
-    monkeypatch.setattr(sys, "argv", ["audit_guolao_lunar_phases.py", *args])
-    main = runpy.run_path(str(ROOT / "scripts/guolao/audit_guolao_lunar_phases.py"))[
-        "main"
-    ]
-    with pytest.raises(SystemExit) as result:
-        main()
-    assert result.value.code == 2
-
-
-def test_cli_keeps_missing_sunrise_explicit(monkeypatch, capsys):
-    monkeypatch.setattr(
-        sys,
-        "argv",
-        ["audit_guolao_lunar_phases.py", "--elapsed-years", "0", "--phase-index", "2"],
-    )
-    main = runpy.run_path(str(ROOT / "scripts/guolao/audit_guolao_lunar_phases.py"))[
-        "main"
-    ]
-    assert main() == 0
-    result = json.loads(capsys.readouterr().out)
-    assert result["phase_name"] == "望"
-    assert (
-        result["source_phase_day_assignment"]["status"]
-        == "requires_explicit_source_sunrise"
-    )

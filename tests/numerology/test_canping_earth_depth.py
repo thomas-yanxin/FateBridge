@@ -9,19 +9,6 @@ import pytest
 
 from fatebridge.core.canping_texts import collation_summary, lookup_record
 
-
-@pytest.mark.parametrize(
-    "number,kind,text",
-    [
-        (2272, "luck", "明珠生蚌內，方寸自然光。"),
-        (2971, "female", "○○有佳人，青鏡朱顏改。"),
-        (3377, "luck", "固壘○○處，隄防有不虞。"),
-    ],
-)
-def test_earth_literal_readings_and_printed_circles(number, kind, text):
-    assert lookup_record("土", number, kind)["text"] == text
-
-
 ROOT = Path(__file__).parents[1] / "fixtures/canping_earth_v1"
 REFERENCE = json.loads((ROOT / "reference.json").read_text())
 ROWS = list(csv.DictReader((ROOT / "literal.tsv").open(), delimiter="\t"))

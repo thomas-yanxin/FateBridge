@@ -2,7 +2,6 @@
 
 import ast
 import copy
-import gzip
 import hashlib
 import json
 import math

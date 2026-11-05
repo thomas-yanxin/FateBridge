@@ -1,8 +1,6 @@
 """A complete permutation and matching prose must not certify a wrong month."""
 
 import asyncio
-import gzip
-import hashlib
 import json
 from copy import deepcopy
 from pathlib import Path
