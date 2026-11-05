@@ -3,8 +3,6 @@
 import hashlib
 import json
 import shutil
-import subprocess
-import sys
 from copy import deepcopy
 from pathlib import Path
 
@@ -197,33 +195,3 @@ def test_reference_cannot_award_itself_full_algorithm_coverage():
     assert result["whole_book_conformity_established"] is False
     assert result["calendar_table_selection_verified"] is False
     assert result["real_world_prediction_established"] is False
-
-
-def test_full_source_audit_retains_its_original_nonzero_gate(tmp_path):
-    output = tmp_path / "audit.json"
-    root = Path(__file__).parents[2]
-    completed = subprocess.run(
-        [
-            sys.executable,
-            "scripts/fengshui/audit_fengshui_sources.py",
-            "--output",
-            str(output),
-        ],
-        cwd=root,
-        capture_output=True,
-        text=True,
-    )
-    assert completed.returncode == 1, completed.stderr
-    result = json.loads(output.read_text())
-    assert result["counts"]["xuankong"] == {"checked": 216, "matched": 213}
-    assert len(result["disagreements"]) == 3
-    assert result["all_scoped_source_checks_passed"] is False
-    assert result["day_hour_table_research"]["differences"] == []
-    assert (
-        result["day_hour_table_research"]["included_in_complete_calendar_acceptance"]
-        is False
-    )
-    calendar = result["day_hour_calendar_selection_research"]
-    assert calendar["independent_calendar_comparison_passed"] is True
-    assert calendar["retained_full_windows"]["sufficient_for_unique_selection"] is False
-    assert calendar["calendar_table_selection_verified"] is False

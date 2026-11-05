@@ -57,6 +57,8 @@ uv run --locked --extra dev python -m scripts.astronomy.audit_complete_moshier_a
 
 固定队列已有测试直接执行完整验证时，以对应领域测试为入口，不另维护一份默认路径、参数别名和 JSON 打印包装。果老原历、圭表、黄赤道、漏刻与限度核对统一运行 `uv run --locked --extra dev python -m pytest -q tests/guolao`；该目录继续保留原典字面、完整参考队列、刊差及输入拒绝验证。果老脚本只保留资料采集、外部数值审计、回放资料验证及预测研究等独立任务。
 
+八字原典位置核对运行 `tests/bazi/test_classical_routes.py`；金口诀早稻田课目与旺衰分别运行 `tests/ren/test_jinkou_waseda_chapter.py`、`tests/ren/test_jinkou_waseda_strength.py`；三式贵人两版本完整表运行 `tests/taiyi/test_sanshi_noble_sources.py`。风水原文、完整下卦／替卦图、日时表与历法选择按 `tests/fengshui/` 的对应来源测试核对，各自保留分歧，不另设跨来源总分或总审计包装。
+
 需要专门运行方式的入口：
 
 | 任务 | 入口与要求 |

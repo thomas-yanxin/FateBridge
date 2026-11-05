@@ -75,11 +75,14 @@ def test_full_chapter_inventory_is_delivered_without_adjudicating_the_six(annual
         )
         assert inventory["duplicate_raw_headings"] == ["鎖課"]
         assert inventory["direct_observations"] == ref["direct_observations"]
+        assert inventory["source_pdf_pages"] == ref["source_pdf_pages"]
+        assert inventory["reviewed_pdf_pages"] == ref["reviewed_pdf_pages"]
         assert (
             inventory["raw_inventory_sha256"]
             == hashlib.sha256((CORPUS / "inventory.json").read_bytes()).hexdigest()
         )
         assert inventory["whole_volume_transcription_complete"] is False
+        assert inventory["full_classical_conformance"] is False
         assert inventory["classical_predicates_adjudicated"] == 0
         assert board["patterns"]["evaluation_counts"]["unresolved"] == 6
         assert all(

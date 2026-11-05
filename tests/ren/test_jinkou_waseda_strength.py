@@ -41,7 +41,7 @@ def test_primary_witness_reaches_the_actual_main_and_annual_course():
     main = body["jinkou"]["internal_strength"]["source_evidence"]
     assert "primary_witness" in main
     assert main["selected_witness"] == "online_transcription"
-    assert main["primary_witness"]["source_sha256"] == REF["witness"]["source_sha256"]
+    assert main["primary_witness"] == REF["witness"]
     assert main["primary_witness"]["symbolic_example_count"] == 12
     assert main["witness_difference"]["original_elements"] == list("土土火木")
     assert main["witness_difference"]["primary_elements"] == list("土土火水")

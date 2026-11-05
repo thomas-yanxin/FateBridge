@@ -3,8 +3,6 @@
 import hashlib
 import json
 import shutil
-import subprocess
-import sys
 from copy import deepcopy
 from pathlib import Path
 
@@ -199,31 +197,3 @@ def test_removed_capture_manifest_entry_cannot_shrink_the_source_scope(tmp_path)
     (folder / "hashes.json").write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="Incomplete"):
         audit.load_lower_clause_reference(folder)
-
-
-def test_unaltered_global_source_gate_keeps_both_edition_scopes(tmp_path):
-    target = tmp_path / "audit.json"
-    process = subprocess.run(
-        [
-            sys.executable,
-            "scripts/fengshui/audit_fengshui_sources.py",
-            "--output",
-            str(target),
-        ],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert process.returncode == 1, process.stderr
-    result = json.loads(target.read_text())
-    assert result["counts"]["xuankong"] == {"checked": 216, "matched": 213}
-    assert result["numeric_clause_acceptance_passed"] is False
-    assert result["unresolved_disagreement_count"] == 0
-    assert (
-        result["unresolved_disagreement_count_scope"]
-        == "web_versus_earlier_facsimile_spot_checks_only"
-    )
-    modern = result["same_edition_lower_clauses"]
-    assert modern["unresolved_source_conflict_count"] == 3
-    assert modern["complete_printed_clause_acceptance_passed"] is False
-    assert result["all_scoped_source_checks_passed"] is False

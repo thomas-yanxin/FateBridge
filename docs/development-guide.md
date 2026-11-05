@@ -87,26 +87,13 @@ curl http://localhost:8010/health
 
 ### 测试
 
-原生星历与独立 DE440 参考用例需要先准备固定来源数据；获取过程校验声明的哈希，数据不入库：
+领域与完整测试命令见[测试索引](../tests/README.md)，当前自包含集合由 `scripts/run_ci_checks.py` 维护。需要外部数值参考时，先按[星历安装](ephemeris.md)准备所选模型；独立 DE440 控制使用：
 
 ```bash
-uv run --locked --extra dev python -m fatebridge.fetch_ephe --year-range 1 9999
-uv run --locked --extra dev python -m fatebridge.fetch_ephe --files seas_12.se1 seas_18.se1 seas_24.se1
 uv run --locked --extra dev python -m scripts.astronomy.prepare_reference_kernel
 ```
 
-```bash
-uv run --locked --extra dev python -m pytest -q
-uv run --locked --extra dev python -m pytest -q tests/integration/test_api_alignment.py
-uv run --locked --extra dev python -m pytest -q tests/western/test_astrology_tools.py
-uv run --locked --extra dev python -m pytest -q tests/integration/test_chinese_metaphysics.py
-```
-
-测试需要在已安装 dev extra 的 Python 3.10–3.13 环境里跑，这跟 CI 矩阵保持一致。注意不要用系统自带的解释器，否则容易出现伪失败。例如异步测试在缺少 `pytest-asyncio` 时不会真正执行，而是直接报 `FAILED`，错误信息通常是 `async def functions are not natively supported`。这类失败是环境问题，不是代码问题：先执行 `uv sync --locked --extra dev` 并通过 `uv run --locked --extra dev` 使用该环境，再判断测试本身是否有错。同理，`black`、`isort`、`mypy` 也都来自 dev extra，系统解释器里一般没有。
-
-数值测试按实际模型选择星历；`tests/support/ephemeris_context.py` 显式选择 Moshier，并在退出时恢复环境、原生路径和相关历法缓存；需要固定执行时间的测试显式传入带时区的 `as_of`，避免把不同地区的相同钟面误当同一瞬间。
-
-当前输出对齐用 `tests/support/output_facts.py` 比较完整未舍入事实，只排除执行回执。精确分界、逐分量守恒、物理参考和原典来源分别验证，不用整包旧快照或重新冻结认证准确性。
+测试与格式工具均使用锁定的 dev extra。缺依赖先修复环境，不将收集成功、跳过或三端相同当作计算正确。数值测试显式选择实际模型；`tests/support/ephemeris_context.py` 管理 Moshier 环境与缓存恢复，`tests/support/output_facts.py` 比较完整未舍入事实，只排除执行回执。需要固定执行时刻时传入带时区的 `as_of`。
 
 ### CI 运行范围
 
@@ -164,67 +151,30 @@ uv run --locked --extra dev mypy src/fatebridge/
 
 ## 设计约束
 
-### 保持逻辑直接，明确校验边界
+编码与审查遵循 [AGENTS.md 的代码简洁与边界原则](../AGENTS.md#代码简洁与边界)，职责和导入方向见[架构说明](architecture.md#分层职责)。领域计算留在 `core` / `analysis`，服务在 `services`，工具由 `services/catalog/` 装配；REST、MCP、CLI 共享执行与输出合同。
 
-编码与审查遵循 [AGENTS.md 的代码简洁与边界原则](../AGENTS.md#代码简洁与边界)。请求、文件和第三方返回在各自边界校验，内部使用已确定的类型；协议错误转换、资源清理及动态字段投影保留必要检查。
+- 出生资料复用 `create_person_info`、`normalize_birth_time`、`resolve_birth_place_context`；分析时刻经 `services.timing_clock` 归一化，隐式当前时间读取 `core.execution_context.current_datetime`。
+- 共享出生响应使用 `services.birth_payload.build_destiny_payload`，时运状态使用 `services.timing_state.build_current_timing_state`；快照、历法查询分别在 `timing_snapshots`、`calendar_tools`，构造器不回调上层用例服务。
+- 可读文本和分节交付沿用 `snapshot_text`、`snapshot_export`、`parse_export_content`；执行回执、重放与投影由 `application` 管理。
+- 请求、星盘与其他共享定义从实际领域模块导入，不添加旧入口兼容包装。Swiss 故障注入针对 `core.astro.runtime`，锁与路径恢复由 `core.ephemeris_runtime` 管理。
 
-### 输入归一化不要分散实现
-
-涉及出生时间、地点、时区、真太阳时修正时，优先复用：
-
-- `create_person_info`
-- `normalize_birth_time`
-- `resolve_birth_place_context`
-
-不要在具体 endpoint 或 tool 里复制这些逻辑。
-
-### 快照能力尽量复用统一合同
-
-如果新增的工具需要“可读文本 + 可筛选 section”，优先复用：
-
-- `snapshot_text`
-- `snapshot_export`
-- `parse_export_content`
-
-不要自己发明另一套 section 过滤格式。
-
-### 三端应共享 service 层与中央目录
-
-新增能力时，不要把领域逻辑直接写进 `src/fatebridge/api.py`、`src/fatebridge/mcp_server.py` 或 `src/fatebridge/cli.py`。这三处只是从 `tool_catalog.py` 派生的 adapter，业务实现应留在 `services` / `core`，工具声明应留在 `CATALOG`。
-
-### 维护依赖方向
-
-核心算法、分析规则和共享工具不得导入应用层、领域服务或协议适配器。工具目录承担装配职责；协议签名与 FastAPI/FastMCP 注册放在 `transports`，执行时钟、receipt 和字段投影放在 `application`。共享出生计算从 `services.birth_context` 导入；共用占星基础表从 `core.astrology_tables` 导入。
-
-请求模型从 `core.requests` 的领域定义模块导入；输入与显示分别使用 `utils.birth_input`、`solar_time`、`formatting`、`elements`。分析时刻由 `services.timing_clock` 归一化，隐式当前时间统一读取 `core.execution_context.current_datetime`。领域工具声明不反向导入中央 `tool_catalog`，服务使用 `lazy_service` 代理保持延迟加载。保留全目录顺序、唯一性和公共合同；不得新增历史入口的兼容包装。
-
-星盘内部代码从 `core.astro.birth`、`chart`、`relationship` 等定义模块导入，旧 `core.astrology` 已删除。故障注入应针对 `core.astro.runtime` 的 `swe`、`ephemeris_call` 或日志状态，以验证真实后端调用。原有 Swiss Ephemeris 锁与目录恢复仍由 `core.ephemeris_runtime` 管理。
-
-出生公共响应使用 `services.birth_payload.build_destiny_payload`，当前时运状态使用 `services.timing_state.build_current_timing_state`。共享构造器不回调 `calculation`、`bazi`、`compatibility` 或 `timing` 用例服务；快照渲染留在 `timing_snapshots`，节气/农历查询留在 `calendar_tools`。这使计算状态和文本调整能分别维护，同时保持已有公开响应。
-
-结构整理后运行 `uv run --locked --extra dev python -m pytest -q tests/quality/test_architecture_boundaries.py tests/integration/test_ci_regressions.py`，并核对全工具输出与发现合同。完整测试和类型检查仍必须通过；不得为纯结构调整重新冻结数值基线。
+模块整理后运行 `tests/quality/test_architecture_boundaries.py`、`tests/integration/test_ci_regressions.py` 和受影响的领域／三端检查；不为结构调整重建数值参考。
 
 ## 测试策略
 
-测试从已安装的 `src` 包导入，仓库根 `conftest.py` 负责 `tests.*` 命名空间；测试文件不再单独修改 `sys.path`。请求模型从 `core.requests` 领域模块导入，工具实现从定义模块导入。`tests/fixtures/transports.py` 提供已挂载 REST endpoint 查询及原生 FastMCP Client 调用，协议测试检查 text JSON 与 structuredContent 一致。`test_runtime_contracts.py` 验证运行时导入隔离与原生协议成功/错误响应；`test_request_catalog_isolation.py` 在新进程验证独立嵌套模型 Schema 与目录不加载计算引擎。
+测试从已安装的 `src` 包导入，使用 pytest 的 `importlib` 模式；根 `conftest.py` 排除原始资料目录，测试不各自修改 `sys.path`。协议辅助在 `tests/support/transports.py`，代表请求和原生客户端辅助在 `tests/fixtures/`。`test_runtime_contracts.py`、`test_request_catalog_isolation.py` 分别核对运行时隔离和新进程目录加载。
 
-修改合同缓存时运行 `tests/integration/test_schema_cache.py`，检查副本隔离、并发冷启动、同名类／输出覆写、模型重建、失败不缓存及逐次业务执行。不要缓存业务输入或结果。共享计算和合同变化同时验证 REST、MCP、CLI 的当前未舍入事实及严格输出模型；独立期望值来自手算、原始参考或所选原典，不从当前算法重新生成。
+共享计算或合同变化需核对 REST、MCP、CLI 的当前未舍入事实、错误和严格投影。独立期望值来自手算、外部数值或指定原典，并注明坐标系、时标、后端、日期范围、容差及未裁定项；复制生产公式、三端相同和 Schema 合法均不能单独证明计算正确。
 
-清理测试时，先确认保留用例覆盖同一输入、行为与失败方式，再移除重复检查。已有完整接口测试和领域断言覆盖的冒烟测试、仅把请求字段原样读回的测试无需重复维护；多版本实现的相同行为可用参数化保留各版本输入和故障场景。原典参考、独立数值对照、历史失败记录与封存源码属于验证证据，不因文件多或体积大而删除。
+清理前比较完整测试节点与实际输入／断言，删除已被同范围检查覆盖的冒烟、参数打印和旧入口专用测试。同一行为用参数化保留各输入和故障，不能删反例或改门槛。独立参考、来源身份和原始失败继续保留，维护规则见[仓库维护](repository-maintenance.md)。
 
-计算正确性需要独立的期望值：手算常量不导入被测实现的数据表，天文数值使用注明坐标系、时标、后端、日期范围与容差的外部参考，原典规则注明所选版本与未裁定项。复制生产公式、比较三端输出或验证 Schema 不能单独证明算法正确。现行算法与测试冲突时依据独立来源和数学推导裁定，删除被当前独立参考取代的旧默认断言。
-
-自包含 CI 包含 `test_bazi_seasonal_phase_accuracy.py` 的十二月支逐格对照与有理数手算、`test_element_primitive.py` 的固定结构计数向量，以及 `test_solar_term_published_reference.py` 的香港天文台2026年十二中气核对。后者维持分钟出版资料对应的60秒容差，不替代既有Moshier历史1秒门槛；这些测试均不认证旺衰工程系数或现实预测。完整本地参考测试和已知分歧见[当前算法状态](algorithm-status.md)，CI 绿灯只覆盖其实际选择的测试。
+CI 仅运行[明确选择的自包含集合](#ci-运行范围)；`local_data` 用例默认仍参与本地完整 pytest。HKO 分钟表的60秒容差与独立 TT 的1秒门槛分别保留，不能相互替代。当前数值与原典分歧见[算法状态](algorithm-status.md)。
 
 ## 文档维护与验证
 
-文档应让读者明确下一步：安装指南带读者跑通最小请求，任务指南解决具体问题，参考页提供可查的字段与契约，原理页解释实现选择。各类页面从[文档中心](README.md)进入；公共术语统一见[核心概念](concepts.md)。
+页面职责与入口见[文档中心](README.md)，公共术语见[核心概念](concepts.md)。操作指南按执行顺序给出前提、命令和成功判据；示例使用虚构资料，参数以实际 Schema 为准。默认值和完整参数表只在所属参考中维护，专题解释实现、来源和限制；逐轮日志与测试数量不写成长期能力承诺。
 
-开头直接说明场景、用途或关键概念，让读者判断是否与自己的任务相关，避免反复使用「本页介绍／帮助你」等套句。必要前提在相应步骤前交代，长文提供章节导航。步骤按实际执行顺序写，命令注明在哪个环境运行，并说明如何确认成功。示例使用虚构数据，只保留理解该任务必需的字段。新增标题时保持描述清楚；修改被引用标题前搜索链接并同步锚点。接口参考以实际 Schema 为准，不在多个页面复制完整参数表。
-
-产品介绍统一说明目标读者、具体用途和实际覆盖：FateBridge 提供可核对的术数与占星计算，Onda 指导咨询，接入应用提供模型对话与界面。能力描述先说明能帮助读者完成什么，再链接实现与限制；计算事实、传统解释与现实建议分别表达。页面侧重各自的读者任务，项目定位以中英文 README 为入口。
-
-文档按读者任务组织；生成契约、规则资料和实际运行结果分别承担不同职责。修改前先定位信源，再更新依赖它的说明，避免同一个默认值分散维护。
+修改前定位信源，删除标题或入口时搜索引用并同步锚点：
 
 | 变更内容 | 权威信源 | 需要同步的文档 / 生成物 |
 | --- | --- | --- |
@@ -257,9 +207,7 @@ git diff --check
 
 `docs/contracts/` 的逐工具 JSON 与索引由 `scripts/build_codex_call_contracts.py` 从实际 MCP 输入 Schema 和共享首轮字段生成，不能手改生成文件。根 `AGENTS.md` 不嵌入这些大合同。接口或首轮字段变化后先运行生成器，再用 `--check` 核对。场景矩阵或技能接口变化后同样重新生成 `data/agent_scenarios.json`，其中包含源文件散列，纯文案变更也可能需要同步生成物。
 
-新增工具还须在 `core/response_models.py` 声明完整结果的必需业务根，目录装配缺声明会失败；不要为了让错误的 service 输出通过而放宽要求。公共投影模型允许字段缺失与合法 null，完整执行的必需根则不可缺失或为 null。相关回归包括 `tests/integration/test_complete_output_contracts.py`、`tests/fengshui/test_fengshui_analysis_progress.py`、`tests/compatibility/test_relationship_and_career_semantics.py`、`tests/integration/test_result_delivery_storage.py` 和 `tests/integration/test_ci_regressions.py`；验证跨端成功／失败、合法投影、状态转移、字符无损读取及多进程容量，而非只冻结一个用户答案。
-
-必需业务根也不能仅为空对象；不可用应返回明确状态，合法空列表按领域合同保留。嵌套必要事实使用 `FullFact[T]`（必须存在且非null）或 `PresentFact[T]`（必须存在、可为null），由共享完整执行上下文递归核验。公开Schema的 `x-fatebridge-full-result` 声明该规则；集合可另声明唯一身份及必要成员。投影后的读取不启用完整执行上下文。规则进入合同指纹，不能通过删除必需事实让错误输出成功。回归见 `tests/integration/test_algorithm_review_repairs.py`。
+完整执行的必需业务根在 `core/response_models.py` 声明；嵌套必需事实使用 `FullFact[T]` 或 `PresentFact[T]`，由完整执行上下文递归核验，规则纳入合同指纹。公开投影允许缺少兄弟字段与合法 null，投影读取不启用完整执行上下文。不能为接收错误输出而放宽声明；相关验证从 `test_complete_output_contracts.py`、`test_algorithm_review_repairs.py` 和对应领域测试开始。
 
 ### 最低同步面
 
@@ -305,30 +253,9 @@ uv run --locked --extra dev python scripts/sync_github_release.py \
   --repo thomas-yanxin/FateBridge
 ```
 
-## 依赖与运行时注意事项
+## 提交前检查
 
-### 核心占星盘
-
-- 可以在缺少 `swisseph` 时继续运行；
-- 但会回退到近似轨道模型；
-- 某些 `hsys` 覆盖值依赖 `swisseph`。
-
-### 西占推运
-
-- 依赖 `kerykeion` / Swiss Ephemeris；
-- 缺少依赖时不会自动降级。
-
-这两类能力的差异在文档和代码里都要保持清晰，不要把“可运行”写成“等精度”。
-
-## 提交前检查清单
-
-提交前建议自查：
-
-1. 已通过锁定开发环境运行相关测试子集，必要时完成全量测试。
-2. Python 变更的 Black、isort 和 mypy 检查通过；纯文档变更完成文档检查。
-3. 新工具是否已在 `tool_catalog.py` 的 `CATALOG` 中声明（三端由此派生），并补了 `test_full_surface_validation.py` 的代表性 payload。
-4. 文档是否更新了端口、能力名、section 名；若工具计数变化，`tests/quality/test_doc_tool_counts.py` 是否仍通过。
-5. 是否错误地把近似实现写成了高精度实现。
+确认已完成受影响领域、三端与静态检查，并同步公共合同、代表请求、文档和生成源。依赖可用、近似回退与实际数值精度分别核对，参见[历法与星历依赖](architecture.md#历法与星历依赖)；完整测试、云端 CI、真实模型和部署按实际运行范围报告。
 
 ## 常用入口
 

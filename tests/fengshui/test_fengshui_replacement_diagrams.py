@@ -3,8 +3,6 @@
 import hashlib
 import json
 import shutil
-import subprocess
-import sys
 from copy import deepcopy
 from pathlib import Path
 
@@ -224,27 +222,3 @@ def test_claimed_totals_and_awards_cannot_change_actual_coverage(frozen):
     assert data == unchanged
     assert result["printed_numerals_checked"] == 5832
     assert result["whole_book_conformity_established"] is False
-
-
-def test_source_command_retains_lower_and_replacement_failures(tmp_path):
-    output = tmp_path / "source-audit.json"
-    process = subprocess.run(
-        [
-            sys.executable,
-            "scripts/fengshui/audit_fengshui_sources.py",
-            "--output",
-            str(output),
-        ],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert process.returncode == 1, process.stderr
-    result = json.loads(output.read_text())
-    assert result["same_edition_lower_clauses"]["unresolved_source_conflict_count"] == 3
-    assert result["complete_lower_diagrams"]["printed_numerals_matched"] == 5831
-    replacement = result["complete_replacement_diagrams"]
-    assert replacement["printed_numerals_checked"] == 5832
-    assert replacement["printed_numerals_matched"] == 5829
-    assert replacement["complete_diagram_acceptance_passed"] is False
-    assert result["all_scoped_source_checks_passed"] is False
