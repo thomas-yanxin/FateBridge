@@ -56,46 +56,38 @@ TOOLS = (
 )
 
 
-async def call_contracts():
+async def call_contracts() -> list[dict[str, object]]:
     """Derive definitions from the same public MCP interface clients receive."""
     async with Client(create_mcp_app()) as client:
         tools = {tool.name: tool for tool in await client.list_tools()}
     specs = {spec.tool_name: spec for spec in CATALOG}
-    return [
-        {
+    records = []
+    for name in TOOLS:
+        spec = specs[name]
+        record: dict[str, object] = {
             "tool": name,
             "input": tools[name].model_dump(by_alias=True)["inputSchema"],
             "first_view": {
-                "fields": suggested_fields(specs[name]),
+                "fields": suggested_fields(spec),
                 "strict_fields": True,
                 "include_snapshot_text": False,
             },
-            **(
-                {"call_guidance": call_guidance(specs[name])}
-                if call_guidance(specs[name])
-                else {}
-            ),
-            **(
-                {"evidence_views": evidence_views(specs[name])}
-                if evidence_views(specs[name])
-                else {}
-            ),
-            **(
-                {
-                    "method_contracts": [
-                        method.as_manifest() for method in specs[name].methods
-                    ]
-                }
-                if specs[name].methods
-                else {}
-            ),
         }
-        for name in TOOLS
-    ]
+        guidance = call_guidance(spec)
+        if guidance:
+            record["call_guidance"] = guidance
+        views = evidence_views(spec)
+        if views:
+            record["evidence_views"] = views
+        if spec.methods:
+            record["method_contracts"] = [
+                method.as_manifest() for method in spec.methods
+            ]
+        records.append(record)
+    return records
 
 
-async def render_files():
-    records = await call_contracts()
+def render_files(records: list[dict[str, object]]) -> dict[str, str]:
     files = {
         f"{record['tool']}.json": json.dumps(
             record, ensure_ascii=False, indent=2, sort_keys=True
@@ -109,9 +101,11 @@ async def render_files():
         "由 `scripts/build_codex_call_contracts.py` 从实际 MCP 生成，不手改。",
         "已连接且定义清楚时直接调用；只有本地离线核对或定义缺失时，读取所选文件，不加载全部合同。",
         "当前连接的工具名、Schema 与公开范围优先；文件存在不代表该工具已连接。",
+        "这里只保存常用工具的离线合同，不是全部公开工具清单；其他工具可用 `fatebridge describe <tool> --detail input` 离线核对。",
+        "生成命令会移除本目录中已不再发布的 JSON；`--check` 同时检查缺失、内容漂移和遗留文件。",
         "",
     ]
-    lines.extend(f"- [{name}]({name}.json)" for name in TOOLS)
+    lines.extend(f"- [{record['tool']}]({record['tool']}.json)" for record in records)
     lines.extend(
         [
             "",
@@ -124,11 +118,12 @@ async def render_files():
     return files
 
 
-async def main():
+async def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
-    args = parser.parse_args()
-    files = await render_files()
+    args = parser.parse_args(argv)
+    files = render_files(await call_contracts())
+    obsolete = {path.name for path in TARGET.glob("*.json")} - files.keys()
     if args.check:
         stale = [
             name
@@ -136,12 +131,17 @@ async def main():
             if not (TARGET / name).is_file()
             or (TARGET / name).read_text(encoding="utf-8") != text
         ]
-        if stale:
-            raise SystemExit(f"MCP call contracts are stale: {', '.join(stale)}")
+        if stale or obsolete:
+            raise SystemExit(
+                f"MCP call contracts are stale: {', '.join(stale)}; "
+                f"obsolete: {', '.join(sorted(obsolete))}"
+            )
     else:
         TARGET.mkdir(parents=True, exist_ok=True)
         for name, text in files.items():
             (TARGET / name).write_text(text, encoding="utf-8")
+        for name in obsolete:
+            (TARGET / name).unlink()
     print(
         "MCP call contracts match live schemas"
         if args.check

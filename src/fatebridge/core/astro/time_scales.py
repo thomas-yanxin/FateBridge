@@ -26,7 +26,8 @@ from fatebridge.core.astro.historical_utc import (
 from fatebridge.core.astro.iers_ut1 import active_ut1
 from fatebridge.core.astro.julian_day import _julian_day
 from fatebridge.core.astro.tt_epoch import TTInstant
-from fatebridge.core.astro.utc_policy import default_delta_t_flag, leap_table
+from fatebridge.core.astro.utc_policy import default_delta_t_flag
+from fatebridge.core.astro.utc_policy import leap_table as leap_table
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.utils.civil_time import utc_calendar
 

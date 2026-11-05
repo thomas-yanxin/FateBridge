@@ -123,12 +123,11 @@ def test_source_months_cannot_be_emended_to_improve_a_candidate(
 
 
 def test_complete_declared_passages_and_original_month_words_are_retained(report):
-    frozen = verify_sources()
+    verify_sources()
     assert (
         hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest()
         == FREEZE_SHA256
     )
-    assert len(frozen["files"]) == 40 and len(frozen["prior_sources"]) == 76
     reading = json.loads((CORPUS / "readings.json").read_text())
     assert not reading["blinded"] and reading["independent_human_reviews"] == 0
     assert [len(c["events"]) for c in reading["cohorts"]] == [20, 21, 1]

@@ -14,6 +14,8 @@ import math
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
+from fatebridge.core.astro.reference import SU28
+from fatebridge.core.astrology_tables import SIGNS
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.utils.civil_clock import parse_iso_datetime
 from fatebridge.utils.coordinates import parse_geo_coordinate
@@ -35,52 +37,10 @@ from ..astro.chart import build_core_chart_payload
 from ..astro.geometry import angle_fraction, combine_longitudes
 from ..calendar import BaZiCalendar
 
-SU28_NAMES = [
-    "角",
-    "亢",
-    "氐",
-    "房",
-    "心",
-    "尾",
-    "箕",
-    "斗",
-    "牛",
-    "女",
-    "虚",
-    "危",
-    "室",
-    "壁",
-    "奎",
-    "娄",
-    "胃",
-    "昴",
-    "毕",
-    "觜",
-    "参",
-    "井",
-    "鬼",
-    "柳",
-    "星",
-    "张",
-    "翼",
-    "轸",
-]
+SU28_NAMES = [name.removesuffix("宿") for name in SU28]
 
 
-ZODIAC_SIGNS = [
-    "Aries",
-    "Taurus",
-    "Gemini",
-    "Cancer",
-    "Leo",
-    "Virgo",
-    "Libra",
-    "Scorpio",
-    "Sagittarius",
-    "Capricorn",
-    "Aquarius",
-    "Pisces",
-]
+ZODIAC_SIGNS = SIGNS
 
 
 ZODIAC_SIGN_CN = {
@@ -194,10 +154,6 @@ def _julian_day(moment: datetime) -> float:
 
 def _sign_name(longitude: float) -> str:
     return ZODIAC_SIGNS[int(longitude // 30) % 12]
-
-
-def _su28_name(longitude: float) -> str:
-    return _su28_position(longitude)[0]
 
 
 def _su28_position(longitude: float) -> Tuple[str, float]:

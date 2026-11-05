@@ -27,6 +27,7 @@ from fatebridge.core.astro.meridian_houses import (
 from fatebridge.core.astro.meridian_placement import attach_factor_placement
 from fatebridge.core.astro.physical_sources import PhysicalEphemerisTrace
 from fatebridge.core.astro.profiles import native_factor_model
+from fatebridge.core.astro.reference import PHYSICAL_BODIES
 from fatebridge.core.astro.reference_angles import (
     qualify_reference_geometry,
     reference_angle_basis,
@@ -41,18 +42,6 @@ from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.utils.errors import EphemerisSourceError
 
 RULESET = "hamburg_midpoint_geometry_v3"
-PHYSICAL_BODIES = (
-    "Sun",
-    "Moon",
-    "Mercury",
-    "Venus",
-    "Mars",
-    "Jupiter",
-    "Saturn",
-    "Uranus",
-    "Neptune",
-    "Pluto",
-)
 HYPOTHETICAL_BODIES = (
     "Cupido",
     "Hades",

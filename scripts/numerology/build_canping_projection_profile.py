@@ -13,10 +13,9 @@ import json
 import math
 from datetime import date
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 ROOT = Path(__file__).resolve().parents[2]
-FIXTURE = ROOT / "tests/fixtures/canping_projection_v1"
 DESTINATION = ROOT / "src/fatebridge/data/astronomy"
 
 
@@ -24,15 +23,25 @@ def encoded(value: Any) -> bytes:
     return (json.dumps(value, ensure_ascii=False, indent=2) + "\n").encode()
 
 
-def build(kernel_path: Path) -> tuple[bytes, dict[str, Any]]:
+def build(
+    kernel_path: Path, profile: Literal["original", "extended"] = "original"
+) -> tuple[bytes, dict[str, Any]]:
     from jplephem.spk import SPK
 
-    protocol_raw = (FIXTURE / "protocol.json").read_bytes()
+    if profile == "original":
+        fixture = "canping_projection_v1"
+        protocol_id = "canping_complete120_projection_v1"
+        event_years, padding_years = [2201, 2320], [2200, 2323]
+    else:
+        fixture = "canping_extended_projection_v1"
+        protocol_id = "canping_extended_complete120_projection_v1"
+        event_years, padding_years = [2301, 2420], [2300, 2423]
+    protocol_raw = (ROOT / "tests/fixtures" / fixture / "protocol.json").read_bytes()
     p = json.loads(protocol_raw)
     if (
-        p["id"] != "canping_complete120_projection_v1"
-        or p["future_event_years"] != [2201, 2320]
-        or p["record_padding_years"] != [2200, 2323]
+        p["id"] != protocol_id
+        or p["future_event_years"] != event_years
+        or p["record_padding_years"] != padding_years
         or p["maximum_horizon_years"] != 120
         or hashlib.sha256(kernel_path.read_bytes()).hexdigest()
         != p["source_kernel"]["sha256"]
@@ -114,7 +123,11 @@ def build(kernel_path: Path) -> tuple[bytes, dict[str, Any]]:
         uncompressed_bytes=len(raw),
         selected_tdb_years_with_padding=p["record_padding_years"],
         software_solar_term_years=p["future_event_years"],
-        projection_origin_civil_years=p["origin_civil_years"],
+        projection_origin_civil_years=(
+            p["origin_civil_years"]
+            if profile == "original"
+            else p["additional_origin_civil_year_ranges"][1]
+        ),
         maximum_projection_horizon_years=120,
         admitted_projection_events=["立春"],
         segments=segments,
@@ -134,15 +147,23 @@ def build(kernel_path: Path) -> tuple[bytes, dict[str, Any]]:
             redistribution_rules_url="https://naif.jpl.nasa.gov/naif/rules.html",
         ),
     )
+    if profile == "extended" and (
+        hashlib.sha256(kernel_path.read_bytes()).hexdigest()
+        != p["source_kernel"]["sha256"]
+    ):
+        raise ValueError("Original kernel changed during extraction")
     return raw, manifest
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--kernel", type=Path, required=True)
+    parser.add_argument(
+        "--profile", choices=["original", "extended"], default="original"
+    )
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    raw, m = build(args.kernel)
+    raw, m = build(args.kernel, args.profile)
     binary = DESTINATION / m["file"]
     metadata = DESTINATION / (m["file"].replace(".bin.gz", ".json"))
     if args.check:

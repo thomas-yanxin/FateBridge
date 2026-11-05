@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
-import runpy
-import tempfile
 from datetime import date
 from pathlib import Path
 from typing import Any, Literal
@@ -316,40 +313,3 @@ def audit() -> dict[str, Any]:
         original_literal_comparison_retained=True,
     )
     return result
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    if args.output.exists():
-        parser.error("Refusing to overwrite an existing audit")
-    result = audit()
-    with args.output.open("x") as stream:
-        json.dump(result, stream, ensure_ascii=False, indent=2)
-        stream.write("\n")
-    print(
-        json.dumps(
-            {
-                k: result[k]
-                for k in (
-                    "authored_cases",
-                    "minute_grid_rows",
-                    "calendar_passed_rows",
-                    "all_authored_boards_agree",
-                    "printed_facts_agree_rows",
-                    "title_recognized_rows",
-                    "execution_errors",
-                    "goal_complete",
-                )
-            },
-            ensure_ascii=False,
-        )
-    )
-    return (
-        1 if result["execution_errors"] or not result["implementation_unchanged"] else 0
-    )
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

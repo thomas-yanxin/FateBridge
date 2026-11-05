@@ -16,10 +16,10 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from fatebridge.validation.human_design import verify_human_design_reading
 from tests.fixtures.mcp_receipt import verified_inline_business
-from tests.integration.test_result_delivery import store as store
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files_module as native_ephemeris_files_module,
 )
+from tests.support.result_delivery import store as store
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 

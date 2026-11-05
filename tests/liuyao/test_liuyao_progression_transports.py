@@ -7,7 +7,9 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.cli import run as cli_run
 from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
-from tests.support.transports import SPECS, business, surface_calls
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as rest
+from tests.support.transports import surface_calls
 
 PAYLOAD = {
     "date": "2026-08-07",
@@ -91,7 +93,7 @@ def test_same_run_delivery_contains_progression_and_adjusted_atoms(
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "progress-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)

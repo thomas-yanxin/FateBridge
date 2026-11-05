@@ -34,7 +34,7 @@ def test_reviewer_artifacts_stay_in_snapshot_but_outside_the_model_workspace(tmp
     paths = {
         "skills/onda-shiye/SKILL.md": "Runtime consultation skill",
         "src/fatebridge/domain.py": "Executable backend",
-        "docs/contracts/bazi_birth.json": "Actual runtime contract",
+        "docs/contracts/bazi_career.json": "Actual runtime contract",
         "docs/scenario-routing.md": "Runtime routing",
         "docs/numerology-audit.md": "Public calculation and source audit",
         "docs/validation/old-answer.txt": "HIDDEN_EXPECTED_ANSWER",

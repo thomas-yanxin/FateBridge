@@ -204,76 +204,180 @@ def test_optimized_python_still_rejects_the_frozen_forgery():
     assert "Weather evidence binding mismatch: rule_trace" in result.stderr
 
 
-def test_cli_reports_invalid_source_without_a_success_receipt(tmp_path):
+AUDIT_CHECKS = [
+    ("trace", "mechanical_binding_verified"),
+    ("calendar", "published_lunar_date_binding_verified"),
+    ("solar", "published_solar_context_verified"),
+    ("context-capacity", "context_capacity_verified"),
+]
+
+
+@pytest.mark.parametrize("check,error_field", AUDIT_CHECKS)
+def test_cli_reports_invalid_source_without_a_success_receipt(
+    tmp_path, check, error_field
+):
     study = tmp_path / "study"
     study.mkdir()
     (study / "plan.json").write_text("{}")
     output = tmp_path / "receipt.json"
-    script = (
-        Path(__file__).parents[2]
-        / "scripts/meihua/audit_meihua_weather_trace_binding.py"
-    )
     result = subprocess.run(
-        [sys.executable, str(script), "--study", str(study), "--output", str(output)],
+        [
+            sys.executable,
+            "-m",
+            "scripts.meihua.audit_meihua_weather_study",
+            "--check",
+            check,
+            "--study",
+            str(study),
+            "--output",
+            str(output),
+        ],
+        cwd=Path(__file__).resolve().parents[2],
         capture_output=True,
         text=True,
         timeout=30,
     )
-    assert result.returncode == 2
-    assert json.loads(result.stderr)["mechanical_binding_verified"] is False
+    assert result.returncode == 2, result.stderr
+    assert json.loads(result.stderr)[error_field] is False
     assert not output.exists()
 
 
-@pytest.mark.parametrize("symlink", [False, True])
-def test_cli_cannot_write_receipts_into_the_original_study(tmp_path, symlink):
-    study = tmp_path / "study"
-    study.mkdir()
-    original = study / "plan.json"
-    original.write_text("{}")
-    output = original
-    if symlink:
-        output = tmp_path / "receipt.json"
-        output.symlink_to(original)
-    script = (
-        Path(__file__).parents[2]
-        / "scripts/meihua/audit_meihua_weather_trace_binding.py"
-    )
-    result = subprocess.run(
-        [sys.executable, str(script), "--study", str(study), "--output", str(output)],
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
-    assert result.returncode == 2
-    assert "outside the immutable study" in json.loads(result.stderr)["error"]
-    assert original.read_text() == "{}"
-
-
-@pytest.mark.parametrize("hardlink", [False, True])
-def test_cli_preserves_existing_receipts_and_hardlinked_source_files(
-    tmp_path, hardlink
+@pytest.mark.parametrize("check,error_field", AUDIT_CHECKS)
+@pytest.mark.parametrize(
+    "target", ["inside", "source", "existing", "symlink", "hardlink"]
+)
+def test_cli_preserves_original_study_and_existing_receipts(
+    tmp_path, check, error_field, target
 ):
     study = tmp_path / "study"
     study.mkdir()
     original = study / "plan.json"
-    original.write_text("{}")
+    original.write_bytes(b'{"immutable":true}')
     output = tmp_path / "receipt.json"
-    if hardlink:
-        output.hardlink_to(original)
+    if target == "inside":
+        output = study / "new-receipt.json"
+    elif target == "source":
+        output = original
+    elif target == "existing":
+        output.write_bytes(b"previous receipt")
+    elif target == "symlink":
+        output.symlink_to(original)
     else:
-        output.write_text("previous receipt")
-    before = output.read_bytes()
-    script = (
-        Path(__file__).parents[2]
-        / "scripts/meihua/audit_meihua_weather_trace_binding.py"
-    )
+        output.hardlink_to(original)
+    before = {path: path.read_bytes() for path in [original, output] if path.exists()}
     result = subprocess.run(
-        [sys.executable, str(script), "--study", str(study), "--output", str(output)],
+        [
+            sys.executable,
+            "-m",
+            "scripts.meihua.audit_meihua_weather_study",
+            "--check",
+            check,
+            "--study",
+            str(study),
+            "--output",
+            str(output),
+        ],
+        cwd=Path(__file__).resolve().parents[2],
         capture_output=True,
         text=True,
         timeout=30,
     )
-    assert result.returncode == 2
-    assert "new file" in json.loads(result.stderr)["error"]
-    assert output.read_bytes() == before
-    assert original.read_text() == "{}"
+    assert result.returncode == 2, result.stderr
+    error = json.loads(result.stderr)
+    assert error[error_field] is False
+    assert "new file outside the immutable study" in error["error"]
+    for path, raw in before.items():
+        assert path.read_bytes() == raw
+    if target == "inside":
+        assert not output.exists()
+
+
+@pytest.mark.parametrize("verified", [False, True])
+def test_cli_keeps_failed_solar_gate_in_the_complete_report(
+    tmp_path, monkeypatch, verified
+):
+    from scripts.meihua import audit_meihua_weather_study as cli
+
+    report = {
+        "published_solar_context_binding": {
+            "evidence_records": 2,
+            "counts": {"verified": int(verified), "unresolved": int(not verified)},
+            "all_original_records_verified_under_declared_guard": verified,
+        }
+    }
+    monkeypatch.setitem(
+        cli.AUDITS, "solar", (lambda study: report, "published_solar_context_verified")
+    )
+    output = tmp_path / "report.json"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "audit",
+            "--check",
+            "solar",
+            "--study",
+            str(tmp_path / "study"),
+            "--output",
+            str(output),
+        ],
+    )
+    assert cli.main() == (0 if verified else 2)
+    assert json.loads(output.read_bytes()) == report
+
+
+@pytest.mark.parametrize("possible", [False, True])
+@pytest.mark.parametrize("required", [False, True])
+def test_cli_capacity_requirement_keeps_diagnostic_and_required_gate_separate(
+    tmp_path, monkeypatch, possible, required
+):
+    from scripts.meihua import audit_meihua_weather_study as cli
+
+    report = {
+        "original_evidence_records": 2,
+        "symbolic_context_domain": {"symbolic_cases": 2880},
+        "cohort_scenario_reports": [
+            {
+                "cohort": "primary_2026_ytd_through_last_complete_month",
+                "scenario": "calendar_season_supplied",
+                "context_oracle_families": [
+                    {
+                        "family": "all_current_context_options",
+                        "bound": {
+                            "cannot_strictly_beat_better_constant_even_with_context_oracle": not possible,
+                            "exact_maximum_margin_over_better_constant": (
+                                1 if possible else -1
+                            ),
+                        },
+                    }
+                ],
+            }
+        ],
+    }
+    monkeypatch.setitem(
+        cli.AUDITS,
+        "context-capacity",
+        (lambda study: report, "context_capacity_verified"),
+    )
+    output = tmp_path / "report.json"
+    argv = [
+        "audit",
+        "--check",
+        "context-capacity",
+        "--study",
+        str(tmp_path / "study"),
+        "--output",
+        str(output),
+    ]
+    if required:
+        argv.append("--require-primary-potential-superiority")
+    monkeypatch.setattr(sys, "argv", argv)
+    assert cli.main() == (2 if required and not possible else 0)
+    actual = json.loads(output.read_bytes())
+    assert actual["cohort_scenario_reports"] == report["cohort_scenario_reports"]
+    assert actual["primary_capacity_requirement"] == {
+        "required_by_command": required,
+        "necessary_condition_only": True,
+        "satisfied": possible,
+        "predictive_efficacy_established": False,
+    }

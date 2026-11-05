@@ -12,6 +12,7 @@ import pytest
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
+from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS
 from tests.support.transports import (
     AS_OF,
     SPECS,
@@ -36,10 +37,13 @@ COMPLETENESS = AUDIT.completeness_reference()
 
 @pytest.fixture(scope="module")
 def outputs():
-    return AUDIT.results(REFERENCE)
+    return AUDIT.results()
 
 
 def test_predeclared_value_and_deletion_denominators_stay_separate():
+    current = copy.deepcopy(REFERENCE["payloads"])
+    assert current["sanshiunited"]["taiyi_options"].pop("accNum") == 0
+    assert current == ANCHOR_PAYLOADS
     result = AUDIT.audit()
     assert result["predeclared_fault_count"] == result["rejected_fault_count"] == 36
     assert result["separately_frozen_completeness_fault_count"] == 6
@@ -87,7 +91,7 @@ def assert_broken_on_three_ports(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    payload = REFERENCE["payloads"][spec.key]
+    payload = ANCHOR_PAYLOADS[spec.key]
     http = rest.post(spec.rest_path, json=payload, params=params)
     protocol = asyncio.run(native(spec, payload, **options))
     code, result = call_cli(spec, payload, tmp_path, capsys, flags=flags)
@@ -130,13 +134,13 @@ def test_full_service_cannot_delete_anchors_to_evade_conditional_guard(
     )
 
 
-@pytest.mark.parametrize("key", REFERENCE["payloads"])
+@pytest.mark.parametrize("key", ANCHOR_PAYLOADS)
 @pytest.mark.parametrize("project", [False, True])
 def test_valid_full_and_anchored_projections_still_agree_on_all_ports(
     key, project, surface_calls
 ):
     spec = SPECS[key]
-    payload = REFERENCE["payloads"][key]
+    payload = ANCHOR_PAYLOADS[key]
     prefix = "subresults.liureng_gods." if key == "sanshiunited" else ""
     fields = [
         prefix + "four_pillars.day",

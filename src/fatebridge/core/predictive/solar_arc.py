@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 from fractions import Fraction
+from typing import Any, Dict
 
 from fatebridge.core.astro.geometry import longitude_float
 
 from ._common import (
-    Any,
-    Dict,
     collect_aspect_hits,
     extract_reference_longitudes,
     longitude_to_point_dict,

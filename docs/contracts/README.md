@@ -3,6 +3,8 @@
 由 `scripts/build_codex_call_contracts.py` 从实际 MCP 生成，不手改。
 已连接且定义清楚时直接调用；只有本地离线核对或定义缺失时，读取所选文件，不加载全部合同。
 当前连接的工具名、Schema 与公开范围优先；文件存在不代表该工具已连接。
+这里只保存常用工具的离线合同，不是全部公开工具清单；其他工具可用 `fatebridge describe <tool> --detail input` 离线核对。
+生成命令会移除本目录中已不再发布的 JSON；`--check` 同时检查缺失、内容漂移和遗留文件。
 
 - [human_design](human_design.json)
 - [astro_horary](astro_horary.json)

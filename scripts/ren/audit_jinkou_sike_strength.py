@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
-import runpy
-import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -175,41 +172,3 @@ def audit() -> dict[str, Any]:
         classical_acceptance_passed=False,
         goal_complete=False,
     )
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    if args.output.exists():
-        parser.error("Refusing to overwrite an existing audit")
-    report = audit()
-    with args.output.open("x") as stream:
-        json.dump(report, stream, ensure_ascii=False, indent=2, allow_nan=False)
-        stream.write("\n")
-    print(
-        json.dumps(
-            {
-                k: report[k]
-                for k in (
-                    "case_count",
-                    "mention_count",
-                    "raw_same_count",
-                    "raw_different_count",
-                    "raw_unmapped_count",
-                    "engineering_guard_passed",
-                    "all_raw_strength_mentions_agree",
-                )
-            }
-        )
-    )
-    return (
-        0
-        if report["engineering_guard_passed"]
-        and report["all_raw_strength_mentions_agree"]
-        else 1
-    )
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

@@ -6,10 +6,12 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 from fastmcp import Client
+from jsonschema import Draft202012Validator
 
 import fatebridge.api as api
 import fatebridge.mcp_server as mcp
 from fatebridge.cli import run as cli_run
+from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES
 
@@ -159,3 +161,80 @@ def surface_calls(rest, tmp_path, capsys):
         return http, protocol, code, local
 
     return call
+
+
+def three_surfaces(spec, payload, fields, as_of, tmp_path, monkeypatch, capsys):
+    api._reset_runtime_state_for_tests()
+    monkeypatch.setattr(
+        api,
+        "API_KEY_AUTHENTICATOR",
+        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
+    )
+    response = TestClient(api.app).post(
+        spec.rest_path,
+        json=payload,
+        params=[
+            ("as_of", as_of),
+            ("strict_fields", "true"),
+            ("include_snapshot_text", "false"),
+            ("response_char_limit", "0"),
+            *[("fields", f) for f in fields],
+        ],
+    )
+
+    async def native():
+        async with Client(create_mcp_app()) as client:
+            return await client.call_tool(
+                spec.tool_name,
+                {
+                    **payload,
+                    "as_of": as_of,
+                    "fields": fields,
+                    "strict_fields": True,
+                    "include_snapshot_text": False,
+                    "response_char_limit": 0,
+                },
+                raise_on_error=False,
+            )
+
+    protocol = asyncio.run(native())
+    request = tmp_path / "request.json"
+    request.write_text(json.dumps(payload, ensure_ascii=False))
+    capsys.readouterr()
+    code = cli_run(
+        [
+            spec.tool_name,
+            "--subject-file",
+            str(request),
+            "--as-of",
+            as_of,
+            "--strict-fields",
+            "--no-include-snapshot-text",
+            "--response-char-limit",
+            "0",
+            "--fields",
+            *fields,
+        ]
+    )
+    cli = json.loads(capsys.readouterr().out)
+    assert response.status_code == 200, response.text
+    assert not protocol.is_error, protocol.content
+    assert code == 0, cli
+    assert protocol.structured_content == json.loads(protocol.content[0].text)
+    bodies = []
+    for label, body in [
+        ("rest", response.json()),
+        ("mcp", protocol.structured_content),
+        ("cli", cli),
+    ]:
+        Draft202012Validator(spec.output_model.model_json_schema()).validate(body)
+        (tmp_path / f"{label}.json").write_text(
+            json.dumps(
+                body, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False
+            )
+        )
+        body = dict(body)
+        body.pop("run_metadata")
+        bodies.append(body)
+    assert bodies[0] == bodies[1] == bodies[2]
+    return bodies[0]

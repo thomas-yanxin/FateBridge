@@ -61,7 +61,8 @@ def test_named_model_numeric_result_does_not_repair_original_swiss_only_gate():
     rows = actual()
     before = deepcopy(rows)
     named = compare(rows)
-    legacy = AUDIT.module("ren_matrix_test_old", "audit_ren_opale_seasons.py")
+    from scripts.ren import audit_ren_opale_seasons as legacy
+
     old = legacy.comparison(
         [CASE], rows, "seasons", lambda _: SimpleNamespace(jd_tt=0, jd_ut1=0)
     )

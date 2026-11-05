@@ -10,18 +10,13 @@ from __future__ import annotations
 from typing import Any
 
 from fatebridge.core.metaphysics.jinkou_pattern_tables import (
-    BRANCH_COMBINES,
-    HOUSE_BRANCH,
     JINKOU_SCAN_SHA256,
     JINKOU_SCAN_URL,
-    STEM_COMBINES,
-    TRINES,
 )
 
 from ...utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 from .common import (
     ELEMENT_CONTROLS,
-    SIX_CLASH_BRANCHES,
     branch_element_text,
     kongwang_for_ganzhi,
     stem_element_text,

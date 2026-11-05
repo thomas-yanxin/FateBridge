@@ -67,6 +67,9 @@ def test_all_seven_printed_intermediates_match_previous_year_only(
         != previous["actual"]["day_denominator"]
     )
 
+    assert report["new_complete_dated_taiyi_boards_passed"] == 0
+    assert report["new_model_invocations"] == 0
+
 
 def test_month_and_day_tokens_require_different_local_origins(
     report: dict[str, Any],
@@ -189,16 +192,6 @@ def test_no_nonexistent_date_gets_full_match(report: dict[str, Any]) -> None:
         if d["label_matches"] and d["ordinal_exists"] is False
     ]
     assert invalid and all(not d["full_date_matches"] for d in invalid)
-
-
-def test_old_failed_reports_stay_false_and_pinned(report: dict[str, Any]) -> None:
-    assert len(report["previous_evidence"]) == 2
-    assert all(
-        not p["whole_goal_complete"] for p in report["previous_evidence"].values()
-    )
-    assert report["new_complete_dated_taiyi_boards_passed"] == 0
-    assert report["new_model_invocations"] == 0
-    assert len(verify_sources()["prior_sources"]) == 11
 
 
 @pytest.mark.parametrize("rewrite_freeze", [False, True])

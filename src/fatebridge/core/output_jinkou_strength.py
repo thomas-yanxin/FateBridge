@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from fatebridge.core.output_jinkou_comparison import TEXT_FIELDS, compare_present
+from fatebridge.core.output_jinkou_comparison import compare_present
 
 from .metaphysics.common import branch_element_text, stem_element_text
 from .metaphysics.jinkou_patterns import use_evidence

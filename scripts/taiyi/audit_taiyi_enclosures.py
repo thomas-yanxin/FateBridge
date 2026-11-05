@@ -6,7 +6,6 @@ The command therefore still exits 1 instead of certifying the whole classic.
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -132,21 +131,3 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         "explicit_historical_year_profile_available": True,
         "scope": "循环核心原例数值与明确正宫提挟几何；默认公共年计依然受通用农历范围约束；V12明确历史历表配置另验，不以古例循环数值匹配冒充历史日期验收。",
     }
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
-    result = audit()
-    raw = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
-    if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(raw)
-    else:
-        print(raw)
-    raise SystemExit(0 if result["whole_enclosure_family_acceptance_passed"] else 1)
-
-
-if __name__ == "__main__":
-    main()

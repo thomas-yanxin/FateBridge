@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -130,29 +129,3 @@ def audit() -> dict[str, Any]:
         "classical_acceptance_passed": False,
         "goal_complete": False,
     }
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    report = audit()
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {
-                k: report[k]
-                for k in (
-                    "scan_case_count",
-                    "scan_matched_count",
-                    "raw_scan_excerpt_conformance",
-                )
-            }
-        )
-    )
-    return 0 if report["raw_scan_excerpt_conformance"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

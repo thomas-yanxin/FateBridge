@@ -1,7 +1,7 @@
 {
   "house": {
     "object_id": "home",
-    "facing_degrees": 180,
+    "facing_degrees": 255,
     "north_reference": "magnetic"
   },
   "occupants": [
@@ -50,5 +50,18 @@
       "evidence": "北方高于宅基的实体，已测量确认"
     }
   ],
-  "effective_year": 2026
+  "effective_year": 2026,
+  "methods": [
+    "bazhai",
+    "jinsuo",
+    "annual_stars",
+    "xuankong_natal"
+  ],
+  "xuankong": {
+    "period": {
+      "basis": "construction_completion",
+      "effective_event_year": 2004,
+      "evidence": "示例：立春后竣工，按竣工事件定运"
+    }
+  }
 }

@@ -129,7 +129,7 @@ def test_focused_qualification_is_recovered_from_the_same_hash_verified_run(
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "focused-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)

@@ -1,0 +1,68 @@
+"""Current Ren anchor requests; frozen corruption criteria remain independent.
+
+The historical faults.json input included retired Taiyi accNum. Current
+Three Arts requests use the supported default Taiyi options; all Ren clocks,
+locations, source profiles and fault constructions are retained.
+"""
+
+ANCHOR_PAYLOADS = {
+    "jinkou": {
+        "analysis_year": 2026,
+        "analysis_month": 2,
+        "analysis_day": 20,
+        "analysis_hour": 4,
+        "analysis_minute": 30,
+        "analysis_timezone": "Asia/Shanghai",
+        "analysis_longitude": 121.4737,
+        "selected_sections": ["起盘信息", "金口诀四位"],
+        "use_true_solar_time": False,
+        "gender": "男",
+        "di_fen": "午",
+    },
+    "liureng_gods": {
+        "analysis_year": 2026,
+        "analysis_month": 2,
+        "analysis_day": 20,
+        "analysis_hour": 4,
+        "analysis_minute": 30,
+        "analysis_timezone": "Asia/Shanghai",
+        "analysis_longitude": 121.4737,
+        "selected_sections": ["起盘信息", "三传"],
+        "use_true_solar_time": False,
+        "gender": "男",
+    },
+    "liureng_runyear": {
+        "name": "张三",
+        "gender": "男",
+        "birth_year": 1994,
+        "birth_month": 8,
+        "birth_day": 23,
+        "birth_hour": 14,
+        "birth_minute": 30,
+        "birth_timezone": "Asia/Shanghai",
+        "birth_longitude": 121.4737,
+        "birth_place": "上海",
+        "use_true_solar_time": False,
+        "analysis_year": 2026,
+        "analysis_month": 2,
+        "analysis_day": 20,
+        "analysis_hour": 4,
+        "analysis_minute": 18,
+        "analysis_timezone": "Asia/Shanghai",
+        "analysis_longitude": 121.4737,
+        "selected_sections": ["起盘信息", "行年"],
+    },
+    "sanshiunited": {
+        "date": "2028-04-06",
+        "time": "09:33:00",
+        "zone": "+08:00",
+        "lat": "31n13",
+        "lon": "121e28",
+        "gps_lat": 31.2,
+        "gps_lon": 121.4,
+        "qimen_options": {"layout": "direct"},
+        "taiyi_options": {},
+        "liureng_yue": "申",
+        "liureng_is_diurnal": False,
+    },
+}

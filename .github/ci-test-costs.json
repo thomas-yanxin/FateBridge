@@ -68,7 +68,6 @@
   "tests/quality/test_codex_experience.py::test_published_starter_projection_is_runnable[two_person_compatibility]": 3,
   "tests/quality/test_codex_experience.py::test_published_starter_projection_is_runnable[ziwei_birth]": 5,
   "tests/quality/test_codex_experience.py::test_published_starter_projection_is_runnable[ziwei_horoscope]": 6,
-  "tests/quality/test_codex_experience.py::test_published_tool_description_is_sufficient_for_strict_first_call": 5,
   "tests/quality/test_codex_experience.py::test_timing_first_view_keeps_current_basis_without_year_grids": 5,
   "tests/integration/test_complete_output_contracts.py::test_every_catalog_tool_declares_real_complete_business_roots": 3,
   "tests/integration/test_complete_output_contracts.py::test_missing_root_and_legal_projection_across_rest_mcp_cli": 7,

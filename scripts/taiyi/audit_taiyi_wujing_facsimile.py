@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import copy
 import hashlib
 import json
@@ -170,26 +169,3 @@ def compare(legacy: dict[str, Any], readings: dict[str, Any]) -> dict[str, Any]:
 
 def audit(corpus: Path = CORPUS) -> dict[str, Any]:
     return compare(literal_audit(), verify(corpus))
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    report = audit()
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {
-                "required_observations": 1440,
-                "native_values_clarified": report["native_values_clarified"],
-                "whole_classic_acceptance_passed": False,
-            }
-        )
-    )
-    return 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

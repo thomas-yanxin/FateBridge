@@ -2,24 +2,21 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
+
+from fatebridge.core.astro.birth import AstroBirthInfo
+from fatebridge.core.astrology_tables import RULER_BY_SIGN, SIGNS
+
 from ._common import (
     LOT_LABELS,
     LOT_POINT_NAMES,
-    RULER_BY_SIGN,
-    SIGNS,
-    Any,
-    AstroBirthInfo,
-    Dict,
-    List,
-    Optional,
     build_lot_payloads,
     classify_releasing_phase,
-    datetime,
     next_sign,
     opposite_sign,
     planet_label,
     sign_label,
-    timedelta,
 )
 
 # 各星座的释放年数（黄道释放法）

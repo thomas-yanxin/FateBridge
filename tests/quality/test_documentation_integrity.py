@@ -66,13 +66,21 @@ def test_broken_links_fail_with_source_location(
     assert f"README.md:1: {expected}" in capsys.readouterr().out
 
 
-def test_invalid_example_json_fails(tmp_path, monkeypatch, capsys):
+@pytest.mark.parametrize(
+    "name",
+    [
+        "docs/examples/broken.json",
+        "docs/examples/study/broken.json",
+        "examples/study/broken.json",
+    ],
+)
+def test_invalid_example_json_fails(tmp_path, monkeypatch, capsys, name):
     monkeypatch.setattr(check_docs, "ROOT", tmp_path)
-    examples: Path = tmp_path / "docs" / "examples"
-    examples.mkdir(parents=True)
-    (examples / "broken.json").write_text("{broken}", encoding="utf-8")
+    example: Path = tmp_path / name
+    example.parent.mkdir(parents=True)
+    example.write_text("{broken}", encoding="utf-8")
     assert check_docs.main([]) == 1
-    assert "docs/examples/broken.json: invalid JSON" in capsys.readouterr().out
+    assert f"{name}: invalid JSON" in capsys.readouterr().out
 
 
 def test_current_links_to_missing_historical_files_or_anchors_still_fail(

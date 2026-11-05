@@ -134,7 +134,7 @@ def test_same_run_text_tracks_qualified_cessation(
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "cessation-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)
@@ -172,7 +172,7 @@ def test_day_components_recover_the_same_complete_hash_verified_run(
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "civil-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)
@@ -286,7 +286,7 @@ def test_same_run_generation_and_snapshot_keep_injury_and_target_void(
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "generation-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)
@@ -447,7 +447,7 @@ def test_same_run_growth_text_and_source_facts(
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "growth-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)
@@ -520,7 +520,7 @@ def test_same_run_hidden_text_distinguishes_flying_void_from_its_support_alterna
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "hidden-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)
@@ -668,7 +668,7 @@ def test_same_run_rootless_route_snapshot_retains_direct_control(
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "routing-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)

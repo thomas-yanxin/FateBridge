@@ -6,16 +6,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
-
-if TYPE_CHECKING:
-    from scripts.taiyi.audit_taiyi_native_columns import (
-        CORRECTION_SHA as NATIVE_CORRECTION_SHA,
-    )
-    from scripts.taiyi.audit_taiyi_native_columns import (
-        MANIFEST_SHA as NATIVE_MANIFEST_SHA,
-    )
-    from scripts.taiyi.audit_taiyi_native_columns import source_readings
+from typing import Any
 
 from scripts.taiyi.audit_taiyi_native_columns import (
     CORRECTION_SHA as NATIVE_CORRECTION_SHA,
@@ -49,10 +40,18 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
             != row["sha256"]
         ):
             raise ValueError("此前原典材料指纹不符：" + row["file"])
-    for name, expected_hash in [
-        ("supplement-manifest.json", SUPPLEMENT_SHA),
-        ("correction-manifest.json", CORRECTION_SHA),
-        ("transcription-collation-manifest.json", COLLATION_SHA),
+    for name, expected_hash, data_files in [
+        (
+            "supplement-manifest.json",
+            SUPPLEMENT_SHA,
+            ("arithmetic-probes.json", "normalization-notes.json"),
+        ),
+        ("correction-manifest.json", CORRECTION_SHA, ("proof-quote-correction.json",)),
+        (
+            "transcription-collation-manifest.json",
+            COLLATION_SHA,
+            ("transcription-collation.json", "transcription-collation-notes.json"),
+        ),
     ]:
         path = corpus / name
         if hashlib.sha256(path.read_bytes()).hexdigest() != expected_hash:
@@ -60,10 +59,11 @@ def source_data(corpus: Path = CORPUS) -> dict[str, Any]:
         extra = json.loads(path.read_text())
         if extra["original_manifest_sha256"] != MANIFEST_SHA:
             raise ValueError("初录引用指纹不符")
-        for item in extra["source_files"]:
+        source_hashes = {item["file"]: item["sha256"] for item in extra["source_files"]}
+        for data_file in data_files:
             if (
-                hashlib.sha256((corpus / item["file"]).read_bytes()).hexdigest()
-                != item["sha256"]
+                hashlib.sha256((corpus / data_file).read_bytes()).hexdigest()
+                != source_hashes[data_file]
             ):
                 raise ValueError("补证/订正原文指纹不符")
     normal = json.loads((corpus / "name-normalization.json").read_text())

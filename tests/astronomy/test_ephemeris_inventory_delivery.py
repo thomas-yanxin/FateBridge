@@ -10,7 +10,7 @@ from fatebridge.application import result_delivery as delivery
 from fatebridge.application.examples import suggested_fields
 from fatebridge.services import replay_metadata
 from tests.fixtures.mcp_receipt import assert_same_run_receipt
-from tests.integration.test_result_delivery import reconstruct, store
+from tests.support.result_delivery import reconstruct, store
 from tests.support.transports import SPECS, inputs, rest, surface_calls
 
 PATH = "run_metadata.runtime"
@@ -146,11 +146,13 @@ def test_real_career_stays_readable_with_large_inventory_across_transports(
         if fields:
             assert result["career_analysis"] == original["career_analysis"]
             assert PATH in ref["deferred_fields"]
-            assert set(ref["deferred_fields"]) <= {
-                PATH,
-                "run_metadata.provenance",
-                "run_metadata.determinism",
-            }
+            for path in ref["deferred_fields"]:
+                assert path.startswith("run_metadata.")
+                key = path.removeprefix("run_metadata.")
+                assert (
+                    reconstruct(store, ref["result_id"], path)
+                    == original["run_metadata"][key]
+                )
             assert_same_run_receipt(
                 result["run_metadata"],
                 original["run_metadata"],

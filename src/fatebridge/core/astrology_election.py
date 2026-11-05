@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import math
 from fractions import Fraction
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from fatebridge.core.astro.event_reference import (
     reference_qualification,

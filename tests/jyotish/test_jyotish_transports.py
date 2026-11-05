@@ -336,14 +336,6 @@ def test_discovery_has_nested_output_contracts_and_task_views():
     assert {"Vimshottari", "DashaBirthBalance", "DashaPeriod"} <= set(schema["$defs"])
 
 
-def test_published_indian_contract_files_match_live_native_mcp_schemas():
-    from scripts import build_codex_call_contracts as builder
-
-    files = asyncio.run(builder.render_files())
-    for name in ("astro_india_chart.json", "astro_vimshottari.json"):
-        assert (builder.TARGET / name).read_text() == files[name]
-
-
 def test_as_of_date_anchor_and_declared_current_clock_use():
     spec = SPECS["astro_vimshottari"]
     request = spec.request_model.model_validate(astro_payload())

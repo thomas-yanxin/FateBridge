@@ -131,7 +131,7 @@ def _record(raw: bytes) -> dict[str, Any]:
         raise ValueError("Unknown native selection record")
     if set(record) != keys:
         raise ValueError("Unknown native selection record")
-    values = validate_selection(record["values"])
+    validate_selection(record["values"])
     return record
 
 

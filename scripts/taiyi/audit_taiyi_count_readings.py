@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -81,20 +80,3 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         "whole_classic_acceptance_passed": False,
         "scope": "40个数的源列表/推导属性和五条文献读法是分类验收，不是40历史课例；和数等级与位置配数分开，原未列/缩写/越界转录不删、不计通过。",
     }
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
-    report = audit()
-    text = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
-    if args.output:
-        args.output.write_text(text)
-    else:
-        print(text, end="")
-    return 0 if report["whole_classic_acceptance_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

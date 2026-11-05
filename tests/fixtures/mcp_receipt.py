@@ -6,12 +6,18 @@ import json
 from fatebridge.utils.json_digest import digest as evidence_digest
 
 
-def assert_same_run_receipt(inline, full, *, deferred_fields=()):
+def assert_same_run_receipt(inline, full, *, deferred_fields=None):
     # The caller first verifies the complete artifact against the original
     # delivery hash. Only explicitly declared supplementary receipt fields
     # may be restored; identity/hashes or undeclared omissions never pass.
     restored = dict(inline)
-    for path in deferred_fields:
+    declared = (
+        None
+        if deferred_fields is None
+        else {path for path in deferred_fields if path.startswith("run_metadata.")}
+    )
+    restored_paths = set()
+    for path in deferred_fields or ():
         if not path.startswith("run_metadata."):
             continue  # whole-result paging is separate from this receipt check
         assert path in {
@@ -28,27 +34,31 @@ def assert_same_run_receipt(inline, full, *, deferred_fields=()):
                 "coverage": full[key].get("coverage"),
             }
             restored[key] = full[key]
+            restored_paths.add(path)
         elif key != "runtime":
             assert key not in inline and key in full, key
             restored[key] = full[key]
+            restored_paths.add(path)
     summary = inline.get("runtime", {})
-    if summary.get("delivery_path") != "run_metadata.runtime":
-        assert restored == full
-        return
-    assert {k: v for k, v in restored.items() if k != "runtime"} == {
-        k: v for k, v in full.items() if k != "runtime"
-    }
-    runtime = full["runtime"]
-    assert summary["environment_sha256"] == runtime["environment_sha256"]
-    assert summary["ephemeris_inventory_sha256"] == runtime["ephemeris"]["sha256"]
-    files = runtime["ephemeris"]["files"]
-    digest = hashlib.sha256(
-        json.dumps(
-            files, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-        ).encode()
-    ).hexdigest()
-    assert summary["ephemeris_inventory_sha256"] == digest
-    assert summary["ephemeris_files_count"] == len(files)
+    if summary.get("delivery_path") == "run_metadata.runtime":
+        runtime = full["runtime"]
+        assert summary["environment_sha256"] == runtime["environment_sha256"]
+        assert summary["ephemeris_inventory_sha256"] == runtime["ephemeris"]["sha256"]
+        files = runtime["ephemeris"]["files"]
+        digest = hashlib.sha256(
+            json.dumps(
+                files, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+            ).encode()
+        ).hexdigest()
+        assert summary["ephemeris_inventory_sha256"] == digest
+        assert type(summary["ephemeris_files_count"]) is int
+        assert summary["ephemeris_files_count"] == len(files)
+        restored["runtime"] = runtime
+        restored_paths.add("run_metadata.runtime")
+    if declared is not None:
+        assert declared == restored_paths
+    assert restored == full
+    assert json.dumps(restored, sort_keys=True) == json.dumps(full, sort_keys=True)
 
 
 async def verified_inline_business(client, payload):

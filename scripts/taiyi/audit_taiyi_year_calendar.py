@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from datetime import date, timedelta
@@ -188,21 +187,3 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         "whole_goal_complete": False,
         "count_policy": "63月首与1831日是所选完整历表区段的日期重建检查，不是1831条独立古例。V11同一古例11数值与2主体不作新案例累加；旧差异不删。",
     }
-
-
-def main():
-    p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--output", type=Path)
-    args = p.parse_args()
-    r = audit()
-    raw = json.dumps(r, ensure_ascii=False, indent=2) + "\n"
-    if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(raw)
-    else:
-        print(raw)
-    raise SystemExit(0 if r["whole_goal_complete"] else 1)
-
-
-if __name__ == "__main__":
-    main()

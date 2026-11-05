@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import argparse
 import copy
-import gzip
 import hashlib
 import json
 from pathlib import Path
@@ -217,32 +215,3 @@ def audit() -> dict[str, Any]:
         full_classical_acceptance=False,
         goal_complete=False,
     )
-
-
-def main() -> int:
-    p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--output", type=Path, required=True)
-    args = p.parse_args()
-    result = audit()
-    args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {
-                k: result[k]
-                for k in [
-                    "printed_age_matches",
-                    "synthetic_ordinal_checks",
-                    "corrected_course_annotation_matches",
-                    "initial_course_annotation_matches",
-                    "parity_checks",
-                    "engineering_checks_passed",
-                    "goal_complete",
-                ]
-            }
-        )
-    )
-    return 0 if result["engineering_checks_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

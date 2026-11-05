@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import copy
 import hashlib
 import json
@@ -117,19 +116,3 @@ def audit() -> dict[str, Any]:
         classical_acceptance_passed=False,
         goal_complete=False,
     )
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    result = audit()
-    args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-    print(
-        f"Rejected {result['rejected_fault_count']}/20 predeclared engineering faults"
-    )
-    return 0 if result["fault_rejection_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

@@ -6,6 +6,20 @@ from typing import Any, Dict
 
 from fatebridge.core.astro import runtime
 
+PHYSICAL_BODIES = (
+    "Sun",
+    "Moon",
+    "Mercury",
+    "Venus",
+    "Mars",
+    "Jupiter",
+    "Saturn",
+    "Uranus",
+    "Neptune",
+    "Pluto",
+)
+
+
 # 本质尊贵 (essential dignity)。仅古典七曜有庙旺落陷之分；天王 / 海王 / 冥王及
 # 交点等无古典本质尊贵，dignity 记为 None。
 # 入庙(domicile)：行星所主之宫；入旺(exaltation)：曜升之宫；
@@ -82,19 +96,7 @@ SU28 = [
 ]
 
 
-PLANET_SEQUENCE = [
-    "Sun",
-    "Moon",
-    "Mercury",
-    "Venus",
-    "Mars",
-    "Jupiter",
-    "Saturn",
-    "Uranus",
-    "Neptune",
-    "Pluto",
-    "North Node",
-]
+PLANET_SEQUENCE = [*PHYSICAL_BODIES, "North Node"]
 
 
 # 月亮交点（虚点）。元素 / 模式平衡按行星本体统计，不计交点。
@@ -124,15 +126,7 @@ PLANET_SWISSEPH_IDS = (
 )
 
 
-TRADITIONAL_PLANETS = [
-    "Sun",
-    "Moon",
-    "Mercury",
-    "Venus",
-    "Mars",
-    "Jupiter",
-    "Saturn",
-]
+TRADITIONAL_PLANETS = list(PHYSICAL_BODIES[:7])
 
 
 # 顺序敏感的 ``TRADITIONAL_PLANETS`` 用于 ``list(...)`` 与有序推导；成员判断

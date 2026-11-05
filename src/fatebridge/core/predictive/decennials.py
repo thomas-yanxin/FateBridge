@@ -2,18 +2,12 @@
 
 from __future__ import annotations
 
-from ._common import (
-    Any,
-    AstroBirthInfo,
-    Dict,
-    List,
-    Optional,
-    datetime,
-    determine_sect,
-    planet_label,
-    point_absolute_position,
-    timedelta,
-)
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
+
+from fatebridge.core.astro.birth import AstroBirthInfo
+
+from ._common import determine_sect, planet_label, point_absolute_position
 
 # 起始模式与排序方式
 DECENNIAL_START_MODE_SECT_LIGHT = "sect_light"

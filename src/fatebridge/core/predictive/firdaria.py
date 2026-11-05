@@ -3,23 +3,21 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from datetime import timezone
+from datetime import datetime, timedelta, timezone
 from fractions import Fraction
+from typing import Any, Dict
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from dateutil import tz
 
+from fatebridge.core.astro.birth import AstroBirthInfo
+
 from ._common import (
     TROPICAL_YEAR_DAYS,
-    Any,
-    AstroBirthInfo,
-    Dict,
-    datetime,
     determine_sect,
     planet_label,
     resolve_local_birthday_anniversary,
     sect_label,
-    timedelta,
 )
 
 # 日盘与夜盘的行星时主顺序（planet, years）

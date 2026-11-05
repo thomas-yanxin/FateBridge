@@ -14,7 +14,7 @@ from fatebridge.core.astro import chart as core_chart
 from fatebridge.core.astro.geometry import _nakshatra, _su28
 from fatebridge.core.astro.reference import NAKSHATRAS, SU28
 from fatebridge.core.local_techniques import chart as local_chart
-from fatebridge.core.local_techniques.chart import _su28_name
+from fatebridge.core.local_techniques.chart import _su28_position
 from fatebridge.core.suzhan_astronomy import apply_equatorial_mansions
 from tests.support.transports import SPECS, business
 from tests.support.transports import inputs as representative_inputs
@@ -41,7 +41,9 @@ def test_every_equal_sector_boundary_and_neighbor_has_the_exact_input_identity(c
                     assert _nakshatra(longitude) == jyotish.nakshatra(longitude)["name"]
                 else:
                     assert _su28(longitude) == SU28[index]
-                    assert _su28_name(longitude) == SU28[index].removesuffix("宿")
+                    assert _su28_position(longitude)[0] == SU28[index].removesuffix(
+                        "宿"
+                    )
 
 
 @pytest.mark.parametrize("longitude", [40, 80, 120, 160, 200, 240, 280, 320])
@@ -52,7 +54,9 @@ def test_exact_forty_degree_multiples_enter_the_next_nakshatra(longitude):
 @pytest.mark.parametrize("longitude", [90, 180, 270])
 def test_exact_quarter_turns_enter_the_next_equal28_mansion(longitude):
     assert _su28(longitude) == SU28[longitude * 28 // 360]
-    assert _su28_name(longitude) == SU28[longitude * 28 // 360].removesuffix("宿")
+    assert _su28_position(longitude)[0] == SU28[longitude * 28 // 360].removesuffix(
+        "宿"
+    )
 
 
 @pytest.mark.native_engine_fault

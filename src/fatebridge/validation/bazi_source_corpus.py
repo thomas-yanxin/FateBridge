@@ -2,11 +2,6 @@
 
 from __future__ import annotations
 
-import json
-from collections import defaultdict
-from copy import deepcopy
-from hashlib import sha256
-from pathlib import Path
 from typing import Any, Mapping
 
 from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
@@ -50,32 +45,4 @@ def input_consistency(values: list[str]) -> dict[str, Any]:
         "literal_source_changed": False,
         "historical_birth_datetime_verified": False,
         "scope": "五虎遁、五鼠遁及六十甲子内部关系核对；不认证录文、公历出生瞬间、子时口径或节后日序，不修改源柱。",
-    }
-
-
-def input_index(rows: list[dict[str, Any]]) -> dict[str, Any]:
-    grouped: dict[tuple[str, ...], list[dict[str, Any]]] = defaultdict(list)
-    for row in rows:
-        grouped[tuple(row["pillars"])].append(
-            {
-                "group": row["group"],
-                "id": row["id"],
-                "label_status": row["label_status"],
-                "expected_strength": row["expected_strength"],
-            }
-        )
-    return {
-        "distinct_four_pillar_inputs": len(grouped),
-        "overlapping_input_records": len(rows) - len(grouped),
-        "repeated_inputs": [
-            {"pillars": list(p), "observations": v}
-            for p, v in grouped.items()
-            if len(v) > 1
-        ],
-        "conflicting_body_annotations": [
-            {"pillars": list(p), "observations": v}
-            for p, v in grouped.items()
-            if len({r["expected_strength"] for r in v if r["expected_strength"]}) > 1
-        ],
-        "deduplication_scope": "Exact input index only; identical source examples and editions may still overlap semantically even when one pillar differs. Neither records nor distinct inputs are independent trials.",
     }

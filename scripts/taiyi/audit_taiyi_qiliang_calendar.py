@@ -2,12 +2,9 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
-import math
-from copy import deepcopy
-from datetime import date, datetime, timezone
+from datetime import date
 from pathlib import Path
 from typing import Any, TypeAlias
 
@@ -213,20 +210,3 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
         "whole_goal_complete": False,
         "scope": "Public year-only mapping to the explicitly named printed table; full source conflicts remain. Sixteen old software payloads are regression controls, not ancient cases. No whole Yuanjia or Wang calendar claim.",
     }
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
-    raw = json.dumps(audit(), ensure_ascii=False, indent=2) + "\n"
-    if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(raw, encoding="utf-8")
-    else:
-        print(raw)
-    raise SystemExit(1)
-
-
-if __name__ == "__main__":
-    main()

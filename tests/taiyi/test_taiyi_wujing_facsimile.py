@@ -3,8 +3,6 @@
 import copy
 import json
 import shutil
-import subprocess
-import sys
 
 import pytest
 
@@ -62,6 +60,9 @@ def test_original_1440_layer_and_all_original_differences_are_unchanged(report):
     assert report["source_or_production_arithmetic_corrected"] is False
     assert report["new_dated_cases"] == report["new_model_calls"] == 0
 
+    assert report["required_observations"] == 1440
+    assert report["whole_classic_acceptance_passed"] is False
+
 
 def test_actual_mismatch_is_not_turned_into_an_unknown_or_fitted_source_value():
     readings = verify()
@@ -94,24 +95,3 @@ def test_changed_literal_or_native_image_is_rejected(tmp_path, name):
     (copied / name).write_bytes(b"changed")
     with pytest.raises(ValueError, match="指纹"):
         verify(copied)
-
-
-def test_documented_module_command_preserves_nonzero_classical_acceptance(tmp_path):
-    path = tmp_path / "report.json"
-    process = subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "scripts.taiyi.audit_taiyi_wujing_facsimile",
-            "--output",
-            str(path),
-        ],
-        cwd=ROOT,
-        text=True,
-        capture_output=True,
-    )
-    assert process.returncode == 1
-    assert "Traceback" not in process.stderr
-    report = json.loads(path.read_text())
-    assert report["required_observations"] == 1440
-    assert report["whole_classic_acceptance_passed"] is False

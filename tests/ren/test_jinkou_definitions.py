@@ -16,6 +16,7 @@ from fatebridge.application.examples import evidence_views
 from fatebridge.core.metaphysics.jinkou_definitions import definition_evidence
 from fatebridge.core.output_jinkou_definitions import JinkouDefinitionEvidence
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
+from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS
 from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -26,9 +27,7 @@ assert MOD and MOD.loader
 AUDIT = importlib.util.module_from_spec(MOD)
 MOD.loader.exec_module(AUDIT)
 READINGS, FACTS = AUDIT.reference()
-PAYLOAD = json.loads((ROOT / "tests/fixtures/ren_anchors_v1/faults.json").read_text())[
-    "payloads"
-]["jinkou"]
+PAYLOAD = ANCHOR_PAYLOADS["jinkou"]
 
 
 def test_new_witness_keeps_ambiguity_and_fixed_denominators():

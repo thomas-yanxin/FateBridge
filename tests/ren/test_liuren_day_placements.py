@@ -17,14 +17,12 @@ from fatebridge.core.metaphysics.liureng_day_placements import (
 from fatebridge.core.output_liuren_day_placements import LiurenDayPlacements
 from fatebridge.core.output_ren_anchors import require_complete_ren_anchors
 from scripts.ren.audit_liuren_day_placements import CORPUS, expected_facts, reference
-from tests.ren.test_liuren_ordered_patterns import raw
+from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
+from tests.support.ren_anchors import anchor_output as raw
 from tests.support.transports import AS_OF, SPECS, business, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = reference()
-PAYLOADS = json.loads((ROOT / "tests/fixtures/ren_anchors_v1/faults.json").read_text())[
-    "payloads"
-]
 
 
 @pytest.fixture(autouse=True)

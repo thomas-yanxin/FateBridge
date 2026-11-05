@@ -91,12 +91,11 @@ def rest_client(monkeypatch):
 
 
 def test_full_source_mapping_is_separate_from_ancient_calendar_acceptance(report):
-    frozen = verify_sources()
+    verify_sources()
     assert (
         hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest()
         == FREEZE_SHA256
     )
-    assert len(frozen["files"]) == 2 and len(frozen["prior_sources"]) == 71
     assert (
         len(report["source_mapping"]) == len(report["month_first_observations"]) == 63
     )

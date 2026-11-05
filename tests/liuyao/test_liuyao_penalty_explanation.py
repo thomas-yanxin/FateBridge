@@ -150,7 +150,7 @@ def test_same_run_full_hash_preserves_unknown_caution(
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "same-run-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)

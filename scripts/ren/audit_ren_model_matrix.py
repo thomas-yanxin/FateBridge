@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import importlib.util
 import json
 import math
 import os
@@ -24,14 +23,6 @@ PROTOCOL_SHA256 = "c87663eb168a41b41948c7d2e2d0e3929c63027489d5a06c98b63b3312dce
 
 def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def module(name: str, filename: str) -> Any:
-    spec = importlib.util.spec_from_file_location(name, ROOT / "scripts" / filename)
-    assert spec and spec.loader
-    loaded = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(loaded)
-    return loaded
 
 
 def protocol(corpus: Path = CORPUS) -> dict[str, Any]:
@@ -140,7 +131,7 @@ def runtime_manifest() -> dict[str, str]:
         if p.is_file() and "__pycache__" not in p.parts and p.suffix != ".pyc"
     ]
     paths += [
-        ROOT / "scripts" / name
+        ROOT / "scripts/ren" / name
         for name in (
             "audit_ren_model_matrix.py",
             "audit_ren_calendar_pmo.py",
@@ -159,7 +150,8 @@ def audit_profile(name: str, ephe_dir: Path) -> dict[str, Any]:
     # Only this isolated process is configured; unrelated processes are untouched.
     os.environ["SE_EPHE_PATH"] = str(ephe_dir.resolve())
     os.environ["FATEBRIDGE_SOLAR_TERM_MODEL"] = selected["mode"]
-    opale = module("ren_matrix_opale", "audit_ren_opale_seasons.py")
+    from scripts.ren import audit_ren_opale_seasons as opale
+
     refs = opale.reference()
     pmo = opale.pmo_module()
     before = runtime_manifest()
@@ -239,7 +231,8 @@ def audit_profile(name: str, ephe_dir: Path) -> dict[str, Any]:
 
 def lunar_replay() -> dict[str, Any]:
     protocol()
-    calendar = module("ren_matrix_hko", "audit_ren_calendar.py")
+    from scripts.ren import audit_ren_calendar as calendar
+
     calendar.reference()
     before = runtime_manifest()
     root = ROOT / "tests/data/ziwei_independent"

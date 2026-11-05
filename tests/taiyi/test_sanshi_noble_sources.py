@@ -3,6 +3,7 @@
 import asyncio
 import hashlib
 import json
+import shutil
 from copy import deepcopy
 from pathlib import Path
 
@@ -27,16 +28,64 @@ CORPUS = ROOT / "tests/fixtures/taiyi_dangshi_noble_v40"
 SOURCE_FREEZE = "2ad83f1a72c0c941dd83f2ff5f4247871ae18227be9a8bdcb06baaa08b0de47c"
 
 
-def source_readings():
+def source_readings(corpus: Path = CORPUS):
     assert (
-        hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest()
+        hashlib.sha256((corpus / "freeze-original.json").read_bytes()).hexdigest()
         == SOURCE_FREEZE
     )
-    frozen = json.loads((CORPUS / "freeze.json").read_text())
-    for base, key in ((CORPUS, "files"), (ROOT, "prior_sources")):
+    original = json.loads((corpus / "freeze-original.json").read_text())
+    frozen = json.loads((corpus / "freeze.json").read_text())
+    # Cleanup removed two process-report dependencies, not source evidence.
+    # Bind the source-only manifest to the unchanged original commitment.
+    assert frozen == {
+        **original,
+        "prior_sources": {
+            name: digest
+            for name, digest in original["prior_sources"].items()
+            if name.startswith("tests/fixtures/")
+        },
+    }
+    for base, key in ((corpus, "files"), (ROOT, "prior_sources")):
         for name, digest in frozen[key].items():
             assert hashlib.sha256((base / name).read_bytes()).hexdigest() == digest
-    return json.loads((CORPUS / "readings.json").read_text())
+    return json.loads((corpus / "readings.json").read_text())
+
+
+@pytest.mark.parametrize(
+    "fault",
+    [
+        "original_freeze",
+        "missing_source_binding",
+        "missing_page_binding",
+        "transcription_and_rehashed_manifest",
+        "page_bytes",
+    ],
+)
+def test_source_only_manifest_cannot_replace_or_reduce_original_evidence(
+    tmp_path, fault
+):
+    corpus = tmp_path / "corpus"
+    shutil.copytree(CORPUS, corpus)
+    manifest = json.loads((corpus / "freeze.json").read_text())
+    if fault == "original_freeze":
+        with (corpus / "freeze-original.json").open("ab") as stream:
+            stream.write(b" ")
+    elif fault == "missing_source_binding":
+        manifest["prior_sources"].pop("tests/fixtures/taiyi_jinjing_v23/manifest.json")
+    elif fault == "missing_page_binding":
+        manifest["files"].pop("siku-native-page53.png")
+    elif fault == "transcription_and_rehashed_manifest":
+        path = corpus / "readings.json"
+        reading = json.loads(path.read_text())
+        reading["editions"][0]["rows"][0]["morning_branch"] = "丑"
+        path.write_text(json.dumps(reading))
+        manifest["files"][path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
+    else:
+        with (corpus / "siku-native-page53.png").open("ab") as stream:
+            stream.write(b"changed")
+    (corpus / "freeze.json").write_text(json.dumps(manifest))
+    with pytest.raises(AssertionError):
+        source_readings(corpus)
 
 
 def test_sanshi_exposes_an_explicit_noble_profile_without_changing_default():
@@ -80,6 +129,7 @@ def test_selected_noble_profile_reaches_the_actual_same_run_board(profile):
     assert result["liureng"]["meta"]["guiren_profile"] == profile
     assessment = result["synthesis"]["noble_source_assessment"]
     assert assessment["status"] == "compared_noble_start_only"
+    assert assessment["source_freeze_sha256"] == SOURCE_FREEZE
     assert assessment["actual_profile"] == profile
     assert assessment["source_morning_evening_boundary_adjudicated"] is False
     trace = result["liureng"]["rule_trace"][assessment["actual_trace_index"]]

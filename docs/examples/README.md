@@ -10,8 +10,7 @@
 
 | 示例文件 | 调用工具 | 用来理解什么 |
 | --- | --- | --- |
-| [住宅基础合参](fengshui-home.json) | `fengshui_assess` | 八宅、金锁与年盘分层输出 |
-| [八宅变爻与宫星关系](fengshui-bazhai-depth.json) | `fengshui_bazhai` | 累计变爻、净变爻和宫星有向生克；基本用途偏好与完整吉凶分开 |
+| [住宅合参](fengshui-home.json) | `fengshui_assess` | 八宅、金锁、年星与历史宅盘分层输出 |
 | [八宅候选与布局证据](fengshui-bazhai-candidate-proof.json) | `fengshui_assess` | 未确认男女起法的两套结果；备选方向保留生克与变爻依据 |
 | [独立室内形态](fengshui-forms.json) | `fengshui_assess` | 无生辰、无罗盘的入口视野与实体背靠 |
 | [元素目标](fengshui-elements.json) | `fengshui_assess` | 对实际计算目标按作用域提出生 / 泄候选 |
@@ -21,20 +20,20 @@
 | [实测工位与完整有限搜索](fengshui-workstation-measured.json) | `fengshui_assess` | 多边形/高度几何、入口与背靠、独立BTB/WOFS规则、逐组合拒绝回执与取舍方案 |
 | [自动网格与屏幕视线](fengshui-workstation-grid-screen.json) | `fengshui_assess` | 明确网格自动生成中心候选、整面透视遮挡、候选独立重算及算法覆盖状态 |
 | [玄空历史宅盘](fengshui-xuankong.json) | `fengshui_xuankong_natal` | 历史事件定运、宅向与候选角区 |
-| [早期宅运完整区间](fengshui-historical-period.json) | `fengshui_xuankong_natal` | 虚构1800年输入；1784–1804端点使用的实际轨道来源 |
-| [原书数表差异](fengshui-source-differences.json) | `fengshui_xuankong_natal` | 原图五与计算二分别保留，读取逐候选来源比较 |
-| [起星图数表差异](fengshui-replacement-source-differences.json) | `fengshui_xuankong_natal` | 五运子午替卦原图九与计算六、编者范围及未验证的兼向条件 |
-| [事件有效年候选](fengshui-event-year-candidates.json) | `fengshui_xuankong_natal` | 依[受控模型运行方法](../fengshui-xuankong.md)，分开读取候选有效年和已确定宅运 |
-| [候选节月有效期](fengshui-month-interval-candidates.json) | `fengshui_monthly_stars` | 依[受控模型运行方法](../fengshui.md)，读取各候选节月的完整区间与来源 |
 | [宅向误差支持角区](fengshui-bearing-support.json) | `fengshui_xuankong_natal` | 同一个宅盘由哪些测量角区与选盘理由支持 |
 | [WMM2025地磁参考](fengshui-geomagnetic.json) | `fengshui_directions` | NOAA数值测试例；原始方位与模型换算候选分别保留 |
 | [独立沈氏城门](fengshui-city-gate.json) | `fengshui_xuankong_natal` | 显式参考运、同元龙门位、顺逆；无需编造历史宅运 |
-| [玄空与年度并列](fengshui-xuankong-with-annual.json) | `fengshui_assess` | 历史宅盘与年盘的独立作用域 |
 | [沈氏主客规则](fengshui-host-guest.json) | `fengshui_xuankong_natal` | 显式选择主客生克；历史宅运、评价运及来源条件分别核对 |
 | [玄空有限解释](fengshui-xuankong-interpretation.json) | `fengshui_assess` | 显式启用有来源的有限解释条件 |
 | [工位活动](fengshui-workstation-activity.json) | `fengshui_assess` | 书桌工作 / 学习用途与宅盘向星 |
 | [入口隔挡](fengshui-entry-barrier.json) | `fengshui_assess` | 入口、桌与隔挡的明确关系和执行条件 |
 | [材料施用条件](fengshui-material-application.json) | `fengshui_assess` | 材料资格、施用条件与目标绑定分别核对 |
+
+## 回归与研究资料
+
+八宅变爻、早期宅运、原书差异、事件年及节月边界由[八宅完整原典对照](../../tests/fengshui/test_fengshui_classical_depth_v2.py)、[历史宅运](../../tests/fengshui/test_fengshui_historical_solar.py)、[下卦来源比较](../../tests/fengshui/test_fengshui_source_comparison.py)、[替卦来源比较](../../tests/fengshui/test_fengshui_replacement_source_comparison.py)、[事件年候选](../../tests/fengshui/test_fengshui_event_year_fidelity.py)和[节月区间](../../tests/fengshui/test_fengshui_month_interval_fidelity.py)维护完整输入与断言，不另存单点请求副本。原始来源和分歧继续保留在这些测试读取的资料中。
+
+研究流程统一使用[预测研究示例](prediction-study/plan.json)，运行方法及占位资料的限制见[计算与预测验收](../prediction-validation.md)。
 
 ## 未解析ASC与13扇区
 

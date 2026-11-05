@@ -1074,11 +1074,6 @@ class Hellenistic(PartialOutput):
     sect: Optional[str] = None
 
 
-class PlanetMansion(PartialOutput):
-    id: Optional[str] = None
-    su28: Optional[str] = None
-
-
 class MoiraPattern(PartialOutput):
     basis: Optional[str] = None
     classical_acceptance: Optional[bool] = None

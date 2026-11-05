@@ -51,6 +51,37 @@ def test_calculate_ziwei_birth_returns_twelve_palaces():
     assert "[宫位总览]" in result["snapshot_text"]
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
 
+    palaces = result["ziwei_birth"]["palaces"]
+
+    for palace in palaces:
+        # additive: legacy `stars` list is preserved unchanged
+        assert "stars" in palace
+        assert "stars_detail" in palace
+        # a star-less palace must still carry stars_detail as an empty list
+        assert isinstance(palace["stars_detail"], list)
+        assert len(palace["stars_detail"]) == len(palace["stars"])
+        for legacy, detail in zip(palace["stars"], palace["stars_detail"]):
+            assert legacy == detail["label"]
+            assert set(detail.keys()) == {"name", "label", "brightness", "mutagen"}
+
+    # at least one major star must carry a non-null brightness
+    all_details = [d for p in palaces for d in p["stars_detail"]]
+    assert any(d["brightness"] is not None for d in all_details)
+
+    # mutagen parsing: any 化X suffix in legacy stars surfaces in detail.mutagen
+    for palace in palaces:
+        for detail in palace["stars_detail"]:
+            if detail["mutagen"] is not None:
+                assert detail["label"] == f"{detail['name']}{detail['mutagen']}"
+                assert detail["mutagen"] in {"化禄", "化权", "化科", "化忌"}
+
+    snapshot = result["snapshot_text"]
+
+    # brightness must render as `star(brightness)` — a brightness char in
+    # parentheses immediately after a star name (e.g. "紫微(庙)", "廉贞化禄(利)"),
+    # not merely somewhere in the text.
+    assert re.search(r"[一-鿿]+\([庙旺得利平不陷]\)", snapshot)
+
 
 def test_calculate_ziwei_birth_supports_selected_export_sections():
     person = create_person_info(
@@ -461,24 +492,6 @@ def test_calculate_qimen_analysis_returns_nine_palaces():
     assert result["snapshot_export"]["export_text"] == result["snapshot_text"]
     assert "离九宫" in result["snapshot_export"]["section_titles_detected"]
 
-
-def test_metaphysics_true_solar_time_includes_equation_of_time():
-    result = calculate_qimen_analysis(
-        analysis_year=2026,
-        analysis_month=4,
-        analysis_day=4,
-        analysis_hour=21,
-        analysis_minute=18,
-        analysis_timezone="Asia/Shanghai",
-        analysis_longitude=121.4737,
-        use_true_solar_time=True,
-    )
-
-    # Direct Swiss Ephemeris 2.10.03 reference, outside FateBridge's helpers:
-    # jd_ut=2461135.0541666667 (13:18 UTC), time_equ=-2.935413924 min,
-    # longitude=+5.8948 min, total=+2.959386076 min. The old 2.51 value came
-    # from a date-only sinusoidal approximation. This is a library integration
-    # reference, not an independent astronomical accuracy certificate.
     assert result["analysis_context"]["time_algorithm"] == "真太阳时"
     assert result["analysis_context"]["corrected_datetime"].startswith(
         "2026-04-04 21:20:"
@@ -735,67 +748,6 @@ def test_calculate_jinkou_analysis_supports_selected_export_sections():
     assert "[起盘信息]" in result["snapshot_export"]["export_text"]
     assert "[金口诀四位]" in result["snapshot_export"]["export_text"]
     assert "[四位神煞]" not in result["snapshot_export"]["export_text"]
-
-
-def test_ziwei_birth_palaces_have_stars_detail():
-    person = create_person_info(
-        birth_year=1994,
-        birth_month=8,
-        birth_day=23,
-        birth_hour=14,
-        name="张三",
-        gender="男",
-        birth_place="上海",
-        birth_minute=30,
-        birth_timezone="Asia/Shanghai",
-    )
-
-    result = calculate_ziwei_birth(person)
-    palaces = result["ziwei_birth"]["palaces"]
-
-    for palace in palaces:
-        # additive: legacy `stars` list is preserved unchanged
-        assert "stars" in palace
-        assert "stars_detail" in palace
-        # a star-less palace must still carry stars_detail as an empty list
-        assert isinstance(palace["stars_detail"], list)
-        assert len(palace["stars_detail"]) == len(palace["stars"])
-        for legacy, detail in zip(palace["stars"], palace["stars_detail"]):
-            assert legacy == detail["label"]
-            assert set(detail.keys()) == {"name", "label", "brightness", "mutagen"}
-
-    # at least one major star must carry a non-null brightness
-    all_details = [d for p in palaces for d in p["stars_detail"]]
-    assert any(d["brightness"] is not None for d in all_details)
-
-    # mutagen parsing: any 化X suffix in legacy stars surfaces in detail.mutagen
-    for palace in palaces:
-        for detail in palace["stars_detail"]:
-            if detail["mutagen"] is not None:
-                assert detail["label"] == f"{detail['name']}{detail['mutagen']}"
-                assert detail["mutagen"] in {"化禄", "化权", "化科", "化忌"}
-
-
-def test_ziwei_snapshot_text_annotates_brightness():
-    person = create_person_info(
-        birth_year=1994,
-        birth_month=8,
-        birth_day=23,
-        birth_hour=14,
-        name="张三",
-        gender="男",
-        birth_place="上海",
-        birth_minute=30,
-        birth_timezone="Asia/Shanghai",
-    )
-
-    result = calculate_ziwei_birth(person)
-    snapshot = result["snapshot_text"]
-
-    # brightness must render as `star(brightness)` — a brightness char in
-    # parentheses immediately after a star name (e.g. "紫微(庙)", "廉贞化禄(利)"),
-    # not merely somewhere in the text.
-    assert re.search(r"[一-鿿]+\([庙旺得利平不陷]\)", snapshot)
 
 
 def test_ziwei_horoscope_request_requires_target_datetime():

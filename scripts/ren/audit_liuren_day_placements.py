@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
-import runpy
-import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -179,27 +176,3 @@ def audit() -> dict[str, Any]:
         original_gates_reclassified=False,
         goal_complete=False,
     )
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    result = audit()
-    with args.output.open("x") as stream:
-        stream.write(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {
-                k: v
-                for k, v in result.items()
-                if k not in {"literal_rows", "symbolic_rows", "implementation_sha256"}
-            },
-            ensure_ascii=False,
-        )
-    )
-    return 0 if result["engineering_checks_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

@@ -1,0 +1,19 @@
+{
+  "recorded_at_utc": "2026-10-25T05:07:01.878082+00:00",
+  "phase": "Before new numeric audits or any V40 production edits; manual inspection and known tables disclosed",
+  "files": {
+    "extraction.json": "00f4e1f30c842c1e5ce11161eccf7cbc6a006bf6a485931b8f26d55ca1a24789",
+    "ming-native-page23.png": "4352497791eacd6b02df9694b0a58dd87b45e76a36134f632cff11c714493ac6",
+    "ming-native-page24.png": "c91b6d87d8ca783181747a0e3bbbc32fe1d75a2310cc7998cd3f133d4c1e8ef7",
+    "readings.json": "17c4bab00f9856890a0986000d986544a8a7c8da3a149d2ab0b83ae59c314b1a",
+    "siku-native-page53.png": "fcdc3c566b18922c8ee5eb44e44c6cd29bf73a91bbe393fe18b26cc49b0edddf",
+    "siku-native-page56.png": "a6d07a1f8f4dbfc05d776f5c486093505749e9241e573939d5996b4e10274a0b",
+    "siku-native-page57.png": "188e76695b163bb8b5ef1adbdea1e0ee93cf9b711be7b1bc1b57a59f66e06733"
+  },
+  "prior_sources": {
+    "tests/fixtures/taiyi_jinjing_v23/manifest.json": "62a40d4517386efea5557598b081aab1e99a1db1d8b58895ae8901ab8a54eced",
+    "tests/fixtures/taiyi_jinjing_v26/initial-freeze.json": "b8717e3e25b4018da3b047505fad396d44de316bd3567918b750a2c0b418dcc7",
+    "docs/validation/taiyi-jinjing-v39/summary.json": "1921bc0a546bb41668633efd889f9fa8df6c09b777d0c401afec1dc1dc789491",
+    "docs/validation/taiyi-jinjing-v25/model-summary.json": "e2d4de086cbb76b8e52406582b476fc4b49b0a243b6756ab1cdcf92e0af770dd"
+  }
+}

@@ -19,9 +19,20 @@ uv run --locked --extra dev python scripts/clean_repository.py --apply
 
 脚本只清理已确认可再生成的构建、缓存、覆盖率、根目录 CI 产物和 Finder 产物。保留虚拟环境、星历和当前参考资料；不使用全仓库 `git clean -fdx`。
 
+本地原始 PDF 和扫描图可另外去重：
+
+```bash
+uv run --locked --extra dev python scripts/clean_repository.py --deduplicate-scans
+uv run --locked --extra dev python scripts/clean_repository.py --deduplicate-scans --apply
+```
+
+只合并 `tests/data/` 与 `tests/fixtures/` 中 SHA-256 相同的原始扫描文件。每份原文在 `tests/data/shared_sources/` 保存一次，各资料集的既有文件名改为相对符号链接，原始清单、来源指纹和读取字节保持一致。需要文件系统支持符号链接；搬运资料集时一并携带共享原文目录。JSON 记录、独立期望值、反例和研究结果保持各自身份，不按字节相同合并；Git 已跟踪文件和指向外部的链接不参与替换。
+
 历史审查目录和退役输出先在仓库外归档并校验，再移出工作区；当前来源清单继续校验原始资料，不携带旧算法输出哈希。
 
 退役代码前核对实际调用者与公开合同，提取仍有独立价值的当前验证，再一起删除旧实现、专用测试、脚本及说明。不得用重算期望值、删反例或放宽容差取得通过。
+
+冻结清单若含已归档的过程报告，保留原始清单及其既定指纹；当前来源清单作为精简派生物，必须与原清单的原始资料、转录及来源身份逐项一致。不能直接用精简后的哈希替换原始来源承诺，也不能为保留旧报告路径重新引入退役程序。
 
 ## 验证
 

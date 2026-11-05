@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 import sys
-from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -143,25 +141,3 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         "full_ancient_calendar_reconstructed": False,
         "real_world_efficacy": "not_tested",
     }
-
-
-def main() -> int:
-    p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--output", type=Path)
-    args = p.parse_args()
-    report = audit()
-    rendered = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
-    if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(rendered)
-    print(rendered, end="")
-    return (
-        0
-        if report["source_example_acceptance_passed"]
-        and report["selected_calendar_facts_passed"]
-        else 1
-    )
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

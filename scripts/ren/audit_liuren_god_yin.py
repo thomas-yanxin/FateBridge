@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -175,32 +174,3 @@ def audit() -> dict[str, Any]:
         real_world_validation="deferred_by_user",
         goal_complete=False,
     )
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", required=True, type=Path)
-    args = parser.parse_args()
-    result = audit()
-    args.output.write_text(
-        json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
-    )
-    print(
-        json.dumps(
-            {
-                k: result[k]
-                for k in [
-                    "original_examples_matched",
-                    "synthetic_board_count",
-                    "synthetic_god_rows_checked",
-                    "engineering_checks_passed",
-                    "goal_complete",
-                ]
-            }
-        )
-    )
-    return 0 if result["engineering_checks_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

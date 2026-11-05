@@ -24,7 +24,7 @@
 
 按[快速入门](getting-started.md)安装后，从仓库根目录运行。REST 需先启动服务，并按服务配置提供 API Key。
 
-示例按用途汇总于[请求索引](examples/README.md)。可复制 [独立宅盘请求](examples/fengshui-xuankong.json) 和 [基础三法＋宅盘＋年星合参](examples/fengshui-xuankong-with-annual.json)。
+示例按用途汇总于[请求索引](examples/README.md)。可复制 [独立宅盘请求](examples/fengshui-xuankong.json) 和 [八宅、金锁、年星与宅盘合参](examples/fengshui-home.json)。
 
 ```json
 {
@@ -44,7 +44,7 @@ curl -X POST http://localhost:8010/api/fengshui/xuankong_natal \
   --data-binary @docs/examples/fengshui-xuankong.json
 
 uv run --locked --extra dev fatebridge fengshui_xuankong_natal --request-file docs/examples/fengshui-xuankong.json
-uv run --locked --extra dev fatebridge fengshui_assess --request-file docs/examples/fengshui-xuankong-with-annual.json
+uv run --locked --extra dev fatebridge fengshui_assess --request-file docs/examples/fengshui-home.json
 uv run --locked --extra dev fatebridge describe fengshui_xuankong_natal
 ```
 

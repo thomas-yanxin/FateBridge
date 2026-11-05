@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import itertools
 import json
@@ -182,24 +181,3 @@ def audit() -> dict[str, Any]:
         goal_complete=False,
         reality_validation="deferred_by_user",
     )
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    if args.output.exists():
-        raise FileExistsError(args.output)
-    result = audit()
-    args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {k: v for k, v in result.items() if not k.endswith("_rows")},
-            ensure_ascii=False,
-        )
-    )
-    raise SystemExit(0 if result["engineering_checks_passed"] else 1)
-
-
-if __name__ == "__main__":
-    main()

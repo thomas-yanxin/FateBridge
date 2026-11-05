@@ -145,7 +145,7 @@ def test_qualification_nested_leaf_and_typo(valid, surface_calls):
 def test_same_run_control_and_raw_opposition_sha(rest, tmp_path, capsys, monkeypatch):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "current-void-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)

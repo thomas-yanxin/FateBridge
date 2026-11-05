@@ -1,8 +1,6 @@
 """The physical join must retain source paths, center and unresolved lodgings."""
 
-import json
 from copy import deepcopy
-from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -124,14 +122,26 @@ def test_public_join_contract_rejects_numerical_facts_as_strings():
         )
 
 
-def test_frozen_source_profiles_still_resolve_to_their_own_boards():
-    path = (
-        Path(__file__).parents[1] / "golden/snapshots/api_divination_sanshiunited.json"
+def test_source_profiles_resolve_in_the_current_default_year_calculation():
+    # Keep the fictional request; retire its rejected accNum=0 placeholder.
+    result = calculate_sanshiunited_analysis(
+        date="2028-04-06",
+        time="09:33:00",
+        zone="+08:00",
+        lon="121e28",
+        lat="31n13",
+        use_true_solar_time=True,
+        liureng_guiren_profile="liuren_common_v1",
+        liureng_is_diurnal=False,
+        liureng_yue="申",
+        qimen_options={"layout": "direct"},
     )
-    frozen = json.loads(path.read_text())
-    for profiles in frozen["synthesis"]["source_profiles"].values():
+    assert result["taiyi"]["calendar_summary"]["calculation_mode"] == "year"
+    assert {"qimen", "liureng"} <= result["synthesis"]["source_profiles"].keys()
+    for profiles in result["synthesis"]["source_profiles"].values():
+        assert profiles
         for profile in profiles:
-            original = resolve(frozen, profile["source_path"])
+            original = resolve(result, profile["source_path"])
             assert profile["unresolved_count"] == len(original.get("unresolved", []))
             for key, value in profile.items():
                 if key not in {"source_path", "source_title", "unresolved_count"}:

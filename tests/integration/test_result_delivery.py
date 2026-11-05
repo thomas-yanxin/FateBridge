@@ -20,14 +20,7 @@ from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import ParameterError
 from fatebridge.utils.private_files import ensure_private_directory, open_private_file
 from tests.fixtures.mcp_receipt import assert_same_run_receipt
-
-
-@pytest.fixture
-def store(tmp_path, monkeypatch):
-    result = delivery.ResultStore(tmp_path / "private")
-    monkeypatch.setattr(delivery, "RESULT_STORE", result)
-    monkeypatch.setattr(api, "RESULT_STORE", result)
-    return result
+from tests.support.result_delivery import reconstruct, store
 
 
 def large_payload():
@@ -39,23 +32,6 @@ def large_payload():
         },
         "run_metadata": {"run_id": "original", "tool_name": "western_timing_analysis"},
     }
-
-
-def reconstruct(store, result_id, path=None):
-    parts = []
-    offset = 0
-    while True:
-        page = store.page(result_id, offset, path)
-        assert len(page["text"]) <= delivery.PAGE_CHARS
-        # Each envelope is valid JSON even when its text is a document fragment.
-        assert json.loads(json.dumps(page, ensure_ascii=False)) == page
-        parts.append(page["text"])
-        offset = page["next_offset"]
-        if offset is None:
-            break
-    text = "".join(parts)
-    assert hashlib.sha256(text.encode()).hexdigest() == page["sha256"]
-    return json.loads(text)
 
 
 @pytest.mark.parametrize("compact", [False, True])

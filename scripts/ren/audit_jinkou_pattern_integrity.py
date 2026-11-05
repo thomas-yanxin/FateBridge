@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import copy
 import hashlib
 import importlib.util
@@ -163,28 +162,3 @@ def audit() -> dict[str, Any]:
         goal_complete=False,
         model_invocations=0,
     )
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    result = audit()
-    args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-    print(
-        {
-            k: result[k]
-            for k in (
-                "corruption_probe_count",
-                "rejected_corruption_probes",
-                "unaltered_outputs_accepted",
-                "selected_integrity_checks_passed",
-                "goal_complete",
-            )
-        }
-    )
-    return 0 if result["selected_integrity_checks_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

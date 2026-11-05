@@ -16,23 +16,67 @@ from fatebridge.core.metaphysics.taiyi_year import cyclic_core
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_dangshi_case_v41"
-FREEZE = "2af3019b0654def7551606b36f682af1059599565991ca57e98bf7527580cf74"
+FREEZE = "aa2c0929a54a50f68b162cd7210e758b8b92a3f4036b858da3bad4ca8fe0b13f"
 
 
-def source_readings() -> dict[str, Any]:
-    if hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest() != FREEZE:
+def source_readings(corpus: Path = CORPUS) -> dict[str, Any]:
+    raw = (corpus / "freeze-original.json").read_bytes()
+    if hashlib.sha256(raw).hexdigest() != FREEZE:
         raise ValueError("Dangshi source freeze changed")
-    frozen = json.loads((CORPUS / "freeze.json").read_text())
-    for base, key in ((CORPUS, "files"), (ROOT, "prior_sources")):
-        for name, expected in frozen[key].items():
-            if hashlib.sha256((base / name).read_bytes()).hexdigest() != expected:
-                raise ValueError(f"Frozen source changed: {name}")
-    result: dict[str, Any] = json.loads((CORPUS / "readings.json").read_text())
+    original = json.loads(raw)
+    frozen = json.loads((corpus / "freeze.json").read_text())
+    noble_path = "tests/fixtures/taiyi_dangshi_noble_v40/freeze.json"
+    noble_corpus = (ROOT / noble_path).parent
+    noble_original_raw = (noble_corpus / "freeze-original.json").read_bytes()
+    if (
+        hashlib.sha256(noble_original_raw).hexdigest()
+        != original["prior_sources"][noble_path]
+    ):
+        raise ValueError("Dangshi original noble source commitment changed")
+    noble_original = json.loads(noble_original_raw)
+    noble_raw = (ROOT / noble_path).read_bytes()
+    noble = json.loads(noble_raw)
+    # Process reports were archived; retain both original commitments and
+    # require their source-only descendants to preserve every source binding.
+    if noble != {
+        **noble_original,
+        "prior_sources": {
+            name: digest
+            for name, digest in noble_original["prior_sources"].items()
+            if name.startswith("tests/fixtures/")
+        },
+    }:
+        raise ValueError("Dangshi noble source projection changed")
+    prior_sources = {
+        name: digest
+        for name, digest in original["prior_sources"].items()
+        if name.startswith("tests/fixtures/")
+    }
+    prior_sources[noble_path] = hashlib.sha256(noble_raw).hexdigest()
+    if frozen != {**original, "prior_sources": prior_sources}:
+        raise ValueError("Dangshi case source projection changed")
+    for folder, manifest in ((noble_corpus, noble), (corpus, frozen)):
+        for base, key in ((folder, "files"), (ROOT, "prior_sources")):
+            for name, expected in manifest[key].items():
+                if hashlib.sha256((base / name).read_bytes()).hexdigest() != expected:
+                    raise ValueError(f"Frozen source changed: {name}")
+    result: dict[str, Any] = json.loads((corpus / "readings.json").read_text())
     return result
 
 
 def audit() -> dict[str, Any]:
     source = source_readings()
+    collation = json.loads((CORPUS / "collation.json").read_text())
+    original = json.loads((CORPUS / "freeze-original.json").read_text())
+    if collation["source_case_freeze_sha256"] != FREEZE or any(
+        original["prior_sources"].get(witness["file"]) != witness["sha256"]
+        for witness in collation["witnesses"]
+    ):
+        raise ValueError("Dangshi collation source binding changed")
+    if collation["literal_variant"]["readings"] != {
+        edition["id"]: edition["marker_gods"][-1] for edition in source["editions"]
+    }:
+        raise ValueError("Dangshi collation replaced an edition reading")
     args = source["conditional_inputs"]
     core = cyclic_core(args["cycle_index"], yin=args["yin"])
     core_rows = [
@@ -95,6 +139,13 @@ def audit() -> dict[str, Any]:
                             "compatible_with_sector_candidates": compatible,
                             "unique_direct_branch_match": unique,
                             "unselected_lodging": actual["status"] == "not_assessed",
+                            # Reverse constraints use the known printed answer;
+                            # they never select or validate a general lodging rule.
+                            "source_constrained_earth_branches": [
+                                r["earth_branch"]
+                                for r in candidates
+                                if expected is not None and r["god"] == expected
+                            ],
                             "status": (
                                 "unrecognized_source_literal"
                                 if expected is None
@@ -135,6 +186,11 @@ def audit() -> dict[str, Any]:
                     "profile": profile,
                     "is_diurnal": is_day,
                     "matches_explicit_source_morning_condition": is_day is True,
+                    "control_role": (
+                        "explicit_source_morning_condition"
+                        if is_day
+                        else "predeclared_modern_night_negative_control"
+                    ),
                     "noble_start_branch": layout["noble_start_branch"],
                     "noble_earth_branch": layout["noble_earth_branch"],
                     "is_reverse": layout["is_reverse"],
@@ -153,6 +209,7 @@ def audit() -> dict[str, Any]:
             args["hour_branch"], None
         ),
         "controls": controls,
+        "source_collation": collation,
         "acceptance_limits": source["acceptance_limits"],
         "new_independent_source_cases": 0,
         "new_complete_dated_joint_cases_passed": 0,

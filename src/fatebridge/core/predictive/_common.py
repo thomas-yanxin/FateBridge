@@ -1,11 +1,10 @@
-"""西占推运共享底座：导入、常量与跨技法工具函数。"""
+"""西占推运共享常量与跨技法计算函数。"""
 
 from __future__ import annotations
 
 import math
 from calendar import monthrange
-from collections import Counter
-from datetime import datetime, timedelta
+from datetime import datetime
 from fractions import Fraction
 from typing import Any, Dict, List, Mapping, Optional
 
@@ -26,16 +25,8 @@ from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.astrology_tables import (
     EGYPTIAN_BOUNDS_BY_SIGN as EGYPTIAN_BOUNDS_BY_SIGN,
 )
-from fatebridge.core.astrology_tables import (  # Predictive reference tables.
-    RULER_BY_SIGN,
-    SIGN_LABELS_ZH,
-    SIGNS,
-)
-from fatebridge.core.ephemeris_runtime import (
-    ephemeris_call,
-    preserve_ephemeris_path,
-    swe,
-)
+from fatebridge.core.astrology_tables import SIGN_LABELS_ZH, SIGNS
+from fatebridge.core.ephemeris_runtime import ephemeris_call, swe
 from fatebridge.core.execution_context import current_datetime
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
 
@@ -56,15 +47,6 @@ TRANSIT_POINT_NAMES = [
     "Uranus",
     "Neptune",
     "Pluto",
-]
-TRADITIONAL_PLANETS = [
-    "Sun",
-    "Moon",
-    "Mercury",
-    "Venus",
-    "Mars",
-    "Jupiter",
-    "Saturn",
 ]
 
 POINT_ATTRIBUTE_NAMES = {
@@ -266,23 +248,6 @@ def resolve_local_birthday_anniversary(
         birth_local_datetime.second,
         birth_local_datetime.microsecond,
         tzinfo=tzinfo or birth_local_datetime.tzinfo,
-    )
-
-
-def add_months(moment: datetime, months: int) -> datetime:
-    month_index = (moment.month - 1) + months
-    target_year = moment.year + (month_index // 12)
-    target_month = (month_index % 12) + 1
-    target_day = min(moment.day, monthrange(target_year, target_month)[1])
-    return datetime(
-        target_year,
-        target_month,
-        target_day,
-        moment.hour,
-        moment.minute,
-        moment.second,
-        moment.microsecond,
-        tzinfo=moment.tzinfo,
     )
 
 

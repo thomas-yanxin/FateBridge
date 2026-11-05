@@ -24,6 +24,12 @@ from fatebridge.core.almanac import (
     localize_datetime,
 )
 from fatebridge.core.bazi_evidence import build_natal_evidence, build_topic_evidence
+from fatebridge.core.bazi_star_tables import (
+    HONG_LUAN_TARGETS,
+    PEACH_BLOSSOM_TARGETS,
+    TIAN_XI_TARGETS,
+    WEN_CHANG_TARGETS,
+)
 from fatebridge.core.clash_comparison import clash_comparison_snapshot_lines
 from fatebridge.core.classical import (
     build_classical_overview,
@@ -86,12 +92,6 @@ MONTH_HOUR_ORDER = [
     "丑",
 ]
 
-PEACH_BLOSSOM_TARGETS = (
-    (("申", "子", "辰"), "酉"),
-    (("寅", "午", "戌"), "卯"),
-    (("亥", "卯", "未"), "子"),
-    (("巳", "酉", "丑"), "午"),
-)
 
 TRAVEL_HORSE_TARGETS = (
     (("申", "子", "辰"), "寅"),
@@ -120,18 +120,6 @@ TIAN_YI_TARGETS = {
     "癸": ["卯", "巳"],
 }
 
-WEN_CHANG_TARGETS = {
-    "甲": "巳",
-    "乙": "午",
-    "丙": "申",
-    "丁": "酉",
-    "戊": "申",
-    "己": "酉",
-    "庚": "亥",
-    "辛": "子",
-    "壬": "寅",
-    "癸": "卯",
-}
 
 # --- 天德贵人 (Heavenly Virtue Noble) ---
 # 按月支查天德所在
@@ -234,38 +222,6 @@ GUA_SU_TARGETS = {
     "申": "未",
     "酉": "未",
     "戌": "未",
-    "亥": "戌",
-}
-
-# --- 红鸾 (Red Phoenix) ---
-HONG_LUAN_TARGETS = {
-    "子": "卯",
-    "丑": "寅",
-    "寅": "丑",
-    "卯": "子",
-    "辰": "亥",
-    "巳": "戌",
-    "午": "酉",
-    "未": "申",
-    "申": "未",
-    "酉": "午",
-    "戌": "巳",
-    "亥": "辰",
-}
-
-# --- 天喜 (Heavenly Joy) ---
-TIAN_XI_TARGETS = {
-    "子": "酉",
-    "丑": "申",
-    "寅": "未",
-    "卯": "午",
-    "辰": "巳",
-    "巳": "辰",
-    "午": "卯",
-    "未": "寅",
-    "申": "丑",
-    "酉": "子",
-    "戌": "亥",
     "亥": "戌",
 }
 

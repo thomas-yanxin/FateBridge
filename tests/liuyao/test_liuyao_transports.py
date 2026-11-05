@@ -8,12 +8,14 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.cli import run as cli_run
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.support.transports import SPECS, business, native, surface_calls
+from tests.support.transports import SPECS, business, native
+from tests.support.transports import rest as rest
+from tests.support.transports import surface_calls
 
 
 def assert_same_run_receipt(store, shaped, original):
     """Restore an explicitly deferred runtime before comparing exact receipts."""
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     inline = dict(shaped["run_metadata"])
     evidence = inline.get("calculation_evidence")
@@ -410,7 +412,7 @@ def test_large_classical_evidence_is_read_losslessly_from_the_same_run(
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
     from fatebridge.application.examples import suggested_fields
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "private-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)

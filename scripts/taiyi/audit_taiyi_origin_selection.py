@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 import os
@@ -182,32 +181,3 @@ def audit() -> dict[str, Any]:
         whole_explanation_fidelity_acceptance_passed=False,
         whole_goal_complete=False,
     )
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    result = audit()
-    args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {
-                k: result[k]
-                for k in [
-                    "civil_rows",
-                    "numeric_controls_passed",
-                    "fidelity_receipts_passed",
-                    "activation_classically_adjudicated",
-                ]
-            }
-        )
-    )
-    return int(
-        result["numeric_controls_passed"] != 96
-        or result["fidelity_receipts_passed"] != 96
-    )
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

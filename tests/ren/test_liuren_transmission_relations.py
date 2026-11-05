@@ -18,6 +18,8 @@ from fatebridge.core.metaphysics.liureng_transmission_relations import (
 from fatebridge.core.output_liuren_transmission_relations import (
     LiurenTransmissionRelations,
 )
+from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
+from tests.support.ren_anchors import anchor_output as raw
 from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -28,15 +30,6 @@ assert MOD and MOD.loader
 AUDIT = importlib.util.module_from_spec(MOD)
 MOD.loader.exec_module(AUDIT)
 RULES, CASES = AUDIT.reference()
-PAYLOADS = json.loads((ROOT / "tests/fixtures/ren_anchors_v1/faults.json").read_text())[
-    "payloads"
-]
-
-
-def raw(key):
-    spec = SPECS[key]
-    fn, args, kw = spec.bind(spec.request_model.model_validate(PAYLOADS[key]))
-    return fn(*args, **kw)
 
 
 def test_literal_and_synthetic_evidence_have_separate_denominators():

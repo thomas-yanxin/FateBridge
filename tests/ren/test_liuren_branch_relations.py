@@ -19,13 +19,12 @@ from fatebridge.core.metaphysics.liureng_branch_relations import (
 from fatebridge.core.output_liuren_branches import LiurenBranchRelations, rebuild
 from scripts.ren.audit_liuren_branch_relations import CORPUS, FACTS, audit, reference
 from scripts.ren.audit_ren_classical import make_seed
+from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
+from tests.support.ren_anchors import anchor_output as raw
 from tests.support.transports import AS_OF, SPECS, business, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 REF = reference()
-PAYLOADS = json.loads((ROOT / "tests/fixtures/ren_anchors_v1/faults.json").read_text())[
-    "payloads"
-]
 
 
 @pytest.fixture(autouse=True)
@@ -43,13 +42,6 @@ def native_files(monkeypatch):
         yield
     finally:
         configure_ephemeris_path(previous)
-
-
-def raw(key="liureng_gods", **extra):
-    spec = SPECS[key]
-    payload = {**PAYLOADS[key], **extra}
-    fn, args, kw = spec.bind(spec.request_model.model_validate(payload))
-    return fn(*args, **kw)
 
 
 @pytest.mark.parametrize("case", REF["synthetic_cases"])

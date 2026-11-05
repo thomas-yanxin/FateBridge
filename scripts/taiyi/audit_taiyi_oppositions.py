@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -90,20 +89,3 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         "rows": results,
         "scope": "24宫数与12对宫几何分列；格10/對2是原词统计，不算名称预测命中率。阳53附带外迫的所核不符保留，其他参照未裁定。12循环注记不是12完整盘或12历史应验。",
     }
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
-    report = audit()
-    text = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
-    if args.output:
-        args.output.write_text(text)
-    else:
-        print(text, end="")
-    return 0 if report["whole_classic_acceptance_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

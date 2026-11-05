@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from itertools import permutations
@@ -164,18 +163,3 @@ def audit() -> dict[str, Any]:
         full_classical_conformance=False,
         goal_complete=False,
     )
-
-
-def main() -> int:
-    p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--output", type=Path, required=True)
-    a = p.parse_args()
-    r = audit()
-    s = json.dumps(r, ensure_ascii=False, indent=2) + "\n"
-    a.output.write_text(s)
-    print(s)
-    return 0 if r["engineering_checks_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

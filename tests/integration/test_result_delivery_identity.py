@@ -17,7 +17,7 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import ParameterError
 from tests.fixtures.mcp_receipt import assert_same_run_receipt
-from tests.integration.test_result_delivery import reconstruct, store  # noqa: F401
+from tests.support.result_delivery import reconstruct, store  # noqa: F401
 from tests.support.transports import rest
 
 

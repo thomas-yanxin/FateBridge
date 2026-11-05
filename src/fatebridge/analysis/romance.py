@@ -20,6 +20,12 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
+from fatebridge.core.bazi_star_tables import (
+    HONG_LUAN_TARGETS,
+    PEACH_BLOSSOM_TARGETS,
+    TIAN_XI_TARGETS,
+)
+
 from ..utils.data import (
     TenGod,
     check_branch_combination,
@@ -28,45 +34,6 @@ from ..utils.data import (
     normalize_gender,
     sum_ten_god_weight,
 )
-
-# 桃花（咸池）：三合局 -> 桃花地支
-_PEACH_TARGETS = (
-    (("申", "子", "辰"), "酉"),
-    (("寅", "午", "戌"), "卯"),
-    (("亥", "卯", "未"), "子"),
-    (("巳", "酉", "丑"), "午"),
-)
-
-# 红鸾（年支 -> 红鸾地支）
-_HONGLUAN = {
-    "子": "卯",
-    "丑": "寅",
-    "寅": "丑",
-    "卯": "子",
-    "辰": "亥",
-    "巳": "戌",
-    "午": "酉",
-    "未": "申",
-    "申": "未",
-    "酉": "午",
-    "戌": "巳",
-    "亥": "辰",
-}
-# 天喜（年支 -> 天喜地支，红鸾对宫）
-_TIANXI = {
-    "子": "酉",
-    "丑": "申",
-    "寅": "未",
-    "卯": "午",
-    "辰": "巳",
-    "巳": "辰",
-    "午": "卯",
-    "未": "寅",
-    "申": "丑",
-    "酉": "子",
-    "戌": "亥",
-    "亥": "戌",
-}
 
 
 class RomanceAnalysis:
@@ -105,7 +72,7 @@ class RomanceAnalysis:
     def _peach_targets(branches: Dict[str, str]) -> set:
         triggers = {branches.get("year"), branches.get("day")}
         targets = set()
-        for group, target in _PEACH_TARGETS:
+        for group, target in PEACH_BLOSSOM_TARGETS:
             if triggers & set(group):
                 targets.add(target)
         return targets
@@ -136,8 +103,8 @@ class RomanceAnalysis:
         pillars: Dict[str, Tuple[str, str]], branches: Dict[str, str]
     ) -> Dict[str, Any]:
         year_branch = branches.get("year", "")
-        hongluan = _HONGLUAN.get(year_branch)
-        tianxi = _TIANXI.get(year_branch)
+        hongluan = HONG_LUAN_TARGETS.get(year_branch)
+        tianxi = TIAN_XI_TARGETS.get(year_branch)
         luan_hits = [n for n, b in branches.items() if b == hongluan]
         xi_hits = [n for n, b in branches.items() if b == tianxi]
         notes: List[str] = []
@@ -243,8 +210,8 @@ class RomanceAnalysis:
         signals: List[str] = []
         year_branch = pillars["year"][1]
         peach_targets = set(peach["peach_branches"])
-        hongluan = _HONGLUAN.get(year_branch)
-        tianxi = _TIANXI.get(year_branch)
+        hongluan = HONG_LUAN_TARGETS.get(year_branch)
+        tianxi = TIAN_XI_TARGETS.get(year_branch)
 
         if norm_gender == "male":
             star_gods: Tuple[TenGod, ...] = (

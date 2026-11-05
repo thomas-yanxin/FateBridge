@@ -7,7 +7,7 @@ import pytest
 
 from fatebridge.application.examples import suggested_fields
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.integration.test_result_delivery import reconstruct, store
+from tests.support.result_delivery import reconstruct, store
 from tests.support.transports import (
     SPECS,
     business,

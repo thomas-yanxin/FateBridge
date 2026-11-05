@@ -15,8 +15,8 @@ from fatebridge.core.bazi_evidence import build_natal_evidence, build_topic_evid
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.output_bazi_evidence import BaziEvidenceChain
 from fatebridge.core.strength import assess_strength
-from tests.integration.test_result_delivery import reconstruct
-from tests.integration.test_result_delivery import store as _shared_store
+from tests.support.result_delivery import reconstruct
+from tests.support.result_delivery import store as _shared_store
 from tests.support.transports import SPECS, business, call_cli, inputs, native
 from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls

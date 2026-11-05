@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import copy
 import hashlib
 import importlib.util
@@ -187,32 +186,3 @@ def audit() -> dict[str, Any]:
         implementation_unchanged=before == {n: sha(ROOT / n) for n in watch},
         source_freeze_sha256=FROZEN,
     )
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", required=True, type=Path)
-    args = parser.parse_args()
-    report = audit()
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {
-                k: report[k]
-                for k in (
-                    "synthetic_fault_count",
-                    "synthetic_rejected_count",
-                    "new_witness_matched_count",
-                    "older_scan_matched_count",
-                    "engineering_rejection_gate_passed",
-                    "original_classical_gate_passed",
-                )
-            }
-        )
-    )
-    return 0 if report["engineering_rejection_gate_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

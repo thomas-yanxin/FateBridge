@@ -15,7 +15,10 @@ from datetime import datetime
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from ...utils.data import (
+    BRANCH_COMBINATIONS,
+    BRANCH_CONFLICTS,
     BRANCH_ELEMENTS,
+    BRANCH_HARMS,
     EARTHLY_BRANCHES,
     HEAVENLY_STEMS,
     STEM_ELEMENTS,
@@ -52,50 +55,11 @@ KONGWANG_BY_XUN_HEAD = {
     "甲寅": "子丑空",
 }
 
-SIX_HARMONY_BRANCHES = {
-    "子": "丑",
-    "丑": "子",
-    "寅": "亥",
-    "亥": "寅",
-    "卯": "戌",
-    "戌": "卯",
-    "辰": "酉",
-    "酉": "辰",
-    "巳": "申",
-    "申": "巳",
-    "午": "未",
-    "未": "午",
-}
+SIX_HARMONY_BRANCHES = BRANCH_COMBINATIONS
 
-SIX_CLASH_BRANCHES = {
-    "子": "午",
-    "午": "子",
-    "丑": "未",
-    "未": "丑",
-    "寅": "申",
-    "申": "寅",
-    "卯": "酉",
-    "酉": "卯",
-    "辰": "戌",
-    "戌": "辰",
-    "巳": "亥",
-    "亥": "巳",
-}
+SIX_CLASH_BRANCHES = BRANCH_CONFLICTS
 
-SIX_HARM_BRANCHES = {
-    "子": "未",
-    "未": "子",
-    "丑": "午",
-    "午": "丑",
-    "寅": "巳",
-    "巳": "寅",
-    "卯": "辰",
-    "辰": "卯",
-    "申": "亥",
-    "亥": "申",
-    "酉": "戌",
-    "戌": "酉",
-}
+SIX_HARM_BRANCHES = BRANCH_HARMS
 
 # 大六壬 月将（神后…）与昼夜贵人/贵人顺序——金口诀与太乙也复用，故归 common。
 YUE_JIANG_NAMES = {

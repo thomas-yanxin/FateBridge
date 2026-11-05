@@ -6,7 +6,6 @@ constraints of these selected formulae, not historical emendations or answers.
 
 from __future__ import annotations
 
-import argparse
 import copy
 import hashlib
 import json
@@ -311,19 +310,3 @@ def audit() -> dict[str, Any]:
         goal_complete=False,
         scope="All64 source entries retained; selected symbolic construction, no real calendar dates or best-fit source edits",
     )
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    value = audit()
-    args.output.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps({k: v for k, v in value.items() if k != "rows"}, ensure_ascii=False)
-    )
-    raise SystemExit(0 if value["arithmetic_checks_passed"] else 1)
-
-
-if __name__ == "__main__":
-    main()

@@ -155,9 +155,6 @@ def test_need_to_song_matches_zengshan_chapter_seven_without_static_transformati
         "兄弟",
     ]
 
-
-def test_every_rule_trace_points_to_actual_returned_facts():
-    result = build_sixyao_result(**INPUT, gua_code="111010", changed_code="010111")
     trace = result["liuyao_evidence"]["rule_trace"]
     assert {row["rule_id"] for row in trace} == {
         "palace_shiying_nazhi_kinship_six_gods",

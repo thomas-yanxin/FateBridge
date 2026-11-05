@@ -13,23 +13,12 @@ from importlib.util import find_spec
 from pydantic import JsonValue
 
 from fatebridge.core.astro import runtime
+from fatebridge.core.astro.reference import PHYSICAL_BODIES
 from fatebridge.utils.errors import EphemerisSourceError
 
 METHOD_ID = "swiss_barycentric_sun_monopole_iau2006_v1"
 LIGHT_SPEED_AU_DAY = 299792458 * 86400 / 149597870700
 DEFLECTION_LIMITER = 1e-11
-PHYSICAL_BODIES = (
-    "Sun",
-    "Moon",
-    "Mercury",
-    "Venus",
-    "Mars",
-    "Jupiter",
-    "Saturn",
-    "Uranus",
-    "Neptune",
-    "Pluto",
-)
 
 
 def point_mass_positions(

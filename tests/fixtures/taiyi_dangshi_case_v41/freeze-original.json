@@ -1,0 +1,23 @@
+{
+  "at_utc": "2026-10-25T06:07:58.040036+00:00",
+  "scope": "Before new numerical audit, source-case replay or production edits; known older results and manual derivation disclosed.",
+  "files": {
+    "readings.json": "329459a81a9e20a244099bedd79a991f2922f98b15bb3d064fb7f2540d3c6174",
+    "sector-basis.json": "9f4fad4e8b9bcffb6fc00cd027e49e4b1e7e0827918481e78c88050f0acf6255"
+  },
+  "prior_sources": {
+    "tests/fixtures/taiyi_dangshi_noble_v40/freeze.json": "2ad83f1a72c0c941dd83f2ff5f4247871ae18227be9a8bdcb06baaa08b0de47c",
+    "tests/fixtures/taiyi_dangshi_noble_v40/ming-native-page24.png": "c91b6d87d8ca783181747a0e3bbbc32fe1d75a2310cc7998cd3f133d4c1e8ef7",
+    "tests/fixtures/taiyi_dangshi_noble_v40/siku-native-page56.png": "a6d07a1f8f4dbfc05d776f5c486093505749e9241e573939d5996b4e10274a0b",
+    "tests/fixtures/taiyi_dangshi_noble_v40/siku-native-page57.png": "188e76695b163bb8b5ef1adbdea1e0ee93cf9b711be7b1bc1b57a59f66e06733",
+    "tests/fixtures/taiyi_gate_sectors_v1/manifest.json": "56a40036f077a0ea79adf41f22224e0e45a9220c02f06d5a2ea7745f9e8d5934",
+    "tests/fixtures/taiyi_gate_sectors_v1/sectors.json": "02f1e61a476ff4aae4ef099df9cbf0554008b11499a3915cd14caff94f76f3e0",
+    "tests/fixtures/taiyi_jinjing_v2/worked-cases.json": "bba3a068f3ad6150e489c93334108a92c66acfde04f66c79a4697cc147a39c9d",
+    "docs/validation/taiyi-jinjing-v25/model-summary.json": "e2d4de086cbb76b8e52406582b476fc4b49b0a243b6756ab1cdcf92e0af770dd",
+    "docs/validation/taiyi-jinjing-v40/summary.json": "6edf9d0e8ae1ea03548183dbe89a1e65587f077ea4862ee663f64bc63225ec6b"
+  },
+  "independent_experts": 0,
+  "blind": false,
+  "new_models": 0,
+  "whole_goal_complete": false
+}

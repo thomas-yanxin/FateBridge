@@ -12,6 +12,7 @@ import random
 from typing import Any, Dict, List, Optional, Tuple
 
 from fatebridge.utils.civil_clock import parse_iso_datetime
+from fatebridge.utils.data import BRANCH_CONFLICTS
 from fatebridge.utils.places import DEFAULT_BIRTH_TIMEZONE
 from fatebridge.utils.timezones import validate_local_clock
 
@@ -191,22 +192,6 @@ _LIUHE_HEXAGRAM_CODES = frozenset(
 )
 
 
-_BRANCH_CLASH = {
-    "子": "午",
-    "午": "子",
-    "丑": "未",
-    "未": "丑",
-    "寅": "申",
-    "申": "寅",
-    "卯": "酉",
-    "酉": "卯",
-    "辰": "戌",
-    "戌": "辰",
-    "巳": "亥",
-    "亥": "巳",
-}
-
-
 def _detect_sixyao_patterns(
     current_code: str,
     changed_code: str,
@@ -243,7 +228,7 @@ def _detect_sixyao_patterns(
             continue
         if orig_branch == new_branch:
             fu_count += 1
-        elif _BRANCH_CLASH.get(orig_branch) == new_branch:
+        elif BRANCH_CONFLICTS.get(orig_branch) == new_branch:
             fan_count += 1
     if fu_count and fu_count == len(moving_indices):
         patterns.append(

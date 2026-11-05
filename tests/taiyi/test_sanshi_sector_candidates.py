@@ -3,6 +3,7 @@
 import asyncio
 import hashlib
 import json
+import shutil
 from copy import deepcopy
 from pathlib import Path
 
@@ -18,20 +19,70 @@ from fatebridge.core.output_sanshi import SanshiSynthesis
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.tool_catalog import CATALOG
+from scripts.taiyi import audit_taiyi_dangshi_case as source_audit
 from scripts.taiyi.audit_taiyi_dangshi_case import audit
+from scripts.taiyi.audit_taiyi_dangshi_case import source_readings as readings
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/taiyi_dangshi_case_v41"
 FREEZE = "aa2c0929a54a50f68b162cd7210e758b8b92a3f4036b858da3bad4ca8fe0b13f"
 
 
-def readings():
-    assert hashlib.sha256((CORPUS / "freeze.json").read_bytes()).hexdigest() == FREEZE
-    frozen = json.loads((CORPUS / "freeze.json").read_text())
-    for base, key in ((CORPUS, "files"), (ROOT, "prior_sources")):
-        for name, sha in frozen[key].items():
-            assert hashlib.sha256((base / name).read_bytes()).hexdigest() == sha
-    return json.loads((CORPUS / "readings.json").read_text())
+@pytest.mark.parametrize(
+    "fault",
+    [
+        "original_case_freeze",
+        "original_noble_freeze",
+        "missing_source_binding",
+        "reading_and_rehashed_manifest",
+        "noble_rebinding_and_rehashed_case",
+        "source_image_bytes",
+    ],
+)
+def test_original_source_chain_rejects_replacement_and_coordinated_rehash(
+    tmp_path, monkeypatch, fault
+):
+    noble_name = "tests/fixtures/taiyi_dangshi_noble_v40"
+    case_name = "tests/fixtures/taiyi_dangshi_case_v41"
+    for name in (noble_name, case_name):
+        shutil.copytree(ROOT / name, tmp_path / name)
+    for name in (noble_name, case_name):
+        manifest = json.loads((ROOT / name / "freeze.json").read_text())
+        for path in manifest["prior_sources"]:
+            target = tmp_path / path
+            if not target.exists():
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / path, target)
+    corpus = tmp_path / case_name
+    noble = tmp_path / noble_name
+    manifest = json.loads((corpus / "freeze.json").read_text())
+    if fault in {"original_case_freeze", "original_noble_freeze"}:
+        folder = corpus if fault == "original_case_freeze" else noble
+        with (folder / "freeze-original.json").open("ab") as stream:
+            stream.write(b" ")
+    elif fault == "missing_source_binding":
+        manifest["prior_sources"].pop(noble_name + "/siku-native-page57.png")
+    elif fault == "reading_and_rehashed_manifest":
+        path = corpus / "readings.json"
+        data = json.loads(path.read_text())
+        data["manual_conditional_board_expected"][0]["god"] = "青龙"
+        path.write_text(json.dumps(data))
+        manifest["files"][path.name] = hashlib.sha256(path.read_bytes()).hexdigest()
+    elif fault == "noble_rebinding_and_rehashed_case":
+        path = noble / "freeze.json"
+        data = json.loads(path.read_text())
+        data["files"].pop("ming-native-page24.png")
+        path.write_text(json.dumps(data))
+        manifest["prior_sources"][noble_name + "/freeze.json"] = hashlib.sha256(
+            path.read_bytes()
+        ).hexdigest()
+    else:
+        with (noble / "siku-native-page57.png").open("ab") as stream:
+            stream.write(b"changed")
+    (corpus / "freeze.json").write_text(json.dumps(manifest))
+    monkeypatch.setattr(source_audit, "ROOT", tmp_path)
+    with pytest.raises(ValueError, match="changed"):
+        readings(corpus)
 
 
 def test_corner_lists_both_actual_branches_without_selecting_a_god():
@@ -147,6 +198,7 @@ def test_pure_layout_requires_explicit_symbolic_conditions(field, value):
 
 def test_source_case_preserves_edition_difference_and_unselected_lodging():
     report = audit()
+    assert report["source_freeze_sha256"] == FREEZE
     assert report["core_matching_rows"] == len(report["core_rows"]) == 10
     assert report["automatic_modern_diurnal_for_source_hour"]["is_diurnal"] is False
     for control in report["controls"]:
@@ -168,6 +220,77 @@ def test_source_case_preserves_edition_difference_and_unselected_lodging():
         assert not ming["whole_case_passed"] and not siku["whole_case_passed"]
     assert not report["whole_goal_complete"] and report["new_model_invocations"] == 0
     assert report["new_complete_dated_joint_cases_passed"] == 0
+
+
+def test_collation_keeps_the_facsimile_variant_separate_from_an_emendation():
+    review = audit()["source_collation"]
+    variant = review["literal_variant"]
+    assert review["source_case_freeze_sha256"] == FREEZE
+    assert variant["readings"] == {"ming": "天空", "siku": "天定"}
+    assert variant["siku_emendation_candidate"] == "天空"
+    assert variant["candidate_status"] == "plausible_emendation_not_adopted_as_literal"
+    assert not variant["same_god_alias_attested_in_reviewed_passages"]
+    assert not variant["frozen_reading_overwritten"]
+    witnesses = {row["id"]: row for row in review["witnesses"]}
+    assert witnesses["ming_case"]["literal"] == "客參將在天空下"
+    assert witnesses["siku_case"]["literal"] == "客參將在天定下"
+    assert witnesses["ming_god_roster"]["literal"] == "後六天空土"
+    assert witnesses["siku_same_leaf_parallel"]["literal"] == "常侍玄命在天空"
+
+
+def test_known_case_reverse_constraints_never_select_a_production_lodging():
+    report = audit()
+    review = report["source_collation"]["lodging_review"]
+    assert review["unrepresented_palaces"] == [1, 3, 5]
+    assert not review["independent_general_lodging_rule_found"]
+    assert not review["production_lodging_selected"]
+    for control in report["controls"]:
+        if not control["matches_explicit_source_morning_condition"]:
+            assert (
+                control["control_role"] == "predeclared_modern_night_negative_control"
+            )
+            continue
+        assert control["control_role"] == "explicit_source_morning_condition"
+        ming, siku = control["editions"]
+        # Read the existing hand board: 巳→午/青龙, 申→酉/太常,
+        # 卯→辰/六合, 午→未/天空. These are reverse constraints,
+        # not a newly established four-corner rule or independent cases.
+        assert [row["source_constrained_earth_branches"] for row in ming["rows"]] == [
+            ["巳"],
+            ["巳"],
+            ["申"],
+            ["卯"],
+            ["午"],
+        ]
+        assert siku["rows"][-1]["source_constrained_earth_branches"] == []
+        assert siku["rows"][-1]["normalized_source_god"] is None
+        for edition in (ming, siku):
+            for row in edition["rows"][:3]:
+                assert row["unselected_lodging"]
+                assert row["actual"]["status"] == "not_assessed"
+                assert not {"earth_branch", "god"} & row["actual"].keys()
+            assert not edition["whole_case_passed"]
+
+
+@pytest.mark.parametrize("fault", ["case_commitment", "page_commitment", "literal"])
+def test_collation_rejects_rebound_sources_and_silent_literal_correction(
+    tmp_path, monkeypatch, fault
+):
+    source = readings()
+    shutil.copyfile(CORPUS / "freeze-original.json", tmp_path / "freeze-original.json")
+    review = json.loads((CORPUS / "collation.json").read_text())
+    if fault == "case_commitment":
+        review["source_case_freeze_sha256"] = "0" * 64
+    elif fault == "page_commitment":
+        review["witnesses"][1]["sha256"] = "0" * 64
+    else:
+        review["literal_variant"]["readings"]["siku"] = "天空"
+    (tmp_path / "collation.json").write_text(json.dumps(review))
+    # Isolate the new collation boundary after verifying the unchanged raw case.
+    monkeypatch.setattr(source_audit, "source_readings", lambda: source)
+    monkeypatch.setattr(source_audit, "CORPUS", tmp_path)
+    with pytest.raises(ValueError, match="changed|replaced"):
+        audit()
 
 
 @pytest.fixture(scope="module")

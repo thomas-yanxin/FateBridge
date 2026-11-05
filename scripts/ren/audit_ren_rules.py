@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import importlib.util
 import json
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
@@ -49,24 +48,25 @@ def load_reference(corpus: Path = CORPUS) -> dict[str, Any]:
         for n in expected
         if n.endswith(".json")
     }
+    # Capture paths remain in the frozen source record; current readers use
+    # the maintained data location with the same independently pinned bytes.
+    data["calendar-sources"]["files"] = {
+        name.replace(
+            "tests/fixtures/fengshui_calendar_v1/", "tests/data/fengshui_calendar_v1/"
+        ): checksum
+        for name, checksum in data["calendar-sources"]["files"].items()
+    }
     for name, checksum in data["calendar-sources"]["files"].items():
         if sha(ROOT / name) != checksum:
             raise ValueError(f"Reference calendar source changed: {name}")
     return data
 
 
-def _prior(name: str):
-    spec = importlib.util.spec_from_file_location(name, ROOT / f"scripts/{name}.py")
-    assert spec and spec.loader
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
 def audit() -> dict[str, Any]:
     ref = load_reference()
-    v1 = _prior("audit_ren_classical")
-    v2 = _prior("audit_ren_depth")
+    from scripts.ren import audit_ren_classical as v1
+    from scripts.ren import audit_ren_depth as v2
+
     old = v2.load_reference()
     scan = v2.load_scan_reference()
     # Only after all source inventories have been verified, load production.

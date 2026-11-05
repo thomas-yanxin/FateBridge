@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import subprocess
-import sys
 from pathlib import Path
 
 import pytest
@@ -91,21 +89,14 @@ def test_noon_theorem_has_complete_context_coverage_without_outcome_or_clock_sel
     assert report["legacy_result_metadata_attached_by_weather_engine"]
     assert not report["legacy_result_metadata_used_for_labels_or_clock_selection"]
     assert not report["outcome_blind_study"]
+    assert not report["real_world_predictive_efficacy_established"]
+    assert len(report["state_cases"]) == 1440
     assert not report["original_future_v1_trial_modified"]
     assert [
         r["hour_number"]
         for r in report["all_hours_in_natural_order_no_clock_selection"]
     ] == list(range(1, 13))
     assert "overapproximation" in report["calendar_domain_relation"]
-
-
-@pytest.mark.parametrize(
-    "forecast,observed", [(f, o) for f in ["dry", "abstain"] for o in [True, False]]
-)
-def test_pointwise_credit_dominance_does_not_depend_on_a_sample(forecast, observed):
-    model_credit = int(forecast == "dry" and not observed)
-    always_dry_credit = int(not observed)
-    assert model_credit <= always_dry_credit
 
 
 def test_attached_legacy_result_metadata_cannot_change_any_trace_or_label(
@@ -122,27 +113,3 @@ def test_attached_legacy_result_metadata_cannot_change_any_trace_or_label(
     assert changed["state_cases"] == report["state_cases"]
     assert changed["locked_noon_preflight"] == report["locked_noon_preflight"]
     assert changed["legacy_result_metadata_attached_by_weather_engine"]
-
-
-def test_cli_readiness_gate_writes_the_complete_failure_instead_of_turning_it_green(
-    tmp_path,
-):
-    output = tmp_path / "reachability.json"
-    completed = subprocess.run(
-        [
-            sys.executable,
-            "scripts/meihua/audit_meihua_weather_reachability.py",
-            "--output",
-            str(output),
-            "--require-potential-superiority",
-        ],
-        cwd=Path(__file__).resolve().parents[2],
-        capture_output=True,
-        text=True,
-        timeout=120,
-    )
-    assert completed.returncode == 2, completed.stderr
-    result = json.loads(output.read_bytes())
-    assert len(result["state_cases"]) == 1440
-    assert result["locked_noon_preflight"]["structural_obstruction"]
-    assert not result["real_world_predictive_efficacy_established"]

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import copy
 import hashlib
 import json
@@ -51,17 +50,18 @@ def reference(corpus: Path = CORPUS) -> dict[str, Any]:
     return data
 
 
-def results(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+def results() -> tuple[dict[str, Any], dict[str, Any]]:
     from fatebridge.services.tool_catalog import CATALOG
+    from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS
 
     outputs = {}
-    for key, payload in data["payloads"].items():
+    for key, payload in ANCHOR_PAYLOADS.items():
         spec = next(s for s in CATALOG if s.key == key)
         request = spec.request_model.model_validate(payload)
         service, args, kwargs = spec.bind(request)
         outputs[key] = service(*args, **kwargs)
     spec = next(s for s in CATALOG if s.key == "jinkou")
-    donor = {**data["payloads"]["jinkou"], "analysis_day": 21}
+    donor = {**ANCHOR_PAYLOADS["jinkou"], "analysis_day": 21}
     service, args, kwargs = spec.bind(spec.request_model.model_validate(donor))
     return outputs, service(*args, **kwargs)
 
@@ -129,7 +129,7 @@ def audit() -> dict[str, Any]:
     from fatebridge.application.execution import OutputContractError, validate_output
     from fatebridge.services.tool_catalog import CATALOG
 
-    valid, donor = results(data)
+    valid, donor = results()
     specs = {s.key: s for s in CATALOG}
     for key, payload in valid.items():
         model = specs[key].output_model
@@ -170,6 +170,8 @@ def audit() -> dict[str, Any]:
         raise ValueError("Anchor source changed during audit")
     return dict(
         reference_sha256=sha(CORPUS / "freeze.json"),
+        request_fixture="tests/fixtures/ren_anchors.py",
+        request_scope="Frozen Ren inputs retained; retired Taiyi accNum omitted from current requests; original fault criteria unchanged.",
         implementation_sha256=after,
         valid_tool_count=len(valid),
         predeclared_fault_count=36,
@@ -186,25 +188,3 @@ def audit() -> dict[str, Any]:
         goal_complete=False,
         scope="Engineering anchor integrity under existing conventions; not independent verification of a civil date, a full original text, or free-text interpretation.",
     )
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    report = audit()
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
-    print(f"Rejected {report['rejected_fault_count']}/36 predeclared anchor faults")
-    print(
-        "Complete-service anchor deletion gate:",
-        report["completeness_rejection_passed"],
-    )
-    return (
-        0
-        if report["fault_rejection_passed"] and report["completeness_rejection_passed"]
-        else 1
-    )
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

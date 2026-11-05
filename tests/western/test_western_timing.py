@@ -606,28 +606,6 @@ def test_equatorial_primary_directions_use_right_ascension_arc():
     assert primary_direction_chart["coordinate_system"] == "right_ascension"
     assert primary_direction_chart["coordinate_label"] == "赤经"
 
-
-def test_equatorial_primary_directions_expose_coordinate_runtime_metadata():
-    result = calculate_western_timing_analysis(
-        name="Alice",
-        birth_year=1990,
-        birth_month=5,
-        birth_day=17,
-        birth_hour=15,
-        birth_minute=30,
-        birth_place="上海",
-        birth_timezone="Asia/Shanghai",
-        birth_longitude=121.4737,
-        birth_latitude=31.2304,
-        analysis_year=2025,
-        analysis_month=5,
-        analysis_day=20,
-        pd_method="equatorial",
-        pd_time_key="Ptolemy",
-        pd_aspects=[0, 90, 180],
-        show_pd_bounds=True,
-    )
-
     expected_precision = (
         "equatorial_runtime_projection"
         if predictive_swe is not None

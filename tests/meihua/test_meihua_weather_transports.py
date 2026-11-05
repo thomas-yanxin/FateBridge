@@ -10,10 +10,10 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import suggested_fields
 from fatebridge.mcp_server import create_mcp_app
-from tests.integration.test_result_delivery import store
 from tests.meihua.test_meihua_transports import INPUT
 from tests.meihua.test_meihua_weather_cast_variants import CASES as VARIANT_CASES
 from tests.meihua.test_meihua_weather_cast_variants import resolve
+from tests.support.result_delivery import store
 from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIELDS = [

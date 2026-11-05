@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
-import importlib.util
 import itertools
 import json
 from pathlib import Path
@@ -54,14 +52,6 @@ def symbolic_rows(stem: str, branches: list[str]) -> list[dict[str, Any]]:
         )
         for label, value in zip(("人元", "贵神", "将神", "地分"), [stem, *branches])
     ]
-
-
-def load_script(name: str):
-    spec = importlib.util.spec_from_file_location(name, ROOT / "scripts" / f"{name}.py")
-    assert spec and spec.loader
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
 
 
 def audit() -> dict[str, Any]:
@@ -160,9 +150,11 @@ def audit() -> dict[str, Any]:
                 )
             ):
                 failures.append(dict(branches=branches, name=expected["name"]))
-    patterns = load_script("audit_jinkou_patterns")
+    from scripts.ren import audit_jinkou_patterns as patterns
+    from scripts.ren.audit_ren_classical import load_frozen_corpus
+
     old = patterns.audit()
-    original_rules = load_script("audit_ren_classical").load_frozen_corpus()["rules"]
+    original_rules = load_frozen_corpus()["rules"]
     auxiliary_failures = []
     auxiliary_checks = 0
     for day, label in original_rules["empty"].items():
@@ -236,31 +228,3 @@ def audit() -> dict[str, Any]:
         goal_complete=False,
         source_sha256=sha(CORPUS / "reference.json"),
     )
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    result = audit()
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {
-                k: result[k]
-                for k in (
-                    "primary_stem_clause_count",
-                    "primary_waiting_clause_count",
-                    "synthetic_matrix_count",
-                    "selected_checks_passed",
-                    "classical_acceptance_passed",
-                )
-            }
-        )
-    )
-    return 0 if result["classical_acceptance_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

@@ -7,6 +7,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
+from fatebridge.utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
+
 TRIGRAM_BITS: Dict[str, List[int]] = {
     "乾": [1, 1, 1],
     "兌": [1, 1, 0],
@@ -19,23 +21,10 @@ TRIGRAM_BITS: Dict[str, List[int]] = {
 }
 
 
-GAN: List[str] = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
+GAN = HEAVENLY_STEMS
 
 
-ZHI: List[str] = [
-    "子",
-    "丑",
-    "寅",
-    "卯",
-    "辰",
-    "巳",
-    "午",
-    "未",
-    "申",
-    "酉",
-    "戌",
-    "亥",
-]
+ZHI = EARTHLY_BRANCHES
 
 
 NATURAL: Dict[str, str] = {

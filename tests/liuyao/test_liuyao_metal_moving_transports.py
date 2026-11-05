@@ -132,7 +132,7 @@ def test_budgeted_first_view_restores_same_run_without_recalculating(
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
     from fatebridge.application.examples import suggested_fields
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     spec = SPECS["sixyao"]
     case = CASES[0]

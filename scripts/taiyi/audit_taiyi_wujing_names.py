@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import copy
 import hashlib
 import json
@@ -178,27 +177,3 @@ def compare(current: dict[str, Any], profile: dict[str, Any]) -> dict[str, Any]:
 def audit() -> dict[str, Any]:
     profile = verify()
     return compare(native_audit(), profile)
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", required=True, type=Path)
-    args = parser.parse_args()
-    report = audit()
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {
-                "required_observations": 1440,
-                "different": len(report["differences"]),
-                "unknown": len(report["unknowns"]),
-                "whole_classic_acceptance_passed": False,
-            }
-        )
-    )
-    return 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

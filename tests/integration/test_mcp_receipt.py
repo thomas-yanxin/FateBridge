@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.fixtures.mcp_receipt import assert_same_run_receipt, verified_inline_business
 
 
 class Pages:
@@ -70,6 +70,44 @@ def test_explicit_metadata_paging_restores_the_exact_original_receipt():
     assert restored == full
     assert inline == before
     assert client.calls == 1
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        "missing_declaration",
+        "extra_declaration",
+        "identity",
+        "count",
+        "boolean_count",
+        "boolean_coercion",
+    ],
+)
+def test_receipt_recovery_requires_exact_declarations_and_essential_identity(change):
+    full, inline, _ = fixture()
+    receipt = inline["run_metadata"]
+    deferred = inline["result_delivery"]["deferred_fields"]
+    assert_same_run_receipt(receipt, full["run_metadata"], deferred_fields=deferred)
+    if change == "missing_declaration":
+        deferred[:] = ["run_metadata.runtime"]
+    elif change == "extra_declaration":
+        deferred.append("run_metadata.unused")
+    elif change == "identity":
+        receipt.pop("run_id")
+        deferred.append("run_metadata.run_id")
+    elif change == "count":
+        receipt["runtime"]["ephemeris_files_count"] = 2
+    elif change == "boolean_count":
+        receipt["runtime"]["ephemeris_files_count"] = True
+    else:
+        full["run_metadata"]["determinism"]["randomness_used"] = False
+        receipt["determinism"] = {
+            **full["run_metadata"]["determinism"],
+            "randomness_used": 0,
+        }
+        deferred.remove("run_metadata.determinism")
+    with pytest.raises(AssertionError):
+        assert_same_run_receipt(receipt, full["run_metadata"], deferred_fields=deferred)
 
 
 @pytest.mark.parametrize(

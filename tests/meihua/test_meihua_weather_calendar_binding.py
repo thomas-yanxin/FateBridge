@@ -4,8 +4,6 @@ import ast
 import copy
 import hashlib
 import json
-import subprocess
-import sys
 from datetime import date
 from pathlib import Path
 
@@ -206,44 +204,3 @@ def test_new_reader_imports_no_production_calendar_engine_or_weather_outcome_rea
         for name in imports
     )
     assert "meihua_weather_trace_binding" in imports
-
-
-@pytest.mark.parametrize("target", ["inside", "existing", "symlink", "hardlink"])
-def test_cli_refuses_output_over_original_inputs_and_existing_receipts(
-    tmp_path, target
-):
-    study = tmp_path / "study"
-    study.mkdir()
-    original = study / "plan.json"
-    original.write_bytes(b'{"immutable":true}')
-    if target == "inside":
-        output = study / "new-receipt.json"
-    elif target == "existing":
-        output = tmp_path / "receipt.json"
-        output.write_bytes(b"old receipt")
-    elif target == "symlink":
-        output = tmp_path / "receipt.json"
-        output.symlink_to(original)
-    else:
-        output = tmp_path / "receipt.json"
-        output.hardlink_to(original)
-    before = {p: p.read_bytes() for p in [original, output] if p.exists()}
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts/meihua/audit_meihua_weather_calendar_binding.py"),
-            "--study",
-            str(study),
-            "--output",
-            str(output),
-        ],
-        capture_output=True,
-        text=True,
-        cwd=ROOT,
-    )
-    assert result.returncode == 2
-    assert json.loads(result.stderr)["published_lunar_date_binding_verified"] is False
-    for p, raw in before.items():
-        assert p.read_bytes() == raw
-    if target == "inside":
-        assert not output.exists()

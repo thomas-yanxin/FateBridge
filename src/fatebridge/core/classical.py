@@ -15,14 +15,12 @@ from fatebridge.core.classical_seasonal import seasonal_reference_layers
 from fatebridge.core.classical_stages import (
     LU_SEATS,
     STAGE_PROFILE_ID,
-    TWELVE_STAGES,
     YANG_BLADE_SEATS,
     twelve_life_stage,
 )
 from fatebridge.utils.data import (
     BRANCH_HIDDEN_STEMS,
     BRANCH_TRIPLE_COMBINATIONS,
-    EARTHLY_BRANCHES,
     STEM_ELEMENTS,
     TRIPLE_COMBINATION_PEAK,
     get_shishen,

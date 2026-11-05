@@ -20,7 +20,6 @@ from fatebridge.core.sukuyo_calendar_basis import (
     DEFAULT_CALENDAR_BASIS,
     HISTORICAL_CALENDAR_BASIS,
     JAPANESE_CALENDAR_BASES,
-    JAPANESE_CALENDAR_BASIS,
     basis_identifiers,
     basis_parameters,
     japanese_calendar_reader,
@@ -34,11 +33,8 @@ from fatebridge.core.sukuyo_profiles import (
     select_profile,
 )
 from fatebridge.core.sukuyo_profiles import source_bundle as profile_sources
+from fatebridge.core.sukuyo_relations import RELATION_TEMPLATE as RELATION_TEMPLATE
 from fatebridge.core.sukuyo_relations import (
-    _ALIASES,
-    _GOOD_CONTACT,
-    RELATION_PAIR,
-    RELATION_TEMPLATE,
     SU27_ORDER,
     SU28_NAMES,
     TEXT_URL,
@@ -539,7 +535,6 @@ def _date_uncertain_calendar(
         if not first_date.isoformat() <= value <= last_date.isoformat():
             excluded.append(value)
             continue
-        target = date.fromisoformat(value)
         # A derived reference-date candidate is a table lookup, never an imputed
         # observed birth clock. Each branch retains its full calendar profile.
         candidate = calendar_mansion(

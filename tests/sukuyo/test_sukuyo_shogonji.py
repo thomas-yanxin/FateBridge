@@ -36,6 +36,15 @@ def test_complete_selected_corpus_retains_all_missing_and_qualified_records():
     assert not r["daily_annotations_transcribed"]
     assert not r["manuscripts_independently_collated"]
 
+    assert [
+        (c["author_julian_date"], c["proleptic_gregorian_date"])
+        for c in r["author_julian_date_label_checks"]
+    ] == [("1345-09-12", "1345-09-20"), ("1346-02-22", "1346-03-02")]
+    assert all(
+        c["agrees_with_selected_lunar_date"] and not c["eclipse_astronomy_reproduced"]
+        for c in r["author_julian_date_label_checks"]
+    )
+
 
 @pytest.mark.parametrize(
     "civil,first,observed",
@@ -125,18 +134,6 @@ def test_reference_mutation_cannot_alter_later_source_bytes_or_readings():
     later = month_header_reference(1346, 9, True, 1)
     assert later["header"]["marginal_mansion_normalized_candidate"] == "氐"
     assert len(later["authors"]) == 3
-
-
-def test_julian_author_dates_are_converted_before_comparing_input_labels():
-    r = verify_headers()
-    assert [
-        (c["author_julian_date"], c["proleptic_gregorian_date"])
-        for c in r["author_julian_date_label_checks"]
-    ] == [("1345-09-12", "1345-09-20"), ("1346-02-22", "1346-03-02")]
-    assert all(
-        c["agrees_with_selected_lunar_date"] and not c["eclipse_astronomy_reproduced"]
-        for c in r["author_julian_date_label_checks"]
-    )
 
 
 def test_known_civil_noon_does_not_invent_the_manuscript_annotation_half():

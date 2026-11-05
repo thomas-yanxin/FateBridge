@@ -22,7 +22,7 @@ from fatebridge.core.astro.physical_sources import (
     PhysicalEphemerisTrace,
     assert_physical_configuration,
 )
-from fatebridge.core.astro.reference import PLANET_SWISSEPH_IDS
+from fatebridge.core.astro.reference import PHYSICAL_BODIES, PLANET_SWISSEPH_IDS
 from fatebridge.core.astro.reference_points import ephemeris_reference_points
 from fatebridge.core.ephemeris_runtime import configured_ephemeris_path
 from fatebridge.utils.errors import EphemerisSourceError
@@ -34,18 +34,6 @@ SOLAR_RADIUS_AU = Fraction(SOLAR_RADIUS_M, 149597870700)
 LIGHT_SPEED_AU_DAY_EXACT = Fraction(299792458 * 86400, 149597870700)
 LIGHT_SPEED_AU_DAY = float(LIGHT_SPEED_AU_DAY_EXACT)
 DEFLECTION_LIMITER = 1e-11
-PHYSICAL_BODIES = (
-    "Sun",
-    "Moon",
-    "Mercury",
-    "Venus",
-    "Mars",
-    "Jupiter",
-    "Saturn",
-    "Uranus",
-    "Neptune",
-    "Pluto",
-)
 
 
 class _RetardedSample(NamedTuple):

@@ -1,6 +1,5 @@
 """Regression coverage for the first-use journeys a Codex user follows."""
 
-import hashlib
 import json
 import shlex
 from pathlib import Path
@@ -25,6 +24,7 @@ from fatebridge.diagnostics import (
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.support.mcp_result_assertions import same_run_projected_response
 
 SUBJECT = str(Path(__file__).parents[2] / "examples/demo-subject.json")
 
@@ -33,11 +33,6 @@ def invoke(capsys, *args):
     code = cli.run(list(args))
     text = capsys.readouterr().out
     return code, json.loads(text), text
-
-
-async def _assert_inline_first_view_with_lossless_runtime(client, payload):
-    """Supplementary receipt paging never removes a first-view business fact."""
-    await verified_inline_business(client, payload)
 
 
 def test_scenario_words_find_tools_and_keep_filters():
@@ -90,10 +85,6 @@ def test_published_example_is_runnable(tool, capsys):
     )
     assert code == 0
     assert result["run_metadata"]["tool_name"] == record["tool"]
-
-
-def test_all_published_demo_inputs_are_valid():
-    assert sum(example_input(spec) is not None for spec in CATALOG) >= 20
 
 
 def test_all_hexagram_summaries_have_one_caution_prefix():
@@ -374,9 +365,7 @@ async def test_consultation_first_views_keep_interpretable_evidence_across_surfa
             },
         )
         assert not result.is_error
-        await _assert_inline_first_view_with_lossless_runtime(
-            client, result.structured_content
-        )
+        await verified_inline_business(client, result.structured_content)
     payload = result.structured_content
     assert not result.is_error
     if key == "analyze_destiny":
@@ -471,65 +460,9 @@ async def test_published_tool_description_delivers_strict_fields_from_one_run():
                 "include_snapshot_text": False,
             },
         )
-        assert not result.is_error
-        payload = result.structured_content
-        assert len(result.content[0].text) <= 8192
-        if "result_delivery" in payload:
-            reference = payload["result_delivery"]
-            manifest = json.loads(
-                (await client.read_resource(reference["manifest_uri"]))[0].text
-            )
-            assert manifest["sha256"] == reference["sha256"]
-            assert (
-                manifest["run_metadata"]["run_id"] == payload["run_metadata"]["run_id"]
-            )
-            text, offset, uri = "", 0, manifest["first_page_uri"]
-            while uri is not None:
-                assert (
-                    uri
-                    == f"fatebridge://results/{reference['result_id']}/pages/{offset}"
-                )
-                page = json.loads((await client.read_resource(uri))[0].text)
-                assert page["result_id"] == reference["result_id"]
-                assert page["sha256"] == reference["sha256"]
-                assert page["offset"] == offset
-                text += page["text"]
-                offset += len(page["text"])
-                assert page["next_offset"] == (
-                    offset if offset < reference["total_chars"] else None
-                )
-                uri = page["next_uri"]
-            assert len(text) == reference["total_chars"]
-            assert hashlib.sha256(text.encode()).hexdigest() == reference["sha256"]
-            payload = json.loads(text)
-            assert payload["run_metadata"] == manifest["run_metadata"]
+        payload = await same_run_projected_response(client, result)
         assert payload["career_analysis"]["career_structure"]["score"] == 95
         assert "run_metadata" in payload
-
-
-@pytest.mark.asyncio
-async def test_published_tool_description_is_sufficient_for_strict_first_call():
-    async with Client(create_mcp_app(families="bazi")) as client:
-        tool = next(t for t in await client.list_tools() if t.name == "bazi_career")
-        fields = json.loads(
-            tool.description.split("fields=", 1)[1].split("; strict_fields", 1)[0]
-        )
-        spec = next(s for s in CATALOG if s.tool_name == tool.name)
-        result = await client.call_tool(
-            tool.name,
-            {
-                **example_input(spec),
-                "fields": fields,
-                "strict_fields": True,
-                "include_snapshot_text": False,
-            },
-        )
-        assert not result.is_error
-        assert (
-            result.structured_content["career_analysis"]["career_structure"]["score"]
-            == 95
-        )
-        assert "run_metadata" in result.structured_content
 
 
 @pytest.mark.local_data

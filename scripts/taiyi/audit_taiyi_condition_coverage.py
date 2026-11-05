@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -98,20 +97,3 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         "rows": rows,
         "scope": "4算数、4中位语义、4个不出原词与36个合成逻辑状态分别报告；非4完整盘或36古例，未把中五直接定义为关或新增五将第四项。",
     }
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
-    report = audit()
-    text = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
-    if args.output:
-        args.output.write_text(text)
-    else:
-        print(text, end="")
-    return 0 if report["whole_classic_acceptance_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

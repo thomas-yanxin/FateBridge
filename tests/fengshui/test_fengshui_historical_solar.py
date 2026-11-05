@@ -13,6 +13,7 @@ from fastmcp import Client
 
 from fatebridge.cli import run
 from fatebridge.core import de440_solar
+from fatebridge.core import ephemeris_runtime as runtime
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.fengshui import historical_solar
 from fatebridge.core.fengshui.calendar import (
@@ -20,6 +21,7 @@ from fatebridge.core.fengshui.calendar import (
     lichun,
     lichun_resolution,
 )
+from fatebridge.core.moshier_solar import MODEL_ID as MOSHIER_MODEL
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.fengshui.test_fengshui_surfaces import rest_client, without_transport
@@ -130,7 +132,7 @@ def test_strict_jpl_auto_selection_is_not_replaced(monkeypatch):
     assert historical_solar.historical_solar_resolution(1785, "立春", "UTC") is None
 
 
-def test_1785_raw_numeric_failure_is_fixed_and_native_control_is_retained(
+def test_1785_corrected_models_preserve_the_raw_swiss_moshier_failure(
     monkeypatch, tmp_path
 ):
     reference = next(r for r in REFERENCE["rows"] if r["year"] == 1785)
@@ -148,11 +150,22 @@ def test_1785_raw_numeric_failure_is_fixed_and_native_control_is_retained(
     )
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     native = lichun_resolution(1785, "UTC")
-    assert native["ephemeris_model"] == "moshier"
-    old_difference = (
+    assert native["ephemeris_model"] == MOSHIER_MODEL
+    native_difference = (
         ephemeris_time(datetime.fromisoformat(native["moment"])).jd_tt
         - reference["jd_tt"]
     ) * 86400
+    assert (
+        abs(native_difference)
+        <= REFERENCE["protocol"]["numeric_implementation_tolerance_seconds"]
+    )
+    # The public native fallback now uses the complete model. Keep the original
+    # library's counterexample as an explicit, separate physical-model control.
+    with runtime._EPHEMERIS_LOCK:
+        raw_crossing = runtime.swe.solcross(
+            315.0, reference["jd_tt"] - 1, runtime.swe.FLG_MOSEPH
+        )
+    old_difference = (raw_crossing - reference["jd_tt"]) * 86400
     assert abs(old_difference) > 1.0
 
 

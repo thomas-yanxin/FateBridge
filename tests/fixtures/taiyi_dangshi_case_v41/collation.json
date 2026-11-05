@@ -1,0 +1,74 @@
+{
+  "id": "jinjing_dangshi_collation_v1",
+  "source_case_freeze_sha256": "aa2c0929a54a50f68b162cd7210e758b8b92a3f4036b858da3bad4ca8fe0b13f",
+  "reader": "Codex定向书影校读；已知原例和既有重建结果，非盲测，独立人类专家0。",
+  "witnesses": [
+    {
+      "id": "ming_case",
+      "edition": "国家图书馆藏NCL-06604明钞本",
+      "source_url": "https://commons.wikimedia.org/wiki/File:NCL-06604_太乙金鏡式經.pdf",
+      "page": 24,
+      "file": "tests/fixtures/taiyi_dangshi_noble_v40/ming-native-page24.png",
+      "sha256": "c91b6d87d8ca783181747a0e3bbbc32fe1d75a2310cc7998cd3f133d4c1e8ef7",
+      "locator": "左半叶，客大将六合之后的客参将条",
+      "literal": "客參將在天空下"
+    },
+    {
+      "id": "siku_case",
+      "edition": "CADAL06056494四库本",
+      "source_url": "https://commons.wikimedia.org/wiki/File:CADAL06056494_太乙金鏡式經·卷一~卷四.djvu",
+      "page": 57,
+      "file": "tests/fixtures/taiyi_dangshi_noble_v40/siku-native-page57.png",
+      "sha256": "188e76695b163bb8b5ef1adbdea1e0ee93cf9b711be7b1bc1b57a59f66e06733",
+      "locator": "从右第二栏末“客”，接第三栏首“參將在天定下”",
+      "literal": "客參將在天定下"
+    },
+    {
+      "id": "ming_god_roster",
+      "edition": "国家图书馆藏NCL-06604明钞本",
+      "source_url": "https://commons.wikimedia.org/wiki/File:NCL-06604_太乙金鏡式經.pdf",
+      "page": 24,
+      "file": "tests/fixtures/taiyi_dangshi_noble_v40/ming-native-page24.png",
+      "sha256": "c91b6d87d8ca783181747a0e3bbbc32fe1d75a2310cc7998cd3f133d4c1e8ef7",
+      "locator": "右半叶从右第三栏上部，十二天将名录末项",
+      "literal": "後六天空土"
+    },
+    {
+      "id": "siku_same_leaf_parallel",
+      "edition": "CADAL06056494四库本",
+      "source_url": "https://commons.wikimedia.org/wiki/File:CADAL06056494_太乙金鏡式經·卷一~卷四.djvu",
+      "page": 57,
+      "file": "tests/fixtures/taiyi_dangshi_noble_v40/siku-native-page57.png",
+      "sha256": "188e76695b163bb8b5ef1adbdea1e0ee93cf9b711be7b1bc1b57a59f66e06733",
+      "locator": "同叶《推太乙玄命法》常侍条",
+      "literal": "常侍玄命在天空"
+    }
+  ],
+  "literal_variant": {
+    "status": "edition_variant_confirmed_from_facsimiles",
+    "readings": {"ming": "天空", "siku": "天定"},
+    "siku_emendation_candidate": "天空",
+    "candidate_basis": ["ming_case", "ming_god_roster", "siku_same_leaf_parallel"],
+    "candidate_status": "plausible_emendation_not_adopted_as_literal",
+    "same_god_alias_attested_in_reviewed_passages": false,
+    "frozen_reading_overwritten": false,
+    "reason": "两版末将字面确有差别；明钞本例、明钞天将名录和四库同叶平行文支持疑“定”为“空”之讹，但不足以把四库原字改掉或把天定登记为天空的已证别名。未见该处原校记，传抄谱系与作者原字未定；网页转录不是新增版本书影。"
+  },
+  "lodging_review": {
+    "method": "在已知原例神名和既定条件重建盘之间反查同扇区候选，不是未看答案前由原典寄支规则推出盘面。",
+    "assumptions": [
+      "按原文日在心宿及卷一十二分野，以卯加寅；不重建缺失公元年的古太阳位置。",
+      "依原文明言庚日朝治大吉取丑；寅时的现代自动夜贵仅作预先声明的负控，不按相符多少选昼夜。",
+      "十二支天盘与顺布天将是条件重建，不是原书印出的完整十二位观测。",
+      "同一九宫的太乙与主大将不是两个独立课例；两个贵人配置在本日同取丑，也不是两份独立印证。"
+    ],
+    "independent_general_lodging_rule_found": false,
+    "unrepresented_palaces": [1, 3, 5],
+    "production_lodging_selected": false,
+    "remaining_evidence_needed": [
+      "与本例神名无关的四维转十二支通则，或能区分候选规则的新具时原例。",
+      "乾一、艮三和中五的直接资料；本例没有这些位置。",
+      "古太阳躔度、朝暮边界、顺逆布将与原例年月日的联合核验。"
+    ]
+  }
+}

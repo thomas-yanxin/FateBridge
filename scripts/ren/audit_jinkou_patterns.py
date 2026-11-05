@@ -8,7 +8,6 @@ The existing manifest identity is pinned independently of its file digests.
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import importlib.util
 import json
@@ -220,36 +219,3 @@ def audit() -> dict[str, Any]:
             "No full-domain calendar or real-model interpretation acceptance in this audit",
         ],
     )
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
-    report = audit()
-    if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(
-            json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
-        )
-    print(
-        json.dumps(
-            {
-                k: report[k]
-                for k in (
-                    "corpus_case_count",
-                    "matched_semantic_cases",
-                    "unevaluated_definitions",
-                    "matched_source_day_cases",
-                    "classical_acceptance_passed",
-                    "goal_complete",
-                )
-            },
-            ensure_ascii=False,
-        )
-    )
-    return 0 if report["classical_acceptance_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

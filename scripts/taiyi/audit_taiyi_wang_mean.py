@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -237,15 +236,6 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
                         ],
                     }
                 )
-    prior = {}
-    for name in axes["retain_full_old_reports"]:
-        old = _json(root / name)
-        prior[name] = {
-            "sha256": hashlib.sha256((root / name).read_bytes()).hexdigest(),
-            "whole_calendar_acceptance_passed": old["whole_calendar_acceptance_passed"],
-            "whole_goal_complete": old["whole_goal_complete"],
-            "old_fields_and_failures_retained": True,
-        }
     return {
         "source_freeze_sha256": FREEZE_SHA256,
         "prior_pinned_files": len(frozen["prior_sources"]),
@@ -258,7 +248,6 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
         "any_series_matches_original_day8_integer_and_label": any(
             s["target_given_number_and_day_match"] for s in series
         ),
-        "previous_evidence": prior,
         "source_leap_or_next_qi_clause_emended": False,
         "calendar_selected_by_fit": False,
         "new_public_calendar_installed": False,
@@ -271,25 +260,3 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
         "whole_goal_complete": False,
         "scope": "Conditional Ming Wang full-window diagnostic with unknown month identities kept. Six winter windows cover the old five-year63-first/62-month1831-day cohort. Algebraic qi steps, source year shifts and counter encodings remain hypotheses; none is selected, installed or counted as a new ancient case.",
     }
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    result = audit()
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(
-        json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
-    print(
-        json.dumps(
-            {k: v for k, v in result.items() if k != "conditional_series"},
-            ensure_ascii=False,
-        )
-    )
-    return 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

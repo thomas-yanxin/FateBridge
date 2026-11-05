@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import itertools
 import json
@@ -141,29 +140,3 @@ def audit() -> dict[str, Any]:
         full_classical_conformance=False,
         goal_complete=False,
     )
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    if args.output.exists():
-        parser.error("output path must be unused")
-    result = audit()
-    args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {
-                k: v
-                for k, v in result.items()
-                if k
-                not in {"mathematical_rows", "symbolic_boards", "implementation_sha256"}
-            },
-            ensure_ascii=False,
-        )
-    )
-    return 0 if result["engineering_checks_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

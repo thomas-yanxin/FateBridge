@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -110,21 +109,3 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             "calendar reconstruction, full classical rules or model behavior."
         ),
     }
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
-    report = audit()
-    raw = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
-    if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(raw)
-    else:
-        print(raw)
-    raise SystemExit(1)  # A bounded repair cannot close the full calendar goal.
-
-
-if __name__ == "__main__":
-    main()

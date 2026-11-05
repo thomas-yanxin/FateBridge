@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import csv
 import hashlib
 import json
@@ -188,20 +187,3 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         "full_ancient_calendar_reconstructed": False,
         "real_world_efficacy": "not_tested",
     }
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
-    raw = json.dumps(audit(), ensure_ascii=False, indent=2) + "\n"
-    if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(raw)
-    else:
-        print(raw, end="")
-    return 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

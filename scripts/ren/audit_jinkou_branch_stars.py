@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
-import gzip
 import hashlib
 import itertools
 import json
@@ -165,22 +163,3 @@ def audit() -> dict[str, Any]:
         new_empirical_events=0,
         goal_complete=False,
     )
-
-
-def main() -> int:
-    p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--output", type=Path, required=True)
-    args = p.parse_args()
-    report = audit()
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {k: v for k, v in report.items() if k != "source_manifest"},
-            ensure_ascii=False,
-        )
-    )
-    return 0 if report["selected_checks_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

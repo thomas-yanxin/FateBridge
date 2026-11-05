@@ -4,8 +4,6 @@ import asyncio
 import hashlib
 import json
 import shutil
-import subprocess
-import sys
 
 import pytest
 from fastapi.testclient import TestClient
@@ -112,6 +110,11 @@ def test_complete_month_cohorts_keep_the_remaining_failures(report):
     assert [
         r["month"] for r in near["records"] if r["month_length_matches"] is False
     ] == [2, 3]
+
+    assert len(report["full_lunation_cohort_hypotheses"]) == 8
+    assert report["new_complete_dated_classical_cases_passed"] == 0
+    assert not report["production_numeric_formula_changed"]
+    assert not report["whole_goal_complete"]
 
 
 @pytest.mark.parametrize("edition,per49", [("ncl_ming", 1447), ("siku", 1457)])
@@ -240,25 +243,3 @@ def test_default_month_receipt_is_identical_on_rest_mcp_cli(
     elif (year, month) == (1043, 12):
         assert (receipt["accumulation"] - 1) % 360 + 1 == 241
     assert receipt["source_year_label_adjudicated"] is False
-
-
-def test_unresolved_calendar_audit_keeps_failure_exit_and_whole_scope(tmp_path):
-    path = tmp_path / "report.json"
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts/taiyi/audit_taiyi_lunation_chain.py"),
-            "--output",
-            str(path),
-        ],
-        capture_output=True,
-        text=True,
-        timeout=120,
-        check=False,
-    )
-    assert result.returncode == 1 and not result.stderr
-    report = json.loads(path.read_text())
-    assert len(report["full_lunation_cohort_hypotheses"]) == 8
-    assert report["new_complete_dated_classical_cases_passed"] == 0
-    assert not report["production_numeric_formula_changed"]
-    assert not report["whole_goal_complete"]

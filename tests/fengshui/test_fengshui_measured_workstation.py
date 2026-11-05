@@ -622,7 +622,7 @@ def test_default_budget_pages_reconstruct_same_run_search_without_recomputation(
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "measured-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)

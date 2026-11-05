@@ -18,16 +18,12 @@ from ...utils.data import EARTHLY_BRANCHES, HEAVENLY_STEMS
 from .common import (
     ELEMENT_CONTROLS,
     ELEMENT_GENERATES,
-    GUI_REN_SEQUENCE,
-    LIURENG_GUIREN_DAY,
-    LIURENG_GUIREN_NIGHT,
     SIX_CLASH_BRANCHES,
     YUE_JIANG_NAMES,
     MetaphysicsSeed,
     branch_element_text,
     ganzhi_text,
     kongwang_for_ganzhi,
-    rotate_sequence,
     stem_element_text,
     xun_head_for_ganzhi,
 )

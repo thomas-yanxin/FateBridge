@@ -172,7 +172,8 @@ def test_reference_mutation_cannot_redefine_the_acceptance_labels(tmp_path):
 
 @pytest.mark.parametrize("day", ["甲子", "甲戌", "甲申", "甲午", "甲辰", "甲寅"])
 def test_literal_case_auxiliary_emptiness_obeys_original_frozen_xun_table(day):
-    patterns = AUDIT.load_script("audit_jinkou_patterns")
+    from scripts.ren import audit_jinkou_patterns as patterns
+
     rules = V1.load_frozen_corpus()["rules"]
     label = rules["empty"][day]
     phase = label[0] if label != "无四大空亡" else None

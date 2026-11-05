@@ -18,6 +18,7 @@ CHECKS = (
     "integration/test_acceptance_population.py",
     "astronomy/test_ephemeris_context.py",
     "quality/test_repository_cleanup.py",
+    "integration/test_mcp_receipt.py",
     "integration/test_result_delivery.py",
     "integration/test_result_delivery_storage.py",
     "integration/test_life_dimensions.py",

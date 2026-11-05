@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import argparse
 import copy
-import gzip
 import hashlib
 import itertools
 import json
@@ -175,26 +173,3 @@ def audit() -> dict[str, Any]:
         new_model_processes=0,
         goal_complete=False,
     )
-
-
-def main() -> None:
-    p = argparse.ArgumentParser()
-    p.add_argument("--output", type=Path, required=True)
-    args = p.parse_args()
-    value = audit()
-    args.output.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {
-                k: v
-                for k, v in value.items()
-                if k not in ["failures", "baseline_comparison"]
-            },
-            ensure_ascii=False,
-        )
-    )
-    raise SystemExit(0 if value["selected_component_checks_passed"] else 1)
-
-
-if __name__ == "__main__":
-    main()

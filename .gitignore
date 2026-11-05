@@ -98,10 +98,12 @@ docs/reviews/
 /tests/fixtures/**
 !/tests/fixtures/**/
 !/tests/fixtures/*.py
+# Preserve small source commitments and collation beside their local raw corpora.
+!/tests/fixtures/taiyi_dangshi_noble_v40/freeze-original.json
+!/tests/fixtures/taiyi_dangshi_case_v41/freeze-original.json
+!/tests/fixtures/taiyi_dangshi_case_v41/collation.json
 
 # Generated CI evidence, kept as workflow artifacts rather than source.
 /ci-selection.json
 /cache-status.txt
-/pytest-results.xml
-/resolved-dependencies.txt
 /ci-evidence/

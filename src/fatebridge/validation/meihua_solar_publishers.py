@@ -5,7 +5,6 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from collections import Counter
 from datetime import datetime, timedelta, timezone
 from html.parser import HTMLParser
 from pathlib import Path
@@ -254,78 +253,4 @@ def compare_label(
         "source_midnight_requires_extra_care": reference["source_midnight_label"],
         "actual_event_date_certified_from_minute_label": False,
         "actual_error_interval_seconds": None,
-    }
-
-
-def audit_solar_publishers(
-    directory: Path, *, expected_sha256: str = EXPECTED_REFERENCE_SHA256
-) -> dict[str, Any]:
-    reference, receipt = read_naoj_reference(directory, expected_sha256=expected_sha256)
-    from fatebridge.core.almanac import SOLAR_TERM_NAMES, get_solar_terms_for_year
-    from fatebridge.core.meihua_solar_reference import compare_solar_term_date
-    from fatebridge.validation.meihua_runtime_guard import (
-        capture_calendar_runtime,
-        verify_calendar_runtime,
-    )
-    from fatebridge.validation.meihua_source_guard import (
-        capture_package_sources,
-        verify_package_sources,
-    )
-
-    package = Path(__file__).resolve().parents[1]
-    source = capture_package_sources(package)
-    runtime = capture_calendar_runtime()
-    rows = []
-    models: Counter[str] = Counter()
-    for year in YEARS:
-        actual = get_solar_terms_for_year(year, "UTC+08:00")
-        if len(actual) != 24 or [t.name for t in actual] != list(SOLAR_TERM_NAMES):
-            raise ValueError("All24 actual term identities are required per year")
-        for index, term in enumerate(actual):
-            value = term.as_dict()
-            ref = reference[(year - 1900) * 24 + index]
-            hko = compare_solar_term_date(value, fact_path=f"year{year}.term{index}")
-            rows.append(compare_label(ref, value, hko))
-            models[term.ephemeris_model] += 1
-    if (
-        sum(
-            r["HKO_comparison_status"]
-            in {"published_date_match", "published_date_disagreement"}
-            for r in rows
-        )
-        != 4800
-    ):
-        raise ValueError("The full original HKO4800 comparison must remain present")
-    read_naoj_reference(directory, expected_sha256=expected_sha256)
-    verify_package_sources(package, source)
-    verify_calendar_runtime(runtime)
-    hko_bad = [
-        r for r in rows if r["HKO_comparison_status"] == "published_date_disagreement"
-    ]
-    naoj_bad = [r for r in rows if not r["computed_date_equals_NAOJ_normalized_label"]]
-    between = [r for r in rows if r["HKO_date_equals_NAOJ_normalized_label"] is False]
-    return {
-        "audit_id": "meihua_full_supported_solar_publisher_labels_v1",
-        "reference": receipt,
-        "all4824_rows_compared": len(rows) == 4824,
-        "original_HKO4800_compared": 4800,
-        "original_HKO_date_gate_met": not hko_bad,
-        "original_HKO_disagreement_count": len(hko_bad),
-        "NAOJ_normalized_label_disagreement_count": len(naoj_bad),
-        "HKO_NAOJ_normalized_label_disagreement_count": len(between),
-        "source_midnight_label_count": sum(
-            r["source_midnight_requires_extra_care"] for r in rows
-        ),
-        "all_nominal_date_labels_agree": not hko_bad and not naoj_bad and not between,
-        "date_disagreements_are_not_automatically_calculation_errors": True,
-        "original_TT_one_second_gate_replaced": False,
-        "original_HKO_reference_replaced": False,
-        "actual_models": dict(models),
-        "source_guard": source,
-        "runtime_guard": runtime,
-        "rows": rows,
-        "actual_physical_observations_added": 0,
-        "absolute_civil_time_accuracy_established": False,
-        "predictive_efficacy_established": False,
-        "scope": "Full frozen online publisher labels and actual returned solar instants. UT+8 and default Delta T are preserved.24:00 rolls only the label date. Minute display, quantization, UT/UTC conventions and model uncertainty are not an authenticated physical error bound or a prediction trial.",
     }

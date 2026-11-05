@@ -6,7 +6,6 @@ symbolic state is not a real dated forecast or evidence of predictive efficacy.
 
 from __future__ import annotations
 
-import hashlib
 from collections import Counter
 from pathlib import Path
 from typing import Any

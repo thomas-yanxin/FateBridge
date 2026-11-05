@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from fractions import Fraction
@@ -248,20 +247,3 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
         "whole_goal_complete": False,
         "scope": "A separately named Yuanjia source algorithm and complete501-505 printed cohort. Calendar identities, qi assignment and any failures remain explicit; source-phase agreement cannot certify Wang's Taiyi case or absolute epoch.",
     }
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
-    raw = json.dumps(audit(), ensure_ascii=False, indent=2) + "\n"
-    if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(raw, encoding="utf-8")
-    else:
-        print(raw)
-    raise SystemExit(1)
-
-
-if __name__ == "__main__":
-    main()

@@ -245,4 +245,4 @@ uv run --locked --extra dev python -m scripts.ren.audit_ren_classical \
 
 ### 本地复核入口
 
-京本金口诀行年使用 `uv run --locked --extra dev python -m scripts.ren.audit_jinkou_year_fate --output /tmp/jinkou-year-fate.json` 及 `tests/ren/test_jinkou_year_fate.py` 核对。出生年干支、指定一岁起算岁序和性别分别保留；岁首与占时实际年龄联动未认证，另课地分是行年支推导，不能写成观测方位。原书标签、循环推导、业务合同与进程内三端分别报告。
+京本金口诀行年使用 `uv run --locked --extra dev python -m pytest -q tests/ren/test_jinkou_year_fate.py` 核对。出生年干支、指定一岁起算岁序和性别分别保留；岁首与占时实际年龄联动未认证，另课地分是行年支推导，不能写成观测方位。原书标签、循环推导、业务合同与进程内三端分别报告。

@@ -3,8 +3,6 @@
 import copy
 import hashlib
 import json
-import subprocess
-import sys
 from pathlib import Path
 
 import pytest
@@ -257,38 +255,6 @@ def test_math_capacity_abstentions_keep_original_zero_correct_credit():
     assert result["maximum_possible_categorical_days"] == 77
     assert result["exact_maximum_margin_over_better_constant"] == -60
     assert result["cannot_strictly_beat_better_constant_even_with_context_oracle"]
-
-
-@pytest.mark.parametrize("kind", ["inside", "existing", "hardlink", "symlink"])
-def test_cli_output_guards_protect_the_original_study_and_existing_reports(
-    kind, tmp_path
-):
-    study = tmp_path / "study"
-    study.mkdir()
-    original = study / "evidence.json"
-    original.write_text("immutable")
-    output = study / "new.json" if kind == "inside" else tmp_path / "report.json"
-    if kind == "existing":
-        output.write_text("existing")
-    elif kind == "hardlink":
-        output.hardlink_to(original)
-    elif kind == "symlink":
-        output.symlink_to(original)
-    run = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts/meihua/audit_meihua_weather_context_capacity.py"),
-            "--study",
-            str(study),
-            "--output",
-            str(output),
-        ],
-        capture_output=True,
-        text=True,
-    )
-    assert run.returncode == 2
-    assert "new file outside" in run.stderr
-    assert original.read_text() == "immutable"
 
 
 def test_capacity_bound_does_not_mutate_or_fill_supplied_context_capabilities():

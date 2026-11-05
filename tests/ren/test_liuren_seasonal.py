@@ -1,7 +1,6 @@
 """Literal seasonal states, conditional emptiness and same-board protocols."""
 
 import copy
-import json
 import shutil
 from dataclasses import replace
 from datetime import datetime
@@ -20,14 +19,12 @@ from fatebridge.core.output_liuren_seasonal import (
     require_complete_seasonal,
 )
 from scripts.ren.audit_liuren_seasonal import BRANCHES, CORPUS, reference, seed_for
+from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
 from tests.support.transports import SPECS, business, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 REF = reference()
 GODS = list(REF["literal_god_elements"])
-PAYLOADS = json.loads((ROOT / "tests/fixtures/ren_anchors_v1/faults.json").read_text())[
-    "payloads"
-]
 
 
 @pytest.fixture(autouse=True)

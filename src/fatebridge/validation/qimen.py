@@ -10,7 +10,7 @@ from typing import Any
 
 from fatebridge.core.metaphysics.common import MetaphysicsSeed
 from fatebridge.core.metaphysics.qimen import _qimen_build_palaces, _qimen_zhifu_zhishi
-from fatebridge.core.qimen_evidence import SOURCE, STEM_PATTERNS, enrich_qimen_evidence
+from fatebridge.core.qimen_evidence import STEM_PATTERNS, enrich_qimen_evidence
 from fatebridge.core.qimen_profiles import GOD_PROFILES, star_season_state
 from fatebridge.validation.claims import CalculationClaim
 

@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.angle_definitions import ecliptic_horizon_angle_definition
-from fatebridge.core.astro.julian_day import _julian_day
+from fatebridge.core.astro.julian_day import _julian_day as _julian_day
 from fatebridge.core.astro.reference import NAKSHATRAS, SU28
 from fatebridge.core.astrology_tables import SIGNS as SIGNS
 from fatebridge.utils.errors import EphemerisSourceError

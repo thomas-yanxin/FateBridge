@@ -10,8 +10,6 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any, Optional, Sequence
 
-from fatebridge.core.sukuyo_candidate_reading import candidate_day_lines
-
 
 def personal_day_evidence(
     natal_mansion: Optional[str], mansion: Optional[str]

@@ -24,18 +24,6 @@ from fatebridge.core.human_design_solar_projection import (
 )
 
 METHOD = "human_design_apparent_position_context_v1"
-PHYSICAL_BODIES = (
-    "Sun",
-    "Moon",
-    "Mercury",
-    "Venus",
-    "Mars",
-    "Jupiter",
-    "Saturn",
-    "Uranus",
-    "Neptune",
-    "Pluto",
-)
 SCOPE = "仅同次positions_at_tt物理天体完整或中断批次已返回的原生坐标、旗标及其名义投影；覆盖本命、区间样本、根端点和整盘对照实际批次，中断前缀不补齐。仅太阳求根、仅交点对照或周期搜索的单体调用不在此计数。观察次数不是独立样本，不认证连续区间、原生执行真实性、物理精度、真实遮掩或可见性。"
 
 

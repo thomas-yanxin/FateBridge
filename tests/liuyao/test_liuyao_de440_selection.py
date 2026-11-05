@@ -113,7 +113,7 @@ def test_default_same_run_sha_restores_actual_source_and_month(
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "default-de440-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)

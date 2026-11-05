@@ -4,8 +4,8 @@ import pytest
 
 from fatebridge.application.examples import suggested_fields
 from tests.bazi.test_bazi_timing_roots_transports import PAYLOAD
-from tests.integration.test_result_delivery import reconstruct
-from tests.integration.test_result_delivery import store as _store_fixture
+from tests.support.result_delivery import reconstruct
+from tests.support.result_delivery import store as _store_fixture
 from tests.support.transports import AS_OF, SPECS, business
 from tests.support.transports import rest as _shared_rest
 from tests.support.transports import surface_calls

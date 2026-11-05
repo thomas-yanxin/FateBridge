@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from datetime import date
@@ -338,14 +337,6 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
             else None
         )
         adapter["absolute_epoch_identity_inferred_from_cycle_match"] = False
-    prior = {
-        name: {
-            "sha256": hashlib.sha256((root / name).read_bytes()).hexdigest(),
-            "whole_goal_complete": _json(root / name)["whole_goal_complete"],
-            "old_failure_fields_retained": True,
-        }
-        for name in axes["previous_evidence_retained"]
-    }
     may = next(
         r
         for r in controls
@@ -374,7 +365,6 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
         "any_series_matches_full_observed_year": any(
             s["full_observed_year_matches"] for s in series
         ),
-        "previous_evidence": prior,
         "new_complete_dated_taiyi_boards_passed": 0,
         "new_model_invocations": 0,
         "universal_day_or_month_counter_encoding_adjudicated": False,
@@ -387,36 +377,3 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
         "whole_goal_complete": False,
         "scope": "One newly collated Key appendix arithmetic chain and an independently transcribed complete1561 calendar year. It constrains this passage's year/count representations without selecting a universal Wang epoch or replacing all prior failures.",
     }
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    result = audit()
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(
-        json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
-    print(
-        json.dumps(
-            {
-                k: result[k]
-                for k in (
-                    "source_firsts",
-                    "source_month_lengths",
-                    "source_days",
-                    "calendar_controls_pass",
-                    "may1_printed_calendar_matches_key_token",
-                    "any_series_matches_full_observed_year",
-                    "whole_goal_complete",
-                )
-            },
-            ensure_ascii=False,
-        )
-    )
-    return 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

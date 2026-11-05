@@ -17,7 +17,6 @@ from fatebridge.core.almanac import (
 )
 from fatebridge.core.metaphysics.taiyi_geometry import (
     BRANCHES,
-    PALACE_ORDER,
     PALACES,
     RING,
     SOURCES,

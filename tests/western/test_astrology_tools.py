@@ -79,10 +79,6 @@ def test_core_chart_variants_expose_variant_specific_fields():
         item for item in india["planets"] if item["id"] == "Moon"
     )
 
-
-def test_core_chart_includes_snapshot_text_and_export():
-    chart = calculate_core_chart_analysis(chart_variant="chart", **astro_payload())
-
     assert "[起盘信息]" in chart["snapshot_text"]
     assert "[宫位宫头]" in chart["snapshot_text"]
     assert "[星与虚点]" in chart["snapshot_text"]
@@ -309,23 +305,6 @@ def test_germany_chart_returns_midpoint_payload():
     assert result["midpoint_aspects"]
     assert result["base_chart"]["planets"]
 
-
-def test_germany_chart_respects_core_house_and_zodiac_overrides():
-    result = calculate_germany_chart_analysis(
-        **astro_payload(),
-        hsys=0,
-        zodiacal=1,
-    )
-
-    assert result["chart_profile"]["house_system"] == "whole_sign"
-    assert result["chart_profile"]["zodiac"] == "sidereal"
-    assert result["base_chart"]["chart_profile"]["house_system"] == "whole_sign"
-    assert result["base_chart"]["chart_profile"]["zodiac"] == "sidereal"
-    assert result["midpoints"]
-
-
-def test_germany_chart_inherits_runtime_precision_from_base_chart():
-    result = calculate_germany_chart_analysis(**astro_payload())
     expected_precision = (
         "ephemeris_runtime_model" if swe is not None else "approximate_orbital_model"
     )
@@ -339,6 +318,20 @@ def test_germany_chart_inherits_runtime_precision_from_base_chart():
         result["base_chart"]["chart_profile"]["engine_precision"] == expected_precision
     )
     assert result["base_chart"]["chart_profile"]["engine_backend"] == expected_backend
+
+
+def test_germany_chart_respects_core_house_and_zodiac_overrides():
+    result = calculate_germany_chart_analysis(
+        **astro_payload(),
+        hsys=0,
+        zodiacal=1,
+    )
+
+    assert result["chart_profile"]["house_system"] == "whole_sign"
+    assert result["chart_profile"]["zodiac"] == "sidereal"
+    assert result["base_chart"]["chart_profile"]["house_system"] == "whole_sign"
+    assert result["base_chart"]["chart_profile"]["zodiac"] == "sidereal"
+    assert result["midpoints"]
 
 
 def test_hsys_int_family_defaults_are_consistent():

@@ -4,8 +4,6 @@ import copy
 import hashlib
 import json
 import shutil
-import subprocess
-import sys
 from fractions import Fraction
 
 import pytest
@@ -43,6 +41,10 @@ def test_native_ming_chain_and_half_hour_units_are_exact_not_float_closeness():
     assert result["counts"] == {"matching": 5, "different": 7, "unresolved": 4}
     assert result["software_preserves_frozen_diagnostic_expectations"]
     assert result["dated_cases"] == 0
+    assert result["whole_calendar_acceptance"] is False
+
+    assert result["required_relations"] == 16
+    assert result["counts"] == EXPECTED["expected_total"]
     assert result["whole_calendar_acceptance"] is False
 
 
@@ -138,22 +140,3 @@ def test_source_values_are_exact_and_never_coerced(value):
     readings["chapter_years"]["value"] = value
     with pytest.raises(ValueError):
         audit_edition(readings)
-
-
-def test_audit_command_preserves_nonacceptance_and_all_requirements(tmp_path):
-    output = tmp_path / "report.json"
-    completed = subprocess.run(
-        [
-            sys.executable,
-            "scripts/taiyi/audit_taiyi_calendar_constants.py",
-            "--output",
-            str(output),
-        ],
-        capture_output=True,
-        text=True,
-    )
-    assert completed.returncode == 1
-    result = json.loads(output.read_text())
-    assert result["required_relations"] == 16
-    assert result["counts"] == EXPECTED["expected_total"]
-    assert result["whole_calendar_acceptance"] is False

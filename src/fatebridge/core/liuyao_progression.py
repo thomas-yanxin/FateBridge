@@ -48,7 +48,6 @@ def changed_calendar_strength(
         or COMBINES[day] == branch
         or stages[element].get(day) in ("长生", "帝旺")
     )
-    facts = branch_facts(branch, month, day, xunkong(day_ganzhi))
     harm = (
         month_opposition_applies(branch, month, day)
         or (

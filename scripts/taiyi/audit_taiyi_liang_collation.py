@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -244,22 +243,3 @@ def audit(corpus: Path = CORPUS, *, root: Path = ROOT) -> dict[str, Any]:
         "whole_classic_acceptance_passed": False,
         "whole_goal_complete": False,
     }
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
-    report = audit()
-    raw = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
-    if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(raw)
-    else:
-        print(raw)
-    # Partial agreement cannot turn the unresolved classical audit green.
-    raise SystemExit(1)
-
-
-if __name__ == "__main__":
-    main()

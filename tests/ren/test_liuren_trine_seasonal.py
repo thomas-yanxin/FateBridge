@@ -5,7 +5,6 @@ import hashlib
 import json
 import shutil
 from dataclasses import replace
-from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -17,12 +16,8 @@ from fatebridge.core.output_chinese import Liuren
 from fatebridge.core.output_liuren_trine_seasonal import LiurenNominalTrineSeasonal
 from scripts.ren.audit_liuren_seasonal import seed_for
 from scripts.ren.audit_liuren_trine_seasonal import CORPUS, FIELD, audit, reference
+from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
 from tests.support.transports import SPECS, business, rest, surface_calls
-
-ROOT = Path(__file__).resolve().parents[2]
-PAYLOADS = json.loads((ROOT / "tests/fixtures/ren_anchors_v1/faults.json").read_text())[
-    "payloads"
-]
 
 
 def source_board():

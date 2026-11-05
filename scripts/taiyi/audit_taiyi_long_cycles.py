@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -110,20 +109,3 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
             (ROOT / "src/fatebridge/core/metaphysics/taiyi_long_cycles.py").read_bytes()
         ).hexdigest(),
     }
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
-    result = audit()
-    text = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
-    if args.output:
-        args.output.parent.mkdir(exist_ok=True, parents=True)
-        args.output.write_text(text)
-    print(text, end="")
-    return 0 if result["classical_acceptance_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

@@ -4,8 +4,6 @@ import copy
 import hashlib
 import json
 import shutil
-import subprocess
-import sys
 
 import pytest
 
@@ -188,24 +186,6 @@ def test_spatial_agreement_cannot_certify_event_claims_or_full_classic(report):
     assert not report["whole_classic_acceptance_passed"]
     assert not report["whole_goal_complete"]
 
-
-def test_direct_audit_cli_keeps_failure_exit_and_writes_full_report(tmp_path):
-    path = tmp_path / "report.json"
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts/taiyi/audit_taiyi_liang_collation.py"),
-            "--output",
-            str(path),
-        ],
-        capture_output=True,
-        text=True,
-        timeout=120,
-        check=False,
-    )
-    assert result.returncode == 1, result.stderr
-    assert result.stderr == ""
-    value = json.loads(path.read_text())
-    assert value["freeze_sha256"] == FREEZE_SHA256
-    assert len(value["all_six_candidate_comparisons"]) == 6
-    assert not value["whole_goal_complete"]
+    assert report["freeze_sha256"] == FREEZE_SHA256
+    assert len(report["all_six_candidate_comparisons"]) == 6
+    assert not report["whole_goal_complete"]

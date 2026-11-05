@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 import math
@@ -225,35 +224,3 @@ def audit() -> dict[str, Any]:
         real_world_efficacy="not_tested",
         whole_goal_complete=False,
     )
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-    result = audit()
-    args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {
-                k: result[k]
-                for k in [
-                    "business_rows",
-                    "business_passed",
-                    "reused_root_controls_passed",
-                    "whole_goal_complete",
-                ]
-            }
-        )
-    )
-    return int(
-        result["business_passed"] != result["business_rows"]
-        or result["reused_root_controls_passed"] != result["reused_root_controls"]
-        or not all(
-            r["standalone_rejected"] for r in result["standalone_outside_controls"]
-        )
-    )
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

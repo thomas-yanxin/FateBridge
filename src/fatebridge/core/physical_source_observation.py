@@ -228,7 +228,7 @@ def native_call_policy(
     except EphemerisSourceError as error:
         state.failure = state.failure or error.reason
         raise
-    except Exception as error:
+    except Exception:
         if coordinate and _physical(body) or event:
             state.fail("required_data_files_unavailable")
         raise

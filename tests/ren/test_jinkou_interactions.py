@@ -20,9 +20,7 @@ from fatebridge.core.output_jinkou_interactions import JinkouPositionInteraction
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.quality.test_codex_call_contracts import (
-    assert_same_receipt_with_explicit_runtime_delivery,
-)
+from tests.fixtures.mcp_receipt import assert_same_run_receipt
 from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -398,8 +396,10 @@ async def test_published_first_view_recovers_all_relations_from_the_same_run():
     text = "".join(pieces)
     assert hashlib.sha256(text.encode()).hexdigest() == reference["sha256"]
     complete = json.loads(text)
-    assert_same_receipt_with_explicit_runtime_delivery(
-        inline["run_metadata"], complete["run_metadata"], reference
+    assert_same_run_receipt(
+        inline["run_metadata"],
+        complete["run_metadata"],
+        deferred_fields=reference["deferred_fields"],
     )
     actual = complete["jinkou"]["position_interactions"]
     assert len(actual["pairs"]) == 6 and len(actual["rule_evaluations"]) == 14

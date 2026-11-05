@@ -120,6 +120,62 @@ def test_nested_symlinks_do_not_expose_external_caches(repository, tmp_path_fact
     assert preserved.exists()
 
 
+def test_duplicate_scans_preserve_frozen_paths_bytes_and_manifest(repository):
+    first = put(repository, "tests/fixtures/first/source.pdf")
+    second = put(repository, "tests/fixtures/second/witness.pdf")
+    manifest = put(repository, "tests/fixtures/second/freeze.json")
+    record = put(repository, "tests/fixtures/second/reference.json")
+    probe = repository / "link-probe"
+    try:
+        probe.symlink_to(first)
+    except OSError:
+        pytest.skip("File symlinks unavailable")
+    probe.unlink()
+    assert clean_repository.main(["--deduplicate-scans"]) == 0
+    assert not first.is_symlink() and not second.is_symlink()
+    assert not (repository / "tests/data/shared_sources").exists()
+    assert clean_repository.main(["--deduplicate-scans", "--apply"]) == 0
+    assert first.is_symlink() and second.is_symlink()
+    assert first.resolve() == second.resolve()
+    assert first.resolve().parent == repository / "tests/data/shared_sources"
+    assert all(
+        p.read_text() == "original bytes" for p in (first, second, manifest, record)
+    )
+    assert not manifest.is_symlink() and not record.is_symlink()
+    assert clean_repository.find_duplicate_scans(repository) == {}
+    # Later corpora reuse the existing original rather than create another store.
+    third = put(repository, "tests/fixtures/third/another.pdf")
+    assert clean_repository.main(["--deduplicate-scans", "--apply"]) == 0
+    assert third.resolve() == first.resolve()
+    assert clean_repository.find_duplicate_scans(repository) == {}
+
+
+def test_tracked_scan_stops_cache_removal_and_deduplication(repository):
+    first = put(repository, "tests/fixtures/first/source.pdf")
+    second = put(repository, "tests/fixtures/second/source.pdf")
+    cache = put(repository, "build/old.py")
+    subprocess.run(["git", "-C", str(repository), "add", str(first)], check=True)
+    assert clean_repository.main(["--deduplicate-scans", "--apply"]) == 1
+    assert first.exists() and second.exists() and cache.exists()
+    assert not first.is_symlink() and not second.is_symlink()
+
+
+def test_duplicate_scan_discovery_does_not_follow_external_links(
+    repository, tmp_path_factory
+):
+    external = tmp_path_factory.mktemp("external-scans")
+    source = put(external, "source.pdf")
+    first = put(repository, "tests/fixtures/first/source.pdf")
+    try:
+        (first.parent / "external").symlink_to(external, target_is_directory=True)
+        (first.parent / "linked.pdf").symlink_to(source)
+        (repository / "tests/data").symlink_to(external, target_is_directory=True)
+    except OSError:
+        pytest.skip("Directory symlinks unavailable")
+    assert clean_repository.find_duplicate_scans(repository) == {}
+    assert source.read_text() == "original bytes"
+
+
 def test_default_collection_does_not_execute_frozen_fixture_programs(tmp_path):
     source = Path(__file__).resolve().parents[2] / "conftest.py"
     (tmp_path / "conftest.py").write_text(source.read_text(), encoding="utf-8")

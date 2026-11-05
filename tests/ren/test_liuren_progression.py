@@ -1,7 +1,6 @@
 """Original progression evidence, strict same-board anchors and actual transports."""
 
 import copy
-import json
 import shutil
 from dataclasses import replace
 from pathlib import Path
@@ -20,13 +19,11 @@ from fatebridge.core.output_liuren_progression import (
 )
 from scripts.ren.audit_liuren_progression import CORPUS, audit, reference
 from scripts.ren.audit_ren_classical import make_seed
+from tests.fixtures.ren_anchors import ANCHOR_PAYLOADS as PAYLOADS
 from tests.support.transports import SPECS, business, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 REF = reference()
-PAYLOADS = json.loads((ROOT / "tests/fixtures/ren_anchors_v1/faults.json").read_text())[
-    "payloads"
-]
 
 
 @pytest.fixture(autouse=True)

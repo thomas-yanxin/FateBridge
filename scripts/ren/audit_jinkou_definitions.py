@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from itertools import product
@@ -171,19 +170,3 @@ def audit() -> dict[str, Any]:
         model_invocations=0,
         new_empirical_outcomes=0,
     )
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
-    result = audit()
-    text = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
-    if args.output:
-        args.output.write_text(text)
-    print(text)
-    return 0 if result["engineering_checks_passed"] else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

@@ -15,7 +15,11 @@ from fatebridge.core import ephemeris_runtime
 from fatebridge.core.astro import runtime
 from fatebridge.core.astro.aberration_math import (
     LIGHT_SPEED_AU_PER_DAY,
-    aberration_beta_jvp,
+)
+from fatebridge.core.astro.aberration_math import (
+    aberration_beta_jvp as aberration_beta_jvp,
+)
+from fatebridge.core.astro.aberration_math import (
     aberration_position_jvp,
     dot,
     longitude_rate_change,

@@ -7,7 +7,12 @@ from copy import deepcopy
 from datetime import datetime, time, timedelta, timezone
 from typing import TYPE_CHECKING, Any
 
-from fatebridge.core.numerology_clock_policy import CLOCK_POLICY_ID, require_birth_clock
+from fatebridge.core.numerology_clock_policy import (
+    CLOCK_POLICY_ID,
+)
+from fatebridge.core.numerology_clock_policy import (
+    require_birth_clock as require_birth_clock,
+)
 from fatebridge.utils.civil_clock import format_utc_offset, resolve_civil_clock
 from fatebridge.utils.coordinates import parse_geo_coordinate
 from fatebridge.utils.timezones import parse_timezone_name, timezone_rules_metadata

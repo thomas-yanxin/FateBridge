@@ -9,27 +9,15 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
+from fatebridge.core.bazi_star_tables import WEN_CHANG_TARGETS
+
 from ..core.rules import BaZiRules
 from ..utils.data import (
     Element,
     TenGod,
+    count_ten_gods,
     get_ten_god,
-    sum_ten_god_weight,
 )
-
-# 文昌贵人：以日干（或年干）查地支
-WENCHANG_TABLE = {
-    "甲": "巳",
-    "乙": "午",
-    "丙": "申",
-    "丁": "酉",
-    "戊": "申",
-    "己": "酉",
-    "庚": "亥",
-    "辛": "子",
-    "壬": "寅",
-    "癸": "卯",
-}
 
 # 五行/十神 → 学科方向
 SEAL_SUBJECT = {
@@ -90,20 +78,20 @@ class EducationAnalysis:
         day_stem: str,
     ) -> Dict[str, Any]:
         """统计可见干与藏干的固定加权出现量，不计算力量。"""
-        # 四组十神互不相交，逐组求和与原 elif 单遍累加结果一致。
+        counts = count_ten_gods(pillars, day_stem)
         return {
-            "seal_weight": sum_ten_god_weight(
-                pillars, day_stem, (TenGod.POSITIVE_SEAL, TenGod.PARTIAL_SEAL)
-            ),
-            "food_hurt_weight": sum_ten_god_weight(
-                pillars, day_stem, (TenGod.FOOD_GOD, TenGod.HURT_OFFICER)
-            ),
-            "officer_weight": sum_ten_god_weight(
-                pillars, day_stem, (TenGod.POSITIVE_OFFICER, TenGod.SEVEN_KILLER)
-            ),
-            "wealth_weight": sum_ten_god_weight(
-                pillars, day_stem, (TenGod.POSITIVE_WEALTH, TenGod.PARTIAL_WEALTH)
-            ),
+            "seal_weight": (counts[TenGod.POSITIVE_SEAL] + counts[TenGod.PARTIAL_SEAL])
+            or 0,
+            "food_hurt_weight": (counts[TenGod.FOOD_GOD] + counts[TenGod.HURT_OFFICER])
+            or 0,
+            "officer_weight": (
+                counts[TenGod.POSITIVE_OFFICER] + counts[TenGod.SEVEN_KILLER]
+            )
+            or 0,
+            "wealth_weight": (
+                counts[TenGod.POSITIVE_WEALTH] + counts[TenGod.PARTIAL_WEALTH]
+            )
+            or 0,
         }
 
     @staticmethod
@@ -181,7 +169,7 @@ class EducationAnalysis:
         day_stem: str,
     ) -> Dict[str, Any]:
         """文昌贵人。"""
-        target = WENCHANG_TABLE.get(day_stem)
+        target = WEN_CHANG_TARGETS.get(day_stem)
         hits = [p_name for p_name, (_, branch) in pillars.items() if branch == target]
         if hits:
             note = f"按日干{day_stem}查文昌{target}，命中柱位：{'、'.join(hits)}；这是神煞查表结果"
@@ -247,7 +235,7 @@ class EducationAnalysis:
     ) -> Dict[str, Any]:
         """考试/升学时机：印星、官星、文昌引动。"""
         signals: List[str] = []
-        wenchang = WENCHANG_TABLE.get(day_stem)
+        wenchang = WEN_CHANG_TARGETS.get(day_stem)
 
         def _assess(label: str, pillar: Tuple[str, str]) -> None:
             stem, branch = pillar

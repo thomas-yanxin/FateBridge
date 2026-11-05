@@ -159,7 +159,7 @@ def test_budgeted_own_si_proof_is_recovered_from_the_original_run(
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
     from fatebridge.application.examples import suggested_fields
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "own-si-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)

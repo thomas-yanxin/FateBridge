@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -79,28 +78,3 @@ def audit(corpus: Path = CORPUS) -> dict[str, Any]:
         requirement_scope="16個常數相容性關係，不是16個古歷時刻或原典課例；測試綠色只核對審計保留全部差異。",
     )
     return result
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
-    report = audit()
-    if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
-    print(
-        json.dumps(
-            {
-                "counts": report["counts"],
-                "dated_cases": 0,
-                "whole_calendar_acceptance": False,
-            },
-            ensure_ascii=False,
-        )
-    )
-    return 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

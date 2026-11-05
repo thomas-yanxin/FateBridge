@@ -129,8 +129,8 @@ def main(argv: list[str] | None = None) -> int:
                     linked = inspect_markdown(destination.read_text(encoding="utf-8"))
                 if unquote(url.fragment) not in linked.anchors:
                     errors.append(f"{label}:{number}: missing heading anchor: {target}")
-    json_paths = sorted((ROOT / "docs" / "examples").glob("*.json")) + sorted(
-        (ROOT / "examples").glob("*.json")
+    json_paths = sorted((ROOT / "docs" / "examples").rglob("*.json")) + sorted(
+        (ROOT / "examples").rglob("*.json")
     )
     for path in json_paths:
         try:

@@ -50,7 +50,7 @@ def test_completed_probe_comparison_restores_the_same_hash_verified_run(
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "model-choice-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)
@@ -139,7 +139,7 @@ def test_same_run_back_support_control_and_snapshot_preserve_original_harm(
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "rescue-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)
@@ -218,7 +218,7 @@ def test_fractional_boundary_clock_on_all_surfaces(offset, rest, tmp_path, capsy
 def test_fractional_clock_same_run_delivery(rest, tmp_path, capsys, monkeypatch):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "solar-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)
@@ -311,7 +311,7 @@ def test_same_run_known_tomb_text_does_not_turn_a_position_into_final_entry(
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
-    from tests.integration.test_result_delivery import reconstruct
+    from tests.support.result_delivery import reconstruct
 
     store = delivery.ResultStore(tmp_path / "stage-results")
     monkeypatch.setattr(delivery, "RESULT_STORE", store)

@@ -8,10 +8,8 @@ import json
 import math
 from typing import Any
 
-from fatebridge.core.human_design_apparent_positions import (
-    PHYSICAL_BODIES,
-    build_context,
-)
+from fatebridge.core.astro.reference import PHYSICAL_BODIES
+from fatebridge.core.human_design_apparent_positions import build_context
 from fatebridge.core.human_design_provenance import position_flag_model
 from fatebridge.validation.claims import _same_value
 

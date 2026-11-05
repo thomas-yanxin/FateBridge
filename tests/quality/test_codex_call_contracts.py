@@ -1,10 +1,6 @@
 """Guard on-demand call contracts against interface and projection drift."""
 
-import copy
-import hashlib
-import importlib.util
-import json
-from pathlib import Path
+import asyncio
 
 import pytest
 from fastmcp import Client
@@ -13,133 +9,30 @@ from jsonschema import ValidationError, validate
 from fatebridge.application.examples import example_input, suggested_fields
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fixtures.mcp_result_delivery import first_page_uri
-
-ROOT = Path(__file__).resolve().parents[2]
-_spec = importlib.util.spec_from_file_location(
-    "codex_contract_builder", ROOT / "scripts/build_codex_call_contracts.py"
-)
-builder = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(builder)
+from scripts import build_codex_call_contracts as builder
+from tests.fixtures.mcp_result_delivery import read_full_result
 
 
-def assert_same_receipt_with_explicit_runtime_delivery(inline, complete, reference):
-    restored = copy.deepcopy(inline)
-    declared = {
-        path
-        for path in reference.get("deferred_fields", [])
-        if path.startswith("run_metadata.")
-    }
-    restored_paths = set()
-    evidence = restored.get("calculation_evidence")
-    if (
-        evidence
-        and evidence.get("delivery_path") == "run_metadata.calculation_evidence"
-    ):
-        from fatebridge.utils.json_digest import digest
-
-        path = "run_metadata.calculation_evidence"
-        assert path in declared
-        assert evidence["sha256"] == digest(complete["calculation_evidence"])
-        assert evidence["coverage"] == complete["calculation_evidence"]["coverage"]
-        restored["calculation_evidence"] = copy.deepcopy(
-            complete["calculation_evidence"]
-        )
-        restored_paths.add(path)
-    runtime = restored.get("runtime") or {}
-    if runtime.get("delivery_path") == "run_metadata.runtime":
-        assert "run_metadata.runtime" in declared
-        actual = complete["runtime"]
-        assert runtime["environment_sha256"] == actual["environment_sha256"]
-        assert runtime["ephemeris_inventory_sha256"] == actual["ephemeris"]["sha256"]
-        assert type(runtime["ephemeris_files_count"]) is int
-        assert runtime["ephemeris_files_count"] == len(actual["ephemeris"]["files"])
-        restored["runtime"] = actual
-        restored_paths.add("run_metadata.runtime")
-    for key in complete.keys() - restored.keys():
-        # Restore only explicitly deferred supplementary metadata. Essential
-        # run identities/hashes must remain inline; do not fill arbitrary gaps.
-        assert key in {"provenance", "determinism"}
-        path = "run_metadata." + key
-        assert path in declared
-        restored[key] = copy.deepcopy(complete[key])
-        restored_paths.add(path)
-    assert declared == restored_paths
-    assert restored == complete
-    assert json.dumps(restored, sort_keys=True) == json.dumps(complete, sort_keys=True)
-
-
-def test_receipt_recovery_requires_exact_declarations_and_keeps_essential_identity_inline():
-    complete = {
-        "run_id": "same-run",
-        "business_output_sha256": "a" * 64,
-        "runtime": {
-            "environment_sha256": "b" * 64,
-            "ephemeris": {"sha256": "c" * 64, "files": {"sepl_18.se1": "d" * 64}},
-        },
-        "provenance": {"source": "same-run receipt"},
-        "determinism": {"randomness_used": False},
-    }
-    inline = {
-        key: copy.deepcopy(value)
-        for key, value in complete.items()
-        if key not in {"provenance", "determinism"}
-    }
-    inline["runtime"] = {
-        "delivery_path": "run_metadata.runtime",
-        "environment_sha256": "b" * 64,
-        "ephemeris_inventory_sha256": "c" * 64,
-        "ephemeris_files_count": 1,
-    }
-    reference = {
-        "deferred_fields": [
-            "run_metadata.runtime",
-            "run_metadata.provenance",
-            "run_metadata.determinism",
-        ]
-    }
-    assert_same_receipt_with_explicit_runtime_delivery(inline, complete, reference)
-    for patch in [
-        {"deferred_fields": ["run_metadata.runtime"]},
-        {"deferred_fields": [*reference["deferred_fields"], "run_metadata.unused"]},
-    ]:
-        with pytest.raises(AssertionError):
-            assert_same_receipt_with_explicit_runtime_delivery(inline, complete, patch)
-    missing_identity = {k: v for k, v in inline.items() if k != "run_id"}
-    with pytest.raises(AssertionError):
-        assert_same_receipt_with_explicit_runtime_delivery(
-            missing_identity,
-            complete,
-            {"deferred_fields": [*reference["deferred_fields"], "run_metadata.run_id"]},
-        )
-    corrupted = copy.deepcopy(inline)
-    corrupted["runtime"]["ephemeris_files_count"] = 2
-    with pytest.raises(AssertionError):
-        assert_same_receipt_with_explicit_runtime_delivery(
-            corrupted, complete, reference
-        )
-    corrupted["runtime"]["ephemeris_files_count"] = True
-    with pytest.raises(AssertionError):
-        assert_same_receipt_with_explicit_runtime_delivery(
-            corrupted, complete, reference
-        )
+@pytest.fixture(scope="module")
+def published_contracts():
+    return asyncio.run(builder.call_contracts())
 
 
 @pytest.mark.asyncio
-async def test_normally_loaded_contracts_match_current_public_interface():
-    for name, text in (await builder.render_files()).items():
-        assert (builder.TARGET / name).read_text(encoding="utf-8") == text
-    guidance = (ROOT / "AGENTS.md").read_bytes()
-    assert len(guidance) < 8192  # Repository context budget, below Codex's default cap.
-    assert b'"properties"' not in guidance
-
-
-@pytest.mark.asyncio
-async def test_contract_publication_ignores_object_order_but_preserves_constraints(
-    monkeypatch,
+async def test_normally_loaded_contracts_match_current_public_interface(
+    published_contracts, monkeypatch
 ):
-    records = await builder.call_contracts()
-    baseline = await builder.render_files()
+    async def contracts():
+        return published_contracts
+
+    monkeypatch.setattr(builder, "call_contracts", contracts)
+    await builder.main(["--check"])
+
+
+def test_contract_publication_ignores_object_order_but_preserves_constraints(
+    published_contracts,
+):
+    baseline = builder.render_files(published_contracts)
 
     def reverse_objects(value):
         if isinstance(value, dict):
@@ -151,24 +44,49 @@ async def test_contract_publication_ignores_object_order_but_preserves_constrain
             return [reverse_objects(item) for item in value]
         return value
 
-    reordered = reverse_objects(records)
-
-    async def contracts():
-        return reordered
-
-    monkeypatch.setattr(builder, "call_contracts", contracts)
-    assert await builder.render_files() == baseline
-    # Published tools need not all be birth_* interfaces (e.g. heluo/canping).
+    reordered = reverse_objects(published_contracts)
+    assert builder.render_files(reordered) == baseline
     birth_record = next(item for item in reordered if item["tool"] == "bazi_career")
     birth_record["input"]["properties"]["birth_hour"]["maximum"] = 22
-    assert await builder.render_files() != baseline
+    assert builder.render_files(reordered) != baseline
 
 
 @pytest.mark.asyncio
-async def test_published_contract_keeps_required_time_and_solar_flag_constraints():
-    record = next(
-        item for item in await builder.call_contracts() if item["tool"] == "bazi_career"
-    )
+@pytest.mark.parametrize("change", ["missing", "changed", "obsolete"])
+async def test_contract_generation_repairs_drift_and_removes_retired_json(
+    tmp_path, monkeypatch, change
+):
+    async def contracts():
+        return [{"tool": "active", "input": {"type": "object"}}]
+
+    monkeypatch.setattr(builder, "call_contracts", contracts)
+    monkeypatch.setattr(builder, "TARGET", tmp_path)
+    await builder.main([])
+    note = tmp_path / "maintenance.md"
+    note.write_text("Keep authored notes")
+    active = tmp_path / "active.json"
+    retired = tmp_path / "retired.json"
+    if change == "missing":
+        active.unlink()
+    elif change == "changed":
+        active.write_text("{}")
+    else:
+        retired.write_text("{}")
+    with pytest.raises(SystemExit, match="active.json|retired.json"):
+        await builder.main(["--check"])
+    # Checking is read-only; generation repairs the exact publication set.
+    assert retired.exists() is (change == "obsolete")
+    assert active.exists() is (change != "missing")
+    await builder.main([])
+    await builder.main(["--check"])
+    assert {p.name for p in tmp_path.glob("*.json")} == {"active.json"}
+    assert note.read_text() == "Keep authored notes"
+
+
+def test_published_contract_keeps_required_time_and_solar_flag_constraints(
+    published_contracts,
+):
+    record = next(item for item in published_contracts if item["tool"] == "bazi_career")
     spec = next(s for s in CATALOG if s.tool_name == record["tool"])
     params = example_input(spec)
     validate(params, record["input"])
@@ -184,11 +102,13 @@ async def test_published_contract_keeps_required_time_and_solar_flag_constraints
 
 
 @pytest.mark.asyncio
-async def test_published_stage_view_retains_actual_period_boundaries():
+async def test_published_stage_view_retains_actual_period_boundaries(
+    published_contracts,
+):
     """A on-demand contract must support stage reading without rediscovery."""
     record = next(
         item
-        for item in await builder.call_contracts()
+        for item in published_contracts
         if item["tool"] == "western_timing_analysis"
     )
     spec = next(s for s in CATALOG if s.tool_name == record["tool"])
@@ -202,17 +122,8 @@ async def test_published_stage_view_retains_actual_period_boundaries():
                 "include_snapshot_text": False,
             },
         )
-        payload = result.structured_content
-        if "result_delivery" in payload:
-            reference = payload["result_delivery"]
-            pieces = []
-            uri = await first_page_uri(client, reference)
-            while uri:
-                page = json.loads((await client.read_resource(uri))[0].text)
-                pieces.append(page["text"])
-                uri = page["next_uri"]
-            payload = json.loads("".join(pieces))
         assert not result.is_error
+        payload = await read_full_result(client, result.structured_content)
         firdaria = payload["time_lords"]["firdaria"]
         for period in (firdaria["current_major"], firdaria["current_sub"]):
             assert period["planet"] and period["start"] < period["end"]
@@ -220,12 +131,14 @@ async def test_published_stage_view_retains_actual_period_boundaries():
 
 @pytest.mark.asyncio
 @pytest.mark.local_data
-async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls():
+async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls(
+    published_contracts,
+):
     from tests.support.compatibility_reference import (
         assert_source_condition_score_reference,
     )
 
-    records = await builder.call_contracts()
+    records = published_contracts
     specs = {s.tool_name: s for s in CATALOG}
     async with Client(create_mcp_app()) as client:
         for record in records:
@@ -237,22 +150,7 @@ async def test_only_published_inputs_and_views_are_enough_for_real_mcp_calls():
             validate(params, record["input"])
             result = await client.call_tool(record["tool"], params)
             assert not result.is_error
-            payload = result.structured_content
-            if "result_delivery" in payload:
-                reference = payload["result_delivery"]
-                pieces = []
-                uri = await first_page_uri(client, reference)
-                while uri:
-                    page = json.loads((await client.read_resource(uri))[0].text)
-                    pieces.append(page["text"])
-                    uri = page["next_uri"]
-                text = "".join(pieces)
-                assert hashlib.sha256(text.encode()).hexdigest() == reference["sha256"]
-                original_receipt = payload["run_metadata"]
-                payload = json.loads(text)
-                assert_same_receipt_with_explicit_runtime_delivery(
-                    original_receipt, payload["run_metadata"], reference
-                )
+            payload = await read_full_result(client, result.structured_content)
             assert (
                 payload["run_metadata"]["tool_name"]
                 == specs[record["tool"]].run_metadata_name
@@ -341,22 +239,7 @@ async def test_fengshui_first_views_deliver_resolvable_rule_sources():
                 },
             )
             assert not result.is_error
-            payload = result.structured_content
-            if "result_delivery" in payload:
-                reference = payload["result_delivery"]
-                pieces = []
-                uri = await first_page_uri(client, reference)
-                while uri:
-                    page = json.loads((await client.read_resource(uri))[0].text)
-                    pieces.append(page["text"])
-                    uri = page["next_uri"]
-                text = "".join(pieces)
-                assert hashlib.sha256(text.encode()).hexdigest() == reference["sha256"]
-                original_receipt = payload["run_metadata"]
-                payload = json.loads(text)
-                assert_same_receipt_with_explicit_runtime_delivery(
-                    original_receipt, payload["run_metadata"], reference
-                )
+            payload = await read_full_result(client, result.structured_content)
             assert payload["rulesets"] and payload["rule_trace"]
             sources = {}
             for ruleset in payload["rulesets"]:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import os
 import shutil
 import subprocess
@@ -25,6 +26,64 @@ CACHES = (
     "resolved-dependencies.txt",
     "ci-evidence",
 )
+SOURCE_SCAN_SUFFIXES = {".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff", ".webp"}
+
+
+def find_duplicate_scans(root: Path) -> dict[str, list[Path]]:
+    """Group byte-identical original scans, excluding links and mutable records."""
+    sizes: dict[int, list[Path]] = {}
+    for base in (root / "tests/fixtures", root / "tests/data"):
+        if base.is_symlink():
+            continue
+        for current, directories, files in os.walk(base, followlinks=False):
+            parent = Path(current)
+            directories[:] = [
+                name
+                for name in directories
+                if name != "__pycache__" and not (parent / name).is_symlink()
+            ]
+            for name in files:
+                path = parent / name
+                if (
+                    path.suffix.lower() in SOURCE_SCAN_SUFFIXES
+                    and not path.is_symlink()
+                ):
+                    sizes.setdefault(path.stat().st_size, []).append(path)
+    groups: dict[str, list[Path]] = {}
+    for paths in sizes.values():
+        if len(paths) < 2:
+            continue
+        for path in sorted(paths):
+            digest = hashlib.sha256()
+            with path.open("rb") as stream:
+                for block in iter(lambda: stream.read(1024 * 1024), b""):
+                    digest.update(block)
+            groups.setdefault(digest.hexdigest(), []).append(path)
+    return {digest: paths for digest, paths in groups.items() if len(paths) > 1}
+
+
+def share_source_scans(root: Path, groups: dict[str, list[Path]]) -> None:
+    """Store each original once; frozen corpus paths remain relative references."""
+    storage = root / "tests/data/shared_sources"
+    for digest, paths in groups.items():
+        stored = [path for path in paths if path.parent == storage]
+        canonical = (
+            stored[0] if stored else storage / (digest + paths[0].suffix.lower())
+        )
+        if not stored:
+            storage.mkdir(parents=True, exist_ok=True)
+            os.link(paths[0], canonical)
+        for path in paths:
+            if path == canonical:
+                continue
+            # Replace only after the relative link exists. A failed link creation
+            # leaves the original scan in place, including on Windows hosts.
+            temporary = path.with_name("." + path.name + ".shared-source")
+            temporary.symlink_to(os.path.relpath(canonical, path.parent))
+            try:
+                temporary.replace(path)
+            finally:
+                temporary.unlink(missing_ok=True)
 
 
 def find_artifacts(root: Path) -> list[Path]:
@@ -71,20 +130,29 @@ def tracked_artifacts(root: Path, candidates: list[Path]) -> list[str]:
         capture_output=True,
     )
     tracked = [Path(os.fsdecode(item)) for item in result.stdout.split(b"\0") if item]
+    relative = {item.relative_to(root) for item in candidates}
     return [
         str(path)
         for path in tracked
-        if any(path.is_relative_to(item.relative_to(root)) for item in candidates)
+        if path in relative or any(parent in relative for parent in path.parents)
     ]
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apply", action="store_true", help="remove listed artifacts")
+    parser.add_argument(
+        "--deduplicate-scans",
+        action="store_true",
+        help="share identical local source scans using relative symbolic links",
+    )
     options = parser.parse_args(argv)
     candidates = find_artifacts(ROOT)
+    scans = find_duplicate_scans(ROOT) if options.deduplicate_scans else {}
     try:
-        protected = tracked_artifacts(ROOT, candidates)
+        protected = tracked_artifacts(
+            ROOT, candidates + [path for paths in scans.values() for path in paths]
+        )
     except (subprocess.CalledProcessError, OSError, ValueError):
         print("Cannot read the Git index; no artifacts removed.")
         return 1
@@ -92,6 +160,16 @@ def main(argv: list[str] | None = None) -> int:
         print("Tracked files found in cleanup candidates; no artifacts removed:")
         print("\n".join(protected))
         return 1
+    if options.deduplicate_scans:
+        aliases = sum(len(paths) - 1 for paths in scans.values())
+        size = sum(
+            paths[0].stat().st_size * (len(paths) - 1) for paths in scans.values()
+        )
+        print(
+            f"Source scans: {len(scans)} duplicate groups, {aliases} extra copies, {size} bytes."
+        )
+        if options.apply:
+            share_source_scans(ROOT, scans)
     for path in candidates:
         print(path.relative_to(ROOT))
         if options.apply:

@@ -14,14 +14,6 @@ METHOD_ID = "registered_source_conditions_v1"
 DATA_NAME = "bazi-source-conditions.json"
 
 
-def canonical_digest(value: Any) -> str:
-    return hashlib.sha256(
-        json.dumps(
-            value, ensure_ascii=False, sort_keys=True, separators=(",", ":")
-        ).encode()
-    ).hexdigest()
-
-
 @lru_cache(maxsize=1)
 def _published_plan() -> dict[str, Any]:
     raw = (

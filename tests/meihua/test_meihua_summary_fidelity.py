@@ -1,15 +1,9 @@
 """Published default evidence and summaries carry their own computed qualifiers."""
 
-import json
-from pathlib import Path
-
 import pytest
 
 from fatebridge.application.examples import suggested_fields
 from tests.support.transports import SPECS
-
-FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_summary_fidelity_v1"
-POLICY = json.loads((FIXTURE / "composition-policy.json").read_text())
 
 
 @pytest.mark.parametrize("tool", ["meihua_cast", "meihua_analysis"])

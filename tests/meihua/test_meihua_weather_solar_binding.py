@@ -4,8 +4,6 @@ import ast
 import copy
 import hashlib
 import json
-import subprocess
-import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -249,33 +247,3 @@ def test_reference_hash_drift_is_not_accepted_as_better_agreement(
                 datetime.fromisoformat("2026-01-01T12:00:00+08:00")
             )
     binding._profile.cache_clear()
-
-
-@pytest.mark.parametrize("kind", ["inside", "existing", "hardlink", "symlink"])
-def test_cli_does_not_overwrite_or_write_into_immutable_study(kind, tmp_path):
-    study = tmp_path / "study"
-    study.mkdir()
-    original = study / "evidence.json"
-    original.write_text("immutable")
-    output = study / "new.json" if kind == "inside" else tmp_path / "result.json"
-    if kind == "existing":
-        output.write_text("existing")
-    elif kind == "hardlink":
-        output.hardlink_to(original)
-    elif kind == "symlink":
-        output.symlink_to(original)
-    process = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts/meihua/audit_meihua_weather_solar_binding.py"),
-            "--study",
-            str(study),
-            "--output",
-            str(output),
-        ],
-        capture_output=True,
-        text=True,
-    )
-    assert process.returncode == 2
-    assert original.read_text() == "immutable"
-    assert "new file outside" in process.stderr

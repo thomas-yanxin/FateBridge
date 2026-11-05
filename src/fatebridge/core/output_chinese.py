@@ -8,14 +8,7 @@ interpretation, plugin details and user question inputs remain extensible JSON.
 from datetime import datetime as _datetime
 from typing import Any, Dict, List, Literal, Optional, Union
 
-from pydantic import (
-    Field,
-    JsonValue,
-    StrictBool,
-    StrictInt,
-    field_validator,
-    model_validator,
-)
+from pydantic import Field, JsonValue, field_validator, model_validator
 
 from fatebridge.core.output_base import FullFact, PartialOutput
 from fatebridge.core.output_canping_schedule import CanpingScheduleBasis
@@ -40,7 +33,6 @@ from fatebridge.core.output_jinkou_interactions import JinkouPositionInteraction
 from fatebridge.core.output_jinkou_natal import JinkouNatalAbsolute
 from fatebridge.core.output_jinkou_qi_models import (
     JinkouInternalRelation,
-    JinkouMonthBuildingCheck,
     JinkouQiEvidence,
 )
 from fatebridge.core.output_jinkou_sources import JinkouStrengthSource, JinkouUseSource
@@ -58,7 +50,7 @@ from fatebridge.core.output_liuren_day_placements import (
     LiurenDayPlacements,
     align_day_placements,
 )
-from fatebridge.core.output_liuren_emptiness import Branch, LiurenEmptinessEvidence
+from fatebridge.core.output_liuren_emptiness import LiurenEmptinessEvidence
 from fatebridge.core.output_liuren_god_yin import LiurenGodYin, align_god_yin
 from fatebridge.core.output_liuren_life import LiurenLifeStage, LiurenLifeStages
 from fatebridge.core.output_liuren_progression import (

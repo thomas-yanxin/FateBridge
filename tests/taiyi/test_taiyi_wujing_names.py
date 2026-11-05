@@ -3,8 +3,6 @@
 import copy
 import json
 import shutil
-import subprocess
-import sys
 
 import pytest
 
@@ -64,6 +62,9 @@ def test_full_cohort_and_original_results_are_retained(report):
     assert report["whole_classic_acceptance_passed"] is False
     assert report["new_dated_cases"] == report["new_model_calls"] == 0
 
+    assert report["required_observations"] == 1440
+    assert report["whole_classic_acceptance_passed"] is False
+
 
 @pytest.mark.parametrize(
     "identifier,field",
@@ -120,24 +121,3 @@ def test_changed_source_is_rejected(tmp_path, name):
     (corpus / name).write_bytes(b"changed")
     with pytest.raises(ValueError, match="指纹"):
         verify(corpus)
-
-
-def test_documented_cli_reports_failed_acceptance_without_execution_error(tmp_path):
-    path = tmp_path / "report.json"
-    process = subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "scripts.taiyi.audit_taiyi_wujing_names",
-            "--output",
-            str(path),
-        ],
-        cwd=ROOT,
-        text=True,
-        capture_output=True,
-    )
-    assert process.returncode == 1
-    assert "Traceback" not in process.stderr
-    result = json.loads(path.read_text())
-    assert result["required_observations"] == 1440
-    assert result["whole_classic_acceptance_passed"] is False
