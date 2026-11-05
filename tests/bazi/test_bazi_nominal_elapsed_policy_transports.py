@@ -1,16 +1,10 @@
 """The same declared nominal clock scale survives full and projected delivery."""
 
-import asyncio
-
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 DECLARATIONS = {
     "elapsed_scale": "nominal_utc_label_seconds",
@@ -23,9 +17,7 @@ rest = _shared_rest
 
 @pytest.mark.parametrize("tool", ["timing_analysis", "dayun_analysis"])
 @pytest.mark.parametrize("project", [False, True])
-def test_dayun_duration_scale_survives_rest_mcp_and_cli(
-    tool, project, rest, tmp_path, capsys
-):
+def test_dayun_duration_scale_survives_rest_mcp_and_cli(tool, project, surface_calls):
     spec = SPECS[tool]
     payload = {
         "birth_year": 2016,
@@ -48,9 +40,9 @@ def test_dayun_duration_scale_survives_rest_mcp_and_cli(
     if project:
         options.update(fields=[path], strict_fields=True)
         flags += ["--fields", path, "--strict-fields", "true"]
-    http = rest.post(spec.rest_path, json=payload, params=options)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec, payload, params=options, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     results = [http.json(), protocol.structured_content, cli]
     for result in results:

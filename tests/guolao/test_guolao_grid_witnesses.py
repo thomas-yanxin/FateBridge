@@ -2,9 +2,6 @@
 
 import hashlib
 import json
-import os
-import subprocess
-import sys
 from dataclasses import replace
 from pathlib import Path
 
@@ -147,22 +144,3 @@ def test_attached_reading_cannot_be_reused_for_a_different_marker_or_column():
         replace(reading, cell=GridCell("虚", None, False))
     with pytest.raises(ValueError):
         replace(reading, witness_id="")
-
-
-def test_actual_research_command_and_uncollated_error():
-    env = dict(os.environ, PYTHONPATH=str(ROOT / "src"))
-    command = [
-        sys.executable,
-        str(ROOT / "scripts/guolao/audit_guolao_grid_witnesses.py"),
-        "--palace",
-        "午",
-        "--column",
-    ]
-    result = subprocess.run(
-        [*command, "15"], env=env, text=True, capture_output=True, check=True
-    )
-    actual = json.loads(result.stdout)
-    assert actual == module.compare_witnesses(palace="午", column=15)
-    error = subprocess.run([*command, "29"], env=env, text=True, capture_output=True)
-    assert error.returncode != 0 and "未校勘" in error.stderr
-    assert not error.stdout

@@ -1,6 +1,5 @@
 """A reference supplement cannot rewrite the parent study or its source window."""
 
-import asyncio
 import hashlib
 import json
 from calendar import month_name
@@ -10,13 +9,7 @@ from pathlib import Path
 import pytest
 
 import fatebridge.validation.meihua_weather_reference_study as module
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 
 def put(path, value):
@@ -122,7 +115,7 @@ def test_normals_parser_selects0_1mm_column_and_all_twelve_months():
 
 @pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
 def test_conditional_reference_counts_and_unknown_vintages_survive_all_surfaces(
-    tool, rest, tmp_path, capsys
+    tool, surface_calls
 ):
     spec = SPECS[tool]
     payload = {"interpretation_topic": "weather"}
@@ -144,30 +137,14 @@ def test_conditional_reference_counts_and_unknown_vintages_survive_all_surfaces(
         "interpretation.weather.research_validation",
         "interpretation.weather.single_forecast",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *(("fields", f) for f in fields),
-            ("strict_fields", "true"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])

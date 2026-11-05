@@ -1,6 +1,5 @@
 """Pinned Jingben ordinals, independent courses, missing facts and real ports."""
 
-import asyncio
 import copy
 
 import pytest
@@ -12,14 +11,8 @@ from fatebridge.core.output_chinese import Jinkou, JinkouYearFate
 from fatebridge.core.requests.metaphysics import JinkouAnalysisRequest
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
 from scripts.ren.audit_jinkou_year_fate import course_cases, references
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    call_cli,
-    native,
-    rest,
-)
 from tests.support.output_facts import canonical_json
+from tests.support.transports import AS_OF, SPECS, rest, surface_calls
 
 REF, _RAW, _ERRATA = references()
 COURSE, CASES = course_cases()
@@ -189,18 +182,18 @@ def test_complete_business_cannot_hide_annual_inputs_or_reuse_another_day(
 
 
 @pytest.mark.parametrize("case", CASES)
-def test_independent_year_course_and_real_rest_mcp_cli(case, rest, tmp_path, capsys):
+def test_independent_year_course_and_real_rest_mcp_cli(case, surface_calls):
     payload = {
         **COURSE["calendar"],
         "gender": case["gender"],
         "is_diurnal": case["is_diurnal"],
     }
-    response = rest.post(
-        SPEC.rest_path, json=payload, params={"as_of": AS_OF, "response_char_limit": 0}
-    )
-    protocol = asyncio.run(native(SPEC, payload))
-    code, cli = call_cli(
-        SPEC, payload, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    response, protocol, code, cli = surface_calls(
+        SPEC,
+        payload,
+        params={"as_of": AS_OF, "response_char_limit": 0},
+        flags=["--response-char-limit", "0"],
+        cli_first=False,
     )
     assert response.status_code == 200 and not protocol.is_error and code == 0
     facts = []
@@ -244,18 +237,16 @@ def test_independent_year_course_and_real_rest_mcp_cli(case, rest, tmp_path, cap
     assert len(set(facts)) == 1
 
 
-def test_unknown_sex_keeps_year_course_unknown_in_strict_three_port_view(
-    rest, tmp_path, capsys
-):
+def test_unknown_sex_keeps_year_course_unknown_in_strict_three_port_view(surface_calls):
     from fatebridge.application.examples import evidence_views
 
     view = evidence_views(SPEC)["year_fate"]
     assert "purpose" in view and "jinkou.year_fate" in view["fields"]
     payload = {**COURSE["calendar"], "gender": "未知", "is_diurnal": False}
     fields = ["four_pillars", "jinkou.year_fate", "jinkou.overview.di_fen"]
-    response = rest.post(
-        SPEC.rest_path,
-        json=payload,
+    response, protocol, code, cli = surface_calls(
+        SPEC,
+        payload,
         params=[("fields", name) for name in fields]
         + [
             ("strict_fields", "true"),
@@ -263,21 +254,11 @@ def test_unknown_sex_keeps_year_course_unknown_in_strict_three_port_view(
             ("as_of", AS_OF),
             ("response_char_limit", "0"),
         ],
-    )
-    protocol = asyncio.run(
-        native(
-            SPEC,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
-    code, cli = call_cli(
-        SPEC,
-        payload,
-        tmp_path,
-        capsys,
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
         flags=[
             "--fields",
             *fields,
@@ -286,6 +267,7 @@ def test_unknown_sex_keeps_year_course_unknown_in_strict_three_port_view(
             "--response-char-limit",
             "0",
         ],
+        cli_first=False,
     )
     assert response.status_code == 200 and not protocol.is_error and code == 0
     facts = []
@@ -304,9 +286,9 @@ def test_unknown_sex_keeps_year_course_unknown_in_strict_three_port_view(
     assert len(set(facts)) == 1
 
 
-def test_invalid_birth_ganzhi_is_rejected_by_all_actual_ports(rest, tmp_path, capsys):
+def test_invalid_birth_ganzhi_is_rejected_by_all_actual_ports(surface_calls):
     payload = {**COURSE["calendar"], "birth_year_ganzhi": "甲丑", "gender": "男"}
-    response = rest.post(SPEC.rest_path, json=payload, params={"as_of": AS_OF})
-    protocol = asyncio.run(native(SPEC, payload))
-    code, _ = call_cli(SPEC, payload, tmp_path, capsys)
+    response, protocol, code, _ = surface_calls(
+        SPEC, payload, params={"as_of": AS_OF}, cli_first=False
+    )
     assert response.status_code in (400, 422) and protocol.is_error and code != 0

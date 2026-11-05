@@ -1,7 +1,5 @@
 """Regressions for career evidence lost between raw calculation and advice."""
 
-import asyncio
-
 import pytest
 
 from fatebridge.analysis.career import CareerAnalysis
@@ -14,13 +12,7 @@ from fatebridge.core.almanac import localize_datetime
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.services.bazi import calculate_bazi_career
 from fatebridge.utils.birth_input import create_person_info
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 D1 = dict(
     birth_year=1992,
@@ -130,25 +122,24 @@ def test_partial_override_reports_effective_pillar_and_marks_auto_age_reference(
 
 @pytest.mark.parametrize("view", [None, "direction", "target_year"])
 def test_career_projection_preserves_primary_tie_and_scope_across_transports(
-    view, rest, tmp_path, capsys
+    view, surface_calls
 ):
     spec = SPECS["bazi_career"]
     fields = suggested_fields(spec, view=view)
     params = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=D1, params=params)
-    protocol = asyncio.run(native(spec, D1, **params))
-    code, output = call_cli(
+    http, protocol, code, output = surface_calls(
         spec,
         D1,
-        tmp_path,
-        capsys,
-        [
+        params=params,
+        options=params,
+        flags=[
             "--no-metadata",
             "--fields",
             *fields,
             "--strict-fields",
             "--no-include-snapshot-text",
         ],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert business(http.json()) == business(protocol.structured_content) == output
@@ -172,9 +163,7 @@ def test_western_career_view_keeps_phase_bounds_and_real_transit_evidence():
     assert "career" in evidence_views(spec)
 
 
-def test_western_career_actual_evidence_agrees_across_transports(
-    rest, tmp_path, capsys
-):
+def test_western_career_actual_evidence_agrees_across_transports(surface_calls):
     spec = SPECS["western_timing_analysis"]
     fields = suggested_fields(spec, view="career")
     request = {
@@ -192,16 +181,12 @@ def test_western_career_actual_evidence_agrees_across_transports(
         response_char_limit=0,
         as_of="2026-10-12T02:00:00Z",
     )
-    http = rest.post(spec.rest_path, json=request, params=params)
-    protocol = asyncio.run(
-        native(spec, request, **{k: v for k, v in params.items() if k != "as_of"})
-    )
-    code, output = call_cli(
+    http, protocol, code, output = surface_calls(
         spec,
         request,
-        tmp_path,
-        capsys,
-        [
+        params=params,
+        options={k: v for k, v in params.items() if k != "as_of"},
+        flags=[
             "--no-metadata",
             "--fields",
             *fields,
@@ -210,6 +195,7 @@ def test_western_career_actual_evidence_agrees_across_transports(
             "--response-char-limit",
             "0",
         ],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert business(http.json()) == business(protocol.structured_content) == output
@@ -226,10 +212,8 @@ def test_western_career_actual_evidence_agrees_across_transports(
 
 
 def test_omitted_target_date_uses_person_timezone_at_frozen_utc_across_transports(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
-    # AS_OF is 2026-10-12T02Z: New York is still October 11, while the
-    # default Shanghai clock is October 12. A timezone label alone is insufficient.
     spec = SPECS["bazi_career"]
     request = {k: v for k, v in D1.items() if not k.startswith("analysis_")}
     request.update(
@@ -237,22 +221,19 @@ def test_omitted_target_date_uses_person_timezone_at_frozen_utc_across_transport
     )
     fields = ["career_analysis.timing_context"]
     params = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(
-        spec.rest_path, json=request, params={**params, "as_of": "2026-10-12T02:00:00Z"}
-    )
-    protocol = asyncio.run(native(spec, request, **params))
-    code, output = call_cli(
+    http, protocol, code, output = surface_calls(
         spec,
         request,
-        tmp_path,
-        capsys,
-        [
+        params={**params, "as_of": "2026-10-12T02:00:00Z"},
+        options=params,
+        flags=[
             "--no-metadata",
             "--fields",
             *fields,
             "--strict-fields",
             "--no-include-snapshot-text",
         ],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert business(http.json()) == business(protocol.structured_content) == output
@@ -284,29 +265,24 @@ def test_omitted_target_date_uses_person_timezone_at_frozen_utc_across_transport
     ],
 )
 def test_suggestions_do_not_reintroduce_single_primary_or_classical_formation(
-    case_input, expected_score, rest, tmp_path, capsys
+    case_input, expected_score, surface_calls
 ):
     spec = SPECS["bazi_career"]
     fields = ["career_analysis"]
     params = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(
-        spec.rest_path,
-        json=case_input,
-        params={**params, "as_of": "2026-10-12T02:00:00Z"},
-    )
-    protocol = asyncio.run(native(spec, case_input, **params))
-    code, output = call_cli(
+    http, protocol, code, output = surface_calls(
         spec,
         case_input,
-        tmp_path,
-        capsys,
-        [
+        params={**params, "as_of": "2026-10-12T02:00:00Z"},
+        options=params,
+        flags=[
             "--no-metadata",
             "--fields",
             *fields,
             "--strict-fields",
             "--no-include-snapshot-text",
         ],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert business(http.json()) == business(protocol.structured_content) == output
@@ -337,12 +313,10 @@ def test_suggestions_do_not_reintroduce_single_primary_or_classical_formation(
         {"dayun_pillar": "甲子suffix", "liunian_pillar": "丙寅suffix"},
     ],
 )
-def test_bad_overrides_rejected_across_transports(override, rest, tmp_path, capsys):
+def test_bad_overrides_rejected_across_transports(override, surface_calls):
     spec = SPECS["bazi_career"]
     case_input = {**D1, **override}
-    http = rest.post(spec.rest_path, json=case_input)
-    protocol = asyncio.run(native(spec, case_input))
-    code, output = call_cli(spec, case_input, tmp_path, capsys)
+    http, protocol, code, output = surface_calls(spec, case_input, cli_first=False)
     assert http.status_code == 422 and protocol.is_error and code == 1
     bodies = [http.json(), protocol.structured_content, output]
     for body in bodies:
@@ -393,26 +367,25 @@ def test_all_and_only_sixty_sexagenary_pillars_are_valid():
 
 
 def test_exact_valid_dual_override_matches_applied_pillars_across_transports(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
     spec = SPECS["bazi_career"]
     case_input = {**D1, "dayun_pillar": "甲子", "liunian_pillar": "丙寅"}
     fields = ["career_analysis.timing_context", "career_analysis.career_timing"]
     params = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=case_input, params=params)
-    protocol = asyncio.run(native(spec, case_input, **params))
-    code, output = call_cli(
+    http, protocol, code, output = surface_calls(
         spec,
         case_input,
-        tmp_path,
-        capsys,
-        [
+        params=params,
+        options=params,
+        flags=[
             "--no-metadata",
             "--fields",
             *fields,
             "--strict-fields",
             "--no-include-snapshot-text",
         ],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert business(http.json()) == business(protocol.structured_content) == output

@@ -1,6 +1,5 @@
 """Transmission selection, branch kin and new source layers remain distinct."""
 
-import asyncio
 import copy
 import importlib.util
 import json
@@ -19,14 +18,7 @@ from fatebridge.core.metaphysics.liureng_transmission_relations import (
 from fatebridge.core.output_liuren_transmission_relations import (
     LiurenTransmissionRelations,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 MOD = importlib.util.spec_from_file_location(
@@ -131,7 +123,7 @@ def test_duplicate_trine_members_and_earth_branches_do_not_invent_a_trine():
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_four_families_deliver_same_source_layers_on_three_ports(
-    key, project, rest, tmp_path, capsys
+    key, project, surface_calls
 ):
     spec = SPECS[key]
     fields = [
@@ -157,9 +149,14 @@ def test_four_families_deliver_same_source_layers_on_three_ports(
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=PAYLOADS[key], params=params)
-    protocol = asyncio.run(native(spec, PAYLOADS[key], **options))
-    code, cli = call_cli(spec, PAYLOADS[key], tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec,
+        PAYLOADS[key],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)
@@ -188,7 +185,7 @@ def test_four_families_deliver_same_source_layers_on_three_ports(
 @pytest.mark.parametrize("key", ["liureng_gods", "jinkou"])
 @pytest.mark.parametrize("project", [False, True])
 def test_false_source_layers_fail_before_unrelated_projection(
-    kind, key, project, rest, monkeypatch, tmp_path, capsys
+    kind, key, project, monkeypatch, surface_calls
 ):
     spec = SPECS[key]
     bad = raw(key)
@@ -223,9 +220,14 @@ def test_false_source_layers_fail_before_unrelated_projection(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(spec.rest_path, json=PAYLOADS[key], params=params)
-    protocol = asyncio.run(native(spec, PAYLOADS[key], **options))
-    code, cli = call_cli(spec, PAYLOADS[key], tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec,
+        PAYLOADS[key],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert (
         http.status_code == 500
         and protocol.is_error

@@ -11,24 +11,23 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import evidence_views
 from fatebridge.cli import run
-from fatebridge.core.ephemeris_runtime import configure_ephemeris_path
 from scripts.western.audit_western_tt_events import (
     CORPUS,
     ROOT,
     validate_reference_identity,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.fixtures.surface_payloads import REST_POST_CASES
+from tests.support.transports import (
     SPECS,
     business,
-    call_cli,
     inputs,
     native,
     rest,
+    surface_calls,
 )
-from tests.fixtures.surface_payloads import REST_POST_CASES
 from tests.western.test_western_event_clock_transports import surfaces
 from tests.western.test_western_horary import QUESTION
-from tests.western.test_western_mixed_moon import directories, selected
+from tests.western.test_western_mixed_moon import selected
 
 
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
@@ -83,9 +82,7 @@ def test_c04_last_nominal_epoch_computes_lilly_daily_motion_on_all_protocols(
         assert horary["verdict"] == "uncertain"
 
 
-def test_uncovered_nominal_ut1_is_still_rejected_on_all_protocols(
-    rest, tmp_path, capsys
-):
+def test_uncovered_nominal_ut1_is_still_rejected_on_all_protocols(surface_calls):
     spec = SPECS["astro_horary"]
     args = dict(
         question_year=2026,
@@ -97,9 +94,7 @@ def test_uncovered_nominal_ut1_is_still_rejected_on_all_protocols(
         latitude=40,
         ut1_source="iers_c04",
     )
-    response = rest.post(spec.rest_path, json=args)
-    code, cli = call_cli(spec, args, tmp_path, capsys)
-    mcp = asyncio.run(native(spec, args))
+    response, mcp, code, cli = surface_calls(spec, args)
     # Runtime coverage validation uses the existing 400 envelope; schema
     # validation uses 422. The TT-only change must not make this request valid.
     assert response.status_code == 400 and code != 0 and mcp.is_error
@@ -111,7 +106,7 @@ def test_uncovered_nominal_ut1_is_still_rejected_on_all_protocols(
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
 @pytest.mark.parametrize("published_card", [True, False])
 def test_literal_table_summary_and_leaf_projection_match_all_protocols(
-    zodiac, published_card, rest, tmp_path, capsys
+    zodiac, published_card, surface_calls
 ):
     spec = SPECS["astro_horary"]
     payload = {**QUESTION, "category": "career", "zodiac_type": zodiac}
@@ -125,40 +120,13 @@ def test_literal_table_summary_and_leaf_projection_match_all_protocols(
             "horary.verdict",
         ]
     )
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", p) for p in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", 0),
-        ],
-    )
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error
@@ -188,7 +156,7 @@ def test_literal_table_summary_and_leaf_projection_match_all_protocols(
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
 @pytest.mark.parametrize("card", [True, False])
 def test_fortune_night_formula_cusp_assignment_and_row_projection_across_protocols(
-    zodiac, card, rest, tmp_path, capsys
+    zodiac, card, surface_calls
 ):
     spec = SPECS["astro_horary"]
     payload = {
@@ -213,40 +181,13 @@ def test_fortune_night_formula_cusp_assignment_and_row_projection_across_protoco
             "horary.verdict",
         ]
     )
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", 0),
-        ],
-    )
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error
@@ -451,13 +392,11 @@ def test_radicality_card_and_leaf_context_on_rest_native_mcp_and_cli(
     ],
 )
 def test_context_faults_fail_before_calculation_on_all_protocols(
-    context, rest, tmp_path, capsys
+    context, surface_calls
 ):
     spec = SPECS["astro_horary"]
     payload = {**QUESTION, "radicality_context": context}
-    http = rest.post(spec.rest_path, json=payload)
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    http, protocol, code, cli = surface_calls(spec, payload)
     assert http.status_code == 422 and code != 0 and protocol.is_error
     assert "horary" not in cli
 
@@ -466,7 +405,7 @@ def test_context_faults_fail_before_calculation_on_all_protocols(
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
 @pytest.mark.parametrize("category", ["marriage", "career"])
 def test_lilly_source_receipts_across_rest_native_mcp_and_cli(
-    project, zodiac, category, rest, tmp_path, capsys
+    project, zodiac, category, surface_calls
 ):
     spec = SPECS["astro_horary"]
     inputs = {**QUESTION, "category": category, "zodiac_type": zodiac}
@@ -492,9 +431,9 @@ def test_lilly_source_receipts_across_rest_native_mcp_and_cli(
             "strict_fields": True,
             "include_snapshot_text": False,
         }
-    response = rest.post(spec.rest_path, json=inputs, params=params)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, inputs, **kwargs))
+    response, protocol, code, cli = surface_calls(
+        spec, inputs, params=params, options=kwargs, flags=flags
+    )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     values = [response.json(), cli, protocol.structured_content]
     assert business(values[0]) == business(values[1]) == business(values[2])
@@ -561,42 +500,17 @@ def test_projection_of_deep_nullable_source_condition_is_declared(rest):
     Draft202012Validator(spec.output_model.model_json_schema()).validate(out)
 
 
-def test_election_major_dignity_scope_is_available_in_strict_view(
-    rest, tmp_path, capsys
-):
+def test_election_major_dignity_scope_is_available_in_strict_view(surface_calls):
     spec = SPECS["astro_election"]
     inputs = REST_POST_CASES[spec.rest_path]()
     fields = ["election.dignity_scope"]
-    response = rest.post(
-        spec.rest_path,
-        json=inputs,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", 0),
-        ],
-    )
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         inputs,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec, inputs, fields=fields, strict_fields=True, include_snapshot_text=False
-        )
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     values = [response.json(), cli, protocol.structured_content]
@@ -664,15 +578,13 @@ def test_native_sun_regulus_five_to_six_degrees_on_rest_mcp_cli(rest, tmp_path, 
     ],
 )
 def test_partial_physical_data_is_an_explicit_source_error(
-    key, selected, rest, tmp_path, capsys
+    key, selected, tmp_path, surface_calls
 ):
     spec = SPECS[key]
     selected("planet_only")
     payload = inputs(spec)
     # All cases are synthetic catalog engineering fixtures at contemporary epochs.
-    http = rest.post(spec.rest_path, json=payload)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, [])
-    protocol = asyncio.run(native(spec, payload))
+    http, protocol, code, cli = surface_calls(spec, payload, flags=[])
     assert http.status_code == 503 and code == 1 and protocol.is_error
     for index, value in enumerate(
         [http.json(), cli, json.loads(protocol.content[0].text)]

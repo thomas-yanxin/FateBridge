@@ -5,10 +5,10 @@ from pathlib import Path
 
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import rest
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files_module as native_ephemeris_files_module,
 )
+from tests.support.transports import rest
 from tests.western.test_western_event_clock_transports import surfaces
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")

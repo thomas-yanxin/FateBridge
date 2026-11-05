@@ -1,6 +1,5 @@
 """The selected wealth supplement keeps every actual role and source atom."""
 
-import asyncio
 import hashlib
 import json
 from pathlib import Path
@@ -8,13 +7,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.services.meihua import calculate_meihua_cast
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_wealth_components_v1"
 CASES = json.loads((FIXTURE / "cases.json").read_text())["cases"]
@@ -152,7 +145,7 @@ def test_mixed_incoming_and_leaking_relations_are_visible_in_summary():
 
 
 @pytest.mark.parametrize("tool", ["meihua_cast", "meihua_analysis"])
-def test_wealth_field_card_agrees_on_rest_mcp_cli(tool, rest, tmp_path, capsys):
+def test_wealth_field_card_agrees_on_rest_mcp_cli(tool, surface_calls):
     from fatebridge.application.examples import suggested_fields
 
     spec = SPECS[tool]
@@ -170,43 +163,17 @@ def test_wealth_field_card_agrees_on_rest_mcp_cli(tool, rest, tmp_path, capsys):
     payload["interpretation_topic"] = "wealth"
     fields = suggested_fields(spec, view="wealth")
     assert "interpretation.wealth_components" in fields
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("response_char_limit", "0"),
-            ("include_snapshot_text", "false"),
-        ],
-    )
-    assert response.status_code == 200, response.text
-    result = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
-    assert not result.is_error, result
-    code, cli = call_cli(
+    response, result, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=(
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-            "--include-snapshot-text",
-            "false",
-        ),
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
+        cli_first=False,
     )
+    assert response.status_code == 200, response.text
+    assert not result.is_error, result
     assert code == 0, cli
     assert (
         business(response.json())

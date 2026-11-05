@@ -1,6 +1,5 @@
 """Analytic planar controls: full turns and exact right angles are identical."""
 
-import asyncio
 import math
 from fractions import Fraction
 
@@ -20,13 +19,7 @@ from fatebridge.core.fengshui.spatial_inputs import (
     PlanSegment,
 )
 from fatebridge.services.fengshui import assess
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 
 @pytest.mark.parametrize("angle", [-1080, -720, -360, 0, 360, 720, 1080])
@@ -142,18 +135,18 @@ def test_analytic_closed_room_retains_desk_and_seat_on_its_boundary(angle, x, wi
 
 @pytest.mark.parametrize("angle,x,width", [(720, 1, 2), (180, 0.25, 0.5)])
 def test_rotation_boundary_facts_agree_on_actual_three_transports(
-    angle, x, width, rest, tmp_path, capsys
+    angle, x, width, surface_calls
 ):
     spec = SPECS["fengshui_assess"]
     payload = payload_for(angle, x, width)
     fields = ["layout_analysis"]
-    response = rest.post(
-        spec.rest_path, json=payload, params={"fields": fields, "strict_fields": True}
+    response, protocol, code, cli = surface_calls(
+        spec,
+        payload,
+        params={"fields": fields, "strict_fields": True},
+        options={"fields": fields, "strict_fields": True},
+        flags=("--fields", *fields, "--strict-fields"),
     )
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, flags=("--fields", *fields, "--strict-fields")
-    )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error
     actual = business(response.json())

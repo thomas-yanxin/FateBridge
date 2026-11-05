@@ -1,9 +1,7 @@
-"""Source-year semantics, independent printed arithmetic, and CLI compatibility."""
+"""Source-year semantics, independent printed arithmetic and source provenance."""
 
 import hashlib
 import json
-import runpy
-import sys
 from datetime import date
 from fractions import Fraction as F
 from pathlib import Path
@@ -15,8 +13,6 @@ from fatebridge.core.guolao_year_labels import DATA, shoushi_year_context
 ROOT = Path(__file__).parents[2]
 FIXTURES = Path(__file__).parents[1] / "fixtures" / "guolao-year-labels-v1"
 REFERENCE = json.loads((FIXTURES / "reference.json").read_text())
-BASELINE = json.loads((FIXTURES / "elapsed-cli-before.json").read_text())
-SCRIPTS = ("audit_guolao_solar.py", "audit_guolao_purple.py")
 
 
 @pytest.mark.parametrize("example", REFERENCE["worked_examples"])
@@ -100,66 +96,6 @@ def test_year_labels_do_not_assign_modern_dates_or_resolve_other_header_variants
     assert value["year_boundary_policy"] == (
         "named_book_year_label_only_no_modern_calendar_boundary"
     )
-
-
-def _command(monkeypatch, capsys, script, args):
-    path = ROOT / "scripts" / script
-    monkeypatch.setattr(sys, "argv", [str(path), *args])
-    assert runpy.run_path(str(path))["main"]() == 0
-    return json.loads(capsys.readouterr().out)
-
-
-@pytest.mark.parametrize("script", SCRIPTS)
-@pytest.mark.parametrize("elapsed", [0, 99, 100, 199, 200, 318, 319, 327])
-def test_existing_complete_cli_payloads_match_before_snapshot(
-    monkeypatch, capsys, script, elapsed
-):
-    actual = _command(monkeypatch, capsys, script, ["--elapsed-years", str(elapsed)])
-    assert actual == BASELINE[f"{script}:{elapsed}"]
-    assert "source_year_context" not in actual
-
-
-@pytest.mark.parametrize("script", SCRIPTS)
-@pytest.mark.parametrize(
-    "selector,year", [("--source-year", 1608), ("--winter-year", 1607)]
-)
-def test_actual_cli_new_selectors_use_same_calculation_as_declared_distance(
-    monkeypatch, capsys, script, selector, year
-):
-    result = _command(monkeypatch, capsys, script, [selector, str(year)])
-    context = result.pop("source_year_context")
-    assert context["elapsed_years"] == 327
-    assert context["inclusive_count_from_reference"] == 328
-    assert context["source_year_sexagenary_label"] == "戊申"
-    assert context["preceding_winter_year_sexagenary_label"] == "丁未"
-    baseline = BASELINE[f"{script}:327"]
-    if script == "audit_guolao_purple.py":
-        assert result["input_kind"] == context["input_kind"]
-        # Only the input declaration changes, not the numerical chain.
-        result["input_kind"] = baseline["input_kind"]
-    assert result == baseline
-
-
-@pytest.mark.parametrize("script", SCRIPTS)
-@pytest.mark.parametrize(
-    "args",
-    [
-        [],
-        ["--source-year", "1608", "--elapsed-years", "327"],
-        ["--source-year", "1608", "--winter-year", "1607"],
-        ["--winter-year", "1279"],
-        ["--source-year", "1608.0"],
-    ],
-)
-def test_cli_rejects_ambiguous_or_unimplemented_inputs(
-    monkeypatch, capsys, script, args
-):
-    path = ROOT / "scripts" / script
-    monkeypatch.setattr(sys, "argv", [str(path), *args])
-    with pytest.raises(SystemExit) as error:
-        runpy.run_path(str(path))["main"]()
-    assert error.value.code == 2
-    assert not capsys.readouterr().out
 
 
 def test_frozen_scans_and_metadata_support_runtime_provenance():

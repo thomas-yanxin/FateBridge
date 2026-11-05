@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import subprocess
-import sys
 from dataclasses import replace
 from fractions import Fraction as F
 from pathlib import Path
@@ -187,53 +185,3 @@ def test_invalid_profiles_and_noncanonical_local_offsets_are_rejected():
             profile.from_mansion(name, degree)
     with pytest.raises(ValueError):
         profile.from_palace("官禄", F())
-
-
-@pytest.mark.parametrize(
-    "arguments,branch",
-    [
-        (["--profile", "nlc166"], None),
-        (["--profile", "nlc166", "--mansion", "斗", "--degree", "3"], "丑"),
-        (["--profile", "wikisource", "--mansion", "斗", "--degree", "3"], "寅"),
-        (["--profile", "nlc166", "--palace", "丑", "--degree", "0"], "丑"),
-        (["--profile", "nlc166", "--angle-from-jiao", "0"], "辰"),
-    ],
-)
-def test_research_cli_selects_named_edition_and_declares_nonmodern_coordinates(
-    arguments, branch
-):
-    run = subprocess.run(
-        [sys.executable, "scripts/guolao/audit_guolao_coordinates.py", *arguments],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    result = json.loads(run.stdout)
-    if branch is None:
-        assert result["calculation"] is None
-    else:
-        assert result["calculation"]["branch"] == branch
-        assert result["calculation"]["modern_longitude"] is None
-    assert not result["audit"]["luwei_edition_emended"]
-
-
-@pytest.mark.parametrize(
-    "arguments",
-    [
-        [],
-        ["--profile", "nlc166", "--mansion", "斗"],
-        ["--profile", "nlc166", "--angle-from-jiao", "0", "--degree", "1"],
-        ["--profile", "nlc166", "--palace", "丑", "--degree", "30"],
-        ["--profile", "nlc166", "--angle-from-jiao", "NaN"],
-    ],
-)
-def test_research_cli_rejects_missing_or_ambiguous_input_units(arguments):
-    run = subprocess.run(
-        [sys.executable, "scripts/guolao/audit_guolao_coordinates.py", *arguments],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-    )
-    assert run.returncode == 2
-    assert not run.stdout

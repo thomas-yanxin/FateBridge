@@ -1,6 +1,5 @@
 """Independent calendar mapping and actual own-Si evidence on all interfaces."""
 
-import asyncio
 import hashlib
 import json
 import os
@@ -9,15 +8,10 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
 from tests.liuyao.test_liuyao_metal_own_si import BASE, CASES, check
 from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.transports import SPECS, business, surface_calls
 
 PUBLIC = json.loads((BASE / "public-payloads.json").read_text())["rows"]
 
@@ -48,7 +42,7 @@ def test_own_si_public_mapping_uses_frozen_independent_calendars():
 @pytest.mark.parametrize("public", PUBLIC, ids=lambda x: x["id"])
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_own_si_evidence_and_remaining_obstructions_on_all_interfaces(
-    public, project, rest, tmp_path, capsys
+    public, project, surface_calls
 ):
     spec = SPECS["sixyao"]
     fields = (
@@ -68,9 +62,9 @@ def test_actual_own_si_evidence_and_remaining_obstructions_on_all_interfaces(
         flags += ["--fields", *fields, "--strict-fields", "true"]
         params += [("fields", f) for f in fields] + [("strict_fields", "true")]
         options.update(fields=fields, strict_fields=True)
-    http = rest.post(spec.rest_path, json=public["payload"], params=params)
-    code, cli = call_cli(spec, public["payload"], tmp_path, capsys, flags=flags)
-    mcp = asyncio.run(native(spec, public["payload"], **options))
+    http, mcp, code, cli = surface_calls(
+        spec, public["payload"], params=params, options=options, flags=flags
+    )
     assert http.status_code == 200 and code == 0 and not mcp.is_error
     results = [http.json(), cli, mcp.structured_content]
     assert business(results[0]) == business(results[1]) == business(results[2])

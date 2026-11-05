@@ -7,8 +7,8 @@ import pytest
 from tests.bazi.test_bazi_birth_component_presence import omitted_payload
 from tests.bazi.test_bazi_birth_seconds import SPECS
 from tests.bazi.test_bazi_birth_seconds_transports import leaf, receipt_path
-from tests.evaluation.test_agentic_nested_outputs import AS_OF, call_cli, native
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import AS_OF, call_cli, native
+from tests.support.transports import rest as _shared_rest
 
 
 def test_mcp_omitted_and_explicit_zero_minute_have_distinct_input_identity():

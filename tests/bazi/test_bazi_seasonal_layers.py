@@ -1,6 +1,5 @@
 """Source layers and positional evidence do not become final 用神 decisions."""
 
-import asyncio
 import hashlib
 import json
 from pathlib import Path
@@ -16,14 +15,9 @@ from fatebridge.core.classical import (
 )
 from fatebridge.core.output_classical_seasonal import SeasonalClimateReference
 from tests.bazi.test_bazi_year_contract import TOPICS
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business, inputs
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -130,7 +124,7 @@ def test_reference_contract_does_not_promote_lookup_or_pending_sources_to_accept
 @pytest.mark.parametrize("topic", TOPICS)
 @pytest.mark.parametrize("birth_day,reviewed", [(16, True), (17, False)])
 def test_ten_published_views_preserve_source_review_and_positions_on_three_surfaces(
-    topic, birth_day, reviewed, rest, tmp_path, capsys
+    topic, birth_day, reviewed, surface_calls
 ):
     spec = SPECS["bazi_" + topic]
     payload = {
@@ -148,23 +142,8 @@ def test_ten_published_views_preserve_source_review_and_positions_on_three_surfa
         "include_snapshot_text": False,
         "response_char_limit": 0,
     }
-    http = rest.post(spec.rest_path, json=payload, params=opts)
-    protocol = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+    http, protocol, code, cli = surface_calls(
+        spec, payload, projection=opts, cli_first=False
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     data = business(http.json())

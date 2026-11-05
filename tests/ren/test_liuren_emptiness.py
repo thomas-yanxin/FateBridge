@@ -1,6 +1,5 @@
 """Original empty-place distinction and same-run port evidence."""
 
-import asyncio
 import copy
 import importlib.util
 import json
@@ -15,14 +14,7 @@ from pydantic import ValidationError
 import fatebridge.application.execution as execution
 from fatebridge.core.metaphysics.liureng_emptiness import emptiness_evidence
 from fatebridge.core.output_liuren_emptiness import LiurenEmptinessEvidence
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 MOD = importlib.util.spec_from_file_location(
@@ -119,7 +111,7 @@ def test_invalid_calculation_context_is_rejected(kind):
     "key", ["liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"]
 )
 @pytest.mark.parametrize("project", [False, True])
-def test_empty_scope_is_same_on_rest_mcp_cli(key, project, rest, tmp_path, capsys):
+def test_empty_scope_is_same_on_rest_mcp_cli(key, project, surface_calls):
     spec = SPECS[key]
     fields = [
         (
@@ -150,9 +142,14 @@ def test_empty_scope_is_same_on_rest_mcp_cli(key, project, rest, tmp_path, capsy
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=PAYLOADS[key], params=params)
-    protocol = asyncio.run(native(spec, PAYLOADS[key], **options))
-    code, cli = call_cli(spec, PAYLOADS[key], tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec,
+        PAYLOADS[key],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)
@@ -178,7 +175,7 @@ def test_empty_scope_is_same_on_rest_mcp_cli(key, project, rest, tmp_path, capsy
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_bad_empty_explanation_facts_fail_before_projection(
-    kind, project, rest, monkeypatch, tmp_path, capsys
+    kind, project, monkeypatch, surface_calls
 ):
     key = "liureng_gods"
     spec = SPECS[key]
@@ -223,9 +220,14 @@ def test_bad_empty_explanation_facts_fail_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(spec.rest_path, json=PAYLOADS[key], params=params)
-    protocol = asyncio.run(native(spec, PAYLOADS[key], **options))
-    code, cli = call_cli(spec, PAYLOADS[key], tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec,
+        PAYLOADS[key],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 500 and protocol.is_error and code != 0
     for body in (http.json(), protocol.structured_content, cli):
         assert body["error_code"] == "internal_error"

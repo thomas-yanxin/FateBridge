@@ -6,14 +6,8 @@ import pytest
 
 from fatebridge.application.examples import evidence_views, suggested_fields
 from fatebridge.core.output_element_presence import ElementPresence
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business, call_cli, inputs, native
+from tests.support.transports import rest as _shared_rest
 
 KEYS = [
     "bazi_birth",

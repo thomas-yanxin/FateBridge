@@ -1,6 +1,5 @@
 """Current day qualification, old raw positions and counterexamples survive RPC."""
 
-import asyncio
 import hashlib
 import json
 from pathlib import Path
@@ -8,14 +7,8 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.liuyao.test_liuyao_month_break import CASES
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_month_break_v24"
 INPUTS = json.loads((REFERENCE / "public-input-mappings.json").read_text())["mappings"]
@@ -23,9 +16,7 @@ INPUTS = json.loads((REFERENCE / "public-input-mappings.json").read_text())["map
 
 @pytest.mark.parametrize("case", CASES, ids=lambda case: case["id"])
 @pytest.mark.parametrize("project", [False, True])
-def test_same_day_month_break_in_rest_native_mcp_cli(
-    case, project, rest, tmp_path, capsys
-):
+def test_same_day_month_break_in_rest_native_mcp_cli(case, project, surface_calls):
     frozen = json.loads((REFERENCE / "public-input-freeze.json").read_text())
     assert (
         hashlib.sha256(
@@ -81,9 +72,9 @@ def test_same_day_month_break_in_rest_native_mcp_cli(
             "true",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=True)
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, payload, **options))
+    http, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=options, flags=flags
+    )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     bodies = [http.json(), cli, protocol.structured_content]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])
@@ -130,7 +121,7 @@ def test_same_day_month_break_in_rest_native_mcp_cli(
 
 @pytest.mark.parametrize("project", [False, True])
 def test_role_raw_month_control_and_current_exemption_remain_distinct(
-    project, rest, tmp_path, capsys
+    project, surface_calls
 ):
     spec = SPECS["sixyao"]
     payload = dict(
@@ -164,9 +155,9 @@ def test_role_raw_month_control_and_current_exemption_remain_distinct(
             "true",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=True)
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, payload, **options))
+    http, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=options, flags=flags
+    )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     bodies = [http.json(), cli, protocol.structured_content]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])

@@ -1,6 +1,5 @@
 """Literal anchors, plate inversion and faithful public 德禄马 facts."""
 
-import asyncio
 import copy
 import importlib.util
 import json
@@ -16,17 +15,9 @@ from fatebridge.application.examples import evidence_views
 from fatebridge.core.metaphysics.liureng import build_liureng_board
 from fatebridge.core.metaphysics.liureng_auxiliary_stars import build_auxiliary_stars
 from fatebridge.core.output_liuren_auxiliary import LiurenAuxiliaryStars
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-    rest,
-)
 from tests.ren.test_ren_classical_depth import AUDIT as REN
 from tests.ren.test_ren_transports import PAYLOAD
+from tests.support.transports import AS_OF, SPECS, business, inputs, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -173,9 +164,7 @@ def test_empty_lu_retains_its_position_and_does_not_cancel_stage():
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
 @pytest.mark.parametrize("project", [False, True])
-def test_actual_auxiliary_facts_agree_on_rest_mcp_cli(
-    key, project, rest, tmp_path, capsys
-):
+def test_actual_auxiliary_facts_agree_on_rest_mcp_cli(key, project, surface_calls):
     spec = SPECS[key]
     payload = dict(PAYLOAD)
     if key == "jinkou":
@@ -208,9 +197,9 @@ def test_actual_auxiliary_facts_agree_on_rest_mcp_cli(
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     bodies = [http.json(), protocol.structured_content, cli]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])
@@ -267,7 +256,7 @@ def test_actual_auxiliary_facts_agree_on_rest_mcp_cli(
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_corrupt_auxiliary_facts_fail_before_projection(
-    fault, project, rest, monkeypatch, tmp_path, capsys
+    fault, project, monkeypatch, surface_calls
 ):
     spec = SPECS["liureng_gods"]
     from fatebridge.services.metaphysics import calculate_liureng_gods
@@ -307,9 +296,9 @@ def test_corrupt_auxiliary_facts_fail_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
         options.update(fields=["analysis_type"], strict_fields=True)
-    http = rest.post(spec.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(spec, PAYLOAD, **options))
-    code, out = call_cli(spec, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, out = surface_calls(
+        spec, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert out["error_code"] == "internal_error"
 
@@ -322,12 +311,12 @@ def test_corrupt_auxiliary_facts_fail_before_projection(
         "liureng.auxiliary_stars.complete_classical_conformance",
     ],
 )
-def test_sparse_object_projections_survive(field, rest, tmp_path, capsys):
+def test_sparse_object_projections_survive(field, surface_calls):
     spec = SPECS["liureng_gods"]
     options = dict(fields=[field], strict_fields=True, include_snapshot_text=False)
-    http = rest.post(
-        spec.rest_path,
-        json=PAYLOAD,
+    http, protocol, code, cli = surface_calls(
+        spec,
+        PAYLOAD,
         params=dict(
             fields=field,
             strict_fields="true",
@@ -335,13 +324,7 @@ def test_sparse_object_projections_survive(field, rest, tmp_path, capsys):
             response_char_limit=0,
             as_of=AS_OF,
         ),
-    )
-    protocol = asyncio.run(native(spec, PAYLOAD, **options))
-    code, cli = call_cli(
-        spec,
-        PAYLOAD,
-        tmp_path,
-        capsys,
+        options=options,
         flags=[
             "--response-char-limit",
             "0",
@@ -352,6 +335,7 @@ def test_sparse_object_projections_survive(field, rest, tmp_path, capsys):
             "--include-snapshot-text",
             "false",
         ],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
@@ -360,48 +344,22 @@ def test_sparse_object_projections_survive(field, rest, tmp_path, capsys):
     spec.output_model.model_validate(cli)
 
 
-def test_sanshi_embedded_board_carries_same_stars(rest, tmp_path, capsys):
+def test_sanshi_embedded_board_carries_same_stars(surface_calls):
     spec = SPECS["sanshiunited"]
     fields = [
         "liureng.auxiliary_stars",
         "subresults.liureng_gods.liureng.auxiliary_stars",
     ]
     payload = inputs(spec)
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *(("fields", f) for f in fields),
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-            ("as_of", AS_OF),
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--response-char-limit",
-            "0",
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
+        cli_first=False,
+        rest_as_of=AS_OF,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
@@ -421,17 +379,15 @@ def test_sanshi_embedded_board_carries_same_stars(rest, tmp_path, capsys):
         ("支煞", ["日支德", "驿马"]),
     ],
 )
-def test_selected_section_exports_exact_placement_facts(
-    section, names, rest, tmp_path, capsys
-):
+def test_selected_section_exports_exact_placement_facts(section, names, surface_calls):
     spec = SPECS["liureng_gods"]
     payload = {**PAYLOAD, "selected_sections": [section]}
-    http = rest.post(
-        spec.rest_path, json=payload, params=dict(as_of=AS_OF, response_char_limit=0)
-    )
-    protocol = asyncio.run(native(spec, payload))
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
+        params=dict(as_of=AS_OF, response_char_limit=0),
+        flags=["--response-char-limit", "0"],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (

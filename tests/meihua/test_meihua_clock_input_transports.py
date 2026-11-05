@@ -1,17 +1,9 @@
 """Clock presence and nominal-default notices survive each local transport."""
 
-import asyncio
-
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.support.meihua_clock_input_reference import assert_clock_input, cases
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIELDS = [
     "analysis_context",
@@ -25,35 +17,15 @@ FIELDS = [
 
 
 @pytest.mark.parametrize("case", cases(), ids=lambda c: c["id"])
-def test_all16_component_states_keep_same_values_and_provenance(
-    case, rest, tmp_path, capsys
-):
+def test_all16_component_states_keep_same_values_and_provenance(case, surface_calls):
     spec = SPECS["meihua_analysis"]
-    response = rest.post(
-        spec.rest_path,
-        json=case["arguments"],
-        params=[
-            *(("fields", f) for f in FIELDS),
-            ("strict_fields", "true"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, cli = call_cli(
+    response, mcp, code, cli = surface_calls(
         spec,
         case["arguments"],
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *FIELDS,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    mcp = asyncio.run(
-        native(spec, case["arguments"], fields=FIELDS, strict_fields=True)
+        projection={
+            **{"fields": FIELDS, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
     assert response.status_code == 200 and code == 0 and not mcp.is_error
     assert (
@@ -69,14 +41,10 @@ def test_all16_component_states_keep_same_values_and_provenance(
 
 
 @pytest.mark.parametrize("minute", [True, 60, 1.5, "1"])
-def test_invalid_minutes_keep_same_nonretryable_rejection(
-    minute, rest, tmp_path, capsys
-):
+def test_invalid_minutes_keep_same_nonretryable_rejection(minute, surface_calls):
     spec = SPECS["meihua_analysis"]
     payload = {**cases()[0]["arguments"], "analysis_minute": minute}
-    response = rest.post(spec.rest_path, json=payload)
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
-    mcp = asyncio.run(native(spec, payload))
+    response, mcp, code, cli = surface_calls(spec, payload)
     assert response.status_code == 422 and code != 0 and mcp.is_error
     for out in [response.json(), cli, mcp.structured_content]:
         assert out["error_code"] == "validation_error" and not out["retryable"]

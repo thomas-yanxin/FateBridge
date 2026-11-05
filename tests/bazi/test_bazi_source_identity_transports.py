@@ -1,20 +1,15 @@
 """Printed identity corrections and false-credit guards survive all surfaces."""
 
-import asyncio
-
 import pytest
 
 from fatebridge.application.examples import suggested_fields
 from fatebridge.services.tool_catalog import CATALOG
 from tests.evaluation.test_agentic_nested_outputs import (
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest_fixture
-from tests.evaluation.test_agentic_nested_outputs import (
     test_nested_fact_faults_are_internal_failures_on_all_surfaces as reject_bad_fact,
 )
+from tests.support.transports import business
+from tests.support.transports import rest as shared_rest_fixture
+from tests.support.transports import surface_calls
 
 SPEC = next(s for s in CATALOG if s.key == "bazi_source_compare")
 rest = shared_rest_fixture
@@ -31,7 +26,7 @@ rest = shared_rest_fixture
     ],
 )
 def test_exact_corrected_identity_and_retained_labels_on_three_surfaces(
-    project, pillars, printed_name, grade, rest, tmp_path, capsys
+    project, pillars, printed_name, grade, surface_calls
 ):
     arguments = dict(
         zip(["year_pillar", "month_pillar", "day_pillar", "hour_pillar"], pillars)
@@ -42,9 +37,9 @@ def test_exact_corrected_identity_and_retained_labels_on_three_surfaces(
         fields = suggested_fields(SPEC, view="source_strength")
         options.update(fields=fields, strict_fields=True)
         flags += ["--fields", *fields, "--strict-fields", "true"]
-    response = rest.post(SPEC.rest_path, json=arguments, params=options)
-    protocol = asyncio.run(native(SPEC, arguments, **options))
-    code, cli = call_cli(SPEC, arguments, tmp_path, capsys, flags=flags)
+    response, protocol, code, cli = surface_calls(
+        SPEC, arguments, params=options, options=options, flags=flags, cli_first=False
+    )
     assert response.status_code == 200 and not protocol.is_error and code == 0
     results = [response.json(), protocol.structured_content, cli]
     for result in results:

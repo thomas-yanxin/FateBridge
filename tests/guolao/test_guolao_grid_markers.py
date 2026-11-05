@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import subprocess
-import sys
 from dataclasses import replace
 from fractions import Fraction
 from pathlib import Path
@@ -170,59 +168,3 @@ def test_reading_types_do_not_turn_missing_or_initial_into_zero(
 ):
     with pytest.raises(error):
         module.MarkerReading("子", 12, "虚", kind, text, value)
-
-
-@pytest.mark.parametrize(
-    "args,expected_column",
-    [
-        (["--source-marker", "虚", "--marker-text", "九", "--source-palace", "子"], 12),
-        (
-            ["--source-marker", "斗", "--marker-not-visible", "--source-palace", "丑"],
-            10,
-        ),
-    ],
-)
-def test_cli_marker_mode_requires_and_preserves_the_literal_source_selection(
-    args, expected_column
-):
-    proc = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts/guolao/audit_guolao_life_grid.py"),
-            *args,
-            "--target-palace",
-            "午",
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    r = json.loads(proc.stdout)["comparison"]
-    assert r["source_cell"]["column"] == expected_column
-    assert r["column_selection"] == "exact_named_marker_and_attached_text"
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        ["--marker-text", "九"],
-        ["--source-marker", "虚", "--source-palace", "子", "--target-palace", "午"],
-        [
-            "--column",
-            "12",
-            "--source-palace",
-            "子",
-            "--target-palace",
-            "午",
-            "--marker-text",
-            "九",
-        ],
-    ],
-)
-def test_cli_does_not_guess_missing_source_arguments(args):
-    proc = subprocess.run(
-        [sys.executable, str(ROOT / "scripts/guolao/audit_guolao_life_grid.py"), *args],
-        capture_output=True,
-        text=True,
-    )
-    assert proc.returncode == 2 and not proc.stdout

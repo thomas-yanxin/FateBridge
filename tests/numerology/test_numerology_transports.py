@@ -12,19 +12,20 @@ from fatebridge.application.examples import (
 )
 from fatebridge.cli import run as cli_run
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.support.heluo_source_facts import (
+    COMMENTARY_RULESET_ID,
+    HEADER_COUNT,
+    PENDING_COUNT,
+)
+from tests.support.transports import (
     SPECS,
     business,
     call_cli,
     native,
     projected_outputs,
 )
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest
-from tests.support.heluo_source_facts import (
-    COMMENTARY_RULESET_ID,
-    HEADER_COUNT,
-    PENDING_COUNT,
-)
+from tests.support.transports import rest as shared_rest
+from tests.support.transports import surface_calls
 
 rest = shared_rest
 
@@ -507,13 +508,11 @@ def test_numerology_default_and_historical_zone_on_three_surfaces(
     ],
 )
 def test_numerology_blank_invalid_and_indeterminate_zone_on_three_surfaces(
-    key, date, time, zone, status, error, rest, tmp_path, capsys
+    key, date, time, zone, status, error, surface_calls
 ):
     spec = SPECS[key]
     payload = {**INPUT, "date": date, "time": time, "zone": zone}
-    response = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, local = surface_calls(spec, payload)
     assert response.status_code == status and code != 0 and protocol.is_error
     assert error in str(response.json())
     assert error in str(local)
@@ -1015,7 +1014,7 @@ def test_source_commentary_and_unselected_branches_on_three_surfaces(
 @pytest.mark.parametrize("key", ["heluo", "canping"])
 @pytest.mark.parametrize("flag", ["__omitted__", True])
 def test_default_or_explicit_solar_time_without_longitude_is_rejected(
-    key, flag, rest, tmp_path, capsys
+    key, flag, surface_calls
 ):
     spec = SPECS[key]
     payload = {**INPUT}
@@ -1023,9 +1022,7 @@ def test_default_or_explicit_solar_time_without_longitude_is_rejected(
         payload.pop("use_true_solar_time")
     else:
         payload["use_true_solar_time"] = flag
-    response = rest.post(spec.rest_path, json=payload)
-    code, _ = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, _ = surface_calls(spec, payload)
     assert response.status_code == 422 and code != 0 and protocol.is_error
 
 
@@ -1096,15 +1093,13 @@ def test_published_birth_clock_view_works_in_real_mcp(key):
     "clock", ["__omitted__", None, "", " ", "未知", "09:33:00Z", "24:00"]
 )
 def test_numerology_unknown_clock_is_rejected_on_three_surfaces(
-    key, clock, rest, tmp_path, capsys
+    key, clock, surface_calls
 ):
     spec = SPECS[key]
     payload = {**INPUT, "time": clock}
     if clock == "__omitted__":
         payload.pop("time")
-    response = rest.post(spec.rest_path, json=payload)
-    code, _ = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, _ = surface_calls(spec, payload)
     assert response.status_code == 422 and code != 0 and protocol.is_error
 
 
@@ -1369,30 +1364,25 @@ def test_heluo_collation_and_normalized_gender_agree_on_three_surfaces(
 
 @pytest.mark.parametrize("gender", ["__omitted__", None, "", "未知", "typo"])
 def test_heluo_missing_or_unknown_gender_is_rejected_on_three_surfaces(
-    gender, rest, tmp_path, capsys
+    gender, surface_calls
 ):
     spec = SPECS["heluo"]
     payload = {**INPUT, "gender": gender}
     if gender == "__omitted__":
         payload.pop("gender")
-    response = rest.post(spec.rest_path, json=payload)
-    code, _ = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, _ = surface_calls(spec, payload)
     assert response.status_code == 422 and code != 0 and protocol.is_error
 
 
 @pytest.mark.parametrize("key", ["heluo", "canping"])
-def test_numerology_facts_and_provenance_agree_on_three_surfaces(
-    key, rest, tmp_path, capsys
-):
+def test_numerology_facts_and_provenance_agree_on_three_surfaces(key, surface_calls):
     spec = SPECS[key]
-    response = rest.post(
-        spec.rest_path, json=INPUT, params={"as_of": "2026-10-12T02:00:00Z"}
+    response, protocol, code, local = surface_calls(
+        spec,
+        INPUT,
+        params={"as_of": "2026-10-12T02:00:00Z"},
+        flags=["--response-char-limit", "0"],
     )
-    code, local = call_cli(
-        spec, INPUT, tmp_path, capsys, flags=["--response-char-limit", "0"]
-    )
-    protocol = asyncio.run(native(spec, INPUT))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -1422,7 +1412,7 @@ def test_numerology_facts_and_provenance_agree_on_three_surfaces(
 
 
 @pytest.mark.parametrize("key", ["heluo", "canping"])
-def test_numerology_evidence_supports_strict_projection(key, rest, tmp_path, capsys):
+def test_numerology_evidence_supports_strict_projection(key, surface_calls):
     spec = SPECS[key]
     fields = [
         "numerology_evidence.rulesets",
@@ -1430,33 +1420,9 @@ def test_numerology_evidence_supports_strict_projection(key, rest, tmp_path, cap
         "numerology_evidence.rule_trace",
     ]
     options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    response = rest.post(
-        spec.rest_path,
-        json=INPUT,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
+    response, protocol, code, local = surface_calls(
+        spec, INPUT, projection={**options, "response_char_limit": 0}
     )
-    code, local = call_cli(
-        spec,
-        INPUT,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(native(spec, INPUT, **options))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     for output in [response.json(), local, protocol.structured_content]:
         assert set(output["numerology_evidence"]) == {
@@ -1467,12 +1433,10 @@ def test_numerology_evidence_supports_strict_projection(key, rest, tmp_path, cap
         assert "snapshot_text" not in output
 
 
-def test_invalid_canping_method_fails_on_all_surfaces(rest, tmp_path, capsys):
+def test_invalid_canping_method_fails_on_all_surfaces(surface_calls):
     spec = SPECS["canping"]
     payload = {**INPUT, "method": "typo"}
-    response = rest.post(spec.rest_path, json=payload)
-    code, _ = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, _ = surface_calls(spec, payload)
     assert response.status_code == 422 and code != 0 and protocol.is_error
 
 
@@ -1524,7 +1488,7 @@ def test_published_number_conditions_view_delivers_full_literal_conditions():
 
 
 def test_heluo_annual_month_and_day_selection_agrees_on_all_three_surfaces(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
     spec = SPECS["heluo"]
     payload = {**INPUT, "analysis_year": 2027, "month_index": 3, "day_index": 10}
@@ -1536,27 +1500,14 @@ def test_heluo_annual_month_and_day_selection_agrees_on_all_three_surfaces(
         "heluo_timing.selected_day",
         "heluo_timing.selected_texts",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("response_char_limit", "0")],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -1579,14 +1530,10 @@ def test_heluo_annual_month_and_day_selection_agrees_on_all_three_surfaces(
         {"analysis_year": 2027, "month_index": 2, "day_index": 31},
     ],
 )
-def test_invalid_heluo_sequence_selection_fails_on_all_surfaces(
-    change, rest, tmp_path, capsys
-):
+def test_invalid_heluo_sequence_selection_fails_on_all_surfaces(change, surface_calls):
     spec = SPECS["heluo"]
     payload = {**INPUT, **change}
-    response = rest.post(spec.rest_path, json=payload)
-    code, _ = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, _ = surface_calls(spec, payload)
     assert response.status_code == 422 and code != 0 and protocol.is_error
 
 
@@ -1670,9 +1617,7 @@ def test_heluo_real_cli_flags_parse_strict_integer_selectors(capsys):
     assert code == 0 and output["heluo_timing"]["selected_day"]["day_index"] == 10
 
 
-def test_corrected_najia_and_positional_evidence_agree_across_surfaces(
-    rest, tmp_path, capsys
-):
+def test_corrected_najia_and_positional_evidence_agree_across_surfaces(surface_calls):
     spec = SPECS["heluo"]
     payload = {**INPUT, "date": "2000-05-15", "time": "09:33:00", "gender": "男"}
     fields = [
@@ -1681,27 +1626,14 @@ def test_corrected_najia_and_positional_evidence_agree_across_surfaces(
         "judge.najia",
         "numerology_evidence.rule_trace",
     ]
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("response_char_limit", "0")],
-    )
-    code, local = call_cli(
+    http, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [http.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -1724,7 +1656,7 @@ def test_corrected_najia_and_positional_evidence_agree_across_surfaces(
     [("bazi_appendix_v1", "not_started"), ("bazi_continuous_v1", "active")],
 )
 def test_canping_query_profiles_preserve_their_real_selected_segment_across_surfaces(
-    profile, status, rest, tmp_path, capsys
+    profile, status, surface_calls
 ):
     spec = SPECS["canping"]
     payload = {
@@ -1740,27 +1672,14 @@ def test_canping_query_profiles_preserve_their_real_selected_segment_across_surf
         "numerology_evidence.selected_texts",
         "numerology_evidence.rulesets",
     ]
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("response_char_limit", "0")],
-    )
-    code, local = call_cli(
+    http, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [http.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -1794,13 +1713,11 @@ def test_canping_query_profiles_preserve_their_real_selected_segment_across_surf
     ],
 )
 def test_canping_missing_or_conflicting_clock_and_direction_inputs_fail_consistently(
-    change, rest, tmp_path, capsys
+    change, surface_calls
 ):
     spec = SPECS["canping"]
     payload = {**INPUT, **change}
-    http = rest.post(spec.rest_path, json=payload)
-    code, _ = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    http, protocol, code, _ = surface_calls(spec, payload)
     assert http.status_code == 422 and code != 0 and protocol.is_error
 
 
@@ -1849,45 +1766,18 @@ def test_canping_real_cli_flags_select_an_actual_dayun_without_implicit_current_
     ],
 )
 def test_seasonal_number_conditions_keep_real_windows_and_evidence_on_three_surfaces(
-    date, expected, rest, tmp_path, capsys
+    date, expected, surface_calls
 ):
     spec = SPECS["heluo"]
     payload = {**INPUT, "date": date, "time": "12:00:00"}
     fields = ["judge.seasonal_numbers", "numerology_evidence.rule_trace"]
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, local = call_cli(
+    http, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [http.json(), local, protocol.structured_content]

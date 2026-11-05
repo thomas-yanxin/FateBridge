@@ -1,6 +1,5 @@
 """Literal source scope, same-board evidence and actual local transports."""
 
-import asyncio
 import copy
 import json
 import shutil
@@ -18,15 +17,8 @@ from fatebridge.core.metaphysics.liureng_day_placements import (
 from fatebridge.core.output_liuren_day_placements import LiurenDayPlacements
 from fatebridge.core.output_ren_anchors import require_complete_ren_anchors
 from scripts.ren.audit_liuren_day_placements import CORPUS, expected_facts, reference
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.ren.test_liuren_ordered_patterns import raw
+from tests.support.transports import AS_OF, SPECS, business, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = reference()
@@ -246,7 +238,7 @@ def test_full_output_binds_evidence_to_actual_board_and_one_trace(
     "key", ["liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"]
 )
 @pytest.mark.parametrize("project", [False, True])
-def test_real_rest_mcp_cli_return_same_new_facts(key, project, rest, tmp_path, capsys):
+def test_real_rest_mcp_cli_return_same_new_facts(key, project, surface_calls):
     spec = SPECS[key]
     path = "liureng.day_placement_patterns"
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
@@ -267,9 +259,14 @@ def test_real_rest_mcp_cli_return_same_new_facts(key, project, rest, tmp_path, c
             "false",
         ]
         options.update(fields=[path], strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=PAYLOADS[key], params=params)
-    protocol = asyncio.run(native(spec, PAYLOADS[key], **options))
-    code, cli = call_cli(spec, PAYLOADS[key], tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec,
+        PAYLOADS[key],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)
@@ -285,7 +282,7 @@ def test_real_rest_mcp_cli_return_same_new_facts(key, project, rest, tmp_path, c
 
 @pytest.mark.parametrize("project", [False, True])
 def test_broken_evidence_is_rejected_before_projection_on_all_ports(
-    project, rest, monkeypatch, tmp_path, capsys
+    project, monkeypatch, surface_calls
 ):
     key = "liureng_gods"
     spec = SPECS[key]
@@ -307,7 +304,12 @@ def test_broken_evidence_is_rejected_before_projection_on_all_ports(
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         options.update(fields=["four_pillars"], strict_fields=True)
-    http = rest.post(spec.rest_path, json=PAYLOADS[key], params=params)
-    protocol = asyncio.run(native(spec, PAYLOADS[key], **options))
-    code, cli = call_cli(spec, PAYLOADS[key], tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec,
+        PAYLOADS[key],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 500 and protocol.is_error and code != 0

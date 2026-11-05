@@ -1,6 +1,5 @@
 """Related contract regressions with shared imports; original cases retained."""
 
-import asyncio
 import inspect
 from dataclasses import replace
 from datetime import datetime
@@ -17,21 +16,21 @@ from fatebridge.utils.solar_time import (
     SOLAR_TIME_STRATEGY_LONGITUDE_ONLY,
     calculate_solar_time_adjustment,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.ren.test_ren_transports import PAYLOAD
+from tests.support.transports import (
     SPECS,
     business,
-    call_cli,
     inputs,
     native,
     rest,
+    surface_calls,
 )
-from tests.ren.test_ren_transports import PAYLOAD
 
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
 @pytest.mark.parametrize("project", [False, True])
 def test_named_solar_model_in_ren_calendar_all_transports(
-    key, project, rest, tmp_path, capsys, monkeypatch
+    key, project, tmp_path, monkeypatch, surface_calls
 ):
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "analytic")
@@ -61,9 +60,9 @@ def test_named_solar_model_in_ren_calendar_all_transports(
             "false",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, payload, **options))
+    http, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=options, flags=flags
+    )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     bodies = [http.json(), cli, protocol.structured_content]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])
@@ -125,7 +124,7 @@ def test_ren_rejects_borrowed_flags_and_incomplete_analytic_identity(
 
 @pytest.mark.parametrize("project", [False, True])
 def test_named_analytic_solar_source_matches_three_protocols(
-    project, rest, tmp_path, capsys, monkeypatch
+    project, tmp_path, monkeypatch, surface_calls
 ):
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "analytic")
@@ -160,9 +159,9 @@ def test_named_analytic_solar_source_matches_three_protocols(
             "false",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    response = rest.post(spec.rest_path, json=payload, params=params)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    mcp = asyncio.run(native(spec, payload, **options))
+    response, mcp, code, cli = surface_calls(
+        spec, payload, params=params, options=options, flags=flags
+    )
     assert response.status_code == 200 and code == 0 and not mcp.is_error
     results = [response.json(), cli, mcp.structured_content]
     assert business(results[0]) == business(results[1]) == business(results[2])

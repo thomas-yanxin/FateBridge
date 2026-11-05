@@ -1,6 +1,5 @@
 """Frozen source clauses, discriminators, same-board guards and real ports."""
 
-import asyncio
 import copy
 import json
 import shutil
@@ -23,15 +22,8 @@ from scripts.ren.audit_liuren_course_conditions import (
     reference,
     transmissions,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.ren.test_liuren_ordered_patterns import raw
+from tests.support.transports import AS_OF, SPECS, business, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 REF = reference()
@@ -197,7 +189,7 @@ def test_invalid_inputs_are_not_filled(fault):
     "key", ["liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"]
 )
 @pytest.mark.parametrize("project", [False, True])
-def test_same_new_facts_on_real_rest_mcp_cli(key, project, rest, tmp_path, capsys):
+def test_same_new_facts_on_real_rest_mcp_cli(key, project, surface_calls):
     spec = SPECS[key]
     path = "liureng.transmission_relations.course_conditions"
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
@@ -218,9 +210,14 @@ def test_same_new_facts_on_real_rest_mcp_cli(key, project, rest, tmp_path, capsy
             "false",
         ]
         options.update(fields=[path], strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=PAYLOADS[key], params=params)
-    protocol = asyncio.run(native(spec, PAYLOADS[key], **options))
-    code, cli = call_cli(spec, PAYLOADS[key], tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec,
+        PAYLOADS[key],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)
@@ -279,7 +276,7 @@ def test_complete_gate_binds_same_board_even_if_foreign_proof_is_consistent(key,
 
 @pytest.mark.parametrize("project", [False, True])
 def test_false_course_fails_before_unrelated_projection(
-    project, rest, monkeypatch, tmp_path, capsys
+    project, monkeypatch, surface_calls
 ):
     spec = SPECS["liureng_gods"]
     value = raw(spec.key)
@@ -302,7 +299,12 @@ def test_false_course_fails_before_unrelated_projection(
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         options.update(fields=["four_pillars"], strict_fields=True)
-    http = rest.post(spec.rest_path, json=PAYLOADS[spec.key], params=params)
-    protocol = asyncio.run(native(spec, PAYLOADS[spec.key], **options))
-    code, _ = call_cli(spec, PAYLOADS[spec.key], tmp_path, capsys, flags=flags)
+    http, protocol, code, _ = surface_calls(
+        spec,
+        PAYLOADS[spec.key],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 500 and protocol.is_error and code != 0

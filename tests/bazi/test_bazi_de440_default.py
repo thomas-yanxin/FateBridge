@@ -1,6 +1,5 @@
 """Default orbit data, exact old counterexamples, and three public protocols."""
 
-import asyncio
 import json
 import shutil
 from datetime import date, datetime
@@ -16,15 +15,9 @@ from fatebridge.core.ephemeris_runtime import (
 )
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.bazi.test_bazi_year_contract import TOPICS
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import AS_OF, SPECS, business, inputs, native
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -185,23 +178,13 @@ def test_default_orbit_source_does_not_probe_an_unused_native_sun(
     ],
 )
 def test_default_de440_is_consumed_identically_by_three_protocols(
-    key,
-    default_without_external_files,
-    rest,
-    tmp_path,
-    capsys,
+    key, default_without_external_files, surface_calls
 ):
     spec = SPECS[key]
     payload = inputs(spec)
     opts = dict(include_snapshot_text=False, response_char_limit=0)
-    http = rest.post(spec.rest_path, json=payload, params={**opts, "as_of": AS_OF})
-    mcp = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=["--include-snapshot-text", "false", "--response-char-limit", "0"],
+    http, mcp, code, cli = surface_calls(
+        spec, payload, projection=opts, cli_first=False, rest_as_of=AS_OF
     )
     assert http.status_code == 200, http.text
     assert not mcp.is_error

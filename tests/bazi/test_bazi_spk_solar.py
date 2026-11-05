@@ -1,6 +1,5 @@
 """File-backed high-precision Sun identity, failure semantics and consumers."""
 
-import asyncio
 import hashlib
 import importlib.metadata
 import json
@@ -14,14 +13,9 @@ from fatebridge.core import almanac, ephemeris_runtime, spk_solar
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.bazi.test_bazi_year_contract import TOPICS
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business, inputs, native
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -153,14 +147,12 @@ def test_receipt_identifies_loaded_modules_when_installed_metadata_disappears(
 
 @pytest.mark.parametrize("key", ["bazi_birth", "liuri_analysis"])
 def test_missing_selected_spk_is_a_structured_error_on_three_protocols(
-    key, selected_spk, monkeypatch, rest, tmp_path, capsys
+    key, selected_spk, monkeypatch, tmp_path, surface_calls
 ):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_SPK_FILE", str(tmp_path / "missing.bsp"))
     spec = SPECS[key]
     payload = inputs(spec)
-    http = rest.post(spec.rest_path, json=payload)
-    mcp = asyncio.run(native(spec, payload))
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
+    http, mcp, code, cli = surface_calls(spec, payload, cli_first=False)
     assert http.status_code == 503 and mcp.is_error and code != 0
     for value in [http.json(), cli]:
         assert value["retryable"] is False
@@ -227,7 +219,7 @@ def test_transient_source_aba_cannot_cache_another_kernel_under_the_original_key
 
 @pytest.mark.parametrize("topic", TOPICS)
 def test_all_ten_bazi_calendar_views_return_actual_spk_on_three_protocols(
-    topic, selected_spk, rest, tmp_path, capsys
+    topic, selected_spk, surface_calls
 ):
     spec = SPECS["bazi_" + topic]
     payload = {**inputs(spec), "use_true_solar_time": False}
@@ -239,28 +231,8 @@ def test_all_ten_bazi_calendar_views_return_actual_spk_on_three_protocols(
         include_snapshot_text=False,
         response_char_limit=0,
     )
-    params = [("fields", f) for f in fields] + [
-        ("strict_fields", "true"),
-        ("include_snapshot_text", "false"),
-        ("response_char_limit", 0),
-    ]
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    mcp = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+    http, mcp, code, cli = surface_calls(
+        spec, payload, projection=opts, cli_first=False
     )
     assert http.status_code == 200 and not mcp.is_error and code == 0
     assert business(http.json()) == business(mcp.structured_content) == business(cli)
@@ -286,20 +258,14 @@ def test_all_ten_bazi_calendar_views_return_actual_spk_on_three_protocols(
     ],
 )
 def test_shared_timing_and_divination_consumers_preserve_spk_identity(
-    key, selected_spk, rest, tmp_path, capsys
+    key, selected_spk, surface_calls
 ):
     spec = SPECS[key]
     payload = inputs(spec)
     # All inputs here are existing fictional test fixtures, not user birth data.
     opts = dict(include_snapshot_text=False, response_char_limit=0)
-    http = rest.post(spec.rest_path, json=payload, params=opts)
-    mcp = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=["--include-snapshot-text", "false", "--response-char-limit", "0"],
+    http, mcp, code, cli = surface_calls(
+        spec, payload, projection=opts, cli_first=False
     )
     assert http.status_code == 200 and not mcp.is_error and code == 0
     assert business(http.json()) == business(mcp.structured_content) == business(cli)

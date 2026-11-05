@@ -1,18 +1,12 @@
 """Regional birth-offset selection agrees over the actual local three surfaces."""
 
-import asyncio
-
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest
 from tests.numerology.test_heluo_poem_transports import run_three
 from tests.numerology.test_numerology_birth_fold import BASE, REFERENCE
+from tests.support.transports import SPECS, business, native
+from tests.support.transports import rest as shared_rest
+from tests.support.transports import surface_calls
 
 rest = shared_rest
 
@@ -99,13 +93,11 @@ def test_offset_receipt_is_reachable_by_narrow_field_projection(
     ],
 )
 def test_invalid_or_unknown_clock_keeps_the_same_error_on_all_surfaces(
-    key, change, status, error, rest, tmp_path, capsys
+    key, change, status, error, surface_calls
 ):
     spec = SPECS[key]
     payload = {**BASE, **change}
-    response = rest.post(spec.rest_path, json=payload)
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
-    mcp = asyncio.run(native(spec, payload))
+    response, mcp, code, cli = surface_calls(spec, payload)
     assert response.status_code == status and code != 0 and mcp.is_error
     assert (
         error in str(response.json())

@@ -1,6 +1,5 @@
 """Endpoint-year support uses adjacent roots without expanding public years."""
 
-import asyncio
 import hashlib
 import json
 from datetime import datetime, timezone
@@ -16,14 +15,7 @@ from fatebridge.core.ephemeris_runtime import (
     configured_ephemeris_path,
 )
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/ren_calendar_guard_v1"
@@ -68,7 +60,7 @@ def empty_ephemeris(monkeypatch, tmp_path):
 @pytest.mark.parametrize("date_parts", CASES)
 @pytest.mark.parametrize("key", ["liureng_gods", "jinkou"])
 def test_endpoint_years_on_three_transports(
-    mode, date_parts, key, empty_ephemeris, monkeypatch, rest, tmp_path, capsys
+    mode, date_parts, key, empty_ephemeris, monkeypatch, surface_calls
 ):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     year, month, day = date_parts
@@ -93,29 +85,8 @@ def test_endpoint_years_on_three_transports(
         include_snapshot_text=False,
         response_char_limit=0,
     )
-    params = [("fields", f) for f in fields] + [
-        ("strict_fields", "true"),
-        ("include_snapshot_text", "false"),
-        ("response_char_limit", "0"),
-        ("as_of", AS_OF),
-    ]
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    mcp = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        [
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+    http, mcp, code, cli = surface_calls(
+        spec, payload, projection=opts, cli_first=False, rest_as_of=AS_OF
     )
     assert http.status_code == 200, http.text
     assert not mcp.is_error, mcp.structured_content
@@ -229,7 +200,7 @@ def test_bazi_year_month_and_native_control_remain_explicit(
 
 @pytest.mark.parametrize("key", ["liureng_gods", "jinkou"])
 def test_guard_corruption_is_a_failure_on_every_transport_before_projection(
-    key, empty_ephemeris, monkeypatch, rest, tmp_path, capsys
+    key, empty_ephemeris, monkeypatch, surface_calls
 ):
     import fatebridge.core.de440_solar as source
 
@@ -253,20 +224,13 @@ def test_guard_corruption_is_a_failure_on_every_transport_before_projection(
     if key == "jinkou":
         payload["di_fen"] = "酉"
     spec = SPECS[key]
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params={"fields": "analysis_type", "strict_fields": "true", "as_of": AS_OF},
-    )
-    mcp = asyncio.run(
-        native(spec, payload, fields=["analysis_type"], strict_fields=True)
-    )
-    code, cli = call_cli(
+    http, mcp, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        ["--fields", "analysis_type", "--strict-fields", "true"],
+        params={"fields": "analysis_type", "strict_fields": "true", "as_of": AS_OF},
+        options={"fields": ["analysis_type"], "strict_fields": True},
+        flags=["--fields", "analysis_type", "--strict-fields", "true"],
+        cli_first=False,
     )
     assert http.status_code == 503 and mcp.is_error and code == 1
     for got in [http.json(), mcp.structured_content, cli]:

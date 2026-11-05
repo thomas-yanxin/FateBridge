@@ -6,24 +6,14 @@ import json
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest
 from tests.numerology.test_numerology_solar_providers import (
     REFERENCE,
     TRACE_ID,
     assert_actual_source,
 )
-from tests.numerology.test_numerology_solar_providers import (
-    solar_aa1996_build as shared_build_fixture,
-)
-from tests.numerology.test_numerology_solar_providers import (
-    solar_provider_environment as shared_provider_fixture,
-)
+from tests.support.transports import SPECS, business, call_cli, native
+from tests.support.transports import rest as shared_rest
+from tests.support.transports import surface_calls
 
 rest = shared_rest
 
@@ -134,14 +124,12 @@ def test_aa1996_lower_endpoint_keeps_120_years_on_all_adapters(
 
 
 def test_aa1996_source_exhaustion_is_nonretryable503_on_all_adapters(
-    monkeypatch, solar_provider_environment, rest, tmp_path, capsys
+    monkeypatch, solar_provider_environment, surface_calls
 ):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "aa1996")
     spec = SPECS["canping"]
     payload = {**REFERENCE["valid_input"], "date": "2200-05-15"}
-    response = rest.post(spec.rest_path, json=payload)
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
-    mcp = asyncio.run(native(spec, payload))
+    response, mcp, code, cli = surface_calls(spec, payload)
     assert response.status_code == 503 and code == 1 and mcp.is_error
     assert cli["status_code"] == 503
     text = "\n".join(block.text for block in mcp.content if hasattr(block, "text"))

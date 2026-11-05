@@ -1,6 +1,5 @@
 """Actual role control remains conditional, traceable and source scoped."""
 
-import asyncio
 import hashlib
 import json
 import shutil
@@ -19,13 +18,7 @@ from fatebridge.core.requests.meihua import MeihuaCasting
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
 from fatebridge.validation.meihua_internal import audit_internal_controls
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_internal_v1"
 BUNDLE = json.loads((REFERENCES / "cases.json").read_text())
@@ -290,7 +283,7 @@ def test_tampering_with_oracle_fails_even_after_rehash(tmp_path):
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 @pytest.mark.parametrize("topic", ["general", "transaction"])
 def test_added_count_control_and_projection_agree_on_rest_mcp_cli(
-    case, topic, rest, tmp_path, capsys
+    case, topic, surface_calls
 ):
     spec = SPECS["meihua_cast"]
     fields = [
@@ -300,31 +293,10 @@ def test_added_count_control_and_projection_agree_on_rest_mcp_cli(
         "summary",
     ]
     payload = {"casting": case["casting"], "interpretation_topic": topic}
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *(("fields", f) for f in fields),
-            ("strict_fields", "true"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(spec, payload, fields=fields, strict_fields=True, response_char_limit=0)
+        projection={"fields": fields, "strict_fields": True, "response_char_limit": 0},
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]

@@ -7,14 +7,15 @@ import pytest
 
 from fatebridge.application.examples import suggested_fields
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.integration.test_result_delivery import reconstruct, store
+from tests.support.transports import (
     SPECS,
     business,
     call_cli,
     native,
     rest,
+    surface_calls,
 )
-from tests.integration.test_result_delivery import reconstruct, store
 
 PAYLOAD = {
     "name": "虚构通路传输回归",
@@ -48,35 +49,26 @@ PAYLOAD = {
     ],
 )
 def test_passage_view_matches_rest_native_mcp_and_cli(
-    topic, rest, tmp_path, capsys, store
+    topic, rest, store, surface_calls
 ):
     spec = SPECS["bazi_" + topic]
     fields = suggested_fields(spec, view="passage")
-    response = rest.post(
-        spec.rest_path,
-        json=PAYLOAD,
+    response, protocol, code, local = surface_calls(
+        spec,
+        PAYLOAD,
         params={
             "fields": fields,
             "strict_fields": True,
             "include_snapshot_text": False,
         },
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            PAYLOAD,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-            response_char_limit=8192,
-        )
-    )
-    code, local = call_cli(
-        spec,
-        PAYLOAD,
-        tmp_path,
-        capsys,
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 8192,
+        },
         flags=["--response-char-limit", "0", "--strict-fields", "--fields", *fields],
+        cli_first=False,
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     result = response.json()

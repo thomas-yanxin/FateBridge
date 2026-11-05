@@ -5,12 +5,12 @@ import asyncio
 import pytest
 
 from fatebridge.application.examples import evidence_views
-from tests.evaluation.test_agentic_nested_outputs import SPECS, call_cli, native, rest
 from tests.support.meihua_qualified_motion_reference import (
     expected_summary,
     load,
     path_get,
 )
+from tests.support.transports import SPECS, call_cli, native, rest
 
 GEOMETRY, COUNTING, READING, TEMPLATES = load()
 FIELD = "interpretation.topic_reading.chapter_qualifications.qualitative_motion"

@@ -3,9 +3,6 @@
 import copy
 import hashlib
 import json
-import os
-import subprocess
-import sys
 from pathlib import Path
 
 import pytest
@@ -218,87 +215,3 @@ def test_changed_usage_notes_and_changed_bound_grid_are_rejected(monkeypatch, tm
     )
     with pytest.raises(ValueError, match="同一NIJL"):
         module.audit_intro_usage(context_policy=module.POLICY)
-
-
-@pytest.mark.parametrize(
-    "arguments,valid",
-    [
-        ([], False),
-        (["--context-policy", module.POLICY], True),
-        (["--context-policy", module.POLICY, "--all-contexts"], True),
-        (
-            [
-                "--context-policy",
-                module.POLICY,
-                "--palace",
-                "子",
-                "--mansion",
-                "虚",
-                "--label",
-                "6",
-            ],
-            True,
-        ),
-        (
-            [
-                "--context-policy",
-                module.POLICY,
-                "--palace",
-                "亥",
-                "--mansion",
-                "奎",
-                "--label",
-                "初",
-            ],
-            True,
-        ),
-        (["--context-policy", module.POLICY, "--palace", "子"], False),
-        (
-            [
-                "--context-policy",
-                module.POLICY,
-                "--palace",
-                "子",
-                "--mansion",
-                "虚",
-                "--label",
-                "6",
-                "--all-contexts",
-            ],
-            False,
-        ),
-        (
-            [
-                "--context-policy",
-                module.POLICY,
-                "--palace",
-                "子",
-                "--mansion",
-                "虚",
-                "--label",
-                "6.0",
-            ],
-            False,
-        ),
-    ],
-)
-def test_actual_cli_requires_explicit_policy_and_retains_same_import_tree(
-    arguments, valid
-):
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts/guolao/audit_guolao_table_usage.py"),
-            *arguments,
-        ],
-        cwd=ROOT,
-        env={**os.environ, "PYTHONPATH": str(ROOT / "src") + os.pathsep + str(ROOT)},
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert (result.returncode == 0) is valid
-    if valid:
-        assert json.loads(result.stdout)["original_usage_adjudicated"] is False
-    else:
-        assert not result.stdout and result.stderr

@@ -1,6 +1,5 @@
 """Full, separately anchored natal courses from confirmed natal inputs."""
 
-import asyncio
 import copy
 import json
 from dataclasses import replace
@@ -11,13 +10,7 @@ import pytest
 import fatebridge.application.execution as execution
 from scripts.ren.audit_jinkou_natal_course import CORPUS, observe, reference
 from scripts.ren.audit_ren_classical import observe_jinkou
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, rest, surface_calls
 
 REF = reference()
 PROTOCOL = json.loads((CORPUS / "protocol.json").read_text())
@@ -113,7 +106,7 @@ def corrupt(value, fault):
 @pytest.mark.parametrize("fault", PROTOCOL["faults"])
 @pytest.mark.parametrize("project", [False, True])
 def test_natal_facts_and_full_child_reject_corruption_before_projection(
-    fault, project, rest, monkeypatch, tmp_path, capsys
+    fault, project, monkeypatch, surface_calls
 ):
     bad = corrupt(output(), fault)
     with pytest.raises(execution.OutputContractError):
@@ -134,9 +127,9 @@ def test_natal_facts_and_full_child_reject_corruption_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         opts.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(SPEC.rest_path, json=payload, params=params)
-    mcp = asyncio.run(native(SPEC, payload, **opts))
-    code, cli = call_cli(SPEC, payload, tmp_path, capsys, flags=flags)
+    http, mcp, code, cli = surface_calls(
+        SPEC, payload, params=params, options=opts, flags=flags, cli_first=False
+    )
     assert (
         http.status_code == 500
         and mcp.is_error
@@ -146,9 +139,7 @@ def test_natal_facts_and_full_child_reject_corruption_before_projection(
 
 
 @pytest.mark.parametrize("project", [False, True])
-def test_three_ports_deliver_full_separate_natal_course(
-    project, rest, tmp_path, capsys
-):
+def test_three_ports_deliver_full_separate_natal_course(project, surface_calls):
     payload = dict(PROTOCOL["public_payload"], natal_branch="子")
     fields = ["four_pillars", "jinkou.overview", "jinkou.natal_course"]
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
@@ -158,9 +149,9 @@ def test_three_ports_deliver_full_separate_natal_course(
         params += [("fields", p) for p in fields] + [("strict_fields", "true")]
         opts.update(fields=fields, strict_fields=True)
         flags += ["--fields", *fields, "--strict-fields", "true"]
-    http = rest.post(SPEC.rest_path, json=payload, params=params)
-    mcp = asyncio.run(native(SPEC, payload, **opts))
-    code, cli = call_cli(SPEC, payload, tmp_path, capsys, flags=flags)
+    http, mcp, code, cli = surface_calls(
+        SPEC, payload, params=params, options=opts, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not mcp.is_error and code == 0
     for body in [http.json(), mcp.structured_content, cli]:
         assert body["jinkou"]["natal_course"] == output()["jinkou"]["natal_course"]
@@ -223,16 +214,17 @@ def test_natal_course_does_not_claim_comprehensive_judgement():
 
 @pytest.mark.parametrize("section", ["京本本命另课", "京本行年另课"])
 def test_both_derived_courses_are_registered_and_individually_exportable(
-    section, rest, tmp_path, capsys
+    section, surface_calls
 ):
     payload = dict(
         PROTOCOL["public_payload"], natal_branch="子", selected_sections=[section]
     )
-    http = rest.post(
-        SPEC.rest_path, json=payload, params={"as_of": AS_OF, "response_char_limit": 0}
+    http, mcp, code, cli = surface_calls(
+        SPEC,
+        payload,
+        params={"as_of": AS_OF, "response_char_limit": 0},
+        cli_first=False,
     )
-    mcp = asyncio.run(native(SPEC, payload))
-    code, cli = call_cli(SPEC, payload, tmp_path, capsys)
     assert http.status_code == 200 and not mcp.is_error and code == 0
     for body in [http.json(), mcp.structured_content, cli]:
         e = body["snapshot_export"]

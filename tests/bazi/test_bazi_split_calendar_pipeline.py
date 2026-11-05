@@ -1,6 +1,5 @@
 """Actual default solar/timing consumers must use their two-part TT epoch."""
 
-import asyncio
 from datetime import datetime, timezone
 from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 from fractions import Fraction
@@ -15,14 +14,9 @@ from fatebridge.core.astro.time_scales import (
 )
 from fatebridge.core.astro.tt_epoch import TTInstant
 from fatebridge.services.tool_catalog import CATALOG
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import AS_OF, business, inputs
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 
 def check_actual_parts(value):
@@ -84,7 +78,7 @@ rest = _shared_rest
 @pytest.mark.parametrize("key", ["bazi_birth", "timing_analysis", "dayun_analysis"])
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_parts_and_same_business_result_on_rest_mcp_cli(
-    key, project, rest, tmp_path, capsys
+    key, project, surface_calls
 ):
     spec = next(s for s in CATALOG if s.key == key)
     payload = {
@@ -118,9 +112,14 @@ def test_actual_parts_and_same_business_result_on_rest_mcp_cli(
             "--strict-fields",
             "true",
         ]
-    http = rest.post(spec.rest_path, json=payload, params={"as_of": AS_OF, **opts})
-    mcp = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags)
+    http, mcp, code, cli = surface_calls(
+        spec,
+        payload,
+        params={"as_of": AS_OF, **opts},
+        options=opts,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 200 and not mcp.is_error and code == 0, http.text
     assert business(http.json()) == business(mcp.structured_content) == business(cli)
     assert check_actual_parts(http.json()) > 0

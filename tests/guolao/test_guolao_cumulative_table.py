@@ -294,23 +294,6 @@ def test_exact_original_day_input_required(value):
 
 
 @pytest.mark.parametrize(
-    "arguments", [["--table-audit"], ["--anomaly-days", "13.7773"]]
-)
-def test_cli_research_output_is_json_and_retains_missing_endpoint(
-    monkeypatch, capsys, arguments
-):
-    monkeypatch.setattr(sys, "argv", ["audit_guolao_cumulative.py", *arguments])
-    with pytest.raises(SystemExit) as exited:
-        runpy.run_path(
-            str(ROOT / "scripts/guolao/audit_guolao_cumulative.py"), run_name="__main__"
-        )
-    assert exited.value.code == 0
-    result = json.loads(capsys.readouterr().out)
-    if "--anomaly-days" in arguments:
-        assert result["signed_correction_ancient_du_exact"] is None
-
-
-@pytest.mark.parametrize(
     "arguments",
     [["--conjunction-method", "literal_table"], ["--conjunction-method=literal_table"]],
 )

@@ -7,13 +7,8 @@ import pytest
 from fatebridge.application.examples import suggested_fields
 from tests.bazi.test_bazi_birth_seconds import SPECS
 from tests.bazi.test_bazi_uncertainty_events import KNOWN
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import AS_OF, business, call_cli, native
+from tests.support.transports import rest as _shared_rest
 
 ROW = next(r for r in KNOWN if r["input"]["birth_year"] >= 2000)
 RANGE_SPECS = [s for s in SPECS if s.key in {"timing_analysis", "dayun_analysis"}]

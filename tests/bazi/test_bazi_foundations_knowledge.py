@@ -1,6 +1,5 @@
 """Additive source-backed concepts preserve the sealed base and public queries."""
 
-import asyncio
 import hashlib
 import json
 from pathlib import Path
@@ -11,13 +10,9 @@ from fatebridge.core import knowledge_store
 from fatebridge.services.knowledge import (
     calculate_knowledge_read,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -89,21 +84,15 @@ def test_each_concept_separates_primary_program_and_editorial_attribution(key):
 @pytest.mark.parametrize("key", KEYS)
 @pytest.mark.parametrize("category", [None, "basics"])
 def test_concepts_are_identical_on_rest_mcp_cli_with_bare_and_explicit_keys(
-    key, category, rest, tmp_path, capsys
+    key, category, surface_calls
 ):
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "key": key}
     if category is not None:
         payload["category"] = category
     opts = {"include_snapshot_text": False, "response_char_limit": 0}
-    http = rest.post(spec.rest_path, json=payload, params=opts)
-    protocol = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=["--include-snapshot-text", "false", "--response-char-limit", "0"],
+    http, protocol, code, cli = surface_calls(
+        spec, payload, projection=opts, cli_first=False
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert (
@@ -118,7 +107,7 @@ def test_concepts_are_identical_on_rest_mcp_cli_with_bare_and_explicit_keys(
 
 @pytest.mark.parametrize("key", KEYS)
 def test_strict_projection_preserves_actual_source_and_supplement_on_three_transports(
-    key, rest, tmp_path, capsys
+    key, surface_calls
 ):
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "key": key}
@@ -135,22 +124,8 @@ def test_strict_projection_preserves_actual_source_and_supplement_on_three_trans
         "include_snapshot_text": False,
         "response_char_limit": 0,
     }
-    http = rest.post(spec.rest_path, json=payload, params=opts)
-    protocol = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+    http, protocol, code, cli = surface_calls(
+        spec, payload, projection=opts, cli_first=False
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     value = business(http.json())

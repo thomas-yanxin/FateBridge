@@ -1,6 +1,5 @@
 """Original diagram positions, birth-year convention and faithful delivery."""
 
-import asyncio
 import importlib.util
 import json
 import shutil
@@ -15,16 +14,10 @@ from fatebridge.services.metaphysics import calculate_liureng_runyear
 from fatebridge.utils.birth_input import create_person_info
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
-from tests.evaluation.test_agentic_nested_outputs import (
     test_nested_fact_faults_are_internal_failures_on_all_surfaces as reject_fault,
 )
 from tests.ren.test_ren_transports import PAYLOAD
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -165,7 +158,7 @@ def test_duplicate_earth_plate_and_invalid_day_or_year_are_rejected():
 @pytest.mark.parametrize("gender", ["女", "未知"])
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_lunar_birth_year_and_placements_agree_on_all_surfaces(
-    day, natal, gender, project, rest, tmp_path, capsys
+    day, natal, gender, project, surface_calls
 ):
     spec = SPECS["liureng_runyear"]
     payload = dict(
@@ -194,9 +187,9 @@ def test_actual_lunar_birth_year_and_placements_agree_on_all_surfaces(
             "false",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, payload, **options))
+    http, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=options, flags=flags
+    )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     bodies = [http.json(), cli, protocol.structured_content]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])

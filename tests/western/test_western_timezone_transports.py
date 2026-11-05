@@ -7,13 +7,14 @@ import pytest
 
 from fatebridge.core.requests.birth import AstroBirthRequest
 from fatebridge.services.tool_catalog import CATALOG
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.support.transports import (
     SPECS,
     business,
     call_cli,
     inputs,
     native,
     rest,
+    surface_calls,
 )
 
 # Negative input checks only for the older lifespan-family routes: no natal
@@ -29,7 +30,7 @@ KEYS = [
 @pytest.mark.parametrize("key", KEYS)
 @pytest.mark.parametrize("zone_input", ["omitted", "null", "empty"])
 def test_unresolved_western_civil_zone_is_an_error_on_all_adapters(
-    key, zone_input, rest, tmp_path, capsys
+    key, zone_input, surface_calls
 ):
     spec = SPECS[key]
     payload = inputs(spec)
@@ -37,9 +38,13 @@ def test_unresolved_western_civil_zone_is_an_error_on_all_adapters(
     payload["birth_place"] = "虚构的未知出生地"
     if zone_input != "omitted":
         payload["birth_timezone"] = None if zone_input == "null" else ""
-    http = rest.post(spec.rest_path, json=payload, params={"fields": "analysis_type"})
-    code, cli = call_cli(spec, payload, tmp_path, capsys, ["--fields", "analysis_type"])
-    protocol = asyncio.run(native(spec, payload, fields=["analysis_type"]))
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
+        params={"fields": "analysis_type"},
+        options={"fields": ["analysis_type"]},
+        flags=["--fields", "analysis_type"],
+    )
     assert http.status_code == 400 and code == 1 and protocol.is_error
     protocol_error = json.loads(protocol.content[0].text)
     assert cli["status_code"] == protocol_error["status_code"] == 400
@@ -111,7 +116,7 @@ def test_relative_clock_requires_each_partys_zone_on_all_adapters(
 )
 @pytest.mark.parametrize("inferred", [False, True])
 def test_confirmed_or_resolved_zone_has_readable_provenance(
-    key, inferred, rest, tmp_path, capsys
+    key, inferred, surface_calls
 ):
     spec = SPECS[key]
     payload = inputs(spec)
@@ -122,15 +127,13 @@ def test_confirmed_or_resolved_zone_has_readable_provenance(
         payload["birth_timezone"] = "Asia/Shanghai"
     path = "base_chart.person_info" if key == "astro_germany" else "person_info"
     fields = [path]
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
         params=[("fields", path), ("strict_fields", "true")],
+        options={"fields": fields, "strict_fields": True},
+        flags=["--fields", path, "--strict-fields", "true"],
     )
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, ["--fields", path, "--strict-fields", "true"]
-    )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     values = [http.json(), cli, json.loads(protocol.content[0].text)]
     assert business(values[0]) == business(values[1]) == business(values[2])

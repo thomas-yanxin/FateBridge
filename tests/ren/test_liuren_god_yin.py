@@ -1,6 +1,5 @@
 """Primary yin-spirit examples and their distinct noble exception."""
 
-import asyncio
 import copy
 import hashlib
 import json
@@ -10,15 +9,8 @@ import pytest
 
 from fatebridge.core.metaphysics.liureng import build_liureng_board
 from scripts.ren.audit_ren_classical import make_seed
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.fixtures.surface_payloads import REST_POST_CASES
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/liuren_god_yin_v1"
@@ -157,7 +149,7 @@ def test_omitted_projected_year_upper_is_not_a_false_unknown_assertion():
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_new_lookup_and_current_year_memberships_survive_three_ports(
-    key, project, rest, tmp_path, capsys
+    key, project, surface_calls
 ):
     spec = SPECS[key]
     payload = REST_POST_CASES[spec.rest_path]()
@@ -184,9 +176,9 @@ def test_new_lookup_and_current_year_memberships_survive_three_ports(
             "false",
         ]
         opts.update(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    protocol = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=opts, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)

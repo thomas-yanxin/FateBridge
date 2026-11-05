@@ -1,6 +1,5 @@
 """The selected analysis instant survives public protocols and calendar edges."""
 
-import asyncio
 import json
 from pathlib import Path
 
@@ -9,13 +8,9 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import suggested_fields
 from fatebridge.core.reproducibility import BAZI_ANALYSIS_CLOCK_TOOLS
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -29,7 +24,7 @@ STAMP = "2025-02-04T04:37:49.123456Z"
 
 @pytest.mark.parametrize("tool", sorted(BAZI_ANALYSIS_CLOCK_TOOLS))
 def test_current_instant_and_published_clock_view_match_on_three_protocols(
-    tool, rest, tmp_path, capsys
+    tool, surface_calls
 ):
     spec = SPECS[tool]
     fields = suggested_fields(spec, view="analysis_clock")
@@ -41,13 +36,11 @@ def test_current_instant_and_published_clock_view_match_on_three_protocols(
         "include_snapshot_text": False,
         "response_char_limit": 0,
     }
-    http = rest.post(spec.rest_path, json=BIRTH, params=opts)
-    protocol = asyncio.run(native(spec, BIRTH, **opts))
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         BIRTH,
-        tmp_path,
-        capsys,
+        params=opts,
+        options=opts,
         flags=[
             "--as-of",
             STAMP,
@@ -60,6 +53,7 @@ def test_current_instant_and_published_clock_view_match_on_three_protocols(
             "--response-char-limit",
             "0",
         ],
+        cli_first=False,
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [http.json(), protocol.structured_content, cli]
@@ -144,7 +138,7 @@ def test_every_timing_endpoint_rejects_invalid_explicit_analysis_clocks(
 
 
 def test_ambiguous_target_has_the_same_nonretryable_error_on_three_protocols(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
     spec = SPECS["liushi_analysis"]
     payload = {
@@ -156,10 +150,8 @@ def test_ambiguous_target_has_the_same_nonretryable_error_on_three_protocols(
         "analysis_hour": 1,
         "analysis_minute": 30,
     }
-    http = rest.post(spec.rest_path, json=payload)
-    protocol = asyncio.run(native(spec, payload))
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    http, protocol, code, cli = surface_calls(
+        spec, payload, flags=["--response-char-limit", "0"], cli_first=False
     )
     assert http.status_code == 400 and protocol.is_error and code != 0
     # HTTP carries status in its response, while MCP/CLI retain execution

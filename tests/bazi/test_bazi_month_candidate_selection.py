@@ -21,14 +21,8 @@ from fatebridge.core.output_candidate_selection import (
     MonthStructureReference,
 )
 from fatebridge.core.rules import BaZiRules
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business, call_cli, inputs, native
+from tests.support.transports import rest as _shared_rest
 
 FIXTURE = (
     Path(__file__).parents[1] / "data/bazi_month_paths_v1/source-observations.json"

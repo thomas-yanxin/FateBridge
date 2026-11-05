@@ -1,6 +1,5 @@
 """An internally coherent pattern ledger must still describe its own course."""
 
-import asyncio
 import copy
 import hashlib
 import json
@@ -14,14 +13,7 @@ from pydantic import ValidationError
 import fatebridge.application.execution as execution
 from fatebridge.core.metaphysics.jinkou_patterns import CATALOG
 from fatebridge.core.output_chinese import Jinkou
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/jinkou_pattern_anchors_v1"
@@ -162,7 +154,7 @@ def test_valid_complete_main_and_annual_courses_are_accepted(annual):
     "fault", ["coordinated_false_positive", "unknown_to_true", "missing_pattern_trace"]
 )
 def test_anchor_failure_survives_all_three_ports_before_projection(
-    fault, project, rest, monkeypatch, tmp_path, capsys
+    fault, project, monkeypatch, surface_calls
 ):
     bad = corrupt(fault)
     original = execution.execute_spec
@@ -179,9 +171,9 @@ def test_anchor_failure_survives_all_three_ports_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         options = dict(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(SPEC.rest_path, json=PAYLOAD, params=params)
-    mcp = asyncio.run(native(SPEC, PAYLOAD, **options))
-    code, cli = call_cli(SPEC, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, mcp, code, cli = surface_calls(
+        SPEC, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 500 and mcp.is_error and code == 1
     for value in (http.json(), mcp.structured_content, cli):
         assert value["error_code"] == "internal_error"

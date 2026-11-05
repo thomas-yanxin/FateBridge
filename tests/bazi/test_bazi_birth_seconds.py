@@ -15,7 +15,7 @@ from fatebridge.core.timing import TimingAnalysis
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.birth_input import PersonInfo, create_person_info
 from fatebridge.utils.solar_time import normalize_birth_time
-from tests.evaluation.test_agentic_nested_outputs import inputs
+from tests.support.transports import inputs
 
 TIMING_KEYS = {
     "timing_analysis",

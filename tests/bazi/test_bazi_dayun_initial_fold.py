@@ -12,8 +12,8 @@ from fatebridge.application.execution import execute_tool
 from fatebridge.core.execution_context import ExecutionOptions
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.utils.timezones import parse_timezone_name
-from tests.evaluation.test_agentic_nested_outputs import SPECS, business, native
-from tests.evaluation.test_agentic_nested_outputs import rest as _rest_fixture
+from tests.support.transports import SPECS, business, native
+from tests.support.transports import rest as _rest_fixture
 
 rest = _rest_fixture
 ROOT = Path(__file__).resolve().parents[2]

@@ -1,6 +1,5 @@
 """Rain stopping, conditional clear sky, and an unresolved anaphor stay distinct."""
 
-import asyncio
 import hashlib
 import json
 import shutil
@@ -11,13 +10,7 @@ import pytest
 from fatebridge.application.examples import suggested_fields
 from fatebridge.services.meihua import calculate_meihua_cast
 from fatebridge.validation.meihua_weather import audit_weather_gen_rain
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_weather_gen_v4"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
@@ -105,7 +98,7 @@ def test_corrupt_gen_oracle_cannot_pass_even_after_rehash(tmp_path):
 @pytest.mark.parametrize(
     "case", [CASES[i] for i in [0, 1, 3, 5]], ids=lambda c: c["id"]
 )
-def test_gen_clause_conditions_survive_all_three_surfaces(case, rest, tmp_path, capsys):
+def test_gen_clause_conditions_survive_all_three_surfaces(case, surface_calls):
     spec = SPECS["meihua_cast"]
     payload = {
         "casting": case["casting"],
@@ -113,20 +106,15 @@ def test_gen_clause_conditions_survive_all_three_surfaces(case, rest, tmp_path, 
         "weather_context": case["context"],
     }
     fields = suggested_fields(spec, view="weather")
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
+    response, protocol, exit_code, local = surface_calls(
+        spec,
+        payload,
         params=[
             *(("fields", f) for f in fields),
             ("strict_fields", "true"),
             ("response_char_limit", "0"),
         ],
-    )
-    exit_code, local = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
+        options={"fields": fields, "strict_fields": True},
         flags=[
             "--fields",
             *fields,
@@ -138,7 +126,6 @@ def test_gen_clause_conditions_survive_all_three_surfaces(case, rest, tmp_path, 
             "0",
         ],
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and exit_code == 0 and not protocol.is_error
     assert (
         business(response.json())

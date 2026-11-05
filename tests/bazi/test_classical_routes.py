@@ -1,6 +1,5 @@
 """Source-position expectations, causal counterexamples and public contracts."""
 
-import asyncio
 import hashlib
 import json
 from pathlib import Path
@@ -11,13 +10,7 @@ from jsonschema import Draft202012Validator
 from fatebridge.analysis.career import CareerAnalysis
 from fatebridge.application.examples import suggested_fields
 from fatebridge.core.bazi_evidence import build_natal_evidence
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "data/bazi_classical_routes_v1/reference.json"
 REFERENCE = json.loads(FIXTURE.read_text())
@@ -199,7 +192,7 @@ def test_career_signals_and_entrepreneurship_use_the_same_observed_day_stars():
 
 @pytest.mark.parametrize("key", ["bazi_career", "bazi_wealth", "bazi_birth"])
 def test_classical_route_evidence_has_the_same_schema_and_facts_on_all_surfaces(
-    key, rest, tmp_path, capsys
+    key, surface_calls
 ):
     spec = SPECS[key]
     args = {
@@ -213,11 +206,9 @@ def test_classical_route_evidence_has_the_same_schema_and_facts_on_all_surfaces(
         "analysis_month": 10,
         "analysis_day": 12,
     }
-    response = rest.post(spec.rest_path, json=args)
-    code, local = call_cli(
-        spec, args, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    response, protocol, code, local = surface_calls(
+        spec, args, flags=["--response-char-limit", "0"]
     )
-    protocol = asyncio.run(native(spec, args))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])

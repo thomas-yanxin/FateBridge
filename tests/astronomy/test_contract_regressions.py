@@ -46,14 +46,14 @@ from fatebridge.utils.timezones import (
 from fatebridge.validation.fengshui_solar_terms import compare_resolution
 from scripts.astronomy import build_ephemeris_manifest as builder
 from tests.astronomy.test_moshier_motion_frames import analytical
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.support.transports import (
     AS_OF,
     SPECS,
     business,
-    call_cli,
     inputs,
     native,
     rest,
+    surface_calls,
 )
 
 
@@ -336,21 +336,15 @@ def test_default_fengshui_source_is_an_orbit_record_crossing(monkeypatch):
 
 
 def test_default_shared_fengshui_source_matches_all_protocols(
-    monkeypatch, rest, tmp_path, capsys
+    monkeypatch, surface_calls
 ):
     monkeypatch.delenv("FATEBRIDGE_SOLAR_TERM_MODEL", raising=False)
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     spec = SPECS["fengshui_assess"]
     payload = inputs(spec)
     options = dict(include_snapshot_text=False, response_char_limit=0)
-    http = rest.post(spec.rest_path, json=payload, params={**options, "as_of": AS_OF})
-    mcp = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=["--include-snapshot-text", "false", "--response-char-limit", "0"],
+    http, mcp, code, cli = surface_calls(
+        spec, payload, projection=options, cli_first=False, rest_as_of=AS_OF
     )
     assert http.status_code == 200, http.text
     assert not mcp.is_error and code == 0

@@ -1,6 +1,5 @@
 """Actual calendar and timing clocks carry the same exact frozen-policy inversion."""
 
-import asyncio
 from datetime import datetime
 from decimal import ROUND_HALF_EVEN, Decimal, localcontext
 
@@ -8,14 +7,9 @@ import pytest
 
 from fatebridge.core.astro.time_scales import leap_table
 from fatebridge.services.tool_catalog import CATALOG
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import AS_OF, business, inputs
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 
 def check_terms(value):
@@ -77,7 +71,7 @@ rest = _shared_rest
 @pytest.mark.parametrize("key", ["bazi_birth", "timing_analysis", "dayun_analysis"])
 @pytest.mark.parametrize("project", [False, True])
 def test_same_correctly_converted_consumed_tt_roots_on_three_public_surfaces(
-    key, project, rest, tmp_path, capsys
+    key, project, surface_calls
 ):
     spec = next(s for s in CATALOG if s.key == key)
     payload = {
@@ -99,9 +93,14 @@ def test_same_correctly_converted_consumed_tt_roots_on_three_public_surfaces(
         )
         opts.update(fields=[field], strict_fields=True)
         flags += ["--fields", field, "--strict-fields", "true"]
-    http = rest.post(spec.rest_path, json=payload, params={"as_of": AS_OF, **opts})
-    protocol = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags)
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
+        params={"as_of": AS_OF, **opts},
+        options=opts,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0, http.text
     outputs = [http.json(), protocol.structured_content, cli]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])

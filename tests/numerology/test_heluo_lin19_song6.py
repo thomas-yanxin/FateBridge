@@ -2,7 +2,6 @@
 
 import hashlib
 import json
-import runpy
 from pathlib import Path
 
 import pytest
@@ -10,10 +9,9 @@ import pytest
 from fatebridge.application.execution import execute_tool
 from fatebridge.core import heluo_poems as hp
 from fatebridge.core import heluo_texts as ht
-from fatebridge.core.heluo import _tiaowen, yao_text
+from fatebridge.core.heluo import yao_text
 from fatebridge.services.knowledge import calculate_knowledge_read
-from tests.evaluation.test_agentic_nested_outputs import SPECS
-from tests.support.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
+from tests.support.transports import SPECS
 
 F = Path(__file__).parents[1] / "fixtures/heluo_lin19_song6_v1"
 REFERENCE = json.loads((F / "source-adoption-reference.json").read_bytes())

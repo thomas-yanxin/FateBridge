@@ -12,15 +12,8 @@ from pydantic import ValidationError
 import fatebridge.mcp_server as mcp
 from fatebridge.cli import run as cli_run
 from fatebridge.core.output_bazi_evidence import EvidenceStructureProfile
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _rest_fixture
+from tests.support.transports import AS_OF, SPECS, business, call_cli, inputs, native
+from tests.support.transports import rest as _rest_fixture
 
 rest = _rest_fixture
 

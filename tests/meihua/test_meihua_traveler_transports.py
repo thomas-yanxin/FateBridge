@@ -15,11 +15,7 @@ from fatebridge.application.examples import suggested_fields
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
-from tests.evaluation.test_agentic_nested_outputs import (  # noqa: F401
-    SPECS,
-    call_cli,
-    rest,
-)
+from tests.support.transports import SPECS, call_cli, rest
 
 FIELD = "interpretation.topic_reading"
 CASES = [

@@ -249,21 +249,6 @@ def test_malformed_or_overclaimed_source_profiles_fail_closed(
         rate.gujin_day_rate_lunar(F(1))
 
 
-def test_cli_exposes_source_ambiguity_without_reporting_a_numeric_correction(
-    monkeypatch, capsys
-):
-    monkeypatch.setattr(
-        sys, "argv", ["audit_guolao_day_rate.py", "--anomaly-days", "7.285"]
-    )
-    with pytest.raises(SystemExit) as exited:
-        runpy.run_path(
-            str(ROOT / "scripts/guolao/audit_guolao_day_rate.py"), run_name="__main__"
-        )
-    assert exited.value.code == 0
-    result = json.loads(capsys.readouterr().out)
-    assert result["signed_correction_ancient_du_exact"] is None
-
-
 def test_grid_keeps_new_method_failures_and_old_default_distinct():
     # A source conflict can create new unresolved years; do not count old-gap
     # resolution as a universal coverage gain. Full400-year receipt is separate.

@@ -10,12 +10,13 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import evidence_views, example_input
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.support.transports import (
     SPECS,
     business,
     call_cli,
     native,
     rest,
+    surface_calls,
 )
 
 PAYLOAD = dict(
@@ -39,9 +40,7 @@ def native_solar_control(monkeypatch):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
 
 
-def test_source_annotation_disagreement_survives_all_three_transports(
-    rest, tmp_path, capsys
-):
+def test_source_annotation_disagreement_survives_all_three_transports(surface_calls):
     spec = SPECS["liureng_gods"]
     payload = {
         **PAYLOAD,
@@ -51,33 +50,9 @@ def test_source_annotation_disagreement_survives_all_three_transports(
     }
     fields = ["liureng.classification", "liureng.four_lessons", "four_pillars"]
     options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *[("fields", field) for field in fields],
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
+    http, protocol, code, cli = surface_calls(
+        spec, payload, projection={**options, "response_char_limit": 0}
     )
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--response-char-limit",
-            "0",
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--fields",
-            *fields,
-        ],
-    )
-    protocol = asyncio.run(native(spec, payload, **options))
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     bodies = [http.json(), cli, protocol.structured_content]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])
@@ -96,7 +71,7 @@ def test_source_annotation_disagreement_survives_all_three_transports(
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
 @pytest.mark.parametrize("project", [False, True])
 def test_corrected_facts_survive_each_transport_and_field_projection(
-    key, project, rest, tmp_path, capsys
+    key, project, surface_calls
 ):
     payload = {**PAYLOAD, **({"di_fen": "酉"} if key == "jinkou" else {})}
     if key == "liureng_runyear":
@@ -150,9 +125,9 @@ def test_corrected_facts_survive_each_transport_and_field_projection(
             *fields,
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, payload, **options))
+    http, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=options, flags=flags
+    )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     bodies = [http.json(), cli, protocol.structured_content]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])
@@ -355,16 +330,15 @@ def test_published_evidence_view_projects_live_facts(key, rest):
 
 
 @pytest.mark.parametrize("section", ["六十四课钤结构", "三合与虚一待用"])
-def test_pattern_section_export_survives_rest_mcp_and_cli(
-    section, rest, tmp_path, capsys
-):
+def test_pattern_section_export_survives_rest_mcp_and_cli(section, surface_calls):
     spec = SPECS["jinkou"]
     payload = {**PAYLOAD, "di_fen": "酉", "selected_sections": [section]}
-    http = rest.post(spec.rest_path, json=payload, params={"response_char_limit": 0})
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
+        params={"response_char_limit": 0},
+        flags=["--response-char-limit", "0"],
     )
-    protocol = asyncio.run(native(spec, payload))
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     bodies = [http.json(), cli, protocol.structured_content]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])

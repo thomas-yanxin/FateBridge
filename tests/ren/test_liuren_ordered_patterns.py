@@ -1,6 +1,5 @@
 """Original ordered clauses, same-board binding and real local transports."""
 
-import asyncio
 import copy
 import itertools
 import json
@@ -18,14 +17,7 @@ from fatebridge.core.metaphysics.liureng_ordered_patterns import (
 from fatebridge.core.output_liuren_ordered_patterns import LiurenOrderedPatterns
 from fatebridge.core.output_ren_anchors import require_complete_ren_anchors
 from scripts.ren.audit_liuren_ordered_patterns import CORPUS, audit, reference
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 REF = reference()
@@ -133,9 +125,7 @@ def raw(key):
     "key", ["liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"]
 )
 @pytest.mark.parametrize("project", [False, True])
-def test_actual_three_ports_deliver_the_same_new_facts(
-    key, project, rest, tmp_path, capsys
-):
+def test_actual_three_ports_deliver_the_same_new_facts(key, project, surface_calls):
     spec = SPECS[key]
     fields = ["liureng.transmission_relations.named_structures"]
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
@@ -156,9 +146,14 @@ def test_actual_three_ports_deliver_the_same_new_facts(
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=PAYLOADS[key], params=params)
-    protocol = asyncio.run(native(spec, PAYLOADS[key], **options))
-    code, cli = call_cli(spec, PAYLOADS[key], tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec,
+        PAYLOADS[key],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)
@@ -203,7 +198,7 @@ def test_full_result_requires_same_board_order_and_one_trace(key, fault):
 
 @pytest.mark.parametrize("project", [False, True])
 def test_false_order_fails_before_projection_on_three_ports(
-    project, rest, monkeypatch, tmp_path, capsys
+    project, monkeypatch, surface_calls
 ):
     key = "liureng_gods"
     spec = SPECS[key]
@@ -226,7 +221,12 @@ def test_false_order_fails_before_projection_on_three_ports(
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         options.update(fields=["four_pillars"], strict_fields=True)
-    http = rest.post(spec.rest_path, json=PAYLOADS[key], params=params)
-    protocol = asyncio.run(native(spec, PAYLOADS[key], **options))
-    code, cli = call_cli(spec, PAYLOADS[key], tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec,
+        PAYLOADS[key],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 500 and protocol.is_error and code != 0

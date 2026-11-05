@@ -16,13 +16,8 @@ from fatebridge.core.stem_order_review import (
     stem_order_review_snapshot_line,
 )
 from fatebridge.validation.stem_order_candidate import extend_non_day_links
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _rest_fixture
+from tests.support.transports import SPECS, business, call_cli, native
+from tests.support.transports import rest as _rest_fixture
 
 rest = _rest_fixture
 FIXTURE = Path(__file__).parents[1] / "data/bazi_ordered_conditions_v1"

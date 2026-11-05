@@ -1,6 +1,5 @@
 """Reported tone categories cannot silently certify a historical sound system."""
 
-import asyncio
 import hashlib
 import json
 from pathlib import Path
@@ -10,13 +9,7 @@ from pydantic import ValidationError
 
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.meihua import calculate_meihua_cast
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_tone_basis_v1"
 CASES = json.loads((FIXTURE / "cases.json").read_text())["cases"]
@@ -143,9 +136,7 @@ def test_other_methods_do_not_accept_tone_evidence(casting):
 
 
 @pytest.mark.parametrize("topic", ["general", "wealth", "weather"])
-def test_tone_basis_is_strictly_projectable_on_rest_mcp_cli(
-    topic, rest, tmp_path, capsys
-):
+def test_tone_basis_is_strictly_projectable_on_rest_mcp_cli(topic, surface_calls):
     spec = SPECS["meihua_cast"]
     p = {
         "casting": {
@@ -163,30 +154,14 @@ def test_tone_basis_is_strictly_projectable_on_rest_mcp_cli(
         "interpretation.status",
         "summary",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=p,
-        params=[
-            *(("fields", f) for f in fields),
-            ("strict_fields", "true"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, cli = call_cli(
+    response, mcp, code, cli = surface_calls(
         spec,
         p,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
-    mcp = asyncio.run(native(spec, p, fields=fields, strict_fields=True))
     assert response.status_code == 200 and code == 0 and not mcp.is_error
     assert (
         business(response.json()) == business(cli) == business(mcp.structured_content)

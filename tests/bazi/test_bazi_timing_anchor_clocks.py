@@ -1,6 +1,5 @@
 """Replay anchors must obey public local-clock validation, not only formatting."""
 
-import asyncio
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -9,13 +8,9 @@ import fatebridge.core.timing as timing
 from fatebridge.core.almanac import SolarTerm
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.utils.timezones import parse_timezone_name, validate_local_clock
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -97,11 +92,8 @@ def test_timeline_window_does_not_floor_a_fractional_computed_boundary(monkeypat
 
 
 def test_actual_provider_lidong_replays_new_month_on_rest_native_mcp_and_cli(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
-    # Under the pinned IANA rules and the configured provider, the 2083
-    # Halifax 立冬 lies in the second 01:xx occurrence. This is an integration
-    # regression against the provider, not an independent future observation.
     spec = SPECS["jieqi_timeline_analysis"]
     args = {
         "birth_year": 1990,
@@ -114,10 +106,8 @@ def test_actual_provider_lidong_replays_new_month_on_rest_native_mcp_and_cli(
         "use_true_solar_time": False,
         "target_year": 2083,
     }
-    response = rest.post(spec.rest_path, json=args)
-    protocol = asyncio.run(native(spec, args))
-    code, local = call_cli(
-        spec, args, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    response, protocol, code, local = surface_calls(
+        spec, args, flags=["--response-char-limit", "0"], cli_first=False
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]

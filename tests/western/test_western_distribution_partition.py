@@ -5,7 +5,6 @@ ordinary birth case and independent 100-place Decimal intersection reference
 are retained under /tmp/fatebridge-unmet-audit-20261103/astrology/.
 """
 
-import asyncio
 import math
 from fractions import Fraction
 
@@ -15,13 +14,7 @@ from fatebridge.core.astrology_lifespan import (
     _bound_segments_from,
     build_distributions_payload,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 ASCENDANT = 3.038038378856752
 SIGNS = (
@@ -106,7 +99,7 @@ def test_all_sign_origins_have_contiguous_nonempty_cells_and_correct_midpoint_la
 
 
 @pytest.mark.parametrize("time_key", ["Ptolemy", "Naibod"])
-def test_correct_bound_sequence_reaches_rest_mcp_cli(rest, tmp_path, capsys, time_key):
+def test_correct_bound_sequence_reaches_rest_mcp_cli(time_key, surface_calls):
     spec = SPECS["astro_distributions"]
     inputs = dict(
         birth_year=2001,
@@ -126,12 +119,16 @@ def test_correct_bound_sequence_reaches_rest_mcp_cli(rest, tmp_path, capsys, tim
         ("include_snapshot_text", "false"),
         ("response_char_limit", 0),
     ]
-    http = rest.post(spec.rest_path, json=inputs, params=query)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, ["--fields", *fields])
-    protocol = asyncio.run(
-        native(
-            spec, inputs, fields=fields, strict_fields=True, include_snapshot_text=False
-        )
+    http, protocol, code, cli = surface_calls(
+        spec,
+        inputs,
+        params=query,
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=["--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error

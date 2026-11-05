@@ -1,6 +1,5 @@
 """Editorial/source scope is explicit; it is not a new force-accuracy score."""
 
-import asyncio
 import json
 from pathlib import Path
 
@@ -9,13 +8,9 @@ import pytest
 from fatebridge.services.knowledge import (
     calculate_knowledge_read,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -106,19 +101,13 @@ def test_nested_entry_sources_cannot_mutate_the_cached_knowledge_bundle():
 
 @pytest.mark.parametrize("category,key", CASES)
 def test_curated_cards_keep_identical_content_on_rest_native_mcp_and_cli(
-    category, key, rest, tmp_path, capsys
+    category, key, surface_calls
 ):
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "category": category, "key": key}
     opts = {"include_snapshot_text": False, "response_char_limit": 0}
-    http = rest.post(spec.rest_path, json=payload, params=opts)
-    protocol = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=["--include-snapshot-text", "false", "--response-char-limit", "0"],
+    http, protocol, code, cli = surface_calls(
+        spec, payload, projection=opts, cli_first=False
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert (

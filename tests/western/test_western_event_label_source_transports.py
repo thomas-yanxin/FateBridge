@@ -1,19 +1,11 @@
 """UTC-source faults stop full calculation before an unrelated field projection."""
 
-import asyncio
 import json
 
 import pytest
 
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, inputs, rest, surface_calls
 from tests.western.test_western_event_label_sources import MODULES, install_carriers
 
 CASES = [
@@ -27,7 +19,7 @@ CASES = [
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
 @pytest.mark.parametrize("fault", [False, True])
 def test_synthetic_carrier_control_and_source_failure_on_all_protocols(
-    key, wrapper, zodiac, fault, monkeypatch, rest, tmp_path, capsys
+    key, wrapper, zodiac, fault, monkeypatch, surface_calls
 ):
     install_carriers(monkeypatch)
     if fault:
@@ -38,30 +30,20 @@ def test_synthetic_carrier_control_and_source_failure_on_all_protocols(
         monkeypatch.setattr(MODULES[wrapper], "utc_from_tt", broken)
     spec = SPECS[key]
     payload = {**inputs(spec), "zodiac_type": zodiac}
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
         params={
             "fields": "analysis_type",
             "strict_fields": "true",
             "include_snapshot_text": "false",
         },
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=["analysis_type"],
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        [
+        options={
+            "fields": ["analysis_type"],
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=[
             "--fields",
             "analysis_type",
             "--strict-fields",
@@ -69,6 +51,7 @@ def test_synthetic_carrier_control_and_source_failure_on_all_protocols(
             "--include-snapshot-text",
             "false",
         ],
+        cli_first=False,
     )
     values = [http.json(), json.loads(protocol.content[0].text), cli]
     if fault:

@@ -10,7 +10,7 @@ from pydantic import ValidationError
 from fatebridge.core.liuyao_progression import PROFILE
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.core.requests.divination import SixYaoRequest
-from scripts.liuyao.build_liuyao_progression_profile import build
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_conditions import conditional_case
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_progression_v8"
@@ -21,7 +21,7 @@ ERRATA = json.loads((REFERENCE / "errata.json").read_text(encoding="utf-8"))["ca
 def test_progression_reference_was_frozen_before_implementation():
     from fatebridge.core.liuyao_evidence import ADVANCES
 
-    assert build() == PROFILE
+    assert build_profile("progression") == PROFILE
     assert ADVANCES == dict(PROFILE["advance_pairs"])
     frozen = json.loads((REFERENCE / "freeze.json").read_text(encoding="utf-8"))
     for name, digest in frozen["sha256"].items():

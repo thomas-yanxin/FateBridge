@@ -1,6 +1,5 @@
 """Fictional frozen instants, independent birth resolution and three surfaces."""
 
-import asyncio
 import importlib.util
 import json
 import shutil
@@ -8,13 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -57,7 +50,7 @@ def test_frozen_reference_edit_cannot_turn_into_a_pass(tmp_path):
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 @pytest.mark.parametrize("project", [False, True])
 def test_birth_instants_chronology_and_failures_agree_across_transports(
-    case, project, rest, tmp_path, capsys
+    case, project, surface_calls
 ):
     spec = SPECS["liureng_runyear"]
     fields = ["runyear", "liureng.calendar_policy.civil_instant_utc"]
@@ -77,9 +70,9 @@ def test_birth_instants_chronology_and_failures_agree_across_transports(
             *fields,
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=case["input"], params=params)
-    code, cli = call_cli(spec, case["input"], tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, case["input"], **options))
+    http, protocol, code, cli = surface_calls(
+        spec, case["input"], params=params, options=options, flags=flags
+    )
     bodies = [http.json(), cli, protocol.structured_content]
     expected = case["expected"]
     if "error" in expected:

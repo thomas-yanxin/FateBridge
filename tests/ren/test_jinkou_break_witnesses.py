@@ -1,6 +1,5 @@
 """Textual uncertainty survives same-course output and public delivery."""
 
-import asyncio
 import copy
 import hashlib
 import json
@@ -13,14 +12,8 @@ from pydantic import ValidationError
 import fatebridge.application.execution as execution
 from fatebridge.core.output_jinkou_breaks import JinkouBranchBreaks
 from scripts.ren.audit_jinkou_break_witnesses import CORPUS, audit, reference
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    business,
-    call_cli,
-    native,
-    rest,
-)
-from tests.ren.test_jinkou_branch_breaks import PAYLOAD, SPEC, course, native_solar, raw
+from tests.ren.test_jinkou_branch_breaks import PAYLOAD, SPEC, course, raw
+from tests.support.transports import AS_OF, business, rest, surface_calls
 
 
 def test_exact_reading_keeps_one_yin_and_the_unread_witness():
@@ -79,9 +72,7 @@ def test_sparse_projection_does_not_fill_missing_readings():
 
 
 @pytest.mark.parametrize("project", [False, True])
-def test_three_ports_preserve_both_witnesses_in_all_courses(
-    project, rest, tmp_path, capsys
-):
+def test_three_ports_preserve_both_witnesses_in_all_courses(project, surface_calls):
     fields = [
         "jinkou.branch_breaks.witness_evidence",
         "jinkou.natal_course.course.branch_breaks.witness_evidence",
@@ -103,9 +94,9 @@ def test_three_ports_preserve_both_witnesses_in_all_courses(
             "false",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(SPEC.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(SPEC, PAYLOAD, **options))
-    code, cli = call_cli(SPEC, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        SPEC, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert (
         business(http.json()) == business(cli) == business(protocol.structured_content)
@@ -124,7 +115,7 @@ def test_three_ports_preserve_both_witnesses_in_all_courses(
     ["missing", "unread_as_false", "duplicate_yin", "whole_book", "wrong_source"],
 )
 def test_faults_are_rejected_before_projection_on_three_ports(
-    role, project, fault, rest, monkeypatch, tmp_path, capsys
+    role, project, fault, monkeypatch, surface_calls
 ):
     bad = copy.deepcopy(raw())
     block = course(bad, role)["branch_breaks"]
@@ -158,9 +149,9 @@ def test_faults_are_rejected_before_projection_on_three_ports(
         params.update(fields="analysis_type", strict_fields="true")
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
         options = dict(fields=["analysis_type"], strict_fields=True)
-    http = rest.post(SPEC.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(SPEC, PAYLOAD, **options))
-    code, cli = call_cli(SPEC, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        SPEC, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert cli["error_code"] == "internal_error"
 

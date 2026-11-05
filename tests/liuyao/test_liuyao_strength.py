@@ -10,7 +10,7 @@ import pytest
 from fatebridge.core.liuyao_judgment import build_conditional_analysis
 from fatebridge.core.liuyao_strength import PROFILE
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
-from scripts.liuyao.build_liuyao_strength_profile import build
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_conditions import mounted
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_strength_v5"
@@ -41,7 +41,7 @@ def classical(case):
 
 
 def test_frozen_source_defines_three_locations_despite_the_other_numeral():
-    assert build() == PROFILE
+    assert build_profile("strength") == PROFILE
     frozen = json.loads((REFERENCE / "freeze.json").read_text(encoding="utf-8"))
     for name, expected in frozen["sha256"].items():
         assert hashlib.sha256((REFERENCE / name).read_bytes()).hexdigest() == expected

@@ -8,7 +8,6 @@ The 30-second comparison line was fixed before the independent comparison;
 this is a development case, not a blind sample or all-event completeness proof.
 """
 
-import asyncio
 import math
 from datetime import datetime, timedelta, timezone
 
@@ -16,13 +15,7 @@ import pytest
 
 from fatebridge.core import astrology_events
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 BIRTH = datetime(2001, 1, 25, 3, tzinfo=timezone.utc)
 REFERENCE = BIRTH + timedelta(days=2)
@@ -131,7 +124,7 @@ def test_local_station_refinement_rejects_changed_native_source(monkeypatch, cha
     assert caught.value.reason == "model_changed"
 
 
-def test_station_cell_root_is_the_same_on_rest_mcp_cli(rest, tmp_path, capsys):
+def test_station_cell_root_is_the_same_on_rest_mcp_cli(surface_calls):
     spec = SPECS["astro_extrareturns"]
     inputs = dict(
         birth_year=2001,
@@ -147,21 +140,21 @@ def test_station_cell_root_is_the_same_on_rest_mcp_cli(rest, tmp_path, capsys):
         analysis_day=27,
     )
     fields = ["extrareturns.returns"]
-    http = rest.post(
-        spec.rest_path,
-        json=inputs,
+    http, protocol, code, cli = surface_calls(
+        spec,
+        inputs,
         params=[
             ("fields", fields[0]),
             ("strict_fields", "true"),
             ("include_snapshot_text", "false"),
             ("response_char_limit", 0),
         ],
-    )
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, ["--fields", *fields])
-    protocol = asyncio.run(
-        native(
-            spec, inputs, fields=fields, strict_fields=True, include_snapshot_text=False
-        )
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=["--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error

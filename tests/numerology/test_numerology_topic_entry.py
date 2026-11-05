@@ -14,13 +14,8 @@ from fatebridge.application.scenarios import definitions, scenario_keys
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from scripts import evaluate_agent as evaluator
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest
+from tests.support.transports import AS_OF, SPECS, business, call_cli
+from tests.support.transports import rest as shared_rest
 
 rest = shared_rest
 

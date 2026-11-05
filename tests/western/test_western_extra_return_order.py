@@ -5,7 +5,6 @@ loop. Native Swiss coordinates independently check the solved equations; these
 checks are not independent physical ephemeris accuracy certification.
 """
 
-import asyncio
 import json
 from datetime import datetime, timedelta, timezone
 
@@ -19,13 +18,7 @@ from fatebridge.core.ephemeris_runtime import (
     swe,
 )
 from fatebridge.services.western_events import calculate_extrareturns
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 BIRTH = datetime(1990, 5, 17, 7, 30, tzinfo=timezone.utc)
 REFERENCE = datetime(2002, 1, 12, tzinfo=timezone.utc)
@@ -176,7 +169,7 @@ def test_scan_keeps_the_final_fractional_cell(monkeypatch):
 
 @pytest.mark.parametrize("zodiac, expected_day", [("Tropic", 24), ("Sidereal", 25)])
 def test_nearest_return_and_zodiac_agree_across_rest_mcp_cli(
-    rest, tmp_path, capsys, zodiac, expected_day
+    zodiac, expected_day, surface_calls
 ):
     spec = SPECS["astro_extrareturns"]
     inputs = dict(
@@ -199,12 +192,16 @@ def test_nearest_return_and_zodiac_agree_across_rest_mcp_cli(
         ("include_snapshot_text", "false"),
         ("response_char_limit", 0),
     ]
-    http = rest.post(spec.rest_path, json=inputs, params=query)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, ["--fields", *fields])
-    protocol = asyncio.run(
-        native(
-            spec, inputs, fields=fields, strict_fields=True, include_snapshot_text=False
-        )
+    http, protocol, code, cli = surface_calls(
+        spec,
+        inputs,
+        params=query,
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=["--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error

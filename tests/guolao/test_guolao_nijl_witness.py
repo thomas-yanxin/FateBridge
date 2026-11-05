@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import subprocess
-import sys
 from dataclasses import replace
 from fractions import Fraction as F
 from pathlib import Path
@@ -143,23 +141,3 @@ def test_incomplete_and_relabelled_witnesses_are_rejected(
     monkeypatch.setattr(g, "NIJL_DATA", path)
     with pytest.raises(ValueError):
         g.compare_nijl_shoushi(whole_degree_policy="explicit_only")
-
-
-def test_comparison_cli_requires_a_separate_witness_mode():
-    cmd = [
-        sys.executable,
-        str(ROOT / "scripts/guolao/audit_guolao_passages.py"),
-        "--whole-degree-policy",
-        "inherit_column_heading",
-        "--compare-nijl-shoushi",
-    ]
-    r = json.loads(
-        subprocess.run(cmd, capture_output=True, text=True, check=True).stdout
-    )
-    assert len(r["entries"]) == 12
-    rejected = subprocess.run(
-        cmd + ["--calendar", "shoushi", "--branch", "子"],
-        capture_output=True,
-        text=True,
-    )
-    assert rejected.returncode != 0

@@ -13,14 +13,8 @@ import fatebridge.application.execution as execution
 from fatebridge.core.output_bazi_anchors import (
     require_complete_bazi_anchors,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _rest_fixture
+from tests.support.transports import AS_OF, SPECS, business, call_cli, native
+from tests.support.transports import rest as _rest_fixture
 
 rest = _rest_fixture
 ROOT = Path(__file__).resolve().parents[2]

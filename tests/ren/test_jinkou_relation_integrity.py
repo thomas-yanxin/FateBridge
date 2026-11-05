@@ -10,9 +10,9 @@ from pydantic import ValidationError
 
 from fatebridge.application.execution import validate_output
 from fatebridge.core.output_chinese import Jinkou, JinkouRelations
-from tests.evaluation.test_agentic_nested_outputs import SPECS, rest
 from tests.ren.test_ren_anchors import assert_broken_on_three_ports
 from tests.ren.test_ren_classical_depth import AUDIT
+from tests.support.transports import SPECS, rest
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/jinkou_relation_integrity_v1"

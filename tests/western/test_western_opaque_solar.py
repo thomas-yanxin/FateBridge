@@ -4,7 +4,6 @@ Native transparent-Sun disagreement remains failed under its original gate.
 The alternative changes a declared ray policy, never a reference or tolerance.
 """
 
-import asyncio
 import csv
 import hashlib
 import io
@@ -26,13 +25,7 @@ from fatebridge.core.astro.time_scales import ut1_from_tt
 from fatebridge.services.astrology import calculate_core_chart_analysis
 from fatebridge.utils.errors import EphemerisSourceError
 from scripts.western.audit_western_reference_points import audit_opaque_solar_positions
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, native, rest, surface_calls
 
 DATA = Path(__file__).parents[1] / "data/astro/mercury-opaque-solar"
 ORIGINAL = (
@@ -382,15 +375,13 @@ PAYLOAD = dict(
 
 
 def test_missing_optional_erfa_is_a_clear_503_on_actual_transports(
-    monkeypatch, rest, tmp_path, capsys
+    monkeypatch, tmp_path, surface_calls
 ):
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.setattr(opaque_solar, "find_spec", lambda name: None)
     spec = SPECS["astro_chart"]
     request = {**PAYLOAD, "ephemeris_policy": "auto", "apparent_model": "opaque_solar"}
-    response = rest.post(spec.rest_path, json=request)
-    protocol = asyncio.run(native(spec, request))
-    code, cli = call_cli(spec, request, tmp_path, capsys)
+    response, protocol, code, cli = surface_calls(spec, request, cli_first=False)
     assert response.status_code == 503 and protocol.is_error and code != 0
     for result in [response.json(), protocol.structured_content, cli]:
         assert result["error_code"] == "dependency_missing"
@@ -423,37 +414,26 @@ def test_default_native_chart_remains_identical_and_new_layer_is_not_mixed_into_
 
 
 @pytest.mark.local_data
-def test_explicit_model_and_schema_on_actual_rest_fastmcp_and_cli(
-    rest, tmp_path, capsys
-):
+def test_explicit_model_and_schema_on_actual_rest_fastmcp_and_cli(surface_calls):
     spec = SPECS["astro_chart"]
     request = {**PAYLOAD, "apparent_model": "opaque_solar"}
     fields = ["apparent_model_positions", "planets", "chart_profile.julian_day_tt"]
-    response = rest.post(
-        spec.rest_path,
-        json=request,
+    response, protocol, code, cli = surface_calls(
+        spec,
+        request,
         params=[("fields", field) for field in fields]
         + [
             ("strict_fields", "true"),
             ("include_snapshot_text", "false"),
             ("response_char_limit", 0),
         ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            request,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
-    code, cli = call_cli(
-        spec,
-        request,
-        tmp_path,
-        capsys,
-        ["--fields", *fields, "--strict-fields", "--no-include-snapshot-text"],
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=["--fields", *fields, "--strict-fields", "--no-include-snapshot-text"],
+        cli_first=False,
     )
     assert response.status_code == 200 and not protocol.is_error and code == 0
     result = business(response.json())
@@ -492,11 +472,9 @@ def test_explicit_model_and_schema_on_actual_rest_fastmcp_and_cli(
     ],
 )
 def test_invalid_selector_or_unsupported_variant_is_rejected_all_transports(
-    extra, rest, tmp_path, capsys
+    extra, surface_calls
 ):
     spec = SPECS["astro_chart"]
     request = {**PAYLOAD, **extra}
-    response = rest.post(spec.rest_path, json=request)
-    protocol = asyncio.run(native(spec, request))
-    code, cli = call_cli(spec, request, tmp_path, capsys)
+    response, protocol, code, cli = surface_calls(spec, request, cli_first=False)
     assert response.status_code == 422 and protocol.is_error and code != 0

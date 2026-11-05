@@ -1,6 +1,5 @@
 """Declared 探原 convention, actual board facts and faithful delivery."""
 
-import asyncio
 import importlib.util
 import json
 import shutil
@@ -15,18 +14,11 @@ from fatebridge.core.metaphysics.liureng_life_stages import (
     life_stage_cycle,
 )
 from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-    rest,
-)
-from tests.evaluation.test_agentic_nested_outputs import (
     test_nested_fact_faults_are_internal_failures_on_all_surfaces as reject_fault,
 )
 from tests.ren.test_ren_classical_depth import AUDIT as REN
 from tests.ren.test_ren_transports import PAYLOAD
+from tests.support.transports import SPECS, business, inputs, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -121,7 +113,7 @@ def test_reference_edit_does_not_turn_into_a_pass(tmp_path):
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_stages_and_corrected_snapshot_across_three_transports(
-    key, project, rest, tmp_path, capsys
+    key, project, surface_calls
 ):
     spec = SPECS[key]
     payload = {**PAYLOAD, "analysis_day": 5, "analysis_hour": 12}
@@ -158,9 +150,9 @@ def test_actual_stages_and_corrected_snapshot_across_three_transports(
             "false",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, payload, **options))
+    http, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=options, flags=flags
+    )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     bodies = [http.json(), cli, protocol.structured_content]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])
@@ -216,44 +208,18 @@ def test_invalid_stem_and_impossible_plate_rejected():
         build_life_stages("甲", plate)
 
 
-def test_sanshi_embedded_ren_uses_the_same_declared_stage_rule(rest, tmp_path, capsys):
+def test_sanshi_embedded_ren_uses_the_same_declared_stage_rule(surface_calls):
     spec = SPECS["sanshiunited"]
     payload = inputs(spec)
     fields = ["liureng.life_stages", "subresults.liureng_gods.liureng.life_stages"]
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *(("fields", f) for f in fields),
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
+        cli_first=False,
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     bodies = [http.json(), cli, protocol.structured_content]

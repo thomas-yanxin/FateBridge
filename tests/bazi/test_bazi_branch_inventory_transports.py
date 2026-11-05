@@ -11,8 +11,8 @@ import pytest
 import fatebridge.application.execution as execution
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.passage_relations import build_passage_relation_context
-from tests.evaluation.test_agentic_nested_outputs import AS_OF, SPECS, call_cli, native
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest
+from tests.support.transports import AS_OF, SPECS, call_cli, native
+from tests.support.transports import rest as shared_rest
 
 rest = shared_rest
 ROOT = Path(__file__).resolve().parents[2]

@@ -1,6 +1,5 @@
 """Complete printed-date conformance does not certify all birth clocks."""
 
-import asyncio
 import gzip
 import json
 from datetime import date
@@ -11,13 +10,9 @@ import pytest
 
 from fatebridge.core import almanac
 from scripts.ziwei.audit_ziwei import hko_rows
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -67,7 +62,7 @@ def test_current_shared_date_components_match_every_frozen_literal_not_only_firs
     "case", frozen("edge-clock-regressions.json")["cases"], ids=lambda c: c["id"]
 )
 def test_accepted_birth_edges_do_not_fake_lunar_fields_outside_corrected_date_range(
-    case, rest, tmp_path, capsys
+    case, surface_calls
 ):
     spec = SPECS["bazi_birth"]
     payload = {
@@ -88,28 +83,8 @@ def test_accepted_birth_edges_do_not_fake_lunar_fields_outside_corrected_date_ra
         include_snapshot_text=False,
         response_char_limit=0,
     )
-    params = [("fields", field) for field in fields] + [
-        ("strict_fields", "true"),
-        ("include_snapshot_text", "false"),
-        ("response_char_limit", "0"),
-    ]
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+    http, protocol, code, cli = surface_calls(
+        spec, payload, projection=options, cli_first=False
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert (

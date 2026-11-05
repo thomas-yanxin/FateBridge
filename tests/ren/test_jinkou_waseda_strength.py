@@ -1,6 +1,5 @@
 """A named primary witness supports the twelve rows without repairing CNTS."""
 
-import asyncio
 import copy
 import hashlib
 import json
@@ -8,14 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.fixtures.surface_payloads import REST_POST_CASES
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/jinkou_waseda_strength_v1"
@@ -85,7 +78,7 @@ def test_every_original_waseda_phase_and_judgement(case):
 
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_three_transports_keep_this_primary_source_and_old_conflict(
-    project, rest, tmp_path, capsys
+    project, surface_calls
 ):
     spec = SPECS["jinkou"]
     payload = {
@@ -112,9 +105,9 @@ def test_actual_three_transports_keep_this_primary_source_and_old_conflict(
             "false",
         ]
         opts.update(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    protocol = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=opts, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)

@@ -9,7 +9,7 @@ import pytest
 from fatebridge.core.liuyao_judgment import build_conditional_analysis
 from fatebridge.core.liuyao_void import PROFILE
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
-from scripts.liuyao.build_liuyao_void_profile import build
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_conditions import mounted
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_void_v7"
@@ -17,7 +17,7 @@ CASES = json.loads((REFERENCE / "cases.json").read_text(encoding="utf-8"))["case
 
 
 def test_new_scan_readings_do_not_overwrite_frozen_transcription():
-    assert build() == PROFILE
+    assert build_profile("void") == PROFILE
     previous = json.loads(
         (REFERENCE.parent / "liuyao-zengshan-sources.json").read_text(encoding="utf-8")
     )

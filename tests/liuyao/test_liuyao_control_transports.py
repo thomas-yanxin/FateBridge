@@ -1,17 +1,10 @@
 """Control eligibility and unresolved activity are identical on three surfaces."""
 
-import asyncio
-
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
 from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.transports import SPECS, business, surface_calls
 
 
 @pytest.mark.parametrize(
@@ -24,7 +17,7 @@ from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
     ],
 )
 def test_control_and_activity_conditions_survive_all_transports(
-    day, changed, checks, rest, tmp_path, capsys
+    day, changed, checks, surface_calls
 ):
     spec = SPECS["sixyao"]
     payload = {
@@ -43,33 +36,9 @@ def test_control_and_activity_conditions_survive_all_transports(
         f"{root}.role_effects",
     ]
     options = {"fields": fields, "strict_fields": True, "include_snapshot_text": False}
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
+    response, protocol, code, local = surface_calls(
+        spec, payload, projection={**options, "response_char_limit": 0}
     )
-    code, local = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(native(spec, payload, **options))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -94,9 +63,7 @@ def test_control_and_activity_conditions_survive_all_transports(
         )
 
 
-def test_control_source_leaf_projects_without_sibling_requirements(
-    rest, tmp_path, capsys
-):
+def test_control_source_leaf_projects_without_sibling_requirements(surface_calls):
     spec = SPECS["sixyao"]
     payload = {
         "date": "2000-02-27",
@@ -105,16 +72,15 @@ def test_control_source_leaf_projects_without_sibling_requirements(
         "changed_code": "110100",
     }
     field = "liuyao_evidence.conditional_analysis.control_conditions.source_sha256"
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params={"fields": field, "strict_fields": True, "include_snapshot_text": False},
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
+        params={"fields": field, "strict_fields": True, "include_snapshot_text": False},
+        options={
+            "fields": [field],
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
         flags=[
             "--fields",
             field,
@@ -125,15 +91,6 @@ def test_control_source_leaf_projects_without_sibling_requirements(
             "--response-char-limit",
             "0",
         ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=[field],
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     for output in [response.json(), local, protocol.structured_content]:
@@ -146,7 +103,7 @@ def test_control_source_leaf_projects_without_sibling_requirements(
 
 
 def test_control_matrix_and_interpretation_are_recovered_from_same_run(
-    rest, tmp_path, capsys, monkeypatch
+    tmp_path, monkeypatch, surface_calls
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
@@ -163,13 +120,9 @@ def test_control_matrix_and_interpretation_are_recovered_from_same_run(
         "changed_code": "111110",
         "focus_line": 3,
     }
-    response = rest.post(
-        spec.rest_path, json=payload, params={"response_char_limit": 8192}
+    response, protocol, code, local = surface_calls(
+        spec, payload, projection={"response_char_limit": 8192}
     )
-    code, local = call_cli(
-        spec, payload, tmp_path, capsys, flags=["--response-char-limit", "8192"]
-    )
-    protocol = asyncio.run(native(spec, payload, response_char_limit=8192))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     for shaped in [response.json(), local, protocol.structured_content]:
         ref = shaped["result_delivery"]

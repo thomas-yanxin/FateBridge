@@ -16,8 +16,6 @@ from fatebridge.core.output_strength_thresholds import (
 )
 from fatebridge.core.strength import DEFAULT_POLICY, _evaluate
 from fatebridge.core.strength_thresholds import threshold_snapshot_lines
-from tests.evaluation.test_agentic_nested_outputs import SPECS, business, call_cli
-from tests.evaluation.test_agentic_nested_outputs import rest as _rest_fixture
 from tests.support.bazi_strength_reference_v3 import reconstruct, seasonal_phases
 from tests.support.bazi_transport_reader import (
     cli_payload,
@@ -26,6 +24,8 @@ from tests.support.bazi_transport_reader import (
     save_json,
     verify_identity,
 )
+from tests.support.transports import SPECS, business, call_cli
+from tests.support.transports import rest as _rest_fixture
 
 rest = _rest_fixture
 ROOT = Path(__file__).resolve().parents[2]

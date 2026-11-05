@@ -123,7 +123,7 @@ uv run --locked --extra dev python scripts/evaluate_agent.py \
 所有古例仅核结构与条件，不恢复未给的公历年份，不评分原书疾病或人生结局。元忌路径进入同次计算生成的摘要；23个条件并不等于23个独立验证样本，更不等于全书规则或真实模型解释已验收。
 
 ```bash
-uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_role_profile --check
+uv run --locked --extra dev python -m scripts.liuyao.build_profile role --check
 uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_roles.py tests/liuyao/test_liuyao_transports.py
 ```
 
@@ -151,7 +151,7 @@ uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_roles.py tests/li
 结合1901–2100年完整队列，当前1900-01-31至2100-02-08的73,058个支持日期都有所列独立发布表的正午标签参照；2100-02-09至12-31的326天仍保留为农历不可用，1900-01-01至01-30的30天也未冒称获得支持。补充审计锁定335个日期，生产范围若缩小就拒绝验收，并检查失败、缺失和审计期间代码／资料变更。这只闭合指定民用日期标签队列，不能授予全历法满分。
 
 ```bash
-uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_strength_profile --check
+uv run --locked --extra dev python -m scripts.liuyao.build_profile strength --check
 uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_strength.py tests/liuyao/test_liuyao_roles.py tests/liuyao/test_liuyao_transports.py
 uv run --locked --extra dev python -m scripts.liuyao.audit_liuyao_1900 --output /tmp/liuyao-calendar-1900-v5.json
 ```
@@ -175,7 +175,7 @@ uv run --locked --extra dev python -m scripts.liuyao.audit_liuyao_1900 --output 
 4,096种本变卦结构遍历核对实际动爻与变支，另有24,576组元忌路径结构校验；这些遍历不是独立原典案例。完整原典和自由模型解释仍未获整体验收。
 
 ```bash
-uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_fanfu_profile --check
+uv run --locked --extra dev python -m scripts.liuyao.build_profile fanfu --check
 uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_fanfu.py tests/liuyao/test_liuyao_transports.py
 ```
 
@@ -216,7 +216,7 @@ uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_fanfu.py tests/li
 2026、2100两年抽段另有730日、1,460次日干支及730次农历比较，所比字段无差异；其中326日仍与生产补充同源。这不是新增独立来源，也不代替73,384日完整日期队列。
 
 ```bash
-uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_void_profile --check
+uv run --locked --extra dev python -m scripts.liuyao.build_profile void --check
 uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_void.py tests/liuyao/test_liuyao_roles.py tests/liuyao/test_liuyao_transports.py
 ```
 
@@ -235,7 +235,7 @@ uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_void.py tests/liu
 REST、原生MCP、CLI、部分字段投影、同次完整缓存和快照分别验证；快照明确写出活动扶源待审及静爻克制受阻。该范围仍未完成全书与全局强弱验收，条件层也不把原始日冲提示自动升级为最终受伤结论。
 
 ```bash
-uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_control_profile --check
+uv run --locked --extra dev python -m scripts.liuyao.build_profile control --check
 uv run --locked --extra dev python -m pytest -q tests/liuyao/test_liuyao_control.py tests/liuyao/test_liuyao_control_transports.py
 ```
 

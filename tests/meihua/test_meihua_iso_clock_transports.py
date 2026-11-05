@@ -1,14 +1,13 @@
 """The actual REST/MCP/CLI paths keep every full packet's declared outcome."""
 
-import asyncio
 from copy import deepcopy
 from dataclasses import replace
 
 import pytest
 
 from fatebridge.application import execution
-from tests.evaluation.test_agentic_nested_outputs import SPECS, call_cli, native, rest
 from tests.support.meihua_iso_clock_reference import load, load_supplement
+from tests.support.transports import SPECS, rest, surface_calls
 
 _, PACKETS = load()
 PACKETS += load_supplement()
@@ -17,7 +16,7 @@ SPEC = SPECS["meihua_analysis"]
 
 @pytest.mark.parametrize("row", PACKETS, ids=lambda r: r["id"])
 def test_iso_clock_validation_precedes_projection_across_transports(
-    row, rest, monkeypatch, tmp_path, capsys
+    row, monkeypatch, surface_calls
 ):
     original = execution.execute_spec
 
@@ -29,29 +28,19 @@ def test_iso_clock_validation_precedes_projection_across_transports(
         return original(spec, request)
 
     monkeypatch.setattr(execution, "execute_spec", inject)
-    response = rest.post(
-        SPEC.rest_path,
-        json=row["request"],
+    response, reply, code, cli = surface_calls(
+        SPEC,
+        row["request"],
         params={
             "fields": "analysis_type",
             "strict_fields": "true",
             "trace_id": "iso-clock",
         },
-    )
-    reply = asyncio.run(
-        native(
-            SPEC,
-            row["request"],
-            fields=["analysis_type"],
-            strict_fields=True,
-            trace_id="iso-clock",
-        )
-    )
-    code, cli = call_cli(
-        SPEC,
-        row["request"],
-        tmp_path,
-        capsys,
+        options={
+            "fields": ["analysis_type"],
+            "strict_fields": True,
+            "trace_id": "iso-clock",
+        },
         flags=[
             "--fields",
             "analysis_type",
@@ -60,6 +49,7 @@ def test_iso_clock_validation_precedes_projection_across_transports(
             "--trace-id",
             "iso-clock",
         ],
+        cli_first=False,
     )
     if row["should_succeed"]:
         assert response.status_code == 200 and not reply.is_error and code == 0

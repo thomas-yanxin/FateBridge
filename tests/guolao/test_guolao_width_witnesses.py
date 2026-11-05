@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import subprocess
-import sys
 from dataclasses import replace
 from fractions import Fraction as F
 from pathlib import Path
@@ -166,23 +164,3 @@ def test_pdf_hash_cannot_be_reported_as_an_original_jpeg_hash():
         replace(row, image_sha256=row.witness.primary_sha256)
     with pytest.raises(ValueError):
         replace(load_row("nijl"), image_sha256=None)
-
-
-@pytest.mark.parametrize("source", list(SOURCES))
-def test_research_cli_selects_explicit_source_without_changing_the_policy(source):
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts/guolao/audit_guolao_widths.py"),
-            "--source",
-            source,
-            "--quarter-policy",
-            "quarter_marks",
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    assert json.loads(result.stdout) == load_row(source).audit(
-        quarter_policy="quarter_marks"
-    )

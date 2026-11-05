@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import subprocess
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -130,45 +128,6 @@ def test_frozen_source_excerpt_and_runtime_inputs_are_fingerprinted():
         "real_world_efficacy_tested",
     ]:
         assert r[key] is False
-
-
-@pytest.mark.parametrize("profile", ["nlc166", "wikisource"])
-def test_cli_replays_both_lanes_with_explicit_named_example(profile):
-    proc = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts/guolao/audit_guolao_cardinals.py"),
-            "--example",
-            "gujin43-318",
-            "--profile",
-            profile,
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    result = json.loads(proc.stdout)
-    assert result == module.gujin43_cardinal_example(profile=profile)
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        [],
-        ["--profile", "nlc166"],
-        ["--example", "gujin43-318"],
-        ["--example", "2026-10-22", "--profile", "nlc166"],
-        ["--example", "gujin43-318", "--profile", "best_fit"],
-    ],
-)
-def test_cli_does_not_infer_an_example_date_or_best_fitting_table(args):
-    proc = subprocess.run(
-        [sys.executable, str(ROOT / "scripts/guolao/audit_guolao_cardinals.py"), *args],
-        capture_output=True,
-        text=True,
-    )
-    assert proc.returncode == 2
-    assert not proc.stdout
 
 
 def test_unavailable_source_profile_is_not_silently_replaced():

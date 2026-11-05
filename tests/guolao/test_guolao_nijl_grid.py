@@ -3,9 +3,6 @@
 import copy
 import hashlib
 import json
-import os
-import subprocess
-import sys
 from dataclasses import replace
 from pathlib import Path
 
@@ -254,31 +251,3 @@ def test_original_example_mutation_cannot_remove_the_failed_rows(monkeypatch, tm
 def test_literal_inputs_do_not_round_wrap_or_guess_columns(palace, column):
     with pytest.raises((TypeError, ValueError)):
         module.literal_cell(palace=palace, column=column)
-
-
-@pytest.mark.parametrize(
-    "args,valid",
-    [
-        ([], True),
-        (["--palace", "亥", "--column", "1"], True),
-        (["--compare-ma591"], True),
-        (["--compare-intro-examples"], True),
-        (["--palace", "子"], False),
-        (["--palace", "子", "--column", "0"], False),
-        (["--compare-ma591", "--palace", "子", "--column", "1"], False),
-    ],
-)
-def test_real_research_cli_uses_same_frozen_import_tree_and_rejects_mixed_modes(
-    args, valid
-):
-    result = subprocess.run(
-        [sys.executable, str(ROOT / "scripts/guolao/audit_guolao_nijl_grid.py"), *args],
-        cwd=ROOT,
-        env={**os.environ, "PYTHONPATH": str(ROOT / "src") + os.pathsep + str(ROOT)},
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert (result.returncode == 0) == valid, result.stderr
-    if valid:
-        assert json.loads(result.stdout)

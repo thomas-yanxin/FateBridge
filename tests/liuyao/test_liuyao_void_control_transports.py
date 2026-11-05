@@ -1,6 +1,5 @@
 """Exact civil mapping, scoped control, strict projection and same-run hash."""
 
-import asyncio
 import json
 import os
 from pathlib import Path
@@ -8,15 +7,10 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
 from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
 from tests.liuyao.test_liuyao_void_control_qualification import CASES, pair
+from tests.support.transports import SPECS, business, surface_calls
 
 ROOT = "liuyao_evidence.conditional_analysis"
 
@@ -35,7 +29,7 @@ def payload(case):
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 @pytest.mark.parametrize("project", [False, True])
-def test_current_void_control_on_all_surfaces(case, project, rest, tmp_path, capsys):
+def test_current_void_control_on_all_surfaces(case, project, surface_calls):
     spec = SPECS["sixyao"]
     fields = [
         ROOT + "." + n
@@ -58,9 +52,9 @@ def test_current_void_control_on_all_surfaces(case, project, rest, tmp_path, cap
             "true",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=True)
-    http = rest.post(spec.rest_path, json=payload(case), params=params)
-    code, cli = call_cli(spec, payload(case), tmp_path, capsys, flags=flags)
-    mcp = asyncio.run(native(spec, payload(case), **options))
+    http, mcp, code, cli = surface_calls(
+        spec, payload(case), params=params, options=options, flags=flags
+    )
     assert http.status_code == 200 and code == 0 and not mcp.is_error
     outputs = [http.json(), cli, mcp.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -98,7 +92,7 @@ def test_current_void_control_on_all_surfaces(case, project, rest, tmp_path, cap
 
 
 @pytest.mark.parametrize("valid", [True, False])
-def test_qualification_nested_leaf_and_typo(valid, rest, tmp_path, capsys):
+def test_qualification_nested_leaf_and_typo(valid, surface_calls):
     spec = SPECS["sixyao"]
     field = (
         ROOT
@@ -122,17 +116,17 @@ def test_qualification_nested_leaf_and_typo(valid, rest, tmp_path, capsys):
         "--response-char-limit",
         "0",
     ]
-    http = rest.post(spec.rest_path, json=p, params=params)
-    code, cli = call_cli(spec, p, tmp_path, capsys, flags=flags)
-    mcp = asyncio.run(
-        native(
-            spec,
-            p,
-            fields=[field],
-            strict_fields=True,
-            include_snapshot_text=False,
-            response_char_limit=0,
-        )
+    http, mcp, code, cli = surface_calls(
+        spec,
+        p,
+        params=params,
+        options={
+            "fields": [field],
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 0,
+        },
+        flags=flags,
     )
     if not valid:
         assert http.status_code == 422 and code == 1 and mcp.is_error

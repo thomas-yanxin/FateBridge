@@ -3,12 +3,8 @@
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    projected_outputs,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest
+from tests.support.transports import SPECS, business, projected_outputs
+from tests.support.transports import rest as shared_rest
 
 rest = shared_rest
 

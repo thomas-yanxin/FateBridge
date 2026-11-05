@@ -1,10 +1,8 @@
 """A coherent TT receipt must still describe the named Sun crossing."""
 
-import asyncio
 import copy
 import hashlib
 import json
-import os
 import shutil
 from dataclasses import replace
 from datetime import datetime
@@ -13,7 +11,6 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from fatebridge.application.execution import validate_output
 from fatebridge.core import almanac
 from fatebridge.core.astro.time_scales import datetime_from_tt_point
 from fatebridge.core.astro.tt_epoch import TTInstant
@@ -21,9 +18,9 @@ from fatebridge.core.metaphysics import ren_calendar
 from fatebridge.core.metaphysics.hko_term_dates import published_date_reference
 from fatebridge.core.output_chinese import RenTermDependency
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.evaluation.test_agentic_nested_outputs import SPECS, call_cli, native, rest
 from tests.ren.test_ren_anchors import assert_broken_on_three_ports
 from tests.ren.test_ren_term_point import payload_for
+from tests.support.transports import SPECS, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/ren_term_longitude_v1"
@@ -251,7 +248,7 @@ def test_spk_selection_cannot_change_during_a_two_endpoint_observation(
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_wrong_named_actual_boundary_fails_before_projection_on_all_ports(
-    key, project, monkeypatch, rest, tmp_path, capsys
+    key, project, monkeypatch, surface_calls
 ):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     original = ren_calendar.get_adjacent_solar_terms
@@ -267,9 +264,9 @@ def test_wrong_named_actual_boundary_fails_before_projection_on_all_ports(
         params = {"fields": "analysis_type", "strict_fields": "true"}
         options = {"fields": ["analysis_type"], "strict_fields": True}
         flags = ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    mcp = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    http, mcp, code, cli = surface_calls(
+        spec, payload, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 503 and mcp.is_error and code != 0
     for body in (http.json(), mcp.structured_content, cli):
         assert body["error_code"] == "ephemeris_source_inconsistent"

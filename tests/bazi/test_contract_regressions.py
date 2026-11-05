@@ -23,8 +23,8 @@ from fatebridge.utils.birth_input import PersonInfo
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.solar_time import normalize_birth_time
 from tests.bazi.test_bazi_birth_seconds import BASE, SPECS
-from tests.evaluation.test_agentic_nested_outputs import inputs
 from tests.support.bazi_punishment_reference import GEOMETRIES, ORDER
+from tests.support.transports import inputs
 
 
 @pytest.mark.parametrize(

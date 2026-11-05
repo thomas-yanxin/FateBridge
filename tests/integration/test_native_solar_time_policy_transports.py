@@ -10,7 +10,7 @@ import pytest
 from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
 
-from tests.evaluation.test_agentic_nested_outputs import SPECS, business, call_cli
+from tests.support.transports import SPECS, business, call_cli
 
 pytest_plugins = ["tests.evaluation.test_agentic_nested_outputs"]
 

@@ -8,13 +8,9 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.core import heluo_months as months
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest
+from tests.support.transports import SPECS, business, call_cli, native
+from tests.support.transports import rest as shared_rest
+from tests.support.transports import surface_calls
 
 rest = shared_rest
 ROOT = Path(__file__).parents[1] / "fixtures/heluo_month_profiles_v1"
@@ -106,14 +102,10 @@ def test_actual_profile_on_rest_mcp_cli(case, method, rest, tmp_path, capsys):
 
 
 @pytest.mark.parametrize("bad", [None, "automatic_best", True])
-def test_invalid_source_selection_rejected_on_every_adapter(
-    bad, rest, tmp_path, capsys
-):
+def test_invalid_source_selection_rejected_on_every_adapter(bad, surface_calls):
     spec = SPECS["heluo"]
     payload = {**CASES[0]["payload"], "month_assignment_method": bad}
-    response = rest.post(spec.rest_path, json=payload)
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
-    mcp = asyncio.run(native(spec, payload))
+    response, mcp, code, cli = surface_calls(spec, payload)
     assert response.status_code == 422 and code != 0 and mcp.is_error
     assert "month_assignment_method" in response.text
     assert "month_assignment_method" in json.dumps(cli)

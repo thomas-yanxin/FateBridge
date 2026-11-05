@@ -1,21 +1,14 @@
 """The conditional root projection is one receipt across all three interfaces."""
 
-import asyncio
-
 import pytest
 
 from fatebridge.application.examples import suggested_fields
 from tests.bazi.test_bazi_timing_roots_transports import PAYLOAD
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
 from tests.integration.test_result_delivery import reconstruct
 from tests.integration.test_result_delivery import store as _store_fixture
+from tests.support.transports import AS_OF, SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 store = _store_fixture
 
@@ -57,7 +50,7 @@ rest = _shared_rest
     ],
 )
 def test_unique_dayun_budget_and_unsupported_annual_match_have_three_surface_parity(
-    payload, node, status, stem_position, rest, tmp_path, capsys
+    payload, node, status, stem_position, surface_calls
 ):
     spec = SPECS["timing_analysis"]
     payload = {
@@ -78,23 +71,8 @@ def test_unique_dayun_budget_and_unsupported_annual_match_have_three_surface_par
         include_snapshot_text=False,
         response_char_limit=0,
     )
-    http = rest.post(spec.rest_path, json=payload, params={**options, "as_of": AS_OF})
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, local = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+    http, protocol, code, local = surface_calls(
+        spec, payload, projection=options, cli_first=False, rest_as_of=AS_OF
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
@@ -116,7 +94,7 @@ def test_unique_dayun_budget_and_unsupported_annual_match_have_three_surface_par
 
 
 def test_root_effect_view_matches_rest_mcp_cli_and_retains_unadjudicated_scope(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
     spec = SPECS["timing_analysis"]
     fields = suggested_fields(spec, view="root_effects")
@@ -126,23 +104,8 @@ def test_root_effect_view_matches_rest_mcp_cli_and_retains_unadjudicated_scope(
         include_snapshot_text=False,
         response_char_limit=0,
     )
-    http = rest.post(spec.rest_path, json=PAYLOAD, params={**options, "as_of": AS_OF})
-    protocol = asyncio.run(native(spec, PAYLOAD, **options))
-    code, cli = call_cli(
-        spec,
-        PAYLOAD,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+    http, protocol, code, cli = surface_calls(
+        spec, PAYLOAD, projection=options, cli_first=False, rest_as_of=AS_OF
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     outputs = [http.json(), protocol.structured_content, cli]

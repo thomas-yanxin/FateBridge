@@ -30,6 +30,7 @@ from fatebridge.core.local_techniques.sixyao import (
 from fatebridge.core.requests.divination import SixYaoRequest
 from fatebridge.core.zhouyi import classical_hexagram
 from scripts.catalogs.build_zhouyi_corpus import build
+from scripts.liuyao.build_profile import build_profile
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 SOURCE = json.loads((FIXTURES / "zhouyi-wikisource.json").read_text())
@@ -224,11 +225,8 @@ def test_every_rule_trace_points_to_actual_returned_facts():
             assert document == scan["source"]["url"]
             collated_pages = {p for c in scan["collations"] for p in c["pdf_pages"]}
             if row["rule_id"] == "metal_si_day_growth_moving_support":
-                from scripts.liuyao.build_liuyao_metal_moving_profile import (
-                    build as moving_profile,
-                )
 
-                profile = moving_profile()
+                profile = build_profile("metal_moving")
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
@@ -241,11 +239,8 @@ def test_every_rule_trace_points_to_actual_returned_facts():
                     p for c in hidden["clauses"] for p in c["pdf_pages"]
                 )
             if row["rule_id"] == "current_void_fill_directed_control":
-                from scripts.liuyao.build_liuyao_void_control_profile import (
-                    build as void_control_profile,
-                )
 
-                profile = void_control_profile()
+                profile = build_profile("void_control")
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(c["pdf_page"] for c in profile["clauses"])
             if row["rule_id"] == "role_condition_effects":
@@ -255,99 +250,69 @@ def test_every_rule_trace_points_to_actual_returned_facts():
                 assert role_source["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(role_source["pages"])
             if row["rule_id"] == "separate_body_region_and_active_line_fanfu":
-                from scripts.liuyao.build_liuyao_fanfu_profile import (
-                    build as fanfu_profile,
-                )
 
-                profile = fanfu_profile()
+                profile = build_profile("fanfu")
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
             if row["rule_id"] == "void_conditions_and_outgoing_obstructions":
-                from scripts.liuyao.build_liuyao_void_profile import (
-                    build as void_profile,
-                )
 
-                profile = void_profile()
+                profile = build_profile("void")
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
             if row["rule_id"] == "activity_control_targets_and_injured_static_control":
-                from scripts.liuyao.build_liuyao_control_profile import (
-                    build as control_profile,
-                )
 
-                profile = control_profile()
+                profile = build_profile("control")
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(c["pdf_page"] for c in profile["clauses"])
             if row["rule_id"] == "day_clash_break_fill_and_moving_scatter":
-                from scripts.liuyao.build_liuyao_clash_profile import (
-                    build as clash_profile,
-                )
 
-                profile = clash_profile()
+                profile = build_profile("clash")
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
             if row["rule_id"] == "outgoing_generation_and_target_reception":
-                from scripts.liuyao.build_liuyao_generation_profile import (
-                    build as generation_profile,
-                )
 
-                profile = generation_profile()
+                profile = build_profile("generation")
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
             if row["rule_id"] == "back_generation_support_for_original_actions":
-                from scripts.liuyao.build_liuyao_rescue_profile import (
-                    build as rescue_profile,
-                )
 
-                profile = rescue_profile()
+                profile = build_profile("rescue")
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
             if row["rule_id"] == "successive_generation_path_conditions":
-                from scripts.liuyao.build_liuyao_routing_profile import (
-                    build as routing_profile,
-                )
 
-                profile = routing_profile()
+                profile = build_profile("routing")
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
             if row["rule_id"] == "partial_stage_query_knowledge":
-                from scripts.liuyao.build_liuyao_stage_profile import (
-                    build as stage_profile,
-                )
 
-                profile = stage_profile()
+                profile = build_profile("stage")
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
             if row["rule_id"] == "earth_cessation_independent_support_exception":
-                from scripts.liuyao.build_liuyao_cessation_profile import (
-                    build as cessation_profile,
-                )
 
-                profile = cessation_profile()
+                profile = build_profile("cessation")
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]
                 )
             if row["rule_id"] == "metal_si_day_growth_month_support":
-                from scripts.liuyao.build_liuyao_growth_profile import (
-                    build as growth_profile,
-                )
 
-                profile = growth_profile()
+                profile = build_profile("growth")
                 assert profile["source"]["sha256"] == scan["source"]["sha256"]
                 collated_pages.update(
                     p for c in profile["clauses"] for p in c["pdf_pages"]

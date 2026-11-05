@@ -1,6 +1,5 @@
 """Each retained general cast owns its body, mutuals, season and actual verse."""
 
-import asyncio
 import hashlib
 import json
 import shutil
@@ -11,7 +10,7 @@ import pytest
 
 from fatebridge.services.meihua import calculate_meihua_cast
 from fatebridge.validation.meihua_general_variants import audit_general_casting_readings
-from tests.evaluation.test_agentic_nested_outputs import rest  # noqa: F401
+from tests.support.transports import rest, surface_calls
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_general_variants_v2"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
@@ -190,44 +189,21 @@ def test_readings_do_not_mutate_cast_or_later_calls():
     assert calculate(CASES[0])["interpretation"]["casting_readings"][0]["body"] == "离"
 
 
-def test_shared_audit_view_keeps_weather_body_readings_inapplicable(
-    rest, tmp_path, capsys
-):
+def test_shared_audit_view_keeps_weather_body_readings_inapplicable(surface_calls):
     from fatebridge.application.examples import evidence_views
-    from tests.evaluation.test_agentic_nested_outputs import (
-        SPECS,
-        business,
-        call_cli,
-        native,
-    )
+    from tests.support.transports import SPECS, business, call_cli, native
 
     spec = SPECS["meihua_cast"]
     fields = evidence_views(spec)["audit"]["fields"]
     payload = {"casting": CASES[0]["casting"], "interpretation_topic": "weather"}
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *(("fields", field) for field in fields),
-            ("strict_fields", "true"),
-            ("response_char_limit", 0),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -239,16 +215,11 @@ def test_shared_audit_view_keeps_weather_body_readings_inapplicable(
 @pytest.mark.parametrize(
     "case", [CASES[0], CASES[3], CASES[4], CASES[6], CASES[8]], ids=lambda c: c["id"]
 )
-def test_candidate_reading_view_agrees_on_rest_mcp_cli(case, rest, tmp_path, capsys):
+def test_candidate_reading_view_agrees_on_rest_mcp_cli(case, surface_calls):
     from jsonschema import Draft202012Validator
 
     from fatebridge.application.examples import evidence_views
-    from tests.evaluation.test_agentic_nested_outputs import (
-        SPECS,
-        business,
-        call_cli,
-        native,
-    )
+    from tests.support.transports import SPECS, business, call_cli, native
 
     spec = SPECS["meihua_cast"]
     fields = evidence_views(spec)["reading"]["fields"]
@@ -256,30 +227,14 @@ def test_candidate_reading_view_agrees_on_rest_mcp_cli(case, rest, tmp_path, cap
         "casting": case["casting"],
         "season_month_branch": case["season_month_branch"],
     }
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *(("fields", field) for field in fields),
-            ("strict_fields", "true"),
-            ("response_char_limit", 0),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])

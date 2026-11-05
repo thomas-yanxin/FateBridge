@@ -1,6 +1,5 @@
 """Named publisher uncertainty does not disappear behind exact table agreement."""
 
-import asyncio
 import json
 import shutil
 from datetime import date
@@ -12,13 +11,7 @@ from fatebridge.core.meihua_calendar_precision import calendar_label_precision
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
 from fatebridge.validation.meihua_calendar_precision import audit_calendar_precision
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_calendar_precision_v4"
 REVIEW_CASES = json.loads((REFERENCES / "review-cases.json").read_text())["cases"]
@@ -128,7 +121,7 @@ def test_changed_reference_is_not_accepted_as_better_agreement(tmp_path):
 
 @pytest.mark.parametrize("topic", ["general", "weather"])
 def test_publisher_review_remains_in_strict_projection_on_all_surfaces(
-    topic, rest, tmp_path, capsys
+    topic, surface_calls
 ):
     payload = {
         "analysis_year": 2057,
@@ -145,27 +138,14 @@ def test_publisher_review_remains_in_strict_projection_on_all_surfaces(
         "summary",
     ]
     spec = SPECS["meihua_analysis"]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("response_char_limit", "0")],
-    )
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (
         business(response.json())

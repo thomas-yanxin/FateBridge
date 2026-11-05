@@ -7,8 +7,8 @@ import pytest
 from fatebridge.application.examples import suggested_fields
 from tests.bazi.test_bazi_birth_seconds import SPECS
 from tests.bazi.test_bazi_dayun_state_clipping import SELECTED
-from tests.evaluation.test_agentic_nested_outputs import business, call_cli, native
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import business, call_cli, native
+from tests.support.transports import rest as _shared_rest
 
 CASES = [SELECTED[0], SELECTED[10]]
 TOOLS = [s for s in SPECS if s.key in {"timing_analysis", "dayun_analysis"}]

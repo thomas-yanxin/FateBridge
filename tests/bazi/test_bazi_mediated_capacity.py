@@ -1,16 +1,10 @@
 """Keep rejected strength witnesses, whole-source failures and old cards visible."""
 
-import asyncio
-
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 KEYS = ("暖局与用神", "日元强弱与性情措辞", "根位与有效接引")
 
@@ -18,20 +12,12 @@ rest = _shared_rest
 
 
 @pytest.mark.parametrize("key", KEYS)
-def test_new_source_conditions_survive_rest_native_mcp_and_cli(
-    key, rest, tmp_path, capsys
-):
+def test_new_source_conditions_survive_rest_native_mcp_and_cli(key, surface_calls):
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "category": "classical_force_semantics", "key": key}
     options = {"include_snapshot_text": True, "response_char_limit": 0}
-    http = rest.post(spec.rest_path, json=payload, params=options)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=["--include-snapshot-text", "true", "--response-char-limit", "0"],
+    http, protocol, code, cli = surface_calls(
+        spec, payload, projection=options, cli_first=False
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert (

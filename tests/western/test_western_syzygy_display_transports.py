@@ -1,24 +1,17 @@
 """Solved historical points and display limits agree across actual adapters."""
 
-import asyncio
 import json
 
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 
 @pytest.mark.parametrize("key", ["astro_chart", "astro_hellen", "astro_chart13"])
 @pytest.mark.parametrize("year,day", [(1, 1), (1, 5), (1, 10), (2026, 4)])
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_extended_syzygy_point_and_summary_on_rest_mcp_cli(
-    key, year, day, zodiacal, rest, tmp_path, capsys
+    key, year, day, zodiacal, surface_calls
 ):
     spec = SPECS[key]
     payload = dict(
@@ -33,36 +26,13 @@ def test_extended_syzygy_point_and_summary_on_rest_mcp_cli(
         zodiacal=zodiacal,
     )
     fields = ["classical.syzygy", "classical.almuten_figuris", "snapshot_text"]
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "true"),
-            ("response_char_limit", 0),
-        ],
-    )
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        [
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec, payload, fields=fields, strict_fields=True, include_snapshot_text=True
-        )
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": True},
+            "response_char_limit": 0,
+        },
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error
@@ -93,7 +63,7 @@ def test_extended_syzygy_point_and_summary_on_rest_mcp_cli(
         ],
     ],
 )
-def test_new_partial_paths_are_faithfully_projected(fields, rest, tmp_path, capsys):
+def test_new_partial_paths_are_faithfully_projected(fields, surface_calls):
     spec = SPECS["astro_chart"]
     payload = dict(
         birth_year=1,
@@ -105,18 +75,17 @@ def test_new_partial_paths_are_faithfully_projected(fields, rest, tmp_path, caps
         birth_latitude=40,
         use_true_solar_time=False,
     )
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
-    )
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        [
+        params=[("fields", f) for f in fields]
+        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=[
             "--fields",
             *fields,
             "--strict-fields",
@@ -124,15 +93,6 @@ def test_new_partial_paths_are_faithfully_projected(fields, rest, tmp_path, caps
             "--include-snapshot-text",
             "false",
         ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     values = [http.json(), cli, json.loads(protocol.content[0].text)]

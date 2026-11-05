@@ -1,6 +1,5 @@
 """Printed pair anchors, same-board facts and the actual three transports."""
 
-import asyncio
 import copy
 import json
 import shutil
@@ -20,14 +19,7 @@ from fatebridge.core.metaphysics.liureng_branch_relations import (
 from fatebridge.core.output_liuren_branches import LiurenBranchRelations, rebuild
 from scripts.ren.audit_liuren_branch_relations import CORPUS, FACTS, audit, reference
 from scripts.ren.audit_ren_classical import make_seed
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 REF = reference()
@@ -174,7 +166,7 @@ def test_inconsistent_context_is_rejected(kind):
 )
 @pytest.mark.parametrize("mode", ["full", "ledger", "partial_context"])
 def test_complete_and_projected_evidence_agrees_across_transports(
-    key, mode, rest, tmp_path, capsys
+    key, mode, surface_calls
 ):
     spec = SPECS[key]
     fields = ["four_pillars", "liureng.branch_relations", "liureng.ruleset"]
@@ -210,9 +202,14 @@ def test_complete_and_projected_evidence_agrees_across_transports(
             "false",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=PAYLOADS[key], params=params)
-    mcp = asyncio.run(native(spec, PAYLOADS[key], **options))
-    code, cli = call_cli(spec, PAYLOADS[key], tmp_path, capsys, flags=flags)
+    http, mcp, code, cli = surface_calls(
+        spec,
+        PAYLOADS[key],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 200 and code == 0 and not mcp.is_error
     values = [http.json(), cli, mcp.structured_content]
     assert business(values[0]) == business(values[1]) == business(values[2])
@@ -235,25 +232,16 @@ def test_complete_and_projected_evidence_agrees_across_transports(
 @pytest.mark.parametrize(
     "key", ["liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"]
 )
-def test_array_item_projection_remains_an_explicit_protocol_error(
-    key, rest, tmp_path, capsys
-):
-    # The shared projection contract permits object paths and whole arrays.
-    # Preserve the initially attempted path as a negative request case.
+def test_array_item_projection_remains_an_explicit_protocol_error(key, surface_calls):
     spec = SPECS[key]
     fields = ["liureng.branch_relations.rows.facts.liuhe"]
-    http = rest.post(
-        spec.rest_path,
-        json=PAYLOADS[key],
-        params={"fields": fields[0], "strict_fields": "true"},
-    )
-    mcp = asyncio.run(native(spec, PAYLOADS[key], fields=fields, strict_fields=True))
-    code, cli = call_cli(
+    http, mcp, code, cli = surface_calls(
         spec,
         PAYLOADS[key],
-        tmp_path,
-        capsys,
+        params={"fields": fields[0], "strict_fields": "true"},
+        options={"fields": fields, "strict_fields": True},
         flags=["--fields", *fields, "--strict-fields", "true"],
+        cli_first=False,
     )
     assert http.status_code == 422 and mcp.is_error and code != 0
     assert "liureng" not in http.json() and "liureng" not in cli
@@ -317,7 +305,7 @@ def test_false_or_missing_evidence_fails_full_output_before_any_projection(kind)
 @pytest.mark.parametrize("kind", ["liupo", "year", "delete", "trace"])
 @pytest.mark.parametrize("project", [False, True])
 def test_wrong_branch_facts_fail_in_actual_three_transports(
-    kind, project, rest, monkeypatch, tmp_path, capsys
+    kind, project, monkeypatch, surface_calls
 ):
     key = "liureng_gods"
     bad = corrupt(kind)
@@ -336,9 +324,14 @@ def test_wrong_branch_facts_fail_in_actual_three_transports(
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
         options = dict(fields=["analysis_type"], strict_fields=True)
     spec = SPECS[key]
-    http = rest.post(spec.rest_path, json=PAYLOADS[key], params=params)
-    mcp = asyncio.run(native(spec, PAYLOADS[key], **options))
-    code, cli = call_cli(spec, PAYLOADS[key], tmp_path, capsys, flags=flags)
+    http, mcp, code, cli = surface_calls(
+        spec,
+        PAYLOADS[key],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 500 and mcp.is_error and code != 0
     for value in [http.json(), cli, mcp.structured_content]:
         assert value["error_code"] == "internal_error" and "liureng" not in value
@@ -369,7 +362,7 @@ def test_default_and_selected_snapshots_preserve_source_and_coexisting_relations
 
 @pytest.mark.parametrize("key", ["liureng_gods", "jinkou"])
 def test_current_automatic_de440_policy_delivers_the_same_source_facts(
-    key, monkeypatch, rest, tmp_path, capsys
+    key, monkeypatch, surface_calls
 ):
     from scripts.ren.audit_liuren_branch_relations import expected
 
@@ -380,32 +373,11 @@ def test_current_automatic_de440_policy_delivers_the_same_source_facts(
         "liureng.calendar_policy.solar_term_dependencies",
     ]
     options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(
-        spec.rest_path,
-        json=PAYLOADS[key],
-        params=[
-            *[("fields", f) for f in fields],
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    mcp = asyncio.run(native(spec, PAYLOADS[key], **options))
-    code, cli = call_cli(
+    http, mcp, code, cli = surface_calls(
         spec,
         PAYLOADS[key],
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={**options, "response_char_limit": 0},
+        cli_first=False,
     )
     assert http.status_code == 200 and code == 0 and not mcp.is_error
     values = [http.json(), cli, mcp.structured_content]

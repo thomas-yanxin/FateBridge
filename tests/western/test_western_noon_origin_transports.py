@@ -1,11 +1,9 @@
 """Real protocol hour labels preserve raw provenance and the same physical chart."""
 
-import asyncio
-
 import pytest
 
 from fatebridge.application.examples import evidence_views
-from tests.evaluation.test_agentic_nested_outputs import SPECS, call_cli, native, rest
+from tests.support.transports import SPECS, rest, surface_calls
 from tests.western.test_western_event_clock_transports import surfaces
 
 
@@ -128,16 +126,14 @@ def test_noon_origin_and_canonical_midnight_labels_on_rest_mcp_cli(
     ],
 )
 def test_invalid_origin_or_final_label_is_rejected_before_calculation(
-    tool, prefix, change, rest, tmp_path, capsys
+    tool, prefix, change, surface_calls
 ):
     values = dict(year=2024, month=1, day=1, hour=0, minute=0)
     values.update(change)
     inputs = {prefix + "_" + k: v for k, v in values.items()}
     inputs.update(longitude=0, latitude=40, timezone_name="UTC")
     spec = SPECS[tool]
-    http = rest.post(spec.rest_path, json=inputs)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, inputs))
+    http, protocol, code, cli = surface_calls(spec, inputs)
     assert http.status_code == 422 and code != 0 and protocol.is_error
     assert "clock_conversion" not in cli
 

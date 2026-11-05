@@ -1,6 +1,5 @@
 """Independent supplied-angle references and faithful consumer propagation."""
 
-import asyncio
 import json
 import math
 from fractions import Fraction
@@ -13,14 +12,8 @@ import fatebridge.core.classical_western as classical
 import fatebridge.core.output_charts as contracts
 from fatebridge.core.astrology_tables import SIGNS
 from fatebridge.core.ptolemy import build_ptolemy_layer
-from tests.evaluation.test_agentic_nested_outputs import rest  # noqa: F401
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
 from tests.support.reference_data import verify_source_files
+from tests.support.transports import SPECS, business, native, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "data/astro/orientality"
 ANGLES = json.loads((FIXTURE / "independent-angle-reference.json").read_text())["cases"]
@@ -118,10 +111,7 @@ def test_policy_cannot_claim_unperformed_observation_or_author_endpoint_acceptan
 
 @pytest.mark.parametrize("row", PUBLIC, ids=lambda row: row["id"])
 def test_all_frozen_event_inputs_across_public_rest_mcp_and_cli(
-    row,
-    rest,  # noqa: F811 - pytest fixture dependency
-    tmp_path,
-    capsys,  # noqa: F811 - pytest fixture dependency
+    row, tmp_path, surface_calls
 ):
     spec = SPECS[row["key"]]
     prefix = "base_chart." if row["key"] == "astro_germany" else ""
@@ -132,12 +122,17 @@ def test_all_frozen_event_inputs_across_public_rest_mcp_and_cli(
         ("response_char_limit", 0),
         ("as_of", "2000-12-31T12:00:00+00:00"),
     ]
-    response = rest.post(spec.rest_path, json=row["inputs"], params=query)
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         row["inputs"],
-        tmp_path,
-        capsys,
+        params=query,
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 0,
+            "as_of": "2000-12-31T12:00:00+00:00",
+        },
         flags=[
             "--fields",
             *fields,
@@ -150,17 +145,6 @@ def test_all_frozen_event_inputs_across_public_rest_mcp_and_cli(
             "--as-of",
             "2000-12-31T12:00:00+00:00",
         ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            row["inputs"],
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-            response_char_limit=0,
-            as_of="2000-12-31T12:00:00+00:00",
-        )
     )
     values = [response.json(), cli, protocol.structured_content]
     for surface, value in zip(["rest", "cli", "mcp"], values):

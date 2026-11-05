@@ -1,26 +1,18 @@
 """Real REST, native MCP and CLI preserve the selected source and open gates."""
 
-import asyncio
-
 import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import evidence_views
 from fatebridge.core import astrology_horary
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, native, rest, surface_calls
 from tests.western.test_western_horary import QUESTION
 
 
 @pytest.mark.parametrize("project", [False, True])
 @pytest.mark.parametrize("profile", ["lilly_1647_p107_first", "lilly_1647_p107_second"])
 def test_orbs_houses_source_facts_cross_actual_three_local_transports(
-    project, profile, rest, tmp_path, capsys
+    project, profile, surface_calls
 ):
     spec = SPECS["astro_horary"]
     inputs = {**QUESTION, "category": "career", "orb_profile": profile}
@@ -46,9 +38,9 @@ def test_orbs_houses_source_facts_cross_actual_three_local_transports(
             "strict_fields": True,
             "include_snapshot_text": False,
         }
-    response = rest.post(spec.rest_path, json=inputs, params=params)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, inputs, **kwargs))
+    response, protocol, code, cli = surface_calls(
+        spec, inputs, params=params, options=kwargs, flags=flags
+    )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     values = [response.json(), cli, protocol.structured_content]
     assert business(values[0]) == business(values[1]) == business(values[2])
@@ -126,10 +118,8 @@ def test_exact_nullable_necessary_conditions_are_published_and_strictly_projecta
 
 @pytest.mark.parametrize("available", [False, True])
 def test_strict_view_accepts_both_available_and_unavailable_histories(
-    available, monkeypatch, rest, tmp_path, capsys
+    available, monkeypatch, surface_calls
 ):
-    # Controlled histories test protocol availability branches, not ephemeris
-    # accuracy. In particular the computed history omits unavailable_reason.
     def history(subject):
         return {
             "status": "computed" if available else "unavailable",
@@ -157,36 +147,13 @@ def test_strict_view_accepts_both_available_and_unavailable_histories(
     spec = SPECS["astro_horary"]
     inputs = {**QUESTION, "category": "career"}
     fields = evidence_views(spec)["lilly_orbs_houses"]["fields"]
-    response = rest.post(
-        spec.rest_path,
-        json=inputs,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", 0),
-        ],
-    )
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         inputs,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec, inputs, fields=fields, strict_fields=True, include_snapshot_text=False
-        )
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error

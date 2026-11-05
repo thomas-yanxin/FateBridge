@@ -13,14 +13,9 @@ from fatebridge.core import knowledge_store
 from fatebridge.services.knowledge import (
     calculate_knowledge_read,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import AS_OF, SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -185,21 +180,15 @@ def test_cached_source_rows_cannot_be_mutated_by_a_caller():
 @pytest.mark.parametrize("key", KEYS)
 @pytest.mark.parametrize("category", [None, "source_vocabulary"])
 def test_full_card_is_identical_on_rest_native_mcp_and_cli(
-    key, category, rest, tmp_path, capsys
+    key, category, surface_calls
 ):
     spec = SPECS["knowledge_read"]
     payload = dict(domain="bazi", key=key)
     if category:
         payload["category"] = category
     options = dict(include_snapshot_text=False, response_char_limit=0)
-    http = rest.post(spec.rest_path, json=payload, params=options)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=["--include-snapshot-text", "false", "--response-char-limit", "0"],
+    http, protocol, code, cli = surface_calls(
+        spec, payload, projection=options, cli_first=False
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert (
@@ -209,7 +198,7 @@ def test_full_card_is_identical_on_rest_native_mcp_and_cli(
 
 @pytest.mark.parametrize("key", KEYS)
 def test_source_projection_is_identical_and_keeps_requested_evidence(
-    key, rest, tmp_path, capsys
+    key, surface_calls
 ):
     spec = SPECS["knowledge_read"]
     payload = dict(domain="bazi", key=key)
@@ -229,22 +218,8 @@ def test_source_projection_is_identical_and_keeps_requested_evidence(
         include_snapshot_text=False,
         response_char_limit=0,
     )
-    http = rest.post(spec.rest_path, json=payload, params=options)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+    http, protocol, code, cli = surface_calls(
+        spec, payload, projection=options, cli_first=False
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert (

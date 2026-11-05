@@ -1,6 +1,5 @@
 """Separate 神将建旺 from phase strength, earth seats and comprehensive use."""
 
-import asyncio
 import copy
 import importlib.util
 import json
@@ -14,14 +13,7 @@ from pydantic import ValidationError
 import fatebridge.application.execution as execution
 from fatebridge.core.output_chinese import JinkouQiEvidence
 from scripts.ren.audit_ren_classical import observe_jinkou
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    REST_POST_CASES,
-    SPECS,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, REST_POST_CASES, SPECS, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 MODULE = importlib.util.spec_from_file_location(
@@ -103,7 +95,7 @@ def test_all_branch_triples_keep_the_complete_source_and_failure_denominator():
 @pytest.mark.parametrize("fault", FAULTS)
 @pytest.mark.parametrize("project", [False, True])
 def test_wrong_or_missing_new_evidence_fails_before_projection_on_all_ports(
-    annual, fault, project, rest, monkeypatch, tmp_path, capsys
+    annual, fault, project, monkeypatch, surface_calls
 ):
     bad = AUDIT.corrupt(output(), fault, annual)
     with pytest.raises(execution.OutputContractError):
@@ -123,16 +115,16 @@ def test_wrong_or_missing_new_evidence_fails_before_projection_on_all_ports(
         params.update(fields="analysis_type", strict_fields="true")
         opts.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(SPEC.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(SPEC, PAYLOAD, **opts))
-    code, cli = call_cli(SPEC, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        SPEC, PAYLOAD, params=params, options=opts, flags=flags, cli_first=False
+    )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert cli["error_code"] == "internal_error"
 
 
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_three_ports_keep_the_same_main_and_annual_month_evidence(
-    project, rest, tmp_path, capsys
+    project, surface_calls
 ):
     fields = [
         "jinkou.qi_evidence",
@@ -146,9 +138,9 @@ def test_actual_three_ports_keep_the_same_main_and_annual_month_evidence(
         params += [("fields", f) for f in fields] + [("strict_fields", "true")]
         flags += ["--fields", *fields, "--strict-fields", "true"]
         opts.update(fields=fields, strict_fields=True)
-    http = rest.post(SPEC.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(SPEC, PAYLOAD, **opts))
-    code, cli = call_cli(SPEC, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        SPEC, PAYLOAD, params=params, options=opts, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     for body in (http.json(), protocol.structured_content, cli):
         assert body["jinkou"]["qi_evidence"] == output()["jinkou"]["qi_evidence"]

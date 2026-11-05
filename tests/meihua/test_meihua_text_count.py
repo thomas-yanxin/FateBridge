@@ -1,6 +1,5 @@
 """Text-count witnesses and declared arithmetic never choose a winning cast."""
 
-import asyncio
 import hashlib
 import json
 from pathlib import Path
@@ -11,13 +10,7 @@ from pydantic import ValidationError
 from fatebridge.core.meihua_casting import cast_explicit_meihua
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.meihua import calculate_meihua_cast
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/meihua_text_count_v1"
 CASES = json.loads((REFERENCE / "cases.json").read_text())["cases"]
@@ -225,7 +218,7 @@ def test_weather_variants_do_not_borrow_the_other_changed_hexagram_rain_symbol()
     ],
 )
 def test_textual_and_arithmetic_conditions_survive_rest_mcp_cli(
-    case, basis, topic, rest, tmp_path, capsys
+    case, basis, topic, surface_calls
 ):
     spec = SPECS["meihua_cast"]
     payload = {"casting": parameters(case, basis), "interpretation_topic": topic}
@@ -236,30 +229,14 @@ def test_textual_and_arithmetic_conditions_survive_rest_mcp_cli(
         "interpretation",
         "summary",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *(("fields", f) for f in fields),
-            ("strict_fields", "true"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (
         business(response.json())

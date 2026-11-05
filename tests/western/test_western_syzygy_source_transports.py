@@ -1,23 +1,13 @@
 """Lunation source receipts and integrity errors reach all public adapters."""
 
-import asyncio
 import json
 
 import pytest
 
 from fatebridge.core.astro import classical, runtime
 from fatebridge.services.astrology import _build_almuten_figuris_line
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
-from tests.support.syzygy_source_profiles import (  # noqa: F401
-    syzygy_profile_directories,
-    syzygy_source_profile,
-)
+from tests.support.syzygy_source_profiles import syzygy_source_profile
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 
 def inputs(year, zodiacal):
@@ -42,7 +32,7 @@ def inputs(year, zodiacal):
     "syzygy_source_profile", ["recorded5", "full37", "empty0"], indirect=True
 )
 def test_actual_source_history_on_rest_mcp_cli(
-    key, year, zodiacal, rest, tmp_path, capsys, syzygy_source_profile
+    key, year, zodiacal, syzygy_source_profile, surface_calls
 ):
     spec = SPECS[key]
     payload = inputs(year, zodiacal)
@@ -51,42 +41,15 @@ def test_actual_source_history_on_rest_mcp_cli(
         "classical.syzygy.julian_day_tt",
         "classical.syzygy.longitude",
     ]
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", 0),
-        ],
-    )
-    assert http.status_code == 200, http.text
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        [
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
+    assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error
     values = [http.json(), cli, protocol.structured_content]
     assert business(values[0]) == business(values[1]) == business(values[2])
@@ -119,7 +82,7 @@ def test_actual_source_history_on_rest_mcp_cli(
 
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_bad_lunation_frame_is_not_silently_omitted(
-    zodiacal, monkeypatch, rest, tmp_path, capsys
+    zodiacal, monkeypatch, surface_calls
 ):
     helper = classical._luminary_lon_speed
     native_call = runtime.ephemeris_call
@@ -140,9 +103,7 @@ def test_bad_lunation_frame_is_not_silently_omitted(
     monkeypatch.setattr(classical, "_luminary_lon_speed", wrapped)
     spec = SPECS["astro_chart"]
     payload = inputs(2026, zodiacal)
-    http = rest.post(spec.rest_path, json=payload)
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    http, protocol, code, cli = surface_calls(spec, payload)
     assert http.status_code == 503, http.text
     assert code == 1 and protocol.is_error and len(count) >= 3
     for value in [http.json(), cli, json.loads(protocol.content[0].text)]:

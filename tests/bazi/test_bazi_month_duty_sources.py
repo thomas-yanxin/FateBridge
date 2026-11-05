@@ -12,14 +12,8 @@ from fatebridge.core.classical_passage import SOURCE as PASSAGE_SOURCE
 from fatebridge.core.month_duty_reference import build_month_duty_reference
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS
 from scripts.bazi.audit_bazi_month_duty_sources import audit, transcribe
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business, call_cli, inputs, native
+from tests.support.transports import rest as _shared_rest
 
 rest = _shared_rest
 

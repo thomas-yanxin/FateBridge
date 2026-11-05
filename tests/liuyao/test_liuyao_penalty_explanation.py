@@ -1,6 +1,5 @@
 """Public cautions use final scoped activity; no second triad calculation."""
 
-import asyncio
 import hashlib
 import json
 import os
@@ -9,15 +8,10 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
 from tests.liuyao.test_liuyao_roles import classical
 from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.transports import SPECS, business, surface_calls
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_explanation_v30"
 CASES = json.loads((BASE / "cases.json").read_text())["cases"]
@@ -79,7 +73,7 @@ PUBLIC = [
 @pytest.mark.parametrize("case_id,day", PUBLIC)
 @pytest.mark.parametrize("project", [False, True])
 def test_caution_and_snapshot_use_same_final_context(
-    case_id, day, project, rest, tmp_path, capsys
+    case_id, day, project, surface_calls
 ):
     case = next(c for c in CASES if c["id"] == case_id)
     spec = SPECS["sixyao"]
@@ -114,9 +108,9 @@ def test_caution_and_snapshot_use_same_final_context(
             ("include_snapshot_text", "true"),
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=True)
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    mcp = asyncio.run(native(spec, payload, **options))
+    http, mcp, code, cli = surface_calls(
+        spec, payload, params=params, options=options, flags=flags
+    )
     assert http.status_code == 200 and code == 0 and not mcp.is_error
     outputs = [http.json(), cli, mcp.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])

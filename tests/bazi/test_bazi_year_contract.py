@@ -6,8 +6,8 @@ import pytest
 from pydantic import ValidationError
 
 from fatebridge.utils.birth_input import PersonInfo
-from tests.evaluation.test_agentic_nested_outputs import SPECS, call_cli, native
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, call_cli, native
+from tests.support.transports import rest as _shared_rest
 
 TOPICS = [
     "birth",

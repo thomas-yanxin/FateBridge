@@ -1,6 +1,5 @@
 """Independent astronomical clocks, real boundary cases and public parity."""
 
-import asyncio
 import csv
 import hashlib
 import importlib.util
@@ -21,14 +20,10 @@ from fatebridge.utils.solar_time import (
     calculate_equation_of_time_minutes,
     calculate_solar_time_adjustment,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
 from tests.fixtures.solar_reference import expected_solar_clock
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "data/bazi-solar-jpl-v1.json"
 REFERENCE = json.loads(FIXTURE.read_text())
@@ -197,15 +192,11 @@ def test_independent_boundary_example_exposes_old_wrong_hour_without_moving_mont
 
 
 @pytest.mark.parametrize("key", ["bazi_birth", "bazi_wealth", "bazi_personality"])
-def test_corrected_clock_and_new_facts_match_rest_native_mcp_cli(
-    key, rest, tmp_path, capsys
-):
+def test_corrected_clock_and_new_facts_match_rest_native_mcp_cli(key, surface_calls):
     spec = SPECS[key]
-    response = rest.post(spec.rest_path, json=INPUT)
-    code, local = call_cli(
-        spec, INPUT, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    response, protocol, code, local = surface_calls(
+        spec, INPUT, flags=["--response-char-limit", "0"]
     )
-    protocol = asyncio.run(native(spec, INPUT))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -236,15 +227,13 @@ def test_corrected_clock_and_new_facts_match_rest_native_mcp_cli(
     ],
 )
 def test_public_knowledge_does_not_reintroduce_retired_calculation_claims(
-    category, key, retired_claim, required_context, rest, tmp_path, capsys
+    category, key, retired_claim, required_context, surface_calls
 ):
     spec = SPECS["knowledge_read"]
     arguments = {"domain": "bazi", "category": category, "key": key}
-    response = rest.post(spec.rest_path, json=arguments)
-    code, local = call_cli(
-        spec, arguments, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    response, protocol, code, local = surface_calls(
+        spec, arguments, flags=["--response-char-limit", "0"]
     )
-    protocol = asyncio.run(native(spec, arguments))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])

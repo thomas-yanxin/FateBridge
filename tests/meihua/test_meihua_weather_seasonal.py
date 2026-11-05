@@ -1,6 +1,5 @@
 """Seasonal conditions use actual graphs and an explicitly named text witness."""
 
-import asyncio
 import hashlib
 import json
 import shutil
@@ -16,7 +15,7 @@ from fatebridge.validation.meihua_weather_policy_v2 import (
     qualified_weather_label,
 )
 from fatebridge.validation.meihua_weather_seasonal import audit_weather_seasonal
-from tests.evaluation.test_agentic_nested_outputs import rest  # noqa: F401
+from tests.support.transports import rest, surface_calls
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_weather_seasonal_v6"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
@@ -166,15 +165,10 @@ def test_a_wrong_predeclared_result_remains_a_disagreement_after_rehash(tmp_path
 
 @pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
 def test_seasonal_source_and_actual_qualification_survive_all_transports(
-    tool, rest, tmp_path, capsys
+    tool, surface_calls
 ):
     from fatebridge.application.examples import suggested_fields
-    from tests.evaluation.test_agentic_nested_outputs import (
-        SPECS,
-        business,
-        call_cli,
-        native,
-    )
+    from tests.support.transports import SPECS, business, call_cli, native
 
     spec = SPECS[tool]
     payload = (
@@ -194,30 +188,14 @@ def test_seasonal_source_and_actual_qualification_survive_all_transports(
         *suggested_fields(spec, view="weather"),
         "interpretation.weather.single_forecast",
     ]
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *(("fields", f) for f in fields),
-            ("strict_fields", "true"),
-            ("response_char_limit", 0),
-        ],
-    )
-    code, local = call_cli(
+    http, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [http.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])

@@ -1,27 +1,19 @@
 """Declared reference centers and motion provenance survive the actual protocols."""
 
-import asyncio
-
 import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import evidence_views
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.support.ephemeris_case_runtime import native_ephemeris_files
+from tests.support.transports import SPECS, business, rest, surface_calls
 from tests.western.test_western_horary import QUESTION
 
 
 @pytest.mark.parametrize("project", [False, True])
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
 def test_reference_points_match_rest_mcp_cli(
-    project, zodiac, rest, tmp_path, capsys, native_ephemeris_files
+    project, zodiac, native_ephemeris_files, surface_calls
 ):
     spec = SPECS["astro_horary"]
     inputs = {**QUESTION, "category": "career", "zodiac_type": zodiac}
@@ -43,9 +35,9 @@ def test_reference_points_match_rest_mcp_cli(
             "false",
         ]
         kwargs = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    response = rest.post(spec.rest_path, json=inputs, params=params)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, inputs, **kwargs))
+    response, protocol, code, cli = surface_calls(
+        spec, inputs, params=params, options=kwargs, flags=flags
+    )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     results = [response.json(), cli, protocol.structured_content]
     assert business(results[0]) == business(results[1]) == business(results[2])
@@ -108,7 +100,7 @@ def test_reference_points_match_rest_mcp_cli(
 
 
 def test_a_native_subject_cannot_mix_configuration_changes_between_planets(
-    rest, monkeypatch, tmp_path, capsys
+    monkeypatch, tmp_path, surface_calls
 ):
     import fatebridge.core.predictive.native_chart as chart
 
@@ -125,16 +117,14 @@ def test_a_native_subject_cannot_mix_configuration_changes_between_planets(
     monkeypatch.setattr(chart, "_swisseph_planet_state", changed)
     spec = SPECS["astro_horary"]
     inputs = {**QUESTION, "category": "career"}
-    response = rest.post(spec.rest_path, json=inputs)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, inputs))
+    response, protocol, code, cli = surface_calls(spec, inputs)
     assert response.status_code == 503 and code != 0 and protocol.is_error
     assert cli.get("error") and response.json().get("error")
 
 
 @pytest.mark.parametrize("project", [False, True])
 def test_unconverged_history_survives_all_protocols_and_summary_projection(
-    project, rest, monkeypatch, tmp_path, capsys
+    project, monkeypatch, tmp_path, surface_calls
 ):
     import fatebridge.core.horary_events as events
 
@@ -172,9 +162,9 @@ def test_unconverged_history_survives_all_protocols_and_summary_projection(
             "false",
         ]
         kwargs = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    response = rest.post(spec.rest_path, json=inputs, params=params)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, inputs, **kwargs))
+    response, protocol, code, cli = surface_calls(
+        spec, inputs, params=params, options=kwargs, flags=flags
+    )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), cli, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])

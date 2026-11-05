@@ -1,6 +1,5 @@
 """Actual P contract, computation notes, and source errors on three adapters."""
 
-import asyncio
 import json
 from datetime import datetime
 
@@ -8,13 +7,7 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.core.astro import house_axes
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 from tests.western.test_western_placidus_semiarc import CRITICAL, HORIZON, separation
 
 
@@ -37,7 +30,7 @@ def payload(zodiacal=0):
 
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_placidus_checked_endpoints_and_limits_survive_public_surfaces(
-    zodiacal, rest, tmp_path, capsys
+    zodiacal, surface_calls
 ):
     spec = SPECS["astro_chart"]
     p = payload(zodiacal)
@@ -49,17 +42,16 @@ def test_placidus_checked_endpoints_and_limits_survive_public_surfaces(
         "summary",
         "interpretation_evidence.social_style.source_paths",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=p,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
-    )
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         p,
-        tmp_path,
-        capsys,
+        params=[("fields", f) for f in fields]
+        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
         flags=[
             "--fields",
             *fields,
@@ -68,9 +60,6 @@ def test_placidus_checked_endpoints_and_limits_survive_public_surfaces(
             "--response-char-limit",
             "0",
         ],
-    )
-    protocol = asyncio.run(
-        native(spec, p, fields=fields, strict_fields=True, include_snapshot_text=False)
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     results = [response.json(), cli, protocol.structured_content]
@@ -111,7 +100,7 @@ def test_placidus_checked_endpoints_and_limits_survive_public_surfaces(
 
 
 def test_newly_checked_small_normal_cannot_silently_fall_back(
-    monkeypatch, rest, tmp_path, capsys
+    monkeypatch, surface_calls
 ):
     def fail(*args):
         raise ArithmeticError("injected small-normal precision failure")
@@ -119,20 +108,12 @@ def test_newly_checked_small_normal_cannot_silently_fall_back(
     monkeypatch.setattr(house_axes, "horizon_geometry", fail)
     spec = SPECS["astro_chart"]
     p = payload()
-    response = rest.post(
-        spec.rest_path,
-        json=p,
-        params=[("fields", "person_info.name"), ("strict_fields", "true")],
-    )
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         p,
-        tmp_path,
-        capsys,
+        params=[("fields", "person_info.name"), ("strict_fields", "true")],
+        options={"fields": ["person_info.name"], "strict_fields": True},
         flags=["--fields", "person_info.name", "--strict-fields"],
-    )
-    protocol = asyncio.run(
-        native(spec, p, fields=["person_info.name"], strict_fields=True)
     )
     assert response.status_code == 503 and code == 1 and protocol.is_error
     for result in (response.json(), cli, json.loads(protocol.content[0].text)):

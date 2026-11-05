@@ -1,23 +1,16 @@
 """Whole-corpus source qualifications survive reference summaries and projection."""
 
-import gzip
-import hashlib
 import json
-from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
 from fatebridge.application.execution import execute_tool
-from fatebridge.services.knowledge import (
-    calculate_knowledge_read,
-    calculate_knowledge_registry,
-)
-from tests.evaluation.test_agentic_nested_outputs import SPECS, business
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest
+from fatebridge.services.knowledge import calculate_knowledge_read
 from tests.numerology.test_heluo_poem_transports import run_three
-from tests.support.heluo_source_facts import HEADER_COUNT
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as shared_rest
 
 rest = shared_rest
 F = Path(__file__).parents[1] / "fixtures/numerology_reference_notes_v1"

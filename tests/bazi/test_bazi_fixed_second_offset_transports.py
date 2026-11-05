@@ -6,8 +6,8 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from tests.bazi.test_bazi_birth_seconds import SPECS
-from tests.evaluation.test_agentic_nested_outputs import business, call_cli, native
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import business, call_cli, native
+from tests.support.transports import rest as _shared_rest
 
 SELECTED = [
     s for s in SPECS if s.key in {"bazi_birth", "timing_analysis", "dayun_analysis"}

@@ -6,8 +6,8 @@ import pytest
 
 from tests.bazi.test_bazi_birth_seconds import BASE, SPECS
 from tests.bazi.test_bazi_birth_seconds_transports import leaf, receipt_path
-from tests.evaluation.test_agentic_nested_outputs import AS_OF, call_cli, inputs, native
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import AS_OF, call_cli, inputs, native
+from tests.support.transports import rest as _shared_rest
 
 
 def omitted_payload(spec):

@@ -12,14 +12,7 @@ from fatebridge.core.hidden_carriers import (
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from tests.bazi.test_bazi_timing_transports import INPUT as TIMING_INPUT
 from tests.bazi.test_bazi_year_contract import TOPICS
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, call_cli, native, rest
 
 INPUT = {
     "name": "虚构藏干盖头验证",

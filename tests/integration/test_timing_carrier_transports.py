@@ -11,15 +11,8 @@ from fatebridge.application.examples import evidence_views
 from fatebridge.core.timing_carriers import timing_carrier_snapshot_lines
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from tests.bazi.test_bazi_timing_transports import INPUT
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.support.mcp_result_assertions import same_run_projected_response
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 
 async def carrier_view(spec, payload, fields):
@@ -40,13 +33,14 @@ async def carrier_view(spec, payload, fields):
         return result
 
 
-def test_same_calculated_carrier_and_text_on_rest_mcp_cli(rest, tmp_path, capsys):
+def test_same_calculated_carrier_and_text_on_rest_mcp_cli(surface_calls):
     spec = SPECS["timing_analysis"]
-    response = rest.post(spec.rest_path, json=INPUT, params={"response_char_limit": 0})
-    code, local = call_cli(
-        spec, INPUT, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    response, protocol, code, local = surface_calls(
+        spec,
+        INPUT,
+        params={"response_char_limit": 0},
+        flags=["--response-char-limit", "0"],
     )
-    protocol = asyncio.run(native(spec, INPUT))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     result = response.json()
     assert business(result) == business(local) == business(protocol.structured_content)

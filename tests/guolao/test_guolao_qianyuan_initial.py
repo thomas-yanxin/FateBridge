@@ -2,9 +2,6 @@
 
 import hashlib
 import json
-import os
-import subprocess
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -140,41 +137,3 @@ def test_changed_source_notes_or_deleted_printed_examples_are_rejected(
     )
     with pytest.raises(ValueError, match="具名乾元"):
         module.audit_original_examples()
-
-
-@pytest.mark.parametrize(
-    "arguments,valid",
-    [
-        ([], True),
-        (["--elapsed-source-days", "2.5", "--quantity-basis", module.BASIS], True),
-        (["--elapsed-source-days", "117/4", "--quantity-basis", module.BASIS], True),
-        (["--elapsed-source-days", "2.5"], False),
-        (
-            ["--elapsed-source-days", "2.5", "--quantity-basis", "longitude_degrees"],
-            False,
-        ),
-        (["--elapsed-source-days", "初", "--quantity-basis", module.BASIS], False),
-        (["--elapsed-source-days", "31", "--quantity-basis", module.BASIS], False),
-        (["--elapsed-source-days", "nan", "--quantity-basis", module.BASIS], False),
-    ],
-)
-def test_actual_cli_binds_the_import_tree_and_refuses_implicit_or_bad_units(
-    arguments, valid
-):
-    proc = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts/guolao/audit_guolao_qianyuan_initial.py"),
-            *arguments,
-        ],
-        cwd=ROOT,
-        env={**os.environ, "PYTHONPATH": str(ROOT / "src") + os.pathsep + str(ROOT)},
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    assert (proc.returncode == 0) is valid
-    if valid:
-        assert json.loads(proc.stdout)["method_id"] == module.METHOD
-    else:
-        assert not proc.stdout and proc.stderr

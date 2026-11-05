@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_conditions import conditional_case
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_generation_v11"
@@ -28,9 +29,8 @@ def annotated_case(case):
 
 def test_generation_reference_is_frozen_and_packaged():
     from fatebridge.core.liuyao_generation import PROFILE
-    from scripts.liuyao.build_liuyao_generation_profile import build
 
-    assert build() == PROFILE
+    assert build_profile("generation") == PROFILE
     for name, digest in json.loads((REFERENCE / "freeze.json").read_text())[
         "sha256"
     ].items():

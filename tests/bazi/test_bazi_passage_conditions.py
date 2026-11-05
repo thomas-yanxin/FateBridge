@@ -1,6 +1,5 @@
 """Contradictory passage receipts fail; valid and partial source facts survive."""
 
-import asyncio
 import gzip
 import json
 from copy import deepcopy
@@ -20,15 +19,9 @@ from fatebridge.core.output_classical_passage import (
 )
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS, GENERATION_CYCLE, STEM_ELEMENTS
 from tests.bazi.test_bazi_year_contract import TOPICS
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _rest_fixture
+from tests.support.transports import AS_OF, SPECS, business, inputs
+from tests.support.transports import rest as _rest_fixture
+from tests.support.transports import surface_calls
 
 rest = _rest_fixture
 ROOT = Path(__file__).resolve().parents[2]
@@ -164,9 +157,7 @@ def test_validation_never_calls_a_strength_or_passage_solver(monkeypatch):
 
 
 @pytest.mark.parametrize("topic", TOPICS)
-def test_all_ten_tools_keep_valid_summary_only_projection(
-    topic, rest, tmp_path, capsys
-):
+def test_all_ten_tools_keep_valid_summary_only_projection(topic, surface_calls):
     spec = SPECS["bazi_" + topic]
     prefix = "bazi_birth" if topic == "birth" else topic + "_analysis"
     path = (
@@ -182,13 +173,11 @@ def test_all_ten_tools_keep_valid_summary_only_projection(
     opts = dict(
         as_of=AS_OF, fields=[path], strict_fields=True, include_snapshot_text=False
     )
-    http = rest.post(spec.rest_path, json=payload, params=opts)
-    protocol = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
+        params=opts,
+        options=opts,
         flags=[
             "--fields",
             path,
@@ -197,6 +186,7 @@ def test_all_ten_tools_keep_valid_summary_only_projection(
             "--include-snapshot-text",
             "false",
         ],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
@@ -207,7 +197,7 @@ def test_all_ten_tools_keep_valid_summary_only_projection(
 
 @pytest.mark.parametrize("topic", TOPICS)
 def test_all_ten_tools_reject_contradictory_nested_receipts_before_projection(
-    topic, rest, monkeypatch, tmp_path, capsys
+    topic, monkeypatch, surface_calls
 ):
     spec = SPECS["bazi_" + topic]
     prefix = "bazi_birth" if topic == "birth" else topic + "_analysis"
@@ -235,13 +225,11 @@ def test_all_ten_tools_reject_contradictory_nested_receipts_before_projection(
         strict_fields=True,
         include_snapshot_text=False,
     )
-    http = rest.post(spec.rest_path, json=request, params=opts)
-    protocol = asyncio.run(native(spec, request, **opts))
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         request,
-        tmp_path,
-        capsys,
+        params=opts,
+        options=opts,
         flags=[
             "--fields",
             "analysis_type",
@@ -250,6 +238,7 @@ def test_all_ten_tools_reject_contradictory_nested_receipts_before_projection(
             "--include-snapshot-text",
             "false",
         ],
+        cli_first=False,
     )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert cli["error_code"] == "internal_error"

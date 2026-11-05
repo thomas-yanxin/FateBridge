@@ -1,6 +1,5 @@
 """Source term identity cannot manufacture a duty, force or hidden root."""
 
-import asyncio
 from copy import deepcopy
 
 import pytest
@@ -8,15 +7,9 @@ import pytest
 from fatebridge.core.month_duty_scan_reference import build_month_duty_scan_reference
 from fatebridge.utils.data import BRANCH_HIDDEN_STEMS
 from tests.bazi.test_bazi_year_contract import TOPICS
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _rest_fixture
+from tests.support.transports import AS_OF, SPECS, business, inputs
+from tests.support.transports import rest as _rest_fixture
+from tests.support.transports import surface_calls
 
 # Re-export the actual fixture object; test arguments refer to this registration.
 rest = _rest_fixture
@@ -118,7 +111,7 @@ def test_returned_source_identity_and_occurrences_cannot_mutate_cache_or_inputs(
 
 @pytest.mark.parametrize("topic", TOPICS)
 def test_identity_layer_matches_actual_rest_native_mcp_cli_for_all_ten_tools(
-    topic, rest, tmp_path, capsys
+    topic, surface_calls
 ):
     spec = SPECS["bazi_" + topic]
     prefix = "bazi_birth" if topic == "birth" else topic + "_analysis"
@@ -146,13 +139,11 @@ def test_identity_layer_matches_actual_rest_native_mcp_cli_for_all_ten_tools(
         include_snapshot_text=False,
         response_char_limit=0,
     )
-    http = rest.post(spec.rest_path, json=payload, params=opts)
-    protocol = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
+        params=opts,
+        options=opts,
         flags=[
             "--response-char-limit",
             "0",
@@ -163,6 +154,7 @@ def test_identity_layer_matches_actual_rest_native_mcp_cli_for_all_ten_tools(
             "--fields",
             path,
         ],
+        cli_first=False,
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert (

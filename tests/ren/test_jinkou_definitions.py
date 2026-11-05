@@ -1,6 +1,5 @@
 """Source uncertainty survives conditional calculations and every transport."""
 
-import asyncio
 import copy
 import importlib.util
 import json
@@ -17,14 +16,7 @@ from fatebridge.application.examples import evidence_views
 from fatebridge.core.metaphysics.jinkou_definitions import definition_evidence
 from fatebridge.core.output_jinkou_definitions import JinkouDefinitionEvidence
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 MOD = importlib.util.spec_from_file_location(
@@ -157,7 +149,7 @@ FAULTS = [
 @pytest.mark.parametrize("fault", FAULTS, ids=lambda f: f[0])
 @pytest.mark.parametrize("project", [False, True])
 def test_unrelated_projection_cannot_hide_false_definition_facts(
-    fault, project, rest, monkeypatch, tmp_path, capsys
+    fault, project, monkeypatch, surface_calls
 ):
     spec = SPECS["jinkou"]
     bad = calculate_jinkou_analysis(**PAYLOAD)
@@ -187,16 +179,16 @@ def test_unrelated_projection_cannot_hide_false_definition_facts(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(spec.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(spec, PAYLOAD, **options))
-    code, output = call_cli(spec, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, output = surface_calls(
+        spec, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert output["error_code"] == "internal_error"
 
 
 @pytest.mark.parametrize("project", [False, True])
 def test_three_ports_preserve_all_six_null_verdicts_and_same_run_facts(
-    project, rest, tmp_path, capsys
+    project, surface_calls
 ):
     spec = SPECS["jinkou"]
     fields = evidence_views(spec)["definition_witnesses"]["fields"]
@@ -216,9 +208,9 @@ def test_three_ports_preserve_all_six_null_verdicts_and_same_run_facts(
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(spec, PAYLOAD, **options))
-    code, cli = call_cli(spec, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)

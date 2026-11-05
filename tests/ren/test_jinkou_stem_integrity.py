@@ -1,6 +1,5 @@
 """Coordinated corruption must still agree with the displayed calculation."""
 
-import asyncio
 import copy
 import importlib.util
 import json
@@ -20,13 +19,7 @@ from fatebridge.core.output_jinkou_stems import (
     JinkouStemRelations,
 )
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 MODULE = importlib.util.spec_from_file_location(
@@ -91,7 +84,7 @@ def test_all_3600_valid_pairs_remain_valid_after_stronger_guard():
 @pytest.mark.parametrize("fault", BUSINESS_FAULTS, ids=lambda f: f["id"])
 @pytest.mark.parametrize("project", [False, True])
 def test_coordinated_faults_fail_on_all_ports_before_unrelated_projection(
-    fault, project, rest, monkeypatch, tmp_path, capsys
+    fault, project, monkeypatch, surface_calls
 ):
     spec = SPECS["jinkou"]
     valid = calculate_jinkou_analysis(**FROZEN["business_payload"])
@@ -116,10 +109,13 @@ def test_coordinated_faults_fail_on_all_ports_before_unrelated_projection(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(spec.rest_path, json=FROZEN["business_payload"], params=params)
-    protocol = asyncio.run(native(spec, FROZEN["business_payload"], **options))
-    code, output = call_cli(
-        spec, FROZEN["business_payload"], tmp_path, capsys, flags=flags
+    http, protocol, code, output = surface_calls(
+        spec,
+        FROZEN["business_payload"],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
     )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert output["error_code"] == "internal_error"

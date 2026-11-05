@@ -15,14 +15,9 @@ from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.output_strength_thresholds import StrengthThresholdArithmetic
 from fatebridge.core.strength import DEFAULT_POLICY, _evaluate
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _rest_fixture
 from tests.support import bazi_strength_reference_v3 as current_reference
+from tests.support.transports import SPECS, business, call_cli, native
+from tests.support.transports import rest as _rest_fixture
 
 rest = _rest_fixture
 NEAR = json.loads(

@@ -1,6 +1,5 @@
 """Actual file-backed solar months and unused-source isolation on public APIs."""
 
-import asyncio
 import hashlib
 import json
 import os
@@ -10,15 +9,9 @@ import pytest
 
 from fatebridge.core import almanac, spk_solar
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
 from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.transports import SPECS, business, native, rest, surface_calls
 
 MODEL = "fatebridge_jpl_spk_solar_v1"
 SHA = "a4ce9bf9b3282becc9f4b2ac3cebe03a2ae7599981aabd7265fd8482fff7c4b5"
@@ -51,11 +44,7 @@ def selected_spk(monkeypatch, tmp_path_factory):
 
 @pytest.mark.parametrize("mode", ["spk", "invalid-policy"])
 def test_static_yi_lookup_does_not_resolve_unused_solar_source(
-    mode,
-    monkeypatch,
-    rest,
-    tmp_path,
-    capsys,
+    mode, monkeypatch, tmp_path, surface_calls
 ):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", mode)
     monkeypatch.setenv("FATEBRIDGE_SOLAR_SPK_FILE", str(tmp_path / "missing.bsp"))
@@ -66,11 +55,12 @@ def test_static_yi_lookup_does_not_resolve_unused_solar_source(
     monkeypatch.setattr(spk_solar, "_selected", forbidden)
     spec = SPECS["gua_lookup"]
     payload = dict(query="111111", lookup_mode="hexagram")
-    http = rest.post(spec.rest_path, json=payload, params={"response_char_limit": 0})
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, ["--response-char-limit", "0"]
+    http, mcp, code, cli = surface_calls(
+        spec,
+        payload,
+        params={"response_char_limit": 0},
+        flags=["--response-char-limit", "0"],
     )
-    mcp = asyncio.run(native(spec, payload))
     assert http.status_code == 200 and code == 0 and not mcp.is_error
     values = [http.json(), cli, mcp.structured_content]
     assert business(values[0]) == business(values[1]) == business(values[2])
@@ -140,12 +130,7 @@ def test_spk_same_run_original_payload_hash(
 
 @pytest.mark.parametrize("reason", ["missing", "invalid", "range"])
 def test_consuming_sixyao_fails_loudly_on_three_protocols(
-    reason,
-    selected_spk,
-    monkeypatch,
-    rest,
-    tmp_path,
-    capsys,
+    reason, selected_spk, monkeypatch, tmp_path, surface_calls
 ):
     payload = dict(PAYLOAD)
     if reason == "range":
@@ -160,9 +145,7 @@ def test_consuming_sixyao_fails_loudly_on_three_protocols(
             "solar_spk_unavailable" if reason == "missing" else "solar_spk_invalid"
         )
     spec = SPECS["sixyao"]
-    http = rest.post(spec.rest_path, json=payload)
-    mcp = asyncio.run(native(spec, payload))
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
+    http, mcp, code, cli = surface_calls(spec, payload, cli_first=False)
     assert http.status_code == 503 and mcp.is_error and code != 0
     for output in [http.json(), cli]:
         assert output["retryable"] is False

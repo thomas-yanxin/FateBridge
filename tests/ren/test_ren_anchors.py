@@ -12,13 +12,14 @@ import pytest
 from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.support.transports import (
     AS_OF,
     SPECS,
     business,
     call_cli,
     native,
     rest,
+    surface_calls,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -132,7 +133,7 @@ def test_full_service_cannot_delete_anchors_to_evade_conditional_guard(
 @pytest.mark.parametrize("key", REFERENCE["payloads"])
 @pytest.mark.parametrize("project", [False, True])
 def test_valid_full_and_anchored_projections_still_agree_on_all_ports(
-    key, project, rest, tmp_path, capsys
+    key, project, surface_calls
 ):
     spec = SPECS[key]
     payload = REFERENCE["payloads"][key]
@@ -161,9 +162,9 @@ def test_valid_full_and_anchored_projections_still_agree_on_all_ports(
             "--include-snapshot-text",
             "false",
         ]
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, result = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    http, protocol, code, result = surface_calls(
+        spec, payload, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json())

@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import subprocess
-import sys
 from dataclasses import replace
 from fractions import Fraction
 from pathlib import Path
@@ -148,43 +146,3 @@ def test_matrix_is_frozen_and_missing_cells_are_not_reconstructed():
         replace(g, rows=rows)
     with pytest.raises(ValueError):
         replace(g, rows=g.rows[:-1])
-
-
-@pytest.mark.parametrize("column", [15, 29, 30])
-def test_cli_comparison_uses_exact_declared_column(column):
-    p = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts/guolao/audit_guolao_life_grid.py"),
-            "--source-palace",
-            "子",
-            "--target-palace",
-            "午",
-            "--column",
-            str(column),
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    r = json.loads(p.stdout)
-    assert r["audit"] == load_grid().audit()
-    assert r["comparison"]["target_cell"]["column"] == column
-    assert r["comparison"]["column_shift_applied"] == 0
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        ["--column", "15"],
-        ["--source-palace", "子", "--target-palace", "午"],
-        ["--column", "31", "--source-palace", "子", "--target-palace", "午"],
-    ],
-)
-def test_cli_requires_all_three_explicit_grid_inputs(args):
-    p = subprocess.run(
-        [sys.executable, str(ROOT / "scripts/guolao/audit_guolao_life_grid.py"), *args],
-        capture_output=True,
-        text=True,
-    )
-    assert p.returncode == 2 and not p.stdout

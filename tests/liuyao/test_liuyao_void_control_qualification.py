@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_roles import classical
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_void_control_v31"
@@ -90,9 +91,8 @@ def test_qualification_is_separate_from_remaining_controls(case):
 
 def test_frozen_author_clause_and_case_protocol():
     from fatebridge.core.liuyao_void_control import PROFILE
-    from scripts.liuyao.build_liuyao_void_control_profile import build
 
-    assert build() == PROFILE
+    assert build_profile("void_control") == PROFILE
     for n, h in json.loads((BASE / "freeze.json").read_text(encoding="utf-8"))[
         "sha256"
     ].items():

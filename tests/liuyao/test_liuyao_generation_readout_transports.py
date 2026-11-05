@@ -1,6 +1,5 @@
 """Actual REST/native MCP/CLI payloads, strict fields and same-run SHA."""
 
-import asyncio
 import json
 import os
 from pathlib import Path
@@ -8,25 +7,18 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
 from tests.liuyao.test_liuyao_generation_readout import (
     CASES,
     assert_returned_gate_readout,
 )
 from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.transports import SPECS, business, native, surface_calls
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])
 @pytest.mark.parametrize("project", [False, True])
-def test_generation_readout_full_and_strict_protocols(
-    case, project, rest, tmp_path, capsys
-):
+def test_generation_readout_full_and_strict_protocols(case, project, surface_calls):
     spec = SPECS["sixyao"]
     fields = [
         "liuyao_evidence.conditional_analysis.generation_conditions",
@@ -50,9 +42,9 @@ def test_generation_readout_full_and_strict_protocols(
             "true",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=True)
-    http = rest.post(spec.rest_path, json=case["payload"], params=params)
-    code, cli = call_cli(spec, case["payload"], tmp_path, capsys, flags=flags)
-    mcp = asyncio.run(native(spec, case["payload"], **options))
+    http, mcp, code, cli = surface_calls(
+        spec, case["payload"], params=params, options=options, flags=flags
+    )
     assert http.status_code == 200 and code == 0 and not mcp.is_error
     outputs = [http.json(), cli, mcp.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -95,41 +87,22 @@ def test_generation_readout_same_run_full_payload_sha(
         assert_returned_gate_readout(restored, case)
 
 
-def test_published_first_view_retains_qualification_without_snapshot(
-    rest, tmp_path, capsys
-):
+def test_published_first_view_retains_qualification_without_snapshot(surface_calls):
     from fatebridge.application.examples import evidence_views, suggested_fields
 
     spec = SPECS["sixyao"]
     fields = suggested_fields(spec)
     assert fields == evidence_views(spec)["line_reading"]["fields"]
-    flags = [
-        "--fields",
-        *fields,
-        "--strict-fields",
-        "true",
-        "--include-snapshot-text",
-        "false",
-        "--response-char-limit",
-        "0",
-    ]
-    params = [("fields", f) for f in fields] + [
-        ("strict_fields", "true"),
-        ("include_snapshot_text", "false"),
-        ("response_char_limit", 0),
-    ]
     case = CASES[0]
-    http = rest.post(spec.rest_path, json=case["payload"], params=params)
-    code, cli = call_cli(spec, case["payload"], tmp_path, capsys, flags=flags)
-    mcp = asyncio.run(
-        native(
-            spec,
-            case["payload"],
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-            response_char_limit=0,
-        )
+    http, mcp, code, cli = surface_calls(
+        spec,
+        case["payload"],
+        projection={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 0,
+        },
     )
     assert http.status_code == 200 and code == 0 and not mcp.is_error
     outputs = [http.json(), cli, mcp.structured_content]
@@ -150,7 +123,7 @@ def test_published_first_view_retains_qualification_without_snapshot(
 
 
 @pytest.mark.parametrize("kind", ["whole_array", "array_child", "unknown_object"])
-def test_generation_array_and_invalid_projection_paths(kind, rest, tmp_path, capsys):
+def test_generation_array_and_invalid_projection_paths(kind, surface_calls):
     from tests.liuyao.test_liuyao_generation_readout import edge
 
     spec = SPECS["sixyao"]
@@ -164,33 +137,16 @@ def test_generation_array_and_invalid_projection_paths(kind, rest, tmp_path, cap
         }[kind]
     )
     fields = [field]
-    flags = [
-        "--fields",
-        *fields,
-        "--strict-fields",
-        "true",
-        "--include-snapshot-text",
-        "false",
-        "--response-char-limit",
-        "0",
-    ]
-    params = [("fields", f) for f in fields] + [
-        ("strict_fields", "true"),
-        ("include_snapshot_text", "false"),
-        ("response_char_limit", 0),
-    ]
     case = CASES[0]
-    http = rest.post(spec.rest_path, json=case["payload"], params=params)
-    code, cli = call_cli(spec, case["payload"], tmp_path, capsys, flags=flags)
-    mcp = asyncio.run(
-        native(
-            spec,
-            case["payload"],
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-            response_char_limit=0,
-        )
+    http, mcp, code, cli = surface_calls(
+        spec,
+        case["payload"],
+        projection={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 0,
+        },
     )
     outputs = [http.json(), cli, mcp.structured_content]
     if kind != "whole_array":

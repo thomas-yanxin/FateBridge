@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.liuyao_growth import PROFILE
-from scripts.liuyao.build_liuyao_growth_profile import build
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_roles import classical
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_growth_v18"
@@ -20,7 +20,7 @@ for change in ERRATA["changes"]:
 
 
 def test_frozen_original_book_clauses_and_expectations():
-    assert build() == PROFILE
+    assert build_profile("growth") == PROFILE
     for name, digest in json.loads((BASE / "freeze.json").read_text())[
         "sha256"
     ].items():

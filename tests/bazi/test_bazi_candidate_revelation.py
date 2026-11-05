@@ -1,19 +1,14 @@
 """The selected source requires revealed wealth and seal for this one route."""
 
-import asyncio
 from copy import deepcopy
 
 import pytest
 
 from fatebridge.core.classical_candidate_selection import build_candidate_selection
 from fatebridge.core.output_candidate_selection import CandidateSelection
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 ORDER = ("year", "month", "day", "hour")
 
@@ -123,7 +118,7 @@ def test_revelation_gate_is_a_role_rule_for_every_day_stem(base, revealed, hidde
     [(0, "requires_force_adjudication"), (17, "observable_prerequisite_not_met")],
 )
 def test_revelation_precondition_matches_across_three_public_surfaces(
-    hour, status, rest, tmp_path, capsys
+    hour, status, surface_calls
 ):
     spec = SPECS["bazi_birth"]
     # Fictional fully specified interface controls; source person identity is
@@ -146,13 +141,11 @@ def test_revelation_precondition_matches_across_three_public_surfaces(
         include_snapshot_text=False,
         response_char_limit=0,
     )
-    response = rest.post(spec.rest_path, json=payload, params=options)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
+        params=options,
+        options=options,
         flags=[
             "--fields",
             field,
@@ -163,6 +156,7 @@ def test_revelation_precondition_matches_across_three_public_surfaces(
             "--response-char-limit",
             "0",
         ],
+        cli_first=False,
     )
     assert response.status_code == 200 and not protocol.is_error and code == 0
     assert (

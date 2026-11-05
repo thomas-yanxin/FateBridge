@@ -4,7 +4,6 @@ import asyncio
 import json
 import shutil
 from datetime import datetime
-from pathlib import Path
 
 import pytest
 from jsonschema import Draft202012Validator
@@ -22,13 +21,7 @@ from scripts.ren.audit_ren_boundary_decisions import (
     reference,
     sha,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, call_cli, native, rest
 
 
 @pytest.fixture(scope="module")

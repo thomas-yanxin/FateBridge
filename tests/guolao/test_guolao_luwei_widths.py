@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import subprocess
-import sys
 from dataclasses import replace
 from fractions import Fraction as F
 from pathlib import Path
@@ -194,29 +192,3 @@ def test_local_bounds_detect_an_outside_offset_without_repairing_the_width():
     assert F(entry["width"]["literal_width_du_exact"]) == 1
     assert entry["printed_unit_sum_within_source_mansion"] is False
     assert not result["complete_luwei_coordinate_profile_built"]
-
-
-def test_research_cli_requires_both_independent_policies_for_passage_comparison():
-    command = [sys.executable, str(ROOT / "scripts/guolao/audit_guolao_widths.py")]
-    result = subprocess.run(
-        command + ["--quarter-policy", "quarter_marks", "--compare-passages"],
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode != 0
-    result = subprocess.run(
-        command
-        + [
-            "--quarter-policy",
-            "quarter_marks",
-            "--compare-passages",
-            "--whole-degree-policy",
-            "inherit_column_heading",
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    r = json.loads(result.stdout)
-    assert F(r["all28_width_sum_du_exact"]) == F("361.98")
-    assert len(r["passages"]["entries"]) == 12

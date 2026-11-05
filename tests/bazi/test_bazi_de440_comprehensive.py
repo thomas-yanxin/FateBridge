@@ -6,13 +6,7 @@ import pytest
 
 from fatebridge.core import de440_solar
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
+from tests.support.transports import SPECS, business, call_cli, inputs, native
 
 
 @pytest.mark.parametrize("project", [False, True])

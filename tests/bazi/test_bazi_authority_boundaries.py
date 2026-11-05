@@ -1,6 +1,5 @@
 """Source-limited rules and explanations may not manufacture outcome claims."""
 
-import asyncio
 import json
 import subprocess
 import sys
@@ -26,13 +25,9 @@ from fatebridge.validation.predictions import (
     StudyPlan,
     evaluate_study,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 
 def pillars(values):
@@ -173,16 +168,15 @@ INPUT = dict(
     "key", ["bazi_birth", "bazi_education", "bazi_relatives", "bazi_romance"]
 )
 def test_correct_date_and_faithful_templates_survive_all_three_surfaces(
-    key, rest, tmp_path, capsys
+    key, surface_calls
 ):
     spec = SPECS[key]
-    response = rest.post(
-        spec.rest_path, json=INPUT, params={"as_of": "2026-10-12T02:00:00Z"}
+    response, protocol, code, local = surface_calls(
+        spec,
+        INPUT,
+        params={"as_of": "2026-10-12T02:00:00Z"},
+        flags=["--response-char-limit", "0"],
     )
-    code, local = call_cli(
-        spec, INPUT, tmp_path, capsys, flags=["--response-char-limit", "0"]
-    )
-    protocol = asyncio.run(native(spec, INPUT))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])

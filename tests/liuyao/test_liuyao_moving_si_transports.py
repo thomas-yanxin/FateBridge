@@ -11,13 +11,8 @@ import pytest
 from fastmcp import Client
 from fastmcp.client.transports import StdioTransport
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-)
 from tests.liuyao.test_liuyao_moving_si import BASE, CASES, check
+from tests.support.transports import AS_OF, SPECS, business, call_cli
 
 ROOT = Path(__file__).resolve().parents[2]
 PUBLIC = json.loads((BASE / "public-payloads.json").read_text())["rows"]

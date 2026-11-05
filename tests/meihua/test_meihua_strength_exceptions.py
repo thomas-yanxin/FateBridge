@@ -1,6 +1,5 @@
 """Literal source and all reused geometry/month contexts, without forecasts."""
 
-import asyncio
 import copy
 import gzip
 import hashlib
@@ -15,13 +14,7 @@ from fatebridge.core.meihua_strength_exceptions import (
     strength_exception_ruleset,
 )
 from fatebridge.services.meihua import calculate_meihua_cast
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_strength_exceptions_v1"
 GEOMETRIES = json.loads((FIXTURE / "geometry384-reused.json").read_text())
@@ -213,7 +206,7 @@ def test_weather_remains_without_body_use_strength_qualification():
 
 
 @pytest.mark.parametrize("tool", ["meihua_cast", "meihua_analysis"])
-def test_strength_card_agrees_on_rest_mcp_cli(tool, rest, tmp_path, capsys):
+def test_strength_card_agrees_on_rest_mcp_cli(tool, surface_calls):
     from fatebridge.application.examples import suggested_fields
 
     spec = SPECS[tool]
@@ -237,36 +230,14 @@ def test_strength_card_agrees_on_rest_mcp_cli(tool, rest, tmp_path, capsys):
         }
     )
     fields = suggested_fields(spec, view="strength_audit")
-    response = rest.post(
-        spec.rest_path,
-        json=args,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    mcp = asyncio.run(
-        native(
-            spec, args, fields=fields, strict_fields=True, include_snapshot_text=False
-        )
-    )
-    code, cli = call_cli(
+    response, mcp, code, cli = surface_calls(
         spec,
         args,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
+        cli_first=False,
     )
     assert response.status_code == 200 and code == 0 and not mcp.is_error
     assert (

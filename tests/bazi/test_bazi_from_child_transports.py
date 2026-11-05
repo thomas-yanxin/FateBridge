@@ -8,13 +8,8 @@ from fatebridge.application.examples import suggested_fields
 from fatebridge.core.classical_from_child import from_child_snapshot_lines
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from tests.bazi.test_bazi_year_contract import TOPICS
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business, call_cli, native
+from tests.support.transports import rest as _shared_rest
 
 # A fabricated protocol subject, chosen to reproduce the literal SJ07 pillars.
 # This does not authenticate the historical author's birth date or biography.

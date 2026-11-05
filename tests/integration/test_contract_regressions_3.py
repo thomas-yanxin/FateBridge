@@ -15,19 +15,12 @@ from fatebridge.application.examples import suggested_fields
 from fatebridge.cli import run
 from fatebridge.core.astro import native_execution as execution
 from fatebridge.mcp_server import create_mcp_app
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-    rest,
-)
 from tests.integration.test_readonly_result_verification import (
     PAYLOADS,
     REFERENCE,
     forbidden,
 )
+from tests.support.transports import SPECS, business, call_cli, inputs, native, rest
 
 
 def test_compact_typed_json_preserves_unicode_envelopes_and_numeric_values():

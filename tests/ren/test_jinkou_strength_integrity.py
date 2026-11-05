@@ -1,6 +1,5 @@
 """Strength, qi, use conditions and traces describe one calculation."""
 
-import asyncio
 import copy
 import importlib.util
 import itertools
@@ -16,14 +15,7 @@ from pydantic import ValidationError
 import fatebridge.application.execution as execution
 from fatebridge.core.metaphysics.jinkou_strength import internal_strength
 from fatebridge.core.output_chinese import Jinkou
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 MOD = importlib.util.spec_from_file_location(
@@ -88,7 +80,7 @@ def test_source_and_fault_cohort_cannot_be_relabelled_or_pruned(tmp_path, change
 @pytest.mark.parametrize("fault", REFERENCE["faults"], ids=lambda f: f["id"])
 @pytest.mark.parametrize("project", [False, True])
 def test_each_predeclared_fault_is_rejected_before_projection_on_all_ports(
-    fault, project, rest, monkeypatch, tmp_path, capsys
+    fault, project, monkeypatch, surface_calls
 ):
     bad = AUDIT.corrupt(raw(), fault)
     with pytest.raises(execution.OutputContractError):
@@ -108,16 +100,16 @@ def test_each_predeclared_fault_is_rejected_before_projection_on_all_ports(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(SPEC.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(SPEC, PAYLOAD, **options))
-    code, cli = call_cli(SPEC, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        SPEC, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert cli["error_code"] == "internal_error"
 
 
 @pytest.mark.parametrize("project", [False, True])
 def test_valid_result_and_nullable_unknowns_are_faithful_on_all_ports(
-    project, rest, tmp_path, capsys
+    project, surface_calls
 ):
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
     flags = ["--response-char-limit", "0"]
@@ -143,9 +135,9 @@ def test_valid_result_and_nullable_unknowns_are_faithful_on_all_ports(
             "--include-snapshot-text",
             "false",
         ]
-    http = rest.post(SPEC.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(SPEC, PAYLOAD, **options))
-    code, cli = call_cli(SPEC, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        SPEC, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)

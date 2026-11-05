@@ -9,12 +9,13 @@ from jsonschema import Draft202012Validator
 from fatebridge.core.astro import house_positions
 from fatebridge.core.astro.topocentric_precision import TOPOCENTRIC_PROJECTION_METHOD
 from fatebridge.core.local_techniques.otherbu import build_otherbu_result
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.support.transports import (
     SPECS,
     business,
     call_cli,
     native,
     rest,
+    surface_calls,
 )
 from tests.western.test_western_house_projection_precision_transports import payload
 
@@ -173,9 +174,7 @@ def test_t_predictive_contract_uses_same_inverse(zodiac, rest, tmp_path, capsys)
             checked(result[layer]["calculation_basis"]["house_position_projection"])
 
 
-def test_t_precision_failure_cannot_be_hidden_by_fields(
-    monkeypatch, rest, tmp_path, capsys
-):
+def test_t_precision_failure_cannot_be_hidden_by_fields(monkeypatch, surface_calls):
     def fail(**kwargs):
         raise ArithmeticError("injected T precision failure")
 
@@ -190,15 +189,13 @@ def test_t_precision_failure_cannot_be_hidden_by_fields(
     )
     spec = SPECS["astro_chart"]
     fields = ["person_info.name"]
-    http = rest.post(
-        spec.rest_path,
-        json=p,
+    http, protocol, code, cli = surface_calls(
+        spec,
+        p,
         params=[("fields", fields[0]), ("strict_fields", "true")],
+        options={"fields": fields, "strict_fields": True},
+        flags=["--fields", *fields, "--strict-fields"],
     )
-    code, cli = call_cli(
-        spec, p, tmp_path, capsys, flags=["--fields", *fields, "--strict-fields"]
-    )
-    protocol = asyncio.run(native(spec, p, fields=fields, strict_fields=True))
     assert http.status_code == 503 and code == 1 and protocol.is_error
     for result in (http.json(), cli, json.loads(protocol.content[0].text)):
         assert result["error_code"] == "ephemeris_source_inconsistent"

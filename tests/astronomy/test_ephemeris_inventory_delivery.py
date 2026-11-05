@@ -1,6 +1,5 @@
 """Large runtime inventories remain lossless without crowding out the analysis."""
 
-import asyncio
 import copy
 import hashlib
 import json
@@ -10,15 +9,9 @@ import pytest
 from fatebridge.application import result_delivery as delivery
 from fatebridge.application.examples import suggested_fields
 from fatebridge.services import replay_metadata
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    call_cli,
-    inputs,
-    native,
-    rest,
-)
 from tests.fixtures.mcp_receipt import assert_same_run_receipt
 from tests.integration.test_result_delivery import reconstruct, store
+from tests.support.transports import SPECS, inputs, rest, surface_calls
 
 PATH = "run_metadata.runtime"
 
@@ -69,7 +62,7 @@ def test_large_inventory_keeps_business_and_exact_receipt_in_same_run(store, com
 
 
 def test_semicolon_directory_inventory_is_equal_across_transports(
-    monkeypatch, rest, tmp_path, capsys
+    monkeypatch, tmp_path, surface_calls
 ):
     monkeypatch.chdir(tmp_path)
     for name in ("first", "second"):
@@ -90,13 +83,11 @@ def test_semicolon_directory_inventory_is_equal_across_transports(
         response_char_limit=0,
         include_snapshot_text=False,
     )
-    response = rest.post(spec.rest_path, json=payload, params=options)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
+        params=options,
+        options=options,
         flags=[
             "--fields",
             PATH,
@@ -105,6 +96,7 @@ def test_semicolon_directory_inventory_is_equal_across_transports(
             "--response-char-limit",
             "0",
         ],
+        cli_first=False,
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     for output in (response.json(), protocol.structured_content, cli):
@@ -113,7 +105,7 @@ def test_semicolon_directory_inventory_is_equal_across_transports(
 
 @pytest.mark.parametrize("limit", [4096, 8192])
 def test_real_career_stays_readable_with_large_inventory_across_transports(
-    monkeypatch, limit, rest, tmp_path, capsys, store
+    monkeypatch, limit, store, surface_calls
 ):
     source = inventory()
     monkeypatch.setattr(
@@ -135,9 +127,9 @@ def test_real_career_stays_readable_with_large_inventory_across_transports(
         opts.update(fields=fields, strict_fields=True)
         params += [("fields", f) for f in fields] + [("strict_fields", "true")]
         flags += ["--fields", *fields, "--strict-fields", "true"]
-    response = rest.post(spec.rest_path, json=payload, params=params)
-    protocol = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    response, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=opts, flags=flags, cli_first=False
+    )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     for result in (response.json(), protocol.structured_content, cli):
         assert (

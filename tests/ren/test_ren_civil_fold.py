@@ -1,6 +1,5 @@
 """Independent fold probes, cache order, and all three Ren transports."""
 
-import asyncio
 import importlib.util
 import json
 import shutil
@@ -11,13 +10,7 @@ import pytest
 
 from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.services.metaphysics import _build_analysis_seed, calculate_liureng_gods
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -109,7 +102,7 @@ def request(key, probe, solar):
 @pytest.mark.parametrize("solar", [False, True])
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_offset_fold_and_pillars_agree_across_rest_native_mcp_cli(
-    key, probe, solar, project, rest, tmp_path, capsys
+    key, probe, solar, project, surface_calls
 ):
     spec = SPECS[key]
     payload = request(key, probe, solar)
@@ -131,9 +124,9 @@ def test_actual_offset_fold_and_pillars_agree_across_rest_native_mcp_cli(
             *fields,
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, payload, **options))
+    http, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=options, flags=flags
+    )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     bodies = [http.json(), cli, protocol.structured_content]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])
@@ -168,7 +161,7 @@ def test_actual_offset_fold_and_pillars_agree_across_rest_native_mcp_cli(
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
 @pytest.mark.parametrize("kind", ["missing", "wrong_offset", "gap"])
 def test_ambiguous_missing_invalid_offset_and_gap_reject_on_every_transport(
-    key, kind, rest, tmp_path, capsys
+    key, kind, surface_calls
 ):
     spec = SPECS[key]
     payload = request(key, HAVANA["probes"][0], False)
@@ -178,9 +171,7 @@ def test_ambiguous_missing_invalid_offset_and_gap_reject_on_every_transport(
         payload["analysis_utc_offset"] = "-03:00"
     else:
         payload.update(analysis_month=3, analysis_day=14)  # Havana 00:30 was skipped.
-    http = rest.post(spec.rest_path, json=payload)
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    http, protocol, code, cli = surface_calls(spec, payload)
     assert http.status_code == 400 and code != 0 and protocol.is_error
     for body in (http.json(), cli, protocol.structured_content):
         assert body["error_code"] == "validation_error"

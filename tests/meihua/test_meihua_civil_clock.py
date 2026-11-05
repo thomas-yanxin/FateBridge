@@ -1,6 +1,5 @@
 """A verified offset selects an actual instant without replacing the calendar zone."""
 
-import asyncio
 import hashlib
 import json
 from datetime import datetime
@@ -11,13 +10,7 @@ import pytest
 from fatebridge.core.requests.divination import MeihuaAnalysisRequest
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.utils.civil_clock import utc_instant
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_civil_clock_v1"
 CASES = json.loads((FIXTURE / "cases.json").read_text())
@@ -191,7 +184,7 @@ def test_malformed_explicit_offsets_are_rejected(offset):
     [CASES["valid"][0], CASES["valid"][1], CASES["valid"][3], CASES["valid"][4]],
     ids=lambda c: c["id"],
 )
-def test_clock_resolution_is_projectable_on_rest_mcp_cli(case, rest, tmp_path, capsys):
+def test_clock_resolution_is_projectable_on_rest_mcp_cli(case, surface_calls):
     spec = SPECS["meihua_analysis"]
     payload = parameters(case)
     fields = [
@@ -201,30 +194,14 @@ def test_clock_resolution_is_projectable_on_rest_mcp_cli(case, rest, tmp_path, c
         "meihua.rule_trace",
         "calendar_context.bazi_month_boundary",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *(("fields", f) for f in fields),
-            ("strict_fields", "true"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, cli = call_cli(
+    response, mcp, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
-    mcp = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and code == 0 and not mcp.is_error
     assert (
         business(response.json()) == business(cli) == business(mcp.structured_content)
@@ -241,13 +218,11 @@ def test_clock_resolution_is_projectable_on_rest_mcp_cli(case, rest, tmp_path, c
     ids=lambda c: c["id"],
 )
 def test_invalid_clocks_keep_the_same_nonretryable_error_on_all_surfaces(
-    case, rest, tmp_path, capsys
+    case, surface_calls
 ):
     spec = SPECS["meihua_analysis"]
     payload = parameters(case)
-    response = rest.post(spec.rest_path, json=payload)
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
-    mcp = asyncio.run(native(spec, payload))
+    response, mcp, code, cli = surface_calls(spec, payload)
     assert response.status_code == 422 and code != 0 and mcp.is_error
     for out in [response.json(), cli, mcp.structured_content]:
         assert out["error_code"] == "validation_error" and out["retryable"] is False

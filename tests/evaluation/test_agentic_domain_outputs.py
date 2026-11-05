@@ -17,16 +17,8 @@ from fatebridge.cli import run as cli_run
 from fatebridge.core.export_contracts import AI_EXPORT_TECHNIQUES
 from fatebridge.core.knowledge_store import load_knowledge_bundles, read_knowledge_entry
 from fatebridge.core.sukuyo import SU27_ORDER, relation_between_su27
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-    rest,
-    schema_leaf,
-)
+from tests.evaluation.test_agentic_nested_outputs import schema_leaf
+from tests.support.transports import AS_OF, SPECS, business, inputs, rest, surface_calls
 
 PROJECTIONS = [
     ("bazi_marriage", "marriage_analysis.spouse_star.spouse_star_positions"),
@@ -48,9 +40,7 @@ PROJECTIONS = [
 
 @pytest.mark.parametrize("key,field", PROJECTIONS)
 @pytest.mark.parametrize("project", [False, True])
-def test_full_and_partial_json_match_all_transports(
-    key, field, project, rest, tmp_path, capsys
-):
+def test_full_and_partial_json_match_all_transports(key, field, project, surface_calls):
     spec = SPECS[key]
     request = inputs(spec)
     params = {"as_of": AS_OF, "include_snapshot_text": False}
@@ -60,9 +50,9 @@ def test_full_and_partial_json_match_all_transports(
         params.update(fields=field, strict_fields=True)
         flags.update(fields=[field], strict_fields=True)
         cli_flags += ["--fields", field, "--strict-fields"]
-    http = rest.post(spec.rest_path, json=request, params=params)
-    protocol = asyncio.run(native(spec, request, **flags))
-    code, output = call_cli(spec, request, tmp_path, capsys, cli_flags)
+    http, protocol, code, output = surface_calls(
+        spec, request, params=params, options=flags, flags=cli_flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert business(http.json()) == business(protocol.structured_content) == output
     assert "run_metadata" not in output and "projection_warnings" not in output
@@ -145,7 +135,7 @@ BAD_FACTS = [
 
 @pytest.mark.parametrize("key,payload", BAD_FACTS)
 def test_faults_cannot_be_hidden_by_projection(
-    key, payload, rest, monkeypatch, tmp_path, capsys
+    key, payload, monkeypatch, surface_calls
 ):
     spec = SPECS[key]
     with pytest.raises(ValidationError):
@@ -163,20 +153,13 @@ def test_faults_cannot_be_hidden_by_projection(
 
     monkeypatch.setattr(execution, "execute_spec", broken_output)
     request = inputs(spec)
-    http = rest.post(
-        spec.rest_path,
-        json=request,
-        params={"fields": "snapshot_text", "as_of": AS_OF, "trace_id": "domain-fault"},
-    )
-    protocol = asyncio.run(
-        native(spec, request, fields=["snapshot_text"], trace_id="domain-fault")
-    )
-    code, output = call_cli(
+    http, protocol, code, output = surface_calls(
         spec,
         request,
-        tmp_path,
-        capsys,
-        ["--fields", "snapshot_text", "--trace-id", "domain-fault"],
+        params={"fields": "snapshot_text", "as_of": AS_OF, "trace_id": "domain-fault"},
+        options={"fields": ["snapshot_text"], "trace_id": "domain-fault"},
+        flags=["--fields", "snapshot_text", "--trace-id", "domain-fault"],
+        cli_first=False,
     )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert (
@@ -484,13 +467,11 @@ def test_extensions_and_original_numeric_types_survive_validation(key):
         ("export_parse", {"technique": "generic", "content": ""}),
     ],
 )
-def test_nondefault_reference_results_match_transports(
-    key, payload, rest, tmp_path, capsys
-):
+def test_nondefault_reference_results_match_transports(key, payload, surface_calls):
     spec = SPECS[key]
-    http = rest.post(spec.rest_path, json=payload, params={"as_of": AS_OF})
-    protocol = asyncio.run(native(spec, payload))
-    code, output = call_cli(spec, payload, tmp_path, capsys, ["--no-metadata"])
+    http, protocol, code, output = surface_calls(
+        spec, payload, params={"as_of": AS_OF}, flags=["--no-metadata"], cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert business(http.json()) == business(protocol.structured_content) == output
     spec.output_model.model_validate(output)
@@ -501,9 +482,7 @@ def test_nondefault_reference_results_match_transports(
 
 
 @pytest.mark.parametrize("partial", [False, True])
-def test_auto_timing_fractional_years_match_all_transports(
-    partial, rest, tmp_path, capsys
-):
+def test_auto_timing_fractional_years_match_all_transports(partial, surface_calls):
     spec = SPECS["bazi_marriage"]
     payload = inputs(spec)
     payload.pop("dayun_pillar", None)
@@ -511,18 +490,13 @@ def test_auto_timing_fractional_years_match_all_transports(
     if partial:
         payload["dayun_pillar"] = "甲子"
     field = "marriage_analysis.timing_context.dayun_age"
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params={"as_of": AS_OF, "fields": field, "strict_fields": True},
-    )
-    protocol = asyncio.run(native(spec, payload, fields=[field], strict_fields=True))
-    code, output = call_cli(
+    http, protocol, code, output = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        ["--no-metadata", "--fields", field, "--strict-fields"],
+        params={"as_of": AS_OF, "fields": field, "strict_fields": True},
+        options={"fields": [field], "strict_fields": True},
+        flags=["--no-metadata", "--fields", field, "--strict-fields"],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert business(http.json()) == business(protocol.structured_content) == output
@@ -533,25 +507,20 @@ def test_auto_timing_fractional_years_match_all_transports(
     "dimension", [key for key, _ in PROJECTIONS if key.startswith("bazi_")]
 )
 def test_unknown_timing_direction_preserves_available_layers_across_transports(
-    dimension, rest, tmp_path, capsys
+    dimension, surface_calls
 ):
     spec = SPECS[dimension]
     payload = inputs(spec)
     payload.pop("dayun_pillar", None)
     payload.pop("liunian_pillar", None)
     payload["gender"] = "未知"
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params={"as_of": AS_OF, "trace_id": "unknown-direction"},
-    )
-    protocol = asyncio.run(native(spec, payload, trace_id="unknown-direction"))
-    code, output = call_cli(
+    http, protocol, code, output = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        ["--trace-id", "unknown-direction", "--no-metadata"],
+        params={"as_of": AS_OF, "trace_id": "unknown-direction"},
+        options={"trace_id": "unknown-direction"},
+        flags=["--trace-id", "unknown-direction", "--no-metadata"],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert business(http.json()) == business(protocol.structured_content) == output

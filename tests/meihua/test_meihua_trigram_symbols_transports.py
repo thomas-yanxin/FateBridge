@@ -1,6 +1,5 @@
 """Actual shared REST/MCP/CLI evidence and a fresh stdio server, no models."""
 
-import json
 import sys
 from pathlib import Path
 
@@ -11,11 +10,7 @@ from fastmcp.client.transports import StdioTransport
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
-from tests.evaluation.test_agentic_nested_outputs import (  # noqa: F401
-    SPECS,
-    call_cli,
-    rest,
-)
+from tests.support.transports import SPECS, call_cli, rest
 
 CASES = [
     (

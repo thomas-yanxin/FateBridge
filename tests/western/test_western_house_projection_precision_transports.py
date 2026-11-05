@@ -1,6 +1,5 @@
 """Actual precision records and source rejections on local public adapters."""
 
-import asyncio
 import json
 
 import pytest
@@ -8,13 +7,7 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.core.astro import house_positions
 from fatebridge.core.astro.house_projection_precision import RC_PLANE_PROJECTION_METHOD
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 from tests.western.test_western_horizon_precision import PUBLIC
 
 
@@ -37,7 +30,7 @@ def payload(hsys, zodiacal=0):
 @pytest.mark.parametrize("hsys", [2])
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_plane_records_and_explanation_survive_public_surfaces(
-    hsys, zodiacal, rest, tmp_path, capsys
+    hsys, zodiacal, surface_calls
 ):
     spec = SPECS["astro_chart"]
     p = payload(hsys, zodiacal)
@@ -47,17 +40,16 @@ def test_plane_records_and_explanation_survive_public_surfaces(
         "summary",
         "interpretation_evidence.social_style.source_paths",
     ]
-    http = rest.post(
-        spec.rest_path,
-        json=p,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
-    )
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         p,
-        tmp_path,
-        capsys,
+        params=[("fields", f) for f in fields]
+        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
         flags=[
             "--fields",
             *fields,
@@ -66,9 +58,6 @@ def test_plane_records_and_explanation_survive_public_surfaces(
             "--response-char-limit",
             "0",
         ],
-    )
-    protocol = asyncio.run(
-        native(spec, p, fields=fields, strict_fields=True, include_snapshot_text=False)
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [http.json(), cli, protocol.structured_content]
@@ -88,7 +77,7 @@ def test_plane_records_and_explanation_survive_public_surfaces(
 
 
 def test_plane_precision_failure_cannot_be_hidden_by_projection(
-    monkeypatch, rest, tmp_path, capsys
+    monkeypatch, surface_calls
 ):
     def fail(**kwargs):
         raise ArithmeticError("injected plane failure")
@@ -96,20 +85,12 @@ def test_plane_precision_failure_cannot_be_hidden_by_projection(
     monkeypatch.setattr(house_positions, "checked_house_plane_position", fail)
     spec = SPECS["astro_chart"]
     p = payload(2)
-    http = rest.post(
-        spec.rest_path,
-        json=p,
-        params=[("fields", "person_info.name"), ("strict_fields", "true")],
-    )
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         p,
-        tmp_path,
-        capsys,
+        params=[("fields", "person_info.name"), ("strict_fields", "true")],
+        options={"fields": ["person_info.name"], "strict_fields": True},
         flags=["--fields", "person_info.name", "--strict-fields"],
-    )
-    protocol = asyncio.run(
-        native(spec, p, fields=["person_info.name"], strict_fields=True)
     )
     assert http.status_code == 503 and code == 1 and protocol.is_error
     for result in [http.json(), cli, json.loads(protocol.content[0].text)]:
@@ -124,9 +105,7 @@ def test_plane_precision_failure_cannot_be_hidden_by_projection(
 
 
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
-def test_actual_campanus_predictive_contract_on_all_surfaces(
-    zodiac, rest, tmp_path, capsys
-):
+def test_actual_campanus_predictive_contract_on_all_surfaces(zodiac, surface_calls):
     case = PUBLIC[0]
     spec = SPECS["transit"]
     p = payload(2)
@@ -147,17 +126,16 @@ def test_actual_campanus_predictive_contract_on_all_surfaces(
         f"{layer}.calculation_basis.house_position_projection"
         for layer in ["natal_reference", "transit"]
     ]
-    http = rest.post(
-        spec.rest_path,
-        json=p,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
-    )
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         p,
-        tmp_path,
-        capsys,
+        params=[("fields", f) for f in fields]
+        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
         flags=[
             "--fields",
             *fields,
@@ -166,9 +144,6 @@ def test_actual_campanus_predictive_contract_on_all_surfaces(
             "--response-char-limit",
             "0",
         ],
-    )
-    protocol = asyncio.run(
-        native(spec, p, fields=fields, strict_fields=True, include_snapshot_text=False)
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [http.json(), cli, protocol.structured_content]

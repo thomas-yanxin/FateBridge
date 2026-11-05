@@ -5,14 +5,8 @@ from copy import deepcopy
 
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.support.meihua_volume5_strength_reference import load
+from tests.support.transports import SPECS, business, call_cli, native, rest
 
 CELLS, _ = load()
 LOOKUP = {(r["column"], r["element"]): r["expected_state"] for r in CELLS}

@@ -5,13 +5,8 @@ import asyncio
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
 from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.transports import SPECS, business, call_cli, native
 
 
 def all_surfaces(payload, fields, rest, tmp_path, capsys, budget=0):

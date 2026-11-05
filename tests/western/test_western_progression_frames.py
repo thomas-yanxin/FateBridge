@@ -4,7 +4,6 @@ Direct Swiss calls check coordinate/time plumbing, not independent ephemeris
 accuracy or the empirical validity of symbolic progression techniques.
 """
 
-import asyncio
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -17,13 +16,7 @@ from fatebridge.core.ephemeris_runtime import (
     swe,
 )
 from fatebridge.services.western_lifespan import _body_declinations, calculate_vedicprog
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, native, rest, surface_calls
 
 BIRTH_INPUTS = dict(
     birth_year=1972,
@@ -113,7 +106,7 @@ def test_vedic_native_offset_failure_never_succeeds_with_linear_approximation(
 
 
 @pytest.mark.parametrize("tool", ["astro_vedicprog", "astro_jaynesprog"])
-def test_correct_progression_frames_reach_rest_mcp_cli(rest, tmp_path, capsys, tool):
+def test_correct_progression_frames_reach_rest_mcp_cli(tool, surface_calls):
     spec = SPECS[tool]
     key = "vedic_progression" if tool == "astro_vedicprog" else "jaynes_declination"
     fields = ["natal_reference", key, "analysis_context.zodiac_type"]
@@ -122,16 +115,16 @@ def test_correct_progression_frames_reach_rest_mcp_cli(rest, tmp_path, capsys, t
         ("include_snapshot_text", "false"),
         ("response_char_limit", 0),
     ]
-    http = rest.post(spec.rest_path, json=BIRTH_INPUTS, params=query)
-    code, cli = call_cli(spec, BIRTH_INPUTS, tmp_path, capsys, ["--fields", *fields])
-    protocol = asyncio.run(
-        native(
-            spec,
-            BIRTH_INPUTS,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
+    http, protocol, code, cli = surface_calls(
+        spec,
+        BIRTH_INPUTS,
+        params=query,
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=["--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error

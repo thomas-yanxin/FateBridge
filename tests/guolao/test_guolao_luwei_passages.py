@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import subprocess
-import sys
 from dataclasses import replace
 from fractions import Fraction as F
 from pathlib import Path
@@ -189,44 +187,3 @@ def test_partial_units_cannot_be_backfilled_in_the_record_and_collections_are_fr
         g.entry("best_fit", "卯", whole_degree_policy="inherit_column_heading")
     with pytest.raises(ValueError):
         g.entry("shoushi", "卯", whole_degree_policy="assume_zero")
-
-
-@pytest.mark.parametrize("policy", POLICIES)
-def test_cli_can_audit_or_return_a_named_cell_without_a_modern_epoch(policy):
-    p = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts/guolao/audit_guolao_passages.py"),
-            "--whole-degree-policy",
-            policy,
-            "--calendar",
-            "shoushi",
-            "--branch",
-            "卯",
-            "--compare-yuanshi",
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    r = json.loads(p.stdout)
-    assert r == load_registry().compare_yuanshi(
-        "shoushi", "卯", whole_degree_policy=policy
-    )
-
-
-@pytest.mark.parametrize(
-    "args",
-    [
-        [],
-        ["--whole-degree-policy", "explicit_only", "--calendar", "shoushi"],
-        ["--whole-degree-policy", "explicit_only", "--compare-yuanshi"],
-    ],
-)
-def test_cli_requires_explicit_degree_policy_and_a_complete_cell_selector(args):
-    p = subprocess.run(
-        [sys.executable, str(ROOT / "scripts/guolao/audit_guolao_passages.py"), *args],
-        capture_output=True,
-        text=True,
-    )
-    assert p.returncode == 2 and not p.stdout

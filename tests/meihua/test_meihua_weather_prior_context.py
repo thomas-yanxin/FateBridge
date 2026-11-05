@@ -1,6 +1,5 @@
 """Confirmed false source antecedents must remain distinct from missing facts."""
 
-import asyncio
 import itertools
 import json
 
@@ -10,13 +9,7 @@ from pydantic import ValidationError
 from fatebridge.core.meihua_weather import build_weather_interpretation
 from fatebridge.core.requests.meihua import MeihuaWeatherContext
 from fatebridge.services.meihua import calculate_meihua_cast
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 PRIOR_RULES = {
     "long_rain_gen_stops",
@@ -83,7 +76,7 @@ def test_all384_casts_confirmed_neither_only_disables_four_prior_clauses(thresho
 
 @pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
 def test_confirmed_neither_and_pending_other_conditions_agree_on_all_surfaces(
-    tool, rest, tmp_path, capsys
+    tool, surface_calls
 ):
     spec = SPECS[tool]
     payload = {
@@ -105,20 +98,15 @@ def test_confirmed_neither_and_pending_other_conditions_agree_on_all_surfaces(
             analysis_timezone="Asia/Hong_Kong",
         )
     fields = ["interpretation.weather", "interpretation.evidence_scope", "summary"]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
+    response, protocol, code, local = surface_calls(
+        spec,
+        payload,
         params=[
             *(("fields", f) for f in fields),
             ("strict_fields", "true"),
             ("response_char_limit", "0"),
         ],
-    )
-    code, local = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
+        options={"fields": fields, "strict_fields": True, "response_char_limit": 0},
         flags=[
             "--fields",
             *fields,
@@ -129,9 +117,6 @@ def test_confirmed_neither_and_pending_other_conditions_agree_on_all_surfaces(
             "--weather-context",
             json.dumps(payload["weather_context"]),
         ],
-    )
-    protocol = asyncio.run(
-        native(spec, payload, fields=fields, strict_fields=True, response_char_limit=0)
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]

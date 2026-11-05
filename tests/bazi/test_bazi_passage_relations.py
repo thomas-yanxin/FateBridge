@@ -14,16 +14,10 @@ from fatebridge.core.classical_passage import build_passage_evidence
 from fatebridge.core.output_passage_relations import PassageRelationContext
 from fatebridge.core.passage_relations import build_passage_relation_context
 from tests.bazi.test_bazi_complete_anchors import TOOLS, base, projection
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _rest_fixture
 from tests.integration.test_result_delivery import reconstruct
 from tests.integration.test_result_delivery import store as _store_fixture
+from tests.support.transports import AS_OF, SPECS, business, call_cli, native
+from tests.support.transports import rest as _rest_fixture
 
 rest = _rest_fixture
 store = _store_fixture

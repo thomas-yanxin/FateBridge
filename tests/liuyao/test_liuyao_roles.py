@@ -10,7 +10,7 @@ import pytest
 
 from fatebridge.core.liuyao_judgment import build_conditional_analysis
 from fatebridge.core.liuyao_roles import PROFILE, evaluate
-from scripts.liuyao.build_liuyao_role_profile import build
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_conditions import mounted
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_effects_v4"
@@ -34,7 +34,7 @@ def classical(case):
 
 
 def test_frozen_scan_clauses_and_expectations_are_not_engine_derived():
-    assert build() == PROFILE
+    assert build_profile("role") == PROFILE
     freeze = json.loads((REFERENCE / "freeze.json").read_text(encoding="utf-8"))
     for name, expected in freeze["sha256"].items():
         assert hashlib.sha256((REFERENCE / name).read_bytes()).hexdigest() == expected
@@ -44,6 +44,45 @@ def test_frozen_scan_clauses_and_expectations_are_not_engine_derived():
         r["quote"] for r in PROFILE["rules"] if r["rule_id"] == "yuan_obstruction_5"
     )
     assert PROFILE["textual_issues"][0]["resolution"].startswith("Unresolved")
+
+
+@pytest.mark.parametrize("fault", ["changed_profile", "changed_scan", "escaped_scan"])
+def test_profile_publisher_rejects_changed_or_detached_source_material(
+    tmp_path, monkeypatch, fault
+):
+    from scripts.liuyao import build_profile as publisher
+
+    monkeypatch.setattr(publisher, "ROOT", tmp_path)
+    reference = tmp_path / "tests/fixtures/liuyao_effects_v4"
+    reference.mkdir(parents=True)
+    source = (
+        tmp_path / "outside.txt" if fault == "escaped_scan" else reference / "scan.txt"
+    )
+    source.write_text("independent source bytes")
+    profile = {
+        "source": {
+            "file": "../../../outside.txt" if fault == "escaped_scan" else "scan.txt",
+            "sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+        }
+    }
+    if fault == "changed_scan":
+        source.write_text("replaced source bytes")
+    original = reference / "profile.json"
+    original.write_text(json.dumps(profile))
+    (reference / "freeze.json").write_text(
+        json.dumps(
+            {
+                "sha256": {
+                    "profile.json": hashlib.sha256(original.read_bytes()).hexdigest()
+                }
+            }
+        )
+    )
+    if fault == "changed_profile":
+        profile["unregistered_claim"] = True
+        original.write_text(json.dumps(profile))
+    with pytest.raises(ValueError):
+        publisher.build_profile("role")
 
 
 @pytest.mark.parametrize("values", list(product((True, False, None), repeat=3)))

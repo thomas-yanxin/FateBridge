@@ -1,8 +1,5 @@
 """Frozen complete second cohort, actual three protocols, and faithful snapshots."""
 
-import asyncio
-import gzip
-import hashlib
 import json
 import shutil
 from datetime import datetime
@@ -13,14 +10,7 @@ import swisseph as swe
 
 from scripts.ren import audit_ren_seconds as audit
 from scripts.ren.ren_second_reference import ReferenceClock
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 IDS = [
@@ -95,7 +85,7 @@ def default_empty(monkeypatch, tmp_path):
 @pytest.mark.parametrize("identifier", IDS)
 @pytest.mark.parametrize("key", ["liureng_gods", "jinkou"])
 def test_whole_seconds_reach_three_protocols_and_the_snapshot(
-    identifier, key, frozen, default_empty, rest, tmp_path, capsys
+    identifier, key, frozen, default_empty, surface_calls
 ):
     row = next(r for r in frozen["data"]["rows"] if r["id"] == identifier)
     moment = datetime.fromisoformat(row["civil_utc"])
@@ -128,33 +118,8 @@ def test_whole_seconds_reach_three_protocols_and_the_snapshot(
         include_snapshot_text=True,
         response_char_limit=0,
     )
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *[("fields", f) for f in fields],
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "true"),
-            ("response_char_limit", "0"),
-            ("as_of", AS_OF),
-        ],
-    )
-    mcp = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        [
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+    http, mcp, code, cli = surface_calls(
+        spec, payload, projection=opts, cli_first=False, rest_as_of=AS_OF
     )
     assert http.status_code == 200, http.text
     assert not mcp.is_error, mcp.structured_content

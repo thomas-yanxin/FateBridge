@@ -1,6 +1,5 @@
 """Literal verse references preserve both source readings and every cast fact."""
 
-import asyncio
 import copy
 import hashlib
 import json
@@ -16,13 +15,7 @@ from fatebridge.core.divination import (
 )
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_text_variants_v1"
 REFERENCE = json.loads((FIXTURE / "reference.json").read_bytes())
@@ -178,50 +171,24 @@ def test_time_entry_uses_its_actual_verse_and_preserves_calendar_and_cast():
 @pytest.mark.parametrize("view", [None, "reading"])
 @pytest.mark.parametrize("topic", ["general", "planning", "weather"])
 def test_published_reading_fields_agree_on_rest_mcp_and_cli(
-    tool, view, topic, rest, tmp_path, capsys
+    tool, view, topic, surface_calls
 ):
     spec = SPECS[tool]
     payload = {"casting": CAST} if tool == "meihua_cast" else dict(TIME)
     payload["interpretation_topic"] = topic
     fields = suggested_fields(spec, view=view)
     assert "interpretation.classical_text_reference" in fields
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", field) for field in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    assert response.status_code == 200, response.text
-    mcp = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
-    assert not mcp.is_error
-    code, cli = call_cli(
+    response, mcp, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
+        cli_first=False,
     )
+    assert response.status_code == 200, response.text
+    assert not mcp.is_error
     assert code == 0
     assert (
         business(response.json()) == business(mcp.structured_content) == business(cli)

@@ -1,14 +1,8 @@
 """Astronomical normalization and source-root facts share one public calculation."""
 
-import asyncio
-
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 PAYLOAD = {
     "name": "虚构均时差边界回归",
@@ -28,16 +22,15 @@ PAYLOAD = {
 
 
 def test_new_hour_pillar_and_source_root_profile_match_all_three_surfaces(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
     spec = SPECS["bazi_birth"]
-    response = rest.post(
-        spec.rest_path, json=PAYLOAD, params={"response_char_limit": 0}
+    response, protocol, code, local = surface_calls(
+        spec,
+        PAYLOAD,
+        params={"response_char_limit": 0},
+        flags=["--response-char-limit", "0"],
     )
-    code, local = call_cli(
-        spec, PAYLOAD, tmp_path, capsys, flags=["--response-char-limit", "0"]
-    )
-    protocol = asyncio.run(native(spec, PAYLOAD))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])

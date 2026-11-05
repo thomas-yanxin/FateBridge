@@ -1,24 +1,15 @@
 """Symbolic solar-arc source controls; no observed-date precision claim."""
 
-import asyncio
 import math
 from datetime import datetime, timezone
 from fractions import Fraction as F
 from types import SimpleNamespace
 
-import pytest
-
 from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.predictive import native_chart
 from fatebridge.core.predictive._common import TIMING_POINT_NAMES, point_attribute_name
 from fatebridge.core.predictive.solar_arc import build_solar_arc_payload
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 
 def subjects(sun, progressed_sun, moon):
@@ -109,7 +100,7 @@ def test_all_thirty_degree_cuts_neighbor_floats_and_both_arc_signs():
 
 
 def test_public_solar_arc_keeps_source_rotation_side_and_orb_on_all_surfaces(
-    monkeypatch, rest, tmp_path, capsys
+    monkeypatch, surface_calls
 ):
     birth_tt = ephemeris_time(datetime(2000, 5, 3, tzinfo=timezone.utc)).jd_tt
     original = native_chart._swisseph_planet_state
@@ -160,14 +151,16 @@ def test_public_solar_arc_keeps_source_rotation_side_and_orb_on_all_surfaces(
         ("include_snapshot_text", "false"),
         ("response_char_limit", 0),
     ]
-    http = rest.post(spec.rest_path, json=inputs, params=query)
-    code, cli = call_cli(
-        spec, inputs, tmp_path, capsys, ["--strict-fields", "--fields", *fields]
-    )
-    mcp = asyncio.run(
-        native(
-            spec, inputs, fields=fields, strict_fields=True, include_snapshot_text=False
-        )
+    http, mcp, code, cli = surface_calls(
+        spec,
+        inputs,
+        params=query,
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=["--strict-fields", "--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not mcp.is_error

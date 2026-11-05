@@ -1,6 +1,5 @@
 """Necessary layout sets are not predicate matches, full classes or forecasts."""
 
-import asyncio
 import copy
 import json
 import shutil
@@ -17,15 +16,8 @@ from fatebridge.core.output_liuren_course_conditions import LiurenCourseConditio
 from fatebridge.core.output_ren_anchors import require_complete_ren_anchors
 from scripts.ren.audit_liuren_course_conditions import transmissions
 from scripts.ren.audit_liuren_course_layout import CORPUS, audit, reference
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.ren.test_liuren_ordered_patterns import raw
+from tests.support.transports import AS_OF, SPECS, business, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 PAYLOADS = json.loads((ROOT / "tests/fixtures/ren_anchors_v1/faults.json").read_text())[
@@ -171,7 +163,7 @@ def test_sparse_projection_does_not_invent_a_missing_day():
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_real_ports_keep_matches_and_necessary_conditions_distinct(
-    key, project, rest, tmp_path, capsys
+    key, project, surface_calls
 ):
     spec = SPECS[key]
     path = "liureng.transmission_relations.course_conditions"
@@ -193,9 +185,14 @@ def test_real_ports_keep_matches_and_necessary_conditions_distinct(
             "false",
         ]
         options.update(fields=[path], strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=PAYLOADS[key], params=params)
-    protocol = asyncio.run(native(spec, PAYLOADS[key], **options))
-    code, cli = call_cli(spec, PAYLOADS[key], tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec,
+        PAYLOADS[key],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)
@@ -238,7 +235,7 @@ def test_complete_gate_requires_same_day_layout_evidence(key, field):
 
 @pytest.mark.parametrize("project", [False, True])
 def test_false_compatibility_fails_before_an_unrelated_projection(
-    project, rest, monkeypatch, tmp_path, capsys
+    project, monkeypatch, surface_calls
 ):
     spec = SPECS["liureng_gods"]
     value = raw(spec.key)
@@ -261,7 +258,12 @@ def test_false_compatibility_fails_before_an_unrelated_projection(
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         options.update(fields=["four_pillars"], strict_fields=True)
-    http = rest.post(spec.rest_path, json=PAYLOADS[spec.key], params=params)
-    protocol = asyncio.run(native(spec, PAYLOADS[spec.key], **options))
-    code, _ = call_cli(spec, PAYLOADS[spec.key], tmp_path, capsys, flags=flags)
+    http, protocol, code, _ = surface_calls(
+        spec,
+        PAYLOADS[spec.key],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert http.status_code == 500 and protocol.is_error and code != 0

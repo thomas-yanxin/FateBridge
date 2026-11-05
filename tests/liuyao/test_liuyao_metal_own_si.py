@@ -2,7 +2,6 @@
 
 import hashlib
 import json
-from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -11,7 +10,7 @@ from pydantic import ValidationError
 from fatebridge.core.liuyao_metal_change import PROFILE, own_si_context
 from fatebridge.core.output_liuyao_conditions import StrengthActor
 from fatebridge.core.output_liuyao_growth import GrowthConditions
-from scripts.liuyao.build_liuyao_metal_own_si_profile import build
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_conditions import conditional_case
 from tests.liuyao.test_liuyao_metal_moving import cycle, read_path
 from tests.liuyao.test_liuyao_roles import classical
@@ -133,7 +132,7 @@ def check(result, case):
 
 
 def test_own_si_original_scan_and_frozen_cases():
-    assert build() == PROFILE
+    assert build_profile("metal_own_si") == PROFILE
     for name, digest in json.loads((BASE / "freeze.json").read_text())[
         "files_sha256"
     ].items():

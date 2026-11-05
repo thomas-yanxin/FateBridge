@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_conditions import conditional_case
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_control_v9"
@@ -15,9 +16,8 @@ ERRATA = json.loads((REFERENCE / "errata.json").read_text(encoding="utf-8"))
 
 def test_control_source_freeze_is_preserved():
     from fatebridge.core.liuyao_control import PROFILE
-    from scripts.liuyao.build_liuyao_control_profile import build
 
-    assert build() == PROFILE
+    assert build_profile("control") == PROFILE
     freeze = json.loads((REFERENCE / "freeze.json").read_text(encoding="utf-8"))
     for name, digest in freeze["sha256"].items():
         assert hashlib.sha256((REFERENCE / name).read_bytes()).hexdigest() == digest

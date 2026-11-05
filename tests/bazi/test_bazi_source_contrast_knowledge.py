@@ -1,6 +1,5 @@
 """Queryable source distinctions preserve every existing response and old gate."""
 
-import asyncio
 import copy
 import hashlib
 import json
@@ -12,13 +11,9 @@ from fatebridge.core import knowledge_store
 from fatebridge.services.knowledge import (
     calculate_knowledge_read,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -165,26 +160,25 @@ def test_new_entry_nested_evidence_cannot_mutate_cached_values():
 @pytest.mark.parametrize("category", [None, "source_contrasts"])
 @pytest.mark.parametrize("include_snapshot", [False, True])
 def test_complete_card_is_identical_on_rest_mcp_and_cli(
-    category, include_snapshot, rest, tmp_path, capsys
+    category, include_snapshot, surface_calls
 ):
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "key": KEY}
     if category:
         payload["category"] = category
     options = {"include_snapshot_text": include_snapshot, "response_char_limit": 0}
-    http = rest.post(spec.rest_path, json=payload, params=options)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
+        params=options,
+        options=options,
         flags=[
             "--include-snapshot-text",
             str(include_snapshot).lower(),
             "--response-char-limit",
             "0",
         ],
+        cli_first=False,
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert (
@@ -200,7 +194,7 @@ def test_complete_card_is_identical_on_rest_mcp_and_cli(
     )
 
 
-def test_strict_source_projection_matches_on_three_transports(rest, tmp_path, capsys):
+def test_strict_source_projection_matches_on_three_transports(surface_calls):
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "key": KEY}
     fields = [
@@ -217,22 +211,8 @@ def test_strict_source_projection_matches_on_three_transports(rest, tmp_path, ca
         "include_snapshot_text": False,
         "response_char_limit": 0,
     }
-    http = rest.post(spec.rest_path, json=payload, params=options)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+    http, protocol, code, cli = surface_calls(
+        spec, payload, projection=options, cli_first=False
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert (

@@ -1,6 +1,5 @@
 """Literal seasonal states, conditional emptiness and same-board protocols."""
 
-import asyncio
 import copy
 import json
 import shutil
@@ -15,20 +14,13 @@ import fatebridge.application.execution as execution
 from fatebridge.application.examples import evidence_views
 from fatebridge.core.metaphysics.liureng import build_liureng_board
 from fatebridge.core.metaphysics.liureng_seasonal import seasonal_evidence
-from fatebridge.core.output_chinese import Liuren
 from fatebridge.core.output_liuren_seasonal import (
     LiurenSeasonalEvidence,
     LiurenSeasonalRow,
     require_complete_seasonal,
 )
 from scripts.ren.audit_liuren_seasonal import BRANCHES, CORPUS, reference, seed_for
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 REF = reference()
@@ -249,40 +241,14 @@ def test_full_guard_rejects_missing_trace_and_valid_other_month_before_projectio
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
 def test_published_actual_evidence_view_agrees_in_rest_native_mcp_and_cli(
-    key, rest, tmp_path, capsys
+    key, surface_calls
 ):
     s = SPECS[key]
     p = copy.deepcopy(PAYLOADS[key])
     name = "liuren_seasonal_evidence" if key == "jinkou" else "seasonal_evidence"
     fields = evidence_views(s)[name]["fields"]
     opts = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    h = rest.post(
-        s.rest_path,
-        json=p,
-        params=[
-            *[("fields", f) for f in fields],
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, c = call_cli(
-        s,
-        p,
-        tmp_path,
-        capsys,
-        flags=[
-            "--response-char-limit",
-            "0",
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-        ],
-    )
-    m = asyncio.run(native(s, p, **opts))
+    h, m, code, c = surface_calls(s, p, projection={**opts, "response_char_limit": 0})
     assert h.status_code == 200 and code == 0 and not m.is_error
     assert business(h.json()) == business(c) == business(m.structured_content)
     e = h.json()["liureng"]["seasonal_evidence"]
@@ -319,7 +285,7 @@ def test_snapshot_lines_keep_branch_god_earth_and_effective_scope_separate():
 
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_three_protocols_reject_deleted_evidence_even_when_fields_hide_it(
-    project, rest, monkeypatch, tmp_path, capsys
+    project, monkeypatch, surface_calls
 ):
     s = SPECS["liureng_gods"]
     p = PAYLOADS["liureng_gods"]
@@ -341,9 +307,9 @@ def test_actual_three_protocols_reject_deleted_evidence_even_when_fields_hide_it
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         opts = dict(fields=["four_pillars"], strict_fields=True)
-    h = rest.post(s.rest_path, json=p, params=params)
-    m = asyncio.run(native(s, p, **opts))
-    code, c = call_cli(s, p, tmp_path, capsys, flags=flags)
+    h, m, code, c = surface_calls(
+        s, p, params=params, options=opts, flags=flags, cli_first=False
+    )
     assert h.status_code == 500 and m.is_error and code != 0
     assert all(
         v["error_code"] == "internal_error" for v in [h.json(), m.structured_content, c]
@@ -353,7 +319,7 @@ def test_actual_three_protocols_reject_deleted_evidence_even_when_fields_hide_it
 @pytest.mark.parametrize("key", ["liureng_gods", "jinkou"])
 @pytest.mark.parametrize("side", ["floor", "next_second"])
 def test_frozen_qingming_second_boundary_reaches_seasonal_table_across_protocols(
-    key, side, monkeypatch, rest, tmp_path, capsys
+    key, side, monkeypatch, tmp_path, surface_calls
 ):
     from scripts.ren.audit_ren_seconds import reference as seconds_reference
 
@@ -382,33 +348,7 @@ def test_frozen_qingming_second_boundary_reaches_seasonal_table_across_protocols
     view = "liuren_seasonal_evidence" if key == "jinkou" else "seasonal_evidence"
     fields = evidence_views(s)[view]["fields"]
     opts = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    h = rest.post(
-        s.rest_path,
-        json=p,
-        params=[
-            *[("fields", f) for f in fields],
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, c = call_cli(
-        s,
-        p,
-        tmp_path,
-        capsys,
-        flags=[
-            "--response-char-limit",
-            "0",
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-        ],
-    )
-    m = asyncio.run(native(s, p, **opts))
+    h, m, code, c = surface_calls(s, p, projection={**opts, "response_char_limit": 0})
     assert h.status_code == 200 and code == 0 and not m.is_error
     assert business(h.json()) == business(c) == business(m.structured_content)
     e = h.json()["liureng"]["seasonal_evidence"]

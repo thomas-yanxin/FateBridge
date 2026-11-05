@@ -1,16 +1,11 @@
 """Preserve revision2 engineering history; verify current revision3 delivery."""
 
-import asyncio
 import json
 from pathlib import Path
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -55,20 +50,12 @@ def test_source_voices_and_engineering_boundaries_survive_revision():
     assert curation["review_status"].endswith("external_review_pending")
 
 
-def test_revised_vocabulary_is_identical_across_rest_native_mcp_and_cli(
-    rest, tmp_path, capsys
-):
+def test_revised_vocabulary_is_identical_across_rest_native_mcp_and_cli(surface_calls):
     spec = SPECS["knowledge_read"]
     payload = {"domain": "bazi", "category": "classical_force_semantics", "key": KEY}
     options = {"include_snapshot_text": True, "response_char_limit": 0}
-    http = rest.post(spec.rest_path, json=payload, params=options)
-    mcp = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=["--include-snapshot-text", "true", "--response-char-limit", "0"],
+    http, mcp, code, cli = surface_calls(
+        spec, payload, projection=options, cli_first=False
     )
     assert http.status_code == 200 and code == 0 and not mcp.is_error
     result = http.json()

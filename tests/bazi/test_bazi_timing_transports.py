@@ -1,17 +1,11 @@
 """The corrected timing facts and their projections survive all public surfaces."""
 
-import asyncio
-
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 INPUT = dict(
     birth_year=1990,
@@ -34,16 +28,15 @@ rest = _shared_rest
 
 @pytest.mark.parametrize("key", ["dayun_analysis", "timing_analysis"])
 def test_date_selected_dayun_and_shared_evidence_agree_on_three_surfaces(
-    key, rest, tmp_path, capsys
+    key, surface_calls
 ):
     spec = SPECS[key]
-    response = rest.post(
-        spec.rest_path, json=INPUT, params={"as_of": "2026-10-12T02:00:00Z"}
+    response, protocol, code, local = surface_calls(
+        spec,
+        INPUT,
+        params={"as_of": "2026-10-12T02:00:00Z"},
+        flags=["--response-char-limit", "0"],
     )
-    code, local = call_cli(
-        spec, INPUT, tmp_path, capsys, flags=["--response-char-limit", "0"]
-    )
-    protocol = asyncio.run(native(spec, INPUT))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -66,9 +59,7 @@ def test_date_selected_dayun_and_shared_evidence_agree_on_three_surfaces(
             )
 
 
-def test_timing_relation_projection_is_supported_without_recalculating(
-    rest, tmp_path, capsys
-):
+def test_timing_relation_projection_is_supported_without_recalculating(surface_calls):
     spec = SPECS["timing_analysis"]
     fields = [
         "interaction_analysis.relations",
@@ -77,17 +68,12 @@ def test_timing_relation_projection_is_supported_without_recalculating(
         "dayun_analysis.end_at",
     ]
     options = {"fields": fields, "strict_fields": True, "include_snapshot_text": False}
-    response = rest.post(
-        spec.rest_path,
-        json=INPUT,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         INPUT,
-        tmp_path,
-        capsys,
+        params=[("fields", f) for f in fields]
+        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
+        options=options,
         flags=[
             "--fields",
             *fields,
@@ -99,7 +85,6 @@ def test_timing_relation_projection_is_supported_without_recalculating(
             "0",
         ],
     )
-    protocol = asyncio.run(native(spec, INPUT, **options))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     for output in [response.json(), local, protocol.structured_content]:
         assert output["interaction_analysis"]["relations"]
@@ -108,14 +93,10 @@ def test_timing_relation_projection_is_supported_without_recalculating(
         assert "snapshot_text" not in output
 
 
-def test_conflicting_dayun_age_and_date_are_rejected_on_every_surface(
-    rest, tmp_path, capsys
-):
+def test_conflicting_dayun_age_and_date_are_rejected_on_every_surface(surface_calls):
     spec = SPECS["dayun_analysis"]
     payload = {**INPUT, "analysis_age": 38}
-    response = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, local = surface_calls(spec, payload)
     assert response.status_code == 422 and code != 0 and protocol.is_error
 
 
@@ -131,17 +112,13 @@ def test_default_dayun_clock_is_replayable_and_explicit_age_is_clock_free(rest):
     assert aged["run_metadata"]["determinism"]["uses_current_time"] is False
 
 
-def test_before_dayun_is_a_valid_result_with_timeline_on_all_surfaces(
-    rest, tmp_path, capsys
-):
+def test_before_dayun_is_a_valid_result_with_timeline_on_all_surfaces(surface_calls):
     spec = SPECS["dayun_analysis"]
     birth = {k: v for k, v in INPUT.items() if not k.startswith("analysis_")}
     payload = {**birth, "analysis_age": 0}
-    response = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(
-        spec, payload, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    response, protocol, code, local = surface_calls(
+        spec, payload, flags=["--response-char-limit", "0"]
     )
-    protocol = asyncio.run(native(spec, payload))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     for output in [response.json(), local, protocol.structured_content]:
         assert "error" not in output
@@ -182,17 +159,15 @@ def test_partial_dayun_date_reads_only_the_default_year_from_clock(rest):
 
 @pytest.mark.parametrize("key", ["timing_analysis", "dayun_analysis"])
 def test_declared_birth_range_and_fact_receipt_agree_on_three_surfaces(
-    key, rest, tmp_path, capsys
+    key, surface_calls
 ):
     from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 
     spec = SPECS[key]
     payload = {**INPUT, "birth_time_uncertainty_minutes": 1}
-    response = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(
-        spec, payload, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    response, protocol, code, local = surface_calls(
+        spec, payload, flags=["--response-char-limit", "0"]
     )
-    protocol = asyncio.run(native(spec, payload))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -213,15 +188,13 @@ def test_declared_birth_range_and_fact_receipt_agree_on_three_surfaces(
 
 
 def test_unknown_gender_range_preserves_partial_comprehensive_result_on_three_surfaces(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
     spec = SPECS["timing_analysis"]
     payload = {**INPUT, "gender": None, "birth_time_uncertainty_minutes": 1}
-    response = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(
-        spec, payload, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    response, protocol, code, local = surface_calls(
+        spec, payload, flags=["--response-char-limit", "0"]
     )
-    protocol = asyncio.run(native(spec, payload))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])

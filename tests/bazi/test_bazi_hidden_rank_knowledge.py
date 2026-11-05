@@ -8,8 +8,6 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.knowledge_store import read_knowledge_entry
-from tests.evaluation.test_agentic_nested_outputs import SPECS, business, call_cli
-from tests.evaluation.test_agentic_nested_outputs import rest as _rest_fixture
 from tests.support.bazi_transport_reader import (
     cli_payload,
     file_payload,
@@ -17,6 +15,8 @@ from tests.support.bazi_transport_reader import (
     save_json,
     verify_identity,
 )
+from tests.support.transports import SPECS, business, call_cli
+from tests.support.transports import rest as _rest_fixture
 
 rest = _rest_fixture
 ROOT = Path(__file__).resolve().parents[2]

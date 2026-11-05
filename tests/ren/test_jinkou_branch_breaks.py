@@ -1,6 +1,5 @@
 """Printed pair membership, same-course binding, and actual public transports."""
 
-import asyncio
 import copy
 import json
 import shutil
@@ -16,14 +15,14 @@ from fatebridge.core.metaphysics.jinkou_branch_breaks import branch_breaks, pair
 from fatebridge.core.output_chinese import JinkouCourse
 from fatebridge.core.output_jinkou_breaks import JinkouBranchBreaks
 from scripts.ren.audit_jinkou_branch_breaks import CORPUS, reference
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.support.transports import (
     AS_OF,
     REST_POST_CASES,
     SPECS,
     business,
-    call_cli,
     native,
     rest,
+    surface_calls,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -119,9 +118,7 @@ def test_invalid_symbols_are_not_interpreted_as_unmatched(a, b):
 
 
 @pytest.mark.parametrize("project", [False, True])
-def test_valid_same_course_facts_survive_actual_rest_mcp_cli(
-    project, rest, tmp_path, capsys
-):
+def test_valid_same_course_facts_survive_actual_rest_mcp_cli(project, surface_calls):
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
     flags, options = ["--response-char-limit", "0"], {}
     if project:
@@ -143,9 +140,9 @@ def test_valid_same_course_facts_survive_actual_rest_mcp_cli(
             "false",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(SPEC.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(SPEC, PAYLOAD, **options))
-    code, cli = call_cli(SPEC, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        SPEC, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     assert (
         business(http.json()) == business(cli) == business(protocol.structured_content)
@@ -171,7 +168,7 @@ def test_valid_same_course_facts_survive_actual_rest_mcp_cli(
     ],
 )
 def test_faults_in_each_course_are_rejected_before_projection_on_all_ports(
-    role, project, fault, rest, monkeypatch, tmp_path, capsys
+    role, project, fault, monkeypatch, surface_calls
 ):
     bad = copy.deepcopy(raw())
     board = course(bad, role)
@@ -209,9 +206,9 @@ def test_faults_in_each_course_are_rejected_before_projection_on_all_ports(
         params.update(fields="analysis_type", strict_fields="true")
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
         options = dict(fields=["analysis_type"], strict_fields=True)
-    http = rest.post(SPEC.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(SPEC, PAYLOAD, **options))
-    code, cli = call_cli(SPEC, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        SPEC, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert cli["error_code"] == "internal_error"
 

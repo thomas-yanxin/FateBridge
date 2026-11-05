@@ -42,8 +42,8 @@ from fatebridge.utils.private_files import (
     locked_private_file,
     open_private_file,
 )
-from tests.evaluation.test_agentic_nested_outputs import SPECS, call_cli, native, rest
 from tests.support.output_facts import canonical_json
+from tests.support.transports import SPECS, native, rest, surface_calls
 
 
 @pytest.mark.parametrize(
@@ -107,13 +107,11 @@ def test_gps_coordinates_take_precedence_over_text_hints():
 )
 @pytest.mark.parametrize("clock", ["", "   "])
 def test_empty_required_clock_fails_on_every_transport(
-    key, options, clock, rest, tmp_path, capsys
+    key, options, clock, surface_calls
 ):
     spec = SPECS[key]
     payload = {"date": "2026-02-10", "time": clock, **options}
-    response = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, local = surface_calls(spec, payload)
     assert response.status_code == 400 and code == 1 and protocol.is_error
     for output in [response.json(), local, protocol.structured_content]:
         assert output["error_code"] == "validation_error"
@@ -596,12 +594,10 @@ def test_invalid_trigram_is_not_replaced_by_a_default(field, invalid):
 
 
 @pytest.mark.parametrize("field", ["taiyin", "taiyang", "shaoyang", "shaoyin"])
-def test_invalid_trigram_fails_on_all_transports(field, rest, tmp_path, capsys):
+def test_invalid_trigram_fails_on_all_transports(field, surface_calls):
     spec = SPECS["tongshefa"]
     payload = {field: "乾卦"}
-    response = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, local = surface_calls(spec, payload)
     assert response.status_code == 400 and code == 1 and protocol.is_error
     for output in [response.json(), local, protocol.structured_content]:
         assert output["error_code"] == "validation_error"

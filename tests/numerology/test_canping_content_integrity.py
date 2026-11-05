@@ -1,15 +1,14 @@
 """An unreviewed literal edit cannot inherit a reviewed revision's status."""
 
 import json
-from pathlib import Path
 
 import pytest
 
 from fatebridge.core import canping_texts as texts
 from fatebridge.utils.errors import NumerologySourceError
-from tests.evaluation.test_agentic_nested_outputs import SPECS
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest
 from tests.numerology.test_heluo_poem_transports import run_three
+from tests.support.transports import SPECS
+from tests.support.transports import rest as shared_rest
 
 rest = shared_rest
 

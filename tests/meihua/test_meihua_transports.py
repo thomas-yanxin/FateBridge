@@ -1,18 +1,10 @@
 """Mei Hua facts, declared conventions and errors agree across REST/MCP/CLI."""
 
-import asyncio
-
 import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import suggested_fields
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 INPUT = {
     "analysis_year": 2026,
@@ -37,9 +29,7 @@ INPUT = {
         ],
     ],
 )
-def test_calculation_and_partial_evidence_agree_on_all_surfaces(
-    fields, rest, tmp_path, capsys
-):
+def test_calculation_and_partial_evidence_agree_on_all_surfaces(fields, surface_calls):
     spec = SPECS["meihua_analysis"]
     fields = suggested_fields(spec) if fields == "first_view" else fields
     params = [("response_char_limit", "0")]
@@ -49,9 +39,9 @@ def test_calculation_and_partial_evidence_agree_on_all_surfaces(
         params += [("fields", f) for f in fields] + [("strict_fields", "true")]
         flags += ["--fields", *fields, "--strict-fields", "true"]
         options = {"fields": fields, "strict_fields": True}
-    response = rest.post(spec.rest_path, json=INPUT, params=params)
-    code, local = call_cli(spec, INPUT, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, INPUT, **options))
+    response, protocol, code, local = surface_calls(
+        spec, INPUT, params=params, options=options, flags=flags
+    )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -79,13 +69,11 @@ def test_calculation_and_partial_evidence_agree_on_all_surfaces(
     ],
 )
 def test_unsupported_date_and_dst_ambiguity_are_failures_on_all_surfaces(
-    changes, rest, tmp_path, capsys
+    changes, surface_calls
 ):
     spec = SPECS["meihua_analysis"]
     payload = {**INPUT, **changes}
-    response = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, local = surface_calls(spec, payload)
     assert response.status_code == 422 and code != 0 and protocol.is_error
     for output in [response.json(), local, protocol.structured_content]:
         assert output["error_code"] == "validation_error"
@@ -97,7 +85,7 @@ def test_unsupported_date_and_dst_ambiguity_are_failures_on_all_surfaces(
     [(1, 31, (1, 1, False)), (9, 24, (8, 1, True)), (10, 23, (9, 1, False))],
 )
 def test_primary_1900_calendar_edges_agree_across_surfaces(
-    month, day, expected, rest, tmp_path, capsys
+    month, day, expected, surface_calls
 ):
     spec = SPECS["meihua_analysis"]
     payload = {
@@ -111,19 +99,13 @@ def test_primary_1900_calendar_edges_agree_across_surfaces(
         "meihua.seed",
         "meihua.calendar_policy",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields] + [("strict_fields", "true")],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
+        params=[("fields", f) for f in fields] + [("strict_fields", "true")],
+        options={"fields": fields, "strict_fields": True},
         flags=["--fields", *fields, "--strict-fields", "true"],
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -141,11 +123,8 @@ def test_primary_1900_calendar_edges_agree_across_surfaces(
 
 
 def test_new_1900_prefix_keeps_the_former_negative_date_as_a_positive_reference(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
-    # TAM1900 prints 十二月初一 on Jan1 and 三十 on Jan30. The current
-    # prefix now admits Jan30: 亥12+月12+日30=54, +午7=61 => 坎/巽,动1.
-    # Keep this positive probe when moving the out-of-range test to1899-12-31.
     spec = SPECS["meihua_analysis"]
     payload = {
         **INPUT,
@@ -160,30 +139,14 @@ def test_new_1900_prefix_keeps_the_former_negative_date_as_a_positive_reference(
         "meihua.changed_hexagram.binary_code",
         "meihua.mutual_hexagram.binary_code",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *(("fields", f) for f in fields),
-            ("strict_fields", "true"),
-            ("response_char_limit", 0),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -214,10 +177,8 @@ def test_new_1900_prefix_keeps_the_former_negative_date_as_a_positive_reference(
     [(2, 9, 1, "110101", 6), (12, 31, 12, "011010", 5)],
 )
 def test_normative_2100_extension_keeps_calendar_source_and_actual_time_cast(
-    month, day, lunar_month, code, line, rest, tmp_path, capsys
+    month, day, lunar_month, code, line, surface_calls
 ):
-    # HKO's two printed month starts; year 申=9, noon 午=7. Manual seeds:
-    # 9+1+1=11, +7=18; 9+12+1=22, +7=29. Not independent astronomy.
     spec = SPECS["meihua_analysis"]
     payload = {
         **INPUT,
@@ -230,19 +191,13 @@ def test_normative_2100_extension_keeps_calendar_source_and_actual_time_cast(
         "meihua.seed",
         "meihua.base_hexagram.binary_code",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[*(("fields", f) for f in fields), ("strict_fields", "true")],
-    )
-    exit_code, local = call_cli(
+    response, protocol, exit_code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
+        params=[*(("fields", f) for f in fields), ("strict_fields", "true")],
+        options={"fields": fields, "strict_fields": True},
         flags=["--fields", *fields, "--strict-fields", "true"],
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and exit_code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])

@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_conditions import conditional_case
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_rescue_v12"
@@ -39,9 +40,8 @@ def current_control_expectation(case):
 
 def test_rescue_source_and_cases_remain_frozen():
     from fatebridge.core.liuyao_rescue import PROFILE
-    from scripts.liuyao.build_liuyao_rescue_profile import build
 
-    assert build() == PROFILE
+    assert build_profile("rescue") == PROFILE
     for name, digest in json.loads((REFERENCE / "freeze.json").read_text())[
         "sha256"
     ].items():

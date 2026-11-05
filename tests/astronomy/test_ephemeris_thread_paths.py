@@ -9,14 +9,7 @@ from types import SimpleNamespace
 import pytest
 
 from fatebridge.core import ephemeris_runtime as runtime
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, call_cli, native, rest
 
 
 @pytest.mark.parametrize("storage", ["process_global", "thread_local"])

@@ -14,11 +14,7 @@ from fastmcp.client.transports import StdioTransport
 from fatebridge.core.meihua_observation import _seed_calendar_values
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.meihua import calculate_meihua_cast
-from tests.evaluation.test_agentic_nested_outputs import (  # noqa: F401
-    SPECS,
-    call_cli,
-    rest,
-)
+from tests.support.transports import SPECS, call_cli, rest
 
 FOLDER = Path(__file__).parents[1] / "fixtures/meihua_quiet_calendar_v74"
 CASES = json.loads((FOLDER / "confirmed-label-cases24.json").read_bytes())

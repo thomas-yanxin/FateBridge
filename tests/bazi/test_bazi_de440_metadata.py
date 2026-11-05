@@ -1,20 +1,12 @@
 """Unused orbit-data failures cannot change a text lookup into a calculation."""
 
-import asyncio
-
 import pytest
 
 from fatebridge.core import de440_solar
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import AS_OF, SPECS, business, inputs
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 
 def unavailable():
@@ -26,11 +18,7 @@ rest = _shared_rest
 
 @pytest.mark.parametrize("key", ["knowledge_read", "gua_lookup"])
 def test_unobserved_default_source_is_not_resolved_for_text_tools(
-    key,
-    monkeypatch,
-    rest,
-    tmp_path,
-    capsys,
+    key, monkeypatch, surface_calls
 ):
     monkeypatch.delenv("FATEBRIDGE_SOLAR_TERM_MODEL", raising=False)
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
@@ -38,14 +26,8 @@ def test_unobserved_default_source_is_not_resolved_for_text_tools(
     spec = SPECS[key]
     payload = inputs(spec)
     opts = dict(include_snapshot_text=False, response_char_limit=0)
-    http = rest.post(spec.rest_path, json=payload, params={**opts, "as_of": AS_OF})
-    mcp = asyncio.run(native(spec, payload, **opts))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=["--include-snapshot-text", "false", "--response-char-limit", "0"],
+    http, mcp, code, cli = surface_calls(
+        spec, payload, projection=opts, cli_first=False, rest_as_of=AS_OF
     )
     assert http.status_code == 200, http.text
     assert not mcp.is_error
@@ -87,20 +69,14 @@ def test_unobserved_default_source_is_not_resolved_for_text_tools(
     ],
 )
 def test_consumed_default_source_remains_a_structured_failure(
-    key,
-    monkeypatch,
-    rest,
-    tmp_path,
-    capsys,
+    key, monkeypatch, surface_calls
 ):
     monkeypatch.delenv("FATEBRIDGE_SOLAR_TERM_MODEL", raising=False)
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     monkeypatch.setattr(de440_solar, "_profile", unavailable)
     spec = SPECS[key]
     payload = {**inputs(spec), "use_true_solar_time": False}
-    http = rest.post(spec.rest_path, json=payload)
-    mcp = asyncio.run(native(spec, payload))
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
+    http, mcp, code, cli = surface_calls(spec, payload, cli_first=False)
     assert http.status_code == 503 and mcp.is_error and code != 0
     assert (
         http.json()["error_code"]

@@ -11,13 +11,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.services.divination import calculate_meihua_analysis
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_solar_reference_v1"
 READING = json.loads((FIXTURE / "source-reading.json").read_text())
@@ -217,9 +211,7 @@ def test_actual_service_explains_disagreement_without_replacing_instant_or_cast(
 
 
 @pytest.mark.parametrize("topic", ["general", "weather"])
-def test_new_layer_projects_identically_on_rest_native_mcp_cli(
-    topic, rest, tmp_path, capsys
-):
+def test_new_layer_projects_identically_on_rest_native_mcp_cli(topic, surface_calls):
     payload = {
         "analysis_year": 1912,
         "analysis_month": 11,
@@ -235,29 +227,14 @@ def test_new_layer_projects_identically_on_rest_native_mcp_cli(
         "summary",
     ]
     spec = SPECS["meihua_analysis"]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *(("fields", f) for f in fields),
-            ("strict_fields", "true"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
+        cli_first=False,
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (

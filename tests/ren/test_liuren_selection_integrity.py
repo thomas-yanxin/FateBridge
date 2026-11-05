@@ -1,6 +1,5 @@
 """Nine-method evidence cannot contradict the returned day and sky board."""
 
-import asyncio
 import copy
 import importlib.util
 import json
@@ -13,14 +12,7 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.core.output_chinese import Liuren
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    REST_POST_CASES,
-    SPECS,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, REST_POST_CASES, SPECS, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 MODULE = importlib.util.spec_from_file_location(
@@ -103,7 +95,7 @@ def test_primary_printed_harm_counts_and_transmissions(case):
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_full_nine_method_facts_reject_faults_before_projection_on_three_ports(
-    key, fault, project, rest, monkeypatch, tmp_path, capsys
+    key, fault, project, monkeypatch, surface_calls
 ):
     spec = SPECS[key]
     bad = AUDIT.corrupt(output(key), key, fault)
@@ -126,9 +118,9 @@ def test_full_nine_method_facts_reject_faults_before_projection_on_three_ports(
         params.update(fields="analysis_type", strict_fields="true")
         opts.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(spec.rest_path, json=payload(key), params=params)
-    protocol = asyncio.run(native(spec, payload(key), **opts))
-    code, cli = call_cli(spec, payload(key), tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec, payload(key), params=params, options=opts, flags=flags, cli_first=False
+    )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert cli["error_code"] == "internal_error"
 
@@ -136,7 +128,7 @@ def test_full_nine_method_facts_reject_faults_before_projection_on_three_ports(
 @pytest.mark.parametrize("key", PROTOCOL["tools"])
 @pytest.mark.parametrize("project", [False, True])
 def test_valid_four_entry_points_preserve_all_nine_method_evidence(
-    key, project, rest, tmp_path, capsys
+    key, project, surface_calls
 ):
     spec = SPECS[key]
     fields = [
@@ -153,9 +145,9 @@ def test_valid_four_entry_points_preserve_all_nine_method_evidence(
         params += [("fields", p) for p in fields] + [("strict_fields", "true")]
         opts.update(fields=fields, strict_fields=True)
         flags += ["--fields", *fields, "--strict-fields", "true"]
-    http = rest.post(spec.rest_path, json=payload(key), params=params)
-    protocol = asyncio.run(native(spec, payload(key), **opts))
-    code, cli = call_cli(spec, payload(key), tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec, payload(key), params=params, options=opts, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     for body in [http.json(), protocol.structured_content, cli]:
         for name in [

@@ -1,6 +1,5 @@
 """Nominal completed trines acquire seasonal facts without changing their parts."""
 
-import asyncio
 import copy
 import hashlib
 import json
@@ -18,13 +17,7 @@ from fatebridge.core.output_chinese import Liuren
 from fatebridge.core.output_liuren_trine_seasonal import LiurenNominalTrineSeasonal
 from scripts.ren.audit_liuren_seasonal import seed_for
 from scripts.ren.audit_liuren_trine_seasonal import CORPUS, FIELD, audit, reference
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 PAYLOADS = json.loads((ROOT / "tests/fixtures/ren_anchors_v1/faults.json").read_text())[
@@ -190,43 +183,21 @@ def test_coarse_same_group_cannot_mask_a_wrong_literal_power(monkeypatch):
     "key", ["liureng_gods", "liureng_runyear", "jinkou", "sanshiunited"]
 )
 def test_all_four_entrypoints_deliver_new_context_identically_on_three_ports(
-    key, rest, tmp_path, capsys
+    key, surface_calls
 ):
     spec = SPECS[key]
     fields = [
         "liureng.transmission_relations.trines",
         "liureng.seasonal_evidence.month_branch",
     ]
-    params = [("fields", f) for f in fields] + [
-        ("strict_fields", "true"),
-        ("include_snapshot_text", "false"),
-        ("response_char_limit", "0"),
-    ]
-    http = rest.post(spec.rest_path, json=PAYLOADS[key], params=params)
-    mcp = asyncio.run(
-        native(
-            spec,
-            PAYLOADS[key],
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
-    code, cli = call_cli(
+    http, mcp, code, cli = surface_calls(
         spec,
         PAYLOADS[key],
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
+        cli_first=False,
     )
     assert http.status_code == 200 and not mcp.is_error and code == 0
     assert business(http.json()) == business(mcp.structured_content) == business(cli)
@@ -236,7 +207,7 @@ def test_all_four_entrypoints_deliver_new_context_identically_on_three_ports(
 @pytest.mark.parametrize("fault", ["delete", "forge"])
 @pytest.mark.parametrize("project", [False, True])
 def test_full_result_cannot_hide_missing_or_forged_new_evidence_before_projection(
-    fault, project, rest, monkeypatch, tmp_path, capsys
+    fault, project, monkeypatch, surface_calls
 ):
     spec = SPECS["liureng_gods"]
     fn, args, kwargs = spec.bind(
@@ -275,9 +246,14 @@ def test_full_result_cannot_hide_missing_or_forged_new_evidence_before_projectio
         params.update(fields="analysis_type", strict_fields="true")
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
         options.update(fields=fields, strict_fields=True)
-    http = rest.post(spec.rest_path, json=PAYLOADS["liureng_gods"], params=params)
-    mcp = asyncio.run(native(spec, PAYLOADS["liureng_gods"], **options))
-    code, cli = call_cli(spec, PAYLOADS["liureng_gods"], tmp_path, capsys, flags=flags)
+    http, mcp, code, cli = surface_calls(
+        spec,
+        PAYLOADS["liureng_gods"],
+        params=params,
+        options=options,
+        flags=flags,
+        cli_first=False,
+    )
     assert (
         http.status_code == 500
         and mcp.is_error

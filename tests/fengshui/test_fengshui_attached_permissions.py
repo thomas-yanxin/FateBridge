@@ -1,18 +1,10 @@
 """Actual motion of attached items requires its own explicit permission."""
 
-import asyncio
-
 import pytest
 
 from fatebridge.services.fengshui import assess
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.fengshui.test_fengshui_rotation_invariance import payload_for
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 
 def attached_request(kind, value, *, unchanged=False):
@@ -136,18 +128,18 @@ def test_unchanged_attached_items_do_not_require_any_action_permission(value):
 
 @pytest.mark.parametrize("kind", ["can_relocate", "can_rotate"])
 def test_unknown_attached_action_is_conditional_on_actual_three_transports(
-    kind, rest, tmp_path, capsys
+    kind, surface_calls
 ):
     spec = SPECS["fengshui_assess"]
     payload = attached_request(kind, None)
     fields = ["layout_analysis"]
-    response = rest.post(
-        spec.rest_path, json=payload, params={"fields": fields, "strict_fields": True}
+    response, protocol, code, cli = surface_calls(
+        spec,
+        payload,
+        params={"fields": fields, "strict_fields": True},
+        options={"fields": fields, "strict_fields": True},
+        flags=("--fields", *fields, "--strict-fields"),
     )
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, flags=("--fields", *fields, "--strict-fields")
-    )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error
     actual = business(response.json())

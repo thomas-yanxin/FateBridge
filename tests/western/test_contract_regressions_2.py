@@ -16,12 +16,13 @@ from fatebridge.core.astro.parts import _build_houses
 from fatebridge.core.output_western import PlanetaryEventHistory
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.house_systems import house_system_fields, normalize_house_system
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.support.transports import (
     SPECS,
     business,
     call_cli,
     native,
     rest,
+    surface_calls,
 )
 from tests.western.test_western_accuracy import BIRTH
 from tests.western.test_western_election import CANDIDATE
@@ -34,7 +35,7 @@ from tests.western.test_western_horizon_precision import EXPECTED, PUBLIC, separ
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
 @pytest.mark.parametrize("unavailable", [False, True])
 def test_native_election_fact_and_unknown_states_agree_across_transports(
-    project, zodiac, unavailable, rest, monkeypatch, tmp_path, capsys
+    project, zodiac, unavailable, monkeypatch, surface_calls
 ):
     if unavailable:
         monkeypatch.setattr(
@@ -78,9 +79,9 @@ def test_native_election_fact_and_unknown_states_agree_across_transports(
             "strict_fields": True,
             "include_snapshot_text": False,
         }
-    response = rest.post(spec.rest_path, json=payload, params=params)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, payload, **kwargs))
+    response, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=kwargs, flags=flags
+    )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     results = [response.json(), cli, protocol.structured_content]
     assert business(results[0]) == business(results[1]) == business(results[2])
@@ -117,7 +118,7 @@ def test_native_election_fact_and_unknown_states_agree_across_transports(
 
 
 def test_source_consistency_failure_is_error_not_partial_favourable_score(
-    rest, monkeypatch, tmp_path, capsys
+    monkeypatch, surface_calls
 ):
     def changed(subject):
         raise EphemerisSourceError("physical_configuration_changed")
@@ -125,9 +126,7 @@ def test_source_consistency_failure_is_error_not_partial_favourable_score(
     monkeypatch.setattr(engine, "native_lunar_contacts", changed)
     spec = SPECS["astro_election"]
     payload = {**CANDIDATE, "topic_id": "general"}
-    response = rest.post(spec.rest_path, json=payload)
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, cli = surface_calls(spec, payload)
     assert response.status_code == 503 and code != 0 and protocol.is_error
     for result in [response.json(), cli, protocol.structured_content]:
         assert result["error_code"] == "ephemeris_source_inconsistent"
@@ -207,10 +206,8 @@ def test_audit_cannot_pass_unavailable_events_as_an_empty_success(monkeypatch):
 @pytest.mark.parametrize("project", [False, True])
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
 def test_event_histories_and_conditions_match_rest_native_mcp_cli(
-    project, zodiac, rest, tmp_path, capsys, monkeypatch
+    project, zodiac, tmp_path, monkeypatch, surface_calls
 ):
-    # This is the explicit native fallback contract. Strict complete-position
-    # derivatives and their unavailable coverage are tested separately.
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.delenv("FATEBRIDGE_JPL_FILE", raising=False)
     spec = SPECS["astro_horary"]
@@ -233,9 +230,9 @@ def test_event_histories_and_conditions_match_rest_native_mcp_cli(
             "false",
         ]
         kwargs = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    response = rest.post(spec.rest_path, json=inputs, params=params)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, flags=flags)
-    mcp = asyncio.run(native(spec, inputs, **kwargs))
+    response, mcp, code, cli = surface_calls(
+        spec, inputs, params=params, options=kwargs, flags=flags
+    )
     assert response.status_code == 200 and code == 0 and not mcp.is_error
     outputs = [response.json(), cli, mcp.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -350,7 +347,7 @@ def test_named_solar_policy_view_keeps_definition_and_textual_conflict_together(
 
 @pytest.mark.parametrize("project", [False, True])
 def test_native_lunar_events_and_unverified_conditions_match_three_transports(
-    project, rest, tmp_path, capsys
+    project, surface_calls
 ):
     spec = SPECS["astro_horary"]
     payload = {**QUESTION, "category": "general"}
@@ -376,9 +373,9 @@ def test_native_lunar_events_and_unverified_conditions_match_three_transports(
             "strict_fields": True,
             "include_snapshot_text": False,
         }
-    response = rest.post(spec.rest_path, json=payload, params=params)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, payload, **kwargs))
+    response, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=kwargs, flags=flags
+    )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), cli, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -441,7 +438,7 @@ def test_published_horary_description_matches_actual_cast_and_verification_scope
 @pytest.mark.parametrize("hsys", [0, 2, 6])
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_precision_receipt_and_coordinates_survive_all_local_surfaces(
-    hsys, zodiacal, rest, tmp_path, capsys
+    hsys, zodiacal, surface_calls
 ):
     case = PUBLIC[0]
     spec = SPECS["astro_chart"]
@@ -463,17 +460,16 @@ def test_precision_receipt_and_coordinates_survive_all_local_surfaces(
         "houses",
         "summary",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", path) for path in fields]
-        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
-    )
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
+        params=[("fields", path) for path in fields]
+        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
         flags=[
             "--fields",
             *fields,
@@ -482,15 +478,6 @@ def test_precision_receipt_and_coordinates_survive_all_local_surfaces(
             "--response-char-limit",
             "0",
         ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), cli, protocol.structured_content]
@@ -512,7 +499,7 @@ def test_precision_receipt_and_coordinates_survive_all_local_surfaces(
 
 
 def test_unresolved_endpoint_rejects_even_an_unrelated_projection_on_all_surfaces(
-    monkeypatch, rest, tmp_path, capsys
+    monkeypatch, surface_calls
 ):
     from fatebridge.core.astro import house_axes
 
@@ -536,27 +523,22 @@ def test_unresolved_endpoint_rejects_even_an_unrelated_projection_on_all_surface
     flags = dict(
         fields=["person_info.name"], strict_fields=True, include_snapshot_text=False
     )
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
         params=[
             ("fields", "person_info.name"),
             ("strict_fields", "true"),
             ("include_snapshot_text", "false"),
         ],
-    )
-    protocol = asyncio.run(native(spec, payload, **flags))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
+        options=flags,
         flags=[
             "--fields",
             "person_info.name",
             "--strict-fields",
             "--no-include-snapshot-text",
         ],
+        cli_first=False,
     )
     assert http.status_code == 503 and protocol.is_error and code == 1
     for value in [http.json(), json.loads(protocol.content[0].text), cli]:
@@ -626,18 +608,15 @@ def test_equal_mc_uses_its_tenth_cusp_name():
 
 
 @pytest.mark.parametrize("key", ["astro_chart", "astro_chart13"])
-def test_equal_mc_tenth_cusp_and_canonical_label_on_all_transports(
-    key, rest, tmp_path, capsys
-):
+def test_equal_mc_tenth_cusp_and_canonical_label_on_all_transports(key, surface_calls):
     spec = SPECS[key]
     payload = {**BIRTH, "hsys": 8}
-    response = rest.post(
-        spec.rest_path, json=payload, params={"response_char_limit": 0}
+    response, mcp, code, cli = surface_calls(
+        spec,
+        payload,
+        params={"response_char_limit": 0},
+        flags=["--response-char-limit", "0"],
     )
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, flags=["--response-char-limit", "0"]
-    )
-    mcp = asyncio.run(native(spec, payload))
     assert response.status_code == 200 and code == 0 and not mcp.is_error
     assert (
         business(response.json()) == business(cli) == business(mcp.structured_content)

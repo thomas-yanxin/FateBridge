@@ -1,6 +1,5 @@
 """Explicit file-backed crossings retain the original one-second TT gate."""
 
-import asyncio
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -16,14 +15,8 @@ from fatebridge.core.ephemeris_runtime import (
     configured_ephemeris_path,
 )
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.ren.test_ren_calendar_guard import references
+from tests.support.transports import SPECS, business, native, rest, surface_calls
 
 EPHE = Path(__file__).resolve().parents[2] / "ephe"
 
@@ -212,7 +205,7 @@ def test_canping_swiss_preserves_full_schedule_or_fails_without_substitution(
 @pytest.mark.parametrize("available", [False, True])
 @pytest.mark.local_data
 def test_swiss_success_and_data_failure_agree_on_three_transports(
-    swiss_environment, monkeypatch, available, rest, tmp_path, capsys
+    swiss_environment, monkeypatch, available, tmp_path, surface_calls
 ):
     monkeypatch.setenv("SE_EPHE_PATH", str(EPHE if available else tmp_path))
     spec = SPECS["liureng_gods"]
@@ -231,23 +224,8 @@ def test_swiss_success_and_data_failure_agree_on_three_transports(
         response_char_limit=0,
         include_snapshot_text=False,
     )
-    response = rest.post(spec.rest_path, json=payload, params=options)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-            "--include-snapshot-text",
-            "false",
-        ],
+    response, protocol, code, cli = surface_calls(
+        spec, payload, projection=options, cli_first=False
     )
     outputs = [response.json(), protocol.structured_content, cli]
     if not available:

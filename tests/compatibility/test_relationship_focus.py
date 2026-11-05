@@ -4,15 +4,9 @@ import pytest
 
 from fatebridge.core.astro.relationship import relationship_focus_block
 from fatebridge.services.astrology import calculate_relative_chart_analysis
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.fixtures.surface_payloads import astro_payload
 from tests.support.relationship_inputs import payloads
+from tests.support.transports import SPECS, business, call_cli, native, rest
 
 
 def test_relationship_focus_block_romance_filters_to_significators():

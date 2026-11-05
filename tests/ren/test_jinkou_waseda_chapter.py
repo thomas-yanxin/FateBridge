@@ -1,6 +1,5 @@
 """The second witness is a bounded, incomplete chapter, not 64 clean answers."""
 
-import asyncio
 import hashlib
 import json
 from pathlib import Path
@@ -8,14 +7,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.application.execution import OutputContractError, validate_output
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/jinkou_waseda_chapter_v1"
@@ -133,7 +125,7 @@ def test_trace_keeps_its_existing_summary_without_inventing_a_second_inventory()
 @pytest.mark.parametrize("annual", [False, True])
 @pytest.mark.parametrize("project", [False, True])
 def test_chapter_source_and_nulls_survive_all_three_ports(
-    annual, project, rest, tmp_path, capsys
+    annual, project, surface_calls
 ):
     payload = dict(PAYLOAD)
     if annual:
@@ -161,9 +153,9 @@ def test_chapter_source_and_nulls_survive_all_three_ports(
             "false",
         ]
         opts.update(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(SPEC.rest_path, json=payload, params=params)
-    mcp = asyncio.run(native(SPEC, payload, **opts))
-    code, cli = call_cli(SPEC, payload, tmp_path, capsys, flags=flags)
+    http, mcp, code, cli = surface_calls(
+        SPEC, payload, params=params, options=opts, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not mcp.is_error and code == 0
     assert business(http.json()) == business(mcp.structured_content) == business(cli)
     for body in [http.json(), mcp.structured_content, cli]:

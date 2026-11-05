@@ -1,4 +1,3 @@
-import asyncio
 import json
 from fractions import Fraction
 
@@ -21,14 +20,8 @@ from fatebridge.services.divination import (
     calculate_suzhan_analysis,
     calculate_tongshefa_analysis,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.fixtures.transports import mcp_text
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 
 def _expected_offline_engine() -> tuple[str, str]:
@@ -553,7 +546,7 @@ def test_calculate_suzhan_analysis_returns_chart_and_snapshot():
 
 
 @pytest.mark.parametrize("mansion_method", ["equatorial_research28", "legacy_equal28"])
-def test_suzhan_uses_shared_local_chart_runtime(mansion_method, rest, tmp_path, capsys):
+def test_suzhan_uses_shared_local_chart_runtime(mansion_method, surface_calls):
     local_chart = _build_local_chart_response(
         date_text="2028-04-06",
         time_text="09:33:00",
@@ -636,13 +629,13 @@ def test_suzhan_uses_shared_local_chart_runtime(mansion_method, rest, tmp_path, 
     )
     spec = SPECS["suzhan"]
     fields = ["params.su28Method", "chart", "astronomy"]
-    response = rest.post(
-        spec.rest_path, json=payload, params={"fields": fields, "strict_fields": True}
+    response, protocol, code, cli = surface_calls(
+        spec,
+        payload,
+        params={"fields": fields, "strict_fields": True},
+        options={"fields": fields, "strict_fields": True},
+        flags=("--fields", *fields, "--strict-fields"),
     )
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, flags=("--fields", *fields, "--strict-fields")
-    )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error
     assert (

@@ -1,21 +1,14 @@
 """Related contract regressions with shared imports; original cases retained."""
 
-import asyncio
 from datetime import date
 
 import pytest
 
 from scripts.liuyao import audit_liuyao_1900 as primary
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.liuyao.test_liuyao_civil_windows import PUBLIC, ROOT, assert_public_windows
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
 from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 
 def test_full_1900_supported_cohort_matches_frozen_primary_cells_and_day_anchor():
@@ -218,26 +211,16 @@ def test_window_container_keeps_exact_component_count_and_durations(
         ] == [86400, 3600, 1800, 86400]
 
 
-def test_array_leaf_projection_is_rejected_by_the_existing_contract(
-    rest, tmp_path, capsys
-):
+def test_array_leaf_projection_is_rejected_by_the_existing_contract(surface_calls):
     spec = SPECS["sixyao"]
     case = PUBLIC["cases"][-1]
     field = ROOT + ".windows.civil_interval.duration_seconds"
-    response = rest.post(
-        spec.rest_path,
-        json=case["input"],
-        params={"fields": field, "strict_fields": "true"},
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         case["input"],
-        tmp_path,
-        capsys,
+        params={"fields": field, "strict_fields": "true"},
+        options={"fields": [field], "strict_fields": True},
         flags=["--fields", field, "--strict-fields", "true"],
-    )
-    protocol = asyncio.run(
-        native(spec, case["input"], fields=[field], strict_fields=True)
     )
     assert response.status_code == 422 and code == 1 and protocol.is_error
     for body in [response.json(), local, protocol.structured_content]:
@@ -577,7 +560,7 @@ def test_same_run_hidden_text_distinguishes_flying_void_from_its_support_alterna
 
 @pytest.mark.parametrize("valid", [True, False])
 def test_month_break_nested_projection_accepts_facts_and_rejects_typos(
-    valid, rest, tmp_path, capsys
+    valid, surface_calls
 ):
     spec = SPECS["sixyao"]
     payload = dict(
@@ -601,31 +584,13 @@ def test_month_break_nested_projection_accepts_facts_and_rejects_typos(
         if valid
         else [root + "day_value_excpetion"]
     )
-    params = [("fields", field) for field in fields] + [
-        ("strict_fields", "true"),
-        ("include_snapshot_text", "false"),
-        ("response_char_limit", 0),
-    ]
-    flags = [
-        "--fields",
-        *fields,
-        "--strict-fields",
-        "true",
-        "--include-snapshot-text",
-        "false",
-        "--response-char-limit",
-        "0",
-    ]
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
     if not valid:
         assert http.status_code == 422 and code == 1 and protocol.is_error

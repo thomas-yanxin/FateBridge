@@ -2,9 +2,6 @@
 
 import hashlib
 import json
-import os
-import subprocess
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -201,31 +198,6 @@ def test_grid_version_drift_rejects_old_case_placement(tmp_path, monkeypatch, fi
     monkeypatch.setattr(module, "OPPOSITE_EXAMPLES", path)
     with pytest.raises(ValueError, match="重新核读"):
         module.audit_opposite_examples(module.NLC166_PALACES)
-
-
-@pytest.mark.parametrize("key", module.PROFILES)
-def test_actual_research_cli_with_selected_version_and_rejection_of_mixed_inputs(key):
-    env = dict(os.environ, PYTHONPATH=str(ROOT / "src"))
-    args = [
-        sys.executable,
-        str(ROOT / "scripts/guolao/audit_guolao_coordinates.py"),
-        "--profile",
-        key,
-        "--audit-opposite-examples",
-    ]
-    success = subprocess.run(args, env=env, text=True, capture_output=True, check=True)
-    assert json.loads(success.stdout)[
-        "opposite_degree_candidates"
-    ] == module.audit_opposite_examples(module.PROFILES[key])
-    failure = subprocess.run(
-        [*args, "--palace", "子", "--degree", "6"],
-        env=env,
-        text=True,
-        capture_output=True,
-    )
-    assert (
-        failure.returncode != 0 and not failure.stdout and "不可混用" in failure.stderr
-    )
 
 
 @pytest.mark.parametrize(

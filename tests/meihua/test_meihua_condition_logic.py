@@ -1,6 +1,5 @@
 """Known-false source prerequisites cannot become unknown from missing intent."""
 
-import asyncio
 import hashlib
 import json
 from pathlib import Path
@@ -9,13 +8,7 @@ import pytest
 
 from fatebridge.core.meihua_stage_emphasis import _scenario_conditions
 from fatebridge.services.meihua import calculate_meihua_cast
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_condition_logic_v2"
 TRUTH = json.loads((FIXTURE / "truth-table.json").read_text())["rows"]
@@ -121,9 +114,7 @@ def test_each_actual_geometry_under_all_three_scenario_states(case):
 
 @pytest.mark.parametrize("scenario", [None, "favorable_matter", "unfavorable_matter"])
 @pytest.mark.parametrize("tool", ["meihua_cast", "meihua_analysis"])
-def test_strict_projection_agrees_on_rest_mcp_cli(
-    tool, scenario, rest, tmp_path, capsys
-):
+def test_strict_projection_agrees_on_rest_mcp_cli(tool, scenario, surface_calls):
     spec = SPECS[tool]
     payload = (
         {"casting": {"method": "existing", "hexagram_code": "000000", "moving_line": 1}}
@@ -139,42 +130,16 @@ def test_strict_projection_agrees_on_rest_mcp_cli(
     if scenario is not None:
         payload["matter_scenario"] = scenario
     fields = ["interpretation.stage_emphasis", "meihua.stage_relations"]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    assert response.status_code == 200, response.text
-    mcp = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
-    code, cli = call_cli(
+    response, mcp, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
+        cli_first=False,
     )
+    assert response.status_code == 200, response.text
     assert code == 0 and not mcp.is_error
     assert (
         business(response.json()) == business(mcp.structured_content) == business(cli)

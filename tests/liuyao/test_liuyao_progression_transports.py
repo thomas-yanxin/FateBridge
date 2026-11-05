@@ -1,19 +1,13 @@
 """Explicit horizons and unresolved progression survive all three transports."""
 
-import asyncio
 import json
 
 import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.cli import run as cli_run
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
 from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.transports import SPECS, business, surface_calls
 
 PAYLOAD = {
     "date": "2026-08-07",
@@ -35,13 +29,7 @@ PAYLOAD = {
 )
 @pytest.mark.parametrize("invalid_array_leaf", [False, True])
 def test_progression_uses_shared_whole_array_projection_contract(
-    horizon,
-    state,
-    now,
-    invalid_array_leaf,
-    rest,
-    tmp_path,
-    capsys,
+    horizon, state, now, invalid_array_leaf, surface_calls
 ):
     spec = SPECS["sixyao"]
     payload = {**PAYLOAD, **({"event_horizon": horizon} if horizon else {})}
@@ -51,40 +39,13 @@ def test_progression_uses_shared_whole_array_projection_contract(
         if invalid_array_leaf
         else [f"{root}.lines", f"{root}.role_effects"]
     )
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
     if invalid_array_leaf:
         # The shared API selects arrays whole, never by implicit traversal.
@@ -118,12 +79,10 @@ def test_explicit_horizon_flag_and_snapshot_keep_the_computed_condition(capsys):
     assert "第5爻退神配对：近事有扶，按已列条件不退" in output["snapshot_text"]
 
 
-def test_invalid_horizon_is_rejected_by_rest_mcp_and_cli(rest, tmp_path, capsys):
+def test_invalid_horizon_is_rejected_by_rest_mcp_and_cli(surface_calls):
     spec = SPECS["sixyao"]
     payload = {**PAYLOAD, "event_horizon": "guess"}
-    response = rest.post(spec.rest_path, json=payload)
-    code, _ = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, _ = surface_calls(spec, payload)
     assert response.status_code == 422 and code != 0 and protocol.is_error
 
 

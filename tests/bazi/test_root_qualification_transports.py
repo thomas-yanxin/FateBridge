@@ -1,21 +1,15 @@
 """The public chart and its explanation consume one surviving-root receipt."""
 
-import asyncio
 from fractions import Fraction as Q
 
 from fatebridge.application.examples import evidence_views
 from fatebridge.core.output_root_qualification import RootQualification
 from fatebridge.core.root_qualification import root_qualification_snapshot_lines
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
 from tests.support.bazi_strength_reference_v3 import (
     assert_current_assessment_arithmetic,
 )
+from tests.support.transports import SPECS, business, surface_calls
 
 PAYLOAD = {
     "name": "虚构阳长生根回归",
@@ -34,16 +28,15 @@ PAYLOAD = {
 
 
 def test_public_root_qualification_receipt_text_and_claims_match_on_all_transports(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
     spec = SPECS["bazi_birth"]
-    response = rest.post(
-        spec.rest_path, json=PAYLOAD, params={"response_char_limit": 0}
+    response, protocol, code, local = surface_calls(
+        spec,
+        PAYLOAD,
+        params={"response_char_limit": 0},
+        flags=["--response-char-limit", "0"],
     )
-    code, local = call_cli(
-        spec, PAYLOAD, tmp_path, capsys, flags=["--response-char-limit", "0"]
-    )
-    protocol = asyncio.run(native(spec, PAYLOAD))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     result = response.json()
     assert business(result) == business(local) == business(protocol.structured_content)

@@ -9,14 +9,8 @@ from pathlib import Path
 import pytest
 
 import fatebridge.application.execution as execution
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest_fixture
+from tests.support.transports import AS_OF, SPECS, business, call_cli, native
+from tests.support.transports import rest as shared_rest_fixture
 
 rest = shared_rest_fixture
 ROOT = Path(__file__).resolve().parents[2]

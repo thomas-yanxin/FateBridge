@@ -1,10 +1,7 @@
 """Reported source categories resolve before arithmetic, never from a story."""
 
-import asyncio
 import hashlib
 import json
-import subprocess
-import sys
 from copy import deepcopy
 from pathlib import Path
 
@@ -13,14 +10,8 @@ from pydantic import ValidationError
 
 from fatebridge.core.requests.meihua import MeihuaCastRequest
 from fatebridge.services.meihua import calculate_meihua_cast
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.meihua.test_meihua_external import at_path
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_observed_categories_v1"
 CASES = json.loads((FIXTURE / "cases.json").read_text())["cases"]
@@ -243,46 +234,20 @@ def test_profile_copy_does_not_change_future_mappings():
     assert observed_category_profile()["subjects"]["dry_wood"]["number"] == 3
 
 
-def test_new_category_method_agrees_on_rest_native_mcp_and_cli(rest, tmp_path, capsys):
+def test_new_category_method_agrees_on_rest_native_mcp_and_cli(surface_calls):
     from fatebridge.application.examples import suggested_fields
 
     spec = SPECS["meihua_cast"]
     payload = {"casting": ORIGINAL[4]["input"]}
     fields = suggested_fields(spec, view="observation_source")
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    mcp = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
-    code, cli = call_cli(
+    response, mcp, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
+        cli_first=False,
     )
     assert response.status_code == 200 and code == 0 and not mcp.is_error
     assert (

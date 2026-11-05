@@ -9,7 +9,7 @@ import pytest
 
 from fatebridge.core.liuyao_metal_change import PROFILE as OWN_PROFILE
 from fatebridge.core.liuyao_metal_moving import PROFILE, moving_support_context
-from scripts.liuyao.build_liuyao_metal_moving_profile import build
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_conditions import conditional_case
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_metal_moving_v34"
@@ -117,7 +117,7 @@ def check(result, case):
 
 
 def test_original_book_profile_and_preregistered_inputs():
-    assert build() == PROFILE
+    assert build_profile("metal_moving") == PROFILE
     frozen = json.loads((BASE / "freeze.json").read_text())["files_sha256"]
     for name, h in frozen.items():
         assert hashlib.sha256((BASE / name).read_bytes()).hexdigest() == h

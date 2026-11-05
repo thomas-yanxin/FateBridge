@@ -16,14 +16,8 @@ from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.timing import TimingAnalysis
 from tests.bazi.test_bazi_solar_provider import clear_solar_caches
 from tests.bazi.test_bazi_year_contract import TOPICS
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business, call_cli, inputs, native
+from tests.support.transports import rest as _shared_rest
 
 
 @pytest.fixture

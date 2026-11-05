@@ -1,6 +1,5 @@
 """Whole-ledger consistency is checked before any output field projection."""
 
-import asyncio
 import copy
 import importlib.util
 import json
@@ -13,15 +12,7 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.core.output_chinese import JinkouPatterns
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, inputs, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -65,7 +56,7 @@ def test_integrity_inventory_cannot_hide_a_precommitted_probe(tmp_path, change):
 @pytest.mark.parametrize("name", FAULTS)
 @pytest.mark.parametrize("project", [False, True])
 def test_conflicting_ledger_facts_fail_on_all_three_transports_before_projection(
-    name, project, rest, monkeypatch, tmp_path, capsys
+    name, project, monkeypatch, surface_calls
 ):
     spec = SPECS["jinkou"]
     # Keep a complete valid business envelope. A patterns-only payload would
@@ -101,9 +92,9 @@ def test_conflicting_ledger_facts_fail_on_all_three_transports_before_projection
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(spec.rest_path, json=inputs(spec), params=params)
-    protocol = asyncio.run(native(spec, inputs(spec), **options))
-    code, output = call_cli(spec, inputs(spec), tmp_path, capsys, flags=flags)
+    http, protocol, code, output = surface_calls(
+        spec, inputs(spec), params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert output["error_code"] == "internal_error"
     assert output["status_code"] == 500 and output["trace_id"] == "ledger-integrity"
@@ -129,9 +120,7 @@ def test_conflicting_ledger_facts_fail_on_all_three_transports_before_projection
         "jinkou.patterns.complete_classical_conformance",
     ],
 )
-def test_actual_sparse_projections_still_agree_across_transports(
-    field, rest, tmp_path, capsys
-):
+def test_actual_sparse_projections_still_agree_across_transports(field, surface_calls):
     spec = SPECS["jinkou"]
     payload = inputs(spec)
     params = dict(
@@ -141,21 +130,15 @@ def test_actual_sparse_projections_still_agree_across_transports(
         response_char_limit=0,
         as_of=AS_OF,
     )
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=[field],
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
+        params=params,
+        options={
+            "fields": [field],
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
         flags=[
             "--fields",
             field,
@@ -166,6 +149,7 @@ def test_actual_sparse_projections_still_agree_across_transports(
             "--response-char-limit",
             "0",
         ],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     bodies = [http.json(), protocol.structured_content, cli]

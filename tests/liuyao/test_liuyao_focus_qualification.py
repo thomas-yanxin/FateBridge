@@ -1,6 +1,5 @@
 """The actual focused source and target remain distinct in every delivery."""
 
-import asyncio
 import hashlib
 import json
 from pathlib import Path
@@ -9,15 +8,9 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
 from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_focus_v25"
 CASES = json.loads((REFERENCE / "cases.json").read_text())["cases"]
@@ -154,23 +147,15 @@ def test_focused_qualification_is_recovered_from_the_same_hash_verified_run(
         assert reconstruct(store, result_id, ROOT + ".focus") == detail["focus"]
 
 
-def test_misspelled_new_source_leaf_is_rejected_consistently(rest, tmp_path, capsys):
+def test_misspelled_new_source_leaf_is_rejected_consistently(surface_calls):
     spec = SPECS["sixyao"]
     field = ROOT + ".focus.source_conditon_match"
-    response = rest.post(
-        spec.rest_path,
-        json=payload(CASES[0]),
-        params={"fields": field, "strict_fields": "true"},
-    )
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         payload(CASES[0]),
-        tmp_path,
-        capsys,
+        params={"fields": field, "strict_fields": "true"},
+        options={"fields": [field], "strict_fields": True},
         flags=["--fields", field, "--strict-fields", "true"],
-    )
-    protocol = asyncio.run(
-        native(spec, payload(CASES[0]), fields=[field], strict_fields=True)
     )
     assert response.status_code == 422 and code == 1 and protocol.is_error
     for result in [response.json(), cli, protocol.structured_content]:

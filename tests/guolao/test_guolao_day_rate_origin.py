@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import runpy
-import sys
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -151,19 +149,3 @@ def test_audit_counts_empty_position_separately_from_numeric_source_cells():
     assert cumulative["day_rate_origin_policy"] == rate.ORIGIN_POLICY
     assert cumulative["empty_day_rate_origin_interpreted_as_zero_at_boundary1"]
     assert cumulative["nonzero_boundary_jumps"] == 21
-
-
-@pytest.mark.parametrize(
-    "script", ["audit_guolao_day_rate.py", "audit_guolao_cumulative.py"]
-)
-def test_both_cli_outputs_distinguish_printed_empty_from_calculation_zero(
-    monkeypatch, capsys, script
-):
-    monkeypatch.setattr(sys, "argv", [script, "--anomaly-days", ".041"])
-    with pytest.raises(SystemExit) as exited:
-        runpy.run_path(str(ROOT / "scripts" / script), run_name="__main__")
-    assert exited.value.code == 0
-    result = json.loads(capsys.readouterr().out)
-    assert result["selected_printed_day_rate_days"] is None
-    assert result["selected_effective_day_rate_days"] == "0.0000"
-    assert result["empty_day_rate_origin_interpreted_as_zero"]

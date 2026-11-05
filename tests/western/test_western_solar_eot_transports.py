@@ -1,21 +1,14 @@
 """The resolved solar-clock basis is delivered through actual adapters."""
 
-import asyncio
 import json
 from datetime import datetime
 
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files_module as native_ephemeris_files_module,
 )
+from tests.support.transports import SPECS, business, rest, surface_calls
 from tests.western.test_western_solar_eot_ut1 import COHERENT_BY_UTC
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
@@ -29,7 +22,7 @@ ROW = COHERENT_BY_UTC["9999-08-11T12:00:00+00:00"]
 @pytest.mark.parametrize("zodiacal", [0, 1])
 @pytest.mark.parametrize("use_solar", [False, True])
 def test_optional_rebase_clock_basis_on_rest_mcp_cli(
-    key, zodiacal, use_solar, rest, tmp_path, capsys
+    key, zodiacal, use_solar, surface_calls
 ):
     spec = SPECS[key]
     payload = dict(
@@ -45,18 +38,17 @@ def test_optional_rebase_clock_basis_on_rest_mcp_cli(
     )
     person_path = "base_chart.person_info" if key == "astro_germany" else "person_info"
     fields = [person_path, "chart_profile"]
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
-    )
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        [
+        params=[("fields", f) for f in fields]
+        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=[
             "--fields",
             *fields,
             "--strict-fields",
@@ -66,15 +58,6 @@ def test_optional_rebase_clock_basis_on_rest_mcp_cli(
             "--response-char-limit",
             "0",
         ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     values = [http.json(), cli, json.loads(protocol.content[0].text)]

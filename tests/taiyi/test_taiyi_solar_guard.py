@@ -16,14 +16,7 @@ from scripts.taiyi.audit_taiyi_solar_guard import (
     policy,
     reference,
 )
-from tests.evaluation.test_agentic_nested_outputs import (  # noqa: F401 - imported pytest fixture
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, call_cli, native, rest
 
 PROTOCOL, REFERENCES = reference()
 

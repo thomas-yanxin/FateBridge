@@ -1,18 +1,12 @@
 """Nominal-epoch solar model receipts survive actual strict REST/MCP/CLI."""
 
-import asyncio
-
 import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import evidence_views
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as rest_fixture
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as rest_fixture
+from tests.support.transports import surface_calls
 from tests.western.test_western_accuracy import BIRTH
 
 rest = rest_fixture
@@ -23,7 +17,7 @@ rest = rest_fixture
 )
 @pytest.mark.parametrize("published_view", [False, True])
 def test_solar_extension_and_physical_error_unknown_are_faithfully_projected(
-    key, published_view, rest, tmp_path, capsys
+    key, published_view, surface_calls
 ):
     spec = SPECS[key]
     prefix = "horary.calculation_basis" if key == "astro_horary" else "chart_profile"
@@ -59,36 +53,13 @@ def test_solar_extension_and_physical_error_unknown_are_faithfully_projected(
     ]
     if published_view:
         fields = evidence_views(spec)["solar_position_model"]["fields"]
-    response = rest.post(
-        spec.rest_path,
-        json=inputs,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", 0),
-        ],
-    )
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         inputs,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec, inputs, fields=fields, strict_fields=True, include_snapshot_text=False
-        )
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error

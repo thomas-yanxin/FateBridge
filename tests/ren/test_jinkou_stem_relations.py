@@ -1,6 +1,5 @@
 """Daily/intrinsic/branch distinctions and same-run faithful delivery."""
 
-import asyncio
 import copy
 import hashlib
 import importlib.util
@@ -26,17 +25,10 @@ from fatebridge.core.output_jinkou_stems import JinkouStemRelations
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.quality.test_codex_call_contracts import (
     assert_same_receipt_with_explicit_runtime_delivery,
 )
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -182,7 +174,7 @@ def test_invalid_or_disagreeing_stem_inputs_are_rejected(bad):
 
 @pytest.mark.parametrize("project", [False, True])
 def test_three_ports_keep_intrinsic_daily_and_branch_relations_distinct(
-    project, rest, tmp_path, capsys
+    project, surface_calls
 ):
     spec = SPECS["jinkou"]
     fields = [
@@ -208,9 +200,9 @@ def test_three_ports_keep_intrinsic_daily_and_branch_relations_distinct(
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(spec, PAYLOAD, **options))
-    code, cli = call_cli(spec, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)
@@ -332,7 +324,7 @@ def corrupt(payload, fault):
 @pytest.mark.parametrize("fault", FAULTS)
 @pytest.mark.parametrize("project", [False, True])
 def test_corrupt_complete_business_facts_fail_before_projection(
-    fault, project, rest, monkeypatch, tmp_path, capsys
+    fault, project, monkeypatch, surface_calls
 ):
     spec = SPECS["jinkou"]
     valid = calculate_jinkou_analysis(**PAYLOAD)
@@ -357,9 +349,9 @@ def test_corrupt_complete_business_facts_fail_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(spec.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(spec, PAYLOAD, **options))
-    code, out = call_cli(spec, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, out = surface_calls(
+        spec, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert out["error_code"] == "internal_error"
 
@@ -374,14 +366,12 @@ def test_corrupt_complete_business_facts_fail_before_projection(
         "complete_classical_conformance",
     ],
 )
-def test_sparse_objects_keep_false_null_and_complete_rule_arrays(
-    field, rest, tmp_path, capsys
-):
+def test_sparse_objects_keep_false_null_and_complete_rule_arrays(field, surface_calls):
     spec = SPECS["jinkou"]
     path = "jinkou.stem_relations." + field
-    http = rest.post(
-        spec.rest_path,
-        json=PAYLOAD,
+    http, protocol, code, cli = surface_calls(
+        spec,
+        PAYLOAD,
         params=dict(
             as_of=AS_OF,
             response_char_limit=0,
@@ -389,21 +379,11 @@ def test_sparse_objects_keep_false_null_and_complete_rule_arrays(
             strict_fields="true",
             include_snapshot_text="false",
         ),
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            PAYLOAD,
-            fields=[path],
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
-    code, cli = call_cli(
-        spec,
-        PAYLOAD,
-        tmp_path,
-        capsys,
+        options={
+            "fields": [path],
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
         flags=[
             "--response-char-limit",
             "0",
@@ -414,6 +394,7 @@ def test_sparse_objects_keep_false_null_and_complete_rule_arrays(
             "--include-snapshot-text",
             "false",
         ],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
@@ -422,17 +403,15 @@ def test_sparse_objects_keep_false_null_and_complete_rule_arrays(
     spec.output_model.model_validate(cli)
 
 
-def test_section_export_and_receipt_do_not_replace_壬_with_intrinsic_丙(
-    rest, tmp_path, capsys
-):
+def test_section_export_and_receipt_do_not_replace_壬_with_intrinsic_丙(surface_calls):
     spec = SPECS["jinkou"]
     payload = {**PAYLOAD, "selected_sections": ["金口诀四位"]}
-    http = rest.post(
-        spec.rest_path, json=payload, params=dict(as_of=AS_OF, response_char_limit=0)
-    )
-    protocol = asyncio.run(native(spec, payload))
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
+        params=dict(as_of=AS_OF, response_char_limit=0),
+        flags=["--response-char-limit", "0"],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (

@@ -9,11 +9,11 @@ from pathlib import Path
 import pytest
 
 import fatebridge.application.execution as execution
-from tests.evaluation.test_agentic_nested_outputs import AS_OF, SPECS, call_cli, native
-from tests.evaluation.test_agentic_nested_outputs import rest as rest_fixture
 from tests.support.bazi_month_command_faults import (
     perturb,
 )
+from tests.support.transports import AS_OF, SPECS, call_cli, native
+from tests.support.transports import rest as rest_fixture
 
 rest = rest_fixture
 ROOT = Path(__file__).resolve().parents[2]

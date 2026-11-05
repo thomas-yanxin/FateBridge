@@ -1,6 +1,5 @@
 """Expose whole-source additions and bounded violations on REST, MCP and CLI."""
 
-import asyncio
 import json
 from pathlib import Path
 
@@ -10,11 +9,10 @@ from fatebridge.application.examples import suggested_fields
 from tests.bazi.test_bazi_source_comparison_transports import (
     SPEC,
     business,
-    call_cli,
-    native,
     reject_bad_fact,
 )
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -30,7 +28,7 @@ CASES = [
 @pytest.mark.parametrize("project", [False, True])
 @pytest.mark.parametrize("case_id,pillars", CASES, ids=[r[0] for r in CASES])
 def test_complete_source_cases_and_constraints_on_all_surfaces(
-    case_id, pillars, project, rest, tmp_path, capsys
+    case_id, pillars, project, surface_calls
 ):
     payload = dict(
         zip(["year_pillar", "month_pillar", "day_pillar", "hour_pillar"], pillars)
@@ -40,9 +38,9 @@ def test_complete_source_cases_and_constraints_on_all_surfaces(
         fields = suggested_fields(SPEC, view="source_strength")
         options.update(fields=fields, strict_fields=True)
         flags += ["--fields", *fields, "--strict-fields", "true"]
-    response = rest.post(SPEC.rest_path, json=payload, params=options)
-    mcp = asyncio.run(native(SPEC, payload, **options))
-    code, cli = call_cli(SPEC, payload, tmp_path, capsys, flags=flags)
+    response, mcp, code, cli = surface_calls(
+        SPEC, payload, params=options, options=options, flags=flags, cli_first=False
+    )
     assert response.status_code == 200 and not mcp.is_error and code == 0
     results = [response.json(), mcp.structured_content, cli]
     for result in results:

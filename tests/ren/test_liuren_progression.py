@@ -1,6 +1,5 @@
 """Original progression evidence, strict same-board anchors and actual transports."""
 
-import asyncio
 import copy
 import json
 import shutil
@@ -21,13 +20,7 @@ from fatebridge.core.output_liuren_progression import (
 )
 from scripts.ren.audit_liuren_progression import CORPUS, audit, reference
 from scripts.ren.audit_ren_classical import make_seed
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 REF = reference()
@@ -218,9 +211,7 @@ def test_seated_empty_and_god_sky_never_replace_raw_branch_empty():
 
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
-def test_actual_rest_native_mcp_cli_share_published_evidence_view(
-    key, rest, tmp_path, capsys
-):
+def test_actual_rest_native_mcp_cli_share_published_evidence_view(key, surface_calls):
     spec = SPECS[key]
     payload = copy.deepcopy(PAYLOADS[key])
     payload["selected_sections"] = ["起盘信息"]
@@ -231,33 +222,9 @@ def test_actual_rest_native_mcp_cli_share_published_evidence_view(
     )
     fields = evidence_views(spec)[name]["fields"]
     options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *[("fields", f) for f in fields],
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
+    http, mcp, code, cli = surface_calls(
+        spec, payload, projection={**options, "response_char_limit": 0}
     )
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--response-char-limit",
-            "0",
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-        ],
-    )
-    mcp = asyncio.run(native(spec, payload, **options))
     assert http.status_code == 200 and code == 0 and not mcp.is_error
     assert business(http.json()) == business(cli) == business(mcp.structured_content)
     ev = http.json()["liureng"]["transmission_progression"]
@@ -296,7 +263,7 @@ def test_shared_execution_rejects_deleted_layer_before_requested_sparse_fields()
 
 @pytest.mark.parametrize("project", [False, True])
 def test_deleted_progression_fails_actual_transports_before_projection(
-    project, rest, monkeypatch, tmp_path, capsys
+    project, monkeypatch, surface_calls
 ):
     spec = SPECS["liureng_gods"]
     payload = PAYLOADS["liureng_gods"]
@@ -320,9 +287,9 @@ def test_deleted_progression_fails_actual_transports_before_projection(
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         options = dict(fields=["four_pillars"], strict_fields=True)
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 500 and protocol.is_error and code != 0
     assert all(
         v["error_code"] == "internal_error" and "liureng" not in v

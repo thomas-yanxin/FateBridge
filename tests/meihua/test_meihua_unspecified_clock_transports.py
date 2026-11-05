@@ -1,14 +1,11 @@
 """The selected local time type is checked before every public projection."""
 
 import asyncio
-from copy import deepcopy
-from dataclasses import replace
 
 import pytest
 
-from fatebridge.application import execution
-from tests.evaluation.test_agentic_nested_outputs import SPECS, call_cli, native, rest
 from tests.support.meihua_unspecified_clock_reference import load
+from tests.support.transports import SPECS, call_cli, native, rest
 
 SPEC = SPECS["meihua_analysis"]
 ROWS = load()

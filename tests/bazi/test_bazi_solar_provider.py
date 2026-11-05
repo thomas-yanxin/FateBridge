@@ -1,6 +1,5 @@
 """Availability guards are regressions, not independent celestial accuracy data."""
 
-import asyncio
 from dataclasses import replace
 from datetime import datetime
 
@@ -11,8 +10,9 @@ from fatebridge.core.calendar import BaZiCalendar
 from fatebridge.core.timing import TimingAnalysis
 from fatebridge.utils.errors import EphemerisSourceError
 from tests.bazi.test_bazi_year_contract import TOPICS
-from tests.evaluation.test_agentic_nested_outputs import SPECS, call_cli, inputs, native
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, inputs, native
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 
 def clear_solar_caches():
@@ -57,13 +57,11 @@ rest = _shared_rest
     ],
 )
 def test_missing_native_crossings_are_rejected_on_all_three_surfaces(
-    key, rest, tmp_path, capsys, failed_solver
+    key, failed_solver, surface_calls
 ):
     spec = SPECS[key]
     payload = {**inputs(spec), "use_true_solar_time": False}
-    http = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    http, protocol, code, local = surface_calls(spec, payload)
     assert http.status_code == 503 and code != 0 and protocol.is_error
     for envelope in (http.json(), local, protocol.structured_content):
         assert envelope["error_code"] == "ephemeris_source_inconsistent"

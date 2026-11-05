@@ -1,6 +1,5 @@
 """The thirty new civil dates and seam retain their literal primary labels."""
 
-import asyncio
 import hashlib
 import json
 from datetime import date, datetime
@@ -11,13 +10,7 @@ import pytest
 from fatebridge.core import lunar_1900_prefix
 from fatebridge.core.almanac import get_lunar_context
 from fatebridge.validation.meihua_calendar import reference_bundle
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/ren_lunar_1900_prefix_v1"
@@ -77,7 +70,7 @@ def test_corrupt_prefix_month_is_rejected(tmp_path, monkeypatch):
 @pytest.mark.parametrize("day", [1, 30, 31])
 @pytest.mark.parametrize("project", [False, True])
 def test_prefix_lunar_year_and_source_survive_all_ren_transports(
-    key, day, project, rest, tmp_path, capsys
+    key, day, project, surface_calls
 ):
     spec = SPECS[key]
     data = dict(
@@ -121,9 +114,9 @@ def test_prefix_lunar_year_and_source_survive_all_ren_transports(
             *fields,
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=data, params=params)
-    code, cli = call_cli(spec, data, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, data, **options))
+    http, protocol, code, cli = surface_calls(
+        spec, data, params=params, options=options, flags=flags
+    )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     bodies = [http.json(), cli, protocol.structured_content]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])

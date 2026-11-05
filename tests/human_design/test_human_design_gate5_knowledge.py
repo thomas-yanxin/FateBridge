@@ -16,10 +16,10 @@ from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.validation.human_design_context_lines import (
     verify_human_design_context_packet,
 )
-from tests.evaluation.test_agentic_nested_outputs import SPECS, business
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest
 from tests.numerology.test_heluo_poem_transports import run_three
 from tests.support.reference_data import read, sha
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as shared_rest
 
 ROOT = Path(__file__).resolve().parents[2]
 E = ROOT / "tests/data/human_design/gate5"

@@ -1,18 +1,15 @@
 """Source dependencies follow actual years; actual default labels stay faithful."""
 
-import hashlib
-import json
 from datetime import datetime
-from pathlib import Path
 
 import pytest
 
 from fatebridge.core import almanac, calendar, de440_solar, timing
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.evaluation.test_agentic_nested_outputs import rest
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
 from tests.liuyao.test_liuyao_transports import assert_same_run_receipt
+from tests.support.transports import rest, surface_calls
 
 MODEL = "fatebridge_de440_solar_v1"
 PAYLOAD = dict(
@@ -146,17 +143,15 @@ def test_selected_source_corruption_still_fails_and_explicit_range_still_refuses
 
 
 def test_selected_default_fault_is_structured_on_three_protocols(
-    monkeypatch, rest, tmp_path, capsys
+    monkeypatch, surface_calls
 ):
     import asyncio
 
-    from tests.evaluation.test_agentic_nested_outputs import SPECS, call_cli, native
+    from tests.support.transports import SPECS, call_cli, native
 
     monkeypatch.setattr(de440_solar, "_profile", unavailable)
     spec = SPECS["sixyao"]
-    http = rest.post(spec.rest_path, json=PAYLOAD)
-    protocol = asyncio.run(native(spec, PAYLOAD))
-    code, cli = call_cli(spec, PAYLOAD, tmp_path, capsys)
+    http, protocol, code, cli = surface_calls(spec, PAYLOAD, cli_first=False)
     assert http.status_code == 503 and protocol.is_error and code != 0
     for output in [http.json(), cli]:
         assert output["retryable"] is False

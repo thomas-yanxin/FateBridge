@@ -1,6 +1,5 @@
 """Epoch labels, selected winter instants and unresolved activation differ."""
 
-import asyncio
 import json
 
 import pytest
@@ -14,14 +13,7 @@ from scripts.taiyi.audit_taiyi_origin_selection import (
     native_inputs,
     references,
 )
-from tests.evaluation.test_agentic_nested_outputs import (  # noqa: F401 - imported pytest fixture
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROWS = references()
 
@@ -88,9 +80,7 @@ TRANSPORT_ROWS = [
 
 
 @pytest.mark.parametrize("row", TRANSPORT_ROWS, ids=lambda r: r["id"])
-def test_selection_view_on_all_three_transports(
-    row, rest, tmp_path, capsys  # noqa: F811 - pytest fixture
-):
+def test_selection_view_on_all_three_transports(row, surface_calls):
     tool = row["tool"]
     spec = SPECS[tool]
     values = inputs(row)
@@ -101,33 +91,8 @@ def test_selection_view_on_all_three_transports(
         include_snapshot_text=False,
         response_char_limit=0,
     )
-    http = rest.post(
-        spec.rest_path,
-        json=values,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-            ("as_of", AS_OF),
-        ],
-    )
-    mcp = asyncio.run(native(spec, values, **opts))
-    code, cli = call_cli(
-        spec,
-        values,
-        tmp_path,
-        capsys,
-        [
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+    http, mcp, code, cli = surface_calls(
+        spec, values, projection=opts, cli_first=False, rest_as_of=AS_OF
     )
     assert http.status_code == 200, http.text
     assert not mcp.is_error, mcp.structured_content

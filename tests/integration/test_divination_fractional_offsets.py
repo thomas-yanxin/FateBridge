@@ -1,6 +1,5 @@
 """Fractional ISO offsets must not move a casting across the late-Zi boundary."""
 
-import asyncio
 from datetime import datetime
 
 import pytest
@@ -9,13 +8,7 @@ from fatebridge.core.local_techniques.chart import (
     _build_metaphysics_seed,
     parse_local_datetime,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 CASES = [
     (
@@ -53,7 +46,7 @@ def test_shared_divination_parser_preserves_the_actual_offset(
 @pytest.mark.parametrize("key", ["sixyao", "sanshiunited"])
 @pytest.mark.parametrize("clock,expected_clock,day,hour", CASES)
 def test_fractional_offset_and_day_pillars_agree_across_transports(
-    key, clock, expected_clock, day, hour, rest, tmp_path, capsys
+    key, clock, expected_clock, day, hour, surface_calls
 ):
     spec = SPECS[key]
     payload = {"date": "2026-11-03", "time": clock, "zone": "UTC"}
@@ -70,15 +63,13 @@ def test_fractional_offset_and_day_pillars_agree_across_transports(
                 for pillar in ("day", "hour")
             ],
         ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
+    response, protocol, code, cli = surface_calls(
+        spec,
+        payload,
         params={"fields": fields, "strict_fields": True},
+        options={"fields": fields, "strict_fields": True},
+        flags=("--fields", *fields, "--strict-fields"),
     )
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, flags=("--fields", *fields, "--strict-fields")
-    )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200, response.text
     assert code == 0
     assert not protocol.is_error

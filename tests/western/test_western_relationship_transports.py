@@ -6,14 +6,8 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import evidence_views, suggested_fields
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.support.relationship_inputs import payloads
+from tests.support.transports import SPECS, business, call_cli, native, rest
 from tests.western.test_western_relationship_scoring import replay
 
 

@@ -12,10 +12,10 @@ from fatebridge.core import heluo_poems as hp
 from fatebridge.core import heluo_texts as ht
 from fatebridge.core.heluo import _tiaowen, yao_text
 from fatebridge.utils.errors import NumerologySourceError
-from tests.evaluation.test_agentic_nested_outputs import SPECS, business
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest
 from tests.numerology.test_heluo_poem_transports import run_three
 from tests.support.heluo_source_facts import HEADER_COUNT, PENDING_COUNT
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as shared_rest
 
 rest = shared_rest
 F = Path(__file__).parents[1] / "fixtures/heluo_sui17_meng4_v1"

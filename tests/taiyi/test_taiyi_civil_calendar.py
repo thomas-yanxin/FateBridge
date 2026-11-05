@@ -24,7 +24,7 @@ from scripts.taiyi.audit_taiyi_civil_calendar import (
     public_input,
     verify_sources,
 )
-from tests.evaluation.test_agentic_nested_outputs import SPECS, business, call_cli
+from tests.support.transports import SPECS, business, call_cli
 from tests.taiyi.test_taiyi_periods import seed_at
 from tests.taiyi.test_taiyi_transports import _same_run_payload
 

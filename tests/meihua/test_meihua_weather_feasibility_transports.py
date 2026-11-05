@@ -1,21 +1,13 @@
 """Capacity bounds accompany the unchanged negative study on every local surface."""
 
-import asyncio
-
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 
 @pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
 def test_public_capacity_bound_keeps_its_full_cohort_and_negative_result(
-    tool, rest, tmp_path, capsys
+    tool, surface_calls
 ):
     spec = SPECS[tool]
     payload = {"interpretation_topic": "weather"}
@@ -39,31 +31,10 @@ def test_public_capacity_bound_keeps_its_full_cohort_and_negative_result(
         "interpretation.weather.research_validation.current_profile_study",
         "interpretation.weather.single_forecast",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *(("fields", f) for f in fields),
-            ("strict_fields", "true"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(spec, payload, fields=fields, strict_fields=True, response_char_limit=0)
+        projection={"fields": fields, "strict_fields": True, "response_char_limit": 0},
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]

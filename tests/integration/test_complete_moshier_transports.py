@@ -1,26 +1,25 @@
 """Unchanged DE440 TT values constrain the same current result on three ports."""
 
-import asyncio
 import json
 from pathlib import Path
 
 import pytest
 
 from fatebridge.core.moshier_solar import MODEL_ID, PROVIDER
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.support.transports import (
     SPECS,
     business,
-    call_cli,
     inputs,
     native,
     rest,
+    surface_calls,
 )
 
 
 @pytest.mark.local_data
 @pytest.mark.parametrize("year", [1800, 2200])
 def test_original_years_current_roots_pass_the_original_gate_on_three_ports(
-    year, monkeypatch, tmp_path, capsys, rest
+    year, monkeypatch, tmp_path, surface_calls
 ):
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
@@ -34,31 +33,22 @@ def test_original_years_current_roots_pass_the_original_gate_on_three_ports(
     spec = SPECS["jieqi_timeline_analysis"]
     payload = {**inputs(spec), "target_year": year}
     field = "target_year_jieqi"
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
         params={
             "fields": field,
             "strict_fields": True,
             "include_snapshot_text": False,
             "response_char_limit": 0,
         },
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=[field],
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        ["--fields", field, "--strict-fields", "--response-char-limit", "0"],
+        options={
+            "fields": [field],
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=["--fields", field, "--strict-fields", "--response-char-limit", "0"],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     outputs = [business(p) for p in (http.json(), protocol.structured_content, cli)]

@@ -8,12 +8,7 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.cli import run as cli_run
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
+from tests.support.transports import SPECS, business, native, surface_calls
 
 
 def assert_same_run_receipt(store, shaped, original):
@@ -92,15 +87,11 @@ def assert_same_run_receipt(store, shaped, original):
         ),
     ],
 )
-def test_classical_facts_are_equal_across_three_surfaces(
-    key, payload, rest, tmp_path, capsys
-):
+def test_classical_facts_are_equal_across_three_surfaces(key, payload, surface_calls):
     spec = SPECS[key]
-    response = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(
-        spec, payload, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    response, protocol, code, local = surface_calls(
+        spec, payload, flags=["--response-char-limit", "0"]
     )
-    protocol = asyncio.run(native(spec, payload))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -124,7 +115,7 @@ def test_classical_facts_are_equal_across_three_surfaces(
 
 
 def test_classical_and_calendar_projections_are_supported_on_all_surfaces(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
     spec = SPECS["sixyao"]
     payload = {
@@ -145,17 +136,12 @@ def test_classical_and_calendar_projections_are_supported_on_all_surfaces(
         "liuyao_evidence.conditional_analysis.timing_candidates.windows",
     ]
     options = {"fields": fields, "strict_fields": True, "include_snapshot_text": False}
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
+        params=[("fields", f) for f in fields]
+        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
+        options=options,
         flags=[
             "--fields",
             *fields,
@@ -167,7 +153,6 @@ def test_classical_and_calendar_projections_are_supported_on_all_surfaces(
             "0",
         ],
     )
-    protocol = asyncio.run(native(spec, payload, **options))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     for output in [response.json(), local, protocol.structured_content]:
         Draft202012Validator(spec.output_model.model_json_schema()).validate(output)
@@ -288,12 +273,10 @@ def test_strict_integer_cli_flags_work_without_a_subject_file(arguments, capsys)
         },
     ],
 )
-def test_bad_casts_fail_on_three_surfaces(payload, rest, tmp_path, capsys):
+def test_bad_casts_fail_on_three_surfaces(payload, surface_calls):
     spec = SPECS["sixyao"]
     payload = {"date": "2026-02-10", "time": "12:00:00", **payload}
-    response = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, local = surface_calls(spec, payload)
     assert response.status_code in (400, 422) and code != 0 and protocol.is_error
     assert "current_code" not in local
 
@@ -319,7 +302,7 @@ def test_bad_casts_fail_on_three_surfaces(payload, rest, tmp_path, capsys):
     ],
 )
 def test_scan_conditions_and_distinct_focus_locations_survive_strict_projection(
-    focus, rest, tmp_path, capsys
+    focus, surface_calls
 ):
     spec = SPECS["sixyao"]
     payload = {
@@ -339,17 +322,12 @@ def test_scan_conditions_and_distinct_focus_locations_survive_strict_projection(
         "liuyao_evidence.conditional_analysis.timing_candidates",
     ]
     options = {"fields": fields, "strict_fields": True, "include_snapshot_text": False}
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
+        params=[("fields", f) for f in fields]
+        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
+        options=options,
         flags=[
             "--fields",
             *fields,
@@ -361,7 +339,6 @@ def test_scan_conditions_and_distinct_focus_locations_survive_strict_projection(
             "0",
         ],
     )
-    protocol = asyncio.run(native(spec, payload, **options))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -428,7 +405,7 @@ def test_published_sixyao_contract_exposes_focus_kind_and_evidence_in_first_view
 
 
 def test_large_classical_evidence_is_read_losslessly_from_the_same_run(
-    rest, tmp_path, capsys, monkeypatch
+    tmp_path, monkeypatch, surface_calls
 ):
     import fatebridge.api as api
     from fatebridge.application import result_delivery as delivery
@@ -450,41 +427,15 @@ def test_large_classical_evidence_is_read_losslessly_from_the_same_run(
         "focus_kinship": "父母",
     }
     fields = suggested_fields(spec)
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "8192"),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "8192",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-            response_char_limit=8192,
-        )
+        projection={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+            "response_char_limit": 8192,
+        },
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     for shaped in [response.json(), local, protocol.structured_content]:
@@ -522,7 +473,7 @@ def test_large_classical_evidence_is_read_losslessly_from_the_same_run(
 
 
 def test_role_effects_strict_projection_keeps_conditional_routing_on_three_surfaces(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
     spec = SPECS["sixyao"]
     payload = {
@@ -540,40 +491,13 @@ def test_role_effects_strict_projection_keeps_conditional_routing_on_three_surfa
         "liuyao_evidence.conditional_analysis.role_effects.focus_robustness",
         "liuyao_evidence.conditional_analysis.role_effects.textual_issues",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("response_char_limit", "0"),
-            ("include_snapshot_text", "false"),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-            "--include-snapshot-text",
-            "false",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
@@ -592,7 +516,7 @@ def test_role_effects_strict_projection_keeps_conditional_routing_on_three_surfa
 
 
 def test_strength_and_tomb_leaves_project_without_unrequested_siblings_on_three_surfaces(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
     spec = SPECS["sixyao"]
     payload = {
@@ -612,40 +536,13 @@ def test_strength_and_tomb_leaves_project_without_unrequested_siblings_on_three_
         f"{root}.role_effects.textual_issues",
         f"{root}.timing_candidates.windows",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
@@ -683,7 +580,7 @@ def test_strength_and_tomb_leaves_project_without_unrequested_siblings_on_three_
     ],
 )
 def test_fanfu_domains_and_body_leaf_survive_strict_projection_on_three_surfaces(
-    base, changed, body, relations, rest, tmp_path, capsys
+    base, changed, body, relations, surface_calls
 ):
     spec = SPECS["sixyao"]
     payload = {
@@ -699,40 +596,13 @@ def test_fanfu_domains_and_body_leaf_survive_strict_projection_on_three_surfaces
     ]
     if body:
         fields.append("liuyao_evidence.fanfu.explicit_body_example.kind")
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
@@ -752,7 +622,7 @@ def test_fanfu_domains_and_body_leaf_survive_strict_projection_on_three_surfaces
 
 
 def test_void_conflicts_and_blocked_generator_project_consistently_on_three_surfaces(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
     spec = SPECS["sixyao"]
     payload = dict(
@@ -771,40 +641,13 @@ def test_void_conflicts_and_blocked_generator_project_consistently_on_three_surf
         f"{root}.classical_assessment.focus.strength.blocked_supports",
         f"{root}.lines",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
@@ -826,7 +669,7 @@ def test_void_conflicts_and_blocked_generator_project_consistently_on_three_surf
 
 
 def test_official_2100_extension_and_source_metadata_survive_all_surfaces(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
     spec = SPECS["sixyao"]
     payload = dict(
@@ -839,40 +682,13 @@ def test_official_2100_extension_and_source_metadata_survive_all_surfaces(
         "calendar_context.lunar_calendar.conversion_source",
         "cast.method",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]

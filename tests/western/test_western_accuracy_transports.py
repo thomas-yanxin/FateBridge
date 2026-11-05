@@ -1,33 +1,24 @@
 """Real REST, native MCP and CLI agree on corrected western facts."""
 
-import asyncio
-
 import pytest
 from jsonschema import Draft202012Validator
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, native, rest, surface_calls
 from tests.western.test_western_accuracy import BIRTH
 
 
 @pytest.mark.parametrize("key", ["astro_chart", "astro_hellen"])
 def test_civil_time_horizon_and_primary_text_facts_across_transports(
-    key, rest, tmp_path, capsys
+    key, surface_calls
 ):
     spec = SPECS[key]
     payload = {**BIRTH, "hsys": 0}
-    response = rest.post(
-        spec.rest_path, json=payload, params={"response_char_limit": 0}
+    response, protocol, code, local = surface_calls(
+        spec,
+        payload,
+        params={"response_char_limit": 0},
+        flags=["--response-char-limit", "0"],
     )
-    code, local = call_cli(
-        spec, payload, tmp_path, capsys, flags=["--response-char-limit", "0"]
-    )
-    protocol = asyncio.run(native(spec, payload))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -41,9 +32,7 @@ def test_civil_time_horizon_and_primary_text_facts_across_transports(
         ]
 
 
-def test_new_evidence_supports_strict_projection_on_all_transports(
-    rest, tmp_path, capsys
-):
+def test_new_evidence_supports_strict_projection_on_all_transports(surface_calls):
     spec = SPECS["astro_hellen"]
     fields = [
         "classical.ptolemy.planets.Sun.triplicity_primary",
@@ -56,17 +45,12 @@ def test_new_evidence_supports_strict_projection_on_all_transports(
         "planetary_hours.hour_end_utc",
     ]
     flags = {"fields": fields, "strict_fields": True, "include_snapshot_text": False}
-    response = rest.post(
-        spec.rest_path,
-        json=BIRTH,
-        params=[("fields", field) for field in fields]
-        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         BIRTH,
-        tmp_path,
-        capsys,
+        params=[("fields", field) for field in fields]
+        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
+        options=flags,
         flags=[
             "--fields",
             *fields,
@@ -78,7 +62,6 @@ def test_new_evidence_supports_strict_projection_on_all_transports(
             "0",
         ],
     )
-    protocol = asyncio.run(native(spec, BIRTH, **flags))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     for result in [response.json(), local, protocol.structured_content]:
         assert result["classical"]["sect"] == "day"
@@ -129,9 +112,7 @@ def test_explanation_references_can_be_checked_against_the_original_receipt(rest
     assert verify_calculation_claims(result, claims)["status"] == "rejected"
 
 
-def test_dst_gap_fails_consistently_instead_of_returning_a_chart(
-    rest, tmp_path, capsys
-):
+def test_dst_gap_fails_consistently_instead_of_returning_a_chart(surface_calls):
     spec = SPECS["astro_chart"]
     payload = {
         **BIRTH,
@@ -140,18 +121,16 @@ def test_dst_gap_fails_consistently_instead_of_returning_a_chart(
         "birth_hour": 2,
         "birth_timezone": "America/New_York",
     }
-    response = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, local = surface_calls(spec, payload)
     assert response.status_code == 400 and code != 0 and protocol.is_error
     assert local["error_code"] == "validation_error"
 
 
 @pytest.mark.parametrize("key", ["solarreturn", "lunarreturn", "transit"])
 def test_native_timing_time_scales_and_full_precision_agree_across_surfaces(
-    key, rest, tmp_path, capsys
+    key, surface_calls
 ):
-    from tests.evaluation.test_agentic_nested_outputs import AS_OF
+    from tests.support.transports import AS_OF
 
     spec = SPECS[key]
     payload = {
@@ -182,21 +161,20 @@ def test_native_timing_time_scales_and_full_precision_agree_across_surfaces(
             f"{key}.return_datetime_utc",
             f"{key}.return_datetime",
         ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
+    response, protocol, code, local = surface_calls(
+        spec,
+        payload,
         params=[("fields", field) for field in fields]
         + [
             ("strict_fields", "true"),
             ("include_snapshot_text", "false"),
             ("as_of", AS_OF),
         ],
-    )
-    code, local = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
         flags=[
             "--fields",
             *fields,
@@ -205,15 +183,6 @@ def test_native_timing_time_scales_and_full_precision_agree_across_surfaces(
             "--response-char-limit",
             "0",
         ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error, (
         response.json(),
@@ -240,23 +209,17 @@ def test_native_timing_time_scales_and_full_precision_agree_across_surfaces(
 
 
 def test_robbins_fortune_formula_and_value_are_projectable_on_all_surfaces(
-    rest, tmp_path, capsys
+    surface_calls,
 ):
     spec = SPECS["astro_chart"]
     fields = ["classical.ptolemy.ruleset_id", "classical.ptolemy.lot_of_fortune"]
-    response = rest.post(
-        spec.rest_path,
-        json=BIRTH,
-        params=[("fields", f) for f in fields] + [("strict_fields", "true")],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         BIRTH,
-        tmp_path,
-        capsys,
+        params=[("fields", f) for f in fields] + [("strict_fields", "true")],
+        options={"fields": fields, "strict_fields": True},
         flags=["--fields", *fields, "--strict-fields", "--response-char-limit", "0"],
     )
-    protocol = asyncio.run(native(spec, BIRTH, fields=fields, strict_fields=True))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (
         business(response.json())
@@ -299,7 +262,7 @@ def test_ready_uses_native_predictive_runtime_without_kerykeion(rest, monkeypatc
 
 @pytest.mark.parametrize("month,day,hour", [(3, 10, 2), (11, 3, 1)])
 def test_invalid_analysis_dst_clock_is_rejected_across_surfaces(
-    month, day, hour, rest, tmp_path, capsys
+    month, day, hour, surface_calls
 ):
     spec = SPECS["transit"]
     payload = {
@@ -317,9 +280,7 @@ def test_invalid_analysis_dst_clock_is_rejected_across_surfaces(
         "analysis_hour": hour,
         "analysis_minute": 30,
     }
-    response = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, local = surface_calls(spec, payload)
     assert response.status_code == 400 and code != 0 and protocol.is_error
     assert local["error_code"] == "validation_error"
     assert "分析钟时" in local["error"]
@@ -327,7 +288,7 @@ def test_invalid_analysis_dst_clock_is_rejected_across_surfaces(
 
 @pytest.mark.parametrize("key", ["astro_chart", "astro_hellen"])
 def test_unrounded_facts_and_source_specific_reading_agree_across_surfaces(
-    key, rest, tmp_path, capsys
+    key, surface_calls
 ):
     import math
 
@@ -343,17 +304,16 @@ def test_unrounded_facts_and_source_specific_reading_agree_across_surfaces(
         "interpretation",
         "interpretation_evidence",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=BIRTH,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         BIRTH,
-        tmp_path,
-        capsys,
+        params=[("fields", f) for f in fields]
+        + [("strict_fields", "true"), ("include_snapshot_text", "false")],
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
         flags=[
             "--fields",
             *fields,
@@ -362,11 +322,6 @@ def test_unrounded_facts_and_source_specific_reading_agree_across_surfaces(
             "--response-char-limit",
             "0",
         ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec, BIRTH, fields=fields, strict_fields=True, include_snapshot_text=False
-        )
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (
@@ -406,7 +361,7 @@ def test_unrounded_facts_and_source_specific_reading_agree_across_surfaces(
 
 
 def test_invalid_internal_coordinate_is_not_published_through_any_surface(
-    rest, tmp_path, capsys, monkeypatch
+    monkeypatch, surface_calls
 ):
     from dataclasses import replace
 
@@ -428,9 +383,7 @@ def test_invalid_internal_coordinate_is_not_published_through_any_surface(
 
     monkeypatch.setattr(execution, "execute_spec", invalid_coordinate)
     spec = SPECS["astro_chart"]
-    response = rest.post(spec.rest_path, json=BIRTH)
-    code, local = call_cli(spec, BIRTH, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, BIRTH))
+    response, protocol, code, local = surface_calls(spec, BIRTH)
     assert response.status_code == 500 and code == 1 and protocol.is_error
     assert (
         local["error_code"]

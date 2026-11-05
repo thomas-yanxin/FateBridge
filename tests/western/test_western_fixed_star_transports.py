@@ -1,19 +1,11 @@
 """Real local transports retain star frame, provenance and partial-layer state."""
 
-import asyncio
-
 import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import evidence_views
 from fatebridge.core import fixed_stars
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, native, rest, surface_calls
 from tests.western.test_western_accuracy import BIRTH
 
 PAYLOAD = {
@@ -49,46 +41,17 @@ def test_published_star_evidence_card_uses_strict_resolvable_fields(key, rest):
 
 @pytest.mark.parametrize("zodiacal", [0, 1])
 @pytest.mark.parametrize("key", ["astro_chart", "astro_hellen"])
-def test_native_star_facts_agree_across_three_transports(
-    key, zodiacal, rest, tmp_path, capsys
-):
+def test_native_star_facts_agree_across_three_transports(key, zodiacal, surface_calls):
     spec = SPECS[key]
     payload = {**PAYLOAD, "zodiacal": zodiacal}
     fields = ["fixed_stars", "chart_profile.fixed_stars", "chart_profile.julian_day_tt"]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", 0),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
+        projection={
+            **{"fields": fields, "strict_fields": True, "include_snapshot_text": False},
+            "response_char_limit": 0,
+        },
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]

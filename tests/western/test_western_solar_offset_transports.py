@@ -1,22 +1,15 @@
 """All adapters preserve the confirmed offset during synthetic solar rebasing."""
 
-import asyncio
 import json
 from datetime import datetime
 from pathlib import Path
 
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files_module as native_ephemeris_files_module,
 )
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
@@ -37,7 +30,7 @@ KEYS = ["astro_chart", "astro_hellen", "astro_chart13", "astro_germany"]
 @pytest.mark.parametrize("row", ROWS, ids=lambda r: r["id"])
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_named_clock_rebase_and_explanation_match_all_adapters(
-    key, row, zodiacal, rest, tmp_path, capsys
+    key, row, zodiacal, surface_calls
 ):
     spec = SPECS[key]
     wall = datetime.fromisoformat(row["recorded_local"])
@@ -54,21 +47,20 @@ def test_named_clock_rebase_and_explanation_match_all_adapters(
         zodiacal=zodiacal,
     )
     path = "base_chart.person_info" if key == "astro_germany" else "person_info"
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
         params=[
             ("fields", path),
             ("strict_fields", "true"),
             ("include_snapshot_text", "false"),
         ],
-    )
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        [
+        options={
+            "fields": [path],
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=[
             "--fields",
             path,
             "--strict-fields",
@@ -78,15 +70,6 @@ def test_named_clock_rebase_and_explanation_match_all_adapters(
             "--response-char-limit",
             "0",
         ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=[path],
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     values = [http.json(), cli, json.loads(protocol.content[0].text)]
@@ -119,9 +102,7 @@ def test_named_clock_rebase_and_explanation_match_all_adapters(
 
 
 @pytest.mark.parametrize("key", KEYS)
-def test_unconfirmed_repeated_nominal_hour_is_still_rejected(
-    key, rest, tmp_path, capsys
-):
+def test_unconfirmed_repeated_nominal_hour_is_still_rejected(key, surface_calls):
     spec = SPECS[key]
     payload = dict(
         birth_year=2024,
@@ -134,9 +115,7 @@ def test_unconfirmed_repeated_nominal_hour_is_still_rejected(
         birth_latitude=40,
         use_true_solar_time=True,
     )
-    http = rest.post(spec.rest_path, json=payload)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, [])
-    protocol = asyncio.run(native(spec, payload))
+    http, protocol, code, cli = surface_calls(spec, payload, flags=[])
     assert http.status_code == 400 and code == 1 and protocol.is_error
     for value in [http.json(), cli, json.loads(protocol.content[0].text)]:
         assert value["error_code"] == "validation_error"

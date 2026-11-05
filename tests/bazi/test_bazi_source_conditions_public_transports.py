@@ -1,6 +1,5 @@
 """Real source facts survive projection; contradictory claims fail before it."""
 
-import asyncio
 import json
 from copy import deepcopy
 from dataclasses import replace
@@ -11,13 +10,9 @@ import pytest
 import fatebridge.application.execution as execution
 from fatebridge.application.examples import suggested_fields
 from fatebridge.services.source_comparison import calculate_bazi_source_compare
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest_fixture
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as shared_rest_fixture
+from tests.support.transports import surface_calls
 
 rest = shared_rest_fixture
 ROOT = Path(__file__).resolve().parents[2]
@@ -38,19 +33,17 @@ def arguments(row):
 
 @pytest.mark.parametrize("row", PLAN["reviews"], ids=lambda r: r["review"]["case_id"])
 def test_all19_real_conditions_and_old_annotations_agree_across_surfaces(
-    row, rest, tmp_path, capsys
+    row, surface_calls
 ):
     args = arguments(row)
     fields = suggested_fields(SPEC, view="source_conditions")
     flags = {"fields": fields, "strict_fields": True, "include_snapshot_text": False}
-    response = rest.post(SPEC.rest_path, json=args, params=flags)
-    protocol = asyncio.run(native(SPEC, args, **flags))
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         SPEC,
         args,
-        tmp_path,
-        capsys,
-        [
+        params=flags,
+        options=flags,
+        flags=[
             "--fields",
             *fields,
             "--strict-fields",
@@ -60,6 +53,7 @@ def test_all19_real_conditions_and_old_annotations_agree_across_surfaces(
             "--response-char-limit",
             "0",
         ],
+        cli_first=False,
     )
     assert response.status_code == 200 and not protocol.is_error and code == 0
     values = [response.json(), protocol.structured_content, cli]
@@ -78,7 +72,7 @@ def test_all19_real_conditions_and_old_annotations_agree_across_surfaces(
     "fault", ["day", "force", "excerpt", "page", "record", "numeric_bool"]
 )
 def test_contradictory_registered_conditions_cannot_hide_behind_unrelated_projection(
-    fault, rest, monkeypatch, tmp_path, capsys
+    fault, monkeypatch, tmp_path, surface_calls
 ):
     row = PLAN["reviews"][-1]
     args = arguments(row)
@@ -108,12 +102,13 @@ def test_contradictory_registered_conditions_cannot_hide_behind_unrelated_projec
 
     monkeypatch.setattr(execution, "execute_spec", broken)
     fields = ["current_calculation.strength_level"]
-    response = rest.post(
-        SPEC.rest_path, json=args, params={"fields": fields, "strict_fields": True}
-    )
-    protocol = asyncio.run(native(SPEC, args, fields=fields, strict_fields=True))
-    code, cli = call_cli(
-        SPEC, args, tmp_path, capsys, ["--fields", *fields, "--strict-fields", "true"]
+    response, protocol, code, cli = surface_calls(
+        SPEC,
+        args,
+        params={"fields": fields, "strict_fields": True},
+        options={"fields": fields, "strict_fields": True},
+        flags=["--fields", *fields, "--strict-fields", "true"],
+        cli_first=False,
     )
     for name, value in [
         ("rest", response.json()),

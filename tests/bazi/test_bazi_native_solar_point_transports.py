@@ -1,21 +1,14 @@
 """Native point metadata and bounded clock failures survive all public surfaces."""
 
-import asyncio
 import json
 
 import pytest
 
 from fatebridge.core import solar_term_clock
 from tests.bazi.test_bazi_tt_utc_exact_transports import check_terms
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import AS_OF, SPECS, business, inputs, native
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -23,7 +16,7 @@ rest = _shared_rest
 @pytest.mark.parametrize("key", ["bazi_birth", "dayun_analysis", "timing_analysis"])
 @pytest.mark.parametrize("project", [False, True])
 def test_native_actual_selected_points_are_public_and_identical(
-    key, project, monkeypatch, rest, tmp_path, capsys
+    key, project, monkeypatch, tmp_path, surface_calls
 ):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
@@ -53,9 +46,9 @@ def test_native_actual_selected_points_are_public_and_identical(
     if project:
         options.update(fields=[field], strict_fields=True)
         flags += ["--fields", field, "--strict-fields", "true"]
-    response = rest.post(spec.rest_path, json=payload, params=options)
-    mcp = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    response, mcp, code, cli = surface_calls(
+        spec, payload, params=options, options=options, flags=flags, cli_first=False
+    )
     assert response.status_code == 200 and not mcp.is_error and code == 0, response.text
     results = [response.json(), mcp.structured_content, cli]
     for result in results:
@@ -92,7 +85,7 @@ def test_native_actual_selected_points_are_public_and_identical(
     ],
 )
 def test_native_clock_failure_is_structured_before_projection(
-    project, fault, reason, monkeypatch, rest, tmp_path, capsys
+    project, fault, reason, monkeypatch, tmp_path, surface_calls
 ):
     monkeypatch.setenv("FATEBRIDGE_SOLAR_TERM_MODEL", "native")
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
@@ -109,9 +102,9 @@ def test_native_clock_failure_is_structured_before_projection(
     if project:
         options.update(fields=["bazi_birth.calendar_context"], strict_fields=True)
         flags += ["--fields", "bazi_birth.calendar_context", "--strict-fields", "true"]
-    response = rest.post(spec.rest_path, json=payload, params=options)
-    mcp = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    response, mcp, code, cli = surface_calls(
+        spec, payload, params=options, options=options, flags=flags, cli_first=False
+    )
     assert response.status_code == 503 and mcp.is_error and code != 0
     for value in [response.json(), mcp.structured_content, cli]:
         assert value["error_code"] == "ephemeris_source_inconsistent"

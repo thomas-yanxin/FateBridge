@@ -1,12 +1,9 @@
 """Ren validates the actual admitted DE440 profile, without moving its root."""
 
-import asyncio
 import copy
 from dataclasses import replace
-from datetime import datetime
 
 import pytest
-from pydantic import ValidationError
 
 from fatebridge.core import almanac, de440_solar
 from fatebridge.core.astro.time_scales import datetime_from_tt_point
@@ -15,14 +12,8 @@ from fatebridge.core.metaphysics import ren_calendar
 from fatebridge.core.output_chinese import RenTermDependency
 from fatebridge.services.metaphysics import _build_analysis_seed
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.support.ren_de440_profile_reference import reference
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 
 @pytest.fixture(autouse=True)
@@ -174,7 +165,7 @@ def test_actual_dependencies_keep_selected_and_mixed_profile_identities(
 @pytest.mark.parametrize("year", [1700, 2300])
 @pytest.mark.parametrize("key", ["liureng_gods", "jinkou"])
 def test_extended_full_request_reaches_rest_mcp_cli_with_actual_source(
-    year, key, rest, tmp_path, capsys
+    year, key, surface_calls
 ):
     payload = dict(
         analysis_year=year,
@@ -190,33 +181,9 @@ def test_extended_full_request_reaches_rest_mcp_cli_with_actual_source(
     s = SPECS[key]
     fields = ["four_pillars", "liureng.calendar_policy", "liureng.meta"]
     options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    h = rest.post(
-        s.rest_path,
-        json=payload,
-        params=[
-            *[("fields", f) for f in fields],
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
+    h, m, ccode, c = surface_calls(
+        s, payload, projection={**options, "response_char_limit": 0}
     )
-    ccode, c = call_cli(
-        s,
-        payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    m = asyncio.run(native(s, payload, **options))
     assert h.status_code == 200 and ccode == 0 and not m.is_error
     assert business(h.json()) == business(c) == business(m.structured_content)
     deps = h.json()["liureng"]["calendar_policy"]["solar_term_dependencies"]

@@ -1,6 +1,5 @@
 """Selected Jingben calendar anchors, branch identities and honest scope."""
 
-import asyncio
 import copy
 import json
 import shutil
@@ -18,16 +17,9 @@ from fatebridge.core.output_jinkou_branch_stars import (
     require_complete_branch_stars,
 )
 from scripts.ren.audit_jinkou_branch_stars import CORPUS, reference
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.ren.test_jinkou_natal import raw
 from tests.ren.test_ren_transports import PAYLOAD
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 REF = reference()
 SPEC = SPECS["jinkou"]
@@ -174,37 +166,16 @@ def test_complete_result_retains_all_explanation_dependencies(fault):
         require_complete_branch_stars(b)
 
 
-def test_published_view_on_real_rest_native_mcp_and_cli(rest, tmp_path, capsys):
+def test_published_view_on_real_rest_native_mcp_and_cli(surface_calls):
     fields = evidence_views(SPEC)["branch_stars"]["fields"]
     payload = dict(PAYLOAD, di_fen="酉")
     opts = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    h = rest.post(
-        SPEC.rest_path,
-        json=payload,
-        params=[
-            ("as_of", AS_OF),
-            ("response_char_limit", "0"),
-            ("include_snapshot_text", "false"),
-            ("strict_fields", "true"),
-            *[("fields", f) for f in fields],
-        ],
-    )
-    m = asyncio.run(native(SPEC, payload, **opts))
-    code, c = call_cli(
+    h, m, code, c = surface_calls(
         SPEC,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={**opts, "response_char_limit": 0},
+        cli_first=False,
+        rest_as_of=AS_OF,
     )
     assert h.status_code == 200 and not m.is_error and code == 0
     assert business(h.json()) == business(m.structured_content) == business(c)
@@ -216,7 +187,7 @@ def test_published_view_on_real_rest_native_mcp_and_cli(rest, tmp_path, capsys):
 @pytest.mark.parametrize("fault", ["missing", "wrong_year", "trace"])
 @pytest.mark.parametrize("project", [False, True])
 def test_domain_faults_fail_on_all_ports_before_projection(
-    fault, project, rest, monkeypatch, tmp_path, capsys
+    fault, project, monkeypatch, surface_calls
 ):
     bad = json.loads(json.dumps(raw()))
     b = bad["jinkou"]
@@ -254,9 +225,9 @@ def test_domain_faults_fail_on_all_ports_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         opts.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    h = rest.post(SPEC.rest_path, json=PAYLOAD, params=params)
-    m = asyncio.run(native(SPEC, PAYLOAD, **opts))
-    code, c = call_cli(SPEC, PAYLOAD, tmp_path, capsys, flags=flags)
+    h, m, code, c = surface_calls(
+        SPEC, PAYLOAD, params=params, options=opts, flags=flags, cli_first=False
+    )
     assert h.status_code == 500 and m.is_error and code == 1
     assert c["error_code"] == "internal_error"
 

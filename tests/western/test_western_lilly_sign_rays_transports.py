@@ -1,7 +1,5 @@
 """Actual local REST/MCP/CLI transport, not resident-server or model acceptance."""
 
-import asyncio
-
 import pytest
 from jsonschema import Draft202012Validator
 
@@ -10,13 +8,9 @@ from fatebridge.core.lilly_rays import (
     describe_sign_relationship,
     directed_sign_relationship,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as transport_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as transport_rest
+from tests.support.transports import surface_calls
 from tests.western.test_western_horary import QUESTION
 
 rest = transport_rest
@@ -26,7 +20,7 @@ rest = transport_rest
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
 @pytest.mark.parametrize("category", ["general", "career"])
 def test_source_directed_sign_witness_across_actual_protocols(
-    project, zodiac, category, rest, tmp_path, capsys
+    project, zodiac, category, surface_calls
 ):
     spec = SPECS["astro_horary"]
     inputs = {**QUESTION, "category": category, "zodiac_type": zodiac}
@@ -52,9 +46,9 @@ def test_source_directed_sign_witness_across_actual_protocols(
             "strict_fields": True,
             "include_snapshot_text": False,
         }
-    http = rest.post(spec.rest_path, json=inputs, params=params)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, inputs, **kwargs))
+    http, protocol, code, cli = surface_calls(
+        spec, inputs, params=params, options=kwargs, flags=flags
+    )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     values = [http.json(), cli, protocol.structured_content]
     assert business(values[0]) == business(values[1]) == business(values[2])

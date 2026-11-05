@@ -1,6 +1,5 @@
 """Complete internally valid results must still answer the submitted request."""
 
-import asyncio
 import copy
 import hashlib
 import json
@@ -14,14 +13,7 @@ from pydantic import ValidationError
 
 import fatebridge.application.execution as execution
 from fatebridge.core.execution_context import call_clock
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/ren_request_binding_v3"
@@ -188,7 +180,7 @@ def test_normalized_clocks_and_explicitly_unknown_inputs_still_work(label):
 @pytest.mark.parametrize("key", REF["bases"])
 @pytest.mark.parametrize("project", [False, True])
 def test_correct_complete_and_projected_results_agree_on_three_ports(
-    key, project, rest, tmp_path, capsys
+    key, project, surface_calls
 ):
     spec = SPECS[key]
     payload = REF["bases"][key]
@@ -199,9 +191,9 @@ def test_correct_complete_and_projected_results_agree_on_three_ports(
         params += [("fields", "analysis_type"), ("strict_fields", "true")]
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, value = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    http, protocol, code, value = surface_calls(
+        spec, payload, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json())
@@ -213,7 +205,7 @@ def test_correct_complete_and_projected_results_agree_on_three_ports(
 @pytest.mark.parametrize("key", REF["bases"])
 @pytest.mark.parametrize("project", [False, True])
 def test_foreign_complete_result_fails_on_three_ports_before_projection(
-    key, project, rest, monkeypatch, tmp_path, capsys
+    key, project, monkeypatch, surface_calls
 ):
     spec = SPECS[key]
     probe = next(p for p in FAULTS if p["key"] == key)
@@ -236,9 +228,9 @@ def test_foreign_complete_result_fails_on_three_ports_before_projection(
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
     payload = probe["request"]
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, result = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    http, protocol, code, result = surface_calls(
+        spec, payload, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert result["error_code"] == "internal_error"
     assert business(http.json())["error_code"] == "internal_error"
@@ -297,7 +289,7 @@ def test_genuine_source_failure_during_binding_keeps_its_type(key, monkeypatch):
 @pytest.mark.parametrize("key", REF["bases"])
 @pytest.mark.parametrize("project", [False, True])
 def test_genuine_source_failure_keeps_its_classification_on_three_ports(
-    key, project, rest, monkeypatch, tmp_path, capsys
+    key, project, monkeypatch, surface_calls
 ):
     from fatebridge.application import ren_request_binding
     from fatebridge.utils.errors import EphemerisSourceError
@@ -315,9 +307,9 @@ def test_genuine_source_failure_keeps_its_classification_on_three_ports(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, result = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    http, protocol, code, result = surface_calls(
+        spec, payload, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 503 and protocol.is_error and code == 1
     assert (
         result["error_code"]

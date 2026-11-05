@@ -1,18 +1,10 @@
 """Unresolved outgoing support cannot prove an unsupported weak target."""
 
-import asyncio
-
 import pytest
 
 from fatebridge.core.requests.divination import SixYaoRequest
 from fatebridge.services.divination import calculate_sixyao_analysis
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 CASES = [
     pytest.param(
@@ -116,7 +108,7 @@ def test_pending_source_does_not_override_month_broken_day_controlled_target():
 
 @pytest.mark.parametrize("date,base,changed,source,target,bucket,matched", CASES)
 def test_pending_support_qualification_matches_real_transports(
-    date, base, changed, source, target, bucket, matched, rest, tmp_path, capsys
+    date, base, changed, source, target, bucket, matched, surface_calls
 ):
     spec = SPECS["sixyao"]
     payload = payload_for(date, base, changed)
@@ -126,13 +118,13 @@ def test_pending_support_qualification_matches_real_transports(
         "liuyao_evidence.conditional_analysis.growth_conditions.lines",
         "liuyao_evidence.conditional_analysis.generation_conditions",
     ]
-    response = rest.post(
-        spec.rest_path, json=payload, params={"fields": fields, "strict_fields": True}
+    response, protocol, code, cli = surface_calls(
+        spec,
+        payload,
+        params={"fields": fields, "strict_fields": True},
+        options={"fields": fields, "strict_fields": True},
+        flags=("--fields", *fields, "--strict-fields"),
     )
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, flags=("--fields", *fields, "--strict-fields")
-    )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error
     expected = business(response.json())

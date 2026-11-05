@@ -8,7 +8,7 @@ import pytest
 from tests.bazi.test_bazi_source_comparison_transports import (
     test_same_literal_comparison_full_and_published_view_on_three_surfaces as check_surfaces,
 )
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import rest as _shared_rest
 
 REFERENCE = Path(__file__).resolve().parents[1] / "data/bazi/complete-units-source.json"
 CASES = json.loads(REFERENCE.read_text())["cases"]

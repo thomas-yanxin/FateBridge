@@ -19,14 +19,9 @@ from fatebridge.core.output_bazi_evidence import StrengthContext
 from fatebridge.core.output_classical_force import EngineeringForceComposition
 from fatebridge.core.output_strength_thresholds import StrengthThresholdArithmetic
 from tests.bazi.test_bazi_strength_thresholds import delivered_payload, evaluate
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _rest_fixture
 from tests.support import bazi_strength_reference_v3 as current_reference
+from tests.support.transports import SPECS, business, call_cli, native
+from tests.support.transports import rest as _rest_fixture
 
 rest = _rest_fixture
 DATA = Path(__file__).parents[1] / "data/bazi"

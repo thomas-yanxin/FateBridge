@@ -7,14 +7,14 @@ import pytest
 
 from fatebridge.core.liuyao_fanfu import PROFILE
 from fatebridge.core.local_techniques.sixyao import build_sixyao_result
-from scripts.liuyao.build_liuyao_fanfu_profile import build
+from scripts.liuyao.build_profile import build_profile
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_fanfu_v6"
 CASES = json.loads((REFERENCE / "cases.json").read_text(encoding="utf-8"))["cases"]
 
 
 def test_runtime_rules_match_frozen_scan_clauses_and_pre_implementation_cases():
-    assert build() == PROFILE
+    assert build_profile("fanfu") == PROFILE
 
 
 @pytest.mark.parametrize("case", CASES, ids=lambda c: c["id"])

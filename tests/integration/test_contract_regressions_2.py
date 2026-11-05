@@ -32,20 +32,18 @@ from fatebridge.services.astrology import (
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError, ParameterError
 from fatebridge.validation.house_roles import audit_specialty_house_roles
-from tests.evaluation.test_agentic_nested_outputs import SPECS, call_cli, native, rest
 from tests.evaluation.test_gauquelin_request_guard import HOUSE_SPECS, payload
+from tests.support.transports import SPECS, native, rest, surface_calls
 from tests.western.test_other_chart_angle_qualification import PAYLOAD
 
 
 @pytest.mark.parametrize("field", ["lookup_mode", "selected_sections"])
 def test_subject_null_nonnullable_field_is_rejected_on_three_protocols(
-    field, rest, tmp_path, capsys
+    field, surface_calls
 ):
     spec = SPECS["gua_lookup"]
     payload = {"query": "111111", field: None}
-    http = rest.post(spec.rest_path, json=payload)
-    protocol = asyncio.run(native(spec, payload))
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
+    http, protocol, code, cli = surface_calls(spec, payload, cli_first=False)
     assert http.status_code == 422 and protocol.is_error and code != 0
     assert http.json()["error_code"] == cli["error_code"] == "validation_error"
     assert field in str(cli["issues"])
@@ -571,7 +569,7 @@ def test_original_policy_source_error_is_preserved(monkeypatch):
 )
 @pytest.mark.parametrize("key", ["bazi_birth", "astro_chart"])
 def test_place_only_input_infers_the_same_point_on_all_surfaces(
-    key, place, timezone, longitude, rest, tmp_path, capsys
+    key, place, timezone, longitude, surface_calls
 ):
     spec = SPECS[key]
     payload = dict(
@@ -584,11 +582,9 @@ def test_place_only_input_infers_the_same_point_on_all_surfaces(
         gender="男",
         use_true_solar_time=True,
     )
-    response = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(
-        spec, payload, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    response, protocol, code, local = surface_calls(
+        spec, payload, flags=["--response-char-limit", "0"]
     )
-    protocol = asyncio.run(native(spec, payload))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     points = []
     for result in [response.json(), local, protocol.structured_content]:

@@ -1,6 +1,5 @@
 """Specified-edition topic clauses keep each actual cast and version distinct."""
 
-import asyncio
 import hashlib
 import json
 import shutil
@@ -12,13 +11,7 @@ from fatebridge.core.meihua_topics import TOPICS, topic_ruleset
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
 from fatebridge.validation.meihua_topics import audit_topic_clauses
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_topics_v1"
 CASES = json.loads((REFERENCES / "cases.json").read_text())["cases"]
@@ -173,7 +166,7 @@ def test_weather_context_cannot_silently_influence_a_topic_chapter(topic):
 @pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
 @pytest.mark.parametrize("topic", TOPICS)
 def test_topic_guidance_projects_source_clause_identically_on_three_surfaces(
-    tool, topic, rest, tmp_path, capsys
+    tool, topic, surface_calls
 ):
     from fatebridge.application.examples import suggested_fields
 
@@ -199,27 +192,14 @@ def test_topic_guidance_projects_source_clause_identically_on_three_surfaces(
     )
     payload["interpretation_topic"] = topic
     fields = suggested_fields(spec, view="topic")
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[("fields", f) for f in fields]
-        + [("strict_fields", "true"), ("response_char_limit", "0")],
-    )
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (
         business(response.json())

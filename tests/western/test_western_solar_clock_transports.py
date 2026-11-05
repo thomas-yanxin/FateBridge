@@ -1,6 +1,5 @@
 """Actual adapters deliver the same physical solar-clock receipt."""
 
-import asyncio
 import json
 from datetime import datetime
 from pathlib import Path
@@ -9,16 +8,10 @@ import pytest
 
 from fatebridge.core.astro import runtime
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files_module as native_ephemeris_files_module,
 )
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
 
@@ -38,7 +31,7 @@ KEYS = ["astro_chart", "astro_hellen", "astro_chart13", "astro_germany"]
 @pytest.mark.parametrize("row", ROWS, ids=lambda r: r["id"])
 @pytest.mark.parametrize("zodiacal", [0, 1])
 def test_coherent_solar_clock_receipt_on_all_adapters(
-    key, row, zodiacal, rest, tmp_path, capsys
+    key, row, zodiacal, surface_calls
 ):
     spec = SPECS[key]
     moment = datetime.fromisoformat(row["utc"])
@@ -54,21 +47,20 @@ def test_coherent_solar_clock_receipt_on_all_adapters(
         zodiacal=zodiacal,
     )
     path = "base_chart.person_info" if key == "astro_germany" else "person_info"
-    http = rest.post(
-        spec.rest_path,
-        json=payload,
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
         params=[
             ("fields", path),
             ("strict_fields", "true"),
             ("include_snapshot_text", "false"),
         ],
-    )
-    code, cli = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        [
+        options={
+            "fields": [path],
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=[
             "--fields",
             path,
             "--strict-fields",
@@ -78,15 +70,6 @@ def test_coherent_solar_clock_receipt_on_all_adapters(
             "--response-char-limit",
             "0",
         ],
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=[path],
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
     )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     values = [http.json(), cli, json.loads(protocol.content[0].text)]
@@ -118,7 +101,7 @@ def test_coherent_solar_clock_receipt_on_all_adapters(
 
 @pytest.mark.parametrize("key", KEYS)
 def test_clock_source_failure_remains_a_503_on_all_adapters(
-    key, rest, tmp_path, capsys, monkeypatch
+    key, monkeypatch, surface_calls
 ):
     spec = SPECS[key]
     original = runtime.ephemeris_call
@@ -139,9 +122,13 @@ def test_clock_source_failure_remains_a_503_on_all_adapters(
         birth_latitude=40,
         use_true_solar_time=True,
     )
-    http = rest.post(spec.rest_path, json=payload, params={"fields": "analysis_type"})
-    code, cli = call_cli(spec, payload, tmp_path, capsys, ["--fields", "analysis_type"])
-    protocol = asyncio.run(native(spec, payload, fields=["analysis_type"]))
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
+        params={"fields": "analysis_type"},
+        options={"fields": ["analysis_type"]},
+        flags=["--fields", "analysis_type"],
+    )
     value = json.loads(protocol.content[0].text)
     assert http.status_code == 503 and code == 1 and protocol.is_error
     assert cli["status_code"] == value["status_code"] == 503

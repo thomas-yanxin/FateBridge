@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.liuyao_cessation import PROFILE, _independent_sources
-from scripts.liuyao.build_liuyao_cessation_profile import build
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_roles import classical
 
 BASE = Path(__file__).parents[1] / "fixtures/liuyao_cessation_v17"
@@ -15,7 +15,7 @@ CASES = json.loads((BASE / "cases.json").read_text())["cases"]
 
 
 def test_frozen_same_edition_clauses_and_cases():
-    assert build() == PROFILE
+    assert build_profile("cessation") == PROFILE
     for name, digest in json.loads((BASE / "freeze.json").read_text())[
         "sha256"
     ].items():

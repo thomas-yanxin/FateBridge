@@ -1,6 +1,5 @@
 """Repeated seasonal clocks must survive typed output and all three transports."""
 
-import asyncio
 import json
 from copy import deepcopy
 from dataclasses import replace
@@ -16,14 +15,9 @@ from fatebridge.core.almanac import SolarTerm, get_solar_terms_for_year
 from fatebridge.core.analytic_solar import MODEL_ID
 from fatebridge.core.output_chinese import SolarTerm as OutputTerm
 from tests.bazi.test_bazi_year_contract import TOPICS
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import AS_OF, SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -99,7 +93,7 @@ def test_inconsistent_or_invalid_supplied_facts_are_rejected(bad):
     ],
 )
 def test_projection_cannot_hide_a_corrupt_solar_instant(
-    bad, rest, tmp_path, capsys, monkeypatch
+    bad, monkeypatch, surface_calls
 ):
     spec = SPECS["bazi_birth"]
     payload = {"bazi_birth": {"calendar_context": {"next_solar_term": bad}}}
@@ -120,14 +114,13 @@ def test_projection_cannot_hide_a_corrupt_solar_instant(
         use_true_solar_time=False,
     )
     options = dict(fields=["analysis_type"], strict_fields=True, as_of=AS_OF)
-    http = rest.post(spec.rest_path, json=arguments, params=options)
-    protocol = asyncio.run(native(spec, arguments, **options))
-    code, cli = call_cli(
+    http, protocol, code, cli = surface_calls(
         spec,
         arguments,
-        tmp_path,
-        capsys,
+        params=options,
+        options=options,
         flags=["--fields", "analysis_type", "--strict-fields", "true"],
+        cli_first=False,
     )
     assert http.status_code == 500 and code == 1 and protocol.is_error
     for result in [http.json(), protocol.structured_content, cli]:
@@ -138,7 +131,7 @@ def test_projection_cannot_hide_a_corrupt_solar_instant(
 @pytest.mark.parametrize("topic", TOPICS)
 @pytest.mark.parametrize("leaf_projection", [False, True])
 def test_all_ten_bazi_tools_preserve_fold_on_rest_native_mcp_cli(
-    topic, leaf_projection, rest, tmp_path, capsys, monkeypatch
+    topic, leaf_projection, tmp_path, monkeypatch, surface_calls
 ):
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     # The historical cohort was produced by this explicitly named model.
@@ -191,13 +184,11 @@ def test_all_ten_bazi_tools_preserve_fold_on_rest_native_mcp_cli(
         response_char_limit=0,
         as_of=AS_OF,
     )
-    response = rest.post(spec.rest_path, json=payload, params=options)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
+        params=options,
+        options=options,
         flags=[
             "--response-char-limit",
             "0",
@@ -208,6 +199,7 @@ def test_all_ten_bazi_tools_preserve_fold_on_rest_native_mcp_cli(
             "--fields",
             *fields,
         ],
+        cli_first=False,
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     results = [response.json(), protocol.structured_content, cli]

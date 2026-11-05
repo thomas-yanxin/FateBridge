@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_conditions import mounted
 from tests.liuyao.test_liuyao_hidden_reception import hidden_case
 
@@ -23,9 +24,8 @@ def corrected(case):
 
 def test_stage_profile_and_original_table_bytes_are_frozen():
     from fatebridge.core.liuyao_stages import PROFILE, STAGES
-    from scripts.liuyao.build_liuyao_stage_profile import build
 
-    assert PROFILE == build()
+    assert PROFILE == build_profile("stage")
     assert STAGES["火"] == {"寅": "长生", "戌": "墓"}
     for name, digest in json.loads((REFERENCE / "freeze.json").read_text())[
         "sha256"

@@ -1,20 +1,13 @@
 """Published root views retain the same calculation on REST, MCP and CLI."""
 
-import asyncio
-
 import pytest
 
 from fatebridge.application.examples import suggested_fields
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
 from tests.integration.test_result_delivery import reconstruct
 from tests.integration.test_result_delivery import store as _shared_store
+from tests.support.transports import AS_OF, SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 PAYLOAD = dict(
     birth_year=1990,
@@ -37,7 +30,7 @@ store = _shared_store
 
 
 @pytest.mark.parametrize("view", ["roots", "stem_roots"])
-def test_published_root_views_match_three_protocols(view, rest, tmp_path, capsys):
+def test_published_root_views_match_three_protocols(view, surface_calls):
     spec = SPECS["timing_analysis"]
     fields = suggested_fields(spec, view=view)
     options = dict(
@@ -46,25 +39,8 @@ def test_published_root_views_match_three_protocols(view, rest, tmp_path, capsys
         include_snapshot_text=False,
         response_char_limit=0,
     )
-    response = rest.post(
-        spec.rest_path, json=PAYLOAD, params={**options, "as_of": AS_OF}
-    )
-    protocol = asyncio.run(native(spec, PAYLOAD, **options))
-    code, cli = call_cli(
-        spec,
-        PAYLOAD,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-            "--response-char-limit",
-            "0",
-        ],
+    response, protocol, code, cli = surface_calls(
+        spec, PAYLOAD, projection=options, cli_first=False, rest_as_of=AS_OF
     )
     assert response.status_code == 200 and not protocol.is_error and code == 0
     outputs = [response.json(), protocol.structured_content, cli]

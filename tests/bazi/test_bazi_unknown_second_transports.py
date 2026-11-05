@@ -7,13 +7,8 @@ import pytest
 
 from tests.bazi.test_bazi_birth_seconds import SPECS
 from tests.bazi.test_bazi_unknown_second_transition import reference
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import AS_OF, business, call_cli, native
+from tests.support.transports import rest as _shared_rest
 
 RANGE_SPECS = [s for s in SPECS if s.key in {"timing_analysis", "dayun_analysis"}]
 

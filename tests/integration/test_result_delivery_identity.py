@@ -2,7 +2,6 @@
 
 import copy
 import json
-from pathlib import Path
 
 import pytest
 
@@ -17,9 +16,9 @@ from fatebridge.cli import run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import ParameterError
-from tests.evaluation.test_agentic_nested_outputs import rest  # noqa: F401
 from tests.fixtures.mcp_receipt import assert_same_run_receipt
 from tests.integration.test_result_delivery import reconstruct, store  # noqa: F401
+from tests.support.transports import rest
 
 
 @pytest.fixture(scope="module")

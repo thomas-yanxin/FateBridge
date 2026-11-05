@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_conditions import conditional_case, mounted
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_hidden_v14"
@@ -30,9 +31,8 @@ def hidden_case(case):
 
 def test_hidden_reception_cases_and_original_remain_frozen():
     from fatebridge.core.liuyao_hidden import PROFILE
-    from scripts.liuyao.build_liuyao_hidden_profile import build
 
-    assert PROFILE == build()
+    assert PROFILE == build_profile("hidden")
     for name, digest in json.loads((REFERENCE / "freeze.json").read_text())[
         "sha256"
     ].items():

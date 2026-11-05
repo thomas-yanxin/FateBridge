@@ -4,7 +4,6 @@ HKO data is used in production for this extension. Tests against that same
 table verify faithful conversion, not independent astronomical accuracy.
 """
 
-import asyncio
 import json
 from datetime import date, datetime
 from pathlib import Path
@@ -14,13 +13,9 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.core.almanac import _lunar_date_from_solar, get_lunar_context
 from fatebridge.core.lunar_supplement import convert, source_for
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -75,9 +70,7 @@ def test_supplement_never_extrapolates_or_mutates_source_metadata():
 
 
 @pytest.mark.parametrize("topic", TOPICS)
-def test_extension_date_is_consistent_on_all_ten_bazi_transports(
-    topic, rest, tmp_path, capsys
-):
+def test_extension_date_is_consistent_on_all_ten_bazi_transports(topic, surface_calls):
     spec = SPECS["bazi_" + topic]
     args = {
         "birth_year": 2100,
@@ -91,10 +84,8 @@ def test_extension_date_is_consistent_on_all_ten_bazi_transports(
         "analysis_month": 12,
         "analysis_day": 31,
     }
-    response = rest.post(spec.rest_path, json=args)
-    protocol = asyncio.run(native(spec, args))
-    code, local = call_cli(
-        spec, args, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    response, protocol, code, local = surface_calls(
+        spec, args, flags=["--response-char-limit", "0"], cli_first=False
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
@@ -111,14 +102,12 @@ def test_extension_date_is_consistent_on_all_ten_bazi_transports(
     "solar,expected", [("2100-02-09", (2100, 1, 1)), ("2100-12-31", (2100, 12, 1))]
 )
 def test_lunar_conversion_exposes_its_finite_source_on_all_transports(
-    solar, expected, rest, tmp_path, capsys
+    solar, expected, surface_calls
 ):
     spec = SPECS["nongli_time"]
     args = {"date": solar, "time": "12:00:00", "zone": "Asia/Shanghai", "time_alg": 1}
-    response = rest.post(spec.rest_path, json=args)
-    protocol = asyncio.run(native(spec, args))
-    code, local = call_cli(
-        spec, args, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    response, protocol, code, local = surface_calls(
+        spec, args, flags=["--response-char-limit", "0"], cli_first=False
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]

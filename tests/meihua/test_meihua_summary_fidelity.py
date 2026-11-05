@@ -1,26 +1,12 @@
 """Published default evidence and summaries carry their own computed qualifiers."""
 
-import asyncio
-import hashlib
 import json
 from pathlib import Path
 
 import pytest
-from fastmcp import Client
 
 from fatebridge.application.examples import suggested_fields
-from fatebridge.mcp_server import create_mcp_app
-from fatebridge.services.divination import calculate_meihua_analysis
-from fatebridge.services.meihua import calculate_meihua_cast
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
-from tests.fixtures.mcp_receipt import verified_inline_business
+from tests.support.transports import SPECS
 
 FIXTURE = Path(__file__).parents[1] / "fixtures/meihua_summary_fidelity_v1"
 POLICY = json.loads((FIXTURE / "composition-policy.json").read_text())

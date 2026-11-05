@@ -1,18 +1,10 @@
 """Actual consumed solar model policy survives full and projected delivery."""
 
-import asyncio
-
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import AS_OF, SPECS, business, inputs
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -20,7 +12,7 @@ rest = _shared_rest
 @pytest.mark.parametrize("key", ["bazi_birth", "dayun_analysis"])
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_model_components_are_identical_on_three_transports(
-    key, project, rest, tmp_path, capsys
+    key, project, surface_calls
 ):
     spec = SPECS[key]
     payload = inputs(spec)
@@ -40,9 +32,9 @@ def test_actual_model_components_are_identical_on_three_transports(
         fields = [calendar_path + ".current_solar_term.solar_model_details"]
         options.update(fields=fields, strict_fields=True)
         flags += ["--fields", *fields, "--strict-fields", "true"]
-    response = rest.post(spec.rest_path, json=payload, params=options)
-    mcp = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    response, mcp, code, cli = surface_calls(
+        spec, payload, params=options, options=options, flags=flags, cli_first=False
+    )
     assert response.status_code == 200, response.text
     assert not mcp.is_error and code == 0
     results = [response.json(), mcp.structured_content, cli]

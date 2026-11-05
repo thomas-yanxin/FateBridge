@@ -1,6 +1,5 @@
 """Loaded UTC coefficients must govern both cached roots and their receipts."""
 
-import asyncio
 import copy
 import importlib.util
 import json
@@ -16,14 +15,7 @@ from fatebridge.core.astro import historical_utc, time_scales, utc_policy
 from fatebridge.core.metaphysics import ren_calendar
 from fatebridge.core.solar_term_runtime import solar_term_cache_context
 from fatebridge.services.metaphysics import calculate_liureng_gods
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 MOD = importlib.util.spec_from_file_location(
@@ -94,7 +86,7 @@ def test_all_three_loaded_profiles_change_the_key_and_restore_it(
 @pytest.mark.parametrize("tool", ["liureng_gods", "jinkou"])
 @pytest.mark.parametrize("project", [False, True])
 def test_reloaded_historical_profile_reaches_three_ports_without_manual_cache_clear(
-    case, tool, project, rest, tmp_path, capsys, monkeypatch
+    case, tool, project, monkeypatch, surface_calls
 ):
     name = "utc1960_table" if case["table"] == "utc1960" else "historical_utc_table"
     table = copy.deepcopy(getattr(historical_utc, name)())
@@ -136,9 +128,9 @@ def test_reloaded_historical_profile_reaches_three_ports_without_manual_cache_cl
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    protocol = asyncio.run(native(spec, payload, **options))
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)

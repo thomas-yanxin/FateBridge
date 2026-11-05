@@ -1,6 +1,5 @@
 """Independent date/hour sources, fallback rejection and actual clock fidelity."""
 
-import asyncio
 import importlib.util
 import shutil
 from datetime import datetime, timedelta, timezone
@@ -10,14 +9,13 @@ import pytest
 
 from fatebridge.core import almanac
 from fatebridge.core.calendar import BaZiCalendar
-from fatebridge.core.metaphysics.ren_calendar import require_ren_calendar
 from fatebridge.services.metaphysics import (
     _build_analysis_seed,
     calculate_jinkou_analysis,
     calculate_liureng_gods,
 )
-from tests.evaluation.test_agentic_nested_outputs import SPECS, call_cli, native, rest
 from tests.ren.test_ren_transports import PAYLOAD
+from tests.support.transports import SPECS, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -44,7 +42,7 @@ def linear_failure(monkeypatch):
 
 @pytest.mark.parametrize("key", ["liureng_gods", "liureng_runyear", "jinkou"])
 def test_failed_astronomical_terms_never_publish_a_fallback_board_in_any_transport(
-    key, rest, tmp_path, capsys, linear_failure
+    key, linear_failure, surface_calls
 ):
     spec = SPECS[key]
     payload = {
@@ -58,9 +56,7 @@ def test_failed_astronomical_terms_never_publish_a_fallback_board_in_any_transpo
         payload.update(
             birth_year=1994, birth_month=8, birth_day=23, birth_hour=14, gender="女"
         )
-    http = rest.post(spec.rest_path, json=payload)
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    http, protocol, code, cli = surface_calls(spec, payload)
     assert http.status_code == 503 and code != 0 and protocol.is_error
     for body in (http.json(), cli, protocol.structured_content):
         assert body["error_code"] == "dependency_missing"

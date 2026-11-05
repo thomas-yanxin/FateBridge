@@ -1,6 +1,5 @@
 """Exact derived node versus displayed node in the unchanged house models."""
 
-import asyncio
 import math
 from datetime import datetime
 from decimal import Decimal, localcontext
@@ -14,9 +13,9 @@ from fatebridge.core.astro.context_geometry import build_context_geometry
 from fatebridge.core.astro.geometry import combine_longitudes
 from fatebridge.core.astro.house_positions import build_ecliptic_house_projection
 from fatebridge.core.astro.time_scales import ephemeris_time
-from tests.evaluation.test_agentic_nested_outputs import SPECS, business, call_cli
-from tests.evaluation.test_agentic_nested_outputs import inputs as representative_inputs
-from tests.evaluation.test_agentic_nested_outputs import native, rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import inputs as representative_inputs
+from tests.support.transports import rest, surface_calls
 
 
 def decimal_house(source, cusps):
@@ -166,7 +165,7 @@ def test_campanus_exact_derived_input_keeps_the_existing_plane_model():
 @pytest.mark.native_engine_fault
 @pytest.mark.parametrize("case", ["regular", "R", "T"])
 def test_public_otherbu_exact_node_house_membership_through_three_transports(
-    monkeypatch, rest, tmp_path, capsys, case
+    monkeypatch, case, surface_calls
 ):
     if case == "regular":
         source, date, time, latitude, hsys = (
@@ -219,12 +218,16 @@ def test_public_otherbu_exact_node_house_membership_through_three_transports(
         ("strict_fields", "true"),
         ("include_snapshot_text", "false"),
     ]
-    http = rest.post(spec.rest_path, json=inputs, params=query)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, ["--fields", *fields])
-    mcp = asyncio.run(
-        native(
-            spec, inputs, fields=fields, strict_fields=True, include_snapshot_text=False
-        )
+    http, mcp, code, cli = surface_calls(
+        spec,
+        inputs,
+        params=query,
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=["--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not mcp.is_error

@@ -1,6 +1,5 @@
 """Source changes invalidate roots and pillars; synthetic kernels are not oracles."""
 
-import asyncio
 import copy
 import json
 import os
@@ -18,9 +17,10 @@ from fatebridge.core.ephemeris_runtime import (
 )
 from fatebridge.core.solar_term_runtime import solar_term_cache_context
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.evaluation.test_agentic_nested_outputs import SPECS, call_cli, native
-from tests.evaluation.test_agentic_nested_outputs import rest as rest
 from tests.liuyao.test_liuyao_clash_transports import all_surfaces
+from tests.support.transports import SPECS, native
+from tests.support.transports import rest as rest
+from tests.support.transports import surface_calls
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
@@ -280,7 +280,7 @@ def test_synthetic_source_switch_changes_public_year_month(
 
 @pytest.mark.parametrize("problem", ["missing", "invalid", "native_unavailable"])
 def test_strict_source_failure_after_warm_year_survives_public_surfaces(
-    problem, rest, tmp_path, capsys, monkeypatch
+    problem, monkeypatch, surface_calls
 ):
     almanac.get_solar_terms_for_year(2026)
     monkeypatch.setenv("FATEBRIDGE_JPL_FILE", "missing-liuyao-v19.eph")
@@ -290,9 +290,7 @@ def test_strict_source_failure_after_warm_year_survives_public_surfaces(
         monkeypatch.setattr(almanac, "swe", None)
     spec = SPECS["sixyao"]
     payload = dict(date="2026-02-04", time="05:00:00", gua_code="000000")
-    response = rest.post(spec.rest_path, json=payload)
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, cli = surface_calls(spec, payload)
     assert response.status_code == 503 and code == 1 and protocol.is_error
     error = (
         "dependency_missing"

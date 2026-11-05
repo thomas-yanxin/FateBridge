@@ -4,7 +4,6 @@ Equal27 and equal28 overlays are numerical partitions. They do not replace
 Guolao's separately named unequal right-ascension mansion boundaries.
 """
 
-import asyncio
 import math
 from decimal import Decimal, localcontext
 
@@ -17,13 +16,9 @@ from fatebridge.core.astro.reference import NAKSHATRAS, SU28
 from fatebridge.core.local_techniques import chart as local_chart
 from fatebridge.core.local_techniques.chart import _su28_name
 from fatebridge.core.suzhan_astronomy import apply_equatorial_mansions
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-)
-from tests.evaluation.test_agentic_nested_outputs import inputs as representative_inputs
-from tests.evaluation.test_agentic_nested_outputs import native, rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import inputs as representative_inputs
+from tests.support.transports import rest, surface_calls
 
 
 @pytest.mark.parametrize("count", [27, 28])
@@ -63,12 +58,8 @@ def test_exact_quarter_turns_enter_the_next_equal28_mansion(longitude):
 @pytest.mark.native_engine_fault
 @pytest.mark.parametrize("tool", ["astro_india", "astro_chart"])
 def test_public_indian_chart_layers_share_the_same_controlled_boundary_coordinate(
-    monkeypatch, rest, tmp_path, capsys, tool
+    monkeypatch, tool, surface_calls
 ):
-    # Install this source control in the dedicated native test process. Both
-    # branches receive the same exact40-degree Moon; other natal inputs and
-    # the real service/transport plumbing remain. It tests sector consistency,
-    # not the physical position of the Moon at this birth instant.
     original_record = core_chart._build_planet_record
     original_positions = jyotish.positions
 
@@ -91,12 +82,16 @@ def test_public_indian_chart_layers_share_the_same_controlled_boundary_coordinat
     fields = ["planets", "india.nakshatras", "india.moon_nakshatra"]
     query = [("fields", field) for field in fields]
     query += [("strict_fields", "true"), ("include_snapshot_text", "false")]
-    http = rest.post(spec.rest_path, json=inputs, params=query)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, ["--fields", *fields])
-    mcp = asyncio.run(
-        native(
-            spec, inputs, fields=fields, strict_fields=True, include_snapshot_text=False
-        )
+    http, mcp, code, cli = surface_calls(
+        spec,
+        inputs,
+        params=query,
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=["--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not mcp.is_error
@@ -111,7 +106,7 @@ def test_public_indian_chart_layers_share_the_same_controlled_boundary_coordinat
 
 
 def test_public_legacy_equal28_keeps_source_membership_when_display_longitudes_tie(
-    monkeypatch, rest, tmp_path, capsys
+    monkeypatch, surface_calls
 ):
     original = local_chart.build_core_chart_payload
     before = math.nextafter(90.0, -math.inf)
@@ -135,9 +130,13 @@ def test_public_legacy_equal28_keeps_source_membership_when_display_longitudes_t
     }
     fields = ["chart.objects", "params.su28Method", "snapshot_text"]
     query = [("fields", field) for field in fields] + [("response_char_limit", 0)]
-    http = rest.post(spec.rest_path, json=inputs, params=query)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, ["--fields", *fields])
-    mcp = asyncio.run(native(spec, inputs, fields=fields, strict_fields=True))
+    http, mcp, code, cli = surface_calls(
+        spec,
+        inputs,
+        params=query,
+        options={"fields": fields, "strict_fields": True},
+        flags=["--fields", *fields],
+    )
     assert http.status_code == 200, http.text
     assert code == 0 and not mcp.is_error
     values = [http.json(), cli, mcp.structured_content]

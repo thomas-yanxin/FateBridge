@@ -6,13 +6,8 @@ import json
 import pytest
 
 from fatebridge.core import heluo_poems as hp
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest
+from tests.support.transports import SPECS, business, call_cli, native
+from tests.support.transports import rest as shared_rest
 
 rest = shared_rest
 CASES = [

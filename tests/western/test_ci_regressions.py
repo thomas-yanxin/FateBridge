@@ -1,6 +1,5 @@
 """Related contract regressions with shared imports; original cases retained."""
 
-import asyncio
 import json
 import math
 from datetime import datetime, timedelta, timezone
@@ -27,13 +26,7 @@ from fatebridge.core.predictive.profections import (
 from fatebridge.core.predictive.returns import _longitude_tt
 from fatebridge.utils.errors import EphemerisSourceError
 from fatebridge.utils.timezones import parse_timezone_name
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, native, rest, surface_calls
 
 
 @pytest.mark.parametrize("zone", ["UTC", "America/New_York", "Australia/Lord_Howe"])
@@ -80,14 +73,12 @@ def test_index_uses_the_same_representable_boundaries_as_the_timeline():
 )
 @pytest.mark.parametrize("return_timezone", ["UTC", "America/New_York"])
 def test_leap_birth_year_and_active_month_agree_on_all_transports(
-    rest,
-    tmp_path,
-    capsys,
     analysis_year,
     analysis_day,
     expected_start,
     expected_end,
     return_timezone,
+    surface_calls,
 ):
     spec = SPECS["givenyear"]
     payload = {
@@ -113,13 +104,13 @@ def test_leap_birth_year_and_active_month_agree_on_all_transports(
         "givenyear.annual_profection",
         "givenyear.analysis_datetime",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
+    response, protocol, code, local = surface_calls(
+        spec,
+        payload,
         params=[("fields", field) for field in fields],
+        options={"fields": fields},
+        flags=["--fields", *fields],
     )
-    code, local = call_cli(spec, payload, tmp_path, capsys, ["--fields", *fields])
-    protocol = asyncio.run(native(spec, payload, fields=fields))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert json.loads(protocol.content[0].text) == protocol.structured_content
     outputs = [response.json(), local, protocol.structured_content]
@@ -250,7 +241,7 @@ def test_persian_hit_limit_keeps_the_first_actual_age_with_equal_display_labels(
     ],
 )
 def test_derived_calculations_reach_all_three_transports(
-    rest, tmp_path, capsys, tool, field, options
+    tool, field, options, surface_calls
 ):
     spec = SPECS[tool]
     inputs = {
@@ -267,12 +258,16 @@ def test_derived_calculations_reach_all_three_transports(
     fields = [field]
     query = [("fields", field), ("strict_fields", "true")]
     query += [("include_snapshot_text", "false"), ("response_char_limit", 0)]
-    http = rest.post(spec.rest_path, json=inputs, params=query)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, ["--fields", *fields])
-    protocol = asyncio.run(
-        native(
-            spec, inputs, fields=fields, strict_fields=True, include_snapshot_text=False
-        )
+    http, protocol, code, cli = surface_calls(
+        spec,
+        inputs,
+        params=query,
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=["--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not protocol.is_error

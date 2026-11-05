@@ -42,6 +42,6 @@ uv run --locked --extra dev python -m pytest -q
 
 测试模块可以复用其他模块中的已命名辅助，但导入测试函数作为辅助时应使用不以 `test_` 开头的别名，避免额外收集同一测试。合并场景文件时保留全部参数、断言、标记及故障方式，并比较完整测试节点清单。
 
-pytest 使用 `importlib` 导入模式，允许不同领域的同名回归模块一起收集。复制的协议调用和分页逻辑统一复用或参数化；不同来源、不同请求和故障控制继续分别验证。梅花主题协议测试集中在 [test_meihua_topics_transports.py](meihua/test_meihua_topics_transports.py)，每个主题仍保留原请求、资格断言及同次结果的完整分页核对。
+pytest 使用 `importlib` 导入模式，允许不同领域的同名回归模块一起收集。三端夹具与调用在 [support/transports.py](support/transports.py) 维护，领域测试保留自己的输入、投影控制、执行顺序、故障注入与业务断言；相同控制才统一生成请求参数。不同来源、不同请求和故障控制继续分别验证。梅花主题协议测试集中在 [test_meihua_topics_transports.py](meihua/test_meihua_topics_transports.py)，每个主题仍保留原请求、资格断言及同次结果的完整分页核对。
 
 原典字面冲突、数值超差和未裁定结果本身也需要回归：测试通过可能只证明这些失败被诚实保留。不得从当前计算输出重新生成期望值、删反例或把固定来源检查改成跳过。当前算法限制见[算法状态](../docs/algorithm-status.md)，验证方法见[计算与预测验收](../docs/prediction-validation.md)。

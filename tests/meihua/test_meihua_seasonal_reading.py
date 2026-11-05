@@ -1,6 +1,5 @@
 """Selected month-strength clauses retain uncertainty and mixed source signals."""
 
-import asyncio
 import hashlib
 import json
 import shutil
@@ -16,13 +15,7 @@ from fatebridge.core.meihua_seasonal_reading import (
 from fatebridge.services.divination import calculate_meihua_analysis
 from fatebridge.services.meihua import calculate_meihua_cast
 from fatebridge.validation.meihua_seasonal_reading import audit_seasonal_reading
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 REFERENCES = Path(__file__).parents[1] / "fixtures/meihua_seasonal_reading_v1"
 DIAGRAMS = json.loads((REFERENCES / "cases.json").read_text())["diagrams"]
@@ -251,7 +244,7 @@ def test_wrong_frozen_status_is_detected_even_after_rehashing(tmp_path):
 @pytest.mark.parametrize("tool", ["meihua_analysis", "meihua_cast"])
 @pytest.mark.parametrize("topic", ["general", "transaction", "weather"])
 def test_new_evidence_and_null_weather_agree_on_three_transports(
-    tool, topic, rest, tmp_path, capsys
+    tool, topic, surface_calls
 ):
     spec = SPECS[tool]
     payload = (
@@ -271,31 +264,10 @@ def test_new_evidence_and_null_weather_agree_on_three_transports(
         "interpretation.seasonal_qualification",
         "summary",
     ]
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *(("fields", f) for f in fields),
-            ("strict_fields", "true"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
-    )
-    protocol = asyncio.run(
-        native(spec, payload, fields=fields, strict_fields=True, response_char_limit=0)
+        projection={"fields": fields, "strict_fields": True, "response_char_limit": 0},
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]

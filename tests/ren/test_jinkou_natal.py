@@ -1,6 +1,5 @@
 """The missing 将命 input is explicit, nullable and faithful on every port."""
 
-import asyncio
 import copy
 import importlib.util
 import json
@@ -17,15 +16,15 @@ from fatebridge.core.metaphysics.jinkou_relations import natal_absolute
 from fatebridge.core.output_chinese import JinkouJue
 from fatebridge.core.output_jinkou_natal import JinkouNatalAbsolute
 from fatebridge.core.requests.metaphysics import JinkouAnalysisRequest
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.ren.test_ren_transports import PAYLOAD
+from tests.support.transports import (
     AS_OF,
     SPECS,
     business,
     call_cli,
-    native,
     rest,
+    surface_calls,
 )
-from tests.ren.test_ren_transports import PAYLOAD
 
 ROOT = Path(__file__).resolve().parents[2]
 MOD = importlib.util.spec_from_file_location(
@@ -103,7 +102,7 @@ def test_omission_and_null_keep_unknown_while_all_twelve_explicit_branches_are_v
 @pytest.mark.parametrize("natal", [None, "卯", "申"])
 @pytest.mark.parametrize("project", [False, True])
 def test_explicit_and_missing_natal_are_delivered_on_three_ports(
-    natal, project, rest, tmp_path, capsys
+    natal, project, surface_calls
 ):
     payload = dict(PAYLOAD, di_fen="酉", natal_branch=natal)
     params = [("as_of", AS_OF), ("response_char_limit", "0")]
@@ -129,9 +128,9 @@ def test_explicit_and_missing_natal_are_delivered_on_three_ports(
             "--include-snapshot-text",
             "false",
         ]
-    http = rest.post(SPEC.rest_path, json=payload, params=params)
-    protocol = asyncio.run(native(SPEC, payload, **options))
-    code, cli = call_cli(SPEC, payload, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        SPEC, payload, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)
@@ -182,7 +181,7 @@ def test_explicit_natal_never_changes_the_four_positions_calendar_or_use():
 )
 @pytest.mark.parametrize("project", [False, True])
 def test_corrupt_natal_evidence_fails_before_unrelated_projection(
-    fault, project, rest, monkeypatch, tmp_path, capsys
+    fault, project, monkeypatch, surface_calls
 ):
     bad = raw(None if fault == "invent_missing_match" else "酉")
     jue = bad["jinkou"]["relations"]["si_jue"]
@@ -242,9 +241,9 @@ def test_corrupt_natal_evidence_fails_before_unrelated_projection(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(SPEC.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(SPEC, PAYLOAD, **options))
-    code, cli = call_cli(SPEC, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        SPEC, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert cli["error_code"] == "internal_error"
 
@@ -276,11 +275,9 @@ def test_cli_explicit_flag_overrides_an_unspecified_natal_branch(tmp_path, capsy
     assert node["right_branch"] == "卯" and node["matched"] is True
 
 
-def test_invalid_natal_input_is_an_input_error_on_every_port(rest, tmp_path, capsys):
+def test_invalid_natal_input_is_an_input_error_on_every_port(surface_calls):
     payload = dict(PAYLOAD, natal_branch="甲子")
-    http = rest.post(SPEC.rest_path, json=payload)
-    protocol = asyncio.run(native(SPEC, payload))
-    code, cli = call_cli(SPEC, payload, tmp_path, capsys)
+    http, protocol, code, cli = surface_calls(SPEC, payload, cli_first=False)
     assert http.status_code == 422 and protocol.is_error and code == 1
     assert cli["error_code"] == "validation_error"
 

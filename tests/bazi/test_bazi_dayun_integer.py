@@ -12,13 +12,8 @@ import fatebridge.core.timing as timing
 from fatebridge.application.execution import execute_tool
 from fatebridge.core.almanac import get_solar_terms_for_year
 from fatebridge.core.execution_context import ExecutionOptions
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _rest_fixture
+from tests.support.transports import SPECS, business, call_cli, native
+from tests.support.transports import rest as _rest_fixture
 
 
 def exact_age_ceiling(birth, boundary):

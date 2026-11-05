@@ -20,7 +20,7 @@ from fatebridge.core.output_chinese import Taiyi
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.divination import calculate_sanshiunited_analysis
 from fatebridge.services.metaphysics import calculate_taiyi_analysis
-from tests.evaluation.test_agentic_nested_outputs import SPECS, business, call_cli
+from tests.support.transports import SPECS, business, call_cli
 from tests.taiyi.test_taiyi_periods import seed_at
 from tests.taiyi.test_taiyi_transports import _same_run_payload
 

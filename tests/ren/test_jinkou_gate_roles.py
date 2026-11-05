@@ -1,6 +1,5 @@
 """A 月将/贵神 role correction must generalize beyond one printed example."""
 
-import asyncio
 import importlib.util
 import json
 import shutil
@@ -9,13 +8,7 @@ from pathlib import Path
 import pytest
 
 from fatebridge.core.metaphysics.jinkou_patterns import structural_patterns
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -96,7 +89,7 @@ def test_new_collation_cannot_overwrite_or_hide_the_original_reference(
 @pytest.mark.parametrize("hour,expected", [(14, True), (12, False)])
 @pytest.mark.parametrize("project", [False, True])
 def test_actual_four_positions_and_snapshot_agree_across_three_surfaces(
-    hour, expected, project, rest, tmp_path, capsys
+    hour, expected, project, surface_calls
 ):
     spec = SPECS["jinkou"]
     payload = dict(
@@ -130,9 +123,9 @@ def test_actual_four_positions_and_snapshot_agree_across_three_surfaces(
             "false",
         ]
         options = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=payload, params=params)
-    code, cli = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, payload, **options))
+    http, protocol, code, cli = surface_calls(
+        spec, payload, params=params, options=options, flags=flags
+    )
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     bodies = [http.json(), cli, protocol.structured_content]
     assert business(bodies[0]) == business(bodies[1]) == business(bodies[2])

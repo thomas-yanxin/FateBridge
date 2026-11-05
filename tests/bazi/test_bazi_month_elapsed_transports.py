@@ -6,13 +6,8 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import SPECS, business, call_cli, native
+from tests.support.transports import rest as _shared_rest
 
 rest = _shared_rest
 

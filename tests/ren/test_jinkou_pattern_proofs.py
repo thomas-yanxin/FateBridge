@@ -1,6 +1,5 @@
 """Complete premise traces, independent arithmetic and preserved source failures."""
 
-import asyncio
 import copy
 import hashlib
 import json
@@ -13,15 +12,8 @@ from pydantic import ValidationError
 from fatebridge.application.execution import OutputContractError, validate_output
 from fatebridge.core.metaphysics.jinkou_patterns import patterns_from_symbols
 from fatebridge.core.output_ren_patterns import JinkouPatterns
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.ren.test_ren_anchors import assert_broken_on_three_ports
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = ROOT / "tests/fixtures/jinkou_pattern_proofs_v1"
@@ -321,7 +313,7 @@ def test_unknown_propagation_obeys_frozen_three_valued_logic(case):
 
 @pytest.mark.parametrize("project", [False, True])
 def test_positive_proofs_on_three_ports_full_and_strict_projection(
-    project, rest, tmp_path, capsys
+    project, surface_calls
 ):
     _, payload = complete()
     params = {"as_of": AS_OF, "response_char_limit": 0}
@@ -337,9 +329,9 @@ def test_positive_proofs_on_three_ports_full_and_strict_projection(
         options = dict(fields=fields, strict_fields=True)
         flags.extend(["--fields", *fields])
         flags.extend(["--strict-fields", "true"])
-    response = rest.post(SPEC.rest_path, json=payload, params=params)
-    protocol = asyncio.run(native(SPEC, payload, **options))
-    code, cli = call_cli(SPEC, payload, tmp_path, capsys, flags=flags)
+    response, protocol, code, cli = surface_calls(
+        SPEC, payload, params=params, options=options, flags=flags, cli_first=False
+    )
     assert response.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(response.json())

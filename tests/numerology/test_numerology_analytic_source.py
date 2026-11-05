@@ -9,9 +9,9 @@ import pytest
 
 from fatebridge.core import almanac, analytic_solar, de440_solar
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.evaluation.test_agentic_nested_outputs import SPECS
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest
 from tests.numerology.test_heluo_poem_transports import run_three
+from tests.support.transports import SPECS
+from tests.support.transports import rest as shared_rest
 
 rest = shared_rest
 F = Path(__file__).parents[1] / "fixtures/numerology_analytic_source_v1"

@@ -28,14 +28,15 @@ from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.astrology import calculate_germany_chart_analysis
 from fatebridge.services.tool_catalog import CATALOG
 from fatebridge.utils.errors import EphemerisSourceError
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.fixtures.surface_payloads import astro_payload
+from tests.support.transports import (
     SPECS,
     business,
     call_cli,
     native,
     rest,
+    surface_calls,
 )
-from tests.fixtures.surface_payloads import astro_payload
 from tests.western.test_house_selection_contract import CODE_SPECS, HOUSE_SPECS, inputs
 from tests.western.test_other_chart_schools_transports import (
     test_specialized_facts_across_three_real_surfaces as check_surfaces,
@@ -458,7 +459,7 @@ def test_published_motion_card_reads_conditions_with_instantaneous_evidence(key,
 @pytest.mark.parametrize("key", ["astro_chart", "astro_hellen", "astro_india"])
 @pytest.mark.parametrize("project", [False, True])
 def test_motion_facts_and_limits_agree_across_rest_native_mcp_and_cli(
-    key, project, rest, tmp_path, capsys
+    key, project, surface_calls
 ):
     spec = SPECS[key]
     fields = [
@@ -486,9 +487,9 @@ def test_motion_facts_and_limits_agree_across_rest_native_mcp_and_cli(
             "strict_fields": True,
             "include_snapshot_text": False,
         }
-    response = rest.post(spec.rest_path, json=BIRTH, params=query)
-    code, local = call_cli(spec, BIRTH, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, BIRTH, **protocol_flags))
+    response, protocol, code, local = surface_calls(
+        spec, BIRTH, params=query, options=protocol_flags, flags=flags
+    )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -638,7 +639,7 @@ def test_julian_and_gregorian_same_instant_on_rest_native_mcp_cli(
     ],
 )
 def test_calendar_faults_are_rejected_consistently_before_calculation(
-    tool, prefix, inputs, calendar, year, month, day, rest, tmp_path, capsys
+    tool, prefix, inputs, calendar, year, month, day, surface_calls
 ):
     spec = SPECS[tool]
     payload = {
@@ -648,9 +649,7 @@ def test_calendar_faults_are_rejected_consistently_before_calculation(
         prefix + "month": month,
         prefix + "day": day,
     }
-    http = rest.post(spec.rest_path, json=payload)
-    code, cli = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    http, protocol, code, cli = surface_calls(spec, payload)
     assert http.status_code == 422 and code != 0 and protocol.is_error
     assert "calendar_conversion" not in cli
 
@@ -659,7 +658,7 @@ def test_calendar_faults_are_rejected_consistently_before_calculation(
 @pytest.mark.parametrize("house", ["R", "E", "N"])
 @pytest.mark.parametrize("zodiac", ["Tropic", "Sidereal"])
 def test_unresolved_physical_reference_is_not_a_confirmed_fact_on_any_adapter(
-    key, house, zodiac, rest, tmp_path, capsys
+    key, house, zodiac, tmp_path, surface_calls
 ):
     prefix = "question" if key == "astro_horary" else "candidate"
     root = "horary" if key == "astro_horary" else "election"
@@ -677,11 +676,12 @@ def test_unresolved_physical_reference_is_not_a_confirmed_fact_on_any_adapter(
     }
     spec = SPECS[key]
     # Full JSON validates all nested facts, not a stubbed domain calculation.
-    http = rest.post(spec.rest_path, json=payload, params={"response_char_limit": 0})
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, ["--response-char-limit", "0"]
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
+        params={"response_char_limit": 0},
+        flags=["--response-char-limit", "0"],
     )
-    protocol = asyncio.run(native(spec, payload))
     assert http.status_code == 200 and code == 0 and not protocol.is_error
     values = [http.json(), cli, json.loads(protocol.content[0].text)]
     assert business(values[0]) == business(values[1]) == business(values[2])

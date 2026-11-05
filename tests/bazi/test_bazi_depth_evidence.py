@@ -15,16 +15,11 @@ from fatebridge.core.bazi_evidence import build_natal_evidence, build_topic_evid
 from fatebridge.core.elements import ElementAnalysis
 from fatebridge.core.output_bazi_evidence import BaziEvidenceChain
 from fatebridge.core.strength import assess_strength
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    inputs,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
 from tests.integration.test_result_delivery import reconstruct
 from tests.integration.test_result_delivery import store as _shared_store
+from tests.support.transports import SPECS, business, call_cli, inputs, native
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 CASES = json.loads(
     (Path(__file__).parents[1] / "data/bazi_classical_v1/cases.json").read_text()
@@ -248,9 +243,7 @@ def test_marriage_index_does_not_generate_late_marriage_or_affair_advice():
     ],
 )
 @pytest.mark.parametrize("gender", ["男", "未知"])
-def test_nine_depth_views_match_actual_rest_mcp_cli(
-    topic, gender, rest, tmp_path, capsys
-):
+def test_nine_depth_views_match_actual_rest_mcp_cli(topic, gender, surface_calls):
     spec = SPECS["bazi_" + topic]
     request = inputs(spec)
     request.pop("dayun_pillar", None)
@@ -263,14 +256,12 @@ def test_nine_depth_views_match_actual_rest_mcp_cli(
         "include_snapshot_text": False,
         "response_char_limit": 0,
     }
-    http = rest.post(spec.rest_path, json=request, params=flags)
-    protocol = asyncio.run(native(spec, request, **flags))
-    code, output = call_cli(
+    http, protocol, code, output = surface_calls(
         spec,
         request,
-        tmp_path,
-        capsys,
-        [
+        params=flags,
+        options=flags,
+        flags=[
             "--no-metadata",
             "--fields",
             *fields,
@@ -279,6 +270,7 @@ def test_nine_depth_views_match_actual_rest_mcp_cli(
             "--response-char-limit",
             "0",
         ],
+        cli_first=False,
     )
     assert http.status_code == 200, http.text
     assert not protocol.is_error and code == 0

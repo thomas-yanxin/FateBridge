@@ -1,6 +1,5 @@
 """Published dates keep their scope, disagreements and same-instant anchors."""
 
-import asyncio
 import copy
 import json
 import shutil
@@ -21,13 +20,7 @@ from fatebridge.core.output_ren_term_dates import (
 )
 from scripts.astronomy.build_hko_term_dates import build, encoded
 from scripts.ren.audit_ren_hko_dates import CORPUS, reference
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, native, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 REF = reference()
@@ -236,40 +229,16 @@ def test_full_policy_cannot_drop_or_forge_reference_evidence(fault):
 @pytest.mark.parametrize("key", ["liureng_gods", "jinkou"])
 @pytest.mark.parametrize("index", range(7))
 def test_old_seven_date_disagreements_survive_all_three_protocols(
-    key, index, rest, tmp_path, capsys
+    key, index, surface_calls
 ):
     s = SPECS[key]
     p = payload(key, index)
     prefix = "jinkou" if key == "jinkou" else "liureng"
     fields = evidence_views(s)["published_term_dates"]["fields"]
     opts = dict(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(
-        s.rest_path,
-        json=p,
-        params=[
-            *[("fields", f) for f in fields],
-            ("strict_fields", "true"),
-            ("include_snapshot_text", "false"),
-            ("response_char_limit", "0"),
-        ],
+    http, mcp, code, cli = surface_calls(
+        s, p, projection={**opts, "response_char_limit": 0}
     )
-    code, cli = call_cli(
-        s,
-        p,
-        tmp_path,
-        capsys,
-        flags=[
-            "--response-char-limit",
-            "0",
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--include-snapshot-text",
-            "false",
-        ],
-    )
-    mcp = asyncio.run(native(s, p, **opts))
     assert http.status_code == 200 and code == 0 and not mcp.is_error
     assert business(http.json()) == business(cli) == business(mcp.structured_content)
     terms = http.json()[prefix]["calendar_policy"]["solar_term_dependencies"]
@@ -302,7 +271,7 @@ def test_runyear_snapshot_shows_same_dependency_conflict_and_reference_scope():
 
 @pytest.mark.parametrize("project", [False, True])
 def test_three_protocols_reject_deleted_or_changed_reference_before_projection(
-    project, rest, monkeypatch, tmp_path, capsys
+    project, monkeypatch, surface_calls
 ):
     s = SPECS["liureng_gods"]
     p = payload("liureng_gods")
@@ -325,9 +294,9 @@ def test_three_protocols_reject_deleted_or_changed_reference_before_projection(
         params += [("fields", "four_pillars"), ("strict_fields", "true")]
         flags += ["--fields", "four_pillars", "--strict-fields", "true"]
         opts = dict(fields=["four_pillars"], strict_fields=True)
-    h = rest.post(s.rest_path, json=p, params=params)
-    m = asyncio.run(native(s, p, **opts))
-    code, c = call_cli(s, p, tmp_path, capsys, flags=flags)
+    h, m, code, c = surface_calls(
+        s, p, params=params, options=opts, flags=flags, cli_first=False
+    )
     assert h.status_code == 500 and m.is_error and code != 0
     assert all(
         v["error_code"] == "internal_error" and "liureng" not in v

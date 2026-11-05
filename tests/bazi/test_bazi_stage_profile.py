@@ -12,13 +12,8 @@ from fatebridge.application.examples import suggested_fields
 from fatebridge.core.classical_roots import classify_classical_root
 from fatebridge.core.classical_stages import life_stage_profile, twelve_life_stage
 from fatebridge.core.output_stage_profile import LifeStageProfile
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-)
-from tests.evaluation.test_agentic_nested_outputs import rest as _rest_fixture
+from tests.support.transports import SPECS, business, call_cli, native
+from tests.support.transports import rest as _rest_fixture
 
 rest = _rest_fixture
 ANCHORS = json.loads(

@@ -5,7 +5,6 @@ import copy
 import hashlib
 import json
 from dataclasses import replace
-from pathlib import Path
 
 import pytest
 from fastmcp import Client
@@ -16,8 +15,8 @@ from fatebridge.application.examples import example_input
 from fatebridge.cli import run as cli_run
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.tool_catalog import CATALOG
-from tests.evaluation.test_agentic_nested_outputs import rest
 from tests.fixtures.mcp_result_delivery import first_page_uri
+from tests.support.transports import rest
 
 KEYS = [
     "astro_chart",

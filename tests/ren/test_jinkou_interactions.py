@@ -1,6 +1,5 @@
 """Classical order, simultaneous relations and faithful three-port delivery."""
 
-import asyncio
 import copy
 import hashlib
 import importlib.util
@@ -21,17 +20,10 @@ from fatebridge.core.output_jinkou_interactions import JinkouPositionInteraction
 from fatebridge.mcp_server import create_mcp_app
 from fatebridge.services.metaphysics import calculate_jinkou_analysis
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
-from tests.evaluation.test_agentic_nested_outputs import (
-    AS_OF,
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.quality.test_codex_call_contracts import (
     assert_same_receipt_with_explicit_runtime_delivery,
 )
+from tests.support.transports import AS_OF, SPECS, business, rest, surface_calls
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
@@ -150,7 +142,7 @@ def test_invalid_position_inputs_are_rejected(bad):
 
 @pytest.mark.parametrize("project", [False, True])
 def test_real_board_has_both_generation_and_control_on_all_ports(
-    project, rest, tmp_path, capsys
+    project, surface_calls
 ):
     spec = SPECS["jinkou"]
     fields = [
@@ -177,9 +169,9 @@ def test_real_board_has_both_generation_and_control_on_all_ports(
             "false",
         ]
         options.update(fields=fields, strict_fields=True, include_snapshot_text=False)
-    http = rest.post(spec.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(spec, PAYLOAD, **options))
-    code, cli = call_cli(spec, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, cli = surface_calls(
+        spec, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
         business(http.json()) == business(protocol.structured_content) == business(cli)
@@ -252,7 +244,7 @@ def corrupt(data, name):
 @pytest.mark.parametrize("fault", FAULTS)
 @pytest.mark.parametrize("project", [False, True])
 def test_complete_business_envelope_rejects_corruption_before_projection(
-    fault, project, rest, monkeypatch, tmp_path, capsys
+    fault, project, monkeypatch, surface_calls
 ):
     spec = SPECS["jinkou"]
     valid = calculate_jinkou_analysis(**PAYLOAD)
@@ -280,9 +272,9 @@ def test_complete_business_envelope_rejects_corruption_before_projection(
         params.update(fields="analysis_type", strict_fields="true")
         options.update(fields=["analysis_type"], strict_fields=True)
         flags += ["--fields", "analysis_type", "--strict-fields", "true"]
-    http = rest.post(spec.rest_path, json=PAYLOAD, params=params)
-    protocol = asyncio.run(native(spec, PAYLOAD, **options))
-    code, out = call_cli(spec, PAYLOAD, tmp_path, capsys, flags=flags)
+    http, protocol, code, out = surface_calls(
+        spec, PAYLOAD, params=params, options=options, flags=flags, cli_first=False
+    )
     assert http.status_code == 500 and protocol.is_error and code == 1
     assert out["error_code"] == "internal_error"
 
@@ -297,14 +289,12 @@ def test_complete_business_envelope_rejects_corruption_before_projection(
         "complete_classical_conformance",
     ],
 )
-def test_sparse_projections_preserve_complete_arrays_and_false(
-    field, rest, tmp_path, capsys
-):
+def test_sparse_projections_preserve_complete_arrays_and_false(field, surface_calls):
     spec = SPECS["jinkou"]
     path = "jinkou.position_interactions." + field
-    http = rest.post(
-        spec.rest_path,
-        json=PAYLOAD,
+    http, protocol, code, cli = surface_calls(
+        spec,
+        PAYLOAD,
         params=dict(
             as_of=AS_OF,
             fields=path,
@@ -312,21 +302,11 @@ def test_sparse_projections_preserve_complete_arrays_and_false(
             include_snapshot_text="false",
             response_char_limit=0,
         ),
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            PAYLOAD,
-            fields=[path],
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
-    )
-    code, cli = call_cli(
-        spec,
-        PAYLOAD,
-        tmp_path,
-        capsys,
+        options={
+            "fields": [path],
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
         flags=[
             "--response-char-limit",
             "0",
@@ -337,6 +317,7 @@ def test_sparse_projections_preserve_complete_arrays_and_false(
             "--include-snapshot-text",
             "false",
         ],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (
@@ -345,17 +326,15 @@ def test_sparse_projections_preserve_complete_arrays_and_false(
     spec.output_model.model_validate(cli)
 
 
-def test_selected_four_position_section_and_same_run_claims_are_faithful(
-    rest, tmp_path, capsys
-):
+def test_selected_four_position_section_and_same_run_claims_are_faithful(surface_calls):
     spec = SPECS["jinkou"]
     payload = {**PAYLOAD, "selected_sections": ["金口诀四位"]}
-    http = rest.post(
-        spec.rest_path, json=payload, params=dict(as_of=AS_OF, response_char_limit=0)
-    )
-    protocol = asyncio.run(native(spec, payload))
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, flags=["--response-char-limit", "0"]
+    http, protocol, code, cli = surface_calls(
+        spec,
+        payload,
+        params=dict(as_of=AS_OF, response_char_limit=0),
+        flags=["--response-char-limit", "0"],
+        cli_first=False,
     )
     assert http.status_code == 200 and not protocol.is_error and code == 0
     assert (

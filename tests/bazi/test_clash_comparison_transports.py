@@ -8,12 +8,13 @@ from fatebridge.application.examples import suggested_fields
 from fatebridge.core.clash_comparison import clash_comparison_snapshot_lines
 from fatebridge.validation.claims import CalculationClaim, verify_calculation_claims
 from tests.bazi.test_bazi_year_contract import TOPICS
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.support.transports import (
     SPECS,
     business,
     call_cli,
     native,
     rest,
+    surface_calls,
 )
 
 PAYLOAD = {
@@ -36,19 +37,15 @@ def walk(result, path):
 
 
 @pytest.mark.parametrize("topic", TOPICS)
-def test_clash_reasoning_view_matches_rest_native_mcp_cli(
-    topic, rest, tmp_path, capsys
-):
+def test_clash_reasoning_view_matches_rest_native_mcp_cli(topic, surface_calls):
     spec = SPECS["bazi_" + topic]
     fields = suggested_fields(spec, view="clash_reasoning")
     opts = {"fields": fields, "strict_fields": True, "include_snapshot_text": False}
-    response = rest.post(spec.rest_path, json=PAYLOAD, params=opts)
-    protocol = asyncio.run(native(spec, PAYLOAD, **opts))
-    code, cli = call_cli(
+    response, protocol, code, cli = surface_calls(
         spec,
         PAYLOAD,
-        tmp_path,
-        capsys,
+        params=opts,
+        options=opts,
         flags=[
             "--fields",
             *fields,
@@ -59,6 +56,7 @@ def test_clash_reasoning_view_matches_rest_native_mcp_cli(
             "--response-char-limit",
             "0",
         ],
+        cli_first=False,
     )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (

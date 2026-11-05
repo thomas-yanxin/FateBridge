@@ -2,8 +2,6 @@
 
 import hashlib
 import json
-import subprocess
-import sys
 from dataclasses import replace
 from fractions import Fraction as F
 from pathlib import Path
@@ -151,39 +149,3 @@ def test_source_elapsed_count_requires_explicit_integer_years(value):
 def test_out_of_scope_upward_reckoning_or_nonpositive_year_length_is_rejected(value):
     with pytest.raises(ValueError):
         shoushi_winter_sun(value)
-
-
-@pytest.mark.parametrize("elapsed", [0, 318, 319])
-def test_research_cli_replays_the_same_domain_chain(elapsed):
-    run = subprocess.run(
-        [
-            sys.executable,
-            "scripts/guolao/audit_guolao_solar.py",
-            "--elapsed-years",
-            str(elapsed),
-        ],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    assert json.loads(run.stdout) == shoushi_winter_sun(elapsed)
-
-
-@pytest.mark.parametrize(
-    "arguments",
-    [
-        [],
-        ["--elapsed-years", "-1"],
-        ["--elapsed-years", "318.5"],
-        ["--elapsed-years", "NaN"],
-    ],
-)
-def test_research_cli_rejects_unprovided_fractional_or_invalid_elapsed_input(arguments):
-    run = subprocess.run(
-        [sys.executable, "scripts/guolao/audit_guolao_solar.py", *arguments],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-    )
-    assert run.returncode == 2 and not run.stdout

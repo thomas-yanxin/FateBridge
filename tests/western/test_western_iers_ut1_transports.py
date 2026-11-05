@@ -1,17 +1,17 @@
 """Real protocol UT1 source selection, numerical axes, and nullable projection."""
 
-import asyncio
 import gzip
 import json
 from pathlib import Path
 
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import SPECS, call_cli, native
-from tests.evaluation.test_agentic_nested_outputs import rest as rest
 from tests.support.ephemeris_case_runtime import (
     native_ephemeris_files_module as native_ephemeris_files_module,
 )
+from tests.support.transports import SPECS
+from tests.support.transports import rest as rest
+from tests.support.transports import surface_calls
 from tests.western.test_western_event_clock_transports import surfaces
 
 pytestmark = pytest.mark.usefixtures("native_ephemeris_files_module")
@@ -142,9 +142,7 @@ def test_observed_partial_source_and_default_null_source(
 
 
 @pytest.mark.parametrize("source", ["auto_observed", "unverified"])
-def test_invalid_source_on_real_protocols(
-    source, rest, tmp_path, capsys
-):  # noqa: F811 - pytest fixture dependency
+def test_invalid_source_on_real_protocols(source, surface_calls):
     spec = SPECS["astro_election"]
     args = dict(
         candidate_year=2024,
@@ -156,9 +154,7 @@ def test_invalid_source_on_real_protocols(
         latitude=40,
         ut1_source=source,
     )
-    http = rest.post(spec.rest_path, json=args)
-    code, cli = call_cli(spec, args, tmp_path, capsys)
-    mcp = asyncio.run(native(spec, args))
+    http, mcp, code, cli = surface_calls(spec, args)
     assert http.status_code == 422 and code != 0 and mcp.is_error
 
 

@@ -4,10 +4,8 @@ import asyncio
 import copy
 import json
 from dataclasses import replace
-from pathlib import Path
 
 import pytest
-from fastapi.testclient import TestClient
 from fastmcp import Client
 from jsonschema import Draft202012Validator
 from jsonschema import ValidationError as SchemaError
@@ -18,111 +16,18 @@ import fatebridge.application.execution as execution
 import fatebridge.mcp_server as mcp
 from fatebridge.cli import run as cli_run
 from fatebridge.services.tool_catalog import CATALOG
-from tests.fixtures.surface_payloads import MCP_CASES, REST_POST_CASES
 from tests.support.current_outputs import current_business
-
-SPECS = {spec.key: spec for spec in CATALOG}
-AS_OF = "2026-10-12T02:00:00Z"
-
-
-@pytest.fixture
-def rest(monkeypatch):
-    api._reset_runtime_state_for_tests()
-    monkeypatch.setattr(
-        api,
-        "API_KEY_AUTHENTICATOR",
-        api.ApiKeyAuthenticator(header_name="X-API-Key", api_keys={}),
-    )
-    return TestClient(api.app)
-
-
-def inputs(spec):
-    factory = (
-        REST_POST_CASES[spec.rest_path]
-        if spec.rest_path
-        else MCP_CASES[spec.tool_name][1]
-    )
-    return spec.request_model.model_validate(factory()).model_dump(exclude_unset=True)
-
-
-def rest_spec(spec):
-    return SPECS["astro_relative"] if spec.key == "astro_relative_chart" else spec
-
-
-def call_cli(spec, payload, tmp_path, capsys, flags=()):
-    subject = tmp_path / "subject.json"
-    subject.write_text(json.dumps(payload, ensure_ascii=False))
-    prefix = ["--no-metadata"] if "--no-metadata" in flags else []
-    flags = [flag for flag in flags if flag != "--no-metadata"]
-    code = cli_run(
-        [
-            *prefix,
-            spec.tool_name,
-            "--subject-file",
-            str(subject),
-            "--as-of",
-            AS_OF,
-            *flags,
-        ]
-    )
-    return code, json.loads(capsys.readouterr().out)
-
-
-async def native(spec, payload, **flags):
-    async with Client(mcp.app) as client:
-        return await client.call_tool(
-            spec.tool_name,
-            {**payload, "as_of": AS_OF, "response_char_limit": 0, **flags},
-            raise_on_error=False,
-        )
-
-
-def business(payload):
-    return {k: v for k, v in payload.items() if k != "run_metadata"}
-
-
-def projected_outputs(
-    spec, payload, fields, rest, tmp_path, capsys, *, include_snapshot_text=None
-):
-    """Call the same strict projection on REST, CLI and native MCP."""
-    options = dict(fields=fields, strict_fields=True, response_char_limit=0)
-    params = [("fields", f) for f in fields] + [
-        ("strict_fields", "true"),
-        ("response_char_limit", "0"),
-    ]
-    flags = [
-        "--fields",
-        *fields,
-        "--strict-fields",
-        "true",
-        "--response-char-limit",
-        "0",
-    ]
-    if include_snapshot_text is not None:
-        options["include_snapshot_text"] = include_snapshot_text
-        text_flag = str(include_snapshot_text).lower()
-        params.append(("include_snapshot_text", text_flag))
-        flags.extend(["--include-snapshot-text", text_flag])
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=params,
-    )
-    code, local = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
-        flags=flags,
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            {**payload, **options},
-        )
-    )
-    assert response.status_code == 200 and code == 0 and not protocol.is_error
-    return [response.json(), local, protocol.structured_content]
+from tests.support.transports import (
+    AS_OF,
+    SPECS,
+    business,
+    call_cli,
+    inputs,
+    native,
+    rest,
+    rest_spec,
+    surface_calls,
+)
 
 
 @pytest.mark.parametrize("key", list(SPECS))
@@ -579,13 +484,11 @@ def test_canonical_relative_modes_agree_on_all_surfaces(rest, tmp_path, capsys, 
 
 @pytest.mark.parametrize("method", ["legacy_reference", "legacy_equatorial", "unknown"])
 def test_retired_primary_direction_method_is_rejected_on_all_surfaces(
-    rest, tmp_path, capsys, method
+    method, surface_calls
 ):
     spec = SPECS["pd"]
     payload = {**inputs(spec), "pd_method": method}
-    http = rest.post(spec.rest_path, json=payload)
-    protocol = asyncio.run(native(spec, payload))
-    code, output = call_cli(spec, payload, tmp_path, capsys)
+    http, protocol, code, output = surface_calls(spec, payload, cli_first=False)
     assert http.status_code == 422
     assert protocol.is_error
     assert code != 0 and output["error_code"] == "validation_error"
@@ -600,13 +503,11 @@ def test_retired_primary_direction_method_is_rejected_on_all_surfaces(
     ],
 )
 def test_retired_field_alias_is_rejected_on_all_surfaces(
-    rest, tmp_path, capsys, key, retired, value
+    key, retired, value, surface_calls
 ):
     spec = SPECS[key]
     payload = {**inputs(spec), retired: value}
-    http = rest.post(spec.rest_path, json=payload)
-    protocol = asyncio.run(native(spec, payload))
-    code, output = call_cli(spec, payload, tmp_path, capsys)
+    http, protocol, code, output = surface_calls(spec, payload, cli_first=False)
     assert http.status_code == 422
     assert protocol.is_error
     assert code != 0 and output["error_code"] == "validation_error"

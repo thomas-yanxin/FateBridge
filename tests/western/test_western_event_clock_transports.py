@@ -7,12 +7,13 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import evidence_views
-from tests.evaluation.test_agentic_nested_outputs import (
+from tests.support.transports import (
     SPECS,
     business,
     call_cli,
     native,
     rest,
+    surface_calls,
 )
 from tests.western.test_western_event_clocks import REFERENCE
 
@@ -156,7 +157,7 @@ def test_jpl_lat_election_physical_axis_on_all_surfaces(rest, tmp_path, capsys):
     [("local_mean_solar", "UTC"), ("local_apparent_solar", "+08:00"), ("auto", None)],
 )
 def test_invalid_clock_contract_rejected_before_calculation_on_all_surfaces(
-    tool, prefix, basis, zone, rest, tmp_path, capsys
+    tool, prefix, basis, zone, surface_calls
 ):
     inputs = {
         prefix + "_year": 2000,
@@ -169,9 +170,7 @@ def test_invalid_clock_contract_rejected_before_calculation_on_all_surfaces(
         "latitude": 40,
     }
     spec = SPECS[tool]
-    http = rest.post(spec.rest_path, json=inputs)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys)
-    mcp = asyncio.run(native(spec, inputs))
+    http, mcp, code, cli = surface_calls(spec, inputs)
     assert http.status_code == 422 and code != 0 and mcp.is_error
     assert "clock_conversion" not in cli
 

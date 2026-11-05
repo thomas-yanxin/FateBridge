@@ -1,6 +1,5 @@
 """All transports retain revised inputs, raw provenance and unadjudicated labels."""
 
-import asyncio
 import json
 from pathlib import Path
 
@@ -10,11 +9,10 @@ from fatebridge.application.examples import suggested_fields
 from tests.bazi.test_bazi_source_comparison_transports import (
     SPEC,
     business,
-    call_cli,
-    native,
     reject_bad_fact,
 )
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import rest as _shared_rest
+from tests.support.transports import surface_calls
 
 rest = _shared_rest
 
@@ -33,7 +31,7 @@ RECORDS = [
 @pytest.mark.parametrize("project", [False, True])
 @pytest.mark.parametrize("patch", RECORDS, ids=[p["reference_id"] for p in RECORDS])
 def test_all_six_revised_records_and_provenance_on_all_surfaces(
-    patch, project, rest, tmp_path, capsys
+    patch, project, surface_calls
 ):
     values = dict(
         zip(
@@ -46,9 +44,9 @@ def test_all_six_revised_records_and_provenance_on_all_surfaces(
         fields = suggested_fields(SPEC, view="source_strength")
         options.update(fields=fields, strict_fields=True)
         flags += ["--fields", *fields, "--strict-fields", "true"]
-    response = rest.post(SPEC.rest_path, json=values, params=options)
-    protocol = asyncio.run(native(SPEC, values, **options))
-    code, cli = call_cli(SPEC, values, tmp_path, capsys, flags=flags)
+    response, protocol, code, cli = surface_calls(
+        SPEC, values, params=options, options=options, flags=flags, cli_first=False
+    )
     assert response.status_code == 200 and not protocol.is_error and code == 0
     results = [response.json(), protocol.structured_content, cli]
     for result in results:

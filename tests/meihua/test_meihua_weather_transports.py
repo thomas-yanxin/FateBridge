@@ -10,17 +10,11 @@ from jsonschema import Draft202012Validator
 
 from fatebridge.application.examples import suggested_fields
 from fatebridge.mcp_server import create_mcp_app
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
 from tests.integration.test_result_delivery import store
 from tests.meihua.test_meihua_transports import INPUT
 from tests.meihua.test_meihua_weather_cast_variants import CASES as VARIANT_CASES
 from tests.meihua.test_meihua_weather_cast_variants import resolve
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 FIELDS = [
     "interpretation.interpretation_topic",
@@ -32,7 +26,7 @@ FIELDS = [
 
 @pytest.mark.parametrize("key", ["meihua_analysis", "meihua_cast"])
 @pytest.mark.parametrize("projected", [False, True])
-def test_weather_rules_agree_on_rest_mcp_cli(key, projected, rest, tmp_path, capsys):
+def test_weather_rules_agree_on_rest_mcp_cli(key, projected, surface_calls):
     spec = SPECS[key]
     payload = (
         dict(INPUT)
@@ -54,9 +48,9 @@ def test_weather_rules_agree_on_rest_mcp_cli(key, projected, rest, tmp_path, cap
         params += [("fields", f) for f in FIELDS] + [("strict_fields", "true")]
         flags += ["--fields", *FIELDS, "--strict-fields", "true"]
         options = {"fields": FIELDS, "strict_fields": True}
-    response = rest.post(spec.rest_path, json=payload, params=params)
-    code, local = call_cli(spec, payload, tmp_path, capsys, flags=flags)
-    protocol = asyncio.run(native(spec, payload, **options))
+    response, protocol, code, local = surface_calls(
+        spec, payload, params=params, options=options, flags=flags
+    )
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     outputs = [response.json(), local, protocol.structured_content]
     assert business(outputs[0]) == business(outputs[1]) == business(outputs[2])
@@ -74,9 +68,7 @@ def test_weather_rules_agree_on_rest_mcp_cli(key, projected, rest, tmp_path, cap
 
 
 @pytest.mark.parametrize("key", ["meihua_analysis", "meihua_cast"])
-def test_weather_context_cannot_silently_use_general_reading(
-    key, rest, tmp_path, capsys
-):
+def test_weather_context_cannot_silently_use_general_reading(key, surface_calls):
     spec = SPECS[key]
     payload = (
         dict(INPUT)
@@ -90,15 +82,13 @@ def test_weather_context_cannot_silently_use_general_reading(
         }
     )
     payload["weather_context"] = {"season": "summer"}
-    response = rest.post(spec.rest_path, json=payload)
-    code, local = call_cli(spec, payload, tmp_path, capsys)
-    protocol = asyncio.run(native(spec, payload))
+    response, protocol, code, local = surface_calls(spec, payload)
     assert response.status_code == 422 and code != 0 and protocol.is_error
 
 
 @pytest.mark.parametrize("key", ["meihua_analysis", "meihua_cast"])
 def test_published_weather_reading_card_retains_control_qualification(
-    key, rest, tmp_path, capsys
+    key, surface_calls
 ):
     spec = SPECS[key]
     payload = (
@@ -116,30 +106,14 @@ def test_published_weather_reading_card_retains_control_qualification(
         interpretation_topic="weather", weather_context={"many_min_count": 2}
     )
     fields = suggested_fields(spec, view="weather")
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
-        params=[
-            *(("fields", f) for f in fields),
-            ("strict_fields", "true"),
-            ("response_char_limit", "0"),
-        ],
-    )
-    code, local = call_cli(
+    response, protocol, code, local = surface_calls(
         spec,
         payload,
-        tmp_path,
-        capsys,
-        flags=[
-            "--fields",
-            *fields,
-            "--strict-fields",
-            "true",
-            "--response-char-limit",
-            "0",
-        ],
+        projection={
+            **{"fields": fields, "strict_fields": True},
+            "response_char_limit": 0,
+        },
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (
         business(response.json())
@@ -167,7 +141,7 @@ def test_published_weather_reading_card_retains_control_qualification(
     ],
 )
 def test_weather_card_keeps_disputed_many_premise_on_all_surfaces(
-    code, line, season, rule_id, rest, tmp_path, capsys
+    code, line, season, rule_id, surface_calls
 ):
     spec = SPECS["meihua_cast"]
     payload = {
@@ -176,20 +150,15 @@ def test_weather_card_keeps_disputed_many_premise_on_all_surfaces(
         "weather_context": {"season": season, "many_min_count": 3},
     }
     fields = suggested_fields(spec, view="weather")
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
+    response, protocol, code, local = surface_calls(
+        spec,
+        payload,
         params=[
             *(("fields", f) for f in fields),
             ("strict_fields", "true"),
             ("response_char_limit", "0"),
         ],
-    )
-    code, local = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
+        options={"fields": fields, "strict_fields": True},
         flags=[
             "--fields",
             *fields,
@@ -201,7 +170,6 @@ def test_weather_card_keeps_disputed_many_premise_on_all_surfaces(
             "0",
         ],
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and code == 0 and not protocol.is_error
     assert (
         business(response.json())
@@ -225,7 +193,7 @@ def test_weather_card_keeps_disputed_many_premise_on_all_surfaces(
 
 @pytest.mark.parametrize("case", VARIANT_CASES[:5], ids=lambda c: c["id"])
 def test_weather_card_preserves_actual_candidate_readings_on_all_surfaces(
-    case, rest, tmp_path, capsys
+    case, surface_calls
 ):
     spec = SPECS["meihua_cast"]
     payload = {
@@ -234,20 +202,15 @@ def test_weather_card_preserves_actual_candidate_readings_on_all_surfaces(
         "weather_context": case["context"],
     }
     fields = suggested_fields(spec, view="weather")
-    response = rest.post(
-        spec.rest_path,
-        json=payload,
+    response, protocol, exit_code, local = surface_calls(
+        spec,
+        payload,
         params=[
             *(("fields", f) for f in fields),
             ("strict_fields", "true"),
             ("response_char_limit", "0"),
         ],
-    )
-    exit_code, local = call_cli(
-        spec,
-        payload,
-        tmp_path,
-        capsys,
+        options={"fields": fields, "strict_fields": True},
         flags=[
             "--fields",
             *fields,
@@ -259,7 +222,6 @@ def test_weather_card_preserves_actual_candidate_readings_on_all_surfaces(
             "0",
         ],
     )
-    protocol = asyncio.run(native(spec, payload, fields=fields, strict_fields=True))
     assert response.status_code == 200 and exit_code == 0 and not protocol.is_error
     assert (
         business(response.json())

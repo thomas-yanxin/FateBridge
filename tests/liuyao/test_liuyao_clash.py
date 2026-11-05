@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_conditions import conditional_case
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_clash_v10"
@@ -14,9 +15,8 @@ CASES = json.loads((REFERENCE / "cases.json").read_text(encoding="utf-8"))["case
 
 def test_clash_reference_remains_frozen():
     from fatebridge.core.liuyao_clash import PROFILE
-    from scripts.liuyao.build_liuyao_clash_profile import build
 
-    assert build() == PROFILE
+    assert build_profile("clash") == PROFILE
     frozen = json.loads((REFERENCE / "freeze.json").read_text())
     for name, digest in frozen["sha256"].items():
         assert hashlib.sha256((REFERENCE / name).read_bytes()).hexdigest() == digest

@@ -4,7 +4,6 @@ These controls make no astronomical-precision or traditional-source claim.
 Run in the existing fresh native test worker for source-seam monkeypatches.
 """
 
-import asyncio
 import math
 from decimal import Decimal, localcontext
 from fractions import Fraction
@@ -20,9 +19,9 @@ from fatebridge.core.astro.time_scales import ephemeris_time
 from fatebridge.core.astrology_tables import SIGNS
 from fatebridge.core.jyotish_vargas import varga_coordinates, varga_longitude
 from fatebridge.core.local_techniques.chart import _build_birth_info
-from tests.evaluation.test_agentic_nested_outputs import SPECS, business, call_cli
-from tests.evaluation.test_agentic_nested_outputs import inputs as representative_inputs
-from tests.evaluation.test_agentic_nested_outputs import native, rest
+from tests.support.transports import SPECS, business
+from tests.support.transports import inputs as representative_inputs
+from tests.support.transports import native, rest, surface_calls
 
 
 @pytest.mark.parametrize("boundary", range(0, 360, 30))
@@ -185,7 +184,7 @@ def test_india_sample_grid_uses_exact_antipodes_for_vargas_nakshatra_and_pada(
 
 @pytest.mark.native_engine_fault
 def test_public_otherbu_exact_node_antipode_through_three_transports(
-    monkeypatch, rest, tmp_path, capsys
+    monkeypatch, surface_calls
 ):
     original = core_chart._build_planet_states
     source = math.nextafter(180.0, -math.inf)
@@ -213,12 +212,16 @@ def test_public_otherbu_exact_node_antipode_through_three_transports(
     fields = ["chart.chart.objects"]
     query = [("fields", field) for field in fields]
     query += [("strict_fields", "true"), ("include_snapshot_text", "false")]
-    http = rest.post(spec.rest_path, json=inputs, params=query)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, ["--fields", *fields])
-    mcp = asyncio.run(
-        native(
-            spec, inputs, fields=fields, strict_fields=True, include_snapshot_text=False
-        )
+    http, mcp, code, cli = surface_calls(
+        spec,
+        inputs,
+        params=query,
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=["--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not mcp.is_error
@@ -237,7 +240,7 @@ def test_public_otherbu_exact_node_antipode_through_three_transports(
     "source", [math.nextafter(v, -math.inf) for v in (15.0, 20.0, 180.0)]
 )
 def test_public_india_partitions_preserve_the_exact_derived_ketu(
-    monkeypatch, rest, tmp_path, capsys, tool, source
+    monkeypatch, tool, source, surface_calls
 ):
     original = runtime.ephemeris_call
 
@@ -262,12 +265,16 @@ def test_public_india_partitions_preserve_the_exact_derived_ketu(
     fields = ["india.charts", "india.nakshatras"]
     query = [("fields", field) for field in fields]
     query += [("strict_fields", "true"), ("include_snapshot_text", "false")]
-    http = rest.post(spec.rest_path, json=inputs, params=query)
-    code, cli = call_cli(spec, inputs, tmp_path, capsys, ["--fields", *fields])
-    mcp = asyncio.run(
-        native(
-            spec, inputs, fields=fields, strict_fields=True, include_snapshot_text=False
-        )
+    http, mcp, code, cli = surface_calls(
+        spec,
+        inputs,
+        params=query,
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=["--fields", *fields],
     )
     assert http.status_code == 200, http.text
     assert code == 0 and not mcp.is_error

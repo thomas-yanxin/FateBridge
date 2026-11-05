@@ -4,7 +4,6 @@ The controlled source proves the governing-window rule, not real planetary
 positions, a measured event date or an ephemeris accuracy bound.
 """
 
-import asyncio
 import math
 from datetime import datetime, timezone
 from fractions import Fraction
@@ -17,13 +16,7 @@ from fatebridge.core.predictive._common import (
     build_natal_subject,
     build_predictive_birth_info,
 )
-from tests.evaluation.test_agentic_nested_outputs import (
-    SPECS,
-    business,
-    call_cli,
-    native,
-    rest,
-)
+from tests.support.transports import SPECS, business, rest, surface_calls
 
 
 @pytest.mark.parametrize("target", [0.0, 1.0, 10.0, 60.0, 120.0, 180.0, 359.0])
@@ -94,7 +87,7 @@ def test_antipodal_discontinuity_is_not_a_return(body, monkeypatch):
     [("solarreturn", 360, returns.swe.SUN), ("lunarreturn", 30, returns.swe.MOON)],
 )
 def test_analytic_source_retains_governing_period_on_actual_three_adapters(
-    tool, period, body, zodiac, monkeypatch, rest, tmp_path, capsys
+    tool, period, body, zodiac, monkeypatch, surface_calls
 ):
     payload = dict(
         birth_year=2000,
@@ -138,18 +131,16 @@ def test_analytic_source_retains_governing_period_on_actual_three_adapters(
         ("include_snapshot_text", "false"),
         ("response_char_limit", 0),
     ]
-    response = rest.post(spec.rest_path, json=payload, params=query)
-    code, cli = call_cli(
-        spec, payload, tmp_path, capsys, ["--fields", *fields, "--strict-fields"]
-    )
-    protocol = asyncio.run(
-        native(
-            spec,
-            payload,
-            fields=fields,
-            strict_fields=True,
-            include_snapshot_text=False,
-        )
+    response, protocol, code, cli = surface_calls(
+        spec,
+        payload,
+        params=query,
+        options={
+            "fields": fields,
+            "strict_fields": True,
+            "include_snapshot_text": False,
+        },
+        flags=["--fields", *fields, "--strict-fields"],
     )
     assert response.status_code == 200, response.text
     assert code == 0 and not protocol.is_error

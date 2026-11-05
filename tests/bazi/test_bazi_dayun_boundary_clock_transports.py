@@ -10,8 +10,8 @@ import pytest
 from fatebridge.application.examples import suggested_fields
 from fatebridge.core.timing import TimingAnalysis
 from tests.bazi.test_bazi_birth_seconds import SPECS
-from tests.evaluation.test_agentic_nested_outputs import business, call_cli, native
-from tests.evaluation.test_agentic_nested_outputs import rest as _shared_rest
+from tests.support.transports import business, call_cli, native
+from tests.support.transports import rest as _shared_rest
 
 ROW = json.loads(
     (

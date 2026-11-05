@@ -5,11 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from tests.evaluation.test_agentic_nested_outputs import SPECS, business
-from tests.evaluation.test_agentic_nested_outputs import rest as shared_rest
 from tests.numerology.test_heluo_lin19_song6 import FAULTS, corrupt_source
 from tests.numerology.test_heluo_lin19_song6 import source_cache as source_cache
 from tests.numerology.test_heluo_poem_transports import run_three
+from tests.support.transports import SPECS, business
+from tests.support.transports import rest as shared_rest
 
 rest = shared_rest
 cases = json.loads(

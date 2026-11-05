@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from scripts.liuyao.build_profile import build_profile
 from tests.liuyao.test_liuyao_conditions import conditional_case
 
 REFERENCE = Path(__file__).parents[1] / "fixtures/liuyao_routing_v13"
@@ -32,9 +33,8 @@ def routing_case(case):
 
 def test_routing_original_and_case_bytes_remain_frozen():
     from fatebridge.core.liuyao_routing import PROFILE
-    from scripts.liuyao.build_liuyao_routing_profile import build
 
-    assert PROFILE == build()
+    assert PROFILE == build_profile("routing")
     for name, digest in json.loads((REFERENCE / "freeze.json").read_text())[
         "sha256"
     ].items():
