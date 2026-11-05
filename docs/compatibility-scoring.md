@@ -74,7 +74,7 @@
 
 固定输入、五种关系权重和逐条加减项保存在本地独立资料
 `tests/data/compatibility/score-ledger.json`。
-[`test_compatibility_score_provenance.py`](../tests/test_compatibility_score_provenance.py)
+[`test_compatibility_score_provenance.py`](../tests/compatibility/test_compatibility_score_provenance.py)
 使用有理数与十进制手算账本核对当前输入、分项贡献、
 旺衰与喜用依据，以及 REST、MCP、CLI 的计算回执。
 
@@ -89,7 +89,7 @@
 
 ```bash
 uv run --locked --extra dev pytest -q \
-  tests/test_compatibility_score_provenance.py \
-  tests/test_compatibility_structure.py \
-  tests/test_relationship_and_career_semantics.py
+  tests/compatibility/test_compatibility_score_provenance.py \
+  tests/compatibility/test_compatibility_structure.py \
+  tests/compatibility/test_relationship_and_career_semantics.py
 ```

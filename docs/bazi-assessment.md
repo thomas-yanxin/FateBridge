@@ -29,8 +29,8 @@ v12在此基础上采用1947年本明确记载的有限结构条件：两处本�
 当前来源审计原24组不同输入先修复GS12，再由v12修复六组，仍有17组与保留三档编释不符，另有2项集合约束违规及4项局部冲向分歧。两项集合违规分别为SJ05从儿不以身强弱论的适用域，以及QQ02官印承受能力未定；不据“非弱”任意选强或中和。3个原集合约束均纳入回执；`--require-full`在完整原典验收未成立时退出1。冲突和未知不改成通过，不以新字段数量增加独立命例信用。运行当前审计：
 
 ```bash
-uv run --locked --extra dev python scripts/audit_bazi_source_corpus.py --output /tmp/bazi-source-audit.json
-uv run --locked --extra dev pytest -n0 tests/test_bazi_current_accuracy.py tests/test_bazi_source_bounds.py
+uv run --locked --extra dev python -m scripts.bazi.audit_bazi_source_corpus --output /tmp/bazi-source-audit.json
+uv run --locked --extra dev pytest -n0 tests/bazi/test_bazi_current_accuracy.py tests/bazi/test_bazi_source_bounds.py
 ```
 
 《滴天髓》当前开发者字面校读另保留558例、1380条原文主张、3项输入疑问及22项字形疑问；它尚不允许作为完整已验收命例库使用。资料与原书见 `tests/data/bazi`。同一原书的重叠记录不相加为独立样本，文本校读不等于数值或预测有效性验证。

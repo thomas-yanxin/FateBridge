@@ -68,10 +68,10 @@ uv run --locked --extra dev fatebridge astro_chart \
 离线检查（也由测试执行）：
 
 ```bash
-uv run --locked --extra dev python scripts/build_place_catalog.py --check
+uv run --locked --extra dev python -m scripts.catalogs.build_place_catalog --check
 uv run --locked --extra dev pytest -q \
-  tests/test_place_catalog.py tests/test_place_catalog_transports.py \
-  tests/test_birth_place_resolution.py tests/test_birth_time_precision.py
+  tests/integration/test_place_catalog.py tests/integration/test_contract_regressions_2.py \
+  tests/integration/test_birth_place_resolution.py tests/integration/test_birth_time_precision.py
 ```
 
 更新数据时，将以下文件准备到独立缓存目录：
@@ -81,9 +81,9 @@ uv run --locked --extra dev pytest -q \
 3. 使用锁定开发环境中的 OpenCC 生成简繁别名。兼容别名输入在 `scripts/data/place_alias_overrides.json`，仅维护名称，不保留旧坐标。
 
 ```bash
-uv run --locked --extra dev python scripts/build_place_catalog.py \
+uv run --locked --extra dev python -m scripts.catalogs.build_place_catalog \
   --source-dir /absolute/path/to/place-source-cache
-uv run --locked --extra dev python scripts/build_place_catalog.py --check
+uv run --locked --extra dev python -m scripts.catalogs.build_place_catalog --check
 ```
 
 导入不会联网。`--check` 检查已发布 JSON 的摘要、坐标范围、原始坐标逆变换、时区、父子层级/循环、数量和覆盖清单；它不会重新下载上游。来源版本、取得日期和验收数量随区划变更一起审核更新。所有中国代表点还经过完整行政路径逐条解析测试；跨三端测试同时覆盖中国区县、欧洲和大洋洲，只证明软件调用一致性，不证明测绘精度或命理预测有效性。

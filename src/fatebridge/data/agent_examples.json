@@ -1449,7 +1449,7 @@
       "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放zone；显式零点有效。真太阳时默认开启，须明确lon或gps_lon；GPS优先，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
       "birth_clock": "numerology_evidence.birth_clock保存同次民用时刻、UTC瞬间、所选计算钟面、经度来源与是否使用。钟表时未给经度为null；太阳钟面不是新的物理瞬间。可用birth_clock视图读取。",
       "body_structure": "body_structure视图按逐阶段实际六爻返回渐卦段的八条结构记录，区分三爻倒序、上下互体、全卦倒序及抽第三爻移顶。八条含六个三爻体及两个六爻卦，不是八个互体；literal_case_match为false时只是明确算子推演，不能称该卦原例已核。五命干支字表不自动选柱或用年纳音替代。此层不替换deTi或后天换卦，不直接裁定葉否。",
-      "body_relations": "judge.deTi按年柱纳音与先后天实际上下体、两互体分列五行关系，完整present=null。旧日干查卦位于judge.day_stem_mapping，不再称为得体。第51页generating_qi必须同时满足无元气且卦体生纳音；第87页双向相生另列，不能反向覆盖。金人、土人口径及完整得体、合理仍待核。",
+      "body_relations": "judge.deTi按年柱纳音与先后天实际上下体、两互体分列五行关系，完整present=null。第51页generating_qi必须同时满足无元气且卦体生纳音；第87页双向相生另列，不能反向覆盖。金人、土人口径及完整得体、合理仍待核。",
       "qi_phases": "judge.qi_phases分别给出先后天正反元气、化工的上下体／互体位置及得失；旧聚合字段仅为并集。反化工春分至夏至按所核两版本同时保留离、巽。土用约定、乙亥例乾化工冲突与气虚制化仍待核；命中不自动裁定葉否或现实吉凶。 yuanqi_opposition按出生年干支核对正反候选，再逐阶段计算无正而有反前提；正反同时出现不匹配该式。上下体／两互体为具名范围，direct_only_condition_match只作另一范围的比较；不能借另一阶段的元气补本阶段。rescue_match为null，节气浅深、气虚和尅制未定，不据此自动裁定反中有救或葉否。 solar_term.boundary_context按原民用年选共享节气窗口，保存当前节气、最近至点及下一四立的真实来源和绝对时刻，并与calendar_context核对。二数时令也用同一民用年上下文；相邻年求根不授权越界公开年份。TT参考与历史／未来UTC、原典日期桥接分开，不能因来源字段或数值分辨率就称全历法已验。",
       "najia": "judge.najia逐阶段列出实际六爻正纳、借用、出生年干支命中位置和source。basis=hexagram_entry表示该卦条目已核；pure_trigram_rule仅按已核纯卦内外位推演，不能说该复卦已逐爻原页核对。najia_collation区分8个纯卦48/12基础位置与13条卦解78/18观察；其余51卦未逐卦核，64卦384位置的软件比对不是384个原典命例。解卦source_issues保留两印本列举次序问题，不改计算爻序或以纳甲命中断完整得势。可用najia视图读取。",
       "month_affinity": "judge.deTime仅卦属月匹配；64卦总论目校含63项明确属月，无妄本月仍未确认。judge.month_affinity区分离散月份、跨年区间、季节、及时和失时；month_label_match仅月号，附加条件未决时即使月号未中也保持match=null。十三条原句的natal_najia_clause分别列月号和同一先／后天阶段出生年干支的正纳／借用位置；不可借另一阶段或deSheng合并布尔替代。及字连接范围与解卦例外未决，两项事实均不裁成整条吉凶。乾八月与颐九月边界为null；随正月相反条件同时保留，不选有利段覆盖。月界与完整得体仍待核。",
@@ -1968,12 +1968,11 @@
         ]
       },
       "body_relations": {
-        "purpose": "核对年纳音、实际上下及互体的有向五行关系、无元气前提；完整得体未决，旧日干映射另列。",
+        "purpose": "核对年纳音、实际上下及互体的有向五行关系、无元气前提；完整得体仍未决。",
         "fields": [
           "four_pillars",
           "judge.deTi",
           "judge.deTi_policy",
-          "judge.day_stem_mapping",
           "numerology_evidence.rulesets",
           "numerology_evidence.unresolved_rules"
         ]

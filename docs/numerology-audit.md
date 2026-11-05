@@ -100,10 +100,10 @@ uv run --locked --extra dev fatebridge heluo \
 
 ```bash
 uv run --locked --extra dev pytest -q \
-  tests/test_heluo_body_depth.py tests/test_heluo_line_conditions_depth.py \
-  tests/test_canping_timing_depth.py tests/test_numerology_clock_depth.py
+  tests/numerology/test_heluo_body_depth.py tests/numerology/test_heluo_line_conditions_depth.py \
+  tests/numerology/test_canping_timing_depth.py tests/numerology/test_numerology_clock_depth.py
 
-uv run --locked --extra dev python scripts/audit_numerology.py \
+uv run --locked --extra dev python -m scripts.numerology.audit_numerology \
   --output /tmp/numerology-current-audit.json
 ```
 

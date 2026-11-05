@@ -989,7 +989,7 @@ def build_persian_directed_payload(
     target, capped at ``max_age_years`` and the first ``limit`` hits by age.
 
     Rational arcs determine selection before display rounding. The fixed chart in
-    :mod:`tests.test_persian_directed` retains the historical hit values and checks
+    :mod:`tests.western.test_persian_directed` retains the historical hit values and checks
     actual chronological order with an independent Decimal calculation. The hit set
     is bounded by the natal objects FateBridge exposes (planets + nodes + 12 cusps); it
     does NOT include 星阙's enriched bodies (asteroids / midpoints / Arabic lots / 四余),

@@ -34,7 +34,7 @@
 
 ```bash
 uv run --locked --extra dev python -m fatebridge.fetch_ephe --year-range 1 9999 --dest /tmp/fatebridge-western-ephe
-uv run --locked --extra dev python scripts/audit_western_ephemeris_coverage.py --ephe-dir /tmp/fatebridge-western-ephe --output /tmp/western-coverage-audit.json
+uv run --locked --extra dev python -m scripts.western.audit_western_ephemeris_coverage --ephe-dir /tmp/fatebridge-western-ephe --output /tmp/western-coverage-audit.json
 ```
 
 昼夜约定为地心太阳中心、无折射、真实高度 ≥0 为昼。行星的 `above_horizon` 也取实际地平高度，缺少高度时返回未知。行星时采用日出日落分段，有自己的视圆／折射口径；两者在地平附近不能当作同一定义。极区没有适用的象限宫位时仍报错，不悄悄替换宫制。
@@ -68,8 +68,8 @@ uv run --locked --extra dev python scripts/audit_western_ephemeris_coverage.py -
 朔望与行星时审计使用[美国海军天文台2026年月相表](https://aa.usno.navy.mil/calculated/moon/phases?year=2026)的全部25次新月／满月作独立分钟级对照，固定容差60秒；按其[UT定义](https://aa.usno.navy.mil/faq/UT)比较UT1。日出前后检查属于声明口径的行为回归，尚未获得独立日出几何或现场天气验证。
 
 ```bash
-uv run --locked --extra dev pytest -q tests/test_western_lunations_hours.py tests/test_planetary_hours.py
-uv run --locked --extra dev python scripts/audit_western_lunations_hours.py --output /tmp/western-lunations-hours.json
+uv run --locked --extra dev pytest -q tests/western/test_western_lunations_hours.py tests/western/test_planetary_hours.py
+uv run --locked --extra dev python -m scripts.western.audit_western_lunations_hours --output /tmp/western-lunations-hours.json
 ```
 
 出界比较使用出生历元的真实黄赤交角，返回 `classical.obliquity`，不把当代固定阈值用于全部历史日期。星历存在但角度或地平计算退化时，整体精度标为混合，并保留 `angle_method/horizon_method`。
@@ -78,9 +78,9 @@ uv run --locked --extra dev python scripts/audit_western_lunations_hours.py --ou
 
 ## 推运、返照与主限坐标
 
-调波盘的黄经乘数、分座与合相判断保留原始浮点输入的精确有理数，再转换显示值；例如 `float(30/7)` 的7调波略低于30°，不能因乘法舍入改入金牛。合相按未舍入角距排序。年龄推进点以同样的原始宫头区间判定接触位置，保留周期末端，并由未舍入年龄直接选择年度标记；2.501岁的显示标签为2.50岁，年度标记仍属最近的3岁。波斯向运先按未舍入年龄截取前120项，再交付两位年龄标签。独立100位Decimal时序与三端回归见[派生计算测试](../tests/test_western_derived_ordering.py)和[波斯向运测试](../tests/test_persian_directed.py)。这些检查不增加星历、出生记录或预测精度。
+调波盘的黄经乘数、分座与合相判断保留原始浮点输入的精确有理数，再转换显示值；例如 `float(30/7)` 的7调波略低于30°，不能因乘法舍入改入金牛。合相按未舍入角距排序。年龄推进点以同样的原始宫头区间判定接触位置，保留周期末端，并由未舍入年龄直接选择年度标记；2.501岁的显示标签为2.50岁，年度标记仍属最近的3岁。波斯向运先按未舍入年龄截取前120项，再交付两位年龄标签。独立100位Decimal时序与三端回归见[派生计算测试](../tests/western/test_ci_regressions.py)和[波斯向运测试](../tests/western/test_persian_directed.py)。这些检查不增加星历、出生记录或预测精度。
 
-界推运沿既定埃及界表推进时，现在保留原始黄经的精确有理弧及半开区间，再转换显示年龄；参加星体也用同一弧区间归属。旧累计浮点与 `1e-9` 跳步会把普通盘的界段漏掉：2001-05-22 02:08 UTC、0°E／40°N的上升约3.038038°，约16.962—26.962岁的火星、土星两段曾被重复标成水星。修复不改界表、时间钥或来源选择；独立100位Decimal全局区间交集与两种时间钥的三端回归见 `tests/test_western_distribution_partition.py`。精确算术保留输入已有区别，不增加观测或原典精度。
+界推运沿既定埃及界表推进时，现在保留原始黄经的精确有理弧及半开区间，再转换显示年龄；参加星体也用同一弧区间归属。旧累计浮点与 `1e-9` 跳步会把普通盘的界段漏掉：2001-05-22 02:08 UTC、0°E／40°N的上升约3.038038°，约16.962—26.962岁的火星、土星两段曾被重复标成水星。修复不改界表、时间钥或来源选择；独立100位Decimal全局区间交集与两种时间钥的三端回归见 `tests/western/test_western_distribution_partition.py`。精确算术保留输入已有区别，不增加观测或原典精度。
 
 
 推运底座现在直接使用 `fatebridge_swisseph_native`，与本命盘共用 TT／UT1 政策，保留内部完整黄经、小数秒及用户输入的纬度。`natal_reference.calculation_basis`、行运／次限／返照的 `calculation_basis` 返回星历模型、时间尺度、TT／UT1、未来闰秒假设和黄道偏移。恒星黄道采用明确的 Lahiri 偏移，整宫宫头按该黄道的星座边界确定；不沿用第三方库的默认偏移或极区纬度夹限。
@@ -93,25 +93,25 @@ uv run --locked --extra dev python scripts/audit_western_lunations_hours.py --ou
 
 土星、木星和平均月交点的多重回归，从参考时刻向两侧连续扫描，以不超过1个TT日的步长括界细化，分别找到所需的最近过去／未来根即停止；各侧保护界为1.5个平均周期加5个TT日。不能只在平均周期种子附近取一个根：木星逆行可使同一黄经在数月内三次经过，旧路径曾把2002年4月的下一次回归跳到2013年。现在不会按整日去重而合并不同根；扫描末端不足整步时也核对最后小段。观察到原生日速变号的日格会局部分成两段，分别用实际黄经验证括根，避免同格中的两次经过相互抵消；细化期间的实际模型与原生文件上下文必须保持一致。原生日速只是转折候选的定位依据，未认证为完整视位置导数。
 
-例如2001-01-25 03:00 UTC的木星本命黄经，在当日14:15:48附近再次经过；旧日格扫描将两根一起漏掉并返回2000年7月的旧根。隔离的Skyfield1.54／DE421以独立实际视黄经作1001点扫描，再二分得第二根14:15:53.098888，两者相差约4.963秒，符合事先固定的30秒线。这是已暴露开发个案，不是盲测或全部年代的独立物理认证。回归见 `tests/test_western_return_station.py`；未观察到的多重转折、停滞擦触和数值分辨率以下结构仍未证明穷尽。
+例如2001-01-25 03:00 UTC的木星本命黄经，在当日14:15:48附近再次经过；旧日格扫描将两根一起漏掉并返回2000年7月的旧根。隔离的Skyfield1.54／DE421以独立实际视黄经作1001点扫描，再二分得第二根14:15:53.098888，两者相差约4.963秒，符合事先固定的30秒线。这是已暴露开发个案，不是盲测或全部年代的独立物理认证。回归见 `tests/western/test_western_return_station.py`；未观察到的多重转折、停滞擦触和数值分辨率以下结构仍未证明穷尽。
 
-多重回归的 `zodiac_type=Sidereal` 现在从本命到试算根都使用原生 Lahiri 黄经，遵循 [Swiss 接口5.8／12.1节](https://www.astro.com/swisseph/swephprg.htm)的 `SEFLG_SIDEREAL` 和 `SE_SIDM_LAHIRI`；默认 `Tropic` 保持回归黄道。原生同库残差检查和2001／2002木星三次过境回归见 `tests/test_western_extra_return_order.py`，不是独立动力学精度或现实预测证据。
+多重回归的 `zodiac_type=Sidereal` 现在从本命到试算根都使用原生 Lahiri 黄经，遵循 [Swiss 接口5.8／12.1节](https://www.astro.com/swisseph/swephprg.htm)的 `SEFLG_SIDEREAL` 和 `SE_SIDM_LAHIRI`；默认 `Tropic` 保持回归黄道。原生同库残差检查和2001／2002木星三次过境回归见 `tests/western/test_western_extra_return_order.py`，不是独立动力学精度或现实预测证据。
 
-恒星次限 `astro_vedicprog` 的本命参照与推运位置现在都直接取共享原生Lahiri底盘，不再把热带本命参照配上恒星推运位置，也不在原生偏移失败时使用线性近似后返回成功。赤纬次限 `astro_jaynesprog` 在原UTC瞬间经共享时间策略取得TT后计算赤纬，不把UTC钟面JD误作UT1调用。1972／1990／2024三个时刻的同库坐标控制与两工具三端核对见 `tests/test_western_progression_frames.py`；这验证时间与坐标传递，不提高外部星历物理精度或符号推运的现实效度。
+恒星次限 `astro_vedicprog` 的本命参照与推运位置现在都直接取共享原生Lahiri底盘，不再把热带本命参照配上恒星推运位置，也不在原生偏移失败时使用线性近似后返回成功。赤纬次限 `astro_jaynesprog` 在原UTC瞬间经共享时间策略取得TT后计算赤纬，不把UTC钟面JD误作UT1调用。1972／1990／2024三个时刻的同库坐标控制与两工具三端核对见 `tests/western/test_western_progression_frames.py`；这验证时间与坐标传递，不提高外部星历物理精度或符号推运的现实效度。
 
 主限的赤道投影现在使用 TT 星体坐标和 UT1 恒星时，MC 保留真实赤纬；半弧方法的 ASC／MC 使用实际赤纬和半弧。两种投影都测试零推进量还原原盘，恒星黄道在投影前后显式转换。半弧方法遇到恒显／恒隐点时拒绝无定义投影，不用任意极小分母制造坐标。现有 `axis_static_key` 与 `mundane_semiarc_static_key` 仍是带明确近似标签的方法；数值修复不等于完整复现某部原典的主限体系。
 
 ## 数值边界与显示
 
-南交点保留北交点加180°的精确派生关系，再判断分座与宫位。普通宫头仍用半开区间；折返宫头的R／T投影把同一精确关系传入已有高精度几何，不改投影方法、相位偏移或精度上限。公开经度仍为浮点显示值，精确派生比值另记在投影检查中；C只扩展内部精确输入兼容，极点原有限制保留。回归见[对点分区](../tests/test_western_antipodes.py)和[对点归宫](../tests/test_western_antipode_houses.py)。这些检查不提高原星历坐标的物理精度。
+南交点保留北交点加180°的精确派生关系，再判断分座与宫位。普通宫头仍用半开区间；折返宫头的R／T投影把同一精确关系传入已有高精度几何，不改投影方法、相位偏移或精度上限。公开经度仍为浮点显示值，精确派生比值另记在投影检查中；C只扩展内部精确输入兼容，极点原有限制保留。回归见[对点分区](../tests/western/test_western_antipodes.py)和[对点归宫](../tests/western/test_western_antipode_houses.py)。这些检查不提高原星历坐标的物理精度。
 
-旧27等分宿辅助函数用浮点近似的13⅓°作整除，40°、80°等精确边界曾落入前一宿，导致印度盘通用顶层与 `india` 专业层不一致。现在27等分及旧28等分示意层均按原黄经的精确有理值分类；`legacy_equal28` 的宿名和 `su28_degree` 也从同一未舍入黄经计算，再保留原有4位 `lon` 显示。90°整点的斗宿内度为0；两侧坐标即使同显90°，归宿仍可不同。全部宿界与相邻float、两个印度入口及旧宿占分支的三端控制回归见[等分宿界测试](../tests/test_equal_lunar_sectors.py)。所修的是既有等分算法，果老研究盘具名不等距赤经宿界保持独立；现代不等宽宿度仍可超过30°，不把等分示意覆盖到未分配的现代点。
+旧27等分宿辅助函数用浮点近似的13⅓°作整除，40°、80°等精确边界曾落入前一宿，导致印度盘通用顶层与 `india` 专业层不一致。现在27等分及旧28等分示意层均按原黄经的精确有理值分类；`legacy_equal28` 的宿名和 `su28_degree` 也从同一未舍入黄经计算，再保留原有4位 `lon` 显示。90°整点的斗宿内度为0；两侧坐标即使同显90°，归宿仍可不同。全部宿界与相邻float、两个印度入口及旧宿占分支的三端控制回归见[等分宿界测试](../tests/astronomy/test_equal_lunar_sectors.py)。所修的是既有等分算法，果老研究盘具名不等距赤经宿界保持独立；现代不等宽宿度仍可超过30°，不把等分示意覆盖到未分配的现代点。
 
 本命、关系盘和推运的数值坐标保留计算精度，星座、宫位、相位及古典条件均使用未舍入值。四位小数舍入曾让白羊末度同时显示为黄经30°、星座内30°，并让刚超过8°容许度的相位进入结果。现在坐标满足黄经 `[0,360)`、星座内度数 `[0,30)`；`chart_profile.aspect_policy` 集中交代现代容许度政策；`aspect_evidence` 保留逐项的 `separation/exact_angle/orb/orb_limit/rule_id`，可直接核算。常规 `aspects` 仍给出完整命中列表与未舍入的偏离度，首轮摘要无需重复每条的政策元数据。公开模型拒绝不可能的坐标。
 
 导出中的“星座＋度数”统一为星座内度数。例如绝对黄经75.123°显示为“双子15.12°”；末度接近边界时显示29.99…°，保留所在星座。JSON保留数值精度，文本位数不表示观测精度。
 
-边界、原典配对和解释反事实的可复现审计与测试见 `tests/test_western_semantic_fidelity.py`。这是限定条件的自动检查，不给自由文本或整个专业系统自评满分。
+边界、原典配对和解释反事实的可复现审计与测试见 `tests/western/test_western_semantic_fidelity.py`。这是限定条件的自动检查，不给自由文本或整个专业系统自评满分。
 
 当前数值检查分别核对独立天文资料、给定坐标的精确算术和公开端口的字段一致性。完整输出相等不能替代 NASA／香港天文台等独立资料的误差检验；各主题下列出当前可运行的审计命令及其范围。
 
@@ -141,12 +141,12 @@ uv run --locked --extra dev python scripts/audit_western_lunations_hours.py --ou
 
 原典关系判断的缺口也需单独保留：[Ptolemy《Tetrabiblos》IV.7，Robbins 1940](https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Ptolemy/Tetrabiblos/4B%2A.html#7)优先考察双方日、月、上升和福点的星座关系，并继续考察位置高低与其他行星的见证；它没有给出此处的七曜百分制。当前自定义评分尚未实现该章完整判断链，不能称为该章的实现，也不能将其综合分解释成关系成败概率。
 
-球面几何有47个来自独立 GeographicLib 2.1 的冻结参考（本地数据：`../tests/fixtures/western-geographiclib-midpoints.json`）；该参考只证明所列球面中点，不验证MC星历或原典解释。关系盘审计与 `tests/test_western_relationship_geometry.py`、`tests/test_western_relationship_transports.py` 分开记录外部几何、内部一致性和真实三端协议检查。
+球面几何有47个来自独立 GeographicLib 2.1 的冻结参考（本地数据：`../tests/fixtures/western-geographiclib-midpoints.json`）；该参考只证明所列球面中点，不验证MC星历或原典解释。关系盘审计与 `tests/western/test_western_relationship_geometry.py`、`tests/western/test_western_relationship_transports.py` 分开记录外部几何、内部一致性和真实三端协议检查。
 
 ```bash
-uv run --locked --extra dev pytest -q tests/test_western_relationship_geometry.py tests/test_western_relationship_transports.py
-uv run --locked --extra dev python scripts/audit_western_relationship.py --output /tmp/western-relationship.json
-uv run --locked --extra dev python scripts/audit_western_relationship_scoring.py --output /tmp/western-relationship-score.json
+uv run --locked --extra dev pytest -q tests/western/test_western_relationship_geometry.py tests/western/test_western_relationship_transports.py
+uv run --locked --extra dev python -m scripts.western.audit_western_relationship --output /tmp/western-relationship.json
+uv run --locked --extra dev python -m scripts.western.audit_western_relationship_scoring --output /tmp/western-relationship-score.json
 ```
 
 ## 宫位与四轴的独立核验
@@ -167,11 +167,11 @@ uv run --locked --extra dev python scripts/audit_western_relationship_scoring.py
 
 ```bash
 git clone --depth 1 --branch v8.00 https://github.com/CruiserOne/Astrolog.git /tmp/astrolog-house-reference
-uv run --locked --extra dev python scripts/build_astrolog_house_oracle.py --source-dir /tmp/astrolog-house-reference
-uv run --locked --extra dev --with pyerfa==2.0.1.5 --with numpy==2.5.4 python scripts/gen_western_houses_reference.py --protocol tests/fixtures/western-houses-protocol.json --astrolog-executable /tmp/astrolog-house-reference/house_oracle --output /tmp/western-houses.json
-uv run --locked --extra dev python scripts/audit_western_houses.py --output /tmp/western-houses-audit.json
-uv run --locked --extra dev python scripts/audit_western_placidus_residuals.py --reference tests/fixtures/western-houses-erfa-astrolog.json --output /tmp/western-placidus-residuals.json
-uv run --locked --extra dev --with pyerfa==2.0.1.5 --with numpy==2.5.4 python scripts/gen_western_rotation_kernel_reference.py --output /tmp/western-rotation-kernel.json
+uv run --locked --extra dev python -m scripts.western.build_astrolog_house_oracle --source-dir /tmp/astrolog-house-reference
+uv run --locked --extra dev --with pyerfa==2.0.1.5 --with numpy==2.5.4 python -m scripts.western.gen_western_houses_reference --protocol tests/fixtures/western-houses-protocol.json --astrolog-executable /tmp/astrolog-house-reference/house_oracle --output /tmp/western-houses.json
+uv run --locked --extra dev python -m scripts.western.audit_western_houses --output /tmp/western-houses-audit.json
+uv run --locked --extra dev python -m scripts.western.audit_western_placidus_residuals --reference tests/fixtures/western-houses-erfa-astrolog.json --output /tmp/western-placidus-residuals.json
+uv run --locked --extra dev --with pyerfa==2.0.1.5 --with numpy==2.5.4 python -m scripts.western.gen_western_rotation_kernel_reference --output /tmp/western-rotation-kernel.json
 ```
 
 构建需Git和C++编译器；本次采集使用Linux x86_64／Python 3.12。源代码数学部分未改写，配置、编译器、可执行文件和结果均保留指纹；这里只将原始公式入口接到固定几何输入，不使用 Matrix 行星位置。该编译产物属于独立校验工具，不是运行时依赖。
@@ -180,7 +180,7 @@ uv run --locked --extra dev --with pyerfa==2.0.1.5 --with numpy==2.5.4 python sc
 
 `profection`、`givenyear` 与综合推运共用年小限计算。周年在出生时区内从原始出生月日重建：2 月 29 日在平年按 2 月 28 日，在下一闰年恢复 2 月 29 日，避免从已截短的日期反复加年而丢失闰日。`return_timezone` 将分析时刻和周年边界转换到目标地区展示，不重新解释原钟面或改变同一瞬间。
 
-月段采用 FateBridge 声明的周年区间十二等分约定：先按 UTC 经过时长分段，再转换为本地时区展示；夏令时变化不会改变等分时长。每个边界直接从完整年区间计算，活动月段采用左闭右开区间，年小限的月序使用同一组可表示边界。`givenyear.year_start/year_end` 与首尾月段保持一致。此约定不认证全部古典月小限方法、出生记录精度或现实事件应期。边界回归见 [`test_profection_intervals.py`](../tests/test_profection_intervals.py)。
+月段采用 FateBridge 声明的周年区间十二等分约定：先按 UTC 经过时长分段，再转换为本地时区展示；夏令时变化不会改变等分时长。每个边界直接从完整年区间计算，活动月段采用左闭右开区间，年小限的月序使用同一组可表示边界。`givenyear.year_start/year_end` 与首尾月段保持一致。此约定不认证全部古典月小限方法、出生记录精度或现实事件应期。边界回归见 [`test_profection_intervals.py`](../tests/western/test_ci_regressions.py)。
 
 ## 极区天球四轴与制宫分支
 
@@ -193,8 +193,8 @@ uv run --locked --extra dev --with pyerfa==2.0.1.5 --with numpy==2.5.4 python sc
 服务层重建解释后，实际产生的极点／交线条件、相反制宫轴及轨道回退说明现在保留在摘要和文本导出。真实模型能否正确读取这些依据仍需单独验证。
 
 ```bash
-uv run --locked --extra dev python scripts/gen_western_placidus_roots.py --reference tests/fixtures/western-houses-erfa-astrolog.json --protocol tests/fixtures/western-placidus-root-protocol.json --output /tmp/western-placidus-roots.json
-uv run --locked --extra dev python scripts/audit_western_polar_geometry.py --reference tests/fixtures/western-houses-erfa-astrolog.json --roots tests/fixtures/western-placidus-bisection.json --output /tmp/western-polar-audit.json
+uv run --locked --extra dev python -m scripts.western.gen_western_placidus_roots --reference tests/fixtures/western-houses-erfa-astrolog.json --protocol tests/fixtures/western-placidus-root-protocol.json --output /tmp/western-placidus-roots.json
+uv run --locked --extra dev python -m scripts.western.audit_western_polar_geometry --reference tests/fixtures/western-houses-erfa-astrolog.json --roots tests/fixtures/western-placidus-bisection.json --output /tmp/western-polar-audit.json
 ```
 
 ## 相位边界与瞬时入出相
@@ -210,8 +210,8 @@ uv run --locked --extra dev python scripts/audit_western_polar_geometry.py --ref
 `astro_chart`、`astro_chart13`、`astro_hellen`、`astro_india`、`astro_germany` 发布 `aspect_motion` 证据视图，将星体、相位、格局与适用限制一起读取；使用时把视图的 `fields` 复制到请求，视图名称本身不是请求参数。独立算术、公开端口一致性、模型解释和安装包分别验证。
 
 ```bash
-uv run --locked --extra dev pytest -q tests/test_western_angular_predicates.py tests/test_western_angular_transports.py
-PYTHONPATH=src:. uv run --locked --extra dev python scripts/audit_western_angular_predicates.py --output /tmp/western-angular-audit.json
+uv run --locked --extra dev pytest -q tests/western/test_western_angular_predicates.py tests/western/test_contract_regressions.py
+PYTHONPATH=src:. uv run --locked --extra dev python -m scripts.western.audit_western_angular_predicates --output /tmp/western-angular-audit.json
 ```
 
 ## 卜卦月亮事件与Lilly条件
@@ -255,8 +255,8 @@ Lilly第114页分别讨论上行星、金水和月亮；共享几何端点约定
 表格与边界核验包含2,520组独立Decimal比较及印例；它是所选原图转录和算术证据，不是独立专家校勘。`lilly_reception_conditions` 严格视图同时读取事实、条件与限制，不能只取一条支持句当成完整结论。
 
 ```bash
-uv run --locked --extra dev pytest -q tests/test_western_lilly_reception.py tests/test_western_lilly_reception_transports.py
-uv run --locked --extra dev python scripts/audit_western_lilly_reception.py --output /tmp/western-lilly-reception.json
+uv run --locked --extra dev pytest -q tests/western/test_western_lilly_reception.py tests/western/test_contract_regressions_3.py
+uv run --locked --extra dev python -m scripts.western.audit_western_lilly_reception --output /tmp/western-lilly-reception.json
 ```
 
 ### Lilly两列容许度、实际落宫与居宫条款
@@ -270,8 +270,8 @@ uv run --locked --extra dev python scripts/audit_western_lilly_reception.py --ou
 原图与修改前反例记录封存资料、独立算术与接口验收。2024年示例窗口另外发现一处金星导数未收敛；修改前卜卦实现配合相同数值底座也复现该失败，见缺口记录。该原始失败回执保留；后续v5已恢复此窗口，详见近太阳导数续修。表格修复或协议测试本身不证明天文精度。
 
 ```bash
-uv run --locked --extra dev python scripts/audit_western_lilly_orbs_houses.py --output /tmp/lilly-orbs-houses.json
-uv run --locked --extra dev pytest -q tests/test_western_lilly_orbs_houses.py tests/test_western_lilly_orbs_houses_transports.py
+uv run --locked --extra dev python -m scripts.western.audit_western_lilly_orbs_houses --output /tmp/lilly-orbs-houses.json
+uv run --locked --extra dev pytest -q tests/western/test_western_lilly_orbs_houses.py tests/western/test_western_lilly_orbs_houses_transports.py
 ```
 
 ### Lilly全表回执与原书例题差异
@@ -321,15 +321,15 @@ uv run --locked --extra dev pytest -q tests/test_western_lilly_orbs_houses.py te
 这套数值权重和75／55／40分档是未校准的产品约定，不能称作Lilly全书择日判断；`scoring_policy`明确来源范围和未完成状态。基准样例的48分没有为本次修复调整。`calculation_conditions`严格视图同时读取原生事件、轴、太阳定义、已知因子、待核项与分数政策。交付验收分开记录计算、原典条件、接口和安装包；相应历史失败和未完成目标均保留。
 
 ```bash
-uv run --locked --extra dev pytest -q tests/test_western_election_conditions.py tests/test_western_election_conditions_transports.py
-uv run --locked --extra dev python scripts/audit_western_election_conditions.py --output /tmp/western-election-conditions.json
+uv run --locked --extra dev pytest -q tests/western/test_western_election_conditions.py tests/western/test_contract_regressions_2.py
+uv run --locked --extra dev python -m scripts.western.audit_western_election_conditions --output /tmp/western-election-conditions.json
 ```
 
 本阶段交付验收分别记录独立JPL对照、宿主与冻结Linux测试、六份共享快照的审查、安装包及未通过的共享检查；不把这些检查合并成原典全文或实际模型解释的认证。
 
 ```bash
-uv run --locked --extra dev pytest -q tests/test_western_horary_motion.py tests/test_western_horary_motion_transports.py
-uv run --locked --extra dev python scripts/audit_western_horary_motion.py --output /tmp/western-horary-jpl.json
+uv run --locked --extra dev pytest -q tests/western/test_western_horary_motion.py tests/western/test_contract_regressions_2.py
+uv run --locked --extra dev python -m scripts.western.audit_western_horary_motion --output /tmp/western-horary-jpl.json
 ```
 
 ## 恒星位置、黄道与原典标签
@@ -414,9 +414,9 @@ uv run --locked --extra dev python scripts/audit_western_horary_motion.py --outp
 具名不透明模型实算全部原7070个天体／时刻，两种框架共14140次投影比较，经纬均符合未改变的0.02角秒线，经度最大约0.002493角秒；原异常点经度差约0.000371角秒。该7070点参考只覆盖太阳、月亮、水星、金星、火星、木星、土星；独立位置层另输出的天王星、海王星、冥王星没有在本轮取得同样独立位置验收。另有偏离原小时网格17分钟的九个水星 Horizons 控制点，继续使用0.02角秒线；这是问题发现后的额外检查，不能称作盲测或全历元认证。资料在 `tests/data/astro/mercury-opaque-solar`，包括原始请求、响应及来源指纹。
 
 ```bash
-uv run --locked --extra dev python scripts/audit_western_reference_points.py --output /tmp/western-reference-points.json
-uv run --locked --extra dev python scripts/audit_western_reference_points.py --apparent-model opaque_solar --output /tmp/western-opaque-solar.json
-uv run --locked --extra dev pytest -q tests/test_western_reference_points.py tests/test_western_reference_point_transports.py
+uv run --locked --extra dev python -m scripts.western.audit_western_reference_points --output /tmp/western-reference-points.json
+uv run --locked --extra dev python -m scripts.western.audit_western_reference_points --apparent-model opaque_solar --output /tmp/western-opaque-solar.json
+uv run --locked --extra dev pytest -q tests/western/test_western_reference_points.py tests/western/test_western_reference_point_transports.py
 ```
 
 默认参考点审计仍因原生严格位置诊断而退出1。显式 `--apparent-model opaque_solar` 只按该独立位置层的7070对原门槛决定退出状态，输出中原生 `same_point_positions_passed` 和 `same_point_numerical_acceptance` 继续为 false；212次原生事件时刻通过另记，不是新模型事件验收。这里的参考量是已暴露的工程对照，不是盲测。
@@ -448,8 +448,8 @@ uv run --locked --extra dev pytest -q tests/test_western_reference_points.py tes
 新JPL冻结参考（本地数据：`../tests/fixtures/western-event-paths-horizons.json`）来自两个21日TT窗口、7070组七曜黄经，原始响应逐字归档（本地数据：`../tests/fixtures/western-event-paths-raw.zip`）。预定2角秒、成相／入宫30秒和停滞120秒容差均未放宽。独立审计中106项事件的身份和数量一致，其中105项时刻符合容差；土星停滞约205秒差异仍未通过。原三点停滞参考、参考舍入问题及五点细化结果均保留，细化没有消除该差异。[Swiss官方](https://www.astro.com/swisseph/swephprg.htm)说明默认视位置与Horizons的IAU76/80及EOP参考框架不同；这是保留的上一轮本体中心对照；上节新的中心控制已定位土星系统质心与本体中心的混用。不能仅凭位置落在2角秒内就认证停滞时刻精度，也不能把同点通过改写成原本体中心比较通过。
 
 ```bash
-uv run --locked --extra dev pytest -q tests/test_western_event_paths.py tests/test_western_event_paths_transports.py
-uv run --locked --extra dev python scripts/audit_western_event_paths.py --output /tmp/western-event-paths-evidence.json
+uv run --locked --extra dev pytest -q tests/western/test_western_event_paths.py tests/western/test_contract_regressions_2.py
+uv run --locked --extra dev python -m scripts.western.audit_western_event_paths --output /tmp/western-event-paths-evidence.json
 ```
 
 审计当前应退出1，表示仍有上述独立对照未通过；测试检查解析反例与协议保真，不把该失败计成通过。资料的作者、印页与两类分离的校勘见原典回执（本地数据：`../tests/fixtures/western-lilly-event-paths-1647.json`）。公开严格视图 `event_paths` 同时包含原生事件、来源、原始状态与未完成条件。
@@ -473,10 +473,10 @@ uv run --locked --extra dev python scripts/audit_western_event_paths.py --output
 
 ```bash
 uv sync --locked --extra dev
-uv run --locked --extra dev pytest -q tests/test_western_accuracy.py tests/test_western_accuracy_transports.py
-uv run --locked --extra dev python scripts/audit_western_accuracy.py --output /tmp/fatebridge-western-independent.json
+uv run --locked --extra dev pytest -q tests/western/test_western_accuracy.py tests/western/test_western_accuracy_transports.py
+uv run --locked --extra dev python -m scripts.western.audit_western_accuracy --output /tmp/fatebridge-western-independent.json
 # 需要刷新外部数据时才联网；不能用本引擎重写参考值。
-uv run --locked --extra dev python scripts/gen_western_horizons_reference.py
+uv run --locked --extra dev python -m scripts.western.gen_western_horizons_reference
 ```
 
 机器可读审计记录列明每个样本、误差、来源和代码指纹。黄金快照维护接口回归；它不充当独立算法答案。不能通过放宽容差、删掉失败年代或增加内部规则命中次数提高验收结果。
@@ -486,12 +486,12 @@ uv run --locked --extra dev python scripts/gen_western_horizons_reference.py
 同一批样本也以当前本地 Swiss 数据文件复核，文件模式审计记录实际 `swieph` 模型及三个文件的 SHA-256。120 组位置最大黄经误差约 0.560 角秒；空目录 Moshier 模式约 1.979 角秒，均在原先固定的 2 角秒内。六个返照在文件模式下太阳最大时刻误差约 5.45 秒、月亮约 0.39 秒。文件由使用者单独取得，未随源码重新分发，也未改变容差以适配观测结果。
 
 ```bash
-uv run --locked --extra dev pytest -q tests/test_western_timing_accuracy.py tests/test_western_accuracy_transports.py
-uv run --locked --extra dev python scripts/audit_western_timing_accuracy.py --output /tmp/fatebridge-western-timing.json
+uv run --locked --extra dev pytest -q tests/western/test_western_timing_accuracy.py tests/western/test_western_accuracy_transports.py
+uv run --locked --extra dev python -m scripts.western.audit_western_timing_accuracy --output /tmp/fatebridge-western-timing.json
 # 已按项目星历流程取得文件后，用同一数据和容差复核实际文件模式：
-uv run --locked --extra dev python scripts/audit_western_timing_accuracy.py --ephemeris-dir ephe --output /tmp/fatebridge-western-timing-swieph.json
+uv run --locked --extra dev python -m scripts.western.audit_western_timing_accuracy --ephemeris-dir ephe --output /tmp/fatebridge-western-timing-swieph.json
 # 仅需刷新 NASA 独立返照参考时运行：
-uv run --locked --extra dev python scripts/gen_western_returns_reference.py
+uv run --locked --extra dev python -m scripts.western.gen_western_returns_reference
 ```
 
 首轮本地验收记录与推运深化验收记录分别记录对应代码状态的专项、三端、类型、格式、构建及全仓检查，不能把不同状态下的通过数直接相加。
@@ -510,8 +510,8 @@ uv run --locked --extra dev python scripts/gen_western_returns_reference.py
 四项不平均、不互相替代。当前未建立“四项满分／最权威预测系统”的结论。现实研究须在结果揭晓前固定计划与方法，参见 [COS 预注册说明](https://www.cos.io/initiatives/prereg)；已有[评估流程](prediction-validation.md#可证伪的现实预测评估)可复用，其八字示例不属于西占数据。
 
 ```bash
-uv run --locked --extra dev pytest -q tests/test_western_semantic_fidelity.py tests/test_western_accuracy_transports.py
-uv run --locked --extra dev python scripts/audit_western_fidelity.py --output /tmp/fatebridge-western-fidelity.json
+uv run --locked --extra dev pytest -q tests/western/test_western_semantic_fidelity.py tests/western/test_western_accuracy_transports.py
+uv run --locked --extra dev python -m scripts.western.audit_western_fidelity --output /tmp/fatebridge-western-fidelity.json
 ```
 
 真实模型的解释应按[模型评估流程](agent-evaluation.md)另行执行和审阅。准备参照或通过机械测试不提高语义验收状态。

@@ -47,7 +47,7 @@
 
 `verified_output_relations`绑定每个具名关系的全部操作数及输出JSON Pointer和摘要，复核时重建关系，不能仅靠篡改后重算摘要蒙混通过。太乙完整起终宫环路还核对每个经过位置及加数，不只核对总和。`source_conflict_certificates`将同次公式结果与原表字面值绑定，保留两边、有限候选和未裁定的来源优先级。它们证明所记录约束不能同时成立，并不裁定原书误刻或优先采用通则。
 
-这批核验是条件数学关系的证明；`producer_instruction_read_set_attested=false`，没有将重建关系冒充生产者机器指令读集或全部上游因果关系的证明。全144太乙核心、1080奇门值使行可用`scripts/audit_verified_output_relations.py`重验。
+这批核验是条件数学关系的证明；`producer_instruction_read_set_attested=false`，没有将重建关系冒充生产者机器指令读集或全部上游因果关系的证明。全144太乙核心、1080奇门值使行可用`scripts/validation/audit_verified_output_relations.py`重验。
 
 MCP在入口复用已校验请求，避免框架填默认值后再次建模而丢掉提供字段信息。REST、MCP、CLI对同输入的证据回执一致。
 
@@ -59,7 +59,7 @@ MCP在入口复用已校验请求，避免框架填默认值后再次建模而�
 
 `validation/acceptance.py`要求固定case ID全集、参考摘要、比较方式、量纲与容差。缺行、重复、额外行、参考不一致和未知均不通过，不由一个成功子集替代分母。数值、来源、解释和现实效度分别列轴。
 
-`scripts/check_framework_gate.py`独立读取原封存JPL参考，用报告中的实际黄经重新比较，不相信报告已写的误差或passed字段；保留原两个后端、24000个位置/后端、1200个设计根/后端，以及2角秒和5秒门槛。
+`scripts/validation/check_framework_gate.py`独立读取原封存JPL参考，用报告中的实际黄经重新比较，不相信报告已写的误差或passed字段；保留原两个后端、24000个位置/后端、1200个设计根/后端，以及2角秒和5秒门槛。
 
 原生 Swiss、Moshier 与显式点质量候选分别保留自己的固定总体和门槛。当前原生位置队列仍有失败，候选的有限队列通过不替换原失败，也不建立全域物理误差界；逐项数字、来源、前提与重验统一见[人类图模型对照](human-design.md#显式视位置模型对照)。
 

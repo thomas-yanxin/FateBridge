@@ -62,7 +62,7 @@ CLI 可直接运行；REST 默认端口为 `8010`；MCP 默认通过 stdio 由�
 | 模块职责、数据流与共享历法依赖 | [架构说明](architecture.md) |
 | 太阳、近太阳位置及月球日速的固定队列 | [分项精度验收](precision-acceptance.md) |
 | 方法登记、误差预算、证据图与固定总体验收 | [计算证据合同](computation-evidence.md) |
-| 扩展、测试、CI、打包与发布 | [开发指南](development-guide.md) |
+| 扩展、测试、CI、打包与发布 | [开发指南](development-guide.md) · [脚本索引](../scripts/README.md) · [测试索引](../tests/README.md) |
 | 仓库维护与本地清理 | [仓库维护](repository-maintenance.md) |
 | 真实模型的调用与解释质量 | [Agent 行为验收](agent-evaluation.md) |
 | 外部命例评估 | [MingLi-Bench](mingli-bench-evaluation.md) |

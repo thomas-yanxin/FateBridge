@@ -27,7 +27,9 @@ def horizons_anchor_checks(root: Path) -> dict[str, Any]:
         or reference["plan_sha256"] != de440["plan_sha256"]
         or reference["generator_sha256"]
         != hashlib.sha256(
-            (root / "scripts/gen_human_design_astronomy_horizons.py").read_bytes()
+            (
+                root / "scripts/human_design/gen_human_design_astronomy_horizons.py"
+            ).read_bytes()
         ).hexdigest()
         or reference["tolerance_arcseconds"] != 2.0
     ):
@@ -108,7 +110,9 @@ def physical_astronomy_checks(root: Path) -> dict[str, Any]:
         or hashlib.sha256(plan_path.read_bytes()).hexdigest()
         != reference["plan_sha256"]
         or hashlib.sha256(
-            (root / "scripts/gen_human_design_astronomy_reference.py").read_bytes()
+            (
+                root / "scripts/human_design/gen_human_design_astronomy_reference.py"
+            ).read_bytes()
         ).hexdigest()
         != reference["generator_sha256"]
     ):

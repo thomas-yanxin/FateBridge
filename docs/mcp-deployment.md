@@ -286,7 +286,7 @@ WantedBy=multi-user.target
 
 ```bash
 uv run --locked --extra dev python scripts/build_onda_plugin.py --output dist/fatebridge-onda-0.2.0.zip
-uv run --locked --extra dev python -m pytest -q tests/test_onda_plugin.py
+uv run --locked --extra dev python -m pytest -q tests/quality/test_onda_plugin.py
 ```
 
 输出路径须尚不存在，避免覆盖旧包。构建器保留 `skills/`、兄弟 `_shared/`、分支参考及本地文档依赖，并加入 `src/fatebridge/`、包数据、`pyproject.toml` 与 `uv.lock`。运行时依赖由 `uv export --locked --no-dev --no-emit-project` 导出至 `backend-requirements.txt`，保留版本、平台标记和散列。`backend-source.json` 记录后端文件与依赖清单的 SHA-256，可核对安装内容。

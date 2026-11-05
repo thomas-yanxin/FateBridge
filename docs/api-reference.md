@@ -4,7 +4,7 @@
 
 首次运行请先看[快速入门](getting-started.md)，可复制的客户端代码见[接入指南](agent-guide.md)，按日常问题选择方法见[场景路由](scenario-routing.md)。
 
-当前实际暴露 91 个业务 REST 路由（另含 `/health`、`/ready`、`/metrics` 三个运维端点）和 92 个 FastMCP 工具。两个数字由中央目录派生，并由 `tests/test_doc_tool_counts.py` 锁定。版本之间的准确字段约束以当前服务的 `/openapi.json`、MCP `tools/list` 或 CLI `describe` 为准。
+当前实际暴露 91 个业务 REST 路由（另含 `/health`、`/ready`、`/metrics` 三个运维端点）和 92 个 FastMCP 工具。两个数字由中央目录派生，并由 `tests/quality/test_doc_tool_counts.py` 锁定。版本之间的准确字段约束以当前服务的 `/openapi.json`、MCP `tools/list` 或 CLI `describe` 为准。
 
 ## 阅读导航
 
@@ -78,7 +78,7 @@
 
 模型校验错误带有 `issues`，每项包含字段 `path`、稳定错误 `code` 和可选 `constraints`，不回显输入值。未知字段会被拒绝；显式非法的 `astro_election.topic_id`、`astro_horary.category` 或 `two_person_compatibility.relationship_type` 不回退为其他主题或 `general`。关系类型只接受 `general/marriage/friendship/business/family`，省略时为 `general`。省略其他可选字段仍使用声明的默认值。CLI 的未知 flag 或 argparse 类型错误属于用法错误（退出 2），进入请求模型后的校验失败属于计算失败（退出 1）。
 
-REST OpenAPI、MCP `tools/list`、`/api/tools` 和 CLI `describe` 发布中央目录的输入与输出 Schema。成功结果在字段投影前校验，输出违规属于 `internal_error`，不归责于请求参数。合同覆盖根字段，以及主限命中与坐标、时主递归子限、寿限时间线、古典与关系盘、紫微星曜、六壬四课三传、奇门宫位、太乙核心盘和地方术数条目，以及九类八字专题、宿曜双向关系、知识覆盖/查询与导出模板/分段/动态设置等稳定嵌套事实。动态星体、卦码和规则键保持开放，但已声明的字典值与列表条目会校验；解释文本和未声明扩展继续允许。业务字段可选且允许 null，以兼容 `fields` 投影、既有可空事实与 CLI 全局 `--no-metadata`；完整执行另核对工具声明的必需根字段及完整事实合同；合法投影不能代替完整结果校验。校验不重序列化响应，因此不补默认值、不删除扩展字段、不改写原数值。OpenAPI 使用稳定 `operationId`，并在启用 REST 密钥时声明实际鉴权要求。合同回归见 [专业嵌套合同测试](../tests/test_agentic_nested_outputs.py) 和 [八字专题、宿曜及知识/导出合同测试](../tests/test_agentic_domain_outputs.py)。
+REST OpenAPI、MCP `tools/list`、`/api/tools` 和 CLI `describe` 发布中央目录的输入与输出 Schema。成功结果在字段投影前校验，输出违规属于 `internal_error`，不归责于请求参数。合同覆盖根字段，以及主限命中与坐标、时主递归子限、寿限时间线、古典与关系盘、紫微星曜、六壬四课三传、奇门宫位、太乙核心盘和地方术数条目，以及九类八字专题、宿曜双向关系、知识覆盖/查询与导出模板/分段/动态设置等稳定嵌套事实。动态星体、卦码和规则键保持开放，但已声明的字典值与列表条目会校验；解释文本和未声明扩展继续允许。业务字段可选且允许 null，以兼容 `fields` 投影、既有可空事实与 CLI 全局 `--no-metadata`；完整执行另核对工具声明的必需根字段及完整事实合同；合法投影不能代替完整结果校验。校验不重序列化响应，因此不补默认值、不删除扩展字段、不改写原数值。OpenAPI 使用稳定 `operationId`，并在启用 REST 密钥时声明实际鉴权要求。合同回归见 [专业嵌套合同测试](../tests/evaluation/test_agentic_nested_outputs.py) 和 [八字专题、宿曜及知识/导出合同测试](../tests/evaluation/test_agentic_domain_outputs.py)。
 
 ### 2.2 快照协议
 

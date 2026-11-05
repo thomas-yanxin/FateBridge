@@ -51,7 +51,7 @@ REST为 `POST /api/fengshui/monthly_stars`，请求体可用 `{"effective_solar_
 完整TT实现对照可离线复核：
 
 ```bash
-uv run --locked --extra dev python scripts/audit_fengshui_monthly_calendar.py \
+uv run --locked --extra dev python -m scripts.fengshui.audit_fengshui_monthly_calendar \
   --reference tests/data/fengshui_monthly_v1/jie-de440-tt.json.gz \
   --output /tmp/fengshui-monthly-tt-audit.json
 ```

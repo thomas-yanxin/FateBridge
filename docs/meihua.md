@@ -221,7 +221,7 @@ uv run --locked --extra dev fatebridge meihua_analysis \
   --strict-fields true --include-snapshot-text false --response-char-limit 0
 ```
 
-固定原始年表及所选时刻用例见参考指纹（本地数据：`../tests/fixtures/meihua_solar_reference_v1/manifest.json`）。`uv run --locked --extra dev python scripts/audit_meihua_solar_reference.py`逐项核对来源转录及所给时刻的日期对照；合成正午不是天文事件观测，不合并成4800份现实预测证据。
+固定原始年表及所选时刻用例见参考指纹（本地数据：`../tests/fixtures/meihua_solar_reference_v1/manifest.json`）。`uv run --locked --extra dev python -m pytest -q tests/meihua/test_meihua_solar_reference.py`逐项核对来源转录及所给时刻的日期对照；合成正午不是天文事件观测，不合并成4800份现实预测证据。
 
 ## 体用、动静与条件推理
 
@@ -751,7 +751,7 @@ uv run --locked --extra dev fatebridge meihua_cast --casting '{"method":"existin
 届时接入固定香港天文台CSV及包含`source_url/retrieved_at/body_sha256/data_kind`的来源回执。该[官方数据集](https://data.gov.hk/en-data/dataset/hk-hko-rss-daily-total-rainfall)标明按月更新，[字典](https://data.weather.gov.hk/weatherAPI/doc/data_dictionary_daily_total_rainfall.pdf)的完整性标记仍按C、#、***分别处理；窗口结束不代表结果已发布。全部365日均保留，缺行、不完整和不可判定结果不补零，Trace仍按源文件明示的小于0.05毫米区间处理。来源回执的哈希相符只证明提交内容一致，不证明它来自官方或在声称时间取得。
 
 ```bash
-uv run --locked --extra dev python scripts/audit_meihua_weather_prospective.py --study /path/to/original-study --attestation /path/to/original-attestation --output /tmp/meihua-prospective-readiness.json
+uv run --locked --extra dev python -m scripts.meihua.audit_meihua_weather_prospective --study /path/to/original-study --attestation /path/to/original-attestation --output /tmp/meihua-prospective-readiness.json
 ```
 
 本入口是独立验证脚本，未增加REST/MCP计算工具或更改取数合同。运行需可用的`openssl ts`；证书在已签时间验证，固定FreeTSA根证书与TSA证书，未检查吊销状态。时间戳证明所绑定字节当时已存在，不是科学注册、原典认证或预测效力证明。结果接入的边界、保留的首次失败与更正
@@ -803,11 +803,11 @@ uv run --locked --extra dev python scripts/audit_meihua_weather_prospective.py -
 
 午时数为7，上下卦取数相差7；模8与模6的共同周期使固定午时最多覆盖24种本卦／动爻几何。365日实际覆盖这24种；按四季逐一核对的96种条件只有17种无雨、79种弃权，本、互、变均未出现旅卦，因而无法检验对应朝晴暮雨条款。12个时支的算术组合上限为192种，已有卦入口则可提供384种；这些是取数几何和软件条件，不是独立现实观测。缺少条件造成的弃权不能靠临时换起卦时刻、改晴雨映射或选有利日期消除。
 
-审计入口为 `uv run --locked --extra dev python scripts/audit_meihua_weather_feasibility.py --vector <固定向量.json> --expected-sha256 <事先保存的SHA-256>`。输入必须列出完整唯一队列和每项标签，缺项、重复JSON键、未知标签及指纹不符均拒绝。文件指纹核对不能单独认证预注册时间或研究来源；精确上限的固定材料（本地数据：`../tests/fixtures/meihua_weather_feasibility_v1/manifest.json`）包含实现前的独立穷举及旧主队列标签，范围及负结果
+审计入口为 `uv run --locked --extra dev python -m scripts.meihua.audit_meihua_weather_feasibility --vector <固定向量.json> --expected-sha256 <事先保存的SHA-256>`。输入必须列出完整唯一队列和每项标签，缺项、重复JSON键、未知标签及指纹不符均拒绝。文件指纹核对不能单独认证预注册时间或研究来源；精确上限的固定材料（本地数据：`../tests/fixtures/meihua_weather_feasibility_v1/manifest.json`）包含实现前的独立穷举及旧主队列标签，范围及负结果
 
 ### 固定午时研究的符号状态事前检查
 
-`uv run --locked --extra dev python scripts/audit_meihua_weather_reachability.py --output /tmp/meihua-weather-support.json`检查当前1.7.0天气规则与固定v3研究标签政策的符号状态。它不接入原始降雨观测文件；底层天气引擎会附带旧研究摘要，诊断不使用摘要决定标签或时刻。本诊断已知旧负结果，不是结果盲测，原研究时刻、样本、标签和门槛不改。加`--require-potential-superiority`时，当前午时方案因结构限制返回退出码2，完整失败材料仍写入输出文件；普通审计退出0只表示穷举完成，不表示预测门槛通过。
+`uv run --locked --extra dev python -m scripts.meihua.audit_meihua_weather_reachability --output /tmp/meihua-weather-support.json`检查当前1.7.0天气规则与固定v3研究标签政策的符号状态。它不接入原始降雨观测文件；底层天气引擎会附带旧研究摘要，诊断不使用摘要决定标签或时刻。本诊断已知旧负结果，不是结果盲测，原研究时刻、样本、标签和门槛不改。加`--require-potential-superiority`时，当前午时方案因结构限制返回退出码2，完整失败材料仍写入输出文件；普通审计退出0只表示穷举完成，不表示预测门槛通过。
 
 年月日和S经8取上下卦、加时经6取动爻，因此S加24保持图式不变。检查覆盖12个时支、每支24个余数，以及未知／春夏秋冬五种季节声明，共288组取数、1,440组解释；前期天气和“多”字阈值仍按原研究保持未知。该域是实际日历输入的超集：全域不存在某标签可限制实际子集，但存在符号状态不证明已经找到实际日期，更不证明预测正确。
 
@@ -838,7 +838,7 @@ uv run --locked --extra dev python scripts/audit_meihua_weather_prospective.py -
 全支持区间的固定对照范围为1900-01-01至2100-12-31，共73,414个唯一民用日期。原子队列保留1901-01-01至2100-02-08的72,723日，不因扩展覆盖而改变其分母；1900年365日另查臺北市立天文科學教育館印表，并分别运行固定UTC+08:00和Asia/Shanghai；2100年尾段另查326日。合计73,779次调用含时区重复，不是同等数量的独立日期或现实占验。年度来源共201份，其中生产也摄入同一香港天文台出版物的2100年尾段只证明忠实摄入，不能当作独立天文验证。
 
 ```bash
-uv run --locked --extra dev python scripts/audit_meihua_calendar.py --output audit-supported-calendar.json
+uv run --locked --extra dev python -m pytest -q tests/meihua/test_meihua_calendar.py
 ```
 
 审计以所选时区的民用正午取数。相同正午时支只有有限的不同卦图组合，完整日期对照不能扩大为所有时辰、所有时区、全部384种单爻变化或全原典符合性。香港天文台关于2057-09-28、2089-09-04、2097-08-07新月日期可能相差一日的说明仍保留；公布历表标签相同不等于未来物理时刻已获分钟级认证。
@@ -864,7 +864,7 @@ uv run --locked --extra dev python scripts/audit_meihua_calendar.py --output aud
 新增审计入口要求事先保存参考文件的SHA-256，完整比较1900—2100年全部4,824个节气；缺项、重复ID、重复JSON键、非有限TT值及指纹变化均拒绝。退出码0仅表示对所给参考满足固定的1秒TT差值门槛，退出码1保留所有超限项。文件指纹和参考自报来源不能单独认证其独立性。
 
 ```bash
-uv run --locked --extra dev python scripts/audit_meihua_solar_seconds.py --reference tests/fixtures/meihua_solar_seconds_v1/reference-2000a.json --expected-sha256 45dd2ab73b54e5d3a4cdbd6b00501180d0f1eb291a8264b9c473dca914ba0e37 --output audit-solar-seconds.json
+uv run --locked --extra dev python -m scripts.meihua.audit_meihua_solar_seconds --reference tests/fixtures/meihua_solar_seconds_v1/reference-2000a.json --expected-sha256 45dd2ab73b54e5d3a4cdbd6b00501180d0f1eb291a8264b9c473dca914ba0e37 --output audit-solar-seconds.json
 ```
 
 固定副本的DE440输出与独立IAU 2006/2000A实现比较，4,824项最大相差约0.0631秒，均在原门槛内；原审计中原版 Swiss Moshier、空外部星历目录的对照有494项超限，最大约2.094秒。两份实现共享DE440动力学来源，不能由软件相符推导绝对民用钟时精度。TT、UT1、UTC以及历史／未来换算条件分别保留，原有7处香港天文台日标签分歧仍未消除。
@@ -886,14 +886,14 @@ uv run --locked --extra dev python scripts/audit_meihua_solar_seconds.py --refer
 `published_lunar_date_binding`只认证所列公布标签与所选政策的对应；原有广义`calendar_labels_independently_authenticated=false`保留。民用UTC瞬间、节月／季节、历史发布时间、独立天文精度及现实效力均未据此认证。原表同一出版者的两种语言不是两次独立天文观测，新增工程检查也不算真实预测样本。详见日期绑定审查。
 
 ```bash
-uv run --locked --extra dev python scripts/audit_meihua_weather_calendar_binding.py --study /path/to/frozen-study --output /tmp/new-calendar-binding-receipt.json
+uv run --locked --extra dev python -m scripts.meihua.audit_meihua_weather_calendar_binding --study /path/to/frozen-study --output /tmp/new-calendar-binding-receipt.json
 ```
 
 输出必须位于原研究目录外，且为此前不存在的新文件；不覆盖旧回执或原始输入。
 
 ### 天气研究的交节时分与节月标签绑定
 
-工程入口 `scripts/audit_meihua_weather_solar_binding.py --study <原完整研究目录> --output <研究目录外的新文件>` 在原农历／机械核验之上，另用冻结的HKO2022—2027二十四节气XML刊载时分核对起卦节月及原研究季节声明。144条原始时分、60项同出版者年历中气对照和取名顺序先固定；不调用生产历法生成预期。
+工程入口 `scripts/meihua/audit_meihua_weather_solar_binding.py --study <原完整研究目录> --output <研究目录外的新文件>` 在原农历／机械核验之上，另用冻结的HKO2022—2027二十四节气XML刊载时分核对起卦节月及原研究季节声明。144条原始时分、60项同出版者年历中气对照和取名顺序先固定；不调用生产历法生成预期。
 
 刊载分钟未找到明确取整规则。输入按完整民用分钟处理，刊载时分两侧各60秒是明示的软件守卫，非官方置信区间或真实误差界；整分钟须在两个相邻节气守卫外，交界未定和首尾范围外均保留。按原研究寅卯辰春等四季约定，未提供季节的情形仍不补值，不替换成旺衰层土月划分。独立研究约定不冒充原典唯一法。
 
@@ -901,7 +901,7 @@ uv run --locked --extra dev python scripts/audit_meihua_weather_calendar_binding
 
 ### 固定午时政策补前提后的容量限制
 
-新增工程入口 `scripts/audit_meihua_weather_context_capacity.py --study <原完整研究目录> --output <研究目录外新文件>` 穷举固定午时1.7.0/v3政策的24种取数余数、120种现有声明组合，保留2880条符号状态及全部六个原队列／情形组。它只分析可能输出的标签，没有取得前期资料或现实结果。
+新增工程入口 `scripts/meihua/audit_meihua_weather_context_capacity.py --study <原完整研究目录> --output <研究目录外新文件>` 穷举固定午时1.7.0/v3政策的24种取数余数、120种现有声明组合，保留2880条符号状态及全部六个原队列／情形组。它只分析可能输出的标签，没有取得前期资料或现实结果。
 
 即使允许每一天任意选现有前期条件和多字阈值，原273日主队列最多77日可分类；较好常量基线在任何完整二元真值下至少正确137日，最乐观贡献差仍为−60。原默认向量的−88上限保持。不能通过补声明、按结果调阈值或删除弃权使这一固定政策胜出；这不排除其他有来源的新方法，也不取消其他版本原365日前瞻计划。
 
@@ -915,22 +915,7 @@ uv run --locked --extra dev python scripts/audit_meihua_weather_calendar_binding
 
 ```bash
 uv sync --locked --extra dev
-uv run --locked --extra dev python scripts/audit_meihua.py --output /tmp/meihua-audit.json
-uv run --locked --extra dev python scripts/audit_meihua_calendar.py --output /tmp/meihua-calendar-audit.json
-uv run --locked --extra dev python scripts/audit_meihua_calendar_precision.py --output /tmp/meihua-calendar-precision-audit.json
-uv run --locked --extra dev python scripts/audit_meihua_topics.py --output /tmp/meihua-topic-audit.json
-uv run --locked --extra dev python scripts/audit_meihua_casting.py --output /tmp/meihua-casting-audit.json
-uv run --locked --extra dev python scripts/audit_meihua_scans.py --output /tmp/meihua-scans-audit.json
-uv run --locked --extra dev python scripts/audit_meihua_weather.py --output /tmp/meihua-weather-audit.json
-uv run --locked --extra dev python scripts/audit_meihua_weather_controls.py --output /tmp/meihua-weather-controls-audit.json
-uv run --locked --extra dev python scripts/audit_meihua_weather_frequency.py --output /tmp/meihua-weather-frequency-audit.json
-uv run --locked --extra dev python scripts/audit_meihua_weather_cast_variants.py --output /tmp/meihua-weather-candidates-audit.json
-uv run --locked --extra dev python scripts/audit_meihua_weather_gen.py --output /tmp/meihua-weather-gen-audit.json
-uv run --locked --extra dev python scripts/audit_meihua_weather_chapter.py --output /tmp/meihua-weather-chapter-audit.json
-uv run --locked --extra dev python scripts/audit_meihua_weather_seasonal.py --output /tmp/meihua-weather-seasonal-audit.json
-uv run --locked --extra dev python scripts/audit_meihua_weather_dayparts.py --output /tmp/meihua-weather-dayparts-audit.json
-uv run --locked --extra dev python scripts/audit_meihua_general_variants.py --output /tmp/meihua-general-candidates-audit.json
-uv run --locked --extra dev python -m pytest -q tests/test_meihua_depth.py tests/test_meihua_transports.py
+uv run --locked --extra dev python -m pytest -q tests/meihua
 ```
 
 | 验收轴 | 本次证据与界限 |
@@ -946,4 +931,4 @@ uv run --locked --extra dev python -m pytest -q tests/test_meihua_depth.py tests
 
 尚未完成物数超八和单组声音计数口径的唯一裁定、自动现场取象、自动音韵或字形取画、完整外应、精确事件应期及全书分类占断；原八个人事题篇分别保留原四章20条、出行／谒见10条、失物5条及行人5条；另支持家宅/屋舍十个文字分支，其中家宅比利的关系条件未裁定，另列求财成分、出行偏好、失物8卦方位类象、行人初用受生受克及外应资格。出行多字、舟陆等角色范围及末句主语仍未裁定，未完成全章综合；天时层仅覆盖所列条件条款。卷三存在「觀梅恒卦」等疑似讹误，不能用程序结果反向校改原文消除分歧。
 
-现实预测后续使用现有 `fatebridge.validation.predictions` 和 `scripts/audit_prediction_study.py`：先固定可观察事件、时间窗、模型与解释政策、队列和基线；在事件窗口前记录预测，再独立判定结果。缺失、弃权及未随访必须保留，开发集与最终验收分开；不能从卦象关系生成假结果、事后改问题或只展示命中例。即使有限样本全对，也不能据此证明总体100%或最权威。
+现实预测后续使用现有 `fatebridge.validation.predictions` 和 `scripts/evaluation/audit_prediction_study.py`：先固定可观察事件、时间窗、模型与解释政策、队列和基线；在事件窗口前记录预测，再独立判定结果。缺失、弃权及未随访必须保留，开发集与最终验收分开；不能从卦象关系生成假结果、事后改问题或只展示命中例。即使有限样本全对，也不能据此证明总体100%或最权威。

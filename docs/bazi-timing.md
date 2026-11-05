@@ -27,8 +27,8 @@
 当前独立数据包括香港天文台发表到分钟的节气表、JPL太阳时资料、DE440的TT根及IANA钟时参考。它们分别检验历法、时标或地区钟时，不能互相替代。原版 Swiss Moshier 的96个独立TT对照仍有12项超出1秒门槛。当前 `native` 的完整 Moshier 修订按独立模型身份验收，已过有限内部队列，仍不能推广为全时域通过；默认随包 DE440 也单独报告，见[太阳模型](solar-backends.md)。数值求根的相邻浮点跨越控制不消除物理模型误差。
 
 ```bash
-uv run --locked --extra dev python scripts/audit_solar_model_reference.py --output /tmp/solar-model-audit.json
-uv run --locked --extra dev pytest -n0 tests/test_bazi_dayun_initial_fold.py tests/test_bazi_timing_roots.py tests/test_bazi_timing_cache_isolation.py
+uv run --locked --extra dev python -m scripts.astronomy.audit_solar_model_reference --output /tmp/solar-model-audit.json
+uv run --locked --extra dev pytest -n0 tests/bazi/test_bazi_dayun_initial_fold.py tests/bazi/test_bazi_timing_roots.py tests/bazi/test_bazi_timing_cache_isolation.py
 ```
 
 首个审计会对未过的1秒门槛返回非零退出状态。当前来源分歧与独立专家、实际预测缺口见[八字旺衰](bazi-assessment.md)；准确的时间换算不证明现实事件预测有效。

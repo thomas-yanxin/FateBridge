@@ -96,7 +96,7 @@ curl -sS -X POST \
 源码环境可执行数据验收，报告保留每项结果、失败和缺失参考；数值失败退出1，只有参考缺失退出2，两者都不能称为完整通过：
 
 ```bash
-uv run --locked --extra dev python scripts/audit_astrodice_kernel.py \
+uv run --locked --extra dev python -m scripts.astrodice.audit_astrodice_kernel \
   --ephe ephe --protocol tests/data/astrodice/tables/kernel-protocol.json \
   --reference tests/data/astrodice/tables/kernel-horizons.json \
   --output /tmp/astrodice-kernel.json
@@ -133,7 +133,7 @@ JPL模式的 `chart.params.chart_profile.physical_ephemeris_source` 返回实际
 相同冻结协议也可直接比较原始JPL路径：
 
 ```bash
-uv run --locked --extra dev python scripts/audit_astrodice_kernel.py \
+uv run --locked --extra dev python -m scripts.astrodice.audit_astrodice_kernel \
   --ephe /absolute/path/to/raw-jpl --jpl-file linux_m13000p17000.441 \
   --protocol tests/data/astrodice/tables/kernel-protocol.json \
   --reference tests/data/astrodice/tables/kernel-horizons.json \
@@ -158,7 +158,7 @@ uv run --locked --extra dev python scripts/audit_astrodice_kernel.py \
 
 ```bash
 SE_EPHE_PATH=/absolute/path/to/raw-jpl FATEBRIDGE_JPL_FILE=linux_m13000p17000.441 \
-uv run --locked --extra dev python -m scripts.audit_astrodice_lunar_motion \
+uv run --locked --extra dev python -m scripts.astrodice.audit_astrodice_lunar_motion \
   --protocol tests/data/astrodice/tables/lunar-chain-protocol.json \
   --reference tests/data/astrodice/tables/lunar-chain-reference.json \
   --output /tmp/astrodice-lunar-motion.json
@@ -171,7 +171,7 @@ uv run --locked --extra dev python -m scripts.audit_astrodice_lunar_motion \
 底层几何速度另按冻结速度协议（本地数据：`../tests/data/astrodice/tables/velocity-protocol.json`）核验。它复用已有公开Horizons参考中的速度分量；阈值在查看速度残差前固定为每坐标分量 `1e-10 AU/日`、视线单位向量导数差 `0.002角秒/日`，不改动原位置容差，也不把方向导数称为黄经速度。这是限定工程诊断，不是全历元Swiss精度保证，也不是新盲测。协议明确保留原始缺失时刻和补充样本的区别。
 
 ```bash
-uv run --locked --extra dev python scripts/audit_astrodice_kernel.py \
+uv run --locked --extra dev python -m scripts.astrodice.audit_astrodice_kernel \
   --ephe /path/to/jpl-directory --jpl-file linux_m13000p17000.441 \
   --protocol tests/data/astrodice/tables/kernel-protocol.json \
   --reference tests/data/astrodice/tables/kernel-horizons.json \
@@ -194,7 +194,7 @@ uv run --locked --extra dev python scripts/audit_astrodice_kernel.py \
 目前这些证据没有证明视黄经日速全面达标；原生速度与位置导数的残余差异仍须调查。原始响应、来源量之间的差异、模板收敛、具体计算修复和双平台结果见视运动与坐标契约审计，光行时链式导数原型和后续运行修正分别见调查推导及月球运动审计。几何速度通过、位置通过、应用测试通过分别保留，不合并成“满分”。
 
 ```bash
-uv run --locked --extra dev python scripts/audit_astrodice_apparent.py \
+uv run --locked --extra dev python -m scripts.astrodice.audit_astrodice_apparent \
   --ephe /path/to/jpl-directory --jpl-file linux_m13000p17000.441 \
   --protocol tests/data/astrodice/tables/apparent-motion-protocol.json \
   --reference tests/data/astrodice/tables/apparent-horizons.json \
@@ -247,11 +247,11 @@ uv run --locked --extra dev python scripts/audit_astrodice_apparent.py \
 
 独立数值参考和原始物理资料保存在 `tests/data/astrodice`，由 `reference-material.json` 给出唯一当前相对路径、来源身份和原始数据摘要。原始 JPL 系数、Horizons 响应、打印区间、源算法常数及原协议中的全部样本与误差线保留。维护中的 Python 文件和原生二进制不作为正确性真值；退役的生产源码、执行日志和整盘快照不参与当前评分。
 
-`scripts/audit_astrodice_display_rate.py` 对原开发／留出群体的 40 项目标／后端组合执行当前计算，再与独立区间参考比较；`scripts/audit_astrodice_lunar_pipeline.py` 对原 12 项月球固定框架组合执行相同流程。位置线为 `0.02` 角秒，日速线为 `0.002` 角秒／源日。每项失败、不可用状态和两种后端都保留，不以选择编码、尺度或删除样本改善结果。源坐标使用的名义 TDB 数值与 TT 命名参数相同，不证明两种物理时标等价；共享旋转也不是独立显示框架精度证明。
+`scripts/astrodice/audit_astrodice_display_rate.py` 对原开发／留出群体的 40 项目标／后端组合执行当前计算，再与独立区间参考比较；`scripts/astrodice/audit_astrodice_lunar_pipeline.py` 对原 12 项月球固定框架组合执行相同流程。位置线为 `0.02` 角秒，日速线为 `0.002` 角秒／源日。每项失败、不可用状态和两种后端都保留，不以选择编码、尺度或删除样本改善结果。源坐标使用的名义 TDB 数值与 TT 命名参数相同，不证明两种物理时标等价；共享旋转也不是独立显示框架精度证明。
 
 在原 `3000-12-07T04:07:32` 数值时刻，压缩星历后端的月球视黄经日速仍比原独立区间高约 `0.00260713472` 角秒／源日，超过 `0.002` 原线；位置误差约 `0.00030606` 角秒，在 `0.02` 原线内。独立原始 DE441 系数核对将主要速度残差定位到压缩星历的几何源层；原生速度与自身位置多步长求导相符，不能用重新求导恢复已丢失的源精度。当前官方 `semo_30.se1` 与所检查的本地文件字节一致。对 2.10.3.2 所含原生 C 源码的系数计数作独立解包和重新编译实验，保留末个有效项或全部项后，该点仍分别约为 `0.00260317`、`0.00260318`，均未过线，且留出样本有轻微变差；这些实验未替换运行库或默认数据。
 
-`scripts/audit_astrodice_lunar_precision.py` 评分当前完整固定接收框架导数，并把原生未修正速度另列诊断。原 137 个中心中的 135 个可评项保留，另两项缺测仍未通过；当前可评项只有上述月球点的日速超过 `0.002`，最大位置误差约 `0.00206794` 角秒。该审计继续返回非零。REST、MCP、CLI 在该点交付相同的原生来源、位置及日速，传输一致不改变数值失败结论。NASA 将原始 DE 系数的积分时标定义为 [TDB](https://ssd.jpl.nasa.gov/planets/eph_export.html)；在该点代入两种时标模型的日速灵敏度约为 `0.000019` 角秒／日，不能解释现有超差，也不构成年 3000 的物理时标精度证明。
+`scripts/astrodice/audit_astrodice_lunar_precision.py` 评分当前完整固定接收框架导数，并把原生未修正速度另列诊断。原 137 个中心中的 135 个可评项保留，另两项缺测仍未通过；当前可评项只有上述月球点的日速超过 `0.002`，最大位置误差约 `0.00206794` 角秒。该审计继续返回非零。REST、MCP、CLI 在该点交付相同的原生来源、位置及日速，传输一致不改变数值失败结论。NASA 将原始 DE 系数的积分时标定义为 [TDB](https://ssd.jpl.nasa.gov/planets/eph_export.html)；在该点代入两种时标模型的日速灵敏度约为 `0.000019` 角秒／日，不能解释现有超差，也不构成年 3000 的物理时标精度证明。
 
 显式选择准备器生成的完整 AD1 至 AD10000 原始 DE441 源后，原 135 个可评项均满足原线，最大方向日速误差约 `0.00109586` 角秒／日、位置误差约 `0.00213165` 角秒；两项原缺测仍为缺测，因此完整 137 项审计返回 `reference_evidence_unresolved` 和退出码 2。另在查询和候选评分前声明的 12 个跨域留出时刻，228 个同 TT／ICRF／地心参考探针得到的日速与位置误差最大分别约 `0.00055658`、`0.00170741` 角秒，均满足原线。这条精确来源路径使用已有公开 JPL 选择，不代表恢复了 Swiss 压缩文件的信息，也不改判其原失败。新留出的原协议和 NASA 响应位于 `tests/data/astrodice/precise-source-holdout`。
 
@@ -261,7 +261,7 @@ uv run --locked --extra dev python scripts/audit_astrodice_apparent.py \
 
 ```bash
 SE_EPHE_PATH=/absolute/path/to/raw-jpl FATEBRIDGE_JPL_FILE=de441-0001-10000.eph \
-uv run --locked --extra dev python -m scripts.audit_astrodice_lunar_endpoint_supplement \
+uv run --locked --extra dev python -m scripts.astrodice.audit_astrodice_lunar_endpoint_supplement \
   --directory tests/data/astrodice/original-endpoint-supplement \
   --output /tmp/astrodice-lunar-endpoint-supplement.json
 ```

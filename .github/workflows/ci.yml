@@ -67,7 +67,7 @@ jobs:
       - name: Verify installed commands and real stdio MCP
         run: |
           uv run --locked --extra dev fatebridge doctor --mcp --scenario onda-shiye
-          uv run --locked --extra dev python -m pytest -q tests/test_cli.py tests/test_api_alignment.py -n auto --maxprocesses=4 --dist worksteal
+          uv run --locked --extra dev python -m pytest -q tests/integration/test_cli.py tests/integration/test_api_alignment.py -n auto --maxprocesses=4 --dist worksteal
 
   quality:
     needs: changes
@@ -98,7 +98,7 @@ jobs:
           path: |
             .mypy_cache
             ~/.cache/black
-          key: quality-${{ runner.os }}-py3.12-${{ hashFiles('uv.lock', 'pyproject.toml') }}-${{ hashFiles('src/**/*.py', 'scripts/**/*.py', 'tests/test_*.py') }}
+          key: quality-${{ runner.os }}-py3.12-${{ hashFiles('uv.lock', 'pyproject.toml') }}-${{ hashFiles('src/**/*.py', 'scripts/**/*.py', 'tests/**/*.py') }}
           restore-keys: |
             quality-${{ runner.os }}-py3.12-${{ hashFiles('uv.lock', 'pyproject.toml') }}-
       - name: Check formatting

@@ -63,7 +63,7 @@ report = verify_fengshui_reading(
 仓库审计命令：
 
 ```bash
-uv run --locked --extra dev python scripts/audit_fengshui_reading.py \
+uv run --locked --extra dev python -m scripts.fengshui.audit_fengshui_reading \
   --payload original-full-response.json \
   --trusted-receipt separately-retained-run-metadata.json
 ```

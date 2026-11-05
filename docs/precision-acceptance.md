@@ -41,7 +41,7 @@ export FATEBRIDGE_JPL_FILE=de441-0001-10000.eph
 
 原96点与新576点数值测试、1800／2200两年各24点三端测试、月球两来源三端测试及水星显式坐标三端测试均分别执行；交付一致性不能代替独立数值线。自包含CI与外部参考队列分别记录，原失败和缺证不因测试程序返回成功而改判。
 
-当前实现与可复算入口：[`moshier_solar.py`](../src/fatebridge/core/moshier_solar.py)、[`opaque_solar.py`](../src/fatebridge/core/astro/opaque_solar.py)、[`fetch_jpl.py`](../src/fatebridge/fetch_jpl.py)、[`audit_complete_moshier_accuracy.py`](../scripts/audit_complete_moshier_accuracy.py)。依据包括 [Moshier原级数](https://www.moshier.net/)、[Swiss官方模型与精度说明](https://www.astro.com/swisseph/swisseph.htm)、[NASA原DE441数据](https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de441/)及[NASA Horizons坐标定义](https://ssd.jpl.nasa.gov/horizons/manual.html)。
+当前实现与可复算入口：[`moshier_solar.py`](../src/fatebridge/core/moshier_solar.py)、[`opaque_solar.py`](../src/fatebridge/core/astro/opaque_solar.py)、[`fetch_jpl.py`](../src/fatebridge/fetch_jpl.py)、[`audit_complete_moshier_accuracy.py`](../scripts/astronomy/audit_complete_moshier_accuracy.py)。依据包括 [Moshier原级数](https://www.moshier.net/)、[Swiss官方模型与精度说明](https://www.astro.com/swisseph/swisseph.htm)、[NASA原DE441数据](https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de441/)及[NASA Horizons坐标定义](https://ssd.jpl.nasa.gov/horizons/manual.html)。
 
 最终自包含CI为1409通过、2个Windows专属平台跳过；运行前后1468个包源码／数据文件字节未变。1128个源码文件类型检查通过，文档、格式和生成合同检查通过。当前wheel全部1468个包文件与源码一致，解包冷启动重验太阳旧失败点、完整DE441来源验证及Venus光锥邻点。外部数值队列、来源缺证和这一组工程检查分别报告。
 

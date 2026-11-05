@@ -150,7 +150,7 @@ k = 0..7，量化单位为微秒
 
 ## 验证范围
 
-固定输入和期望值在 `tests/fixtures/firdaria-reference.json`（本地数据：`../tests/fixtures/firdaria-reference.json`），核心执行入口为 [`tests/test_firdaria_reference.py`](../tests/test_firdaria_reference.py)，三端入口为 [`tests/test_firdaria_transports.py`](../tests/test_firdaria_transports.py)。独立数学参考保留，用同一批固定期望值核对实际生产代码。
+固定输入和期望值在 `tests/fixtures/firdaria-reference.json`（本地数据：`../tests/fixtures/firdaria-reference.json`），核心执行入口为 [`tests/western/test_firdaria_reference.py`](../tests/western/test_firdaria_reference.py)，三端入口为 [`tests/western/test_firdaria_transports.py`](../tests/western/test_firdaria_transports.py)。独立数学参考保留，用同一批固定期望值核对实际生产代码。
 
 | 类别 | 验收内容 | 实际被测对象 |
 | --- | --- | --- |
@@ -163,7 +163,7 @@ k = 0..7，量化单位为微秒
 
 ```bash
 uv sync --locked --extra dev
-uv run --locked --extra dev pytest -q tests/test_firdaria_reference.py tests/test_firdaria_transports.py
+uv run --locked --extra dev pytest -q tests/western/test_firdaria_reference.py tests/western/test_firdaria_transports.py
 ```
 
 生产核心没有依赖测试内的参考函数。通过这些用例表示本地生产路径和三端协议通过验收，不表示已部署到其他环境或已核验第三方产品。返回时间线仍最多 12 段，`current_major/current_sub` 独立覆盖查询时刻。默认法达完整时间线与已有冻结数据比对，不重写黄金基线。

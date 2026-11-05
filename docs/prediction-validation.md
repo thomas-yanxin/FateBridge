@@ -20,7 +20,7 @@
 杂气月增加“透干且有实际会支支持”的有限取格条件；仍保留所有候选，不把会支存在解释为已经合化或成格。PDF65的戊日丁未月命例因此从误报月刃改为正官。后续又按PDF65–66正官章补上本气正官、财印辅助的限定分支，同页乙日壬申月命例不再因印透自动改为印格；详细条件和藏干根语义见[八字判定](bazi-assessment.md)。`original_structure`、`seat_qualification`、`selection_rule`显示选择依据，不能把标签当完整原典裁定。
 
 ```bash
-uv run --locked --extra dev python scripts/audit_bazi_classical.py \
+uv run --locked --extra dev python -m scripts.bazi.audit_bazi_classical \
   --output /tmp/fatebridge-classical-audit.json
 ```
 
@@ -76,7 +76,7 @@ assert verification["status"] == "verified_structured_facts"
 可以直接运行不包含任何预测和结果的[虚构流程示例](examples/prediction-study/plan.json)：
 
 ```bash
-uv run --locked --extra dev python scripts/audit_prediction_study.py \
+uv run --locked --extra dev python -m scripts.evaluation.audit_prediction_study \
   --plan docs/examples/prediction-study/plan.json \
   --forecasts docs/examples/prediction-study/forecasts.json \
   --outcomes docs/examples/prediction-study/outcomes.json \
@@ -90,10 +90,10 @@ uv run --locked --extra dev python scripts/audit_prediction_study.py \
 
 ```bash
 uv run --locked --extra dev pytest -q \
-  tests/test_hko_calendar_independent.py \
-  tests/test_bazi_second_iteration.py \
-  tests/test_prediction_validation.py \
-  tests/test_bazi_timing_transports.py
+  tests/astronomy/test_hko_calendar_independent.py \
+  tests/bazi/test_bazi_second_iteration.py \
+  tests/evaluation/test_prediction_validation.py \
+  tests/bazi/test_bazi_timing_transports.py
 ```
 
 这组测试覆盖有限历法对照、资格反例、出生范围、三端共享合同、结构化引用与统计计算；它不将软件回归数量换算为四项能力总分。
@@ -110,7 +110,7 @@ uv run --locked --extra dev pytest -q \
 
 ## 奇门研究的盘面绑定
 
-`scripts/audit_qimen_study.py` 将每条预测绑定到实际问时、明确的排局口径、完整奇门结果和冻结解释策略，然后逐案重算再交给通用二元结果评估器。它检查研究记录的一致性，不是已经验证的预测模型，也不提供权威认证。
+`scripts/qimen/audit_qimen_study.py` 将每条预测绑定到实际问时、明确的排局口径、完整奇门结果和冻结解释策略，然后逐案重算再交给通用二元结果评估器。它检查研究记录的一致性，不是已经验证的预测模型，也不提供权威认证。
 
 目前没有可核验的真实奇门预测队列。当前演示脚本生成明确标为 `synthetic` 的三个人工案例、全部弃权和空结果列表，可评估数为0，现实效度为 `not_tested`。演示中的目标、日期、主体、记录哈希和时间戳都不是外部登记或经验材料。
 
@@ -134,20 +134,20 @@ uv run --locked --extra dev pytest -q \
 源码环境先执行 `uv sync --locked --extra dev`。以下目录须是尚未生成过这些文件的新目录；命令拒绝覆盖已有封存记录。
 
 ```bash
-uv run --locked --extra dev python scripts/demo_qimen_study.py \
+uv run --locked --extra dev python -m scripts.qimen.demo_qimen_study \
   --output-dir /tmp/fatebridge-qimen-synthetic-demo
 
-uv run --locked --extra dev python scripts/audit_qimen_study.py fingerprint \
+uv run --locked --extra dev python -m scripts.qimen.audit_qimen_study fingerprint \
   --policy /tmp/fatebridge-qimen-synthetic-demo/policy.json \
   --output /tmp/fatebridge-qimen-synthetic-demo/fingerprint.json
 
-uv run --locked --extra dev python scripts/audit_qimen_study.py seal \
+uv run --locked --extra dev python -m scripts.qimen.audit_qimen_study seal \
   --study /tmp/fatebridge-qimen-synthetic-demo/study.json \
   --synthetic-at 2026-12-31T00:00:00+00:00 \
   --output /tmp/fatebridge-qimen-synthetic-demo/resealed.json \
   > /tmp/fatebridge-qimen-synthetic-demo/reseal-receipt.json
 
-uv run --locked --extra dev python scripts/audit_qimen_study.py evaluate \
+uv run --locked --extra dev python -m scripts.qimen.audit_qimen_study evaluate \
   --commitment /tmp/fatebridge-qimen-synthetic-demo/resealed.json \
   --outcomes /tmp/fatebridge-qimen-synthetic-demo/outcomes.json \
   --as-of 2027-03-01T00:00:00+00:00 \

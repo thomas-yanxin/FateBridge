@@ -35,7 +35,7 @@ export FATEBRIDGE_SOLAR_TERM_MODEL=swiss
 
 当前数值门槛为与固定 DE440 参考比较的1秒 TT，参考输入与原数值见 [96点当前参考](../tests/data/solar/de440-guard-tt.json)。原版 Swiss Moshier 同一队列的12项失败继续单列；FateBridge完整修订按独立身份验收，不将旧模型失败改判。
 
-当前原生求根使用 `native_swiss_tt_solar_bisection_v2`：返回首个达到或越过目标太阳黄经的可表示 TT 浮点点，其前一浮点点仍在交点之前，策略为 `first_post_crossing_tt_float`。这是同一太阳模型数值方程的边界取点约定，不修正星历系数，也不把浮点分辨率当作物理精度。实现见 [`almanac.py`](../src/fatebridge/core/almanac.py)，当前前后侧验证见 [`test_native_solar_crossing_side.py`](../tests/test_native_solar_crossing_side.py)。
+当前原生求根使用 `native_swiss_tt_solar_bisection_v2`：返回首个达到或越过目标太阳黄经的可表示 TT 浮点点，其前一浮点点仍在交点之前，策略为 `first_post_crossing_tt_float`。这是同一太阳模型数值方程的边界取点约定，不修正星历系数，也不把浮点分辨率当作物理精度。实现见 [`almanac.py`](../src/fatebridge/core/almanac.py)，当前前后侧验证见 [`test_native_solar_crossing_side.py`](../tests/integration/test_ci_regressions.py)。
 
 ## 完整 Moshier 解析回退
 
@@ -43,7 +43,7 @@ export FATEBRIDGE_SOLAR_TERM_MODEL=swiss
 
 原版误差来自地月质心级数与短月球偏移两部分：仅补完整月球时，原96点仍7项超差；仅更新地月质心时仍2项；两者都更新后，当前完整实现原96点全部进入1秒线，最大0.775253秒。新增576个未重叠TT点全部进入原线，最大0.668031秒。原有14904点参考中，内部1784—2204年全部10104个交点实求验收，最大0.883480秒、零超差；其中公开1800—2200年共9624点。参考队列、数值与1秒线均未重建或放宽。
 
-`resolution_provider=fatebridge_moshier` 保留新模型与系数身份，不借用原生太阳返回标志。源码见 [`moshier_solar.py`](../src/fatebridge/core/moshier_solar.py)，数值检查见 [`audit_solar_model_reference.py`](../scripts/audit_solar_model_reference.py) 和 [`audit_complete_moshier_accuracy.py`](../scripts/audit_complete_moshier_accuracy.py)。原始数学依据为 [Moshier AA5.6](https://www.moshier.net/) 的 `gplan.c`、`ear404.c`、`epsiln.c`，原表整数及独立作者C实现的位置和导数另行核验。
+`resolution_provider=fatebridge_moshier` 保留新模型与系数身份，不借用原生太阳返回标志。源码见 [`moshier_solar.py`](../src/fatebridge/core/moshier_solar.py)，数值检查见 [`audit_solar_model_reference.py`](../scripts/astronomy/audit_solar_model_reference.py) 和 [`audit_complete_moshier_accuracy.py`](../scripts/astronomy/audit_complete_moshier_accuracy.py)。原始数学依据为 [Moshier AA5.6](https://www.moshier.net/) 的 `gplan.c`、`ear404.c`、`epsiln.c`，原表整数及独立作者C实现的位置和导数另行核验。
 
 更广原队列中仍发现15个1秒超差，不能推广为全时域通过。DE440比较共享轨道谱系，不是独立物理观测，也不认证历史／未来UTC。风水原5秒候选保留策略不变，与1秒数值验收分别报告。
 

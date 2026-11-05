@@ -112,7 +112,7 @@ REST 本机启动命令为 `API_HOST=127.0.0.1 fatebridge-api`。默认端口 `8
 
 ```bash
 uv run --locked --extra dev python scripts/check_docs.py
-uv run --locked --extra dev python -m pytest -q tests/test_documentation_integrity.py tests/test_doc_tool_counts.py
+uv run --locked --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py tests/quality/test_doc_tool_counts.py
 ```
 
 接口、技能和生成源的同步要求见[文档维护与验证](docs/development-guide.md#文档维护与验证)。报告问题请附版本、虚构的最小复现和实际错误；安全问题按 [SECURITY.md](SECURITY.md) 私下报告。

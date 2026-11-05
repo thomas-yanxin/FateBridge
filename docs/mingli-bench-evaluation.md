@@ -33,7 +33,7 @@
 先核对生成物和完整来源：
 
 ```bash
-uv run --locked --extra dev python scripts/build_mingli_evaluation.py --check
+uv run --locked --extra dev python -m scripts.evaluation.build_mingli_evaluation --check
 ```
 
 按[Agent 运行器](agent-evaluation.md)准备当前开发集，冻结源码、隐藏判据及真实 MCP 参照；准备不启动模型：
@@ -66,10 +66,10 @@ uv run --locked --extra dev python scripts/evaluate_agent.py \
 
 解释场景覆盖八字事业、性格和学业，其他体系和主题尚未在该层验收。来源输入归属、主题／方法路由与实际回答分别复核；开发复测不计为新增独立留出验收。
 
-完成逐项复核后，用[离线审计器](../scripts/audit_mingli_evaluation.py)核对审阅材料。可以传入多份互不重复的审阅文件：
+完成逐项复核后，用[离线审计器](../scripts/evaluation/audit_mingli_evaluation.py)核对审阅材料。可以传入多份互不重复的审阅文件：
 
 ```bash
-uv run --locked --extra dev python scripts/audit_mingli_evaluation.py \
+uv run --locked --extra dev python -m scripts.evaluation.audit_mingli_evaluation \
   --run /tmp/fatebridge-mingli-development-run \
   --review /tmp/fatebridge-mingli-development-review.json \
   --output /tmp/fatebridge-mingli-development-audit.json

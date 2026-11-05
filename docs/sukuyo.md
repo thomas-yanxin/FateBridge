@@ -25,7 +25,7 @@
 当前合成研究协议检验资料绑定、盲法、完整上下文承诺与统计门槛；合成结果不建立现实有效性。来源校读、软件正确性、解释忠实与真实预测分别验收，分数不表示关系成功概率。
 
 ```bash
-uv run --locked --extra dev pytest -n0 tests/test_sukuyo_profiles.py tests/test_sukuyo_historical_calendar.py tests/test_sukuyo_protocol_context.py
+uv run --locked --extra dev pytest -n0 tests/sukuyo/test_sukuyo_profiles.py tests/sukuyo/test_sukuyo_historical_calendar.py tests/sukuyo/test_sukuyo_protocol_context.py
 ```
 
 具体候选、来源与限制随同一次结果交付；完整资料读取同一run的 `result_delivery`，不通过重算替换结果。

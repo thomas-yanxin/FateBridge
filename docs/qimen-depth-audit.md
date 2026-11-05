@@ -74,7 +74,7 @@ uv run --locked --extra dev fatebridge qimen \
 
 另一问题是明确写成 `2026-11-01 01:30-04:00` 或 `01:30-05:00`、目标区仍写纽约时，两个已确定的实际时刻都会被原来的重复钟时检查拒绝。现在ISO偏移输入保留其实际时刻；未带偏移的本地重复或不存在钟时仍拒绝。纽约两个时刻在该经度的太阳时分别落子、丑，均与专用奇门的相同显式偏移输入相符。Python官方文档区分[保持实际时刻的时区转换与只替换时区标签的操作](https://docs.python.org/3/library/datetime.html#datetime.datetime.astimezone)，本修复遵守这个区分；太阳标签本身不是再次移动后的民用实际时刻。
 
-新增回归夹具（本地数据：`../tests/fixtures/qimen-clock-representations-v1.json`）包含8组日期／时区案例；直接时间／太阳时、拆补／置闰共32组等价时刻对照。它们是发现问题后的回归与表示不变性检查，分别计数，不增加75个独立历法参考数。新增[测试](../tests/test_qimen_offset_clock.py)还比较专用奇门与三式实际盘面、明确偏移的重复小时，以及真实REST／原生MCP／CLI交付。原典规则版本仍为2.8.0；该范围修改计算实现，冻结研究通过整个包的实现指纹区分版本，没有改写旧研究的预测或结果。
+新增回归夹具（本地数据：`../tests/fixtures/qimen-clock-representations-v1.json`）包含8组日期／时区案例；直接时间／太阳时、拆补／置闰共32组等价时刻对照。它们是发现问题后的回归与表示不变性检查，分别计数，不增加75个独立历法参考数。新增[测试](../tests/qimen/test_qimen_offset_clock.py)还比较专用奇门与三式实际盘面、明确偏移的重复小时，以及真实REST／原生MCP／CLI交付。原典规则版本仍为2.8.0；该范围修改计算实现，冻结研究通过整个包的实现指纹区分版本，没有改写旧研究的预测或结果。
 
 ### 真太阳时修正依据与边界可辨识性
 
@@ -290,8 +290,8 @@ uv run --locked --extra dev fatebridge qimen \
 ### 独立复核命令
 
 ```bash
-uv run --locked --extra dev python scripts/audit_qimen.py --output /tmp/fatebridge-qimen-current.json
-uv run --locked --extra dev pytest -q tests/test_qimen_depth.py tests/test_qimen_accuracy.py tests/test_qimen_calendar_depth.py tests/test_qimen_timezone_rules.py tests/test_qimen_numeric_tables.py tests/test_qimen_profiles.py tests/test_qimen_head_patterns.py tests/test_qimen_stem_context.py tests/test_qimen_transports.py tests/test_qimen_combinations.py tests/test_qimen_claims.py
+uv run --locked --extra dev python -m scripts.qimen.audit_qimen --output /tmp/fatebridge-qimen-current.json
+uv run --locked --extra dev pytest -q tests/qimen/test_qimen_depth.py tests/qimen/test_qimen_accuracy.py tests/qimen/test_qimen_calendar_depth.py tests/qimen/test_qimen_timezone_rules.py tests/qimen/test_qimen_numeric_tables.py tests/qimen/test_qimen_profiles.py tests/qimen/test_qimen_head_patterns.py tests/qimen/test_qimen_stem_context.py tests/qimen/test_qimen_transports.py tests/qimen/test_qimen_combinations.py tests/qimen/test_qimen_claims.py
 uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 ```
 
@@ -299,7 +299,7 @@ uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 
 ### 现实预测的前瞻验证
 
-目前没有提交可核验的奇门事前预测与完整结果队列，因此现实效度为 `not_tested`。通用二元结果评估器之上增加奇门实际盘面绑定与逐案重放，入口为 `scripts/audit_qimen_study.py`；[完整操作和边界](prediction-validation.md#奇门研究的盘面绑定)包含可运行的全部弃权合成演示，不能把它当经验样本。
+目前没有提交可核验的奇门事前预测与完整结果队列，因此现实效度为 `not_tested`。通用二元结果评估器之上增加奇门实际盘面绑定与逐案重放，入口为 `scripts/qimen/audit_qimen_study.py`；[完整操作和边界](prediction-validation.md#奇门研究的盘面绑定)包含可运行的全部弃权合成演示，不能把它当经验样本。
 
 1. 在收集结果前公开冻结一个可客观判断的目标、预测时间窗、纳入和排除规则、队列、代码与解释策略指纹。不能事后更换目标或用已知结果挑算例。
 2. 预先指定对照：基准率预测、同样获得现实信息但不看奇门盘的解释者，以及打乱问时的盲对照。重复主体或相关事件须按聚类处理，不能冒充独立样本。

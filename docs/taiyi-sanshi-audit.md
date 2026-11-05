@@ -54,16 +54,16 @@ uv run --locked --extra dev fatebridge taiyi \
   --analysis-hour 12 --analysis-timezone Asia/Shanghai \
   --no-use-true-solar-time --strict-fields \
   --fields taiyi.calendar_rules taiyi.core_board taiyi.rule_trace taiyi.ruleset
-uv run --locked --extra dev python scripts/audit_taiyi_classical.py \
+uv run --locked --extra dev python -m scripts.taiyi.audit_taiyi_classical \
   --output /tmp/fatebridge-taiyi-jinjing-source-current.json
 uv run --locked --extra dev pytest -q \
-  tests/test_taiyi_accuracy.py tests/test_taiyi_transports.py \
-  tests/test_metaphysics_lunar_required.py
+  tests/taiyi/test_taiyi_accuracy.py tests/taiyi/test_taiyi_transports.py \
+  tests/integration/test_contract_regressions.py
 ```
 
 审计脚本有未决分歧就返回非零；测试验证审计是否诚实保留这些分歧，所以测试绿色和原典审计失败可以同时成立。测试不得删去失败局或只改分母。
 
-REST、原生进程内MCP和CLI的真实调用见 [传输测试](../tests/test_taiyi_transports.py)。它们验证相同输入、字段投影、依据及错误输出，不替代远程部署或真实模型行为验证。
+REST、原生进程内MCP和CLI的真实调用见 [传输测试](../tests/taiyi/test_taiyi_transports.py)。它们验证相同输入、字段投影、依据及错误输出，不替代远程部署或真实模型行为验证。
 
 ## 规则范围与校勘
 
@@ -119,10 +119,10 @@ uv run --locked --extra dev fatebridge sanshiunited \
   --date 2026-06-21 --time 17:00:02 --zone Asia/Shanghai \
   --taiyi-options '{"calculation_mode":"hour"}' --no-use-true-solar-time \
   --strict-fields --fields synthesis.palace_correspondences
-uv run --locked --extra dev python scripts/audit_taiyi_classical.py \
+uv run --locked --extra dev python -m scripts.taiyi.audit_taiyi_classical \
   --include-yin --output /tmp/fatebridge-taiyi-jinjing-all-cycles-current.json
-uv run --locked --extra dev pytest -q tests/test_taiyi_periods.py \
-  tests/test_sanshi_correspondences.py tests/test_taiyi_accuracy.py tests/test_taiyi_transports.py
+uv run --locked --extra dev pytest -q tests/taiyi/test_taiyi_periods.py \
+  tests/taiyi/test_sanshi_correspondences.py tests/taiyi/test_taiyi_accuracy.py tests/taiyi/test_taiyi_transports.py
 ```
 
 卷五扩展另见**年度十神与720项原表核验**。
@@ -133,7 +133,7 @@ uv run --locked --extra dev pytest -q tests/test_taiyi_periods.py \
 
 ## 现实预测的独立验收
 
-目前没有已注册的太乙或三式真实研究，`real_world_efficacy=not_tested`。可复用 [前瞻评估器](../src/fatebridge/validation/predictions.py) 与 [运行脚本](../scripts/audit_prediction_study.py)，但应先完成以下材料再开始收集结果：
+目前没有已注册的太乙或三式真实研究，`real_world_efficacy=not_tested`。可复用 [前瞻评估器](../src/fatebridge/validation/predictions.py) 与 [运行脚本](../scripts/evaluation/audit_prediction_study.py)，但应先完成以下材料再开始收集结果：
 
 - 预先固定可观测的事件定义、时间窗、来源、基线、入组队列、模型及解释策略指纹；预测在窗口开始前存证。只有年计的配置不能为同一年不同分钟制造不同太乙预测。
 - 在独立训练集上确定解释到预测的规则；锁定后使用未用于调参的前瞻样本。修改规则后重新注册验证，不能把旧验证结果沿用为新模型成绩。

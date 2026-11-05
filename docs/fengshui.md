@@ -266,7 +266,7 @@ uv run --locked --extra dev fatebridge fengshui_assess --request-file home.json 
 ## 验证与维护
 
 ```bash
-uv run --locked --extra dev pytest -q tests/test_fengshui.py tests/test_fengshui_surfaces.py
+uv run --locked --extra dev pytest -q tests/fengshui/test_fengshui.py tests/fengshui/test_fengshui_surfaces.py
 ```
 
 离线测试用固定参考事实（本地数据：`../tests/data/fengshui-reference.json`）登记的提交／SHA-256核对1900–2099男女命卦400项、独立八宅字典64项，并测试纪元／世纪／五数寄宫、立春前后与时区等价、方位边界、坐向反转、门床灶用途、不同住户、未知／混合砂水、来源版本、三端真实调用／校验／投影／请求文件。2026九宫另用作者出版年盘核对。代表性输入加入当前全端合同检查，数值精度使用独立参考及边界反例验证。

@@ -163,7 +163,7 @@ IMCCE OPALE保留三条来源时间路线：初始504项原生／解析各1项�
 
 ### 从支序正确深入到细课名和实际得气
 
-当前持续目标按用户要求为“历法、某部原典、解释忠实”三项。现实预测验证暂缓；[新验收脚本](../scripts/audit_ren_rules.py)的 `--require-three-axis-completion` 只按这三项的证据清单判断，不以未做现实预测单独阻止三项验收，也不将有限对照冒充全覆盖。
+当前持续目标按用户要求为“历法、某部原典、解释忠实”三项。现实预测验证暂缓；[新验收脚本](../scripts/ren/audit_ren_rules.py)的 `--require-three-axis-completion` 只按这三项的证据清单判断，不以未做现实预测单独阻止三项验收，也不将有限对照冒充全覆盖。
 
 六壬新增 `classification`，按《探原》九宗门总说，从实际四课、候选、阴阳、初中传刑冲推导细课名及依据。伏吟不再一律标自任／自信，区分杜传、不虞；下贼上取比用与上克下取知一分开；无贼克返吟按本书叫无亲，有贼克叫无依；始入和独足另作细分。四课选传仍对同一上神去重，判断“只有一下贼上”则保留原四课数量，不能把去重后的一个候选误说成原四课只有一处贼克。
 
@@ -211,17 +211,17 @@ IMCCE OPALE保留三条来源时间路线：初始504项原生／解析各1项�
 
 ```bash
 uv sync --locked --extra dev
-uv run --locked --extra dev python scripts/audit_ren_classical.py \
+uv run --locked --extra dev python -m scripts.ren.audit_ren_classical \
   --output /tmp/ren-classical-audit.json
 uv run --locked --extra dev python -m pytest -q \
-  tests/test_ren_classical_depth.py tests/test_ren_transports.py \
-  tests/test_metaphysics_reference.py
+  tests/ren/test_ren_classical_depth.py tests/ren/test_ren_transports.py \
+  tests/integration/test_metaphysics_reference.py
 ```
 
 审计分开报告 5 个明确原文课例、73 项所选规则/课例比较、12 个官方中气边界、720局独立实现对照 和 2 处待校勘疑文。73 项包含这 5 个课例，不重复相加当样本量。`selected_checks_passed` 仅表示所选比较通过。启用完整目标门槛：
 
 ```bash
-uv run --locked --extra dev python scripts/audit_ren_classical.py \
+uv run --locked --extra dev python -m scripts.ren.audit_ren_classical \
   --require-full-conformance
 ```
 
@@ -233,7 +233,7 @@ uv run --locked --extra dev python scripts/audit_ren_classical.py \
 
 结构化事实引用可使用已有 `fatebridge.validation.claims.verify_calculation_claims`，绑定原始完整结果的 `run_id` 和业务结果 SHA-256。当前测试核验金口诀贵神名称，拒绝错引为旧值、跨结果或篡改完整结果；自由文本是否忠实仍需独立人工或盲评，不能由结构化校验代替。
 
-前瞻评估可复用已有 `scripts/audit_prediction_study.py` 与 `fatebridge.validation.predictions`。该范围没有真实外部结果数据，`real_world_prediction=not_tested`。开始正式研究前，需要：
+前瞻评估可复用已有 `scripts/evaluation/audit_prediction_study.py` 与 `fatebridge.validation.predictions`。该范围没有真实外部结果数据，`real_world_prediction=not_tested`。开始正式研究前，需要：
 
 1. 固定一个可客观裁定、有限时间窗内的单一事件目标，写清未发生和无法裁定的条件。
 2. 在收集结局前冻结完整样本队列、规则/代码/解释策略、概率校准方法、对照基线和分析计划。不能从传统旺衰或动爻直接编造成功概率。
@@ -245,4 +245,4 @@ uv run --locked --extra dev python scripts/audit_ren_classical.py \
 
 ### 本地复核入口
 
-京本金口诀行年使用 `uv run --locked --extra dev python scripts/audit_jinkou_year_fate.py --output /tmp/jinkou-year-fate.json` 及 `tests/test_jinkou_year_fate.py` 核对。出生年干支、指定一岁起算岁序和性别分别保留；岁首与占时实际年龄联动未认证，另课地分是行年支推导，不能写成观测方位。原书标签、循环推导、业务合同与进程内三端分别报告。
+京本金口诀行年使用 `uv run --locked --extra dev python -m scripts.ren.audit_jinkou_year_fate --output /tmp/jinkou-year-fate.json` 及 `tests/ren/test_jinkou_year_fate.py` 核对。出生年干支、指定一岁起算岁序和性别分别保留；岁首与占时实际年龄联动未认证，另课地分是行年支推导，不能写成观测方位。原书标签、循环推导、业务合同与进程内三端分别报告。

@@ -18,7 +18,7 @@
 - `Placeholder`：合同或模式入口存在，但主输出层仍是占位兼容
 - `Excluded`：当前仓库不提供该能力
 
-> 工具的唯一信源是中央目录 `src/fatebridge/services/tool_catalog.py`。REST 公开 **91 个工具**，MCP 公开 **92 个工具**，分为 **13 个 family**。本页按 MCP 集合统计；目录有 93 条记录，CLI 可执行 92 条，差异见 [API 参考](api-reference.md#24-三端能力边界)。下表逐 family 列出全部工具；新增能力时请同步本页（总数、逐 family 数量与完整工具清单由 `tests/test_doc_tool_counts.py` 锁定）。
+> 工具的唯一信源是中央目录 `src/fatebridge/services/tool_catalog.py`。REST 公开 **91 个工具**，MCP 公开 **92 个工具**，分为 **13 个 family**。本页按 MCP 集合统计；目录有 93 条记录，CLI 可执行 92 条，差异见 [API 参考](api-reference.md#24-三端能力边界)。下表逐 family 列出全部工具；新增能力时请同步本页（总数、逐 family 数量与完整工具清单由 `tests/quality/test_doc_tool_counts.py` 锁定）。
 
 所有目录记录现有统一的输入/输出 Schema，三端由同一 `ToolSpec` 发布并校验；这属于接口合同覆盖，不提高算法的 `Implemented` / `Approximate` 等级，也不表示全部嵌套专业字段已有完整类型定义。
 
@@ -230,7 +230,7 @@
 
 > 运限的 `natal_prerequisites` 另携带同次内部本命的月时、年干、命身、宫干支纳音与局数推导，供解释局数及起限岁数时直接引用。它核实实际计算之间的连接；公历起算、原典岁首与现实效度仍需分别验收。
 
-> 六壬按九宗门取传，第一课生克使用日干五行，寄宫负责定位；天盘顺布与贵人顺逆分别计算。原独立 daliurenpython 三传参考覆盖720张天地盘，全部12个时支展开为8,640组；原始向量保存在 [三传参考](../tests/fixtures/liureng_transmissions_reference.json)，由[当前对照测试](../tests/test_metaphysics_reference.py)读取。此范围只核三传，不认证全部课名、神煞、流派或现实预测。
+> 六壬按九宗门取传，第一课生克使用日干五行，寄宫负责定位；天盘顺布与贵人顺逆分别计算。原独立 daliurenpython 三传参考覆盖720张天地盘，全部12个时支展开为8,640组；原始向量保存在 [三传参考](../tests/fixtures/liureng_transmissions_reference.json)，由[当前对照测试](../tests/integration/test_metaphysics_reference.py)读取。此范围只核三传，不认证全部课名、神煞、流派或现实预测。
 
 > 金口诀使用本法地分与贵神固有干支，不借大六壬课体决定取用。四位的季节旺衰、课内旺衰、得气和阴阳用位分别返回；综合用位、完整合化及原典疑文保持未知。64课逐条使用true／false／null区分命中、未命中与未判，原四位重建46相符、16不同、2缺日的完整分母保留。三合支齐不证明合化，命支未给不补造大绝。来源、课钤对照及未决范围见[六壬与金口诀](liuren-jinkou-audit.md#盘面规则与同课条件)。
 

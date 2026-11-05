@@ -97,10 +97,10 @@ uv run --locked --extra dev fatebridge fengshui_xuankong_natal \
 - X2的3套下卦：七运午子、八运甲庚、七运卯酉；4套替卦：八运甲庚兼寅申、七运午子兼丙壬、七运乾巽兼戌辰、七运卯酉兼甲庚。七套全部九宫27个数字吻合，包含五黄不替与替后仍按原阴阳飞布。
 - Apache-2.0 [YuanZHAO321/FengShuiCalculators固定提交](https://github.com/YuanZHAO321/FengShuiCalculators/blob/2eacd85b9878452469c6669e7fff05d2c6226c97/docs/js/flyingstars.js) 独立生成9运×24山＝216套下卦，保存提交ID和两个文件SHA-256。168套无五黄的盘全部一致；含向五黄的24套也一致；192套吻合、24套山五黄不同。参考实现向五黄直接借物理向山阴阳，未采用本版本的借宅运追踪；这些盘的向山与宅运本宫恰互为相对山，元龙和阴阳相同，所以数值吻合不能证明其借法表述一致。
 - 独立抄录X1同元龙山和阴阳表，以X2五黄规则、X3所载二／六／七运阴阳模式交叉核对，再展开48项固定五黄顺逆数字断言（24山盘、24向盘）；这些是独立阴阳表的规则验证，不冒称48幅出版盘图。未调用生产阴阳表或飞布函数生成预期值。
-- 外部山五黄分支直接用 `!facing.yang`，相对本版本借宅运同元龙阴阳发生取反。保持原外部结果；[离线回归](../tests/test_xuankong.py)核对固定夹具中的逐盘差异、元龙、借山、阴阳及逆向数列，不修改参考引擎强求216套一致，也不称其支持替星。
+- 外部山五黄分支直接用 `!facing.yang`，相对本版本借宅运同元龙阴阳发生取反。保持原外部结果；[离线回归](../tests/fengshui/test_xuankong.py)核对固定夹具中的逐盘差异、元龙、借山、阴阳及逆向数列，不修改参考引擎强求216套一致，也不称其支持替星。
 
 ```bash
-uv run --locked --extra dev pytest -q tests/test_xuankong.py tests/test_fengshui_surfaces.py
+uv run --locked --extra dev pytest -q tests/fengshui/test_xuankong.py tests/fengshui/test_fengshui_surfaces.py
 ```
 
 另覆盖9运24山正向及左右兼向共648组合、立春前后／跨时区、定运来源、五运、磁北要求、精确山界与角度误差、缺失输入、聚合层不互相覆盖及REST／实际MCP协议／CLI一致性。规则计算一致与现实预测有效性是不同验证范围。

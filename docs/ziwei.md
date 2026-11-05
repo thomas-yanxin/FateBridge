@@ -27,7 +27,7 @@
 `tests/data/ziwei_independent` 保留一手书影、HKO历表与独立字面规则参考。软件交叉对照只证明对指定配置的有限一致；条件宫位审计不认证历法转换，春节边界与同一瞬间跨区岁序另用独立日期资料检验。
 
 ```bash
-uv run --locked --extra dev pytest -n0 tests/test_ziwei_tables.py tests/test_ziwei_horoscope_crosscheck.py tests/test_ziwei_twenty_first_iteration.py
+uv run --locked --extra dev pytest -n0 tests/ziwei/test_contract_regressions.py tests/ziwei/test_ziwei_horoscope_crosscheck.py tests/ziwei/test_ziwei_twenty_first_iteration.py
 ```
 
 精确的索引、可复现结果和局部文字符合度不证明现实预测有效。整书、全部流派、未知生时、连续未来时间以及实际事件预测仍需各自的独立验收。

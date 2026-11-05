@@ -112,7 +112,7 @@ Contributions to documentation, algorithms, interfaces, tests, and Onda skills a
 
 ```bash
 uv run --locked --extra dev python scripts/check_docs.py
-uv run --locked --extra dev python -m pytest -q tests/test_documentation_integrity.py tests/test_doc_tool_counts.py
+uv run --locked --extra dev python -m pytest -q tests/quality/test_documentation_integrity.py tests/quality/test_doc_tool_counts.py
 ```
 
 [Documentation maintenance](docs/development-guide.md#文档维护与验证) covers interface, skill, and generated-source synchronization. Include the version, a minimal fictional reproduction, and the actual error in bug reports. Report vulnerabilities privately under [SECURITY.md](SECURITY.md).

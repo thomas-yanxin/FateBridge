@@ -187,7 +187,7 @@ SPECS: List[ToolSpec] = [
     # on MCP. They INTENTIONALLY share a single provenance name
     # (``astro_relative_chart``) so downstream metrics/logs treat them as one
     # tool regardless of surface — this parity is locked by
-    # tests/test_api_alignment.py (both surfaces assert the same run_metadata
+    # tests/integration/test_api_alignment.py (both surfaces assert the same run_metadata
     # tool_name). The ``metadata_name`` override on the REST spec is what aligns
     # its provenance to the MCP name; do not split them without updating that test.
     ToolSpec(

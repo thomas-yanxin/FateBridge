@@ -32,7 +32,7 @@ Raman运动表的54项关系矛盾、不同扫描见证的19个清晰单元差�
 
 ## 名义盘、条件证据与解读范围
 
-Ketu由同次Rahu精确加180°得到。分盘、星宿与宿足使用这项未舍入派生关系，名义盘和时间误差采样采用同一口径；返回的经度仍为浮点数。独立传入的手工原盘继续尊重其显式Ketu值，不据Rahu重建。边界与三端回归见[对点分区测试](../tests/test_western_antipodes.py)，不构成独立天文精度认证。
+Ketu由同次Rahu精确加180°得到。分盘、星宿与宿足使用这项未舍入派生关系，名义盘和时间误差采样采用同一口径；返回的经度仍为浮点数。独立传入的手工原盘继续尊重其显式Ketu值，不据Rahu重建。边界与三端回归见[对点分区测试](../tests/western/test_western_antipodes.py)，不构成独立天文精度认证。
 
 `india.reading_basis`明确按所填出生时刻的名义值计算。没有给出生时误差时，`options_basis=nominal_only`且敏感性仍为`not_assessed`，不能当作已证实精确；给定误差后，星宿、宿主及宿足与分盘使用同一最多30秒UTC网格。`nakshatra_alternatives`列出发生变化的星体／上升及覆盖数，覆盖数不是概率；没有列出变化也不证明连续区间内没有边界。原生解读会把名义月宿与抽样候选一并陈述，达沙摘要也明确使用名义生时。
 
@@ -182,7 +182,7 @@ MCP 使用同名工具及相同业务参数。首次按工具公开的 `natal/ca
 
 ## 数值与软件验证
 
-`tests/test_jyotish.py` 使用原书第 6 章算例 16／17 核对 D9／D10，第 16 章算例 50 核对给定月亮位置的剩余运；给定经度算例与真实天文重新排盘分开。还验证全部主／次运边界、周期切换、节点、相位、DST 和生时敏感性。
+`tests/jyotish/test_jyotish.py` 使用原书第 6 章算例 16／17 核对 D9／D10，第 16 章算例 50 核对给定月亮位置的剩余运；给定经度算例与真实天文重新排盘分开。还验证全部主／次运边界、周期切换、节点、相位、DST 和生时敏感性。
 
 `tests/fixtures/jyotish-reference.json` 来自隔离安装的 **PyJHora 4.8.7**，包含软件版本、源文件哈希及配置；6 组虚构资料覆盖三种年长、平／真交点、D1／D9／D10 和各 81 个次运起点。双方均使用 Swiss Ephemeris 天文库，所以这是独立规则实现对照，不是独立天文模型证明。PyJHora 的本地 JD 输入显式采用 UT1 加时区；分期比较相对出生锚点的历时，不将其 UT1 日期直接解释为 UTC。不同的 JD 浮点路径可相差约 40 微秒，并被分盘或多年运期放大；测试上升／分盘按分度放宽数值容差，达沙起点允许 1 秒差。
 
@@ -206,18 +206,18 @@ v24的Aiyar比较使用每张名义分盘和每个生时变体自己的同一原
 uv venv --python 3.12 /tmp/fatebridge-jyotish-oracle
 uv pip install --python /tmp/fatebridge-jyotish-oracle/bin/python --no-deps PyJHora==4.8.7 pyswisseph==2.10.3.2 numpy pandas
 uv pip install --python /tmp/fatebridge-jyotish-oracle/bin/python geocoder geopy python-dateutil timezonefinder scipy pytz requests
-/tmp/fatebridge-jyotish-oracle/bin/python scripts/gen_jyotish_reference.py
-uv run --locked --extra dev pytest -q tests/test_jyotish.py tests/test_jyotish_reference.py tests/test_jyotish_transports.py
+/tmp/fatebridge-jyotish-oracle/bin/python -m scripts.jyotish.gen_jyotish_reference
+uv run --locked --extra dev pytest -q tests/jyotish/test_jyotish.py tests/jyotish/test_jyotish_reference.py tests/jyotish/test_jyotish_transports.py
 ```
 
 NASA 数据重取及独立检查（普通测试使用冻结数据，无需联网）：
 
 ```bash
-uv run --locked --extra dev python scripts/gen_jyotish_horizons_reference.py
-uv run --locked --extra dev pytest -q tests/test_jyotish_independent_audit.py
+uv run --locked --extra dev python -m scripts.jyotish.gen_jyotish_horizons_reference
+uv run --locked --extra dev pytest -q tests/jyotish/test_jyotish_independent_audit.py
 ```
 
-`tests/test_jyotish_transports.py` 通过真实 REST、原生 MCP 协议及 CLI 验证配置和输出。上述验证证明所声明口径下的工程一致性，不认证传统解释或现实预测。
+`tests/jyotish/test_jyotish_transports.py` 通过真实 REST、原生 MCP 协议及 CLI 验证配置和输出。上述验证证明所声明口径下的工程一致性，不认证传统解释或现实预测。
 
 ## 现实预测研究
 
@@ -246,7 +246,7 @@ uv run --locked --extra dev pytest -q tests/test_jyotish_independent_audit.py
 
 ```bash
 # 用明确配置的独立参考环境运行生成器；普通测试不重建期望数据。
-uv run --locked --extra dev pytest -q tests/test_jyotish_sthana.py tests/test_jyotish_transports.py
+uv run --locked --extra dev pytest -q tests/jyotish/test_jyotish_sthana.py tests/jyotish/test_jyotish_transports.py
 ```
 
 查看完整位置分量的虚构示例：

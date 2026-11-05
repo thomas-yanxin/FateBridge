@@ -1,7 +1,7 @@
 {
   "call_guidance": {
     "birth_clock": "numerology_evidence.birth_clock保存同次民用时刻、UTC瞬间、所选计算钟面、经度来源与是否使用。钟表时未给经度为null；太阳钟面不是新的物理瞬间。可用birth_clock视图读取。",
-    "body_relations": "judge.deTi按年柱纳音与先后天实际上下体、两互体分列五行关系，完整present=null。旧日干查卦位于judge.day_stem_mapping，不再称为得体。第51页generating_qi必须同时满足无元气且卦体生纳音；第87页双向相生另列，不能反向覆盖。金人、土人口径及完整得体、合理仍待核。",
+    "body_relations": "judge.deTi按年柱纳音与先后天实际上下体、两互体分列五行关系，完整present=null。第51页generating_qi必须同时满足无元气且卦体生纳音；第87页双向相生另列，不能反向覆盖。金人、土人口径及完整得体、合理仍待核。",
     "body_structure": "body_structure视图按逐阶段实际六爻返回渐卦段的八条结构记录，区分三爻倒序、上下互体、全卦倒序及抽第三爻移顶。八条含六个三爻体及两个六爻卦，不是八个互体；literal_case_match为false时只是明确算子推演，不能称该卦原例已核。五命干支字表不自动选柱或用年纳音替代。此层不替换deTi或后天换卦，不直接裁定葉否。",
     "evidence": "按实际chart元堂读取numerology_evidence的轨迹、条文、来源和未决规则；judge.xie仅基础命中，不能选定葉者或不葉者分支。",
     "known_inputs": "出生时间与性别须明确提供；空白时间不能补零点。时间字段是当地钟时，时区放zone；显式零点有效。真太阳时默认开启，须明确lon或gps_lon；GPS优先，0度有效。缺失不可套上海或0度，不为通过调用自动改为钟表时。",
@@ -32,11 +32,10 @@
         "four_pillars",
         "judge.deTi",
         "judge.deTi_policy",
-        "judge.day_stem_mapping",
         "numerology_evidence.rulesets",
         "numerology_evidence.unresolved_rules"
       ],
-      "purpose": "核对年纳音、实际上下及互体的有向五行关系、无元气前提；完整得体未决，旧日干映射另列。"
+      "purpose": "核对年纳音、实际上下及互体的有向五行关系、无元气前提；完整得体仍未决。"
     },
     "body_structure": {
       "fields": [

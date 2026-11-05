@@ -83,6 +83,11 @@ def inspect_markdown(text: str) -> Document:
 
 def markdown_paths() -> list[Path]:
     paths = set(ROOT.glob("*.md")) | set((ROOT / "skills").rglob("*.md"))
+    paths.update(
+        path
+        for path in (ROOT / "scripts/README.md", ROOT / "tests/README.md")
+        if path.is_file()
+    )
     for current, directories, files in os.walk(ROOT / "docs", followlinks=False):
         directories[:] = [
             name

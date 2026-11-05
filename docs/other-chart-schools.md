@@ -44,7 +44,7 @@ Gauquelin是36个顺时针分区，十二宫公开接口拒绝其名称，不静
 
 ```bash
 uv run --locked --extra dev python -m fatebridge.fetch_ephe --years 1800 2500
-uv run --locked --extra dev pytest -q tests/test_other_chart_physical_sources.py
+uv run --locked --extra dev pytest -q tests/western/test_other_chart_physical_sources.py
 ```
 
 三端用 `error_code=ephemeris_source_inconsistent`、HTTP 503 和 `retryable=false` 表达这类运行数据问题；`issues` 的 `runtime.ephemeris_data` 给出 `model_changed`、`edition_changed` 或文件变更等具名原因。它不是出生资料有误，也不再被“错误文字含 ephemeris”这一通用规则抹成缺依赖。补齐范围数据并重新加载运行时后再执行同一请求；不通过缩短区间、删除样点或改容许度获得通过。
@@ -262,14 +262,14 @@ uv run --locked --extra dev fatebridge astro_chart13 \
   --strict-fields --no-include-snapshot-text
 
 uv run --locked --extra dev pytest -q \
-  tests/test_other_chart_physical_sources.py tests/test_other_chart_historical_reference.py \
-  tests/test_ephemeris_source_errors.py tests/test_runtime_and_errors.py \
-  tests/test_other_chart_clock_basis.py tests/test_other_chart_birth_seconds.py tests/test_other_chart_two_factor.py \
-  tests/test_other_chart_orbit_sources.py tests/test_ephemeris_runtime.py \
-  tests/test_other_chart_meridian_houses.py tests/test_other_chart_meridian_transports.py tests/test_other_chart_meridian_native_clock.py \
-  tests/test_other_chart_day_meridian.py tests/test_other_chart_solar_arc.py tests/test_other_chart_sensitivity.py \
-  tests/test_other_chart_depth.py tests/test_other_chart_schools.py tests/test_other_chart_schools_transports.py
-uv run --locked --extra dev python -m scripts.audit_other_chart_schools \
+  tests/western/test_other_chart_physical_sources.py tests/western/test_other_chart_historical_reference.py \
+  tests/astronomy/test_contract_regressions.py tests/integration/test_runtime_and_errors.py \
+  tests/western/test_other_chart_clock_basis.py tests/western/test_other_chart_birth_seconds.py tests/western/test_contract_regressions.py \
+  tests/western/test_other_chart_orbit_sources.py tests/astronomy/test_ephemeris_runtime.py \
+  tests/western/test_other_chart_meridian_houses.py tests/western/test_contract_regressions.py tests/western/test_other_chart_meridian_native_clock.py \
+  tests/western/test_other_chart_day_meridian.py tests/western/test_other_chart_solar_arc.py tests/western/test_other_chart_sensitivity.py \
+  tests/western/test_other_chart_depth.py tests/western/test_other_chart_schools.py tests/western/test_other_chart_schools_transports.py
+uv run --locked --extra dev python -m scripts.western.audit_other_chart_schools \
   --output /tmp/fatebridge-other-chart-schools-current.json
 uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 ```
@@ -278,7 +278,7 @@ uv run --locked --extra dev python scripts/build_codex_call_contracts.py --check
 
 ```bash
 uv run --locked --extra dev python -m fatebridge.fetch_ephe
-uv run --locked --extra dev pytest -q tests/test_other_chart_historical_reference.py
+uv run --locked --extra dev pytest -q tests/western/test_other_chart_historical_reference.py
 ```
 
 没有星历文件时的 Moshier 回退必须单独报告：海王星误差约 1.097″，超出预定的 1″ 门槛，不能改容许度或省略此案例。使用已核验星历文件后重跑的结果也必须保留实际模型和文件哈希；文件完整性本身不是天文精度保证。固定TT检查与共享审计中的57项出版社参考分列，但同样纳入 `numerical_subset_checks_passed`：当前 Moshier 报告返回失败，已核验 Swiss 数据报告返回通过。原典整例和现实预测仍未据此验收。
@@ -317,7 +317,7 @@ REST 把业务参数放请求体，`fields/strict_fields/include_snapshot_text` 
 ```bash
 curl --fail --location 'https://a182559.uranus.1blu.de/data/public/4b5ecc.php?dl=true' \
   --output /tmp/witte-ephemeris-2026.pdf
-uv run --locked --extra dev python scripts/gen_uranian_witte_reference.py \
+uv run --locked --extra dev python -m scripts.western.gen_uranian_witte_reference \
   --pdf /tmp/witte-ephemeris-2026.pdf --check
 ```
 
@@ -336,8 +336,8 @@ Moshier模型有明确未通过事实：既有240组对照中76项超限、最�
 当前原始响应可由维护中的独立ERFA／NumPy生成器重新解析及归算，无须保存旧FateBridge实现或源码AST。检查保留位置、两框架速度、全部差分与步长不确定度；不访问NASA。uv首次准备独立依赖可能联网。
 
 ```bash
-uv run --locked --extra dev python scripts/audit_moshier_frames.py --output /tmp/fatebridge-motion-audit.json
-env -u PYTHONPATH uv run --no-project --python 3.12 --with pyerfa==2.0.1.5 --with numpy==2.5.4 python scripts/verify_moshier_frame_reference.py --output /tmp/fatebridge-motion-reference-check.json
+uv run --locked --extra dev python -m scripts.astronomy.audit_moshier_frames --output /tmp/fatebridge-motion-audit.json
+env -u PYTHONPATH uv run --no-project --python 3.12 --with pyerfa==2.0.1.5 --with numpy==2.5.4 python -m scripts.astronomy.verify_moshier_frame_reference --output /tmp/fatebridge-motion-reference-check.json
 ```
 
 审计退出1表示实际数值超限，退出2表示来源或参考未完备。来源完整性、原典整例、真实模型解释和现实预测分别验收。

@@ -236,7 +236,7 @@
 
 ## 覆盖核对清单
 
-以下工具集合必须恰好等于 `tool_catalog.CATALOG` 全集（由 `tests/test_scenario_routing_coverage.py` 在 CI 锁定）。新增工具若未在此登记，CI 失败。格式：`- tool_key — 归属`。
+以下工具集合必须恰好等于 `tool_catalog.CATALOG` 全集（由 `tests/integration/test_scenario_routing_coverage.py` 在 CI 锁定）。新增工具若未在此登记，CI 失败。格式：`- tool_key — 归属`。
 
 - `analyze_destiny` — 命格综合主证
 - `bazi_birth` — 核心命盘

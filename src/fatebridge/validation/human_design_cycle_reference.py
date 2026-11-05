@@ -22,7 +22,7 @@ def independent_cycle_checks(root: Path) -> dict[str, Any]:
     reference = json.loads(reference_path.read_text())
     if reference["plan_sha256"] != hashlib.sha256(plan_path.read_bytes()).hexdigest():
         raise ValueError("Cycle reference plan changed")
-    generator = root / "scripts/gen_human_design_cycles_reference.py"
+    generator = root / "scripts/human_design/gen_human_design_cycles_reference.py"
     if (
         reference["generator_sha256"]
         != hashlib.sha256(generator.read_bytes()).hexdigest()

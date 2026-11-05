@@ -40,7 +40,7 @@ JPL原始文件头范围是TDB，返回`range_time_scale=TDB`及`start_julian_da
 
 `ephemeris_backend_comparison`实际用对照后端重算26项激活并独立求出自身设计根。两盘的设计TT可不同，因此差值包含求根位移，不能当成同一TT的位置误差。`reference_chart`保留参考坐标、旗标、时标和结构；主盘不被替换。所选天体已为Moshier时返回`same_backend_not_independent`；对照不可用不能记成零差。
 
-[预声明天文计划](../tests/fixtures/human-design-astronomy-plan.json)保留1800–2399年的122个出生TT。[独立DE440生成器](../scripts/gen_human_design_astronomy_reference.py)不导入FateBridge或Swiss，分别求122个设计根，两时刻十个物理目标共2,440位置。[原参考](../tests/fixtures/human-design-astronomy-de440.json)及[18个Horizons锚点](../tests/fixtures/human-design-astronomy-horizons.json)保留原数值与出处。
+[预声明天文计划](../tests/fixtures/human-design-astronomy-plan.json)保留1800–2399年的122个出生TT。[独立DE440生成器](../scripts/human_design/gen_human_design_astronomy_reference.py)不导入FateBridge或Swiss，分别求122个设计根，两时刻十个物理目标共2,440位置。[原参考](../tests/fixtures/human-design-astronomy-de440.json)及[18个Horizons锚点](../tests/fixtures/human-design-astronomy-horizons.json)保留原数值与出处。
 
 原门槛是同TT位置2角秒、设计根5秒。当前Swiss文件后端通过这批2,440位置及122根；Moshier保留228项位置超差、1项跨线、8项Color、22项Tone及77项Base差异。Moshier设计根通过5秒不弥补其它天体位置超差。该有限样本不建立全时域或临界细分误差界。
 
@@ -124,7 +124,7 @@ uv run --locked --extra dev python -m fatebridge.fetch_ephe --profile human_desi
 同原封存DE440参考、原1200时刻双侧10天体、原2角秒门槛的24000位置均符合，最大差0.038386角秒。候选自己的全部1200设计根也在原5秒门槛内，最大差0.055442秒；人格TT及自身设计根的24000位置在原2角秒线内，最大差0.053665角秒。原Swiss的1项失败与Moshier的2238项失败仍单列；没有改参考、删太阳近旁点或调整门槛。该有限队列比较不证明全域物理误差界、原版软件模型或现实效度。
 
 ```bash
-uv run --locked --extra dev python scripts/audit_hd_point_mass.py --output /tmp/hd-point-mass.json
+uv run --locked --extra dev python -m scripts.human_design.audit_hd_point_mass --output /tmp/hd-point-mass.json
 ```
 
 ## 调用与复核
@@ -139,8 +139,8 @@ uv run --locked --extra dev fatebridge human_design \
   --strict-fields --include-snapshot-text false
 
 uv run --locked --extra dev pytest -q -n0 \
-  tests/test_human_design_astronomy.py tests/test_human_design_cycle_phase.py \
-  tests/test_ephemeris_thread_paths.py
+  tests/human_design/test_human_design_astronomy.py tests/human_design/test_human_design_cycle_phase.py \
+  tests/astronomy/test_ephemeris_thread_paths.py
 ```
 
 示例是虚构工程输入。离线包验证、当前本地三端协议和真实模型答复分别验收；任何一项通过不自动证明其它层。

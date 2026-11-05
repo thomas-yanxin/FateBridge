@@ -93,9 +93,9 @@ uv run --locked --extra dev fatebridge sixyao \
 历表共 73,049 天，日干支 146,098 次及可用农历 72,723 次比较无差异。2100-02-09 至 2100-12-31 的 326 天超出当前离线农历支持范围，仍计入队列并单列缺失；1900-01-31 起的 335 个支持日期没有此套天文台年表参考。审计程序保留错误、差异、缺失和运行期间代码变更，不能静默剔除或重写期望值。
 
 ```bash
-uv run --locked --extra dev python scripts/build_liuyao_scan_profile.py --check
-uv run --locked --extra dev python scripts/audit_liuyao_calendar.py --output /tmp/liuyao-calendar-v3.json
-uv run --locked --extra dev pytest -q tests/test_liuyao_scan_depth.py tests/test_liuyao_calendar_audit.py tests/test_liuyao_transports.py
+uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_scan_profile --check
+uv run --locked --extra dev python -m scripts.liuyao.audit_liuyao_calendar --output /tmp/liuyao-calendar-v3.json
+uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_scan_depth.py tests/liuyao/test_liuyao_calendar_audit.py tests/liuyao/test_liuyao_transports.py
 ```
 
 真实模型运行需用户明确授权独立代理后执行下列入口，完成后还须逐条语义审阅原始回答；预先保存案例文件哈希，保留失败和未恢复错误。
@@ -123,8 +123,8 @@ uv run --locked --extra dev python scripts/evaluate_agent.py \
 所有古例仅核结构与条件，不恢复未给的公历年份，不评分原书疾病或人生结局。元忌路径进入同次计算生成的摘要；23个条件并不等于23个独立验证样本，更不等于全书规则或真实模型解释已验收。
 
 ```bash
-uv run --locked --extra dev python scripts/build_liuyao_role_profile.py --check
-uv run --locked --extra dev pytest -q tests/test_liuyao_roles.py tests/test_liuyao_transports.py
+uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_role_profile --check
+uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_roles.py tests/liuyao/test_liuyao_transports.py
 ```
 
 ## 有根生扶、三墓及冲开条件
@@ -151,9 +151,9 @@ uv run --locked --extra dev pytest -q tests/test_liuyao_roles.py tests/test_liuy
 结合1901–2100年完整队列，当前1900-01-31至2100-02-08的73,058个支持日期都有所列独立发布表的正午标签参照；2100-02-09至12-31的326天仍保留为农历不可用，1900-01-01至01-30的30天也未冒称获得支持。补充审计锁定335个日期，生产范围若缩小就拒绝验收，并检查失败、缺失和审计期间代码／资料变更。这只闭合指定民用日期标签队列，不能授予全历法满分。
 
 ```bash
-uv run --locked --extra dev python scripts/build_liuyao_strength_profile.py --check
-uv run --locked --extra dev pytest -q tests/test_liuyao_strength.py tests/test_liuyao_roles.py tests/test_liuyao_transports.py
-uv run --locked --extra dev python scripts/audit_liuyao_1900.py --output /tmp/liuyao-calendar-1900-v5.json
+uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_strength_profile --check
+uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_strength.py tests/liuyao/test_liuyao_roles.py tests/liuyao/test_liuyao_transports.py
+uv run --locked --extra dev python -m scripts.liuyao.audit_liuyao_1900 --output /tmp/liuyao-calendar-1900-v5.json
 ```
 
 ## 卦体、内外卦与动爻的反伏
@@ -175,8 +175,8 @@ uv run --locked --extra dev python scripts/audit_liuyao_1900.py --output /tmp/li
 4,096种本变卦结构遍历核对实际动爻与变支，另有24,576组元忌路径结构校验；这些遍历不是独立原典案例。完整原典和自由模型解释仍未获整体验收。
 
 ```bash
-uv run --locked --extra dev python scripts/build_liuyao_fanfu_profile.py --check
-uv run --locked --extra dev pytest -q tests/test_liuyao_fanfu.py tests/test_liuyao_transports.py
+uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_fanfu_profile --check
+uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_fanfu.py tests/liuyao/test_liuyao_transports.py
 ```
 
 ## 空亡、回头克来源及时间层
@@ -216,8 +216,8 @@ uv run --locked --extra dev pytest -q tests/test_liuyao_fanfu.py tests/test_liuy
 2026、2100两年抽段另有730日、1,460次日干支及730次农历比较，所比字段无差异；其中326日仍与生产补充同源。这不是新增独立来源，也不代替73,384日完整日期队列。
 
 ```bash
-uv run --locked --extra dev python scripts/build_liuyao_void_profile.py --check
-uv run --locked --extra dev pytest -q tests/test_liuyao_void.py tests/test_liuyao_roles.py tests/test_liuyao_transports.py
+uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_void_profile --check
+uv run --locked --extra dev pytest -q tests/liuyao/test_liuyao_void.py tests/liuyao/test_liuyao_roles.py tests/liuyao/test_liuyao_transports.py
 ```
 
 ## 动静对象、弱动克旺静与受克传递
@@ -235,8 +235,8 @@ uv run --locked --extra dev pytest -q tests/test_liuyao_void.py tests/test_liuya
 REST、原生MCP、CLI、部分字段投影、同次完整缓存和快照分别验证；快照明确写出活动扶源待审及静爻克制受阻。该范围仍未完成全书与全局强弱验收，条件层也不把原始日冲提示自动升级为最终受伤结论。
 
 ```bash
-uv run --locked --extra dev python scripts/build_liuyao_control_profile.py --check
-uv run --locked --extra dev python -m pytest -q tests/test_liuyao_control.py tests/test_liuyao_control_transports.py
+uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_control_profile --check
+uv run --locked --extra dev python -m pytest -q tests/liuyao/test_liuyao_control.py tests/liuyao/test_liuyao_control_transports.py
 ```
 
 ## 固定资料与复现
@@ -247,9 +247,9 @@ uv run --locked --extra dev python -m pytest -q tests/test_liuyao_control.py tes
 - [香港天文台 2026 对照表](https://www.hko.gov.hk/tc/gts/time/calendar/text/files/T2026c.txt)冻结于 历表（本地数据：`../tests/fixtures/liuyao-hko-2026.txt`）。节气只核对发布日期；精确交接瞬间的前后分界是引擎边界回归，不能把日期表当作秒级外部精度证据。
 
 ```bash
-uv run --locked --extra dev python scripts/build_zhouyi_corpus.py --check
-uv run --locked --extra dev python scripts/build_liuyao_sources.py --check
-uv run --locked --extra dev python -m pytest -q tests/test_liuyao_depth.py tests/test_liuyao_conditions.py tests/test_liuyao_transports.py
+uv run --locked --extra dev python -m scripts.catalogs.build_zhouyi_corpus --check
+uv run --locked --extra dev python -m scripts.liuyao.build_liuyao_sources --check
+uv run --locked --extra dev python -m pytest -q tests/liuyao/test_liuyao_depth.py tests/liuyao/test_liuyao_conditions.py tests/liuyao/test_liuyao_transports.py
 uv run --locked --extra dev fatebridge sixyao --subject-file docs/examples/liuyao-need-to-song.json --response-char-limit 0
 ```
 
@@ -297,7 +297,7 @@ uv run --locked --extra dev fatebridge sixyao --subject-file docs/examples/liuya
 
 ## 现实预测的下一验收条件
 
-使用现有 [预注册评估器](../src/fatebridge/validation/predictions.py)和 [离线评估入口](../scripts/audit_prediction_study.py)：先冻结问题定义、起卦输入、规则版本、解释到预测的映射、样本队列、时间窗和朴素基线，再在结果未知时保存预测，待时间窗成熟后独立判定结果。保留弃答、缺失及失败案例；报告覆盖率、样本数、校准、Brier 分数、基线差值与区间。不能事后改用神、反复起卦择优、挑中例、改评价问题，或将六爻规则分数直接转成成功概率。
+使用现有 [预注册评估器](../src/fatebridge/validation/predictions.py)和 [离线评估入口](../scripts/evaluation/audit_prediction_study.py)：先冻结问题定义、起卦输入、规则版本、解释到预测的映射、样本队列、时间窗和朴素基线，再在结果未知时保存预测，待时间窗成熟后独立判定结果。保留弃答、缺失及失败案例；报告覆盖率、样本数、校准、Brier 分数、基线差值与区间。不能事后改用神、反复起卦择优、挑中例、改评价问题，或将六爻规则分数直接转成成功概率。
 
 目前没有为本规则集登记这样的独立前瞻资料，故现实效力为 `not_established`。即使有限样本全部命中，区间和未观测条件仍须报告；评估器、文本哈希、可复现运行本身均不能授予“最权威预测系统”资格。
 
@@ -354,6 +354,6 @@ uv run --locked --extra dev fatebridge sixyao --subject-file docs/examples/liuya
 
 `routing_conditions.routes[].legacy_source_path` 指向同一次计算的 `role_effects.chains` 索引。后者保留角色结构路径，前者另列活动、受生、出力及阻断资格；两层都是当前事实及其关联，路径条件匹配不等于完整化解或现实成功。
 
-本位金化巳的长生／回头克资格未明时，伏神的可能受克列表仍保留该来源，受生门槛继续待决；旺衰的生扶来源也进入待决项。已确认回头克仍阻断，月破日克且无独立根仍按原门槛核对。当前反例可查[伏神待决测试](../tests/test_liuyao_hidden_pending_control.py)与[生源待决测试](../tests/test_liuyao_pending_strength.py)。
+本位金化巳的长生／回头克资格未明时，伏神的可能受克列表仍保留该来源，受生门槛继续待决；旺衰的生扶来源也进入待决项。已确认回头克仍阻断，月破日克且无独立根仍按原门槛核对。当前反例可查[伏神待决测试](../tests/liuyao/test_liuyao_hidden_pending_control.py)与[生源待决测试](../tests/liuyao/test_liuyao_pending_strength.py)。
 
 所核117个引用对象中仅16个完成该组勘误核对；全部960种阶段查询属于有限结构队列，不代表全书或现实占验。原五例解释研究及20条标准的18／20覆盖结果保留，另有环境未评情形；不能把规则或协议测试通过记作解释满分或现实预测认证。
